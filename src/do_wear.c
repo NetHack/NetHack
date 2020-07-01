@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1586125907 2020/04/05 22:31:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1592951498 2020/06/23 22:31:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2071,13 +2071,13 @@ struct obj *obj;
          * to change so armor's +/- value is evident via the status line.
          * We used to set it here because of that, but then it would stick
          * if a nymph stole the armor before it was fully worn.  Delay it
-         * until the aftermv action.  The player may still know this armor's
+         * until the afternmv action.  The player may still know this armor's
          * +/- amount if donning gets interrupted, but the hero won't.
          *
         obj->known = 1;
          */
         setworn(obj, mask);
-        /* if there's no delay, we'll execute 'aftermv' immediately */
+        /* if there's no delay, we'll execute 'afternmv' immediately */
         if (obj == uarm)
             g.afternmv = Armor_on;
         else if (obj == uarmh)
@@ -2101,7 +2101,7 @@ struct obj *obj;
             g.multi_reason = "dressing up";
             g.nomovemsg = "You finish your dressing maneuver.";
         } else {
-            unmul(""); /* call aftermv, clear it+nomovemsg+multi_reason */
+            unmul(""); /* call afternmv, clear it+nomovemsg+multi_reason */
             on_msg(obj);
         }
         g.context.takeoff.mask = g.context.takeoff.what = 0L;

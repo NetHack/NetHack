@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1591017419 2020/06/01 13:16:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1593306909 2020/06/28 01:15:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,6 +21,7 @@ static struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
 static struct obj *FDECL(make_corpse, (struct monst *, unsigned));
 static int FDECL(minliquid_core, (struct monst *));
 static void FDECL(m_detach, (struct monst *, struct permonst *));
+static void FDECL(set_mon_min_mhpmax, (struct monst *, int));
 static void FDECL(lifesaved_monster, (struct monst *));
 static void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
 static boolean FDECL(ok_to_obliterate, (struct monst *));
@@ -55,6 +56,16 @@ const char *msg;
                        mtmp->mnum, mndx, msg);
             mtmp->mnum = mndx;
         }
+        /* check before DEADMONSTER() because dead monsters should still
+           have sane mhpmax */
+        if (mtmp->mhpmax < 1
+            || mtmp->mhpmax < (int) mtmp->m_lev + 1
+            || mtmp->mhp > mtmp->mhpmax)
+            impossible(
+                     "%s: level %d monster #%u [%s] has %d cur HP, %d max HP",
+                       msg, (int) mtmp->m_lev,
+                       mtmp->m_id, fmt_ptr((genericptr_t) mtmp),
+                       mtmp->mhp, mtmp->mhpmax);
         if (DEADMONSTER(mtmp)) {
 #if 0
             /* bad if not fmons list or if not vault guard */
@@ -2007,6 +2018,26 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     iflags.purge_monsters++;
 }
 
+/* give a life-saved monster a reasonable mhpmax value in case it has
+   been the victim of excessive life draining */
+static void
+set_mon_min_mhpmax(mon, minimum_mhpmax)
+struct monst *mon;
+int minimum_mhpmax; /* monster life-saving has traditionally used 10 */
+{
+    /* can't be less than m_lev+1 (if we just used m_lev itself, level 0
+       monsters would end up allowing a minimum of 0); since life draining
+       reduces m_lev, this usually won't give the monster much of a boost */
+    if (mon->mhpmax < (int) mon->m_lev + 1)
+        mon->mhpmax = (int) mon->m_lev + 1;
+    /* caller can specify an alternate minimum; we'll honor it iff it is
+       greater than m_lev+1; the traditional arbitrary value of 10 always
+       gives level 0 and level 1 monsters a boost and has a moderate
+       chance of doing so for level 2, a tiny chance for levels 3..9 */
+    if (mon->mhpmax < minimum_mhpmax)
+        mon->mhpmax = minimum_mhpmax;
+}
+
 /* find the worn amulet of life saving which will save a monster */
 struct obj *
 mlifesaver(mon)
@@ -2057,8 +2088,7 @@ struct monst *mtmp;
         if (mtmp->mtame && !mtmp->isminion) {
             wary_dog(mtmp, !surviver);
         }
-        if (mtmp->mhpmax <= 0)
-            mtmp->mhpmax = 10;
+        set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(mtmp->m_lev+1,10) */
         mtmp->mhp = mtmp->mhpmax;
 
         if (!surviver) {
@@ -2115,8 +2145,7 @@ register struct monst *mtmp;
                     spec_death ? "reconstitutes" : "transforms");
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
-            if (mtmp->mhpmax <= 0)
-                mtmp->mhpmax = 10;
+            set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
             mtmp->mhp = mtmp->mhpmax;
             /* mtmp==u.ustuck can happen if previously a fog cloud
                or poly'd hero is hugging a vampire bat */
@@ -2731,8 +2760,7 @@ struct monst *mtmp;
                     surface(x,y));
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
-            if (mtmp->mhpmax <= 0)
-                mtmp->mhpmax = 10;
+            set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
             mtmp->mhp = mtmp->mhpmax;
             /* this can happen if previously a fog cloud */
             if (u.uswallow && (mtmp == u.ustuck))
@@ -2766,8 +2794,7 @@ struct monst *mtmp;
            they revert to innate shape rather than become a statue */
         mtmp->mcanmove = 1;
         mtmp->mfrozen = 0;
-        if (mtmp->mhpmax <= 0)
-            mtmp->mhpmax = 10;
+        set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(mtmp->m_lev+1,10) */
         mtmp->mhp = mtmp->mhpmax;
         (void) newcham(mtmp, &mons[mtmp->cham], FALSE, TRUE);
         newsym(mtmp->mx, mtmp->my);

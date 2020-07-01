@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1590343774 2020/05/24 18:09:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1592875138 2020/06/23 01:18:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -324,7 +324,11 @@ doread()
     } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         const char *what = 0;
 
-        if (scroll->oclass == SPBOOK_CLASS)
+        if (scroll->otyp == SPE_NOVEL)
+            /* unseen novels are already distinguishable from unseen
+               spellbooks so this isn't revealing any extra information */
+            what = "words";
+        else if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
         else if (!scroll->dknown)
             what = "formula on the scroll";

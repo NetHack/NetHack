@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1581886858 2020/02/16 21:00:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1593611274 2020/07/01 13:47:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1337,11 +1337,21 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         }
     }
     if (spec_ability(otmp, SPFX_DRLI)) {
-        /* some non-living creatures (golems, vortices) are
-           vulnerable to life drain effects */
+        /* some non-living creatures (golems, vortices) are vulnerable to
+           life drain effects so can get "<Arti> draws the <life>" feedback */
         const char *life = nonliving(mdef->data) ? "animating force" : "life";
 
         if (!youdefend) {
+            int m_lev = (int) mdef->m_lev, /* will be 0 for 1d4 mon */
+                mhpmax = mdef->mhpmax,
+                drain = monhp_per_lvl(mdef); /* usually 1d8 */
+                /* note: DRLI attack uses 2d6, attacker doesn't get healed */
+
+            /* stop draining HP if it drops too low (still drains level;
+               also caller still inflicts regular weapon damage) */
+            if (mhpmax - drain <= m_lev)
+                drain = (mhpmax > m_lev) ? (mhpmax - (m_lev + 1)) : 0;
+
             if (vis) {
                 if (otmp->oartifact == ART_STORMBRINGER)
                     pline_The("%s blade draws the %s from %s!",
@@ -1355,21 +1365,20 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                 /* losing a level when at 0 is fatal */
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
             } else {
-                int drain = monhp_per_lvl(mdef);
-
                 *dmgptr += drain;
                 mdef->mhpmax -= drain;
                 mdef->m_lev--;
-                drain /= 2;
-                if (drain) {
-                    /* attacker heals in proportion to amount drained */
-                    if (youattack) {
-                        healup(drain, 0, FALSE, FALSE);
-                    } else {
-                        magr->mhp += drain;
-                        if (magr->mhp > magr->mhpmax)
-                            magr->mhp = magr->mhpmax;
-                    }
+            }
+
+            if (drain > 0) {
+                /* drain: was target's damage, now heal attacker by half */
+                drain = (drain + 1) / 2; /* drain/2 rounded up */
+                if (youattack) {
+                    healup(drain, 0, FALSE, FALSE);
+                } else {
+                    magr->mhp += drain;
+                    if (magr->mhp > magr->mhpmax)
+                        magr->mhp = magr->mhpmax;
                 }
             }
             return vis;
@@ -1389,7 +1398,7 @@ int dieroll; /* needed for Magicbane and vorpal blades */
                       life);
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
-                magr->mhp += (oldhpmax - u.uhpmax) / 2;
+                magr->mhp += (oldhpmax - u.uhpmax + 1) / 2;
                 if (magr->mhp > magr->mhpmax)
                     magr->mhp = magr->mhpmax;
             }
@@ -1938,6 +1947,12 @@ struct obj **objp; /* might be destroyed or unintentionally dropped */
 boolean loseit;    /* whether to drop it if hero can longer touch it */
 {
     struct obj *obj = *objp;
+
+    /* allow hero in silver-hating form to try to perform invocation ritual */
+    if (obj->otyp == BELL_OF_OPENING
+        && invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
+        return 1;
+    }
 
     if (touch_artifact(obj, &g.youmonst)) {
         char buf[BUFSZ];

@@ -42,7 +42,7 @@ static void FDECL(process_options, (int argc, char **argv));
 static void NDECL(nhusage);
 
 #if defined(MICRO) || defined(OS2)
-extern void FDECL(nethack_exit, (int));
+extern void FDECL(nethack_exit, (int)) NORETURN;
 #else
 #define nethack_exit exit
 #endif

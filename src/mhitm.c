@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1583608838 2020/03/07 19:20:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1593614973 2020/07/01 14:49:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -984,7 +984,7 @@ int dieroll;
                 /* artifact_hit updates 'tmp' but doesn't inflict any
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
-               if (DEADMONSTER(mdef))
+                if (DEADMONSTER(mdef))
                     return (MM_DEF_DIED
                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             }
@@ -1286,22 +1286,32 @@ int dieroll;
         }
         if (!tele_restrict(magr)) {
             boolean couldspot = canspotmon(magr);
+
             (void) rloc(magr, TRUE);
             if (g.vis && couldspot && !canspotmon(magr))
                 pline("%s suddenly disappears!", buf);
         }
         break;
-    case AD_DRLI:
+    case AD_DRLI: /* drain life */
         if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
-            tmp = d(2, 6);
+            tmp = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
             if (g.vis && canspotmon(mdef))
-                pline("%s suddenly seems weaker!", Monnam(mdef));
-            mdef->mhpmax -= tmp;
-            if (mdef->m_lev == 0)
+                pline("%s becomes weaker!", Monnam(mdef));
+            if (mdef->mhpmax - tmp > (int) mdef->m_lev) {
+                mdef->mhpmax -= tmp;
+            } else {
+                /* limit floor of mhpmax reduction to current m_lev + 1;
+                   avoid increasing it if somehow already less than that */
+                if (mdef->mhpmax > (int) mdef->m_lev)
+                    mdef->mhpmax = (int) mdef->m_lev + 1;
+            }
+            if (mdef->m_lev == 0) /* automatic kill if drained past level 0 */
                 tmp = mdef->mhp;
             else
                 mdef->m_lev--;
-            /* Automatic kill if drained past level 0 */
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
         }
         break;
     case AD_SSEX:

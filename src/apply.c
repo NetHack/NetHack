@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1582155875 2020/02/19 23:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1593614972 2020/07/01 14:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.325 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1034,9 +1034,9 @@ struct obj **optr;
     struct monst *mtmp;
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
-            invoking =
-                (obj->otyp == BELL_OF_OPENING && invocation_pos(u.ux, u.uy)
-                 && !On_stairs(u.ux, u.uy));
+            invoking = (obj->otyp == BELL_OF_OPENING
+                        && invocation_pos(u.ux, u.uy)
+                        && !On_stairs(u.ux, u.uy));
 
     You("ring %s.", the(xname(obj)));
 
@@ -3654,11 +3654,10 @@ doapply()
         } else if (!ublindf) {
             Blindf_on(obj);
         } else {
-            You("are already %s.", ublindf->otyp == TOWEL
-                                       ? "covered by a towel"
-                                       : ublindf->otyp == BLINDFOLD
-                                             ? "wearing a blindfold"
-                                             : "wearing lenses");
+            You("are already %s.",
+                (ublindf->otyp == TOWEL) ? "covered by a towel"
+                : (ublindf->otyp == BLINDFOLD) ? "wearing a blindfold"
+                  : "wearing lenses");
         }
         break;
     case CREAM_PIE:

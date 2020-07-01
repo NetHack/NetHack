@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1591178399 2020/06/03 09:59:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1593306908 2020/06/28 01:15:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1583,6 +1583,7 @@ struct monst *mtmp;
     if (!has_omonst(obj))
         newomonst(obj);
     if (has_omonst(obj)) {
+        int baselevel = mtmp->data->mlevel;
         struct monst *mtmp2 = OMONST(obj);
 
         *mtmp2 = *mtmp;
@@ -1600,6 +1601,16 @@ struct monst *mtmp;
         /* if mtmp is a long worm with segments, its saved traits will
            be one without any segments */
         mtmp2->wormno = 0;
+        /* mtmp might have been killed by repeated life draining; make sure
+           mtmp2 can survive if revived ('baselevel' will be 0 for 1d4 mon) */
+        if (mtmp2->mhpmax <= baselevel)
+            mtmp2->mhpmax = baselevel + 1;
+        /* mtmp is assumed to be dead but we don't kill it or its saved
+           traits, just force those to have a sane value for current HP */
+        if (mtmp2->mhp > mtmp2->mhpmax)
+            mtmp2->mhp = mtmp2->mhpmax;
+        if (mtmp2->mhp < 1)
+            mtmp2->mhp = 0;
     }
     return obj;
 }

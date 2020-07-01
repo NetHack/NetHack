@@ -28,7 +28,7 @@ char *FDECL(translate_path_variables, (const char *, char *));
 char *NDECL(exename);
 boolean NDECL(fakeconsole);
 void NDECL(freefakeconsole);
-E void FDECL(nethack_exit, (int));
+E void FDECL(nethack_exit, (int)) NORETURN;
 #if defined(MSWIN_GRAPHICS)
 E void NDECL(mswin_destroy_reg);
 #endif

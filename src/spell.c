@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1581322667 2020/02/10 08:17:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1593614134 2020/07/01 14:35:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -201,7 +201,8 @@ struct obj *spellbook;
     return gone;
 }
 
-/* special effects for The Book of the Dead */
+/* special effects for The Book of the Dead; reading it while blind is
+   allowed so that needs to be taken into account too */
 static void
 deadbook(book2)
 struct obj *book2;
@@ -211,6 +212,7 @@ struct obj *book2;
 
     You("turn the pages of the Book of the Dead...");
     makeknown(SPE_BOOK_OF_THE_DEAD);
+    book2->dknown = 1; /* in case blind now and hasn't been seen yet */
     /* KMH -- Need ->known to avoid "_a_ Book of the Dead" */
     book2->known = 1;
     if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
@@ -219,7 +221,9 @@ struct obj *book2;
                          arti_cursed = FALSE;
 
         if (book2->cursed) {
-            pline_The("runes appear scrambled.  You can't read them!");
+            pline_The("%s!",
+                      Blind ? "Book seems to be ignoring you"
+                            : "runes appear scrambled.  You can't read them");
             return;
         }
 
@@ -251,7 +255,9 @@ struct obj *book2;
 
         if (arti_cursed) {
             pline_The("invocation fails!");
-            pline("At least one of your artifacts is cursed...");
+            /* this used to say "your artifacts" but the invocation tools
+               are not artifacts */
+            pline("At least one of your relics is cursed...");
         } else if (arti1_primed && arti2_primed) {
             unsigned soon =
                 (unsigned) d(2, 6); /* time til next intervene() */
@@ -265,7 +271,7 @@ struct obj *book2;
             u.uevent.udemigod = 1; /* wizdead() */
             if (!u.udg_cnt || u.udg_cnt > soon)
                 u.udg_cnt = soon;
-        } else { /* at least one artifact not prepared properly */
+        } else { /* at least one relic not prepared properly */
             You("have a feeling that %s is amiss...", something);
             goto raise_dead;
         }
@@ -274,7 +280,7 @@ struct obj *book2;
 
     /* when not an invocation situation */
     if (book2->cursed) {
-    raise_dead:
+ raise_dead:
 
         You("raised the dead!");
         /* first maybe place a dangerous adversary */

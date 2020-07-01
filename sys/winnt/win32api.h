@@ -10,8 +10,6 @@
 #ifndef WIN32API
 #define WIN32API
 
-#if defined(_MSC_VER)
-
 #if defined(HACK_H)
 #error win32api.h must be included before hack.h
 #endif
@@ -32,9 +30,10 @@
 #error win32api.h should be included first
 #endif
 
+#if defined(_MSC_VER)
 #pragma warning(disable : 4142) /* Warning, Benign redefinition of type */
 #pragma pack(8)
-#endif // _MSC_VER
+#endif
 
 #define WIN32_LEAN_AND_MEAN
 
