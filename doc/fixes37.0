@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ $NHDT-Date: 1593611274 2020/07/01 13:47:54 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ $NHDT-Date: 1593614134 2020/07/01 14:35:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -201,6 +201,13 @@ report "<Mon> expires" rather than "<Mon> dies" if polymorphed hero kills a
 	non-living monster (golem, vortex) with life drain (vampire bite)
 allow hero in silver-hating form to ring the silver bell but only if on/over
 	the vibrating square
+reading the Book of the Dead while blind is allowed; doing so gives
+	"you turn the pages of the Book of the Dead" and the type of item
+	becomes discovered, but the object wasn't being flagged as 'dknown'
+	so if not seen yet it remained "a spellbook" in hero's inventory
+reading cursed Book of the Dead while blind gave feedback for sighted hero
+reading non-cursed Book of the Dead without having prepped the other tools
+	referred to those as "artifacts" even though they aren't; use "relics"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
