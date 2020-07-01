@@ -2678,10 +2678,6 @@ const char *str;
            messages, clear flag mask leaving only display attr */
         /*attr &= ~(ATR_URGENT | ATR_NOHISTORY);*/
 
-        /* really do this later */
-#if defined(USER_SOUNDS) && defined(WIN32CON)
-        play_sound_for_message(str);
-#endif
         if (!suppress_history) {
             /* normal output; add to current top line if room, else flush
                whatever is there to history and then write this */

@@ -103,10 +103,6 @@ const char * NetHackQtMessageWindow::GetStr(bool init)
 
 void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
 {
-#ifdef USER_SOUNDS
-    play_sound_for_message(text.toLatin1().constData());
-#endif
-
     changed=true;
 
     // If the line is output from the "/" command, map the first character

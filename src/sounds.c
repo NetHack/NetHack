@@ -1268,6 +1268,7 @@ typedef struct audio_mapping_rec {
 } audio_mapping;
 
 static audio_mapping *soundmap = 0;
+static audio_mapping *FDECL(sound_matches_message, (const char *));
 
 char *sounddir = 0; /* set in files.c */
 
@@ -1325,18 +1326,48 @@ const char *mapping;
     return 1;
 }
 
+static audio_mapping *
+sound_matches_message(msg)
+const char *msg;
+{
+    audio_mapping *snd = soundmap;
+
+    while (snd) {
+        if (regex_match(msg, snd->regex))
+            return snd;
+        snd = snd->next;
+    }
+    return (audio_mapping *) 0;
+}
+
 void
 play_sound_for_message(msg)
 const char *msg;
 {
-    audio_mapping *cursor = soundmap;
+    audio_mapping *snd = sound_matches_message(msg);
 
-    while (cursor) {
-        if (regex_match(msg, cursor->regex)) {
-            play_usersound(cursor->filename, cursor->volume);
-        }
-        cursor = cursor->next;
-    }
+    if (snd)
+        play_usersound(snd->filename, snd->volume);
+}
+
+void
+maybe_play_sound(msg)
+const char *msg;
+{
+#if defined(WIN32) || defined(QT_GRAPHICS)
+    audio_mapping *snd = sound_matches_message(msg);
+
+    if (snd
+#if defined(WIN32)
+        && (WINDOWPORT("tty") || WINDOWPORT("mswin"))
+#else
+#if defined(QT_GRAPHICS)
+        && WINDOWPORT("Qt")
+#endif
+#endif
+        )
+        play_usersound(snd->filename, snd->volume);
+#endif  /* WIN32 || QT_GRAPHICS */
 }
 
 void

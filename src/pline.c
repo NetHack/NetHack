@@ -15,7 +15,9 @@ static char *FDECL(You_buf, (int));
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static void FDECL(execplinehandler, (const char *));
 #endif
-
+#ifdef USER_SOUNDS
+extern void FDECL(maybe_play_sound, (const char *));
+#endif
 #ifdef DUMPLOG
 
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
@@ -163,6 +165,7 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1] = '\0';
         line = pbuf;
     }
+    msgtyp = MSGTYP_NORMAL;
 
 #ifdef DUMPLOG
     /* We hook here early to have options-agnostic output.
@@ -182,10 +185,13 @@ VA_DECL(const char *, line)
         goto pline_done;
     }
 
-    msgtyp = MSGTYP_NORMAL;
     no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
     if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
+#ifdef USER_SOUNDS
+        if (msgtyp == MSGTYP_NORMAL || msgtyp == MSGTYP_NOSHOW)
+            maybe_play_sound(line);
+#endif
         if ((g.pline_flags & URGENT_MESSAGE) == 0
             && (msgtyp == MSGTYP_NOSHOW
                 || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg))))
