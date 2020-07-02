@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1590263455 2020/05/23 19:50:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1593651682 2020/07/02 01:01:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1090,18 +1090,48 @@ dochat()
 
     mtmp = m_at(tx, ty);
 
-    if ((!mtmp || mtmp->mundetected)
-        && (otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
-        /* Talking to a statue */
-        if (!Blind) {
-            pline_The("%s seems not to notice you.",
-                      /* if hallucinating, you can't tell it's a statue */
-                      Hallucination ? rndmonnam((char *) 0) : "statue");
+    if (!mtmp || mtmp->mundetected) {
+        if ((otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
+            /* Talking to a statue */
+            if (!Blind)
+                pline_The("%s seems not to notice you.",
+                          /* if hallucinating, you can't tell it's a statue */
+                          Hallucination ? rndmonnam((char *) 0) : "statue");
+            return 0;
         }
-        return 0;
+        if (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR) {
+            /* Talking to a wall; secret door remains hidden by behaving
+               like a wall; IS_WALL() test excludes solid rock even when
+               that serves as a wall bordering a corridor */
+            if (Blind && !IS_WALL(g.lastseentyp[tx][ty])) {
+                /* when blind, you can only talk to a wall if it has
+                   already been mapped as a wall */
+                ;
+            } else if (!Hallucination) {
+                pline("It's like talking to a wall.");
+            } else {
+                static const char *const walltalk[] = {
+                    "gripes about its job.",
+                    "tells you a funny joke!",
+                    "insults your heritage!",
+                    "chuckles.",
+                    "guffaws merrily!",
+                    "deprecates your exploration efforts.",
+                    "suggests a stint of rehab...",
+                    "doesn't seem to be interested.",
+                };
+                int idx = rn2(10);
+
+                if (idx >= SIZE(walltalk))
+                    idx = SIZE(walltalk) - 1;
+                pline_The("wall %s", walltalk[idx]);
+            }
+            return 0;
+        }
     }
 
-    if (!mtmp || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+    if (!mtmp || mtmp->mundetected
+        || M_AP_TYPE(mtmp) == M_AP_FURNITURE
         || M_AP_TYPE(mtmp) == M_AP_OBJECT)
         return 0;
 
