@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ $NHDT-Date: 1593219357 2020/06/27 00:55:57 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.385 $ $NHDT-Date: 1593731697 2020/07/02 23:14:57 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -4653,7 +4653,7 @@ The directory that houses the sound files to be played.
 .lp SOUND
 An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
-.PS "sound file"
+.PS "sound index"
 .PL MESG
 message window mapping (the only one supported in 3.6);
 .PL pattern
@@ -4661,9 +4661,9 @@ the pattern to match;
 .PL "sound file"
 the sound file to play;
 .PL volume
-the volume to be set while playing the sound file.
-.PL "vt_sounddata index"
-optional - the index corresponding to a sound file;
+the volume to be set while playing the sound file;
+.PL "sound index"
+optional; the index corresponding to a sound file.
 .PE
 .lp ""
 The pattern should be a POSIX extended regular expression.
