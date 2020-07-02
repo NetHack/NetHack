@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1587110794 2020/04/17 08:06:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
+ /* NetHack 3.6	wintty.c	$NHDT-Date: 1587110794 2020/04/17 08:06:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -36,13 +36,18 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
+#if defined(TTY_TILES_ESCCODES) || defined(TTY_SOUND_ESCCODES)
+#define VT_ANSI_COMMAND 'z'
+#endif
 #ifdef TTY_TILES_ESCCODES
 extern short glyph2tile[];
-#define TILE_ANSI_COMMAND 'z'
 #define AVTC_GLYPH_START   0
 #define AVTC_GLYPH_END     1
 #define AVTC_SELECT_WINDOW 2
 #define AVTC_INLINE_SYNC   3
+#endif
+#ifdef TTY_SOUND_ESCCODES
+#define AVTC_SOUND_PLAY    4
 #endif
 
 #ifdef HANGUP_HANDLING
@@ -244,11 +249,11 @@ int i, c, d;
                 vt_tile_current_window = c;
             }
             if (d >= 0)
-                printf("\033[1;%d;%d;%d%c", i, c, d, TILE_ANSI_COMMAND);
+                printf("\033[1;%d;%d;%d%c", i, c, d, VT_ANSI_COMMAND);
             else
-                printf("\033[1;%d;%d%c", i, c, TILE_ANSI_COMMAND);
+                printf("\033[1;%d;%d%c", i, c, VT_ANSI_COMMAND);
         } else {
-            printf("\033[1;%d%c", i, TILE_ANSI_COMMAND);
+            printf("\033[1;%d%c", i, VT_ANSI_COMMAND);
         }
     }
 }
@@ -259,6 +264,24 @@ int i, c, d;
 #define print_vt_code2(i,c)   print_vt_code((i), (c), -1)
 #define print_vt_code3(i,c,d) print_vt_code((i), (c), (d))
 
+#ifdef TTY_SOUND_ESCCODES
+void
+print_vt_soundcode_idx(idx, v)
+int idx, v;
+{
+    HUPSKIP();
+    if (iflags.vt_sounddata) {
+        if (v >= 0)
+            printf("\033[1;%d;%d;%d%c", AVTC_SOUND_PLAY,
+                   idx, v, VT_ANSI_COMMAND);
+        else
+            printf("\033[1;%d;%d%c", AVTC_SOUND_PLAY,
+                   idx, VT_ANSI_COMMAND);
+    }
+}
+#else
+# define print_vt_soundcode_idx(idx, v) ;
+#endif /* !TTY_SOUND_ESCCODES */
 
 /* clean up and quit */
 static void
@@ -2678,10 +2701,6 @@ const char *str;
            messages, clear flag mask leaving only display attr */
         /*attr &= ~(ATR_URGENT | ATR_NOHISTORY);*/
 
-        /* really do this later */
-#if defined(USER_SOUNDS) && defined(WIN32CON)
-        play_sound_for_message(str);
-#endif
         if (!suppress_history) {
             /* normal output; add to current top line if room, else flush
                whatever is there to history and then write this */
@@ -4633,6 +4652,15 @@ render_status(VOID_ARGS)
 }
 
 #endif /* STATUS_HILITES */
+
+#if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
+void
+play_usersound_via_idx(idx, volume)
+int idx, volume;
+{
+     print_vt_soundcode_idx(idx, volume);
+}
+#endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */
 
 #endif /* TTY_GRAPHICS */
 

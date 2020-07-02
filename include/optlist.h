@@ -517,6 +517,13 @@ pfx_##a,
     NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 (boolean *) 0)
 #endif
+#ifdef TTY_SOUND_ESCCODES
+    NHOPTB(vt_sounddata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                &iflags.vt_sounddata)
+#else
+    NHOPTB(vt_sounddata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                (boolean *) 0)
+#endif
     NHOPTC(warnings, 10, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "display characters for warnings")
     NHOPTC(whatis_coord, 1, opt_in, set_in_game, Yes, Yes, No, Yes, NoAlias,

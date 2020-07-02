@@ -189,4 +189,13 @@ set_altkeyhandler(const char *inName)
 {
     return;
 }
+
+#if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
+void
+play_usersound_via_idx(idx, volume)
+int idx, volume;
+{
+}
+#endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */
+
 #endif /* TTYSTUBS */

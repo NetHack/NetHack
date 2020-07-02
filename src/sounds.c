@@ -1258,16 +1258,23 @@ tiphat()
 
 #ifdef USER_SOUNDS
 
+#if defined(WIN32) || defined(QT_GRAPHICS)
 extern void FDECL(play_usersound, (const char *, int));
+#endif
+#if defined(TTY_SOUND_ESCCODES)
+extern void FDECL(play_usersound_via_idx, (int, int));
+#endif
 
 typedef struct audio_mapping_rec {
     struct nhregex *regex;
     char *filename;
     int volume;
+    int idx;
     struct audio_mapping_rec *next;
 } audio_mapping;
 
 static audio_mapping *soundmap = 0;
+static audio_mapping *FDECL(sound_matches_message, (const char *));
 
 char *sounddir = 0; /* set in files.c */
 
@@ -1279,26 +1286,29 @@ const char *mapping;
     char text[256];
     char filename[256];
     char filespec[256];
-    int volume;
+    int volume, idx = -1;
+    boolean toolong = FALSE;
 
-    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
+    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d", text,
+               filename, &volume, &idx) == 4
+        || sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
                filename, &volume) == 3) {
         audio_mapping *new_map;
 
         if (!sounddir)
             sounddir = dupstr(".");
-
         if (strlen(sounddir) + 1 + strlen(filename) >= sizeof filespec) {
             raw_print("sound file name too long");
             return 0;
-        }
+	}
         Sprintf(filespec, "%s/%s", sounddir, filename);
 
-        if (can_read_file(filespec)) {
+        if (idx >= 0 || can_read_file(filespec)) {
             new_map = (audio_mapping *) alloc(sizeof *new_map);
             new_map->regex = regex_init();
             new_map->filename = dupstr(filespec);
             new_map->volume = volume;
+            new_map->idx = idx;
             new_map->next = soundmap;
 
             if (!regex_compile(text, new_map->regex)) {
@@ -1325,18 +1335,56 @@ const char *mapping;
     return 1;
 }
 
+static audio_mapping *
+sound_matches_message(msg)
+const char *msg;
+{
+    audio_mapping *snd = soundmap;
+
+    while (snd) {
+        if (regex_match(msg, snd->regex))
+            return snd;
+        snd = snd->next;
+    }
+    return (audio_mapping *) 0;
+}
+
 void
 play_sound_for_message(msg)
 const char *msg;
 {
-    audio_mapping *cursor = soundmap;
+    audio_mapping *snd = sound_matches_message(msg);
 
-    while (cursor) {
-        if (regex_match(msg, cursor->regex)) {
-            play_usersound(cursor->filename, cursor->volume);
-        }
-        cursor = cursor->next;
-    }
+    if (snd)
+        play_usersound(snd->filename, snd->volume);
+}
+
+void
+maybe_play_sound(msg)
+const char *msg;
+{
+#if defined(WIN32) || defined(QT_GRAPHICS) || defined(TTY_SOUND_ESCCODES)
+    audio_mapping *snd = sound_matches_message(msg);
+
+    if (snd
+#if defined(WIN32) || defined(QT_GRAPHICS)
+#ifdef TTY_SOUND_ESCCODES
+        && !iflags.vt_sounddata
+#endif
+#if defined(QT_GRAPHICS)
+        && WINDOWPORT("Qt")
+#endif
+#if defined(WIN32)
+        && (WINDOWPORT("tty") || WINDOWPORT("mswin") || WINDOWPORT("curses"))
+#endif
+#endif /* WIN32 || QT_GRAPHICS */
+        )
+        play_usersound(snd->filename, snd->volume);
+#if defined(TTY_GRAPHICS) && defined(TTY_SOUND_ESCCODES)
+    else if (snd && iflags.vt_sounddata && snd->idx >= 0 && WINDOWPORT("tty"))
+        play_usersound_via_idx(snd->idx, snd->volume);
+#endif  /* TTY_GRAPHICS && TTY_SOUND_ESCCODES */
+#endif  /* WIN32 || QT_GRAPHICS || TTY_SOUND_ESCCODES */
 }
 
 void
