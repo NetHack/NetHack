@@ -1942,35 +1942,35 @@
           mand.   Monsters can fall prey to traps, too, which can be a very
           useful defensive strategy.
 
-               There is a special pre-mapped branch of the dungeon based on
-          the  classic  computer  game  "Sokoban."  The goal is to push the
-          boulders into the pits or holes.  With careful foresight,  it  is
-          possible  to  complete  all of the levels according to the tradi-
-          tional rules of Sokoban.  Some allowances are permitted  in  case
-          the player gets stuck; however, they will lower your luck.
+               There is a special pre-mapped multi-level branch of the dun-
+          geon based on the classic computer game "Sokoban," a puzzle solv-
+          ing game.  In that game, you operate as a  warehouse  worker  who
+          pushes crates around obstacles to position them at designated lo-
+          cations.  In NetHack, the goal is to push boulders into  pits  or
+          holes until those traps have all been nullified, giving access to
+          whatever is beyond them.  In the Sokoban game, you can only  move
+          in the four cardinal compass directions, and a crate in its final
+          destination blocks further access to that spot.  In  the  Sokoban
+          levels of NetHack, you can move diagonally (unless that would let
+          you pass between two neighboring boulders) but you can only  push
+          boulders  in  the  four  cardinal directions, and a boulder which
+          fills a pit or hole removes both the  boulder  and  the  trap  so
+          opens  up normal access to that spot.  With careful foresight, it
+          is possible to complete all of the levels according to the tradi-
+          tional  rules  of  Sokoban.  (Hint: to solve Sokoban puzzles, you
+          often need to move things away from their  eventual  destinations
+          in  order  to open up more room to maneuver.)  Since NetHack does
+          not support an undo capability, some allowances are permitted  in
+          case  you get stuck.  For example, you may drop everything in or-
+          der to be able to squeeze into the same  location  as  a  boulder
+          (and then presumably move past it), or may destroy a boulder with
+          magic or tools, or may create  new  boulders  with  a  scroll  of
+          earth.   However,  doing such things will lower your luck without
+          any specific message given about that.  See the  Conduct  section
+          for  information  about  getting  feedback  for  your  actions in
+          Sokoban.
 
-          5.3.  Stairs and ladders (`<', `>')
 
-               In  general, each level in the dungeon will have a staircase
-          going up (`<') to the previous level and another going down (`>')
-          to  the  next  level.  There are some exceptions though.  For in-
-          stance, fairly early in the dungeon you will find  a  level  with
-          two down staircases, one continuing into the dungeon and the oth-
-          er branching into an area known  as  the  Gnomish  Mines.   Those
-          mines  eventually hit a dead end, so after exploring them (if you
-          choose to do so), you'll need to climb back up to the  main  dun-
-          geon.
-
-               When  you  traverse a set of stairs, or trigger a trap which
-          sends you to another level, the level you're leaving will be  de-
-          activated  and  stored  in a file on disk.  If you're moving to a
-          previously visited level, it will be loaded from its file on disk
-          and  reactivated.   If you're moving to a level which has not yet
-          been visited, it will be created (from scratch  for  most  random
-          levels, from a template for some "special" levels, or loaded from
-          the remains of an earlier game for a "bones" level as briefly de-
-          scribed  below).   Monsters are only active on the current level;
-          those on other levels are essentially placed into stasis.
 
 
 
@@ -1984,60 +1984,60 @@
 
 
 
-               Ordinarily when you climb a set of stairs, you  will  arrive
-          on  the  corresponding  staircase  at your destination.  However,
-          pets (see below) and some other monsters  will  follow  along  if
+          5.3.  Stairs and ladders (`<', `>')
+
+               In general, each level in the dungeon will have a  staircase
+          going up (`<') to the previous level and another going down (`>')
+          to the next level.  There are some exceptions  though.   For  in-
+          stance,  fairly  early  in the dungeon you will find a level with
+          two down staircases, one continuing into the dungeon and the oth-
+          er  branching  into  an  area  known as the Gnomish Mines.  Those
+          mines eventually hit a dead end, so after exploring them (if  you
+          choose  to  do so), you'll need to climb back up to the main dun-
+          geon.
+
+               When you traverse a set of stairs, or trigger a  trap  which
+          sends  you to another level, the level you're leaving will be de-
+          activated and stored in a file on disk.  If you're  moving  to  a
+          previously visited level, it will be loaded from its file on disk
+          and reactivated.  If you're moving to a level which has  not  yet
+          been  visited,  it  will be created (from scratch for most random
+          levels, from a template for some "special" levels, or loaded from
+          the remains of an earlier game for a "bones" level as briefly de-
+          scribed below).  Monsters are only active on the  current  level;
+          those on other levels are essentially placed into stasis.
+
+               Ordinarily  when  you climb a set of stairs, you will arrive
+          on the corresponding staircase  at  your  destination.   However,
+          pets  (see  below)  and  some other monsters will follow along if
           they're close enough when you travel up or down stairs, and occa-
-          sionally one of these creatures  will  displace  you  during  the
+          sionally  one  of  these  creatures  will displace you during the
           climb.  When that occurs, the pet or other monster will arrive on
           the staircase and you will end up nearby.
 
-               Ladders serve the same purpose as staircases,  and  the  two
-          types  of  inter-level  connections  are nearly indistinguishable
+               Ladders  serve  the  same purpose as staircases, and the two
+          types of inter-level  connections  are  nearly  indistinguishable
           during game play.
 
           5.4.  Shops and shopping
 
-               Occasionally you will run across a room  with  a  shopkeeper
-          near  the  door  and  many items lying on the floor.  You can buy
+               Occasionally  you  will  run across a room with a shopkeeper
+          near the door and many items lying on the  floor.   You  can  buy
           items by picking them up and then using the `p' command.  You can
-          inquire  about the price of an item prior to picking it up by us-
+          inquire about the price of an item prior to picking it up by  us-
           ing the "#chat" command while standing on it.  Using an item pri-
           or to paying for it will incur a charge, and the shopkeeper won't
           allow you to leave the shop until you have paid any debt you owe.
 
-               You can sell items to a shopkeeper by dropping them  to  the
-          floor  while inside a shop.  You will either be offered an amount
-          of gold and asked whether you're willing to sell,  or  you'll  be
-          told  that  the shopkeeper isn't interested (generally, your item
-          needs to be compatible with the type of  merchandise  carried  by
+               You  can  sell items to a shopkeeper by dropping them to the
+          floor while inside a shop.  You will either be offered an  amount
+          of  gold  and  asked whether you're willing to sell, or you'll be
+          told that the shopkeeper isn't interested (generally,  your  item
+          needs  to  be  compatible with the type of merchandise carried by
           the shop).
 
-               If  you drop something in a shop by accident, the shopkeeper
-          will usually claim ownership without offering  any  compensation.
-          You'll have to buy it back if you want to reclaim it.
-
-               Shopkeepers  sometimes run out of money.  When that happens,
-          you'll be offered credit instead of gold when  you  try  to  sell
-          something.   Credit  can  be used to pay for purchases, but it is
-          only good in the shop where it was  obtained;  other  shopkeepers
-          won't  honor  it.   (If you happen to find a "credit card" in the
-          dungeon, don't bother trying to use it in shops; shopkeepers will
-          not accept it.)
-
-               The  `$'  command,  which reports the amount of gold you are
-          carrying (in inventory, not inside bags or boxes), will also show
-          current  shop debt or credit, if any.  The "Iu" command lists un-
-          paid items (those which still belong to the shop) if you are car-
-          rying  any.   The "Ix" command shows an inventory-like display of
-          any unpaid items which have been used up, along with  other  shop
-          fees, if any.
-
-          5.4.1.  Shop idiosyncrasies
-
-               Several aspects of shop behavior might be unexpected.
-
-
+               If you drop something in a shop by accident, the  shopkeeper
+          will  usually  claim ownership without offering any compensation.
 
 
           NetHack 3.7                                          July 2, 2020
@@ -2050,15 +2050,37 @@
 
 
 
+          You'll have to buy it back if you want to reclaim it.
+
+               Shopkeepers sometimes run out of money.  When that  happens,
+          you'll  be  offered  credit  instead of gold when you try to sell
+          something.  Credit can be used to pay for purchases,  but  it  is
+          only  good  in  the shop where it was obtained; other shopkeepers
+          won't honor it.  (If you happen to find a "credit  card"  in  the
+          dungeon, don't bother trying to use it in shops; shopkeepers will
+          not accept it.)
+
+               The `$' command, which reports the amount of  gold  you  are
+          carrying (in inventory, not inside bags or boxes), will also show
+          current shop debt or credit, if any.  The "Iu" command lists  un-
+          paid items (those which still belong to the shop) if you are car-
+          rying any.  The "Ix" command shows an inventory-like  display  of
+          any  unpaid  items which have been used up, along with other shop
+          fees, if any.
+
+          5.4.1.  Shop idiosyncrasies
+
+               Several aspects of shop behavior might be unexpected.
+
           * The price of a given item can vary due to a variety of factors.
 
-          * A  shopkeeper treats the spot immediately inside the door as if
+          * A shopkeeper treats the spot immediately inside the door as  if
             it were outside the shop.
 
           * While the shopkeeper watches you like a hawk, he will generally
             ignore any other customers.
 
-          * If  a  shop  is "closed for inventory," it will not open of its
+          * If a shop is "closed for inventory," it will not  open  of  its
             own accord.
 
           * Shops do not get restocked with new items, regardless of inven-
@@ -2066,44 +2088,22 @@
 
           5.5.  Movement feedback
 
-               Moving  around  the  map usually provides no feedback--other
-          than drawing the hero at the new location--unless you step on  an
-          object  or pile of objects, or on a trap, or attempt to move onto
-          a spot where a monster is located.   There  are  several  options
+               Moving around the map usually  provides  no  feedback--other
+          than  drawing the hero at the new location--unless you step on an
+          object or pile of objects, or on a trap, or attempt to move  onto
+          a  spot  where  a  monster is located.  There are several options
           which can be used to augment the normal feedback.
 
-               The  pile_limit option controls how many objects can be in a
+               The pile_limit option controls how many objects can be in  a
           pile--sharing the same map location--for the game to state "there
-          are  objects  here"  instead  of listing them.  The default is 5.
+          are objects here" instead of listing them.   The  default  is  5.
           Setting it to 1 would always give that message instead of listing
           any objects.  Setting it to 0 is a special case which will always
           list all objects no matter how big a pile is.  Note that the num-
-          ber  refers  to  the  count of separate stacks of objects present
-          rather than the sum of the quantities of those stacks (so  7  ar-
-          rows  or 25 gold pieces will each count as 1 rather than as 7 and
-          25, respectively, and total to 2 when both are at the same  loca-
-          tion).
-
-               The  "nopickup" command prefix (default `m') can be used be-
-          fore a movement direction to step on objects  without  attempting
-          auto-pickup and without giving feedback about them.
-
-               The  mention_walls  option controls whether you get feedback
-          if you try to walk into a wall or solid stone or off the edge  of
-          the  map.  Normally nothing happens (unless the hero is blind and
-          no wall is shown, then the wall that is being bumped into will be
-          drawn  on the map).  This option also gives feedback when rushing
-          or running stops for some non-obvious reason.
-
-               The mention_decor option controls whether you  get  feedback
-          when  walking on "furniture."  Normally stepping onto stairs or a
-          fountain or an altar or various other things doesn't elicit  any-
-          thing  unless it is covered by one or more objects so is obscured
-          on the map.  Setting this  option  to  true  will  describe  such
-          things  even  when  they  aren't obscured.  Doorless doorways and
-          open doors aren't considered worthy of mention; closed doors  (if
-          you  can  move  onto their spots) and broken doors are.  Assuming
-          that you're able to do so, moving onto water or lava or ice  will
+          ber refers to the count of separate  stacks  of  objects  present
+          rather  than  the sum of the quantities of those stacks (so 7 ar-
+          rows or 25 gold pieces will each count as 1 rather than as 7  and
+          25,  respectively,  and  total  to  2  when  both are at the same
 
 
           NetHack 3.7                                          July 2, 2020
@@ -2116,24 +2116,46 @@
 
 
 
-          give  feedback  if not yet on that type of terrain but not repeat
-          it (unless there has been some intervening message)  when  moving
+          location).
+
+               The "nopickup" command prefix (default `m') can be used  be-
+          fore  a  movement direction to step on objects without attempting
+          auto-pickup and without giving feedback about them.
+
+               The mention_walls option controls whether you  get  feedback
+          if  you try to walk into a wall or solid stone or off the edge of
+          the map.  Normally nothing happens (unless the hero is blind  and
+          no wall is shown, then the wall that is being bumped into will be
+          drawn on the map).  This option also gives feedback when  rushing
+          or running stops for some non-obvious reason.
+
+               The  mention_decor  option controls whether you get feedback
+          when walking on "furniture."  Normally stepping onto stairs or  a
+          fountain  or an altar or various other things doesn't elicit any-
+          thing unless it is covered by one or more objects so is  obscured
+          on  the  map.   Setting  this  option  to true will describe such
+          things even when they aren't  obscured.   Doorless  doorways  and
+          open  doors aren't considered worthy of mention; closed doors (if
+          you can move onto their spots) and broken  doors  are.   Assuming
+          that  you're able to do so, moving onto water or lava or ice will
+          give feedback if not yet on that type of terrain but  not  repeat
+          it  (unless  there has been some intervening message) when moving
           from water to another water spot, or lava to lava, or ice to ice.
-          Moving off of any of those back onto "normal" terrain  will  give
-          one  message  too, unless there is feedback about one or more ob-
+          Moving  off  of any of those back onto "normal" terrain will give
+          one message too, unless there is feedback about one or  more  ob-
           jects, in which case the back on land circumstance is implied.
 
-               The confirm and safe_pet options control what  happens  when
-          you  try  to  move onto a peaceful monster's spot or a tame one's
+               The  confirm  and safe_pet options control what happens when
+          you try to move onto a peaceful monster's spot or  a  tame  one's
           spot.
 
-               The "nopickup" command prefix  (default  `m')  is  also  the
+               The  "nopickup"  command  prefix  (default  `m') is also the
           move-without-attacking prefix and can be used to try to step onto
           a visible monster's spot without the move being considered an at-
-          tack  (see  the  Fighting  subsection  of  Monsters  below).  The
-          "fight" command prefix (default `F'; also `-'  if  number_pad  is
+          tack (see  the  Fighting  subsection  of  Monsters  below).   The
+          "fight"  command  prefix  (default `F'; also `-' if number_pad is
           on) can be used to force an attack, when guessing where an unseen
-          monster is or when deliberately  attacking  a  peaceful  or  tame
+          monster  is  or  when  deliberately  attacking a peaceful or tame
           creature.
 
                The run_mode option controls how frequently the map gets re-
@@ -2142,34 +2164,12 @@
 
           6.  Monsters
 
-               Monsters  you  cannot  see  are not displayed on the screen.
-          Beware!  You may suddenly come upon one in a  dark  place.   Some
-          magic  items  can  help  you  locate  them before they locate you
+               Monsters you cannot see are not  displayed  on  the  screen.
+          Beware!   You  may  suddenly come upon one in a dark place.  Some
+          magic items can help you  locate  them  before  they  locate  you
           (which some monsters can do very well).
 
-               The commands `/' and `;' may be used to  obtain  information
-          about  those  monsters who are displayed on the screen.  The com-
-          mand "#name" (by default bound to `C'), allows you  to  assign  a
-          name  to  a  monster, which may be useful to help distinguish one
-          from another when multiple monsters  are  present.   Assigning  a
-          name which is just a space will remove any prior name.
 
-               The extended command "#chat" can be used to interact with an
-          adjacent monster.  There is no actual dialog (in other words, you
-          don't get to choose what you'll say), but chatting with some mon-
-          sters such as a shopkeeper or the Oracle of  Delphi  can  produce
-          useful results.
-
-          6.1.  Fighting
-
-               If  you see a monster and you wish to fight it, just attempt
-          to walk into it.  Many monsters you  find  will  mind  their  own
-          business unless you attack them.  Some of them are very dangerous
-          when angered.  Remember:  discretion is the better part of valor.
-
-               In most circumstances, if you attempt to attack  a  peaceful
-          monster  by  moving into its location, you'll be asked to confirm
-          your intent.  By default  an  answer  of  `y'  acknowledges  that
 
 
           NetHack 3.7                                          July 2, 2020
@@ -2182,59 +2182,59 @@
 
 
 
-          intent,  which  can  be  error prone if you're using `y' to move.
-          You can set the paranoid_confirmation option  to  require  a  re-
-          sponse of "yes" instead.
+               The  commands  `/' and `;' may be used to obtain information
+          about those monsters who are displayed on the screen.   The  com-
+          mand  "#name"  (by  default bound to `C'), allows you to assign a
+          name to a monster, which may be useful to  help  distinguish  one
+          from  another  when  multiple  monsters are present.  Assigning a
+          name which is just a space will remove any prior name.
 
-               If  you  can't  see a monster (if it is invisible, or if you
-          are blinded), the symbol `I' will be shown when you learn of  its
-          presence.   If you attempt to walk into it, you will try to fight
-          it just like a monster that you can see; of course, if  the  mon-
+               The extended command "#chat" can be used to interact with an
+          adjacent monster.  There is no actual dialog (in other words, you
+          don't get to choose what you'll say), but chatting with some mon-
+          sters  such  as  a shopkeeper or the Oracle of Delphi can produce
+          useful results.
+
+          6.1.  Fighting
+
+               If you see a monster and you wish to fight it, just  attempt
+          to  walk  into  it.   Many  monsters you find will mind their own
+          business unless you attack them.  Some of them are very dangerous
+          when angered.  Remember:  discretion is the better part of valor.
+
+               In  most  circumstances, if you attempt to attack a peaceful
+          monster by moving into its location, you'll be asked  to  confirm
+          your  intent.   By default an answer of `y' acknowledges that in-
+          tent, which can be error prone if you're using `y' to move.   You
+          can set the paranoid_confirmation option to require a response of
+          "yes" instead.
+
+               If you can't see a monster (if it is invisible,  or  if  you
+          are  blinded), the symbol `I' will be shown when you learn of its
+          presence.  If you attempt to walk into it, you will try to  fight
+          it  just  like a monster that you can see; of course, if the mon-
           ster has moved, you will attack empty air.  If you guess that the
-          monster has moved and you don't wish to fight, you  can  use  the
-          `m'  command to move without fighting; likewise, if you don't re-
+          monster  has  moved  and you don't wish to fight, you can use the
+          `m' command to move without fighting; likewise, if you don't  re-
           member a monster but want to try fighting anyway, you can use the
           `F' command.
 
           6.2.  Your pet
 
                You start the game with a little dog (`d'), kitten (`f'), or
-          pony (`u'), which follows you about the dungeon and  fights  mon-
-          sters  with you.  Like you, your pet needs food to survive.  Dogs
-          and cats usually feed  themselves  on  fresh  carrion  and  other
-          meats;  horses  need  vegetarian food which is harder to come by.
-          If you're worried about your pet or want to  train  it,  you  can
+          pony  (`u'),  which follows you about the dungeon and fights mon-
+          sters with you.  Like you, your pet needs food to survive.   Dogs
+          and  cats  usually  feed  themselves  on  fresh carrion and other
+          meats; horses need vegetarian food which is harder  to  come  by.
+          If  you're  worried  about  your pet or want to train it, you can
           feed it, too, by throwing it food.  A properly trained pet can be
           very useful under certain circumstances.
 
-               Your pet also gains experience from  killing  monsters,  and
-          can  grow  over  time,  gaining hit points and doing more damage.
-          Initially, your pet may even be better  at  killing  things  than
+               Your  pet  also  gains experience from killing monsters, and
+          can grow over time, gaining hit points  and  doing  more  damage.
+          Initially,  your  pet  may  even be better at killing things than
           you, which makes pets useful for low-level characters.
 
-               Your  pet  will  follow  you up and down staircases if it is
-          next to you when you move.  Otherwise your pet will  be  stranded
-          and  may  become wild.  Similarly, when you trigger certain types
-          of traps which alter your location (for  instance,  a  trap  door
-          which  drops you to a lower dungeon level), any adjacent pet will
-          accompany you and any non-adjacent pet will be left behind.  Your
-          pet  may trigger such traps itself; you will not be carried along
-          with it even if adjacent at the time.
-
-          6.3.  Steeds
-
-               Some types of creatures in the dungeon can actually be  rid-
-          den if you have the right equipment and skill.  Convincing a wild
-          beast to let you saddle it up is  difficult  to  say  the  least.
-          Many  a dungeoneer has had to resort to magic and wizardry in or-
-          der to forge the alliance.  Once you do have the beast under your
-          control  however,  you  can easily climb in and out of the saddle
-          with the "#ride" command.  Lead the beast around the dungeon when
-          riding, in the same manner as you would move yourself.  It is the
-          beast that you will see displayed on the map.
-
-               Riding skill is managed by the "#enhance" command.  See  the
-          section on Weapon proficiency for more information about that.
 
 
 
@@ -2248,60 +2248,60 @@
 
 
 
+               Your pet will follow you up and down  staircases  if  it  is
+          next  to  you when you move.  Otherwise your pet will be stranded
+          and may become wild.  Similarly, when you trigger  certain  types
+          of  traps  which  alter  your location (for instance, a trap door
+          which drops you to a lower dungeon level), any adjacent pet  will
+          accompany you and any non-adjacent pet will be left behind.  Your
+          pet may trigger such traps itself; you will not be carried  along
+          with it even if adjacent at the time.
+
+          6.3.  Steeds
+
+               Some  types of creatures in the dungeon can actually be rid-
+          den if you have the right equipment and skill.  Convincing a wild
+          beast  to  let  you  saddle  it up is difficult to say the least.
+          Many a dungeoneer has had to resort to magic and wizardry in  or-
+          der to forge the alliance.  Once you do have the beast under your
+          control however, you can easily climb in and out  of  the  saddle
+          with the "#ride" command.  Lead the beast around the dungeon when
+          riding, in the same manner as you would move yourself.  It is the
+          beast that you will see displayed on the map.
+
+               Riding  skill is managed by the "#enhance" command.  See the
+          section on Weapon proficiency for more information about that.
+
                Use the `a' (apply) command and pick a saddle in your inven-
-          tory to attempt to put that saddle on an adjacent  creature.   If
+          tory  to  attempt to put that saddle on an adjacent creature.  If
           successful, it will be transferred to that creature's inventory.
 
                Use the "#loot" command while adjacent to a saddled creature
-          to try to remove the saddle from that creature.   If  successful,
+          to  try  to remove the saddle from that creature.  If successful,
           it will be transferred to your inventory.
 
           6.4.  Bones levels
 
-               You  may encounter the shades and corpses of other adventur-
+               You may encounter the shades and corpses of other  adventur-
           ers (or even former incarnations of yourself!) and their personal
-          effects.   Ghosts  are  hard  to  kill,  but easy to avoid, since
-          they're slow and do little damage.  You can plunder the  deceased
-          adventurer's  possessions; however, they are likely to be cursed.
+          effects.  Ghosts are hard to  kill,  but  easy  to  avoid,  since
+          they're  slow and do little damage.  You can plunder the deceased
+          adventurer's possessions; however, they are likely to be  cursed.
           Beware of whatever killed the former player; it is probably still
           lurking around, gloating over its last victory.
 
           6.5.  Persistence of Monsters
 
                Monsters (a generic reference which also includes humans and
-          pets) are only shown while they can be seen or otherwise  sensed.
-          Moving  to  a location where you can't see or sense a monster any
-          more will result in it disappearing from your map,  similarly  if
+          pets)  are only shown while they can be seen or otherwise sensed.
+          Moving to a location where you can't see or sense a  monster  any
+          more  will  result in it disappearing from your map, similarly if
           it is the one who moved rather than you.
 
-               However,  if  you encounter a monster which you can't see or
-          sense--perhaps it is invisible and has just  tapped  you  on  the
-          noggin--a  special  "remembered,  unseen  monster" marker will be
-          displayed at the location where you think it is.  That will  per-
-          sist  until  you have proven that there is no monster there, even
-          if the unseen monster moves to another location or you move to  a
-          spot  where the marker's location ordinarily wouldn't be seen any
-          more.
-
-          7.  Objects
-
-               When you find something in the dungeon, it is common to want
-          to pick it up.  In NetHack, this is accomplished automatically by
-          walking over the object (unless you turn off the  autopickup  op-
-          tion  (see  below),  or move with the `m' prefix (see above)), or
-          manually by using the `,' command.
-
-               If you're carrying too many items, NetHack will tell you  so
-          and  you  won't  be able to pick up anything more.  Otherwise, it
-          will add the object(s) to your pack and tell you  what  you  just
-          picked up.
-
-               As  you add items to your inventory, you also add the weight
-          of that object to your load.  The amount that you can  carry  de-
-          pends  on  your strength and your constitution.  The stronger and
-          sturdier you are, the less the additional load will  affect  you.
-          There comes a point, though, when the weight of all of that stuff
-          you are  carrying  around  with  you  through  the  dungeon  will
+               However, if you encounter a monster which you can't  see  or
+          sense--perhaps  it  is  invisible  and has just tapped you on the
+          noggin--a special "remembered, unseen  monster"  marker  will  be
+          displayed  at  the  location  where  you  think it is.  That will
 
 
           NetHack 3.7                                          July 2, 2020
@@ -2314,11 +2314,34 @@
 
 
 
-          encumber  you.   Your  reactions  will get slower and you'll burn
-          calories faster, requiring food more frequently to cope with  it.
-          Eventually,  you'll  be  so overloaded that you'll either have to
-          discard some of  what  you're  carrying  or  collapse  under  its
-          weight.
+          persist until you have proven that there  is  no  monster  there,
+          even  if the unseen monster moves to another location or you move
+          to a spot where the marker's location ordinarily wouldn't be seen
+          any more.
+
+          7.  Objects
+
+               When you find something in the dungeon, it is common to want
+          to pick it up.  In NetHack, this is accomplished automatically by
+          walking  over  the object (unless you turn off the autopickup op-
+          tion (see below), or move with the `m' prefix  (see  above)),  or
+          manually by using the `,' command.
+
+               If  you're carrying too many items, NetHack will tell you so
+          and you won't be able to pick up anything  more.   Otherwise,  it
+          will  add  the  object(s) to your pack and tell you what you just
+          picked up.
+
+               As you add items to your inventory, you also add the  weight
+          of  that  object to your load.  The amount that you can carry de-
+          pends on your strength and your constitution.  The  stronger  and
+          sturdier  you  are, the less the additional load will affect you.
+          There comes a point, though, when the weight of all of that stuff
+          you  are carrying around with you through the dungeon will encum-
+          ber you.  Your reactions will get slower and you'll burn calories
+          faster,  requiring food more frequently to cope with it.  Eventu-
+          ally, you'll be so overloaded that you'll either have to  discard
+          some of what you're carrying or collapse under its weight.
 
                NetHack  will  tell  you how badly you have loaded yourself.
           If  you  are  encumbered,  one  of  the  conditions   "Burdened",
@@ -2345,6 +2368,18 @@
           the  "#name"  command,  for the same purpose at any time, to name
           all objects of a particular type or just  an  individual  object.
           When  you  use "#name" on an object which has already been named,
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              37
+
+
+
           specifying a space as the value will remove the  prior  name  in-
           stead of assigning a new one.
 
@@ -2368,17 +2403,6 @@
           unblessed, but the uncursed designation  is  what  you  will  see
           within  the  game.   A  "glass half full versus glass half empty"
           situation; make of that what you will.
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              37
-
-
 
                There are magical means of bestowing or removing curses upon
           objects,  so  even  if you are stuck with one, you can still have
@@ -2410,6 +2434,18 @@
           weapons,  like arrows and spears.  To hit monsters with a weapon,
           you must wield it and attack them, or throw it at them.  You  can
           simply  elect  to  throw  a spear.  To shoot an arrow, you should
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              38
+
+
+
           first wield a bow, then throw the arrow.  Crossbows shoot  cross-
           bow bolts.  Slings hurl rocks and (other) stones (like gems).
 
@@ -2434,18 +2470,6 @@
           shield,  and  vice versa.  When wielding a one-handed weapon, you
           can have another weapon ready to use by setting  things  up  with
           the  `x'  command,  which  exchanges  your primary (the one being
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              38
-
-
-
           wielded) and alternate weapons.  And if you have  proficiency  in
           the  "two weapon combat" skill, you may wield both weapons simul-
           taneously as primary and secondary; use the `X' command to engage
@@ -2476,6 +2500,18 @@
           in  your  inventory  which are considered likely to be thrown, or
           picking `*' will list your entire inventory.  After you've chosen
           what  to  throw, you will be prompted for a direction rather than
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              39
+
+
+
           for a specific target.  The distance something can be thrown  de-
           pends mainly on the type of object and your strength.  Arrows can
           be thrown by hand, but can be thrown much  farther  and  will  be
@@ -2499,28 +2535,16 @@
           wielding one to shoot arrows, in crossbow skill if you're  wield-
           ing  one to shoot bolts, or in sling skill if you're wielding one
           to shoot stones).  The number of items that the character  has  a
-          chance  to  fire  varies  from  turn to turn.  You can explicitly
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              39
-
-
-
-          limit the number of shots by using a numeric  prefix  before  the
-          `t'  or  `f'  command.  For example, "2f" (or "n2f" if using num-
-          ber_pad mode) would ensure that at most 2 arrows are shot even if
-          you  could  have  fired  3.   If you specify a larger number than
-          would have been shot ("4f" in this example), you'll just  end  up
-          shooting the same number (3, here) as if no limit had been speci-
-          fied.  Once the volley is in motion, all of the items will travel
-          in the same direction; if the first ones kill a monster, the oth-
-          ers can still continue beyond that spot.
+          chance to fire varies from turn to turn.  You can explicitly lim-
+          it the number of shots by using a numeric prefix before  the  `t'
+          or  `f' command.  For example, "2f" (or "n2f" if using number_pad
+          mode) would ensure that at most 2 arrows are  shot  even  if  you
+          could  have  fired  3.  If you specify a larger number than would
+          have been shot ("4f" in this example), you'll just end up  shoot-
+          ing  the same number (3, here) as if no limit had been specified.
+          Once the volley is in motion, all of the items will travel in the
+          same  direction; if the first ones kill a monster, the others can
+          still continue beyond that spot.
 
           7.2.2.  Weapon proficiency
 
@@ -2542,6 +2566,18 @@
           skill(s) to improve when you've used one or more skills enough to
           become eligible to do so.  The skill rankings are  "none"  (some-
           times also referred to as "restricted", because you won't be able
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              40
+
+
+
           to advance), "unskilled", "basic", "skilled", and "expert".   Re-
           stricted skills simply will not appear in the list shown by "#en-
           hance".   (Divine  intervention  might  unrestrict  a  particular
@@ -2563,20 +2599,6 @@
           not increased automatically because there is a limit to your  to-
           tal  overall  skills, so you need to actively choose which skills
           to enhance and which to ignore.
-
-
-
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              40
-
-
 
           7.2.3.  Two-Weapon combat
 
@@ -2610,6 +2632,18 @@
           want  as  primary  which will push the first into secondary posi-
           tion.
 
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              41
+
+
+
                When in two-weapon combat mode, using the `X'  command  tog-
           gles  back to single-weapon mode.  Throwing or dropping either of
           the weapons or having one of them be stolen or destroyed will al-
@@ -2631,19 +2665,6 @@
                      Plate mail, Crystal plate mail            3
                      Bronze plate mail, Splint mail,
                         Banded mail, Dwarvish mithril-coat     4
-
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              41
-
-
-
                      Chain mail, Elven mithril-coat            5
                      Scale mail, Orcish chain mail             6
                      Ring mail, Studded leather armor,
@@ -2677,6 +2698,18 @@
 
                The  nudist  option  can be set (prior to game start) to at-
           tempt to play the entire game without wearing any armor (a  self-
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              42
+
+
+
           imposed challenge which is extremely difficult to accomplish).
 
                The commands to use armor are `W' (wear) and `T' (take off).
@@ -2698,18 +2731,6 @@
                When you kill monsters, they usually leave corpses which are
           also "food."  Many, but not all, of these are edible;  some  also
           give  you special powers when you eat them.  A good rule of thumb
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              42
-
-
-
           is "you are what you eat."
 
                Some character roles and some monsters are vegetarian.  Veg-
@@ -2743,6 +2764,18 @@
           vironment variable to the file name of your mailbox.  You may al-
           so  want to set the "MAILREADER" environment variable to the file
           name of your favorite reader, so NetHack can shell to it when you
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              43
+
+
+
           read  the  scroll.  On versions of NetHack where mail is randomly
           generated internal to the game, these environment  variables  are
           ignored.  You can disable the mail daemon by turning off the mail
@@ -2762,19 +2795,6 @@
           to dip ("#dip") an object into a potion.
 
                The command to drink a potion is `q' (quaff).
-
-
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              43
-
-
 
           7.7.  Wands (`/')
 
@@ -2808,6 +2828,20 @@
                The command to use a wand is `z' (zap).  To break  one,  use
           the `a' (apply) command.
 
+
+
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              44
+
+
+
           7.8.  Rings (`=')
 
                Rings  are very useful items, since they are relatively per-
@@ -2829,18 +2863,6 @@
 
                The commands to use rings are `P' (put on) and `R' (remove).
           `A', `W', and `T' can also be used; see Amulets.
-
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              44
-
-
 
           7.9.  Spellbooks (`+')
 
@@ -2874,6 +2896,18 @@
 
                Just as weapons are divided into groups in which a character
           can become proficient (to varying degrees), spells are  similarly
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              45
+
+
+
           grouped.  Successfully casting a spell exercises its skill group;
           using the "#enhance" command to advance a sufficiently  exercised
           skill  will  affect  all spells within the group.  Advanced skill
@@ -2896,18 +2930,6 @@
 
                Tools are miscellaneous objects with various purposes.  Some
           tools have a limited number of uses, akin to wand  charges.   For
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              45
-
-
-
           example,  lamps burn out after a while.  Other tools are contain-
           ers, which objects can be placed into or taken out of.
 
@@ -2940,6 +2962,18 @@
           you unlock or open them.  You can check for and try to deactivate
           traps with the "#untrap" extended command.
 
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              46
+
+
+
           7.11.  Amulets (`"')
 
                Amulets  are very similar to rings, and often more powerful.
@@ -2962,18 +2996,6 @@
 
                Some  gems  are valuable, and can be sold for a lot of gold.
           They are also a far more efficient way of carrying  your  riches.
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              46
-
-
-
           Valuable gems increase your score if you bring them with you when
           you exit.
 
@@ -3003,6 +3025,21 @@
           longer  shown  as  ``' but by the letter representing the monster
           they depict instead.
 
+
+
+
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              47
+
+
+
           7.14.  Gold (`$')
 
                Gold adds to your score, and you can  buy  things  in  shops
@@ -3028,18 +3065,6 @@
           until you can see or feel that location again.  One  notable  ex-
           ception  is  that  if the object gets covered by the "remembered,
           unseen monster" marker.  When that marker is later removed  after
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              47
-
-
-
           you've verified that no monster is there, you will have forgotten
           that there was any object there regardless of whether the  unseen
           monster  actually took the object.  If the object is still there,
@@ -3069,6 +3094,18 @@
           The  most difficult of these is the foodless challenge.  Although
           creatures can survive long periods of time without food, there is
           a  physiological  need for water; thus there is no restriction on
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              48
+
+
+
           drinking beverages, even if they provide some  minor  food  bene-
           fits.   Calling  upon  your god for help with starvation does not
           violate any food challenges either.
@@ -3094,18 +3131,6 @@
 
                Eating  any kind of meat violates the vegetarian, vegan, and
           foodless conducts.  This includes tripe rations, the  corpses  or
-
-
-          NetHack 3.7                                          July 2, 2020
-
-
-
-
-
-          NetHack Guidebook                                              48
-
-
-
           tins  of  any monsters not mentioned above, and the various other
           chunks of meat found in the dungeon.  Swallowing and digesting  a
           monster while polymorphed is treated as if you ate the creature's
@@ -3135,6 +3160,18 @@
           of  Yendor  to  your  god is necessary to win the game and is not
           counted against this conduct.  You are also not penalized for be-
           ing  spoken  to  by an angry god, priest(ess), or other religious
+
+
+          NetHack 3.7                                          July 2, 2020
+
+
+
+
+
+          NetHack Guidebook                                              49
+
+
+
           figure; a true atheist would hear the words but attach no special
           meaning to them.
 
@@ -3149,17 +3186,46 @@
           This  is a particularly difficult challenge, although it is still
           possible to gain experience by other means.
 
-               An illiterate character cannot read or write.  This includes
-          reading  a scroll, spellbook, fortune cookie message, or t-shirt;
-          writing a scroll; or making an engraving of anything other than a
-          single  "X"  (the traditional signature of an illiterate person).
-          Reading an engraving, or any item that is absolutely necessary to
-          win  the game, is not counted against this conduct.  The identity
-          of scrolls and spellbooks  (and  knowledge  of  spells)  in  your
-          starting  inventory  is  assumed to be learned from your teachers
-          prior to the start of the game and isn't counted.
+               An illiterate character does not read or  write.   This  in-
+          cludes reading a scroll, spellbook, fortune cookie message, or t-
+          shirt; writing a scroll; or making an engraving of anything other
+          than  a  single  "X"  (the traditional signature of an illiterate
+          person).  Reading an engraving, or any item  that  is  absolutely
+          necessary  to  win the game, is not counted against this conduct.
+          The identity of scrolls and spellbooks (and knowledge of  spells)
+          in  your  starting  inventory  is assumed to be learned from your
+          teachers prior to the start of the game and isn't counted.
 
+               There is a side-branch to the main dungeon called "Sokoban,"
+          briefly  described  in  the earlier section about Traps.  As men-
+          tioned there, the goal is to push boulders into pits and/or holes
+          to  plug  those  in order to both get the boulders out of the way
+          and be able to go past the traps.  There are some special "rules"
+          that  are  active when in that branch of the dungeon.  Some rules
+          can't be bypassed, such as being unable to push a boulder  diago-
+          nally.  Others rules can, such as not smashing boulders with mag-
+          ic or tools, but doing so causes you to receive a  luck  penalty.
+          No  message about that is given at the time, but it is tracked as
+          a conduct.  The #conduct command and/or end  of  game  disclosure
+          will  report  whether  you  have  abided  by the special rules of
+          Sokoban, and if not, how many times you violated them,  providing
+          you  with  a way to discover which actions incur bad luck so that
+          you can be better informed about whether or not to avoid  repeat-
+          ing  those  actions  in  the future.  (Note:  the Sokoban conduct
+          will only be displayed if you have entered the Sokoban branch  of
+          the  dungeon during the current game.  Once that has happened, it
+          becomes part of disclosed conduct even if you haven't  done  any-
+          thing  interesting  there.   Ending  the  game  with  "obeyed the
+          Sokoban rules" conduct is most meaningful if you also  manage  to
+          perform   the  "obtained  the  Sokoban  prize"  achievement  (see
+          Achievements below).)
 
+               There are several other challenges tracked by the game.   It
+          is possible to eliminate one or more species of monsters by geno-
+          cide; playing without this feature  is  considered  a  challenge.
+          When the game offers you an opportunity to genocide monsters, you
+          may respond with the monster type "none" if you want to  decline.
+          You  can change the form of an item into another item of the same
 
 
           NetHack 3.7                                          July 2, 2020
@@ -3168,16 +3234,10 @@
 
 
 
-          NetHack Guidebook                                              49
+          NetHack Guidebook                                              50
 
 
 
-               There are several other challenges tracked by the game.   It
-          is possible to eliminate one or more species of monsters by geno-
-          cide; playing without this feature  is  considered  a  challenge.
-          When the game offers you an opportunity to genocide monsters, you
-          may respond with the monster type "none" if you want to  decline.
-          You  can change the form of an item into another item of the same
           type ("polypiling") or the form of your  own  body  into  another
           creature  ("polyself")  by  wand,  spell, or potion of polymorph;
           avoiding these effects are each considered challenges.   Polymor-
@@ -3225,6 +3285,12 @@
           Nudist     - Never wore any armor.
           Ascended   - Delivered the Amulet to its final destination.
 
+          Notes:
+
+               Achievements  are  recorded and subsequently reported in the
+          order in which they happen during your current game  rather  than
+          the order listed here.
+
 
 
 
@@ -3234,15 +3300,9 @@
 
 
 
-          NetHack Guidebook                                              50
+          NetHack Guidebook                                              51
 
 
-
-          Notes:
-
-               Achievements  are  recorded and subsequently reported in the
-          order in which they happen during your current game  rather  than
-          the order listed here.
 
                There  are nine <Rank> titles for each role, bestowed at ex-
           perience levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.  The one for
@@ -3293,6 +3353,12 @@
                The default name of the configuration file varies on differ-
           ent operating systems.
 
+               On UNIX, Linux, and Mac OS X it is ".nethackrc" in  the  us-
+          er's  home directory.  The file may not exist, but it is a normal
+          ASCII text file and can be created with any text editor.
+
+
+
 
           NetHack 3.7                                          July 2, 2020
 
@@ -3300,13 +3366,9 @@
 
 
 
-          NetHack Guidebook                                              51
+          NetHack Guidebook                                              52
 
 
-
-               On UNIX, Linux, and Mac OS X it is ".nethackrc" in  the  us-
-          er's  home directory.  The file may not exist, but it is a normal
-          ASCII text file and can be created with any text editor.
 
                On Windows, it is ".nethackrc"  in  the  folder  "\%USERPRO-
           FILE%\NetHack\3.6".   The  file may not exist, but it is a normal
@@ -3358,6 +3420,10 @@
             file so setting HACKDIR to override that is not usually  neces-
             sary or recommended.
 
+          LEVELDIR
+            The  location that in-progress level files are stored. Defaults
+            to HACKDIR, must be writable.
+
 
 
           NetHack 3.7                                          July 2, 2020
@@ -3366,13 +3432,9 @@
 
 
 
-          NetHack Guidebook                                              52
+          NetHack Guidebook                                              53
 
 
-
-          LEVELDIR
-            The  location that in-progress level files are stored. Defaults
-            to HACKDIR, must be writable.
 
           SAVEDIR
             The location where saved games are kept. Defaults  to  HACKDIR,
@@ -3421,8 +3483,12 @@
 
             Example:
 
-
-
+                 OPTIONS=color
+                 CHOOSE=char A,char B
+                 [char A]
+                 OPTIONS=role:arc,race:dwa,align:law,gender:fem
+                 [char B]
+                 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 
 
 
@@ -3432,16 +3498,9 @@
 
 
 
-          NetHack Guidebook                                              53
+          NetHack Guidebook                                              54
 
 
-
-                 OPTIONS=color
-                 CHOOSE=char A,char B
-                 [char A]
-                 OPTIONS=role:arc,race:dwa,align:law,gender:fem
-                 [char B]
-                 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 
           MENUCOLOR
             Highlight menu lines with different colors.  See the "Configur-
@@ -3492,13 +3551,20 @@
 
 
 
+
+
+
+
+
+
+
           NetHack 3.7                                          July 2, 2020
 
 
 
 
 
-          NetHack Guidebook                                              54
+          NetHack Guidebook                                              55
 
 
 
@@ -3564,7 +3630,7 @@
 
 
 
-          NetHack Guidebook                                              55
+          NetHack Guidebook                                              56
 
 
 
@@ -3630,7 +3696,7 @@
 
 
 
-          NetHack Guidebook                                              56
+          NetHack Guidebook                                              57
 
 
 
@@ -3696,7 +3762,7 @@
 
 
 
-          NetHack Guidebook                                              57
+          NetHack Guidebook                                              58
 
 
 
@@ -3762,7 +3828,7 @@
 
 
 
-          NetHack Guidebook                                              58
+          NetHack Guidebook                                              59
 
 
 
@@ -3828,7 +3894,7 @@
 
 
 
-          NetHack Guidebook                                              59
+          NetHack Guidebook                                              60
 
 
 
@@ -3894,7 +3960,7 @@
 
 
 
-          NetHack Guidebook                                              60
+          NetHack Guidebook                                              61
 
 
 
@@ -3960,7 +4026,7 @@
 
 
 
-          NetHack Guidebook                                              61
+          NetHack Guidebook                                              62
 
 
 
@@ -4026,7 +4092,7 @@
 
 
 
-          NetHack Guidebook                                              62
+          NetHack Guidebook                                              63
 
 
 
@@ -4092,7 +4158,7 @@
 
 
 
-          NetHack Guidebook                                              63
+          NetHack Guidebook                                              64
 
 
 
@@ -4158,7 +4224,7 @@
 
 
 
-          NetHack Guidebook                                              64
+          NetHack Guidebook                                              65
 
 
 
@@ -4224,7 +4290,7 @@
 
 
 
-          NetHack Guidebook                                              65
+          NetHack Guidebook                                              66
 
 
 
@@ -4290,7 +4356,7 @@
 
 
 
-          NetHack Guidebook                                              66
+          NetHack Guidebook                                              67
 
 
 
@@ -4356,7 +4422,7 @@
 
 
 
-          NetHack Guidebook                                              67
+          NetHack Guidebook                                              68
 
 
 
@@ -4422,7 +4488,7 @@
 
 
 
-          NetHack Guidebook                                              68
+          NetHack Guidebook                                              69
 
 
 
@@ -4488,7 +4554,7 @@
 
 
 
-          NetHack Guidebook                                              69
+          NetHack Guidebook                                              70
 
 
 
@@ -4554,7 +4620,7 @@
 
 
 
-          NetHack Guidebook                                              70
+          NetHack Guidebook                                              71
 
 
 
@@ -4620,7 +4686,7 @@
 
 
 
-          NetHack Guidebook                                              71
+          NetHack Guidebook                                              72
 
 
 
@@ -4686,7 +4752,7 @@
 
 
 
-          NetHack Guidebook                                              72
+          NetHack Guidebook                                              73
 
 
 
@@ -4752,7 +4818,7 @@
 
 
 
-          NetHack Guidebook                                              73
+          NetHack Guidebook                                              74
 
 
 
@@ -4818,7 +4884,7 @@
 
 
 
-          NetHack Guidebook                                              74
+          NetHack Guidebook                                              75
 
 
 
@@ -4884,7 +4950,7 @@
 
 
 
-          NetHack Guidebook                                              75
+          NetHack Guidebook                                              76
 
 
 
@@ -4950,7 +5016,7 @@
 
 
 
-          NetHack Guidebook                                              76
+          NetHack Guidebook                                              77
 
 
 
@@ -5016,7 +5082,7 @@
 
 
 
-          NetHack Guidebook                                              77
+          NetHack Guidebook                                              78
 
 
 
@@ -5082,7 +5148,7 @@
 
 
 
-          NetHack Guidebook                                              78
+          NetHack Guidebook                                              79
 
 
 
@@ -5148,7 +5214,7 @@
 
 
 
-          NetHack Guidebook                                              79
+          NetHack Guidebook                                              80
 
 
 
@@ -5214,7 +5280,7 @@
 
 
 
-          NetHack Guidebook                                              80
+          NetHack Guidebook                                              81
 
 
 
@@ -5280,7 +5346,7 @@
 
 
 
-          NetHack Guidebook                                              81
+          NetHack Guidebook                                              82
 
 
 
@@ -5346,7 +5412,7 @@
 
 
 
-          NetHack Guidebook                                              82
+          NetHack Guidebook                                              83
 
 
 
@@ -5412,7 +5478,7 @@
 
 
 
-          NetHack Guidebook                                              83
+          NetHack Guidebook                                              84
 
 
 
@@ -5478,7 +5544,7 @@
 
 
 
-          NetHack Guidebook                                              84
+          NetHack Guidebook                                              85
 
 
 
@@ -5544,7 +5610,7 @@
 
 
 
-          NetHack Guidebook                                              85
+          NetHack Guidebook                                              86
 
 
 
@@ -5610,7 +5676,7 @@
 
 
 
-          NetHack Guidebook                                              86
+          NetHack Guidebook                                              87
 
 
 
@@ -5676,7 +5742,7 @@
 
 
 
-          NetHack Guidebook                                              87
+          NetHack Guidebook                                              88
 
 
 
@@ -5742,7 +5808,7 @@
 
 
 
-          NetHack Guidebook                                              88
+          NetHack Guidebook                                              89
 
 
 
@@ -5808,7 +5874,7 @@
 
 
 
-          NetHack Guidebook                                              89
+          NetHack Guidebook                                              90
 
 
 
@@ -5874,7 +5940,7 @@
 
 
 
-          NetHack Guidebook                                              90
+          NetHack Guidebook                                              91
 
 
 
@@ -5940,7 +6006,7 @@
 
 
 
-          NetHack Guidebook                                              91
+          NetHack Guidebook                                              92
 
 
 
@@ -6006,7 +6072,7 @@
 
 
 
-          NetHack Guidebook                                              92
+          NetHack Guidebook                                              93
 
 
 
@@ -6072,7 +6138,7 @@
 
 
 
-          NetHack Guidebook                                              93
+          NetHack Guidebook                                              94
 
 
 
@@ -6138,7 +6204,7 @@
 
 
 
-          NetHack Guidebook                                              94
+          NetHack Guidebook                                              95
 
 
 
@@ -6204,7 +6270,7 @@
 
 
 
-          NetHack Guidebook                                              95
+          NetHack Guidebook                                              96
 
 
 
@@ -6270,7 +6336,7 @@
 
 
 
-          NetHack Guidebook                                              96
+          NetHack Guidebook                                              97
 
 
 
@@ -6336,7 +6402,7 @@
 
 
 
-          NetHack Guidebook                                              97
+          NetHack Guidebook                                              98
 
 
 
@@ -6402,7 +6468,7 @@
 
 
 
-          NetHack Guidebook                                              98
+          NetHack Guidebook                                              99
 
 
 
@@ -6468,7 +6534,7 @@
 
 
 
-          NetHack Guidebook                                              99
+          NetHack Guidebook                                             100
 
 
 
