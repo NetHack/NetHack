@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1591017416 2020/06/01 13:16:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.848 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1593771615 2020/07/03 10:20:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.849 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -998,6 +998,7 @@ E void FDECL(record_achievement, (SCHAR_P));
 E boolean FDECL(remove_achievement, (SCHAR_P));
 E int NDECL(count_achievements);
 E schar FDECL(achieve_rank, (int));
+E boolean NDECL(sokoban_in_play);
 E int NDECL(dovanquished);
 E int NDECL(doborn);
 E void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));

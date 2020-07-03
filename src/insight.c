@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1593768047 2020/07/03 09:20:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1593771616 2020/07/03 10:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1769,7 +1769,7 @@ show_conduct(final)
 int final;
 {
     char buf[BUFSZ];
-    int ngenocided, soko_ach;
+    int ngenocided;
 
     /* Create the conduct window */
     g.en_win = create_nhwindow(NHW_MENU);
@@ -1866,13 +1866,8 @@ int final;
                     " for any artifacts", "");
     }
 
-    /* only report Sokoban conduct if the Sokoban branch has been entered;
-       to find out whether that's the case, it's simpler to check the
-       recorded achievements than the convoluted dungeon data structure */
-    for (soko_ach = 0; u.uachieved[soko_ach]; ++soko_ach)
-        if (u.uachieved[soko_ach] == ACH_SOKO) /* "entered Sokoban" */
-            break;
-    if (u.uachieved[soko_ach]) {
+    /* only report Sokoban conduct if the Sokoban branch has been entered */
+    if (sokoban_in_play()) {
         const char *presentverb = "have violated", *pastverb = "violated";
 
         Strcpy(buf, " the special Sokoban rules ");
@@ -2138,6 +2133,21 @@ int rank; /* 1..8 */
     if (flags.female)
         achidx = -achidx;
     return achidx;
+}
+
+/* return True if sokoban branch has been entered, False otherwise */
+boolean
+sokoban_in_play()
+{
+    int achidx;
+
+    /* TODO? move this to dungeon.c and test furthest level reached of the
+       sokoban branch instead of relying on the entered-sokoban achievement */
+
+    for (achidx = 0; u.uachieved[achidx]; ++achidx)
+        if (u.uachieved[achidx] == ACH_SOKO)
+            return TRUE;
+    return FALSE;
 }
 
 /*

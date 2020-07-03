@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1581322668 2020/02/10 08:17:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1593771616 2020/07/03 10:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -430,6 +430,15 @@ encodeconduct()
         e |= 1L << 10;
     if (!num_genocides())
         e |= 1L << 11;
+    /* one bit isn't really adequate for sokoban conduct:
+       reporting "obeyed sokoban rules" is misleading if sokoban wasn't
+       completed or at least attempted; however, suppressing that when
+       sokoban was never entered, as we do here, risks reporting
+       "violated sokoban rules" when no such thing occured; this can
+       be disambiguated in xlogfile post-processors by testing the
+       entered-sokoban bit in the 'achieve' field */
+    if (!u.uconduct.sokocheat && sokoban_in_play())
+        e |= 1L << 12;
 
     return e;
 }
@@ -582,6 +591,8 @@ encode_extended_conducts()
     add_achieveX(buf, "wishless",     !u.uconduct.wishes);
     add_achieveX(buf, "artiwishless", !u.uconduct.wisharti);
     add_achieveX(buf, "genocideless", !num_genocides());
+    if (sokoban_in_play())
+        add_achieveX(buf, "sokoban",  !u.uconduct.sokocheat);
     add_achieveX(buf, "blind",        u.uroleplay.blind);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
 
