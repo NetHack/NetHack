@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1593306912 2020/06/28 01:15:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.343 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1593772051 2020/07/03 10:27:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4824,8 +4824,12 @@ register struct obj *obj; /* no texts here! */
     if (obj->where == OBJ_FLOOR) {
         obj_extract_self(obj); /* move rocks back on top */
         place_object(obj, obj->ox, obj->oy);
-        if (!does_block(obj->ox, obj->oy, &levl[obj->ox][obj->oy]))
+        if (!does_block(obj->ox, obj->oy, &levl[obj->ox][obj->oy])) {
             unblock_point(obj->ox, obj->oy);
+            /* need immediate update in case this is a striking/force bolt
+               zap that is about hit more things */
+            vision_recalc(0);
+        }
         if (cansee(obj->ox, obj->oy))
             newsym(obj->ox, obj->oy);
     }

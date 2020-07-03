@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ $NHDT-Date: 1593768043 2020/07/03 09:20:43 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ $NHDT-Date: 1593772051 2020/07/03 10:27:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -208,6 +208,9 @@ reading the Book of the Dead while blind is allowed; doing so gives
 reading cursed Book of the Dead while blind gave feedback for sighted hero
 reading non-cursed Book of the Dead without having prepped the other tools
 	referred to those as "artifacts" even though they aren't; use "relics"
+zapping a line of boulders with striking or force bolt was updating 'couldsee'
+	but deferring 'cansee', resulting in seeing the first boulder fracture
+	and only hearing that happen for the others despite coming into view
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
