@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ $NHDT-Date: 1593651682 2020/07/02 01:01:22 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ $NHDT-Date: 1593768043 2020/07/03 09:20:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -385,6 +385,9 @@ boolean options can optionally have the form "name:value" with value taken
 	from among "true", "yes", "on", or "false", "no", "off"
 record number of wishes and artifact wishes in xlogfile
 give feedback for '#chat' directed at walls
+add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
+	which incur luck penalties have been violated; don't report it
+	unless/until Sokoban branch has been entered
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586375531 2020/04/08 19:52:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1593768047 2020/07/03 09:20:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1769,7 +1769,7 @@ show_conduct(final)
 int final;
 {
     char buf[BUFSZ];
-    int ngenocided;
+    int ngenocided, soko_ach;
 
     /* Create the conduct window */
     g.en_win = create_nhwindow(NHW_MENU);
@@ -1864,6 +1864,38 @@ int final;
         if (!u.uconduct.wisharti)
             enl_msg(You_, "have not wished", "did not wish",
                     " for any artifacts", "");
+    }
+
+    /* only report Sokoban conduct if the Sokoban branch has been entered;
+       to find out whether that's the case, it's simpler to check the
+       recorded achievements than the convoluted dungeon data structure */
+    for (soko_ach = 0; u.uachieved[soko_ach]; ++soko_ach)
+        if (u.uachieved[soko_ach] == ACH_SOKO) /* "entered Sokoban" */
+            break;
+    if (u.uachieved[soko_ach]) {
+        const char *presentverb = "have violated", *pastverb = "violated";
+
+        Strcpy(buf, " the special Sokoban rules ");
+        switch (u.uconduct.sokocheat) {
+        case 0L:
+            presentverb = "have not violated";
+            pastverb = "did not violate";
+            Strcpy(buf, " any of the special Sokoban rules");
+            break;
+        case 1L:
+            Strcat(buf, "once");
+            break;
+        case 2L:
+            Strcat(buf, "twice");
+            break;
+        case 3L:
+            Strcat(buf, "thrice");
+            break;
+        default:
+            Sprintf(eos(buf), "%ld times", u.uconduct.sokocheat);
+            break;
+        }
+        enl_msg(You_, presentverb, pastverb, buf, "");
     }
 
     show_achievements(final);
