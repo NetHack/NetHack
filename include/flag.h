@@ -327,6 +327,9 @@ struct instance_flags {
 #ifdef TTY_TILES_ESCCODES
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
+#ifdef TTY_SOUND_ESCCODES
+    boolean vt_sounddata;    /* output console codes for sound support in TTY*/
+#endif
     boolean clicklook;       /* allow right-clicking for look */
     boolean cmdassist;       /* provide detailed assistance for some comnds */
     boolean time_botl;       /* context.botl for 'time' (moves) only */

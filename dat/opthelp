@@ -114,6 +114,9 @@ preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
 Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
 vt_tiledata    insert extra data escape code markers into output  [FALSE]
 
+Boolean option if TTY_SOUND_ESCCODES was set at compile time (tty only):
+vt_sounddata   insert sound data escape code markers into output  [FALSE]
+
 Any Boolean option can be negated by prefixing it with a '!' or 'no'.
 
 

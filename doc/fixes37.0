@@ -298,6 +298,10 @@ Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
 Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
+user_sounds: move the message hook from inside individual window display ports
+	to the core where it allows MSGTYP_NOSHOW msgtyp's to still trigger
+	sounds to correct a reported github issue; also fixes a past reported
+	issue that the curses port on Windows not working with user_sounds
 Windows: update for new status condition fields
 Windows: include commented-out 'PORTABLE_DEVICE_PATHS' in sysconf.template
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
@@ -385,6 +389,11 @@ give feedback for '#chat' directed at walls
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
+user_sounds: provide an experimental mechanism for terminal-side sounds similar
+	to the method used for vt_tiledata; new option vt_sounddata that also
+	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
+	terminal-side code external to NetHack to recognize the sequence and
+	act on it
 
 
 NetHack Community Patches (or Variation) Included
