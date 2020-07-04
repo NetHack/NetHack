@@ -1898,8 +1898,8 @@ discover it with the `{\tt s}' (search) command.  Monsters can fall prey to
 traps, too, which can be a very useful defensive strategy.
 
 %.pg
-There is a special pre-mapped multi-level branch of the dungeon based
-on the classic computer game ``{\tt Sokoban},'' a puzzle solving game.
+There is a special multi-level branch of the dungeon with pre-mapped levels
+based on the classic computer game ``{\tt Sokoban}.''
 In that game, you operate as a warehouse worker who pushes crates around
 obstacles to position them at designated locations.
 In NetHack, the goal is to push boulders into pits or holes until those
@@ -1918,9 +1918,10 @@ according to the traditional rules of Sokoban.
 their eventual destinations in order to open up more room to maneuver.)
 Since NetHack does not support an {\it undo\/} capability, some allowances
 are permitted in case you get stuck.
-For example, you may drop everything in order to be able to squeeze
+For example, each level has at least one extra boulder.
+Also, it is possible to drop everything in order to be able to squeeze
 into the same location as a boulder (and then presumably move past it),
-or may destroy a boulder with magic or tools, or may create new boulders
+or to destroy a boulder with magic or tools, or to create new boulders
 with a scroll of earth.
 However, doing such things will lower your luck without any specific
 message given about that.
@@ -3118,19 +3119,19 @@ There are some special ``rules'' that are active when in that branch
 of the dungeon.
 Some rules can't be bypassed, such as being unable to push a boulder
 diagonally.
-Others rules can, such as not smashing boulders with magic or tools,
+Other rules can, such as not smashing boulders with magic or tools,
 but doing so causes you to receive a luck penalty.
 No message about that is given at the time, but it is tracked as a conduct.
-The #conduct command and/or end of game disclosure will report whether
+The #conduct command and end of game disclosure will report whether
 you have abided by the special rules of Sokoban, and if not, how many
 times you violated them, providing you with a way to discover which
 actions incur bad luck so that you can be better informed about whether
 or not to avoid repeating those actions in the future.
-(Note:  the {\it Sokoban\/} conduct will only be displayed if you have
+(Note:  the Sokoban conduct will only be displayed if you have
 entered the Sokoban branch of the dungeon during the current game.
 Once that has happened, it becomes part of disclosed conduct even if
 you haven't done anything interesting there.
-Ending the game with ``obeyed the Sokoban rules'' conduct is most
+Ending the game with ``never broke the Sokoban rules'' conduct is most
 meaningful if you also manage to perform
 the ``obtained the Sokoban prize'' achievement
 (see {\it Achievements\/} below).)
