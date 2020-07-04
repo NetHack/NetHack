@@ -587,7 +587,7 @@ register struct monst *mtmp;
                 continue;
             if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
                 || !rn2(10)) {
-                if (cansee(m2->mx, m2->my))
+                if (canseemon(m2))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
                 if (DEADMONSTER(m2))
