@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                    July 2, 2020
+                                    July 5, 2020
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -786,7 +786,7 @@
                Di  - examine your inventory before dropping anything.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -984,7 +984,7 @@
                hand and it will generally be less effective than when shot.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1050,7 +1050,7 @@
                from normal play to "explore mode", also known as "discovery
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1182,7 +1182,7 @@
                not  have  a  name,  only  other  stacks  with  no  name are
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1248,7 +1248,7 @@
                Dip  an  object into something.  Autocompletes.  Default key
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1446,7 +1446,7 @@
                it.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1578,7 +1578,7 @@
                Show bare  map  without  displaying  monsters,  objects,  or
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1908,7 +1908,7 @@
           will  set  off  the  trap's  explosion.   (If  you  decline,  you
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -1942,39 +1942,39 @@
           mand.   Monsters can fall prey to traps, too, which can be a very
           useful defensive strategy.
 
-               There is a special pre-mapped multi-level branch of the dun-
-          geon based on the classic computer game "Sokoban," a puzzle solv-
-          ing game.  In that game, you operate as a  warehouse  worker  who
-          pushes crates around obstacles to position them at designated lo-
-          cations.  In NetHack, the goal is to push boulders into  pits  or
-          holes until those traps have all been nullified, giving access to
-          whatever is beyond them.  In the Sokoban game, you can only  move
-          in the four cardinal compass directions, and a crate in its final
-          destination blocks further access to that spot.  In  the  Sokoban
-          levels of NetHack, you can move diagonally (unless that would let
-          you pass between two neighboring boulders) but you can only  push
-          boulders  in  the  four  cardinal directions, and a boulder which
-          fills a pit or hole removes both the  boulder  and  the  trap  so
-          opens  up normal access to that spot.  With careful foresight, it
-          is possible to complete all of the levels according to the tradi-
-          tional  rules  of  Sokoban.  (Hint: to solve Sokoban puzzles, you
-          often need to move things away from their  eventual  destinations
-          in  order  to open up more room to maneuver.)  Since NetHack does
-          not support an undo capability, some allowances are permitted  in
-          case  you get stuck.  For example, you may drop everything in or-
-          der to be able to squeeze into the same  location  as  a  boulder
-          (and then presumably move past it), or may destroy a boulder with
-          magic or tools, or may create  new  boulders  with  a  scroll  of
-          earth.   However,  doing such things will lower your luck without
-          any specific message given about that.  See the  Conduct  section
-          for  information  about  getting  feedback  for  your  actions in
-          Sokoban.
+               There is a special multi-level branch of  the  dungeon  with
+          pre-mapped  levels  based on the classic computer game "Sokoban."
+          In that game, you operate as a warehouse worker who pushes crates
+          around  obstacles  to  position them at designated locations.  In
+          NetHack, the goal is to push boulders into pits  or  holes  until
+          those traps have all been nullified, giving access to whatever is
+          beyond them.  In the Sokoban game, you can only move in the  four
+          cardinal compass directions, and a crate in its final destination
+          blocks further access to that spot.  In  the  Sokoban  levels  of
+          NetHack,  you can move diagonally (unless that would let you pass
+          between two neighboring boulders) but you can only push  boulders
+          in  the four cardinal directions, and a boulder which fills a pit
+          or hole removes both the boulder and the trap so opens up  normal
+          access  to  that spot.  With careful foresight, it is possible to
+          complete all of the levels according to the traditional rules  of
+          Sokoban.  (Hint: to solve Sokoban puzzles, you often need to move
+          things away from their eventual destinations in order to open  up
+          more  room  to maneuver.)  Since NetHack does not support an undo
+          capability, some allowances are permitted in case you get  stuck.
+          For example, each level has at least one extra boulder.  Also, it
+          is possible to drop everything in order to be able to squeeze in-
+          to  the same location as a boulder (and then presumably move past
+          it), or to destroy a boulder with magic or tools,  or  to  create
+          new  boulders with a scroll of earth.  However, doing such things
+          will lower your luck without any  specific  message  given  about
+          that.   See  the  Conduct  section  for information about getting
+          feedback for your actions in Sokoban.
 
 
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2040,7 +2040,7 @@
           will  usually  claim ownership without offering any compensation.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2106,7 +2106,7 @@
           25,  respectively,  and  total  to  2  when  both are at the same
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2304,7 +2304,7 @@
           displayed  at  the  location  where  you  think it is.  That will
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2370,7 +2370,7 @@
           When  you  use "#name" on an object which has already been named,
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2436,7 +2436,7 @@
           simply  elect  to  throw  a spear.  To shoot an arrow, you should
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2502,7 +2502,7 @@
           what  to  throw, you will be prompted for a direction rather than
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2568,7 +2568,7 @@
           times also referred to as "restricted", because you won't be able
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2700,7 +2700,7 @@
           tempt to play the entire game without wearing any armor (a  self-
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2766,7 +2766,7 @@
           name of your favorite reader, so NetHack can shell to it when you
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2832,7 +2832,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2898,7 +2898,7 @@
           can become proficient (to varying degrees), spells are  similarly
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3030,7 +3030,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3096,7 +3096,7 @@
           a  physiological  need for water; thus there is no restriction on
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3162,7 +3162,7 @@
           ing  spoken  to  by an angry god, priest(ess), or other religious
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3203,32 +3203,32 @@
           and be able to go past the traps.  There are some special "rules"
           that  are  active when in that branch of the dungeon.  Some rules
           can't be bypassed, such as being unable to push a boulder  diago-
-          nally.  Others rules can, such as not smashing boulders with mag-
-          ic or tools, but doing so causes you to receive a  luck  penalty.
-          No  message about that is given at the time, but it is tracked as
-          a conduct.  The #conduct command and/or end  of  game  disclosure
-          will  report  whether  you  have  abided  by the special rules of
-          Sokoban, and if not, how many times you violated them,  providing
-          you  with  a way to discover which actions incur bad luck so that
-          you can be better informed about whether or not to avoid  repeat-
-          ing  those  actions  in  the future.  (Note:  the Sokoban conduct
-          will only be displayed if you have entered the Sokoban branch  of
-          the  dungeon during the current game.  Once that has happened, it
-          becomes part of disclosed conduct even if you haven't  done  any-
-          thing  interesting  there.   Ending  the  game  with  "obeyed the
-          Sokoban rules" conduct is most meaningful if you also  manage  to
-          perform   the  "obtained  the  Sokoban  prize"  achievement  (see
-          Achievements below).)
+          nally.  Other rules can, such as not smashing boulders with magic
+          or tools, but doing so causes you to receive a luck penalty.   No
+          message  about  that is given at the time, but it is tracked as a
+          conduct.  The #conduct command and end of  game  disclosure  will
+          report  whether  you have abided by the special rules of Sokoban,
+          and if not, how many times you violated them, providing you  with
+          a way to discover which actions incur bad luck so that you can be
+          better informed about whether or not to avoid repeating those ac-
+          tions  in  the  future.  (Note:  the Sokoban conduct will only be
+          displayed if you have entered the Sokoban branch of  the  dungeon
+          during the current game.  Once that has happened, it becomes part
+          of disclosed conduct even if you haven't done anything  interest-
+          ing  there.  Ending the game with "never broke the Sokoban rules"
+          conduct is most meaningful if you also manage to perform the "ob-
+          tained the Sokoban prize" achievement (see Achievements below).)
 
-               There are several other challenges tracked by the game.   It
+               There  are several other challenges tracked by the game.  It
           is possible to eliminate one or more species of monsters by geno-
-          cide; playing without this feature  is  considered  a  challenge.
+          cide;  playing  without  this  feature is considered a challenge.
           When the game offers you an opportunity to genocide monsters, you
-          may respond with the monster type "none" if you want to  decline.
-          You  can change the form of an item into another item of the same
+          may  respond with the monster type "none" if you want to decline.
+          You can change the form of an item into another item of the  same
+          type  ("polypiling")  or  the  form of your own body into another
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3238,25 +3238,24 @@
 
 
 
-          type ("polypiling") or the form of your  own  body  into  another
-          creature  ("polyself")  by  wand,  spell, or potion of polymorph;
-          avoiding these effects are each considered challenges.   Polymor-
-          phing  monsters,  including  pets, does not break either of these
-          challenges.  Finally, you may sometimes receive  wishes;  a  game
-          without  an attempt to wish for any items is a challenge, as is a
-          game without wishing for an artifact (even if the artifact  imme-
-          diately  disappears).  When the game offers you an opportunity to
-          make a wish for an item, you may choose "nothing" if you want  to
+          creature ("polyself") by wand, spell,  or  potion  of  polymorph;
+          avoiding  these effects are each considered challenges.  Polymor-
+          phing monsters, including pets, does not break  either  of  these
+          challenges.   Finally,  you  may sometimes receive wishes; a game
+          without an attempt to wish for any items is a challenge, as is  a
+          game  without wishing for an artifact (even if the artifact imme-
+          diately disappears).  When the game offers you an opportunity  to
+          make  a wish for an item, you may choose "nothing" if you want to
           decline.
 
           8.1.  Achievements
 
-               End  of  game  disclosure will also display various achieve-
-          ments representing progress toward  ultimate  ascension,  if  any
-          have  been attained.  They aren't directly related to conduct but
-          are grouped with it because they fall into the same  category  of
-          "bragging  rights"  and  to  limit the number of questions during
-          disclosure.  Listed here roughly in order of difficulty  and  not
+               End of game disclosure will also  display  various  achieve-
+          ments  representing  progress  toward  ultimate ascension, if any
+          have been attained.  They aren't directly related to conduct  but
+          are  grouped  with it because they fall into the same category of
+          "bragging rights" and to limit the  number  of  questions  during
+          disclosure.   Listed  here roughly in order of difficulty and not
           necessarily in the order in which you might accomplish them.
 
           <Rank>     - Attained rank title <Rank>.
@@ -3287,14 +3286,15 @@
 
           Notes:
 
-               Achievements  are  recorded and subsequently reported in the
-          order in which they happen during your current game  rather  than
+               Achievements are recorded and subsequently reported  in  the
+          order  in  which they happen during your current game rather than
           the order listed here.
 
+               There are nine <Rank> titles for each role, bestowed at  ex-
+          perience levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.  The one for
 
 
-
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3304,29 +3304,27 @@
 
 
 
-               There  are nine <Rank> titles for each role, bestowed at ex-
-          perience levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.  The one for
-          experience  level  1  is  not recorded as an achievement.  Losing
-          enough levels to revert to lower rank(s)  does  not  discard  the
+          experience level 1 is not recorded  as  an  achievement.   Losing
+          enough  levels  to  revert  to lower rank(s) does not discard the
           corresponding achievement(s).
 
-               There's  no  guaranteed Novel so the achievement to read one
+               There's no guaranteed Novel so the achievement to  read  one
           might not always be attainable (except perhaps by wishing).  Sim-
-          ilarly,  the  Big  Room level is not always present.  Unlike with
+          ilarly, the Big Room level is not always  present.   Unlike  with
           the Novel, there's no way to wish for this opportunity.
 
                The "special items" hidden in Mines' End and Sokoban are not
-          unique  but  are considered to be prizes or rewards for exploring
-          those levels since doing so is  not  necessary  to  complete  the
+          unique but are considered to be prizes or rewards  for  exploring
+          those  levels  since  doing  so  is not necessary to complete the
           game.  Finding other instances of the same objects doesn't record
           the corresponding achievement.
 
-               The Medusa achievement is recorded if she dies for any  rea-
-          son,  even  if  you are not directly responsible, and only if she
+               The  Medusa achievement is recorded if she dies for any rea-
+          son, even if you are not directly responsible, and  only  if  she
           dies.
 
                Blind and Nudist are also conducts, and they can only be en-
-          abled  by  setting the correspondingly named option in NETHACKOP-
+          abled by setting the correspondingly named option  in  NETHACKOP-
           TIONS or run-time configuration file prior to game start.  In the
           case of Blind, the option also enforces the conduct.  They aren't
           really significant accomplishments unless/until you make substan-
@@ -3334,18 +3332,18 @@
 
           9.  Options
 
-               Due  to variations in personal tastes and conceptions of how
+               Due to variations in personal tastes and conceptions of  how
           NetHack should do things, there are options you can set to change
           how NetHack behaves.
 
           9.1.  Setting the options
 
-               Options  may  be  set in a number of ways.  Within the game,
+               Options may be set in a number of ways.   Within  the  game,
           the `O' command allows you to view all options and change most of
-          them.   You can also set options automatically by placing them in
-          a configuration file, or in the NETHACKOPTIONS environment  vari-
+          them.  You can also set options automatically by placing them  in
+          a  configuration file, or in the NETHACKOPTIONS environment vari-
           able.  Some versions of NetHack also have front-end programs that
-          allow you to set options before starting the  game  or  a  global
+          allow  you  to  set  options before starting the game or a global
           configuration for system administrators.
 
           9.2.  Using a configuration file
@@ -3353,14 +3351,16 @@
                The default name of the configuration file varies on differ-
           ent operating systems.
 
-               On UNIX, Linux, and Mac OS X it is ".nethackrc" in  the  us-
-          er's  home directory.  The file may not exist, but it is a normal
+               On  UNIX,  Linux, and Mac OS X it is ".nethackrc" in the us-
+          er's home directory.  The file may not exist, but it is a  normal
           ASCII text file and can be created with any text editor.
 
+               On  Windows,  it  is  ".nethackrc" in the folder "\%USERPRO-
+          FILE%\NetHack\3.6".  The file may not exist, but it is  a  normal
+          ASCII  text  file can can be created with any text editor.  After
 
 
-
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3370,28 +3370,25 @@
 
 
 
-               On Windows, it is ".nethackrc"  in  the  folder  "\%USERPRO-
-          FILE%\NetHack\3.6".   The  file may not exist, but it is a normal
-          ASCII text file can can be created with any text  editor.   After
-          running  NetHack  for  the  first time, you should find a default
-          template for the configuration file  named  ".nethackrc.template"
+          running NetHack for the first time, you  should  find  a  default
+          template  for  the configuration file named ".nethackrc.template"
           in "\%USERPROFILE%\NetHack\3.6".  If you had not created the con-
-          figuration file, NetHack will create the configuration  file  for
+          figuration  file,  NetHack will create the configuration file for
           you using the default template file.
 
-               On  MS-DOS,  it  is  "defaults.nh"  in  the  same  folder as
+               On MS-DOS,  it  is  "defaults.nh"  in  the  same  folder  as
           nethack.exe.
 
-               Any line in the configuration  file  starting  with  `#'  is
+               Any  line  in  the  configuration  file starting with `#' is
           treated as a comment.  Empty lines are ignored.
 
-               Any  line beginning with `[' and ending in `]' is considered
-          a section marker.  The text between the square  brackets  is  the
-          section  name.   Lines after a section marker belong to that sec-
-          tion, and are ignored unless a CHOOSE statement was used  to  se-
+               Any line beginning with `[' and ending in `]' is  considered
+          a  section  marker.   The text between the square brackets is the
+          section name.  Lines after a section marker belong to  that  sec-
+          tion,  and  are ignored unless a CHOOSE statement was used to se-
           lect that section.  Section names are case insensitive.
 
-               You  can use different configuration statements in the file,
+               You can use different configuration statements in the  file,
           some of which can be used multiple times.  In general, the state-
           ments are written in capital letters, followed by an equals sign,
           followed by settings particular to that statement.
@@ -3399,14 +3396,14 @@
                Here is a list of allowed statements:
 
           OPTIONS
-            There are two types of options, boolean and  compound  options.
-            Boolean  options toggle a setting on or off, while compound op-
-            tions take more diverse values.  Prefix a boolean  option  with
-            "no"  or  `!' to turn it off.  For compound options, the option
+            There  are  two types of options, boolean and compound options.
+            Boolean options toggle a setting on or off, while compound  op-
+            tions  take  more diverse values.  Prefix a boolean option with
+            "no" or `!' to turn it off.  For compound options,  the  option
             name and value are separated by a colon.  Some options are per-
             sistent, and apply only to new games.  You can specify multiple
             OPTIONS statements, and multiple options separated by commas in
-            a  single OPTIONS statement.  (Comma separated options are pro-
+            a single OPTIONS statement.  (Comma separated options are  pro-
             cessed from right to left.)
 
             Example:
@@ -3415,18 +3412,21 @@
                  OPTIONS=!legacy,autopickup,pickup_types:$"=/!?+
 
           HACKDIR
-            Default location of files NetHack  needs.  On  Windows  HACKDIR
-            defaults  to  the  location  of the NetHack.exe or NetHackw.exe
-            file so setting HACKDIR to override that is not usually  neces-
+            Default  location  of  files  NetHack needs. On Windows HACKDIR
+            defaults to the location of  the  NetHack.exe  or  NetHackw.exe
+            file  so setting HACKDIR to override that is not usually neces-
             sary or recommended.
 
           LEVELDIR
-            The  location that in-progress level files are stored. Defaults
+            The location that in-progress level files are stored.  Defaults
             to HACKDIR, must be writable.
 
+          SAVEDIR
+            The  location  where saved games are kept. Defaults to HACKDIR,
+            must be writable.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3436,12 +3436,8 @@
 
 
 
-          SAVEDIR
-            The location where saved games are kept. Defaults  to  HACKDIR,
-            must be writable.
-
           BONESDIR
-            The  location  that  bones files are kept. Defaults to HACKDIR,
+            The location that bones files are kept.  Defaults  to  HACKDIR,
             must be writable.
 
           LOCKDIR
@@ -3449,14 +3445,14 @@
             Defaults to HACKDIR, must be writable.
 
           TROUBLEDIR
-            The  location  that  a record of game aborts and self-diagnosed
+            The location that a record of game  aborts  and  self-diagnosed
             game problems is kept. Defaults to HACKDIR, must be writable.
 
           AUTOCOMPLETE
             Enable or disable an extended command autocompletion.  Autocom-
-            pletion  has no effect for the X11 windowport.  You can specify
-            multiple autocompletions.  To enable autocompletion,  list  the
-            extended  command.   Prefix the command with "!" to disable the
+            pletion has no effect for the X11 windowport.  You can  specify
+            multiple  autocompletions.   To enable autocompletion, list the
+            extended command.  Prefix the command with "!" to  disable  the
             autocompletion for that command.
 
             Example:
@@ -3464,13 +3460,13 @@
                  AUTOCOMPLETE=zap,!annotate
 
           AUTOPICKUP_EXCEPTION
-            Set exceptions to the pickup_types option.  See the  "Configur-
+            Set  exceptions to the pickup_types option.  See the "Configur-
             ing Autopickup Exceptions" section.
 
           BINDINGS
-            Change  the  key  bindings of some special keys, menu accelera-
+            Change the key bindings of some special  keys,  menu  accelera-
             tors, or extended commands.  You can specify multiple bindings.
-            Format  is  key  followed by the command, separated by a colon.
+            Format is key followed by the command, separated  by  a  colon.
             See the "Changing Key Bindings" section for more information.
 
             Example:
@@ -3478,7 +3474,7 @@
                  BIND=^X:getpos.autodescribe
 
           CHOOSE
-            Chooses at random one of the comma-separated parameters  as  an
+            Chooses  at  random one of the comma-separated parameters as an
             active section name. Lines in other sections are ignored.
 
             Example:
@@ -3490,9 +3486,13 @@
                  [char B]
                  OPTIONS=role:wiz,race:elf,align:cha,gender:mal
 
+          MENUCOLOR
+            Highlight menu lines with different colors.  See the "Configur-
+            ing Menu Colors" section.
 
 
-          NetHack 3.7                                          July 2, 2020
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3502,16 +3502,12 @@
 
 
 
-          MENUCOLOR
-            Highlight menu lines with different colors.  See the "Configur-
-            ing Menu Colors" section.
-
           MSGTYPE
-            Change the way messages are shown in the top status line.   See
+            Change  the way messages are shown in the top status line.  See
             the "Configuring Message Types" section.
 
           ROGUESYMBOLS
-            Custom  symbols for for the rogue level's symbol set.  See SYM-
+            Custom symbols for for the rogue level's symbol set.  See  SYM-
             BOLS below.
 
           SOUND
@@ -3519,12 +3515,12 @@
             tion.
 
           SOUNDDIR
-            Define  the  directory  that contains the sound files.  See the
+            Define the directory that contains the sound  files.   See  the
             "Configuring User Sounds" section.
 
           SYMBOLS
-            Override one or more symbols in the symbol  set  used  for  all
-            dungeon  levels  except  for  the special rogue level.  See the
+            Override  one  or  more  symbols in the symbol set used for all
+            dungeon levels except for the special  rogue  level.   See  the
             "Modifying NetHack Symbols" section.
 
             Example:
@@ -3533,9 +3529,9 @@
                  SYMBOLS=S_boulder:0,S_golem:7
 
           WIZKIT
-            Debug mode only:  extra items  to  add  to  initial  inventory.
-            Value  is  the  name  of  a text file containing a list of item
-            names, one per line, up to a maximum of 128 lines.   Each  line
+            Debug  mode  only:   extra  items  to add to initial inventory.
+            Value is the name of a text file  containing  a  list  of  item
+            names,  one  per line, up to a maximum of 128 lines.  Each line
             is processed by the function that handles wishing.
 
             Example:
@@ -3558,7 +3554,11 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3588,12 +3588,12 @@
 
           9.3.  Using the NETHACKOPTIONS environment variable
 
-               The  NETHACKOPTIONS  variable  is  a comma-separated list of
-          initial values for the various options.  Some can only be  turned
-          on  or  off.   You turn one of these on by adding the name of the
-          option to the list, and turn it off by typing a `!' or  "no"  be-
-          fore  the  name.  Others take a character string as a value.  You
-          can set string options by typing the  option  name,  a  colon  or
+               The NETHACKOPTIONS variable is  a  comma-separated  list  of
+          initial  values for the various options.  Some can only be turned
+          on or off.  You turn one of these on by adding the  name  of  the
+          option  to  the list, and turn it off by typing a `!' or "no" be-
+          fore the name.  Others take a character string as a  value.   You
+          can  set  string  options  by  typing the option name, a colon or
           equals sign, and then the value of the string.  The value is ter-
           minated by the next comma or the end of string.
 
@@ -3603,7 +3603,7 @@
 
           % setenv NETHACKOPTIONS "color,\!leg,name:Blue Meanie,fruit:lime"
 
-          in csh (note the need to escape the `!'  since  it's  special  to
+          in  csh  (note  the  need to escape the `!' since it's special to
           that shell), or the pair of commands
 
           $ NETHACKOPTIONS="color,!leg,name:Blue Meanie,fruit:lime"
@@ -3613,18 +3613,18 @@
 
                The NETHACKOPTIONS value is effectively the same as a single
           OPTIONS statement in a configuration file.  The "OPTIONS=" prefix
-          is  implied  and comma separated options are processed from right
+          is implied and comma separated options are processed  from  right
           to left.  Other types of configuration statements such as BIND or
           MSGTYPE are not allowed.
 
                Instead of a comma-separated list of options, NETHACKOPTIONS
-          can be set to the full name of a configuration file you  want  to
-          use.   If  that  full name doesn't start with a slash, precede it
-          with `@' (at-sign) to let NetHack know that the rest is  intended
-          as  a  file  name.   If  it  does  start with `/', the at-sign is
+          can  be  set to the full name of a configuration file you want to
+          use.  If that full name doesn't start with a  slash,  precede  it
+          with  `@' (at-sign) to let NetHack know that the rest is intended
+          as a file name.  If it  does  start  with  `/',  the  at-sign  is
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3639,28 +3639,28 @@
           9.4.  Customization options
 
                Here are explanations of what the various options do.  Char-
-          acter  strings  that  are too long may be truncated.  Some of the
+          acter strings that are too long may be truncated.   Some  of  the
           options listed may be inactive in your dungeon.
 
-               Some options are persistent,  and  are  saved  and  reloaded
+               Some  options  are  persistent,  and  are saved and reloaded
           along with the game.  Changing a persistent option in the config-
           uration file applies only to new games.
 
           acoustics
-            Enable messages about what your character hears  (default  on).
+            Enable  messages  about what your character hears (default on).
             Note that this has nothing to do with your computer's audio ca-
             pabilities.  Persistent.
 
           align
-            Your  starting  alignment  (align:lawful,   align:neutral,   or
-            align:chaotic).   You  may  specify just the first letter.  The
-            default is to randomly pick an appropriate alignment.   If  you
+            Your   starting   alignment  (align:lawful,  align:neutral,  or
+            align:chaotic).  You may specify just the  first  letter.   The
+            default  is  to randomly pick an appropriate alignment.  If you
             prefix the value with `!' or "no", you will exclude that align-
-            ment from being picked randomly.  Cannot be set  with  the  `O'
+            ment  from  being  picked randomly.  Cannot be set with the `O'
             command.  Persistent.
 
           autodescribe
-            Automatically  describe  the terrain under cursor when asked to
+            Automatically describe the terrain under cursor when  asked  to
             get a location on the map (default true).  The whatis_coord op-
             tion controls whether the description includes map coordinates.
 
@@ -3669,28 +3669,28 @@
             into a place that can be dug (default false).  Persistent.
 
           autoopen
-            Walking into a closed door attempts to open it (default  true).
+            Walking  into a closed door attempts to open it (default true).
             Persistent.
 
           autopickup
-            Automatically  pick up things onto which you move (default on).
+            Automatically pick up things onto which you move (default  on).
             Persistent.  See pickup_types to refine the behavior.
 
           autoquiver
-            This option controls what happens  when  you  attempt  the  `f'
-            (fire)  command  when  nothing  is quivered or readied (default
-            false).  When true, the  computer  will  fill  your  quiver  or
-            quiver  sack  or make ready some suitable weapon.  Note that it
-            will not take into account the blessed/cursed status,  enchant-
+            This  option  controls  what  happens  when you attempt the `f'
+            (fire) command when nothing is  quivered  or  readied  (default
+            false).   When  true,  the  computer  will  fill your quiver or
+            quiver sack or make ready some suitable weapon.  Note  that  it
+            will  not take into account the blessed/cursed status, enchant-
             ment, damage, or quality of the weapon; you are free to manual-
-            ly fill your quiver or quiver sack or make ready with  the  `Q'
+            ly  fill  your quiver or quiver sack or make ready with the `Q'
             command instead.  If no weapon is found or the option is false,
             the `t' (throw) command is executed instead.  Persistent.
 
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3701,9 +3701,9 @@
 
 
           autounlock
-            Walking into a locked door or looting a locked container  while
-            carrying  an unlocking tool (such as a key) will ask whether to
-            use that tool to unlock the door or container  (default  true).
+            Walking  into a locked door or looting a locked container while
+            carrying an unlocking tool (such as a key) will ask whether  to
+            use  that  tool to unlock the door or container (default true).
             Persistent.
 
           blind
@@ -3711,32 +3711,24 @@
             tent.
 
           bones
-            Allow saving and loading bones files (default  true).   Persis-
+            Allow  saving  and loading bones files (default true).  Persis-
             tent.
 
           boulder
-            Set  the  character  used  to  display boulders (default is the
+            Set the character used to  display  boulders  (default  is  the
             "large rock" class symbol, ``').
 
           catname
-            Name your starting cat (for example "catname:Morris").   Cannot
+            Name  your starting cat (for example "catname:Morris").  Cannot
             be set with the `O' command.
 
           character
-            Synonym  for "role" to pick the type of your character (for ex-
+            Synonym for "role" to pick the type of your character (for  ex-
             ample "character:Monk").  See role for more details.
 
           checkpoint
-            Save game state after each level change, for possible  recovery
+            Save  game state after each level change, for possible recovery
             after program crash (default on).  Persistent.
-
-          checkspace
-            Check  free  disk  space  before writing files to disk (default
-            on).  You may have to turn this off if you have more than 2  GB
-            free  space on the partition used for your save and level files
-            (because too much space might overflow the calculation and  end
-            up looking like insufficient space).  Only applies when MFLOPPY
-            was defined during compilation.
 
           clicklook
             Allows looking at things on the screen by navigating the  mouse
@@ -3754,9 +3746,17 @@
           dark_room
             Show out-of-sight areas of lit rooms (default on).  Persistent.
 
+          disclose
+            Controls what information the program  reveals  when  the  game
+            ends.   Value  is  a space separated list of prompting/category
+            pairs (default is "ni na nv ng nc no", prompt with default  re-
+            sponse of `n' for each candidate).  Persistent.  The possibili-
+            ties are:
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3765,13 +3765,6 @@
           NetHack Guidebook                                              58
 
 
-
-          disclose
-            Controls what information the program  reveals  when  the  game
-            ends.   Value  is  a space separated list of prompting/category
-            pairs (default is "ni na nv ng nc no", prompt with default  re-
-            sponse of `n' for each candidate).  Persistent.  The possibili-
-            ties are:
 
                  i - disclose your inventory;
                  a - disclose your attributes;
@@ -3820,9 +3813,16 @@
             Name your starting dog (for example "dogname:Fang").  Cannot be
             set with the `O' command.
 
+          extmenu
+            Changes  the  extended  commands  interface to pop-up a menu of
+            available commands.  It is keystroke compatible with the tradi-
+            tional  interface  except that it does not require that you hit
+            Enter.  It is implemented for the tty interface (default off).
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3831,12 +3831,6 @@
           NetHack Guidebook                                              59
 
 
-
-          extmenu
-            Changes  the  extended  commands  interface to pop-up a menu of
-            available commands.  It is keystroke compatible with the tradi-
-            tional  interface  except that it does not require that you hit
-            Enter.  It is implemented for the tty interface (default off).
 
             For the X11 interface, which always uses a menu for choosing an
             extended command, it controls whether the menu shows all avail-
@@ -3886,9 +3880,15 @@
             the `/' command, ask if you want to see it (default on).  Turn-
             ing  help  off  makes  just looking at things faster, since you
             aren't interrupted with the "More info?" prompt,  but  it  also
+            means that you might miss some interesting and/or important in-
+            formation.  Persistent.
+
+          herecmd_menu
+            When using a windowport that supports  mouse  and  clicking  on
+            yourself  or  next  to you, show a menu of possible actions for
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3898,12 +3898,6 @@
 
 
 
-            means that you might miss some interesting and/or important in-
-            formation.  Persistent.
-
-          herecmd_menu
-            When using a windowport that supports  mouse  and  clicking  on
-            yourself  or  next  to you, show a menu of possible actions for
             the location.  Same as "#herecmdmenu" and "#therecmdmenu"  com-
             mands.
 
@@ -3953,8 +3947,14 @@
             Show corridor squares seen by night vision or  a  light  source
             held by your character as lit (default off).  Persistent.
 
+          lootabc
+            When  using  a  menu  to interact with a container, use the old
+            `a', `b', and `c' keyboard shortcuts rather than the  mnemonics
+            `o', `i', and `b' (default off).  Persistent.
 
-          NetHack 3.7                                          July 2, 2020
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -3963,11 +3963,6 @@
           NetHack Guidebook                                              61
 
 
-
-          lootabc
-            When  using  a  menu  to interact with a container, use the old
-            `a', `b', and `c' keyboard shortcuts rather than the  mnemonics
-            `o', `i', and `b' (default off).  Persistent.
 
           mail
             Enable mail delivery during the game (default on).  Persistent.
@@ -4019,8 +4014,13 @@
             Menu character accelerator to jump to the first page in a menu.
             Implemented by the Amiga, Gem and tty ports.  Default `^'.
 
+          menu_headings
+            Controls how the headings in a menu  are  highlighted.   Values
+            are  "none", "bold", "dim", "underline", "blink", or "inverse".
+            Not all ports can actually display all types.
 
-          NetHack 3.7                                          July 2, 2020
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4029,11 +4029,6 @@
           NetHack Guidebook                                              62
 
 
-
-          menu_headings
-            Controls how the headings in a menu  are  highlighted.   Values
-            are  "none", "bold", "dim", "underline", "blink", or "inverse".
-            Not all ports can actually display all types.
 
           menu_invert_all
             Menu character accelerator to invert all items in a menu.   Im-
@@ -4084,9 +4079,14 @@
 
           mouse_support
             Allow use of the mouse for input and  travel.   Valid  settings
+            are:
+
+                 0 - disabled
+                 1 - enabled and make OS adjustments to support mouse use
+                 2 - like 1 but does not make any OS adjustments
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4096,14 +4096,8 @@
 
 
 
-            are:
-
-                 0 - disabled
-                 1 - enabled and make OS adjustments to support mouse use
-                 2 - like 1 but does not make any OS adjustments
-
-            Omitting  a  value  is  the  same  as specifying 1 and negating
-            mouse_support is the same as specifying 0.
+                 Omitting  a value is the same as specifying 1 and negating
+                 mouse_support is the same as specifying 0.
 
           msghistory
             The number of top line messages to keep (and be able to  recall
@@ -4150,9 +4144,15 @@
              0 - move by letters; "yuhjklbn"
              1 - move by numbers; digit `5' acts as `G' movement prefix
              2 - like 1 but `5' works as `g' prefix instead of as `G'
+             3 - by numbers using phone key layout; 123 above, 789 below
+             4 - combines 3 with 2; phone layout plus MS-DOS compatibility
+            -1 - by letters but use `z' to go northwest, `y' to zap wands
+
+            For backward compatibility, omitting a value  is  the  same  as
+            specifying  1 and negating number_pad is the same as specifying
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4162,12 +4162,6 @@
 
 
 
-             3 - by numbers using phone key layout; 123 above, 789 below
-             4 - combines 3 with 2; phone layout plus MS-DOS compatibility
-            -1 - by letters but use `z' to go northwest, `y' to zap wands
-
-            For backward compatibility, omitting a value  is  the  same  as
-            specifying  1 and negating number_pad is the same as specifying
             0.  (Settings 2 and 4 are for compatibility with MS-DOS or  old
             PC Hack; in addition to the different behavior for `5', `Alt-5'
             acts as `G' and `Alt-0' acts as `I'.  Setting -1 is to accommo-
@@ -4216,9 +4210,15 @@
             all         - turn on all of the above.
 
             By  default,  the  pray choice is enabled, the others disabled.
+            To disable it without setting any of  the  other  choices,  use
+            "paranoid_confirmation:none".  To keep it enabled while setting
+            any of the others, include it  in  the  list,  such  as  "para-
+            noid_confirmation:attack pray Remove".
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4227,11 +4227,6 @@
           NetHack Guidebook                                              65
 
 
-
-            To disable it without setting any of  the  other  choices,  use
-            "paranoid_confirmation:none".  To keep it enabled while setting
-            any of the others, include it  in  the  list,  such  as  "para-
-            noid_confirmation:attack pray Remove".
 
           perm_invent
             If  true,  always  display  your current inventory in a window.
@@ -4282,9 +4277,14 @@
 
           pickup_thrown
             If this option is on and autopickup is also on, try to pick  up
+            things  that  you threw, even if they aren't in pickup_types or
+            match an autopickup exception.  Default is on.  Persistent.
+
+          pickup_types
+            Specify the object types to be picked up when autopickup is on.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4294,11 +4294,6 @@
 
 
 
-            things  that  you threw, even if they aren't in pickup_types or
-            match an autopickup exception.  Default is on.  Persistent.
-
-          pickup_types
-            Specify the object types to be picked up when autopickup is on.
             Default is all types.  You can use autopickup_exception config-
             uration file lines to further refine autopickup behavior.  Per-
             sistent.
@@ -4347,10 +4342,15 @@
             Make the space bar a synonym for the `.' (#wait)  command  (de-
             fault off).  Persistent.
 
+          role
+            Pick  your type of character (for example "role:Samurai"); syn-
+            onym for "character".  See "name" for an  alternate  method  of
+            specifying  your  role.   Normally only the first letter of the
+            value is examined; `r' is an exception with "Rogue",  "Ranger",
+            and "random" values.  If you prefix the value with `!' or "no",
 
 
-
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4360,12 +4360,6 @@
 
 
 
-          role
-            Pick  your type of character (for example "role:Samurai"); syn-
-            onym for "character".  See "name" for an  alternate  method  of
-            specifying  your  role.   Normally only the first letter of the
-            value is examined; `r' is an exception with "Rogue",  "Ranger",
-            and "random" values.  If you prefix the value with `!' or "no",
             you will exclude that role from being picked randomly.   Cannot
             be set with the `O' command.  Persistent.
 
@@ -4414,9 +4408,15 @@
             Show your accumulated experience points on bottom line (default
             off).  Persistent.
 
+          showrace
+            Display yourself as the glyph for your race,  rather  than  the
+            glyph  for your role (default off).  Note that this setting af-
+            fects only the appearance of the display, not the way the  game
+            treats you.  Persistent.
 
 
-          NetHack 3.7                                          July 2, 2020
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4425,12 +4425,6 @@
           NetHack Guidebook                                              68
 
 
-
-          showrace
-            Display yourself as the glyph for your race,  rather  than  the
-            glyph  for your role (default off).  Note that this setting af-
-            fects only the appearance of the display, not the way the  game
-            treats you.  Persistent.
 
           showscore
             Show your approximate accumulated score on bottom line (default
@@ -4481,8 +4475,14 @@
             screen.   Use "symset:default" to explicitly select the default
             symbols.
 
+          time
+            Show the elapsed game time in turns  on  bottom  line  (default
+            off).  Persistent.
 
-          NetHack 3.7                                          July 2, 2020
+
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4491,10 +4491,6 @@
           NetHack Guidebook                                              69
 
 
-
-          time
-            Show the elapsed game time in turns  on  bottom  line  (default
-            off).  Persistent.
 
           timed_delay
             When  pausing  momentarily for display effect, such as with ex-
@@ -4545,10 +4541,14 @@
 
           whatis_filter
             When getting a location on the map, and using the keys to cycle
-            through   next  and  previous  targets,  allows  filtering  the
+            through  next and previous targets, allows filtering the possi-
+            ble targets.
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4557,8 +4557,6 @@
           NetHack Guidebook                                              70
 
 
-
-            possible targets.
 
                  n - no filtering [default]
                  v - in view only
@@ -4612,9 +4610,11 @@
           listed here.  You can safely add any of  these  options  to  your
           configuration  file, and if the window port is capable of adjust-
           ing to suit your preferences, it will attempt to  do  so.  If  it
+          can't  it will silently ignore it.  You can find out if an option
+          is supported by the window port that you are currently  using  by
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4624,8 +4624,6 @@
 
 
 
-          can't  it will silently ignore it.  You can find out if an option
-          is supported by the window port that you are currently  using  by
           checking to see if it shows up in the Options list.  Some options
           are dynamic and can be specified during the  game  with  the  `O'
           command.
@@ -4678,9 +4676,11 @@
           font_size_menu
             If NetHack can, it should use this size font for menu windows.
 
+          font_size_message
+            If  NetHack  can,  it should use this size font for the message
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4690,8 +4690,6 @@
 
 
 
-          font_size_message
-            If  NetHack  can,  it should use this size font for the message
             window.
 
           font_size_status
@@ -4746,7 +4744,9 @@
             Not all ports support this option.
 
 
-          NetHack 3.7                                          July 2, 2020
+
+
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4812,7 +4812,7 @@
                  2 - auto, on if display is at least (24+2)x(80+2)  (default)
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4878,7 +4878,7 @@
             ond ESC to finish cancelling such a count.  At other prompts  a
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -4944,7 +4944,7 @@
             Set the color palette for PC systems  using  NO_TERMS  (default
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5142,7 +5142,7 @@
             When asked for a location, the key to go  to  previous  closest
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5208,7 +5208,7 @@
             location.  Default is `z'.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5274,7 +5274,7 @@
                     sage is shown in between.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5340,7 +5340,7 @@
             specifies  that  any menu line with " blessed " contained in it
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5406,7 +5406,7 @@
           will  cause  the  hitpoints  field to display in the color red if
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5472,7 +5472,7 @@
             ally displayed depending upon your other option settings.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5868,7 +5868,7 @@
           program  as  a  message  handler", your NetHack has been compiled
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6000,7 +6000,7 @@
             bones file content in ascii text.
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6066,7 +6066,7 @@
             %D - current time, YYYYMMDDhhmmss format
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6132,7 +6132,7 @@
           It is initiated by starting the game  with  the  -D  command-line
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6264,7 +6264,7 @@
           "icons" and were distinct for  specific  types  of  monsters  and
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6330,7 +6330,7 @@
           Walz, and Paul Winner, released 3.3.0 in December 1999 and  3.3.1
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6396,7 +6396,7 @@
           stable version that provided continued enjoyment by the community
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6462,7 +6462,7 @@
           NetHack 3.6, hindered by limited  access.  Kevin  Smolkowski  has
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6528,7 +6528,7 @@
           of the names of the worst of these miscreants in this,  the  list
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7                                          July 2, 2020
+          NetHack 3.7                                          July 5, 2020
 
 
 
