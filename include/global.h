@@ -175,36 +175,12 @@ extern struct cross_target_s cross_target;
 #include "unixconf.h"
 #endif
 
-#ifdef OS2
-#include "os2conf.h"
-#endif
-
 #ifdef MSDOS
 #include "pcconf.h"
 #endif
 
-#ifdef TOS
-#include "tosconf.h"
-#endif
-
-#ifdef AMIGA
-#include "amiconf.h"
-#endif
-
-#ifdef MAC
-#include "macconf.h"
-#endif
-
-#ifdef __BEOS__
-#include "beconf.h"
-#endif
-
 #ifdef WIN32
-#ifdef WIN_CE
-#include "wceconf.h"
-#else
 #include "ntconf.h"
-#endif
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */

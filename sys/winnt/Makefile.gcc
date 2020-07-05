@@ -474,8 +474,7 @@ endif
 CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
 		$(INCL)/global.h $(INCL)/fnamesiz.h $(INCL)/coord.h \
 		$(INCL)/vmsconf.h $(INCL)/system.h $(INCL)/unixconf.h \
-		$(INCL)/os2conf.h $(INCL)/micro.h $(INCL)/pcconf.h \
-		$(INCL)/tosconf.h $(INCL)/amiconf.h $(INCL)/macconf.h \
+		$(INCL)/micro.h $(INCL)/pcconf.h \
 		$(INCL)/beconf.h $(INCL)/ntconf.h
 
 HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \

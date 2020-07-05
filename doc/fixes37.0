@@ -468,7 +468,8 @@ convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
 relocated unmaintained code to outdated folder, specifically sys/amiga, 
 	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
-	win/gnome, include/amiconf.h, include/os2conf.h, include/tosconf.h
-remove SYSFLAGS conditional code
-remove MFLOPPY conditional code
-
+	win/gnome, include/amiconf.h, include/beconf.h, include/def_os2.h,
+	include/os2conf.h, include/macconf.h, include/tosconf.h,
+	include/wceconf.h
+removed SYSFLAGS conditional code
+removed MFLOPPY conditional code
