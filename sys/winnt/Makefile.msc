@@ -472,7 +472,7 @@ PDCLIB =
 CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\global.h $(INCL)\fnamesiz.h $(INCL)\coord.h \
 		$(INCL)\vmsconf.h $(INCL)\system.h $(INCL)\nhlua.h \
-		$(INCL)\unixconf.h $(INCL)\micro.h $(INCL)\pcconf.h \ 
+		$(INCL)\unixconf.h $(INCL)\micro.h $(INCL)\pcconf.h \
 		$(INCL)\ntconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
