@@ -493,7 +493,7 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_file.h, special level & dungeon files.
 #
-HACKINCL = align.h artifact.h artilist.h attrib.h beconf.h botl.h \
+HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
 	func_tab.h global.h hack.h lint.h mextra.h mfndpos.h \
