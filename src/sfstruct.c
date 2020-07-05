@@ -1,4 +1,4 @@
-/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1593953360 2020/07/05 12:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -212,11 +212,6 @@ register unsigned num;
     int idx = getidx(fd, NOFLG);
 
     if (idx >= 0) {
-#ifdef MFLOPPY
-        bytes_counted += num;
-        if (count_only)
-            return;
-#endif
 #ifdef USE_BUFFERING
         if (bw_buffered[idx] && bw_FILE[idx]) {
             failed = (fwrite(loc, (int) num, 1, bw_FILE[idx]) != 1);

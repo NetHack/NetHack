@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1591476281 2020/06/06 20:44:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.466 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1593953355 2020/07/05 12:49:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.467 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,9 +8,6 @@
 #include "objclass.h"
 #include "flag.h"
 NEARDATA struct flag flags; /* provide linkage */
-#ifdef SYSFLAGS
-NEARDATA struct sysflag sysflags; /* provide linkage */
-#endif
 NEARDATA struct instance_flags iflags; /* provide linkage */
 #define static
 #else
@@ -5989,10 +5986,6 @@ initoptions_init()
             *(allopt[i].addr) = allopt[i].initval;
     }
 
-#ifdef SYSFLAGS
-    Strcpy(sysflags.sysflagsid, "sysflags");
-    sysflags.sysflagsid[9] = (char) sizeof (struct sysflag);
-#endif
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;

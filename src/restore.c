@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1581886865 2020/02/16 21:01:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1593953357 2020/07/05 12:49:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -33,7 +33,7 @@ static void FDECL(freefruitchn, (struct fruit *));
 static void FDECL(ghostfruit, (struct obj *));
 static boolean FDECL(restgamestate, (NHFILE *, unsigned int *, unsigned int *));
 static void FDECL(restlevelstate, (unsigned int, unsigned int));
-static int FDECL(restlevelfile, (NHFILE *, XCHAR_P));
+static int FDECL(restlevelfile, (XCHAR_P));
 static void FDECL(restore_msghistory, (NHFILE *));
 static void FDECL(reset_oattached_mids, (BOOLEAN_P));
 static void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
@@ -548,9 +548,6 @@ NHFILE *nhfp;
 unsigned int *stuckid, *steedid;
 {
     struct flag newgameflags;
-#ifdef SYSFLAGS
-    struct sysflag newgamesysflags;
-#endif
     struct context_info newgamecontext; /* all 0, but has some pointers */
     struct obj *otmp;
     struct obj *bc_obj;
@@ -608,12 +605,6 @@ unsigned int *stuckid, *steedid;
         /* specified by save file; check authorization now */
         set_playmode();
     }
-#ifdef SYSFLAGS
-    newgamesysflags = sysflags;
-    if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
-#endif
-
     role_init(); /* Reset the initial role, race, gender, and alignment */
 #ifdef AMII_GRAPHICS
     amii_setpens(amii_numcolors); /* use colors from save file */
@@ -654,9 +645,6 @@ unsigned int *stuckid, *steedid;
         iflags.deferred_X = FALSE;
         iflags.perm_invent = defer_perm_invent;
         flags = newgameflags;
-#ifdef SYSFLAGS
-        sysflags = newgamesysflags;
-#endif
         g.context = newgamecontext;
         g.youmonst = cg.zeromonst;
         return FALSE;
@@ -776,66 +764,22 @@ unsigned int stuckid, steedid;
 
 /*ARGSUSED*/
 static int
-restlevelfile(nhfp, ltmp)
-NHFILE *nhfp; /* used in MFLOPPY only */
+restlevelfile(ltmp)
 xchar ltmp;
 {
     char whynot[BUFSZ];
-#ifdef MFLOPPY
-    int savemode;
-#endif
-    NHFILE *nnhfp = (NHFILE *) 0;
+    NHFILE *nhfp = (NHFILE *) 0;
 
-#ifndef MFLOPPY
-    nhUse(nhfp);
-#endif
-    nnhfp = create_levelfile(ltmp, whynot);
-    if (!nnhfp) {
+    nhfp = create_levelfile(ltmp, whynot);
+    if (!nhfp) {
         /* BUG: should suppress any attempt to write a panic
            save file if file creation is now failing... */
         panic("restlevelfile: %s", whynot);
     }
-#ifdef MFLOPPY
-    savemode = nnhfp->mode;
-    nnhfp->mode = COUNTING;
-    if (!savelev(nnhfp, ltmp)) {
-        /* The savelev can't proceed because the size required
-         * is greater than the available disk space.
-         */
-        pline("Not enough space on `%s' to restore your game.", levels);
-
-        /* Remove levels and bones that may have been created.
-         */
-        close_nhfile(nnhfp);
-#ifdef AMIGA
-        clearlocks();
-#else /* !AMIGA */
-        eraseall(levels, g.alllevels);
-        eraseall(levels, g.allbones);
-
-        /* Perhaps the person would like to play without a
-         * RAMdisk.
-         */
-        if (g.ramdisk) {
-            /* PlaywoRAMdisk may not return, but if it does
-             * it is certain that g.ramdisk will be 0.
-             */
-            playwoRAMdisk();
-            /* Rewind save file and try again */
-            rewind_nhfile(nhfp);
-            (void) validate(nhfp, (char *) 0); /* skip version etc */
-            return dorecover(nhfp);            /* 0 or 1 */
-        }
-#endif /* ?AMIGA */
-        pline("Be seeing you...");
-        nh_terminate(EXIT_SUCCESS);
-    }
-    nnhfp->mode = savemode;
-#endif /* MFLOPPY */
-    bufon(nnhfp->fd);
-    nnhfp->mode = WRITING | FREEING;
-    savelev(nnhfp, ltmp);
-    close_nhfile(nnhfp);
+    bufon(nhfp->fd);
+    nhfp->mode = WRITING | FREEING;
+    savelev(nhfp, ltmp);
+    close_nhfile(nhfp);
     return 2;
 }
 
@@ -870,7 +814,7 @@ NHFILE *nhfp;
 #ifdef INSURANCE
     savestateinlock();
 #endif
-    rtmp = restlevelfile(nhfp, ledger_no(&u.uz));
+    rtmp = restlevelfile(ledger_no(&u.uz));
     if (rtmp < 2)
         return rtmp; /* dorecover called recursively */
 
@@ -924,7 +868,7 @@ NHFILE *nhfp;
         }
         mark_synch();
 #endif
-        rtmp = restlevelfile(nhfp, ltmp);
+        rtmp = restlevelfile(ltmp);
         if (rtmp < 2)
             return rtmp; /* dorecover called recursively */
     }
@@ -944,9 +888,6 @@ NHFILE *nhfp;
         assign_graphics(ROGUESET);
 #ifdef USE_TILES
     substitute_tiles(&u.uz);
-#endif
-#ifdef MFLOPPY
-    gameDiskPrompt();
 #endif
     max_rank_sz(); /* to recompute g.mrank_sz (botl.c) */
     /* take care of iron ball & chain */
