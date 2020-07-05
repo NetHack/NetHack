@@ -1020,7 +1020,7 @@ int mndx;
     } else if (!mon->m_lev) {
         mon->mhpmax = mon->mhp = rnd(4);
     } else {
-        mon->mhpmax = mon->mhp = d((int) mon->m_lev, 8);
+        mon->mhpmax = mon->mhp = d((int) mon->m_lev, 8) + 1;
         if (is_home_elemental(ptr))
             mon->mhpmax = (mon->mhp *= 3);
     }
