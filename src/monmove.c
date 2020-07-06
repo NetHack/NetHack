@@ -593,7 +593,7 @@ register struct monst *mtmp;
                 if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
                 else
-                    m2->msleeping = 0;
+                    wakeup(m2, FALSE);
             }
         }
     }
