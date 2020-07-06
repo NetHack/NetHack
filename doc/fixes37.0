@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ $NHDT-Date: 1593651682 2020/07/02 01:01:22 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ $NHDT-Date: 1593772051 2020/07/03 10:27:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -208,6 +208,9 @@ reading the Book of the Dead while blind is allowed; doing so gives
 reading cursed Book of the Dead while blind gave feedback for sighted hero
 reading non-cursed Book of the Dead without having prepped the other tools
 	referred to those as "artifacts" even though they aren't; use "relics"
+zapping a line of boulders with striking or force bolt was updating 'couldsee'
+	but deferring 'cansee', resulting in seeing the first boulder fracture
+	and only hearing that happen for the others despite coming into view
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -385,6 +388,9 @@ boolean options can optionally have the form "name:value" with value taken
 	from among "true", "yes", "on", or "false", "no", "off"
 record number of wishes and artifact wishes in xlogfile
 give feedback for '#chat' directed at walls
+add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
+	which incur luck penalties have been violated; don't report it
+	unless/until Sokoban branch has been entered
 
 
 Platform- and/or Interface-Specific New Features
@@ -462,4 +468,8 @@ convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
 relocated unmaintained code to outdated folder, specifically sys/amiga, 
 	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
-	win/gnome
+	win/gnome, include/amiconf.h, include/beconf.h, include/def_os2.h,
+	include/os2conf.h, include/macconf.h, include/tosconf.h,
+	include/wceconf.h
+removed SYSFLAGS conditional code
+removed MFLOPPY conditional code

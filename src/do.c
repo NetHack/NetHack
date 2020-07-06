@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1588191740 2020/04/29 20:22:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1593953347 2020/07/05 12:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1157,9 +1157,6 @@ currentlevel_rewrite()
 {
     NHFILE *nhfp;
     char whynot[BUFSZ];
-#ifdef MFLOPPY
-    int savemode;
-#endif
 
     /* since level change might be a bit slow, flush any buffered screen
      *  output (like "you fall through a trap door") */
@@ -1178,18 +1175,6 @@ currentlevel_rewrite()
         return (NHFILE *) 0;
     }
 
-#ifdef MFLOPPY
-    savemode = nhfp->mode;
-    nhfp->mode = COUNTING;
-    if (!savelev(nhfp, ledger_no(&u.uz))) {
-        close_nhfile(nhfp);
-        delete_levelfile(ledger_no(&u.uz));
-        pline("NetHack is out of disk space for making levels!");
-        You("can save, quit, or continue playing.");
-        return -1;
-    }
-    nhfp->mode = savemode;
-#endif
     return nhfp;
 }
 

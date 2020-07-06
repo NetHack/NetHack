@@ -173,14 +173,14 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
-HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
-	   config.h config1.h context.h coord.h decl.h def_os2.h display.h \
+HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
+	   config.h config1.h context.h coord.h decl.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
-	   hack.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+	   hack.h mextra.h mfndpos.h micro.h mkroom.h \
 	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	   os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	   patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	   tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h \
+	   tradstdc.h trampoli.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -378,11 +378,8 @@ spotless :	clean
 #	dependencies (mostly cloned from sys/unix/Makefile.src)
 # config.h timestamp
 $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
-		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h \
-		$(INC)unixconf.h $(INC)os2conf.h $(INC)micro.h \
-		$(INC)pcconf.h $(INC)tosconf.h $(INC)amiconf.h \
-		$(INC)macconf.h $(INC)beconf.h $(INC)wceconf.h \
-		$(INC)ntconf.h
+		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h $(INC)unixconf.h \
+		$(INC)micro.h $(INC)pcconf.h $(INC)ntconf.h
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \

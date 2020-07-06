@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1591017416 2020/06/01 13:16:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.848 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1593953334 2020/07/05 12:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.850 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -787,9 +787,6 @@ E char *FDECL(fname_encode, (const char *, CHAR_P, char *, char *, int));
 E char *FDECL(fname_decode, (CHAR_P, char *, char *, int));
 E const char *FDECL(fqname, (const char *, int, int));
 E FILE *FDECL(fopen_datafile, (const char *, const char *, int));
-#ifdef MFLOPPY
-E void NDECL(set_lock_and_bones);
-#endif
 E void FDECL(zero_nhfile, (NHFILE *));
 E void FDECL(close_nhfile, (NHFILE *));
 E void FDECL(rewind_nhfile, (NHFILE *));
@@ -799,9 +796,6 @@ E NHFILE *FDECL(open_levelfile, (int, char *));
 E void FDECL(delete_levelfile, (int));
 E void NDECL(clearlocks);
 E NHFILE *FDECL(create_bonesfile, (d_level *, char **, char *));
-#ifdef MFLOPPY
-E void NDECL(cancel_bonesfile);
-#endif
 E void FDECL(commit_bonesfile, (d_level *));
 E NHFILE *FDECL(open_bonesfile, (d_level *, char **));
 E int FDECL(delete_bonesfile, (d_level *));
@@ -998,6 +992,7 @@ E void FDECL(record_achievement, (SCHAR_P));
 E boolean FDECL(remove_achievement, (SCHAR_P));
 E int NDECL(count_achievements);
 E schar FDECL(achieve_rank, (int));
+E boolean NDECL(sokoban_in_play);
 E int NDECL(dovanquished);
 E int NDECL(doborn);
 E void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
@@ -1934,13 +1929,6 @@ E const char *NDECL(get_portable_device);
 #if defined(MICRO) || defined(WIN32)
 E void NDECL(flushout);
 E int NDECL(dosh);
-#ifdef MFLOPPY
-E void FDECL(eraseall, (const char *, const char *));
-E void FDECL(copybones, (int));
-E void NDECL(playwoRAMdisk);
-E int FDECL(saveDiskPrompt, (int));
-E void NDECL(gameDiskPrompt);
-#endif
 E void FDECL(append_slash, (char *));
 E void FDECL(getreturn, (const char *));
 #ifndef AMIGA
@@ -2302,13 +2290,7 @@ E boolean FDECL(tricked_fileremoved, (NHFILE *, char *));
 #ifdef INSURANCE
 E void NDECL(savestateinlock);
 #endif
-#ifdef MFLOPPY
-E boolean FDECL(savelev, (NHFILE *, XCHAR_P));
-E boolean FDECL(swapin_file, (int));
-E void NDECL(co_false);
-#else
 E void FDECL(savelev, (NHFILE *, XCHAR_P));
-#endif
 E genericptr_t FDECL(mon_to_buffer, (struct monst *, int *));
 E boolean FDECL(close_check, (int));
 E void FDECL(savecemetery, (NHFILE *, struct cemetery **));

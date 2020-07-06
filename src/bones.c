@@ -1,13 +1,9 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1571363147 2019/10/18 01:45:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1593953344 2020/07/05 12:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-#ifdef MFLOPPY
-extern long bytes_counted;
-#endif
 
 static boolean FDECL(no_bones_level, (d_level *));
 static void FDECL(goodfruit, (int));
@@ -530,43 +526,6 @@ struct obj *corpse;
         return;
     }
     c = (char) (strlen(bonesid) + 1);
-
-#ifdef MFLOPPY /* check whether there is room */
-    if (iflags.checkspace) {
-        int savemode = nhfp->mode;
-
-        nhfp->mode = COUNTING;
-        savelev(nhfp, ledger_no(&u.uz));
-        /* savelev() initializes bytes_counted to 0, so it must come
-         * first here even though it does not in the real save.  the
-         * resulting extra bflush() at the end of savelev() may increase
-         * bytes_counted by a couple over what the real usage will be.
-         *
-         * note it is safe to call store_version() here only because
-         * bufon() is null for ZEROCOMP, which MFLOPPY uses -- otherwise
-         * this code would have to know the size of the version
-         * information itself.
-         */
-        store_version(nhfp);
-        store_savefileinfo(nhfp);
-    	if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
-            bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
-        }
-        savefruitchn(nhfp);
-        if (nhfp->structlevel)
-            bflush(nhfp->fd);
-        if (bytes_counted > freediskspace(bones)) { /* not enough room */
-            if (wizard)
-                pline("Insufficient space to create bones file.");
-	    close_nhfile(nhfp);
-            cancel_bonesfile();
-            return;
-        }
-        co_false(); /* make sure stuff before savelev() gets written */
-        nhfp->mode = savemode;
-    }
-#endif /* MFLOPPY */
 
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{July 2, 2020}
+\date{July 5, 2020}
 
 \maketitle
 
@@ -1898,12 +1898,35 @@ discover it with the `{\tt s}' (search) command.  Monsters can fall prey to
 traps, too, which can be a very useful defensive strategy.
 
 %.pg
-There is a special pre-mapped branch of the dungeon based on the
-classic computer game ``{\tt Sokoban}.''  The goal is to push the boulders
-into the pits or holes.  With careful foresight, it is possible to
-complete all of the levels according to the traditional rules of
-Sokoban.  Some allowances are permitted in case the player gets stuck;
-however, they will lower your luck.
+There is a special multi-level branch of the dungeon with pre-mapped levels
+based on the classic computer game ``{\tt Sokoban}.''
+In that game, you operate as a warehouse worker who pushes crates around
+obstacles to position them at designated locations.
+In NetHack, the goal is to push boulders into pits or holes until those
+traps have all been nullified, giving access to whatever is beyond them.
+In the Sokoban game, you can only move in the four cardinal compass
+directions, and a crate in its final destination blocks further access
+to that spot.
+In the Sokoban levels of NetHack, you can move diagonally (unless that
+would let you pass between two neighboring boulders) but you can only
+push boulders in the four cardinal directions, and a boulder which fills
+a pit or hole removes both the boulder and the trap so opens up normal
+access to that spot.
+With careful foresight, it is possible to complete all of the levels
+according to the traditional rules of Sokoban.
+(Hint: to solve Sokoban puzzles, you often need to move things away from
+their eventual destinations in order to open up more room to maneuver.)
+Since NetHack does not support an {\it undo\/} capability, some allowances
+are permitted in case you get stuck.
+For example, each level has at least one extra boulder.
+Also, it is possible to drop everything in order to be able to squeeze
+into the same location as a boulder (and then presumably move past it),
+or to destroy a boulder with magic or tools, or to create new boulders
+with a scroll of earth.
+However, doing such things will lower your luck without any specific
+message given about that.
+See the Conduct section for information about getting feedback for your
+actions in Sokoban.
 
 %.hn 2
 \subsection*{Stairs and ladders (`{\tt <}', `{\tt >}')}
@@ -3076,7 +3099,7 @@ difficult challenge, although it is still possible to gain experience
 by other means.
 
 %.pg
-An illiterate character cannot read or write.  This includes reading
+An illiterate character does not read or write.  This includes reading
 a scroll, spellbook, fortune cookie message, or t-shirt; writing a
 scroll; or making an engraving of anything other than a single ``X'' (the
 traditional signature of an illiterate person).  Reading an engraving,
@@ -3085,6 +3108,33 @@ against this conduct.  The identity of scrolls and spellbooks (and
 knowledge of spells) in your starting inventory is assumed to be
 learned from your teachers prior to the start of the game and isn't
 counted.
+
+%.pg
+There is a side-branch to the main dungeon called ``Sokoban,'' briefly
+described in the earlier section about {\it Traps}.
+As mentioned there, the goal is to push boulders into pits and/or holes
+to plug those in order to both get the boulders out of your way and be
+able to go past the traps.
+There are some special ``rules'' that are active when in that branch
+of the dungeon.
+Some rules can't be bypassed, such as being unable to push a boulder
+diagonally.
+Other rules can, such as not smashing boulders with magic or tools,
+but doing so causes you to receive a luck penalty.
+No message about that is given at the time, but it is tracked as a conduct.
+The #conduct command and end of game disclosure will report whether
+you have abided by the special rules of Sokoban, and if not, how many
+times you violated them, providing you with a way to discover which
+actions incur bad luck so that you can be better informed about whether
+or not to avoid repeating those actions in the future.
+(Note:  the Sokoban conduct will only be displayed if you have
+entered the Sokoban branch of the dungeon during the current game.
+Once that has happened, it becomes part of disclosed conduct even if
+you haven't done anything interesting there.
+Ending the game with ``never broke the Sokoban rules'' conduct is most
+meaningful if you also manage to perform
+the ``obtained the Sokoban prize'' achievement
+(see {\it Achievements\/} below).)
 
 %.pg
 There are several other challenges tracked by the game.  It is possible
@@ -3593,14 +3643,6 @@ synonym for ``{\it role\/}''.  See {\it role\/} for more details.
 \item[\ib{checkpoint}]
 Save game state after each level change, for possible recovery after
 program crash (default on).  Persistent.
-%.lp
-\item[\ib{checkspace}]
-Check free disk space before writing files to disk (default on).
-You may have to turn this off if you have more than 2 GB free space
-on the partition used for your save and level files
-(because too much space might overflow the calculation and end up
-looking like insufficient space).
-Only applies when MFLOPPY was defined during compilation.
 %.lp
 \item[\ib{clicklook}]
 Allows looking at things on the screen by navigating the mouse
@@ -5106,11 +5148,11 @@ Each SOUND entry is broken down into the following parts:
 
 %.sd
 %.si
-{\tt MESG      } --- message window mapping (the only one supported in 3.6);\\
-{\tt pattern   } --- the pattern to match;\\
-{\tt sound file} --- the sound file to play;\\
-{\tt volume    } --- the volume to be set while playing the sound file.
-{\tt sound index } --- optional - the index corresponding to a sound file.
+{\tt MESG       } --- message window mapping (the only one supported in 3.6);\\
+{\tt pattern    } --- the pattern to match;\\
+{\tt sound file } --- the sound file to play;\\
+{\tt volume     } --- the volume to be set while playing the sound file;\\
+{\tt sound index} --- optional; the index corresponding to a sound file.
 %.ei
 %.ed
 \elist

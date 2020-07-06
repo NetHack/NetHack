@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date: 1447755969 2015/11/17 10:26:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	dungeon.h	$NHDT-Date: 1593953333 2020/07/05 12:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -167,15 +167,6 @@ struct linfo {
         /* Note:  VISITED and LFILE_EXISTS are currently almost always
          * set at the same time.  However they _mean_ different things.
          */
-#ifdef MFLOPPY
-#define FROMPERM 1 /* for ramdisk use */
-#define TOPERM 2   /* for ramdisk use */
-#define ACTIVE 1
-#define SWAPPED 2
-    int where;
-    long time;
-    long size;
-#endif /* MFLOPPY */
 };
 
 /* types and structures for dungeon map recording

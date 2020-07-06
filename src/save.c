@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1590263454 2020/05/23 19:50:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1593953359 2020/07/05 12:49:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,11 +10,6 @@
 #endif
 #if !defined(LSC) && !defined(O_WRONLY) && !defined(AZTEC_C)
 #include <fcntl.h>
-#endif
-
-#ifdef MFLOPPY
-long bytes_counted;
-static int count_only;
 #endif
 
 #if defined(UNIX) || defined(WIN32)
@@ -38,12 +33,6 @@ static void FDECL(savemonchn, (NHFILE *,struct monst *));
 static void FDECL(savetrapchn, (NHFILE *,struct trap *));
 static void FDECL(savegamestate, (NHFILE *));
 static void FDECL(save_msghistory, (NHFILE *));
-
-#ifdef MFLOPPY
-static void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
-static boolean NDECL(swapout_oldest);
-static void FDECL(copyfile, (char *, char *));
-#endif /* MFLOPPY */
 
 #ifdef ZEROCOMP
 static void FDECL(zerocomp_bufon, (int));
@@ -119,11 +108,6 @@ dosave0()
     (void) signal(SIGINT, SIG_IGN);
 #endif
 
-#if defined(MICRO) && defined(MFLOPPY)
-    if (!saveDiskPrompt(0))
-        return 0;
-#endif
-
     HUP if (iflags.window_inited) {
         nh_uncompress(fq_save);
         nhfp = open_savefile();
@@ -165,36 +149,6 @@ dosave0()
     if (!WINDOWPORT("X11"))
         putstr(WIN_MAP, 0, "Saving:");
 #endif
-#ifdef MFLOPPY
-    /* make sure there is enough disk space */
-    if (iflags.checkspace) {
-        long fds, needed;
-
-        nhfp->mode = COUNTING;
-        savelev(nhfp, ledger_no(&u.uz));
-        savegamestate(nhfp);
-        needed = bytes_counted;
-
-        for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
-            if (ltmp != ledger_no(&u.uz) && g.level_info[ltmp].where)
-                needed += g.level_info[ltmp].size + (sizeof ltmp);
-        fds = freediskspace(fq_save);
-        if (needed > fds) {
-            HUP
-            {
-                There("is insufficient space on SAVE disk.");
-                pline("Require %ld bytes but only have %ld.", needed, fds);
-            }
-            flushout();
-            close_nhfile(nhfp);
-            (void) delete_savefile();
-            return 0;
-        }
-
-        co_false();
-    }
-#endif /* MFLOPPY */
-
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);
     store_savefileinfo(nhfp);
@@ -272,17 +226,11 @@ NHFILE *nhfp;
     unsigned long uid;
     struct obj * bc_objs = (struct obj *)0;
 
-#ifdef MFLOPPY
-    count_only = (nhfp->mode & COUNTING);
-#endif
     uid = (unsigned long) getuid();
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
         bwrite(nhfp->fd, (genericptr_t) &g.context, sizeof g.context);
         bwrite(nhfp->fd, (genericptr_t) &flags, sizeof flags);
-#ifdef SYSFLAGS
-        bwrite(nhfp->fd, (genericptr_t) &sysflags, sysflags);
-#endif
     }
     urealtime.finish_time = getnow();
     urealtime.realtime += (long) (urealtime.finish_time
@@ -443,44 +391,8 @@ savestateinlock()
 }
 #endif
 
-#ifdef MFLOPPY
-boolean
-savelev(nhfp, lev)
-NHFILE *nhfp;
-xchar lev;
-{
-    if (nhfp->mode & COUNTING) {
-        int savemode = nhfp->mode;
-
-        bytes_counted = 0;
-        savelev0(nhfp, lev);
-        /* probably bytes_counted will be filled in again by an
-         * immediately following WRITE_SAVE anyway, but we'll
-         * leave it out of checkspace just in case */
-        if (iflags.checkspace) {
-            while (bytes_counted > freediskspace(levels))
-                if (!swapout_oldest())
-                    return FALSE;
-        }
-    }
-    if (nhfp->mode & (WRITING | FREEING)) {
-        bytes_counted = 0;
-        savelev0(nhfp, lev);
-    }
-    if (nhfp->mode != FREEING) {
-        g.level_info[lev].where = ACTIVE;
-        g.level_info[lev].time = g.moves;
-        g.level_info[lev].size = bytes_counted;
-    }
-    return TRUE;
-}
-
-static void
-savelev0(nhfp, lev)
-#else
 void
 savelev(nhfp, lev)
-#endif
 NHFILE *nhfp;
 xchar lev;
 {
@@ -516,9 +428,6 @@ xchar lev;
 
         if (!nhfp)
             panic("Save on bad file!"); /* impossible */
-#ifdef MFLOPPY
-        count_only = (nhfp->mode & COUNTING);
-#endif
         if (lev >= 0 && lev <= maxledgerno())
             g.level_info[lev].flags |= VISITED;
         if (nhfp->structlevel)
@@ -1167,97 +1076,4 @@ freedynamicdata()
     return;
 }
 
-#ifdef MFLOPPY
-boolean
-swapin_file(lev)
-int lev;
-{
-    char to[PATHLEN], from[PATHLEN];
-
-    Sprintf(from, "%s%s", g.permbones, g.alllevels);
-    Sprintf(to, "%s%s", levels, g.alllevels);
-    set_levelfile_name(from, lev);
-    set_levelfile_name(to, lev);
-    if (iflags.checkspace) {
-        while (g.level_info[lev].size > freediskspace(to))
-            if (!swapout_oldest())
-                return FALSE;
-    }
-    if (wizard) {
-        pline("Swapping in `%s'.", from);
-        wait_synch();
-    }
-    copyfile(from, to);
-    (void) unlink(from);
-    g.level_info[lev].where = ACTIVE;
-    return TRUE;
-}
-
-static boolean
-swapout_oldest()
-{
-    char to[PATHLEN], from[PATHLEN];
-    int i, oldest;
-    long oldtime;
-
-    if (!g.ramdisk)
-        return FALSE;
-    for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
-        if (g.level_info[i].where == ACTIVE
-            && (!oldtime || g.level_info[i].time < oldtime)) {
-            oldest = i;
-            oldtime = g.level_info[i].time;
-        }
-    if (!oldest)
-        return FALSE;
-    Sprintf(from, "%s%s", levels, g.alllevels);
-    Sprintf(to, "%s%s", g.permbones, g.alllevels);
-    set_levelfile_name(from, oldest);
-    set_levelfile_name(to, oldest);
-    if (wizard) {
-        pline("Swapping out `%s'.", from);
-        wait_synch();
-    }
-    copyfile(from, to);
-    (void) unlink(from);
-    g.level_info[oldest].where = SWAPPED;
-    return TRUE;
-}
-
-static void
-copyfile(from, to)
-char *from, *to;
-{
-#ifdef TOS
-    if (_copyfile(from, to))
-        panic("Can't copy %s to %s", from, to);
-#else
-    char buf[BUFSIZ]; /* this is system interaction, therefore
-                       * BUFSIZ instead of NetHack's BUFSZ */
-    int nfrom, nto, fdfrom, fdto;
-
-    if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0)
-        panic("Can't copy from %s !?", from);
-    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0)
-        panic("Can't copy to %s", to);
-    do {
-        nfrom = read(fdfrom, buf, BUFSIZ);
-        nto = write(fdto, buf, nfrom);
-        if (nto != nfrom)
-            panic("Copyfile failed!");
-    } while (nfrom == BUFSIZ);
-    (void) nhclose(fdfrom);
-    (void) nhclose(fdto);
-#endif /* TOS */
-}
-
-/* see comment in bones.c */
-void
-co_false()
-{
-    count_only = FALSE;
-    return;
-}
-
-#endif /* MFLOPPY */
 /*save.c*/

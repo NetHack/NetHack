@@ -370,7 +370,7 @@ WINCURSESLIB = -lncurses
 GAME     = nethack
 # GAME     = nethack.prg
 
-# if you defined RANDOM in unixconf.h/tosconf.h since your system did not come
+# if you defined RANDOM in unixconf.h since your system did not come
 # with a reasonable random number generator
 # RANDOBJ = random.o
 RANDOBJ =
@@ -401,7 +401,7 @@ QUIETCC=0
 # Nothing below this line should have to be changed.
 #
 # Other things that have to be reconfigured are in config.h,
-# {unixconf.h, pcconf.h, tosconf.h}, and possibly system.h
+# {unixconf.h, pcconf.h}, and possibly system.h
 
 # Verbosity definitions, begin
 #   Set QUIETCC=1 above to output less feedback while building.
@@ -493,15 +493,15 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_file.h, special level & dungeon files.
 #
-HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
-	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
+HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
+	color.h config.h config1.h context.h coord.h decl.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
-	func_tab.h global.h hack.h lint.h macconf.h mextra.h mfndpos.h \
+	func_tab.h global.h hack.h lint.h mextra.h mfndpos.h \
 	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	optlist.h os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	optlist.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
 	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
@@ -733,9 +733,7 @@ depend: ../sys/unix/depend.awk \
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/global.h ../include/coord.h ../include/vmsconf.h \
 		../include/system.h ../include/nhlua.h ../include/unixconf.h \
-		../include/os2conf.h ../include/micro.h ../include/pcconf.h \
-		../include/tosconf.h ../include/amiconf.h ../include/macconf.h \
-		../include/beconf.h ../include/wceconf.h ../include/ntconf.h \
+		../include/micro.h ../include/pcconf.h ../include/ntconf.h \
 		../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp

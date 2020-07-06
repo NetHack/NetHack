@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1575161954 2019/12/01 00:59:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.6 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1593953352 2020/07/05 12:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -228,13 +228,8 @@ make_version()
          | ((unsigned long) sizeof(struct obj) << 17)
          | ((unsigned long) sizeof(struct monst) << 10)
          | ((unsigned long) sizeof(struct you)));
-    version.struct_sizes2 = (((unsigned long) sizeof(struct flag) << 10) |
+    version.struct_sizes2 = (((unsigned long) sizeof(struct flag) << 10));
 /* free bits in here */
-#ifdef SYSFLAGS
-                             ((unsigned long) sizeof(struct sysflag)));
-#else
-                             ((unsigned long) 0L));
-#endif
     return;
 }
 
@@ -438,9 +433,6 @@ static const char *build_opts[] = {
 #endif
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     "external program as a message handler",
-#endif
-#ifdef MFLOPPY
-    "floppy drive support",
 #endif
 #ifdef INSURANCE
     "insurance files for recovering from crashes",

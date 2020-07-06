@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1586382778 2020/04/08 21:52:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1593768051 2020/07/03 09:20:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5456,13 +5456,18 @@ void
 sokoban_guilt()
 {
     if (Sokoban) {
+        u.uconduct.sokocheat++;
         change_luck(-1);
-        /* TODO: issue some feedback so that player can learn that whatever
-           he/she just did is a naughty thing to do in sokoban and should
-           probably be avoided in future....
-           Caveat: doing this might introduce message sequencing issues,
-           depending upon feedback during the various actions which trigger
-           Sokoban luck penalties. */
+        /*
+         * TODO:
+         *  Issue some feedback so that player can learn that whatever
+         *  he/she just did is a naughty thing to do in sokoban and
+         *  should probably be avoided in future....
+         *
+         *  Caveat:  doing this might introduce message sequencing
+         *  issues, depending upon feedback during the various actions
+         *  which trigger Sokoban luck penalties.
+         */
     }
 }
 
