@@ -23,13 +23,6 @@
 #include "flag.h"
 #include "dlb.h"
 
-/* version information */
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
-
 #include <ctype.h>
 #ifdef MAC
 #if defined(__SC__) || defined(__MRC__) /* MPW compilers */

@@ -4,9 +4,6 @@
 
 #include "config.h"
 #include "dlb.h"
-#if defined(VERSION_IN_DLB_FILENAME)
-#include "patchlevel.h"
-#endif
 
 #ifdef __DJGPP__
 #include <string.h>
