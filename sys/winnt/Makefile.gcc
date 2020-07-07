@@ -126,6 +126,12 @@ TARGET_CPU=x86
 # x86libs or x64libs depending on whether you're building for 64 bits.
 #
 #---------------------------------------------------------------
+ifndef LUA_VERSION
+LUAVER=5.4.0
+else
+LUAVER=$(LUA_VERSION)
+endif
+#---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
@@ -137,11 +143,7 @@ TARGET_CPU=x86
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua-5.4.0
-ifndef LUA_VERSION
-LUA_VERSION=5.4.0
-endif
-
+LUATOP=../lib/lua-$(LUAVER)
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -415,7 +417,9 @@ OPTIONS_FILE = $(DAT)\options
 # Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
+ifndef LUAVER
 LUAVER   = 5.4.0
+endif
 LUASRC   = $(LUATOP)/src
 LUALIB   = $(O)lua-$(LUAVER).static.a
 LUADLL   = $(O)lua-$(LUAVER).a
