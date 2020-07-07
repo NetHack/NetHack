@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.388 $ $NHDT-Date: 1593953329 2020/07/05 12:48:49 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.389 $ $NHDT-Date: 1594118318 2020/07/07 10:38:38 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -5417,8 +5417,9 @@ He then coordinated a cast of thousands in enhancing and debugging
 NetHack 1.4 and released NetHack versions 2.2 and 2.3.
 .pg
 Later, Mike coordinated a major re-write of the game, heading a
-team which included \fBKen Arromdee\fP, \fBJean-Christophe Collet\fP, \fBSteve
-Creps\fP, \fBEric Hendrickson\fP, \fBIzchak Miller\fP, \fBJohn Rupley\fP,
+team which included \fBKen Arromdee\fP, \fBJean-Christophe Collet\fP,
+\fBSteve Creps\fP, \fBEric Hendrickson\fP, \fBIzchak Miller\fP,
+\fBEric S. Raymond\fP, \fBJohn Rupley\fP,
 \fBMike Threepoint\fP, and \fBJanet Walz\fP, to produce NetHack 3.0c.
 .pg
 NetHack 3.0 was ported to the Atari by \fBEric R. Smith\fP, to OS/2 by
@@ -5435,20 +5436,26 @@ revisions of 3.0.
 .pg
 Version 3.0 went through ten relatively rapidly released \(lqpatch-level\(rq
 revisions.
-Versions at the time were designated \(lq3.0 patchlevel 10\(rq
-or \(lq3.0pl10\(rq rather than 3.0.10; that three component numbering scheme
-began to be used with 3.1.0.
+Versions at the time were known as 3.0 for the base release and variously
+as \(lq3.0a\(rq through \(lq3.0j\(rq,
+\(lq3.0\ patchlevel\ 1\(rq through \(lq3.0\ patchlevel\ 10\(rq,
+or \(lq3.0pl1\(rq through \(lq3.0pl10\(rq
+rather than 3.0.0 and 3.0.1 through 3.0.10;
+the three component numbering scheme began to be used with 3.1.0.
 .pg
 Headed by \fBMike Stephenson\fP and coordinated by \fBIzchak Miller\fP and
 \fBJanet Walz\fP, the NetHack Development Team which now included
 \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJean-Christophe Collet\fP, \fBKevin Darcy\fP,
 \fBMatt Day\fP, \fBTimo Hakulinen\fP, \fBSteve Linhart\fP, \fBDean Luick\fP,
-\fBPat Rankin\fP, \fBEric Raymond\fP, and \fBEric Smith\fP undertook a radical
-revision of 3.0.  They re-structured the game's design, and re-wrote major
-parts of the code.  They added multiple dungeons, a new display, special
+\fBPat Rankin\fP, \fBEric Raymond\fP, and \fBEric Smith\fP undertook a
+radical revision of 3.0.
+They re-structured the game's design, and re-wrote major
+parts of the code.
+They added multiple dungeons, a new display, special
 individual character quests, a new endgame and many other new features, and
 produced NetHack 3.1.
+Version 3.1.0 was released in January of 1993.
 .pg
 \fBKen Lorber\fP, \fBGregg Wonderly\fP and \fBGreg Olson\fP, with help
 from \fBRichard Addison\fP, \fBMike Passaretti\fP, and \fBOlaf Seibert\fP,
@@ -5494,15 +5501,18 @@ The 3.2 NetHack Development Team, comprised of \fBMichael Allison\fP, \fBKen
 Arromdee\fP, \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSteve Creps\fP,
 \fBKevin Darcy\fP, \fBTimo Hakulinen\fP, \fBSteve Linhart\fP, \fBDean
 Luick\fP, \fBPat Rankin\fP, \fBEric Smith\fP, \fBMike Stephenson\fP,
-\fBJanet Walz\fP, and \fBPaul Winner\fP, released version 3.2 in April of
+\fBJanet Walz\fP, and \fBPaul Winner\fP, released version 3.2.0 in April of
 1996.
 .pg
-Version 3.2 marked the tenth anniversary of the formation of the development
-team.  In a testament to their dedication to the game, all thirteen members
-of the original NetHack Development Team remained on the team at the start of work
-on that release.  During the interval between the release of 3.1.3
-and 3.2, one of the founding members of the NetHack Development Team, \fBDr. Izchak
-Miller\fP, was diagnosed with cancer and passed away.  That release of the
+Version 3.2 marked the tenth anniversary of the formation of the
+development team.
+In a testament to their dedication to the game, all thirteen members
+of the original NetHack Development Team remained on the team at the
+start of work on that release.
+During the interval between the release of 3.1.3
+and 3.2.0, one of the founding members of the NetHack Development Team,
+\fBDr. Izchak Miller\fP, was diagnosed with cancer and passed away.
+That release of the
 game was dedicated to him by the development and porting teams.
 .pg
 Version 3.2 proved to be more stable than previous versions.
@@ -5532,6 +5542,19 @@ of these ideas into NetHack 3.3.
 .pg
 The final update to 3.2 was the bug fix release 3.2.3, which was released
 simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
+Because of the newer version, 3.2.3 was released as a source code patch only,
+without any ready-to-play distribution for systems that usually had such.
+.pg
+(To anyone considering resurrecting an old version:  all versions before
+3.2.3 had a \fIY2K\fP bug.
+The high scores file and the log file contained
+dates which were formatted using a two-digit year, and 1999's year 99 was
+followed by 2000's year 100.
+That got written out successfully but it
+unintentionally introduced an extra column in the file layout which prevented
+score entries from being read back in correctly, interfering with insertion
+of new high scores and with retrieval of old character names to use for
+random ghost and statue names in the current game.)
 .pg
 The 3.3 NetHack Development Team, consisting of
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
