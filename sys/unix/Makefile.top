@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.6  Makefile.top    $NHDT-Date: 1589911654 2020/05/19 18:07:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $
+# NetHack 3.6  Makefile.top    $NHDT-Date: 1594155882 2020/07/07 21:04:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -75,7 +75,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 #CHGRP = chgrp
 
 # Lua version
-LUA_VERSION = 5.3.5
+LUA_VERSION = 5.4.0
 
 #
 # end of configuration

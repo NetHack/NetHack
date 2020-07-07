@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1573165004 2019/11/07 22:16:44 $	$NHDT-Branch: paxed-lua-v2-merged $:$NHDT-Revision: 1.38 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1594155889 2020/07/07 21:04:49 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -29,7 +29,7 @@ VMS = [-.sys.vms]
 WINSHR = [-.win.share]
 X11 = [-.win.X11]
 #LUA source tree parallel to NetHack tree in lua535 directory
-LUA = [-.-.lua535.src]
+LUA = [-.-.lua540.src]
 MAKEFILE= $(SRC)Makefile.
 
 # if you are using gcc as your compiler:
@@ -214,8 +214,17 @@ HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 	$(HOBJ1) $(HOBJ2) $(HOBJ3) $(HOBJ4) $(HOBJ5) $(HOBJ6)
 
 LUAOBJ = nhlua.o,nhlsel.o
+
+#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  so comment top two and uncomment bottom two for the previous version (5.3.5)
+LUA535SRCFILES =
+LUA535OBJFILES =
+#LUA535SRCFILES = $(LUA)lbitlib.c
+#LUA535OBJFILES = lbitlib.o,
+endif
+
 LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
-	$(LUA)lbitlib.c $(LUA)lcode.c $(LUA)lcorolib.c \
+	$(LUA535SRCFILES) $(LUA)lcode.c $(LUA)lcorolib.c \
 	$(LUA)lctype.c $(LUA)ldblib.c $(LUA)ldebug.c \
 	$(LUA)ldo.c $(LUA)ldump.c $(LUA)lfunc.c $(LUA)lgc.c \
 	$(LUA)linit.c $(LUA)liolib.c $(LUA)llex.c \
@@ -226,7 +235,7 @@ LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
 	$(LUA)ltm.c $(LUA)lundump.c $(LUA)lutf8lib.c \
 	$(LUA)lvm.c $(LUA)lzio.c
 
-LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj,lbitlib.obj, \
+LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj, $(LUA535OBJFILES) \
 	lcode.obj,lcorolib.obj,lctype.obj,ldblib.obj
 LUALIBOBJ2 = ldebug.obj,ldo.obj,ldump.obj,lfunc.obj, \
 	lgc.obj,linit.obj,liolib.obj,llex.obj
@@ -448,11 +457,12 @@ wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
 vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
-#	lua 5.3.5 code
+#	lua 5.4.0 code
 lapi.obj :	$(LUA)lapi.c	
 lauxlib.obj :	$(LUA)lauxlib.c
 lbaselib.obj :	$(LUA)lbaselib.c
-lbitlib.obj :	$(LUA)lbitlib.c
+#uncomment this for 5.3.5
+#lbitlib.obj :	$(LUA)lbitlib.c
 lcode.obj :	$(LUA)lcode.c
 lcorolib.obj :	$(LUA)lcorolib.c
 lctype.obj :	$(LUA)lctype.c

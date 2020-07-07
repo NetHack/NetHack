@@ -44,10 +44,16 @@ PDCURSES_TOP=../lib/pdcurses
 #DJGPP_TOP = $(HOME)/lib/djgpp
 
 #---------------------------------------------------------------
+ifeq "$(LUA_VERSION)" "5.3.5"
+LUAVER=5.3.5
+else
+LUAVER=5.4.0
+endif
+#---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -55,7 +61,7 @@ PDCURSES_TOP=../lib/pdcurses
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua-5.3.5
+LUATOP=../lib/lua-$(LUAVER)
 #
 #
 #==============================================================================
@@ -308,18 +314,18 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 ifeq "$(ADD_LUA)" "Y"
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua535s.a
-#LUADLL   = $(O)lua535.a
+LUALIB   = $(O)lua$(subst .,, $(LUAVER))s.a
+#LUADLL   = $(O)lua$(subst .,, $(LUAVER)).a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUALIB)
 #LUATARGETS = $(LUADLL) $(LUALIB)
 
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
 		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
 		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
@@ -327,7 +333,7 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o
 LUAOBJFILES2 =  $(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o
@@ -336,7 +342,7 @@ LUAOBJFILES3 =  $(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
 LUAOBJFILES4 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 
-#LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+#LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 #		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
 #		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 #		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
@@ -345,9 +351,13 @@ LUAOBJFILES4 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 	
-LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
+ifeq "$(LUAVER)" "5.3.5"
+LUASRCFILES = $(LUASRCFILES) lbitlib.c
+LUAOBJFILES1 = $(LUAOBJFILES1) $(O)lbitlib.o
 endif
+LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
 
+endif
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================
 # PDCurses build macros

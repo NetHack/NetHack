@@ -50,7 +50,10 @@
     <ClCompile Include="$(LuaDir)lapi.c" />
     <ClCompile Include="$(LuaDir)lauxlib.c" />
     <ClCompile Include="$(LuaDir)lbaselib.c" />
-    <ClCompile Include="$(LuaDir)lbitlib.c" />
+    <ClCompile Include="$(LuaDir)lbitlib.c">
+        <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.4.0'">true</ExcludedFromBuild>
+        <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.3.5'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="$(LuaDir)lcode.c" />
     <ClCompile Include="$(LuaDir)lcorolib.c" />
     <ClCompile Include="$(LuaDir)lctype.c" />
