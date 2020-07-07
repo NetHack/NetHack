@@ -13,7 +13,9 @@
 #include "resource.h"
 
 #include "color.h"
+#if !defined(PATCHLEVEL_H)
 #include "patchlevel.h"
+#endif
 
 #define NHMAP_FONT_NAME TEXT("Terminal")
 #define NHMAP_TTFONT_NAME TEXT("Consolas")

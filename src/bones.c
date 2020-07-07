@@ -594,7 +594,7 @@ getbones()
                3.6.0 bones to remain compatible, we need an extra test;
                once compatibility with 3.6.x goes away, this can too
                (we don't try to make this conditional upon the value of
-               VERSION_COMPATIBILITY because then we'd need patchlevel.h) */
+               VERSION_COMPATIBILITY) */
             && (strlen(bonesid) <= 2
                 || strcmp(bonesid + 2, oldbonesid) != 0)) {
             char errbuf[BUFSZ];

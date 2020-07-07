@@ -7,7 +7,6 @@
 #include "hack.h"
 #include "wincurs.h"
 #include "cursinit.h"
-/*#include "patchlevel.h"*/
 
 #include <ctype.h>
 

@@ -12,9 +12,6 @@
 #include <sys\stat.h>
 #include <errno.h>
 #include <ShlObj.h>
-#if !defined(VERSION_MAJOR)
-#include "patchlevel.h"
-#endif
 
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
