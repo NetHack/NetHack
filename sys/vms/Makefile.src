@@ -220,7 +220,7 @@ LUAOBJ = nhlua.o,nhlsel.o
 LUA535SRCFILES =
 LUA535OBJFILES =
 #LUA535SRCFILES = $(LUA)lbitlib.c
-#LUA535OBJFILES = ,lbitlib.o
+#LUA535OBJFILES = lbitlib.o,
 endif
 
 LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
