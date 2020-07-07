@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1573165004 2019/11/07 22:16:44 $	$NHDT-Branch: paxed-lua-v2-merged $:$NHDT-Revision: 1.38 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1594155889 2020/07/07 21:04:49 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -220,7 +220,7 @@ LUAOBJ = nhlua.o,nhlsel.o
 LUA535SRCFILES =
 LUA535OBJFILES =
 #LUA535SRCFILES = $(LUA)lbitlib.c
-#LUA535OBJFILES = ,lbitlib.o
+#LUA535OBJFILES = lbitlib.o,
 endif
 
 LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
