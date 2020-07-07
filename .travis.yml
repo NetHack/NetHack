@@ -3,7 +3,7 @@ matrix:
   include:
     - name: linux-xenial-gcc
       os: linux
-      env: HINTS=linux-travis LUA_VERSION=5.4.0
+      env: HINTS=linux LUA_VERSION=5.4.0
       compiler: gcc
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../

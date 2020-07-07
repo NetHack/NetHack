@@ -384,7 +384,7 @@ OPTIONS_FILE = $(DAT)\options
 #=================================================================
 
 !IFDEF LUATOP
-LUATMP   = $(LUATOP:..\..\lua-=)    #strip leading "..\..\lua-"
+LUATMP   = $(LUATOP:..\lib\lua-=)    #strip leading "..\lib\lua-"
 LUATMP   = $(LUATMP:-beta=)         #strip suffix if exists "-beta"
 !IF "$(LUATMP)" == "5.4.0"
 LUAVER   = 5.4.0
@@ -394,7 +394,7 @@ LUAVER   = 5.4.0
 !ENDIF
 
 !IFNDEF LUAVER
-LUATMP   = $(LUATOP:..\..\LUA-=)    #strip leading "..\..\LUA-"
+LUATMP   = $(LUATOP:..\lib\LUA-=)    #strip leading "..\lib\LUA-"
 LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
 !IF "$(LUATMP)" == "5.4.0"
 LUAVER   = 5.4.0
