@@ -7,9 +7,9 @@ matrix:
       compiler: gcc
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-xenial-gcc-nocommon
       os: linux
       env: HINTS=linux LUA_VERSION=5.4.0
@@ -17,9 +17,9 @@ matrix:
       script:
         - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-bionic-gcc
       os: linux
       env: HINTS=linux LUA_VERSION=5.4.0
@@ -27,18 +27,18 @@ matrix:
       compiler: gcc
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-xenial-clang
       os: linux
       env: HINTS=linux LUA_VERSION=5.4.0
       compiler: clang
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-xenial-gcc-x11
       os: linux
       env: HINTS=linux-x11 LUA_VERSION=5.4.0
@@ -51,9 +51,9 @@ matrix:
             - xfonts-utils
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-xenial-gcc-qt5
       os: linux
       env: HINTS=linux-qt5 LUA_VERSION=5.4.0
@@ -69,9 +69,9 @@ matrix:
             - qtbase5-dev-tools
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make QT_SELECT=5 MOC=moc install
+        - make QT_SELECT=5 MOC=moc LUA_VERSION=$LUA_VERSION install
     - name: linux-bionic-gcc-x11
       os: linux
       env: HINTS=linux-x11 LUA_VERSION=5.4.0
@@ -85,7 +85,7 @@ matrix:
             - xfonts-utils
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make install
     - name: linux-xenial-gcc-minimal
@@ -113,9 +113,9 @@ matrix:
               sed -i '/^#define SHELL/d'          include/unixconf.h
               sed -i '/^#define SUSPEND/d'        include/unixconf.h
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
-              make fetch-lua
+              make fetch-lua LUA_VERSION=$LUA_VERSION
               test -d "lib/lua-$LUA_VERSION/src" || exit 0
-              make install
+              make LUA_VERSION=$LUA_VERSION install
               cat dat/options
     - name: windows-visualstudio
       os: windows
@@ -134,7 +134,7 @@ matrix:
         - test -d "lib/pdcurses" || exit 0
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
-        - mingw32-make install
+        - mingw32-make LUA_VERSION=$LUA_VERSION install
     - name: msdos-linuxhost-crosscompile
       os: linux
       env: HINTS=linux LUA_VERSION=5.4.0
@@ -142,7 +142,7 @@ matrix:
       script:
 #        - export
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua
+        - make LUA_VERSION=$LUA_VERSION fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - cd lib/lua-$LUA_VERSION/src && make a && cd ../../.. 
         - sh sys/msdos/msdos-cross-compile.sh
