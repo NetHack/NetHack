@@ -47,7 +47,7 @@ PDCURSES_TOP=../lib/pdcurses
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -55,7 +55,7 @@ PDCURSES_TOP=../lib/pdcurses
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua-5.3.5
+LUATOP=../lib/lua-5.4.0
 #
 #
 #==============================================================================
@@ -308,12 +308,12 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 ifeq "$(ADD_LUA)" "Y"
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua535s.a
-#LUADLL   = $(O)lua535.a
+LUALIB   = $(O)lua540s.a
+#LUADLL   = $(O)lua540.a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUALIB)

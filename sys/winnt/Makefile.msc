@@ -135,7 +135,7 @@ DEBUGINFO = Y
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -143,7 +143,7 @@ DEBUGINFO = Y
 #    successfully build NetHack-3.7.  You cannot build a functional
 #    version of NetHack-3.7 Work-in-progress without including Lua.
 #
-LUATOP=..\lib\lua-5.3.5
+LUATOP=..\lib\lua-5.4.0
 #
 #
 #==============================================================================
@@ -380,7 +380,7 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
 !IFDEF LUATOP

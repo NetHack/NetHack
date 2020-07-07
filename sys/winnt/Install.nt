@@ -47,7 +47,7 @@ version.  You can use one of the following build environments:
                                     |          |                 |
                                  +----+    +------+        +-----------+
                                  |    |    |      |        |           |
-                             share  winnt tty   win32  Lua-5.3.5    pdcurses
+                             share  winnt tty   win32  Lua-5.4.0    pdcurses
                                                   |
                                                vs2017
 
