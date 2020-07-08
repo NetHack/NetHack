@@ -399,7 +399,7 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	to the method used for vt_tiledata; new option vt_sounddata that also
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
-	act on it
+	act on it)
 
 
 NetHack Community Patches (or Variation) Included
