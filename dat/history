@@ -39,9 +39,11 @@ Dungeoneers, they continued to enhance the PC, Macintosh, and Amiga ports
 through the later revisions of 3.0.
 
 Version 3.0 went through ten relatively rapidly released "patch-level"
-revisions.  Versions at the time were designated "3.0 patchlevel 10" or
-"3.0pl10" rather than 3.0.10; that three component numbering scheme began
-to be used with 3.1.0.
+revisions.  Versions at the time were known as 3.0 for the base release
+and variously as "3.0a" through "3.0j", "3.0 patchlevel 1" through
+"3.0 patchlevel 10", or "3.0pl1" through "3.0pl10" rather than 3.0.0 and
+3.0.1 through 3.0.10; the three component numbering scheme began to be used
+with 3.1.0.
 
 Headed by Mike Stephenson and coordinated by Izchak Miller and Janet Walz,
 the NetHack Development Team which now included Ken Arromdee, David Cohrs,
@@ -50,7 +52,7 @@ Dean Luick, Pat Rankin, Eric Raymond, and Eric Smith undertook a radical
 revision of 3.0.  They re-structured the game's design, and re-wrote major
 parts of the code.  They added multiple dungeons, a new display, special
 individual character quests, a new endgame and many other new features, and
-produced NetHack 3.1.
+produced NetHack 3.1.  Version 3.1.0 was released in January of 1993.
 
 Ken Lorber, Gregg Wonderly and Greg Olson, with help from Richard Addison,
 Mike Passaretti, and Olaf Seibert, developed NetHack 3.1 for the Amiga.
@@ -87,15 +89,15 @@ other games.  NetHack's tiles support was then implemented on other platforms
 The 3.2 NetHack Development Team, comprised of Michael Allison, Ken Arromdee,
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen, Steve
 Linhart, Dean Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet Walz,
-and Paul Winner, released version 3.2 in April of 1996.
+and Paul Winner, released version 3.2.0 in April of 1996.
 
 Version 3.2 marked the tenth anniversary of the formation of the development
 team.  In a testament to their dedication to the game, all thirteen members
-of the original NetHack Development Team remained on the team at the start of
-work on that release.  During the interval between the release of 3.1.3 and
-3.2, one of the founding members of the NetHack Development Team,
-Dr. Izchak Miller, passed away.  That release of the game was dedicated to
-him by the development and porting teams.
+of the original NetHack Development Team remained on the team at the start
+of work on that release.  During the interval between the release of 3.1.3
+and 3.2.0, one of the founding members of the NetHack Development Team,
+Dr. Izchak Miller, was diagnosed with cancer and passed away.  That release
+of the game was dedicated to him by the development and porting teams.
 
 Version 3.2 proved to be more stable than previous versions.  Many bugs
 were fixed, abuses eliminated, and game features tuned for better game
@@ -120,6 +122,17 @@ NetHack 3.3.
 
 The final update to 3.2 was the bug fix release 3.2.3, which was released
 simultaneously with 3.3.0 in December 1999 just in time for the Year 2000.
+Because of the newer version, 3.2.3 was released as a source code patch only,
+without any ready-to-play distribution for systems that usually had such.
+
+(To anyone considering resurrecting an old version:  all versions before
+3.2.3 had a Y2K bug.  The high scores file and the log file contained dates
+which were formatted using a two-digit year, and 1999's year 99 was followed
+by 2000's year 100.  That got written out successfully but it unintentionally
+introduced an extra column in the file layout which prevented score entries
+from being read back in correctly, interfering with insertion of new high
+scores and with retrieval of old character names to use for random ghost and
+statue names in the current game.)
 
 The 3.3 NetHack Development Team, consisting of Michael Allison, Ken Arromdee,
 David Cohrs, Jessie Collet, Steve Creps, Kevin Darcy, Timo Hakulinen,
