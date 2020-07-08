@@ -1,4 +1,4 @@
-/* NetHack 3.6	config1.h	$NHDT-Date: 1555702947 2019/04/19 19:42:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	config1.h	$NHDT-Date: 1594169991 2020/07/08 00:59:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,6 +28,7 @@
 
 #ifdef MSDOS
 #undef UNIX
+#define SHORT_FILENAMES
 #endif
 
 /*

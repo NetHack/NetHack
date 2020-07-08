@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1575245033 2019/12/02 00:03:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1594169990 2020/07/08 00:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -37,6 +37,16 @@
    ULTRIX_PROTO. */
 
 #include "config1.h" /* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
+
+/*
+ * Consolidated version, patchlevel, development status.
+ */
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
+#include "patchlevel.h"
+#endif
+
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.

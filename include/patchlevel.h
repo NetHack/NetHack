@@ -3,6 +3,9 @@
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifndef PATCHLEVEL_H
+#define PATCHLEVEL_H
+
 /* NetHack 3.7.x */
 #define VERSION_MAJOR 3
 #define VERSION_MINOR 7
@@ -15,6 +18,23 @@
  * and save files.
  */
 #define EDITLEVEL 22
+
+/*
+ * Development status possibilities.
+ */
+#define NH_STATUS_RELEASED    0         /* Released */
+#define NH_STATUS_WIP         1         /* Work in progress */
+#define NH_STATUS_BETA        2         /* BETA testing */
+#define NH_STATUS_POSTRELEASE 3         /* patch commit point only */
+
+/*
+ * Development status of this NetHack version.
+ */
+#define NH_DEVEL_STATUS NH_STATUS_WIP
+
+#ifndef DEBUG  /* allow tool chains to define without causing warnings */
+#define DEBUG
+#endif
 
 #define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2020"
 #define COPYRIGHT_BANNER_B \
@@ -532,4 +552,5 @@
 
 /****************************************************************************/
 
+#endif /* PATHLEVEL_H */
 /*patchlevel.h*/
