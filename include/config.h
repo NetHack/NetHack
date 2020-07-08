@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1575245033 2019/12/02 00:03:53 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1594169990 2020/07/08 00:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,17 +7,7 @@
 #define CONFIG_H
 
 /*
- * Section 1:   NetHack consolidated version, patchlevel, development status.
- */
-
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
-
-/*
- * Section 2:   Operating and window systems selection.
+ * Section 1:   Operating and window systems selection.
  *              Select the version of the OS you are using.
  *              For "UNIX" select BSD, ULTRIX, SYSV, or HPUX in unixconf.h.
  *              A "VMS" option is not needed since the VMS C-compilers
@@ -47,6 +37,16 @@
    ULTRIX_PROTO. */
 
 #include "config1.h" /* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
+
+/*
+ * Consolidated version, patchlevel, development status.
+ */
+#ifdef SHORT_FILENAMES
+#include "patchlev.h"
+#else
+#include "patchlevel.h"
+#endif
+
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.
@@ -154,7 +154,7 @@
 #endif
 
 /*
- * Section 3:   Some global parameters and filenames.
+ * Section 2:   Some global parameters and filenames.
  *
  *              LOGFILE, XLOGFILE, NEWS and PANICLOG refer to files in
  *              the playground directory.  Commenting out LOGFILE, XLOGFILE,
@@ -383,7 +383,7 @@
 #endif /* CHDIR */
 
 /*
- * Section 4:   Definitions that may vary with system type.
+ * Section 3:   Definitions that may vary with system type.
  *              For example, both schar and uchar should be short ints on
  *              the AT&T 3B2/3B5/etc. family.
  */
@@ -476,7 +476,7 @@ typedef unsigned char uchar;
 #endif
 
 /*
- * Section 5:  EXPERIMENTAL STUFF
+ * Section 4:  EXPERIMENTAL STUFF
  *
  * Conditional compilation of new or experimental options are controlled here.
  * Enable any of these at your own risk -- there are almost certainly
@@ -586,7 +586,7 @@ typedef unsigned char uchar;
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
-/* End of Section 5 */
+/* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES
 # ifndef USE_TILES
