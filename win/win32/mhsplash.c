@@ -13,7 +13,9 @@
 #else
 #include "config.h"
 #endif
+#if !defined(VERSION_MAJOR)
 #include "patchlevel.h"
+#endif
 #include "dlb.h"
 
 #define LLEN 128

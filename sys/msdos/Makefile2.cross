@@ -891,8 +891,6 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 #  o -c (which is included in cflags) substituted with -o$@ , 
 #  o an explicit build instruction for dlb.o because it requires 
 #    a .h file in ../sys/msdos.
-#  o the PATCHLEV_H macro is substitued for $(INCL)/patchlevel.h 
-#    to work around a long filename issue.
 #  o $(CFLAGS) changed to $(cflags)
 # Other than that, these dependencies are untouched.
 # That means that there is some irrelevant stuff
@@ -930,7 +928,7 @@ $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
 $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/tty/topl.c
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
-		$(INCL)/date.h $(PATCHLEV_H) $(INCL)/tcap.h
+		$(INCL)/date.h $(INCL)/tcap.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/tty/wintty.c
 $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 		$(CONFIG_H)
@@ -938,7 +936,7 @@ $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 $(O)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/dialogs.c
 $(O)winX.o: ../win/X11/winX.c $(HACK_H) $(INCL)/winX.h $(INCL)/dlb.h \
-		$(PATCHLEV_H) ../win/X11/nh72icon \
+		../win/X11/nh72icon \
 		../win/X11/nh56icon ../win/X11/nh32icon
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/winX.c
 $(O)winmap.o: ../win/X11/winmap.c $(INCL)/xwindow.h $(HACK_H) $(INCL)/dlb.h \
@@ -1001,7 +999,7 @@ $(O)gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h
 $(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
 	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnyesno.c
 $(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-		$(PATCHLEV_H) $(INCL)/wingem.h
+		$(INCL)/wingem.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/gem/wingem.c
 $(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
 		$(INCL)/gr_rect.h $(INCL)/wintype.h $(INCL)/wingem.h
@@ -1011,7 +1009,7 @@ $(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
 $(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/gem/gr_rect.c
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
-		$(INCL)/dlb.h $(PATCHLEV_H) $(INCL)/tile2x11.h \
+		$(INCL)/dlb.h $(INCL)/tile2x11.h \
 		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
 		$(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qt_win.cpp
@@ -1121,13 +1119,13 @@ $(O)symbols.o: symbols.c $(HACK_H) $(INCL)/tcap.h
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)
-$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)
+$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)/date.h $(PATCHLEV_H)
+$(O)version.o: version.c $(HACK_H) $(INCL)/date.h
 $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)

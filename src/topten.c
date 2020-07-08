@@ -5,11 +5,6 @@
 
 #include "hack.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
 
 /* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the
  * whole file, because that entails creating a new version which

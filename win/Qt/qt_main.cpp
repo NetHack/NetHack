@@ -7,7 +7,6 @@
 extern "C" {
 #include "hack.h"
 }
-#include "patchlevel.h"
 #undef Invisible
 #undef Warning
 #undef index

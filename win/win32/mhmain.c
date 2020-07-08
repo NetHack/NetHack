@@ -9,7 +9,9 @@
 #else
 #include "config.h"
 #endif
+#if !defined(PATCHLEVEL_H)
 #include "patchlevel.h"
+#endif
 #include "resource.h"
 #include "mhmsg.h"
 #include "mhinput.h"

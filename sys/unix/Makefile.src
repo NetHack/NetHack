@@ -730,11 +730,11 @@ depend: ../sys/unix/depend.awk \
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
 # config.h timestamp
-$(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
-		../include/global.h ../include/coord.h ../include/vmsconf.h \
-		../include/system.h ../include/nhlua.h ../include/unixconf.h \
-		../include/micro.h ../include/pcconf.h ../include/ntconf.h \
-		../include/fnamesiz.h
+$(CONFIG_H): ../include/config.h ../include/patchlevel.h ../include/config1.h \
+		../include/tradstdc.h ../include/global.h ../include/coord.h \
+		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
+		../include/unixconf.h ../include/micro.h ../include/pcconf.h \
+		../include/ntconf.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
@@ -790,8 +790,7 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/tty/topl.c
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/tty/wintty.c
-cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/patchlevel.h \
-		../include/wincurs.h
+cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmain.c
 curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/wincurs.h \
 		../win/curses/curswins.h
@@ -846,7 +845,7 @@ gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnaskstr.c
 gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnomeprv.h \
-		$(HACK_H) ../include/dlb.h ../include/patchlevel.h \
+		$(HACK_H) ../include/dlb.h \
 		../include/winGnome.h ../win/gnome/gnmain.h \
 		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
 		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
@@ -860,33 +859,31 @@ gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(CONFIG_H) \
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnglyph.c
 gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnbind.h \
-		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
-		../win/gnome/gnplayer.h ../win/gnome/gnstatus.h \
-		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
-		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
-		../win/gnome/gnopts.h ../include/date.h
+		../include/winGnome.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnbind.h ../win/gnome/gnmap.h \
+		../win/gnome/gnmenu.h ../win/gnome/gnplayer.h \
+		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
+		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
+		../win/gnome/gnworn.h ../win/gnome/gnopts.h ../include/date.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmain.c
 gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h $(CONFIG_H) \
 		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h
+		../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmap.c
 gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h $(CONFIG_H) \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h \
-		../win/gnome/gnmain.h ../win/gnome/gnbind.h \
-		../win/gnome/gnmap.h ../win/gnome/gnplayer.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
-		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
-		../win/gnome/gnworn.h ../include/func_tab.h
+		../include/winGnome.h ../win/gnome/gnmain.h \
+		../win/gnome/gnbind.h ../win/gnome/gnmap.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+		../include/func_tab.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmenu.c
 gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h $(CONFIG_H) \
 		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
-		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
-		../win/gnome/gnglyph.h
+		../include/dlb.h ../include/winGnome.h ../win/gnome/gnglyph.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmesg.c
 gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
 		$(CONFIG_H) ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
@@ -896,12 +893,12 @@ gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnplayer.c
 gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnmain.h
+		../include/winGnome.h ../win/gnome/gnglyph.h \
+		../win/gnome/gnmain.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnsignal.c
 gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h $(CONFIG_H) \
 		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
-		../include/dlb.h ../include/patchlevel.h ../include/winGnome.h \
+		../include/dlb.h ../include/winGnome.h \
 		../win/gnome/gnglyph.h ../win/gnome/gn_xpms.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnstatus.c
 gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h $(CONFIG_H) \
@@ -909,21 +906,20 @@ gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h $(CONFIG_H) \
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gntext.c
 gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmap.h \
-		../win/gnome/gnmenu.h ../win/gnome/gnplayer.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
-		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
-		../win/gnome/gnworn.h
+		../include/winGnome.h ../win/gnome/gnmain.h \
+		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
+		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
+		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
+		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
+		../win/gnome/gnyesno.h ../win/gnome/gnworn.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnyesno.c
 gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h $(CONFIG_H) \
 		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
 		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/patchlevel.h ../include/winGnome.h
+		../include/winGnome.h
 	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnworn.c
 wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
-		../include/patchlevel.h ../include/wingem.h
+		../include/wingem.h
 	$(CC) $(CFLAGS) -c -o $@ ../win/gem/wingem.c
 wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
 		../include/gr_rect.h ../include/wintype.h ../include/wingem.h
@@ -963,7 +959,7 @@ qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_key.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
 qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_line.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
-qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../include/patchlevel.h \
+qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) \
 		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_main.moc \
 		../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
 		../win/Qt/qt_key.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
@@ -1025,7 +1021,7 @@ qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_yndlg.h qt_yndlg.moc \
 		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
 qt3_win.o: ../win/Qt3/qt3_win.cpp $(HACK_H) ../include/func_tab.h \
-		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
+		../include/dlb.h ../include/tile2x11.h \
 		../win/Qt3/qt3_win.h ../win/Qt3/qt3_clust.h \
 		../win/Qt3/qt3_kde0.h ../win/Qt3/qt3_xpms.h qt3_win.moc \
 		qt3_kde0.moc qt3tableview.moc
@@ -1055,7 +1051,7 @@ decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
-dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h ../include/patchlevel.h
+dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h
 do.o: do.c $(HACK_H)
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
@@ -1090,8 +1086,7 @@ mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/mextra.h ../include/you.h \
 		../include/attrib.h ../include/prop.h ../include/skills.h \
-		../include/context.h ../include/flag.h ../include/dlb.h \
-		../include/patchlevel.h
+		../include/context.h ../include/flag.h ../include/dlb.h
 mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 minion.o: minion.c $(HACK_H)
@@ -1150,14 +1145,13 @@ symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H)
-topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
+topten.o: topten.c $(HACK_H) ../include/dlb.h
 track.o: track.c $(HACK_H)
 trap.o: trap.c $(HACK_H)
 u_init.o: u_init.c $(HACK_H)
 uhitm.o: uhitm.c $(HACK_H)
 vault.o: vault.c $(HACK_H)
-version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/patchlevel.h
+version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h
 vision.o: vision.c $(HACK_H) ../include/vis_tab.h
 weapon.o: weapon.c $(HACK_H)
 were.o: were.c $(HACK_H)

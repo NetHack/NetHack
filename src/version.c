@@ -7,16 +7,6 @@
 #include "dlb.h"
 #include "date.h"
 
-/*
- * All the references to the contents of patchlevel.h have been moved
- * into makedefs....
- */
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
-
 #if defined(CROSSCOMPILE)
 struct cross_target_s cross_target = {
     /* https://groups.google.com/forum/#!original/
