@@ -3,7 +3,7 @@ matrix:
   include:
     - name: linux-xenial-gcc
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.4.0
       compiler: gcc
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -12,7 +12,7 @@ matrix:
         - make install
     - name: linux-xenial-gcc-nocommon
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.4.0
       compiler: gcc
       script:
         - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
@@ -22,7 +22,7 @@ matrix:
         - make install
     - name: linux-bionic-gcc
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.4.0
       dist: bionic
       compiler: gcc
       script:
@@ -32,7 +32,7 @@ matrix:
         - make install
     - name: linux-xenial-clang
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.4.0
       compiler: clang
       script:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -41,7 +41,7 @@ matrix:
         - make install
     - name: linux-xenial-gcc-x11
       os: linux
-      env: HINTS=linux-x11 LUA_VERSION=5.3.5
+      env: HINTS=linux-x11 LUA_VERSION=5.4.0
       compiler: gcc
       addons:
         apt:
@@ -56,7 +56,7 @@ matrix:
         - make install
     - name: linux-xenial-gcc-qt5
       os: linux
-      env: HINTS=linux-qt5 LUA_VERSION=5.3.5
+      env: HINTS=linux-qt5 LUA_VERSION=5.4.0
       compiler: gcc
       addons:
         apt:
@@ -74,7 +74,7 @@ matrix:
         - make QT_SELECT=5 MOC=moc install
     - name: linux-bionic-gcc-x11
       os: linux
-      env: HINTS=linux-x11 LUA_VERSION=5.3.5
+      env: HINTS=linux-x11 LUA_VERSION=5.4.0
       dist: bionic
       compiler: gcc
       addons:
@@ -90,7 +90,7 @@ matrix:
         - make install
     - name: linux-xenial-gcc-minimal
       os: linux
-      env: HINTS=linux-minimal LUA_VERSION=5.3.5
+      env: HINTS=linux-minimal LUA_VERSION=5.4.0
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -128,7 +128,7 @@ matrix:
       script:
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
-        - export LUA_VERSION=5.3.5
+        - export LUA_VERSION=5.4.0
         - sh sys/winnt/travis-gcc.sh
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - test -d "lib/pdcurses" || exit 0
@@ -137,7 +137,7 @@ matrix:
         - mingw32-make install
     - name: msdos-linuxhost-crosscompile
       os: linux
-      env: HINTS=linux LUA_VERSION=5.3.5
+      env: HINTS=linux LUA_VERSION=5.4.0
       compiler: gcc
       script:
 #        - export

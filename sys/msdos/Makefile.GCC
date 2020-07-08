@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1519600525 2018/02/25 23:15:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.34 $
+# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1594155873 2020/07/07 21:04:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
 #	Copyright (c) NetHack PC Development Team 1996-2019.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #
@@ -39,10 +39,16 @@ ADD_CURSES=Y
 PDCURSES_TOP=../../pdcurses
 
 #---------------------------------------------------------------
+ifeq "$(LUA_VERSION)" "5.3.5"
+LUAVER=5.3.5
+else
+LUAVER=5.4.0
+endif
+#---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -50,8 +56,7 @@ PDCURSES_TOP=../../pdcurses
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua535
-
+LUATOP=../lib/lua$(subst .,, $(LUAVER))
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -300,12 +305,12 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua535s.a
-LUADLL   = $(O)lua535.a
+LUALIB   = $(O)lua$(subst .,, $(LUAVER))s.a
+LUADLL   = $(O)lua$(subst .,, $(LUAVER)).a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
@@ -951,14 +956,14 @@ $(PATCHLEV_H):
 lua.exe: $(O)lua.o $(LUALIB) 
 	$(link) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
 
-luac.exe: $(O)luac.o $(O)lua535s.a
+luac.exe: $(O)luac.o $(O)lua$(subst .,, $(LUAVER))s.a
 	$(link) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-$(O)lua535.a: $(LUAOBJFILES)
+$(O)lua$(subst .,, $(LUAVER)).a: $(LUAOBJFILES)
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<
 
-$(O)lua535s.a: $(LUAOBJFILES)
+$(O)lua$(subst .,, $(LUAVER))s.a: $(LUAOBJFILES)
 	ar rcS $@ $(LUAOBJFILES1)
 	ar rcS $@ $(LUAOBJFILES2)
 	ar rcs $@ $(LUAOBJFILES3)

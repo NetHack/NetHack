@@ -1,4 +1,4 @@
-# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1546174698 2018/12/30 12:58:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.71 $
+# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1594155895 2020/07/07 21:04:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -126,10 +126,16 @@ TARGET_CPU=x86
 # x86libs or x64libs depending on whether you're building for 64 bits.
 #
 #---------------------------------------------------------------
+ifndef LUA_VERSION
+LUAVER=5.4.0
+else
+LUAVER=$(LUA_VERSION)
+endif
+#---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -137,11 +143,7 @@ TARGET_CPU=x86
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua-5.3.5
-ifndef LUA_VERSION
-LUA_VERSION=5.3.5
-endif
-
+LUATOP=../lib/lua-$(LUAVER)
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -412,10 +414,12 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
-LUAVER   = 5.3.5
+ifndef LUAVER
+LUAVER   = 5.4.0
+endif
 LUASRC   = $(LUATOP)/src
 LUALIB   = $(O)lua-$(LUAVER).static.a
 LUADLL   = $(O)lua-$(LUAVER).a
@@ -423,7 +427,7 @@ LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
 
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
 		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
 		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
@@ -431,7 +435,7 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
 		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
@@ -439,6 +443,12 @@ LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
 		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
 		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+ifeq "$(LUAVER)" "5.3.5"
+#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  so we have to tack those on for the previous version (5.3.5)
+LUASRCFILES = $(LUASRCFILES) lbitlib.c
+LUAOBJFILES = $(LUAOBJFILES) lbitlib.o
+endif
 
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================

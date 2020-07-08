@@ -5,6 +5,8 @@
     <VERSION_MAJOR>3</VERSION_MAJOR>
     <VERSION_MINOR>7</VERSION_MINOR>
     <PATCHLEVEL>0</PATCHLEVEL>
+    <LUA_VERSION>5.4.0</LUA_VERSION>
+    <ADD_PACKAGE>true</ADD_PACKAGE>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -19,6 +21,14 @@
     </BuildMacro>
     <BuildMacro Include="PATCHLEVEL">
       <Value>$(PATCHLEVEL)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="LUA_VERSION">
+      <Value>$(LUA_VERSION)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="ADD_PACKAGE">
+      <Value>$(ADD_PACKAGE)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

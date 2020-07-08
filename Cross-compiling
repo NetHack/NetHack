@@ -407,7 +407,7 @@ Using the cross-compiler, build the following targets:
 
     b) Lua (mandatory in 3.7)
 
-          lib/lua-5.3.5/src
+          lib/lua-5.4.0/src
 
                    from sources: lua.c, lapi.c, lauxlib.c, lbaselib.c, lcode.c,
                                  lcorolib.c, lctype.c, ldblib.c, ldebug.c,
