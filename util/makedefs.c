@@ -962,6 +962,7 @@ const char *deflt_content;
        matches a regular entry (bogusmon "grue"), that entry will become
        more likely to be picked than normal but it's nothing to worry about */
     (void) fputs(xcrypt(deflt_content), ofp);
+    (void) fputc('\n', ofp);
 
     tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
     grep0(ifp, tfp);
