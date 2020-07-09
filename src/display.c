@@ -1372,6 +1372,7 @@ int
 doredraw()
 {
     docrt();
+    pline("[test] doredraw()");
     return 0;
 }
 

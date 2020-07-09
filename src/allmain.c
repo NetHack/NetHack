@@ -56,6 +56,7 @@ boolean resuming;
         pline("Watch out!  Bad things can happen on Friday the 13th.");
         change_luck(-1);
     }
+    pline("If you see this, the compilation is done well.");
 
     if (!resuming) { /* new game */
         context.rndencode = rnd(9000);
@@ -450,6 +451,8 @@ boolean resuming;
             /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }
+        pline("is it end of turn?");
+        doredraw();
     }
 }
 
