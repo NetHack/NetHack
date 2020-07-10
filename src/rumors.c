@@ -1,4 +1,4 @@
-/* NetHack 3.7	rumors.c	$NHDT-Date: 1594347790 2020/07/10 02:23:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.7	rumors.c	$NHDT-Date: 1594370241 2020/07/10 08:37:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -352,12 +352,14 @@ winid *winptr;
             if (entrycount == 2) {
                 putstr(tmpwin, 0, "(only two entries)");
             } else {
-                /* showing an elipsis three times (once for each file)
-                   results in total size being 24 lines, forcing a
-                   --More-- prompt if user only has a 24 line screen;
-                   that doesn't look very good but isn't incorrect;
-                   including it avoids ambiguity about whether there
-                   are other lines */
+                /* showing an elipsis avoids ambiguity about whether
+                   there are other lines; doing so three times (once for
+                   each file) results in total output being 24 lines,
+                   forcing a --More-- prompt if using a 24 line screen;
+                   displaying 23 lines and --More-- followed by second
+                   page with 1 line doesn't look very good but isn't
+                   incorrect, and taller screens where that won't be an
+                   issue are more common than 24 line terminals nowadays */
                 if (entrycount > 3)
                     putstr(tmpwin, 0, " ...");
                 putstr(tmpwin, 0, xbuf); /* already decrypted */
