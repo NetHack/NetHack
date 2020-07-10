@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.389 $ $NHDT-Date: 1594118318 2020/07/07 10:38:38 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.390 $ $NHDT-Date: 1594347794 2020/07/10 02:23:14 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 5, 2020
+.ds f2 "July 9, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1554,7 +1554,12 @@ Autocompletes.
 Debug mode only.
 Default key is \(oq\(haF\(cq.
 .lp #wizrumorcheck
-Verify rumor boundaries.
+Verify rumor boundaries by displaying first and last true rumors and
+first and last false rumors.
+.lp ""
+Also displays first, second, and last random engravings, epitaphs,
+and hallucinatory monsters.
+.lp ""
 Autocompletes.
 Debug mode only.
 .lp #wizsmell
