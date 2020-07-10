@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{July 5, 2020}
+\date{July 9, 2020}
 
 \maketitle
 
@@ -1650,7 +1650,12 @@ Debug mode only.
 Default key is `{\tt \^{}F}'.
 %.lp
 \item[\tb{\#wizrumorcheck}]
-Verify rumor boundaries.
+Verify rumor boundaries by displaying first and last true rumors and
+first and last false rumors.\\
+%.lp ""
+Also displays first, second, and last random engravings, epitaphs,
+and hallucinatory monsters.\\
+%.lp ""
 Autocompletes.
 Debug mode only.
 %.lp
@@ -1882,7 +1887,7 @@ And some (giants) can smash doors.
 Secret doors are hidden and appear to be ordinary wall (from inside a
 room) or solid rock (from outside).
 You can find them with the `{\tt s}' (search) command but it might
-take multiple tries.
+take multiple tries (possibly many tries if your luck is poor).
 Once found they are in all ways equivalent to normal doors.
 Mapping magic does not reveal secret doors.
 
@@ -1890,12 +1895,44 @@ Mapping magic does not reveal secret doors.
 \subsection*{Traps (`{\tt \^{}}')}
 
 %.pg
-There are traps throughout the dungeon to snare the unwary delver.
+There are traps throughout the dungeon to snare the unwary intruder.
 For example, you may suddenly fall into a pit and be stuck for a few
-turns trying to climb out.  Traps don't appear on your map until you
-see one triggered by moving onto it, see something fall into it, or you
-discover it with the `{\tt s}' (search) command.  Monsters can fall prey to
-traps, too, which can be a very useful defensive strategy.
+turns trying to climb out (see below).
+A trap usually won't appear on your map until you trigger it by moving
+onto it, you see someone else trigger it, or you discover it with
+the `{\tt s}' (search) command (multiple attempts are often needed;
+if your luck is poor, many attempts might be needed).
+{\it Wands of secret door detection\/} and {\it spell of detect unseen\/}
+also reveal traps within a modest radius but only if the trap is also
+within line-of-sight (whether you can see at the time or not).
+There is also other magic which can reveal traps.
+
+%.pg
+Monsters can fall prey to
+traps, too, which can potentially be used as a defensive strategy.
+Unfortunately traps can be harmful to your pet(s) as well.
+Monsters, including pets, usually will avoid moving onto a trap which
+is shown on your map if they have encountered that type of trap before.
+
+%.pg
+Some traps such as pits, bear traps, and webs hold you in one place.
+You can escape by simply trying to move to an adjacent spot and repeat
+as needed; eventually you will get free.
+
+%.pg
+Other traps can send you to different locations.
+Teleporters send you elsewhere on the same dungeon level.
+Level teleporters send you to a random dungeon level, the destination
+chosen from a few levels lower all the way to the top.
+Trap doors and holes also send you to another level, but one which is
+always below the current level.
+Usually that will be the next level down but it can be farther.
+All of these traps choose a new destination each time they're activated.
+Magic portals also send you to a different level but behave differently.
+Some portals are two-way and their remote destination is always the same:
+another portal which can take you back.
+Others are one-way and send you to a specific destination level but not
+necessarily to a specific location there.
 
 %.pg
 There is a special multi-level branch of the dungeon with pre-mapped levels
@@ -1925,8 +1962,8 @@ or to destroy a boulder with magic or tools, or to create new boulders
 with a scroll of earth.
 However, doing such things will lower your luck without any specific
 message given about that.
-See the Conduct section for information about getting feedback for your
-actions in Sokoban.
+See the {\it Conduct\/} section for information about getting feedback for
+your actions in Sokoban.
 
 %.hn 2
 \subsection*{Stairs and ladders (`{\tt <}', `{\tt >}')}

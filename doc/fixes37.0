@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ $NHDT-Date: 1593772051 2020/07/03 10:27:31 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ $NHDT-Date: 1594347794 2020/07/10 02:23:14 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -211,6 +211,11 @@ reading non-cursed Book of the Dead without having prepped the other tools
 zapping a line of boulders with striking or force bolt was updating 'couldsee'
 	but deferring 'cansee', resulting in seeing the first boulder fracture
 	and only hearing that happen for the others despite coming into view
+the default engraving, epitaph, and bogus monster inserted by 'makedefs -s'
+	(3.6.6 fix for empty source data file) lacked terminating newline, so
+	when the corresponding file wasn't actually empty its first line ended
+	up concatenated; default portion of the bad combined entry would be
+	decrypted properly but the portion from the file's first line wouldn't
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
