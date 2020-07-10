@@ -168,7 +168,7 @@ paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
               eating  -- yes vs y to confirm whether to continue eating
               Were-change -- yes vs y to confirm changing form due to
                       lycanthropy when hero has polymorph control;
-              pray    -- y to confirm an attempt to pray; on by default
+              pray    -- yes vs y to confirm an attempt to pray
               Remove  -- always pick from inventory for 'R' and 'T' even when
                       wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumbrance    [S]

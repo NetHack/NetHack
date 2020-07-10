@@ -151,7 +151,7 @@ static const struct paranoia_opts {
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
     { PARANOID_PRAY, "pray", 1, 0, 0,
-      "y to pray (supersedes old \"prayconfirm\" option)" },
+      "yes vs y to pray" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       "always pick from inventory for Remove and Takeoff" },
     /* for config file parsing; interactive menu skips these */
@@ -2465,67 +2465,62 @@ char *op;
            hit), or add an extra prompt (pray, Remove) that isn't
            ordinarily there */
 
-        if (strncmpi(opts, "prayconfirm", 4) != 0) { /* not prayconfirm */
-            /* at present we don't complain about duplicates for this
-               option, but we do throw away the old settings whenever
-               we process a new one [clearing old flags is essential
-               for handling default paranoid_confirm:pray sanely] */
-            flags.paranoia_bits = 0; /* clear all */
-            if (negated) {
-                flags.paranoia_bits = 0; /* [now redundant...] */
-            } else if (op != empty_optstr) {
-                char *pp, buf[BUFSZ];
+        /* at present we don't complain about duplicates for this
+           option, but we do throw away the old settings whenever
+           we process a new one [clearing old flags is essential
+           for handling default paranoid_confirm:pray sanely] */
+        /* which isn't by default any longer, could perhaps be
+           changed, though allowing for repeats without issue is
+           nice */
+        flags.paranoia_bits = 0; /* clear all */
+        if (negated) {
+            flags.paranoia_bits = 0; /* [now redundant...] */
+        } else if (op != empty_optstr) {
+            char *pp, buf[BUFSZ];
 
-                strncpy(buf, op, sizeof buf - 1);
-                buf[sizeof buf - 1] = '\0';
-                op = mungspaces(buf);
-                for (;;) {
-                    /* We're looking to parse
-                       "paranoid_confirm:whichone wheretwo whothree"
-                       and "paranoid_confirm:" prefix has already
-                       been stripped off by the time we get here */
-                    pp = index(op, ' ');
-                    if (pp)
-                        *pp = '\0';
-                    /* we aren't matching option names but match_optname()
-                       does what we want once we've broken the space
-                       delimited aggregate into separate tokens */
-                    for (i = 0; i < SIZE(paranoia); ++i) {
-                        if (match_optname(op, paranoia[i].argname,
-                                          paranoia[i].argMinLen, FALSE)
-                            || (paranoia[i].synonym
-                                && match_optname(op, paranoia[i].synonym,
-                                                 paranoia[i].synMinLen,
-                                                 FALSE))) {
-                            if (paranoia[i].flagmask)
-                                flags.paranoia_bits |= paranoia[i].flagmask;
-                            else /* 0 == "none", so clear all */
-                                flags.paranoia_bits = 0;
-                            break;
-                        }
+            strncpy(buf, op, sizeof buf - 1);
+            buf[sizeof buf - 1] = '\0';
+            op = mungspaces(buf);
+            for (;;) {
+                /* We're looking to parse
+                   "paranoid_confirm:whichone wheretwo whothree"
+                   and "paranoid_confirm:" prefix has already
+                   been stripped off by the time we get here */
+                pp = index(op, ' ');
+                if (pp)
+                    *pp = '\0';
+                /* we aren't matching option names but match_optname()
+                   does what we want once we've broken the space
+                   delimited aggregate into separate tokens */
+                for (i = 0; i < SIZE(paranoia); ++i) {
+                    if (match_optname(op, paranoia[i].argname,
+                                      paranoia[i].argMinLen, FALSE)
+                        || (paranoia[i].synonym
+                            && match_optname(op, paranoia[i].synonym,
+                                             paranoia[i].synMinLen,
+                                             FALSE))) {
+                        if (paranoia[i].flagmask)
+                            flags.paranoia_bits |= paranoia[i].flagmask;
+                        else /* 0 == "none", so clear all */
+                            flags.paranoia_bits = 0;
+                        break;
                     }
-                    if (i == SIZE(paranoia)) {
-                        /* didn't match anything, so arg is bad;
-                           any flags already set will stay set */
-                        config_error_add("Unknown %s parameter '%s'",
-                                         allopt[optidx].name, op);
-                        return optn_err;
-                    }
-                    /* move on to next token */
-                    if (pp)
-                        op = pp + 1;
-                    else
-                        break; /* no next token */
-                }              /* for(;;) */
-            } else
-                return optn_err;
-            return optn_ok;
-        } else { /* prayconfirm */
-            if (negated)
-                flags.paranoia_bits &= ~PARANOID_PRAY;
-            else
-                flags.paranoia_bits |= PARANOID_PRAY;
-            return optn_ok;
+                }
+                if (i == SIZE(paranoia)) {
+                    /* didn't match anything, so arg is bad;
+                       any flags already set will stay set */
+                    config_error_add("Unknown %s parameter '%s'",
+                                     allopt[optidx].name, op);
+                    return optn_err;
+                }
+                /* move on to next token */
+                if (pp)
+                    op = pp + 1;
+                else
+                    break; /* no next token */
+            }              /* for(;;) */
+        } else {
+            return optn_err;
         }
         return optn_ok;
     }
@@ -5989,7 +5984,6 @@ initoptions_init()
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
-    flags.paranoia_bits = PARANOID_PRAY; /* old prayconfirm=TRUE */
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;

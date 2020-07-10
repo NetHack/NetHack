@@ -333,7 +333,7 @@ pfx_##a,
 #endif
 #endif
     NHOPTC(paranoid_confirmation, 28, opt_in, set_in_game, Yes, Yes, Yes, Yes,
-                "prayconfirm", "extra prompting in certain situations")
+                NoAlias, "extra prompting in certain situations")
     NHOPTB(perm_invent, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.perm_invent)
     NHOPTC(petattr, 88, opt_in, set_in_game, No, Yes, No, No, NoAlias,

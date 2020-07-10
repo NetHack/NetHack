@@ -1403,11 +1403,8 @@ Pray to the gods for help. Autocompletes. Default key is `{\tt M-p}'.\\
 Praying too soon after receiving prior help is a bad idea.
 (Hint: entering the dungeon alive is treated as having received help.
 You probably shouldn't start off a new game by praying right away.)
-Since using this command by accident can cause trouble, there is an
-option to make you confirm your intent before praying.  It is enabled
-by default, and you can reset the
-{\it paranoid\verb+_+confirmation\/}
-option to disable it.
+Since using this command by accident can cause trouble, you will be
+prompted to confirm your intent before praying.
 %.lp
 \item[\tb{\#prevmsg}]
 Show previously displayed game messages. Default key is `{\tt \^{}P}'.
@@ -4077,7 +4074,7 @@ are filled in at the end from the previous order.
 %.lp
 \item[\ib{paranoid\verb+_+confirmation}]
 A space separated list of specific situations where alternate
-prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray}''.
+prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:none}''.
 %.sd
 %.si
 \newlength{\pcwidth}
@@ -4111,8 +4108,7 @@ require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
 due to lycanthropy
 when hero has polymorph control;
 \item[{\tt pray~~~}]
-require `{\tt y}' to confirm an attempt to pray rather
-than immediately praying; on by default;
+require ``{\tt yes}'' rather than `{\tt y}' to confirm an attempt to pray
 \item[{\tt Remove~}] require selection from inventory for `{\tt R}'
 and `{\tt T}'
 commands even when wearing just one applicable item.
@@ -4121,11 +4117,6 @@ turn on all of the above.
 \elist
 %.ei
 %.ed
-By default, the pray choice is enabled, the others disabled.
-To disable it without setting
-any of the other choices, use ``{\it paranoid\verb+_+confirmation:none}''.  To keep
-it enabled while setting others, include it in the list,
-such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 %.lp
 \item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
