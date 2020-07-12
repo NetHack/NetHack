@@ -7,6 +7,7 @@
 
 #include "hack.h"
 #include <ctype.h>
+#include "test.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -56,7 +57,11 @@ boolean resuming;
         pline("Watch out!  Bad things can happen on Friday the 13th.");
         change_luck(-1);
     }
-    pline("If you see this, the compilation is done well.");
+    int tmp_ = add_test(3, 1);
+    char c_ = tmp_ + '0';
+    char msg[100] = "TEST #1 add new object file 3+1 = ";
+    strncat(msg, &c_, 1);
+    pline(msg);
 
     if (!resuming) { /* new game */
         context.rndencode = rnd(9000);
@@ -452,7 +457,7 @@ boolean resuming;
             display_nhwindow(WIN_MAP, FALSE);
         }
         pline("is it end of turn?");
-        doredraw();
+        You("%d, %d", u.ux, u.uy);
     }
 }
 
