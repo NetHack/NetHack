@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1593953347 2020/07/05 12:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1594601903 2020/07/13 00:58:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1470,7 +1470,7 @@ boolean at_stairs, falling, portal;
         mklev();
         new = TRUE; /* made the level */
 
-        familiar = (find_ghost_with_name(g.plname) != (struct monst *) 0);
+        familiar = bones_include_name(g.plname);
     } else {
         /* returning to previously visited level; reload it */
         nhfp = open_levelfile(new_ledger, whynot);

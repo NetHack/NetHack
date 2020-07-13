@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1594168620 2020/07/08 00:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.851 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1594601903 2020/07/13 00:58:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.852 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -161,6 +161,7 @@ E void FDECL(drop_upon_death, (struct monst *, struct obj *, int, int));
 E boolean NDECL(can_make_bones);
 E void FDECL(savebones, (int, time_t, struct obj *));
 E int NDECL(getbones);
+E boolean FDECL(bones_include_name, (const char *));
 
 /* ### botl.c ### */
 
