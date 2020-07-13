@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1594635320 2020/07/13 10:15:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1593306909 2020/06/28 01:15:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
