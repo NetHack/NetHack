@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1590870788 2020/05/30 20:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1594630714 2020/07/13 08:58:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -938,8 +938,12 @@ struct monst *mtmp;
              * (mongone -> mdrop_special_objs) but we force any
              * monster who manages to acquire it or the invocation
              * tools to stick around instead of letting it escape.
+             * Don't let the Wizard escape even when not carrying
+             * anything of interest unless there are more than 1
+             * of him.
              */
-            if (mon_has_special(mtmp))
+            if (mon_has_special(mtmp)
+                || (mtmp->iswiz && g.context.no_of_wizards < 2))
                 return 0;
             if (vismon)
                 pline("%s escapes the dungeon!", Monnam(mtmp));

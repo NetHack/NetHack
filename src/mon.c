@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1593306909 2020/06/28 01:15:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1594630713 2020/07/13 08:58:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1988,9 +1988,14 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mtmp->mtrapped = 0;
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
+    if (mtmp->iswiz)
+        wizdead();
+    if (mtmp->data->msound == MS_NEMESIS)
+        nemdead();
     if (mtmp->m_id == g.stealmid)
         thiefdead();
     relobj(mtmp, 0, FALSE);
+
     if (onmap || mtmp == g.level.monsters[0][0]) {
         if (mtmp->wormno)
             remove_worm(mtmp);
@@ -2243,10 +2248,12 @@ register struct monst *mtmp;
             break;
         }
     }
+#if 0   /* moved to m_detach() to kick in if mongone() happens */
     if (mtmp->iswiz)
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
+#endif
     if (mtmp->data == &mons[PM_MEDUSA])
         record_achievement(ACH_MEDU);
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))

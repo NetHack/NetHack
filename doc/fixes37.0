@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ $NHDT-Date: 1594395803 2020/07/10 15:43:23 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ $NHDT-Date: 1594630713 2020/07/13 08:58:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -217,6 +217,10 @@ the default engraving, epitaph, and bogus monster inserted by 'makedefs -s'
 	when the corresponding file wasn't actually empty its first line ended
 	up concatenated; default portion of the bad combined entry would be
 	decrypted properly but the portion from the file's first line wouldn't
+if the Wizard of Yendor fled up the stairs on level 1, the game would behave
+	as if he was still in play, but he wouldn't be on migrating monsters
+	list so couldn't be brought back and wouldn't appear on Plane of Earth
+	(stale non-zero value for context.no_of_wizards)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
