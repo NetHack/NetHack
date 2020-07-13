@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1593306909 2020/06/28 01:15:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1594635320 2020/07/13 10:15:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4320,22 +4320,6 @@ pacify_guards()
         if (is_watch(mtmp->data))
             mtmp->mpeaceful = 1;
     }
-}
-
-struct monst *
-find_ghost_with_name(str)
-char *str;
-{
-    struct monst *mtmp;
-
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp)
-            || mtmp->data != &mons[PM_GHOST] || !has_mname(mtmp))
-            continue;
-        if (!strcmpi(MNAME(mtmp), str))
-            return mtmp;
-    }
-    return (struct monst *) 0;
 }
 
 void

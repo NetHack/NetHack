@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1594601903 2020/07/13 00:58:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.852 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1594635320 2020/07/13 10:15:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.853 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1514,7 +1514,6 @@ E void NDECL(kill_genocided_monsters);
 E void FDECL(golemeffects, (struct monst *, int, int));
 E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
-E struct monst *FDECL(find_ghost_with_name, (char *));
 E void FDECL(decide_to_shapeshift, (struct monst *, int));
 E boolean FDECL(vamp_stone, (struct monst *));
 
