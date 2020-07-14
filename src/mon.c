@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1594630713 2020/07/13 08:58:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1594727746 2020/07/14 11:55:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.340 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3235,8 +3235,11 @@ register struct monst *mtmp;
 boolean via_attack;
 {
     mtmp->msleeping = 0;
-    if (M_AP_TYPE(mtmp)) {
-        seemimic(mtmp);
+    if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
+        /* mimics come out of hiding, but disguised Wizard doesn't
+           have to lose his disguise */
+        if (M_AP_TYPE(mtmp) != M_AP_MONSTER)
+            seemimic(mtmp);
     } else if (g.context.forcefight && !g.context.mon_moving
                && mtmp->mundetected) {
         mtmp->mundetected = 0;

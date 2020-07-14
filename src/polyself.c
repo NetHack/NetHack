@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1583073991 2020/03/01 14:46:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1594727748 2020/07/14 11:55:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.154 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1581,10 +1581,12 @@ dopoly()
     return 1;
 }
 
+/* #monster for hero-as-mind_flayer giving psychic blast */
 int
 domindblast()
 {
     struct monst *mtmp, *nmon;
+    int dmg;
 
     if (u.uen < 10) {
         You("concentrate but lack the energy to maintain doing so.");
@@ -1605,12 +1607,21 @@ domindblast()
             continue;
         if (mtmp->mpeaceful)
             continue;
+        if (mindless(mtmp->data))
+            continue;
         u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
         if (u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)) {
+            dmg = rnd(15);
+            /* wake it up first, to bring hidden monster out of hiding;
+               but in case it is currently peaceful, don't make it hostile
+               unless it will survive the psychic blast, otherwise hero
+               would avoid the penalty for killing it while peaceful */
+            wakeup(mtmp, (dmg > mtmp->mhp) ? TRUE : FALSE);
             You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),
                 u_sen ? "telepathy"
-                      : telepathic(mtmp->data) ? "latent telepathy" : "mind");
-            mtmp->mhp -= rnd(15);
+                : telepathic(mtmp->data) ? "latent telepathy"
+                  : "mind");
+            mtmp->mhp -= dmg;
             if (DEADMONSTER(mtmp))
                 killed(mtmp);
         }

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ $NHDT-Date: 1594630713 2020/07/13 08:58:33 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ $NHDT-Date: 1594727746 2020/07/14 11:55:46 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -221,6 +221,10 @@ if the Wizard of Yendor fled up the stairs on level 1, the game would behave
 	as if he was still in play, but he wouldn't be on migrating monsters
 	list so couldn't be brought back and wouldn't appear on Plane of Earth
 	(stale non-zero value for context.no_of_wizards)
+if a mind flayer's psychic blast targetted a hidden monster, feedback named
+	the monster but it wasn't brought out of hiding
+hero poly'd into a mind flayer who used #monster to emit a psychic blast was
+	able to harm mindless monsters with it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
