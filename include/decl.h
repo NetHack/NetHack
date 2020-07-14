@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1593953331 2020/07/05 12:48:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.6  decl.h  $NHDT-Date: 1594730609 2020/07/14 12:43:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -932,9 +932,10 @@ struct instance_globals {
     /* makemon.c */
 
     /* mhitm.c */
-    boolean vis;
-    boolean far_noise;
     long noisetime;
+    boolean far_noise;
+    boolean vis;
+    boolean skipdrin; /* mind flayer against headless target */
 
     /* mhitu.c */
     int mhitu_dieroll;

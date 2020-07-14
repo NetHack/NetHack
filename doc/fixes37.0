@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ $NHDT-Date: 1594727746 2020/07/14 11:55:46 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ $NHDT-Date: 1594730609 2020/07/14 12:43:29 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -405,6 +405,9 @@ give feedback for '#chat' directed at walls
 add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
 	which incur luck penalties have been violated; don't report it
 	unless/until Sokoban branch has been entered
+reduce verbosity when a mind flayer attacks a headless monster; when a
+	tentacle-to-head attack hits but fails to accomplish anything skip
+	remaining attacks (mind flayer has 3, master mind flayer has 5)
 
 
 Platform- and/or Interface-Specific New Features
