@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ $NHDT-Date: 1594730609 2020/07/14 12:43:29 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ $NHDT-Date: 1594771373 2020/07/15 00:02:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -287,6 +287,8 @@ only generate shop items on solid floor squares
 avoid gcc 10 warning by removing duplicate definition of 'head_engr'
 if a monster removed a corpse from an ice box, the corpse would never rot away
 monster creation on quest levels could make genocided creatures
+enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
+	value for level N monsters created with a d8 value of 1 for all N d8's
 
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1594727746 2020/07/14 11:55:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.340 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1594771374 2020/07/15 00:02:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -59,7 +59,7 @@ const char *msg;
         /* check before DEADMONSTER() because dead monsters should still
            have sane mhpmax */
         if (mtmp->mhpmax < 1
-            || mtmp->mhpmax < (int) mtmp->m_lev + 1
+            || mtmp->mhpmax < (int) mtmp->m_lev
             || mtmp->mhp > mtmp->mhpmax)
             impossible(
                      "%s: level %d monster #%u [%s] has %d cur HP, %d max HP",
