@@ -117,8 +117,8 @@ CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
 CFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 LINK=$(CXX)
-WINSRC += $(WINQT4SRC)
-WINOBJ0 += $(WINQT4OBJ)
+WINSRC += $(WINQTSRC)
+WINOBJ0 += $(WINQTOBJ)
 VARDATND += rip.xpm
 MOC = moc
 
