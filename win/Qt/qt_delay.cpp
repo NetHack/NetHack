@@ -15,7 +15,9 @@
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
+#include "qt_redef.h"
 #include "qt_delay.h"
 
 namespace nethack_qt_ {
