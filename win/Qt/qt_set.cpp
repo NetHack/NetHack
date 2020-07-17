@@ -41,7 +41,7 @@ namespace nethack_qt_ {
 #define TILEWMIN 6
 #define TILEHMIN 6
 
-NetHackQtSettings::NetHackQtSettings(int w, int h) :
+NetHackQtSettings::NetHackQtSettings(int w UNUSED, int h UNUSED) :
     settings(),
     tilewidth(this),
     tileheight(this),
@@ -151,7 +151,7 @@ void NetHackQtSettings::toggleGlyphSize()
     whichsize.toggle();
 }
 
-void NetHackQtSettings::setGlyphSize(bool which)
+void NetHackQtSettings::setGlyphSize(bool which UNUSED)
 {
     QSize n = QSize(tilewidth.value(),tileheight.value());
     if ( othersize.isValid() ) {

@@ -71,7 +71,7 @@ QSize NetHackQtRIP::sizeHint() const
     return pixmap->size();
 }
 
-void NetHackQtRIP::paintEvent(QPaintEvent* event)
+void NetHackQtRIP::paintEvent(QPaintEvent* event UNUSED)
 {
     if ( riplines ) {
 	int pix_x=(width()-pixmap->width())/2;

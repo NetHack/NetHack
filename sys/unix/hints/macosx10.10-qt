@@ -114,6 +114,7 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
+CFLAGS += -Wno-deprecated-declarations
 CFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 LINK=$(CXX)

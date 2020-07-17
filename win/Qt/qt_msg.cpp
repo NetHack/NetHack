@@ -63,7 +63,7 @@ void NetHackQtMessageWindow::updateFont()
 	map->setFont(qt_settings->normalFont());
 }
 
-void NetHackQtMessageWindow::Scroll(int dx, int dy)
+void NetHackQtMessageWindow::Scroll(int dx UNUSED, int dy UNUSED)
 {
     //RLC Is this necessary?
     //RLC list->Scroll(dx,dy);
@@ -81,7 +81,7 @@ void NetHackQtMessageWindow::ClearMessages()
         list->clear();
 }
 
-void NetHackQtMessageWindow::Display(bool block)
+void NetHackQtMessageWindow::Display(bool block UNUSED)
 {
     if (changed) {
 	list->repaint();
@@ -139,7 +139,7 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
 #endif
 
     // ATR_BLINK not supported
-    if (list->count() >= ::iflags.msg_history)
+    if (list->count() >= (int) ::iflags.msg_history)
 	delete list->item(0);
     list->addItem(text2);
 

@@ -30,7 +30,7 @@ NetHackQtLineEdit::NetHackQtLineEdit() :
 {
 }
 
-NetHackQtLineEdit::NetHackQtLineEdit(QWidget* parent, const char* name) :
+NetHackQtLineEdit::NetHackQtLineEdit(QWidget* parent, const char* name UNUSED) :
     QLineEdit(parent)
 {
 }

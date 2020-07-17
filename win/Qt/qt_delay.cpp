@@ -34,7 +34,7 @@ void NetHackQtDelay::wait()
     m_loop.exec();
 }
 
-void NetHackQtDelay::timerEvent(QTimerEvent* timer)
+void NetHackQtDelay::timerEvent(QTimerEvent* timer UNUSED)
 {
     m_loop.exit();
     killTimer(m_timer);

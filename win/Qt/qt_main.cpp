@@ -379,7 +379,7 @@ static const char * rest_xpm[] = {
 "     ....   ",
 "            "};
 /* XPM */
-static const char * cast_a_xpm[] = {
+static const char * cast_a_xpm[] UNUSED = {
 "12 13 3 1",
 " 	c None",
 ".	c #FFFF6DB60000",
@@ -398,7 +398,7 @@ static const char * cast_a_xpm[] = {
 "   .   X  X ",
 "   .   X  X "};
 /* XPM */
-static const char * cast_b_xpm[] = {
+static const char * cast_b_xpm[] UNUSED = {
 "12 13 3 1",
 " 	c None",
 ".	c #FFFF6DB60000",
@@ -417,7 +417,7 @@ static const char * cast_b_xpm[] = {
 "   .   X  X ",
 "   .   XXX  "};
 /* XPM */
-static const char * cast_c_xpm[] = {
+static const char * cast_c_xpm[] UNUSED = {
 "12 13 3 1",
 " 	c None",
 ".	c #FFFF6DB60000",

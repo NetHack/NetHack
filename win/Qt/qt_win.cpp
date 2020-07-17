@@ -121,18 +121,18 @@ NetHackQtWindow::~NetHackQtWindow()
 // XXX Use "expected ..." for now, abort or default later.
 //
 void NetHackQtWindow::Clear() { puts("unexpected Clear"); }
-void NetHackQtWindow::Display(bool block) { puts("unexpected Display"); }
+void NetHackQtWindow::Display(bool block UNUSED) { puts("unexpected Display"); }
 bool NetHackQtWindow::Destroy() { return true; }
-void NetHackQtWindow::CursorTo(int x,int y) { puts("unexpected CursorTo"); }
-void NetHackQtWindow::PutStr(int attr, const QString& text) { puts("unexpected PutStr"); }
+void NetHackQtWindow::CursorTo(int x UNUSED,int y UNUSED) { puts("unexpected CursorTo"); }
+void NetHackQtWindow::PutStr(int attr UNUSED, const QString& text UNUSED) { puts("unexpected PutStr"); }
 void NetHackQtWindow::StartMenu() { puts("unexpected StartMenu"); }
-void NetHackQtWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-    const QString& str, unsigned itemflags) { puts("unexpected AddMenu"); }
-void NetHackQtWindow::EndMenu(const QString& prompt) { puts("unexpected EndMenu"); }
-int NetHackQtWindow::SelectMenu(int how, MENU_ITEM_P **menu_list) { puts("unexpected SelectMenu"); return 0; }
-void NetHackQtWindow::ClipAround(int x,int y) { puts("unexpected ClipAround"); }
-void NetHackQtWindow::PrintGlyph(int x,int y,int glyph) { puts("unexpected PrintGlyph"); }
+void NetHackQtWindow::AddMenu(int glyph UNUSED, const ANY_P* identifier UNUSED, char ch UNUSED, char gch UNUSED, int attr UNUSED,
+    const QString& str UNUSED, unsigned itemflags UNUSED) { puts("unexpected AddMenu"); }
+void NetHackQtWindow::EndMenu(const QString& prompt UNUSED) { puts("unexpected EndMenu"); }
+int NetHackQtWindow::SelectMenu(int how UNUSED, MENU_ITEM_P **menu_list UNUSED) { puts("unexpected SelectMenu"); return 0; }
+void NetHackQtWindow::ClipAround(int x UNUSED,int y UNUSED) { puts("unexpected ClipAround"); }
+void NetHackQtWindow::PrintGlyph(int x UNUSED,int y UNUSED,int glyph UNUSED) { puts("unexpected PrintGlyph"); }
 //void NetHackQtWindow::PrintGlyphCompose(int x,int y,int,int) { puts("unexpected PrintGlyphCompose"); }
-void NetHackQtWindow::UseRIP(int how, time_t when) { puts("unexpected UseRIP"); }
+void NetHackQtWindow::UseRIP(int how UNUSED, time_t when UNUSED) { puts("unexpected UseRIP"); }
 
 } // namespace nethack_qt_

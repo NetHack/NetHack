@@ -370,7 +370,7 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
     }
 }
 
-void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior)
+void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->StartMenu();
@@ -427,7 +427,7 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,int bkglyph)
+void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,int bkglyph UNUSED)
 {
     /* TODO: bkglyph */
     NetHackQtWindow* window=id_to_window[(int)wid];
@@ -681,7 +681,7 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 	    bool macro=false;
 	    for (int i=0; !macro && key_macro[i].key; i++) {
 		if (key_macro[i].key==k
-		 && ((key_macro[i].state&key_event->modifiers())==key_macro[i].state))
+		 && ((key_macro[i].state&key_event->modifiers()) == (unsigned int) key_macro[i].state))
 		{
 		    keybuffer.Put(key_macro[i].macro);
 		    macro=true;
@@ -720,9 +720,9 @@ QFrame* NetHackQtBind::splash=0;
 QStringList *NetHackQtBind::msgs_strings;
 boolean NetHackQtBind::msgs_saved = false;
 boolean NetHackQtBind::msgs_initd = false;
-
+#if 0
 static void Qt_positionbar(char *) {}
-
+#endif
 } // namespace nethack_qt_
 
 struct window_procs Qt_procs = {
@@ -804,7 +804,11 @@ struct window_procs Qt_procs = {
 };
 
 #ifndef WIN32
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
 extern "C" void play_usersound(const char* filename, int volume)
+#else
+extern "C" void play_usersound(const char* filename UNUSED, int volume UNUSED)
+#endif
 {
 #ifdef USER_SOUNDS
 #ifndef QT_NO_SOUND
