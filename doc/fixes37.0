@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ $NHDT-Date: 1594771373 2020/07/15 00:02:53 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ $NHDT-Date: 1595006054 2020/07/17 17:14:14 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -492,3 +492,7 @@ relocated unmaintained code to outdated folder, specifically sys/amiga,
 	include/wceconf.h
 removed SYSFLAGS conditional code
 removed MFLOPPY conditional code
+get rid of 3.6.1 workaround needed to retain compatibility with 3.6.0 bones
+	files after fix for 3.3.0 through 3.6.0 bug for invalid 'bonesid'
+	designation in bones of quest levels
+
