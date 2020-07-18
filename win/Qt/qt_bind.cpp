@@ -17,7 +17,7 @@ extern "C" {
 #undef min
 #undef max
 
-#include "qt_undef.h"
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #include <QtCore/QStringList>
 #if QT_VERSION >= 0x050000
@@ -26,7 +26,7 @@ extern "C" {
 #else
 #include <QtGui/QSound>
 #endif
-#include "qt_redef.h"
+#include "qt_post.h"
 #include "qt_bind.h"
 #include "qt_click.h"
 #ifdef TIMED_DELAY

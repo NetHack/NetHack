@@ -17,12 +17,12 @@ extern "C" {
 #undef min
 #undef max
 
-#include "qt_undef.h"
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
-#include "qt_redef.h"
+#include "qt_post.h"
 #include "qt_main.h"
 #include "qt_main.moc"
 #include "qt_bind.h"
