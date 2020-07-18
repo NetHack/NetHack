@@ -755,7 +755,8 @@ $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 $(O)alloc.o: $(CONFIG_H)	 alloc.c
 	$(TARGET_CC) $(cflags) -o$@ alloc.c
 
-$(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/color.h $(INCL)/rm.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h $(MSYS)/pcvideo.h
 	$(TARGET_CC) $(cflags) -I$(MSYS) -o$@ drawing.c
 
 $(O)decl.o: $(CONFIG_H) decl.c
@@ -1042,7 +1043,6 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(CONFIG_H)
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h

@@ -1505,7 +1505,8 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 $(O)drawing_host.o: drawing.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ drawing.c
 
-$(O)drawing.o: drawing.c $(CONFIG_H)
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\color.h $(INCL)\rm.h \
+		$(INCL)\objclass.h $(INCL)\monsym.h
 	@$(cc) $(cflagsBuild) -Fo$@ drawing.c
 
 $(O)monst_host.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
