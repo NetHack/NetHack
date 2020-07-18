@@ -114,12 +114,13 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
+CFLAGS += -Wno-deprecated-declarations
 CFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 LINK=$(CXX)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
-VARDATND += rip.xpm
+VARDATND += nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 MOC = moc
 
 # XXX if /Developer/qt exists and QTDIR not set, use that

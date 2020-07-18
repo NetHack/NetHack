@@ -96,6 +96,7 @@
 #endif
 
 #ifdef QT_GRAPHICS
+#include "../win/Qt/qt_redef.h"
 #ifndef DEFAULT_WC_TILED_MAP
 #define DEFAULT_WC_TILED_MAP /* Default to tiles if users doesn't say \
                                 wc_ascii_map */

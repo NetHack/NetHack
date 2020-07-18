@@ -17,10 +17,12 @@ extern "C" {
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_plsel.h"
 #include "qt_plsel.moc"
 #include "qt_bind.h"
@@ -42,7 +44,7 @@ static const char nh_attribution[] = "<center><big>NetHack %1</big>"
 
 class NhPSListViewItem : public QTableWidgetItem {
 public:
-    NhPSListViewItem( QTableWidget* parent, const QString& name ) :
+    NhPSListViewItem( QTableWidget* parent UNUSED, const QString& name ) :
 	QTableWidgetItem(name)
     {
     }
@@ -138,7 +140,7 @@ public:
     }
 };
 
-NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
+NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) :
     QDialog(NetHackQtBind::mainWidget()),
     fully_specified_role(true)
 {
@@ -182,8 +184,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks) :
     QButtonGroup *gendergroup = new QButtonGroup(this);
     QGroupBox* alignbox = new QGroupBox("Alignment",this);
     QButtonGroup *aligngroup = new QButtonGroup(this);
-    QVBoxLayout* vbgb = new QVBoxLayout(genderbox);
-    QVBoxLayout* vbab = new QVBoxLayout(alignbox);
+    QVBoxLayout* vbgb UNUSED = new QVBoxLayout(genderbox);
+    QVBoxLayout* vbab UNUSED = new QVBoxLayout(alignbox);
     char versionbuf[QBUFSZ];
     QLabel* logo = new QLabel(QString(nh_attribution).arg(version_string(versionbuf)), this);
 
@@ -412,7 +414,7 @@ void NetHackQtPlayerSelector::selectRole(int crow, int ccol, int prow, int pcol)
     setupOthers();
 }
 
-void NetHackQtPlayerSelector::selectRace(int crow, int ccol, int prow, int pcol)
+void NetHackQtPlayerSelector::selectRace(int crow UNUSED, int ccol UNUSED, int prow, int pcol UNUSED)
 {
     int ra = race->currentRow();
     int ro = role->currentRow();

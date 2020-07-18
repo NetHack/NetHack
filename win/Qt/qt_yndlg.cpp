@@ -15,10 +15,12 @@
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_yndlg.h"
 #include "qt_yndlg.moc"
 #include "qt_str.h"
@@ -182,7 +184,7 @@ char NetHackQtYnDialog::Exec()
 	show();
 	char choice=0;
 	char ch_esc=0;
-	for (uint i=0; i<ch.length(); i++) {
+	for (uint i=0; i< (uint) ch.length(); i++) {
 	    if (ch[i].unicode()=='q') ch_esc='q';
 	    else if (!ch_esc && ch[i].unicode()=='n') ch_esc='n';
 	}

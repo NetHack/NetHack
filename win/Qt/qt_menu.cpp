@@ -17,10 +17,12 @@ extern "C" {
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_menu.h"
 #include "qt_menu.moc"
 #include "qt_glyph.h"
@@ -239,7 +241,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 
     // Determine column widths
     std::vector<int> col_widths;
-    for (std::size_t i = 0; i < itemlist.size(); ++i) {
+    for (std::size_t i = 0; i < (size_t) itemlist.size(); ++i) {
 	QStringList columns = itemlist[i].str.split("\t");
         if (!itemlist[i].Selectable() && columns.size() == 1)
         {
@@ -247,7 +249,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
             // Assume this is a section header
             continue;
         }
-	for (std::size_t j = 0U; j < columns.size(); ++j) {
+	for (std::size_t j = 0U; j < (size_t) columns.size(); ++j) {
 	    int w = fm.width(columns[j] + "  \t");
 	    if (j >= col_widths.size()) {
 		col_widths.push_back(w);
@@ -258,12 +260,12 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
     }
 
     // Pad each column to its column width
-    for (std::size_t i = 0U; i < itemlist.size(); ++i) {
+    for (std::size_t i = 0U; i < (size_t) itemlist.size(); ++i) {
 	QTableWidgetItem *twi = table->item(i, 4);
 	if (twi == NULL) { continue; }
 	QString text = twi->text();
 	QStringList columns = text.split("\t");
-	for (std::size_t j = 0U; j+1U < columns.size(); ++j) {
+	for (std::size_t j = 0U; j+1U < (size_t) columns.size(); ++j) {
 	    columns[j] += "\t";
 	    int width = col_widths[j];
 	    while (fm.width(columns[j]) < width) {
@@ -394,7 +396,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     table->item(row, 4)->setFlags(Qt::ItemIsEnabled);
     WidenColumn(4, fm.width(text));
 
-    if (mi.color != -1) {
+    if ((int) mi.color != -1) {
 	twi->setForeground(colors[mi.color]);
     }
 
@@ -495,7 +497,7 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 	    InputCount(key);
 	else {
 	    for (int i=0; i<itemcount; i++) {
-		if (itemlist[i].ch == key || itemlist[i].gch == key)
+		if ((unsigned int) itemlist[i].ch == key || (unsigned int) itemlist[i].gch == key)
 		    ToggleSelect(i);
 	    }
 	}
@@ -579,7 +581,7 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
     }
 }
 
-void NetHackQtMenuWindow::cellToggleSelect(int i, int j)
+void NetHackQtMenuWindow::cellToggleSelect(int i, int j UNUSED)
 {
     ToggleSelect(i);
 }
@@ -649,7 +651,7 @@ bool NetHackQtTextWindow::Destroy()
     return !isVisible();
 }
 
-void NetHackQtTextWindow::UseRIP(int how, time_t when)
+void NetHackQtTextWindow::UseRIP(int how, time_t when UNUSED)
 {
 // Code from X11 windowport
 #define STONE_LINE_LEN 16    /* # chars that fit on one line */
@@ -717,7 +719,7 @@ void NetHackQtTextWindow::Clear()
     str_fixed=false;
 }
 
-void NetHackQtTextWindow::Display(bool block)
+void NetHackQtTextWindow::Display(bool block UNUSED)
 {
     if (str_fixed) {
 	lines->setFont(qt_settings->normalFixedFont());
@@ -750,7 +752,7 @@ void NetHackQtTextWindow::Display(bool block)
     exec();
 }
 
-void NetHackQtTextWindow::PutStr(int attr, const QString& text)
+void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 {
     str_fixed=str_fixed || text.contains("    ");
     lines->addItem(text);

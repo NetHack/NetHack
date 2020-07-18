@@ -15,7 +15,9 @@
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
+#include "qt_redef.h"
 #include "qt_delay.h"
 
 namespace nethack_qt_ {
@@ -32,7 +34,7 @@ void NetHackQtDelay::wait()
     m_loop.exec();
 }
 
-void NetHackQtDelay::timerEvent(QTimerEvent* timer)
+void NetHackQtDelay::timerEvent(QTimerEvent* timer UNUSED)
 {
     m_loop.exit();
     killTimer(m_timer);

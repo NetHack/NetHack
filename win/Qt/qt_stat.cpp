@@ -17,10 +17,12 @@ extern "C" {
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_stat.h"
 #include "qt_stat.moc"
 #include "qt_set.h"
@@ -209,14 +211,14 @@ QWidget* NetHackQtStatusWindow::Widget() { return this; }
 void NetHackQtStatusWindow::Clear()
 {
 }
-void NetHackQtStatusWindow::Display(bool block)
+void NetHackQtStatusWindow::Display(bool block UNUSED)
 {
 }
 void NetHackQtStatusWindow::CursorTo(int,int y)
 {
     cursy=y;
 }
-void NetHackQtStatusWindow::PutStr(int attr, const QString& text)
+void NetHackQtStatusWindow::PutStr(int attr UNUSED, const QString& text UNUSED)
 {
     // do a complete update when line 0 is done (as per X11 fancy status)
     if (cursy==0) updateStats();

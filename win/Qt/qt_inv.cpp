@@ -18,10 +18,12 @@ extern "C" {
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_inv.h"
 #include "qt_glyph.h"
 #include "qt_set.h"

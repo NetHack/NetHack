@@ -15,7 +15,9 @@
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
+#include "qt_redef.h"
 #include "qt_key.h"
 
 namespace nethack_qt_ {
@@ -28,9 +30,10 @@ NetHackQtKeyBuffer::NetHackQtKeyBuffer() :
 bool NetHackQtKeyBuffer::Empty() const { return in==out; }
 bool NetHackQtKeyBuffer::Full() const { return (in+1)%maxkey==out; }
 
-void NetHackQtKeyBuffer::Put(int k, int a, int state)
+void NetHackQtKeyBuffer::Put(int k, int a, int kbstate)
 {
     if ( Full() ) return;	// Safety
+    nhUse(kbstate);
     key[in]=k;
     ascii[in]=a;
     in=(in+1)%maxkey;

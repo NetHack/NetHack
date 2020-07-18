@@ -15,10 +15,12 @@
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_set.h"
 #include "qt_set.moc"
 #include "qt_glyph.h"
@@ -39,7 +41,7 @@ namespace nethack_qt_ {
 #define TILEWMIN 6
 #define TILEHMIN 6
 
-NetHackQtSettings::NetHackQtSettings(int w, int h) :
+NetHackQtSettings::NetHackQtSettings(int w UNUSED, int h UNUSED) :
     settings(),
     tilewidth(this),
     tileheight(this),
@@ -149,7 +151,7 @@ void NetHackQtSettings::toggleGlyphSize()
     whichsize.toggle();
 }
 
-void NetHackQtSettings::setGlyphSize(bool which)
+void NetHackQtSettings::setGlyphSize(bool which UNUSED)
 {
     QSize n = QSize(tilewidth.value(),tileheight.value());
     if ( othersize.isValid() ) {

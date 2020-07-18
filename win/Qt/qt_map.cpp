@@ -17,10 +17,12 @@ extern "C" {
 #undef min
 #undef max
 
+#include "qt_undef.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_redef.h"
 #include "qt_map.h"
 #include "qt_map.moc"
 #include "qt_click.h"
@@ -527,9 +529,9 @@ void NetHackQtMapViewport::CursorTo(int x,int y)
     Changed(cursor.x(),cursor.y());
 }
 
-void NetHackQtMapViewport::PrintGlyph(int x,int y,int glyph)
+void NetHackQtMapViewport::PrintGlyph(int x,int y,int theglyph)
 {
-    Glyph(x,y)=glyph;
+    Glyph(x,y)=theglyph;
     Changed(x,y);
 }
 
@@ -578,7 +580,7 @@ void NetHackQtMapWindow2::clearMessages()
     messages_rect = QRect();
 }
 
-void NetHackQtMapWindow2::putMessage(int attr, const QString& text)
+void NetHackQtMapWindow2::putMessage(int attr UNUSED, const QString& text)
 {
     if ( !messages.isEmpty() )
 	messages += "\n";
@@ -615,7 +617,7 @@ void NetHackQtMapWindow2::CursorTo(int x,int y)
     m_viewport->CursorTo(x, y);
 }
 
-void NetHackQtMapWindow2::PutStr(int attr, const QString& text)
+void NetHackQtMapWindow2::PutStr(int attr UNUSED, const QString& text UNUSED)
 {
     puts("unexpected PutStr in MapWindow");
 }
