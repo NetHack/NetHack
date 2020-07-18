@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1566346604 2019/08/21 00:16:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.51 $
+# NetHack 3.6  macosx10.11 $NHDT-Date: 1595085485 2020/07/18 15:18:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -24,7 +24,7 @@ WANT_WIN_QT=1
 
 # 1a. What is the default window system?
 #WANT_DEFAULT=tty
-#WANT_DEFAULT=x11
+#WANT_DEFAULT=X11
 WANT_DEFAULT=Qt
 
 # 1b. If you set WANT_WIN_QT, you need to
@@ -101,15 +101,22 @@ CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
 
 ifdef WANT_WIN_X11
+VARDATND0 = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
+CFLAGS += -DX11_GRAPHICS
+# separate from CFLAGS so that we don't pass it to every file
+X11CFLAGS = -I/opt/X11/include
+# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND0 += rip.xpm
+endif
 WINSRC += $(WINX11SRC)
 WINOBJ0 += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
-LFLAGS += -L/opt/X11/lib
-VARDATND += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
-CFLAGS += -DX11_GRAPHICS -I/opt/X11/include
-# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
-CFLAGS += -Wno-variadic-macros
+LFLAGS=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
@@ -120,7 +127,7 @@ WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Wi
 LINK=$(CXX)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
-VARDATND += nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
+VARDATND0 = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 MOC = moc
 
 # XXX if /Developer/qt exists and QTDIR not set, use that
@@ -132,6 +139,8 @@ endif	# WANT_WIN_QT
 
 # prevent duplicate tile.o in WINOBJ
 WINOBJ = $(sort $(WINOBJ0))
+# also prevent duplicate data files if both X11 and Qt are being supported
+VARDATND+= $(sort $(VARDATND0))
 
 ifdef WANT_SHARE_INSTALL
 # if $GAMEUID is root, we install into roughly proper Mac locations, otherwise
