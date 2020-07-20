@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1593771616 2020/07/03 10:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1595282650 2020/07/20 22:04:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1479,8 +1479,12 @@ int final;
     if (u.uhitinc) {
         (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
         if (iflags.tux_penalty && !Upolyd)
-            Sprintf(eos(buf), " %s your suit penalty",
-                    (u.uhitinc < 0) ? "increasing" : "offsetting");
+            Sprintf(eos(buf), " %s your suit's penalty",
+                    (u.uhitinc < 0) ? "increasing"
+                    : (u.uhitinc < 4 * g.urole.spelarmr / 5)
+                      ? "partly offsetting"
+                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offseting"
+                        : "overcoming");
         you_have(buf, "");
     }
     if (u.udaminc)
