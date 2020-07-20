@@ -238,6 +238,7 @@ struct instance_flags {
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
+    boolean tux_penalty;      /* True iff hero is a monk and wearing a suit */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES

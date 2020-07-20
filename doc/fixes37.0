@@ -391,6 +391,7 @@ for !fixinv option where inventory letters normally don't stick, try to put
 	thrown from; only works if it does return and is successfully caught
 wizard mode #wizborn command
 include more skill information in ^X output when dual-wielding
+include monk's to-hit penalty for worn suit in the status section of ^X output
 item-using monsters will zap wand of undead turning at corpse-wielding hero
 	when the corpse is harmful
 boiling a pool or fountain now creates a temporary cloud of steam
