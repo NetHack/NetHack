@@ -664,15 +664,18 @@ bones_include_name(name)
 const char *name;
 {
     struct cemetery *bp;
+    int len;
     char buf[BUFSZ];
 
+    /* prepare buffer by appending terminal hyphen to name, to avoid partial
+     * matches producing false positives */
     Strcpy(buf, name);
     Strcat(buf, "-");
-    int l = strlen(buf);
+    len = strlen(buf);
 
     if ((bp = g.level.bonesinfo)) {
         do {
-            if (!strncmp(bp->who, buf, l))
+            if (!strncmp(bp->who, buf, len))
                 return TRUE;
         } while ((bp = bp->next) != (struct cemetery *) 0);
     }
