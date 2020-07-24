@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1595102359 2020/07/18 19:59:19 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ $NHDT-Date: 1595621524 2020/07/24 20:12:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -225,6 +225,7 @@ if a mind flayer's psychic blast targetted a hidden monster, feedback named
 	the monster but it wasn't brought out of hiding
 hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 	able to harm mindless monsters with it
+some hero attacks that should have gotten a skill bonus or penalty weren't
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
