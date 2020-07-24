@@ -343,11 +343,11 @@ qt_clust.h    qt_delay.cpp  qt_delay.h    qt_glyph.cpp  qt_glyph.h
 qt_icon.cpp   qt_icon.h     qt_inv.cpp    qt_inv.h      qt_kde0.h
 qt_key.cpp    qt_key.h      qt_line.cpp   qt_line.h     qt_main.cpp
 qt_main.h     qt_map.cpp    qt_map.h      qt_menu.cpp   qt_menu.h
-qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_rip.cpp
-qt_rip.h      qt_set.cpp    qt_set.h      qt_stat.cpp   qt_stat.h
-qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
-qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
-qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
+qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_post.h
+qt_pre.h      qt_rip.cpp    qt_rip.h      qt_set.cpp    qt_set.h
+qt_stat.cpp   qt_stat.h     qt_str.cpp    qt_str.h      qt_streq.cpp
+qt_streq.h    qt_svsel.cpp  qt_svsel.h    qt_win.cpp    qt_win.h
+qt_xcmd.cpp   qt_xcmd.h     qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
 
 win/X11:
 (files for X versions)

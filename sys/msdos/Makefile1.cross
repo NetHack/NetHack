@@ -621,7 +621,8 @@ spotless: clean
 
 # src dependencies
 
-$(HOST_O)drawing.o: $(CONFIG_H)
+$(HOST_O)drawing.o: $(CONFIG_H) $(INCL)/color.h $(INCL)/rm.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h
 $(HOST_O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(HOST_O)alloc.o: alloc.c $(CONFIG_H)
 $(HOST_O)dlb.o: dlb.c $(CONFIG_H) $(INCL)/dlb.h

@@ -755,7 +755,8 @@ $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 $(O)alloc.o: $(CONFIG_H)	 alloc.c
 	$(TARGET_CC) $(cflags) -o$@ alloc.c
 
-$(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/color.h $(INCL)/rm.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h $(MSYS)/pcvideo.h
 	$(TARGET_CC) $(cflags) -I$(MSYS) -o$@ drawing.c
 
 $(O)decl.o: $(CONFIG_H) decl.c
@@ -898,8 +899,6 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 #
 #
 # src dependencies
-#$(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
-	$(TARGET_CC) $(cflags) -o$@ ../sys/atari/tos.c
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
 		#$(INCL)/win32api.h
 	$(TARGET_CC) $(cflags) -o$@ ../sys/share/pcmain.c
@@ -957,57 +956,6 @@ $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/winval.c
 #$(O)tile.o: tile.c $(HACK_H)
 #$(HOST_O)tile.o: tile.c $(HACK_H)
-$(O)gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
-		../win/gnome/gnmain.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnaskstr.c
-$(O)gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
-		../win/gnome/gnaskstr.h ../win/gnome/gnyesno.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnbind.c
-$(O)gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(INCL)/tile2x11.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnglyph.c
-$(O)gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
-		$(INCL)/date.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmain.c
-$(O)gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmap.c
-$(O)gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
-		../win/gnome/gnbind.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmenu.c
-$(O)gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmesg.c
-$(O)gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnopts.c
-$(O)gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
-		../win/gnome/gnmain.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnplayer.c
-$(O)gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnmain.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnsignal.c
-$(O)gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-		../win/gnome/gnomeprv.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnstatus.c
-$(O)gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
-		../win/gnome/gn_rip.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gntext.c
-$(O)gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnworn.c
-$(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnyesno.c
-$(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-		$(INCL)/wingem.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/wingem.c
-$(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
-		$(INCL)/gr_rect.h $(INCL)/wintype.h $(INCL)/wingem.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/wingem1.c
-$(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/load_img.c
-$(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/gr_rect.c
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
 		$(INCL)/dlb.h $(INCL)/tile2x11.h \
 		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
@@ -1017,7 +965,6 @@ $(O)qt_clust.o: ../win/Qt/qt_clust.cpp $(INCL)/qt_clust.h
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qt_clust.cpp
 $(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qttableview.cpp
-#$(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
@@ -1042,7 +989,6 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(CONFIG_H)
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h

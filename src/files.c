@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1593953349 2020/07/05 12:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1595006057 2020/07/17 17:14:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -686,12 +686,12 @@ d_level *lev;
     char *dptr;
 
     /*
-     * "bonD0.nn.le"   = bones for level nn in the main dungeon;
-     * "bonM0.T.le"    = bones for Minetown;
-     * "bonQBar.n.le"  = bones for level n in the Barbarian quest;
-     * "bon3D0.nn.le"  = \
-     * "bon3M0.T.le"   =  > same as above, but for bones pool #3.
-     * "bon3QBar.n.le" = /
+     * "bonD0.nn"   = bones for level nn in the main dungeon;
+     * "bonM0.T"    = bones for Minetown;
+     * "bonQBar.n"  = bones for level n in the Barbarian quest;
+     * "bon3D0.nn"  = \
+     * "bon3M0.T"   =  > same as above, but for bones pool #3.
+     * "bon3QBar.n" = /
      *
      * Return value for content validation skips "bon" and the
      * pool number (if present), making it feasible for the admin
@@ -707,15 +707,9 @@ d_level *lev;
         Sprintf(eos(file), "%u", poolnum);
     }
 #endif
-    dptr = eos(file); /* this used to be after the following Sprintf()
-                         and the return value was (dptr - 2) */
+    dptr = eos(file);
     /* when this naming scheme was adopted, 'filecode' was one letter;
-       3.3.0 turned it into a three letter string (via roles[] in role.c);
-       from that version through 3.6.0, 'dptr' pointed past the filecode
-       and the return value of (dptr - 2)  was wrong for bones produced
-       in the quest branch, skipping the boneid character 'Q' and the
-       first letter of the role's filecode; bones loading still worked
-       because the bonesid used for validation had the same error */
+       3.3.0 turned it into a three letter string for quest levels */
     Sprintf(dptr, "%c%s", g.dungeons[lev->dnum].boneid,
             In_quest(lev) ? g.urole.filecode : "0");
     if ((sptr = Is_special(lev)) != 0)
@@ -779,7 +773,8 @@ char errbuf[];
             /* Use O_TRUNC to force the file to be shortened if it already
              * exists and is currently longer.
              */
-            nhfp->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+            nhfp->fd = open(file,
+                            O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 #else
 #ifdef MAC
             nhfp->fd = maccreat(file, BONE_TYPE);

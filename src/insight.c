@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1593771616 2020/07/03 10:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1595282650 2020/07/20 22:04:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1018,6 +1018,15 @@ int final;
     }
     /* current weapon(s) and corresponding skill level(s) */
     weapon_insight(final);
+    /* unlike ring of increase accuracy's effect, the monk's suit penalty
+       is too blatant to be restricted to magical enlightenment */
+    if (iflags.tux_penalty && !Upolyd) {
+        (void) enlght_combatinc("to hit", -g.urole.spelarmr, final, buf);
+        /* if from_what() ever gets extended from wizard mode to normal
+           play, it could be adapted to handled this */
+        Sprintf(eos(buf), " due to your %s", suit_simple_name(uarm));
+        you_have(buf, "");
+    }
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
@@ -1467,8 +1476,17 @@ int final;
         enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
     if (Slow_digestion)
         you_have("slower digestion", from_what(SLOW_DIGESTION));
-    if (u.uhitinc)
-        you_have(enlght_combatinc("to hit", u.uhitinc, final, buf), "");
+    if (u.uhitinc) {
+        (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
+        if (iflags.tux_penalty && !Upolyd)
+            Sprintf(eos(buf), " %s your suit's penalty",
+                    (u.uhitinc < 0) ? "increasing"
+                    : (u.uhitinc < 4 * g.urole.spelarmr / 5)
+                      ? "partly offsetting"
+                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offseting"
+                        : "overcoming");
+        you_have(buf, "");
+    }
     if (u.udaminc)
         you_have(enlght_combatinc("damage", u.udaminc, final, buf), "");
     if (u.uspellprot || Protection) {

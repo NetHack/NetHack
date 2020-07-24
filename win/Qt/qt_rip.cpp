@@ -15,10 +15,12 @@
 #undef min
 #undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_rip.h"
 #include "qt_bind.h"
 #include "qt_str.h"
@@ -69,7 +71,7 @@ QSize NetHackQtRIP::sizeHint() const
     return pixmap->size();
 }
 
-void NetHackQtRIP::paintEvent(QPaintEvent* event)
+void NetHackQtRIP::paintEvent(QPaintEvent* event UNUSED)
 {
     if ( riplines ) {
 	int pix_x=(width()-pixmap->width())/2;

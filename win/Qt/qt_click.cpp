@@ -15,7 +15,9 @@
 #undef min
 #undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
+#include "qt_post.h"
 #include "qt_click.h"
 
 namespace nethack_qt_ {
