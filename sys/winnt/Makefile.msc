@@ -190,6 +190,7 @@ MSWIN   = ..\win\win32   # window port files (win32)
 WCURSES = ..\win\curses  # window port files (curses) 
 WSHR    = ..\win\share   # Tile support files 
 QT      = ..\win\Qt      # QT support files
+X11     = ..\win\X11     # X11 support files
 
 #
 #  Object directory.
@@ -1361,6 +1362,30 @@ $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
+$(U)tile2x11.exe: $(O)tile2x11.o $(O)tiletext.o $(O)tiletxt.o $(O)alloc.o \
+		$(O)panic.o $(O)monst.o $(O)objects.o
+	@echo Linking $(@:\=/)
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+		$(O)tile2x11.o
+		$(O)tiletext.o
+		$(O)tiletxt.o
+		$(O)drawing.o
+		$(O)monst.o
+		$(O)objects.o
+		$(O)alloc.o
+		$(O)panic.o
+<<
+
+$(O)tile2x11.o: $(X11)\tile2x11.c $(HACK_H) $(TILE_H) $(INCL)\tile2x11.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(X11)\tile2x11.c
+
+$(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
+				$(WSHR)\other.txt \
+                                $(WSHR)\monsters.txt
+	$(U)tile2x11 $(WSHR)\monsters.txt $(WSHR)\objects.txt \
+				$(WSHR)\other.txt \
+                                -grayscale $(WSHR)\monsters.txt
+
 #===============================================================================
 # PDCurses
 #===============================================================================
@@ -1735,31 +1760,31 @@ $(O)cursmesg.o: ..\win\curses\cursmesg.c $(HACK_H) $(INCL)\wincurs.h \
 $(O)cursinvt.o: ..\win\curses\cursinvt.c $(HACK_H) $(INCL)\wincurs.h \
 		..\win\curses\cursinvt.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\curses\cursinvt.c
-#$(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
+#$(O)Window.o: $(X11)\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 #		$(CONFIG_H) $(INCL)\lint.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\Window.c
-$(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H) $(INCL)\lint.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\dialogs.c
-$(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
-		$(INCL)\xwindow.h ..\win\X11\nh72icon ..\win\X11\nh56icon \
-		..\win\X11\nh32icon
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winX.c
-$(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\Window.c
+$(O)dialogs.o: $(X11)\dialogs.c $(CONFIG_H) $(INCL)\lint.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\dialogs.c
+$(O)winX.o: $(X11)\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
+		$(INCL)\xwindow.h $(X11)\nh72icon $(X11)\nh56icon \
+		$(X11)\nh32icon
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winX.c
+$(O)winmap.o: $(X11)\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmap.c
-$(O)winmenu.o: ..\win\X11\winmenu.c $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmenu.c
-$(O)winmesg.o: ..\win\X11\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmesg.c
-$(O)winmisc.o: ..\win\X11\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmap.c
+$(O)winmenu.o: $(X11)\winmenu.c $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmenu.c
+$(O)winmesg.o: $(X11)\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmesg.c
+$(O)winmisc.o: $(X11)\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmisc.c
-$(O)winstat.o: ..\win\X11\winstat.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winstat.c
-$(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\wintext.c
-$(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winval.c
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmisc.c
+$(O)winstat.o: $(X11)\winstat.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winstat.c
+$(O)wintext.o: $(X11)\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\wintext.c
+$(O)winval.o: $(X11)\winval.c $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 #cppregex.o: ..\sys\share\cppregex.cpp
 #	$(CXX) $(CXXFLAGS) -Fo$@  ..\sys\share\cppregex.cpp
