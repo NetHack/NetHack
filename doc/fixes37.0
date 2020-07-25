@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ $NHDT-Date: 1595627151 2020/07/24 21:45:51 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.255 $ $NHDT-Date: 1595637572 2020/07/25 00:39:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -225,7 +225,7 @@ if a mind flayer's psychic blast targetted a hidden monster, feedback named
 	the monster but it wasn't brought out of hiding
 hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 	able to harm mindless monsters with it
-some hero attacks that should have gotten a skill bonus or penalty weren't
+some hero attacks that should have gotten a skill bonus or penalty didn't
 change internal name of "<foo> venom" to "splash of <foo> venom"
 singularize "splashes" to "splash" instead of "splashe"
 
