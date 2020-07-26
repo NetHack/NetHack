@@ -22,7 +22,8 @@ Debug-Mode Quick Reference:
 #wizborn        == show monster birth/death/geno/extinct stats
 #wizintrinsic   == set selected intrinsic timeouts
 #wizmakemap     == recreate the current dungeon level
-#wizrumorcheck  == validate first and last rumor for true and false set
+#wizrumorcheck  == validate rumor indexing and show first, second, and last
+                   random engravings, epitaphs, and hallucinatory monsters
 #wizsmell       == smell a monster
 #wizwhere       == show dungeon placement of all special levels
 #wmode          == show wall modes

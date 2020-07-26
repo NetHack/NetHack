@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1595282650 2020/07/20 22:04:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1595637572 2020/07/25 00:39:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1023,7 +1023,7 @@ int final;
     if (iflags.tux_penalty && !Upolyd) {
         (void) enlght_combatinc("to hit", -g.urole.spelarmr, final, buf);
         /* if from_what() ever gets extended from wizard mode to normal
-           play, it could be adapted to handled this */
+           play, it could be adapted to handle this */
         Sprintf(eos(buf), " due to your %s", suit_simple_name(uarm));
         you_have(buf, "");
     }

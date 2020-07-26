@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1593306911 2020/06/28 01:15:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1595621524 2020/07/24 20:12:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -680,7 +680,7 @@ int dieroll;
             unpoisonmsg = FALSE;
     boolean silvermsg = FALSE, silverobj = FALSE;
     boolean lightobj = FALSE;
-    boolean valid_weapon_attack = FALSE;
+    boolean use_weapon_skill = FALSE, train_weapon_skill = FALSE;
     boolean unarmed = !uwep && !uarm && !uarms;
     boolean hand_to_hand = (thrown == HMON_MELEE
                             /* not grapnels; applied implies uwep */
@@ -695,13 +695,16 @@ int dieroll;
 
     wakeup(mon, TRUE);
     if (!obj) { /* attack with bare hands */
-        if (mdat == &mons[PM_SHADE])
+        if (mdat == &mons[PM_SHADE]) {
             tmp = 0;
-        else if (martial_bonus())
-            tmp = rnd(4); /* bonus for martial arts */
-        else
-            tmp = rnd(2);
-        valid_weapon_attack = (tmp > 1);
+        } else {
+            /* note: 1..2 or 1..4 can be substantiallly increased by
+               strength bonus or skill bonus, usually both... */
+            tmp = rnd(!martial_bonus() ? 2 : 4);
+            use_weapon_skill = TRUE;
+            train_weapon_skill = (tmp > 1);
+        }
+
         /* Blessed gloves give bonuses when fighting 'bare-handed'.  So do
            silver rings.  Note:  rings are worn under gloves, so you don't
            get both bonuses, and two silver rings don't give double bonus. */
@@ -711,6 +714,7 @@ int dieroll;
                                   + ((silverhit & W_RINGR) ? 1 : 0));
         if (barehand_silver_rings > 0)
             silvermsg = TRUE;
+
     } else {
         if (!(artifact_light(obj) && obj->lamplit))
             Strcpy(saved_oname, cxname(obj));
@@ -728,7 +732,8 @@ int dieroll;
                 /* or throw a missile without the proper bow... */
                 || (is_ammo(obj) && (thrown != HMON_THROWN
                                      || !ammo_and_launcher(obj, uwep)))) {
-                /* then do only 1-2 points of damage */
+                /* then do only 1-2 points of damage and don't use or
+                   train weapon's skill */
                 if (mdat == &mons[PM_SHADE] && !shade_glare(obj))
                     tmp = 0;
                 else
@@ -757,10 +762,13 @@ int dieroll;
                         tmp++;
                 }
             } else {
+                /* "normal" weapon usage */
+                use_weapon_skill = TRUE;
                 tmp = dmgval(obj, mon);
                 /* a minimal hit doesn't exercise proficiency */
-                valid_weapon_attack = (tmp > 1);
-                if (!valid_weapon_attack || mon == u.ustuck || u.twoweap
+                train_weapon_skill = (tmp > 1);
+                /* special attack actions */
+                if (!train_weapon_skill || mon == u.ustuck || u.twoweap
                     /* Cleaver can hit up to three targets at once so don't
                        let it also hit from behind or shatter foes' weapons */
                     || (hand_to_hand && obj->oartifact == ART_CLEAVER)) {
@@ -813,6 +821,7 @@ int dieroll;
                        destroyed and they might do so */
                     if (DEADMONSTER(mon)) /* artifact killed monster */
                         return FALSE;
+                    /* perhaps artifact tried to behead a headless monster */
                     if (tmp == 0)
                         return TRUE;
                     hittxt = TRUE;
@@ -830,25 +839,27 @@ int dieroll;
                     jousting = joust(mon, obj);
                     /* exercise skill even for minimal damage hits */
                     if (jousting)
-                        valid_weapon_attack = TRUE;
+                        train_weapon_skill = TRUE;
                 }
                 if (thrown == HMON_THROWN
                     && (is_ammo(obj) || is_missile(obj))) {
                     if (ammo_and_launcher(obj, uwep)) {
-                        /* Elves and Samurai do extra damage using
-                         * their bows&arrows; they're highly trained.
-                         */
+                        /* elves and samurai do extra damage using their own
+                           bows with own arrows; they're highly trained */
                         if (Role_if(PM_SAMURAI) && obj->otyp == YA
                             && uwep->otyp == YUMI)
                             tmp++;
                         else if (Race_if(PM_ELF) && obj->otyp == ELVEN_ARROW
                                  && uwep->otyp == ELVEN_BOW)
                             tmp++;
+                        train_weapon_skill = (tmp > 0);
                     }
                     if (obj->opoisoned && is_poisonable(obj))
                         ispoisoned = TRUE;
                 }
             }
+
+        /* attacking with non-weapons */
         } else if (obj->oclass == POTION_CLASS) {
             if (obj->quan > 1L)
                 obj = splitobj(obj, 1L);
@@ -1030,10 +1041,17 @@ int dieroll;
                         pline(obj->otyp == CREAM_PIE ? "Splat!" : "Splash!");
                         setmangry(mon, TRUE);
                     }
-                    if (thrown)
-                        obfree(obj, (struct obj *) 0);
-                    else
-                        useup(obj);
+                    {
+                        boolean more_than_1 = (obj->quan > 1L);
+
+                        if (thrown)
+                            obfree(obj, (struct obj *) 0);
+                        else
+                            useup(obj);
+
+                        if (!more_than_1)
+                            obj = (struct obj *) 0;
+                    }
                     hittxt = TRUE;
                     get_dmg_bonus = FALSE;
                     tmp = 0;
@@ -1046,10 +1064,17 @@ int dieroll;
                         Your("venom burns %s!", mon_nam(mon));
                         tmp = dmgval(obj, mon);
                     }
-                    if (thrown)
-                        obfree(obj, (struct obj *) 0);
-                    else
-                        useup(obj);
+                    {
+                        boolean more_than_1 = (obj->quan > 1L);
+
+                        if (thrown)
+                            obfree(obj, (struct obj *) 0);
+                        else
+                            useup(obj);
+
+                        if (!more_than_1)
+                            obj = (struct obj *) 0;
+                    }
                     hittxt = TRUE;
                     get_dmg_bonus = FALSE;
                     break;
@@ -1086,28 +1111,62 @@ int dieroll;
         }
     }
 
-    /****** NOTE: perhaps obj is undefined!! (if !thrown && BOOMERANG)
-     *      *OR* if attacking bare-handed!! */
+    /*
+     ***** NOTE: perhaps obj is undefined! (if !thrown && BOOMERANG)
+     *      *OR* if attacking bare-handed!
+     * Note too: the cases where obj might get destroyed do not
+     *      set 'use_weapon_skill', bare-handed does.
+     */
 
-    if (get_dmg_bonus && tmp > 0) {
-        tmp += u.udaminc;
-        /* If you throw using a propellor, you don't get a strength
-         * bonus but you do get an increase-damage bonus.
+    if (tmp > 0) {
+        int dmgbonus = 0;
+
+        /*
+         * Potential bonus (or penalty) from worn ring of increase damage
+         * (or intrinsic bonus from eating same) or from strength.
          */
-        if (thrown != HMON_THROWN || !obj || !uwep
-            || !ammo_and_launcher(obj, uwep))
-            tmp += dbon();
-    }
+        if (get_dmg_bonus) {
+            dmgbonus = u.udaminc;
+            /* throwing using a propellor gets an increase-damage bonus
+               but not a strength one; other attacks get both */
+            if (thrown != HMON_THROWN
+                || !obj || !uwep || !ammo_and_launcher(obj, uwep))
+                dmgbonus += dbon();
+        }
 
-    if (valid_weapon_attack) {
-        struct obj *wep;
+        /*
+         * Potential bonus (or penalty) from weapon skill.
+         * 'use_weapon_skill' is True for hand-to-hand ordinary weapon,
+         * applied or jousting polearm or lance, thrown missile (dart,
+         * shuriken, boomerang), or shot ammo (arrow, bolt, rock/gem when
+         * wielding corresponding launcher).
+         * It is False for hand-to-hand or thrown non-weapon, hand-to-hand
+         * polearm or lance when not mounted, hand-to-hand missile or ammo
+         * or launcher, thrown non-missile, or thrown ammo (including rocks)
+         * when not wielding corresponding launcher.
+         */
+        if (use_weapon_skill) {
+            struct obj *skillwep = obj;
 
-        /* to be valid a projectile must have had the correct projector */
-        wep = PROJECTILE(obj) ? uwep : obj;
-        tmp += weapon_dam_bonus(wep);
-        /* [this assumes that `!thrown' implies wielded...] */
-        wtype = thrown ? weapon_type(wep) : uwep_skill_type();
-        use_skill(wtype, 1);
+            if (PROJECTILE(obj) && ammo_and_launcher(obj, uwep))
+                skillwep = uwep;
+            dmgbonus += weapon_dam_bonus(skillwep);
+
+            /* hit for more than minimal damage (before being adjusted
+               for damage or skill bonus) trains the skill toward future
+               enhancement */
+            if (train_weapon_skill) {
+                /* [this assumes that `!thrown' implies wielded...] */
+                wtype = thrown ? weapon_type(skillwep) : uwep_skill_type();
+                use_skill(wtype, 1);
+            }
+        }
+
+        /* apply combined damage+strength and skill bonuses */
+        tmp += dmgbonus;
+        /* don't let penalty, if bonus is negative, turn a hit into a miss */
+        if (tmp < 1)
+            tmp = 1;
     }
 
     if (ispoisoned) {
@@ -1152,12 +1211,13 @@ int dieroll;
         if (jousting < 0) {
             pline("%s shatters on impact!", Yname2(obj));
             /* (must be either primary or secondary weapon to get here) */
-            set_twoweap(FALSE); /* u.twoweap = FALSE; untwoweapon() is too verbose */
+            set_twoweap(FALSE); /* sets u.twoweap = FALSE;
+                                 * untwoweapon() is too verbose here */
             if (obj == uwep)
                 uwepgone(); /* set g.unweapon */
             /* minor side-effect: broken lance won't split puddings */
             useup(obj);
-            obj = 0;
+            obj = (struct obj *) 0;
         }
         /* avoid migrating a dead monster */
         if (mon->mhp > tmp) {
@@ -1214,9 +1274,9 @@ int dieroll;
             && !(is_ammo(obj) || is_missile(obj)))
         && hand_to_hand) {
         struct monst *mclone;
-        if ((mclone = clone_mon(mon, 0, 0)) != 0) {
-            char withwhat[BUFSZ];
+        char withwhat[BUFSZ];
 
+        if ((mclone = clone_mon(mon, 0, 0)) != 0) {
             withwhat[0] = '\0';
             if (u.twoweap && flags.verbose)
                 Sprintf(withwhat, " with %s", yname(obj));

@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.251 $ $NHDT-Date: 1595102359 2020/07/18 19:59:19 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ $NHDT-Date: 1595668889 2020/07/25 09:21:29 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -225,6 +225,9 @@ if a mind flayer's psychic blast targetted a hidden monster, feedback named
 	the monster but it wasn't brought out of hiding
 hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 	able to harm mindless monsters with it
+some hero attacks that should have gotten a skill bonus or penalty didn't
+change internal name of "<foo> venom" to "splash of <foo> venom"
+singularize "splashes" to "splash" instead of "splashe"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -289,6 +292,8 @@ if a monster removed a corpse from an ice box, the corpse would never rot away
 monster creation on quest levels could make genocided creatures
 enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
 	value for level N monsters created with a d8 value of 1 for all N d8's
+some versions of tiles processing (not X11's) complained about the rename of
+	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
 
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display

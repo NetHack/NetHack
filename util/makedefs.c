@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1594347789 2020/07/10 02:23:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1595627153 2020/07/24 21:45:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -2091,8 +2091,18 @@ do_objs()
                 break;
             }
             /*FALLTHRU*/
+        case VENOM_CLASS:
+            /* fall-through from gem class is ok; objects[] used to have
+                { "{acid,blinding} venom", "splash of venom" }
+               but those have been changed to
+                { "splash of {acid,blinding} venom", "splash of venom" }
+               so strip the extra "splash of " off to keep same macros */
+            if (!strncmp(objnam, "SPLASH_OF_", 10))
+                objnam += 10;
+            /*FALLTHRU*/
         default:
             Fprintf(ofp, "#define\t");
+            break;
         }
         if (prefix >= 0)
             Fprintf(ofp, "%s\t%d\n", limit(objnam, prefix), i);

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{July 9, 2020}
+\date{July 25, 2020}
 
 \maketitle
 
@@ -1959,7 +1959,7 @@ For example, each level has at least one extra boulder.
 Also, it is possible to drop everything in order to be able to squeeze
 into the same location as a boulder (and then presumably move past it),
 or to destroy a boulder with magic or tools, or to create new boulders
-with a scroll of earth.
+with a {\it scroll of earth}.
 However, doing such things will lower your luck without any specific
 message given about that.
 See the {\it Conduct\/} section for information about getting feedback for
@@ -2028,10 +2028,12 @@ claim ownership without offering any compensation.  You'll have to buy
 it back if you want to reclaim it.
 
 %.pg
-Shopkeepers sometimes run out of money.  When that happens, you'll be
-offered credit instead of gold when you try to sell something.  Credit
-can be used to pay for purchases, but it is only good in the shop where
-it was obtained; other shopkeepers won't honor it.  (If you happen to
+Shopkeepers sometime run out of money.
+When that happens, you'll be
+offered credit instead of gold when you try to sell something.
+Credit can be used to pay for purchases, but it is only good in the shop
+where it was obtained; other shopkeepers won't honor it.
+(If you happen to
 find a ``credit card'' in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
 
@@ -2060,7 +2062,7 @@ A shopkeeper treats the spot immediately inside the door as if it were
 outside the shop.
 %.lp \(bu 2
 \item[$\bullet$]
-While the shopkeeper watches you like a hawk, he will generally ignore
+While the shopkeeper watches you like a hawk, he or she will generally ignore
 any other customers.
 %.lp \(bu 2
 \item[$\bullet$]
@@ -2324,8 +2326,8 @@ to discard some of what you're carrying or collapse under its weight.
 %.pg
 {\it NetHack\/} will tell you how badly you have loaded yourself.
 If you are encumbered, one of the conditions
-``{\it Burdened\/}'', ``{\it Stressed\/}'', ``{\it Strained\/}'',
-``{\it Overtaxed\/}'' or ``{\it Overloaded\/}'' will be
+{\tt Burdened}, {\tt Stressed}, {\tt Strained},
+{\tt Overtaxed}, or {\tt Overloaded} will be
 shown on the bottom line status display.
 
 %.pg
@@ -2366,9 +2368,10 @@ less effective in combat.  Other cursed objects may act poorly or
 detrimentally in other ways.
 
 %.pg
-Objects can also be blessed.  Blessed items usually work better or
-more beneficially than normal uncursed items.  For example, a blessed
-weapon will do more damage against demons.
+Objects can also be blessed instead.
+Blessed items usually work better or more beneficially than normal
+uncursed items.
+For example, a blessed weapon will do slightly more damage against demons.
 
 %.pg
 Objects which are neither cursed nor blessed are referred to as uncursed.
@@ -2379,21 +2382,30 @@ half full versus glass half empty'' situation; make of that what you will.
 %.pg
 There are magical means of bestowing or removing curses upon objects,
 so even if you are stuck with one, you can still have the curse
-lifted and the item removed.  Priests and Priestesses have an innate
+lifted and the item removed.
+Priests and Priestesses have an innate
 sensitivity to this property in any object, so they can more easily avoid
 cursed objects than other character roles.
+Dropping objects onto an altar will reveal their bless or curse state
+provided that you can see them land.
 
 %.pg
 An item with unknown status will be reported in your inventory with no prefix.
 An item which you know the state of will be distinguished in your inventory
-by the presence of the word ``cursed'', ``uncursed'' or ``blessed'' in the
-description of the item.
-In some cases ``uncursed'' will be omitted as being redundant when
+by the presence of the word {\tt cursed}, {\tt uncursed} or
+{\tt blessed} in the description of the item.
+In some cases {\tt uncursed} will be omitted as being redundant when
 enough other information is displayed.
 The
 {\it implicit\verb+_+uncursed\/}
-option can be used to control this; toggle it off to have ``uncursed''
+option can be used to control this; toggle it off to have {\tt uncursed}
 be displayed even when that can be deduced from other attributes.
+
+%.pg
+Sometimes the bless or curse state of objects is referred to as their
+``{\tt BUC}'' attribute, for Blessed, Uncursed, or Cursed state,
+or ``{\tt BUCX}'' for Blessed, Uncursed, Cursed, or unknown.
+(The term {\it beatitude\/} is occasionally used as well.)
 
 %.hn 2
 \subsection*{Weapons (`{\tt )}')}
