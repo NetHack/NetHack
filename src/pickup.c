@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1590870789 2020/05/30 20:33:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1595787212 2020/07/26 18:13:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2351,9 +2351,14 @@ register struct obj *obj;
     if (Icebox && !age_is_relative(obj)) {
         obj->age = g.monstermoves - obj->age; /* actual age */
         /* stop any corpse timeouts when frozen */
-        if (obj->otyp == CORPSE && obj->timed) {
-            (void) stop_timer(ROT_CORPSE, obj_to_any(obj));
-            (void) stop_timer(REVIVE_MON, obj_to_any(obj));
+        if (obj->otyp == CORPSE) {
+            if (obj->timed) {
+                (void) stop_timer(ROT_CORPSE, obj_to_any(obj));
+                (void) stop_timer(REVIVE_MON, obj_to_any(obj));
+            }
+            /* if this is the corpse of a cancelled ice troll, uncancel it */
+            if (obj->corpsenm == PM_ICE_TROLL && has_omonst(obj))
+                OMONST(obj)->mcan = 0;
         }
     } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
         /* explicitly mention what item is triggering the explosion */
@@ -2362,7 +2367,7 @@ register struct obj *obj;
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
-        if (obj->otyp == BAG_OF_HOLDING) /* putting bag of holding into another */
+        if (obj->otyp == BAG_OF_HOLDING) /* one bag of holding into another */
             do_boh_explosion(obj, (obj->where == OBJ_FLOOR));
         obfree(obj, (struct obj *) 0);
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
@@ -2489,8 +2494,13 @@ struct obj *obj;
     if (!age_is_relative(obj)) {
         obj->age = g.monstermoves - obj->age; /* actual age */
         if (obj->otyp == CORPSE) {
-            /* start a rot-away timer but not a troll's revive timer */
-            obj->norevive = 1;
+            struct monst *m = get_mtraits(obj, FALSE);
+            boolean iceT = m ? (m->data == &mons[PM_ICE_TROLL])
+                             : (obj->corpsenm == PM_ICE_TROLL);
+
+            /* start a revive timer if this corpse is for an ice troll,
+               otherwise start a rot-away timer (even for other trolls) */
+            obj->norevive = iceT ? 0 : 1;
             start_corpse_timeout(obj);
         }
     }

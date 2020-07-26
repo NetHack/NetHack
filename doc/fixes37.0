@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ $NHDT-Date: 1595774758 2020/07/26 14:45:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1595787211 2020/07/26 18:13:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -229,6 +229,10 @@ some hero attacks that should have gotten a skill bonus or penalty didn't
 change internal name of "<foo> venom" to "splash of <foo> venom"
 singularize "splashes" to "splash" instead of "splashe"
 treat slinging gems and tossing or slinging stones at unicorns as attacks
+give rot-away timer instead of revive timer to corpses of cancelled trolls
+switch revive timer to rot-away timer if a troll corpse gets cancelled
+uncancel an ice troll if its corpse is put into an ice box; give corpse a
+	revive timer if later taken out
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

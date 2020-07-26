@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1593772051 2020/07/03 10:27:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1595787213 2020/07/26 18:13:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1152,6 +1152,19 @@ register struct obj *obj;
             break;
         }
     }
+    /* cancelling a troll's corpse prevents it from reviving (on its own;
+       does not affect undead turning induced revival) */
+    if (obj->otyp == CORPSE && obj->timed
+        && !is_rider(&mons[obj->corpsenm])) {
+        anything a = *obj_to_any(obj);
+        long timout = peek_timer(REVIVE_MON, &a);
+
+        if (timout) {
+            (void) stop_timer(REVIVE_MON, &a);
+            (void) start_timer(timout, TIMER_OBJECT, ROT_CORPSE, &a);
+        }
+    }
+
     unbless(obj);
     uncurse(obj);
     return;
