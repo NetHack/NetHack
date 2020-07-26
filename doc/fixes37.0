@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ $NHDT-Date: 1595668889 2020/07/25 09:21:29 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ $NHDT-Date: 1595774758 2020/07/26 14:45:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -228,6 +228,7 @@ hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 some hero attacks that should have gotten a skill bonus or penalty didn't
 change internal name of "<foo> venom" to "splash of <foo> venom"
 singularize "splashes" to "splash" instead of "splashe"
+treat slinging gems and tossing or slinging stones at unicorns as attacks
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
