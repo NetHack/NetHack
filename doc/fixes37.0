@@ -276,6 +276,7 @@ grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
 fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
+handle gone portal when going back in quest
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
 change inconsistent achievement spelling of "Mine Town" to "Minetown"
