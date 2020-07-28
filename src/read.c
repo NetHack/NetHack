@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1592875138 2020/06/23 01:18:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1595966992 2020/07/28 20:09:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1345,34 +1345,36 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     case SCR_IDENTIFY:
         /* known = TRUE; -- handled inline here */
-        /* use up the scroll first, before makeknown() performs a
-           perm_invent update; also simplifies empty invent check */
+        /* use up the scroll first, before learnscrolltyp() -> makeknown()
+           performs perm_invent update; also simplifies empty invent check */
         useup(sobj);
         sobj = 0; /* it's gone */
-        if (confused)
+        /* scroll just identifies itself for any scroll read while confused
+           or for cursed scroll read without knowing identify yet */
+        if (confused || (scursed && !already_known))
             You("identify this as an identify scroll.");
-        else if (!already_known || !g.invent)
-            /* force feedback now if invent became
-               empty after using up this scroll */
+        else if (!already_known)
             pline("This is an identify scroll.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
+        if (confused || (scursed && !already_known))
+            break;
         /*FALLTHRU*/
     case SPE_IDENTIFY:
-        cval = 1;
-        if (sblessed || (!scursed && !rn2(5))) {
-            cval = rn2(5);
-            /* note: if cval==0, identify all items */
-            if (cval == 1 && sblessed && Luck > 0)
-                ++cval;
-        }
-        if (g.invent && !confused) {
+        if (g.invent) {
+            cval = 1;
+            if (sblessed || (!scursed && !rn2(5))) {
+                cval = rn2(5);
+                /* note: if cval==0, identify all items */
+                if (cval == 1 && sblessed && Luck > 0)
+                    ++cval;
+            }
             identify_pack(cval, !already_known);
-        } else if (otyp == SPE_IDENTIFY) {
-            /* when casting a spell we know we're not confused,
-               so inventory must be empty (another message has
-               already been given above if reading a scroll) */
-            pline("You're not carrying anything to be identified.");
+        } else {
+            /* spell cast with inventory empty or scroll read when it's
+               the only item leaving empty inventory after being used up */
+            pline("You're not carrying anything%s to be identified.",
+                  (otyp == SCR_IDENTIFY) ? " else" : "");
         }
         break;
     case SCR_CHARGING:
