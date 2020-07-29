@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1588776919 2020/05/06 14:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1595989869 2020/07/29 02:31:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -179,7 +179,7 @@ LIBS += -lm
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
-CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
+CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include $(QTCXXFLAGS)
 CXX ?= g++
 MOC ?= moc
 #LINK=g++
