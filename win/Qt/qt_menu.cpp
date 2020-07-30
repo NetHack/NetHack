@@ -214,7 +214,7 @@ void NetHackQtMenuWindow::EndMenu(const QString& p)
 
 int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 {
-    QFont tablefont(qt_settings->normalFont());
+    QFont tablefont(qt_settings->normalFixedFont());
     table->setFont(tablefont);
 
     table->setRowCount(itemcount);
