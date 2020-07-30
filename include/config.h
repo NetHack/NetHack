@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1594169990 2020/07/08 00:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1596072230 2020/07/30 01:23:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -58,7 +58,6 @@
 /* #define CURSES_GRAPHICS *//* Curses interface - Karl Garrison*/
 /* #define X11_GRAPHICS */   /* X11 interface */
 /* #define QT_GRAPHICS */    /* Qt interface */
-/* #define GNOME_GRAPHICS */ /* Gnome interface */
 /* #define MSWIN_GRAPHICS */ /* Windows NT, CE, Graphics */
 
 /*
@@ -103,16 +102,24 @@
 #ifndef NOUSER_SOUNDS
 #define USER_SOUNDS /* Use sounds */
 #endif
+#ifndef USE_XPM
 #define USE_XPM           /* Use XPM format for images (required) */
+#endif
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#endif
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "Qt"
 #endif
 #endif
 
 #ifdef GNOME_GRAPHICS
+#ifndef USE_XPM
 #define USE_XPM           /* Use XPM format for images (required) */
+#endif
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#endif
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "Gnome"
 #endif
@@ -125,8 +132,10 @@
 #define HACKDIR "\\nethack"
 #endif
 
+#ifdef TTY_GRAPHICS
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "tty"
+#endif
 #endif
 
 #ifdef CURSES_GRAPHICS
@@ -146,7 +155,9 @@
  */
 /* # define USE_XPM */ /* Disable if you do not have the XPM library */
 #ifdef USE_XPM
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.xpm) */
+#endif
 #endif
 #ifndef DEFAULT_WC_TILED_MAP
 #define DEFAULT_WC_TILED_MAP /* Default to tiles */
