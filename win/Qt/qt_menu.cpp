@@ -222,7 +222,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
     how=h;
 
     ok->setEnabled(how!=PICK_ONE);ok->setDefault(how!=PICK_ONE);
-    cancel->setEnabled(how!=PICK_NONE);
+    cancel->setEnabled(true);
     all->setEnabled(how==PICK_ANY);
     none->setEnabled(how==PICK_ANY);
     invert->setEnabled(how==PICK_ANY);
