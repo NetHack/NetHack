@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1595989870 2020/07/29 02:31:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $
+# NetHack 3.6  macosx10.10-qt $NHDT-Date: 1596115204 2020/07/30 13:20:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -67,6 +67,12 @@ CXX=clang++ -std=gnu++11
 # You shouldn't need to change anything below here.
 #
 
+ifdef WANT_WIN_QT
+LINK = $(CXX)
+else
+LINK = $(CC)
+endif
+
 #CFLAGS+=-W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
@@ -91,7 +97,6 @@ endif
 WINSRC =
 WINOBJ0 =
 WINLIB =
-LINK = $(CC)
 VARDATND =
 
 ifdef WANT_WIN_TTY
@@ -127,7 +132,6 @@ CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
 QTCXXFLAGS += -Wno-deprecated-declarations
 QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
-LINK=$(CXX)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 VARDATND0 = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
