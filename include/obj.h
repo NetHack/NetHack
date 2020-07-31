@@ -389,8 +389,8 @@ struct obj {
  *       4. Add a testing macro after the set of referencing macros
  *          (see has_oname(), has_omonst(), has_omailcmd(), and has_omin(),
  *          for examples).
- *       5. Zero out the pointer to your struct in newoextra() in
- *          src/mkobj.c.
+ *       5. If your new field isn't a pointer and requires a special value
+ *          on initialization, add code to init_oextra() in src/mkobj.c.
  *       6. Create newXX(otmp) function and possibly free_XX(otmp) function
  *          in an appropriate new or existing source file and add a prototype
  *          for it to include/extern.h.  The majority of these are currently

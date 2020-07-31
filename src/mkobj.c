@@ -67,16 +67,22 @@ static const struct icp hellprobs[] = { { 20, WEAPON_CLASS },
                                         { 8, RING_CLASS },
                                         { 4, AMULET_CLASS } };
 
+static const struct oextra zerooextra = { DUMMY };
+
+static void
+init_oextra(oex)
+struct oextra *oex;
+{
+    *oex = zerooextra;
+}
+
 struct oextra *
 newoextra()
 {
     struct oextra *oextra;
 
     oextra = (struct oextra *) alloc(sizeof (struct oextra));
-    oextra->oname = 0;
-    oextra->omonst = 0;
-    oextra->omailcmd = 0;
-    oextra->omid = 0;
+    init_oextra(oextra);
     return oextra;
 }
 

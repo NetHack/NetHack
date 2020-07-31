@@ -1038,19 +1038,23 @@ int mndx;
     }
 }
 
+static const struct mextra zeromextra = { DUMMY };
+
+static void
+init_mextra(mex)
+struct mextra *mex;
+{
+    *mex = zeromextra;
+    mex->mcorpsenm = NON_PM;
+}
+
 struct mextra *
 newmextra()
 {
     struct mextra *mextra;
 
     mextra = (struct mextra *) alloc(sizeof(struct mextra));
-    mextra->mname = 0;
-    mextra->egd = 0;
-    mextra->epri = 0;
-    mextra->eshk = 0;
-    mextra->emin = 0;
-    mextra->edog = 0;
-    mextra->mcorpsenm = NON_PM;
+    init_mextra(mextra);
     return mextra;
 }
 
