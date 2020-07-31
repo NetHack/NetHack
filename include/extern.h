@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1596162339 2020/07/31 02:25:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.852 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1596226441 2020/07/31 20:14:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.853 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1044,6 +1044,7 @@ E int FDECL(ggetobj, (const char *, int (*)(OBJ_P), int,
                       BOOLEAN_P, unsigned *));
 E int FDECL(askchain, (struct obj **, const char *, int, int (*)(OBJ_P),
                        int (*)(OBJ_P), int, const char *));
+E void FDECL(set_cknown_lknown, (struct obj *));
 E void FDECL(fully_identify_obj, (struct obj *));
 E int FDECL(identify, (struct obj *));
 E int FDECL(count_unidentified, (struct obj *));
