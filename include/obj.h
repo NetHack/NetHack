@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1590870784 2020/05/30 20:33:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1596162340 2020/07/31 02:25:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -44,6 +44,7 @@ struct obj {
                   number of charges for wand or charged tool ( >= -1 );
                   number of candles attached to candelabrum;
                   marks your eggs, tin variety and spinach tins;
+                  candy bar wrapper index;
                   Schroedinger's Box (1) or royal coffers for a court (2);
                   tells which fruit a fruit is;
                   special for uball and amulet;

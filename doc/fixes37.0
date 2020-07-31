@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ $NHDT-Date: 1596124734 2020/07/30 15:58:54 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1596162338 2020/07/31 02:25:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -233,6 +233,9 @@ give rot-away timer instead of revive timer to corpses of cancelled trolls
 switch revive timer to rot-away timer if a troll corpse gets cancelled
 uncancel an ice troll if its corpse is put into an ice box; give corpse a
 	revive timer if later taken out
+splitting a stack of candy bars gave new wrapper text depending upon the
+	obj->o_id value assigned; keep existing text for both halves of stack
+	(side-effect: separate candy bars usually won't merge anymore)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
