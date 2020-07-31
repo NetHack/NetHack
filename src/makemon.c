@@ -1038,7 +1038,7 @@ int mndx;
     }
 }
 
-static const struct mextra zeromextra = { DUMMY };
+static const struct mextra zeromextra = DUMMY;
 
 static void
 init_mextra(mex)
