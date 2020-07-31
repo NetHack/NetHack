@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1595627152 2020/07/24 21:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1596162343 2020/07/31 02:25:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -718,10 +718,25 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     if (pluralize)
         Strcpy(buf, makeplural(buf));
 
-    if (obj->otyp == T_SHIRT && g.program_state.gameover) {
+    /* maybe give some extra information which isn't shown during play */
+    if (g.program_state.gameover) {
+        const char *lbl;
         char tmpbuf[BUFSZ];
 
-        Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+        /* disclose without breaking illiterate conduct, but mainly tip off
+           players who aren't aware that something readable is present */
+        switch (obj->otyp) {
+        case T_SHIRT:
+            Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+            break;
+        case CANDY_BAR:
+            lbl = candy_wrapper_text(obj);
+            if (*lbl)
+                Sprintf(eos(buf), " labeled \"%s\"", lbl);
+            break;
+        default:
+            break;
+        }
     }
 
     if (has_oname(obj) && dknown) {

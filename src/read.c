@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1592875138 2020/06/23 01:18:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1596162345 2020/07/31 02:25:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -178,6 +178,39 @@ char *buf;
     return erode_obj_text(apron, buf);
 }
 
+static const char *candy_wrappers[] = {
+    "",                         /* (none -- should never happen) */
+    "Apollo",                   /* Lost */
+    "Moon Crunchy",             /* South Park */
+    "Snacky Cake",    "Chocolate Nuggie", "The Small Bar",
+    "Crispy Yum Yum", "Nilla Crunchie",   "Berry Bar",
+    "Choco Nummer",   "Om-nom", /* Cat Macro */
+    "Fruity Oaty",              /* Serenity */
+    "Wonka Bar",                /* Charlie and the Chocolate Factory */
+};
+
+/* return the text of a candy bar's wrapper */
+const char *
+candy_wrapper_text(obj)
+struct obj *obj;
+{
+    /* modulo operation is just bullet proofing; 'spe' is already in range */
+    return candy_wrappers[obj->spe % SIZE(candy_wrappers)];
+}
+
+/* assign a wrapper to a candy bar stack */
+void
+assign_candy_wrapper(obj)
+struct obj *obj;
+{
+    if (obj->otyp == CANDY_BAR) {
+        /* skips candy_wrappers[0] */
+        obj->spe = 1 + rn2(SIZE(candy_wrappers) - 1);
+    }
+    return;
+}
+
+/* the 'r' command; read a scroll or spell book or various other things */
 int
 doread()
 {
@@ -299,22 +332,17 @@ doread()
         u.uconduct.literate++;
         return 1;
     } else if (scroll->otyp == CANDY_BAR) {
-        static const char *wrapper_msgs[] = {
-            "Apollo",       /* Lost */
-            "Moon Crunchy", /* South Park */
-            "Snacky Cake",    "Chocolate Nuggie", "The Small Bar",
-            "Crispy Yum Yum", "Nilla Crunchie",   "Berry Bar",
-            "Choco Nummer",   "Om-nom", /* Cat Macro */
-            "Fruity Oaty",              /* Serenity */
-            "Wonka Bar" /* Charlie and the Chocolate Factory */
-        };
+        const char *wrapper = candy_wrapper_text(scroll);
 
         if (Blind) {
             You_cant("feel any Braille writing.");
             return 0;
         }
-        pline("The wrapper reads: \"%s\".",
-              wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
+        if (!*wrapper) {
+            pline("The candy bar's wrapper is blank.");
+            return 0;
+        }
+        pline("The wrapper reads: \"%s\".", wrapper);
         u.uconduct.literate++;
         return 1;
     } else if (scroll->oclass != SCROLL_CLASS
@@ -1345,34 +1373,36 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     case SCR_IDENTIFY:
         /* known = TRUE; -- handled inline here */
-        /* use up the scroll first, before makeknown() performs a
-           perm_invent update; also simplifies empty invent check */
+        /* use up the scroll first, before learnscrolltyp() -> makeknown()
+           performs perm_invent update; also simplifies empty invent check */
         useup(sobj);
         sobj = 0; /* it's gone */
-        if (confused)
+        /* scroll just identifies itself for any scroll read while confused
+           or for cursed scroll read without knowing identify yet */
+        if (confused || (scursed && !already_known))
             You("identify this as an identify scroll.");
-        else if (!already_known || !g.invent)
-            /* force feedback now if invent became
-               empty after using up this scroll */
+        else if (!already_known)
             pline("This is an identify scroll.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
+        if (confused || (scursed && !already_known))
+            break;
         /*FALLTHRU*/
     case SPE_IDENTIFY:
-        cval = 1;
-        if (sblessed || (!scursed && !rn2(5))) {
-            cval = rn2(5);
-            /* note: if cval==0, identify all items */
-            if (cval == 1 && sblessed && Luck > 0)
-                ++cval;
-        }
-        if (g.invent && !confused) {
+        if (g.invent) {
+            cval = 1;
+            if (sblessed || (!scursed && !rn2(5))) {
+                cval = rn2(5);
+                /* note: if cval==0, identify all items */
+                if (cval == 1 && sblessed && Luck > 0)
+                    ++cval;
+            }
             identify_pack(cval, !already_known);
-        } else if (otyp == SPE_IDENTIFY) {
-            /* when casting a spell we know we're not confused,
-               so inventory must be empty (another message has
-               already been given above if reading a scroll) */
-            pline("You're not carrying anything to be identified.");
+        } else {
+            /* spell cast with inventory empty or scroll read when it's
+               the only item leaving empty inventory after being used up */
+            pline("You're not carrying anything%s to be identified.",
+                  (otyp == SCR_IDENTIFY) ? " else" : "");
         }
         break;
     case SCR_CHARGING:

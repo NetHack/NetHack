@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.258 $ $NHDT-Date: 1595787211 2020/07/26 18:13:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1596162338 2020/07/31 02:25:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -233,6 +233,9 @@ give rot-away timer instead of revive timer to corpses of cancelled trolls
 switch revive timer to rot-away timer if a troll corpse gets cancelled
 uncancel an ice troll if its corpse is put into an ice box; give corpse a
 	revive timer if later taken out
+splitting a stack of candy bars gave new wrapper text depending upon the
+	obj->o_id value assigned; keep existing text for both halves of stack
+	(side-effect: separate candy bars usually won't merge anymore)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -276,6 +279,7 @@ grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
 fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
+handle gone portal when going back in quest
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
 change inconsistent achievement spelling of "Mine Town" to "Minetown"
@@ -321,6 +325,16 @@ curses: for vertical status, line up conditions in columns; usually two but
 msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
+Qt: use more columns for extended command selection dialog so that the number
+	of rows needed doesn't result in some commands being unaccessible
+Qt: suppress wizard mode commands from '#' handling when not in wizard mode
+Qt: organize extended command selection grid by columns instead of by rows
+	(first N entries down left column, next N entries down 2nd column, &c)
+Qt: when selecting an extended command by typing its name, support <delete>
+	(aka <rubout>) in addition to <backspace> to go back a character
+Qt: switch to fixed-width font for menus
+Qt: don't disable [cancel] button when viewing inventory or other pick-none
+	menus; ESC works to dismiss those and [cancel] should be the same
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
@@ -507,4 +521,6 @@ removed MFLOPPY conditional code
 get rid of 3.6.1 workaround needed to retain compatibility with 3.6.0 bones
 	files after fix for 3.3.0 through 3.6.0 bug for invalid 'bonesid'
 	designation in bones of quest levels
+add an additional note to mextra.h and obj.h comments that reminds people to
+	zero out added mextra and oextra fields in the appropriate function
 

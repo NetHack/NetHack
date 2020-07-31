@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1590870784 2020/05/30 20:33:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1596162340 2020/07/31 02:25:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -44,6 +44,7 @@ struct obj {
                   number of charges for wand or charged tool ( >= -1 );
                   number of candles attached to candelabrum;
                   marks your eggs, tin variety and spinach tins;
+                  candy bar wrapper index;
                   Schroedinger's Box (1) or royal coffers for a court (2);
                   tells which fruit a fruit is;
                   special for uball and amulet;
@@ -388,7 +389,9 @@ struct obj {
  *       4. Add a testing macro after the set of referencing macros
  *          (see has_oname(), has_omonst(), has_omailcmd(), and has_omin(),
  *          for examples).
- *       5. Create newXX(otmp) function and possibly free_XX(otmp) function
+ *       5. If your new field isn't a pointer and requires a non-zero value
+ *          on initialization, add code to init_oextra() in src/mkobj.c.
+ *       6. Create newXX(otmp) function and possibly free_XX(otmp) function
  *          in an appropriate new or existing source file and add a prototype
  *          for it to include/extern.h.  The majority of these are currently
  *          located in mkobj.c for convenience.
@@ -409,14 +412,14 @@ struct obj {
  *              }
  *         }
  *
- *       6. Adjust size_obj() in src/cmd.c appropriately.
- *       7. Adjust dealloc_oextra() in src/mkobj.c to clean up
+ *       7. Adjust size_obj() in src/cmd.c appropriately.
+ *       8. Adjust dealloc_oextra() in src/mkobj.c to clean up
  *          properly during obj deallocation.
- *       8. Adjust copy_oextra() in src/mkobj.c to make duplicate
+ *       9. Adjust copy_oextra() in src/mkobj.c to make duplicate
  *          copies of your struct or data onto another obj struct.
- *       9. Adjust restobj() in src/restore.c to deal with your
+ *      10. Adjust restobj() in src/restore.c to deal with your
  *          struct or data during a restore.
- *      10. Adjust saveobj() in src/save.c to deal with your
+ *      11. Adjust saveobj() in src/save.c to deal with your
  *          struct or data during a save.
  */
 

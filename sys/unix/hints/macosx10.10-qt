@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1595085485 2020/07/18 15:18:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $
+# NetHack 3.6  macosx10.10-qt $NHDT-Date: 1596115204 2020/07/30 13:20:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -31,7 +31,10 @@ WANT_DEFAULT=Qt
 #  A) set QTDIR either here or in the environment to point to the Qt5
 #     library installation root.  (Qt2 or Qt3 will not work.)
 ifdef WANT_WIN_QT
+# Qt installed via homebrew
 QTDIR=$(shell brew --prefix)/opt/qt
+# Qt installed via macports (qt511 package; 5.13 requires OSX 10.12 or later)
+#QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT
 
 # 2. Is this a build for a binary that will be shared among different users
@@ -64,6 +67,12 @@ CXX=clang++ -std=gnu++11
 # You shouldn't need to change anything below here.
 #
 
+ifdef WANT_WIN_QT
+LINK = $(CXX)
+else
+LINK = $(CC)
+endif
+
 #CFLAGS+=-W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
 CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
@@ -88,7 +97,6 @@ endif
 WINSRC =
 WINOBJ0 =
 WINLIB =
-LINK = $(CC)
 VARDATND =
 
 ifdef WANT_WIN_TTY
@@ -121,10 +129,9 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
-CFLAGS += -Wno-deprecated-declarations
-CFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
+QTCXXFLAGS += -Wno-deprecated-declarations
+QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
-LINK=$(CXX)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 VARDATND0 = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm

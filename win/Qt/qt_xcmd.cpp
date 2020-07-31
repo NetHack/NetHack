@@ -34,6 +34,14 @@ namespace nethack_qt_ {
 void centerOnMain(QWidget *);
 // end temporary
 
+static inline bool
+interesting_command(unsigned indx)
+{
+    return (!(extcmdlist[indx].flags & CMD_NOT_AVAILABLE)
+            /* 'wizard' is #undef'd above [why?] so rely on its internals */
+            && (flags.debug || !(extcmdlist[indx].flags & WIZMODECMD)));
+}
+
 NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     QDialog(parent)
 {
@@ -51,24 +59,56 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     QGroupBox *grid=new QGroupBox("Extended commands",this);
     l->addWidget(grid);
 
-    int i;
-    int butw=50;
+    unsigned i, j, ncmds = 0;
+    int butw = 50;
     QFontMetrics fm = fontMetrics();
-    for (i=0; extcmdlist[i].ef_txt; i++) {
-	butw = std::max(butw,30+fm.width(extcmdlist[i].ef_txt));
+    for (i = 0; extcmdlist[i].ef_txt; ++i) {
+        if (interesting_command(i)) {
+            ++ncmds;
+            butw = std::max(butw, 30 + fm.width(extcmdlist[i].ef_txt));
+        }
     }
-    int ncols=4;
+
+    /* 'ncols' should be calculated to fit (or enable a vertical scrollbar
+       when its so big it forces too many rows, if GroupBox supports that);
+       it used to be hardcoded 4 but after every command became accessible
+       as an extended command, that resulted in so many rows that some of
+       the buttoms were chopped off at the bottom of the grid */
+    unsigned ncols = !flags.debug ? 6 : 8,
+             nrows = (ncmds + ncols - 1) / ncols;
+    /*
+     * Choose grid layout.  This ought to selected via a button that can
+     * be used to toggle the setting back and forth.
+     *
+     *  by row  vs  by column
+     *   a b         a e
+     *   c d         b f
+     *   e f         c g
+     *   g           d
+     *
+     * Prior to 3.7, it was always by-row, but by-column is more natural
+     * for an alphabetized list.
+     */
+    bool by_column = true;
 
     QVBoxLayout* bl = new QVBoxLayout(grid);
     bl->addSpacing(fm.height());
     QGridLayout* gl = new QGridLayout();
     bl->addLayout(gl);
-    for (i=0; extcmdlist[i].ef_txt; i++) {
-	QPushButton* pb=new QPushButton(extcmdlist[i].ef_txt, grid);
-	pb->setMinimumSize(butw,pb->sizeHint().height());
-	group->addButton(pb, i+1);
-	gl->addWidget(pb,i/ncols,i%ncols);
-        buttons.append(pb);
+    for (i = j = 0; extcmdlist[i].ef_txt; ++i) {
+        if (interesting_command(i)) {
+            QPushButton *pb = new QPushButton(extcmdlist[i].ef_txt, grid);
+            pb->setMinimumSize(butw, pb->sizeHint().height());
+            group->addButton(pb, i + 1);
+            if (by_column)
+                /* 0..R-1 down first column, R..2*R-1 down second column,...*/
+                gl->addWidget(pb, j % nrows, j / nrows);
+            else
+                /* 0..C-1 across first row, C..2*C-1 across second row, ... */
+                gl->addWidget(pb, j / ncols, j % ncols);
+            buttons.append(pb);
+            ++j;
+        }
     }
     group->addButton(can, 0);
     connect(group,SIGNAL(buttonPressed(int)),this,SLOT(done(int)));
@@ -90,7 +130,7 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
     {
 	reject();
     }
-    else if (text == "\b")
+    else if (text == "\b" || text == "\177")
     {
 	QString promptstr = prompt->text();
 	if (promptstr != "#")
@@ -104,6 +144,8 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 	unsigned matches = 0;
 	unsigned match = 0;
 	for (unsigned i=0; extcmdlist[i].ef_txt; i++) {
+            if (!interesting_command(i))
+                continue;
 	    if (QString(extcmdlist[i].ef_txt).startsWith(typedstr)) {
 		++matches;
 		if (matches >= 2)
@@ -136,6 +178,11 @@ int NetHackQtExtCmdRequestor::get()
     return result()-1;
 }
 
+/*
+ * FIXME:
+ *  This looks terrible.  [Possibly a difference between initial
+ *  implementation using Qt2 and the current Qt version?]
+ */
 // Enable only buttons that match the current prompt string
 void NetHackQtExtCmdRequestor::enableButtons()
 {

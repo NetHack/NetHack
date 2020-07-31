@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1588776919 2020/05/06 14:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# NetHack 3.6  Makefile.src    $NHDT-Date: 1596115531 2020/07/30 13:25:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -49,7 +49,7 @@ SHELL=/bin/sh
 # for UNIX systems
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
-SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
+SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
@@ -173,13 +173,10 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
 #CFLAGS = -O -I../include
 #LFLAGS =
 
-# -lm required by lua
-LIBS += -lm
-
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
-CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
+CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include $(QTCXXFLAGS)
 CXX ?= g++
 MOC ?= moc
 #LINK=g++
@@ -447,6 +444,9 @@ AT = $(AT_V$(QUIETCC))
 
 MAKEDEFS = ../util/makedefs
 
+# -lm required by lua
+LUALIB = ../lib/lua/liblua.a -lm
+
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
 HACK_H	= ../src/hack.h-t
@@ -550,32 +550,33 @@ $(GAME):	$(SYSTEM)
 
 Sysunix:	$(HOBJ) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS) $(LUALIB)
 	@touch Sysunix
 
 Sys3B2:	$(HOBJ) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) -lmalloc
+	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LUALIB) -lmalloc
 	@touch Sys3B2
 
 Sysatt:	$(HOBJ) Makefile
 	@echo "Loading $(GAME)."
-	$(AT)$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
+	$(AT)$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ) \
+		$(LUALIB)
 	@touch Sysatt
 
 Systos:	$(HOBJ) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LUALIB)
 	@touch Systos
 
 SysV-AT:	DUMB.Setup $(HOBJ) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LUALIB)
 	@touch SysV-AT
 
 SysBe: $(HOBJ) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS) $(LUALIB)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
