@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ $NHDT-Date: 1596226446 2020/07/31 20:14:06 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ $NHDT-Date: 1596236728 2020/07/31 23:05:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -337,6 +337,7 @@ Qt: when selecting an extended command by typing its name, support <delete>
 Qt: switch to fixed-width font for menus
 Qt: don't disable [cancel] button when viewing inventory or other pick-none
 	menus; ESC works to dismiss those and [cancel] should be the same
+Qt: bring status conditions up to 3.6 levels but new ones lack pictures
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
