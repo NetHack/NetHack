@@ -56,6 +56,8 @@
  *          struct or data during a restore.
  *      10. Adjust savemon() in src/save.c to deal with your
  *          struct or data during a save.
+ *      11. Zero out the pointer to your struct in newmextra() in
+ *          src/makemon.c.
  */
 
 /***
