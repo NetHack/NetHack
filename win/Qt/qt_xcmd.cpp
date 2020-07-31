@@ -70,7 +70,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     }
 
     /* 'ncols' should be calculated to fit (or enable a vertical scrollbar
-       when its so big it forces too many rows, if GroupBox supports that);
+       when resulting 'nrows' is too big, if GroupBox supports that);
        it used to be hardcoded 4 but after every command became accessible
        as an extended command, that resulted in so many rows that some of
        the buttoms were chopped off at the bottom of the grid */
