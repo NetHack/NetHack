@@ -521,4 +521,6 @@ removed MFLOPPY conditional code
 get rid of 3.6.1 workaround needed to retain compatibility with 3.6.0 bones
 	files after fix for 3.3.0 through 3.6.0 bug for invalid 'bonesid'
 	designation in bones of quest levels
+add an additional note to mextra.h and obj.h comments that reminds people to
+	zero out added mextra and oextra fields in the appropriate function
 
