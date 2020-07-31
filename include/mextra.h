@@ -19,7 +19,7 @@
  *          file.
  *       3. Add a referencing macro at bottom of this file after the mextra
  *          struct (see MNAME, EGD, EPRI, ESHK, EMIN, or EDOG for examples).
- *       4. If your new field isn't a pointer and requires a special value
+ *       4. If your new field isn't a pointer and requires a non-zero value
  *          on initialization, add code to init_mextra() in src/makemon.c
  *       5. Create a newXX(mtmp) function and possibly a free_XX(mtmp)
  *          function in an appropriate new or existing source file and add
