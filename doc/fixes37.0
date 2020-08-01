@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.262 $ $NHDT-Date: 1596162338 2020/07/31 02:25:38 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ $NHDT-Date: 1596226446 2020/07/31 20:14:06 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -236,6 +236,8 @@ uncancel an ice troll if its corpse is put into an ice box; give corpse a
 splitting a stack of candy bars gave new wrapper text depending upon the
 	obj->o_id value assigned; keep existing text for both halves of stack
 	(side-effect: separate candy bars usually won't merge anymore)
+describing tin variety (deep fried, pureed, &c) relied on the 'contents known'
+	flag but object identification wasn't setting obj->cknown for tins
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

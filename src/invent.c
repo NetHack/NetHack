@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1590343765 2020/05/24 18:09:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1596226443 2020/07/31 20:14:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2315,6 +2315,20 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
  *      Object identification routines:
  */
 
+/* set the cknown and lknown flags on an object if they're applicable */
+void
+set_cknown_lknown(obj)
+struct obj *obj;
+{
+    if (Is_container(obj) || obj->otyp == STATUE)
+        obj->cknown = obj->lknown = 1;
+    else if (obj->otyp == TIN)
+        obj->cknown = 1;
+    /* TODO? cknown might be extended to candy bar, where it would mean that
+       wrapper's text was known which in turn indicates candy bar's content */
+    return;
+}
+
 /* make an object actually be identified; no display updating */
 void
 fully_identify_obj(otmp)
@@ -2324,8 +2338,7 @@ struct obj *otmp;
     if (otmp->oartifact)
         discover_artifact((xchar) otmp->oartifact);
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
-    if (Is_container(otmp) || otmp->otyp == STATUE)
-        otmp->cknown = otmp->lknown = 1;
+    set_cknown_lknown(otmp); /* set otmp->{cknown,lknown} if applicable */
     if (otmp->otyp == EGG && otmp->corpsenm != NON_PM)
         learn_egg_type(otmp->corpsenm);
 }
