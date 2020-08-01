@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ $NHDT-Date: 1596236728 2020/07/31 23:05:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.267 $ $NHDT-Date: 1596283876 2020/08/01 12:11:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -303,6 +303,7 @@ if a monster removed a corpse from an ice box, the corpse would never rot away
 monster creation on quest levels could make genocided creatures
 enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
 	value for level N monsters created with a d8 value of 1 for all N d8's
+disable that extra check because gremlim HP split after cloning triggers it
 some versions of tiles processing (not X11's) complained about the rename of
 	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
 
