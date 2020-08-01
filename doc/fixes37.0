@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.267 $ $NHDT-Date: 1596283876 2020/08/01 12:11:16 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.268 $ $NHDT-Date: 1596287474 2020/08/01 13:11:14 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -238,6 +238,8 @@ splitting a stack of candy bars gave new wrapper text depending upon the
 	(side-effect: separate candy bars usually won't merge anymore)
 describing tin variety (deep fried, pureed, &c) relied on the 'contents known'
 	flag but object identification wasn't setting obj->cknown for tins
+wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
+	intended because the check for that was being made too soon
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -306,6 +308,8 @@ enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
 disable that extra check because gremlim HP split after cloning triggers it
 some versions of tiles processing (not X11's) complained about the rename of
 	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
+wizard mode #timeout changed to show timed Displacement in 'can be timed in
+	normal play' section instead of 'timed via #wizintrinsic only' section
 
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display

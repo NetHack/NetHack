@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1596287475 2020/08/01 13:11:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,6 +46,8 @@ const struct propname {
     { DETECT_MONSTERS, "monster detection" },
     { SEE_INVIS, "see invisible" },
     { INVIS, "invisible" },
+    { DISPLACED, "displaced" }, /* timed amount possible via eating a
+                                 * displacer beast corpse */
     /* properties beyond here don't have timed values during normal play,
        so there's not much point in trying to order them sensibly;
        they're either on or off based on equipment, role, actions, &c */
@@ -70,7 +72,6 @@ const struct propname {
     { SEARCHING, "searching" },
     { INFRAVISION, "infravision" },
     { ADORNED, "adorned (+/- Cha)" },
-    { DISPLACED, "displaced" },
     { STEALTH, "stealthy" },
     { AGGRAVATE_MONSTER, "monster aggravation" },
     { CONFLICT, "conflict" },
