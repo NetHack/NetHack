@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1595637572 2020/07/25 00:39:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1596334662 2020/08/02 02:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -976,12 +976,18 @@ int final;
     }
     Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
     mungspaces(buf);             /* strip trailing spaces */
-    if (*buf) {
+    /* status line doesn't show hunger when state is "not hungry", we do;
+       needed for wizard mode's reveal of u.uhunger but add it for everyone */
+    if (!*buf)
+        Strcpy(buf, "not hungry");
+    if (*buf) { /* (since "not hungry" was added, this will always be True) */
         *buf = lowc(*buf); /* override capitalization */
         if (!strcmp(buf, "weak"))
             Strcat(buf, " from severe hunger");
         else if (!strncmp(buf, "faint", 5)) /* fainting, fainted */
             Strcat(buf, " due to starvation");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", u.uhunger);
         you_are(buf, "");
     }
     /* encumbrance */
@@ -1007,6 +1013,8 @@ int final;
             adj = "not possible";
             break;
         }
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
         Sprintf(eos(buf), "; movement %s %s%s", !final ? "is" : "was", adj,
                 (cap < OVERLOADED) ? " slowed" : "");
         you_are(buf, "");
@@ -1014,7 +1022,10 @@ int final;
         /* last resort entry, guarantees Status section is non-empty
            (no longer needed for that purpose since weapon status added;
            still useful though) */
-        you_are("unencumbered", "");
+        Strcpy(buf, "unencumbered");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
+        you_are(buf, "");
     }
     /* current weapon(s) and corresponding skill level(s) */
     weapon_insight(final);
