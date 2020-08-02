@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.268 $ $NHDT-Date: 1596287474 2020/08/01 13:11:14 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ $NHDT-Date: 1596395887 2020/08/02 19:18:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -240,6 +240,9 @@ describing tin variety (deep fried, pureed, &c) relied on the 'contents known'
 	flag but object identification wasn't setting obj->cknown for tins
 wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
 	intended because the check for that was being made too soon
+chatting to the quest leader in wizard mode with sufficient experience level
+	and insufficient piety, player is asked whether alignment should be
+	boosted; answering 'n' resulted in being prompted a second time
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

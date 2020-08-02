@@ -1,4 +1,4 @@
-/* NetHack 3.6	quest.c	$NHDT-Date: 1505170343 2017/09/11 22:52:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	quest.c	$NHDT-Date: 1596395887 2020/08/02 19:18:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -277,6 +277,8 @@ chat_with_leader()
 
     /* Rule 5: You aren't yet acceptable - or are you? */
     } else {
+        int purity = 0;
+
         if (!Qstat(met_leader)) {
             qt_pager("leader_first");
             Qstat(met_leader) = TRUE;
@@ -293,10 +295,10 @@ chat_with_leader()
             qt_pager("badlevel");
             exercise(A_WIS, TRUE);
             expulsion(FALSE);
-        } else if (is_pure(TRUE) < 0) {
+        } else if ((purity = is_pure(TRUE)) < 0) {
             com_pager("banished");
             expulsion(TRUE);
-        } else if (is_pure(TRUE) == 0) {
+        } else if (purity == 0) {
             qt_pager("badalign");
             if (Qstat(not_ready) == MAX_QUEST_TRIES) {
                 qt_pager("leader_last");
