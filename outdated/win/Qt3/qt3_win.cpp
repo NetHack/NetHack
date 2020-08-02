@@ -1,4 +1,4 @@
-// NetHack 3.6	qt_win.cpp	$NHDT-Date: 1575917720 2019/12/09 18:55:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
+// NetHack 3.6	qt_win.cpp	$NHDT-Date: 1596404695 2020/08/02 21:44:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.91 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
@@ -146,23 +146,44 @@ static const char nh_attribution[] = "<center><big>NetHack</big>"
 static QString
 aboutMsg()
 {
+    char vbuf[BUFSZ];
     QString msg;
     msg.sprintf(
-    "Qt NetHack is a version of NetHack built\n"
+        // format
+        "Qt NetHack is a version of NetHack\n"
+        "built using"           // no newline
 #ifdef KDE
-    "using KDE and the Qt GUI toolkit.\n"
+        " KDE and"              // ditto
+#endif
+        " the Qt %d GUI toolkit.\n"
+        "\nThis is NetHack %s%s.\n"
+        "\nNetHack's Qt interface originally developed by Warwick Allison.\n"
+        "\n"
+#if 0
+        "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n" //obsolete
+#endif
+#ifdef KDE
+        "KDE:\n     https://kde.org/\n"
+#endif
+#if 1
+        "Qt:\n     https://qt.io/\n"
 #else
-    "using the Qt GUI toolkit.\n"
+        "Qt:\n     http://www.troll.no/\n"      // obsolete
 #endif
-    "This is version %d.%d.%d\n\n"
-    "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n\n"
-#ifdef KDE
-	  "KDE:\n     http://www.kde.org\n"
+        "NetHack:\n     %s\n",
+        // arguments
+#ifdef QT_VERSION_MAJOR
+        QT_VERSION_MAJOR,
+#else
+        3,              // Qt version macro should exist; if not, assume Qt3
 #endif
-	  "Qt:\n     http://www.troll.no",
-	VERSION_MAJOR,
-	VERSION_MINOR,
-	PATCHLEVEL);
+        version_string(vbuf), /* nethack version */
+#ifdef QT_VERSION_STR
+        " with Qt " QT_VERSION_STR,
+#else
+        "",
+#endif
+        DEVTEAM_URL);
     return msg;
 }
 
