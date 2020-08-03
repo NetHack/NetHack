@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1587317999 2020/04/19 17:39:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1596287474 2020/08/01 13:11:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1564,6 +1564,9 @@ wiz_intrinsic(VOID_ARGS)
                 continue;
             }
             if (p == FIRE_RES) {
+                /* FIRE_RES and properties beyond it (in the propertynames[]
+                   ordering, not their numerical PROP values), can only be
+                   set to timed values here so show a separator */
                 any.a_int = 0;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--",
                          MENU_ITEMFLAGS_NONE);
@@ -1642,23 +1645,23 @@ wiz_intrinsic(VOID_ARGS)
                 }
                 goto def_feedback;
             case GLIB:
-                /* slippery fingers applies to gloves if worn at the time
-                   so persistent inventory might need updating */
+                /* slippery fingers might need a persistent inventory update
+                   so needs more than simple incr_itimeout() but we want
+                   the pline() issued with that */
                 make_glib((int) newtimeout);
-                goto def_feedback;
-            case LEVITATION:
-            case FLYING:
-                float_vs_flight();
                 /*FALLTHRU*/
             default:
  def_feedback:
-                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
-                      oldtimeout ? "increased by" : "set to", amt);
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
+                g.context.botl = 1; /* have pline() do a status update */
+                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
+                      oldtimeout ? "increased by" : "set to", amt);
                 break;
             }
-            g.context.botl = 1; /* probably not necessary... */
+            /* this has to be after incr_timeout() */
+            if (p == LEVITATION || p == FLYING)
+                float_vs_flight();
         }
         if (n >= 1)
             free((genericptr_t) pick_list);

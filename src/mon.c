@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1594771374 2020/07/15 00:02:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1596283876 2020/08/01 12:11:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.342 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,6 +56,12 @@ const char *msg;
                        mtmp->mnum, mndx, msg);
             mtmp->mnum = mndx;
         }
+#if 0   /*
+         * Gremlims don't obey the (mhpmax >= m_lev) rule so disable
+         * this check, at least for the time being.  We could skip it
+         * when the cloned flag is set, but the original gremlim would
+         * still be an issue.
+         */
         /* check before DEADMONSTER() because dead monsters should still
            have sane mhpmax */
         if (mtmp->mhpmax < 1
@@ -66,6 +72,7 @@ const char *msg;
                        msg, (int) mtmp->m_lev,
                        mtmp->m_id, fmt_ptr((genericptr_t) mtmp),
                        mtmp->mhp, mtmp->mhpmax);
+#endif
         if (DEADMONSTER(mtmp)) {
 #if 0
             /* bad if not fmons list or if not vault guard */

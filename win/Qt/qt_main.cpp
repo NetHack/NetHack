@@ -439,23 +439,44 @@ static const char * cast_c_xpm[] UNUSED = {
 static QString
 aboutMsg()
 {
+    char vbuf[BUFSZ];
     QString msg;
     msg.sprintf(
-    "Qt NetHack is a version of NetHack built\n"
+        // format
+        "Qt NetHack is a version of NetHack\n"
+        "built using"           // no newline
 #ifdef KDE
-    "using KDE and the Qt GUI toolkit.\n"
+        " KDE and"              // ditto
+#endif
+        " the Qt %d GUI toolkit.\n"
+        "\nThis is NetHack %s%s.\n"
+        "\nNetHack's Qt interface originally developed by Warwick Allison.\n"
+        "\n"
+#if 0
+        "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n" //obsolete
+#endif
+#ifdef KDE
+        "KDE:\n     https://kde.org/\n"
+#endif
+#if 1
+        "Qt:\n     https://qt.io/\n"
 #else
-    "using the Qt GUI toolkit.\n"
+        "Qt:\n     http://www.troll.no/\n"      // obsolete
 #endif
-    "This is version %d.%d.%d\n\n"
-    "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n\n"
-#ifdef KDE
-	  "KDE:\n     http://www.kde.org\n"
+        "NetHack:\n     %s\n",
+        // arguments
+#ifdef QT_VERSION_MAJOR
+        QT_VERSION_MAJOR,
+#else
+        5,              // Qt version macro should exist; if not, assume Qt5
 #endif
-	  "Qt:\n     http://www.troll.no",
-	VERSION_MAJOR,
-	VERSION_MINOR,
-	PATCHLEVEL);
+        version_string(vbuf), /* nethack version */
+#ifdef QT_VERSION_STR
+        " with Qt " QT_VERSION_STR,
+#else
+        "",
+#endif
+        DEVTEAM_URL);
     return msg;
 }
 

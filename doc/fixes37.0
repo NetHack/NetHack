@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ $NHDT-Date: 1596236728 2020/07/31 23:05:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ $NHDT-Date: 1596395887 2020/08/02 19:18:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -238,6 +238,11 @@ splitting a stack of candy bars gave new wrapper text depending upon the
 	(side-effect: separate candy bars usually won't merge anymore)
 describing tin variety (deep fried, pureed, &c) relied on the 'contents known'
 	flag but object identification wasn't setting obj->cknown for tins
+wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
+	intended because the check for that was being made too soon
+chatting to the quest leader in wizard mode with sufficient experience level
+	and insufficient piety, player is asked whether alignment should be
+	boosted; answering 'n' resulted in being prompted a second time
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -303,8 +308,11 @@ if a monster removed a corpse from an ice box, the corpse would never rot away
 monster creation on quest levels could make genocided creatures
 enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
 	value for level N monsters created with a d8 value of 1 for all N d8's
+disable that extra check because gremlim HP split after cloning triggers it
 some versions of tiles processing (not X11's) complained about the rename of
 	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
+wizard mode #timeout changed to show timed Displacement in 'can be timed in
+	normal play' section instead of 'timed via #wizintrinsic only' section
 
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
