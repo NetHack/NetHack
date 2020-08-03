@@ -1317,7 +1317,6 @@ const char *mapping;
     char filename[256];
     char filespec[256];
     int volume, idx = -1;
-    boolean toolong = FALSE;
 
     if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d", text,
                filename, &volume, &idx) == 4

@@ -805,7 +805,7 @@ struct window_procs Qt_procs = {
 
 #ifndef WIN32
 #if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
-extern "C" void play_usersound(const char* filename, int volume)
+extern "C" void play_usersound(const char* filename, int volume UNUSED)
 #else
 extern "C" void play_usersound(const char* filename UNUSED, int volume UNUSED)
 #endif
