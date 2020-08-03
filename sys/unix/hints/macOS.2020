@@ -1,14 +1,13 @@
-#
-# NetHack 3.6  macOS.2020 $NHDT-Date: 1573841535 2019/11/15 18:12:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.60 $
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1596489016 2020/08/03 21:10:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
 #-PRE
 # macOS X hints file
 # Tested on:
-#     - MacOS Catalina 10.15 
+#     - MacOS Catalina 10.15
 #
-# If this doesn't work for some other version of Mac OS X, make a new file for 
+# If this doesn't work for some other version of Mac OS X, make a new file for
 # that OS, don't change this one. And let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
 
@@ -24,26 +23,37 @@
 #
 #  - You'll need to obtain and install the ncurses development libraries
 #    if you want curses window port support.
-#  
-# Assuming you have the prerequisite packages, You can specify the 
+#
+# Assuming you have the prerequisite packages, You can specify the
 # window ports to include on the make command line without requiring
 # you to edit the Makefile:
 # make WANT_WIN_QT=1 WANT_WIN_X11=1 WANT_WIN_CURSES=1 WANT_WIN_TTY=1 all
+# in the src/ directory prior to 'make install' in the top directory.
+# Add WANT_DEFAULT=Qt (or other interface) if you want nethack to use
+# something other than tty as the default interface.
 #
-# This hints file can build several different types of installations.
-# Edit the next section to match the type of build you need.
 
-# 1. Which window system(s) should be included in this binary?
-WANT_WIN_TTY=1
+# This hints file can build several different interfaces and several
+# types of installations (private, shared, source).
+# Edit the section (1.) to control which interface(s).
+# Edit the section (2.) to match the type of build you need.
+
+# 1. Which windowing interface(s) should be included in this binary?
+# One or more of these can be manually uncommented and/or can be specified
+# on the 'make' command line.  If none are enabled, tty will be used.
+#WANT_WIN_TTY=1
 #WANT_WIN_CURSES=1
 #WANT_WIN_X11=1
 #WANT_WIN_QT=1
 
 # 1a. What is the default window system?
-WANT_DEFAULT=tty
+# Exactly one of these can be manually uncommented and/or can be specified
+# on the 'make' command line.  If none is enabled, the first among
+# WANT_WIN_{tty,curses,X11,Qt} that is enabled will become default.
+#WANT_DEFAULT=tty
 #WANT_DEFAULT=curses
 #WANT_DEFAULT=Qt
-#WANT_DEFAULT=x11
+#WANT_DEFAULT=X11
 
 # 1b. If you set WANT_WIN_QT, you need to
 #  A) set QTDIR either here or in the environment to point to the Qt5
@@ -51,11 +61,14 @@ WANT_DEFAULT=tty
 #  B) set XPMLIB to point to the Xpm library
 ifdef WANT_WIN_QT
 #QTDIR=/Developer/Qt
-#LIBXPM= -L/opt/X11/lib -lXpm
+# Qt installed via homebrew
 QTDIR=$(shell brew --prefix)/opt/qt
-# Qt installed via macports (qt511 package; 5.13 requires OSX 10.12 or later)
+# Qt installed via macports
 #QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT
+ifndef LIBXPM
+LIBXPM= -L/opt/X11/lib -lXpm
+endif
 
 # 2. Is this a build for a binary that will be shared among different users
 #    or will it be private to you?
@@ -69,66 +82,89 @@ endif	# WANT_WIN_QT
 #	  NB: the group will be created locally; if your computer is centrally
 #	   administered this may not be what you (or your admin) want.
 #	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
-#	- 'make install' must be run as "sudo make install"    
-#	- 'make install' must be run as "sudo make install"    
+#	- 'make install' must be run as "sudo make install"
+#    Note: 'make install' starts out be removing all files and subdirectories
+#    from the target destination.  Use 'make update' instead if there is
+#    anything there that you want to keep such as the high scores file from
+#    a previous install.
 #WANT_SHARE_INSTALL=1
 GAMEUID  = $(USER)
 GAMEGRP  = games
-# build to run in the source tree - primarily for development.  Build with "make all"
+# build to run in the source tree - primarily for development.  Build
+# with "make all"
 #WANT_SOURCE_INSTALL=1
 
-# At the moment this is just for debugging, but in the future it could be
-# useful for other things.  Requires SYSCF and an ANSI compiler.
-#WANT_WIN_CHAIN=1
-
+# 3. miscellaneous:  compiler selection; Qt5 requires C++11
 ifdef WANT_WIN_QT
 CC=clang
 CXX=clang++ -std=gnu++11
-LINK= $(CXX)
 #CC=gcc
-#CXX=g++
+#CXX=g++ -std=gnu++11
+LINK= $(CXX)
 else
+# compiling C code only; CC and CXX defaults can be used
+#CC=
+#CXX=
 LINK = $(CC)
 endif
 #MOC = moc
 
+# At the moment the 'chain' interface is just for debugging, but in the future
+# it could be useful for other things.  Requires SYSCF and an ANSI compiler.
+#WANT_WIN_CHAIN=1
+
 #
-# You shouldn't need to change anything below here.
+# You shouldn't need to change anything below here (in the hints file; if
+# you're reading this in Makefile augmented by hints, that may not be true).
 #
 
+# Make sure that at least one interface aside from 'chain' is enabled.
+ifndef WANT_WIN_TTY
+ifndef  WANT_WIN_CURSES
+ifndef   WANT_WIN_X11
+ifndef    WANT_WIN_QT
+WANT_WIN_TTY=1
+endif
+endif
+endif
+endif
+
+# Make sure that a default interface is specified; this doesn't guarantee
+# sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but
+# 'makedefs -v' would notice, complain, and quit causing 'make' to quit.
 ifndef WANT_DEFAULT
+# pick the first one enabled among { tty, curses, X11, Qt }
 ifdef WANT_WIN_TTY
 WANT_DEFAULT=tty
-endif
-endif
-
-ifndef WANT_DEFAULT
-ifdef WANT_WIN_X11
-WANT_DEFAULT=x11
-endif
-endif
-
-ifndef WANT_DEFAULT
-ifdef WANT_WIN_CURSES
+else
+ifdef  WANT_WIN_CURSES
 WANT_DEFAULT=curses
-endif
-endif
-
-ifndef WANT_DEFAULT
-ifdef WANT_WIN_QT
+else
+ifdef   WANT_WIN_X11
+WANT_DEFAULT=X11
+else
+ifdef    WANT_WIN_QT
 WANT_DEFAULT=Qt
+else
+# ? shouldn't be able to get here...
+endif
+endif
+endif
 endif
 endif
 
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CFLAGS+=-DGCC_WARN
 ifndef WANT_WIN_QT
 #	these are normally used when compiling nethack's core
 CFLAGS+=-ansi -pedantic -Wno-long-long
-#	but -ansi -pendantic forces C90 sematics and win/Qt/qt_*.cpp trigger
+#	but -ansi forces -std=c90 for C or -std=c++98 for C++;
+#	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
 #In file included from .../qt5/include/QtCore/qglobal.h:105:
 #.../qt5/include/QtCore/qcompilerdetection.h:561:6:
 #  error Qt requires a C++11 compiler and yours does not seem to be that.
-#	so we suppress them when the build includes Qt
+#	so we suppress -ansi when the build includes Qt
 endif
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
