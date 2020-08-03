@@ -91,6 +91,11 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     prompt(0),
     counting(false)
 {
+    // setFont() was in SelectMenu(), in time to be rendered but too late
+    // when measuring the width and height that will be needed
+    QFont tablefont(qt_settings->normalFixedFont());
+    table->setFont(tablefont);
+
     QGridLayout *grid = new QGridLayout();
     table->setColumnCount(5);
     table->setFrameStyle(QFrame::Panel|QFrame::Sunken);
@@ -134,7 +139,8 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     grid->setRowStretch(2, 1);
     setFocusPolicy(Qt::StrongFocus);
     table->setFocusPolicy(Qt::NoFocus);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(cellToggleSelect(int,int)));
+    connect(table, SIGNAL(cellClicked(int,int)),
+            this, SLOT(cellToggleSelect(int,int)));
 
     setLayout(grid);
 }
@@ -214,9 +220,6 @@ void NetHackQtMenuWindow::EndMenu(const QString& p)
 
 int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 {
-    QFont tablefont(qt_settings->normalFixedFont());
-    table->setFont(tablefont);
-
     table->setRowCount(itemcount);
 
     how=h;
@@ -243,10 +246,18 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
     std::vector<int> col_widths;
     for (std::size_t i = 0; i < (size_t) itemlist.size(); ++i) {
 	QStringList columns = itemlist[i].str.split("\t");
-        if (!itemlist[i].Selectable() && columns.size() == 1)
-        {
-            // Nonselectable line with no column dividers
+        if (!itemlist[i].Selectable() && columns.size() == 1) {
+            // Nonselectable line with no column dividers.
             // Assume this is a section header
+            // or ordinary text (^X feedback, for instance) rendered in
+            // a menu because tty's paginated menus can be used to go
+            // backward, unlike text windows which can only go forward.
+            QTableWidgetItem *twi = table->item(i, 4);
+            if (twi) {
+                QString text = twi->text();
+#define MENU_WIDTH_SLOP 20 /* this should not be necessary */
+                WidenColumn(4, fm.width(text) + MENU_WIDTH_SLOP);
+            }
             continue;
         }
 	for (std::size_t j = 0U; j < (size_t) columns.size(); ++j) {
