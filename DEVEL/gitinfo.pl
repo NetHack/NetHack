@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# NetHack 3.6  getinfo.pl       $NHDT-Date: 1524689669 2018/04/25 20:54:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# NetHack 3.7  getinfo.pl       $NHDT-Date: 1596498266 2020/08/03 23:44:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 # Copyright (c) 2018 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 

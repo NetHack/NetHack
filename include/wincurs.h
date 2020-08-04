@@ -1,4 +1,4 @@
-/* NetHack 3.6 wincurs.h */
+/* NetHack 3.7 wincurs.h */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 

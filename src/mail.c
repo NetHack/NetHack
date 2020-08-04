@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1568508711 2019/09/15 00:51:51 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.7	mail.c	$NHDT-Date: 1596498174 2020/08/03 23:42:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */

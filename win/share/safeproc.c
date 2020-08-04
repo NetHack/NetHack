@@ -1,4 +1,4 @@
-/* NetHack 3.6	safeproc.c   */	
+/* NetHack 3.7	safeproc.c   */	
 /* Copyright (c) Michael Allison, 2018                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

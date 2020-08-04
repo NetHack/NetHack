@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1596226441 2020/07/31 20:14:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.853 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1596498536 2020/08/03 23:48:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.854 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

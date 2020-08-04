@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1596115531 2020/07/30 13:25:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1596498291 2020/08/03 23:44:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 

@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  NHgithook.pm       $NHDT-Date: 1524689631 2018/04/25 20:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.6 $
+# NetHack 3.7  NHgithook.pm       $NHDT-Date: 1596498406 2020/08/03 23:46:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

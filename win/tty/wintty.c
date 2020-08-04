@@ -1,4 +1,4 @@
- /* NetHack 3.6	wintty.c	$NHDT-Date: 1587110794 2020/04/17 08:06:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
+ /* NetHack 3.7	wintty.c	$NHDT-Date: 1596498345 2020/08/03 23:45:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.259 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

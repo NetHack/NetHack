@@ -1,4 +1,4 @@
-/* NetHack 3.6	integer.h	$NHDT-Date: 1551901047 2019/03/06 19:37:27 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.7	integer.h	$NHDT-Date: 1596498539 2020/08/03 23:48:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) 2016 by Michael Allison          */
 /* NetHack may be freely redistributed.  See license for details. */
 

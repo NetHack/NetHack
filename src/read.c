@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1596162345 2020/07/31 02:25:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1596498202 2020/08/03 23:43:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */

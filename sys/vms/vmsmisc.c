@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1524689429 2018/04/25 20:50:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	vmsmisc.c	$NHDT-Date: 1596498308 2020/08/03 23:45:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2011 by Robert Patrick Rankin              */
 /* NetHack may be freely redistributed.  See license for details. */
 
