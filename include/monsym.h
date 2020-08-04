@@ -1,4 +1,4 @@
-/* NetHack 3.6  monsym.h        $NHDT-Date: 1547428769 2019/01/14 01:19:29 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7  monsym.h        $NHDT-Date: 1596498550 2020/08/03 23:49:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen              */
 /* NetHack may be freely redistributed.  See license for details. */
 /*      Monster symbols and creation information rev 1.0          */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1594168619 2020/07/08 00:36:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.468 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1596494520 2020/08/03 22:42:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.469 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2079,6 +2079,13 @@ char *op;
     return optn_ok;
 }
 
+/* whether the 'msg_window' option is used to control ^P behavior */
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#define PREV_MSGS 1
+#else
+#define PREV_MSGS 0
+#endif
+
 int
 optfn_msg_window(optidx, req, negated, opts, op)
 int optidx;
@@ -2088,8 +2095,12 @@ char *opts;
 char *op;
 {
     int retval = optn_ok;
-#ifdef TTY_GRAPHICS
+#if PREV_MSGS
     int tmp;
+#else
+    nhUse(optidx);
+    nhUse(negated);
+    nhUse(op);
 #endif
 
     if (req == do_init) {
@@ -2098,8 +2109,8 @@ char *op;
     if (req == do_set) {
         /* msg_window:single, combo, full or reversed */
 
-/* allow option to be silently ignored by non-tty ports */
-#ifdef TTY_GRAPHICS
+        /* allow option to be silently ignored by non-tty ports */
+#if PREV_MSGS
         if (op == empty_optstr) {
             tmp = negated ? 's' : 'f';
         } else {
@@ -2111,16 +2122,10 @@ char *op;
         }
         switch (tmp) {
         case 's': /* single message history cycle (default if negated) */
-            iflags.prevmsg_window = 's';
-            break;
-        case 'c': /* combination: two singles, then full page */
-            iflags.prevmsg_window = 'c';
-            break;
+        case 'c': /* combination: first two as singles, then full page */
         case 'f': /* full page (default if specified without argument) */
-            iflags.prevmsg_window = 'f';
-            break;
-        case 'r': /* full page (reversed) */
-            iflags.prevmsg_window = 'r';
+        case 'r': /* full page in reverse order (LIFO; default for curses) */
+            iflags.prevmsg_window = (char) tmp;
             break;
         default:
             config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
@@ -2134,11 +2139,16 @@ char *op;
         if (!opts)
             return optn_err;
         opts[0] = '\0';
-#ifdef TTY_GRAPHICS
-        Sprintf(opts, "%s", (iflags.prevmsg_window == 's') ? "single"
-                           : (iflags.prevmsg_window == 'c') ? "combination"
-                             : (iflags.prevmsg_window == 'f') ? "full"
-                               : "reversed");
+#if PREV_MSGS
+        tmp = iflags.prevmsg_window;
+        if (WINDOWPORT("curses")) {
+            if (tmp == 's' || tmp == 'c')
+                tmp = iflags.prevmsg_window = 'r';
+        }
+        Sprintf(opts, "%s", (tmp == 's') ? "single"
+                            : (tmp == 'c') ? "combination"
+                              : (tmp == 'f') ? "full"
+                                : "reversed");
 #endif
         return optn_ok;
     }

@@ -1,4 +1,4 @@
-/* NetHack 3.6  tile.h       $NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.7  tile.h       $NHDT-Date: 1596498339 2020/08/03 23:45:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /*      Copyright (c) 2016 by Michael Allison             */
 /* NetHack may be freely redistributed.  See license for details. */
 

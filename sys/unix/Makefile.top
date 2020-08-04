@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.6  Makefile.top    $NHDT-Date: 1594155882 2020/07/07 21:04:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1596498292 2020/08/03 23:44:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 

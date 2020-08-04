@@ -1,4 +1,4 @@
--- NetHack 3.6	endgame.des	$NHDT-Date: 1546303680 2019/01/01 00:48:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.14 $
+-- NetHack 3.7	endgame.des	$NHDT-Date: 1546303680 2019/01/01 00:48:00 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.14 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen

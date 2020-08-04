@@ -1,4 +1,4 @@
-/* NetHack 3.6	vision.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	vision.h	$NHDT-Date: 1596498568 2020/08/03 23:49:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 

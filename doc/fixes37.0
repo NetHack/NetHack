@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ $NHDT-Date: 1596395887 2020/08/02 19:18:07 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.271 $ $NHDT-Date: 1596494524 2020/08/03 22:42:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -314,10 +314,14 @@ some versions of tiles processing (not X11's) complained about the rename of
 wizard mode #timeout changed to show timed Displacement in 'can be timed in
 	normal play' section instead of 'timed via #wizintrinsic only' section
 
+curses: 'msg_window' option wasn't functional for curses unless the binary
+	also included tty support
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
 	new level after level change when S_unexplored is <space>
+Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
+	left some generated data files which should have been deleted
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in

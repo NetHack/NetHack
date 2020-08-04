@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1578137629 2020/01/04 11:33:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.7	hacklib.c	$NHDT-Date: 1596498172 2020/08/03 23:42:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */

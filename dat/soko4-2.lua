@@ -1,4 +1,4 @@
--- NetHack 3.6	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --

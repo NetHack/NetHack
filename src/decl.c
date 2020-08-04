@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1594730611 2020/07/14 12:43:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1596498154 2020/08/03 23:42:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */

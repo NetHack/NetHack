@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1595627153 2020/07/24 21:45:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1596498258 2020/08/03 23:44:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */

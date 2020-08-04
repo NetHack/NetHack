@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1594155889 2020/07/07 21:04:49 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+#	NetHack 3.7	Makefile.src	$NHDT-Date: 1596498302 2020/08/03 23:45:02 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

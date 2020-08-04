@@ -1,4 +1,4 @@
-/* NetHack 3.6	wc_chainout.c	$NHDT-Date: 1433806611 2015/06/08 23:36:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.7	wc_chainout.c	$NHDT-Date: 1596498324 2020/08/03 23:45:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

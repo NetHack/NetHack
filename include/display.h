@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1559994621 2019/06/08 11:50:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1596498533 2020/08/03 23:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */

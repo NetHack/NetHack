@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1588776926 2020/05/06 14:55:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+# NetHack 3.7  Makefile.utl    $NHDT-Date: 1596498292 2020/08/03 23:44:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

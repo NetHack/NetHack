@@ -1,4 +1,4 @@
-/* NetHack 3.6	mac-carbon.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.7	mac-carbon.h	$NHDT-Date: 1596498540 2020/08/03 23:49:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
 /*-Copyright (c) Kevin Hugo, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1594727747 2020/07/14 11:55:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1596498186 2020/08/03 23:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */

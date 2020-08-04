@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1573346194 2019/11/10 00:36:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	write.c	$NHDT-Date: 1596498232 2020/08/03 23:43:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

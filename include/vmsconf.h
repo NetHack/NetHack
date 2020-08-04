@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsconf.h	$NHDT-Date: 1555361299 2019/04/15 20:48:19 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	vmsconf.h	$NHDT-Date: 1596498569 2020/08/03 23:49:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	recover.c	$NHDT-Date: 1550103078 2019/02/14 00:11:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.7	recover.c	$NHDT-Date: 1596498262 2020/08/03 23:44:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

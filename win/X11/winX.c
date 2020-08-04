@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1577063125 2019/12/23 01:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1596498377 2020/08/03 23:46:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

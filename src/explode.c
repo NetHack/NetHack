@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1589322381 2020/05/12 22:26:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	explode.c	$NHDT-Date: 1596498168 2020/08/03 23:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 

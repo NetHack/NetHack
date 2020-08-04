@@ -1,5 +1,5 @@
 /*
- * NetHack 3.6  mdgrep.h  $NHDT-Date: 1432512785 2015/05/25 00:13:05 $ $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+ * NetHack 3.7  mdgrep.h  $NHDT-Date: 1596498259 2020/08/03 23:44:19 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *
