@@ -439,18 +439,23 @@ static const char * cast_c_xpm[] UNUSED = {
 static QString
 aboutMsg()
 {
-    char vbuf[BUFSZ];
+    char *p, vbuf[BUFSZ];
+    /* nethack's getversionstring() includes a final period
+       but we're using it mid-sentence so strip period off */
+    if ((p = strrchr(getversionstring(vbuf), '.')) != 0 && *(p + 1) == '\0')
+        *p = '\0';
     QString msg;
     msg.sprintf(
         // format
-        "Qt NetHack is a version of NetHack\n"
-        "built using"           // no newline
+        "Qt NetHack is a version of NetHack built using" // no newline
 #ifdef KDE
-        " KDE and"              // ditto
+        " KDE and"                                       // ditto
 #endif
-        " the Qt %d GUI toolkit.\n"
-        "\nThis is NetHack %s%s.\n"
-        "\nNetHack's Qt interface originally developed by Warwick Allison.\n"
+        " the Qt %d GUI toolkit.\n"                      // short Qt version
+        "\n"
+        "This is %s%s.\n"       // long nethack version and full Qt version
+        "\n"
+        "NetHack's Qt interface originally developed by Warwick Allison.\n"
         "\n"
 #if 0
         "Homepage:\n     http://trolls.troll.no/warwick/nethack/\n" //obsolete
@@ -463,14 +468,14 @@ aboutMsg()
 #else
         "Qt:\n     http://www.troll.no/\n"      // obsolete
 #endif
-        "NetHack:\n     %s\n",
+        "NetHack:\n     %s\n", // DEVTEAM_URL
         // arguments
 #ifdef QT_VERSION_MAJOR
         QT_VERSION_MAJOR,
 #else
         5,              // Qt version macro should exist; if not, assume Qt5
 #endif
-        getversionstring(vbuf), /* nethack version */
+        vbuf,           // nethack version
 #ifdef QT_VERSION_STR
         " with Qt " QT_VERSION_STR,
 #else
