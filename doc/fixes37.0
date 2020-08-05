@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ $NHDT-Date: 1596652492 2020/08/05 18:34:52 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ $NHDT-Date: 1596656886 2020/08/05 19:48:06 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -356,6 +356,8 @@ Qt: clicking on the window's Close button brought up a dialog offering
 	infinite loop with complaints about Qt's event loop already being
 	active; change dialog: offer "Save and exit" or "Quit without saving"
 	with no opportunity to try to back out of the Close operation
+Qt: add 3.6 status fields Stone, Slime, Strngl, Deaf, Lev, Fly, Ride
+Qt: add Attributes, Overview, and Annotate to the "Info" pull down menu
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic

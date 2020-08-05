@@ -631,12 +631,15 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { help,  0, 1},
 
         { info,  "Inventory",        3, ddoinv},
+        { info,  "Attributes (extended status)", 3, doattributes },
+        { info,  "Overview",         3, dooverview },
         { info,  "Conduct",          3, doconduct},
         { info,  "Discoveries",      3, dodiscovered},
         { info,  "List/reorder spells",  3, dovspell},
-        { info,  "Adjust letters",   2, doorganize},
+        { info,  "Adjust inventory letters", 2, doorganize },
         { info,  0, 3},
         { info,  "Name object or creature", 3, docallcmd},
+        { info,  "Annotate level",   2, donamelevel },
         { info,  0, 3},
         { info,  "Skills",  3, enhance_weapon_skill},
 
