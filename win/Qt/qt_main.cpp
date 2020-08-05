@@ -1071,21 +1071,33 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
 {
     if ( g.program_state.something_worth_saving ) {
-	switch ( QMessageBox::information( this, "NetHack",
-	    "This will end your NetHack session",
-	    "&Save", "&Cancel", 0, 1 ) )
-	{
-	    case 0:
-		// See dosave() function
-		if (dosave0()) {
-		    u.uhp = -1;
-		    NetHackQtBind::qt_exit_nhwindows(0);
-		    nh_terminate(EXIT_SUCCESS);
-		}
-		break;
-	    case 1:
-		break; // ignore the event
+        int ok = 0;
+        /* this used to offer "Save" and "Cancel"
+           but cancel (ignoring the close attempt) won't work
+           if user has clicked on the window's Close button */
+	int act = QMessageBox::information(this, "NetHack",
+                        "This will end your NetHack session",
+                        "&Save and exit", "&Quit without saving", 0, 1);
+	switch (act) {
+        case 0:
+            // See dosave() function
+            ok = dosave0();
+            break;
+        case 1:
+            // quit -- bypass the prompting preformed by done2()
+            ok = 1;
+            g.program_state.stopprint++;
+            done(QUIT);
+            /*NOTREACHED*/
+            break;
+        case 2:
+            // cancel -- no longer an alternative
+            break; // ignore the event
 	}
+        /* if !ok, we should try to continue, but we don't... */
+        u.uhp = -1;
+        NetHackQtBind::qt_exit_nhwindows(0);
+        nh_terminate(EXIT_SUCCESS);
     } else {
 	e->accept();
     }
