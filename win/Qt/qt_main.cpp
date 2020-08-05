@@ -470,7 +470,7 @@ aboutMsg()
 #else
         5,              // Qt version macro should exist; if not, assume Qt5
 #endif
-        version_string(vbuf), /* nethack version */
+        getversionstring(vbuf), /* nethack version */
 #ifdef QT_VERSION_STR
         " with Qt " QT_VERSION_STR,
 #else
