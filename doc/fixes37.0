@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.271 $ $NHDT-Date: 1596494524 2020/08/03 22:42:04 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.272 $ $NHDT-Date: 1596651973 2020/08/05 18:26:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -350,6 +350,7 @@ Qt: switch to fixed-width font for menus
 Qt: don't disable [cancel] button when viewing inventory or other pick-none
 	menus; ESC works to dismiss those and [cancel] should be the same
 Qt: bring status conditions up to 3.6 levels but new ones lack pictures
+Qt: fix control key on OSX
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic

@@ -520,6 +520,11 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     QCoreApplication::setOrganizationName("The NetHack DevTeam");
     QCoreApplication::setOrganizationDomain("nethack.org");
     QCoreApplication::setApplicationName("NetHack");
+#ifdef MACOSX
+    /* without this, neither control+x nor option+x do anything;
+       with it, control+x is ^X and option+x still does nothing */
+    QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta);
+#endif
 
     setWindowTitle("Qt NetHack");
     if ( qt_compact_mode )
