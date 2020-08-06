@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ $NHDT-Date: 1596656886 2020/08/05 19:48:06 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.275 $ $NHDT-Date: 1596754606 2020/08/06 22:56:46 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -459,6 +459,11 @@ add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
 reduce verbosity when a mind flayer attacks a headless monster; when a
 	tentacle-to-head attack hits but fails to accomplish anything skip
 	remaining attacks (mind flayer has 3, master mind flayer has 5)
+add END-CHOOSE directive for run-time config file; CHOOSE section1,section2
+	followed by [section1] ... [section2] ... forced all the rest of the
+	file to be part of the last section; that still works the same but
+	END-CHOOSE can be used to terminate the last section and revert to
+	common options for the remainder of the file
 
 
 Platform- and/or Interface-Specific New Features

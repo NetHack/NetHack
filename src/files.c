@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1595006057 2020/07/17 17:14:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1596754598 2020/08/06 22:56:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.317 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -163,7 +163,8 @@ static void FDECL(adjust_prefix, (char *, int));
 static boolean FDECL(config_error_nextline, (const char *));
 static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
-static boolean FDECL(is_config_section, (const char *));
+static char *FDECL(is_config_section, (char *));
+static boolean FDECL(is_end_of_sections, (const char *));
 static boolean FDECL(handle_config_section, (char *));
 static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
@@ -2258,7 +2259,7 @@ int prefixid;
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
 static char *
-choose_random_part(str,sep)
+choose_random_part(str, sep)
 char *str;
 char sep;
 {
@@ -2310,28 +2311,77 @@ free_config_sections()
     }
 }
 
-static boolean
+/* check for " [ anything-except-bracket-or-empty ] # arbitrary-comment"
+   with spaces optional; returns pointer to "anything-except..." (with
+   trailing " ] #..." stripped) if ok, otherwise Null */
+static char *
 is_config_section(str)
-const char *str;
+char *str; /* trailing spaces will be stripped, ']' too iff result is good */
 {
-    const char *a = rindex(str, ']');
+    char *a, *c, *z;
 
-    return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
+    /* remove any spaces at start and end; won't significantly interfere
+       with echoing the string in a config error message, if warranted */
+    a = trimspaces(str);
+    /* first character should be open square bracket; set pointer past it */
+    if (*a++ != '[')
+        return (char *) 0;
+    /* last character should be close bracket, ignoring any comment */
+    z = index(a, ']');
+    if (!z || z == a)
+        return (char *) 0;
+    for (c = z + 1; *c && *c != '#'; ++c)
+        continue;
+    if (*c && *c != '#')
+        return (char *) 0;
+    /* we now know that result is good; there won't be a config error
+       message so we can modify the input string */
+    *z = '\0';
+    /* 'a' points past '[' and the string ends where ']' was; remove any
+       spaces between '[' and choice-start and between choice-end and ']' */
+    return trimspaces(a);
+}
+
+static boolean
+is_end_of_sections(buf)
+const char *buf;
+{
+    /* "END-CHOOSE"; bypass match_optname()/match_varname();
+       accepts "ENDCHOOSE", "END CHOOSE", "END-CHOOSE", "END_CHOOSE" */
+    if (!strncmpi(buf, "END", 3) && buf[3]) {
+        boolean sep = index(" -_", buf[3]) != 0;
+
+        if (!strcmpi(&buf[sep ? 4 : 3], "CHOOSE")) {
+            if (!g.config_section_current)
+                config_error_add("END-CHOOSE when not in a CHOOSE section");
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 static boolean
 handle_config_section(buf)
 char *buf;
 {
-    if (is_config_section(buf)) {
-        char *send;
-        if (g.config_section_current) {
+    boolean was_in_section = (g.config_section_current != 0);
+    char *sect = is_config_section(buf);
+
+    if (sect) {
+        if (g.config_section_current)
             free(g.config_section_current);
+        /* is_config_section() removed brackets from 'sect' */
+        if (!g.config_section_chosen) {
+            config_error_add("Section \"[%s]\" without CHOOSE", sect);
+            return TRUE;
         }
-        g.config_section_current = dupstr(&buf[1]);
-        send = rindex(g.config_section_current, ']');
-        *send = '\0';
+        g.config_section_current = dupstr(sect);
         debugpline1("set config section: '%s'", g.config_section_current);
+        return TRUE;
+    } else if (is_end_of_sections(buf)) {
+        if (was_in_section)
+            debugpline0("unset config section");
+        free_config_sections();
         return TRUE;
     }
 
@@ -2385,6 +2435,12 @@ char *origbuf;
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
     mungspaces(buf);
+
+    /* "END-CHOOSE" doesn't have a value so we need to check for it
+       before checking for that; if found here, is_end_of_sections()
+       will report a config_error */
+    if (is_end_of_sections(buf))
+        return FALSE;
 
     /* find the '=' or ':' */
     bufp = find_optparam(buf);
@@ -2670,8 +2726,7 @@ char *origbuf;
             retval = FALSE;
 #endif
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
-                          "WARNINGS");
+        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT, "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "ROGUESYMBOLS", 4)) {
         if (!parsesymbols(bufp, ROGUESET)) {
