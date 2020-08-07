@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.394 $ $NHDT-Date: 1596754607 2020/08/06 22:56:47 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.395 $ $NHDT-Date: 1596785362 2020/08/07 07:29:22 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -3130,16 +3130,20 @@ the configuration file for you using the default template file.
 .pg
 On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
-Any line in the configuration file starting with \(oq#\(cq is treated
-as a comment.
+Any line in the configuration file starting with \(oq\f(CR#\fP\(cq is treated
+as a comment and ignored.
 Empty lines are ignored.
 .pg
-Any line beginning with \(oq[\(cq and ending in \(oq]\(cq is considered
-a section marker.
+Any line beginning with \(oq\f(CR[\fP\(cq and ending in \(oq\f(CR]\fP\(cq
+is a section marker (the closing \(oq\f(CR]\fP\(cq can be followed
+by whitespace and then an arbitrary comment beginning with \(oq\f(CR#\fP\(cq).
 The text between the square brackets is the section name.
-Lines after a section marker belong to that section, and are
-ignored unless a CHOOSE directive was used to select that section.
-Section names are case insensitive.
+Section markers are only valid after a CHOOSE directive and their names
+are case insensitive.
+Lines after a section marker belong to that section up until another
+section starts or a marker without a name is encountered or the file ends.
+Lines within sections are ignored unless a CHOOSE directive has selected
+that section.
 .pg
 You can use different configuration directives in the file, some
 of which can be used multiple times.
@@ -3232,17 +3236,13 @@ CHOOSE=char A,char B
 OPTIONS=role:arc,race:dwa,align:law,gender:fem
 [char B]
 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
-END-CHOOSE
+[] #end of CHOOSE
 OPTIONS=!rest_on_space
 .ft \" revert to previous font
 .ed
-.lp END-CHOOSE
-An optional way to terminate CHOOSE.
-.\" use of the \% prefix prevents END-CHOOSE from being hyphenated across
-.\" line boundary despite its hyphen; needed for the plain text output to
-.\" avoid splitting the directive name
-You can place an \%END-CHOOSE directive after the last CHOOSE section in
-order to follow that with other options which are common to all sections.
+.lp ""
+If \f(CR[]\fP is present, the preceding section is closed and no new
+section begins; whatever follows will be common to all sections.
 Otherwise the last section extends to the end of the options file.
 .lp MENUCOLOR
 Highlight menu lines with different colors.

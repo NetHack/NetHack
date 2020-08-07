@@ -3355,12 +3355,20 @@ On MS-DOS it is \mbox{``defaults.nh''} in the same folder as
 \mbox{{\it nethack.exe\/}}.\\
 
 %.lp ""
-Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
-Empty lines are ignored. Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
-marker. The text between the square brackets is the section name.
-Lines after a section marker belong to that section, and are
-ignored unless a CHOOSE -directive was used to select that section.
-Section names are case insensitive.
+Any line in the configuration file starting with `{\tt \#}' is treated
+as a comment and ignored.
+Empty lines are ignored.
+
+Any line beginning with `{\tt [}' and ending in `{\tt ]}'
+is a section marker (the closing `{\tt ]}' can be followed
+by whitespace and then an arbitrary comment beginning with `{\tt #}').
+The text between the square brackets is the section name.
+Section markers are only valid after a CHOOSE directive and their names
+are case insensitive.
+Lines after a section marker belong to that section up until another
+section starts or a marker without a name is encountered or the file ends.
+Lines within sections are ignored unless a CHOOSE directive has selected
+that section.
 
 %.pg
 You can use different configuration directives in the file, some
@@ -3474,16 +3482,14 @@ Example:
    OPTIONS=role:arc,race:dwa,align:law,gender:fem
    [char B]
    OPTIONS=role:wiz,race:elf,align:cha,gender:mal
-   END-CHOOSE
+   [] #end of CHOOSE
    OPTIONS=!rest_on_space
 \end{verbatim}
 %.ed
 
-%.lp
-\item[\bb{END-CHOOSE}]
-An optional way to terminate CHOOSE.
-You can place an END-CHOOSE directive after the last CHOOSE section in
-order to follow that with other options which are common to all sections.
+%.lp ""
+If {\tt []} is present, the preceding section is closed and no new
+section begins; whatever follows will be common to all sections.
 Otherwise the last section extends to the end of the options file.
 
 %.lp

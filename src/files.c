@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1596754598 2020/08/06 22:56:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.317 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1596785343 2020/08/07 07:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -164,7 +164,6 @@ static boolean FDECL(config_error_nextline, (const char *));
 static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
 static char *FDECL(is_config_section, (char *));
-static boolean FDECL(is_end_of_sections, (const char *));
 static boolean FDECL(handle_config_section, (char *));
 static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
@@ -2328,7 +2327,7 @@ char *str; /* trailing spaces will be stripped, ']' too iff result is good */
         return (char *) 0;
     /* last character should be close bracket, ignoring any comment */
     z = index(a, ']');
-    if (!z || z == a)
+    if (!z)
         return (char *) 0;
     for (c = z + 1; *c && *c != '#'; ++c)
         continue;
@@ -2343,45 +2342,26 @@ char *str; /* trailing spaces will be stripped, ']' too iff result is good */
 }
 
 static boolean
-is_end_of_sections(buf)
-const char *buf;
-{
-    /* "END-CHOOSE"; bypass match_optname()/match_varname();
-       accepts "ENDCHOOSE", "END CHOOSE", "END-CHOOSE", "END_CHOOSE" */
-    if (!strncmpi(buf, "END", 3) && buf[3]) {
-        boolean sep = index(" -_", buf[3]) != 0;
-
-        if (!strcmpi(&buf[sep ? 4 : 3], "CHOOSE")) {
-            if (!g.config_section_current)
-                config_error_add("END-CHOOSE when not in a CHOOSE section");
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-static boolean
 handle_config_section(buf)
 char *buf;
 {
-    boolean was_in_section = (g.config_section_current != 0);
     char *sect = is_config_section(buf);
 
     if (sect) {
         if (g.config_section_current)
-            free(g.config_section_current);
+            free(g.config_section_current), g.config_section_current = 0;
         /* is_config_section() removed brackets from 'sect' */
         if (!g.config_section_chosen) {
             config_error_add("Section \"[%s]\" without CHOOSE", sect);
             return TRUE;
         }
-        g.config_section_current = dupstr(sect);
-        debugpline1("set config section: '%s'", g.config_section_current);
-        return TRUE;
-    } else if (is_end_of_sections(buf)) {
-        if (was_in_section)
+        if (*sect) { /* got a section name */
+            g.config_section_current = dupstr(sect);
+            debugpline1("set config section: '%s'", g.config_section_current);
+        } else { /* empty section name => end of sections */
+            free_config_sections();
             debugpline0("unset config section");
-        free_config_sections();
+        }
         return TRUE;
     }
 
@@ -2435,12 +2415,6 @@ char *origbuf;
        remove leading and trailing spaces (exception: if there is nothing
        but spaces, one of them will be kept even though it leads/trails) */
     mungspaces(buf);
-
-    /* "END-CHOOSE" doesn't have a value so we need to check for it
-       before checking for that; if found here, is_end_of_sections()
-       will report a config_error */
-    if (is_end_of_sections(buf))
-        return FALSE;
 
     /* find the '=' or ':' */
     bufp = find_optparam(buf);
