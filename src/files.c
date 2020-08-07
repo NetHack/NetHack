@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1595006057 2020/07/17 17:14:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1596785343 2020/08/07 07:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -163,7 +163,7 @@ static void FDECL(adjust_prefix, (char *, int));
 static boolean FDECL(config_error_nextline, (const char *));
 static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
-static boolean FDECL(is_config_section, (const char *));
+static char *FDECL(is_config_section, (char *));
 static boolean FDECL(handle_config_section, (char *));
 static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
@@ -2258,7 +2258,7 @@ int prefixid;
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
 static char *
-choose_random_part(str,sep)
+choose_random_part(str, sep)
 char *str;
 char sep;
 {
@@ -2310,28 +2310,58 @@ free_config_sections()
     }
 }
 
-static boolean
+/* check for " [ anything-except-bracket-or-empty ] # arbitrary-comment"
+   with spaces optional; returns pointer to "anything-except..." (with
+   trailing " ] #..." stripped) if ok, otherwise Null */
+static char *
 is_config_section(str)
-const char *str;
+char *str; /* trailing spaces will be stripped, ']' too iff result is good */
 {
-    const char *a = rindex(str, ']');
+    char *a, *c, *z;
 
-    return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
+    /* remove any spaces at start and end; won't significantly interfere
+       with echoing the string in a config error message, if warranted */
+    a = trimspaces(str);
+    /* first character should be open square bracket; set pointer past it */
+    if (*a++ != '[')
+        return (char *) 0;
+    /* last character should be close bracket, ignoring any comment */
+    z = index(a, ']');
+    if (!z)
+        return (char *) 0;
+    for (c = z + 1; *c && *c != '#'; ++c)
+        continue;
+    if (*c && *c != '#')
+        return (char *) 0;
+    /* we now know that result is good; there won't be a config error
+       message so we can modify the input string */
+    *z = '\0';
+    /* 'a' points past '[' and the string ends where ']' was; remove any
+       spaces between '[' and choice-start and between choice-end and ']' */
+    return trimspaces(a);
 }
 
 static boolean
 handle_config_section(buf)
 char *buf;
 {
-    if (is_config_section(buf)) {
-        char *send;
-        if (g.config_section_current) {
-            free(g.config_section_current);
+    char *sect = is_config_section(buf);
+
+    if (sect) {
+        if (g.config_section_current)
+            free(g.config_section_current), g.config_section_current = 0;
+        /* is_config_section() removed brackets from 'sect' */
+        if (!g.config_section_chosen) {
+            config_error_add("Section \"[%s]\" without CHOOSE", sect);
+            return TRUE;
         }
-        g.config_section_current = dupstr(&buf[1]);
-        send = rindex(g.config_section_current, ']');
-        *send = '\0';
-        debugpline1("set config section: '%s'", g.config_section_current);
+        if (*sect) { /* got a section name */
+            g.config_section_current = dupstr(sect);
+            debugpline1("set config section: '%s'", g.config_section_current);
+        } else { /* empty section name => end of sections */
+            free_config_sections();
+            debugpline0("unset config section");
+        }
         return TRUE;
     }
 
@@ -2670,8 +2700,7 @@ char *origbuf;
             retval = FALSE;
 #endif
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
-                          "WARNINGS");
+        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT, "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "ROGUESYMBOLS", 4)) {
         if (!parsesymbols(bufp, ROGUESET)) {

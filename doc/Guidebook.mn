@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.393 $ $NHDT-Date: 1595731545 2020/07/26 02:45:45 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.395 $ $NHDT-Date: 1596785362 2020/08/07 07:29:22 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 25, 2020
+.ds f2 "August 5, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3130,24 +3130,28 @@ the configuration file for you using the default template file.
 .pg
 On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
-Any line in the configuration file starting with \(oq#\(cq is treated
-as a comment.
+Any line in the configuration file starting with \(oq\f(CR#\fP\(cq is treated
+as a comment and ignored.
 Empty lines are ignored.
 .pg
-Any line beginning with \(oq[\(cq and ending in \(oq]\(cq is considered
-a section marker.
+Any line beginning with \(oq\f(CR[\fP\(cq and ending in \(oq\f(CR]\fP\(cq
+is a section marker (the closing \(oq\f(CR]\fP\(cq can be followed
+by whitespace and then an arbitrary comment beginning with \(oq\f(CR#\fP\(cq).
 The text between the square brackets is the section name.
-Lines after a section marker belong to that section, and are
-ignored unless a CHOOSE statement was used to select that section.
-Section names are case insensitive.
+Section markers are only valid after a CHOOSE directive and their names
+are case insensitive.
+Lines after a section marker belong to that section up until another
+section starts or a marker without a name is encountered or the file ends.
+Lines within sections are ignored unless a CHOOSE directive has selected
+that section.
 .pg
-You can use different configuration statements in the file, some
+You can use different configuration directives in the file, some
 of which can be used multiple times.
-In general, the statements are
+In general, the directives are
 written in capital letters, followed by an equals sign, followed by
-settings particular to that statement.
+settings particular to that directive.
 .pg
-Here is a list of allowed statements:
+Here is a list of allowed directives:
 .lp OPTIONS
 There are two types of options, boolean and compound options.
 Boolean options toggle a setting on or off, while compound options
@@ -3155,8 +3159,8 @@ take more diverse values.
 Prefix a boolean option with \(lqno\(rq or \(oq!\(cq to turn it off.
 For compound options, the option name and value are separated by a colon.
 Some options are persistent, and apply only to new games.
-You can specify multiple OPTIONS statements, and multiple options
-separated by commas in a single OPTIONS statement.
+You can specify multiple OPTIONS directives, and multiple options
+separated by commas in a single OPTIONS directive.
 (Comma separated options are processed from right to left.)
 .lp ""
 Example:
@@ -3220,7 +3224,8 @@ Example:
 .ed
 .lp CHOOSE
 Chooses at random one of the comma-separated parameters as an active
-section name. Lines in other sections are ignored.
+section name.
+Lines in other sections are ignored.
 .lp ""
 Example:
 .sd
@@ -3231,8 +3236,14 @@ CHOOSE=char A,char B
 OPTIONS=role:arc,race:dwa,align:law,gender:fem
 [char B]
 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
+[] #end of CHOOSE
+OPTIONS=!rest_on_space
 .ft \" revert to previous font
 .ed
+.lp ""
+If \f(CR[]\fP is present, the preceding section is closed and no new
+section begins; whatever follows will be common to all sections.
+Otherwise the last section extends to the end of the options file.
 .lp MENUCOLOR
 Highlight menu lines with different colors.
 See the \(lqConfiguring Menu Colors\(rq section.
@@ -3342,10 +3353,10 @@ to that shell), or the pair of commands
 in \fIsh\fP, \fIksh\fP, or \fIbash\fP.
 .pg
 The NETHACKOPTIONS value is effectively the same as a single OPTIONS
-statement in a configuration file.
+directive in a configuration file.
 The \(lqOPTIONS=\(rq prefix is implied and comma separated options are
 processed from right to left.
-Other types of configuration statements such as BIND or MSGTYPE are
+Other types of configuration directives such as BIND or MSGTYPE are
 not allowed.
 .pg
 Instead of a comma-separated list of options,
@@ -4338,7 +4349,7 @@ May be used to alter the value of keystrokes that the operating system
 returns to NetHack to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to NetHack, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the configuration file
+You can use multiple subkeyvalue assignments in the configuration file
 if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video

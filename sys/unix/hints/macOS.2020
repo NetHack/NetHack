@@ -19,7 +19,7 @@
 #    One possible way: brew install xquartz
 #
 #  - You'll need to obtain and install Qt if you want Qt support
-#    One possible way: Brew install Qt
+#    One possible way: brew install Qt
 #
 #  - You'll need to obtain and install the ncurses development libraries
 #    if you want curses window port support.
@@ -187,15 +187,14 @@ endif # WANT_WIN_CHAIN
 WINSRC =
 WINOBJ0 =
 WINLIB =
-WINLIB0 =
 VARDATND =
 VARDATND0 =
-WINCURSESLIB=-lncurses
+WINCURSESLIB =
 
 ifdef WANT_WIN_TTY
 WINSRC += $(WINTTYSRC)
 WINOBJ0 += $(WINTTYOBJ)
-WINLIB0 += $(WINCURSESLIB)
+WINCURSESLIB = -lncurses
 else	# !WANT_WIN_TTY
 CFLAGS += -DNOTTYGRAPHICS
 endif	# !WANT_WIN_TTY
@@ -204,11 +203,12 @@ ifdef WANT_WIN_CURSES
 CFLAGS += -DCURSES_GRAPHICS
 WINSRC += $(WINCURSESSRC)
 WINOBJ0 += $(WINCURSESOBJ)
-WINLIB0 += $(WINCURSESLIB)
+WINCURSESLIB = -lncurses
 endif
 
-# prevent duplicates in WINLIB from WINLIB0
-WINLIB += $(sort $(WINLIB0))
+ifdef WINCURSESLIB
+WINLIB += $(WINCURSESLIB)
+endif
 
 ifdef WANT_WIN_X11
 USE_XPM=1
