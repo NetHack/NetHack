@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ $NHDT-Date: 1596785361 2020/08/07 07:29:21 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.277 $ $NHDT-Date: 1596841504 2020/08/07 23:05:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -313,6 +313,11 @@ some versions of tiles processing (not X11's) complained about the rename of
 	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
 wizard mode #timeout changed to show timed Displacement in 'can be timed in
 	normal play' section instead of 'timed via #wizintrinsic only' section
+the fix to make worm visibility checks work as intended forced the coordinates
+	of the extra tail segment co-located with the worm monster to match
+	the worm instead of leaving it off the map; place_worm_tail_randomly()
+	reverses the segments and can throw some away if there isn't room,
+	but throwing away the extra segment removed the worm from the map
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
