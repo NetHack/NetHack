@@ -728,6 +728,7 @@ xchar x, y;
         return;
     }
 
+    wheads[wnum]->wx = 0, wheads[wnum]->wy = 0;
     wheads[wnum] = new_tail = curr;
     curr = curr->nseg;
     new_tail->nseg = (struct wseg *) 0;
