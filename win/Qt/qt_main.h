@@ -53,6 +53,7 @@ public slots:
 	void doMenuItem(QAction *);
 	void doQtSettings(bool);
 	void doAbout(bool);
+        void doQuit(bool);
 	//RLC void doGuidebook(bool);
 	void doKeys(const QString&);
 

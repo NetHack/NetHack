@@ -578,18 +578,22 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,    "History",            3, dohistory},
         { game,    "Redraw",             0, doredraw}, // useless
         { game,
-#ifndef MACOSX
-                   "Options",
-#else
-             /* Qt on OSX would rename "Options" to "Preferences..." and
-                move it from intended destination to the application menu */
-                   "Run-time options",
+#ifdef MACOSX
+            /* Qt on OSX would rename "Options" to "Preferences..." and
+               move it from intended destination to the application menu */
+                   "Run-time &" // rely on adjacent string concatenation
 #endif
-                                         3, doset},
+                   "Options",            3, doset},
         { game,    "Explore mode",       3, enter_explore_mode},
         { game,    0, 3},
-        { game,    "Save",               3, dosave},
-        { game,    "Quit",               3, done2},
+        { game,    "Save-and-exit",      3, dosave},
+        { game,
+#ifdef MACOSX
+            /* need something to prevent matching leading "quit"
+               so that it isn't hijacked for the application menu */
+                   "_&"
+#endif
+                   "Quit-without-saving", 3, done2},
 
         { apparel, "Apparel off",        2, doddoremarm},
         { apparel, "Remove many",        1, doddoremarm},
@@ -682,10 +686,12 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
                     "Preferences...",
 #endif
                     this, SLOT(doQtSettings(bool)));
-    /* on OSX, 'about' will end up in the application menu
-       rather than the help menu; at present, just live with that */
-    help->addAction("About Qt NetHack...",this,SLOT(doAbout(bool)));
-    //help->addAction("NetHack Guidebook...",this,SLOT(doGuidebook(bool)));
+    /* on OSX, 'about' will end up in the application menu rather than
+       the help menu (this had trailing "..." but that conflicts with
+       the convention that an elipsis indicates the choice will bring
+       up its own sub-menu) */
+    help->addAction("About Qt NetHack", this, SLOT(doAbout(bool)));
+    //help->addAction("NetHack Guidebook", this, SLOT(doGuidebook(bool)));
     help->addSeparator();
 
     for (i=0; item[i].menu; i++) {
@@ -747,6 +753,21 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	help->setTitle("Help");
 	menubar->addMenu(help);
     }
+#ifdef MACOSX
+    /* for OSX, the attempt above to add "About Qt NetHack" went into
+       the application menu instead of the help menu; we'll add it to
+       the latter now and have two ways to access it; without the
+       leading underscore (or some other spelling variation such as
+       "'bout"), this one would get interceptd too and then evidently
+       be discarded as a duplicate */
+    help->addSeparator();
+    help->addAction("_About_Qt_NetHack_", this, SLOT(doAbout(bool)));
+    /* we also want a "Quit NetHack" entry in the application menu;
+       when "_Quit-without-saving" was called "Quit" it got intercepted
+       for that, but now it needs to be added separately; we'll use a
+       handy menu and let the interception put it in the intended place */
+    game->addAction("Quit NetHack", this, SLOT(doQuit(bool)));
+#endif
 
     QSignalMapper* sm = new QSignalMapper(this);
     connect(sm, SIGNAL(mapped(const QString&)), this, SLOT(doKeys(const QString&)));
@@ -910,6 +931,41 @@ void NetHackQtMainWindow::doQtSettings(bool)
 void NetHackQtMainWindow::doAbout(bool)
 {
     QMessageBox::about(this, "About Qt NetHack", aboutMsg());
+}
+
+// on OSX, "quit nethack" has been selected in the application menu or
+// "Command+Q" has been typed -- user is asking to quit the application;
+// unlike with the window's Close button, user has a chance to back out
+void NetHackQtMainWindow::doQuit(bool)
+{
+    // there is a separate Quit-without-saving menu entry in the game menu
+    // that leads to nethack's "Really quit?" prompt; OSX players can use
+    // either one, other implementations only have that other one but this
+    // routine is unconditional in case someone wants to change that
+#ifdef MACOSX
+    QString info;
+    info.sprintf("This will end your NetHack session.%s",
+                 !g.program_state.something_worth_saving ? ""
+                 : "\n(Cancel quitting and use the Save command"
+                   "\nto save your current game.)");
+    /* this is similar to closeEvent but the details are different */
+    int act = QMessageBox::information(this, "NetHack", info,
+                                       "&Quit without saving",
+                                       "&Cancel and return to game",
+                                       0, 1);
+    switch (act) {
+    case 0:
+        // quit -- bypass the prompting preformed by done2()
+        g.program_state.stopprint++;
+        done(QUIT);
+        /*NOTREACHED*/
+        break;
+    case 1:
+        // cancel
+        break; // return to game
+    }
+#endif
+    return;
 }
 
 #if 0 // RLC this isn't used
@@ -1106,16 +1162,17 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
+// game window's Close button has been activated
+void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
 {
+    int ok = 0;
     if ( g.program_state.something_worth_saving ) {
-        int ok = 0;
         /* this used to offer "Save" and "Cancel"
            but cancel (ignoring the close attempt) won't work
            if user has clicked on the window's Close button */
 	int act = QMessageBox::information(this, "NetHack",
-                        "This will end your NetHack session",
-                        "&Save and exit", "&Quit without saving", 0, 1);
+                              "This will end your NetHack session.",
+                              "&Save and exit", "&Quit without saving", 0, 1);
 	switch (act) {
         case 0:
             // See dosave() function
@@ -1128,17 +1185,15 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent* e)
             done(QUIT);
             /*NOTREACHED*/
             break;
-        case 2:
-            // cancel -- no longer an alternative
-            break; // ignore the event
 	}
-        /* if !ok, we should try to continue, but we don't... */
-        u.uhp = -1;
-        NetHackQtBind::qt_exit_nhwindows(0);
-        nh_terminate(EXIT_SUCCESS);
     } else {
-	e->accept();
+        /* nothing worth saving; just close/quit */
+        ok = 1;
     }
+    /* if !ok, we should try to continue, but we don't... */
+    u.uhp = -1;
+    NetHackQtBind::qt_exit_nhwindows(0);
+    nh_terminate(EXIT_SUCCESS);
 }
 
 void NetHackQtMainWindow::ShowIfReady()
