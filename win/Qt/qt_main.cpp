@@ -520,6 +520,11 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     QCoreApplication::setOrganizationName("The NetHack DevTeam");
     QCoreApplication::setOrganizationDomain("nethack.org");
     QCoreApplication::setApplicationName("NetHack");
+    {
+        char cvers[BUFSZ];
+        QString qvers = version_string(cvers);
+        QCoreApplication::setApplicationVersion(qvers);
+    }
 #ifdef MACOSX
     /* without this, neither control+x nor option+x do anything;
        with it, control+x is ^X and option+x still does nothing */
@@ -527,11 +532,24 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 #endif
 
     setWindowTitle("Qt NetHack");
-    if ( qt_compact_mode )
-	setWindowIcon(QIcon(QPixmap(nh_icon_small)));
-    else
-	setWindowIcon(QIcon(QPixmap(nh_icon)));
+    setWindowIcon(QIcon(QPixmap(qt_compact_mode ? nh_icon_small : nh_icon)));
 
+#ifdef MACOSX
+    /*
+     * OSX Note:
+     *  The toolbar on OSX starts with a system menu labeled with the
+     *  Apple logo and an application menu labeled with the application's
+     *  name (taken from Info.plist if present, otherwise the base name
+     *  of the running program).  After that, application-specific menus
+     *  (in our case "game",...,"help") follow.  Several menu entry
+     *  names ("About", "Quit"/"Exit", "Preferences"/"Options"/
+     *  "Settings"/"Setup"/"Config") get hijacked and placed in the
+     *  application menu (and renamed in the process) even if the code
+     *  here tries to put them in another menu.
+     *  See QtWidgets/doc/qmenubar.html for slightly more information.
+     *  setMenuRole() is supposed to be able to override this behavior.
+     */
+#endif
     QMenu* game=new QMenu;
     QMenu* apparel=new QMenu;
     QMenu* act1=new QMenu;
@@ -540,7 +558,6 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     QMenu* info=new QMenu;
 
     QMenu *help;
-
 #ifdef KDE
     help = kapp->getHelpMenu( true, "" );
     help->addSeparator();
@@ -560,7 +577,15 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,    "Compilation",        3, doextversion},
         { game,    "History",            3, dohistory},
         { game,    "Redraw",             0, doredraw}, // useless
-        { game,    "Options",            3, doset},
+        { game,
+#ifndef MACOSX
+                   "Options",
+#else
+             /* Qt on OSX would rename "Options" to "Preferences..." and
+                move it from intended destination to the application menu */
+                   "Run-time options",
+#endif
+                                         3, doset},
         { game,    "Explore mode",       3, enter_explore_mode},
         { game,    0, 3},
         { game,    "Save",               3, dosave},
@@ -574,11 +599,11 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { apparel, "Two weapon combat",  3, dotwoweapon},
         { apparel, "Load quiver",        3, dowieldquiver},
         { apparel, 0, 3},
-        { apparel, "Wear armour",        3, dowear},
-        { apparel, "Take off armour",    3, dotakeoff},
+        { apparel, "Wear armor",         3, dowear},
+        { apparel, "Take off armor",     3, dotakeoff},
         { apparel, 0, 3},
-        { apparel, "Put on non-armour",  3, doputon},
-        { apparel, "Remove non-armour",  3, doremring},
+        { apparel, "Put on accessories", 3, doputon},
+        { apparel, "Remove accessories", 3, doremring},
 
         /* { act1,      "Again\tCtrl+A",           "\001", 2},
         { act1, 0, 0, 3}, */
@@ -636,10 +661,10 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { info,  "Conduct",          3, doconduct},
         { info,  "Discoveries",      3, dodiscovered},
         { info,  "List/reorder spells",  3, dovspell},
-        { info,  "Adjust inventory letters", 2, doorganize },
+        { info,  "Adjust inventory letters", 3, doorganize },
         { info,  0, 3},
         { info,  "Name object or creature", 3, docallcmd},
-        { info,  "Annotate level",   2, donamelevel },
+        { info,  "Annotate level",   3, donamelevel },
         { info,  0, 3},
         { info,  "Skills",  3, enhance_weapon_skill},
 
@@ -648,7 +673,17 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 
     int i;
 
-    game->addAction("Qt settings...",this,SLOT(doQtSettings(bool)));
+    game->addAction(
+#ifndef MACOSX
+                    "Qt settings...",
+#else
+                    /* on OSX, put this in the application menu by using
+                       a name that Qt will move to that menu */
+                    "Preferences...",
+#endif
+                    this, SLOT(doQtSettings(bool)));
+    /* on OSX, 'about' will end up in the application menu
+       rather than the help menu; at present, just live with that */
     help->addAction("About Qt NetHack...",this,SLOT(doAbout(bool)));
     //help->addAction("NetHack Guidebook...",this,SLOT(doGuidebook(bool)));
     help->addSeparator();
