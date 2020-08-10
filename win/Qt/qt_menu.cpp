@@ -242,6 +242,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	AddRow(i, itemlist[i]);
     }
 
+#define MENU_WIDTH_SLOP 10 /* this should not be necessary */
     // Determine column widths
     std::vector<int> col_widths;
     for (std::size_t i = 0; i < (size_t) itemlist.size(); ++i) {
@@ -255,8 +256,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
             QTableWidgetItem *twi = table->item(i, 4);
             if (twi) {
                 QString text = twi->text();
-#define MENU_WIDTH_SLOP 20 /* this should not be necessary */
-                WidenColumn(4, fm.width(text) + MENU_WIDTH_SLOP);
+                WidenColumn(4, fm.width(text));
             }
             continue;
         }
@@ -285,7 +285,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	}
 	text = columns.join("");
 	twi->setText(text);
-	WidenColumn(4, fm.width(text));
+	WidenColumn(4, fm.width(text) + MENU_WIDTH_SLOP);
     }
 
     // FIXME:  size for compact mode
