@@ -1,5 +1,5 @@
 #
-# NetHack 3.7  linux.2020 $NHDT-Date: 1597029501 2020/08/10 03:18:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
+# NetHack 3.7  linux.2020 $NHDT-Date: 1597072358 2020/08/10 15:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -132,10 +132,13 @@ endif
 endif
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL
-GTEQ9 := $(shell expr `gcc -dumpversion | cut -f1 -d.` \>= 9)
-ifeq "$(GTEQ9)" "1"
+CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
+ifeq "$(CCISCLANG)" ""
+GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GCCGTEQ9)" "1"
 CFLAGS+=-Wno-format-overflow
-endif  #compiler version greater than or equal to 9
+endif  #gcc version greater than or equal to 9
+endif  #not clang
 CFLAGS+=-DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
