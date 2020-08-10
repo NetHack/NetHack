@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ $NHDT-Date: 1597090815 2020/08/10 20:20:15 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ $NHDT-Date: 1597098351 2020/08/10 22:25:51 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -370,6 +370,13 @@ Qt: menu commands are now working; commands invoked via M-c were having that
 	send #abc with just enough letters to disambiguate from other commands
 	("Compilation" is one remaining problem; it yields "#version" which
 	brings up '#' menu subset with choices of "version" and "versionshort")
+Qt: "paper doll" subset of persistent inventory has undergone several changes:
+	show previously missing quiver below weapon instead of duplicating
+	gloves there; show secondary weapon in shield slot and blank out
+	alternate weapon slot when two-weapon combat is active; show wielded
+	two-handed weapon in both the shield and primary weapon slots; show
+	first active light source in a previously unused slot on lower right;
+	show first leash-in-use in a previously unused slot on lower left
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
