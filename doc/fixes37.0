@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ $NHDT-Date: 1596785361 2020/08/07 07:29:21 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ $NHDT-Date: 1597010101 2020/08/09 21:55:01 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -313,6 +313,11 @@ some versions of tiles processing (not X11's) complained about the rename of
 	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
 wizard mode #timeout changed to show timed Displacement in 'can be timed in
 	normal play' section instead of 'timed via #wizintrinsic only' section
+the fix to make worm visibility checks work as intended forced the coordinates
+	of the extra tail segment co-located with the worm monster to match
+	the worm instead of leaving it off the map; place_worm_tail_randomly()
+	reverses the segments and can throw some away if there isn't room,
+	but throwing away the extra segment removed the worm from the map
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -350,7 +355,6 @@ Qt: switch to fixed-width font for menus
 Qt: don't disable [cancel] button when viewing inventory or other pick-none
 	menus; ESC works to dismiss those and [cancel] should be the same
 Qt: bring status conditions up to 3.6 levels but new ones lack pictures
-Qt: fix control key on OSX
 Qt: clicking on the window's Close button brought up a dialog offering
 	choices of "Save" and "Cancel"; picking Cancel sent nethack into an
 	infinite loop with complaints about Qt's event loop already being
@@ -358,6 +362,19 @@ Qt: clicking on the window's Close button brought up a dialog offering
 	with no opportunity to try to back out of the Close operation
 Qt: add 3.6 status fields Stone, Slime, Strngl, Deaf, Lev, Fly, Ride
 Qt: add Attributes, Overview, and Annotate to the "Info" pull down menu
+Qt: rename menu entries game->Save to game->Save-and-exit and game->Quit
+	to game->Quit-without-saving
+Qt+QSX: fix control key
+Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
+	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
+	for making persistent Qt customizations to "nethack->Preferences..."
+Qt+OSX: prevent game->Quit-without-saving from being hijacked for the nethack
+	menu by renaming it game->_Quit-without-saving (OSX only)
+Qt+OSX: add a separate nethack->Quit menu entry with different functionality;
+	Command+Q invokes it
+Qt+OSX: since menu entry help->"About Qt NetHack" gets hijacked and becomes
+	"nethack->About nethack", add a separate help->_About_Qt_NetHack_
+	which stays where intended and brings up the same information
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic

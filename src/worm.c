@@ -1,4 +1,4 @@
-/* NetHack 3.7	worm.c	$NHDT-Date: 1596498230 2020/08/03 23:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1596841504 2020/08/07 23:05:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -727,6 +727,18 @@ xchar x, y;
         impossible("place_worm_tail_randomly: wormno is set without a tail!");
         return;
     }
+    if (wtails[wnum] == wheads[wnum]) {
+        /* single segment, co-located with worm so nothing to place */
+        if (curr->wx != worm->mx || curr->wy != worm->my)
+            impossible(
+        "place_worm_tail_randomly: tail segement at <%d,%d>, worm at <%d,%d>",
+                       curr->wx, curr->wy, worm->mx, worm->my);
+        return;
+    }
+    /* remove head segment from map in case we end up calling toss_wsegs();
+       if it doesn't get tossed, it will become the final tail segment and
+       get new coordinates */
+    wheads[wnum]->wx = wheads[wnum]->wy = 0;
 
     wheads[wnum] = new_tail = curr;
     curr = curr->nseg;
@@ -736,7 +748,7 @@ xchar x, y;
 
     while (curr) {
         xchar nx, ny;
-        char tryct = 0;
+        int tryct = 0;
 
         /* pick a random direction from x, y and search for goodpos() */
         do {
