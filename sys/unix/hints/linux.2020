@@ -132,7 +132,10 @@ endif
 endif
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL
+GTEQ9 := $(shell expr `gcc -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GTEQ9)" "1"
 CFLAGS+=-Wno-format-overflow
+endif  #compiler version greater than or equal to 9
 CFLAGS+=-DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
