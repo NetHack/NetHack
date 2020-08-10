@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1596498292 2020/08/03 23:44:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1597031649 2020/08/10 03:54:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -106,7 +106,7 @@ lua_support: lib/lua/liblua.a include/nhlua.h
 	@true
 lib/lua-$(LUA_VERSION)/src/liblua.a: lib/lua-$(LUA_VERSION)/src/lua.h
 	( cd lib/lua-$(LUA_VERSION)/src \
-	  && make SYSCFLAGS='$(SYSCFLAGS)' a && cd ../../.. )
+	  && make CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)' a && cd ../../.. )
 lib/lua/liblua.a: lib/lua-$(LUA_VERSION)/src/liblua.a
 	@( if [ ! -d lib/lua ] ; then mkdir -p lib/lua ; fi )
 	cp lib/lua-$(LUA_VERSION)/src/liblua.a $@
