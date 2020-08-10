@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1596498536 2020/08/03 23:48:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.854 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1597069374 2020/08/10 14:22:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.855 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,6 +204,7 @@ E void FDECL(random_response, (char *, int));
 E int NDECL(rnd_extcmd_idx);
 E int NDECL(domonability);
 E char FDECL(cmd_from_func, (int NDECL((*))));
+E const char *FDECL(cmdname_from_func, (int NDECL((*)), char *, BOOLEAN_P));
 E boolean FDECL(redraw_cmd, (CHAR_P));
 E const char *FDECL(levltyp_to_name, (int));
 #ifdef USE_TRAMPOLI

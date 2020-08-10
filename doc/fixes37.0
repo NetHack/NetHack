@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.279 $ $NHDT-Date: 1597010101 2020/08/09 21:55:01 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ $NHDT-Date: 1597069374 2020/08/10 14:22:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -364,6 +364,11 @@ Qt: add 3.6 status fields Stone, Slime, Strngl, Deaf, Lev, Fly, Ride
 Qt: add Attributes, Overview, and Annotate to the "Info" pull down menu
 Qt: rename menu entries game->Save to game->Save-and-exit and game->Quit
 	to game->Quit-without-saving
+Qt: menu commands are now working; commands invoked via M-c were having that
+	keystroke changed to '?', bringing up nethack's help menu; now those
+	send #abc with just enough letters to disambiguate from other commands
+	("Compilation" is one remaining problem; it yields "#version" which
+	brings up '#' menu subset with choices of "version" and "versionshort")
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
