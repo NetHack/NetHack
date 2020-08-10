@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ $NHDT-Date: 1597069374 2020/08/10 14:22:54 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ $NHDT-Date: 1597090815 2020/08/10 20:20:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -243,6 +243,7 @@ wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
 chatting to the quest leader in wizard mode with sufficient experience level
 	and insufficient piety, player is asked whether alignment should be
 	boosted; answering 'n' resulted in being prompted a second time
+leashing or unleashing pets wasn't updating persistent inventory window
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
