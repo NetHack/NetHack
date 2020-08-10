@@ -1,5 +1,5 @@
 #
-# NetHack 3.7  linux.2020 $NHDT-Date: 1596498415 2020/08/03 23:46:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
+# NetHack 3.7  linux.2020 $NHDT-Date: 1597029501 2020/08/10 03:18:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -132,6 +132,7 @@ endif
 endif
 
 CFLAGS=-g -O -I../include -DNOTPARMDECL
+CFLAGS+=-Wno-format-overflow
 CFLAGS+=-DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
