@@ -119,10 +119,8 @@ endif
 # compiler detection
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
 ifeq "$(CCISCLANG)" ""
-CC=gcc
 CXX=g++ -std=gnu++11
 else
-CC=clang
 CXX=clang++ -std=gnu++11
 endif
 
