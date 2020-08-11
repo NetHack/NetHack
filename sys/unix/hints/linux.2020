@@ -76,21 +76,6 @@ endif
 GAMEUID  = $(USER)
 GAMEGRP  = games
 
-# 3. miscellaneous:  compiler selection; Qt5 requires C++11
-ifdef WANT_WIN_QT
-CC=clang
-CXX=clang++ -std=gnu++11
-#CC=gcc
-#CXX=g++ -std=gnu++11
-LINK= $(CXX)
-else
-# compiling C code only; CC and CXX defaults can be used
-#CC=
-#CXX=
-LINK = $(CC)
-endif
-#MOC = moc
-
 #
 # You shouldn't need to change anything below here (in the hints file; if
 # you're reading this in Makefile augmented by hints, that may not be true).
@@ -131,9 +116,27 @@ endif
 endif
 endif
 
-CFLAGS=-g -O -I../include -DNOTPARMDECL
+# compiler detection
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
 ifeq "$(CCISCLANG)" ""
+CC=gcc
+CXX=g++ -std=gnu++11
+else
+CC=clang
+CXX=clang++ -std=gnu++11
+endif
+
+ifdef WANT_WIN_QT
+# Qt5 requires C++11
+LINK = $(CXX)
+#MOC = moc
+else
+LINK = $(CC)
+endif
+
+CFLAGS=-g -O -I../include -DNOTPARMDECL
+ifeq "$(CCISCLANG)" ""
+# get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GCCGTEQ9)" "1"
 CFLAGS+=-Wno-format-overflow
