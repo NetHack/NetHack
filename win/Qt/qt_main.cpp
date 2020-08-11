@@ -702,8 +702,16 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
                 actchar[0] = actchar[1] = '\0';
                 if (item[i].funct) {
                     actchar[0] = cmd_from_func(item[i].funct);
-                    /* M-c won't work */
-                    if ((actchar[0] & 0x7f) != actchar[0])
+                    if (actchar[0]
+                        /* M-c won't work; translation between character
+                           sets by the QString class can classify such
+                           characters as erroneous and change them to '?' */
+                        && ((actchar[0] & 0x7f) != actchar[0]
+                        /* the vi movement keys won't work reliably
+                           because toggling number_pad affects them but
+                           doesn't redo these menus */
+                            || strchr("hjklyubnHJKLYUBN", actchar[0])
+                            || strchr("hjklyubn", (actchar[0] | 0x60))))
                         actchar[0] = '\0';
                 }
                 if (actchar[0] && !qt_compact_mode)
