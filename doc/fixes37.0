@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ $NHDT-Date: 1597098351 2020/08/10 22:25:51 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ $NHDT-Date: 1597182932 2020/08/11 21:55:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -244,6 +244,9 @@ chatting to the quest leader in wizard mode with sufficient experience level
 	and insufficient piety, player is asked whether alignment should be
 	boosted; answering 'n' resulted in being prompted a second time
 leashing or unleashing pets wasn't updating persistent inventory window
+end of game inventory disclosure passed an inappropriate argument to the
+	inventory display routine; not noticeable for tty and curses,
+	noticeable but not harmful for X11, and slightly harmful for Qt
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

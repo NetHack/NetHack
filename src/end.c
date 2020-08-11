@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1596498166 2020/08/03 23:42:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1597182933 2020/08/11 21:55:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -784,7 +784,7 @@ boolean taken;
         c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
         if (c == 'y') {
             /* caller has already ID'd everything */
-            (void) display_inventory((char *) 0, TRUE);
+            (void) display_inventory((char *) 0, FALSE);
             container_contents(g.invent, TRUE, TRUE, FALSE);
         }
         if (c == 'q')
