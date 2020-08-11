@@ -1,5 +1,5 @@
 #
-# NetHack 3.7  linux.2020 $NHDT-Date: 1597029501 2020/08/10 03:18:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
+# NetHack 3.7  linux.2020 $NHDT-Date: 1597072358 2020/08/10 15:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -76,21 +76,6 @@ endif
 GAMEUID  = $(USER)
 GAMEGRP  = games
 
-# 3. miscellaneous:  compiler selection; Qt5 requires C++11
-ifdef WANT_WIN_QT
-CC=clang
-CXX=clang++ -std=gnu++11
-#CC=gcc
-#CXX=g++ -std=gnu++11
-LINK= $(CXX)
-else
-# compiling C code only; CC and CXX defaults can be used
-#CC=
-#CXX=
-LINK = $(CC)
-endif
-#MOC = moc
-
 #
 # You shouldn't need to change anything below here (in the hints file; if
 # you're reading this in Makefile augmented by hints, that may not be true).
@@ -131,8 +116,30 @@ endif
 endif
 endif
 
+# compiler detection
+CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
+ifeq "$(CCISCLANG)" ""
+CXX=g++ -std=gnu++11
+else
+CXX=clang++ -std=gnu++11
+endif
+
+ifdef WANT_WIN_QT
+# Qt5 requires C++11
+LINK = $(CXX)
+#MOC = moc
+else
+LINK = $(CC)
+endif
+
 CFLAGS=-g -O -I../include -DNOTPARMDECL
+ifeq "$(CCISCLANG)" ""
+# get the version of gcc
+GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GCCGTEQ9)" "1"
 CFLAGS+=-Wno-format-overflow
+endif  #gcc version greater than or equal to 9
+endif  #not clang
 CFLAGS+=-DDLB
 CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE

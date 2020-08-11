@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1596498153 2020/08/03 23:42:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.421 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1597069374 2020/08/10 14:22:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2276,6 +2276,57 @@ int NDECL((*fn));
         if (g.Cmd.commands[i] && g.Cmd.commands[i]->ef_funct == fn)
             return (char) i;
     return '\0';
+}
+
+/* return extended command name (without leading '#') for command (*fn)() */
+const char *
+cmdname_from_func(fn, outbuf, fullname)
+int NDECL((*fn));
+char outbuf[];
+boolean fullname; /* False: just enough to disambiguate */
+{
+    const struct ext_func_tab *extcmd, *cmdptr = 0;
+    const char *res = 0;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (extcmd->ef_funct == fn) {
+            cmdptr = extcmd;
+            res = cmdptr->ef_txt;
+            break;
+        }
+
+    if (!res) {
+        /* make sure output buffer doesn't contain junk or stale data;
+           return Null below */
+        outbuf[0] = '\0';
+    } else if (fullname) {
+        /* easy; the entire command name */
+        res = strcpy(outbuf, res);
+    } else {
+        const struct ext_func_tab *matchcmd = extcmdlist;
+        int len = 0;
+
+        /* find the shortest leading substring which is unambiguous */
+        do {
+            if (++len >= (int) strlen(res))
+                break;
+            for (extcmd = matchcmd; extcmd->ef_txt; ++extcmd) {
+                if (extcmd == cmdptr)
+                    continue;
+                if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0
+                    || ((extcmd->flags & WIZMODECMD) != 0 && !wizard))
+                    continue;
+                if (!strncmp(res, extcmd->ef_txt, len)) {
+                    matchcmd = extcmd;
+                    break;
+                }
+            }
+        } while (extcmd->ef_txt);
+        copynchars(outbuf, res, len);
+        debugpline2("shortened %s: \"%s\"", res, outbuf);
+        res = outbuf;
+    }
+    return res;
 }
 
 /*

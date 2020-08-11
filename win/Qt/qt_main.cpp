@@ -699,16 +699,32 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	    if (item[i].name) {
                 char actchar[32];
                 char menuitem[BUFSZ];
-                actchar[0] = '\0';
+                actchar[0] = actchar[1] = '\0';
                 if (item[i].funct) {
                     actchar[0] = cmd_from_func(item[i].funct);
-                    actchar[1] = '\0';
+                    if (actchar[0]
+                        /* M-c won't work; translation between character
+                           sets by the QString class can classify such
+                           characters as erroneous and change them to '?' */
+                        && ((actchar[0] & 0x7f) != actchar[0]
+                        /* the vi movement keys won't work reliably
+                           because toggling number_pad affects them but
+                           doesn't redo these menus */
+                            || strchr("hjklyubnHJKLYUBN", actchar[0])
+                            || strchr("hjklyubn", (actchar[0] | 0x60))))
+                        actchar[0] = '\0';
                 }
                 if (actchar[0] && !qt_compact_mode)
-                    Sprintf(menuitem, "%s\t%s", item[i].name,
+                    Sprintf(menuitem, "%.50s\t%.9s", item[i].name,
                             visctrl(actchar[0]));
                 else
                     Sprintf(menuitem, "%s", item[i].name);
+
+                if (item[i].funct && !actchar[0]) {
+                    actchar[0] = '#';
+                    (void) cmdname_from_func(item[i].funct,
+                                             &actchar[1], FALSE);
+                }
                 if (actchar[0]) {
                     QString name = menuitem;
                     QAction *action = item[i].menu->addAction(name);
@@ -919,6 +935,12 @@ public:
 
 void NetHackQtMainWindow::doMenuItem(QAction *action)
 {
+    /* this converts meta characters to '?'; menu processing has been
+       changed to send multi-character "#abc" instead (already needed
+       for commands that didn't have either a regular keystroke or a
+       meta shortcut); it must send just enough to disambiguate from
+       other extended command names, otherwise the remainder would be
+       left in the queue for subsequent handling as additional commands */
     doKeys(action->data().toString());
 }
 
@@ -985,6 +1007,8 @@ void NetHackQtMainWindow::doGuidebook(bool)
 
 void NetHackQtMainWindow::doKeys(const QString& k)
 {
+    /* [this should probably be using toLocal8Bit();
+       toAscii() is not offered as an alternative...] */
     keysink.Put(k.toLatin1().constData());
     qApp->exit();
 }
