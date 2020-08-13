@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1596494520 2020/08/03 22:42:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.469 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1597357458 2020/08/13 22:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.470 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -359,14 +359,12 @@ boolean tinitial, tfrom_file;
                 got_match = TRUE;
             }
         }
-
-#if 0
+#if 0   /* this prevents "boolopt:True" &c */
         if (!got_match) {
             if (has_val && !allopt[i].valok)
                 continue;
         }
 #endif
-
         /*
          * During option initialization, the function
          *     determine_ambiguities()
@@ -692,8 +690,7 @@ char *op UNUSED;
 #ifdef BACKWARD_COMPAT
 
         /* if ((opts = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-                                                                          ==
-           empty_optstr)
+               == empty_optstr)
          */
         if ((opts = string_for_opt(opts, FALSE)) == empty_optstr)
             return FALSE;
@@ -3492,6 +3489,9 @@ char *op;
         if (g.currentgraphics == PRIMARY && g.symset[PRIMARY].name)
             Strcat(opts, ", active");
         return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_symset(optidx);
     }
     return optn_ok;
 }

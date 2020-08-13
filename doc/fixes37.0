@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ $NHDT-Date: 1597182932 2020/08/11 21:55:32 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1597357458 2020/08/13 22:24:18 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -322,6 +322,7 @@ the fix to make worm visibility checks work as intended forced the coordinates
 	the worm instead of leaving it off the map; place_worm_tail_randomly()
 	reverses the segments and can throw some away if there isn't room,
 	but throwing away the extra segment removed the worm from the map
+using 'O' to try to change 'symset' was a no-op; 'roguesymset' worked
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
