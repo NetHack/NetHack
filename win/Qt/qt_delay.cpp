@@ -4,16 +4,9 @@
 
 // qt_delay.cpp -- implement a delay
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>

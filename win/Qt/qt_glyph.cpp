@@ -6,17 +6,8 @@
 
 extern "C" {
 #include "hack.h"
+#include "tile2x11.h" /* x11tiles is potential fallback for nhtiles.bmp */
 }
-#include "tile2x11.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -49,7 +40,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 {
     const char* tile_file = PIXMAPDIR "/nhtiles.bmp";
 
-    if ( iflags.wc_tile_file )
+    if (iflags.wc_tile_file)
 	tile_file = iflags.wc_tile_file;
 
     if (!img.load(tile_file)) {
@@ -73,11 +64,11 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 	tiles_per_row = 40;
     }
 
-    if ( iflags.wc_tile_width )
+    if (iflags.wc_tile_width)
 	tilefile_tile_W = iflags.wc_tile_width;
     else
 	tilefile_tile_W = img.width() / tiles_per_row;
-    if ( iflags.wc_tile_height )
+    if (iflags.wc_tile_height)
 	tilefile_tile_H = iflags.wc_tile_height;
     else
 	tilefile_tile_H = tilefile_tile_W;
@@ -88,59 +79,57 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 void NetHackQtGlyphs::drawGlyph(QPainter& painter, int glyph, int x, int y)
 {
     int tile = glyph2tile[glyph];
-    int px = (tile%tiles_per_row)*width();
-    int py = tile/tiles_per_row*height();
+    int px = (tile % tiles_per_row) * width();
+    int py = tile / tiles_per_row * height();
 
-    painter.drawPixmap(
-	x,
-	y,
-	pm,
-	px,py,
-	width(),height()
-    );
+    painter.drawPixmap(x, y, pm, px, py, width(), height());
 }
-void NetHackQtGlyphs::drawCell(QPainter& painter, int glyph, int cellx, int celly)
+
+void NetHackQtGlyphs::drawCell(QPainter& painter, int glyph,
+                               int cellx, int celly)
 {
-    drawGlyph(painter,glyph,cellx*width(),celly*height());
+    drawGlyph(painter, glyph, cellx * width(), celly * height());
 }
+
 QPixmap NetHackQtGlyphs::glyph(int glyph)
 {
     int tile = glyph2tile[glyph];
-    int px = (tile%tiles_per_row)*tilefile_tile_W;
-    int py = tile/tiles_per_row*tilefile_tile_H;
+    int px = (tile % tiles_per_row) * tilefile_tile_W;
+    int py = tile / tiles_per_row * tilefile_tile_H;
 
-    return QPixmap::fromImage(img.copy(px, py, tilefile_tile_W, tilefile_tile_H));
+    return QPixmap::fromImage(img.copy(px, py,
+                                       tilefile_tile_W, tilefile_tile_H));
 }
+
 void NetHackQtGlyphs::setSize(int w, int h)
 {
-    if ( size == QSize(w,h) )
+    if (size == QSize(w, h))
 	return;
-
-    bool was1 = size == pm1.size();
-    size = QSize(w,h);
+    size = QSize(w, h);
     if (!w || !h)
 	return; // Still not decided
 
-    if ( size == pm1.size() ) {
+    if (size == pm1.size()) { // not zoomed
 	pm = pm1;
 	return;
     }
-    if ( size == pm2.size() ) {
+    if (size == pm2.size()) { // zoomed
 	pm = pm2;
 	return;
     }
 
-    if (w==tilefile_tile_W && h==tilefile_tile_H) {
+    bool was1 = (size == pm1.size());
+    if (w == tilefile_tile_W && h == tilefile_tile_H) {
 	pm.convertFromImage(img);
     } else {
-	QApplication::setOverrideCursor( Qt::WaitCursor );
+	QApplication::setOverrideCursor(Qt::WaitCursor);
 	QImage scaled = img.scaled(
-	    w*img.width()/tilefile_tile_W,
-	    h*img.height()/tilefile_tile_H,
+	    w * img.width() / tilefile_tile_W,
+	    h * img.height() / tilefile_tile_H,
 	    Qt::IgnoreAspectRatio,
 	    Qt::FastTransformation
 	);
-	pm.convertFromImage(scaled,Qt::ThresholdDither|Qt::PreferDither);
+	pm.convertFromImage(scaled, Qt::ThresholdDither | Qt::PreferDither);
 	QApplication::restoreOverrideCursor();
     }
     (was1 ? pm2 : pm1) = pm;
