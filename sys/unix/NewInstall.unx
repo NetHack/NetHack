@@ -65,8 +65,8 @@ the following build command:
     make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_WIN_X11=1 install
 
 To build a binary with tty + curses + X11 + Qt support (that is, all the
-available interaces that are available), you can use the following shorthand
-build command:
+interaces that are available), you can use the following shorthand build
+command:
     make WANT_WIN_ALL all
     make WANT_WIN_ALL install
 
@@ -146,6 +146,6 @@ additional interfaces. See below.
  | --remove-section=.note.ABI-tag/usr/lib/x86_64-linux-gnu/libQt5Core.so.5    |
  +----------+---------+-----------------+-------------------------------------+
 
-# NetHack 3.7  NewInstall.unx       $NHDT-Date: 1597340354 2020/08/13 17:39:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+# NetHack 3.7  NewInstall.unx       $NHDT-Date: 1597340557 2020/08/13 17:42:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
 # Copyright (c) 2009 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
