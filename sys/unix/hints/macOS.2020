@@ -1,64 +1,32 @@
-# NetHack 3.7  macOS.2020 $NHDT-Date: 1596489016 2020/08/03 21:10:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1597332721 2020/08/13 15:32:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
-#-PRE
-# macOS X hints file
+#---------------------------------------------------------------------
+# MacOS hints file with support for multiple window ports (interfaces)
 # Tested on:
 #     - MacOS Catalina 10.15
 #
-# If this doesn't work for some other version of Mac OS X, make a new file for
-# that OS, don't change this one. And let us know about it.
+# If this doesn't work for some other version of Mac OS X, consider
+# making a new hints file it, rather than changing this one.
+# And let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
 
-#
-# This hints file supports tty, curses, x11, and Qt in the same binary,
-# but:
-#  - You'll need to obtain and install XQuartz if you want X11 support.
-#    (Attempting to run X11.app will describe where to get it.)
-#    One possible way: brew install xquartz
-#
-#  - You'll need to obtain and install Qt if you want Qt support
-#    One possible way: brew install Qt
-#
-#  - You'll need to obtain and install the ncurses development libraries
-#    if you want curses window port support.
-#
-# Assuming you have the prerequisite packages, You can specify the
-# window ports to include on the make command line without requiring
-# you to edit the Makefile:
-# make WANT_WIN_QT=1 WANT_WIN_X11=1 WANT_WIN_CURSES=1 WANT_WIN_TTY=1 all
-# in the src/ directory prior to 'make install' in the top directory.
-# Add WANT_DEFAULT=Qt (or other interface) if you want nethack to use
-# something other than tty as the default interface.
+#-PRE xxxx
+# macOS X hints file
 #
 
-# This hints file can build several different interfaces and several
-# types of installations (private, shared, source).
-# Edit the section (1.) to control which interface(s).
-# Edit the section (2.) to match the type of build you need.
+#-INCLUDE multiw-1.2020
 
-# 1. Which windowing interface(s) should be included in this binary?
-# One or more of these can be manually uncommented and/or can be specified
-# on the 'make' command line.  If none are enabled, tty will be used.
-#WANT_WIN_TTY=1
-#WANT_WIN_CURSES=1
-#WANT_WIN_X11=1
-#WANT_WIN_QT=1
-
-# 1a. What is the default window system?
-# Exactly one of these can be manually uncommented and/or can be specified
-# on the 'make' command line.  If none is enabled, the first among
-# WANT_WIN_{tty,curses,X11,Qt} that is enabled will become default.
-#WANT_DEFAULT=tty
-#WANT_DEFAULT=curses
-#WANT_DEFAULT=Qt
-#WANT_DEFAULT=X11
-
-# 1b. If you set WANT_WIN_QT, you need to
+# 4. If you set WANT_WIN_QT, you need to
 #  A) set QTDIR either here or in the environment to point to the Qt5
 #     library installation root.  (Qt2, Qt3, Qt4 will not work)
 #  B) set XPMLIB to point to the Xpm library
+ifndef WANT_WIN_QT
+ifdef WANT_WIN_ALL
+WANT_WIN_QT=1
+endif
+endif
 ifdef WANT_WIN_QT
 #QTDIR=/Developer/Qt
 # Qt installed via homebrew
@@ -70,92 +38,17 @@ ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
 endif
 
-# 2. Is this a build for a binary that will be shared among different users
-#    or will it be private to you?
-#    If it is shared:
-#	- it will be owned by the user and group listed
-#	- if the user does not exist, you MUST create it before installing
-#	  NetHack
-#	- if the group does not exist, it will be created.
-#	  NB: if the group already exists and is being used for something
-#	   besides games, you probably want to specify a new group instead
-#	  NB: the group will be created locally; if your computer is centrally
-#	   administered this may not be what you (or your admin) want.
-#	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
-#	- 'make install' must be run as "sudo make install"
-#    Note: 'make install' starts out be removing all files and subdirectories
-#    from the target destination.  Use 'make update' instead if there is
-#    anything there that you want to keep such as the high scores file from
-#    a previous install.
-#WANT_SHARE_INSTALL=1
-GAMEUID  = $(USER)
-GAMEGRP  = games
-# build to run in the source tree - primarily for development.  Build
-# with "make all"
-#WANT_SOURCE_INSTALL=1
+# 5. Other
 
-# 3. miscellaneous:  compiler selection; Qt5 requires C++11
-ifdef WANT_WIN_QT
-CC=clang
-CXX=clang++ -std=gnu++11
-#CC=gcc
-#CXX=g++ -std=gnu++11
-LINK= $(CXX)
-else
-# compiling C code only; CC and CXX defaults can be used
-#CC=
-#CXX=
-LINK = $(CC)
-endif
-#MOC = moc
-
-# At the moment the 'chain' interface is just for debugging, but in the future
-# it could be useful for other things.  Requires SYSCF and an ANSI compiler.
-#WANT_WIN_CHAIN=1
-
-#
+#-----------------------------------------------------------------------------
 # You shouldn't need to change anything below here (in the hints file; if
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-# Make sure that at least one interface aside from 'chain' is enabled.
-ifndef WANT_WIN_TTY
-ifndef  WANT_WIN_CURSES
-ifndef   WANT_WIN_X11
-ifndef    WANT_WIN_QT
-WANT_WIN_TTY=1
-endif
-endif
-endif
-endif
+#-INCLUDE multiw-2.2020
 
-# Make sure that a default interface is specified; this doesn't guarantee
-# sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but
-# 'makedefs -v' would notice, complain, and quit causing 'make' to quit.
-ifndef WANT_DEFAULT
-# pick the first one enabled among { tty, curses, X11, Qt }
-ifdef WANT_WIN_TTY
-WANT_DEFAULT=tty
-else
-ifdef  WANT_WIN_CURSES
-WANT_DEFAULT=curses
-else
-ifdef   WANT_WIN_X11
-WANT_DEFAULT=X11
-else
-ifdef    WANT_WIN_QT
-WANT_DEFAULT=Qt
-else
-# ? shouldn't be able to get here...
-endif
-endif
-endif
-endif
-endif
-
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
-	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
-CFLAGS+=-DGCC_WARN
+# XXX -g vs -O should go here, -I../include goes in the makefile
+CFLAGS+=-g -I../include -DNOTPARMDECL
 ifndef WANT_WIN_QT
 #	these are normally used when compiling nethack's core
 CFLAGS+=-ansi -pedantic -Wno-long-long
@@ -169,45 +62,51 @@ endif
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
 #CFLAGS+=-Wunreachable-code
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CFLAGS+=-DGCC_WARN
 
-# XXX -g vs -O should go here, -I../include goes in the makefile
-CFLAGS+=-g -I../include
+# NetHack sources control
+CFLAGS+=-DDLB
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+#CFLAGS+=-DTIMED_DELAY
+#CFLAGS+=-DDUMPLOG
+#CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+#CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 # older binaries use NOCLIPPING, but that disables SIGWINCH
 #CFLAGS+=-DNOCLIPPING
-CFLAGS+= -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
-CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
-CFLAGS+= -DGREPPATH=\"/usr/bin/grep\"
+CFLAGS+=-DNOMAIL
+#CFLAGS+=-DEXTRA_SANITY_CHECKS
+#CFLAGS+=-DEDIT_GETLIN
+#CFLAGS+=-DSCORE_ON_BOTL
+#CFLAGS+=-DMSGHANDLER
+#CFLAGS+=-DTTY_TILES_ESCCODES
+#CFLAGS+=-DTTY_SOUND_ESCCODES
+
+CFLAGS+= $(WINCFLAGS)   #from multiwin.2020
+
+VARDATND =
+VARDATND0 =
+CURSESLIB =
 
 ifdef WANT_WIN_CHAIN
-CFLAGS+= -DWINCHAIN
 HINTSRC=$(CHAINSRC)
 HINTOBJ=$(CHAINOBJ)
 endif # WANT_WIN_CHAIN
 
-WINSRC =
-WINOBJ0 =
-WINLIB =
-VARDATND =
-VARDATND0 =
-WINCURSESLIB =
-
 ifdef WANT_WIN_TTY
-WINSRC += $(WINTTYSRC)
-WINOBJ0 += $(WINTTYOBJ)
-WINCURSESLIB = -lncurses
-else	# !WANT_WIN_TTY
-CFLAGS += -DNOTTYGRAPHICS
-endif	# !WANT_WIN_TTY
-
-ifdef WANT_WIN_CURSES
-CFLAGS += -DCURSES_GRAPHICS
-WINSRC += $(WINCURSESSRC)
-WINOBJ0 += $(WINCURSESOBJ)
-WINCURSESLIB = -lncurses
+CURSESLIB = -lncurses
 endif
 
-ifdef WINCURSESLIB
-WINLIB += $(WINCURSESLIB)
+ifdef WANT_WIN_CURSES
+CURSESLIB = -lncurses
+endif
+
+ifdef CURSESLIB
+WINLIB += $(CURSESLIB)
 endif
 
 ifdef WANT_WIN_X11
@@ -216,7 +115,6 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 # -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
 POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
-CFLAGS += -DX11_GRAPHICS
 # separate from CFLAGS so that we don't pass it to every file
 X11CFLAGS = -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
@@ -226,14 +124,13 @@ CFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
-WINSRC += $(WINX11SRC)
-WINOBJ0 += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
-CFLAGS += -DQT_GRAPHICS
+# Qt5 requires C++11
+LINK = $(CXX)
 QTCXXFLAGS += -Wno-deprecated-declarations
 QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
@@ -254,6 +151,7 @@ WINOBJ = $(sort $(WINOBJ0))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
 
+WANT_BUNDLE=1
 ifdef WANT_SHARE_INSTALL
 # if $GAMEUID is root, we install into roughly proper Mac locations, otherwise
 # we install into ~/nethackdir
@@ -278,10 +176,16 @@ VARDIRPERM = 0775
 ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # XXX it's nice we don't write over sysconf, but we've already erased it
 # make sure we have group GAMEUID and group GAMEGRP
-PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); . sys/unix/hints/macosx.sh group2 $(GAMEGRP); mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
-CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
+		. sys/unix/hints/macosx.sh group2 $(GAMEGRP); \
+		mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
+		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+
 else ifdef WANT_SOURCE_INSTALL
+
 PREFIX=$(abspath $(NHSROOT))
 # suppress nethack.sh
 #SHELLDIR=
@@ -295,7 +199,9 @@ POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/s
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+
 else	# !WANT_SOURCE_INSTALL
+
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
@@ -304,17 +210,45 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
-ifdef WANT_WIN_X11
+ifdef ($(WANT_DEFAULT),X11)
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
 PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc || true
-endif	# WANT_WIN_X11
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
-CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
-endif	# !WANT_SOURCE_INSTALL
+endif	# WANT_DEFAULT X11
+
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
+		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+ifdef WANT_BUNDLE
+#
+# Bundle
+#
+# $(HACKDIR)/$(GAME).app/
+#              Contents/
+#                 Frameworks/
+#                 Info.plist
+#                 MacOS/
+#                    $(GAME)
+#                 PkgInfo/
+#                 PlugIns/
+#                 Resources/
+#                 SharedFrameWorks/
+#
+BUNDLE = mkdir -p $(HACKDIR)/nethack.app/Contents/MacOS; \
+              sys/unix/hints/macosx.sh infoplist > $(HACKDIR)/nethack.app/Contents/Info.plist; \
+              mv $(HACKDIR)/nethack $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
+ifdef WANT_SHARE_INSTALL
+BUNDLE+= chmod $(GAMEPERM) $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
+endif
+
+POSTINSTALL+= $(BUNDLE)
+POSTINSTALL+= if test -f $(SHELLDIR)/$(GAME); then \
+			  sed -i '' 's;HACKDIR/$(GAME);HACKDIR/$(GAME).app/Contents/MacOS/$(GAME);' $(SHELLDIR)/$(GAME) ; fi;
+endif   # WANT_BUNDLE
+endif   # !WANT_SHARE_INSTALL
 
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
-
 
 # ~/Library/Preferences/NetHack Defaults
 # OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
