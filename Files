@@ -310,6 +310,10 @@ macosx10.8          macosx10.10         macosx10.10-qt
 macosx10.14         solaris             solaris-playground
 unix
 
+sys/unix/hints/include:
+(files for configuring UNIX NetHack versions)
+multiw-1.2020  multiw-2.2020
+
 sys/vms:
 (files for VMS version)
 Install.vms   Makefile.dat  Makefile.doc  Makefile.src  Makefile.top
