@@ -12,16 +12,17 @@ if [ ! -d "$(pwd)/lib" ]; then
 	exit 1
 fi
 
-DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
+#DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
+DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/"
 if [ "$(uname)" = "Darwin" ]; then
     #Mac
-    DJGPP_FILE="djgpp-osx-gcc550.tar.bz2"
+    DJGPP_FILE="djgpp-osx-$GCCVER.tar.bz2"
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     #Linux
-    DJGPP_FILE="djgpp-linux64-gcc550.tar.bz2"
+    DJGPP_FILE="djgpp-linux64-$GCCVER.tar.bz2"
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     #mingw
-    DJGPP_FILE="djgpp-mingw-gcc550-standalone.zip"
+    DJGPP_FILE="djgpp-mingw-$GCCVER-standalone.zip"
 else
     echo "No DJGPP release for you, sorry."
     exit 1
