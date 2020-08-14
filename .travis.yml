@@ -54,7 +54,7 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-focal-gcc10-x11
+    - name: linux-focal-gcc9-x11
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
       dist: focal
@@ -62,7 +62,7 @@ matrix:
       addons:
         apt:
           packages:
-            - gcc-10
+            - gcc-9
             - libx11-dev
             - libxaw7-dev
             - xfonts-utils
