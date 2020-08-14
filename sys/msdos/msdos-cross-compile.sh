@@ -7,6 +7,14 @@ else
 	export DJGPP_TOP="$TRAVIS_BUILD_DIR/lib/djgpp"
 fi
 
+if [ -z "$GCCVER" ]; then
+	export GCCVER=gcc1010
+fi
+
+if [ -z "$LUA_VERSION" ]; then
+	export LUA_VERSION=5.4.0
+fi
+
 if [ ! -d "$(pwd)/lib" ]; then
 	echo "Set up for Unix build and 'make fetch-lua' first."
 	exit 1
@@ -17,9 +25,15 @@ DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/"
 if [ "$(uname)" = "Darwin" ]; then
     #Mac
     DJGPP_FILE="djgpp-osx-$GCCVER.tar.bz2"
+    if [ -z "HINTS" ]; then
+        export HINTS=macOS.2020
+    fi
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     #Linux
     DJGPP_FILE="djgpp-linux64-$GCCVER.tar.bz2"
+    if [ -z "$HINTS" ]; then
+        export HINTS=linux.2020
+    fi
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     #mingw
     DJGPP_FILE="djgpp-mingw-$GCCVER-standalone.zip"

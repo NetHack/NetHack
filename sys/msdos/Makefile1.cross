@@ -569,7 +569,8 @@ $(HOST_O)panic.o: $(CONFIG_H) $(U)panic.c
 #==========================================
 
 clean:
-	rm ./host_o/*.o
+	-rm $(HOBJ)/*.o
+	-rm ./msdos_o/*.o
 	if [ -f $(HOST_O)prereq.tag ];     then rm $(HOST_O)prereq.tag; fi;
 	if [ -f hobj.tag ];                then rm hobj.tag; fi;
 	if [ -f $(HOST_O)utility.tag ];    then rm $(HOST_O)utility.tag; fi;
