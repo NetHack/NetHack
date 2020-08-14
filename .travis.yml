@@ -135,16 +135,15 @@ matrix:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make LUA_VERSION=$LUA_VERSION install
-    - name: msdos-linuxhost-crosscompile
+    - name: msdos-linux-focal-crosscompile
       os: linux
       env: HINTS=linux LUA_VERSION=5.4.0
+      dist: focal
       compiler: gcc
       script:
 #       - export
 #       - export GCCVER=gcc550
         - export GCCVER=gcc1010
-        - sudo apt-get remove --auto-remove flex
-        - sudo apt-get install libfl-dev
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make LUA_VERSION=$LUA_VERSION fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
