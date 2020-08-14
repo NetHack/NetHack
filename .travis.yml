@@ -54,7 +54,7 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-xenial-gcc-x11
+    - name: linux-focal-gcc10-x11
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
       dist: focal
