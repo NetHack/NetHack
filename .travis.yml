@@ -20,6 +20,21 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make LUA_VERSION=$LUA_VERSION install
+    - name: linux-focal-gcc9
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - gcc-9
+            - g++-9
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make LUA_VERSION=$LUA_VERSION install
     - name: linux-bionic-gcc
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -137,7 +152,7 @@ matrix:
         - mingw32-make LUA_VERSION=$LUA_VERSION install
     - name: msdos-linux-focal-crosscompile
       os: linux
-      env: HINTS=linux LUA_VERSION=5.4.0
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
       dist: focal
       compiler: gcc
       script:
