@@ -57,10 +57,12 @@ matrix:
     - name: linux-xenial-gcc-x11
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
       compiler: gcc
       addons:
         apt:
           packages:
+            - gcc-10
             - libx11-dev
             - libxaw7-dev
             - xfonts-utils
