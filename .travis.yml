@@ -143,6 +143,7 @@ matrix:
 #       - export
 #       - export GCCVER=gcc550
         - export GCCVER=gcc1010
+        - sudo apt-get remove --auto-remove flex
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make LUA_VERSION=$LUA_VERSION fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
