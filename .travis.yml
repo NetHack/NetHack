@@ -147,7 +147,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make LUA_VERSION=$LUA_VERSION fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - cd lib/lua-$LUA_VERSION/src && make a && cd ../../.. 
+        - cd lib/lua-$LUA_VERSION/src && make a && cd ../../..
         - sh sys/msdos/msdos-cross-compile.sh
   exclude:
 #    - os: osx
