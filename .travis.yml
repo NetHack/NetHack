@@ -140,7 +140,9 @@ matrix:
       env: HINTS=linux LUA_VERSION=5.4.0
       compiler: gcc
       script:
-#        - export
+#       - export
+#       - export GCCVER=gcc550
+        - export GCCVER=gcc1010
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make LUA_VERSION=$LUA_VERSION fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
