@@ -18,6 +18,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - rm -f /usr/bin/moc
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-focal-gcc9-win-all
       os: linux
@@ -58,6 +59,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - rm -f /usr/bin/moc
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-focal-clang-win-all
       os: linux
