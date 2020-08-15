@@ -1,77 +1,7 @@
 language: c
 matrix:
   include:
-    - name: linux-xenial-gcc
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      compiler: gcc
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-xenial-gcc-nocommon
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      compiler: gcc
-      script:
-        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-focal-gcc9
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      dist: focal
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - gcc-9
-            - g++-9
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-bionic-gcc
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      dist: bionic
-      compiler: gcc
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-xenial-clang
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      compiler: clang
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION install
-    - name: linux-focal-gcc9-x11
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      dist: focal
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - gcc-9
-            - libx11-dev
-            - libxaw7-dev
-            - xfonts-utils
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make WANT_WIN_X11=1 LUA_VERSION=$LUA_VERSION install
-    - name: linux-xenial-gcc-qt5
+    - name: linux-xenial-gcc-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
       compiler: gcc
@@ -88,10 +18,31 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make WANT_WIN_QT=1 QT_SELECT=5 MOC=moc LUA_VERSION=$LUA_VERSION install
-    - name: linux-bionic-gcc-x11
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+    - name: linux-focal-gcc9-win-all
       os: linux
-      env: HINTS=linux-x11 LUA_VERSION=5.4.0
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - gcc-9
+            - g++-9
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+    - name: linux-bionic-gcc-win-all
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
       dist: bionic
       compiler: gcc
       addons:
@@ -100,7 +51,40 @@ matrix:
             - libx11-dev
             - libxaw7-dev
             - xfonts-utils
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
       script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+    - name: linux-focal-clang-win-all
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - xfonts-utils
+            - libx11-dev
+            - libxaw7-dev
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+    - name: linux-xenial-gcc-nocommon
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: xenial
+      compiler: gcc
+      script:
+        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
@@ -132,7 +116,7 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make fetch-lua LUA_VERSION=$LUA_VERSION
               test -d "lib/lua-$LUA_VERSION/src" || exit 0
-              make LUA_VERSION=$LUA_VERSION install
+              make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
               cat dat/options
     - name: windows-visualstudio
       os: windows
@@ -152,19 +136,19 @@ matrix:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make LUA_VERSION=$LUA_VERSION install
-    - name: msdos-linux-focal-crosscompile
+    - name: msdos-linux-focal-djgpp-crosscompile
       os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      env: HINTS=linux LUA_VERSION=5.4.0
       dist: focal
       compiler: gcc
       script:
-#       - export
-#       - export GCCVER=gcc550
+#        - export
+#        - export GCCVER=gcc550
         - export GCCVER=gcc1010
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make LUA_VERSION=$LUA_VERSION fetch-lua
+        - make fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - cd lib/lua-$LUA_VERSION/src && make a && cd ../../..
+        - cd lib/lua-$LUA_VERSION/src && make CC='gcc' a  && cd ../../.. 
         - sh sys/msdos/msdos-cross-compile.sh
   exclude:
 #    - os: osx
