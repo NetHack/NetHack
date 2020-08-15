@@ -1944,7 +1944,7 @@ long timeout UNUSED;
 
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
-    if ((mptr->mflags3 & M3_DISPLACES) != 0 && body->where == OBJ_FLOOR
+    if (is_displacer(mptr) && body->where == OBJ_FLOOR
         && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);

@@ -1742,8 +1742,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
        as high as the attacker, don't let attacker do so, otherwise
        they might just end up swapping places again when defender
        gets its chance to move */
-    if ((pa->mflags3 & M3_DISPLACES) != 0
-        && ((pd->mflags3 & M3_DISPLACES) == 0 || magr->m_lev > mdef->m_lev)
+    if (is_displacer(pa) && (!is_displacer(pd) || magr->m_lev > mdef->m_lev)
         /* no displacing grid bugs diagonally */
         && !(magr->mx != mdef->mx && magr->my != mdef->my
              && NODIAG(monsndx(pd)))
