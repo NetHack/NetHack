@@ -1,6 +1,5 @@
 language: c
 matrix:
-matrix:
   include:
     - name: linux-xenial-gcc-win-all
       os: linux
