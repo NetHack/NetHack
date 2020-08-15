@@ -19,27 +19,6 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
-    - name: linux-focal-gcc9-win-all
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      dist: focal
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - gcc-9
-            - g++-9
-            - libx11-dev
-            - libxaw7-dev
-            - xfonts-utils
-            - qtbase5-dev
-            - qtmultimedia5-dev
-            - qtbase5-dev-tools
-      script:
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-bionic-gcc-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -89,6 +68,27 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make install
+    - name: linux-focal-gcc9-win-all
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - gcc-9
+            - g++-9
+            - libx11-dev
+            - libxaw7-dev
+            - xfonts-utils
+            - qtbase5-dev
+            - qtmultimedia5-dev
+            - qtbase5-dev-tools
+      script:
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua LUA_VERSION=$LUA_VERSION
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-xenial-gcc-minimal
       os: linux
       env: HINTS=linux-minimal LUA_VERSION=5.4.0
