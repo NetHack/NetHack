@@ -18,7 +18,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-focal-gcc9-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -39,7 +39,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-bionic-gcc-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -58,7 +58,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-focal-clang-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -77,7 +77,7 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
     - name: linux-xenial-gcc-nocommon
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
@@ -116,7 +116,7 @@ matrix:
               sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
               make fetch-lua LUA_VERSION=$LUA_VERSION
               test -d "lib/lua-$LUA_VERSION/src" || exit 0
-              make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL install
+              make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 install
               cat dat/options
     - name: windows-visualstudio
       os: windows
