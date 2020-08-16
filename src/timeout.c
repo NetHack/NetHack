@@ -318,12 +318,13 @@ slime_dialogue()
 {
     register long i = (Slimed & TIMEOUT) / 2L;
 
-    if (i == 1L) {
+    if ((Slimed & TIMEOUT) == 1L) {
         /* display as green slime during "You have become green slime."
            but don't worry about not being able to see self; if already
            mimicking something else at the time, implicitly be revealed */
         g.youmonst.m_ap_type = M_AP_MONSTER;
         g.youmonst.mappearance = PM_GREEN_SLIME;
+        newsym(u.ux, u.uy);
     }
     if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
@@ -2403,7 +2404,7 @@ long adjust;     /* how much to adjust timeout */
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-       
+
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)
