@@ -110,9 +110,27 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     } else {
 	splash = 0;
     }
+
+    // these used to be in MainWindow but we want them before QtSettings
+    // which we want before MainWindow...
+    QCoreApplication::setOrganizationName("The NetHack DevTeam");
+    QCoreApplication::setOrganizationDomain("nethack.org");
+    QCoreApplication::setApplicationName("NetHack-Qt"); // Qt NetHack
+    {
+        char cvers[BUFSZ];
+        QString qvers = version_string(cvers);
+        QCoreApplication::setApplicationVersion(qvers);
+    }
+#ifdef MACOSX
+    /* without this, neither control+x nor option+x do anything;
+       with it, control+x is ^X and option+x still does nothing */
+    QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta);
+#endif
+
+    qt_settings = new NetHackQtSettings(); /*(main->width(),main->height());*/
+
     main = new NetHackQtMainWindow(keybuffer);
     connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
-    qt_settings=new NetHackQtSettings(main->width(),main->height());
     msgs_strings = new QStringList();
     msgs_initd = false;
     msgs_saved = false;

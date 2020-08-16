@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1597357458 2020/08/13 22:24:18 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ $NHDT-Date: 1597546107 2020/08/16 02:48:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -507,6 +507,8 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
+Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
+	dialog box ("Preferences..." on OSX)
 
 
 NetHack Community Patches (or Variation) Included
