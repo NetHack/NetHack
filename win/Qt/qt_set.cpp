@@ -196,6 +196,9 @@ NetHackQtSettings::NetHackQtSettings() :
 
 NetHackQtGlyphs& NetHackQtSettings::glyphs()
 {
+    // Caveat:
+    //  'theglyphs' will be Null if the tiles file couldn't be loaded;
+    //  the game can still procede with an ascii map in that situation.
     return *theglyphs;
 }
 
@@ -213,8 +216,10 @@ void NetHackQtSettings::resizeTiles()
     settings.setValue("tilewidth", tileWidth);
     settings.setValue("tileheight", tileHeight);
 
-    theglyphs->setSize(tileWidth, tileHeight);
-    emit tilesChanged();
+    if (theglyphs) {
+        theglyphs->setSize(tileWidth, tileHeight);
+        emit tilesChanged();
+    }
 }
 
 void NetHackQtSettings::toggleGlyphSize()

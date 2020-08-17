@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.287 $ $NHDT-Date: 1597704087 2020/08/17 22:41:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ $NHDT-Date: 1597707740 2020/08/17 23:42:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -349,6 +349,7 @@ curses: for vertical status, line up conditions in columns; usually two but
 msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
+Qt: [later] tiles load failure at startup now continues using an ascii map
 Qt: use more columns for extended command selection dialog so that the number
 	of rows needed doesn't result in some commands being unaccessible
 Qt: suppress wizard mode commands from '#' handling when not in wizard mode
