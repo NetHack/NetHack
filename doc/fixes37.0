@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ $NHDT-Date: 1597700875 2020/08/17 21:47:55 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.287 $ $NHDT-Date: 1597704087 2020/08/17 22:41:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -510,6 +510,8 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	act on it)
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
+Qt: draw a border around each tile in the paper door inventory; when BUC is
+	known for a doll item, change the border's color and thicken it
 
 
 NetHack Community Patches (or Variation) Included

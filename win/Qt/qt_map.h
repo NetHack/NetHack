@@ -22,7 +22,8 @@ public:
 
 protected:
 	virtual void paintEvent(QPaintEvent* event);
-	bool DrawWalls(QPainter& painter, int x, int y, int w, int h, unsigned ch);
+        bool DrawWalls(QPainter& painter, int x, int y,
+                       int w, int h, unsigned ch);
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;
 	virtual void mousePressEvent(QMouseEvent* event);
