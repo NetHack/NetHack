@@ -1,5 +1,5 @@
 #
-# NetHack 3.7  macosx10.10-qt $NHDT-Date: 1596498421 2020/08/03 23:47:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $
+# NetHack 3.7  macosx10.10-qt $NHDT-Date: 1597704795 2020/08/17 22:53:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -145,7 +145,7 @@ QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Q
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
-VARDATND0 = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
+VARDATND0 = nhtiles.bmp rip.xpm nhsplash.xpm
 MOC = moc
 
 # XXX if /Developer/qt exists and QTDIR not set, use that
