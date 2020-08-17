@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.285 $ $NHDT-Date: 1597546107 2020/08/16 02:48:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ $NHDT-Date: 1597700875 2020/08/17 21:47:55 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -381,6 +381,7 @@ Qt: "paper doll" subset of persistent inventory has undergone several changes:
 	two-handed weapon in both the shield and primary weapon slots; show
 	first active light source in a previously unused slot on lower right;
 	show first leash-in-use in a previously unused slot on lower left
+Qt: paper doll inventory view was inconsistently updated during Hallucination
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

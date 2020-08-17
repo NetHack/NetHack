@@ -48,13 +48,12 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter& painter, obj* nhobj,
                                        int x, int y, bool canbe)
 {
     short int glyph;
-    if (nhobj)
-	glyph = obj_to_glyph(nhobj, rn2_on_display_rng);
-    else if (canbe)
-	glyph = cmap_to_glyph(S_room);
-    else
-	glyph = GLYPH_UNEXPLORED; // was cmap_to_glyph(S_stone)
-
+    if (nhobj) {
+        /* Hallucination doesn't affect inventory */
+        glyph = obj_to_glyph(nhobj, rn2_on_display_rng);
+    } else {
+        glyph = canbe ? cmap_to_glyph(S_room) : GLYPH_UNEXPLORED;
+    }
     qt_settings->glyphs().drawCell(painter, glyph, x, y);
 }
 
