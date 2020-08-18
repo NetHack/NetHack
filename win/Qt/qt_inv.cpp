@@ -48,14 +48,22 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter& painter, obj* nhobj,
                                        int x, int y, bool canbe)
 {
     short int glyph;
-    if (nhobj)
-	glyph=obj_to_glyph(nhobj, rn2_on_display_rng);
-    else if (canbe)
-	glyph=cmap_to_glyph(S_room);
-    else
-	glyph=cmap_to_glyph(S_stone);
+    int border;
 
-    qt_settings->glyphs().drawCell(painter,glyph,x,y);
+    if (nhobj) {
+        border = BORDER_DEFAULT;
+        if (Role_if('P') && !Blind)
+            nhobj->bknown = 1;
+        if (nhobj->bknown)
+            border = nhobj->cursed ? BORDER_CURSED
+                     : !nhobj->blessed ? BORDER_UNCURSED
+                       : BORDER_BLESSED;
+        glyph = obj_to_glyph(nhobj, rn2_on_display_rng);
+    } else {
+        border = NO_BORDER;
+        glyph = canbe ? cmap_to_glyph(S_room) : GLYPH_UNEXPLORED;
+    }
+    qt_settings->glyphs().drawBorderedCell(painter, glyph, x, y, border);
 }
 
 void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
@@ -75,6 +83,13 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     //      show two-handed primary weapon in both shield and uwep slots;
     //      show lit lamp/lantern/candle/candelabrum on lower right side;
     //      show leash-in-use on lower left side
+
+#ifdef ENHANCED_PAPERDOLL
+    if (!qt_settings->doll_is_shown)
+        return;
+    qt_settings->glyphs().setSize(qt_settings->dollWidth,
+                                  qt_settings->dollHeight);
+#endif
 
     QPainter painter;
     painter.begin(this);
@@ -115,13 +130,29 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     drawWorn(painter, find_tool(OIL_LAMP), 2, 4);
 
     painter.end();
+
+#ifdef ENHANCED_PAPERDOLL
+    qt_settings->glyphs().setSize(qt_settings->tileWidth,
+                                  qt_settings->tileHeight);
+#endif
 }
 
 QSize NetHackQtInvUsageWindow::sizeHint(void) const
 {
     if (qt_settings) {
-	return QSize(qt_settings->glyphs().width()*3,
-		     qt_settings->glyphs().height()*6);
+        int w = 0, h = 0;
+        // 1+X+1: one pixel border surrounding each tile in the paper doll,
+        // so +1 left and +1 right, also +1 above and +1 below
+#ifdef ENHANCED_PAPERDOLL
+        if (qt_settings->doll_is_shown) {
+            w = (1 + qt_settings->dollWidth + 1) * 3;
+            h = (1 + qt_settings->dollHeight + 1) * 6;
+        }
+#else
+        w = (1 + qt_settings->glyphs().width() + 1) * 3;
+        h = (1 + qt_settings->glyphs().height() + 1) * 6;
+#endif
+        return QSize(w, h);
     } else {
 	return QWidget::sizeHint();
     }

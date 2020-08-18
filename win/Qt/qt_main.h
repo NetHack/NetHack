@@ -49,6 +49,9 @@ public:
 
 	void fadeHighlighting();
 
+        // this is unconditional in case qt_main.h comes before qt_set.h
+        void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
+
 public slots:
 	void doMenuItem(QAction *);
 	void doQtSettings(bool);

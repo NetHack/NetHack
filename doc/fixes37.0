@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.284 $ $NHDT-Date: 1597357458 2020/08/13 22:24:18 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.287 $ $NHDT-Date: 1597704087 2020/08/17 22:41:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -381,6 +381,7 @@ Qt: "paper doll" subset of persistent inventory has undergone several changes:
 	two-handed weapon in both the shield and primary weapon slots; show
 	first active light source in a previously unused slot on lower right;
 	show first leash-in-use in a previously unused slot on lower left
+Qt: paper doll inventory view was inconsistently updated during Hallucination
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
@@ -507,6 +508,10 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
+Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
+	dialog box ("Preferences..." on OSX)
+Qt: draw a border around each tile in the paper door inventory; when BUC is
+	known for a doll item, change the border's color and thicken it
 
 
 NetHack Community Patches (or Variation) Included

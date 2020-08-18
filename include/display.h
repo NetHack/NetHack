@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1596498533 2020/08/03 23:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1597700875 2020/08/17 21:47:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -328,18 +328,18 @@ enum explosion_types {
 
 /* This has the unfortunate side effect of needing a global variable    */
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
-#define random_obj_to_glyph(rng)                \
-    ((g.otg_temp = random_object(rng)) == CORPSE  \
-         ? random_monster(rng) + GLYPH_BODY_OFF \
+#define random_obj_to_glyph(rng) \
+    ((g.otg_temp = random_object(rng)) == CORPSE                \
+         ? random_monster(rng) + GLYPH_BODY_OFF                 \
          : g.otg_temp + GLYPH_OBJ_OFF)
 
-#define obj_to_glyph(obj, rng)                                          \
-    (((obj)->otyp == STATUE)                                            \
-         ? statue_to_glyph(obj, rng)                                    \
-         : Hallucination                                                \
-               ? random_obj_to_glyph(rng)                               \
-               : ((obj)->otyp == CORPSE)                                \
-                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF           \
+#define obj_to_glyph(obj, rng) \
+    (((obj)->otyp == STATUE)                                    \
+         ? statue_to_glyph(obj, rng)                            \
+         : Hallucination                                        \
+               ? random_obj_to_glyph(rng)                       \
+               : ((obj)->otyp == CORPSE)                        \
+                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF   \
                      : (int) (obj)->otyp + GLYPH_OBJ_OFF)
 
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
@@ -348,6 +348,16 @@ enum explosion_types {
 #define statue_to_glyph(obj, rng)                              \
     (Hallucination ? random_monster(rng) + GLYPH_MON_OFF       \
                    : (int) (obj)->corpsenm + GLYPH_STATUE_OFF)
+
+/* briefly used for Qt's "paper doll" inventory which shows map tiles for
+   equipped objects; those vary like floor items during hallucination now
+   so this isn't used anywhere */
+#define obj_to_true_glyph(obj) \
+    (((obj)->otyp == STATUE)                            \
+     ? ((int) (obj)->corpsenm + GLYPH_STATUE_OFF)       \
+       : ((obj)->otyp == CORPSE)                        \
+         ? ((int) (obj)->corpsenm + GLYPH_BODY_OFF)     \
+           : ((int) (obj)->otyp + GLYPH_OBJ_OFF))
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx) + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype, idx) \

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1596498291 2020/08/03 23:44:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1597704252 2020/08/17 22:44:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -871,14 +871,17 @@ qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
 qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
 		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_inv.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
 qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_icon.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
 qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_set.h
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
 qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_key.h
@@ -898,18 +901,21 @@ qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
 		../win/Qt/qt_clust.h qt_map.moc ../win/Qt/qt_click.h \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_xpms.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
 		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
 qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_menu.h ../win/Qt/qt_win.h \
 		../win/Qt/qt_rip.h qt_menu.moc ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
 		../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
 qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
 		qt_msg.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
 qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_plsel.h qt_plsel.moc \
@@ -921,12 +927,14 @@ qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
 qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_pre.h \
-		../win/Qt/qt_post.h ../win/Qt/qt_set.h qt_set.moc \
+		../win/Qt/qt_post.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_set.moc \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
 qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_stat.h ../win/Qt/qt_win.h \
 		../win/Qt/qt_icon.h qt_stat.moc ../win/Qt/qt_set.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
 		../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
 	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
 qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
