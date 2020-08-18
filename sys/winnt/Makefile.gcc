@@ -1,4 +1,4 @@
-# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1594155895 2020/07/07 21:04:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $
+# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1597760766 2020/08/18 14:26:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -1481,15 +1481,123 @@ $(O)wintext.o: ../win/X11/wintext.c $(HACK_H) $(INCL)/winX.h $(INCL)/xwindow.h
 $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
 	$(cc) $(CFLAGS) -o$@ ../win/X11/winval.c
 $(O)tile.o: $(SRC)/tile.c $(HACK_H)
-$(O)qt_win.o: $(QT)/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
-		$(INCL)/dlb.h $(INCL)/tile2x11.h \
-		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
-		$(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
-	$(CXX) $(CXXFLAGS) -o$@ $(QT)/qt_win.cpp
-$(O)qt_clust.o: $(QT)/qt_clust.cpp $(INCL)/qt_clust.h
-	$(CXX) $(CXXFLAGS) -o$@ $(QT)/qt_clust.cpp
-$(O)qttableview.o: $(QT)/qttableview.cpp $(INCL)/qttableview.h
-	$(CXX) $(CXXFLAGS) -o$@ $(QT)/qttableview.cpp
+#---
+$(O)qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_click.h ../win/Qt/qt_delay.h \
+		../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_menu.h \
+		../win/Qt/qt_rip.h ../win/Qt/qt_msg.h ../win/Qt/qt_plsel.h \
+		../win/Qt/qt_svsel.h ../win/Qt/qt_set.h ../win/Qt/qt_stat.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
+		../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h ../include/dlb.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
+$(O)qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_click.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
+$(O)qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
+$(O)qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_delay.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
+$(O)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
+		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_inv.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
+$(O)qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_icon.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
+$(O)qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
+$(O)qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_key.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
+$(O)qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_line.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
+$(O)qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		qt_main.moc ../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_inv.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_stat.h ../win/Qt/qt_icon.h \
+		../win/Qt/qt_str.h qt_kde0.moc
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
+$(O)qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_clust.h qt_map.moc ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_xpms.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
+$(O)qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_menu.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_rip.h qt_menu.moc ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
+		../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
+$(O)qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
+		qt_msg.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
+$(O)qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_plsel.h qt_plsel.moc \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
+$(O)qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_rip.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
+$(O)qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_set.moc \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
+$(O)qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_stat.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_icon.h qt_stat.moc ../win/Qt/qt_set.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
+$(O)qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
+$(O)qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
+		../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
+$(O)qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_svsel.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
+$(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
+#	$(CXX) $(CXXFLAGS) -o$@ $(QT)/qttableview.cpp
+$(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_win.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_set.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
+$(O)qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
+		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_xcmd.h \
+#		qt_xcmd.moc ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+#		../win/Qt/qt_kde0.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
+$(O)qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_yndlg.h qt_yndlg.moc \
+		../win/Qt/qt_str.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
+#---
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
