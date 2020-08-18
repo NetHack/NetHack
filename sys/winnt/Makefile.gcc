@@ -1,4 +1,4 @@
-# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1597760766 2020/08/18 14:26:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $
+# NetHack 3.7	Makefile.gcc	$NHDT-Date: 1597761345 2020/08/18 14:35:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $
 # Copyright (c) 2010 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -1578,7 +1578,7 @@ $(O)qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_svsel.h ../win/Qt/qt_bind.h \
 		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
 #	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
-$(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
+#$(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
 #	$(CXX) $(CXXFLAGS) -o$@ $(QT)/qttableview.cpp
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_win.h ../win/Qt/qt_bind.h \
