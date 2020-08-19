@@ -1788,116 +1788,121 @@ $(O)winval.o: $(X11)\winval.c $(HACK_H) $(INCL)\winX.h
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 #cppregex.o: ..\sys\share\cppregex.cpp
 #	$(CXX) $(CXXFLAGS) -Fo$@  ..\sys\share\cppregex.cpp
-$(O)qt_bind.o: $(QT)\qt_bind.cpp $(HACK_H) $(QT)\qt_bind.h \
-		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_click.h \
-		$(QT)\qt_delay.h $(QT)\qt_xcmd.h $(QT)\qt_key.h \
-		$(QT)\qt_map.h $(QT)\qt_win.h $(QT)\qt_clust.h \
-		$(QT)\qt_menu.h $(QT)\qt_rip.h $(QT)\qt_msg.h \
-		$(QT)\qt_plsel.h $(QT)\qt_svsel.h $(QT)\qt_set.h \
-		$(QT)\qt_stat.h $(QT)\qt_icon.h $(QT)\qt_streq.h \
-		$(QT)\qt_line.h $(QT)\qt_yndlg.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h \
-		$(INCL)\dlb.h
+#---
+qt_bind.o: $(QT)\qt_bind.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_click.h $(QT)\qt_delay.h \
+		$(QT)\qt_xcmd.h $(QT)\qt_key.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_menu.h \
+		$(QT)\qt_rip.h $(QT)\qt_msg.h $(QT)\qt_plsel.h \
+		$(QT)\qt_svsel.h $(QT)\qt_set.h $(QT)\qt_stat.h \
+		$(QT)\qt_icon.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_yndlg.h $(QT)\qt_str.h $(INCL)\dlb.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_bind.cpp
-$(O)qt_click.o: $(QT)\qt_click.cpp $(HACK_H) $(QT)\qt_click.h
-	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_click.cpp \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
-$(O)qt_clust.o: $(QT)\qt_clust.cpp $(QT)\qt_clust.h
+qt_click.o: $(QT)\qt_click.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_click.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_click.cpp
+qt_clust.o: $(QT)\qt_clust.cpp $(QT)\qt_clust.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_clust.cpp
-$(O)qt_delay.o: $(QT)\qt_delay.cpp $(HACK_H) $(QT)\qt_delay.h
-	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_delay.cpp \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
-$(O)qt_glyph.o: $(QT)\qt_glyph.cpp $(HACK_H) $(INCL)\tile2x11.h \
-		$(QT)\qt_glyph.h $(QT)\qt_set.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_delay.o: $(QT)\qt_delay.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_delay.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_delay.cpp	
+qt_glyph.o: $(QT)\qt_glyph.cpp $(HACK_H) $(INCL)\tile2x11.h \
+		$(QT)\qt_pre.h $(QT)\qt_post.h $(QT)\qt_glyph.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_set.h $(QT)\qt_inv.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_glyph.cpp
-$(O)qt_icon.o: $(QT)\qt_icon.cpp $(HACK_H) $(QT)\qt_icon.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_icon.o: $(QT)\qt_icon.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_icon.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_icon.cpp
-$(O)qt_inv.o: $(QT)\qt_inv.cpp $(HACK_H) $(QT)\qt_inv.h \
-		$(QT)\qt_glyph.h $(QT)\qt_set.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_inv.o: $(QT)\qt_inv.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_inv.h $(QT)\qt_glyph.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_inv.cpp
-$(O)qt_key.o: $(QT)\qt_key.cpp $(HACK_H) $(QT)\qt_key.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_key.o: $(QT)\qt_key.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_key.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_key.cpp
-$(O)qt_line.o: $(QT)\qt_line.cpp $(HACK_H) $(QT)\qt_line.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_line.o: $(QT)\qt_line.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_line.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_line.cpp
-$(O)qt_main.o: $(QT)\qt_main.cpp $(HACK_H) \
-		$(QT)\qt_main.h $(QT)\qt_kde0.h qt_main.moc \
-		$(QT)\qt_bind.h $(QT)\qt_glyph.h $(QT)\qt_inv.h \
-		$(QT)\qt_key.h $(QT)\qt_map.h $(QT)\qt_win.h \
-		$(QT)\qt_clust.h $(QT)\qt_msg.h $(QT)\qt_set.h \
-		$(QT)\qt_stat.h $(QT)\qt_icon.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h \
-		qt_kde0.moc
+qt_main.o: $(QT)\qt_main.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		qt_main.moc $(QT)\qt_bind.h $(QT)\qt_glyph.h \
+		$(QT)\qt_inv.h $(QT)\qt_key.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_msg.h \
+		$(QT)\qt_set.h $(QT)\qt_stat.h $(QT)\qt_icon.h \
+		$(QT)\qt_str.h qt_kde0.moc
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_main.cpp
-$(O)qt_map.o: $(QT)\qt_map.cpp $(HACK_H) $(QT)\qt_map.h $(QT)\qt_win.h \
+qt_map.o: $(QT)\qt_map.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_map.h $(QT)\qt_win.h \
 		$(QT)\qt_clust.h qt_map.moc $(QT)\qt_click.h \
 		$(QT)\qt_glyph.h $(QT)\qt_xpms.h $(QT)\qt_set.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
 		$(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_map.cpp
-$(O)qt_menu.o: $(QT)\qt_menu.cpp $(HACK_H) $(QT)\qt_menu.h \
-		$(QT)\qt_win.h $(QT)\qt_rip.h qt_menu.moc \
-		$(QT)\qt_glyph.h $(QT)\qt_set.h $(QT)\qt_streq.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h \
-		$(QT)\qt_line.h $(QT)\qt_str.h
+qt_menu.o: $(QT)\qt_menu.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_menu.h $(QT)\qt_win.h \
+		$(QT)\qt_rip.h qt_menu.moc $(QT)\qt_glyph.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_menu.cpp
-$(O)qt_msg.o: $(QT)\qt_msg.cpp $(HACK_H) $(QT)\qt_msg.h $(QT)\qt_win.h \
+qt_msg.o: $(QT)\qt_msg.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_msg.h $(QT)\qt_win.h \
 		qt_msg.moc $(QT)\qt_map.h $(QT)\qt_clust.h \
-		$(QT)\qt_set.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_msg.cpp
-$(O)qt_plsel.o: $(QT)\qt_plsel.cpp $(HACK_H) $(QT)\qt_plsel.h qt_plsel.moc \
+qt_plsel.o: $(QT)\qt_plsel.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_plsel.h qt_plsel.moc \
 		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
-		$(QT)\qt_glyph.h $(QT)\qt_set.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+		$(QT)\qt_glyph.h $(QT)\qt_set.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_plsel.cpp
-$(O)qt_rip.o: $(QT)\qt_rip.cpp $(HACK_H) $(QT)\qt_rip.h \
-		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
-		$(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_rip.o: $(QT)\qt_rip.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_rip.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_rip.cpp
-$(O)qt_set.o: $(QT)\qt_set.cpp $(HACK_H) $(QT)\qt_set.h qt_set.moc \
-		$(QT)\qt_glyph.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_set.o: $(QT)\qt_set.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_set.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h qt_set.moc \
+		$(QT)\qt_glyph.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_set.cpp
-$(O)qt_stat.o: $(QT)\qt_stat.cpp $(HACK_H) $(QT)\qt_stat.h \
-		$(QT)\qt_win.h $(QT)\qt_icon.h qt_stat.moc \
-		$(QT)\qt_set.h $(QT)\qt_str.h $(QT)\qt_xpms.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_stat.o: $(QT)\qt_stat.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_stat.h $(QT)\qt_win.h \
+		$(QT)\qt_icon.h qt_stat.moc $(QT)\qt_set.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_str.h $(QT)\qt_xpms.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_stat.cpp
-$(O)qt_str.o: $(QT)\qt_str.cpp $(QT)\qt_str.h
+qt_str.o: $(QT)\qt_str.cpp $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_str.cpp
-$(O)qt_streq.o: $(QT)\qt_streq.cpp $(HACK_H) $(QT)\qt_streq.h \
-		$(QT)\qt_line.h $(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_streq.o: $(QT)\qt_streq.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_streq.cpp
-$(O)qt_svsel.o: $(QT)\qt_svsel.cpp $(HACK_H) $(QT)\qt_svsel.h \
-		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
-		$(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_svsel.o: $(QT)\qt_svsel.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_svsel.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_svsel.cpp
-$(O)qt_win.o: $(QT)\qt_win.cpp $(HACK_H) $(QT)\qt_win.h \
-		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
-		$(QT)\qt_click.h $(QT)\qt_glyph.h $(QT)\qt_inv.h \
-		$(QT)\qt_key.h $(QT)\qt_icon.h $(QT)\qt_map.h \
-		$(QT)\qt_clust.h $(QT)\qt_menu.h $(QT)\qt_rip.h \
-		$(QT)\qt_msg.h $(QT)\qt_set.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_win.o: $(QT)\qt_win.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_win.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_click.h \
+		$(QT)\qt_glyph.h $(QT)\qt_inv.h $(QT)\qt_key.h \
+		$(QT)\qt_icon.h $(QT)\qt_map.h $(QT)\qt_clust.h \
+		$(QT)\qt_menu.h $(QT)\qt_rip.h $(QT)\qt_msg.h \
+		$(QT)\qt_set.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_win.cpp
-$(O)qt_xcmd.o: $(QT)\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
-		$(QT)\qt_xcmd.h qt_xcmd.moc $(QT)\qt_bind.h \
-		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_set.h \
-		$(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_xcmd.o: $(QT)\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
+		$(QT)\qt_pre.h $(QT)\qt_post.h $(QT)\qt_xcmd.h \
+		qt_xcmd.moc $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_set.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_xcmd.cpp
-$(O)qt_yndlg.o: $(QT)\qt_yndlg.cpp $(HACK_H) $(QT)\qt_yndlg.h qt_yndlg.moc \
-		$(QT)\qt_str.h \
-		$(QT)\qt_pre.h $(QT)\qt_post.h
+qt_yndlg.o: $(QT)\qt_yndlg.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_yndlg.h qt_yndlg.moc \
+		$(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_yndlg.cpp
+#----
 $(O)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_chainin.c
 $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)

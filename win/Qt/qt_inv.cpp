@@ -85,6 +85,8 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     //      show leash-in-use on lower left side
 
 #ifdef ENHANCED_PAPERDOLL
+    if (iflags.wc_ascii_map)
+        qt_settings->doll_is_shown = false;
     if (!qt_settings->doll_is_shown)
         return;
     qt_settings->glyphs().setSize(qt_settings->dollWidth,
@@ -144,13 +146,17 @@ QSize NetHackQtInvUsageWindow::sizeHint(void) const
         // 1+X+1: one pixel border surrounding each tile in the paper doll,
         // so +1 left and +1 right, also +1 above and +1 below
 #ifdef ENHANCED_PAPERDOLL
+        if (iflags.wc_ascii_map)
+            qt_settings->doll_is_shown = false;
         if (qt_settings->doll_is_shown) {
             w = (1 + qt_settings->dollWidth + 1) * 3;
             h = (1 + qt_settings->dollHeight + 1) * 6;
         }
 #else
-        w = (1 + qt_settings->glyphs().width() + 1) * 3;
-        h = (1 + qt_settings->glyphs().height() + 1) * 6;
+        if (iflags.wc_tiles_map) {
+            w = (1 + qt_settings->glyphs().width() + 1) * 3;
+            h = (1 + qt_settings->glyphs().height() + 1) * 6;
+        }
 #endif
         return QSize(w, h);
     } else {

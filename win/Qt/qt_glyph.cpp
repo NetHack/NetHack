@@ -46,16 +46,15 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 	tile_file = iflags.wc_tile_file;
 
     if (!img.load(tile_file)) {
+        tiles_per_row = TILES_PER_ROW;
+
 	tile_file = PIXMAPDIR "/x11tiles";
 	if (!img.load(tile_file)) {
 	    QString msg;
-
             msg.sprintf("Cannot load 'nhtiles.bmp' or 'x11tiles'.");
-	    QMessageBox::warning(0, "IO Error", msg);
-            NetHackQtBind::qt_exit_nhwindows((const char *) 0);
-            nh_terminate(EXIT_FAILURE);
+            iflags.wc_ascii_map = 1;
+            iflags.wc_tiled_map = 0;
 	} else {
-	    tiles_per_row = TILES_PER_ROW;
             if (img.width() % tiles_per_row) {
                 impossible(
             "Tile file \"%s\" has %d columns, not multiple of row count (%d)",
@@ -68,8 +67,11 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 
     if (iflags.wc_tile_width)
 	tilefile_tile_W = iflags.wc_tile_width;
+    else if (iflags.wc_ascii_map)
+	tilefile_tile_W = 16;
     else
 	tilefile_tile_W = img.width() / tiles_per_row;
+
     if (iflags.wc_tile_height)
 	tilefile_tile_H = iflags.wc_tile_height;
     else
