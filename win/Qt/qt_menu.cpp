@@ -653,7 +653,7 @@ bool NetHackQtTextWindow::Destroy()
     return !isVisible();
 }
 
-void NetHackQtTextWindow::UseRIP(int how, time_t when UNUSED)
+void NetHackQtTextWindow::UseRIP(int how, time_t when)
 {
 // Code from X11 windowport
 #define STONE_LINE_LEN 16    /* # chars that fit on one line */
@@ -677,41 +677,63 @@ static char** rip_line=0;
     int line;
 
     /* Put name on stone */
-    snprintf(rip_line[NAME_LINE], STONE_LINE_LEN+1, "%s", g.plname);
+    (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
+                    "%.*s", STONE_LINE_LEN, g.plname);
 
-    /* Put $ on stone */
-    snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN+1, "%ld Au", money_cnt(g.invent));
+    /* Put $ on stone;
+       to keep things safe and relatively simple, impose an arbitrary
+       upper limit that's the same for 64 bit and 32 bit configurations
+       (also 16 bit configurations provided they use 32 bit long); the
+       upper limit for directly carried gold is somewhat less than 300K
+       due to carrying capacity, but end-of-game handling has already
+       added in gold from containers, so the amount could be much more
+       (simplest case: ~300K four times in a blessed bag of holding, so
+       ~1.2M; in addition to the hassle of getting such a thing set up,
+       it would need many gold-rich bones levels or wizard mode wishing) */
+    long cash = std::max(g.done_money, 0L);
+    /* force less that 10 digits to satisfy elaborate format checking;
+       it's arbitrary but still way, way more than could ever be needed */
+    if (cash > 999999999L)
+        cash = 999999999L;
+    (void) snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN + 1, "%ld Au", cash);
 
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
     //str_copy(buf, killer, SIZE(buf));
 
     /* Put death type on stone */
-    for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
-	int i,i0;
+    for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; ++line) {
 	char tmpchar;
+	int i, i0 = (int) strlen(dpx);
 
-	if ( (i0=strlen(dpx)) > STONE_LINE_LEN) {
-	    for(i = STONE_LINE_LEN;
-		((i0 > STONE_LINE_LEN) && i); i--)
-		if(dpx[i] == ' ') i0 = i;
-	    if(!i) i0 = STONE_LINE_LEN;
+	if (i0 > STONE_LINE_LEN) {
+	    for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
+		if (dpx[i] == ' ')
+                    i0 = i;
+	    if (!i)
+                i0 = STONE_LINE_LEN;
 	}
 	tmpchar = dpx[i0];
 	dpx[i0] = 0;
-	str_copy(rip_line[line], dpx, STONE_LINE_LEN+1);
+	(void) str_copy(rip_line[line], dpx, STONE_LINE_LEN + 1);
 	if (tmpchar != ' ') {
 	    dpx[i0] = tmpchar;
 	    dpx= &dpx[i0];
-	} else  dpx= &dpx[i0+1];
+	} else {
+            dpx= &dpx[i0 + 1];
+        }
     }
 
-    /* Put year on stone */
-    snprintf(rip_line[YEAR_LINE], STONE_LINE_LEN+1, "%4d", getyear());
+    /* Put year on stone;
+       64 bit configuration with 64 bit int is capable of overflowing
+       STONE_LINE_LEN characters; a compiler might warn about that,
+       so force a value that it can recognize as fitting within buffer's
+       range ("%4d" imposes a minimum number of digits, not a maximum) */
+    int year = (int) ((yyyymmdd(when) / 10000L) % 10000L); /* Y10K bug! */
+    (void) snprintf(rip_line[YEAR_LINE], STONE_LINE_LEN + 1, "%4d", year);
 
-    rip.setLines(rip_line,YEAR_LINE+1);
-
-    use_rip=true;
+    rip.setLines(rip_line, YEAR_LINE + 1);
+    use_rip = true;
 }
 
 void NetHackQtTextWindow::Clear()
@@ -820,8 +842,9 @@ void NetHackQtMenuOrTextWindow::StartMenu()
     if (!actual) actual=new NetHackQtMenuWindow(parent);
     actual->StartMenu();
 }
-void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-	const QString& str, unsigned itemflags)
+void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
+                                        char ch, char gch, int attr,
+                                        const QString& str, unsigned itemflags)
 {
     if (!actual) impossible("AddMenu called before we know if Menu or Text");
     actual->AddMenu(glyph,identifier,ch,gch,attr,str,itemflags);

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ $NHDT-Date: 1597707740 2020/08/17 23:42:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ $NHDT-Date: 1597967807 2020/08/20 23:56:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -383,6 +383,12 @@ Qt: "paper doll" subset of persistent inventory has undergone several changes:
 	first active light source in a previously unused slot on lower right;
 	show first leash-in-use in a previously unused slot on lower left
 Qt: paper doll inventory view was inconsistently updated during Hallucination
+Qt: when hero died, gold on tombstone only included gold in inventory, not
+	any additional gold inside carried containers; also, inventory gold
+	will be zero if bones get created for all 3.6.x and for 3.4.x+GOLDOBJ
+Qt: tombstone showed newly constructed date instead of the value set up at
+	time of death; it only shows year but that could be wrong if player
+	stared at or ignored prior --More-- for long enough on 31 December
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

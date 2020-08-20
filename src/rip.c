@@ -1,4 +1,4 @@
-/* NetHack 3.7	rip.c	$NHDT-Date: 1596498204 2020/08/03 23:43:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	rip.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -60,12 +60,10 @@ static const char *rip_txt[] = {
 };
 #define STONE_LINE_CENT 19 /* char[] element of center of stone face */
 #endif                     /* NH320_DEDICATION */
-#define STONE_LINE_LEN                               \
-    16               /* # chars that fit on one line \
-                      * (note 1 ' ' border)          \
-                      */
-#define NAME_LINE 6  /* *char[] line # for player name */
-#define GOLD_LINE 7  /* *char[] line # for amount of gold */
+#define STONE_LINE_LEN  16 /* # chars that fit on one line
+                            * (note 1 ' ' border)           */
+#define NAME_LINE  6 /* *char[] line # for player name */
+#define GOLD_LINE  7 /* *char[] line # for amount of gold */
 #define DEATH_LINE 8 /* *char[] line # for death description */
 #define YEAR_LINE 12 /* *char[] line # for year */
 
@@ -90,9 +88,9 @@ time_t when;
     register char **dp;
     register char *dpx;
     char buf[BUFSZ];
-    long year;
     register int x;
-    int line;
+    int line, year;
+    long cash;
 
     g.rip = dp = (char **) alloc(sizeof(rip_txt));
     for (x = 0; rip_txt[x]; ++x)
@@ -100,13 +98,15 @@ time_t when;
     dp[x] = (char *) 0;
 
     /* Put name on stone */
-    Sprintf(buf, "%s", g.plname);
-    buf[STONE_LINE_LEN] = 0;
+    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, g.plname);
     center(NAME_LINE, buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", g.done_money);
-    buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
+    cash = max(g.done_money, 0L);
+    /* arbitrary upper limit; practical upper limit is quite a bit less */
+    if (cash > 999999999L)
+        cash = 999999999L;
+    Sprintf(buf, "%ld Au", cash);
     center(GOLD_LINE, buf);
 
     /* Put together death description */
@@ -114,11 +114,11 @@ time_t when;
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {
-        register int i, i0;
         char tmpchar;
+        int i, i0 = (int) strlen(dpx);
 
-        if ((i0 = strlen(dpx)) > STONE_LINE_LEN) {
-            for (i = STONE_LINE_LEN; ((i0 > STONE_LINE_LEN) && i); i--)
+        if (i0 > STONE_LINE_LEN) {
+            for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
                 if (dpx[i] == ' ')
                     i0 = i;
             if (!i)
@@ -135,8 +135,8 @@ time_t when;
     }
 
     /* Put year on stone */
-    year = yyyymmdd(when) / 10000L;
-    Sprintf(buf, "%4ld", year);
+    year = (int) ((yyyymmdd(when) / 10000L) % 10000L);
+    Sprintf(buf, "%4d", year);
     center(YEAR_LINE, buf);
 
 #ifdef DUMPLOG
