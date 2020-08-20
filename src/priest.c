@@ -1,4 +1,4 @@
-/* NetHack 3.7	priest.c	$NHDT-Date: 1596498199 2020/08/03 23:43:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1597931337 2020/08/20 13:48:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -636,7 +636,7 @@ register struct monst *priest;
                    && (!(HProtection & INTRINSIC)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
-            verbalize("Thy devotion has been rewarded.");
+            verbalize("Thou hast been rewarded for thy devotion.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
                 if (!u.ublessed)
