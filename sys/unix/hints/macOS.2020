@@ -132,6 +132,13 @@ ifdef WANT_WIN_QT
 # Qt5 requires C++11
 LINK = $(CXX)
 QTCXXFLAGS += -Wno-deprecated-declarations
+ifeq "$(CCISCLANG)" ""
+# get the version of g++
+GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GPPGTEQ9)" "1"
+QTCXXFLAGS+= -Wno-format-truncation
+endif  #g++ version greater than or equal to 9
+endif  #not clang
 QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 WINSRC += $(WINQTSRC)

@@ -898,12 +898,13 @@ curses_end_screen()
 
 /*
 outrip(winid, int)
-            -- The tombstone code.  If you want the traditional code use
-               genl_outrip for the value and check the #if in rip.c.
+                -- The tombstone code.  We use genl_outrip() from rip.c
+                   instead of rolling our own.
 */
 void
 curses_outrip(winid wid UNUSED,
-              int how UNUSED)
+              int how UNUSED,
+              time_t when UNUSED)
 {
      return;
 }

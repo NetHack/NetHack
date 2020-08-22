@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintext.c	$NHDT-Date: 1596498376 2020/08/03 23:46:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.7	wintext.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,14 +489,20 @@ calculate_rip_text(int how, time_t when)
 
     char buf[BUFSZ];
     char *dpx;
-    int line;
-    long year;
+    int line, year;
+    long cash;
 
     /* Put name on stone */
     Sprintf(rip_line[NAME_LINE], "%s", g.plname);
 
     /* Put $ on stone */
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", g.done_money);
+    cash = max(g.done_money, 0L);
+    /* arbitrary upper limit; practical upper limit is quite a bit less */
+    if (cash > 999999999L)
+        cash = 999999999L;
+    Sprintf(buf, "%ld Au", cash);
+    Sprintf(rip_line[GOLD_LINE], "%ld Au", cash);
+
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
 
@@ -523,8 +529,8 @@ calculate_rip_text(int how, time_t when)
     }
 
     /* Put year on stone */
-    year = yyyymmdd(when) / 10000L;
-    Sprintf(rip_line[YEAR_LINE], "%4ld", year);
+    year = (int) ((yyyymmdd(when) / 10000L) % 10000L);
+    Sprintf(rip_line[YEAR_LINE], "%4d", year);
 }
 
 /*
