@@ -16,7 +16,7 @@ public:
 	bool Empty() const;
 	bool Full() const;
 
-	void Put(int k, int ascii, int state);
+	void Put(int k, int ascii, uint state);
 	void Put(char a);
 	void Put(const char* str);
 	int GetKey();
