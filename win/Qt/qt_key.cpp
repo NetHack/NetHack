@@ -25,7 +25,7 @@ bool NetHackQtKeyBuffer::Full() const { return (in+1)%maxkey==out; }
 
 void NetHackQtKeyBuffer::Put(int k, int a, uint kbstate)
 {
-    //raw_fprintf("k:%3d a:%3d s:0x%08x\n", k, a, kbstate);
+    //raw_printf("k:%3d a:%3d s:0x%08x", k, a, kbstate);
     if ( Full() ) return;	// Safety
     key[in] = k;
     ascii[in] = a;
