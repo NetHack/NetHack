@@ -57,17 +57,17 @@ matrix:
         - make fetch-lua LUA_VERSION=$LUA_VERSION
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
-    - name: linux-xenial-gcc-nocommon
-      os: linux
-      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-      dist: xenial
-      compiler: gcc
-      script:
-        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
-        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-        - make fetch-lua LUA_VERSION=$LUA_VERSION
-        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-        - make install
+#    - name: linux-xenial-gcc-nocommon
+#      os: linux
+#      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+#      dist: xenial
+#      compiler: gcc
+#      script:
+#        - echo "CFLAGS+=-fno-common" >>sys/unix/hints/$HINTS
+#        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+#        - make fetch-lua LUA_VERSION=$LUA_VERSION
+#        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+#        - make install
     - name: linux-focal-gcc9-win-all
       os: linux
       env: HINTS=linux.2020 LUA_VERSION=5.4.0
