@@ -1218,10 +1218,18 @@ do_date()
 #endif
     Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n", version.entity_count,
             ul_sfx);
+#ifndef WASM
     Fprintf(ofp, "#define VERSION_SANITY2 0x%08lx%s\n", version.struct_sizes1,
             ul_sfx);
     Fprintf(ofp, "#define VERSION_SANITY3 0x%08lx%s\n", version.struct_sizes2,
             ul_sfx);
+#else /* WASM */
+    Fprintf(ofp, "#define VERSION_SANITY2 0x%08llx%s\n", version.struct_sizes1,
+            ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY3 0x%08llx%s\n", version.struct_sizes2,
+            ul_sfx);
+#endif /* !WASM */
+
     Fprintf(ofp, "\n");
     Fprintf(ofp, "#define VERSION_STRING \"%s\"\n", version_string(buf, "."));
     Fprintf(ofp, "#define VERSION_ID \\\n \"%s\"\n",

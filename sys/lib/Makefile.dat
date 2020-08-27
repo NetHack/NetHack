@@ -1,0 +1,136 @@
+#      NetHack Datafiles Makefile.dat $NHDT-Date: 1596486993 2020/08/03 20:36:33 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
+# Copyright (c) 2018 by Pasi Kallinen
+# NetHack may be freely redistributed.  See license for details.
+
+# Root of source tree:
+NHSROOT=..
+
+# for Atari
+# SHELL=E:/GEMINI2/MUPFEL.TTP
+# UUDECODE=uudecode
+
+VARDAT = bogusmon data engrave epitaph rumors oracles options
+
+all:	$(VARDAT) spec_levs quest_levs
+
+../util/makedefs:
+	(cd ../util ; $(MAKE) makedefs)
+
+../util/tile2x11:
+	(cd ../util ; $(MAKE) tile2x11)
+
+../util/tile2beos:
+	(cd ../util ; $(MAKE) tile2beos)
+
+../util/tile2bmp:
+	(cd ../util ; $(MAKE) tile2bmp)
+
+x11tiles: ../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
+				../win/share/other.txt \
+                                ../win/share/monsters.txt
+	../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
+				../win/share/other.txt \
+                                -grayscale ../win/share/monsters.txt
+
+beostiles: ../util/tile2beos ../win/share/monsters.txt \
+				../win/share/objects.txt \
+				../win/share/other.txt
+	../util/tile2beos ../win/share/monsters.txt \
+				../win/share/objects.txt \
+				../win/share/other.txt
+
+nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt \
+				../win/share/objects.txt \
+				../win/share/other.txt
+	../util/tile2bmp $@
+
+NetHack.ad: ../win/X11/NetHack.ad
+# handle "#define foo bar" -lines
+	grep ^#define ../win/X11/NetHack.ad | \
+		sed -e 's/^#define/s/g' -e 's/  */ /g' \
+		    -e 's/$$/ g/g' > NetHack.ad.tmp
+	grep -v ^#define ../win/X11/NetHack.ad | \
+		sed -f NetHack.ad.tmp > NetHack.ad
+	-rm -f NetHack.ad.tmp
+
+pet_mark.xbm: ../win/X11/pet_mark.xbm
+	cp ../win/X11/pet_mark.xbm pet_mark.xbm
+
+pilemark.xbm: ../win/X11/pilemark.xbm
+	cp ../win/X11/pilemark.xbm pilemark.xbm
+
+rip.xpm: ../win/X11/rip.xpm
+	cp ../win/X11/rip.xpm rip.xpm
+
+mapbg.xpm: ../win/gnome/mapbg.xpm
+	cp ../win/gnome/mapbg.xpm mapbg.xpm
+
+nhsplash.xpm: ../win/share/nhsplash.xpm
+	cp ../win/share/nhsplash.xpm nhsplash.xpm
+
+nethack.icns: ../win/share/nhicns.uu
+	$(UUDECODE) ../win/share/nhicns.uu
+
+Info.plist: ../win/Qt/Info.pli
+	cp ../win/Qt/Info.pli Info.plist
+
+../util/tile2img.ttp:
+	(cd ../util ; $(MAKE) tile2img.ttp)
+
+../util/xpm2img.ttp:
+	(cd ../util ; $(MAKE) xpm2img.ttp)
+nh16.img: ../util/tile2img.ttp ../win/share/monsters.txt \
+				../win/share/objects.txt ../win/share/other.txt
+	../util/tile2img.ttp nh16.img
+
+rip.img: ../util/xpm2img.ttp
+	../util/xpm2img.ttp ../win/X11/rip.xpm rip.img
+title.img:
+	# cp ../win/gem/title.img title.img
+	$(UUDECODE) ../win/gem/title.uu
+
+GEM_RSC.RSC:
+	# cp ../win/gem/GEM_RSC.RSC GEM_RSC.RSC
+	$(UUDECODE) ../win/gem/gem_rsc.uu
+
+
+data:	data.base ../util/makedefs
+	../util/makedefs -d
+
+rumors:	rumors.tru rumors.fal ../util/makedefs
+	../util/makedefs -r
+
+oracles:	oracles.txt ../util/makedefs
+	../util/makedefs -h
+
+engrave:	engrave.txt ../util/makedefs
+	../util/makedefs -s
+
+epitaph:	epitaph.txt ../util/makedefs
+	../util/makedefs -s
+
+bogusmon:	bogusmon.txt ../util/makedefs
+	../util/makedefs -s
+
+# note: 'options' should have already been made when include/date.h was created
+options:	../util/makedefs
+	../util/makedefs -v
+
+# these don't actually do anything useful now that levcomp and dngcomp are gone
+spec_levs:
+	touch spec_levs
+quest_levs:
+	touch quest_levs
+
+# gitinfo.txt is optionally made by src/Makefile when creating date.h
+# spec_levs and quest_levs are empty marker files to control 'make' actions
+clean:
+	-rm -f spec_levs quest_levs gitinfo.txt
+
+spotless: clean
+	-rm -f nhdat $(VARDAT) \
+		x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm \
+		rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad \
+		nhsplash.xpm nhtiles.bmp beostiles
+
+#eof#
