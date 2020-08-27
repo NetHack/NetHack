@@ -47,6 +47,10 @@ endif
 endif
 endif
 
+ifdef WANT_LIBNH
+WANT_DEFAULT=shim
+endif
+
 # Make sure that a default interface is specified; this doesn't guarantee
 # sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but
 # 'makedefs -v' would notice, complain, and quit causing 'make' to quit.

@@ -1,0 +1,20 @@
+{
+  "name": "@neth4ck/neth4ck",
+  "version": "1.0.0",
+  "description": "The original NetHack rogue-like game built as a WebAssembly module",
+  "main": "src/nethackShim.js",
+  "scripts": {
+    "test": "node test/test.js",
+    "clean": "rm ./build/nethack.js; rm ./build/nethack.wasm; true",
+    "build": "cp ../../../src/nethack.js ../../../src/nethack.wasm ./build",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "nethack",
+    "rogue",
+    "rogue-like",
+    "game"
+  ],
+  "author": "Adam Powers <apowers@ato.ms>",
+  "license": "SEE LICENSE IN LICENSE.md"
+}

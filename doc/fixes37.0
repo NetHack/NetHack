@@ -597,6 +597,8 @@ fix the "stuck pets" issue (github #329)
 allow themed room subrooms to be filled (github #347)
 allow rereading spellbooks to refresh memory at any time (github #261)
 allow themed rooms constrained by level difficulty (github #344)
+add a varied form of LIBNH nethack library contribution (github #385)
+add cross-compile to WASM (github #385)
 
 
 Code Cleanup and Reorganization

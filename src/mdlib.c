@@ -131,7 +131,7 @@ static struct win_info window_opts[] = {
     { "mswin", "Windows GUI", TRUE },
 #endif
 #ifdef SHIM_GRAPHICS
-    { "shim", "Nethack Library Windowing Shim", TRUE },
+    { "shim", "NetHack Library Windowing Shim", TRUE },
 #endif
 
 #if 0  /* remainder have been retired */

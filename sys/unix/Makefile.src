@@ -300,6 +300,12 @@ WINGNOMEOBJ =
 WINGEMSRC =
 WINGEMOBJ =
 
+# Files for Shim windowing interface for libnethack -- doesn't do anything,
+# just passes along the API calls to the library
+#
+WINSHIMSRC = ../win/shim/winshim.c
+WINSHIMOBJ = winshim.o
+
 #
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
@@ -524,7 +530,7 @@ SYSCXXSRC = ../sys/share/cppregex.cpp
 GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) $(WINSHIMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
