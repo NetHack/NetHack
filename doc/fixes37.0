@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ $NHDT-Date: 1597967807 2020/08/20 23:56:47 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.290 $ $NHDT-Date: 1598570054 2020/08/27 23:14:14 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -247,6 +247,7 @@ leashing or unleashing pets wasn't updating persistent inventory window
 end of game inventory disclosure passed an inappropriate argument to the
 	inventory display routine; not noticeable for tty and curses,
 	noticeable but not harmful for X11, and slightly harmful for Qt
+turning into slime rendered hero as slime one turn too soon
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
