@@ -64,7 +64,7 @@
  * Define the default window system.  This should be one that is compiled
  * into your system (see defines above).  Known window systems are:
  *
- *      tty, X11, mac, amii, BeOS, Qt, Gem, Gnome
+ *      tty, X11, mac, amii, BeOS, Qt, Gem, Gnome, shim
  */
 
 /* MAC also means MAC windows */
@@ -141,6 +141,12 @@
 #ifdef CURSES_GRAPHICS
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "curses"
+#endif
+#endif
+
+#ifdef SHIM_GRAPHICS
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "shim"
 #endif
 #endif
 
