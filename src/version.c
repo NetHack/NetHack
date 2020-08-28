@@ -265,7 +265,7 @@ boolean pastebuf;
     raw_printf("%s", buf2);
 
     if (pastebuf) {
-#ifdef RUNTIME_PASTEBUF_SUPPORT
+#if defined(RUNTIME_PASTEBUF_SUPPORT) && !defined(LIBNH)
         /*
          * Call a platform/port-specific routine to insert the
          * version information into a paste buffer. Useful for
