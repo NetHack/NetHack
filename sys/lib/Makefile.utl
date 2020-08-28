@@ -148,9 +148,6 @@ CXX_V1 = @echo "[CXX] $<"; $(ACTUAL_CXX)
 CXX = $(CXX_V$(QUIETCC))
 
 CFLAGS+=-I../include
-ifdef WANT_WASM
-CFLAGS+=-DWASM
-endif
 
 # LD and LINK might be based on invoking CC and may not be able to substitute
 # for QUIETCC, so feedback from them is handled differently (via $AT)
