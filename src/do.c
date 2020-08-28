@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1596498158 2020/08/03 23:42:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1598575088 2020/08/28 00:38:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1944,7 +1944,7 @@ long timeout UNUSED;
 
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
-    if ((mptr->mflags3 & M3_DISPLACES) != 0 && body->where == OBJ_FLOOR
+    if (is_displacer(mptr) && body->where == OBJ_FLOOR
         && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);

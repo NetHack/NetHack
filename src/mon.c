@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1596498185 2020/08/03 23:43:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.343 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1598575089 2020/08/28 00:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1742,8 +1742,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
        as high as the attacker, don't let attacker do so, otherwise
        they might just end up swapping places again when defender
        gets its chance to move */
-    if ((pa->mflags3 & M3_DISPLACES) != 0
-        && ((pd->mflags3 & M3_DISPLACES) == 0 || magr->m_lev > mdef->m_lev)
+    if (is_displacer(pa) && (!is_displacer(pd) || magr->m_lev > mdef->m_lev)
         /* no displacing grid bugs diagonally */
         && !(magr->mx != mdef->mx && magr->my != mdef->my
              && NODIAG(monsndx(pd)))
