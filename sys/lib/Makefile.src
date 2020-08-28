@@ -600,6 +600,7 @@ $(WASM_DATA_DIR):
 	touch $(WASM_DATA_DIR)/record
 	touch $(WASM_DATA_DIR)/logfile
 	touch $(WASM_DATA_DIR)/xlogfile
+	( cd ..; $(MAKE) dlb )
 	( cd ..; $(MAKE) dofiles-dlb )
 	cp ../sys/lib/sysconf $(WASM_DATA_DIR)/sysconf
 
@@ -767,7 +768,7 @@ tags: $(CSOURCES)
 	@( cd ../util ; $(MAKE) tags )
 
 clean:
-	-rm -f *.o $(HACK_H) $(CONFIG_H) $(WASM_TARGET) $(WASM_TARGET:.js=.wasm) $(LIBNH_TARGET)
+	-rm -f *.o $(HACK_H) $(CONFIG_H) $(WASM_TARGET) $(WASM_TARGET:.js=.wasm) $(WASM_TARGET:.js=.data) $(LIBNH_TARGET)
 	-rm -rf $(WASM_DATA_DIR)
 
 spotless: clean

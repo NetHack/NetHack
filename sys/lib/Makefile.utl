@@ -95,6 +95,7 @@ NHSROOT=..
 
 #CFLAGS = -O -I../include
 #LFLAGS =
+CFLAGS+=-DNOTTYGRAPHICS -DSHIM_GRAPHICS -DDEFAULT_WINDOW_SYS=\"shim\"
 
 # -lm required by lua
 LFLAGS += -lm

@@ -211,7 +211,7 @@ title.img:
 check-dlb: options
 	@if egrep -s librarian dat/options ; then $(MAKE) dlb ; else true ; fi
 
-dlb:
+dlb: $(VARDATD)
 	( cd util ; $(MAKE) dlb )
 	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
 
@@ -320,13 +320,11 @@ clean:
 	( cd src ; $(MAKE) clean )
 	( cd util ; $(MAKE) clean )
 	( cd dat ; $(MAKE) clean )
-	( cd doc ; $(MAKE) clean )
 	( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
-spotless::
+spotless: clean
 	( cd src ; $(MAKE) spotless )
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )
-	( cd doc ; $(MAKE) spotless )
