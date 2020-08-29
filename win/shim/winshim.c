@@ -59,8 +59,8 @@ void name fn_args { \
 #else /* !__EMSCRIPTEN__ */
 #define A2P
 #define P2V
-#define DECLCB(ret_type, name, args, fmt, ...) \
-ret_type name args { \
+#define DECLCB(ret_type, name, fn_args, fmt, ...) \
+ret_type name fn_args { \
     ret_type ret; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
@@ -68,7 +68,8 @@ ret_type name args { \
     return ret; \
 }
 
-void name args { \
+#define VDECLCB(name, fn_args, fmt, ...) \
+void name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
     shim_graphics_callback(#name, NULL, fmt, __VA_ARGS__); \
