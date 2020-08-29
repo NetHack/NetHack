@@ -87,7 +87,7 @@ function setGraphicsCallback() {
 // this is the "shim graphics" callback function
 // it gets called every time something needs to be displayed
 // or input needs to be gathered from the user
-function windowCallback(name, fmt, retPtr, args) {
+function windowCallback(name, retPtr, fmt, args) {
     name = Module.UTF8ToString(name);
     fmt = Module.UTF8ToString(fmt);
     let argTypes = fmt.split("");
