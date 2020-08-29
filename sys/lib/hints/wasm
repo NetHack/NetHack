@@ -18,13 +18,14 @@ EMCC_LFLAGS+=-s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["_nhmain"]' -O3
 EMCC_LFLAGS+=-s MODULARIZE
 EMCC_LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_stub_graphics_set_callback"]'
-EMCC_LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString"]'
+EMCC_LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "getValue"]'
 EMCC_LFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0
 EMCC_LFLAGS+=--embed-file wasm-data@/
 
 # WASM C flags
 EMCC_CFLAGS=
-EMCC_CFLAGS+=-Wall -Werror
+EMCC_CFLAGS+=-Wall
+EMCC_CFLAGS+=-Werror
 EMCC_DEBUG_CFLAGS+=-s ASSERTIONS=1
 EMCC_DEBUG_CFLAGS+=-s STACK_OVERFLOW_CHECK=2
 EMCC_DEBUG_CFLAGS+=-s SAFE_HEAP=1
@@ -32,16 +33,17 @@ EMCC_DEBUG_CFLAGS+=-s LLD_REPORT_UNDEFINED
 EMCC_PROD_CFLAGS+=-O3
 
 # Nethack C flags
-CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
 CFLAGS+=-g -I../include -DNOTPARMDECL
-CFLAGS+=-Wall -Werror
+CFLAGS+=-Wall
+CFLAGS+=-Werror
 CFLAGS+=-DGCC_WARN
 
 # NetHack sources control
 CFLAGS+=-DDLB
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+=-DDLB
-CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+#CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
 CFLAGS+=-DNOMAIL
 
 ifdef WASM_DEBUG

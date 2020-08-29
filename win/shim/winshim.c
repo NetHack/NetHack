@@ -7,6 +7,80 @@
 #include "hack.h"
 
 #ifdef SHIM_GRAPHICS
+#include <stdarg.h>
+/* for cross-compiling to WebAssembly (WASM) */
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
+#define SHIM_DEBUG
+
+#ifndef __EMSCRIPTEN__
+typedef void(*stub_callback_t)(const char *name, const char *fmt, void *ret_ptr, ...);
+#else /* __EMSCRIPTEN__ */
+/* WASM can't handle a variadic callback, so we pass back an array of pointers instead... */
+typedef void(*stub_callback_t)(const char *name, const char *fmt, void *ret_ptr, void *args[]);
+#endif /* !__EMSCRIPTEN__ */
+
+/* this is the primary interface to shim graphics,
+ * call this function with your declared callback function
+ * and you will receive all the windowing calls
+ */
+static stub_callback_t shim_graphics_callback = NULL;
+#ifdef __EMSCRIPTEN__
+  EMSCRIPTEN_KEEPALIVE
+#endif
+void stub_graphics_set_callback(stub_callback_t cb) {
+    shim_graphics_callback = cb;
+}
+
+#ifdef __EMSCRIPTEN__
+// A2P = Argument to Pointer
+#define A2P &
+// P2V = Pointer to Void
+#define P2V (void *)
+#define DECLCB(ret_type, name, fn_args, fmt, ...) \
+ret_type name fn_args { \
+    void *args[] = { __VA_ARGS__ }; \
+    ret_type ret; \
+    debugf("SHIM GRAPHICS: " #name "\n"); \
+    if (!shim_graphics_callback) return; \
+    shim_graphics_callback(#name, fmt, (void *)&ret, args); \
+    return ret; \
+}
+
+#define VDECLCB(name, fn_args, fmt, ...) \
+void name fn_args { \
+    void *args[] = { __VA_ARGS__ }; \
+    debugf("SHIM GRAPHICS: " #name "\n"); \
+    if (!shim_graphics_callback) return; \
+    shim_graphics_callback(#name, fmt, NULL, args); \
+}
+#else /* !__EMSCRIPTEN__ */
+#define A2P
+#define P2V
+#define DECLCB(ret_type, name, args, fmt, ...) \
+ret_type name args { \
+    ret_type ret; \
+    debugf("SHIM GRAPHICS: " #name "\n"); \
+    if (!shim_graphics_callback) return; \
+    shim_graphics_callback(#name, fmt, (void *)&ret, __VA_ARGS__); \
+    return ret; \
+}
+
+void name args { \
+    debugf("SHIM GRAPHICS: " #name "\n"); \
+    if (!shim_graphics_callback) return; \
+    shim_graphics_callback(#name, fmt, NULL, __VA_ARGS__); \
+}
+#endif /* __EMSCRIPTEN__ */
+
+#ifdef SHIM_DEBUG
+#define debugf printf
+#else /* !SHIM_DEBUG */
+#define debugf(...)
+#endif /* SHIM_DEBUG */
+
 
 enum win_types {
     WINSTUB_MESSAGE = 1,
@@ -29,6 +103,7 @@ name args { \
 #define DECL(name, args) \
 void name args;
 
+// void DECLCB(shim_init_nhwindows,(int *argcp, char **argv), "pp", argcp, argv)
 VSTUB(shim_init_nhwindows,(int *argcp, char **argv))
 VSTUB(shim_player_selection,(void))
 VSTUB(shim_askname,(void))
@@ -40,8 +115,10 @@ winid STUB(shim_create_nhwindow, WINSTUB_MAP, (int a))
 VSTUB(shim_clear_nhwindow,(winid a))
 VSTUB(shim_display_nhwindow,(winid a, BOOLEAN_P b))
 VSTUB(shim_destroy_nhwindow,(winid a))
-VSTUB(shim_curs,(winid a, int x, int y))
-DECL(shim_putstr,(winid w, int attr, const char *str))
+VDECLCB(shim_curs,(winid a, int x, int y), "viii", A2P a, A2P x, A2P y)
+// VSTUB(shim_curs,(winid a, int x, int y))
+// DECL(shim_putstr,(winid w, int attr, const char *str))
+VDECLCB(shim_putstr,(winid w, int attr, const char *str), "viis", A2P w, A2P attr, P2V str)
 VSTUB(shim_display_file,(const char *a, BOOLEAN_P b))
 VSTUB(shim_start_menu,(winid w, unsigned long mbehavior))
 VSTUB(shim_add_menu,(winid a, int b, const ANY_P *c, CHAR_P d, CHAR_P e, int f, const char *h, unsigned int k))
@@ -53,8 +130,10 @@ VSTUB(shim_mark_synch,(void))
 VSTUB(shim_wait_synch,(void))
 VSTUB(shim_cliparound,(int a, int b))
 VSTUB(shim_update_positionbar,(char *a))
-DECL(shim_print_glyph,(winid w, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph))
-DECL(shim_raw_print,(const char *str))
+// DECL(shim_print_glyph,(winid w, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph))
+VDECLCB(shim_print_glyph,(winid w, int x, int y, int glyph, int bkglyph), "viiiii", A2P w, A2P x, A2P y, A2P glyph, A2P bkglyph)
+// DECL(shim_raw_print,(const char *str))
+VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VSTUB(shim_raw_print_bold,(const char *a))
 int STUB(shim_nhgetch,0,(void))
 int STUB(shim_nh_poskey,0,(int *a, int *b, int *c))
@@ -140,22 +219,22 @@ struct window_procs shim_procs = {
     genl_can_suspend_yes,
 };
 
-void shim_print_glyph(winid w, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph) {
-    /* map glyph to character and color */
-    // (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
+// void shim_print_glyph(winid w, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph) {
+//     /* map glyph to character and color */
+//     // (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
 
-    fprintf(stdout, "shim_print_glyph (%d,%d): %c\n", x,y,(char)glyph);
-    fflush(stdout);
-}
+//     fprintf(stdout, "shim_print_glyph (%d,%d): %c\n", x,y,(char)glyph);
+//     fflush(stdout);
+// }
 
-void shim_raw_print(const char *str) {
-    fprintf(stdout, "shim_raw_print: %s\n", str);
-    fflush(stdout);
-}
+// void shim_raw_print(const char *str) {
+//     fprintf(stdout, "shim_raw_print: %s\n", str);
+//     fflush(stdout);
+// }
 
-void shim_putstr(winid w, int attr, const char *str) {
-    fprintf(stdout, "shim_putstr (win %d): %s\n", w, str);
-    fflush(stdout);
-}
+// void shim_putstr(winid w, int attr, const char *str) {
+//     fprintf(stdout, "shim_putstr (win %d): %s\n", w, str);
+//     fflush(stdout);
+// }
 
 #endif /* SHIM_GRAPHICS */
