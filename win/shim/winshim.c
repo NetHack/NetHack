@@ -16,10 +16,10 @@
 #define SHIM_DEBUG
 
 #ifndef __EMSCRIPTEN__
-typedef void(*stub_callback_t)(const char *name, const char *fmt, void *ret_ptr, ...);
+typedef void(*stub_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
 #else /* __EMSCRIPTEN__ */
 /* WASM can't handle a variadic callback, so we pass back an array of pointers instead... */
-typedef void(*stub_callback_t)(const char *name, const char *fmt, void *ret_ptr, void *args[]);
+typedef void(*stub_callback_t)(const char *name, void *ret_ptr, const char *fmt, void *args[]);
 #endif /* !__EMSCRIPTEN__ */
 
 /* this is the primary interface to shim graphics,
@@ -45,7 +45,7 @@ ret_type name fn_args { \
     ret_type ret; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, fmt, (void *)&ret, args); \
+    shim_graphics_callback(#name, (void *)&ret, fmt, args); \
     return ret; \
 }
 
@@ -54,7 +54,7 @@ void name fn_args { \
     void *args[] = { __VA_ARGS__ }; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, fmt, NULL, args); \
+    shim_graphics_callback(#name, NULL, fmt, args); \
 }
 #else /* !__EMSCRIPTEN__ */
 #define A2P
@@ -64,14 +64,14 @@ ret_type name args { \
     ret_type ret; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, fmt, (void *)&ret, __VA_ARGS__); \
+    shim_graphics_callback(#name, (void *)&ret, fmt, __VA_ARGS__); \
     return ret; \
 }
 
 void name args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, fmt, NULL, __VA_ARGS__); \
+    shim_graphics_callback(#name, NULL, fmt, __VA_ARGS__); \
 }
 #endif /* __EMSCRIPTEN__ */
 
