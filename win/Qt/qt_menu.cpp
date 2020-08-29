@@ -215,7 +215,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 
     how=h;
 
-    ok->setEnabled(how!=PICK_ONE);ok->setDefault(how!=PICK_ONE);
+    ok->setEnabled(how!=PICK_ONE); ok->setDefault(how!=PICK_ONE);
     cancel->setEnabled(true);
     all->setEnabled(how==PICK_ANY);
     none->setEnabled(how==PICK_ANY);
@@ -499,7 +499,8 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 	    InputCount(key);
 	else {
 	    for (int i=0; i<itemcount; i++) {
-		if ((unsigned int) itemlist[i].ch == key || (unsigned int) itemlist[i].gch == key)
+		if ((unsigned int) itemlist[i].ch == key
+                    || (unsigned int) itemlist[i].gch == key)
 		    ToggleSelect(i);
 	    }
 	}
@@ -511,32 +512,45 @@ void NetHackQtMenuWindow::All()
     if (how != PICK_ANY)
         return;
 
+    bool didcheck = false;
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(true);
+	if (cb != NULL) {
+            cb->setChecked(true);
+            didcheck = true;
+        }
     }
+    if (didcheck)
+        table->repaint();
 }
 void NetHackQtMenuWindow::ChooseNone()
 {
     if (how != PICK_ANY)
         return;
 
+    bool diduncheck = false;
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(false);
+	if (cb != NULL) {
+            cb->setChecked(false);
+            diduncheck = true;
+        }
     }
+    if (diduncheck)
+        table->repaint();
 }
 void NetHackQtMenuWindow::Invert()
 {
     if (how != PICK_ANY)
         return;
 
+    boolean didtoggle = false;
     for (int i=0; i<itemcount; i++) {
         if (!menuitem_invert_test(0, itemlist[i].itemflags,
                                   itemlist[i].selected))
@@ -546,8 +560,13 @@ void NetHackQtMenuWindow::Invert()
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(cb->checkState() == Qt::Unchecked);
+	if (cb != NULL) {
+            cb->setChecked(cb->checkState() == Qt::Unchecked);
+            didtoggle = true;
+        }
     }
+    if (didtoggle)
+        table->repaint();
 }
 void NetHackQtMenuWindow::Search()
 {
@@ -556,6 +575,7 @@ void NetHackQtMenuWindow::Search()
 
     NetHackQtStringRequestor requestor(this, "Search for:");
     char line[256];
+    line[0] = '\0'; /* for EDIT_GETLIN */
     if (requestor.Get(line)) {
 	for (int i=0; i<itemcount; i++) {
 	    if (itemlist[i].str.contains(line))
@@ -569,8 +589,8 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
 	if (cb == NULL) return;
 
-	cb->setChecked((counting && !countstr.isEmpty())
-		    || cb->checkState() == Qt::Unchecked);
+        cb->setChecked((counting && !countstr.isEmpty())
+                       || cb->checkState() == Qt::Unchecked);
 
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText(countstr);
@@ -579,7 +599,9 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 
 	if (how==PICK_ONE) {
 	    accept();
-	}
+        } else {
+            table->repaint();
+        }
     }
 }
 
