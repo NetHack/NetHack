@@ -46,7 +46,7 @@ extern int qt_compact_mode;
 
 namespace nethack_qt_ {
 
-// XXX Should be from Options
+// XXX Should be from Options [or from Qt Settings (aka Preferences)].
 //
 // XXX Hmm.  Tricky part is that perhaps some macros should only be active
 // XXX       when a key is about to be gotten.  For example, the user could
@@ -55,13 +55,13 @@ namespace nethack_qt_ {
 //
 static struct key_macro_rec {
     int key;
-    int state;
-    const char* macro;
+    uint state;
+    const char *macro, *numpad_macro;
 } key_macro[]={
-    { Qt::Key_F1, 0, "n100." }, // Rest (x100)
-    { Qt::Key_F2, 0, "n20s" },  // Search (x20)
-    { Qt::Key_Tab, 0, "\001" },
-    { 0, 0, 0 }
+    { Qt::Key_F1,  0U, "100.", "n100." }, // Rest (x100)
+    { Qt::Key_F2,  0U, "20s",  "n20s"  }, // Search (x20)
+    { Qt::Key_Tab, 0U, "\001", "\001"  }, // ^A (Do-again)
+    { 0, 0U, (const char *) 0, (const char *) 0 }
 };
 
 NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
@@ -75,8 +75,9 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 {
     QPixmap pm("nhsplash.xpm");
     if ( iflags.wc_splash_screen && !pm.isNull() ) {
-	splash = new QFrame(NULL,
-	    Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint );
+        splash = new QFrame(NULL, (Qt::FramelessWindowHint
+                                   | Qt::X11BypassWindowManagerHint
+                                   | Qt::WindowStaysOnTopHint));
 	QVBoxLayout *vb = new QVBoxLayout(splash);
 	QLabel *lsplash = new QLabel(splash);
 	vb->addWidget(lsplash);
@@ -534,19 +535,25 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
         message = question;
     }
 
-    if (qt_settings->ynInMessages() && WIN_MESSAGE!=WIN_ERR) {
+    if (qt_settings->ynInMessages() && WIN_MESSAGE != WIN_ERR) {
 	// Similar to X11 windowport `slow' feature.
 
 	int result = -1;
 
 #ifdef USE_POPUPS
         if (choices) {
-            if (!strcmp(choices,"ynq"))
-                result = QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2);
-            else if (!strcmp(choices,"yn"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1);
+            if (!strcmp(choices, "ynq"))
+                result = QMessageBox::information (NetHackQtBind::mainWidget(),
+                                                   "NetHack", question,
+                                                 "&Yes", "&No", "&Quit", 0, 2);
+            else if (!strcmp(choices, "yn"))
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),
+                                                  "NetHack", question,
+                                                  "&Yes", "&No", 0, 1);
             else if (!strcmp(choices, "rl"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Right", "&Left",0,1);
+                result = QMessageBox::information(NetHackQtBind::mainWidget(),
+                                                  "NetHack", question,
+                                                  "&Right", "&Left", 0, 1);
 
             if (result >= 0 && result < strlen(choices)) {
                 char yn_resp = choices[result];
@@ -686,46 +693,48 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 {
     // Ignore Alt-key navigation to menubar, it's annoying when you
     // use Alt-Direction to move around.
-    if ( main && event->type()==QEvent::KeyRelease && main==receiver
-	    && ((QKeyEvent*)event)->key() == Qt::Key_Alt )
-	return true;
+    if (main && receiver == main && event->type() == QEvent::KeyRelease
+        && ((QKeyEvent *) event)->key() == Qt::Key_Alt)
+        return true;
 
-    bool result=QApplication::notify(receiver,event);
-    if (event->type()==QEvent::KeyPress) {
-	QKeyEvent* key_event=(QKeyEvent*)event;
+    bool result = QApplication::notify(receiver, event);
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *key_event = (QKeyEvent *) event;
 
-	if (!key_event->isAccepted()) {
-	    const int k=key_event->key();
-	    bool macro=false;
-	    for (int i=0; !macro && key_macro[i].key; i++) {
-		if (key_macro[i].key==k
-		 && ((key_macro[i].state&key_event->modifiers()) == (unsigned int) key_macro[i].state))
-		{
-		    keybuffer.Put(key_macro[i].macro);
-		    macro=true;
-		}
-	    }
-	    QString key=key_event->text();
-	    QChar ch = !key.isEmpty() ? key.at(0) : 0;
-	    if (ch > 128) ch = 0;
-	    if ( ch == 0 && (key_event->modifiers() & Qt::ControlModifier) ) {
-		// On Mac, ascii control codes are not sent, force them.
-		if ( k>=Qt::Key_A && k<=Qt::Key_Z )
-		    ch = k - Qt::Key_A + 1;
-	    }
-	    if (!macro && ch != 0) {
-		bool alt = (key_event->modifiers()&Qt::AltModifier) ||
-		   (k >= Qt::Key_0 && k <= Qt::Key_9 && (key_event->modifiers()&Qt::ControlModifier));
-		keybuffer.Put(key_event->key(),ch.cell() + (alt ? 128 : 0),
-		    key_event->modifiers());
-		key_event->accept();
-		result=true;
-	    }
-
-	    if (ch != 0 || macro) {
-		qApp->exit();
-	    }
-	}
+        if (!key_event->isAccepted()) {
+            Qt::KeyboardModifiers mod = key_event->modifiers();
+            const int k = key_event->key();
+            for (int i = 0; key_macro[i].key; i++) {
+                if (key_macro[i].key == k
+                    && ((key_macro[i].state & mod) == key_macro[i].state)) {
+                    // matched macro; put its expansion into the input buffer
+                    keybuffer.Put(!::iflags.num_pad ? key_macro[i].macro
+                                  : key_macro[i].numpad_macro);
+                    key_event->accept();
+                    qApp->exit();
+                    return true;
+                }
+            }
+            QString key = key_event->text();
+            QChar ch = !key.isEmpty() ? key.at(0) : 0;
+            if (ch > 128)
+                ch = 0;
+            // on OSX, ascii control codes are not sent, force them
+            if ((mod & Qt::ControlModifier) != 0) {
+                if (ch == 0 && k >= Qt::Key_A && k <= Qt::Key_Underscore)
+                    ch = (QChar) (k - (Qt::Key_A - 1));
+            }
+            // if we have a valid character, queue it up
+            if (ch != 0) {
+                bool alt = ((mod & Qt::AltModifier) != 0
+                            || (k >= Qt::Key_0 && k <= Qt::Key_9
+                                && (mod & Qt::ControlModifier) != 0));
+                keybuffer.Put(k, ch.cell() + (alt ? 128 : 0), (uint) mod);
+                key_event->accept();
+                qApp->exit();
+                result = true;
+            }
+        }
     }
     return result;
 }
