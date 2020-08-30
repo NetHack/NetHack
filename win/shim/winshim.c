@@ -16,21 +16,21 @@
 #undef SHIM_DEBUG
 
 #ifndef __EMSCRIPTEN__
-typedef void(*stub_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
+typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
 #else /* __EMSCRIPTEN__ */
 /* WASM can't handle a variadic callback, so we pass back an array of pointers instead... */
-typedef void(*stub_callback_t)(const char *name, void *ret_ptr, const char *fmt, void *args[]);
+typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, void *args[]);
 #endif /* !__EMSCRIPTEN__ */
 
 /* this is the primary interface to shim graphics,
  * call this function with your declared callback function
  * and you will receive all the windowing calls
  */
-static stub_callback_t shim_graphics_callback = NULL;
+static shim_callback_t shim_graphics_callback = NULL;
 #ifdef __EMSCRIPTEN__
   EMSCRIPTEN_KEEPALIVE
 #endif
-void stub_graphics_set_callback(stub_callback_t cb) {
+void shim_graphics_set_callback(shim_callback_t cb) {
     shim_graphics_callback = cb;
 }
 
@@ -84,10 +84,10 @@ void name fn_args { \
 
 
 enum win_types {
-    WINSTUB_MESSAGE = 1,
-    WINSTUB_MAP,
-    WINSTUB_MENU,
-    WINSTUB_EXT
+    WINSHIM_MESSAGE = 1,
+    WINSHIM_MAP,
+    WINSHIM_MENU,
+    WINSHIM_EXT
 };
 
 #define VSTUB(name, args) \
@@ -111,8 +111,7 @@ VDECLCB(shim_get_nh_event,(void), "v")
 VDECLCB(shim_exit_nhwindows,(const char *str), "vs", P2V str)
 VDECLCB(shim_suspend_nhwindows,(const char *str), "vs", P2V str)
 VDECLCB(shim_resume_nhwindows,(void), "v")
-// DECLCB(winid, shim_create_nhwindow, (int type), "ii", A2P type)
-winid STUB(shim_create_nhwindow, WINSTUB_MAP, (int a))
+DECLCB(winid, shim_create_nhwindow, (int type), "ii", A2P type)
 VDECLCB(shim_clear_nhwindow,(winid window), "vi", A2P window)
 VDECLCB(shim_display_nhwindow,(winid window, BOOLEAN_P blocking), "vii", A2P window, A2P blocking)
 VDECLCB(shim_destroy_nhwindow,(winid window), "vi", A2P window)
@@ -125,8 +124,8 @@ VDECLCB(shim_add_menu,
     "viipiiisi",
     A2P window, A2P glyph, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
 VDECLCB(shim_end_menu,(winid window, const char *prompt), "vis", A2P window, P2V prompt)
-int STUB(shim_select_menu,0,(winid a, int b, MENU_ITEM_P **c))
-char STUB(shim_message_menu,'y',(CHAR_P a, int b, const char *c))
+DECLCB(int, shim_select_menu,(winid window, int how, MENU_ITEM_P **menu_list), "iiip", A2P window, A2P how, P2V menu_list)
+DECLCB(char, shim_message_menu,(CHAR_P let, int how, const char *mesg), "ciis", A2P let, A2P how, P2V mesg)
 VDECLCB(shim_update_inventory,(void), "v")
 VDECLCB(shim_mark_synch,(void), "v")
 VDECLCB(shim_wait_synch,(void), "v")
@@ -135,25 +134,25 @@ VDECLCB(shim_update_positionbar,(char *posbar), "vp", P2V posbar)
 VDECLCB(shim_print_glyph,(winid w, int x, int y, int glyph, int bkglyph), "viiiii", A2P w, A2P x, A2P y, A2P glyph, A2P bkglyph)
 VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VDECLCB(shim_raw_print_bold,(const char *str), "vs", P2V str)
-int STUB(shim_nhgetch,0,(void))
-int STUB(shim_nh_poskey,0,(int *a, int *b, int *c))
+DECLCB(int, shim_nhgetch,(void), "i")
+DECLCB(int, shim_nh_poskey,(int *x, int *y, int *mod), "ippp", P2V x, P2V y, P2V mod)
 VDECLCB(shim_nhbell,(void), "v")
-int STUB(shim_doprev_message,0,(void))
-char STUB(shim_yn_function,'y',(const char *a, const char *b, CHAR_P c))
+DECLCB(int, shim_doprev_message,(void),"iv")
+DECLCB(char, shim_yn_function,(const char *query, const char *resp, CHAR_P def), "cssi", P2V query, P2V resp, A2P def)
 VDECLCB(shim_getlin,(const char *query, char *bufp), "vsp", P2V query, P2V bufp)
-int STUB(shim_get_ext_cmd,0,(void))
+DECLCB(int,shim_get_ext_cmd,(void),"iv")
 VDECLCB(shim_number_pad,(int state), "vi", A2P state)
 VDECLCB(shim_delay_output,(void), "v")
 VDECLCB(shim_change_color,(int color, long rgb, int reverse), "viii", A2P color, A2P rgb, A2P reverse)
 VDECLCB(shim_change_background,(int white_or_black), "vi", A2P white_or_black)
-short STUB(set_shim_font_name,0,(winid a, char *b))
-char *STUB(shim_get_color_string,"",(void))
+DECLCB(short, set_shim_font_name,(winid window_type, char *font_name),"2is", A2P window_type, P2V font_name)
+DECLCB(char *,shim_get_color_string,(void),"sv")
 
 /* other defs that really should go away (they're tty specific) */
 VDECLCB(shim_start_screen, (void), "v")
 VDECLCB(shim_end_screen, (void), "v")
 VDECLCB(shim_preference_update, (const char *pref), "vp", P2V pref)
-char *STUB(shim_getmsghistory, (char *)"", (BOOLEAN_P a))
+DECLCB(char *,shim_getmsghistory, (BOOLEAN_P init), "si", A2P init)
 VDECLCB(shim_putmsghistory, (const char *msg, BOOLEAN_P restoring_msghist), "vsi", P2V msg, A2P restoring_msghist)
 VDECLCB(shim_status_init, (void), "v")
 VDECLCB(shim_status_enablefield,

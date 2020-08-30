@@ -17,8 +17,8 @@ EMCC_LFLAGS=-s WASM=1
 EMCC_LFLAGS+=-s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["_nhmain"]' -O3
 EMCC_LFLAGS+=-s MODULARIZE
-EMCC_LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_stub_graphics_set_callback"]'
-EMCC_LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "getValue"]'
+EMCC_LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback"]'
+EMCC_LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "getValue", "setValue"]'
 EMCC_LFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0
 EMCC_LFLAGS+=--embed-file wasm-data@/
 
