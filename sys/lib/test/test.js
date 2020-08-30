@@ -19,7 +19,7 @@ function setGraphicsCallback() {
 
     console.log("doing call");
     Module.ccall(
-        "stub_graphics_set_callback", // C function name
+        "shim_graphics_set_callback", // C function name
         null, // return type
         ["number"], // arg types
         [cb], // arg values
@@ -153,7 +153,7 @@ function doGraphics(name, ... args) {
 //     }
 //     // console.log("Module", util.inspect(Module, {depth: null, showHidden: true}));
 //     // TODO:
-//     // stub_graphics_set_callback();
+//     // shim_graphics_set_callback();
 
 //     // options:
 //     // https://emscripten.org/docs/api_reference/module.html
