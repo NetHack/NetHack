@@ -4,6 +4,8 @@ This creates a library for NetHack that can be incorporated into other programs.
 * nethack.js / nethack.wasm - a [WebAssembly / WASM](https://webassembly.org/) library for use in JavaScript programs (both nodejs and browser)
 
 ## API: libnethack.a
+This libarary has only been built on MacOS, but should work on Linux and other unix-ish platforms. If you have problems, start by stealing hints files from the `sys/unix/hints` for your platform. Contributions for other platforms are happily accepted.
+
 The API is two functions:
 * `nhmain(int argc, char *argv[])` - The main function for NetHack that configures the program and runs the `moveloop()` until the game is over. The arguments to this function are the [command line arguments](https://nethackwiki.com/wiki/Options) to NetHack.
 * `stub_graphics_set_callback(stub_callback_t cb)` - A single function that sets a callback to gather graphics events: write a string to screen, get user input, etc. Your job is to pass in a callback and handle all the requested rendering events to show NetHack on the scrren. The callback is `void stub_callback_t(const char *name, void *ret_ptr, const char *fmt,  ...)`
