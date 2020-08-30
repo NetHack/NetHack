@@ -114,16 +114,18 @@ register struct monst *mtmp;
 
     /* a similar check is in monster_nearby() in hack.c */
     /* check whether hero notices monster and stops current activity */
-    if (g.occupation && !rd && !Confusion && (!mtmp->mpeaceful || Hallucination)
+    if (g.occupation && !rd
+        /* monster is hostile and can attack (or hallu distorts knowledge) */
+        && (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
         /* it's close enough to be a threat */
-        && distu(x, y) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
+        && distu(mtmp->mx, mtmp->my) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
         /* and either couldn't see it before, or it was too far away */
         && (!already_saw_mon || !couldsee(x, y)
             || distu(x, y) > (BOLT_LIM + 1) * (BOLT_LIM + 1))
         /* can see it now, or sense it and would normally see it */
-        && (canseemon(mtmp) || (sensemon(mtmp) && couldsee(x, y)))
-        && mtmp->mcanmove && !noattacks(mtmp->data)
-        && !onscary(u.ux, u.uy, mtmp))
+        && canspotmon(mtmp) && couldsee(mtmp->mx, mtmp->my)
+        /* monster isn't paralyzed or afraid (scare monster/Elbereth) */
+        && mtmp->mcanmove && !onscary(u.ux, u.uy, mtmp))
         stop_occupation();
 
     return rd;

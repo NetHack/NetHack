@@ -2971,10 +2971,10 @@ monster_nearby()
                 continue;
             if ((mtmp = m_at(x, y)) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
-                && (!mtmp->mpeaceful || Hallucination)
+                && (Hallucination
+                    || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
-                && !noattacks(mtmp->data) && mtmp->mcanmove
-                && !mtmp->msleeping  /* aplvax!jcn */
+                && mtmp->mcanmove && !mtmp->msleeping  /* aplvax!jcn */
                 && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
                 return 1;
         }
