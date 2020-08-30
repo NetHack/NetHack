@@ -92,3 +92,5 @@ libtest.c
 nhlibtest
 run.sh
 test.js
+sys/lib/npm-package/build/nethack.js
+sys/lib/npm-package/build/nethack.wasm
