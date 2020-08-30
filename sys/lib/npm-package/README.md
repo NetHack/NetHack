@@ -10,7 +10,10 @@ npm install nethack
 ```
 
 ## API
-The main module returns a setup function: `startNethack(myCallback, moduleOptions)`.
+The main module returns a setup function: `startNethack(uiCallback, moduleOptions)`.
+* `uiCallback(name, ... args)` - Your callback function that will handle rendering NetHack on the screen of your choice. The `name` argument is one of the UI functions of the [NetHack Window Interface](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc) and the `args` are corresponding to the window interface function that is being called. You are required to return the correct type of data for the function that is implemented.
+* `moduleOptions` - An optional [emscripten Module object](https://emscripten.org/docs/api_reference/module.html) for configuring the WASM that will be run.
+  * `Module.arguments` - Of note is the [arguments property](https://emscripten.org/docs/api_reference/module.html#Module.arguments) which gets passed to NetHack as its [command line parameters](https://nethackwiki.com/wiki/Options).
 
 ## Example
 ``` js
