@@ -582,12 +582,16 @@ void NetHackQtMapWindow2::clearMessages()
 
 void NetHackQtMapWindow2::putMessage(int attr UNUSED, const QString& text)
 {
-    if ( !messages.isEmpty() )
+    if (!messages.isEmpty())
 	messages += "\n";
     messages += QString(text).replace(QChar(0x200B), "");
-    QFontMetrics fm = fontMetrics();
 #if 0
-    messages_rect = fm.boundingRect(viewport.contentsX(),viewport.contentsY(),viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+    QFontMetrics fm = fontMetrics();
+    messages_rect = fm.boundingRect(viewport.contentsX(), viewport.contentsY(),
+                                    viewport.width(), 0,
+                                    (Qt::TextWordWrap | Qt::AlignTop
+                                     | Qt::AlignLeft | Qt::TextDontClip),
+                                    messages);
     update(messages_rect);
 #endif
 }

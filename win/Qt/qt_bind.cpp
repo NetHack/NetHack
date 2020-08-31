@@ -471,7 +471,7 @@ void NetHackQtBind::qt_raw_print_bold(const char *str)
 int NetHackQtBind::qt_nhgetch()
 {
     if (main)
-	main->fadeHighlighting();
+	main->fadeHighlighting(true);
 
     // Process events until a key arrives.
     //
@@ -479,19 +479,28 @@ int NetHackQtBind::qt_nhgetch()
 	qApp->exec();
     }
 
+    // after getting a key rather than before
+    if (main)
+        main->fadeHighlighting(false);
+
     return keybuffer.GetAscii();
 }
 
 int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
 {
     if (main)
-	main->fadeHighlighting();
+	main->fadeHighlighting(true);
 
     // Process events until a key or map-click arrives.
     //
     while (keybuffer.Empty() && clickbuffer.Empty()) {
 	qApp->exec();
     }
+
+    // after getting a key or click rather than before
+    if (main)
+        main->fadeHighlighting(false);
+
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
     } else {

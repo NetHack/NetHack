@@ -30,6 +30,9 @@ public:
 
 	void setMap(NetHackQtMapWindow2*);
 
+        bool hilit_mesgs();
+        void unhighlight_mesgs();
+
 private:
 	QListWidget* list;
 	bool changed;

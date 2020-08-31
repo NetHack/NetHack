@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.292 $ $NHDT-Date: 1598831076 2020/08/30 23:44:36 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.293 $ $NHDT-Date: 1598852985 2020/08/31 05:49:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -393,6 +393,7 @@ Qt: tombstone showed newly constructed date instead of the value set up at
 Qt: menu choices All, None, Invert were setting, unsetting, or toggling menu
 	entry checkboxes internally but didn't redraw the menu to show that
 Qt: fix the F1/F2/Tab macro keys to not require that number_pad be On
+Qt: unhighlight highlighted message (last one issued) after player has seen it
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

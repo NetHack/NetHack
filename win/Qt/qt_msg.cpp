@@ -74,6 +74,9 @@ void NetHackQtMessageWindow::ClearMessages()
 
 void NetHackQtMessageWindow::Display(bool block UNUSED)
 {
+    //
+    // FIXME: support for 'block' is necessary for MSGTYPE=stop
+    //
     if (changed) {
 	list->repaint();
 	changed=false;
@@ -88,8 +91,9 @@ const char * NetHackQtMessageWindow::GetStr(bool init)
     QListWidgetItem *item = list->item(currgetmsg++);
     if (item) {
         QString str = item->text();
-        //raw_printf("getstr[%i]='%s'", currgetmsg, str.toLatin1().constData());
-        return str.toLatin1().constData();
+        const char *result = str.toLatin1().constData();
+        //raw_printf("getstr[%d]='%s'", currgetmsg, result);
+        return result;
     }
     return NULL;
 }
@@ -114,31 +118,52 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
     font.setWeight((attr == ATR_BOLD) ? QFont::Bold : QFont::Normal);
     item->setFont(font);
 
-    QColor fg = item->foreground().color();
-    QColor bg = item->background().color();
-    if (attr == ATR_DIM)
-    {
-	fg.setAlpha(fg.alpha() / 2);
+    if (attr == ATR_DIM || attr == ATR_INVERSE) {
+        QColor fg = item->foreground().color();
+        QColor bg = item->background().color();
+        if (attr == ATR_DIM) {
+            fg.setAlpha(fg.alpha() / 2);
+            new_fgbg = true;
+        }
+        if (attr == ATR_INVERSE) {
+            QColor swap;
+            swap = fg; fg = bg; bg = swap;
+        }
+        item->setForeground(fg);
+        item->setBackground(bg);
     }
-    if (attr == ATR_INVERSE)
-    {
-	QColor swap;
-	swap = fg; fg = bg; bg = swap;
-    }
-    item->setForeground(fg);
-    item->setBackground(bg);
+    // ATR_BLINK not supported
 #endif
 
-    // ATR_BLINK not supported
     if (list->count() >= (int) ::iflags.msg_history)
 	delete list->item(0);
     list->addItem(text2);
 
     // Force scrollbar to bottom
-    list->setCurrentRow(list->count()-1);
+    list->setCurrentRow(list->count() - 1);
 
-    if ( map )
+    if (map)
 	map->putMessage(attr, text2);
+}
+
+// are there any highlighted messages?
+bool NetHackQtMessageWindow::hilit_mesgs()
+{
+    // PutStr() uses setCurrentRow() to select the last message line;
+    // being selected causes that line to be highlighted.
+    //
+    // We could/should keep track of whether anything is currently
+    // highlighted instead of just assuming that last message still is.
+    if (list && list->count())
+        return true;
+    return false;
+}
+
+// unhighlight any highlighted messages
+void NetHackQtMessageWindow::unhighlight_mesgs()
+{
+    if (list)
+        list->clearSelection();
 }
 
 } // namespace nethack_qt_
