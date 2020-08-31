@@ -32,6 +32,8 @@ public:
 
         bool hilit_mesgs();
         void unhighlight_mesgs();
+        // for adding the answer for yn() to its prompt string
+        void AddToStr(const char *answerbuf);
 
 private:
 	QListWidget* list;

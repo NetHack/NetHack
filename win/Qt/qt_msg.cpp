@@ -62,7 +62,10 @@ void NetHackQtMessageWindow::Scroll(int dx UNUSED, int dy UNUSED)
 
 void NetHackQtMessageWindow::Clear()
 {
-    if ( map )
+    if (list)
+        NetHackQtMessageWindow::unhighlight_mesgs();
+
+    if (map)
 	map->clearMessages();
 }
 
@@ -144,6 +147,16 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
 
     if (map)
 	map->putMessage(attr, text2);
+}
+
+// append the user's answer to a prompt message
+void NetHackQtMessageWindow::AddToStr(const char *answer)
+{
+    if (list) {
+        QListWidgetItem *item = list->currentItem();
+        if (item)
+            item->setText(item->text() + QString(" %1").arg(answer));
+    }
 }
 
 // are there any highlighted messages?

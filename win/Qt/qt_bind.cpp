@@ -524,7 +524,8 @@ int NetHackQtBind::qt_doprev_message()
     return 0;
 }
 
-char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, CHAR_P def)
+char NetHackQtBind::qt_yn_function(const char *question_,
+                                   const char *choices, CHAR_P def)
 {
     QString question(QString::fromLatin1(question_));
     QString message;
@@ -548,6 +549,8 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
 	// Similar to X11 windowport `slow' feature.
 
 	int result = -1;
+        char cbuf[40];
+        cbuf[0] = '\0';
 
 #ifdef USE_POPUPS
         if (choices) {
@@ -575,20 +578,33 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
 	while (result < 0) {
+            cbuf[0] = '\0';
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
+                Strcpy(cbuf, "ESC");
 	    } else if (choices && !strchr(choices,ch)) {
 		if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
 		    result=def;
+                    Strcpy(cbuf, visctrl(def));
 		} else {
 		    NetHackQtBind::qt_nhbell();
 		    // and try again...
 		}
 	    } else {
 		result=ch;
+                Strcpy(cbuf, (ch == ' ') ? "SPC" : visctrl(ch));
 	    }
 	}
+
+        // if answer was supplied via popup, it will already be appended
+        // to the prompt, so included above, and cbuf[] will be empty
+        if (cbuf[0]) {
+            NetHackQtWindow *window = id_to_window[WIN_MESSAGE];
+            NetHackQtMessageWindow *mesgwin
+                = static_cast <NetHackQtMessageWindow *> (window);
+            mesgwin->AddToStr(cbuf);
+        }
 
 	NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
 
