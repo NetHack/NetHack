@@ -4,7 +4,6 @@ let Module;
 let userCallback;
 let savedOnRuntimeInitialized;
 function nethackStart(cb, inputModule = {}) {
-    console.log("cb is", cb);
     if(typeof cb !== "function") throw new TypeError("expected first argument to be callback function");
     if(typeof inputModule !== "object") throw new TypeError("expected second argument to be object");
 
