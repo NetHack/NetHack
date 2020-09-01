@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ $NHDT-Date: 1598859031 2020/08/31 07:30:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.295 $ $NHDT-Date: 1598958650 2020/09/01 11:10:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -248,6 +248,7 @@ end of game inventory disclosure passed an inappropriate argument to the
 	inventory display routine; not noticeable for tty and curses,
 	noticeable but not harmful for X11, and slightly harmful for Qt
 turning into slime rendered hero as slime one turn too soon
+avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
