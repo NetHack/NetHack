@@ -1,5 +1,5 @@
 {
-  "name": "nethack",
+  "name": "@neth_ck/nethack",
   "version": "1.0.0",
   "description": "The original NetHack rogue-like game built as a WebAssembly module",
   "main": "src/nethackShim.js",
