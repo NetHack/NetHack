@@ -76,9 +76,6 @@ char *argv[];
     boolean plsel_once = FALSE;
     int i;
 
-    printf ("nhmain\n");
-    printf ("argc: %d\n", argc);
-    printf ("argv: %p\n", (void *)argv);
     for (i = 0; i < argc; i++) {
         printf ("argv[%d]: %s\n", i, argv[i]);
     }
