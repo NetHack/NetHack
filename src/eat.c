@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1599255099 2020/09/04 21:31:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1599258557 2020/09/04 22:29:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2811,7 +2811,7 @@ bite()
 void
 gethungry()
 {
-    long accessorytime;
+    int accessorytime;
 
     if (u.uinvulnerable)
         return; /* you don't feel hungrier */
@@ -2837,8 +2837,8 @@ gethungry()
      * Also causes melee-induced hunger to vary from turn-based hunger
      * instead of just replicating that.
      */
-    accessorytime = g.moves + (long) rn2(20);
-    if (accessorytime % 2L) { /* odd */
+    accessorytime = rn2(20); /* rn2(20) replaces (int) (g.moves % 20L) */
+    if (accessorytime % 2) { /* odd */
         /* Regeneration uses up food, unless due to an artifact */
         if ((HRegeneration & ~FROMFORM)
             || (ERegeneration & ~(W_ARTI | W_WEP)))
@@ -2864,7 +2864,7 @@ gethungry()
          * cancellation") if hero doesn't have protection from some
          * other source (cloak or second ring).
          */
-        switch ((int) (accessorytime % 20L)) { /* note: use even cases only */
+        switch (accessorytime) { /* note: use even cases among 0..19 only */
         case 4:
             if (uleft && uleft->otyp != MEAT_RING
                 /* more hungry if +/- is nonzero or +/- doesn't apply or
