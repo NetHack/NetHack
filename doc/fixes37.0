@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1599184888 2020/09/04 02:01:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ $NHDT-Date: 1599255099 2020/09/04 21:31:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -249,6 +249,7 @@ end of game inventory disclosure passed an inappropriate argument to the
 	noticeable but not harmful for X11, and slightly harmful for Qt
 turning into slime rendered hero as slime one turn too soon
 avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
+randomize the turns where accessories and extrinsics affect nutrition
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

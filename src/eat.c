@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1596498165 2020/08/03 23:42:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1599255099 2020/09/04 21:31:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2811,6 +2811,8 @@ bite()
 void
 gethungry()
 {
+    long accessorytime;
+
     if (u.uinvulnerable)
         return; /* you don't feel hungrier */
 
@@ -2825,14 +2827,25 @@ gethungry()
         && !Slow_digestion)
         u.uhunger--; /* ordinary food consumption */
 
-    if (g.moves % 2) { /* odd turns */
+    /*
+     * 3.7:  trigger is randomized instead of (moves % N).  Makes
+     * ring juggling (using the 'time' option to see the turn counter
+     * in order to time swapping of a pair of rings of slow digestion,
+     * wearing one on one hand, then putting on the other and taking
+     * off the first, then vice versa, over and over and over and ...
+     * to avoid any hunger from wearing a ring) become ineffective.
+     * Also causes melee-induced hunger to vary from turn-based hunger
+     * instead of just replicating that.
+     */
+    accessorytime = g.moves + (long) rn2(20);
+    if (accessorytime % 2L) { /* odd */
         /* Regeneration uses up food, unless due to an artifact */
         if ((HRegeneration & ~FROMFORM)
             || (ERegeneration & ~(W_ARTI | W_WEP)))
             u.uhunger--;
         if (near_capacity() > SLT_ENCUMBER)
             u.uhunger--;
-    } else { /* even turns */
+    } else { /* even */
         if (Hunger)
             u.uhunger--;
         /* Conflict uses up food too */
@@ -2851,7 +2864,7 @@ gethungry()
          * cancellation") if hero doesn't have protection from some
          * other source (cloak or second ring).
          */
-        switch ((int) (g.moves % 20)) { /* note: use even cases only */
+        switch ((int) (accessorytime % 20L)) { /* note: use even cases only */
         case 4:
             if (uleft && uleft->otyp != MEAT_RING
                 /* more hungry if +/- is nonzero or +/- doesn't apply or
