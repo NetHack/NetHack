@@ -530,6 +530,7 @@ char NetHackQtBind::qt_yn_function(const char *question_,
     QString question(QString::fromLatin1(question_));
     QString message;
     char yn_esc_map='\033';
+    int result = -1;
 
     if (choices) {
         // anything beyond <esc> is hidden>
@@ -537,44 +538,34 @@ char NetHackQtBind::qt_yn_function(const char *question_,
         size_t cb = choicebuf.indexOf('\033');
         choicebuf = choicebuf.mid(0U, cb);
         message = QString("%1 [%2] ").arg(question, choicebuf);
-        if (def) message += QString("(%1) ").arg(QChar(def));
+        if (def)
+            message += QString("(%1) ").arg(QChar(def));
         // escape maps to 'q' or 'n' or default, in that order
-        yn_esc_map = (strchr(choices, 'q') ? 'q' :
-                      (strchr(choices, 'n') ? 'n' : def));
+        yn_esc_map = strchr(choices, 'q') ? 'q'
+                     : strchr(choices, 'n') ? 'n'
+                       : def;
     } else {
         message = question;
     }
 
-    if (qt_settings->ynInMessages() && WIN_MESSAGE != WIN_ERR) {
+    if (
+        /*
+         * The 'Settings' dialog doesn't present prompting-in-message-window
+         * as a candidate for customization but core supports 'popup_dialog'
+         * option so let player use that instead.
+         */
+#if 0
+        qt_settings->ynInMessages()
+#else
+        !::iflags.wc_popup_dialog
+#endif
+        && WIN_MESSAGE != WIN_ERR) {
 	// Similar to X11 windowport `slow' feature.
 
-	int result = -1;
-        char cbuf[40];
+        char cbuf[20];
         cbuf[0] = '\0';
 
-#ifdef USE_POPUPS
-        if (choices) {
-            if (!strcmp(choices, "ynq"))
-                result = QMessageBox::information (NetHackQtBind::mainWidget(),
-                                                   "NetHack", question,
-                                                 "&Yes", "&No", "&Quit", 0, 2);
-            else if (!strcmp(choices, "yn"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),
-                                                  "NetHack", question,
-                                                  "&Yes", "&No", 0, 1);
-            else if (!strcmp(choices, "rl"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),
-                                                  "NetHack", question,
-                                                  "&Right", "&Left", 0, 1);
-
-            if (result >= 0 && result < strlen(choices)) {
-                char yn_resp = choices[result];
-                message += QString(" %1").arg(yn_resp);
-                result = yn_resp;
-            }
-        }
-#endif
-
+        // add the prompt to the messsage window
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
 	while (result < 0) {
@@ -593,41 +584,83 @@ char NetHackQtBind::qt_yn_function(const char *question_,
 		}
 	    } else {
 		result=ch;
-                Strcpy(cbuf, (ch == ' ') ? "SPC" : visctrl(ch));
+                Strcpy(cbuf, visctrl(ch));
 	    }
 	}
 
-        // if answer was supplied via popup, it will already be appended
-        // to the prompt, so included above, and cbuf[] will be empty
+        // update the prompt message line to include the response
         if (cbuf[0]) {
-            NetHackQtWindow *window = id_to_window[WIN_MESSAGE];
-            NetHackQtMessageWindow *mesgwin
-                = static_cast <NetHackQtMessageWindow *> (window);
-            mesgwin->AddToStr(cbuf);
+            if (!strcmp(cbuf, " "))
+                Strcpy(cbuf, "SPC");
+
+            NetHackQtMessageWindow *mesgwin = main->GetMessageWindow();
+            if (mesgwin)
+                mesgwin->AddToStr(cbuf);
         }
 
-	NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
-
-	return result;
     } else {
-	NetHackQtYnDialog dialog(mainWidget(),question,choices,def);
-	char ret = dialog.Exec();
-        if (!(ret == '\0' || ret == '\033') && choices)
-            message += QString(" %1").arg(ret);
-        else if (def)
-            message += QString(" %1").arg(def);
+        // use a popup dialog box
+        NetHackQtYnDialog dialog(main, question, choices, def);
+        char ret = dialog.Exec();
+        if (ret == 0) {
+            ret = '\033';
+        }
+        // discard any input that YnDialog() might have left pending
+        keybuffer.Drain();
+
+        // combine the prompt and result
+        char cbuf[40];
+        Strcpy(cbuf, (ret == '\033') ? "ESC"
+                     : (ret == ' ') ? "SPC"
+                       : visctrl(ret));
+        if (ret == '#' && choices && !strncmp(choices, "yn#", (size_t) 3))
+            Sprintf(eos(cbuf), " %ld", ::yn_number);
+        message += QString(" %1").arg(cbuf);
+
+        // add the prompt with appended response to the messsage window
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
-        return ret;
+        result = ret;
     }
+
+    // unhighlight the prompt; does not erase the multi-line message window
+    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
+
+    return (char) result;
 }
 
 void NetHackQtBind::qt_getlin(const char *prompt, char *line)
 {
     NetHackQtStringRequestor requestor(mainWidget(),prompt);
     if (!requestor.Get(line)) {
-	line[0]=0;
+        Strcpy(line, "\033");
+        // discard any input that Get() might have left pending
+        keybuffer.Drain();
     }
+
+    // add the prompt with appended response to the messsage window
+    char buf[BUFSZ + 20], *q; /* +20: plenty of extra room for visctrl() */
+    copynchars(buf, prompt, BUFSZ - 1);
+    q = eos(buf);
+    *q++ = ' '; /* guaranteed to fit; temporary lack of terminator is ok */
+
+    if (line[0] == '\033') {
+        Strcpy(q, "ESC");
+    } else if (line[0] == ' ' && !line[1]) {
+        Strcpy(q, "SPC");
+    } else {
+        /* buf[] has more than enough room to hold one extra visctrl()
+           in case q is at the last viable slot and *p yields "M-^c" */
+        for (char *p = line; *p && q < &buf[BUFSZ - 1]; ++p, q = eos(q))
+            Strcpy(q, visctrl(*p));
+    }
+    if (q > &buf[BUFSZ - 1])
+        q = &buf[BUFSZ - 1];
+    *q = '\0';
+
+    NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, buf);
+    // unhighlight the prompt; does not erase the multi-line message window
+    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
 }
 
 int NetHackQtBind::qt_get_ext_cmd()
@@ -665,17 +698,17 @@ void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
     window->UseRIP(how, when);
 }
 
-char * NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
+char *NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
 {
-    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (window)
-        return (char *)window->GetStr(init);
+        return (char *) window->GetStr((bool) init);
     return NULL;
 }
 
 void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
 {
-    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (!window)
         return;
 
@@ -685,7 +718,7 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
         int i = 0;
         const char *str;
 
-        while ((str = window->GetStr((i == 0)))) {
+        while ((str = window->GetStr((bool) (i == 0))) != 0) {
             msgs_strings->append(str);
             i++;
         }
@@ -702,11 +735,11 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
 #endif
     } else if (msgs_saved) {
         /* restore strings */
-        int i;
-        for (i = 0; i < msgs_strings->size(); i++) {
-            window->PutStr(ATR_NONE, msgs_strings->at((i)));
+        for (int i = 0; i < msgs_strings->size(); ++i) {
+            const QString &nxtmsg = msgs_strings->at(i);
+            window->PutStr(ATR_NONE, nxtmsg);
 #ifdef DUMPLOG
-            dumplogmsg(msgs_strings->at(i).toLatin1().constData());
+            dumplogmsg(nxtmsg.toLatin1().constData());
 #endif
         }
         delete msgs_strings;
@@ -782,9 +815,10 @@ struct window_procs Qt_procs = {
     WC_COLOR | WC_HILITE_PET
     | WC_ASCII_MAP | WC_TILED_MAP
     | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
+    | WC_POPUP_DIALOG
     | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN,
     0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
     nethack_qt_::NetHackQtBind::qt_askname,

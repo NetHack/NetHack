@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.295 $ $NHDT-Date: 1598958650 2020/09/01 11:10:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ $NHDT-Date: 1599184888 2020/09/04 02:01:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -397,6 +397,8 @@ Qt: fix the F1/F2/Tab macro keys to not require that number_pad be On
 Qt: unhighlight highlighted message (last one issued) after player has seen it
 Qt: update message window's last message with player's response if it's a
 	prompt string for a single-character of input (ynaq or invent letter)
+Qt: for line input, display the prompt+response in the message window
+Qt: enable the popup_dialog WC option (result is a bit flakey but usable)
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

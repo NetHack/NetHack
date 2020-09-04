@@ -85,4 +85,9 @@ Qt::KeyboardModifiers NetHackQtKeyBuffer::TopState() const
     return state[out];
 }
 
+void NetHackQtKeyBuffer::Drain()
+{
+    in = out = 0;
+}
+
 } // namespace nethack_qt_
