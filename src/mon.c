@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1598575089 2020/08/28 00:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1599330921 2020/09/05 18:35:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1809,6 +1809,9 @@ struct monst *mtmp, *mtmp2;
         otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;
+    /* before relmon(mtmp), because it could clear polearm.hitmon */
+    if (g.context.polearm.hitmon == mtmp)
+        g.context.polearm.hitmon = mtmp2;
 
     /* remove the old monster from the map and from `fmon' list */
     relmon(mtmp, (struct monst **) 0);
@@ -1852,6 +1855,9 @@ struct monst **monst_list; /* &g.migrating_mons or &g.mydogs or null */
 
     if (!fmon)
         panic("relmon: no fmon available.");
+
+    if (mon == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = (struct monst *) 0;
 
     if (unhide) {
         /* can't remain hidden across level changes (exception: wizard
