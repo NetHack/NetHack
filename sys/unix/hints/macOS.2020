@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.2020 $NHDT-Date: 1597704793 2020/08/17 22:53:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1599337708 2020/09/05 20:28:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -16,6 +16,14 @@
 # macOS X hints file
 #
 
+# compiler flags:  various -I, -D, and -W get appended below;
+#	these are the settings of most interest for an end-user build
+#	(clang doesn't support '-Og', gcc needs 4.x or later)
+CFLAGS = -g
+#CFLAGS = -g -Og
+#CFLAGS = -O2
+
+# note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 3
 #-INCLUDE multiw-1.2020
 
 # 4. If you set WANT_WIN_QT, you need to
@@ -47,8 +55,7 @@ endif
 
 #-INCLUDE multiw-2.2020
 
-# XXX -g vs -O should go here, -I../include goes in the makefile
-CFLAGS+=-g -I../include -DNOTPARMDECL
+CFLAGS+=-I../include -DNOTPARMDECL
 ifndef WANT_WIN_QT
 #	these are normally used when compiling nethack's core
 CFLAGS+=-ansi -pedantic -Wno-long-long
@@ -139,7 +146,7 @@ ifeq "$(GPPGTEQ9)" "1"
 QTCXXFLAGS+= -Wno-format-truncation
 endif  #g++ version greater than or equal to 9
 endif  #not clang
-QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  multiw-2.2020 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  multiw-2.2020 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-3.7 $
 #
 # Sorts out support for multiple window ports (interfaces) to included in the build.
 #
@@ -29,26 +29,23 @@
 # something other than tty as the default interface.
 #
 
-# Make sure that at least one interface is enabled.
-ifndef WANT_WIN_ALL
-ifndef  WANT_WIN_TTY
-ifndef   WANT_WIN_CURSES
-ifndef    WANT_WIN_X11
-ifndef     WANT_WIN_QT
-WANT_WIN_TTY=1
-endif
-endif
-endif
-endif
-endif
-
 ifdef WANT_WIN_ALL
 WANT_WIN_TTY=1
 WANT_WIN_CURSES=1
 WANT_WIN_X11=1
 WANT_WIN_QT=1
+else
+# Make sure that at least one interface is enabled.
+ifndef WANT_WIN_TTY
+ifndef  WANT_WIN_CURSES
+ifndef   WANT_WIN_X11
+ifndef    WANT_WIN_QT
+WANT_WIN_TTY=1
 endif
-
+endif
+endif
+endif
+endif
 
 # Make sure that a default interface is specified; this doesn't guarantee
 # sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but

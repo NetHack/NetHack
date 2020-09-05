@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.2020 $NHDT-Date: 1597704792 2020/08/17 22:53:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+# NetHack 3.7  linux.2020 $NHDT-Date: 1599337708 2020/09/05 20:28:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -16,6 +16,14 @@
 # linux.2020 hints file provides a single-user build for Linux (such
 # as Ubuntu focal).
 
+# compiler flags:  various -I, -D, and -W get appended below;
+#	these are the settings of most interest for an end-user build
+#	(clang doesn't support '-Og', gcc needs 4.x or later)
+CFLAGS = -g
+#CFLAGS = -g -Og
+#CFLAGS = -O2
+
+# note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 3
 #-INCLUDE multiw-1.2020
 
 # 4. If you set WANT_WIN_QT, you need to
@@ -45,8 +53,7 @@ GAMEGRP  = games
 
 #-INCLUDE multiw-2.2020
 
-# XXX -g vs -O should go here, -I../include goes in the makefile
-CFLAGS=-g -O -I../include -DNOTPARMDECL
+CFLAGS+=-I../include -DNOTPARMDECL
 ifeq "$(CCISCLANG)" ""
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
@@ -134,7 +141,7 @@ ifeq "$(GPPGTEQ9)" "1"
 QTCXXFLAGS+= -Wno-format-truncation
 endif  #g++ version greater than or equal to 9
 endif  #not clang
-QTCXXFLAGS += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags)
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 QTCXXFLAGS += -fPIC
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
