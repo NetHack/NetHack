@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.297 $ $NHDT-Date: 1599255099 2020/09/04 21:31:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ $NHDT-Date: 1599434249 2020/09/06 23:17:29 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -326,6 +326,8 @@ the fix to make worm visibility checks work as intended forced the coordinates
 	reverses the segments and can throw some away if there isn't room,
 	but throwing away the extra segment removed the worm from the map
 using 'O' to try to change 'symset' was a no-op; 'roguesymset' worked
+change default for lit attribute in special level des.terrain directives to
+	'unchanged' instead of 'unlit'
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
