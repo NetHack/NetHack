@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1581886866 2020/02/16 21:01:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1596498207 2020/08/03 23:43:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.160 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,11 +10,6 @@
 #endif
 #if !defined(LSC) && !defined(O_WRONLY) && !defined(AZTEC_C)
 #include <fcntl.h>
-#endif
-
-#ifdef MFLOPPY
-long bytes_counted;
-static int count_only;
 #endif
 
 #if defined(UNIX) || defined(WIN32)
@@ -38,12 +33,6 @@ static void FDECL(savemonchn, (NHFILE *,struct monst *));
 static void FDECL(savetrapchn, (NHFILE *,struct trap *));
 static void FDECL(savegamestate, (NHFILE *));
 static void FDECL(save_msghistory, (NHFILE *));
-
-#ifdef MFLOPPY
-static void FDECL(savelev0, (NHFILE *, XCHAR_P, int));
-static boolean NDECL(swapout_oldest);
-static void FDECL(copyfile, (char *, char *));
-#endif /* MFLOPPY */
 
 #ifdef ZEROCOMP
 static void FDECL(zerocomp_bufon, (int));
@@ -104,7 +93,7 @@ dosave0()
     if (iflags.save_uswallow)
         u.uswallow = 1, iflags.save_uswallow = 0;
     if (iflags.save_uinwater)
-        u.uinwater = 1, iflags.save_uinwater = 0;
+        u.uinwater = 1, iflags.save_uinwater = 0; /* bypass set_uinwater() */
     if (iflags.save_uburied)
         u.uburied = 1, iflags.save_uburied = 0;
 
@@ -117,11 +106,6 @@ dosave0()
 #endif
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
-#endif
-
-#if defined(MICRO) && defined(MFLOPPY)
-    if (!saveDiskPrompt(0))
-        return 0;
 #endif
 
     HUP if (iflags.window_inited) {
@@ -165,36 +149,6 @@ dosave0()
     if (!WINDOWPORT("X11"))
         putstr(WIN_MAP, 0, "Saving:");
 #endif
-#ifdef MFLOPPY
-    /* make sure there is enough disk space */
-    if (iflags.checkspace) {
-        long fds, needed;
-
-        nhfp->mode = COUNTING;
-        savelev(nhfp, ledger_no(&u.uz));
-        savegamestate(nhfp);
-        needed = bytes_counted;
-
-        for (ltmp = 1; ltmp <= maxledgerno(); ltmp++)
-            if (ltmp != ledger_no(&u.uz) && g.level_info[ltmp].where)
-                needed += g.level_info[ltmp].size + (sizeof ltmp);
-        fds = freediskspace(fq_save);
-        if (needed > fds) {
-            HUP
-            {
-                There("is insufficient space on SAVE disk.");
-                pline("Require %ld bytes but only have %ld.", needed, fds);
-            }
-            flushout();
-            close_nhfile(nhfp);
-            (void) delete_savefile();
-            return 0;
-        }
-
-        co_false();
-    }
-#endif /* MFLOPPY */
-
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);
     store_savefileinfo(nhfp);
@@ -272,17 +226,11 @@ NHFILE *nhfp;
     unsigned long uid;
     struct obj * bc_objs = (struct obj *)0;
 
-#ifdef MFLOPPY
-    count_only = (nhfp->mode & COUNTING);
-#endif
     uid = (unsigned long) getuid();
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
         bwrite(nhfp->fd, (genericptr_t) &g.context, sizeof g.context);
         bwrite(nhfp->fd, (genericptr_t) &flags, sizeof flags);
-#ifdef SYSFLAGS
-        bwrite(nhfp->fd, (genericptr_t) &sysflags, sysflags);
-#endif
     }
     urealtime.finish_time = getnow();
     urealtime.realtime += (long) (urealtime.finish_time
@@ -443,44 +391,8 @@ savestateinlock()
 }
 #endif
 
-#ifdef MFLOPPY
-boolean
-savelev(nhfp, lev)
-NHFILE *nhfp;
-xchar lev;
-{
-    if (nhfp->mode & COUNTING) {
-        int savemode = nhfp->mode;
-
-        bytes_counted = 0;
-        savelev0(nhfp, lev);
-        /* probably bytes_counted will be filled in again by an
-         * immediately following WRITE_SAVE anyway, but we'll
-         * leave it out of checkspace just in case */
-        if (iflags.checkspace) {
-            while (bytes_counted > freediskspace(levels))
-                if (!swapout_oldest())
-                    return FALSE;
-        }
-    }
-    if (nhfp->mode & (WRITING | FREEING)) {
-        bytes_counted = 0;
-        savelev0(nhfp, lev);
-    }
-    if (nhfp->mode != FREEING) {
-        g.level_info[lev].where = ACTIVE;
-        g.level_info[lev].time = g.moves;
-        g.level_info[lev].size = bytes_counted;
-    }
-    return TRUE;
-}
-
-static void
-savelev0(nhfp, lev)
-#else
 void
 savelev(nhfp, lev)
-#endif
 NHFILE *nhfp;
 xchar lev;
 {
@@ -516,9 +428,6 @@ xchar lev;
 
         if (!nhfp)
             panic("Save on bad file!"); /* impossible */
-#ifdef MFLOPPY
-        count_only = (nhfp->mode & COUNTING);
-#endif
         if (lev >= 0 && lev <= maxledgerno())
             g.level_info[lev].flags |= VISITED;
         if (nhfp->structlevel)
@@ -633,9 +542,9 @@ boolean rlecomp;
                     /* run has been broken, write out run-length encoding */
  writeout:
                     if (nhfp->structlevel) {
-                        bwrite(nhfp->fd, (genericptr_t) &match, sizeof (uchar));
-                        bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof (struct rm));
-		    }
+                        bwrite(nhfp->fd, (genericptr_t) &match, sizeof match);
+                        bwrite(nhfp->fd, (genericptr_t) rgrm, sizeof *rgrm);
+                    }
                     /* start encoding again. we have at least 1 rm
                        in the next run, viz. this one. */
                     match = 1;
@@ -679,7 +588,7 @@ struct cemetery **cemeteryaddr;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) thisbones, sizeof *thisbones);
-	}
+        }
         if (release_data(nhfp))
             free((genericptr_t) thisbones);
     }
@@ -705,7 +614,7 @@ NHFILE *nhfp;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) damageptr, sizeof *damageptr);
-	}
+        }
         tmp_dam = damageptr;
         damageptr = damageptr->next;
         if (release_data(nhfp))
@@ -742,23 +651,8 @@ struct obj *otmp;
         } else {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) &zerobuf, sizeof zerobuf);
-	}
-        buflen = OMID(otmp) ? (int) sizeof (unsigned) : 0;
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0) {
-            if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) OMID(otmp), buflen);
-	}
-        /* TODO: post 3.6.x, get rid of this */
-        buflen = OLONG(otmp) ? (int) sizeof (long) : 0;
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        if (buflen > 0) {
-            if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) OLONG(otmp), buflen);
-	}
-
+        }
+        /* extra info about scroll of mail */
         buflen = OMAILCMD(otmp) ? (int) strlen(OMAILCMD(otmp)) + 1 : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
@@ -766,6 +660,11 @@ struct obj *otmp;
             if (nhfp->structlevel)
                   bwrite(nhfp->fd, (genericptr_t) OMAILCMD(otmp), buflen);
         }
+        /* omid used to be indirect via a pointer in oextra but has
+           become part of oextra itself; 0 means not applicable and
+           gets saved/restored whenever any other oxtra components do */
+        if (nhfp->structlevel)
+            bwrite(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
     }
 }
 
@@ -874,11 +773,12 @@ struct monst *mtmp;
         if (buflen > 0) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) EDOG(mtmp), buflen);
-	}
+        }
         /* mcorpsenm is inline int rather than pointer to something,
            so doesn't need to be preceded by a length field */
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+            bwrite(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp),
+                   sizeof MCORPSENM(mtmp));
     }
 }
 
@@ -930,7 +830,7 @@ register struct trap *trap;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)  
                 bwrite(nhfp->fd, (genericptr_t) trap, sizeof *trap);
-	}
+        }
         if (release_data(nhfp))
             dealloc_trap(trap);
         trap = trap2;
@@ -959,7 +859,7 @@ NHFILE *nhfp;
         if (f1->fid >= 0 && perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) f1, sizeof *f1);
-	}
+        }
         if (release_data(nhfp))
             dealloc_fruit(f1);
         f1 = f2;
@@ -992,7 +892,7 @@ NHFILE *nhfp;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) tmplev, sizeof *tmplev);
-	}
+        }
         if (release_data(nhfp))
             free((genericptr_t) tmplev);
     }
@@ -1067,7 +967,8 @@ NHFILE *nhfp;
     if (nhfp->structlevel) {
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */
-        bwrite(nhfp->fd, (genericptr_t) &sfsaveinfo, (unsigned) sizeof sfsaveinfo);
+        bwrite(nhfp->fd, (genericptr_t) &sfsaveinfo,
+               (unsigned) sizeof sfsaveinfo);
         bufon(nhfp->fd);
     }
     return;
@@ -1084,6 +985,7 @@ free_dungeons()
     tnhfp.mode = FREEING;
     savelevchn(&tnhfp);
     save_dungeon(&tnhfp, FALSE, TRUE);
+    free_luathemes(TRUE);
 #endif
     return;
 }
@@ -1157,7 +1059,11 @@ freedynamicdata()
     /* miscellaneous */
     /* free_pickinv_cache();  --  now done from really_done()... */
     free_symsets();
+#ifdef USER_SOUNDS
+    release_sound_mappings();
+#endif
 #endif /* FREE_ALL_MEMORY */
+
     if (VIA_WINDOWPORT())
         status_finish();
 #ifdef DUMPLOG
@@ -1170,97 +1076,4 @@ freedynamicdata()
     return;
 }
 
-#ifdef MFLOPPY
-boolean
-swapin_file(lev)
-int lev;
-{
-    char to[PATHLEN], from[PATHLEN];
-
-    Sprintf(from, "%s%s", g.permbones, g.alllevels);
-    Sprintf(to, "%s%s", levels, g.alllevels);
-    set_levelfile_name(from, lev);
-    set_levelfile_name(to, lev);
-    if (iflags.checkspace) {
-        while (g.level_info[lev].size > freediskspace(to))
-            if (!swapout_oldest())
-                return FALSE;
-    }
-    if (wizard) {
-        pline("Swapping in `%s'.", from);
-        wait_synch();
-    }
-    copyfile(from, to);
-    (void) unlink(from);
-    g.level_info[lev].where = ACTIVE;
-    return TRUE;
-}
-
-static boolean
-swapout_oldest()
-{
-    char to[PATHLEN], from[PATHLEN];
-    int i, oldest;
-    long oldtime;
-
-    if (!g.ramdisk)
-        return FALSE;
-    for (i = 1, oldtime = 0, oldest = 0; i <= maxledgerno(); i++)
-        if (g.level_info[i].where == ACTIVE
-            && (!oldtime || g.level_info[i].time < oldtime)) {
-            oldest = i;
-            oldtime = g.level_info[i].time;
-        }
-    if (!oldest)
-        return FALSE;
-    Sprintf(from, "%s%s", levels, g.alllevels);
-    Sprintf(to, "%s%s", g.permbones, g.alllevels);
-    set_levelfile_name(from, oldest);
-    set_levelfile_name(to, oldest);
-    if (wizard) {
-        pline("Swapping out `%s'.", from);
-        wait_synch();
-    }
-    copyfile(from, to);
-    (void) unlink(from);
-    g.level_info[oldest].where = SWAPPED;
-    return TRUE;
-}
-
-static void
-copyfile(from, to)
-char *from, *to;
-{
-#ifdef TOS
-    if (_copyfile(from, to))
-        panic("Can't copy %s to %s", from, to);
-#else
-    char buf[BUFSIZ]; /* this is system interaction, therefore
-                       * BUFSIZ instead of NetHack's BUFSZ */
-    int nfrom, nto, fdfrom, fdto;
-
-    if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0)
-        panic("Can't copy from %s !?", from);
-    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0)
-        panic("Can't copy to %s", to);
-    do {
-        nfrom = read(fdfrom, buf, BUFSIZ);
-        nto = write(fdto, buf, nfrom);
-        if (nto != nfrom)
-            panic("Copyfile failed!");
-    } while (nfrom == BUFSIZ);
-    (void) nhclose(fdfrom);
-    (void) nhclose(fdto);
-#endif /* TOS */
-}
-
-/* see comment in bones.c */
-void
-co_false()
-{
-    count_only = FALSE;
-    return;
-}
-
-#endif /* MFLOPPY */
 /*save.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1578895348 2020/01/13 06:02:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1597931337 2020/08/20 13:48:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -232,12 +232,22 @@ boolean sanctum; /* is it the seat of the high priest? */
     struct monst *priest;
     struct obj *otmp;
     int cnt;
+    int px = 0, py = 0, i, si = rn2(8);
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
 
-    if (MON_AT(sx + 1, sy))
-        (void) rloc(m_at(sx + 1, sy), FALSE); /* insurance */
+    for (i = 0; i < 8; i++) {
+        px = sx + xdir[(i+si) % 8];
+        py = sy + ydir[(i+si) % 8];
+        if (pm_good_location(px, py, prim))
+            break;
+    }
+    if (i == 8)
+        px = sx, py = sy;
 
-    priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
-                     sx + 1, sy, MM_EPRI);
+    if (MON_AT(px, py))
+        (void) rloc(m_at(px, py), FALSE); /* insurance */
+
+    priest = makemon(prim, px, py, MM_EPRI);
     if (priest) {
         EPRI(priest)->shroom = (schar) ((sroom - g.rooms) + ROOMOFFSET);
         EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
@@ -626,7 +636,7 @@ register struct monst *priest;
                    && (!(HProtection & INTRINSIC)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
-            verbalize("Thy devotion has been rewarded.");
+            verbalize("Thou hast been rewarded for thy devotion.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
                 if (!u.ublessed)

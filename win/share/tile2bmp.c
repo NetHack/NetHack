@@ -1,4 +1,4 @@
-/* NetHack 3.6	tile2bmp.c	$NHDT-Date: 1451442061 2015/12/30 02:21:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.7	tile2bmp.c	$NHDT-Date: 1596498340 2020/08/03 23:45:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -16,8 +16,10 @@
 #include "win32api.h"
 #endif
 
-#include "hack.h"
+#include "config.h"
 #include "tile.h"
+extern void NDECL(monst_globals_init);
+extern void NDECL(objects_globals_init);
 
 #include <stdint.h>
 #if defined(UINT32_MAX) && defined(INT32_MAX) && defined(UINT16_MAX)
@@ -160,7 +162,7 @@ static void FDECL(build_bmfh, (BITMAPFILEHEADER *));
 static void FDECL(build_bmih, (BITMAPINFOHEADER *));
 static void FDECL(build_bmptile, (pixel(*) [TILE_X]));
 
-char *tilefiles[] = {
+const char *tilefiles[] = {
 #if (TILE_X == 32)
     "../win/share/mon32.txt", "../win/share/obj32.txt",
     "../win/share/oth32.txt",

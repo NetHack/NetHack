@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1581637124 2020/02/13 23:38:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.176 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1593953335 2020/07/05 12:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -136,43 +136,6 @@ struct flag {
 };
 
 /*
- * System-specific flags that are saved with the game if SYSFLAGS is defined.
- */
-
-#if defined(AMIFLUSH) || defined(AMII_GRAPHICS) || defined(OPT_DISPMAP)
-#define SYSFLAGS
-#else
-#if defined(MFLOPPY) || defined(MAC)
-#define SYSFLAGS
-#endif
-#endif
-
-#ifdef SYSFLAGS
-struct sysflag {
-    char sysflagsid[10];
-#ifdef AMIFLUSH
-    boolean altmeta;  /* use ALT keys as META */
-    boolean amiflush; /* kill typeahead */
-#endif
-#ifdef AMII_GRAPHICS
-    int numcols;
-    unsigned short
-        amii_dripens[20]; /* DrawInfo Pens currently there are 13 in v39 */
-    AMII_COLOR_TYPE amii_curmap[AMII_MAXCOLORS]; /* colormap */
-#endif
-#ifdef OPT_DISPMAP
-    boolean fast_map; /* use optimized, less flexible map display */
-#endif
-#ifdef MFLOPPY
-    boolean asksavedisk;
-#endif
-#ifdef MAC
-    boolean page_wait; /* put up a --More-- after a page of messages */
-#endif
-};
-#endif
-
-/*
  * Flags that are set each time the game is started.
  * These are not saved with the game.
  *
@@ -251,14 +214,13 @@ struct instance_flags {
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
-    int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
     boolean autodescribe;     /* autodescribe mode in getpos() */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
+    boolean defer_decor;      /* terrain change message vs slipping on ice */
     boolean echo;             /* 1 to echo characters */
     boolean force_invmenu;    /* always menu when handling inventory */
     boolean hilite_pile;      /* mark piles of objects with a hilite */
@@ -276,6 +238,7 @@ struct instance_flags {
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
+    boolean tux_penalty;      /* True iff hero is a monk and wearing a suit */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES
@@ -290,11 +253,6 @@ struct instance_flags {
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */
     boolean extmenu;          /* extended commands use menu interface */
-#ifdef MFLOPPY
-    boolean checkspace; /* check disk space before writing files */
-                        /* (in iflags to allow restore after moving
-                         * to >2GB partition) */
-#endif
 #ifdef MICRO
     boolean BIOS; /* use IBM or ST BIOS calls when appropriate */
 #endif
@@ -327,6 +285,9 @@ struct instance_flags {
 #endif
 #ifdef TTY_TILES_ESCCODES
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
+#endif
+#ifdef TTY_SOUND_ESCCODES
+    boolean vt_sounddata;    /* output console codes for sound support in TTY*/
 #endif
     boolean clicklook;       /* allow right-clicking for look */
     boolean cmdassist;       /* provide detailed assistance for some comnds */
@@ -428,9 +389,6 @@ struct instance_flags {
 #define preload_tiles wc_preload_tiles
 
 extern NEARDATA struct flag flags;
-#ifdef SYSFLAGS
-extern NEARDATA struct sysflag sysflags;
-#endif
 extern NEARDATA struct instance_flags iflags;
 
 /* last_msg values
@@ -448,7 +406,9 @@ enum plnmsg_types {
     PLNMSG_CAUGHT_IN_EXPLOSION, /* explode() feedback */
     PLNMSG_OBJ_GLOWS,           /* "the <obj> glows <color>" */
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
-    PLNMSG_OK_DONT_DIE          /* overriding death in explore/wizard mode */
+    PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
+    PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 
 /* runmode options */

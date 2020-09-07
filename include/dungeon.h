@@ -1,10 +1,17 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date: 1447755969 2015/11/17 10:26:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	dungeon.h	$NHDT-Date: 1596498535 2020/08/03 23:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef DUNGEON_H
 #define DUNGEON_H
+
+typedef struct d_level { /* basic dungeon level element */
+    xchar dnum;          /* dungeon number */
+    xchar dlevel;        /* level number */
+} d_level;
+
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
 
 typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(town, 1);       /* is this a town? (levels only) */
@@ -14,11 +21,6 @@ typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(align, 3);      /* dungeon alignment. */
     Bitfield(unused, 1);     /* etc... */
 } d_flags;
-
-typedef struct d_level { /* basic dungeon level element */
-    xchar dnum;          /* dungeon number */
-    xchar dlevel;        /* level number */
-} d_level;
 
 typedef struct s_level { /* special dungeon level element */
     struct s_level *next;
@@ -57,6 +59,7 @@ typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */
     char fill_lvl[15];     /* name of "fill" level protype file */
+    char themerms[15];     /* lua file name containing themed rooms */
     char boneid;           /* character to id dungeon in bones files */
     d_flags flags;         /* dungeon flags */
     xchar entry_lev;       /* entry level */
@@ -159,20 +162,11 @@ typedef struct branch {
 struct linfo {
     unsigned char flags;
 #define VISITED 0x01      /* hero has visited this level */
-#define FORGOTTEN 0x02    /* hero will forget this level when reached */
+/* 0x02 was FORGOTTEN, when amnesia made you forget maps */
 #define LFILE_EXISTS 0x04 /* a level file exists for this level */
         /* Note:  VISITED and LFILE_EXISTS are currently almost always
          * set at the same time.  However they _mean_ different things.
          */
-#ifdef MFLOPPY
-#define FROMPERM 1 /* for ramdisk use */
-#define TOPERM 2   /* for ramdisk use */
-#define ACTIVE 1
-#define SWAPPED 2
-    int where;
-    long time;
-    long size;
-#endif /* MFLOPPY */
 };
 
 /* types and structures for dungeon map recording
@@ -261,5 +255,7 @@ typedef struct mapseen {
     /* dead heroes; might not have graves or ghosts */
     struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
+
+#endif /* !MAKEDEFS_C && !MDLIB_C */
 
 #endif /* DUNGEON_H */

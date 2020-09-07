@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1575830005 2019/12/08 18:33:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	questpgr.c	$NHDT-Date: 1596498201 2020/08/03 23:43:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,6 +24,7 @@ static void FDECL(convert_line, (char *,char *));
 static void FDECL(deliver_by_pline, (const char *));
 static void FDECL(deliver_by_window, (const char *, int));
 static boolean FDECL(skip_pager, (BOOLEAN_P));
+static boolean FDECL(com_pager_core, (const char *, const char *, BOOLEAN_P));
 
 short
 quest_info(typ)
@@ -363,9 +364,9 @@ char *in_line, *out_line;
             *cc++ = *c;
             break;
         }
+        if (cc > &out_line[BUFSZ - 1])
+            panic("convert_line: overflow");
     }
-    if (cc > &out_line[BUFSZ-1])
-        panic("convert_line: overflow");
     *cc = 0;
     return;
 }
@@ -431,19 +432,20 @@ boolean common UNUSED;
     return FALSE;
 }
 
-boolean
+static boolean
 com_pager_core(section, msgid, showerror)
 const char *section;
 const char *msgid;
 boolean showerror;
 {
-    const char *const howtoput[] = { "pline", "window", "text", "menu", "default", NULL };
-    const int howtoput2i[] = { 1, 2, 2, 3, 0, 0 };
+    static const char *const howtoput[] = {
+        "pline", "window", "text", "menu", "default", NULL
+    };
+    static const int howtoput2i[] = { 1, 2, 2, 3, 0, 0 };
     int output;
     lua_State *L;
-    char *synopsis;
-    char *text;
-    char *fallback_msgid = NULL;
+    char *text = NULL, *synopsis = NULL, *fallback_msgid = NULL;
+    boolean res = FALSE;
 
     if (skip_pager(TRUE))
         return FALSE;
@@ -453,8 +455,7 @@ boolean showerror;
     if (!nhl_loadlua(L, QTEXT_FILE)) {
         if (showerror)
             impossible("com_pager: %s not found.", QTEXT_FILE);
-        lua_close(L);
-        return FALSE;
+        goto compagerdone;
     }
 
     lua_settop(L, 0);
@@ -463,8 +464,7 @@ boolean showerror;
         if (showerror)
             impossible("com_pager: questtext in %s is not a lua table",
                        QTEXT_FILE);
-        lua_close(L);
-        return FALSE;
+        goto compagerdone;
     }
 
     lua_getfield(L, -1, section);
@@ -472,11 +472,10 @@ boolean showerror;
         if (showerror)
             impossible("com_pager: questtext[%s] in %s is not a lua table",
                        section, QTEXT_FILE);
-        lua_close(L);
-        return FALSE;
+        goto compagerdone;
     }
 
-tryagain:
+ tryagain:
     lua_getfield(L, -1, fallback_msgid ? fallback_msgid : msgid);
     if (!lua_istable(L, -1)) {
         if (!fallback_msgid) {
@@ -489,20 +488,24 @@ tryagain:
                     goto tryagain;
             }
         }
-
-        if (showerror)
-            impossible("com_pager: questtext[%s][%s] in %s is not a lua table",
-                       section, msgid, QTEXT_FILE);
-        free(fallback_msgid);
-        lua_close(L);
-        return FALSE;
+        if (showerror) {
+            if (!fallback_msgid)
+                impossible(
+                      "com_pager: questtext[%s][%s] in %s is not a lua table",
+                           section, msgid, QTEXT_FILE);
+            else
+                impossible(
+           "com_pager: questtext[%s][%s] and [][%s] in %s are not lua tables",
+                           section, msgid, fallback_msgid, QTEXT_FILE);
+        }
+        goto compagerdone;
     }
 
     synopsis = get_table_str_opt(L, "synopsis", NULL);
     text = get_table_str_opt(L, "text", NULL);
     output = howtoput2i[get_table_option(L, "output", "default", howtoput)];
 
-    if (!synopsis && !text) {
+    if (!text) {
         int nelems;
 
         lua_len(L, -1);
@@ -511,11 +514,10 @@ tryagain:
         if (nelems < 2) {
             if (showerror)
                 impossible(
-                "com_pager: questtext[%s][%s] in %s in not an array of strings",
-                       section, msgid, QTEXT_FILE);
-            free(fallback_msgid);
-            lua_close(L);
-            return FALSE;
+              "com_pager: questtext[%s][%s] in %s in not an array of strings",
+                           section, fallback_msgid ? fallback_msgid : msgid,
+                           QTEXT_FILE);
+            goto compagerdone;
         }
         nelems = rn2(nelems) + 1;
         lua_pushinteger(L, nelems);
@@ -528,24 +530,33 @@ tryagain:
 
     if (output == 0 || output == 1)
         deliver_by_pline(text);
-    else if (output == 3)
-        deliver_by_window(text, NHW_MENU);
     else
-        deliver_by_window(text, NHW_TEXT);
+        deliver_by_window(text, (output == 3) ? NHW_MENU : NHW_TEXT);
 
     if (synopsis) {
         char in_line[BUFSZ], out_line[BUFSZ];
 
+#if 0   /* not yet -- brackets need to be removed from quest.lua */
+        Sprintf(in_line, "[%.*s]",
+                (int) (sizeof in_line - sizeof "[]"), synopsis);
+#else
         Strcpy(in_line, synopsis);
+#endif
         convert_line(in_line, out_line);
+        /* bypass message delivery but be available for ^P recall */
         putmsghistory(out_line, FALSE);
-        free(synopsis);
     }
+    res = TRUE;
 
-    free(fallback_msgid);
-    free(text);
+ compagerdone:
+    if (text)
+        free((genericptr_t) text);
+    if (synopsis)
+        free((genericptr_t) synopsis);
+    if (fallback_msgid)
+        free((genericptr_t) fallback_msgid);
     lua_close(L);
-    return TRUE;
+    return res;
 }
 
 void

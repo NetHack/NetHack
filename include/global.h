@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1574982019 2019/11/28 23:00:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1594032649 2020/07/06 10:50:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,23 +7,6 @@
 #define GLOBAL_H
 
 #include <stdio.h>
-
-/*
- * Development status possibilities.
- */
-#define NH_STATUS_RELEASED    0         /* Released */
-#define NH_STATUS_WIP         1         /* Work in progress */
-#define NH_STATUS_BETA        2         /* BETA testing */
-#define NH_STATUS_POSTRELEASE 3         /* patch commit point only */
-
-/*
- * Development status of this NetHack version.
- */
-#define NH_DEVEL_STATUS NH_STATUS_WIP
-
-#ifndef DEBUG  /* allow tool chains to define without causing warnings */
-#define DEBUG
-#endif
 
 /*
  * Files expected to exist in the playground directory.
@@ -175,36 +158,12 @@ extern struct cross_target_s cross_target;
 #include "unixconf.h"
 #endif
 
-#ifdef OS2
-#include "os2conf.h"
-#endif
-
 #ifdef MSDOS
 #include "pcconf.h"
 #endif
 
-#ifdef TOS
-#include "tosconf.h"
-#endif
-
-#ifdef AMIGA
-#include "amiconf.h"
-#endif
-
-#ifdef MAC
-#include "macconf.h"
-#endif
-
-#ifdef __BEOS__
-#include "beconf.h"
-#endif
-
 #ifdef WIN32
-#ifdef WIN_CE
-#include "wceconf.h"
-#else
 #include "ntconf.h"
-#endif
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
@@ -310,11 +269,42 @@ extern struct cross_target_s cross_target;
 #define Vsprintf (void) vsprintf
 #endif
 
-/* primitive memory leak debugging; see alloc.c */
+/*
+ *  Memory allocation.  Functions are declared here rather than in
+ *  extern.h so that source files which use config.h instead of hack.h
+ *  will see the declarations.
+ *
+ *  NetHack does not use malloc() [except to implement alloc() in alloc.c]
+ *  or realloc() or calloc().  They return Null if memory runs out and
+ *  nethack's code relies on alloc() to intercept that so that a zillion
+ *  callers don't need to test for Null result.  alloc() never returns
+ *  Null; if memory runs out, it calls panic() and does not return at all.
+ */
+
+/* dupstr() is unconditional in alloc.c but not used when MONITOR_HEAP
+   is enabled; some utility programs link with alloc.{o,obj} and need it
+   if nethack is built with MONITOR_HEAP enabled and they aren't; this
+   declaration has been moved out of the '#else' below to avoid getting
+   a complaint from -Wmissing-prototypes when building with MONITOR_HEAP */
+extern char *FDECL(dupstr, (const char *));
+
+/*
+ * MONITOR_HEAP is conditionally used for primitive memory leak debugging.
+ * When enabled, NH_HEAPLOG (if defined in the environment) is used as the
+ * name of a log file to create for capturing allocations and releases.
+ * [The 'heaputil' program to analyze that file isn't included in releases.]
+ *
+ * See alloc.c.
+ */
 #ifdef MONITOR_HEAP
+/* plain alloc() is not declared except in alloc.c */
 extern long *FDECL(nhalloc, (unsigned int, const char *, int));
 extern void FDECL(nhfree, (genericptr_t, const char *, int));
 extern char *FDECL(nhdupstr, (const char *, const char *, int));
+/* this predates C99's __func__; that is trickier to use conditionally
+   because it is not implemented as a preprocessor macro; MONITOR_HEAP
+   wouldn't gain much benefit from it anyway so continue to live without it;
+   if func's caller were accessible, that would be a very different issue */
 #ifndef __FILE__
 #define __FILE__ ""
 #endif
@@ -325,9 +315,9 @@ extern char *FDECL(nhdupstr, (const char *, const char *, int));
 #define free(a) nhfree(a, __FILE__, (int) __LINE__)
 #define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else /* !MONITOR_HEAP */
+/* declare alloc.c's alloc(); allocations made with it use ordinary free() */
 extern long *FDECL(alloc, (unsigned int));  /* alloc.c */
-extern char *FDECL(dupstr, (const char *)); /* ditto */
-#endif
+#endif /* ?MONITOR_HEAP */
 
 /* Used for consistency checks of various data files; declare it here so
    that utility programs which include config.h but not hack.h can see it. */

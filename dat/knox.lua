@@ -1,4 +1,4 @@
--- NetHack 3.6	knox.des	$NHDT-Date: 1547343821 2019/01/13 01:43:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	knox.des	$NHDT-Date: 1547343821 2019/01/13 01:43:41 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -41,14 +41,14 @@ des.teleport_region({ region = {06,15,09,16}, dir="down" })
 --   Throne room, with Croesus on the throne
 des.region({ x1=37,y1=08,x2=46,y2=11, lit=1, type="throne", prefilled=0 })
 --   50% chance each to move throne and/or fort's entry secret door up one row
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.monster({ id = "Croesus", x=43, y=10, peaceful = 0 })
 else
    des.monster({ id = "Croesus", x=43, y=09, peaceful = 0 })
    des.terrain(43,09, "\\")
    des.terrain(43,10, ".")
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(47,09, "S")
    des.terrain(47,10, "|")
 end
@@ -65,12 +65,12 @@ function treasure_spot(x,y)
    end
 end
 
-des.region({ region={21,08,35,11}, lit=1, type="orginary" })
+des.region({ region={21,08,35,11}, lit=1, type="ordinary" })
 local treasury = selection.area(21,08,35,11);
 treasury:iterate(treasure_spot);
 
 --   Vault entrance also varies
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(36,09, "|")
    des.terrain(36,10, "S")
 end

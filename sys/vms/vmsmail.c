@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsmail.c	$NHDT-Date: 1449801741 2015/12/11 02:42:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	vmsmail.c	$NHDT-Date: 1596498307 2020/08/03 23:45:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Robert Patrick Rankin, 1991.                     */
 /* NetHack may be freely redistributed.  See license for details. */
 

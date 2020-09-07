@@ -1,4 +1,4 @@
-/* NetHack 3.6	vision.h	$NHDT-Date: 1559994624 2019/06/08 11:50:24 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	vision.h	$NHDT-Date: 1596498568 2020/08/03 23:49:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 
@@ -52,7 +52,7 @@
 /*
  *  Circle information
  */
-#define MAX_RADIUS 15 /* this is in points from the source */
+#define MAX_RADIUS 16 /* this is in points from the source */
 
 /* Use this macro to get a list of distances of the edges (see vision.c). */
 #define circle_ptr(z) (&circle_data[(int) circle_start[z]])

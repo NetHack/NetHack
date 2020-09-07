@@ -1,4 +1,4 @@
-# NetHack 3.6  code_style.txt       $NHDT-Date: 1524689669 2018/04/25 20:54:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# NetHack 3.7  code_style.txt       $NHDT-Date: 1596498264 2020/08/03 23:44:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $
 # Copyright (c) 2015 by Derek S. Ray
 # NetHack may be freely redistributed.  See license for details.
 
@@ -48,7 +48,7 @@ Functions and Control Statements
 
 For a function definition, the return type, declarator, and opening brace
 should each appear on a line of their own. Arguments are never declared in the
-function declarator, but are declared, unintended, K&R-style before the
+function declarator, but are declared, unindented, K&R-style before the
 opening brace:
 
     void

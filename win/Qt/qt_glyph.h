@@ -9,6 +9,11 @@
 
 namespace nethack_qt_ {
 
+enum border_code {
+    NO_BORDER, BORDER_DEFAULT,
+    BORDER_CURSED, BORDER_UNCURSED, BORDER_BLESSED
+};
+
 class NetHackQtGlyphs {
 public:
 	NetHackQtGlyphs();
@@ -20,6 +25,8 @@ public:
 
 	void drawGlyph(QPainter&, int glyph, int pixelx, int pixely);
 	void drawCell(QPainter&, int glyph, int cellx, int celly);
+	void drawBorderedCell(QPainter&, int glyph,
+                              int cellx, int celly, int bordercode);
 	QPixmap glyph(int glyph);
 
 private:

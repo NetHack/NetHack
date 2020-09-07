@@ -1,4 +1,4 @@
-/* NetHack 3.6	tile2x11.h	$NHDT-Date: 1524689515 2018/04/25 20:51:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	tile2x11.h	$NHDT-Date: 1597274123 2020/08/12 23:15:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /*      Copyright (c) 2002 by David Cohrs              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,10 @@
 #define TILE2X11_H
 
 /*
- * Header for the x11 tile map.
+ * Header for the X11 tile map.
+ *
+ * dat/x11tiles is used by Qt for fallback if nhtiles.bmp is inaccessible,
+ * so this header is used by Qt as well as by X11.
  */
 typedef struct {
     unsigned long version;

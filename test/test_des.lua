@@ -21,6 +21,13 @@ function check_loc_name(x, y, name)
    end
 end
 
+function check_loc_flag(x, y, flag, value)
+   local loc = nh.getmap(x, y);
+   if (loc.flags[flag] ~= value) then
+      error(loc.typ_name .. " at (" .. x .. "," .. y .. ") flag " .. flag .. " is " .. tostring(loc.flags[flag]) .. ", not " .. tostring(value));
+   end
+end
+
 function check_trap_at(x,y, name)
    local t = nh.gettrap(x + 1, y); -- + 1 == g.xstart
    if (t.ttyp_name ~= name) then
@@ -214,9 +221,20 @@ FFF]] })
 III
 .I.
 III]] })
+   des.map({ coord = {30, 5}, map = [[
+...
+...
+...]], contents = function(map)
+                des.terrain(0,0, "L");
+                des.terrain(map.width-1,map.height-1, "T");
+   end});
+   check_loc_name(30, 5, "lava pool");
+   check_loc_name(32, 7, "tree");
 end
 
 function test_feature()
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = ".", lit = 1 });
    des.feature("fountain", 40, 08);
    check_loc_name(40 + 1, 08, "fountain");
    des.feature("sink", {41, 08});
@@ -225,6 +243,35 @@ function test_feature()
    check_loc_name(42 + 1, 08, "pool");
    des.feature({ type = "sink", coord = {43, 08} });
    check_loc_name(43 + 1, 08, "sink");
+
+   des.feature({ type = "throne", coord = {44, 08}, looted=true });
+   check_loc_name(44 + 1, 08, "throne");
+   check_loc_flag(44 + 1, 08, "looted", true);
+
+   des.feature({ type = "throne", coord = {44, 08}, looted=false });
+   check_loc_name(44 + 1, 08, "throne");
+   check_loc_flag(44 + 1, 08, "looted", false);
+
+   des.feature({ type = "tree", coord = {45, 08}, looted=true, swarm=false });
+   check_loc_name(45 + 1, 08, "tree");
+   check_loc_flag(45 + 1, 08, "looted", true);
+   check_loc_flag(45 + 1, 08, "swarm", false);
+
+   des.feature({ type = "tree", coord = {45, 08}, looted=false, swarm=true });
+   check_loc_name(45 + 1, 08, "tree");
+   check_loc_flag(45 + 1, 08, "looted", false);
+   check_loc_flag(45 + 1, 08, "swarm", true);
+
+   des.feature({ type = "fountain", coord = {46, 08}, looted=false, warned=true });
+   check_loc_name(46 + 1, 08, "fountain");
+   check_loc_flag(46 + 1, 08, "looted", false);
+   check_loc_flag(46 + 1, 08, "warned", true);
+
+   des.feature({ type = "sink", coord = {47, 08}, pudding=false, dishwasher=true, ring=true });
+   check_loc_name(47 + 1, 08, "sink");
+   check_loc_flag(47 + 1, 08, "pudding", false);
+   check_loc_flag(47 + 1, 08, "dishwasher", true);
+   check_loc_flag(47 + 1, 08, "ring", true);
 end
 
 function test_gold()
@@ -282,10 +329,16 @@ function test_region()
 end
 
 function test_door()
+   des.terrain(12, 12, "-");
    des.door("nodoor", 12,12);
+
+   des.terrain(13, 12, "-");
    des.door({ x = 13, y = 12, state = "open" });
+
+   des.terrain(14, 12, "-");
    des.door({ coord = {14, 12}, state = "open" });
-   des.room({ type = "graveyard", contents = function()
+
+   des.room({ type = "ordinary", contents = function()
                  des.door({ wall = "north", pos = 1 });
                  des.door({ wall = "random", state = "locked" });
                          end
@@ -309,17 +362,19 @@ end
 function test_room()
    des.reset_level();
    des.level_init({ style = "solidfill", fg=" " });
-   des.room({ type = " ordinary", lit = 1,
+   des.room({ type = "ordinary", lit = 1,
               x=3, y=3, xalign="center", yalign="center",
               w=11, h=9, contents = function()
                  des.room({ x=4, y=3, w=3,h=3 });
               end
    });
-   des.room({ type=" ordinary", coord={3, 3}, w=3, h=3 });
+   des.room({ type="ordinary", coord={3, 3}, w=3, h=3 });
    des.room();
-   des.room({ contents = function()
+   des.room({ contents = function(rm)
                  des.object();
                  des.monster();
+                 des.terrain(0,0, "L");
+                 des.terrain(rm.width, rm.height, "T");
                          end
    });
    des.random_corridors();
@@ -390,21 +445,16 @@ function test_replace_terrain()
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", lit=1 });
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", chance=50 });
    des.replace_terrain({ region={1,1, 70,19}, fromterrain=".", toterrain="L", chance=25 });
+   des.replace_terrain({ selection=selection.area(2,5, 10,15), fromterrain="L", toterrain="." });
+   des.replace_terrain({ mapfragment=[[...]], toterrain="T" });
+   des.replace_terrain({ mapfragment=[[w.w]], toterrain="L" });
 end
 
 function test_corridor()
    des.reset_level();
    des.level_init({ style = "solidfill", fg=" " });
-   des.room({ x=2, y=2, xalign="center", yalign="center", w=4, h=4,
-              contents = function()
-                 des.door({ wall = "south", pos = 2 });
-                         end
-   });
-   des.room({ x=1, y=3, xalign="center", yalign="center", w=6, h=6,
-              contents = function()
-                 des.door({ wall = "north", pos = 1 });
-                         end
-   });
+   des.room({ x=2, y=2, xalign="center", yalign="center", w=4, h=4 });
+   des.room({ x=1, y=3, xalign="center", yalign="center", w=6, h=6 });
    des.corridor({ srcroom=0, srcwall="south", srcdoor=0, destroom=1, destwall="north", destdoor=0 });
 end
 

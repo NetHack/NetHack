@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1580600496 2020/02/01 23:41:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1596498154 2020/08/03 23:42:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,9 +22,6 @@ const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
 NEARDATA struct flag flags;
 NEARDATA boolean has_strong_rngseed = FALSE;
-#ifdef SYSFLAGS
-NEARDATA struct sysflag sysflags;
-#endif
 NEARDATA struct instance_flags iflags;
 NEARDATA struct you u;
 NEARDATA time_t ubirthday;
@@ -285,6 +282,7 @@ const struct instance_globals g_init = {
     0L, /* domove_succeeded */
     NULL, /* nomovemsg */
     DUMMY, /* plname */
+    0, /* plnamelen */
     DUMMY, /* pl_character */
     '\0', /* pl_race */
     DUMMY, /* pl_fruit */
@@ -348,14 +346,10 @@ const struct instance_globals g_init = {
 #ifdef MICRO
     UNDEFINED_VALUES, /* levels */
 #endif /* MICRO */
-#ifdef MFLOPPY
-    UNDEFINED_VALUES, /* permbones */
-    FALSE,     /*ramdisk */
-    TRUE, /* saveprompt */
-    "levels.*", /* alllevels */
-    "bones*.*", /* allbones */
-#endif
     UNDEFINED_VALUES, /* program_state */
+
+    /* detect.c */
+    0, /* already_found_flag */
 
     /* dig.c */
     UNDEFINED_VALUE, /* did_dig_msg */
@@ -369,6 +363,7 @@ const struct instance_globals g_init = {
     FALSE, /* at_ladder */
     NULL, /* dfr_pre_msg */
     NULL, /* dfr_post_msg */
+    0, /* did_nothing_flag */
     { 0, 0 }, /* save_dlevel */
 
     /* do_name.c */
@@ -409,7 +404,7 @@ const struct instance_globals g_init = {
     DUMMY, /* warnsyms */
 
     /* dungeon.c */
-    UNDEFINED_VALUE, /* n_dgns */
+    0, /* n_dgns */
     NULL, /* branches */
     NULL, /* mapseenchn */
 
@@ -466,16 +461,16 @@ const struct instance_globals g_init = {
     /* makemon.c */
 
     /* mhitm.c */
-    UNDEFINED_VALUE, /* vis */
-    UNDEFINED_VALUE, /* far_noise */
-    UNDEFINED_VALUE, /* noisetime */
-    UNDEFINED_PTR, /* otmp */
-    UNDEFINED_VALUE, /* dieroll */
+    0L, /* noisetime */
+    FALSE, /* far_noise */
+    FALSE, /* vis */
+    FALSE, /* skipdrin */
 
     /* mhitu.c */
     UNDEFINED_VALUE, /* mhitu_dieroll */
 
     /* mklev.c */
+    UNDEFINED_VALUES, /* luathemes[] */
     UNDEFINED_VALUE, /* vault_x */
     UNDEFINED_VALUE, /* vault_y */
     UNDEFINED_VALUE, /* made_branch */
@@ -636,10 +631,16 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
     UNDEFINED_VALUE, /* ysize */
+    FALSE, /* in_mk_themerooms */
+    FALSE, /* themeroom_failed */
 
     /* spells.c */
     0, /* spl_sortmode */
     NULL, /* spl_orderindx */
+
+    /* steal.c */
+    0, /* stealoid */
+    0, /* stealmid */
 
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */
@@ -731,9 +732,6 @@ decl_globals_init()
     g.subrooms = &g.rooms[MAXNROFROOMS + 1];
 
     ZERO(flags);
-#ifdef SYSFLAGS
-    ZERO(sysflags);
-#endif
     ZERO(iflags);
     ZERO(u);
     ZERO(ubirthday);

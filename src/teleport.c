@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1581886867 2020/02/16 21:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1596498216 2020/08/03 23:43:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,10 +42,11 @@ boolean
 goodpos(x, y, mtmp, gpflags)
 int x, y;
 struct monst *mtmp;
-unsigned gpflags;
+long gpflags;
 {
     struct permonst *mdat = (struct permonst *) 0;
-    boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0);
+    boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0),
+            allow_u = ((gpflags & GP_ALLOW_U) != 0);
 
     if (!isok(x, y))
         return FALSE;
@@ -56,10 +57,12 @@ unsigned gpflags;
      * which could be co-located and thus get restricted a bit too much.
      * oh well.
      */
-    if (x == u.ux && y == u.uy
-        && mtmp != &g.youmonst && (mtmp != u.ustuck || !u.uswallow)
-        && (!u.usteed || mtmp != u.usteed))
-        return FALSE;
+    if (!allow_u) {
+        if (x == u.ux && y == u.uy && mtmp != &g.youmonst
+            && (mtmp != u.ustuck || !u.uswallow)
+            && (!u.usteed || mtmp != u.usteed))
+            return FALSE;
+    }
 
     if (mtmp) {
         struct monst *mtmp2 = m_at(x, y);
@@ -144,7 +147,7 @@ enexto_core(cc, xx, yy, mdat, entflags)
 coord *cc;
 xchar xx, yy;
 struct permonst *mdat;
-unsigned entflags;
+long entflags;
 {
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
@@ -248,28 +251,28 @@ int x1, y1, x2, y2;
         return FALSE;
     if (g.dndest.nlx > 0) {
         /* if inside a restricted region, can't teleport outside */
-        if (within_bounded_area(x1, y1, g.dndest.nlx, g.dndest.nly, g.dndest.nhx,
-                                g.dndest.nhy)
+        if (within_bounded_area(x1, y1, g.dndest.nlx, g.dndest.nly,
+                                g.dndest.nhx, g.dndest.nhy)
             && !within_bounded_area(x2, y2, g.dndest.nlx, g.dndest.nly,
                                     g.dndest.nhx, g.dndest.nhy))
             return FALSE;
         /* and if outside, can't teleport inside */
-        if (!within_bounded_area(x1, y1, g.dndest.nlx, g.dndest.nly, g.dndest.nhx,
-                                 g.dndest.nhy)
-            && within_bounded_area(x2, y2, g.dndest.nlx, g.dndest.nly, g.dndest.nhx,
-                                   g.dndest.nhy))
+        if (!within_bounded_area(x1, y1, g.dndest.nlx, g.dndest.nly,
+                                 g.dndest.nhx, g.dndest.nhy)
+            && within_bounded_area(x2, y2, g.dndest.nlx, g.dndest.nly,
+                                   g.dndest.nhx, g.dndest.nhy))
             return FALSE;
     }
     if (g.updest.nlx > 0) { /* ditto */
-        if (within_bounded_area(x1, y1, g.updest.nlx, g.updest.nly, g.updest.nhx,
-                                g.updest.nhy)
+        if (within_bounded_area(x1, y1, g.updest.nlx, g.updest.nly,
+                                g.updest.nhx, g.updest.nhy)
             && !within_bounded_area(x2, y2, g.updest.nlx, g.updest.nly,
                                     g.updest.nhx, g.updest.nhy))
             return FALSE;
-        if (!within_bounded_area(x1, y1, g.updest.nlx, g.updest.nly, g.updest.nhx,
-                                 g.updest.nhy)
-            && within_bounded_area(x2, y2, g.updest.nlx, g.updest.nly, g.updest.nhx,
-                                   g.updest.nhy))
+        if (!within_bounded_area(x1, y1, g.updest.nlx, g.updest.nly,
+                                 g.updest.nhx, g.updest.nhy)
+            && within_bounded_area(x2, y2, g.updest.nlx, g.updest.nly,
+                                   g.updest.nhx, g.updest.nhy))
             return FALSE;
     }
     return TRUE;
@@ -301,9 +304,9 @@ teleds(nux, nuy, teleds_flags)
 int nux, nuy;
 int teleds_flags;
 {
-    boolean ball_active, ball_still_in_range;
-    boolean allow_drag = teleds_flags & TELEDS_ALLOW_DRAG;
-    boolean is_teleport = teleds_flags & TELEDS_TELEPORT;
+    boolean ball_active, ball_still_in_range = FALSE,
+            allow_drag = (teleds_flags & TELEDS_ALLOW_DRAG) != 0,
+            is_teleport = (teleds_flags & TELEDS_TELEPORT) != 0;
     struct monst *vault_guard = vault_occupied(u.urooms) ? findgd() : 0;
 
     if (u.utraptype == TT_BURIEDBALL) {
@@ -311,7 +314,10 @@ int teleds_flags;
         buried_ball_to_punishment();
     }
     ball_active = (Punished && uball->where != OBJ_FREE);
-    ball_still_in_range = FALSE;
+    if (!ball_active
+        || near_capacity() > SLT_ENCUMBER
+        || distmin(u.ux, u.uy, nux, nuy) > 1)
+        allow_drag = FALSE;
 
     /* If they have to move the ball, then drag if allow_drag is true;
      * otherwise they are teleporting, so unplacebc().
@@ -329,18 +335,10 @@ int teleds_flags;
      * rock in the way), in which case it teleports the ball on its own.
      */
     if (ball_active) {
-        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2) {
+        if (!carried(uball) && distmin(nux, nuy, uball->ox, uball->oy) <= 2)
             ball_still_in_range = TRUE; /* don't have to move the ball */
-        } else {
-            /* have to move the ball */
-            if (!allow_drag || distmin(u.ux, u.uy, nux, nuy) > 1) {
-                /* we should not have dist > 1 and allow_drag at the same
-                 * time, but just in case, we must then revert to teleport.
-                 */
-                allow_drag = FALSE;
-                unplacebc();
-            }
-        }
+        else if (!allow_drag)
+            unplacebc(); /* have to move the ball */
     }
     reset_utrap(FALSE);
     set_ustuck((struct monst *) 0);
@@ -353,43 +351,32 @@ int teleds_flags;
     }
 
     if (u.uswallow) {
+        /* subset of unstuck() */
         u.uswldtim = u.uswallow = 0;
-        if (Punished && !ball_active) {
-            /* ensure ball placement, like unstuck */
-            ball_active = TRUE;
-            allow_drag = FALSE;
+        if (Punished) { /* ball&chain are off map while swallowed */
+            ball_active = TRUE; /* to put chain and non-carried ball on map */
+            ball_still_in_range = allow_drag = FALSE; /* (redundant) */
         }
         docrt();
     }
-    if (ball_active) {
-        if (ball_still_in_range || allow_drag) {
-            int bc_control;
-            xchar ballx, bally, chainx, chainy;
-            boolean cause_delay;
+    if (ball_active && (ball_still_in_range || allow_drag)) {
+        int bc_control;
+        xchar ballx, bally, chainx, chainy;
+        boolean cause_delay;
 
-            if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
-                          &chainy, &cause_delay, allow_drag)) {
-                move_bc(0, bc_control, ballx, bally, chainx, chainy);
-            } else {
-                /* dragging fails if hero is encumbered beyond 'burdened' */
-                allow_drag = FALSE; /* teleport b&c to hero's new spot */
-                unplacebc(); /* to match placebc() below */
-            }
-        }
+        if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
+                      &chainy, &cause_delay, allow_drag))
+            move_bc(0, bc_control, ballx, bally, chainx, chainy);
+        else /* dragging fails if hero is encumbered beyond 'burdened' */
+            unplacebc(); /* to match placebc() below */
     }
-
-    if (is_teleport && flags.verbose)
-        You("materialize in %s location!",
-            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
 
     /* must set u.ux, u.uy after drag_ball(), which may need to know
        the old position if allow_drag is true... */
     u_on_newpos(nux, nuy); /* set u.<x,y>, usteed-><mx,my>; cliparound() */
     fill_pit(u.ux0, u.uy0);
-    if (ball_active) {
-        if (!ball_still_in_range && !allow_drag)
-            placebc();
-    }
+    if (ball_active && uchain && uchain->where == OBJ_FREE)
+        placebc(); /* put back the ball&chain if they were taken off map */
     initrack(); /* teleports mess up tracking monsters without this */
     update_player_regions();
     /*
@@ -403,6 +390,12 @@ int teleds_flags;
     g.vision_full_recalc = 1;
     nomul(0);
     vision_recalc(0); /* vision before effects */
+
+    /* this used to take place sooner, but if a --More-- prompt was issued
+       then the old map display was shown instead of the new one */
+    if (is_teleport && flags.verbose)
+        You("materialize in %s location!",
+            (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
     /* if terrain type changes, levitation or flying might become blocked
        or unblocked; might issue message, so do this after map+vision has
        been updated for new location instead of right after u_on_newpos() */
@@ -525,7 +518,8 @@ struct obj *scroll;
              * of the function. */
             return;
     }
-    if ((Teleport_control && !Stunned) || wizard) {
+    if ((Teleport_control && !Stunned) || (scroll && scroll->blessed)
+         || wizard) {
         if (unconscious()) {
             pline("Being unconscious, you cannot control your teleport.");
         } else {
@@ -550,12 +544,6 @@ struct obj *scroll;
                 return;
             }
             pline("Sorry...");
-        }
-    } else if (scroll && scroll->blessed) {
-        /* (this used to be handled in seffects()) */
-        if (yn("Do you wish to teleport?") == 'n') {
-            learnscroll(scroll); /* this is obviously a teleport scroll */
-            return;
         }
     }
 
@@ -688,23 +676,34 @@ boolean break_the_rules; /* True: wizard mode ^T */
     boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
-    if (trap && (!trap->tseen || trap->ttyp != TELEP_TRAP))
+    if (trap && !trap->tseen)
         trap = 0;
 
     if (trap) {
-        trap_once = trap->once; /* trap may get deleted, save this */
-        if (trap->once) {
-            pline("This is a vault teleport, usable once only.");
-            if (yn("Jump in?") == 'n') {
-                trap = 0;
-            } else {
-                deltrap(trap);
-                newsym(u.ux, u.uy);
+        if (trap->ttyp == LEVEL_TELEP && trap->tseen) {
+            if (yn("There is a level teleporter here. Trigger it?") == 'y') {
+                level_tele_trap(trap, FORCETRAP);
+                /* deliberate jumping will always take time even if it doesn't
+                 * work */
+                return 1;
+            } else
+                trap = 0; /* continue with normal horizontal teleport */
+        } else if (trap->ttyp == TELEP_TRAP) {
+            trap_once = trap->once; /* trap may get deleted, save this */
+            if (trap->once) {
+                pline("This is a vault teleport, usable once only.");
+                if (yn("Jump in?") == 'n') {
+                    trap = 0;
+                } else {
+                    deltrap(trap);
+                    newsym(u.ux, u.uy);
+                }
             }
-        }
-        if (trap)
-            You("%s onto the teleportation trap.",
-                locomotion(g.youmonst.data, "jump"));
+            if (trap)
+                You("%s onto the teleportation trap.",
+                    locomotion(g.youmonst.data, "jump"));
+        } else
+            trap = 0;
     }
     if (!trap) {
         boolean castit = FALSE;
@@ -712,11 +711,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(g.youmonst.data))) {
-            /* Try to use teleport away spell.
-               Prior to 3.6.2 this used to require that you know the spellbook
-               (probably just intended as an optimization to skip the
-               lookup loop) but it is possible to know and cast a spell
-               after forgetting its book due to amnesia. */
+            /* Try to use teleport away spell. */
             for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
                 if (g.spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY)
                     break;
@@ -1023,11 +1018,11 @@ level_tele()
            which branches don't connect to anything deeper;
            mainly used to distinguish "can't get there from here"
            vs "from anywhere" rather than to control destination */
-        d_level *branch = In_quest(&u.uz) ? &qstart_level
+        d_level *qbranch = In_quest(&u.uz) ? &qstart_level
                           : In_mines(&u.uz) ? &mineend_level
                             : &sanctum_level;
-        int deepest = g.dungeons[branch->dnum].depth_start
-                      + dunlevs_in_dungeon(branch) - 1;
+        int deepest = g.dungeons[qbranch->dnum].depth_start
+                      + dunlevs_in_dungeon(qbranch) - 1;
 
         /* if invocation did not yet occur, teleporting into
          * the last level of Gehennom is forbidden.
@@ -1122,19 +1117,21 @@ struct trap *trap;
 unsigned trflags;
 {
     char verbbuf[BUFSZ];
+    boolean intentional = FALSE;
 
-    if ((trflags & VIASITTING) != 0)
+    if ((trflags & (VIASITTING | FORCETRAP)) != 0) {
         Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
-    else
+        intentional = TRUE;
+    } else
         Sprintf(verbbuf, "%s onto",
                 Levitation ? (const char *) "float"
                            : locomotion(g.youmonst.data, "step"));
     You("%s a level teleport trap!", verbbuf);
 
-    if (Antimagic) {
+    if (Antimagic && !intentional) {
         shieldeff(u.ux, u.uy);
     }
-    if (Antimagic || In_endgame(&u.uz)) {
+    if ((Antimagic && !intentional) || In_endgame(&u.uz)) {
         You_feel("a wrenching sensation.");
         return;
     }
@@ -1177,13 +1174,15 @@ struct monst *mtmp;
             return (within_bounded_area(x, y, g.updest.lx, g.updest.ly,
                                         g.updest.hx, g.updest.hy)
                     && (!g.updest.nlx
-                        || !within_bounded_area(x, y, g.updest.nlx, g.updest.nly,
+                        || !within_bounded_area(x, y,
+                                                g.updest.nlx, g.updest.nly,
                                                 g.updest.nhx, g.updest.nhy)));
         if (g.dndest.lx && (yy & 1) == 0) /* moving down */
             return (within_bounded_area(x, y, g.dndest.lx, g.dndest.ly,
                                         g.dndest.hx, g.dndest.hy)
                     && (!g.dndest.nlx
-                        || !within_bounded_area(x, y, g.dndest.nlx, g.dndest.nly,
+                        || !within_bounded_area(x, y,
+                                                g.dndest.nlx, g.dndest.nly,
                                                 g.dndest.nhx, g.dndest.nhy)));
     } else {
         /* [try to] prevent a shopkeeper or temple priest from being
@@ -1493,7 +1492,8 @@ register struct obj *obj;
              || (g.dndest.nlx && On_W_tower_level(&u.uz)
                  && within_bounded_area(tx, ty, g.dndest.nlx, g.dndest.nly,
                                         g.dndest.nhx, g.dndest.nhy)
-                    != within_bounded_area(otx, oty, g.dndest.nlx, g.dndest.nly,
+                    != within_bounded_area(otx, oty,
+                                           g.dndest.nlx, g.dndest.nly,
                                            g.dndest.nhx, g.dndest.nhy)));
 
     if (flooreffects(obj, tx, ty, "fall")) {
@@ -1562,8 +1562,8 @@ random_teleport_level()
         max_depth = bottom + (g.dungeons[u.uz.dnum].depth_start - 1);
     } else {
         min_depth = 1;
-        max_depth =
-            dunlevs_in_dungeon(&u.uz) + (g.dungeons[u.uz.dnum].depth_start - 1);
+        max_depth = dunlevs_in_dungeon(&u.uz)
+                    + (g.dungeons[u.uz.dnum].depth_start - 1);
         /* can't reach Sanctum if the invocation hasn't been performed */
         if (Inhell && !u.uevent.invoked)
             max_depth -= 1;

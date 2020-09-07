@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1580044340 2020/01/26 13:12:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1596498146 2020/08/03 23:42:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -178,6 +178,9 @@ boolean resuming;
                     g.monstermoves++; /* [obsolete (for a long time...)] */
                     g.moves++;
 
+                    if (flags.time && !g.context.run)
+                        iflags.time_botl = TRUE; /* 'moves' just changed */
+
                     /********************************/
                     /* once-per-turn things go here */
                     /********************************/
@@ -189,8 +192,6 @@ boolean resuming;
 
                     if (u.ublesscnt)
                         u.ublesscnt--;
-                    if (flags.time && !g.context.run)
-                        iflags.time_botl = TRUE;
 
                     /* One possible result of prayer is healing.  Whether or
                      * not you get healed depends on your current hit points.
@@ -436,8 +437,6 @@ boolean resuming;
             if (!g.multi) {
                 /* lookaround may clear multi */
                 g.context.move = 0;
-                if (flags.time)
-                    g.context.botl = TRUE;
                 continue;
             }
             if (g.context.mv) {
@@ -457,9 +456,6 @@ boolean resuming;
         }
         if (u.utotype)       /* change dungeon level */
             deferred_goto(); /* after rhack() */
-        /* !g.context.move here: multiple movement command stopped */
-        else if (flags.time && (!g.context.move || !g.context.mv))
-            g.context.botl = TRUE;
 
         if (g.vision_full_recalc)
             vision_recalc(0); /* vision! */
@@ -600,10 +596,6 @@ void
 newgame()
 {
     int i;
-
-#ifdef MFLOPPY
-    gameDiskPrompt();
-#endif
 
     g.context.botlx = TRUE;
     g.context.ident = 1;

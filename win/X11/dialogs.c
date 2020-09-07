@@ -79,6 +79,7 @@
 
 #include "config.h" /* #define for const for non __STDC__ compilers */
 #include "lint.h"   /* for nethack's nhStr() macro */
+#include "winX.h"   /* to make sure protoypes match corresponding functions */
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */

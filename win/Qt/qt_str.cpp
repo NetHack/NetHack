@@ -35,7 +35,7 @@ QString str_titlecase(const QString& str)
 QString nh_capitalize_words(const QString& str)
 {
     QStringList words = str.split(" ");
-    for (size_t i = 0; i < words.size(); ++i) {
+    for (size_t i = 0; i < (size_t) words.size(); ++i) {
 	words[i] = str_titlecase(words[i]);
     }
     return words.join(" ");

@@ -7,15 +7,25 @@
 #ifndef QT4SET_H
 #define QT4SET_H
 
+#define ENHANCED_PAPERDOLL /* separate size from map tiles, can be hidden */
+
+#include "qt_bind.h" // needed for mainWidget() for updateInventory()
+
 namespace nethack_qt_ {
 
 class NetHackQtGlyphs;
+class NetHackQtMainWindow;
 
 class NetHackQtSettings : public QDialog {
 	Q_OBJECT
 public:
-	// Size of window - used to decide default sizes
-	NetHackQtSettings(int width, int height);
+        int tileWidth = 16, tileHeight = 16;
+#ifdef ENHANCED_PAPERDOLL
+        int dollWidth = 32, dollHeight = 32;
+        bool doll_is_shown = true;
+#endif
+	// dialog box for Qt-specific settings
+	NetHackQtSettings();
 
 	NetHackQtGlyphs& glyphs();
 	const QFont& normalFont();
@@ -31,21 +41,41 @@ signals:
 public slots:
 	void toggleGlyphSize();
 	void setGlyphSize(bool);
+#ifdef ENHANCED_PAPERDOLL
+	void toggleDollShown();
+        void setDollShown(bool);
+        void resizeDoll();
+#endif
 
 private:
 	QSettings settings;
+
+	QCheckBox whichsize;
 	QSpinBox tilewidth;
 	QSpinBox tileheight;
 	QLabel widthlbl;
 	QLabel heightlbl;
-	QCheckBox whichsize;
 	QSize othersize;
+#ifdef ENHANCED_PAPERDOLL
+	QCheckBox dollshown;
+	QSpinBox dollwidth;
+	QSpinBox dollheight;
+	QLabel dollwidthlbl;
+	QLabel dollheightlbl;
+#endif
 
 	QComboBox fontsize;
 
 	QFont normal, normalfixed, large;
 
 	NetHackQtGlyphs* theglyphs;
+#if 0
+        void updateInventory()
+        {
+            static_cast <NetHackQtMainWindow *> (NetHackQtBind::mainWidget())
+                ->updateInventory();
+        }
+#endif
 
 private slots:
 	void resizeTiles();

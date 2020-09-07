@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1578855624 2020/01/12 19:00:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.7	objects.c	$NHDT-Date: 1596498192 2020/08/03 23:43:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -607,15 +607,20 @@ RING("protection from shape changers", "shiny",
     OBJECT(OBJ(name, desc),                                            \
            BITS(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, P_NONE, IRON),        \
            power, AMULET_CLASS, prob, 0, 20, 150, 0, 0, 0, 0, 20, HI_METAL)
-AMULET("amulet of ESP",                "circular", TELEPAT, 175),
+AMULET("amulet of ESP",                "circular", TELEPAT, 120),
 AMULET("amulet of life saving",       "spherical", LIFESAVED, 75),
-AMULET("amulet of strangulation",          "oval", STRANGLED, 135),
-AMULET("amulet of restful sleep",    "triangular", SLEEPY, 135),
-AMULET("amulet versus poison",        "pyramidal", POISON_RES, 165),
-AMULET("amulet of change",               "square", 0, 130),
-AMULET("amulet of unchanging",          "concave", UNCHANGING, 45),
+AMULET("amulet of strangulation",          "oval", STRANGLED, 115),
+AMULET("amulet of restful sleep",    "triangular", SLEEPY, 115),
+AMULET("amulet versus poison",        "pyramidal", POISON_RES, 115),
+AMULET("amulet of change",               "square", 0, 115),
+AMULET("amulet of unchanging",          "concave", UNCHANGING, 60),
 AMULET("amulet of reflection",        "hexagonal", REFLECTING, 75),
-AMULET("amulet of magical breathing", "octagonal", MAGICAL_BREATHING, 65),
+AMULET("amulet of magical breathing", "octagonal", MAGICAL_BREATHING, 75),
+        /* +2 AC and +2 MC; +2 takes naked hero past 'warded' to 'guarded' */
+AMULET("amulet of guarding",         "perforated", PROTECTION, 75),
+        /* cubical: some descriptions are already three dimensional and
+           parallelogrammatical (real word!) would be way over the top */
+AMULET("amulet of flying",              "cubical", FLYING, 60),
 /* fixed descriptions; description duplication is deliberate;
  * fake one must come before real one because selection for
  * description shuffling stops when a non-magic amulet is encountered
@@ -1145,10 +1150,10 @@ OBJECT(OBJ("iron chain", None),
 /* Venom is normally a transitory missile (spit by various creatures)
  * but can be wished for in wizard mode so could occur in bones data.
  */
-OBJECT(OBJ("blinding venom", "splash of venom"),
+OBJECT(OBJ("splash of blinding venom", "splash of venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
        VENOM_CLASS, 500, 0, 1, 0, 0, 0, 0, 0, 0, HI_ORGANIC),
-OBJECT(OBJ("acid venom", "splash of venom"),
+OBJECT(OBJ("splash of acid venom", "splash of venom"),
        BITS(0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, LIQUID), 0,
        VENOM_CLASS, 500, 0, 1, 0, 6, 6, 0, 0, 0, HI_ORGANIC),
         /* +d6 small or large */
@@ -1169,6 +1174,8 @@ OBJECT(OBJ(None, None),
 
 /* clang-format on */
 /* *INDENT-ON* */
+
+void NDECL(objects_globals_init); /* in hack.h but we're using config.h */
 
 struct objdescr obj_descr[SIZE(obj_descr_init)];
 struct objclass objects[SIZE(obj_init)];

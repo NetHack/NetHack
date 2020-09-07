@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1550524569 2019/02/18 21:16:09 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.7	worn.c	$NHDT-Date: 1596498231 2020/08/03 23:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -57,16 +57,14 @@ long mask;
         uskin = obj;
         /* assert( !uarm ); */
     } else {
-        if ((mask & W_ARMOR))
-            u.uroleplay.nudist = FALSE;
-        for (wp = worn; wp->w_mask; wp++)
+        for (wp = worn; wp->w_mask; wp++) {
             if (wp->w_mask & mask) {
                 oobj = *(wp->w_obj);
                 if (oobj && !(oobj->owornmask & wp->w_mask))
                     impossible("Setworn: mask = %ld.", wp->w_mask);
                 if (oobj) {
                     if (u.twoweap && (oobj->owornmask & (W_WEP | W_SWAPWEP)))
-                        u.twoweap = 0;
+                        set_twoweap(FALSE); /* u.twoweap = FALSE */
                     oobj->owornmask &= ~wp->w_mask;
                     if (wp->w_mask & ~(W_SWAPWEP | W_QUIVER)) {
                         /* leave as "x = x <op> y", here and below, for broken
@@ -105,6 +103,11 @@ long mask;
                     }
                 }
             }
+        }
+        if (obj && (obj->owornmask & W_ARMOR) != 0L)
+            u.uroleplay.nudist = FALSE;
+        /* tux -> tuxedo -> "monkey suit" -> monk's suit */
+        iflags.tux_penalty = (uarm && Role_if(PM_MONK) && g.urole.spelarmr);
     }
     update_inventory();
 }
@@ -120,8 +123,8 @@ register struct obj *obj;
 
     if (!obj)
         return;
-    if (obj == uwep || obj == uswapwep)
-        u.twoweap = 0;
+    if (u.twoweap && (obj == uwep || obj == uswapwep))
+        set_twoweap(FALSE); /* u.twoweap = FALSE */
     for (wp = worn; wp->w_mask; wp++)
         if (obj == *(wp->w_obj)) {
             /* in case wearing or removal is in progress or removal
@@ -137,6 +140,8 @@ register struct obj *obj;
             if ((p = w_blocks(obj, wp->w_mask)) != 0)
                 u.uprops[p].blocked &= ~wp->w_mask;
         }
+    if (!uarm)
+        iflags.tux_penalty = FALSE;
     update_inventory();
 }
 
@@ -441,9 +446,13 @@ register struct monst *mon;
     long mwflags = mon->misc_worn_check;
 
     for (obj = mon->minvent; obj; obj = obj->nobj) {
-        if (obj->owornmask & mwflags)
-            base -= ARM_BONUS(obj);
-        /* since ARM_BONUS is positive, subtracting it increases AC */
+        if (obj->owornmask & mwflags) {
+            if (obj->otyp == AMULET_OF_GUARDING)
+                base -= 2; /* fixed amount, not impacted by erosion */
+            else
+                base -= ARM_BONUS(obj);
+            /* since ARM_BONUS is positive, subtracting it increases AC */
+        }
     }
     return base;
 }
@@ -527,8 +536,8 @@ boolean racialexception;
     old = which_armor(mon, flag);
     if (old && old->cursed)
         return;
-    if (old && flag == W_AMUL)
-        return; /* no such thing as better amulets */
+    if (old && flag == W_AMUL && old->otyp != AMULET_OF_GUARDING)
+        return; /* no amulet better than life-saving or reflection */
     best = old;
 
     for (obj = mon->minvent; obj; obj = obj->nobj) {
@@ -536,10 +545,18 @@ boolean racialexception;
         case W_AMUL:
             if (obj->oclass != AMULET_CLASS
                 || (obj->otyp != AMULET_OF_LIFE_SAVING
-                    && obj->otyp != AMULET_OF_REFLECTION))
+                    && obj->otyp != AMULET_OF_REFLECTION
+                    && obj->otyp != AMULET_OF_GUARDING))
                 continue;
-            best = obj;
-            goto outer_break; /* no such thing as better amulets */
+            /* for 'best' to be non-Null, it must be an amulet of guarding;
+               life-saving and reflection don't get here due to early return
+               and other amulets of guarding can't be any better */
+            if (!best || obj->otyp != AMULET_OF_GUARDING) {
+                best = obj;
+                if (best->otyp != AMULET_OF_GUARDING)
+                    goto outer_break; /* life-saving or reflection; use it */
+            }
+            continue; /* skip post-switch armor handling */
         case W_ARMU:
             if (!is_shirt(obj))
                 continue;
@@ -593,7 +610,7 @@ boolean racialexception;
             continue;
         best = obj;
     }
-outer_break:
+ outer_break:
     if (!best || best == old)
         return;
 
@@ -972,7 +989,7 @@ boolean polyspot;
         if (mon == u.usteed)
             goto noride;
     } else if (mon == u.usteed && !can_ride(mon)) {
-    noride:
+ noride:
         You("can no longer ride %s.", mon_nam(mon));
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             char buf[BUFSZ];

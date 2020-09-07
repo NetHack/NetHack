@@ -1,5 +1,5 @@
 #!perl
-# NetHack 3.6  mdgrep.pl  $NHDT-Date: 1524684408 2018/04/25 19:26:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $
+# NetHack 3.7  mdgrep.pl  $NHDT-Date: 1596498260 2020/08/03 23:44:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -43,7 +43,7 @@
 # GCC_WARN VOIDYYPUT FLEX_SCANNER FLEXHACK_SCANNER WIERD_LEX
 # NeXT __osf__ SVR4 _AIX32 _BULL_SOURCE AUX __sgi GNUDOS
 # TIMED_DELAY DEF_MAILREADER DEF_PAGER NO_SIGNAL PC_LOCKING LATTICE __GO32__
-# msleep NO_FILE_LINKS bsdi HPUX AMIFLUSH SYSFLAGS
+# msleep NO_FILE_LINKS bsdi HPUX AMIFLUSH
 # OVERLAY USE_TRAMPOLI USE_OVLx SPEC_LEV DGN_COMP
 # SCREEN_BIOS SCREEN_DJGPPFAST SCREEN_VGA SCREEN_8514
 # EXEPATH NOTSTDC SELECTSAVED NOTPARMDECL
@@ -54,17 +54,17 @@
 
 $outfile = "mdgrep.h";
 sub start_file {
-	($rev) = ('$NHDT-Revision: 1.16 $') =~ m/: (.*) .$/;
-	my $date = '$NHDT-Date: 1524684408 2018/04/25 19:26:48 $';
-	my $branch = '$NHDT-Branch: NetHack-3.6.0 $';
-	my $revision = '$NHDT-Revision: 1.16 $';
+	($rev) = ('$NHDT-Revision: 1.20 $') =~ m/: (.*) .$/;
+	my $date = '$NHDT-Date: 1596498261 2020/08/03 23:44:21 $';
+	my $branch = '$NHDT-Branch: NetHack-3.7 $';
+	my $revision = '$NHDT-Revision: 1.20 $';
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Date and Revision below will be modified when mdgrep.h is written to
 # git - this is correct (but it means you must commit changes to mdgrep.pl
 # before generating mdgrep.h and committing that file).
 	print OUT <<E_O_M;
 /*
- * NetHack 3.6  $outfile  $date $branch:$revision
+ * NetHack 3.7  $outfile  $date $branch:$revision
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *

@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1573165004 2019/11/07 22:16:44 $	$NHDT-Branch: paxed-lua-v2-merged $:$NHDT-Revision: 1.38 $
+#	NetHack 3.7	Makefile.src	$NHDT-Date: 1596498302 2020/08/03 23:45:02 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -29,7 +29,7 @@ VMS = [-.sys.vms]
 WINSHR = [-.win.share]
 X11 = [-.win.X11]
 #LUA source tree parallel to NetHack tree in lua535 directory
-LUA = [-.-.lua535.src]
+LUA = [-.-.lua540.src]
 MAKEFILE= $(SRC)Makefile.
 
 # if you are using gcc as your compiler:
@@ -173,14 +173,14 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
-HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
-	   config.h config1.h context.h coord.h decl.h def_os2.h display.h \
+HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
+	   config.h config1.h context.h coord.h decl.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
-	   hack.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+	   hack.h mextra.h mfndpos.h micro.h mkroom.h \
 	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	   os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
+	   patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	   tosconf.h tradstdc.h trampoli.h trap.h unixconf.h vision.h \
+	   tradstdc.h trampoli.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -214,8 +214,17 @@ HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 	$(HOBJ1) $(HOBJ2) $(HOBJ3) $(HOBJ4) $(HOBJ5) $(HOBJ6)
 
 LUAOBJ = nhlua.o,nhlsel.o
+
+#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  so comment top two and uncomment bottom two for the previous version (5.3.5)
+LUA535SRCFILES =
+LUA535OBJFILES =
+#LUA535SRCFILES = $(LUA)lbitlib.c
+#LUA535OBJFILES = lbitlib.o,
+endif
+
 LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
-	$(LUA)lbitlib.c $(LUA)lcode.c $(LUA)lcorolib.c \
+	$(LUA535SRCFILES) $(LUA)lcode.c $(LUA)lcorolib.c \
 	$(LUA)lctype.c $(LUA)ldblib.c $(LUA)ldebug.c \
 	$(LUA)ldo.c $(LUA)ldump.c $(LUA)lfunc.c $(LUA)lgc.c \
 	$(LUA)linit.c $(LUA)liolib.c $(LUA)llex.c \
@@ -226,7 +235,7 @@ LUALIBSRC = $(LUA)lapi.c $(LUA)lauxlib.c $(LUA)lbaselib.c \
 	$(LUA)ltm.c $(LUA)lundump.c $(LUA)lutf8lib.c \
 	$(LUA)lvm.c $(LUA)lzio.c
 
-LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj,lbitlib.obj, \
+LUALIBOBJ1 = lapi.obj,lauxlib.obj,lbaselib.obj, $(LUA535OBJFILES) \
 	lcode.obj,lcorolib.obj,lctype.obj,ldblib.obj
 LUALIBOBJ2 = ldebug.obj,ldo.obj,ldump.obj,lfunc.obj, \
 	lgc.obj,linit.obj,liolib.obj,llex.obj
@@ -378,11 +387,8 @@ spotless :	clean
 #	dependencies (mostly cloned from sys/unix/Makefile.src)
 # config.h timestamp
 $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
-		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h \
-		$(INC)unixconf.h $(INC)os2conf.h $(INC)micro.h \
-		$(INC)pcconf.h $(INC)tosconf.h $(INC)amiconf.h \
-		$(INC)macconf.h $(INC)beconf.h $(INC)wceconf.h \
-		$(INC)ntconf.h
+		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h $(INC)unixconf.h \
+		$(INC)micro.h $(INC)pcconf.h $(INC)ntconf.h
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
@@ -420,9 +426,8 @@ getline.obj :	$(TTY)getline.c $(HACK_H) $(INC)func_tab.h
 termcap.obj :	$(TTY)termcap.c $(HACK_H) $(INC)tcap.h
 topl.obj :	$(TTY)topl.c $(HACK_H) $(INC)tcap.h
 wintty.obj :	$(TTY)wintty.c $(HACK_H) $(INC)dlb.h \
-		$(INC)date.h $(INC)patchlevel.h $(INC)tcap.h
-cursmain.obj :	$(CURSES)cursmain.c $(HACK_H) $(INC)patchlevel.h \
-		$(INC)wincurs.h
+		$(INC)date.h $(INC)tcap.h
+cursmain.obj :	$(CURSES)cursmain.c $(HACK_H) $(INC)wincurs.h
 curswins.obj : 	$(CURSES)curswins.c $(HACK_H) $(INC)wincurs.h \
 		$(CURSES)curswins.h
 cursmisc.obj : 	$(CURSES)cursmisc.c $(HACK_H) $(INC)wincurs.h \
@@ -440,7 +445,7 @@ cursinvt.obj : 	$(CURSES)cursinvt.c $(HACK_H) $(INC)wincurs.h \
 Window.obj :	$(X11)Window.c $(INC)xwindowp.h $(INC)xwindow.h $(CONFIG_H)
 dialogs.obj :	$(X11)dialogs.c $(CONFIG_H)
 winX.obj :	$(X11)winX.c $(HACK_H) $(INC)winX.h $(INC)dlb.h \
-		$(INC)patchlevel.h $(X11)nh72icon $(X11)nh56icon $(X11)nh32icon
+		$(X11)nh72icon $(X11)nh56icon $(X11)nh32icon
 winmap.obj :	$(X11)winmap.c $(INC)xwindow.h $(HACK_H) $(INC)dlb.h \
 		$(INC)winX.h $(INC)tile2x11.h
 winmenu.obj :	$(X11)winmenu.c $(HACK_H) $(INC)winX.h
@@ -451,11 +456,12 @@ wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
 vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
-#	lua 5.3.5 code
+#	lua 5.4.0 code
 lapi.obj :	$(LUA)lapi.c	
 lauxlib.obj :	$(LUA)lauxlib.c
 lbaselib.obj :	$(LUA)lbaselib.c
-lbitlib.obj :	$(LUA)lbitlib.c
+#uncomment this for 5.3.5
+#lbitlib.obj :	$(LUA)lbitlib.c
 lcode.obj :	$(LUA)lcode.c
 lcorolib.obj :	$(LUA)lcorolib.c
 lctype.obj :	$(LUA)lctype.c
@@ -582,13 +588,13 @@ steed.obj :	steed.c $(HACK_H)
 sys.obj :	sys.c $(HACK_H)
 teleport.obj :	teleport.c $(HACK_H)
 timeout.obj :	timeout.c $(HACK_H)
-topten.obj :	topten.c $(HACK_H) $(INC)dlb.h $(INC)patchlevel.h
+topten.obj :	topten.c $(HACK_H) $(INC)dlb.h
 track.obj :	track.c $(HACK_H)
 trap.obj :	trap.c $(HACK_H)
 u_init.obj :	u_init.c $(HACK_H)
 uhitm.obj :	uhitm.c $(HACK_H)
 vault.obj :	vault.c $(HACK_H)
-version.obj :	version.c $(HACK_H) $(INC)dlb.h $(INC)date.h $(INC)patchlevel.h
+version.obj :	version.c $(HACK_H) $(INC)dlb.h $(INC)date.h
 vision.obj :	vision.c $(HACK_H) $(INC)vis_tab.h
 weapon.obj :	weapon.c $(HACK_H)
 were.obj :	were.c $(HACK_H)

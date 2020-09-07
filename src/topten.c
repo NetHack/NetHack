@@ -1,20 +1,15 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1581322668 2020/02/10 08:17:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.7	topten.c	$NHDT-Date: 1596498218 2020/08/03 23:43:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
 
-/* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the 
- * whole file, because that entails creating a new version which 
+/* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the
+ * whole file, because that entails creating a new version which
  * requires that the old one be deletable. UPDATE_RECORD_IN_PLACE
- * had to be defined more centrally in 3.7 to ensure that the 
+ * had to be defined more centrally in 3.7 to ensure that the
  * final_fpos field gets included in struct instance_globals aka 'g'.
 */
 
@@ -71,6 +66,9 @@ static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
 static long NDECL(encodexlogflags);
 static long NDECL(encodeconduct);
 static long FDECL(encodeachieve, (BOOLEAN_P));
+static void FDECL(add_achieveX, (char *, const char *, BOOLEAN_P));
+static char *NDECL(encode_extended_achievements);
+static char *NDECL(encode_extended_conducts);
 #endif
 static void FDECL(free_ttlist, (struct toptenentry *));
 static int FDECL(classmon, (char *, BOOLEAN_P));
@@ -367,6 +365,8 @@ int how;
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
             encodeconduct(), XLOG_SEP, g.moves, XLOG_SEP,
             encodeachieve(FALSE));
+    Fprintf(rfile, "%cachieveX=%s", XLOG_SEP, encode_extended_achievements());
+    Fprintf(rfile, "%cconductX=%s", XLOG_SEP, encode_extended_conducts());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
             (long) urealtime.realtime, XLOG_SEP,
             (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);
@@ -374,6 +374,9 @@ int how;
             genders[flags.initgend].filecode, XLOG_SEP,
             aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
     Fprintf(rfile, "%cflags=0x%lx", XLOG_SEP, encodexlogflags());
+    Fprintf(rfile, "%cgold=%ld", XLOG_SEP, money_cnt(g.invent) + hidden_gold());
+    Fprintf(rfile, "%cwish_cnt=%ld", XLOG_SEP, u.uconduct.wishes);
+    Fprintf(rfile, "%carti_wish_cnt=%ld", XLOG_SEP, u.uconduct.wisharti);
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
 }
@@ -422,6 +425,15 @@ encodeconduct()
         e |= 1L << 10;
     if (!num_genocides())
         e |= 1L << 11;
+    /* one bit isn't really adequate for sokoban conduct:
+       reporting "obeyed sokoban rules" is misleading if sokoban wasn't
+       completed or at least attempted; however, suppressing that when
+       sokoban was never entered, as we do here, risks reporting
+       "violated sokoban rules" when no such thing occured; this can
+       be disambiguated in xlogfile post-processors by testing the
+       entered-sokoban bit in the 'achieve' field */
+    if (!u.uconduct.sokocheat && sokoban_in_play())
+        e |= 1L << 12;
 
     return e;
 }
@@ -448,6 +460,138 @@ boolean secondlong; /* False: handle achievements 1..31, True: 32..62 */
             r |= 1L << (achidx - 1);
     }
     return r;
+}
+
+/* add the achievement or conduct comma-separated to string */
+static void
+add_achieveX(buf, achievement, condition)
+char *buf;
+const char *achievement;
+boolean condition;
+{
+    if (condition) {
+        if (buf[0] != '\0') {
+            Strcat(buf, ",");
+        }
+        Strcat(buf, achievement);
+    }
+}
+
+static char *
+encode_extended_achievements()
+{
+    static char buf[N_ACH * 40];
+    char rnkbuf[40];
+    const char *achievement = NULL;
+    int i, achidx, absidx;
+
+    buf[0] = '\0';
+    for (i = 0; u.uachieved[i]; i++) {
+        achidx = u.uachieved[i];
+        absidx = abs(achidx);
+        switch (absidx) {
+        case ACH_UWIN:
+            achievement = "ascended";
+            break;
+        case ACH_ASTR:
+            achievement = "entered_astral_plane";
+            break;
+        case ACH_ENDG:
+            achievement = "entered_elemental_planes";
+            break;
+        case ACH_AMUL:
+            achievement = "obtained_the_amulet_of_yendor";
+            break;
+        case ACH_INVK:
+            achievement = "performed_the_invocation_ritual";
+            break;
+        case ACH_BOOK:
+            achievement = "obtained_the_book_of_the_dead";
+            break;
+        case ACH_BELL:
+            achievement = "obtained_the_bell_of_opening";
+            break;
+        case ACH_CNDL:
+            achievement = "obtained_the_candelabrum_of_invocation";
+            break;
+        case ACH_HELL:
+            achievement = "entered_gehennom";
+            break;
+        case ACH_MEDU:
+            achievement = "defeated_medusa";
+            break;
+        case ACH_MINE_PRIZE:
+            achievement = "obtained_the_luckstone_from_the_mines";
+            break;
+        case ACH_SOKO_PRIZE:
+            achievement = "obtained_the_sokoban_prize";
+            break;
+        case ACH_ORCL:
+            achievement = "consulted_the_oracle";
+            break;
+        case ACH_NOVL:
+            achievement = "read_a_discworld_novel";
+            break;
+        case ACH_MINE:
+            achievement = "entered_the_gnomish_mines";
+            break;
+        case ACH_TOWN:
+            achievement = "entered_mine_town";
+            break;
+        case ACH_SHOP:
+            achievement = "entered_a_shop";
+            break;
+        case ACH_TMPL:
+            achievement = "entered_a_temple";
+            break;
+        case ACH_SOKO:
+            achievement = "entered_sokoban";
+            break;
+        case ACH_BGRM:
+            achievement = "entered_bigroom";
+            break;
+        /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
+        case ACH_RNK1: case ACH_RNK2: case ACH_RNK3: case ACH_RNK4:
+        case ACH_RNK5: case ACH_RNK6: case ACH_RNK7: case ACH_RNK8:
+            Sprintf(rnkbuf, "attained_the_rank_of_%s",
+                    rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
+                            Role_switch, (achidx < 0) ? TRUE : FALSE));
+            strNsubst(rnkbuf, " ", "_", 0); /* replace every ' ' with '_' */
+            achievement = lcase(rnkbuf);
+            break;
+        default:
+            continue;
+        }
+        add_achieveX(buf, achievement, TRUE);
+    }
+
+    return buf;
+}
+
+static char *
+encode_extended_conducts()
+{
+    static char buf[BUFSZ];
+
+    buf[0] = '\0';
+    add_achieveX(buf, "foodless",     !u.uconduct.food);
+    add_achieveX(buf, "vegan",        !u.uconduct.unvegan);
+    add_achieveX(buf, "vegetarian",   !u.uconduct.unvegetarian);
+    add_achieveX(buf, "atheist",      !u.uconduct.gnostic);
+    add_achieveX(buf, "weaponless",   !u.uconduct.weaphit);
+    add_achieveX(buf, "pacifist",     !u.uconduct.killer);
+    add_achieveX(buf, "illiterate",   !u.uconduct.literate);
+    add_achieveX(buf, "polyless",     !u.uconduct.polypiles);
+    add_achieveX(buf, "polyselfless", !u.uconduct.polyselfs);
+    add_achieveX(buf, "wishless",     !u.uconduct.wishes);
+    add_achieveX(buf, "artiwishless", !u.uconduct.wisharti);
+    add_achieveX(buf, "genocideless", !num_genocides());
+    if (sokoban_in_play())
+        add_achieveX(buf, "sokoban",  !u.uconduct.sokocheat);
+    add_achieveX(buf, "blind",        u.uroleplay.blind);
+    add_achieveX(buf, "nudist",       u.uroleplay.nudist);
+
+    return buf;
 }
 
 #endif /* XLOGFILE */

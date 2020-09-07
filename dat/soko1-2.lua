@@ -1,4 +1,4 @@
--- NetHack 3.6	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -100,7 +100,7 @@ des.region({ region={18,09, 22,15}, lit = 1, type = "zoo",
 	     prefilled = 0, irregular = 1 });
 
 px, py = selection.rndcoord(place);
-if math.random(0, 99) < 25 then
+if percent(25) then
    des.object({ id="bag of holding", x=px, y=py,
 		buc="not-cursed", achievement=1 });
 else

@@ -1,4 +1,4 @@
-/* NetHack 3.6 wincurs.h */
+/* NetHack 3.7 wincurs.h */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -105,7 +105,7 @@ extern void curses_number_pad(int state);
 extern void curses_delay_output(void);
 extern void curses_start_screen(void);
 extern void curses_end_screen(void);
-extern void curses_outrip(winid wid, int how);
+extern void curses_outrip(winid wid, int how, time_t when);
 extern void genl_outrip(winid tmpwin, int how, time_t when);
 extern void curses_preference_update(const char *pref);
 extern void curs_reset_windows(boolean, boolean);

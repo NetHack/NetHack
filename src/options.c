@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1582748890 2020/02/26 20:28:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1597357458 2020/08/13 22:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.470 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8,9 +8,6 @@
 #include "objclass.h"
 #include "flag.h"
 NEARDATA struct flag flags; /* provide linkage */
-#ifdef SYSFLAGS
-NEARDATA struct sysflag sysflags; /* provide linkage */
-#endif
 NEARDATA struct instance_flags iflags; /* provide linkage */
 #define static
 #else
@@ -87,7 +84,7 @@ enum window_option_types {
     TEXT_OPTION
 };
 
-enum {optn_err = 0, optn_ok};
+enum {optn_silenterr = -1, optn_err = 0, optn_ok};
 enum requests {do_nothing, do_init, do_set, do_handler, get_val};
 
 static struct allopt_t allopt[SIZE(allopt_init)];
@@ -107,7 +104,7 @@ extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
 
 static char empty_optstr[] = { '\0' };
-boolean duplicate;
+boolean duplicate, using_alias;
 
 static const char def_inv_order[MAXOCLASSES] = {
     COIN_CLASS, AMULET_CLASS, WEAPON_CLASS, ARMOR_CLASS, FOOD_CLASS,
@@ -230,8 +227,8 @@ static void FDECL(bad_negation, (const char *, BOOLEAN_P));
 static int FDECL(change_inv_order, (char *));
 static boolean FDECL(warning_opts, (char *, const char *));
 static int FDECL(feature_alert_opts, (char *, const char *));
-static boolean FDECL(duplicate_opt_detection, (const char *, int));
-static void FDECL(complain_about_duplicate, (const char *, int));
+static boolean FDECL(duplicate_opt_detection, (int));
+static void FDECL(complain_about_duplicate, (int));
 static int FDECL(length_without_val, (const char *, int len));
 static void NDECL(determine_ambiguities);
 static int FDECL(check_misc_menu_command, (char *, char *));
@@ -247,7 +244,7 @@ static boolean FDECL(test_regex_pattern, (const char *, const char *));
 static boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 static void FDECL(free_one_menu_coloring, (int));
 static int NDECL(count_menucolors);
-static boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
+static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
                                            char *, char **));
 static void FDECL(doset_add_menu, (winid, const char *, int, int));
 static void FDECL(opts_add_others, (winid, const char *, int,
@@ -286,7 +283,7 @@ static void FDECL(wc_set_font_name, (int, char *));
 static int FDECL(wc_set_window_colors, (char *));
 static boolean FDECL(illegal_menu_cmd_key, (CHAR_P));
 #ifndef CHANGE_COLOR
-int FDECL(optfn_palette, (int, BOOLEAN_P, BOOLEAN_P, char *, char *));
+int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
 #endif
 #ifdef CURSES_GRAPHICS
 extern int curses_read_attrs(const char *attrs);
@@ -306,11 +303,12 @@ register char *opts;
 boolean tinitial, tfrom_file;
 {
     char *op;
-    boolean negated, got_match, has_val = FALSE;
+    boolean negated, got_match = FALSE, has_val = FALSE;
     int i, matchidx = -1, optresult = optn_err, optlen, optlen_wo_val;
     boolean retval = TRUE;
 
     duplicate = FALSE;
+    using_alias = FALSE;
     g.opt_initial = tinitial;
     g.opt_from_file = tfrom_file;
     if ((op = index(opts, ',')) != 0) {
@@ -361,12 +359,12 @@ boolean tinitial, tfrom_file;
                 got_match = TRUE;
             }
         }
-
+#if 0   /* this prevents "boolopt:True" &c */
         if (!got_match) {
             if (has_val && !allopt[i].valok)
                 continue;
         }
-
+#endif
         /*
          * During option initialization, the function
          *     determine_ambiguities()
@@ -376,13 +374,13 @@ boolean tinitial, tfrom_file;
          *
          */
         if (!got_match)
-            got_match = match_optname(opts, allopt[i].name, allopt[i].minmatch,
-                                      allopt[i].valok);
+            got_match = match_optname(opts, allopt[i].name,
+                                      allopt[i].minmatch, TRUE);
         if (got_match) {
             if (!allopt[i].pfx && optlen < allopt[i].minmatch) {
                 config_error_add(
-              "Ambiguous option %s, %d characters are needed to differentiate",
-                             opts, allopt[i].minmatch);
+             "Ambiguous option %s, %d characters are needed to differentiate",
+                                 opts, allopt[i].minmatch);
                 break;
             }
             matchidx = i;
@@ -402,9 +400,10 @@ boolean tinitial, tfrom_file;
                 continue;
             got_match = match_optname(opts, allopt[i].alias,
                                       (int) strlen(allopt[i].alias),
-                                      allopt[i].valok);
+                                      TRUE);
             if (got_match) {
                 matchidx = i;
+                using_alias = TRUE;
                 break;
             }
         }
@@ -414,9 +413,9 @@ boolean tinitial, tfrom_file;
     g.program_state.in_parseoptions++;
 
     if (got_match && matchidx >= 0) {
-        duplicate = duplicate_opt_detection(opts, 1);
+        duplicate = duplicate_opt_detection(matchidx);
         if (duplicate && !allopt[matchidx].dupeok)
-            complain_about_duplicate(opts, 1);
+            complain_about_duplicate(matchidx);
 
         /* check for bad negation, so option functions don't have to */
         if (negated && !allopt[matchidx].negateok) {
@@ -430,8 +429,8 @@ boolean tinitial, tfrom_file;
          */
         if (allopt[matchidx].optfn) {
             op = string_for_opt(opts, TRUE);
-            optresult = (*allopt[matchidx].optfn)(allopt[matchidx].idx, do_set,
-                                                  negated, opts, op);
+            optresult = (*allopt[matchidx].optfn)(allopt[matchidx].idx,
+                                                  do_set, negated, opts, op);
         }
     }
 
@@ -461,6 +460,8 @@ boolean tinitial, tfrom_file;
         }
     }
 
+    if (optresult == optn_silenterr)
+        return FALSE;
     if (optresult == optn_ok)
         return retval;
 
@@ -506,13 +507,13 @@ char *op;
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initalign = str2align(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             }
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -669,40 +670,6 @@ char *op UNUSED;
 }
 
 int
-optfn_altmeta(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        /* Amiga altmeta causes Alt+key to be converted into Meta+key by
-           low level nethack code; on by default, can be toggled off if
-           Alt+key is needed for some ASCII chars on non-ASCII keyboard */
-
-        /* non-Amiga altmeta causes nethack's top level command loop to treat
-           two character sequence "ESC c" as M-c, for terminals or emulators
-           which send "ESC c" when Alt+c is pressed; off by default, enabling
-           this can potentially make trouble if user types ESC when nethack
-           is honoring this conversion request (primarily after starting a
-           count prefix prior to a command and then deciding to cancel it) */
-
-        return optn_ok;
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_err;
-    }
-    return optn_ok;
-}
-
-int
 optfn_boulder(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -723,8 +690,7 @@ char *op UNUSED;
 #ifdef BACKWARD_COMPAT
 
         /* if ((opts = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-                                                                          ==
-           empty_optstr)
+               == empty_optstr)
          */
         if ((opts = string_for_opt(opts, FALSE)) == empty_optstr)
             return FALSE;
@@ -735,7 +701,10 @@ char *op UNUSED;
             clash = opts[0] ? 1 : 0;
         else if (opts[0] >= '1' && opts[0] < WARNCOUNT + '0')
             clash = 2;
-        if (clash) {
+        if (opts[0] < ' ') {
+            config_error_add("boulder symbol cannot be a control character");
+            return optn_ok;
+        } else if (clash) {
             /* symbol chosen matches a used monster or warning
                symbol which is not good - reject it */
             config_error_add("Badoption - boulder symbol '%s' would conflict "
@@ -1312,14 +1281,14 @@ char *op;
     }
     if (req == do_set) {
         /* gender:string */
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initgend = str2gend(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else
                 flags.female = flags.initgend;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -1460,23 +1429,15 @@ char *op UNUSED;
     return optn_ok;
 }
 
+#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
 int
 optfn_MACgraphics(optidx, req, negated, opts, op)
-#if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
 int optidx;
 int req;
 boolean negated;
 char *opts;
 char *op;
-#else
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts UNUSED;
-char *op UNUSED;
-#endif
 {
-#if defined(MAC_GRAPHICS_ENV) && defined(BACKWARD_COMPAT)
     boolean badflag = FALSE;
 
     if (req == do_init) {
@@ -1511,20 +1472,9 @@ char *op UNUSED;
         opts[0] = '\0';
         return optn_ok;
     }
-#else
-    if (req == do_set) {
-        config_error_add("'%s' %s; use 'symset:%s' instead",
-                         allopt[optidx].name,
-#ifdef MAC_GRAPHICS_ENV /* implies BACKWARD_COMPAT is not defined */
-                         "no longer supported",
-#else
-                         "is not supported",
-#endif
-                         allopt[optidx].name);
-    }
-#endif
     return optn_ok;
 }
+#endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
 
 int
 optfn_map_mode(optidx, req, negated, opts, op)
@@ -1945,36 +1895,6 @@ char *op UNUSED;
 }
 
 int
-optfn_menucolor(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        /* menucolor:"regex_string"=color */
-        if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-            != empty_optstr) {
-            if (!add_menu_coloring(op))
-                return optn_err;
-        } else
-            return optn_err;
-        return optn_ok;
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-int
 optfn_menuinvertmode(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2156,6 +2076,13 @@ char *op;
     return optn_ok;
 }
 
+/* whether the 'msg_window' option is used to control ^P behavior */
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#define PREV_MSGS 1
+#else
+#define PREV_MSGS 0
+#endif
+
 int
 optfn_msg_window(optidx, req, negated, opts, op)
 int optidx;
@@ -2165,8 +2092,12 @@ char *opts;
 char *op;
 {
     int retval = optn_ok;
-#ifdef TTY_GRAPHICS
+#if PREV_MSGS
     int tmp;
+#else
+    nhUse(optidx);
+    nhUse(negated);
+    nhUse(op);
 #endif
 
     if (req == do_init) {
@@ -2175,8 +2106,8 @@ char *op;
     if (req == do_set) {
         /* msg_window:single, combo, full or reversed */
 
-/* allow option to be silently ignored by non-tty ports */
-#ifdef TTY_GRAPHICS
+        /* allow option to be silently ignored by non-tty ports */
+#if PREV_MSGS
         if (op == empty_optstr) {
             tmp = negated ? 's' : 'f';
         } else {
@@ -2188,16 +2119,10 @@ char *op;
         }
         switch (tmp) {
         case 's': /* single message history cycle (default if negated) */
-            iflags.prevmsg_window = 's';
-            break;
-        case 'c': /* combination: two singles, then full page */
-            iflags.prevmsg_window = 'c';
-            break;
+        case 'c': /* combination: first two as singles, then full page */
         case 'f': /* full page (default if specified without argument) */
-            iflags.prevmsg_window = 'f';
-            break;
-        case 'r': /* full page (reversed) */
-            iflags.prevmsg_window = 'r';
+        case 'r': /* full page in reverse order (LIFO; default for curses) */
+            iflags.prevmsg_window = (char) tmp;
             break;
         default:
             config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
@@ -2211,11 +2136,16 @@ char *op;
         if (!opts)
             return optn_err;
         opts[0] = '\0';
-#ifdef TTY_GRAPHICS
-        Sprintf(opts, "%s", (iflags.prevmsg_window == 's') ? "single"
-                           : (iflags.prevmsg_window == 'c') ? "combination"
-                             : (iflags.prevmsg_window == 'f') ? "full"
-                               : "reversed");
+#if PREV_MSGS
+        tmp = iflags.prevmsg_window;
+        if (WINDOWPORT("curses")) {
+            if (tmp == 's' || tmp == 'c')
+                tmp = iflags.prevmsg_window = 'r';
+        }
+        Sprintf(opts, "%s", (tmp == 's') ? "single"
+                            : (tmp == 'c') ? "combination"
+                              : (tmp == 'f') ? "full"
+                                : "reversed");
 #endif
         return optn_ok;
     }
@@ -2453,7 +2383,7 @@ char *op;
 
 #ifndef WIN32
             if (duplicate)
-                complain_about_duplicate(opts, 1);
+                complain_about_duplicate(optidx);
 #endif
 #ifdef MAC
             if (match_optname(opts, "hicolor", 3, TRUE)) {
@@ -2524,7 +2454,8 @@ char *op;
     return optn_ok;
 }
 
-int optfn_paranoid_confirmation(optidx, req, negated, opts, op)
+int
+optfn_paranoid_confirmation(optidx, req, negated, opts, op)
 int optidx;
 int req;
 boolean negated;
@@ -3032,14 +2963,14 @@ char *op;
     }
     if (req == do_set) {
         /* race:string */
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initrace = str2race(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else /* Backwards compatibility */
                 g.pl_race = *op;
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -3107,14 +3038,14 @@ char *op;
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(negated, allopt[optidx].name, opts, &op)) {
+        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
             if ((flags.initrole = str2role(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             } else /* Backwards compatibility */
                 nmcpy(g.pl_character, op, PL_NSIZ);
         } else
-            return optn_err;
+            return optn_silenterr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -3460,6 +3391,7 @@ char *op;
     return optn_ok;
 }
 
+#ifdef WIN32
 int
 optfn_subkeyvalue(optidx, req, negated, opts, op)
 int optidx UNUSED;
@@ -3472,12 +3404,10 @@ char *op UNUSED;
         return optn_ok;
     }
     if (req == do_set) {
-#if defined(WIN32)
         if (op == empty_optstr)
             return optn_err;
 #ifdef TTY_GRAPHICS
         map_subkeyvalue(op);
-#endif
 #endif
         return optn_ok;
     }
@@ -3489,6 +3419,7 @@ char *op UNUSED;
     }
     return optn_ok;
 }
+#endif /* WIN32 */
 
 int
 optfn_suppress_alert(optidx, req, negated, opts, op)
@@ -3558,6 +3489,9 @@ char *op;
         if (g.currentgraphics == PRIMARY && g.symset[PRIMARY].name)
             Strcat(opts, ", active");
         return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_symset(optidx);
     }
     return optn_ok;
 }
@@ -4381,7 +4315,7 @@ char *op;
                 return optn_err;
             }
             if (duplicate)
-                complain_about_duplicate(opts, 1);
+                complain_about_duplicate(optidx);
             if (opttype > 0 && !negated
                 && (op = string_for_opt(opts, FALSE)) != empty_optstr) {
                 switch (opttype) {
@@ -4518,21 +4452,22 @@ char *op;
         if (!g.opt_initial && (allopt[optidx].setwhere == set_in_config))
             return optn_err;
 
-        /* 0 means boolean opts */
-        if (duplicate_opt_detection(allopt[optidx].name, 0))
-            complain_about_duplicate(allopt[optidx].name, 0);
-
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
+            int ln;
+
             if (negated) {
                 config_error_add(
-                    "Negated boolean '%s' should not have a parameter",
-                    allopt[optidx].name);
+                           "Negated boolean '%s' should not have a parameter",
+                                 allopt[optidx].name);
                 return optn_err;
             }
-            if (!strcmp(op, "true") || !strcmp(op, "yes")) {
+            ln = (int) strlen(op);
+            if (!strncmpi(op, "true", max(ln, 3))
+                || !strcmpi(op, "yes") || !strcmpi(op, "on")) {
                 negated = FALSE;
-            } else if (!strcmp(op, "false") || !strcmp(op, "no")) {
+            } else if (!strncmpi(op, "false", max(ln, 3))
+                       || !strcmpi(op, "no") || !strcmpi(op, "off")) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
                 config_error_add("Illegal parameter for a boolean");
@@ -4892,10 +4827,10 @@ handler_menu_headings(VOID_ARGS)
 static int
 handler_msg_window(VOID_ARGS)
 {
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     winid tmpwin;
     anything any;
 
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     if (WINDOWPORT("tty") || WINDOWPORT("curses")) {
         /* by Christian W. Cooper */
         menu_item *window_pick = (menu_item *) 0;
@@ -5526,7 +5461,7 @@ handler_menu_colors(VOID_ARGS)
         if (*mcbuf == '\033')
             goto menucolors_done;
         if (*mcbuf
-            && test_regex_pattern(mcbuf, (const char *)0)
+            && test_regex_pattern(mcbuf, "MENUCOLORS regex")
             && (mcclr = query_color((char *) 0)) != -1
             && (mcattr = query_attr((char *) 0)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
@@ -5608,7 +5543,7 @@ handler_msgtype(VOID_ARGS)
         if (*mtbuf == '\033')
             return TRUE;
         if (*mtbuf
-            && test_regex_pattern(mtbuf, (const char *)0)
+            && test_regex_pattern(mtbuf, "MSGTYPE regex")
             && (mttyp = query_msgtype()) != -1
             && !msgtype_add(mttyp, mtbuf)) {
             pline("Error adding the message type.");
@@ -5788,84 +5723,41 @@ boolean val_allowed;
 }
 
 void
-set_duplicate_opt_detection(on_or_off)
-int on_or_off;
+reset_duplicate_opt_detection(VOID_ARGS)
 {
-    int k, *optptr;
+    int k;
 
-    if (on_or_off != 0) {
-        /*-- ON --*/
-        if (iflags.opt_booldup)
-            impossible("iflags.opt_booldup already on (memory leak)");
-        iflags.opt_booldup = (int *) alloc(SIZE(allopt) * sizeof (int));
-        optptr = iflags.opt_booldup;
-        for (k = 0; k < SIZE(allopt); ++k)
-            *optptr++ = 0;
-
-        if (iflags.opt_compdup)
-            impossible("iflags.opt_compdup already on (memory leak)");
-        iflags.opt_compdup = (int *) alloc(SIZE(allopt) * sizeof (int));
-        optptr = iflags.opt_compdup;
-        for (k = 0; k < SIZE(allopt); ++k)
-            *optptr++ = 0;
-    } else {
-        /*-- OFF --*/
-        if (iflags.opt_booldup)
-            free((genericptr_t) iflags.opt_booldup);
-        iflags.opt_booldup = (int *) 0;
-        if (iflags.opt_compdup)
-            free((genericptr_t) iflags.opt_compdup);
-        iflags.opt_compdup = (int *) 0;
-    }
+    for (k = 0; k < OPTCOUNT; ++k)
+        allopt[k].dupdetected = 0;
 }
 
 static boolean
-duplicate_opt_detection(opts, iscompound)
-const char *opts;
-int iscompound; /* 0 == boolean option, 1 == compound */
+duplicate_opt_detection(optidx)
+int optidx;
 {
-    int i, *optptr;
-
-    if (!iscompound && iflags.opt_booldup && g.opt_initial && g.opt_from_file) {
-        for (i = 0; allopt[i].name; i++) {
-            if (match_optname(opts, allopt[i].name, 3, FALSE)) {
-                optptr = iflags.opt_booldup + i;
-                *optptr += 1;
-                if (*optptr > 1)
-                    return TRUE;
-                else
-                    return FALSE;
-            }
-        }
-    } else if (iscompound && iflags.opt_compdup && g.opt_initial && g.opt_from_file) {
-        for (i = 0; allopt[i].name; i++) {
-            if (match_optname(opts, allopt[i].name, strlen(allopt[i].name),
-                              TRUE)) {
-                optptr = iflags.opt_compdup + i;
-                *optptr += 1;
-                if (*optptr > 1)
-                    return TRUE;
-                else
-                    return FALSE;
-            }
-        }
-    }
+    if (g.opt_initial && g.opt_from_file)
+        return allopt[optidx].dupdetected++;
     return FALSE;
 }
 
 static void
-complain_about_duplicate(opts, iscompound)
-const char *opts;
-int iscompound; /* 0 == boolean option, 1 == compound */
+complain_about_duplicate(optidx)
+int optidx;
 {
+    char buf[BUFSZ];
+
 #ifdef MAC
     /* the Mac has trouble dealing with the output of messages while
      * processing the config file.  That should get fixed one day.
      * For now just return.
      */
 #else /* !MAC */
-    config_error_add("%s option specified multiple times: %s",
-                     iscompound ? "compound" : "boolean", opts);
+    buf[0] = '\0';
+    if (using_alias)
+        Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
+    config_error_add("%s option specified multiple times: %s%s",
+                     (allopt[optidx].opttyp == CompOpt) ? "compound" : "boolean",
+                     allopt[optidx].name, buf);
 #endif /* ?MAC */
     return;
 }
@@ -6099,18 +5991,11 @@ initoptions_init()
     init_random(rn2);
     init_random(rn2_on_display_rng);
 
-    /* for detection of configfile options specified multiple times */
-    iflags.opt_booldup = iflags.opt_compdup = (int *) 0;
-
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].addr)
             *(allopt[i].addr) = allopt[i].initval;
     }
 
-#ifdef SYSFLAGS
-    Strcpy(sysflags.sysflagsid, "sysflags");
-    sysflags.sysflagsid[9] = (char) sizeof (struct sysflag);
-#endif
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
@@ -6575,12 +6460,13 @@ char *str;
             c = colornames[i].color;
             break;
         }
-    if (i == SIZE(colornames) && (*str >= '0' && *str <= '9'))
+    if (i == SIZE(colornames) && digit(*str))
         c = atoi(str);
 
-    if (c == CLR_MAX)
-        config_error_add("Unknown color '%s'", str);
-
+    if (c < 0 || c >= CLR_MAX) {
+        config_error_add("Unknown color '%.60s'", str);
+        c = CLR_MAX; /* "none of the above" */
+    }
     return c;
 }
 
@@ -6611,7 +6497,7 @@ boolean complain;
         }
 
     if (a == -1 && complain)
-        config_error_add("Unknown text attribute '%s'", str);
+        config_error_add("Unknown text attribute '%.50s'", str);
 
     return a;
 }
@@ -6795,16 +6681,20 @@ msgtype_add(typ, pattern)
 int typ;
 char *pattern;
 {
+    static const char *re_error = "MSGTYPE regex error";
     struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof *tmp);
 
     tmp->msgtype = typ;
     tmp->regex = regex_init();
+    /* test_regex_pattern() has already validated this regexp but parsing
+       it again could conceivably run out of memory */
     if (!regex_compile(pattern, tmp->regex)) {
-        static const char *re_error = "MSGTYPE regex error";
+        const char *re_error_desc = regex_error_desc(tmp->regex);
 
-        config_error_add("%s: %s", re_error, regex_error_desc(tmp->regex));
+        /* free first in case reason for failure was insufficient memory */
         regex_free(tmp->regex);
         free((genericptr_t) tmp);
+        config_error_add("%s: %s", re_error, re_error_desc);
         return FALSE;
     }
     tmp->pattern = dupstr(pattern);
@@ -6929,30 +6819,40 @@ char *str;
     return FALSE;
 }
 
+/* parse 'str' as a regular expression to check whether it's valid;
+   compiled regexp gets thrown away regardless of the outcome */
 static boolean
 test_regex_pattern(str, errmsg)
 const char *str;
 const char *errmsg;
 {
-    static const char re_error[] = "Regex error";
+    static const char def_errmsg[] = "NHregex error";
     struct nhregex *match;
-    boolean retval = TRUE;
+    const char *re_error_desc;
+    boolean retval;
 
     if (!str)
         return FALSE;
+    if (!errmsg)
+        errmsg = def_errmsg;
 
     match = regex_init();
     if (!match) {
-        config_error_add("NHregex error");
+        config_error_add("%s", errmsg);
         return FALSE;
     }
 
-    if (!regex_compile(str, match)) {
-        config_error_add("%s: %s", errmsg ? errmsg : re_error,
-                         regex_error_desc(match));
-        retval = FALSE;
-    }
+    retval = regex_compile(str, match);
+    /* get potential error message before freeing regexp and free regexp
+       before issuing message in case the error is "ran out of memory"
+       since message delivery might need to allocate some memory */
+    re_error_desc = !retval ? regex_error_desc(match) : 0;
+    /* discard regexp; caller will re-parse it after validating other stuff */
     regex_free(match);
+    /* if returning failure, tell player */
+    if (!retval)
+        config_error_add("%s: %s", errmsg, re_error_desc);
+
     return retval;
 }
 
@@ -6968,19 +6868,23 @@ int c, a;
         return FALSE;
     tmp = (struct menucoloring *) alloc(sizeof *tmp);
     tmp->match = regex_init();
+    /* test_regex_pattern() has already validated this regexp but parsing
+       it again could conceivably run out of memory */
     if (!regex_compile(str, tmp->match)) {
-        config_error_add("%s: %s", re_error, regex_error_desc(tmp->match));
+        const char *re_error_desc = regex_error_desc(tmp->match);
+
+        /* free first in case reason for regcomp failure was out-of-memory */
         regex_free(tmp->match);
-        free(tmp);
+        free((genericptr_t) tmp);
+        config_error_add("%s: %s", re_error, re_error_desc);
         return FALSE;
-    } else {
-        tmp->next = g.menu_colorings;
-        tmp->origstr = dupstr(str);
-        tmp->color = c;
-        tmp->attr = a;
-        g.menu_colorings = tmp;
-        return TRUE;
     }
+    tmp->next = g.menu_colorings;
+    tmp->origstr = dupstr(str);
+    tmp->color = c;
+    tmp->attr = a;
+    g.menu_colorings = tmp;
+    return TRUE;
 }
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
@@ -7059,6 +6963,7 @@ free_menu_coloring()
         free((genericptr_t) tmp->origstr);
         free((genericptr_t) tmp);
     }
+    g.menu_colorings = (struct menucoloring *) 0;
 }
 
 static void
@@ -7099,7 +7004,8 @@ count_menucolors(VOID_ARGS)
 }
 
 static boolean
-parse_role_opts(negated, fullname, opts, opp)
+parse_role_opts(optidx, negated, fullname, opts, opp)
+int optidx;
 boolean negated;
 const char *fullname;
 char *opts;
@@ -7126,8 +7032,8 @@ char **opp;
                 return FALSE;
             }
         } else {
-            if (duplicate_opt_detection(opts, 1))
-                complain_about_duplicate(opts, 1);
+            if (duplicate && !allopt[optidx].dupeok)
+                complain_about_duplicate(optidx);
             *opp = op;
             return TRUE;
         }
@@ -7612,6 +7518,8 @@ doset() /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
+    } else if (g.context.botl || g.context.botlx) {
+        bot();
     }
     return 0;
 }
@@ -7873,13 +7781,14 @@ const char *mapping;
     ape = (struct autopickup_exception *) alloc(sizeof *ape);
     ape->regex = regex_init();
     if (!regex_compile(text, ape->regex)) {
-        config_error_add("%s: %s", APE_regex_error,
-                         regex_error_desc(ape->regex));
+        const char *re_error_desc = regex_error_desc(ape->regex);
+
+        /* free first in case reason for failure was insufficient memory */
         regex_free(ape->regex);
         free((genericptr_t) ape);
+        config_error_add("%s: %s", APE_regex_error, re_error_desc);
         return 0;
     }
-
     ape->pattern = dupstr(text);
     ape->grab = grab;
     ape->next = g.apelist;
@@ -7917,10 +7826,10 @@ free_autopickup_exceptions()
     struct autopickup_exception *ape;
 
     while ((ape = g.apelist) != 0) {
-      regex_free(ape->regex);
-      free((genericptr_t) ape->pattern);
-      g.apelist = ape->next;
-      free((genericptr_t) ape);
+        free((genericptr_t) ape->pattern);
+        regex_free(ape->regex);
+        g.apelist = ape->next;
+        free((genericptr_t) ape);
     }
 }
 
@@ -8641,7 +8550,7 @@ set_playmode()
 {
     if (wizard) {
         if (authorize_wizard_mode())
-            Strcpy(g.plname, "wizard");
+            g.plnamelen = (int) strlen(strcpy(g.plname, "wizard"));
         else
             wizard = FALSE; /* not allowed or not available */
         /* force explore mode if we didn't make it into wizard mode */

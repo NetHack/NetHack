@@ -1,4 +1,4 @@
--- NetHack 3.6	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -33,7 +33,7 @@ des.non_diggable(selection.area(00,00,47,12))
 des.mazewalk(00,06,"west")
 des.stair("down", 44,06)
 des.door("locked",00,06)
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(34,08,'-')
    des.terrain(34,04,'S')
    des.terrain(29,05,'|')

@@ -1,4 +1,4 @@
-/* NetHack 3.6	Window.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.7	Window.c	$NHDT-Date: 1596498371 2020/08/03 23:46:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,8 +31,9 @@
 
 #include "xwindowp.h"
 
-#include "config.h"
-#include "lint.h"
+#include "config.h" /* #define for const for non __STDC__ compilers */
+#include "lint.h"   /* for nethack's nhStr() macro */
+#include "winX.h"   /* to make sure protoypes match corresponding functions */
 
 static XtResource resources[] = {
 #define offset(field) XtOffset(WindowWidget, window.field)

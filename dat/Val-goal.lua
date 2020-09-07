@@ -1,4 +1,4 @@
--- NetHack 3.6	Valkyrie.des	$NHDT-Date: 1553807172 2019/03/28 21:06:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.15 $
+-- NetHack 3.7	Valkyrie.des	$NHDT-Date: 1553807172 2019/03/28 21:06:12 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.15 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -38,7 +38,7 @@ des.non_diggable(selection.area(00,00,34,16))
 -- Drawbridges; northern one opens from the south (portcullis) to further
 -- north (lowered span), southern one from the north to further south
 des.drawbridge({ x=17, y=02, dir="south", state="random" })
-if math.random(0, 99) < 75 then
+if percent(75) then
    des.drawbridge({ x=17, y=14, dir="north", state="open" })
 else
    des.drawbridge({ x=17, y=14, dir="north", state="random" })

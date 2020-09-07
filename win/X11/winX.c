@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1577063125 2019/12/23 01:05:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1596498377 2020/08/03 23:46:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -98,13 +98,15 @@ static XtSignalId X11_sig_id;
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
     "X11",
-    (WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
-     | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT),
-#if defined(STATUS_HILITES)
-    WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
+    ( WC_COLOR | WC_INVERSE | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
+     | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT ),
+    /* status requires VIA_WINDOWPORT(); WC2_FLUSH_STATUS ensures that */
+    ( WC2_FLUSH_STATUS
+#ifdef STATUS_HILITES
+      | WC2_RESET_STATUS | WC2_HILITE_STATUS
 #endif
-    0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+      | 0L ),
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
     X11_suspend_nhwindows, X11_resume_nhwindows, X11_create_nhwindow,
@@ -300,6 +302,9 @@ struct xwindow *wp;
         XtNbright_cyan,
         XtNwhite,
     };
+    static const char *wintypenames[NHW_TEXT] = {
+        "message", "status", "map", "menu", "text"
+    };
     Display *dpy;
     Colormap screen_colormap;
     XrmDatabase rDB;
@@ -307,13 +312,8 @@ struct xwindow *wp;
     Status rc;
     int color;
     char *ret_type[32];
-    char clr_name[BUFSZ];
-    char clrclass[BUFSZ];
-    const char *wintypenames[NHW_TEXT] = {
-        "message", "status", "map", "menu", "text"
-    };
+    char wtn_up[20], clr_name[BUFSZ], clrclass[BUFSZ];
     const char *wtn;
-    char wtn_up[BUFSZ];
 
     if (wp->nh_colors_inited || !wp->type)
         return;
@@ -1414,7 +1414,8 @@ static XtActionsRec actions[] = {
 static XtResource resources[] = {
     { nhStr("slow"), nhStr("Slow"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, slow), XtRString, nhStr("True") },
-    { nhStr("fancy_status"), nhStr("Fancy_status"), XtRBoolean, sizeof(Boolean),
+    { nhStr("fancy_status"), nhStr("Fancy_status"),
+      XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, fancy_status), XtRString, nhStr("True") },
     { nhStr("autofocus"), nhStr("AutoFocus"), XtRBoolean, sizeof(Boolean),
       XtOffset(AppResources *, autofocus), XtRString, nhStr("False") },
@@ -1469,10 +1470,10 @@ XErrorEvent *error;
 {
     char buf[BUFSZ];
     XGetErrorText(display, error->error_code, buf, BUFSZ);
-    fprintf(stderr, "X Error: code %i (%s), request %i, minor %i, serial %lu\n",
+    fprintf(stderr,
+            "X Error: code %i (%s), request %i, minor %i, serial %lu\n",
             error->error_code, buf,
-            error->request_code, error->minor_code,
-            error->serial);
+            error->request_code, error->minor_code, error->serial);
     panic("X Error");
     return 0;
 }
@@ -2289,8 +2290,8 @@ static int
 input_event(exit_condition)
 int exit_condition;
 {
-    if (appResources.fancy_status && WIN_STATUS != WIN_ERR) /* hilighting on the fancy status window */
-        check_turn_events();
+    if (appResources.fancy_status && WIN_STATUS != WIN_ERR)
+        check_turn_events(); /* hilighting on the fancy status window */
     if (WIN_MAP != WIN_ERR) /* make sure cursor is not clipped */
         check_cursor_visibility(&window_list[WIN_MAP]);
     if (WIN_MESSAGE != WIN_ERR) /* reset pause line */
@@ -2608,19 +2609,6 @@ int dir;
     if (dir != WININIT)
         return;
 
-#ifdef OPENWINBUG
-    /* With the OpenWindows 3.0 libraries and the SunOS 4.1.2 ld, these
-     * two routines will not be found when linking.  An apparently correct
-     * executable is produced, along with nasty messages and a failure code
-     * returned to make.  The routines are in the static libXmu.a and
-     * libXmu.sa.4.0, but not in libXmu.so.4.0.  Rather than fiddle with
-     * static linking, we do this.
-     */
-    if (rn2(2) > 2) { /* i.e., FALSE that an optimizer probably can't find */
-        get_wmShellWidgetClass();
-        get_applicationShellWidgetClass();
-    }
-#endif
     return;
 }
 

@@ -4,21 +4,16 @@
 
 // qt_svsel.cpp -- saved game selector
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_svsel.h"
 #include "qt_bind.h"
 #include "qt_str.h"
@@ -60,7 +55,7 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     QGroupBox* box = new QGroupBox("Saved Characters",this);
     QButtonGroup *bg = new QButtonGroup(this);
     vbl->addWidget(box);
-    QVBoxLayout *bgl = new QVBoxLayout(box);
+    QVBoxLayout *bgl UNUSED = new QVBoxLayout(box);
     connect(bg, SIGNAL(buttonPressed(int)), this, SLOT(done(int)));
     for (int i=0; saved[i]; i++) {
 	QPushButton* b = new QPushButton(saved[i],box);

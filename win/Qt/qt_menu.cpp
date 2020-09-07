@@ -7,20 +7,13 @@
 extern "C" {
 #include "hack.h"
 }
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_menu.h"
 #include "qt_menu.moc"
 #include "qt_glyph.h"
@@ -89,6 +82,11 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     prompt(0),
     counting(false)
 {
+    // setFont() was in SelectMenu(), in time to be rendered but too late
+    // when measuring the width and height that will be needed
+    QFont tablefont(qt_settings->normalFixedFont());
+    table->setFont(tablefont);
+
     QGridLayout *grid = new QGridLayout();
     table->setColumnCount(5);
     table->setFrameStyle(QFrame::Panel|QFrame::Sunken);
@@ -132,7 +130,8 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     grid->setRowStretch(2, 1);
     setFocusPolicy(Qt::StrongFocus);
     table->setFocusPolicy(Qt::NoFocus);
-    connect(table, SIGNAL(cellClicked(int,int)), this, SLOT(cellToggleSelect(int,int)));
+    connect(table, SIGNAL(cellClicked(int,int)),
+            this, SLOT(cellToggleSelect(int,int)));
 
     setLayout(grid);
 }
@@ -212,15 +211,12 @@ void NetHackQtMenuWindow::EndMenu(const QString& p)
 
 int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 {
-    QFont tablefont(qt_settings->normalFont());
-    table->setFont(tablefont);
-
     table->setRowCount(itemcount);
 
     how=h;
 
-    ok->setEnabled(how!=PICK_ONE);ok->setDefault(how!=PICK_ONE);
-    cancel->setEnabled(how!=PICK_NONE);
+    ok->setEnabled(how!=PICK_ONE); ok->setDefault(how!=PICK_ONE);
+    cancel->setEnabled(true);
     all->setEnabled(how==PICK_ANY);
     none->setEnabled(how==PICK_ANY);
     invert->setEnabled(how==PICK_ANY);
@@ -237,17 +233,25 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	AddRow(i, itemlist[i]);
     }
 
+#define MENU_WIDTH_SLOP 10 /* this should not be necessary */
     // Determine column widths
     std::vector<int> col_widths;
-    for (std::size_t i = 0; i < itemlist.size(); ++i) {
+    for (std::size_t i = 0; i < (size_t) itemlist.size(); ++i) {
 	QStringList columns = itemlist[i].str.split("\t");
-        if (!itemlist[i].Selectable() && columns.size() == 1)
-        {
-            // Nonselectable line with no column dividers
+        if (!itemlist[i].Selectable() && columns.size() == 1) {
+            // Nonselectable line with no column dividers.
             // Assume this is a section header
+            // or ordinary text (^X feedback, for instance) rendered in
+            // a menu because tty's paginated menus can be used to go
+            // backward, unlike text windows which can only go forward.
+            QTableWidgetItem *twi = table->item(i, 4);
+            if (twi) {
+                QString text = twi->text();
+                WidenColumn(4, fm.width(text));
+            }
             continue;
         }
-	for (std::size_t j = 0U; j < columns.size(); ++j) {
+	for (std::size_t j = 0U; j < (size_t) columns.size(); ++j) {
 	    int w = fm.width(columns[j] + "  \t");
 	    if (j >= col_widths.size()) {
 		col_widths.push_back(w);
@@ -258,12 +262,12 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
     }
 
     // Pad each column to its column width
-    for (std::size_t i = 0U; i < itemlist.size(); ++i) {
+    for (std::size_t i = 0U; i < (size_t) itemlist.size(); ++i) {
 	QTableWidgetItem *twi = table->item(i, 4);
 	if (twi == NULL) { continue; }
 	QString text = twi->text();
 	QStringList columns = text.split("\t");
-	for (std::size_t j = 0U; j+1U < columns.size(); ++j) {
+	for (std::size_t j = 0U; j+1U < (size_t) columns.size(); ++j) {
 	    columns[j] += "\t";
 	    int width = col_widths[j];
 	    while (fm.width(columns[j]) < width) {
@@ -272,7 +276,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	}
 	text = columns.join("");
 	twi->setText(text);
-	WidenColumn(4, fm.width(text));
+	WidenColumn(4, fm.width(text) + MENU_WIDTH_SLOP);
     }
 
     // FIXME:  size for compact mode
@@ -394,7 +398,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     table->item(row, 4)->setFlags(Qt::ItemIsEnabled);
     WidenColumn(4, fm.width(text));
 
-    if (mi.color != -1) {
+    if ((int) mi.color != -1) {
 	twi->setForeground(colors[mi.color]);
     }
 
@@ -495,7 +499,8 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 	    InputCount(key);
 	else {
 	    for (int i=0; i<itemcount; i++) {
-		if (itemlist[i].ch == key || itemlist[i].gch == key)
+		if ((unsigned int) itemlist[i].ch == key
+                    || (unsigned int) itemlist[i].gch == key)
 		    ToggleSelect(i);
 	    }
 	}
@@ -507,32 +512,45 @@ void NetHackQtMenuWindow::All()
     if (how != PICK_ANY)
         return;
 
+    bool didcheck = false;
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(true);
+	if (cb != NULL) {
+            cb->setChecked(true);
+            didcheck = true;
+        }
     }
+    if (didcheck)
+        table->repaint();
 }
 void NetHackQtMenuWindow::ChooseNone()
 {
     if (how != PICK_ANY)
         return;
 
+    bool diduncheck = false;
     for (int i=0; i<itemcount; i++) {
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(false);
+	if (cb != NULL) {
+            cb->setChecked(false);
+            diduncheck = true;
+        }
     }
+    if (diduncheck)
+        table->repaint();
 }
 void NetHackQtMenuWindow::Invert()
 {
     if (how != PICK_ANY)
         return;
 
+    boolean didtoggle = false;
     for (int i=0; i<itemcount; i++) {
         if (!menuitem_invert_test(0, itemlist[i].itemflags,
                                   itemlist[i].selected))
@@ -542,8 +560,13 @@ void NetHackQtMenuWindow::Invert()
 	if (count != NULL) count->setText("");
 
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
-	if (cb != NULL) cb->setChecked(cb->checkState() == Qt::Unchecked);
+	if (cb != NULL) {
+            cb->setChecked(cb->checkState() == Qt::Unchecked);
+            didtoggle = true;
+        }
     }
+    if (didtoggle)
+        table->repaint();
 }
 void NetHackQtMenuWindow::Search()
 {
@@ -552,6 +575,7 @@ void NetHackQtMenuWindow::Search()
 
     NetHackQtStringRequestor requestor(this, "Search for:");
     char line[256];
+    line[0] = '\0'; /* for EDIT_GETLIN */
     if (requestor.Get(line)) {
 	for (int i=0; i<itemcount; i++) {
 	    if (itemlist[i].str.contains(line))
@@ -565,8 +589,8 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 	QCheckBox *cb = dynamic_cast<QCheckBox *>(table->cellWidget(i, 1));
 	if (cb == NULL) return;
 
-	cb->setChecked((counting && !countstr.isEmpty())
-		    || cb->checkState() == Qt::Unchecked);
+        cb->setChecked((counting && !countstr.isEmpty())
+                       || cb->checkState() == Qt::Unchecked);
 
 	QTableWidgetItem *count = table->item(i, 0);
 	if (count != NULL) count->setText(countstr);
@@ -575,11 +599,13 @@ void NetHackQtMenuWindow::ToggleSelect(int i)
 
 	if (how==PICK_ONE) {
 	    accept();
-	}
+        } else {
+            table->repaint();
+        }
     }
 }
 
-void NetHackQtMenuWindow::cellToggleSelect(int i, int j)
+void NetHackQtMenuWindow::cellToggleSelect(int i, int j UNUSED)
 {
     ToggleSelect(i);
 }
@@ -673,41 +699,63 @@ static char** rip_line=0;
     int line;
 
     /* Put name on stone */
-    snprintf(rip_line[NAME_LINE], STONE_LINE_LEN+1, "%s", g.plname);
+    (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
+                    "%.*s", STONE_LINE_LEN, g.plname);
 
-    /* Put $ on stone */
-    snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN+1, "%ld Au", money_cnt(g.invent));
+    /* Put $ on stone;
+       to keep things safe and relatively simple, impose an arbitrary
+       upper limit that's the same for 64 bit and 32 bit configurations
+       (also 16 bit configurations provided they use 32 bit long); the
+       upper limit for directly carried gold is somewhat less than 300K
+       due to carrying capacity, but end-of-game handling has already
+       added in gold from containers, so the amount could be much more
+       (simplest case: ~300K four times in a blessed bag of holding, so
+       ~1.2M; in addition to the hassle of getting such a thing set up,
+       it would need many gold-rich bones levels or wizard mode wishing) */
+    long cash = std::max(g.done_money, 0L);
+    /* force less that 10 digits to satisfy elaborate format checking;
+       it's arbitrary but still way, way more than could ever be needed */
+    if (cash > 999999999L)
+        cash = 999999999L;
+    (void) snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN + 1, "%ld Au", cash);
 
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
     //str_copy(buf, killer, SIZE(buf));
 
     /* Put death type on stone */
-    for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
-	int i,i0;
+    for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; ++line) {
 	char tmpchar;
+	int i, i0 = (int) strlen(dpx);
 
-	if ( (i0=strlen(dpx)) > STONE_LINE_LEN) {
-	    for(i = STONE_LINE_LEN;
-		((i0 > STONE_LINE_LEN) && i); i--)
-		if(dpx[i] == ' ') i0 = i;
-	    if(!i) i0 = STONE_LINE_LEN;
+	if (i0 > STONE_LINE_LEN) {
+	    for (i = STONE_LINE_LEN; (i > 0) && (i0 > STONE_LINE_LEN); --i)
+		if (dpx[i] == ' ')
+                    i0 = i;
+	    if (!i)
+                i0 = STONE_LINE_LEN;
 	}
 	tmpchar = dpx[i0];
 	dpx[i0] = 0;
-	str_copy(rip_line[line], dpx, STONE_LINE_LEN+1);
+	(void) str_copy(rip_line[line], dpx, STONE_LINE_LEN + 1);
 	if (tmpchar != ' ') {
 	    dpx[i0] = tmpchar;
 	    dpx= &dpx[i0];
-	} else  dpx= &dpx[i0+1];
+	} else {
+            dpx= &dpx[i0 + 1];
+        }
     }
 
-    /* Put year on stone */
-    snprintf(rip_line[YEAR_LINE], STONE_LINE_LEN+1, "%4d", getyear());
+    /* Put year on stone;
+       64 bit configuration with 64 bit int is capable of overflowing
+       STONE_LINE_LEN characters; a compiler might warn about that,
+       so force a value that it can recognize as fitting within buffer's
+       range ("%4d" imposes a minimum number of digits, not a maximum) */
+    int year = (int) ((yyyymmdd(when) / 10000L) % 10000L); /* Y10K bug! */
+    (void) snprintf(rip_line[YEAR_LINE], STONE_LINE_LEN + 1, "%4d", year);
 
-    rip.setLines(rip_line,YEAR_LINE+1);
-
-    use_rip=true;
+    rip.setLines(rip_line, YEAR_LINE + 1);
+    use_rip = true;
 }
 
 void NetHackQtTextWindow::Clear()
@@ -717,7 +765,7 @@ void NetHackQtTextWindow::Clear()
     str_fixed=false;
 }
 
-void NetHackQtTextWindow::Display(bool block)
+void NetHackQtTextWindow::Display(bool block UNUSED)
 {
     if (str_fixed) {
 	lines->setFont(qt_settings->normalFixedFont());
@@ -750,7 +798,7 @@ void NetHackQtTextWindow::Display(bool block)
     exec();
 }
 
-void NetHackQtTextWindow::PutStr(int attr, const QString& text)
+void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 {
     str_fixed=str_fixed || text.contains("    ");
     lines->addItem(text);
@@ -816,8 +864,9 @@ void NetHackQtMenuOrTextWindow::StartMenu()
     if (!actual) actual=new NetHackQtMenuWindow(parent);
     actual->StartMenu();
 }
-void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-	const QString& str, unsigned itemflags)
+void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
+                                        char ch, char gch, int attr,
+                                        const QString& str, unsigned itemflags)
 {
     if (!actual) impossible("AddMenu called before we know if Menu or Text");
     actual->AddMenu(glyph,identifier,ch,gch,attr,str,itemflags);

@@ -1,4 +1,4 @@
-This is a listing of all files in a full NetHack 3.6 distribution, organized
+This is a listing of all files in a full NetHack 3.7 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
@@ -57,9 +57,9 @@ minetn-5.lua  minetn-6.lua  minetn-7.lua  nhlib.lua     opthelp
 oracle.lua    oracles.txt   orcus.lua     quest.lua     rumors.fal
 rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua   soko2-1.lua
 soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua   soko4-2.lua
-symbols       tower1.lua    tower2.lua    tower3.lua    tribute
-valley.lua    water.lua     wizard1.lua   wizard2.lua   wizard3.lua
-wizhelp
+symbols       themerms.lua  tower1.lua    tower2.lua    tower3.lua
+tribute       valley.lua    water.lua     wizard1.lua   wizard2.lua
+wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
@@ -73,11 +73,12 @@ fixes31.2       fixes31.3       fixes32.0       fixes32.1
 fixes32.2       fixes32.3       fixes33.0       fixes33.1
 fixes34.0       fixes34.1       fixes34.2       fixes34.3
 fixes35.0       fixes36.0       fixes36.1       fixes36.2
-fixes36.3       fixes36.4       fixes36.5       fixes37.0
-fixesXX.X       makedefs.6      makedefs.txt    mn.7
-mn.txt          mnh.7           mnh.txt         nethack.6
-nethack.txt     options.doc     recover.6       recover.txt
-tmac.n          tmac.nh         window.doc
+fixes36.3       fixes36.4       fixes36.5       fixes36.6
+fixes37.0       fixesXX.X       lua.adoc        makedefs.6
+makedefs.txt    mn.7            mn.txt          mnh.7
+mnh.txt         nethack.6       nethack.txt     options.doc
+recover.6       recover.txt     tmac.n          tmac.nh
+window.doc
 
 include:
 (files for GEM versions)
@@ -90,28 +91,111 @@ winGnome.h
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
 (files for all versions)
-align.h       amiconf.h     artifact.h    artilist.h    attrib.h
-beconf.h      botl.h        color.h       config.h      config1.h
-context.h     coord.h       decl.h        def_os2.h     dgn_file.h
-display.h     dlb.h         dungeon.h     engrave.h     extern.h
-flag.h        fnamesiz.h    func_tab.h    global.h      hack.h
-integer.h     isaac64.h     lint.h        mail.h        mextra.h
-mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
-monflag.h     monst.h       monsym.h      ntconf.h      obj.h
-objclass.h    optlist.h     os2conf.h     patchlevel.h  pcconf.h
-permonst.h    prop.h        quest.h       rect.h        region.h
-rm.h          skills.h      sp_lev.h      spell.h       sys.h
-system.h      tcap.h        tileset.h     timeout.h     tosconf.h
+align.h       artifact.h    artilist.h    attrib.h      botl.h
+color.h       config.h      config1.h     context.h     coord.h
+decl.h        dgn_file.h    display.h     dlb.h         dungeon.h
+engrave.h     extern.h      flag.h        fnamesiz.h    func_tab.h
+global.h      hack.h        integer.h     isaac64.h     lint.h
+mail.h        mextra.h      mfndpos.h     micro.h       mkroom.h
+monattk.h     mondata.h     monflag.h     monst.h       monsym.h
+ntconf.h      obj.h         objclass.h    optlist.h     patchlevel.h
+pcconf.h      permonst.h    prop.h        quest.h       rect.h
+region.h      rm.h          skills.h      sp_lev.h      spell.h
+sys.h         system.h      tcap.h        tileset.h     timeout.h
 tradstdc.h    trampoli.h    trap.h        unixconf.h    vision.h
-vmsconf.h     wceconf.h     winami.h      wincurs.h     winprocs.h
-wintype.h     you.h         youprop.h
+vmsconf.h     winami.h      wincurs.h     winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
 
 (files for various Macintosh versions)
-mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
-mactty.h      macwin.h      mttypriv.h
+mac-carbon.h  mac-qt.h      mac-term.h    macpopup.h    mactty.h
+macwin.h      mttypriv.h
+
+outdated/include:
+(files that are no longer maintained for current game code)
+amiconf.h  beconf.h   def_os2.h  macconf.h  os2conf.h  tosconf.h  wceconf.h
+
+outdated/sys/amiga:
+(files for Amiga versions - untested for 3.7)
+Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
+amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
+amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
+amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
+ifchange      mkdmake       txt2iff.c     winami.c      winami.p
+winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
+winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
+
+outdated/sys/atari:
+(files for Atari version - untested for 3.7)
+Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
+unx2atar.sed
+
+outdated/sys/be:
+(files for BeOS version - untested for 3.7)
+README    bemain.c
+
+outdated/sys/mac:
+(files for 68K Macintosh versions)
+Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
+NHsound.hqx   News          README        carbon.plist  dprintf.c
+maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
+macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
+mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
+
+outdated/sys/msdos:
+(files for deprecated real mode msdos version)
+Makefile.BC   Makefile.MSC  SCHEMA35.MSC  moveinit.pat  ovlinit.c
+schema1.BC    schema2.BC    schema3.MSC
+
+outdated/sys/os2:
+(files for OS/2 version - untested for 3.7)
+Install.os2   Makefile.os2  nhpmico.uu    os2.c
+
+outdated/sys/wince:
+(files for Windows CE and PocketPC - untested for 3.7)
+Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
+defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
+mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
+mhdlg.h       mhfont.c      mhfont.h      mhinput.c     mhinput.h
+mhmain.c      mhmain.h      mhmap.c       mhmap.h       mhmenu.c
+mhmenu.h      mhmsg.h       mhmsgwnd.c    mhmsgwnd.h    mhrip.c
+mhrip.h       mhstatus.c    mhstatus.h    mhtext.c      mhtext.h
+mhtxtbuf.c    mhtxtbuf.h    mswproc.c     newres.h      nhico.uu
+resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
+winmain.c
+
+outdated/sys/wince/ceinc:
+(header files for Windows CE and PocketPC - untested for 3.7)
+assert.h  errno.h   fcntl.h
+
+outdated/sys/wince/ceinc/sys:
+(sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
+stat.h
+
+outdated/win/Qt3:
+(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
+Info.plist           Install.Qt           knethack.lnk
+knh-mini.xpm         knh.xpm              qpe-nethack.control
+qt3_clust.cpp        qt3_clust.h          qt3_kde0.h
+qt3_win.cpp          qt3_win.h            qt3_xpms.h
+qt3tableview.cpp     qt3tableview.h       tileedit.cpp
+tileedit.h
+
+outdated/win/gem:
+(files for GEM versions - untested for 3.7)
+Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
+load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
+
+outdated/win/gnome:
+(files for GNOME versions - untested for 3.7)
+README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
+gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
+gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
+gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
+gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
+gnyesno.h   mapbg.xpm
 
 src:
 (files for all versions)
@@ -130,57 +214,24 @@ options.c   pager.c     pickup.c    pline.c     polyself.c  potion.c
 pray.c      priest.c    quest.c     questpgr.c  read.c      rect.c
 region.c    restore.c   rip.c       rnd.c       role.c      rumors.c
 save.c      sfstruct.c  shk.c       shknam.c    sit.c       sounds.c
-sp_lev.c    spell.c     steal.c     steed.c     sys.c       teleport.c
-timeout.c   topten.c    track.c     trap.c      u_init.c    uhitm.c
-vault.c     version.c   vision.c    weapon.c    were.c      wield.c
-windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
-
-sys/amiga:
-(files for Amiga versions - untested for 3.6.5)
-Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
-amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
-amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
-amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
-ifchange      mkdmake       txt2iff.c     winami.c      winami.p
-winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
-winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
-
-sys/atari:
-(files for Atari version - untested for 3.7)
-Install.tos   atarifnt.uue  nethack.mnu   setup.g       tos.c
-unx2atar.sed
-
-sys/be:
-(files for BeOS version - untested for 3.7)
-README    bemain.c
-
-sys/mac:
-(files for 68K Macintosh versions)
-Files.r       Install.mw    MacHelp       NHDeflts      NHrsrc.hqx
-NHsound.hqx   News          README        carbon.plist  dprintf.c
-maccurs.c     macerrs.c     macfile.c     machelp.hqx   macmain.c
-macmenu.c     mactopl.c     mactty.c      macunix.c     macwin.c
-mgetline.c    mmodal.c      mrecover.c    mrecover.hqx  mttymain.c
+sp_lev.c    spell.c     steal.c     steed.c     symbols.c   sys.c
+teleport.c  timeout.c   topten.c    track.c     trap.c      u_init.c
+uhitm.c     vault.c     version.c   vision.c    weapon.c    were.c
+wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
+zap.c
 
 sys/msdos:
 (files for MSDOS version)
-Install.dos             Makefile.BC             Makefile.GCC
-Makefile.MSC            Makefile1.cross         Makefile2.cross
-SCHEMA35.MSC            moveinit.pat            msdos-cross-compile.sh
-msdos.c                 msdoshlp.txt            nhlua.h
-ovlinit.c               pckeys.c                pctiles.c
-pctiles.h               pcvideo.h               portio.h
-schema1.BC              schema2.BC              schema3.MSC
-setup.bat               sysconf                 tile2bin.c
-vesa.h                  video.c                 vidtxt.c
-vidvesa.c               vidvga.c
+Install.dos             Makefile.GCC            Makefile1.cross
+Makefile2.cross         msdos-cross-compile.sh  msdos.c
+msdoshlp.txt            nhlua.h                 pckeys.c
+pctiles.c               pctiles.h               pcvideo.h
+portio.h                setup.bat               sysconf
+tile2bin.c              vesa.h                  video.c
+vidtxt.c                vidvesa.c               vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
-
-sys/os2:
-(files for OS/2 version - untested for 3.7)
-Install.os2   Makefile.os2  nhpmico.uu    os2.c
 
 sys/share:
 (Berkeley random number file, which may be included in any version)
@@ -253,10 +304,15 @@ sys/unix/hints:
 (files for configuring UNIX NetHack versions)
 linux               linux-chroot        linux-minimal
 linux-qt4           linux-qt5           linux-x11
-macosx              macosx.sh           macosx10.5
-macosx10.7          macosx10.8          macosx10.10
-macosx10.10-qt      macosx10.14         solaris
-solaris-playground  unix
+linux.2020          macOS.2020          macosx
+macosx.sh           macosx10.5          macosx10.7
+macosx10.8          macosx10.10         macosx10.10-qt
+macosx10.14         solaris             solaris-playground
+unix
+
+sys/unix/hints/include:
+(files for configuring UNIX NetHack versions)
+multiw-1.2020  multiw-2.2020
 
 sys/vms:
 (files for VMS version)
@@ -264,27 +320,6 @@ Install.vms   Makefile.dat  Makefile.doc  Makefile.src  Makefile.top
 Makefile.utl  install.com   lev_lex.h     nethack.com   oldcrtl.c
 spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
-
-sys/wince:
-(files for Windows CE and PocketPC - untested for 3.7)
-Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
-defaults.nh   keypad.uu     menubar.uu    mhaskyn.c     mhaskyn.h
-mhcmd.c       mhcmd.h       mhcolor.c     mhcolor.h     mhdlg.c
-mhdlg.h       mhfont.c      mhfont.h      mhinput.c     mhinput.h
-mhmain.c      mhmain.h      mhmap.c       mhmap.h       mhmenu.c
-mhmenu.h      mhmsg.h       mhmsgwnd.c    mhmsgwnd.h    mhrip.c
-mhrip.h       mhstatus.c    mhstatus.h    mhtext.c      mhtext.h
-mhtxtbuf.c    mhtxtbuf.h    mswproc.c     newres.h      nhico.uu
-resource.h    winMS.h       winhack.c     winhack.rc    winhcksp.rc
-winmain.c
-
-sys/wince/ceinc:
-(header files for Windows CE and PocketPC - untested for 3.7)
-assert.h  errno.h   fcntl.h
-
-sys/wince/ceinc/sys:
-(sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
-stat.h
 
 sys/winnt:
 (files for Windows 7/8.x/10 version)
@@ -313,20 +348,11 @@ qt_clust.h    qt_delay.cpp  qt_delay.h    qt_glyph.cpp  qt_glyph.h
 qt_icon.cpp   qt_icon.h     qt_inv.cpp    qt_inv.h      qt_kde0.h
 qt_key.cpp    qt_key.h      qt_line.cpp   qt_line.h     qt_main.cpp
 qt_main.h     qt_map.cpp    qt_map.h      qt_menu.cpp   qt_menu.h
-qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_rip.cpp
-qt_rip.h      qt_set.cpp    qt_set.h      qt_stat.cpp   qt_stat.h
-qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
-qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
-qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
-
-win/Qt3:
-(files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
-Info.plist           Install.Qt           knethack.lnk
-knh-mini.xpm         knh.xpm              qpe-nethack.control
-qt3_clust.cpp        qt3_clust.h          qt3_kde0.h
-qt3_win.cpp          qt3_win.h            qt3_xpms.h
-qt3tableview.cpp     qt3tableview.h       tileedit.cpp
-tileedit.h
+qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_post.h
+qt_pre.h      qt_rip.cpp    qt_rip.h      qt_set.cpp    qt_set.h
+qt_stat.cpp   qt_stat.h     qt_str.cpp    qt_str.h      qt_streq.cpp
+qt_streq.h    qt_svsel.cpp  qt_svsel.h    qt_win.cpp    qt_win.h
+qt_xcmd.cpp   qt_xcmd.h     qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
 
 win/X11:
 (files for X versions)
@@ -345,20 +371,6 @@ win/curses:
 Bugs.txt    Readme.txt  Todo.txt    cursdial.c  cursdial.h  cursinit.c
 cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
-
-win/gem:
-(files for GEM versions - untested for 3.7)
-Install.gem  bitmfile.c   gem_rsc.uu   gem_rso.uu   gr_rect.c    gr_rect.h
-load_img.c   tile2img.c   title.uu     wingem.c     wingem1.c    xpm2img.c
-
-win/gnome:
-(files for GNOME versions - untested for 3.7)
-README      gn_xpms.h   gnaskstr.c  gnaskstr.h  gnbind.c    gnbind.h
-gnglyph.c   gnglyph.h   gnmain.c    gnmain.h    gnmap.c     gnmap.h
-gnmenu.c    gnmenu.h    gnmesg.c    gnmesg.h    gnomeprv.h  gnopts.c
-gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
-gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
-gnyesno.h   mapbg.xpm
 
 win/macosx:
 (files for macosx versions)

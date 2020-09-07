@@ -44,10 +44,16 @@ PDCURSES_TOP=../lib/pdcurses
 #DJGPP_TOP = $(HOME)/lib/djgpp
 
 #---------------------------------------------------------------
+ifeq "$(LUA_VERSION)" "5.3.5"
+LUAVER=5.3.5
+else
+LUAVER=5.4.0
+endif
+#---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -55,7 +61,7 @@ PDCURSES_TOP=../lib/pdcurses
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua-5.3.5
+LUATOP=../lib/lua-$(LUAVER)
 #
 #
 #==============================================================================
@@ -233,46 +239,6 @@ U  = $(UTIL)/
 #  Tile related object files.
 #==========================================
 
-#ifeq ($(SUPPRESS_GRAPHICS),Y)
-#TILOBJ       =
-#TILOBJ2      =
-#TEXTIO       =
-#TEXTIO2      =
-#TILE_BMP     =
-#TILEUTIL     = 
-#TILEFILES    = 
-#TILEFILES2   = 
-#GIFREADERS   = 
-#GIFREAD2     = 
-#PPMWRITERS   = 
-#PPMWRIT2     = 
-#
-#else
-#
-#TILOBJ      = $(O)tile.o $(VIDEO_OBJ)
-#
-#TILOBJ2     = $(O)tileset.o $(O)bmptiles.o $(O)giftiles.o
-#
-#TEXTIO      = $(HOST_O)tiletext.o $(HOST_O)tiletxt.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#
-#TEXTIO2     = $(HOST_O)tiletex2.o $(HOST_O)tiletxt2.o $(HOST_O)drawing.o $(HOST_O)decl.o $(HOST_O)monst.o \
-#		$(HOST_O)objects.o $(HOST_O)stubvid.o
-#TILEUTIL    = $(TILOBJ) $(U)tile2bin $(U)til2bin2 $(TILE_BMP) $(PLANAR_TIB) $(OVERVIEW_TIB)
-#
-#TILEFILES   = $(WSHR)/monsters.txt $(WSHR)/objects.txt $(WSHR)/other.txt
-#
-#TILEFILES2  = $(WSHR)/monthin.txt $(WSHR)/objthin.txt $(WSHR)/oththin.txt
-#
-#GIFREADERS  = $(HOST_O)gifread.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#GIFREAD2    = $(HOST_O)gifread2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRITERS  = $(HOST_O)ppmwrite.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#
-#PPMWRIT2    = $(HOST_O)ppmwrit2.o $(HOST_O)alloc.o $(HOST_O)panic.o
-#endif
-
 PLANAR_TIB   = $(DAT)/NETHACK1.tib
 OVERVIEW_TIB = $(DAT)/NETHACKO.tib
 TILE_BMP     = $(DAT)/NHTILES.BMP
@@ -309,12 +275,12 @@ VOBJ20 = $(O)region.o  $(O)restore.o  $(O)rip.o      $(O)rnd.o
 VOBJ21 = $(O)role.o    $(O)rumors.o   $(O)save.o     $(O)sfstruct.o
 VOBJ22 = $(O)shk.o     $(O)shknam.o   $(O)sit.o      $(O)sounds.o
 VOBJ23 = $(O)sp_lev.o  $(O)spell.o    $(O)steal.o    $(O)steed.o
-VOBJ24 = $(O)sys.o     $(O)teleport.o $(O)termcap.o  $(O)timeout.o
-VOBJ25 = $(O)topl.o    $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ26 = $(O)u_init.o  $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ27 = $(O)vis_tab.o $(O)weapon.o   $(O)were.o     $(O)wield.o
-VOBJ28 = $(O)windows.o $(O)wintty.o   $(O)wizard.o   $(O)worm.o
-VOBJ29 = $(O)worn.o    $(O)write.o    $(O)zap.o
+VOBJ24 = $(O)symbols.o $(O)sys.o      $(O)teleport.o $(O)termcap.o
+VOBJ25 = $(O)timeout.o $(O)topl.o     $(O)topten.o   $(O)track.o
+VOBJ26 = $(O)trap.o    $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ27 = $(O)vision.o  $(O)vis_tab.o  $(O)weapon.o   $(O)were.o
+VOBJ28 = $(O)wield.o   $(O)windows.o  $(O)wintty.o   $(O)wizard.o
+VOBJ29 = $(O)worm.o    $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ30 = $(REGEX)      $(VIDEO_OBJ)
 
 SOBJ   = $(O)msdos.o   $(O)pcsys.o    $(O)tty.o      $(O)unix.o \
@@ -348,18 +314,18 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 ifeq "$(ADD_LUA)" "Y"
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua535s.a
-#LUADLL   = $(O)lua535.a
+LUALIB   = $(O)lua$(subst .,, $(LUAVER))s.a
+#LUADLL   = $(O)lua$(subst .,, $(LUAVER)).a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
 LUATARGETS = lua.exe luac.exe $(LUALIB)
 #LUATARGETS = $(LUADLL) $(LUALIB)
 
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
 		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
 		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
@@ -367,7 +333,7 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o
 LUAOBJFILES2 =  $(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o
@@ -376,7 +342,7 @@ LUAOBJFILES3 =  $(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
 LUAOBJFILES4 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 
-#LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+#LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 #		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
 #		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
 #		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
@@ -385,9 +351,13 @@ LUAOBJFILES4 =  $(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 #		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 	
-LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
+ifeq "$(LUAVER)" "5.3.5"
+LUASRCFILES = $(LUASRCFILES) lbitlib.c
+LUAOBJFILES1 = $(LUAOBJFILES1) $(O)lbitlib.o
 endif
+LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
 
+endif
 ifeq "$(ADD_CURSES)" "Y"
 #==========================================
 # PDCurses build macros
@@ -453,9 +423,7 @@ GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
 CONFIG_H = $(INCL)/config.h $(INCL)/config1.h $(INCL)/tradstdc.h \
 		$(INCL)/global.h $(INCL)/coord.h $(INCL)/vmsconf.h \
 		$(INCL)/system.h $(INCL)/nhlua.h $(INCL)/unixconf.h \
-		$(INCL)/os2conf.h $(INCL)/micro.h $(INCL)/pcconf.h \
-		$(INCL)/tosconf.h $(INCL)/amiconf.h $(INCL)/macconf.h \
-		$(INCL)/beconf.h $(INCL)/wceconf.h $(INCL)/ntconf.h
+		$(INCL)/micro.h $(INCL)/pcconf.h $(INCL)/ntconf.h
 
 HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/lint.h $(INCL)/align.h \
 		$(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
@@ -721,6 +689,11 @@ $(O)$(GAME).lnk: $(ALLOBJ)
 	echo $(VOBJ23) >> $@
 	echo $(VOBJ24) >> $@
 	echo $(VOBJ25) >> $@
+	echo $(VOBJ26) >> $@
+	echo $(VOBJ27) >> $@
+	echo $(VOBJ28) >> $@
+	echo $(VOBJ29) >> $@
+	echo $(VOBJ30) >> $@
 	echo $(SOBJ)   >> $@
 	echo $(TILOBJ) >> $@
 	echo $(TILOBJ2) >> $@
@@ -782,7 +755,8 @@ $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 $(O)alloc.o: $(CONFIG_H)	 alloc.c
 	$(TARGET_CC) $(cflags) -o$@ alloc.c
 
-$(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/color.h $(INCL)/rm.h \
+		$(INCL)/objclass.h $(INCL)/monsym.h $(MSYS)/pcvideo.h
 	$(TARGET_CC) $(cflags) -I$(MSYS) -o$@ drawing.c
 
 $(O)decl.o: $(CONFIG_H) decl.c
@@ -898,6 +872,7 @@ $(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
 	$(TARGET_CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
 
 # sys/msdos
+$(O)tile.o : $(HACK_H) $(SRC)/tile.c
 $(O)msdos.o : $(HACK_H)  $(MSYS)/msdos.c
 $(O)pckeys.o : $(HACK_H)  $(MSYS)/pckeys.c
 $(O)pctiles.o : $(HACK_H)  $(MSYS)/pctiles.c $(MSYS)/portio.h
@@ -917,8 +892,6 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 #  o -c (which is included in cflags) substituted with -o$@ , 
 #  o an explicit build instruction for dlb.o because it requires 
 #    a .h file in ../sys/msdos.
-#  o the PATCHLEV_H macro is substitued for $(INCL)/patchlevel.h 
-#    to work around a long filename issue.
 #  o $(CFLAGS) changed to $(cflags)
 # Other than that, these dependencies are untouched.
 # That means that there is some irrelevant stuff
@@ -926,8 +899,6 @@ $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 #
 #
 # src dependencies
-#$(O)tos.o: ../sys/atari/tos.c $(HACK_H) $(INCL)/tcap.h
-	$(TARGET_CC) $(cflags) -o$@ ../sys/atari/tos.c
 $(O)pcmain.o: ../sys/share/pcmain.c $(HACK_H) $(INCL)/dlb.h \
 		#$(INCL)/win32api.h
 	$(TARGET_CC) $(cflags) -o$@ ../sys/share/pcmain.c
@@ -956,7 +927,7 @@ $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
 $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/tty/topl.c
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
-		$(INCL)/date.h $(PATCHLEV_H) $(INCL)/tcap.h
+		$(INCL)/date.h $(INCL)/tcap.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/tty/wintty.c
 $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 		$(CONFIG_H)
@@ -964,7 +935,7 @@ $(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 $(O)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/dialogs.c
 $(O)winX.o: ../win/X11/winX.c $(HACK_H) $(INCL)/winX.h $(INCL)/dlb.h \
-		$(PATCHLEV_H) ../win/X11/nh72icon \
+		../win/X11/nh72icon \
 		../win/X11/nh56icon ../win/X11/nh32icon
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/winX.c
 $(O)winmap.o: ../win/X11/winmap.c $(INCL)/xwindow.h $(HACK_H) $(INCL)/dlb.h \
@@ -985,59 +956,8 @@ $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
 	$(TARGET_CC) $(cflags) -o$@ ../win/X11/winval.c
 #$(O)tile.o: tile.c $(HACK_H)
 #$(HOST_O)tile.o: tile.c $(HACK_H)
-$(O)gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
-		../win/gnome/gnmain.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnaskstr.c
-$(O)gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnmain.h \
-		../win/gnome/gnaskstr.h ../win/gnome/gnyesno.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnbind.c
-$(O)gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(INCL)/tile2x11.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnglyph.c
-$(O)gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnbind.h ../win/gnome/gnopts.h $(HACK_H) \
-		$(INCL)/date.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmain.c
-$(O)gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmap.c
-$(O)gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h ../win/gnome/gnmain.h \
-		../win/gnome/gnbind.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmenu.c
-$(O)gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h ../win/gnome/gnsignal.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnmesg.c
-$(O)gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnopts.c
-$(O)gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
-		../win/gnome/gnmain.h $(HACK_H)
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnplayer.c
-$(O)gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnmain.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnsignal.c
-$(O)gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h \
-		../win/gnome/gnsignal.h ../win/gnome/gn_xpms.h \
-		../win/gnome/gnomeprv.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnstatus.c
-$(O)gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h ../win/gnome/gnmain.h \
-		../win/gnome/gn_rip.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gntext.c
-$(O)gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnworn.c
-$(O)gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h ../win/gnome/gnyesno.h
-	$(TARGET_CC) $(cflags) $(GNOMEINC) -o$@ ../win/gnome/gnyesno.c
-$(O)wingem.o: ../win/gem/wingem.c $(HACK_H) $(INCL)/func_tab.h $(INCL)/dlb.h \
-		$(PATCHLEV_H) $(INCL)/wingem.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/wingem.c
-$(O)wingem1.o: ../win/gem/wingem1.c $(INCL)/gem_rsc.h $(INCL)/load_img.h \
-		$(INCL)/gr_rect.h $(INCL)/wintype.h $(INCL)/wingem.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/wingem1.c
-$(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/load_img.c
-$(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
-	$(TARGET_CC) $(cflags) -o$@ ../win/gem/gr_rect.c
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
-		$(INCL)/dlb.h $(PATCHLEV_H) $(INCL)/tile2x11.h \
+		$(INCL)/dlb.h $(INCL)/tile2x11.h \
 		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \
 		$(INCL)/qt_xpms.h qt_win.moc qt_kde0.moc qttableview.moc
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qt_win.cpp
@@ -1045,7 +965,6 @@ $(O)qt_clust.o: ../win/Qt/qt_clust.cpp $(INCL)/qt_clust.h
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qt_clust.cpp
 $(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qttableview.cpp
-#$(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
@@ -1070,7 +989,6 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)/tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
@@ -1143,16 +1061,17 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)/dlb.h $(INCL)/sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H) $(INCL)/tcap.h
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)
-$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h $(PATCHLEV_H)
+$(O)topten.o: topten.c $(HACK_H) $(INCL)/dlb.h
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)/date.h $(PATCHLEV_H)
+$(O)version.o: version.c $(HACK_H) $(INCL)/date.h
 $(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)

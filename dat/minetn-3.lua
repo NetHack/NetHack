@@ -1,4 +1,4 @@
--- NetHack 3.6	mines.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
+-- NetHack 3.7	mines.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
 --	Copyright (c) 1989-95 by Jean-Christophe Collet
 --	Copyright (c) 1991-95 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -84,7 +84,7 @@ des.room({ type = "ordinary",lit=1,x=3,y=3,
              end
   })
 
-  des.room({ type = "food shop", chance=90,lit=1,x=26,y=8,w=3,h=2,
+  des.room({ type = monkfoodshop(), chance=90,lit=1,x=26,y=8,w=3,h=2,
              contents = function()
                 des.door({ state="closed", wall="west" })
              end

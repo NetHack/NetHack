@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1580600478 2020/02/01 23:41:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1596498532 2020/08/03 23:48:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -123,7 +123,7 @@ struct sinfo {
 
 /* NetHack ftypes */
 #define NHF_LEVELFILE       1
-#define NHF_SAVEFILE        2 
+#define NHF_SAVEFILE        2
 #define NHF_BONESFILE       3
 /* modes */
 #define READING  0x0
@@ -141,7 +141,7 @@ struct fieldlevel_content {
     boolean binary;       /* binary rather than text */
     boolean json;         /* JSON */
 };
-    
+
 typedef struct {
     int fd;               /* for traditional structlevel binary writes */
     int mode;             /* holds READING, WRITING, or FREEING modes  */
@@ -322,9 +322,6 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
 #define LI g.tc_gbl_data.tc_LI
 #define CO g.tc_gbl_data.tc_CO
 #endif
-
-/* xxxexplain[] is in drawing.c */
-E const char *const monexplain[], invisexplain[], *const oclass_names[];
 
 /* Some systems want to use full pathnames for some subsets of file names,
  * rather than assuming that they're all in the current directory.  This
@@ -631,6 +628,17 @@ struct role_filter {
     short mask;
 };
 
+/* read.c, create_particular() & create_particular_parse() */
+struct _create_particular_data {
+    int quan;
+    int which;
+    int fem;
+    char monclass;
+    boolean randmonst;
+    boolean maketame, makepeaceful, makehostile;
+    boolean sleeping, saddled, invisible, hidden;
+};
+
 /* instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * an set in decl.c during early early engine initialization.
@@ -702,7 +710,7 @@ struct instance_globals {
     const char *hname; /* name of the game (argv[0] of main) */
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
-    int bases[MAXOCLASSES];
+    int bases[MAXOCLASSES + 1];
     int multi;
     const char *multi_reason;
     int nroom;
@@ -727,6 +735,7 @@ struct instance_globals {
 #define DOMOVE_RUSH         0x00000002
     const char *nomovemsg;
     char plname[PL_NSIZ]; /* player name */
+    int plnamelen; /* length of plname[] if that came from getlogin() */
     char pl_character[PL_CSIZ];
     char pl_race; /* character's race */
     char pl_fruit[PL_FSIZ];
@@ -774,7 +783,7 @@ struct instance_globals {
     long moves;
     long monstermoves; /* moves and monstermoves diverge when player is Fast */
     long wailmsg;
-    struct obj *migrating_objs; /* objects moving to another dungeon level */    
+    struct obj *migrating_objs; /* objects moving to another dungeon level */
     struct obj *billobjs; /* objects not yet paid for */
 #if defined(MICRO) || defined(WIN32)
     char hackdir[PATHLEN]; /* where rumors, help, record are */
@@ -784,7 +793,7 @@ struct instance_globals {
     struct context_info context;
     char *fqn_prefix[PREFIX_COUNT];
     /* Windowing stuff that's really tty oriented, but present for all ports */
-    struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */     
+    struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */
 #if defined(UNIX) || defined(VMS)
     int locknum; /* max num of simultaneous users */
 #endif
@@ -794,15 +803,12 @@ struct instance_globals {
 #ifdef MICRO
     char levels[PATHLEN]; /* where levels are */
 #endif /* MICRO */
-#ifdef MFLOPPY
-    char permbones[PATHLEN]; /* where permanent copy of bones go */
-    int ramdisk = FALSE;     /* whether to copy bones to levels or not */
-    int saveprompt = TRUE;
-    const char *alllevels = "levels.*";
-    const char *allbones = "bones*.*";
-#endif
     struct sinfo program_state;
 
+    /* detect.c */
+
+    int already_found_flag; /* used to augment first "already found a monster"
+                             * message if 'cmdassist' is Off */
     /* dig.c */
 
     boolean did_dig_msg;
@@ -817,7 +823,8 @@ struct instance_globals {
     boolean at_ladder;
     char *dfr_pre_msg;  /* pline() before level change */
     char *dfr_post_msg; /* pline() after level change */
-    d_level save_dlevel;
+    int did_nothing_flag; /* to augment the no-rest-next-to-monster message */
+    d_level save_dlevel; /* ? [even back in 3.4.3, only used in bones.c] */
 
     /* do_name.c */
     struct selectionvar *gloc_filter_map;
@@ -837,7 +844,7 @@ struct instance_globals {
     char dogname[PL_PSIZ];
     char catname[PL_PSIZ];
     char horsename[PL_PSIZ];
-    char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */    
+    char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
     struct monst *mydogs; /* monsters that went down/up together with @ */
     struct monst *migrating_mons; /* monsters moving to another level */
     struct autopickup_exception *apelist;
@@ -903,7 +910,7 @@ struct instance_globals {
 
     /* invent.c */
     int lastinvnr;  /* 0 ... 51 (never saved&restored) */
-    unsigned sortlootmode; /* set by sortloot() for use by sortloot_cmp(); 
+    unsigned sortlootmode; /* set by sortloot() for use by sortloot_cmp();
                             * reset by sortloot when done */
     char *invbuf;
     unsigned invbufsiz;
@@ -925,19 +932,16 @@ struct instance_globals {
     /* makemon.c */
 
     /* mhitm.c */
-    boolean vis;
-    boolean far_noise;
     long noisetime;
-    struct obj *otmp;
-    int dieroll; /* Needed for the special case of monsters wielding vorpal
-                  * blades (rare). If we use this a lot it should probably
-                  * be a parameter to mdamagem() instead of a global variable.
-                  */
+    boolean far_noise;
+    boolean vis;
+    boolean skipdrin; /* mind flayer against headless target */
 
     /* mhitu.c */
     int mhitu_dieroll;
 
     /* mklev.c */
+    genericptr_t luathemes[MAXDUNGEON];
     xchar vault_x;
     xchar vault_y;
     boolean made_branch; /* used only during level creation */
@@ -947,7 +951,7 @@ struct instance_globals {
     int min_rx; /* rectangle bounds for regions */
     int max_rx;
     int min_ry;
-    int max_ry; 
+    int max_ry;
     int n_loc_filled;
 
     /* mkmaze.c */
@@ -1125,10 +1129,16 @@ struct instance_globals {
     struct sp_coder *coder;
     xchar xstart, ystart;
     xchar xsize, ysize;
+    boolean in_mk_themerooms;
+    boolean themeroom_failed;
 
     /* spells.c */
     int spl_sortmode;   /* index into spl_sortchoices[] */
     int *spl_orderindx; /* array of g.spl_book[] indices */
+
+    /* steal.c */
+    unsigned int stealoid; /* object to be stolen */
+    unsigned int stealmid; /* monster doing the stealing */
 
     /* timeout.c */
     /* ordered timer list */

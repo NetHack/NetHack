@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1582364450 2020/02/22 09:40:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.7	rumors.c	$NHDT-Date: 1594370241 2020/07/10 08:37:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -42,6 +42,7 @@
 
 static void FDECL(init_rumors, (dlb *));
 static void FDECL(init_oracles, (dlb *));
+static void FDECL(others_check, (const char *ftype, const char *, winid *));
 static void FDECL(couldnt_open_file, (const char *));
 
 static void
@@ -147,9 +148,10 @@ boolean exclude_cookie;
         couldnt_open_file(RUMORFILE);
         g.true_rumor_size = -1; /* don't try to open it again */
     }
-/* this is safe either way, so do it always since we can't get the definition
- * out of makedefs.c
- */
+
+    /* this is safe either way, so do it always since we can't get the
+     * definition out of makedefs.c
+     */
 #define PAD_RUMORS_TO
 #ifdef PAD_RUMORS_TO
     /* remove padding */
@@ -165,55 +167,49 @@ boolean exclude_cookie;
     return rumor_buf;
 }
 
-/*
- * test that the true/false rumor boundaries are valid.
- */
+/* test that the true/false rumor boundaries are valid and show the first
+   two and very last epitaphs, engravings, and bogus monsters */
 void
 rumor_check()
 {
     dlb *rumors = 0;
-    winid tmpwin;
+    winid tmpwin = WIN_ERR;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
     if (g.true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
-    no_rumors:
+ no_rumors:
         pline("rumors not accessible.");
-        if (rumors)
-            (void) dlb_fclose(rumors);
         return;
     }
 
     rumors = dlb_fopen(RUMORFILE, "r");
-
     if (rumors) {
         long ftell_rumor_start = 0L;
 
         rumor_buf[0] = '\0';
         if (g.true_rumor_size == 0L) { /* if this is 1st outrumor() */
             init_rumors(rumors);
-            if (g.true_rumor_size < 0L)
+            if (g.true_rumor_size < 0L) {
+                rumors = (dlb *) 0; /* init_rumors() closes it upon failure */
                 goto no_rumors; /* init failed */
+            }
         }
         tmpwin = create_nhwindow(NHW_TEXT);
 
         /*
          * reveal the values.
          */
-
-        Sprintf(
-            rumor_buf,
-            "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.true_rumor_start, g.true_rumor_start, g.true_rumor_end,
-            (unsigned long) g.true_rumor_end, g.true_rumor_size,
-            (unsigned long) g.true_rumor_size);
+        Sprintf(rumor_buf,
+               "T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+            (long) g.true_rumor_start, g.true_rumor_start,
+            g.true_rumor_end, (unsigned long) g.true_rumor_end,
+            g.true_rumor_size,(unsigned long) g.true_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
-
-        Sprintf(
-            rumor_buf,
-            "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
-            (long) g.false_rumor_start, g.false_rumor_start, g.false_rumor_end,
-            (unsigned long) g.false_rumor_end, g.false_rumor_size,
-            (unsigned long) g.false_rumor_size);
+        Sprintf(rumor_buf,
+               "F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)",
+            (long) g.false_rumor_start, g.false_rumor_start,
+            g.false_rumor_end, (unsigned long) g.false_rumor_end,
+            g.false_rumor_size, (unsigned long) g.false_rumor_size);
         putstr(tmpwin, 0, rumor_buf);
 
         /*
@@ -260,11 +256,123 @@ rumor_check()
         putstr(tmpwin, 0, rumor_buf);
 
         (void) dlb_fclose(rumors);
-        display_nhwindow(tmpwin, TRUE);
-        destroy_nhwindow(tmpwin);
     } else {
         couldnt_open_file(RUMORFILE);
         g.true_rumor_size = -1; /* don't try to open it again */
+    }
+
+    /* initial implementation of default epitaph/engraving/bogusmon
+       contained an error; check those along with rumors */
+    others_check("Engravings:", ENGRAVEFILE, &tmpwin);
+    others_check("Epitaphs:", EPITAPHFILE, &tmpwin);
+    others_check("Bogus monsters:", BOGUSMONFILE, &tmpwin);
+
+    if (tmpwin != WIN_ERR) {
+        display_nhwindow(tmpwin, TRUE);
+        destroy_nhwindow(tmpwin);
+    }
+}
+
+/* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
+static void
+others_check(ftype, fname, winptr)
+const char *ftype, *fname;
+winid *winptr;
+{
+    static const char errfmt[] = "others_check(\"%s\"): %s";
+    dlb *fh;
+    char line[BUFSZ], xbuf[BUFSZ], *endp;
+    winid tmpwin = *winptr;
+    int entrycount = 0;
+
+    fh = dlb_fopen(fname, "r");
+    if (fh) {
+        if (tmpwin == WIN_ERR) {
+            *winptr = tmpwin = create_nhwindow(NHW_TEXT);
+            if (tmpwin == WIN_ERR) {
+                /* should panic, but won't for wizard mode check operation */
+                impossible(errfmt, fname, "can't create temporary window");
+                goto closeit;
+            }
+        }
+        putstr(tmpwin, 0, "");
+        putstr(tmpwin, 0, ftype);
+        /* "don't edit" comment */
+        *line = '\0';
+        if (!dlb_fgets(line, sizeof line, fh)) {
+            Sprintf(xbuf, errfmt, fname, "error; can't read comment line");
+            putstr(tmpwin, 0, xbuf);
+            goto closeit;
+        }
+        if (*line != '#') {
+            Sprintf(xbuf, errfmt, fname,
+                    "malformed; first line is not a comment line:");
+            putstr(tmpwin, 0, xbuf);
+            /* show the bad line; we don't know whether it has been
+               encrypted via xcrypt() so show it both ways */
+            if ((endp = index(line, '\n')) != 0)
+                *endp = 0;
+            putstr(tmpwin, 0, "- first line, as is");
+            putstr(tmpwin, 0, line);
+            putstr(tmpwin, 0, "- xcrypt of first line");
+            putstr(tmpwin, 0, xcrypt(line, xbuf));
+            goto closeit;
+        }
+        /* first line; should be default one inserted by makedefs when
+           building the file but we don't have the expected value so
+           can only require a line to exist */
+        *line = '\0';
+        if (!dlb_fgets(line, sizeof line, fh) || *line == '\n') {
+            Sprintf(xbuf, errfmt, fname,
+                    !*line ? "can't read first non-comment line"
+                           : "first non-comment line is empty");
+            putstr(tmpwin, 0, xbuf);
+            goto closeit;
+        }
+        ++entrycount;
+        if ((endp = index(line, '\n')) != 0)
+            *endp = 0;
+        putstr(tmpwin, 0, xcrypt(line, xbuf));
+        if (!dlb_fgets(line, sizeof line, fh)) {
+            putstr(tmpwin, 0, "(no second entry)");
+        } else {
+            ++entrycount;
+            if ((endp = index(line, '\n')) != 0)
+                *endp = 0;
+            putstr(tmpwin, 0, xcrypt(line, xbuf));
+            while (dlb_fgets(line, sizeof line, fh)) {
+                ++entrycount;
+                if ((endp = index(line, '\n')) != 0)
+                    *endp = 0;
+                (void) xcrypt(line, xbuf);
+            }
+            /* count will be 2 if the default entry and the first ordinary
+               entry are the only ones present (if either of those were
+               missing, we wouldn't have gotten here...) */
+            if (entrycount == 2) {
+                putstr(tmpwin, 0, "(only two entries)");
+            } else {
+                /* showing an elipsis avoids ambiguity about whether
+                   there are other lines; doing so three times (once for
+                   each file) results in total output being 24 lines,
+                   forcing a --More-- prompt if using a 24 line screen;
+                   displaying 23 lines and --More-- followed by second
+                   page with 1 line doesn't look very good but isn't
+                   incorrect, and taller screens where that won't be an
+                   issue are more common than 24 line terminals nowadays */
+                if (entrycount > 3)
+                    putstr(tmpwin, 0, " ...");
+                putstr(tmpwin, 0, xbuf); /* already decrypted */
+            }
+        }
+
+ closeit:
+        (void) dlb_fclose(fh);
+    } else {
+        /* since this comes out via impossible(), it won't be integrated
+           with the text window of values, but it shouldn't ever happen
+           so we won't waste effort integrating it */
+        couldnt_open_file(fname);
     }
 }
 

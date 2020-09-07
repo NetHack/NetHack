@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1555361298 2019/04/15 20:48:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.7	unixconf.h	$NHDT-Date: 1596498567 2020/08/03 23:49:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -69,18 +69,6 @@
                      * For example, platforms using the GNU libraries,
                      * Linux, Solaris 2.x
                      */
-
-/* #define OPENWINBUG */  /* avoid a problem using OpenWindows 3.0 for
-                             X11 on SunOS 4.1.x, x>= 2.  Do not define
-                             for other X11 implementations. */
-/* #define PYRAMID_BUG */ /* avoid a bug on the Pyramid */
-/* #define BSD_43_BUG */  /* for real 4.3BSD cc's without schain botch fix */
-/* #define MICROPORT_BUG */     /* problems with large arrays in structs */
-/* #define MICROPORT_286_BUG */ /* changes needed in termcap.c to get it to
-                                   run with Microport Sys V/AT version 2.4.
-                                   By Jay Maynard */
-/* #define AIXPS_2BUG */ /* avoid a problem with little_to_big() optimization
-                            */
 
 /* #define RANDOM */ /* if neither random/srandom nor lrand48/srand48
                         is available from your system */

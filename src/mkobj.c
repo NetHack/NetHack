@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1578895344 2020/01/13 06:02:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1596498183 2020/08/03 23:43:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,17 +67,22 @@ static const struct icp hellprobs[] = { { 20, WEAPON_CLASS },
                                         { 8, RING_CLASS },
                                         { 4, AMULET_CLASS } };
 
+static const struct oextra zerooextra = DUMMY;
+
+static void
+init_oextra(oex)
+struct oextra *oex;
+{
+    *oex = zerooextra;
+}
+
 struct oextra *
 newoextra()
 {
     struct oextra *oextra;
 
     oextra = (struct oextra *) alloc(sizeof (struct oextra));
-    oextra->oname = 0;
-    oextra->omonst = 0;
-    oextra->omid = 0;
-    oextra->olong = 0;
-    oextra->omailcmd = 0;
+    init_oextra(oextra);
     return oextra;
 }
 
@@ -92,10 +97,6 @@ struct obj *o;
             free((genericptr_t) x->oname);
         if (x->omonst)
             free_omonst(o);     /* 'o' rather than 'x' */
-        if (x->omid)
-            free((genericptr_t) x->omid);
-        if (x->olong)
-            free((genericptr_t) x->olong);
         if (x->omailcmd)
             free((genericptr_t) x->omailcmd);
 
@@ -141,42 +142,14 @@ struct obj *otmp;
 {
     if (!otmp->oextra)
         otmp->oextra = newoextra();
-    if (!OMID(otmp)) {
-        OMID(otmp) = (unsigned *) alloc(sizeof (unsigned));
-        (void) memset((genericptr_t) OMID(otmp), 0, sizeof (unsigned));
-    }
+    OMID(otmp) = 0;
 }
 
 void
 free_omid(otmp)
 struct obj *otmp;
 {
-    if (otmp->oextra && OMID(otmp)) {
-        free((genericptr_t) OMID(otmp));
-        OMID(otmp) = (unsigned *) 0;
-    }
-}
-
-void
-newolong(otmp)
-struct obj *otmp;
-{
-    if (!otmp->oextra)
-        otmp->oextra = newoextra();
-    if (!OLONG(otmp)) {
-        OLONG(otmp) = (long *) alloc(sizeof (long));
-        (void) memset((genericptr_t) OLONG(otmp), 0, sizeof (long));
-    }
-}
-
-void
-free_olong(otmp)
-struct obj *otmp;
-{
-    if (otmp->oextra && OLONG(otmp)) {
-        free((genericptr_t) OLONG(otmp));
-        OLONG(otmp) = (long *) 0;
-    }
+    OMID(otmp) = 0;
 }
 
 void
@@ -406,20 +379,13 @@ struct obj *obj2, *obj1;
         if (OMONST(obj1)->mextra)
             copy_mextra(OMONST(obj2), OMONST(obj1));
     }
+    if (has_omailcmd(obj1)) {
+        new_omailcmd(obj2, OMAILCMD(obj1));
+    }
     if (has_omid(obj1)) {
         if (!OMID(obj2))
             newomid(obj2);
-        (void) memcpy((genericptr_t) OMID(obj2), (genericptr_t) OMID(obj1),
-                      sizeof (unsigned));
-    }
-    if (has_olong(obj1)) {
-        if (!OLONG(obj2))
-            newolong(obj2);
-        (void) memcpy((genericptr_t) OLONG(obj2), (genericptr_t) OLONG(obj1),
-                      sizeof (long));
-    }
-    if (has_omailcmd(obj1)) {
-        new_omailcmd(obj2, OMAILCMD(obj1));
+        OMID(obj2) = OMID(obj1);
     }
 }
 
@@ -876,6 +842,12 @@ boolean artif;
             case KELP_FROND:
                 otmp->quan = (long) rnd(2);
                 break;
+            case CANDY_BAR:
+                /* set otmp->spe */
+                assign_candy_wrapper(otmp);
+                break;
+            default:
+                break;
             }
             if (Is_pudding(otmp)) {
                 otmp->quan = 1L; /* for emphasis; glob quantity is always 1 */
@@ -941,16 +913,16 @@ boolean artif;
                 otmp->spe = rn1(70, 30);
                 break;
             case CAN_OF_GREASE:
-                otmp->spe = rnd(25);
+                otmp->spe = rn1(21, 5); /* 0..20 + 5 => 5..25 */
                 blessorcurse(otmp, 10);
                 break;
             case CRYSTAL_BALL:
-                otmp->spe = rnd(5);
+                otmp->spe = rn1(5, 3); /* 0..4 + 3 => 3..7 */
                 blessorcurse(otmp, 2);
                 break;
             case HORN_OF_PLENTY:
             case BAG_OF_TRICKS:
-                otmp->spe = rnd(20);
+                otmp->spe = rn1(18, 3); /* 0..17 + 3 => 3..20 */
                 break;
             case FIGURINE:
                 tryct = 0;
@@ -1188,10 +1160,11 @@ struct obj *body;
     long corpse_age; /* age of corpse          */
     int rot_adjust;
     short action;
+    boolean no_revival;
 
-#define TAINT_AGE (50L)        /* age when corpses go bad */
-#define TROLL_REVIVE_CHANCE 37 /* 1/37 chance for 50 turns ~ 75% chance */
-#define ROT_AGE (250L)         /* age when corpses rot away */
+    /* if a troll corpse was frozen, it won't get a revive timer */
+    no_revival = (body->norevive != 0);
+    body->norevive = 0; /* always clear corpse's 'frozen' flag */
 
     /* lizards and lichen don't rot or revive */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
@@ -1216,8 +1189,9 @@ struct obj *body;
             if (!rn2(3))
                 break;
 
-    } else if (mons[body->corpsenm].mlet == S_TROLL && !body->norevive) {
+    } else if (mons[body->corpsenm].mlet == S_TROLL && !no_revival) {
         long age;
+
         for (age = 2; age <= TAINT_AGE; age++)
             if (!rn2(TROLL_REVIVE_CHANCE)) { /* troll revives */
                 action = REVIVE_MON;
@@ -1226,8 +1200,6 @@ struct obj *body;
             }
     }
 
-    if (body->norevive)
-        body->norevive = 0;
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
@@ -1556,6 +1528,10 @@ unsigned corpstatflags;
 
         if (!ptr)
             ptr = mtmp->data;
+
+        /* don't give a revive timer to a cancelled troll's corpse */
+        if (mtmp->mcan && !is_rider(ptr))
+            otmp->norevive = 1;
     }
 
     /* when 'ptr' is non-null it comes from our caller or from 'mtmp';
@@ -1609,7 +1585,7 @@ unsigned mid;
     if (!mid || !obj)
         return (struct obj *) 0;
     newomid(obj);
-    *OMID(obj) = mid;
+    OMID(obj) = mid;
     return obj;
 }
 
@@ -1623,6 +1599,7 @@ struct monst *mtmp;
     if (!has_omonst(obj))
         newomonst(obj);
     if (has_omonst(obj)) {
+        int baselevel = mtmp->data->mlevel;
         struct monst *mtmp2 = OMONST(obj);
 
         *mtmp2 = *mtmp;
@@ -1637,6 +1614,19 @@ struct monst *mtmp;
         mtmp2->minvent = (struct obj *) 0;
         if (mtmp->mextra)
             copy_mextra(mtmp2, mtmp);
+        /* if mtmp is a long worm with segments, its saved traits will
+           be one without any segments */
+        mtmp2->wormno = 0;
+        /* mtmp might have been killed by repeated life draining; make sure
+           mtmp2 can survive if revived ('baselevel' will be 0 for 1d4 mon) */
+        if (mtmp2->mhpmax <= baselevel)
+            mtmp2->mhpmax = baselevel + 1;
+        /* mtmp is assumed to be dead but we don't kill it or its saved
+           traits, just force those to have a sane value for current HP */
+        if (mtmp2->mhp > mtmp2->mhpmax)
+            mtmp2->mhp = mtmp2->mhpmax;
+        if (mtmp2->mhp < 1)
+            mtmp2->mhp = 0;
     }
     return obj;
 }
@@ -1665,6 +1655,7 @@ boolean copyof;
             /* Never insert this returned pointer into mon chains! */
             mnew = mtmp;
         }
+        mnew->data = &mons[mnew->mnum];
     }
     return mnew;
 }
@@ -1939,11 +1930,12 @@ register struct obj *otmp;
 
 /* throw away all of a monster's inventory */
 void
-discard_minvent(mtmp)
+discard_minvent(mtmp, uncreate_artifacts)
 struct monst *mtmp;
+boolean uncreate_artifacts;
 {
     struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = (!DEADMONSTER(mtmp));
+    boolean keeping_mon = !DEADMONSTER(mtmp);
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */
@@ -1957,6 +1949,8 @@ struct monst *mtmp;
             }
             otmp->owornmask = 0L; /* obfree() expects this */
         }
+        if (uncreate_artifacts && otmp->oartifact)
+            artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0); /* dealloc_obj() isn't sufficient */
     }
 }

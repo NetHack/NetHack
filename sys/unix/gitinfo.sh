@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  gitinfo.sh	$NHDT-Date: 1524689450 2018/04/25 20:50:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# NetHack 3.7  gitinfo.sh	$NHDT-Date: 1596498289 2020/08/03 23:44:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 

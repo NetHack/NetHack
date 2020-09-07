@@ -1,4 +1,4 @@
--- NetHack 3.6	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -67,16 +67,16 @@ local px, py = place:rndcoord(1);
 des.object({ id="statue",x=px, y=py, buc="uncursed",
                       montype="knight", historic=1, male=1,name="Perseus",
                       contents = function()
-                         if math.random(0,99) < 75 then
+                         if percent(75) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })
                          end
-                         if math.random(0,99) < 25 then
+                         if percent(25) then
                             des.object({ id = "levitation boots", spe=0 })
                          end
-                         if math.random(0,99) < 50 then
+                         if percent(50) then
                             des.object({ id = "scimitar", buc="blessed", spe=2 })
                          end
-                         if math.random(0,99) < 50 then
+                         if percent(50) then
                             des.object("sack")
                          end
                       end
@@ -102,17 +102,17 @@ des.monster("kraken", 07,07)
 --
 -- the nesting dragon
 des.monster({ id = "yellow dragon", x=05, y=04, asleep=1 })
-if math.random(0,99) < 50 then
+if percent(50) then
    des.monster({ id = "baby yellow dragon", x=04,y=04, asleep=1 })
 end
-if math.random(0,99) < 25 then
+if percent(25) then
    des.monster({ id = "baby yellow dragon", x=04, y=05, asleep=1 })
 end
 des.object({ id = "egg", x=05, y=04, montype="yellow dragon" });
-if math.random(0,99) < 50 then
+if percent(50) then
    des.object({ id = "egg", x=05, y=04, montype="yellow dragon" });
 end
-if math.random(0,99) < 25 then
+if percent(25) then
    des.object({ id = "egg", x=05, y=04, montype="yellow dragon" });
 end
 --

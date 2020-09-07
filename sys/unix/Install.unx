@@ -229,7 +229,7 @@ Notes:
 	config.h: UNIX, TTY_GRAPHICS
 	unixconf.h: SYSV, SVR4, TERMINFO, POSIX_JOB_CONTROL, POSIX_TYPES
 
-    X11_GRAPHICS does work.  Do not define OPENWINBUG.  You may safely define
+    X11_GRAPHICS does work.  You may safely define
     NETWORK, TEXTCOLOR if desired.  Other #defines in these files may be
     defined too, as needed.  Just make sure that the set mentioned here are
     not misdefined, or your compile will fail (do _not_ define BSD or SUNOS4).

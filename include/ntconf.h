@@ -1,4 +1,4 @@
-/* NetHack 3.6	ntconf.h	$NHDT-Date: 1447424077 2015/11/13 14:14:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	ntconf.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,6 +29,7 @@
 #define DUMPLOG_MSG_COUNT 50
 
 #define USER_SOUNDS
+#define TTY_SOUND_ESCCODES
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 #define SELECTSAVED /* Provide menu of saved games to choose from at start */

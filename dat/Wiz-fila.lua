@@ -1,4 +1,4 @@
--- NetHack 3.6	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --

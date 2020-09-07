@@ -1,7 +1,10 @@
-/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1581322658 2020/02/10 08:17:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1593768081 2020/07/03 09:21:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
+
+#ifndef PATCHLEVEL_H
+#define PATCHLEVEL_H
 
 /* NetHack 3.7.x */
 #define VERSION_MAJOR 3
@@ -14,7 +17,24 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 16
+#define EDITLEVEL 22
+
+/*
+ * Development status possibilities.
+ */
+#define NH_STATUS_RELEASED    0         /* Released */
+#define NH_STATUS_WIP         1         /* Work in progress */
+#define NH_STATUS_BETA        2         /* BETA testing */
+#define NH_STATUS_POSTRELEASE 3         /* patch commit point only */
+
+/*
+ * Development status of this NetHack version.
+ */
+#define NH_DEVEL_STATUS NH_STATUS_WIP
+
+#ifndef DEBUG  /* allow tool chains to define without causing warnings */
+#define DEBUG
+#endif
 
 #define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2020"
 #define COPYRIGHT_BANNER_B \
@@ -43,6 +63,15 @@
 
 /****************************************************************************/
 /* Version 3.6.x */
+
+/*  Patch 6, March 8, 2020
+ *  invalid status highlight color could be maliciously used to corrupt memory
+ *  formatting corpse names used internal buffers differently from formatting
+ *      other objects and could potentially clobber memory
+ *  avoid divide by 0 crash if 'bogusmon' (file of bogus monster types) is empty
+ *  avoid #wizrumorcheck crash if either 'rumors.tru' or 'rumors.fal' or both
+ *      were empty when makedefs built 'rumors'
+ */
 
 /*  Patch 5, January 27, 2020
  *
@@ -523,4 +552,5 @@
 
 /****************************************************************************/
 
+#endif /* PATHLEVEL_H */
 /*patchlevel.h*/

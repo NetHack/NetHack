@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkroom.c	$NHDT-Date: 1446887530 2015/11/07 09:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	mkroom.c	$NHDT-Date: 1596498184 2020/08/03 23:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -20,6 +20,7 @@
 static boolean FDECL(isbig, (struct mkroom *));
 static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
 static void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
+static void FDECL(mk_zoo_thronemon, (int, int));
 static void NDECL(mktemple);
 static coord *FDECL(shrine_pos, (int));
 static struct permonst *NDECL(morguemon);
@@ -240,7 +241,7 @@ int type;
     }
 }
 
-void
+static void
 mk_zoo_thronemon(x,y)
 int x,y;
 {
@@ -652,6 +653,11 @@ inside_room(croom, x, y)
 struct mkroom *croom;
 xchar x, y;
 {
+    if (croom->irregular) {
+        int i = (int) ((croom - g.rooms) + ROOMOFFSET);
+        return (!levl[x][y].edge && (int) levl[x][y].roomno == i);
+    }
+
     return (boolean) (x >= croom->lx - 1 && x <= croom->hx + 1
                       && y >= croom->ly - 1 && y <= croom->hy + 1);
 }
@@ -707,6 +713,23 @@ coord *c;
     return TRUE;
 }
 
+boolean
+somexyspace(croom, c)
+struct mkroom *croom;
+coord *c;
+{
+    int trycnt = 0;
+    boolean okay;
+
+    do {
+        okay = somexy(croom, c) && isok(c->x, c->y) && !occupied(c->x, c->y)
+            && (levl[c->x][c->y].typ == ROOM
+                || levl[c->x][c->y].typ == CORR
+                || levl[c->x][c->y].typ == ICE);
+    } while (trycnt++ < 100 && !okay);
+    return okay;
+}
+
 /*
  * Search for a special room given its type (zoo, court, etc...)
  *      Special values :
@@ -757,15 +780,13 @@ courtmon()
         return mkclass(S_KOBOLD, 0);
 }
 
-#define NSTYPES (PM_CAPTAIN - PM_SOLDIER + 1)
-
 static const struct {
     unsigned pm;
     unsigned prob;
-} squadprob[NSTYPES] = { { PM_SOLDIER, 80 },
-                         { PM_SERGEANT, 15 },
-                         { PM_LIEUTENANT, 4 },
-                         { PM_CAPTAIN, 1 } };
+} squadprob[] = { { PM_SOLDIER, 80 },
+                  { PM_SERGEANT, 15 },
+                  { PM_LIEUTENANT, 4 },
+                  { PM_CAPTAIN, 1 } };
 
 /* return soldier types. */
 static struct permonst *
@@ -776,14 +797,14 @@ squadmon()
     sel_prob = rnd(80 + level_difficulty());
 
     cpro = 0;
-    for (i = 0; i < NSTYPES; i++) {
+    for (i = 0; i < SIZE(squadprob); i++) {
         cpro += squadprob[i].prob;
         if (cpro > sel_prob) {
             mndx = squadprob[i].pm;
             goto gotone;
         }
     }
-    mndx = squadprob[rn2(NSTYPES)].pm;
+    mndx = squadprob[rn2(SIZE(squadprob))].pm;
 gotone:
     if (!(g.mvitals[mndx].mvflags & G_GONE))
         return &mons[mndx];

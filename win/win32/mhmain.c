@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmain.c	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.7	mhmain.c	$NHDT-Date: 1596498352 2020/08/03 23:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,9 @@
 #else
 #include "config.h"
 #endif
+#if !defined(PATCHLEVEL_H)
 #include "patchlevel.h"
+#endif
 #include "resource.h"
 #include "mhmsg.h"
 #include "mhinput.h"

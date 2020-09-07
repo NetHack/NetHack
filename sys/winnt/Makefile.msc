@@ -130,12 +130,17 @@ DEBUGINFO = Y
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
+!IFNDEF LUA_VERSION
+LUAVER=5.4.0
+!ELSE
+LUAVER=$(LUA_VERSION)
+!ENDIF
 #==============================================================================
 #
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.3.5.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -143,13 +148,12 @@ DEBUGINFO = Y
 #    successfully build NetHack-3.7.  You cannot build a functional
 #    version of NetHack-3.7 Work-in-progress without including Lua.
 #
-LUATOP=..\lib\lua-5.3.5
+LUATOP=..\lib\lua-$(LUAVER)
 #
 #
 #==============================================================================
 #
 #TEST_CROSSCOMPILE=Y
-#OPTIONS_AT_RUNTIME=Y
 #
 #==============================================================================
 #======================== End of Modification Section =========================
@@ -185,6 +189,8 @@ TTY     = ..\win\tty     # window port files (tty)
 MSWIN   = ..\win\win32   # window port files (win32)
 WCURSES = ..\win\curses  # window port files (curses) 
 WSHR    = ..\win\share   # Tile support files 
+QT      = ..\win\Qt      # QT support files
+X11     = ..\win\X11     # X11 support files
 
 #
 #  Object directory.
@@ -245,16 +251,15 @@ O  = $(OBJ)^\
 U  = $(UTIL)^\
 
 !IFDEF TEST_CROSSCOMPILE
-CROSSCOMPILE_TARGET = -DCROSSCOMPILE_TARGET
-CROSSCOMPILE_HOST = -DCROSSCOMPILE_HOST
-CROSSCOMPILE = -DCROSSCOMPILE
-OPTIONS_AT_RUNTIME=Y
 HOST=_host
+CROSSCOMPILE_TARGET= -DCROSSCOMPILE_TARGET
+CROSSCOMPILE_HOST= -DCROSSCOMPILE_HOST
+CROSSCOMPILE= -DCROSSCOMPILE
 !ELSE
-!UNDEF CROSSCOMPILE_TARGET
-!UNDEF CROSSCOMPILE_HOST
-!UNDEF CROSSCOMPILE
-!UNDEF HOST
+HOST=
+CROSSCOMPILE_TARGET=
+CROSSCOMPILE_HOST=
+CROSSCOMPILE=
 !ENDIF
 
 #
@@ -263,7 +268,7 @@ HOST=_host
 
 MAKESRC       = $(U)makedefs.c
 
-MAKEDEFSOBJS  = $(O)makedefs$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
+MAKEDEFSOBJS  = $(O)makedefs.o $(O)monst$(HOST).o $(O)objects$(HOST).o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -273,26 +278,16 @@ TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 # These are not invoked during a normal game build in 3.4
 #
 
-!IFDEF CROSSCOMPILE_HOST
-DO_UTILS = Y
-!ELSE IFNDEF CROSSCOMPILE
-DO_UTILS = Y
-!ELSE
-DO_UTILS = N
-!ENDIF
+TEXT_IO   = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing$(HOST).o \
+		 $(O)monst$(HOST).o	$(O)objects$(HOST).o
 
-!IF "$(DO_UTILS)" == "Y"
-TEXT_IO        = $(O)tiletext$(HOST).o	$(O)tiletxt$(HOST).o	$(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o	$(O)monst$(HOST).o	$(O)objects$(HOST).o
+TEXT_IO32 = $(O)tilete32.o $(O)tiletx32.o $(O)drawing$(HOST).o \
+		 $(O)monst$(HOST).o $(O)objects$(HOST).o
 
-TEXT_IO32      = $(O)tilete32$(HOST).o $(O)tiletx32$(HOST).o $(O)drawing$(HOST).o \
-		 $(O)decl$(HOST).o $(O)monst$(HOST).o $(O)objects$(HOST).o
+GIFREADERS_HOST     = $(O)gifread.o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
+GIFREADERS32_HOST   = $(O)gifrd32.o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
-GIFREADERS     = $(O)gifread$(HOST).o	$(O)alloc$(HOST).o $(O)panic$(HOST).o
-GIFREADERS32   = $(O)gifrd32$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
-
-PPMWRITERS     = $(O)ppmwrite$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o
-!ENDIF
+PPMWRITERS     = $(O)ppmwrite.o $(O)alloc$(HOST).o $(O)panic$(HOST).o
 
 #
 #  Object files for the game itself.
@@ -320,16 +315,16 @@ VOBJ19 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)restore.o
 VOBJ20 = $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
 VOBJ21 = $(O)save.o     $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
 VOBJ22 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
-VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)sys.o      $(O)teleport.o
-VOBJ24 = $(O)timeout.o  $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ25 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vis_tab.o
-VOBJ26 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
-VOBJ27 = $(O)windows.o  $(O)wizard.o   $(O)worm.o     $(O)worn.o
-VOBJ28 = $(O)write.o    $(O)zap.o
+VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
+VOBJ24 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
+VOBJ25 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ26 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
+VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
+VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 DLBOBJ_HOST = $(O)dlb$(HOST).o
 !ENDIF
 DLBOBJ = $(O)dlb.o
@@ -339,12 +334,6 @@ REGEX  = $(O)cppregex.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 MDLIB = $(O)mdlib.o
-
-!IF "$(OPTIONS_AT_RUNTIME)" == "Y"
-RUNTIMEOPTDEF=-DOPTIONS_AT_RUNTIME
-!ELSE
-RUNTIMEOPTDEF=
-!ENDIF
 
 !IFNDEF ADD_CURSES
 CURSESOBJ=
@@ -398,11 +387,12 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.3.5.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
+!IFNDEF LUAVER
 !IFDEF LUATOP
-LUATMP   = $(LUATOP:..\..\lua-=)    #strip leading "..\..\lua-"
+LUATMP   = $(LUATOP:..\lib\lua-=)    #strip leading "..\lib\lua-"
 LUATMP   = $(LUATMP:-beta=)         #strip suffix if exists "-beta"
 !IF "$(LUATMP)" == "5.4.0"
 LUAVER   = 5.4.0
@@ -412,12 +402,13 @@ LUAVER   = 5.4.0
 !ENDIF
 
 !IFNDEF LUAVER
-LUATMP   = $(LUATOP:..\..\LUA-=)    #strip leading "..\..\LUA-"
+LUATMP   = $(LUATOP:..\lib\LUA-=)    #strip leading "..\lib\LUA-"
 LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
-!IF "$(LUATMP)" == "5.4.0"
-LUAVER   = 5.4.0
-!ELSE
+!IF "$(LUATMP)" == "5.3.5"
 LUAVER   = 5.3.5
+!ELSE
+LUAVER   = 5.4.0
+!ENDIF
 !ENDIF
 !ENDIF
 
@@ -447,7 +438,7 @@ LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o                \
 !IF "$(LUAVER)" == "5.3.5"
 LUASRCFILES = $(LUASRCFILES) lbitlib.c
 LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
-!ELSEIF "$(LUAVER)" == "5.4.0"
+!ELSE
 #  5.4.0 adds header files ljumptab.h and lopnames.h
 #        and removes lbitlib.c
 !ENDIF
@@ -487,12 +478,11 @@ PDCLIB =
 # Header file macros
 #==========================================
 
-CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
+CONFIG_H = $(INCL)\config.h $(INCL)\patchlevel.h \
+		$(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\global.h $(INCL)\fnamesiz.h $(INCL)\coord.h \
 		$(INCL)\vmsconf.h $(INCL)\system.h $(INCL)\nhlua.h \
-		$(INCL)\unixconf.h $(INCL)\os2conf.h $(INCL)\micro.h \
-		$(INCL)\pcconf.h $(INCL)\tosconf.h $(INCL)\amiconf.h \
-		$(INCL)\macconf.h $(INCL)\beconf.h $(INCL)\wceconf.h \
+		$(INCL)\unixconf.h $(INCL)\micro.h $(INCL)\pcconf.h \
 		$(INCL)\ntconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
@@ -552,7 +542,7 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that 
 # is too old or untested.
 #
-#NMAKE version 1421277022 is distributed with latest VS 2019
+#NMAKE version 1427291110 is distributed with latest VS 2019
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -576,19 +566,22 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1421277023)
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1427291111)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1421277022)
+!ELSEIF ($(MAKEVERSION) > 1427291110)
 VSVER=2999              #untested future version
 !ENDIF
 
 !IF ($(VSVER) >= 2012)
+!IF ($(VSVER) <= $(VSNEWEST))
 !MESSAGE Autodetected Visual Studio $(VSVER)
-!ELSEIF ($(VSVER) == 2999
-!MESSAGE The version of Visual Studio is newer than the most recent at
-!MESSAGE the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
-!MESSAGE Because it is newer we'll proceed expecting that the 
-!MESSAGE VS$(VSNEWEST) processing will still work.
+!ENDIF
+!ENDIF
+!IF ($(VSVER) == 2999)
+!MESSAGE The NMAKE version of this Visual Studio $(_NMAKE_VER) is newer than the
+!MESSAGE most recent at the time this Makefile was crafted (Visual Studio $(VSNEWEST)).
+!MESSAGE Because it is newer we'll proceed expecting that the VS$(VSNEWEST) processing
+!MESSAGE will still work.
 !ELSEIF ($(VSVER) == 0000)
 !MESSAGE The version of Visual Studio appears to be quite old, older
 !MESSAGE than VS2010 which is the oldest supported version by this
@@ -776,7 +769,7 @@ DLB =
 #==========================================
 
 {$(UTIL)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $<
+	@$(cc) $(cflagsBuild) -Fo$@ $<
 
 #==========================================
 # Rules for files in win\share
@@ -1066,22 +1059,22 @@ $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 #==========================================
 # Makedefs Stuff
 #==========================================
-$(U)nhsizes3.exe: $(O)nhsizes3$(HOST).o
+$(U)nhsizes3.exe: $(O)nhsizes3.o
 	@echo Linking $(@:\=/)
-	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes$(HOST).o $(O)panic$(HOST).o $(O)alloc$(HOST).o
+	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic$(HOST).o $(O)alloc$(HOST).o
 
-$(O)nhsizes3$(HOST).o: $(CONFIG_H) nhsizes3.c
+$(O)nhsizes3.o: $(CONFIG_H) nhsizes3.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes3.c
 
 $(U)makedefs.exe:	$(MAKEDEFSOBJS)
 	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEDEFSOBJS)
 
-$(O)makedefs$(HOST).o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
+$(O)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\objclass.h $(INCL)\monsym.h \
 		$(INCL)\artilist.h $(INCL)\dungeon.h $(INCL)\obj.h \
 		$(INCL)\monst.h $(INCL)\you.h $(INCL)\flag.h \
-		$(INCL)\dlb.h $(INCL)\patchlevel.h
+		$(INCL)\dlb.h
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)makedefs.c
@@ -1111,11 +1104,11 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 # uudecode utility and uuencoded targets
 #==========================================
 
-$(U)uudecode.exe: $(O)uudecode$(HOST).o
+$(U)uudecode.exe: $(O)uudecode.o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode$(HOST).o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
-$(O)uudecode$(HOST).o: $(SSYS)\uudecode.c
+$(O)uudecode.o: $(SSYS)\uudecode.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
@@ -1213,15 +1206,15 @@ $(U)dlb.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
 		$(O)panic$(HOST).o
 <<
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)dlb$(HOST).o: $(O)dlb_main$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
 !ENDIF
 
 $(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
+	@$(cc) $(cflagsBuild) /Fo$@ $(SRC)\dlb.c
 	
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)dlb_main$(HOST).o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(UTIL)\dlb_main.c
 !ENDIF
@@ -1269,61 +1262,61 @@ $(U)recover.exe: $(RECOVOBJS)
 	$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)recover.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
 #==========================================
 
 $(SRC)\tile.c: $(U)tilemap.exe
-	@echo A new $(@:\=/) has been created
 	@$(U)tilemap
+	@echo A new $(@:\=/) has been created
 
-$(U)tilemap.exe: $(O)tilemap$(HOST).o
+$(U)tilemap.exe: $(O)tilemap.o
 	@echo Linking $(@:\=/)
-	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap$(HOST).o
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
-$(O)tilemap$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletx32$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
-$(O)tiletxt$(HOST).o: $(WSHR)\tilemap.c $(HACK_H)
+$(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
-$(O)gifread$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
-$(O)gifrd32$(HOST).o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
+$(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
-$(O)ppmwrite$(HOST).o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
+$(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
-$(O)tiletext$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
-$(O)tilete32$(HOST).o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
+$(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
 #==========================================
 
-$(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
+$(U)gif2txt.exe: $(GIFREADERS_HOST) $(TEXT_IO)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(GIFREADERS:^	=^
+		$(GIFREADERS_HOST:^	=^
 		)
 		$(TEXT_IO:^	=^
 		)
 <<
 
-$(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
+$(U)gif2tx32.exe: $(GIFREADERS32_HOST) $(TEXT_IO32)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(GIFREADERS32:^	=^
+		$(GIFREADERS32_HOST:^	=^
 		)
 		$(TEXT_IO32:^	=^
 		)
@@ -1347,27 +1340,51 @@ $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 #	@$(U)til2bm32 $(TILEBMP32)
 
 
-$(U)tile2bmp.exe: $(O)tile2bmp$(HOST).o $(TEXT_IO)
+$(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(O)tile2bmp$(HOST).o
+		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
 		)
 <<
 
-$(U)til2bm32.exe: $(O)til2bm32$(HOST).o $(TEXT_IO32)
+$(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
     	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
-		$(O)til2bm32$(HOST).o
+		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
 		)
 <<
 
-$(O)tile2bmp$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
-$(O)til2bm32$(HOST).o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
+
+$(U)tile2x11.exe: $(O)tile2x11.o $(O)tiletext.o $(O)tiletxt.o $(O)alloc.o \
+		$(O)panic.o $(O)monst.o $(O)objects.o
+	@echo Linking $(@:\=/)
+	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+		$(O)tile2x11.o
+		$(O)tiletext.o
+		$(O)tiletxt.o
+		$(O)drawing.o
+		$(O)monst.o
+		$(O)objects.o
+		$(O)alloc.o
+		$(O)panic.o
+<<
+
+$(O)tile2x11.o: $(X11)\tile2x11.c $(HACK_H) $(TILE_H) $(INCL)\tile2x11.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(X11)\tile2x11.c
+
+$(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
+				$(WSHR)\other.txt \
+                                $(WSHR)\monsters.txt
+	$(U)tile2x11 $(WSHR)\monsters.txt $(WSHR)\objects.txt \
+				$(WSHR)\other.txt \
+                                -grayscale $(WSHR)\monsters.txt
 
 #===============================================================================
 # PDCurses
@@ -1434,7 +1451,7 @@ $(O)mhmsgwnd.o: $(MSWIN)\mhmsgwnd.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\m
 $(O)mhrip.o: $(MSWIN)\mhrip.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
 		$(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
 $(O)mhsplash.o: $(MSWIN)\mhsplash.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
-		$(MSWIN)\resource.h $(WINDHDR) $(HACK_H) $(INCL)\patchlevel.h
+		$(MSWIN)\resource.h $(WINDHDR) $(HACK_H)
 $(O)mhstatus.o: $(MSWIN)\mhstatus.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
 		$(WINDHDR) $(HACK_H)
 $(O)mhtext.o: $(MSWIN)\mhtext.c $(MSWIN)\$(@B).h $(MSWIN)\mhmsg.h $(MSWIN)\mhfont.h \
@@ -1490,14 +1507,14 @@ $(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
 # data file.
 #
 
-!IFDEF CROSSCOMPILE_HOST
+!IFDEF TEST_CROSSCOMPILE
 $(O)mdlib$(HOST).o: $(SRC)\mdlib.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSDEFINE_HOST) -Fo$@ $(SRC)\mdlib.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(SRC)\mdlib.c
 !ENDIF
 
 $(O)mdlib.o: $(SRC)\mdlib.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(SRC)\mdlib.c
-#	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
+	@$(cc) $(cflagsBuild) -Fo$@ $(SRC)\mdlib.c
+#	@$(cc) $(cflagsBuild) /EP -Fo$@ $(SRC)\mdlib.c >mdlib.c.preprocessed
 
 #============================================
 # util dual-role CROSSCOMPILE dependencies
@@ -1505,64 +1522,42 @@ $(O)mdlib.o: $(SRC)\mdlib.c
 #
 # These have dual-roles and need to be build for host and target platforms.
 #
-!IFDEF CROSSCOMPILE_HOST
-$(O)panic$(HOST).o:  $(U)panic.c $(CONFIG_H)
+$(O)panic_host.o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)panic.c
-!ENDIF
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(U)panic.c
+	@$(cc) $(cflagsBuild) -Fo$@ $(U)panic.c
 
-
-!IFDEF CROSSCOMPILE_HOST
-$(O)drawing$(HOST).o: drawing.c $(HACK_H) $(INCL)\tcap.h
+$(O)drawing_host.o: drawing.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ drawing.c
-!ENDIF
 
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)\tcap.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ drawing.c
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\color.h $(INCL)\rm.h \
+		$(INCL)\objclass.h $(INCL)\monsym.h
+	@$(cc) $(cflagsBuild) -Fo$@ drawing.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)decl$(HOST).o: decl.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ decl.c
-!ENDIF
-
-$(O)decl.o: decl.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ decl.c
-
-!IFDEF CROSSCOMPILE_HOST
-$(O)monst$(HOST).o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
+$(O)monst_host.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
 		$(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ monst.c
-!ENDIF
+	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
 		$(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ monst.c
+	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)objects$(HOST).o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
-		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ objects.c
-!ENDIF
-
-$(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
+$(O)objects_host.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ objects.c
 
-!IFDEF CROSSCOMPILE_HOST
-$(O)alloc$(HOST).o: alloc.c $(CONFIG_H)
+$(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
+		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
+	@$(cc) $(cflagsBuild) -Fo$@ objects.c
+
+$(O)alloc_host.o: alloc.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ alloc.c
-!ENDIF
 
 $(O)alloc.o: alloc.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ alloc.c
-
-$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
-		$(INCL)\patchlevel.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
+	@$(cc) $(cflagsBuild) -Fo$@ alloc.c
 
 #===================================================================
 # DAT dependencies
@@ -1707,8 +1702,6 @@ clean:
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #
-$(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
-#	@$(cc) $(cflagsBuild) -Fo$@  ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\sys\share\pcmain.c
 $(O)pcsys.o: ..\sys\share\pcsys.c $(HACK_H)
@@ -1743,7 +1736,7 @@ $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\tty\topl.c
 $(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h $(INCL)\tcap.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\tty\wintty.c
-$(O)cursmain.o: ..\win\curses\cursmain.c $(HACK_H) $(INCL)\patchlevel.h \
+$(O)cursmain.o: ..\win\curses\cursmain.c $(HACK_H) \
 		$(INCL)\wincurs.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\curses\cursmain.c
 $(O)curswins.o: ..\win\curses\curswins.c $(HACK_H) $(INCL)\wincurs.h \
@@ -1767,224 +1760,149 @@ $(O)cursmesg.o: ..\win\curses\cursmesg.c $(HACK_H) $(INCL)\wincurs.h \
 $(O)cursinvt.o: ..\win\curses\cursinvt.c $(HACK_H) $(INCL)\wincurs.h \
 		..\win\curses\cursinvt.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\curses\cursinvt.c
-#$(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
+#$(O)Window.o: $(X11)\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 #		$(CONFIG_H) $(INCL)\lint.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\Window.c
-$(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H) $(INCL)\lint.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\dialogs.c
-$(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
-		$(INCL)\xwindow.h ..\win\X11\nh72icon ..\win\X11\nh56icon \
-		..\win\X11\nh32icon
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winX.c
-$(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\Window.c
+$(O)dialogs.o: $(X11)\dialogs.c $(CONFIG_H) $(INCL)\lint.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\dialogs.c
+$(O)winX.o: $(X11)\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
+		$(INCL)\xwindow.h $(X11)\nh72icon $(X11)\nh56icon \
+		$(X11)\nh32icon
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winX.c
+$(O)winmap.o: $(X11)\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmap.c
-$(O)winmenu.o: ..\win\X11\winmenu.c $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmenu.c
-$(O)winmesg.o: ..\win\X11\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmesg.c
-$(O)winmisc.o: ..\win\X11\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmap.c
+$(O)winmenu.o: $(X11)\winmenu.c $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmenu.c
+$(O)winmesg.o: $(X11)\winmesg.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmesg.c
+$(O)winmisc.o: $(X11)\winmisc.c $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winmisc.c
-$(O)winstat.o: ..\win\X11\winstat.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winstat.c
-$(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\wintext.c
-$(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
-#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  ..\win\X11\winval.c
-$(O)tile.o: $(SRC)\tile.c $(HACK_H)
-$(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
-		..\win\gnome\gnmain.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnaskstr.c
-$(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnomeprv.h \
-		$(HACK_H) $(INCL)\dlb.h $(INCL)\patchlevel.h \
-		$(INCL)\winGnome.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gnmap.h ..\win\gnome\gnmenu.h \
-		..\win\gnome\gnplayer.h ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnglyph.h ..\win\gnome\gnstatus.h \
-		..\win\gnome\gntext.h ..\win\gnome\gnmesg.h \
-		..\win\gnome\gnyesno.h ..\win\gnome\gnworn.h \
-		..\win\gnome\gnaskstr.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnbind.c
-$(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h $(CONFIG_H) \
-		$(INCL)\tile2x11.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnglyph.c
-$(O)gnmain.o: ..\win\gnome\gnmain.c ..\win\gnome\gnmain.h ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnglyph.h ..\win\gnome\gnbind.h \
-		..\win\gnome\gnmap.h ..\win\gnome\gnmenu.h \
-		..\win\gnome\gnplayer.h ..\win\gnome\gnstatus.h \
-		..\win\gnome\gntext.h ..\win\gnome\gnmesg.h \
-		..\win\gnome\gnyesno.h ..\win\gnome\gnworn.h \
-		..\win\gnome\gnopts.h $(INCL)\date.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnmain.c
-$(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h $(CONFIG_H) \
-		..\win\gnome\gnglyph.h ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnmap.c
-$(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h $(CONFIG_H) \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnmain.h ..\win\gnome\gnbind.h \
-		..\win\gnome\gnmap.h ..\win\gnome\gnplayer.h \
-		..\win\gnome\gnsignal.h ..\win\gnome\gnglyph.h \
-		..\win\gnome\gnstatus.h ..\win\gnome\gntext.h \
-		..\win\gnome\gnmesg.h ..\win\gnome\gnyesno.h \
-		..\win\gnome\gnworn.h $(INCL)\func_tab.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnmenu.c
-$(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h $(CONFIG_H) \
-		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h $(HACK_H) \
-		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnglyph.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnmesg.c
-$(O)gnopts.o: ..\win\gnome\gnopts.c ..\win\gnome\gnopts.h ..\win\gnome\gnglyph.h \
-		$(CONFIG_H) ..\win\gnome\gnmain.h ..\win\gnome\gnmap.h $(HACK_H)
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnopts.c
-$(O)gnplayer.o: ..\win\gnome\gnplayer.c ..\win\gnome\gnplayer.h \
-		..\win\gnome\gnmain.h $(HACK_H)
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnplayer.c
-$(O)gnsignal.o: ..\win\gnome\gnsignal.c ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnglyph.h ..\win\gnome\gnmain.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnsignal.c
-$(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h $(CONFIG_H) \
-		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h $(HACK_H) \
-		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnglyph.h ..\win\gnome\gn_xpms.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnstatus.c
-$(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h $(CONFIG_H) \
-		..\win\gnome\gnmain.h ..\win\gnome\gn_rip.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gntext.c
-$(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h \
-		..\win\gnome\gnmain.h ..\win\gnome\gnmap.h \
-		..\win\gnome\gnmenu.h ..\win\gnome\gnplayer.h \
-		..\win\gnome\gnsignal.h ..\win\gnome\gnglyph.h \
-		..\win\gnome\gnstatus.h ..\win\gnome\gntext.h \
-		..\win\gnome\gnmesg.h ..\win\gnome\gnyesno.h \
-		..\win\gnome\gnworn.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnyesno.c
-$(O)gnworn.o: ..\win\gnome\gnworn.c ..\win\gnome\gnworn.h $(CONFIG_H) \
-		..\win\gnome\gnglyph.h ..\win\gnome\gnsignal.h \
-		..\win\gnome\gnomeprv.h $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\winGnome.h
-#	@$(cc) $(cflagsBuild) $(GNOMEINC) -Fo$@  ..\win\gnome\gnworn.c
-$(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h $(INCL)\wingem.h
-#	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\wingem.c
-$(O)wingem1.o: ..\win\gem\wingem1.c $(INCL)\gem_rsc.h $(INCL)\load_img.h \
-		$(INCL)\gr_rect.h $(INCL)\wintype.h $(INCL)\wingem.h
-#	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\wingem1.c
-$(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
-#	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\load_img.c
-$(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
-#	@$(cc) $(cflagsBuild) -Fo$@  ..\win\gem\gr_rect.c
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winmisc.c
+$(O)winstat.o: $(X11)\winstat.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winstat.c
+$(O)wintext.o: $(X11)\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\wintext.c
+$(O)winval.o: $(X11)\winval.c $(HACK_H) $(INCL)\winX.h
+#	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\winval.c
 $(O)tile.o: $(SRC)\tile.c $(HACK_H)
 #cppregex.o: ..\sys\share\cppregex.cpp
 #	$(CXX) $(CXXFLAGS) -Fo$@  ..\sys\share\cppregex.cpp
-$(O)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_bind.h \
-		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_click.h \
-		..\win\Qt\qt_delay.h ..\win\Qt\qt_xcmd.h ..\win\Qt\qt_key.h \
-		..\win\Qt\qt_map.h ..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h \
-		..\win\Qt\qt_menu.h ..\win\Qt\qt_rip.h ..\win\Qt\qt_msg.h \
-		..\win\Qt\qt_plsel.h ..\win\Qt\qt_svsel.h ..\win\Qt\qt_set.h \
-		..\win\Qt\qt_stat.h ..\win\Qt\qt_icon.h ..\win\Qt\qt_streq.h \
-		..\win\Qt\qt_line.h ..\win\Qt\qt_yndlg.h ..\win\Qt\qt_str.h \
-		$(INCL)\dlb.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_bind.cpp
-$(O)qt_click.o: ..\win\Qt\qt_click.cpp $(HACK_H) ..\win\Qt\qt_click.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_click.cpp
-$(O)qt_clust.o: ..\win\Qt\qt_clust.cpp ..\win\Qt\qt_clust.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_clust.cpp
-$(O)qt_delay.o: ..\win\Qt\qt_delay.cpp $(HACK_H) ..\win\Qt\qt_delay.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_delay.cpp
-$(O)qt_glyph.o: ..\win\Qt\qt_glyph.cpp $(HACK_H) $(INCL)\tile2x11.h \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_glyph.cpp
-$(O)qt_icon.o: ..\win\Qt\qt_icon.cpp $(HACK_H) ..\win\Qt\qt_icon.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_icon.cpp
-$(O)qt_inv.o: ..\win\Qt\qt_inv.cpp $(HACK_H) ..\win\Qt\qt_inv.h \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_inv.cpp
-$(O)qt_key.o: ..\win\Qt\qt_key.cpp $(HACK_H) ..\win\Qt\qt_key.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_key.cpp
-$(O)qt_line.o: ..\win\Qt\qt_line.cpp $(HACK_H) ..\win\Qt\qt_line.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_line.cpp
-$(O)qt_main.o: ..\win\Qt\qt_main.cpp $(HACK_H) $(INCL)\patchlevel.h \
-		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h qt_main.moc \
-		..\win\Qt\qt_bind.h ..\win\Qt\qt_glyph.h ..\win\Qt\qt_inv.h \
-		..\win\Qt\qt_key.h ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h \
-		..\win\Qt\qt_clust.h ..\win\Qt\qt_msg.h ..\win\Qt\qt_set.h \
-		..\win\Qt\qt_stat.h ..\win\Qt\qt_icon.h ..\win\Qt\qt_str.h \
-		qt_kde0.moc
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_main.cpp
-$(O)qt_map.o: ..\win\Qt\qt_map.cpp $(HACK_H) ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h \
-		..\win\Qt\qt_clust.h qt_map.moc ..\win\Qt\qt_click.h \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_xpms.h ..\win\Qt\qt_set.h \
-		..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_map.cpp
-$(O)qt_menu.o: ..\win\Qt\qt_menu.cpp $(HACK_H) ..\win\Qt\qt_menu.h \
-		..\win\Qt\qt_win.h ..\win\Qt\qt_rip.h qt_menu.moc \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_streq.h \
-		..\win\Qt\qt_line.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_menu.cpp
-$(O)qt_msg.o: ..\win\Qt\qt_msg.cpp $(HACK_H) ..\win\Qt\qt_msg.h ..\win\Qt\qt_win.h \
-		qt_msg.moc ..\win\Qt\qt_map.h ..\win\Qt\qt_clust.h \
-		..\win\Qt\qt_set.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_msg.cpp
-$(O)qt_plsel.o: ..\win\Qt\qt_plsel.cpp $(HACK_H) ..\win\Qt\qt_plsel.h qt_plsel.moc \
-		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_plsel.cpp
-$(O)qt_rip.o: ..\win\Qt\qt_rip.cpp $(HACK_H) ..\win\Qt\qt_rip.h \
-		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
-		..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_rip.cpp
-$(O)qt_set.o: ..\win\Qt\qt_set.cpp $(HACK_H) ..\win\Qt\qt_set.h qt_set.moc \
-		..\win\Qt\qt_glyph.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_set.cpp
-$(O)qt_stat.o: ..\win\Qt\qt_stat.cpp $(HACK_H) ..\win\Qt\qt_stat.h \
-		..\win\Qt\qt_win.h ..\win\Qt\qt_icon.h qt_stat.moc \
-		..\win\Qt\qt_set.h ..\win\Qt\qt_str.h ..\win\Qt\qt_xpms.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_stat.cpp
-$(O)qt_str.o: ..\win\Qt\qt_str.cpp ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_str.cpp
-$(O)qt_streq.o: ..\win\Qt\qt_streq.cpp $(HACK_H) ..\win\Qt\qt_streq.h \
-		..\win\Qt\qt_line.h ..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_streq.cpp
-$(O)qt_svsel.o: ..\win\Qt\qt_svsel.cpp $(HACK_H) ..\win\Qt\qt_svsel.h \
-		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
-		..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_svsel.cpp
-$(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) ..\win\Qt\qt_win.h \
-		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
-		..\win\Qt\qt_click.h ..\win\Qt\qt_glyph.h ..\win\Qt\qt_inv.h \
-		..\win\Qt\qt_key.h ..\win\Qt\qt_icon.h ..\win\Qt\qt_map.h \
-		..\win\Qt\qt_clust.h ..\win\Qt\qt_menu.h ..\win\Qt\qt_rip.h \
-		..\win\Qt\qt_msg.h ..\win\Qt\qt_set.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_win.cpp
-$(O)qt_xcmd.o: ..\win\Qt\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
-		..\win\Qt\qt_xcmd.h qt_xcmd.moc ..\win\Qt\qt_bind.h \
-		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h \
-		..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_xcmd.cpp
-$(O)qt_yndlg.o: ..\win\Qt\qt_yndlg.cpp $(HACK_H) ..\win\Qt\qt_yndlg.h qt_yndlg.moc \
-		..\win\Qt\qt_str.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt\qt_yndlg.cpp
-$(O)qt3_win.o: ..\win\Qt3\qt3_win.cpp $(HACK_H) $(INCL)\func_tab.h \
-		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\tile2x11.h \
-		..\win\Qt3\qt3_win.h ..\win\Qt3\qt3_clust.h \
-		..\win\Qt3\qt3_kde0.h ..\win\Qt3\qt3_xpms.h qt3_win.moc \
-		qt3_kde0.moc qt3tableview.moc
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt3\qt3_win.cpp
-$(O)qt3_clust.o: ..\win\Qt3\qt3_clust.cpp ..\win\Qt3\qt3_clust.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt3\qt3_clust.cpp
-$(O)qt3tableview.o: ..\win\Qt3\qt3tableview.cpp ..\win\Qt3\qt3tableview.h
-	$(CXX) $(CXXFLAGS) -Fo$@  ..\win\Qt3\qt3tableview.cpp
+#---
+qt_bind.o: $(QT)\qt_bind.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_click.h $(QT)\qt_delay.h \
+		$(QT)\qt_xcmd.h $(QT)\qt_key.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_menu.h \
+		$(QT)\qt_rip.h $(QT)\qt_msg.h $(QT)\qt_plsel.h \
+		$(QT)\qt_svsel.h $(QT)\qt_set.h $(QT)\qt_stat.h \
+		$(QT)\qt_icon.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_yndlg.h $(QT)\qt_str.h $(INCL)\dlb.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_bind.cpp
+qt_click.o: $(QT)\qt_click.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_click.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_click.cpp
+qt_clust.o: $(QT)\qt_clust.cpp $(QT)\qt_clust.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_clust.cpp
+qt_delay.o: $(QT)\qt_delay.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_delay.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_delay.cpp	
+qt_glyph.o: $(QT)\qt_glyph.cpp $(HACK_H) $(INCL)\tile2x11.h \
+		$(QT)\qt_pre.h $(QT)\qt_post.h $(QT)\qt_glyph.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_set.h $(QT)\qt_inv.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_glyph.cpp
+qt_icon.o: $(QT)\qt_icon.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_icon.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_icon.cpp
+qt_inv.o: $(QT)\qt_inv.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_inv.h $(QT)\qt_glyph.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_inv.cpp
+qt_key.o: $(QT)\qt_key.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_key.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_key.cpp
+qt_line.o: $(QT)\qt_line.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_line.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_line.cpp
+qt_main.o: $(QT)\qt_main.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		qt_main.moc $(QT)\qt_bind.h $(QT)\qt_glyph.h \
+		$(QT)\qt_inv.h $(QT)\qt_key.h $(QT)\qt_map.h \
+		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_msg.h \
+		$(QT)\qt_set.h $(QT)\qt_stat.h $(QT)\qt_icon.h \
+		$(QT)\qt_str.h qt_kde0.moc
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_main.cpp
+qt_map.o: $(QT)\qt_map.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_map.h $(QT)\qt_win.h \
+		$(QT)\qt_clust.h qt_map.moc $(QT)\qt_click.h \
+		$(QT)\qt_glyph.h $(QT)\qt_xpms.h $(QT)\qt_set.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_map.cpp
+qt_menu.o: $(QT)\qt_menu.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_menu.h $(QT)\qt_win.h \
+		$(QT)\qt_rip.h qt_menu.moc $(QT)\qt_glyph.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_menu.cpp
+qt_msg.o: $(QT)\qt_msg.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_msg.h $(QT)\qt_win.h \
+		qt_msg.moc $(QT)\qt_map.h $(QT)\qt_clust.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_msg.cpp
+qt_plsel.o: $(QT)\qt_plsel.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_plsel.h qt_plsel.moc \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_glyph.h $(QT)\qt_set.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_plsel.cpp
+qt_rip.o: $(QT)\qt_rip.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_rip.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_rip.cpp
+qt_set.o: $(QT)\qt_set.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_set.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h qt_set.moc \
+		$(QT)\qt_glyph.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_set.cpp
+qt_stat.o: $(QT)\qt_stat.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_stat.h $(QT)\qt_win.h \
+		$(QT)\qt_icon.h qt_stat.moc $(QT)\qt_set.h \
+		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
+		$(QT)\qt_str.h $(QT)\qt_xpms.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_stat.cpp
+qt_str.o: $(QT)\qt_str.cpp $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_str.cpp
+qt_streq.o: $(QT)\qt_streq.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_streq.h $(QT)\qt_line.h \
+		$(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_streq.cpp
+qt_svsel.o: $(QT)\qt_svsel.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_svsel.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_svsel.cpp
+qt_win.o: $(QT)\qt_win.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_win.h $(QT)\qt_bind.h \
+		$(QT)\qt_main.h $(QT)\qt_kde0.h $(QT)\qt_click.h \
+		$(QT)\qt_glyph.h $(QT)\qt_inv.h $(QT)\qt_key.h \
+		$(QT)\qt_icon.h $(QT)\qt_map.h $(QT)\qt_clust.h \
+		$(QT)\qt_menu.h $(QT)\qt_rip.h $(QT)\qt_msg.h \
+		$(QT)\qt_set.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_win.cpp
+qt_xcmd.o: $(QT)\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
+		$(QT)\qt_pre.h $(QT)\qt_post.h $(QT)\qt_xcmd.h \
+		qt_xcmd.moc $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_set.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_xcmd.cpp
+qt_yndlg.o: $(QT)\qt_yndlg.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_yndlg.h qt_yndlg.moc \
+		$(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_yndlg.cpp
+#----
 $(O)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_chainin.c
 $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
@@ -2006,7 +1924,7 @@ $(O)decl.o: decl.c $(HACK_H)
 $(O)detect.o: detect.c $(HACK_H) $(INCL)\artifact.h
 $(O)dig.o: dig.c $(HACK_H)
 $(O)display.o: display.c $(HACK_H)
-$(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)\dlb.h $(INCL)\patchlevel.h
+$(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)\dlb.h
 $(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
 $(O)do_wear.o: do_wear.c $(HACK_H)
@@ -2014,7 +1932,6 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)\mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(HACK_H) $(INCL)\tcap.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)\dlb.h
@@ -2041,8 +1958,7 @@ $(O)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\artilist.h $(INCL)\dungeon.h $(INCL)\obj.h \
 		$(INCL)\monst.h $(INCL)\mextra.h $(INCL)\you.h \
 		$(INCL)\attrib.h $(INCL)\prop.h $(INCL)\skills.h \
-		$(INCL)\context.h $(INCL)\flag.h $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h
+		$(INCL)\context.h $(INCL)\flag.h $(INCL)\dlb.h
 $(O)mhitm.o: mhitm.c $(HACK_H) $(INCL)\artifact.h
 $(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)\artifact.h
 $(O)minion.o: minion.c $(HACK_H)
@@ -2070,8 +1986,8 @@ $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 $(O)objnam.o: objnam.c $(HACK_H)
 $(O)options.o: options.c $(INCL)\optlist.h $(CONFIG_H) $(INCL)\objclass.h $(INCL)\flag.h \
 		$(HACK_H) $(INCL)\tcap.h
-	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP options.c >$(@B).preproc
-	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ options.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ options.c
+#	$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP options.c >$(@B).preproc
 $(O)pager.o: pager.c $(HACK_H) $(INCL)\dlb.h
 $(O)pickup.o: pickup.c $(HACK_H)
 $(O)pline.o: pline.c $(HACK_H)
@@ -2099,17 +2015,18 @@ $(O)sp_lev.o: sp_lev.c $(HACK_H) $(INCL)\sp_lev.h
 $(O)spell.o: spell.c $(HACK_H)
 $(O)steal.o: steal.c $(HACK_H)
 $(O)steed.o: steed.c $(HACK_H)
+$(O)symbols.o: symbols.c $(HACK_H) $(INCL)\tcap.h
 $(O)sys.o: sys.c $(HACK_H)
 $(O)teleport.o: teleport.c $(HACK_H)
 $(O)timeout.o: timeout.c $(HACK_H)
-$(O)topten.o: topten.c $(HACK_H) $(INCL)\dlb.h $(INCL)\patchlevel.h
+$(O)topten.o: topten.c $(HACK_H) $(INCL)\dlb.h
 $(O)track.o: track.c $(HACK_H)
 $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
-		$(INCL)\patchlevel.h
+$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
 $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)

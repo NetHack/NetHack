@@ -1,4 +1,4 @@
-/* NetHack 3.6    bmptiles.c    $NHDT-Date: 1457207054 2016/03/05 19:44:14 $ $NHDT-Branch: chasonr $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7    bmptiles.c    $NHDT-Date: 1596498334 2020/08/03 23:45:34 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 

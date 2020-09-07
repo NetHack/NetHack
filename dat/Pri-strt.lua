@@ -1,4 +1,4 @@
--- NetHack 3.6	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -43,6 +43,8 @@ des.replace_terrain({ region={00,00, 10,19}, fromterrain=".", toterrain="T", cha
 des.replace_terrain({ region={65,00, 75,19}, fromterrain=".", toterrain="T", chance=10 })
 des.terrain({05,04}, ".")
 
+local spacelocs = selection.floodfill(05,04);
+
 -- Portal arrival point
 des.levregion({ region = {05,04,05,04}, type="branch" })
 -- Stairs
@@ -84,22 +86,16 @@ des.monster("acolyte", 33, 12)
 -- Non diggable walls
 des.non_diggable(selection.area(18,03,55,16))
 -- Random traps
-des.trap("dart",20,09)
-des.trap("dart",20,10)
+for i = 1, 2 do
+   local x,y = spacelocs:rndcoord(1);
+   des.trap("dart",x,y)
+end
 des.trap()
 des.trap()
 des.trap()
 des.trap()
 -- Monsters on siege duty.
-des.monster("human zombie", 37, 01)
-des.monster("human zombie", 37, 18)
-des.monster("human zombie", 03, 03)
-des.monster("human zombie", 65, 04)
-des.monster("human zombie", 12, 11)
-des.monster("human zombie", 60, 12)
-des.monster("human zombie", 14, 08)
-des.monster("human zombie", 55, 00)
-des.monster("human zombie", 18, 18)
-des.monster("human zombie", 59, 10)
-des.monster("human zombie", 13, 09)
-des.monster("human zombie", 01, 17)
+for i = 1, 12 do
+   local x,y = spacelocs:rndcoord(1);
+   des.monster("human zombie", x, y);
+end

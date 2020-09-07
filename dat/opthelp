@@ -83,9 +83,6 @@ checkpoint     save game state after each level change, for       [TRUE]
 Boolean option if NEWS was set at compile time:
 news           print any news from game administrator on startup  [TRUE]
 
-Boolean option if MFLOPPY was set at compile time:
-checkspace     check free disk space before writing files to disk [TRUE]
-
 Boolean option if SCORE_ON_BOTL was set at compile time:
 showscore      display your approximate accumulated score         [FALSE]
 
@@ -113,6 +110,9 @@ preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
 
 Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
 vt_tiledata    insert extra data escape code markers into output  [FALSE]
+
+Boolean option if TTY_SOUND_ESCCODES was set at compile time (tty only):
+vt_sounddata   insert sound data escape code markers into output  [FALSE]
 
 Any Boolean option can be negated by prefixing it with a '!' or 'no'.
 

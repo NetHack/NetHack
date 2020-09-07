@@ -1,5 +1,57 @@
 /* clang-format off */
 /* XPM */
+static const char *blank_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"40 40 5 1",
+/* colors */
+"  c #000000",
+". c None",
+/* not used here */
+"X c #909090",
+"o c #606060",
+"O c #303030",
+/* pixels */
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................",
+"........................................"
+};
 static const char *blind_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "40 40 5 1",
@@ -253,6 +305,49 @@ static const char *confused_xpm[] = {
 "* c #303030",
 "= c #6C91B6",
 /* pixels */
+#if 1
+/* mirror image of original; confused brain is facing the other way */
+"OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+"OOOOOOO+.OO+O+OO.O+.=OO+.=.OOOOOOOOOOOOO",
+"OOOOOO+O=++==+O=+=====O=====++OOOOOOOOOO",
+"OOOOO+=O+==OO===++++=.=====.=+OOOOOOOOOO",
+"OOOO======OoO&+===o==o=+.===+=OOOOOOOOOO",
+"O.O.=+==+Oo&o==oO&&&&o=+OO====+O+OOOOOOO",
+"O=+=O==Oooo&=ooo&o&oOooo=o&&+==O+=+.+OOO",
+"O==++==+o&==o=oo&&o&=&oo=oo===O++OOOOOOO",
+"OO=======oo&&o&oo&o&OO&o====O=.o=OOOOOOO",
+"OOOO=====O&o=oOOoooo=Ooo=O=O=+===oOOOOOO",
+"OOOO+===O=o=O====oo=O=======+==+OOOOOOOO",
+"OOOOO======O========O====+=X=#=.OOOOOOOO",
+"OOOO+==OO==========O====%#=.++oX#.OOOOOO",
+"OOOO+==+=+=O====+====X==.=#.+#+#oX+OOOOO",
+"OOOOO.OO+o===##Xo====.X=#.##===O+.+.OOOO",
+"OOOO+=oOO=...+#O#X#==+#.o##O#O####+#OOOO",
+"OOOOo=OO+==+X+#.X#+#.O#.#++++X+#+o#++OOO",
+"OOOOOOO..+##+#XX+..#++#++X##.+X..+.+#OOO",
+"OOOOOOO#+#+..X#+#+X+#++.+#++#+O....##OOO",
+"OOOOOO$X.++#.##++.#XX#X#X+O#+#.+.+#++OOO",
+"OOOOO**+##X+X+###X+##+++.++#+++.+#+#OOOO",
+"OOOO@ *#+#+X#+.++..+.###o##.+#OO#..#OOOO",
+"OOOO$ *#.+###++##+###.+++.O#+#+O#.#+OOOO",
+"OOOO*  ###+#.##..+#++##X..o#+#+#+XXOOOOO",
+"OOOO   %%XX%####+..+#.+#+#+#+X#.#XOOOOOO",
+"OOOO*  %.=++X.+#+#+#++.#+#+#.X%%.OOOOOOO",
+"OOOO$  %#%%%%XX+.####O.+#+##* *.OOOOOOOO",
+"OOOO$  X#+++.=XXX+++#.+.X%   .OOOOOOOOOO",
+"OOOO$  *X%####.=%X#..X%%   *.OOOOOOOOOOO",
+"OOOOO   *=###%X#.=%%%XX* $.OOOOOOOOOOOOO",
+"OOOOO@   *=#.+.#%%=%%%+OOOOOOOOOOOOOOOOO",
+"OOOOOO    *%X##X==%%%=oOOOOOOOOOOOOOOOOO",
+"OOOOOO@     *%=X%%%%X+OOOOOOOOOOOOOOOOOO",
+"OOOOOOO@*      X%%%%XOOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOO$$*   *X%%%=OOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOO.  =%%X+OOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOO  %%%XOOOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOO$ *%%=OOOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOO$ %%%=OOOOOOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOO$ %%%+OOOOOOOOOOOOOOOOOOOO"
+#else
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
 "OOOOOOOOOOOOOO.=.+OO=.+O.OO+O+OO.+OOOOOO",
 "OOOOOOOOOOO++=====O=====+=O+==++=O+OOOOO",
@@ -293,6 +388,7 @@ static const char *confused_xpm[] = {
 "OOOOOOOOOOOOOOOOOOOOO=%%* $OOOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOO=%%% $OOOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOO+%%% $OOOOOOOOOOOOO"
+#endif
 };
 /* XPM */
 static const char *dex_xpm[] = {

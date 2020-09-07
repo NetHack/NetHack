@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1598570054 2020/08/27 23:14:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,6 +46,8 @@ const struct propname {
     { DETECT_MONSTERS, "monster detection" },
     { SEE_INVIS, "see invisible" },
     { INVIS, "invisible" },
+    { DISPLACED, "displaced" }, /* timed amount possible via eating a
+                                 * displacer beast corpse */
     /* properties beyond here don't have timed values during normal play,
        so there's not much point in trying to order them sensibly;
        they're either on or off based on equipment, role, actions, &c */
@@ -70,7 +72,6 @@ const struct propname {
     { SEARCHING, "searching" },
     { INFRAVISION, "infravision" },
     { ADORNED, "adorned (+/- Cha)" },
-    { DISPLACED, "displaced" },
     { STEALTH, "stealthy" },
     { AGGRAVATE_MONSTER, "monster aggravation" },
     { CONFLICT, "conflict" },
@@ -315,16 +316,20 @@ static NEARDATA const char *const slime_texts[] = {
 static void
 slime_dialogue()
 {
-    register long i = (Slimed & TIMEOUT) / 2L;
+    long t = (Slimed & TIMEOUT), i = t / 2L;
 
-    if (i == 1L) {
+    if (t == 1L) {
         /* display as green slime during "You have become green slime."
            but don't worry about not being able to see self; if already
            mimicking something else at the time, implicitly be revealed */
         g.youmonst.m_ap_type = M_AP_MONSTER;
         g.youmonst.mappearance = PM_GREEN_SLIME;
+        /* no message given when 't' is odd, so no automatic update of
+           self; force one */
+        newsym(u.ux, u.uy);
     }
-    if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
+
+    if ((t % 2L) != 0L && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
@@ -573,6 +578,16 @@ nh_timeout()
                 make_vomiting(0L, TRUE);
                 break;
             case SICK:
+                /* You might be able to bounce back from food poisoning, but not
+                 * other forms of illness. */
+                if ((u.usick_type & SICK_NONVOMITABLE) == 0
+                    && rn2(100) < ACURR(A_CON)) {
+                    You("have recovered from your illness.");
+                    make_sick(0, NULL, FALSE, SICK_ALL);
+                    exercise(A_CON, FALSE);
+                    adjattrib(A_CON, -1, 1);
+                    break;
+                }
                 You("die from your illness.");
                 if (kptr && kptr->name[0]) {
                     g.killer.format = kptr->format;
@@ -671,6 +686,10 @@ nh_timeout()
                     spoteffects(TRUE);
                 }
                 break;
+            case DISPLACED:
+                if (!Displaced) /* give a message */
+                    toggle_displacement((struct obj *) 0, 0L, FALSE);
+                break;
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {
@@ -706,7 +725,7 @@ nh_timeout()
             case FUMBLING:
                 /* call this only when a move took place.  */
                 /* otherwise handle fumbling msgs locally. */
-                if (u.umoved && !Levitation) {
+                if (u.umoved && !(Levitation || Flying)) {
                     slip_or_trip();
                     nomul(-2);
                     g.multi_reason = "fumbling";
@@ -725,6 +744,12 @@ nh_timeout()
                 HFumbling &= ~FROMOUTSIDE;
                 if (Fumbling)
                     incr_itimeout(&HFumbling, rnd(20));
+
+                if (iflags.defer_decor) {
+                    /* 'mention_decor' was deferred for message sequencing
+                       reasons; catch up now */
+                    deferred_decor(FALSE);
+                }
                 break;
             case DETECT_MONSTERS:
                 see_monsters();
@@ -2382,7 +2407,7 @@ long adjust;     /* how much to adjust timeout */
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-       
+
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)

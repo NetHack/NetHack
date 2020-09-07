@@ -7,16 +7,8 @@
 extern "C" {
 #include "hack.h"
 }
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #include <QtCore/QStringList>
 #if QT_VERSION >= 0x050000
@@ -25,6 +17,7 @@ extern "C" {
 #else
 #include <QtGui/QSound>
 #endif
+#include "qt_post.h"
 #include "qt_bind.h"
 #include "qt_click.h"
 #ifdef TIMED_DELAY
@@ -53,7 +46,7 @@ extern int qt_compact_mode;
 
 namespace nethack_qt_ {
 
-// XXX Should be from Options
+// XXX Should be from Options [or from Qt Settings (aka Preferences)].
 //
 // XXX Hmm.  Tricky part is that perhaps some macros should only be active
 // XXX       when a key is about to be gotten.  For example, the user could
@@ -62,13 +55,13 @@ namespace nethack_qt_ {
 //
 static struct key_macro_rec {
     int key;
-    int state;
-    const char* macro;
+    uint state;
+    const char *macro, *numpad_macro;
 } key_macro[]={
-    { Qt::Key_F1, 0, "n100." }, // Rest (x100)
-    { Qt::Key_F2, 0, "n20s" },  // Search (x20)
-    { Qt::Key_Tab, 0, "\001" },
-    { 0, 0, 0 }
+    { Qt::Key_F1,  0U, "100.", "n100." }, // Rest (x100)
+    { Qt::Key_F2,  0U, "20s",  "n20s"  }, // Search (x20)
+    { Qt::Key_Tab, 0U, "\001", "\001"  }, // ^A (Do-again)
+    { 0, 0U, (const char *) 0, (const char *) 0 }
 };
 
 NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
@@ -82,8 +75,9 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 {
     QPixmap pm("nhsplash.xpm");
     if ( iflags.wc_splash_screen && !pm.isNull() ) {
-	splash = new QFrame(NULL,
-	    Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint | Qt::WindowStaysOnTopHint );
+        splash = new QFrame(NULL, (Qt::FramelessWindowHint
+                                   | Qt::X11BypassWindowManagerHint
+                                   | Qt::WindowStaysOnTopHint));
 	QVBoxLayout *vb = new QVBoxLayout(splash);
 	QLabel *lsplash = new QLabel(splash);
 	vb->addWidget(lsplash);
@@ -117,9 +111,27 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     } else {
 	splash = 0;
     }
+
+    // these used to be in MainWindow but we want them before QtSettings
+    // which we want before MainWindow...
+    QCoreApplication::setOrganizationName("The NetHack DevTeam");
+    QCoreApplication::setOrganizationDomain("nethack.org");
+    QCoreApplication::setApplicationName("NetHack-Qt"); // Qt NetHack
+    {
+        char cvers[BUFSZ];
+        QString qvers = version_string(cvers);
+        QCoreApplication::setApplicationVersion(qvers);
+    }
+#ifdef MACOSX
+    /* without this, neither control+x nor option+x do anything;
+       with it, control+x is ^X and option+x still does nothing */
+    QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta);
+#endif
+
+    qt_settings = new NetHackQtSettings(); /*(main->width(),main->height());*/
+
     main = new NetHackQtMainWindow(keybuffer);
     connect(qApp, SIGNAL(lastWindowClosed()), qApp, SLOT(quit()));
-    qt_settings=new NetHackQtSettings(main->width(),main->height());
     msgs_strings = new QStringList();
     msgs_initd = false;
     msgs_saved = false;
@@ -189,14 +201,16 @@ void NetHackQtBind::qt_askname()
     free_saved_games(saved);
 
     switch (ch) {
-      case -1:
-	if ( splash ) splash->hide();
-	if (NetHackQtPlayerSelector(keybuffer).Choose())
-	    return;
-      case -2:
-	break;
-      default:
-	return;
+    case -1:
+        if (splash)
+            splash->hide();
+        if (NetHackQtPlayerSelector(keybuffer).Choose())
+            return;
+        /*FALLTHRU*/
+    case -2:
+        break;
+    default:
+        return;
     }
 
     // Quit
@@ -252,22 +266,30 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
     NetHackQtWindow* window=0;
 
     switch (type) {
-     case NHW_MAP: {
+    case NHW_MAP: {
 	NetHackQtMapWindow2* w=new NetHackQtMapWindow2(clickbuffer);
 	main->AddMapWindow(w);
 	window=w;
-    } break; case NHW_MESSAGE: {
+        break;
+    }
+    case NHW_MESSAGE: {
 	NetHackQtMessageWindow* w=new NetHackQtMessageWindow;
 	main->AddMessageWindow(w);
 	window=w;
-    } break; case NHW_STATUS: {
+        break;
+    }
+    case NHW_STATUS: {
 	NetHackQtStatusWindow* w=new NetHackQtStatusWindow;
 	main->AddStatusWindow(w);
 	window=w;
-    } break; case NHW_MENU:
+        break;
+    }
+    case NHW_MENU:
 	window=new NetHackQtMenuOrTextWindow(mainWidget());
-    break; case NHW_TEXT:
+        break;
+    case NHW_TEXT:
 	window=new NetHackQtTextWindow(mainWidget());
+        break;
     }
 
     window->nhid = id;
@@ -279,8 +301,7 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 #else
 	&& main->isVisible()
 #endif
-	)
-    {
+	) {
 	delete splash;
 	splash = 0;
     }
@@ -368,7 +389,7 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
     }
 }
 
-void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior)
+void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->StartMenu();
@@ -425,7 +446,7 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,int bkglyph)
+void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,int bkglyph UNUSED)
 {
     /* TODO: bkglyph */
     NetHackQtWindow* window=id_to_window[(int)wid];
@@ -450,7 +471,7 @@ void NetHackQtBind::qt_raw_print_bold(const char *str)
 int NetHackQtBind::qt_nhgetch()
 {
     if (main)
-	main->fadeHighlighting();
+	main->fadeHighlighting(true);
 
     // Process events until a key arrives.
     //
@@ -458,19 +479,28 @@ int NetHackQtBind::qt_nhgetch()
 	qApp->exec();
     }
 
+    // after getting a key rather than before
+    if (main)
+        main->fadeHighlighting(false);
+
     return keybuffer.GetAscii();
 }
 
 int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
 {
     if (main)
-	main->fadeHighlighting();
+	main->fadeHighlighting(true);
 
     // Process events until a key or map-click arrives.
     //
     while (keybuffer.Empty() && clickbuffer.Empty()) {
 	qApp->exec();
     }
+
+    // after getting a key or click rather than before
+    if (main)
+        main->fadeHighlighting(false);
+
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
     } else {
@@ -494,11 +524,13 @@ int NetHackQtBind::qt_doprev_message()
     return 0;
 }
 
-char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, CHAR_P def)
+char NetHackQtBind::qt_yn_function(const char *question_,
+                                   const char *choices, CHAR_P def)
 {
     QString question(QString::fromLatin1(question_));
     QString message;
     char yn_esc_map='\033';
+    int result = -1;
 
     if (choices) {
         // anything beyond <esc> is hidden>
@@ -506,76 +538,129 @@ char NetHackQtBind::qt_yn_function(const char *question_, const char *choices, C
         size_t cb = choicebuf.indexOf('\033');
         choicebuf = choicebuf.mid(0U, cb);
         message = QString("%1 [%2] ").arg(question, choicebuf);
-        if (def) message += QString("(%1) ").arg(QChar(def));
+        if (def)
+            message += QString("(%1) ").arg(QChar(def));
         // escape maps to 'q' or 'n' or default, in that order
-        yn_esc_map = (strchr(choices, 'q') ? 'q' :
-                      (strchr(choices, 'n') ? 'n' : def));
+        yn_esc_map = strchr(choices, 'q') ? 'q'
+                     : strchr(choices, 'n') ? 'n'
+                       : def;
     } else {
         message = question;
     }
 
-    if (qt_settings->ynInMessages() && WIN_MESSAGE!=WIN_ERR) {
+    if (
+        /*
+         * The 'Settings' dialog doesn't present prompting-in-message-window
+         * as a candidate for customization but core supports 'popup_dialog'
+         * option so let player use that instead.
+         */
+#if 0
+        qt_settings->ynInMessages()
+#else
+        !::iflags.wc_popup_dialog
+#endif
+        && WIN_MESSAGE != WIN_ERR) {
 	// Similar to X11 windowport `slow' feature.
 
-	int result = -1;
+        char cbuf[20];
+        cbuf[0] = '\0';
 
-#ifdef USE_POPUPS
-        if (choices) {
-            if (!strcmp(choices,"ynq"))
-                result = QMessageBox::information (NetHackQtBind::mainWidget(),"NetHack",question,"&Yes","&No","&Quit",0,2);
-            else if (!strcmp(choices,"yn"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Yes", "&No",0,1);
-            else if (!strcmp(choices, "rl"))
-                result = QMessageBox::information(NetHackQtBind::mainWidget(),"NetHack",question,"&Right", "&Left",0,1);
-
-            if (result >= 0 && result < strlen(choices)) {
-                char yn_resp = choices[result];
-                message += QString(" %1").arg(yn_resp);
-                result = yn_resp;
-            }
-        }
-#endif
-
+        // add the prompt to the messsage window
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
 	while (result < 0) {
+            cbuf[0] = '\0';
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
+                Strcpy(cbuf, "ESC");
 	    } else if (choices && !strchr(choices,ch)) {
 		if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
 		    result=def;
+                    Strcpy(cbuf, visctrl(def));
 		} else {
 		    NetHackQtBind::qt_nhbell();
 		    // and try again...
 		}
 	    } else {
 		result=ch;
+                Strcpy(cbuf, visctrl(ch));
 	    }
 	}
 
-	NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
+        // update the prompt message line to include the response
+        if (cbuf[0]) {
+            if (!strcmp(cbuf, " "))
+                Strcpy(cbuf, "SPC");
 
-	return result;
+            NetHackQtMessageWindow *mesgwin = main->GetMessageWindow();
+            if (mesgwin)
+                mesgwin->AddToStr(cbuf);
+        }
+
     } else {
-	NetHackQtYnDialog dialog(mainWidget(),question,choices,def);
-	char ret = dialog.Exec();
-        if (!(ret == '\0' || ret == '\033') && choices)
-            message += QString(" %1").arg(ret);
-        else if (def)
-            message += QString(" %1").arg(def);
+        // use a popup dialog box
+        NetHackQtYnDialog dialog(main, question, choices, def);
+        char ret = dialog.Exec();
+        if (ret == 0) {
+            ret = '\033';
+        }
+        // discard any input that YnDialog() might have left pending
+        keybuffer.Drain();
+
+        // combine the prompt and result
+        char cbuf[40];
+        Strcpy(cbuf, (ret == '\033') ? "ESC"
+                     : (ret == ' ') ? "SPC"
+                       : visctrl(ret));
+        if (ret == '#' && choices && !strncmp(choices, "yn#", (size_t) 3))
+            Sprintf(eos(cbuf), " %ld", ::yn_number);
+        message += QString(" %1").arg(cbuf);
+
+        // add the prompt with appended response to the messsage window
 	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
-        return ret;
+        result = ret;
     }
+
+    // unhighlight the prompt; does not erase the multi-line message window
+    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
+
+    return (char) result;
 }
 
 void NetHackQtBind::qt_getlin(const char *prompt, char *line)
 {
     NetHackQtStringRequestor requestor(mainWidget(),prompt);
     if (!requestor.Get(line)) {
-	line[0]=0;
+        Strcpy(line, "\033");
+        // discard any input that Get() might have left pending
+        keybuffer.Drain();
     }
+
+    // add the prompt with appended response to the messsage window
+    char buf[BUFSZ + 20], *q; /* +20: plenty of extra room for visctrl() */
+    copynchars(buf, prompt, BUFSZ - 1);
+    q = eos(buf);
+    *q++ = ' '; /* guaranteed to fit; temporary lack of terminator is ok */
+
+    if (line[0] == '\033') {
+        Strcpy(q, "ESC");
+    } else if (line[0] == ' ' && !line[1]) {
+        Strcpy(q, "SPC");
+    } else {
+        /* buf[] has more than enough room to hold one extra visctrl()
+           in case q is at the last viable slot and *p yields "M-^c" */
+        for (char *p = line; *p && q < &buf[BUFSZ - 1]; ++p, q = eos(q))
+            Strcpy(q, visctrl(*p));
+    }
+    if (q > &buf[BUFSZ - 1])
+        q = &buf[BUFSZ - 1];
+    *q = '\0';
+
+    NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, buf);
+    // unhighlight the prompt; does not erase the multi-line message window
+    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
 }
 
 int NetHackQtBind::qt_get_ext_cmd()
@@ -613,17 +698,17 @@ void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
     window->UseRIP(how, when);
 }
 
-char * NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
+char *NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
 {
-    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (window)
-        return (char *)window->GetStr(init);
+        return (char *) window->GetStr((bool) init);
     return NULL;
 }
 
 void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
 {
-    NetHackQtMessageWindow* window = main->GetMessageWindow();
+    NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (!window)
         return;
 
@@ -633,7 +718,7 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
         int i = 0;
         const char *str;
 
-        while ((str = window->GetStr((i == 0)))) {
+        while ((str = window->GetStr((bool) (i == 0))) != 0) {
             msgs_strings->append(str);
             i++;
         }
@@ -650,11 +735,11 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
 #endif
     } else if (msgs_saved) {
         /* restore strings */
-        int i;
-        for (i = 0; i < msgs_strings->size(); i++) {
-            window->PutStr(ATR_NONE, msgs_strings->at((i)));
+        for (int i = 0; i < msgs_strings->size(); ++i) {
+            const QString &nxtmsg = msgs_strings->at(i);
+            window->PutStr(ATR_NONE, nxtmsg);
 #ifdef DUMPLOG
-            dumplogmsg(msgs_strings->at(i).toLatin1().constData());
+            dumplogmsg(nxtmsg.toLatin1().constData());
 #endif
         }
         delete msgs_strings;
@@ -666,46 +751,48 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 {
     // Ignore Alt-key navigation to menubar, it's annoying when you
     // use Alt-Direction to move around.
-    if ( main && event->type()==QEvent::KeyRelease && main==receiver
-	    && ((QKeyEvent*)event)->key() == Qt::Key_Alt )
-	return true;
+    if (main && receiver == main && event->type() == QEvent::KeyRelease
+        && ((QKeyEvent *) event)->key() == Qt::Key_Alt)
+        return true;
 
-    bool result=QApplication::notify(receiver,event);
-    if (event->type()==QEvent::KeyPress) {
-	QKeyEvent* key_event=(QKeyEvent*)event;
+    bool result = QApplication::notify(receiver, event);
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *key_event = (QKeyEvent *) event;
 
-	if (!key_event->isAccepted()) {
-	    const int k=key_event->key();
-	    bool macro=false;
-	    for (int i=0; !macro && key_macro[i].key; i++) {
-		if (key_macro[i].key==k
-		 && ((key_macro[i].state&key_event->modifiers())==key_macro[i].state))
-		{
-		    keybuffer.Put(key_macro[i].macro);
-		    macro=true;
-		}
-	    }
-	    QString key=key_event->text();
-	    QChar ch = !key.isEmpty() ? key.at(0) : 0;
-	    if (ch > 128) ch = 0;
-	    if ( ch == 0 && (key_event->modifiers() & Qt::ControlModifier) ) {
-		// On Mac, ascii control codes are not sent, force them.
-		if ( k>=Qt::Key_A && k<=Qt::Key_Z )
-		    ch = k - Qt::Key_A + 1;
-	    }
-	    if (!macro && ch != 0) {
-		bool alt = (key_event->modifiers()&Qt::AltModifier) ||
-		   (k >= Qt::Key_0 && k <= Qt::Key_9 && (key_event->modifiers()&Qt::ControlModifier));
-		keybuffer.Put(key_event->key(),ch.cell() + (alt ? 128 : 0),
-		    key_event->modifiers());
-		key_event->accept();
-		result=true;
-	    }
-
-	    if (ch != 0 || macro) {
-		qApp->exit();
-	    }
-	}
+        if (!key_event->isAccepted()) {
+            Qt::KeyboardModifiers mod = key_event->modifiers();
+            const int k = key_event->key();
+            for (int i = 0; key_macro[i].key; i++) {
+                if (key_macro[i].key == k
+                    && ((key_macro[i].state & mod) == key_macro[i].state)) {
+                    // matched macro; put its expansion into the input buffer
+                    keybuffer.Put(!::iflags.num_pad ? key_macro[i].macro
+                                  : key_macro[i].numpad_macro);
+                    key_event->accept();
+                    qApp->exit();
+                    return true;
+                }
+            }
+            QString key = key_event->text();
+            QChar ch = !key.isEmpty() ? key.at(0) : 0;
+            if (ch > 128)
+                ch = 0;
+            // on OSX, ascii control codes are not sent, force them
+            if ((mod & Qt::ControlModifier) != 0) {
+                if (ch == 0 && k >= Qt::Key_A && k <= Qt::Key_Underscore)
+                    ch = (QChar) (k - (Qt::Key_A - 1));
+            }
+            // if we have a valid character, queue it up
+            if (ch != 0) {
+                bool alt = ((mod & Qt::AltModifier) != 0
+                            || (k >= Qt::Key_0 && k <= Qt::Key_9
+                                && (mod & Qt::ControlModifier) != 0));
+                keybuffer.Put(k, ch.cell() + (alt ? 128 : 0), (uint) mod);
+                key_event->accept();
+                qApp->exit();
+                result = true;
+            }
+        }
     }
     return result;
 }
@@ -718,9 +805,9 @@ QFrame* NetHackQtBind::splash=0;
 QStringList *NetHackQtBind::msgs_strings;
 boolean NetHackQtBind::msgs_saved = false;
 boolean NetHackQtBind::msgs_initd = false;
-
+#if 0
 static void Qt_positionbar(char *) {}
-
+#endif
 } // namespace nethack_qt_
 
 struct window_procs Qt_procs = {
@@ -728,9 +815,10 @@ struct window_procs Qt_procs = {
     WC_COLOR | WC_HILITE_PET
     | WC_ASCII_MAP | WC_TILED_MAP
     | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
+    | WC_POPUP_DIALOG
     | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN,
     0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
     nethack_qt_::NetHackQtBind::qt_askname,
@@ -802,7 +890,11 @@ struct window_procs Qt_procs = {
 };
 
 #ifndef WIN32
-extern "C" void play_usersound(const char* filename, int volume)
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
+extern "C" void play_usersound(const char* filename, int volume UNUSED)
+#else
+extern "C" void play_usersound(const char* filename UNUSED, int volume UNUSED)
+#endif
 {
 #ifdef USER_SOUNDS
 #ifndef QT_NO_SOUND

@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1581886864 2020/02/16 21:01:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1596498197 2020/08/03 23:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1203,7 +1203,7 @@ dospit()
             break;
         }
         otmp->spe = 1; /* to indicate it's yours */
-        throwit(otmp, 0L, FALSE);
+        throwit(otmp, 0L, FALSE, (struct obj *) 0);
     }
     return 1;
 }
@@ -1581,10 +1581,12 @@ dopoly()
     return 1;
 }
 
+/* #monster for hero-as-mind_flayer giving psychic blast */
 int
 domindblast()
 {
     struct monst *mtmp, *nmon;
+    int dmg;
 
     if (u.uen < 10) {
         You("concentrate but lack the energy to maintain doing so.");
@@ -1605,12 +1607,21 @@ domindblast()
             continue;
         if (mtmp->mpeaceful)
             continue;
+        if (mindless(mtmp->data))
+            continue;
         u_sen = telepathic(mtmp->data) && !mtmp->mcansee;
         if (u_sen || (telepathic(mtmp->data) && rn2(2)) || !rn2(10)) {
+            dmg = rnd(15);
+            /* wake it up first, to bring hidden monster out of hiding;
+               but in case it is currently peaceful, don't make it hostile
+               unless it will survive the psychic blast, otherwise hero
+               would avoid the penalty for killing it while peaceful */
+            wakeup(mtmp, (dmg > mtmp->mhp) ? TRUE : FALSE);
             You("lock in on %s %s.", s_suffix(mon_nam(mtmp)),
                 u_sen ? "telepathy"
-                      : telepathic(mtmp->data) ? "latent telepathy" : "mind");
-            mtmp->mhp -= rnd(15);
+                : telepathic(mtmp->data) ? "latent telepathy"
+                  : "mind");
+            mtmp->mhp -= dmg;
             if (DEADMONSTER(mtmp))
                 killed(mtmp);
         }
@@ -1908,6 +1919,7 @@ polysense()
 
     switch (u.umonnum) {
     case PM_PURPLE_WORM:
+    case PM_BABY_PURPLE_WORM:
         warnidx = PM_SHRIEKER;
         break;
     case PM_VAMPIRE:

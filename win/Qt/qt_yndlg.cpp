@@ -4,21 +4,16 @@
 
 // qt_yndlg.cpp -- yes/no dialog
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_yndlg.h"
 #include "qt_yndlg.moc"
 #include "qt_str.h"
@@ -29,16 +24,47 @@ extern int qt_compact_mode;
 
 namespace nethack_qt_ {
 
+static const char lrq[] = "lr\033LRq";
+char altchoices[BUFSZ + 12];
+
 // temporary
 void centerOnMain(QWidget *);
 // end temporary
 
-NetHackQtYnDialog::NetHackQtYnDialog(QWidget *parent,const QString& q,const char* ch,char df) :
+NetHackQtYnDialog::NetHackQtYnDialog(QWidget *parent, const QString &q,
+                                     const char *ch, char df) :
     QDialog(parent),
     question(q), choices(ch), def(df),
     keypress('\033')
 {
     setWindowTitle("NetHack: Question");
+
+    // plain prompt doesn't show any room for an answer (answer won't be
+    // echoed but the fact that a prompt is pending and accepts typed
+    // input as an alternative to mouse click seems clearer when there
+    // is some space available to accept it)
+    if (!question.endsWith(" ") && !question.endsWith("_"))
+        question += " _"; // an underlined space would be better
+
+    if (choices) {
+        // special handling for wearing rings; prompt asks "right or left?"
+        // but side-by-side buttons look better with [left][right] instead
+        if (!strcmp(choices, "rl")) {
+            choices = lrq;
+            if (!def)
+                def = 'r';
+
+        // if count is allowed, explicitly add the digits as valid
+        } else if (!strncmp(choices, "yn#", (size_t) 3)) {
+            ::yn_number = 0L;
+
+            if (!strchr(choices, '9')) {
+                copynchars(altchoices, choices, BUFSZ - 1);
+                // duplicate # is intentional; explicitly separates \... and 0
+                choices = strcat(altchoices, "\033#0123456789");
+            }
+        }
+    }
 }
 
 char NetHackQtYnDialog::Exec()
@@ -58,9 +84,10 @@ char NetHackQtYnDialog::Exec()
 	    if ( question[c] == '-' )
 		ch.append(question[c++]);
 	    unsigned from=0;
-	    while ( c < question.size() && question[c] != ']' && question[c] != ' ' ) {
+            while (c < question.size()
+                   && question[c] != ']' && question[c] != ' ') {
 		if ( question[c] == '-' ) {
-		    from = question[c-1].unicode();
+		    from = question[c - 1].cell();
 		} else if ( from != 0 ) {
 		    for (unsigned f=from+1; f<=question[c]; f++)
 			ch.append(QChar(f));
@@ -106,9 +133,9 @@ char NetHackQtYnDialog::Exec()
     }
     if (!ch.isNull()) {
 	QVBoxLayout *vb = new QVBoxLayout;
-	bool bigq = qlabel.length()>40;
-	if ( bigq ) {
-	    QLabel* q = new QLabel(qlabel,this);
+        bool bigq = (qlabel.length() > (qt_compact_mode ? 40 : 60));
+        if (bigq) {
+            QLabel *q = new QLabel(qlabel, this);
 	    q->setAlignment(Qt::AlignLeft);
 	    q->setWordWrap(true);
 	    q->setMargin(4);
@@ -121,60 +148,84 @@ char NetHackQtYnDialog::Exec()
 	QButtonGroup *bgroup = new QButtonGroup(group);
 
 	int nchoices=ch.length();
-
-	bool allow_count=ch.contains('#');
-	QString yn = "yn", ynq = "ynq";
-	bool is_ynq = ch == yn || ch == ynq;
+        bool allow_count = (ch.left(3) == QString("yn#")),
+             is_ynq = (ch == QString("ynq")), // [ Yes  ][  No  ][Cancel]
+             is_yn  = (ch == QString("yn")),  // [Yes ][ No ]
+             is_lr  = (ch == QString(lrq));   // [ Left ][Right ]
 
 	const int margin=8;
 	const int gutter=8;
 	const int extra=fontMetrics().height(); // Extra for group
 	int x=margin, y=extra+margin;
-	int butsize=fontMetrics().height()*2+5;
+        int butheight = fontMetrics().height() * 2 + 5,
+            butwidth = (butheight - 5)
+                       * ((is_ynq || is_lr) ? 3 : is_yn ? 2 : 1) + 5;
 
-	QPushButton* button;
-	for (int i=0; i<nchoices && ch[i]!='\033'; i++) {
-	    QString button_name = QString(ch[i]);
-	    if (is_ynq) {
-		if (button_name == ynq.mid(0, 1)) {
-		    button_name = "Yes";
-		} else if (button_name == ynq.mid(1, 1)) {
-		    button_name = "No";
-		} else if (button_name == ynq.mid(2, 1)) {
-		    button_name = "Cancel";
-		}
-	    }
-	    button=new QPushButton(button_name);
-	    if ( !enable.isNull() ) {
-		if ( !enable.contains(ch[i]) )
-		    button->setEnabled(false);
-	    }
-	    button->setFixedSize(butsize,butsize); // Square
-	    if (ch[i]==def) button->setDefault(true);
-	    if (i%10==9) {
-		// last in row
-		x=margin;
-		y+=butsize+gutter;
-	    } else {
-		x+=butsize+gutter;
-	    }
+        QPushButton *button;
+        for (int i = 0; i < nchoices; ++i) {
+            if (ch[i] == '\033')
+                break; // ESC and anything after are hidden
+            if (ch[i] == '#' && allow_count)
+                continue; // don't show a button for '#'; has Count box instead
+            QString button_name = QString(visctrl((char) ch[i].cell()));
+            if (is_yn || is_ynq || is_lr) {
+                switch (ch[i].cell()) {
+                case 'y':
+                    button_name = "Yes";
+                    break;
+                case 'n':
+                    button_name = "No";
+                    break;
+                case 'q':
+                    // FIXME: sometimes the 'q' choice is ''cancel current
+                    // action'' but other times it is actually 'quit'.
+                    if (question.left(10) == QString("Dump core?"))
+                        button_name = "Quit";
+                    else
+                        button_name = "Cancel";
+                    break;
+                case 'l':
+                    button_name = "Left";
+                    break;
+                case 'r':
+                    button_name = "Right";
+                    break;
+                }
+            }
+            button=new QPushButton(button_name);
+            if (!enable.isNull()) {
+                if (!enable.contains(ch[i]))
+                    button->setEnabled(false);
+            }
+            button->setFixedSize(butwidth, butheight);
+            if (ch[i] == def)
+                button->setDefault(true);
+            // 'x' and 'y' don't seem to actually used anywhere
+            // and limit of 10 buttons per row isn't enforced
+            if (i % 10 == 9) {
+                // last in row
+                x = margin;
+                y += butheight + gutter;
+            } else {
+                x += butwidth + gutter;
+            }
 	    groupbox->addWidget(button);
 	    bgroup->addButton(button, i);
 	}
 
-	connect(bgroup,SIGNAL(buttonClicked(int)),this,SLOT(doneItem(int)));
+        connect(bgroup, SIGNAL(buttonClicked(int)), this, SLOT(doneItem(int)));
 
-	QLabel* lb=0;
-	QLineEdit* le=0;
-
-	if (allow_count) {
-	    QHBoxLayout *hb = new QHBoxLayout(this);
-	    lb=new QLabel("Count: ");
-	    hb->addWidget(lb);
-	    le=new QLineEdit();
-	    hb->addWidget(le);
-	    vb->addLayout(hb);
+        QLabel *lb = 0;
+        QLineEdit *le = 0;
+        if (allow_count) {
+            // put the Count widget in between [y] and [n][a][q]
+            lb = new QLabel("Count:");
+            groupbox->insertWidget(1, lb); // [n] button is item #1
+            le = new QLineEdit();
+            groupbox->insertWidget(2, le); // [n] became #2, Count label #1
 	}
+        // add an invisible right-most field to left justify the buttons
+        groupbox->addStretch(80);
 
 	setLayout(vb);
 	adjustSize();
@@ -182,23 +233,70 @@ char NetHackQtYnDialog::Exec()
 	show();
 	char choice=0;
 	char ch_esc=0;
-	for (uint i=0; i<ch.length(); i++) {
-	    if (ch[i].unicode()=='q') ch_esc='q';
-	    else if (!ch_esc && ch[i].unicode()=='n') ch_esc='n';
+        for (int i = 0; i < ch.length(); ++i) {
+            if (ch[i].cell() == 'q')
+                ch_esc = 'q';
+            else if (!ch_esc && ch[i].cell() == 'n')
+                ch_esc = 'n';
 	}
-	exec();
-	if ( result() == 0) {
-	    choice = ch_esc ? ch_esc : def ? def : ' ';
-	} else if ( result() == 1 ) {
-	    choice = def ? def : ch_esc ? ch_esc : ' ';
-	} else if ( result() >= 1000 ) {
-	    choice = ch[result() - 1000].unicode();
-	}
-	if (allow_count && !le->text().isEmpty()) {
-	    yn_number=le->text().toInt();
-	    choice='#';
-	}
-	return choice;
+
+        //
+        // When a count is allowed, clicking on the count widget then
+        // typing in digits followed by <return> is 'normal' operation.
+        // However, typing a digit without clicking first will set focus
+        // to the count widget with that typed digit preloaded.
+        // FIXME:  Unfortunately, it will also be selected, so typing
+        // another digit replaces it instead of being the next digit in
+        // a multiple-digit number.
+        //
+        // Theoretically typing '#' does this to, with a 0 preloaded
+        // and intentionally selected, but the KeyPress bug (below) of
+        // treating <shift> as a complete response prevents use of
+        // shift+3 from being used to generate '#'.
+        //
+        bool retry; // for digit + re-activate widget + rest of number
+        do {
+            retry = false; // might have a second pass (but not a third)
+            exec();
+            int res = result();
+            if (res == 0) {
+                choice = is_lr ? '\033' : ch_esc ? ch_esc : def ? def : ' ';
+            } else if (res == 1) {
+                choice = def ? def : ch_esc ? ch_esc : ' ';
+            } else if (res >= 1000) {
+                choice = (char) ch[res - 1000].cell();
+
+                if (allow_count && strchr("#0123456789", choice)) {
+                    if (choice == '#') {
+                        // 0 will be preselected; typing anything replaces it
+                        le->insert(QString("0"));
+                    } else {
+                        le->insert(QString(choice));
+                        //
+                        // FIXME:  despite the documentation claiming that
+                        // 'false' cancels any selection, the digit always
+                        // starts out selected (from running exec() again?)
+                        // so typing the next digit replaces it instead of
+                        // being appended to it unless the player uses
+                        // right-arrow to move the cursor.
+                        //
+                        le->end(false);
+                    }
+                    // (don't know whether this actually does anything useful)
+                    le->setAttribute(Qt::WA_KeyboardFocusChange, true);
+                    le->setFocus(Qt::ActiveWindowFocusReason);
+                    retry = true;
+                }
+            }
+        } while (retry);
+
+        // non-Null 'le' implies 'allow_count'
+        if (le && !le->text().isEmpty()) {
+            ::yn_number = le->text().toInt();
+            choice = '#';
+        }
+        keypress = choice;
+
     } else {
 	QLabel label(qlabel,this);
 	QPushButton cancel("Dismiss",this);
@@ -212,12 +310,18 @@ char NetHackQtYnDialog::Exec()
 	show();
 	keypress = '\033';
 	exec();
-	return keypress;
     }
+    return keypress;
 }
 
 void NetHackQtYnDialog::keyPressEvent(QKeyEvent* event)
 {
+    //
+    // FIXME:  on OSX (possibly elsewhere), this accepts <shift>
+    // (and even <caps lock>) as the entire response before the user
+    // has a chance to type any character to be shifted.
+    //
+
     // Don't want QDialog's Return/Esc behaviour
     //RLC ...or do we?
     QString text(event->text());

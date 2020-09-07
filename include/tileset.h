@@ -1,4 +1,4 @@
-/* NetHack 3.6    tileset.h    $NHDT-Date: 1457207052 2016/03/05 19:44:12 $ $NHDT-Branch: chasonr $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7    tileset.h    $NHDT-Date: 1596498564 2020/08/03 23:49:24 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,7 @@ struct TileImage {
 
 boolean FDECL(read_tiles, (const char *filename, BOOLEAN_P true_color));
 const struct Pixel *NDECL(get_palette);
-boolean FDECL(set_tile_type, (BOOLEAN_P true_color));
+void FDECL(set_tile_type, (BOOLEAN_P true_color));
 void NDECL(free_tiles);
 const struct TileImage *FDECL(get_tile, (unsigned tile_index));
 
@@ -42,8 +42,11 @@ struct TileSetImage {
     unsigned tile_width, tile_height;
 };
 
-boolean FDECL(read_bmp_tiles, (const char *filename, struct TileSetImage *image));
-boolean FDECL(read_gif_tiles, (const char *filename, struct TileSetImage *image));
-boolean FDECL(read_png_tiles, (const char *filename, struct TileSetImage *image));
+boolean FDECL(read_bmp_tiles, (const char *filename,
+                               struct TileSetImage *image));
+boolean FDECL(read_gif_tiles, (const char *filename,
+                               struct TileSetImage *image));
+boolean FDECL(read_png_tiles, (const char *filename,
+                               struct TileSetImage *image));
 
 #endif

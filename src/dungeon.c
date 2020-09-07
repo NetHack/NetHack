@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1580607225 2020/02/02 01:33:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1596498164 2020/08/03 23:42:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,6 +49,7 @@ static int FDECL(possible_places, (int, boolean *,
                                        struct proto_dungeon *));
 static xchar FDECL(pick_level, (boolean *, int));
 static boolean FDECL(place_level, (int, struct proto_dungeon *));
+static int FDECL(get_dgn_flags, (lua_State *));
 static boolean FDECL(unplaced_floater, (struct dungeon *));
 static boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
 static void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
@@ -143,23 +144,24 @@ boolean perform_write, free_data;
             bwrite(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
             bwrite(nhfp->fd, (genericptr_t) g.dungeons,
                    sizeof(dungeon) * (unsigned) g.n_dgns);
-            bwrite(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
+            bwrite(nhfp->fd, (genericptr_t) &g.dungeon_topology,
+                   sizeof g.dungeon_topology);
             bwrite(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
         }
         for (count = 0, curr = g.branches; curr; curr = curr->next)
             count++;
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
 
         for (curr = g.branches; curr; curr = curr->next) {
           if (nhfp->structlevel)
-              bwrite(nhfp->fd, (genericptr_t) curr, sizeof(branch));
+              bwrite(nhfp->fd, (genericptr_t) curr, sizeof *curr);
         }
         count = maxledgerno();
         if (nhfp->structlevel) { 
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
             bwrite(nhfp->fd, (genericptr_t) g.level_info,
-                   (unsigned) count * sizeof(struct linfo));
+                   (unsigned) count * sizeof (struct linfo));
             bwrite(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
         }
         for (count = 0, curr_ms = g.mapseenchn; curr_ms;
@@ -167,7 +169,7 @@ boolean perform_write, free_data;
             count++;
 
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &count, sizeof(count));
+            bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
 
         for (curr_ms = g.mapseenchn; curr_ms; curr_ms = curr_ms->next) {
             save_mapseen(nhfp, curr_ms);
@@ -202,20 +204,22 @@ NHFILE *nhfp;
     mapseen *curr_ms, *last_ms;
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof(g.n_dgns));
-        mread(nhfp->fd, (genericptr_t) g.dungeons, sizeof(dungeon) * (unsigned) g.n_dgns);
-        mread(nhfp->fd, (genericptr_t) &g.dungeon_topology, sizeof g.dungeon_topology);
+        mread(nhfp->fd, (genericptr_t) &g.n_dgns, sizeof g.n_dgns);
+        mread(nhfp->fd, (genericptr_t) g.dungeons,
+              sizeof (dungeon) * (unsigned) g.n_dgns);
+        mread(nhfp->fd, (genericptr_t) &g.dungeon_topology,
+              sizeof g.dungeon_topology);
         mread(nhfp->fd, (genericptr_t) g.tune, sizeof tune);
     }
     last = g.branches = (branch *) 0;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
 
     for (i = 0; i < count; i++) {
-        curr = (branch *) alloc(sizeof(branch));
+        curr = (branch *) alloc(sizeof *curr);
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) curr, sizeof(branch));
+            mread(nhfp->fd, (genericptr_t) curr, sizeof *curr);
         curr->next = (branch *) 0;
         if (last)
             last->next = curr;
@@ -225,18 +229,18 @@ NHFILE *nhfp;
     }
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
 
     if (count >= MAXLINFO)
         panic("level information count larger (%d) than allocated size",
               count);
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) g.level_info,
-              (unsigned) count * sizeof(struct linfo));
+              (unsigned) count * sizeof (struct linfo));
 
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &g.inv_pos, sizeof g.inv_pos);
-        mread(nhfp->fd, (genericptr_t) &count, sizeof(count));
+        mread(nhfp->fd, (genericptr_t) &count, sizeof count);
     }
 
     last_ms = (mapseen *) 0;
@@ -841,6 +845,7 @@ init_dungeons()
     i = 0;
     while (lua_next(L, tidx) != 0) {
         char *dgn_name, *dgn_bonetag, *dgn_protoname, *dgn_fill;
+        char *dgn_themerms;
         int dgn_base, dgn_range, dgn_align, dgn_entry, dgn_chance, dgn_flags;
 
         if (!lua_istable(L, -1))
@@ -857,6 +862,7 @@ init_dungeons()
         dgn_chance = get_table_int_opt(L, "chance", 100);
         dgn_flags = get_dgn_flags(L);
         dgn_fill = get_table_str_opt(L, "lvlfill", emptystr);
+        dgn_themerms = get_table_str_opt(L, "themerooms", emptystr);
 
         debugpline4("DUNGEON[%i]: %s, base=(%i,%i)",
                     i, dgn_name, dgn_base, dgn_range);
@@ -869,6 +875,7 @@ init_dungeons()
             free((genericptr_t) dgn_bonetag);
             free((genericptr_t) dgn_protoname);
             free((genericptr_t) dgn_fill);
+            free((genericptr_t) dgn_themerms);
             continue;
         }
 
@@ -1022,10 +1029,12 @@ init_dungeons()
         Strcpy(g.dungeons[i].fill_lvl, dgn_fill); /* FIXME: fill_lvl len */
         Strcpy(g.dungeons[i].dname, dgn_name); /* FIXME: dname length */
         Strcpy(g.dungeons[i].proto, dgn_protoname); /* FIXME: proto length */
+        Strcpy(g.dungeons[i].themerms, dgn_themerms); /* FIXME: length */
         g.dungeons[i].boneid = *dgn_bonetag ? *dgn_bonetag : 0;
         free((genericptr) dgn_fill);
         /* free((genericptr) dgn_protoname); -- stored in pd.tmpdungeon[] */
         free((genericptr) dgn_bonetag);
+        free((genericptr) dgn_themerms);
 
         if (dgn_range)
             g.dungeons[i].num_dunlevs = (xchar) rn1(dgn_range, dgn_base);
@@ -1440,6 +1449,7 @@ int x, y;
 #ifdef CLIPPING
     cliparound(u.ux, u.uy);
 #endif
+    u.uundetected = 0;
     /* ridden steed always shares hero's location */
     if (u.usteed)
         u.usteed->mx = u.ux, u.usteed->my = u.uy;
@@ -1958,7 +1968,7 @@ const char *nam;
                  && dlev.dnum == valley_level.dnum))
             && (/* either wizard mode or else seen and not forgotten */
                 wizard
-                || (g.level_info[idx].flags & (FORGOTTEN | VISITED))
+                || (g.level_info[idx].flags & (VISITED))
                        == VISITED)) {
             lev = depth(&dlev);
         }
@@ -1973,9 +1983,9 @@ const char *nam;
             idx &= 0x00FF;
             /* either wizard mode, or else _both_ sides of branch seen */
             if (wizard
-                || (((g.level_info[idx].flags & (FORGOTTEN | VISITED))
+                || (((g.level_info[idx].flags & (VISITED))
                      == VISITED)
-                    && ((g.level_info[idxtoo].flags & (FORGOTTEN | VISITED))
+                    && ((g.level_info[idxtoo].flags & (VISITED))
                         == VISITED))) {
                 if (ledger_to_dnum(idxtoo) == u.uz.dnum)
                     idx = idxtoo;
@@ -2391,35 +2401,6 @@ const char *s;
     return mptr;
 }
 
-
-void
-forget_mapseen(ledger_num)
-int ledger_num;
-{
-    mapseen *mptr;
-    struct cemetery *bp;
-
-    for (mptr = g.mapseenchn; mptr; mptr = mptr->next)
-        if (g.dungeons[mptr->lev.dnum].ledger_start + mptr->lev.dlevel
-            == ledger_num)
-            break;
-
-    /* if not found, then nothing to forget */
-    if (mptr) {
-        mptr->flags.forgot = 1;
-        mptr->br = (branch *) 0;
-
-        /* custom names are erased, not just forgotten until revisited */
-        if (mptr->custom) {
-            mptr->custom_lth = 0;
-            free((genericptr_t) mptr->custom);
-            mptr->custom = (char *) 0;
-        }
-        (void) memset((genericptr_t) mptr->msrooms, 0, sizeof mptr->msrooms);
-        for (bp = mptr->final_resting_place; bp; bp = bp->next)
-            bp->bonesknown = FALSE;
-    }
-}
 
 void
 rm_mapseen(ledger_num)

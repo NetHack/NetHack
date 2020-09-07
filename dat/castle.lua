@@ -1,4 +1,4 @@
--- NetHack 3.6	castle.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	castle.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -141,7 +141,7 @@ des.object(object[4],54,11)
 des.object(object[4],55,11)
 -- THE WAND OF WISHING in 1 of the 4 towers
 local px, py = place:rndcoord(1);
-des.object({ id = "chest", trapped = 0, x = px, y = py,
+des.object({ id = "chest", trapped = 0, locked = 1, x = px, y = py,
              contents = function()
                 des.object("wishing");
              end

@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1578855627 2020/01/12 19:00:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	u_init.c	$NHDT-Date: 1596498222 2020/08/03 23:43:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -603,7 +603,7 @@ u_init()
     uarm = uarmc = uarmh = uarms = uarmg = uarmf = 0;
     uwep = uball = uchain = uleft = uright = 0;
     uswapwep = uquiver = 0;
-    u.twoweap = 0;
+    u.twoweap = FALSE; /* bypass set_twoweap() */
     u.ublessed = 0;                     /* not worthy yet */
     u.ugangr   = 0;                     /* gods not angry */
     u.ugifts   = 0;                     /* no divine gifts bestowed */
@@ -1114,11 +1114,11 @@ register struct trobj *trop;
         if (obj->oclass == ARMOR_CLASS) {
             if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep))) {
                 setworn(obj, W_ARMS);
-                /* Prior to 3.6.2 this used to unset uswapwep if it was set, but
-                   wearing a shield doesn't prevent having an alternate
+                /* Prior to 3.6.2 this used to unset uswapwep if it was set,
+                   but wearing a shield doesn't prevent having an alternate
                    weapon ready to swap with the primary; just make sure we
                    aren't two-weaponing (academic; no one starts that way) */
-                u.twoweap = FALSE;
+                set_twoweap(FALSE); /* u.twoweap = FALSE */
             } else if (is_helmet(obj) && !uarmh)
                 setworn(obj, W_ARMH);
             else if (is_gloves(obj) && !uarmg)
@@ -1147,16 +1147,8 @@ register struct trobj *trop;
         if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
             initialspell(obj);
 
-#if !defined(PYRAMID_BUG) && !defined(MAC)
         if (--trop->trquan)
             continue; /* make a similar object */
-#else
-        if (trop->trquan) { /* check if zero first */
-            --trop->trquan;
-            if (trop->trquan)
-                continue; /* make a similar object */
-        }
-#endif
         trop++;
     }
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1575245071 2019/12/02 00:04:31 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.7	minion.c	$NHDT-Date: 1596498180 2020/08/03 23:43:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -38,6 +38,8 @@ boolean spotted; /* seen|sensed vs all */
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
+            continue;
+        if (mtmp->isgd && mtmp->mx == 0)
             continue;
         if (spotted && !canspotmon(mtmp))
             continue;
@@ -228,7 +230,8 @@ register struct monst *mtmp;
 {
     long cash, demand, offer;
 
-    if (uwep && uwep->oartifact == ART_EXCALIBUR) {
+    if (uwep && (uwep->oartifact == ART_EXCALIBUR
+                 || uwep->oartifact == ART_DEMONBANE)) {
         pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);

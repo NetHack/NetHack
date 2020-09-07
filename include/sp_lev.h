@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.h	$NHDT-Date: 1580434523 2020/01/31 01:35:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.7	sp_lev.h	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,6 +38,7 @@ enum lvlinit_types {
     LVLINIT_NONE = 0,
     LVLINIT_SOLIDFILL,
     LVLINIT_MAZEGRID,
+    LVLINIT_MAZE,
     LVLINIT_MINES,
     LVLINIT_ROGUE,
     LVLINIT_SWAMP
@@ -60,6 +61,11 @@ enum lvlinit_types {
 /* gradient filter types */
 #define SEL_GRADIENT_RADIAL 0
 #define SEL_GRADIENT_SQUARE 1
+
+/* light states for terrain replacements, specifically for SET_TYPLIT
+ * (not used for init_level) */
+#define SET_LIT_RANDOM -1
+#define SET_LIT_NOCHANGE -2
 
 #define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
@@ -110,6 +116,8 @@ typedef struct {
     boolean smoothed, joined;
     xchar lit, walled;
     boolean icedpools;
+    int corrwid, wallthick;
+    boolean rm_deadends;
 } lev_init;
 
 typedef struct {
@@ -165,12 +173,6 @@ typedef struct {
 } terrain;
 
 typedef struct {
-    xchar chance;
-    xchar x1, y1, x2, y2;
-    xchar fromter, toter, tolit;
-} replaceterrain;
-
-typedef struct {
     struct {
         xchar room;
         xchar wall;
@@ -186,12 +188,25 @@ typedef struct _room {
     xchar rtype, chance, rlit, filled, joined;
 } room;
 
-typedef struct {
-    schar zaligntyp;
-    schar keep_region;
-    schar halign, valign;
-    char xsize, ysize;
-    char **map;
-} mazepart;
+struct mapfragment {
+    int wid, hei;
+    char *data;
+};
+
+#define SET_TYPLIT(x, y, ttyp, llit) \
+    {                                                             \
+        if ((x) >= 1 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
+            if ((ttyp) < MAX_TYPE)                                \
+                levl[(x)][(y)].typ = (ttyp);                      \
+            if ((ttyp) == LAVAPOOL)                               \
+                levl[(x)][(y)].lit = 1;                           \
+            else if ((schar)(llit) != SET_LIT_NOCHANGE) {         \
+                if ((schar)(llit) == SET_LIT_RANDOM)              \
+                    levl[(x)][(y)].lit = rn2(2);                  \
+                else                                              \
+                    levl[(x)][(y)].lit = (llit);                  \
+            }                                                     \
+        }                                                         \
+    }
 
 #endif /* SP_LEV_H */

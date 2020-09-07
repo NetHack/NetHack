@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1578137629 2020/01/04 11:33:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.7	hacklib.c	$NHDT-Date: 1596498172 2020/08/03 23:42:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -73,6 +73,7 @@
         void            strbuf_nl_to_crlf (strbuf_t *)
         char *          nonconst        (const char *, char *)
         int             swapbits        (int, int, int)
+        void            shuffle_int_array (int *, int)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -1299,6 +1300,23 @@ int val, bita, bitb;
     int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
 
     return (val ^ ((tmp << bita) | (tmp << bitb)));
+}
+
+/* randomize the given list of numbers  0 <= i < count */
+void
+shuffle_int_array(indices, count)
+int *indices;
+int count;
+{
+    int i, iswap, temp;
+
+    for (i = count - 1; i > 0; i--) {
+        if ((iswap = rn2(i + 1)) == i)
+            continue;
+        temp = indices[i];
+        indices[i] = indices[iswap];
+        indices[iswap] = temp;
+    }
 }
 
 /*hacklib.c*/

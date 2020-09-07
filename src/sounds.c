@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1582061574 2020/02/18 21:32:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	sounds.c	$NHDT-Date: 1596498211 2020/08/03 23:43:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1090,18 +1090,48 @@ dochat()
 
     mtmp = m_at(tx, ty);
 
-    if ((!mtmp || mtmp->mundetected)
-        && (otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
-        /* Talking to a statue */
-        if (!Blind) {
-            pline_The("%s seems not to notice you.",
-                      /* if hallucinating, you can't tell it's a statue */
-                      Hallucination ? rndmonnam((char *) 0) : "statue");
+    if (!mtmp || mtmp->mundetected) {
+        if ((otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
+            /* Talking to a statue */
+            if (!Blind)
+                pline_The("%s seems not to notice you.",
+                          /* if hallucinating, you can't tell it's a statue */
+                          Hallucination ? rndmonnam((char *) 0) : "statue");
+            return 0;
         }
-        return 0;
+        if (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR) {
+            /* Talking to a wall; secret door remains hidden by behaving
+               like a wall; IS_WALL() test excludes solid rock even when
+               that serves as a wall bordering a corridor */
+            if (Blind && !IS_WALL(g.lastseentyp[tx][ty])) {
+                /* when blind, you can only talk to a wall if it has
+                   already been mapped as a wall */
+                ;
+            } else if (!Hallucination) {
+                pline("It's like talking to a wall.");
+            } else {
+                static const char *const walltalk[] = {
+                    "gripes about its job.",
+                    "tells you a funny joke!",
+                    "insults your heritage!",
+                    "chuckles.",
+                    "guffaws merrily!",
+                    "deprecates your exploration efforts.",
+                    "suggests a stint of rehab...",
+                    "doesn't seem to be interested.",
+                };
+                int idx = rn2(10);
+
+                if (idx >= SIZE(walltalk))
+                    idx = SIZE(walltalk) - 1;
+                pline_The("wall %s", walltalk[idx]);
+            }
+            return 0;
+        }
     }
 
-    if (!mtmp || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE
+    if (!mtmp || mtmp->mundetected
+        || M_AP_TYPE(mtmp) == M_AP_FURNITURE
         || M_AP_TYPE(mtmp) == M_AP_OBJECT)
         return 0;
 
@@ -1258,18 +1288,25 @@ tiphat()
 
 #ifdef USER_SOUNDS
 
+#if defined(WIN32) || defined(QT_GRAPHICS)
 extern void FDECL(play_usersound, (const char *, int));
+#endif
+#if defined(TTY_SOUND_ESCCODES)
+extern void FDECL(play_usersound_via_idx, (int, int));
+#endif
 
 typedef struct audio_mapping_rec {
     struct nhregex *regex;
     char *filename;
     int volume;
+    int idx;
     struct audio_mapping_rec *next;
 } audio_mapping;
 
 static audio_mapping *soundmap = 0;
+static audio_mapping *FDECL(sound_matches_message, (const char *));
 
-char *sounddir = ".";
+char *sounddir = 0; /* set in files.c */
 
 /* adds a sound file mapping, returns 0 on failure, 1 on success */
 int
@@ -1279,30 +1316,37 @@ const char *mapping;
     char text[256];
     char filename[256];
     char filespec[256];
-    int volume;
+    int volume, idx = -1;
 
-    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
+    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d", text,
+               filename, &volume, &idx) == 4
+        || sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
                filename, &volume) == 3) {
         audio_mapping *new_map;
 
-        if (strlen(sounddir) + strlen(filename) > 254) {
+        if (!sounddir)
+            sounddir = dupstr(".");
+        if (strlen(sounddir) + 1 + strlen(filename) >= sizeof filespec) {
             raw_print("sound file name too long");
             return 0;
-        }
+	}
         Sprintf(filespec, "%s/%s", sounddir, filename);
 
-        if (can_read_file(filespec)) {
-            new_map = (audio_mapping *) alloc(sizeof(audio_mapping));
+        if (idx >= 0 || can_read_file(filespec)) {
+            new_map = (audio_mapping *) alloc(sizeof *new_map);
             new_map->regex = regex_init();
             new_map->filename = dupstr(filespec);
             new_map->volume = volume;
+            new_map->idx = idx;
             new_map->next = soundmap;
 
             if (!regex_compile(text, new_map->regex)) {
-                raw_print(regex_error_desc(new_map->regex));
+                const char *re_error_desc = regex_error_desc(new_map->regex);
+
                 regex_free(new_map->regex);
-                free(new_map->filename);
-                free(new_map);
+                free((genericptr_t) new_map->filename);
+                free((genericptr_t) new_map);
+                raw_print(re_error_desc);
                 return 0;
             } else {
                 soundmap = new_map;
@@ -1320,18 +1364,73 @@ const char *mapping;
     return 1;
 }
 
+static audio_mapping *
+sound_matches_message(msg)
+const char *msg;
+{
+    audio_mapping *snd = soundmap;
+
+    while (snd) {
+        if (regex_match(msg, snd->regex))
+            return snd;
+        snd = snd->next;
+    }
+    return (audio_mapping *) 0;
+}
+
 void
 play_sound_for_message(msg)
 const char *msg;
 {
-    audio_mapping *cursor = soundmap;
+    audio_mapping *snd = sound_matches_message(msg);
 
-    while (cursor) {
-        if (regex_match(msg, cursor->regex)) {
-            play_usersound(cursor->filename, cursor->volume);
-        }
-        cursor = cursor->next;
+    if (snd)
+        play_usersound(snd->filename, snd->volume);
+}
+
+void
+maybe_play_sound(msg)
+const char *msg;
+{
+#if defined(WIN32) || defined(QT_GRAPHICS) || defined(TTY_SOUND_ESCCODES)
+    audio_mapping *snd = sound_matches_message(msg);
+
+    if (snd
+#if defined(WIN32) || defined(QT_GRAPHICS)
+#ifdef TTY_SOUND_ESCCODES
+        && !iflags.vt_sounddata
+#endif
+#if defined(QT_GRAPHICS)
+        && WINDOWPORT("Qt")
+#endif
+#if defined(WIN32)
+        && (WINDOWPORT("tty") || WINDOWPORT("mswin") || WINDOWPORT("curses"))
+#endif
+#endif /* WIN32 || QT_GRAPHICS */
+        )
+        play_usersound(snd->filename, snd->volume);
+#if defined(TTY_GRAPHICS) && defined(TTY_SOUND_ESCCODES)
+    else if (snd && iflags.vt_sounddata && snd->idx >= 0 && WINDOWPORT("tty"))
+        play_usersound_via_idx(snd->idx, snd->volume);
+#endif  /* TTY_GRAPHICS && TTY_SOUND_ESCCODES */
+#endif  /* WIN32 || QT_GRAPHICS || TTY_SOUND_ESCCODES */
+}
+
+void
+release_sound_mappings()
+{
+    audio_mapping *nextsound = 0;
+
+    while (soundmap) {
+        nextsound = soundmap->next;
+        regex_free(soundmap->regex);
+        free((genericptr_t) soundmap->filename);
+        free((genericptr_t) soundmap);
+        soundmap = nextsound;
     }
+
+    if (sounddir)
+        free((genericptr_t) sounddir), sounddir = 0;
 }
 
 #endif /* USER_SOUNDS */

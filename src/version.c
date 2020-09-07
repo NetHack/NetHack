@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1575161965 2019/12/01 00:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.7	version.c	$NHDT-Date: 1596498224 2020/08/03 23:43:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,16 +6,6 @@
 #include "hack.h"
 #include "dlb.h"
 #include "date.h"
-
-/*
- * All the references to the contents of patchlevel.h have been moved
- * into makedefs....
- */
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
 
 #if defined(CROSSCOMPILE)
 struct cross_target_s cross_target = {

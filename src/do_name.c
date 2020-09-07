@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1582364431 2020/02/22 09:40:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1596498162 2020/08/03 23:42:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,18 +6,22 @@
 #include "hack.h"
 
 static char *NDECL(nextmbuf);
+static void FDECL(getpos_help_keyxhelp, (winid, const char *, const char *, int));
 static void FDECL(getpos_help, (BOOLEAN_P, const char *));
 static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
+static int FDECL(gloc_filter_classify_glyph, (int));
+static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
+static void FDECL(gloc_filter_floodfill, (int, int));
+static void NDECL(gloc_filter_init);
+static void NDECL(gloc_filter_done);
 static boolean FDECL(gather_locs_interesting, (int, int, int));
 static void FDECL(gather_locs, (coord **, int *, int));
-static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
 static void FDECL(auto_describe, (int, int));
 static void NDECL(do_mname);
 static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 static void FDECL(do_oname, (struct obj *));
 static char *FDECL(docall_xname, (struct obj *));
 static void NDECL(namefloorobj);
-static char *FDECL(bogusmon, (char *,char *));
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -53,9 +57,10 @@ boolean FDECL((*gp_getvalidf), (int, int));
 static const char *const gloc_descr[NUM_GLOCS][4] = {
     { "any monsters", "monster", "next/previous monster", "monsters" },
     { "any items", "item", "next/previous object", "objects" },
-    { "any doors", "door", "next/previous door or doorway", "doors or doorways" },
+    { "any doors", "door", "next/previous door or doorway",
+      "doors or doorways" },
     { "any unexplored areas", "unexplored area", "unexplored location",
-      "unexplored locations" },
+      "locations next to unexplored locations" },
     { "anything interesting", "interesting thing", "anything interesting",
       "anything interesting" },
     { "any valid locations", "valid location", "valid location",
@@ -68,21 +73,31 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
     " in this area"
 };
 
-void
+static void
 getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
 winid tmpwin;
 const char *k1;
 const char *k2;
 int gloc;
 {
-    char sbuf[BUFSZ];
+    char sbuf[BUFSZ], fbuf[QBUFSZ];
+    const char *move_cursor_to = "move the cursor to ",
+               *filtertxt = gloc_filtertxt[iflags.getloc_filter];
 
+    if (gloc == GLOC_EXPLORE) {
+        /* default of "move to unexplored location" is inaccurate
+           because the position will be one spot short of that */
+        move_cursor_to = "move the cursor next to an ";
+        if (iflags.getloc_usemenu)
+            /* default is too wide for basic 80-column tty so shorten it
+               to avoid wrapping */
+            filtertxt = strsubst(strcpy(fbuf, filtertxt),
+                                 "this area", "area");
+    }
     Sprintf(sbuf, "Use '%s'/'%s' to %s%s%s.",
             k1, k2,
-            iflags.getloc_usemenu ? "get a menu of "
-                                  : "move the cursor to ",
-            gloc_descr[gloc][2 + iflags.getloc_usemenu],
-            gloc_filtertxt[iflags.getloc_filter]);
+            iflags.getloc_usemenu ? "get a menu of " : move_cursor_to,
+            gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
     putstr(tmpwin, 0, sbuf);
 }
 
@@ -134,8 +149,8 @@ const char *goal;
                              visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
                              GLOC_EXPLORE);
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
+                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
+                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
@@ -240,15 +255,14 @@ const void *b;
 
 #define IS_UNEXPLORED_LOC(x,y) \
     (isok((x), (y))                                     \
-     && glyph_is_cmap(levl[(x)][(y)].glyph)             \
-     && levl[(x)][(y)].glyph == GLYPH_UNEXPLORED        \
+     && glyph_is_unexplored(levl[(x)][(y)].glyph)   \
      && !levl[(x)][(y)].seenv)
 
 #define GLOC_SAME_AREA(x,y)                                     \
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
-int
+static int
 gloc_filter_classify_glyph(glyph)
 int glyph;
 {
@@ -291,7 +305,7 @@ int x, y;
     return FALSE;
 }
 
-void
+static void
 gloc_filter_floodfill(x, y)
 int x, y;
 {
@@ -301,7 +315,7 @@ int x, y;
     selection_floodfill(g.gloc_filter_map, x, y, FALSE);
 }
 
-void
+static void
 gloc_filter_init()
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
@@ -322,7 +336,7 @@ gloc_filter_init()
     }
 }
 
-void
+static void
 gloc_filter_done()
 {
     if (g.gloc_filter_map) {
@@ -336,10 +350,7 @@ static boolean
 gather_locs_interesting(x, y, gloc)
 int x, y, gloc;
 {
-    /* TODO: if glyph is a pile glyph, convert to ordinary one
-     *       in order to keep tail/boulder/rock check simple.
-     */
-    int glyph = glyph_at(x, y);
+    int glyph, sym;
 
     if (iflags.getloc_filter == GFILTER_VIEW && !cansee(x, y))
         return FALSE;
@@ -348,6 +359,8 @@ int x, y, gloc;
         && !GLOC_SAME_AREA(x + 1, y) && !GLOC_SAME_AREA(x, y + 1))
         return FALSE;
 
+    glyph = glyph_at(x, y);
+    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
     switch (gloc) {
     default:
     case GLOC_MONS:
@@ -361,43 +374,41 @@ int x, y, gloc;
                 && glyph != objnum_to_glyph(ROCK));
     case GLOC_DOOR:
         return (glyph_is_cmap(glyph)
-                && (is_cmap_door(glyph_to_cmap(glyph))
-                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
-                    || glyph_to_cmap(glyph) == S_ndoor));
+                && (is_cmap_door(sym)
+                    || is_cmap_drawbridge(sym)
+                    || sym == S_ndoor));
     case GLOC_EXPLORE:
         return (glyph_is_cmap(glyph)
-                && (is_cmap_door(glyph_to_cmap(glyph))
-                    || is_cmap_drawbridge(glyph_to_cmap(glyph))
-                    || glyph_to_cmap(glyph) == S_ndoor
-                    || glyph_to_cmap(glyph) == S_room
-                    || glyph_to_cmap(glyph) == S_darkroom
-                    || glyph_to_cmap(glyph) == S_corr
-                    || glyph_to_cmap(glyph) == S_litcorr)
+                && !glyph_is_nothing(glyph_to_cmap(glyph))
+                && (is_cmap_door(sym)
+                    || is_cmap_drawbridge(sym)
+                    || sym == S_ndoor
+                    || is_cmap_room(sym)
+                    || is_cmap_corr(sym))
                 && (IS_UNEXPLORED_LOC(x + 1, y)
                     || IS_UNEXPLORED_LOC(x - 1, y)
                     || IS_UNEXPLORED_LOC(x, y + 1)
                     || IS_UNEXPLORED_LOC(x, y - 1)));
     case GLOC_VALID:
         if (getpos_getvalid)
-            return (*getpos_getvalid)(x,y);
+            return (*getpos_getvalid)(x, y);
         /*FALLTHRU*/
     case GLOC_INTERESTING:
-        return gather_locs_interesting(x,y, GLOC_DOOR)
-            || !(glyph_is_cmap(glyph)
-                 && (is_cmap_wall(glyph_to_cmap(glyph))
-                     || glyph_to_cmap(glyph) == S_tree
-                     || glyph_to_cmap(glyph) == S_bars
-                     || glyph_to_cmap(glyph) == S_ice
-                     || glyph_to_cmap(glyph) == S_air
-                     || glyph_to_cmap(glyph) == S_cloud
-                     || glyph_to_cmap(glyph) == S_lava
-                     || glyph_to_cmap(glyph) == S_water
-                     || glyph_to_cmap(glyph) == S_pool
-                     || glyph_to_cmap(glyph) == S_ndoor
-                     || glyph_to_cmap(glyph) == S_room
-                     || glyph_to_cmap(glyph) == S_darkroom
-                     || glyph_to_cmap(glyph) == S_corr
-                     || glyph_to_cmap(glyph) == S_litcorr));
+        return (gather_locs_interesting(x, y, GLOC_DOOR)
+                || !((glyph_is_cmap(glyph)
+                      && (is_cmap_wall(sym)
+                          || sym == S_tree
+                          || sym == S_bars
+                          || sym == S_ice
+                          || sym == S_air
+                          || sym == S_cloud
+                          || is_cmap_lava(sym)
+                          || is_cmap_water(sym)
+                          || sym == S_ndoor
+                          || is_cmap_room(sym)
+                          || is_cmap_corr(sym)))
+                     || glyph_is_nothing(glyph)
+                     || glyph_is_unexplored(glyph)));
     }
     /*NOTREACHED*/
     return FALSE;
@@ -575,7 +586,7 @@ int gloc;
     if (gcount < 2) { /* gcount always includes the hero */
         free((genericptr_t) garr);
         You("cannot %s %s.",
-            iflags.getloc_filter == GFILTER_VIEW ? "see" : "detect",
+            (iflags.getloc_filter == GFILTER_VIEW) ? "see" : "detect",
             gloc_descr[gloc][0]);
         return FALSE;
     }
@@ -2047,7 +2058,7 @@ boolean ckloc;
 }
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
-static char *
+char *
 bogusmon(buf, code)
 char *buf, *code;
 {

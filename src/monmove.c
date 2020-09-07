@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1580633722 2020/02/02 08:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1596498186 2020/08/03 23:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -135,10 +135,13 @@ int x, y;
 struct monst *mtmp;
 {
     /* creatures who are directly resistant to magical scaring:
+     * humans aren't monsters
+     * uniques have ascended their base monster instincts
      * Rodney, lawful minions, Angels, the Riders, shopkeepers
      * inside their own shop, priests inside their own temple */
     if (mtmp->iswiz || is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL]
         || is_rider(mtmp->data)
+        || mtmp->data->mlet == S_HUMAN || unique_corpstat(mtmp->data)
         || (mtmp->isshk && inhishop(mtmp))
         || (mtmp->ispriest && inhistemple(mtmp)))
         return FALSE;
@@ -500,8 +503,12 @@ register struct monst *mtmp;
 
     /* Monsters that want to acquire things */
     /* may teleport, so do it before inrange is set */
-    if (is_covetous(mdat))
+    if (is_covetous(mdat)) {
         (void) tactics(mtmp);
+        /* tactics -> mnexto -> deal_with_overcrowding */
+        if (mtmp->mstate)
+            return 0;
+    }
 
     /* check distance and scariness of attacks */
     distfleeck(mtmp, &inrange, &nearby, &scared);
@@ -555,13 +562,27 @@ register struct monst *mtmp;
             && (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
             pline("It feels quite soothing.");
         } else if (!u.uinvulnerable) {
-            register boolean m_sen = sensemon(mtmp);
+            int dmg;
+            boolean m_sen = sensemon(mtmp);
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
-                int dmg;
+                /* hiding monsters are brought out of hiding when hit by
+                   a psychic blast, so do the same for hiding poly'd hero */
+                if (u.uundetected) {
+                    u.uundetected = 0;
+                    newsym(u.ux, u.uy);
+                } else if (U_AP_TYPE != M_AP_NOTHING
+                           /* hero has no way to hide as monster but
+                              check for that theoretical case anyway */
+                           && U_AP_TYPE != M_AP_MONSTER) {
+                    g.youmonst.m_ap_type = M_AP_NOTHING;
+                    g.youmonst.mappearance = 0;
+                    newsym(u.ux, u.uy);
+                }
                 pline("It locks on to your %s!",
-                      m_sen ? "telepathy" : Blind_telepat ? "latent telepathy"
-                                                          : "mind");
+                      m_sen ? "telepathy"
+                      : Blind_telepat ? "latent telepathy"
+                        : "mind"); /* note: hero is never mindless */
                 dmg = rnd(15);
                 if (Half_spell_damage)
                     dmg = (dmg + 1) / 2;
@@ -580,13 +601,13 @@ register struct monst *mtmp;
                 continue;
             if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
                 || !rn2(10)) {
+                /* wake it up first, to bring hidden monster out of hiding */
+                wakeup(m2, FALSE);
                 if (cansee(m2->mx, m2->my))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
                 if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
-                else
-                    m2->msleeping = 0;
             }
         }
     }
@@ -619,6 +640,9 @@ register struct monst *mtmp;
 
     /*  Now the actual movement phase
      */
+
+    if (mtmp->data == &mons[PM_HEZROU]) /* stench */
+        create_gas_cloud(mtmp->mx, mtmp->my, 1, 8);
 
     if (mdat == &mons[PM_KILLER_BEE]
         /* could be smarter and deliberately move to royal jelly, but
@@ -832,7 +856,7 @@ m_move(mtmp, after)
 register struct monst *mtmp;
 register int after;
 {
-    register int appr;
+    int appr, etmp;
     xchar gx, gy, nix, niy, chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
@@ -871,16 +895,15 @@ register int after;
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))
         return 0; /* do not leave hiding place */
 
-    set_apparxy(mtmp);
-    /* where does mtmp think you are? */
-    /* Not necessary if m_move called from this file, but necessary in
-     * other calls of m_move (ex. leprechauns dodging)
-     */
+    /* Where does 'mtmp' think you are?  Not necessary if m_move() called
+       from this file, but needed for other calls of m_move(). */
+    set_apparxy(mtmp); /* set mtmp->mux, mtmp->muy */
+
     if (!Is_rogue_level(&u.uz))
         can_tunnel = tunnels(ptr);
     can_open = !(nohands(ptr) || verysmall(ptr));
-    can_unlock =
-        ((can_open && monhaskey(mtmp, TRUE)) || mtmp->iswiz || is_rider(ptr));
+    can_unlock = ((can_open && monhaskey(mtmp, TRUE))
+                  || mtmp->iswiz || is_rider(ptr));
     doorbuster = is_giant(ptr);
     if (mtmp->wormno)
         goto not_special;
@@ -990,6 +1013,12 @@ register int after;
                     > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
             appr = -1;
 
+        /* hostile monsters with ranged thrown weapons try to stay away */
+        if (!mtmp->mpeaceful
+            && (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) < 5*5)
+            && m_canseeu(mtmp) && m_has_launcher_and_ammo(mtmp))
+            appr = -1;
+
         if (!should_see && can_track(ptr)) {
             register coord *cp;
 
@@ -1003,8 +1032,8 @@ register int after;
 
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
-               && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
-                   <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
+             && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
+                 <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
 
         if (appr != 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the
@@ -1466,7 +1495,7 @@ register int after;
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                /* As of 3.6.2: was using may_dig() but it doesn't handle bars */
+                /* 3.6.2: was using may_dig() but it doesn't handle bars */
                 if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
                     && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
                     if (canseemon(mtmp))
@@ -1481,7 +1510,8 @@ register int after;
             }
 
             /* possibly dig */
-            if (can_tunnel && mdig_tunnel(mtmp))
+            if (can_tunnel && may_dig(mtmp->mx, mtmp->my)
+                && mdig_tunnel(mtmp))
                 return 2; /* mon died (position already updated) */
 
             /* set also in domove(), hack.c */
@@ -1524,8 +1554,14 @@ register int after;
 
             /* Maybe a cube ate just about anything */
             if (ptr == &mons[PM_GELATINOUS_CUBE]) {
-                if (meatobj(mtmp) == 2)
-                    return 2; /* it died */
+                if ((etmp = meatobj(mtmp)) >= 2)
+                    return etmp; /* it died or got forced off the level */
+            }
+            /* Maybe a purple worm ate a corpse */
+            if (ptr == &mons[PM_PURPLE_WORM]
+                || ptr == &mons[PM_BABY_PURPLE_WORM]) {
+                if ((etmp = meatcorpse(mtmp)) >= 2)
+                    return etmp; /* it died or got forced off the level */
             }
 
             if (!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE) || !rn2(25)) {
@@ -1603,8 +1639,8 @@ void
 set_apparxy(mtmp)
 register struct monst *mtmp;
 {
-    boolean notseen, gotu;
-    register int disp, mx = mtmp->mux, my = mtmp->muy;
+    boolean notseen, notthere, gotu;
+    int disp, mx = mtmp->mux, my = mtmp->muy;
     long umoney = money_cnt(g.invent);
 
     /*
@@ -1621,24 +1657,25 @@ register struct monst *mtmp;
         goto found_you;
 
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
+    notthere = (Displaced && mtmp->data != &mons[PM_DISPLACER_BEAST]);
     /* add cases as required.  eg. Displacement ... */
-    if (notseen || Underwater) {
+    if (Underwater) {
+        disp = 1;
+    } else if (notseen) {
         /* Xorns can smell quantities of valuable metal
-            like that in solid gold coins, treat as seen */
-        if ((mtmp->data == &mons[PM_XORN]) && umoney && !Underwater)
-            disp = 0;
-        else
-            disp = 1;
-    } else if (Displaced) {
+           like that in solid gold coins, treat as seen */
+        disp = (mtmp->data == &mons[PM_XORN] && umoney) ? 0 : 1;
+    } else if (notthere) {
         disp = couldsee(mx, my) ? 2 : 1;
-    } else
+    } else {
         disp = 0;
+    }
     if (!disp)
         goto found_you;
 
     /* without something like the following, invisibility and displacement
        are too powerful */
-    gotu = notseen ? !rn2(3) : Displaced ? !rn2(4) : FALSE;
+    gotu = notseen ? !rn2(3) : notthere ? !rn2(4) : FALSE;
 
     if (!gotu) {
         register int try_cnt = 0;

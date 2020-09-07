@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1578947634 2020/01/13 20:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.7	role.c	$NHDT-Date: 1596498206 2020/08/03 23:43:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -749,7 +749,7 @@ randrole_filtered()
 
     /* this doesn't rule out impossible combinations but attempts to
        honor all the filter masks */
-    for (i = 0; i < SIZE(roles); ++i)
+    for (i = 0; i < SIZE(roles) - 1; ++i) /* -1: avoid terminating element */
         if (ok_role(i, ROLE_NONE, ROLE_NONE, ROLE_NONE)
             && ok_race(i, ROLE_RANDOM, ROLE_NONE, ROLE_NONE)
             && ok_gend(i, ROLE_NONE, ROLE_RANDOM, ROLE_NONE)
@@ -1657,14 +1657,19 @@ plnamesuffix()
                 && (sptr[i] == ' ' || sptr[i] == '\0'))
                 *g.plname = '\0'; /* call askname() */
         }
+        if (!*g.plname)
+            g.plnamelen = 0;
     }
 
     do {
-        if (!*g.plname)
+        if (!*g.plname) {
             askname(); /* fill g.plname[] if necessary, or set defer_plname */
+            g.plnamelen = 0; /* plname[] might have -role-race-&c attached */
+        }
 
         /* Look for tokens delimited by '-' */
-        if ((eptr = index(g.plname, '-')) != (char *) 0)
+        sptr = g.plname + g.plnamelen;
+        if ((eptr = index(sptr, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
             /* Isolate the next token */
@@ -1685,10 +1690,7 @@ plnamesuffix()
     } while (!*g.plname && !iflags.defer_plname);
 
     /* commas in the g.plname confuse the record file, convert to spaces */
-    for (sptr = g.plname; *sptr; sptr++) {
-        if (*sptr == ',')
-            *sptr = ' ';
-    }
+    (void) strNsubst(g.plname, ",", " ", 0);
 }
 
 /* show current settings for name, role, race, gender, and alignment
@@ -1739,7 +1741,8 @@ winid where;
        to narrow something done to a single choice] */
 
     Sprintf(buf, "%12s ", "name:");
-    Strcat(buf, (which == RS_NAME) ? choosing : !*g.plname ? not_yet : g.plname);
+    Strcat(buf, (which == RS_NAME) ? choosing
+                : !*g.plname ? not_yet : g.plname);
     putstr(where, 0, buf);
     Sprintf(buf, "%12s ", "role:");
     Strcat(buf, (which == RS_ROLE) ? choosing : (r == ROLE_NONE)
@@ -1939,7 +1942,7 @@ boolean preselect;
  *      1 - The Rogue Leader is the Tourist Nemesis.
  *      2 - Priests start with a random alignment - convert the leader and
  *          guardians here.
- *      3 - Priests also get their of deities from a randomly chosen role.
+ *      3 - Priests also get their set of deities from a randomly chosen role.
  *      4 - [obsolete] Elves can have one of two different leaders,
  *          but can't work it out here because it requires hacking the
  *          level file data (see sp_lev.c).

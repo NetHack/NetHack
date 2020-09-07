@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1559994621 2019/06/08 11:50:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1597700875 2020/08/17 21:47:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,6 +12,18 @@
 #ifndef MONDATA_H
 #include "mondata.h" /* for mindless() */
 #endif
+
+/* types of explosions */
+enum explosion_types {
+    EXPL_DARK    = 0,
+    EXPL_NOXIOUS = 1,
+    EXPL_MUDDY   = 2,
+    EXPL_WET     = 3,
+    EXPL_MAGICAL = 4,
+    EXPL_FIERY   = 5,
+    EXPL_FROSTY  = 6,
+    EXPL_MAX     = 7
+};
 
 /*
  * vobj_at()
@@ -122,14 +134,14 @@
              && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
- * is_safepet(mon)
+ * is_safemon(mon)
  *
  * A special case check used in attack() and domove().  Placing the
- * definition here is convenient.
+ * definition here is convenient.  No longer limited to pets.
  */
-#define is_safepet(mon)                                                   \
-    (mon && mon->mtame && canspotmon(mon) && flags.safe_dog && !Confusion \
-     && !Hallucination && !Stunned)
+#define is_safemon(mon) \
+    (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
+     && !Confusion && !Hallucination && !Stunned)
 
 /*
  * canseeself()
@@ -260,7 +272,7 @@
  * explosions   A set of nine for each of the following seven explosion types:
  *                   dark, noxious, muddy, wet, magical, fiery, frosty.
  *              The nine positions represent those surrounding the hero.
- *              Count: MAXEXPCHARS * EXPL_MAX (EXPL_MAX is defined in hack.h)
+ *              Count: MAXEXPCHARS * EXPL_MAX
  *
  * zap beam     A set of four (there are four directions) for each beam type.
  *              The beam type is shifted over 2 positions and the direction
@@ -316,18 +328,18 @@
 
 /* This has the unfortunate side effect of needing a global variable    */
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
-#define random_obj_to_glyph(rng)                \
-    ((g.otg_temp = random_object(rng)) == CORPSE  \
-         ? random_monster(rng) + GLYPH_BODY_OFF \
+#define random_obj_to_glyph(rng) \
+    ((g.otg_temp = random_object(rng)) == CORPSE                \
+         ? random_monster(rng) + GLYPH_BODY_OFF                 \
          : g.otg_temp + GLYPH_OBJ_OFF)
 
-#define obj_to_glyph(obj, rng)                                          \
-    (((obj)->otyp == STATUE)                                            \
-         ? statue_to_glyph(obj, rng)                                    \
-         : Hallucination                                                \
-               ? random_obj_to_glyph(rng)                               \
-               : ((obj)->otyp == CORPSE)                                \
-                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF           \
+#define obj_to_glyph(obj, rng) \
+    (((obj)->otyp == STATUE)                                    \
+         ? statue_to_glyph(obj, rng)                            \
+         : Hallucination                                        \
+               ? random_obj_to_glyph(rng)                       \
+               : ((obj)->otyp == CORPSE)                        \
+                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF   \
                      : (int) (obj)->otyp + GLYPH_OBJ_OFF)
 
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
@@ -336,6 +348,16 @@
 #define statue_to_glyph(obj, rng)                              \
     (Hallucination ? random_monster(rng) + GLYPH_MON_OFF       \
                    : (int) (obj)->corpsenm + GLYPH_STATUE_OFF)
+
+/* briefly used for Qt's "paper doll" inventory which shows map tiles for
+   equipped objects; those vary like floor items during hallucination now
+   so this isn't used anywhere */
+#define obj_to_true_glyph(obj) \
+    (((obj)->otyp == STATUE)                            \
+     ? ((int) (obj)->corpsenm + GLYPH_STATUE_OFF)       \
+       : ((obj)->otyp == CORPSE)                        \
+         ? ((int) (obj)->corpsenm + GLYPH_BODY_OFF)     \
+           : ((int) (obj)->otyp + GLYPH_OBJ_OFF))
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx) + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype, idx) \

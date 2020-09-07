@@ -5,7 +5,7 @@
                        NetHack 3.7 on a Windows system
                        (Windows 7/8.x/10 or later only)
          ==============================================================
-          Last revision: $NHDT-Date: 1575245156 2019/12/02 00:05:56 $
+          Last revision: $NHDT-Date: 1594155895 2020/07/07 21:04:55 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -47,7 +47,7 @@ version.  You can use one of the following build environments:
                                     |          |                 |
                                  +----+    +------+        +-----------+
                                  |    |    |      |        |           |
-                             share  winnt tty   win32  Lua-5.3.5    pdcurses
+                             share  winnt tty   win32  Lua-5.4.0    pdcurses
                                                   |
                                                vs2017
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkroom.h	$NHDT-Date: 1560851014 2019/06/18 09:43:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	mkroom.h	$NHDT-Date: 1596498547 2020/08/03 23:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,7 @@ struct mkroom {
     schar fdoor;          /* index for the first door of the room */
     schar nsubrooms;      /* number of subrooms */
     boolean irregular;    /* true if room is non-rectangular */
+    schar roomnoidx;
     struct mkroom *sbrooms[MAX_SUBROOMS]; /* Subrooms pointers */
     struct monst *resident; /* priest/shopkeeper/guard for this room */
 };
@@ -48,6 +49,7 @@ struct shclass {
 /* values for rtype in the room definition structure */
 enum roomtype_types {
     OROOM      =  0, /* ordinary room */
+    THEMEROOM  =  1, /* like OROOM, but never converted to special room */
     COURT      =  2, /* contains a throne */
     SWAMP      =  3, /* contains pools */
     VAULT      =  4, /* detached room usually reached via teleport trap */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1578252632 2020/01/05 19:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	music.c	$NHDT-Date: 1596498191 2020/08/03 23:43:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,6 +34,7 @@ static void FDECL(charm_snakes, (int));
 static void FDECL(calm_nymphs, (int));
 static void FDECL(charm_monsters, (int));
 static void FDECL(do_earthquake, (int));
+static const char *NDECL(generic_lvl_desc);
 static int FDECL(do_improvisation, (struct obj *));
 
 /*
@@ -463,7 +464,7 @@ int force;
         }
 }
 
-const char *
+static const char *
 generic_lvl_desc()
 {
     if (Is_astralevel(&u.uz))

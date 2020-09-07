@@ -1,4 +1,4 @@
--- NetHack 3.6	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -34,16 +34,16 @@ des.map([[
 
 -- Make the path somewhat unpredictable
 -- If you get "lucky", you may have to go through all three graveyards.
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(selection.line(50,8, 53,8), '-')
    des.terrain(selection.line(40,8, 43,8), 'B')
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain({ x=27, y=12, typ='|' })
    des.terrain(selection.line(27,3, 29,3), 'B')
    des.terrain({ x=28, y=2, typ='-' })
 end
-if math.random(0, 99) < 50 then
+if percent(50) then
    des.terrain(selection.line(16,10, 16,11), '|')
    des.terrain(selection.line(9,13, 14,13), 'B')
 end

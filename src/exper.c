@@ -1,4 +1,4 @@
-/* NetHack 3.6	exper.c	$NHDT-Date: 1562114352 2019/07/03 00:39:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.7	exper.c	$NHDT-Date: 1596498167 2020/08/03 23:42:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -299,9 +299,12 @@ boolean incr; /* true iff via incremental experience growth */
 
     /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
+        int newrank, oldrank = xlev_to_rank(u.ulevel);
+
         /* increase experience points to reflect new level */
         if (incr) {
             long tmp = newuexp(u.ulevel + 1);
+
             if (u.uexp >= tmp)
                 u.uexp = tmp - 1;
         } else {
@@ -314,6 +317,9 @@ boolean incr; /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
+        newrank = xlev_to_rank(u.ulevel);
+        if (newrank > oldrank)
+            record_achievement(achieve_rank(newrank));
     }
     g.context.botl = TRUE;
 }

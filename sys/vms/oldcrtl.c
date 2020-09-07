@@ -1,4 +1,4 @@
-/* NetHack 3.6	oldcrtl.c	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.7	oldcrtl.c	$NHDT-Date: 1596498304 2020/08/03 23:45:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
 /*	 Pat Rankin  May'90					  */
 /* VMS NetHack support, not needed for vms 4.6,4.7,5.x,or later   */
 

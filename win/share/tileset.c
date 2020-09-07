@@ -1,8 +1,10 @@
-/* NetHack 3.6    tileset.c    $NHDT-Date: 1501463811 2017/07/31 01:16:51 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7    tileset.c    $NHDT-Date: 1596498341 2020/08/03 23:45:41 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
 /* Copyright (c) Ray Chason, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include "hack.h"
+#include "config.h"
+#include "objclass.h"
+#include "flag.h"
 #include "tileset.h"
 
 static void FDECL(get_tile_map, (const char *));
@@ -102,7 +104,7 @@ error:
 }
 
 /* Free tile memory not required by the chosen display mode */
-boolean
+void
 set_tile_type(true_color)
 boolean true_color;
 {
