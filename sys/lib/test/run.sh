@@ -12,6 +12,7 @@ fi
 if [ x$1 == "xrunlib" ]; then
     LIBS="-Lsrc -lnethack -Llib/lua -llua -lm"
     BADLIBS="-lncurses"
+    rm nhlibtest
     gcc -o nhlibtest libtest.c $LIBS $BADLIBS
     ./nhlibtest
 fi
@@ -26,7 +27,7 @@ if [ x$1 == "xwasm" ]; then
 fi
 
 if [ x$1 == "xrunwasm" ]; then
-    node test.js
+    cd sys/lib/npm-package && node test/test.js
 fi
 
 if [ x$1 == "xbin" ]; then
