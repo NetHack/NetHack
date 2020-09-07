@@ -5,6 +5,7 @@
 /* not an actual windowing port, but a fake win port for libnethack */
 
 #include "hack.h"
+#include <string.h>
 
 #ifdef SHIM_GRAPHICS
 #include <stdarg.h>
@@ -15,26 +16,30 @@
 
 #undef SHIM_DEBUG
 
-#ifndef __EMSCRIPTEN__
-typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
-#else /* __EMSCRIPTEN__ */
-/* WASM can't handle a variadic callback, so we pass back an array of pointers instead... */
-typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, void *args[]);
-#endif /* !__EMSCRIPTEN__ */
+#ifdef SHIM_DEBUG
+#define debugf printf
+#else /* !SHIM_DEBUG */
+#define debugf(...)
+#endif /* SHIM_DEBUG */
 
-/* this is the primary interface to shim graphics,
+
+/* shim_graphics_callback is the primary interface to shim graphics,
  * call this function with your declared callback function
  * and you will receive all the windowing calls
  */
-static shim_callback_t shim_graphics_callback = NULL;
 #ifdef __EMSCRIPTEN__
-  EMSCRIPTEN_KEEPALIVE
-#endif
-void shim_graphics_set_callback(shim_callback_t cb) {
-    shim_graphics_callback = cb;
+/************
+ * WASM interface
+ ************/
+EMSCRIPTEN_KEEPALIVE
+static char *shim_callback_name = NULL;
+void shim_graphics_set_callback(char *cbName) {
+    if (shim_callback_name != NULL) free(shim_callback_name);
+    shim_callback_name = strdup(cbName);
+    /* TODO: free(shim_callback_name) during shutdown? */
 }
+void local_callback (const char *cb_name, const char *shim_name, void *ret_ptr, const char *fmt_str, void *args);
 
-#ifdef __EMSCRIPTEN__
 /* A2P = Argument to Pointer */
 #define A2P &
 /* P2V = Pointer to Void */
@@ -44,8 +49,8 @@ ret_type name fn_args { \
     void *args[] = { __VA_ARGS__ }; \
     ret_type ret = (ret_type) 0; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
-    if (!shim_graphics_callback) return ret; \
-    shim_graphics_callback(#name, (void *)&ret, fmt, args); \
+    if (!shim_callback_name) return ret; \
+    local_callback(shim_callback_name, #name, (void *)&ret, fmt, args); \
     return ret; \
 }
 
@@ -53,10 +58,21 @@ ret_type name fn_args { \
 void name fn_args { \
     void *args[] = { __VA_ARGS__ }; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
-    if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, NULL, fmt, args); \
+    if (!shim_callback_name) return; \
+    local_callback(shim_callback_name, #name, NULL, fmt, args); \
 }
+
 #else /* !__EMSCRIPTEN__ */
+
+/************
+ * libnethack.a interface
+ ************/
+typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
+static shim_callback_t shim_graphics_callback = NULL;
+void shim_graphics_set_callback(shim_callback_t cb) {
+    shim_graphics_callback = cb;
+}
+
 #define A2P
 #define P2V
 #define DECLCB(ret_type, name, fn_args, fmt, ...) \
@@ -64,7 +80,7 @@ ret_type name fn_args { \
     ret_type ret = (ret_type) 0; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return ret; \
-    shim_graphics_callback(#name, (void *)&ret, fmt, __VA_ARGS__); \
+    shim_graphics_callback(#name, (void *)&ret, fmt, ## __VA_ARGS__); \
     return ret; \
 }
 
@@ -72,16 +88,9 @@ ret_type name fn_args { \
 void name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
-    shim_graphics_callback(#name, NULL, fmt, __VA_ARGS__); \
+    shim_graphics_callback(#name, NULL, fmt, ## __VA_ARGS__); \
 }
 #endif /* __EMSCRIPTEN__ */
-
-#ifdef SHIM_DEBUG
-#define debugf printf
-#else /* !SHIM_DEBUG */
-#define debugf(...)
-#endif /* SHIM_DEBUG */
-
 
 enum win_types {
     WINSHIM_MESSAGE = 1,
@@ -221,5 +230,123 @@ struct window_procs shim_procs = {
 #endif
     genl_can_suspend_yes,
 };
+
+#ifdef __EMSCRIPTEN__
+/* convert the C callback to a JavaScript callback */
+EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *ret_ptr, const char *fmt_str, void *args), {
+    Asyncify.handleAsync(async () => {
+        // convert callback arguments to proper JavaScript varaidic arguments
+        let name = Module.UTF8ToString(shim_name);
+        let fmt = Module.UTF8ToString(fmt_str);
+        let cbName = Module.UTF8ToString(cb_name);
+        // console.log("local_callback:", cbName, fmt, name);
+
+        let argTypes = fmt.split("");
+        let retType = argTypes.shift();
+
+        // build array of JavaScript args from WASM parameters
+        let jsArgs = [];
+        for (let i = 0; i < argTypes.length; i++) {
+            let ptr = args + (4*i);
+            let val = typeLookup(argTypes[i], ptr);
+            jsArgs.push(val);
+        }
+
+        // do the callback
+        let userCallback = globalThis[cbName];
+        let retVal = await runJsLoop(() => userCallback(name, ... jsArgs));
+
+        // save the return value
+        setReturn(name, ret_ptr, retType, retVal);
+
+        // convert 'ptr' to the type indicated by 'type'
+        function typeLookup(type, ptr) {
+            switch(type) {
+            case "s": // string
+                return Module.UTF8ToString(Module.getValue(ptr, "*"));
+            case "p": // pointer
+                ptr = Module.getValue(ptr, "*");
+                if(!ptr) return 0; // null pointer
+                return Module.getValue(ptr, "*");
+            case "c": // char
+                return String.fromCharCode(Module.getValue(Module.getValue(ptr, "*"), "i8"));
+            case "0": /* 2^0 = 1 byte */
+                return Module.getValue(Module.getValue(ptr, "*"), "i8");
+            case "1": /* 2^1 = 2 bytes */
+                return Module.getValue(Module.getValue(ptr, "*"), "i16");
+            case "2": /* 2^2 = 4 bytes */
+            case "i": // integer
+            case "n": // number
+                return Module.getValue(Module.getValue(ptr, "*"), "i32");
+            case "f": // float
+                return Module.getValue(Module.getValue(ptr, "*"), "float");
+            case "d": // double
+                return Module.getValue(Module.getValue(ptr, "*"), "double");
+            default:
+                throw new TypeError ("unknown type:" + type);
+            }
+        }
+
+        // setTimeout() with value of '0' is similar to setImmediate() (which isn't standard)
+        // this lets the JS loop run for a tick so that other events can occur
+        // XXX: I also tried replacing the for(;;) in allmain.c:moveloop() with emscripten_set_main_loop()
+        // unfortunately that won't work -- if the simulate_infinite_loop arg is false, it falls through;
+        // if is true, it throws an exception to break out of main(), but doesn't get caught because
+        // the stack isn't running under main() anymore...
+        // I think this is suboptimal, but we will have to live with it
+        async function runJsLoop(cb) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(cb());
+                }, 0);
+            });
+        }
+
+        // sets the return value of the function to the type expected
+        function setReturn(name, ptr, type, value = 0) {
+            switch (type) {
+            case "p":
+                throw new Error("not implemented");
+            case "s":
+                if(typeof value !== "string")
+                    throw new TypeError(`expected ${name} return type to be string`);
+                value=value?value:"(no value)";
+                var strPtr = Module.getValue(ptr, "i32");
+                Module.stringToUTF8(value, strPtr, 1024);
+                break;
+            case "i":
+                if(typeof value !== "number" || !Number.isInteger(value))
+                    throw new TypeError(`expected ${name} return type to be integer`);
+                Module.setValue(ptr, value, "i32");
+                break;
+            case "c":
+                if(typeof value !== "number" || value < 0 || value > 128)
+                    throw new TypeError(`expected ${name} return type to be integer representing an ASCII character`);
+                Module.setValue(ptr, value, "i8");
+                break;
+            case "f":
+                if(typeof value !== "number" || isFloat(value))
+                    throw new TypeError(`expected ${name} return type to be float`);
+                // XXX: I'm not sure why 'double' works and 'float' doesn't
+                Module.setValue(ptr, value, "double");
+                break;
+            case "d":
+                if(typeof value !== "number" || isFloat(value))
+                    throw new TypeError(`expected ${name} return type to be float`);
+                Module.setValue(ptr, value, "double");
+                break;
+            case "v":
+                break;
+            default:
+                throw new Error("unknown type");
+            }
+
+            function isFloat(n){
+                return n === +n && n !== (n|0) && !Number.isInteger(n);
+            }
+        }
+    });
+})
+#endif /* __EMSCRIPTEN__ */
 
 #endif /* SHIM_GRAPHICS */

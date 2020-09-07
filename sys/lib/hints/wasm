@@ -15,21 +15,30 @@ EMRANLIB=emranlib
 EMCC_LFLAGS=-s SINGLE_FILE=1
 EMCC_LFLAGS=-s WASM=1
 EMCC_LFLAGS+=-s ALLOW_TABLE_GROWTH
-EMCC_LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["_nhmain"]' -O3
+EMCC_LFLAGS+=-s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
+EMCC_LFLAGS+=-O3
 EMCC_LFLAGS+=-s MODULARIZE
 EMCC_LFLAGS+=-s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback"]'
 EMCC_LFLAGS+=-s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", "removeFunction", "UTF8ToString", "getValue", "setValue"]'
 EMCC_LFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0
 EMCC_LFLAGS+=--embed-file wasm-data@/
 
+# For a list of EMCC settings:
+# https://github.com/emscripten-core/emscripten/blob/master/src/settings.js
+
 # WASM C flags
 EMCC_CFLAGS=
 EMCC_CFLAGS+=-Wall
 EMCC_CFLAGS+=-Werror
+#EMCC_CFLAGS+=-s DISABLE_EXCEPTION_CATCHING=0
 EMCC_DEBUG_CFLAGS+=-s ASSERTIONS=1
+#EMCC_DEBUG_CFLAGS+=-s ASSERTIONS=2
 EMCC_DEBUG_CFLAGS+=-s STACK_OVERFLOW_CHECK=2
 EMCC_DEBUG_CFLAGS+=-s SAFE_HEAP=1
-EMCC_DEBUG_CFLAGS+=-s LLD_REPORT_UNDEFINED
+EMCC_DEBUG_CFLAGS+=-s LLD_REPORT_UNDEFINED=1
+#EMCC_DEBUG_CFLAGS+=-s EXCEPTION_DEBUG=1
+#EMCC_DEBUG_CFLAGS+=-fsanitize=undefined -fsanitize=address -fsanitize=leak
+#EMCC_DEBUG_CFLAGS+=-s EXIT_RUNTIME
 EMCC_PROD_CFLAGS+=-O3
 
 # Nethack C flags

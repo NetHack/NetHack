@@ -1,28 +1,37 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 /* external functions */
 int nhmain(int argc, char *argv[]);
 typedef void(*stub_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
-void stub_graphics_set_callback(stub_callback_t cb);
+void shim_graphics_set_callback(stub_callback_t cb);
 
 /* forward declarations */
 void window_cb(const char *name, void *ret_ptr, const char *fmt, ...);
-
+void *yourFunctionToRenderGraphics(const char *name, va_list args);
 
 int main(int argc, char *argv[]) {
-    stub_graphics_set_callback(window_cb);
+    shim_graphics_set_callback(window_cb);
     nhmain(argc, argv);
 }
 
-void window_cb(const char *name, void *ret_ptr, const char *fmt, ...) {
-    /* TODO -- see windowCallback below for hints */
-
+void *yourFunctionToRenderGraphics(const char *name, va_list args) {
+    printf("yourFunctionToRenderGraphics name %s\n", name);
     /* DO SOMETHING HERE */
-    *ret_ptr = yourFunctionToRenderGraphics(name, va_list args);
+    return NULL;
 }
 
+void window_cb(const char *name, void *ret_ptr, const char *fmt, ...) {
+    void *ret;
+    va_list args;
+    /* TODO -- see windowCallback below for hints */
+    va_start(args, fmt);
 
+    ret = yourFunctionToRenderGraphics(name, args);
+    // *((int *)ret_ptr = *((int *)ret); // e.g. yourFunctionToRenderGraphics returns an int
 
+    va_end(args);
+}
 
 #if 0
 function variadicCallback(name, retPtr, fmt, args) {

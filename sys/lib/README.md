@@ -34,12 +34,10 @@ Where is the header file for the API you ask? There isn't one. It's three functi
 ## API: nethack.js
 The WebAssembly API has a similar signature to `libnethack.a` with minor syntactic differences:
 * `main(int argc, char argv[])` - The main function for NetHack
-* `shim_graphics_set_callback(shim_callback_t cb)` - The same as above, but the signature of the callback is slightly different because WASM can't handle variadic callbacks. The callback is: `void shim_callback_t(const char *name, void *ret_ptr, const char *fmt,  void *args[])`
-  * `name` - same as above
-  * `ret_ptr` - same as above
-  * `fmt` - same as above
-  * `args` - an array of pointers to the arguments, where each pointer can be de-referenced to a value as specified in the `fmt` string.
-
+* `shim_graphics_set_callback(char *cbName)` - A `String` representing a name of a callback function. The callback function be registered as `globalThis[cbName] = function yourCallback(name, ... args) { /* your stuff */ }`. Note that [globalThis](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis) points to `window` in browsers and `global` in node.js.
+  * `name` is the name of the [window function](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc) that needs to be handled
+  * `... args` is a variable number and type of arguments depending on the `window function` that is being called. The arguments associated with each `name` are described in the [NetHack window.doc](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc)
+  * The function must return the value expected for the specified `name`
 
 
 ## API Stability
@@ -54,7 +52,7 @@ typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt,
 void shim_graphics_set_callback(shim_callback_t cb);
 
 void window_cb(const char *name, void *ret_ptr, const char *fmt, ...) {
-    /* TODO -- see windowCallback below for hints */
+    /* TODO */
 }
 
 int main(int argc, char *argv[]) {
@@ -65,117 +63,33 @@ int main(int argc, char *argv[]) {
 
 ## nethack.js example
 ``` js
-// Module is defined by emscripten
-// https://emscripten.org/docs/api_reference/module.html
-let Module = {
-    // if this is true, main() won't be called automatically
-    // noInitialRun: true,
+const path = require("path");
 
-    // after loading the library, set the callback function
-    onRuntimeInitialized: function (... args) {
-        setGraphicsCallback();
-    }
-};
+// starts nethack
+function nethackStart(cb, inputModule = {}) {
+    // set callback
+    let cbName = cb.name;
+    if (cbName === "") cbName = "__anonymousNetHackCallback";
+    let userCallback = globalThis[cbName] = cb;
 
-var factory = require("./src/nethack.js");
+    // Emscripten Module config
+    let Module = inputModule;
+    savedOnRuntimeInitialized = Module.onRuntimeInitialized;
+    Module.onRuntimeInitialized = function (... args) {
+        // after the WASM is loaded, add the shim graphics callback function
+        Module.ccall(
+            "shim_graphics_set_callback", // C function name
+            null, // return type
+            ["string"], // arg types
+            [cbName], // arg values
+            {async: true} // options
+        );
+    };
 
-// run NetHack!
-factory(Module);
-
-// register the callback with the WASM library
-function setGraphicsCallback() {
-    console.log("creating WASM callback function");
-    let cb = Module.addFunction(windowCallback, "viiii");
-
-    console.log("setting callback function with library");
-    Module.ccall(
-        "shim_graphics_set_callback", // C function name
-        null, // return type
-        ["number"], // arg types
-        [cb], // arg values
-        {async: true} // options
-    );
-
-    /* TODO: removeFunction */
+    // load and run the module
+    var factory = require(path.join(__dirname, "../build/nethack.js"));
+    factory(Module);
 }
 
-// this is the "shim graphics" callback function
-// it gets called every time something needs to be displayed
-// or input needs to be gathered from the user
-function windowCallback(name, retPtr, fmt, args) {
-    name = Module.UTF8ToString(name);
-    fmt = Module.UTF8ToString(fmt);
-    let argTypes = fmt.split("");
-    let retType = argTypes.shift();
-
-    // convert arguments to JavaScript types
-    let jsArgs = [];
-    for (let i = 0; i < argTypes.length; i++) {
-        let ptr = args + (4*i);
-        let val = typeLookup(argTypes[i], ptr);
-        jsArgs.push(val);
-    }
-    console.log(`graphics callback: ${name} [${jsArgs}]`);
-    /**********
-     * YOU HAVE TO IMPLEMENT THIS FUNCTION to render things
-     **********/
-    let ret = yourFunctionToRenderGraphics(name, jsArgs);
-    setReturn(retPtr, retType, ret);
-}
-
-// takes a character `type` and a WASM pointer and returns a JavaScript value
-function typeLookup(type, ptr) {
-    switch(type) {
-    case "s": // string
-        return Module.UTF8ToString(Module.getValue(ptr, "*"));
-    case "p": // pointer
-        return Module.getValue(Module.getValue(ptr, "*"), "*");
-    case "c": // char
-        return String.fromCharCode(Module.getValue(Module.getValue(ptr, "*"), "i8"));
-    case "0": /* 2^0 = 1 byte */
-        return Module.getValue(Module.getValue(ptr, "*"), "i8");
-    case "1": /* 2^1 = 2 bytes */
-        return Module.getValue(Module.getValue(ptr, "*"), "i16");
-    case "2": /* 2^2 = 4 bytes */
-    case "i": // integer
-    case "n": // number
-        return Module.getValue(Module.getValue(ptr, "*"), "i32");
-    case "f": // float
-        return Module.getValue(Module.getValue(ptr, "*"), "float");
-    case "d": // double
-        return Module.getValue(Module.getValue(ptr, "*"), "double");
-    default:
-        throw new TypeError ("unknown type:" + type);
-    }
-}
-
-// takes a a WASM pointer, a charater `type` and a value and sets the value at pointer
-function setReturn(ptr, type, value = 0) {
-    switch (type) {
-    case "p":
-        throw new Error("not implemented");
-    case "s":
-        value=value?value:"(no value)";
-        var strPtr = Module.getValue(ptr, "i32");
-        Module.stringToUTF8(value, strPtr, 1024);
-        break;
-    case "i":
-        Module.setValue(ptr, value, "i32");
-        break;
-    case "c":
-        Module.setValue(ptr, value, "i8");
-        break;
-    case "f":
-        // XXX: I'm not sure why 'double' works and 'float' doesn't
-        Module.setValue(ptr, value, "double");
-        break;
-    case "d":
-        Module.setValue(ptr, value, "double");
-        break;
-    case "v":
-        break;
-    default:
-        throw new Error("unknown type");
-    }
-}
+nethackStart(yourCallbackFunction);
 ```
