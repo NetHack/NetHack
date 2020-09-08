@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ $NHDT-Date: 1599434249 2020/09/06 23:17:29 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1599559379 2020/09/08 10:02:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -328,6 +328,8 @@ the fix to make worm visibility checks work as intended forced the coordinates
 using 'O' to try to change 'symset' was a no-op; 'roguesymset' worked
 change default for lit attribute in special level des.terrain directives to
 	'unchanged' instead of 'unlit'
+replace worm tail placement code that reportedly led to a sanity_check warning
+	[no actual code problem found; might be compiler bug for 'xchar']
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
