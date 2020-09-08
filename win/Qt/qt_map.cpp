@@ -153,11 +153,12 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 		    );
 		}
 #ifdef TEXTCOLOR
-		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pet_annotation);
-                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                } else if ((special & MG_OBJPILE) != 0
+                           && ::iflags.hilite_pile) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pile_annotation);
@@ -177,11 +178,12 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 		mapglyph(g, &ch, &color, &special, i, j, 0);
 		qt_settings->glyphs().drawCell(painter, g, i, j);
 #ifdef TEXTCOLOR
-		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pet_annotation);
-                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                } else if ((special & MG_OBJPILE) != 0
+                           && ::iflags.hilite_pile) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pile_annotation);
@@ -201,32 +203,42 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 	} else
 	{
 	    int hp100;
-	    if (u.mtimedone) {
+	    if (Upolyd) {
 		hp100=u.mhmax ? u.mh*100/u.mhmax : 100;
 	    } else {
 		hp100=u.uhpmax ? u.uhp*100/u.uhpmax : 100;
 	    }
 
-	    if (hp100 > 75) painter.setPen(Qt::white);
-	    else if (hp100 > 50) painter.setPen(Qt::yellow);
-	    else if (hp100 > 25) painter.setPen(QColor(0xff,0xbf,0x00)); // orange
-	    else if (hp100 > 10) painter.setPen(Qt::red);
-	    else painter.setPen(Qt::magenta);
+            if (hp100 > 75)
+                painter.setPen(Qt::white);
+            else if (hp100 > 50)
+                painter.setPen(Qt::yellow);
+            else if (hp100 > 25)
+                painter.setPen(QColor(0xff, 0xbf, 0x00)); // orange
+            else if (hp100 > 10)
+                painter.setPen(Qt::red);
+            else
+                painter.setPen(Qt::magenta);
 	}
 
-	painter.drawRect(
-	    cursor.x()*qt_settings->glyphs().width(),cursor.y()*qt_settings->glyphs().height(),
-	    qt_settings->glyphs().width()-1,qt_settings->glyphs().height()-1);
+	painter.drawRect(cursor.x() * qt_settings->glyphs().width(),
+                         cursor.y() * qt_settings->glyphs().height(),
+                         qt_settings->glyphs().width() - 1,
+                         qt_settings->glyphs().height() - 1);
     }
 
 #if 0
     if (area.intersects(messages_rect)) {
 	painter.setPen(Qt::black);
-	painter.drawText(viewport.contentsX()+1,viewport.contentsY()+1,
-	    viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+        painter.drawText(viewport.contentsX() + 1, viewport.contentsY() + 1,
+                         viewport.width(), 0,
+                         (Qt::TextWordWrap | Qt::AlignTop
+                          | Qt::AlignLeft | Qt::TextDontClip), messages);
 	painter.setPen(Qt::white);
-	painter.drawText(viewport.contentsX(),viewport.contentsY(),
-	    viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+        painter.drawText(viewport.contentsX(), viewport.contentsY(),
+                         viewport.width(), 0,
+                         (Qt::TextWordWrap | Qt::AlignTop
+                          | Qt::AlignLeft | Qt::TextDontClip), messages);
     }
 #endif
 
@@ -696,7 +708,11 @@ void NetHackQtMapWindow::putMessage(int attr, const QString& text)
 	messages += "\n";
     messages += QString(text).replace(QChar(0x200B), "");
     QFontMetrics fm = fontMetrics();
-    messages_rect = fm.boundingRect(viewport.contentsX(),viewport.contentsY(),viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+    messages_rect = fm.boundingRect(viewport.contentsX(), viewport.contentsY(),
+                                    viewport.width(), 0,
+                                    (Qt::TextWordWrap | Qt::AlignTop
+                                     | Qt::AlignLeft | Qt::TextDontClip),
+                                    messages);
     update(messages_rect);
 }
 
@@ -849,11 +865,12 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    QString(QChar(ch)).left(1)
 		);
 #ifdef TEXTCOLOR
-		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pet_annotation);
-                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                } else if ((special & MG_OBJPILE) != 0
+                           && ::iflags.hilite_pile) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pile_annotation);
@@ -873,11 +890,12 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		mapglyph(g, &ch, &color, &special, i, j, 0);
 		qt_settings->glyphs().drawCell(painter, g, i, j);
 #ifdef TEXTCOLOR
-		if (((special & MG_PET) != 0) && ::iflags.hilite_pet) {
+                if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pet_annotation);
-                } else if (((special & MG_OBJPILE) != 0) && ::iflags.hilite_pile) {
+                } else if ((special & MG_OBJPILE) != 0
+                           && ::iflags.hilite_pile) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
                                              j*qt_settings->glyphs().height()),
                                        pile_annotation);
@@ -897,31 +915,41 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	} else
 	{
 	    int hp100;
-	    if (u.mtimedone) {
+	    if (Upolyd) {
 		hp100=u.mhmax ? u.mh*100/u.mhmax : 100;
 	    } else {
 		hp100=u.uhpmax ? u.uhp*100/u.uhpmax : 100;
 	    }
 
-	    if (hp100 > 75) painter.setPen(Qt::white);
-	    else if (hp100 > 50) painter.setPen(Qt::yellow);
-	    else if (hp100 > 25) painter.setPen(QColor(0xff,0xbf,0x00)); // orange
-	    else if (hp100 > 10) painter.setPen(Qt::red);
-	    else painter.setPen(Qt::magenta);
+            if (hp100 > 75)
+                painter.setPen(Qt::white);
+            else if (hp100 > 50)
+                painter.setPen(Qt::yellow);
+            else if (hp100 > 25)
+                painter.setPen(QColor(0xff, 0xbf, 0x00)); // orange
+            else if (hp100 > 10)
+                painter.setPen(Qt::red);
+            else
+                painter.setPen(Qt::magenta);
 	}
 
-	painter.drawRect(
-	    cursor.x()*qt_settings->glyphs().width(),cursor.y()*qt_settings->glyphs().height(),
-	    qt_settings->glyphs().width()-1,qt_settings->glyphs().height()-1);
+        painter.drawRect(cursor.x() * qt_settings->glyphs().width(),
+                         cursor.y() * qt_settings->glyphs().height(),
+                         qt_settings->glyphs().width() - 1,
+                         qt_settings->glyphs().height() - 1);
     }
 
     if (area.intersects(messages_rect)) {
 	painter.setPen(Qt::black);
-	painter.drawText(viewport.contentsX()+1,viewport.contentsY()+1,
-	    viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+        painter.drawText(viewport.contentsX() + 1, viewport.contentsY() + 1,
+                         viewport.width(), 0,
+                         (Qt::TextWordWrap | Qt::AlignTop
+                          | Qt::AlignLeft | Qt::TextDontClip), messages);
 	painter.setPen(Qt::white);
-	painter.drawText(viewport.contentsX(),viewport.contentsY(),
-	    viewport.width(),0, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft|Qt::TextDontClip, messages);
+        painter.drawText(viewport.contentsX(), viewport.contentsY(),
+                         viewport.width(), 0,
+                         (Qt::TextWordWrap | Qt::AlignTop
+                          | Qt::AlignLeft | Qt::TextDontClip), messages);
     }
 
     painter.end();
