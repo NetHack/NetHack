@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.2020 $NHDT-Date: 1599337708 2020/09/05 20:28:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $
+# NetHack 3.7  linux.2020 $NHDT-Date: 1599593762 2020/09/08 19:36:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
@@ -53,42 +53,42 @@ GAMEGRP  = games
 
 #-INCLUDE multiw-2.2020
 
-CFLAGS+=-I../include -DNOTPARMDECL
+# MORECFLAGS is eventually appended to CFLAGS
+MORECFLAGS=-I../include -DNOTPARMDECL
+
 ifeq "$(CCISCLANG)" ""
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GCCGTEQ9)" "1"
-CFLAGS+=-Wno-format-overflow
+MORECFLAGS+=-Wno-format-overflow
 endif  #gcc version greater than or equal to 9
 endif  #not clang
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
-#CFLAGS+=-Wunreachable-code
-#CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+#MORECFLAGS+=-Wunreachable-code
+#MORECFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
 #	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
-#CFLAGS+=-DGCC_WARN
+#MORECFLAGS+=-DGCC_WARN
 
 # NetHack sources control
-CFLAGS+=-DDLB
-CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
-CFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
-CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
-CFLAGS+=-DTIMED_DELAY
-CFLAGS+=-DDUMPLOG
-CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
-#CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
-CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
-# older binaries use NOCLIPPING, but that disables SIGWINCH
-#CFLAGS+=-DNOCLIPPING
-#CFLAGS+=-DNOMAIL
-#CFLAGS+=-DEXTRA_SANITY_CHECKS
-#CFLAGS+=-DEDIT_GETLIN
-#CFLAGS+=-DSCORE_ON_BOTL
-#CFLAGS+=-DMSGHANDLER
-#CFLAGS+=-DTTY_TILES_ESCCODES
-#CFLAGS+=-DTTY_SOUND_ESCCODES
+MORECFLAGS+=-DDLB
+MORECFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+MORECFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
+MORECFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+MORECFLAGS+=-DTIMED_DELAY
+MORECFLAGS+=-DDUMPLOG
+MORECFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+#MORECFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+MORECFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+#MORECFLAGS+=-DNOMAIL
+#MORECFLAGS+=-DEXTRA_SANITY_CHECKS
+#MORECFLAGS+=-DEDIT_GETLIN
+#MORECFLAGS+=-DSCORE_ON_BOTL
+#MORECFLAGS+=-DMSGHANDLER
+#MORECFLAGS+=-DTTY_TILES_ESCCODES
+#MORECFLAGS+=-DTTY_SOUND_ESCCODES
 
-CFLAGS+= $(WINCFLAGS)	#WINCFLAGS set from multiw-2.2020
+MORECFLAGS+= $(WINCFLAGS)	#WINCFLAGS set from multiw-2.2020
 
 VARDATND =
 VARDATND0 =
@@ -122,7 +122,7 @@ X11CFLAGS = -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
 ifdef USE_XPM
-CFLAGS += -DUSE_XPM
+MORECFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
@@ -160,6 +160,14 @@ endif	# !WANT_WIN_QT
 WINOBJ = $(sort $(WINOBJ0))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
+
+# if CFLAGS=foo was specified on the command line, CFLAGS+=$(MORECFLAGS)
+# would be ignored without 'override'; we want to allow CFLAGS=-g vs -O
+# on the command line without having to specify all the other stuff
+#
+override CFLAGS+=$(MORECFLAGS)
+#
+
 
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
