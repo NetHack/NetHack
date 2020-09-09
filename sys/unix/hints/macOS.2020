@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.2020 $NHDT-Date: 1599593767 2020/09/08 19:36:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1599687615 2020/09/09 21:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -16,12 +16,16 @@
 # macOS X hints file
 #
 
-# compiler flags:  various -I, -D, and -W get appended below;
+# compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
+#	various -I, -D, and -W settings appended below;
 #	these are the settings of most interest for an end-user build
 #	(clang doesn't support '-Og', gcc needs 4.x or later)
-CFLAGS = -g
-#CFLAGS = -g -Og
-#CFLAGS = -O2
+CCFLAGS = -g
+#CCFLAGS = -g -Og
+#CCFLAGS = -O2
+#	Note: this is not the usual 'CFLAGS' which is used in default
+#	rules for compiling C code; specifying a value for that on the
+#	'make' command line should be avoided.
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 3
 #-INCLUDE multiw-1.2020
@@ -55,12 +59,11 @@ endif
 
 #-INCLUDE multiw-2.2020
 
-# MORECFLAGS is eventually appended to CFLAGS
-MORECFLAGS=-I../include -DNOTPARMDECL
+CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
 
 ifndef WANT_WIN_QT
 #	these are normally used when compiling nethack's core
-MORECFLAGS+=-ansi -pedantic -Wno-long-long
+CFLAGS+=-ansi -pedantic -Wno-long-long
 #	but -ansi forces -std=c90 for C or -std=c++98 for C++;
 #	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
 #In file included from .../qt5/include/QtCore/qglobal.h:105:
@@ -70,30 +73,30 @@ MORECFLAGS+=-ansi -pedantic -Wno-long-long
 endif
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
-#MORECFLAGS+=-Wunreachable-code
-MORECFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+#CFLAGS+=-Wunreachable-code
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
-MORECFLAGS+=-DGCC_WARN
+CFLAGS+=-DGCC_WARN
 
 # NetHack sources control
-MORECFLAGS+=-DDLB
-MORECFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
-MORECFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
-MORECFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
-#MORECFLAGS+=-DTIMED_DELAY
-#MORECFLAGS+=-DDUMPLOG
-#MORECFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
-MORECFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
-#MORECFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
-MORECFLAGS+=-DNOMAIL
-#MORECFLAGS+=-DEXTRA_SANITY_CHECKS
-#MORECFLAGS+=-DEDIT_GETLIN
-#MORECFLAGS+=-DSCORE_ON_BOTL
-#MORECFLAGS+=-DMSGHANDLER
-#MORECFLAGS+=-DTTY_TILES_ESCCODES
-#MORECFLAGS+=-DTTY_SOUND_ESCCODES
+CFLAGS+=-DDLB
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+#CFLAGS+=-DTIMED_DELAY
+#CFLAGS+=-DDUMPLOG
+#CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+#CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS+=-DNOMAIL
+#CFLAGS+=-DEXTRA_SANITY_CHECKS
+#CFLAGS+=-DEDIT_GETLIN
+#CFLAGS+=-DSCORE_ON_BOTL
+#CFLAGS+=-DMSGHANDLER
+#CFLAGS+=-DTTY_TILES_ESCCODES
+#CFLAGS+=-DTTY_SOUND_ESCCODES
 
-MORECFLAGS+= $(WINCFLAGS)   #WINCFLAGS set from multiw-2.2020
+CFLAGS+= $(WINCFLAGS)   #WINCFLAGS set from multiw-2.2020
 
 VARDATND =
 VARDATND0 =
@@ -127,7 +130,7 @@ X11CFLAGS = -I/opt/X11/include
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
 ifdef USE_XPM
-MORECFLAGS += -DUSE_XPM
+CFLAGS += -DUSE_XPM
 WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
@@ -164,13 +167,6 @@ endif	# !WANT_WIN_QT
 WINOBJ = $(sort $(WINOBJ0))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
-
-# if CFLAGS=foo was specified on the command line, CFLAGS+=$(MORECFLAGS)
-# would be ignored without 'override'; we want to allow CFLAGS=-g vs -O
-# on the command line without having to specify all the other stuff
-#
-override CFLAGS+=$(MORECFLAGS)
-#
 
 
 WANT_BUNDLE=1
