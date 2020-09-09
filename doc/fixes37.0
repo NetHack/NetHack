@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ $NHDT-Date: 1599559379 2020/09/08 10:02:59 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1599686385 2020/09/09 21:19:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -507,7 +507,7 @@ new monsters:  displacer beast ('f') and genetic engineer ('Q')
 make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
 boolean options can optionally have the form "name:value" with value taken
-	from among "true", "yes", "on", or "false", "no", "off"
+	from among "true", "yes", "on", or 1 and "false", "no", "off", or 0
 record number of wishes and artifact wishes in xlogfile
 give feedback for '#chat' directed at walls
 add 'Sokoban' conduct, tracking the number of times the special Sokoban rules

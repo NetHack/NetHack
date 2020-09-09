@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1597357458 2020/08/13 22:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.470 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1599686385 2020/09/09 21:19:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.471 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4445,6 +4445,8 @@ char *op;
         return optn_ok;
     }
     if (req == do_set) {
+        boolean nosexchange = FALSE;
+
         if (!allopt[optidx].addr)
             return optn_ok; /* silent retreat */
 
@@ -4460,18 +4462,23 @@ char *op;
                 config_error_add(
                            "Negated boolean '%s' should not have a parameter",
                                  allopt[optidx].name);
-                return optn_err;
+                return optn_silenterr;
             }
+            /* length is greater than 0 or we wouldn't have gotten here */
             ln = (int) strlen(op);
-            if (!strncmpi(op, "true", max(ln, 3))
-                || !strcmpi(op, "yes") || !strcmpi(op, "on")) {
+            if (!strncmpi(op, "true", ln)
+                || !strncmpi(op, "yes", ln)
+                || !strcmpi(op, "on")
+                || (digit(*op) && atoi(op) == 1)) {
                 negated = FALSE;
-            } else if (!strncmpi(op, "false", max(ln, 3))
-                       || !strcmpi(op, "no") || !strcmpi(op, "off")) {
+            } else if (!strncmpi(op, "false", ln)
+                       || !strncmpi(op, "no", ln)
+                       || !strcmpi(op, "off")
+                       || (digit(*op) && atoi(op) == 0)) {
                 negated = TRUE;
             } else if (!allopt[optidx].valok) {
-                config_error_add("Illegal parameter for a boolean");
-                return optn_err;
+                config_error_add("'%s' is not valid for a boolean", opts);
+                return optn_silenterr;
             }
         }
         if (iflags.debug_fuzzer && !g.opt_initial) {
@@ -4484,8 +4491,7 @@ char *op;
         case opt_female:
             if (!strncmpi(opts, "female", 3)) {
                 if (!g.opt_initial && flags.female == negated) {
-                    config_error_add("That is not anatomically possible.");
-                    return optn_err;
+                    nosexchange = TRUE;
                 } else {
                     flags.initgend = flags.female = !negated;
                     return optn_ok;
@@ -4493,14 +4499,26 @@ char *op;
             }
             if (!strncmpi(opts, "male", 3)) {
                 if (!g.opt_initial && flags.female != negated) {
-                    config_error_add("That is not anatomically possible.");
-                    return optn_err;
+                    nosexchange = TRUE;
                 } else {
                     flags.initgend = flags.female = negated;
                     return optn_ok;
                 }
             }
             break;
+        }
+        /* this dates from when 'O' prompted for a line of options text
+           rather than use a menu to control access to which options can
+           be modified during play; it was possible to attempt to use
+           'O' to specify female or negate male when playing as male or
+           to specify male or negate female when playing as female;
+           options processing rejects that for !opt_initial; not possible
+           now but kept in case someone brings the old 'O' behavior back */
+        if (nosexchange) {
+            /* can't arbitrarily change sex after game has started;
+               magic (amulet or polymorph) is required for that */
+            config_error_add("'%s' is not anatomically possible.", opts);
+            return optn_silenterr;
         }
 
         *(allopt[optidx].addr) = !negated;    /* <==== SET IT HERE */
