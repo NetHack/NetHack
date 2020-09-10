@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1599686385 2020/09/09 21:19:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.471 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1599778431 2020/09/10 22:53:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.472 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -235,13 +235,14 @@ static int FDECL(check_misc_menu_command, (char *, char *));
 int FDECL(spcfn_misc_menu_cmd, (int, int, BOOLEAN_P, char *, char *));
 
 static const char *FDECL(attr2attrname, (int));
+static void FDECL(basic_menu_colors, (BOOLEAN_P));
 static const char * FDECL(msgtype2name, (int));
 static int NDECL(query_msgtype);
 static boolean FDECL(msgtype_add, (int, char *));
 static void FDECL(free_one_msgtype, (int));
 static int NDECL(msgtype_count);
 static boolean FDECL(test_regex_pattern, (const char *, const char *));
-static boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
+static boolean FDECL(add_menu_coloring_parsed, (const char *, int, int));
 static void FDECL(free_one_menu_coloring, (int));
 static int NDECL(count_menucolors);
 static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
@@ -6402,9 +6403,9 @@ char* bindings;
  *
  */
 
-static const struct {
+static const struct color_names {
     const char *name;
-    const int color;
+    int color;
 } colornames[] = {
     { "black", CLR_BLACK },
     { "red", CLR_RED },
@@ -6435,9 +6436,9 @@ static const struct {
     { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
-static const struct {
+static const struct attr_names {
     const char *name;
-    const int attr;
+    int attr;
 } attrnames[] = {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
@@ -6520,6 +6521,61 @@ boolean complain;
     return a;
 }
 
+extern const char regex_id[]; /* from sys/share/<various>regex.{c,cpp} */
+
+/* True: temporarily replace menu color entries with a fake set of menu
+   colors, { "light blue"=light_blue, "blue"=blue, "red"=red, &c }, that
+   illustrates most colors for use when the pick-a-color menu is rendered;
+   suppresses black and white because one of those will likely be invisible
+   due to matching the background; False: restore user-specified colorings */
+static void
+basic_menu_colors(load_colors)
+boolean load_colors;
+{
+    if (load_colors) {
+        /* replace normal menu colors with a set specifically for colors */
+        g.save_menucolors = iflags.use_menu_color;
+        g.save_colorings = g.menu_colorings;
+
+        iflags.use_menu_color = TRUE;
+        if (g.color_colorings) {
+            /* use the alternate colorings which were set up previously */
+            g.menu_colorings = g.color_colorings;
+        } else {
+            /* create the alternate colorings once */
+            char cnm[QBUFSZ];
+            int i, c;
+            boolean pmatchregex = !strcmpi(regex_id, "pmatchregex");
+
+            /* menu_colorings pointer has been saved; clear it in order
+               to add the alternate entries as if from scratch */
+            g.menu_colorings = (struct menucoloring *) 0;
+
+            /* this orders the patterns last-in/first-out; that means
+               that the "light <foo>" variations come before the basic
+               "<foo>" ones, which is exactly what we want */
+            for (i = 0; i < SIZE(colornames); ++i) {
+                if (!colornames[i].name) /* first alias entry has no name */
+                    break;
+                c = colornames[i].color;
+                if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
+                    continue; /* skip these */
+                Sprintf(cnm, pmatchregex ? "*%s" : "%s", colornames[i].name);
+                add_menu_coloring_parsed(dupstr(cnm), c, ATR_NONE);
+            }
+
+            /* right now, menu_colorings contains the alternate color list;
+               remember that list for future pick-a-color instances and
+               also keep it as is for this instance */
+            g.color_colorings = g.menu_colorings;
+        }
+    } else {
+        /* restore normal user-specific menu colors */
+        iflags.use_menu_color = g.save_menucolors;
+        g.menu_colorings = g.save_colorings;
+    }
+}
+
 int
 query_color(prompt)
 const char *prompt;
@@ -6528,6 +6584,9 @@ const char *prompt;
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
+
+    /* replace user patterns with color name ones and force 'menucolors' On */
+    basic_menu_colors(TRUE);
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -6543,6 +6602,11 @@ const char *prompt;
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
     destroy_nhwindow(tmpwin);
+
+    /* remove temporary color name patterns and restore user-specified ones;
+       reset 'menucolors' option to its previous value */
+    basic_menu_colors(FALSE);
+
     if (pick_cnt > 0) {
         i = colornames[picks[0].item.a_int - 1].color;
         /* pick_cnt==2: explicitly picked something other than the
@@ -6876,7 +6940,7 @@ const char *errmsg;
 
 static boolean
 add_menu_coloring_parsed(str, c, a)
-char *str;
+const char *str;
 int c, a;
 {
     static const char re_error[] = "Menucolor regex error";
@@ -6970,20 +7034,27 @@ int *color, *attr;
     return FALSE;
 }
 
+/* release all menu color patterns */
 void
 free_menu_coloring()
 {
-    struct menucoloring *tmp, *tmp2;
+    /* either menu_colorings or color_colorings or both might need to
+       be freed or already be Null; do-loop will iterate at most twice */
+    do {
+        struct menucoloring *tmp, *tmp2;
 
-    for (tmp = g.menu_colorings; tmp; tmp = tmp2) {
-        tmp2 = tmp->next;
-        regex_free(tmp->match);
-        free((genericptr_t) tmp->origstr);
-        free((genericptr_t) tmp);
-    }
-    g.menu_colorings = (struct menucoloring *) 0;
+        for (tmp = g.menu_colorings; tmp; tmp = tmp2) {
+            tmp2 = tmp->next;
+            regex_free(tmp->match);
+            free((genericptr_t) tmp->origstr);
+            free((genericptr_t) tmp);
+        }
+        g.menu_colorings = g.color_colorings;
+        g.color_colorings = (struct menucoloring *) 0;
+    } while (g.menu_colorings);
 }
 
+/* release a specific menu color pattern; not used for color_colorings */
 static void
 free_one_menu_coloring(idx)
 int idx; /* 0 .. */

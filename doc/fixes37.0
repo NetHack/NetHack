@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ $NHDT-Date: 1599686385 2020/09/09 21:19:45 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ $NHDT-Date: 1599778430 2020/09/10 22:53:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -521,6 +521,8 @@ add section marker [] support to run-time config file; CHOOSE section1,section2
 	file to be part of the last section; that still works the same, but []
 	can be used to terminate the last section and revert to common options
 	for the remainder of the file
+render the color names in the corresponding color when using the pick-a-color
+	menu for adding status highlights or menu colors via 'O'
 
 
 Platform- and/or Interface-Specific New Features
