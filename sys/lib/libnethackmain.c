@@ -19,6 +19,9 @@
 /* for cross-compiling to WebAssembly (WASM) */
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
+void js_helpers_init();
+void js_constants_init();
+void js_globals_init();
 #endif
 
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
@@ -74,45 +77,12 @@ char *argv[];
     boolean exact_username;
     boolean resuming = FALSE; /* assume new game */
     boolean plsel_once = FALSE;
-    int i;
-
-    for (i = 0; i < argc; i++) {
-        printf ("argv[%d]: %s\n", i, argv[i]);
-    }
+    // int i;
+    // for (i = 0; i < argc; i++) {
+    //     printf ("argv[%d]: %s\n", i, argv[i]);
+    // }
 
     early_init();
-
-#if 0 /* __APPLE__ */
-    {
-/* special hack to change working directory to a resource fork when
-   running from finder --sam */
-#define MAC_PATH_VALUE ".app/Contents/MacOS/"
-        char mac_cwd[1024], *mac_exe = argv[0], *mac_tmp;
-        int arg0_len = strlen(mac_exe), mac_tmp_len, mac_lhs_len = 0;
-        getcwd(mac_cwd, 1024);
-        if (mac_exe[0] == '/' && !strcmp(mac_cwd, "/")) {
-            if ((mac_exe = strrchr(mac_exe, '/')))
-                mac_exe++;
-            else
-                mac_exe = argv[0];
-            mac_tmp_len = (strlen(mac_exe) * 2) + strlen(MAC_PATH_VALUE);
-            if (mac_tmp_len <= arg0_len) {
-                mac_tmp = malloc(mac_tmp_len + 1);
-                sprintf(mac_tmp, "%s%s%s", mac_exe, MAC_PATH_VALUE, mac_exe);
-                if (!strcmp(argv[0] + (arg0_len - mac_tmp_len), mac_tmp)) {
-                    mac_lhs_len =
-                        (arg0_len - mac_tmp_len) + strlen(mac_exe) + 5;
-                    if (mac_lhs_len > mac_tmp_len - 1)
-                        mac_tmp = realloc(mac_tmp, mac_lhs_len);
-                    strncpy(mac_tmp, argv[0], mac_lhs_len);
-                    mac_tmp[mac_lhs_len] = '\0';
-                    chdir(mac_tmp);
-                }
-                free(mac_tmp);
-            }
-        }
-    }
-#endif /* __APPLE__ */
 
     g.hname = argv[0];
     g.hackpid = getpid();
@@ -231,6 +201,11 @@ char *argv[];
 #ifdef WINCHAIN
     commit_windowchain();
 #endif
+#ifdef __EMSCRIPTEN__
+    js_helpers_init();
+    js_constants_init();
+    js_globals_init();
+#endif
     init_nhwindows(&argc, argv); /* now we can set up window system */
 #ifdef _M_UNIX
     init_sco_cons();
@@ -260,9 +235,11 @@ char *argv[];
         /* use character name rather than lock letter for file names */
         g.locknum = 0;
     } else {
+#ifndef NO_SIGNAL
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
         (void) signal(SIGINT, SIG_IGN);
+#endif
     }
 
     dlb_init(); /* must be before newgame() */
@@ -748,44 +725,6 @@ get_login_name()
     return buf;
 }
 
-#if 0 /* __APPLE__ */
-extern int errno;
-
-void
-port_insert_pastebuf(buf)
-char *buf;
-{
-    /* This should be replaced when there is a Cocoa port. */
-    const char *errfmt;
-    size_t len;
-    FILE *PB = popen("/usr/bin/pbcopy", "w");
-
-    if (!PB) {
-        errfmt = "Unable to start pbcopy (%d)\n";
-        goto error;
-    }
-
-    len = strlen(buf);
-    /* Remove the trailing \n, carefully. */
-    if (buf[len - 1] == '\n')
-        len--;
-
-    /* XXX Sorry, I'm too lazy to write a loop for output this short. */
-    if (len != fwrite(buf, 1, len, PB)) {
-        errfmt = "Error sending data to pbcopy (%d)\n";
-        goto error;
-    }
-
-    if (pclose(PB) != -1) {
-        return;
-    }
-    errfmt = "Error finishing pbcopy (%d)\n";
-
- error:
-    raw_printf(errfmt, strerror(errno));
-}
-#endif /* __APPLE__ */
-
 unsigned long
 sys_random_seed()
 {
@@ -818,4 +757,127 @@ sys_random_seed()
     return seed;
 }
 
-/*unixmain.c*/
+#ifdef __EMSCRIPTEN__
+/***
+ * Helpers
+ ***/
+EM_JS(void, js_helpers_init, (), {
+    globalThis.nethackGlobal = globalThis.nethackGlobal || {};
+    globalThis.nethackGlobal.helpers = globalThis.nethackGlobal.helpers || {};
+
+    installHelper(mapglyphHelper);
+    installHelper(displayInventory);
+
+    // used by print_glyph
+    function mapglyphHelper(glyph, x, y, mgflags) {
+        let ochar = _malloc(4);
+        let ocolor = _malloc(4);
+        let ospecial = _malloc(4);
+
+        _mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags);
+
+        let ch = getValue(ochar, "i32");
+        let color = getValue(ocolor, "i32");
+        let special = getValue(ospecial, "i32");
+
+        _free (ochar);
+        _free (ocolor);
+        _free (ospecial);
+
+        return {
+            glyph,
+            ch,
+            color,
+            special,
+            x,
+            y,
+            mgflags
+        };
+    }
+
+    // used by update_inventory
+    function displayInventory() {
+        // Asyncify.handleAsync(async () => {
+            return _display_inventory(0, 0);
+            console.log ("displayInventory done");
+        // });
+    }
+
+    function installHelper(fn, name) {
+        name = name || fn.name;
+        globalThis.nethackGlobal.helpers[name] = fn;
+    }
+})
+
+/***
+ * Constants
+ ***/
+#define SET_CONSTANT(scope, name) set_const(scope, #name, name);
+EM_JS(void, set_const, (char *scope_str, char *name_str, int num), {
+    let scope = UTF8ToString(scope_str);
+    let name = UTF8ToString(name_str);
+    globalThis.nethackGlobal.constants[scope] = globalThis.nethackGlobal.constants[scope] || {};
+    globalThis.nethackGlobal.constants[scope][name] = num;
+    globalThis.nethackGlobal.constants[scope][num] = name;
+});
+
+void js_constants_init() {
+    EM_ASM({
+        globalThis.nethackGlobal = globalThis.nethackGlobal || {};
+        globalThis.nethackGlobal.constants = globalThis.nethackGlobal.constants || {};
+    });
+
+    // create_nhwindow
+    SET_CONSTANT("WIN_TYPE", NHW_MESSAGE)
+    SET_CONSTANT("WIN_TYPE", NHW_STATUS)
+    SET_CONSTANT("WIN_TYPE", NHW_MAP)
+    SET_CONSTANT("WIN_TYPE", NHW_MENU)
+    SET_CONSTANT("WIN_TYPE", NHW_TEXT)
+
+    // status_update
+    SET_CONSTANT("STATUS_FIELD", BL_CHARACTERISTICS)
+    SET_CONSTANT("STATUS_FIELD", BL_RESET)
+    SET_CONSTANT("STATUS_FIELD", BL_FLUSH)
+    SET_CONSTANT("STATUS_FIELD", BL_TITLE)
+    SET_CONSTANT("STATUS_FIELD", BL_STR)
+    SET_CONSTANT("STATUS_FIELD", BL_DX)
+    SET_CONSTANT("STATUS_FIELD", BL_CO)
+    SET_CONSTANT("STATUS_FIELD", BL_IN)
+    SET_CONSTANT("STATUS_FIELD", BL_WI)
+    SET_CONSTANT("STATUS_FIELD", BL_CH)
+    SET_CONSTANT("STATUS_FIELD", BL_ALIGN)
+    SET_CONSTANT("STATUS_FIELD", BL_SCORE)
+    SET_CONSTANT("STATUS_FIELD", BL_CAP)
+    SET_CONSTANT("STATUS_FIELD", BL_GOLD)
+    SET_CONSTANT("STATUS_FIELD", BL_ENE)
+    SET_CONSTANT("STATUS_FIELD", BL_ENEMAX)
+    SET_CONSTANT("STATUS_FIELD", BL_XP)
+    SET_CONSTANT("STATUS_FIELD", BL_AC)
+    SET_CONSTANT("STATUS_FIELD", BL_HD)
+    SET_CONSTANT("STATUS_FIELD", BL_TIME)
+    SET_CONSTANT("STATUS_FIELD", BL_HUNGER)
+    SET_CONSTANT("STATUS_FIELD", BL_HP)
+    SET_CONSTANT("STATUS_FIELD", BL_HPMAX)
+    SET_CONSTANT("STATUS_FIELD", BL_LEVELDESC)
+    SET_CONSTANT("STATUS_FIELD", BL_EXP)
+    SET_CONSTANT("STATUS_FIELD", BL_CONDITION)
+    SET_CONSTANT("STATUS_FIELD", MAXBLSTATS)
+}
+
+/***
+ * Globals
+ ***/
+void js_globals_init() {
+    // printf("js_globals_init\n");
+
+    // player name
+    // g.plname
+
+    // bottom line stats
+    // g.blstats
+    // g.now_or_before_idx
+}
+
+#endif
+
+/*libnethack.c*/
