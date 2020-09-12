@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1599778431 2020/09/10 22:53:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.472 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1599893947 2020/09/12 06:59:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.473 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6546,6 +6546,7 @@ boolean load_colors;
             char cnm[QBUFSZ];
             int i, c;
             boolean pmatchregex = !strcmpi(regex_id, "pmatchregex");
+            const char *patternfmt = pmatchregex ? "*%s" : "%s";
 
             /* menu_colorings pointer has been saved; clear it in order
                to add the alternate entries as if from scratch */
@@ -6560,7 +6561,7 @@ boolean load_colors;
                 c = colornames[i].color;
                 if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
                     continue; /* skip these */
-                Sprintf(cnm, pmatchregex ? "*%s" : "%s", colornames[i].name);
+                Sprintf(cnm, patternfmt, colornames[i].name);
                 add_menu_coloring_parsed(dupstr(cnm), c, ATR_NONE);
             }
 
@@ -6570,7 +6571,7 @@ boolean load_colors;
             g.color_colorings = g.menu_colorings;
         }
     } else {
-        /* restore normal user-specific menu colors */
+        /* restore normal user-specified menu colors */
         iflags.use_menu_color = g.save_menucolors;
         g.menu_colorings = g.save_colorings;
     }
