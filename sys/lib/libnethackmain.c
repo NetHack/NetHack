@@ -799,7 +799,6 @@ EM_JS(void, js_helpers_init, (), {
     function displayInventory() {
         // Asyncify.handleAsync(async () => {
             return _display_inventory(0, 0);
-            console.log ("displayInventory done");
         // });
     }
 
