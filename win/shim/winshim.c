@@ -51,6 +51,7 @@ ret_type name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_callback_name) return ret; \
     local_callback(shim_callback_name, #name, (void *)&ret, fmt, args); \
+    debugf("SHIM GRAPHICS: " #name " done.\n"); \
     return ret; \
 }
 
@@ -60,6 +61,7 @@ void name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_callback_name) return; \
     local_callback(shim_callback_name, #name, NULL, fmt, args); \
+    debugf("SHIM GRAPHICS: " #name " done.\n"); \
 }
 
 #else /* !__EMSCRIPTEN__ */
@@ -81,6 +83,7 @@ ret_type name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return ret; \
     shim_graphics_callback(#name, (void *)&ret, fmt, ## __VA_ARGS__); \
+    debugf("SHIM GRAPHICS: " #name " done.\n"); \
     return ret; \
 }
 
@@ -89,6 +92,7 @@ void name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
     shim_graphics_callback(#name, NULL, fmt, ## __VA_ARGS__); \
+    debugf("SHIM GRAPHICS: " #name " done.\n"); \
 }
 #endif /* __EMSCRIPTEN__ */
 
@@ -133,9 +137,9 @@ VDECLCB(shim_add_menu,
     "viipiiisi",
     A2P window, A2P glyph, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
 VDECLCB(shim_end_menu,(winid window, const char *prompt), "vis", A2P window, P2V prompt)
-DECLCB(int, shim_select_menu,(winid window, int how, MENU_ITEM_P **menu_list), "iiip", A2P window, A2P how, P2V menu_list)
+/* XXX: shim_select_menu menu_list is an output */
+DECLCB(int, shim_select_menu,(winid window, int how, MENU_ITEM_P **menu_list), "iiio", A2P window, A2P how, P2V menu_list)
 DECLCB(char, shim_message_menu,(CHAR_P let, int how, const char *mesg), "ciis", A2P let, A2P how, P2V mesg)
-VDECLCB(shim_update_inventory,(void), "v")
 VDECLCB(shim_mark_synch,(void), "v")
 VDECLCB(shim_wait_synch,(void), "v")
 VDECLCB(shim_cliparound,(int x, int y), "vii", A2P x, A2P y)
@@ -144,11 +148,11 @@ VDECLCB(shim_print_glyph,(winid w, int x, int y, int glyph, int bkglyph), "viiii
 VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VDECLCB(shim_raw_print_bold,(const char *str), "vs", P2V str)
 DECLCB(int, shim_nhgetch,(void), "i")
-DECLCB(int, shim_nh_poskey,(int *x, int *y, int *mod), "ippp", P2V x, P2V y, P2V mod)
+DECLCB(int, shim_nh_poskey,(int *x, int *y, int *mod), "iooo", P2V x, P2V y, P2V mod)
 VDECLCB(shim_nhbell,(void), "v")
 DECLCB(int, shim_doprev_message,(void),"iv")
 DECLCB(char, shim_yn_function,(const char *query, const char *resp, CHAR_P def), "cssi", P2V query, P2V resp, A2P def)
-VDECLCB(shim_getlin,(const char *query, char *bufp), "vsp", P2V query, P2V bufp)
+VDECLCB(shim_getlin,(const char *query, char *bufp), "vso", P2V query, P2V bufp)
 DECLCB(int,shim_get_ext_cmd,(void),"iv")
 VDECLCB(shim_number_pad,(int state), "vi", A2P state)
 VDECLCB(shim_delay_output,(void), "v")
@@ -168,10 +172,23 @@ VDECLCB(shim_status_enablefield,
     (int fieldidx, const char *nm, const char *fmt, BOOLEAN_P enable),
     "vippi",
     A2P fieldidx, P2V nm, P2V fmt, A2P enable)
+/* XXX: the second argument to shim_status_update is sometimes an integer and sometimes a pointer */
 VDECLCB(shim_status_update,
     (int fldidx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks),
-    "vipiiip",
+    "vioiiip",
     A2P fldidx, P2V ptr, A2P chg, A2P percent, A2P color, P2V colormasks)
+
+#ifdef __EMSCRIPTEN__
+/* XXX: calling display_inventory() from shim_update_inventory() causes reentrancy that breaks emscripten Asyncify */
+/* this should be fine since according to windows.doc, the only purpose of shim_update_inventory() is to call display_inventory() */
+void shim_update_inventory() {
+    if(iflags.perm_invent) {
+        display_inventory(NULL, FALSE);
+    }
+}
+#else /* !__EMSCRIPTEN__ */
+VDECLCB(shim_update_inventory,(void), "v")
+#endif
 
 /* Interface definition used in windows.c */
 struct window_procs shim_procs = {
@@ -234,12 +251,18 @@ struct window_procs shim_procs = {
 #ifdef __EMSCRIPTEN__
 /* convert the C callback to a JavaScript callback */
 EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *ret_ptr, const char *fmt_str, void *args), {
-    Asyncify.handleAsync(async () => {
+    // Asyncify.handleAsync() is the more logical choice here; however, the stack unrolling in Asyncify is performed by
+    // function call analysis during compilation. Since we are using an indirect callback (cb_name), it can't predict the stack
+    // unrolling and it crashes. Thus we use Asyncify.handleSleep() and wakeUp() to make sure that async doesn't break
+    // Asyncify. For details, see: https://emscripten.org/docs/porting/asyncify.html#optimizing
+    Asyncify.handleSleep(wakeUp => {
         // convert callback arguments to proper JavaScript varaidic arguments
-        let name = Module.UTF8ToString(shim_name);
-        let fmt = Module.UTF8ToString(fmt_str);
-        let cbName = Module.UTF8ToString(cb_name);
+        let name = UTF8ToString(shim_name);
+        let fmt = UTF8ToString(fmt_str);
+        let cbName = UTF8ToString(cb_name);
         // console.log("local_callback:", cbName, fmt, name);
+
+        reentryMutexLock(name);
 
         let argTypes = fmt.split("");
         let retType = argTypes.shift();
@@ -252,49 +275,81 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
             jsArgs.push(val);
         }
 
+        decodeArgs(name, jsArgs);
+
         // do the callback
         let userCallback = globalThis[cbName];
-        let retVal = await runJsLoop(() => userCallback(name, ... jsArgs));
+        runJsEventLoop(() => userCallback.call(this, name, ... jsArgs)).then((retVal) => {
+            // save the return value
+            setReturn(name, ret_ptr, retType, retVal);
+            // return
+            setTimeout(() => {
+                reentryMutexUnlock();
+                wakeUp();
+            }, 0);
+        });
 
-        // save the return value
-        setReturn(name, ret_ptr, retType, retVal);
 
         // convert 'ptr' to the type indicated by 'type'
         function typeLookup(type, ptr) {
             switch(type) {
             case "s": // string
-                return Module.UTF8ToString(Module.getValue(ptr, "*"));
+                return UTF8ToString(getValue(ptr, "*"));
             case "p": // pointer
-                ptr = Module.getValue(ptr, "*");
+                ptr = getValue(ptr, "*");
                 if(!ptr) return 0; // null pointer
-                return Module.getValue(ptr, "*");
+                return getValue(ptr, "*");
             case "c": // char
-                return String.fromCharCode(Module.getValue(Module.getValue(ptr, "*"), "i8"));
+                return String.fromCharCode(getValue(getValue(ptr, "*"), "i8"));
             case "0": /* 2^0 = 1 byte */
-                return Module.getValue(Module.getValue(ptr, "*"), "i8");
+                return getValue(getValue(ptr, "*"), "i8");
             case "1": /* 2^1 = 2 bytes */
-                return Module.getValue(Module.getValue(ptr, "*"), "i16");
+                return getValue(getValue(ptr, "*"), "i16");
             case "2": /* 2^2 = 4 bytes */
             case "i": // integer
             case "n": // number
-                return Module.getValue(Module.getValue(ptr, "*"), "i32");
+                return getValue(getValue(ptr, "*"), "i32");
             case "f": // float
-                return Module.getValue(Module.getValue(ptr, "*"), "float");
+                return getValue(getValue(ptr, "*"), "float");
             case "d": // double
-                return Module.getValue(Module.getValue(ptr, "*"), "double");
+                return getValue(getValue(ptr, "*"), "double");
+            case "o": // overloaded: multiple types
+                return ptr;
             default:
                 throw new TypeError ("unknown type:" + type);
             }
         }
 
-        // setTimeout() with value of '0' is similar to setImmediate() (which isn't standard)
+        // make callback arguments friendly: convert numbers to strings where possible
+        function decodeArgs(name, args) {
+            // if (!globalThis.nethackGlobal.makeArgsFriendly) return;
+
+            switch(name) {
+                case "shim_create_nhwindow":
+                    args[0] = globalThis.nethackGlobal.constants["WIN_TYPE"][args[0]];
+                    break;
+                case "shim_status_update":
+                    // which field is being updated?
+                    args[0] = globalThis.nethackGlobal.constants["STATUS_FIELD"][args[0]];
+                    // arg[1] is a string unless it is BL_CONDITION, BL_RESET, BL_FLUSH, BL_CHARACTERISTICS
+                    if(["BL_CONDITION", "BL_RESET", "BL_FLUSH", "BL_CHARACTERISTICS"].indexOf(args[0] && args[1]) < 0) {
+                        args[1] = typeLookup("s", args[1]);
+                    } else {
+                        args[1] = typeLookup("p", args[1]);
+                    }
+                    break;
+            }
+        }
+
+        // setTimeout() with value of '0' is similar to setImmediate() (but setImmediate isn't standard)
         // this lets the JS loop run for a tick so that other events can occur
         // XXX: I also tried replacing the for(;;) in allmain.c:moveloop() with emscripten_set_main_loop()
-        // unfortunately that won't work -- if the simulate_infinite_loop arg is false, it falls through;
+        // unfortunately that won't work -- if the simulate_infinite_loop arg is false, it falls through
+        // and the program ends;
         // if is true, it throws an exception to break out of main(), but doesn't get caught because
         // the stack isn't running under main() anymore...
-        // I think this is suboptimal, but we will have to live with it
-        async function runJsLoop(cb) {
+        // I think this is suboptimal, but we will have to live with it (for now?)
+        async function runJsEventLoop(cb) {
             return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(cb());
@@ -311,29 +366,29 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
                 if(typeof value !== "string")
                     throw new TypeError(`expected ${name} return type to be string`);
                 value=value?value:"(no value)";
-                var strPtr = Module.getValue(ptr, "i32");
-                Module.stringToUTF8(value, strPtr, 1024);
+                var strPtr = getValue(ptr, "i32");
+                stringToUTF8(value, strPtr, 1024);
                 break;
             case "i":
                 if(typeof value !== "number" || !Number.isInteger(value))
                     throw new TypeError(`expected ${name} return type to be integer`);
-                Module.setValue(ptr, value, "i32");
+                setValue(ptr, value, "i32");
                 break;
             case "c":
                 if(typeof value !== "number" || value < 0 || value > 128)
                     throw new TypeError(`expected ${name} return type to be integer representing an ASCII character`);
-                Module.setValue(ptr, value, "i8");
+                setValue(ptr, value, "i8");
                 break;
             case "f":
                 if(typeof value !== "number" || isFloat(value))
                     throw new TypeError(`expected ${name} return type to be float`);
                 // XXX: I'm not sure why 'double' works and 'float' doesn't
-                Module.setValue(ptr, value, "double");
+                setValue(ptr, value, "double");
                 break;
             case "d":
                 if(typeof value !== "number" || isFloat(value))
-                    throw new TypeError(`expected ${name} return type to be float`);
-                Module.setValue(ptr, value, "double");
+                    throw new TypeError(`expected ${name} return type to be double`);
+                setValue(ptr, value, "double");
                 break;
             case "v":
                 break;
@@ -344,6 +399,18 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
             function isFloat(n){
                 return n === +n && n !== (n|0) && !Number.isInteger(n);
             }
+        }
+
+        function reentryMutexLock(name) {
+            globalThis.nethackGlobal = globalThis.nethackGlobal || {};
+            if(globalThis.nethackGlobal.shimPreventReentry) {
+                throw new Error(`'${name}' attempting second call to 'local_callback' before '${globalThis.nethackGlobal.shimPreventReentry}' has finished, will crash emscripten Asyncify. For details see: emscripten.org/docs/porting/asyncify.html#reentrancy`);
+            }
+            globalThis.nethackGlobal.shimPreventReentry = name;
+        }
+
+        function reentryMutexUnlock() {
+            globalThis.nethackGlobal.shimPreventReentry = null;
         }
     });
 })
