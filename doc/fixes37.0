@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ $NHDT-Date: 1599778430 2020/09/10 22:53:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.302 $ $NHDT-Date: 1600179998 2020/09/15 14:26:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -404,6 +404,7 @@ Qt: update message window's last message with player's response if it's a
 	prompt string for a single-character of input (ynaq or invent letter)
 Qt: for line input, display the prompt+response in the message window
 Qt: enable the popup_dialog WC option (result is a bit flakey but usable)
+Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
