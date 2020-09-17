@@ -82,9 +82,9 @@ des.region({ region={61,05,74,14},lit=1,type="ordinary",irregular=1 })
 -- A Sanctum for each alignment
 -- The shrines' alignments are shuffled for
 -- each game
-des.region({ region={04,07,10,11},lit=1,type="temple" })
-des.region({ region={34,03,40,07},lit=1,type="temple" })
-des.region({ region={64,07,70,11},lit=1,type="temple" })
+des.region({ region={04,07,10,11},lit=1,type="temple",filled=2 })
+des.region({ region={34,03,40,07},lit=1,type="temple",filled=2 })
+des.region({ region={64,07,70,11},lit=1,type="temple",filled=2 })
 
 des.altar({ x=07, y=09, align=align[1],type="sanctum" })
 des.altar({ x=37, y=05, align=align[2],type="sanctum" })
