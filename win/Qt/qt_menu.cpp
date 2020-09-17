@@ -312,6 +312,11 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
             QTableWidgetItem *twi = table->item(row, 4); // description
             if (twi == NULL)
                 continue;
+            // if a header/footnote/&c with no sub-fields, don't inflate
+            // the size of col_widths[0]
+            if (!itemlist[row].Selectable()
+                && !itemlist[row].str.contains(QChar('\t')))
+                continue;
             // determine column widths of sub-fields within description
             QStringList columns = itemlist[row].str.split("\t");
             for (int fld = 0; fld < (int) columns.size(); ++fld) {
@@ -334,7 +339,7 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
         QTableWidgetItem *cnt = table->item(row, 0);
         if (cnt != NULL) {
             QString Amt = "";
-            long amt = count(row); // fetch item(i,0) as a number
+            long amt = count(row); // fetch item(row,0) as a number
             if (amt > 0L)
                 Amt.sprintf("%*ld", countdigits, amt);
             cnt->setText(Amt);
@@ -348,7 +353,7 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
         if (split_descr) {
             QStringList columns = text.split("\t");
             for (int fld = 0; fld < (int) columns.size() - 1; ++fld) {
-                //columns[j] += "\t";
+                //columns[fld] += "\t"; /* (used to pad with tabs) */
                 int width = col_widths[fld];
                 while (fm.width(columns[fld]) < width)
                     columns[fld] += " "; //"\t";
@@ -513,7 +518,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
 	letter = QString(mi.ch) + " - ";
     } else {
 	// Letter is left blank, except for skills display when # and * are
-	// presented
+	// presented (note: they're just displayed, not become selectors)
 	if (text.startsWith("    ")) {
 	    // If mi.str starts with "    ", it's meant to line up with lines
 	    // that have a letter; we don't want that here
@@ -527,7 +532,14 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     twi = new QTableWidgetItem(letter);
     table->setItem(row, 3, twi);
     table->item(row, 3)->setFlags(Qt::ItemIsEnabled);
-    WidenColumn(3, fm.width(letter));
+    // add extra padding because the measured width comes out too narrow;
+    // for the normal case of "a - ", the trailing space hid the fact that
+    // the column wasn't wide enough for four characters; for the "   #"
+    // and "   *" cases, the last character was replaced by very tiny "..."
+    int w = (int) fm.width(letter);
+    if (w)
+        w += MENU_WIDTH_SLOP / 2;
+    WidenColumn(3, w);
 
     twi = new QTableWidgetItem(text);
     table->setItem(row, 4, twi);
@@ -685,8 +697,8 @@ void NetHackQtMenuWindow::All()
             cb->setChecked(Qt::Checked);
         }
     }
-    if (biggestcount > 0L) { // counts got cleared when entries became checked
-        UpdateCountColumn(-1L);
+    if (biggestcount > 0L) { // had one or more counts
+        UpdateCountColumn(-1L); // all counts are now gone
     } else {
         table->repaint();
     }
@@ -713,8 +725,8 @@ void NetHackQtMenuWindow::ChooseNone()
             cb->setChecked(Qt::Unchecked);
         }
     }
-    if (biggestcount > 0L) { // all counts have been removed
-        UpdateCountColumn(-1L);
+    if (biggestcount > 0L) { // had one or more counts
+        UpdateCountColumn(-1L); // all counts are now gone
     } else {
         table->repaint();
     }
@@ -733,8 +745,8 @@ void NetHackQtMenuWindow::Invert()
             continue;
         ToggleSelect(row, false);
     }
-    if (biggestcount > 0L) { // all entries with counts are now unchecked
-        UpdateCountColumn(-1L);
+    if (biggestcount > 0L) { // had one or more counts
+        UpdateCountColumn(-1L); // all counts are now gone
     } else {
         table->repaint();
     }
@@ -747,7 +759,7 @@ void NetHackQtMenuWindow::Search()
 
     searching = true;
     NetHackQtStringRequestor requestor(this, "Search for:");
-    char line[256];
+    char line[BUFSZ];
     line[0] = '\0'; /* for EDIT_GETLIN */
     if (requestor.Get(line)) {
 	for (int i=0; i<itemcount; i++) {
@@ -763,7 +775,7 @@ void NetHackQtMenuWindow::ClearSearch()
     searching = false;
 }
 
-void NetHackQtMenuWindow::ToggleSelect(int row, bool already_checked)
+void NetHackQtMenuWindow::ToggleSelect(int row, bool already_toggled)
 {
     if (itemlist[row].Selectable()) {
         QCheckBox *cb = dynamic_cast<QCheckBox *> (table->cellWidget(row, 1));
@@ -773,9 +785,9 @@ void NetHackQtMenuWindow::ToggleSelect(int row, bool already_checked)
         if (how == PICK_ONE) {
             // explicitly picking a preselected item in a pick-one menu
             // chooses that item rather than toggling preselection off;
-            // by clearing whole menu, the code below will select item #i
+            // by clearing whole menu, the code below will select item #row
             ChooseNone();
-            already_checked = false;
+            already_toggled = false;
             // FIXME?  this won't handle a pending count properly;
             // are there any pick-one menus with preselected choice
             // where a count is useful?
@@ -785,7 +797,7 @@ void NetHackQtMenuWindow::ToggleSelect(int row, bool already_checked)
 
         QTableWidgetItem *countfield = table->item(row, 0);
         if (!counting) {
-            if (!already_checked)
+            if (!already_toggled)
                 cb->setChecked((cb->checkState() == Qt::Unchecked) // toggle
                                ? Qt::Checked : Qt::Unchecked);
             itemlist[row].selected = (cb->checkState() != Qt::Unchecked);
