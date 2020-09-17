@@ -32,7 +32,7 @@ des.map([[
 |             -------------                  -----          -------        |
 ----------------------------------------------------------------------------
 ]]);
-des.region({ region={15,07, 21,10}, lit=1, type="temple", contents = function()
+des.region({ region={15,07, 21,10}, lit=1, type="temple", filled=2, contents = function()
                 des.door({ wall = "random", state = "secret" });
 end })
 des.altar({ x=18, y=08, align="noalign", type="sanctum" })

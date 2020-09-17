@@ -56,7 +56,7 @@ place:set(04,15);
 place:set(46,15);
 
 -- Dungeon description
-des.region({ region={00,00,50,17}, lit=0, type="swamp" })
+des.region({ region={00,00,50,17}, lit=0, type="swamp", filled=2 })
 des.levregion({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17}, type="stair-down" });
 des.levregion({ region = {69,00,79,20}, region_islev=1, exclude={0,0,50,17}, type="stair-up" });
 des.levregion({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17}, type="branch" });

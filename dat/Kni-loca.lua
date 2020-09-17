@@ -27,7 +27,7 @@ xxxxxxxxx.......xxxxxx.....xxxxxxxxxxxxx
 -- The Isle of Glass is a Tor rising out of the swamps surrounding it.
 des.region(selection.area(00,00,39,11), "lit")
 -- The top area of the Tor is a holy site.
-des.region({ region={09,02, 27,09}, lit=1, type="temple" })
+des.region({ region={09,02, 27,09}, lit=1, type="temple", filled=2 })
 -- Stairs
 des.stair("up", 38,0)
 des.stair("down", 18,05)

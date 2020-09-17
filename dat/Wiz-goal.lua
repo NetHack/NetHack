@@ -29,7 +29,7 @@ des.map([[
                                                                             
 ]]);
 -- Dungeon Description
-des.region({ region={13,10,18,12}, lit=0, type="temple" })
+des.region({ region={13,10,18,12}, lit=0, type="temple", filled=2 })
 des.region(selection.area(13,06,18,08), "lit")
 des.region(selection.area(20,04,30,14), "unlit")
 des.region(selection.area(32,06,33,07), "unlit")

@@ -132,6 +132,6 @@ des.door("locked",50,06)
 des.object("(", 50, 03)
 des.object({ id = "statue", x=38, y=15, montype="gnome king", historic=1 })
 -- Temple
-des.region({ region={29,02, 33,04}, lit=1, type="temple" })
+des.region({ region={29,02, 33,04}, lit=1, type="temple", filled=1 })
 des.door("closed",31,05)
 des.altar({ x=31,y=03, align=align[1], type="shrine" })
