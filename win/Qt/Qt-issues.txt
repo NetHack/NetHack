@@ -57,4 +57,9 @@ intended to be displayed, is displayed (as blank terrain).
 3.6 status conditions (Stone, Slime, Strngl, Deaf, Lev, Fly, Ride)
 have been implemented but need icon artwork (one 40x40 tile for each).
 
+Qt menus which can execute nethack commands do so by stuffing command
+keystrokes into the input buffer.  If player's run-time config file
+has BIND directives after windowtype:Qt (or anywhere if Qt is chosen
+by default), menus aren't updated to use the new key assignments.
+
 -----
