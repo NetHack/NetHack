@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1596498202 2020/08/03 23:43:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -217,9 +217,27 @@ doread()
     register struct obj *scroll;
     boolean confused, nodisappear;
 
+    /*
+     * Reading while blind is allowed in most cases, including the
+     * Book of the Dead but not regular spellbooks.  For scrolls, the
+     * description has to have been seen or magically learned (so only
+     * when scroll->dknown is true):  hero recites the label while
+     * holding the unfurled scroll.  We deliberately don't require
+     * free hands because that would cripple scroll of remove curse,
+     * but we ought to be requiring hands or at least limbs.  The
+     * recitation could be sub-vocal; actual speech isn't required.
+     *
+     * Reading while confused is allowed and can produce alternate
+     * outcome.
+     *
+     * Reading while stunned is currently allowed but probably should
+     * be prevented....
+     */
+
     g.known = FALSE;
     if (check_capacity((char *) 0))
         return 0;
+
     scroll = getobj(readable, "read");
     if (!scroll)
         return 0;
@@ -1358,8 +1376,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_TELEPORTATION:
         if (confused || scursed) {
             level_tele();
+            /* gives "materialize on different/same level!" message, must
+               be a teleport scroll */
+            g.known = TRUE;
         } else {
-            g.known = scrolltele(sobj);
+            scrolltele(sobj);
+            /* this will call learnscroll() as appropriate, and has results
+               which maybe shouldn't result in the scroll becoming known;
+               either way, no need to set g.known here */
         }
         break;
     case SCR_GOLD_DETECTION:

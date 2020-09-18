@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1599778430 2020/09/10 22:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.241 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1600468452 2020/09/18 22:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1147,7 +1147,6 @@ struct instance_globals {
     unsigned int stealmid; /* monster doing the stealing */
 
     /* teleport.c */
-    struct obj *telescroll; /* non-null when teleporting via this scroll */
 
     /* timeout.c */
     /* ordered timer list */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1599559379 2020/09/08 10:02:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.856 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1600468452 2020/09/18 22:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.857 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2586,7 +2586,7 @@ E void FDECL(teleds, (int, int, int));
 E boolean FDECL(safe_teleds, (int));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
 E void NDECL(tele);
-E boolean FDECL(scrolltele, (struct obj *));
+E void FDECL(scrolltele, (struct obj *));
 E int NDECL(dotelecmd);
 E int FDECL(dotele, (BOOLEAN_P));
 E void NDECL(level_tele);

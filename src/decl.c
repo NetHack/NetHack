@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1599778430 2020/09/10 22:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -646,7 +646,6 @@ const struct instance_globals g_init = {
     0, /* stealmid */
 
     /* teleport.c */
-    NULL, /* telescroll */
 
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */

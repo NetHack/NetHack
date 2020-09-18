@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.302 $ $NHDT-Date: 1600179998 2020/09/15 14:26:38 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1600468452 2020/09/18 22:34:12 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -330,6 +330,8 @@ change default for lit attribute in special level des.terrain directives to
 	'unchanged' instead of 'unlit'
 replace worm tail placement code that reportedly led to a sanity_check warning
 	[no actual code problem found; might be compiler bug for 'xchar']
+learn scroll of teleportation after reading even when random destination is
+	right by starting spot
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -524,6 +526,7 @@ add section marker [] support to run-time config file; CHOOSE section1,section2
 	for the remainder of the file
 render the color names in the corresponding color when using the pick-a-color
 	menu for adding status highlights or menu colors via 'O'
+reading blessed scroll of teleportation confers one-shot teleport control
 
 
 Platform- and/or Interface-Specific New Features
