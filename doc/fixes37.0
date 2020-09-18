@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ $NHDT-Date: 1600468452 2020/09/18 22:34:12 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ $NHDT-Date: 1600469617 2020/09/18 22:53:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -250,6 +250,7 @@ end of game inventory disclosure passed an inappropriate argument to the
 turning into slime rendered hero as slime one turn too soon
 avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
 randomize the turns where accessories and extrinsics affect nutrition
+handle being interrupted by approaching monsters more consistently
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
