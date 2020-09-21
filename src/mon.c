@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1599559379 2020/09/08 10:02:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1600652305 2020/09/21 01:38:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,6 +84,8 @@ const char *msg;
         }
         if (chk_geno && (g.mvitals[mndx].mvflags & G_GENOD) != 0)
             impossible("genocided %s in play (%s)", mons[mndx].mname, msg);
+        if (mtmp->mtame && !mtmp->mpeaceful)
+            impossible("tame %s is not peaceful (%s)", mons[mndx].mname, msg);
     }
     if (mtmp->isshk && !has_eshk(mtmp))
         impossible("shk without eshk (%s)", msg);
@@ -3182,9 +3184,6 @@ boolean via_attack;
 
     /* make other peaceful monsters react */
     if (!g.context.mon_moving) {
-        static const char *const Exclam[] = {
-            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
-        };
         struct monst *mon;
         int mndx = monsndx(mtmp->data);
 
@@ -3205,8 +3204,7 @@ boolean via_attack;
                         (void) angry_guards(!!Deaf);
                     } else {
                         if (!rn2(5)) {
-                            verbalize("%s", Exclam[mon->m_id % SIZE(Exclam)]);
-                            exclaimed = TRUE;
+                            exclaimed = maybe_gasp(mon);
                         }
                         /* shopkeepers and temple priests might gasp in
                            surprise, but they won't become angry here */
@@ -3218,8 +3216,8 @@ boolean via_attack;
                             exclaimed = TRUE;
                         }
                         if (mon->mtame) {
-                            /* mustn't set mpeaceful to 0 as below;
-                               perhaps reduce tameness? */
+                            ; /* mustn't set mpeaceful to 0 as below;
+                               * perhaps reduce tameness? */
                         } else {
                             mon->mpeaceful = 0;
                             adjalign(-1);

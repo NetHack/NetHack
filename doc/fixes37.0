@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ $NHDT-Date: 1600469617 2020/09/18 22:53:37 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1600652305 2020/09/21 01:38:25 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -251,6 +251,9 @@ turning into slime rendered hero as slime one turn too soon
 avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
 randomize the turns where accessories and extrinsics affect nutrition
 handle being interrupted by approaching monsters more consistently
+if hero attacked a peaceful monster, some other peaceful monsters with humanoid
+	shape (minotaur, zruty, perhaps others) that witnessed it but which
+	shouldn't be capable of normal speech expressed their surprise audibly
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
