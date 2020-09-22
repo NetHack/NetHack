@@ -254,6 +254,12 @@ handle being interrupted by approaching monsters more consistently
 if hero attacked a peaceful monster, some other peaceful monsters with humanoid
 	shape (minotaur, zruty, perhaps others) that witnessed it but which
 	shouldn't be capable of normal speech expressed their surprise audibly
+when make was invoked with -j makedefs instances could end up running in
+	parallel and could trample on each other's temp files; default to
+	using mkstemp(); allow a port runtime library implementation that lacks
+	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
+	provide a work-alike mkstemp() implementation for windows visual studio
+	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

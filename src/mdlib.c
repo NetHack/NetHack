@@ -66,7 +66,14 @@ static char *FDECL(eos, (char *));
 #if 0
 static char *FDECL(mdlib_strsubst, (char *, const char *, const char *));
 #endif
+
+#ifndef HAS_NO_MKSTEMP
+#ifdef _MSC_VER
+static int FDECL(mkstemp, (char *));
+#endif
+#endif
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
+
 #if !defined(MAKEDEFS_C) && defined(WIN32)
 extern int GUILaunched;
 #endif
@@ -319,6 +326,23 @@ const char *build_date;
     return outbuf;
 }
 
+#ifndef HAS_NO_MKSTEMP
+#ifdef _MSC_VER
+int
+mkstemp(template)
+char *template;
+{
+    int err;
+
+    err = _mktemp_s(template, strlen(template) + 1);
+    if( err != 0 )
+        return -1;
+    return _open(template,
+                 _O_RDWR | _O_BINARY | _O_TEMPORARY | _O_CREAT,
+                 _S_IREAD | _S_IWRITE);
+}
+#endif /* _MSC_VER */
+#endif /* HAS_NO_MKSTEMP */
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
 static int
