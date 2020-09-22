@@ -416,8 +416,10 @@ int flg UNUSED;
     if (istemp) {
         (void) snprintf(tmpfbuf, sizeof tmpfbuf, DATA_TEMPLATE, "mdXXXXXX");
         tmpfd = mkstemp(tmpfbuf);
-        if (tmpfd >= 0)
+        if (tmpfd >= 0) {
             rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
+            Unlink(tmpfbuf);
+	}
     } else
 #endif
     rv = fopen(name, mode);
