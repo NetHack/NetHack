@@ -419,7 +419,7 @@ int flg UNUSED;
         if (tmpfd >= 0) {
             rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
             Unlink(tmpfbuf);
-	}
+        }
     } else
 #endif
     rv = fopen(name, mode);
