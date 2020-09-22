@@ -751,7 +751,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
        the application menu instead of the help menu; we'll add it to
        the latter now and have two ways to access it; without the
        leading underscore (or some other spelling variation such as
-       "'bout"), this one would get interceptd too and then evidently
+       "'bout"), this one would get intercepted too and then evidently
        be discarded as a duplicate */
     help->addSeparator();
     help->addAction("_About_Qt_NetHack_", this, SLOT(doAbout(bool)));
@@ -1042,10 +1042,16 @@ void NetHackQtMainWindow::updateInventory()
     }
 }
 
-void NetHackQtMainWindow::fadeHighlighting()
+void NetHackQtMainWindow::fadeHighlighting(bool before_key)
 {
-    if (status) {
-	status->fadeHighlighting();
+    if (before_key) {
+        // status highlighting fades at start of turn
+        if (status)
+            status->fadeHighlighting();
+    } else {
+        // message highlighting fades after user has given input
+        if (message && message->hilit_mesgs())
+            message->unhighlight_mesgs();
     }
 }
 

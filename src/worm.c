@@ -1,4 +1,4 @@
-/* NetHack 3.7	worm.c	$NHDT-Date: 1596841504 2020/08/07 23:05:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1599559380 2020/09/08 10:03:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,9 @@ struct wseg {
 
 static void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
 static void FDECL(shrink_worm, (int));
-static void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
+#if 0
+static void FDECL(random_dir, (int, int, int *, int *));
+#endif
 static struct wseg *FDECL(create_worm_tail, (int));
 
 /*  Description of long worm implementation.
@@ -680,6 +682,31 @@ struct monst *worm;
     }
 }
 
+/* called from mon_sanity_check(mon.c) */
+void
+wormno_sanity_check()
+{
+#ifdef EXTRA_SANITY_CHECKS
+    struct wseg *seg;
+    int wh = 0, wt = 0;
+
+    /* checking tail management, not a particular monster; since wormno==0
+       means 'not a worm', wheads[0] and wtails[0] should always be empty;
+       note: if erroneously non-Null, tail segment count will include the
+       extra segment for the worm's head that isn't shown on the map */
+    for (seg = wheads[0]; seg; seg = seg->nseg)
+        ++wh;
+    for (seg = wtails[0]; seg; seg = seg->nseg)
+        ++wt;
+    if (wh || wt) {
+        impossible(
+        "phantom worm tail #0 [head=%s, %d segment%s; tail=%s, %d segment%s]",
+                   fmt_ptr(wheads[0]), wh, plur(wh),
+                   fmt_ptr(wtails[0]), wt, plur(wt));
+    }
+#endif /* EXTRA_SANITY_CHECKS */
+}
+
 /*
  *  remove_worm()
  *
@@ -721,7 +748,7 @@ xchar x, y;
     int wnum = worm->wormno;
     struct wseg *curr = wtails[wnum];
     struct wseg *new_tail;
-    xchar ox = x, oy = y;
+    int ox = x, oy = y;
 
     if (wnum && (!wtails[wnum] || !wheads[wnum])) {
         impossible("place_worm_tail_randomly: wormno is set without a tail!");
@@ -729,10 +756,14 @@ xchar x, y;
     }
     if (wtails[wnum] == wheads[wnum]) {
         /* single segment, co-located with worm so nothing to place */
-        if (curr->wx != worm->mx || curr->wy != worm->my)
+        if (curr->wx != worm->mx || curr->wy != worm->my) {
             impossible(
         "place_worm_tail_randomly: tail segement at <%d,%d>, worm at <%d,%d>",
                        curr->wx, curr->wy, worm->mx, worm->my);
+            if (m_at(curr->wx, curr->wy) == worm)
+                remove_monster(curr->wx, curr->wy);
+            curr->wx = worm->mx, curr->wy = worm->my;
+        }
         return;
     }
     /* remove head segment from map in case we end up calling toss_wsegs();
@@ -747,30 +778,56 @@ xchar x, y;
     new_tail->wy = y;
 
     while (curr) {
-        xchar nx, ny;
-        int tryct = 0;
+        int nx = 0, ny = 0;
+#if 0   /* old code */
+        int trycnt = 0;
 
-        /* pick a random direction from x, y and search for goodpos() */
+        /* pick a random direction from x, y and test for goodpos() */
         do {
             random_dir(ox, oy, &nx, &ny);
-        } while (!goodpos(nx, ny, worm, 0) && (tryct++ < 50));
+        } while (!goodpos(nx, ny, worm, 0) && ++tryct <= 50);
 
-        if (tryct < 50) {
+        if (tryct <= 50)
+#else   /* new code */
+        int i, j, k, dirs[8];
+
+        /* instead of picking a random direction up to 50 times, try each
+           of the eight directions at most once after shuffling their order */
+        for (i = 0; i < 8; ++i)
+            dirs[i] = i;
+        for (i = 8; i > 0; --i) {
+            j = rn2(i);
+            k = dirs[j];
+            dirs[j] = dirs[i - 1];
+            dirs[i - 1] = k;
+        }
+        for (i = 0; i < 8; ++i) {
+            nx = ox + xdir[dirs[i]];
+            ny = oy + ydir[dirs[i]];
+            if (goodpos(nx, ny, worm, 0)) /* includes an isok() check */
+                break;
+        }
+
+        if (i < 8)
+#endif
+        {
             place_worm_seg(worm, nx, ny);
-            curr->wx = ox = nx;
-            curr->wy = oy = ny;
+            curr->wx = (xchar) (ox = nx);
+            curr->wy = (xchar) (oy = ny);
             wtails[wnum] = curr;
             curr = curr->nseg;
             wtails[wnum]->nseg = new_tail;
             new_tail = wtails[wnum];
             newsym(nx, ny);
-        } else {                     /* Oops.  Truncate because there was */
-            toss_wsegs(curr, FALSE); /* no place for the rest of it */
+        } else {
+            /* Oops.  Truncate because there is no place for rest of it. */
+            toss_wsegs(curr, FALSE);
             curr = (struct wseg *) 0;
         }
     }
 }
 
+#if 0
 /*
  * Given a coordinate x, y.
  * return in *nx, *ny, the coordinates of one of the <= 8 squares adjoining.
@@ -781,8 +838,8 @@ xchar x, y;
 static
 void
 random_dir(x, y, nx, ny)
-xchar x, y;
-xchar *nx, *ny;
+int x, y;
+int *nx, *ny;
 {
     *nx = x + (x > 1                /* extreme left ? */
                ? (x < COLNO - 1     /* extreme right ? */
@@ -802,6 +859,7 @@ xchar *nx, *ny;
                       : -1)                 /* bottom, use -1 */
                    : 1);                    /* top, use +1 */
 }
+#endif
 
 /* for size_monst(cmd.c) to support #stats */
 int

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ $NHDT-Date: 1597967807 2020/08/20 23:56:47 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ $NHDT-Date: 1600652305 2020/09/21 01:38:25 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -247,6 +247,19 @@ leashing or unleashing pets wasn't updating persistent inventory window
 end of game inventory disclosure passed an inappropriate argument to the
 	inventory display routine; not noticeable for tty and curses,
 	noticeable but not harmful for X11, and slightly harmful for Qt
+turning into slime rendered hero as slime one turn too soon
+avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
+randomize the turns where accessories and extrinsics affect nutrition
+handle being interrupted by approaching monsters more consistently
+if hero attacked a peaceful monster, some other peaceful monsters with humanoid
+	shape (minotaur, zruty, perhaps others) that witnessed it but which
+	shouldn't be capable of normal speech expressed their surprise audibly
+when make was invoked with -j makedefs instances could end up running in
+	parallel and could trample on each other's temp files; default to
+	using mkstemp(); allow a port runtime library implementation that lacks
+	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
+	provide a work-alike mkstemp() implementation for windows visual studio
+	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -323,6 +336,12 @@ the fix to make worm visibility checks work as intended forced the coordinates
 	reverses the segments and can throw some away if there isn't room,
 	but throwing away the extra segment removed the worm from the map
 using 'O' to try to change 'symset' was a no-op; 'roguesymset' worked
+change default for lit attribute in special level des.terrain directives to
+	'unchanged' instead of 'unlit'
+replace worm tail placement code that reportedly led to a sanity_check warning
+	[no actual code problem found; might be compiler bug for 'xchar']
+learn scroll of teleportation after reading even when random destination is
+	right by starting spot
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -389,6 +408,15 @@ Qt: when hero died, gold on tombstone only included gold in inventory, not
 Qt: tombstone showed newly constructed date instead of the value set up at
 	time of death; it only shows year but that could be wrong if player
 	stared at or ignored prior --More-- for long enough on 31 December
+Qt: menu choices All, None, Invert were setting, unsetting, or toggling menu
+	entry checkboxes internally but didn't redraw the menu to show that
+Qt: fix the F1/F2/Tab macro keys to not require that number_pad be On
+Qt: unhighlight highlighted message (last one issued) after player has seen it
+Qt: update message window's last message with player's response if it's a
+	prompt string for a single-character of input (ynaq or invent letter)
+Qt: for line input, display the prompt+response in the message window
+Qt: enable the popup_dialog WC option (result is a bit flakey but usable)
+Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
@@ -492,7 +520,7 @@ new monsters:  displacer beast ('f') and genetic engineer ('Q')
 make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
 boolean options can optionally have the form "name:value" with value taken
-	from among "true", "yes", "on", or "false", "no", "off"
+	from among "true", "yes", "on", or 1 and "false", "no", "off", or 0
 record number of wishes and artifact wishes in xlogfile
 give feedback for '#chat' directed at walls
 add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
@@ -506,6 +534,9 @@ add section marker [] support to run-time config file; CHOOSE section1,section2
 	file to be part of the last section; that still works the same, but []
 	can be used to terminate the last section and revert to common options
 	for the remainder of the file
+render the color names in the corresponding color when using the pick-a-color
+	menu for adding status highlights or menu colors via 'O'
+reading blessed scroll of teleportation confers one-shot teleport control
 
 
 Platform- and/or Interface-Specific New Features

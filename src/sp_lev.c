@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1596498212 2020/08/03 23:43:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +10,7 @@
  */
 
 #define IN_SP_LEV_C
- 
+
 #include "hack.h"
 #include "sp_lev.h"
 
@@ -5089,12 +5089,15 @@ lua_State *L;
     return 0;
 }
 
-/* terrain({ x=NN, y=NN, typ=MAPCHAR, lit=BOOL }); */
-/* terrain({ coord={X, Y}, typ=MAPCHAR, lit=BOOL }); */
-/* terrain({ selection=SELECTION, typ=MAPCHAR, lit=BOOL }); */
-/* terrain( SELECTION, MAPCHAR [, BOOL ] ); */
-/* terrain({x,y}, MAPCHAR); */
-/* terrain(x,y, MAPCHAR); */
+/*
+ * [lit_state: 1 On, 0 Off, -1 random, -2 leave as-is]
+ * terrain({ x=NN, y=NN, typ=MAPCHAR, lit=lit_state });
+ * terrain({ coord={X, Y}, typ=MAPCHAR, lit=lit_state });
+ * terrain({ selection=SELECTION, typ=MAPCHAR, lit=lit_state });
+ * terrain( SELECTION, MAPCHAR [, lit_state ] );
+ * terrain({x,y}, MAPCHAR);
+ * terrain(x,y, MAPCHAR);
+ */
 int
 lspo_terrain(L)
 lua_State *L;
@@ -5105,7 +5108,7 @@ lua_State *L;
     int argc = lua_gettop(L);
 
     create_des_coder();
-    tmpterrain.tlit = 0;
+    tmpterrain.tlit = SET_LIT_NOCHANGE;
     tmpterrain.ter = INVALID_TYPE;
 
     if (argc == 1) {
@@ -5120,7 +5123,7 @@ lua_State *L;
             lua_pop(L, 1);
         }
         tmpterrain.ter = get_table_mapchr(L, "typ");
-        tmpterrain.tlit = get_table_int_opt(L, "lit", 0);
+        tmpterrain.tlit = get_table_int_opt(L, "lit", SET_LIT_NOCHANGE);
     } else if (argc == 2 && lua_type(L, 1) == LUA_TTABLE
                && lua_type(L, 2) == LUA_TSTRING) {
         int tx, ty;
@@ -5154,10 +5157,16 @@ lua_State *L;
     return 0;
 }
 
-/* replace_terrain({ x1=NN,y1=NN, x2=NN,y2=NN, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
-/* replace_terrain({ region={x1,y1, x2,y2}, fromterrain=MAPCHAR, toterrain=MAPCHAR, lit=N, chance=NN }); */
-/* replace_terrain({ selection=selection.area(2,5, 40,10), fromterrain=MAPCHAR, toterrain=MAPCHAR }); */
-/* replace_terrain({ selection=SEL, mapfragment=[[...]], toterrain=MAPCHAR }); */
+/*
+ * replace_terrain({ x1=NN,y1=NN, x2=NN,y2=NN, fromterrain=MAPCHAR,
+ *                   toterrain=MAPCHAR, lit=N, chance=NN });
+ * replace_terrain({ region={x1,y1, x2,y2}, fromterrain=MAPCHAR,
+ *                   toterrain=MAPCHAR, lit=N, chance=NN });
+ * replace_terrain({ selection=selection.area(2,5, 40,10),
+ *                   fromterrain=MAPCHAR, toterrain=MAPCHAR });
+ * replace_terrain({ selection=SEL, mapfragment=[[...]],
+ *                   toterrain=MAPCHAR });
+ */
 int
 lspo_replace_terrain(L)
 lua_State *L;
@@ -5195,7 +5204,7 @@ lua_State *L;
     }
 
     chance = get_table_int_opt(L, "chance", 100);
-    tolit = get_table_int_opt(L, "lit", -2);
+    tolit = get_table_int_opt(L, "lit", SET_LIT_NOCHANGE);
     x1 = get_table_int_opt(L, "x1", -1);
     y1 = get_table_int_opt(L, "y1", -1);
     x2 = get_table_int_opt(L, "x2", -1);

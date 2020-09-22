@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1596498217 2020/08/03 23:43:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1598570054 2020/08/27 23:14:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -316,16 +316,20 @@ static NEARDATA const char *const slime_texts[] = {
 static void
 slime_dialogue()
 {
-    register long i = (Slimed & TIMEOUT) / 2L;
+    long t = (Slimed & TIMEOUT), i = t / 2L;
 
-    if (i == 1L) {
+    if (t == 1L) {
         /* display as green slime during "You have become green slime."
            but don't worry about not being able to see self; if already
            mimicking something else at the time, implicitly be revealed */
         g.youmonst.m_ap_type = M_AP_MONSTER;
         g.youmonst.mappearance = PM_GREEN_SLIME;
+        /* no message given when 't' is odd, so no automatic update of
+           self; force one */
+        newsym(u.ux, u.uy);
     }
-    if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
+
+    if ((t % 2L) != 0L && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
@@ -2403,7 +2407,7 @@ long adjust;     /* how much to adjust timeout */
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-       
+
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)

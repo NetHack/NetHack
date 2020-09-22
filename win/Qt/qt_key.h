@@ -27,6 +27,8 @@ public:
 	int TopAscii() const;
 	Qt::KeyboardModifiers TopState() const;
 
+        void Drain();
+
 private:
 	enum { maxkey=64 };
 	int key[maxkey];

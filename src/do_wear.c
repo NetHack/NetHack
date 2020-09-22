@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_wear.c	$NHDT-Date: 1596498163 2020/08/03 23:42:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1598958650 2020/09/01 11:10:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1982,6 +1982,7 @@ struct obj *obj;
                     answer = yn_function(qbuf, "rl", '\0');
                     switch (answer) {
                     case '\0':
+                    case '\033':
                         return 0;
                     case 'l':
                     case 'L':
