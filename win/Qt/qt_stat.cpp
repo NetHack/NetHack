@@ -88,19 +88,19 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     p_encumber[3] = QPixmap(ext_enc_xpm);
     p_encumber[4] = QPixmap(ovr_enc_xpm);
 
-    p_stoned = QPixmap(blank_xpm);              // placeholder icon
-    p_slimed = QPixmap(blank_xpm);              // placeholder icon
-    p_strngld = QPixmap(blank_xpm);             // placeholder icon
+    p_stoned = QPixmap(stone_xpm);
+    p_slimed = QPixmap(slime_xpm);
+    p_strngld = QPixmap(strngl_xpm);
     p_sick_fp = QPixmap(sick_fp_xpm);
     p_sick_il = QPixmap(sick_il_xpm);
     p_stunned = QPixmap(stunned_xpm);
     p_confused = QPixmap(confused_xpm);
     p_hallu = QPixmap(hallu_xpm);
     p_blind = QPixmap(blind_xpm);
-    p_deaf = QPixmap(blank_xpm);                // placeholder icon
-    p_lev = QPixmap(blank_xpm);                 // placeholder icon
-    p_fly = QPixmap(blank_xpm);                 // placeholder icon
-    p_ride = QPixmap(blank_xpm);                // placeholder icon
+    p_deaf = QPixmap(deaf_xpm);
+    p_lev = QPixmap(lev_xpm);
+    p_fly = QPixmap(fly_xpm);
+    p_ride = QPixmap(ride_xpm);
 
     str.setIcon(p_str);
     dex.setIcon(p_dex);

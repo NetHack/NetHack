@@ -1,4 +1,9 @@
+// qt_xpms.h - static xpm arrays for use in status display
+//
+// In alhpabetical order by array name.  Probably not the best ordering...
+
 /* clang-format off */
+#if 0   // blank icon for use as placeholder
 /* XPM */
 static const char *blank_xpm[] = {
 /* width height ncolors chars_per_pixel */
@@ -52,6 +57,7 @@ static const char *blank_xpm[] = {
 "........................................",
 "........................................"
 };
+#endif
 static const char *blind_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "40 40 5 1",
@@ -391,6 +397,55 @@ static const char *confused_xpm[] = {
 #endif
 };
 /* XPM */
+static const char *deaf_xpm[] = { // placeholder for Deaf condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #dfdf40",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooXXXXooooooooooooooooooooooooooooX",
+"XooooooXoooXoooooooooooooooooooooooooooX",
+"XooooooXoooXoooooooooooooooooooooooooooX",
+"XooooooXoooXoooooooooooooooooooooooooooX",
+"XooooooXoooXoooooooooooooooooooooooooooX",
+"XooooooXoooXooXXXXXooooooooooooooooooooX",
+"XooooooXXXXoooXooooooooooooooooooooooooX",
+"XoooooooooooooXooooooooooooooooooooooooX",
+"XoooooooooooooXXXXoooooooooooooooooooooX",
+"XoooooooooooooXooooooooooooooooooooooooX",
+"XoooooooooooooXooooooooXoooooooooooooooX",
+"XoooooooooooooXXXXXoooXoXooooooooooooooX",
+"XooooooooooooooooooooXoooXoooooooooooooX",
+"XooooooooooooooooooooXoooXoooooooooooooX",
+"XooooooooooooooooooooXXXXXoooooooooooooX",
+"XooooooooooooooooooooXoooXooXXXXXooooooX",
+"XooooooooooooooooooooXoooXooXooooooooooX",
+"XoooooooooooooooooooooooooooXooooooooooX",
+"XoooooooooooooooooooooooooooXXXXoooooooX",
+"XoooooooooooooooooooooooooooXooooooooooX",
+"XoooooooooooooooooooooooooooXooooooooooX",
+"XoooooooooooooooooooooooooooXooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+};
+/* XPM */
 static const char *dex_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "40 40 19 1",
@@ -515,6 +570,104 @@ static const char *ext_enc_xpm[] = {
 "OOOOOOOOOOoOOoOOoOOoOoOoOOoOoOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+};
+/* XPM */
+static const char *fly_xpm[] = { // placeholder for Flying condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #7fefef",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooXoooXoooooooooooX",
+"XooooooooooooooooooooooXoooXoooooooooooX",
+"XoooooooooooooooooXoooooXoXooooooooooooX",
+"XoooooooooooooooooXoooooXoXooooooooooooX",
+"XooooooooooXXXXXooXooooooXoooooooooooooX",
+"XooooooooooXooooooXooooooXoooooooooooooX",
+"XooooooooooXooooooXooooooXoooooooooooooX",
+"XooooooooooXXXXoooXooooooooooooooooooooX",
+"XooooooooooXooooooXXXXoooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+};
+/* XPM */
+static const char *lev_xpm[] = { // placeholder for Levitating condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #df1010",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooXoooooXoooooooooX",
+"XooooooooooooooooooooooXoooooXoooooooooX",
+"XoooooooooooooooXXXXXoooXoooXooooooooooX",
+"XoooooooooooooooXoooooooXoooXooooooooooX",
+"XoooooooooXoooooXooooooooXoXoooooooooooX",
+"XoooooooooXoooooXXXXoooooXoXoooooooooooX",
+"XoooooooooXoooooXoooooooooXooooooooooooX",
+"XoooooooooXoooooXooooooooooooooooooooooX",
+"XoooooooooXoooooXXXXXooooooooooooooooooX",
+"XoooooooooXooooooooooooooooooooooooooooX",
+"XoooooooooXXXXoooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 };
 /* XPM */
 static const char *hallu_xpm[] = {
@@ -1013,47 +1166,53 @@ static const char *ovr_enc_xpm[] = {
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
 };
 /* XPM */
-static const char *pet_mark_xpm[] = {
+static const char *ride_xpm[] = { // placeholder for Riding condition
 /* width height ncolors chars_per_pixel */
-"8 7 2 1",
+"40 40 2 1",
 /* colors */
-". c None",
-"  c #FF0000",
+"X c None",
+"o c #df7f00",
 /* pixels */
-"........",
-"..  .  .",
-".       ",
-".       ",
-"..     .",
-"...   ..",
-".... ..."
-};
-/* XPM */
-static const char *pet_mark_small_xpm[] = {
-/* width height ncolors chars_per_pixel */
-"5 5 2 1",
-/* colors */
-". c None",
-"X c #FF0000",
-/* pixels */
-".X.X.",
-"XXXXX",
-".XXX.",
-"..X.."
-};
-/* XPM */
-static const char *pile_mark_xpm[] = {
-/* width height ncolors chars_per_pixel */
-"5 5 2 1",
-/* colors */
-". c None",
-"X c #00FF00",
-/* pixels */
-"..X..",
-"..X..",
-"XXXXX",
-"..X..",
-"..X.."
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XoooooooXXXXoooXXXooXXXXoooXXXXXoooooooX",
+"XoooooooXoooXoooXoooXoooXooXoooooooooooX",
+"XoooooooXoooXoooXoooXoooXooXoooooooooooX",
+"XoooooooXXXXooooXoooXoooXooXXXXooooooooX",
+"XoooooooXoXoooooXoooXoooXooXoooooooooooX",
+"XoooooooXooXooooXoooXoooXooXoooooooooooX",
+"XoooooooXoooXooXXXooXXXXoooXXXXXoooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 };
 /* XPM */
 static const char *satiated_xpm[] = {
@@ -1273,6 +1432,55 @@ static const char *sick_il_xpm[] = {
 "#################$#$####################"
 };
 /* XPM */
+static const char *slime_xpm[] = { // placeholder for Slimed condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #40df40",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooXXXoooooooooooooooooooooooooooooooX",
+"XoooXooooooooooooooooooooooooooooooooooX",
+"XoooXooooooooooooooooooooooooooooooooooX",
+"XooooXXXoooooooooooooooooooooooooooooooX",
+"XoooooooXooooooooooooooooooooooooooooooX",
+"XoooooooXooXoooooooooooooooooooooooooooX",
+"XooooXXXoooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXooooooXXXooooooooooooooooooX",
+"XooooooooooXoooooooXoooooooooooooooooooX",
+"XooooooooooXXXXXoooXoooooooooooooooooooX",
+"XooooooooooooooooooXoooooooooooooooooooX",
+"XooooooooooooooooooXoooooooooooooooooooX",
+"XooooooooooooooooooXoooXoooooXoooooooooX",
+"XoooooooooooooooooXXXooXXoooXXoooooooooX",
+"XooooooooooooooooooooooXXXoXXXoooooooooX",
+"XooooooooooooooooooooooXoXXXoXoooooooooX",
+"XooooooooooooooooooooooXooXooXoooooooooX",
+"XooooooooooooooooooooooXoooooXooXXXXXooX",
+"XooooooooooooooooooooooXoooooXooXooooooX",
+"XoooooooooooooooooooooooooooooooXooooooX",
+"XoooooooooooooooooooooooooooooooXXXXoooX",
+"XoooooooooooooooooooooooooooooooXooooooX",
+"XoooooooooooooooooooooooooooooooXooooooX",
+"XoooooooooooooooooooooooooooooooXXXXXooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+};
+/* XPM */
 static const char *slt_enc_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "40 40 13 1",
@@ -1331,6 +1539,55 @@ static const char *slt_enc_xpm[] = {
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
 "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+};
+/* XPM */
+static const char *stone_xpm[] = { // placeholder for Stoned condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #6c91b6",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooXXXoooooooooooooooooooooooooooooooX",
+"XoooXooooooooooooooooooooooooooooooooooX",
+"XoooXooooooooooooooooooooooooooooooooooX",
+"XooooXXXoooooooooooooooooooooooooooooooX",
+"XoooooooXooooooooooooooooooooooooooooooX",
+"XoooooooXooXXXXXoooooooooooooooooooooooX",
+"XooooXXXoooooXoooooooooooooooooooooooooX",
+"XooooooooooooXoooooooooooooooooooooooooX",
+"XooooooooooooXoooooooooooooooooooooooooX",
+"XooooooooooooXooooXXXooooooooooooooooooX",
+"XooooooooooooXoooXoooXoooooooooooooooooX",
+"XooooooooooooXoooXoooXoooooooooooooooooX",
+"XooooooooooooooooXoooXoooooooooooooooooX",
+"XooooooooooooooooXoooXoooooooooooooooooX",
+"XooooooooooooooooXoooXooXoooXooooooooooX",
+"XoooooooooooooooooXXXoooXXooXooooooooooX",
+"XoooooooooooooooooooooooXXooXooooooooooX",
+"XoooooooooooooooooooooooXoXoXooooooooooX",
+"XoooooooooooooooooooooooXooXXooooooooooX",
+"XoooooooooooooooooooooooXooXXooXXXXXoooX",
+"XoooooooooooooooooooooooXoooXooXoooooooX",
+"XooooooooooooooooooooooooooooooXoooooooX",
+"XooooooooooooooooooooooooooooooXXXXooooX",
+"XooooooooooooooooooooooooooooooXoooooooX",
+"XooooooooooooooooooooooooooooooXoooooooX",
+"XooooooooooooooooooooooooooooooXXXXXoooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 };
 /* XPM */
 static const char *str_xpm[] = {
@@ -1395,6 +1652,55 @@ static const char *str_xpm[] = {
 "+...o                            -&&++++",
 "+..#O                     -&&%++++++++++",
 "++++++++++++++++++++++++++++++++++++++++"
+};
+/* XPM */
+static const char *strngl_xpm[] = { // placeholder for Strangled condition
+/* width height ncolors chars_per_pixel */
+"40 40 2 1",
+/* colors */
+"X c None",
+"o c #bf40ff",
+/* pixels */
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooXXXoooooooooooooooooooooooooooooooooX",
+"XoXooooooooooooooooooooooooooooooooooooX",
+"XoXooooooooooooooooooooooooooooooooooooX",
+"XoXXXXoooooooooooooooooooooooooooooooooX",
+"XoooooXooooooooooooooooooooooooooooooooX",
+"XoooooXooXXXXXoooooooooooooooooooooooooX",
+"XooXXXoooooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXoooooooooooooooooooooooooooX",
+"XooooooooooXooXXXXoooooooooooooooooooooX",
+"XooooooooooXooXoooXooooooooooooooooooooX",
+"XoooooooooooooXoooXooooooooooooooooooooX",
+"XoooooooooooooXXXXoooooooooooooooooooooX",
+"XoooooooooooooXoXooooooooooooooooooooooX",
+"XoooooooooooooXooXoooXoooXoooooooooooooX",
+"XoooooooooooooXoooXooXXooXoooooooooooooX",
+"XooooooooooooooooooooXXooXoooooooooooooX",
+"XooooooooooooooooooooXoXoXoooooooooooooX",
+"XooooooooooooooooooooXooXXoooooooooooooX",
+"XooooooooooooooooooooXooXXoooXXXoooooooX",
+"XooooooooooooooooooooXoooXooXooooooooooX",
+"XoooooooooooooooooooooooooooXooooooooooX",
+"XoooooooooooooooooooooooooooXoXXXooooooX",
+"XoooooooooooooooooooooooooooXoooXooooooX",
+"XoooooooooooooooooooooooooooXoooXooXoooX",
+"XooooooooooooooooooooooooooooXXXoooXoooX",
+"XooooooooooooooooooooooooooooooooooXoooX",
+"XooooooooooooooooooooooooooooooooooXoooX",
+"XooooooooooooooooooooooooooooooooooXoooX",
+"XooooooooooooooooooooooooooooooooooXoooX",
+"XooooooooooooooooooooooooooooooooooXXXXX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XooooooooooooooooooooooooooooooooooooooX",
+"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 };
 /* XPM */
 static const char *stunned_xpm[] = {
