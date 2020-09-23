@@ -78,10 +78,11 @@ private:
 	NetHackQtLabelledIcon hp;
 	NetHackQtLabelledIcon power;
 	NetHackQtLabelledIcon ac;
-	NetHackQtLabelledIcon level;
-	NetHackQtLabelledIcon exp;
-	NetHackQtLabelledIcon align;
-
+        NetHackQtLabelledIcon level; // Xp level
+        NetHackQtLabelledIcon exp;   // appended to Xp rather than separate
+                                     // but still used to pad their line
+        NetHackQtLabelledIcon align; // alignment is on Conditions line
+                                     // because it has an icon above it
 	NetHackQtLabelledIcon time;
 	NetHackQtLabelledIcon score;
 

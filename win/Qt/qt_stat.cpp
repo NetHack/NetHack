@@ -32,18 +32,18 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     //  Blank value is 0 and should never change.
     name(this,"(name)"),
     dlevel(this,"(dlevel)"),
-    str(this,"STR"),
-    dex(this,"DEX"),
-    con(this,"CON"),
-    intel(this,"INT"),
-    wis(this,"WIS"),
-    cha(this,"CHA"),
+    str(this, "Str"),
+    dex(this, "Dex"),
+    con(this, "Con"),
+    intel(this, "Int"),
+    wis(this, "Wis"),
+    cha(this, "Cha"),
     gold(this,"Gold"),
     hp(this,"Hit Points"),
     power(this,"Power"),
     ac(this,"Armour Class"),
     level(this,"Level"),
-    exp(this,"Experience"),
+    exp(this, "_"), // exp displayed as Xp/Exp but exp widget used for padding
     align(this,"Alignment"),
     time(this,"Time"),
     score(this,"Score"),
@@ -208,7 +208,7 @@ void NetHackQtStatusWindow::doUpdate()
     power.setFont(normal);
     ac.setFont(normal);
     level.setFont(normal);
-    exp.setFont(normal);
+    //exp.setFont(normal);
     align.setFont(normal);
     time.setFont(normal);
     score.setFont(normal);
@@ -297,7 +297,7 @@ void NetHackQtStatusWindow::resizeEvent(QResizeEvent*)
     power.setGeometry(x,y,iw,lh); x+=iw;
     ac.setGeometry(x,y,iw,lh); x+=iw;
     level.setGeometry(x,y,iw,lh); x+=iw;
-    exp.setGeometry(x,y,iw,lh); x+=iw;
+    //exp.setGeometry(x,y,iw,lh); x+=iw;
     x=0; y+=lh;
 
     lh=int(h*SP_hln3);
@@ -367,7 +367,7 @@ void NetHackQtStatusWindow::fadeHighlighting()
     power.dissipateHighlight();
     ac.dissipateHighlight();
     level.dissipateHighlight();
-    exp.dissipateHighlight();
+    //exp.dissipateHighlight();
     align.dissipateHighlight();
 
     time.dissipateHighlight();
@@ -413,22 +413,23 @@ void NetHackQtStatusWindow::updateStats()
 
     if (cursy != 0) return;    /* do a complete update when line 0 is done */
 
-    if (ACURR(A_STR) > 118) {
-	buf.sprintf("STR:%d",ACURR(A_STR)-100);
-    } else if (ACURR(A_STR)==118) {
-	buf.sprintf("STR:18/**");
-    } else if(ACURR(A_STR) > 18) {
-	buf.sprintf("STR:18/%02d",ACURR(A_STR)-18);
+    int st = ACURR(A_STR);
+    if (st > STR18(100)) {
+        buf.sprintf("Str:%d", st - 100);        // 19..25
+    } else if (st == STR18(100)) {
+        buf.sprintf("Str:18/**");               // 18/100
+    } else if (st > 18) {
+        buf.sprintf("Str:18/%02d", st - 18);    // 18/01..18/99
     } else {
-	buf.sprintf("STR:%d",ACURR(A_STR));
+        buf.sprintf("Str:%d", st);              //  3..18
     }
-    str.setLabel(buf,NetHackQtLabelledIcon::NoNum,ACURR(A_STR));
+    str.setLabel(buf, NetHackQtLabelledIcon::NoNum, (long) st);
+    dex.setLabel("Dex:", (long) ACURR(A_DEX));
+    con.setLabel("Con:", (long) ACURR(A_CON));
+    intel.setLabel("Int:", (long) ACURR(A_INT));
+    wis.setLabel("Wis:", (long) ACURR(A_WIS));
+    cha.setLabel("Cha:", (long) ACURR(A_CHA));
 
-    dex.setLabel("DEX:",(long)ACURR(A_DEX));
-    con.setLabel("CON:",(long)ACURR(A_CON));
-    intel.setLabel("INT:",(long)ACURR(A_INT));
-    wis.setLabel("WIS:",(long)ACURR(A_WIS));
-    cha.setLabel("CHA:",(long)ACURR(A_CHA));
     const char* hung=hu_stat[u.uhs];
     if (hung[0]==' ') {
 	hunger.hide();
@@ -479,7 +480,7 @@ void NetHackQtStatusWindow::updateStats()
     if (Flying) fly.show(); else fly.hide();
     if (u.usteed) ride.show(); else ride.hide();
 
-    if (u.mtimedone) {
+    if (Upolyd) {
 	buf = nh_capitalize_words(mons[u.umonnum].mname);
     } else {
 	buf = rank_of(u.ulevel, g.pl_character[0], ::flags.female);
@@ -498,30 +499,35 @@ void NetHackQtStatusWindow::updateStats()
 
     gold.setLabel("Au:", money_cnt(g.invent));
 
-    if (u.mtimedone) {
-	// You're a monster!
-
-	buf.sprintf("/%d", u.mhmax);
-	hp.setLabel("HP:", u.mh  > 0 ? u.mh  : 0, buf);
-	level.setLabel("HD:",(long)mons[u.umonnum].mlevel);
+    if (Upolyd) {
+        // You're a monster!
+        buf.sprintf("/%d", u.mhmax);
+        hp.setLabel("HP:", std::max((long) u.mh, 0L), buf);
+        level.setLabel("HD:", (long) mons[u.umonnum].mlevel); // hit dice
+        // Exp points are not shown when HD is displayed instead of Xp level
     } else {
-	// You're normal.
-
-	buf.sprintf("/%d", u.uhpmax);
-	hp.setLabel("HP:", u.uhp > 0 ? u.uhp : 0, buf);
-	level.setLabel("Level:",(long)u.ulevel);
+        // You're normal.
+        buf.sprintf("/%d", u.uhpmax);
+        hp.setLabel("HP:", std::max((long) u.uhp, 0L), buf);
+        // if Exp points are to be displayed, append them to Xp level;
+        // up/down highlighting becomes tricky--don't try very hard
+        if (::flags.showexp) {
+            buf.sprintf("%ld/%ld", (long) u.ulevel, (long) u.uexp);
+            level.setLabel("Level:" + buf,
+                           NetHackQtLabelledIcon::NoNum, (long) u.uexp);
+        } else {
+            level.setLabel("Level:", (long) u.ulevel);
+        }
     }
     buf.sprintf("/%d", u.uenmax);
     power.setLabel("Pow:", u.uen, buf);
     ac.setLabel("AC:",(long)u.uac);
-#ifdef EXP_ON_BOTL
-    if (::flags.showexp) {
-	exp.setLabel("Exp:",(long)u.uexp);
-    } else
-#endif
-    {
-	exp.setLabel("");
-    }
+    //if (::flags.showexp) {
+    //    exp.setLabel("Exp:", (long) u.uexp);
+    //} else {
+        // 'exp' now only used to pad the line that Xp/Exp is displayed on
+        exp.setLabel("");
+    //}
     if (u.ualign.type==A_CHAOTIC) {
 	align.setIcon(p_chaotic);
 	text = "Chaotic";
@@ -534,11 +540,13 @@ void NetHackQtStatusWindow::updateStats()
     }
     align.setLabel(text);
 
-    if (::flags.time) time.setLabel("Time:",(long)g.moves);
-    else time.setLabel("");
+    if (::flags.time)
+        time.setLabel("Time:", (long) g.moves);
+    else
+        time.setLabel("");
 #ifdef SCORE_ON_BOTL
     if (::flags.showscore) {
-	score.setLabel("Score:",(long)botl_score());
+        score.setLabel("Score:", (long) botl_score());
     } else
 #endif
     {
@@ -564,10 +572,11 @@ void NetHackQtStatusWindow::updateStats()
 	power.highlightWhenChanging();
 	ac.highlightWhenChanging(); ac.lowIsGood();
 	level.highlightWhenChanging();
-	exp.highlightWhenChanging();
+        //exp.highlightWhenChanging(); -- 'exp' is just padding
 	align.highlightWhenChanging();
 
-	//time.highlightWhenChanging();
+        // don't highlight 'time' because it changes almost continuously
+        //time.highlightWhenChanging();
 	score.highlightWhenChanging();
 
 	hunger.highlightWhenChanging();
