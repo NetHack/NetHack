@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1596498258 2020/08/03 23:44:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1600855420 2020/09/23 10:03:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -165,7 +165,6 @@ extern void NDECL(monst_globals_init);   /* monst.c */
 extern void NDECL(objects_globals_init); /* objects.c */
 
 static char *FDECL(name_file, (const char *, const char *));
-static void FDECL(delete_file, (const char *template, const char *));
 static FILE *FDECL(getfp, (const char *, const char *, const char *, int));
 static void FDECL(do_ext_makedefs, (int, char **));
 static char *FDECL(xcrypt, (const char *));
@@ -383,6 +382,9 @@ const char *tag;
     return namebuf;
 }
 
+#ifdef HAS_NO_MKSTEMP
+static void FDECL(delete_file, (const char *template, const char *));
+
 static void
 delete_file(template, tag)
 const char *template;
@@ -392,6 +394,7 @@ const char *tag;
 
     Unlink(name);
 }
+#endif
 
 static FILE *
 getfp(template, tag, mode, flg)
@@ -410,9 +413,7 @@ int flg UNUSED;
     boolean istemp = (flg & FLG_TEMPFILE) != 0;
     char tmpfbuf[MAXFNAMELEN];
     int tmpfd;
-#endif
 
-#ifndef HAS_NO_MKSTEMP
     if (istemp) {
         (void) snprintf(tmpfbuf, sizeof tmpfbuf, DATA_TEMPLATE, "mdXXXXXX");
         tmpfd = mkstemp(tmpfbuf);
