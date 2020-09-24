@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1600909016 2020/09/24 00:56:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.203 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3844,7 +3844,8 @@ lua_State *L;
                 lua_getfield(L, 1, "contents");
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
-                    l_push_wid_hei_table(L, tmpcr->hx - tmpcr->lx, tmpcr->hy - tmpcr->ly);
+                    l_push_wid_hei_table(L, 1 + tmpcr->hx - tmpcr->lx,
+                                         1 + tmpcr->hy - tmpcr->ly);
                     lua_call(L, 1, 0);
                 } else
                     lua_pop(L, 1);

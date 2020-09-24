@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ $NHDT-Date: 1600863687 2020/09/23 12:21:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ $NHDT-Date: 1600909016 2020/09/24 00:56:56 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -342,6 +342,7 @@ replace worm tail placement code that reportedly led to a sanity_check warning
 	[no actual code problem found; might be compiler bug for 'xchar']
 learn scroll of teleportation after reading even when random destination is
 	right by starting spot
+fix off-by-one bug in dimensions of theme rooms
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
