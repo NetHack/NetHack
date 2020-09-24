@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1600652305 2020/09/21 01:38:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1600933441 2020/09/24 07:44:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3138,6 +3138,9 @@ boolean via_attack;
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
         return;
+    /* [FIXME: this logic seems wrong; peaceful humanoids gasp or exclaim
+       when they see you attack a peaceful monster but they just casually
+       look the other way when you attack a pet?] */
     if (mtmp->mtame)
         return;
     mtmp->mpeaceful = 0;
@@ -3196,25 +3199,50 @@ boolean via_attack;
             if (!mindless(mon->data) && mon->mpeaceful
                 && couldsee(mon->mx, mon->my) && !mon->msleeping
                 && mon->mcansee && m_canseeu(mon)) {
-                boolean exclaimed = FALSE;
+                char buf[BUFSZ];
+                boolean exclaimed = FALSE, needpunct = FALSE, alreadyfleeing;
 
+                buf[0] = '\0';
                 if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
                     if (is_watch(mon->data)) {
                         verbalize("Halt!  You're under arrest!");
                         (void) angry_guards(!!Deaf);
                     } else {
-                        if (!rn2(5)) {
-                            exclaimed = maybe_gasp(mon);
+                        if (!Deaf && !rn2(5)) {
+                            const char *gasp = maybe_gasp(mon);
+
+                            if (gasp) {
+                                if (!strncmpi(gasp, "gasp", 4)) {
+                                    Sprintf(buf, "%s gasps", Monnam(mon));
+                                    needpunct = TRUE;
+                                } else {
+                                    Sprintf(buf, "%s exclaims \"%s\"",
+                                            Monnam(mon), gasp);
+                                }
+                                exclaimed = TRUE;
+                            }
                         }
                         /* shopkeepers and temple priests might gasp in
                            surprise, but they won't become angry here */
-                        if (mon->isshk || mon->ispriest)
+                        if (mon->isshk || mon->ispriest) {
+                            if (exclaimed)
+                                pline("%s%s", buf, " then shrugs.");
                             continue;
+                        }
 
                         if (mon->data->mlevel < rn2(10)) {
+                            alreadyfleeing = (mon->mflee || mon->mfleetim);
                             monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
-                            exclaimed = TRUE;
+                            if (exclaimed) {
+                                if (flags.verbose && !alreadyfleeing) {
+                                    Strcat(buf, " and then turns to flee.");
+                                    needpunct = FALSE;
+                                }
+                            } else
+                                exclaimed = TRUE; /* got msg from monflee() */
                         }
+                        if (*buf)
+                            pline("%s%s", buf, needpunct ? "." : "");
                         if (mon->mtame) {
                             ; /* mustn't set mpeaceful to 0 as below;
                                * perhaps reduce tameness? */
@@ -3228,12 +3256,18 @@ boolean via_attack;
                 } else if (mon->data->mlet == mtmp->data->mlet
                            && big_little_match(mndx, monsndx(mon->data))
                            && !rn2(3)) {
-                    if (!rn2(4)) {
+                    if (!Deaf && !rn2(4)) {
                         growl(mon);
-                        exclaimed = TRUE;
+                        exclaimed = (iflags.last_msg == PLNMSG_GROWL);
                     }
-                    if (rn2(6))
+                    if (rn2(6)) {
+                        alreadyfleeing = (mon->mflee || mon->mfleetim);
                         monflee(mon, rn2(25) + 15, TRUE, !exclaimed);
+                        if (exclaimed && !alreadyfleeing)
+                            /* word like a separate sentence so that we
+                               don't have to poke around inside growl() */
+                            pline("And then starts to flee.");
+                    }
                 }
             }
         }

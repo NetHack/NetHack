@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ $NHDT-Date: 1600909016 2020/09/24 00:56:56 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.309 $ $NHDT-Date: 1600933440 2020/09/24 07:44:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -254,6 +254,8 @@ handle being interrupted by approaching monsters more consistently
 if hero attacked a peaceful monster, some other peaceful monsters with humanoid
 	shape (minotaur, zruty, perhaps others) that witnessed it but which
 	shouldn't be capable of normal speech expressed their surprise audibly
+make gasp/exclamation message from peaceful monsters be more verbose to
+	indicate which monster is doing the gasping or exclaiming
 when make was invoked with -j makedefs instances could end up running in
 	parallel and could trample on each other's temp files; default to
 	using mkstemp(); allow a port runtime library implementation that lacks
