@@ -1,4 +1,4 @@
-/* NetHack 3.7	sounds.c	$NHDT-Date: 1600652306 2020/09/21 01:38:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	sounds.c	$NHDT-Date: 1600933442 2020/09/24 07:44:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -369,6 +369,7 @@ register struct monst *mtmp;
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
+        iflags.last_msg = PLNMSG_GROWL;
         if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
@@ -480,7 +481,7 @@ register struct monst *mtmp;
 }
 
 /* hero has attacked a peaceful monster within 'mon's view */
-boolean
+const char *
 maybe_gasp(mon)
 struct monst *mon;
 {
@@ -542,10 +543,9 @@ struct monst *mon;
         break;
     }
     if (dogasp) {
-        verbalize("%s", Exclam[mon->m_id % SIZE(Exclam)]);
-        return TRUE;
+        return Exclam[rn2(SIZE(Exclam))]; /* [mon->m_id % SIZE(Exclam)]; */
     }
-    return FALSE;
+    return (const char *) 0;
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */

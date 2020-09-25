@@ -18,9 +18,56 @@ extern "C" {
 #include "qt_map.moc"
 #include "qt_click.h"
 #include "qt_glyph.h"
-#include "qt_xpms.h"
 #include "qt_set.h"
 #include "qt_str.h"
+
+// pet- and pile-mark xpm arrays moved out of qt_xpms.h so that we don't
+// include it here anymore; including that header in two files resulted in
+// two copies of all the static xpm data and all the rest is for qt_stat.cpp
+//
+/* XPM */
+static const char *pet_mark_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"8 7 2 1",
+/* colors */
+". c None",
+"  c #FF0000",
+/* pixels */
+"........",
+"..  .  .",
+".       ",
+".       ",
+"..     .",
+"...   ..",
+".... ..."
+};
+/* XPM */
+static const char *pet_mark_small_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"5 5 2 1",
+/* colors */
+". c None",
+"X c #FF0000",
+/* pixels */
+".X.X.",
+"XXXXX",
+".XXX.",
+"..X.."
+};
+/* XPM */
+static const char *pile_mark_xpm[] = {
+/* width height ncolors chars_per_pixel */
+"5 5 2 1",
+/* colors */
+". c None",
+"X c #00FF00",
+/* pixels */
+"..X..",
+"..X..",
+"XXXXX",
+"..X..",
+"..X.."
+};
 
 // temporary
 extern int qt_compact_mode;

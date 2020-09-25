@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1593953335 2020/07/05 12:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1600933440 2020/09/24 07:44:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -408,6 +408,7 @@ enum plnmsg_types {
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
     PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
     PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_GROWL,               /* growl() gave some message */
     PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 
