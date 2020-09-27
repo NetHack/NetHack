@@ -160,6 +160,18 @@ char NetHackQtYnDialog::Exec()
         int butheight = fontMetrics().height() * 2 + 5,
             butwidth = (butheight - 5)
                        * ((is_ynq || is_lr) ? 3 : is_yn ? 2 : 1) + 5;
+        if (butwidth == butheight) { // square, room for one character or ^c
+            // some characters will be labelled by name rather than by
+            // keystroke so will need wider buttons
+            for (int i = 0; i < nchoices; ++i) {
+                if (ch[i] == '\033')
+                    break; // ESC and anything after are hidden
+                if (ch[i] == ' ' || ch[i] == '\n' || ch[i] == '\r') {
+                    butwidth = (butheight - 5) * 2 + 5;
+                    break;
+                }
+            }
+        }
 
         QPushButton *button;
         for (int i = 0; i < nchoices; ++i) {
@@ -189,6 +201,26 @@ char NetHackQtYnDialog::Exec()
                     break;
                 case 'r':
                     button_name = "Right";
+                    break;
+                }
+            } else {
+                // special characters usually aren't listed among choices
+                // but if they are, label the buttons for them with sensible
+                // names; we want to avoid "^J" and "^M" for \n and \r;
+                // <Enter> and <Return> are equivalent to each other but
+                // labelling \n as newline or line-feed seems confusing;
+                switch (ch[i].cell()) {
+                case ' ':
+                    button_name = "Spc";
+                    break;
+                case '\n':
+                    button_name = "Ent";
+                    break;
+                case '\r':
+                    button_name = "Ret";
+                    break;
+                case '\033': // won't happen; ESC is hidden
+                    button_name = "Esc";
                     break;
                 }
             }
@@ -223,6 +255,7 @@ char NetHackQtYnDialog::Exec()
             groupbox->insertWidget(1, lb); // [n] button is item #1
             le = new QLineEdit();
             groupbox->insertWidget(2, le); // [n] became #2, Count label #1
+            le->setPlaceholderText(QString("#")); // grayed out
 	}
         // add an invisible right-most field to left justify the buttons
         groupbox->addStretch(80);
@@ -271,6 +304,7 @@ char NetHackQtYnDialog::Exec()
                         // 0 will be preselected; typing anything replaces it
                         le->insert(QString("0"));
                     } else {
+#if 1
                         le->insert(QString(choice));
                         //
                         // FIXME:  despite the documentation claiming that
@@ -281,6 +315,13 @@ char NetHackQtYnDialog::Exec()
                         // right-arrow to move the cursor.
                         //
                         le->end(false);
+#else
+                        // this also claims to cancel any selection and
+                        // position the cursor after the text but actually
+                        // leaves the digit selected, ready to be overwritten
+                        le->setText(QString(choice));
+                        le->setModified(true);
+#endif
                     }
                     // (don't know whether this actually does anything useful)
                     le->setAttribute(Qt::WA_KeyboardFocusChange, true);
@@ -290,9 +331,10 @@ char NetHackQtYnDialog::Exec()
             }
         } while (retry);
 
-        // non-Null 'le' implies 'allow_count'
+        // non-Null 'le' implies 'allow_count'; having a grayed-out '#'
+        // present in the QLineEdit widget doesn't affect its isEmpty() test
         if (le && !le->text().isEmpty()) {
-            ::yn_number = le->text().toInt();
+            ::yn_number = le->text().toLong();
             choice = '#';
         }
         keypress = choice;
