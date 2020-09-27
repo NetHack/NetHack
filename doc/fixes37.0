@@ -585,6 +585,8 @@ correct the Guidebook descriptions for msdos video_width and video_height to
 	described there forces the 640x480x16 mode where video_width and
 	video_height don't operate (github #294)
 redo rndmonst() to operate in a single pass (github pull request #286)
+fix the "stuck pets" issue (github #329)
+allow themed room subrooms to be filled (github #347)
 
 
 Code Cleanup and Reorganization
