@@ -166,6 +166,10 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
+#ifdef AMIGA
+#include "amiconf.h"
+#endif
+
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
 #ifdef AMIGA

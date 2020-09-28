@@ -65,7 +65,7 @@ void Abort(long rc);
 #endif
 void CleanUp(void);
 void flush_glyph_buffer(struct Window *w);
-void amiga_print_glyph(winid window, int color_index, int glyph, int bkglyph);
+void amiga_print_glyph(winid window, int color_index, int glyph);
 void start_glyphout(winid window);
 void amii_end_glyphout(winid window);
 struct NewWindow *DupNewWindow(struct NewWindow *win);

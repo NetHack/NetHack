@@ -37,6 +37,81 @@ dospkg: $(GAMEBIN) $(TARGETDIR)/recover.exe ../dat/nhtiles.bmp
 	@echo msdos package zip file $(TARGETDIR)/NH370DOS.ZIP
 endif  # CROSS_TO_MSDOS
 
+ifdef CROSS_TO_AMIGA
+$(TARGETDIR)/amidos.o : ../outdated/sys/amiga/amidos.c $(HACK_H)
+$(TARGETDIR)/amigst.o : ../outdated/sys/amiga/amigst.c $(HACK_H)
+$(TARGETDIR)/amirip.o : ../outdated/sys/amiga/amirip.c $(HACK_H)
+$(TARGETDIR)/amistack.o : ../outdated/sys/amiga/amistack.c $(HACK_H)
+$(TARGETDIR)/amitty.o : ../outdated/sys/amiga/amitty.c $(HACK_H)
+$(TARGETDIR)/amiwind.o : ../outdated/sys/amiga/amiwind.c \
+		../outdated/sys/amiga/amimenu.c $(HACK_H)
+$(TARGETDIR)/winami.o : ../outdated/sys/amiga/winami.c $(HACK_H)
+$(TARGETDIR)/winchar.o : ../outdated/sys/amiga/winchar.c tile.c $(HACK_H)
+$(TARGETDIR)/winfuncs.o : ../outdated/sys/amiga/winfuncs.c $(HACK_H)
+$(TARGETDIR)/winkey.o : ../outdated/sys/amiga/winkey.c $(HACK_H)
+$(TARGETDIR)/winamenu.o : ../outdated/sys/amiga/winamenu.c $(HACK_H) 
+$(TARGETDIR)/winreq.o : ../outdated/sys/amiga/winreq.c \
+		../outdated/sys/amiga/colorwin.c \
+		../outdated/sys/amiga/clipwin.c $(HACK_H)
+$(TARGETDIR)/winstr.o : ../outdated/sys/amiga/winstr.c $(HACK_H)
+$(TARGETDIR)/tomb.iff : ../util/xpm2iff ../outdated/sys/amiga/gave16.xpm
+../util/tiletext.o : ../win/share/tiletext.c
+	$(CC) $(CFLAGS) -c \
+		-o $@ ../win/share/tiletext.c
+../util/txt2iff : ../util/txt2iff.o ../util/tiletext.o \
+		../util/tiletxt.o
+	$(LINK) $(LFLAGS) -L../lib -o $@ ../util/txt2iff.o ../util/tiletext.o \
+		../util/tiletxt.o -lriffl
+../util/txt2iff.o : ../outdated/sys/amiga/txt2iff.c $(HACK_H)
+	$(CC) $(CFLAGS) -c \
+		-I../lib/riffl-0.2/include \
+		-I/opt/amiga/m68k-amigaos/ndk13-include \
+		-o $@ ../outdated/sys/amiga/txt2iff.c
+../util/xpm2iff : ../util/xpm2iff.o
+	$(LINK) $(LFLAGS) -L../lib -o $@ ../util/txt2iff.o -lriffl
+../util/xpm2iff.o : ../outdated/sys/amiga/xpm2iff.c $(HACK_H)
+	$(CC) $(CFLAGS) -o $@ ../outdated/sys/amiga/xpm2iff.c
+$(TARGETDIR)/objects.iff: ../win/share/objects.txt ../util/txt2iff
+	../util/txt2iff ../win/share/objects.txt $@
+$(TARGETDIR)/monsters.iff: ../win/share/monsters.txt ../util/txt2iff
+	../util/txt2iff ../win/share/monsters.txt $@
+$(TARGETDIR)/other.iff: ../win/share/other.txt ../util/txt2iff
+	../util/txt2iff ../win/share/other.txt $@
+#
+#.PHONY: amigapkg
+amigapkg: $(GAMEBIN) $(TARGETDIR)/recover.exe ../dat/nhtiles.bmp
+	mkdir -p $(TARGETDIR)/pkg
+	cp $(GAMEBIN) $(TARGETDIR)/pkg/nethack
+	cp ../dat/nhdat $(TARGETDIR)/pkg/nhdat
+	cp ../dat/license $(TARGETDIR)/pkg/license
+	cp ../dat/nhtiles.bmp $(TARGETDIR)/pkg/nhtiles.bmp
+	cp $(TARGETDIR)/tomb.iff $(TARGETDIR)/pkg/tomb.iff
+	cp $(TARGETDIR)/monsters.iff $(TARGETDIR)/pkg/monsters.iff
+	cp $(TARGETDIR)/objects.iff $(TARGETDIR)/pkg/objects.iff
+	cp $(TARGETDIR)/other.iff $(TARGETDIR)/pkg/other.iff
+	cp ../dat/symbols $(TARGETDIR)/pkg/symbols
+	cp ../sys/share/NetHack.cnf $(TARGETDIR)/pkg/nethack.cnf
+	cp ../sys/msdos/sysconf $(TARGETDIR)/pkg/sysconf
+	cp ../outdated/sys/amiga/amii.hlp $(TARGETDIR)/pkg/amii.hlp
+	cp ../sys/msdos/sysconf $(TARGETDIR)/pkg/sysconf
+	cp ../doc/nethack.txt $(TARGETDIR)/pkg/nethack.txt
+	../util/uudecode ../outdated/sys/amiga/amifont8.uu
+	cp 8 $(TARGETDIR)/pkg/8
+	../util/uudecode ../outdated/sys/amiga/amifont.uu
+	cp hack.font $(TARGETDIR)/pkg/hack.font
+	../util/uudecode ../outdated/sys/amiga/dflticon.uu
+	cp default.icon $(TARGETDIR)/pkg/default.icon
+	../util/uudecode ../outdated/sys/amiga/NHinfo.uu
+	cp NetHack.info $(TARGETDIR)/pkg/NetHack.info
+	../util/uudecode ../outdated/sys/amiga/NewGame.uu
+	cp NewGame.info $(TARGETDIR)/pkg/NewGame.info
+	../util/uudecode ../outdated/sys/amiga/HackWB.uu
+	cp HackWB.info $(TARGETDIR)/pkg/HackWB.info
+	-touch $(TARGETDIR)/pkg/record
+	zip -9 $(TARGETDIR)/NH370AMI.ZIP $(TARGETDIR)/pkg/*
+	@echo amiga package zip file $(TARGETDIR)/NH370AMI.ZIP
+endif  # CROSS_TO_AMIGA
+
 #
 # shared file dependencies
 #

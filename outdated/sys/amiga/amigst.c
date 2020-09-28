@@ -36,8 +36,14 @@
 #include <functions.h>
 #endif
 
+#ifndef AMIGA_CROSS
 #include "NH:sys/amiga/winami.p"
 #include "NH:sys/amiga/amiwind.p"
 #include "NH:sys/amiga/amidos.p"
+#else
+#include "winami.p"
+#include "amiwind.p"
+#include "amidos.p"
+#endif
 
 /* end amigst.c */

@@ -268,7 +268,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (argc == 0)
         chdirx(HACKDIR, 1);
 #endif
-    ami_wininit_data();
+    ami_wininit_data(WININIT);
 #endif
     initoptions();
 
@@ -753,5 +753,41 @@ char *str;
     return tmp;
 }
 #endif /* EXEPATH */
+
+#ifdef AMIGA_CROSS
+void msmsg
+VA_DECL(const char *, fmt)
+{
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    Vprintf(fmt, VA_ARGS);
+    flushout();
+    VA_END();
+    return;
+}
+
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed = 0L;
+    unsigned long pid = (unsigned long) getpid();
+    boolean no_seed = TRUE;
+
+#ifdef AMIGA_STRONG_RANDOM_SEED_HERE
+    /* hypothetical - strong seed code is required */
+    /* then has_strong_seed could be set */
+#endif
+    if (no_seed) {
+        seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+        /* Quick dirty band-aid to prevent PRNG prediction */
+        if (pid) {
+            if (!(pid & 3L))
+                pid -= 1L;
+            seed *= pid;
+        }
+    }
+    return seed;
+}
+#endif
 
 /*pcmain.c*/

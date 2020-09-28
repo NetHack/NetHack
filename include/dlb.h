@@ -9,7 +9,7 @@
 #ifdef DLB
 
 /* implementations */
-#ifdef MAC
+#if defined(MAC) && !defined(MAC_CROSS)
 #define DLBRSRC /* use Mac resources */
 #else
 #define DLBLIB /* use a set of external files */

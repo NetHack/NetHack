@@ -2149,10 +2149,12 @@ E void NDECL(deliver_splev_message);
 /* ### random.c ### */
 
 #if defined(RANDOM) && !defined(__GO32__) /* djgpp has its own random */
+#ifndef AMIGA_CROSS
 E void FDECL(srandom, (unsigned));
 E char *FDECL(initstate, (unsigned, char *, int));
 E char *FDECL(setstate, (char *));
 E long NDECL(random);
+#endif
 #endif /* RANDOM */
 
 /* ### read.c ### */
