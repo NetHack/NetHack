@@ -123,9 +123,9 @@ Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
 amidos.c      amidos.p      amifont.uu    amifont8.uu   amigst.c
 amii.hlp      amimenu.c     amirip.c      amistack.c    amitty.c
 amiwind.c     amiwind.p     clipwin.c     colorwin.c    grave16.xpm
-ifchange      mkdmake       txt2iff.c     winami.c      winami.p
-winchar.c     windefs.h     winext.h      winfuncs.c    winkey.c
-winmenu.c     winproto.h    winreq.c      winstr.c      xpm2iff.c
+ifchange      mkdmake       txt2iff.c     winamenu.c    winami.c
+winami.p      winchar.c     windefs.h     winext.h      winfuncs.c
+winkey.c      winproto.h    winreq.c      winstr.c      xpm2iff.c
 
 outdated/sys/atari:
 (files for Atari version - untested for 3.7)
@@ -222,13 +222,14 @@ zap.c
 
 sys/msdos:
 (files for MSDOS version)
-Install.dos             Makefile.GCC            Makefile1.cross
-Makefile2.cross         msdos-cross-compile.sh  msdos.c
-msdoshlp.txt            nhlua.h                 pckeys.c
-pctiles.c               pctiles.h               pcvideo.h
-portio.h                setup.bat               sysconf
-tile2bin.c              vesa.h                  video.c
-vidtxt.c                vidvesa.c               vidvga.c
+Install.dos              Makefile.GCC             Makefile1.cross
+Makefile2.cross          fetch-cross-compiler.sh  msdos-cross-compile.sh
+msdos.c                  msdoshlp.txt             nhlua.h
+pckeys.c                 pctiles.c                pctiles.h
+pcvideo.h                portio.h                 setup.bat
+sysconf                  tile2bin.c               vesa.h
+video.c                  vidtxt.c                 vidvesa.c
+vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
@@ -312,7 +313,7 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-multiw-1.2020  multiw-2.2020
+cross-post.2020  cross-pre.2020   multiw-1.2020    multiw-2.2020
 
 sys/vms:
 (files for VMS version)
@@ -343,16 +344,17 @@ dlb_main.c  makedefs.c  mdgrep.h    mdgrep.pl   panic.c     recover.c
 
 win/Qt:
 (files for the Qt 4 or 5 widget library - X11, Windows, Mac OS X)
-qt_bind.cpp   qt_bind.h     qt_click.cpp  qt_click.h    qt_clust.cpp
-qt_clust.h    qt_delay.cpp  qt_delay.h    qt_glyph.cpp  qt_glyph.h
-qt_icon.cpp   qt_icon.h     qt_inv.cpp    qt_inv.h      qt_kde0.h
-qt_key.cpp    qt_key.h      qt_line.cpp   qt_line.h     qt_main.cpp
-qt_main.h     qt_map.cpp    qt_map.h      qt_menu.cpp   qt_menu.h
-qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_post.h
-qt_pre.h      qt_rip.cpp    qt_rip.h      qt_set.cpp    qt_set.h
-qt_stat.cpp   qt_stat.h     qt_str.cpp    qt_str.h      qt_streq.cpp
-qt_streq.h    qt_svsel.cpp  qt_svsel.h    qt_win.cpp    qt_win.h
-qt_xcmd.cpp   qt_xcmd.h     qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
+Qt-issues.txt  qt_bind.cpp    qt_bind.h      qt_click.cpp   qt_click.h
+qt_clust.cpp   qt_clust.h     qt_delay.cpp   qt_delay.h     qt_glyph.cpp
+qt_glyph.h     qt_icon.cpp    qt_icon.h      qt_inv.cpp     qt_inv.h
+qt_kde0.h      qt_key.cpp     qt_key.h       qt_line.cpp    qt_line.h
+qt_main.cpp    qt_main.h      qt_map.cpp     qt_map.h       qt_menu.cpp
+qt_menu.h      qt_msg.cpp     qt_msg.h       qt_plsel.cpp   qt_plsel.h
+qt_post.h      qt_pre.h       qt_rip.cpp     qt_rip.h       qt_set.cpp
+qt_set.h       qt_stat.cpp    qt_stat.h      qt_str.cpp     qt_str.h
+qt_streq.cpp   qt_streq.h     qt_svsel.cpp   qt_svsel.h     qt_win.cpp
+qt_win.h       qt_xcmd.cpp    qt_xcmd.h      qt_xpms.h      qt_yndlg.cpp
+qt_yndlg.h
 
 win/X11:
 (files for X versions)
