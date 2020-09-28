@@ -8,7 +8,8 @@ ifdef CROSS_TO_MSDOS
 BUILD_LUA=1
 BUILD_PDCURSES=1
 override TARGET = msdos
-override TARGETDIR = ../targets/$(TARGET)
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS=
 endif
 
@@ -16,7 +17,8 @@ ifdef CROSS_TO_AMIGA
 BUILD_LUA=1
 BUILD_PDCURSES=1
 override TARGET = amiga
-override TARGETDIR = ../targets/$(TARGET)
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS=
 endif
 
@@ -28,26 +30,26 @@ ifdef BUILD_LUA
 LUA_VERSION ?=5.4.0
 LUATOP ?= ../lib/lua-$(LUA_VERSION)
 LUASRCDIR ?= $(LUATOP)/src
-LUAOBJFILES1 =  $(TARGETDIR)/lapi.o $(TARGETDIR)/lauxlib.o \
-		$(TARGETDIR)/lbaselib.o $(TARGETDIR)/lcode.o \
-		$(TARGETDIR)/lcorolib.o $(TARGETDIR)/lctype.o \
-		$(TARGETDIR)/ldblib.o
+LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
+		$(TARGETPFX)lbaselib.o $(TARGETPFX)lcode.o \
+		$(TARGETPFX)lcorolib.o $(TARGETPFX)lctype.o \
+		$(TARGETPFX)ldblib.o
 ifeq "$(LUA_VERSION)" "5.3.5"
-LUAOBJFILES1 += $(TARGETDIR)/lbitlib.o
+LUAOBJFILES1 += $(TARGETPFX)lbitlib.o
 endif
-LUAOBJFILES2 =  $(TARGETDIR)/ldebug.o $(TARGETDIR)/ldo.o $(TARGETDIR)/ldump.o \
-		$(TARGETDIR)/lfunc.o $(TARGETDIR)/lgc.o $(TARGETDIR)/linit.o \
-		$(TARGETDIR)/liolib.o $(TARGETDIR)/llex.o
-LUAOBJFILES3 =  $(TARGETDIR)/lmathlib.o $(TARGETDIR)/lmem.o \
-		$(TARGETDIR)/loadlib.o $(TARGETDIR)/lobject.o \
-		$(TARGETDIR)/lopcodes.o $(TARGETDIR)/loslib.o \
-		$(TARGETDIR)/lparser.o $(TARGETDIR)/lstate.o
-LUAOBJFILES4 =  $(TARGETDIR)/lstring.o $(TARGETDIR)/lstrlib.o \
-		$(TARGETDIR)/ltable.o $(TARGETDIR)/ltablib.o \
-		$(TARGETDIR)/ltm.o $(TARGETDIR)/lundump.o \
-		$(TARGETDIR)/lutf8lib.o $(TARGETDIR)/lvm.o $(TARGETDIR)/lzio.o
+LUAOBJFILES2 =  $(TARGETPFX)ldebug.o $(TARGETPFX)ldo.o $(TARGETPFX)ldump.o \
+		$(TARGETPFX)lfunc.o $(TARGETPFX)lgc.o $(TARGETPFX)linit.o \
+		$(TARGETPFX)liolib.o $(TARGETPFX)llex.o
+LUAOBJFILES3 =  $(TARGETPFX)lmathlib.o $(TARGETPFX)lmem.o \
+		$(TARGETPFX)loadlib.o $(TARGETPFX)lobject.o \
+		$(TARGETPFX)lopcodes.o $(TARGETPFX)loslib.o \
+		$(TARGETPFX)lparser.o $(TARGETPFX)lstate.o
+LUAOBJFILES4 =  $(TARGETPFX)lstring.o $(TARGETPFX)lstrlib.o \
+		$(TARGETPFX)ltable.o $(TARGETPFX)ltablib.o \
+		$(TARGETPFX)ltm.o $(TARGETPFX)lundump.o \
+		$(TARGETPFX)lutf8lib.o $(TARGETPFX)lvm.o $(TARGETPFX)lzio.o
 LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
-LUACROSSLIB = $(TARGETDIR)/$(O)lua$(subst .,,$(LUA_VERSION)).a
+LUACROSSLIB = $(TARGETPFX)$(O)lua$(subst .,,$(LUA_VERSION)).a
 LUAINCL  = -I$(LUASRCDIR)
 BUILDMORE += $(LUACROSSLIB)
 override TARGET_LIBS += $(LUACROSSLIB) -lm
@@ -63,33 +65,33 @@ ifdef WANT_WIN_CURSES
 PDCTOP = ../lib/pdcurses
 PDCURSESDEF= -I../lib/pdcurses -I../lib/pdcurses/dos \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
-PDCLIBOBJ1= $(TARGETDIR)/addch.o $(TARGETDIR)/addchstr.o \
-		$(TARGETDIR)/addstr.o $(TARGETDIR)/attr.o \
-		$(TARGETDIR)/beep.o $(TARGETDIR)/bkgd.o \
-		$(TARGETDIR)/border.o $(TARGETDIR)/clear.o \
-		$(TARGETDIR)/color.o $(TARGETDIR)/delch.o \
-		$(TARGETDIR)/deleteln.o $(TARGETDIR)/getch.o \
-		$(TARGETDIR)/getstr.o $(TARGETDIR)/getyx.o \
-		$(TARGETDIR)/inch.o
-PDCLIBOBJ2= $(TARGETDIR)/inchstr.o $(TARGETDIR)/initscr.o \
-		$(TARGETDIR)/inopts.o $(TARGETDIR)/insch.o \
-		$(TARGETDIR)/insstr.o $(TARGETDIR)/instr.o \
-		$(TARGETDIR)/kernel.o $(TARGETDIR)/keyname.o \
-		$(TARGETDIR)/mouse.o $(TARGETDIR)/move.o \
-		$(TARGETDIR)/outopts.o $(TARGETDIR)/overlay.o
-PDCLIBOBJ3= $(TARGETDIR)/pad.o $(TARGETDIR)/panel.o $(TARGETDIR)/printw.o \
-		$(TARGETDIR)/refresh.o $(TARGETDIR)/scanw.o \
-		$(TARGETDIR)/scr_dump.o $(TARGETDIR)/scroll.o \
-		$(TARGETDIR)/slk.o $(TARGETDIR)/termattr.o
-PDCLIBOBJ4= $(TARGETDIR)/touch.o $(TARGETDIR)/util.o $(TARGETDIR)/window.o \
-		$(TARGETDIR)/debug.o
+PDCLIBOBJ1= $(TARGETPFX)addch.o $(TARGETPFX)addchstr.o \
+		$(TARGETPFX)addstr.o $(TARGETPFX)attr.o \
+		$(TARGETPFX)beep.o $(TARGETPFX)bkgd.o \
+		$(TARGETPFX)border.o $(TARGETPFX)clear.o \
+		$(TARGETPFX)color.o $(TARGETPFX)delch.o \
+		$(TARGETPFX)deleteln.o $(TARGETPFX)getch.o \
+		$(TARGETPFX)getstr.o $(TARGETPFX)getyx.o \
+		$(TARGETPFX)inch.o
+PDCLIBOBJ2= $(TARGETPFX)inchstr.o $(TARGETPFX)initscr.o \
+		$(TARGETPFX)inopts.o $(TARGETPFX)insch.o \
+		$(TARGETPFX)insstr.o $(TARGETPFX)instr.o \
+		$(TARGETPFX)kernel.o $(TARGETPFX)keyname.o \
+		$(TARGETPFX)mouse.o $(TARGETPFX)move.o \
+		$(TARGETPFX)outopts.o $(TARGETPFX)overlay.o
+PDCLIBOBJ3= $(TARGETPFX)pad.o $(TARGETPFX)panel.o $(TARGETPFX)printw.o \
+		$(TARGETPFX)refresh.o $(TARGETPFX)scanw.o \
+		$(TARGETPFX)scr_dump.o $(TARGETPFX)scroll.o \
+		$(TARGETPFX)slk.o $(TARGETPFX)termattr.o
+PDCLIBOBJ4= $(TARGETPFX)touch.o $(TARGETPFX)util.o $(TARGETPFX)window.o \
+		$(TARGETPFX)debug.o
 PDCLIBOBJS = $(PDCLIBOBJ1) $(PDCLIBOBJ2) $(PDCLIBOBJ3) $(PDCLIBOBJ4)
-PDCLIB = $(TARGETDIR)/pdclib.a
+PDCLIB = $(TARGETPFX)pdclib.a
 PDCINCL = -I$(PDCTOP) -I$(PDCTOP)/pdcurses
-PDCOBJS = $(TARGETDIR)/pdcclip.o $(TARGETDIR)/pdcdisp.o \
-		$(TARGETDIR)/pdcgetsc.o $(TARGETDIR)/pdckbd.o \
-		$(TARGETDIR)/pdcscrn.o $(TARGETDIR)/pdcsetsc.o \
-		$(TARGETDIR)/pdcutil.o
+PDCOBJS = $(TARGETPFX)pdcclip.o $(TARGETPFX)pdcdisp.o \
+		$(TARGETPFX)pdcgetsc.o $(TARGETPFX)pdckbd.o \
+		$(TARGETPFX)pdcscrn.o $(TARGETPFX)pdcsetsc.o \
+		$(TARGETPFX)pdcutil.o
 override TARGET_LIBS += $(PDCLIB)
 ifdef CROSS_TO_MSDOS
 PDCINCL += -I$(PDCTOP)/dos
@@ -100,7 +102,7 @@ override TARGET_LIBS += -lSDL
 endif
 BUILDMORE += $(PDCLIB)
 # Rules for PDCurses files
-$(TARGETDIR)/%.o : $(PDCTOP)/pdcurses/%.c
+$(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
 else   #WANT_WIN_CURSES
 PDCURSESDEF=
@@ -151,30 +153,30 @@ override SYSSRC = ../sys/share/pcmain.c ../sys/msdos/msdos.c \
 		../sys/msdos/vidvga.c ../sys/msdos/vidvesa.c \
 		../win/share/bmptiles.c ../win/share/giftiles.c \
 		../win/share/tileset.c
-override SYSOBJ= $(TARGETDIR)/pcmain.o $(TARGETDIR)/msdos.o \
-		$(TARGETDIR)/pcsys.o $(TARGETDIR)/pctty.o \
-		$(TARGETDIR)/pcunix.o $(TARGETDIR)/video.o \
-		$(TARGETDIR)/vidtxt.o $(TARGETDIR)/pckeys.o \
-		$(TARGETDIR)/vidvga.o $(TARGETDIR)/vidvesa.o \
-		$(TARGETDIR)/bmptiles.o $(TARGETDIR)/giftiles.o \
-		$(TARGETDIR)/tileset.o $(TARGETDIR)/tile.o
+override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
+		$(TARGETPFX)pcsys.o $(TARGETPFX)pctty.o \
+		$(TARGETPFX)pcunix.o $(TARGETPFX)video.o \
+		$(TARGETPFX)vidtxt.o $(TARGETPFX)pckeys.o \
+		$(TARGETPFX)vidvga.o $(TARGETPFX)vidvesa.o \
+		$(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o \
+		$(TARGETPFX)tileset.o $(TARGETPFX)tile.o
 override WINLIB=
 override LUALIB=
-override GAMEBIN = $(TARGETDIR)/nethack.exe
+override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE= dospkg
 VARDATND += nhtiles.bmp
 PREGAME = mkdir -p $(TARGETDIR)
 CLEANMORE += rm -r $(TARGETDIR)
-BUILDMORE += $(TARGETDIR)/recover.exe
+BUILDMORE += $(TARGETPFX)recover.exe
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
-$(TARGETDIR)/%.o : $(PDCTOP)/dos/%.c
+$(TARGETPFX)%.o : $(PDCTOP)/dos/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 #
 # Rule for files in sys/msdos
-$(TARGETDIR)/%.o : ../sys/msdos/%.c
+$(TARGETPFX)%.o : ../sys/msdos/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_TO_MSDOS
 #=================================================================
@@ -203,7 +205,7 @@ TOOLTOP = /opt/amiga/bin
 #TOOLARCH = -m68020 -mcrt=clib2
 #TOOLARCH = -m68020   #newlib
 TOOLARCH = -m68020 -noixemul
-override REGEXOBJ = $(TARGETDIR)/cppregex.o
+override REGEXOBJ = $(TARGETPFX)cppregex.o
 override TARGET_CC = $(TOOLTOP)/m68k-amigaos-gcc
 override TARGET_CXX = $(TOOLTOP)/m68k-amigaos-c++
 override TARGET_AR = $(TOOLTOP)/m68k-amigaos-ar 
@@ -216,7 +218,7 @@ override TARGET_CFLAGS = -c -O $(TOOLARCH) \
 	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET \
 	-DAMIGA_VERSION_STRING=\""VER: NetHack 3.7.0 \(12.13.2020)\""
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
-ifeq "$(REGEXOBJ)" "$(TARGETDIR)/cppregex.o"
+ifeq "$(REGEXOBJ)" "$(TARGETPFX)cppregex.o"
 override TARGET_LINK = $(TARGET_CXX)
 else
 override TARGET_LINK = $(TARGET_CC)
@@ -237,48 +239,48 @@ override SYSSRC = ../outdated/sys/amiga/amidos.c ../outdated/sys/amiga/amigst.c 
 		../win/share/tileset.c
 #		../outdated/sys/amiga/xpm2iff.c
 #		../outdated/sys/amiga/txt2iff.c
-override SYSOBJ = $(TARGETDIR)/amidos.o $(TARGETDIR)/amigst.o \
-		$(TARGETDIR)/amirip.o $(TARGETDIR)/amistack.o \
-		$(TARGETDIR)/amitty.o $(TARGETDIR)/amiwind.o \
-		$(TARGETDIR)/winami.o $(TARGETDIR)/winchar.o \
-		$(TARGETDIR)/winfuncs.o $(TARGETDIR)/winkey.o \
-		$(TARGETDIR)/winamenu.o $(TARGETDIR)/winreq.o \
-		$(TARGETDIR)/winstr.o $(TARGETDIR)/pcmain.o \
-		$(TARGETDIR)/bmptiles.o $(TARGETDIR)/giftiles.o \
-		$(TARGETDIR)/tileset.o
-#		$(TARGETDIR)/xpm2iff.o
+override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
+		$(TARGETPFX)amirip.o $(TARGETPFX)amistack.o \
+		$(TARGETPFX)amitty.o $(TARGETPFX)amiwind.o \
+		$(TARGETPFX)winami.o $(TARGETPFX)winchar.o \
+		$(TARGETPFX)winfuncs.o $(TARGETPFX)winkey.o \
+		$(TARGETPFX)winamenu.o $(TARGETPFX)winreq.o \
+		$(TARGETPFX)winstr.o $(TARGETPFX)pcmain.o \
+		$(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o \
+		$(TARGETPFX)tileset.o
+#		$(TARGETPFX)xpm2iff.o
 #		../util/txt2iff.o
 override WINLIB=
 override LUALIB=
-override GAMEBIN = $(TARGETDIR)/nethack.exe
+override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE= amigapkg
 PREGAME = mkdir -p ../targets/amiga
 CLEANMORE += rm -r ../targets/amiga
-BUILDMORE += $(TARGETDIR)/recover.exe
+BUILDMORE += $(TARGETPFX)recover.exe
 #		../util/txt2iff
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses sdl1-specific files
-$(TARGETDIR)/%.o : $(PDCTOP)/sdl1/%.c
+$(TARGETPFX)%.o : $(PDCTOP)/sdl1/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 # Rule for files in sys/amiga
-$(TARGETDIR)/%.o : ../outdated/sys/amiga/%.c
+$(TARGETPFX)%.o : ../outdated/sys/amiga/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_TO_AMIGA
 #=================================================================
 
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
-$(TARGETDIR)/%.o : $(PDCTOP)/sdl1/%.c
+$(TARGETPFX)%.o : $(PDCTOP)/sdl1/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 # Rule for LUA files
-$(TARGETDIR)/%.o : $(LUATOP)/src/%.c
+$(TARGETPFX)%.o : $(LUATOP)/src/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) $(LUA_FLAGS) -o$@ $<
 ifdef WANT_WIN_CURSES
 # Rules for PDCurses files
-$(TARGETDIR)/%.o : $(PDCTOP)/pdcurses/%.c
+$(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 
