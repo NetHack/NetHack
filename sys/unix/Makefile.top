@@ -205,6 +205,9 @@ dlb:
 	( cd util ; $(MAKE) dlb )
 	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
 
+package: $(GAME) recover $(VARDAT) spec_levs
+	( cd src ;  $(MAKE) $(PACKAGE) )
+
 # recover can be used when INSURANCE is defined in include/config.h
 # and the checkpoint option is true
 recover: $(GAME)

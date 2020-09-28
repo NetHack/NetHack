@@ -339,7 +339,7 @@ E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));
 #else
-#if defined(AZTEC_50) || defined(NHSTDC))
+#if defined(AZTEC_50) || defined(NHSTDC)
 E int FDECL(memcmp, (const void *, const void *, size_t));
 E void *FDECL(memcpy, (void *, const void *, size_t));
 E void *FDECL(memset, (void *, int, size_t));

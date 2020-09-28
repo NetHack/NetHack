@@ -1,0 +1,110 @@
+#===============-=================================================
+# NetHack 3.7  include/cross-post $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+#
+# Cross-compiling -POST section
+
+#
+# Lua lib
+$(LUACROSSLIB): $(LUALIBOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES1)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
+	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
+	$(TARGET_AR) rcs $@ $(LUAOBJFILES4)
+ifdef WANT_WIN_CURSES
+$(TARGETDIR)/pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+endif
+#
+# Lua src
+$(TARGETDIR)/lapi.o : $(LUATOP)/src/lapi.c
+$(TARGETDIR)/lauxlib.o : $(LUATOP)/src/lauxlib.c
+$(TARGETDIR)/lbaselib.o : $(LUATOP)/src/lbaselib.c
+$(TARGETDIR)/lbitlib.o : $(LUATOP)/src/lbitlib.c
+$(TARGETDIR)/lcode.o : $(LUATOP)/src/lcode.c
+$(TARGETDIR)/lcorolib.o : $(LUATOP)/src/lcorolib.c
+$(TARGETDIR)/lctype.o : $(LUATOP)/src/lctype.c
+$(TARGETDIR)/ldblib.o : $(LUATOP)/src/ldblib.c
+$(TARGETDIR)/ldebug.o : $(LUATOP)/src/ldebug.c
+$(TARGETDIR)/ldo.o : $(LUATOP)/src/ldo.c
+$(TARGETDIR)/ldump.o : $(LUATOP)/src/ldump.c
+$(TARGETDIR)/lfunc.o : $(LUATOP)/src/lfunc.c
+$(TARGETDIR)/lgc.o : $(LUATOP)/src/lgc.c
+$(TARGETDIR)/linit.o : $(LUATOP)/src/linit.c
+$(TARGETDIR)/liolib.o : $(LUATOP)/src/liolib.c
+$(TARGETDIR)/llex.o : $(LUATOP)/src/llex.c
+$(TARGETDIR)/lmathlib.o : $(LUATOP)/src/lmathlib.c
+$(TARGETDIR)/lmem.o : $(LUATOP)/src/lmem.c
+$(TARGETDIR)/loadlib.o : $(LUATOP)/src/loadlib.c
+$(TARGETDIR)/lobject.o : $(LUATOP)/src/lobject.c
+$(TARGETDIR)/lopcodes.o : $(LUATOP)/src/lopcodes.c
+$(TARGETDIR)/loslib.o : $(LUATOP)/src/loslib.c
+$(TARGETDIR)/lparser.o : $(LUATOP)/src/lparser.c
+$(TARGETDIR)/lstate.o : $(LUATOP)/src/lstate.c
+$(TARGETDIR)/lstring.o : $(LUATOP)/src/lstring.c
+$(TARGETDIR)/lstrlib.o : $(LUATOP)/src/lstrlib.c
+$(TARGETDIR)/ltable.o : $(LUATOP)/src/ltable.c
+$(TARGETDIR)/ltablib.o : $(LUATOP)/src/ltablib.c
+$(TARGETDIR)/ltm.o : $(LUATOP)/src/ltm.c
+$(TARGETDIR)/lundump.o : $(LUATOP)/src/lundump.c
+$(TARGETDIR)/lutf8lib.o : $(LUATOP)/src/lutf8lib.c
+$(TARGETDIR)/lvm.o : $(LUATOP)/src/lvm.c
+$(TARGETDIR)/lzio.o : $(LUATOP)/src/lzio.c
+#
+# PDCurses src
+#
+$(TARGETDIR)/addch.o : $(PDCTOP)/pdcurses/addch.c
+$(TARGETDIR)/addchstr.o : $(PDCTOP)/pdcurses/addchstr.c
+$(TARGETDIR)/addstr.o : $(PDCTOP)/pdcurses/addstr.c
+$(TARGETDIR)/attr.o : $(PDCTOP)/pdcurses/attr.c
+$(TARGETDIR)/beep.o : $(PDCTOP)/pdcurses/beep.c
+$(TARGETDIR)/bkgd.o : $(PDCTOP)/pdcurses/bkgd.c
+$(TARGETDIR)/border.o : $(PDCTOP)/pdcurses/border.c
+$(TARGETDIR)/clear.o : $(PDCTOP)/pdcurses/clear.c
+$(TARGETDIR)/color.o : $(PDCTOP)/pdcurses/color.c
+$(TARGETDIR)/delch.o : $(PDCTOP)/pdcurses/delch.c
+$(TARGETDIR)/deleteln.o : $(PDCTOP)/pdcurses/deleteln.c
+$(TARGETDIR)/getch.o : $(PDCTOP)/pdcurses/getch.c
+$(TARGETDIR)/getstr.o : $(PDCTOP)/pdcurses/getstr.c
+$(TARGETDIR)/getyx.o : $(PDCTOP)/pdcurses/getyx.c
+$(TARGETDIR)/inch.o : $(PDCTOP)/pdcurses/inch.c
+$(TARGETDIR)/inchstr.o : $(PDCTOP)/pdcurses/inchstr.c
+$(TARGETDIR)/initscr.o : $(PDCTOP)/pdcurses/initscr.c
+$(TARGETDIR)/inopts.o : $(PDCTOP)/pdcurses/inopts.c
+$(TARGETDIR)/insch.o : $(PDCTOP)/pdcurses/insch.c
+$(TARGETDIR)/insstr.o : $(PDCTOP)/pdcurses/insstr.c
+$(TARGETDIR)/instr.o : $(PDCTOP)/pdcurses/instr.c
+$(TARGETDIR)/kernel.o : $(PDCTOP)/pdcurses/kernel.c
+$(TARGETDIR)/keyname.o : $(PDCTOP)/pdcurses/keyname.c
+$(TARGETDIR)/mouse.o : $(PDCTOP)/pdcurses/mouse.c
+$(TARGETDIR)/move.o : $(PDCTOP)/pdcurses/move.c
+$(TARGETDIR)/outopts.o : $(PDCTOP)/pdcurses/outopts.c
+$(TARGETDIR)/overlay.o : $(PDCTOP)/pdcurses/overlay.c
+$(TARGETDIR)/pad.o : $(PDCTOP)/pdcurses/pad.c
+$(TARGETDIR)/panel.o : $(PDCTOP)/pdcurses/panel.c
+$(TARGETDIR)/printw.o : $(PDCTOP)/pdcurses/printw.c
+$(TARGETDIR)/refresh.o : $(PDCTOP)/pdcurses/refresh.c
+$(TARGETDIR)/scanw.o : $(PDCTOP)/pdcurses/scanw.c
+$(TARGETDIR)/scr_dump.o : $(PDCTOP)/pdcurses/scr_dump.c
+$(TARGETDIR)/scroll.o : $(PDCTOP)/pdcurses/scroll.c
+$(TARGETDIR)/slk.o : $(PDCTOP)/pdcurses/slk.c
+$(TARGETDIR)/termattr.o : $(PDCTOP)/pdcurses/termattr.c
+$(TARGETDIR)/touch.o : $(PDCTOP)/pdcurses/touch.c
+$(TARGETDIR)/util.o : $(PDCTOP)/pdcurses/util.c
+$(TARGETDIR)/window.o : $(PDCTOP)/pdcurses/window.c
+$(TARGETDIR)/debug.o : $(PDCTOP)/pdcurses/debug.c
+$(TARGETDIR)/pdcclip.o : $(PDCTOP)/dos/pdcclip.c
+$(TARGETDIR)/pdcdisp.o : $(PDCTOP)/dos/pdcdisp.c
+$(TARGETDIR)/pdcgetsc.o : $(PDCTOP)/dos/pdcgetsc.c
+$(TARGETDIR)/pdckbd.o : $(PDCTOP)/dos/pdckbd.c
+$(TARGETDIR)/pdcscrn.o : $(PDCTOP)/dos/pdcscrn.c
+$(TARGETDIR)/pdcsetsc.o : $(PDCTOP)/dos/pdcsetsc.c
+$(TARGETDIR)/pdcutil.o : $(PDCTOP)/dos/pdcutil.c
+
+
+#
+# End of cross-compiling -POST section
+#===============-=================================================
+
+

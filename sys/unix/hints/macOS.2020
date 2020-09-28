@@ -274,8 +274,11 @@ VARDIR=$(HACKDIR)
 #
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
-
+#
+#-INCLUDE cross-pre.2020
+#
 #-POST
+
 ifdef MAKEFILE_TOP
 ###
 ### Packaging
@@ -456,3 +459,6 @@ else
 endif	# end of build_qt_pkg
 endif	# WANT_WIN_QT for packaging
 endif	# MAKEFILE_TOP
+#
+#-INCLUDE cross-post.2020
+#

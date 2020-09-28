@@ -28,7 +28,9 @@
 
 #ifdef MSDOS
 #undef UNIX
+#ifndef CROSSCOMPILE
 #define SHORT_FILENAMES
+#endif
 #endif
 
 /*

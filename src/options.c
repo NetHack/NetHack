@@ -1450,14 +1450,15 @@ char *op;
             if (g.symset[PRIMARY].name) {
                 badflag = TRUE;
             } else {
-                g.symset[PRIMARY].name = dupstr(fullname);
+                g.symset[PRIMARY].name = dupstr(allopt[optidx].name);
                 if (!read_sym_file(PRIMARY)) {
                     badflag = TRUE;
                     clear_symsetentry(PRIMARY, TRUE);
                 }
             }
             if (badflag) {
-                config_error_add("Failure to load symbol set %s.", fullname);
+                config_error_add("Failure to load symbol set %s.",
+				 allopt[optidx].name);
                 return FALSE;
             } else {
                 switch_symbols(TRUE);
@@ -2440,6 +2441,7 @@ char *op;
             if (!g.opt_initial) {
                 g.opt_need_redraw = TRUE;
             }
+        }
 #endif /* CHANGE_COLOR */
             return optn_ok;
     }
@@ -2454,6 +2456,7 @@ char *op;
     }
     return optn_ok;
 }
+
 
 int
 optfn_paranoid_confirmation(optidx, req, negated, opts, op)

@@ -213,9 +213,11 @@ extern struct cross_target_s cross_target;
 #endif
 #endif
 
+#if !defined(CROSSCOMPILE)
 #if defined(MICRO)
 #if !defined(AMIGA) && !defined(TOS) && !defined(OS2_HPFS)
 #define SHORT_FILENAMES /* filenames are 8.3 */
+#endif
 #endif
 #endif
 
