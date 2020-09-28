@@ -3,6 +3,52 @@
 #
 # Cross-compiling -POST section
 
+ifdef CROSS_TO_MSDOS
+#
+$(TARGETDIR)/msdos.o : ../sys/msdos/msdos.c $(HACK_H)
+$(TARGETDIR)/pckeys.o : ../sys/msdos/pckeys.c $(HACK_H)
+$(TARGETDIR)/pctiles.o : ../sys/msdos/pctiles.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETDIR)/video.o : ../sys/msdos/video.c ../sys/msdos/portio.h $(HACK_H)
+$(TARGETDIR)/vidtxt.o : ../sys/msdos/vidtxt.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETDIR)/vidvga.o : ../sys/msdos/vidvga.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETDIR)/vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		../win/share/tile.h ../include/tileset.h $(HACK_H)
+$(TARGETDIR)/vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
+		$(HACK_H)
+$(TARGETDIR)/tile.o : tile.c
+#
+#.PHONY: dospkg
+dospkg: $(GAMEBIN) $(TARGETDIR)/recover.exe ../dat/nhtiles.bmp
+	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
+	mkdir -p $(TARGETDIR)/pkg
+	cp $(GAMEBIN) $(TARGETDIR)/pkg/NETHACK.EXE
+	cp ../dat/nhdat $(TARGETDIR)/pkg/NHDAT
+	cp ../dat/license $(TARGETDIR)/pkg/LICENSE
+	cp ../dat/nhtiles.bmp $(TARGETDIR)/pkg/NHTILES.BMP
+	cp ../dat/symbols $(TARGETDIR)/pkg/SYMBOLS
+	cp ../sys/share/NetHack.cnf $(TARGETDIR)/pkg/NETHACK.CNF
+	cp ../sys/msdos/sysconf $(TARGETDIR)/pkg/SYSCONF
+	cp ../doc/nethack.txt $(TARGETDIR)/pkg/NETHACK.TXT
+	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETDIR)/pkg/CWSDPMI.EXE
+	-touch $(TARGETDIR)/pkg/RECORD
+	zip -9 $(TARGETDIR)/NH370DOS.ZIP $(TARGETDIR)/pkg/*
+	@echo msdos package zip file $(TARGETDIR)/NH370DOS.ZIP
+endif  # CROSS_TO_MSDOS
+
+#
+# shared file dependencies
+#
+$(TARGETDIR)/pcmain.o : ../sys/share/pcmain.c $(HACK_H)
+$(TARGETDIR)/pcsys.o : ../sys/share/pcsys.c $(HACK_H)
+$(TARGETDIR)/pctty.o : ../sys/share/pctty.c $(HACK_H)
+$(TARGETDIR)/pcunix.o : ../sys/share/pcunix.c $(HACK_H)
+$(TARGETDIR)/tileset.o : ../win/share/tileset.c
+$(TARGETDIR)/bmptiles.o : ../win/share/bmptiles.c
+$(TARGETDIR)/giftiles.o : ../win/share/giftiles.c
+$(TARGETDIR)/recover.exe : $(TARGETDIR)/recover.o
+
 #
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
