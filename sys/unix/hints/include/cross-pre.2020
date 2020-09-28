@@ -1,0 +1,107 @@
+#===============-=================================================
+# NetHack 3.7  include/cross-pre $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+#
+# Cross-compiling -PRE section
+#
+ifdef BUILD_LUA
+#===============-=================================================
+# LUA library
+# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
+#=================================================================
+LUA_VERSION ?=5.4.0
+LUATOP ?= ../lib/lua-$(LUA_VERSION)
+LUASRCDIR ?= $(LUATOP)/src
+LUAOBJFILES1 =  $(TARGETDIR)/lapi.o $(TARGETDIR)/lauxlib.o \
+		$(TARGETDIR)/lbaselib.o $(TARGETDIR)/lcode.o \
+		$(TARGETDIR)/lcorolib.o $(TARGETDIR)/lctype.o \
+		$(TARGETDIR)/ldblib.o
+ifeq "$(LUA_VERSION)" "5.3.5"
+LUAOBJFILES1 += $(TARGETDIR)/lbitlib.o
+endif
+LUAOBJFILES2 =  $(TARGETDIR)/ldebug.o $(TARGETDIR)/ldo.o $(TARGETDIR)/ldump.o \
+		$(TARGETDIR)/lfunc.o $(TARGETDIR)/lgc.o $(TARGETDIR)/linit.o \
+		$(TARGETDIR)/liolib.o $(TARGETDIR)/llex.o
+LUAOBJFILES3 =  $(TARGETDIR)/lmathlib.o $(TARGETDIR)/lmem.o \
+		$(TARGETDIR)/loadlib.o $(TARGETDIR)/lobject.o \
+		$(TARGETDIR)/lopcodes.o $(TARGETDIR)/loslib.o \
+		$(TARGETDIR)/lparser.o $(TARGETDIR)/lstate.o
+LUAOBJFILES4 =  $(TARGETDIR)/lstring.o $(TARGETDIR)/lstrlib.o \
+		$(TARGETDIR)/ltable.o $(TARGETDIR)/ltablib.o \
+		$(TARGETDIR)/ltm.o $(TARGETDIR)/lundump.o \
+		$(TARGETDIR)/lutf8lib.o $(TARGETDIR)/lvm.o $(TARGETDIR)/lzio.o
+LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
+LUACROSSLIB = $(TARGETDIR)/$(O)lua$(subst .,,$(LUA_VERSION)).a
+LUAINCL  = -I$(LUASRCDIR)
+BUILDMORE += $(LUACROSSLIB)
+override TARGET_LIBS += $(LUACROSSLIB) -lm
+else
+LUAINCL=
+endif  # BUILD_LUA
+
+ifdef BUILD_PDCURSES
+#===============-=================================================
+# PD Curses library
+#===============-=================================================
+ifdef WANT_WIN_CURSES
+PDCTOP = ../lib/pdcurses
+PDCURSESDEF= -I../lib/pdcurses -I../lib/pdcurses/dos \
+		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+PDCLIBOBJ1= $(TARGETDIR)/addch.o $(TARGETDIR)/addchstr.o \
+		$(TARGETDIR)/addstr.o $(TARGETDIR)/attr.o \
+		$(TARGETDIR)/beep.o $(TARGETDIR)/bkgd.o \
+		$(TARGETDIR)/border.o $(TARGETDIR)/clear.o \
+		$(TARGETDIR)/color.o $(TARGETDIR)/delch.o \
+		$(TARGETDIR)/deleteln.o $(TARGETDIR)/getch.o \
+		$(TARGETDIR)/getstr.o $(TARGETDIR)/getyx.o \
+		$(TARGETDIR)/inch.o
+PDCLIBOBJ2= $(TARGETDIR)/inchstr.o $(TARGETDIR)/initscr.o \
+		$(TARGETDIR)/inopts.o $(TARGETDIR)/insch.o \
+		$(TARGETDIR)/insstr.o $(TARGETDIR)/instr.o \
+		$(TARGETDIR)/kernel.o $(TARGETDIR)/keyname.o \
+		$(TARGETDIR)/mouse.o $(TARGETDIR)/move.o \
+		$(TARGETDIR)/outopts.o $(TARGETDIR)/overlay.o
+PDCLIBOBJ3= $(TARGETDIR)/pad.o $(TARGETDIR)/panel.o $(TARGETDIR)/printw.o \
+		$(TARGETDIR)/refresh.o $(TARGETDIR)/scanw.o \
+		$(TARGETDIR)/scr_dump.o $(TARGETDIR)/scroll.o \
+		$(TARGETDIR)/slk.o $(TARGETDIR)/termattr.o
+PDCLIBOBJ4= $(TARGETDIR)/touch.o $(TARGETDIR)/util.o $(TARGETDIR)/window.o \
+		$(TARGETDIR)/debug.o
+PDCLIBOBJS = $(PDCLIBOBJ1) $(PDCLIBOBJ2) $(PDCLIBOBJ3) $(PDCLIBOBJ4)
+PDCLIB = $(TARGETDIR)/pdclib.a
+PDCINCL = -I$(PDCTOP) -I$(PDCTOP)/pdcurses
+PDCOBJS = $(TARGETDIR)/pdcclip.o $(TARGETDIR)/pdcdisp.o \
+		$(TARGETDIR)/pdcgetsc.o $(TARGETDIR)/pdckbd.o \
+		$(TARGETDIR)/pdcscrn.o $(TARGETDIR)/pdcsetsc.o \
+		$(TARGETDIR)/pdcutil.o
+override TARGET_LIBS += $(PDCLIB)
+BUILDMORE += $(PDCLIB)
+# Rules for PDCurses files
+$(TARGETDIR)/%.o : $(PDCTOP)/pdcurses/%.c
+	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
+else   #WANT_WIN_CURSES
+PDCURSESDEF=
+PDCLIBOBJS=
+PDCOBJS=
+PDCLIB=
+PDCINCL=
+endif  # WANT_WIN_CURSES
+endif  # BUILD_PDCURSES
+
+ifdef WANT_WIN_CURSES
+# rules for pdcurses dos-specific files
+$(TARGETDIR)/%.o : $(PDCTOP)/sdl1/%.c
+	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
+endif  # WANT_WIN_CURSES
+# Rule for LUA files
+$(TARGETDIR)/%.o : $(LUATOP)/src/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) $(LUA_FLAGS) -o$@ $<
+ifdef WANT_WIN_CURSES
+# Rules for PDCurses files
+$(TARGETDIR)/%.o : $(PDCTOP)/pdcurses/%.c
+	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
+endif  # WANT_WIN_CURSES
+
+# 
+# End of cross-compiling -PRE section
+#===============-=================================================
+

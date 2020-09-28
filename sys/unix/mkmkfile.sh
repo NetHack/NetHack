@@ -40,5 +40,6 @@ echo "### Start $5 POST" >> $3
 echo "###" >> $3
 awk '/^#-POST/,/^#-PRE/{ \
 	if(index($0, "#-POST") == 1) print "# (new segment at source line",NR,")"; \
-	if(index($0, "#-P") != 1) print}' $4 >> $3
+	if(index($0, "#-INCLUDE") == 1)	system("cat hints/include/"$2); \
+	else if(index($0, "#-P") != 1) print}' $4 >> $3
 echo "### End $5 POST" >> $3
