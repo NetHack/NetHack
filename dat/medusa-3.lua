@@ -37,7 +37,10 @@ place:set(66,05);
 place:set(46,15);
 
 des.region(selection.area(00,00,74,19),"lit")
-des.region({ region={49,14, 51,16}, lit=-1, type="ordinary", prefilled = 1 });
+-- fixup_special hack: the first room defined on a Medusa level gets some
+-- leaderboard statues, use arrival_room to force it to be a room even though
+-- monsters won't arrive within it
+des.region({ region={49,14, 51,16}, lit=-1, type="ordinary", arrival_room=true });
 des.region(selection.area(07,05,09,07),"unlit")
 des.region(selection.area(65,04,67,06),"unlit")
 des.region(selection.area(45,14,47,16),"unlit")

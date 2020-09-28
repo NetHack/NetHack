@@ -94,8 +94,7 @@ des.door("closed", 17, 11);
 des.door("closed", 17, 13);
 des.door("closed", 17, 15);
 
-des.region({ region={18,10, 22,16}, lit = 1, type = "zoo",
-	     prefilled = 0, irregular = 1 });
+des.region({ region={18,10, 22,16}, lit = 1, type = "zoo", filled = 1, irregular = 1 });
 
 px, py = selection.rndcoord(place);
 if percent(75) then

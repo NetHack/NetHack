@@ -39,7 +39,7 @@ des.levregion({ region = {08,16,08,16}, type="branch" });
 des.teleport_region({ region = {06,15,09,16}, dir="up" })
 des.teleport_region({ region = {06,15,09,16}, dir="down" })
 --   Throne room, with Croesus on the throne
-des.region({ x1=37,y1=08,x2=46,y2=11, lit=1, type="throne", prefilled=0 })
+des.region({ x1=37,y1=08,x2=46,y2=11, lit=1, type="throne", filled=1 })
 --   50% chance each to move throne and/or fort's entry secret door up one row
 if percent(50) then
    des.monster({ id = "Croesus", x=43, y=10, peaceful = 0 })
@@ -80,10 +80,10 @@ des.region(selection.area(46,06,48,06),"lit")
 des.region(selection.area(19,13,21,13),"lit")
 des.region(selection.area(46,13,48,13),"lit")
 --   A welcoming committee
-des.region({ region={03,10,07,13},lit=1,type="zoo",prefilled=0,irregular=1 })
+des.region({ region={03,10,07,13},lit=1,type="zoo",filled=1,irregular=1 })
 --   arrival chamber; needs to be a real room to control migrating monsters,
 --   and `unfilled' is a kludge to force an ordinary room to remain a room
-des.region({ region={06,15,09,16},lit=0,type="ordinary",prefilled=0 })
+des.region({ region={06,15,09,16},lit=0,type="ordinary",arrival_room=true })
 
 --   3.6.2:  Entering level carrying a lit candle would show the whole entry
 --   chamber except for its top right corner even though some of the revealed
@@ -109,7 +109,7 @@ des.region(selection.area(05,14,09,14),"unlit")
 --   it is expected to work.)
 
 --   Barracks
-des.region({ region={62,03,71,04},lit=1,type="barracks",prefilled=0,irregular=1 })
+des.region({ region={62,03,71,04},lit=1,type="barracks",filled=1,irregular=1 })
 -- Doors
 des.door("closed",06,14)
 des.door("closed",09,03)

@@ -28,12 +28,12 @@ des.levregion({ type="stair-up", region={01,00,79,20}, region_islev=1, exclude={
 des.levregion({ type="stair-down", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} })
-des.region({ region={12,01, 20,09}, lit=0, type="morgue", prefilled=1, contents=function()
+des.region({ region={12,01, 20,09}, lit=0, type="morgue", filled=2, contents=function()
                 local sdwall = { "south", "west", "east" };
                 des.door({ wall = sdwall[math.random(1, #sdwall)], state = "secret" });
 end })
 -- another region to constrain monster arrival
-des.region({ region={01,01, 10,11}, lit=0, type="ordinary", prefilled=0 })
+des.region({ region={01,01, 10,11}, lit=0, type="ordinary", arrival_room=true })
 des.mazewalk(28,05,"east")
 des.ladder("down", 06,05)
 -- Non diggable walls

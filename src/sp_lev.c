@@ -40,7 +40,6 @@ static void NDECL(remove_boundary_syms);
 static void FDECL(set_door_orientation, (int, int));
 static void FDECL(maybe_add_door, (int, int, struct mkroom *));
 static void NDECL(link_doors_rooms);
-static void NDECL(fill_rooms);
 static int NDECL(rnddoor);
 static int NDECL(rndtrap);
 static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
@@ -1033,20 +1032,6 @@ link_doors_rooms()
                     }
                 }
             }
-}
-
-static void
-fill_rooms()
-{
-    int tmpi, m;
-
-    for (tmpi = 0; tmpi < g.nroom; tmpi++) {
-        if (g.rooms[tmpi].needfill)
-            fill_room(&g.rooms[tmpi], (g.rooms[tmpi].needfill == 2));
-        for (m = 0; m < g.rooms[tmpi].nsubrooms; m++)
-            if (g.rooms[tmpi].sbrooms[m]->needfill)
-                fill_room(g.rooms[tmpi].sbrooms[m], FALSE);
-    }
 }
 
 /*
@@ -2682,14 +2667,23 @@ corridor *c;
  * Fill a room (shop, zoo, etc...) with appropriate stuff.
  */
 void
-fill_room(croom, prefilled)
+fill_special_room(croom)
 struct mkroom *croom;
-boolean prefilled;
 {
-    if (!croom || croom->rtype == OROOM)
+    int i;
+
+    /* First recurse into subrooms. We don't want to block an ordinary room with
+     * a special subroom from having the subroom filled, or an unfilled outer
+     * room preventing a special subroom from being filled. */
+    for (i = 0; i < croom->nsubrooms; ++i) {
+        fill_special_room(croom->sbrooms[i]);
+    }
+
+    if (!croom || croom->rtype == OROOM || croom->rtype == THEMEROOM
+        || croom->needfill == FILL_NONE)
         return;
 
-    if (!prefilled) {
+    if (croom->needfill == FILL_NORMAL) {
         int x, y;
 
         /* Shop ? */
@@ -2770,7 +2764,7 @@ struct mkroom *mkr;
 #else
         topologize(aroom); /* set roomno */
 #endif
-        aroom->needfill = r->filled;
+        aroom->needfill = r->needfill;
         aroom->needjoining = r->joined;
         return aroom;
     }
@@ -3831,7 +3825,8 @@ lua_State *L;
         tmproom.rtype = get_table_roomtype_opt(L, "type", OROOM);
         tmproom.chance = get_table_int_opt(L, "chance", 100);
         tmproom.rlit = get_table_int_opt(L, "lit", -1);
-        tmproom.filled = get_table_int_opt(L, "filled", g.in_mk_themerooms ? 0 : 1);
+        /* theme rooms default to unfilled */
+        tmproom.needfill = get_table_int_opt(L, "filled", g.in_mk_themerooms ? 0 : 1);
         tmproom.joined = get_table_int_opt(L, "joined", 1);
 
         if (!g.coder->failed_room[g.coder->n_subroom - 1]) {
@@ -5599,7 +5594,7 @@ genericptr_t arg;
 }
 
 /* region(selection, lit); */
-/* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, prefilled=BOOL [ , contents = FUNCTION ] }); */
+/* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
 /* region({ region={x1,y1, x2,y2}, type="ordinary" }); */
 int
 lspo_region(L)
@@ -5607,9 +5602,9 @@ lua_State *L;
 {
     xchar dx1, dy1, dx2, dy2;
     register struct mkroom *troom;
-    boolean prefilled = FALSE, room_not_needed,
+    boolean do_arrival_room = FALSE, room_not_needed,
             irregular = FALSE, joined = TRUE;
-    int rtype = OROOM, rlit = 1;
+    int rtype = OROOM, rlit = 1, needfill = 0;
     int argc = lua_gettop(L);
 
     create_des_coder();
@@ -5617,13 +5612,12 @@ lua_State *L;
     if (argc <= 1) {
         lcheck_param_table(L);
 
-        /* TODO: check the prefilled, what was the default in lev_comp? */
-        /* "unfilled" == 0, "filled" == 1, missing = "filled" */
-
-        /* TODO: "unfilled" ==> prefilled=1 */
-        prefilled = get_table_boolean_opt(L, "prefilled", 0);
+        /* TODO: "unfilled" ==> filled=0, "filled" ==> filled=1, and
+         * "lvflags_only" ==> filled=2, probably in a get_table_needfill_opt */
+        needfill = get_table_int_opt(L, "filled", 0);
         irregular = get_table_boolean_opt(L, "irregular", 0);
         joined = get_table_boolean_opt(L, "joined", 1);
+        do_arrival_room = get_table_boolean_opt(L, "arrival_room", 0);
         rtype = get_table_roomtype_opt(L, "type", OROOM);
         rlit = get_table_int_opt(L, "lit", -1);
         dx1 = get_table_int_opt(L, "x1", -1); /* TODO: area */
@@ -5668,10 +5662,16 @@ lua_State *L;
     get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *) 0);
     get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *) 0);
 
-    /* for an ordinary room, `prefilled' is a flag to force
-       an actual room to be created (such rooms are used to
-       control placement of migrating monster arrivals) */
-    room_not_needed = (rtype == OROOM && !irregular && !prefilled && !g.in_mk_themerooms);
+    /* Many regions are simple, rectangular areas that just need to set lighting
+     * in an area. In that case, we don't need to do anything complicated by
+     * creating a room. The exceptions are:
+     *  - Special rooms (which usually need to be filled).
+     *  - Irregular regions (more convenient to use the room-making code).
+     *  - Themed room regions (which often have contents).
+     *  - When a room is desired to constrain the arrival of migrating monsters
+     *    (see the mon_arrive function for details).
+     */
+    room_not_needed = (rtype == OROOM && !irregular && !do_arrival_room && !g.in_mk_themerooms);
     if (room_not_needed || g.nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed)
@@ -5689,8 +5689,7 @@ lua_State *L;
     troom = &g.rooms[g.nroom];
 
     /* mark rooms that must be filled, but do it later */
-    if (rtype != OROOM)
-        troom->needfill = (prefilled ? 2 : 1);
+    troom->needfill = needfill;
 
     troom->needjoining = joined;
 
@@ -5710,9 +5709,6 @@ lua_State *L;
         topologize(troom); /* set roomno */
 #endif
     }
-
-    if (g.in_mk_themerooms && prefilled)
-        troom->needfill = 1;
 
     if (!room_not_needed) {
         if (g.coder->n_subroom > 1)
@@ -6419,7 +6415,6 @@ const char *name;
         goto give_up;
 
     link_doors_rooms();
-    fill_rooms();
     remove_boundary_syms();
 
     /* TODO: ensure_way_out() needs rewrite */

@@ -185,7 +185,7 @@ typedef struct _room {
     Str_or_Len parent;
     xchar x, y, w, h;
     xchar xalign, yalign;
-    xchar rtype, chance, rlit, filled, joined;
+    xchar rtype, chance, rlit, needfill, joined;
 } room;
 
 struct mapfragment {
