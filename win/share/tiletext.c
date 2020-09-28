@@ -1,4 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	tiletext.c	$NHDT-Date: 1596498342 2020/08/03 23:45:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 

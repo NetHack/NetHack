@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1586815084 2020/04/13 21:58:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,9 +22,6 @@ const schar zdir[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 1, -1 };
 
 NEARDATA struct flag flags;
 NEARDATA boolean has_strong_rngseed = FALSE;
-#ifdef SYSFLAGS
-NEARDATA struct sysflag sysflags;
-#endif
 NEARDATA struct instance_flags iflags;
 NEARDATA struct you u;
 NEARDATA time_t ubirthday;
@@ -285,6 +282,7 @@ const struct instance_globals g_init = {
     0L, /* domove_succeeded */
     NULL, /* nomovemsg */
     DUMMY, /* plname */
+    0, /* plnamelen */
     DUMMY, /* pl_character */
     '\0', /* pl_race */
     DUMMY, /* pl_fruit */
@@ -348,13 +346,6 @@ const struct instance_globals g_init = {
 #ifdef MICRO
     UNDEFINED_VALUES, /* levels */
 #endif /* MICRO */
-#ifdef MFLOPPY
-    UNDEFINED_VALUES, /* permbones */
-    FALSE,     /*ramdisk */
-    TRUE, /* saveprompt */
-    "levels.*", /* alllevels */
-    "bones*.*", /* allbones */
-#endif
     UNDEFINED_VALUES, /* program_state */
 
     /* detect.c */
@@ -470,9 +461,10 @@ const struct instance_globals g_init = {
     /* makemon.c */
 
     /* mhitm.c */
-    UNDEFINED_VALUE, /* vis */
-    UNDEFINED_VALUE, /* far_noise */
-    UNDEFINED_VALUE, /* noisetime */
+    0L, /* noisetime */
+    FALSE, /* far_noise */
+    FALSE, /* vis */
+    FALSE, /* skipdrin */
 
     /* mhitu.c */
     UNDEFINED_VALUE, /* mhitu_dieroll */
@@ -534,17 +526,20 @@ const struct instance_globals g_init = {
     0, /* distantname */
 
     /* options.c */
-    NULL, /* symset_list */
+    (struct symsetentry *) 0, /* symset_list */
     UNDEFINED_VALUES, /* mapped_menu_cmds */
     UNDEFINED_VALUES, /* mapped_menu_op */
     0, /* n_menu_mapped */
-    UNDEFINED_VALUE, /* opt_initial */
-    UNDEFINED_VALUE, /* opt_from_file */
-    UNDEFINED_VALUE, /* opt_need_redraw */
+    FALSE, /* opt_initial */
+    FALSE, /* opt_from_file */
+    FALSE, /* opt_need_redraw */
+    FALSE, /* save_menucolors */
+    (struct menucoloring *) 0, /* save_colorings */
+    (struct menucoloring *) 0, /* color_colorings */
 
     /* pickup.c */
     0,  /* oldcap */
-    UNDEFINED_PTR, /* current_container */
+    (struct obj *) 0, /* current_container */
     UNDEFINED_VALUE, /* abort_looting */
     UNDEFINED_VALUE, /* val_for_n_or_more */
     UNDEFINED_VALUES, /* valid_menu_classes */
@@ -559,7 +554,7 @@ const struct instance_globals g_init = {
     0, /* saved_pline_index */
     UNDEFINED_VALUES,
 #endif
-    NULL, /* you_buf */
+    (char *) 0, /* you_buf */
     0, /* you_buf_siz */
 
     /* polyself.c */
@@ -646,8 +641,11 @@ const struct instance_globals g_init = {
     0, /* spl_sortmode */
     NULL, /* spl_orderindx */
 
+    /* steal.c */
+    0, /* stealoid */
+    0, /* stealmid */
+
     /* teleport.c */
-    NULL, /* telescroll */
 
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */
@@ -739,9 +737,6 @@ decl_globals_init()
     g.subrooms = &g.rooms[MAXNROFROOMS + 1];
 
     ZERO(flags);
-#ifdef SYSFLAGS
-    ZERO(sysflags);
-#endif
     ZERO(iflags);
     ZERO(u);
     ZERO(ubirthday);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1558330405 2019/05/20 05:33:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.7	wintty.h	$NHDT-Date: 1596498572 2020/08/03 23:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -153,7 +153,6 @@ E void NDECL(term_end_raw_bold);
 #ifdef TEXTCOLOR
 E void NDECL(term_end_color);
 E void FDECL(term_start_color, (int color));
-E int FDECL(has_color, (int color));
 #endif /* TEXTCOLOR */
 
 /* ### topl.c ### */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1587317999 2020/04/19 17:39:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1597069374 2020/08/10 14:22:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1564,6 +1564,9 @@ wiz_intrinsic(VOID_ARGS)
                 continue;
             }
             if (p == FIRE_RES) {
+                /* FIRE_RES and properties beyond it (in the propertynames[]
+                   ordering, not their numerical PROP values), can only be
+                   set to timed values here so show a separator */
                 any.a_int = 0;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--",
                          MENU_ITEMFLAGS_NONE);
@@ -1642,23 +1645,23 @@ wiz_intrinsic(VOID_ARGS)
                 }
                 goto def_feedback;
             case GLIB:
-                /* slippery fingers applies to gloves if worn at the time
-                   so persistent inventory might need updating */
+                /* slippery fingers might need a persistent inventory update
+                   so needs more than simple incr_itimeout() but we want
+                   the pline() issued with that */
                 make_glib((int) newtimeout);
-                goto def_feedback;
-            case LEVITATION:
-            case FLYING:
-                float_vs_flight();
                 /*FALLTHRU*/
             default:
  def_feedback:
-                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
-                      oldtimeout ? "increased by" : "set to", amt);
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
+                g.context.botl = 1; /* have pline() do a status update */
+                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
+                      oldtimeout ? "increased by" : "set to", amt);
                 break;
             }
-            g.context.botl = 1; /* probably not necessary... */
+            /* this has to be after incr_timeout() */
+            if (p == LEVITATION || p == FLYING)
+                float_vs_flight();
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
@@ -2273,6 +2276,57 @@ int NDECL((*fn));
         if (g.Cmd.commands[i] && g.Cmd.commands[i]->ef_funct == fn)
             return (char) i;
     return '\0';
+}
+
+/* return extended command name (without leading '#') for command (*fn)() */
+const char *
+cmdname_from_func(fn, outbuf, fullname)
+int NDECL((*fn));
+char outbuf[];
+boolean fullname; /* False: just enough to disambiguate */
+{
+    const struct ext_func_tab *extcmd, *cmdptr = 0;
+    const char *res = 0;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (extcmd->ef_funct == fn) {
+            cmdptr = extcmd;
+            res = cmdptr->ef_txt;
+            break;
+        }
+
+    if (!res) {
+        /* make sure output buffer doesn't contain junk or stale data;
+           return Null below */
+        outbuf[0] = '\0';
+    } else if (fullname) {
+        /* easy; the entire command name */
+        res = strcpy(outbuf, res);
+    } else {
+        const struct ext_func_tab *matchcmd = extcmdlist;
+        int len = 0;
+
+        /* find the shortest leading substring which is unambiguous */
+        do {
+            if (++len >= (int) strlen(res))
+                break;
+            for (extcmd = matchcmd; extcmd->ef_txt; ++extcmd) {
+                if (extcmd == cmdptr)
+                    continue;
+                if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0
+                    || ((extcmd->flags & WIZMODECMD) != 0 && !wizard))
+                    continue;
+                if (!strncmp(res, extcmd->ef_txt, len)) {
+                    matchcmd = extcmd;
+                    break;
+                }
+            }
+        } while (extcmd->ef_txt);
+        copynchars(outbuf, res, len);
+        debugpline2("shortened %s: \"%s\"", res, outbuf);
+        res = outbuf;
+    }
+    return res;
 }
 
 /*

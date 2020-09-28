@@ -1,4 +1,4 @@
-/* NetHack 3.6	win32api.h	$NHDT-Date: 1432516197 2015/05/25 01:09:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	win32api.h	$NHDT-Date: 1596498320 2020/08/03 23:45:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +9,6 @@
  */
 #ifndef WIN32API
 #define WIN32API
-
-#if defined(_MSC_VER)
 
 #if defined(HACK_H)
 #error win32api.h must be included before hack.h
@@ -32,9 +30,10 @@
 #error win32api.h should be included first
 #endif
 
+#if defined(_MSC_VER)
 #pragma warning(disable : 4142) /* Warning, Benign redefinition of type */
 #pragma pack(8)
-#endif // _MSC_VER
+#endif
 
 #define WIN32_LEAN_AND_MEAN
 

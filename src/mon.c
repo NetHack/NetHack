@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1586091449 2020/04/05 12:57:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1600933441 2020/09/24 07:44:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,6 +21,7 @@ static struct permonst *FDECL(accept_newcham_form, (struct monst *, int));
 static struct obj *FDECL(make_corpse, (struct monst *, unsigned));
 static int FDECL(minliquid_core, (struct monst *));
 static void FDECL(m_detach, (struct monst *, struct permonst *));
+static void FDECL(set_mon_min_mhpmax, (struct monst *, int));
 static void FDECL(lifesaved_monster, (struct monst *));
 static void FDECL(migrate_mon, (struct monst *, XCHAR_P, XCHAR_P));
 static boolean FDECL(ok_to_obliterate, (struct monst *));
@@ -55,6 +56,23 @@ const char *msg;
                        mtmp->mnum, mndx, msg);
             mtmp->mnum = mndx;
         }
+#if 0   /*
+         * Gremlims don't obey the (mhpmax >= m_lev) rule so disable
+         * this check, at least for the time being.  We could skip it
+         * when the cloned flag is set, but the original gremlim would
+         * still be an issue.
+         */
+        /* check before DEADMONSTER() because dead monsters should still
+           have sane mhpmax */
+        if (mtmp->mhpmax < 1
+            || mtmp->mhpmax < (int) mtmp->m_lev
+            || mtmp->mhp > mtmp->mhpmax)
+            impossible(
+                     "%s: level %d monster #%u [%s] has %d cur HP, %d max HP",
+                       msg, (int) mtmp->m_lev,
+                       mtmp->m_id, fmt_ptr((genericptr_t) mtmp),
+                       mtmp->mhp, mtmp->mhpmax);
+#endif
         if (DEADMONSTER(mtmp)) {
 #if 0
             /* bad if not fmons list or if not vault guard */
@@ -66,6 +84,8 @@ const char *msg;
         }
         if (chk_geno && (g.mvitals[mndx].mvflags & G_GENOD) != 0)
             impossible("genocided %s in play (%s)", mons[mndx].mname, msg);
+        if (mtmp->mtame && !mtmp->mpeaceful)
+            impossible("tame %s is not peaceful (%s)", mons[mndx].mname, msg);
     }
     if (mtmp->isshk && !has_eshk(mtmp))
         impossible("shk without eshk (%s)", msg);
@@ -132,6 +152,8 @@ mon_sanity_check()
     for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
     }
+
+    wormno_sanity_check(); /* test for bogus worm tail */
 }
 
 /* Would monster be OK with poison gas? */
@@ -1724,8 +1746,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
        as high as the attacker, don't let attacker do so, otherwise
        they might just end up swapping places again when defender
        gets its chance to move */
-    if ((pa->mflags3 & M3_DISPLACES) != 0
-        && ((pd->mflags3 & M3_DISPLACES) == 0 || magr->m_lev > mdef->m_lev)
+    if (is_displacer(pa) && (!is_displacer(pd) || magr->m_lev > mdef->m_lev)
         /* no displacing grid bugs diagonally */
         && !(magr->mx != mdef->mx && magr->my != mdef->my
              && NODIAG(monsndx(pd)))
@@ -1792,6 +1813,9 @@ struct monst *mtmp, *mtmp2;
         otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;
+    /* before relmon(mtmp), because it could clear polearm.hitmon */
+    if (g.context.polearm.hitmon == mtmp)
+        g.context.polearm.hitmon = mtmp2;
 
     /* remove the old monster from the map and from `fmon' list */
     relmon(mtmp, (struct monst **) 0);
@@ -1800,7 +1824,7 @@ struct monst *mtmp, *mtmp2;
     if (mtmp != u.usteed) /* don't place steed onto the map */
         place_monster(mtmp2, mtmp2->mx, mtmp2->my);
     if (mtmp2->wormno)      /* update level.monsters[wseg->wx][wseg->wy] */
-        place_wsegs(mtmp2, NULL); /* locations to mtmp2 not mtmp. */
+        place_wsegs(mtmp2, mtmp); /* locations to mtmp2 not mtmp. */
     if (emits_light(mtmp2->data)) {
         /* since this is so rare, we don't have any `mon_move_light_source' */
         new_light_source(mtmp2->mx, mtmp2->my, emits_light(mtmp2->data),
@@ -1835,6 +1859,9 @@ struct monst **monst_list; /* &g.migrating_mons or &g.mydogs or null */
 
     if (!fmon)
         panic("relmon: no fmon available.");
+
+    if (mon == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = (struct monst *) 0;
 
     if (unhide) {
         /* can't remain hidden across level changes (exception: wizard
@@ -1977,7 +2004,14 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mtmp->mtrapped = 0;
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
+    if (mtmp->iswiz)
+        wizdead();
+    if (mtmp->data->msound == MS_NEMESIS)
+        nemdead();
+    if (mtmp->m_id == g.stealmid)
+        thiefdead();
     relobj(mtmp, 0, FALSE);
+
     if (onmap || mtmp == g.level.monsters[0][0]) {
         if (mtmp->wormno)
             remove_worm(mtmp);
@@ -2003,6 +2037,26 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
 
     mtmp->mstate |= MON_DETACH;
     iflags.purge_monsters++;
+}
+
+/* give a life-saved monster a reasonable mhpmax value in case it has
+   been the victim of excessive life draining */
+static void
+set_mon_min_mhpmax(mon, minimum_mhpmax)
+struct monst *mon;
+int minimum_mhpmax; /* monster life-saving has traditionally used 10 */
+{
+    /* can't be less than m_lev+1 (if we just used m_lev itself, level 0
+       monsters would end up allowing a minimum of 0); since life draining
+       reduces m_lev, this usually won't give the monster much of a boost */
+    if (mon->mhpmax < (int) mon->m_lev + 1)
+        mon->mhpmax = (int) mon->m_lev + 1;
+    /* caller can specify an alternate minimum; we'll honor it iff it is
+       greater than m_lev+1; the traditional arbitrary value of 10 always
+       gives level 0 and level 1 monsters a boost and has a moderate
+       chance of doing so for level 2, a tiny chance for levels 3..9 */
+    if (mon->mhpmax < minimum_mhpmax)
+        mon->mhpmax = minimum_mhpmax;
 }
 
 /* find the worn amulet of life saving which will save a monster */
@@ -2055,8 +2109,7 @@ struct monst *mtmp;
         if (mtmp->mtame && !mtmp->isminion) {
             wary_dog(mtmp, !surviver);
         }
-        if (mtmp->mhpmax <= 0)
-            mtmp->mhpmax = 10;
+        set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(mtmp->m_lev+1,10) */
         mtmp->mhp = mtmp->mhpmax;
 
         if (!surviver) {
@@ -2113,8 +2166,7 @@ register struct monst *mtmp;
                     spec_death ? "reconstitutes" : "transforms");
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
-            if (mtmp->mhpmax <= 0)
-                mtmp->mhpmax = 10;
+            set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
             mtmp->mhp = mtmp->mhpmax;
             /* mtmp==u.ustuck can happen if previously a fog cloud
                or poly'd hero is hugging a vampire bat */
@@ -2212,10 +2264,12 @@ register struct monst *mtmp;
             break;
         }
     }
+#if 0   /* moved to m_detach() to kick in if mongone() happens */
     if (mtmp->iswiz)
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
+#endif
     if (mtmp->data == &mons[PM_MEDUSA])
         record_achievement(ACH_MEDU);
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
@@ -2729,8 +2783,7 @@ struct monst *mtmp;
                     surface(x,y));
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
-            if (mtmp->mhpmax <= 0)
-                mtmp->mhpmax = 10;
+            set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
             mtmp->mhp = mtmp->mhpmax;
             /* this can happen if previously a fog cloud */
             if (u.uswallow && (mtmp == u.ustuck))
@@ -2764,8 +2817,7 @@ struct monst *mtmp;
            they revert to innate shape rather than become a statue */
         mtmp->mcanmove = 1;
         mtmp->mfrozen = 0;
-        if (mtmp->mhpmax <= 0)
-            mtmp->mhpmax = 10;
+        set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(mtmp->m_lev+1,10) */
         mtmp->mhp = mtmp->mhpmax;
         (void) newcham(mtmp, &mons[mtmp->cham], FALSE, TRUE);
         newsym(mtmp->mx, mtmp->my);
@@ -3086,6 +3138,9 @@ boolean via_attack;
     mtmp->mstrategy &= ~STRAT_WAITMASK;
     if (!mtmp->mpeaceful)
         return;
+    /* [FIXME: this logic seems wrong; peaceful humanoids gasp or exclaim
+       when they see you attack a peaceful monster but they just casually
+       look the other way when you attack a pet?] */
     if (mtmp->mtame)
         return;
     mtmp->mpeaceful = 0;
@@ -3132,9 +3187,6 @@ boolean via_attack;
 
     /* make other peaceful monsters react */
     if (!g.context.mon_moving) {
-        static const char *const Exclam[] = {
-            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
-        };
         struct monst *mon;
         int mndx = monsndx(mtmp->data);
 
@@ -3147,29 +3199,53 @@ boolean via_attack;
             if (!mindless(mon->data) && mon->mpeaceful
                 && couldsee(mon->mx, mon->my) && !mon->msleeping
                 && mon->mcansee && m_canseeu(mon)) {
-                boolean exclaimed = FALSE;
+                char buf[BUFSZ];
+                boolean exclaimed = FALSE, needpunct = FALSE, alreadyfleeing;
 
+                buf[0] = '\0';
                 if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
                     if (is_watch(mon->data)) {
                         verbalize("Halt!  You're under arrest!");
                         (void) angry_guards(!!Deaf);
                     } else {
-                        if (!rn2(5)) {
-                            verbalize("%s", Exclam[mon->m_id % SIZE(Exclam)]);
-                            exclaimed = TRUE;
+                        if (!Deaf && !rn2(5)) {
+                            const char *gasp = maybe_gasp(mon);
+
+                            if (gasp) {
+                                if (!strncmpi(gasp, "gasp", 4)) {
+                                    Sprintf(buf, "%s gasps", Monnam(mon));
+                                    needpunct = TRUE;
+                                } else {
+                                    Sprintf(buf, "%s exclaims \"%s\"",
+                                            Monnam(mon), gasp);
+                                }
+                                exclaimed = TRUE;
+                            }
                         }
                         /* shopkeepers and temple priests might gasp in
                            surprise, but they won't become angry here */
-                        if (mon->isshk || mon->ispriest)
+                        if (mon->isshk || mon->ispriest) {
+                            if (exclaimed)
+                                pline("%s%s", buf, " then shrugs.");
                             continue;
+                        }
 
                         if (mon->data->mlevel < rn2(10)) {
+                            alreadyfleeing = (mon->mflee || mon->mfleetim);
                             monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
-                            exclaimed = TRUE;
+                            if (exclaimed) {
+                                if (flags.verbose && !alreadyfleeing) {
+                                    Strcat(buf, " and then turns to flee.");
+                                    needpunct = FALSE;
+                                }
+                            } else
+                                exclaimed = TRUE; /* got msg from monflee() */
                         }
+                        if (*buf)
+                            pline("%s%s", buf, needpunct ? "." : "");
                         if (mon->mtame) {
-                            /* mustn't set mpeaceful to 0 as below;
-                               perhaps reduce tameness? */
+                            ; /* mustn't set mpeaceful to 0 as below;
+                               * perhaps reduce tameness? */
                         } else {
                             mon->mpeaceful = 0;
                             adjalign(-1);
@@ -3180,12 +3256,18 @@ boolean via_attack;
                 } else if (mon->data->mlet == mtmp->data->mlet
                            && big_little_match(mndx, monsndx(mon->data))
                            && !rn2(3)) {
-                    if (!rn2(4)) {
+                    if (!Deaf && !rn2(4)) {
                         growl(mon);
-                        exclaimed = TRUE;
+                        exclaimed = (iflags.last_msg == PLNMSG_GROWL);
                     }
-                    if (rn2(6))
+                    if (rn2(6)) {
+                        alreadyfleeing = (mon->mflee || mon->mfleetim);
                         monflee(mon, rn2(25) + 15, TRUE, !exclaimed);
+                        if (exclaimed && !alreadyfleeing)
+                            /* word like a separate sentence so that we
+                               don't have to poke around inside growl() */
+                            pline("And then starts to flee.");
+                    }
                 }
             }
         }
@@ -3199,8 +3281,11 @@ register struct monst *mtmp;
 boolean via_attack;
 {
     mtmp->msleeping = 0;
-    if (M_AP_TYPE(mtmp)) {
-        seemimic(mtmp);
+    if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
+        /* mimics come out of hiding, but disguised Wizard doesn't
+           have to lose his disguise */
+        if (M_AP_TYPE(mtmp) != M_AP_MONSTER)
+            seemimic(mtmp);
     } else if (g.context.forcefight && !g.context.mon_moving
                && mtmp->mundetected) {
         mtmp->mundetected = 0;

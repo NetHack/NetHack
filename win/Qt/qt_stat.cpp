@@ -7,20 +7,13 @@
 extern "C" {
 #include "hack.h"
 }
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_stat.h"
 #include "qt_stat.moc"
 #include "qt_set.h"
@@ -39,29 +32,36 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     //  Blank value is 0 and should never change.
     name(this,"(name)"),
     dlevel(this,"(dlevel)"),
-    str(this,"STR"),
-    dex(this,"DEX"),
-    con(this,"CON"),
-    intel(this,"INT"),
-    wis(this,"WIS"),
-    cha(this,"CHA"),
+    str(this, "Str"),
+    dex(this, "Dex"),
+    con(this, "Con"),
+    intel(this, "Int"),
+    wis(this, "Wis"),
+    cha(this, "Cha"),
     gold(this,"Gold"),
     hp(this,"Hit Points"),
     power(this,"Power"),
     ac(this,"Armour Class"),
     level(this,"Level"),
-    exp(this,"Experience"),
+    exp(this, "_"), // exp displayed as Xp/Exp but exp widget used for padding
     align(this,"Alignment"),
     time(this,"Time"),
     score(this,"Score"),
     hunger(this,""),
-    confused(this,"Confused"),
-    sick_fp(this,"Sick"),
-    sick_il(this,"Ill"),
-    blind(this,""),
-    stunned(this,"Stunned"),
-    hallu(this,"Hallu"),
     encumber(this,""),
+    stoned(this,"Stone"),
+    slimed(this,"Slime"),
+    strngld(this,"Strngl"),
+    sick_fp(this,"FoodPois"),
+    sick_il(this,"TermIll"),
+    stunned(this,"Stun"),
+    confused(this,"Conf"),
+    hallu(this,"Hallu"),
+    blind(this,""),
+    deaf(this,"Deaf"),
+    lev(this,"Lev"),
+    fly(this,"Fly"),
+    ride(this,"Ride"),
     hline1(this),
     hline2(this),
     hline3(this),
@@ -82,18 +82,25 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     p_satiated = QPixmap(satiated_xpm);
     p_hungry = QPixmap(hungry_xpm);
 
-    p_confused = QPixmap(confused_xpm);
-    p_sick_fp = QPixmap(sick_fp_xpm);
-    p_sick_il = QPixmap(sick_il_xpm);
-    p_blind = QPixmap(blind_xpm);
-    p_stunned = QPixmap(stunned_xpm);
-    p_hallu = QPixmap(hallu_xpm);
-
     p_encumber[0] = QPixmap(slt_enc_xpm);
     p_encumber[1] = QPixmap(mod_enc_xpm);
     p_encumber[2] = QPixmap(hvy_enc_xpm);
     p_encumber[3] = QPixmap(ext_enc_xpm);
     p_encumber[4] = QPixmap(ovr_enc_xpm);
+
+    p_stoned = QPixmap(stone_xpm);
+    p_slimed = QPixmap(slime_xpm);
+    p_strngld = QPixmap(strngl_xpm);
+    p_sick_fp = QPixmap(sick_fp_xpm);
+    p_sick_il = QPixmap(sick_il_xpm);
+    p_stunned = QPixmap(stunned_xpm);
+    p_confused = QPixmap(confused_xpm);
+    p_hallu = QPixmap(hallu_xpm);
+    p_blind = QPixmap(blind_xpm);
+    p_deaf = QPixmap(deaf_xpm);
+    p_lev = QPixmap(lev_xpm);
+    p_fly = QPixmap(fly_xpm);
+    p_ride = QPixmap(ride_xpm);
 
     str.setIcon(p_str);
     dex.setIcon(p_dex);
@@ -104,15 +111,21 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
 
     align.setIcon(p_neutral);
     hunger.setIcon(p_hungry);
+    encumber.setIcon(p_encumber[0]);
 
-    confused.setIcon(p_confused);
+    stoned.setIcon(p_stoned);
+    slimed.setIcon(p_slimed);
+    strngld.setIcon(p_strngld);
     sick_fp.setIcon(p_sick_fp);
     sick_il.setIcon(p_sick_il);
-    blind.setIcon(p_blind);
     stunned.setIcon(p_stunned);
+    confused.setIcon(p_confused);
     hallu.setIcon(p_hallu);
-
-    encumber.setIcon(p_encumber[0]);
+    blind.setIcon(p_blind);
+    deaf.setIcon(p_deaf);
+    lev.setIcon(p_lev);
+    fly.setIcon(p_fly);
+    ride.setIcon(p_ride);
 
     hline1.setFrameStyle(QFrame::HLine|QFrame::Sunken);
     hline2.setFrameStyle(QFrame::HLine|QFrame::Sunken);
@@ -154,13 +167,20 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     QHBoxLayout *statbox = new QHBoxLayout();
 	statbox->addWidget(&align);
 	statbox->addWidget(&hunger);
-	statbox->addWidget(&confused);
+	statbox->addWidget(&encumber);
+	statbox->addWidget(&stoned);
+	statbox->addWidget(&slimed);
+	statbox->addWidget(&strngld);
 	statbox->addWidget(&sick_fp);
 	statbox->addWidget(&sick_il);
-	statbox->addWidget(&blind);
 	statbox->addWidget(&stunned);
+	statbox->addWidget(&confused);
 	statbox->addWidget(&hallu);
-	statbox->addWidget(&encumber);
+	statbox->addWidget(&blind);
+	statbox->addWidget(&deaf);
+	statbox->addWidget(&lev);
+	statbox->addWidget(&fly);
+	statbox->addWidget(&ride);
     statbox->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     vbox->addLayout(statbox);
     setLayout(vbox);
@@ -188,18 +208,25 @@ void NetHackQtStatusWindow::doUpdate()
     power.setFont(normal);
     ac.setFont(normal);
     level.setFont(normal);
-    exp.setFont(normal);
+    //exp.setFont(normal);
     align.setFont(normal);
     time.setFont(normal);
     score.setFont(normal);
     hunger.setFont(normal);
-    confused.setFont(normal);
+    encumber.setFont(normal);
+    stoned.setFont(normal);
+    slimed.setFont(normal);
+    strngld.setFont(normal);
     sick_fp.setFont(normal);
     sick_il.setFont(normal);
-    blind.setFont(normal);
     stunned.setFont(normal);
+    confused.setFont(normal);
     hallu.setFont(normal);
-    encumber.setFont(normal);
+    blind.setFont(normal);
+    deaf.setFont(normal);
+    lev.setFont(normal);
+    fly.setFont(normal);
+    ride.setFont(normal);
 
     updateStats();
 }
@@ -209,14 +236,14 @@ QWidget* NetHackQtStatusWindow::Widget() { return this; }
 void NetHackQtStatusWindow::Clear()
 {
 }
-void NetHackQtStatusWindow::Display(bool block)
+void NetHackQtStatusWindow::Display(bool block UNUSED)
 {
 }
 void NetHackQtStatusWindow::CursorTo(int,int y)
 {
     cursy=y;
 }
-void NetHackQtStatusWindow::PutStr(int attr, const QString& text)
+void NetHackQtStatusWindow::PutStr(int attr UNUSED, const QString& text UNUSED)
 {
     // do a complete update when line 0 is done (as per X11 fancy status)
     if (cursy==0) updateStats();
@@ -270,7 +297,7 @@ void NetHackQtStatusWindow::resizeEvent(QResizeEvent*)
     power.setGeometry(x,y,iw,lh); x+=iw;
     ac.setGeometry(x,y,iw,lh); x+=iw;
     level.setGeometry(x,y,iw,lh); x+=iw;
-    exp.setGeometry(x,y,iw,lh); x+=iw;
+    //exp.setGeometry(x,y,iw,lh); x+=iw;
     x=0; y+=lh;
 
     lh=int(h*SP_hln3);
@@ -286,13 +313,20 @@ void NetHackQtStatusWindow::resizeEvent(QResizeEvent*)
     iw=width()/9;
     align.setGeometry(x,y,iw,lh); x+=iw;
     hunger.setGeometry(x,y,iw,lh); x+=iw;
-    confused.setGeometry(x,y,iw,lh); x+=iw;
+    encumber.setGeometry(x,y,iw,lh); x+=iw;
+    stoned.setGeometry(x,y,iw,lh); x+=iw;
+    slimed.setGeometry(x,y,iw,lh); x+=iw;
+    strngld.setGeometry(x,y,iw,lh); x+=iw;
     sick_fp.setGeometry(x,y,iw,lh); x+=iw;
     sick_il.setGeometry(x,y,iw,lh); x+=iw;
-    blind.setGeometry(x,y,iw,lh); x+=iw;
     stunned.setGeometry(x,y,iw,lh); x+=iw;
+    confused.setGeometry(x,y,iw,lh); x+=iw;
     hallu.setGeometry(x,y,iw,lh); x+=iw;
-    encumber.setGeometry(x,y,iw,lh); x+=iw;
+    blind.setGeometry(x,y,iw,lh); x+=iw;
+    deaf.setGeometry(x,y,iw,lh); x+=iw;
+    lev.setGeometry(x,y,iw,lh); x+=iw;
+    fly.setGeometry(x,y,iw,lh); x+=iw;
+    ride.setGeometry(x,y,iw,lh); x+=iw;
     x=0; y+=lh;
 #else
     // This is clumsy.  But QLayout objects are proving balky.
@@ -333,20 +367,27 @@ void NetHackQtStatusWindow::fadeHighlighting()
     power.dissipateHighlight();
     ac.dissipateHighlight();
     level.dissipateHighlight();
-    exp.dissipateHighlight();
+    //exp.dissipateHighlight();
     align.dissipateHighlight();
 
     time.dissipateHighlight();
     score.dissipateHighlight();
 
     hunger.dissipateHighlight();
-    confused.dissipateHighlight();
+    encumber.dissipateHighlight();
+    stoned.dissipateHighlight();
+    slimed.dissipateHighlight();
+    strngld.dissipateHighlight();
     sick_fp.dissipateHighlight();
     sick_il.dissipateHighlight();
-    blind.dissipateHighlight();
     stunned.dissipateHighlight();
+    confused.dissipateHighlight();
     hallu.dissipateHighlight();
-    encumber.dissipateHighlight();
+    blind.dissipateHighlight();
+    deaf.dissipateHighlight();
+    lev.dissipateHighlight();
+    fly.dissipateHighlight();
+    ride.dissipateHighlight();
 }
 
 /*
@@ -359,7 +400,7 @@ void NetHackQtStatusWindow::fadeHighlighting()
  *
  * Information on the second line:
  *    dlvl, gold, hp, power, ac, {level & exp or HD **}
- *    status (hunger, conf, halu, stun, sick, blind), time, encumbrance
+ *    status (hunger, encumbrance, sick, stun, conf, halu, blind), time
  *
  * [**] HD is shown instead of level and exp if mtimedone is non-zero.
  */
@@ -372,22 +413,23 @@ void NetHackQtStatusWindow::updateStats()
 
     if (cursy != 0) return;    /* do a complete update when line 0 is done */
 
-    if (ACURR(A_STR) > 118) {
-	buf.sprintf("STR:%d",ACURR(A_STR)-100);
-    } else if (ACURR(A_STR)==118) {
-	buf.sprintf("STR:18/**");
-    } else if(ACURR(A_STR) > 18) {
-	buf.sprintf("STR:18/%02d",ACURR(A_STR)-18);
+    int st = ACURR(A_STR);
+    if (st > STR18(100)) {
+        buf.sprintf("Str:%d", st - 100);        // 19..25
+    } else if (st == STR18(100)) {
+        buf.sprintf("Str:18/**");               // 18/100
+    } else if (st > 18) {
+        buf.sprintf("Str:18/%02d", st - 18);    // 18/01..18/99
     } else {
-	buf.sprintf("STR:%d",ACURR(A_STR));
+        buf.sprintf("Str:%d", st);              //  3..18
     }
-    str.setLabel(buf,NetHackQtLabelledIcon::NoNum,ACURR(A_STR));
+    str.setLabel(buf, NetHackQtLabelledIcon::NoNum, (long) st);
+    dex.setLabel("Dex:", (long) ACURR(A_DEX));
+    con.setLabel("Con:", (long) ACURR(A_CON));
+    intel.setLabel("Int:", (long) ACURR(A_INT));
+    wis.setLabel("Wis:", (long) ACURR(A_WIS));
+    cha.setLabel("Cha:", (long) ACURR(A_CHA));
 
-    dex.setLabel("DEX:",(long)ACURR(A_DEX));
-    con.setLabel("CON:",(long)ACURR(A_CON));
-    intel.setLabel("INT:",(long)ACURR(A_INT));
-    wis.setLabel("WIS:",(long)ACURR(A_WIS));
-    cha.setLabel("CHA:",(long)ACURR(A_CHA));
     const char* hung=hu_stat[u.uhs];
     if (hung[0]==' ') {
 	hunger.hide();
@@ -396,14 +438,25 @@ void NetHackQtStatusWindow::updateStats()
 	hunger.setLabel(hung);
 	hunger.show();
     }
-    if (Confusion) confused.show(); else confused.hide();
+    const char *enc = enc_stat[near_capacity()];
+    if (enc[0]==' ' || !enc[0]) {
+	encumber.hide();
+    } else {
+	encumber.setIcon(p_encumber[near_capacity() - 1]);
+	encumber.setLabel(enc);
+	encumber.show();
+    }
+    if (Stoned) stoned.show(); else stoned.hide();
+    if (Slimed) slimed.show(); else slimed.hide();
+    if (Strangled) strngld.show(); else strngld.hide();
     if (Sick) {
-	if (u.usick_type & SICK_VOMITABLE) {
+        /* FoodPois or TermIll or both */
+	if (u.usick_type & SICK_VOMITABLE) { /* food poisoning */
 	    sick_fp.show();
 	} else {
 	    sick_fp.hide();
 	}
-	if (u.usick_type & SICK_NONVOMITABLE) {
+	if (u.usick_type & SICK_NONVOMITABLE) { /* terminally ill */
 	    sick_il.show();
 	} else {
 	    sick_il.hide();
@@ -412,23 +465,22 @@ void NetHackQtStatusWindow::updateStats()
 	sick_fp.hide();
 	sick_il.hide();
     }
+    if (Stunned) stunned.show(); else stunned.hide();
+    if (Confusion) confused.show(); else confused.hide();
+    if (Hallucination) hallu.show(); else hallu.hide();
     if (Blind) {
 	blind.setLabel("Blind");
 	blind.show();
     } else {
 	blind.hide();
     }
-    if (Stunned) stunned.show(); else stunned.hide();
-    if (Hallucination) hallu.show(); else hallu.hide();
-    const char* enc=enc_stat[near_capacity()];
-    if (enc[0]==' ' || !enc[0]) {
-	encumber.hide();
-    } else {
-	encumber.setIcon(p_encumber[near_capacity()-1]);
-	encumber.setLabel(enc);
-	encumber.show();
-    }
-    if (u.mtimedone) {
+    if (Deaf) deaf.show(); else deaf.hide();
+    // flying is blocked when levitating, so Lev and Fly are mutually exclusive
+    if (Levitation) lev.show(); else lev.hide();
+    if (Flying) fly.show(); else fly.hide();
+    if (u.usteed) ride.show(); else ride.hide();
+
+    if (Upolyd) {
 	buf = nh_capitalize_words(mons[u.umonnum].mname);
     } else {
 	buf = rank_of(u.ulevel, g.pl_character[0], ::flags.female);
@@ -447,30 +499,35 @@ void NetHackQtStatusWindow::updateStats()
 
     gold.setLabel("Au:", money_cnt(g.invent));
 
-    if (u.mtimedone) {
-	// You're a monster!
-
-	buf.sprintf("/%d", u.mhmax);
-	hp.setLabel("HP:", u.mh  > 0 ? u.mh  : 0, buf);
-	level.setLabel("HD:",(long)mons[u.umonnum].mlevel);
+    if (Upolyd) {
+        // You're a monster!
+        buf.sprintf("/%d", u.mhmax);
+        hp.setLabel("HP:", std::max((long) u.mh, 0L), buf);
+        level.setLabel("HD:", (long) mons[u.umonnum].mlevel); // hit dice
+        // Exp points are not shown when HD is displayed instead of Xp level
     } else {
-	// You're normal.
-
-	buf.sprintf("/%d", u.uhpmax);
-	hp.setLabel("HP:", u.uhp > 0 ? u.uhp : 0, buf);
-	level.setLabel("Level:",(long)u.ulevel);
+        // You're normal.
+        buf.sprintf("/%d", u.uhpmax);
+        hp.setLabel("HP:", std::max((long) u.uhp, 0L), buf);
+        // if Exp points are to be displayed, append them to Xp level;
+        // up/down highlighting becomes tricky--don't try very hard
+        if (::flags.showexp) {
+            buf.sprintf("%ld/%ld", (long) u.ulevel, (long) u.uexp);
+            level.setLabel("Level:" + buf,
+                           NetHackQtLabelledIcon::NoNum, (long) u.uexp);
+        } else {
+            level.setLabel("Level:", (long) u.ulevel);
+        }
     }
     buf.sprintf("/%d", u.uenmax);
     power.setLabel("Pow:", u.uen, buf);
     ac.setLabel("AC:",(long)u.uac);
-#ifdef EXP_ON_BOTL
-    if (::flags.showexp) {
-	exp.setLabel("Exp:",(long)u.uexp);
-    } else
-#endif
-    {
-	exp.setLabel("");
-    }
+    //if (::flags.showexp) {
+    //    exp.setLabel("Exp:", (long) u.uexp);
+    //} else {
+        // 'exp' now only used to pad the line that Xp/Exp is displayed on
+        exp.setLabel("");
+    //}
     if (u.ualign.type==A_CHAOTIC) {
 	align.setIcon(p_chaotic);
 	text = "Chaotic";
@@ -483,11 +540,13 @@ void NetHackQtStatusWindow::updateStats()
     }
     align.setLabel(text);
 
-    if (::flags.time) time.setLabel("Time:",(long)g.moves);
-    else time.setLabel("");
+    if (::flags.time)
+        time.setLabel("Time:", (long) g.moves);
+    else
+        time.setLabel("");
 #ifdef SCORE_ON_BOTL
     if (::flags.showscore) {
-	score.setLabel("Score:",(long)botl_score());
+        score.setLabel("Score:", (long) botl_score());
     } else
 #endif
     {
@@ -513,20 +572,28 @@ void NetHackQtStatusWindow::updateStats()
 	power.highlightWhenChanging();
 	ac.highlightWhenChanging(); ac.lowIsGood();
 	level.highlightWhenChanging();
-	exp.highlightWhenChanging();
+        //exp.highlightWhenChanging(); -- 'exp' is just padding
 	align.highlightWhenChanging();
 
-	//time.highlightWhenChanging();
+        // don't highlight 'time' because it changes almost continuously
+        //time.highlightWhenChanging();
 	score.highlightWhenChanging();
 
 	hunger.highlightWhenChanging();
-	confused.highlightWhenChanging();
+	encumber.highlightWhenChanging();
+	stoned.highlightWhenChanging();
+	slimed.highlightWhenChanging();
+	strngld.highlightWhenChanging();
 	sick_fp.highlightWhenChanging();
 	sick_il.highlightWhenChanging();
-	blind.highlightWhenChanging();
 	stunned.highlightWhenChanging();
+	confused.highlightWhenChanging();
 	hallu.highlightWhenChanging();
-	encumber.highlightWhenChanging();
+	blind.highlightWhenChanging();
+	deaf.highlightWhenChanging();
+	lev.highlightWhenChanging();
+	fly.highlightWhenChanging();
+	ride.highlightWhenChanging();
     }
 }
 

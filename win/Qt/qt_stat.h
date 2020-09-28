@@ -48,15 +48,21 @@ private:
 
 	QPixmap p_satiated;
 	QPixmap p_hungry;
+	QPixmap p_encumber[5];
 
-	QPixmap p_confused;
+	QPixmap p_stoned;
+	QPixmap p_slimed;
+	QPixmap p_strngld;
 	QPixmap p_sick_fp;
 	QPixmap p_sick_il;
-	QPixmap p_blind;
 	QPixmap p_stunned;
+	QPixmap p_confused;
 	QPixmap p_hallu;
-
-	QPixmap p_encumber[5];
+	QPixmap p_blind;
+	QPixmap p_deaf;
+	QPixmap p_lev;
+	QPixmap p_fly;
+	QPixmap p_ride;
 
 	NetHackQtLabelledIcon name;
 	NetHackQtLabelledIcon dlevel;
@@ -72,21 +78,30 @@ private:
 	NetHackQtLabelledIcon hp;
 	NetHackQtLabelledIcon power;
 	NetHackQtLabelledIcon ac;
-	NetHackQtLabelledIcon level;
-	NetHackQtLabelledIcon exp;
-	NetHackQtLabelledIcon align;
-
+        NetHackQtLabelledIcon level; // Xp level
+        NetHackQtLabelledIcon exp;   // appended to Xp rather than separate
+                                     // but still used to pad their line
+        NetHackQtLabelledIcon align; // alignment is on Conditions line
+                                     // because it has an icon above it
 	NetHackQtLabelledIcon time;
 	NetHackQtLabelledIcon score;
 
 	NetHackQtLabelledIcon hunger;
-	NetHackQtLabelledIcon confused;
+	NetHackQtLabelledIcon encumber;
+
+	NetHackQtLabelledIcon stoned;
+	NetHackQtLabelledIcon slimed;
+	NetHackQtLabelledIcon strngld;
 	NetHackQtLabelledIcon sick_fp;
 	NetHackQtLabelledIcon sick_il;
-	NetHackQtLabelledIcon blind;
 	NetHackQtLabelledIcon stunned;
+	NetHackQtLabelledIcon confused;
 	NetHackQtLabelledIcon hallu;
-	NetHackQtLabelledIcon encumber;
+	NetHackQtLabelledIcon blind;
+	NetHackQtLabelledIcon deaf;
+	NetHackQtLabelledIcon lev;
+	NetHackQtLabelledIcon fly;
+	NetHackQtLabelledIcon ride;
 
 	QFrame hline1;
 	QFrame hline2;

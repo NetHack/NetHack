@@ -1,5 +1,5 @@
-# NetHack 3.6	data.base
-# $NHDT-Date: 1581206724 2020/02/09 00:05:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $
+# NetHack 3.7	data.base
+# $NHDT-Date: 1596498239 2020/08/03 23:43:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -1083,7 +1083,6 @@ crom
 	aura of evil magic in the air.  Without thought, he readies
 	his weapon, and mutters under his breath:
 	"By Crom, there will be blood spilt today."
-
 	    [ Conan the Avenger by Robert E. Howard, Bjorn Nyberg,
 		and L. Sprague de Camp ]
 crossbow*
@@ -1273,6 +1272,17 @@ dispater
 	Wealth".  It refers to the wealth of precious stone below the
 	earth.
 		[ Encyclopedia Mythica, ed. M.F. Lindemans ]
+# 3.7; monster adapted from slash'em based on an AD&D Monster Manual entry;
+# slash'em lacked a description so this entry has been created from scratch;
+# the puma comparison is how the AD&D monster is described (except that
+# that creature has six legs and two tentacles!) but the actual monster's
+# behavior is substantially different
+displacer beast
+	This strange creature appears to be mutant form of puma (aka
+	cougar or mountain lion) which lives in underground settings
+	rather than outdoor wilderness.  It is capable of exchanging
+	positions with people or creatures in its path and is not
+	fooled by displaced images of others.
 djinn*
 	The djinn are genies from the elemental plane of Air.  There,
 	among their kind, they have their own societies.  They are
@@ -1869,6 +1879,14 @@ gem or rock
 	same as for jewels:  it is always the false ones that look the
 	most real, the most brilliant.
 		[ Salvador Dali ]
+# 3.7; monster derived from slash'em which lacked a description so this
+# entry has been created from scratch
+genetic engineer
+	These very odd people have mastered the ability to insert gene
+	sequences from one organism into another, usually triggering
+	immediate mutations in the subject.  Far from needing an
+	elaborate laboratory to accomplish such abominations, a mere
+	touch seems to be all that is necessary.
 geryon
 	Forthwith that image vile of fraud appear'd,
 	His head and upper part expos'd on land,
@@ -5526,7 +5544,6 @@ whistle
 
 	Well, the best way to find out is evidently to whistle
 	for him.'
-
 		[Ghost Stories of an Antiquary, by Montague Rhodes James
 		 'Oh, Whistle, and I'll Come to You My Lad']
 # werecritter -- see "lycanthrope"

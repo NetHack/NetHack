@@ -1,4 +1,4 @@
-/* NetHack 3.6  stubs.c       $NHDT-Date: 1524689357 2018/04/25 20:49:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 3.7  stubs.c       $NHDT-Date: 1596498317 2020/08/03 23:45:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /*      Copyright (c) 2015 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -189,4 +189,13 @@ set_altkeyhandler(const char *inName)
 {
     return;
 }
+
+#if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
+void
+play_usersound_via_idx(idx, volume)
+int idx, volume;
+{
+}
+#endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */
+
 #endif /* TTYSTUBS */

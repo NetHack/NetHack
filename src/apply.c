@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1582155875 2020/02/19 23:44:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1597090815 2020/08/10 20:20:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -548,20 +548,23 @@ number_leashed()
 /* otmp is about to be destroyed or stolen */
 void
 o_unleash(otmp)
-register struct obj *otmp;
+struct obj *otmp;
 {
     register struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        if (mtmp->m_id == (unsigned) otmp->leashmon)
+        if (mtmp->m_id == (unsigned) otmp->leashmon) {
             mtmp->mleashed = 0;
-    otmp->leashmon = 0;
+            otmp->leashmon = 0;
+            update_inventory();
+            break;
+        }
 }
 
 /* mtmp is about to die, or become untame */
 void
 m_unleash(mtmp, feedback)
-register struct monst *mtmp;
+struct monst *mtmp;
 boolean feedback;
 {
     register struct obj *otmp;
@@ -573,8 +576,11 @@ boolean feedback;
             Your("leash falls slack.");
     }
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == LEASH && otmp->leashmon == (int) mtmp->m_id)
+        if (otmp->otyp == LEASH && (unsigned) otmp->leashmon == mtmp->m_id) {
             otmp->leashmon = 0;
+            update_inventory();
+            break;
+        }
     mtmp->mleashed = 0;
 }
 
@@ -686,6 +692,7 @@ struct obj *obj;
             mtmp->mleashed = 1;
             obj->leashmon = (int) mtmp->m_id;
             mtmp->msleeping = 0;
+            update_inventory();
         }
     } else {
         /* applying a leash which is currently in use */
@@ -697,6 +704,7 @@ struct obj *obj;
         } else {
             mtmp->mleashed = 0;
             obj->leashmon = 0;
+            update_inventory();
             You("remove the leash from %s%s.",
                 spotmon ? "your " : "", l_monnam(mtmp));
         }
@@ -711,13 +719,10 @@ struct monst *mtmp;
 {
     struct obj *otmp;
 
-    otmp = g.invent;
-    while (otmp) {
-        if (otmp->otyp == LEASH && otmp->leashmon == (int) mtmp->m_id)
-            return otmp;
-        otmp = otmp->nobj;
-    }
-    return (struct obj *) 0;
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (otmp->otyp == LEASH && (unsigned) otmp->leashmon == mtmp->m_id)
+            break;
+    return otmp;
 }
 
 boolean
@@ -735,13 +740,14 @@ next_to_u()
             if (distu(mtmp->mx, mtmp->my) > 2) {
                 for (otmp = g.invent; otmp; otmp = otmp->nobj)
                     if (otmp->otyp == LEASH
-                        && otmp->leashmon == (int) mtmp->m_id) {
+                        && (unsigned) otmp->leashmon == mtmp->m_id) {
                         if (otmp->cursed)
                             return FALSE;
-                        You_feel("%s leash go slack.",
-                                 (number_leashed() > 1) ? "a" : "the");
                         mtmp->mleashed = 0;
                         otmp->leashmon = 0;
+                        update_inventory();
+                        You_feel("%s leash go slack.",
+                                 (number_leashed() > 1) ? "a" : "the");
                     }
             }
         }
@@ -1034,9 +1040,9 @@ struct obj **optr;
     struct monst *mtmp;
     boolean wakem = FALSE, learno = FALSE,
             ordinary = (obj->otyp != BELL_OF_OPENING || !obj->spe),
-            invoking =
-                (obj->otyp == BELL_OF_OPENING && invocation_pos(u.ux, u.uy)
-                 && !On_stairs(u.ux, u.uy));
+            invoking = (obj->otyp == BELL_OF_OPENING
+                        && invocation_pos(u.ux, u.uy)
+                        && !On_stairs(u.ux, u.uy));
 
     You("ring %s.", the(xname(obj)));
 
@@ -3654,11 +3660,10 @@ doapply()
         } else if (!ublindf) {
             Blindf_on(obj);
         } else {
-            You("are already %s.", ublindf->otyp == TOWEL
-                                       ? "covered by a towel"
-                                       : ublindf->otyp == BLINDFOLD
-                                             ? "wearing a blindfold"
-                                             : "wearing lenses");
+            You("are already %s.",
+                (ublindf->otyp == TOWEL) ? "covered by a towel"
+                : (ublindf->otyp == BLINDFOLD) ? "wearing a blindfold"
+                  : "wearing lenses");
         }
         break;
     case CREAM_PIE:

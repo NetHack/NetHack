@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1576626110 2019/12/17 23:41:50 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1596785343 2020/08/07 07:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -120,7 +120,7 @@ extern char *FDECL(translate_path_variables, (const char *, char *));
 #endif
 
 #ifdef USER_SOUNDS
-extern char *sounddir;
+extern char *sounddir; /* defined in sounds.c */
 #endif
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
@@ -163,7 +163,7 @@ static void FDECL(adjust_prefix, (char *, int));
 static boolean FDECL(config_error_nextline, (const char *));
 static void NDECL(free_config_sections);
 static char *FDECL(choose_random_part, (char *, CHAR_P));
-static boolean FDECL(is_config_section, (const char *));
+static char *FDECL(is_config_section, (char *));
 static boolean FDECL(handle_config_section, (char *));
 static char *FDECL(find_optparam, (const char *));
 static void FDECL(parseformat, (int *, char *));
@@ -492,30 +492,6 @@ NHFILE *nhfp;
 
 /* ----------  BEGIN LEVEL FILE HANDLING ----------- */
 
-#ifdef MFLOPPY
-/* Set names for bones[] and lock[] */
-void
-set_lock_and_bones()
-{
-    if (!g.ramdisk) {
-        Strcpy(levels, g.permbones);
-        Strcpy(g.bones, g.permbones);
-    }
-    append_slash(g.permbones);
-    append_slash(g.levels);
-#ifdef AMIGA
-    strncat(levels, bbs_id, PATHLEN);
-#endif
-    append_slash(g.bones);
-    Strcat(g.bones, "bonesnn.*");
-    Strcpy(g.lock, g.levels);
-#ifndef AMIGA
-    Strcat(g.lock, g.alllevels);
-#endif
-    return;
-}
-#endif /* MFLOPPY */
-
 /* Construct a file name for a level-type file, which is of the form
  * something.level (with any old level stripped off).
  * This assumes there is space on the end of 'file' to append
@@ -598,11 +574,6 @@ char errbuf[];
         *errbuf = '\0';
     set_levelfile_name(g.lock, lev);
     fq_lock = fqname(g.lock, LEVELPREFIX, 0);
-#ifdef MFLOPPY
-    /* If not currently accessible, swap it in. */
-    if (g.level_info[lev].where != ACTIVE)
-        swapin_file(lev);
-#endif
     nhfp = new_nhfile();
     if (nhfp) {
         nhfp->mode = READING;
@@ -651,29 +622,21 @@ int lev;
 void
 clearlocks()
 {
+    int x;
+
 #ifdef HANGUPHANDLING
     if (g.program_state.preserve_locks)
         return;
 #endif
-#if !defined(PC_LOCKING) && defined(MFLOPPY) && !defined(AMIGA)
-    eraseall(levels, g.alllevels);
-    if (g.ramdisk)
-        eraseall(g.permbones, g.alllevels);
-#else
-    {
-        register int x;
-
 #ifndef NO_SIGNAL
-        (void) signal(SIGINT, SIG_IGN);
+    (void) signal(SIGINT, SIG_IGN);
 #endif
 #if defined(UNIX) || defined(VMS)
-        sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
+    sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
 #endif
-        /* can't access maxledgerno() before dungeons are created -dlc */
-        for (x = (g.n_dgns ? maxledgerno() : 0); x >= 0; x--)
-            delete_levelfile(x); /* not all levels need be present */
-    }
-#endif /* ?PC_LOCKING,&c */
+    /* can't access maxledgerno() before dungeons are created -dlc */
+    for (x = (g.n_dgns ? maxledgerno() : 0); x >= 0; x--)
+        delete_levelfile(x); /* not all levels need be present */
 }
 
 #if defined(SELECTSAVED)
@@ -723,12 +686,12 @@ d_level *lev;
     char *dptr;
 
     /*
-     * "bonD0.nn.le"   = bones for level nn in the main dungeon;
-     * "bonM0.T.le"    = bones for Minetown;
-     * "bonQBar.n.le"  = bones for level n in the Barbarian quest;
-     * "bon3D0.nn.le"  = \
-     * "bon3M0.T.le"   =  > same as above, but for bones pool #3.
-     * "bon3QBar.n.le" = /
+     * "bonD0.nn"   = bones for level nn in the main dungeon;
+     * "bonM0.T"    = bones for Minetown;
+     * "bonQBar.n"  = bones for level n in the Barbarian quest;
+     * "bon3D0.nn"  = \
+     * "bon3M0.T"   =  > same as above, but for bones pool #3.
+     * "bon3QBar.n" = /
      *
      * Return value for content validation skips "bon" and the
      * pool number (if present), making it feasible for the admin
@@ -744,15 +707,9 @@ d_level *lev;
         Sprintf(eos(file), "%u", poolnum);
     }
 #endif
-    dptr = eos(file); /* this used to be after the following Sprintf()
-                         and the return value was (dptr - 2) */
+    dptr = eos(file);
     /* when this naming scheme was adopted, 'filecode' was one letter;
-       3.3.0 turned it into a three letter string (via roles[] in role.c);
-       from that version through 3.6.0, 'dptr' pointed past the filecode
-       and the return value of (dptr - 2)  was wrong for bones produced
-       in the quest branch, skipping the boneid character 'Q' and the
-       first letter of the role's filecode; bones loading still worked
-       because the bonesid used for validation had the same error */
+       3.3.0 turned it into a three letter string for quest levels */
     Sprintf(dptr, "%c%s", g.dungeons[lev->dnum].boneid,
             In_quest(lev) ? g.urole.filecode : "0");
     if ((sptr = Is_special(lev)) != 0)
@@ -816,7 +773,8 @@ char errbuf[];
             /* Use O_TRUNC to force the file to be shortened if it already
              * exists and is currently longer.
              */
-            nhfp->fd = open(file, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
+            nhfp->fd = open(file,
+                            O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, FCMASK);
 #else
 #ifdef MAC
             nhfp->fd = maccreat(file, BONE_TYPE);
@@ -846,19 +804,6 @@ char errbuf[];
     nhfp = viable_nhfile(nhfp);
     return nhfp;
 }
-
-#ifdef MFLOPPY
-/* remove partial bonesfile in process of creation */
-void
-cancel_bonesfile()
-{
-    const char *tempname;
-
-    tempname = set_bonestemp_name();
-    tempname = fqname(tempname, BONESPREFIX, 0);
-    (void) unlink(tempname);
-}
-#endif /* MFLOPPY */
 
 /* move completed bones file to proper name */
 void
@@ -1201,10 +1146,6 @@ restore_saved_game()
     NHFILE *nhfp = (NHFILE *) 0;
 
     set_savefile_name(TRUE);
-#ifdef MFLOPPY
-    if (!saveDiskPrompt(1))
-        return -1;
-#endif /* MFLOPPY */
     fq_save = fqname(g.SAVEF, SAVEPREFIX, 0);
 
     nh_uncompress(fq_save);
@@ -2087,10 +2028,6 @@ const char *fname;
     configfile[sizeof configfile - 1] = '\0';
 }
 
-#ifndef MFLOPPY
-#define fopenp fopen
-#endif
-
 static FILE *
 fopen_config_file(filename, src)
 const char *filename;
@@ -2106,7 +2043,7 @@ int src;
         /* SYSCF_FILE; if we can't open it, caller will bail */
         if (filename && *filename) {
             set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
-            fp = fopenp(configfile, "r");
+            fp = fopen(configfile, "r");
         } else
             fp = (FILE *) 0;
         return  fp;
@@ -2130,7 +2067,7 @@ int src;
             /* fall through to standard names */
         } else
 #endif
-        if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
             return  fp;
 #if defined(UNIX) || defined(VMS)
         } else {
@@ -2145,20 +2082,20 @@ int src;
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
     set_configfile_name(fqname(default_configfile, CONFIGPREFIX, 0));
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
         return fp;
     } else if (strcmp(default_configfile, configfile)) {
         set_configfile_name(default_configfile);
-        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
     }
 #ifdef MSDOS
     set_configfile_name(fqname(backward_compat_configfile, CONFIGPREFIX, 0));
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0) {
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
         return fp;
     } else if (strcmp(backward_compat_configfile, configfile)) {
         set_configfile_name(backward_compat_configfile);
-        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
     }
 #endif
@@ -2167,10 +2104,10 @@ int src;
 #ifdef VMS
     /* no punctuation, so might be a logical name */
     set_configfile_name("nethackini");
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0)
         return fp;
     set_configfile_name("sys$login:nethack.ini");
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0)
         return fp;
 
     envp = nh_getenv("HOME");
@@ -2181,7 +2118,7 @@ int src;
                 !index(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
                 "NetHack.cnf");
     set_configfile_name(tmp_config);
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
@@ -2191,7 +2128,7 @@ int src;
         Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
 
     set_configfile_name(tmp_config);
-    if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+    if ((fp = fopen(configfile, "r")) != (FILE *) 0)
         return fp;
 #if defined(__APPLE__) /* UNIX+__APPLE__ => MacOSX */
     /* try an alternative */
@@ -2200,13 +2137,13 @@ int src;
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults");
         set_configfile_name(tmp_config);
-        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
         /* may be easier for user to edit if filename has '.txt' suffix */
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults.txt");
         set_configfile_name(tmp_config);
-        if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0)
             return fp;
     }
 #endif /*__APPLE__*/
@@ -2321,7 +2258,7 @@ int prefixid;
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
 static char *
-choose_random_part(str,sep)
+choose_random_part(str, sep)
 char *str;
 char sep;
 {
@@ -2373,28 +2310,58 @@ free_config_sections()
     }
 }
 
-static boolean
+/* check for " [ anything-except-bracket-or-empty ] # arbitrary-comment"
+   with spaces optional; returns pointer to "anything-except..." (with
+   trailing " ] #..." stripped) if ok, otherwise Null */
+static char *
 is_config_section(str)
-const char *str;
+char *str; /* trailing spaces will be stripped, ']' too iff result is good */
 {
-    const char *a = rindex(str, ']');
+    char *a, *c, *z;
 
-    return (a && *str == '[' && *(a+1) == '\0' && (int)(a - str) > 0);
+    /* remove any spaces at start and end; won't significantly interfere
+       with echoing the string in a config error message, if warranted */
+    a = trimspaces(str);
+    /* first character should be open square bracket; set pointer past it */
+    if (*a++ != '[')
+        return (char *) 0;
+    /* last character should be close bracket, ignoring any comment */
+    z = index(a, ']');
+    if (!z)
+        return (char *) 0;
+    for (c = z + 1; *c && *c != '#'; ++c)
+        continue;
+    if (*c && *c != '#')
+        return (char *) 0;
+    /* we now know that result is good; there won't be a config error
+       message so we can modify the input string */
+    *z = '\0';
+    /* 'a' points past '[' and the string ends where ']' was; remove any
+       spaces between '[' and choice-start and between choice-end and ']' */
+    return trimspaces(a);
 }
 
 static boolean
 handle_config_section(buf)
 char *buf;
 {
-    if (is_config_section(buf)) {
-        char *send;
-        if (g.config_section_current) {
-            free(g.config_section_current);
+    char *sect = is_config_section(buf);
+
+    if (sect) {
+        if (g.config_section_current)
+            free(g.config_section_current), g.config_section_current = 0;
+        /* is_config_section() removed brackets from 'sect' */
+        if (!g.config_section_chosen) {
+            config_error_add("Section \"[%s]\" without CHOOSE", sect);
+            return TRUE;
         }
-        g.config_section_current = dupstr(&buf[1]);
-        send = rindex(g.config_section_current, ']');
-        *send = '\0';
-        debugpline1("set config section: '%s'", g.config_section_current);
+        if (*sect) { /* got a section name */
+            g.config_section_current = dupstr(sect);
+            debugpline1("set config section: '%s'", g.config_section_current);
+        } else { /* empty section name => end of sections */
+            free_config_sections();
+            debugpline0("unset config section");
+        }
         return TRUE;
     }
 
@@ -2433,6 +2400,7 @@ char *origbuf;
 #endif
 #ifdef SYSCF
     int n, src = iflags.parse_config_file_src;
+    boolean in_sysconf = (src == set_in_sysconf);
 #endif
     char *bufp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
@@ -2506,19 +2474,6 @@ char *origbuf;
 #ifdef MICRO
     } else if (match_varname(buf, "HACKDIR", 4)) {
         (void) strncpy(g.hackdir, bufp, PATHLEN - 1);
-#ifdef MFLOPPY
-    } else if (match_varname(buf, "RAMDISK", 3)) {
-/* The following ifdef is NOT in the wrong
- * place.  For now, we accept and silently
- * ignore RAMDISK */
-#ifndef AMIGA
-        if (strlen(bufp) >= PATHLEN)
-            bufp[PATHLEN - 1] = '\0';
-        Strcpy(levels, bufp);
-        g.ramdisk = (strcmp(g.permbones, levels) != 0);
-        ramdisk_specified = TRUE;
-#endif
-#endif
     } else if (match_varname(buf, "LEVELS", 4)) {
         if (strlen(bufp) >= PATHLEN)
             bufp[PATHLEN - 1] = '\0';
@@ -2531,16 +2486,7 @@ char *origbuf;
 
         if ((ptr = index(bufp, ';')) != 0) {
             *ptr = '\0';
-#ifdef MFLOPPY
-            if (*(ptr + 1) == 'n' || *(ptr + 1) == 'N') {
-                g.saveprompt = FALSE;
-            }
-#endif
         }
-#if defined(SYSFLAGS) && defined(MFLOPPY)
-        else
-            g.saveprompt = sysflags.asksavedisk;
-#endif
 
         (void) strncpy(g.SAVEP, bufp, SAVESIZE - 1);
         append_slash(g.SAVEP);
@@ -2559,7 +2505,7 @@ char *origbuf;
         (void) strncpy(g.catname, bufp, PL_PSIZ - 1);
 
 #ifdef SYSCF
-    } else if (src == set_in_sysconf && match_varname(buf, "WIZARDS", 7)) {
+    } else if (in_sysconf && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
             free((genericptr_t) sysopt.wizards);
         sysopt.wizards = dupstr(bufp);
@@ -2571,15 +2517,15 @@ char *origbuf;
                 free((genericptr_t) sysopt.fmtd_wizard_list);
             sysopt.fmtd_wizard_list = build_english_list(sysopt.wizards);
         }
-    } else if (src == set_in_sysconf && match_varname(buf, "SHELLERS", 8)) {
+    } else if (in_sysconf && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers)
             free((genericptr_t) sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
-    } else if (src == set_in_sysconf && match_varname(buf, "EXPLORERS", 7)) {
+    } else if (in_sysconf && match_varname(buf, "EXPLORERS", 7)) {
         if (sysopt.explorers)
             free((genericptr_t) sysopt.explorers);
         sysopt.explorers = dupstr(bufp);
-    } else if (src == set_in_sysconf && match_varname(buf, "DEBUGFILES", 5)) {
+    } else if (in_sysconf && match_varname(buf, "DEBUGFILES", 5)) {
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
@@ -2588,17 +2534,17 @@ char *origbuf;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
-    } else if (src == set_in_sysconf && match_varname(buf, "DUMPLOGFILE", 7)) {
+    } else if (in_sysconf && match_varname(buf, "DUMPLOGFILE", 7)) {
 #ifdef DUMPLOG
         if (sysopt.dumplogfile)
             free((genericptr_t) sysopt.dumplogfile);
         sysopt.dumplogfile = dupstr(bufp);
 #endif
-    } else if (src == set_in_sysconf && match_varname(buf, "GENERICUSERS", 12)) {
+    } else if (in_sysconf && match_varname(buf, "GENERICUSERS", 12)) {
         if (sysopt.genericusers)
             free((genericptr_t) sysopt.genericusers);
         sysopt.genericusers = dupstr(bufp);
-    } else if (src == set_in_sysconf && match_varname(buf, "BONES_POOLS", 10)) {
+    } else if (in_sysconf && match_varname(buf, "BONES_POOLS", 10)) {
         /* max value of 10 guarantees (N % bones.pools) will be one digit
            so we don't lose control of the length of bones file names */
         n = atoi(bufp);
@@ -2606,112 +2552,109 @@ char *origbuf;
         /* note: right now bones_pools==0 is the same as bones_pools==1,
            but we could change that and make bones_pools==0 become an
            indicator to suppress bones usage altogether */
-    } else if (src == set_in_sysconf && match_varname(buf, "SUPPORT", 7)) {
+    } else if (in_sysconf && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
         sysopt.support = dupstr(bufp);
-    } else if (src == set_in_sysconf && match_varname(buf, "RECOVER", 7)) {
+    } else if (in_sysconf && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover)
             free((genericptr_t) sysopt.recover);
         sysopt.recover = dupstr(bufp);
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "CHECK_SAVE_UID", 14)) {
+    } else if (in_sysconf && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "CHECK_PLNAME", 12)) {
+    } else if (in_sysconf && match_varname(buf, "CHECK_PLNAME", 12)) {
         n = atoi(bufp);
         sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
-        /* allow anyone to turn it off, but only sysconf to turn it on*/
-        if (src != set_in_sysconf && n != 0) {
+        /* allow anyone to disable it but can only enable it in sysconf
+           or as a no-op for the user when sysconf hasn't disabled it */
+        if (!in_sysconf && !sysopt.seduce && n != 0) {
             config_error_add("Illegal value in SEDUCE");
-            return FALSE;
+            n = 0;
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
-    } else if (src == set_in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
+    } else if (in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
         if (n < 0 || n > 25) {
-            config_error_add("Illegal value in MAXPLAYERS (maximum is 25).");
-            return FALSE;
+            config_error_add("Illegal value in MAXPLAYERS (maximum is 25)");
+            n = 5;
         }
         sysopt.maxplayers = n;
-    } else if (src == set_in_sysconf && match_varname(buf, "PERSMAX", 7)) {
+    } else if (in_sysconf && match_varname(buf, "PERSMAX", 7)) {
         n = atoi(bufp);
         if (n < 1) {
-            config_error_add("Illegal value in PERSMAX (minimum is 1).");
-            return FALSE;
+            config_error_add("Illegal value in PERSMAX (minimum is 1)");
+            n = 0;
         }
         sysopt.persmax = n;
-    } else if (src == set_in_sysconf && match_varname(buf, "PERS_IS_UID", 11)) {
+    } else if (in_sysconf && match_varname(buf, "PERS_IS_UID", 11)) {
         n = atoi(bufp);
         if (n != 0 && n != 1) {
-            config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1).");
-            return FALSE;
+            config_error_add("Illegal value in PERS_IS_UID (must be 0 or 1)");
+            n = 0;
         }
         sysopt.pers_is_uid = n;
-    } else if (src == set_in_sysconf && match_varname(buf, "ENTRYMAX", 8)) {
+    } else if (in_sysconf && match_varname(buf, "ENTRYMAX", 8)) {
         n = atoi(bufp);
         if (n < 10) {
-            config_error_add("Illegal value in ENTRYMAX (minimum is 10).");
-            return FALSE;
+            config_error_add("Illegal value in ENTRYMAX (minimum is 10)");
+            n = 10;
         }
         sysopt.entrymax = n;
-    } else if ((src == set_in_sysconf) && match_varname(buf, "POINTSMIN", 9)) {
+    } else if (in_sysconf && match_varname(buf, "POINTSMIN", 9)) {
         n = atoi(bufp);
         if (n < 1) {
-            config_error_add("Illegal value in POINTSMIN (minimum is 1).");
-            return FALSE;
+            config_error_add("Illegal value in POINTSMIN (minimum is 1)");
+            n = 100;
         }
         sysopt.pointsmin = n;
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
+    } else if (in_sysconf && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
         n = atoi(bufp);
         if (n < 1) {
             config_error_add(
-                      "Illegal value in MAX_STATUENAME_RANK (minimum is 1).");
-            return FALSE;
+                      "Illegal value in MAX_STATUENAME_RANK (minimum is 1)");
+            n = 10;
         }
         sysopt.tt_oname_maxrank = n;
 
     /* SYSCF PANICTRACE options */
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "PANICTRACE_LIBC", 15)) {
+    } else if (in_sysconf && match_varname(buf, "PANICTRACE_LIBC", 15)) {
         n = atoi(bufp);
 #if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
         if (n < 0 || n > 2) {
-            config_error_add("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
-            return FALSE;
+            config_error_add("Illegal value in PANICTRACE_LIBC (not 0,1,2)");
+            n = 0;
         }
 #endif
         sysopt.panictrace_libc = n;
-    } else if (src == set_in_sysconf
+    } else if (in_sysconf
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
         n = atoi(bufp);
 #if defined(PANICTRACE)
         if (n < 0 || n > 2) {
-            config_error_add("Illegal value in PANICTRACE_GDB (not 0,1,2).");
-            return FALSE;
+            config_error_add("Illegal value in PANICTRACE_GDB (not 0,1,2)");
+            n = 0;
         }
 #endif
         sysopt.panictrace_gdb = n;
-    } else if (src == set_in_sysconf && match_varname(buf, "GDBPATH", 7)) {
+    } else if (in_sysconf && match_varname(buf, "GDBPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            config_error_add("File specified in GDBPATH does not exist.");
+            config_error_add("File specified in GDBPATH does not exist");
             return FALSE;
         }
 #endif
         if (sysopt.gdbpath)
             free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
-    } else if (src == set_in_sysconf && match_varname(buf, "GREPPATH", 7)) {
+    } else if (in_sysconf && match_varname(buf, "GREPPATH", 7)) {
 #if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
-            config_error_add("File specified in GREPPATH does not exist.");
+            config_error_add("File specified in GREPPATH does not exist");
             return FALSE;
         }
 #endif
@@ -2719,30 +2662,30 @@ char *origbuf;
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
     /* SYSCF SAVE and BONES format options */
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "SAVEFORMAT", 10)) {
+    } else if (in_sysconf && match_varname(buf, "SAVEFORMAT", 10)) {
         parseformat(sysopt.saveformat, bufp);
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "BONESFORMAT", 11)) {
+    } else if (in_sysconf && match_varname(buf, "BONESFORMAT", 11)) {
         parseformat(sysopt.bonesformat, bufp);
-    } else if (src == set_in_sysconf
-               && match_varname(buf, "ACCESSIBILITY", 13)) {
+    } else if (in_sysconf && match_varname(buf, "ACCESSIBILITY", 13)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
-            config_error_add("Illegal value in ACCESSIBILITY (not 0,1).");
-            return FALSE;
+            config_error_add("Illegal value in ACCESSIBILITY (not 0,1)");
+            n = 0;
         }
         sysopt.accessibility = n;
+    } else if (in_sysconf && match_varname(buf, "PORTABLE_DEVICE_PATHS", 8)) {
 #ifdef WIN32
-    } else if (src == set_in_sysconf
-                && match_varname(buf, "portable_device_paths", 8)) {
         n = atoi(bufp);
         if (n < 0 || n > 1) {
-            config_error_add("Illegal value in portable_device_paths (not 0,1).");
-            return FALSE;
+            config_error_add(
+                         "Illegal value in PORTABLE_DEVICE_PATHS (not 0,1)");
+            n = 0;
         }
         sysopt.portable_device_paths = n;
+#else   /* Windows-only directive encountered by non-Windows config */
+        config_error_add("PORTABLE_DEVICE_PATHS is not supported");
 #endif
+
 #endif /* SYSCF */
 
     } else if (match_varname(buf, "BOULDER", 3)) {
@@ -2757,8 +2700,7 @@ char *origbuf;
             retval = FALSE;
 #endif
     } else if (match_varname(buf, "WARNINGS", 5)) {
-        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT,
-                          "WARNINGS");
+        (void) get_uchars(bufp, translate, FALSE, WARNCOUNT, "WARNINGS");
         assign_warnings(translate);
     } else if (match_varname(buf, "ROGUESYMBOLS", 4)) {
         if (!parsesymbols(bufp, ROGUESET)) {
@@ -2790,17 +2732,6 @@ char *origbuf;
         int val = atoi(bufp);
 
         amii_numcolors = 1L << min(DEPTH, val);
-#ifdef SYSFLAGS
-    } else if (match_varname(buf, "DRIPENS", 7)) {
-        int i, val;
-        char *t;
-
-        for (i = 0, t = strtok(bufp, ",/"); t != (char *) 0;
-             i < 20 && (t = strtok((char *) 0, ",/")), ++i) {
-            sscanf(t, "%d", &val);
-            sysflags.amii_dripens[i] = val;
-        }
-#endif
     } else if (match_varname(buf, "SCREENMODE", 10)) {
         extern long amii_scrnmode;
 
@@ -2887,6 +2818,8 @@ char *origbuf;
 #endif /*AMIGA*/
 #ifdef USER_SOUNDS
     } else if (match_varname(buf, "SOUNDDIR", 8)) {
+        if (sounddir)
+            free((genericptr_t) sounddir);
         sounddir = dupstr(bufp);
     } else if (match_varname(buf, "SOUND", 5)) {
         add_sound_mapping(bufp);
@@ -3103,7 +3036,7 @@ fopen_wizkit_file()
         /* fall through to standard names */
     } else
 #endif
-        if ((fp = fopenp(g.wizkit, "r")) != (FILE *) 0) {
+        if ((fp = fopen(g.wizkit, "r")) != (FILE *) 0) {
         return fp;
 #if defined(UNIX) || defined(VMS)
     } else {
@@ -3115,7 +3048,7 @@ fopen_wizkit_file()
     }
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopenp(fqname(g.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
+    if ((fp = fopen(fqname(g.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
         return fp;
 #else
 #ifdef VMS
@@ -3124,7 +3057,7 @@ fopen_wizkit_file()
         Sprintf(tmp_wizkit, "%s%s", envp, g.wizkit);
     else
         Sprintf(tmp_wizkit, "%s%s", "sys$login:", g.wizkit);
-    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
+    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
@@ -3132,7 +3065,7 @@ fopen_wizkit_file()
         Sprintf(tmp_wizkit, "%s/%s", envp, g.wizkit);
     else
         Strcpy(tmp_wizkit, g.wizkit);
-    if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
+    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
         return fp;
     else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
@@ -3329,7 +3262,8 @@ boolean FDECL((*proc), (char *));
                     }
                     bufp++;
                     if (g.config_section_chosen)
-                        free(g.config_section_chosen), g.config_section_chosen = 0;
+                        free(g.config_section_chosen),
+                            g.config_section_chosen = 0;
                     section = choose_random_part(bufp, ',');
                     if (section) {
                         g.config_section_chosen = dupstr(section);
@@ -3342,7 +3276,7 @@ boolean FDECL((*proc), (char *));
                     continue;
                 }
 
-                if (!proc(buf))
+                if (!(*proc)(buf))
                     rv = FALSE;
 
                 free(buf);
@@ -3727,7 +3661,7 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
     char tmp[PATHLEN];
 
 #ifdef OS2_CODEVIEW /* explicit path on opening for OS/2 */
-    /* how does this work when there isn't an explicit path or fopenp
+    /* how does this work when there isn't an explicit path or fopen
      * for later access to the file via fopen_datafile? ? */
     (void) strncpy(tmp, dir, PATHLEN - 1);
     tmp[PATHLEN - 1] = '\0';

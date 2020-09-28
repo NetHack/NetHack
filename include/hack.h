@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1580600495 2020/02/01 23:41:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1596498538 2020/08/03 23:48:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -305,10 +305,11 @@ typedef struct sortloot_item Loot;
 #define MM_EDOG     0x001000L /* add edog structure */
 #define MM_ASLEEP   0x002000L /* monsters should be generated asleep */
 #define MM_NOGRP    0x004000L /* suppress creation of monster groups */
+#define MM_NOTAIL   0x008000L /* if a long worm, don't give it a tail */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x008000L /* [actually used by enexto() to decide whether
+#define GP_ALLOW_XY 0x010000L /* [actually used by enexto() to decide whether
                                * to make an extra call to goodpos()]        */
-#define GP_ALLOW_U  0x010000L /* don't reject hero's location */
+#define GP_ALLOW_U  0x020000L /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -560,6 +561,6 @@ enum optset_restrictions {
 #endif
 
 #define DEVTEAM_EMAIL "devteam@nethack.org"
-#define DEVTEAM_URL "http://www.nethack.org"
+#define DEVTEAM_URL "https://www.nethack.org/"
 
 #endif /* HACK_H */

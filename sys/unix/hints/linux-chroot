@@ -1,5 +1,5 @@
 #
-# NetHack 3.5  linux $NHDT-Date: 1524684267 2018/04/25 19:24:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.1 $
+# NetHack 3.5  linux $NHDT-Date: 1589828479 2020/05/18 19:01:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 # NetHack 3.5  linux $Date: 2010/01/15 19:54:37 $  $Revision: 1.8 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
@@ -30,6 +30,11 @@ CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 CFLAGS+=-DTIMED_DELAY
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+=-DVAR_PLAYGROUND=\"$(HACKDIR)/var\"
+
+# when building liblua.a, avoid warning that use of tmpnam() should be
+# replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+# this needs to be passed via make rather than defined in unixconf.h
+SYSCFLAGS=-DLUA_USE_POSIX
 
 LINK=$(CC)
 # Only needed for GLIBC stack trace:

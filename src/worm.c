@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1580633722 2020/02/02 08:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1599559380 2020/09/08 10:03:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,7 +16,9 @@ struct wseg {
 
 static void FDECL(toss_wsegs, (struct wseg *, BOOLEAN_P));
 static void FDECL(shrink_worm, (int));
-static void FDECL(random_dir, (XCHAR_P, XCHAR_P, xchar *, xchar *));
+#if 0
+static void FDECL(random_dir, (int, int, int *, int *));
+#endif
 static struct wseg *FDECL(create_worm_tail, (int));
 
 /*  Description of long worm implementation.
@@ -126,9 +128,9 @@ int wseg_count;
     } else {
         wtails[wnum] = wheads[wnum] = seg = newseg();
         seg->nseg = (struct wseg *) 0;
-        seg->wx = worm->mx;
-        seg->wy = worm->my;
     }
+    seg->wx = worm->mx;
+    seg->wy = worm->my;
     wgrowtime[wnum] = 0L;
 }
 
@@ -144,14 +146,13 @@ toss_wsegs(curr, display_update)
 struct wseg *curr;
 boolean display_update;
 {
-    struct wseg *seg;
+    struct wseg *nxtseg;
 
     while (curr) {
-        seg = curr->nseg;
+        nxtseg = curr->nseg;
 
-        /* remove from level.monsters[][] */
-
-        /* need to check curr->wx for genocided while migrating_mon */
+        /* remove from level.monsters[][];
+           need to check curr->wx for genocided while migrating_mon */
         if (curr->wx) {
             remove_monster(curr->wx, curr->wy);
 
@@ -162,7 +163,7 @@ boolean display_update;
 
         /* free memory used by the segment */
         dealloc_seg(curr);
-        curr = seg;
+        curr = nxtseg;
     }
 }
 
@@ -313,7 +314,6 @@ struct monst *worm;
     int wnum = worm->wormno;
 
     worm->wormno = 0;
-
     /*  This will also remove the real monster (ie 'w') from the its
      *  position in level.monsters[][].
      */
@@ -505,11 +505,9 @@ boolean use_detection_glyph;
     int what_tail = what_mon(PM_LONG_WORM_TAIL, newsym_rn2);
 
     while (curr != wheads[worm->wormno]) {
-        num = use_detection_glyph
-            ? detected_monnum_to_glyph(what_tail)
-            : (worm->mtame
-               ? petnum_to_glyph(what_tail)
-               : monnum_to_glyph(what_tail));
+        num = use_detection_glyph ? detected_monnum_to_glyph(what_tail)
+              : worm->mtame ? petnum_to_glyph(what_tail)
+                : monnum_to_glyph(what_tail);
         show_glyph(curr->wx, curr->wy, num);
         curr = curr->nseg;
     }
@@ -612,6 +610,7 @@ NHFILE *nhfp;
  *  place_wsegs()
  *
  *  Place the segments of the given worm.  Called from restore.c
+ *  and from replmon() in mon.c.
  *  If oldworm is not NULL, assumes the oldworm segments are on map
  *  in the same location as worm segments
  */
@@ -622,42 +621,90 @@ struct monst *worm, *oldworm;
     struct wseg *curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        xchar x = curr->wx;
-        xchar y = curr->wy;
+        xchar x = curr->wx, y = curr->wy;
+        struct monst *mtmp = m_at(x, y);
 
-        if (oldworm) {
-            if (m_at(x,y) == oldworm)
-                remove_monster(x, y);
-            else
-                impossible("placing worm seg <%i,%i> over another mon", x, y);
-        }
+        if (oldworm && mtmp == oldworm)
+            remove_monster(x, y);
+        else if (mtmp)
+            impossible("placing worm seg <%d,%d> over another mon", x, y);
+        else if (oldworm)
+            impossible("replacing worm seg <%d,%d> on empty spot", x, y);
+
         place_worm_seg(worm, x, y);
         curr = curr->nseg;
     }
+    /* head segment is co-located with worm itself so not placed on the map */
+    curr->wx = worm->mx, curr->wy = worm->my;
 }
 
+/* called from mon_sanity_check(mon.c) */
 void
 sanity_check_worm(worm)
 struct monst *worm;
 {
     struct wseg *curr;
+    int wnum, x, y;
 
-    if (!worm)
-        panic("no worm!");
-    if (!worm->wormno)
-        panic("not a worm?!");
+    if (!worm) {
+        impossible("worm_sanity: null monster!");
+        return;
+    }
+    /* note: wormno can't be less than 0 (unsigned bit field) and can't
+       be greater that MAX_NUM_WORMS - 1 (which uses all available bits)
+       so checking for 0 is all we can manage for wormno validation;
+       since caller has already done that, this is rather pointless... */
+    if (!worm->wormno) {
+        impossible("worm_sanity: not a worm!");
+        return;
+    }
 
-    curr = wtails[worm->wormno];
+    wnum = worm->wormno;
+    if (!wtails[wnum] || !wheads[wnum]) {
+        impossible("wormno %d is set without proper tail", wnum);
+        return;
+    }
+    /* if worm is migrating, we can't check its segments against the map */
+    if (!worm->mx)
+        return;
 
-    while (curr != wheads[worm->wormno]) {
-        if (curr->wx) {
-            if (!isok(curr->wx, curr->wy))
-                panic("worm seg not isok");
-            if (g.level.monsters[curr->wx][curr->wy] != worm)
-                panic("worm not at seg location");
-        }
+    curr = wtails[wnum];
+    while (curr != wheads[wnum]) {
+        x = curr->wx, y = curr->wy;
+        if (!isok(x, y))
+            impossible("worm seg not isok <%d,%d>", x, y);
+        else if (g.level.monsters[x][y] != worm)
+            impossible("mon (%s) at seg location is not worm (%s)",
+                       fmt_ptr((genericptr_t) g.level.monsters[x][y]),
+                       fmt_ptr((genericptr_t) worm));
+
         curr = curr->nseg;
     }
+}
+
+/* called from mon_sanity_check(mon.c) */
+void
+wormno_sanity_check()
+{
+#ifdef EXTRA_SANITY_CHECKS
+    struct wseg *seg;
+    int wh = 0, wt = 0;
+
+    /* checking tail management, not a particular monster; since wormno==0
+       means 'not a worm', wheads[0] and wtails[0] should always be empty;
+       note: if erroneously non-Null, tail segment count will include the
+       extra segment for the worm's head that isn't shown on the map */
+    for (seg = wheads[0]; seg; seg = seg->nseg)
+        ++wh;
+    for (seg = wtails[0]; seg; seg = seg->nseg)
+        ++wt;
+    if (wh || wt) {
+        impossible(
+        "phantom worm tail #0 [head=%s, %d segment%s; tail=%s, %d segment%s]",
+                   fmt_ptr(wheads[0]), wh, plur(wh),
+                   fmt_ptr(wtails[0]), wt, plur(wt));
+    }
+#endif /* EXTRA_SANITY_CHECKS */
 }
 
 /*
@@ -701,12 +748,28 @@ xchar x, y;
     int wnum = worm->wormno;
     struct wseg *curr = wtails[wnum];
     struct wseg *new_tail;
-    xchar ox = x, oy = y;
+    int ox = x, oy = y;
 
     if (wnum && (!wtails[wnum] || !wheads[wnum])) {
         impossible("place_worm_tail_randomly: wormno is set without a tail!");
         return;
     }
+    if (wtails[wnum] == wheads[wnum]) {
+        /* single segment, co-located with worm so nothing to place */
+        if (curr->wx != worm->mx || curr->wy != worm->my) {
+            impossible(
+        "place_worm_tail_randomly: tail segement at <%d,%d>, worm at <%d,%d>",
+                       curr->wx, curr->wy, worm->mx, worm->my);
+            if (m_at(curr->wx, curr->wy) == worm)
+                remove_monster(curr->wx, curr->wy);
+            curr->wx = worm->mx, curr->wy = worm->my;
+        }
+        return;
+    }
+    /* remove head segment from map in case we end up calling toss_wsegs();
+       if it doesn't get tossed, it will become the final tail segment and
+       get new coordinates */
+    wheads[wnum]->wx = wheads[wnum]->wy = 0;
 
     wheads[wnum] = new_tail = curr;
     curr = curr->nseg;
@@ -715,30 +778,56 @@ xchar x, y;
     new_tail->wy = y;
 
     while (curr) {
-        xchar nx, ny;
-        char tryct = 0;
+        int nx = 0, ny = 0;
+#if 0   /* old code */
+        int trycnt = 0;
 
-        /* pick a random direction from x, y and search for goodpos() */
+        /* pick a random direction from x, y and test for goodpos() */
         do {
             random_dir(ox, oy, &nx, &ny);
-        } while (!goodpos(nx, ny, worm, 0) && (tryct++ < 50));
+        } while (!goodpos(nx, ny, worm, 0) && ++tryct <= 50);
 
-        if (tryct < 50) {
+        if (tryct <= 50)
+#else   /* new code */
+        int i, j, k, dirs[8];
+
+        /* instead of picking a random direction up to 50 times, try each
+           of the eight directions at most once after shuffling their order */
+        for (i = 0; i < 8; ++i)
+            dirs[i] = i;
+        for (i = 8; i > 0; --i) {
+            j = rn2(i);
+            k = dirs[j];
+            dirs[j] = dirs[i - 1];
+            dirs[i - 1] = k;
+        }
+        for (i = 0; i < 8; ++i) {
+            nx = ox + xdir[dirs[i]];
+            ny = oy + ydir[dirs[i]];
+            if (goodpos(nx, ny, worm, 0)) /* includes an isok() check */
+                break;
+        }
+
+        if (i < 8)
+#endif
+        {
             place_worm_seg(worm, nx, ny);
-            curr->wx = ox = nx;
-            curr->wy = oy = ny;
+            curr->wx = (xchar) (ox = nx);
+            curr->wy = (xchar) (oy = ny);
             wtails[wnum] = curr;
             curr = curr->nseg;
             wtails[wnum]->nseg = new_tail;
             new_tail = wtails[wnum];
             newsym(nx, ny);
-        } else {                     /* Oops.  Truncate because there was */
-            toss_wsegs(curr, FALSE); /* no place for the rest of it */
+        } else {
+            /* Oops.  Truncate because there is no place for rest of it. */
+            toss_wsegs(curr, FALSE);
             curr = (struct wseg *) 0;
         }
     }
 }
 
+#if 0
 /*
  * Given a coordinate x, y.
  * return in *nx, *ny, the coordinates of one of the <= 8 squares adjoining.
@@ -749,8 +838,8 @@ xchar x, y;
 static
 void
 random_dir(x, y, nx, ny)
-xchar x, y;
-xchar *nx, *ny;
+int x, y;
+int *nx, *ny;
 {
     *nx = x + (x > 1                /* extreme left ? */
                ? (x < COLNO - 1     /* extreme right ? */
@@ -770,6 +859,7 @@ xchar *nx, *ny;
                       : -1)                 /* bottom, use -1 */
                    : 1);                    /* top, use +1 */
 }
+#endif
 
 /* for size_monst(cmd.c) to support #stats */
 int

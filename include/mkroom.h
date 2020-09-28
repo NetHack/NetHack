@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkroom.h	$NHDT-Date: 1560851014 2019/06/18 09:43:34 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	mkroom.h	$NHDT-Date: 1596498547 2020/08/03 23:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -89,6 +89,14 @@ enum roomtype_types {
                        * searching required */
 #define ROOMOFFSET  3 /* (levl[x][y].roomno - ROOMOFFSET) gives g.rooms[] index,
                        * for inside-squares and non-shared boundaries */
+
+/* Values for needfill */
+#define FILL_NONE    0 /* do not fill this room with anything */
+#define FILL_NORMAL  1 /* fill the room normally (OROOM or THEMEROOM gets
+                          fill_ordinary_room; any other room type gets stocked
+                          with its usual monsters/objects/terrain) */
+#define FILL_LVFLAGS 2 /* special rooms only; set the room's rtype and level
+                          flags as appropriate, but do not put anything in it */
 
 #define IS_ROOM_PTR(x)      ((x) >= g.rooms && (x) < g.rooms + MAXNROFROOMS)
 #define IS_ROOM_INDEX(x)    ((x) >= 0 && (x) < MAXNROFROOMS)

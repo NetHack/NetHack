@@ -1,4 +1,4 @@
--- NetHack 3.6	castle.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	castle.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -230,7 +230,7 @@ des.region(selection.area(00,00,62,16),"unlit")
 des.region(selection.area(00,05,05,11),"lit")
 des.region(selection.area(57,05,62,11),"lit")
 --   Throne room
-des.region({ region={27,05, 37,11},lit=1,type="throne", prefilled=1 })
+des.region({ region={27,05, 37,11},lit=1,type="throne", filled=2 })
 --   Antechamber
 des.region(selection.area(07,05,14,11),"lit")
 --   Storerooms
@@ -244,8 +244,8 @@ des.region(selection.area(56,02,60,03),"lit")
 des.region(selection.area(02,13,06,14),"lit")
 des.region(selection.area(56,13,60,14),"lit")
 --   Barracks
-des.region({ region={16,05, 25,06},lit=1,type="barracks", prefilled=0 })
-des.region({ region={16,10, 25,11},lit=1,type="barracks", prefilled=0 })
+des.region({ region={16,05, 25,06},lit=1,type="barracks", filled=1 })
+des.region({ region={16,10, 25,11},lit=1,type="barracks", filled=1 })
 --   Hallways
 des.region(selection.area(08,03,54,03),"unlit")
 des.region(selection.area(08,13,54,13),"unlit")

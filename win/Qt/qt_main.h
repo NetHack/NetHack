@@ -47,12 +47,16 @@ public:
 	void RemoveWindow(NetHackQtWindow* window);
 	void updateInventory();
 
-	void fadeHighlighting();
+	void fadeHighlighting(bool before_key);
+
+        // this is unconditional in case qt_main.h comes before qt_set.h
+        void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
 
 public slots:
 	void doMenuItem(QAction *);
 	void doQtSettings(bool);
 	void doAbout(bool);
+        void doQuit(bool);
 	//RLC void doGuidebook(bool);
 	void doKeys(const QString&);
 

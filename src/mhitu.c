@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1586913203 2020/04/15 01:13:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.7	mhitu.c	$NHDT-Date: 1596498179 2020/08/03 23:42:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -594,7 +594,7 @@ register struct monst *mtmp;
     /* when not cancelled and not in current form due to shapechange, many
        demons can summon more demons and were creatures can summon critters;
        also, were creature might change from human to animal or vice versa */
-    if (mtmp->cham == NON_PM && !mtmp->mcan
+    if (mtmp->cham == NON_PM && !mtmp->mcan && !range2
         && (is_demon(mdat) || is_were(mdat))) {
         summonmu(mtmp, youseeit);
         mdat = mtmp->data; /* update cached value in case of were change */
@@ -622,6 +622,8 @@ register struct monst *mtmp;
             return (foo == 1);
     }
 
+    g.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
+
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
         if (i > 0 && foundyou /* previous attack might have moved hero */
@@ -630,7 +632,9 @@ register struct monst *mtmp;
         mon_currwep = (struct obj *)0;
         mattk = getmattk(mtmp, &g.youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
-            || (skipnonmagc && mattk->aatyp != AT_MAGC))
+            || (skipnonmagc && mattk->aatyp != AT_MAGC)
+            || (g.skipdrin && mattk->aatyp == AT_TENT
+                && mattk->adtyp == AD_DRIN))
             continue;
 
         switch (mattk->aatyp) {
@@ -1185,6 +1189,8 @@ register struct attack *mattk;
         hitmsg(mtmp, mattk);
         if (defends(AD_DRIN, uwep) || !has_head(g.youmonst.data)) {
             You("don't seem harmed.");
+            /* attacker should skip remaining AT_TENT+AD_DRIN attacks */
+            g.skipdrin = TRUE;
             /* Not clear what to do for green slimes */
             break;
         }
@@ -1232,10 +1238,13 @@ register struct attack *mattk;
             }
         }
         break;
-    case AD_DRLI:
+    case AD_DRLI: /* drain life */
         hitmsg(mtmp, mattk);
         if (uncancelled && !rn2(3) && !Drain_resistance) {
             losexp("life drainage");
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
         }
         break;
     case AD_LEGS: {

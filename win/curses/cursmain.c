@@ -1,15 +1,10 @@
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
-/* NetHack 3.6 cursmain.c */
+/* NetHack 3.7 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "curses.h"
 #include "hack.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
 #include "color.h"
 #include "wincurs.h"
 
@@ -903,12 +898,13 @@ curses_end_screen()
 
 /*
 outrip(winid, int)
-            -- The tombstone code.  If you want the traditional code use
-               genl_outrip for the value and check the #if in rip.c.
+                -- The tombstone code.  We use genl_outrip() from rip.c
+                   instead of rolling our own.
 */
 void
 curses_outrip(winid wid UNUSED,
-              int how UNUSED)
+              int how UNUSED,
+              time_t when UNUSED)
 {
      return;
 }

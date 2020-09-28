@@ -1,4 +1,4 @@
--- NetHack 3.6	Healer.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	Healer.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991, 1993 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
@@ -23,7 +23,7 @@ PPPPPPPPPPP........PPPPPPPPPPPP
 ]]);
 -- Dungeon Description
 des.region(selection.area(00,00,30,09), "lit")
-des.region({ region={12,03, 20,06}, lit=1, type="temple" })
+des.region({ region={12,03, 20,06}, lit=1, type="temple", filled=1 })
 -- Doors
 des.door("closed",09,04)
 des.door("closed",09,05)

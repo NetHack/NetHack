@@ -1,0 +1,458 @@
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1599687615 2020/09/09 21:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $
+# Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
+# NetHack may be freely redistributed.  See license for details.
+#
+#---------------------------------------------------------------------
+# MacOS hints file with support for multiple window ports (interfaces)
+# Tested on:
+#     - MacOS Catalina 10.15
+#
+# If this doesn't work for some other version of Mac OS X, consider
+# making a new hints file it, rather than changing this one.
+# And let us know about it.
+# Useful info: http://www.opensource.apple.com/darwinsource/index.html
+
+#-PRE xxxx
+# macOS X hints file
+#
+
+# compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
+#	various -I, -D, and -W settings appended below;
+#	these are the settings of most interest for an end-user build
+#	(clang doesn't support '-Og', gcc needs 4.x or later)
+CCFLAGS = -g
+#CCFLAGS = -g -Og
+#CCFLAGS = -O2
+#	Note: this is not the usual 'CFLAGS' which is used in default
+#	rules for compiling C code; specifying a value for that on the
+#	'make' command line should be avoided.
+
+# note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 3
+#-INCLUDE multiw-1.2020
+
+# 4. If you set WANT_WIN_QT, you need to
+#  A) set QTDIR either here or in the environment to point to the Qt5
+#     library installation root.  (Qt2, Qt3, Qt4 will not work)
+#  B) set XPMLIB to point to the Xpm library
+ifndef WANT_WIN_QT
+ifdef WANT_WIN_ALL
+WANT_WIN_QT=1
+endif
+endif
+ifdef WANT_WIN_QT
+#QTDIR=/Developer/Qt
+# Qt installed via homebrew
+QTDIR=$(shell brew --prefix)/opt/qt
+# Qt installed via macports
+#QTDIR=/opt/local/libexec/qt5
+endif	# WANT_WIN_QT
+ifndef LIBXPM
+LIBXPM= -L/opt/X11/lib -lXpm
+endif
+
+# 5. Other
+
+#-----------------------------------------------------------------------------
+# You shouldn't need to change anything below here (in the hints file; if
+# you're reading this in Makefile augmented by hints, that may not be true).
+#
+
+#-INCLUDE multiw-2.2020
+
+CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
+
+ifndef WANT_WIN_QT
+#	these are normally used when compiling nethack's core
+CFLAGS+=-ansi -pedantic -Wno-long-long
+#	but -ansi forces -std=c90 for C or -std=c++98 for C++;
+#	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
+#In file included from .../qt5/include/QtCore/qglobal.h:105:
+#.../qt5/include/QtCore/qcompilerdetection.h:561:6:
+#  error Qt requires a C++11 compiler and yours does not seem to be that.
+#	so we suppress -ansi when the build includes Qt
+endif
+# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
+# leave it out by default.
+#CFLAGS+=-Wunreachable-code
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CFLAGS+=-DGCC_WARN
+
+# NetHack sources control
+CFLAGS+=-DDLB
+CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+#CFLAGS+=-DTIMED_DELAY
+#CFLAGS+=-DDUMPLOG
+#CFLAGS+=-DCONFIG_ERROR_SECURE=FALSE
+CFLAGS+=-DGREPPATH=\"/usr/bin/grep\"
+#CFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS+=-DNOMAIL
+#CFLAGS+=-DEXTRA_SANITY_CHECKS
+#CFLAGS+=-DEDIT_GETLIN
+#CFLAGS+=-DSCORE_ON_BOTL
+#CFLAGS+=-DMSGHANDLER
+#CFLAGS+=-DTTY_TILES_ESCCODES
+#CFLAGS+=-DTTY_SOUND_ESCCODES
+
+CFLAGS+= $(WINCFLAGS)   #WINCFLAGS set from multiw-2.2020
+
+VARDATND =
+VARDATND0 =
+CURSESLIB =
+
+ifdef WANT_WIN_CHAIN
+HINTSRC=$(CHAINSRC)
+HINTOBJ=$(CHAINOBJ)
+endif # WANT_WIN_CHAIN
+
+ifdef WANT_WIN_TTY
+CURSESLIB = -lncurses
+endif
+
+ifdef WANT_WIN_CURSES
+CURSESLIB = -lncurses
+endif
+
+ifdef CURSESLIB
+WINLIB += $(CURSESLIB)
+endif
+
+ifdef WANT_WIN_X11
+USE_XPM=1
+WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
+VARDATND0 += x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+# -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
+POSTINSTALL += bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
+# separate from CFLAGS so that we don't pass it to every file
+X11CFLAGS = -I/opt/X11/include
+# avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
+X11CFLAGS += -Wno-variadic-macros
+ifdef USE_XPM
+CFLAGS += -DUSE_XPM
+WINX11LIB += -lXpm
+VARDATND0 += rip.xpm
+endif
+WINLIB += $(WINX11LIB)
+LFLAGS=-L/opt/X11/lib
+endif	# WANT_WIN_X11
+
+ifdef WANT_WIN_QT
+# Qt5 requires C++11
+LINK = $(CXX)
+QTCXXFLAGS += -Wno-deprecated-declarations
+ifeq "$(CCISCLANG)" ""
+# get the version of g++
+GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GPPGTEQ9)" "1"
+QTCXXFLAGS+= -Wno-format-truncation
+endif  #g++ version greater than or equal to 9
+endif  #not clang
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+WINSRC += $(WINQTSRC)
+WINOBJ0 += $(WINQTOBJ)
+VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
+# XXX if /Developer/qt exists and QTDIR not set, use that
+ifndef QTDIR
+$(error QTDIR not defined in the environment or Makefile)
+endif	# QTDIR
+# XXX make sure QTDIR points to something reasonable
+else	# !WANT_WIN_QT
+LINK=$(CC)
+endif	# !WANT_WIN_QT
+
+# prevent duplicate tile.o in WINOBJ
+WINOBJ = $(sort $(WINOBJ0))
+# prevent duplicates in VARDATND if both X11 and Qt are being supported
+VARDATND += $(sort $(VARDATND0))
+
+
+WANT_BUNDLE=1
+ifdef WANT_SHARE_INSTALL
+# if $GAMEUID is root, we install into roughly proper Mac locations, otherwise
+# we install into ~/nethackdir
+ifeq ($(GAMEUID),root)
+PREFIX:=/Library/NetHack
+SHELLDIR=/usr/local/bin
+HACKDIR=$(PREFIX)/nethackdir
+CHOWN=chown
+CHGRP=chgrp
+# We run sgid so the game has access to both HACKDIR and user preferences.
+GAMEPERM = 02755
+else	# ! root
+PREFIX:=/Users/$(GAMEUID)
+SHELLDIR=$(PREFIX)/bin
+HACKDIR=$(PREFIX)/Library/NetHack/nethackdir
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
+GAMEPERM = 0500
+endif	# ! root
+VARFILEPERM = 0664
+VARDIRPERM = 0775
+ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
+# XXX it's nice we don't write over sysconf, but we've already erased it
+# make sure we have group GAMEUID and group GAMEGRP
+PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
+		. sys/unix/hints/macosx.sh group2 $(GAMEGRP); \
+		mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
+		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+
+else ifdef WANT_SOURCE_INSTALL
+
+PREFIX=$(abspath $(NHSROOT))
+# suppress nethack.sh
+#SHELLDIR=
+HACKDIR=$(PREFIX)/playground
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
+GAMEPERM = 0700
+VARFILEPERM = 0600
+VARDIRPERM = 0700
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
+# We can use "make all" to build the whole thing - but it misses some things:
+MOREALL=$(MAKE) install
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+
+else	# !WANT_SOURCE_INSTALL
+
+PREFIX:=$(wildcard ~)
+SHELLDIR=$(PREFIX)/bin
+HACKDIR=$(PREFIX)/nethackdir
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
+GAMEPERM = 0700
+VARFILEPERM = 0600
+VARDIRPERM = 0700
+ifdef ($(WANT_DEFAULT),X11)
+# install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
+PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc || true
+endif	# WANT_DEFAULT X11
+
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
+		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+ifdef WANT_BUNDLE
+#
+# Bundle
+#
+# $(HACKDIR)/$(GAME).app/
+#              Contents/
+#                 Frameworks/
+#                 Info.plist
+#                 MacOS/
+#                    $(GAME)
+#                 PkgInfo/
+#                 PlugIns/
+#                 Resources/
+#                 SharedFrameWorks/
+#
+BUNDLE = mkdir -p $(HACKDIR)/nethack.app/Contents/MacOS; \
+              sys/unix/hints/macosx.sh infoplist > $(HACKDIR)/nethack.app/Contents/Info.plist; \
+              mv $(HACKDIR)/nethack $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
+ifdef WANT_SHARE_INSTALL
+BUNDLE+= chmod $(GAMEPERM) $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
+endif
+
+POSTINSTALL+= $(BUNDLE)
+POSTINSTALL+= if test -f $(SHELLDIR)/$(GAME); then \
+			  sed -i '' 's;HACKDIR/$(GAME);HACKDIR/$(GAME).app/Contents/MacOS/$(GAME);' $(SHELLDIR)/$(GAME) ; fi;
+endif   # WANT_BUNDLE
+endif   # !WANT_SHARE_INSTALL
+
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
+
+# ~/Library/Preferences/NetHack Defaults
+# OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
+# OPTIONS=hilite_pet,toptenwin,msghistory:200,windowtype:Qt
+#
+# Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
+# package under the docs directory).
+
+#-POST
+ifdef MAKEFILE_TOP
+###
+### Packaging
+###
+# Notes:
+# 1) The Apple developer utilities must be installed in the default location.
+# 2) Do a normal build before trying to package the game.
+# 3) This matches the 3.4.3 Term package, but there are some things that
+#    should be changed.
+#
+# Packages that are being distributed must be signed by a Developer ID
+# Installer certificate.  Set DEVELOPER_CERT to the name of the certificate
+# if you wish for your package to be signed for distribution.
+#
+# If building a package for signing, you must use sudo approriately.
+# the binaries and package using sudo but you DO NOT use sudo to sign the
+# package.  If you use sudo to sign the package, it will fail.
+#
+#   sudo make all
+#   sudo make build_tty_pkg
+#   make sign_tty_pkg
+#
+
+ifdef WANT_WIN_TTY
+DEVUTIL=/Developer/Applications/Utilities
+SVS=$(shell $(NHSROOT)/util/makedefs --svs)
+SVSDOT=$(shell $(NHSROOT)/util/makedefs --svs .)
+
+PKGROOT_UG	= PKGROOT/$(PREFIX)
+PKGROOT_UGLN	= PKGROOT/$(HACKDIR)
+PKGROOT_BIN	= PKGROOT/$(SHELLDIR)
+
+#DEVELOPER_CERT = Developer ID Installer: Bart House
+DEVELOPER_CERT = NONE
+
+spotless::
+	rm -rf RESOURCES
+	rm -rf PKG
+	rm -rf PKGSCRIPTS
+	rm -rf PKGROOT
+	rm -f Info.plist
+	rm -f Distribution.xml
+	rm -f NetHack-*-mac-Term*
+
+build_tty_pkg:
+ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
+	-echo build_tty_pkg only works for a tty-only build
+	exit 1
+else
+	rm -rf NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
+	$(MAKE) build_package_root
+	rm -rf RESOURCES
+	mkdir RESOURCES
+	#enscript --language=rtf -o - < dat/license >RESOURCES/License.rtf
+	sys/unix/hints/macosx.sh descplist > RESOURCES/Description.plist
+	sys/unix/hints/macosx.sh infoplist > Info.plist
+
+	mkdir PKGROOT/Applications
+	#osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+	#	 win/macosx/NetHackRecover.applescript
+	#cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+	osacompile -o PKGROOT/Applications/NetHackRecover.app \
+		 win/macosx/NetHackRecover.applescript
+	cp win/macosx/recover.pl $(PKGROOT_UGLN)
+
+	osacompile -o PKGROOT/Applications/NetHackTerm.app \
+		 win/macosx/NetHackTerm.applescript
+
+	# XXX integrate into Makefile.doc
+	(cd doc; cat Guidebook.mn | ../util/makedefs --grep --input - --output - \
+	| tbl tmac.n - | groff | pstopdf -i -o Guidebook.pdf)
+	cp doc/Guidebook.pdf $(PKGROOT_UG)/doc/NetHackGuidebook.pdf
+
+	osacompile -o PKGROOT/Applications/NetHackGuidebook.app \
+		 win/macosx/NetHackGuidebook.applescript
+
+	mkdir -p PKG
+	pkgbuild --root PKGROOT --identifier org.nethack.term --scripts PKGSCRIPTS PKG/NH-Term.pkg
+	productbuild --synthesize --product Info.plist --package PKG/NH-Term.pkg Distribution.xml
+	productbuild --distribution Distribution.xml --resources RESOURCES --package-path PKG NetHack-$(SVS)-mac-Term-unsigned.pkg
+ifeq ($(DEVELOPER_CERT),NONE)
+	cp NetHack-$(SVS)-mac-Term-unsigned.pkg NetHack-$(SVS)-mac-Term.pkg
+	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term-unsigned.pkg NetHack-$(SVS)-mac-Term-unsigned.dmg
+	@echo -------------------------------------------
+	@echo PACKAGE IS NOT SIGNED FOR DISTRIBUTION!!!!!
+	@echo ===========================================
+else
+	@echo "run 'make sign_tty_pkg' to complete package"
+endif
+
+sign_tty_pkg:
+	productsign --timestamp=none --sign "$(DEVELOPER_CERT)" NetHack-$(SVS)-mac-Term-unsigned.pkg NetHack-$(SVS)-mac-Term.pkg || (echo "Package signing failed"; exit 1)
+	spctl -a -v --type install NetHack-$(SVS)-mac-Term.pkg || (echo "Package not signed properly"; exit 1)
+	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
+
+build_package_root:
+	cd src/..       # make sure we are at TOP
+	rm -rf PKGROOT
+	mkdir -p $(PKGROOT_UG)/lib $(PKGROOT_BIN) $(PKGROOT_UG)/man/man6 $(PKGROOT_UG)/doc $(PKGROOT_UGLN)
+	install -p src/nethack $(PKGROOT_BIN)
+	# XXX should this be called nethackrecover?
+	install -p util/recover $(PKGROOT_BIN)
+	install -p doc/nethack.6 $(PKGROOT_UG)/man/man6
+	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
+	install -p doc/Guidebook $(PKGROOT_UG)/doc
+	install -p dat/nhdat $(PKGROOT_UGLN)
+	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
+	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
+# XXX these files should be somewhere else for good Mac form
+	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile
+	mkdir $(PKGROOT_UGLN)/save
+# XXX what about a news file?
+
+	mkdir -p PKGSCRIPTS
+	echo '#!/bin/sh'                              >  PKGSCRIPTS/postinstall
+	echo dseditgroup -o create -r '"Games Group"' -s 3600 $(GAMEGRP) >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(HACKDIR)        >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(HACKDIR)/*        >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(HACKDIR)        >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(HACKDIR)/*        >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)          >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)/save     >> PKGSCRIPTS/postinstall
+	echo chmod $(FILEPERM)    $(HACKDIR)/license  >> PKGSCRIPTS/postinstall
+	echo chmod $(FILEPERM)    $(HACKDIR)/nhdat    >> PKGSCRIPTS/postinstall
+	echo chmod $(FILEPERM)    $(HACKDIR)/symbols  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/perm     >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/record   >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/logfile  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/xlogfile >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/sysconf  >> PKGSCRIPTS/postinstall
+	echo chmod $(GAMEPERM)   $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo chmod $(EXEPERM)    $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
+	chmod 0775 PKGSCRIPTS/postinstall
+
+endif	# end of build_tty_pkg
+endif	# WANT_WIN_TTY for packaging
+
+ifdef WANT_WIN_QT
+# XXX untested and incomplete (see below)
+build_qt_pkg:
+ifneq (,$(WANT_WIN_X11)$(WANT_WIN_TTY))
+	-echo build_qt_pkg only works for a qt-only build
+	exit 1
+else
+	$(MAKE) build_package_root
+	rm -rf NetHackQt
+	mkdir -p NetHackQt/NetHackQt.app/nethackdir/save
+	mkdir NetHackQt/Documentation
+	cp doc/Guidebook.txt doc/nethack.txt doc/recover.txt NetHackQt/Documentation
+
+	osacompile -o NetHackQt/NetHackQt.app/nethackdir/NetHackRecover.app \
+		 win/macosx/NetHackRecover.applescript
+	cp win/macosx/recover.pl NetHackQt/NetHackQt.app/nethackdir
+
+	mkdir -p NetHackQt/NetHackQt.app/Contents/Frameworks
+	cp $(QTDIR)/libqt-mt.3.dylib NetHackQt/NetHackQt.app/Contents/Frameworks
+
+	mkdir NetHackQt/NetHackQt.app/Contents/MacOS
+	mv PKGROOT/nethack NetHackQt/NetHackQt.app/Contents/MacOS
+
+	mv PKGROOT/lib/nethackdir NetHackQt/NetHackQt.app/nethackdir
+
+# XXX still missing:
+#NetHackQt/NetHackQt.app
+# /Contents
+#	Info.plist
+#	Resources/nethack.icns
+#NetHackQt/Documentation
+#NetHackQtRecover.txt
+#NetHack Defaults.txt
+#changes.patch XXX is this still needed?  why isn't it part of the tree?
+#  doesn't go here
+	hdiutil create -verbose -srcfolder NetHackQt NetHack-$(SVS)-macosx-qt.dmg
+endif	# end of build_qt_pkg
+endif	# WANT_WIN_QT for packaging
+endif	# MAKEFILE_TOP

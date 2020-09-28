@@ -1,4 +1,4 @@
-/* NetHack 3.6	permonst.h	$NHDT-Date: 1539804913 2018/10/17 19:35:13 $  $NHDT-Branch: keni-makedefsm $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	permonst.h	$NHDT-Date: 1596498555 2020/08/03 23:49:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */

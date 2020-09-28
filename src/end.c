@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1583190253 2020/03/02 23:04:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1597182933 2020/08/11 21:55:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,7 +39,7 @@ static void NDECL(dump_plines);
 static void FDECL(dump_everything, (int, time_t));
 
 #if defined(__BEOS__) || defined(MICRO) || defined(OS2) || defined(WIN32)
-extern void FDECL(nethack_exit, (int));
+extern void FDECL(nethack_exit, (int)) NORETURN;
 #else
 #define nethack_exit exit
 #endif
@@ -784,7 +784,7 @@ boolean taken;
         c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
         if (c == 'y') {
             /* caller has already ID'd everything */
-            (void) display_inventory((char *) 0, TRUE);
+            (void) display_inventory((char *) 0, FALSE);
             container_contents(g.invent, TRUE, TRUE, FALSE);
         }
         if (c == 'q')
@@ -1315,8 +1315,7 @@ int how;
         for (obj = g.invent; obj; obj = obj->nobj) {
             discover_object(obj->otyp, TRUE, FALSE);
             obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-            if (Is_container(obj) || obj->otyp == STATUE)
-                obj->cknown = obj->lknown = 1;
+            set_cknown_lknown(obj); /* set flags when applicable */
             /* we resolve Schroedinger's cat now in case of both
                disclosure and dumplog, where the 50:50 chance for
                live cat has to be the same both times */

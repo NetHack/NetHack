@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  macosx.sh $NHDT-Date: 1517231957 2018/01/29 13:19:17 $  $NHDT-Branch: githash $:$NHDT-Revision: 1.20 $
+# NetHack 3.7  macosx.sh $NHDT-Date: 1597332920 2020/08/13 15:35:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -151,7 +151,7 @@ xdescplist)	SVSDOT=`util/makedefs --svs .`
         <key>IFPkgDescriptionDeleteWarning</key>
         <string></string>
         <key>IFPkgDescriptionDescription</key>
-        <string>NetHack $SVSDOT for the MacOS X Terminal
+        <string>NetHack $SVSDOT for MacOS
 </string>
         <key>IFPkgDescriptionTitle</key>
         <string>NetHack</string>
@@ -169,9 +169,9 @@ xinfoplist)	SVSDOT=`util/makedefs --svs .`
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>NetHack $SVSDOT for the MacOS X Terminal</string>
+	<string>NetHack $SVSDOT for MacOS</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.nethack.term</string>
+	<string>org.nethack.macos</string>
 	<key>CFBundleName</key>
 	<string>NetHack</string>
 	<key>CFBundleShortVersionString</key>

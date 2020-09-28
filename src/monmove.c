@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1586091452 2020/04/05 12:57:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1600469618 2020/09/18 22:53:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -114,16 +114,18 @@ register struct monst *mtmp;
 
     /* a similar check is in monster_nearby() in hack.c */
     /* check whether hero notices monster and stops current activity */
-    if (g.occupation && !rd && !Confusion && (!mtmp->mpeaceful || Hallucination)
+    if (g.occupation && !rd
+        /* monster is hostile and can attack (or hallu distorts knowledge) */
+        && (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
         /* it's close enough to be a threat */
-        && distu(x, y) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
+        && distu(mtmp->mx, mtmp->my) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
         /* and either couldn't see it before, or it was too far away */
         && (!already_saw_mon || !couldsee(x, y)
             || distu(x, y) > (BOLT_LIM + 1) * (BOLT_LIM + 1))
         /* can see it now, or sense it and would normally see it */
-        && (canseemon(mtmp) || (sensemon(mtmp) && couldsee(x, y)))
-        && mtmp->mcanmove && !noattacks(mtmp->data)
-        && !onscary(u.ux, u.uy, mtmp))
+        && canspotmon(mtmp) && couldsee(mtmp->mx, mtmp->my)
+        /* monster isn't paralyzed or afraid (scare monster/Elbereth) */
+        && mtmp->mcanmove && !onscary(u.ux, u.uy, mtmp))
         stop_occupation();
 
     return rd;
@@ -562,13 +564,27 @@ register struct monst *mtmp;
             && (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
             pline("It feels quite soothing.");
         } else if (!u.uinvulnerable) {
-            register boolean m_sen = sensemon(mtmp);
+            int dmg;
+            boolean m_sen = sensemon(mtmp);
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
-                int dmg;
+                /* hiding monsters are brought out of hiding when hit by
+                   a psychic blast, so do the same for hiding poly'd hero */
+                if (u.uundetected) {
+                    u.uundetected = 0;
+                    newsym(u.ux, u.uy);
+                } else if (U_AP_TYPE != M_AP_NOTHING
+                           /* hero has no way to hide as monster but
+                              check for that theoretical case anyway */
+                           && U_AP_TYPE != M_AP_MONSTER) {
+                    g.youmonst.m_ap_type = M_AP_NOTHING;
+                    g.youmonst.mappearance = 0;
+                    newsym(u.ux, u.uy);
+                }
                 pline("It locks on to your %s!",
-                      m_sen ? "telepathy" : Blind_telepat ? "latent telepathy"
-                                                          : "mind");
+                      m_sen ? "telepathy"
+                      : Blind_telepat ? "latent telepathy"
+                        : "mind"); /* note: hero is never mindless */
                 dmg = rnd(15);
                 if (Half_spell_damage)
                     dmg = (dmg + 1) / 2;
@@ -587,13 +603,13 @@ register struct monst *mtmp;
                 continue;
             if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
                 || !rn2(10)) {
+                /* wake it up first, to bring hidden monster out of hiding */
+                wakeup(m2, FALSE);
                 if (cansee(m2->mx, m2->my))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
                 if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
-                else
-                    m2->msleeping = 0;
             }
         }
     }

@@ -83,10 +83,6 @@ pfx_##a,
                "status window alignment")
     NHOPTC(altkeyhandler, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                "alternate key handler")
-#if defined(SYSFLAGS) && defined(AMIGA)
-    NHOPTB(altmeta, 0, opt_out, set_in_config, On, No, No, No, NoAlias,
-               &sysflags.altmeta)
-#else
 #ifdef ALTMETA
     NHOPTB(altmeta, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,
                &iflags.altmeta)
@@ -94,16 +90,8 @@ pfx_##a,
     NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
                (boolean *) 0)
 #endif
-#endif
     NHOPTB(ascii_map, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                &iflags.wc_ascii_map)
-#if defined(SYSFLAGS) && defined(MFLOPPY)
-    NHOPTB(asksavedisk, 0, opt_in, set_gameview, Off, No, No, No, NoAlias,
-               &sysflags.asksavedisk)
-#else
-    NHOPTB(asksavedisk, 0, opt_in, set_gameview, Off, No, No, No, NoAlias,
-               (boolean *) 0)
-#endif
     NHOPTB(autodescribe, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.autodescribe)
     NHOPTB(autodig, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
@@ -515,6 +503,13 @@ pfx_##a,
                 &iflags.vt_tiledata)
 #else
     NHOPTB(vt_tiledata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                (boolean *) 0)
+#endif
+#ifdef TTY_SOUND_ESCCODES
+    NHOPTB(vt_sounddata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
+                &iflags.vt_sounddata)
+#else
+    NHOPTB(vt_sounddata, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 (boolean *) 0)
 #endif
     NHOPTC(warnings, 10, opt_in, set_in_config, No, Yes, No, No, NoAlias,

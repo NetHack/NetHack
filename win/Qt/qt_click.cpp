@@ -4,18 +4,13 @@
 
 // qt_click.cpp -- a mouse click buffer
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
+#include "qt_post.h"
 #include "qt_click.h"
 
 namespace nethack_qt_ {

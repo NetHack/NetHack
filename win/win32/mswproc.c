@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1575245201 2019/12/02 00:06:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.7	mswproc.c	$NHDT-Date: 1596498364 2020/08/03 23:46:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1333,12 +1333,18 @@ mswin_raw_print_flush()
 {
     if (raw_print_strbuf.str != NULL) {
         int wlen = strlen(raw_print_strbuf.str) + 1;
-        TCHAR * wbuf = (TCHAR *) alloc(wlen * sizeof(TCHAR));
-        if (wbuf != NULL) {
-            NHMessageBox(GetNHApp()->hMainWnd,
+        if (strcmp(raw_print_strbuf.str, "\n") != 0
+#ifdef _MSC_VER
+            || IsDebuggerPresent()
+#endif
+                                  ) {
+            TCHAR * wbuf = (TCHAR *) alloc(wlen * sizeof(TCHAR));
+            if (wbuf != NULL) {
+                NHMessageBox(GetNHApp()->hMainWnd,
                             NH_A2W(raw_print_strbuf.str, wbuf, wlen),
                             MB_ICONINFORMATION | MB_OK);
-            free(wbuf);
+                free(wbuf);
+            }
         }
         strbuf_empty(&raw_print_strbuf);
     }

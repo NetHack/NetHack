@@ -1,13 +1,9 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1571363147 2019/10/18 01:45:47 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.7	bones.c	$NHDT-Date: 1596498151 2020/08/03 23:42:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-#ifdef MFLOPPY
-extern long bytes_counted;
-#endif
 
 static boolean FDECL(no_bones_level, (d_level *));
 static void FDECL(goodfruit, (int));
@@ -531,49 +527,14 @@ struct obj *corpse;
     }
     c = (char) (strlen(bonesid) + 1);
 
-#ifdef MFLOPPY /* check whether there is room */
-    if (iflags.checkspace) {
-        int savemode = nhfp->mode;
-
-        nhfp->mode = COUNTING;
-        savelev(nhfp, ledger_no(&u.uz));
-        /* savelev() initializes bytes_counted to 0, so it must come
-         * first here even though it does not in the real save.  the
-         * resulting extra bflush() at the end of savelev() may increase
-         * bytes_counted by a couple over what the real usage will be.
-         *
-         * note it is safe to call store_version() here only because
-         * bufon() is null for ZEROCOMP, which MFLOPPY uses -- otherwise
-         * this code would have to know the size of the version
-         * information itself.
-         */
-        store_version(nhfp);
-        store_savefileinfo(nhfp);
-    	if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
-            bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nnn */
-        }
-        savefruitchn(nhfp);
-        if (nhfp->structlevel)
-            bflush(nhfp->fd);
-        if (bytes_counted > freediskspace(bones)) { /* not enough room */
-            if (wizard)
-                pline("Insufficient space to create bones file.");
-	    close_nhfile(nhfp);
-            cancel_bonesfile();
-            return;
-        }
-        co_false(); /* make sure stuff before savelev() gets written */
-        nhfp->mode = savemode;
-    }
-#endif /* MFLOPPY */
-
     nhfp->mode = WRITING | FREEING;
     store_version(nhfp);
     store_savefileinfo(nhfp);
     if (nhfp->structlevel) {
+        /* if a bones pool digit is in use, it precedes the bonesid
+           string and isn't recorded in the file */
         bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
-        bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
+        bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nn */
         savefruitchn(nhfp);
     }
     update_mlstmv(); /* update monsters for eventual restoration */
@@ -626,22 +587,18 @@ getbones()
             }
         }
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
-            mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
+            /* if a bones pool digit is in use, it precedes the bonesid
+               string and wasn't recorded in the file */
+            mread(nhfp->fd, (genericptr_t) &c,
+                  sizeof c); /* length including terminating '\0' */
+            mread(nhfp->fd, (genericptr_t) oldbonesid,
+                  (unsigned) c); /* DD.nn or Qrrr.n for role rrr */
         }
-        if (strcmp(bonesid, oldbonesid) != 0
-            /* from 3.3.0 through 3.6.0, bones in the quest branch stored
-               a bogus bonesid in the file; 3.6.1 fixed that, but for
-               3.6.0 bones to remain compatible, we need an extra test;
-               once compatibility with 3.6.x goes away, this can too
-               (we don't try to make this conditional upon the value of
-               VERSION_COMPATIBILITY because then we'd need patchlevel.h) */
-            && (strlen(bonesid) <= 2
-                || strcmp(bonesid + 2, oldbonesid) != 0)) {
+        if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];
 
-            Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,
-                    bonesid);
+            Sprintf(errbuf, "This is bones level '%s', not '%s'!",
+                    oldbonesid, bonesid);
             if (wizard) {
                 pline1(errbuf);
                 ok = FALSE; /* won't die of trickery */

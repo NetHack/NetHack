@@ -1,4 +1,4 @@
-This is a listing of all files in a full NetHack 3.6 distribution, organized
+This is a listing of all files in a full NetHack 3.7 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
@@ -91,28 +91,31 @@ winGnome.h
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
 (files for all versions)
-align.h       amiconf.h     artifact.h    artilist.h    attrib.h
-beconf.h      botl.h        color.h       config.h      config1.h
-context.h     coord.h       decl.h        def_os2.h     dgn_file.h
-display.h     dlb.h         dungeon.h     engrave.h     extern.h
-flag.h        fnamesiz.h    func_tab.h    global.h      hack.h
-integer.h     isaac64.h     lint.h        mail.h        mextra.h
-mfndpos.h     micro.h       mkroom.h      monattk.h     mondata.h
-monflag.h     monst.h       monsym.h      ntconf.h      obj.h
-objclass.h    optlist.h     os2conf.h     patchlevel.h  pcconf.h
-permonst.h    prop.h        quest.h       rect.h        region.h
-rm.h          skills.h      sp_lev.h      spell.h       sys.h
-system.h      tcap.h        tileset.h     timeout.h     tosconf.h
+align.h       artifact.h    artilist.h    attrib.h      botl.h
+color.h       config.h      config1.h     context.h     coord.h
+decl.h        dgn_file.h    display.h     dlb.h         dungeon.h
+engrave.h     extern.h      flag.h        fnamesiz.h    func_tab.h
+global.h      hack.h        integer.h     isaac64.h     lint.h
+mail.h        mextra.h      mfndpos.h     micro.h       mkroom.h
+monattk.h     mondata.h     monflag.h     monst.h       monsym.h
+ntconf.h      obj.h         objclass.h    optlist.h     patchlevel.h
+pcconf.h      permonst.h    prop.h        quest.h       rect.h
+region.h      rm.h          skills.h      sp_lev.h      spell.h
+sys.h         system.h      tcap.h        tileset.h     timeout.h
 tradstdc.h    trampoli.h    trap.h        unixconf.h    vision.h
-vmsconf.h     wceconf.h     winami.h      wincurs.h     winprocs.h
-wintype.h     you.h         youprop.h
+vmsconf.h     winami.h      wincurs.h     winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
 
 (files for various Macintosh versions)
-mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
-mactty.h      macwin.h      mttypriv.h
+mac-carbon.h  mac-qt.h      mac-term.h    macpopup.h    mactty.h
+macwin.h      mttypriv.h
+
+outdated/include:
+(files that are no longer maintained for current game code)
+amiconf.h  beconf.h   def_os2.h  macconf.h  os2conf.h  tosconf.h  wceconf.h
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
@@ -301,10 +304,15 @@ sys/unix/hints:
 (files for configuring UNIX NetHack versions)
 linux               linux-chroot        linux-minimal
 linux-qt4           linux-qt5           linux-x11
-macosx              macosx.sh           macosx10.5
-macosx10.7          macosx10.8          macosx10.10
-macosx10.10-qt      macosx10.14         solaris
-solaris-playground  unix
+linux.2020          macOS.2020          macosx
+macosx.sh           macosx10.5          macosx10.7
+macosx10.8          macosx10.10         macosx10.10-qt
+macosx10.14         solaris             solaris-playground
+unix
+
+sys/unix/hints/include:
+(files for configuring UNIX NetHack versions)
+multiw-1.2020  multiw-2.2020
 
 sys/vms:
 (files for VMS version)
@@ -340,11 +348,11 @@ qt_clust.h    qt_delay.cpp  qt_delay.h    qt_glyph.cpp  qt_glyph.h
 qt_icon.cpp   qt_icon.h     qt_inv.cpp    qt_inv.h      qt_kde0.h
 qt_key.cpp    qt_key.h      qt_line.cpp   qt_line.h     qt_main.cpp
 qt_main.h     qt_map.cpp    qt_map.h      qt_menu.cpp   qt_menu.h
-qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_rip.cpp
-qt_rip.h      qt_set.cpp    qt_set.h      qt_stat.cpp   qt_stat.h
-qt_str.cpp    qt_str.h      qt_streq.cpp  qt_streq.h    qt_svsel.cpp
-qt_svsel.h    qt_win.cpp    qt_win.h      qt_xcmd.cpp   qt_xcmd.h
-qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
+qt_msg.cpp    qt_msg.h      qt_plsel.cpp  qt_plsel.h    qt_post.h
+qt_pre.h      qt_rip.cpp    qt_rip.h      qt_set.cpp    qt_set.h
+qt_stat.cpp   qt_stat.h     qt_str.cpp    qt_str.h      qt_streq.cpp
+qt_streq.h    qt_svsel.cpp  qt_svsel.h    qt_win.cpp    qt_win.h
+qt_xcmd.cpp   qt_xcmd.h     qt_xpms.h     qt_yndlg.cpp  qt_yndlg.h
 
 win/X11:
 (files for X versions)

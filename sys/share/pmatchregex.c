@@ -1,4 +1,4 @@
-/* NetHack 3.6  pmatchregex.c	$NHDT-Date: 1544482890 2018/12/10 23:01:30 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.2 $ */
+/* NetHack 3.7  pmatchregex.c	$NHDT-Date: 1596498285 2020/08/03 23:44:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

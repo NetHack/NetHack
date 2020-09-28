@@ -1,4 +1,4 @@
--- NetHack 3.6	Ranger.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
+-- NetHack 3.7	Ranger.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.

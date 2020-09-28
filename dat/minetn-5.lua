@@ -1,4 +1,4 @@
--- NetHack 3.6	mines.des	$NHDT-Date: 1548631704 2019/01/27 23:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $
+-- NetHack 3.7	mines.des	$NHDT-Date: 1548631704 2019/01/27 23:28:24 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $
 --	Copyright (c) 1989-95 by Jean-Christophe Collet
 --	Copyright (c) 1991-95 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -95,13 +95,13 @@ des.monster("dwarf")
 des.monster("dwarf")
 
 -- The shops
-des.region({ region={25,17, 28,19}, lit=1, type="candle shop", prefilled=0 })
+des.region({ region={25,17, 28,19}, lit=1, type="candle shop", filled=1 })
 des.door("closed",24,18)
-des.region({ region={59, 9, 67,10}, lit=1, type="shop", prefilled=0 })
+des.region({ region={59, 9, 67,10}, lit=1, type="shop", filled=1 })
 des.door("closed",66,08)
-des.region({ region={57,13, 60,15}, lit=1, type="tool shop", prefilled=0 })
+des.region({ region={57,13, 60,15}, lit=1, type="tool shop", filled=1 })
 des.door("closed",56,14)
-des.region({ region={05,09, 08,10}, lit=1, type=monkfoodshop(), prefilled=0 })
+des.region({ region={05,09, 08,10}, lit=1, type=monkfoodshop(), filled=1 })
 des.door("closed",07,11)
 -- Gnome homes
 des.door("closed",04,14)
@@ -132,6 +132,6 @@ des.door("locked",50,06)
 des.object("(", 50, 03)
 des.object({ id = "statue", x=38, y=15, montype="gnome king", historic=1 })
 -- Temple
-des.region({ region={29,02, 33,04}, lit=1, type="temple" })
+des.region({ region={29,02, 33,04}, lit=1, type="temple", filled=1 })
 des.door("closed",31,05)
 des.altar({ x=31,y=03, align=align[1], type="shrine" })

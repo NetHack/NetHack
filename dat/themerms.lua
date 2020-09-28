@@ -15,7 +15,6 @@
 -- core calls themerooms_generate() multiple times per level
 -- to generate a single themed room.
 
-
 themerooms = {
    {
      -- the "default" room
@@ -86,8 +85,8 @@ themerooms = {
       contents = function()
          des.room({ type = "themed",
                   contents = function(rm)
-                     for x = 0, rm.width do
-                        for y = 0, rm.height do
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
                            if (percent(30)) then
                               if (percent(50)) then
                                  des.object("boulder");
@@ -108,9 +107,10 @@ themerooms = {
       contents = function()
          des.room({ type = "themed",
                   contents = function(rm)
-                     for x = 0, rm.width do
-                        for y = 0, rm.height do
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
                            if (percent(30)) then
+                              -- this will create a giant spider
                               des.trap("web", x, y);
                            end
                         end
@@ -128,8 +128,8 @@ themerooms = {
                                     "land mine", "sleep gas", "rust",
                                     "anti magic" };
                     shuffle(traps);
-                    for x = 0, rm.width do
-                       for y = 0, rm.height do
+                    for x = 0, rm.width - 1 do
+                       for y = 0, rm.height - 1 do
                           if (percent(30)) then
                              des.trap(traps[1], x, y);
                           end
@@ -179,8 +179,8 @@ themerooms = {
                  contents = function(rm)
                     local terr = { "-", "-", "-", "-", "L", "P", "T" };
                     shuffle(terr);
-                    for x = 0, (rm.width - 3) / 4 do
-                       for y = 0, (rm.height - 3) / 4 do
+                    for x = 0, (rm.width / 4) - 1 do
+                       for y = 0, (rm.height / 4) - 1 do
                           des.terrain({ x = x * 4 + 2, y = y * 4 + 2, typ = terr[1], lit = -2 });
                           des.terrain({ x = x * 4 + 3, y = y * 4 + 2, typ = terr[1], lit = -2 });
                           des.terrain({ x = x * 4 + 2, y = y * 4 + 3, typ = terr[1], lit = -2 });
@@ -229,7 +229,9 @@ themerooms = {
    function()
       des.room({ type = "themed", w = 5 + nh.rn2(3)*2, h = 5 + nh.rn2(3)*2,
                  contents = function(rm)
-                    des.room({ type = "themed", x = (rm.width / 2), y = (rm.height / 2), w = 1, h = 1, joined = 0,
+                    des.room({ type = "themed",
+			       x = (rm.width - 1) / 2, y = (rm.height - 1) / 2,
+			       w = 1, h = 1, joined = 0,
                                contents = function()
                                   if (percent(50)) then
                                      local mons = { "M", "V", "L", "Z" };
@@ -255,7 +257,8 @@ themerooms = {
                  contents = function(rm)
                     local feature = { "C", "L", "I", "P", "T" };
                     shuffle(feature);
-                    des.terrain(rm.width / 2, rm.height / 2, feature[1]);
+                    des.terrain((rm.width - 1) / 2, (rm.height - 1) / 2,
+				feature[1]);
                  end
       });
    end,
@@ -270,7 +273,7 @@ themerooms = {
 |......|
 |......|
 |......|
---------]], contents = function(m) des.region({ region={1,1,3,3}, type="ordinary", irregular=true, prefilled=true }); end });
+--------]], contents = function(m) des.region({ region={1,1,3,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 1
@@ -283,7 +286,7 @@ xxx|...|
 |......|
 |......|
 |......|
---------]], contents = function(m) des.region({ region={5,1,5,3}, type="ordinary", irregular=true, prefilled=true }); end });
+--------]], contents = function(m) des.region({ region={5,1,5,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 2
@@ -296,7 +299,7 @@ xxx|...|
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- L-shaped, rot 3
@@ -309,7 +312,7 @@ xxx-----]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Blocked center
@@ -331,7 +334,7 @@ if (percent(30)) then
    shuffle(terr);
    des.replace_terrain({ region = {1,1, 9,9}, fromterrain = "L", toterrain = terr[1] });
 end
-des.region({ region={1,1,2,2}, type="ordinary", irregular=true, prefilled=true });
+des.region({ region={1,1,2,2}, type="ordinary", irregular=true, filled=1 });
 end });
    end,
 
@@ -344,7 +347,7 @@ x--.--x
 |.....|
 --...--
 x--.--x
-xx---xx]], contents = function(m) des.region({ region={3,3,3,3}, type="ordinary", irregular=true, prefilled=true }); end });
+xx---xx]], contents = function(m) des.region({ region={3,3,3,3}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Circular, medium
@@ -358,7 +361,7 @@ x--...--x
 |.......|
 --.....--
 x--...--x
-xx-----xx]], contents = function(m) des.region({ region={4,4,4,4}, type="ordinary", irregular=true, prefilled=true }); end });
+xx-----xx]], contents = function(m) des.region({ region={4,4,4,4}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Circular, big
@@ -374,7 +377,7 @@ x-.......-x
 --.......--
 x-.......-x
 x---...---x
-xxx-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped
@@ -387,7 +390,7 @@ xxx|...|xxx
 |.........|
 |.........|
 |.........|
------------]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+-----------]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 1
@@ -403,7 +406,7 @@ xxx|...|xxx
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 2
@@ -416,7 +419,7 @@ xxx|...|xxx
 ----...----
 xxx|...|xxx
 xxx|...|xxx
-xxx-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- T-shaped, rot 3
@@ -432,7 +435,7 @@ xxx|...|
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- S-shaped
@@ -448,7 +451,7 @@ xxx-----]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary
 ----...|
 xxx|...|
 xxx|...|
-xxx-----]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- S-shaped, rot 1
@@ -461,7 +464,7 @@ xxx|......|
 |......----
 |......|xxx
 |......|xxx
---------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+--------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Z-shaped
@@ -477,7 +480,7 @@ xxx|...|
 |...----
 |...|xxx
 |...|xxx
------xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, prefilled=true }); end });
+-----xxx]], contents = function(m) des.region({ region={5,5,5,5}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Z-shaped, rot 1
@@ -490,7 +493,7 @@ xxx|...|
 ----......|
 xxx|......|
 xxx|......|
-xxx--------]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx--------]], contents = function(m) des.region({ region={2,2,2,2}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Cross
@@ -506,7 +509,7 @@ xxx|...|xxx
 ----...----
 xxx|...|xxx
 xxx|...|xxx
-xxx-----xxx]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, prefilled=true }); end });
+xxx-----xxx]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Four-leaf clover
@@ -522,7 +525,7 @@ xx|.....|xx
 |.........|
 |...---...|
 |...|x|...|
------x-----]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, prefilled=true }); end });
+-----x-----]], contents = function(m) des.region({ region={6,6,6,6}, type="ordinary", irregular=true, filled=1 }); end });
    end,
 
    -- Water-surrounded vault
@@ -533,7 +536,7 @@ xx|.....|xx
 }|..|}
 }|..|}
 }----}
-}}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, prefilled=false, joined=false });
+}}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, filled=0, joined=false });
      local nasty_undead = { "giant zombie", "ettin zombie", "vampire lord" };
      des.object("chest", 2, 2);
      des.object("chest", 3, 2);

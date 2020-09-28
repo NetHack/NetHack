@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhdlg.c	$NHDT-Date: 1544695946 2018/12/13 10:12:26 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	mhdlg.c	$NHDT-Date: 1596498347 2020/08/03 23:45:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -300,7 +300,7 @@ enum player_selector_control {
     psc_control_count
 };
 
-static const s_psc_id[psc_control_count] = {
+static const int s_psc_id[psc_control_count] = {
     IDC_PLSEL_NAME_GROUP,
     IDC_PLSEL_ROLE_GROUP,
     IDC_PLSEL_RACE_GROUP,

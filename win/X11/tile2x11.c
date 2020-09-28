@@ -22,6 +22,9 @@ unsigned char tile_bytes[TILE_X * TILE_Y * (MAX_GLYPH + TILES_PER_ROW)];
 unsigned char *curr_tb = tile_bytes;
 unsigned char x11_colormap[MAXCOLORMAPSIZE][3];
 
+extern void NDECL(monst_globals_init);
+extern void NDECL(objects_globals_init);
+
 /* Look up the given pixel and return its colormap index. */
 static unsigned char
 pix_to_colormap(pix)
@@ -186,6 +189,10 @@ char **argv;
                 argv[0]);
         exit(1);
     }
+
+    /* without this, the comparisons check uninitialized data and won't pass */
+    objects_globals_init();
+    monst_globals_init();
 
     fp = fopen(OUTNAME, "w");
     if (!fp) {

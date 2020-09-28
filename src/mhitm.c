@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1583608838 2020/03/07 19:20:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1596498178 2020/08/03 23:42:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -345,17 +345,32 @@ register struct monst *magr, *mdef;
      */
     magr->mlstmv = g.monstermoves;
 
+    /* controls whether a mind flayer uses all of its tentacle-for-DRIN
+       attacks; when fighting a headless monster, stop after the first
+       one because repeating the same failing hit (or even an ordinary
+       tentacle miss) is very verbose and makes the flayer look stupid */
+    g.skipdrin = FALSE;
+
     /* Now perform all attacks for the monster. */
     for (i = 0; i < NATTK; i++) {
         res[i] = MM_MISS;
         mattk = getmattk(magr, mdef, i, res, &alt_attk);
         mwep = (struct obj *) 0;
         attk = 1;
+        /* reduce verbosity for mind flayer attacking creature without a
+           head (or worm's tail); this is similar to monster with multiple
+           attacks after a wildmiss against displaced or invisible hero */
+        if (g.skipdrin && mattk->aatyp == AT_TENT && mattk->adtyp == AD_DRIN)
+            continue;
+
         switch (mattk->aatyp) {
         case AT_WEAP: /* "hand to hand" attacks */
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1) {
                 /* D: Do a ranged attack here! */
                 strike = thrwmm(magr, mdef);
+                if (strike)
+                    /* We don't really know if we hit or not; pretend we did. */
+                    res[i] |= MM_HIT;
                 if (DEADMONSTER(mdef))
                     res[i] = MM_DEF_DIED;
                 if (DEADMONSTER(magr))
@@ -984,7 +999,7 @@ int dieroll;
                 /* artifact_hit updates 'tmp' but doesn't inflict any
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
-               if (DEADMONSTER(mdef))
+                if (DEADMONSTER(mdef))
                     return (MM_DEF_DIED
                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             }
@@ -1286,22 +1301,32 @@ int dieroll;
         }
         if (!tele_restrict(magr)) {
             boolean couldspot = canspotmon(magr);
+
             (void) rloc(magr, TRUE);
             if (g.vis && couldspot && !canspotmon(magr))
                 pline("%s suddenly disappears!", buf);
         }
         break;
-    case AD_DRLI:
+    case AD_DRLI: /* drain life */
         if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
-            tmp = d(2, 6);
+            tmp = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
             if (g.vis && canspotmon(mdef))
-                pline("%s suddenly seems weaker!", Monnam(mdef));
-            mdef->mhpmax -= tmp;
-            if (mdef->m_lev == 0)
+                pline("%s becomes weaker!", Monnam(mdef));
+            if (mdef->mhpmax - tmp > (int) mdef->m_lev) {
+                mdef->mhpmax -= tmp;
+            } else {
+                /* limit floor of mhpmax reduction to current m_lev + 1;
+                   avoid increasing it if somehow already less than that */
+                if (mdef->mhpmax > (int) mdef->m_lev)
+                    mdef->mhpmax = (int) mdef->m_lev + 1;
+            }
+            if (mdef->m_lev == 0) /* automatic kill if drained past level 0 */
                 tmp = mdef->mhp;
             else
                 mdef->m_lev--;
-            /* Automatic kill if drained past level 0 */
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
         }
         break;
     case AD_SSEX:
@@ -1394,6 +1419,9 @@ int dieroll;
                 pline("%s doesn't seem harmed.", Monnam(mdef));
             /* Not clear what to do for green slimes */
             tmp = 0;
+            /* don't bother with additional DRIN attacks since they wouldn't
+               be able to hit target on head either */
+            g.skipdrin = TRUE; /* affects mattackm()'s attack loop */
             break;
         }
         if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkroom.c	$NHDT-Date: 1446887530 2015/11/07 09:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	mkroom.c	$NHDT-Date: 1596498184 2020/08/03 23:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -199,8 +199,10 @@ gottype:
     topologize(sroom);
 #endif
 
-    /* stock the room with a shopkeeper and artifacts */
-    stock_room(i, sroom);
+    /* The shop used to be stocked here, but this no longer happens - all we do
+     * is set its rtype, and it gets stocked at the end of makelevel() along
+     * with other special rooms. */
+    sroom->needfill = FILL_NORMAL;
 }
 
 /* pick an unused room, preferably with only one door */
@@ -237,7 +239,9 @@ int type;
 
     if ((sroom = pick_room(FALSE)) != 0) {
         sroom->rtype = type;
-        fill_zoo(sroom);
+        /* room does not get stocked at this time - it will get stocked at the
+         * end of makelevel() */
+        sroom->needfill = FILL_NORMAL;
     }
 }
 
@@ -271,6 +275,8 @@ struct mkroom *sroom;
     int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     coord mm;
 
+    /* Note: This doesn't check needfill; it assumes the caller has already done
+     * that. */
     sh = sroom->fdoor;
     switch (type) {
     case COURT:

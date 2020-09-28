@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1589064684 2020/05/09 22:51:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.7	rm.h	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -436,22 +436,6 @@ struct rm {
     Bitfield(candig, 1); /* Exception to Can_dig_down; was a trapdoor */
 };
 
-#define SET_TYPLIT(x, y, ttyp, llit)                              \
-    {                                                             \
-        if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
-            if ((ttyp) < MAX_TYPE)                                \
-                levl[(x)][(y)].typ = (ttyp);                      \
-            if ((ttyp) == LAVAPOOL)                               \
-                levl[(x)][(y)].lit = 1;                           \
-            else if ((schar)(llit) != -2) {                       \
-                if ((schar)(llit) == -1)                          \
-                    levl[(x)][(y)].lit = rn2(2);                  \
-                else                                              \
-                    levl[(x)][(y)].lit = (llit);                  \
-            }                                                     \
-        }                                                         \
-    }
-
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
  * mode describes which parts of a wall are finished (seen as as wall)
@@ -631,10 +615,10 @@ typedef struct {
  * Macros for encapsulation of level.monsters references.
  */
 #if 0
-#define MON_AT(x, y)                            \
+#define MON_AT(x, y) \
     (g.level.monsters[x][y] != (struct monst *) 0 \
      && !(g.level.monsters[x][y])->mburied)
-#define MON_BURIED_AT(x, y)                     \
+#define MON_BURIED_AT(x, y) \
     (g.level.monsters[x][y] != (struct monst *) 0 \
      && (g.level.monsters[x][y])->mburied)
 #else   /* without 'mburied' */
@@ -642,15 +626,15 @@ typedef struct {
 #endif
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
-    do {                                                        \
+    do {                                                            \
         if (g.level.monsters[x][y] && g.level.monsters[x][y] != m)  \
-            impossible("place_worm_seg over mon");              \
-        g.level.monsters[x][y] = m;                               \
+            impossible("place_worm_seg over mon");                  \
+        g.level.monsters[x][y] = m;                                 \
     } while(0)
 #define remove_monster(x, y) \
-    do {                                                \
+    do {                                                  \
         if (!g.level.monsters[x][y])                      \
-            impossible("no monster to remove");         \
+            impossible("no monster to remove");           \
         g.level.monsters[x][y] = (struct monst *) 0;      \
     } while(0)
 #else

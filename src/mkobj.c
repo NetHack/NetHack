@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1585361051 2020/03/28 02:04:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.176 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1596498183 2020/08/03 23:43:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,16 +67,22 @@ static const struct icp hellprobs[] = { { 20, WEAPON_CLASS },
                                         { 8, RING_CLASS },
                                         { 4, AMULET_CLASS } };
 
+static const struct oextra zerooextra = DUMMY;
+
+static void
+init_oextra(oex)
+struct oextra *oex;
+{
+    *oex = zerooextra;
+}
+
 struct oextra *
 newoextra()
 {
     struct oextra *oextra;
 
     oextra = (struct oextra *) alloc(sizeof (struct oextra));
-    oextra->oname = 0;
-    oextra->omonst = 0;
-    oextra->omailcmd = 0;
-    oextra->omid = 0;
+    init_oextra(oextra);
     return oextra;
 }
 
@@ -836,6 +842,12 @@ boolean artif;
             case KELP_FROND:
                 otmp->quan = (long) rnd(2);
                 break;
+            case CANDY_BAR:
+                /* set otmp->spe */
+                assign_candy_wrapper(otmp);
+                break;
+            default:
+                break;
             }
             if (Is_pudding(otmp)) {
                 otmp->quan = 1L; /* for emphasis; glob quantity is always 1 */
@@ -1148,6 +1160,11 @@ struct obj *body;
     long corpse_age; /* age of corpse          */
     int rot_adjust;
     short action;
+    boolean no_revival;
+
+    /* if a troll corpse was frozen, it won't get a revive timer */
+    no_revival = (body->norevive != 0);
+    body->norevive = 0; /* always clear corpse's 'frozen' flag */
 
     /* lizards and lichen don't rot or revive */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
@@ -1172,8 +1189,9 @@ struct obj *body;
             if (!rn2(3))
                 break;
 
-    } else if (mons[body->corpsenm].mlet == S_TROLL && !body->norevive) {
+    } else if (mons[body->corpsenm].mlet == S_TROLL && !no_revival) {
         long age;
+
         for (age = 2; age <= TAINT_AGE; age++)
             if (!rn2(TROLL_REVIVE_CHANCE)) { /* troll revives */
                 action = REVIVE_MON;
@@ -1182,8 +1200,6 @@ struct obj *body;
             }
     }
 
-    if (body->norevive)
-        body->norevive = 0;
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
@@ -1512,6 +1528,10 @@ unsigned corpstatflags;
 
         if (!ptr)
             ptr = mtmp->data;
+
+        /* don't give a revive timer to a cancelled troll's corpse */
+        if (mtmp->mcan && !is_rider(ptr))
+            otmp->norevive = 1;
     }
 
     /* when 'ptr' is non-null it comes from our caller or from 'mtmp';
@@ -1579,6 +1599,7 @@ struct monst *mtmp;
     if (!has_omonst(obj))
         newomonst(obj);
     if (has_omonst(obj)) {
+        int baselevel = mtmp->data->mlevel;
         struct monst *mtmp2 = OMONST(obj);
 
         *mtmp2 = *mtmp;
@@ -1593,6 +1614,19 @@ struct monst *mtmp;
         mtmp2->minvent = (struct obj *) 0;
         if (mtmp->mextra)
             copy_mextra(mtmp2, mtmp);
+        /* if mtmp is a long worm with segments, its saved traits will
+           be one without any segments */
+        mtmp2->wormno = 0;
+        /* mtmp might have been killed by repeated life draining; make sure
+           mtmp2 can survive if revived ('baselevel' will be 0 for 1d4 mon) */
+        if (mtmp2->mhpmax <= baselevel)
+            mtmp2->mhpmax = baselevel + 1;
+        /* mtmp is assumed to be dead but we don't kill it or its saved
+           traits, just force those to have a sane value for current HP */
+        if (mtmp2->mhp > mtmp2->mhpmax)
+            mtmp2->mhp = mtmp2->mhpmax;
+        if (mtmp2->mhp < 1)
+            mtmp2->mhp = 0;
     }
     return obj;
 }
@@ -1621,6 +1655,7 @@ boolean copyof;
             /* Never insert this returned pointer into mon chains! */
             mnew = mtmp;
         }
+        mnew->data = &mons[mnew->mnum];
     }
     return mnew;
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	symbols.c	$NHDT-Date: 1588776075 2020/05/06 14:41:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7	symbols.c	$NHDT-Date: 1596498214 2020/08/03 23:43:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 

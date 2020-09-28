@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1586375531 2020/04/08 19:52:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1596334662 2020/08/02 02:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -976,12 +976,18 @@ int final;
     }
     Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
     mungspaces(buf);             /* strip trailing spaces */
-    if (*buf) {
+    /* status line doesn't show hunger when state is "not hungry", we do;
+       needed for wizard mode's reveal of u.uhunger but add it for everyone */
+    if (!*buf)
+        Strcpy(buf, "not hungry");
+    if (*buf) { /* (since "not hungry" was added, this will always be True) */
         *buf = lowc(*buf); /* override capitalization */
         if (!strcmp(buf, "weak"))
             Strcat(buf, " from severe hunger");
         else if (!strncmp(buf, "faint", 5)) /* fainting, fainted */
             Strcat(buf, " due to starvation");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", u.uhunger);
         you_are(buf, "");
     }
     /* encumbrance */
@@ -1007,6 +1013,8 @@ int final;
             adj = "not possible";
             break;
         }
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
         Sprintf(eos(buf), "; movement %s %s%s", !final ? "is" : "was", adj,
                 (cap < OVERLOADED) ? " slowed" : "");
         you_are(buf, "");
@@ -1014,10 +1022,22 @@ int final;
         /* last resort entry, guarantees Status section is non-empty
            (no longer needed for that purpose since weapon status added;
            still useful though) */
-        you_are("unencumbered", "");
+        Strcpy(buf, "unencumbered");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
+        you_are(buf, "");
     }
     /* current weapon(s) and corresponding skill level(s) */
     weapon_insight(final);
+    /* unlike ring of increase accuracy's effect, the monk's suit penalty
+       is too blatant to be restricted to magical enlightenment */
+    if (iflags.tux_penalty && !Upolyd) {
+        (void) enlght_combatinc("to hit", -g.urole.spelarmr, final, buf);
+        /* if from_what() ever gets extended from wizard mode to normal
+           play, it could be adapted to handle this */
+        Sprintf(eos(buf), " due to your %s", suit_simple_name(uarm));
+        you_have(buf, "");
+    }
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
@@ -1467,8 +1487,17 @@ int final;
         enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
     if (Slow_digestion)
         you_have("slower digestion", from_what(SLOW_DIGESTION));
-    if (u.uhitinc)
-        you_have(enlght_combatinc("to hit", u.uhitinc, final, buf), "");
+    if (u.uhitinc) {
+        (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
+        if (iflags.tux_penalty && !Upolyd)
+            Sprintf(eos(buf), " %s your suit's penalty",
+                    (u.uhitinc < 0) ? "increasing"
+                    : (u.uhitinc < 4 * g.urole.spelarmr / 5)
+                      ? "partly offsetting"
+                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offseting"
+                        : "overcoming");
+        you_have(buf, "");
+    }
     if (u.udaminc)
         you_have(enlght_combatinc("damage", u.udaminc, final, buf), "");
     if (u.uspellprot || Protection) {
@@ -1866,6 +1895,33 @@ int final;
                     " for any artifacts", "");
     }
 
+    /* only report Sokoban conduct if the Sokoban branch has been entered */
+    if (sokoban_in_play()) {
+        const char *presentverb = "have violated", *pastverb = "violated";
+
+        Strcpy(buf, " the special Sokoban rules ");
+        switch (u.uconduct.sokocheat) {
+        case 0L:
+            presentverb = "have not violated";
+            pastverb = "did not violate";
+            Strcpy(buf, " any of the special Sokoban rules");
+            break;
+        case 1L:
+            Strcat(buf, "once");
+            break;
+        case 2L:
+            Strcat(buf, "twice");
+            break;
+        case 3L:
+            Strcat(buf, "thrice");
+            break;
+        default:
+            Sprintf(eos(buf), "%ld times", u.uconduct.sokocheat);
+            break;
+        }
+        enl_msg(You_, presentverb, pastverb, buf, "");
+    }
+
     show_achievements(final);
 
     /* Pop up the window and wait for a key */
@@ -2106,6 +2162,21 @@ int rank; /* 1..8 */
     if (flags.female)
         achidx = -achidx;
     return achidx;
+}
+
+/* return True if sokoban branch has been entered, False otherwise */
+boolean
+sokoban_in_play()
+{
+    int achidx;
+
+    /* TODO? move this to dungeon.c and test furthest level reached of the
+       sokoban branch instead of relying on the entered-sokoban achievement */
+
+    for (achidx = 0; u.uachieved[achidx]; ++achidx)
+        if (u.uachieved[achidx] == ACH_SOKO)
+            return TRUE;
+    return FALSE;
 }
 
 /*
