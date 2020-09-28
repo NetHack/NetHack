@@ -29,12 +29,19 @@
 #endif
 
 /* Prototypes */
-#include "NH:sys/amiga/winami.p"
+#ifndef AMIGA_CROSS
 #include "NH:sys/amiga/amiwind.p"
+#include "NH:sys/amiga/winami.p"
 #include "NH:sys/amiga/amidos.p"
+#else
+#include "winami.p"
+#include "winami.p"
+#include "amidos.p"
+#endif
 
 extern char Initialized;
 extern struct window_procs amii_procs;
+struct ami_sysflags sysflags = {0};
 
 #ifndef __SASC_60
 int Enable_Abort = 0; /* for stdio package */
@@ -272,6 +279,7 @@ const char *from, *to;
 }
 #endif
 
+#ifdef MFLOPPY
 /* this should be replaced */
 saveDiskPrompt(start)
 {
@@ -325,6 +333,7 @@ saveDiskPrompt(start)
     }
     return 1;
 }
+#endif /* MFLOPPY */
 
 /* Return 1 if the record file was found */
 static boolean

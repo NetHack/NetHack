@@ -191,7 +191,7 @@ time_t when;
     tomb_text(buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", done_money);
+    Sprintf(buf, "%ld Au", g.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     tomb_text(buf);
 
