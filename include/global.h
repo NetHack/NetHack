@@ -166,6 +166,10 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
+#ifdef AMIGA
+#include "amiconf.h"
+#endif
+
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
 #ifdef AMIGA
@@ -213,9 +217,11 @@ extern struct cross_target_s cross_target;
 #endif
 #endif
 
+#if !defined(CROSSCOMPILE)
 #if defined(MICRO)
 #if !defined(AMIGA) && !defined(TOS) && !defined(OS2_HPFS)
 #define SHORT_FILENAMES /* filenames are 8.3 */
+#endif
 #endif
 #endif
 

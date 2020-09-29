@@ -35,7 +35,9 @@
 
 /*#define OVERLAY */ /* Manual overlay definition (MSC 6.0ax only) */
 
+#ifndef AMIGA_CROSS
 #define SHELL /* via exec of COMMAND.COM */
+#endif
 
 /*
  * Screen control options
@@ -88,7 +90,9 @@
 #define ANSI_DEFAULT
 #endif
 
+#ifndef AMIGA_CROSS
 #define RANDOM /* have Berkeley random(3) */
+#endif
 
 #define MAIL /* Allows for fake mail daemon to deliver mail */
              /* in the MSDOS version.  (For AMIGA MAIL see  */
@@ -99,6 +103,10 @@
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__SC__)
 #include <process.h> /* Provides prototypes of exit(), spawn()      */
+#endif
+
+#ifdef AMIGA_CROSS
+#include <spawn.h>
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER >= 7)
@@ -155,7 +163,9 @@
 
 #endif /* MSDOS configuration stuff */
 
+#ifndef PATHLEN
 #define PATHLEN 64  /* maximum pathlength */
+#endif
 #define FILENAME 80 /* maximum filename length (conservative) */
 #ifndef MICRO_H
 #include "micro.h" /* contains necessary externs for [os_name].c */
