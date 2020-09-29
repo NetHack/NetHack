@@ -29,7 +29,7 @@ struct cross_target_s cross_target = {
 
 #if defined(NETHACK_GIT_SHA)
 const char *NetHack_git_sha
-#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
                 = NETHACK_GIT_SHA
 #else
 #ifdef NETHACK_HOST_GIT_SHA
@@ -41,7 +41,7 @@ const char *NetHack_git_sha
 
 #if defined(NETHACK_GIT_BRANCH)
 const char *NetHack_git_branch
-#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
                 = NETHACK_GIT_BRANCH
 #else
 #ifdef NETHACK_HOST_GIT_BRANCH
@@ -429,7 +429,7 @@ void
 store_version(nhfp)
 NHFILE *nhfp;
 {
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
@@ -439,7 +439,7 @@ NHFILE *nhfp;
 #endif
     };
 
-#if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_HOST)
+#if defined(CROSSCOMPILE) && defined(CROSSCOMPILE_TARGET)
     version_data.incarnation = VERSION_NUMBER;    /* actual version number */
     version_data.feature_set = VERSION_FEATURES;  /* bitmask of config settings */
     version_data.entity_count  = VERSION_SANITY1; /* # of monsters and objects */

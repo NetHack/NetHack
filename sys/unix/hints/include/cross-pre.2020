@@ -127,7 +127,7 @@ ifdef CROSS_TO_MSDOS
 # Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
 #=================================================================
 
-CFLAGS += -DCROSSCOMPILE -DCROSSCOMPILE_HOST
+CFLAGS += -DCROSSCOMPILE
 
 #
 # Override the build tools and some obj files to
@@ -195,7 +195,7 @@ ifdef CROSS_TO_AMIGA
 # Amiga m68k from https://github.com/bebbo/amiga-gcc
 #=================================================================
 
-CFLAGS += -DCROSSCOMPILE -DCROSSCOMPILE_HOST
+CFLAGS += -DCROSSCOMPILE
 
 #
 # Override the build tools and some obj files to
