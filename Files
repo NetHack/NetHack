@@ -109,13 +109,11 @@ you.h         youprop.h
 (file for tty versions)
 wintty.h
 
-(files for various Macintosh versions)
-mac-carbon.h  mac-qt.h      mac-term.h    macpopup.h    mactty.h
-macwin.h      mttypriv.h
-
 outdated/include:
 (files that are no longer maintained for current game code)
-amiconf.h  beconf.h   def_os2.h  macconf.h  os2conf.h  tosconf.h  wceconf.h
+amiconf.h     beconf.h      def_os2.h     mac-carbon.h  mac-qt.h
+mac-term.h    macconf.h     macpopup.h    mactty.h      macwin.h
+mttypriv.h    os2conf.h     tosconf.h     wceconf.h
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
