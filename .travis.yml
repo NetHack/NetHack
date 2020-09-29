@@ -148,8 +148,8 @@ matrix:
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-#        - cd lib/lua-$LUA_VERSION/src && make CC='gcc' a  && cd ../../..
         - sh sys/msdos/fetch-cross-compiler.sh
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
   exclude:
 #    - os: osx
