@@ -28,7 +28,7 @@ des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} 
 des.levregion({ region={25,11,25,11}, type="portal", name="fakewiz1" });
 des.mazewalk(28,09,"east")
 des.region({ region={07,03, 15,11}, lit=0 ,type="morgue", filled=2 })
-des.region({ region={17,06, 18,11}, lit=0, type="beehive" })
+des.region({ region={17,06, 18,11}, lit=0, type="beehive", filled=1 })
 -- make the entry chamber a real room; it affects monster arrival
 des.region({ region={20,06,26,11},lit=0,type="ordinary",arrival_room=true,
              contents = function()

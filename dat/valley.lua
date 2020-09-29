@@ -51,7 +51,7 @@ end
 
 -- Dungeon Description
 -- The shrine to Moloch.
-des.region({ region={01,06, 05,14},lit=1,type="temple" })
+des.region({ region={01,06, 05,14},lit=1,type="temple",filled=2 })
 -- The Morgues
 des.region({ region={19,01, 24,08},lit=0,type="morgue",filled=1,irregular=1 })
 des.region({ region={09,14, 16,18},lit=0,type="morgue",filled=1,irregular=1 })
