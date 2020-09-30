@@ -262,6 +262,7 @@ when make was invoked with -j makedefs instances could end up running in
 	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
 	provide a work-alike mkstemp() implementation for windows visual studio
 	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
+make piranhas faster and give them extra bite attack
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
