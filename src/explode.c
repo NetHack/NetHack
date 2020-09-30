@@ -412,6 +412,9 @@ int expltype;
                 idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
                 idamnonres += destroy_mitem(mtmp, RING_CLASS, (int) adtyp);
 
+                if (adtyp == AD_FIRE)
+                    ignite_items(mtmp->minvent);
+
                 if (explmask[i][j] == 1) {
                     golemeffects(mtmp, (int) adtyp, dam + idamres);
                     mtmp->mhp -= idamnonres;
@@ -500,8 +503,10 @@ int expltype;
             You("are unharmed!");
         } else if (adtyp == AD_PHYS || physical_dmg)
             damu = Maybe_Half_Phys(damu);
-        if (adtyp == AD_FIRE)
+        if (adtyp == AD_FIRE) {
             (void) burnarmor(&g.youmonst);
+            ignite_items(g.invent);
+        }
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
         destroy_item(POTION_CLASS, (int) adtyp);

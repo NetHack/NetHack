@@ -553,6 +553,7 @@ int spellnum;
         destroy_item(SCROLL_CLASS, AD_FIRE);
         destroy_item(POTION_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
+        ignite_items(g.invent);
         (void) burn_floor_objects(u.ux, u.uy, TRUE, FALSE);
         break;
     case CLC_LIGHTNING: {
