@@ -111,6 +111,15 @@ Example:
  local str = nh.ing_suffix("foo");
 
 
+=== level_difficulty
+
+Returns an integer value describing the level difficulty.
+Normally this is the level's physical depth from the surface.
+
+Example:
+
+ local diff = nh.level_difficulty();
+
 === makeplural
 
 Pluralize the given string.

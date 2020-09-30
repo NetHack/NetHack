@@ -253,12 +253,10 @@ U  = $(UTIL)^\
 !IFDEF TEST_CROSSCOMPILE
 HOST=_host
 CROSSCOMPILE_TARGET= -DCROSSCOMPILE_TARGET
-CROSSCOMPILE_HOST= -DCROSSCOMPILE_HOST
 CROSSCOMPILE= -DCROSSCOMPILE
 !ELSE
 HOST=
 CROSSCOMPILE_TARGET=
-CROSSCOMPILE_HOST=
 CROSSCOMPILE=
 !ENDIF
 
@@ -1064,7 +1062,7 @@ $(U)nhsizes3.exe: $(O)nhsizes3.o
 	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic$(HOST).o $(O)alloc$(HOST).o
 
 $(O)nhsizes3.o: $(CONFIG_H) nhsizes3.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ nhsizes3.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ nhsizes3.c
 
 $(U)makedefs.exe:	$(MAKEDEFSOBJS)
 	@echo Linking $(@:\=/)
@@ -1077,8 +1075,8 @@ $(O)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\dlb.h
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)makedefs.c
-#	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /EP -Fo$@ $(U)makedefs.c >makedefs.c.preprocessed
+	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ $(U)makedefs.c
+#	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) /EP -Fo$@ $(U)makedefs.c >makedefs.c.preprocessed
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1109,7 +1107,7 @@ $(U)uudecode.exe: $(O)uudecode.o
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
 	chdir $(MSWSYS)
@@ -1208,7 +1206,7 @@ $(U)dlb.exe: $(DLBOBJ_HOST) $(O)dlb$(HOST).o
 
 !IFDEF TEST_CROSSCOMPILE
 $(O)dlb$(HOST).o: $(O)dlb_main$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(SRC)\dlb.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /Fo$@ $(SRC)\dlb.c
 !ENDIF
 
 $(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
@@ -1216,7 +1214,7 @@ $(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 	
 !IFDEF TEST_CROSSCOMPILE
 $(O)dlb_main$(HOST).o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /Fo$@ $(UTIL)\dlb_main.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /Fo$@ $(UTIL)\dlb_main.c
 !ENDIF
 
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
@@ -1277,28 +1275,28 @@ $(U)tilemap.exe: $(O)tilemap.o
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletx32.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /DTILETEXT /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tilemap.c
 
 $(O)tiletxt.o: $(WSHR)\tilemap.c $(HACK_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /DTILETEXT -Fo$@ $(WSHR)\tilemap.c
 
 $(O)gifread.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) -Fo$@ $(WSHR)\gifread.c
 
 $(O)gifrd32.o: $(WSHR)\gifread.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\gifread.c
 
 $(O)ppmwrite.o: $(WSHR)\ppmwrite.c $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) -Fo$@ $(WSHR)\ppmwrite.c
 
 $(O)tiletext.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) -Fo$@ $(WSHR)\tiletext.c
 
 $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DTILE_X=32 /DTILE_Y=32 -Fo$@ $(WSHR)\tiletext.c
 
 #==========================================
 # Optional Tile Utilities
@@ -1357,10 +1355,10 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 <<
 
 $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
 $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 $(U)tile2x11.exe: $(O)tile2x11.o $(O)tiletext.o $(O)tiletxt.o $(O)alloc.o \
 		$(O)panic.o $(O)monst.o $(O)objects.o
@@ -1377,7 +1375,7 @@ $(U)tile2x11.exe: $(O)tile2x11.o $(O)tiletext.o $(O)tiletxt.o $(O)alloc.o \
 <<
 
 $(O)tile2x11.o: $(X11)\tile2x11.c $(HACK_H) $(TILE_H) $(INCL)\tile2x11.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -I$(WSHR) /DPACKED_FILE /Fo$@ $(X11)\tile2x11.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /Fo$@ $(X11)\tile2x11.c
 
 $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 				$(WSHR)\other.txt \
@@ -1509,7 +1507,7 @@ $(O)sfstruct.o: $(HACK_H) $(SRC)\sfstruct.c
 
 !IFDEF TEST_CROSSCOMPILE
 $(O)mdlib$(HOST).o: $(SRC)\mdlib.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(SRC)\mdlib.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ $(SRC)\mdlib.c
 !ENDIF
 
 $(O)mdlib.o: $(SRC)\mdlib.c
@@ -1523,13 +1521,13 @@ $(O)mdlib.o: $(SRC)\mdlib.c
 # These have dual-roles and need to be build for host and target platforms.
 #
 $(O)panic_host.o:  $(U)panic.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ $(U)panic.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ $(U)panic.c
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)panic.c
 
 $(O)drawing_host.o: drawing.c $(CONFIG_H)
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_HOST) -Fo$@ drawing.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ drawing.c
 
 $(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\color.h $(INCL)\rm.h \
 		$(INCL)\objclass.h $(INCL)\monsym.h

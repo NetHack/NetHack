@@ -1135,13 +1135,13 @@ do_date()
     char githash[BUFSZ], gitbranch[BUFSZ];
     char *c, cbuf[60], buf[BUFSZ];
     const char *ul_sfx;
-#if defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST)
+#if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_TARGET)
     int steps = 0;
     const char ind[] = "    ";
     const char *xpref = "HOST_";
 #else
     const char *xpref = (const char *) 0;
-#endif /* CROSSCOMPILE && CROSSCOMPILE_HOST */
+#endif /* CROSSCOMPILE && !CROSSCOMPILE_TARGET */
 
     /* before creating date.h, make sure that xxx_GRAPHICS and
        DEFAULT_WINDOW_SYS have been set up in a viable fashion */
@@ -1243,10 +1243,10 @@ do_date()
     ul_sfx = "L";
 #endif
 
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
     Fprintf(ofp,
-            "\n#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)\n");
-#endif /* CROSSCOMPILE || CROSSCOMPILE_HOST */
+            "\n#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)\n");
+#endif /* CROSSCOMPILE || !CROSSCOMPILE_TARGET */
     if (date_via_env)
         Fprintf(ofp, "#define SOURCE_DATE_EPOCH (%lu%s) /* via getenv() */\n",
                 (unsigned long) clocktim, ul_sfx);
@@ -1282,13 +1282,13 @@ do_date()
         Fprintf(ofp, "#define NETHACK_GIT_BRANCH \"%s\"\n", gitbranch);
     }
     if (xpref && get_gitinfo(githash, gitbranch)) {
-        Fprintf(ofp, "#else /* !CROSSCOMPILE || CROSSCOMPILE_HOST */\n");
+        Fprintf(ofp, "#else /* !CROSSCOMPILE || !CROSSCOMPILE_TARGET */\n");
         Fprintf(ofp, "#define NETHACK_%sGIT_SHA \"%s\"\n",
                 xpref, githash);
         Fprintf(ofp, "#define NETHACK_%sGIT_BRANCH \"%s\"\n",
                 xpref, gitbranch);
     }
-    Fprintf(ofp, "#endif /* !CROSSCOMPILE || CROSSCOMPILE_HOST */\n");
+    Fprintf(ofp, "#endif /* !CROSSCOMPILE || !CROSSCOMPILE_TARGET */\n");
     Fprintf(ofp, "\n");
 #ifdef AMIGA
     {

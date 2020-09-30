@@ -34,6 +34,7 @@ static int FDECL(nhl_ing_suffix, (lua_State *));
 static int FDECL(nhl_an, (lua_State *));
 static int FDECL(nhl_rn2, (lua_State *));
 static int FDECL(nhl_random, (lua_State *));
+static int FDECL(nhl_level_difficulty, (lua_State *));
 static void FDECL(init_nhc_data, (lua_State *));
 static int FDECL(nhl_push_anything, (lua_State *, int, void *));
 static int FDECL(nhl_meta_u_index, (lua_State *));
@@ -657,6 +658,21 @@ lua_State *L;
     return 1;
 }
 
+/* level_difficulty() */
+static int
+nhl_level_difficulty(L)
+lua_State *L;
+{
+    int argc = lua_gettop(L);
+    if (argc == 0) {
+        lua_pushinteger(L, level_difficulty());
+    }
+    else {
+        nhl_error(L, "level_difficulty should not have any args");
+    }
+    return 1;
+}
+
 /* get mandatory integer value from table */
 int
 get_table_int(L, name)
@@ -831,6 +847,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"an", nhl_an},
     {"rn2", nhl_rn2},
     {"random", nhl_random},
+    {"level_difficulty", nhl_level_difficulty},
     {NULL, NULL}
 };
 

@@ -1,7 +1,10 @@
 
 -- themerooms is an array of tables and/or functions.
--- the tables define "frequency" and "contents",
--- a plain function has frequency of 1
+-- the tables define "frequency", "contents", "mindiff" and "maxdiff".
+-- frequency is optional; if omitted, 1 is assumed.
+-- mindiff and maxdiff are optional and independent; if omitted, the room is
+-- not constrained by level difficulty.
+-- a plain function has frequency of 1, and no difficulty constraints.
 -- des.room({ type = "ordinary", filled = 1 })
 --   - ordinary rooms can be converted to shops or any other special rooms.
 --   - filled = 1 means the room gets random room contents, even if it
@@ -13,7 +16,7 @@
 -- to generate a single themed room.
 
 themerooms = {
-  {
+   {
      -- the "default" room
       frequency = 1000,
       contents = function()
@@ -76,38 +79,44 @@ themerooms = {
    end,
 
    -- Boulder room
-   function()
-      des.room({ type = "themed",
-                 contents = function(rm)
-                    for x = 0, rm.width - 1 do
-                       for y = 0, rm.height - 1 do
-                          if (percent(30)) then
-                             if (percent(50)) then
-                                des.object("boulder");
-                             else
-                                des.trap("rolling boulder");
-                             end
-                          end
-                       end
-                    end
-                 end
-      });
-   end,
+   {
+      mindiff = 4,
+      contents = function()
+         des.room({ type = "themed",
+                  contents = function(rm)
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
+                           if (percent(30)) then
+                              if (percent(50)) then
+                                 des.object("boulder");
+                              else
+                                 des.trap("rolling boulder");
+                              end
+                           end
+                        end
+                     end
+                  end
+         });
+      end
+   },
 
    -- Spider nest
-   function()
-      des.room({ type = "themed",
-                 contents = function(rm)
-                    for x = 0, rm.width - 1 do
-                       for y = 0, rm.height - 1 do
-                          if (percent(30)) then
-                             des.trap("web", x, y);
-                          end
-                       end
-                    end
-                 end
-      });
-   end,
+   {
+      mindiff = 10,
+      contents = function()
+         des.room({ type = "themed",
+                  contents = function(rm)
+                     for x = 0, rm.width - 1 do
+                        for y = 0, rm.height - 1 do
+                           if (percent(30)) then
+                              des.trap("web", x, y);
+                           end
+                        end
+                     end
+                  end
+         });
+      end
+   },
 
    -- Trap room
    function()
@@ -538,36 +547,46 @@ end });
 
 };
 
-local total_frequency = 0;
-for i = 1, #themerooms do
-   local t = type(themerooms[i]);
+function is_eligible(room)
+   local t = type(room);
+   local diff = nh.level_difficulty();
    if (t == "table") then
-      total_frequency = total_frequency + themerooms[i].frequency;
+      if (room.mindiff ~= nil and diff < room.mindiff) then
+         return false
+      elseif (room.maxdiff ~= nil and diff > room.maxdiff) then
+         return false
+      end
    elseif (t == "function") then
-      total_frequency = total_frequency + 1;
+      -- functions currently have no constraints
    end
-end
-
-if (total_frequency == 0) then
-   error("Theme rooms total_frequency == 0");
+   return true
 end
 
 function themerooms_generate()
-   local pick = nh.rn2(total_frequency);
+   local pick = 1;
+   local total_frequency = 0;
    for i = 1, #themerooms do
-      local t = type(themerooms[i]);
-      if (t == "table") then
-         pick = pick - themerooms[i].frequency;
-         if (pick < 0) then
-            themerooms[i].contents();
-            return;
+      -- Reservoir sampling: select one room from the set of eligible rooms,
+      -- which may change on different levels because of level difficulty.
+      if is_eligible(themerooms[i]) then
+         local this_frequency;
+         if (type(themerooms[i]) == "table" and themerooms[i].frequency ~= nil) then
+            this_frequency = themerooms[i].frequency;
+         else
+            this_frequency = 1;
          end
-      elseif (t == "function") then
-         pick = pick - 1;
-         if (pick < 0) then
-            themerooms[i]();
-            return;
+         total_frequency = total_frequency + this_frequency;
+         -- avoid rn2(0) if a room has freq 0
+         if this_frequency > 0 and nh.rn2(total_frequency) < this_frequency then
+            pick = i;
          end
       end
+   end
+
+   local t = type(themerooms[pick]);
+   if (t == "table") then
+      themerooms[pick].contents();
+   elseif (t == "function") then
+      themerooms[pick]();
    end
 end
