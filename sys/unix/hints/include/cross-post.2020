@@ -18,7 +18,6 @@ $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
-$(TARGETPFX)recover.o : ../util/recover.c
 #
 #.PHONY: dospkg
 dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
@@ -123,8 +122,9 @@ $(TARGETPFX)pcunix.o : ../sys/share/pcunix.c $(HACK_H)
 $(TARGETPFX)tileset.o : ../win/share/tileset.c
 $(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
 $(TARGETPFX)giftiles.o : ../win/share/giftiles.c
+$(TARGETPFX)recover.o : ../util/recover.c
 $(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
-
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ $(TARGETPFX)recover.o $(TARGET_LIBS)
 #
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
