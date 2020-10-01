@@ -6,11 +6,15 @@ whether to [ignore], [report], or [restart] will eventually appear
 (it's slow).  That should be repressed even if the report choice could
 be directed at nethack.org.
 
-Urgent:  launching Qt nethack as a synchronous subprocess (ie, no
-trailing '&') from a Terminal window, changing focus back to that
-terminal after NetHack has started, and typing ^C sends the program
-into an endless loop with repeated messages to stderr (the terminal)
-complaining that the event loop is already running.
+Launching Qt nethack as a synchronous subprocess (ie, no trailing '&')
+from a Terminal window, changing focus back to that terminal after
+NetHack has started, and typing ^C was sending the program into an
+endless loop in qt_nhgetch() with repeated messages to stderr
+(the terminal) complaining that the event loop is already running.
+Triggered by yn_function("Really quit?") in the core.  That situation
+has been reduced to a single event loop complaint, do downgraded from
+"Urgent", but the prompt is auto-answered with ESC instead of letting
+the user respond.
 
 On OSX, if the program is run from nethackdir/nethack rather than from
 NetHack.app/Contents/MacOS/nethack (plus having NetHack.app/Contents/

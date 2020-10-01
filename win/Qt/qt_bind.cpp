@@ -313,22 +313,26 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 void NetHackQtBind::qt_clear_nhwindow(winid wid)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->Clear();
+    if (window)
+        window->Clear();
 }
 
 void NetHackQtBind::qt_display_nhwindow(winid wid, BOOLEAN_P block)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->Display(block);
+    if (window)
+        window->Display(block);
 }
 
 void NetHackQtBind::qt_destroy_nhwindow(winid wid)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    main->RemoveWindow(window);
-    if (window->Destroy())
-	delete window;
-    id_to_window[(int)wid] = 0;
+    if (window) {
+        main->RemoveWindow(window);
+        if (window->Destroy())
+            delete window;
+        id_to_window[(int) wid] = 0;
+    }
 }
 
 void NetHackQtBind::qt_curs(winid wid, int x, int y)
@@ -476,7 +480,22 @@ int NetHackQtBind::qt_nhgetch()
     // Process events until a key arrives.
     //
     while (keybuffer.Empty()) {
-	qApp->exec();
+        int exc = qApp->exec();
+        /*
+         * On OSX (possibly elsewhere), this prevents an infinite
+         * loop repeatedly issuing the complaint:
+QCoreApplication::exec: The event loop is already running
+         * to stderr if you syncronously start nethack from a terminal
+         * then switch focus back to that terminal and type ^C.
+         *  SIGINT -> done1() -> done2() -> yn_function("Really quit?")
+         * in the core asks for another keystroke.
+         *
+         * However, it still issues one such complaint, and whatever
+         * prompt wanted a response ("Really quit?") is shown in the
+         * message window but is auto-answered with ESC.
+         */
+        if (exc == -1)
+            keybuffer.Put('\033');
     }
 
     // after getting a key rather than before
@@ -494,7 +513,10 @@ int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
     // Process events until a key or map-click arrives.
     //
     while (keybuffer.Empty() && clickbuffer.Empty()) {
-	qApp->exec();
+        int exc = qApp->exec();
+        // [see comment above in qt_nhgetch()]
+        if (exc == -1)
+            keybuffer.Put('\033');
     }
 
     // after getting a key or click rather than before
@@ -524,6 +546,70 @@ int NetHackQtBind::qt_doprev_message()
     return 0;
 }
 
+// display "--More--" as a prompt and wait for a response from the user
+//
+// Used by qt_display_nhwindow(WIN_MESSAGE, TRUE) where second argument
+// True requests blocking.  We need it to support MSGTYPE=stop but the
+// core also uses that in various other situations.
+char NetHackQtBind::qt_more()
+{
+    char ch = '\033';
+
+    // without this gameover hack, quitting via menu or window close
+    // button ends up provoking a complaint from qt_nhgetch() [see the
+    // ^C comment in that routine] when the core triggers --More-- via
+    //  done2() -> really_done() -> display_nhwindow(WIN_MESSAGE, TRUE)
+    // (get rid of this if the exec() loop issue gets properly fixed)
+    if (::g.program_state.gameover)
+        return ch; // bypass --More-- and just continue with program exit
+
+    NetHackQtMessageWindow *mesgwin = main ? main->GetMessageWindow() : NULL;
+
+    // kill any typeahead; for '!popup_dialog' this forces qt_nhgetch()
+    keybuffer.Drain();
+
+    if (mesgwin && !::iflags.wc_popup_dialog && WIN_MESSAGE != WIN_ERR) {
+
+        mesgwin->AddToStr("--More--");
+        bool retry = false;
+        int complain = 0;
+        do {
+            ch = NetHackQtBind::qt_nhgetch();
+            switch (ch) {
+            case '\0': // hypothetical
+                ch = '\033';
+                /*FALLTHRU*/
+            case ' ':
+            case '\n':
+            case '\r':
+            case '\033':
+                retry = false;
+                break;
+            default:
+                if (++complain > 1)
+                    NetHackQtBind::qt_nhbell();
+                retry = true;
+                break;
+            }
+        } while (retry);
+        // unhighlight the line with the prompt; does not erase the window
+        NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
+
+    } else {
+        // use a popup dialog box; unlike yn_function(), we don't show
+        // the prompt+response in the message window
+        NetHackQtYnDialog dialog(main, "--More--", " \033\n\r", ' ');
+        ch = dialog.Exec();
+        if (ch == '\0') {
+            ch = '\033';
+        }
+        // discard any input that YnDialog() might have left pending
+        keybuffer.Drain();
+    }
+
+    return ch;
+}
+
 char NetHackQtBind::qt_yn_function(const char *question_,
                                    const char *choices, CHAR_P def)
 {
@@ -533,10 +619,13 @@ char NetHackQtBind::qt_yn_function(const char *question_,
     int result = -1;
 
     if (choices) {
-        // anything beyond <esc> is hidden>
-        QString choicebuf = choices;
-        size_t cb = choicebuf.indexOf('\033');
-        choicebuf = choicebuf.mid(0U, cb);
+        QString choicebuf((int) strlen(choices) + 1, QChar('\0'));
+        for (const char *p = choices; *p; ++p) {
+            if (*p == '\033') // <esc> and anything beyond is hidden
+                break;
+            choicebuf += visctrl(*p);
+        }
+        choicebuf.truncate(QBUFSZ - 1); // no effect if already shorter
         message = QString("%1 [%2] ").arg(question, choicebuf);
         if (def)
             message += QString("(%1) ").arg(QChar(def));
@@ -617,14 +706,16 @@ char NetHackQtBind::qt_yn_function(const char *question_,
             Sprintf(eos(cbuf), " %ld", ::yn_number);
         message += QString(" %1").arg(cbuf);
 
-        // add the prompt with appended response to the messsage window
-	NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
+        // add the prompt with appended response to the message window
+        if (WIN_MESSAGE != WIN_ERR)
+            NetHackQtBind::qt_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
         result = ret;
     }
 
     // unhighlight the prompt; does not erase the multi-line message window
-    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
+    if (WIN_MESSAGE != WIN_ERR)
+        NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
 
     return (char) result;
 }
@@ -747,6 +838,7 @@ void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
     }
 }
 
+// event loop callback
 bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
 {
     // Ignore Alt-key navigation to menubar, it's annoying when you
@@ -756,7 +848,9 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
         return true;
 
     bool result = QApplication::notify(receiver, event);
-    if (event->type() == QEvent::KeyPress) {
+    int evtyp = event->type();
+
+    if (evtyp == QEvent::KeyPress) {
         QKeyEvent *key_event = (QKeyEvent *) event;
 
         if (!key_event->isAccepted()) {
@@ -778,10 +872,11 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
             if (ch > 128)
                 ch = 0;
             // on OSX, ascii control codes are not sent, force them
-            if ((mod & Qt::ControlModifier) != 0) {
-                if (ch == 0 && k >= Qt::Key_A && k <= Qt::Key_Underscore)
+            if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
+                if (k >= Qt::Key_A && k <= Qt::Key_Underscore)
                     ch = (QChar) (k - (Qt::Key_A - 1));
             }
+            //raw_printf("notify()=%d \"%s\"", k, visctrl(ch.cell()));
             // if we have a valid character, queue it up
             if (ch != 0) {
                 bool alt = ((mod & Qt::AltModifier) != 0
@@ -792,6 +887,18 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
                 qApp->exit();
                 result = true;
             }
+
+#if 0   /* this was a failed attempt to prevent qt_more() from looping
+         * after command+q (on OSX) is used to bring up the quit dialog;
+         * now qt_more() uses an early return if program_state.gameover
+         * is set */
+        } else if (evtyp == QEvent::FocusOut
+                   || evtyp == QEvent::ShortcutOverride
+                   || evtyp == QEvent::PlatformSurface) {
+            // leave qt_nhgetch()'s event loop if focus switches somewhere else
+            qApp->exit();
+            result = false;
+#endif
         }
     }
     return result;
