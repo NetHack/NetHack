@@ -2428,6 +2428,7 @@ boolean ordinary;
         destroy_item(POTION_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
         destroy_item(FOOD_CLASS, AD_FIRE); /* only slime for now */
+        ignite_items(g.invent);
         break;
 
     case WAN_COLD:
@@ -3717,6 +3718,8 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
                 (void) destroy_mitem(mon, SCROLL_CLASS, AD_FIRE);
             if (!rn2(5))
                 (void) destroy_mitem(mon, SPBOOK_CLASS, AD_FIRE);
+            if (!rn2(3))
+                ignite_items(mon->minvent);
             destroy_mitem(mon, FOOD_CLASS, AD_FIRE); /* carried slime */
         }
         break;
@@ -3874,6 +3877,8 @@ xchar sx, sy;
                 destroy_item(SCROLL_CLASS, AD_FIRE);
             if (!rn2(5))
                 destroy_item(SPBOOK_CLASS, AD_FIRE);
+            if (!rn2(3))
+                ignite_items(g.invent);
             destroy_item(FOOD_CLASS, AD_FIRE);
         }
         break;
@@ -4035,6 +4040,9 @@ boolean u_caused;
             }
         }
     }
+    /* This also ignites floor items, but does not change cnt
+       because they weren't consumed. */
+    ignite_items(g.level.objects[x][y]);
     return cnt;
 }
 

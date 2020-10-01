@@ -1192,6 +1192,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
         if (!rn2(7))
             (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        if (!rn2(4))
+            ignite_items(mdef->minvent);
         if (youdefend && Slimed)
             burn_away_slime();
         return realizes_damage;

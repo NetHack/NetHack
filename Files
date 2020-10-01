@@ -220,8 +220,7 @@ zap.c
 
 sys/msdos:
 (files for MSDOS version)
-Install.dos              Makefile.GCC             Makefile1.cross
-Makefile2.cross          fetch-cross-compiler.sh  msdos-cross-compile.sh
+Install.dos              Makefile.GCC             fetch-cross-compiler.sh
 msdos.c                  msdoshlp.txt             nhlua.h
 pckeys.c                 pctiles.c                pctiles.h
 pcvideo.h                portio.h                 setup.bat

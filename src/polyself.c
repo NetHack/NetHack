@@ -1447,6 +1447,8 @@ dogaze()
                         (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
                     if (lev > rn2(25))
                         (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
+                    if (lev > rn2(20))
+                        ignite_items(mtmp->minvent);
                     if (dmg)
                         mtmp->mhp -= dmg;
                     if (DEADMONSTER(mtmp))

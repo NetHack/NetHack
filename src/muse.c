@@ -1594,6 +1594,7 @@ struct monst *mtmp;
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+            ignite_items(mtmp->minvent);
             num = (2 * (rn1(3, 3) + 2 * bcsign(otmp)) + 1) / 3;
             if (Fire_resistance)
                 You("are not harmed.");
