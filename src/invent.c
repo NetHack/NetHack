@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1596226443 2020/07/31 20:14:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1601594180 2020/10/01 23:16:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2102,9 +2102,7 @@ unsigned *resultflags;
             }
         }
 
-        if (oc_of_sym == COIN_CLASS && !combo) {
-            g.context.botl = 1;
-        } else if (sym == 'a') {
+        if (sym == 'a') {
             allflag = TRUE;
         } else if (sym == 'A') {
             ; /* same as the default */
@@ -2133,11 +2131,6 @@ unsigned *resultflags;
                ? -2 : -3;
     } else if (flags.menu_style != MENU_TRADITIONAL && combo && !allflag) {
         return 0;
-#if 0
-    /* !!!! test gold dropping */
-    } else if (allowgold == 2 && !oletct) {
-        return 1; /* you dropped gold (or at least tried to)  */
-#endif
     } else {
         int cnt = askchain(&g.invent, olets, allflag, fn, ckfn, mx, word);
         /*
@@ -3232,8 +3225,7 @@ dotypeinv()
         }
     }
     if (traditional) {
-        /* collect a list of classes of objects carried, for use as a prompt
-         */
+        /* collect list of classes of objects carried, for use as a prompt */
         types[0] = 0;
         class_count = collect_obj_classes(types, g.invent, FALSE,
                                           (boolean FDECL((*), (OBJ_P))) 0,

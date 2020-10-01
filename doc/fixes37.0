@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ $NHDT-Date: 1601547360 2020/10/01 10:16:00 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ $NHDT-Date: 1601594180 2020/10/01 23:16:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -264,6 +264,8 @@ when make was invoked with -j makedefs instances could end up running in
 	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
 make piranhas faster and give them extra bite attack
 fire sources can ignite candles, lamps, and potions of oil
+for multiple drop ('D') with menustyle traditional or combination, if the only
+	object class player picked was '$' then it operated on all classes
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
