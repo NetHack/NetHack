@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.316 $ $NHDT-Date: 1601594180 2020/10/01 23:16:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.317 $ $NHDT-Date: 1601595709 2020/10/01 23:41:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -227,6 +227,9 @@ hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 	able to harm mindless monsters with it
 some hero attacks that should have gotten a skill bonus or penalty didn't
 change internal name of "<foo> venom" to "splash of <foo> venom"
+some operations that made sense to handle venom ('D', scroll of identify, no
+	doubt others) ignored it because venom is suppressed from packorder;
+	matters for wizard mode or for normal play that loads wizard bones
 singularize "splashes" to "splash" instead of "splashe"
 treat slinging gems and tossing or slinging stones at unicorns as attacks
 give rot-away timer instead of revive timer to corpses of cancelled trolls
