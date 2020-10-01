@@ -7,6 +7,7 @@
 ifdef CROSS_TO_MSDOS
 BUILD_LUA=1
 BUILD_PDCURSES=1
+CROSS_SHARED=1
 override TARGET = msdos
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
@@ -16,6 +17,7 @@ endif
 ifdef CROSS_TO_AMIGA
 BUILD_LUA=1
 BUILD_PDCURSES=1
+CROSS_SHARED=1
 override TARGET = amiga
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
@@ -166,8 +168,7 @@ override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE= dospkg
 VARDATND += nhtiles.bmp
 PREGAME = mkdir -p $(TARGETDIR)
-CLEANMORE += rm -r $(TARGETDIR)
-BUILDMORE += $(TARGETPFX)recover.exe
+CLEANMORE += rm -f -r $(TARGETDIR)
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
@@ -252,11 +253,10 @@ override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
 #		../util/txt2iff.o
 override WINLIB=
 override LUALIB=
-override GAMEBIN = $(TARGETPFX)nethack.exe
+override GAMEBIN = $(TARGETPFX)nethack
 override PACKAGE= amigapkg
 PREGAME = mkdir -p ../targets/amiga
 CLEANMORE += rm -r ../targets/amiga
-BUILDMORE += $(TARGETPFX)recover.exe
 #		../util/txt2iff
 #
 ifdef WANT_WIN_CURSES
@@ -269,7 +269,7 @@ $(TARGETPFX)%.o : ../outdated/sys/amiga/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_TO_AMIGA
 #=================================================================
-
+ifdef CROSS_SHARED
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
 $(TARGETPFX)%.o : $(PDCTOP)/sdl1/%.c
@@ -289,6 +289,8 @@ $(TARGETPFX)%.o : ../win/share/%.c
 # Rules for util files heading for target
 $(TARGETPFX)%.o : ../util/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+endif  # CROSS_SHARED
+#
 # End of cross-compiling -PRE section
 #===============-=================================================
 

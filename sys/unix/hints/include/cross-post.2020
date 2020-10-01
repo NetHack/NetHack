@@ -18,12 +18,16 @@ $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
+$(GAMEBIN) : $(HOBJ)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 #
-#.PHONY: dospkg
+.PHONY: dospkg
 dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
+	cp $(TARGETPFX)recover.exe $(TARGETPFX)pkg/RECOVER.EXE
 	cp ../dat/nhdat $(TARGETPFX)pkg/NHDAT
 	cp ../dat/license $(TARGETPFX)pkg/LICENSE
 	cp ../dat/nhtiles.bmp $(TARGETPFX)pkg/NHTILES.BMP
@@ -77,8 +81,11 @@ $(TARGETPFX)monsters.iff: ../win/share/monsters.txt ../util/txt2iff
 	../util/txt2iff ../win/share/monsters.txt $@
 $(TARGETPFX)other.iff: ../win/share/other.txt ../util/txt2iff
 	../util/txt2iff ../win/share/other.txt $@
+$(GAMEBIN) : $(HOBJ)
+	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 #
-#.PHONY: amigapkg
+.PHONY: amigapkg
 amigapkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/nethack
@@ -112,9 +119,8 @@ amigapkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	@echo amiga package zip file $(TARGETPFX)NH370AMI.ZIP
 endif  # CROSS_TO_AMIGA
 
-#
+ifdef CROSS_SHARED
 # shared file dependencies
-#
 $(TARGETPFX)pcmain.o : ../sys/share/pcmain.c $(HACK_H)
 $(TARGETPFX)pcsys.o : ../sys/share/pcsys.c $(HACK_H)
 $(TARGETPFX)pctty.o : ../sys/share/pctty.c $(HACK_H)
@@ -124,8 +130,10 @@ $(TARGETPFX)bmptiles.o : ../win/share/bmptiles.c
 $(TARGETPFX)giftiles.o : ../win/share/giftiles.c
 $(TARGETPFX)recover.o : ../util/recover.c
 $(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
-	$(TARGET_LINK) $(TARGET_LFLAGS) -o $@ $(TARGETPFX)recover.o $(TARGET_LIBS)
+	$(TARGET_LINK) $(TARGET_LFLAGS) $(TARGETPFX)recover.o -o $@
+endif  # CROSS_SHARED
 #
+ifdef BUILD_LUA
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
 	if [ -f $@ ]; then rm $@; fi;
@@ -173,9 +181,10 @@ $(TARGETPFX)lundump.o : $(LUATOP)/src/lundump.c
 $(TARGETPFX)lutf8lib.o : $(LUATOP)/src/lutf8lib.c
 $(TARGETPFX)lvm.o : $(LUATOP)/src/lvm.c
 $(TARGETPFX)lzio.o : $(LUATOP)/src/lzio.c
-#
+endif  # BUILD_LUA
+
+ifdef BUILD_PDCURSES
 # PDCurses src
-#
 $(TARGETPFX)addch.o : $(PDCTOP)/pdcurses/addch.c
 $(TARGETPFX)addchstr.o : $(PDCTOP)/pdcurses/addchstr.c
 $(TARGETPFX)addstr.o : $(PDCTOP)/pdcurses/addstr.c
@@ -223,8 +232,7 @@ $(TARGETPFX)pdckbd.o : $(PDCTOP)/dos/pdckbd.c
 $(TARGETPFX)pdcscrn.o : $(PDCTOP)/dos/pdcscrn.c
 $(TARGETPFX)pdcsetsc.o : $(PDCTOP)/dos/pdcsetsc.c
 $(TARGETPFX)pdcutil.o : $(PDCTOP)/dos/pdcutil.c
-
-
+endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section
 #===============-=================================================
