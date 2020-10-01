@@ -1225,10 +1225,10 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 	if (message) message->Scroll(0,+1);
         break;
     case Qt::Key_Space:
-	if ( flags.rest_on_space ) {
-	    event->ignore();
-	    return;
-	}
+        //if (flags.rest_on_space) {
+        event->ignore(); // punt to NetHackQtBind::notify()
+        return;
+        //}
     case Qt::Key_Enter:
 	if ( map )
 	    map->clickCursor();

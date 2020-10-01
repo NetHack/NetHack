@@ -71,6 +71,7 @@ public:
 	static int qt_nh_poskey(int *x, int *y, int *mod);
 	static void qt_nhbell();
 	static int qt_doprev_message();
+        static char qt_more();
         static char qt_yn_function(const char *question,
                                    const char *choices, CHAR_P def);
 	static void qt_getlin(const char *prompt, char *line);
