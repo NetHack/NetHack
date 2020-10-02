@@ -16,6 +16,8 @@ private:
 	const char* choices;
 	char def;
 	char keypress;
+        bool allow_count;
+        QLineEdit *le;
 
 protected:
 	virtual void keyPressEvent(QKeyEvent*);

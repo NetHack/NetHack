@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.317 $ $NHDT-Date: 1601595709 2020/10/01 23:41:49 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1601600393 2020/10/02 00:59:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -389,7 +389,6 @@ Qt: when selecting an extended command by typing its name, support <delete>
 Qt: switch to fixed-width font for menus
 Qt: don't disable [cancel] button when viewing inventory or other pick-none
 	menus; ESC works to dismiss those and [cancel] should be the same
-Qt: bring status conditions up to 3.6 levels but new ones lack pictures
 Qt: clicking on the window's Close button brought up a dialog offering
 	choices of "Save" and "Cancel"; picking Cancel sent nethack into an
 	infinite loop with complaints about Qt's event loop already being
@@ -427,8 +426,8 @@ Qt: update message window's last message with player's response if it's a
 Qt: for line input, display the prompt+response in the message window
 Qt: enable the popup_dialog WC option (result is a bit flakey but usable)
 Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
-Qt: tried to honor 'showexp' but the value was unintentionally supressed by
-	[lack of] obsolete conditional EXP_ON_BOTL
+Qt: tried to honor 'showexp' but the value was unintentionally suppressed by
+	[lack of definition for] obsolete conditional EXP_ON_BOTL
 Qt: implement --More-- prompt to support MSGTYPE=stop
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's

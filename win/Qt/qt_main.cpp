@@ -956,7 +956,7 @@ void NetHackQtMainWindow::doQuit(bool)
     case 0:
         // quit -- bypass the prompting preformed by done2()
         g.program_state.stopprint++;
-        done(QUIT);
+        ::done(QUIT);
         /*NOTREACHED*/
         break;
     case 1:
@@ -1260,7 +1260,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
             // quit -- bypass the prompting preformed by done2()
             ok = 1;
             g.program_state.stopprint++;
-            done(QUIT);
+            ::done(QUIT);
             /*NOTREACHED*/
             break;
 	}
