@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1596498538 2020/08/03 23:48:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -346,27 +346,29 @@ typedef struct sortloot_item Loot;
 #define ALL_FINISHED 0x01 /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE     0x01   /* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x02 /* if only 1 object, don't ask */
-#define USE_INVLET      0x04   /* use object's invlet */
-#define INVORDER_SORT   0x08   /* sort objects by packorder */
-#define SIGNAL_NOMENU   0x10   /* return -1 rather than 0 if none allowed */
-#define SIGNAL_ESCAPE   0x20   /* return -2 rather than 0 for ESC */
-#define FEEL_COCKATRICE 0x40   /* engage cockatrice checks and react */
-#define INCLUDE_HERO    0x80   /* show hero among engulfer's inventory */
+#define BY_NEXTHERE       0x0001 /* follow objlist by nexthere field */
+#define INCLUDE_VENOM     0x0002 /* include venom objects if present */
+#define AUTOSELECT_SINGLE 0x0004 /* if only 1 object, don't ask */
+#define USE_INVLET        0x0008 /* use object's invlet */
+#define INVORDER_SORT     0x0010 /* sort objects by packorder */
+#define SIGNAL_NOMENU     0x0020 /* return -1 rather than 0 if none allowed */
+#define SIGNAL_ESCAPE     0x0040 /* return -2 rather than 0 for ESC */
+#define FEEL_COCKATRICE   0x0080 /* engage cockatrice checks and react */
+#define INCLUDE_HERO      0x0100 /* show hero among engulfer's inventory */
 
 /* Flags to control query_category() */
-/* BY_NEXTHERE used by query_category() too, so skip 0x01 */
-#define UNPAID_TYPES 0x002
-#define GOLD_TYPES   0x004
-#define WORN_TYPES   0x008
-#define ALL_TYPES    0x010
-#define BILLED_TYPES 0x020
-#define CHOOSE_ALL   0x040
-#define BUC_BLESSED  0x080
-#define BUC_CURSED   0x100
-#define BUC_UNCURSED 0x200
-#define BUC_UNKNOWN  0x400
+/* BY_NEXTHERE and INCLUDE_VENOM are used by query_category() too, so
+   skip 0x0001 and 0x0002 */
+#define UNPAID_TYPES      0x0004
+#define GOLD_TYPES        0x0008
+#define WORN_TYPES        0x0010
+#define ALL_TYPES         0x0020
+#define BILLED_TYPES      0x0040
+#define CHOOSE_ALL        0x0080
+#define BUC_BLESSED       0x0100
+#define BUC_CURSED        0x0200
+#define BUC_UNCURSED      0x0400
+#define BUC_UNKNOWN       0x0800
 #define BUC_ALLBKNOWN (BUC_BLESSED | BUC_CURSED | BUC_UNCURSED)
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2

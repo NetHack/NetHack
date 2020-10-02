@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1596498195 2020/08/03 23:43:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.271 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1601595711 2020/10/01 23:41:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -910,7 +910,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
     int i, n;
     winid win;
     struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
-    char *pack;
+    char *pack, packbuf[MAXOCLASSES + 1];
     anything any;
     boolean printed_type_name, first,
             sorted = (qflags & INVORDER_SORT) != 0,
@@ -970,7 +970,9 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
      * each type so we can group them.  The allow function was
      * called by sortloot() and will be called once per item here.
      */
-    pack = flags.inv_order;
+    pack = strcpy(packbuf, flags.inv_order);
+    if (qflags & INCLUDE_VENOM)
+        (void) strkitten(pack, VENOM_CLASS); /* venom is not in inv_order */
     first = TRUE;
     do {
         printed_type_name = FALSE;
@@ -1095,7 +1097,7 @@ int how;               /* type of query */
     int n;
     winid win;
     struct obj *curr;
-    char *pack;
+    char *pack, packbuf[MAXOCLASSES + 1];
     anything any;
     boolean collected_type_name;
     char invlet;
@@ -1154,7 +1156,10 @@ int how;               /* type of query */
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
-    pack = flags.inv_order;
+
+    pack = strcpy(packbuf, flags.inv_order);
+    if (qflags & INCLUDE_VENOM)
+        (void) strkitten(pack, VENOM_CLASS); /* venom is not in inv_order */
 
     if (qflags & CHOOSE_ALL) {
         invlet = 'A';
@@ -2990,13 +2995,14 @@ boolean put_in;
             }
         }
     } else {
-        mflags = INVORDER_SORT;
+        mflags = INVORDER_SORT | INCLUDE_VENOM;
         if (put_in && flags.invlet_constant)
             mflags |= USE_INVLET;
         if (!put_in)
             g.current_container->cknown = 1;
         Sprintf(buf, "%s what?", action);
-        n = query_objlist(buf, put_in ? &g.invent : &(g.current_container->cobj),
+        n = query_objlist(buf,
+                          put_in ? &g.invent : &(g.current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n) {

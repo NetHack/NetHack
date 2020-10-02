@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1598575088 2020/08/28 00:38:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -845,8 +845,9 @@ int retry;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         n = query_category("Drop what type of items?", g.invent,
-                           UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL | BUC_BLESSED
-                               | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
+                           (UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL
+                            | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
+                            | BUC_UNKNOWN | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
         if (!n)
             goto drop_done;
@@ -897,7 +898,8 @@ int retry;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &g.invent,
-                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
+                          (USE_INVLET | INVORDER_SORT | INCLUDE_VENOM),
+                          &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n > 0) {
             /*
