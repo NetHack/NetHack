@@ -675,7 +675,9 @@ support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
 Wait or rest, do nothing for one turn. Precede with the \(oqm\(cq prefix
-to wait for a turn even next to a hostile monster.
+to wait for a turn even next to a hostile monster, if
+.op safe_wait
+is on.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp ""
@@ -884,7 +886,9 @@ Redraw the screen.
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
 Precede with the \(oqm\(cq prefix to search for a turn
-even next to a hostile monster.
+even next to a hostile monster, if
+.op safe_wait
+is on.
 .lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent \(lqremembered, unseen monster\(rq marker.
@@ -3987,6 +3991,9 @@ Persistent.
 .lp safe_pet
 Prevent you from (knowingly) attacking your pets (default on).
 Persistent.
+.lp safe_wait
+Prevents you from waiting or searching when next to a hostile monster
+(default on). Persistent.
 .lp sanity_check
 Evaluate monsters, objects, and map prior to each turn (default off).
 Debug mode only.

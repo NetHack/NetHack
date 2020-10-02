@@ -1982,22 +1982,36 @@ long timeout UNUSED;
     }
 }
 
+boolean
+cmd_safety_prevention(cmddesc, act, flagcounter)
+char *cmddesc;
+char *act;
+int *flagcounter;
+{
+    if (flags.safe_wait && !iflags.menu_requested
+        && !g.multi && monster_nearby()) {
+        char buf[QBUFSZ];
+
+        buf[0] = '\0';
+        if (iflags.cmdassist || !*flagcounter++)
+            Sprintf(buf, "  Use '%s' prefix to force %s.",
+                    visctrl(g.Cmd.spkeys[NHKF_REQMENU]), cmddesc);
+        Norep("%s%s", act, buf);
+        return TRUE;
+    }
+    *flagcounter = 0;
+    return FALSE;
+}
+
 /* '.' command: do nothing == rest; also the
    ' ' command iff 'rest_on_space' option is On */
 int
 donull()
 {
-    if (!iflags.menu_requested && !g.multi && monster_nearby()) {
-        char buf[QBUFSZ];
-
-        buf[0] = '\0';
-        if (iflags.cmdassist || !g.did_nothing_flag++)
-            Sprintf(buf, "  Use '%s' prefix to force a no-op (to rest).",
-                    visctrl(g.Cmd.spkeys[NHKF_REQMENU])); /* default is "m" */
-        Norep("Are you waiting to get hit?%s", buf);
+    if (cmd_safety_prevention("a no-op (to rest)",
+                          "Are you waiting to get hit?",
+                          &g.did_nothing_flag))
         return 0;
-    }
-    g.did_nothing_flag = 0; /* reset */
     return 1; /* Do nothing, but let other things happen */
 }
 

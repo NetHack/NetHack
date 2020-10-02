@@ -769,7 +769,8 @@ location other than the current position.
 %.lp
 \item[\tb{.}]
 Wait or rest, do nothing for one turn. Precede with the `{\tt m}' prefix
-to wait for a turn even next to a hostile monster.
+to wait for a turn even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.
 %.lp
 \item[\tb{a}]
 Apply (use) a tool (pick-axe, key, lamp \ldots).\\
@@ -968,7 +969,8 @@ Redraw the screen.
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
 Precede with the `{\tt m}' prefix to wait for a turn
-even next to a hostile monster.\\
+even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.\\
 %.lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent ``remembered, unseen monster'' marker.
@@ -4307,6 +4309,10 @@ depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+%.lp
+\item[\ib{safe\verb+_+wait}]
+Prevents you from waiting or searching when next to a hostile monster
+(default on).  Persistent.
 %+.lp
 \item[\ib{sanity\verb+_+check}]
 Evaluate monsters, objects, and map prior to each turn (default off).
