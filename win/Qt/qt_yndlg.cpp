@@ -295,8 +295,8 @@ char NetHackQtYnDialog::Exec()
         // present in the QLineEdit widget doesn't affect its isEmpty() test
         if (le && !le->text().isEmpty()) {
             QString text(le->text());
-            if (text[0] == "#")
-                text = text.mid(1);
+            if (text.at(0) == QChar('#'))
+                text = text.mid(1); // rest of string past [0]
             ::yn_number = text.toLong();
             choice = '#';
         }
