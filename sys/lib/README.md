@@ -9,11 +9,26 @@ This library has only been built on MacOS, but should work on Linux and other un
 Building the WASM module requires that you have the [emscripten toolchain / sdk installed](https://emscripten.org/docs/getting_started/downloads.html).
 
 Generally the build is the same as the unix build:
+
+[Edit Oct 4, 2020: Use the existing Makefile and hints, hints/include system for cross-compiles]
+1. `cd sys/unix`
+2. `./setup.sh hints/macOS.2020`
+3. `cd ../..`
+4. For `libnethack.a`: `make WANT_LIBNH=1 all`
+5. For `nethack.js`: `make CROSS_TO_WASM=1 all`
+
+[Original text was:]
 1. `cd sys/lib`
 2. For `libnethack.a`: `./setup.sh hints/macOS.2020`; for `nethack.js`: `./setup.sh hints/wasm`
 3. `cd ../..`
 4. `make`
 
+
+[Edit Oct 4, 2020:]
+Resulting libaries will be in the `targets/wasm` directory for `CROSS_TO_WASM=1`.
+Resulting libaries will be in the `src` directory for `WANT_LIBNH=1`.
+
+[Original text:]
 Resulting libaries will be in the `src` directory.
 
 WASM also has a npm module that can be published out of `sys/lib/npm-library`. After building the `nethack.js` it can be published by:
