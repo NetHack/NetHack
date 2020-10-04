@@ -331,8 +331,15 @@ struct version_info {
     unsigned long incarnation;   /* actual version number */
     unsigned long feature_set;   /* bitmask of config settings */
     unsigned long entity_count;  /* # of monsters and objects */
+#ifndef __EMSCRIPTEN__
     unsigned long struct_sizes1; /* size of key structs */
     unsigned long struct_sizes2; /* size of more key structs */
+#else /* __EMSCRIPTEN__ */
+    /* 'long' in WASM is 4 bytes, which is too small to hold version numbers
+     * such as: VERSION_SANITY2 */
+    unsigned long long struct_sizes1; /* size of key structs */
+    unsigned long long struct_sizes2; /* size of more key structs */
+#endif /* !__EMSCRIPTEN__ */
 };
 
 struct savefile_info {
@@ -396,7 +403,7 @@ struct savefile_info {
 
 /* PANICTRACE: Always defined for NH_DEVEL_STATUS != NH_STATUS_RELEASED
    but only for supported platforms. */
-#ifdef UNIX
+#if defined(UNIX) && !defined(__EMSCRIPTEN__)
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
 #if !defined(CROSS_TO_WASM)
@@ -414,7 +421,7 @@ struct savefile_info {
 #if defined(MACOSX)
 #define PANICTRACE_LIBC
 #endif
-#ifdef UNIX
+#if defined(UNIX) && !defined(__EMSCRIPTEN__) /* no popen in WASM */
 #if !defined(CROSS_TO_WASM) /* no popen in WASM */
 #define PANICTRACE_GDB
 #endif
