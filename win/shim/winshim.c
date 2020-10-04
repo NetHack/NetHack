@@ -262,6 +262,10 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
         let cbName = UTF8ToString(cb_name);
         // console.log("local_callback:", cbName, fmt, name);
 
+        // get pointer / type conversion helpers
+        let getPointerValue = globalThis.nethackGlobal.helpers.getPointerValue;
+        let setPointerValue = globalThis.nethackGlobal.helpers.setPointerValue;
+
         reentryMutexLock(name);
 
         let argTypes = fmt.split("");
@@ -271,7 +275,7 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
         let jsArgs = [];
         for (let i = 0; i < argTypes.length; i++) {
             let ptr = args + (4*i);
-            let val = typeLookup(argTypes[i], ptr);
+            let val = getArg(name, ptr, argTypes[i]);
             jsArgs.push(val);
         }
 
@@ -281,44 +285,13 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
         let userCallback = globalThis[cbName];
         runJsEventLoop(() => userCallback.call(this, name, ... jsArgs)).then((retVal) => {
             // save the return value
-            setReturn(name, ret_ptr, retType, retVal);
+            setPointerValue(name, ret_ptr, retType, retVal);
             // return
             setTimeout(() => {
                 reentryMutexUnlock();
                 wakeUp();
             }, 0);
         });
-
-
-        // convert 'ptr' to the type indicated by 'type'
-        function typeLookup(type, ptr) {
-            switch(type) {
-            case "s": // string
-                return UTF8ToString(getValue(ptr, "*"));
-            case "p": // pointer
-                ptr = getValue(ptr, "*");
-                if(!ptr) return 0; // null pointer
-                return getValue(ptr, "*");
-            case "c": // char
-                return String.fromCharCode(getValue(getValue(ptr, "*"), "i8"));
-            case "0": /* 2^0 = 1 byte */
-                return getValue(getValue(ptr, "*"), "i8");
-            case "1": /* 2^1 = 2 bytes */
-                return getValue(getValue(ptr, "*"), "i16");
-            case "2": /* 2^2 = 4 bytes */
-            case "i": // integer
-            case "n": // number
-                return getValue(getValue(ptr, "*"), "i32");
-            case "f": // float
-                return getValue(getValue(ptr, "*"), "float");
-            case "d": // double
-                return getValue(getValue(ptr, "*"), "double");
-            case "o": // overloaded: multiple types
-                return ptr;
-            default:
-                throw new TypeError ("unknown type:" + type);
-            }
-        }
 
         // make callback arguments friendly: convert numbers to strings where possible
         function decodeArgs(name, args) {
@@ -333,12 +306,75 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
                     args[0] = globalThis.nethackGlobal.constants["STATUS_FIELD"][args[0]];
                     // arg[1] is a string unless it is BL_CONDITION, BL_RESET, BL_FLUSH, BL_CHARACTERISTICS
                     if(["BL_CONDITION", "BL_RESET", "BL_FLUSH", "BL_CHARACTERISTICS"].indexOf(args[0] && args[1]) < 0) {
-                        args[1] = typeLookup("s", args[1]);
+                        args[1] = getArg(name, args[1], "s");
                     } else {
-                        args[1] = typeLookup("p", args[1]);
+                        args[1] = getArg(name, args[1], "p");
                     }
                     break;
+                case "shim_display_file":
+                    args[1] = !!args[1];
+                case "shim_display_nhwindow":
+                    args[0] = decodeWindow(args[0]);
+                    args[1] = !!args[1];
+                    break;
+                case "shim_getmsghistory":
+                    args[0] = !!args[0];
+                    break;
+                case "shim_putmsghistory":
+                    args[1] = !!args[1];
+                    break;
+                case "shim_status_enablefield":
+                    console.log("shim_status_enablefield arg 1:", args[1]);
+                    args[3] = !!args[3];
+                    break;
+                case "shim_add_menu":
+                    args[0] = decodeWindow(args[0]);
+                    // args[1] = mapglyphHelper(args[1]);
+                    // args[5] = decodeAttr(args[5]);
+                    break;
+                case "shim_putstr":
+                    args[0] = decodeWindow(args[0]);
+                    break;
+                case "shim_select_menu":
+                    args[0] = decodeWindow(args[0]);
+                    args[1] = decodeSelected(args[1]);
+                    break;
+                case "shim_clear_nhwindow":
+                case "shim_destroy_nhwindow":
+                case "shim_curs":
+                case "shim_start_menu":
+                case "shim_end_menu":
+                case "shim_print_glyph":
+                    args[0] = decodeWindow(args[0]);
+                    break;
             }
+        }
+
+        function decodeWindow(winid) {
+            let { WIN_MAP, WIN_INVEN, WIN_STATUS, WIN_MESSAGE } = globalThis.nethackGlobal.globals;
+            switch(winid) {
+                case WIN_MAP: return "WIN_MAP";
+                case WIN_MESSAGE: return "WIN_MESSAGE";
+                case WIN_STATUS: return "WIN_STATUS";
+                case WIN_INVEN: return "WIN_INVEN";
+                default: return winid;
+            }
+            // return winid;
+        }
+
+        function decodeSelected(how) {
+            let { PICK_NONE, PICK_ONE, PICK_ANY } = globalThis.nethackGlobal.constants.MENU_SELECT;
+            switch(how) {
+                case PICK_NONE: return "PICK_NONE";
+                case PICK_ONE: return "PICK_ONE";
+                case PICK_ANY: return "PICK_ANY";
+                default: return how;
+            }
+
+        }
+
+        function getArg(name, ptr, type) {
+            return (type === "o")?ptr:getPointerValue(name, getValue(ptr, "*"), type);
         }
 
         // setTimeout() with value of '0' is similar to setImmediate() (but setImmediate isn't standard)
@@ -357,60 +393,16 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
             });
         }
 
-        // sets the return value of the function to the type expected
-        function setReturn(name, ptr, type, value = 0) {
-            switch (type) {
-            case "p":
-                throw new Error("not implemented");
-            case "s":
-                if(typeof value !== "string")
-                    throw new TypeError(`expected ${name} return type to be string`);
-                value=value?value:"(no value)";
-                var strPtr = getValue(ptr, "i32");
-                stringToUTF8(value, strPtr, 1024);
-                break;
-            case "i":
-                if(typeof value !== "number" || !Number.isInteger(value))
-                    throw new TypeError(`expected ${name} return type to be integer`);
-                setValue(ptr, value, "i32");
-                break;
-            case "c":
-                if(typeof value !== "number" || value < 0 || value > 128)
-                    throw new TypeError(`expected ${name} return type to be integer representing an ASCII character`);
-                setValue(ptr, value, "i8");
-                break;
-            case "f":
-                if(typeof value !== "number" || isFloat(value))
-                    throw new TypeError(`expected ${name} return type to be float`);
-                // XXX: I'm not sure why 'double' works and 'float' doesn't
-                setValue(ptr, value, "double");
-                break;
-            case "d":
-                if(typeof value !== "number" || isFloat(value))
-                    throw new TypeError(`expected ${name} return type to be double`);
-                setValue(ptr, value, "double");
-                break;
-            case "v":
-                break;
-            default:
-                throw new Error("unknown type");
-            }
-
-            function isFloat(n){
-                return n === +n && n !== (n|0) && !Number.isInteger(n);
-            }
-        }
-
         function reentryMutexLock(name) {
             globalThis.nethackGlobal = globalThis.nethackGlobal || {};
-            if(globalThis.nethackGlobal.shimPreventReentry) {
-                throw new Error(`'${name}' attempting second call to 'local_callback' before '${globalThis.nethackGlobal.shimPreventReentry}' has finished, will crash emscripten Asyncify. For details see: emscripten.org/docs/porting/asyncify.html#reentrancy`);
+            if(globalThis.nethackGlobal.shimFunctionRunning) {
+                throw new Error(`'${name}' attempting second call to 'local_callback' before '${globalThis.nethackGlobal.shimFunctionRunning}' has finished, will crash emscripten Asyncify. For details see: emscripten.org/docs/porting/asyncify.html#reentrancy`);
             }
-            globalThis.nethackGlobal.shimPreventReentry = name;
+            globalThis.nethackGlobal.shimFunctionRunning = name;
         }
 
         function reentryMutexUnlock() {
-            globalThis.nethackGlobal.shimPreventReentry = null;
+            globalThis.nethackGlobal.shimFunctionRunning = null;
         }
     });
 })
