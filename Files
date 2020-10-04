@@ -218,6 +218,22 @@ uhitm.c     vault.c     version.c   vision.c    weapon.c    were.c
 wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
 zap.c
 
+sys/lib:
+(files in top directory)
+README.md  sysconf
+
+sys/lib/npm-package:
+(files in top directory)
+LICENSE.md    README.md     package.json
+
+sys/lib/npm-package/src:
+(file in top directory)
+nethackShim.js
+
+sys/lib/test:
+(files in top directory)
+README.md  libtest.c  run.sh
+
 sys/msdos:
 (files for MSDOS version)
 Install.dos              Makefile.GCC             fetch-cross-compiler.sh
@@ -382,6 +398,10 @@ bmptiles.c     gifread.c      giftiles.c     monsters.txt   nhicns.uu
 nhsplash.xpm   objects.txt    other.txt      ppmwrite.c     renumtiles.pl
 safeproc.c     thintile.c     tile.doc       tile.h         tile2bmp.c
 tilemap.c      tileset.c      tiletext.c
+
+win/shim:
+(file in top directory)
+winshim.c
 
 win/tty:
 (files for tty versions)
