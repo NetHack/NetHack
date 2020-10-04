@@ -69,6 +69,7 @@ NetHackQtYnDialog::NetHackQtYnDialog(QWidget *parent, const QString &q,
             }
         }
     }
+    alt_answer[0] = alt_result[0] = '\0';
 }
 
 char NetHackQtYnDialog::Exec()
@@ -152,7 +153,10 @@ char NetHackQtYnDialog::Exec()
 	QButtonGroup *bgroup = new QButtonGroup(group);
 
 	int nchoices=ch.length();
-        bool is_ynq = (ch == QString("ynq")), // [ Yes  ][  No  ][Cancel]
+        bool is_ynaq = (ch == QString("ynaq") // [Yes ][ No ][All ][Stop]
+                        || ch == QString("yn#aq")
+                        || ch == altchoices), // alternate "yn#aq"
+             is_ynq = (ch == QString("ynq")), // [ Yes  ][  No  ][Cancel]
              is_yn  = (ch == QString("yn")),  // [Yes ][ No ]
              is_lr  = (ch == QString(lrq));   // [ Left ][Right ]
 
@@ -161,8 +165,8 @@ char NetHackQtYnDialog::Exec()
 	const int extra=fontMetrics().height(); // Extra for group
 	int x=margin, y=extra+margin;
         int butheight = fontMetrics().height() * 2 + 5,
-            butwidth = (butheight - 5)
-                       * ((is_ynq || is_lr) ? 3 : is_yn ? 2 : 1) + 5;
+            butwidth = (butheight - 5) * ((is_ynq || is_lr) ? 3
+                                          : (is_ynaq || is_yn) ? 2 : 1) + 5;
         if (butwidth == butheight) { // square, enough room for C or ^C
             // some characters will be labelled by name rather than by
             // keystroke so will need wider buttons
@@ -183,7 +187,9 @@ char NetHackQtYnDialog::Exec()
             if (ch[i] == '#' && allow_count)
                 continue; // don't show a button for '#'; has Count box instead
             QString button_name = QString(visctrl((char) ch[i].cell()));
-            if (is_yn || is_ynq || is_lr) {
+            if (is_yn || is_ynq || is_ynaq || is_lr) {
+                // FIXME: a better way to recognize which labels should
+                // use alterate text is needed
                 switch (ch[i].cell()) {
                 case 'y':
                     button_name = "Yes";
@@ -191,13 +197,28 @@ char NetHackQtYnDialog::Exec()
                 case 'n':
                     button_name = "No";
                     break;
-                case 'q':
-                    // FIXME: sometimes the 'q' choice is ''cancel current
-                    // action'' but other times it is actually 'quit'.
-                    if (question.left(10) == QString("Dump core?"))
-                        button_name = "Quit";
+                case 'a':
+                    // the display of vanquished monsters uses "ynaq" for
+                    // convenience, where 'a' requests a sort-by menu;
+                    // show "sort" instead of "all" and allow player to
+                    // type either 'a' or 's' when not clicking on button
+                    if (question.contains(QString("vanquished?")))
+                        button_name = "Sort", AltChoice('s', 'a');
                     else
-                        button_name = "Cancel";
+                        button_name = "All";
+                    break;
+                case 'q':
+                    // most 'q' replies are actually for "cancel" but
+                    // for "ynaq" (where "all" is a choice) it's "stop"
+                    // and for end of game disclosure it really is "quit"
+                    if (question.left(10) == QString("Dump core?")
+                        || (::g.program_state.gameover
+                            && question.left(11) == QString("Do you want")))
+                        button_name = "Quit";
+                    else if (is_ynaq)
+                        button_name = "Stop", AltChoice('s', 'q');
+                    else
+                        button_name = "Cancel", AltChoice('c', 'q');
                     break;
                 case 'l':
                     button_name = "Left";
@@ -286,7 +307,10 @@ char NetHackQtYnDialog::Exec()
         if (res == 0) {
             choice = is_lr ? '\033' : ch_esc ? ch_esc : def ? def : ' ';
         } else if (res == 1) {
-            choice = def ? def : ch_esc ? ch_esc : ' ';
+            if (keypress)
+                choice = keypress;
+            else
+                choice = def ? def : ch_esc ? ch_esc : ' ';
         } else if (res >= 1000) {
             choice = (char) ch[res - 1000].cell();
         }
@@ -319,23 +343,33 @@ char NetHackQtYnDialog::Exec()
     return keypress;
 }
 
+void NetHackQtYnDialog::AltChoice(char ans, char res)
+{
+    if (ans && !strchr(alt_answer, ans)) {
+        (void) strkitten(alt_answer, ans);
+        (void) strkitten(alt_result, res);
+    }
+}
+
 void NetHackQtYnDialog::keyPressEvent(QKeyEvent* event)
 {
+    keypress = '\0';
     QString text(event->text());
-    if (text.isEmpty() && event->modifiers())
+    if (text.isEmpty())  /* && event->modifiers()) */
         return;
 
-    if (!choices || !*choices) {
-	if (!text.isEmpty()) {
-	    keypress = text.toUcs4()[0];
-            this->done(1);
-	}
+    keypress = text.at(0).cell();
+    char *p = NULL;
+    if (*alt_answer && (p = strchr(alt_answer, keypress)) != 0)
+        keypress = alt_result[p - alt_answer];
+
+    if (!choices || !*choices || !keypress) {
+        this->done(1);
 
     } else {
-	int where = QString::fromLatin1(choices).indexOf(text);
+	int where = QString::fromLatin1(choices).indexOf(QChar(keypress));
 
-        if (where != -1 && allow_count
-            && strchr("#0123456789", text[0].cell())) {
+        if (allow_count && strchr("#0123456789", keypress)) {
             if (text == "#") {
                 // 0 will be preselected; typing anything replaces it
                 le->setText(QString("0"));
@@ -347,7 +381,18 @@ void NetHackQtYnDialog::keyPressEvent(QKeyEvent* event)
             }
             // (don't know whether this actually does anything useful)
             le->setAttribute(Qt::WA_KeyboardFocusChange, true);
+            // this is definitely useful...
             le->setFocus(Qt::ActiveWindowFocusReason);
+            //
+            // TODO: 'No' is highlighted as default for result if player
+            // types <return>, but once count entry starts that should
+            // be changed because this LineEdit dialog has now become
+            // the defacto default.  We can't just turn off the default
+            // setting for the 'No' button because <return> only works
+            // if there is a default explicitly set.  Unfortunately the
+            // LineEdit widget isn't a viable candidate for that because
+            // it isn't a button.  [Maybe just highlight 'Yes' instead?]
+            //
 
 	} else if (where != -1) {
             this->done(where + 1000);
