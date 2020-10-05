@@ -183,13 +183,6 @@ LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
 #without winshim
 override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
-libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
-	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
-	@echo "$@ built."
-libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o$@ $<
-winshim.o : ../win/shim/winshim.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
 
 WANT_BUNDLE=1
@@ -301,6 +294,15 @@ VARDIR=$(HACKDIR)
 #-INCLUDE cross-pre.2020
 #
 #-POST
+ifdef WANT_LIBNH
+libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	@echo "$@ built."
+libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+winshim.o : ../win/shim/winshim.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+endif  # WANT_LIBNH
 
 ifdef MAKEFILE_TOP
 ###
