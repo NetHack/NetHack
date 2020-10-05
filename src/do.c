@@ -1984,8 +1984,8 @@ long timeout UNUSED;
 
 boolean
 cmd_safety_prevention(cmddesc, act, flagcounter)
-char *cmddesc;
-char *act;
+const char *cmddesc;
+const char *act;
 int *flagcounter;
 {
     if (flags.safe_wait && !iflags.menu_requested
