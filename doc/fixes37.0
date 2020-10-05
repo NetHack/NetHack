@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1601600393 2020/10/02 00:59:53 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.321 $ $NHDT-Date: 1601940384 2020/10/05 23:26:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -430,6 +430,9 @@ Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
 Qt: tried to honor 'showexp' but the value was unintentionally suppressed by
 	[lack of definition for] obsolete conditional EXP_ON_BOTL
 Qt: implement --More-- prompt to support MSGTYPE=stop
+Qt: for menu search, don't require clicking on the search target popup before
+	typing target string (was using typed letters to make menu selections
+	if player didn't click on the popup first)
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

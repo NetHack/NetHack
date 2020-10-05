@@ -6,8 +6,6 @@
 
 //
 // TODO:
-//  search behaves weirdly unless you click in the line-edit dialog box
-//    after clicking on the [search] button to pop that up;
 //  implement next_page, prev_page, first_page, and last_page to work
 //    like they do for X11:  scroll menu window as if it were paginated;
 //  entering a count that uses more digits than the previous biggest count
