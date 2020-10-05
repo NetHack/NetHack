@@ -161,7 +161,7 @@ $(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
 	$(TARGET_LINK) $(TARGET_LFLAGS) $(TARGETPFX)recover.o -o $@
 endif  # CROSS_SHARED
 #
-ifdef BUILD_LUA
+ifdef BUILD_TARGET_LUA
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
 	if [ -f $@ ]; then rm $@; fi;
@@ -206,7 +206,7 @@ $(TARGETPFX)lundump.o : $(LUATOP)/src/lundump.c
 $(TARGETPFX)lutf8lib.o : $(LUATOP)/src/lutf8lib.c
 $(TARGETPFX)lvm.o : $(LUATOP)/src/lvm.c
 $(TARGETPFX)lzio.o : $(LUATOP)/src/lzio.c
-endif  # BUILD_LUA
+endif  # BUILD_TARGET_LUA
 
 ifdef BUILD_PDCURSES
 ifdef WANT_WIN_CURSES

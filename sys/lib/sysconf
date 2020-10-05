@@ -146,5 +146,6 @@ PANICTRACE_LIBC=0
 # option settings via NETHACKOPTIONS in their environment or via
 # ~/.nethackrc run-time configuration file.
 #OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
+OPTIONS=perm_invent
 
 #eof

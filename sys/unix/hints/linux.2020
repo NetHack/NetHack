@@ -166,10 +166,15 @@ VARDATND += $(sort $(VARDATND0))
 
 ifdef WANT_LIBNH
 CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
-WINOBJ = winshim.o
+LIBNHSYSSRC = ../sys/lib/libnethackmain.c \
+		../sys/share/ioctl.c ../sys/share/unixtty.c \
+		../sys/unix/unixunix.c ../sys/unix/unixres.c \
+		../win/shim/winshim.c
+LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
+                unixres.o winshim.o
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
-libnethack.a: $(HOBJ) $(SYSOBJ) $(WINOBJ) ../lib/lua/liblua.a
-	$(AR) rcs $@ $(HOBJ) $(WINOBJ) ../lib/lua/liblua.a
+libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
 winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<

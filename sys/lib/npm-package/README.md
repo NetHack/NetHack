@@ -15,6 +15,11 @@ The main module returns a setup function: `startNethack(uiCallback, moduleOption
 * `moduleOptions` - An optional [emscripten Module object](https://emscripten.org/docs/api_reference/module.html) for configuring the WASM that will be run.
   * `Module.arguments` - Of note is the [arguments property](https://emscripten.org/docs/api_reference/module.html#Module.arguments) which gets passed to NetHack as its [command line parameters](https://nethackwiki.com/wiki/Options).
 
+There are a number of auxilary functions and variables that may help with building your applications. All of these are under `globalThis.nethackOptions`. Use `console.log(globalThis.nethackOptions)` for a full list of options. Some worth mentioning are:
+* `globalThis.nethackOptions.helpers` - Helper functions that are useful for NetHack windowing ports
+  * `globalThis.nethackOptions.mapglyphHelper` - Converts an integer glyph into a character to be displayed. Useful if you are using ASCII characters for representing NetHack (as opposed to tiles). Interface is `mapglyphHelper(glyph, x, y, mgflags)` and will typically be called as part of the `shim_print_glyph` function.
+* `globalThis.nethackOptions.constants` - A Object full of constants that are `#define`'d in NetHack's C code. Useful for translating to / from numbers in the APIs and return values.
+
 ## Example
 ``` js
 let nethackStart = require("nethack");

@@ -1,6 +1,6 @@
 {
   "name": "@neth4ck/neth4ck",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The original NetHack rogue-like game built as a WebAssembly module",
   "main": "src/nethackShim.js",
   "scripts": {
@@ -13,7 +13,12 @@
     "nethack",
     "rogue",
     "rogue-like",
-    "game"
+    "roguelike",
+    "dungeon",
+    "dungeons",
+    "game",
+    "rpg",
+    "dnd"
   ],
   "author": "Adam Powers <apowers@ato.ms>",
   "license": "SEE LICENSE IN LICENSE.md"
