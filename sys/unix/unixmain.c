@@ -45,17 +45,7 @@ static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
 static struct passwd *NDECL(get_unix_pw);
 
-#if defined(CROSSCOMPILE_TARGET) && defined(CROSS_TO_WASM)
-/* for cross-compiling to WebAssembly (WASM) */
-#include <emscripten/emscripten.h>
-/* if WebAssembly, export this API and don't optimize it out */
-#define KEEP EMSCRIPTEN_KEEPALIVE
-#else
-#define KEEP
-#endif
-
-
-int KEEP
+int
 main(argc, argv)
 int argc;
 char *argv[];
