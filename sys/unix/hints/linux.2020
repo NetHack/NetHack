@@ -172,10 +172,15 @@ LIBNHSYSSRC = ../sys/lib/libnethackmain.c \
 		../win/shim/winshim.c
 LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
                 unixres.o winshim.o
+#don't bother building the game executable as it will fail
+#without winshim
+override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
 libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
+libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
 winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # BUILD_LIBNH
