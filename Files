@@ -220,15 +220,19 @@ zap.c
 
 sys/lib:
 (files in top directory)
-README.md  sysconf
+README.md         libnethackmain.c  sysconf
 
 sys/lib/npm-package:
 (files in top directory)
-LICENSE.md    README.md     package.json
+LICENSE.md         README.md          package-lock.json  package.json
 
 sys/lib/npm-package/src:
 (file in top directory)
 nethackShim.js
+
+sys/lib/npm-package/test:
+(file in top directory)
+test.js
 
 sys/lib/test:
 (files in top directory)
