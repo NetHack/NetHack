@@ -5,7 +5,7 @@
 #
 
 ifdef CROSS_TO_MSDOS
-BUILD_LUA=1
+BUILD_TARGET_LUA=1
 BUILD_PDCURSES=1
 CROSS_SHARED=1
 override TARGET = msdos
@@ -15,7 +15,7 @@ override TARGET_LIBS=
 endif
 
 ifdef CROSS_TO_AMIGA
-BUILD_LUA=1
+BUILD_TARGET_LUA=1
 BUILD_PDCURSES=1
 CROSS_SHARED=1
 override TARGET = amiga
@@ -25,14 +25,14 @@ override TARGET_LIBS=
 endif
 
 ifdef CROSS_TO_WASM
-BUILD_LUA=1
+BUILD_TARGET_LUA=1
 override TARGET = wasm
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS= 
 endif
 
-ifdef BUILD_LUA
+ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
 # Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
@@ -65,7 +65,7 @@ BUILDMORE += $(LUACROSSLIB)
 override TARGET_LIBS += $(LUACROSSLIB) -lm
 else
 LUAINCL=
-endif  # BUILD_LUA
+endif  # BUILD_TARGET_LUA
 
 ifdef BUILD_PDCURSES
 #===============-=================================================
@@ -333,11 +333,11 @@ override TARGET_CFLAGS = $(EMCC_CFLAGS) -c \
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
 override TARGET_LFLAGS= $(EMCC_LFLAGS)
-override SYSSRC = ../sys/unix/unixmain.c \
+override SYSSRC = ../sys/lib/libnethackmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-override SYSOBJ= $(TARGETPFX)unixmain.o \
+override SYSOBJ= $(TARGETPFX)libnethackmain.o \
 		$(TARGETPFX)ioctl.o $(TARGETPFX)unixtty.o \
 		$(TARGETPFX)unixunix.o $(TARGETPFX)unixres.o \
 		$(TARGETPFX)winshim.o
@@ -353,6 +353,9 @@ PREGAME = mkdir -p $(TARGETDIR)
 CLEANMORE += rm -f -r $(TARGETDIR)
 # Rule for file in sys/unix
 $(TARGETPFX)%.o : ../sys/unix/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
+# Rule for file in sys/lib
+$(TARGETPFX)%.o : ../sys/lib/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
 # Rule for files in win/shim
 $(TARGETPFX)%.o : ../win/shim/%.c
@@ -377,11 +380,11 @@ $(TARGETPFX)%.o : ../util/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
 endif  # CROSS_SHARED
 
-ifdef BUILD_LUA
+ifdef BUILD_TARGET_LUA
 # Rule for LUA files
 $(TARGETPFX)%.o : $(LUATOP)/src/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) $(LUA_FLAGS) -o$@ $<
-endif  # BUILD_LUA
+endif  # BUILD_TARGET_LUA
 #
 # End of cross-compiling -PRE section
 #===============-=================================================
