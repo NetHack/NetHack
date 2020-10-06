@@ -382,23 +382,23 @@ ifdef WANT_WIN_CURSES
 ifdef BUILD_PDCURSES
 # Rules for PDCurses files
 $(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
-	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
+	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -c -o$@  $<
 endif  # BUILD_PDCURSES
 endif  # WANT_WIN_CURSES
 
 ifdef CROSS_SHARED
 # Rules for win/share files
 $(TARGETPFX)%.o : ../win/share/%.c
-	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
 # Rules for util files heading for target
 $(TARGETPFX)%.o : ../util/%.c
-	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
 endif  # CROSS_SHARED
 
 ifdef BUILD_TARGET_LUA
 # Rule for LUA files
 $(TARGETPFX)%.o : $(LUATOP)/src/%.c
-	$(TARGET_CC) $(TARGET_CFLAGS) $(LUA_FLAGS) -o$@ $<
+	$(TARGET_CC) $(TARGET_CFLAGS) -c $(LUA_FLAGS) -o$@ $<
 endif  # BUILD_TARGET_LUA
 #
 # End of cross-compiling -PRE section
