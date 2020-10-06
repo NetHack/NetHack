@@ -5,6 +5,7 @@
 #
 
 ifdef CROSS_TO_MSDOS
+CROSS=1
 BUILD_TARGET_LUA=1
 BUILD_PDCURSES=1
 CROSS_SHARED=1
@@ -15,6 +16,7 @@ override TARGET_LIBS=
 endif
 
 ifdef CROSS_TO_AMIGA
+CROSS=1
 BUILD_TARGET_LUA=1
 BUILD_PDCURSES=1
 CROSS_SHARED=1
@@ -25,11 +27,18 @@ override TARGET_LIBS=
 endif
 
 ifdef CROSS_TO_WASM
+CROSS=1
 BUILD_TARGET_LUA=1
 override TARGET = wasm
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS= 
+endif
+
+ifdef CROSS
+override PREGAME=
+override CLEANMORE=
+override PACKAGE=
 endif
 
 ifdef BUILD_TARGET_LUA
@@ -61,7 +70,8 @@ LUAOBJFILES4 =  $(TARGETPFX)lstring.o $(TARGETPFX)lstrlib.o \
 LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
 LUACROSSLIB = $(TARGETPFX)lua$(subst .,,$(LUA_VERSION)).a
 LUAINCL  = -I$(LUASRCDIR)
-BUILDMORE += $(LUACROSSLIB)
+override BUILDMORE += $(LUACROSSLIB) ;
+override CLEANMORE += rm -f $(LUACROSSLIB) ;
 override TARGET_LIBS += $(LUACROSSLIB) -lm
 else
 LUAINCL=
@@ -110,7 +120,8 @@ ifdef CROSS_TO_AMIGA
 PDCINCL += -I$(PDCTOP)/sdl1 -I/opt/amiga/m68k-amigaos/include/SDL
 override TARGET_LIBS += -lSDL
 endif
-BUILDMORE += $(PDCLIB)
+override BUILDMORE += $(PDCLIB) ;
+override CLEANMORE += rm -f $(PDCLIB) ;
 # Rules for PDCurses files
 $(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
 	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
@@ -173,10 +184,10 @@ override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
 override WINLIB=
 override LUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
-override PACKAGE= dospkg
+override PACKAGE = dospkg
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -f -r $(TARGETDIR) ;
 VARDATND += nhtiles.bmp
-PREGAME = mkdir -p $(TARGETDIR)
-CLEANMORE += rm -f -r $(TARGETDIR)
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
@@ -262,9 +273,9 @@ override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
 override WINLIB=
 override LUALIB=
 override GAMEBIN = $(TARGETPFX)nethack
-override PACKAGE= amigapkg
-PREGAME = mkdir -p $(TARGETDIR)
-CLEANMORE += rm -r $(TARGETDIR)
+override PACKAGE = amigapkg
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -r $(TARGETDIR) ;
 #		../util/txt2iff
 #
 ifdef WANT_WIN_CURSES
@@ -284,9 +295,10 @@ ifdef CROSS_TO_WASM
 # originally from https://github.com/NetHack/NetHack/pull/385
 #===============-=================================================
 #
-WASM_DATA_DIR = $(TARGETPFX)wasm-data/
+WASM_DATA_DIR = $(TARGETPFX)wasm-data
 WASM_TARGET = $(TARGETPFX)nethack.js
-EMCC_LFLAGS = -s SINGLE_FILE=1
+EMCC_LFLAGS =
+#EMCC_LFLAGS += -s SINGLE_FILE=1
 EMCC_LFLAGS += -s WASM=1
 EMCC_LFLAGS += -s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS += -s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
@@ -303,7 +315,7 @@ EMCC_LFLAGS += --embed-file $(WASM_DATA_DIR)
 # WASM C flags
 EMCC_CFLAGS=
 EMCC_CFLAGS += -Wall
-EMCC_CFLAGS += -Werror
+#EMCC_CFLAGS += -Werror
 #EMCC_CFLAGS += -s DISABLE_EXCEPTION_CATCHING=0
 EMCC_DEBUG_CFLAGS += -s ASSERTIONS=1
 #EMCC_DEBUG_CFLAGS += -s ASSERTIONS=2
@@ -325,7 +337,7 @@ endif
 override TARGET_CC = emcc
 override TARGET_CXX = emcc
 override TARGET_AR = emar
-override TARGET_CFLAGS = $(EMCC_CFLAGS) -c \
+override TARGET_CFLAGS = $(EMCC_CFLAGS) \
 	-I../include \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) \
 	-DNOTTYGRAPHICS -DSHIM_GRAPHICS -DDEFAULT_WINDOW_SYS=\"shim\" \
@@ -343,14 +355,17 @@ override SYSOBJ= $(TARGETPFX)libnethackmain.o \
 		$(TARGETPFX)winshim.o
 override WINLIB = emranlib 
 override LUALIB=
-override PACKAGE= wasmpkg
 override REGEXOBJ = $(TARGETPFX)posixregex.o
+override WINOBJ=
+#override INSTDIR = $(WASM_DATA_DIR)
+#override PACKAGE= wasmpkg
+#override MOREALL = ( cd src ; $(MAKE) $(WASM_TARGET) )
+override GAME=
+override ALLDEP = wasm
+override PREGAME += mkdir -p $(TARGETDIR)/wasm-data ;
+override CLEANMORE += rm -rf $(TARGETDIR) ;
 RANLIB=$(EMRANLIB)
 #VARDATND += nhtiles.bmp
-override GAME=
-MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(WASM_TARGET) )
-PREGAME = mkdir -p $(TARGETDIR)
-CLEANMORE += rm -f -r $(TARGETDIR)
 # Rule for file in sys/unix
 $(TARGETPFX)%.o : ../sys/unix/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
