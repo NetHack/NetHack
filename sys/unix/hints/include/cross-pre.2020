@@ -37,6 +37,7 @@ endif
 
 ifdef CROSS
 override PREGAME=
+override BUILDMORE=
 override CLEANMORE=
 override PACKAGE=
 endif
@@ -70,7 +71,7 @@ LUAOBJFILES4 =  $(TARGETPFX)lstring.o $(TARGETPFX)lstrlib.o \
 LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
 LUACROSSLIB = $(TARGETPFX)lua$(subst .,,$(LUA_VERSION)).a
 LUAINCL  = -I$(LUASRCDIR)
-override BUILDMORE += $(LUACROSSLIB) ;
+override BUILDMORE += $(LUACROSSLIB)
 override CLEANMORE += rm -f $(LUACROSSLIB) ;
 override TARGET_LIBS += $(LUACROSSLIB) -lm
 else
@@ -120,7 +121,7 @@ ifdef CROSS_TO_AMIGA
 PDCINCL += -I$(PDCTOP)/sdl1 -I/opt/amiga/m68k-amigaos/include/SDL
 override TARGET_LIBS += -lSDL
 endif
-override BUILDMORE += $(PDCLIB) ;
+override BUILDMORE += $(PDCLIB)
 override CLEANMORE += rm -f $(PDCLIB) ;
 # Rules for PDCurses files
 $(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
