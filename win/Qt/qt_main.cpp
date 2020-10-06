@@ -990,6 +990,13 @@ void NetHackQtMainWindow::doKeys(const QString& k)
     qApp->exit();
 }
 
+// ENHANCED_PAPERDOLL - player clicked on PaperDoll window
+void NetHackQtMainWindow::DollClickToKeys(const char *cmds)
+{
+    keysink.Put(cmds);
+    qApp->exit();
+}
+
 void NetHackQtMainWindow::AddMessageWindow(NetHackQtMessageWindow* window)
 {
     message=window;
