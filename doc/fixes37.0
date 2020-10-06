@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.322 $ $NHDT-Date: 1602002574 2020/10/06 16:42:54 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ $NHDT-Date: 1602022805 2020/10/06 22:20:05 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -569,6 +569,7 @@ Qt: draw a border around each tile in the paper doll inventory; when BUC is
 Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
 	and worn items plus tools [lamps, leashes] actively in use; in other
 	words, same set of things whose tiles are used to populate the doll)
+Qt: clicking on the status window runs the #attributes command (^X)
 
 
 NetHack Community Patches (or Variation) Included
