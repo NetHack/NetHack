@@ -20,6 +20,7 @@ extern "C" {
 #include "qt_post.h"
 #include "qt_inv.h"
 #include "qt_glyph.h"
+#include "qt_main.h"
 #include "qt_set.h"
 
 namespace nethack_qt_ {
@@ -52,12 +53,14 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter& painter, obj* nhobj,
 
     if (nhobj) {
         border = BORDER_DEFAULT;
+#ifdef ENHANCED_PAPERDOLL
         if (Role_if('P') && !Blind)
             nhobj->bknown = 1;
         if (nhobj->bknown)
             border = nhobj->cursed ? BORDER_CURSED
                      : !nhobj->blessed ? BORDER_UNCURSED
                        : BORDER_BLESSED;
+#endif
         glyph = obj_to_glyph(nhobj, rn2_on_display_rng);
     } else {
         border = NO_BORDER;
@@ -153,7 +156,7 @@ QSize NetHackQtInvUsageWindow::sizeHint(void) const
             h = (1 + qt_settings->dollHeight + 1) * 6;
         }
 #else
-        if (iflags.wc_tiles_map) {
+        if (iflags.wc_tiled_map) {
             w = (1 + qt_settings->glyphs().width() + 1) * 3;
             h = (1 + qt_settings->glyphs().height() + 1) * 6;
         }
@@ -162,6 +165,20 @@ QSize NetHackQtInvUsageWindow::sizeHint(void) const
     } else {
 	return QWidget::sizeHint();
     }
+}
+
+// ENHANCED_PAPERDOLL - clicking on the PaperDoll runs #seeall
+void NetHackQtInvUsageWindow::mousePressEvent(QMouseEvent *event UNUSED)
+{
+#ifdef ENHANCED_PAPERDOLL
+    char cmdbuf[32];
+    Strcpy(cmdbuf, "#");
+    (void) cmdname_from_func(doprinuse, &cmdbuf[1], FALSE);
+    // queue up #seeall as if user had typed it; we don't execute doprinuse()
+    // directly because the program might not be ready for the next command
+    QWidget *main = NetHackQtBind::mainWidget();
+    (static_cast <NetHackQtMainWindow *> (main))->DollClickToKeys(cmdbuf);
+#endif
 }
 
 } // namespace nethack_qt_

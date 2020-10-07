@@ -399,11 +399,14 @@ struct savefile_info {
 #ifdef UNIX
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
+#if !defined(CROSS_TO_WASM)
 #ifndef PANICTRACE
 #define PANICTRACE
-#endif
-#endif
-#endif
+#endif  /* PANICTRACE */
+#endif  /* CROSS_TO_WASM */
+#endif  /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
+#endif  /* UNIX */
+
 /* The following are meaningless if PANICTRACE is not defined: */
 #if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
 #define PANICTRACE_LIBC
@@ -412,7 +415,9 @@ struct savefile_info {
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX
+#if !defined(CROSS_TO_WASM) /* no popen in WASM */
 #define PANICTRACE_GDB
+#endif
 #endif
 
 /* Supply nethack_enter macro if not supplied by port */

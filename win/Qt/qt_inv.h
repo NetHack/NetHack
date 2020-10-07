@@ -16,6 +16,9 @@ public:
 	virtual void paintEvent(QPaintEvent*);
 	virtual QSize sizeHint(void) const;
 
+protected:
+	virtual void mousePressEvent(QMouseEvent *event);
+
 private:
 	void drawWorn(QPainter& painter, obj*, int x, int y, bool canbe=true);
 };

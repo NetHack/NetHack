@@ -142,8 +142,8 @@ matrix:
       dist: focal
       compiler: gcc
       script:
-        - export
-        - export GCCVER=gcc550
+#        - export
+#        - export GCCVER=gcc550
         - export GCCVER=gcc1010
         - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
         - make fetch-lua

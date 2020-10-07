@@ -389,7 +389,7 @@
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
 
-#ifdef MACOSX
+#if defined(MACOSX) && !defined(LIBNH)
 # define RUNTIME_PASTEBUF_SUPPORT
 #endif
 

@@ -1,4 +1,4 @@
-Cross-compiling NetHack 3.7 Last edit: September 29, 2020
+Cross-compiling NetHack 3.7 Last edit: October 6, 2020
 
 The NetHack 3.7 build process differs from the build process of previous
 versions in some important ways that make it possible to use a cross-compiler
@@ -18,6 +18,7 @@ Part B Contents:
     B3. What needs to be built for the TARGET?
     B4. Case sample: msdos
     B5. Case sample: amiga (started but incomplete)
+    B6. Case sample: Web Assembly, libnethack
 
 --------------------------------------------------------------------------------
  Part A - Cross-compiling NetHack
@@ -611,5 +612,79 @@ Cross-compiler url:      https://github.com/bebbo/amiga-gcc
 
     If you make headway, or are successful getting a working copy of
     NetHack going on the amiga, drop us a note at devteam@nethack.org.
+
+  +--------------------------------+
+  | B6. Case sample: Web Assembly  |
+  +--------------------------------+
+
+Credit: The initial Web Assembly cross compile was found in a pull request:
+            https://github.com/NetHack/NetHack/pull/385
+        by apowers313. The pull request was merged with some accompanying
+        NetHack source tree integration changes in early October 2020.
+
+Cross-compiler used: emscripten
+Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
+
+    Here's a brief guide to obtaining the cross-compiler sources via git and
+    building it on your system.
+
+    For Ubuntu, the build prerequisite packages for building the compiler can
+    be easily obtained:
+
+        sudo apt-get install python3 cmake default-jre
+
+    For macOS, you will need to install Xcode, git, cmake, Python 3.5 or new
+    (at time of this writing).
+
+    After installing the prerequite packages above, obtain the cross-compiler
+    via git and build it from the directory of your choice using steps similar
+    to these:
+
+            git clone https://github.com/emscripten-core/emsdk.git
+            cd emsdk
+            git pull
+            ./emsdk install latest
+            ./emsdk activate latest
+            source ./emsdk_env.sh
+
+    The steps above reflect what was outlined at this url at the time
+    of writing:
+
+            https://emscripten.org/docs/getting_started/downloads.html
+
+    That is the definitive source and trumps anything documented here.
+
+    On your linux host, prepare to cross-compile NetHack as follows:
+
+        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        make fetch-lua
+
+    On your macOS host, prepare to cross-compile NetHack as follows:
+
+        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        make fetch-lua
+
+    Then, cross-compile to targets/wasm as follows:
+
+        make CROSS_TO_WASM=1
+
+    You can build src/nethacklib.a from pull request 385 as follows:
+
+        make WANT_LIBNH=1
+
+    Do not add any additional windowport interfaces to your build
+    (such as WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_WIN_X11=1 or
+    WANT_WIN_QT=1) as those aren't applicable to the Web Assembly
+    or nethacklib builds. A "shim" pseudo-windowport is included
+    from pull request 385.
+
+    Result: As mentioned, the wasm cross-compile will end up in 
+            targets/wasm and the nethacklib.a will end up
+            src.
+
+    The cross-compiler hints additions are enclosed inside ifdef sections
+    and shouldn't interfere with the non-cross-compile builds using
+    hints/linux.2020 or hints/macOS.2020.
+
 ---
 

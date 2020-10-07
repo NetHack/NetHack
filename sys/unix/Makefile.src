@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1600904413 2020/09/23 23:40:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1601854487 2020/10/04 23:34:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -300,6 +300,12 @@ WINGNOMEOBJ =
 WINGEMSRC =
 WINGEMOBJ =
 
+# Files for Shim windowing interface for libnethack -- doesn't do anything,
+# just passes along the API calls to the library
+#
+WINSHIMSRC = ../win/shim/winshim.c
+WINSHIMOBJ = winshim.o
+
 #
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
@@ -419,9 +425,9 @@ GAMEBIN = $(GAME)
 # RANDOBJ = $(TARGETPFX)random.o
 RANDOBJ =
 
-
 # used by `make depend' to reconstruct this Makefile; you shouldn't need this
-AWK	= nawk
+# at all but can override with 'make AWK=nawk' or 'make AWK=gawk' if necessary
+AWK	= awk
 
 # when using 'makedefs -v', also force dat/gitinfo.txt to be up to date;
 # changing this to 0 will change the behavior to only make that file if
@@ -481,6 +487,13 @@ AT_V1 := @
 AT = $(AT_V$(QUIETCC))
 # Verbosity, end
 
+# verbosity-adjacent; these will already have 'real' values if hints have
+# set up cross-compiling, in which case these assignments will be no-ops
+PREGAME=@true
+CLEANMORE=@true
+PACKAGE=@true
+
+
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
@@ -524,7 +537,7 @@ SYSCXXSRC = ../sys/share/cppregex.cpp
 GENCSRC = vis_tab.c	#tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) $(WINSHIMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
@@ -609,7 +622,7 @@ all:	$(GAME)
 	@echo ""
 
 pregame:
-	true; $(PREGAME)
+	$(PREGAME)
 
 $(GAME):	pregame $(SYSTEM)
 	@echo "$(GAME) is up to date."
@@ -784,7 +797,7 @@ tags: $(CSOURCES)
 
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
-	true; $(CLEANMORE)
+	$(CLEANMORE)
 
 spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*
@@ -794,7 +807,7 @@ spotless: clean
 	-rm -f ../win/gnome/gn_rip.h
 
 package:
-	true; $(PACKAGE)
+	$(PACKAGE)
 	@echo packaging complete.
 
 depend: ../sys/unix/depend.awk \

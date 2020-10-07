@@ -164,6 +164,19 @@ WINOBJ = $(sort $(WINOBJ0))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
 
+ifdef WANT_LIBNH
+CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
+LIBNHSYSSRC = ../sys/lib/libnethackmain.c \
+		../sys/share/ioctl.c ../sys/share/unixtty.c \
+		../sys/unix/unixunix.c ../sys/unix/unixres.c \
+		../win/shim/winshim.c
+LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
+                unixres.o winshim.o
+#don't bother building the game executable as it will fail
+#without winshim
+override GAME=
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
+endif  # WANT_LIBNH
 
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
@@ -210,4 +223,14 @@ GAMEPERM = 0755
 #-POST
 #
 #-INCLUDE cross-post.2020
+#
+ifdef WANT_LIBNH
+libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	@echo "$@ built."
+libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+winshim.o : ../win/shim/winshim.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+endif  # WANT_LIBNH
 #

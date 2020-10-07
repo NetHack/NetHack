@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{August 5, 2020}
+\date{October 2, 2020}
 
 \maketitle
 
@@ -769,7 +769,8 @@ location other than the current position.
 %.lp
 \item[\tb{.}]
 Wait or rest, do nothing for one turn. Precede with the `{\tt m}' prefix
-to wait for a turn even next to a hostile monster.
+to wait for a turn even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.
 %.lp
 \item[\tb{a}]
 Apply (use) a tool (pick-axe, key, lamp \ldots).\\
@@ -968,7 +969,8 @@ Redraw the screen.
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
 Precede with the `{\tt m}' prefix to wait for a turn
-even next to a hostile monster.\\
+even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.\\
 %.lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent ``remembered, unseen monster'' marker.
@@ -2838,7 +2840,7 @@ That's done implicitly to avoid unnecessary tedium.
 
 %.pg
 The commands to use rings are `{\tt P}' (put on) and `{\tt R}' (remove).
-`{\tt A|', `{\tt W}', and `{\tt T}' can also be used; see {\it Amulets\/}.
+`{\tt A}', `{\tt W}', and `{\tt T}' can also be used; see {\it Amulets\/}.
 
 %.hn 2
 \subsection*{Spellbooks (`{\tt +}')}
@@ -3171,7 +3173,7 @@ diagonally.
 Other rules can, such as not smashing boulders with magic or tools,
 but doing so causes you to receive a luck penalty.
 No message about that is given at the time, but it is tracked as a conduct.
-The #conduct command and end of game disclosure will report whether
+The {\tt \#conduct} command and end of game disclosure will report whether
 you have abided by the special rules of Sokoban, and if not, how many
 times you violated them, providing you with a way to discover which
 actions incur bad luck so that you can be better informed about whether
@@ -3288,7 +3290,7 @@ Losing enough levels to revert to lower rank(s) does not discard the
 corresponding achievement(s).
 
 %.pg
-The ``special items'' hidden in {\it Mines'~End\/} and (\it Sokoban\/}
+The ``special items'' hidden in {\it Mines'~End\/} and {\it Sokoban\/}
 are not unique but are considered to be prizes or rewards
 for exploring those levels since doing so is not necessary to complete
 the game.
@@ -3361,7 +3363,7 @@ Empty lines are ignored.
 
 Any line beginning with `{\tt [}' and ending in `{\tt ]}'
 is a section marker (the closing `{\tt ]}' can be followed
-by whitespace and then an arbitrary comment beginning with `{\tt #}').
+by whitespace and then an arbitrary comment beginning with `{\tt \#}').
 The text between the square brackets is the section name.
 Section markers are only valid after a CHOOSE directive and their names
 are case insensitive.
@@ -4307,6 +4309,10 @@ depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+%.lp
+\item[\ib{safe\verb+_+wait}]
+Prevents you from waiting or searching when next to a hostile monster
+(default on).  Persistent.
 %+.lp
 \item[\ib{sanity\verb+_+check}]
 Evaluate monsters, objects, and map prior to each turn (default off).

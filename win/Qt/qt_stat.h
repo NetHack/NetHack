@@ -27,6 +27,7 @@ public:
 	void fadeHighlighting();
 
 protected:
+	virtual void mousePressEvent(QMouseEvent *event);
 	//RLC void resizeEvent(QResizeEvent*);
 
 private slots:

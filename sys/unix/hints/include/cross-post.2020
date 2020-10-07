@@ -18,9 +18,9 @@ $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
-$(GAMEBIN) : $(HOBJ)
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-	$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
 #
 .PHONY: dospkg
 dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
@@ -81,9 +81,9 @@ $(TARGETPFX)monsters.iff: ../win/share/monsters.txt ../util/txt2iff
 	../util/txt2iff ../win/share/monsters.txt $@
 $(TARGETPFX)other.iff: ../win/share/other.txt ../util/txt2iff
 	../util/txt2iff ../win/share/other.txt $@
-$(GAMEBIN) : $(HOBJ)
+$(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-	$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
 #
 .PHONY: amigapkg
 amigapkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
@@ -119,6 +119,33 @@ amigapkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	@echo amiga package zip file $(TARGETPFX)NH370AMI.ZIP
 endif  # CROSS_TO_AMIGA
 
+ifdef CROSS_TO_WASM
+$(WASM_TARGET): pregame $(HOBJ) $(LUACROSSLIB) $(WASM_DATA_DIR)
+	-rm $@
+	$(TARGET_CC) $(TARGET_LFLAGS) $(TARGET_CFLAGS) -o $@ \
+		$(HOBJ) $(TARGET_LIBS)
+
+$(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
+	touch $(WASM_DATA_DIR)/perm
+	touch $(WASM_DATA_DIR)/record
+	touch $(WASM_DATA_DIR)/logfile
+	touch $(WASM_DATA_DIR)/xlogfile
+	cp ../sys/lib/sysconf $(WASM_DATA_DIR)/sysconf
+
+$(WASM_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dlb )
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
+endif  # CROSS_TO_WASM
+#
+
 ifdef CROSS_SHARED
 # shared file dependencies
 $(TARGETPFX)pcmain.o : ../sys/share/pcmain.c $(HACK_H)
@@ -133,7 +160,7 @@ $(TARGETPFX)recover.exe : $(TARGETPFX)recover.o
 	$(TARGET_LINK) $(TARGET_LFLAGS) $(TARGETPFX)recover.o -o $@
 endif  # CROSS_SHARED
 #
-ifdef BUILD_LUA
+ifdef BUILD_TARGET_LUA
 # Lua lib
 $(LUACROSSLIB): $(LUALIBOBJS)
 	if [ -f $@ ]; then rm $@; fi;
@@ -141,12 +168,9 @@ $(LUACROSSLIB): $(LUALIBOBJS)
 	$(TARGET_AR) rcS $@ $(LUAOBJFILES2)
 	$(TARGET_AR) rcS $@ $(LUAOBJFILES3)
 	$(TARGET_AR) rcs $@ $(LUAOBJFILES4)
-ifdef WANT_WIN_CURSES
-$(TARGETPFX)pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
-	if [ -f $@ ]; then rm $@; fi;
-	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
-endif
-#
+
+#	$(TARGET_AR) rcs $@ $(LUALIBOBJS)
+
 # Lua src
 $(TARGETPFX)lapi.o : $(LUATOP)/src/lapi.c
 $(TARGETPFX)lauxlib.o : $(LUATOP)/src/lauxlib.c
@@ -181,9 +205,14 @@ $(TARGETPFX)lundump.o : $(LUATOP)/src/lundump.c
 $(TARGETPFX)lutf8lib.o : $(LUATOP)/src/lutf8lib.c
 $(TARGETPFX)lvm.o : $(LUATOP)/src/lvm.c
 $(TARGETPFX)lzio.o : $(LUATOP)/src/lzio.c
-endif  # BUILD_LUA
+endif  # BUILD_TARGET_LUA
 
 ifdef BUILD_PDCURSES
+ifdef WANT_WIN_CURSES
+$(TARGETPFX)pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
+	if [ -f $@ ]; then rm $@; fi;
+	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
+endif
 # PDCurses src
 $(TARGETPFX)addch.o : $(PDCTOP)/pdcurses/addch.c
 $(TARGETPFX)addchstr.o : $(PDCTOP)/pdcurses/addchstr.c

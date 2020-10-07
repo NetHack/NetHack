@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ $NHDT-Date: 1601600393 2020/10/02 00:59:53 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ $NHDT-Date: 1602022805 2020/10/06 22:20:05 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -126,7 +126,8 @@ it's possible to wish for tins of the Riders in wizard mode; eating one is
 	fatal but if you're life-saved or decline to die, the game crashed
 revival via undead turning of corpse carried by hero said "your <mon> corpse
 	comes alive" even when revived monster was undead
-prevent searching or waiting next to a hostile monster - override with 'm'
+prevent searching or waiting next to a hostile monster if boolean option
+	safe_wait is on - override with 'm'
 allow random mimics to show up mimicing more furniture than just stairs
 scatter exploding bag of holding contents instead of outright deleting them
 male hero poly'd into nymph chooses charm vs seduce message based on being
@@ -429,6 +430,9 @@ Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
 Qt: tried to honor 'showexp' but the value was unintentionally suppressed by
 	[lack of definition for] obsolete conditional EXP_ON_BOTL
 Qt: implement --More-- prompt to support MSGTYPE=stop
+Qt: for menu search, don't require clicking on the search target popup before
+	typing target string (was using typed letters to make menu selections
+	if player didn't click on the popup first)
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
@@ -560,8 +564,12 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	act on it)
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
-Qt: draw a border around each tile in the paper door inventory; when BUC is
+Qt: draw a border around each tile in the paper doll inventory; when BUC is
 	known for a doll item, change the border's color and thicken it
+Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
+	and worn items plus tools [lamps, leashes] actively in use; in other
+	words, same set of things whose tiles are used to populate the doll)
+Qt: clicking on the status window runs the #attributes command (^X)
 
 
 NetHack Community Patches (or Variation) Included
@@ -596,6 +604,8 @@ fix the "stuck pets" issue (github #329)
 allow themed room subrooms to be filled (github #347)
 allow rereading spellbooks to refresh memory at any time (github #261)
 allow themed rooms constrained by level difficulty (github #344)
+add a varied form of LIBNH nethack library contribution (github #385)
+add cross-compile to WASM (github #385)
 
 
 Code Cleanup and Reorganization

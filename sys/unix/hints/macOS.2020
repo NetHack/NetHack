@@ -62,6 +62,7 @@ endif
 CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
 
 ifndef WANT_WIN_QT
+ifndef WANT_LIBNH
 #	these are normally used when compiling nethack's core
 CFLAGS+=-ansi -pedantic -Wno-long-long
 #	but -ansi forces -std=c90 for C or -std=c++98 for C++;
@@ -70,6 +71,8 @@ CFLAGS+=-ansi -pedantic -Wno-long-long
 #.../qt5/include/QtCore/qcompilerdetection.h:561:6:
 #  error Qt requires a C++11 compiler and yours does not seem to be that.
 #	so we suppress -ansi when the build includes Qt
+#LIBNH's winshim requires C99 for the way it is currently coded
+endif
 endif
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
@@ -168,6 +171,19 @@ WINOBJ = $(sort $(WINOBJ0))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
 
+ifdef WANT_LIBNH
+CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
+LIBNHSYSSRC = ../sys/lib/libnethackmain.c \
+		../sys/share/ioctl.c ../sys/share/unixtty.c \
+		../sys/unix/unixunix.c ../sys/unix/unixres.c \
+		../win/shim/winshim.c
+LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
+                unixres.o winshim.o
+#don't bother building the game executable as it will fail
+#without winshim
+override GAME=
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
+endif  # WANT_LIBNH
 
 WANT_BUNDLE=1
 ifdef WANT_SHARE_INSTALL
@@ -278,6 +294,15 @@ VARDIR=$(HACKDIR)
 #-INCLUDE cross-pre.2020
 #
 #-POST
+ifdef WANT_LIBNH
+libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+	@echo "$@ built."
+libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+winshim.o : ../win/shim/winshim.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $<
+endif  # WANT_LIBNH
 
 ifdef MAKEFILE_TOP
 ###

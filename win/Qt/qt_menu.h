@@ -129,6 +129,7 @@ private:
 	void AddRow(int row, const MenuItem& mi);
 	void WidenColumn(int column, int width);
         void PadMenuColumns(bool split_descr);
+        void MenuResize();
         void UpdateCountColumn(long newcount);
 
         void ClearSearch();

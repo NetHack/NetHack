@@ -19,8 +19,12 @@ private:
         bool allow_count;
         QLineEdit *le;
 
+        // abritrary size; might need to be more sophisicated someday
+        char alt_answer[26 + 1], alt_result[26 + 1];
+
 protected:
 	virtual void keyPressEvent(QKeyEvent*);
+        void AltChoice(char answer, char result);
 
 private slots:
 	void doneItem(int);

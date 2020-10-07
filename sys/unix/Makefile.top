@@ -94,8 +94,10 @@ DATNODLB = $(VARDATND) license symbols
 DATDLB = $(DATHELP) dungeon.lua tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
+ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+
 # first target is also the default target for 'make' without any arguments
-all:	$(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+all:    $(ALLDEP)
 	true; $(MOREALL)
 	@echo "Done."
 
@@ -204,6 +206,9 @@ check-dlb: options
 dlb:
 	( cd util ; $(MAKE) dlb )
 	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
+
+wasm:
+	( cd src ; $(MAKE) $(WASM_TARGET) )
 
 package: $(GAME) recover $(VARDAT) spec_levs
 	( cd src ;  $(MAKE) $(PACKAGE) )
@@ -318,7 +323,7 @@ clean:
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
-spotless::
+spotless:: clean
 	( cd src ; $(MAKE) spotless )
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )

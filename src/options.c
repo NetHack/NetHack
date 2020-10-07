@@ -5730,8 +5730,8 @@ int len;
    substring of a particular option name; option string might have
    a colon or equals sign and arbitrary value appended to it */
 boolean
-match_optname(user_string, opt_name, min_length, val_allowed)
-const char *user_string, *opt_name;
+match_optname(user_string, optn_name, min_length, val_allowed)
+const char *user_string, *optn_name;
 int min_length;
 boolean val_allowed;
 {
@@ -5741,7 +5741,7 @@ boolean val_allowed;
         len = length_without_val(user_string, len);
 
     return (boolean) (len >= min_length
-                      && !strncmpi(opt_name, user_string, len));
+                      && !strncmpi(optn_name, user_string, len));
 }
 
 void
