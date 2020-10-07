@@ -606,15 +606,8 @@ void NetHackQtStatusWindow::checkTurnEvents()
 // clicking on status window runs #attributes (^X)
 void NetHackQtStatusWindow::mousePressEvent(QMouseEvent *event UNUSED)
 {
-    // same code as NetHackQtInvUsageWindow::mousePressEvent except for func
-    char cmdbuf[32];
-    Strcpy(cmdbuf, "#");
-    (void) cmdname_from_func(doattributes, &cmdbuf[1], FALSE);
-    // queue up #attribues as if user had typed it; we don't execute
-    // doattributes() directly because the program might not be ready
-    // for a command right now
     QWidget *main = NetHackQtBind::mainWidget();
-    (static_cast <NetHackQtMainWindow *> (main))->DollClickToKeys(cmdbuf);
+    (static_cast <NetHackQtMainWindow *> (main))->FuncAsCommand(doattributes);
 }
 
 } // namespace nethack_qt_

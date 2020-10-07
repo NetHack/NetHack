@@ -270,6 +270,7 @@ make piranhas faster and give them extra bite attack
 fire sources can ignite candles, lamps, and potions of oil
 for multiple drop ('D') with menustyle traditional or combination, if the only
 	object class player picked was '$' then it operated on all classes
+small monsters could seep through their shirt
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -167,17 +167,12 @@ QSize NetHackQtInvUsageWindow::sizeHint(void) const
     }
 }
 
-// ENHANCED_PAPERDOLL - clicking on the PaperDoll runs #seeall
+// ENHANCED_PAPERDOLL - clicking on the PaperDoll runs #seeall ('*')
 void NetHackQtInvUsageWindow::mousePressEvent(QMouseEvent *event UNUSED)
 {
 #ifdef ENHANCED_PAPERDOLL
-    char cmdbuf[32];
-    Strcpy(cmdbuf, "#");
-    (void) cmdname_from_func(doprinuse, &cmdbuf[1], FALSE);
-    // queue up #seeall as if user had typed it; we don't execute doprinuse()
-    // directly because the program might not be ready for the next command
     QWidget *main = NetHackQtBind::mainWidget();
-    (static_cast <NetHackQtMainWindow *> (main))->DollClickToKeys(cmdbuf);
+    (static_cast <NetHackQtMainWindow *> (main))->FuncAsCommand(doprinuse);
 #endif
 }
 

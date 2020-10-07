@@ -982,19 +982,26 @@ void NetHackQtMainWindow::doGuidebook(bool)
 }
 #endif
 
+void NetHackQtMainWindow::doKeys(const char *cmds)
+{
+    keysink.Put(cmds);
+    qApp->exit();
+}
+
 void NetHackQtMainWindow::doKeys(const QString& k)
 {
     /* [this should probably be using toLocal8Bit();
        toAscii() is not offered as an alternative...] */
-    keysink.Put(k.toLatin1().constData());
-    qApp->exit();
+    doKeys(k.toLatin1().constData());
 }
 
-// ENHANCED_PAPERDOLL - player clicked on PaperDoll window
-void NetHackQtMainWindow::DollClickToKeys(const char *cmds)
+// queue up the command name for a function, as if user had typed it
+void NetHackQtMainWindow::FuncAsCommand(int NDECL((*func)))
 {
-    keysink.Put(cmds);
-    qApp->exit();
+    char cmdbuf[32];
+    Strcpy(cmdbuf, "#");
+    (void) cmdname_from_func(func, &cmdbuf[1], FALSE);
+    doKeys(cmdbuf);
 }
 
 void NetHackQtMainWindow::AddMessageWindow(NetHackQtMessageWindow* window)
