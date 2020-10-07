@@ -917,7 +917,8 @@ boolean polyspot;
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
-                if (sliparm(mon->data))
+                /* sliparm checks whirly, noncorporeal, and small or under */
+                if (sliparm(mdat) && !(mdat->msize <= MZ_SMALL))
                     pline("%s seeps right through %s shirt!", Monnam(mon),
                           ppronoun);
                 else
