@@ -49,9 +49,9 @@ public:
 
 	void fadeHighlighting(bool before_key);
 
-        // these are unconditional in case qt_main.h comes before qt_set.h
+        void FuncAsCommand(int NDECL((*func)));
+        // this is unconditional in case qt_main.h comes before qt_set.h
         void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
-        void DollClickToKeys(const char *); // ENHANCED_PAPERDOLL
 
 public slots:
 	void doMenuItem(QAction *);
@@ -59,6 +59,7 @@ public slots:
 	void doAbout(bool);
         void doQuit(bool);
 	//RLC void doGuidebook(bool);
+        void doKeys(const char *);
 	void doKeys(const QString&);
 
 protected:
