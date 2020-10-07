@@ -904,7 +904,7 @@ boolean polyspot;
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0) {
             if (vis) {
-                if (is_whirly(mon->data))
+                if (is_whirly(mdat))
                     pline("%s %s falls, unsupported!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
                 else
@@ -917,7 +917,7 @@ boolean polyspot;
         }
         if ((otmp = which_armor(mon, W_ARMU)) != 0) {
             if (vis) {
-                if (sliparm(mon->data))
+                if (is_whirly(mdat))
                     pline("%s seeps right through %s shirt!", Monnam(mon),
                           ppronoun);
                 else
