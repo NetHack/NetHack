@@ -396,7 +396,7 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
 void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->StartMenu();
+    window->StartMenu(wid == WIN_INVEN);
 }
 
 void NetHackQtBind::qt_add_menu(winid wid, int glyph,

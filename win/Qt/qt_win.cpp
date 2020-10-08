@@ -99,7 +99,8 @@ void NetHackQtWindow::Display(bool block UNUSED) { puts("unexpected Display"); }
 bool NetHackQtWindow::Destroy() { return true; }
 void NetHackQtWindow::CursorTo(int x UNUSED,int y UNUSED) { puts("unexpected CursorTo"); }
 void NetHackQtWindow::PutStr(int attr UNUSED, const QString& text UNUSED) { puts("unexpected PutStr"); }
-void NetHackQtWindow::StartMenu() { puts("unexpected StartMenu"); }
+void NetHackQtWindow::StartMenu(bool using_WIN_INVEN UNUSED)
+                                { puts("unexpected StartMenu"); }
 void NetHackQtWindow::AddMenu(int glyph UNUSED, const ANY_P* identifier UNUSED,
                               char ch UNUSED, char gch UNUSED, int attr UNUSED,
                               const QString& str UNUSED, unsigned itemflags UNUSED)
