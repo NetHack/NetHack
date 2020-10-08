@@ -184,6 +184,14 @@ void NetHackQtMessageWindow::AddToStr(const char *answer)
     }
 }
 
+// used when yn_function() or more() rejects player's input and tries again
+void NetHackQtMessageWindow::RehighlightPrompt()
+{
+    // selects most recent message, which causes it to be highlighted
+    if (list && list->count())
+        list->setCurrentRow(list->count() - 1);
+}
+
 // are there any highlighted messages?
 bool NetHackQtMessageWindow::hilit_mesgs()
 {
