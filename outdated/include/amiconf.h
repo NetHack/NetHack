@@ -14,7 +14,7 @@
 
 #include <time.h> /* get time_t defined before use! */
 
-#ifdef AMIGA_CROSS
+#ifdef CROSS_TO_AMIGA
 #include <stdlib.h>
 #include <string.h>
 #endif
@@ -56,7 +56,7 @@ typedef long off_t;
 #define DLBFILE2 "nhsdat" /* sound library */
 #endif
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #define FILENAME_CMP stricmp /* case insensitive */
 #else
 #define FILENAME_CMP strcmpi /* case insensitive */
@@ -76,7 +76,7 @@ typedef long off_t;
 #define MFLOPPY /* You'll probably want this; provides assistance \
                  * for typical personal computer configurations   \
                  */
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #define RANDOM
 #endif
 
@@ -149,7 +149,7 @@ extern char *FDECL(gets, (char *));
 
 #define TEXTCOLOR /* Use colored monsters and objects */
 #define HACKFONT  /* Use special hack.font */
-#ifndef AMIGA_CROSS   /* issues with prototype and spawnl */
+#ifndef CROSS_TO_AMIGA   /* issues with prototype and spawnl */
 #define SHELL  /* Have a shell escape command (!) */
 #endif
 #define MAIL      /* Get mail at unexpected occasions */

@@ -14,14 +14,14 @@
 #ifdef TESTING
 #include "hack.h"
 #else
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:src/tile.c"
 #else
 #include "../src/tile.c"
 #endif
 #endif
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:win/share/tile.h"
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"

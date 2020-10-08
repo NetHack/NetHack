@@ -29,7 +29,7 @@
 #endif
 
 /* Prototypes */
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/amiwind.p"
 #include "NH:sys/amiga/winami.p"
 #include "NH:sys/amiga/amidos.p"
