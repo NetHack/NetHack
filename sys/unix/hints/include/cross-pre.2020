@@ -381,7 +381,7 @@ override WINOBJ=
 override GAME=
 # the real VARDAT hasn't been defined yet for use in ALLDEP override
 WASM_DAT = bogusmon data engrave epitaph oracles options quest.lua rumors
-override ALLDEP = include/nhlua.h $(WASM_DAT) wasm spec_levs check-dlb
+override ALLDEP = include/nhlua.h $(WASM_DAT) spec_levs check-dlb wasm
 override PREGAME += mkdir -p $(TARGETDIR)/wasm-data ;
 override CLEANMORE += rm -rf $(TARGETDIR) ;
 RANLIB=$(EMRANLIB)
