@@ -136,21 +136,21 @@ matrix:
         - cd src
         - cp ../sys/winnt/Makefile.gcc ./Makefile
         - mingw32-make LUA_VERSION=$LUA_VERSION install
-#    - name: msdos-linux-focal-djgpp-crosscompile
-#      os: linux
-#      env: HINTS=linux.2020 LUA_VERSION=5.4.0
-#      dist: focal
-#      compiler: gcc
-#      script:
-##        - export
-##        - export GCCVER=gcc550
-#        - export GCCVER=gcc1010
-#        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
-#        - make fetch-lua
-#        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
-#        - sh sys/msdos/fetch-cross-compiler.sh
-#        - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
-#        - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+    - name: msdos-linux-focal-djgpp-crosscompile
+      os: linux
+      env: HINTS=linux.2020 LUA_VERSION=5.4.0
+      dist: focal
+      compiler: gcc
+      script:
+#        - export
+#        - export GCCVER=gcc550
+        - export GCCVER=gcc1010
+        - cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
+        - make fetch-lua
+        - test -d "lib/lua-$LUA_VERSION/src" || exit 0
+        - sh sys/msdos/fetch-cross-compiler.sh
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+        - make LUA_VERSION=$LUA_VERSION WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
   exclude:
 #    - os: osx
 #      osx_image: xcode10.3
