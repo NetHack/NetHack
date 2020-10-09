@@ -572,7 +572,8 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
-HOSTOBJ = monst.o objects.o alloc.o drawing.o
+FIRSTOBJ = monst.o objects.o
+HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 
 HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
