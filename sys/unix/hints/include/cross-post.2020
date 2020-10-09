@@ -132,7 +132,7 @@ $(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
 	touch $(WASM_DATA_DIR)/xlogfile
 	cp ../sys/lib/sysconf $(WASM_DATA_DIR)/sysconf
 
-$(WASM_DATA_DIR)/nhdat: $(WASM_VARDAT)
+$(WASM_DATA_DIR)/nhdat: $(WASM_DAT)
 	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dlb )
 	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dofiles-dlb )
 
