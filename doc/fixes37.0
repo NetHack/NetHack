@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ $NHDT-Date: 1602022805 2020/10/06 22:20:05 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.325 $ $NHDT-Date: 1602270140 2020/10/09 19:02:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -271,6 +271,7 @@ fire sources can ignite candles, lamps, and potions of oil
 for multiple drop ('D') with menustyle traditional or combination, if the only
 	object class player picked was '$' then it operated on all classes
 small monsters could seep through their shirt
+don't snuff brass lantern when it's hit by water unless it is submerged
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

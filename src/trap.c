@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1596498220 2020/08/03 23:43:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.362 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1602270123 2020/10/09 19:02:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1149,10 +1149,7 @@ unsigned trflags;
             if (u.twoweap || (uwep && bimanual(uwep)))
                 (void) water_damage(u.twoweap ? uswapwep : uwep, 0, TRUE);
  glovecheck:
-            (void) water_damage(uarmg, "gauntlets", TRUE);
-            /* Not "metal gauntlets" since it gets called
-             * even if it's leather for the message
-             */
+            (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
             break;
         case 2:
             pline("%s your right %s!", A_gush_of_water_hits, body_part(ARM));
@@ -1160,10 +1157,12 @@ unsigned trflags;
             goto glovecheck;
         default:
             pline("%s you!", A_gush_of_water_hits);
+            /* note: exclude primary and seconary weapons from splashing
+               because cases 1 and 2 target them [via water_damage()] */
             for (otmp = g.invent; otmp; otmp = otmp->nobj)
                 if (otmp->lamplit && otmp != uwep
                     && (otmp != uswapwep || !u.twoweap))
-                    (void) snuff_lit(otmp);
+                    (void) splash_lit(otmp);
             if (uarmc)
                 (void) water_damage(uarmc, cloak_simple_name(uarmc), TRUE);
             else if (uarm)
@@ -2344,7 +2343,7 @@ register struct monst *mtmp;
                     (void) water_damage(target, 0, TRUE);
  glovecheck:
                 target = which_armor(mtmp, W_ARMG);
-                (void) water_damage(target, "gauntlets", TRUE);
+                (void) water_damage(target, gloves_simple_name(target), TRUE);
                 break;
             case 2:
                 if (in_sight)
@@ -2357,8 +2356,9 @@ register struct monst *mtmp;
                     pline("%s %s!", A_gush_of_water_hits, mon_nam(mtmp));
                 for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
                     if (otmp->lamplit
+                        /* exclude weapon(s) because cases 1 and 2 do them */
                         && (otmp->owornmask & (W_WEP | W_SWAPWEP)) == 0)
-                        (void) snuff_lit(otmp);
+                        (void) splash_lit(otmp);
                 if ((target = which_armor(mtmp, W_ARMC)) != 0)
                     (void) water_damage(target, cloak_simple_name(target),
                                         TRUE);
@@ -3538,7 +3538,7 @@ boolean force;
     if (!obj)
         return ER_NOTHING;
 
-    if (snuff_lit(obj))
+    if (splash_lit(obj))
         return ER_DAMAGED;
 
     if (!ostr)
