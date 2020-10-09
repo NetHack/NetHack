@@ -2,7 +2,7 @@
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
@@ -45,7 +45,7 @@ struct NewWindow StrWindow = {
     &String, NULL, NULL, NULL, NULL, 5, 5, 0xffff, 0xffff, CUSTOMSCREEN
 };
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/colorwin.c"
 #else
 #include "colorwin.c"
@@ -58,7 +58,7 @@ struct NewWindow StrWindow = {
 #define GADOKAY 6
 #define GADCANCEL 7
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/clipwin.c"
 #else
 #include "clipwin.c"

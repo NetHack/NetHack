@@ -12,10 +12,10 @@
 
 #include <ctype.h>
 #include <fcntl.h>
-#if !defined(MSDOS) && !defined(WIN_CE) && !defined(AMIGA_CROSS)
+#if !defined(MSDOS) && !defined(WIN_CE) && !defined(CROSS_TO_AMIGA)
 #include <process.h>
 #endif
-#if defined(__GO32__) || defined(AMIGA_CROSS)
+#if defined(__GO32__) || defined(CROSS_TO_AMIGA)
 #define P_WAIT 0
 #define P_NOWAIT 1
 #endif
@@ -154,7 +154,7 @@ const char *str;
 #ifdef TOS
     msmsg("Hit <Return> %s.", str);
 #else
-#ifdef AMIGA_CROSS
+#ifdef CROSS_TO_AMIGA
     (void) printf("Hit <Enter> %s.", str);
 #else
     msmsg("Hit <Enter> %s.", str);

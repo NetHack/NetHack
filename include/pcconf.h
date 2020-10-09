@@ -35,7 +35,7 @@
 
 /*#define OVERLAY */ /* Manual overlay definition (MSC 6.0ax only) */
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #define SHELL /* via exec of COMMAND.COM */
 #endif
 
@@ -90,7 +90,7 @@
 #define ANSI_DEFAULT
 #endif
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #define RANDOM /* have Berkeley random(3) */
 #endif
 
@@ -105,7 +105,7 @@
 #include <process.h> /* Provides prototypes of exit(), spawn()      */
 #endif
 
-#ifdef AMIGA_CROSS
+#ifdef CROSS_TO_AMIGA
 #include <spawn.h>
 #endif
 

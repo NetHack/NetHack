@@ -396,7 +396,7 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
 void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->StartMenu();
+    window->StartMenu(wid == WIN_INVEN);
 }
 
 void NetHackQtBind::qt_add_menu(winid wid, int glyph,
@@ -588,6 +588,11 @@ char NetHackQtBind::qt_more()
             default:
                 if (++complain > 1)
                     NetHackQtBind::qt_nhbell();
+                // typing anything caused the most recent message line
+                // (which happens to our prompt) from having highlighting
+                // be removed; put that back
+                if (mesgwin)
+                    mesgwin->RehighlightPrompt();
                 retry = true;
                 break;
             }
@@ -669,6 +674,13 @@ char NetHackQtBind::qt_yn_function(const char *question_,
                     Strcpy(cbuf, visctrl(def));
 		} else {
 		    NetHackQtBind::qt_nhbell();
+                    // typing anything caused the most recent message line
+                    // (which happens to our prompt) from having highlighting
+                    // be removed; put that back
+                    NetHackQtMessageWindow
+                            *mesgwin = main ? main->GetMessageWindow() : NULL;
+                    if (mesgwin)
+                        mesgwin->RehighlightPrompt();
 		    // and try again...
 		}
 	    } else {

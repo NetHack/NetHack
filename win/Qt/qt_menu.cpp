@@ -8,6 +8,13 @@
 // TODO:
 //  inventory menus reuse the same menu window over and over (in the core);
 //    it isn't resizing properly to reflect each new instance's content;
+//    [temporary 'fix' allocates at least 15 lines in case a really short
+//    subset is displayed before a full inventory; but all inventory menus
+//    will be padded to that length when they might otherwise show all the
+//    entries with less, and inventories which have more will need to be
+//    scrolled to see the excess even if a taller menu would fit on the
+//    screen; code now has to distinguish between inventory menu and
+//    'other' menu so that the latter isn't padded too]
 //  implement next_page, prev_page, first_page, and last_page to work
 //    like they do for X11:  scroll menu window as if it were paginated;
 //  entering a count that uses more digits than the previous biggest count
@@ -67,22 +74,44 @@ int NetHackQtMenuListBox::TotalWidth() const
 
 int NetHackQtMenuListBox::TotalHeight() const
 {
-    int row, height = 0;
+    int row, rowheight, height = 0;
 
     for (row = 0; row < rowCount(); ++row) {
 	height += rowHeight(row);
     }
+    // 20: arbitrary; should always have at least 1 row so it shouldn't matter
+    rowheight = (row > 0) ? rowHeight(row - 1) : 20;
+
+    //
+    // FIXME:
+    //  The core reuses one window for inventory displays and this
+    //  part of sizeHint() is working for the initial size but is
+    //  ineffective for later resizes.
+    //
+
+    // TEMPORARY:
+    // in case first inventory menu displayed is a short one pad it
+    // with blank lines so later long ones won't be far too short
+    if ((dynamic_cast <NetHackQtMenuWindow *> (parent()))->is_invent) {
+        if (row < 15)
+            height += (15 - row) * rowheight;
+    }
+
     // include extra height so that there will be a blank gap after the
     // last entry to show that there is nothing to scroll forward too
-    height += (row > 0) ? (rowHeight(row - 1) / 2) : 7;
+    height += rowheight / 2;
     return height;
 }
 
 QSize NetHackQtMenuListBox::sizeHint() const
 {
-    QScrollBar *hscroll = horizontalScrollBar();
-    int hsize = hscroll ? hscroll->height() : 0;
-    return QSize(TotalWidth()+hsize, TotalHeight()+hsize);
+    QScrollBar *hscroll = horizontalScrollBar(),
+               *vscroll = verticalScrollBar();
+    int hsize = (hscroll && hscroll->isVisible()) ? hscroll->height() : 0,
+        vsize = (vscroll && vscroll->isVisible()) ? vscroll->width() : 0;
+    hsize += MENU_WIDTH_SLOP, vsize += MENU_WIDTH_SLOP;
+    // note: a vertical scrollbar affects widget width, a horizontal one height
+    return QSize(TotalWidth() + vsize, TotalHeight() + hsize);
 }
 
 //
@@ -125,12 +154,13 @@ void NetHackQtMenuWindow::MenuResize()
 //
 NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     QDialog(parent),
+    is_invent(false), // reset to True when window is core's WIN_INVEN
     table(new NetHackQtMenuListBox()),
     prompt(0),
     biggestcount(0L), // largest subset amount that user has entered
     countdigits(0),   // number of digits needed by biggestcount
     counting(false),  // user has typed a digit and more might follow
-    searching(false)
+    searching(false)  // user has begun entering a search target string
 {
     // setFont() was in SelectMenu(), in time to be rendered but too late
     // when measuring the width and height that will be needed
@@ -198,7 +228,7 @@ QWidget* NetHackQtMenuWindow::Widget() { return this; }
 //         can't rely on the MenuWindow constructor for initialization.
 //
 
-void NetHackQtMenuWindow::StartMenu()
+void NetHackQtMenuWindow::StartMenu(bool using_WIN_INVEN)
 {
     itemcount = 0;
     table->setRowCount(itemcount);
@@ -208,6 +238,8 @@ void NetHackQtMenuWindow::StartMenu()
     countdigits = 0;
     ClearCount(); // reset 'counting' flag and digit string 'countstr'
     ClearSearch(); // reset 'searching' flag
+
+    is_invent = using_WIN_INVEN;
 }
 
 NetHackQtMenuWindow::MenuItem::MenuItem() :
@@ -1149,10 +1181,10 @@ void NetHackQtMenuOrTextWindow::PutStr(int attr, const QString& text)
 }
 
 // Menu
-void NetHackQtMenuOrTextWindow::StartMenu()
+void NetHackQtMenuOrTextWindow::StartMenu(bool using_WIN_INVEN)
 {
     if (!actual) actual=new NetHackQtMenuWindow(parent);
-    actual->StartMenu();
+    actual->StartMenu(using_WIN_INVEN);
 }
 void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
                                         char ch, char gch, int attr,

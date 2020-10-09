@@ -3,7 +3,7 @@
  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"

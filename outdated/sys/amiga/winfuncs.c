@@ -3,7 +3,7 @@
  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
@@ -17,7 +17,7 @@
 #include "date.h"
 
 extern struct TagItem scrntags[];
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 extern struct Library *ConsoleDevice;
 #else
 extern struct Device *
@@ -792,7 +792,7 @@ amii_create_nhwindow(type) register int type;
         }
 
 	ConsoleDevice =
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
                         (struct Library *)
 #else
 	                (struct Device *

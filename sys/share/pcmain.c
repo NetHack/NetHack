@@ -754,7 +754,7 @@ char *str;
 }
 #endif /* EXEPATH */
 
-#ifdef AMIGA_CROSS
+#ifdef CROSS_TO_AMIGA
 void msmsg
 VA_DECL(const char *, fmt)
 {

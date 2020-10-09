@@ -3,7 +3,7 @@
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
@@ -26,7 +26,7 @@ static int BufferGetchar(void);
 static void ProcessMessage(register struct IntuiMessage *message);
 
 #define BufferQueueChar(ch) (KbdBuffer[KbdBuffered++] = (ch))
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 struct Library *ConsoleDevice;
 #else
 struct Device *
@@ -36,7 +36,7 @@ struct Device *
        ConsoleDevice;
 #endif
 
-#ifndef AMIGA_CROSS
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/amimenu.c"
 #else
 #include "amimenu.c"
