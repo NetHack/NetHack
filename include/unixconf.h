@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1555361298 2019/04/15 20:48:18 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.7	unixconf.h	$NHDT-Date: 1596498567 2020/08/03 23:49:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -389,7 +389,7 @@
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
 
-#ifdef MACOSX
+#if defined(MACOSX) && !defined(LIBNH)
 # define RUNTIME_PASTEBUF_SUPPORT
 #endif
 

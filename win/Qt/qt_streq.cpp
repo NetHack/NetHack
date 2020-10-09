@@ -4,21 +4,16 @@
 
 // qt_streq.cpp -- string requestor
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_streq.h"
 #include "qt_str.h"
 
@@ -88,6 +83,13 @@ bool NetHackQtStringRequestor::Get(char* buffer, int maxchar)
 #endif
     centerOnMain(this);
     show();
+    // Make sure that setFocus() really does change keyboard focus.
+    // This allows typing to go directly to the NetHackQtLineEdit
+    // widget without clicking on or in it first.  Not needed for
+    // qt_getline() but is needed for menu Search to prevent typed
+    // characters being treated as making menu selections.
+    if (!input.isActiveWindow())
+        input.activateWindow();
     input.setFocus();
     exec();
 

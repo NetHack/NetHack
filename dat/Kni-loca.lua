@@ -1,4 +1,4 @@
--- NetHack 3.6	Knight.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
+-- NetHack 3.7	Knight.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -27,7 +27,7 @@ xxxxxxxxx.......xxxxxx.....xxxxxxxxxxxxx
 -- The Isle of Glass is a Tor rising out of the swamps surrounding it.
 des.region(selection.area(00,00,39,11), "lit")
 -- The top area of the Tor is a holy site.
-des.region({ region={09,02, 27,09}, lit=1, type="temple" })
+des.region({ region={09,02, 27,09}, lit=1, type="temple", filled=2 })
 -- Stairs
 des.stair("up", 38,0)
 des.stair("down", 18,05)

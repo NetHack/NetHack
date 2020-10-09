@@ -1,4 +1,4 @@
--- NetHack 3.6	Tourist.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
+-- NetHack 3.7	Tourist.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
@@ -32,14 +32,14 @@ des.map([[
 des.region(selection.area(00,00,75,19), "lit")
 des.non_diggable(selection.area(00,00,75,19))
 --
-des.region({ region={01,01, 04,05}, lit=0, type="morgue", prefilled = 0 })
-des.region({ region={15,03, 20,05}, lit=1, type="shop", prefilled = 0  })
-des.region({ region={62,03, 71,04}, lit=1, type="shop", prefilled = 0  })
-des.region({ region={01,17, 11,18}, lit=1, type="barracks", prefilled = 0  })
-des.region({ region={12,09, 20,10}, lit=1, type="barracks", prefilled = 0  })
-des.region({ region={53,11, 59,14}, lit=1, type="zoo", prefilled = 0  })
-des.region({ region={63,14, 72,16}, lit=1, type="barracks", prefilled = 0  })
-des.region({ region={32,14, 40,16}, lit=1, type="temple", prefilled = 0  })
+des.region({ region={01,01, 04,05}, lit=0, type="morgue", filled=1 })
+des.region({ region={15,03, 20,05}, lit=1, type="shop", filled=1 })
+des.region({ region={62,03, 71,04}, lit=1, type="shop", filled=1 })
+des.region({ region={01,17, 11,18}, lit=1, type="barracks", filled=1 })
+des.region({ region={12,09, 20,10}, lit=1, type="barracks", filled=1 })
+des.region({ region={53,11, 59,14}, lit=1, type="zoo", filled=1 })
+des.region({ region={63,14, 72,16}, lit=1, type="barracks", filled=1 })
+des.region({ region={32,14, 40,16}, lit=1, type="temple", filled=1 })
 --
 des.region({ region = {06,01,11,02}, type = "ordinary" })
 des.region({ region = {24,01,29,02}, type = "ordinary" })

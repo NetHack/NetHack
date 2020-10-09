@@ -379,6 +379,8 @@ pfx_##a,
                 NoAlias, "display frequency when `running' or `travelling'")
     NHOPTB(safe_pet, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.safe_dog)
+    NHOPTB(safe_wait, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
+                &flags.safe_wait)
     NHOPTB(sanity_check, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.sanity_check)
     NHOPTC(scores, 32, opt_in, set_in_game, No, Yes, No, No, NoAlias,

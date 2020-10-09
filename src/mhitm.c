@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1593614973 2020/07/01 14:49:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1596498178 2020/08/03 23:42:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.140 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -345,17 +345,32 @@ register struct monst *magr, *mdef;
      */
     magr->mlstmv = g.monstermoves;
 
+    /* controls whether a mind flayer uses all of its tentacle-for-DRIN
+       attacks; when fighting a headless monster, stop after the first
+       one because repeating the same failing hit (or even an ordinary
+       tentacle miss) is very verbose and makes the flayer look stupid */
+    g.skipdrin = FALSE;
+
     /* Now perform all attacks for the monster. */
     for (i = 0; i < NATTK; i++) {
         res[i] = MM_MISS;
         mattk = getmattk(magr, mdef, i, res, &alt_attk);
         mwep = (struct obj *) 0;
         attk = 1;
+        /* reduce verbosity for mind flayer attacking creature without a
+           head (or worm's tail); this is similar to monster with multiple
+           attacks after a wildmiss against displaced or invisible hero */
+        if (g.skipdrin && mattk->aatyp == AT_TENT && mattk->adtyp == AD_DRIN)
+            continue;
+
         switch (mattk->aatyp) {
         case AT_WEAP: /* "hand to hand" attacks */
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1) {
                 /* D: Do a ranged attack here! */
                 strike = thrwmm(magr, mdef);
+                if (strike)
+                    /* We don't really know if we hit or not; pretend we did. */
+                    res[i] |= MM_HIT;
                 if (DEADMONSTER(mdef))
                     res[i] = MM_DEF_DIED;
                 if (DEADMONSTER(magr))
@@ -1027,6 +1042,7 @@ int dieroll;
         }
         /* only potions damage resistant players in destroy_item */
         tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        ignite_items(mdef->minvent);
         break;
     case AD_COLD:
         if (cancelled) {
@@ -1404,6 +1420,9 @@ int dieroll;
                 pline("%s doesn't seem harmed.", Monnam(mdef));
             /* Not clear what to do for green slimes */
             tmp = 0;
+            /* don't bother with additional DRIN attacks since they wouldn't
+               be able to hit target on head either */
+            g.skipdrin = TRUE; /* affects mattackm()'s attack loop */
             break;
         }
         if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {

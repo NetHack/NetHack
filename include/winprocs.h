@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.7	winprocs.h	$NHDT-Date: 1596498572 2020/08/03 23:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

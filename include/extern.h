@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1594168620 2020/07/08 00:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.851 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1600933440 2020/09/24 07:44:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.859 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,6 +204,7 @@ E void FDECL(random_response, (char *, int));
 E int NDECL(rnd_extcmd_idx);
 E int NDECL(domonability);
 E char FDECL(cmd_from_func, (int NDECL((*))));
+E const char *FDECL(cmdname_from_func, (int NDECL((*)), char *, BOOLEAN_P));
 E boolean FDECL(redraw_cmd, (CHAR_P));
 E const char *FDECL(levltyp_to_name, (int));
 #ifdef USE_TRAMPOLI
@@ -423,6 +424,7 @@ E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
 E void NDECL(deferred_goto);
 E boolean FDECL(revive_corpse, (struct obj *));
 E void FDECL(revive_mon, (ANY_P *, long));
+E boolean FDECL(cmd_safety_prevention, (const char *, const char *, int *));
 E int NDECL(donull);
 E int NDECL(dowipe);
 E void FDECL(legs_in_no_shape, (const char *, BOOLEAN_P));
@@ -1044,6 +1046,7 @@ E int FDECL(ggetobj, (const char *, int (*)(OBJ_P), int,
                       BOOLEAN_P, unsigned *));
 E int FDECL(askchain, (struct obj **, const char *, int, int (*)(OBJ_P),
                        int (*)(OBJ_P), int, const char *));
+E void FDECL(set_cknown_lknown, (struct obj *));
 E void FDECL(fully_identify_obj, (struct obj *));
 E int FDECL(identify, (struct obj *));
 E int FDECL(count_unidentified, (struct obj *));
@@ -2147,16 +2150,20 @@ E void NDECL(deliver_splev_message);
 /* ### random.c ### */
 
 #if defined(RANDOM) && !defined(__GO32__) /* djgpp has its own random */
+#ifndef CROSS_TO_AMIGA
 E void FDECL(srandom, (unsigned));
 E char *FDECL(initstate, (unsigned, char *, int));
 E char *FDECL(setstate, (char *));
 E long NDECL(random);
+#endif
 #endif /* RANDOM */
 
 /* ### read.c ### */
 
 E void FDECL(learnscroll, (struct obj *));
 E char *FDECL(tshirt_text, (struct obj *, char *));
+E const char *FDECL(candy_wrapper_text, (struct obj *));
+E void FDECL(assign_candy_wrapper, (struct obj *));
 E int NDECL(doread);
 E boolean FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *, int));
@@ -2438,6 +2445,7 @@ E void FDECL(growl, (struct monst *));
 E void FDECL(yelp, (struct monst *));
 E void FDECL(whimper, (struct monst *));
 E void FDECL(beg, (struct monst *));
+E const char *FDECL(maybe_gasp, (struct monst *));
 E int NDECL(dotalk);
 E int NDECL(tiphat);
 #ifdef USER_SOUNDS
@@ -2462,7 +2470,7 @@ E boolean FDECL(create_room, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                               XCHAR_P, XCHAR_P, XCHAR_P));
 E void FDECL(create_secret_door, (struct mkroom *, XCHAR_P));
 E boolean FDECL(dig_corridor, (coord *, coord *, BOOLEAN_P, SCHAR_P, SCHAR_P));
-E void FDECL(fill_room, (struct mkroom *, BOOLEAN_P));
+E void FDECL(fill_special_room, (struct mkroom *));
 E boolean FDECL(load_special, (const char *));
 E xchar FDECL(selection_getpoint, (int, int, struct selectionvar *));
 E struct selectionvar *NDECL(selection_new);
@@ -2582,7 +2590,7 @@ E void FDECL(teleds, (int, int, int));
 E boolean FDECL(safe_teleds, (int));
 E boolean FDECL(teleport_pet, (struct monst *, BOOLEAN_P));
 E void NDECL(tele);
-E boolean FDECL(scrolltele, (struct obj *));
+E void FDECL(scrolltele, (struct obj *));
 E int NDECL(dotelecmd);
 E int FDECL(dotele, (BOOLEAN_P));
 E void NDECL(level_tele);
@@ -2708,6 +2716,7 @@ E boolean NDECL(lava_effects);
 E void NDECL(sink_into_lava);
 E void NDECL(sokoban_guilt);
 E const char * FDECL(trapname, (int, BOOLEAN_P));
+E void FDECL(ignite_items, (struct obj *));
 
 /* ### u_init.c ### */
 
@@ -3074,6 +3083,7 @@ E void FDECL(save_worm, (NHFILE *));
 E void FDECL(rest_worm, (NHFILE *));
 E void FDECL(place_wsegs, (struct monst *, struct monst *));
 E void FDECL(sanity_check_worm, (struct monst *));
+E void NDECL(wormno_sanity_check);
 E void FDECL(remove_worm, (struct monst *));
 E void FDECL(place_worm_tail_randomly, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(size_wseg, (struct monst *));

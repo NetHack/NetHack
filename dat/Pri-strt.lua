@@ -1,4 +1,4 @@
--- NetHack 3.6	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -37,7 +37,7 @@ des.map([[
 ]]);
 -- Dungeon Description
 des.region(selection.area(00,00,75,19), "lit")
-des.region({ region={24,06, 33,13}, lit=1, type="temple" })
+des.region({ region={24,06, 33,13}, lit=1, type="temple", filled=2 })
 
 des.replace_terrain({ region={00,00, 10,19}, fromterrain=".", toterrain="T", chance=10 })
 des.replace_terrain({ region={65,00, 75,19}, fromterrain=".", toterrain="T", chance=10 })

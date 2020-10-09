@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhdefkey.c	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	nhdefkey.c	$NHDT-Date: 1596498313 2020/08/03 23:45:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

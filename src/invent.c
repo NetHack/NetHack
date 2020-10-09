@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1590343765 2020/05/24 18:09:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1601595710 2020/10/01 23:41:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.302 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2102,9 +2102,7 @@ unsigned *resultflags;
             }
         }
 
-        if (oc_of_sym == COIN_CLASS && !combo) {
-            g.context.botl = 1;
-        } else if (sym == 'a') {
+        if (sym == 'a') {
             allflag = TRUE;
         } else if (sym == 'A') {
             ; /* same as the default */
@@ -2118,11 +2116,11 @@ unsigned *resultflags;
             m_seen = TRUE;
         } else if (oc_of_sym == MAXOCLASSES) {
             You("don't have any %c's.", sym);
-        } else if (oc_of_sym != VENOM_CLASS) { /* suppress venom */
+        } else {
             if (!index(olets, oc_of_sym)) {
                 add_valid_menu_class(oc_of_sym);
                 olets[oletct++] = oc_of_sym;
-                olets[oletct] = 0;
+                olets[oletct] = '\0';
             }
         }
     }
@@ -2133,11 +2131,6 @@ unsigned *resultflags;
                ? -2 : -3;
     } else if (flags.menu_style != MENU_TRADITIONAL && combo && !allflag) {
         return 0;
-#if 0
-    /* !!!! test gold dropping */
-    } else if (allowgold == 2 && !oletct) {
-        return 1; /* you dropped gold (or at least tried to)  */
-#endif
     } else {
         int cnt = askchain(&g.invent, olets, allflag, fn, ckfn, mx, word);
         /*
@@ -2315,6 +2308,20 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
  *      Object identification routines:
  */
 
+/* set the cknown and lknown flags on an object if they're applicable */
+void
+set_cknown_lknown(obj)
+struct obj *obj;
+{
+    if (Is_container(obj) || obj->otyp == STATUE)
+        obj->cknown = obj->lknown = 1;
+    else if (obj->otyp == TIN)
+        obj->cknown = 1;
+    /* TODO? cknown might be extended to candy bar, where it would mean that
+       wrapper's text was known which in turn indicates candy bar's content */
+    return;
+}
+
 /* make an object actually be identified; no display updating */
 void
 fully_identify_obj(otmp)
@@ -2324,8 +2331,7 @@ struct obj *otmp;
     if (otmp->oartifact)
         discover_artifact((xchar) otmp->oartifact);
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
-    if (Is_container(otmp) || otmp->otyp == STATUE)
-        otmp->cknown = otmp->lknown = 1;
+    set_cknown_lknown(otmp); /* set otmp->{cknown,lknown} if applicable */
     if (otmp->otyp == EGG && otmp->corpsenm != NON_PM)
         learn_egg_type(otmp->corpsenm);
 }
@@ -2354,7 +2360,7 @@ int id_limit;
         Sprintf(buf, "What would you like to identify %s?",
                 first ? "first" : "next");
         n = query_objlist(buf, &g.invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
-                                         | USE_INVLET | INVORDER_SORT),
+                                           | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
 
         if (n > 0) {
@@ -3211,6 +3217,7 @@ dotypeinv()
                 i |= BUC_CURSED;
             if (xcnt)
                 i |= BUC_UNKNOWN;
+            i |= INCLUDE_VENOM;
             n = query_category(prompt, g.invent, i, &pick_list, PICK_ONE);
             if (!n)
                 return 0;
@@ -3219,8 +3226,7 @@ dotypeinv()
         }
     }
     if (traditional) {
-        /* collect a list of classes of objects carried, for use as a prompt
-         */
+        /* collect list of classes of objects carried, for use as a prompt */
         types[0] = 0;
         class_count = collect_obj_classes(types, g.invent, FALSE,
                                           (boolean FDECL((*), (OBJ_P))) 0,
@@ -3336,7 +3342,7 @@ dotypeinv()
     }
     if (query_objlist((char *) 0, &g.invent,
                       ((flags.invlet_constant ? USE_INVLET : 0)
-                       | INVORDER_SORT),
+                       | INVORDER_SORT | INCLUDE_VENOM),
                       &pick_list, PICK_NONE, this_type_only) > 0)
         free((genericptr_t) pick_list);
     return 0;

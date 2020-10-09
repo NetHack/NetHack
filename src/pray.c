@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1584872363 2020/03/22 10:19:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.7	pray.c	$NHDT-Date: 1596498198 2020/08/03 23:43:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

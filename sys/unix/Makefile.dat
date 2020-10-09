@@ -1,4 +1,4 @@
-#      NetHack Datafiles Makefile.dat $NHDT-Date: 1447844574 2018/04/25 19:25:54 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $
+#      NetHack Datafiles Makefile.dat $NHDT-Date: 1596486993 2020/08/03 20:36:33 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -116,18 +116,21 @@ bogusmon:	bogusmon.txt ../util/makedefs
 options:	../util/makedefs
 	../util/makedefs -v
 
-
+# these don't actually do anything useful now that levcomp and dngcomp are gone
 spec_levs:
 	touch spec_levs
-
 quest_levs:
 	touch quest_levs
 
 # gitinfo.txt is optionally made by src/Makefile when creating date.h
+# spec_levs and quest_levs are empty marker files to control 'make' actions
 clean:
-	-rm -f gitinfo.txt
+	-rm -f spec_levs quest_levs gitinfo.txt
 
 spotless: clean
-	-rm -f nhdat x11tiles beostiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
-	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad
-	-rm -f nhsplash.xpm nhtiles.bmp
+	-rm -f nhdat $(VARDAT) \
+		x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm \
+		rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad \
+		nhsplash.xpm nhtiles.bmp beostiles
+
+#eof#

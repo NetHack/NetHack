@@ -1,4 +1,4 @@
-/* NetHack 3.6	quest.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	quest.h	$NHDT-Date: 1596498556 2020/08/03 23:49:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

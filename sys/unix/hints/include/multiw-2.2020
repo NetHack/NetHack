@@ -1,0 +1,109 @@
+#------------------------------------------------------------------------------
+# NetHack 3.7  multiw-2.2020 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-3.7 $
+#
+# Sorts out support for multiple window ports (interfaces) to included in the build.
+#
+# Included from:
+#           hints/linux.2020
+#           hints/macOS.2020
+#
+# The following will be set appropriately following this:
+#     - WANT_WIN_XXX  (at least one will be set; default is TTY)
+#     - WANT_DEFAULT (set to match one of the enabled WANT_WIN_XXX)
+#     - WINCFLAGS
+#     - WINSRC
+#     - WINOBJ0
+#---
+# User selections could be specified as combinations of any of the following:
+# WIN_WANT_TTY=1, WIN_WANT_CURSES=1, WIN_WANT_QT=1, WIN_WANT_X11=1
+# The selections will all be linked into the same binary.
+#
+# Assuming you have the prerequisite packages mentioned above, you can
+# specify, right on the make command line, which window ports (or interfaces)
+# to include in your build. Doing it via the make command line means that won't
+# have to edit the Makefile.
+#
+# make WANT_WIN_QT=1 WANT_WIN_X11=1 WANT_WIN_CURSES=1 WANT_WIN_TTY=1 install
+#
+# Add WANT_DEFAULT=Qt (or other interface) if you want nethack to use
+# something other than tty as the default interface.
+#
+
+ifdef WANT_WIN_ALL
+WANT_WIN_TTY=1
+WANT_WIN_CURSES=1
+WANT_WIN_X11=1
+WANT_WIN_QT=1
+else
+# Make sure that at least one interface is enabled.
+ifndef WANT_WIN_TTY
+ifndef  WANT_WIN_CURSES
+ifndef   WANT_WIN_X11
+ifndef    WANT_WIN_QT
+WANT_WIN_TTY=1
+endif
+endif
+endif
+endif
+endif
+
+ifdef WANT_LIBNH
+WANT_DEFAULT=shim
+endif
+
+# Make sure that a default interface is specified; this doesn't guarantee
+# sanity for something like 'make WANT_WIN_CURSES=1 WANT_DEFAULT=X11' but
+# 'makedefs -v' would notice, complain, and quit causing 'make' to quit.
+ifndef WANT_DEFAULT
+# pick the first one enabled among { tty, curses, X11, Qt }
+ifdef WANT_WIN_TTY
+WANT_DEFAULT=tty
+else
+ifdef  WANT_WIN_CURSES
+WANT_DEFAULT=curses
+else
+ifdef   WANT_WIN_X11
+WANT_DEFAULT=X11
+else
+ifdef    WANT_WIN_QT
+WANT_DEFAULT=Qt
+else
+# ? shouldn't be able to get here...
+endif
+endif
+endif
+endif
+endif
+
+WINCFLAGS=
+WINSRC =
+WINOBJ0 =
+
+ifdef WANT_WIN_TTY
+WINSRC += $(WINTTYSRC)
+WINOBJ0 += $(WINTTYOBJ)
+else
+WINCFLAGS += -DNOTTYGRAPHICS
+endif
+
+ifdef WANT_WIN_CURSES
+WINCFLAGS += -DCURSES_GRAPHICS
+WINSRC += $(WINCURSESSRC)
+WINOBJ0 += $(WINCURSESOBJ)
+endif
+
+ifdef WANT_WIN_X11
+WINCFLAGS += -DX11_GRAPHICS
+WINSRC += $(WIINX11SRC)
+WINOBJ0 += $(WINX11OBJ)
+endif
+
+ifdef WANT_WIN_QT
+WINCFLAGS += -DQT_GRAPHICS
+WINSRC += $(WINQTSRC)
+WINOBJ0 += $(WINQTOBJ)
+endif
+
+#end of hints/include/multiw-2.2020
+#------------------------------------------------------------------------------
+

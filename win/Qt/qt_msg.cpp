@@ -7,20 +7,13 @@
 extern "C" {
 #include "hack.h"
 }
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_msg.h"
 #include "qt_msg.moc"
 #include "qt_map.h"
@@ -61,7 +54,7 @@ void NetHackQtMessageWindow::updateFont()
 	map->setFont(qt_settings->normalFont());
 }
 
-void NetHackQtMessageWindow::Scroll(int dx, int dy)
+void NetHackQtMessageWindow::Scroll(int dx UNUSED, int dy UNUSED)
 {
     //RLC Is this necessary?
     //RLC list->Scroll(dx,dy);
@@ -69,7 +62,10 @@ void NetHackQtMessageWindow::Scroll(int dx, int dy)
 
 void NetHackQtMessageWindow::Clear()
 {
-    if ( map )
+    if (list)
+        NetHackQtMessageWindow::unhighlight_mesgs();
+
+    if (map)
 	map->clearMessages();
 }
 
@@ -85,6 +81,10 @@ void NetHackQtMessageWindow::Display(bool block)
 	list->repaint();
 	changed=false;
     }
+    if (block) {
+        // we don't care what the response is here
+        (void) NetHackQtBind::qt_more();
+    }
 }
 
 const char * NetHackQtMessageWindow::GetStr(bool init)
@@ -95,8 +95,9 @@ const char * NetHackQtMessageWindow::GetStr(bool init)
     QListWidgetItem *item = list->item(currgetmsg++);
     if (item) {
         QString str = item->text();
-        //raw_printf("getstr[%i]='%s'", currgetmsg, str.toLatin1().constData());
-        return str.toLatin1().constData();
+        const char *result = str.toLatin1().constData();
+        //raw_printf("getstr[%d]='%s'", currgetmsg, result);
+        return result;
     }
     return NULL;
 }
@@ -113,39 +114,102 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
     } else {
 	text2 = text;
     }
+
 #if 0
-    QListWidgetItem *item = new QListWidgetItem(text2);
-
-    QFont font = item->font();
-    font.setUnderline(attr == ATR_ULINE);
-    font.setWeight((attr == ATR_BOLD) ? QFont::Bold : QFont::Normal);
-    item->setFont(font);
-
-    QColor fg = item->foreground().color();
-    QColor bg = item->background().color();
-    if (attr == ATR_DIM)
-    {
-	fg.setAlpha(fg.alpha() / 2);
+    if (attr != ATR_NONE) {
+        QListWidgetItem *item = new QListWidgetItem(text2);
+        if (attr != ATR_DIM && attr != ATR_INVERSE) {
+            QFont font = item->font();
+            font.setUnderline(attr == ATR_ULINE);
+            font.setWeight((attr == ATR_BOLD) ? QFont::Bold : QFont::Normal);
+            item->setFont(font);
+            // ATR_BLINK not supported
+        } else {
+            // ATR_DIM or ATR_INVERSE
+            QBrush fg = item->foreground();
+            QBrush bg = item->background();
+            if (fg.color() == bg.color()) { // from menu coloring [AddRow()]
+                // default foreground and background come up the same for
+                // some unknown reason
+                //[pr: both are set to 'Qt::color1' which has same RGB
+                //     value as 'Qt::black'; X11 on OSX behaves similarly]
+                if (fg.color() == Qt::color1) {
+                    fg = Qt::black;
+                    bg = Qt::white;
+                } else {
+                    fg = (bg.color() == Qt::white) ? Qt::black : Qt::white;
+                }
+            }
+            if (attr == ATR_DIM) {
+                QColor fg_clr = fg.color();
+                fg_clr.setAlpha(fg_clr.alpha() / 2);
+                item->setFlags(Qt::NoItemFlags);
+            } else if (attr == ATR_INVERSE) {
+                QBrush swapfb;
+                swapfb = fg; fg = bg; bg = swapfb;
+            }
+            item->setForeground(fg);
+            item->setBackground(bg);
+        }
     }
-    if (attr == ATR_INVERSE)
-    {
-	QColor swap;
-	swap = fg; fg = bg; bg = swap;
-    }
-    item->setForeground(fg);
-    item->setBackground(bg);
 #endif
 
-    // ATR_BLINK not supported
-    if (list->count() >= ::iflags.msg_history)
+    if (list->count() >= (int) ::iflags.msg_history)
 	delete list->item(0);
     list->addItem(text2);
+    /* assert( list->count() > 0 ); */
 
-    // Force scrollbar to bottom
-    list->setCurrentRow(list->count()-1);
+    // force scrollbar to bottom;
+    // selects most recent message, which causes it to be highlighted
+    list->setCurrentRow(list->count() - 1);
 
-    if ( map )
+    if (map)
 	map->putMessage(attr, text2);
+}
+
+// append to the last message; usually the user's answer to a prompt
+void NetHackQtMessageWindow::AddToStr(const char *answer)
+{
+    if (list) {
+        QListWidgetItem *item = list->currentItem();
+        int ct = 0;
+        if (!item && (ct = list->count()) > 0) {
+            list->setCurrentRow(ct - 1);
+            item = list->currentItem();
+        }
+        if (item)
+            item->setText(item->text() + QString(" %1").arg(answer));
+        else // just in case...
+            NetHackQtMessageWindow::PutStr(ATR_NONE, answer);
+    }
+}
+
+// used when yn_function() or more() rejects player's input and tries again
+void NetHackQtMessageWindow::RehighlightPrompt()
+{
+    // selects most recent message, which causes it to be highlighted
+    if (list && list->count())
+        list->setCurrentRow(list->count() - 1);
+}
+
+// are there any highlighted messages?
+bool NetHackQtMessageWindow::hilit_mesgs()
+{
+    // PutStr() uses setCurrentRow() to select the last message line;
+    // being selected causes that line to be highlighted.
+    //
+    // We could/should keep track of whether anything is currently
+    // highlighted instead of just assuming that last message still is.
+    if (list && list->count())
+        return true;
+    return false;
+}
+
+// unhighlight any highlighted messages
+void NetHackQtMessageWindow::unhighlight_mesgs()
+{
+    if (list)
+        list->clearSelection();
 }
 
 } // namespace nethack_qt_

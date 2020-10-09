@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1593953347 2020/07/05 12:49:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -845,8 +845,9 @@ int retry;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         n = query_category("Drop what type of items?", g.invent,
-                           UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL | BUC_BLESSED
-                               | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN,
+                           (UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL
+                            | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
+                            | BUC_UNKNOWN | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
         if (!n)
             goto drop_done;
@@ -897,7 +898,8 @@ int retry;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &g.invent,
-                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
+                          (USE_INVLET | INVORDER_SORT | INCLUDE_VENOM),
+                          &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n > 0) {
             /*
@@ -1944,7 +1946,7 @@ long timeout UNUSED;
 
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
-    if ((mptr->mflags3 & M3_DISPLACES) != 0 && body->where == OBJ_FLOOR
+    if (is_displacer(mptr) && body->where == OBJ_FLOOR
         && get_obj_location(body, &x, &y, 0) && (mtmp = m_at(x, y)) != 0) {
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);
@@ -1980,22 +1982,36 @@ long timeout UNUSED;
     }
 }
 
+boolean
+cmd_safety_prevention(cmddesc, act, flagcounter)
+const char *cmddesc;
+const char *act;
+int *flagcounter;
+{
+    if (flags.safe_wait && !iflags.menu_requested
+        && !g.multi && monster_nearby()) {
+        char buf[QBUFSZ];
+
+        buf[0] = '\0';
+        if (iflags.cmdassist || !*flagcounter++)
+            Sprintf(buf, "  Use '%s' prefix to force %s.",
+                    visctrl(g.Cmd.spkeys[NHKF_REQMENU]), cmddesc);
+        Norep("%s%s", act, buf);
+        return TRUE;
+    }
+    *flagcounter = 0;
+    return FALSE;
+}
+
 /* '.' command: do nothing == rest; also the
    ' ' command iff 'rest_on_space' option is On */
 int
 donull()
 {
-    if (!iflags.menu_requested && !g.multi && monster_nearby()) {
-        char buf[QBUFSZ];
-
-        buf[0] = '\0';
-        if (iflags.cmdassist || !g.did_nothing_flag++)
-            Sprintf(buf, "  Use '%s' prefix to force a no-op (to rest).",
-                    visctrl(g.Cmd.spkeys[NHKF_REQMENU])); /* default is "m" */
-        Norep("Are you waiting to get hit?%s", buf);
+    if (cmd_safety_prevention("a no-op (to rest)",
+                          "Are you waiting to get hit?",
+                          &g.did_nothing_flag))
         return 0;
-    }
-    g.did_nothing_flag = 0; /* reset */
     return 1; /* Do nothing, but let other things happen */
 }
 

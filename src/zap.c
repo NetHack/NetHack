@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1593772051 2020/07/03 10:27:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1596498233 2020/08/03 23:43:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1152,6 +1152,19 @@ register struct obj *obj;
             break;
         }
     }
+    /* cancelling a troll's corpse prevents it from reviving (on its own;
+       does not affect undead turning induced revival) */
+    if (obj->otyp == CORPSE && obj->timed
+        && !is_rider(&mons[obj->corpsenm])) {
+        anything a = *obj_to_any(obj);
+        long timout = peek_timer(REVIVE_MON, &a);
+
+        if (timout) {
+            (void) stop_timer(REVIVE_MON, &a);
+            (void) start_timer(timout, TIMER_OBJECT, ROT_CORPSE, &a);
+        }
+    }
+
     unbless(obj);
     uncurse(obj);
     return;
@@ -2415,6 +2428,7 @@ boolean ordinary;
         destroy_item(POTION_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
         destroy_item(FOOD_CLASS, AD_FIRE); /* only slime for now */
+        ignite_items(g.invent);
         break;
 
     case WAN_COLD:
@@ -3704,6 +3718,8 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
                 (void) destroy_mitem(mon, SCROLL_CLASS, AD_FIRE);
             if (!rn2(5))
                 (void) destroy_mitem(mon, SPBOOK_CLASS, AD_FIRE);
+            if (!rn2(3))
+                ignite_items(mon->minvent);
             destroy_mitem(mon, FOOD_CLASS, AD_FIRE); /* carried slime */
         }
         break;
@@ -3861,6 +3877,8 @@ xchar sx, sy;
                 destroy_item(SCROLL_CLASS, AD_FIRE);
             if (!rn2(5))
                 destroy_item(SPBOOK_CLASS, AD_FIRE);
+            if (!rn2(3))
+                ignite_items(g.invent);
             destroy_item(FOOD_CLASS, AD_FIRE);
         }
         break;
@@ -4022,6 +4040,9 @@ boolean u_caused;
             }
         }
     }
+    /* This also ignites floor items, but does not change cnt
+       because they weren't consumed. */
+    ignite_items(g.level.objects[x][y]);
     return cnt;
 }
 

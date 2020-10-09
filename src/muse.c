@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1590870788 2020/05/30 20:33:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1596498190 2020/08/03 23:43:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -938,8 +938,12 @@ struct monst *mtmp;
              * (mongone -> mdrop_special_objs) but we force any
              * monster who manages to acquire it or the invocation
              * tools to stick around instead of letting it escape.
+             * Don't let the Wizard escape even when not carrying
+             * anything of interest unless there are more than 1
+             * of him.
              */
-            if (mon_has_special(mtmp))
+            if (mon_has_special(mtmp)
+                || (mtmp->iswiz && g.context.no_of_wizards < 2))
                 return 0;
             if (vismon)
                 pline("%s escapes the dungeon!", Monnam(mtmp));
@@ -1590,6 +1594,7 @@ struct monst *mtmp;
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
             (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+            ignite_items(mtmp->minvent);
             num = (2 * (rn1(3, 3) + 2 * bcsign(otmp)) + 1) / 3;
             if (Fire_resistance)
                 You("are not harmed.");

@@ -1,4 +1,4 @@
--- NetHack 3.6	mines.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
+-- NetHack 3.7	mines.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
 --	Copyright (c) 1989-95 by Jean-Christophe Collet
 --	Copyright (c) 1991-95 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -35,8 +35,8 @@ des.map([[
 local place = { {08,16},{13,07},{21,08},{41,14},{50,04},{50,16},{66,01} }
 shuffle(place)
 
-des.region({ region={26,01,32,01}, lit=0, type="ordinary",
-	     prefilled=0, irregular=1 })
+-- make the entry chamber a real room; it affects monster arrival
+des.region({ region={26,01,32,01}, lit=0, type="ordinary", irregular=1, arrival_room=true })
 des.region(selection.area(20,08,21,08),"unlit")
 des.region(selection.area(23,08,25,08),"unlit");
 -- Secret doors

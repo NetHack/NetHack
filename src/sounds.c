@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1593651682 2020/07/02 01:01:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	sounds.c	$NHDT-Date: 1600933442 2020/09/24 07:44:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -369,6 +369,7 @@ register struct monst *mtmp;
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
         pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
+        iflags.last_msg = PLNMSG_GROWL;
         if (g.context.run)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
@@ -477,6 +478,74 @@ register struct monst *mtmp;
             pline("%s seems famished.", Monnam(mtmp));
         /* looking famished will be a good trick for a tame skeleton... */
     }
+}
+
+/* hero has attacked a peaceful monster within 'mon's view */
+const char *
+maybe_gasp(mon)
+struct monst *mon;
+{
+    static const char *const Exclam[] = {
+        "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?",
+    };
+    struct permonst *mptr = mon->data;
+    int msound = mptr->msound;
+    boolean dogasp = FALSE;
+
+    /* other roles' guardians and cross-aligned priests don't gasp */
+    if ((msound == MS_GUARDIAN && mptr != &mons[g.urole.guardnum])
+        || (msound == MS_PRIEST && !p_coaligned(mon)))
+        msound = MS_SILENT;
+    /* co-aligned angels do gasp */
+    else if (msound == MS_CUSS && has_emin(mon)
+           && (p_coaligned(mon) ? !EMIN(mon)->renegade : EMIN(mon)->renegade))
+        msound = MS_HUMANOID;
+
+    /*
+     * Only called for humanoids so animal noise handling is ignored.
+     */
+    switch (msound) {
+    case MS_HUMANOID:
+    case MS_ARREST: /* Kops */
+    case MS_SOLDIER: /* solider, watchman */
+    case MS_GUARD: /* vault guard */
+    case MS_NURSE:
+    case MS_SEDUCE: /* nymph, succubus/incubus */
+    case MS_LEADER: /* quest leader */
+    case MS_GUARDIAN: /* leader's guards */
+    case MS_SELL: /* shopkeeper */
+    case MS_ORACLE:
+    case MS_PRIEST: /* temple priest, roaming aligned priest (not mplayer) */
+    case MS_BOAST: /* giants */
+    case MS_IMITATE: /* doppelganger, leocrotta, Aleax */
+        dogasp = TRUE;
+        break;
+    /* issue comprehensible word(s) if hero is similar type of creature */
+    case MS_ORC: /* used to be synonym for MS_GRUNT */
+    case MS_GRUNT: /* ogres, trolls, gargoyles, one or two others */
+    case MS_LAUGH: /* leprechaun, gremlin */
+    case MS_ROAR: /* dragon, xorn, owlbear */
+    /* capable of speech but only do so if hero is similar type */
+    case MS_DJINNI:
+    case MS_VAMPIRE: /* vampire in its own form */
+    case MS_WERE: /* lycanthrope in human form */
+    case MS_SPELL: /* titan, barrow wight, Nazgul, nalfeshnee */
+        dogasp = (mptr->mlet == g.youmonst.data->mlet);
+        break;
+    /* capable of speech but don't care if you attack peacefuls */
+    case MS_BRIBE:
+    case MS_CUSS:
+    case MS_RIDER:
+    case MS_NEMESIS:
+    /* can't speak */
+    case MS_SILENT:
+    default:
+        break;
+    }
+    if (dogasp) {
+        return Exclam[rn2(SIZE(Exclam))]; /* [mon->m_id % SIZE(Exclam)]; */
+    }
+    return (const char *) 0;
 }
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
@@ -1317,7 +1386,6 @@ const char *mapping;
     char filename[256];
     char filespec[256];
     int volume, idx = -1;
-    boolean toolong = FALSE;
 
     if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d", text,
                filename, &volume, &idx) == 4

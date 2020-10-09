@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1593953345 2020/07/05 12:49:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -461,9 +461,10 @@ const struct instance_globals g_init = {
     /* makemon.c */
 
     /* mhitm.c */
-    UNDEFINED_VALUE, /* vis */
-    UNDEFINED_VALUE, /* far_noise */
-    UNDEFINED_VALUE, /* noisetime */
+    0L, /* noisetime */
+    FALSE, /* far_noise */
+    FALSE, /* vis */
+    FALSE, /* skipdrin */
 
     /* mhitu.c */
     UNDEFINED_VALUE, /* mhitu_dieroll */
@@ -525,17 +526,20 @@ const struct instance_globals g_init = {
     0, /* distantname */
 
     /* options.c */
-    NULL, /* symset_list */
+    (struct symsetentry *) 0, /* symset_list */
     UNDEFINED_VALUES, /* mapped_menu_cmds */
     UNDEFINED_VALUES, /* mapped_menu_op */
     0, /* n_menu_mapped */
-    UNDEFINED_VALUE, /* opt_initial */
-    UNDEFINED_VALUE, /* opt_from_file */
-    UNDEFINED_VALUE, /* opt_need_redraw */
+    FALSE, /* opt_initial */
+    FALSE, /* opt_from_file */
+    FALSE, /* opt_need_redraw */
+    FALSE, /* save_menucolors */
+    (struct menucoloring *) 0, /* save_colorings */
+    (struct menucoloring *) 0, /* color_colorings */
 
     /* pickup.c */
     0,  /* oldcap */
-    UNDEFINED_PTR, /* current_container */
+    (struct obj *) 0, /* current_container */
     UNDEFINED_VALUE, /* abort_looting */
     UNDEFINED_VALUE, /* val_for_n_or_more */
     UNDEFINED_VALUES, /* valid_menu_classes */
@@ -550,7 +554,7 @@ const struct instance_globals g_init = {
     0, /* saved_pline_index */
     UNDEFINED_VALUES,
 #endif
-    NULL, /* you_buf */
+    (char *) 0, /* you_buf */
     0, /* you_buf_siz */
 
     /* polyself.c */
@@ -642,7 +646,6 @@ const struct instance_globals g_init = {
     0, /* stealmid */
 
     /* teleport.c */
-    NULL, /* telescroll */
 
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */

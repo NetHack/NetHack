@@ -4,21 +4,16 @@
 
 // qt_line.cpp -- a one line input window
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
 #include "qt_line.h"
 
 namespace nethack_qt_ {
@@ -28,7 +23,7 @@ NetHackQtLineEdit::NetHackQtLineEdit() :
 {
 }
 
-NetHackQtLineEdit::NetHackQtLineEdit(QWidget* parent, const char* name) :
+NetHackQtLineEdit::NetHackQtLineEdit(QWidget* parent, const char* name UNUSED) :
     QLineEdit(parent)
 {
 }

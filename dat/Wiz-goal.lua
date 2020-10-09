@@ -1,4 +1,4 @@
--- NetHack 3.6	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -29,7 +29,7 @@ des.map([[
                                                                             
 ]]);
 -- Dungeon Description
-des.region({ region={13,10,18,12}, lit=0, type="temple" })
+des.region({ region={13,10,18,12}, lit=0, type="temple", filled=2 })
 des.region(selection.area(13,06,18,08), "lit")
 des.region(selection.area(20,04,30,14), "unlit")
 des.region(selection.area(32,06,33,07), "unlit")

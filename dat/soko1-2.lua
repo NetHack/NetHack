@@ -1,4 +1,4 @@
--- NetHack 3.6	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	sokoban.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1998-1999 by Kevin Hugo
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -96,8 +96,7 @@ des.door("locked",23,12)
 des.door("closed",17,10)
 des.door("closed",17,12)
 des.door("closed",17,14)
-des.region({ region={18,09, 22,15}, lit = 1, type = "zoo",
-	     prefilled = 0, irregular = 1 });
+des.region({ region={18,09, 22,15}, lit = 1, type = "zoo", filled = 1, irregular = 1 });
 
 px, py = selection.rndcoord(place);
 if percent(25) then

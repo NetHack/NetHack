@@ -1,4 +1,4 @@
-/* NetHack 3.6	mextra.h	$NHDT-Date: 1574722861 2019/11/25 23:01:01 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	mextra.h	$NHDT-Date: 1596498545 2020/08/03 23:49:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,7 +19,9 @@
  *          file.
  *       3. Add a referencing macro at bottom of this file after the mextra
  *          struct (see MNAME, EGD, EPRI, ESHK, EMIN, or EDOG for examples).
- *       4. Create a newXX(mtmp) function and possibly a free_XX(mtmp)
+ *       4. If your new field isn't a pointer and requires a non-zero value
+ *          on initialization, add code to init_mextra() in src/makemon.c
+ *       5. Create a newXX(mtmp) function and possibly a free_XX(mtmp)
  *          function in an appropriate new or existing source file and add
  *          a prototype for it to include/extern.h.
  *
@@ -39,7 +41,7 @@
  *                  }
  *              }
  *
- *       5. Consider adding a new makemon flag MM_XX flag to include/hack.h
+ *       6. Consider adding a new makemon flag MM_XX flag to include/hack.h
  *          and a corresponding change to makemon() if you require your
  *          structure to be added at monster creation time.  Initialize your
  *          struct after a successful return from makemon().
@@ -47,14 +49,14 @@
  *              src/makemon.c:  if (mmflags & MM_XX) newXX(mtmp);
  *              your new code:  mon = makemon(&mons[mnum], x, y, MM_XX);
  *
- *       6. Adjust size_monst() in src/cmd.c appropriately.
- *       7. Adjust dealloc_mextra() in src/mon.c to clean up
+ *       7. Adjust size_monst() in src/cmd.c appropriately.
+ *       8. Adjust dealloc_mextra() in src/mon.c to clean up
  *          properly during monst deallocation.
- *       8. Adjust copy_mextra() in src/mon.c to make duplicate
+ *       9. Adjust copy_mextra() in src/mon.c to make duplicate
  *          copies of your struct or data on another monst struct.
- *       9. Adjust restmon() in src/restore.c to deal with your
+ *      10. Adjust restmon() in src/restore.c to deal with your
  *          struct or data during a restore.
- *      10. Adjust savemon() in src/save.c to deal with your
+ *      11. Adjust savemon() in src/save.c to deal with your
  *          struct or data during a save.
  */
 

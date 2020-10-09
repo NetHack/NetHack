@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1587502224 2020/04/21 20:50:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1596498187 2020/08/03 23:43:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2636,9 +2636,9 @@ struct permonst _mons2[] = {
         M1_SWIM | M1_AMPHIBIOUS | M1_SLITHY | M1_NOLIMBS | M1_NOHEAD
             | M1_NOTAKE | M1_POIS,
         M2_HOSTILE, 0, 5, CLR_BLUE),
-    MON("piranha", S_EEL, LVL(5, 12, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+    MON("piranha", S_EEL, LVL(5, 18, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BITE, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(60, 30, MS_SILENT, MZ_SMALL), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,

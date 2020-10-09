@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.6  Guidebook.tex $NHDT-Date: 1431192762 2015/12/16 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+% NetHack 3.7  Guidebook.tex $NHDT-Date: 1431192762 2015/12/16 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{July 9, 2020}
+\date{October 2, 2020}
 
 \maketitle
 
@@ -769,7 +769,8 @@ location other than the current position.
 %.lp
 \item[\tb{.}]
 Wait or rest, do nothing for one turn. Precede with the `{\tt m}' prefix
-to wait for a turn even next to a hostile monster.
+to wait for a turn even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.
 %.lp
 \item[\tb{a}]
 Apply (use) a tool (pick-axe, key, lamp \ldots).\\
@@ -968,7 +969,8 @@ Redraw the screen.
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
 Precede with the `{\tt m}' prefix to wait for a turn
-even next to a hostile monster.\\
+even next to a hostile monster, if {\it safe\verb+_+wait\/}
+is on.\\
 %.lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent ``remembered, unseen monster'' marker.
@@ -1956,7 +1958,7 @@ For example, each level has at least one extra boulder.
 Also, it is possible to drop everything in order to be able to squeeze
 into the same location as a boulder (and then presumably move past it),
 or to destroy a boulder with magic or tools, or to create new boulders
-with a scroll of earth.
+with a {\it scroll of earth}.
 However, doing such things will lower your luck without any specific
 message given about that.
 See the {\it Conduct\/} section for information about getting feedback for
@@ -2025,10 +2027,12 @@ claim ownership without offering any compensation.  You'll have to buy
 it back if you want to reclaim it.
 
 %.pg
-Shopkeepers sometimes run out of money.  When that happens, you'll be
-offered credit instead of gold when you try to sell something.  Credit
-can be used to pay for purchases, but it is only good in the shop where
-it was obtained; other shopkeepers won't honor it.  (If you happen to
+Shopkeepers sometime run out of money.
+When that happens, you'll be
+offered credit instead of gold when you try to sell something.
+Credit can be used to pay for purchases, but it is only good in the shop
+where it was obtained; other shopkeepers won't honor it.
+(If you happen to
 find a ``credit card'' in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
 
@@ -2057,7 +2061,7 @@ A shopkeeper treats the spot immediately inside the door as if it were
 outside the shop.
 %.lp \(bu 2
 \item[$\bullet$]
-While the shopkeeper watches you like a hawk, he will generally ignore
+While the shopkeeper watches you like a hawk, he or she will generally ignore
 any other customers.
 %.lp \(bu 2
 \item[$\bullet$]
@@ -2321,8 +2325,8 @@ to discard some of what you're carrying or collapse under its weight.
 %.pg
 {\it NetHack\/} will tell you how badly you have loaded yourself.
 If you are encumbered, one of the conditions
-``{\it Burdened\/}'', ``{\it Stressed\/}'', ``{\it Strained\/}'',
-``{\it Overtaxed\/}'' or ``{\it Overloaded\/}'' will be
+{\tt Burdened}, {\tt Stressed}, {\tt Strained},
+{\tt Overtaxed}, or {\tt Overloaded} will be
 shown on the bottom line status display.
 
 %.pg
@@ -2363,9 +2367,10 @@ less effective in combat.  Other cursed objects may act poorly or
 detrimentally in other ways.
 
 %.pg
-Objects can also be blessed.  Blessed items usually work better or
-more beneficially than normal uncursed items.  For example, a blessed
-weapon will do more damage against demons.
+Objects can also be blessed instead.
+Blessed items usually work better or more beneficially than normal
+uncursed items.
+For example, a blessed weapon will do slightly more damage against demons.
 
 %.pg
 Objects which are neither cursed nor blessed are referred to as uncursed.
@@ -2376,21 +2381,30 @@ half full versus glass half empty'' situation; make of that what you will.
 %.pg
 There are magical means of bestowing or removing curses upon objects,
 so even if you are stuck with one, you can still have the curse
-lifted and the item removed.  Priests and Priestesses have an innate
+lifted and the item removed.
+Priests and Priestesses have an innate
 sensitivity to this property in any object, so they can more easily avoid
 cursed objects than other character roles.
+Dropping objects onto an altar will reveal their bless or curse state
+provided that you can see them land.
 
 %.pg
 An item with unknown status will be reported in your inventory with no prefix.
 An item which you know the state of will be distinguished in your inventory
-by the presence of the word ``cursed'', ``uncursed'' or ``blessed'' in the
-description of the item.
-In some cases ``uncursed'' will be omitted as being redundant when
+by the presence of the word {\tt cursed}, {\tt uncursed} or
+{\tt blessed} in the description of the item.
+In some cases {\tt uncursed} will be omitted as being redundant when
 enough other information is displayed.
 The
 {\it implicit\verb+_+uncursed\/}
-option can be used to control this; toggle it off to have ``uncursed''
+option can be used to control this; toggle it off to have {\tt uncursed}
 be displayed even when that can be deduced from other attributes.
+
+%.pg
+Sometimes the bless or curse state of objects is referred to as their
+``{\tt BUC}'' attribute, for Blessed, Uncursed, or Cursed state,
+or ``{\tt BUCX}'' for Blessed, Uncursed, Cursed, or unknown.
+(The term {\it beatitude\/} is occasionally used as well.)
 
 %.hn 2
 \subsection*{Weapons (`{\tt )}')}
@@ -2823,7 +2837,7 @@ That's done implicitly to avoid unnecessary tedium.
 
 %.pg
 The commands to use rings are `{\tt P}' (put on) and `{\tt R}' (remove).
-`{\tt A|', `{\tt W}', and `{\tt T}' can also be used; see {\it Amulets\/}.
+`{\tt A}', `{\tt W}', and `{\tt T}' can also be used; see {\it Amulets\/}.
 
 %.hn 2
 \subsection*{Spellbooks (`{\tt +}')}
@@ -3156,7 +3170,7 @@ diagonally.
 Other rules can, such as not smashing boulders with magic or tools,
 but doing so causes you to receive a luck penalty.
 No message about that is given at the time, but it is tracked as a conduct.
-The #conduct command and end of game disclosure will report whether
+The {\tt \#conduct} command and end of game disclosure will report whether
 you have abided by the special rules of Sokoban, and if not, how many
 times you violated them, providing you with a way to discover which
 actions incur bad luck so that you can be better informed about whether
@@ -3273,7 +3287,7 @@ Losing enough levels to revert to lower rank(s) does not discard the
 corresponding achievement(s).
 
 %.pg
-The ``special items'' hidden in {\it Mines'~End\/} and (\it Sokoban\/}
+The ``special items'' hidden in {\it Mines'~End\/} and {\it Sokoban\/}
 are not unique but are considered to be prizes or rewards
 for exploring those levels since doing so is not necessary to complete
 the game.
@@ -3320,7 +3334,7 @@ The default name and location of the configuration file varies on different
 operating systems.\\
 
 %.lp ""
-On Unix, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
+On UNIX, Linux and Mac OS X it is \mbox{``.nethackrc''} in the user's home
 directory. The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.\\
 
@@ -3340,22 +3354,30 @@ On MS-DOS it is \mbox{``defaults.nh''} in the same folder as
 \mbox{{\it nethack.exe\/}}.\\
 
 %.lp ""
-Any line in the configuration file starting with `{\tt \#}' is treated as a comment.
-Empty lines are ignored. Any line beginning with `{\tt [}' and ending in `{\tt ]}' is considered a section
-marker. The text between the square brackets is the section name.
-Lines after a section marker belong to that section, and are
-ignored unless a CHOOSE -statement was used to select that section.
-Section names are case insensitive.
+Any line in the configuration file starting with `{\tt \#}' is treated
+as a comment and ignored.
+Empty lines are ignored.
+
+Any line beginning with `{\tt [}' and ending in `{\tt ]}'
+is a section marker (the closing `{\tt ]}' can be followed
+by whitespace and then an arbitrary comment beginning with `{\tt \#}').
+The text between the square brackets is the section name.
+Section markers are only valid after a CHOOSE directive and their names
+are case insensitive.
+Lines after a section marker belong to that section up until another
+section starts or a marker without a name is encountered or the file ends.
+Lines within sections are ignored unless a CHOOSE directive has selected
+that section.
 
 %.pg
-You can use different configuration statements in the file, some
+You can use different configuration directives in the file, some
 of which can be used multiple times.
-In general, the statements are
+In general, the directives are
 written in capital letters, followed by an equals sign, followed by
-settings particular to that statement.
+settings particular to that directive.
 
 %.pg
-Here is a list of allowed statements:
+Here is a list of allowed directives:
 
 %.lp
 \blist{}
@@ -3366,8 +3388,8 @@ take more diverse values.
 Prefix a boolean option with `no' or `!' to turn it off.
 For compound options, the option name and value are separated by a colon.
 Some options are persistent, and apply only to new games.
-You can specify multiple OPTIONS statements, and multiple options
-separated by commas in a single OPTIONS statement.
+You can specify multiple OPTIONS directives, and multiple options
+separated by commas in a single OPTIONS directive.
 (Comma separated options are processed from right to left.)
 
 %.lp ""
@@ -3446,7 +3468,8 @@ Example:
 %.lp
 \item[\bb{CHOOSE}]
 Chooses at random one of the comma-separated parameters as an active
-section name. Lines in other sections are ignored.
+section name.
+Lines in other sections are ignored.
 
 %.lp ""
 Example:
@@ -3458,8 +3481,15 @@ Example:
    OPTIONS=role:arc,race:dwa,align:law,gender:fem
    [char B]
    OPTIONS=role:wiz,race:elf,align:cha,gender:mal
+   [] #end of CHOOSE
+   OPTIONS=!rest_on_space
 \end{verbatim}
 %.ed
+
+%.lp ""
+If {\tt []} is present, the preceding section is closed and no new
+section begins; whatever follows will be common to all sections.
+Otherwise the last section extends to the end of the options file.
 
 %.lp
 \item[\bb{MENUCOLOR}]
@@ -3577,10 +3607,10 @@ to that shell), or the pair of commands
 
 %.pg
 The NETHACKOPTIONS value is effectively the same as a single OPTIONS
-statement in a configuration file.
+directive in a configuration file.
 The ``OPTIONS='' prefix is implied and comma separated options are
 processed from right to left.
-Other types of configuration statements such as BIND or MSGTYPE are
+Other types of configuration directives such as BIND or MSGTYPE are
 not allowed.
 
 %.pg
@@ -4270,6 +4300,10 @@ depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).  Persistent.
+%.lp
+\item[\ib{safe\verb+_+wait}]
+Prevents you from waiting or searching when next to a hostile monster
+(default on).  Persistent.
 %+.lp
 \item[\ib{sanity\verb+_+check}]
 Evaluate monsters, objects, and map prior to each turn (default off).
@@ -4724,7 +4758,7 @@ returns to {\it NetHack\/} to help compensate for international keyboard
 issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to {\it NetHack\/}, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the configuration file
+You can use multiple subkeyvalue assignments in the configuration file
 if needed.
 Cannot be set with the `{\tt O}' command.
 %.lp
@@ -5913,9 +5947,18 @@ Kenny Woodland}, {\it Mike Thome}, and {\it Jon Payne}.
 
 %.pg
 \medskip
-\nd {\it Andries Brouwer\/} did a major re-write, transforming {\it Hack\/}
-into a very different game, and published (at least) three versions (1.0.1,
-1.0.2, and 1.0.3) for UNIX machines to the Usenet.
+\nd {\it Andries Brouwer\/} did a major re-write while at
+Stichting Mathematisch Centrum (now Centrum Wiskunde \& Informatica),
+transforming Hack into a very different game.
+He published the Hack source code for use on UNIX
+systems by posting that to Usenet
+newsgroup {\it net.sources\/} (later renamed {\it comp.sources})
+releasing version 1.0 in December of 1984, then versions 1.0.1, 1.0.2,
+and finally 1.0.3 in July of 1985.
+Usenet newsgroup {\it net.games.hack\/} (later
+renamed {\it rec.games.hack}, eventually replaced
+by {\it rec.games.roguelike.nethack})
+was created for discussing it.
 
 %.pg
 \medskip
@@ -5938,6 +5981,9 @@ incorporating many of the added features, and produced {\it NetHack\/} version
 1.4 in 1987.
 He then coordinated a cast of thousands in enhancing and debugging
 {\it NetHack\/} 1.4 and released {\it NetHack\/} versions 2.2 and 2.3.
+Like Hack, they were released by posting their source code to Usenet where
+they remained available in various archives accessible
+via {\it ftp\/} and {\it uucp\/} after expiring from the newsgroup.
 
 %.pg
 \medskip
@@ -6229,8 +6275,8 @@ In January 2015, preparation began for the release of NetHack 3.6.
 
 %.pg
 \medskip
-At the beginning of development for what would eventually get released
-as 3.6.0, the {\it NetHack Development Team} consisted of {\it Warwick Allison},
+At the beginning of development for what would eventually get released as
+3.6.0, the {\it NetHack Development Team} consisted of {\it Warwick Allison},
 {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet},
 {\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin},
@@ -6256,7 +6302,7 @@ patches.  Many bugs were fixed and some code was restructured.
 \medskip
 The {\it NetHack Development Team}, as well as {\it Steve VanDevender} and
 {\it Kevin Smolkowski}, ensured that {\it NetHack\/} 3.6 continued to
-operate on various Unix flavors and maintained the X11 interface.
+operate on various UNIX flavors and maintained the X11 interface.
 
 %.pg
 \medskip

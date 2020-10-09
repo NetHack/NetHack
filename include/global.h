@@ -166,6 +166,10 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
+#ifdef AMIGA
+#include "amiconf.h"
+#endif
+
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
 #ifdef AMIGA
@@ -213,9 +217,11 @@ extern struct cross_target_s cross_target;
 #endif
 #endif
 
+#if !defined(CROSSCOMPILE)
 #if defined(MICRO)
 #if !defined(AMIGA) && !defined(TOS) && !defined(OS2_HPFS)
 #define SHORT_FILENAMES /* filenames are 8.3 */
+#endif
 #endif
 #endif
 
@@ -393,11 +399,14 @@ struct savefile_info {
 #ifdef UNIX
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 /* see end.c */
+#if !defined(CROSS_TO_WASM)
 #ifndef PANICTRACE
 #define PANICTRACE
-#endif
-#endif
-#endif
+#endif  /* PANICTRACE */
+#endif  /* CROSS_TO_WASM */
+#endif  /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
+#endif  /* UNIX */
+
 /* The following are meaningless if PANICTRACE is not defined: */
 #if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
 #define PANICTRACE_LIBC
@@ -406,7 +415,9 @@ struct savefile_info {
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX
+#if !defined(CROSS_TO_WASM) /* no popen in WASM */
 #define PANICTRACE_GDB
+#endif
 #endif
 
 /* Supply nethack_enter macro if not supplied by port */

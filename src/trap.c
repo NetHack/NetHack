@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1593768051 2020/07/03 09:20:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1596498220 2020/08/03 23:43:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.362 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2434,6 +2434,7 @@ register struct monst *mtmp;
                 (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
                 (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
                 (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+                ignite_items(mtmp->minvent);
             }
             if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE)
                 && !see_it && distu(mtmp->mx, mtmp->my) <= 3 * 3)
@@ -3196,6 +3197,7 @@ struct obj *box; /* null for floor trap */
         destroy_item(SCROLL_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
         destroy_item(POTION_CLASS, AD_FIRE);
+        ignite_items(g.invent);
     }
     if (!box && burn_floor_objects(u.ux, u.uy, see_it, TRUE) && !see_it)
         You("smell paper burning.");
@@ -5400,6 +5402,7 @@ lava_effects()
     destroy_item(SCROLL_CLASS, AD_FIRE);
     destroy_item(SPBOOK_CLASS, AD_FIRE);
     destroy_item(POTION_CLASS, AD_FIRE);
+    ignite_items(g.invent);
     return FALSE;
 }
 
@@ -5558,6 +5561,47 @@ boolean override;
             ttyp = nameidx;
     }
     return defsyms[trap_to_defsym(ttyp)].explanation;
+}
+
+/* Ignite ignitable items in the given object chain, due to some external source
+ * of fire. The object chain should be somewhere exposed, like someone's open
+ * inventory or the floor.
+ * This is modeled after destroy_item() somewhat and hopefully will be able to
+ * merge into it in the future.
+ */
+void
+ignite_items(objchn)
+struct obj *objchn;
+{
+    struct obj *obj;
+    boolean vis = FALSE;
+    if (!objchn)
+        return;
+
+    if (objchn->where == OBJ_INVENT)
+        vis = TRUE; /* even when blind; lit-state can be seen in inventory */
+    else if (objchn->where == OBJ_MINVENT)
+        vis = canseemon(objchn->ocarry);
+    else if (objchn->where == OBJ_FLOOR)
+        vis = cansee(objchn->ox, objchn->oy);
+    else {
+        impossible("igniting item in a weird location %d", objchn->where);
+        return;
+    }
+
+    for (obj = objchn; obj; obj = obj->nobj) {
+        if (!(ignitable(obj) || obj->otyp == MAGIC_LAMP)
+            /* The Candelabrum requires intention to be lit */
+            || obj->otyp == CANDELABRUM_OF_INVOCATION
+            || obj->otyp == BRASS_LANTERN /* doesn't ignite via fire */
+            || obj->in_use     /* not available */
+            || obj->lamplit) { /* already burning */
+            continue;
+        }
+        begin_burn(obj, FALSE);
+        if (vis)
+            pline("%s on fire!", Yobjnam2(obj, "catch"));
+    }
 }
 
 /*trap.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1587248921 2020/04/18 22:28:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1597700875 2020/08/17 21:47:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1339,9 +1339,16 @@ void
 see_objects()
 {
     register struct obj *obj;
+
     for (obj = fobj; obj; obj = obj->nobj)
         if (vobj_at(obj->ox, obj->oy) == obj)
             newsym(obj->ox, obj->oy);
+
+    /* Qt's "paper doll" subset of persistent inventory shows map tiles
+       for objects which aren't on the floor so not handled by above loop;
+       inventory which includes glyphs should also be affected, so do this
+       for all interfaces in case any feature that for persistent inventory */
+    update_inventory();
 }
 
 /*

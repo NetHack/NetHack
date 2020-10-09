@@ -1,4 +1,4 @@
-/* NetHack 3.6	windmain.c	$NHDT-Date: 1543465755 2018/11/29 04:29:15 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.7	windmain.c	$NHDT-Date: 1596498320 2020/08/03 23:45:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmap.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	mkmap.c	$NHDT-Date: 1596498181 2020/08/03 23:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -193,7 +193,10 @@ boolean anyroom;
                         levl[ii][jj].edge = 1;
                         if (lit)
                             levl[ii][jj].lit = lit;
-                        if ((int) levl[ii][jj].roomno != rmno)
+
+                        if (levl[ii][jj].roomno == NO_ROOM)
+                            levl[ii][jj].roomno = rmno;
+                        else if ((int) levl[ii][jj].roomno != rmno)
                             levl[ii][jj].roomno = SHARED;
                     }
         }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1589322381 2020/05/12 22:26:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	explode.c	$NHDT-Date: 1596498168 2020/08/03 23:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -412,6 +412,9 @@ int expltype;
                 idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
                 idamnonres += destroy_mitem(mtmp, RING_CLASS, (int) adtyp);
 
+                if (adtyp == AD_FIRE)
+                    ignite_items(mtmp->minvent);
+
                 if (explmask[i][j] == 1) {
                     golemeffects(mtmp, (int) adtyp, dam + idamres);
                     mtmp->mhp -= idamnonres;
@@ -500,8 +503,10 @@ int expltype;
             You("are unharmed!");
         } else if (adtyp == AD_PHYS || physical_dmg)
             damu = Maybe_Half_Phys(damu);
-        if (adtyp == AD_FIRE)
+        if (adtyp == AD_FIRE) {
             (void) burnarmor(&g.youmonst);
+            ignite_items(g.invent);
+        }
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
         destroy_item(POTION_CLASS, (int) adtyp);

@@ -7,21 +7,36 @@ else
 	export DJGPP_TOP="$TRAVIS_BUILD_DIR/lib/djgpp"
 fi
 
+if [ -z "$GCCVER" ]; then
+	export GCCVER=gcc1010
+fi
+
+if [ -z "$LUA_VERSION" ]; then
+	export LUA_VERSION=5.4.0
+fi
+
 if [ ! -d "$(pwd)/lib" ]; then
 	echo "Set up for Unix build and 'make fetch-lua' first."
 	exit 1
 fi
 
-DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
+#DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
+DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/"
 if [ "$(uname)" = "Darwin" ]; then
     #Mac
-    DJGPP_FILE="djgpp-osx-gcc550.tar.bz2"
+    DJGPP_FILE="djgpp-osx-$GCCVER.tar.bz2"
+    if [ -z "HINTS" ]; then
+        export HINTS=macOS.2020
+    fi
 elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
     #Linux
-    DJGPP_FILE="djgpp-linux64-gcc550.tar.bz2"
+    DJGPP_FILE="djgpp-linux64-$GCCVER.tar.bz2"
+    if [ -z "$HINTS" ]; then
+        export HINTS=linux.2020
+    fi
 elif [ "$(expr substr $(uname -s) 1 10)" = "MINGW32_NT" ]; then
     #mingw
-    DJGPP_FILE="djgpp-mingw-gcc550-standalone.zip"
+    DJGPP_FILE="djgpp-mingw-$GCCVER-standalone.zip"
 else
     echo "No DJGPP release for you, sorry."
     exit 1
@@ -79,36 +94,4 @@ cd ../
 if [ ! -d "lib/lua-$LUA_VERSION/src" ]; then
         exit 0
 fi
-
-#echo after dos extender
-
-cd src
-
-mkdir -p ../msdos-binary
-cp ../dat/data.base ../dat/data.bas
-cp ../include/patchlevel.h ../include/patchlev.h
-cp ../doc/Guidebook.txt ../doc/guidebk.txt
-cp ../sys/share/posixregex.c ../sys/share/posixreg.c
-#cp ../sys/msdos/Makefile1.cross ../src/Makefile1
-#cp ../sys/msdos/Makefile2.cross ../src/Makefile2
-make -f ../sys/msdos/Makefile1.cross
-#cat ../include/date.h
-export GCC_EXEC_PREFIX=$DJGPP_TOP/lib/gcc/
-# export
-
-#pwd
-
-make -f ../sys/msdos/Makefile2.cross
-unset GCC_EXEC_PREFIX
-#pwd
-
-if [ -f ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE ]; then
-    cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE ../msdos-binary/CWSDPMI.EXE;
-fi
-
-# ls -l ../msdos-binary
-cd ../msdos-binary
-zip -9 ../lib/NH370DOS.ZIP *
-cd ../
-ls -l lib/NH370DOS.ZIP
 

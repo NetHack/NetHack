@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1593611274 2020/07/01 13:47:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1596498149 2020/08/03 23:42:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1192,6 +1192,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
         if (!rn2(7))
             (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        if (!rn2(4))
+            ignite_items(mdef->minvent);
         if (youdefend && Slimed)
             burn_away_slime();
         return realizes_damage;

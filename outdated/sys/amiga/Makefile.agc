@@ -184,7 +184,7 @@ MAKEDEFOBJ = \
 AMIGAOBJ = \
 	$(O)amidos.o	$(O)amirip.o 	$(O)amistack.o	\
 	$(O)amiwind.o	$(O)winami.o	$(O)winchar.o	$(O)winfuncs.o	\
-	$(O)winkey.o	$(O)winmenu.o	$(O)winreq.o	$(O)winstr.o
+	$(O)winkey.o	$(O)winamenu.o	$(O)winreq.o	$(O)winstr.o
 
 # Objects from assembly sources (because DMake can't handle default rules)
 AMIGAOBJ2 = \
@@ -572,7 +572,7 @@ $(O)winfuncs.o:	$(AMI)winfuncs.c $(HDEP) $(AMDEP) $(I)patchlevel.h
 
 $(O)winkey.o:	$(AMI)winkey.c $(HDEP) $(AMDEP)
 
-$(O)winmenu.o:	$(AMI)winmenu.c $(HDEP) $(AMDEP)
+$(O)winamenu.o:	$(AMI)winamenu.c $(HDEP) $(AMDEP)
 
 $(O)winami.o:	$(AMI)winami.c $(HDEP) $(AMDEP) #$(AMI)char.c $(AMI)randwin.c
 

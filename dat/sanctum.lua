@@ -1,4 +1,4 @@
--- NetHack 3.6	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -32,11 +32,11 @@ des.map([[
 |             -------------                  -----          -------        |
 ----------------------------------------------------------------------------
 ]]);
-des.region({ region={15,07, 21,10}, lit=1, type="temple", contents = function()
+des.region({ region={15,07, 21,10}, lit=1, type="temple", filled=2, contents = function()
                 des.door({ wall = "random", state = "secret" });
 end })
 des.altar({ x=18, y=08, align="noalign", type="sanctum" })
-des.region({ region={41,06, 48,11}, lit=0, type="morgue", prefilled=0, irregular=1 })
+des.region({ region={41,06, 48,11}, lit=0, type="morgue", filled=1, irregular=1 })
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,75,19))
 -- Invisible barrier separating the left & right halves of the level

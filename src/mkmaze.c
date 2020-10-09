@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577674536 2019/12/30 02:55:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1596498182 2020/08/03 23:43:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -541,7 +541,7 @@ fixup_special()
         struct obj *otmp;
         int tryct;
 
-        croom = &g.rooms[0]; /* only one room on the medusa level */
+        croom = &g.rooms[0]; /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct--) {
             x = somex(croom);
             y = somey(croom);
@@ -574,15 +574,6 @@ fixup_special()
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
         g.level.flags.graveyard = 1;
-    } else if (on_level(&u.uz, &orcus_level)) {
-        struct monst *mtmp, *mtmp2;
-
-        /* it's a ghost town, get rid of shopkeepers */
-        for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-            mtmp2 = mtmp->nmon;
-            if (mtmp->isshk)
-                mongone(mtmp);
-        }
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();

@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1593953331 2020/07/05 12:48:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1600468452 2020/09/18 22:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -639,12 +639,7 @@ struct _create_particular_data {
     boolean sleeping, saddled, invisible, hidden;
 };
 
-/* instance_globals holds engine state that does not need to be
- * persisted upon game exit.  The initialization state is well defined
- * an set in decl.c during early early engine initialization.
- *
- * unlike instance_flags, values in the structure can be of any type. */
-
+/* some array sizes for 'g' */
 #define BSIZE 20
 #define WIZKIT_MAX 128
 #define CVT_BUF_SIZE 64
@@ -652,6 +647,16 @@ struct _create_particular_data {
 #define LUA_VER_BUFSIZ 20
 #define LUA_COPYRIGHT_BUFSIZ 120
 
+/*
+ * 'g' -- instance_globals holds engine state that does not need to be
+ * persisted upon game exit.  The initialization state is well defined
+ * and set in decl.c during early early engine initialization.
+ *
+ * Unlike instance_flags, values in the structure can be of any type.
+ *
+ * Pulled from other files to be grouped in one place.  Some comments
+ * which came with them don't make much sense out of their original context.
+ */
 struct instance_globals {
 
     /* apply.c */
@@ -684,12 +689,12 @@ struct instance_globals {
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */
-    /* Provide a means to redo the last command.  The flag `in_doagain' is set
-     * to true while redoing the command.  This flag is tested in commands that
-     * require additional input (like `throw' which requires a thing and a
-     * direction), and the input prompt is not shown.  Also, while in_doagain is
-     * TRUE, no keystrokes can be saved into the saveq.
-     */
+    /* Provide a means to redo the last command.  The flag `in_doagain'
+       (decl.c below) is set to true while redoing the command.  This flag
+       is tested in commands that require additional input (like `throw'
+       which requires a thing and a direction), and the input prompt is
+       not shown.  Also, while in_doagain is TRUE, no keystrokes can be
+       saved into the saveq. */
     char pushq[BSIZE];
     char saveq[BSIZE];
     int phead;
@@ -932,9 +937,10 @@ struct instance_globals {
     /* makemon.c */
 
     /* mhitm.c */
-    boolean vis;
-    boolean far_noise;
     long noisetime;
+    boolean far_noise;
+    boolean vis;
+    boolean skipdrin; /* mind flayer against headless target */
 
     /* mhitu.c */
     int mhitu_dieroll;
@@ -998,34 +1004,35 @@ struct instance_globals {
     /* objname.c */
     /* distantname used by distant_name() to pass extra information to
        xname_flags(); it would be much cleaner if this were a parameter,
-       but that would require all of the xname() and doname() calls to be
-       modified */
+       but that would require all xname() and doname() calls to be modified */
     int distantname;
 
     /* options.c */
     struct symsetentry *symset_list; /* files.c will populate this with
-                                        list of available sets */
-    /*
-        * Allow the user to map incoming characters to various menu commands.
-        * The accelerator list must be a valid C string.
-        */
+                                      * list of available sets */
+    /* Allow the user to map incoming characters to various menu commands. */
     char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS + 1]; /* exported */
     char mapped_menu_op[MAX_MENU_MAPPED_CMDS + 1];
     short n_menu_mapped;
+    /* options processing */
     boolean opt_initial;
     boolean opt_from_file;
     boolean opt_need_redraw; /* for doset() */
+    /* use menucolors to show colors in the pick-a-color menu */
+    boolean save_menucolors; /* copy of iflags.use_menu_colors */
+    struct menucoloring *save_colorings; /* copy of g.menu_colorings */
+    struct menucoloring *color_colorings; /* alternate set of menu colors */
 
     /* pickup.c */
     int oldcap; /* last encumberance */
     /* current_container is set in use_container(), to be used by the
        callback routines in_container() and out_container() from askchain()
-       and use_container(). Also used by menu_loot() and container_gone(). */
+       and use_container().  Also used by menu_loot() and container_gone(). */
     struct obj *current_container;
     boolean abort_looting;
     /* Value set by query_objlist() for n_or_more(). */
     long val_for_n_or_more;
-    /* list of valid menu classes for query_objlist() and allow_category callback
+    /* list of menu classes for query_objlist() and allow_category callback
        (with room for all object classes, 'u'npaid, BUCX, and terminator) */
     char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
     boolean class_filter;
@@ -1140,7 +1147,6 @@ struct instance_globals {
     unsigned int stealmid; /* monster doing the stealing */
 
     /* teleport.c */
-    struct obj *telescroll; /* non-null when teleporting via this scroll */
 
     /* timeout.c */
     /* ordered timer list */

@@ -1,4 +1,4 @@
--- NetHack 3.6	Tourist.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
+-- NetHack 3.7	Tourist.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991,92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
@@ -33,7 +33,7 @@ des.map([[
 des.region(selection.area(00,00,75,19), "lit")
 -- The Inn
 des.region(selection.area(01,01,09,02), "lit")
-des.region({ region = {01,04,09,05}, lit=1, type = "barracks" })
+des.region({ region = {01,04,09,05}, lit=1, type = "barracks", filled = 1 })
 des.region(selection.area(01,07,02,10), "unlit")
 des.region(selection.area(07,07,09,10), "unlit")
 des.region(selection.area(01,14,02,15), "unlit")
@@ -41,9 +41,9 @@ des.region(selection.area(07,14,09,15), "unlit")
 des.region(selection.area(01,17,02,18), "unlit")
 des.region(selection.area(07,17,09,18), "unlit")
 --
-des.region({ region = {11,01,19,02}, lit = 0, type = "barracks" })
+des.region({ region = {11,01,19,02}, lit = 0, type = "barracks", filled = 1 })
 des.region(selection.area(21,01,30,02), "unlit")
-des.region({ region = {11,17,19,18}, lit = 0, type = "barracks" })
+des.region({ region = {11,17,19,18}, lit = 0, type = "barracks", filled = 1 })
 des.region(selection.area(21,17,30,18), "unlit")
 -- Police Station
 des.region(selection.area(18,07,25,11), "lit")
@@ -53,12 +53,12 @@ des.region(selection.area(24,13,25,13), "unlit")
 -- The town itself
 des.region(selection.area(42,03,47,06), "unlit")
 des.region(selection.area(42,08,50,11), "unlit")
-des.region({ region = {37,16,41,18}, lit = 0, type = "morgue" })
+des.region({ region = {37,16,41,18}, lit = 0, type = "morgue", filled = 1 })
 des.region(selection.area(47,16,55,18), "unlit")
 des.region(selection.area(55,01,62,03), "unlit")
 des.region(selection.area(64,01,71,03), "unlit")
-des.region({ region = {60,14,71,15}, lit = 1, type = "shop" })
-des.region({ region = {60,17,71,18}, lit = 1, type = "shop" })
+des.region({ region = {60,14,71,15}, lit = 1, type = "shop", filled = 1 })
+des.region({ region = {60,17,71,18}, lit = 1, type = "shop", filled = 1 })
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,75,19))
 -- Stairs

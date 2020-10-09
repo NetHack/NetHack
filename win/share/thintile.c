@@ -1,4 +1,4 @@
-/* NetHack 3.6	thintile.c	$NHDT-Date: 1457207049 2016/03/05 19:44:09 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7	thintile.c	$NHDT-Date: 1596498337 2020/08/03 23:45:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
 /*   Copyright (c) NetHack Development Team 1995                    */
 /*   NetHack may be freely redistributed.  See license for details. */
 

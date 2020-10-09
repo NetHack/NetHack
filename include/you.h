@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1593768079 2020/07/03 09:21:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	you.h	$NHDT-Date: 1596498576 2020/08/03 23:49:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -359,7 +359,7 @@ struct you {
     char ushops_entered[5]; /* ditto, shops entered this turn */
     char ushops_left[5];    /* ditto, shops exited this turn */
 
-    int uhunger;  /* refd only in eat.c and shk.c */
+    int uhunger;  /* refd only in eat.c and shk.c (also insight.c) */
     unsigned uhs; /* hunger state - see eat.c */
 
     struct prop uprops[LAST_PROP + 1];

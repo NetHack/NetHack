@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# NetHack 3.6  NHsubst       $NHDT-Date: 1524689631 2018/04/25 20:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $
+# NetHack 3.7  NHsubst       $NHDT-Date: 1596498407 2020/08/03 23:46:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -392,7 +392,7 @@ $TEST-Branch: theirs $
 
 TEST 8:
 <<< d1
-/* NetHack 3.6        objnam.c        $TEST-Date$ $TEST-Branch$:$TEST-Revision$ */
+/* NetHack 3.7        objnam.c        $TEST-Date$ $TEST-Branch$:$TEST-Revision$ */
 ===
-/* NetHack 3.6        objnam.c        $TEST-Date: 1426977394 2015/03/21 22:36:34 $  $TEST-Branch: master $:$TEST-Revision: 1.108 $ */
+/* NetHack 3.7        objnam.c        $TEST-Date: 1426977394 2015/03/21 22:36:34 $  $TEST-Branch: master $:$TEST-Revision: 1.108 $ */
 >>> d3

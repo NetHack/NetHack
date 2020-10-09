@@ -1,4 +1,4 @@
--- NetHack 3.6	Samurai.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Samurai.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
@@ -37,7 +37,7 @@ des.map([[
 ]]);
 -- Dungeon Description
 des.region(selection.area(00,00,75,19), "lit")
-des.region({ region={18,03, 26,07}, lit=1, type="throne", prefilled=1 })
+des.region({ region={18,03, 26,07}, lit=1, type="throne", filled=2 })
 -- Portal arrival zone
 des.levregion({ region = {62,12,70,17}, type="branch" })
 -- Stairs

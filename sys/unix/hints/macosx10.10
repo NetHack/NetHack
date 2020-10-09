@@ -1,5 +1,5 @@
 #
-# NetHack 3.6  macosx10.11 $NHDT-Date: 1566346603 2019/08/21 00:16:43 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.53 $
+# NetHack 3.7  macosx10.11 $NHDT-Date: 1596498420 2020/08/03 23:47:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -59,6 +59,7 @@ GAMEGRP  = games
 #WANT_SOURCE_INSTALL=1
 
 CC=gcc
+CXX=g++
 
 # At the moment this is just for debugging, but in the future it could be
 # useful for other things.  Requires SYSCF and an ANSI compiler.
@@ -68,8 +69,23 @@ CC=gcc
 # You shouldn't need to change anything below here.
 #
 
+ifdef WANT_WIN_QT
+LINK = $(CXX)
+else
+LINK = $(CC)
+endif
+
 #CFLAGS+=-W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN -ansi -pedantic -Wno-long-long
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN
+ifndef WANT_WIN_QT
+#	these are normally used when compiling nethack's core
+CFLAGS+=-ansi -pedantic -Wno-long-long
+#	but -ansi -pendantic forces C90 sematics and win/Qt/qt_*.cpp trigger
+#In file included from .../qt5/include/QtCore/qglobal.h:105:
+#.../qt5/include/QtCore/qcompilerdetection.h:561:6:
+#  error Qt requires a C++11 compiler and yours does not seem to be that.
+#	so we suppress them when the build includes Qt
+endif
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # leave it out by default.
 #CFLAGS+=-Wunreachable-code
@@ -110,9 +126,9 @@ WINX11LIB = -lXaw -lXmu -lXext -lXt -lX11
 VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 # -x: if built without dlb, some versions of mkfontdir think *.lev are fonts
 POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; ( cd $(HACKDIR); mkfontdir -x .lev );
+CFLAGS += -DX11_GRAPHICS
 # separate from CFLAGS so that we don't pass it to every file
 X11CFLAGS = -I/opt/X11/include
-CFLAGS += -DX11_GRAPHICS
 # avoid repeated complaints about _X_NONNULL(args...) in <X11/Xfuncproto.h>
 X11CFLAGS += -Wno-variadic-macros
 ifdef USE_XPM
@@ -129,7 +145,6 @@ endif	# WANT_WIN_X11
 ifdef WANT_WIN_QT
 CFLAGS += -DQT_GRAPHICS -DNOUSER_SOUNDS
 CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-LINK=g++
 WINSRC += $(WINQTSRC)
 WINLIB += $(WINQTLIB) $(LIBXPM)
 WINLIB += -framework Carbon -framework QuickTime -lz -framework OpenGL
@@ -149,8 +164,6 @@ ifndef QTDIR
 $(error QTDIR not defined in the environment or Makefile)
 endif	# QTDIR
 # XXX make sure QTDIR points to something reasonable
-else	# !WANT_WIN_QT
-LINK=$(CC)
 endif	# !WANT_WIN_QT
 
 ifdef WANT_SHARE_INSTALL

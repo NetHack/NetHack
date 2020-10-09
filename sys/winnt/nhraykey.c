@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhraykey.c	$NHDT-Date: 1457207047 2016/03/05 19:44:07 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	nhraykey.c	$NHDT-Date: 1596498314 2020/08/03 23:45:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

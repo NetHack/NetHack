@@ -1,4 +1,4 @@
--- NetHack 3.6	yendor.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	yendor.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -27,11 +27,10 @@ des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,
 des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} })
 des.levregion({ region={25,11,25,11}, type="portal", name="fakewiz1" });
 des.mazewalk(28,09,"east")
-des.region({ region={07,03, 15,11}, lit=0 ,type="morgue",prefilled=1 })
-des.region({ region={17,06, 18,11}, lit=0, type="beehive" })
--- make the entry chamber a real room; it affects monster arrival;
--- `unfilled' is a kludge to force an ordinary room to remain a room
-des.region({ region={20,06,26,11},lit=0,type="ordinary",prefilled=1,
+des.region({ region={07,03, 15,11}, lit=0 ,type="morgue", filled=2 })
+des.region({ region={17,06, 18,11}, lit=0, type="beehive", filled=1 })
+-- make the entry chamber a real room; it affects monster arrival
+des.region({ region={20,06,26,11},lit=0,type="ordinary",arrival_room=true,
              contents = function()
                 local w = "north";
                 if percent(50) then w = "west" end

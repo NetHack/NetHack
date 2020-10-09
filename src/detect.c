@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1586815085 2020/04/13 21:58:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	detect.c	$NHDT-Date: 1596498155 2020/08/03 23:42:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1868,17 +1868,10 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
 int
 dosearch()
 {
-    if (!iflags.menu_requested && !g.multi && monster_nearby()) {
-        char buf[QBUFSZ];
-
-        buf[0] = '\0';
-        if (iflags.cmdassist || !g.already_found_flag++)
-            Sprintf(buf, "  Use '%s' prefix to force another search.",
-                    visctrl(g.Cmd.spkeys[NHKF_REQMENU])); /* default is "m" */
-        Norep("You already found a monster.%s", buf);
+    if (cmd_safety_prevention("another search",
+                          "You already found a monster.",
+                          &g.already_found_flag))
         return 0;
-    }
-    g.already_found_flag = 0; /* start over */
     return dosearch0(0);
 }
 

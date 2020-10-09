@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1575161965 2019/12/01 00:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.7	version.c	$NHDT-Date: 1596498224 2020/08/03 23:43:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -29,7 +29,7 @@ struct cross_target_s cross_target = {
 
 #if defined(NETHACK_GIT_SHA)
 const char *NetHack_git_sha
-#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
                 = NETHACK_GIT_SHA
 #else
 #ifdef NETHACK_HOST_GIT_SHA
@@ -41,7 +41,7 @@ const char *NetHack_git_sha
 
 #if defined(NETHACK_GIT_BRANCH)
 const char *NetHack_git_branch
-#if !defined(CROSSCOMPILE) || (defined(CROSSCOMPILE) && defined(CROSSCOMPILE_HOST))
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
                 = NETHACK_GIT_BRANCH
 #else
 #ifdef NETHACK_HOST_GIT_BRANCH
@@ -265,7 +265,7 @@ boolean pastebuf;
     raw_printf("%s", buf2);
 
     if (pastebuf) {
-#ifdef RUNTIME_PASTEBUF_SUPPORT
+#if defined(RUNTIME_PASTEBUF_SUPPORT) && !defined(LIBNH)
         /*
          * Call a platform/port-specific routine to insert the
          * version information into a paste buffer. Useful for
@@ -429,7 +429,7 @@ void
 store_version(nhfp)
 NHFILE *nhfp;
 {
-#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_HOST)
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
         VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
@@ -439,7 +439,7 @@ NHFILE *nhfp;
 #endif
     };
 
-#if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_HOST)
+#if defined(CROSSCOMPILE) && defined(CROSSCOMPILE_TARGET)
     version_data.incarnation = VERSION_NUMBER;    /* actual version number */
     version_data.feature_set = VERSION_FEATURES;  /* bitmask of config settings */
     version_data.entity_count  = VERSION_SANITY1; /* # of monsters and objects */

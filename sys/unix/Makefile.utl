@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl    $NHDT-Date: 1588776926 2020/05/06 14:55:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+# NetHack 3.7  Makefile.utl    $NHDT-Date: 1596498292 2020/08/03 23:44:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -106,9 +106,6 @@ CPPFLAGS =
 
 LIBS =
 
-# If you are cross-compiling, you must use this:
-#OBJDIR = .
-# otherwise, you can save a little bit of disk space with this:
 OBJDIR = ../src
 
 # if you change this to 1, feedback while building will omit -Dthis -Wthat
@@ -186,17 +183,31 @@ RECOVOBJS = recover.o
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
 
+# Distinguish between the build tools for the native host
+# and the build tools for the target environment in commands.
+# This allows the same set of Makefiles to be used for native
+# builds and for cross-compiles by overriding these in hints
+# files or on the command line.
+
+TARGETPFX= 
+TARGET_CC = $(CC)
+TARGET_CFLAGS = $(CFLAGS)
+TARGET_LINK = $(LINK)
+TARGET_LFLAGS = $(LFLAGS)
+TARGET_CXX = $(CXX)
+TARGET_CXXFLAGS = $(CXXFLAGS)
 
 #	dependencies for makedefs
 #
 makedefs:	$(MAKEOBJS) mdgrep.h
-	$(CC) $(LFLAGS) -o makedefs $(MAKEOBJS)
+	$(LINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
 makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h
+	$(CC) $(CFLAGS) -c makedefs.c -o $@
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
@@ -222,6 +233,7 @@ lintdefs:
 
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c panic.c -o $@
 
 
 # with all of extern.h's functions to complain about, we drown in
@@ -233,7 +245,7 @@ lintdgn:
 #	dependencies for recover
 #
 recover: $(RECOVOBJS)
-	$(CC) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
+	$(LINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
 
 recover.o: recover.c $(CONFIG_H) ../include/date.h
 
@@ -244,8 +256,7 @@ dlb:	$(DLBOBJS)
 	$(CC) $(LFLAGS) -o dlb $(DLBOBJS) $(LIBS)
 
 dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h ../include/date.h
-	$(CC) $(CFLAGS) -c dlb_main.c
-
+	$(CC) $(CFLAGS) -c dlb_main.c -o $@
 
 
 #	dependencies for tile utilities
@@ -257,24 +268,24 @@ PPMWRITERS = ppmwrite.o
 tileutils: tilemap gif2txt txt2ppm tile2x11
 
 gif2txt: $(GIFREADERS) $(TEXT_IO)
-	$(CC) $(LFLAGS) -o gif2txt $(GIFREADERS) $(TEXT_IO) $(LIBS)
+	$(LINK) $(LFLAGS) -o gif2txt $(GIFREADERS) $(TEXT_IO) $(LIBS)
 txt2ppm: $(PPMWRITERS) $(TEXT_IO)
-	$(CC) $(LFLAGS) -o txt2ppm $(PPMWRITERS) $(TEXT_IO) $(LIBS)
+	$(LINK) $(LFLAGS) -o txt2ppm $(PPMWRITERS) $(TEXT_IO) $(LIBS)
 
 tile2x11: tile2x11.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
+	$(LINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
 
 tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
+	$(LINK) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
 
 tile2bmp: tile2bmp.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
+	$(LINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
 
 xpm2img.ttp: xpm2img.o bitmfile.o
-	$(CC) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
+	$(LINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
 tile2beos: tile2beos.o $(TEXT_IO)
-	$(CC) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
+	$(LINK) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
 
 #--compiling and linking in one step leaves extra debugging files (in their
 #  own subdirectories!) on OSX; compile and link separately to suppress
@@ -282,14 +293,14 @@ tile2beos: tile2beos.o $(TEXT_IO)
 #tilemap: ../win/share/tilemap.c $(HACK_H)
 #	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
 tilemap: tilemap.o
-	$(CC) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
+	$(LINK) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
 ../src/tile.c: tilemap
 	./tilemap
 
 ../include/tile.h: ../win/share/tile.h
 	cp ../win/share/tile.h ../include/tile.h
 tiletext.o: ../win/share/tiletext.c $(CONFIG_H) ../include/tile.h
-	$(CC) $(CFLAGS) -c ../win/share/tiletext.c
+	$(CC) $(CFLAGS) -c ../win/share/tiletext.c -o $@
 tiletxt.c: ./Makefile
 	@echo '/* alternate compilation for tilemap.c to create tiletxt.o' > tiletxt.c
 	@echo '   that does not rely on "cc -c -o tiletxt.o tilemap.c"'	 >> tiletxt.c
@@ -298,32 +309,32 @@ tiletxt.c: ./Makefile
 	echo '#include "../win/share/tilemap.c"' >> tiletxt.c
 	@echo '/*tiletxt.c*/'			 >> tiletxt.c
 tiletxt.o: tiletxt.c ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) -c tiletxt.c
+	$(CC) $(CFLAGS) -c tiletxt.c -o $@
 tilemap.o: ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../win/share/tilemap.c
+	$(CC) $(CFLAGS) -c ../win/share/tilemap.c -o $@
 
 gifread.o: ../win/share/gifread.c $(CONFIG_H) ../include/tile.h
-	$(CC) $(CFLAGS) -c ../win/share/gifread.c
+	$(CC) $(CFLAGS) -c ../win/share/gifread.c -o $@
 ppmwrite.o: ../win/share/ppmwrite.c $(CONFIG_H) ../include/tile.h
-	$(CC) $(CFLAGS) -c ../win/share/ppmwrite.c
+	$(CC) $(CFLAGS) -c ../win/share/ppmwrite.c -o $@
 
 tile2bmp.o: ../win/share/tile2bmp.c $(HACK_H) ../include/tile.h
-	$(CC) $(CFLAGS) -c ../win/share/tile2bmp.c
+	$(CC) $(CFLAGS) -c ../win/share/tile2bmp.c -o $@
 
 tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../include/tile.h \
 						../include/tile2x11.h
-	$(CC) $(CFLAGS) -c ../win/X11/tile2x11.c
+	$(CC) $(CFLAGS) -c ../win/X11/tile2x11.c -o $@
 
 tile2img.o: ../win/gem/tile2img.c $(HACK_H) ../include/tile.h \
 						../include/bitmfile.h
-	$(CC) $(CFLAGS) -c ../win/gem/tile2img.c
+	$(CC) $(CFLAGS) -c ../win/gem/tile2img.c -o $@
 xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c ../win/gem/xpm2img.c
+	$(CC) $(CFLAGS) -c ../win/gem/xpm2img.c -o $@
 bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c ../win/gem/bitmfile.c
+	$(CC) $(CFLAGS) -c ../win/gem/bitmfile.c -o $@
 
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
-	$(CXX) $(CFLAGS) -c ../win/BeOS/tile2beos.cpp
+	$(CXX) $(CFLAGS) -c ../win/BeOS/tile2beos.cpp -o $@
 
 tileedit: tileedit.cpp $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
@@ -341,8 +352,7 @@ tileedit: tileedit.cpp $(TEXT_IO)
 # to improvise things not in the instructions, like 'make makedefs' here
 # in util...
 
-# make sure object files from src are available when needed
-#
+# make sure host object files from src are available when needed
 $(OBJDIR)/alloc.o: ../src/alloc.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/alloc.c -o $@
 $(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H)

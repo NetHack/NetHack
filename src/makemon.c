@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1591178397 2020/06/03 09:59:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1596498176 2020/08/03 23:42:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.177 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -997,13 +997,16 @@ struct monst *mon;
 int mndx;
 {
     struct permonst *ptr = &mons[mndx];
+    int basehp = 0;
 
     mon->m_lev = adj_lev(ptr);
     if (is_golem(ptr)) {
+        /* golems have a fixed amount of HP, varying by golem type */
         mon->mhpmax = mon->mhp = golemhp(mndx);
     } else if (is_rider(ptr)) {
         /* we want low HP, but a high mlevel so they can attack well */
-        mon->mhpmax = mon->mhp = d(10, 8);
+        basehp = 10; /* minimum is 1 per false (weaker) level */
+        mon->mhpmax = mon->mhp = d(basehp, 8);
     } else if (ptr->mlevel > 49) {
         /* "special" fixed hp monster
          * the hit points are encoded in the mlevel in a somewhat strange
@@ -1012,18 +1015,37 @@ int mndx;
         mon->mhpmax = mon->mhp = 2 * (ptr->mlevel - 6);
         mon->m_lev = mon->mhp / 4; /* approximation */
     } else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
-        /* adult dragons */
-        mon->mhpmax = mon->mhp =
-            (int) (In_endgame(&u.uz)
-                       ? (8 * mon->m_lev)
-                       : (4 * mon->m_lev + d((int) mon->m_lev, 4)));
+        /* adult dragons; N*(4+rnd(4)) before endgame, N*8 once there */
+        basehp = (int) mon->m_lev; /* not really applicable; isolates cast */
+        mon->mhpmax = mon->mhp = In_endgame(&u.uz) ? (8 * basehp)
+                                 : (4 * basehp + d(basehp, 4));
     } else if (!mon->m_lev) {
+        basehp = 1; /* minimum is 1, increased to 2 below */
         mon->mhpmax = mon->mhp = rnd(4);
     } else {
-        mon->mhpmax = mon->mhp = d((int) mon->m_lev, 8);
+        basehp = (int) mon->m_lev; /* minimum possible is one per level */
+        mon->mhpmax = mon->mhp = d(basehp, 8);
         if (is_home_elemental(ptr))
-            mon->mhpmax = (mon->mhp *= 3);
+            mon->mhpmax = (mon->mhp *= 3); /* leave 'basehp' as-is */
     }
+
+    /* if d(X,8) rolled a 1 all X times, give a boost;
+       most beneficial for level 0 and level 1 monsters, making mhpmax
+       and starting mhp always be at least 2 */
+    if (mon->mhpmax == basehp) {
+        mon->mhpmax += 1;
+        mon->mhp = mon->mhpmax;
+    }
+}
+
+static const struct mextra zeromextra = DUMMY;
+
+static void
+init_mextra(mex)
+struct mextra *mex;
+{
+    *mex = zeromextra;
+    mex->mcorpsenm = NON_PM;
 }
 
 struct mextra *
@@ -1032,13 +1054,7 @@ newmextra()
     struct mextra *mextra;
 
     mextra = (struct mextra *) alloc(sizeof(struct mextra));
-    mextra->mname = 0;
-    mextra->egd = 0;
-    mextra->epri = 0;
-    mextra->eshk = 0;
-    mextra->emin = 0;
-    mextra->edog = 0;
-    mextra->mcorpsenm = NON_PM;
+    init_mextra(mextra);
     return mextra;
 }
 
