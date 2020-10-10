@@ -480,7 +480,7 @@ struct obj *container; /* container, for autounlock */
                 }
 
                 if (otmp->obroken) {
-                    You_cant("fix its broken lock with %s.", an(xname(pick)));
+                    You_cant("fix its broken lock with %s.", an(simple_typename(picktyp)));
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */
