@@ -338,11 +338,30 @@ endif
 override TARGET_CC = emcc
 override TARGET_CXX = emcc
 override TARGET_AR = emar
-override TARGET_CFLAGS = $(EMCC_CFLAGS) \
-	-I../include \
-	$(LUAINCL) -DDLB $(PDCURSESDEF) \
-	-DNOTTYGRAPHICS -DSHIM_GRAPHICS -DDEFAULT_WINDOW_SYS=\"shim\" \
-	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_WASM -DLIBNH
+WASM_CFLAGS = -Wall -Wextra -Wno-missing-field-initializers
+WASM_CFLAGS += -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch
+WASM_CFLAGS += -Wshadow
+# WASM_CFLAGS += -Wwrite-strings
+# WASM_CFLAGS += -Werror
+# Nethack C flags
+WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.2020
+WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
+WASM_CFLAGS += -g -I../include -DNOTPARMDECL
+WASM_CFLAGS += -DGCC_WARN
+# NetHack sources control
+WASM_CFLAGS += -DDLB
+WASM_CFLAGS += -DHACKDIR=\"$(HACKDIR)\"
+WASM_CFLAGS += -DDEFAULT_WINDOW_SYS=\"shim\" \
+#override TARGET_CFLAGS += -DGREPPATH=\"/usr/bin/grep\"
+WASM_CFLAGS += -DNOMAIL
+WASM_CFLAGS += $(LUAINCL)
+WASM_CFLAGS += -DNOTTYGRAPHICS -DSHIM_GRAPHICS -DLIBNH
+WASM_CFLAGS += -DCROSSCOMPILE
+WASM_TARGET_CFLAGS = -DCROSSCOMPILE_TARGET -DCROSS_TO_WASM
+# For src Makefile 
+override CFLAGS = $(WASM_CFLAGS)
+override TARGET_CFLAGS = $(EMCC_CFLAGS) $(WASM_CFLAGS) $(WASM_TARGET_CFLAGS)
+#
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
 override TARGET_LFLAGS= $(EMCC_LFLAGS)
@@ -358,11 +377,11 @@ override WINLIB = emranlib
 override LUALIB=
 override REGEXOBJ = $(TARGETPFX)posixregex.o
 override WINOBJ=
-#override INSTDIR = $(WASM_DATA_DIR)
-#override PACKAGE= wasmpkg
-#override MOREALL = ( cd src ; $(MAKE) $(WASM_TARGET) )
+# don't bother Making regular NetHack executable
 override GAME=
-override ALLDEP = wasm
+# the real VARDAT hasn't been defined yet for use in ALLDEP override
+WASM_DAT = bogusmon data engrave epitaph oracles options quest.lua rumors
+override ALLDEP = include/nhlua.h $(WASM_DAT) spec_levs check-dlb wasm
 override PREGAME += mkdir -p $(TARGETDIR)/wasm-data ;
 override CLEANMORE += rm -rf $(TARGETDIR) ;
 RANLIB=$(EMRANLIB)

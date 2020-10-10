@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1597090815 2020/08/10 20:20:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1602270122 2020/10/09 19:02:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.328 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1344,6 +1344,63 @@ struct obj *obj;
             return TRUE;
     }
     return FALSE;
+}
+
+/* called when lit object is hit by water */
+boolean
+splash_lit(obj)
+struct obj *obj;
+{
+    boolean result, dunk = FALSE;
+
+    /* lantern won't be extinguished by a rust trap or rust monster attack
+       but will be if submerged or placed into a container or swallowed by
+       a monster (for mobile light source handling, not because it ought
+       to stop being lit in all those situations...) */
+    if (obj->lamplit && obj->otyp == BRASS_LANTERN) {
+        struct monst *mtmp;
+        boolean useeit = FALSE, uhearit = FALSE, snuff = TRUE;
+
+        if (obj->where == OBJ_INVENT) {
+            useeit = !Blind;
+            uhearit = !Deaf;
+            /* underwater light sources aren't allowed but if hero
+               is just entering water, Underwater won't be set yet */
+            dunk = (is_pool(u.ux, u.uy)
+                    && ((!Levitation && !Flying && !Wwalking)
+                        || Is_waterlevel(&u.uz)));
+            snuff = FALSE;
+        } else if (obj->where == OBJ_MINVENT
+                   /* don't assume that lit lantern has been swallowed;
+                      a nymph might have stolen it or picked it up */
+                   && ((mtmp = obj->ocarry), humanoid(mtmp->data))) {
+            xchar x, y;
+
+            useeit = get_obj_location(obj, &x, &y, 0) && cansee(x, y);
+            uhearit = couldsee(x, y) && distu(x, y) < 5 * 5;
+            dunk = (is_pool(mtmp->mx, mtmp->my)
+                    && ((!is_flyer(mtmp->data) && !is_floater(mtmp->data))
+                        || Is_waterlevel(&u.uz)));
+            snuff = FALSE;
+        }
+
+        if (useeit || uhearit)
+            pline("%s %s%s%s.", Yname2(obj),
+                  uhearit ? "crackles" : "",
+                  (uhearit && useeit) ? " and " : "",
+                  useeit ? "flickers" : "");
+        if (!dunk && !snuff)
+            return FALSE;
+    }
+
+    result = snuff_lit(obj);
+
+    /* this is simpler when we wait until after lantern has been snuffed */
+    if (dunk) {
+        /* drain some of the battery but don't short it out entirely */
+        obj->age -= (obj->age > 200L) ? 100L : (obj->age / 2L);
+    }
+    return result;
 }
 
 /* Called when potentially lightable object is affected by fire_damage().

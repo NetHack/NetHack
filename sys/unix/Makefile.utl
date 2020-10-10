@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.7  Makefile.utl    $NHDT-Date: 1596498292 2020/08/03 23:44:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
+# NetHack 3.7  Makefile.utl    $NHDT-Date: 1602258295 2020/10/09 15:44:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -120,6 +120,10 @@ QUIETCC=0
 # in Makefile.src; these use '$(CC) $(LFLAGS)' and ought to be changed to use
 # $(LD) or $(LINK) as appropriate [quiet mode echoes a misleading $< value]
 
+# [LINK might be defined to use $(CXX); we don't want that here.]
+CLINK=$(CC)
+CXXLINK=$(CXX)
+
 # ----------------------------------------
 #
 # Nothing below this line should have to be changed.
@@ -131,7 +135,7 @@ QUIETCC=0
 ACTUAL_CC := $(CC)
 ACTUAL_CXX := $(CXX)
 ACTUAL_LD := $(LD)
-ACTUAL_LINK := $(LINK)
+ACTUAL_CLINK := $(CLINK)
 
 CC_V0 = $(ACTUAL_CC)
 CC_V = $(CC_V0)
@@ -146,7 +150,7 @@ CXX = $(CXX_V$(QUIETCC))
 # LD and LINK might be based on invoking CC and may not be able to substitute
 # for QUIETCC, so feedback from them is handled differently (via $AT)
 LD = $(ACTUAL_LD)
-LINK = $(ACTUAL_LINK)
+CLINK = $(ACTUAL_CLINK)
 
 AT_V0 :=
 AT_V := $(AT_V0)
@@ -162,7 +166,7 @@ HACK_H	 = ../src/hack.h-t
 MAKESRC = makedefs.c ../src/mdlib.c
 RECOVSRC = recover.c
 DLBSRC = dlb_main.c
-UTILSRCS = $(MAKESRC) panic.c $(DGNCOMPSRC) $(RECOVSRC) $(DLBSRC)
+UTILSRCS = $(MAKESRC) panic.c $(RECOVSRC) $(DLBSRC)
 
 # files that define all monsters and objects
 CMONOBJ = ../src/monst.c ../src/objects.c
@@ -192,7 +196,7 @@ DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
 TARGETPFX= 
 TARGET_CC = $(CC)
 TARGET_CFLAGS = $(CFLAGS)
-TARGET_LINK = $(LINK)
+TARGET_CLINK = $(CLINK)
 TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
 TARGET_CXXFLAGS = $(CXXFLAGS)
@@ -200,7 +204,7 @@ TARGET_CXXFLAGS = $(CXXFLAGS)
 #	dependencies for makedefs
 #
 makedefs:	$(MAKEOBJS) mdgrep.h
-	$(LINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
+	$(CLINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
 makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
@@ -239,13 +243,14 @@ panic.o:     panic.c $(CONFIG_H)
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
 lintdgn:
-	@lint -axhu -I../include -DLINT $(DGNCOMPSRC) $(CALLOC) | sed '/_flsbuf/d'
+	@lint -axhu -I../include -DLINT $(UTILSRCS) $(CALLOC) \
+		| sed '/_flsbuf/d'
 
 
 #	dependencies for recover
 #
 recover: $(RECOVOBJS)
-	$(LINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
+	$(CLINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
 
 recover.o: recover.c $(CONFIG_H) ../include/date.h
 
@@ -253,7 +258,7 @@ recover.o: recover.c $(CONFIG_H) ../include/date.h
 #	dependencies for dlb
 #
 dlb:	$(DLBOBJS)
-	$(CC) $(LFLAGS) -o dlb $(DLBOBJS) $(LIBS)
+	$(CLINK) $(LFLAGS) -o dlb $(DLBOBJS) $(LIBS)
 
 dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h ../include/date.h
 	$(CC) $(CFLAGS) -c dlb_main.c -o $@
@@ -268,24 +273,25 @@ PPMWRITERS = ppmwrite.o
 tileutils: tilemap gif2txt txt2ppm tile2x11
 
 gif2txt: $(GIFREADERS) $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o gif2txt $(GIFREADERS) $(TEXT_IO) $(LIBS)
+	$(CLINK) $(LFLAGS) -o gif2txt $(GIFREADERS) $(TEXT_IO) $(LIBS)
 txt2ppm: $(PPMWRITERS) $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o txt2ppm $(PPMWRITERS) $(TEXT_IO) $(LIBS)
+	$(CLINK) $(LFLAGS) -o txt2ppm $(PPMWRITERS) $(TEXT_IO) $(LIBS)
 
 tile2x11: tile2x11.o $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
+	$(CLINK) $(LFLAGS) -o tile2x11 tile2x11.o $(TEXT_IO) $(LIBS)
 
 tile2img.ttp: tile2img.o bitmfile.o $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o $(TEXT_IO) $(LIBS)
+	$(CLINK) $(LFLAGS) -o tile2img.ttp tile2img.o bitmfile.o \
+		$(TEXT_IO) $(LIBS)
 
 tile2bmp: tile2bmp.o $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
+	$(CLINK) $(LFLAGS) -o tile2bmp tile2bmp.o $(TEXT_IO)
 
 xpm2img.ttp: xpm2img.o bitmfile.o
-	$(LINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
+	$(CLINK) $(LFLAGS) -o xpm2img.ttp xpm2img.o bitmfile.o $(LIBS)
 
 tile2beos: tile2beos.o $(TEXT_IO)
-	$(LINK) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
+	$(CXXLINK) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
 
 #--compiling and linking in one step leaves extra debugging files (in their
 #  own subdirectories!) on OSX; compile and link separately to suppress
@@ -293,7 +299,7 @@ tile2beos: tile2beos.o $(TEXT_IO)
 #tilemap: ../win/share/tilemap.c $(HACK_H)
 #	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
 tilemap: tilemap.o
-	$(LINK) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
+	$(CLINK) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
 ../src/tile.c: tilemap
 	./tilemap
 
@@ -336,10 +342,12 @@ bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
 	$(CXX) $(CFLAGS) -c ../win/BeOS/tile2beos.cpp -o $@
 
-tileedit: tileedit.cpp $(TEXT_IO)
+# note: tileedit.cpp was developed for Qt2 and will not compile using Qt5
+tileedit.o: ../win/Qt/tileedit.cpp
+	$(CXX) -I../include -I$(QTDIR)/include ../win/Qt/tileedit.cpp
+tileedit: tileedit.o $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
-	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib \
-		tileedit.cpp $(TEXT_IO) -lqt
+	$(CXXLINK) -o tileedit -L$(QTDIR)/lib tileedit.o $(TEXT_IO) -lqt
 
 # using dependencies like
 #	../src/foo::

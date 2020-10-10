@@ -1296,7 +1296,9 @@ do_date()
         Fprintf(ofp, "#define NETHACK_%sGIT_BRANCH \"%s\"\n",
                 xpref, gitbranch);
     }
+#if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
     Fprintf(ofp, "#endif /* !CROSSCOMPILE || !CROSSCOMPILE_TARGET */\n");
+#endif
     Fprintf(ofp, "\n");
 #ifdef AMIGA
     {
