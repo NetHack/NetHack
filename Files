@@ -430,7 +430,7 @@ splash.uu              tiles-mingw32.mak      tiles.mak
 winMS.h
 
 win/win32/vs:
-(files for Visual Studio 2017 Community Edition builds)
+(files for Visual Studio 2017 or 2019 Community Edition builds)
 NetHack.sln                   NetHack.vcxproj
 NetHackPackage.appxmanifest   NetHackPackage.wapproj
 NetHackProperties.props       NetHackW.vcxproj
@@ -453,7 +453,7 @@ tilemap.vcxproj               tiles.vcxproj
 travisci.sh                   uudecode.vcxproj
 
 win/win32/vs/Images:
-(files for Visual Studio 2017 Community Edition builds)
+(files for Visual Studio 2017 or 2019 Community Edition builds)
 BadgeLogo.scale-100.png
 BadgeLogo.scale-125.png
 BadgeLogo.scale-150.png
