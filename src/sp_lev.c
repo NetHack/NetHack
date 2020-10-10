@@ -197,6 +197,9 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
      * end of no 'g.'
      */
 
+#define TYP_CANNOT_MATCH(typ) \
+    ((typ) == MAX_TYPE || (typ) == INVALID_TYPE)
+
 /* Does typ match with levl[][].typ, considering special types
    MATCH_WALL and MAX_TYPE (aka transparency)? */
 static boolean
@@ -277,7 +280,7 @@ struct mapfragment *mf;
     else if (!mapfrag_canmatch(mf)) {
         mapfrag_free(&mf);
         return "mapfragment needs to have odd height and width";
-    } else if (mapfrag_get(mf, (mf->wid/2), (mf->hei/2)) >= MAX_TYPE) {
+    } else if (TYP_CANNOT_MATCH(mapfrag_get(mf, (mf->wid/2), (mf->hei/2)))) {
         mapfrag_free(&mf);
         return "mapfragment center must be valid terrain";
     }
