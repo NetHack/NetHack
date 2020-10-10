@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.325 $ $NHDT-Date: 1602270140 2020/10/09 19:02:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ $NHDT-Date: 1602355548 2020/10/10 18:45:48 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -272,6 +272,10 @@ for multiple drop ('D') with menustyle traditional or combination, if the only
 	object class player picked was '$' then it operated on all classes
 small monsters could seep through their shirt
 don't snuff brass lantern when it's hit by water unless it is submerged
+when reporting that hero can't repair a chest's broken lock with key/pick/card
+	just describe the base item without BUC, user assigned name, &c since
+	"You can't repair a chest's lock with an uncursed key." implicitly
+	suggests that you might be able to do so with a blessed or cursed one
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
