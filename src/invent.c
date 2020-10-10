@@ -1884,11 +1884,14 @@ register const char *let, *word;
 void
 silly_thing(word, otmp)
 const char *word;
+#ifdef OBSOLETE_HANDLING
 struct obj *otmp;
-{
-#if 1 /* 'P','R' vs 'W','T' handling is obsolete */
-    nhUse(otmp);
 #else
+struct obj *otmp UNUSED;
+#endif
+{
+#ifdef OBSOLETE_HANDLING
+    /* 'P','R' vs 'W','T' handling is obsolete */
     const char *s1, *s2, *s3;
     int ocls = otmp->oclass, otyp = otmp->otyp;
 

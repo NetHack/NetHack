@@ -304,7 +304,10 @@ register char *opts;
 boolean tinitial, tfrom_file;
 {
     char *op;
-    boolean negated, got_match = FALSE, has_val = FALSE;
+    boolean negated, got_match = FALSE;
+#if 0
+    boolean has_val = FALSE;
+#endif
     int i, matchidx = -1, optresult = optn_err, optlen, optlen_wo_val;
     boolean retval = TRUE;
 
@@ -345,11 +348,16 @@ boolean tinitial, tfrom_file;
     optlen = (int) strlen(opts);
     optlen_wo_val = length_without_val(opts, optlen);
     if (optlen_wo_val < optlen) {
+#if 0
         has_val = TRUE;
+#endif
         optlen = optlen_wo_val;
-    } else {
+    }
+#if 0
+    else {
         has_val = FALSE;
     }
+#endif
 
     for (i = 0; i < OPTCOUNT; ++i) {
         got_match = FALSE;

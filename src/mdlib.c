@@ -60,7 +60,6 @@ static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *, const char *));
 static char *FDECL(bannerc_string, (char *, const char *));
 
-static int FDECL(case_insensitive_comp, (const char *, const char *));
 static void NDECL(make_version);
 static char *FDECL(eos, (char *));
 #if 0
@@ -73,6 +72,11 @@ static int FDECL(mkstemp, (char *));
 #endif
 #endif
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
+
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
+    || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
+static int FDECL(case_insensitive_comp, (const char *, const char *));
+#endif
 
 #if !defined(MAKEDEFS_C) && defined(WIN32)
 extern int GUILaunched;
@@ -88,7 +92,10 @@ static void FDECL(opt_out_words, (char *, int *));
 static void NDECL(build_savebones_compat_string);
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 40
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
+    && defined(__DATE__) && defined(__TIME__)
 static char rttimebuf[MAXOPT];
+#endif
 static char *opttext[120] = { 0 };
 char optbuf[BUFSZ];
 static struct version_info version;
@@ -348,6 +355,8 @@ char *template;
 #endif /* HAS_NO_MKSTEMP */
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
+    || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
 static int
 case_insensitive_comp(s1, s2)
 const char *s1;
@@ -367,6 +376,7 @@ const char *s2;
     }
     return u1 - u2;
 }
+#endif
 
 static char *
 eos(str)

@@ -3076,7 +3076,7 @@ lua_State *L;
 
 static int
 find_montype(L, s)
-lua_State *L;
+lua_State *L UNUSED;
 const char *s;
 {
     int i;
@@ -3084,7 +3084,6 @@ const char *s;
     for (i = LOW_PM; i < NUMMONS; i++)
         if (!strcmpi(mons[i].mname, s))
             return i;
-    nhUse(L);
     return NON_PM;
 }
 

@@ -2075,16 +2075,14 @@ int x, y, a, b, c;
 /* Return the wall mode for a T wall. */
 static int
 set_twall(x0, y0, x1, y1, x2, y2, x3, y3)
+#ifdef WA_VERBOSE
 int x0, y0; /* used #if WA_VERBOSE */
+#else
+int x0, y0 UNUSED;
+#endif
 int x1, y1, x2, y2, x3, y3;
 {
     int wmode, is_1, is_2, is_3;
-
-#ifndef WA_VERBOSE
-    /* non-verbose more_than_one() doesn't use these */
-    nhUse(x0);
-    nhUse(y0);
-#endif
 
     is_1 = check_pos(x1, y1, WM_T_LONG);
     is_2 = check_pos(x2, y2, WM_T_BL);

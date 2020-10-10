@@ -3592,7 +3592,11 @@ tty_nhgetch()
 /*ARGSUSED*/
 int
 tty_nh_poskey(x, y, mod)
+#if defined(WIN32CON)
 int *x, *y, *mod;
+#else
+int *x UNUSED, *y UNUSED, *mod UNUSED;
+#endif
 {
     int i;
 
@@ -3612,10 +3616,6 @@ int *x, *y, *mod;
     if (ttyDisplay && ttyDisplay->toplin == 1)
         ttyDisplay->toplin = 2;
 #else /* !WIN32CON */
-    nhUse(x);
-    nhUse(y);
-    nhUse(mod);
-
     i = tty_nhgetch();
 #endif /* ?WIN32CON */
     return i;

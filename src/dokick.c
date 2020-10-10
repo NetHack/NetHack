@@ -1708,7 +1708,8 @@ unsigned long deliverflags;
         if ((where & MIGR_TO_SPECIES) == 0)
             continue;
 
-        if ((mtmp->data->mflags2 & DELIVER_PM) == otmp->corpsenm) {
+        if (otmp->migr_species != NON_PM
+            && (mtmp->data->mflags2 & DELIVER_PM) == (unsigned) otmp->migr_species) {
             obj_extract_self(otmp);
             otmp->owornmask = 0L;
             otmp->ox = otmp->oy = 0;
@@ -1725,7 +1726,7 @@ unsigned long deliverflags;
                 }
                 free_oname(otmp);
             }
-            otmp->corpsenm = NON_PM;
+            otmp->migr_species = NON_PM;
             (void) add_to_minv(mtmp, otmp);
             cnt++;
             if (maxobj && cnt >= maxobj)
