@@ -593,7 +593,7 @@ VSVER=2999              #untested future version
 !include <win32.mak>
 ! ENDIF
 
-#These will be in the environment variables with one of the VS2017
+#These will be in the environment variables with one of the Visual Studio
 #developer command prompts.
 #VSCMD_ARG_HOST_ARCH=x64
 #VSCMD_ARG_TGT_ARCH=x86
