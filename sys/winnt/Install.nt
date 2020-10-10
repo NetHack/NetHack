@@ -51,10 +51,15 @@ version.  You can use one of the following build environments:
                                                   |
                                                vs2017
 
- 
 /--------------------------------------------------------\
 | Building And Running Using Visual Studio 2017          |
 \--------------------------------------------------------/
+
+Before proceeding, please obtain the lua-5.4.0 sources and copy them to
+the new directory lib\lua-5.4.0\src.  This source can be obtain either from
+http://www.lua.org/ftp/lua-5.4.0.tar.gz or from the git hub mirror
+https://github.com/lua/lua.git using the tag 'v5.4.0'.  The build expects
+to find lua files such as 'lua.h' at 'lib\lua-5.4.0\src\lua.h'.
 
 If you are NOT using Visual Studio 2017 IDE, or you prefer to build
 using a Make utility and a Makefile proceed to "Building Using Make".
