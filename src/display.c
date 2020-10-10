@@ -2078,7 +2078,7 @@ set_twall(x0, y0, x1, y1, x2, y2, x3, y3)
 #ifdef WA_VERBOSE
 int x0, y0; /* used #if WA_VERBOSE */
 #else
-int x0, y0 UNUSED;
+int x0 UNUSED, y0 UNUSED;
 #endif
 int x1, y1, x2, y2, x3, y3;
 {

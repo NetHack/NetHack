@@ -7586,7 +7586,7 @@ doset() /* changing options via menu by Per Liboriussen */
                     (void) parseoptions(buf, setinitial, fromfile);
                 } else {
                     /* compound option */
-                    int k = opt_indx, reslt;
+                    int k = opt_indx, reslt UNUSED;
 
                     if (allopt[k].has_handler && allopt[k].optfn) {
                         reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
