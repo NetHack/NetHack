@@ -1136,8 +1136,6 @@ do_date()
     char *c, cbuf[60], buf[BUFSZ];
     const char *ul_sfx;
 #if defined(CROSSCOMPILE) && !defined(CROSSCOMPILE_TARGET)
-    int steps = 0;
-    const char ind[] = "    ";
     const char *xpref = "HOST_";
 #else
     const char *xpref = (const char *) 0;
@@ -1931,7 +1929,7 @@ void
 do_monstr()
 {
     struct permonst *ptr;
-    int i, j;
+    int i;
 
     /* Don't break anything for ports that haven't been updated. */
     printf("DEPRECATION WARNINGS:\n");
@@ -1973,7 +1971,7 @@ do_monstr()
 
     /* output derived monstr values as a comment */
     Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
-    for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
+    for (ptr = &mons[0]; ptr->mlet; ptr++) {
         i = mstrength(ptr);
         Fprintf(ofp, "%-24s %2u\n", ptr->mname, (unsigned int) (uchar) i);
     }

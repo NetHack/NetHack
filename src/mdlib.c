@@ -799,6 +799,8 @@ build_options()
 void
 runtime_info_init()
 {
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
+    && defined(__DATE__) && defined(__TIME__)
     int i;
     char tmpbuf[BUFSZ], *strp;
     const char *mth[] = {
@@ -806,12 +808,15 @@ runtime_info_init()
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     struct tm t = {0};
     time_t timeresult;
+#endif
 
     if (!done_runtime_opt_init_once) {
         done_runtime_opt_init_once = 1;
         build_savebones_compat_string();
         /* construct the current version number */
         make_version();
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
+#if defined(__DATE__) && defined(__TIME__)
         /*
          * In a cross-compiled environment, you can't execute
          * the target binaries during the build, so we can't
@@ -831,8 +836,6 @@ runtime_info_init()
          *    gcc, msvc, clang   __TIME__  "23:59:01"
          *
          */
-
-#if defined(__DATE__) && defined(__TIME__)
         if (sizeof __DATE__ + sizeof __TIME__  + sizeof "123" <
             sizeof rttimebuf)
             Sprintf(rttimebuf, "%s %s", __DATE__, __TIME__);
@@ -859,35 +862,28 @@ runtime_info_init()
             extract_field(tmpbuf, rttimebuf, 2, 18);  /* sec  */
             t.tm_sec = atoi(tmpbuf);
             timeresult = mktime(&t);
-#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
             BUILD_TIME = (unsigned long) timeresult;
             BUILD_DATE = rttimebuf;
-#endif
-#else  /* __DATE__ && __TIME__ */
-            nhUse(strp);
+	}
 #endif /* __DATE__ && __TIME__ */
-
-#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
-            VERSION_NUMBER = version.incarnation;
-            VERSION_FEATURES = version.feature_set;
+        VERSION_NUMBER = version.incarnation;
+        VERSION_FEATURES = version.feature_set;
 #ifdef MD_IGNORED_FEATURES
-            IGNORED_FEATURES = MD_IGNORED_FEATURES;
+        IGNORED_FEATURES = MD_IGNORED_FEATURES;
 #endif
-            VERSION_SANITY1 = version.entity_count;
-            VERSION_SANITY2 = version.struct_sizes1;
-            VERSION_SANITY3 = version.struct_sizes2;
-
-            VERSION_STRING = strdup(version_string(tmpbuf, "."));
-            VERSION_ID = strdup(version_id_string(tmpbuf, BUILD_DATE));
-            COPYRIGHT_BANNER_C = strdup(bannerc_string(tmpbuf, BUILD_DATE));
+        VERSION_SANITY1 = version.entity_count;
+        VERSION_SANITY2 = version.struct_sizes1;
+        VERSION_SANITY3 = version.struct_sizes2;
+        VERSION_STRING = strdup(version_string(tmpbuf, "."));
+        VERSION_ID = strdup(version_id_string(tmpbuf, BUILD_DATE));
+        COPYRIGHT_BANNER_C = strdup(bannerc_string(tmpbuf, BUILD_DATE));
 #ifdef NETHACK_HOST_GIT_SHA
-            NETHACK_GIT_SHA = strdup(NETHACK_HOST_GIT_SHA);
+        NETHACK_GIT_SHA = strdup(NETHACK_HOST_GIT_SHA);
 #endif
 #ifdef NETHACK_HOST_GIT_BRANCH
-            NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
+        NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
 #endif
 #endif /* !MAKEDEFS_C  && CROSSCOMPILE_TARGET */
-	}
         idxopttext = 0;
         build_options();
     }
