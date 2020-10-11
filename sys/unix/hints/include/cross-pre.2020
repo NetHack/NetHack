@@ -184,6 +184,7 @@ override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
 		$(TARGETPFX)tileset.o $(TARGETPFX)tile.o
 override WINLIB=
 override LUALIB=
+override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
 override PREGAME += mkdir -p $(TARGETDIR) ;
@@ -273,6 +274,7 @@ override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
 #		../util/txt2iff.o
 override WINLIB=
 override LUALIB=
+override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack
 override PACKAGE = amigapkg
 override PREGAME += mkdir -p $(TARGETDIR) ;
@@ -375,6 +377,7 @@ override SYSOBJ= $(TARGETPFX)libnethackmain.o \
 		$(TARGETPFX)winshim.o
 override WINLIB = emranlib 
 override LUALIB=
+override TOPLUALIB=
 override REGEXOBJ = $(TARGETPFX)posixregex.o
 override WINOBJ=
 # don't bother Making regular NetHack executable
