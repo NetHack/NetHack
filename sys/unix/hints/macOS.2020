@@ -173,16 +173,16 @@ VARDATND += $(sort $(VARDATND0))
 
 ifdef WANT_LIBNH
 CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
-LIBNHSYSSRC = ../sys/lib/libnethackmain.c \
+LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-LIBNHSYSOBJ= libnethackmain.o ioctl.o unixtty.o unixunix.o \
+LIBNHSYSOBJ= libnhmain.o ioctl.o unixtty.o unixunix.o \
                 unixres.o winshim.o
 #don't bother building the game executable as it will fail
 #without winshim
 override GAME=
-MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnethack.a )
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnh.a )
 endif  # WANT_LIBNH
 
 WANT_BUNDLE=1
@@ -295,10 +295,10 @@ VARDIR=$(HACKDIR)
 #
 #-POST
 ifdef WANT_LIBNH
-libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
-libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H) ../include/date.h
+libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H) ../include/date.h
 	$(CC) $(CFLAGS) -c -o$@ $<
 winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<

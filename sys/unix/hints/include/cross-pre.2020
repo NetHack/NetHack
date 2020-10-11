@@ -367,11 +367,11 @@ override TARGET_CFLAGS = $(EMCC_CFLAGS) $(WASM_CFLAGS) $(WASM_TARGET_CFLAGS)
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
 override TARGET_LFLAGS= $(EMCC_LFLAGS)
-override SYSSRC = ../sys/lib/libnethackmain.c \
+override SYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-override SYSOBJ= $(TARGETPFX)libnethackmain.o \
+override SYSOBJ= $(TARGETPFX)libnhmain.o \
 		$(TARGETPFX)ioctl.o $(TARGETPFX)unixtty.o \
 		$(TARGETPFX)unixunix.o $(TARGETPFX)unixres.o \
 		$(TARGETPFX)winshim.o
@@ -393,8 +393,8 @@ RANLIB=$(EMRANLIB)
 # Rule for file in sys/unix
 $(TARGETPFX)%.o : ../sys/unix/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
-# Rule for file in sys/lib
-$(TARGETPFX)%.o : ../sys/lib/%.c
+# Rule for file in sys/libnh
+$(TARGETPFX)%.o : ../sys/libnh/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
 # Rule for files in win/shim
 $(TARGETPFX)%.o : ../win/shim/%.c

@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1596498297 2020/08/03 23:44:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	libnhmain.c	$NHDT-Date: 1596498297 2020/08/03 23:44:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1124,4 +1124,4 @@ EM_JS(void, create_global, (char *name_str, void *ptr, char *type_str), {
 
 #endif
 
-/*libnethack.c*/
+/*libnhmain.c*/
