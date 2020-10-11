@@ -133,8 +133,7 @@ $(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
 	cp ../sys/lib/sysconf $(WASM_DATA_DIR)/sysconf
 
 $(WASM_DATA_DIR)/nhdat:
-	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dlb )
-	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dofiles-dlb )
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' $(WASMDEP) dofiles-dlb )
 
 #
 $(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
