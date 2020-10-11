@@ -7,7 +7,6 @@
 
 #include "hack.h"
 #include "dlb.h"
-#include "date.h"
 
 #include <ctype.h>
 #include <sys/stat.h>
