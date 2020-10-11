@@ -130,9 +130,9 @@ extern const struct attack c_sa_no[NATTK];
 
 void
 sysopt_seduce_set(val)
+#if 0
 int val;
 {
-#if 0
 /*
  * Attack substitution is now done on the fly in getmattk(mhitu.c).
  */
@@ -144,8 +144,9 @@ int val;
         mons[PM_SUCCUBUS].mattk[x] = setval[x];
     }
 #else
-    nhUse(val);
-#endif /*0*/
+int val UNUSED;
+{
+#endif
     return;
 }
 
