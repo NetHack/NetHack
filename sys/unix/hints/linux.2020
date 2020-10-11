@@ -228,7 +228,7 @@ ifdef WANT_LIBNH
 libnethack.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
-libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H)
+libnethackmain.o : ../sys/lib/libnethackmain.c $(HACK_H) ../include/date.h
 	$(CC) $(CFLAGS) -c -o$@ $<
 winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
