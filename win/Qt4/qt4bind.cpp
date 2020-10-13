@@ -455,7 +455,22 @@ int NetHackQtBind::qt_nhgetch()
     // Process events until a key arrives.
     //
     while (keybuffer.Empty()) {
-	qApp->exec();
+        int exc = qApp->exec();
+        /*
+         * On OSX (possibly elsewhere), this prevents an infinite
+         * loop repeatedly issuing the complaint:
+QCoreApplication::exec: The event loop is already running
+         * to stderr if you syncronously start nethack from a terminal
+         * then switch focus back to that terminal and type ^C.
+         *  SIGINT -> done1() -> done2() -> yn_function("Really quit?")
+         * in the core asks for another keystroke.
+         *
+         * However, it still issues one such complaint, and whatever
+         * prompt wanted a response ("Really quit?") is shown in the
+         * message window but is auto-answered with ESC.
+         */
+        if (exc == -1)
+            keybuffer.Put('\033');
     }
 
     return keybuffer.GetAscii();
@@ -469,7 +484,10 @@ int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
     // Process events until a key or map-click arrives.
     //
     while (keybuffer.Empty() && clickbuffer.Empty()) {
-	qApp->exec();
+        int exc = qApp->exec();
+        // [see comment above in qt_nhgetch()]
+        if (exc == -1)
+            keybuffer.Put('\033');
     }
     if (!keybuffer.Empty()) {
 	return keybuffer.GetAscii();
