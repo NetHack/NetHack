@@ -77,6 +77,8 @@ private slots:
 
 private:
 	void ShowIfReady();
+        void AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
+                           const char *name, int NDECL((*func)), QPixmap xpm);
 
 #ifdef KDE
 	KMenuBar* menubar;

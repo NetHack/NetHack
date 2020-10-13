@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.327 $ $NHDT-Date: 1602621704 2020/10/13 20:41:44 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.328 $ $NHDT-Date: 1602623144 2020/10/13 21:05:44 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -441,6 +441,7 @@ Qt: for menu search, don't require clicking on the search target popup before
 	if player didn't click on the popup first)
 Qt: rest ("Zz") button on the toolbar only worked when 'rest_on_space' was On
 	(core issue, not Qt's fault)
+Qt: rename toolbar button "Get" and action menu choice "Get" to "Pick up"
 Qt+QSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
