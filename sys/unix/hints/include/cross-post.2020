@@ -130,11 +130,10 @@ $(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
 	touch $(WASM_DATA_DIR)/record
 	touch $(WASM_DATA_DIR)/logfile
 	touch $(WASM_DATA_DIR)/xlogfile
-	cp ../sys/lib/sysconf $(WASM_DATA_DIR)/sysconf
+	cp ../sys/libnh/sysconf $(WASM_DATA_DIR)/sysconf
 
 $(WASM_DATA_DIR)/nhdat:
-	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dlb )
-	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' dofiles-dlb )
+	( cd ..; $(MAKE) INSTDIR='$(WASM_DATA_DIR)' $(WASMDEP) dofiles-dlb )
 
 #
 $(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
@@ -143,8 +142,7 @@ $(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
 $(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
 $(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
 $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
-$(TARGETPFX)libnethackmain.o : ../sys/lib/libnethackmain.c \
-		$(HACK_H) ../include/date.h
+$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 endif  # CROSS_TO_WASM
 #
 

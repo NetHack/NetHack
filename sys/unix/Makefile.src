@@ -300,7 +300,7 @@ WINGNOMEOBJ =
 WINGEMSRC =
 WINGEMOBJ =
 
-# Files for Shim windowing interface for libnethack -- doesn't do anything,
+# Files for Shim windowing interface for libnh -- doesn't do anything,
 # just passes along the API calls to the library
 #
 WINSHIMSRC = ../win/shim/winshim.c
