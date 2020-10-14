@@ -101,8 +101,9 @@ void NetHackQtGlyphs::drawBorderedCell(QPainter& painter, int glyph,
 {
     int wd = width(),
         ht = height(),
+        yoffset = 1,  // tiny extra margin at top
         lox = cellx * (wd + 2),
-        loy = celly * (ht + 2);
+        loy = celly * (ht + 2) + yoffset;
 
     drawGlyph(painter, glyph, lox + 1, loy + 1);
 
