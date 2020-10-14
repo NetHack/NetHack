@@ -352,6 +352,25 @@ static const char * eat_xpm[] = {
 "   oo  oo   ",
 "   oo  oo   "};
 /* XPM */
+static const char * search_xpm[] = {
+"12 13 3 1",
+" 	c None",
+".	c #FFFFFFFF0000",
+"X	c #7F0000000000",
+"            ",
+"    XXXXX   ",
+"   X ... X  ",
+"   X.....X  ",
+"   X.....X  ",
+"   X ... X  ",
+"    XXXXX   ",
+"      X     ",
+"      X     ",
+"      X     ",
+"      X     ",
+"      X     ",
+"            "};
+/* XPM */
 static const char * rest_xpm[] = {
 "12 13 2 1",
 " 	c None",
@@ -777,6 +796,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     AddToolButton(toolbar, sm, "Throw", dothrow, QPixmap(throw_xpm));
     AddToolButton(toolbar, sm, "Fire", dofire, QPixmap(fire_xpm));
     AddToolButton(toolbar, sm, "Eat", doeat, QPixmap(eat_xpm));
+    AddToolButton(toolbar, sm, "Search", dosearch, QPixmap(search_xpm));
     AddToolButton(toolbar, sm, "Rest", donull, QPixmap(rest_xpm));
 
     connect(game, SIGNAL(triggered(QAction *)),
