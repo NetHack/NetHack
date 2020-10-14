@@ -294,7 +294,7 @@ static const char * fire_xpm[] = {
 " . o        ",
 "  o         "};
 /* XPM */
-static const char * get_xpm[] = {
+static const char * pickup_xpm[] = {
 "12 13 3 1",
 " 	c None",
 ".	c #000000000000",
@@ -478,10 +478,10 @@ aboutMsg()
 
 class SmallToolButton : public QToolButton {
 public:
-    SmallToolButton(const QPixmap & pm, const QString &textLabel,
-                 const QString& grouptext,
-                 QObject * receiver, const char* slot,
-                 QWidget * parent) :
+    SmallToolButton(const QPixmap &pm, const QString &textLabel,
+                    const QString &grouptext,
+                    QObject *receiver, const char *slot,
+                    QWidget *parent) :
 	QToolButton(parent)
     {
 	setIcon(QIcon(pm));
@@ -599,12 +599,13 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         /* { act1,      "Fight\tShift+F",             "F", 3}, */
         { act1, "Fire from quiver",  2, dofire},
         { act1, "Force",             3, doforce},
-        { act1, "Get",               2, dopickup},
         { act1, "Jump",              3, dojump},
         { act2, "Kick",              2, dokick},
         { act2, "Loot",              3, doloot},
         { act2, "Open door",         3, doopen},
         { act2, "Pay",               3, dopay},
+        // calling this "Get" was confusing to experienced players
+        { act1, "Pick up (was Get)", 3, dopickup},
         { act2, "Rest",              2, donull},
         { act2, "Ride",              3, doride},
         { act2, "Search",            3, dosearch},
@@ -762,51 +763,37 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     game->addAction("Quit NetHack", this, SLOT(doQuit(bool)));
 #endif
 
+    // order changed: was Again, Get, Kick, Throw, Fire, Drop, Eat, Rest
+    //                now Again, PickUp, Drop, Kick, Throw, Fire, Eat, Rest
     QSignalMapper* sm = new QSignalMapper(this);
-    connect(sm, SIGNAL(mapped(const QString&)), this, SLOT(doKeys(const QString&)));
-    QToolButton* tb;
-    char actchar[32];
-    tb = new SmallToolButton( QPixmap(again_xpm),"Again","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", g.Cmd.spkeys[NHKF_DOAGAIN]);
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(get_xpm),"Get","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(dopickup));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(kick_xpm),"Kick","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(dokick));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(throw_xpm),"Throw","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(dothrow));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(fire_xpm),"Fire","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(dofire));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(drop_xpm),"Drop","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(doddrop));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(eat_xpm),"Eat","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(doeat));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
-    tb = new SmallToolButton( QPixmap(rest_xpm),"Rest","Action", sm, SLOT(map()), toolbar );
-    Sprintf(actchar, "%c", cmd_from_func(donull));
-    sm->setMapping(tb, actchar );
-    toolbar->addWidget(tb);
+    connect(sm, SIGNAL(mapped(const QString&)),
+            this, SLOT(doKeys(const QString&)));
+    // 'donull' is a placeholder here; AddToolButton() will fix it up
+    AddToolButton(toolbar, sm, "Again", donull, QPixmap(again_xpm));
+    // this used to be called "Get" which is confusing to experienced players
+    AddToolButton(toolbar, sm, "Pick up", dopickup, QPixmap(pickup_xpm));
+    AddToolButton(toolbar, sm, "Drop", doddrop, QPixmap(drop_xpm));
+    AddToolButton(toolbar, sm, "Kick", dokick, QPixmap(kick_xpm));
+    AddToolButton(toolbar, sm, "Throw", dothrow, QPixmap(throw_xpm));
+    AddToolButton(toolbar, sm, "Fire", dofire, QPixmap(fire_xpm));
+    AddToolButton(toolbar, sm, "Eat", doeat, QPixmap(eat_xpm));
+    AddToolButton(toolbar, sm, "Rest", donull, QPixmap(rest_xpm));
 
-    connect(game,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
-    connect(apparel,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
-    connect(act1,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
+    connect(game, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
+    connect(apparel, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
+    connect(act1, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
     if (act2 != act1)
-	connect(act2,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
-    connect(magic,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
-    connect(info,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
-    connect(help,SIGNAL(triggered(QAction *)),this,SLOT(doMenuItem(QAction *)));
+	connect(act2, SIGNAL(triggered(QAction *)),
+                this, SLOT(doMenuItem(QAction *)));
+    connect(magic, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
+    connect(info, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
+    connect(help, SIGNAL(triggered(QAction *)),
+            this, SLOT(doMenuItem(QAction *)));
 
 #ifdef KDE
     setMenu (menubar);
@@ -852,6 +839,22 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	vsplitter->insertWidget(0, hsplitter);
 	hsplitter->insertWidget(1, invusage);
     }
+}
+
+void NetHackQtMainWindow::AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
+                                        const char *name, int NDECL((*func)),
+                                        QPixmap xpm)
+{
+    QToolButton *tb = new SmallToolButton(xpm, QString(name), "Action",
+                                          sm, SLOT(map()), toolbar);
+    char actchar[32];
+    // the ^A command is just a keystroke, not a full blown command function
+    if (!strcmp(name, "Again"))
+        (void) strkitten(actchar, ::g.Cmd.spkeys[NHKF_DOAGAIN]);
+    else
+        Sprintf(actchar, "%c", cmd_from_func(func));
+    sm->setMapping(tb, actchar);
+    toolbar->addWidget(tb);
 }
 
 void NetHackQtMainWindow::zoomMap()

@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1597069374 2020/08/10 14:22:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1602621705 2020/10/13 20:41:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2272,9 +2272,18 @@ int NDECL((*fn));
 {
     int i;
 
-    for (i = 0; i < 256; ++i)
+    /* skip NUL; allowing it would wreak havoc */
+    for (i = 1; i < 256; ++i) {
+        /* skip space; we'll use it below as last resort if no other
+           keystroke invokes space's command */
+        if (i == ' ')
+            continue;
+
         if (g.Cmd.commands[i] && g.Cmd.commands[i]->ef_funct == fn)
             return (char) i;
+    }
+    if (g.Cmd.commands[' '] && g.Cmd.commands[' ']->ef_funct == fn)
+        return ' ';
     return '\0';
 }
 
