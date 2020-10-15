@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.329 $ $NHDT-Date: 1602669770 2020/10/14 10:02:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ $NHDT-Date: 1602716771 2020/10/14 23:06:11 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -575,6 +575,8 @@ Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
 	known for a doll item, change the border's color and thicken it
+Qt: letting the mouse hover over the paper doll shows a tool tip describing
+	the object--or lack of same--in the slot under the pointer
 Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
 	and worn items plus tools [lamps, leashes] actively in use; in other
 	words, same set of things whose tiles are used to populate the doll)
