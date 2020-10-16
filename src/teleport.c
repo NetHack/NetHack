@@ -528,6 +528,11 @@ struct obj *scroll;
                 learnscroll(scroll);
             cc.x = u.ux;
             cc.y = u.uy;
+            if (iflags.travelcc.x != 0 || iflags.travelcc.y != 0) {
+                /* The player showed some interest in traveling here;
+                 * pre-suggest this coordinate. */
+                cc = iflags.travelcc;
+            }
             if (getpos(&cc, TRUE, "the desired position") < 0)
                 return; /* abort */
             /* possible extensions: introduce a small error if
