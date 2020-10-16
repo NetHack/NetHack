@@ -111,9 +111,9 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
 {
     //    0 1 2      two        dual
     //               hander     wielding
-    // 0  x H b      x H b      . H b
+    // 0  b H q      b H q      b H q
     // 1  S " w      W " W      X " w
-    // 2  G C q      G C q      G C q
+    // 2  G C x      G C x      G C .
     // 3  = A =      = A =      = A =
     // 4  l U L      l U L      l U L
     // 5  . F .      . F .      . F .
@@ -145,13 +145,7 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     // String argument is for a tool tip when the object in question is Null.
     //
     //  left column
-    /* uswapwep slot varies depending upon dual-wielding state;
-       shown in shield slot when actively wielded, so uswapwep slot is empty
-       then and an alternate tool tip is used to explain that emptiness */
-    if (!u.twoweap)
-        drawWorn(painter, uswapwep, 0, 0, "no alternate weapon");
-    else
-        drawWorn(painter, NULL,     0, 0, "secondary weapon is wielded");
+    drawWorn(painter, ublindf,      0, 0, "no eyewear"); // bf|towel|lenses
     /* shield slot varies depending upon weapon usage;
        no alt tool tip is needed for first two cases because object will
        never be Null when the corresponding tests pass */
@@ -176,9 +170,15 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     drawWorn(painter, uarmf,   1, 5, "no boots");
 
     //  right column
-    drawWorn(painter, ublindf, 2, 0, "no eyewear"); // blindfold/towel/lenses
+    drawWorn(painter, uquiver, 2, 0, "nothing readied for firing"); // quiver
     drawWorn(painter, uwep,    2, 1, "no weapon");
-    drawWorn(painter, uquiver, 2, 2, "nothing readied for firing"); // quiver
+    /* uswapwep slot varies depending upon dual-wielding state;
+       shown in shield slot when actively wielded, so uswapwep slot is empty
+       then and an alternate tool tip is used to explain that emptiness */
+    if (!u.twoweap)
+        drawWorn(painter, uswapwep, 2, 2, "no alternate weapon");
+    else
+        drawWorn(painter, NULL,     2, 2, "secondary weapon is wielded");
     drawWorn(painter, uright,  2, 3, "no right ring");
     /* OIL_LAMP matches lit candles, lamps, lantern, and candelabrum
        (and might also duplicate Sunsword when it is wielded--hence lit--
