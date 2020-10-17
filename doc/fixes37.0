@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ $NHDT-Date: 1602716771 2020/10/14 23:06:11 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.332 $ $NHDT-Date: 1602958104 2020/10/17 18:08:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -443,6 +443,9 @@ Qt: for menu search, don't require clicking on the search target popup before
 Qt: rest ("Zz") button on the toolbar only worked when 'rest_on_space' was On
 	(core issue, not Qt's fault)
 Qt: rename toolbar button "Get" and action menu choice "Get" to "Pick up"
+Qt: status icons for alignment|hunger|encumbrance which started out centered
+	relative to the label text below them would shift to being left
+	justified when status got updated
 Qt+OSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

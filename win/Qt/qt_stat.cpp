@@ -344,7 +344,7 @@ void NetHackQtStatusWindow::resizeEvent(QResizeEvent*)
 /*
  * Set all widget values to a null string.  This is used after all spacings
  * have been calculated so that when the window is popped up we don't get all
- * kinds of funny values being displayed.
+ * kinds of funny values being displayed.  [Actually it isn't used at all.]
  */
 void NetHackQtStatusWindow::nullOut()
 {
@@ -436,6 +436,7 @@ void NetHackQtStatusWindow::updateStats()
     } else {
 	hunger.setIcon(u.uhs ? p_hungry : p_satiated);
 	hunger.setLabel(hung);
+        hunger.ForceResize();
 	hunger.show();
     }
     const char *enc = enc_stat[near_capacity()];
@@ -444,6 +445,7 @@ void NetHackQtStatusWindow::updateStats()
     } else {
 	encumber.setIcon(p_encumber[near_capacity() - 1]);
 	encumber.setLabel(enc);
+        encumber.ForceResize();
 	encumber.show();
     }
     if (Stoned) stoned.show(); else stoned.hide();
@@ -468,6 +470,7 @@ void NetHackQtStatusWindow::updateStats()
     if (Stunned) stunned.show(); else stunned.hide();
     if (Confusion) confused.show(); else confused.hide();
     if (Hallucination) hallu.show(); else hallu.hide();
+    // [pr - Why is blind handled differently from other on/off conditions?]
     if (Blind) {
 	blind.setLabel("Blind");
 	blind.show();
@@ -490,12 +493,13 @@ void NetHackQtStatusWindow::updateStats()
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     char buf3[BUFSZ];
-    if (describe_level(buf3)) {
-	dlevel.setLabel(buf3,true);
-    } else {
-	buf.sprintf("%s, level ", g.dungeons[u.uz.dnum].dname);
-	dlevel.setLabel(buf,(long)::depth(&u.uz));
+    if (!describe_level(buf3)) {
+	Sprintf(buf3, "%s, level %d",
+                g.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
     }
+    // false: always highlight as 'change for the better' regardless of
+    // new depth compared to old
+    dlevel.setLabel(buf3, false);
 
     gold.setLabel("Au:", money_cnt(g.invent));
 
@@ -521,13 +525,14 @@ void NetHackQtStatusWindow::updateStats()
     }
     buf.sprintf("/%d", u.uenmax);
     power.setLabel("Pow:", u.uen, buf);
-    ac.setLabel("AC:",(long)u.uac);
+    ac.setLabel("AC:", (long) u.uac);
     //if (::flags.showexp) {
     //    exp.setLabel("Exp:", (long) u.uexp);
     //} else {
-        // 'exp' now only used to pad the line that Xp/Exp is displayed on
+        // 'exp' is now only used to pad the line that Xp/Exp is displayed on
         exp.setLabel("");
     //}
+    text = NULL;
     if (u.ualign.type==A_CHAOTIC) {
 	align.setIcon(p_chaotic);
 	text = "Chaotic";
@@ -538,7 +543,14 @@ void NetHackQtStatusWindow::updateStats()
 	align.setIcon(p_lawful);
 	text = "Lawful";
     }
-    align.setLabel(text);
+    if (text) {
+        // false: don't highlight as 'became lower' even if the internal
+        // numeric value is becoming lower (N -> C, L -> N || C)
+        align.setLabel(text, false);
+        // without this, the ankh pixmap shifts from centered to left
+        // justified relative to the label text for some unknown reason...
+        align.ForceResize();
+    }
 
     if (::flags.time)
         time.setLabel("Time:", (long) g.moves);
