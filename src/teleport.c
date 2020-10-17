@@ -540,7 +540,8 @@ struct obj *scroll;
             if (teleok(cc.x, cc.y, FALSE)) {
                 /* for scroll, discover it regardless of destination */
                 teleds(cc.x, cc.y, TELEDS_TELEPORT);
-                iflags.travelcc.x = iflags.travelcc.y = 0;
+                if (iflags.travelcc.x == cc.x && iflags.travelcc.y == cc.y)
+                    iflags.travelcc.x = iflags.travelcc.y = 0;
                 return;
             }
             pline("Sorry...");
