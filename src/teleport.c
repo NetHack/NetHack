@@ -528,7 +528,7 @@ struct obj *scroll;
                 learnscroll(scroll);
             cc.x = u.ux;
             cc.y = u.uy;
-            if (iflags.travelcc.x != 0 || iflags.travelcc.y != 0) {
+            if (isok(iflags.travelcc.x, iflags.travelcc.y)) {
                 /* The player showed some interest in traveling here;
                  * pre-suggest this coordinate. */
                 cc = iflags.travelcc;
@@ -540,6 +540,7 @@ struct obj *scroll;
             if (teleok(cc.x, cc.y, FALSE)) {
                 /* for scroll, discover it regardless of destination */
                 teleds(cc.x, cc.y, TELEDS_TELEPORT);
+                iflags.travelcc.x = iflags.travelcc.y = 0;
                 return;
             }
             pline("Sorry...");
