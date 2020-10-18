@@ -278,6 +278,7 @@ when reporting that hero can't repair a chest's broken lock with key/pick/card
 	"You can't repair a chest's lock with an uncursed key." implicitly
 	suggests that you might be able to do so with a blessed or cursed one
 pre-populate teleport destination prompt with travel destination
+ghosts cannot be renamed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
