@@ -51,8 +51,8 @@
     <ClCompile Include="$(LuaDir)lauxlib.c" />
     <ClCompile Include="$(LuaDir)lbaselib.c" />
     <ClCompile Include="$(LuaDir)lbitlib.c">
-        <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.4.0'">true</ExcludedFromBuild>
-        <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.3.5'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.4.0'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.3.5'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(LuaDir)lcode.c" />
     <ClCompile Include="$(LuaDir)lcorolib.c" />
@@ -244,6 +244,90 @@
     <ClInclude Include="$(WinWin32Dir)mhstatus.h" />
     <ClInclude Include="$(WinWin32Dir)mhtext.h" />
     <ClInclude Include="$(WinWin32Dir)winMS.h" />
+    <ClInclude Include="$(IncDir)align.h" />
+    <ClInclude Include="$(IncDir)artifact.h" />
+    <ClInclude Include="$(IncDir)artilist.h" />
+    <ClInclude Include="$(IncDir)attrib.h" />
+    <ClInclude Include="$(IncDir)bitmfile.h" />
+    <ClInclude Include="$(IncDir)botl.h" />
+    <ClInclude Include="$(IncDir)color.h" />
+    <ClInclude Include="$(IncDir)config.h" />
+    <ClInclude Include="$(IncDir)config1.h" />
+    <ClInclude Include="$(IncDir)context.h" />
+    <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)date.h" />
+    <ClInclude Include="$(IncDir)decl.h" />
+    <ClInclude Include="$(IncDir)dgn_comp.h" />
+    <ClInclude Include="$(IncDir)dgn_file.h" />
+    <ClInclude Include="$(IncDir)display.h" />
+    <ClInclude Include="$(IncDir)dlb.h" />
+    <ClInclude Include="$(IncDir)dungeon.h" />
+    <ClInclude Include="$(IncDir)engrave.h" />
+    <ClInclude Include="$(IncDir)extern.h" />
+    <ClInclude Include="$(IncDir)flag.h" />
+    <ClInclude Include="$(IncDir)fnamesiz.h" />
+    <ClInclude Include="$(IncDir)func_tab.h" />
+    <ClInclude Include="$(IncDir)gem_rsc.h" />
+    <ClInclude Include="$(IncDir)global.h" />
+    <ClInclude Include="$(IncDir)hack.h" />
+    <ClInclude Include="$(IncDir)integer.h" />
+    <ClInclude Include="$(IncDir)isaac64.h" />
+    <ClInclude Include="$(IncDir)lev_comp.h" />
+    <ClInclude Include="$(IncDir)lint.h" />
+    <ClInclude Include="$(IncDir)load_img.h" />
+    <ClInclude Include="$(IncDir)mail.h" />
+    <ClInclude Include="$(IncDir)mextra.h" />
+    <ClInclude Include="$(IncDir)mfndpos.h" />
+    <ClInclude Include="$(IncDir)micro.h" />
+    <ClInclude Include="$(IncDir)mkroom.h" />
+    <ClInclude Include="$(IncDir)monattk.h" />
+    <ClInclude Include="$(IncDir)mondata.h" />
+    <ClInclude Include="$(IncDir)monflag.h" />
+    <ClInclude Include="$(IncDir)monst.h" />
+    <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)nhlua.h" />
+    <ClInclude Include="$(IncDir)ntconf.h" />
+    <ClInclude Include="$(IncDir)obj.h" />
+    <ClInclude Include="$(IncDir)objclass.h" />
+    <ClInclude Include="$(IncDir)onames.h" />
+    <ClInclude Include="$(IncDir)optlist.h" />
+    <ClInclude Include="$(IncDir)patchlevel.h" />
+    <ClInclude Include="$(IncDir)pcconf.h" />
+    <ClInclude Include="$(IncDir)permonst.h" />
+    <ClInclude Include="$(IncDir)pm.h" />
+    <ClInclude Include="$(IncDir)prop.h" />
+    <ClInclude Include="$(IncDir)quest.h" />
+    <ClInclude Include="$(IncDir)rect.h" />
+    <ClInclude Include="$(IncDir)region.h" />
+    <ClInclude Include="$(IncDir)rm.h" />
+    <ClInclude Include="$(IncDir)skills.h" />
+    <ClInclude Include="$(IncDir)spell.h" />
+    <ClInclude Include="$(IncDir)sp_lev.h" />
+    <ClInclude Include="$(IncDir)sys.h" />
+    <ClInclude Include="$(IncDir)system.h" />
+    <ClInclude Include="$(IncDir)tcap.h" />
+    <ClInclude Include="$(IncDir)tile2x11.h" />
+    <ClInclude Include="$(IncDir)tileset.h" />
+    <ClInclude Include="$(IncDir)timeout.h" />
+    <ClInclude Include="$(IncDir)tradstdc.h" />
+    <ClInclude Include="$(IncDir)trampoli.h" />
+    <ClInclude Include="$(IncDir)trap.h" />
+    <ClInclude Include="$(IncDir)unixconf.h" />
+    <ClInclude Include="$(IncDir)vision.h" />
+    <ClInclude Include="$(IncDir)vis_tab.h" />
+    <ClInclude Include="$(IncDir)vmsconf.h" />
+    <ClInclude Include="$(IncDir)winami.h" />
+    <ClInclude Include="$(IncDir)wincurs.h" />
+    <ClInclude Include="$(IncDir)wingem.h" />
+    <ClInclude Include="$(IncDir)winGnome.h" />
+    <ClInclude Include="$(IncDir)winprocs.h" />
+    <ClInclude Include="$(IncDir)wintty.h" />
+    <ClInclude Include="$(IncDir)wintype.h" />
+    <ClInclude Include="$(IncDir)winX.h" />
+    <ClInclude Include="$(IncDir)xwindow.h" />
+    <ClInclude Include="$(IncDir)xwindowp.h" />
+    <ClInclude Include="$(IncDir)you.h" />
+    <ClInclude Include="$(IncDir)youprop.h" />
     <ClInclude Include="..\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +340,9 @@
     <Image Include="..\rip.bmp" />
     <Image Include="..\splash.bmp" />
     <Image Include="..\tiles.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">
