@@ -1071,7 +1071,6 @@ void create_global (char *name, void *ptr, char *type);
 void js_globals_init() {
     // int i;
     // char buf[BUFSZ];
-    printf("js_globals_init\n");
 
     EM_ASM({
         globalThis.nethackGlobal = globalThis.nethackGlobal || {};
