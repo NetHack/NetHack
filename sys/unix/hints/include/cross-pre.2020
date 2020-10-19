@@ -32,7 +32,7 @@ BUILD_TARGET_LUA=1
 override TARGET = wasm
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
-override TARGET_LIBS= 
+override TARGET_LIBS=
 endif
 
 ifdef CROSS
@@ -246,7 +246,7 @@ else
 override TARGET_LINK = $(TARGET_CC)
 endif
 override TARGET_LFLAGS= $(TOOLARCH)
-#override TARGET_LIBS += 
+#override TARGET_LIBS +=
 VARDATND += nhtiles.bmp
 override SYSSRC = ../outdated/sys/amiga/amidos.c ../outdated/sys/amiga/amigst.c \
 		../outdated/sys/amiga/amimenu.c ../outdated/sys/amiga/amirip.c \
@@ -298,10 +298,12 @@ ifdef CROSS_TO_WASM
 # originally from https://github.com/NetHack/NetHack/pull/385
 #===============-=================================================
 #
+WASM_DEBUG = 1
 WASM_DATA_DIR = $(TARGETPFX)wasm-data
 WASM_TARGET = $(TARGETPFX)nethack.js
 EMCC_LFLAGS =
 #EMCC_LFLAGS += -s SINGLE_FILE=1
+EMCC_LFLAGS += -DHACKDIR=\"$(HACKDIR)\"
 EMCC_LFLAGS += -s WASM=1
 EMCC_LFLAGS += -s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS += -s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
@@ -311,23 +313,28 @@ EMCC_LFLAGS += -s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback"]'
 EMCC_LFLAGS += -s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", \
 			"removeFunction", "UTF8ToString", "getValue", "setValue"]'
 EMCC_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=0
-EMCC_LFLAGS += --embed-file $(WASM_DATA_DIR)
+# XXX: the "@/" at the end of "--embed-file" tells emscripten to embed the files
+# in the root directory, otherwise they will end up in the $(WASM_DATA_DIR) path
+EMCC_LFLAGS += --embed-file $(WASM_DATA_DIR)@/
 # For a list of EMCC settings:
 # https://github.com/emscripten-core/emscripten/blob/master/src/settings.js
 #
 # WASM C flags
-EMCC_CFLAGS=
+EMCC_CFLAGS =
 EMCC_CFLAGS += -Wall
-#EMCC_CFLAGS += -Werror
+EMCC_CFLAGS += -Werror
+EMCC_CFLAGS
 #EMCC_CFLAGS += -s DISABLE_EXCEPTION_CATCHING=0
-EMCC_DEBUG_CFLAGS += -s ASSERTIONS=1
-#EMCC_DEBUG_CFLAGS += -s ASSERTIONS=2
+#EMCC_DEBUG_CFLAGS += -s ASSERTIONS=1
+EMCC_DEBUG_CFLAGS += -s ASSERTIONS=2
 EMCC_DEBUG_CFLAGS += -s STACK_OVERFLOW_CHECK=2
 EMCC_DEBUG_CFLAGS += -s SAFE_HEAP=1
 EMCC_DEBUG_CFLAGS += -s LLD_REPORT_UNDEFINED=1
-#EMCC_DEBUG_CFLAGS += -s EXCEPTION_DEBUG=1
+EMCC_DEBUG_CFLAGS += -s EXCEPTION_DEBUG=1
 #EMCC_DEBUG_CFLAGS += -fsanitize=undefined -fsanitize=address -fsanitize=leak
-#EMCC_DEBUG_CFLAGS += -s EXIT_RUNTIME
+EMCC_DEBUG_CFLAGS += -s EXIT_RUNTIME=1
+# XXX: if --profiling isn't included then any error dumps 10MB of WASM to the screen rather than a useful message
+EMCC_DEBUG_CFLAGS += --profiling
 EMCC_PROD_CFLAGS += -O3
 ifdef WASM_DEBUG
 EMCC_CFLAGS += $(EMCC_DEBUG_CFLAGS)
