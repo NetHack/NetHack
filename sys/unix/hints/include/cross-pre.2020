@@ -29,6 +29,8 @@ endif
 ifdef CROSS_TO_WASM
 CROSS=1
 BUILD_TARGET_LUA=1
+HACKDIR=/
+PREFIX=
 override TARGET = wasm
 override TARGETDIR=../targets/$(TARGET)
 override TARGETPFX = $(TARGETDIR)/
@@ -309,7 +311,7 @@ EMCC_LFLAGS += -s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS += -s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
 EMCC_LFLAGS += -O3
 EMCC_LFLAGS += -s MODULARIZE
-EMCC_LFLAGS += -s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback"]'
+EMCC_LFLAGS += -s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_mapglyph", "_display_inventory"]'
 EMCC_LFLAGS += -s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", \
 			"removeFunction", "UTF8ToString", "getValue", "setValue"]'
 EMCC_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=0
@@ -323,7 +325,7 @@ EMCC_LFLAGS += --embed-file $(WASM_DATA_DIR)@/
 EMCC_CFLAGS =
 EMCC_CFLAGS += -Wall
 EMCC_CFLAGS += -Werror
-EMCC_CFLAGS
+EMCC_CFLAGS += -DNO_SIGNAL
 #EMCC_CFLAGS += -s DISABLE_EXCEPTION_CATCHING=0
 #EMCC_DEBUG_CFLAGS += -s ASSERTIONS=1
 EMCC_DEBUG_CFLAGS += -s ASSERTIONS=2
