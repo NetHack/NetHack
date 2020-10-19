@@ -281,6 +281,11 @@ POSTINSTALL+= if test -f $(SHELLDIR)/$(GAME); then \
 endif   # WANT_BUNDLE
 endif   # !WANT_SHARE_INSTALL
 
+ifdef CROSS_TO_WASM
+HACKDIR=/
+PREFIX=
+endif # !CROSS_TO_WASM
+
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 
@@ -294,6 +299,7 @@ VARDIR=$(HACKDIR)
 #-INCLUDE cross-pre.2020
 #
 #-POST
+
 ifdef WANT_LIBNH
 libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
