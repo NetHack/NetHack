@@ -195,7 +195,6 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
     boolean is_you = (mdef == &g.youmonst);
     boolean check_visor = FALSE;
     struct obj *o;
-    const char *s;
 
     /* no eyes protect against all attacks for now */
     if (!haseyes(mdef->data))

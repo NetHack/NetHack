@@ -40,7 +40,6 @@ struct obj *otmp;
     struct monst *mtmp;
     struct permonst *ptr;
     int chance;
-    const char *s;
 
     if (!u_handsy())
         return 0;
