@@ -486,7 +486,6 @@ int
 dodrink()
 {
     register struct obj *otmp;
-    const char *potion_descr;
 
     if (Strangled) {
         pline("If you can't breathe air, how can you drink liquid?");
@@ -538,21 +537,18 @@ dodrink()
     }
     otmp->in_use = TRUE; /* you've opened the stopper */
 
-    potion_descr = OBJ_DESCR(objects[otmp->otyp]);
-    if (potion_descr) {
-        if (!strcmp(potion_descr, "milky")
-            && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
-            && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
-            ghost_from_bottle();
-            useup(otmp);
-            return 1;
-        } else if (!strcmp(potion_descr, "smoky")
-                   && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
-                   && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
-            djinni_from_bottle(otmp);
-            useup(otmp);
-            return 1;
-        }
+    if (objdescr_is(otmp, "milky")
+        && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
+        && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
+        ghost_from_bottle();
+        useup(otmp);
+        return 1;
+    } else if (objdescr_is(otmp, "smoky")
+               && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
+               && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
+        djinni_from_bottle(otmp);
+        useup(otmp);
+        return 1;
     }
     return dopotion(otmp);
 }

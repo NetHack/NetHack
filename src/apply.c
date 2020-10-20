@@ -3406,7 +3406,7 @@ struct obj *obj;
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
-    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
+    boolean is_fragile = objdescr_is(obj, "balsa");
 
     if (!paranoid_query(ParanoidBreakwand,
                        safe_qbuf(confirm,

@@ -57,11 +57,9 @@ struct obj *obj;
     if (obj->oclass == POTION_CLASS) {
         coord cc;
         static const char *empty = "The potion turns out to be empty.";
-        const char *potion_descr;
         struct monst *mtmp;
 
-        potion_descr = OBJ_DESCR(objects[obj->otyp]);
-        if (potion_descr && !strcmp(potion_descr, "milky")) {
+        if (objdescr_is(obj, "milky")) {
             if (!(g.mvitals[PM_GHOST].mvflags & G_GONE)
                 && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
                 if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST]))
@@ -87,7 +85,7 @@ struct obj *obj;
                 return 2;
             }
         }
-        if (potion_descr && !strcmp(potion_descr, "smoky")
+        if (objdescr_is(obj, "smoky")
             && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
             && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
             if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI]))

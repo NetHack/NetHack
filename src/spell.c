@@ -446,7 +446,7 @@ register struct obj *spellbook;
 
     /* attempting to read dull book may make hero fall asleep */
     if (!confused && !Sleep_resistance
-        && !strcmp(OBJ_DESCR(objects[booktype]), "dull")) {
+        && objdescr_is(spellbook, "dull")) {
         const char *eyes;
         int dullbook = rnd(25) - ACURR(A_WIS);
 

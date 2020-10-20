@@ -271,8 +271,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
         o = (mdef == &g.youmonst) ? g.invent : mdef->minvent;
         for (; o; o = o->nobj)
             if ((o->owornmask & W_ARMH)
-                && (s = OBJ_DESCR(objects[o->otyp])) != (char *) 0
-                && !strcmp(s, "visored helmet"))
+                && objdescr_is(o, "visored helmet"))
                 return FALSE;
     }
 

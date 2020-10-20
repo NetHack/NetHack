@@ -282,6 +282,26 @@ shuffle_all()
     return;
 }
 
+/* Return TRUE if the provided string matches the unidentified description of
+ * the provided object. */
+boolean
+objdescr_is(obj, descr)
+struct obj *obj;
+const char *descr;
+{
+    const char *objdescr;
+
+    if (!obj) {
+        impossible("objdescr_is: null obj");
+        return FALSE;
+    }
+
+    objdescr = OBJ_DESCR(objects[obj->otyp]);
+    if (!objdescr)
+        return FALSE; /* no obj description, no match */
+    return !strcmp(objdescr, descr);
+}
+
 /* find the object index for snow boots; used [once] by slippery ice code */
 int
 find_skates()

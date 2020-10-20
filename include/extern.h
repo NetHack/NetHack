@@ -1776,6 +1776,7 @@ E void NDECL(nttty_exit);
 E void NDECL(init_objects);
 E void FDECL(obj_shuffle_range, (int, int *, int *));
 E int NDECL(find_skates);
+E boolean FDECL(objdescr_is, (struct obj *, const char *));
 E void NDECL(oinit);
 E void FDECL(savenames, (NHFILE *));
 E void FDECL(restnames, (NHFILE *));

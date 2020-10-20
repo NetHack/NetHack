@@ -1114,7 +1114,7 @@ struct monst *mtmp;
                           distant_name(otmp, doname));
                 /* give this one even if !verbose */
                 if (otmp->oclass == SCROLL_CLASS
-                    && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+                    && objdescr_is(otmp, "YUM YUM"))
                     pline("Yum%c", otmp->blessed ? '!' : '.');
             } else {
                 if (flags.verbose)
