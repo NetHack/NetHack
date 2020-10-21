@@ -621,7 +621,8 @@ VA_DECL(const char *, str)
 
 /* nhassert_failed is called when an nhassert's condition is false */
 void
-nhassert_failed(filepath, line)
+nhassert_failed(expression, filepath, line)
+    const char* expression;
     const char * filepath;
     int line;
 {
@@ -633,7 +634,7 @@ nhassert_failed(filepath, line)
     filename = (filename == NULL ? strrchr(filepath, '\\') : filename);
     filename = (filename == NULL ? filepath : filename + 1);
 
-    impossible("nhassert failed in file '%s' at line %d", filename, line);
+    impossible("nhassert(%s) failed in file '%s' at line %d", expression, filename, line);
 }
 
 /*pline.c*/
