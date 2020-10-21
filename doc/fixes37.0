@@ -569,6 +569,7 @@ add section marker [] support to run-time config file; CHOOSE section1,section2
 render the color names in the corresponding color when using the pick-a-color
 	menu for adding status highlights or menu colors via 'O'
 reading blessed scroll of teleportation confers one-shot teleport control
+mild zombie apocalypse
 
 
 Platform- and/or Interface-Specific New Features

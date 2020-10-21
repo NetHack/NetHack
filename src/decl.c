@@ -498,6 +498,7 @@ const struct instance_globals g_init = {
     /* mon.c */
     UNDEFINED_VALUE, /* vamp_rise_msg */
     UNDEFINED_VALUE, /* disintegested */
+    UNDEFINED_VALUE, /* zombify */
     NULL, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
 

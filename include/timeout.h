@@ -29,6 +29,7 @@ enum timeout_types {
     ROT_ORGANIC = 0, /* for buried organics */
     ROT_CORPSE,
     REVIVE_MON,
+    ZOMBIFY_MON,
     BURN_OBJECT,
     HATCH_EGG,
     FIG_TRANSFORM,

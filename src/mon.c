@@ -10,6 +10,7 @@
 static void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
                                                 const char *));
 static boolean FDECL(restrap, (struct monst *));
+static long FDECL(mm_2way_aggression, (struct monst *, struct monst *));
 static long FDECL(mm_aggression, (struct monst *, struct monst *));
 static long FDECL(mm_displacement, (struct monst *, struct monst *));
 static int NDECL(pick_animal);
@@ -189,6 +190,59 @@ struct monst *mtmp;
     if (is_you ? Poison_resistance : resists_poison(mtmp))
         return M_POISONGAS_MINOR;
     return M_POISONGAS_BAD;
+}
+
+/* Return TRUE if this monster is capable of converting other monsters into
+ * zombies. */
+boolean
+zombie_maker(pm)
+struct permonst *pm;
+{
+    switch(pm->mlet) {
+    case S_ZOMBIE:
+        /* Z-class monsters that aren't actually zombies go here */
+        if (pm == &mons[PM_GHOUL] || pm == &mons[PM_SKELETON])
+            return FALSE;
+        return TRUE;
+    case S_LICH:
+        /* all liches will create zombies as well */
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* return the monster index of the zombie monster which this monster could be
+ * turned into, or NON_PM if it doesn't have a direct counterpart. Sort of the
+ * zombie-specific inverse of undead_to_corpse.
+ * If a zombie gets passed to this function, it should return NON_PM, not the
+ * same monster again. */
+int
+zombie_form(pm)
+struct permonst *pm;
+{
+    switch(pm->mlet) {
+    case S_KOBOLD:
+        return PM_KOBOLD_ZOMBIE;
+    case S_ORC:
+        return PM_ORC_ZOMBIE;
+    case S_GIANT:
+        if (pm == &mons[PM_ETTIN])
+            return PM_ETTIN_ZOMBIE;
+        return PM_GIANT_ZOMBIE;
+    case S_HUMAN:
+    case S_KOP:
+        if (is_elf(pm))
+            return PM_ELF_ZOMBIE;
+        return PM_HUMAN_ZOMBIE;
+    case S_HUMANOID:
+        if (is_dwarf(pm))
+            return PM_DWARF_ZOMBIE;
+        else
+            break;
+    case S_GNOME:
+        return PM_GNOME_ZOMBIE;
+    }
+    return NON_PM;
 }
 
 /* convert the monster index of an undead to its living counterpart */
@@ -1710,6 +1764,23 @@ long flag;
     return cnt;
 }
 
+/* Part of mm_aggression that represents two-way aggression. To avoid having to
+ * code each case twice, this function contains those cases that ought to
+ * happen twice, and mm_aggression will call it twice. */
+static long
+mm_2way_aggression(magr, mdef)
+struct monst *magr, *mdef;
+{
+    struct permonst *ma = magr->data;
+    struct permonst *md = mdef->data;
+
+    /* zombies vs things that can be zombified */
+    if (zombie_maker(ma) && zombie_form(md) != NON_PM)
+        return ALLOW_M|ALLOW_TM;
+
+    return 0;
+}
+
 /* Monster against monster special attacks; for the specified monster
    combinations, this allows one monster to attack another adjacent one
    in the absence of Conflict.  There is no provision for targetting
@@ -1722,6 +1793,10 @@ struct monst *magr, /* monster that is currently deciding where to move */
 {
     int mndx = monsndx(magr->data);
 
+    /* don't allow pets to fight each other */
+    if (magr->mtame && mdef->mtame)
+        return 0;
+
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
     if ((mndx == PM_PURPLE_WORM || mndx == PM_BABY_PURPLE_WORM)
@@ -1730,7 +1805,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
     /* Various other combinations such as dog vs cat, cat vs rat, and
        elf vs orc have been suggested.  For the time being we don't
        support those. */
-    return 0L;
+    return (mm_2way_aggression(magr, mdef) | mm_2way_aggression(mdef, magr));
 }
 
 /* Monster displacing another monster out of the way */
@@ -2665,8 +2740,12 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
         }
         /* corpse--none if hero was inside the monster */
         if (!wasinside && corpse_chance(mtmp, (struct monst *) 0, FALSE)) {
+            g.zombify = (!g.thrownobj && !g.stoned && !uwep
+                         && zombie_maker(g.youmonst.data)
+                         && zombie_form(mtmp->data) != NON_PM);
             cadaver = make_corpse(mtmp, burycorpse ? CORPSTAT_BURIED
                                                    : CORPSTAT_NONE);
+            g.zombify = FALSE; /* reset */
             if (burycorpse && cadaver && cansee(x, y) && !mtmp->minvis
                 && cadaver->where == OBJ_BURIED && !nomsg) {
                 pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));

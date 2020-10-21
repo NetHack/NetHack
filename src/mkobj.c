@@ -1198,6 +1198,10 @@ struct obj *body;
                 when = age;
                 break;
             }
+    } else if (!no_revival && g.zombify
+               && zombie_form(&mons[body->corpsenm]) != NON_PM) {
+        action = ZOMBIFY_MON;
+        when = 5 + rn2(15);
     }
 
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
@@ -1541,7 +1545,7 @@ unsigned corpstatflags;
 
         otmp->corpsenm = monsndx(ptr);
         otmp->owt = weight(otmp);
-        if (otmp->otyp == CORPSE && (special_corpse(old_corpsenm)
+        if (otmp->otyp == CORPSE && (g.zombify || special_corpse(old_corpsenm)
                                      || special_corpse(otmp->corpsenm))) {
             obj_stop_timers(otmp);
             start_corpse_timeout(otmp);

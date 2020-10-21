@@ -1293,29 +1293,8 @@ register int after;
          * Pets get taken care of above and shouldn't reach this code.
          * Conflict gets handled even farther away (movemon()).
          */
-        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy)) {
-            struct monst *mtmp2;
-            int mstatus;
-
-            mtmp2 = m_at(nix, niy);
-
-            g.notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
-            /* note: mstatus returns 0 if mtmp2 is nonexistent */
-            mstatus = mattackm(mtmp, mtmp2);
-
-            if (mstatus & MM_AGR_DIED) /* aggressor died */
-                return 2;
-
-            if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
-                && mtmp2->movement >= NORMAL_SPEED) {
-                mtmp2->movement -= NORMAL_SPEED;
-                g.notonhead = 0;
-                mstatus = mattackm(mtmp2, mtmp); /* return attack */
-                if (mstatus & MM_DEF_DIED)
-                    return 2;
-            }
-            return 3;
-        }
+        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy))
+            return m_move_aggress(mtmp, nix, niy);
 
         if ((info[chi] & ALLOW_MDISP)) {
             struct monst *mtmp2;
@@ -1605,6 +1584,44 @@ register int after;
         }
     }
     return mmoved;
+}
+
+/* The part of m_move that deals with a monster attacking another monster (and
+ * that monster possibly retaliating).
+ * Extracted into its own function so that it can be called with monsters that
+ * have special move patterns (shopkeepers, priests, etc) that want to attack
+ * other monsters but aren't just roaming freely around the level (so allowing
+ * m_move to run fully for them could select an invalid move).
+ * x and y are the coordinates mtmp wants to attack.
+ * Return values are the same as for m_move, but this function only return 2
+ * (mtmp died) or 3 (mtmp made its move).
+ */
+int
+m_move_aggress(mtmp, x, y)
+struct monst * mtmp;
+xchar x, y;
+{
+    struct monst *mtmp2;
+    int mstatus;
+
+    mtmp2 = m_at(x, y);
+
+    g.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
+    /* note: mstatus returns 0 if mtmp2 is nonexistent */
+    mstatus = mattackm(mtmp, mtmp2);
+
+    if (mstatus & MM_AGR_DIED) /* aggressor died */
+        return 2;
+
+    if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+        && mtmp2->movement >= NORMAL_SPEED) {
+        mtmp2->movement -= NORMAL_SPEED;
+        g.notonhead = 0;
+        mstatus = mattackm(mtmp2, mtmp); /* return attack */
+        if (mstatus & MM_DEF_DIED)
+            return 2;
+    }
+    return 3;
 }
 
 void
