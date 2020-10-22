@@ -42,6 +42,7 @@ static char *FDECL(spellretention, (int, char *));
 static int NDECL(throwspell);
 static void NDECL(cast_protection);
 static void FDECL(spell_backfire, (int));
+static int FDECL(spell_hunger, (int));
 static const char *FDECL(spelltypemnemonic, (int));
 static boolean FDECL(spell_aim_step, (genericptr_t, int, int));
 
@@ -894,12 +895,47 @@ int spell;
     return;
 }
 
+/* Given an expected amount of hunger for a spell, return the amount it should
+ * be reduced to. High-intelligence Wizards get to cast spells with less or no
+ * hunger penalty. */
+static int
+spell_hunger(hungr)
+int hungr;
+{
+    /* If hero is a wizard, their current intelligence
+     * (bonuses + temporary + current)
+     * affects hunger reduction in casting a spell.
+     * 1. int = 17-18 no reduction
+     * 2. int = 16    1/4 hungr
+     * 3. int = 15    1/2 hungr
+     * 4. int = 1-14  normal reduction
+     * The reason for this is:
+     * a) Intelligence affects the amount of exertion
+     * in thinking.
+     * b) Wizards have spent their life at magic and
+     * understand quite well how to cast spells.
+     */
+    if (Role_if(PM_WIZARD)) {
+        int intel = acurr(A_INT);
+        if (intel >= 17)
+            return 0;
+        else if (intel == 16)
+            return hungr / 4;
+        else if (intel == 15)
+            return hungr / 2;
+    }
+    /* no adjustment */
+    return hungr;
+}
+/* for using this function to test whether hunger would be eliminated */
+#define spell_would_hunger() (spell_hunger(100) > 0)
+
 int
 spelleffects(spell, atme)
 int spell;
 boolean atme;
 {
-    int energy, damage, chance, n, intell;
+    int energy, damage, chance, n;
     int otyp, skill, role_skill, res = 0;
     boolean confused = (Confusion != 0);
     boolean physical_damage = FALSE;
@@ -943,7 +979,8 @@ boolean atme;
      */
     energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
 
-    if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
+    if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD
+        && spell_would_hunger() > 0) {
         You("are too hungry to cast that spell.");
         return 0;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
@@ -979,43 +1016,7 @@ boolean atme;
         return res;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
-            int hungr = energy * 2;
-
-            /* If hero is a wizard, their current intelligence
-             * (bonuses + temporary + current)
-             * affects hunger reduction in casting a spell.
-             * 1. int = 17-18 no reduction
-             * 2. int = 16    1/4 hungr
-             * 3. int = 15    1/2 hungr
-             * 4. int = 1-14  normal reduction
-             * The reason for this is:
-             * a) Intelligence affects the amount of exertion
-             * in thinking.
-             * b) Wizards have spent their life at magic and
-             * understand quite well how to cast spells.
-             */
-            intell = acurr(A_INT);
-            if (!Role_if(PM_WIZARD))
-                intell = 10;
-            switch (intell) {
-            case 25:
-            case 24:
-            case 23:
-            case 22:
-            case 21:
-            case 20:
-            case 19:
-            case 18:
-            case 17:
-                hungr = 0;
-                break;
-            case 16:
-                hungr /= 4;
-                break;
-            case 15:
-                hungr /= 2;
-                break;
-            }
+            int hungr = spell_hunger(energy * 2);
             /* don't put player (quite) into fainting from
              * casting a spell, particularly since they might
              * not even be hungry at the beginning; however,

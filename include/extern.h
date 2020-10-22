@@ -389,6 +389,7 @@ E void FDECL(row_refresh, (int, int, int));
 E void NDECL(cls);
 E void FDECL(flush_screen, (int));
 E int FDECL(back_to_glyph, (XCHAR_P, XCHAR_P));
+E int FDECL(back_to_defsym, (XCHAR_P, XCHAR_P));
 E int FDECL(zapdir_to_glyph, (int, int, int));
 E int FDECL(glyph_at, (XCHAR_P, XCHAR_P));
 E void NDECL(reglyph_darkroom);
@@ -481,6 +482,7 @@ E struct monst *FDECL(christen_orc, (struct monst *, const char *,
                                      const char *));
 E const char *FDECL(noveltitle, (int *));
 E const char *FDECL(lookup_novel, (const char *, int *));
+E void FDECL(mintroduce, (struct monst *));
 
 /* ### do_wear.c ### */
 
@@ -864,6 +866,7 @@ E void NDECL(drinkfountain);
 E void FDECL(dipfountain, (struct obj *));
 E void FDECL(breaksink, (int, int));
 E void NDECL(drinksink);
+E struct obj* FDECL(ring_from_sink, (XCHAR_P, XCHAR_P));
 
 /* ### hack.c ### */
 
@@ -1464,7 +1467,7 @@ E int FDECL(meatmetal, (struct monst *));
 E int FDECL(meatobj, (struct monst *));
 E int FDECL(meatcorpse, (struct monst *));
 E void FDECL(mpickgold, (struct monst *));
-E boolean FDECL(mpickstuff, (struct monst *, const char *));
+E boolean FDECL(mpickstuff, (struct monst *, boolean (*)(OBJ_P)));
 E int FDECL(curr_mon_load, (struct monst *));
 E int FDECL(max_mon_load, (struct monst *));
 E int FDECL(can_carry, (struct monst *, struct obj *));
@@ -1583,6 +1586,7 @@ E void FDECL(mon_yells, (struct monst *, const char *));
 E int FDECL(dochug, (struct monst *));
 E boolean FDECL(m_digweapon_check, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(m_move, (struct monst *, int));
+E int FDECL(concealed_spot, (int, int));
 E void FDECL(dissolve_bars, (int, int));
 E boolean FDECL(closed_door, (int, int));
 E boolean FDECL(accessible, (int, int));
@@ -3178,6 +3182,7 @@ E void FDECL(destroy_item, (int, int));
 E int FDECL(destroy_mitem, (struct monst *, int, int));
 E int FDECL(resist, (struct monst *, CHAR_P, int, int));
 E void NDECL(makewish);
+E const char* FDECL(flash_str, (int, BOOLEAN_P));
 
 #endif /* !MAKEDEFS_C && !MDLIB_C */
 

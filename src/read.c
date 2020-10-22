@@ -1570,7 +1570,16 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     }
     case SCR_EARTH:
         /* TODO: handle steeds */
-        if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
+        if (confused) {
+            /* create earth elementals and dust vortices */
+            int i;
+            for (i = 0; i < (2 * (2 + sblessed - scursed)) - 1; ++i) {
+                makemon(&mons[(rn2(3) ? PM_EARTH_ELEMENTAL : PM_DUST_VORTEX)],
+                        u.ux, u.uy, MM_NOWAIT);
+            }
+            pline("The earth moves around you!");
+        }
+        else if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
             && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
             register int x, y;
             int nboulders = 0;
@@ -1594,13 +1603,13 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                             && !IS_AIR(levl[x][y].typ)
                             && (x != u.ux || y != u.uy)) {
                             nboulders +=
-                                drop_boulder_on_monster(x, y, confused, TRUE);
+                                drop_boulder_on_monster(x, y, FALSE, TRUE);
                         }
                     }
                 }
             /* Attack the player */
             if (!sblessed) {
-                drop_boulder_on_player(confused, !scursed, TRUE, FALSE);
+                drop_boulder_on_player(FALSE, !scursed, TRUE, FALSE);
             } else if (!nboulders)
                 pline("But nothing else happens.");
         }
@@ -1914,11 +1923,34 @@ struct obj *obj;
             g.rooms[rnum].rlit = on;
         }
         /* hallways remain dark on the rogue level */
-    } else
-        do_clear_area(u.ux, u.uy,
-                      (obj && obj->oclass == SCROLL_CLASS && obj->blessed)
-                         ? 9 : 5,
-                      set_lit, (genericptr_t) (on ? &is_lit : (char *) 0));
+    } else {
+        int radius;
+        if(obj && obj->oclass == SCROLL_CLASS) {
+            /* blessed scroll lights up entire level */
+            if(obj->blessed) {
+		int x, y;
+                radius = -1;
+		for (x = 1; x < COLNO; x++) {
+		    for (y = 1; y < ROWNO; y++) {
+                        set_lit(x, y, (on ? &is_lit : NULL));
+                    }
+                }
+            }
+            else {
+                /* uncursed gets a much larger area than the
+                 * 5 it had previously */
+                radius = 11;
+            }
+        }
+        else {
+            radius = 5;
+        }
+
+        if(radius > 0) {
+            do_clear_area(u.ux, u.uy, radius, set_lit,
+                          (genericptr_t) (on ? &is_lit : (char *) 0));
+        }
+    }
 
     /*
      *  If we are not blind, then force a redraw on all positions in sight

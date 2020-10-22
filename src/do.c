@@ -294,6 +294,50 @@ register struct obj *obj;
         if (obj->oclass != COIN_CLASS)
             obj->bknown = 1; /* ok to bypass set_bknown() */
     }
+
+    /* From NetHack4: colored flashes one level deep inside containers. */
+    if (Has_contents(obj) && !obj->olocked && obj->cknown) {
+        int blessed = 0;
+        int cursed = 0;
+        struct obj * otmp;
+        for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
+            if (otmp->blessed)
+                blessed++;
+            if (otmp->cursed)
+                cursed++;
+            if (!Hallucination) {
+                otmp->bknown = 1;
+            }
+        }
+        /* even when hallucinating, if you get no flashes at all, you know
+         * everything's uncursed, so save the player the trouble of manually
+         * naming them all */
+        if (Hallucination && blessed + cursed == 0) {
+            for (otmp = obj->cobj; otmp; otmp = otmp->nobj) {
+                otmp->bknown = 1;
+            }
+        }
+        if (blessed + cursed > 0) {
+            const char* color;
+            if (Hallucination) {
+                color = "pretty multichromatic";
+            }
+            else if (blessed == 0) {
+                color = hcolor(NH_BLACK);
+            }
+            else if (cursed == 0) {
+                color = hcolor(NH_AMBER);
+            }
+            else {
+                color = "colored";
+            }
+
+            pline("From inside %s, you see %s flash%s.",
+                  the(xname(obj)),
+                  (blessed + cursed == 1 ? an(color) : color),
+                  (blessed + cursed == 1 ? "" : "es"));
+        }
+    }
 }
 
 static void
@@ -549,7 +593,7 @@ register struct obj *obj;
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);
-    } else if (!rn2(5)) {
+    } else if (rn2(5)) {
         freeinv(obj);
         obj->in_use = FALSE;
         obj->ox = u.ux;
@@ -1233,14 +1277,8 @@ struct monst *mtmp;
 
     /* There's a monster at your target destination; it might be one
        which accompanied you--see mon_arrive(dogmove.c)--or perhaps
-       it was already here.  Randomly move you to an adjacent spot
-       or else the monster to any nearby location.  Prior to 3.3.0
-       the latter was done unconditionally. */
-    if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
-        && distu(cc.x, cc.y) <= 2)
-        u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
-    else
-        mnexto(mtmp);
+       it was already here. Displace the monster to any nearby location. */
+    mnexto(mtmp);
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
         /* there was an unconditional impossible("mnexto failed")

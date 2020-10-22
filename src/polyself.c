@@ -1531,7 +1531,7 @@ dohide()
         u.uundetected = 0;
         return 0;
     }
-    if (hides_under(g.youmonst.data) && !g.level.objects[u.ux][u.uy]) {
+    if (hides_under(g.youmonst.data) && !concealed_spot(u.ux, u.uy)) {
         There("is nothing to hide under here.");
         u.uundetected = 0;
         return 0;

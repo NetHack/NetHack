@@ -181,16 +181,18 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
             return FALSE;
         }
         if (!((Blind ? Blind_telepat : Unblind_telepat) || Detect_monsters)) {
-            struct obj *obj;
 
             if (!Blind && Hallucination)
                 pline("A %s %s appeared!",
                       mtmp->mtame ? "tame" : "wild", l_monnam(mtmp));
             else if (Blind || (is_pool(mtmp->mx, mtmp->my) && !Underwater))
                 pline("Wait!  There's a hidden monster there!");
-            else if ((obj = g.level.objects[mtmp->mx][mtmp->my]) != 0)
-                pline("Wait!  There's %s hiding under %s!",
-                      an(l_monnam(mtmp)), doname(obj));
+            else if (concealed_spot(mtmp->mx, mtmp->my)) {
+                struct obj *obj = g.level.objects[mtmp->mx][mtmp->my];
+                pline("Wait!  There's %s hiding under %s%s!", an(l_monnam(mtmp)),
+                      obj ? "" : "the ",
+                      obj ? doname(obj) : explain_terrain(mtmp->mx, mtmp->my));
+            }
             return TRUE;
         }
     }
@@ -2969,7 +2971,7 @@ boolean wep_was_destroyed;
                     if (ureflects("%s gaze is reflected by your %s.",
                                   s_suffix(Monnam(mon)))) {
                         ;
-                    } else if (Hallucination && rn2(4)) {
+                    } else if (Hallucination) {
                         /* [it's the hero who should be getting paralyzed
                            and isn't; this message describes the monster's
                            reaction rather than the hero's escape] */
@@ -3252,8 +3254,10 @@ light_hits_gremlin(mon, dmg)
 struct monst *mon;
 int dmg;
 {
-    pline("%s %s!", Monnam(mon),
-          (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
+    if (canspotmon(mon)) {
+        pline("%s %s!", Monnam(mon),
+            (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
+    }
     mon->mhp -= dmg;
     wake_nearto(mon->mx, mon->my, 30);
     if (DEADMONSTER(mon)) {
@@ -3261,8 +3265,13 @@ int dmg;
             monkilled(mon, (char *) 0, AD_BLND);
         else
             killed(mon);
-    } else if (cansee(mon->mx, mon->my) && !canspotmon(mon)) {
-        map_invisible(mon->mx, mon->my);
+    } else {
+        if (cansee(mon->mx, mon->my) && !canspotmon(mon)) {
+            map_invisible(mon->mx, mon->my);
+        }
+        if (!g.context.mon_moving) {
+            setmangry(mon, FALSE);
+        }
     }
 }
 

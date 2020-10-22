@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static const char *NDECL(blengr);
+static void FDECL(engraving_learn_wand, (struct obj*));
 
 char *
 random_engraving(outbuf)
@@ -468,20 +469,21 @@ static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
 int
 doengrave()
 {
-    boolean dengr = FALSE;    /* TRUE if we wipe out the current engraving */
-    boolean doblind = FALSE;  /* TRUE if engraving blinds the player */
-    boolean doknown = FALSE;  /* TRUE if we identify the stylus */
-    boolean eow = FALSE;      /* TRUE if we are overwriting oep */
-    boolean jello = FALSE;    /* TRUE if we are engraving in slime */
-    boolean ptext = TRUE;     /* TRUE if we must prompt for engrave text */
-    boolean teleengr = FALSE; /* TRUE if we move the old engraving */
-    boolean zapwand = FALSE;  /* TRUE if we remove a wand charge */
-    xchar type = DUST;        /* Type of engraving made */
+    boolean dengr = FALSE;     /* TRUE if we wipe out the current engraving */
+    boolean doblind = FALSE;   /* TRUE if engraving blinds the player */
+    boolean preknown = FALSE;  /* TRUE if we identify the stylus before */
+    boolean postknown = FALSE; /* TRUE if we identify the stylus after */
+    boolean eow = FALSE;       /* TRUE if we are overwriting oep */
+    boolean jello = FALSE;     /* TRUE if we are engraving in slime */
+    boolean ptext = TRUE;      /* TRUE if we must prompt for engrave text */
+    boolean teleengr = FALSE;  /* TRUE if we move the old engraving */
+    boolean zapwand = FALSE;   /* TRUE if we remove a wand charge */
+    xchar type = DUST;         /* Type of engraving made */
     xchar oetype = 0;         /* will be set to type of current engraving */
-    char buf[BUFSZ];          /* Buffer for final/poly engraving text */
-    char ebuf[BUFSZ];         /* Buffer for initial engraving text */
-    char fbuf[BUFSZ];         /* Buffer for "your fingers" */
-    char qbuf[QBUFSZ];        /* Buffer for query text */
+    char buf[BUFSZ];           /* Buffer for final/poly engraving text */
+    char ebuf[BUFSZ];          /* Buffer for initial engraving text */
+    char fbuf[BUFSZ];          /* Buffer for "your fingers" */
+    char qbuf[QBUFSZ];         /* Buffer for query text */
     char post_engr_text[BUFSZ]; /* Text displayed after engraving prompt */
     const char *everb;          /* Present tense of engraving type */
     const char *eloc; /* Where the engraving is (ie dust/floor/...) */
@@ -658,6 +660,8 @@ doengrave()
             case WAN_WISHING:
             case WAN_ENLIGHTENMENT:
                 zapnodir(otmp);
+                /* pre/postknown not needed; these will make it known if
+                 * applicable */
                 break;
             /* IMMEDIATE wands */
             /* If wand is "IMMEDIATE", remember to affect the
@@ -666,17 +670,20 @@ doengrave()
             case WAN_STRIKING:
                 Strcpy(post_engr_text,
                     "The wand unsuccessfully fights your attempt to write!");
+                postknown = TRUE;
                 break;
             case WAN_SLOW_MONSTER:
                 if (!Blind) {
                     Sprintf(post_engr_text, "The bugs on the %s slow down!",
                             surface(u.ux, u.uy));
+                    postknown = TRUE;
                 }
                 break;
             case WAN_SPEED_MONSTER:
                 if (!Blind) {
                     Sprintf(post_engr_text, "The bugs on the %s speed up!",
                             surface(u.ux, u.uy));
+                    postknown = TRUE;
                 }
                 break;
             case WAN_POLYMORPH:
@@ -684,6 +691,7 @@ doengrave()
                     if (!Blind) {
                         type = (xchar) 0; /* random */
                         (void) random_engraving(buf);
+                        postknown = TRUE;
                     } else {
                         /* keep the same type so that feels don't
                            change and only the text is altered,
@@ -709,6 +717,7 @@ doengrave()
                     Sprintf(post_engr_text,
                             "The %s is riddled by bullet holes!",
                             surface(u.ux, u.uy));
+                    postknown = TRUE;
                 }
                 break;
             /* can't tell sleep from death - Eric Backus */
@@ -720,9 +729,11 @@ doengrave()
                 }
                 break;
             case WAN_COLD:
-                if (!Blind)
+                if (!Blind) {
                     Strcpy(post_engr_text,
                            "A few ice cubes drop from the wand.");
+                    postknown = TRUE;
+                }
                 if (!oep || (oep->engr_type != BURN))
                     break;
                 /*FALLTHRU*/
@@ -750,7 +761,7 @@ doengrave()
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
                         pline("This %s is a wand of digging!", xname(otmp));
-                    doknown = TRUE;
+                    preknown = TRUE;
                 }
                 Strcpy(post_engr_text,
                        (Blind && !Deaf)
@@ -773,7 +784,7 @@ doengrave()
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
                         pline("This %s is a wand of fire!", xname(otmp));
-                    doknown = TRUE;
+                    preknown = TRUE;
                 }
                 Strcpy(post_engr_text, Blind ? "You feel the wand heat up."
                                              : "Flames fly from the wand.");
@@ -784,7 +795,7 @@ doengrave()
                 if (!objects[otmp->otyp].oc_name_known) {
                     if (flags.verbose)
                         pline("This %s is a wand of lightning!", xname(otmp));
-                    doknown = TRUE;
+                    preknown = TRUE;
                 }
                 if (!Blind) {
                     Strcpy(post_engr_text, "Lightning arcs from the wand.");
@@ -890,10 +901,8 @@ doengrave()
      */
 
     /* Identify stylus */
-    if (doknown) {
-        learnwand(otmp);
-        if (objects[otmp->otyp].oc_name_known)
-            more_experienced(0, 10);
+    if (preknown) {
+        engraving_learn_wand(otmp);
     }
     if (teleengr) {
         rloc_engr(oep);
@@ -1153,8 +1162,12 @@ doengrave()
     /* Put the engraving onto the map */
     make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, type);
 
-    if (post_engr_text[0])
+    if (post_engr_text[0]) {
         pline("%s", post_engr_text);
+        if (postknown) {
+            engraving_learn_wand(otmp);
+        }
+    }
     if (doblind && !resists_blnd(&g.youmonst)) {
         You("are blinded by the flash!");
         make_blinded((long) rnd(50), FALSE);
@@ -1162,6 +1175,18 @@ doengrave()
             Your1(vision_clears);
     }
     return 1;
+}
+
+/* Learn what a wand is by engraving with it. */
+static void
+engraving_learn_wand(obj)
+struct obj* obj;
+{
+    learnwand(obj);
+    /* For some reason, this gives 10 points even if you already knew the
+     * wand... */
+    if (objects[obj->otyp].oc_name_known)
+        more_experienced(0, 10);
 }
 
 /* while loading bones, clean up text which might accidentally

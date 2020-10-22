@@ -26,7 +26,7 @@ static void FDECL(backfire, (struct obj *));
 static void FDECL(boxlock_invent, (struct obj *));
 static int FDECL(spell_hit_bonus, (int));
 static void FDECL(destroy_one_item, (struct obj *, int, int));
-static void FDECL(wishcmdassist, (int));
+static void NDECL(wishcmdassist);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -66,6 +66,8 @@ const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
         "blast of disintegration", "blast of lightning",
         "blast of poison gas", "blast of acid", "", ""
     };
+
+extern const char* const hallublasts[49]; /* hallucinatory blasts [mthrowu.c] */
 
 /*
  * Recognizing unseen wands by zapping:  in 3.4.3 and earlier, zapping
@@ -1976,6 +1978,10 @@ struct obj *obj, *otmp;
                 (void) boxlock(obj, otmp);
 
             if (obj_shudders(obj)) {
+                /* Do we need to possibly refresh our cover state?
+                 * If we are currently hiding and the shuddering object might
+                 * have been the only thing on our square, call hideunder
+                 * again. */
                 boolean cover = ((obj == g.level.objects[u.ux][u.uy])
                                  && u.uundetected
                                  && hides_under(g.youmonst.data));
@@ -2210,7 +2216,8 @@ int
 zappable(wand)
 register struct obj *wand;
 {
-    if (wand->spe < 0 || (wand->spe == 0 && rn2(121)))
+    int wrestchance = (wand->blessed ? 7 : (wand->cursed ? 121 : 23));
+    if (wand->spe < 0 || (wand->spe == 0 && rn2(wrestchance)))
         return 0;
     if (wand->spe == 0)
         You("wrest one last charge from the worn-out wand.");
@@ -2677,9 +2684,10 @@ ubreatheu(mattk)
 struct attack *mattk;
 {
     int dtyp = 20 + mattk->adtyp - 1;      /* breath by hero */
-    const char *fltxt = flash_types[dtyp]; /* blast of <something> */
 
-    zhitu(dtyp, mattk->damn, fltxt, u.ux, u.uy);
+    /* zhitu doesn't print the flash string; it only needs it for losehp and
+     * killer. Suppress hallucinatory ray names. */
+    zhitu(dtyp, mattk->damn, flash_str(dtyp, TRUE), u.ux, u.uy);
 }
 
 /* light damages hero in gremlin form */
@@ -3352,6 +3360,21 @@ struct obj **pobj; /* object tossed/used, set to NULL
         }
 
         typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
+
+        if (typ == IRONBARS && weapon == ZAPPED_WAND
+            && ((levl[g.bhitpos.x][g.bhitpos.y].wall_info & W_NONDIGGABLE) == 0)
+            && (obj->otyp == SPE_FORCE_BOLT || obj->otyp == WAN_STRIKING)) {
+            levl[g.bhitpos.x][g.bhitpos.y].typ = ROOM;
+            if (cansee(g.bhitpos.x, g.bhitpos.y))
+                pline_The("iron bars are blown apart!");
+            else
+                You_hear("a lot of loud clanging sounds!");
+            wake_nearto(g.bhitpos.x, g.bhitpos.y, 20 * 20);
+            newsym(g.bhitpos.x, g.bhitpos.y);
+            /* stop the bolt here; it takes a lot of energy to destroy bars */
+            range = 0;
+            break;
+        }
 
         /* iron bars will block anything big enough and break some things */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
@@ -4140,14 +4163,13 @@ boolean say; /* Announce out of sight hit/miss events if true */
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE;
-    const char *fltxt;
     struct obj *otmp;
     int spell_type;
+    int typ = (type <= -30) ? abstype : abs(type);
 
     /* if its a Hero Spell then get its SPE_TYPE */
     spell_type = is_hero_spell(type) ? SPE_MAGIC_MISSILE + abstype : 0;
 
-    fltxt = flash_types[(type <= -30) ? abstype : abs(type)];
     if (u.uswallow) {
         register int tmp;
 
@@ -4157,8 +4179,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
         if (!u.ustuck)
             u.uswallow = 0;
         else
-            pline("%s rips into %s%s", The(fltxt), mon_nam(u.ustuck),
-                  exclam(tmp));
+            pline("%s rips into %s%s", The(flash_str(typ, FALSE)),
+                  mon_nam(u.ustuck), exclam(tmp));
         /* Using disintegration from the inside only makes a hole... */
         if (tmp == MAGIC_COOKIE)
             u.ustuck->mhp = 0;
@@ -4215,7 +4237,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
-                        hit(fltxt, mon, exclam(0));
+                        hit(flash_str(typ, FALSE), mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
                         (void) mon_reflects(mon,
                                             "But it reflects from %s %s!");
@@ -4229,7 +4251,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     if (is_rider(mon->data)
                         && abs(type) == ZT_BREATH(ZT_DEATH)) {
                         if (canseemon(mon)) {
-                            hit(fltxt, mon, ".");
+                            hit(flash_str(typ, FALSE), mon, ".");
                             pline("%s disintegrates.", Monnam(mon));
                             pline("%s body reintegrates before your %s!",
                                   s_suffix(Monnam(mon)),
@@ -4243,7 +4265,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     }
                     if (mon->data == &mons[PM_DEATH] && abstype == ZT_DEATH) {
                         if (canseemon(mon)) {
-                            hit(fltxt, mon, ".");
+                            hit(flash_str(typ, FALSE), mon, ".");
                             pline("%s absorbs the deadly %s!", Monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? "blast"
                                                               : "ray");
@@ -4253,11 +4275,11 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     }
 
                     if (tmp == MAGIC_COOKIE) { /* disintegration */
-                        disintegrate_mon(mon, type, fltxt);
+                        disintegrate_mon(mon, type, flash_str(typ, FALSE));
                     } else if (DEADMONSTER(mon)) {
                         if (type < 0) {
                             /* mon has just been killed by another monster */
-                            monkilled(mon, fltxt, AD_RBRE);
+                            monkilled(mon, flash_str(typ, FALSE), AD_RBRE);
                         } else {
                             int xkflags = XKILL_GIVEMSG; /* killed(mon); */
 
@@ -4275,7 +4297,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                         if (!otmp) {
                             /* normal non-fatal hit */
                             if (say || canseemon(mon))
-                                hit(fltxt, mon, exclam(tmp));
+                                hit(flash_str(typ, FALSE), mon, exclam(tmp));
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
@@ -4291,7 +4313,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                 range -= 2;
             } else {
                 if (say || canseemon(mon))
-                    miss(fltxt, mon);
+                    miss(flash_str(typ, FALSE), mon);
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0);
@@ -4300,7 +4322,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline("%s hits you!", The(fltxt));
+                pline("%s hits you!", The(flash_str(typ, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",
@@ -4311,10 +4333,12 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     dy = -dy;
                     shieldeff(sx, sy);
                 } else {
-                    zhitu(type, nd, fltxt, sx, sy);
+                    /* flash_str here only used for killer; suppress
+                     * hallucination */
+                    zhitu(type, nd, flash_str(typ, TRUE), sx, sy);
                 }
             } else if (!Blind) {
-                pline("%s whizzes by you!", The(fltxt));
+                pline("%s whizzes by you!", The(flash_str(typ, FALSE)));
             } else if (abstype == ZT_LIGHTNING) {
                 Your("%s tingles.", body_part(ARM));
             }
@@ -4339,7 +4363,8 @@ boolean say; /* Announce out of sight hit/miss events if true */
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
                 || fireball) {
                 if (Is_airlevel(&u.uz)) { /* nothing to bounce off of */
-                    pline_The("%s vanishes into the aether!", fltxt);
+                    pline_The("%s vanishes into the aether!",
+                              flash_str(typ, FALSE));
                     if (fireball)
                         type = ZT_WAND(ZT_FIRE); /* skip pending fireball */
                     break;
@@ -4348,7 +4373,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                     sy = lsy;
                     break; /* fireballs explode before the obstacle */
                 } else
-                    pline_The("%s bounces!", fltxt);
+                    pline_The("%s bounces!", flash_str(typ, FALSE));
             }
             if (!dx || !dy || !rn2(bchance)) {
                 dx = -dx;
@@ -5323,11 +5348,8 @@ int damage, tell;
     return resisted;
 }
 
-#define MAXWISHTRY 5
-
 static void
-wishcmdassist(triesleft)
-int triesleft;
+wishcmdassist()
 {
     static NEARDATA const char *
         wishinfo[] = {
@@ -5349,16 +5371,12 @@ int triesleft;
   0,
     },
         preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
-        retry_info[] =
-                    "If you specify an unrecognized object name %s%s time%s,",
-        retry_too[] = "a randomly chosen item will be granted.",
         suppress_cmdassist[] =
             "(Suppress this assistance with !cmdassist in your config file.)",
         *cardinals[] = { "zero",  "one",  "two", "three", "four", "five" },
         too_many[] = "too many";
     int i;
     winid win;
-    char buf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
     if (!win)
@@ -5368,14 +5386,6 @@ int triesleft;
     if (!u.uconduct.wishes)
         putstr(win, 0, preserve_wishless);
     putstr(win, 0, "");
-    Sprintf(buf, retry_info,
-            (triesleft >= 0 && triesleft < SIZE(cardinals))
-               ? cardinals[triesleft]
-               : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "",
-            plur(triesleft));
-    putstr(win, 0, buf);
-    putstr(win, 0, retry_too);
     putstr(win, 0, "");
     if (iflags.cmdassist)
         putstr(win, 0, suppress_cmdassist);
@@ -5405,9 +5415,16 @@ makewish()
     if (buf[0] == '\033') {
         buf[0] = '\0';
     } else if (!strcmpi(buf, "help")) {
-        wishcmdassist(MAXWISHTRY - tries);
+        wishcmdassist();
         buf[0] = '\0'; /* for EDIT_GETLIN */
         goto retry;
+    }
+    if (buf[0] == '\0') {
+        if (yn("Really forfeit this wish?") == 'y') {
+            Strcpy(buf, "nothing");
+        }
+        else
+            goto retry;
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
@@ -5417,12 +5434,8 @@ makewish()
     otmp = readobjnam(buf, &nothing);
     if (!otmp) {
         pline("Nothing fitting that description exists in the game.");
-        if (++tries < MAXWISHTRY)
-            goto retry;
-        pline1(thats_enough_tries);
-        otmp = readobjnam((char *) 0, (struct obj *) 0);
-        if (!otmp)
-            return; /* for safety; should never happen */
+        tries++;
+        goto retry;
     } else if (otmp == &nothing) {
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
@@ -5449,6 +5462,28 @@ makewish()
                                    (const char *) 0);
         u.ublesscnt += rn1(100, 50); /* the gods take notice */
     }
+}
+
+/* Fills buf with the appropriate string for this ray.
+ * In the hallucination case, insert "blast of <silly thing>".
+ * Assumes that the caller will specify typ in the appropriate range for
+ * wand/spell/breath weapon. */
+const char*
+flash_str(typ, nohallu)
+int typ;
+boolean nohallu; /* suppress hallucination (for death reasons) */
+{
+    static char fltxt[BUFSZ];
+    if (Hallucination && !nohallu) {
+        /* always return "blast of foo" for simplicity.
+         * This could be extended with hallucinatory rays, but probably not worth
+         * it at this time. */
+        Sprintf(fltxt, "blast of %s", hallublasts[rn2(SIZE(hallublasts))]);
+    }
+    else {
+        Strcpy(fltxt, flash_types[typ]);
+    }
+    return fltxt;
 }
 
 /*zap.c*/

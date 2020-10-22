@@ -952,23 +952,6 @@ int pm;
         (void) eatmdone();
 
     switch (pm) {
-    case PM_NEWT:
-        /* MRKR: "eye of newt" may give small magical energy boost */
-        if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
-            int old_uen = u.uen;
-
-            u.uen += rnd(3);
-            if (u.uen > u.uenmax) {
-                if (!rn2(3))
-                    u.uenmax++;
-                u.uen = u.uenmax;
-            }
-            if (old_uen != u.uen) {
-                You_feel("a mild buzz.");
-                g.context.botl = 1;
-            }
-        }
-        break;
     case PM_WRAITH:
         pluslvl(FALSE);
         break;
@@ -1112,6 +1095,10 @@ int pm;
     if (check_intrinsics) {
         struct permonst *ptr = &mons[pm];
         boolean conveys_STR = is_giant(ptr);
+        /* MRKR: "eye of newt" may give small magical energy boost
+         * as well as other magical monsters */
+        boolean conveys_energy = (attacktype(&mons[pm], AT_MAGC)
+                                  || pm == PM_NEWT);
         int i, count;
 
         if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU)
@@ -1135,6 +1122,11 @@ int pm;
             tmp = -1; /* use -1 as fake prop index for STR */
             debugpline1("\"Intrinsic\" strength, %d", tmp);
         }
+        else if (conveys_energy) {
+            count = 1;
+            tmp = -2;
+            debugpline1("\"Intrinsic\" energy gain, %d", tmp);
+        }
         for (i = 1; i <= LAST_PROP; i++) {
             if (!intrinsic_possible(i, ptr))
                 continue;
@@ -1154,6 +1146,23 @@ int pm;
         /* if something was chosen, give it now (givit() might fail) */
         if (tmp == -1)
             gainstr((struct obj *) 0, 0, TRUE);
+        else if (tmp == -2) {
+            if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
+                int old_uen = u.uen, old_uenmax = u.uenmax;
+                u.uen += (pm == PM_NEWT) ? rnd(3) : rnd(mons[pm].mlevel);
+                if (u.uen > u.uenmax) {
+                    if (!rn2(3))
+                        u.uenmax++;
+                    u.uen = u.uenmax;
+                }
+                if (old_uen != u.uen) {
+                    You_feel("a %s buzz.",
+                            old_uenmax != u.uenmax ? "moderate" : "mild");
+                    g.context.botl = 1;
+                }
+            }
+
+        }
         else if (tmp > 0)
             givit(tmp, ptr);
     } /* check_intrinsics */
@@ -1393,6 +1402,13 @@ const char *mesg;
                   tintxts[r].txt, fingers_or_gloves(TRUE));
         }
 
+        if (!strcmp(tintxts[r].txt, "szechuan") && rn2(2)) {
+            struct obj* cookie = mksobj(FORTUNE_COOKIE, FALSE, FALSE);
+            cookie->blessed = tin->blessed;
+            cookie->cursed = tin->cursed;
+            pline("There is a free fortune cookie inside!");
+            hold_another_object(cookie, "It falls to the floor.", NULL, NULL);
+        }
     } else { /* spinach... */
         if (tin->cursed) {
             pline("It contains some decaying%s%s substance.",

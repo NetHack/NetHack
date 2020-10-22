@@ -1745,6 +1745,15 @@ int
 back_to_glyph(x, y)
 xchar x, y;
 {
+    return cmap_to_glyph(back_to_defsym(x, y));
+}
+
+/* extracted from back_to_glyph so that we can get the string description of a
+ * terrain spot on the map */
+int
+back_to_defsym(x, y)
+xchar x, y;
+{
     int idx;
     struct rm *ptr = &(levl[x][y]);
 
@@ -1858,12 +1867,12 @@ xchar x, y;
         idx = (ptr->horizontal) ? S_hodbridge : S_vodbridge;
         break;
     default:
-        impossible("back_to_glyph:  unknown level type [ = %d ]", ptr->typ);
+        impossible("back_to_defsym:  unknown level type [ = %d ]", ptr->typ);
         idx = S_room;
         break;
     }
 
-    return cmap_to_glyph(idx);
+    return idx;
 }
 
 /*

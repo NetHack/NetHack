@@ -386,8 +386,6 @@ lua_State *L;
                                          (levl[x][y].flags & S_LPUDDING));
                 nhl_add_table_entry_bool(L, "dishwasher",
                                          (levl[x][y].flags & S_LDWASHER));
-                nhl_add_table_entry_bool(L, "ring",
-                                         (levl[x][y].flags & S_LRING));
             }
             /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
 

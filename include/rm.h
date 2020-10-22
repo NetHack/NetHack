@@ -375,7 +375,6 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
  */
 #define S_LPUDDING 1
 #define S_LDWASHER 2
-#define S_LRING 4
 
 /*
  * The four directions for a DrawBridge.
