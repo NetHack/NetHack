@@ -279,6 +279,7 @@ when reporting that hero can't repair a chest's broken lock with key/pick/card
 	suggests that you might be able to do so with a blessed or cursed one
 pre-populate teleport destination prompt with travel destination
 ghosts cannot be renamed
+tossed upwards objects got two times half physical damage reduction
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

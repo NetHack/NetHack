@@ -1071,7 +1071,7 @@ boolean hitsroof;
         }
         hitfloor(obj, TRUE);
         g.thrownobj = 0;
-        losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
+        losehp(dmg, "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }
