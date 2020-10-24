@@ -985,6 +985,8 @@ long timeout;
             /* free egg here because we use it above */
             obj_extract_self(egg);
             obfree(egg, (struct obj *) 0);
+            if ((mon = m_at(x,y)) && !hideunder(mon) && cansee(x, y))
+                redraw = TRUE;
         }
         if (redraw)
             newsym(x, y);
