@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1597182933 2020/08/11 21:55:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.212 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1603534633 2020/10/24 10:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -820,9 +820,14 @@ boolean taken;
         if (should_query_disclose_option('c', &defquery)) {
             int acnt = count_achievements();
 
-            Sprintf(qbuf, "Do you want to see your conduct%s%s?",
-                    (acnt > 0) ? " and achievement" : "",
-                    (acnt > 1) ? "s" : "");
+            Sprintf(qbuf, "Do you want to see your conduct%s?",
+                    /* this was distinguishing between one achievement and
+                       multiple achievements, but "conduct and achievement"
+                       looked strange if multiple conducts got shown (which
+                       is usual for an early game death); we could switch
+                       to plural vs singular for conducts but the less
+                       specific "conduct and achievements" is sufficient */
+                    (acnt > 0) ? " and achievements" : "");
             c = yn_function(qbuf, ynqchars, defquery);
         } else {
             c = defquery;
