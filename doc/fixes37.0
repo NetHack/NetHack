@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.332 $ $NHDT-Date: 1602958104 2020/10/17 18:08:24 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ $NHDT-Date: 1603507384 2020/10/24 02:43:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -280,6 +280,12 @@ when reporting that hero can't repair a chest's broken lock with key/pick/card
 pre-populate teleport destination prompt with travel destination
 ghosts cannot be renamed
 tossed upwards objects got two times half physical damage reduction
+monster xorns could pass through iron bars but not eat them; monster rock
+	moles could no neither; now they can eat bars when adjacent and will
+	do so if the bars are blocking their path
+hero poly'd into rust monster could implicitly eat bars when adjacent by
+	trying to move there, now when in rock mole form too; in xorn form
+	can explicitly eat them via 'e' after moving onto their spot
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
