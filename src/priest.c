@@ -52,7 +52,7 @@ register xchar omx, omy, gx, gy;
     schar chcnt, cnt;
     coord poss[9];
     long info[9];
-    long ninfo;
+    long ninfo = 0;
     long allowflags;
 #if 0 /* dead code; see below */
     struct obj *ib = (struct obj *) 0;
