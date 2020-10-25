@@ -104,6 +104,9 @@ private:
 	NetHackQtLabelledIcon fly;
 	NetHackQtLabelledIcon ride;
 
+        QLabel hpbar_health; // hit point bar, left half
+        QLabel hpbar_injury; // hit point bar, right half
+
 	QFrame hline1;
 	QFrame hline2;
 	QFrame hline3;
@@ -111,7 +114,10 @@ private:
 	int cursy;
 
 	bool first_set;
+        bool alreadyfullhp;
 
+        QHBoxLayout *InitHitpointBar();
+        void HitpointBar();
 	void nullOut();
 	void updateStats();
 	void checkTurnEvents();

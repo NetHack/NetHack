@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1599893947 2020/09/12 06:59:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.473 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1603666043 2020/10/25 22:47:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.478 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4607,6 +4607,12 @@ char *op;
                 /* [is reassessment really needed here?] */
                 status_initialize(REASSESS_ONLY);
                 g.opt_need_redraw = TRUE;
+#ifdef QT_GRAPHICS
+            } else if (WINDOWPORT("Qt")) {
+                /* Qt doesn't support HILITE_STATUS or FLUSH_STATUS so fails
+                   VIA_WINDOWPORT(), but it does support WC2_HITPOINTBAR */
+                g.context.botlx = TRUE;
+#endif
             }
             break;
         case opt_color:
@@ -7619,7 +7625,8 @@ doset() /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
-    } else if (g.context.botl || g.context.botlx) {
+    }
+    if (g.context.botl || g.context.botlx) {
         bot();
     }
     return 0;

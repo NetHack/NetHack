@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ $NHDT-Date: 1603509297 2020/10/24 03:14:57 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ $NHDT-Date: 1603666043 2020/10/25 22:47:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -600,6 +600,7 @@ Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
 	words, same set of things whose tiles are used to populate the doll)
 Qt: clicking on the status window runs the #attributes command (^X)
 Qt: add a Search button to the toolbar
+Qt: support the 'hitpointbar' option
 
 
 NetHack Community Patches (or Variation) Included

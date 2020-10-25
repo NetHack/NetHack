@@ -931,12 +931,11 @@ static void Qt_positionbar(char *) {}
 
 struct window_procs Qt_procs = {
     "Qt",
-    WC_COLOR | WC_HILITE_PET
-    | WC_ASCII_MAP | WC_TILED_MAP
-    | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
-    | WC_POPUP_DIALOG
-    | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN,
-    0L,
+    (WC_COLOR | WC_HILITE_PET
+     | WC_ASCII_MAP | WC_TILED_MAP
+     | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
+     | WC_POPUP_DIALOG | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN),
+    (WC2_HITPOINTBAR),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
