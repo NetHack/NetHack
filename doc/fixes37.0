@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.341 $ $NHDT-Date: 1603666043 2020/10/25 22:47:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.342 $ $NHDT-Date: 1603741470 2020/10/26 19:44:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -458,6 +458,7 @@ Qt: rename toolbar button "Get" and action menu choice "Get" to "Pick up"
 Qt: status icons for alignment|hunger|encumbrance which started out centered
 	relative to the label text below them would shift to being left
 	justified when status got updated
+Qt: handle '&' properly if it occurs as part of yn_function popup dialog
 Qt+OSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
