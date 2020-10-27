@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.342 $ $NHDT-Date: 1603741470 2020/10/26 19:44:30 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.343 $ $NHDT-Date: 1603777052 2020/10/27 05:37:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -459,6 +459,9 @@ Qt: status icons for alignment|hunger|encumbrance which started out centered
 	relative to the label text below them would shift to being left
 	justified when status got updated
 Qt: handle '&' properly if it occurs as part of yn_function popup dialog
+Qt: fix the display side of saved game selection; character names for
+	available save files are shown in a column of push buttons instead
+	of each button overwriting all the ones before it
 Qt+OSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

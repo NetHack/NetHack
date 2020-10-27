@@ -3,6 +3,34 @@
 // NetHack may be freely redistributed.  See license for details.
 
 // qt_svsel.cpp -- saved game selector
+//
+// Popup's layout:
+//----
+//         NetHack 3.7.x          (literal text w/ dynamic version number)
+//    /----------------------\
+//    |                      |
+//    |                      |
+//    |     splash image     |    nhsplash.xpm (red dragon w/ rider)
+//    |                      |
+//    |                      |
+//    \----------------------/
+//     by the NetHack DevTeam     (literal text)
+//      [  Quit  ] [New-Game]     side-by-side buttons
+//      Saved characters          (literal text in small font)
+//      [   character one   ]     button with character name
+//      [   character two   ]     button with another character name
+//      [  character three  ]     button with yet another character name
+//              ...               as many buttons as needed
+//----
+//
+// TODO?
+//  Character names are sorted alphabetically.  It would be useful to
+//  be able to sort by role or by game start date or by save date.
+//  The core fetches character names from inside the files; it could
+//  obtain the information needed for alternate sorting.  Simpler
+//  enchancement:  instead of just showing the character name, show
+//  "name-role-race-gender-alignment".
+//
 
 extern "C" {
 #include "hack.h"
@@ -20,26 +48,29 @@ extern "C" {
 
 namespace nethack_qt_ {
 
+//
+// popup dialog at start of game to choose between a new game or which save
+// file to load if user has at least one saved game and either hasn't supplied
+// any character name or has supplied one which doesn't have a save file
+//
 NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     QDialog(NetHackQtBind::mainWidget())
 {
     QVBoxLayout *vbl = new QVBoxLayout(this);
     QHBoxLayout* hb;
 
-#if 0   // this works but don't add it until the rest is working as intended
     char cvers[BUFSZ];
     QString qvers = QString("NetHack ") + QString(version_string(cvers));
-    QLabel* vers = new QLabel(qvers, this);
+    QLabel *vers = new QLabel(qvers, this);
     vers->setAlignment(Qt::AlignCenter);
     vbl->addWidget(vers);
-#endif
 
-    QLabel* logo = new QLabel(this);
+    QLabel *logo = new QLabel(this);
     logo->setAlignment(Qt::AlignCenter);
     logo->setPixmap(QPixmap("nhsplash.xpm"));
     vbl->addWidget(logo);
 
-    QLabel* attr = new QLabel("by the NetHack DevTeam",this);
+    QLabel *attr = new QLabel("by the NetHack DevTeam", this);
     attr->setAlignment(Qt::AlignCenter);
     vbl->addWidget(attr);
     vbl->addStretch(2);
@@ -51,30 +82,25 @@ QLayout: Attempting to add QLayout "" to QDialog "", which already has a layout
     hb = new QHBoxLayout((QWidget *) NULL);
     vbl->addLayout(hb, Qt::AlignCenter);
 
-    QPushButton* q = new QPushButton("Quit",this);
+    QPushButton *q = new QPushButton("Quit", this);
     hb->addWidget(q);
     connect(q, SIGNAL(clicked()), this, SLOT(reject()));
-    QPushButton* c = new QPushButton("New Game",this);
+    QPushButton *c = new QPushButton("New Game", this);
     hb->addWidget(c);
     connect(c, SIGNAL(clicked()), this, SLOT(accept()));
     c->setDefault(true);
 
-    //
-    // FIXME!
-    //  The text "Saved Characters" is overwritten by all the
-    //  filename buttons.  The last button added is the only one
-    //  visible but clicking on it seems to activate the first
-    //  one instead.
-    //
-    QGroupBox* box = new QGroupBox("Saved Characters",this);
-    QButtonGroup *bg = new QButtonGroup(this);
-    vbl->addWidget(box);
-    QVBoxLayout *bgl UNUSED = new QVBoxLayout(box);
+    QGroupBox *box = new QGroupBox("Saved Characters", this);
+    QVBoxLayout *bgl = new QVBoxLayout();
+    QButtonGroup *bg = new QButtonGroup();
     connect(bg, SIGNAL(buttonPressed(int)), this, SLOT(done(int)));
-    for (int i=0; saved[i]; i++) {
-	QPushButton* b = new QPushButton(saved[i],box);
-	bg->addButton(b, i+2);
+    for (int i = 0; saved[i]; ++i) {
+        QPushButton *b = new QPushButton(saved[i]);
+        bgl->addWidget(b);
+        bg->addButton(b, i + 2);
     }
+    box->setLayout(bgl);
+    vbl->addWidget(box);
 }
 
 int NetHackQtSavedGameSelector::choose()
@@ -83,7 +109,7 @@ int NetHackQtSavedGameSelector::choose()
     if ( qt_compact_mode )
 	showMaximized();
 #endif
-    return exec()-2;
+    return exec() - 2;
 }
 
 } // namespace nethack_qt_
