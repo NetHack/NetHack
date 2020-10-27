@@ -185,38 +185,57 @@ void NetHackQtBind::qt_player_selection()
 
 void NetHackQtBind::qt_askname()
 {
-    have_asked = true;
+    char default_plname[PL_NSIZ];
 
-    // We do it all here, and nothing in askname
+    have_asked = true;
+    str_copy(default_plname, g.plname, PL_NSIZ);
+
+    // We do it all here (plus qt_plsel.cpp and qt_svsel.cpp),
+    // nothing in player_selection().
 
     char** saved = get_saved_games();
-    int ch = -1;
+    int ch = -1; // -1 => new game
     if ( saved && *saved ) {
 	if ( splash ) splash->hide();
 	NetHackQtSavedGameSelector sgsel((const char**)saved);
 	ch = sgsel.choose();
 	if ( ch >= 0 )
 	    str_copy(g.plname, saved[ch], SIZE(g.plname));
+        // caller needs new lock name even if plname[] hasn't changed
+        // because successful get_saved_games() clobbers g.SAVEF[]
+        ::iflags.renameinprogress = TRUE;
     }
     free_saved_games(saved);
 
     switch (ch) {
     case -1:
+        // New Game
         if (splash)
             splash->hide();
-        if (NetHackQtPlayerSelector(keybuffer).Choose())
-            return;
+        if (NetHackQtPlayerSelector(keybuffer).Choose()) {
+            // success; handle plname[] verification below prior to returning
+            break;
+        }
         /*FALLTHRU*/
     case -2:
+        // Quit
+        clearlocks();
+        qt_exit_nhwindows(0);
+        nh_terminate(0);
+        /*NOTREACHED*/
         break;
     default:
-        return;
+        // picked a character from the saved games list
+        break;
     }
 
-    // Quit
-    clearlocks();
-    qt_exit_nhwindows(0);
-    nh_terminate(0);
+    if (!*g.plname)
+        // in case Choose() returns with plname[] empty
+        Strcpy(g.plname, default_plname);
+    else if (strcmp(g.plname, default_plname) != 0)
+        // caller needs to set new lock file name
+        ::iflags.renameinprogress = TRUE;
+    return;
 }
 
 void NetHackQtBind::qt_get_nh_event()

@@ -44,15 +44,6 @@ On the map, ^V is a dead key (at least on OSX; all other ASCII control
 characters from ^A through ^U, ^W through ^Z, and ^[, ^\, ^], ^^, ^_
 work; no attempt to have ^@ generate NUL has been made).
 
-The save file selection widget writes all the file name selection
-buttons on top of each other, with the last one added being the only
-one visible.  Clicking on it seems to be picking the first one instead.
-If you pick "new game" and use a different character name then
-eventually save, it clobbers the last one in the list (rather, warns
-the player that a save file exists and asks whether to overwrite it;
-answering yes and then loading the file shows the new character, not
-the original one even though the file is still named for that one).
-
 Map column #0, which the core reserves for its own purposes and isn't
 intended to be displayed, is displayed (as blank terrain).
 
