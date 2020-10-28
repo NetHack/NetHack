@@ -138,8 +138,8 @@ const char *str;
     end_glyphout(); /* in case message printed during graphics output */
     putsyms(str);
     cl_end();
-    ttyDisplay->toplin = 1;
-    if (ttyDisplay->cury && otoplin != 3)
+    ttyDisplay->toplin = TOPLINE_NEED_MORE;
+    if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
         more();
 }
 
@@ -151,7 +151,7 @@ const char *str;
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
     if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->cury && ttyDisplay->toplin == 2)
+        if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY)
             tty_clear_nhwindow(WIN_MESSAGE);
 
         cw->curx = cw->cury = 0;
@@ -159,8 +159,8 @@ const char *str;
         cl_end();
         addtopl(str);
 
-        if (ttyDisplay->cury && ttyDisplay->toplin != 3)
-            ttyDisplay->toplin = 2;
+        if (ttyDisplay->cury && ttyDisplay->toplin != TOPLINE_SPECIAL_PROMPT)
+            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
     }
 }
 
@@ -196,7 +196,7 @@ const char *s;
     tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
     putsyms(s);
     cl_end();
-    ttyDisplay->toplin = 1;
+    ttyDisplay->toplin = TOPLINE_NEED_MORE;
 }
 
 void
@@ -204,11 +204,14 @@ more()
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
-    /* avoid recursion -- only happens from interrupts */
-    if (ttyDisplay->inmore++)
-        return;
     if (iflags.debug_fuzzer)
         return;
+
+    /* avoid recursion -- only happens from interrupts */
+    if (ttyDisplay->inmore)
+        return;
+
+    ttyDisplay->inmore++;
 
     if (ttyDisplay->toplin) {
         tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
@@ -236,7 +239,7 @@ more()
         home();
         cl_end();
     }
-    ttyDisplay->toplin = 0;
+    ttyDisplay->toplin = TOPLINE_EMPTY;
     ttyDisplay->inmore = 0;
 }
 
@@ -252,7 +255,7 @@ register const char *bp;
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP))
+    if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || (cw->flags & WIN_STOP))
         && cw->cury == 0
         && n0 + (int) strlen(g.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
@@ -263,9 +266,9 @@ register const char *bp;
             addtopl(bp);
         return;
     } else if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->toplin == 1) {
+        if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
             more();
-        } else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
+        } else if (cw->cury) { /* for toplin == TOPLINE_NON_EMPTY && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }
@@ -309,6 +312,7 @@ char c;
         if (ttyDisplay->curx == 0 && ttyDisplay->cury > 0)
             tty_curs(BASE_WINDOW, CO, (int) ttyDisplay->cury - 1);
         backsp();
+        nhassert(ttyDisplay->curx > 0);
         ttyDisplay->curx--;
         cw->curx = ttyDisplay->curx;
         return;
@@ -381,10 +385,10 @@ char def;
     char prompt[BUFSZ];
 
     yn_number = 0L;
-    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = 3; /* special prompt state */
+    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
     ttyDisplay->inread++;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
@@ -531,7 +535,7 @@ char def;
     dumplogmsg(g.toplines);
 #endif
     ttyDisplay->inread--;
-    ttyDisplay->toplin = 2;
+    ttyDisplay->toplin = TOPLINE_NON_EMPTY;
     if (ttyDisplay->intr)
         ttyDisplay->intr--;
     if (wins[WIN_MESSAGE]->cury)
@@ -686,6 +690,13 @@ boolean restoring_msghist;
     }
 
     if (msg) {
+        /* Caller is asking us to remember a top line that needed more.
+           Should we call more?  This can happen when the player has set
+           iflags.force_invmenu and they attempt to shoot with nothing in
+           the quiver. */
+        if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+            ttyDisplay->toplin = TOPLINE_NON_EMPTY;
+
         /* move most recent message to history, make this become most recent */
         remember_topl();
         Strcpy(g.toplines, msg);
@@ -693,6 +704,9 @@ boolean restoring_msghist;
         dumplogmsg(g.toplines);
 #endif
     } else if (snapshot_mesgs) {
+        nhassert(ttyDisplay == NULL ||
+                 ttyDisplay->toplin != TOPLINE_NEED_MORE);
+
         /* done putting arbitrary messages in; put the snapshot ones back */
         for (idx = 0; snapshot_mesgs[idx]; ++idx) {
             remember_topl();

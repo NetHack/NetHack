@@ -1,4 +1,4 @@
-/* NetHack 3.7	monmove.c	$NHDT-Date: 1600469618 2020/09/18 22:53:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1603507386 2020/10/24 02:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1015,10 +1015,11 @@ register int after;
                     > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
             appr = -1;
 
-        /* hostile monsters with ranged thrown weapons try to stay away */
+        /* hostiles with ranged weapons or spit attack try to stay away */
         if (!mtmp->mpeaceful
             && (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) < 5*5)
-            && m_canseeu(mtmp) && m_has_launcher_and_ammo(mtmp))
+            && m_canseeu(mtmp) &&
+            (m_has_launcher_and_ammo(mtmp) || attacktype(mtmp->data, AT_SPIT)))
             appr = -1;
 
         if (!should_see && can_track(ptr)) {
@@ -1292,29 +1293,8 @@ register int after;
          * Pets get taken care of above and shouldn't reach this code.
          * Conflict gets handled even farther away (movemon()).
          */
-        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy)) {
-            struct monst *mtmp2;
-            int mstatus;
-
-            mtmp2 = m_at(nix, niy);
-
-            g.notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
-            /* note: mstatus returns 0 if mtmp2 is nonexistent */
-            mstatus = mattackm(mtmp, mtmp2);
-
-            if (mstatus & MM_AGR_DIED) /* aggressor died */
-                return 2;
-
-            if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
-                && mtmp2->movement >= NORMAL_SPEED) {
-                mtmp2->movement -= NORMAL_SPEED;
-                g.notonhead = 0;
-                mstatus = mattackm(mtmp2, mtmp); /* return attack */
-                if (mstatus & MM_DEF_DIED)
-                    return 2;
-            }
-            return 3;
-        }
+        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy))
+            return m_move_aggress(mtmp, nix, niy);
 
         if ((info[chi] & ALLOW_MDISP)) {
             struct monst *mtmp2;
@@ -1497,9 +1477,12 @@ register int after;
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                /* 3.6.2: was using may_dig() but it doesn't handle bars */
+                /* 3.6.2: was using may_dig() but that doesn't handle bars;
+                   AD_RUST catches rust monsters but metallivorous() is
+                   needed for xorns and rock moles */
                 if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
-                    && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
+                    && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR)
+                        || metallivorous(ptr))) {
                     if (canseemon(mtmp))
                         pline("%s eats through the iron bars.", Monnam(mtmp));
                     dissolve_bars(mtmp->mx, mtmp->my);
@@ -1606,6 +1589,44 @@ register int after;
     return mmoved;
 }
 
+/* The part of m_move that deals with a monster attacking another monster (and
+ * that monster possibly retaliating).
+ * Extracted into its own function so that it can be called with monsters that
+ * have special move patterns (shopkeepers, priests, etc) that want to attack
+ * other monsters but aren't just roaming freely around the level (so allowing
+ * m_move to run fully for them could select an invalid move).
+ * x and y are the coordinates mtmp wants to attack.
+ * Return values are the same as for m_move, but this function only return 2
+ * (mtmp died) or 3 (mtmp made its move).
+ */
+int
+m_move_aggress(mtmp, x, y)
+struct monst * mtmp;
+xchar x, y;
+{
+    struct monst *mtmp2;
+    int mstatus;
+
+    mtmp2 = m_at(x, y);
+
+    g.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
+    /* note: mstatus returns 0 if mtmp2 is nonexistent */
+    mstatus = mattackm(mtmp, mtmp2);
+
+    if (mstatus & MM_AGR_DIED) /* aggressor died */
+        return 2;
+
+    if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+        && mtmp2->movement >= NORMAL_SPEED) {
+        mtmp2->movement -= NORMAL_SPEED;
+        g.notonhead = 0;
+        mstatus = mattackm(mtmp2, mtmp); /* return attack */
+        if (mstatus & MM_DEF_DIED)
+            return 2;
+    }
+    return 3;
+}
+
 void
 dissolve_bars(x, y)
 register int x, y;
@@ -1613,6 +1634,8 @@ register int x, y;
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;
     newsym(x, y);
+    if (x == u.ux && y == u.uy)
+        switch_terrain();
 }
 
 boolean

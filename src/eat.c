@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1599258557 2020/09/04 22:29:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1449,7 +1449,8 @@ opentin(VOID_ARGS)
 {
     /* perhaps it was stolen (although that should cause interruption) */
     if (!carried(g.context.tin.tin)
-        && (!obj_here(g.context.tin.tin, u.ux, u.uy) || !can_reach_floor(TRUE)))
+        && (!obj_here(g.context.tin.tin, u.ux, u.uy)
+            || !can_reach_floor(TRUE)))
         return 0; /* %% probably we should use tinoid */
     if (g.context.tin.usedtime++ >= 50) {
         You("give up your attempt to open the tin.");
@@ -2134,7 +2135,7 @@ eatspecial()
             pline("Yuck%c", otmp->blessed ? '!' : '.');
         else if (otmp->oclass == SCROLL_CLASS
                  /* check description after checking for specific scrolls */
-                 && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+                 && objdescr_is(otmp, "YUM YUM"))
             pline("Yum%c", otmp->blessed ? '!' : '.');
         else
             pline("Needs salt...");
@@ -2488,6 +2489,18 @@ doeat()
         }
     }
 
+    /* from floorfood(), &zeroobj means iron bars at current spot */
+    if (otmp == &cg.zeroobj) {
+        /* hero in metallivore form is eating [diggable] iron bars
+           at current location so skip the other assorted checks;
+           operates as if digging rather than via the eat occupation */
+        if (still_chewing(u.ux, u.uy) && levl[u.ux][u.uy].typ == IRONBARS) {
+            /* this is verbose, but player will see the hero rather than the
+               bars so wouldn't know that more turns of eating are required */
+            You("pause to swallow.");
+        }
+        return 1;
+    }
     /* We have to make non-foods take 1 move to eat, unless we want to
      * do ridiculous amounts of coding to deal with partly eaten plate
      * mails, players who polymorph back to human in the middle of their
@@ -3156,18 +3169,18 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     register struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
-    boolean feeding = !strcmp(verb, "eat"),    /* corpsecheck==0 */
-        offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
+    struct permonst *uptr = g.youmonst.data;
+    boolean feeding = !strcmp(verb, "eat"),        /* corpsecheck==0 */
+            offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
     /* if we can't touch floor objects then use invent food only */
     if (iflags.menu_requested /* command was preceded by 'm' prefix */
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
-            && (Wwalking || is_clinger(g.youmonst.data)
-                || (Flying && !Breathless))))
+            && (Wwalking || is_clinger(uptr) || (Flying && !Breathless))))
         goto skipfloor;
 
-    if (feeding && metallivorous(g.youmonst.data)) {
+    if (feeding && metallivorous(uptr)) {
         struct obj *gold;
         struct trap *ttmp = t_at(u.ux, u.uy);
 
@@ -3188,8 +3201,30 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
                 return (struct obj *) 0;
             }
         }
+        if (levl[u.ux][u.uy].typ == IRONBARS) {
+            /* already verified that hero is metallivorous above */
+            boolean nodig = (levl[u.ux][u.uy].wall_info & W_NONDIGGABLE) != 0;
 
-        if (g.youmonst.data != &mons[PM_RUST_MONSTER]
+            c = 'n';
+            Strcpy(qbuf, "There are iron bars here");
+            if (nodig || u.uhunger > 1500) {
+                pline("%s but you %s eat them.", qbuf,
+                      nodig ? "cannot" : "are too full to");
+            } else {
+                Strcat(qbuf, ((!g.context.digging.chew
+                               || g.context.digging.pos.x != u.ux
+                               || g.context.digging.pos.y != u.uy
+                               || !on_level(&g.context.digging.level, &u.uz))
+                              ? "; eat them?"
+                              : "; resume eating them?"));
+                c = yn_function(qbuf, ynqchars, 'n');
+            }
+            if (c == 'y')
+                return (struct obj *) &cg.zeroobj; /* csst away 'const' */
+            else if (c == 'q')
+                return (struct obj *) 0;
+        }
+        if (uptr != &mons[PM_RUST_MONSTER]
             && (gold = g_at(u.ux, u.uy)) != 0) {
             if (gold->quan == 1L)
                 Sprintf(qbuf, "There is 1 gold piece here; eat it?");

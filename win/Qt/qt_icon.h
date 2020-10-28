@@ -24,6 +24,7 @@ public:
 	void highlightWhenChanging();
 	void lowIsGood();
 	void dissipateHighlight();
+        void ForceResize();
 
 	virtual void show();
 	virtual QSize sizeHint() const;

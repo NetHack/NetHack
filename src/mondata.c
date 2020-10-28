@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1596498186 2020/08/03 23:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1603507386 2020/10/24 02:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,7 +195,6 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
     boolean is_you = (mdef == &g.youmonst);
     boolean check_visor = FALSE;
     struct obj *o;
-    const char *s;
 
     /* no eyes protect against all attacks for now */
     if (!haseyes(mdef->data))
@@ -271,8 +270,7 @@ struct obj *obj; /* aatyp == AT_WEAP, AT_SPIT */
         o = (mdef == &g.youmonst) ? g.invent : mdef->minvent;
         for (; o; o = o->nobj)
             if ((o->owornmask & W_ARMH)
-                && (s = OBJ_DESCR(objects[o->otyp])) != (char *) 0
-                && !strcmp(s, "visored helmet"))
+                && objdescr_is(o, "visored helmet"))
                 return FALSE;
     }
 
@@ -336,7 +334,10 @@ struct permonst *mptr;
 {
     return (boolean) (passes_walls(mptr) || amorphous(mptr) || unsolid(mptr)
                       || is_whirly(mptr) || verysmall(mptr)
-                      || dmgtype(mptr, AD_CORR) || dmgtype(mptr, AD_RUST)
+                      /* rust monsters and some puddings can destroy bars */
+                      || dmgtype(mptr, AD_RUST) || dmgtype(mptr, AD_CORR)
+                      /* rock moles can eat bars */
+                      || metallivorous(mptr)
                       || (slithy(mptr) && !bigmonst(mptr)));
 }
 

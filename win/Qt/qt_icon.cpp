@@ -52,15 +52,16 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, bool lower)
     if (!label) {
 	label=new QLabel(this);
 	label->setFont(font());
-	resizeEvent(0);
     }
     if (label->text() != t) {
 	label->setText(t);
-	highlight(lower==low_is_good ? hl_good : hl_bad);
+        ForceResize();
+	highlight((lower == low_is_good) ? hl_good : hl_bad);
     }
 }
 
-void NetHackQtLabelledIcon::setLabel(const QString& t, long v, long cv, const QString& tail)
+void NetHackQtLabelledIcon::setLabel(const QString& t, long v, long cv,
+                                     const QString& tail)
 {
     QString buf;
     if (v==NoNum) {
@@ -72,16 +73,19 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, long v, long cv, const QS
     prev_value=cv;
 }
 
-void NetHackQtLabelledIcon::setLabel(const QString& t, long v, const QString& tail)
+void NetHackQtLabelledIcon::setLabel(const QString& t, long v,
+                                     const QString& tail)
 {
     setLabel(t,v,v,tail);
 }
 
 void NetHackQtLabelledIcon::setIcon(const QPixmap& i)
 {
-    if (icon) icon->setPixmap(i);
-    else { icon=new QLabel(this); icon->setPixmap(i); resizeEvent(0); }
-    icon->resize(i.width(),i.height());
+    if (!icon)
+        icon = new QLabel(this);
+    icon->setPixmap(i);
+    ForceResize();
+    icon->resize(i.width(), i.height());
 }
 
 void NetHackQtLabelledIcon::setFont(const QFont& f)
@@ -169,6 +173,13 @@ void NetHackQtLabelledIcon::unhighlight()
     if (label) { // Surely it is?!
 	label->setStyleSheet("");
     }
+}
+
+// used when label (most status fields) or pixmap (alignment, hunger,
+// encumbrance) changes value
+void NetHackQtLabelledIcon::ForceResize()
+{
+    this->resizeEvent((QResizeEvent *) NULL);
 }
 
 void NetHackQtLabelledIcon::resizeEvent(QResizeEvent*)

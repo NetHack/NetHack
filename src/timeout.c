@@ -985,6 +985,8 @@ long timeout;
             /* free egg here because we use it above */
             obj_extract_self(egg);
             obfree(egg, (struct obj *) 0);
+            if ((mon = m_at(x,y)) && !hideunder(mon) && cansee(x, y))
+                redraw = TRUE;
         }
         if (redraw)
             newsym(x, y);
@@ -1745,6 +1747,7 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(rot_organic, (timeout_proc) 0, "rot_organic"),
     TTAB(rot_corpse, (timeout_proc) 0, "rot_corpse"),
     TTAB(revive_mon, (timeout_proc) 0, "revive_mon"),
+    TTAB(zombify_mon, (timeout_proc) 0, "zombify_mon"),
     TTAB(burn_object, cleanup_burn, "burn_object"),
     TTAB(hatch_egg, (timeout_proc) 0, "hatch_egg"),
     TTAB(fig_transform, (timeout_proc) 0, "fig_transform"),

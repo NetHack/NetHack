@@ -22,6 +22,7 @@ public slots:
 	void Quit();
 	void Random();
         void Randomize();
+        void plnamePlayVsQuit();
 
 	void selectName(const QString& n);
 	void selectRole(int current, int, int previous, int);
@@ -38,9 +39,14 @@ private:
 	QTableWidget* race;
 	QRadioButton **gender;
 	QRadioButton **alignment;
+
 	bool fully_specified_role;
         int chosen_gend;
         int chosen_align;
+
+        QPushButton *rand_btn;
+        QPushButton *play_btn;
+        QPushButton *quit_btn;
 };
 
 } // namespace nethack_qt_

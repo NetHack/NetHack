@@ -348,7 +348,7 @@ int sig_unused UNUSED;
             new_status_window();
             if (u.ux) {
                 i = ttyDisplay->toplin;
-                ttyDisplay->toplin = 0;
+                ttyDisplay->toplin = TOPLINE_EMPTY;
                 docrt();
                 bot();
                 ttyDisplay->toplin = i;
@@ -436,7 +436,7 @@ char **argv UNUSED;
 
     /* set up tty descriptor */
     ttyDisplay = (struct DisplayDesc *) alloc(sizeof (struct DisplayDesc));
-    ttyDisplay->toplin = 0;
+    ttyDisplay->toplin = TOPLINE_EMPTY;
     ttyDisplay->rows = hgt;
     ttyDisplay->cols = wid;
     ttyDisplay->curx = ttyDisplay->cury = 0;
@@ -1652,12 +1652,12 @@ winid window;
 
     switch (cw->type) {
     case NHW_MESSAGE:
-        if (ttyDisplay->toplin) {
+        if (ttyDisplay->toplin != TOPLINE_EMPTY) {
             home();
             cl_end();
             if (cw->cury)
                 docorner(1, cw->cury + 1);
-            ttyDisplay->toplin = 0;
+            ttyDisplay->toplin = TOPLINE_EMPTY;
         }
         break;
     case NHW_STATUS:
@@ -2353,12 +2353,13 @@ boolean blocking; /* with ttys, all windows are blocking */
 
     switch (cw->type) {
     case NHW_MESSAGE:
-        if (ttyDisplay->toplin == 1) {
+        if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
             more();
-            ttyDisplay->toplin = 1; /* more resets this */
+            ttyDisplay->toplin = TOPLINE_NEED_MORE; /* more resets this */
             tty_clear_nhwindow(window);
+            nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
         } else
-            ttyDisplay->toplin = 0;
+            ttyDisplay->toplin = TOPLINE_EMPTY;
         cw->curx = cw->cury = 0;
         if (!cw->active)
             iflags.window_inited = TRUE;
@@ -2366,8 +2367,8 @@ boolean blocking; /* with ttys, all windows are blocking */
     case NHW_MAP:
         end_glyphout();
         if (blocking) {
-            if (!ttyDisplay->toplin)
-                ttyDisplay->toplin = 1;
+            if (ttyDisplay->toplin != TOPLINE_EMPTY)
+                ttyDisplay->toplin = TOPLINE_NEED_MORE;
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
             return;
         }
@@ -2397,7 +2398,7 @@ boolean blocking; /* with ttys, all windows are blocking */
             cw->offx = 0;
         if (cw->type == NHW_MENU)
             cw->offy = 0;
-        if (ttyDisplay->toplin == 1)
+        if (ttyDisplay->toplin == TOPLINE_NEED_MORE)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
 #ifdef H2344_BROKEN
         if (cw->maxrow >= (int) ttyDisplay->rows
@@ -2413,7 +2414,7 @@ boolean blocking; /* with ttys, all windows are blocking */
                 cl_eos();
             } else
                 clear_screen();
-            ttyDisplay->toplin = 0;
+            ttyDisplay->toplin = TOPLINE_EMPTY;
         } else {
             if (WIN_MESSAGE != WIN_ERR)
                 tty_clear_nhwindow(WIN_MESSAGE);
@@ -2442,8 +2443,9 @@ winid window;
 
     switch (cw->type) {
     case NHW_MESSAGE:
-        if (ttyDisplay->toplin)
+        if (ttyDisplay->toplin != TOPLINE_EMPTY)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
+        nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
         /*FALLTHRU*/
     case NHW_STATUS:
     case NHW_BASE:
@@ -3194,10 +3196,11 @@ const char *mesg;
        response to a prompt, we'll assume that the display is up to date */
     tty_putstr(WIN_MESSAGE, 0, mesg);
     /* if `mesg' didn't wrap (triggering --More--), force --More-- now */
-    if (ttyDisplay->toplin == 1) {
+    if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
         more();
-        ttyDisplay->toplin = 1; /* more resets this */
+        ttyDisplay->toplin = TOPLINE_NEED_MORE; /* more resets this */
         tty_clear_nhwindow(WIN_MESSAGE);
+        nhassert(ttyDisplay->toplin == TOPLINE_EMPTY);
     }
     /* normally <ESC> means skip further messages, but in this case
        it means cancel the current prompt; any other messages should
@@ -3237,7 +3240,7 @@ tty_wait_synch()
             (void) fflush(stdout);
         } else if (ttyDisplay->inread > g.program_state.gameover) {
             /* this can only happen if we were reading and got interrupted */
-            ttyDisplay->toplin = 3;
+            ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
             /* do this twice; 1st time gets the Quit? message again */
             (void) tty_doprev_message();
             (void) tty_doprev_message();
@@ -3570,8 +3573,9 @@ tty_nhgetch()
         i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     else if (i == EOF)
         i = '\033'; /* same for EOF */
-    if (ttyDisplay && ttyDisplay->toplin == 1)
-        ttyDisplay->toplin = 2;
+    /* topline has been seen - we can clear need for more */
+    if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+        ttyDisplay->toplin = TOPLINE_NON_EMPTY;
 #ifdef TTY_TILES_ESCCODES
     {
         /* hack to force output of the window select code */
@@ -3613,8 +3617,9 @@ int *x UNUSED, *y UNUSED, *mod UNUSED;
     i = ntposkey(x, y, mod);
     if (!i && mod && (*mod == 0 || *mod == EOF))
         i = '\033'; /* map NUL or EOF to ESC, nethack doesn't expect either */
-    if (ttyDisplay && ttyDisplay->toplin == 1)
-        ttyDisplay->toplin = 2;
+    /* topline has been seen - we can clear need for more */
+    if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
+        ttyDisplay->toplin = TOPLINE_NON_EMPTY;
 #else /* !WIN32CON */
     i = tty_nhgetch();
 #endif /* ?WIN32CON */

@@ -246,6 +246,17 @@ char NetHackQtYnDialog::Exec()
                 case '\033': // won't happen; ESC is hidden
                     button_name = "Esc";
                     break;
+                case '&':
+                    // ampersand is used as a hidden quote char to flag
+                    // next character as a keyboard shortcut associated
+                    // with the current action--that's inappropriate here;
+                    // two consecutive ampersands are needed to display
+                    // one in a button label; first check whether caller
+                    // has already done that, skip this one if so
+                    if (i > 0 && ch[i - 1].cell() == QChar('&'))
+                        continue; // next i
+                    button_name = "&&";
+                    break;
                 }
             }
             button=new QPushButton(button_name);

@@ -1196,7 +1196,8 @@ do_mname()
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);
-    } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk) {
+    } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
+               || mtmp->data == &mons[PM_GHOST]) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             pline("%s will not accept the name %s.", upstart(monnambuf), buf);
     } else

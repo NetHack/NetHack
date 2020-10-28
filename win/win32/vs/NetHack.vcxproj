@@ -299,6 +299,9 @@
   <ItemGroup>
     <Image Include="$(WinWin32Dir)nethack.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">
     <MSBuild Projects="afternethack.proj" Targets="Build" Properties="Configuration=$(Configuration)" />

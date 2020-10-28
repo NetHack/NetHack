@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1600469617 2020/09/18 22:53:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.268 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1603507385 2020/10/24 02:43:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,6 @@
 
 static void NDECL(maybe_wail);
 static int NDECL(moverock);
-static int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
 static void NDECL(dosinkfall);
 static boolean FDECL(findtravelpath, (int));
 static boolean FDECL(trapmove, (int, int, struct trap *));
@@ -394,7 +393,7 @@ moverock()
  *  Chew on a wall, door, or boulder.  [What about statues?]
  *  Returns TRUE if still eating, FALSE when done.
  */
-static int
+int
 still_chewing(x, y)
 xchar x, y;
 {
@@ -418,7 +417,15 @@ xchar x, y;
                     : "hard stone");
         nomul(0);
         return 1;
-    } else if (g.context.digging.pos.x != x || g.context.digging.pos.y != y
+    } else if (lev->typ == IRONBARS
+               && metallivorous(g.youmonst.data) && u.uhunger > 1500) {
+        /* finishing eating via 'morehungry()' doesn't handle choking */
+        You("are too full to eat the bars.");
+        nomul(0);
+        return 1;
+    } else if (!g.context.digging.chew
+               || g.context.digging.pos.x != x
+               || g.context.digging.pos.y != y
                || !on_level(&g.context.digging.level, &u.uz)) {
         g.context.digging.down = FALSE;
         g.context.digging.chew = TRUE;
@@ -504,7 +511,20 @@ xchar x, y;
         digtxt = "chew through the tree.";
         lev->typ = ROOM;
     } else if (lev->typ == IRONBARS) {
-        digtxt = "eat through the bars.";
+        if (metallivorous(g.youmonst.data)) { /* should always be True here */
+            /* arbitrary amount; unlike proper eating, nutrition is
+               bestowed in a lump sum at the end */
+            int nut = (int) objects[HEAVY_IRON_BALL].oc_weight;
+
+            /* lesshungry() requires that victual be set up, so skip it;
+               morehungry() of a negative amount will increase nutrition
+               without any possibility of choking to death on the meal;
+               updates hunger state and requests status update if changed */
+            morehungry(-nut);
+        }
+        digtxt = (x == u.ux && y == u.uy)
+                 ? "devour the iron bars."
+                 : "eat through the bars.";
         dissolve_bars(x, y);
     } else if (lev->typ == SDOOR) {
         if (lev->doormask & D_TRAPPED) {
@@ -745,8 +765,10 @@ int mode;
                 pline("There is an obstacle there.");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
-            if ((dmgtype(g.youmonst.data, AD_RUST)
-                 || dmgtype(g.youmonst.data, AD_CORR)) && mode == DO_MOVE
+            if (mode == DO_MOVE
+                && (dmgtype(g.youmonst.data, AD_RUST)
+                    || dmgtype(g.youmonst.data, AD_CORR)
+                    || metallivorous(g.youmonst.data))
                 && still_chewing(x, y)) {
                 return FALSE;
             }

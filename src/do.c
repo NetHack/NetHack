@@ -1982,6 +1982,28 @@ long timeout UNUSED;
     }
 }
 
+/* Timeout callback. Revive the corpse as a zombie. */
+/*ARGSUSED*/
+void
+zombify_mon(arg, timeout)
+anything *arg;
+long timeout UNUSED;
+{
+    struct obj *body = arg->a_obj;
+    int zmon = zombie_form(&mons[body->corpsenm]);
+
+    if (zmon != NON_PM) {
+
+        if (has_omid(body))
+            free_omid(body);
+        if (has_omonst(body))
+            free_omonst(body);
+
+        body->corpsenm = zmon;
+        revive_mon(arg, timeout);
+    }
+}
+
 boolean
 cmd_safety_prevention(cmddesc, act, flagcounter)
 const char *cmddesc;

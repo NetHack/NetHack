@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1602270114 2020/10/09 19:01:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.867 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.873 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -425,6 +425,7 @@ E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
 E void NDECL(deferred_goto);
 E boolean FDECL(revive_corpse, (struct obj *));
 E void FDECL(revive_mon, (ANY_P *, long));
+E void FDECL(zombify_mon, (ANY_P *, long));
 E boolean FDECL(cmd_safety_prevention, (const char *, const char *, int *));
 E int NDECL(donull);
 E int NDECL(dowipe);
@@ -873,6 +874,7 @@ E anything *FDECL(long_to_any, (long));
 E anything *FDECL(monst_to_any, (struct monst *));
 E anything *FDECL(obj_to_any, (struct obj *));
 E boolean FDECL(revive_nasty, (int, int, const char *));
+E int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
 E void FDECL(movobj, (struct obj *, XCHAR_P, XCHAR_P));
 E boolean FDECL(may_dig, (XCHAR_P, XCHAR_P));
 E boolean FDECL(may_passwall, (XCHAR_P, XCHAR_P));
@@ -1454,6 +1456,8 @@ E int FDECL(cmap_to_type, (int));
 /* ### mon.c ### */
 
 E void NDECL(mon_sanity_check);
+E boolean FDECL(zombie_maker, (struct permonst *));
+E int FDECL(zombie_form, (struct permonst *));
 E int FDECL(m_poisongas_ok, (struct monst *));
 E int FDECL(undead_to_corpse, (int));
 E int FDECL(genus, (int, int));
@@ -1583,6 +1587,7 @@ E void FDECL(mon_yells, (struct monst *, const char *));
 E int FDECL(dochug, (struct monst *));
 E boolean FDECL(m_digweapon_check, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(m_move, (struct monst *, int));
+E int FDECL(m_move_aggress, (struct monst *, XCHAR_P, XCHAR_P));
 E void FDECL(dissolve_bars, (int, int));
 E boolean FDECL(closed_door, (int, int));
 E boolean FDECL(accessible, (int, int));
@@ -1776,6 +1781,7 @@ E void NDECL(nttty_exit);
 E void NDECL(init_objects);
 E void FDECL(obj_shuffle_range, (int, int *, int *));
 E int NDECL(find_skates);
+E boolean FDECL(objdescr_is, (struct obj *, const char *));
 E void NDECL(oinit);
 E void FDECL(savenames, (NHFILE *));
 E void FDECL(restnames, (NHFILE *));
@@ -2020,6 +2026,7 @@ E void VDECL(verbalize, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(raw_printf, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(impossible, (const char *, ...)) PRINTF_F(1, 2);
 E void VDECL(config_error_add, (const char *, ...)) PRINTF_F(1, 2);
+E void FDECL(nhassert_failed, (const char *, const char *, int));
 
 /* ### polyself.c ### */
 

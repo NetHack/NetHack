@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1596498190 2020/08/03 23:43:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1603509297 2020/10/24 03:14:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -57,11 +57,9 @@ struct obj *obj;
     if (obj->oclass == POTION_CLASS) {
         coord cc;
         static const char *empty = "The potion turns out to be empty.";
-        const char *potion_descr;
         struct monst *mtmp;
 
-        potion_descr = OBJ_DESCR(objects[obj->otyp]);
-        if (potion_descr && !strcmp(potion_descr, "milky")) {
+        if (objdescr_is(obj, "milky")) {
             if (!(g.mvitals[PM_GHOST].mvflags & G_GONE)
                 && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
                 if (!enexto(&cc, mon->mx, mon->my, &mons[PM_GHOST]))
@@ -87,7 +85,7 @@ struct obj *obj;
                 return 2;
             }
         }
-        if (potion_descr && !strcmp(potion_descr, "smoky")
+        if (objdescr_is(obj, "smoky")
             && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
             && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
             if (!enexto(&cc, mon->mx, mon->my, &mons[PM_DJINNI]))
@@ -185,6 +183,8 @@ struct monst *mtmp;
 struct obj *otmp;
 boolean self;
 {
+    char *objnamp, objbuf[BUFSZ];
+
     if (!canseemon(mtmp)) {
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
@@ -193,9 +193,7 @@ boolean self;
                  (distu(mtmp->mx, mtmp->my) <= range * range)
                  ? "nearby" : "in the distance");
         otmp->known = 0; /* hero doesn't know how many charges are left */
-    } else {
-        char *objnamp, objbuf[BUFSZ];
-
+    } else if (self) {
         otmp->dknown = 1;
         objnamp = xname(otmp);
         if (strlen(objnamp) >= QBUFSZ)
@@ -204,8 +202,17 @@ boolean self;
         /* "<mon> plays a <horn> directed at himself!" */
         pline("%s!", monverbself(mtmp, Monnam(mtmp), "play", objbuf));
         makeknown(otmp->otyp); /* (wands handle this slightly differently) */
-        if (!self)
-            stop_occupation();
+    } else {
+        otmp->dknown = 1;
+        objnamp = xname(otmp);
+        if (strlen(objnamp) >= QBUFSZ)
+            objnamp = simpleonames(otmp);
+        pline("%s %s %s directed at you!",
+              /* monverbself() would adjust the verb if hallucination made
+                 subject plural; stick with singular here, at least for now */
+              Monnam(mtmp), "plays", an(objnamp));
+        makeknown(otmp->otyp);
+        stop_occupation();
     }
     otmp->spe -= 1; /* use a charge */
 }

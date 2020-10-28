@@ -4,6 +4,16 @@
 
 // qt_plsel.cpp -- player selector dialog
 
+//
+// TODO:
+//  increase height so that no scrolling is needed for role list;
+//  the [Random] button doesn't do anything;
+//  make race first vs role first dynamically selectable (tty allows
+//    gender first and alignment first too);
+//  maybe add a set of radio buttons for normal mode vs explore mode
+//    [vs wizard mode if eligible]
+//
+
 extern "C" {
 #include "hack.h"
 }
@@ -23,6 +33,29 @@ extern "C" {
 
 // Warwick prefers it this way...
 #define QT_CHOOSE_RACE_FIRST
+
+/* check whether plname[] is among the list of generic user names */
+static bool generic_plname()
+{
+    if (*g.plname) {
+        const char *sptr;
+        const char *genericusers = sysopt.genericusers;
+        int ln = (int) strlen(g.plname);
+
+        if (!genericusers || !*genericusers)
+            genericusers = "player games";
+        else if (!strcmp(genericusers, "*")) /* "*" => always ask for name */
+            return true;
+
+        if ((sptr = strstri(genericusers, g.plname)) != 0
+            /* check for full word: start of list or following a space */
+            && (sptr == genericusers || sptr[-1] == ' ')
+            /* and also preceding a space or at end of list */
+            && (sptr[ln] == ' ' || sptr[ln] == '\0'))
+            return true;
+    }
+    return false;
+}
 
 namespace nethack_qt_ {
 
@@ -133,14 +166,19 @@ public:
 
 NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) :
     QDialog(NetHackQtBind::mainWidget()),
-    fully_specified_role(true)
+    fully_specified_role(true),
+    chosen_gend(ROLE_NONE),
+    chosen_align(ROLE_NONE),
+    rand_btn(new QPushButton("Random")),
+    play_btn(new QPushButton("Play")),
+    quit_btn(new QPushButton("Quit"))
 {
     /*
                0             1             2
 	  + Name ------------------------------------+
 	0 |                                          |
 	  + ---- ------------------------------------+
-	  + Role ---+   + Race ---+   + Gender ------+
+	  + Race ---+   + Role ---+   + Gender ------+
 	  |         |   |         |   |  * Male      |
 	1 |         |   |         |   |  * Female    |
 	  |         |   |         |   +--------------+
@@ -165,30 +203,36 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     QVBoxLayout *namelayout = new QVBoxLayout(namebox);
     QLineEdit* name = new QLineEdit(namebox);
     namelayout->addWidget(name);
-    name->setMaxLength(sizeof(g.plname)-1);
-    if ( strncmp(g.plname,"player",6) && strncmp(g.plname,"games",5) )
-	name->setText(g.plname);
+    name->setMaxLength(PL_NSIZ - 1);
+    name->setPlaceholderText(QString("  (required)")); // grayed out
+
+    // if plname[] contains a generic user name, clear it
+    if (generic_plname())
+        *g.plname = '\0';
+    name->setText(g.plname);
     connect(name, SIGNAL(textChanged(const QString&)),
-	    this, SLOT(selectName(const QString&)) );
+            this, SLOT(selectName(const QString&)));
     name->setFocus();
+
     QGroupBox* genderbox = new QGroupBox("Gender",this);
     QButtonGroup *gendergroup = new QButtonGroup(this);
     QGroupBox* alignbox = new QGroupBox("Alignment",this);
     QButtonGroup *aligngroup = new QButtonGroup(this);
+    // these two QVBoxLayout pointers aren't used, the vertical box layouts
+    // being assigned to them are...
     QVBoxLayout* vbgb UNUSED = new QVBoxLayout(genderbox);
     QVBoxLayout* vbab UNUSED = new QVBoxLayout(alignbox);
     char versionbuf[QBUFSZ];
-    QLabel* logo = new QLabel(QString(nh_attribution).arg(version_string(versionbuf)), this);
+    QLabel *logo = new QLabel(QString(nh_attribution).arg(
+                                           version_string(versionbuf)), this);
 
     l->addWidget( namebox, 0,0,1,3 );
-#ifdef QT_CHOOSE_RACE_FIRST
-    race = new NhPSListView(this);
     role = new NhPSListView(this);
+    race = new NhPSListView(this);
+#ifdef QT_CHOOSE_RACE_FIRST
     l->addWidget( race, 1,0,6,1 );
     l->addWidget( role, 1,1,6,1 );
 #else
-    role = new NhPSListView(this);
-    race = new NhPSListView(this);
     l->addWidget( role, 1,0,6,1 );
     l->addWidget( race, 1,1,6,1 );
 #endif
@@ -215,7 +259,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 	role->setItem(i, 0, item);
     }
-    connect( role, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(selectRole(int, int, int, int)) );
+    connect(role, SIGNAL(currentCellChanged(int, int, int, int)),
+            this, SLOT(selectRole(int, int, int, int)));
     role->setHorizontalHeaderLabels(QStringList("Role"));
     role->resizeColumnToContents(0);
 
@@ -230,7 +275,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 	race->setItem(i, 0, item);
     }
-    connect( race, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(selectRace(int, int, int, int)) );
+    connect(race, SIGNAL(currentCellChanged(int, int, int, int)),
+            this, SLOT(selectRace(int, int, int, int)));
     race->setHorizontalHeaderLabels(QStringList("Race"));
     race->resizeColumnToContents(0);
 
@@ -240,7 +286,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	genderbox->layout()->addWidget(gender[i]);
 	gendergroup->addButton(gender[i], i);
     }
-    connect( gendergroup, SIGNAL(buttonPressed(int)), this, SLOT(selectGender(int)) );
+    connect(gendergroup, SIGNAL(buttonPressed(int)),
+            this, SLOT(selectGender(int)));
 
     alignment = new QRadioButton*[ROLE_ALIGNS];
     for (i=0; i<ROLE_ALIGNS; i++) {
@@ -248,21 +295,18 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	alignbox->layout()->addWidget(alignment[i]);
 	aligngroup->addButton(alignment[i], i);
     }
-    connect( aligngroup, SIGNAL(buttonPressed(int)), this, SLOT(selectAlignment(int)) );
+    connect(aligngroup, SIGNAL(buttonPressed(int)),
+            this, SLOT(selectAlignment(int)));
 
-    QPushButton* rnd = new QPushButton("Random",this);
-    l->addWidget( rnd, 4, 2 );
-    rnd->setDefault(false);
-    connect( rnd, SIGNAL(clicked()), this, SLOT(Randomize()) );
-
-    QPushButton* ok = new QPushButton("Play",this);
-    l->addWidget( ok, 5, 2 );
-    ok->setDefault(true);
-    connect( ok, SIGNAL(clicked()), this, SLOT(accept()) );
-
-    QPushButton* cancel = new QPushButton("Quit",this);
-    l->addWidget( cancel, 6, 2 );
-    connect( cancel, SIGNAL(clicked()), this, SLOT(reject()) );
+    l->addWidget(rand_btn, 4, 2);
+    connect(rand_btn, SIGNAL(clicked()), this, SLOT(Randomize()));
+    l->addWidget(play_btn, 5, 2);
+    connect(play_btn, SIGNAL(clicked()), this, SLOT(accept()));
+    l->addWidget(quit_btn, 6, 2);
+    connect(quit_btn, SIGNAL(clicked()), this, SLOT(reject()));
+    // if plname[] is non-empty, the Play button is enabled and the default;
+    // otherwise, Play is disabled and Quit is the default
+    plnamePlayVsQuit();
 
     Randomize();
 }
@@ -307,7 +351,7 @@ void NetHackQtPlayerSelector::Randomize()
     }
 
     // make sure we have a valid combination, honoring
-    // the users request if possible.
+    // the user's request if possible.
     bool choose_race_first;
 #ifdef QT_CHOOSE_RACE_FIRST
     choose_race_first = true;
@@ -361,12 +405,35 @@ void NetHackQtPlayerSelector::Randomize()
     race->setCurrentCell(ra, 0);
 }
 
-void NetHackQtPlayerSelector::selectName(const QString& n)
+// if plname[] is empty, disable [Play], otherwise [Play] is the default
+void NetHackQtPlayerSelector::plnamePlayVsQuit()
 {
-    str_copy(g.plname,n.toLatin1().constData(),SIZE(g.plname));
+    if (*g.plname) {
+        play_btn->setEnabled(true);
+        play_btn->setDefault(true);
+        //quit_btn->setDefault(false);
+    } else {
+        play_btn->setEnabled(false); // [Play] still visible but grayed out
+        //play_btn->setDefault(false);
+        quit_btn->setDefault(true);
+    }
 }
 
-void NetHackQtPlayerSelector::selectRole(int crow, int ccol, int prow, int pcol)
+// the line edit widget for the name field has received input
+void NetHackQtPlayerSelector::selectName(const QString& n)
+{
+    const char *name_str = n.toLatin1().constData();
+    // skip any leading spaces
+    // (it would be better to set up a validator that rejects leading spaces)
+    while (*name_str == ' ')
+        ++name_str;
+    str_copy(g.plname, name_str, PL_NSIZ);
+    // possibly enable or disable the [Play] button
+    plnamePlayVsQuit();
+}
+
+void NetHackQtPlayerSelector::selectRole(int crow, int ccol,
+                                         int prow, int pcol)
 {
     int ra = race->currentRow();
     int ro = role->currentRow();
@@ -395,17 +462,20 @@ void NetHackQtPlayerSelector::selectRole(int crow, int ccol, int prow, int pcol)
 	item = role->item(j, 0);
 	item->setSelected(item == i);
 	bool v = validrace(j,ra);
-	item->setFlags(
-		v ? Qt::ItemIsEnabled|Qt::ItemIsSelectable
-		  : Qt::NoItemFlags);
+        item->setFlags(v ? Qt::ItemIsEnabled|Qt::ItemIsSelectable
+                         : Qt::NoItemFlags);
     }
+    nhUse(crow);
+    nhUse(ccol);
+    nhUse(pcol);
 #endif
 
     //flags.initrole = role->currentRow();
     setupOthers();
 }
 
-void NetHackQtPlayerSelector::selectRace(int crow UNUSED, int ccol UNUSED, int prow, int pcol UNUSED)
+void NetHackQtPlayerSelector::selectRace(int crow, int ccol,
+                                         int prow, int pcol)
 {
     int ra = race->currentRow();
     int ro = role->currentRow();
@@ -433,10 +503,12 @@ void NetHackQtPlayerSelector::selectRace(int crow UNUSED, int ccol UNUSED, int p
 	item = race->item(j, 0);
 	item->setSelected(item == i);
 	bool v = validrace(ro,j);
-	item->setFlags(
-		v ? Qt::ItemIsEnabled|Qt::ItemIsSelectable
-		  : Qt::NoItemFlags);
+        item->setFlags(v ? Qt::ItemIsEnabled|Qt::ItemIsSelectable
+                         : Qt::NoItemFlags);
     }
+    nhUse(crow);
+    nhUse(ccol);
+    nhUse(pcol);
 #endif
 
     //flags.initrace = race->currentRow();

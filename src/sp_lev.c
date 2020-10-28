@@ -4393,7 +4393,7 @@ int lit;
                     break;
                 case 0:
                 case 1:
-                    if (levl[x][y].lit == lit)
+                    if (levl[x][y].lit == (unsigned int) lit)
                         selection_setpoint(x, y, ret, 1);
                     break;
                 }
