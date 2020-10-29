@@ -2104,6 +2104,7 @@ extern long random(void);
 
 extern void learnscroll(struct obj *);
 extern char *tshirt_text(struct obj *, char *);
+extern char *hawaiian_motif(struct obj *, char *);
 extern char *apron_text(struct obj *, char *);
 extern const char *candy_wrapper_text(struct obj *);
 extern void assign_candy_wrapper(struct obj *);
