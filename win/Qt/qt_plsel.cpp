@@ -6,7 +6,8 @@
 
 //
 // TODO:
-//  increase height so that no scrolling is needed for role list;
+//  increase height so that no scrolling is needed for role list [needs
+//    to be done properly instead of forcing logo string to be taller]
 //  the [Random] button doesn't do anything;
 //  make race first vs role first dynamically selectable (tty allows
 //    gender first and alignment first too);
@@ -63,8 +64,10 @@ namespace nethack_qt_ {
 void centerOnMain( QWidget* w );
 // end temporary
 
-static const char nh_attribution[] = "<center><big>NetHack %1</big>"
-	"<br><small>by the NetHack DevTeam</small></center>";
+// hack: padded with blank lines by inserting breaks above and below in
+// order to force window to be tall enough to show all the roles at once
+static const char nh_attribution[] = "<br><center><big>NetHack %1</big>"
+        "<br><small>by the NetHack DevTeam</small></center><br>";
 
 class NhPSListViewItem : public QTableWidgetItem {
 public:
@@ -214,9 +217,10 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
             this, SLOT(selectName(const QString&)));
     name->setFocus();
 
-    QGroupBox* genderbox = new QGroupBox("Gender",this);
+    // changed to move gender and alignment labels inside their boxes (below)
+    QGroupBox *genderbox = new QGroupBox();
     QButtonGroup *gendergroup = new QButtonGroup(this);
-    QGroupBox* alignbox = new QGroupBox("Alignment",this);
+    QGroupBox *alignbox = new QGroupBox();
     QButtonGroup *aligngroup = new QButtonGroup(this);
     // these two QVBoxLayout pointers aren't used, the vertical box layouts
     // being assigned to them are...
@@ -280,6 +284,12 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     race->setHorizontalHeaderLabels(QStringList("Race"));
     race->resizeColumnToContents(0);
 
+    // TODO: render the alignment and gender labels smaller to match the
+    // horizontal header labels for role and race; getting the font from
+    // race table above and setting it for labels below made no difference
+
+    QLabel *gendlabel = new QLabel("Gender");
+    genderbox->layout()->addWidget(gendlabel);
     gender = new QRadioButton*[ROLE_GENDERS];
     for (i=0; i<ROLE_GENDERS; i++) {
 	gender[i] = new QRadioButton( genders[i].adj, genderbox );
@@ -289,6 +299,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     connect(gendergroup, SIGNAL(buttonPressed(int)),
             this, SLOT(selectGender(int)));
 
+    QLabel *alignlabel = new QLabel("Alignment");
+    alignbox->layout()->addWidget(alignlabel);
     alignment = new QRadioButton*[ROLE_ALIGNS];
     for (i=0; i<ROLE_ALIGNS; i++) {
 	alignment[i] = new QRadioButton( aligns[i].adj, alignbox );
