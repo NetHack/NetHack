@@ -30,6 +30,8 @@ typedef struct align { /* alignment & record */
 #define AM_LAWFUL 4
 
 #define AM_MASK 7
+/* Some altars are considered as shrines, so we need a flag. */
+#define AM_SHRINE 8
 
 #define AM_SPLEV_CO 3
 #define AM_SPLEV_NONCO 7
@@ -40,5 +42,15 @@ typedef struct align { /* alignment & record */
                                                      : ((int) x) - 2))
 #define Align2amask(x) \
     (((x) == A_NONE) ? AM_NONE : ((x) == A_LAWFUL) ? AM_LAWFUL : (x) + 2)
+
+/* Because clearly Nethack needs more ways to specify alignment.
+   The Amask2msa AM_LAWFUL check needs to mask with AM_MASK to
+   strip off possible AM_SHRINE bit */
+#define Amask2msa(x) (((x) & AM_MASK) == AM_LAWFUL ? 3 : (x) & AM_MASK)
+#define Msa2amask(x) ((x) == 3 ? AM_LAWFUL : (x))
+#define MSA_NONE    0  /* unaligned or multiple alignments */
+#define MSA_LAWFUL  1
+#define MSA_NEUTRAL 2
+#define MSA_CHAOTIC 3
 
 #endif /* ALIGN_H */
