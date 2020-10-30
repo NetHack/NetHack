@@ -46,8 +46,8 @@ typedef struct align { /* alignment & record */
 /* Because clearly Nethack needs more ways to specify alignment.
    The Amask2msa AM_LAWFUL check needs to mask with AM_MASK to
    strip off possible AM_SHRINE bit */
-#define Amask2msa(x) (((x) & AM_MASK) == AM_LAWFUL ? 3 : (x) & AM_MASK)
-#define Msa2amask(x) ((x) == 3 ? AM_LAWFUL : (x))
+#define Amask2msa(x) (((x) & AM_MASK) == 4 ? 3 : (x) & AM_MASK)
+#define Msa2amask(x) ((x) == 3 ? 4 : (x))
 #define MSA_NONE    0  /* unaligned or multiple alignments */
 #define MSA_LAWFUL  1
 #define MSA_NEUTRAL 2
