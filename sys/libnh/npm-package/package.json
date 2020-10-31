@@ -4,9 +4,9 @@
   "description": "The original NetHack rogue-like game built as a WebAssembly module",
   "main": "src/nethackShim.js",
   "scripts": {
-    "test": "node test/test.js",
+    "test": "npm run build && node test/test.js",
     "clean": "rm ./build/nethack.js; rm ./build/nethack.wasm; true",
-    "build": "cp ../../../src/nethack.js ../../../src/nethack.wasm ./build",
+    "build": "mkdir build; cp ../../../targets/wasm/nethack.js ../../../targets/wasm/nethack.wasm ./build",
     "prepack": "npm run build"
   },
   "keywords": [

@@ -294,6 +294,7 @@ VARDIR=$(HACKDIR)
 #-INCLUDE cross-pre.2020
 #
 #-POST
+
 ifdef WANT_LIBNH
 libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a

@@ -2,11 +2,13 @@
 
 if [ x$1 == "xlib" ]; then
     echo Doing lib...
-    make spotless
-    cd sys/lib
+    if [ -f Makefile ]; then
+        make spotless
+    fi
+    cd sys/unix
     ./setup.sh hints/macOS.2020
     cd ../..
-    make
+    make WANT_LIBNH=1
 fi
 
 if [ x$1 == "xrunlib" ]; then
@@ -19,15 +21,17 @@ fi
 
 if [ x$1 == "xwasm" ]; then
     echo Doing wasm...
-    make spotless
-    cd sys/lib
-    ./setup.sh hints/wasm
+    if [ -f Makefile ]; then
+        make spotless
+    fi
+    cd sys/unix
+    ./setup.sh hints/macOS.2020
     cd ../..
-    make
+    make CROSS_TO_WASM=1
 fi
 
 if [ x$1 == "xrunwasm" ]; then
-    cd sys/lib/npm-package && node test/test.js
+    cd sys/lib/npm-package && npm run build && node test/test.js
 fi
 
 if [ x$1 == "xbin" ]; then

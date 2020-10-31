@@ -101,10 +101,10 @@ dosave0()
         return 0;
     fq_save = fqname(g.SAVEF, SAVEPREFIX, 1); /* level files take 0 */
 
+#ifndef NO_SIGNAL
 #if defined(UNIX) || defined(VMS)
     sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
 #endif
-#ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
 #endif
 
