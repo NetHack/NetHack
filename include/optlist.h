@@ -122,7 +122,7 @@ pfx_##a,
     NHOPTC(catname, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "the name of your (first) cat (e.g., catname:Tabby)")
 #ifdef INSURANCE
-    NHOPTB(checkpoint, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
+    NHOPTB(checkpoint, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.ins_chkpt)
 #else
     NHOPTB(checkpoint, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,

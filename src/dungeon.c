@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1596498164 2020/08/03 23:42:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1604105163 2020/10/31 00:46:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2672,8 +2672,8 @@ recalc_mapseen()
     struct monst *mtmp;
     struct cemetery *bp, **bonesaddr;
     struct trap *t;
-    unsigned i, ridx;
-    int x, y, ltyp, count, atmp;
+    unsigned i, ridx, atmp;
+    int x, y, ltyp, count;
 
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets
@@ -2842,10 +2842,13 @@ recalc_mapseen()
                     mptr->feat.ngrave = count;
                 break;
             case ALTAR:
+                /* get the altarmask for this location; might be a mimic */
+                atmp = altarmask_at(x, y);
+                /* convert to index: 0..3 */
                 atmp = (Is_astralevel(&u.uz)
                         && (levl[x][y].seenv & SVALL) != SVALL)
                          ? MSA_NONE
-                         : Amask2msa(levl[x][y].altarmask);
+                         : Amask2msa(atmp);
                 if (!mptr->feat.naltar)
                     mptr->feat.msalign = atmp;
                 else if (mptr->feat.msalign != atmp)
@@ -3297,6 +3300,8 @@ boolean printdun;
                         an(shop_string(mptr->feat.shoptype)));
         }
         if (mptr->feat.naltar > 0) {
+            unsigned atmp;
+
             /* Temples + non-temple altars get munged into just "altars" */
             if (mptr->feat.ntemple != mptr->feat.naltar)
                 ADDNTOBUF("altar", mptr->feat.naltar);
@@ -3304,7 +3309,9 @@ boolean printdun;
                 ADDNTOBUF("temple", mptr->feat.ntemple);
 
             /* only print out altar's god if they are all to your god */
-            if (Amask2align(Msa2amask(mptr->feat.msalign)) == u.ualign.type)
+            atmp = mptr->feat.msalign;              /*    0,  1,  2,  3 */
+            atmp = Msa2amask(atmp);                 /*    0,  1,  2,  4 */
+            if (Amask2align(atmp) == u.ualign.type) /* -127, -1,  0, +1 */
                 Sprintf(eos(buf), " to %s", align_gname(u.ualign.type));
         }
         ADDNTOBUF("throne", mptr->feat.nthrone);

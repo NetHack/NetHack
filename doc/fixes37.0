@@ -287,6 +287,7 @@ hero poly'd into rust monster could implicitly eat bars when adjacent by
 	trying to move there, now when in rock mole form too; in xorn form
 	can explicitly eat them via 'e' after moving onto their spot
 monster hiding under an egg that hatched was kept hidden
+restful sleep regenerates hit points
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

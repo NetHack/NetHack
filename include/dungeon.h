@@ -182,14 +182,6 @@ struct linfo {
  * fountains").  This makes it also subject to player conditions (amnesia).
  */
 
-/* Because clearly Nethack needs more ways to specify alignment */
-#define Amask2msa(x) ((x) == 4 ? 3 : (x) &AM_MASK)
-#define Msa2amask(x) ((x) == 3 ? 4 : (x))
-#define MSA_NONE 0 /* unaligned or multiple alignments */
-#define MSA_LAWFUL 1
-#define MSA_NEUTRAL 2
-#define MSA_CHAOTIC 3
-
 /* what the player knows about a single dungeon level */
 /* initialized in mklev() */
 typedef struct mapseen {

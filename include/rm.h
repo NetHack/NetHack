@@ -336,11 +336,6 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define D_SECRET 32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
- * Some altars are considered as shrines, so we need a flag.
- */
-#define AM_SHRINE 8
-
-/*
  * Thrones should only be looted once.
  */
 #define T_LOOTED 1

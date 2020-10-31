@@ -6579,7 +6579,7 @@ boolean load_colors;
                 if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
                     continue; /* skip these */
                 Sprintf(cnm, patternfmt, colornames[i].name);
-                add_menu_coloring_parsed(dupstr(cnm), c, ATR_NONE);
+                add_menu_coloring_parsed(cnm, c, ATR_NONE);
             }
 
             /* right now, menu_colorings contains the alternate color list;
