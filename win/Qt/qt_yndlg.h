@@ -18,6 +18,7 @@ private:
 	char keypress;
         bool allow_count;
         QLineEdit *le;
+        QPushButton *y_btn;
 
         // abritrary size; might need to be more sophisicated someday
         char alt_answer[26 + 1], alt_result[26 + 1];

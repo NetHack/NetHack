@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1604105163 2020/10/31 00:46:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1604173730 2020/10/31 19:48:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3311,7 +3311,7 @@ boolean printdun;
             /* only print out altar's god if they are all to your god */
             atmp = mptr->feat.msalign;              /*    0,  1,  2,  3 */
             atmp = Msa2amask(atmp);                 /*    0,  1,  2,  4 */
-            if (Amask2align(atmp) == u.ualign.type) /* -127, -1,  0, +1 */
+            if (Amask2align(atmp) == u.ualign.type) /* -128, -1,  0, +1 */
                 Sprintf(eos(buf), " to %s", align_gname(u.ualign.type));
         }
         ADDNTOBUF("throne", mptr->feat.nthrone);
