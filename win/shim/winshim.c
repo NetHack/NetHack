@@ -305,7 +305,11 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
                     // which field is being updated?
                     args[0] = globalThis.nethackGlobal.constants["STATUS_FIELD"][args[0]];
                     // arg[1] is a string unless it is BL_CONDITION, BL_RESET, BL_FLUSH, BL_CHARACTERISTICS
-                    if(["BL_CONDITION", "BL_RESET", "BL_FLUSH", "BL_CHARACTERISTICS"].indexOf(args[0] && args[1]) < 0) {
+                    if(args[0] !== "BL_CONDITION" &&
+                        args[0] !== "BL_RESET" &&
+                        args[0] !== "BL_FLUSH" &&
+                        args[0] !== "BL_CHARACTERISTICS" &&
+                        args[1]) {
                         args[1] = getArg(name, args[1], "s");
                     } else {
                         args[1] = getArg(name, args[1], "p");
