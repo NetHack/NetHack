@@ -431,11 +431,12 @@ void NetHackQtStatusWindow::HitpointBar()
     *barcolors[6][2] = {
         { "black",   "black"     },  // 100%   /* second black never shown */
         { "blue",    "darkBlue"  },  //75..99
-        // gray is darker than darkGray for some reason (at least on OSX)...
-        // green and orange would look better if they were lighter/brighter
-        { "green",   "gray"      },  //50..74
+        /* gray is darker than darkGray for some reason (at least on OSX);
+           default green is too dark compared to blue, yellow, orange,
+           and red so is changed here to green.lighter(150) */
+        { "#00c000", "gray"      },  //50..74  /* "green"=="#008000" */
         { "yellow",  "darkGray"  },  //25..49
-        { "#ff7f00", "lightGray" },  //10..24  /* #ff7f00=="orange" */
+        { "orange",  "lightGray" },  //10..24
         { "red",     "white"     },  // 0..9
     };
 

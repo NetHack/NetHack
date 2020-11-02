@@ -1,4 +1,4 @@
-/* NetHack 3.7	align.h	$NHDT-Date: 1604105154 2020/10/31 00:45:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	align.h	$NHDT-Date: 1604269810 2020/11/01 22:30:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,7 +42,7 @@ typedef struct align { /* alignment & record */
 #define Amask2align(x) \
     ((aligntyp) ((((x) & AM_MASK) == 0) ? A_NONE                \
                  : (((x) & AM_MASK) == AM_LAWFUL) ? A_LAWFUL    \
-                   : ((int) (x) - 2))) /* 2 => 0, 1 => -1 */
+                   : ((int) ((x) & AM_MASK)) - 2)) /* 2 => 0, 1 => -1 */
 #define Align2amask(x) \
     ((unsigned) (((x) == A_NONE) ? AM_NONE                      \
                  : ((x) == A_LAWFUL) ? AM_LAWFUL                \
