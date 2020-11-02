@@ -40,6 +40,8 @@ nethackStart(async function (name, ... args) {
     case "shim_yn_function":
     case "shim_message_menu":
         return 121; // 'y'
+    case "shim_getmsghistory":
+        return "";
     case "shim_nhgetch":
     case "shim_nh_poskey":
         return 0;
