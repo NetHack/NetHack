@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1596498552 2020/08/03 23:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1604442292 2020/11/03 22:24:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -308,22 +308,26 @@ struct obj {
     (otmp->otyp == TALLOW_CANDLE || otmp->otyp == WAX_CANDLE)
 #define MAX_OIL_IN_FLASK 400 /* maximum amount of oil in a potion of oil */
 
-/* MAGIC_LAMP intentionally excluded below */
-/* age field of this is relative age rather than absolute */
-#define age_is_relative(otmp)                                       \
+/* age field of this is relative age rather than absolute; does not include
+   magic lamp */
+#define age_is_relative(otmp) \
     ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)
-/* object can be ignited */
-#define ignitable(otmp)                                             \
+/* object can be ignited; magic lamp used to excluded here too but all
+   usage of this macro ended up testing
+     (ignitable(obj) || obj->otyp == MAGIC_LAMP)
+   so include it; brass lantern can be lit but not by fire */
+#define ignitable(otmp) \
     ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
+     || ((otmp)->otyp == MAGIC_LAMP && (otmp)->spe > 0)             \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)
 
 /* things that can be read */
-#define is_readable(otmp)                                                    \
+#define is_readable(otmp) \
     ((otmp)->otyp == FORTUNE_COOKIE || (otmp)->otyp == T_SHIRT               \
      || (otmp)->otyp == ALCHEMY_SMOCK || (otmp)->otyp == CREDIT_CARD         \
      || (otmp)->otyp == CAN_OF_GREASE || (otmp)->otyp == MAGIC_MARKER        \

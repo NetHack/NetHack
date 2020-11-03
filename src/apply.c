@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1602270122 2020/10/09 19:02:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.328 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1604442295 2020/11/03 22:24:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1404,14 +1404,14 @@ struct obj *obj;
 }
 
 /* Called when potentially lightable object is affected by fire_damage().
-   Return TRUE if object was lit and FALSE otherwise --ALI */
+   Return TRUE if object becomes lit and FALSE otherwise --ALI */
 boolean
 catch_lit(obj)
 struct obj *obj;
 {
     xchar x, y;
 
-    if (!obj->lamplit && (obj->otyp == MAGIC_LAMP || ignitable(obj))) {
+    if (!obj->lamplit && ignitable(obj)) {
         if ((obj->otyp == MAGIC_LAMP
              || obj->otyp == CANDELABRUM_OF_INVOCATION) && obj->spe == 0)
             return FALSE;

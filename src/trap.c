@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1602270123 2020/10/09 19:02:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1604442297 2020/11/03 22:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5563,9 +5563,9 @@ boolean override;
     return defsyms[trap_to_defsym(ttyp)].explanation;
 }
 
-/* Ignite ignitable items in the given object chain, due to some external source
- * of fire. The object chain should be somewhere exposed, like someone's open
- * inventory or the floor.
+/* Ignite ignitable items in the given object chain, due to some external
+ * source of fire.  The object chain should be somewhere exposed, like
+ * someone's open inventory or the floor.
  * This is modeled after destroy_item() somewhat and hopefully will be able to
  * merge into it in the future.
  */
@@ -5590,7 +5590,7 @@ struct obj *objchn;
     }
 
     for (obj = objchn; obj; obj = obj->nobj) {
-        if (!(ignitable(obj) || obj->otyp == MAGIC_LAMP)
+        if (!ignitable(obj)
             /* The Candelabrum requires intention to be lit */
             || obj->otyp == CANDELABRUM_OF_INVOCATION
             || obj->otyp == BRASS_LANTERN /* doesn't ignite via fire */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	light.c	$NHDT-Date: 1596498173 2020/08/03 23:42:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.7	light.c	$NHDT-Date: 1604442297 2020/11/03 22:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -691,8 +691,7 @@ boolean
 obj_is_burning(obj)
 struct obj *obj;
 {
-    return (boolean) (obj->lamplit && (obj->otyp == MAGIC_LAMP
-                                       || ignitable(obj)
+    return (boolean) (obj->lamplit && (ignitable(obj)
                                        || artifact_light(obj)));
 }
 
