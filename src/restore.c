@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1593953357 2020/07/05 12:49:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1604513828 2020/11/04 18:17:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -294,27 +294,6 @@ boolean frozen;
             /* restore container back pointers */
             for (otmp3 = otmp->cobj; otmp3; otmp3 = otmp3->nobj)
                 otmp3->ocontainer = otmp;
-        } else if (SchroedingersBox(otmp)) {
-            struct obj *catcorpse;
-
-            /*
-             * TODO:  Remove this after 3.6.x save compatibility is dropped.
-             *
-             * As of 3.6.2, SchroedingersBox() always has a cat corpse in it.
-             * For 3.6.[01], it was empty and its weight was falsified
-             * to have the value it would have had if there was one inside.
-             * Put a non-rotting cat corpse in this box to convert to 3.6.2.
-             *
-             * [Note: after this fix up, future save/restore of this object
-             * will take the Has_contents() code path above.]
-             */
-            if ((catcorpse = mksobj(CORPSE, TRUE, FALSE)) != 0) {
-                otmp->spe = 1; /* flag for special SchroedingersBox */
-                set_corpsenm(catcorpse, PM_HOUSECAT);
-                (void) stop_timer(ROT_CORPSE, obj_to_any(catcorpse));
-                add_to_container(otmp, catcorpse);
-                otmp->owt = weight(otmp);
-            }
         }
         if (otmp->bypass)
             otmp->bypass = 0;
