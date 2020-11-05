@@ -754,7 +754,7 @@ char NetHackQtBind::qt_yn_function(const char *question_,
 void NetHackQtBind::qt_getlin(const char *prompt, char *line)
 {
     NetHackQtStringRequestor requestor(mainWidget(),prompt);
-    if (!requestor.Get(line)) {
+    if (!requestor.Get(line, BUFSZ, 40)) {
         Strcpy(line, "\033");
         // discard any input that Get() might have left pending
         keybuffer.Drain();
