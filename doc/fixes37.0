@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ $NHDT-Date: 1603836614 2020/10/27 22:10:14 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1604619327 2020/11/05 23:35:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -467,6 +467,10 @@ Qt: don't clobber an existing save file after choosing "new game" in the
 	saved game selection widget
 Qt: don't get stuck in a loop after choosing "play" while the character name
 	field is empty in the character selection widget
+Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
+	for instance), clicking on [Search], entering a search target in the
+	resulting popup and clicking on [Okay] or typing <return>, the text
+	window got pushed underneath the main window so seemed to go away
 Qt+OSX: fix control key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"

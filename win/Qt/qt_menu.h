@@ -155,15 +155,21 @@ public slots:
 	void Search();
 
 private slots:
+        void doDismiss();
 	void doUpdate();
+
+protected:
+	virtual void keyPressEvent(QKeyEvent *);
 
 private:
 	bool use_rip;
 	bool str_fixed;
+        bool textsearching;
 
 	QPushButton ok;
 	QPushButton search;
 	NetHackQtTextListBox* lines;
+        char target[BUFSZ];
 
 	NetHackQtRIP rip;
 };
