@@ -13,14 +13,14 @@ namespace nethack_qt_ {
 // Bounded string copy
 size_t str_copy(char *dest, const char *src, size_t max)
 {
-    size_t len = strlen(src);
+    size_t len = 0;
     if (max != 0) {
-	size_t csize = len;
+        len = strlen(src);
 	if (len > max - 1) {
 	    len = max - 1;
 	}
-	memcpy(dest, src, csize);
-	dest[csize] = '\0';
+        memcpy(dest, src, len);
+        dest[len] = '\0';
     }
     return len;
 }
