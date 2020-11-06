@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ $NHDT-Date: 1604619327 2020/11/05 23:35:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ $NHDT-Date: 1604620981 2020/11/06 00:03:01 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -373,6 +373,8 @@ learn scroll of teleportation after reading even when random destination is
 fix off-by-one bug in dimensions of theme rooms
 fire/frost horn feedback when zapped by monster was inaccurate (falsely
 	claimed that it was "directed at self" when attacking hero)
+tins of spinach and 'dead' eggs could cause out of array bounds access
+	attempting to index into mons[] by polyfodder() macro
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
