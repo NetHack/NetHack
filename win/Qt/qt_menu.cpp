@@ -1195,7 +1195,7 @@ void NetHackQtTextWindow::Search()
         // when no row is highlighted (selected), start the search
         // on the current row, otherwise start on the row after it
         // [normally means that the very first row is a candidate
-        // for containgin the target during the very first search]
+        // for containing the target during the very first search]
         int startln = lines->selectedItems().count();
         for (int i = startln; i < linecount; ++i) {
             int lnum = (i + current) % linecount;
