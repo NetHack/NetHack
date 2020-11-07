@@ -107,23 +107,37 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
     qt_settings->glyphs().drawBorderedCell(painter, glyph, x, y, border);
 }
 
+// called to update the paper doll inventory subset
 void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
 {
-    //    0 1 2      two        dual
-    //               hander     wielding
-    // 0  b H q      b H q      b H q
-    // 1  S " w      W " W      X " w
-    // 2  G C x      G C x      G C .
-    // 3  = A =      = A =      = A =
-    // 4  l U L      l U L      l U L
-    // 5  . F .      . F .      . F .
+    // Paper doll is a 6 row by 3 column grid of worn and wielded
+    // equipment showing the map tiles that the inventory objects
+    // would be displayed as if they were on the floor.
     //
-    // 3.7: use a different legend for the layout
-    //      show quiver instead of repeating gloves on both sides;
+    //    0 1 2            two-    dual
+    //   [ old ]   normal  hander  wielding              legend
+    // 0 [x H b]   b H q   b H q   b H q     b eyewear  H helmet  q quiver
+    // 1 [S " w]   S " w   W " W   X " w     S shield   " amulet  w weapon
+    // 2 [G C G]   G C x   G C x   G C .     G gloves   C cloak   x alt-weap
+    // 3 [= A =]   = A =   = A =   = A =     = left rg  A suit    = right ring
+    // 4 [. U .]   l U L   l U L   l U L     l leash    U shirt   L light
+    // 5 [. F .]   . F .   . F .   . F .     . blank    F boots   . blank
+    //                                       W wielded two-handed weapon
+    //                                       X wielded secondary weapon
+    //
+    // 3.7: use a different legend for the layout:
+    //      show gloves in only one slot;
+    //      move alternate weapon to former right hand glove slot;
+    //      move blindfold to former alternate weapon slot;
+    //      add quiver to former blindfold slot;
     //      show secondary weapon in shield slot when two-weapon is active;
     //      show two-handed primary weapon in both shield and uwep slots;
     //      show lit lamp/lantern/candle/candelabrum on lower right side;
     //      show leash-in-use on lower left side
+    //
+    // Possible enhancement:  for two-handed weapon, show the left hand
+    // instance as a mirror image of the normal right hand one.
+    //
 
 #ifdef ENHANCED_PAPERDOLL
     if (iflags.wc_ascii_map)
