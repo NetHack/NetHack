@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1596162343 2020/07/31 02:25:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.304 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1604745123 2020/11/07 10:32:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1269,7 +1269,7 @@ unsigned doname_flags;
        (objects won't normally be formatted during that time, but if
        'perm_invent' is enabled then they might be) */
     if (iflags.suppress_price || g.restoring) {
-        ; /* don't attempt to obtain any stop pricing, even if 'with_price' */
+        ; /* don't attempt to obtain any shop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
 

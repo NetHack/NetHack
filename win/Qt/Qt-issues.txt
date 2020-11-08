@@ -52,4 +52,11 @@ intended to be displayed, is displayed (as blank terrain).
 3.6 status conditions (Stone, Slime, Strngl, Deaf, Lev, Fly, Ride)
 have been implemented but need icon artwork (one 40x40 tile for each).
 
+In a menu window, typing ':' (via shift+something) works to initiate
+a search without the need to click on the [Search] button.  In a text
+window, it does not, despite moving the menu key press interpretation
+code into its own routine and calling that for both types of windows.
+From the text window code, it sees the initial shift but not the ':'
+that should follow.
+
 -----

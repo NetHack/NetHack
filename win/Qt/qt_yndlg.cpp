@@ -154,6 +154,8 @@ char NetHackQtYnDialog::Exec()
 	QButtonGroup *bgroup = new QButtonGroup(group);
 
 	int nchoices=ch.length();
+        // note: is_ynaq covers nyaq too because the choices string is
+        // "ynaq" for both; only the default differs; likewise for nyNaq
         bool is_ynaq = (ch == QString("ynaq") // [Yes ][ No ][All ][Stop]
                         || ch == QString("yn#aq")
                         || ch == altchoices), // alternate "yn#aq"
@@ -289,11 +291,11 @@ char NetHackQtYnDialog::Exec()
 
         QLabel *lb = 0;
         if (allow_count) {
-            // put the Count widget in between [y] and [n][a][q]
+            // insert Count widget in front of [n], between [y] and [n][a][q]
             lb = new QLabel("Count:");
-            groupbox->insertWidget(1, lb); // [n] button is item #1
+            groupbox->insertWidget(1, lb); // [y] button is item #0, [n] is #1
             le = new QLineEdit();
-            groupbox->insertWidget(2, le); // [n] became #2, Count label #1
+            groupbox->insertWidget(2, le); // [n] became #2, Count label is #1
             le->setPlaceholderText(QString("#")); // grayed out
 	}
         // add an invisible right-most field to left justify the buttons
