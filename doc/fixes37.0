@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ $NHDT-Date: 1604620981 2020/11/06 00:03:01 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ $NHDT-Date: 1604880453 2020/11/09 00:07:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -288,6 +288,8 @@ hero poly'd into rust monster could implicitly eat bars when adjacent by
 	can explicitly eat them via 'e' after moving onto their spot
 monster hiding under an egg that hatched was kept hidden
 restful sleep regenerates hit points
+attacking non-adjacent concealed mimic by applying a polearm would make the
+	hero be stuck to that mimic
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1600933441 2020/09/24 07:44:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1604880454 2020/11/09 00:07:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2575,6 +2575,12 @@ void
 set_ustuck(mtmp)
 struct monst *mtmp;
 {
+    if (iflags.sanity_check || iflags.debug_fuzzer) {
+        if (mtmp && distu(mtmp->mx, mtmp->my) > 2)
+            impossible("Sticking to %s at distu %d?",
+                       mon_nam(mtmp), distu(mtmp->mx, mtmp->my));
+    }
+
     g.context.botl = 1;
     u.ustuck = mtmp;
 }

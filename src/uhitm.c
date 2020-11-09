@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1596498221 2020/08/03 23:43:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1604880456 2020/11/09 00:07:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,10 +141,10 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         /* if it was an invisible mimic, treat it as if we stumbled
          * onto a visible mimic
          */
-        if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
-            /* applied pole-arm attack is too far to get stuck */
-            && distu(mtmp->mx, mtmp->my) <= 2) {
-            if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
+        if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers) {
+            if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
+                /* applied pole-arm attack is too far to get stuck */
+                && distu(mtmp->mx, mtmp->my) <= 2)
                 set_ustuck(mtmp);
         }
         /* #H7329 - if hero is on engraved "Elbereth", this will end up
@@ -2007,7 +2007,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         break;
     }
     case AD_STCK:
-        if (!negated && !sticks(pd))
+        if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
             u.ustuck = mdef; /* it's now stuck to you */
         break;
     case AD_WRAP:
@@ -3133,7 +3133,9 @@ struct monst *mtmp;
 {
     const char *fmt = "Wait!  That's %s!", *generic = "a monster", *what = 0;
 
-    if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
+    if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
+        /* must be adjacent; attack via polearm could be from farther away */
+        && distu(mtmp->mx, mtmp->my) <= 2)
         set_ustuck(mtmp);
 
     if (Blind) {
