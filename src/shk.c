@@ -362,6 +362,13 @@ register boolean nearshop;
 
     {
         coord mm;
+        stairway *stway = g.stairs;
+
+        while (stway) {
+            if (!stway->isladder && !stway->up && stway->tolev.dnum == u.uz.dnum)
+                break;
+            stway = stway->next;
+        }
 
         if (nearshop) {
             /* Create swarm around you, if you merely "stepped out" */
@@ -375,8 +382,8 @@ register boolean nearshop;
         if (flags.verbose)
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
-        mm.x = xdnstair;
-        mm.y = ydnstair;
+        mm.x = stway->sx;
+        mm.y = stway->sy;
         makekops(&mm);
         /* Create swarm near shopkeeper (hinders return to shop) */
         mm.x = shkp->mx;

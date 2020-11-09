@@ -719,10 +719,7 @@ clear_level_structures()
     g.doorindex = 0;
     init_rect();
     init_vault();
-    xdnstair = ydnstair = xupstair = yupstair = 0;
-    g.sstairs.sx = g.sstairs.sy = 0;
-    xdnladder = ydnladder = xupladder = yupladder = 0;
-    g.dnstairs_room = g.upstairs_room = g.sstairs_room = (struct mkroom *) 0;
+    stairway_free_all();
     g.made_branch = FALSE;
     clear_regions();
     g.xstart = 1;
@@ -1112,13 +1109,6 @@ mklev()
     for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
         g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
 
-    /* something like this usually belongs in clear_level_structures()
-       but these aren't saved and restored so might not retain their
-       values for the life of the current level; reset them to default
-       now so that they never do and no one will be tempted to introduce
-       a new use of them for anything on this level */
-    g.dnstairs_room = g.upstairs_room = g.sstairs_room = (struct mkroom *) 0;
-
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);
 }
@@ -1262,14 +1252,10 @@ xchar x, y; /* location */
     if (br->type == BR_PORTAL) {
         mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
-        g.sstairs.sx = x;
-        g.sstairs.sy = y;
-        g.sstairs.up =
-            (char) on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
-        assign_level(&g.sstairs.tolev, dest);
-        g.sstairs_room = br_room;
+        boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
 
-        levl[x][y].ladder = g.sstairs.up ? LA_UP : LA_DOWN;
+        stairway_add(x,y, goes_up, FALSE, dest);
+        levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
     }
     /*
@@ -1633,13 +1619,17 @@ struct mkroom *croom;
         return;
 
     if (up) {
-        xupstair = x;
-        yupstair = y;
-        g.upstairs_room = croom;
+        d_level dest;
+
+        dest.dnum = u.uz.dnum;
+        dest.dlevel = u.uz.dlevel - 1;
+        stairway_add(x,y, TRUE, FALSE, &dest);
     } else {
-        xdnstair = x;
-        ydnstair = y;
-        g.dnstairs_room = croom;
+        d_level dest;
+
+        dest.dnum = u.uz.dnum;
+        dest.dlevel = u.uz.dlevel + 1;
+        stairway_add(x,y, FALSE, FALSE, &dest);
     }
 
     levl[x][y].typ = STAIRS;
@@ -1659,7 +1649,7 @@ struct mkroom *croom;
 int phase;
 {
     return (croom && (croom->needjoining || (phase < 0))
-            && ((croom != g.dnstairs_room && croom != g.upstairs_room)
+            && ((!has_dnstairs(croom) && !has_upstairs(croom))
                 || phase < 1)
             && (croom->rtype == OROOM
                 || ((phase < 2) && croom->rtype == THEMEROOM)));

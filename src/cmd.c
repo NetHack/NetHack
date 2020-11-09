@@ -3958,6 +3958,7 @@ boolean doit;
     schar typ = levl[u.ux][u.uy].typ;
     int npick;
     menu_item *picks = (menu_item *) 0;
+    stairway *stway = stairway_at(u.ux, u.uy);
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
@@ -3974,16 +3975,14 @@ boolean doit;
         add_herecmd_menuitem(win, dosit,
                              "Sit on the throne");
 
-    if (On_stairs_up(u.ux, u.uy)) {
+    if (stway && stway->up) {
         Sprintf(buf, "Go up the %s",
-                (u.ux == xupladder && u.uy == yupladder)
-                ? "ladder" : "stairs");
+                stway->isladder ? "ladder" : "stairs");
         add_herecmd_menuitem(win, doup, buf);
     }
-    if (On_stairs_dn(u.ux, u.uy)) {
+    if (stway && !stway->up) {
         Sprintf(buf, "Go down the %s",
-                (u.ux == xupladder && u.uy == yupladder)
-                ? "ladder" : "stairs");
+                stway->isladder ? "ladder" : "stairs");
         add_herecmd_menuitem(win, dodown, buf);
     }
     if (u.usteed) { /* another movement choice */

@@ -2130,6 +2130,8 @@ struct obj *obj;
 
     obj->where = OBJ_MIGRATING;
     obj->nobj = g.migrating_objs;
+    obj->omigr_from_dnum = u.uz.dnum;
+    obj->omigr_from_dlevel = u.uz.dlevel;
     g.migrating_objs = obj;
 }
 

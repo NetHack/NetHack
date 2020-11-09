@@ -950,10 +950,9 @@ int
 dodown()
 {
     struct trap *trap = 0;
-    boolean stairs_down = ((u.ux == xdnstair && u.uy == ydnstair)
-                           || (u.ux == g.sstairs.sx && u.uy == g.sstairs.sy
-                               && !g.sstairs.up)),
-            ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
+    stairway *stway = stairway_at(u.ux, u.uy);
+    boolean stairs_down = (stway && !stway->up && !stway->isladder),
+            ladder_down = (stway && !stway->up &&  stway->isladder);
 
     if (u_rooted())
         return 1;
@@ -1105,6 +1104,8 @@ dodown()
 int
 doup()
 {
+    stairway *stway = stairway_at(u.ux,u.uy);
+
     if (u_rooted())
         return 1;
 
@@ -1114,10 +1115,7 @@ doup()
         return 1;
     }
 
-    if ((u.ux != xupstair || u.uy != yupstair)
-        && (!xupladder || u.ux != xupladder || u.uy != yupladder)
-        && (!g.sstairs.sx || u.ux != g.sstairs.sx || u.uy != g.sstairs.sy
-            || !g.sstairs.up)) {
+    if (!stway || (stway && !stway->up)) {
         You_cant("go up here.");
         return 0;
     }
@@ -1458,6 +1456,7 @@ boolean at_stairs, falling, portal;
             dunlev_reached(&u.uz) = dunlev(&u.uz);
     }
 
+    stairway_free_all();
     /* set default level change destination areas */
     /* the special level code may override these */
     (void) memset((genericptr_t) &g.updest, 0, sizeof g.updest);
@@ -1528,8 +1527,9 @@ boolean at_stairs, falling, portal;
         }
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
-            if (g.at_ladder)
-                u_on_newpos(xdnladder, ydnladder);
+            stairway *stway = stairway_find_from(&u.uz0, g.at_ladder);
+            if (stway)
+                u_on_newpos(stway->sx, stway->sy);
             else if (newdungeon)
                 u_on_sstairs(1);
             else
@@ -1544,8 +1544,9 @@ boolean at_stairs, falling, portal;
                       (Flying && g.at_ladder) ? " along" : "",
                       g.at_ladder ? "ladder" : "stairs");
         } else { /* down */
-            if (g.at_ladder)
-                u_on_newpos(xupladder, yupladder);
+            stairway *stway = stairway_find_from(&u.uz0, g.at_ladder);
+            if (stway)
+                u_on_newpos(stway->sx, stway->sy);
             else if (newdungeon)
                 u_on_sstairs(0);
             else

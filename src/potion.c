@@ -1051,9 +1051,7 @@ register struct obj *otmp;
             HLevitation &= ~I_SPECIAL; /* can't descend upon demand */
             if (BLevitation) {
                 ; /* rising via levitation is blocked */
-            } else if ((u.ux == xupstair && u.uy == yupstair)
-                    || (g.sstairs.up && u.ux == g.sstairs.sx && u.uy == g.sstairs.sy)
-                    || (xupladder && u.ux == xupladder && u.uy == yupladder)) {
+            } else if (stairway_find_dir(TRUE)) {
                 (void) doup();
                 /* in case we're already Levitating, which would have
                    resulted in incrementing 'nothing' */

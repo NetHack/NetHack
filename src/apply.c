@@ -2556,10 +2556,10 @@ struct obj *otmp;
         what = "in water";
     else if (is_lava(u.ux, u.uy))
         what = "in lava";
-    else if (On_stairs(u.ux, u.uy))
-        what = (u.ux == xdnladder || u.ux == xupladder) ? "on the ladder"
-                                                        : "on the stairs";
-    else if (IS_FURNITURE(levtyp) || IS_ROCK(levtyp)
+    else if (On_stairs(u.ux, u.uy)) {
+        stairway *stway = stairway_at(u.ux, u.uy);
+        what = stway->isladder ? "on the ladder" : "on the stairs";
+    } else if (IS_FURNITURE(levtyp) || IS_ROCK(levtyp)
              || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy))
         what = "here";
     else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))

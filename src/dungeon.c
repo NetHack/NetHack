@@ -1398,13 +1398,14 @@ void
 next_level(at_stairs)
 boolean at_stairs;
 {
-    if (at_stairs && u.ux == g.sstairs.sx && u.uy == g.sstairs.sy) {
-        /* Taking a down dungeon branch. */
-        goto_level(&g.sstairs.tolev, at_stairs, FALSE, FALSE);
-    } else {
-        /* Going down a stairs or jump in a trap door. */
-        d_level newlevel;
+    stairway *stway = stairway_at(u.ux, u.uy);
+    d_level newlevel;
 
+    if (at_stairs && stway) {
+        newlevel.dnum = stway->tolev.dnum;
+        newlevel.dlevel = stway->tolev.dlevel;
+        goto_level(&newlevel, at_stairs, FALSE, FALSE);
+    } else {
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = u.uz.dlevel + 1;
         goto_level(&newlevel, at_stairs, !at_stairs, FALSE);
@@ -1416,17 +1417,22 @@ void
 prev_level(at_stairs)
 boolean at_stairs;
 {
-    if (at_stairs && u.ux == g.sstairs.sx && u.uy == g.sstairs.sy) {
+    stairway *stway = stairway_at(u.ux, u.uy);
+    d_level newlevel;
+
+    if (at_stairs && stway && stway->tolev.dnum != u.uz.dnum) {
         /* Taking an up dungeon branch. */
         /* KMH -- Upwards branches are okay if not level 1 */
         /* (Just make sure it doesn't go above depth 1) */
         if (!u.uz.dnum && u.uz.dlevel == 1 && !u.uhave.amulet)
             done(ESCAPED);
-        else
-            goto_level(&g.sstairs.tolev, at_stairs, FALSE, FALSE);
+        else {
+            newlevel.dnum = stway->tolev.dnum;
+            newlevel.dlevel = stway->tolev.dlevel;
+            goto_level(&newlevel, at_stairs, FALSE, FALSE);
+        }
     } else {
         /* Going up a stairs or rising through the ceiling. */
-        d_level newlevel;
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = u.uz.dlevel - 1;
         goto_level(&newlevel, at_stairs, FALSE, FALSE);
@@ -1492,13 +1498,141 @@ int upflag;
     switch_terrain();
 }
 
+void
+stairway_add(x,y, up, ladder, dest)
+int x,y;
+boolean up, ladder;
+d_level *dest;
+{
+    stairway *tmp = (stairway *)alloc(sizeof(stairway));
+
+    tmp->sx = x;
+    tmp->sy = y;
+    tmp->up = up;
+    tmp->isladder = ladder;
+    assign_level(&(tmp->tolev), dest);
+    tmp->next = g.stairs;
+    g.stairs = tmp;
+}
+
+void
+stairway_free_all()
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp) {
+        stairway *tmp2 = tmp->next;
+        free(tmp);
+        tmp = tmp2;
+    }
+    g.stairs = NULL;
+}
+
+stairway *
+stairway_at(x,y)
+int x,y;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp && !(tmp->sx == x && tmp->sy == y))
+        tmp = tmp->next;
+
+    return tmp;
+}
+
+stairway *
+stairway_find(fromdlev)
+d_level *fromdlev;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum == fromdlev->dnum
+            && tmp->tolev.dlevel == fromdlev->dlevel)
+            return tmp;
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
+
+stairway *
+stairway_find_from(fromdlev, ladder)
+d_level *fromdlev;
+boolean ladder;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum == fromdlev->dnum
+            && tmp->tolev.dlevel == fromdlev->dlevel
+            && tmp->isladder == ladder)
+            return tmp;
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
+
+stairway *
+stairway_find_dir(up)
+boolean up;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp && !(tmp->up == up))
+        tmp = tmp->next;
+
+    return tmp;
+}
+
+stairway *
+stairway_find_ladder()
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp && !tmp->isladder)
+        tmp = tmp->next;
+
+    return tmp;
+}
+
+stairway *
+stairway_find_type_dir(ladder,up)
+boolean ladder, up;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp && !(tmp->isladder == ladder && tmp->up == up))
+        tmp = tmp->next;
+
+    return tmp;
+}
+
+stairway *
+stairway_find_special_dir(up)
+boolean up;
+{
+    stairway *tmp = g.stairs;
+
+    while (tmp) {
+        if (tmp->tolev.dnum != u.uz.dnum && tmp->up != up)
+            return tmp;
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
+
 /* place you on the special staircase */
 void
 u_on_sstairs(upflag)
 int upflag;
 {
-    if (g.sstairs.sx)
-        u_on_newpos(g.sstairs.sx, g.sstairs.sy);
+    stairway *stway = stairway_find_special_dir(upflag);
+
+    if (stway)
+        u_on_newpos(stway->sx, stway->sy);
     else
         u_on_rndspot(upflag);
 }
@@ -1507,8 +1641,10 @@ int upflag;
 void
 u_on_upstairs()
 {
-    if (xupstair)
-        u_on_newpos(xupstair, yupstair);
+    stairway *stway = stairway_find_dir(TRUE);
+
+    if (stway)
+        u_on_newpos(stway->sx, stway->sy);
     else
         u_on_sstairs(0); /* destination upstairs implies moving down */
 }
@@ -1517,8 +1653,10 @@ u_on_upstairs()
 void
 u_on_dnstairs()
 {
-    if (xdnstair)
-        u_on_newpos(xdnstair, ydnstair);
+    stairway *stway = stairway_find_dir(FALSE);
+
+    if (stway)
+        u_on_newpos(stway->sx, stway->sy);
     else
         u_on_sstairs(1); /* destination dnstairs implies moving up */
 }
@@ -1527,37 +1665,34 @@ boolean
 On_stairs(x, y)
 xchar x, y;
 {
-    return (boolean) ((x == xupstair && y == yupstair)
-                      || (x == xdnstair && y == ydnstair)
-                      || (x == xdnladder && y == ydnladder)
-                      || (x == xupladder && y == yupladder)
-                      || (x == g.sstairs.sx && y == g.sstairs.sy));
+    return (stairway_at(x,y) != NULL);
 }
 
 boolean
 On_ladder(x, y)
 xchar x, y;
 {
-    return (boolean) ((x == xdnladder && y == ydnladder)
-                      || (x == xupladder && y == yupladder));
+    stairway *stway = stairway_at(x,y);
+
+    return (boolean) (stway && stway->isladder);
 }
 
 boolean
 On_stairs_up(x, y)
 xchar x, y;
 {
-    return ((x == xupstair && y == yupstair)
-            || (x == g.sstairs.sx && y == g.sstairs.sy && g.sstairs.up)
-            || (x == xupladder && y == yupladder));
+    stairway *stway = stairway_at(x,y);
+
+    return (boolean) (stway && stway->up);
 }
 
 boolean
 On_stairs_dn(x, y)
 xchar x, y;
 {
-    return ((x == xdnstair && y == ydnstair)
-            || (x == g.sstairs.sx && y == g.sstairs.sy && !g.sstairs.up)
-            || (x == xdnladder && y == ydnladder));
+    stairway *stway = stairway_at(x,y);
+
+    return (boolean) (stway && !stway->up);
 }
 
 boolean
@@ -1599,6 +1734,8 @@ Can_rise_up(x, y, lev)
 int x, y;
 d_level *lev;
 {
+    stairway *stway = stairway_find_special_dir(FALSE);
+
     /* can't rise up from inside the top of the Wizard's tower */
     /* KMH -- or in sokoban */
     if (In_endgame(lev) || In_sokoban(lev)
@@ -1607,7 +1744,7 @@ d_level *lev;
     return (boolean) (lev->dlevel > 1
                       || (g.dungeons[lev->dnum].entry_lev == 1
                           && ledger_no(lev) != 1
-                          && g.sstairs.sx && g.sstairs.up));
+                          && stway && stway->up));
 }
 
 boolean

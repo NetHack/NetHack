@@ -329,28 +329,24 @@ xchar *sx;
 xchar *sy;
 {
     xchar x = 0, y = 0;
+    stairway *stway = g.stairs;
+    boolean stdir = !builds_up(&u.uz);
 
-    if (builds_up(&u.uz)) {
-        if (xdnstair) {
-            x = xdnstair;
-            y = ydnstair;
-        } else if (xdnladder) {
-            x = xdnladder;
-            y = ydnladder;
-        }
+    if ((stway = stairway_find_type_dir(FALSE, stdir)) != 0) {
+        x = stway->sx;
+        y = stway->sy;
+    } else if ((stway = stairway_find_type_dir(TRUE, stdir)) != 0) {
+        x = stway->sx;
+        y = stway->sy;
     } else {
-        if (xupstair) {
-            x = xupstair;
-            y = yupstair;
-        } else if (xupladder) {
-            x = xupladder;
-            y = yupladder;
+        while (stway) {
+            if (stway->tolev.dnum != u.uz.dnum) {
+                x = stway->sx;
+                y = stway->sy;
+                break;
+            }
+            stway = stway->next;
         }
-    }
-
-    if (!x && g.sstairs.sx) {
-        x = g.sstairs.sx;
-        y = g.sstairs.sy;
     }
 
     if (x && y) {

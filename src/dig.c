@@ -188,7 +188,8 @@ int x, y;
         (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
 
     if (On_stairs(x, y)) {
-        if (x == xdnladder || x == xupladder) {
+        stairway *stway = stairway_at(x, y);
+        if (stway->isladder) {
             if (verbose)
                 pline_The("ladder resists your effort.");
         } else if (verbose)
@@ -1431,12 +1432,12 @@ zap_dig()
         if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !Underwater) {
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 int dmg;
-                if (On_stairs(u.ux, u.uy))
+                if (On_stairs(u.ux, u.uy)) {
+                    stairway *stway = stairway_at(u.ux, u.uy);
                     pline_The("beam bounces off the %s and hits the %s.",
-                              (u.ux == xdnladder || u.ux == xupladder)
-                                  ? "ladder"
-                                  : "stairs",
+                              stway->isladder ? "ladder" : "stairs",
                               ceiling(u.ux, u.uy));
+                }
                 You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
                 pline("It falls on your %s!", body_part(HEAD));
                 dmg = rnd((uarmh && is_metallic(uarmh)) ? 2 : 6);

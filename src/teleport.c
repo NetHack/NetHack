@@ -1260,6 +1260,17 @@ register int x, y;
         make_angry_shk(mtmp, oldx, oldy);
 }
 
+static stairway *
+stairway_find_forwiz(ladder, up)
+boolean ladder, up;
+{
+    stairway *stway = g.stairs;
+
+    while (stway && !(stway->isladder == ladder && stway->up == up && stway->tolev.dnum == u.uz.dnum))
+        stway = stway->next;
+    return stway;
+}
+
 /* place a monster at a random location, typically due to teleport */
 /* return TRUE if successful, FALSE if not */
 boolean
@@ -1268,6 +1279,7 @@ struct monst *mtmp; /* mx==0 implies migrating monster arrival */
 boolean suppress_impossible;
 {
     register int x, y, trycount;
+    stairway *stway;
 
     if (mtmp == u.usteed) {
         tele();
@@ -1275,12 +1287,19 @@ boolean suppress_impossible;
     }
 
     if (mtmp->iswiz && mtmp->mx) { /* Wizard, not just arriving */
-        if (!In_W_tower(u.ux, u.uy, &u.uz))
-            x = xupstair, y = yupstair;
-        else if (!xdnladder) /* bottom level of tower */
-            x = xupladder, y = yupladder;
-        else
-            x = xdnladder, y = ydnladder;
+        if (!In_W_tower(u.ux, u.uy, &u.uz)) {
+            stway = stairway_find_forwiz(FALSE, TRUE);
+            x = stway->sx;
+            y = stway->sy;
+        } else if (!stairway_find_forwiz(TRUE, FALSE)) { /* bottom level of tower */
+            stway = stairway_find_forwiz(TRUE, TRUE);
+            x = stway->sx;
+            y = stway->sy;
+        } else {
+            stway = stairway_find_forwiz(TRUE, FALSE);
+            x = stway->sx;
+            y = stway->sy;
+        }
         /* if the wiz teleports away to heal, try the up staircase,
            to block the player's escaping before he's healed
            (deliberately use `goodpos' rather than `rloc_pos_ok' here) */

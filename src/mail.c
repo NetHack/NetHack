@@ -151,6 +151,7 @@ coord *startp;
     int lax;          /* if TRUE, pick a position in sight. */
     int dd;           /* distance to current point */
     int max_distance; /* max distance found so far */
+    stairway *stway = g.stairs;
 
     /*
      * If blind and not telepathic, then it doesn't matter what we pick ---
@@ -166,15 +167,13 @@ coord *startp;
      * Arrive at an up or down stairwell if it is in line of sight from the
      * hero.
      */
-    if (couldsee(g.upstair.sx, g.upstair.sy)) {
-        startp->x = g.upstair.sx;
-        startp->y = g.upstair.sy;
-        return TRUE;
-    }
-    if (couldsee(g.dnstair.sx, g.dnstair.sy)) {
-        startp->x = g.dnstair.sx;
-        startp->y = g.dnstair.sy;
-        return TRUE;
+    while (stway) {
+        if (stway->tolev.dnum == u.uz.dnum && couldsee(stway->sx, stway->sy)) {
+            startp->x = stway->sx;
+            startp->y = stway->sy;
+            return TRUE;
+        }
+        stway = stway->next;
     }
 
     /*
