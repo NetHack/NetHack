@@ -10,6 +10,9 @@
 
 namespace nethack_qt_ {
 
+// for calls to drawWorn
+enum drawWornFlag { dollNoFlag = 0, dollUnused = 1, dollReverse = 2 };
+
 class NetHackQtInvUsageWindow : public QWidget {
 public:
 	NetHackQtInvUsageWindow(QWidget* parent);
@@ -23,7 +26,7 @@ protected:
 
 private:
         void drawWorn(QPainter &painter, obj *nhobj, int x, int y,
-                      const char *alttip, bool canbe=true);
+                      const char *alttip, int flags = dollNoFlag);
         bool tooltip_event(QHelpEvent *tipevent);
 
         char *tips[3][6]; // PAPERDOLL is a grid of 3x6 cells for tiles

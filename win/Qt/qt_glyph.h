@@ -23,17 +23,21 @@ public:
 	void toggleSize();
 	void setSize(int w, int h);
 
-	void drawGlyph(QPainter&, int glyph, int pixelx, int pixely);
-	void drawCell(QPainter&, int glyph, int cellx, int celly);
-	void drawBorderedCell(QPainter&, int glyph,
-                              int cellx, int celly, int bordercode);
-	QPixmap glyph(int glyph);
+        void drawGlyph(QPainter &, int glyph, int pixelx, int pixely,
+                       bool reversed = false);
+        void drawCell(QPainter &, int glyph, int cellx, int celly);
+        void drawBorderedCell(QPainter &, int glyph,
+                              int cellx, int celly, int bordercode,
+                              bool reversed);
+        QPixmap glyph(int glyphindx);
+        QPixmap reversed_pixmap(int glyphindx);
 
 private:
 	QImage img;
 	QPixmap pm,pm1, pm2;
 	QSize size;
 	int tiles_per_row;
+        //QTransform *mirrormatrix;
 };
 
 } // namespace nethack_qt_
