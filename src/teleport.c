@@ -731,7 +731,7 @@ boolean break_the_rules; /* True: wizard mode ^T */
 
         cantdoit = 0;
         /* 3.6.2: the magic numbers for hunger, strength, and energy
-           have been changed to match the ones used in spelleffects().
+           have been changed to match those of the teleport away spell.
            Also, failing these tests used to return 1 and use a move
            even though casting failure due to these reasons doesn't.
            [Note: this spellev() is different from the one in spell.c
@@ -767,7 +767,8 @@ boolean break_the_rules; /* True: wizard mode ^T */
         if (castit) {
             /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
-            if (spelleffects(sp_no, TRUE))
+            u.dx = u.dy = u.dz = 0;  /* cast at self */
+            if (docastspecial(sp_no, FALSE))
                 return 1;
             else if (!break_the_rules)
                 return 0;

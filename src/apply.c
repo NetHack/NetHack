@@ -1774,7 +1774,7 @@ int magic; /* 0=Physical, otherwise skill level */
             if (g.spl_book[sp_no].sp_id == NO_SPELL)
                 break;
             else if (g.spl_book[sp_no].sp_id == SPE_JUMPING)
-                return spelleffects(sp_no, FALSE);
+                return docastspecial(sp_no, FALSE);
     }
 
     if (!magic && (nolimbs(g.youmonst.data) || slithy(g.youmonst.data))) {

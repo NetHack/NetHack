@@ -20,7 +20,7 @@ functions:0 _tty_dismiss_nhwindow _gender _genl_outrip _get_cost _get_free_room_
 functions:0 _get_location _get_map _get_mleash
 ;
 functions:1 _move_update _movebubbles _movecmd _movemon _moverock _movobj _mpickgold
-functions:1 _doaltarobj _doapply _dobreathe _docall _docast
+functions:1 _doaltarobj _doapply _dobreathe _docall _docast _docastspecial
 ;
 functions:2 _do_vicinity_map
 functions:3 _pcmain
@@ -240,19 +240,19 @@ functions:215 _shuffle_all _shuffle_tiles _simple_look _singular _sitoa _skill_a
 functions:216 _skinback _sleep_monst _slept_monst _slip_or_trip _sliparm _slots_required _snuff_candle _snuff_light_source
 functions:217 _snuff_lit _sobj_at _some_armor _somegold _somex _somexy _somey _sort_rooms
 functions:218 _sort_valuables _sp_lev_shuffle _spec_ability _spec_abon _spec_applies _spec_dbon _spell_damage_bonus _spell_hit_bonus
-functions:219 _spell_skilltype _spelleffects _spitmu _splatter_burning_oil _split_mon _split_rects _splitbill _splitobj
+functions:219 _spell_skilltype _spelleffects _spellhunger _spitmu _splatter_burning_oil _split_mon _split_rects _splitbill _splitobj
 functions:220 _spoteffects _squadmon _srandom _stackobj _standoutbeg _standoutend _start_corpse_timeout _start_eating
 functions:221 _start_engulf _start_timer _start_tin _steal _steal_it _stealamulet _stealarm _stealgold
 functions:223 _stop_timer _store_version _strange_feeling _strategy _string_for_env_opt _string_for_opt _strncmpi _strprepend
 functions:224 _strstri _study_book _stumble_onto_mimic _sub_one_frombill _subfrombill _substitute_tiles _summon_minion _surface
 functions:225 _swallow_to_glyph _swapin_file _swapout_oldest _switchar _t_warn
-functions:226 _tabexpand _tactics _take_gold _take_off _tamedog _target_on _tele _tele_jump_ok
+functions:226 _tabexpand _tactics _take_gold _take_off _tamedog _target_on _targetspell _tele _tele_jump_ok
 functions:227 _tele_restrict _tele_trap _teleds _teleok _teleport_pet _temple_occupied _tended_shop _term_end_attr
 functions:228 _term_end_color
 functions:229 _The _this_type_only _thitm _thitmonst _thitu _throw_gold _throwing_weapon _throwit
 functions:230 _thrwmu _tileview _timed_occupation _timer_is_local _timer_sanity_check _tinnable _title_to_mon _tmp_at
 functions:231 _topl_putsym _topologize _topten _topten_print _topten_print_bold _toss_up _toss_wsegs _touch_artifact
-functions:232 _touchfood _trap_detect _trickery _try_disarm _try_lift _trycall _tt_oname _tty_add_menu
+functions:232 _touchfood _trap_detect _trickery _try_disarm _try_lift _trycall _tryspell _tt_oname _tty_add_menu
 functions:233 _tty_askname _tty_clear_nhwindow _tty_cliparound 
 functions:234 _tty_display_file _tty_display_nhwindow _tty_doprev_message _tty_end_menu _tty_end_screen _tty_exit_nhwindows _tty_get_ext_cmd _tty_get_nh_event
 functions:235 _tty_getlin _tty_init_nhwindows _tty_mark_synch _tty_message_menu _tty_nh_poskey _tty_nhbell _tty_nhgetch _tty_number_pad
@@ -517,4 +517,3 @@ functions:478 _zapsetup _zapwrapup _comp_times _directionname _fname_decode _fna
 ;functions:479 _free_edog _free_egd _free_emin _free_eshk _free_olong _free_saved_games
 ;functions:480 _genl_can_suspend_no _genl_getmsghistory _genl_message_menu _genl_putmsghistory
 ;functions:481 _get_saved_games _initstate _set_savepref _set_wc_option_mod_status _set_wc2_option_mod_status _setstate _uint_to_any
-

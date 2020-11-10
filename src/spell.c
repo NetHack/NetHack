@@ -32,6 +32,9 @@ static void FDECL(deadbook, (struct obj *));
 static int NDECL(learn);
 static boolean NDECL(rejectcasting);
 static boolean FDECL(getspell, (int *));
+static void FDECL(spellhunger, (int));
+static int FDECL(tryspell, (int));
+static int FDECL(targetspell, (int, boolean));
 static int FDECL(CFDECLSPEC spell_cmp, (const genericptr,
                                             const genericptr));
 static void NDECL(sortspells);
@@ -39,9 +42,10 @@ static boolean NDECL(spellsortmenu);
 static boolean FDECL(dospellmenu, (const char *, int, int *));
 static int FDECL(percent_success, (int));
 static char *FDECL(spellretention, (int, char *));
-static int NDECL(throwspell);
+static int FDECL(throwspell, (boolean));
 static void NDECL(cast_protection);
 static void FDECL(spell_backfire, (int));
+static int FDECL(spelleffects, (int));
 static const char *FDECL(spelltypemnemonic, (int));
 static boolean FDECL(spell_aim_step, (genericptr_t, int, int));
 
@@ -730,15 +734,234 @@ int *spell_no;
                        spell_no);
 }
 
+static void
+spellhunger(spell_no)
+int spell_no;
+{
+    if (spellid(spell_no) != SPE_DETECT_FOOD) {
+        int hungr = spellev(spell_no) * 10;
+
+        /* If hero is a wizard, their current intelligence
+            * (bonuses + temporary + current)
+            * affects hunger reduction in casting a spell.
+            * 1. int = 17-25 no cost
+            * 2. int = 16    1/4 cost
+            * 3. int = 15    1/2 cost
+            * 4. int = 1-14  normal cost
+            * The reason for this is:
+            * a) Intelligence affects the amount of exertion
+            * in thinking.
+            * b) Wizards have spent their life at magic and
+            * understand quite well how to cast spells.
+            */
+        if (Role_if(PM_WIZARD)) {
+            switch (acurr(A_INT)) {
+            case 25:
+            case 24:
+            case 23:
+            case 22:
+            case 21:
+            case 20:
+            case 19:
+            case 18:
+            case 17:
+                hungr = 0;
+                break;
+            case 16:
+                hungr /= 4;
+                break;
+            case 15:
+                hungr /= 2;
+                break;
+            }
+        }
+        /* don't put player (quite) into fainting from
+            * casting a spell, particularly since they might
+            * not even be hungry at the beginning; however,
+            * this is low enough that they must eat before
+            * casting anything else except detect food
+            */
+        if (hungr > u.uhunger - 3)
+            hungr = u.uhunger - 3;
+        morehungry(hungr);
+    }
+}
+
+/*
+ * Return 1 if we successfully cast the spell, 0 if we failed without using a move,
+ * 2 if we failed but used a move anyway, or 3 if we succeeded but force using a move
+ * even if cancelled (due to Amulet energy drain).
+ * Applies failure energy cost and Amulet drain but not other costs.
+ */
+static int
+tryspell(spell_no)
+int spell_no;
+{
+    int energy, hunger, chance, res = 0;
+    boolean confused = (Confusion != 0);
+    boolean had_energy;
+
+    /*
+     * Reject attempting to cast while stunned or with no free hands.
+     * Already done in getspell() to stop casting before choosing
+     * which spell, but duplicated here for cases where tryspell()
+     * gets called directly for ^T without intrinsic teleport capability,
+     * #turn for non-priest/non-knight or j without intrinsic jumping.
+     * (There's no duplication of messages; when the rejection takes
+     * place in getspell(), we don't get called.)
+     */
+    if (rejectcasting()) {
+        return 0;
+    }
+
+    /*
+     * Spell casting no longer affects knowledge of the spell. A
+     * decrement of spell knowledge is done every turn.
+     */
+    if (spellknow(spell_no) <= 0) {
+        Your("knowledge of this spell is twisted.");
+        pline("It invokes nightmarish images in your mind...");
+        spell_backfire(spell_no);
+        return 2;
+    } else if (spellknow(spell_no) <= KEEN / 200) { /* 100 turns left */
+        You("strain to recall the spell.");
+    } else if (spellknow(spell_no) <= KEEN / 40) { /* 500 turns left */
+        You("have difficulty remembering the spell.");
+    } else if (spellknow(spell_no) <= KEEN / 20) { /* 1000 turns left */
+        Your("knowledge of this spell is growing faint.");
+    } else if (spellknow(spell_no) <= KEEN / 10) { /* 2000 turns left */
+        Your("recall of this spell is gradually fading.");
+    }
+
+    /*
+     *  Note: dotele() also calculates energy use and checks nutrition
+     *  and strength requirements; it any of these change, update it too.
+     */
+    energy = (spellev(spell_no) * 5); /* 5 <= energy <= 35 */
+
+    if (u.uhunger <= 10 && spellid(spell_no) != SPE_DETECT_FOOD) {
+        You("are too hungry to cast that spell.");
+        return 0;
+    } else if (ACURR(A_STR) < 4 && spellid(spell_no) != SPE_RESTORE_ABILITY) {
+        You("lack the strength to cast spells.");
+        return 0;
+    } else if (check_capacity(
+                "Your concentration falters while carrying so much stuff.")) {
+        return 2;
+    }
+
+    /* if the cast attempt is already going to fail due to insufficient
+       energy (ie, u.uen < energy), the Amulet's drain effect won't kick
+       in and no turn will be consumed; however, when it does kick in,
+       the attempt may fail due to lack of energy after the draining, in
+       which case a turn will be used up in addition to the energy loss */
+    had_energy = u.uen >= energy;
+    if (u.uhave.amulet && had_energy) {
+        You_feel("the amulet draining your energy away.");
+        /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
+           so if amulet-induced cost was more than u.uen, nothing
+           (except the "don't have enough energy" message) happened
+           and player could just try again (and again and again...);
+           now we drain some energy immediately, which has a
+           side-effect of not increasing the hunger aspect of casting */
+        u.uen -= rnd(2 * energy);
+        if (u.uen < 0)
+            u.uen = 0;
+        g.context.botl = 1;
+        res = 2; /* time is going to elapse even if spell doesn't get cast */
+    }
+
+    if (energy > u.uen) {
+        You("%s have enough energy to cast that spell.", had_energy ? "no longer" : "don't");
+        return res;
+    }
+
+    chance = percent_success(spell_no);
+    if (confused || (rnd(100) > chance)) {
+        spellhunger(spell_no); /* Failing to cast a spell uses energy, but cancelling it doesn't. */
+        You("fail to cast the spell correctly.");
+        u.uen -= energy / 2;
+        g.context.botl = 1;
+        return 2;
+    }
+
+    return 1 + res;
+}
+
+/*
+ * Return 1 if a target was chosen or the spell does not require a target,
+ * 0 if the player cancelled out of the prompt or chose an invalid target
+ * (fireball, cone of cold)
+ */
+static int
+targetspell(spell_no, force_move)
+int spell_no;
+boolean force_move;
+{
+    switch (spellid(spell_no))
+    {
+    case SPE_FIREBALL:
+    case SPE_CONE_OF_COLD:
+        if (P_SKILL(spell_skilltype(spellid(spell_no))) >= P_SKILLED) {
+            return throwspell(force_move);
+        }
+        /*FALLTHRU*/
+    case SPE_FORCE_BOLT:
+    case SPE_SLEEP:
+    case SPE_MAGIC_MISSILE:
+    case SPE_KNOCK:
+    case SPE_SLOW_MONSTER:
+    case SPE_WIZARD_LOCK:
+    case SPE_DIG:
+    case SPE_TURN_UNDEAD:
+    case SPE_POLYMORPH:
+    case SPE_TELEPORT_AWAY:
+    case SPE_CANCELLATION:
+    case SPE_FINGER_OF_DEATH:
+    case SPE_LIGHT:
+    case SPE_DETECT_UNSEEN:
+    case SPE_HEALING:
+    case SPE_EXTRA_HEALING:
+    case SPE_DRAIN_LIFE:
+    case SPE_STONE_TO_FLESH:
+        if (!getdir((char *) 0)) {
+            pline1(force_move ? nothing_happens : Never_mind);
+            return FALSE;
+        }
+        break;
+    }
+    return TRUE;
+}
+
+
 /* the 'Z' command -- cast a spell */
 int
 docast()
 {
-    int spell_no;
+    int spell_no, res;
+    if (!getspell(&spell_no)) return 0;
+    res = tryspell(spell_no);
+    if (!(res & 1)) return res != 0;  /* spell failed; may have used a move */
+    if (!targetspell(spell_no, res == 3)) return res == 3;
+    return spelleffects(spell_no);
+}
 
-    if (getspell(&spell_no))
-        return spelleffects(spell_no, FALSE);
-    return 0;
+/*
+ * Cast a specific spell, possibly skipping the target prompt.
+ * If target is FALSE, we assume the caller has already set a target (^T).
+ */
+int
+docastspecial(spell_no, target)
+int spell_no;
+boolean target;
+{
+    int res;
+    res = tryspell(spell_no);
+    if (!(res & 1)) return res != 0;  /* spell failed; may have used a move */
+    if (target) {
+        if (!targetspell(spell_no, res == 3)) return res == 3;
+    }
+    return spelleffects(spell_no);
 }
 
 static const char *
@@ -895,9 +1118,8 @@ int spell;
 }
 
 int
-spelleffects(spell, atme)
+spelleffects(spell)
 int spell;
-boolean atme;
 {
     int energy, damage, chance, n, intell;
     int otyp, skill, role_skill, res = 0;
@@ -906,137 +1128,20 @@ boolean atme;
     struct obj *pseudo;
     coord cc;
 
-    /*
-     * Reject attempting to cast while stunned or with no free hands.
-     * Already done in getspell() to stop casting before choosing
-     * which spell, but duplicated here for cases where spelleffects()
-     * gets called directly for ^T without intrinsic teleport capability
-     * or #turn for non-priest/non-knight.
-     * (There's no duplication of messages; when the rejection takes
-     * place in getspell(), we don't get called.)
-     */
-    if (rejectcasting()) {
-        return 0; /* no time elapses */
-    }
+    spellhunger(spell);
 
-    /*
-     * Spell casting no longer affects knowledge of the spell. A
-     * decrement of spell knowledge is done every turn.
-     */
-    if (spellknow(spell) <= 0) {
-        Your("knowledge of this spell is twisted.");
-        pline("It invokes nightmarish images in your mind...");
-        spell_backfire(spell);
-        return 1;
-    } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
-        You("strain to recall the spell.");
-    } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
-        You("have difficulty remembering the spell.");
-    } else if (spellknow(spell) <= KEEN / 20) { /* 1000 turns left */
-        Your("knowledge of this spell is growing faint.");
-    } else if (spellknow(spell) <= KEEN / 10) { /* 2000 turns left */
-        Your("recall of this spell is gradually fading.");
-    }
     /*
      *  Note: dotele() also calculates energy use and checks nutrition
      *  and strength requirements; it any of these change, update it too.
      */
     energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
 
-    if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
-        You("are too hungry to cast that spell.");
-        return 0;
-    } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
-        You("lack the strength to cast spells.");
-        return 0;
-    } else if (check_capacity(
-                "Your concentration falters while carrying so much stuff.")) {
-        return 1;
-    }
-
-    /* if the cast attempt is already going to fail due to insufficient
-       energy (ie, u.uen < energy), the Amulet's drain effect won't kick
-       in and no turn will be consumed; however, when it does kick in,
-       the attempt may fail due to lack of energy after the draining, in
-       which case a turn will be used up in addition to the energy loss */
-    if (u.uhave.amulet && u.uen >= energy) {
-        You_feel("the amulet draining your energy away.");
-        /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
-           so if amulet-induced cost was more than u.uen, nothing
-           (except the "don't have enough energy" message) happened
-           and player could just try again (and again and again...);
-           now we drain some energy immediately, which has a
-           side-effect of not increasing the hunger aspect of casting */
-        u.uen -= rnd(2 * energy);
-        if (u.uen < 0)
-            u.uen = 0;
-        g.context.botl = 1;
-        res = 1; /* time is going to elapse even if spell doesn't get cast */
-    }
-
-    if (energy > u.uen) {
-        You("don't have enough energy to cast that spell.");
-        return res;
-    } else {
-        if (spellid(spell) != SPE_DETECT_FOOD) {
-            int hungr = energy * 2;
-
-            /* If hero is a wizard, their current intelligence
-             * (bonuses + temporary + current)
-             * affects hunger reduction in casting a spell.
-             * 1. int = 17-18 no reduction
-             * 2. int = 16    1/4 hungr
-             * 3. int = 15    1/2 hungr
-             * 4. int = 1-14  normal reduction
-             * The reason for this is:
-             * a) Intelligence affects the amount of exertion
-             * in thinking.
-             * b) Wizards have spent their life at magic and
-             * understand quite well how to cast spells.
-             */
-            intell = acurr(A_INT);
-            if (!Role_if(PM_WIZARD))
-                intell = 10;
-            switch (intell) {
-            case 25:
-            case 24:
-            case 23:
-            case 22:
-            case 21:
-            case 20:
-            case 19:
-            case 18:
-            case 17:
-                hungr = 0;
-                break;
-            case 16:
-                hungr /= 4;
-                break;
-            case 15:
-                hungr /= 2;
-                break;
-            }
-            /* don't put player (quite) into fainting from
-             * casting a spell, particularly since they might
-             * not even be hungry at the beginning; however,
-             * this is low enough that they must eat before
-             * casting anything else except detect food
-             */
-            if (hungr > u.uhunger - 3)
-                hungr = u.uhunger - 3;
-            morehungry(hungr);
-        }
-    }
-
-    chance = percent_success(spell);
-    if (confused || (rnd(100) > chance)) {
-        You("fail to cast the spell correctly.");
-        u.uen -= energy / 2;
-        g.context.botl = 1;
-        return 1;
-    }
-
     u.uen -= energy;
+    if (u.uen < 0)
+    {
+        impossible("Not enough energy but spell was successful?");
+        u.uen = 0;
+    }
     g.context.botl = 1;
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
@@ -1061,34 +1166,32 @@ boolean atme;
     case SPE_FIREBALL:
     case SPE_CONE_OF_COLD:
         if (role_skill >= P_SKILLED) {
-            if (throwspell()) {
-                cc.x = u.dx;
-                cc.y = u.dy;
-                n = rnd(8) + 1;
-                while (n--) {
-                    if (!u.dx && !u.dy && !u.dz) {
-                        if ((damage = zapyourself(pseudo, TRUE)) != 0) {
-                            char buf[BUFSZ];
-                            Sprintf(buf, "zapped %sself with a spell",
-                                    uhim());
-                            losehp(damage, buf, NO_KILLER_PREFIX);
-                        }
-                    } else {
-                        explode(u.dx, u.dy,
-                                otyp - SPE_MAGIC_MISSILE + 10,
-                                spell_damage_bonus(u.ulevel / 2 + 1), 0,
-                                (otyp == SPE_CONE_OF_COLD)
-                                   ? EXPL_FROSTY
-                                   : EXPL_FIERY);
+            cc.x = u.dx;
+            cc.y = u.dy;
+            n = rnd(8) + 1;
+            while (n--) {
+                if (!u.dx && !u.dy && !u.dz) {
+                    if ((damage = zapyourself(pseudo, TRUE)) != 0) {
+                        char buf[BUFSZ];
+                        Sprintf(buf, "zapped %sself with a spell",
+                                uhim());
+                        losehp(damage, buf, NO_KILLER_PREFIX);
                     }
-                    u.dx = cc.x + rnd(3) - 2;
-                    u.dy = cc.y + rnd(3) - 2;
-                    if (!isok(u.dx, u.dy) || !cansee(u.dx, u.dy)
-                        || IS_STWALL(levl[u.dx][u.dy].typ) || u.uswallow) {
-                        /* Spell is reflected back to center */
-                        u.dx = cc.x;
-                        u.dy = cc.y;
-                    }
+                } else {
+                    explode(u.dx, u.dy,
+                            otyp - SPE_MAGIC_MISSILE + 10,
+                            spell_damage_bonus(u.ulevel / 2 + 1), 0,
+                            (otyp == SPE_CONE_OF_COLD)
+                                ? EXPL_FROSTY
+                                : EXPL_FIERY);
+                }
+                u.dx = cc.x + rnd(3) - 2;
+                u.dy = cc.y + rnd(3) - 2;
+                if (!isok(u.dx, u.dy) || !cansee(u.dx, u.dy)
+                    || IS_STWALL(levl[u.dx][u.dy].typ) || u.uswallow) {
+                    /* Spell is reflected back to center */
+                    u.dx = cc.x;
+                    u.dy = cc.y;
                 }
             }
             break;
@@ -1122,20 +1225,6 @@ boolean atme;
                    but they've been extended to take a direction like wands */
                 if (role_skill >= P_SKILLED)
                     pseudo->blessed = 1;
-            }
-            if (atme) {
-                u.dx = u.dy = u.dz = 0;
-            } else if (!getdir((char *) 0)) {
-                /* getdir cancelled, re-use previous direction */
-                /*
-                 * FIXME:  reusing previous direction only makes sense
-                 * if there is an actual previous direction.  When there
-                 * isn't one, the spell gets cast at self which is rarely
-                 * what the player intended.  Unfortunately, the way
-                 * spelleffects() is organized means that aborting with
-                 * "nevermind" is not an option.
-                 */
-                pline_The("magical energy is released!");
             }
             if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
@@ -1242,7 +1331,8 @@ int x, y;
 
 /* Choose location where spell takes effect. */
 static int
-throwspell()
+throwspell(force_move)
+boolean force_move;
 {
     coord cc, uc;
     struct monst *mtmp;
@@ -1258,8 +1348,10 @@ throwspell()
     pline("Where do you want to cast the spell?");
     cc.x = u.ux;
     cc.y = u.uy;
-    if (getpos(&cc, TRUE, "the desired position") < 0)
+    if (getpos(&cc, TRUE, "the desired position") < 0) {
+        pline1(force_move ? nothing_happens : Never_mind);
         return 0; /* user pressed ESC */
+    }
     /* The number of moves from hero to where the spell drops.*/
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
         pline_The("spell dissipates over the distance!");
