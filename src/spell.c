@@ -1124,7 +1124,7 @@ int spell;
     int energy, damage, chance, n, intell;
     int otyp, skill, role_skill, res = 0;
     boolean confused = (Confusion != 0);
-    boolean physical_damage = FALSE;
+    boolean physical_damage;
     struct obj *pseudo;
     coord cc;
 
@@ -1153,6 +1153,7 @@ int spell;
      * See spell_skilltype for categories.
      */
     otyp = pseudo->otyp;
+    physical_damage = otyp == SPE_FORCE_BOLT;
     skill = spell_skilltype(otyp);
     role_skill = P_SKILL(skill);
 
@@ -1200,8 +1201,6 @@ int spell;
 
     /* these spells are all duplicates of wand effects */
     case SPE_FORCE_BOLT:
-        physical_damage = TRUE;
-    /*FALLTHRU*/
     case SPE_SLEEP:
     case SPE_MAGIC_MISSILE:
     case SPE_KNOCK:
