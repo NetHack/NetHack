@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.349 $ $NHDT-Date: 1604880453 2020/11/09 00:07:33 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.350 $ $NHDT-Date: 1605184219 2020/11/12 12:30:19 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -290,6 +290,9 @@ monster hiding under an egg that hatched was kept hidden
 restful sleep regenerates hit points
 attacking non-adjacent concealed mimic by applying a polearm would make the
 	hero be stuck to that mimic
+hero could break a wand ("raising the wand high over your head, you break it
+	in two") even if hands were welded to a two-handed weapon or to a
+	one-handed weapon and also to a shield
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -644,7 +647,7 @@ always print a message when the hero level teleports (github #265)
 remove Sokoban luck penalties for actions you can't cheat with (github #260)
 sounds for minotaurs (github #298)
 correct the Guidebook descriptions for msdos video_width and video_height to
-	state that they work with video:vesa; the video:vga setting that was 
+	state that they work with video:vesa; the video:vga setting that was
 	described there forces the 640x480x16 mode where video_width and
 	video_height don't operate (github #294)
 redo rndmonst() to operate in a single pass (github pull request #286)
@@ -690,7 +693,7 @@ resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters
 convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
-relocated unmaintained code to outdated folder, specifically sys/amiga, 
+relocated unmaintained code to outdated folder, specifically sys/amiga,
 	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
 	win/gnome, include/amiconf.h, include/beconf.h, include/def_os2.h,
 	include/os2conf.h, include/macconf.h, include/tosconf.h,

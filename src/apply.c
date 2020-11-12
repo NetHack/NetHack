@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1604442295 2020/11/03 22:24:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1605184220 2020/11/12 12:30:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3406,21 +3406,24 @@ struct obj *obj;
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
-    boolean is_fragile = objdescr_is(obj, "balsa");
-
-    if (!paranoid_query(ParanoidBreakwand,
-                       safe_qbuf(confirm,
-                                 "Are you really sure you want to break ",
-                                 "?", obj, yname, ysimple_name, "the wand")))
-        return 0;
+    boolean is_fragile = (objdescr_is(obj, "balsa")
+                          || objdescr_is(obj, "glass"));
 
     if (nohands(g.youmonst.data)) {
         You_cant("break %s without hands!", yname(obj));
+        return 0;
+    } else if (!freehand()) {
+        Your("%s are occupied!", makeplural(body_part(HAND)));
         return 0;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         You("don't have the strength to break %s!", yname(obj));
         return 0;
     }
+    if (!paranoid_query(ParanoidBreakwand,
+                        safe_qbuf(confirm,
+                                  "Are you really sure you want to break ",
+                                  "?", obj, yname, ysimple_name, "the wand")))
+        return 0;
     pline("Raising %s high above your %s, you %s it in two!", yname(obj),
           body_part(HEAD), is_fragile ? "snap" : "break");
 
