@@ -331,7 +331,24 @@ tty_shutdown()
         free((genericptr_t) nh_HE), nh_HE = (char *) 0;
         dynamic_HIHE = FALSE;
     }
-#endif
+#else /* TERMLIB */
+#ifndef TOS
+#if defined(ANSI_DEFAULT) && defined(TEXTCOLOR)
+    for (int i = 0; i < CLR_MAX / 2; i++)
+        if (i != CLR_BLACK) {
+            free(hilites[i | BRIGHT]);
+            if (i != CLR_GRAY)
+            /* Mirrors logic in tty_startup if ANSI_DEFAULT is set. */
+#ifdef MICRO
+                if (i != CLR_BLUE)
+#endif /* MICRO */
+                {
+                    free(hilites[i]);
+                }
+        }
+#endif /* ANSI_DEFAULT) && TEXTCOLOR */
+#endif /* TOS */
+#endif /* TERMLIB */
     return;
 }
 
