@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1604173730 2020/10/31 19:48:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1605305480 2020/11/13 22:11:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1499,9 +1499,9 @@ int upflag;
 }
 
 void
-stairway_add(x,y, up, ladder, dest)
-int x,y;
-boolean up, ladder;
+stairway_add(x, y, up, isladder, dest)
+int x, y;
+boolean up, isladder;
 d_level *dest;
 {
     stairway *tmp = (stairway *)alloc(sizeof(stairway));
@@ -1509,7 +1509,7 @@ d_level *dest;
     tmp->sx = x;
     tmp->sy = y;
     tmp->up = up;
-    tmp->isladder = ladder;
+    tmp->isladder = isladder;
     assign_level(&(tmp->tolev), dest);
     tmp->next = g.stairs;
     g.stairs = tmp;
@@ -1536,7 +1536,6 @@ int x,y;
 
     while (tmp && !(tmp->sx == x && tmp->sy == y))
         tmp = tmp->next;
-
     return tmp;
 }
 
@@ -1549,28 +1548,26 @@ d_level *fromdlev;
     while (tmp) {
         if (tmp->tolev.dnum == fromdlev->dnum
             && tmp->tolev.dlevel == fromdlev->dlevel)
-            return tmp;
+            break; /* return */
         tmp = tmp->next;
     }
-
     return tmp;
 }
 
 stairway *
-stairway_find_from(fromdlev, ladder)
+stairway_find_from(fromdlev, isladder)
 d_level *fromdlev;
-boolean ladder;
+boolean isladder;
 {
     stairway *tmp = g.stairs;
 
     while (tmp) {
         if (tmp->tolev.dnum == fromdlev->dnum
             && tmp->tolev.dlevel == fromdlev->dlevel
-            && tmp->isladder == ladder)
-            return tmp;
+            && tmp->isladder == isladder)
+            break; /* return */
         tmp = tmp->next;
     }
-
     return tmp;
 }
 
@@ -1582,7 +1579,6 @@ boolean up;
 
     while (tmp && !(tmp->up == up))
         tmp = tmp->next;
-
     return tmp;
 }
 
@@ -1593,19 +1589,17 @@ stairway_find_ladder()
 
     while (tmp && !tmp->isladder)
         tmp = tmp->next;
-
     return tmp;
 }
 
 stairway *
-stairway_find_type_dir(ladder,up)
-boolean ladder, up;
+stairway_find_type_dir(isladder, up)
+boolean isladder, up;
 {
     stairway *tmp = g.stairs;
 
-    while (tmp && !(tmp->isladder == ladder && tmp->up == up))
+    while (tmp && !(tmp->isladder == isladder && tmp->up == up))
         tmp = tmp->next;
-
     return tmp;
 }
 
@@ -1620,7 +1614,6 @@ boolean up;
             return tmp;
         tmp = tmp->next;
     }
-
     return tmp;
 }
 

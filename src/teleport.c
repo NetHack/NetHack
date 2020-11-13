@@ -1,4 +1,4 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1600468454 2020/09/18 22:34:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1605305493 2020/11/13 22:11:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1261,12 +1261,13 @@ register int x, y;
 }
 
 static stairway *
-stairway_find_forwiz(ladder, up)
-boolean ladder, up;
+stairway_find_forwiz(isladder, up)
+boolean isladder, up;
 {
     stairway *stway = g.stairs;
 
-    while (stway && !(stway->isladder == ladder && stway->up == up && stway->tolev.dnum == u.uz.dnum))
+    while (stway && !(stway->isladder == isladder
+                      && stway->up == up && stway->tolev.dnum == u.uz.dnum))
         stway = stway->next;
     return stway;
 }

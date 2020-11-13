@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1604513828 2020/11/04 18:17:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1605305492 2020/11/13 22:11:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -916,7 +916,7 @@ NHFILE *nhfp;
     stairway_free_all();
     while (1) {
         if (nhfp->structlevel) {
-            len += sizeof(buflen);
+            len += (int) sizeof(buflen);
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
         }
 
@@ -924,11 +924,12 @@ NHFILE *nhfp;
             break;
 
         if (nhfp->structlevel) {
-            len += sizeof(stairway);
-            mread(nhfp->fd, (genericptr_t) &stway, sizeof(stairway));
+            len += (int) sizeof (stairway);
+            mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
         }
 
-        stairway_add(stway.sx, stway.sy, stway.up, stway.isladder, &(stway.tolev));
+        stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
+                     &(stway.tolev));
     }
 }
 
@@ -1157,7 +1158,8 @@ xchar lev;
     if (ghostly) {
         stairway *stway = g.stairs;
         while (stway) {
-            if (!stway->isladder && !stway->up && stway->tolev.dnum == u.uz.dnum)
+            if (!stway->isladder && !stway->up
+                && stway->tolev.dnum == u.uz.dnum)
                 break;
             stway = stway->next;
         }
@@ -1181,7 +1183,6 @@ xchar lev;
         br = Is_branchlev(&u.uz);
         if (br && u.uz.dlevel == 1) {
             d_level ltmp;
-            stairway *stway;
 
             if (on_level(&u.uz, &br->end1))
                 assign_level(&ltmp, &br->end2);

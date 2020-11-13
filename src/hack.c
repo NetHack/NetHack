@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1603507385 2020/10/24 02:43:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2991,12 +2991,13 @@ monster_nearby()
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
             if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
-            if ((mtmp = m_at(x, y)) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            if ((mtmp = m_at(x, y)) != 0
+                && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (Hallucination
                     || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
-                && mtmp->mcanmove && !mtmp->msleeping  /* aplvax!jcn */
+                && mtmp->mcanmove && !mtmp->msleeping
                 && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
                 return 1;
         }

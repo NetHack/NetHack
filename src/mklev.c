@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1596498181 2020/08/03 23:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1252,7 +1252,8 @@ xchar x, y; /* location */
     if (br->type == BR_PORTAL) {
         mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
-        boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
+        boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up
+                                                     : !br->end1_up;
 
         stairway_add(x,y, goes_up, FALSE, dest);
         levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
@@ -1601,9 +1602,11 @@ coord *tm;
 void
 mkstairs(x, y, up, croom)
 xchar x, y;
-char up;
-struct mkroom *croom;
+char up;	/* [why 'char' when usage is boolean?] */
+struct mkroom *croom UNUSED;
 {
+    d_level dest;
+
     if (!x) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
@@ -1618,19 +1621,9 @@ struct mkroom *croom;
         || (dunlev(&u.uz) == dunlevs_in_dungeon(&u.uz) && !up))
         return;
 
-    if (up) {
-        d_level dest;
-
-        dest.dnum = u.uz.dnum;
-        dest.dlevel = u.uz.dlevel - 1;
-        stairway_add(x,y, TRUE, FALSE, &dest);
-    } else {
-        d_level dest;
-
-        dest.dnum = u.uz.dnum;
-        dest.dlevel = u.uz.dlevel + 1;
-        stairway_add(x,y, FALSE, FALSE, &dest);
-    }
+    dest.dnum = u.uz.dnum;
+    dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
+    stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
     levl[x][y].typ = STAIRS;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
