@@ -23,7 +23,7 @@
  *              @...X   +4
  *
  */
-const char circle_data[] = {
+const xchar circle_data[] = {
     /*  0*/ 0,
     /*  1*/ 1,  1,
     /*  3*/ 2,  2,  1,
@@ -49,7 +49,7 @@ const char circle_data[] = {
  * used for a single point:  temporary light source of a camera flash
  * as it traverses its path.
  */
-const char circle_start[] = {
+const xchar circle_start[] = {
     /* 0*/ 0,
     /* 1*/ 1,
     /* 2*/ 3,
@@ -74,26 +74,26 @@ const char circle_start[] = {
 
 /*------ local variables ------*/
 
-static char could_see[2][ROWNO][COLNO]; /* vision work space */
-static char *cs_rows0[ROWNO], *cs_rows1[ROWNO];
-static char cs_rmin0[ROWNO], cs_rmax0[ROWNO];
-static char cs_rmin1[ROWNO], cs_rmax1[ROWNO];
+static xchar could_see[2][ROWNO][COLNO]; /* vision work space */
+static xchar *cs_rows0[ROWNO], *cs_rows1[ROWNO];
+static xchar cs_rmin0[ROWNO], cs_rmax0[ROWNO];
+static xchar cs_rmin1[ROWNO], cs_rmax1[ROWNO];
 
 static char viz_clear[ROWNO][COLNO]; /* vision clear/blocked map */
 static char *viz_clear_rows[ROWNO];
 
-static char left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
-static char right_ptrs[ROWNO][COLNO];
+static xchar left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
+static xchar right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
 static void FDECL(fill_point, (int, int));
 static void FDECL(dig_point, (int, int));
 static void NDECL(view_init);
-static void FDECL(view_from, (int, int, char **, char *, char *, int,
+static void FDECL(view_from, (int, int, xchar **, xchar *, xchar *, int,
                                   void (*)(int, int, genericptr_t),
                                   genericptr_t));
-static void FDECL(get_unused_cs, (char ***, char **, char **));
-static void FDECL(rogue_vision, (char **, char *, char *));
+static void FDECL(get_unused_cs, (xchar ***, xchar **, xchar **));
+static void FDECL(rogue_vision, (xchar **, xchar *, xchar *));
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
@@ -246,11 +246,11 @@ vision_reset()
  */
 static void
 get_unused_cs(rows, rmin, rmax)
-char ***rows;
-char **rmin, **rmax;
+xchar ***rows;
+xchar **rmin, **rmax;
 {
     register int row;
-    register char *nrmin, *nrmax;
+    register xchar *nrmin, *nrmax;
 
     if (g.viz_array == cs_rows0) {
         *rows = cs_rows1;
@@ -287,8 +287,8 @@ char **rmin, **rmax;
  */
 static void
 rogue_vision(next, rmin, rmax)
-char **next; /* could_see array pointers */
-char *rmin, *rmax;
+xchar **next; /* could_see array pointers */
+xchar *rmin, *rmax;
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
@@ -494,13 +494,13 @@ int control;
 {
     extern unsigned char seenv_matrix[3][3]; /* from display.c */
     static unsigned char colbump[COLNO + 1]; /* cols to bump sv */
-    char **temp_array; /* points to the old vision array */
-    char **next_array; /* points to the new vision array */
-    char *next_row;    /* row pointer for the new array */
-    char *old_row;     /* row pointer for the old array */
-    char *next_rmin;   /* min pointer for the new array */
-    char *next_rmax;   /* max pointer for the new array */
-    const char *ranges; /* circle ranges -- used for xray & night vision */
+    xchar **temp_array; /* points to the old vision array */
+    xchar **next_array; /* points to the new vision array */
+    xchar *next_row;    /* row pointer for the new array */
+    xchar *old_row;     /* row pointer for the old array */
+    xchar *next_rmin;   /* min pointer for the new array */
+    xchar *next_rmax;   /* max pointer for the new array */
+    const xchar *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
@@ -1092,9 +1092,9 @@ int row, col;
 static int start_row;
 static int start_col;
 static int step;
-static char **cs_rows;
-static char *cs_left;
-static char *cs_right;
+static xchar **cs_rows;
+static xchar *cs_left;
+static xchar *cs_right;
 
 static void FDECL((*vis_func), (int, int, genericptr_t));
 static genericptr_t varg;
@@ -1605,9 +1605,9 @@ static close2d *close_dy[CLOSE_MAX_BC_DY];
 static far2d *far_dy[FAR_MAX_BC_DY];
 
 static void FDECL(right_side,  (int, int, int, int, int,
-                                    int, int, const char *));
+                                    int, int, const xchar *));
 static void FDECL(left_side, (int, int, int, int, int, int, int, 
-                                    const char *));
+                                    const xchar *));
 static int FDECL(close_shadow, (int, int, int, int));
 static int FDECL(far_shadow, (int, int, int, int));
 
@@ -1720,7 +1720,7 @@ int cb_row, cb_col; /* close block row and col */
 int fb_row, fb_col; /* far block row and col */
 int left;           /* left mark of the previous row */
 int right_mark;     /* right mark of previous row */
-char *limits;       /* points at range limit for current row, or NULL */
+xchar *limits;       /* points at range limit for current row, or NULL */
 {
     register int i;
     register char *rowp = NULL;
@@ -1998,7 +1998,7 @@ int cb_row, cb_col; /* close block row and col */
 int fb_row, fb_col; /* far block row and col */
 int left_mark;      /* left mark of previous row */
 int right;          /* right mark of the previous row */
-const char *limits;
+const xchar *limits;
 {
     register int i;
     register char *rowp = NULL;
@@ -2196,8 +2196,8 @@ const char *limits;
 static void
 view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
 int srow, scol;               /* source row and column */
-char **loc_cs_rows;           /* could_see array (row pointers) */
-char *left_most, *right_most; /* limits of what could be seen */
+xchar **loc_cs_rows;           /* could_see array (row pointers) */
+xchar *left_most, *right_most; /* limits of what could be seen */
 int range;                    /* 0 if unlimited */
 void FDECL((*func), (int, int, genericptr_t));
 genericptr_t arg;
@@ -2289,8 +2289,8 @@ genericptr_t arg;
 /*
  * Defines local to Algorithm C.
  */
-static void FDECL(right_side, (int, int, int, const char *));
-static void FDECL(left_side, (int, int, int, const char *));
+static void FDECL(right_side, (int, int, int, const xchar *));
+static void FDECL(left_side, (int, int, int, const xchar *));
 
 /* Initialize algorithm C (nothing). */
 static void
@@ -2307,7 +2307,7 @@ right_side(row, left, right_mark, limits)
 int row;        /* current row */
 int left;       /* first (left side) visible spot on prev row */
 int right_mark; /* last (right side) visible spot on prev row */
-const char *limits;   /* points at range limit for current row, or NULL */
+const xchar *limits;   /* points at range limit for current row, or NULL */
 {
     int right;                  /* right limit of "could see" */
     int right_edge;             /* right edge of an opening */
@@ -2315,9 +2315,9 @@ const char *limits;   /* points at range limit for current row, or NULL */
     int deeper;                 /* if TRUE, call self as needed */
     int result;                 /* set by q?_path() */
     register int i;             /* loop counter */
-    register char *rowp = NULL; /* row optimization */
-    char *row_min = NULL;       /* left most  [used by macro set_min()] */
-    char *row_max = NULL;       /* right most [used by macro set_max()] */
+    register xchar *rowp = NULL; /* row optimization */
+    xchar *row_min = NULL;       /* left most  [used by macro set_min()] */
+    xchar *row_max = NULL;       /* right most [used by macro set_max()] */
     int lim_max;                /* right most limit of circle */
 
     nrow = row + step;
@@ -2497,13 +2497,13 @@ const char *limits;   /* points at range limit for current row, or NULL */
 static void
 left_side(row, left_mark, right, limits)
 int row, left_mark, right;
-const char *limits;
+const xchar *limits;
 {
     int left, left_edge, nrow, deeper, result;
     register int i;
-    register char *rowp = NULL;
-    char *row_min = NULL;
-    char *row_max = NULL;
+    register xchar *rowp = NULL;
+    xchar *row_min = NULL;
+    xchar *row_max = NULL;
     int lim_min;
 
 #ifdef GCC_WARN
@@ -2633,19 +2633,19 @@ const char *limits;
 static void
 view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
 int srow, scol;     /* starting row and column */
-char **loc_cs_rows; /* pointers to the rows of the could_see array */
-char *left_most;    /* min mark on each row */
-char *right_most;   /* max mark on each row */
+xchar **loc_cs_rows; /* pointers to the rows of the could_see array */
+xchar *left_most;    /* min mark on each row */
+xchar *right_most;   /* max mark on each row */
 int range;          /* 0 if unlimited */
 void FDECL((*func), (int, int, genericptr_t));
 genericptr_t arg;
 {
     register int i; /* loop counter */
-    char *rowp;     /* optimization for setting could_see */
+    xchar *rowp;     /* optimization for setting could_see */
     int nrow;       /* the next row */
     int left;       /* the left-most visible column */
     int right;      /* the right-most visible column */
-    const char *limits;   /* range limit for next row */
+    const xchar *limits;   /* range limit for next row */
 
     /* Set globals for q?_path(), left_side(), and right_side() to use. */
     start_col = scol;
@@ -2685,7 +2685,7 @@ genericptr_t arg;
         if (right > scol + range)
             right = scol + range;
     } else
-        limits = (char *) 0;
+        limits = (xchar *) 0;
 
     if (func) {
         for (i = left; i <= right; i++)
@@ -2744,12 +2744,12 @@ genericptr_t arg;
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy) {
-        view_from(srow, scol, (char **) 0, (char *) 0, (char *) 0, range,
+        view_from(srow, scol, (xchar **) 0, (xchar *) 0, (xchar *) 0, range,
                   func, arg);
     } else {
         register int x;
         int y, min_x, max_x, max_y, offset;
-        const char *limits;
+        const xchar *limits;
         boolean override_vision;
 
         /* vision doesn't pass through water or clouds, detection should

@@ -1119,7 +1119,7 @@ E int NDECL(dosuspend);
 
 E void FDECL(new_light_source, (XCHAR_P, XCHAR_P, int, int, ANY_P *));
 E void FDECL(del_light_source, (int, ANY_P *));
-E void FDECL(do_light_sources, (char **));
+E void FDECL(do_light_sources, (xchar **));
 E void FDECL(show_transient_light, (struct obj *, int, int));
 E void NDECL(transient_light_cleanup);
 E struct monst *FDECL(find_mid, (unsigned, unsigned));
@@ -2497,7 +2497,7 @@ E void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 E void FDECL(selection_floodfill, (struct selectionvar *, int, int,
                                    BOOLEAN_P));
 E boolean FDECL(pm_good_location, (int, int, struct permonst *));
-E void FDECL(get_location_coord, (schar *, schar *, int, struct mkroom *,
+E void FDECL(get_location_coord, (xchar *, xchar *, int, struct mkroom *,
                                   long));
 E void FDECL(selection_setpoint, (int, int, struct selectionvar *, XCHAR_P));
 E struct selectionvar * FDECL(selection_not, (struct selectionvar *));

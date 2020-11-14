@@ -14,7 +14,7 @@ static int FDECL(l_selection_not, (lua_State *));
 static int FDECL(l_selection_filter_percent, (lua_State *));
 static int FDECL(l_selection_rndcoord, (lua_State *));
 static boolean FDECL(params_sel_2coords, (lua_State *, struct selectionvar **,
-                                          schar *, schar *, schar *, schar *));
+                                          xchar *, xchar *, xchar *, xchar *));
 static int FDECL(l_selection_line, (lua_State *));
 static int FDECL(l_selection_randline, (lua_State *));
 static int FDECL(l_selection_rect, (lua_State *));
@@ -143,7 +143,7 @@ l_selection_setpoint(L)
 lua_State *L;
 {
     struct selectionvar *sel = (struct selectionvar *) 0;
-    schar x = -1, y = -1;
+    xchar x = -1, y = -1;
     int val = 1;
     int argc = lua_gettop(L);
     long crd = 0L;
@@ -153,15 +153,15 @@ lua_State *L;
     } else if (argc == 1) {
         sel = l_selection_check(L, 1);
     } else if (argc == 2) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         lua_pop(L, 2);
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
     } else {
         sel = l_selection_check(L, 1);
-        x = (schar) luaL_checkinteger(L, 2);
-        y = (schar) luaL_checkinteger(L, 3);
+        x = (xchar) luaL_checkinteger(L, 2);
+        y = (xchar) luaL_checkinteger(L, 3);
         val = (int) luaL_optinteger(L, 4, 1);
     }
 
@@ -188,8 +188,8 @@ l_selection_getpoint(L)
 lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
-    schar x = (schar) luaL_checkinteger(L, 2);
-    schar y = (schar) luaL_checkinteger(L, 3);
+    xchar x = (xchar) luaL_checkinteger(L, 2);
+    xchar y = (xchar) luaL_checkinteger(L, 3);
     int val;
     long crd;
 
@@ -344,16 +344,16 @@ static boolean
 params_sel_2coords(L, sel, x1,y1, x2,y2)
 lua_State *L;
 struct selectionvar **sel;
-schar *x1, *y1, *x2, *y2;
+xchar *x1, *y1, *x2, *y2;
 {
     int argc = lua_gettop(L);
 
     if (argc == 4) {
         (void) l_selection_new(L);
-        *x1 = (schar) luaL_checkinteger(L, 1);
-        *y1 = (schar) luaL_checkinteger(L, 2);
-        *x2 = (schar) luaL_checkinteger(L, 3);
-        *y2 = (schar) luaL_checkinteger(L, 4);
+        *x1 = (xchar) luaL_checkinteger(L, 1);
+        *y1 = (xchar) luaL_checkinteger(L, 2);
+        *x2 = (xchar) luaL_checkinteger(L, 3);
+        *y2 = (xchar) luaL_checkinteger(L, 4);
         *sel = l_selection_check(L, 5);
         lua_remove(L, 1);
         lua_remove(L, 1);
@@ -362,10 +362,10 @@ schar *x1, *y1, *x2, *y2;
         return TRUE;
     } else if (argc == 5) {
         *sel = l_selection_check(L, 1);
-        *x1 = (schar) luaL_checkinteger(L, 2);
-        *y1 = (schar) luaL_checkinteger(L, 3);
-        *x2 = (schar) luaL_checkinteger(L, 4);
-        *y2 = (schar) luaL_checkinteger(L, 5);
+        *x1 = (xchar) luaL_checkinteger(L, 2);
+        *y1 = (xchar) luaL_checkinteger(L, 3);
+        *x2 = (xchar) luaL_checkinteger(L, 4);
+        *y2 = (xchar) luaL_checkinteger(L, 5);
         lua_pop(L, 4);
         return TRUE;
     }
@@ -380,10 +380,7 @@ l_selection_line(L)
 lua_State *L;
 {
     struct selectionvar *sel = NULL;
-    schar x1;
-    schar y1;
-    schar x2;
-    schar y2;
+    xchar x1, y1, x2, y2;
 
     if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.line: illegal arguments");
@@ -404,10 +401,7 @@ l_selection_rect(L)
 lua_State *L;
 {
     struct selectionvar *sel = NULL;
-    schar x1;
-    schar y1;
-    schar x2;
-    schar y2;
+    xchar x1, y1, x2, y2;
 
     if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.rect: illegal arguments");
@@ -437,10 +431,7 @@ lua_State *L;
 {
     struct selectionvar *sel = NULL;
     int y;
-    schar x1;
-    schar y1;
-    schar x2;
-    schar y2;
+    xchar x1, y1, x2, y2;
 
     if (!params_sel_2coords(L, &sel, &x1, &y1, &x2, &y2)) {
         nhl_error(L, "selection.fillrect: illegal arguments");
@@ -473,22 +464,22 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    schar x1, y1, x2, y2;
+    xchar x1, y1, x2, y2;
     int roughness = 7;
 
     if (argc == 6) {
         sel = l_selection_check(L, 1);
-        x1 = (schar) luaL_checkinteger(L, 2);
-        y1 = (schar) luaL_checkinteger(L, 3);
-        x2 = (schar) luaL_checkinteger(L, 4);
-        y2 = (schar) luaL_checkinteger(L, 5);
+        x1 = (xchar) luaL_checkinteger(L, 2);
+        y1 = (xchar) luaL_checkinteger(L, 3);
+        x2 = (xchar) luaL_checkinteger(L, 4);
+        y2 = (xchar) luaL_checkinteger(L, 5);
         roughness = (int) luaL_checkinteger(L, 6);
         lua_pop(L, 5);
     } else if (argc == 5 && lua_type(L, 1) == LUA_TNUMBER) {
-        x1 = (schar) luaL_checkinteger(L, 1);
-        y1 = (schar) luaL_checkinteger(L, 2);
-        x2 = (schar) luaL_checkinteger(L, 3);
-        y2 = (schar) luaL_checkinteger(L, 4);
+        x1 = (xchar) luaL_checkinteger(L, 1);
+        y1 = (xchar) luaL_checkinteger(L, 2);
+        x2 = (xchar) luaL_checkinteger(L, 3);
+        y2 = (xchar) luaL_checkinteger(L, 4);
         roughness = (int) luaL_checkinteger(L, 5);
         lua_pop(L, 5);
         (void) l_selection_new(L);
@@ -610,11 +601,11 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    schar x, y;
+    xchar x, y;
 
     if (argc == 2) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         lua_pop(L, 2);
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
@@ -644,20 +635,20 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    schar x = 0, y = 0;
+    xchar x = 0, y = 0;
     int r = 0, filled = 0;
 
     if (argc == 3) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         r = (int) luaL_checkinteger(L, 3);
         lua_pop(L, 3);
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
         filled = 0;
     } else if (argc == 4 && lua_type(L, 1) == LUA_TNUMBER) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         r = (int) luaL_checkinteger(L, 3);
         filled = (int) luaL_checkinteger(L, 4); /* TODO: boolean*/
         lua_pop(L, 4);
@@ -665,8 +656,8 @@ lua_State *L;
         sel = l_selection_check(L, 1);
     } else if (argc == 4 || argc == 5) {
         sel = l_selection_check(L, 1);
-        x = (schar) luaL_checkinteger(L, 2);
-        y = (schar) luaL_checkinteger(L, 3);
+        x = (xchar) luaL_checkinteger(L, 2);
+        y = (xchar) luaL_checkinteger(L, 3);
         r = (int) luaL_checkinteger(L, 4);
         filled = (int) luaL_optinteger(L, 5, 0); /* TODO: boolean */
     } else {
@@ -693,12 +684,12 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    schar x = 0, y = 0;
+    xchar x = 0, y = 0;
     int r1 = 0, r2 = 0, filled = 0;
 
     if (argc == 4) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         r1 = (int) luaL_checkinteger(L, 3);
         r2 = (int) luaL_checkinteger(L, 4);
         lua_pop(L, 4);
@@ -706,8 +697,8 @@ lua_State *L;
         sel = l_selection_check(L, 1);
         filled = 0;
     } else if (argc == 5 && lua_type(L, 1) == LUA_TNUMBER) {
-        x = (schar) luaL_checkinteger(L, 1);
-        y = (schar) luaL_checkinteger(L, 2);
+        x = (xchar) luaL_checkinteger(L, 1);
+        y = (xchar) luaL_checkinteger(L, 2);
         r1 = (int) luaL_checkinteger(L, 3);
         r2 = (int) luaL_checkinteger(L, 4);
         filled = (int) luaL_optinteger(L, 5, 0); /* TODO: boolean */
@@ -716,8 +707,8 @@ lua_State *L;
         sel = l_selection_check(L, 1);
     } else if (argc == 5 || argc == 6) {
         sel = l_selection_check(L, 1);
-        x = (schar) luaL_checkinteger(L, 2);
-        y = (schar) luaL_checkinteger(L, 3);
+        x = (xchar) luaL_checkinteger(L, 2);
+        y = (xchar) luaL_checkinteger(L, 3);
         r1 = (int) luaL_checkinteger(L, 4);
         r2 = (int) luaL_checkinteger(L, 5);
         filled = (int) luaL_optinteger(L, 6, 0); /* TODO: boolean */

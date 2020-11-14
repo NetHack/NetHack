@@ -42,11 +42,11 @@ static void FDECL(maybe_add_door, (int, int, struct mkroom *));
 static void NDECL(link_doors_rooms);
 static int NDECL(rnddoor);
 static int NDECL(rndtrap);
-static void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
+static void FDECL(get_location, (xchar *, xchar *, int, struct mkroom *));
 static boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 static unpacked_coord FDECL(get_unpacked_coord, (long, int));
-static void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
-static void FDECL(get_free_room_loc, (schar *, schar *,
+static void FDECL(get_room_loc, (xchar *, xchar *, struct mkroom *));
+static void FDECL(get_free_room_loc, (xchar *, xchar *,
                                           struct mkroom *, packed_coord));
 static boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
                                       XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
@@ -1075,7 +1075,7 @@ rndtrap()
  */
 static void
 get_location(x, y, humidity, croom)
-schar *x, *y;
+xchar *x, *y;
 int humidity;
 struct mkroom *croom;
 {
@@ -1207,7 +1207,7 @@ int defhumidity;
 
 void
 get_location_coord(x, y, humidity, croom, crd)
-schar *x, *y;
+xchar *x, *y;
 int humidity;
 struct mkroom *croom;
 long crd;
@@ -1230,7 +1230,7 @@ long crd;
 
 static void
 get_room_loc(x, y, croom)
-schar *x, *y;
+xchar *x, *y;
 struct mkroom *croom;
 {
     coord c;
@@ -1257,11 +1257,11 @@ struct mkroom *croom;
  */
 static void
 get_free_room_loc(x, y, croom, pos)
-schar *x, *y;
+xchar *x, *y;
 struct mkroom *croom;
 packed_coord pos;
 {
-    schar try_x, try_y;
+    xchar try_x, try_y;
     register int trycnt = 0;
 
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
@@ -1741,7 +1741,7 @@ create_trap(t, croom)
 spltrap *t;
 struct mkroom *croom;
 {
-    schar x = -1, y = -1;
+    xchar x = -1, y = -1;
     coord tm;
 
     if (croom) {
@@ -1825,7 +1825,7 @@ monster *m;
 struct mkroom *croom;
 {
     struct monst *mtmp;
-    schar x, y;
+    xchar x, y;
     char class;
     aligntyp amask;
     coord cc;
@@ -2088,7 +2088,7 @@ object *o;
 struct mkroom *croom;
 {
     struct obj *otmp;
-    schar x, y;
+    xchar x, y;
     char c;
     boolean named; /* has a name been supplied in level description? */
 
@@ -2324,7 +2324,8 @@ create_altar(a, croom)
 altar *a;
 struct mkroom *croom;
 {
-    schar sproom, x = -1, y = -1;
+    schar sproom;
+    xchar x = -1, y = -1;
     aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
@@ -3922,7 +3923,7 @@ lspo_grave(L)
 lua_State *L;
 {
     int argc = lua_gettop(L);
-    schar x, y;
+    xchar x, y;
     long scoord;
     int ax,ay;
     char *txt;
@@ -4134,7 +4135,7 @@ lspo_gold(L)
 lua_State *L;
 {
     int argc = lua_gettop(L);
-    schar x, y;
+    xchar x, y;
     long amount;
     long gcoord;
     int gx, gy;
@@ -4885,7 +4886,7 @@ lua_State *L;
         -1, D_ISOPEN, D_CLOSED, D_LOCKED, D_NODOOR, D_BROKEN, D_SECRET
     };
     int msk;
-    schar x,y;
+    xchar x,y;
     xchar typ;
     int argc = lua_gettop(L);
 
@@ -4966,7 +4967,7 @@ lua_State *L;
                                             "throne", "tree", NULL };
     static const int features2i[] = { FOUNTAIN, SINK, POOL,
                                       THRONE, TREE, STONE };
-    schar x,y;
+    xchar x,y;
     int typ;
     int argc = lua_gettop(L);
     boolean can_have_flags = FALSE;
@@ -5167,7 +5168,7 @@ lua_State *L;
         if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
             (void) selection_not(sel);
         } else {
-            schar rx1, ry1, rx2, ry2;
+            xchar rx1, ry1, rx2, ry2;
             rx1 = x1, ry1 = y1, rx2 = x2, ry2 = x2;
             get_location(&rx1, &ry1, ANY_LOC, g.coder->croom);
             get_location(&rx2, &ry2, ANY_LOC, g.coder->croom);
@@ -5825,7 +5826,7 @@ lua_State *L;
 {
     static const char *const wprops[] = { "nondiggable", "nonpasswall", NULL };
     static const int wprop2i[] = { W_NONDIGGABLE, W_NONPASSWALL, -1 };
-    schar dx1 = -1, dy1 = -1, dx2 = -1, dy2 = -1;
+    xchar dx1 = -1, dy1 = -1, dx2 = -1, dy2 = -1;
     int wprop;
 
     create_des_coder();
