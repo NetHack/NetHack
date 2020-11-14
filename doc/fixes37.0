@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.352 $ $NHDT-Date: 1605315160 2020/11/14 00:52:40 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.353 $ $NHDT-Date: 1605316497 2020/11/14 01:14:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -385,6 +385,8 @@ tins of spinach and 'dead' eggs could cause out of array bounds access
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
+Qt: at Xp levels above 20 with 'showexp' On, the combined status field
+	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on

@@ -3,6 +3,43 @@
 // NetHack may be freely redistributed.  See license for details.
 
 // qt_stat.cpp -- status window, upper right portion of the overall window
+//
+// The Qt status window consists of many lines:
+//
+//      hitpoint bar (when enabled)
+//      Title (plname the Rank or plname the MonsterSpecies)
+//      Dungeon location (branch and level)
+//      separator line
+//      six icons (special 40x40 tiles, paired with...)
+//      six characteristic texts ("Str:18/03", "Dex:15", &c)
+//      separator line
+//      five status fields without icons (some containing two values:
+//        Gold, HP/HPmax, Energy/Enmax, AC, XpLevel/ExpPoints or HD)
+//      optional line with two text fields (Time:1234, Score:89)
+//      separator line
+//      varying number of icons (one or more, each paired with...)
+//      corresponding text (Alignment plus zero or more status conditions
+//        including Hunger if not "normal" and encumbrance if not "normal")
+//
+// The hitpoint bar spans the width of the status window when enabled.
+// Title and location are centered.
+// The icons and text for the size characteristics are evenly spaced.
+// The five main stats are padded with an empty sixth and spaced to
+//   match the characteristics.
+// Time and Score are spaced as if each were three fields wide.
+// Icons and texts for alignment and conditions are left justified.
+// The separator lines are thin and don't take up much vertical space.
+// The hitpoint bar line and the Time+Score line are omitted when the
+//   corresponding items are disabled.
+//
+// FIXME:
+//  When hitpoint bar is shown, attempting to resize horizontally won't
+//    do anything.  Toggling it off, then resizing, and back On works.
+//
+// TODO:
+//  If/when status conditions become too wide for the status window, scale
+//    down their icons and switch their text to a smaller font to match.
+//
 
 extern "C" {
 #include "hack.h"
@@ -22,6 +59,8 @@ extern "C" {
 
 extern const char *enc_stat[]; /* from botl.c */
 extern const char *hu_stat[]; /* from eat.c */
+
+extern int qt_compact_mode;
 
 namespace nethack_qt_ {
 
@@ -67,6 +106,11 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     first_set(true),
     alreadyfullhp(false)
 {
+    if (!qt_compact_mode) {
+        int w = NetHackQtBind::mainWidget()->width();
+        setMaximumWidth(w / 2);
+    }
+
     p_str = QPixmap(str_xpm);
     p_str = QPixmap(str_xpm);
     p_dex = QPixmap(dex_xpm);
@@ -648,7 +692,11 @@ void NetHackQtStatusWindow::updateStats()
         // up/down highlighting becomes tricky--don't try very hard
         if (::flags.showexp) {
             buf.sprintf("%ld/%ld", (long) u.ulevel, (long) u.uexp);
-            level.setLabel("Level:" + buf,
+            // at levels above 20, "Level:NN/nnnnnnnn" doesn't fit so
+            // shorten "Level" to "Lvl" at that stage;
+            // at level 30, a few pixels are truncated from the start
+            // and end of "Lvl:30/nnnnnnnnn" but the result is ledgible
+            level.setLabel(((u.ulevel <= 20) ? "Level:" : "Lvl:") + buf,
                            NetHackQtLabelledIcon::NoNum, (long) u.uexp);
         } else {
             level.setLabel("Level:", (long) u.ulevel);
