@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.350 $ $NHDT-Date: 1605184219 2020/11/12 12:30:19 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.352 $ $NHDT-Date: 1605315160 2020/11/14 00:52:40 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -293,6 +293,8 @@ attacking non-adjacent concealed mimic by applying a polearm would make the
 hero could break a wand ("raising the wand high over your head, you break it
 	in two") even if hands were welded to a two-handed weapon or to a
 	one-handed weapon and also to a shield
+if a monster threw a cocktrice egg at the hero but hit and petrified another
+	monster, the hero would get credit/blame for killing it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
