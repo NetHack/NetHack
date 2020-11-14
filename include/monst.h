@@ -82,6 +82,7 @@ struct monst {
     xchar mx, my;
     xchar mux, muy;       /* where the monster thinks you are */
 #define MTSZ 4
+    /* mtrack[0..2] is used to keep extra data when migrating the monster */
     coord mtrack[MTSZ];   /* monster track */
     int mhp, mhpmax;
     unsigned mappearance; /* for undetected mimics and the wiz */

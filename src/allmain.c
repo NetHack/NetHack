@@ -712,43 +712,21 @@ do_positionbar()
 {
     static char pbar[COLNO];
     char *p;
+    stairway *stway = g.stairs;
 
     p = pbar;
-    /* up stairway */
-    if (g.upstair.sx
-        && (glyph_to_cmap(g.level.locations[g.upstair.sx][g.upstair.sy].glyph)
-                == S_upstair
-            || glyph_to_cmap(g.level.locations[g.upstair.sx][g.upstair.sy].glyph)
-                   == S_upladder)) {
-        *p++ = '<';
-        *p++ = g.upstair.sx;
-    }
-    if (g.sstairs.sx
-        && (glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
-                == S_upstair
-            || glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
-                   == S_upladder)) {
-        *p++ = '<';
-        *p++ = g.sstairs.sx;
-    }
+    /* TODO: use the same method as getpos() so objects don't cover stairs */
+    while (stway) {
+        int x = stway->sx;
+        int y = stway->sy;
+        int glyph = glyph_to_cmap(g.level.locations[x][y].glyph);
 
-    /* down stairway */
-    if (g.dnstair.sx
-        && (glyph_to_cmap(g.level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
-                == S_dnstair
-            || glyph_to_cmap(g.level.locations[g.dnstair.sx][g.dnstair.sy].glyph)
-                   == S_dnladder)) {
-        *p++ = '>';
-        *p++ = g.dnstair.sx;
-    }
-    if (g.sstairs.sx
-        && (glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
-                == S_dnstair
-            || glyph_to_cmap(g.level.locations[g.sstairs.sx][g.sstairs.sy].glyph)
-                   == S_dnladder)) {
-        *p++ = '>';
-        *p++ = g.sstairs.sx;
-    }
+        if (is_cmap_stairs(glyph)) {
+            *p++ = (stway->up ? '<' : '>');
+            *p++ = stway->sx;
+        }
+        stway = stway->next;
+     }
 
     /* hero location */
     if (u.ux) {

@@ -1095,20 +1095,16 @@ coord *cc;
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {
+                stairway *stway = g.stairs;
                 /* all map positions are visible (or not good),
                    try to pick something logical */
-                if (g.dnstair.sx && !rn2(2)) {
-                    nx = g.dnstair.sx;
-                    ny = g.dnstair.sy;
-                } else if (g.upstair.sx && !rn2(2)) {
-                    nx = g.upstair.sx;
-                    ny = g.upstair.sy;
-                } else if (g.dnladder.sx && !rn2(2)) {
-                    nx = g.dnladder.sx;
-                    ny = g.dnladder.sy;
-                } else if (g.upladder.sx && !rn2(2)) {
-                    nx = g.upladder.sx;
-                    ny = g.upladder.sy;
+                while (stway) {
+                    if (stway->tolev.dnum == u.uz.dnum && !rn2(2)) {
+                        nx = stway->sx;
+                        ny = stway->sy;
+                        break;
+                    }
+                    stway = stway->next;
                 }
                 if (goodpos(nx, ny, mon, gpflags))
                     goto gotgood;

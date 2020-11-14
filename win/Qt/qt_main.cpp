@@ -1138,6 +1138,16 @@ void NetHackQtMainWindow::layout()
         // call resizePaperDoll() indirectly...
         qt_settings->resizeDoll();
 #endif
+        // reset widths
+        int w = width(); /* of main window */
+        // 10: approximate size of resizing hotspots
+        int d = qt_settings->doll_is_shown ? 10 + invusage->width() + 10 : 10;
+        if (d % 4)
+            d += 4 - d % 4;
+        splittersizes[2] = w / 2 - (d * 1 / 4); // status
+        splittersizes[1] = d - 10;              // invusage
+        splittersizes[0] = w / 2 - (d * 3 / 4); // messages
+        hsplitter->setSizes(splittersizes);
     }
 }
 
@@ -1162,8 +1172,8 @@ void NetHackQtMainWindow::resizePaperDoll(bool showdoll)
         hsplitter->setSizes(hsplittersizes);
     }
 
-    // Height limit is 48 pixels per doll cell;
-    // values greater than 44 need taller window which pushes the map down.
+    // Height limit is 48+2 pixels per doll cell plus 1 pixel margin at top;
+    // values greater than 42+2 need taller window which pushes the map down.
     // FIXME: this doesn't shrink the window back if size is reduced from 45+
     int oldheight = vsplittersizes[0],
         newheight = w->height();

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1596498189 2020/08/03 23:43:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1605315160 2020/11/14 00:52:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -395,8 +395,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             }
         }
         if (otmp->otyp == EGG && touch_petrifies(&mons[otmp->corpsenm])) {
-            if (!munstone(mtmp, TRUE))
-                minstapetrify(mtmp, TRUE);
+            if (!munstone(mtmp, FALSE))
+                minstapetrify(mtmp, FALSE);
             if (resists_ston(mtmp))
                 damage = 0;
         }

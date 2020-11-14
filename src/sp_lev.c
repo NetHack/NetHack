@@ -60,7 +60,6 @@ static void FDECL(create_object, (object *, struct mkroom *));
 static void FDECL(create_altar, (altar *, struct mkroom *));
 static boolean FDECL(search_door, (struct mkroom *,
                                        xchar *, xchar *, XCHAR_P, int));
-static void NDECL(fix_stair_rooms);
 static void FDECL(create_corridor, (corridor *));
 static struct mkroom *FDECL(build_room, (room *, struct mkroom *));
 static void FDECL(light_region, (region *));
@@ -500,6 +499,7 @@ boolean extras;
     struct mkroom *sroom;
     timer_element *timer;
     boolean ball_active = FALSE, ball_fliparea = FALSE;
+    stairway *stway;
 
     /* nothing to do unless (flp & 1) or (flp & 2) or both */
     if ((flp & 3) == 0)
@@ -537,29 +537,11 @@ boolean extras;
     }
 
     /* stairs and ladders */
-    if (flp & 1) {
-        if (xupstair)
-            yupstair = FlipY(yupstair);
-        if (xdnstair)
-            ydnstair = FlipY(ydnstair);
-        if (xupladder)
-            yupladder = FlipY(yupladder);
-        if (xdnladder)
-            ydnladder = FlipY(ydnladder);
-        if (g.sstairs.sx)
-            g.sstairs.sy = FlipY(g.sstairs.sy);
-    }
-    if (flp & 2) {
-        if (xupstair)
-            xupstair = FlipX(xupstair);
-        if (xdnstair)
-            xdnstair = FlipX(xdnstair);
-        if (xupladder)
-            xupladder = FlipX(xupladder);
-        if (xdnladder)
-            xdnladder = FlipX(xdnladder);
-        if (g.sstairs.sx)
-            g.sstairs.sx = FlipX(g.sstairs.sx);
+    for (stway = g.stairs; stway; stway = stway->next) {
+        if (flp & 1)
+            stway->sy = FlipY(stway->sy);
+        if (flp & 2)
+            stway->sx = FlipX(stway->sx);
     }
 
     /* traps */
@@ -2565,52 +2547,6 @@ schar ftyp, btyp;
 }
 
 /*
- * Disgusting hack: since special levels have their rooms filled before
- * sorting the rooms, we have to re-arrange the speed values g.upstairs_room
- * and g.dnstairs_room after the rooms have been sorted.  On normal levels,
- * stairs don't get created until _after_ sorting takes place.
- */
-static void
-fix_stair_rooms()
-{
-    int i;
-    struct mkroom *croom;
-
-    if (xdnstair
-        && !((g.dnstairs_room->lx <= xdnstair
-              && xdnstair <= g.dnstairs_room->hx)
-             && (g.dnstairs_room->ly <= ydnstair
-                 && ydnstair <= g.dnstairs_room->hy))) {
-        for (i = 0; i < g.nroom; i++) {
-            croom = &g.rooms[i];
-            if ((croom->lx <= xdnstair && xdnstair <= croom->hx)
-                && (croom->ly <= ydnstair && ydnstair <= croom->hy)) {
-                g.dnstairs_room = croom;
-                break;
-            }
-        }
-        if (i == g.nroom)
-            panic("Couldn't find dnstair room in fix_stair_rooms!");
-    }
-    if (xupstair
-        && !((g.upstairs_room->lx <= xupstair
-              && xupstair <= g.upstairs_room->hx)
-             && (g.upstairs_room->ly <= yupstair
-                 && yupstair <= g.upstairs_room->hy))) {
-        for (i = 0; i < g.nroom; i++) {
-            croom = &g.rooms[i];
-            if ((croom->lx <= xupstair && xupstair <= croom->hx)
-                && (croom->ly <= yupstair && yupstair <= croom->hy)) {
-                g.upstairs_room = croom;
-                break;
-            }
-        }
-        if (i == g.nroom)
-            panic("Couldn't find upstair room in fix_stair_rooms!");
-    }
-}
-
-/*
  * Corridors always start from a door. But it can end anywhere...
  * Basically we search for door coordinates or for endpoints coordinates
  * (from a distance).
@@ -2622,7 +2558,6 @@ corridor *c;
     coord org, dest;
 
     if (c->src.room == -1) {
-        fix_stair_rooms();
         makecorridors(); /*makecorridors(c->src.door);*/
         return;
     }
@@ -3933,12 +3868,18 @@ boolean using_ladder;
     if (using_ladder) {
         levl[x][y].typ = LADDER;
         if (up) {
-            xupladder = x;
-            yupladder = y;
+            d_level dest;
+
+            dest.dnum = u.uz.dnum;
+            dest.dlevel = u.uz.dlevel - 1;
+            stairway_add(x, y, TRUE, TRUE, &dest);
             levl[x][y].ladder = LA_UP;
         } else {
-            xdnladder = x;
-            ydnladder = y;
+            d_level dest;
+
+            dest.dnum = u.uz.dnum;
+            dest.dlevel = u.uz.dlevel + 1;
+            stairway_add(x, y, FALSE, TRUE, &dest);
             levl[x][y].ladder = LA_DOWN;
         }
     } else {
@@ -5334,17 +5275,15 @@ ensure_way_out()
     struct trap *ttmp = g.ftrap;
     int x,y;
     boolean ret = TRUE;
+    stairway *stway = g.stairs;
 
     set_selection_floodfillchk(floodfillchk_match_accessible);
 
-    if (xupstair && !selection_getpoint(xupstair, yupstair, ov))
-        selection_floodfill(ov, xupstair, yupstair, TRUE);
-    if (xdnstair && !selection_getpoint(xdnstair, ydnstair, ov))
-        selection_floodfill(ov, xdnstair, ydnstair, TRUE);
-    if (xupladder && !selection_getpoint(xupladder, yupladder, ov))
-        selection_floodfill(ov, xupladder, yupladder, TRUE);
-    if (xdnladder && !selection_getpoint(xdnladder, ydnladder, ov))
-        selection_floodfill(ov, xdnladder, ydnladder, TRUE);
+    while (stway) {
+        if (stway->tolev.dnum == u.uz.dnum)
+            selection_floodfill(ov, stway->sx, stway->sy, TRUE);
+        stway = stway->next;
+    }
 
     while (ttmp) {
         if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE

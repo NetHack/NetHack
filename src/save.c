@@ -28,6 +28,7 @@ static void FDECL(savedamage, (NHFILE *));
 static void FDECL(saveobj, (NHFILE *,struct obj *));
 static void FDECL(savemon, (NHFILE *,struct monst *));
 static void FDECL(savelevl, (NHFILE *,BOOLEAN_P));
+static void FDECL(save_stairs, (NHFILE *));
 static void FDECL(saveobjchn, (NHFILE *,struct obj *));
 static void FDECL(savemonchn, (NHFILE *,struct monst *));
 static void FDECL(savetrapchn, (NHFILE *,struct trap *));
@@ -457,11 +458,7 @@ xchar lev;
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
         bwrite(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
-        bwrite(nhfp->fd, (genericptr_t) &g.upstair, sizeof (stairway));
-        bwrite(nhfp->fd, (genericptr_t) &g.dnstair, sizeof (stairway));
-        bwrite(nhfp->fd, (genericptr_t) &g.upladder, sizeof (stairway));
-        bwrite(nhfp->fd, (genericptr_t) &g.dnladder, sizeof (stairway));
-        bwrite(nhfp->fd, (genericptr_t) &g.sstairs, sizeof (stairway));
+        save_stairs(nhfp);
         bwrite(nhfp->fd, (genericptr_t) &g.updest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &g.dndest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &g.level.flags, sizeof g.level.flags);
@@ -496,6 +493,7 @@ xchar lev;
         fobj = 0;
         g.level.buriedobjlist = 0;
         g.billobjs = 0;
+        stairway_free_all();
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
     save_engravings(nhfp);
@@ -665,6 +663,34 @@ struct obj *otmp;
            gets saved/restored whenever any other oxtra components do */
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
+    }
+}
+
+static void
+save_stairs(nhfp)
+NHFILE *nhfp;
+{
+    stairway *stway = g.stairs;
+    int buflen = (int) sizeof (stairway);
+    int len = 0;
+
+    while (stway) {
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel) {
+                len += sizeof(buflen);
+                bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+                len += sizeof(stairway);
+                bwrite(nhfp->fd, (genericptr_t) stway, sizeof(stairway));
+            }
+        }
+        stway = stway->next;
+    }
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            buflen = -1;
+            len += sizeof(buflen);
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        }
     }
 }
 

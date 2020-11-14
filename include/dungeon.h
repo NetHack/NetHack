@@ -34,7 +34,9 @@ typedef struct s_level { /* special dungeon level element */
 typedef struct stairway { /* basic stairway identifier */
     xchar sx, sy;         /* x / y location of the stair */
     d_level tolev;        /* where does it go */
-    char up;              /* what type of stairway (up/down) */
+    boolean up;           /* up or down? */
+    boolean isladder;     /* ladder or stairway? */
+    struct stairway *next;
 } stairway;
 
 /* level region types */

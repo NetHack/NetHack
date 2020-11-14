@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1596498181 2020/08/03 23:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -719,10 +719,7 @@ clear_level_structures()
     g.doorindex = 0;
     init_rect();
     init_vault();
-    xdnstair = ydnstair = xupstair = yupstair = 0;
-    g.sstairs.sx = g.sstairs.sy = 0;
-    xdnladder = ydnladder = xupladder = yupladder = 0;
-    g.dnstairs_room = g.upstairs_room = g.sstairs_room = (struct mkroom *) 0;
+    stairway_free_all();
     g.made_branch = FALSE;
     clear_regions();
     g.xstart = 1;
@@ -1112,13 +1109,6 @@ mklev()
     for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
         g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
 
-    /* something like this usually belongs in clear_level_structures()
-       but these aren't saved and restored so might not retain their
-       values for the life of the current level; reset them to default
-       now so that they never do and no one will be tempted to introduce
-       a new use of them for anything on this level */
-    g.dnstairs_room = g.upstairs_room = g.sstairs_room = (struct mkroom *) 0;
-
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);
 }
@@ -1262,14 +1252,11 @@ xchar x, y; /* location */
     if (br->type == BR_PORTAL) {
         mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
-        g.sstairs.sx = x;
-        g.sstairs.sy = y;
-        g.sstairs.up =
-            (char) on_level(&br->end1, &u.uz) ? br->end1_up : !br->end1_up;
-        assign_level(&g.sstairs.tolev, dest);
-        g.sstairs_room = br_room;
+        boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up
+                                                     : !br->end1_up;
 
-        levl[x][y].ladder = g.sstairs.up ? LA_UP : LA_DOWN;
+        stairway_add(x,y, goes_up, FALSE, dest);
+        levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
     }
     /*
@@ -1615,9 +1602,11 @@ coord *tm;
 void
 mkstairs(x, y, up, croom)
 xchar x, y;
-char up;
-struct mkroom *croom;
+char up;	/* [why 'char' when usage is boolean?] */
+struct mkroom *croom UNUSED;
 {
+    d_level dest;
+
     if (!x) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
@@ -1632,15 +1621,9 @@ struct mkroom *croom;
         || (dunlev(&u.uz) == dunlevs_in_dungeon(&u.uz) && !up))
         return;
 
-    if (up) {
-        xupstair = x;
-        yupstair = y;
-        g.upstairs_room = croom;
-    } else {
-        xdnstair = x;
-        ydnstair = y;
-        g.dnstairs_room = croom;
-    }
+    dest.dnum = u.uz.dnum;
+    dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
+    stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
     levl[x][y].typ = STAIRS;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
@@ -1659,7 +1642,7 @@ struct mkroom *croom;
 int phase;
 {
     return (croom && (croom->needjoining || (phase < 0))
-            && ((croom != g.dnstairs_room && croom != g.upstairs_room)
+            && ((!has_dnstairs(croom) && !has_upstairs(croom))
                 || phase < 1)
             && (croom->rtype == OROOM
                 || ((phase < 2) && croom->rtype == THEMEROOM)));

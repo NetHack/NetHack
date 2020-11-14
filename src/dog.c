@@ -306,6 +306,8 @@ boolean with_you;
     xchar xlocale, ylocale, xyloc, xyflags, wander;
     int num_segs;
     boolean failed_to_place = FALSE;
+    stairway *stway;
+    d_level fromdlev;
 
     mtmp->nmon = fmon;
     fmon = mtmp;
@@ -331,6 +333,8 @@ boolean with_you;
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
     ylocale = mtmp->mtrack[1].y;
+    fromdlev.dnum = mtmp->mtrack[2].x;
+    fromdlev.dlevel = mtmp->mtrack[2].y;
     memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
 
     if (mtmp == u.usteed)
@@ -376,19 +380,34 @@ boolean with_you;
         xlocale = u.ux, ylocale = u.uy;
         break;
     case MIGR_STAIRS_UP:
-        xlocale = xupstair, ylocale = yupstair;
+        if ((stway = stairway_find_from(&fromdlev, FALSE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_STAIRS_DOWN:
-        xlocale = xdnstair, ylocale = ydnstair;
+        if ((stway = stairway_find_from(&fromdlev, FALSE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_LADDER_UP:
-        xlocale = xupladder, ylocale = yupladder;
+        if ((stway = stairway_find_from(&fromdlev, TRUE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_LADDER_DOWN:
-        xlocale = xdnladder, ylocale = ydnladder;
+        if ((stway = stairway_find_from(&fromdlev, TRUE)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_SSTAIRS:
-        xlocale = g.sstairs.sx, ylocale = g.sstairs.sy;
+        if ((stway = stairway_find(&fromdlev)) != 0) {
+            xlocale = stway->sx;
+            ylocale = stway->sy;
+        }
         break;
     case MIGR_PORTAL:
         if (In_endgame(&u.uz)) {
@@ -719,6 +738,8 @@ coord *cc;   /* optional destination coordinates */
         xyflags |= 2;
     mtmp->wormno = num_segs;
     mtmp->mlstmv = g.monstermoves;
+    mtmp->mtrack[2].x = u.uz.dnum; /* migrating from this dungeon */
+    mtmp->mtrack[2].y = u.uz.dlevel; /* migrating from this dungeon level */
     mtmp->mtrack[1].x = cc ? cc->x : mtmp->mx;
     mtmp->mtrack[1].y = cc ? cc->y : mtmp->my;
     mtmp->mtrack[0].x = xyloc;

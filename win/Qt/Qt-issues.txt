@@ -59,4 +59,15 @@ code into its own routine and calling that for both types of windows.
 From the text window code, it sees the initial shift but not the ':'
 that should follow.
 
+Clicking on window close button pops up a confirmation dialog with
+  [  Save and exit  ]  [__Quit_without_saving__]
+with the second one highlighted.  Internally they're specified as
+"&Save" and "&Quit".  Typing <return> or <space> picks Quit, but
+typing 'Q' or 'q' picks Save-and-exit because Alt+Q is expected for
+the keyboard shortcut.
+
+The status window can't be resized while hitpointbar is active.
+Toggling it off, resizing as desired, then toggling it back on is a
+viable workaround.
+
 -----

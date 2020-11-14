@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1604513828 2020/11/04 18:17:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1605305492 2020/11/13 22:11:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -906,6 +906,34 @@ NHFILE *nhfp;
 }
 
 void
+rest_stairs(nhfp)
+NHFILE *nhfp;
+{
+    int buflen = 0;
+    stairway stway;
+    int len = 0;
+
+    stairway_free_all();
+    while (1) {
+        if (nhfp->structlevel) {
+            len += (int) sizeof(buflen);
+            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        }
+
+        if (buflen == -1)
+            break;
+
+        if (nhfp->structlevel) {
+            len += (int) sizeof (stairway);
+            mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
+        }
+
+        stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
+                     &(stway.tolev));
+    }
+}
+
+void
 restcemetery(nhfp, cemeteryaddr)
 NHFILE *nhfp;
 struct cemetery **cemeteryaddr;
@@ -1050,11 +1078,7 @@ xchar lev;
     elapsed = g.monstermoves - g.omoves;
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t)&g.upstair, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.dnstair, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.upladder, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.dnladder, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.sstairs, sizeof(stairway));
+        rest_stairs(nhfp);
         mread(nhfp->fd, (genericptr_t)&g.updest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.dndest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.level.flags, sizeof(g.level.flags));
@@ -1132,16 +1156,27 @@ xchar lev;
     rest_regions(nhfp);
 
     if (ghostly) {
+        stairway *stway = g.stairs;
+        while (stway) {
+            if (!stway->isladder && !stway->up
+                && stway->tolev.dnum == u.uz.dnum)
+                break;
+            stway = stway->next;
+        }
+
         /* Now get rid of all the temp fruits... */
         freefruitchn(g.oldfruit), g.oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
-            && lev < ledger_no(&stronghold_level) && xdnstair == 0) {
+            && lev < ledger_no(&stronghold_level) && !stway) {
             coord cc;
+            d_level dest;
+
+            dest.dnum = u.uz.dnum;
+            dest.dlevel = u.uz.dlevel + 1;
 
             mazexy(&cc);
-            xdnstair = cc.x;
-            ydnstair = cc.y;
+            stairway_add(cc.x, cc.y, FALSE, FALSE, &dest);
             levl[cc.x][cc.y].typ = STAIRS;
         }
 
@@ -1157,8 +1192,15 @@ xchar lev;
             switch (br->type) {
             case BR_STAIR:
             case BR_NO_END1:
-            case BR_NO_END2: /* OK to assign to g.sstairs if it's not used */
-                assign_level(&g.sstairs.tolev, &ltmp);
+            case BR_NO_END2:
+                stway = g.stairs;
+                while (stway) {
+                    if (stway->tolev.dnum != u.uz.dnum)
+                        break;
+                    stway = stway->next;
+                }
+                if (stway)
+                    assign_level(&(stway->tolev), &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
                 for (trap = g.ftrap; trap; trap = trap->ntrap)

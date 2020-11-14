@@ -270,10 +270,7 @@ const struct instance_globals g_init = {
     (ROWNO - 1) & ~1, /* y_maze_max */
     UNDEFINED_VALUE, /* otg_temp */
     0, /* in_doagain */
-    DUMMY, /* dnstair */
-    DUMMY, /* upstair */
-    DUMMY, /* dnladder */
-    DUMMY, /* upladder */
+    NULL, /* stairs */
     DUMMY, /* smeq */
     0, /* doorindex */
     NULL, /* save_cm */
@@ -294,7 +291,6 @@ const struct instance_globals g_init = {
     UNDEFINED_PTR, /* sp_levchn */
     { 0, 0, STRANGE_OBJECT, FALSE }, /* m_shot */
     UNDEFINED_VALUES, /* dungeons */
-    { 0, 0, { 0, 0 }, 0 }, /* sstairs */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* updest */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* dndest */
     { 0, 0} , /* inv_pos */
@@ -305,9 +301,6 @@ const struct instance_globals g_init = {
     FALSE, /* mrg_to_wielded */
     NULL, /* plinemsg_types */
     UNDEFINED_VALUES, /* toplines */
-    UNDEFINED_PTR, /* upstairs_room */
-    UNDEFINED_PTR, /* dnstairs_room */
-    UNDEFINED_PTR, /* sstairs_room */
     DUMMY, /* bhitpos */
     FALSE, /* in_steed_dismounting */
     DUMMY, /* doors */
