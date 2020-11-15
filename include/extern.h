@@ -2502,12 +2502,12 @@ E void FDECL(get_location_coord, (xchar *, xchar *, int, struct mkroom *,
 E void FDECL(selection_setpoint, (int, int, struct selectionvar *, XCHAR_P));
 E struct selectionvar * FDECL(selection_not, (struct selectionvar *));
 E void FDECL(selection_filter_percent, (struct selectionvar *, int));
-E int FDECL(selection_rndcoord, (struct selectionvar *, schar *, schar *,
+E int FDECL(selection_rndcoord, (struct selectionvar *, xchar *, xchar *,
                                  BOOLEAN_P));
 E void FDECL(selection_do_grow, (struct selectionvar *, int));
-E void FDECL(selection_do_line, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P,
+E void FDECL(selection_do_line, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                  struct selectionvar *));
-E void FDECL(selection_do_randline, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P,
+E void FDECL(selection_do_randline, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                      SCHAR_P, SCHAR_P, struct selectionvar *));
 E struct selectionvar *FDECL(selection_filter_mapchar, (struct selectionvar *,
                                                         XCHAR_P, int));

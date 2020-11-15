@@ -43,7 +43,7 @@ static void NDECL(link_doors_rooms);
 static int NDECL(rnddoor);
 static int NDECL(rndtrap);
 static void FDECL(get_location, (xchar *, xchar *, int, struct mkroom *));
-static boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
+static boolean FDECL(is_ok_location, (XCHAR_P, XCHAR_P, int));
 static unpacked_coord FDECL(get_unpacked_coord, (long, int));
 static void FDECL(get_room_loc, (xchar *, xchar *, struct mkroom *));
 static void FDECL(get_free_room_loc, (xchar *, xchar *,
@@ -1145,7 +1145,7 @@ struct mkroom *croom;
 
 static boolean
 is_ok_location(x, y, humidity)
-register schar x, y;
+register xchar x, y;
 register int humidity;
 {
     register int typ;
@@ -2793,7 +2793,7 @@ int humidity;
         if (--tryct < 0)
             break; /* give up */
     } while (!(x % 2) || !(y % 2) || SpLev_Map[x][y]
-             || !is_ok_location((schar) x, (schar) y, humidity));
+             || !is_ok_location((xchar) x, (xchar) y, humidity));
 
     m->x = (xchar) x, m->y = (xchar) y;
 }
@@ -4361,7 +4361,7 @@ int percent;
 int
 selection_rndcoord(ov, x, y, removeit)
 struct selectionvar *ov;
-schar *x, *y;
+xchar *x, *y;
 boolean removeit;
 {
     int idx = 0;
@@ -4712,7 +4712,7 @@ long x, y, x2, y2, gtyp, mind, maxd, limit;
 /* bresenham line algo */
 void
 selection_do_line(x1, y1, x2, y2, ov)
-schar x1, y1, x2, y2;
+xchar x1, y1, x2, y2;
 struct selectionvar *ov;
 {
     int d0, dx, dy, ai, bi, xi, yi;
@@ -4766,7 +4766,8 @@ struct selectionvar *ov;
 
 void
 selection_do_randline(x1, y1, x2, y2, rough, rec, ov)
-schar x1, y1, x2, y2, rough, rec;
+xchar x1, y1, x2, y2;
+schar rough, rec;
 struct selectionvar *ov;
 {
     int mx, my;
@@ -5208,7 +5209,7 @@ struct selectionvar *ov;
         WAN_TELEPORTATION, SCR_TELEPORTATION, RIN_TELEPORTATION
     };
     struct selectionvar *ov2 = selection_new(), *ov3;
-    schar x, y;
+    xchar x, y;
     boolean res = TRUE;
 
     selection_floodfill(ov2, nx, ny, TRUE);

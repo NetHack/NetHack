@@ -318,7 +318,7 @@ lua_State *L;
 {
     struct selectionvar *sel = l_selection_check(L, 1);
     int removeit = (int) luaL_optinteger(L, 2, 0);
-    schar x, y;
+    xchar x, y;
     selection_rndcoord(sel, &x, &y, removeit);
     update_croom();
     if (g.coder && g.coder->croom) {
@@ -739,7 +739,7 @@ lua_State *L;
     struct selectionvar *sel = (struct selectionvar *) 0;
     /* if x2 and y2 aren't set, the gradient has a single center point of x,y;
      * if they are set, the gradient is centered on a (x,y) to (x2,y2) line */
-    schar x = 0, y = 0, x2 = -1, y2 = -1;
+    xchar x = 0, y = 0, x2 = -1, y2 = -1;
     /* points will not be added within mindist of the center; the chance for a
      * point between mindist and maxdist to be added to the selection starts at
      * 0% at mindist and increases linearly to 100% at maxdist */
@@ -758,10 +758,10 @@ lua_State *L;
     if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
         lcheck_param_table(L);
         type = gradtypes2i[get_table_option(L, "type", "radial", gradtypes)];
-        x = (schar) get_table_int(L, "x");
-        y = (schar) get_table_int(L, "y");
-        x2 = (schar) get_table_int_opt(L, "x2", -1);
-        y2 = (schar) get_table_int_opt(L, "y2", -1);
+        x = (xchar) get_table_int(L, "x");
+        y = (xchar) get_table_int(L, "y");
+        x2 = (xchar) get_table_int_opt(L, "x2", -1);
+        y2 = (xchar) get_table_int_opt(L, "y2", -1);
         /* maxdist is required because there's no obvious default value for it,
          * whereas mindist has an obvious defalt of 0 */
         maxdist = get_table_int(L, "maxdist");
