@@ -420,7 +420,7 @@ E void NDECL(save_currentstate);
 E void FDECL(u_collide_m, (struct monst *));
 E void FDECL(goto_level, (d_level *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void NDECL(maybe_lvltport_feedback);
-E void FDECL(schedule_goto, (d_level *, BOOLEAN_P, BOOLEAN_P, int,
+E void FDECL(schedule_goto, (d_level *, int,
                              const char *, const char *));
 E void NDECL(deferred_goto);
 E boolean FDECL(revive_corpse, (struct obj *));

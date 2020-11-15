@@ -941,7 +941,7 @@ level_tele()
         }
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = llimit + newlev;
-        schedule_goto(&newlevel, FALSE, FALSE, 0, (char *) 0, (char *) 0);
+        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
         return;
     }
 
@@ -1049,7 +1049,7 @@ level_tele()
         }
     }
 
-    schedule_goto(&newlevel, FALSE, FALSE, 0, (char *) 0,
+    schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
                   flags.verbose ? "You materialize on a different level!"
                                 : (char *) 0);
 
@@ -1090,7 +1090,7 @@ register struct trap *ttmp;
     }
 
     target_level = ttmp->dst;
-    schedule_goto(&target_level, FALSE, FALSE, 1,
+    schedule_goto(&target_level, UTOTYPE_PORTAL,
                   "You feel dizzy for a moment, but the sensation passes.",
                   (char *) 0);
 }
