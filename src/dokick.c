@@ -1617,7 +1617,7 @@ obj_delivery(near_hero)
 boolean near_hero;
 {
     register struct obj *otmp, *otmp2;
-    register int nx, ny;
+    int nx = 0, ny = 0;
     int where;
     boolean nobreak, noscatter;
     stairway *stway;
@@ -1650,13 +1650,13 @@ boolean near_hero;
         switch (where) {
         case MIGR_LADDER_UP:
             isladder = TRUE;
+            /*FALLTHRU*/
         case MIGR_STAIRS_UP:
         case MIGR_SSTAIRS:
             if ((stway = stairway_find_from(&fromdlev, isladder)) != 0) {
                 nx = stway->sx;
                 nx = stway->sy;
             }
-            break;
             break;
         case MIGR_WITH_HERO:
             nx = u.ux, ny = u.uy;
