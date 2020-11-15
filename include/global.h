@@ -49,9 +49,8 @@
 #endif /* DUMB */
 
 /*
- * type xchar: small integers in the range 0 - 127, usually coordinates
- * although they are nonnegative they must not be declared unsigned
- * since otherwise comparisons with signed quantities are done incorrectly
+ * type xchar: small integers (typedef'd as signed char,
+ * so in the range -127 - 127), usually coordinates.
  */
 typedef schar xchar;
 
