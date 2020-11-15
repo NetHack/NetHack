@@ -1025,10 +1025,9 @@ link_doors_rooms()
 static int
 rnddoor()
 {
-    int i = 1 << rn2(5);
+    static int state[] = { D_NODOOR, D_BROKEN, D_ISOPEN, D_CLOSED, D_LOCKED };
 
-    i >>= 1;
-    return i;
+    return state[rn2(SIZE(state))];
 }
 
 /*
