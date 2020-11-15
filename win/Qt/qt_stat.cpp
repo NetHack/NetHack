@@ -521,8 +521,10 @@ void NetHackQtStatusWindow::HitpointBar()
             w = geoH.right() - geoH.left() + 1; // might yield 0 (ie, if dead)
             styleH.sprintf(styleformat, barcolors[colorindx][0], w, w);
             hpbar_health.setStyleSheet(styleH);
-            // style sheet should be doing this but width was sticking at full
-            hpbar_health.setMaximumWidth(w);
+            // when healing, having the old injury-side shown while the new
+            // health-side expands pushes the injury farther right and it's
+            // momentarily visible there before it gets recalculated+redrawn
+            hpbar_injury.hide(); // will re-show below
             hpbar_health.show(); // don't need to hide() if/when width is 0
 
             int oldleft = geoI.left();
@@ -550,7 +552,6 @@ void NetHackQtStatusWindow::HitpointBar()
             w = geoH.right() - geoH.left() + 1;
             styleH.sprintf(styleformat, barcolors[colorindx][0], w, w);
             hpbar_health.setStyleSheet(styleH);
-            hpbar_health.setMaximumWidth(w); // (see above)
             hpbar_health.show();
 
             alreadyfullhp = true;
