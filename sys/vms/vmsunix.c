@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsunix.c	$NHDT-Date: 1596498310 2020/08/03 23:45:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.7	vmsunix.c	$NHDT-Date: 1605493693 2020/11/16 02:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,7 +54,7 @@ int fd;
     if (fstat(fd, &buf))
         return 0; /* cannot get status */
 #ifndef INSURANCE
-    if (buf.st_size != sizeof(int))
+    if (buf.st_size != sizeof (int))
         return 0; /* not an xlock file */
 #endif
     (void) time(&date);
@@ -62,7 +62,7 @@ int fd;
         int lockedpid; /* should be the same size as hackpid */
         unsigned long status, dummy, code = JPI$_PID;
 
-        if (read(fd, (genericptr_t) &lockedpid, sizeof(lockedpid))
+        if (read(fd, (genericptr_t) &lockedpid, sizeof lockedpid)
             != sizeof(lockedpid)) /* strange ... */
             return 0;
         status = lib$getjpi(&code, &lockedpid, 0, &dummy);
@@ -138,7 +138,7 @@ getlock()
     error(g.locknum ? "Too many hacks running now."
                   : "There is a game in progress under your name.");
 
-gotlock:
+ gotlock:
     fd = creat(g.lock, FCMASK);
     unlock_file(HLOCK);
     if (fd == -1) {
@@ -373,6 +373,45 @@ privon()
 }
 #endif /* CHDIR || SHELL || SECURE */
 
+#ifdef SYSCF
+boolean
+check_user_string(userlist)
+const char *userlist;
+{
+    char usrnambuf[BUFSZ];
+    const char *sptr, *p, *q;
+    int ln;
+
+    if (!strcmp(userlist, "*"))
+        return TRUE;
+
+    /* FIXME: ought to use $getjpi or $getuai to retrieve user name here... */
+    Strcpy(usrnambuf, nh_getenv("USER"));
+    ln = (int) strlen(usrnambuf);
+    if (!ln)
+        return FALSE;
+
+    while ((sptr = strstri(userlist, usrnambuf)) != 0) {
+        /* check for full word: start of list or following a space or comma */
+        if ((sptr == userlist || sptr[-1] == ' ' || sptr[-1] == ',')
+            /* and also preceding a space or comma or at end of list */
+            && (sptr[ln] == ' ' || sptr[ln] == ',' || sptr[ln] == '\0'))
+            return TRUE;
+        /* doesn't match full word, but maybe we got a false hit when
+           looking for "jane" in the list "janedoe jane" so keep going */
+        p = index(sptr + 1, ' ');
+        q = index(sptr + 1, ',');
+        if (!p || (q && q < p))
+            p = q;
+        if (!p)
+            break;
+        userlist = p + 1;
+    }
+
+    return FALSE;
+}
+#endif /* SYSCF */
+
 #if defined(SHELL) || defined(SUSPEND)
 static void
 hack_escape(screen_manip, msg_str)
@@ -406,6 +445,14 @@ unsigned long dosh_pid = 0, /* this should cover any interactive escape */
 int
 dosh()
 {
+#ifdef SYSCF
+    if (!sysopt.shellers || !sysopt.shellers[0]
+        || !check_user_string(sysopt.shellers)) {
+        /* FIXME: should no longer assume a particular command keystroke */
+        Norep("Unavailable command '!'.");
+        return 0;
+    }
+#endif
     return vms_doshell("", TRUE); /* call for interactive child process */
 }
 
@@ -617,7 +664,7 @@ int how; /* 1: exit after traceback; 2: stay in debugger */
            in a last-gasp environment so apply the KISS principle...) */
         DBGCMD("set Module/Calls ; show Calls 18"),
         /* epilogue; "exit" ends the sequence it's part of, but it doesn't
-           seem able to cause program termination end when used separately;
+           seem able to cause program termination when used separately;
            instead of relying on it, we'll redirect debugger input to come
            from the null device so that it'll get an end-of-input condition
            when it tries to get a command from the user */
@@ -844,7 +891,7 @@ const unsigned long lib$initialize[] = { (unsigned long) (void *) vmsexeini };
 #endif
 /*      We also need to link against a linker options file containing:
 sys$library:starlet.olb/Include=(lib$initialize)
-psect_attr=lib$initialize, Con,Usr,noPic,Rel,Gbl,noShr,noExe,Rd,noWrt,Long
+psect_attr=lib$initialize, Con,Rel,Gbl,noShr,noExe,Rd,noWrt
  */
 #endif /* C_LIB$INITIALIZE */
 /* End of debugger hackery. */
