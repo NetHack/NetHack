@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.873 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1605493683 2020/11/16 02:28:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.878 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2768,7 +2768,7 @@ E void NDECL(port_help);
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
 E void FDECL(append_slash, (char *));
-E boolean FDECL(check_user_string, (char *));
+E boolean FDECL(check_user_string, (const char *));
 E char *NDECL(get_login_name);
 E unsigned long NDECL(sys_random_seed);
 #endif /* UNIX */
@@ -2951,6 +2951,9 @@ E char *NDECL(verify_termcap);
 #if defined(CHDIR) || defined(SHELL) || defined(SECURE)
 E void NDECL(privoff);
 E void NDECL(privon);
+#endif
+#ifdef SYSCF
+E boolean FDECL(check_user_string, (const char *));
 #endif
 #ifdef SHELL
 E int NDECL(dosh);

@@ -39,7 +39,7 @@ extern "C" {
 static bool generic_plname()
 {
     if (*g.plname) {
-        const char *sptr;
+        const char *sptr, *p;
         const char *genericusers = sysopt.genericusers;
         int ln = (int) strlen(g.plname);
 
@@ -48,12 +48,18 @@ static bool generic_plname()
         else if (!strcmp(genericusers, "*")) /* "*" => always ask for name */
             return true;
 
-        if ((sptr = strstri(genericusers, g.plname)) != 0
+        while ((sptr = strstri(genericusers, g.plname)) != NULL) {
             /* check for full word: start of list or following a space */
-            && (sptr == genericusers || sptr[-1] == ' ')
-            /* and also preceding a space or at end of list */
-            && (sptr[ln] == ' ' || sptr[ln] == '\0'))
-            return true;
+            if ((sptr == genericusers || sptr[-1] == ' ')
+                /* and also preceding a space or at end of list */
+                && (sptr[ln] == ' ' || sptr[ln] == '\0'))
+                return true;
+            /* doesn't match full word, but maybe we got a false hit when
+               looking for "play" in list "player play" so keep going */
+            if ((p = strchr(sptr + 1, ' ')) == NULL)
+                break;
+            genericusers = p + 1;
+        }
     }
     return false;
 }
