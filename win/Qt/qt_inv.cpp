@@ -222,13 +222,13 @@ QSize NetHackQtInvUsageWindow::sizeHint(void) const
         if (iflags.wc_ascii_map)
             qt_settings->doll_is_shown = false;
         if (qt_settings->doll_is_shown) {
-            w = (1 + qt_settings->dollWidth + 1) * 3;
-            h = (1 + qt_settings->dollHeight + 1) * 6;
+            w += (1 + qt_settings->dollWidth + 1) * 3;
+            h += (1 + qt_settings->dollHeight + 1) * 6;
         }
 #else
         if (iflags.wc_tiled_map) {
-            w = (1 + qt_settings->glyphs().width() + 1) * 3;
-            h = (1 + qt_settings->glyphs().height() + 1) * 6;
+            w += (1 + qt_settings->glyphs().width() + 1) * 3;
+            h += (1 + qt_settings->glyphs().height() + 1) * 6;
         }
 #endif
         return QSize(w, h);

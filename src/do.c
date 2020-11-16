@@ -1446,7 +1446,7 @@ boolean at_stairs, falling, portal;
     assign_level(&u.uz0, &u.uz);
     assign_level(&u.uz, newlevel);
     assign_level(&u.utolev, newlevel);
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
     if (!builds_up(&u.uz)) { /* usual case */
         if (dunlev(&u.uz) > dunlev_reached(&u.uz))
             dunlev_reached(&u.uz) = dunlev(&u.uz);
@@ -1784,24 +1784,13 @@ final_level()
 
 /* change levels at the end of this turn, after monsters finish moving */
 void
-schedule_goto(tolev, at_stairs, falling, portal_flag, pre_msg, post_msg)
+schedule_goto(tolev, utotype_flags, pre_msg, post_msg)
 d_level *tolev;
-boolean at_stairs, falling;
-int portal_flag;
+int utotype_flags;
 const char *pre_msg, *post_msg;
 {
-    int typmask = 0100; /* non-zero triggers `deferred_goto' */
-
-    /* destination flags (`goto_level' args) */
-    if (at_stairs)
-        typmask |= 1;
-    if (falling)
-        typmask |= 2;
-    if (portal_flag)
-        typmask |= 4;
-    if (portal_flag < 0)
-        typmask |= 0200; /* flag for portal removal */
-    u.utotype = typmask;
+    /* UTOTYPE_DEFERRED is used, so UTOTYPE_NONE can trigger deferred_goto() */
+    u.utotype = utotype_flags | UTOTYPE_DEFERRED;
     /* destination level */
     assign_level(&u.utolev, tolev);
 
@@ -1823,8 +1812,10 @@ deferred_goto()
         assign_level(&oldlev, &u.uz);
         if (g.dfr_pre_msg)
             pline1(g.dfr_pre_msg);
-        goto_level(&dest, !!(typmask & 1), !!(typmask & 2), !!(typmask & 4));
-        if (typmask & 0200) { /* remove portal */
+        goto_level(&dest, !!(typmask & UTOTYPE_ATSTAIRS),
+                   !!(typmask & UTOTYPE_FALLING),
+                   !!(typmask & UTOTYPE_PORTAL));
+        if (typmask & UTOTYPE_RMPORTAL) { /* remove portal */
             struct trap *t = t_at(u.ux, u.uy);
 
             if (t) {
@@ -1835,7 +1826,7 @@ deferred_goto()
         if (g.dfr_post_msg && !on_level(&u.uz, &oldlev))
             pline1(g.dfr_post_msg);
     }
-    u.utotype = 0; /* our caller keys off of this */
+    u.utotype = UTOTYPE_NONE; /* our caller keys off of this */
     if (g.dfr_pre_msg)
         free((genericptr_t) g.dfr_pre_msg), g.dfr_pre_msg = 0;
     if (g.dfr_post_msg)

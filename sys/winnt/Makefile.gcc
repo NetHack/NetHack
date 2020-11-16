@@ -127,7 +127,7 @@ TARGET_CPU=x86
 #
 #---------------------------------------------------------------
 ifndef LUA_VERSION
-LUAVER=5.4.0
+LUAVER=5.4.1
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -135,7 +135,7 @@ endif
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.1.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -416,11 +416,11 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
 #=================================================================
 
 ifndef LUAVER
-LUAVER   = 5.4.0
+LUAVER   = 5.4.1
 endif
 LUASRC   = $(LUATOP)/src
 LUALIB   = $(O)lua-$(LUAVER).static.a
@@ -446,7 +446,7 @@ LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
 		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
 ifeq "$(LUAVER)" "5.3.5"
-#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  5.4.0 added header files ljumptab.h and lopnames.h and removes lbitlib.c
 #  so we have to tack those on for the previous version (5.3.5)
 LUASRCFILES = $(LUASRCFILES) lbitlib.c
 LUAOBJFILES = $(LUAOBJFILES) lbitlib.o

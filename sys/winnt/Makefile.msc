@@ -131,7 +131,7 @@ DEBUGINFO = Y
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 !IFNDEF LUA_VERSION
-LUAVER=5.4.0
+LUAVER=5.4.1
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -140,7 +140,7 @@ LUAVER=$(LUA_VERSION)
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.1.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -385,7 +385,7 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
 #=================================================================
 
 !IFNDEF LUAVER
@@ -394,6 +394,9 @@ LUATMP   = $(LUATOP:..\lib\lua-=)    #strip leading "..\lib\lua-"
 LUATMP   = $(LUATMP:-beta=)         #strip suffix if exists "-beta"
 !IF "$(LUATMP)" == "5.4.0"
 LUAVER   = 5.4.0
+!ENDIF
+!IF "$(LUATMP)" == "5.4.1"
+LUAVER   = 5.4.1
 !ENDIF
 !ELSE
 !ERROR NetHack 3.7 requires LUA so LUATOP must be defined
@@ -405,7 +408,7 @@ LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
 !IF "$(LUATMP)" == "5.3.5"
 LUAVER   = 5.3.5
 !ELSE
-LUAVER   = 5.4.0
+LUAVER   = 5.4.1
 !ENDIF
 !ENDIF
 !ENDIF
@@ -437,7 +440,7 @@ LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o                \
 LUASRCFILES = $(LUASRCFILES) lbitlib.c
 LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
 !ELSE
-#  5.4.0 adds header files ljumptab.h and lopnames.h
+#  5.4.0 added header files ljumptab.h and lopnames.h
 #        and removes lbitlib.c
 !ENDIF
 

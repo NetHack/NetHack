@@ -215,7 +215,7 @@ HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 
 LUAOBJ = nhlua.o,nhlsel.o
 
-#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  5.4.0 added header files ljumptab.h and lopnames.h and removes lbitlib.c
 #  so comment top two and uncomment bottom two for the previous version (5.3.5)
 LUA535SRCFILES =
 LUA535OBJFILES =

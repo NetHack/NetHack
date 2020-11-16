@@ -48,8 +48,8 @@ static void FDECL(write_ls, (NHFILE *, light_source *));
 static int FDECL(maybe_write_ls, (NHFILE *, int, BOOLEAN_P));
 
 /* imported from vision.c, for small circles */
-extern char circle_data[];
-extern char circle_start[];
+extern xchar circle_data[];
+extern xchar circle_start[];
 
 
 /* Create a new light source.  Caller (and extern.h) doesn't need to know
@@ -144,13 +144,13 @@ anything *id;
 /* Mark locations that are temporarily lit via mobile light sources. */
 void
 do_light_sources(cs_rows)
-char **cs_rows;
+xchar **cs_rows;
 {
     int x, y, min_x, max_x, max_y, offset;
-    char *limits;
+    xchar *limits;
     short at_hero_range = 0;
     light_source *ls;
-    char *row;
+    xchar *row;
 
     for (ls = g.light_base; ls; ls = ls->next) {
         ls->flags &= ~LSF_SHOW;

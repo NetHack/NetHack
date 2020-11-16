@@ -24,7 +24,7 @@ export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER
 export LIB=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/$VSVER/$TOOLSVER/VC/Tools/MSVC/$MSVER/lib/x86:$LIB
 export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/ucrt/x86:$LIB
 export LIB=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/lib/$WKITVER/um/x86:$LIB
-export LUA_VERSION=5.4.0
+export LUA_VERSION=5.4.1
 mkdir -p lib
 cd lib
 git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses

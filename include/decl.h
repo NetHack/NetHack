@@ -803,8 +803,8 @@ struct instance_globals {
 
     /* display.c */
     gbuf_entry gbuf[ROWNO][COLNO];
-    char gbuf_start[ROWNO];
-    char gbuf_stop[ROWNO];
+    xchar gbuf_start[ROWNO];
+    xchar gbuf_stop[ROWNO];
 
 
     /* do.c */
@@ -828,7 +828,7 @@ struct instance_globals {
     int petname_used; /* user preferred pet name has been used */
     xchar gtyp;  /* type of dog's current goal */
     xchar gx; /* x position of dog's current goal */
-    char  gy; /* y position of dog's current goal */
+    xchar gy; /* y position of dog's current goal */
     char dogname[PL_PSIZ];
     char catname[PL_PSIZ];
     char horsename[PL_PSIZ];
@@ -1169,9 +1169,9 @@ struct instance_globals {
                                       Stormbringer's maliciousness. */
 
     /* vision.c */
-    char **viz_array; /* used in cansee() and couldsee() macros */
-    char *viz_rmin;			/* min could see indices */
-    char *viz_rmax;			/* max could see indices */
+    xchar **viz_array; /* used in cansee() and couldsee() macros */
+    xchar *viz_rmin;			/* min could see indices */
+    xchar *viz_rmax;			/* max could see indices */
     boolean vision_full_recalc;
 
     /* weapon.c */

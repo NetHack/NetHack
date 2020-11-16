@@ -334,6 +334,15 @@ enum utraptypes {
     TT_BURIEDBALL = 5
 };
 
+enum utotypes {
+    UTOTYPE_NONE     = 0x00,
+    UTOTYPE_ATSTAIRS = 0x01,
+    UTOTYPE_FALLING  = 0x02,
+    UTOTYPE_PORTAL   = 0x04,
+    UTOTYPE_RMPORTAL = 0x10,  /* remove portal */
+    UTOTYPE_DEFERRED = 0x20,  /* deferred_goto */
+};
+
 /*** Information about the player ***/
 struct you {
     xchar ux, uy;       /* current map coordinates */

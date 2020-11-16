@@ -614,7 +614,7 @@ u_init()
     u.udg_cnt = 0;
     u.mh = u.mhmax = u.mtimedone = 0;
     u.uz.dnum = u.uz0.dnum = 0;
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
 #endif /* 0 */
 
     u.uz.dlevel = 1;
