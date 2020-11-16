@@ -1978,7 +1978,7 @@ dodip()
     } else if (obj->otyp == POT_POLYMORPH || potion->otyp == POT_POLYMORPH) {
         /* some objects can't be polymorphed */
         if (obj->otyp == potion->otyp /* both POT_POLY */
-            || obj->otyp == WAN_POLYMORPH || obj->otyp == SPE_POLYMORPH
+            || unpolyable(obj)
             || obj == uball || obj == uskin
             || obj_resists(obj->otyp == POT_POLYMORPH ? potion : obj,
                            5, 95)) {
