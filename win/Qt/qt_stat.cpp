@@ -14,9 +14,9 @@
 //      six characteristic texts ("Str:18/03", "Dex:15", &c)
 //      separator line
 //      five status fields without icons (some containing two values:
-//        Gold, HP/HPmax, Energy/Enmax, AC, XpLevel/ExpPoints or HD)
-//      optional line with two text fields (Time:1234, Score:89)
+//        HP/HPmax, Energy/Enmax, AC, XpLevel/ExpPoints or HD, [blank], Gold)
 //      separator line
+//      optional line with two text fields (Time:1234, Score:89)
 //      varying number of icons (one or more, each paired with...)
 //      corresponding text (Alignment plus zero or more status conditions
 //        including Hunger if not "normal" and encumbrance if not "normal")
@@ -29,16 +29,38 @@
 // Time and Score are spaced as if each were three fields wide.
 // Icons and texts for alignment and conditions are left justified.
 // The separator lines are thin and don't take up much vertical space.
-// The hitpoint bar line and the Time+Score line are omitted when the
-//   corresponding items are disabled.
+// When enabled, the hitpoint bar bisects the margin above Title,
+//   increasing the overall status height by 9 pixels; when disabled,
+//   the status shifts up by those 9 pixels.
+// When Time+Score line is empty, it still takes up the vertical space
+//   that would be used to show those values.
 //
 // FIXME:
 //  When hitpoint bar is shown, attempting to resize horizontally won't
 //    do anything.  Toggling it off, then resizing, and back On works.
+//    (Caused by specifying min-width and max-width constraints in the
+//    style sheets used to control color, but removing those constraints
+//    causes the bar display to get screwed up.)
 //
 // TODO:
 //  If/when status conditions become too wide for the status window, scale
 //    down their icons and switch their text to a smaller font to match.
+//  Title and Location are explicitly rendered with a bigger font than
+//    the rest of status.  That takes up more space, which is ok, but it
+//    also increases the vertical margin in between them by more than is
+//    necessary.  Should squeeze some of that excess blank space out.
+//  Changed values are highlighted as "gone Up" (green) or "gone Down" (red)
+//    with NetHackQtLabelledIcon::setLabel() taking an optional boolean
+//    argument indicating "lower is better" (for AC).  That flag should
+//    have other choices:  "changed" (third color with no better or worse
+//    judgement, for alignment and dungeon location) and "ignore" (don't
+//    highlight, to suppress the bogus highlighting that currently happens
+//    when toggling 'showexp' or 'showscore').
+//  Maybe:  if Alignment was moved to the characteristics line, giving that
+//    seven columns, then Time and Score could replace the one blank field
+//    on the HP line, giving it seven fields too and eliminating a whole
+//    line.  [Maybe handle this dynamically, controlled via existing
+//    'statuslines' 2 vs 3 that's currently a no-op for Qt?]
 //
 
 extern "C" {
@@ -65,43 +87,49 @@ extern int qt_compact_mode;
 namespace nethack_qt_ {
 
 NetHackQtStatusWindow::NetHackQtStatusWindow() :
+    /* first three rows:  hitpoint bar, title (plname the Rank), location */
+    hpbar_health(this),
+    hpbar_injury(this),
     name(this,"(name)"),
     dlevel(this,"(dlevel)"),
+    /* next two rows:  icon over text label for the six characteristics */
     str(this, "Str"),
     dex(this, "Dex"),
     con(this, "Con"),
     intel(this, "Int"),
     wis(this, "Wis"),
     cha(this, "Cha"),
-    gold(this,"Gold"),
+    /* sixth row, text only:  some contain two slash-separated values */
     hp(this,"Hit Points"),
     power(this,"Power"),
-    ac(this,"Armour Class"),
-    level(this,"Level"),
-    exp(this, "_"), // exp displayed as Xp/Exp but exp widget used for padding
+    ac(this,"Armor Class"),
+    level(this,"Level"), // Xp level, with "/"+Exp points optionally appended
+    blank1(this, ""),    // used for padding to align columns (was once 'exp')
+    gold(this,"Gold"),   // gold used to be this row's first column, now last
+    /* seventh row:  two optionally displayed values (just text, no icons) */
+    time(this,"Time"),   // if 'time' option On
+    score(this,"Score"), // if SCORE_ON_BOTL defined and 'showscore' option On
+    /* last two rows:  alignment followed by conditions (icons over text) */
     align(this,"Alignment"),
-    time(this,"Time"),
-    score(this,"Score"),
     hunger(this,""),
     encumber(this,""),
-    stoned(this,"Stone"),
+    stoned(this,"Stone"),     // major conditions
     slimed(this,"Slime"),
     strngld(this,"Strngl"),
     sick_fp(this,"FoodPois"),
     sick_il(this,"TermIll"),
-    stunned(this,"Stun"),
+    stunned(this,"Stun"),     // minor conditions
     confused(this,"Conf"),
     hallu(this,"Hallu"),
-    blind(this,""),
+    blind(this,"Blind"),
     deaf(this,"Deaf"),
-    lev(this,"Lev"),
+    lev(this,"Lev"),          // 'other' conditions
     fly(this,"Fly"),
     ride(this,"Ride"),
-    hpbar_health(this),
-    hpbar_injury(this),
-    hline1(this),
+    hline1(this),             // separators
     hline2(this),
     hline3(this),
+    /* miscellaneous; not display fields */
     cursy(0),
     first_set(true),
     alreadyfullhp(false)
@@ -179,6 +207,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     hline2.setLineWidth(1);
     hline3.setLineWidth(1);
 
+    // set up last but shown first (above name) via layout below */
     QHBoxLayout *hpbar = InitHitpointBar();
 
 #if 1 //RLC
@@ -200,12 +229,12 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     vbox->addLayout(atr1box);
     vbox->addWidget(&hline2);
     QHBoxLayout *atr2box = new QHBoxLayout();
-	atr2box->addWidget(&gold);
 	atr2box->addWidget(&hp);
 	atr2box->addWidget(&power);
 	atr2box->addWidget(&ac);
 	atr2box->addWidget(&level);
-	atr2box->addWidget(&exp);
+	atr2box->addWidget(&blank1); // empty column #5
+	atr2box->addWidget(&gold);
     vbox->addLayout(atr2box);
     vbox->addWidget(&hline3);
     QHBoxLayout *timebox = new QHBoxLayout();
@@ -251,15 +280,14 @@ void NetHackQtStatusWindow::doUpdate()
     intel.setFont(normal);
     wis.setFont(normal);
     cha.setFont(normal);
-    gold.setFont(normal);
     hp.setFont(normal);
     power.setFont(normal);
     ac.setFont(normal);
     level.setFont(normal);
-    //exp.setFont(normal);
-    align.setFont(normal);
+    gold.setFont(normal);
     time.setFont(normal);
     score.setFont(normal);
+    align.setFont(normal);
     hunger.setFont(normal);
     encumber.setFont(normal);
     stoned.setFont(normal);
@@ -415,7 +443,6 @@ void NetHackQtStatusWindow::fadeHighlighting()
     power.dissipateHighlight();
     ac.dissipateHighlight();
     level.dissipateHighlight();
-    //exp.dissipateHighlight();
     align.dissipateHighlight();
 
     time.dissipateHighlight();
@@ -646,14 +673,9 @@ void NetHackQtStatusWindow::updateStats()
     if (Stunned) stunned.show(); else stunned.hide();
     if (Confusion) confused.show(); else confused.hide();
     if (Hallucination) hallu.show(); else hallu.hide();
-    // [pr - Why is blind handled differently from other on/off conditions?]
-    if (Blind) {
-	blind.setLabel("Blind");
-	blind.show();
-    } else {
-	blind.hide();
-    }
+    if (Blind) blind.show(); else blind.hide();
     if (Deaf) deaf.show(); else deaf.hide();
+
     // flying is blocked when levitating, so Lev and Fly are mutually exclusive
     if (Levitation) lev.show(); else lev.hide();
     if (Flying) fly.show(); else fly.hide();
@@ -676,8 +698,6 @@ void NetHackQtStatusWindow::updateStats()
     // false: always highlight as 'change for the better' regardless of
     // new depth compared to old
     dlevel.setLabel(buf3, false);
-
-    gold.setLabel("Au:", money_cnt(g.invent));
 
     if (Upolyd) {
         // You're a monster!
@@ -706,12 +726,9 @@ void NetHackQtStatusWindow::updateStats()
     buf.sprintf("/%d", u.uenmax);
     power.setLabel("Pow:", u.uen, buf);
     ac.setLabel("AC:", (long) u.uac);
-    //if (::flags.showexp) {
-    //    exp.setLabel("Exp:", (long) u.uexp);
-    //} else {
-        // 'exp' is now only used to pad the line that Xp/Exp is displayed on
-        exp.setLabel("");
-    //}
+    // label prefix used to be "Au:", tty uses "$:"
+    gold.setLabel("Gold:", money_cnt(g.invent));
+
     text = NULL;
     if (u.ualign.type==A_CHAOTIC) {
 	align.setIcon(p_chaotic);
@@ -763,7 +780,6 @@ void NetHackQtStatusWindow::updateStats()
 	power.highlightWhenChanging();
 	ac.highlightWhenChanging(); ac.lowIsGood();
 	level.highlightWhenChanging();
-        //exp.highlightWhenChanging(); -- 'exp' is just padding
 	align.highlightWhenChanging();
 
         // don't highlight 'time' because it changes almost continuously

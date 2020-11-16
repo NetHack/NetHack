@@ -65,9 +65,18 @@ private:
 	QPixmap p_fly;
 	QPixmap p_ride;
 
-	NetHackQtLabelledIcon name;
-	NetHackQtLabelledIcon dlevel;
+        /*
+         *  Status fields, in display order (the three separator lines
+         *  are exceptions).  Hitpoint bar is optionally displayed and
+         *  contains two side-by-side parts; neither part is labelled.
+         */
+        QLabel hpbar_health;          // hit point bar, left half
+        QLabel hpbar_injury;          // hit point bar, right half
+        NetHackQtLabelledIcon name;   // (aka title) centered on its own row
+        NetHackQtLabelledIcon dlevel; // (aka location) likewise
 
+        /* the six characteristics; each is shown with a 40x40 icon above
+           and a text label below, so implicitly two rows */
 	NetHackQtLabelledIcon str;
 	NetHackQtLabelledIcon dex;
 	NetHackQtLabelledIcon con;
@@ -75,21 +84,34 @@ private:
 	NetHackQtLabelledIcon wis;
 	NetHackQtLabelledIcon cha;
 
-	NetHackQtLabelledIcon gold;
-	NetHackQtLabelledIcon hp;
-	NetHackQtLabelledIcon power;
-	NetHackQtLabelledIcon ac;
-        NetHackQtLabelledIcon level; // Xp level
-        NetHackQtLabelledIcon exp;   // appended to Xp rather than separate
-                                     // but still used to pad their line
-        NetHackQtLabelledIcon align; // alignment is on Conditions line
-                                     // because it has an icon above it
-	NetHackQtLabelledIcon time;
-	NetHackQtLabelledIcon score;
+        /* five various status fields, some showing two values, shown as
+           a row of text only; 'exp' used to be a separate field but is
+           now displayed with 'level', with a blank field where it was so
+           that there continue to be six columns which line up beneath the
+           characteristics; gold used to be left-most but doesn't warrant
+           that position; Xp or Xp/Exp is replaced by HD when polymorphed */
+        NetHackQtLabelledIcon hp;     // current HP / maximum HP
+        NetHackQtLabelledIcon power;  // current energy / maximum energy
+        NetHackQtLabelledIcon ac;     // armor class
+        NetHackQtLabelledIcon level;  // Xp level / Exp points (if 'showexp')
+        NetHackQtLabelledIcon blank1; // pads the line to six columns
+        NetHackQtLabelledIcon gold;   // used to come before HP
 
-	NetHackQtLabelledIcon hunger;
-	NetHackQtLabelledIcon encumber;
+        /* next row:  two more fields, possibly blank; when present, each
+           is sized as if for three fields, so their centered values line
+           up with 2nd and 5th columns of the rows above */
+        NetHackQtLabelledIcon time;   // moves counter (if 'time' is set)
+        NetHackQtLabelledIcon score;  // tentative score (if compiled with
+                                      // SCORE_ON_BOTL and 'showscore' is set)
 
+        /* last rows:  alignment and zero or more status conditions;
+           like the characteristics, they are shown as if in two rows with
+           a 40x40 icon above and text lebel below; blank values are omitted
+           and non-blank values are left justified */
+        NetHackQtLabelledIcon align;    // w/ alignment-specific ankh icon
+        NetHackQtLabelledIcon hunger;   // blank if 'normal'
+        NetHackQtLabelledIcon encumber; // blank if 'unencumbered' ('normal')
+        /* zero or more status conditions; in major, minor, 'other' order */
 	NetHackQtLabelledIcon stoned;
 	NetHackQtLabelledIcon slimed;
 	NetHackQtLabelledIcon strngld;
@@ -104,12 +126,9 @@ private:
 	NetHackQtLabelledIcon fly;
 	NetHackQtLabelledIcon ride;
 
-        QLabel hpbar_health; // hit point bar, left half
-        QLabel hpbar_injury; // hit point bar, right half
-
-	QFrame hline1;
-	QFrame hline2;
-	QFrame hline3;
+        QFrame hline1; // between dlevel and characteristics
+        QFrame hline2; // between characteristics and regular status fields
+        QFrame hline3; // between regular fields and time,score or conditions
 
 	int cursy;
 
