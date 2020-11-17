@@ -1476,6 +1476,16 @@ struct obj *obj;
     delobj(obj);
 }
 
+/* Returns TRUE if obj resists polymorphing */
+boolean
+obj_unpolyable(obj)
+struct obj *obj;
+{
+    return (unpolyable(obj)
+            || obj == uball || obj == uskin
+            || obj_resists(obj, 5, 95));
+}
+
 /* classes of items whose current charge count carries over across polymorph
  */
 static const char charged_objs[] = { WAND_CLASS, WEAPON_CLASS, ARMOR_CLASS,
@@ -1964,7 +1974,7 @@ struct obj *obj, *otmp;
         switch (otmp->otyp) {
         case WAN_POLYMORPH:
         case SPE_POLYMORPH:
-            if (unpolyable(obj) || obj_resists(obj, 5, 95)) {
+            if (obj_unpolyable(obj)) {
                 res = 0;
                 break;
             }
