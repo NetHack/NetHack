@@ -167,6 +167,11 @@ void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
     // This nethack engine feature should be moved into windowport API
     nt_kbhit = NetHackQtBind::qt_kbhit;
 #endif
+
+#ifndef DYNAMIC_STATUSLINES
+    // 'statuslines' option can be set in config file but not via 'O'
+    set_wc2_option_mod_status(WC2_STATUSLINES, set_gameview);
+#endif
 }
 
 int NetHackQtBind::qt_kbhit()
@@ -443,7 +448,7 @@ int NetHackQtBind::qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list)
 void NetHackQtBind::qt_update_inventory()
 {
     if (main)
-	main->updateInventory();
+	main->updateInventory(); // update the paper doll inventory subset
     /* doesn't work yet
     if (g.program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, false);
@@ -820,6 +825,18 @@ void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
     window->UseRIP(how, when);
 }
 
+void NetHackQtBind::qt_preference_update(const char *optname)
+{
+#ifdef DYNAMIC_STATUSLINES  // leave disabled; redoStatus() doesn't work
+    if (!strcmp(optname, "statuslines")) {
+        // delete and recreate status window
+        main->redoStatus();
+    }
+#else
+    nhUse(optname);
+#endif
+}
+
 char *NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
 {
     NetHackQtMessageWindow *window = main->GetMessageWindow();
@@ -954,7 +971,7 @@ struct window_procs Qt_procs = {
      | WC_ASCII_MAP | WC_TILED_MAP
      | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
      | WC_POPUP_DIALOG | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN),
-    (WC2_HITPOINTBAR),
+    (WC2_HITPOINTBAR | WC2_STATUSLINES),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
@@ -1012,8 +1029,7 @@ struct window_procs Qt_procs = {
 #else
     genl_outrip,
 #endif
-    genl_preference_update,
-
+    nethack_qt_::NetHackQtBind::qt_preference_update,
     nethack_qt_::NetHackQtBind::qt_getmsghistory,
     nethack_qt_::NetHackQtBind::qt_putmsghistory,
     genl_status_init,

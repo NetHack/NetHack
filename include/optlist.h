@@ -425,13 +425,8 @@ pfx_##a,
     NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No, NoAlias,
                 "highlight control")
 #endif
-#ifdef CURSES_GRAPHICS
     NHOPTC(statuslines, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
-                "2 or 3 lines for horizontal (bottom or top) status display")
-#else
-    NHOPTC(statuslines, 20, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "2 or 3 lines for status display")
-#endif
 #ifdef WIN32
     NHOPTC(subkeyvalue, 7, opt_in, set_in_config, No, Yes, Yes, No, NoAlias,
                 "override keystroke value")

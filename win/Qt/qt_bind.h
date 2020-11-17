@@ -81,6 +81,7 @@ public:
 	static void qt_start_screen();
 	static void qt_end_screen();
 
+        static void qt_preference_update(const char *optname);
         static char *qt_getmsghistory(BOOLEAN_P init);
         static void qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring);
 

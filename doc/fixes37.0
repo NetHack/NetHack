@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.353 $ $NHDT-Date: 1605316497 2020/11/14 01:14:57 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.354 $ $NHDT-Date: 1605578879 2020/11/17 02:07:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -295,6 +295,7 @@ hero could break a wand ("raising the wand high over your head, you break it
 	one-handed weapon and also to a shield
 if a monster threw a cocktrice egg at the hero but hit and petrified another
 	monster, the hero would get credit/blame for killing it
+update persistent inventory when putting on a helmet causes it to auto-curse
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

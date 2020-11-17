@@ -41,6 +41,8 @@
 //    (Caused by specifying min-width and max-width constraints in the
 //    style sheets used to control color, but removing those constraints
 //    causes the bar display to get screwed up.)
+//  There are separate icons for Satiated and Hungry, but Weak, Fainting,
+//    and Fainted all share the Hungry one when they should be different.
 //
 // TODO:
 //  If/when status conditions become too wide for the status window, scale
@@ -56,11 +58,12 @@
 //    judgement, for alignment and dungeon location) and "ignore" (don't
 //    highlight, to suppress the bogus highlighting that currently happens
 //    when toggling 'showexp' or 'showscore').
-//  Maybe:  if Alignment was moved to the characteristics line, giving that
-//    seven columns, then Time and Score could replace the one blank field
-//    on the HP line, giving it seven fields too and eliminating a whole
-//    line.  [Maybe handle this dynamically, controlled via existing
-//    'statuslines' 2 vs 3 that's currently a no-op for Qt?]
+//  The condensed display (statuslines:2; Alignment with Characteristics
+//    instead of with Conditions and Time,Score on HP,...,Gold row) has
+//    vertical padding when the Conditions row is empty, but having the
+//    first Cond come On or the last one go Off still makes the rest of
+//    status shift a little as if the padding (same size icon plus empty
+//    text label) was slightly taller than a regular Cond.
 //
 
 extern "C" {
@@ -111,6 +114,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     score(this,"Score"), // if SCORE_ON_BOTL defined and 'showscore' option On
     /* last two rows:  alignment followed by conditions (icons over text) */
     align(this,"Alignment"),
+    blank2(this, ""),    // used to prevent Conditions row from being empty
     hunger(this,""),
     encumber(this,""),
     stoned(this,"Stone"),     // major conditions
@@ -150,6 +154,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     p_chaotic = QPixmap(chaotic_xpm);
     p_neutral = QPixmap(neutral_xpm);
     p_lawful = QPixmap(lawful_xpm);
+    p_blank2 = QPixmap(blank_xpm);
 
     p_satiated = QPixmap(satiated_xpm);
     p_hungry = QPixmap(hungry_xpm);
@@ -182,6 +187,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     cha.setIcon(p_cha);
 
     align.setIcon(p_neutral);
+    blank2.setIcon(p_blank2); // used for spacing when Conditions row is empty
     hunger.setIcon(p_hungry);
     encumber.setIcon(p_encumber[0]);
 
@@ -210,60 +216,98 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     // set up last but shown first (above name) via layout below */
     QHBoxLayout *hpbar = InitHitpointBar();
 
+    // 'statuslines' takes a value of 2 or 3; we use 3 as a request to put
+    // Alignment in front of status conditions so that line is never empty
+    // and to show Time and/or Score on their own line which might be empty
+    boolean spreadout = (::iflags.wc2_statuslines != 2);
+
 #if 1 //RLC
     name.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     dlevel.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     QVBoxLayout *vbox = new QVBoxLayout();
     vbox->setSpacing(0);
-    vbox->addLayout(hpbar);
+    vbox->addLayout(hpbar); // when 'hitpointbar' is enabled, it comes first
     vbox->addWidget(&name);
     vbox->addWidget(&dlevel);
     vbox->addWidget(&hline1);
-    QHBoxLayout *atr1box = new QHBoxLayout();
-	atr1box->addWidget(&str);
-	atr1box->addWidget(&dex);
-	atr1box->addWidget(&con);
-	atr1box->addWidget(&intel);
-	atr1box->addWidget(&wis);
-	atr1box->addWidget(&cha);
-    vbox->addLayout(atr1box);
+    QHBoxLayout *charbox = new QHBoxLayout(); // Characteristics
+        charbox->addWidget(&str);
+        charbox->addWidget(&dex);
+        charbox->addWidget(&con);
+        charbox->addWidget(&intel);
+        charbox->addWidget(&wis);
+        charbox->addWidget(&cha);
+        if (!spreadout) {
+            // when condensed, include Alignment with Characteristics
+            charbox->addWidget(&align);
+        }
+    vbox->addLayout(charbox);
     vbox->addWidget(&hline2);
-    QHBoxLayout *atr2box = new QHBoxLayout();
-	atr2box->addWidget(&hp);
-	atr2box->addWidget(&power);
-	atr2box->addWidget(&ac);
-	atr2box->addWidget(&level);
-	atr2box->addWidget(&blank1); // empty column #5
-	atr2box->addWidget(&gold);
-    vbox->addLayout(atr2box);
-    vbox->addWidget(&hline3);
-    QHBoxLayout *timebox = new QHBoxLayout();
-	timebox->addWidget(&time);
-	timebox->addWidget(&score);
-    vbox->addLayout(timebox);
-    QHBoxLayout *statbox = new QHBoxLayout();
-	statbox->addWidget(&align);
-	statbox->addWidget(&hunger);
-	statbox->addWidget(&encumber);
-	statbox->addWidget(&stoned);
-	statbox->addWidget(&slimed);
-	statbox->addWidget(&strngld);
-	statbox->addWidget(&sick_fp);
-	statbox->addWidget(&sick_il);
-	statbox->addWidget(&stunned);
-	statbox->addWidget(&confused);
-	statbox->addWidget(&hallu);
-	statbox->addWidget(&blind);
-	statbox->addWidget(&deaf);
-	statbox->addWidget(&lev);
-	statbox->addWidget(&fly);
-	statbox->addWidget(&ride);
-    statbox->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    QHBoxLayout *statbox = new QHBoxLayout(); // core status fields
+        statbox->addWidget(&hp);
+        statbox->addWidget(&power);
+        statbox->addWidget(&ac);
+        statbox->addWidget(&level);
+        if (spreadout) {
+            // when not condensed, put a blank field in front of Gold;
+            // Time and Score will be shown on their own separate line
+            statbox->addWidget(&blank1); // empty column #5 of 6
+            statbox->addWidget(&gold);
+        } else {
+            // when condensed, display Time and Score on HP,...,Gold row
+#ifndef SCORE_ON_BOTL
+            statbox->addWidget(&blank1); // empty column #5 of 7
+#else
+            statbox->addWidget(&score);  // usually empty column #5
+#endif
+            statbox->addWidget(&gold);   // columns 6 and maybe empty 7
+            statbox->addWidget(&time);
+        }
     vbox->addLayout(statbox);
+    vbox->addWidget(&hline3); // separtor before Time+Score or Conditions
+    if (spreadout) {
+        // when not condensed, put Time and Score on an extra row; since
+        // they're both optionally displayed, their row might be empty
+        // TODO? when neither will be shown, set their heights smaller
+        // and if either gets toggled On, set height back to normal
+        QHBoxLayout *timebox = new QHBoxLayout();
+            timebox->addWidget(&time);
+            timebox->addWidget(&score);
+        vbox->addLayout(timebox);
+    }
+    QHBoxLayout *condbox = new QHBoxLayout(); // Conditions
+        if (spreadout) {
+            // when not condensed, include Alignment with Conditions to
+            // spread things out and also so that their row is never empty
+            condbox->addWidget(&align);
+        } else {
+            // otherwise place a padding widget on this row; it will be
+            // hidden if any Conditions are shown, or shown (with blank
+            // icon and empty text) when there aren't any, reserving
+            // space (the height of the row) for later conditions
+            condbox->addWidget(&blank2);
+        }
+        condbox->addWidget(&hunger);
+        condbox->addWidget(&encumber);
+        condbox->addWidget(&stoned);
+        condbox->addWidget(&slimed);
+        condbox->addWidget(&strngld);
+        condbox->addWidget(&sick_fp);
+        condbox->addWidget(&sick_il);
+        condbox->addWidget(&stunned);
+        condbox->addWidget(&confused);
+        condbox->addWidget(&hallu);
+        condbox->addWidget(&blind);
+        condbox->addWidget(&deaf);
+        condbox->addWidget(&lev);
+        condbox->addWidget(&fly);
+        condbox->addWidget(&ride);
+    condbox->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    vbox->addLayout(condbox);
     setLayout(vbox);
 #endif
 
-    connect(qt_settings,SIGNAL(fontChanged()),this,SLOT(doUpdate()));
+    connect(qt_settings, SIGNAL(fontChanged()), this, SLOT(doUpdate()));
     doUpdate();
 }
 
@@ -633,6 +677,9 @@ void NetHackQtStatusWindow::updateStats()
     wis.setLabel("Wis:", (long) ACURR(A_WIS));
     cha.setLabel("Cha:", (long) ACURR(A_CHA));
 
+    boolean spreadout = (::iflags.wc2_statuslines != 2);
+    int k = 0; // number of conditions shown
+
     const char* hung=hu_stat[u.uhs];
     if (hung[0]==' ') {
 	hunger.hide();
@@ -640,7 +687,7 @@ void NetHackQtStatusWindow::updateStats()
 	hunger.setIcon(u.uhs ? p_hungry : p_satiated);
 	hunger.setLabel(hung);
         hunger.ForceResize();
-	hunger.show();
+	++k, hunger.show();
     }
     const char *enc = enc_stat[near_capacity()];
     if (enc[0]==' ' || !enc[0]) {
@@ -649,20 +696,20 @@ void NetHackQtStatusWindow::updateStats()
 	encumber.setIcon(p_encumber[near_capacity() - 1]);
 	encumber.setLabel(enc);
         encumber.ForceResize();
-	encumber.show();
+	++k, encumber.show();
     }
-    if (Stoned) stoned.show(); else stoned.hide();
-    if (Slimed) slimed.show(); else slimed.hide();
-    if (Strangled) strngld.show(); else strngld.hide();
+    if (Stoned) ++k, stoned.show(); else stoned.hide();
+    if (Slimed) ++k, slimed.show(); else slimed.hide();
+    if (Strangled) ++k, strngld.show(); else strngld.hide();
     if (Sick) {
         /* FoodPois or TermIll or both */
 	if (u.usick_type & SICK_VOMITABLE) { /* food poisoning */
-	    sick_fp.show();
+	    ++k, sick_fp.show();
 	} else {
 	    sick_fp.hide();
 	}
 	if (u.usick_type & SICK_NONVOMITABLE) { /* terminally ill */
-	    sick_il.show();
+	    ++k, sick_il.show();
 	} else {
 	    sick_il.hide();
 	}
@@ -670,16 +717,16 @@ void NetHackQtStatusWindow::updateStats()
 	sick_fp.hide();
 	sick_il.hide();
     }
-    if (Stunned) stunned.show(); else stunned.hide();
-    if (Confusion) confused.show(); else confused.hide();
-    if (Hallucination) hallu.show(); else hallu.hide();
-    if (Blind) blind.show(); else blind.hide();
-    if (Deaf) deaf.show(); else deaf.hide();
+    if (Stunned) ++k, stunned.show(); else stunned.hide();
+    if (Confusion) ++k, confused.show(); else confused.hide();
+    if (Hallucination) ++k, hallu.show(); else hallu.hide();
+    if (Blind) ++k, blind.show(); else blind.hide();
+    if (Deaf) ++k, deaf.show(); else deaf.hide();
 
     // flying is blocked when levitating, so Lev and Fly are mutually exclusive
-    if (Levitation) lev.show(); else lev.hide();
-    if (Flying) fly.show(); else fly.hide();
-    if (u.usteed) ride.show(); else ride.hide();
+    if (Levitation) ++k, lev.show(); else lev.hide();
+    if (Flying) ++k, fly.show(); else fly.hide();
+    if (u.usteed) ++k, ride.show(); else ride.hide();
 
     if (Upolyd) {
 	buf = nh_capitalize_words(mons[u.umonnum].mname);
@@ -748,6 +795,13 @@ void NetHackQtStatusWindow::updateStats()
         // justified relative to the label text for some unknown reason...
         align.ForceResize();
     }
+    if (spreadout)
+        ++k; // when not condensed, Alignment is shown on the Conditions row
+
+    if (!k) {
+        blank2.show(); // for vertical spacing: force the row to be non-empty
+    } else
+        blank2.hide();
 
     if (::flags.time)
         time.setLabel("Time:", (long) g.moves);

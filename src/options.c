@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1603666043 2020/10/25 22:47:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.478 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1605618310 2020/11/17 13:05:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.480 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3381,9 +3381,9 @@ char *op;
             itmp = atoi(op);
         }
         if (itmp < 2 || itmp > 3) {
-            config_error_add("'%s' requires a value of 2 or 3",
-                             allopt[optidx].name);
-            retval = optn_err;
+            config_error_add("'%s:%s' is invalid; must be 2 or 3",
+                             allopt[optidx].name, op);
+            retval = optn_silenterr;
         } else {
             iflags.wc2_statuslines = itmp;
             if (!g.opt_initial)
@@ -4212,13 +4212,9 @@ char *op;
 
         if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
             != empty_optstr) {
+            nmcpy(g.chosen_windowtype, op, WINTYPELEN);
             if (!iflags.windowtype_deferred) {
-                char buf[WINTYPELEN];
-
-                nmcpy(buf, op, WINTYPELEN);
-                choose_windows(buf);
-            } else {
-                nmcpy(g.chosen_windowtype, op, WINTYPELEN);
+                choose_windows(g.chosen_windowtype);
             }
         } else
             return optn_err;

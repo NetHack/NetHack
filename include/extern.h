@@ -3154,6 +3154,7 @@ E int FDECL(unturn_dead, (struct monst *));
 E void NDECL(unturn_you);
 E void FDECL(cancel_item, (struct obj *));
 E boolean FDECL(drain_item, (struct obj *, BOOLEAN_P));
+E boolean FDECL(obj_unpolyable, (struct obj *));
 E struct obj *FDECL(poly_obj, (struct obj *, int));
 E boolean FDECL(obj_resists, (struct obj *, int, int));
 E boolean FDECL(obj_shudders, (struct obj *));
