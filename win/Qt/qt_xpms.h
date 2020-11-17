@@ -3,7 +3,8 @@
 // In alhpabetical order by array name.  Probably not the best ordering...
 
 /* clang-format off */
-#if 0   // blank icon for use as placeholder
+
+// blank icon for use as placeholder
 /* XPM */
 static const char *blank_xpm[] = {
 /* width height ncolors chars_per_pixel */
@@ -57,7 +58,8 @@ static const char *blank_xpm[] = {
 "........................................",
 "........................................"
 };
-#endif
+
+// Characteristics, Alignment, and Conditions
 static const char *blind_xpm[] = {
 /* width height ncolors chars_per_pixel */
 "40 40 5 1",
@@ -1821,4 +1823,5 @@ static const char *wis_xpm[] = {
 "oooooooooooooooooooooooooooooooooooooooo",
 "oooooooooooooooooooooooooooooooooooooooo"
 };
+
 /* clang-format on */

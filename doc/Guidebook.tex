@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{October 2, 2020}
+\date{November 16, 2020}
 
 \maketitle
 
@@ -4621,8 +4621,36 @@ it starts up (default yes).
 %.lp
 \item[\ib{statuslines}]
 Number of lines for traditional below-the-map status display.
-Acceptable values are 2 and 3 (default is 2).
-Curses and tty interfaces only.
+Acceptable values are {\tt 2} and {\tt 3} (default is {\tt 2}).
+
+%.lp ""
+For {\tt 3}, the {\tt tty} interface moves some fields around and
+mainly shows status conditions on their own line.
+A display capable of showing at least 25 lines is recommended.
+The value can be toggled back and forth during the game with the `O'
+command.
+
+%.lp ""
+The {\tt curses} interface does likewise if the
+{\it align\verb+_+status\/}
+option is set to {\it top\/} or {\it bottom\/} but ignores
+{\it statuslines\/}
+when set to {\it left\/} or {\it right}.
+
+%.lp ""
+The {\tt Qt} interface already displays more than 3 lines for status
+so uses the
+{\it statuslines\/}
+value differently.
+A value of {\tt 3} renders status in the {\tt Qt} interface's
+original format, with the status window spread out vertically.
+A value of {\tt 2} makes status be slightly condensed, moving some
+fields to different lines to eliminate one whole line, reducing the
+height needed.
+For {\tt Qt},
+{\it statuslines\/}
+can only be set in the configuration file or via NETHACKOPTIONS, not
+with the `O' command.
 %.lp
 \item[\ib{term\verb+_+cols} {\normalfont and}]
 %.lp

@@ -1148,6 +1148,24 @@ void NetHackQtMainWindow::layout()
     }
 }
 
+#ifdef DYNAMIC_STATUSLINES  // leave disabled; this doesn't work as intended
+// called when 'statuslines' changes from 2 to 3 or vice versa; simpler to
+// destroy and recreate the status window than to adjust existing fields
+void NetHackQtMainWindow::redoStatus()
+{
+    NetHackQtStatusWindow *oldstatus = this->status;
+    if (!oldstatus)
+        return; // not ready yet?
+    this->status = new NetHackQtStatusWindow;
+
+    if (!qt_compact_mode)
+        hsplitter->replaceWidget(2, this->status->Widget());
+
+    delete oldstatus;
+    ShowIfReady();
+}
+#endif
+
 void NetHackQtMainWindow::resizePaperDoll(bool showdoll)
 {
 #ifdef ENHANCED_PAPERDOLL

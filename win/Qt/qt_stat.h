@@ -46,6 +46,7 @@ private:
 	QPixmap p_chaotic;
 	QPixmap p_neutral;
 	QPixmap p_lawful;
+        QPixmap p_blank2; // conditionally used for vertical spacing
 
 	QPixmap p_satiated;
 	QPixmap p_hungry;
@@ -109,6 +110,7 @@ private:
            a 40x40 icon above and text lebel below; blank values are omitted
            and non-blank values are left justified */
         NetHackQtLabelledIcon align;    // w/ alignment-specific ankh icon
+        NetHackQtLabelledIcon blank2;   // used for spacing if Align is moved
         NetHackQtLabelledIcon hunger;   // blank if 'normal'
         NetHackQtLabelledIcon encumber; // blank if 'unencumbered' ('normal')
         /* zero or more status conditions; in major, minor, 'other' order */

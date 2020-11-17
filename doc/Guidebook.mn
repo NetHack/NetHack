@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.395 $ $NHDT-Date: 1596785362 2020/08/07 07:29:22 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ $NHDT-Date: 1605618309 2020/11/17 13:05:09 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 2, 2020
+.ds f2 "November 16, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4241,8 +4241,33 @@ If NetHack can, it should display an opening splash screen when it starts
 up (default yes).
 .lp statuslines
 Number of lines for traditional below-the-map status display.
-Acceptable values are 2 and 3 (default is 2).
-Curses and tty interfaces only.
+Acceptable values are \f(CR2\fP and \f(CR3\fP (default is \f(CR2\fP).
+.lp ""
+For \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
+mainly shows status conditions on their own line.
+A display capable of showing at least 25 lines is recommended.
+The value can be toggled back and forth during the game with the \(oqO\(cq
+command.
+.lp ""
+The \f(CRcurses\fP interface does likewise if the
+.op align_status
+option is set to \fItop\fP or \fIbottom\fP but ignores
+.op statuslines
+when set to \fIleft\fP or \fIright\fP.
+.lp ""
+The \f(CRQt\fP interface already displays more than 3 lines for status
+so uses the
+.op statuslines
+value differently.
+A value of \f(CR3\fP renders status in the \f(CRQt\fP interface's
+original format, with the status window spread out vertically.
+A value of \f(CR2\fP makes status be slightly condensed, moving some
+fields to different lines to eliminate one whole line, reducing the
+height needed.
+For \f(CRQt\fP,
+.op statuslines
+can only be set in the configuration file or via NETHACKOPTIONS, not
+with the \(oqO\(cq command.
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.

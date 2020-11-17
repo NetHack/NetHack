@@ -52,6 +52,10 @@ public:
         void FuncAsCommand(int NDECL((*func)));
         // this is unconditional in case qt_main.h comes before qt_set.h
         void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
+#ifdef DYNAMIC_STATUSLINES
+        // called when 'statuslines' option has been changed
+        void redoStatus();
+#endif
 
 public slots:
 	void doMenuItem(QAction *);
