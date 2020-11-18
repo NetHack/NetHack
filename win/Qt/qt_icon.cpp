@@ -2,7 +2,24 @@
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
 
-// qt_icon.cpp -- a labelled icon
+// qt_icon.cpp -- a labelled icon for display in the status window
+//
+// TODO?
+//  When the label specifies two values separated by a slash (curHP/maxHP,
+//    curEn/maxEn, XpLevel/ExpPoints when 'showexp' is On), highlighting
+//    for changes is all or nothing.  curHP and curEn go up and down
+//    without any change to the corresponding maximum all the time.  Much
+//    rarer, but when maxHP and maxEn go up with level gain, the hero
+//    could be injured by a passive counterattack or collateral damage
+//    from an area effect--or much simpler, the casting cost of a spell
+//    that killed a monster and produced the level gain--so the current
+//    value could stay the same or even go down at same time max goes up.
+//    Likewise, Exp goes up a lot but Xp relatively rarely.  (On the very
+//    rare occasions where either goes down, they'll both do so.)
+//    Highlighting two slash-separated values independently would be
+//    worthwhile but with the 'single label using a style sheet for color'
+//    approach it isn't going to happen.
+//
 
 extern "C" {
 #include "hack.h"
@@ -18,24 +35,25 @@ extern "C" {
 
 namespace nethack_qt_ {
 
-NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget* parent, const char* l) :
+NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l) :
     QWidget(parent),
+    label(new QLabel(l,this)),
+    icon(NULL),
     low_is_good(false),
     prev_value(-123),
-    turn_count(-1),
-    label(new QLabel(l,this)),
-    icon(0)
+    turn_count(-1)
 {
     initHighlight();
 }
 
-NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget* parent, const char* l, const QPixmap& i) :
+NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l,
+                                             const QPixmap &i) :
     QWidget(parent),
+    label(new QLabel(l,this)),
+    icon(new QLabel(this)),
     low_is_good(false),
     prev_value(-123),
-    turn_count(-1),
-    label(new QLabel(l,this)),
-    icon(new QLabel(this))
+    turn_count(-1)
 {
     setIcon(i);
     initHighlight();
@@ -43,6 +61,7 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget* parent, const char* l, con
 
 void NetHackQtLabelledIcon::initHighlight()
 {
+    // note: named 'green' is much darker than Qt::green
     hl_good = "QLabel { background-color : green; color : white }";
     hl_bad  = "QLabel { background-color : red  ; color : white }";
 }

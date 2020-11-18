@@ -757,17 +757,27 @@ void NetHackQtStatusWindow::updateStats()
         buf.sprintf("/%d", u.uhpmax);
         hp.setLabel("HP:", std::max((long) u.uhp, 0L), buf);
         // if Exp points are to be displayed, append them to Xp level;
-        // up/down highlighting becomes tricky--don't try very hard
-        if (::flags.showexp) {
-            buf.sprintf("%ld/%ld", (long) u.ulevel, (long) u.uexp);
-            // at levels above 20, "Level:NN/nnnnnnnn" doesn't fit so
-            // shorten "Level" to "Lvl" at that stage;
-            // at level 30, a few pixels are truncated from the start
-            // and end of "Lvl:30/nnnnnnnnn" but the result is ledgible
-            level.setLabel(((u.ulevel <= 20) ? "Level:" : "Lvl:") + buf,
-                           NetHackQtLabelledIcon::NoNum, (long) u.uexp);
-        } else {
-            level.setLabel("Level:", (long) u.ulevel);
+        // up/down highlighting becomes tricky--don't try very hard;
+        // depending upon font size and status layout, "Level:NN/nnnnnnnn"
+        // might be too wide to fit
+        static const char *const lvllbl[3] = { "Level:", "Lvl:", "L:" };
+        QFontMetrics fm(level.label->font());
+        int startingpass = ::flags.showexp ? 0 : 3;
+        for (int i = startingpass; i < 6; ++i) {
+            // passes 0,1,2 are with Exp, 3,4,5 without (3 should always fit)
+            if (i < 3) {
+                buf.sprintf("%s%ld/%ld", lvllbl[i],
+                            (long) u.ulevel, (long) u.uexp);
+                level.setLabel(buf, NetHackQtLabelledIcon::NoNum,
+                               (long) u.uexp);
+            } else {
+                buf.sprintf("%s%ld", lvllbl[i - 3], (long) u.ulevel);
+                level.setLabel(buf, NetHackQtLabelledIcon::NoNum,
+                               (long) u.ulevel);
+            }
+            // 2: allow a couple of pixels at either end to be clipped off
+            if (fm.size(0, buf).width() <= (2 + level.width() + 2))
+                break;
         }
     }
     buf.sprintf("/%d", u.uenmax);
@@ -803,13 +813,37 @@ void NetHackQtStatusWindow::updateStats()
     } else
         blank2.hide();
 
-    if (::flags.time)
+    if (::flags.time) {
+        // hypothetically Time could grow to enough digits to have trouble
+        // fitting, but it's not worth worrying about
         time.setLabel("Time:", (long) g.moves);
-    else
+    } else {
         time.setLabel("");
+    }
 #ifdef SCORE_ON_BOTL
     if (::flags.showscore) {
-        score.setLabel("Score:", (long) botl_score());
+        long pts = botl_score();
+        if (spreadout) {
+            // plenty of room; Time and Score both have the width of 3 fields
+            score.setLabel("Score:", pts);
+        } else {
+            // depending upon font size and status layout, "Score:nnnnnnnn"
+            // might be too wide to fit (simpler version of Level:NN/nnnnnnnn)
+            static const char *const scrlbl[3] = { "Score:", "Scr:", "S:" };
+            QFontMetrics fm(score.label->font());
+            for (int i = 0; i < 3; ++i) {
+                buf.sprintf("%s%ld", scrlbl[i], pts);
+                score.setLabel(buf, NetHackQtLabelledIcon::NoNum, pts);
+                // 2: allow a couple of pixels at either end to be clipped off
+                if (fm.size(0, buf).width() <= (2 + score.width() + 2))
+                    break;
+            }
+            // with Xp/Exp, we fallback to Xp if the shortest label prefix
+            // is still too long; here we just show a clipped value and
+            // let user either live with it or turn 'showscore' off (or
+            // set statuslines:3 to take advantage of the extra room that
+            // the spread out status layout provides)
+        }
     } else
 #endif
     {
