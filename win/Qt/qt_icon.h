@@ -11,15 +11,18 @@ namespace nethack_qt_ {
 
 class NetHackQtLabelledIcon : public QWidget {
 public:
-	NetHackQtLabelledIcon(QWidget* parent, const char* label);
-	NetHackQtLabelledIcon(QWidget* parent, const char* label, const QPixmap& icon);
+        NetHackQtLabelledIcon(QWidget *parent, const char *label);
+        NetHackQtLabelledIcon(QWidget *parent, const char *label,
+                              const QPixmap &icon);
 
 	enum { NoNum=-99999 };
-	void setLabel(const QString&, bool lower=true); // a string
-	void setLabel(const QString&, long, const QString& tail=""); // a number
-	void setLabel(const QString&, long show_value, long comparative_value, const QString& tail="");
-	void setIcon(const QPixmap&);
-	virtual void setFont(const QFont&);
+        void setLabel(const QString &, bool lower=true); // string
+        void setLabel(const QString &, long, const QString &tail=""); // number
+        void setLabel(const QString &, long show_value,
+                      long comparative_value, const QString &tail="");
+        void setIcon(const QPixmap &);
+        virtual void setFont(const QFont &);
+        //QString labelText() { return QString(this->label->text()); }
 
 	void highlightWhenChanging();
 	void lowIsGood();
@@ -29,6 +32,9 @@ public:
 	virtual void show();
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;
+
+        QLabel *label;
+        QLabel *icon;
 
 protected:
 	void resizeEvent(QResizeEvent*);
@@ -44,9 +50,6 @@ private:
 	int turn_count;		/* last time the value changed */
 	QString hl_good;
 	QString hl_bad;
-
-	QLabel* label;
-	QLabel* icon;
 };
 
 } // namespace nethack_qt_
