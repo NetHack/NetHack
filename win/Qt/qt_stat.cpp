@@ -58,12 +58,6 @@
 //    judgement, for alignment and dungeon location) and "ignore" (don't
 //    highlight, to suppress the bogus highlighting that currently happens
 //    when toggling 'showexp' or 'showscore').
-//  The condensed display (statuslines:2; Alignment with Characteristics
-//    instead of with Conditions and Time,Score on HP,...,Gold row) has
-//    vertical padding when the Conditions row is empty, but having the
-//    first Cond come On or the last one go Off still makes the rest of
-//    status shift a little as if the padding (same size icon plus empty
-//    text label) was slightly taller than a regular Cond.
 //
 
 extern "C" {
@@ -114,7 +108,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     score(this,"Score"), // if SCORE_ON_BOTL defined and 'showscore' option On
     /* last two rows:  alignment followed by conditions (icons over text) */
     align(this,"Alignment"),
-    blank2(this, ""),    // used to prevent Conditions row from being empty
+    blank2(this, " "),   // used to prevent Conditions row from being empty
     hunger(this,""),
     encumber(this,""),
     stoned(this,"Stone"),     // major conditions
@@ -133,6 +127,8 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     hline1(this),             // separators
     hline2(this),
     hline3(this),
+    vline1(this), // vertical separator between Characteristics and Alignment
+    vline2(this), // padding for row 2 to match row 1's separator; not shown
     /* miscellaneous; not display fields */
     cursy(0),
     first_set(true),
@@ -206,12 +202,18 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     ride.setIcon(p_ride);
 
     // separator lines
-    hline1.setFrameStyle(QFrame::HLine|QFrame::Sunken);
-    hline2.setFrameStyle(QFrame::HLine|QFrame::Sunken);
-    hline3.setFrameStyle(QFrame::HLine|QFrame::Sunken);
+    hline1.setFrameStyle(QFrame::HLine | QFrame::Sunken);
+    hline2.setFrameStyle(QFrame::HLine | QFrame::Sunken);
+    hline3.setFrameStyle(QFrame::HLine | QFrame::Sunken);
     hline1.setLineWidth(1);
     hline2.setLineWidth(1);
     hline3.setLineWidth(1);
+    // vertical separators for condensed layout (statuslines:2)
+    vline1.setFrameStyle(QFrame::VLine | QFrame::Sunken);
+    vline2.setFrameStyle(QFrame::VLine | QFrame::Sunken);
+    vline1.setLineWidth(1); // separates Alignment from Charisma
+    vline2.setLineWidth(1);
+    vline2.hide(); // padding to keep row 2 aligned with row 1, never shown
 
     // set up last but shown first (above name) via layout below */
     QHBoxLayout *hpbar = InitHitpointBar();
@@ -239,6 +241,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
         charbox->addWidget(&cha);
         if (!spreadout) {
             // when condensed, include Alignment with Characteristics
+            charbox->addWidget(&vline1); // show a short vertical separator
             charbox->addWidget(&align);
         }
     vbox->addLayout(charbox);
@@ -261,6 +264,7 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
             statbox->addWidget(&score);  // usually empty column #5
 #endif
             statbox->addWidget(&gold);   // columns 6 and maybe empty 7
+            statbox->addWidget(&vline2); // padding between 6 and 7; not shown
             statbox->addWidget(&time);
         }
     vbox->addLayout(statbox);
@@ -328,10 +332,19 @@ void NetHackQtStatusWindow::doUpdate()
     power.setFont(normal);
     ac.setFont(normal);
     level.setFont(normal);
+    blank1.setFont(normal); // padding
     gold.setFont(normal);
     time.setFont(normal);
     score.setFont(normal);
     align.setFont(normal);
+    // blank2 is used as a dummy condition when Alignment has been moved
+    // elsewhere (statuslines:2) and no other conditions currently apply;
+    // it has a blank icon with a label of a single space (if the label
+    // is completely empty, the rest of status shifts down a little when
+    // one or more real conditions replace it and shifts up again when
+    // all conditions are removed and this one is reinstated--as if "" is
+    // slightly taller than " ")
+    blank2.setFont(normal);
     hunger.setFont(normal);
     encumber.setFont(normal);
     stoned.setFont(normal);
@@ -762,40 +775,46 @@ void NetHackQtStatusWindow::updateStats()
         // might be too wide to fit
         static const char *const lvllbl[3] = { "Level:", "Lvl:", "L:" };
         QFontMetrics fm(level.label->font());
-        int startingpass = ::flags.showexp ? 0 : 3;
-        for (int i = startingpass; i < 6; ++i) {
-            // passes 0,1,2 are with Exp, 3,4,5 without (3 should always fit)
+        for (int i = ::flags.showexp ? 0 : 3; i < 4; ++i) {
+            // passes 0,1,2 are with Exp, 3 is without Exp and always fits
             if (i < 3) {
-                buf.sprintf("%s%ld/%ld", lvllbl[i],
-                            (long) u.ulevel, (long) u.uexp);
-                level.setLabel(buf, NetHackQtLabelledIcon::NoNum,
-                               (long) u.uexp);
+                buf.sprintf("%s%ld/%ld", lvllbl[i], (long) u.ulevel, u.uexp);
             } else {
                 buf.sprintf("%s%ld", lvllbl[i - 3], (long) u.ulevel);
-                level.setLabel(buf, NetHackQtLabelledIcon::NoNum,
-                               (long) u.ulevel);
             }
-            // 2: allow a couple of pixels at either end to be clipped off
-            if (fm.size(0, buf).width() <= (2 + level.width() + 2))
+            // +2: allow a couple of pixels at either end to be clipped off
+            if (fm.size(0, buf).width() <= (2 + level.label->width() + 2))
                 break;
         }
+        level.setLabel(buf, NetHackQtLabelledIcon::NoNum,
+                       // if we intended to show Exp but must settle
+                       // for Xp due to width, we still want to use
+                       // Exp for setLabel()'s Up|Down highlighting
+                       ::flags.showexp ? u.uexp : (long) u.ulevel);
     }
     buf.sprintf("/%d", u.uenmax);
-    power.setLabel("Pow:", u.uen, buf);
+    power.setLabel("Pow:", (long) u.uen, buf);
     ac.setLabel("AC:", (long) u.uac);
-    // label prefix used to be "Au:", tty uses "$:"
-    gold.setLabel("Gold:", money_cnt(g.invent));
+    // gold prefix used to be "Au:", tty uses "$:"; never too wide to fit;
+    // practical limit due to carrying capacity limit is less than 300K
+    long goldamt = money_cnt(g.invent);
+    goldamt = std::max(goldamt, 0L); // sanity; core's botl() does likewise
+    goldamt = std::min(goldamt, 99999999L); // ditto
+    gold.setLabel("Gold:", goldamt);
 
     text = NULL;
-    if (u.ualign.type==A_CHAOTIC) {
-	align.setIcon(p_chaotic);
-	text = "Chaotic";
-    } else if (u.ualign.type==A_NEUTRAL) {
-	align.setIcon(p_neutral);
-	text = "Neutral";
+    if (u.ualign.type == A_LAWFUL) {
+        align.setIcon(p_lawful);
+        text = "Lawful";
+    } else if (u.ualign.type == A_NEUTRAL) {
+        align.setIcon(p_neutral);
+        text = "Neutral";
     } else {
-	align.setIcon(p_lawful);
-	text = "Lawful";
+        // Unaligned should never happen but handle it sanely if it does
+        align.setIcon(p_chaotic);
+        text = (u.ualign.type == A_CHAOTIC) ? "Chaotic"
+               : (u.ualign.type == A_NONE) ? "unaligned"
+                 : "other?";
     }
     if (text) {
         // false: don't highlight as 'became lower' even if the internal
@@ -833,11 +852,11 @@ void NetHackQtStatusWindow::updateStats()
             QFontMetrics fm(score.label->font());
             for (int i = 0; i < 3; ++i) {
                 buf.sprintf("%s%ld", scrlbl[i], pts);
-                score.setLabel(buf, NetHackQtLabelledIcon::NoNum, pts);
-                // 2: allow a couple of pixels at either end to be clipped off
+                // +2: allow couple of pixels at either end to be clipped off
                 if (fm.size(0, buf).width() <= (2 + score.width() + 2))
                     break;
             }
+            score.setLabel(buf, NetHackQtLabelledIcon::NoNum, pts);
             // with Xp/Exp, we fallback to Xp if the shortest label prefix
             // is still too long; here we just show a clipped value and
             // let user either live with it or turn 'showscore' off (or
@@ -863,16 +882,17 @@ void NetHackQtStatusWindow::updateStats()
 	wis.highlightWhenChanging();
 	cha.highlightWhenChanging();
 
-	gold.highlightWhenChanging();
 	hp.highlightWhenChanging();
 	power.highlightWhenChanging();
 	ac.highlightWhenChanging(); ac.lowIsGood();
 	level.highlightWhenChanging();
-	align.highlightWhenChanging();
+	gold.highlightWhenChanging();
 
         // don't highlight 'time' because it changes almost continuously
         //time.highlightWhenChanging();
 	score.highlightWhenChanging();
+
+	align.highlightWhenChanging();
 
 	hunger.highlightWhenChanging();
 	encumber.highlightWhenChanging();
