@@ -1866,7 +1866,7 @@ int
 dopray()
 {
     /* Confirm accidental slips of Alt-P */
-    if (ParanoidPray && yn("Are you sure you want to pray?") != 'y')
+    if (!paranoid_query(ParanoidPray, "Are you sure you want to pray?"))
         return 0;
 
     u.uconduct.gnostic++;
