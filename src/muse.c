@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1603509297 2020/10/24 03:14:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1605726852 2020/11/18 19:14:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -331,12 +331,15 @@ boolean
 find_defensive(mtmp)
 struct monst *mtmp;
 {
-    register struct obj *obj = 0;
+    struct obj *obj;
     struct trap *t;
     int fraction, x = mtmp->mx, y = mtmp->my;
     boolean stuck = (mtmp == u.ustuck),
             immobile = (mtmp->data->mmove == 0);
     stairway *stway;
+
+    g.m.defensive = (struct obj *) 0;
+    g.m.has_defense = 0;
 
     if (is_animal(mtmp->data) || mindless(mtmp->data))
         return FALSE;
@@ -345,19 +348,25 @@ struct monst *mtmp;
     if (u.uswallow && stuck)
         return FALSE;
 
-    g.m.defensive = (struct obj *) 0;
-    g.m.has_defense = 0;
-
-    /* since unicorn horns don't get used up, the monster would look
-     * silly trying to use the same cursed horn round after round
+    /*
+     * Since unicorn horns don't get used up, the monster would look
+     * silly trying to use the same cursed horn round after round,
+     * so skip cursed unicorn horns.
+     *
+     * Unicorns use their own horns; they're excluded from inventory
+     * scanning by nohands().  Ki-rin is depicted in the AD&D Monster
+     * Manual with same horn as a unicorn, so let it use its horn too.
+     * is_unicorn() doesn't include it; the class differs and it has
+     * no interest in gems.
      */
     if (mtmp->mconf || mtmp->mstun || !mtmp->mcansee) {
-        if (!is_unicorn(mtmp->data) && !nohands(mtmp->data)) {
+        obj = 0;
+        if (!nohands(mtmp->data)) {
             for (obj = mtmp->minvent; obj; obj = obj->nobj)
                 if (obj->otyp == UNICORN_HORN && !obj->cursed)
                     break;
         }
-        if (obj || is_unicorn(mtmp->data)) {
+        if (obj || is_unicorn(mtmp->data) || mtmp->data == &mons[PM_KI_RIN]) {
             g.m.defensive = obj;
             g.m.has_defense = MUSE_UNICORN_HORN;
             return TRUE;
@@ -2363,7 +2372,8 @@ struct obj *obj;
         if (typ == PICK_AXE)
             return (boolean) needspick(mon->data);
         if (typ == UNICORN_HORN)
-            return (boolean) (!obj->cursed && !is_unicorn(mon->data));
+            return (boolean) (!obj->cursed && !is_unicorn(mon->data)
+                              && mon->data != &mons[PM_KI_RIN]);
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
         if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed))
