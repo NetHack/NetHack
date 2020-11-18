@@ -1,5 +1,5 @@
 # NetHack 3.7	data.base
-# $NHDT-Date: 1596498239 2020/08/03 23:43:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# $NHDT-Date: 1605726848 2020/11/18 19:14:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -2699,10 +2699,11 @@ kelp*
 	specimens in their native setting.
 		[ 20,000 Leagues Under the Sea, by Jules Verne ]
 ki-rin
-	The ki-rin is a strange-looking flying creature.  It has
-	scales, a mane like a lion, a tail, hooves, and a horn.  It
-	is brightly colored, and can usually be found flying in the
-	sky looking for good deeds to reward.
+	The ki-rin is a strange-looking wingless flying creature.
+	It has scales, a mane like a lion, a tail, four legs with
+	hooves, and a horn like a unicorn's.  It is brightly colored,
+	and can usually be found flying in the sky looking for good
+	deeds to reward.
 king arthur
 *arthur
 	Ector took both his sons to the church before which the
