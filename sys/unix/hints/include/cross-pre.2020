@@ -334,7 +334,7 @@ EMCC_DEBUG_CFLAGS += -s SAFE_HEAP=1
 EMCC_DEBUG_CFLAGS += -s LLD_REPORT_UNDEFINED=1
 EMCC_DEBUG_CFLAGS += -s EXCEPTION_DEBUG=1
 #EMCC_DEBUG_CFLAGS += -fsanitize=undefined -fsanitize=address -fsanitize=leak
-EMCC_DEBUG_CFLAGS += -s EXIT_RUNTIME=1
+EMCC_DEBUG_CFLAGS += -s NO_EXIT_RUNTIME
 # XXX: if --profiling isn't included then any error dumps 10MB of WASM to the screen rather than a useful message
 EMCC_DEBUG_CFLAGS += --profiling
 EMCC_PROD_CFLAGS += -O3
