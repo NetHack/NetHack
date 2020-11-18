@@ -35,7 +35,13 @@ EMSCRIPTEN_KEEPALIVE
 static char *shim_callback_name = NULL;
 void shim_graphics_set_callback(char *cbName) {
     if (shim_callback_name != NULL) free(shim_callback_name);
-    shim_callback_name = strdup(cbName);
+    if(cbName && strlen(cbName) > 0) {
+        debugf("setting shim_callback_name: %s\n", cbName);
+        shim_callback_name = strdup(cbName);
+    } else {
+        debugf("un-setting shim_callback_name\n");
+        shim_callback_name = NULL;
+    }
     /* TODO: free(shim_callback_name) during shutdown? */
 }
 void local_callback (const char *cb_name, const char *shim_name, void *ret_ptr, const char *fmt_str, void *args);
@@ -95,27 +101,6 @@ void name fn_args { \
     debugf("SHIM GRAPHICS: " #name " done.\n"); \
 }
 #endif /* __EMSCRIPTEN__ */
-
-enum win_types {
-    WINSHIM_MESSAGE = 1,
-    WINSHIM_MAP,
-    WINSHIM_MENU,
-    WINSHIM_EXT
-};
-
-#define VSTUB(name, args) \
-void name args { \
-    printf ("Running " #name "...\n"); \
-}
-
-#define STUB(name, retval, args) \
-name args { \
-    printf ("Running " #name "...\n"); \
-    return retval; \
-}
-
-#define DECL(name, args) \
-void name args;
 
 VDECLCB(shim_init_nhwindows,(int *argcp, char **argv), "vpp", P2V argcp, P2V argv)
 VDECLCB(shim_player_selection,(void), "v")
@@ -279,8 +264,6 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
             jsArgs.push(val);
         }
 
-        decodeArgs(name, jsArgs);
-
         // do the callback
         let userCallback = globalThis[cbName];
         runJsEventLoop(() => userCallback.call(this, name, ... jsArgs)).then((retVal) => {
@@ -292,86 +275,6 @@ EM_JS(void, local_callback, (const char *cb_name, const char *shim_name, void *r
                 wakeUp();
             }, 0);
         });
-
-        // make callback arguments friendly: convert numbers to strings where possible
-        function decodeArgs(name, args) {
-            // if (!globalThis.nethackGlobal.makeArgsFriendly) return;
-
-            switch(name) {
-                case "shim_create_nhwindow":
-                    args[0] = globalThis.nethackGlobal.constants["WIN_TYPE"][args[0]];
-                    break;
-                case "shim_status_update":
-                    // which field is being updated?
-                    args[0] = globalThis.nethackGlobal.constants["STATUS_FIELD"][args[0]];
-                    // arg[1] is a string unless it is BL_CONDITION, BL_RESET, BL_FLUSH, BL_CHARACTERISTICS
-                    if(["BL_CONDITION", "BL_RESET", "BL_FLUSH", "BL_CHARACTERISTICS"].indexOf(args[0] && args[1]) < 0) {
-                        args[1] = getArg(name, args[1], "s");
-                    } else {
-                        args[1] = getArg(name, args[1], "p");
-                    }
-                    break;
-                case "shim_display_file":
-                    args[1] = !!args[1];
-                case "shim_display_nhwindow":
-                    args[0] = decodeWindow(args[0]);
-                    args[1] = !!args[1];
-                    break;
-                case "shim_getmsghistory":
-                    args[0] = !!args[0];
-                    break;
-                case "shim_putmsghistory":
-                    args[1] = !!args[1];
-                    break;
-                case "shim_status_enablefield":
-                    console.log("shim_status_enablefield arg 1:", args[1]);
-                    args[3] = !!args[3];
-                    break;
-                case "shim_add_menu":
-                    args[0] = decodeWindow(args[0]);
-                    // args[1] = mapglyphHelper(args[1]);
-                    // args[5] = decodeAttr(args[5]);
-                    break;
-                case "shim_putstr":
-                    args[0] = decodeWindow(args[0]);
-                    break;
-                case "shim_select_menu":
-                    args[0] = decodeWindow(args[0]);
-                    args[1] = decodeSelected(args[1]);
-                    break;
-                case "shim_clear_nhwindow":
-                case "shim_destroy_nhwindow":
-                case "shim_curs":
-                case "shim_start_menu":
-                case "shim_end_menu":
-                case "shim_print_glyph":
-                    args[0] = decodeWindow(args[0]);
-                    break;
-            }
-        }
-
-        function decodeWindow(winid) {
-            let { WIN_MAP, WIN_INVEN, WIN_STATUS, WIN_MESSAGE } = globalThis.nethackGlobal.globals;
-            switch(winid) {
-                case WIN_MAP: return "WIN_MAP";
-                case WIN_MESSAGE: return "WIN_MESSAGE";
-                case WIN_STATUS: return "WIN_STATUS";
-                case WIN_INVEN: return "WIN_INVEN";
-                default: return winid;
-            }
-            // return winid;
-        }
-
-        function decodeSelected(how) {
-            let { PICK_NONE, PICK_ONE, PICK_ANY } = globalThis.nethackGlobal.constants.MENU_SELECT;
-            switch(how) {
-                case PICK_NONE: return "PICK_NONE";
-                case PICK_ONE: return "PICK_ONE";
-                case PICK_ANY: return "PICK_ANY";
-                default: return how;
-            }
-
-        }
 
         function getArg(name, ptr, type) {
             return (type === "o")?ptr:getPointerValue(name, getValue(ptr, "*"), type);

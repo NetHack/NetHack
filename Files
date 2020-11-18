@@ -222,18 +222,6 @@ sys/libnh:
 (files in top directory)
 README.md    libnhmain.c  sysconf
 
-sys/libnh/npm-package:
-(files in top directory)
-LICENSE.md         README.md          package-lock.json  package.json
-
-sys/libnh/npm-package/src:
-(file in top directory)
-nethackShim.js
-
-sys/libnh/npm-package/test:
-(file in top directory)
-test.js
-
 sys/libnh/test:
 (files in top directory)
 README.md  libtest.c  run.sh

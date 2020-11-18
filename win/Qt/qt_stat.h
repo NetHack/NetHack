@@ -131,6 +131,8 @@ private:
         QFrame hline1; // between dlevel and characteristics
         QFrame hline2; // between characteristics and regular status fields
         QFrame hline3; // between regular fields and time,score or conditions
+        QFrame vline1; // for statuslines:2, between Cha and Alignment
+        QFrame vline2; // for statuslines:2, padding between Gold and Time
 
 	int cursy;
 

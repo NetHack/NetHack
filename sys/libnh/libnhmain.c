@@ -648,11 +648,11 @@ char *name;
 
 boolean
 check_user_string(optstr)
-char *optstr;
+const char *optstr;
 {
     struct passwd *pw;
     int pwlen;
-    char *eop, *w;
+    const char *eop, *w;
     char *pwname = 0;
 
     if (optstr[0] == '*')
@@ -664,7 +664,7 @@ char *optstr;
     if (!pwname || !*pwname)
         return FALSE;
     pwlen = (int) strlen(pwname);
-    eop = eos(optstr);
+    eop = eos((char *)optstr);
     w = optstr;
     while (w + pwlen <= eop) {
         if (!*w)
