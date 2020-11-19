@@ -16,24 +16,39 @@
 //      five status fields without icons (some containing two values:
 //        HP/HPmax, Energy/Enmax, AC, XpLevel/ExpPoints or HD, [blank], Gold)
 //      separator line
-//      optional line with two text fields (Time:1234, Score:89)
+//      line with two optional text fields (Time:1234, Score:89), maybe blank
 //      varying number of icons (one or more, each paired with...)
 //      corresponding text (Alignment plus zero or more status conditions
 //        including Hunger if not "normal" and encumbrance if not "normal")
 //
 // The hitpoint bar spans the width of the status window when enabled.
 // Title and location are centered.
-// The icons and text for the size characteristics are evenly spaced.
-// The five main stats are padded with an empty sixth and spaced to
-//   match the characteristics.
-// Time and Score are spaced as if each were three fields wide.
+// The icons and text for the six characteristics are evenly spaced;
+//   this pair of lines is sometimes referred to as "row 1" below.
+// The five main stats or slash-separated stat pairs are padded with an
+//   empty slot between Xp and Gold; adding the sixth makes that row
+//   line up with the characteristics; this line is sometimes referred
+//   to as "row 2".
+// Time and Score are spaced as if each were three fields wide; their
+//   line is "row 3" relative to statuslines:2 vs statuslines:3.
 // Icons and texts for alignment and conditions are left justified.
 // The separator lines are thin and don't take up much vertical space.
 // When enabled, the hitpoint bar bisects the margin above Title,
 //   increasing the overall status height by 9 pixels; when disabled,
 //   the status shifts up by those 9 pixels.
-// When Time+Score line is empty, it still takes up the vertical space
-//   that would be used to show those values.
+// When row 3 (Time, Score) is blank, it still takes up the vertical
+//   space that would be used to show those values.
+//
+// The above is for statuslines:3, which used to be the default.  For
+//   statuslines:2, rows 1 and 2 are extended from six to seven fields
+//   and row 3 (optional Time, Score) is eliminated.  Alignment is
+//   moved from the beginning of the Conditions pair (icon over text)
+//   of lines up to the end of row 1, the Characteristics pair of lines,
+//   with a separator between Cha:NN and it.  Time, when active, is
+//   placed after Gold.  Score, if enabled and active, is shown in the
+//   filler slot before Gold.  When there are no Conditions to display,
+//   there is an an invisible fake one (blank icon over blank text)
+//   rendered in order to preserve the vertical space they need.
 //
 // FIXME:
 //  When hitpoint bar is shown, attempting to resize horizontally won't
@@ -42,7 +57,13 @@
 //    style sheets used to control color, but removing those constraints
 //    causes the bar display to get screwed up.)
 //  There are separate icons for Satiated and Hungry, but Weak, Fainting,
-//    and Fainted all share the Hungry one when they should be different.
+//    and Fainted all share the Hungry one.  Weak should have its own,
+//    Fainting+Fainted should have another.  The current two depict
+//    plates with cutlery which is a bit of an anachronism.  Statiated
+//    could be replaced by a figure in profile with a bulging belly,
+//    Hungry similar but with a slightly concave belly, Weak either a
+//    collapsing figure or a much larger concavity or both, Fainting/
+//    Fainted a fully collapsed figure.
 //
 // TODO:
 //  If/when status conditions become too wide for the status window, scale
@@ -51,13 +72,13 @@
 //    the rest of status.  That takes up more space, which is ok, but it
 //    also increases the vertical margin in between them by more than is
 //    necessary.  Should squeeze some of that excess blank space out.
-//  Changed values are highlighted as "gone Up" (green) or "gone Down" (red)
-//    with NetHackQtLabelledIcon::setLabel() taking an optional boolean
-//    argument indicating "lower is better" (for AC).  That flag should
-//    have other choices:  "changed" (third color with no better or worse
-//    judgement, for alignment and dungeon location) and "ignore" (don't
-//    highlight, to suppress the bogus highlighting that currently happens
-//    when toggling 'showexp' or 'showscore').
+//  Highlighting of Xp/Exp needs work when 'showexp' is toggled On or Off.
+//    The field passed to xp.setLabel() for its better vs worse comparison
+//    gets swapped from Xp to Exp or vice versa, yielding a nonsensical
+//    comparison for the first status update after the 'showexp' toggle.
+//  Toggling 'showscore' while Score is highlighted leaves the highlight
+//    on blank space until it times out.  (Time isn't highlighted and Exp
+//    is combined with Xp so always updated; only Score is affected.)
 //
 
 extern "C" {
@@ -132,7 +153,10 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     /* miscellaneous; not display fields */
     cursy(0),
     first_set(true),
-    alreadyfullhp(false)
+    alreadyfullhp(false),
+    was_polyd(false),
+    had_exp(false),
+    had_score(false)
 {
     if (!qt_compact_mode) {
         int w = NetHackQtBind::mainWidget()->width();
@@ -502,7 +526,7 @@ void NetHackQtStatusWindow::fadeHighlighting()
     level.dissipateHighlight();
     align.dissipateHighlight();
 
-    time.dissipateHighlight();
+    //time.dissipateHighlight();
     score.dissipateHighlight();
 
     hunger.dissipateHighlight();
@@ -665,12 +689,19 @@ void NetHackQtStatusWindow::HitpointBar()
 void NetHackQtStatusWindow::updateStats()
 {
     if (!parentWidget()) return;
+    if (cursy != 0) return; /* do a complete update when line 0 is done */
 
     QString buf;
-    const char *text;
 
-    if (cursy != 0) return;    /* do a complete update when line 0 is done */
-
+    if (first_set) {
+        was_polyd = Upolyd ? true : false;
+        had_exp = ::flags.showexp ? true : false;
+        // not '#ifndef SCORE_ON_BOTL' here; use the variable and the widget
+        had_score = ::flags.showscore ? true : false; // false when disabled
+        score.setLabel(""); // init if enabled, one-time set if disabled
+    }
+    // display hitpoint bar if it is active; it isn't subject to field
+    // highlighting so we don't track whether it has just been toggled On|Off
     HitpointBar();
 
     int st = ACURR(A_STR);
@@ -747,18 +778,23 @@ void NetHackQtStatusWindow::updateStats()
 	buf = rank_of(u.ulevel, g.pl_character[0], ::flags.female);
     }
     QString buf2;
-    buf2.sprintf("%s the %s", g.plname, buf.toLatin1().constData());
+    char buf3[BUFSZ];
+    buf2.sprintf("%s the %s", upstart(strcpy(buf3, g.plname)),
+                 buf.toLatin1().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
-    char buf3[BUFSZ];
     if (!describe_level(buf3)) {
 	Sprintf(buf3, "%s, level %d",
                 g.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
     }
-    // false: always highlight as 'change for the better' regardless of
-    // new depth compared to old
-    dlevel.setLabel(buf3, false);
+    dlevel.setLabel(buf3);
 
+    int poly_toggled = !was_polyd ^ !Upolyd;
+    if (poly_toggled) {
+        // for this update, changed values aren't better|worse, just different
+        hp.setCompareMode(NeitherIsBetter);
+        level.setCompareMode(NeitherIsBetter);
+    }
     if (Upolyd) {
         // You're a monster!
         buf.sprintf("/%d", u.mhmax);
@@ -773,6 +809,9 @@ void NetHackQtStatusWindow::updateStats()
         // up/down highlighting becomes tricky--don't try very hard;
         // depending upon font size and status layout, "Level:NN/nnnnnnnn"
         // might be too wide to fit
+#if 0   /* not yet */
+        int exp_toggled = !had_exp ^ !::flags.showexp;
+#endif
         static const char *const lvllbl[3] = { "Level:", "Lvl:", "L:" };
         QFontMetrics fm(level.label->font());
         for (int i = ::flags.showexp ? 0 : 3; i < 4; ++i) {
@@ -792,6 +831,14 @@ void NetHackQtStatusWindow::updateStats()
                        // Exp for setLabel()'s Up|Down highlighting
                        ::flags.showexp ? u.uexp : (long) u.ulevel);
     }
+    if (poly_toggled) {
+        // for next update, changed values will be better|worse as usual
+        hp.setCompareMode(BiggerIsBetter);
+        level.setCompareMode(BiggerIsBetter);
+    }
+    was_polyd = Upolyd ? true : false;
+    had_exp = (::flags.showexp && !was_polyd) ? true : false;
+
     buf.sprintf("/%d", u.uenmax);
     power.setLabel("Pow:", (long) u.uen, buf);
     ac.setLabel("AC:", (long) u.uac);
@@ -802,7 +849,7 @@ void NetHackQtStatusWindow::updateStats()
     goldamt = std::min(goldamt, 99999999L); // ditto
     gold.setLabel("Gold:", goldamt);
 
-    text = NULL;
+    const char *text = NULL;
     if (u.ualign.type == A_LAWFUL) {
         align.setIcon(p_lawful);
         text = "Lawful";
@@ -816,14 +863,10 @@ void NetHackQtStatusWindow::updateStats()
                : (u.ualign.type == A_NONE) ? "unaligned"
                  : "other?";
     }
-    if (text) {
-        // false: don't highlight as 'became lower' even if the internal
-        // numeric value is becoming lower (N -> C, L -> N || C)
-        align.setLabel(text, false);
-        // without this, the ankh pixmap shifts from centered to left
-        // justified relative to the label text for some unknown reason...
-        align.ForceResize();
-    }
+    align.setLabel(QString(text));
+    // without this, the ankh pixmap shifts from centered to left
+    // justified relative to the label text for some unknown reason...
+    align.ForceResize();
     if (spreadout)
         ++k; // when not condensed, Alignment is shown on the Conditions row
 
@@ -832,6 +875,8 @@ void NetHackQtStatusWindow::updateStats()
     } else
         blank2.hide();
 
+    // Time isn't highlighted (due to constantly changing) so we don't keep
+    // track of whether it has just been toggled On or Off
     if (::flags.time) {
         // hypothetically Time could grow to enough digits to have trouble
         // fitting, but it's not worth worrying about
@@ -840,7 +885,10 @@ void NetHackQtStatusWindow::updateStats()
         time.setLabel("");
     }
 #ifdef SCORE_ON_BOTL
+    int score_toggled = !had_score ^ !::flags.showscore;
     if (::flags.showscore) {
+        if (score_toggled) // toggled On
+            score.setCompareMode(NeitherIsBetter);
         long pts = botl_score();
         if (spreadout) {
             // plenty of room; Time and Score both have the width of 3 fields
@@ -863,17 +911,26 @@ void NetHackQtStatusWindow::updateStats()
             // set statuslines:3 to take advantage of the extra room that
             // the spread out status layout provides)
         }
-    } else
-#endif
-    {
-	score.setLabel("");
+    } else {
+        if (score_toggled) { // toggled Off; if already Off, no need to set ""
+            score.setCompareMode(NoCompare);
+            score.setLabel(""); // blank when not active
+        }
     }
+    if (score_toggled)
+        score.setCompareMode(BiggerIsBetter);
+    had_score = ::flags.showscore ? true : false;
+#endif /* SCORE_ON_BOTL */
 
     if (first_set) {
 	first_set=false;
 
+        was_polyd = Upolyd ? true : false;
+        had_exp = ::flags.showexp ? true : false;
+        had_score = ::flags.showscore ? true : false;
+
 	name.highlightWhenChanging();
-	dlevel.highlightWhenChanging();
+	dlevel.highlightWhenChanging(); dlevel.setCompareMode(NeitherIsBetter);
 
 	str.highlightWhenChanging();
 	dex.highlightWhenChanging();
@@ -884,15 +941,16 @@ void NetHackQtStatusWindow::updateStats()
 
 	hp.highlightWhenChanging();
 	power.highlightWhenChanging();
-	ac.highlightWhenChanging(); ac.lowIsGood();
+	ac.highlightWhenChanging(); ac.setCompareMode(SmallerIsBetter);
 	level.highlightWhenChanging();
 	gold.highlightWhenChanging();
 
         // don't highlight 'time' because it changes almost continuously
-        //time.highlightWhenChanging();
+        // [if we did highlight it, we wouldn't show increase as 'Better']
+        //time.highlightWhenChanging(); time.setCompareMode(NeitherIsBetter);
 	score.highlightWhenChanging();
 
-	align.highlightWhenChanging();
+	align.highlightWhenChanging(); align.setCompareMode(NeitherIsBetter);
 
 	hunger.highlightWhenChanging();
 	encumber.highlightWhenChanging();

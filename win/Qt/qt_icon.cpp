@@ -7,7 +7,8 @@
 // TODO?
 //  When the label specifies two values separated by a slash (curHP/maxHP,
 //    curEn/maxEn, XpLevel/ExpPoints when 'showexp' is On), highlighting
-//    for changes is all or nothing.  curHP and curEn go up and down
+//    for changes is all or nothing based on which field caller passes
+//    as the value to use for comparison.  curHP and curEn go up and down
 //    without any change to the corresponding maximum all the time.  Much
 //    rarer, but when maxHP and maxEn go up with level gain, the hero
 //    could be injured by a passive counterattack or collateral damage
@@ -19,6 +20,8 @@
 //    Highlighting two slash-separated values independently would be
 //    worthwhile but with the 'single label using a style sheet for color'
 //    approach it isn't going to happen.
+// FIXME:
+//  Every LabelledIcon duplicates hl_better, hl_worse, hl_changd.
 //
 
 extern "C" {
@@ -39,9 +42,9 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l) :
     QWidget(parent),
     label(new QLabel(l,this)),
     icon(NULL),
-    low_is_good(false),
-    prev_value(-123),
-    turn_count(-1)
+    comp_mode(BiggerIsBetter),
+    prev_value(NoNum),
+    turn_count(-1L)
 {
     initHighlight();
 }
@@ -51,9 +54,9 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l,
     QWidget(parent),
     label(new QLabel(l,this)),
     icon(new QLabel(this)),
-    low_is_good(false),
-    prev_value(-123),
-    turn_count(-1)
+    comp_mode(BiggerIsBetter),
+    prev_value(NoNum),
+    turn_count(-1L)
 {
     setIcon(i);
     initHighlight();
@@ -61,12 +64,13 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l,
 
 void NetHackQtLabelledIcon::initHighlight()
 {
-    // note: named 'green' is much darker than Qt::green
-    hl_good = "QLabel { background-color : green; color : white }";
-    hl_bad  = "QLabel { background-color : red  ; color : white }";
+    // note: string "green" is much darker than Qt::green
+    hl_better = "QLabel { background-color : green ; color : white }";
+    hl_worse  = "QLabel { background-color : red   ; color : white }";
+    hl_changd = "QLabel { background-color : blue  ; color : white }";
 }
 
-void NetHackQtLabelledIcon::setLabel(const QString& t, bool lower)
+void NetHackQtLabelledIcon::setLabel(const QString &t, bool lower)
 {
     if (!label) {
 	label=new QLabel(this);
@@ -75,7 +79,12 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, bool lower)
     if (label->text() != t) {
 	label->setText(t);
         ForceResize();
-	highlight((lower == low_is_good) ? hl_good : hl_bad);
+        if (comp_mode != NoCompare) {
+            highlight((comp_mode == NeitherIsBetter) ? hl_changd
+                      : (comp_mode == (lower ? SmallerIsBetter
+                                             : BiggerIsBetter)) ? hl_better
+                        : hl_worse);
+        }
     }
 }
 
@@ -113,14 +122,19 @@ void NetHackQtLabelledIcon::setFont(const QFont& f)
     if (label) label->setFont(f);
 }
 
+// [pr] this might no longer be needed; it seems to have been responsible
+// for highlighting the blank space where an optional field like Score
+// was just toggled off; we don't need or want that anymore...
 void NetHackQtLabelledIcon::show()
 {
+    if (
 #if QT_VERSION >= 300
-    if (isHidden())
+        isHidden()
 #else
-    if (!isVisible())
+        !isVisible()
 #endif
-	highlight(hl_bad);
+        && comp_mode != NoCompare)
+	highlight(hl_worse);
     QWidget::show();
 }
 
@@ -156,41 +170,42 @@ QSize NetHackQtLabelledIcon::minimumSizeHint() const
 
 void NetHackQtLabelledIcon::highlightWhenChanging()
 {
-    turn_count=0;
+    turn_count = 0; // turn_count starts negative (as flag to not highlight)
 }
 
-void NetHackQtLabelledIcon::lowIsGood()
+// set comp_mode to one of NoCompare or {Bigger,Smaller,Neither}IsBetter
+void NetHackQtLabelledIcon::setCompareMode(int newmode)
 {
-    low_is_good=true;
-}
-
-void NetHackQtLabelledIcon::dissipateHighlight()
-{
-    if (turn_count>0) {
-	turn_count--;
-	if (!turn_count)
-	    unhighlight();
-    }
-}
-
-void NetHackQtLabelledIcon::highlight(const QString& hl)
-{
-    if (label) { // Surely it is?!
-	if (turn_count>=0) {
-	    label->setStyleSheet(hl);
-	    turn_count=4;
-	    // `4' includes this turn, so dissipates after
-	    // 3 more keypresses.
-	} else {
-	    label->setStyleSheet("");
-	}
-    }
+    comp_mode = newmode;
 }
 
 void NetHackQtLabelledIcon::unhighlight()
 {
     if (label) { // Surely it is?!
-	label->setStyleSheet("");
+        label->setStyleSheet("");
+    }
+    if (turn_count > 0)
+        turn_count = 0;
+}
+
+void NetHackQtLabelledIcon::highlight(const QString& hl)
+{
+    if (label) { // Surely it is?!
+        if (turn_count >= 0) {
+            label->setStyleSheet(hl);
+            turn_count = 4;
+            // 4 includes this turn, so dissipates after 3 more keypresses.
+        } else {
+            unhighlight();
+        }
+    }
+}
+
+void NetHackQtLabelledIcon::dissipateHighlight()
+{
+    if (turn_count > 0) {
+        if (!--turn_count)
+            unhighlight();
     }
 }
 
