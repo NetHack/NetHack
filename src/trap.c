@@ -1532,11 +1532,15 @@ unsigned trflags;
             set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
             exercise(A_DEX, FALSE);
         }
+        /* add a pit before calling losehp so bones won't keep the landmine;
+         * blow_up_landmine will remove the pit afterwards if inappropriate */
+        trap->ttyp = PIT;
+        trap->madeby_u = FALSE;
+        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle && !u.usteed)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
         newsym(u.ux, u.uy); /* update trap symbol */
-        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
         /* fall recursively into the pit... */
         if ((trap = t_at(u.ux, u.uy)) != 0)
             dotrap(trap, RECURSIVETRAP);
@@ -1685,6 +1689,7 @@ struct trap *trap;
 {
     int x = trap->tx, y = trap->ty, dbx, dby;
     struct rm *lev = &levl[x][y];
+    schar typ;
 
     (void) scatter(x, y, 4,
                    MAY_DESTROY | MAY_HIT | MAY_FRACTURE | VIS_EFFECTS,
@@ -1707,9 +1712,18 @@ struct trap *trap;
             /* no pits here */
             deltrap(trap);
         } else {
-            trap->ttyp = PIT;       /* explosion creates a pit */
-            trap->madeby_u = FALSE; /* resulting pit isn't yours */
-            seetrap(trap);          /* and it isn't concealed */
+            /* fill pit with water, if applicable */
+            typ = fillholetyp(x, y, FALSE);
+            if (typ != ROOM) {
+                lev->typ = typ;
+                liquid_flow(x, y, typ, trap,
+                            cansee(x, y) ? "The hole fills with %s!"
+                                         : (char *) 0);
+            } else {
+                trap->ttyp = PIT;       /* explosion creates a pit */
+                trap->madeby_u = FALSE; /* resulting pit isn't yours */
+                seetrap(trap);          /* and it isn't concealed */
+            }
         }
     }
 }
