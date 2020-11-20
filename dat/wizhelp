@@ -20,9 +20,10 @@ Debug-Mode Quick Reference:
 #vanquished     == disclose counts of dead monsters sorted in various ways
 #vision         == show vision array
 #wizborn        == show monster birth/death/geno/extinct stats
+#wizfliplevel   == transpose the current dungeon level
 #wizintrinsic   == set selected intrinsic timeouts
 #wizmakemap     == recreate the current dungeon level
-#wizrumorcheck  == validate rumor indexing and show first, second, and last
+#wizrumorcheck  == validate rumor indexing; also show first, second, and last
                    random engravings, epitaphs, and hallucinatory monsters
 #wizsmell       == smell a monster
 #wizwhere       == show dungeon placement of all special levels

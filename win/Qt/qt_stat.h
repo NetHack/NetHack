@@ -138,6 +138,12 @@ private:
 
 	bool first_set;
         bool alreadyfullhp;
+        bool was_polyd;
+        bool had_exp;
+        // Time isn't highlighted (due to constantly changing) so we don't
+        // keep track of whether it was On and is now Off or vice versa
+        //bool had_time;
+        bool had_score;
 
         QHBoxLayout *InitHitpointBar();
         void HitpointBar();

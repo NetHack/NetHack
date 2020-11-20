@@ -9,13 +9,18 @@
 
 namespace nethack_qt_ {
 
+enum CompareMode {
+    NoCompare = -1, BiggerIsBetter = 0,
+    SmallerIsBetter = 1, NeitherIsBetter = 2
+};
+
 class NetHackQtLabelledIcon : public QWidget {
 public:
         NetHackQtLabelledIcon(QWidget *parent, const char *label);
         NetHackQtLabelledIcon(QWidget *parent, const char *label,
                               const QPixmap &icon);
 
-	enum { NoNum=-99999 };
+        enum { NoNum = -99999L };
         void setLabel(const QString &, bool lower=true); // string
         void setLabel(const QString &, long, const QString &tail=""); // number
         void setLabel(const QString &, long show_value,
@@ -25,7 +30,7 @@ public:
         //QString labelText() { return QString(this->label->text()); }
 
 	void highlightWhenChanging();
-	void lowIsGood();
+        void setCompareMode(int newmode);
 	void dissipateHighlight();
         void ForceResize();
 
@@ -45,11 +50,13 @@ private:
 	void highlight(const QString& highlight);
 	void unhighlight();
 
-	bool low_is_good;
-	int prev_value;
-	int turn_count;		/* last time the value changed */
-	QString hl_good;
-	QString hl_bad;
+        int comp_mode;          /* compareMode; default is BiggerIsBetter */
+        long prev_value;
+        long turn_count;        /* last time the value changed */
+
+        QString hl_better;
+        QString hl_worse;
+        QString hl_changd;
 };
 
 } // namespace nethack_qt_
