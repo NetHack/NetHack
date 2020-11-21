@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1596498197 2020/08/03 23:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1605959204 2020/11/21 11:46:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1783,6 +1783,7 @@ int part;
     if (mptr == &mons[PM_RAVEN])
         return bird_parts[part];
     if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN
+        || mptr == &mons[PM_KI_RIN]
         || (mptr == &mons[PM_ROTHE] && part != HAIR))
         return horse_parts[part];
     if (mptr->mlet == S_LIGHT) {

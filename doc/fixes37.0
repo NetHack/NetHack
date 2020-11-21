@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ $NHDT-Date: 1605927391 2020/11/21 02:56:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ $NHDT-Date: 1605959203 2020/11/21 11:46:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -298,8 +298,8 @@ if a monster threw a cocktrice egg at the hero but hit and petrified another
 update persistent inventory when putting on a helmet causes it to auto-curse
 since ki-rin look quite a bit like unicorns, make them be more like one:
 	allow them to use their own horn to cure themselves; remove M1_ANIMAL,
-	change MS_NEIGH to MS_SPELL, add MR_POISON; they're still 'A' rather
-	than 'u' and don't care about gems
+	change MS_NEIGH to MS_SPELL, add MR_POISON, use horse body parts;
+	they're still 'A' rather than 'u' and don't care about gems
 wand or scroll of create monster that makes a new monster which can be seen
 	or sensed becomes discovered but was doing so even for a concealed
 	mimic seen as furniture or an object
