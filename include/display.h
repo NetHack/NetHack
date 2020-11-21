@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1597700875 2020/08/17 21:47:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1605927391 2020/11/21 02:56:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -69,6 +69,15 @@ enum explosion_types {
  * hero can physically see the location of the monster.  The function
  * vobj_at() returns a pointer to an object that the hero can see there.
  * Infravision is not taken into account.
+ *
+ * Note:  not reliable for concealed mimics.  They don't have
+ * 'mon->mundetected' set even when mimicking objects or furniture.
+ * [Fixing this with a pair of mon->m_ap_type checks here (via either
+ * 'typ!=object && typ!=furniture' or 'typ==nothing || typ==monster')
+ * will require reviewing every instance of mon_visible(), canseemon(),
+ * canspotmon(), is_safemon() and perhaps others.  Fixing it by setting
+ * mon->mundetected when concealed would be better but also require
+ * reviewing all those instances and also existing mundetected instances.]
  */
 #if 0
 #define mon_visible(mon) \
