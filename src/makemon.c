@@ -1,4 +1,4 @@
-/* NetHack 3.7	makemon.c	$NHDT-Date: 1596498176 2020/08/03 23:42:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1605927392 2020/11/21 02:56:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1503,7 +1503,8 @@ boolean neverask;
             x = c.x, y = c.y;
 
         mon = makemon(mptr, x, y, NO_MM_FLAGS);
-        if (mon && canspotmon(mon))
+        if (mon && canspotmon(mon) && (M_AP_TYPE(mon) == M_AP_NOTHING
+                                       || M_AP_TYPE(mon) == M_AP_MONSTER))
             known = TRUE;
     }
     return known;

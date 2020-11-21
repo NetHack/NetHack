@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.356 $ $NHDT-Date: 1605726848 2020/11/18 19:14:08 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ $NHDT-Date: 1605927391 2020/11/21 02:56:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -300,6 +300,9 @@ since ki-rin look quite a bit like unicorns, make them be more like one:
 	allow them to use their own horn to cure themselves; remove M1_ANIMAL,
 	change MS_NEIGH to MS_SPELL, add MR_POISON; they're still 'A' rather
 	than 'u' and don't care about gems
+wand or scroll of create monster that makes a new monster which can be seen
+	or sensed becomes discovered but was doing so even for a concealed
+	mimic seen as furniture or an object
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
