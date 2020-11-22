@@ -62,12 +62,18 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l,
     initHighlight();
 }
 
+// set up the style sheet strings used to specify color for status field
+// labels [done "once", but once for each LabelledIcon that's constucted,
+// so more than 20 copies overall]
 void NetHackQtLabelledIcon::initHighlight()
 {
-    // note: string "green" is much darker than Qt::green
-    hl_better = "QLabel { background-color : green ; color : white }";
-    hl_worse  = "QLabel { background-color : red   ; color : white }";
-    hl_changd = "QLabel { background-color : blue  ; color : white }";
+    // note: string "green" is much darker than enum Qt::green
+    // QColor("green")              => #00ff00
+    // QColor(Qt::green)            => #008000
+    // QColor("green").lighter(150) => #00c000  /* hitpoint bar's green */
+    hl_better = "QLabel { background-color : #00c000 ; color : white }";
+    hl_worse  = "QLabel { background-color : red     ; color : white }";
+    hl_changd = "QLabel { background-color : blue    ; color : white }";
 }
 
 void NetHackQtLabelledIcon::setLabel(const QString &t, bool lower)
