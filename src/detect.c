@@ -1,4 +1,4 @@
-/* NetHack 3.7	detect.c	$NHDT-Date: 1596498155 2020/08/03 23:42:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	detect.c	$NHDT-Date: 1606009000 2020/11/22 01:36:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -357,7 +357,7 @@ register struct obj *sobj;
 
             if (g.youmonst.data == &mons[PM_GOLD_GOLEM])
                 Sprintf(buf, "You feel like a million %s!", currency(2L));
-            else if (money_cnt(g.invent) || hidden_gold())
+            else if (money_cnt(g.invent) || hidden_gold(TRUE))
                 Strcpy(buf,
                    "You feel worried about your future financial situation.");
             else if (steedgold)

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ $NHDT-Date: 1605959203 2020/11/21 11:46:43 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ $NHDT-Date: 1606008997 2020/11/22 01:36:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -303,6 +303,8 @@ since ki-rin look quite a bit like unicorns, make them be more like one:
 wand or scroll of create monster that makes a new monster which can be seen
 	or sensed becomes discovered but was doing so even for a concealed
 	mimic seen as furniture or an object
+'showscore' could be used to determine how much gold was inside a container
+	whose contents were unknown
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

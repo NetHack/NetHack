@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1596498208 2020/08/03 23:43:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1606009003 2020/11/22 01:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1245,7 +1245,7 @@ dopay()
     long ltmp;
     long umoney;
     int pass, tmp, sk = 0, seensk = 0;
-    boolean paid = FALSE, stashed_gold = (hidden_gold() > 0L);
+    boolean paid = FALSE, stashed_gold = (hidden_gold(TRUE) > 0L);
 
     g.multi = 0;
 
@@ -1595,7 +1595,8 @@ boolean itemize;
     long ltmp, quan, save_quan;
     long umoney = money_cnt(g.invent);
     int buy;
-    boolean stashed_gold = (hidden_gold() > 0L), consumed = (which == 0);
+    boolean stashed_gold = (hidden_gold(TRUE) > 0L),
+            consumed = (which == 0);
 
     if (!obj->unpaid && !bp->useup) {
         impossible("Paid object on bill??");
@@ -2226,8 +2227,9 @@ boolean unpaid_only;
 
 /* count amount of gold inside container 'obj' and any nested containers */
 long
-contained_gold(obj)
+contained_gold(obj, even_if_unknown)
 struct obj *obj;
+boolean even_if_unknown; /* True: all gold; False: limit to known contents */
 {
     register struct obj *otmp;
     register long value = 0L;
@@ -2236,8 +2238,8 @@ struct obj *obj;
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
         if (otmp->oclass == COIN_CLASS)
             value += otmp->quan;
-        else if (Has_contents(otmp))
-            value += contained_gold(otmp);
+        else if (Has_contents(otmp) && (otmp->cknown || even_if_unknown))
+            value += contained_gold(otmp, even_if_unknown);
 
     return value;
 }
@@ -2611,7 +2613,7 @@ boolean reset_nocharge;
     /* outer container might be marked no_charge but still have contents
        which should be charged for; clear no_charge when picking things up */
     if (obj->no_charge) {
-        if (!Has_contents(obj) || (contained_gold(obj) == 0L
+        if (!Has_contents(obj) || (contained_gold(obj, TRUE) == 0L
                                    && contained_cost(obj, shkp, 0L, FALSE,
                                                      !reset_nocharge) == 0L))
             shkp = 0; /* not billable */
@@ -2661,7 +2663,7 @@ boolean ininv, dummy, silent;
 
     if (container) {
         cltmp = contained_cost(obj, shkp, cltmp, FALSE, FALSE);
-        gltmp = contained_gold(obj);
+        gltmp = contained_gold(obj, TRUE);
 
         if (ltmp)
             add_one_tobill(obj, dummy, shkp);
@@ -2936,7 +2938,7 @@ boolean peaceful, silent;
 
             value += stolen_container(obj, shkp, 0L, ininv);
             if (!ininv)
-                gvalue += contained_gold(obj);
+                gvalue += contained_gold(obj, TRUE);
         }
     }
 
@@ -3043,7 +3045,7 @@ xchar x, y;
         /* find the price of content before subfrombill */
         cltmp = contained_cost(obj, shkp, cltmp, TRUE, FALSE);
         /* find the value of contained gold */
-        gltmp += contained_gold(obj);
+        gltmp += contained_gold(obj, TRUE);
         cgold = (gltmp > 0L);
     }
 

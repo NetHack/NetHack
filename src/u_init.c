@@ -1,4 +1,4 @@
-/* NetHack 3.7	u_init.c	$NHDT-Date: 1596498222 2020/08/03 23:43:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	u_init.c	$NHDT-Date: 1606009005 2020/11/22 01:36:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -876,7 +876,7 @@ u_init()
 
     if (u.umoney0)
         ini_inv(Money);
-    u.umoney0 += hidden_gold(); /* in case sack has gold in it */
+    u.umoney0 += hidden_gold(TRUE); /* in case sack has gold in it */
 
     find_ac();     /* get initial ac value */
     init_attr(75); /* init attribute values */

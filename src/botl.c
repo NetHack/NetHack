@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1596498152 2020/08/03 23:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1606008998 2020/11/22 01:36:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -398,7 +398,8 @@ botl_score()
     long deepest = deepest_lev_reached(FALSE);
     long utotal;
 
-    utotal = money_cnt(g.invent) + hidden_gold();
+    /* hidden_gold(False): only gold in containers whose contents are known */
+    utotal = money_cnt(g.invent) + hidden_gold(FALSE);
     if ((utotal -= u.umoney0) < 0L)
         utotal = 0L;
     utotal += u.urexp + (50 * (deepest - 1))
