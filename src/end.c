@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1603534633 2020/10/24 10:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1606009001 2020/11/22 01:36:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1382,8 +1382,8 @@ int how;
 
         umoney = money_cnt(g.invent);
         tmp = u.umoney0;
-        umoney += hidden_gold(); /* accumulate gold from containers */
-        tmp = umoney - tmp;      /* net gain */
+        umoney += hidden_gold(TRUE); /* accumulate gold from containers */
+        tmp = umoney - tmp;          /* net gain */
 
         if (tmp < 0L)
             tmp = 0L;

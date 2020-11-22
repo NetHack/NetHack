@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1605493683 2020/11/16 02:28:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.878 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1606008997 2020/11/22 01:36:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.880 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2396,7 +2396,7 @@ E void NDECL(finish_paybill);
 E struct obj *FDECL(find_oid, (unsigned));
 E long FDECL(contained_cost,
              (struct obj *, struct monst *, long, BOOLEAN_P, BOOLEAN_P));
-E long FDECL(contained_gold, (struct obj *));
+E long FDECL(contained_gold, (struct obj *, BOOLEAN_P));
 E void FDECL(picked_container, (struct obj *));
 E void FDECL(gem_learned, (int));
 E void FDECL(alter_cost, (struct obj *, long));
@@ -2823,7 +2823,7 @@ E void FDECL(uleftvault, (struct monst *));
 E void NDECL(invault);
 E int FDECL(gd_move, (struct monst *));
 E void FDECL(paygd, (BOOLEAN_P));
-E long NDECL(hidden_gold);
+E long FDECL(hidden_gold, (BOOLEAN_P));
 E boolean NDECL(gd_sound);
 E void FDECL(vault_gd_watching, (unsigned int));
 

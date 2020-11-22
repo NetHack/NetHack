@@ -1,4 +1,4 @@
- /* NetHack 3.7	wintty.c	$NHDT-Date: 1596498345 2020/08/03 23:45:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.259 $ */
+ /* NetHack 3.7	wintty.c	$NHDT-Date: 1606011660 2020/11/22 02:21:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1922,7 +1922,12 @@ struct WinDesc *cw;
 
         if (n > 0) /* at least one group accelerator found */
             for (rp = gacc, curr = cw->mlist; curr; curr = curr->next)
-                if (curr->gselector && curr->gselector != curr->selector
+                if (curr->gselector
+                    && (curr->gselector != curr->selector
+                        /* '$' is both a selector "letter" and a group
+                           accelerator; including it in gacc allows gold to
+                           be selected via group when not on current page */
+                        || curr->gselector == GOLD_SYM)
                     && !index(gacc, curr->gselector)
                     && (cw->how == PICK_ANY
                         || gcnt[GSELIDX(curr->gselector)] == 1)) {
