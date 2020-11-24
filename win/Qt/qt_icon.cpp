@@ -63,8 +63,8 @@ NetHackQtLabelledIcon::NetHackQtLabelledIcon(QWidget *parent, const char *l,
 }
 
 // set up the style sheet strings used to specify color for status field
-// labels [done "once", but once for each LabelledIcon that's constucted,
-// so more than 20 copies overall]
+// labels [done "once", but once for each LabelledIcon that's constructed,
+// so about 30 copies overall with 3.6's status conditions]
 void NetHackQtLabelledIcon::initHighlight()
 {
     // note: string "green" is much darker than enum Qt::green
@@ -90,6 +90,11 @@ void NetHackQtLabelledIcon::setLabel(const QString &t, bool lower)
                       : (comp_mode == (lower ? SmallerIsBetter
                                              : BiggerIsBetter)) ? hl_better
                         : hl_worse);
+        } else if (turn_count) {
+            // if we don't want to highlight this status field but it is
+            // currently highlighted (perhaps optional Score recently went
+            // up and has just been toggled off), remove the highlight
+            unhighlight();
         }
     }
 }

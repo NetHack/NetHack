@@ -76,9 +76,6 @@
 //    The field passed to xp.setLabel() for its better vs worse comparison
 //    gets swapped from Xp to Exp or vice versa, yielding a nonsensical
 //    comparison for the first status update after the 'showexp' toggle.
-//  Toggling 'showscore' while Score is highlighted leaves the highlight
-//    on blank space until it times out.  (Time isn't highlighted and Exp
-//    is combined with Xp so always updated; only Score is affected.)
 //
 
 extern "C" {
@@ -694,9 +691,10 @@ void NetHackQtStatusWindow::updateStats()
     QString buf;
 
     if (first_set) {
+        // set toggle-detection flags for optional fields
         was_polyd = Upolyd ? true : false;
         had_exp = ::flags.showexp ? true : false;
-        // not '#ifndef SCORE_ON_BOTL' here; use the variable and the widget
+        // not conditionalized upon '#ifdef SCORE_ON_BOTL' here
         had_score = ::flags.showscore ? true : false; // false when disabled
         score.setLabel(""); // init if enabled, one-time set if disabled
     }
