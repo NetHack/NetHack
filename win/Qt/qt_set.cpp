@@ -141,6 +141,7 @@ NetHackQtSettings::NetHackQtSettings() :
     connect(&dollheight, SIGNAL(valueChanged(int)), this, SLOT(resizeDoll()));
 #endif
 
+    fontsize.setMinimumContentsLength((int) strlen("Medium"));
     fontsize.addItem("Huge");
     fontsize.addItem("Large");
     fontsize.addItem("Medium");

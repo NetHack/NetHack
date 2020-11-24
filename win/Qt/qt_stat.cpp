@@ -72,10 +72,6 @@
 //    the rest of status.  That takes up more space, which is ok, but it
 //    also increases the vertical margin in between them by more than is
 //    necessary.  Should squeeze some of that excess blank space out.
-//  Highlighting of Xp/Exp needs work when 'showexp' is toggled On or Off.
-//    The field passed to xp.setLabel() for its better vs worse comparison
-//    gets swapped from Xp to Exp or vice versa, yielding a nonsensical
-//    comparison for the first status update after the 'showexp' toggle.
 //
 
 extern "C" {
@@ -788,11 +784,12 @@ void NetHackQtStatusWindow::updateStats()
     dlevel.setLabel(buf3);
 
     int poly_toggled = !was_polyd ^ !Upolyd;
-    if (poly_toggled) {
+    int exp_toggled = !had_exp ^ !::flags.showexp;
+    if (poly_toggled)
         // for this update, changed values aren't better|worse, just different
         hp.setCompareMode(NeitherIsBetter);
+    if (poly_toggled || exp_toggled)
         level.setCompareMode(NeitherIsBetter);
-    }
     if (Upolyd) {
         // You're a monster!
         buf.sprintf("/%d", u.mhmax);
@@ -807,9 +804,6 @@ void NetHackQtStatusWindow::updateStats()
         // up/down highlighting becomes tricky--don't try very hard;
         // depending upon font size and status layout, "Level:NN/nnnnnnnn"
         // might be too wide to fit
-#if 0   /* not yet */
-        int exp_toggled = !had_exp ^ !::flags.showexp;
-#endif
         static const char *const lvllbl[3] = { "Level:", "Lvl:", "L:" };
         QFontMetrics fm(level.label->font());
         for (int i = ::flags.showexp ? 0 : 3; i < 4; ++i) {
@@ -829,11 +823,11 @@ void NetHackQtStatusWindow::updateStats()
                        // Exp for setLabel()'s Up|Down highlighting
                        ::flags.showexp ? u.uexp : (long) u.ulevel);
     }
-    if (poly_toggled) {
+    if (poly_toggled)
         // for next update, changed values will be better|worse as usual
         hp.setCompareMode(BiggerIsBetter);
+    if (poly_toggled || exp_toggled)
         level.setCompareMode(BiggerIsBetter);
-    }
     was_polyd = Upolyd ? true : false;
     had_exp = (::flags.showexp && !was_polyd) ? true : false;
 
