@@ -1225,8 +1225,10 @@ register struct obj *obj;
     }
     update_map = (obj->where == OBJ_FLOOR);
     obj_extract_self(obj);
-    if (update_map)
+    if (update_map) {
+        maybe_unhide_at(obj->ox, obj->oy);
         newsym(obj->ox, obj->oy);
+    }
     obfree(obj, (struct obj *) 0); /* frees contents also */
 }
 

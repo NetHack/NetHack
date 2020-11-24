@@ -1128,6 +1128,8 @@ xchar lev;
         place_monster(mtmp, mtmp->mx, mtmp->my);
         if (mtmp->wormno)
             place_wsegs(mtmp, NULL);
+        if (hides_under(mtmp->data) && mtmp->mundetected)
+            (void) hideunder(mtmp);
 
         /* regenerate monsters while on another level */
         if (!u.uz.dlevel)
