@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1598570054 2020/08/27 23:14:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1606243387 2020/11/24 18:43:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,11 +46,16 @@ const struct propname {
     { DETECT_MONSTERS, "monster detection" },
     { SEE_INVIS, "see invisible" },
     { INVIS, "invisible" },
-    { DISPLACED, "displaced" }, /* timed amount possible via eating a
-                                 * displacer beast corpse */
-    /* properties beyond here don't have timed values during normal play,
-       so there's not much point in trying to order them sensibly;
-       they're either on or off based on equipment, role, actions, &c */
+    /* timed displacement is possible via eating a displacer beast corpse */
+    { DISPLACED, "displaced" },
+    /* timed pass-walls is a potential prayer result if surrounded by stone
+       with nowhere to be safely teleported to */
+    { PASSES_WALLS, "pass thru walls" },
+    /*
+     * Properties beyond here don't have timed values during normal play,
+     * so there's not much point in trying to order them sensibly.
+     * They're either on or off based on equipment, role, actions, &c.
+     */
     { FIRE_RES, "fire resistance" },
     { COLD_RES, "cold resistance" },
     { SLEEP_RES, "sleep resistance" },
@@ -81,7 +86,6 @@ const struct propname {
     { WWALKING, "water walking" },
     { SWIMMING, "swimming" },
     { MAGICAL_BREATHING, "magical breathing" },
-    { PASSES_WALLS, "pass thru walls" },
     { SLOW_DIGESTION, "slow digestion" },
     { HALF_SPDAM, "half spell damage" },
     { HALF_PHDAM, "half physical damage" },
@@ -676,6 +680,12 @@ nh_timeout()
                 }
                 break;
             case LEVITATION:
+                /* timed Flying is via #wizintrinsic only; still, we want to
+                   avoid float_down() reporting "you have stopped levitating
+                   and are now flying" if both are timing out together;
+                   relies on knowing that Lev timeout is handled before Fly */
+                if ((HFlying & TIMEOUT) == 1L)
+                    --HFlying; /* bypass pending 'case FLYING' */
                 (void) float_down(I_SPECIAL | TIMEOUT, 0L);
                 break;
             case FLYING:
