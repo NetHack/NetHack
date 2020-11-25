@@ -14,7 +14,7 @@ new machine.  The basic steps in porting the program are:
 	    have the files in the top directory since you're reading this
 	    one. :-)
 
-	    If you will be cross-compiling for your target platform on 
+	    If you will be cross-compiling for your target platform on
             a different platform, you may want to read Cross-compiling
             in the Top folder as well.
 
@@ -185,7 +185,7 @@ line options to produce several output files that are required for:
           (a) additional build steps to follow, including some header
               files: pm.h, onames.h, date.h.
           (b) creation of files, containing information required by,
-              or about the game during its execution, that are stored in a 
+              or about the game during its execution, that are stored in a
               portable, platform-independent way, that need to be inserted
               into the final game package.
 
@@ -205,7 +205,7 @@ utilities, and so forth. Those produce output files for use during the game and
 need to be included in the packaging of the game.
 
      4.3. Lua
-  
+
 	Compile and link into a library, or obtain a prebuilt Lua library for
 your platform. Place the Lua source into lib/lua-5.4.1 (or other folder
 representing an appropriate Lua version); place the compiled Lua library into
@@ -244,7 +244,7 @@ text by makedefs during the build process, have been replaced by Lua versions
 and are inserted into the game package for processing by the embedded Lua
 interpreter during game execution.
 
-     5.2  Level Compiler  
+     5.2  Level Compiler
 
 	There is no longer a build-time level compiler. Instead, the level
 descriptions have been converted to Lua and are inserted into the game package

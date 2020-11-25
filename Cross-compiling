@@ -678,7 +678,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
     or nethacklib builds. A "shim" pseudo-windowport is included
     from pull request 385.
 
-    Result: As mentioned, the wasm cross-compile will end up in 
+    Result: As mentioned, the wasm cross-compile will end up in
             targets/wasm and the nethacklib.a will end up
             src.
 

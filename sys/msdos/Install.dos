@@ -1,5 +1,5 @@
 
-	   Copyright (c) NetHack PC Development Team 1990-2002.
+	   Copyright (c) NetHack PC Development Team 1990-2020.
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
@@ -9,13 +9,13 @@
         Last revision: $NHDT-Date: 1596508786 2020/08/04 02:39:46 $
 
 Credit for a runnable full PC NetHack 3.7 goes to the PC Development team
-of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer, 
-Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson, 
+of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer,
+Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson,
 Stephen White, Ken Washikita and Janet Walz.  The present port is based
 on the previous effort of Pierre Martineau, Stephen Spackman, Steve Creps, Mike
 Threepoint, Mike Stephenson, Norm Meluch and Don Kneller.
 
-There has been very little port-specific maintenance for NetHack on DOS since 
+There has been very little port-specific maintenance for NetHack on DOS since
 NetHack 3.3.0.
 
 CONTENTS:
@@ -51,12 +51,12 @@ I.  Dispelling the Myths:
     with 3.5.x.
 
     You may find it useful to obtain copies of lex (flex) and yacc (bison
-    or byacc).  While not strictly necessary to compile nethack, they are 
-    required should you desire to make any changes to the level and dungeon 
-    compilers.  Flex and Bison are included with the DJGPP distribution and 
-    are also available on many archive sites. 
+    or byacc).  While not strictly necessary to compile nethack, they are
+    required should you desire to make any changes to the level and dungeon
+    compilers.  Flex and Bison are included with the DJGPP distribution and
+    are also available on many archive sites.
 
-    Also be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and 
+    Also be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and
     touch.exe, since the Makefile uses them by default.
 
 II. To compile your copy of NetHack on a DOS machine:
@@ -76,12 +76,12 @@ II. To compile your copy of NetHack on a DOS machine:
 
                            (top)
                              |
-        ------------------------------------------------- 
-        |       |     |        |       |     |          | 
+        -------------------------------------------------
+        |       |     |        |       |     |          |
        util    dat   doc    include   src   sys        win
                                              |          |
-                                          ------      ----- 
-                                          |    |      |   |  
+                                          ------      -----
+                                          |    |      |   |
                                        share msdos   tty share
 
     Check the file "Files" in your top level directory for an exact
@@ -118,9 +118,9 @@ II. To compile your copy of NetHack on a DOS machine:
 
     First check config.h according to the comments to match your system and
     desired set of features.  Mostly you need to check the WIZARD option,
-    and check TERMLIB and COMPRESS.  Also be sure to leave DLB support 
-    commented out in config.h.  MSDOS has support for DLB, but it must be 
-    done through the Makefile, rather than config.h, to ensure that the 
+    and check TERMLIB and COMPRESS.  Also be sure to leave DLB support
+    commented out in config.h.  MSDOS has support for DLB, but it must be
+    done through the Makefile, rather than config.h, to ensure that the
     necessary packaging steps are done.
 
     We've managed to enable all the special features.  You may include all
@@ -154,14 +154,14 @@ II. To compile your copy of NetHack on a DOS machine:
     occupied for quite some time.  If all goes well, you will get an
     NetHack executable.
 
-9.  If you chose DLB support (recommended), make sure that the file nhdat 
+9.  If you chose DLB support (recommended), make sure that the file nhdat
     got copied into the game directory.
 
     If you didn't choose DLB support, make sure the support files --
     data, rumors, cmdhelp, opthelp, help, hh,history, guidebook.txt
-    license, and all the *.lev files -- were copied to the game directory.  
-    If not, move them there from the dat directory yourself.  rumors can 
-    be created manually be entering "makedefs -r", data by entering 
+    license, and all the *.lev files -- were copied to the game directory.
+    If not, move them there from the dat directory yourself.  rumors can
+    be created manually be entering "makedefs -r", data by entering
     "makedefs -d".
 
     Make sure the files NetHack1.tib and NetHacko.tib made it to your game
@@ -175,7 +175,7 @@ II. To compile your copy of NetHack on a DOS machine:
     speed-dialer, making the file hidden on many machines.
 
     If you changed your build settings to include TERMCAP support, copy
-    termcap to your game directory.  
+    termcap to your game directory.
 
     Also, make sure the file msdoshlp.txt made it to your game directory.
     If it didn't, move it from sys\msdos to your game directory
@@ -191,8 +191,8 @@ Appendix A - Building the "official binary"
     If you wish to build a copy of NetHack identical to the one that
     the pc team distributes, simply do the following:
 
-    The 32-bit Protected Mode DPMI version built with 32-bit djgpp 
-    compiler V2.03 or greater, make no changes to any of the defines and use 
+    The 32-bit Protected Mode DPMI version built with 32-bit djgpp
+    compiler V2.03 or greater, make no changes to any of the defines and use
     the Makefile.GCC as distributed, and as moved in step 3.
 
     Paths below are relative to the top of your unpacked
@@ -219,11 +219,11 @@ Appendix B - DJGPP Compiler (gcc ported to msdos)
     At the time of this release in April 2002, the URL
 	http://www.delorie.com/djgpp/zip-picker.html/
     had information on how to obtain djgpp and what pieces to get.
-    Be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and 
+    Be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and
     touch.exe, since the Makefile uses them by default (or change
     the Makefile to use alternatives).
 
-    Special note for Windows 2000 / Windows XP users: You must have a 
+    Special note for Windows 2000 / Windows XP users: You must have a
     recent djgpp distribution for the build process, and the generated
     executables to work properly on those platforms.
 
@@ -234,9 +234,9 @@ Appendix B - DJGPP Compiler (gcc ported to msdos)
     djgpp.
 
     The latest version of djgpp, V2.03 with the most recent refresh
-    will produce a binary that will run under Microsoft Windows, or any 
-    other DPMI provider.  djgpp also comes with a DPMI provider called CWSDPMI.  
-    Place CWSDPMI.EXE in your path and it will be used in the absence of any 
+    will produce a binary that will run under Microsoft Windows, or any
+    other DPMI provider.  djgpp also comes with a DPMI provider called CWSDPMI.
+    Place CWSDPMI.EXE in your path and it will be used in the absence of any
     other DPMI provider.
 
     If you want to use the built-in DJGPP screen routines, uncomment
@@ -247,7 +247,7 @@ Appendix C - Additional Notes
 1)  Save files and bones files from versions of NetHack prior to 3.5.0 will not
     work with this NetHack.  Don't bother trying to keep them.
 
-2)  To install an update of NetHack after changing something, type 'make' 
+2)  To install an update of NetHack after changing something, type 'make'
     for DJGPP from the src directory.  If you add, delete, or reorder monsters or
     objects, or you change the format of saved level files, delete any save
     and bones files.  (Trying to use such files sometimes produces amusing

@@ -47,7 +47,7 @@ DIRPERM  = 0755
 #SHELLDIR = $(PREFIX)/games
 
 # per discussion in Install.X11 and Install.Qt
-#VARDATND = 
+#VARDATND =
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
 # for Atari/Gem
