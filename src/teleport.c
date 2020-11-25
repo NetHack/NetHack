@@ -1258,6 +1258,10 @@ register int x, y;
        the latter only happens if you've attacked them with polymorph */
     if (resident_shk && !inhishop(mtmp))
         make_angry_shk(mtmp, oldx, oldy);
+
+    /* trapped monster teleported away */
+    if (mtmp->mtrapped && !mtmp->wormno)
+        (void) mintrap(mtmp);
 }
 
 static stairway *

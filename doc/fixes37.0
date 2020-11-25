@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ $NHDT-Date: 1606033928 2020/11/22 08:32:08 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.362 $ $NHDT-Date: 1606243387 2020/11/24 18:43:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -305,6 +305,9 @@ wand/scroll of create monster or bag of tricks that makes a new monster which
 	concealed mimic seen as furniture or an object
 'showscore' could be used to determine how much gold was inside a container
 	whose contents were unknown
+wizard mode (only way to get timed flying): if levitation and flying time out
+	on same turn, player was told "You have stopped levitating and are
+	now flying."; status line wasn't updated to remove stale Fly condition
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

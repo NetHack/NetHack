@@ -135,14 +135,13 @@ private:
         QFrame vline2; // for statuslines:2, padding between Gold and Time
 
 	int cursy;
-
 	bool first_set;
         bool alreadyfullhp;
+
+        // for some fields, we need to know more than just "changed since
+        // last update"; there's no 'had_time' because Time isn't highlighted
         bool was_polyd;
         bool had_exp;
-        // Time isn't highlighted (due to constantly changing) so we don't
-        // keep track of whether it was On and is now Off or vice versa
-        //bool had_time;
         bool had_score;
 
         QHBoxLayout *InitHitpointBar();

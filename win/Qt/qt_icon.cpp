@@ -133,19 +133,16 @@ void NetHackQtLabelledIcon::setFont(const QFont& f)
     if (label) label->setFont(f);
 }
 
-// [pr] this might no longer be needed; it seems to have been responsible
-// for highlighting the blank space where an optional field like Score
-// was just toggled off; we don't need or want that anymore...
+// used to highlight status conditions going from Off (blank) to On as "Worse"
 void NetHackQtLabelledIcon::show()
 {
-    if (
-#if QT_VERSION >= 300
-        isHidden()
-#else
-        !isVisible()
-#endif
-        && comp_mode != NoCompare)
-	highlight(hl_worse);
+    // Hunger and Encumbrance are worse when going from not shown
+    // to anything and they're set to SmallerIsBetter, so both
+    // BiggerIsBetter and SmallerIsBetter warrant hl_worse here.
+    // Fly, Lev, and Ride are set NeitherIsBetter so that when
+    // they appear they won't be classified as worse.
+    if (isHidden() && comp_mode != NoCompare)
+	highlight((comp_mode != NeitherIsBetter) ? hl_worse : hl_changd);
     QWidget::show();
 }
 
