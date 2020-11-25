@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{November 16, 2020}
+\date{November 25, 2020}
 
 \maketitle
 
@@ -4529,7 +4529,16 @@ with the `{\tt O}' command.
  Where to align or place the status window (top, bottom, left, or right).
 %.lp
 \item[\ib{ascii\verb+_+map}]
-If {\it NetHack\/} can, it should display an ascii map.
+%.hw DECgraphics IBMgraphics \% don't hyphenate these
+\hyphenation{DECgraphics IBMgraphics}
+If {\it NetHack\/} can, it should display the map using simple
+characters (letters and punctuation) rather than {\it tiles\/} graphics.
+In some cases, characters can be augmented with line-drawing symbols;
+use the {\tt symset}
+option to select a symbol set such as {\it DECgraphics\/}
+or {\it IBMgraphics\/} if your display supports them.
+Setting {\tt ascii\verb+_+map} to {\it True\/} forces
+{\tt tiled\verb+_+map} to be {\it False}.
 %.lp
 \item[\ib{color}]
 If {\it NetHack\/} can, it should display color for different monsters,
@@ -4661,9 +4670,6 @@ Curses will attempt to resize to the values specified but will settle
 for smaller sizes if they are too big.
 Default is the current window size.
 %.lp
-\item[\ib{tiled\verb+_+map}]
-If {\it NetHack\/} can, it should display a tiled map if it can.
-%.lp
 \item[\ib{tile\verb+_+file}]
 Specify the name of an alternative tile file to override the default.
 %.lp
@@ -4672,6 +4678,13 @@ Specify the preferred height of each tile in a tile capable port.
 %.lp
 \item[\ib{tile\verb+_+width}]
 Specify the preferred width of each tile in a tile capable port
+%.lp
+\item[\ib{tiled\verb+_+map}]
+If {\it NetHack\/} can, it should display the map using \fItiles\fP graphics
+rather than simple characters (letters and punctuation, possibly
+augmented by line-drawing symbols).
+Setting {\tt tiled\verb+_+map} to {\it True\/} forces
+{\tt ascii\verb+_+map} to be {\it False}.
 %.lp
 \item[\ib{use\verb+_+darkgray}]
 Use bold black instead of blue for black glyphs (TTY only).
