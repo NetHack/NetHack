@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.399 $ $NHDT-Date: 1606324515 2020/11/25 17:15:15 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ $NHDT-Date: 1606328499 2020/11/25 18:21:39 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -103,7 +103,7 @@ travel, you see the ancient ruins that mark the entrance to the
 Mazes of Menace.  It is late at night, so you make camp at the entrance
 and spend the night sleeping under the open skies.  In the morning, you
 gather your gear, eat what may be your last meal outside, and enter the
-dungeon...
+dungeon....
 .
 .hn 1
 What is going on here?
@@ -1991,6 +1991,23 @@ The
 .op run_mode
 option controls how frequently the map gets redrawn when moving more
 than one step in a single command (so when rushing, running, or traveling).
+.hn 2
+Rogue level
+.pg
+One dungeon level (occurring in mid to late teens of the main dungeon)
+is a tribute to the ancestor game \fIhack\fP's inspiration \fIrogue\fP.
+.pg
+It is usually displayed differently from other levels: possibly in
+characters instead of tiles, or without line-drawing symbols if already
+in characters; also, gold is shown as \f(CR*\fP rather than \f(CR$\fP
+and stairs are shown as \f(CR%\fP rather than \f(CR<\fP and \f(CR>\fP.
+There are some minor differences in actual game play: doorways lack
+doors; a scroll, wand, or spell of light used in a room lights up the
+whole room rather than within a radius around your character.
+And monsters represented by lower-case letters aren't randomly
+generated on the rogue level.
+.pg
+The slight strangeness of this level is a feature, not a bug....
 .
 .hn 1
 Monsters

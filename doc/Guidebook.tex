@@ -2075,7 +2075,7 @@ Shops do not get restocked with new items, regardless of inventory depletion.
 \end{itemize}
 
 %.hn 2
-\subsubsection*{Movement feedback}
+\subsection*{Movement feedback}
 
 %.pg
 Moving around the map usually provides no
@@ -2160,6 +2160,27 @@ The
 {\it run\verb+_+mode}
 option controls how frequently the map gets redrawn when moving more
 than one step in a single command (so when rushing, running, or traveling).
+
+%.hn 2
+\subsection*{Rogue level}
+
+%.pg
+One dungeon level (occurring in mid to late teens of the main dungeon)
+is a tribute to the ancestor game {\it hack}'s inspiration {\it rogue}.
+
+%.pg
+It is usually displayed differently from other levels: possibly in
+characters instead of tiles, or without line-drawing symbols if already
+in characters; also, gold is shown as {\tt *} rather than {\tt \verb+$+}
+and stairs are shown as {\tt \verb+%+} rather than {\tt <} and {\tt >}.
+There are some minor differences in actual game play: doorways lack
+doors; a scroll, wand, or spell of light used in a room lights up the
+whole room rather than within a radius around your character.
+And monsters represented by lower-case letters aren't randomly
+generated on the rogue level.
+
+%.pg
+The slight strangeness of this level is a feature, not a bug....
 
 %.hn 1
 \section{Monsters}
@@ -4848,7 +4869,7 @@ if this does not correct the problem, try {\tt !color}.
 Cannot be set with the `{\tt O}' command.
 \elist
 
-%.nh 2
+%.hn 2
 \subsection*{Regular Expressions}
 
 %.pg
