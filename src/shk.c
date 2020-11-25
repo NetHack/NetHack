@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1606009003 2020/11/22 01:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1606343581 2020/11/25 22:33:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3003,6 +3003,44 @@ boolean peaceful, silent;
     return value;
 }
 
+/* opposite of costly_gold(); hero has dropped gold in a shop;
+   called from sellobj(); ought to be called from subfrombill() too */
+void
+donate_gold(gltmp, shkp, selling)
+long gltmp;
+struct monst *shkp;
+boolean selling; /* True: dropped in shop; False: kicked and landed in shop */
+{
+    struct eshk *eshkp = ESHK(shkp);
+
+    if (eshkp->debit >= gltmp) {
+        if (eshkp->loan) { /* you carry shop's gold */
+            if (eshkp->loan > gltmp)
+                eshkp->loan -= gltmp;
+            else
+                eshkp->loan = 0L;
+        }
+        eshkp->debit -= gltmp;
+        Your("debt is %spaid off.", eshkp->debit ? "partially " : "");
+    } else {
+        long delta = gltmp - eshkp->debit;
+
+        eshkp->credit += delta;
+        if (eshkp->debit) {
+            eshkp->debit = 0L;
+            eshkp->loan = 0L;
+            Your("debt is paid off.");
+        }
+        if (eshkp->credit == delta)
+            You("have %sestablished %ld %s credit.",
+                !selling ? "re-" : "", delta, currency(delta));
+        else
+            pline("%ld %s added%s to your credit; total is now %ld %s.",
+                  delta, currency(delta), !selling ? " back" : "",
+                  eshkp->credit, currency(eshkp->credit));
+    }
+}
+
 void
 sellobj_state(deliberate)
 int deliberate;
@@ -3088,7 +3126,7 @@ xchar x, y;
         return;
     }
 
-    if (eshkp->robbed) { /* shkp is not angry? */
+    if (eshkp->robbed) { /* bones; shop robbed by previous customer */
         if (isgold)
             offer = obj->quan;
         else if (cgold)
@@ -3106,32 +3144,7 @@ xchar x, y;
         if (!cgold)
             gltmp = obj->quan;
 
-        if (eshkp->debit >= gltmp) {
-            if (eshkp->loan) { /* you carry shop's gold */
-                if (eshkp->loan >= gltmp)
-                    eshkp->loan -= gltmp;
-                else
-                    eshkp->loan = 0L;
-            }
-            eshkp->debit -= gltmp;
-            Your("debt is %spaid off.", eshkp->debit ? "partially " : "");
-        } else {
-            long delta = gltmp - eshkp->debit;
-
-            eshkp->credit += delta;
-            if (eshkp->debit) {
-                eshkp->debit = 0L;
-                eshkp->loan = 0L;
-                Your("debt is paid off.");
-            }
-            if (eshkp->credit == delta)
-                You("have established %ld %s credit.", delta,
-                    currency(delta));
-            else
-                pline("%ld %s added to your credit; total is now %ld %s.",
-                      delta, currency(delta), eshkp->credit,
-                      currency(eshkp->credit));
-        }
+        donate_gold(gltmp, shkp, TRUE);
 
         if (!offer || g.sell_how == SELL_DONTSELL) {
             if (!isgold) {

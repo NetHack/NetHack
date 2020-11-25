@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.362 $ $NHDT-Date: 1606243387 2020/11/24 18:43:07 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.363 $ $NHDT-Date: 1606343573 2020/11/25 22:32:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -308,6 +308,9 @@ wand/scroll of create monster or bag of tricks that makes a new monster which
 wizard mode (only way to get timed flying): if levitation and flying time out
 	on same turn, player was told "You have stopped levitating and are
 	now flying."; status line wasn't updated to remove stale Fly condition
+throwing or kicking a shop container (that's light enough to move) made the
+	hero pay for any gold inside, then didn't refund that amount if the
+	container landed inside the shop
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
