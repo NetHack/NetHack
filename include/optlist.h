@@ -120,7 +120,7 @@ pfx_##a,
                 "deprecated (use S_boulder in sym file instead)")
 #endif
     NHOPTC(catname, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "the name of your (first) cat (e.g., catname:Tabby)")
+                "name of your starting pet when it is a kitten")
 #ifdef INSURANCE
     NHOPTB(checkpoint, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.ins_chkpt)
@@ -150,11 +150,11 @@ pfx_##a,
                 opt_in, set_in_game, Yes, Yes, No, Yes, NoAlias,
                 "the kinds of information to disclose at end of game")
     NHOPTC(dogname, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "the name of your (first) dog (e.g., dogname:Fang)")
+                "name of your starting pet when it is a little dog")
     NHOPTC(dungeon, MAXDCHARS + 1,opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "the symbols to use in drawing the dungeon map")
+                NoAlias, "list of symbols to use in drawing the dungeon map")
     NHOPTC(effects, MAXECHARS + 1, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "the symbols to use in drawing special effects")
+                NoAlias, "list of symbols to use in drawing special effects")
     NHOPTB(eight_bit_tty, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc_eight_bit_input)
     NHOPTB(extmenu, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
@@ -164,29 +164,29 @@ pfx_##a,
     NHOPTB(fixinv, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.invlet_constant)
     NHOPTC(font_map, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the font to use in the map window")
+                "font to use in the map window")
     NHOPTC(font_menu, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the font to use in menus")
+                "font to use in menus")
     NHOPTC(font_message, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the font to use in the message window")
+                "font to use in the message window")
     NHOPTC(font_size_map, 20, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the size of the map font")
+                "size of the map font")
     NHOPTC(font_size_menu, 20, opt_in, set_gameview, Yes, Yes, Yes, No,
-                NoAlias, "the size of the menu font")
+                NoAlias, "size of the menu font")
     NHOPTC(font_size_message, 20, opt_in, set_gameview, Yes, Yes, Yes, No,
-                NoAlias, "the size of the message font")
+                NoAlias, "size of the message font")
     NHOPTC(font_size_status, 20, opt_in, set_gameview, Yes, Yes, Yes, No,
-                NoAlias, "the size of the status font")
+                NoAlias, "size of the status font")
     NHOPTC(font_size_text, 20, opt_in, set_gameview, Yes, Yes, Yes, No,
-                NoAlias, "the size of the text font")
+                NoAlias, "size of the text font")
     NHOPTC(font_status, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the font to use in status window")
+                "font to use in status window")
     NHOPTC(font_text, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,
-                "the font to use in text windows")
+                "font to use in text windows")
     NHOPTB(force_invmenu, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.force_invmenu)
     NHOPTC(fruit, PL_FSIZ, opt_in, set_in_game, No, Yes, No, No, NoAlias,
-                "the name of a fruit you enjoy eating")
+                "name of a fruit you enjoy eating")
     NHOPTB(fullscreen, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_fullscreen)
     NHOPTC(gender, 8, opt_in, set_gameview, No, Yes, No, No, NoAlias,
@@ -209,12 +209,12 @@ pfx_##a,
                 &iflags.hilite_pile)
 #ifdef STATUS_HILITES
     NHOPTC(hilite_status, 13, opt_out, set_in_game, Yes, Yes, Yes, No, NoAlias,
-                "hilite_status")
+                "a status highlighting rule (can occur multiple times)")
 #endif
     NHOPTB(hitpointbar, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_hitpointbar)
     NHOPTC(horsename, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "name of your (first) horse (e.g., horsename:Silver)")
+                "name of your starting pet when it is a pony")
 #ifdef BACKWARD_COMPAT
     NHOPTC(IBMgraphics, 70, opt_in, set_in_config, Yes, Yes, No, No, NoAlias,
                 "load IBMGraphics display symbols")
@@ -292,7 +292,7 @@ pfx_##a,
     NHOPTB(monpolycontrol, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.mon_polycontrol)
     NHOPTC(monsters, MAXMCLASSES, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "the symbols to use for monsters")
+                NoAlias, "list of symbols to use for monsters")
     NHOPTC(mouse_support, 0, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "game receives click info from mouse")
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
@@ -320,7 +320,7 @@ pfx_##a,
     NHOPTC(number_pad, 1, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "use the number pad for movement")
     NHOPTC(objects, MAXOCLASSES, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "the symbols to use for objects")
+                NoAlias, "list of symbols to use for objects")
     NHOPTC(packorder, MAXOCLASSES, opt_in, set_in_game, No, Yes, No, No,
                 NoAlias, "the inventory order of the items in your pack")
 #ifdef CHANGE_COLOR
@@ -422,8 +422,8 @@ pfx_##a,
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
 #else
-    NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No, NoAlias,
-                "highlight control")
+    NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No,
+                NoAlias, "highlight control")
 #endif
     NHOPTC(statuslines, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "2 or 3 lines for status display")
@@ -461,7 +461,7 @@ pfx_##a,
     NHOPTB(toptenwin, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.toptenwin)
     NHOPTC(traps, MAXTCHARS + 1, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "the symbols to use in drawing traps")
+                NoAlias, "list of symbols to use in drawing traps")
     NHOPTB(travel, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.travelcmd)
 #ifdef DEBUG
@@ -528,7 +528,7 @@ pfx_##a,
     NHOPTC(windowcolors, 80, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "the foreground/background colors of windows")
     NHOPTC(windowtype, WINTYPELEN, opt_in, set_gameview, No, Yes, No, No,
-                NoAlias, "windowing system to use")
+                NoAlias, "windowing system to use (should be specified first)")
     NHOPTB(wizweight, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
