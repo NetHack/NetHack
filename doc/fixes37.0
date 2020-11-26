@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.363 $ $NHDT-Date: 1606343573 2020/11/25 22:32:53 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ $NHDT-Date: 1606385979 2020/11/26 10:19:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -398,6 +398,9 @@ fire/frost horn feedback when zapped by monster was inaccurate (falsely
 	claimed that it was "directed at self" when attacking hero)
 tins of spinach and 'dead' eggs could cause out of array bounds access
 	attempting to index into mons[] by polyfodder() macro
+options help ('? g') listed all boolean options, then repeated them among
+	the compound options; on OSX they showed a description of "(null)"
+	but for other sprintf implementations they might cause a crash
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
