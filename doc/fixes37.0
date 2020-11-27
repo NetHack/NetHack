@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ $NHDT-Date: 1606385979 2020/11/26 10:19:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ $NHDT-Date: 1606473484 2020/11/27 10:38:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -311,6 +311,7 @@ wizard mode (only way to get timed flying): if levitation and flying time out
 throwing or kicking a shop container (that's light enough to move) made the
 	hero pay for any gold inside, then didn't refund that amount if the
 	container landed inside the shop
+try to fix message sequencing for tame golems that "roast/rot/rust in peace"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
