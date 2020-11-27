@@ -3165,6 +3165,7 @@ E int FDECL(bhito, (struct obj *, struct obj *));
 E int FDECL(bhitpile,
             (struct obj *, int (*)(OBJ_P, OBJ_P), int, int, SCHAR_P));
 E int FDECL(zappable, (struct obj *));
+E void NDECL(do_enlightenment_effect);
 E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);
 E int FDECL(zapyourself, (struct obj *, BOOLEAN_P));
