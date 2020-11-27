@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1606385980 2020/11/26 10:19:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.481 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1606445249 2020/11/27 02:47:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -246,13 +246,12 @@ static boolean FDECL(add_menu_coloring_parsed, (const char *, int, int));
 static void FDECL(free_one_menu_coloring, (int));
 static int NDECL(count_menucolors);
 static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
-                                           char *, char **));
+                                       char *, char **));
 static void FDECL(doset_add_menu, (winid, const char *, int, int));
-static void FDECL(opts_add_others, (winid, const char *, int,
-                                        char *, int));
+static void FDECL(opts_add_others, (winid, const char *, int, char *, int));
 static int FDECL(handle_add_list_remove, (const char *, int));
 static void FDECL(remove_autopickup_exception,
-                      (struct autopickup_exception *));
+                  (struct autopickup_exception *));
 static int NDECL(count_apes);
 static int NDECL(count_cond);
 
@@ -7401,9 +7400,9 @@ static struct other_opts {
     int NDECL((*othr_count_func));
 } othropt[] = {
     { "autopickup exceptions", set_in_game, OPT_OTHER_APEXC, count_apes },
-    { "status condition fields", set_in_game, OPT_OTHER_COND, count_cond },
     { "menu colors", set_in_game, OPT_OTHER_MENUCOLOR, count_menucolors },
     { "message types", set_in_game, OPT_OTHER_MSGTYPE, msgtype_count },
+    { "status condition fields", set_in_game, OPT_OTHER_COND, count_cond },
 #ifdef STATUS_HILITES
     { "status hilite rules", set_in_game, OPT_OTHER_STATHILITE,
       count_status_hilites },
@@ -8105,8 +8104,8 @@ static const char *opt_epilog[] = {
     "Some of the options can only be set before the game is started;",
     "those items will not be selectable in the 'O' command's menu.",
     "Some options are stored in a game's save file, and will keep saved",
-    "values when restoring that game even if you have updated your",
-    "config file to change them.  Such changes will matter for new games.",
+    "values when restoring that game even if you have updated your config-",
+    "uration file to change them.  Such changes will matter for new games.",
     "The \"other settings\" can be set with 'O', but when set within the",
     "configuration file they use their own directives rather than OPTIONS.",
     "See NetHack's \"Guidebook\" for details.",
@@ -8152,7 +8151,7 @@ option_help()
 
     putstr(datawin, 0, "Other settings:");
     for (i = 0; othropt[i].name; ++i) {
-        Sprintf(buf, "`%s'", othropt[i].name);
+        Sprintf(buf, " %s", othropt[i].name);
         putstr(datawin, 0, buf);
     }
 

@@ -235,8 +235,8 @@ Compound options which may be set only on startup are:
 align      Your starting alignment (lawful, neutral, chaotic,      [random]
            or random).  Many roles restrict the choice to a subset.
            You may specify just the first letter.
-catname    name of your starting pet when it is a kitten             [none]
-dogname    name of your starting pet when it is a little dog         [none]
+catname    name of your starting pet if it is a kitten               [none]
+dogname    name of your starting pet if it is a little dog           [none]
            Several roles who start with a dog have one whose name is
            pre-set (for example, "Hachi" for Samurai), but that name
            will be overridden if you specify dogname.
@@ -244,7 +244,7 @@ gender     Your starting gender (male, female, or random).         [random]
            You may specify just the first letter.  Although you can
            still denote your gender using the old "male" and "female"
            boolean options, the "gender" option will take precedence.
-horsename  name of your starting pet when it is a pony               [none]
+horsename  name of your starting pet if it is a pony                 [none]
 menu_*     specify single character accelerators for menu commands.
            Here is a list of all commands with their default keystroke
            followed by a list of window-ports that implement them:

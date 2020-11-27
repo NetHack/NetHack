@@ -120,7 +120,7 @@ pfx_##a,
                 "deprecated (use S_boulder in sym file instead)")
 #endif
     NHOPTC(catname, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "name of your starting pet when it is a kitten")
+                "name of your starting pet if it is a kitten")
 #ifdef INSURANCE
     NHOPTB(checkpoint, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.ins_chkpt)
@@ -150,7 +150,7 @@ pfx_##a,
                 opt_in, set_in_game, Yes, Yes, No, Yes, NoAlias,
                 "the kinds of information to disclose at end of game")
     NHOPTC(dogname, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "name of your starting pet when it is a little dog")
+                "name of your starting pet if it is a little dog")
     NHOPTC(dungeon, MAXDCHARS + 1,opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "list of symbols to use in drawing the dungeon map")
     NHOPTC(effects, MAXECHARS + 1, opt_in, set_in_config, No, Yes, No, No,
@@ -214,7 +214,7 @@ pfx_##a,
     NHOPTB(hitpointbar, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_hitpointbar)
     NHOPTC(horsename, PL_PSIZ, opt_in, set_gameview, No, Yes, No, No, NoAlias,
-                "name of your starting pet when it is a pony")
+                "name of your starting pet if it is a pony")
 #ifdef BACKWARD_COMPAT
     NHOPTC(IBMgraphics, 70, opt_in, set_in_config, Yes, Yes, No, No, NoAlias,
                 "load IBMGraphics display symbols")
