@@ -1,4 +1,4 @@
-/* NetHack 3.7	dokick.c	$NHDT-Date: 1606009001 2020/11/22 01:36:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.7	dokick.c	$NHDT-Date: 1606343576 2020/11/25 22:32:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.160 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -508,7 +508,8 @@ xchar x, y;
     }
 
     if (!uarmf && g.kickedobj->otyp == CORPSE
-        && touch_petrifies(&mons[g.kickedobj->corpsenm]) && !Stone_resistance) {
+        && touch_petrifies(&mons[g.kickedobj->corpsenm])
+        && !Stone_resistance) {
         You("kick %s with your bare %s.",
             corpse_xname(g.kickedobj, (const char *) 0, CXN_PFX_THE),
             makeplural(body_part(FOOT)));
@@ -705,12 +706,23 @@ xchar x, y;
         else
             (void) stolen_value(g.kickedobj, x, y, (boolean) shkp->mpeaceful,
                                 FALSE);
+        costly = FALSE; /* already billed */
     }
 
     if (flooreffects(g.kickedobj, g.bhitpos.x, g.bhitpos.y, "fall"))
         return 1;
-    if (g.kickedobj->unpaid)
-        subfrombill(g.kickedobj, shkp);
+    if (costly) {
+        long gt = 0L;
+
+        /* costly + landed outside shop handled above; must be inside shop */
+        if (g.kickedobj->unpaid)
+            subfrombill(g.kickedobj, shkp);
+
+        /* if billed for contained gold during kick, get a refund now */
+        if (Has_contents(g.kickedobj)
+            && (gt = contained_gold(g.kickedobj, TRUE)) > 0L)
+            donate_gold(gt, shkp, FALSE);
+    }
     place_object(g.kickedobj, g.bhitpos.x, g.bhitpos.y);
     stackobj(g.kickedobj);
     newsym(g.kickedobj->ox, g.kickedobj->oy);
@@ -1723,7 +1735,8 @@ unsigned long deliverflags;
             continue;
 
         if (otmp->migr_species != NON_PM
-            && (mtmp->data->mflags2 & DELIVER_PM) == (unsigned) otmp->migr_species) {
+            && ((mtmp->data->mflags2 & DELIVER_PM)
+                == (unsigned) otmp->migr_species)) {
             obj_extract_self(otmp);
             otmp->owornmask = 0L;
             otmp->ox = otmp->oy = 0;
@@ -1777,7 +1790,8 @@ long num;
         if (nodrop)
             Sprintf(eos(xbuf), ".");
         else
-            Sprintf(eos(xbuf), " and %s %s.", otense(otmp, "fall"), g.gate_str);
+            Sprintf(eos(xbuf), " and %s %s.",
+                    otense(otmp, "fall"), g.gate_str);
         pline("%s%s", obuf, xbuf);
     } else if (!nodrop)
         pline("%s %s %s.", obuf, otense(otmp, "fall"), g.gate_str);

@@ -53,7 +53,7 @@ $(TARGETPFX)winami.o : ../outdated/sys/amiga/winami.c $(HACK_H)
 $(TARGETPFX)winchar.o : ../outdated/sys/amiga/winchar.c tile.c $(HACK_H)
 $(TARGETPFX)winfuncs.o : ../outdated/sys/amiga/winfuncs.c $(HACK_H)
 $(TARGETPFX)winkey.o : ../outdated/sys/amiga/winkey.c $(HACK_H)
-$(TARGETPFX)winamenu.o : ../outdated/sys/amiga/winamenu.c $(HACK_H) 
+$(TARGETPFX)winamenu.o : ../outdated/sys/amiga/winamenu.c $(HACK_H)
 $(TARGETPFX)winreq.o : ../outdated/sys/amiga/winreq.c \
 		../outdated/sys/amiga/colorwin.c \
 		../outdated/sys/amiga/clipwin.c $(HACK_H)

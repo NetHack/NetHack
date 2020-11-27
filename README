@@ -11,7 +11,7 @@ The file doc/fixes37.0 in the source distribution will be updated with a list
 of fixes as they are committed.
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
-released code, and if stability is paramount, then the most recent 
+released code, and if stability is paramount, then the most recent
 NetHack 3.6.6 release is safest for you.
 
 We're making the .0 work-in-progress available so that you can observe, test
@@ -22,11 +22,11 @@ The file doc/fixes37.0 in the source distribution has a full list of bug-fixes
 included so far, as well as brief mentions of some of the other code changes.
 The text in there was written for the development team's own use and is
 provided  "as is", so please do not ask us to further explain the entries in
-that file. Some entries might be considered "spoilers", particularly in the 
+that file. Some entries might be considered "spoilers", particularly in the
 "new features" section.
 
 Along with the game improvements and bug fixes, NetHack 3.7 strives to make
-some general architectural improvements to the game or to its building 
+some general architectural improvements to the game or to its building
 process. Among them:
 
  *  Remove barriers to building NetHack on one platform and operating system,
@@ -35,9 +35,9 @@ process. Among them:
     See the file "Cross-compiling" in the top-level folder for more information
     on that.
 
- *  Replace the build-time "yacc and lex"-based level compiler, the "yacc and 
+ *  Replace the build-time "yacc and lex"-based level compiler, the "yacc and
     lex"-based dungeon compiler, and the quest text file processing done
-    by NetHack's "makedefs" utility, with Lua text alternatives that are 
+    by NetHack's "makedefs" utility, with Lua text alternatives that are
     loaded and processed by the game during play.
 
  *  Write game savefiles and bonesfiles in a more portable and consistent way
@@ -60,7 +60,7 @@ considered spoilers:
         their individual fields and save those fields instead of the entire
         struct
  -  savefile: use little-endian format for fields where that makes a difference
- 
+
                         - - - - - - - - - - -
 
 Please read items (1), (2) and (3) BEFORE doing anything with your new code.
@@ -113,7 +113,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Instructions have been provided by way of community contribution on:
-        msdos protected mode using djgpp including a Linux-host djgpp 
+        msdos protected mode using djgpp including a Linux-host djgpp
         cross-compile
 
     Previous versions of NetHack were tested and known to run on the

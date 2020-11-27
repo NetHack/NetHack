@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1605618310 2020/11/17 13:05:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.480 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1606445249 2020/11/27 02:47:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.482 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -246,13 +246,12 @@ static boolean FDECL(add_menu_coloring_parsed, (const char *, int, int));
 static void FDECL(free_one_menu_coloring, (int));
 static int NDECL(count_menucolors);
 static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
-                                           char *, char **));
+                                       char *, char **));
 static void FDECL(doset_add_menu, (winid, const char *, int, int));
-static void FDECL(opts_add_others, (winid, const char *, int,
-                                        char *, int));
+static void FDECL(opts_add_others, (winid, const char *, int, char *, int));
 static int FDECL(handle_add_list_remove, (const char *, int));
 static void FDECL(remove_autopickup_exception,
-                      (struct autopickup_exception *));
+                  (struct autopickup_exception *));
 static int NDECL(count_apes);
 static int NDECL(count_cond);
 
@@ -5788,7 +5787,8 @@ int optidx;
     if (using_alias)
         Sprintf(buf, " (via alias: %s)", allopt[optidx].alias);
     config_error_add("%s option specified multiple times: %s%s",
-                     (allopt[optidx].opttyp == CompOpt) ? "compound" : "boolean",
+                     (allopt[optidx].opttyp == CompOpt) ? "compound"
+                                                        : "boolean",
                      allopt[optidx].name, buf);
 #endif /* ?MAC */
     return;
@@ -7400,10 +7400,9 @@ static struct other_opts {
     int NDECL((*othr_count_func));
 } othropt[] = {
     { "autopickup exceptions", set_in_game, OPT_OTHER_APEXC, count_apes },
-    { "status condition fields", set_in_game,
-      OPT_OTHER_COND, count_cond },
     { "menu colors", set_in_game, OPT_OTHER_MENUCOLOR, count_menucolors },
     { "message types", set_in_game, OPT_OTHER_MSGTYPE, msgtype_count },
+    { "status condition fields", set_in_game, OPT_OTHER_COND, count_cond },
 #ifdef STATUS_HILITES
     { "status hilite rules", set_in_game, OPT_OTHER_STATHILITE,
       count_status_hilites },
@@ -8102,8 +8101,14 @@ static const char *opt_intro[] = {
 
 static const char *opt_epilog[] = {
     "",
-    "Some of the options can be set only before the game is started; those",
-    "items will not be selectable in the 'O' command's menu.",
+    "Some of the options can only be set before the game is started;",
+    "those items will not be selectable in the 'O' command's menu.",
+    "Some options are stored in a game's save file, and will keep saved",
+    "values when restoring that game even if you have updated your config-",
+    "uration file to change them.  Such changes will matter for new games.",
+    "The \"other settings\" can be set with 'O', but when set within the",
+    "configuration file they use their own directives rather than OPTIONS.",
+    "See NetHack's \"Guidebook\" for details.",
     (char *) 0
 };
 
@@ -8135,14 +8140,43 @@ option_help()
     /* Compound options */
     putstr(datawin, 0, "Compound options:");
     for (i = 0; allopt[i].name; i++) {
+        if (allopt[i].opttyp != CompOpt) /* skip booleans */
+            continue;
         Sprintf(buf2, "`%s'", allopt[i].name);
         Sprintf(buf, "%-20s - %s%c", buf2, allopt[i].descr,
                 allopt[i + 1].name ? ',' : '.');
         putstr(datawin, 0, buf);
     }
+    putstr(datawin, 0, "");
+
+    putstr(datawin, 0, "Other settings:");
+    for (i = 0; othropt[i].name; ++i) {
+        Sprintf(buf, " %s", othropt[i].name);
+        putstr(datawin, 0, buf);
+    }
 
     for (i = 0; opt_epilog[i]; i++)
         putstr(datawin, 0, opt_epilog[i]);
+
+    /*
+     * TODO:
+     *  briefly describe interface-specific option-like settings for
+     *  the currently active interface:
+     *    X11 uses X-specific "application defaults" from NetHack.ad;
+     *    Qt has menu accessible "game -> Qt settings" (non-OSX) or
+     *      "nethack -> Preferences" (OSX) to maintain a few options
+     *      (font size, map tile size, paperdoll show/hide flag and
+     *      tile size) which persist across games;
+     *    Windows GUI also has some port-specific menus;
+     *    tty and curses: anything?
+     *  Best done via a new windowprocs function rather than plugging
+     *  in details here.
+     *
+     * Maybe:
+     *  switch from text window to pick-none menu so that user can
+     *  scroll back up.  (Not necessary for Qt where text windows are
+     *  already scrollable.)
+     */
 
     display_nhwindow(datawin, FALSE);
     destroy_nhwindow(datawin);

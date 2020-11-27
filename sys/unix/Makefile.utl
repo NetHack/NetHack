@@ -193,7 +193,7 @@ DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
 # builds and for cross-compiles by overriding these in hints
 # files or on the command line.
 
-TARGETPFX= 
+TARGETPFX=
 TARGET_CC = $(CC)
 TARGET_CFLAGS = $(CFLAGS)
 TARGET_CLINK = $(CLINK)

@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1606008997 2020/11/22 01:36:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.880 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1606343573 2020/11/25 22:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.882 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2406,8 +2406,9 @@ E boolean FDECL(billable, (struct monst **, struct obj *, CHAR_P, BOOLEAN_P));
 E void FDECL(addtobill, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(splitbill, (struct obj *, struct obj *));
 E void FDECL(subfrombill, (struct obj *, struct monst *));
-E long FDECL(stolen_value,
-             (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P, BOOLEAN_P));
+E long FDECL(stolen_value, (struct obj *, XCHAR_P, XCHAR_P,
+                            BOOLEAN_P, BOOLEAN_P));
+E void FDECL(donate_gold, (long, struct monst *, BOOLEAN_P));
 E void FDECL(sellobj_state, (int));
 E void FDECL(sellobj, (struct obj *, XCHAR_P, XCHAR_P));
 E int FDECL(doinvbill, (int));

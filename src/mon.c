@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1604880454 2020/11/09 00:07:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1606473489 2020/11/27 10:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2582,20 +2582,39 @@ struct monst *mdef;
 const char *fltxt;
 int how;
 {
-    if ((mdef->wormno ? worm_known(mdef) : cansee(mdef->mx, mdef->my))
-        && fltxt)
+    struct permonst *mptr = mdef->data;
+
+    if (fltxt && (mdef->wormno ? worm_known(mdef)
+                               : cansee(mdef->mx, mdef->my)))
         pline("%s is %s%s%s!", Monnam(mdef),
-              nonliving(mdef->data) ? "destroyed" : "killed",
+              nonliving(mptr) ? "destroyed" : "killed",
               *fltxt ? " by the " : "", fltxt);
     else
+        /* sad feeling is deferred until after potential life-saving */
         iflags.sad_feeling = (mdef->mtame != 0);
 
-    /* no corpses if digested or disintegrated */
-    g.disintegested = (how == AD_DGST || how == -AD_RBRE);
+    /* no corpse if digested or disintegrated or flammable golem burnt up;
+       no corpse for a paper golem means no scrolls; golems that rust or
+       rot completely are described as "falling to pieces" so they do
+       leave a corpse (which means staves for wood golem, leather armor for
+       leather golem, iron chains for iron golem, not a regular corpse) */
+    g.disintegested = (how == AD_DGST || how == -AD_RBRE
+                       || (how == AD_FIRE && completelyburns(mptr)));
     if (g.disintegested)
-        mondead(mdef);
+        mondead(mdef); /* never leaves a corpse */
     else
-        mondied(mdef);
+        mondied(mdef); /* calls mondead() and maybe leaves a corpse */
+
+    /* extra message if pet golem is completely destroyed;
+       if not visible, this will follow "you have a sad feeling" */
+    if (mdef->mtame) {
+        const char *rxt = (how == AD_FIRE && completelyburns(mptr)) ? "roast"
+                          : (how == AD_RUST && completelyrusts(mptr)) ? "rust"
+                            : (how == AD_DCAY && completelyrots(mptr)) ? "rot"
+                              :  0;
+        if (rxt)
+            pline("May %s %s in peace.", noit_mon_nam(mdef), rxt);
+    }
 }
 
 void

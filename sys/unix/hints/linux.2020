@@ -1,6 +1,6 @@
 # NetHack 3.7  linux.2020 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
-# NetHack may be freely redistributed.  See license for details. 
+# NetHack may be freely redistributed.  See license for details.
 #
 #---------------------------------------------------------------------
 # Linux hints file with support for multiple window ports (interfaces)
@@ -191,7 +191,7 @@ POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
 	chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 
 ifneq "$(CCISCLANG)" ""
-# gdb may not be installed if clang is chosen compiler so the game 
+# gdb may not be installed if clang is chosen compiler so the game
 # won't start in that case due to a sysconf error. Comment out
 # relevant lines in sysconf.
 POSTINSTALL+= sed -i -e 's;^GDBPATH=/usr/bin/gdb;\#GDBPATH=/usr/bin/gdb;' \

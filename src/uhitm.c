@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1604880456 2020/11/09 00:07:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1606473490 2020/11/27 10:38:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1935,7 +1935,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         }
         break;
     case AD_RUST:
-        if (pd == &mons[PM_IRON_GOLEM]) {
+        if (completelyrusts(pd)) { /* iron golem */
             pline("%s falls to pieces!", Monnam(mdef));
             xkilled(mdef, XKILL_NOMSG);
         }
@@ -1947,7 +1947,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         tmp = 0;
         break;
     case AD_DCAY:
-        if (pd == &mons[PM_WOOD_GOLEM] || pd == &mons[PM_LEATHER_GOLEM]) {
+        if (completelyrots(pd)) { /* wood golem or leather golem */
             pline("%s falls to pieces!", Monnam(mdef));
             xkilled(mdef, XKILL_NOMSG);
         }

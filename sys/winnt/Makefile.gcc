@@ -34,7 +34,7 @@
 #
 # Build Options Decisions
 #
-#       There are currently 4 decisions that you can choose to make. 
+#       There are currently 4 decisions that you can choose to make.
 #       None of the 4 decisions are absolutely required because defaults are in place:
 #	1. Where do you want your build to end up?
 #	2. Do you want debug information in the executable?
@@ -92,11 +92,11 @@ TARGET_CPU=x86
 #
 # 4. Uncomment these and set them appropriately if you want to
 #    include curses port support alongside TTY support in your
-#    NetHack.exe binary. 
+#    NetHack.exe binary.
 #
-#    You'll have to set PDCURSES_H to the correct location of the 
+#    You'll have to set PDCURSES_H to the correct location of the
 #    PDCurses header (.h) files and PDCURSES_C to the location
-#    of your PDCurses C files which must already be resident on 
+#    of your PDCurses C files which must already be resident on
 #    your machine.
 #
 # ADD_CURSES=Y
@@ -134,7 +134,7 @@ endif
 #---------------------------------------------------------------
 # Location of LUA
 #
-# Original source needs to be obtained from: 
+# Original source needs to be obtained from:
 #    http://www.lua.org/ftp/lua-5.4.1.tar.gz
 #
 #    This build assumes that the LUA sources are located
@@ -185,8 +185,8 @@ NHV=$(subst ",,$(NHV1))
 # MSWSYS  - mswin specific files
 # TTY     - window port files (tty)
 # MSWIN   - window port files (win32)
-# WCURSES - window port files (curses) 
-# WSHR    - Tile support files 
+# WCURSES - window port files (curses)
+# WSHR    - Tile support files
 # QT      - QT window support files
 
 INCL    =../include
@@ -303,13 +303,13 @@ PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
 #
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
-VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
-VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
-VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
-VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
-VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
-VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
-VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
+VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o
+VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o
+VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
+VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o
+VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
+VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
 VOBJ09 = $(O)hacklib.o  $(O)insight.o  $(O)invent.o   $(O)isaac64.o
 VOBJ10 = $(O)light.o    $(O)lock.o     $(O)mail.o     $(O)makemon.o
 VOBJ11 = $(O)mapglyph.o $(O)mdlib.o    $(O)mcastu.o   $(O)mhitm.o
@@ -350,7 +350,7 @@ CURSESOBJ=
 endif
 
 SOBJ   = $(O)windmain.o $(O)winnt.o $(O)win10.o \
-	$(O)safeproc.o $(O)nhlan.o $(SOUND) 
+	$(O)safeproc.o $(O)nhlan.o $(SOUND)
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	 $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
@@ -476,7 +476,7 @@ PDCLIB = $(O)pdcurses.a
 
 PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCWINCON)
 else
-PDCLIB = 
+PDCLIB =
 endif
 
 #==========================================
@@ -742,7 +742,7 @@ SHELL=CMD.EXE
 # Since DOS doesn't allow / as path separator, and GCC doesn't allow \ as
 # path separator, we must change all pathnames when performing DOS commands.
 # This is done by blindly applying $(subst /,\, ...) on every command.
-# Where any command contain / for another reason (switch char, a little 
+# Where any command contain / for another reason (switch char, a little
 # more care is taken.
 
 #
@@ -794,7 +794,7 @@ recover: $(U)recover.exe
 	$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR)/recover.txt)
 
-$(O)sp_lev.tag: $(O)utility.tag 
+$(O)sp_lev.tag: $(O)utility.tag
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
@@ -819,7 +819,7 @@ $(O)winres.o: $(TILEBMP16) $(MSWIN)/NetHackW.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/splash.bmp
 	$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/NetHackW.rc
 
-$(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
+$(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico
 	$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
 
 #==========================================
@@ -858,7 +858,7 @@ $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 endif
 
 $(O)nhdefkey.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c
 
 $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o gamedir.tag
 	@echo Linking $@
@@ -866,7 +866,7 @@ $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nh340key.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c
 
 $(GAMEDIR)/nh340key.dll : $(O)nh340key.o gamedir.tag
 	@echo Linking $@
@@ -874,7 +874,7 @@ $(GAMEDIR)/nh340key.dll : $(O)nh340key.o gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nhraykey.o:
-		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c 
+		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c
 
 $(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o gamedir.tag
 	@echo Linking $@
@@ -1163,7 +1163,7 @@ $(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h
 $(O)pdcurses.a : $(PDCLIBOBJS) $(PDCOBJS)
 	ar rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
 
-  
+
 #=============================================================
 # LUA
 #=============================================================
@@ -1352,7 +1352,7 @@ $(O)tile.o: $(SRC)/tile.c $(HACK_H)
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	$(cc) $(CFLAGS) -o$@ $(U)panic.c
 
-# 
+#
 # sys/share dependencies
 #
 
@@ -1361,7 +1361,7 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 
 #
 # Other dependencies needed by some ports
-# 
+#
 
 ifeq "$(ADD_CURSES)" "Y"
 # curses window port dependencies
@@ -1418,7 +1418,7 @@ endif
 #	with -o$@
 #   * targets prefixed with $(O)
 #   * $(CC) changed to $(cc)
-# but otherwise untouched. 
+# but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #

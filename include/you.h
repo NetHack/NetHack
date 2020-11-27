@@ -340,7 +340,7 @@ enum utotypes {
     UTOTYPE_FALLING  = 0x02,
     UTOTYPE_PORTAL   = 0x04,
     UTOTYPE_RMPORTAL = 0x10,  /* remove portal */
-    UTOTYPE_DEFERRED = 0x20,  /* deferred_goto */
+    UTOTYPE_DEFERRED = 0x20   /* deferred_goto */
 };
 
 /*** Information about the player ***/

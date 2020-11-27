@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1596498161 2020/08/03 23:42:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1606343578 2020/11/25 22:32:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -935,10 +935,15 @@ boolean broken;
         /* ushops0: in case we threw while levitating and recoiled
            out of shop (most likely to the shk's spot in front of door) */
         if (*oshops == *u.ushops || *oshops == *u.ushops0) {
-            if (is_unpaid(obj))
+            if (is_unpaid(obj)) {
+                long gt = Has_contents(obj) ? contained_gold(obj, TRUE) : 0L;
+
                 subfrombill(obj, shkp);
-            else if (x != shkp->mx || y != shkp->my)
+                if (gt > 0L)
+                    donate_gold(gt, shkp, TRUE);
+            } else if (x != shkp->mx || y != shkp->my) {
                 sellobj(obj, x, y);
+            }
         }
     }
 }

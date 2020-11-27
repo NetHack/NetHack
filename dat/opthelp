@@ -52,6 +52,8 @@ quick_farsight usually skip the chance to browse the map when     [FALSE]
 rawio          allow the use of raw I/O                           [FALSE]
 rest_on_space  count the space bar as a rest character            [FALSE]
 safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]
+safe_wait      require use of 'm' prefix before '.' or 's' to     [TRUE]
+               wait or search when adjacent to a hostile monster
 sanity_check   perform data sanity checks                         [FALSE]
 showexp        display your accumulated experience points         [FALSE]
 showrace       show yourself by your race rather than by role     [FALSE]
@@ -133,6 +135,8 @@ disclose      the types of information you want         [ni na nv ng nc no]
               'o' dungeon overview)
 fruit         the name of a fruit you enjoy eating             [slime mold]
               (basically a whimsy which NetHack uses from time to time).
+hilite_status specifies a rule for highlighting a status field           []
+              (multiple instances are allowed)
 menustyle     user interface for selection of multiple objects:      [Full]
               Traditional -- prompt for classes of interest, then
                              prompt item-by-item for those classes;
@@ -143,13 +147,24 @@ menustyle     user interface for selection of multiple objects:      [Full]
               only the first letter ('T','C','F','P') matters
               (With Traditional, many actions allow pseudo-class 'm' to
               request a menu for choosing items: one-shot Combination.)
+msg_window    behavior of ^P message recall for tty interface:          [s]
+              single      -- one message at a time
+              full        -- full window with all saved top line messages
+              reverse     -- full with messages printed most-recent-first
+              combination -- first two of consecutive ^P commands show
+                             single messages, third yields full set
+msg_window    behavior of ^P message recall for curses interface:       [r]
+              reverse     -- full window, most recent first
+              full        -- full with messages printed least recent first,
+                             initially positioned on last page to start
+                             with most recent messages in view
 number_pad    alphabetic versus numeric control over movement:          [0]
                0 -- traditional hjkl + yubn movement (default);
                1 -- digits control movement, for use with numeric keypad;
                2 -- same as 1, but '5' works as 'g' prefix rather than 'G';
                3 -- numeric for phone keypad (1,2,3 above, 7,8,9 below);
                4 -- phone keypad (3) combined with '5' preference (2);
-              -1 -- alphabetic movement but 'z' swapped with 'y'.
+              -1 -- "qwertz"; alphabetic movement but 'z' swapped with 'y'.
               Setting number_pad (to a positive value) affects how all
               digit keys are handled, not just those on numeric keypad.
 packorder     a list of default symbols for kinds of       [")[%?+!=/(*`0_]
@@ -190,6 +205,11 @@ scores        the parts of the score list you wish    [!own/3 top/2 around]
               to see when the game ends.  You choose a combination of
               top scores, scores around the top scores, and all of your
               own scores.
+statushilites whether to display status highlights (when non-zero) and  [0]
+              also how many turns to display temporary highlights (for
+              'up', 'down', and 'changed' hilite_status rules)
+statuslines   whether to use expanded (3) or condensed (2) status       [2]
+              (for tty and curses; 2 is traditional, 3 is recommended)
 suppress_alert disable various version-specific warnings about changes   []
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit
@@ -215,8 +235,8 @@ Compound options which may be set only on startup are:
 align      Your starting alignment (lawful, neutral, chaotic,      [random]
            or random).  Many roles restrict the choice to a subset.
            You may specify just the first letter.
-catname    the name of your first cat                                [none]
-dogname    the name of your first dog                                [none]
+catname    name of your starting pet if it is a kitten               [none]
+dogname    name of your starting pet if it is a little dog           [none]
            Several roles who start with a dog have one whose name is
            pre-set (for example, "Hachi" for Samurai), but that name
            will be overridden if you specify dogname.
@@ -224,7 +244,7 @@ gender     Your starting gender (male, female, or random).         [random]
            You may specify just the first letter.  Although you can
            still denote your gender using the old "male" and "female"
            boolean options, the "gender" option will take precedence.
-horsename  the name of your first horse                              [none]
+horsename  name of your starting pet if it is a pony                 [none]
 menu_*     specify single character accelerators for menu commands.
            Here is a list of all commands with their default keystroke
            followed by a list of window-ports that implement them:
@@ -264,6 +284,9 @@ role       Your starting role (e.g., role:Barbarian, role:Valk).   [random]
            as possible.  You can also still denote your role by
            appending it to the "name" option (e.g., name:Vic-V), but
            the "role" option will take precedence.
+statuslines whether to use expanded (3) or condensed (2) status         [2]
+           (unlike for tty and curses, for Qt this can only be be set at
+           startup; also unlike tty and curses, 2 is recommended over 3)
 windowtype windowing system to be used    [depends on operating system and
            compile-time setup]    if more than one choice is available.
            Most instances of the program support only one window-type;
@@ -272,14 +295,6 @@ windowtype windowing system to be used    [depends on operating system and
            seen while the program is running by using the #version
            command or from outside the program by examining the text file
            named 'options' which is generated when building it.
-
-Compound option if TTY_GRAPHICS was set at compile time:
-msg_window the type of message window to use:                      [single]
-           single      -- One message at a time
-           full        -- Full window with all saved top line messages
-           reverse     -- Same as full, but messages printed most-recent-first
-           combination -- Two single messages, then as full
-
 
 Some sample options lists are:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
