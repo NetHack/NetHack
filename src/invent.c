@@ -1464,6 +1464,157 @@ const char *action;
     return !strcmp(action, "wear") || !strcmp(action, "put on");
 }
 
+/* helper for getobj(), exclude obj if it cannot be used to do word */
+static boolean
+getobj_obj_exclude(word, otmp)
+const char *word;
+struct obj *otmp;
+{
+    return ((taking_off(word) /* exclude if not worn */
+            && !(otmp->owornmask & (W_ARMOR | W_ACCESSORY)))
+        || (putting_on(word) /* exclude if already worn */
+            && (otmp->owornmask & (W_ARMOR | W_ACCESSORY)))
+#if 0 /* 3.4.1 -- include currently wielded weapon among 'wield' choices */
+        || (!strcmp(word, "wield")
+            && (otmp->owornmask & W_WEP))
+#endif
+        || (!strcmp(word, "ready")    /* exclude when wielded... */
+            && ((otmp == uwep || (otmp == uswapwep && u.twoweap))
+                && otmp->quan == 1L)) /* ...unless more than one */
+        || ((!strcmp(word, "dip") || !strcmp(word, "grease"))
+            && inaccessible_equipment(otmp, (const char *) 0, FALSE)));
+}
+
+/* helper for getobj(), exclude obj if it cannot be used to do word */
+static boolean
+getobj_obj_exclude_too(word, otmp)
+const char *word;
+struct obj *otmp;
+{
+    short otyp = otmp->otyp;
+
+    return ((putting_on(word)
+             && ((otmp->oclass == FOOD_CLASS && otyp != MEAT_RING)
+                 || (otmp->oclass == TOOL_CLASS && otyp != BLINDFOLD
+                     && otyp != TOWEL && otyp != LENSES)))
+            || (!strcmp(word, "wield")
+                && (otmp->oclass == TOOL_CLASS && !is_weptool(otmp)))
+            || (!strcmp(word, "eat") && !is_edible(otmp))
+            || (!strcmp(word, "sacrifice")
+                && (otyp != CORPSE && otyp != AMULET_OF_YENDOR
+                    && otyp != FAKE_AMULET_OF_YENDOR))
+        || (!strcmp(word, "write with")
+            && (otmp->oclass == TOOL_CLASS
+                && otyp != MAGIC_MARKER && otyp != TOWEL))
+            || (!strcmp(word, "tin")
+                && (otyp != CORPSE || !tinnable(otmp)))
+        || (!strcmp(word, "rub")
+            && ((otmp->oclass == TOOL_CLASS && otyp != OIL_LAMP
+                 && otyp != MAGIC_LAMP && otyp != BRASS_LANTERN)
+                || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))
+                || (otmp->oclass == FOOD_CLASS
+                    && otmp->otyp != LUMP_OF_ROYAL_JELLY)))
+            || (!strcmp(word, "use or apply")
+                /* Picks, axes, pole-weapons, bullwhips */
+                && ((otmp->oclass == WEAPON_CLASS
+                     && !is_pick(otmp) && !is_axe(otmp)
+                     && !is_pole(otmp) && otyp != BULLWHIP)
+                    || (otmp->oclass == POTION_CLASS
+                        /* only applicable potion is oil, and it will only
+                           be offered as a choice when already discovered */
+                        && (otyp != POT_OIL || !otmp->dknown
+                            || !objects[POT_OIL].oc_name_known))
+                    || (otmp->oclass == FOOD_CLASS
+                        && otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF
+                        && otyp != LUMP_OF_ROYAL_JELLY)
+                    || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
+            || (!strcmp(word, "rub the royal jelly on") && otmp->otyp != EGG)
+            || (!strcmp(word, "invoke")
+                && !otmp->oartifact
+                && !objects[otyp].oc_unique
+                && (otyp != FAKE_AMULET_OF_YENDOR || otmp->known)
+                && otyp != CRYSTAL_BALL /* synonym for apply */
+                /* note: presenting the possibility of invoking non-artifact
+                   mirrors and/or lamps is simply a cruel deception... */
+                && otyp != MIRROR
+                && otyp != MAGIC_LAMP
+                && (otyp != OIL_LAMP /* don't list known oil lamp */
+                    || (otmp->dknown && objects[OIL_LAMP].oc_name_known)))
+            || (!strcmp(word, "untrap with")
+                && ((otmp->oclass == TOOL_CLASS && otyp != CAN_OF_GREASE)
+                    || (otmp->oclass == POTION_CLASS
+                        /* only applicable potion is oil, and it will only
+                           be offered as a choice when already discovered */
+                        && (otyp != POT_OIL || !otmp->dknown
+                            || !objects[POT_OIL].oc_name_known))))
+            || (!strcmp(word, "tip") && !Is_container(otmp)
+                /* include horn of plenty if sufficiently discovered */
+                && (otmp->otyp != HORN_OF_PLENTY || !otmp->dknown
+                    || !objects[HORN_OF_PLENTY].oc_name_known))
+            || (!strcmp(word, "charge") && !is_chargeable(otmp))
+            || (!strcmp(word, "open") && otyp != TIN)
+            || (!strcmp(word, "call") && !objtyp_is_callable(otyp)));
+}
+
+/* helper for getobj(), obj is acceptable but not listed */
+static boolean
+getobj_obj_acceptable_unlisted(word, otmp, let)
+const char *word;
+struct obj *otmp;
+char let;
+{
+    long dummymask;
+    short otyp = otmp->otyp;
+
+    return (/* ugly check for unworn armor that can't be worn */
+            (putting_on(word) && let == ARMOR_CLASS
+             && !canwearobj(otmp, &dummymask, FALSE))
+            /* or armor with 'P' or 'R' or accessory with 'W' or 'T' */
+            || ((putting_on(word) || taking_off(word))
+                && ((let == ARMOR_CLASS) ^ (otmp->oclass == ARMOR_CLASS)))
+            /* or unsuitable items rubbed on known touchstone */
+            || (!strncmp(word, "rub on the stone", 16)
+                && let == GEM_CLASS && otmp->dknown
+                && objects[otyp].oc_name_known)
+            /* suppress corpses on astral, amulets elsewhere */
+            || (!strcmp(word, "sacrifice")
+                /* (!astral && amulet) || (astral && !amulet) */
+                && (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
+            /* suppress container being stashed into */
+            || (!strcmp(word, "stash") && !ck_bag(otmp))
+            /* worn armor (shirt, suit) covered by worn armor (suit, cloak)
+               or accessory (ring) covered by cursed worn armor (gloves) */
+            || (taking_off(word)
+                && inaccessible_equipment(otmp, (const char *) 0,
+                                          (boolean) (otmp->oclass == RING_CLASS)))
+            || (!strcmp(word, "write on")
+                && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
+                    || !otmp->dknown || !objects[otyp].oc_name_known)));
+}
+
+void
+mime_action(word)
+const char *word;
+{
+    char buf[BUFSZ];
+    char *bp = buf;
+    char *suf = (char *) 0;
+
+    strcpy(buf, word);
+    if ((bp = strstr(buf, " on the ")) != 0) {
+        /* rub on the stone[s] */
+        *bp = '\0';
+        suf = (bp + 1);
+    }
+    if ((bp = strstr(buf, " or ")) != 0) {
+        *bp = '\0';
+        bp = (rn2(2) ? buf : (bp + 4));
+    } else
+        bp = buf;
+    You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
+        suf ? suf : "");
+}
+
 /*
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
@@ -1492,7 +1643,6 @@ register const char *let, *word;
     boolean cntgiven = FALSE;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
-    long dummymask;
     Loot *sortedinvent, *srtinv;
 
     if (*let == ALLOW_COUNT)
@@ -1550,134 +1700,27 @@ register const char *let, *word;
             register int otyp = otmp->otyp;
 
             bp[foo++] = otmp->invlet;
-/* clang-format off */
-/* *INDENT-OFF* */
-            /* ugly check: remove inappropriate things */
-            if (
-                (taking_off(word) /* exclude if not worn */
-                 && !(otmp->owornmask & (W_ARMOR | W_ACCESSORY)))
-             || (putting_on(word) /* exclude if already worn */
-                 && (otmp->owornmask & (W_ARMOR | W_ACCESSORY)))
-#if 0 /* 3.4.1 -- include currently wielded weapon among 'wield' choices */
-             || (!strcmp(word, "wield")
-                 && (otmp->owornmask & W_WEP))
-#endif
-             || (!strcmp(word, "ready")    /* exclude when wielded... */
-                 && ((otmp == uwep || (otmp == uswapwep && u.twoweap))
-                     && otmp->quan == 1L)) /* ...unless more than one */
-             || ((!strcmp(word, "dip") || !strcmp(word, "grease"))
-                 && inaccessible_equipment(otmp, (const char *) 0, FALSE))
-             ) {
+            /* remove inappropriate things */
+            if (getobj_obj_exclude(word, otmp)) {
                 foo--;
                 foox++;
             }
-            /* Second ugly check; unlike the first it won't trigger an
-             * "else" in "you don't have anything else to ___".
+            /* remove inappropriate thing, but unlike the first it won't
+             * trigger an "else" in "you don't have anything else to ___".
              */
-            else if (
-                (putting_on(word)
-                 && ((otmp->oclass == FOOD_CLASS && otmp->otyp != MEAT_RING)
-                     || (otmp->oclass == TOOL_CLASS && otyp != BLINDFOLD
-                         && otyp != TOWEL && otyp != LENSES)))
-             || (!strcmp(word, "wield")
-                 && (otmp->oclass == TOOL_CLASS && !is_weptool(otmp)))
-             || (!strcmp(word, "eat") && !is_edible(otmp))
-             || (!strcmp(word, "sacrifice")
-                 && (otyp != CORPSE && otyp != AMULET_OF_YENDOR
-                     && otyp != FAKE_AMULET_OF_YENDOR))
-             || (!strcmp(word, "write with")
-                 && (otmp->oclass == TOOL_CLASS
-                     && otyp != MAGIC_MARKER && otyp != TOWEL))
-             || (!strcmp(word, "tin")
-                 && (otyp != CORPSE || !tinnable(otmp)))
-             || (!strcmp(word, "rub")
-                 && ((otmp->oclass == TOOL_CLASS && otyp != OIL_LAMP
-                      && otyp != MAGIC_LAMP && otyp != BRASS_LANTERN)
-                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))
-                     || (otmp->oclass == FOOD_CLASS
-                         && otmp->otyp != LUMP_OF_ROYAL_JELLY)))
-             || (!strcmp(word, "use or apply")
-                 /* Picks, axes, pole-weapons, bullwhips */
-                 && ((otmp->oclass == WEAPON_CLASS
-                      && !is_pick(otmp) && !is_axe(otmp)
-                      && !is_pole(otmp) && otyp != BULLWHIP)
-                     || (otmp->oclass == POTION_CLASS
-                         /* only applicable potion is oil, and it will only
-                            be offered as a choice when already discovered */
-                         && (otyp != POT_OIL || !otmp->dknown
-                             || !objects[POT_OIL].oc_name_known))
-                     || (otmp->oclass == FOOD_CLASS
-                         && otyp != CREAM_PIE && otyp != EUCALYPTUS_LEAF
-                         && otyp != LUMP_OF_ROYAL_JELLY)
-                     || (otmp->oclass == GEM_CLASS && !is_graystone(otmp))))
-             || (!strcmp(word, "rub the royal jelly on") && otmp->otyp != EGG)
-             || (!strcmp(word, "invoke")
-                 && !otmp->oartifact
-                 && !objects[otyp].oc_unique
-                 && (otyp != FAKE_AMULET_OF_YENDOR || otmp->known)
-                 && otyp != CRYSTAL_BALL /* synonym for apply */
-                 /* note: presenting the possibility of invoking non-artifact
-                    mirrors and/or lamps is simply a cruel deception... */
-                 && otyp != MIRROR
-                 && otyp != MAGIC_LAMP
-                 && (otyp != OIL_LAMP /* don't list known oil lamp */
-                     || (otmp->dknown && objects[OIL_LAMP].oc_name_known)))
-             || (!strcmp(word, "untrap with")
-                 && ((otmp->oclass == TOOL_CLASS && otyp != CAN_OF_GREASE)
-                     || (otmp->oclass == POTION_CLASS
-                         /* only applicable potion is oil, and it will only
-                            be offered as a choice when already discovered */
-                         && (otyp != POT_OIL || !otmp->dknown
-                             || !objects[POT_OIL].oc_name_known))))
-             || (!strcmp(word, "tip") && !Is_container(otmp)
-                 /* include horn of plenty if sufficiently discovered */
-                 && (otmp->otyp != HORN_OF_PLENTY || !otmp->dknown
-                     || !objects[HORN_OF_PLENTY].oc_name_known))
-             || (!strcmp(word, "charge") && !is_chargeable(otmp))
-             || (!strcmp(word, "open") && otyp != TIN)
-             || (!strcmp(word, "call") && !objtyp_is_callable(otyp))
-             || (!strcmp(word, "adjust") && otmp->oclass == COIN_CLASS
-                 && !usegold)
-             ) {
+            else if (getobj_obj_exclude_too(word, otmp)
+                     || (!strcmp(word, "adjust") && otmp->oclass == COIN_CLASS
+                         && !usegold)) {
                 foo--;
             }
-            /* Third ugly check:  acceptable but not listed as likely
-             * candidates in the prompt or in the inventory subset if
-             * player responds with '?'.
-             */
-            else if (
-             /* ugly check for unworn armor that can't be worn */
-                (putting_on(word) && *let == ARMOR_CLASS
-                 && !canwearobj(otmp, &dummymask, FALSE))
-             /* or armor with 'P' or 'R' or accessory with 'W' or 'T' */
-             || ((putting_on(word) || taking_off(word))
-                 && ((*let == ARMOR_CLASS) ^ (otmp->oclass == ARMOR_CLASS)))
-             /* or unsuitable items rubbed on known touchstone */
-             || (!strncmp(word, "rub on the stone", 16)
-                 && *let == GEM_CLASS && otmp->dknown
-                 && objects[otyp].oc_name_known)
-             /* suppress corpses on astral, amulets elsewhere */
-             || (!strcmp(word, "sacrifice")
-                 /* (!astral && amulet) || (astral && !amulet) */
-                 && (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
-             /* suppress container being stashed into */
-             || (!strcmp(word, "stash") && !ck_bag(otmp))
-             /* worn armor (shirt, suit) covered by worn armor (suit, cloak)
-                or accessory (ring) covered by cursed worn armor (gloves) */
-             || (taking_off(word)
-                 && inaccessible_equipment(otmp, (const char *) 0,
-                                      (boolean) (otmp->oclass == RING_CLASS)))
-             || (!strcmp(word, "write on")
-                 && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
-                     || !otmp->dknown || !objects[otyp].oc_name_known))
-             ) {
-                /* acceptable but not listed as likely candidate */
+            else if (getobj_obj_acceptable_unlisted(word, otmp, *let)) {
+                /* acceptable but not listed as likely candidates in the prompt
+                 * or in the inventory subset if player responds with '?'.
+                 */
                 foo--;
                 allowall = TRUE;
                 *ap++ = otmp->invlet;
             }
-/* *INDENT-ON* */
-/* clang-format on */
         } else {
             /* "ugly check" for reading fortune cookies, part 2 */
             if ((!strcmp(word, "read") && is_readable(otmp)))
@@ -1743,23 +1786,8 @@ register const char *let, *word;
             return (struct obj *) 0;
         }
         if (ilet == HANDS_SYM) { /* '-' */
-            if (!allownone) {
-                char *suf = (char *) 0;
-
-                strcpy(buf, word);
-                if ((bp = strstr(buf, " on the ")) != 0) {
-                    /* rub on the stone[s] */
-                    *bp = '\0';
-                    suf = (bp + 1);
-                }
-                if ((bp = strstr(buf, " or ")) != 0) {
-                    *bp = '\0';
-                    bp = (rn2(2) ? buf : (bp + 4));
-                } else
-                    bp = buf;
-                You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
-                    suf ? suf : "");
-            }
+            if (!allownone)
+                mime_action(word);
             return (allownone ? (struct obj *) &cg.zeroobj : (struct obj *) 0);
         }
  redo_menu:
