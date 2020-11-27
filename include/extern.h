@@ -896,6 +896,7 @@ E int NDECL(wiz_debug_cmd_traveldisplay);
 #endif
 E boolean NDECL(u_rooted);
 E void NDECL(domove);
+E void NDECL(overexert_hp);
 E boolean NDECL(overexertion);
 E void NDECL(invocation_message);
 E void NDECL(switch_terrain);

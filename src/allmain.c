@@ -215,17 +215,7 @@ boolean resuming;
                     if (wtcap > MOD_ENCUMBER && u.umoved) {
                         if (!(wtcap < EXT_ENCUMBER ? g.moves % 30
                                                    : g.moves % 10)) {
-                            if (Upolyd && u.mh > 1) {
-                                u.mh--;
-                                g.context.botl = TRUE;
-                            } else if (!Upolyd && u.uhp > 1) {
-                                u.uhp--;
-                                g.context.botl = TRUE;
-                            } else {
-                                You("pass out from exertion!");
-                                exercise(A_CON, FALSE);
-                                fall_asleep(-10, FALSE);
-                            }
+                            overexert_hp();
                         }
                     }
 
