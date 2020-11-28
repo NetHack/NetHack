@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1601595710 2020/10/01 23:41:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.302 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1606528765 2020/11/28 01:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1586,7 +1586,7 @@ char let;
                or accessory (ring) covered by cursed worn armor (gloves) */
             || (taking_off(word)
                 && inaccessible_equipment(otmp, (const char *) 0,
-                                          (boolean) (otmp->oclass == RING_CLASS)))
+                                      (boolean) (otmp->oclass == RING_CLASS)))
             || (!strcmp(word, "write on")
                 && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
                     || !otmp->dknown || !objects[otyp].oc_name_known)));
@@ -1697,26 +1697,23 @@ register const char *let, *word;
         if (!*let || index(let, otmp->oclass)
             || (usegold && otmp->invlet == GOLD_SYM)
             || (useboulder && otmp->otyp == BOULDER)) {
-            register int otyp = otmp->otyp;
-
             bp[foo++] = otmp->invlet;
+
             /* remove inappropriate things */
             if (getobj_obj_exclude(word, otmp)) {
                 foo--;
                 foox++;
-            }
-            /* remove inappropriate thing, but unlike the first it won't
-             * trigger an "else" in "you don't have anything else to ___".
-             */
-            else if (getobj_obj_exclude_too(word, otmp)
-                     || (!strcmp(word, "adjust") && otmp->oclass == COIN_CLASS
-                         && !usegold)) {
+
+            /* remove more inappropriate things, but unlike the first it won't
+               trigger an "else" in "you don't have anything else to ___" */
+            } else if (getobj_obj_exclude_too(word, otmp)
+                       || (!strcmp(word, "adjust")
+                           && otmp->oclass == COIN_CLASS && !usegold)) {
                 foo--;
-            }
-            else if (getobj_obj_acceptable_unlisted(word, otmp, *let)) {
-                /* acceptable but not listed as likely candidates in the prompt
-                 * or in the inventory subset if player responds with '?'.
-                 */
+
+            /* acceptable but not listed as likely candidates in the prompt
+               or in the inventory subset if player responds with '?' */
+            } else if (getobj_obj_acceptable_unlisted(word, otmp, *let)) {
                 foo--;
                 allowall = TRUE;
                 *ap++ = otmp->invlet;
@@ -1729,9 +1726,9 @@ register const char *let, *word;
     }
     unsortloot(&sortedinvent);
 
-    bp[foo] = 0;
+    bp[foo] = '\0';
     if (foo == 0 && bp > buf && bp[-1] == ' ')
-        *--bp = 0;
+        *--bp = '\0';
     Strcpy(lets, bp); /* necessary since we destroy buf */
     if (foo > 5)      /* compactify string */
         compactify(bp);

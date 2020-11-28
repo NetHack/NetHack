@@ -2061,6 +2061,22 @@ int x1, y1, x2, y2;
     }
 }
 
+/* HP loss or passing out from overexerting yourself */
+void
+overexert_hp()
+{
+    int *hp = (!Upolyd ? &u.uhp : &u.mh);
+
+    if (*hp > 1) {
+        *hp -= 1;
+        g.context.botl = TRUE;
+    } else {
+        You("pass out from exertion!");
+        exercise(A_CON, FALSE);
+        fall_asleep(-10, FALSE);
+    }
+}
+
 /* combat increases metabolism */
 boolean
 overexertion()
@@ -2070,15 +2086,7 @@ overexertion()
        execute if you decline to attack a peaceful monster */
     gethungry();
     if ((g.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
-        int *hp = (!Upolyd ? &u.uhp : &u.mh);
-
-        if (*hp > 1) {
-            *hp -= 1;
-        } else {
-            You("pass out from exertion!");
-            exercise(A_CON, FALSE);
-            fall_asleep(-10, FALSE);
-        }
+        overexert_hp();
     }
     return (boolean) (g.multi < 0); /* might have fainted (forced to sleep) */
 }
