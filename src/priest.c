@@ -67,23 +67,7 @@ register xchar omx, omy, gx, gy;
 
     nix = omx;
     niy = omy;
-    if (mtmp->isshk)
-        allowflags = ALLOW_SSM;
-    else
-        allowflags = ALLOW_SSM | ALLOW_SANCT;
-    if (passes_walls(mtmp->data))
-        allowflags |= (ALLOW_ROCK | ALLOW_WALL);
-    if (throws_rocks(mtmp->data))
-        allowflags |= ALLOW_ROCK;
-    if (tunnels(mtmp->data))
-        allowflags |= ALLOW_DIG;
-    if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
-        allowflags |= OPENDOOR;
-        if (monhaskey(mtmp, TRUE))
-            allowflags |= UNLOCKDOOR;
-    }
-    if (is_giant(mtmp->data))
-        allowflags |= BUSTDOOR;
+    allowflags = mon_allowflags(mtmp);
     cnt = mfndpos(mtmp, poss, info, allowflags);
 
     if (mtmp->isshk && avoid && uondoor) { /* perhaps we cannot avoid him */

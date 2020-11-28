@@ -2458,7 +2458,7 @@ NetHack.
 Here is a list of the armor class values provided by suits of armor:
 .
 .\" Replace the old one suit per line table with a more condensed one.
-.\" AC4 and AC7 have been split into two lines to accomodate plain text
+.\" AC4 and AC7 have been split into two lines to accommodate plain text
 .\" output (Guidebook.txt).  AC4 needs it to reduce overall width; after
 .\" that, AC7 became the longest and the table looks better by shortening
 .\" it to get the second column (number) closer to the text on most lines.

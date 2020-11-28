@@ -609,7 +609,7 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
 
     data = (PNHMessageWindow) GetWindowLong(hWnd, GWL_USERDATA);
     if (data) {
-        /* set size to accomodate MSG_VISIBLE_LINES, highligh rectangle and
+        /* set size to accommodate MSG_VISIBLE_LINES, highligh rectangle and
            horizontal scroll bar (difference between window rect and client
            rect */
         GetClientRect(hWnd, &client_rt);

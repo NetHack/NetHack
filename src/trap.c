@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1604442297 2020/11/03 22:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1606558763 2020/11/28 10:19:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.367 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2369,12 +2369,11 @@ register struct monst *mtmp;
                     (void) water_damage(target, "shirt", TRUE);
             }
 
-            if (mptr == &mons[PM_IRON_GOLEM]) {
+            if (completelyrusts(mptr)) {
                 if (in_sight)
-                    pline("%s falls to pieces!", Monnam(mtmp));
-                else if (mtmp->mtame)
-                    pline("May %s rust in peace.", mon_nam(mtmp));
-                mondied(mtmp);
+                    pline("%s %s to pieces!", Monnam(mtmp),
+                          !mlifesaver(mtmp) ? "falls" : "starts to fall");
+                monkilled(mtmp, (const char *) 0, AD_RUST);
                 if (DEADMONSTER(mtmp))
                     trapkilled = TRUE;
             } else if (mptr == &mons[PM_GREMLIN] && rn2(3)) {
@@ -2400,8 +2399,10 @@ register struct monst *mtmp;
                 int num = d(2, 4), alt;
                 boolean immolate = FALSE;
 
-                /* paper burns very fast, assume straw is tightly
-                 * packed and burns a bit slower */
+                /* paper burns very fast, assume straw is tightly packed
+                   and burns a bit slower
+                   (note: this is inconsistent with mattackm()'s AD_FIRE
+                   damage where completelyburns() includes straw golem) */
                 switch (monsndx(mptr)) {
                 case PM_PAPER_GOLEM:
                     immolate = TRUE;
@@ -5245,7 +5246,7 @@ boolean nocorpse;
                 dam = 1;
         }
         mon->mhp -= dam;
-        if (DEADMONSTER(mon)) {
+        if (mon->mhp <= 0) {
             int xx = mon->mx, yy = mon->my;
 
             monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
