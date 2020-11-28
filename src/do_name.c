@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1596498162 2020/08/03 23:42:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1606504240 2020/11/27 19:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -556,7 +556,7 @@ int cx, cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-        custompline(SUPPRESS_HISTORY,
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE),
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
