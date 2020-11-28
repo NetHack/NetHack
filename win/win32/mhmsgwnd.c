@@ -769,7 +769,7 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
     sz->cx = rt.right - rt.left;
     sz->cy = rt.bottom - rt.top;
 
-    /* set size to accomodate MSG_VISIBLE_LINES and
+    /* set size to accommodate MSG_VISIBLE_LINES and
        horizontal scroll bar (difference between window rect and client rect
        */
     GetClientRect(hWnd, &client_rt);
