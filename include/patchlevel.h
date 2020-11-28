@@ -98,7 +98,7 @@
  *  fix the article used in the message when your steed encounters a polymorph
  *      trap
  *  allow teleporting onto the vibrating square
- *  message "your knapsack can't accomodate any more items" when picking stuff
+ *  message "your knapsack can't accommodate any more items" when picking stuff
  *      up or removing such from container was inaccurate if there was some
  *      gold pending; vary the message rather than add more convoluted pickup
  *      code
