@@ -1173,34 +1173,7 @@ register int after;
 
     nix = omx;
     niy = omy;
-    flag = 0L;
-    if (mtmp->mpeaceful && (!Conflict || resist(mtmp, RING_CLASS, 0, 0)))
-        flag |= (ALLOW_SANCT | ALLOW_SSM);
-    else
-        flag |= ALLOW_U;
-    if (is_minion(ptr) || is_rider(ptr))
-        flag |= ALLOW_SANCT;
-    /* unicorn may not be able to avoid hero on a noteleport level */
-    if (is_unicorn(ptr) && !noteleport_level(mtmp))
-        flag |= NOTONL;
-    if (passes_walls(ptr))
-        flag |= (ALLOW_WALL | ALLOW_ROCK);
-    if (passes_bars(ptr))
-        flag |= ALLOW_BARS;
-    if (can_tunnel)
-        flag |= ALLOW_DIG;
-    if (is_human(ptr) || ptr == &mons[PM_MINOTAUR])
-        flag |= ALLOW_SSM;
-    if ((is_undead(ptr) && ptr->mlet != S_GHOST) || is_vampshifter(mtmp))
-        flag |= NOGARLIC;
-    if (throws_rocks(ptr))
-        flag |= ALLOW_ROCK;
-    if (can_open)
-        flag |= OPENDOOR;
-    if (can_unlock)
-        flag |= UNLOCKDOOR;
-    if (doorbuster)
-        flag |= BUSTDOOR;
+    flag = mon_allowflags(mtmp);
     {
         register int i, j, nx, ny, nearer;
         int jcnt, cnt;
