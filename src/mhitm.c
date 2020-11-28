@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1606473486 2020/11/27 10:38:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1606558747 2020/11/28 10:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1022,8 +1022,12 @@ int dieroll;
         if (g.vis && canseemon(mdef))
             pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
         if (completelyburns(pd)) { /* paper golem or straw golem */
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
             if (g.vis && canseemon(mdef))
-                pline("%s burns completely!", Monnam(mdef));
+                pline("%s %s!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "burns completely"
+                                        : "is totally engulfed in flames");
             monkilled(mdef, (char *) 0, AD_FIRE);
             if (!DEADMONSTER(mdef))
                 return 0;
@@ -1100,7 +1104,8 @@ int dieroll;
             break;
         if (completelyrusts(pd)) { /* PM_IRON_GOLEM */
             if (g.vis && canseemon(mdef))
-                pline("%s falls to pieces!", Monnam(mdef));
+                pline("%s %s to pieces!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "falls" : "starts to fall");
             monkilled(mdef, (char *) 0, AD_RUST);
             if (!DEADMONSTER(mdef))
                 return 0;
@@ -1121,8 +1126,11 @@ int dieroll;
         if (magr->mcan)
             break;
         if (completelyrots(pd)) { /* PM_WOOD_GOLEM || PM_LEATHER_GOLEM */
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
             if (g.vis && canseemon(mdef))
-                pline("%s falls to pieces!", Monnam(mdef));
+                pline("%s %s to pieces!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "falls" : "starts to fall");
             monkilled(mdef, (char *) 0, AD_DCAY);
             if (!DEADMONSTER(mdef))
                 return 0;

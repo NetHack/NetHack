@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1606473489 2020/11/27 10:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.354 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1606558762 2020/11/28 10:19:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2591,7 +2591,7 @@ int how;
               *fltxt ? " by the " : "", fltxt);
     else
         /* sad feeling is deferred until after potential life-saving */
-        iflags.sad_feeling = (mdef->mtame != 0);
+        iflags.sad_feeling = mdef->mtame ? TRUE : FALSE;
 
     /* no corpse if digested or disintegrated or flammable golem burnt up;
        no corpse for a paper golem means no scrolls; golems that rust or
@@ -2605,6 +2605,8 @@ int how;
     else
         mondied(mdef); /* calls mondead() and maybe leaves a corpse */
 
+    if (!DEADMONSTER(mdef))
+        return; /* life-saved */
     /* extra message if pet golem is completely destroyed;
        if not visible, this will follow "you have a sad feeling" */
     if (mdef->mtame) {

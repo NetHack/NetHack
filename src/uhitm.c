@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1606473490 2020/11/27 10:38:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1606558760 2020/11/28 10:19:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1769,7 +1769,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
         if (completelyburns(pd)) { /* paper golem or straw golem */
             if (!Blind)
-                pline("%s burns completely!", Monnam(mdef));
+                /* note: the life-saved case is hypothetical because
+                   life-saving doesn't work for golems */
+                pline("%s %s!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "burns completely"
+                                        : "is totally engulfed in flames");
             else
                 You("smell burning%s.",
                     (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
@@ -1936,7 +1940,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         break;
     case AD_RUST:
         if (completelyrusts(pd)) { /* iron golem */
-            pline("%s falls to pieces!", Monnam(mdef));
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
+            pline("%s %s to pieces!", Monnam(mdef),
+                  !mlifesaver(mdef) ? "falls" : "starts to fall");
             xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_RUST);
@@ -1948,7 +1955,8 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         break;
     case AD_DCAY:
         if (completelyrots(pd)) { /* wood golem or leather golem */
-            pline("%s falls to pieces!", Monnam(mdef));
+            pline("%s %s to pieces!", Monnam(mdef),
+                  !mlifesaver(mdef) ? "falls" : "starts to fall");
             xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_ROT);
