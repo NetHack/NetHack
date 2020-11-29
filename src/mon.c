@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1606558762 2020/11/28 10:19:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1606623308 2020/11/29 04:15:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1546,58 +1546,59 @@ long
 mon_allowflags(mtmp)
 struct monst *mtmp;
 {
-    long flags = 0L;
+    long allowflags = 0L;
     boolean can_open = !(nohands(mtmp->data) || verysmall(mtmp->data));
     boolean can_unlock = ((can_open && monhaskey(mtmp, TRUE))
                           || mtmp->iswiz || is_rider(mtmp->data));
     boolean doorbuster = is_giant(mtmp->data);
 
     if (mtmp->mtame)
-        flags |= ALLOW_M | ALLOW_TRAPS | ALLOW_SANCT | ALLOW_SSM;
+        allowflags |= ALLOW_M | ALLOW_TRAPS | ALLOW_SANCT | ALLOW_SSM;
     else if (mtmp->mpeaceful)
-        flags |= ALLOW_SANCT | ALLOW_SSM;
+        allowflags |= ALLOW_SANCT | ALLOW_SSM;
     else
-        flags |= ALLOW_U;
+        allowflags |= ALLOW_U;
     if (Conflict && !resist(mtmp, RING_CLASS, 0, 0))
-        flags |= ALLOW_U;
+        allowflags |= ALLOW_U;
     if (mtmp->isshk)
-        flags |= ALLOW_SSM;
+        allowflags |= ALLOW_SSM;
     if (mtmp->ispriest)
-        flags |= ALLOW_SSM | ALLOW_SANCT;
+        allowflags |= ALLOW_SSM | ALLOW_SANCT;
     if (passes_walls(mtmp->data))
-        flags |= (ALLOW_ROCK | ALLOW_WALL);
+        allowflags |= (ALLOW_ROCK | ALLOW_WALL);
     if (throws_rocks(mtmp->data))
-        flags |= ALLOW_ROCK;
+        allowflags |= ALLOW_ROCK;
     if (tunnels(mtmp->data)
         && !Is_rogue_level(&u.uz)) /* same restriction as m_move() */
-        flags |= ALLOW_DIG;
+        allowflags |= ALLOW_DIG;
     if (doorbuster)
-        flags |= BUSTDOOR;
+        allowflags |= BUSTDOOR;
     if (can_open)
-        flags |= OPENDOOR;
+        allowflags |= OPENDOOR;
     if (can_unlock)
-        flags |= UNLOCKDOOR;
+        allowflags |= UNLOCKDOOR;
     if (passes_bars(mtmp->data))
-        flags |= ALLOW_BARS;
+        allowflags |= ALLOW_BARS;
     if (is_displacer(mtmp->data))
-        flags |= ALLOW_MDISP;
+        allowflags |= ALLOW_MDISP;
     if (is_minion(mtmp->data) || is_rider(mtmp->data))
-        flags |= ALLOW_SANCT;
+        allowflags |= ALLOW_SANCT;
     /* unicorn may not be able to avoid hero on a noteleport level */
     if (is_unicorn(mtmp->data) && !noteleport_level(mtmp))
-        flags |= NOTONL;
+        allowflags |= NOTONL;
     if (passes_walls(mtmp->data))
-        flags |= (ALLOW_WALL | ALLOW_ROCK);
+        allowflags |= (ALLOW_WALL | ALLOW_ROCK);
     if (passes_bars(mtmp->data))
-        flags |= ALLOW_BARS;
+        allowflags |= ALLOW_BARS;
     if (is_human(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
-        flags |= ALLOW_SSM;
-    if ((is_undead(mtmp->data) && mtmp->data->mlet != S_GHOST) || is_vampshifter(mtmp))
-        flags |= NOGARLIC;
+        allowflags |= ALLOW_SSM;
+    if ((is_undead(mtmp->data) && mtmp->data->mlet != S_GHOST)
+        || is_vampshifter(mtmp))
+        allowflags |= NOGARLIC;
     if (throws_rocks(mtmp->data))
-        flags |= ALLOW_ROCK;
+        allowflags |= ALLOW_ROCK;
 
-    return flags;
+    return allowflags;
 }
 
 /* return number of acceptable neighbour positions */
