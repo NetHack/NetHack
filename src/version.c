@@ -247,7 +247,8 @@ doextversion()
     return 0;
 }
 
-void early_version_info(pastebuf)
+void
+early_version_info(pastebuf)
 boolean pastebuf;
 {
     char buf[BUFSZ], buf2[BUFSZ];
