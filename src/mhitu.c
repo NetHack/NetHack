@@ -1242,13 +1242,9 @@ register struct attack *mattk;
         }
         break;
     case AD_DRLI: /* drain life */
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(3) && !Drain_resistance) {
-            losexp("life drainage");
-
-            /* unlike hitting with Stormbringer, wounded attacker doesn't
-               heal any from the drained life */
-        }
+        mhitm_ad_drli(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_LEGS: {
         long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;

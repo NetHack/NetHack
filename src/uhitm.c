@@ -1852,10 +1852,6 @@ struct mhitm_data *mhm;
         mhm->damage = 0;
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        /*  Next a cancellation factor.
-         *  Use uncancelled when cancellation factor takes into account certain
-         *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
-         */
         int armpro = magic_negation(mdef);
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
 
@@ -1873,6 +1869,87 @@ struct mhitm_data *mhm;
             xdrainenergym(mdef, (boolean) (g.vis && canspotmon(mdef)
                                            && mattk->aatyp != AT_ENGL));
         mhm->damage = 0;
+    }
+}
+
+void
+mhitm_ad_drli(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && !rn2(3) && !resists_drli(mdef)) {
+            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+            pline("%s becomes weaker!", Monnam(mdef));
+            if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
+                mdef->mhpmax -= mhm->damage;
+            } else {
+                /* limit floor of mhpmax reduction to current m_lev + 1;
+                   avoid increasing it if somehow already less than that */
+                if (mdef->mhpmax > (int) mdef->m_lev)
+                    mdef->mhpmax = (int) mdef->m_lev + 1;
+            }
+            mdef->mhp -= mhm->damage;
+            /* !m_lev: level 0 monster is killed regardless of hit points
+               rather than drop to level -1; note: some non-living creatures
+               (golems, vortices) are subject to life-drain */
+            if (DEADMONSTER(mdef) || !mdef->m_lev) {
+                pline("%s %s!", Monnam(mdef),
+                      nonliving(mdef->data) ? "expires" : "dies");
+                xkilled(mdef, XKILL_NOMSG);
+            } else
+                mdef->m_lev--;
+            mhm->damage = 0; /* damage has already been inflicted */
+
+            /* unlike hitting with Stormbringer, wounded hero doesn't
+               heal any from the drained life */
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && !rn2(3) && !Drain_resistance) {
+            losexp("life drainage");
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
+            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+            if (g.vis && canspotmon(mdef))
+                pline("%s becomes weaker!", Monnam(mdef));
+            if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
+                mdef->mhpmax -= mhm->damage;
+            } else {
+                /* limit floor of mhpmax reduction to current m_lev + 1;
+                   avoid increasing it if somehow already less than that */
+                if (mdef->mhpmax > (int) mdef->m_lev)
+                    mdef->mhpmax = (int) mdef->m_lev + 1;
+            }
+            if (mdef->m_lev == 0) /* automatic kill if drained past level 0 */
+                mhm->damage = mdef->mhp;
+            else
+                mdef->m_lev--;
+
+            /* unlike hitting with Stormbringer, wounded attacker doesn't
+               heal any from the drained life */
+        }
     }
 }
 
@@ -2126,32 +2203,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         mhm.damage = 0;
         break;
     case AD_DRLI: /* drain life */
-        if (!negated && !rn2(3) && !resists_drli(mdef)) {
-            mhm.damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
-            pline("%s becomes weaker!", Monnam(mdef));
-            if (mdef->mhpmax - mhm.damage > (int) mdef->m_lev) {
-                mdef->mhpmax -= mhm.damage;
-            } else {
-                /* limit floor of mhpmax reduction to current m_lev + 1;
-                   avoid increasing it if somehow already less than that */
-                if (mdef->mhpmax > (int) mdef->m_lev)
-                    mdef->mhpmax = (int) mdef->m_lev + 1;
-            }
-            mdef->mhp -= mhm.damage;
-            /* !m_lev: level 0 monster is killed regardless of hit points
-               rather than drop to level -1; note: some non-living creatures
-               (golems, vortices) are subject to life-drain */
-            if (DEADMONSTER(mdef) || !mdef->m_lev) {
-                pline("%s %s!", Monnam(mdef),
-                      nonliving(mdef->data) ? "expires" : "dies");
-                xkilled(mdef, XKILL_NOMSG);
-            } else
-                mdef->m_lev--;
-            mhm.damage = 0; /* damage has already been inflicted */
-
-            /* unlike hitting with Stormbringer, wounded hero doesn't
-               heal any from the drained life */
-        }
+        mhitm_ad_drli(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_RUST:
         mhitm_ad_rust(&g.youmonst, mattk, mdef, &mhm);

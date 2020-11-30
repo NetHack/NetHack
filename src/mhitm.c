@@ -1286,26 +1286,9 @@ int dieroll;
         }
         break;
     case AD_DRLI: /* drain life */
-        if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
-            mhm.damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
-            if (g.vis && canspotmon(mdef))
-                pline("%s becomes weaker!", Monnam(mdef));
-            if (mdef->mhpmax - mhm.damage > (int) mdef->m_lev) {
-                mdef->mhpmax -= mhm.damage;
-            } else {
-                /* limit floor of mhpmax reduction to current m_lev + 1;
-                   avoid increasing it if somehow already less than that */
-                if (mdef->mhpmax > (int) mdef->m_lev)
-                    mdef->mhpmax = (int) mdef->m_lev + 1;
-            }
-            if (mdef->m_lev == 0) /* automatic kill if drained past level 0 */
-                mhm.damage = mdef->mhp;
-            else
-                mdef->m_lev--;
-
-            /* unlike hitting with Stormbringer, wounded attacker doesn't
-               heal any from the drained life */
-        }
+        mhitm_ad_drli(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SSEX:
     case AD_SITM: /* for now these are the same */
