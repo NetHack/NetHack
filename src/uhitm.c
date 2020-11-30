@@ -3216,6 +3216,31 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_famn(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        pline("%s reaches out, and your body shrivels.", Monnam(magr));
+        exercise(A_CON, FALSE);
+        if (!is_fainted())
+            morehungry(rn1(40, 40));
+        /* plus the normal damage */
+    } else {
+        /* mhitm */
+        mhm->damage = 0;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE

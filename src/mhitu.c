@@ -1463,11 +1463,9 @@ register struct attack *mattk;
         (void) diseasemu(mdat); /* plus the normal damage */
         break;
     case AD_FAMN:
-        pline("%s reaches out, and your body shrivels.", Monnam(mtmp));
-        exercise(A_CON, FALSE);
-        if (!is_fainted())
-            morehungry(rn1(40, 40));
-        /* plus the normal damage */
+        mhitm_ad_famn(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLIM:
         mhitm_ad_slim(mtmp, mattk, &g.youmonst, &mhm);
