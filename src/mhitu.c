@@ -1409,9 +1409,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_SLOW:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && HFast && !defends(AD_SLOW, uwep) && !rn2(4))
-            u_slow_down();
+        mhitm_ad_slow(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DREN:
         mhitm_ad_dren(mtmp, mattk, &g.youmonst, &mhm);

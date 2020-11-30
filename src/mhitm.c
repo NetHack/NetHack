@@ -1091,14 +1091,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_SLOW:
-        if (!cancelled && mdef->mspeed != MSLOW) {
-            unsigned int oldspeed = mdef->mspeed;
-
-            mon_adjust_speed(mdef, -1, (struct obj *) 0);
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-            if (mdef->mspeed != oldspeed && g.vis && canspotmon(mdef))
-                pline("%s slows down.", Monnam(mdef));
-        }
+        mhitm_ad_slow(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CONF:
         /* Since confusing another monster doesn't have a real time

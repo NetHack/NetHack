@@ -3093,6 +3093,53 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_slow(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && mdef->mspeed != MSLOW) {
+            unsigned int oldspeed = mdef->mspeed;
+
+            mon_adjust_speed(mdef, -1, (struct obj *) 0);
+            if (mdef->mspeed != oldspeed && canseemon(mdef))
+                pline("%s slows down.", Monnam(mdef));
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && HFast && !defends(AD_SLOW, uwep) && !rn2(4))
+            u_slow_down();
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && mdef->mspeed != MSLOW) {
+            unsigned int oldspeed = mdef->mspeed;
+
+            mon_adjust_speed(mdef, -1, (struct obj *) 0);
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            if (mdef->mspeed != oldspeed && g.vis && canspotmon(mdef))
+                pline("%s slows down.", Monnam(mdef));
+        }
+    }
+}
+
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3320,13 +3367,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_SLOW:
-        if (!negated && mdef->mspeed != MSLOW) {
-            unsigned int oldspeed = mdef->mspeed;
-
-            mon_adjust_speed(mdef, -1, (struct obj *) 0);
-            if (mdef->mspeed != oldspeed && canseemon(mdef))
-                pline("%s slows down.", Monnam(mdef));
-        }
+        mhitm_ad_slow(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CONF:
         if (!mdef->mconf) {
