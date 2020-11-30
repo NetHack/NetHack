@@ -2330,6 +2330,108 @@ struct mhitm_data *mhm;
 }
 
 
+void
+mhitm_ad_tlpt(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (mhm->damage <= 0)
+            mhm->damage = 1;
+        if (!negated) {
+            char nambuf[BUFSZ];
+            boolean u_saw_mon = (canseemon(mdef)
+                                 || (u.uswallow && u.ustuck == mdef));
+
+            /* record the name before losing sight of monster */
+            Strcpy(nambuf, Monnam(mdef));
+            if (u_teleport_mon(mdef, FALSE) && u_saw_mon
+                && !(canseemon(mdef) || (u.uswallow && u.ustuck == mdef)))
+                pline("%s suddenly disappears!", nambuf);
+            if (mhm->damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
+                if (mdef->mhp == 1)
+                    ++mdef->mhp;
+                mhm->damage = mdef->mhp - 1;
+            }
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+        int tmphp;
+
+        hitmsg(magr, mattk);
+        if (uncancelled) {
+            if (flags.verbose)
+                Your("position suddenly seems %suncertain!",
+                     (Teleport_control && !Stunned && !unconscious()) ? ""
+                     : "very ");
+            tele();
+            /* As of 3.6.2:  make sure damage isn't fatal; previously, it
+               was possible to be teleported and then drop dead at
+               the destination when QM's 1d4 damage gets applied below;
+               even though that wasn't "wrong", it seemed strange,
+               particularly if the teleportation had been controlled
+               [applying the damage first and not teleporting if fatal
+               is another alternative but it has its own complications] */
+            if ((Half_physical_damage ? (mhm->damage - 1) / 2 : mhm->damage)
+                >= (tmphp = (Upolyd ? u.mh : u.uhp))) {
+                mhm->damage = tmphp - 1;
+                if (Half_physical_damage)
+                    mhm->damage *= 2; /* doesn't actually increase damage; we only
+                               * get here if half the original damage would
+                               * would have been fatal, so double reduced
+                               * damage will be less than original damage */
+                if (mhm->damage < 1) { /* implies (tmphp <= 1) */
+                    mhm->damage = 1;
+                    /* this might increase current HP beyond maximum HP but
+                       it will be immediately reduced below, so that should
+                       be indistinguishable from zero damage; we don't drop
+                       damage all the way to zero because that inhibits any
+                       passive counterattack if poly'd hero has one */
+                    if (Upolyd && u.mh == 1)
+                        ++u.mh;
+                    else if (!Upolyd && u.uhp == 1)
+                        ++u.uhp;
+                    /* [don't set context.botl here] */
+                }
+            }
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && mhm->damage < mdef->mhp && !tele_restrict(mdef)) {
+            char mdef_Monnam[BUFSZ];
+            boolean wasseen = canspotmon(mdef);
+
+            /* save the name before monster teleports, otherwise
+               we'll get "it" in the suddenly disappears message */
+            if (g.vis && wasseen)
+                Strcpy(mdef_Monnam, Monnam(mdef));
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            (void) rloc(mdef, TRUE);
+            if (g.vis && wasseen && !canspotmon(mdef) && mdef != u.usteed)
+                pline("%s suddenly disappears!", mdef_Monnam);
+            if (mhm->damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
+                if (mdef->mhp == 1)
+                    ++mdef->mhp;
+                mhm->damage = mdef->mhp - 1;
+            }
+        }
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2466,24 +2568,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_TLPT:
-        if (mhm.damage <= 0)
-            mhm.damage = 1;
-        if (!negated) {
-            char nambuf[BUFSZ];
-            boolean u_saw_mon = (canseemon(mdef)
-                                 || (u.uswallow && u.ustuck == mdef));
-
-            /* record the name before losing sight of monster */
-            Strcpy(nambuf, Monnam(mdef));
-            if (u_teleport_mon(mdef, FALSE) && u_saw_mon
-                && !(canseemon(mdef) || (u.uswallow && u.ustuck == mdef)))
-                pline("%s suddenly disappears!", nambuf);
-            if (mhm.damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
-                if (mdef->mhp == 1)
-                    ++mdef->mhp;
-                mhm.damage = mdef->mhp - 1;
-            }
-        }
+        mhitm_ad_tlpt(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_BLND:
         if (can_blnd(&g.youmonst, mdef, mattk->aatyp, (struct obj *) 0)) {

@@ -1076,24 +1076,9 @@ int dieroll;
         mhm.damage = (mattk->adtyp == AD_STON ? 0 : 1);
         break;
     case AD_TLPT:
-        if (!cancelled && mhm.damage < mdef->mhp && !tele_restrict(mdef)) {
-            char mdef_Monnam[BUFSZ];
-            boolean wasseen = canspotmon(mdef);
-
-            /* save the name before monster teleports, otherwise
-               we'll get "it" in the suddenly disappears message */
-            if (g.vis && wasseen)
-                Strcpy(mdef_Monnam, Monnam(mdef));
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-            (void) rloc(mdef, TRUE);
-            if (g.vis && wasseen && !canspotmon(mdef) && mdef != u.usteed)
-                pline("%s suddenly disappears!", mdef_Monnam);
-            if (mhm.damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
-                if (mdef->mhp == 1)
-                    ++mdef->mhp;
-                mhm.damage = mdef->mhp - 1;
-            }
-        }
+        mhitm_ad_tlpt(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLEE:
         if (!cancelled && !mdef->msleeping
