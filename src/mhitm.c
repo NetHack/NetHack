@@ -1081,15 +1081,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_SLEE:
-        if (!cancelled && !mdef->msleeping
-            && sleep_monst(mdef, rnd(10), -1)) {
-            if (g.vis && canspotmon(mdef)) {
-                Strcpy(buf, Monnam(mdef));
-                pline("%s is put to sleep by %s.", buf, mon_nam(magr));
-            }
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-            slept_monst(mdef);
-        }
+        mhitm_ad_slee(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_PLYS:
         mhitm_ad_plys(magr, mattk, mdef, &mhm);

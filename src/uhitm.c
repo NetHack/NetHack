@@ -2907,6 +2907,59 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_slee(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && !mdef->msleeping && sleep_monst(mdef, rnd(10), -1)) {
+            if (!Blind)
+                pline("%s is put to sleep by you!", Monnam(mdef));
+            slept_monst(mdef);
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && g.multi >= 0 && !rn2(5)) {
+            if (Sleep_resistance)
+                return;
+            fall_asleep(-rnd(10), TRUE);
+            if (Blind)
+                You("are put to sleep!");
+            else
+                You("are put to sleep by %s!", mon_nam(magr));
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && !mdef->msleeping
+            && sleep_monst(mdef, rnd(10), -1)) {
+            if (g.vis && canspotmon(mdef)) {
+                char buf[BUFSZ];
+                Strcpy(buf, Monnam(mdef));
+                pline("%s is put to sleep by %s.", buf, mon_nam(magr));
+            }
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            slept_monst(mdef);
+        }
+    }
+}
+
 
 
 /* Template for monster hits monster for AD_FOO.
@@ -3121,11 +3174,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_SLEE:
-        if (!negated && !mdef->msleeping && sleep_monst(mdef, rnd(10), -1)) {
-            if (!Blind)
-                pline("%s is put to sleep by you!", Monnam(mdef));
-            slept_monst(mdef);
-        }
+        mhitm_ad_slee(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLIM:
         if (negated)
