@@ -57,6 +57,7 @@ local wishtest_objects = {
    ["landmine"] = { otyp_name = "land mine", oclass = "(" },
    ["land mine"] = { otyp_name = "land mine", oclass = "(" },
    ["bag of tricks"] = { otyp_name = "bag of tricks", oclass = "(" },
+   ["bags of tricks"] = { otyp_name = "bag of tricks", oclass = "(" },
    ["sprig of wolfsbane"] = { otyp_name = "sprig of wolfsbane", oclass = "%" },
    ["wolfsbane"] = { otyp_name = "sprig of wolfsbane", oclass = "%" },
    ["clove of garlic"] = { otyp_name = "clove of garlic", oclass = "%" },
