@@ -1096,16 +1096,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_CONF:
-        /* Since confusing another monster doesn't have a real time
-         * limit, setting spec_used would not really be right (though
-         * we still should check for it).
-         */
-        if (!magr->mcan && !mdef->mconf && !magr->mspec_used) {
-            if (g.vis && canseemon(mdef))
-                pline("%s looks confused.", Monnam(mdef));
-            mdef->mconf = 1;
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-        }
+        mhitm_ad_conf(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_BLND:
         mhitm_ad_blnd(magr, mattk, mdef, &mhm);

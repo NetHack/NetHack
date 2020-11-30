@@ -3139,6 +3139,48 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_conf(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (!mdef->mconf) {
+            if (canseemon(mdef))
+                pline("%s looks confused.", Monnam(mdef));
+            mdef->mconf = 1;
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!magr->mcan && !rn2(4) && !magr->mspec_used) {
+            magr->mspec_used = magr->mspec_used + (mhm->damage + rn2(6));
+            if (Confusion)
+                You("are getting even more confused.");
+            else
+                You("are getting confused.");
+            make_confused(HConfusion + mhm->damage, FALSE);
+        }
+        mhm->damage = 0;
+    } else {
+        /* mhitm */
+        /* Since confusing another monster doesn't have a real time
+         * limit, setting spec_used would not really be right (though
+         * we still should check for it).
+         */
+        if (!magr->mcan && !mdef->mconf && !magr->mspec_used) {
+            if (g.vis && canseemon(mdef))
+                pline("%s looks confused.", Monnam(mdef));
+            mdef->mconf = 1;
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+        }
+    }
+}
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -3372,11 +3414,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_CONF:
-        if (!mdef->mconf) {
-            if (canseemon(mdef))
-                pline("%s looks confused.", Monnam(mdef));
-            mdef->mconf = 1;
-        }
+        mhitm_ad_conf(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_POLY:
         if (!negated && mhm.damage < mdef->mhp)

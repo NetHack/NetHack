@@ -1419,16 +1419,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_CONF:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(4) && !mtmp->mspec_used) {
-            mtmp->mspec_used = mtmp->mspec_used + (mhm.damage + rn2(6));
-            if (Confusion)
-                You("are getting even more confused.");
-            else
-                You("are getting confused.");
-            make_confused(HConfusion + mhm.damage, FALSE);
-        }
-        mhm.damage = 0;
+        mhitm_ad_conf(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DETH:
         pline("%s reaches out with its deadly touch.", Monnam(mtmp));
