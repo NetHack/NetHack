@@ -1138,34 +1138,9 @@ int dieroll;
         mhm.damage = 0;
         break;
     case AD_CURS:
-        if (!night() && (pa == &mons[PM_GREMLIN]))
-            break;
-        if (!magr->mcan && !rn2(10)) {
-            mdef->mcan = 1; /* cancelled regardless of lifesave */
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-            if (is_were(pd) && pd->mlet != S_HUMAN)
-                were_change(mdef);
-            if (pd == &mons[PM_CLAY_GOLEM]) {
-                if (g.vis && canseemon(mdef)) {
-                    pline("Some writing vanishes from %s head!",
-                          s_suffix(mon_nam(mdef)));
-                    pline("%s is destroyed!", Monnam(mdef));
-                }
-                mondied(mdef);
-                if (!DEADMONSTER(mdef))
-                    return 0;
-                else if (mdef->mtame && !g.vis)
-                    You(brief_feeling, "strangely sad");
-                return (MM_DEF_DIED
-                        | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-            }
-            if (!Deaf) {
-                if (!g.vis)
-                    You_hear("laughter.");
-                else if (canseemon(magr))
-                    pline("%s chuckles.", Monnam(magr));
-            }
-        }
+        mhitm_ad_curs(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SGLD:
         mhitm_ad_sgld(magr, mattk, mdef, &mhm);

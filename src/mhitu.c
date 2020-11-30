@@ -1482,24 +1482,9 @@ register struct attack *mattk;
         }
         break;
     case AD_CURS:
-        hitmsg(mtmp, mattk);
-        if (!night() && mdat == &mons[PM_GREMLIN])
-            break;
-        if (!mtmp->mcan && !rn2(10)) {
-            if (!Deaf) {
-                if (Blind)
-                    You_hear("laughter.");
-                else
-                    pline("%s chuckles.", Monnam(mtmp));
-            }
-            if (u.umonnum == PM_CLAY_GOLEM) {
-                pline("Some writing vanishes from your head!");
-                /* KMH -- this is okay with unchanging */
-                rehumanize();
-                break;
-            }
-            attrcurse();
-        }
+        mhitm_ad_curs(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STUN:
         hitmsg(mtmp, mattk);

@@ -5,6 +5,9 @@
 
 #include "hack.h"
 
+static const char brief_feeling[] =
+    "have a %s feeling for a moment, then it passes.";
+
 static boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
                                        int, int, struct attack *, int));
 static boolean FDECL(theft_petrifies, (struct obj *));
@@ -2481,6 +2484,88 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_curs(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (night() && !rn2(10) && !mdef->mcan) {
+            if (pd == &mons[PM_CLAY_GOLEM]) {
+                if (!Blind)
+                    pline("Some writing vanishes from %s head!",
+                          s_suffix(mon_nam(mdef)));
+                xkilled(mdef, XKILL_NOMSG);
+                /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
+            } else {
+                mdef->mcan = 1;
+                You("chuckle.");
+            }
+        }
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!night() && pa == &mons[PM_GREMLIN])
+            return;
+        if (!magr->mcan && !rn2(10)) {
+            if (!Deaf) {
+                if (Blind)
+                    You_hear("laughter.");
+                else
+                    pline("%s chuckles.", Monnam(magr));
+            }
+            if (u.umonnum == PM_CLAY_GOLEM) {
+                pline("Some writing vanishes from your head!");
+                /* KMH -- this is okay with unchanging */
+                rehumanize();
+                return;
+            }
+            attrcurse();
+        }
+    } else {
+        /* mhitm */
+        if (!night() && (pa == &mons[PM_GREMLIN]))
+            return;
+        if (!magr->mcan && !rn2(10)) {
+            mdef->mcan = 1; /* cancelled regardless of lifesave */
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            if (is_were(pd) && pd->mlet != S_HUMAN)
+                were_change(mdef);
+            if (pd == &mons[PM_CLAY_GOLEM]) {
+                if (g.vis && canseemon(mdef)) {
+                    pline("Some writing vanishes from %s head!",
+                          s_suffix(mon_nam(mdef)));
+                    pline("%s is destroyed!", Monnam(mdef));
+                }
+                mondied(mdef);
+                if (!DEADMONSTER(mdef)) {
+                    mhm->hitflags = MM_MISS;
+                    mhm->done = TRUE;
+                    return;
+                }
+                else if (mdef->mtame && !g.vis)
+                    You(brief_feeling, "strangely sad");
+                mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                mhm->done = TRUE;
+                return;
+            }
+            if (!Deaf) {
+                if (!g.vis)
+                    You_hear("laughter.");
+                else if (canseemon(magr))
+                    pline("%s chuckles.", Monnam(magr));
+            }
+        }
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2626,19 +2711,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_CURS:
-        if (night() && !rn2(10) && !mdef->mcan) {
-            if (pd == &mons[PM_CLAY_GOLEM]) {
-                if (!Blind)
-                    pline("Some writing vanishes from %s head!",
-                          s_suffix(mon_nam(mdef)));
-                xkilled(mdef, XKILL_NOMSG);
-                /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
-            } else {
-                mdef->mcan = 1;
-                You("chuckle.");
-            }
-        }
-        mhm.damage = 0;
+        mhitm_ad_curs(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRLI: /* drain life */
         mhitm_ad_drli(&g.youmonst, mattk, mdef, &mhm);
