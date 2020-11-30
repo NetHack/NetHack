@@ -1098,29 +1098,9 @@ register struct attack *mattk;
             mhm.damage = 0;
         break;
     case AD_FIRE:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-            pline("You're %s!", on_fire(g.youmonst.data, mattk));
-            if (completelyburns(g.youmonst.data)) { /* paper or straw golem */
-                You("go up in flames!");
-                /* KMH -- this is okay with unchanging */
-                rehumanize();
-                break;
-            } else if (Fire_resistance) {
-                pline_The("fire doesn't feel hot!");
-                mhm.damage = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(SCROLL_CLASS, AD_FIRE);
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(POTION_CLASS, AD_FIRE);
-            if ((int) mtmp->m_lev > rn2(25))
-                destroy_item(SPBOOK_CLASS, AD_FIRE);
-            if ((int) mtmp->m_lev > rn2(20))
-                ignite_items(g.invent);
-            burn_away_slime();
-        } else
-            mhm.damage = 0;
+        mhitm_ad_fire(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_COLD:
         hitmsg(mtmp, mattk);

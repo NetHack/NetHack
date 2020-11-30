@@ -1953,6 +1953,127 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_fire(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (negated) {
+            mhm->damage = 0;
+            return;
+        }
+        if (!Blind)
+            pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
+        if (completelyburns(pd)) { /* paper golem or straw golem */
+            if (!Blind)
+                /* note: the life-saved case is hypothetical because
+                   life-saving doesn't work for golems */
+                pline("%s %s!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "burns completely"
+                                        : "is totally engulfed in flames");
+            else
+                You("smell burning%s.",
+                    (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
+                      : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
+            xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
+            mhm->damage = 0;
+            return;
+            /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
+        }
+        mhm->damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
+        mhm->damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        if (resists_fire(mdef)) {
+            if (!Blind)
+                pline_The("fire doesn't heat %s!", mon_nam(mdef));
+            golemeffects(mdef, AD_FIRE, mhm->damage);
+            shieldeff(mdef->mx, mdef->my);
+            mhm->damage = 0;
+        }
+        /* only potions damage resistant players in destroy_item */
+        mhm->damage += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        ignite_items(mdef->minvent);
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled) {
+            pline("You're %s!", on_fire(pd, mattk));
+            if (completelyburns(pd)) { /* paper or straw golem */
+                You("go up in flames!");
+                /* KMH -- this is okay with unchanging */
+                rehumanize();
+                return;
+            } else if (Fire_resistance) {
+                pline_The("fire doesn't feel hot!");
+                mhm->damage = 0;
+            }
+            if ((int) magr->m_lev > rn2(20))
+                destroy_item(SCROLL_CLASS, AD_FIRE);
+            if ((int) magr->m_lev > rn2(20))
+                destroy_item(POTION_CLASS, AD_FIRE);
+            if ((int) magr->m_lev > rn2(25))
+                destroy_item(SPBOOK_CLASS, AD_FIRE);
+            if ((int) magr->m_lev > rn2(20))
+                ignite_items(g.invent);
+            burn_away_slime();
+        } else
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (cancelled) {
+            mhm->damage = 0;
+            return;
+        }
+        if (g.vis && canseemon(mdef))
+            pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
+        if (completelyburns(pd)) { /* paper golem or straw golem */
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
+            if (g.vis && canseemon(mdef))
+                pline("%s %s!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "burns completely"
+                                        : "is totally engulfed in flames");
+            monkilled(mdef, (char *) 0, AD_FIRE);
+            if (!DEADMONSTER(mdef)) {
+                mhm->hitflags = MM_MISS;
+                mhm->done = TRUE;
+                return;
+            }
+            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->done = TRUE;
+            return;
+        }
+        mhm->damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
+        mhm->damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        if (resists_fire(mdef)) {
+            if (g.vis && canseemon(mdef))
+                pline_The("fire doesn't seem to burn %s!", mon_nam(mdef));
+            shieldeff(mdef->mx, mdef->my);
+            golemeffects(mdef, AD_FIRE, mhm->damage);
+            mhm->damage = 0;
+        }
+        /* only potions damage resistant players in destroy_item */
+        mhm->damage += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        ignite_items(mdef->minvent);
+    }
+}
+
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2053,40 +2174,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         }
         break;
     case AD_FIRE:
-        if (negated) {
-            mhm.damage = 0;
-            break;
-        }
-        if (!Blind)
-            pline("%s is %s!", Monnam(mdef), on_fire(pd, mattk));
-        if (completelyburns(pd)) { /* paper golem or straw golem */
-            if (!Blind)
-                /* note: the life-saved case is hypothetical because
-                   life-saving doesn't work for golems */
-                pline("%s %s!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "burns completely"
-                                        : "is totally engulfed in flames");
-            else
-                You("smell burning%s.",
-                    (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
-                      : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
-            xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
-            mhm.damage = 0;
-            break;
-            /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
-        }
-        mhm.damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
-        mhm.damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
-        if (resists_fire(mdef)) {
-            if (!Blind)
-                pline_The("fire doesn't heat %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_FIRE, mhm.damage);
-            shieldeff(mdef->mx, mdef->my);
-            mhm.damage = 0;
-        }
-        /* only potions damage resistant players in destroy_item */
-        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
-        ignite_items(mdef->minvent);
+        mhitm_ad_fire(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_COLD:
         if (negated) {
