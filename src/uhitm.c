@@ -2432,6 +2432,54 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_blnd(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
+            if (!Blind && mdef->mcansee)
+                pline("%s is blinded.", Monnam(mdef));
+            mdef->mcansee = 0;
+            mhm->damage += mdef->mblinded;
+            if (mhm->damage > 127)
+                mhm->damage = 127;
+            mdef->mblinded = mhm->damage;
+        }
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
+            if (!Blind)
+                pline("%s blinds you!", Monnam(magr));
+            make_blinded(Blinded + (long) mhm->damage, FALSE);
+            if (!Blind)
+                Your1(vision_clears);
+        }
+        mhm->damage = 0;
+    } else {
+        /* mhitm */
+        if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
+            register unsigned rnd_tmp;
+
+            if (g.vis && mdef->mcansee && canspotmon(mdef))
+                pline("%s is blinded.", Monnam(mdef));
+            rnd_tmp = d((int) mattk->damn, (int) mattk->damd);
+            if ((rnd_tmp += mdef->mblinded) > 127)
+                rnd_tmp = 127;
+            mdef->mblinded = rnd_tmp;
+            mdef->mcansee = 0;
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+        }
+        mhm->damage = 0;
+    }
+}
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2573,16 +2621,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_BLND:
-        if (can_blnd(&g.youmonst, mdef, mattk->aatyp, (struct obj *) 0)) {
-            if (!Blind && mdef->mcansee)
-                pline("%s is blinded.", Monnam(mdef));
-            mdef->mcansee = 0;
-            mhm.damage += mdef->mblinded;
-            if (mhm.damage > 127)
-                mhm.damage = 127;
-            mdef->mblinded = mhm.damage;
-        }
-        mhm.damage = 0;
+        mhitm_ad_blnd(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CURS:
         if (night() && !rn2(10) && !mdef->mcan) {

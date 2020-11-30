@@ -1125,14 +1125,9 @@ register struct attack *mattk;
         }
         break;
     case AD_BLND:
-        if (can_blnd(mtmp, &g.youmonst, mattk->aatyp, (struct obj *) 0)) {
-            if (!Blind)
-                pline("%s blinds you!", Monnam(mtmp));
-            make_blinded(Blinded + (long) mhm.damage, FALSE);
-            if (!Blind)
-                Your1(vision_clears);
-        }
-        mhm.damage = 0;
+        mhitm_ad_blnd(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRST:
         ptmp = A_STR;

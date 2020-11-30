@@ -1123,19 +1123,9 @@ int dieroll;
         }
         break;
     case AD_BLND:
-        if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
-            register unsigned rnd_tmp;
-
-            if (g.vis && mdef->mcansee && canspotmon(mdef))
-                pline("%s is blinded.", Monnam(mdef));
-            rnd_tmp = d((int) mattk->damn, (int) mattk->damd);
-            if ((rnd_tmp += mdef->mblinded) > 127)
-                rnd_tmp = 127;
-            mdef->mblinded = rnd_tmp;
-            mdef->mcansee = 0;
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-        }
-        mhm.damage = 0;
+        mhitm_ad_blnd(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_HALU:
         if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
