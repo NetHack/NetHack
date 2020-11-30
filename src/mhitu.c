@@ -1130,20 +1130,11 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_DRST:
-        ptmp = A_STR;
-        goto dopois;
     case AD_DRDX:
-        ptmp = A_DEX;
-        goto dopois;
     case AD_DRCO:
-        ptmp = A_CON;
- dopois:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(8)) {
-            Sprintf(buf, "%s %s", s_suffix(Monnam(mtmp)),
-                    mpoisons_subj(mtmp, mattk));
-            poisoned(buf, ptmp, mdat->mname, 30, FALSE);
-        }
+        mhitm_ad_drst(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRIN:
         hitmsg(mtmp, mattk);

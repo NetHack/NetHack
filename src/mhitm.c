@@ -1216,24 +1216,9 @@ int dieroll;
     case AD_DRST:
     case AD_DRDX:
     case AD_DRCO:
-        if (!cancelled && !rn2(8)) {
-            if (g.vis && canspotmon(magr))
-                pline("%s %s was poisoned!", s_suffix(Monnam(magr)),
-                      mpoisons_subj(magr, mattk));
-            if (resists_poison(mdef)) {
-                if (g.vis && canspotmon(mdef) && canspotmon(magr))
-                    pline_The("poison doesn't seem to affect %s.",
-                              mon_nam(mdef));
-            } else {
-                if (rn2(10))
-                    mhm.damage += rn1(10, 6);
-                else {
-                    if (g.vis && canspotmon(mdef))
-                        pline_The("poison was deadly...");
-                    mhm.damage = mdef->mhp;
-                }
-            }
-        }
+        mhitm_ad_drst(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRIN:
         if (g.notonhead || !has_head(pd)) {

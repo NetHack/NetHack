@@ -2566,6 +2566,78 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_drst(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && !rn2(8)) {
+            Your("%s was poisoned!", mpoisons_subj(magr, mattk));
+            if (resists_poison(mdef)) {
+                pline_The("poison doesn't seem to affect %s.", mon_nam(mdef));
+            } else {
+                if (!rn2(10)) {
+                    Your("poison was deadly...");
+                    mhm->damage = mdef->mhp;
+                } else
+                    mhm->damage += rn1(10, 6);
+            }
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+        int ptmp;
+        char buf[BUFSZ];
+
+        switch (mattk->adtyp) {
+        case AD_DRST: ptmp = A_STR; break;
+        case AD_DRDX: ptmp = A_DEX; break;
+        case AD_DRCO: ptmp = A_CON; break;
+        }
+        hitmsg(magr, mattk);
+        if (uncancelled && !rn2(8)) {
+            Sprintf(buf, "%s %s", s_suffix(Monnam(magr)),
+                    mpoisons_subj(magr, mattk));
+            poisoned(buf, ptmp, pa->mname, 30, FALSE);
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && !rn2(8)) {
+            if (g.vis && canspotmon(magr))
+                pline("%s %s was poisoned!", s_suffix(Monnam(magr)),
+                      mpoisons_subj(magr, mattk));
+            if (resists_poison(mdef)) {
+                if (g.vis && canspotmon(mdef) && canspotmon(magr))
+                    pline_The("poison doesn't seem to affect %s.",
+                              mon_nam(mdef));
+            } else {
+                if (rn2(10))
+                    mhm->damage += rn1(10, 6);
+                else {
+                    if (g.vis && canspotmon(mdef))
+                        pline_The("poison was deadly...");
+                    mhm->damage = mdef->mhp;
+                }
+            }
+        }
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2743,18 +2815,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     case AD_DRST:
     case AD_DRDX:
     case AD_DRCO:
-        if (!negated && !rn2(8)) {
-            Your("%s was poisoned!", mpoisons_subj(&g.youmonst, mattk));
-            if (resists_poison(mdef)) {
-                pline_The("poison doesn't seem to affect %s.", mon_nam(mdef));
-            } else {
-                if (!rn2(10)) {
-                    Your("poison was deadly...");
-                    mhm.damage = mdef->mhp;
-                } else
-                    mhm.damage += rn1(10, 6);
-            }
-        }
+        mhitm_ad_drst(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRIN: {
         struct obj *helmet;
