@@ -1021,20 +1021,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_COLD:
-        if (cancelled) {
-            mhm.damage = 0;
-            break;
-        }
-        if (g.vis && canseemon(mdef))
-            pline("%s is covered in frost!", Monnam(mdef));
-        if (resists_cold(mdef)) {
-            if (g.vis && canseemon(mdef))
-                pline_The("frost doesn't seem to chill %s!", mon_nam(mdef));
-            shieldeff(mdef->mx, mdef->my);
-            golemeffects(mdef, AD_COLD, mhm.damage);
-            mhm.damage = 0;
-        }
-        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+        mhitm_ad_cold(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ELEC:
         if (cancelled) {

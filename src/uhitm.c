@@ -2073,6 +2073,73 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_cold(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (negated) {
+            mhm->damage = 0;
+            return;
+        }
+        if (!Blind)
+            pline("%s is covered in frost!", Monnam(mdef));
+        if (resists_cold(mdef)) {
+            shieldeff(mdef->mx, mdef->my);
+            if (!Blind)
+                pline_The("frost doesn't chill %s!", mon_nam(mdef));
+            golemeffects(mdef, AD_COLD, mhm->damage);
+            mhm->damage = 0;
+        }
+        mhm->damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled) {
+            pline("You're covered in frost!");
+            if (Cold_resistance) {
+                pline_The("frost doesn't seem cold!");
+                mhm->damage = 0;
+            }
+            if ((int) magr->m_lev > rn2(20))
+                destroy_item(POTION_CLASS, AD_COLD);
+        } else
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (cancelled) {
+            mhm->damage = 0;
+            return;
+        }
+        if (g.vis && canseemon(mdef))
+            pline("%s is covered in frost!", Monnam(mdef));
+        if (resists_cold(mdef)) {
+            if (g.vis && canseemon(mdef))
+                pline_The("frost doesn't seem to chill %s!", mon_nam(mdef));
+            shieldeff(mdef->mx, mdef->my);
+            golemeffects(mdef, AD_COLD, mhm->damage);
+            mhm->damage = 0;
+        }
+        mhm->damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2179,20 +2246,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_COLD:
-        if (negated) {
-            mhm.damage = 0;
-            break;
-        }
-        if (!Blind)
-            pline("%s is covered in frost!", Monnam(mdef));
-        if (resists_cold(mdef)) {
-            shieldeff(mdef->mx, mdef->my);
-            if (!Blind)
-                pline_The("frost doesn't chill %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_COLD, mhm.damage);
-            mhm.damage = 0;
-        }
-        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+        mhitm_ad_cold(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ELEC:
         if (negated) {

@@ -1103,17 +1103,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_COLD:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-            pline("You're covered in frost!");
-            if (Cold_resistance) {
-                pline_The("frost doesn't seem cold!");
-                mhm.damage = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(POTION_CLASS, AD_COLD);
-        } else
-            mhm.damage = 0;
+        mhitm_ad_cold(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ELEC:
         hitmsg(mtmp, mattk);
