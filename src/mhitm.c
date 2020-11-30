@@ -1221,25 +1221,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_DRIN:
-        if (g.notonhead || !has_head(pd)) {
-            if (g.vis && canspotmon(mdef))
-                pline("%s doesn't seem harmed.", Monnam(mdef));
-            /* Not clear what to do for green slimes */
-            mhm.damage = 0;
-            /* don't bother with additional DRIN attacks since they wouldn't
-               be able to hit target on head either */
-            g.skipdrin = TRUE; /* affects mattackm()'s attack loop */
-            break;
-        }
-        if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {
-            if (g.vis && canspotmon(magr) && canseemon(mdef)) {
-                Strcpy(buf, s_suffix(Monnam(mdef)));
-                pline("%s helmet blocks %s attack to %s head.", buf,
-                      s_suffix(mon_nam(magr)), mhis(mdef));
-            }
-            break;
-        }
-        mhm.hitflags = eat_brains(magr, mdef, g.vis, &mhm.damage);
+        mhitm_ad_drin(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLIM:
         if (cancelled)

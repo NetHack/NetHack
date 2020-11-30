@@ -2638,6 +2638,108 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_drin(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        struct obj *helmet;
+
+        if (g.notonhead || !has_head(pd)) {
+            pline("%s doesn't seem harmed.", Monnam(mdef));
+            /* hero should skip remaining AT_TENT+AD_DRIN attacks
+               because they'll be just as harmless as this one (and also
+               to reduce verbosity) */
+            g.skipdrin = TRUE;
+            mhm->damage = 0;
+            if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {
+                if (!Slimed) {
+                    You("suck in some slime and don't feel very well.");
+                    make_slimed(10L, (char *) 0);
+                }
+            }
+            return;
+        }
+        if (m_slips_free(mdef, mattk))
+            return;
+
+        if ((helmet = which_armor(mdef, W_ARMH)) != 0 && rn2(8)) {
+            pline("%s %s blocks your attack to %s head.",
+                  s_suffix(Monnam(mdef)), helm_simple_name(helmet),
+                  mhis(mdef));
+            return;
+        }
+
+        (void) eat_brains(&g.youmonst, mdef, TRUE, &mhm->damage);
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (defends(AD_DRIN, uwep) || !has_head(pd)) {
+            You("don't seem harmed.");
+            /* attacker should skip remaining AT_TENT+AD_DRIN attacks */
+            g.skipdrin = TRUE;
+            /* Not clear what to do for green slimes */
+            return;
+        }
+        if (u_slip_free(magr, mattk))
+            return;
+
+        if (uarmh && rn2(8)) {
+            /* not body_part(HEAD) */
+            Your("%s blocks the attack to your head.",
+                 helm_simple_name(uarmh));
+            return;
+        }
+        /* negative armor class doesn't reduce this damage */
+        if (Half_physical_damage)
+            mhm->damage = (mhm->damage + 1) / 2;
+        mdamageu(magr, mhm->damage);
+        mhm->damage = 0; /* don't inflict a second dose below */
+
+        if (!uarmh || uarmh->otyp != DUNCE_CAP) {
+            /* eat_brains() will miss if target is mindless (won't
+               happen here; hero is considered to retain his mind
+               regardless of current shape) or is noncorporeal
+               (can't happen here; no one can poly into a ghost
+               or shade) so this check for missing is academic */
+            if (eat_brains(magr, mdef, TRUE, (int *) 0) == MM_MISS)
+                return;
+        }
+        /* adjattrib gives dunce cap message when appropriate */
+        (void) adjattrib(A_INT, -rnd(2), FALSE);
+    } else {
+        /* mhitm */
+        char buf[BUFSZ];
+
+        if (g.notonhead || !has_head(pd)) {
+            if (g.vis && canspotmon(mdef))
+                pline("%s doesn't seem harmed.", Monnam(mdef));
+            /* Not clear what to do for green slimes */
+            mhm->damage = 0;
+            /* don't bother with additional DRIN attacks since they wouldn't
+               be able to hit target on head either */
+            g.skipdrin = TRUE; /* affects mattackm()'s attack loop */
+            return;
+        }
+        if ((mdef->misc_worn_check & W_ARMH) && rn2(8)) {
+            if (g.vis && canspotmon(magr) && canseemon(mdef)) {
+                Strcpy(buf, s_suffix(Monnam(mdef)));
+                pline("%s helmet blocks %s attack to %s head.", buf,
+                      s_suffix(mon_nam(magr)), mhis(mdef));
+            }
+            return;
+        }
+        mhm->hitflags = eat_brains(magr, mdef, g.vis, &mhm->damage);
+    }
+}
+
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2819,37 +2921,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         if (mhm.done)
             return mhm.hitflags;
         break;
-    case AD_DRIN: {
-        struct obj *helmet;
-
-        if (g.notonhead || !has_head(pd)) {
-            pline("%s doesn't seem harmed.", Monnam(mdef));
-            /* hero should skip remaining AT_TENT+AD_DRIN attacks
-               because they'll be just as harmless as this one (and also
-               to reduce verbosity) */
-            g.skipdrin = TRUE;
-            mhm.damage = 0;
-            if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {
-                if (!Slimed) {
-                    You("suck in some slime and don't feel very well.");
-                    make_slimed(10L, (char *) 0);
-                }
-            }
-            break;
-        }
-        if (m_slips_free(mdef, mattk))
-            break;
-
-        if ((helmet = which_armor(mdef, W_ARMH)) != 0 && rn2(8)) {
-            pline("%s %s blocks your attack to %s head.",
-                  s_suffix(Monnam(mdef)), helm_simple_name(helmet),
-                  mhis(mdef));
-            break;
-        }
-
-        (void) eat_brains(&g.youmonst, mdef, TRUE, &mhm.damage);
+    case AD_DRIN:
+        mhitm_ad_drin(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
-    }
     case AD_STCK:
         if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
             u.ustuck = mdef; /* it's now stuck to you */

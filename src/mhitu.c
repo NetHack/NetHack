@@ -13,7 +13,6 @@ static void FDECL(mswings, (struct monst *, struct obj *));
 static void FDECL(wildmiss, (struct monst *, struct attack *));
 static void FDECL(summonmu, (struct monst *, BOOLEAN_P));
 static boolean FDECL(diseasemu, (struct permonst *));
-static boolean FDECL(u_slip_free, (struct monst *, struct attack *));
 static int FDECL(hitmu, (struct monst *, struct attack *));
 static int FDECL(gulpmu, (struct monst *, struct attack *));
 static int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
@@ -869,7 +868,7 @@ struct permonst *mdat;
 }
 
 /* check whether slippery clothing protects from hug or wrap attack */
-static boolean
+boolean
 u_slip_free(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
@@ -1137,40 +1136,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_DRIN:
-        hitmsg(mtmp, mattk);
-        if (defends(AD_DRIN, uwep) || !has_head(g.youmonst.data)) {
-            You("don't seem harmed.");
-            /* attacker should skip remaining AT_TENT+AD_DRIN attacks */
-            g.skipdrin = TRUE;
-            /* Not clear what to do for green slimes */
-            break;
-        }
-        if (u_slip_free(mtmp, mattk))
-            break;
-
-        if (uarmh && rn2(8)) {
-            /* not body_part(HEAD) */
-            Your("%s blocks the attack to your head.",
-                 helm_simple_name(uarmh));
-            break;
-        }
-        /* negative armor class doesn't reduce this damage */
-        if (Half_physical_damage)
-            mhm.damage = (mhm.damage + 1) / 2;
-        mdamageu(mtmp, mhm.damage);
-        mhm.damage = 0; /* don't inflict a second dose below */
-
-        if (!uarmh || uarmh->otyp != DUNCE_CAP) {
-            /* eat_brains() will miss if target is mindless (won't
-               happen here; hero is considered to retain his mind
-               regardless of current shape) or is noncorporeal
-               (can't happen here; no one can poly into a ghost
-               or shade) so this check for missing is academic */
-            if (eat_brains(mtmp, &g.youmonst, TRUE, (int *) 0) == MM_MISS)
-                break;
-        }
-        /* adjattrib gives dunce cap message when appropriate */
-        (void) adjattrib(A_INT, -rnd(2), FALSE);
+        mhitm_ad_drin(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_PLYS:
         hitmsg(mtmp, mattk);
