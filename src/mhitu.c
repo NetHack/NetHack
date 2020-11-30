@@ -1330,11 +1330,9 @@ register struct attack *mattk;
         }
         break;
     case AD_SGLD:
-        hitmsg(mtmp, mattk);
-        if (g.youmonst.data->mlet == mdat->mlet)
-            break;
-        if (!mtmp->mcan)
-            stealgold(mtmp);
+        mhitm_ad_sgld(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
 
     case AD_SSEX:

@@ -2262,6 +2262,74 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_sgld(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        struct obj *mongold = findgold(mdef->minvent);
+
+        if (mongold) {
+            obj_extract_self(mongold);
+            if (merge_choice(g.invent, mongold) || inv_cnt(FALSE) < 52) {
+                addinv(mongold);
+                Your("purse feels heavier.");
+            } else {
+                You("grab %s's gold, but find no room in your knapsack.",
+                    mon_nam(mdef));
+                dropy(mongold);
+            }
+        }
+        exercise(A_DEX, TRUE);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (pd->mlet == pa->mlet)
+            return;
+        if (!magr->mcan)
+            stealgold(magr);
+    } else {
+        /* mhitm */
+        char buf[BUFSZ];
+
+        mhm->damage = 0;
+        if (magr->mcan)
+            return;
+        /* technically incorrect; no check for stealing gold from
+         * between mdef's feet...
+         */
+        {
+            struct obj *gold = findgold(mdef->minvent);
+
+            if (!gold)
+                return;
+            obj_extract_self(gold);
+            add_to_minv(magr, gold);
+        }
+        mdef->mstrategy &= ~STRAT_WAITFORU;
+        if (g.vis && canseemon(mdef)) {
+            Strcpy(buf, Monnam(magr));
+            pline("%s steals some gold from %s.", buf, mon_nam(mdef));
+        }
+        if (!tele_restrict(magr)) {
+            boolean couldspot = canspotmon(magr);
+
+            (void) rloc(magr, TRUE);
+            if (g.vis && couldspot && !canspotmon(magr))
+                pline("%s suddenly disappears!", buf);
+        }
+    }
+}
+
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2297,7 +2365,6 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     register struct permonst *pd = mdef->data;
     int armpro;
     boolean negated;
-    struct obj *mongold;
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
@@ -2394,22 +2461,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         mhm.damage = 0;
         break;
     case AD_SGLD:
-        /* This you as a leprechaun, so steal
-           real gold only, no lesser coins */
-        mongold = findgold(mdef->minvent);
-        if (mongold) {
-            obj_extract_self(mongold);
-            if (merge_choice(g.invent, mongold) || inv_cnt(FALSE) < 52) {
-                addinv(mongold);
-                Your("purse feels heavier.");
-            } else {
-                You("grab %s's gold, but find no room in your knapsack.",
-                    mon_nam(mdef));
-                dropy(mongold);
-            }
-        }
-        exercise(A_DEX, TRUE);
-        mhm.damage = 0;
+        mhitm_ad_sgld(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_TLPT:
         if (mhm.damage <= 0)

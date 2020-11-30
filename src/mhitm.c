@@ -1193,32 +1193,9 @@ int dieroll;
         }
         break;
     case AD_SGLD:
-        mhm.damage = 0;
-        if (magr->mcan)
-            break;
-        /* technically incorrect; no check for stealing gold from
-         * between mdef's feet...
-         */
-        {
-            struct obj *gold = findgold(mdef->minvent);
-
-            if (!gold)
-                break;
-            obj_extract_self(gold);
-            add_to_minv(magr, gold);
-        }
-        mdef->mstrategy &= ~STRAT_WAITFORU;
-        if (g.vis && canseemon(mdef)) {
-            Strcpy(buf, Monnam(magr));
-            pline("%s steals some gold from %s.", buf, mon_nam(mdef));
-        }
-        if (!tele_restrict(magr)) {
-            boolean couldspot = canspotmon(magr);
-
-            (void) rloc(magr, TRUE);
-            if (g.vis && couldspot && !canspotmon(magr))
-                pline("%s suddenly disappears!", buf);
-        }
+        mhitm_ad_sgld(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRLI: /* drain life */
         mhitm_ad_drli(magr, mattk, mdef, &mhm);
