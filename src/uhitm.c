@@ -3317,6 +3317,36 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_halu(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        mhm->damage = 0;
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
+            if (g.vis && canseemon(mdef))
+                pline("%s looks %sconfused.", Monnam(mdef),
+                      mdef->mconf ? "more " : "");
+            mdef->mconf = 1;
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+        }
+        mhm->damage = 0;
+    }
+}
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return

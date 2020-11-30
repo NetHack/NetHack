@@ -1107,14 +1107,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_HALU:
-        if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
-            if (g.vis && canseemon(mdef))
-                pline("%s looks %sconfused.", Monnam(mdef),
-                      mdef->mconf ? "more " : "");
-            mdef->mconf = 1;
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-        }
-        mhm.damage = 0;
+        mhitm_ad_halu(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CURS:
         mhitm_ad_curs(magr, mattk, mdef, &mhm);
