@@ -3241,6 +3241,30 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_pest(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        pline("%s reaches out, and you feel fever and chills.", Monnam(magr));
+        (void) diseasemu(pa);
+        /* plus the normal damage */
+    } else {
+        /* mhitm */
+        mhm->damage = 0;
+    }
+}
+
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE

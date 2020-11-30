@@ -1290,6 +1290,7 @@ E void FDECL(expels, (struct monst *, struct permonst *, BOOLEAN_P));
 E struct attack *FDECL(getmattk, (struct monst *, struct monst *,
                                   int, int *, struct attack *));
 E int FDECL(mattacku, (struct monst *));
+boolean FDECL(diseasemu, (struct permonst *));
 boolean FDECL(u_slip_free, (struct monst *, struct attack *));
 E int FDECL(magic_negation, (struct monst *));
 E boolean NDECL(gulp_blnd_check);
@@ -2781,6 +2782,7 @@ E void FDECL(mhitm_ad_slow, (struct monst *, struct attack *, struct monst *, st
 E void FDECL(mhitm_ad_conf, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_poly, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_famn, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_pest, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,

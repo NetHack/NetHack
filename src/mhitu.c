@@ -12,7 +12,6 @@ static void FDECL(missmu, (struct monst *, BOOLEAN_P, struct attack *));
 static void FDECL(mswings, (struct monst *, struct obj *));
 static void FDECL(wildmiss, (struct monst *, struct attack *));
 static void FDECL(summonmu, (struct monst *, BOOLEAN_P));
-static boolean FDECL(diseasemu, (struct permonst *));
 static int FDECL(hitmu, (struct monst *, struct attack *));
 static int FDECL(gulpmu, (struct monst *, struct attack *));
 static int FDECL(explmu, (struct monst *, struct attack *, BOOLEAN_P));
@@ -853,7 +852,7 @@ boolean youseeit;
     } /* were creature */
 }
 
-static boolean
+boolean
 diseasemu(mdat)
 struct permonst *mdat;
 {
@@ -1459,8 +1458,9 @@ register struct attack *mattk;
         }
         break;
     case AD_PEST:
-        pline("%s reaches out, and you feel fever and chills.", Monnam(mtmp));
-        (void) diseasemu(mdat); /* plus the normal damage */
+        mhitm_ad_pest(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_FAMN:
         mhitm_ad_famn(mtmp, mattk, &g.youmonst, &mhm);
