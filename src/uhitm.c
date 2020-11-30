@@ -2140,6 +2140,79 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_elec(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (negated) {
+            mhm->damage = 0;
+            return;
+        }
+        if (!Blind)
+            pline("%s is zapped!", Monnam(mdef));
+        mhm->damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
+        if (resists_elec(mdef)) {
+            if (!Blind)
+                pline_The("zap doesn't shock %s!", mon_nam(mdef));
+            golemeffects(mdef, AD_ELEC, mhm->damage);
+            shieldeff(mdef->mx, mdef->my);
+            mhm->damage = 0;
+        }
+        /* only rings damage resistant players in destroy_item */
+        mhm->damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled) {
+            You("get zapped!");
+            if (Shock_resistance) {
+                pline_The("zap doesn't shock you!");
+                mhm->damage = 0;
+            }
+            if ((int) magr->m_lev > rn2(20))
+                destroy_item(WAND_CLASS, AD_ELEC);
+            if ((int) magr->m_lev > rn2(20))
+                destroy_item(RING_CLASS, AD_ELEC);
+        } else
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (cancelled) {
+            mhm->damage = 0;
+            return;
+        }
+        if (g.vis && canseemon(mdef))
+            pline("%s gets zapped!", Monnam(mdef));
+        mhm->damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
+        if (resists_elec(mdef)) {
+            if (g.vis && canseemon(mdef))
+                pline_The("zap doesn't shock %s!", mon_nam(mdef));
+            shieldeff(mdef->mx, mdef->my);
+            golemeffects(mdef, AD_ELEC, mhm->damage);
+            mhm->damage = 0;
+        }
+        /* only rings damage resistant players in destroy_item */
+        mhm->damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2251,22 +2324,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_ELEC:
-        if (negated) {
-            mhm.damage = 0;
-            break;
-        }
-        if (!Blind)
-            pline("%s is zapped!", Monnam(mdef));
-        mhm.damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
-        if (resists_elec(mdef)) {
-            if (!Blind)
-                pline_The("zap doesn't shock %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_ELEC, mhm.damage);
-            shieldeff(mdef->mx, mdef->my);
-            mhm.damage = 0;
-        }
-        /* only rings damage resistant players in destroy_item */
-        mhm.damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+        mhitm_ad_elec(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ACID:
         if (resists_acid(mdef))

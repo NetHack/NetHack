@@ -1108,19 +1108,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_ELEC:
-        hitmsg(mtmp, mattk);
-        if (uncancelled) {
-            You("get zapped!");
-            if (Shock_resistance) {
-                pline_The("zap doesn't shock you!");
-                mhm.damage = 0;
-            }
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(WAND_CLASS, AD_ELEC);
-            if ((int) mtmp->m_lev > rn2(20))
-                destroy_item(RING_CLASS, AD_ELEC);
-        } else
-            mhm.damage = 0;
+        mhitm_ad_elec(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLEE:
         hitmsg(mtmp, mattk);

@@ -1026,22 +1026,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_ELEC:
-        if (cancelled) {
-            mhm.damage = 0;
-            break;
-        }
-        if (g.vis && canseemon(mdef))
-            pline("%s gets zapped!", Monnam(mdef));
-        mhm.damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
-        if (resists_elec(mdef)) {
-            if (g.vis && canseemon(mdef))
-                pline_The("zap doesn't shock %s!", mon_nam(mdef));
-            shieldeff(mdef->mx, mdef->my);
-            golemeffects(mdef, AD_ELEC, mhm.damage);
-            mhm.damage = 0;
-        }
-        /* only rings damage resistant players in destroy_item */
-        mhm.damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+        mhitm_ad_elec(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ACID:
         if (magr->mcan) {
