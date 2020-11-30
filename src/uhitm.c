@@ -1689,6 +1689,118 @@ struct attack *mattk;
         mpickobj(mdef, gold);
 }
 
+void
+mhitm_ad_rust(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (completelyrusts(pd)) { /* iron golem */
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
+            pline("%s %s to pieces!", Monnam(mdef),
+                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+            xkilled(mdef, XKILL_NOMSG);
+            mhm->hitflags |= MM_DEF_DIED;
+        }
+        erode_armor(mdef, ERODE_RUST);
+        mhm->damage = 0; /* damageum(), int tmp */
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (magr->mcan) {
+            return;
+        }
+        if (completelyrusts(pd)) {
+            You("rust!");
+            /* KMH -- this is okay with unchanging */
+            rehumanize();
+            return;
+        }
+        erode_armor(&g.youmonst, ERODE_RUST);
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            return;
+        if (completelyrusts(pd)) { /* PM_IRON_GOLEM */
+            if (g.vis && canseemon(mdef))
+                pline("%s %s to pieces!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+            monkilled(mdef, (char *) 0, AD_RUST);
+            if (!DEADMONSTER(mdef)) {
+                mhm->hitflags = MM_MISS;
+                mhm->done = TRUE;
+                return;
+            }
+            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->done = TRUE;
+            return;
+        }
+        erode_armor(mdef, ERODE_RUST);
+        mdef->mstrategy &= ~STRAT_WAITFORU;
+        mhm->damage = 0; /* mdamagem(), int tmp */
+    }
+}
+
+void
+mhitm_ad_corr(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        erode_armor(mdef, ERODE_CORRODE);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (magr->mcan)
+            return;
+        erode_armor(mdef, ERODE_CORRODE);
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            return;
+        erode_armor(mdef, ERODE_CORRODE);
+        mdef->mstrategy &= ~STRAT_WAITFORU;
+        mhm->damage = 0;
+    }
+}
+
+/* Template for monster hits monster for AD_FOO.
+   - replace "break" with return
+   - replace "return" with mhm->done = TRUE
+*/
+void
+mhitm_ad_FOO(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        /* TODO */
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        /* TODO */
+    } else {
+        /* mhitm */
+        /* TODO */
+    }
+}
+
 int
 damageum(mdef, mattk, specialdmg)
 register struct monst *mdef;
@@ -1696,9 +1808,12 @@ register struct attack *mattk;
 int specialdmg; /* blessed and/or silver bonus against various things */
 {
     register struct permonst *pd = mdef->data;
-    int armpro, tmp = d((int) mattk->damn, (int) mattk->damd);
+    int armpro;
     boolean negated;
     struct obj *mongold;
+    struct mhitm_data mhm;
+    mhm.damage = d((int) mattk->damn, (int) mattk->damd);
+    mhm.hitflags = MM_MISS;
 
     armpro = magic_negation(mdef);
     /* since hero can't be cancelled, only defender's armor applies */
@@ -1720,7 +1835,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     case AD_LEGS:
 #if 0
         if (u.ucancelled) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
 #endif
@@ -1730,39 +1845,39 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     case AD_PHYS:
  physical:
         if (pd == &mons[PM_SHADE]) {
-            tmp = 0;
+            mhm.damage = 0;
             if (!specialdmg)
                 impossible("bad shade attack function flow?");
         }
-        tmp += specialdmg;
+        mhm.damage += specialdmg;
 
         if (mattk->aatyp == AT_WEAP) {
             /* hmonas() uses known_hitum() to deal physical damage,
                then also damageum() for non-AD_PHYS; don't inflict
                extra physical damage for unusual damage types */
-            tmp = 0;
+            mhm.damage = 0;
         } else if (mattk->aatyp == AT_KICK
                    || mattk->aatyp == AT_CLAW
                    || mattk->aatyp == AT_TUCH
                    || mattk->aatyp == AT_HUGS) {
             if (thick_skinned(pd))
-                tmp = (mattk->aatyp == AT_KICK) ? 0 : (tmp + 1) / 2;
+                mhm.damage = (mattk->aatyp == AT_KICK) ? 0 : (mhm.damage + 1) / 2;
             /* add ring(s) of increase damage */
             if (u.udaminc > 0) {
                 /* applies even if damage was 0 */
-                tmp += u.udaminc;
-            } else if (tmp > 0) {
+                mhm.damage += u.udaminc;
+            } else if (mhm.damage > 0) {
                 /* ring(s) might be negative; avoid converting
                    0 to non-0 or positive to non-positive */
-                tmp += u.udaminc;
-                if (tmp < 1)
-                    tmp = 1;
+                mhm.damage += u.udaminc;
+                if (mhm.damage < 1)
+                    mhm.damage = 1;
             }
         }
         break;
     case AD_FIRE:
         if (negated) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (!Blind)
@@ -1779,26 +1894,26 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                     (pd == &mons[PM_PAPER_GOLEM]) ? " paper"
                       : (pd == &mons[PM_STRAW_GOLEM]) ? " straw" : "");
             xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
-            tmp = 0;
+            mhm.damage = 0;
             break;
-            /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
+            /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
         }
-        tmp += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
-        tmp += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
         if (resists_fire(mdef)) {
             if (!Blind)
                 pline_The("fire doesn't heat %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_FIRE, tmp);
+            golemeffects(mdef, AD_FIRE, mhm.damage);
             shieldeff(mdef->mx, mdef->my);
-            tmp = 0;
+            mhm.damage = 0;
         }
         /* only potions damage resistant players in destroy_item */
-        tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
         ignite_items(mdef->minvent);
         break;
     case AD_COLD:
         if (negated) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (!Blind)
@@ -1807,43 +1922,43 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             shieldeff(mdef->mx, mdef->my);
             if (!Blind)
                 pline_The("frost doesn't chill %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_COLD, tmp);
-            tmp = 0;
+            golemeffects(mdef, AD_COLD, mhm.damage);
+            mhm.damage = 0;
         }
-        tmp += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
         break;
     case AD_ELEC:
         if (negated) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (!Blind)
             pline("%s is zapped!", Monnam(mdef));
-        tmp += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
+        mhm.damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
         if (resists_elec(mdef)) {
             if (!Blind)
                 pline_The("zap doesn't shock %s!", mon_nam(mdef));
-            golemeffects(mdef, AD_ELEC, tmp);
+            golemeffects(mdef, AD_ELEC, mhm.damage);
             shieldeff(mdef->mx, mdef->my);
-            tmp = 0;
+            mhm.damage = 0;
         }
         /* only rings damage resistant players in destroy_item */
-        tmp += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+        mhm.damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
         break;
     case AD_ACID:
         if (resists_acid(mdef))
-            tmp = 0;
+            mhm.damage = 0;
         break;
     case AD_STON:
         if (!munstone(mdef, TRUE))
             minstapetrify(mdef, TRUE);
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_SSEX:
     case AD_SEDU:
     case AD_SITM:
         steal_it(mdef, mattk);
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_SGLD:
         /* This you as a leprechaun, so steal
@@ -1861,11 +1976,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             }
         }
         exercise(A_DEX, TRUE);
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_TLPT:
-        if (tmp <= 0)
-            tmp = 1;
+        if (mhm.damage <= 0)
+            mhm.damage = 1;
         if (!negated) {
             char nambuf[BUFSZ];
             boolean u_saw_mon = (canseemon(mdef)
@@ -1876,10 +1991,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             if (u_teleport_mon(mdef, FALSE) && u_saw_mon
                 && !(canseemon(mdef) || (u.uswallow && u.ustuck == mdef)))
                 pline("%s suddenly disappears!", nambuf);
-            if (tmp >= mdef->mhp) { /* see hitmu(mhitu.c) */
+            if (mhm.damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
                 if (mdef->mhp == 1)
                     ++mdef->mhp;
-                tmp = mdef->mhp - 1;
+                mhm.damage = mdef->mhp - 1;
             }
         }
         break;
@@ -1888,12 +2003,12 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             if (!Blind && mdef->mcansee)
                 pline("%s is blinded.", Monnam(mdef));
             mdef->mcansee = 0;
-            tmp += mdef->mblinded;
-            if (tmp > 127)
-                tmp = 127;
-            mdef->mblinded = tmp;
+            mhm.damage += mdef->mblinded;
+            if (mhm.damage > 127)
+                mhm.damage = 127;
+            mdef->mblinded = mhm.damage;
         }
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_CURS:
         if (night() && !rn2(10) && !mdef->mcan) {
@@ -1902,27 +2017,27 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                     pline("Some writing vanishes from %s head!",
                           s_suffix(mon_nam(mdef)));
                 xkilled(mdef, XKILL_NOMSG);
-                /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
+                /* Don't return yet; keep hp<1 and mhm.damage=0 for pet msg */
             } else {
                 mdef->mcan = 1;
                 You("chuckle.");
             }
         }
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_DRLI: /* drain life */
         if (!negated && !rn2(3) && !resists_drli(mdef)) {
-            tmp = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+            mhm.damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
             pline("%s becomes weaker!", Monnam(mdef));
-            if (mdef->mhpmax - tmp > (int) mdef->m_lev) {
-                mdef->mhpmax -= tmp;
+            if (mdef->mhpmax - mhm.damage > (int) mdef->m_lev) {
+                mdef->mhpmax -= mhm.damage;
             } else {
                 /* limit floor of mhpmax reduction to current m_lev + 1;
                    avoid increasing it if somehow already less than that */
                 if (mdef->mhpmax > (int) mdef->m_lev)
                     mdef->mhpmax = (int) mdef->m_lev + 1;
             }
-            mdef->mhp -= tmp;
+            mdef->mhp -= mhm.damage;
             /* !m_lev: level 0 monster is killed regardless of hit points
                rather than drop to level -1; note: some non-living creatures
                (golems, vortices) are subject to life-drain */
@@ -1932,26 +2047,21 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                 xkilled(mdef, XKILL_NOMSG);
             } else
                 mdef->m_lev--;
-            tmp = 0; /* damage has already been inflicted */
+            mhm.damage = 0; /* damage has already been inflicted */
 
             /* unlike hitting with Stormbringer, wounded hero doesn't
                heal any from the drained life */
         }
         break;
     case AD_RUST:
-        if (completelyrusts(pd)) { /* iron golem */
-            /* note: the life-saved case is hypothetical because
-               life-saving doesn't work for golems */
-            pline("%s %s to pieces!", Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
-            xkilled(mdef, XKILL_NOMSG);
-        }
-        erode_armor(mdef, ERODE_RUST);
-        tmp = 0;
+        mhitm_ad_rust(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CORR:
-        erode_armor(mdef, ERODE_CORRODE);
-        tmp = 0;
+        mhitm_ad_corr(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DCAY:
         if (completelyrots(pd)) { /* wood golem or leather golem */
@@ -1960,12 +2070,12 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_ROT);
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_DREN:
         if (!negated && !rn2(4))
             xdrainenergym(mdef, TRUE);
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_DRST:
     case AD_DRDX:
@@ -1977,9 +2087,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             } else {
                 if (!rn2(10)) {
                     Your("poison was deadly...");
-                    tmp = mdef->mhp;
+                    mhm.damage = mdef->mhp;
                 } else
-                    tmp += rn1(10, 6);
+                    mhm.damage += rn1(10, 6);
             }
         }
         break;
@@ -1992,7 +2102,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                because they'll be just as harmless as this one (and also
                to reduce verbosity) */
             g.skipdrin = TRUE;
-            tmp = 0;
+            mhm.damage = 0;
             if (!Unchanging && pd == &mons[PM_GREEN_SLIME]) {
                 if (!Slimed) {
                     You("suck in some slime and don't feel very well.");
@@ -2011,7 +2121,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             break;
         }
 
-        (void) eat_brains(&g.youmonst, mdef, TRUE, &tmp);
+        (void) eat_brains(&g.youmonst, mdef, TRUE, &mhm.damage);
         break;
     }
     case AD_STCK:
@@ -2022,7 +2132,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         if (!sticks(pd)) {
             if (!u.ustuck && !rn2(10)) {
                 if (m_slips_free(mdef, mattk)) {
-                    tmp = 0;
+                    mhm.damage = 0;
                 } else {
                     You("swing yourself around %s!", mon_nam(mdef));
                     set_ustuck(mdef);
@@ -2032,20 +2142,20 @@ int specialdmg; /* blessed and/or silver bonus against various things */
                 if (is_pool(u.ux, u.uy) && !is_swimmer(pd)
                     && !amphibious(pd)) {
                     You("drown %s...", mon_nam(mdef));
-                    tmp = mdef->mhp;
+                    mhm.damage = mdef->mhp;
                 } else if (mattk->aatyp == AT_HUGS)
                     pline("%s is being crushed.", Monnam(mdef));
             } else {
-                tmp = 0;
+                mhm.damage = 0;
                 if (flags.verbose)
                     You("brush against %s %s.", s_suffix(mon_nam(mdef)),
                         mbodypart(mdef, LEG));
             }
         } else
-            tmp = 0;
+            mhm.damage = 0;
         break;
     case AD_PLYS:
-        if (!negated && mdef->mcanmove && !rn2(3) && tmp < mdef->mhp) {
+        if (!negated && mdef->mcanmove && !rn2(3) && mhm.damage < mdef->mhp) {
             if (!Blind)
                 pline("%s is frozen by you!", Monnam(mdef));
             paralyze_monst(mdef, rnd(10));
@@ -2072,7 +2182,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             /* munslime attempt could have been fatal */
             if (DEADMONSTER(mdef))
                 return 2; /* skip death message */
-            tmp = 0;
+            mhm.damage = 0;
         }
         break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
@@ -2096,26 +2206,26 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         }
         break;
     case AD_POLY:
-        if (!negated && tmp < mdef->mhp)
-            tmp = mon_poly(&g.youmonst, mdef, tmp);
+        if (!negated && mhm.damage < mdef->mhp)
+            mhm.damage = mon_poly(&g.youmonst, mdef, mhm.damage);
         break;
     default:
-        tmp = 0;
+        mhm.damage = 0;
         break;
     }
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
-    mdef->mhp -= tmp;
+    mdef->mhp -= mhm.damage;
     if (DEADMONSTER(mdef)) {
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
-            if (tmp)
-                xkilled(mdef, XKILL_NOMSG); /* !tmp but hp<1: already killed */
+            if (mhm.damage)
+                xkilled(mdef, XKILL_NOMSG); /* !mhm.damage but hp<1: already killed */
         } else if (!flags.verbose) {
             You("destroy it!");
-            if (tmp)
+            if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
-        } else if (tmp)
+        } else if (mhm.damage)
             killed(mdef);
         return 2;
     }

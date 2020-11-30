@@ -86,6 +86,12 @@
 #define AD_SAMU 252 /* hits, may steal Amulet (Wizard) */
 #define AD_CURS 253 /* random curse (ex. gremlin) */
 
+struct mhitm_data {
+    int damage;
+    int hitflags; /* MM_DEF_DIED | MM_AGR_DIED | ... */
+    boolean done;
+};
+
 /*
  *  Monster to monster attacks.  When a monster attacks another (mattackm),
  *  any or all of the following can be returned.  See mattackm() for more

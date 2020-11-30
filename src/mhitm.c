@@ -858,10 +858,11 @@ int dieroll;
     struct obj *obj;
     char buf[BUFSZ];
     struct permonst *pa = magr->data, *pd = mdef->data;
-    int armpro, num,
-        tmp = d((int) mattk->damn, (int) mattk->damd),
-        res = MM_MISS;
+    int armpro, num;
     boolean cancelled;
+    struct mhitm_data mhm;
+    mhm.damage = d((int) mattk->damn, (int) mattk->damd);
+    mhm.hitflags = MM_MISS;
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
          || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))
@@ -914,7 +915,7 @@ int dieroll;
         }
         if (flags.verbose && !Deaf)
             verbalize("Burrrrp!");
-        tmp = mdef->mhp;
+        mhm.damage = mdef->mhp;
         /* Use up amulet of life saving */
         if ((obj = mlifesaver(mdef)) != 0)
             m_useup(mdef, obj);
@@ -955,7 +956,7 @@ int dieroll;
         goto physical;
     case AD_LEGS:
         if (magr->mcan) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         goto physical;
@@ -967,11 +968,11 @@ int dieroll;
             mwep = 0;
 
         if (shade_miss(magr, mdef, mwep, FALSE, TRUE)) {
-            tmp = 0;
+            mhm.damage = 0;
         } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
             /* [no 'kicking boots' check needed; monsters with kick attacks
                can't wear boots and monsters that wear boots don't kick] */
-            tmp = 0;
+            mhm.damage = 0;
         } else if (mwep) { /* non-Null 'mwep' implies AT_WEAP || AT_CLAW */
             struct obj *marmg;
 
@@ -979,19 +980,19 @@ int dieroll;
                 && touch_petrifies(&mons[mwep->corpsenm]))
                 goto do_stone;
 
-            tmp += dmgval(mwep, mdef);
+            mhm.damage += dmgval(mwep, mdef);
             if ((marmg = which_armor(magr, W_ARMG)) != 0
                 && marmg->otyp == GAUNTLETS_OF_POWER)
-                tmp += rn1(4, 3); /* 3..6 */
-            if (tmp < 1) /* is this necessary?  mhitu.c has it... */
-                tmp = 1;
+                mhm.damage += rn1(4, 3); /* 3..6 */
+            if (mhm.damage < 1) /* is this necessary?  mhitu.c has it... */
+                mhm.damage = 1;
             if (mwep->oartifact) {
                 /* when magr's weapon is an artifact, caller suppressed its
                    usual 'hit' message in case artifact_hit() delivers one;
                    now we'll know and might need to deliver skipped message
                    (note: if there's no message there'll be no auxilliary
                    damage so the message here isn't coming too late) */
-                if (!artifact_hit(magr, mdef, mwep, &tmp, dieroll)) {
+                if (!artifact_hit(magr, mdef, mwep, &mhm.damage, dieroll)) {
                     if (g.vis)
                         pline("%s hits %s.", Monnam(magr),
                               mon_nam_too(mdef, magr));
@@ -1003,20 +1004,20 @@ int dieroll;
                     return (MM_DEF_DIED
                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             }
-            if (tmp)
+            if (mhm.damage)
                 rustm(mdef, mwep);
         } else if (pa == &mons[PM_PURPLE_WORM] && pd == &mons[PM_SHRIEKER]) {
             /* hack to enhance mm_aggression(); we don't want purple
                worm's bite attack to kill a shrieker because then it
                won't swallow the corpse; but if the target survives,
                the subsequent engulf attack should accomplish that */
-            if (tmp >= mdef->mhp && mdef->mhp > 1)
-                tmp = mdef->mhp - 1;
+            if (mhm.damage >= mdef->mhp && mdef->mhp > 1)
+                mhm.damage = mdef->mhp - 1;
         }
         break;
     case AD_FIRE:
         if (cancelled) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (g.vis && canseemon(mdef))
@@ -1033,22 +1034,22 @@ int dieroll;
                 return 0;
             return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
         }
-        tmp += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
-        tmp += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
         if (resists_fire(mdef)) {
             if (g.vis && canseemon(mdef))
                 pline_The("fire doesn't seem to burn %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
-            golemeffects(mdef, AD_FIRE, tmp);
-            tmp = 0;
+            golemeffects(mdef, AD_FIRE, mhm.damage);
+            mhm.damage = 0;
         }
         /* only potions damage resistant players in destroy_item */
-        tmp += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
+        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_FIRE);
         ignite_items(mdef->minvent);
         break;
     case AD_COLD:
         if (cancelled) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (g.vis && canseemon(mdef))
@@ -1057,39 +1058,39 @@ int dieroll;
             if (g.vis && canseemon(mdef))
                 pline_The("frost doesn't seem to chill %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
-            golemeffects(mdef, AD_COLD, tmp);
-            tmp = 0;
+            golemeffects(mdef, AD_COLD, mhm.damage);
+            mhm.damage = 0;
         }
-        tmp += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
+        mhm.damage += destroy_mitem(mdef, POTION_CLASS, AD_COLD);
         break;
     case AD_ELEC:
         if (cancelled) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (g.vis && canseemon(mdef))
             pline("%s gets zapped!", Monnam(mdef));
-        tmp += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
+        mhm.damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
         if (resists_elec(mdef)) {
             if (g.vis && canseemon(mdef))
                 pline_The("zap doesn't shock %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
-            golemeffects(mdef, AD_ELEC, tmp);
-            tmp = 0;
+            golemeffects(mdef, AD_ELEC, mhm.damage);
+            mhm.damage = 0;
         }
         /* only rings damage resistant players in destroy_item */
-        tmp += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
+        mhm.damage += destroy_mitem(mdef, RING_CLASS, AD_ELEC);
         break;
     case AD_ACID:
         if (magr->mcan) {
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (resists_acid(mdef)) {
             if (g.vis && canseemon(mdef))
                 pline("%s is covered in %s, but it seems harmless.",
                       Monnam(mdef), hliquid("acid"));
-            tmp = 0;
+            mhm.damage = 0;
         } else if (g.vis && canseemon(mdef)) {
             pline("%s is covered in %s!", Monnam(mdef), hliquid("acid"));
             pline("It burns %s!", mon_nam(mdef));
@@ -1100,27 +1101,14 @@ int dieroll;
             acid_damage(MON_WEP(mdef));
         break;
     case AD_RUST:
-        if (magr->mcan)
-            break;
-        if (completelyrusts(pd)) { /* PM_IRON_GOLEM */
-            if (g.vis && canseemon(mdef))
-                pline("%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
-            monkilled(mdef, (char *) 0, AD_RUST);
-            if (!DEADMONSTER(mdef))
-                return 0;
-            return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-        }
-        erode_armor(mdef, ERODE_RUST);
-        mdef->mstrategy &= ~STRAT_WAITFORU;
-        tmp = 0;
+        mhitm_ad_rust(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CORR:
-        if (magr->mcan)
-            break;
-        erode_armor(mdef, ERODE_CORRODE);
-        mdef->mstrategy &= ~STRAT_WAITFORU;
-        tmp = 0;
+        mhitm_ad_corr(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DCAY:
         if (magr->mcan)
@@ -1138,7 +1126,7 @@ int dieroll;
         }
         erode_armor(mdef, ERODE_CORRODE);
         mdef->mstrategy &= ~STRAT_WAITFORU;
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_STON:
         if (magr->mcan)
@@ -1149,7 +1137,7 @@ int dieroll;
             goto post_stone;
         if (poly_when_stoned(pd)) {
             mon_to_stone(mdef);
-            tmp = 0;
+            mhm.damage = 0;
             break;
         }
         if (!resists_ston(mdef)) {
@@ -1163,10 +1151,10 @@ int dieroll;
                 You(brief_feeling, "peculiarly sad");
             return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
         }
-        tmp = (mattk->adtyp == AD_STON ? 0 : 1);
+        mhm.damage = (mattk->adtyp == AD_STON ? 0 : 1);
         break;
     case AD_TLPT:
-        if (!cancelled && tmp < mdef->mhp && !tele_restrict(mdef)) {
+        if (!cancelled && mhm.damage < mdef->mhp && !tele_restrict(mdef)) {
             char mdef_Monnam[BUFSZ];
             boolean wasseen = canspotmon(mdef);
 
@@ -1178,10 +1166,10 @@ int dieroll;
             (void) rloc(mdef, TRUE);
             if (g.vis && wasseen && !canspotmon(mdef) && mdef != u.usteed)
                 pline("%s suddenly disappears!", mdef_Monnam);
-            if (tmp >= mdef->mhp) { /* see hitmu(mhitu.c) */
+            if (mhm.damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
                 if (mdef->mhp == 1)
                     ++mdef->mhp;
-                tmp = mdef->mhp - 1;
+                mhm.damage = mdef->mhp - 1;
             }
         }
         break;
@@ -1240,7 +1228,7 @@ int dieroll;
             mdef->mcansee = 0;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_HALU:
         if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
@@ -1250,7 +1238,7 @@ int dieroll;
             mdef->mconf = 1;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_CURS:
         if (!night() && (pa == &mons[PM_GREMLIN]))
@@ -1283,7 +1271,7 @@ int dieroll;
         }
         break;
     case AD_SGLD:
-        tmp = 0;
+        mhm.damage = 0;
         if (magr->mcan)
             break;
         /* technically incorrect; no check for stealing gold from
@@ -1312,11 +1300,11 @@ int dieroll;
         break;
     case AD_DRLI: /* drain life */
         if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
-            tmp = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+            mhm.damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
             if (g.vis && canspotmon(mdef))
                 pline("%s becomes weaker!", Monnam(mdef));
-            if (mdef->mhpmax - tmp > (int) mdef->m_lev) {
-                mdef->mhpmax -= tmp;
+            if (mdef->mhpmax - mhm.damage > (int) mdef->m_lev) {
+                mdef->mhpmax -= mhm.damage;
             } else {
                 /* limit floor of mhpmax reduction to current m_lev + 1;
                    avoid increasing it if somehow already less than that */
@@ -1324,7 +1312,7 @@ int dieroll;
                     mdef->mhpmax = (int) mdef->m_lev + 1;
             }
             if (mdef->m_lev == 0) /* automatic kill if drained past level 0 */
-                tmp = mdef->mhp;
+                mhm.damage = mdef->mhp;
             else
                 mdef->m_lev--;
 
@@ -1386,13 +1374,13 @@ int dieroll;
                     pline("%s suddenly disappears!", buf);
             }
         }
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_DREN:
         if (!cancelled && !rn2(4))
             xdrainenergym(mdef, (boolean) (g.vis && canspotmon(mdef)
                                            && mattk->aatyp != AT_ENGL));
-        tmp = 0;
+        mhm.damage = 0;
         break;
     case AD_DRST:
     case AD_DRDX:
@@ -1407,11 +1395,11 @@ int dieroll;
                               mon_nam(mdef));
             } else {
                 if (rn2(10))
-                    tmp += rn1(10, 6);
+                    mhm.damage += rn1(10, 6);
                 else {
                     if (g.vis && canspotmon(mdef))
                         pline_The("poison was deadly...");
-                    tmp = mdef->mhp;
+                    mhm.damage = mdef->mhp;
                 }
             }
         }
@@ -1421,7 +1409,7 @@ int dieroll;
             if (g.vis && canspotmon(mdef))
                 pline("%s doesn't seem harmed.", Monnam(mdef));
             /* Not clear what to do for green slimes */
-            tmp = 0;
+            mhm.damage = 0;
             /* don't bother with additional DRIN attacks since they wouldn't
                be able to hit target on head either */
             g.skipdrin = TRUE; /* affects mattackm()'s attack loop */
@@ -1435,7 +1423,7 @@ int dieroll;
             }
             break;
         }
-        res = eat_brains(magr, mdef, g.vis, &tmp);
+        mhm.hitflags = eat_brains(magr, mdef, g.vis, &mhm.damage);
         break;
     case AD_SLIM:
         if (cancelled)
@@ -1446,41 +1434,41 @@ int dieroll;
                             (boolean) (g.vis && canseemon(mdef))))
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
-                res = MM_HIT;
+                mhm.hitflags = MM_HIT;
             }
             /* munslime attempt could have been fatal,
                potentially to multiple monsters (SCR_FIRE) */
             if (DEADMONSTER(magr))
-                res |= MM_AGR_DIED;
+                mhm.hitflags |= MM_AGR_DIED;
             if (DEADMONSTER(mdef))
-                res |= MM_DEF_DIED;
-            tmp = 0;
+                mhm.hitflags |= MM_DEF_DIED;
+            mhm.damage = 0;
         }
         break;
     case AD_STCK:
         if (cancelled)
-            tmp = 0;
+            mhm.damage = 0;
         break;
     case AD_WRAP: /* monsters cannot grab one another, it's too hard */
         if (magr->mcan)
-            tmp = 0;
+            mhm.damage = 0;
         break;
     case AD_ENCH:
         /* there's no msomearmor() function, so just do damage */
         /* if (cancelled) break; */
         break;
     case AD_POLY:
-        if (!magr->mcan && tmp < mdef->mhp)
-            tmp = mon_poly(magr, mdef, tmp);
+        if (!magr->mcan && mhm.damage < mdef->mhp)
+            mhm.damage = mon_poly(magr, mdef, mhm.damage);
         break;
     default:
-        tmp = 0;
+        mhm.damage = 0;
         break;
     }
-    if (!tmp)
-        return res;
+    if (!mhm.damage)
+        return mhm.hitflags;
 
-    if ((mdef->mhp -= tmp) < 1) {
+    if ((mdef->mhp -= mhm.damage) < 1) {
         if (m_at(mdef->mx, mdef->my) == magr) { /* see gulpmm() */
             remove_monster(mdef->mx, mdef->my);
             mdef->mhp = 1; /* otherwise place_monster will complain */
@@ -1495,8 +1483,8 @@ int dieroll;
         monkilled(mdef, "", (int) mattk->adtyp);
         g.zombify = FALSE; /* reset */
         if (!DEADMONSTER(mdef))
-            return res; /* mdef lifesaved */
-        else if (res == MM_AGR_DIED)
+            return mhm.hitflags; /* mdef lifesaved */
+        else if (mhm.hitflags == MM_AGR_DIED)
             return (MM_DEF_DIED | MM_AGR_DIED);
 
         if (mattk->adtyp == AD_DGST) {
@@ -1518,7 +1506,7 @@ int dieroll;
 
         return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
     }
-    return (res == MM_AGR_DIED) ? MM_AGR_DIED : MM_HIT;
+    return (mhm.hitflags == MM_AGR_DIED) ? MM_AGR_DIED : MM_HIT;
 }
 
 int

@@ -1282,6 +1282,7 @@ E void FDECL(rustm, (struct monst *, struct obj *));
 
 /* ### mhitu.c ### */
 
+E void FDECL(hitmsg, (struct monst *, struct attack *));
 E const char *FDECL(mpoisons_subj, (struct monst *, struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);
@@ -2754,6 +2755,8 @@ E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
 E boolean FDECL(shade_miss, (struct monst *, struct monst *, struct obj *,
                              BOOLEAN_P, BOOLEAN_P));
+E void FDECL(mhitm_ad_rust, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_corr, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
