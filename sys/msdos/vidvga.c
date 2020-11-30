@@ -1,4 +1,4 @@
-/* NetHack 3.7	vidvga.c	$NHDT-Date: 1596498278 2020/08/03 23:44:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.7	vidvga.c	$NHDT-Date: 1606765216 2020/11/30 19:40:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.26 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*
@@ -430,7 +430,6 @@ static void
 vga_cliparound(x, y)
 int x, y;
 {
-/*    extern boolean g.restoring; */
     int oldx = clipx;
 
     if (!iflags.tile_view || iflags.over_view || iflags.traditional_view)
@@ -444,7 +443,7 @@ int x, y;
         clipx = clipxmax - (viewport_size - 1);
     }
     if (clipx != oldx) {
-        if (on_level(&u.uz0, &u.uz) && !g.restoring)
+        if (on_level(&u.uz0, &u.uz) && !g.program_state.restoring)
             /* (void) doredraw(); */
             vga_redrawmap(1);
     }

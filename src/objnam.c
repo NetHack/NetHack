@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1604745123 2020/11/07 10:32:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.305 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1606765213 2020/11/30 19:40:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1293,8 +1293,8 @@ unsigned doname_flags;
     /* treat 'restoring' like suppress_price because shopkeeper and
        bill might not be available yet while restore is in progress
        (objects won't normally be formatted during that time, but if
-       'perm_invent' is enabled then they might be) */
-    if (iflags.suppress_price || g.restoring) {
+       'perm_invent' is enabled then they might be [not any more...]) */
+    if (iflags.suppress_price || g.program_state.restoring) {
         ; /* don't attempt to obtain any shop pricing, even if 'with_price' */
     } else if (is_unpaid(obj)) { /* in inventory or in container in invent */
         long quotedprice = unpaid_cost(obj, TRUE);
@@ -3261,10 +3261,11 @@ char *bp;
 struct _readobjnam_data *d;
 {
     d->cnt = d->spe = d->spesgn = d->typ = 0;
-    d->very = d->rechrg = d->blessed = d->uncursed = d->iscursed = d->ispoisoned =
-        d->isgreased = d->eroded = d->eroded2 = d->erodeproof = d->halfeaten =
-        d->islit = d->unlabeled = d->ishistoric = d->isdiluted = d->trapped =
-        d->locked = d->unlocked = d->broken = d->real = d->fake = 0;
+    d->very = d->rechrg = d->blessed = d->uncursed = d->iscursed
+        = d->ispoisoned = d->isgreased = d->eroded = d->eroded2
+        = d->erodeproof = d->halfeaten = d->islit = d->unlabeled
+        = d->ishistoric = d->isdiluted = d->trapped = d->locked
+        = d->unlocked = d->broken = d->real = d->fake = 0;
     d->tvariety = RANDOM_TIN;
     d->mntmp = NON_PM;
     d->contents = UNDEFINED;
@@ -4078,13 +4079,12 @@ readobjnam(bp, no_wish)
 register char *bp;
 struct obj *no_wish;
 {
-    register char *p;
     struct _readobjnam_data d;
 
     readobjnam_init(bp, &d);
-
     if (!bp)
         goto any;
+
     /* first, remove extra whitespace they may have typed */
     (void) mungspaces(bp);
     /* allow wishing for "nothing" to preserve wishless conduct...
@@ -4145,7 +4145,7 @@ struct obj *no_wish;
  wiztrap:
     if (wizard && !g.program_state.wizkit_wishing) {
         /* [inline code moved to separate routine to unclutter readobjnam] */
-        if ((d.otmp = wizterrainwish(d.bp, p, d.locked, d.trapped)) != 0)
+        if ((d.otmp = wizterrainwish(d.bp, d.p, d.locked, d.trapped)) != 0)
             return d.otmp;
     }
 
@@ -4196,7 +4196,8 @@ struct obj *no_wish;
 
     /* if asking for corpse of a monster which leaves behind a glob, give
        glob instead of rejecting the monster type to create random corpse */
-    if (d.typ == CORPSE && d.mntmp >= LOW_PM && mons[d.mntmp].mlet == S_PUDDING) {
+    if (d.typ == CORPSE && d.mntmp >= LOW_PM
+        && mons[d.mntmp].mlet == S_PUDDING) {
         d.typ = GLOB_OF_GRAY_OOZE + (d.mntmp - PM_GRAY_OOZE);
         d.mntmp = NON_PM; /* not used for globs */
     }
@@ -4206,8 +4207,9 @@ struct obj *no_wish;
     d.otmp = d.typ ? mksobj(d.typ, TRUE, FALSE) : mkobj(d.oclass, FALSE);
     d.typ = d.otmp->otyp, d.oclass = d.otmp->oclass; /* what we actually got */
 
-    if (d.islit && (d.typ == OIL_LAMP || d.typ == MAGIC_LAMP || d.typ == BRASS_LANTERN
-                  || Is_candle(d.otmp) || d.typ == POT_OIL)) {
+    if (d.islit && (d.typ == OIL_LAMP || d.typ == MAGIC_LAMP
+                    || d.typ == BRASS_LANTERN
+                    || Is_candle(d.otmp) || d.typ == POT_OIL)) {
         place_object(d.otmp, u.ux, u.uy); /* make it viable light source */
         begin_burn(d.otmp, FALSE);
         obj_extract_self(d.otmp); /* now release it for caller's use */
@@ -4348,7 +4350,8 @@ struct obj *no_wish;
         case SCALE_MAIL:
             /* Dragon mail - depends on the order of objects & dragons. */
             if (d.mntmp >= PM_GRAY_DRAGON && d.mntmp <= PM_YELLOW_DRAGON)
-                d.otmp->otyp = GRAY_DRAGON_SCALE_MAIL + d.mntmp - PM_GRAY_DRAGON;
+                d.otmp->otyp = GRAY_DRAGON_SCALE_MAIL
+                              + d.mntmp - PM_GRAY_DRAGON;
             break;
         }
     }
@@ -4380,7 +4383,8 @@ struct obj *no_wish;
          * armor modified by confused reading of cursed destroy armor)
          * so don't prevent player from wishing for such a combination.
          */
-        if (d.erodeproof && (is_damageable(d.otmp) || d.otmp->otyp == CRYSKNIFE))
+        if (d.erodeproof
+            && (is_damageable(d.otmp) || d.otmp->otyp == CRYSKNIFE))
             d.otmp->oerodeproof = (Luck >= 0 || wizard);
     }
 
@@ -4431,8 +4435,8 @@ struct obj *no_wish;
     if (d.isgreased)
         d.otmp->greased = 1;
 
-    if (d.isdiluted && d.otmp->oclass == POTION_CLASS && d.otmp->otyp != POT_WATER)
-        d.otmp->odiluted = 1;
+    if (d.isdiluted && d.otmp->oclass == POTION_CLASS)
+        d.otmp->odiluted = (d.otmp->otyp != POT_WATER);
 
     /* set tin variety */
     if (d.otmp->otyp == TIN && d.tvariety >= 0 && (rn2(4) || wizard))

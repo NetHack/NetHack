@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.367 $ $NHDT-Date: 1606697932 2020/11/30 00:58:52 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ $NHDT-Date: 1606765210 2020/11/30 19:40:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -736,3 +736,8 @@ add an additional note to mextra.h and obj.h comments that reminds people to
 	appropriately init new fields if they need to initialize to something
 	other than zero
 rework stairs structure into a linked list
+move 'restoring' to the program_state struct; add corresponding 'saving';
+	both used to enforce no updating of status lines or of persistent
+	inventory when the relevant activity is in progress
+
+

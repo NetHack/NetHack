@@ -76,7 +76,6 @@ extern int attrib_text_normal;  /* text mode normal attribute */
 extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
 extern boolean inmap;           /* in the map window */
-/* extern boolean g.restoring; */
 
 /*
  * Global Variables
@@ -786,7 +785,7 @@ int x, y;
         clipymax = ROWNO - 1;
     }
     if (clipx != oldx || clipy != oldy) {
-        if (on_level(&u.uz0, &u.uz) && !g.restoring)
+        if (on_level(&u.uz0, &u.uz) && !g.program_state.restoring)
             /* (void) doredraw(); */
             vesa_redrawmap();
     }

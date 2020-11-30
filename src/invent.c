@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1606528765 2020/11/28 01:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1606765212 2020/11/30 19:40:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2496,7 +2496,7 @@ learn_unseen_invent()
 void
 update_inventory()
 {
-    if (g.restoring)
+    if (g.program_state.saving || g.program_state.restoring)
         return;
 
     /*
