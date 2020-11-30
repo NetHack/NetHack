@@ -2851,6 +2851,63 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_plys(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && mdef->mcanmove && !rn2(3) && mhm->damage < mdef->mhp) {
+            if (!Blind)
+                pline("%s is frozen by you!", Monnam(mdef));
+            paralyze_monst(mdef, rnd(10));
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && g.multi >= 0 && !rn2(3)) {
+            if (Free_action) {
+                You("momentarily stiffen.");
+            } else {
+                if (Blind)
+                    You("are frozen!");
+                else
+                    You("are frozen by %s!", mon_nam(magr));
+                g.nomovemsg = You_can_move_again;
+                nomul(-rnd(10));
+                g.multi_reason = "paralyzed by a monster";
+                exercise(A_DEX, FALSE);
+            }
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && mdef->mcanmove) {
+            if (g.vis && canspotmon(mdef)) {
+                char buf[BUFSZ];
+                Strcpy(buf, Monnam(mdef));
+                pline("%s is frozen by %s.", buf, mon_nam(magr));
+            }
+            paralyze_monst(mdef, rnd(10));
+        }
+    }
+}
+
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2867,12 +2924,22 @@ struct mhitm_data *mhm;
 
     if (magr == &g.youmonst) {
         /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
         /* TODO */
     } else if (mdef == &g.youmonst) {
         /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
         /* TODO */
     } else {
         /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
         /* TODO */
     }
 }
@@ -3049,11 +3116,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_PLYS:
-        if (!negated && mdef->mcanmove && !rn2(3) && mhm.damage < mdef->mhp) {
-            if (!Blind)
-                pline("%s is frozen by you!", Monnam(mdef));
-            paralyze_monst(mdef, rnd(10));
-        }
+        mhitm_ad_plys(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLEE:
         if (!negated && !mdef->msleeping && sleep_monst(mdef, rnd(10), -1)) {

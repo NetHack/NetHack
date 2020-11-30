@@ -1092,13 +1092,9 @@ int dieroll;
         }
         break;
     case AD_PLYS:
-        if (!cancelled && mdef->mcanmove) {
-            if (g.vis && canspotmon(mdef)) {
-                Strcpy(buf, Monnam(mdef));
-                pline("%s is frozen by %s.", buf, mon_nam(magr));
-            }
-            paralyze_monst(mdef, rnd(10));
-        }
+        mhitm_ad_plys(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLOW:
         if (!cancelled && mdef->mspeed != MSLOW) {

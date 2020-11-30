@@ -1141,21 +1141,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_PLYS:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && g.multi >= 0 && !rn2(3)) {
-            if (Free_action) {
-                You("momentarily stiffen.");
-            } else {
-                if (Blind)
-                    You("are frozen!");
-                else
-                    You("are frozen by %s!", mon_nam(mtmp));
-                g.nomovemsg = You_can_move_again;
-                nomul(-rnd(10));
-                g.multi_reason = "paralyzed by a monster";
-                exercise(A_DEX, FALSE);
-            }
-        }
+        mhitm_ad_plys(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRLI: /* drain life */
         mhitm_ad_drli(mtmp, mattk, &g.youmonst, &mhm);
