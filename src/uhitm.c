@@ -3182,6 +3182,40 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_poly(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && mhm->damage < mdef->mhp)
+            mhm->damage = mon_poly(magr, mdef, mhm->damage);
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        if (uncancelled && Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp))
+            mhm->damage = mon_poly(magr, mdef, mhm->damage);
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!magr->mcan && mhm->damage < mdef->mhp)
+            mhm->damage = mon_poly(magr, mdef, mhm->damage);
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3419,8 +3453,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_POLY:
-        if (!negated && mhm.damage < mdef->mhp)
-            mhm.damage = mon_poly(&g.youmonst, mdef, mhm.damage);
+        mhitm_ad_poly(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     default:
         mhm.damage = 0;

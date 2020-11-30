@@ -1224,8 +1224,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_POLY:
-        if (!magr->mcan && mhm.damage < mdef->mhp)
-            mhm.damage = mon_poly(magr, mdef, mhm.damage);
+        mhitm_ad_poly(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     default:
         mhm.damage = 0;

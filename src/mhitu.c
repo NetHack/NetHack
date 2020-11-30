@@ -1480,8 +1480,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_POLY:
-        if (uncancelled && Maybe_Half_Phys(mhm.damage) < (Upolyd ? u.mh : u.uhp))
-            mhm.damage = mon_poly(mtmp, &g.youmonst, mhm.damage);
+        mhitm_ad_poly(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     default:
         mhm.damage = 0;
