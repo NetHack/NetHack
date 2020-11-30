@@ -13,7 +13,7 @@ namespace nethack_qt_ {
 
 class NetHackQtMapWindow2;
 
-class NetHackQtMessageWindow : QObject, public NetHackQtWindow {
+class NetHackQtMessageWindow : QScrollArea, public NetHackQtWindow {
 	Q_OBJECT
 public:
 	NetHackQtMessageWindow();
@@ -37,8 +37,9 @@ public:
         void AddToStr(const char *answerbuf);
 
 private:
-	QListWidget* list;
-	bool changed;
+        QListWidget *list;
+        QScrollArea *scrollarea;
+        bool changed;
         int currgetmsg;
 	NetHackQtMapWindow2* map;
 
