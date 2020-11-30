@@ -1832,6 +1832,50 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_dren(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && !rn2(4))
+            xdrainenergym(mdef, TRUE);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        /*  Next a cancellation factor.
+         *  Use uncancelled when cancellation factor takes into account certain
+         *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
+         */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && !rn2(4)) /* 25% chance */
+            drain_en(mhm->damage);
+        mhm->damage = 0;
+    } else {
+        /* mhitm */
+        /* cancellation factor is the same as when attacking the hero */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (!cancelled && !rn2(4))
+            xdrainenergym(mdef, (boolean) (g.vis && canspotmon(mdef)
+                                           && mattk->aatyp != AT_ENGL));
+        mhm->damage = 0;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2125,9 +2169,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_DREN:
-        if (!negated && !rn2(4))
-            xdrainenergym(mdef, TRUE);
-        mhm.damage = 0;
+        mhitm_ad_dren(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRST:
     case AD_DRDX:

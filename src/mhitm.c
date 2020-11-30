@@ -1364,10 +1364,9 @@ int dieroll;
         mhm.damage = 0;
         break;
     case AD_DREN:
-        if (!cancelled && !rn2(4))
-            xdrainenergym(mdef, (boolean) (g.vis && canspotmon(mdef)
-                                           && mattk->aatyp != AT_ENGL));
-        mhm.damage = 0;
+        mhitm_ad_dren(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DRST:
     case AD_DRDX:

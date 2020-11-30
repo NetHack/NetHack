@@ -1611,10 +1611,9 @@ register struct attack *mattk;
             u_slow_down();
         break;
     case AD_DREN:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4)) /* 25% chance */
-            drain_en(mhm.damage);
-        mhm.damage = 0;
+        mhitm_ad_dren(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CONF:
         hitmsg(mtmp, mattk);
