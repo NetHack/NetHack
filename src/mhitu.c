@@ -1477,22 +1477,9 @@ register struct attack *mattk;
         /* plus the normal damage */
         break;
     case AD_SLIM:
-        hitmsg(mtmp, mattk);
-        if (!uncancelled)
-            break;
-        if (flaming(g.youmonst.data)) {
-            pline_The("slime burns away!");
-            mhm.damage = 0;
-        } else if (Unchanging || noncorporeal(g.youmonst.data)
-                   || g.youmonst.data == &mons[PM_GREEN_SLIME]) {
-            You("are unaffected.");
-            mhm.damage = 0;
-        } else if (!Slimed) {
-            You("don't feel very well.");
-            make_slimed(10L, (char *) 0);
-            delayed_killer(SLIMED, KILLED_BY_AN, mtmp->data->mname);
-        } else
-            pline("Yuck!");
+        mhitm_ad_slim(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         hitmsg(mtmp, mattk);

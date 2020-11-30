@@ -2960,6 +2960,85 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_slim(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (negated)
+            return; /* physical damage only */
+        if (!rn2(4) && !slimeproof(pd)) {
+            if (!munslime(mdef, TRUE) && !DEADMONSTER(mdef)) {
+                /* this assumes newcham() won't fail; since hero has
+                   a slime attack, green slimes haven't been geno'd */
+                You("turn %s into slime.", mon_nam(mdef));
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
+                    pd = mdef->data;
+            }
+            /* munslime attempt could have been fatal */
+            if (DEADMONSTER(mdef)) {
+                mhm->hitflags = MM_DEF_DIED; /* skip death message */
+                mhm->done = TRUE;
+                return;
+            }
+            mhm->damage = 0;
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (!uncancelled)
+            return;
+        if (flaming(pd)) {
+            pline_The("slime burns away!");
+            mhm->damage = 0;
+        } else if (Unchanging || noncorporeal(pd)
+                   || pd == &mons[PM_GREEN_SLIME]) {
+            You("are unaffected.");
+            mhm->damage = 0;
+        } else if (!Slimed) {
+            You("don't feel very well.");
+            make_slimed(10L, (char *) 0);
+            delayed_killer(SLIMED, KILLED_BY_AN, magr->data->mname);
+        } else
+            pline("Yuck!");
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (cancelled)
+            return; /* physical damage only */
+        if (!rn2(4) && !slimeproof(pd)) {
+            if (!munslime(mdef, FALSE) && !DEADMONSTER(mdef)) {
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE,
+                            (boolean) (g.vis && canseemon(mdef))))
+                    pd = mdef->data;
+                mdef->mstrategy &= ~STRAT_WAITFORU;
+                mhm->hitflags = MM_HIT;
+            }
+            /* munslime attempt could have been fatal,
+               potentially to multiple monsters (SCR_FIRE) */
+            if (DEADMONSTER(magr))
+                mhm->hitflags |= MM_AGR_DIED;
+            if (DEADMONSTER(mdef))
+                mhm->hitflags |= MM_DEF_DIED;
+            mhm->damage = 0;
+        }
+    }
+}
 
 
 /* Template for monster hits monster for AD_FOO.
@@ -3179,21 +3258,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_SLIM:
-        if (negated)
-            break; /* physical damage only */
-        if (!rn2(4) && !slimeproof(pd)) {
-            if (!munslime(mdef, TRUE) && !DEADMONSTER(mdef)) {
-                /* this assumes newcham() won't fail; since hero has
-                   a slime attack, green slimes haven't been geno'd */
-                You("turn %s into slime.", mon_nam(mdef));
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
-                    pd = mdef->data;
-            }
-            /* munslime attempt could have been fatal */
-            if (DEADMONSTER(mdef))
-                return 2; /* skip death message */
-            mhm.damage = 0;
-        }
+        mhitm_ad_slim(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         /* there's no msomearmor() function, so just do damage */

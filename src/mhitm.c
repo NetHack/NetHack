@@ -1216,24 +1216,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_SLIM:
-        if (cancelled)
-            break; /* physical damage only */
-        if (!rn2(4) && !slimeproof(pd)) {
-            if (!munslime(mdef, FALSE) && !DEADMONSTER(mdef)) {
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE,
-                            (boolean) (g.vis && canseemon(mdef))))
-                    pd = mdef->data;
-                mdef->mstrategy &= ~STRAT_WAITFORU;
-                mhm.hitflags = MM_HIT;
-            }
-            /* munslime attempt could have been fatal,
-               potentially to multiple monsters (SCR_FIRE) */
-            if (DEADMONSTER(magr))
-                mhm.hitflags |= MM_AGR_DIED;
-            if (DEADMONSTER(mdef))
-                mhm.hitflags |= MM_DEF_DIED;
-            mhm.damage = 0;
-        }
+        mhitm_ad_slim(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STCK:
         mhitm_ad_stck(magr, mattk, mdef, &mhm);
