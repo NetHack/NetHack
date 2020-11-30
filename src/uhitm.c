@@ -2213,6 +2213,55 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_acid(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (resists_acid(mdef))
+            mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!magr->mcan && !rn2(3))
+            if (Acid_resistance) {
+                pline("You're covered in %s, but it seems harmless.",
+                      hliquid("acid"));
+                mhm->damage = 0;
+            } else {
+                pline("You're covered in %s!  It burns!", hliquid("acid"));
+                exercise(A_STR, FALSE);
+            }
+        else
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        if (magr->mcan) {
+            mhm->damage = 0;
+            return;
+        }
+        if (resists_acid(mdef)) {
+            if (g.vis && canseemon(mdef))
+                pline("%s is covered in %s, but it seems harmless.",
+                      Monnam(mdef), hliquid("acid"));
+            mhm->damage = 0;
+        } else if (g.vis && canseemon(mdef)) {
+            pline("%s is covered in %s!", Monnam(mdef), hliquid("acid"));
+            pline("It burns %s!", mon_nam(mdef));
+        }
+        if (!rn2(30))
+            erode_armor(mdef, ERODE_CORRODE);
+        if (!rn2(6))
+            acid_damage(MON_WEP(mdef));
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2329,8 +2378,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_ACID:
-        if (resists_acid(mdef))
-            mhm.damage = 0;
+        mhitm_ad_acid(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STON:
         if (!munstone(mdef, TRUE))

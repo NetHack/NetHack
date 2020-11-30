@@ -1031,23 +1031,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_ACID:
-        if (magr->mcan) {
-            mhm.damage = 0;
-            break;
-        }
-        if (resists_acid(mdef)) {
-            if (g.vis && canseemon(mdef))
-                pline("%s is covered in %s, but it seems harmless.",
-                      Monnam(mdef), hliquid("acid"));
-            mhm.damage = 0;
-        } else if (g.vis && canseemon(mdef)) {
-            pline("%s is covered in %s!", Monnam(mdef), hliquid("acid"));
-            pline("It burns %s!", mon_nam(mdef));
-        }
-        if (!rn2(30))
-            erode_armor(mdef, ERODE_CORRODE);
-        if (!rn2(6))
-            acid_damage(MON_WEP(mdef));
+        mhitm_ad_acid(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_RUST:
         mhitm_ad_rust(magr, mattk, mdef, &mhm);

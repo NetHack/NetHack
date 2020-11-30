@@ -1550,18 +1550,9 @@ register struct attack *mattk;
         }
         break;
     case AD_ACID:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(3))
-            if (Acid_resistance) {
-                pline("You're covered in %s, but it seems harmless.",
-                      hliquid("acid"));
-                mhm.damage = 0;
-            } else {
-                pline("You're covered in %s!  It burns!", hliquid("acid"));
-                exercise(A_STR, FALSE);
-            }
-        else
-            mhm.damage = 0;
+        mhitm_ad_acid(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLOW:
         hitmsg(mtmp, mattk);
