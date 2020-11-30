@@ -1498,16 +1498,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_DCAY:
-        hitmsg(mtmp, mattk);
-        if (mtmp->mcan)
-            break;
-        if (completelyrots(g.youmonst.data)) {
-            You("rot!");
-            /* KMH -- this is okay with unchanging */
-            rehumanize();
-            break;
-        }
-        erode_armor(&g.youmonst, ERODE_ROT);
+        mhitm_ad_dcay(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_HEAL:
         /* a cancelled nurse is just an ordinary monster,

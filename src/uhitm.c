@@ -1776,6 +1776,62 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_dcay(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (completelyrots(pd)) { /* wood golem or leather golem */
+            pline("%s %s to pieces!", Monnam(mdef),
+                  !mlifesaver(mdef) ? "falls" : "starts to fall");
+            xkilled(mdef, XKILL_NOMSG);
+        }
+        erode_armor(mdef, ERODE_ROT);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (magr->mcan)
+            return;
+        if (completelyrots(pd)) {
+            You("rot!");
+            /* KMH -- this is okay with unchanging */
+            rehumanize();
+            return;
+        }
+        erode_armor(mdef, ERODE_ROT);
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            return;
+        if (completelyrots(pd)) { /* PM_WOOD_GOLEM || PM_LEATHER_GOLEM */
+            /* note: the life-saved case is hypothetical because
+               life-saving doesn't work for golems */
+            if (g.vis && canseemon(mdef))
+                pline("%s %s to pieces!", Monnam(mdef),
+                      !mlifesaver(mdef) ? "falls" : "starts to fall");
+            monkilled(mdef, (char *) 0, AD_DCAY);
+            if (!DEADMONSTER(mdef)) {
+                mhm->done = TRUE;
+                mhm->hitflags = MM_MISS;
+                return;
+            }
+            mhm->done = TRUE;
+            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            return;
+        }
+        erode_armor(mdef, ERODE_CORRODE);
+        mdef->mstrategy &= ~STRAT_WAITFORU;
+        mhm->damage = 0;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -2064,13 +2120,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_DCAY:
-        if (completelyrots(pd)) { /* wood golem or leather golem */
-            pline("%s %s to pieces!", Monnam(mdef),
-                  !mlifesaver(mdef) ? "falls" : "starts to fall");
-            xkilled(mdef, XKILL_NOMSG);
-        }
-        erode_armor(mdef, ERODE_ROT);
-        mhm.damage = 0;
+        mhitm_ad_dcay(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DREN:
         if (!negated && !rn2(4))

@@ -1111,22 +1111,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_DCAY:
-        if (magr->mcan)
-            break;
-        if (completelyrots(pd)) { /* PM_WOOD_GOLEM || PM_LEATHER_GOLEM */
-            /* note: the life-saved case is hypothetical because
-               life-saving doesn't work for golems */
-            if (g.vis && canseemon(mdef))
-                pline("%s %s to pieces!", Monnam(mdef),
-                      !mlifesaver(mdef) ? "falls" : "starts to fall");
-            monkilled(mdef, (char *) 0, AD_DCAY);
-            if (!DEADMONSTER(mdef))
-                return 0;
-            return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-        }
-        erode_armor(mdef, ERODE_CORRODE);
-        mdef->mstrategy &= ~STRAT_WAITFORU;
-        mhm.damage = 0;
+        mhitm_ad_dcay(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STON:
         if (magr->mcan)
