@@ -1482,36 +1482,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
-        hitmsg(mtmp, mattk);
-        /* uncancelled is sufficient enough; please
-           don't make this attack less frequent */
-        if (uncancelled) {
-            struct obj *obj = some_armor(&g.youmonst);
-
-            if (!obj) {
-                /* some rings are susceptible;
-                   amulets and blindfolds aren't (at present) */
-                switch (rn2(5)) {
-                case 0:
-                    break;
-                case 1:
-                    obj = uright;
-                    break;
-                case 2:
-                    obj = uleft;
-                    break;
-                case 3:
-                    obj = uamul;
-                    break;
-                case 4:
-                    obj = ublindf;
-                    break;
-                }
-            }
-            if (drain_item(obj, FALSE)) {
-                pline("%s less effective.", Yobjnam2(obj, "seem"));
-            }
-        }
+        mhitm_ad_ench(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_POLY:
         if (uncancelled && Maybe_Half_Phys(mhm.damage) < (Upolyd ? u.mh : u.uhp))

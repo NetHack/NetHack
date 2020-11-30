@@ -3040,6 +3040,58 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_ench(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        /* there's no msomearmor() function, so just do damage */
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        /* uncancelled is sufficient enough; please
+           don't make this attack less frequent */
+        if (uncancelled) {
+            struct obj *obj = some_armor(mdef);
+
+            if (!obj) {
+                /* some rings are susceptible;
+                   amulets and blindfolds aren't (at present) */
+                switch (rn2(5)) {
+                case 0:
+                    break;
+                case 1:
+                    obj = uright;
+                    break;
+                case 2:
+                    obj = uleft;
+                    break;
+                case 3:
+                    obj = uamul;
+                    break;
+                case 4:
+                    obj = ublindf;
+                    break;
+                }
+            }
+            if (drain_item(obj, FALSE)) {
+                pline("%s less effective.", Yobjnam2(obj, "seem"));
+            }
+        }
+    } else {
+        /* mhitm */
+        /* there's no msomearmor() function, so just do damage */
+    }
+}
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -3262,9 +3314,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         if (mhm.done)
             return mhm.hitflags;
         break;
-    case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
-        /* there's no msomearmor() function, so just do damage */
-        /* if (negated) break; */
+    case AD_ENCH:
+        mhitm_ad_ench(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SLOW:
         if (!negated && mdef->mspeed != MSLOW) {

@@ -1231,8 +1231,9 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_ENCH:
-        /* there's no msomearmor() function, so just do damage */
-        /* if (cancelled) break; */
+        mhitm_ad_ench(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_POLY:
         if (!magr->mcan && mhm.damage < mdef->mhp)
