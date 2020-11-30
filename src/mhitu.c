@@ -1239,38 +1239,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_WRAP:
-        if ((!mtmp->mcan || u.ustuck == mtmp) && !sticks(g.youmonst.data)) {
-            if (!u.ustuck && !rn2(10)) {
-                if (u_slip_free(mtmp, mattk)) {
-                    mhm.damage = 0;
-                } else {
-                    set_ustuck(mtmp); /* before message, for botl update */
-                    pline("%s swings itself around you!", Monnam(mtmp));
-                }
-            } else if (u.ustuck == mtmp) {
-                if (is_pool(mtmp->mx, mtmp->my) && !Swimming && !Amphibious) {
-                    boolean moat = (levl[mtmp->mx][mtmp->my].typ != POOL)
-                                   && (levl[mtmp->mx][mtmp->my].typ != WATER)
-                                   && !Is_medusa_level(&u.uz)
-                                   && !Is_waterlevel(&u.uz);
-
-                    pline("%s drowns you...", Monnam(mtmp));
-                    g.killer.format = KILLED_BY_AN;
-                    Sprintf(g.killer.name, "%s by %s",
-                            moat ? "moat" : "pool of water",
-                            an(mtmp->data->mname));
-                    done(DROWNING);
-                } else if (mattk->aatyp == AT_HUGS) {
-                    You("are being crushed.");
-                }
-            } else {
-                mhm.damage = 0;
-                if (flags.verbose)
-                    pline("%s brushes against your %s.", Monnam(mtmp),
-                          body_part(LEG));
-            }
-        } else
-            mhm.damage = 0;
+        mhitm_ad_wrap(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_WERE:
         hitmsg(mtmp, mattk);

@@ -2775,6 +2775,82 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_wrap(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (!sticks(pd)) {
+            if (!u.ustuck && !rn2(10)) {
+                if (m_slips_free(mdef, mattk)) {
+                    mhm->damage = 0;
+                } else {
+                    You("swing yourself around %s!", mon_nam(mdef));
+                    set_ustuck(mdef);
+                }
+            } else if (u.ustuck == mdef) {
+                /* Monsters don't wear amulets of magical breathing */
+                if (is_pool(u.ux, u.uy) && !is_swimmer(pd)
+                    && !amphibious(pd)) {
+                    You("drown %s...", mon_nam(mdef));
+                    mhm->damage = mdef->mhp;
+                } else if (mattk->aatyp == AT_HUGS)
+                    pline("%s is being crushed.", Monnam(mdef));
+            } else {
+                mhm->damage = 0;
+                if (flags.verbose)
+                    You("brush against %s %s.", s_suffix(mon_nam(mdef)),
+                        mbodypart(mdef, LEG));
+            }
+        } else
+            mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        if ((!magr->mcan || u.ustuck == magr) && !sticks(pd)) {
+            if (!u.ustuck && !rn2(10)) {
+                if (u_slip_free(magr, mattk)) {
+                    mhm->damage = 0;
+                } else {
+                    set_ustuck(magr); /* before message, for botl update */
+                    pline("%s swings itself around you!", Monnam(magr));
+                }
+            } else if (u.ustuck == magr) {
+                if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious) {
+                    boolean moat = (levl[magr->mx][magr->my].typ != POOL)
+                                   && (levl[magr->mx][magr->my].typ != WATER)
+                                   && !Is_medusa_level(&u.uz)
+                                   && !Is_waterlevel(&u.uz);
+
+                    pline("%s drowns you...", Monnam(magr));
+                    g.killer.format = KILLED_BY_AN;
+                    Sprintf(g.killer.name, "%s by %s",
+                            moat ? "moat" : "pool of water",
+                            an(magr->data->mname));
+                    done(DROWNING);
+                } else if (mattk->aatyp == AT_HUGS) {
+                    You("are being crushed.");
+                }
+            } else {
+                mhm->damage = 0;
+                if (flags.verbose)
+                    pline("%s brushes against your %s.", Monnam(magr),
+                          body_part(LEG));
+            }
+        } else
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            mhm->damage = 0;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2968,30 +3044,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_WRAP:
-        if (!sticks(pd)) {
-            if (!u.ustuck && !rn2(10)) {
-                if (m_slips_free(mdef, mattk)) {
-                    mhm.damage = 0;
-                } else {
-                    You("swing yourself around %s!", mon_nam(mdef));
-                    set_ustuck(mdef);
-                }
-            } else if (u.ustuck == mdef) {
-                /* Monsters don't wear amulets of magical breathing */
-                if (is_pool(u.ux, u.uy) && !is_swimmer(pd)
-                    && !amphibious(pd)) {
-                    You("drown %s...", mon_nam(mdef));
-                    mhm.damage = mdef->mhp;
-                } else if (mattk->aatyp == AT_HUGS)
-                    pline("%s is being crushed.", Monnam(mdef));
-            } else {
-                mhm.damage = 0;
-                if (flags.verbose)
-                    You("brush against %s %s.", s_suffix(mon_nam(mdef)),
-                        mbodypart(mdef, LEG));
-            }
-        } else
-            mhm.damage = 0;
+        mhitm_ad_wrap(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_PLYS:
         if (!negated && mdef->mcanmove && !rn2(3) && mhm.damage < mdef->mhp) {

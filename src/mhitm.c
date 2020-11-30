@@ -1250,9 +1250,10 @@ int dieroll;
         if (mhm.done)
             return mhm.hitflags;
         break;
-    case AD_WRAP: /* monsters cannot grab one another, it's too hard */
-        if (magr->mcan)
-            mhm.damage = 0;
+    case AD_WRAP:
+        mhitm_ad_wrap(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ENCH:
         /* there's no msomearmor() function, so just do damage */
