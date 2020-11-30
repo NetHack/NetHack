@@ -1234,10 +1234,9 @@ register struct attack *mattk;
         }
         break;
     case AD_STCK:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !u.ustuck && !sticks(g.youmonst.data)) {
-            set_ustuck(mtmp);
-        }
+        mhitm_ad_stck(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_WRAP:
         if ((!mtmp->mcan || u.ustuck == mtmp) && !sticks(g.youmonst.data)) {

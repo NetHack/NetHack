@@ -1246,8 +1246,9 @@ int dieroll;
         }
         break;
     case AD_STCK:
-        if (cancelled)
-            mhm.damage = 0;
+        mhitm_ad_stck(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_WRAP: /* monsters cannot grab one another, it's too hard */
         if (magr->mcan)

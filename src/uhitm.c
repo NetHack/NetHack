@@ -2739,6 +2739,42 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_stck(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
+            u.ustuck = mdef; /* it's now stuck to you */
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && !u.ustuck && !sticks(pd)) {
+            set_ustuck(magr);
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+
+        if (cancelled)
+            mhm->damage = 0;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -2927,8 +2963,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_STCK:
-        if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
-            u.ustuck = mdef; /* it's now stuck to you */
+        mhitm_ad_stck(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_WRAP:
         if (!sticks(pd)) {

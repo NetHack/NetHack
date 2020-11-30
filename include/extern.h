@@ -2771,6 +2771,7 @@ E void FDECL(mhitm_ad_blnd, (struct monst *, struct attack *, struct monst *, st
 E void FDECL(mhitm_ad_curs, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_drst, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_drin, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_stck, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
 E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
