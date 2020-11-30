@@ -4232,7 +4232,8 @@ char *op;
  *    Prefix-handling functions
  */
 
-int pfxfn_cond_(optidx, req, negated, opts, op)
+int
+pfxfn_cond_(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
 boolean negated;
@@ -4276,7 +4277,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int pfxfn_font(optidx, req, negated, opts, op)
+int
+pfxfn_font(optidx, req, negated, opts, op)
 int optidx;
 int req;
 boolean negated;
@@ -4412,7 +4414,8 @@ char *op;
 }
 
 #if defined(MICRO) && !defined(AMIGA)
-int pfxfn_IBM_(optidx, req, negated, opts, op)
+int
+pfxfn_IBM_(optidx, req, negated, opts, op)
 int optidx;
 int req;
 boolean negated;
@@ -4640,7 +4643,8 @@ char *op;
     return optn_ok;
 }
 
-int spcfn_misc_menu_cmd(midx, req, negated, opts, op)
+int
+spcfn_misc_menu_cmd(midx, req, negated, opts, op)
 int midx;
 int req;
 boolean negated;

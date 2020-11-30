@@ -23,9 +23,12 @@ extern "C" {
 namespace nethack_qt_ {
 
 NetHackQtMessageWindow::NetHackQtMessageWindow() :
-    list(new QListWidget())
+    list(new QListWidget()),
+    scrollarea(new QScrollArea())
 {
     list->setFocusPolicy(Qt::NoFocus);
+    scrollarea->setFocusPolicy(Qt::NoFocus);
+    scrollarea->takeWidget();
     ::iflags.window_inited = 1;
     map = 0;
     currgetmsg = 0;
@@ -39,7 +42,9 @@ NetHackQtMessageWindow::~NetHackQtMessageWindow()
     delete list;
 }
 
-QWidget* NetHackQtMessageWindow::Widget() { return list; }
+QWidget* NetHackQtMessageWindow::Widget() {
+    return list;
+}
 
 void NetHackQtMessageWindow::setMap(NetHackQtMapWindow2* m)
 {
@@ -152,6 +157,8 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
             item->setBackground(bg);
         }
     }
+#else
+    nhUse(attr);
 #endif
 
     if (list->count() >= (int) ::iflags.msg_history)
@@ -162,6 +169,13 @@ void NetHackQtMessageWindow::PutStr(int attr, const QString& text)
     // force scrollbar to bottom;
     // selects most recent message, which causes it to be highlighted
     list->setCurrentRow(list->count() - 1);
+
+    // if message window has been scrolled right, force back to left edge
+    QScrollBar *sb = list->horizontalScrollBar();
+    if (sb && sb->value() > 0) {
+        sb->setValue(0);
+        this->viewport()->update();
+    }
 
     if (map)
 	map->putMessage(attr, text2);
