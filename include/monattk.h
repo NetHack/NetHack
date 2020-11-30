@@ -90,6 +90,7 @@ struct mhitm_data {
     int damage;
     int hitflags; /* MM_DEF_DIED | MM_AGR_DIED | ... */
     boolean done;
+    boolean permdmg;
 };
 
 /*

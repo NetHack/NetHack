@@ -967,12 +967,13 @@ register struct attack *mattk;
 {
     struct permonst *mdat = mtmp->data;
     int uncancelled, ptmp;
-    int armpro, permdmg, tmphp;
+    int armpro, tmphp;
     char buf[BUFSZ];
     struct permonst *olduasmon = g.youmonst.data;
     int res;
     struct mhitm_data mhm;
     mhm.hitflags = MM_MISS;
+    mhm.permdmg = 0;
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
@@ -1012,7 +1013,6 @@ register struct attack *mattk;
     armpro = magic_negation(&g.youmonst);
     uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro);
 
-    permdmg = 0;
     /*  Now, adjust damages via resistances or specific attacks */
     switch (mattk->adtyp) {
     case AD_PHYS:
@@ -1423,39 +1423,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_DETH:
-        pline("%s reaches out with its deadly touch.", Monnam(mtmp));
-        if (is_undead(g.youmonst.data)) {
-            /* Still does normal damage */
-            pline("Was that the touch of death?");
-            break;
-        }
-        switch (rn2(20)) {
-        case 19:
-        case 18:
-        case 17:
-            if (!Antimagic) {
-                g.killer.format = KILLED_BY_AN;
-                Strcpy(g.killer.name, "touch of death");
-                done(DIED);
-                mhm.damage = 0;
-                break;
-            }
-            /*FALLTHRU*/
-        default: /* case 16: ... case 5: */
-            You_feel("your life force draining away...");
-            permdmg = 1; /* actual damage done below */
-            break;
-        case 4:
-        case 3:
-        case 2:
-        case 1:
-        case 0:
-            if (Antimagic)
-                shieldeff(u.ux, u.uy);
-            pline("Lucky for you, it didn't work!");
-            mhm.damage = 0;
-            break;
-        }
+        mhitm_ad_deth(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_PEST:
         mhitm_ad_pest(mtmp, mattk, &g.youmonst, &mhm);
@@ -1509,7 +1479,7 @@ register struct attack *mattk;
                     || is_vampshifter(mtmp))))
             mhm.damage = (mhm.damage + 1) / 2;
 
-        if (permdmg) { /* Death's life force drain */
+        if (mhm.permdmg) { /* Death's life force drain */
             int lowerlimit, *hpmax_p;
             /*
              * Apply some of the damage to permanent hit points:
@@ -1520,13 +1490,13 @@ register struct attack *mattk;
              *  otherwise        0..50%
              * Never reduces hpmax below 1 hit point per level.
              */
-            permdmg = rn2(mhm.damage / 2 + 1);
+            mhm.permdmg = rn2(mhm.damage / 2 + 1);
             if (Upolyd || u.uhpmax > 25 * u.ulevel)
-                permdmg = mhm.damage;
+                mhm.permdmg = mhm.damage;
             else if (u.uhpmax > 10 * u.ulevel)
-                permdmg += mhm.damage / 2;
+                mhm.permdmg += mhm.damage / 2;
             else if (u.uhpmax > 5 * u.ulevel)
-                permdmg += mhm.damage / 4;
+                mhm.permdmg += mhm.damage / 4;
 
             if (Upolyd) {
                 hpmax_p = &u.mhmax;
@@ -1536,8 +1506,8 @@ register struct attack *mattk;
                 hpmax_p = &u.uhpmax;
                 lowerlimit = u.ulevel;
             }
-            if (*hpmax_p - permdmg > lowerlimit)
-                *hpmax_p -= permdmg;
+            if (*hpmax_p - mhm.permdmg > lowerlimit)
+                *hpmax_p -= mhm.permdmg;
             else if (*hpmax_p > lowerlimit)
                 *hpmax_p = lowerlimit;
             /* else unlikely...

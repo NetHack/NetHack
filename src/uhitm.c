@@ -3264,6 +3264,59 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_deth(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        pline("%s reaches out with its deadly touch.", Monnam(magr));
+        if (is_undead(pd)) {
+            /* Still does normal damage */
+            pline("Was that the touch of death?");
+            return;
+        }
+        switch (rn2(20)) {
+        case 19:
+        case 18:
+        case 17:
+            if (!Antimagic) {
+                g.killer.format = KILLED_BY_AN;
+                Strcpy(g.killer.name, "touch of death");
+                done(DIED);
+                mhm->damage = 0;
+                return;
+            }
+            /*FALLTHRU*/
+        default: /* case 16: ... case 5: */
+            You_feel("your life force draining away...");
+            mhm->permdmg = 1; /* actual damage done below */
+            return;
+        case 4:
+        case 3:
+        case 2:
+        case 1:
+        case 0:
+            if (Antimagic)
+                shieldeff(u.ux, u.uy);
+            pline("Lucky for you, it didn't work!");
+            mhm->damage = 0;
+            return;
+        }
+    } else {
+        /* mhitm */
+        mhm->damage = 0;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -3312,6 +3365,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
+    mhm.permdmg = 0;
 
     armpro = magic_negation(mdef);
     /* since hero can't be cancelled, only defender's armor applies */
