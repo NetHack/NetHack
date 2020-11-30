@@ -55,7 +55,7 @@ namespace nethack_qt_ {
 void centerOnMain( QWidget* w );
 // end temporary
 
-static uchar keyValue(QKeyEvent *key_event)
+uchar keyValue(QKeyEvent *key_event)
 {
     // key_event manipulation derived from NetHackQtBind::notify()
     const int k = key_event->key();

@@ -3,6 +3,15 @@
 // NetHack may be freely redistributed.  See license for details.
 
 // qt_xcmd.cpp -- extended command widget
+//
+// TODO:
+//  Add button that toggles the grid of command names from column-oriented
+//    to row-oriented and vice versa.
+//  Add another button to filter out commands that can be invoked by a
+//    'normal' keystroke (not Meta) with current key bindings.
+//  If not those, move the [cancel] button from being absurdly wide at the
+//    top of the popup to being ordinary width, right justified on same
+//    line as the prompt where user's typed characters are shown.
 
 extern "C" {
 #include "hack.h"
@@ -23,6 +32,8 @@ extern "C" {
 
 namespace nethack_qt_ {
 
+extern uchar keyValue(QKeyEvent *key_event); // from qt_menu.cpp
+
 // temporary
 void centerOnMain(QWidget *);
 // end temporary
@@ -31,7 +42,8 @@ static inline bool
 interesting_command(unsigned indx)
 {
     return (!(extcmdlist[indx].flags & CMD_NOT_AVAILABLE)
-            /* 'wizard' is #undef'd above [why?] so rely on its internals */
+            /* 'wizard' is #undef'd above because Qt uses that token
+               so rely on its internals */
             && (flags.debug || !(extcmdlist[indx].flags & WIZMODECMD)));
 }
 
@@ -40,7 +52,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
 {
     QVBoxLayout *l = new QVBoxLayout(this);
 
-    QPushButton* can = new QPushButton("Cancel", this);
+    QPushButton *can = new QPushButton("Cancel", this);
     can->setDefault(true);
     can->setMinimumSize(can->sizeHint());
     l->addWidget(can);
@@ -66,7 +78,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
        when resulting 'nrows' is too big, if GroupBox supports that);
        it used to be hardcoded 4 but after every command became accessible
        as an extended command, that resulted in so many rows that some of
-       the buttoms were chopped off at the bottom of the grid */
+       the buttons were chopped off at the bottom of the grid */
     unsigned ncols = !flags.debug ? 6 : 8,
              nrows = (ncmds + ncols - 1) / ncols;
     /*
@@ -84,21 +96,36 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
      */
     bool by_column = true;
 
-    QVBoxLayout* bl = new QVBoxLayout(grid);
+    QVBoxLayout *bl = new QVBoxLayout(grid);
     bl->addSpacing(fm.height());
-    QGridLayout* gl = new QGridLayout();
+    QGridLayout *gl = new QGridLayout();
     bl->addLayout(gl);
     for (i = j = 0; extcmdlist[i].ef_txt; ++i) {
         if (interesting_command(i)) {
             QPushButton *pb = new QPushButton(extcmdlist[i].ef_txt, grid);
             pb->setMinimumSize(butw, pb->sizeHint().height());
+            // force the button to have fixed width or it can move around a
+            // pixel or two (tiny but visibly noticeable) when enableButtons()
+            // hides whole columns [see stretch comment below]
+            pb->setMaximumSize(pb->minimumSize());
             group->addButton(pb, i + 1);
-            if (by_column)
-                /* 0..R-1 down first column, R..2*R-1 down second column,...*/
-                gl->addWidget(pb, j % nrows, j / nrows);
-            else
-                /* 0..C-1 across first row, C..2*C-1 across second row, ... */
-                gl->addWidget(pb, j / ncols, j % ncols);
+            /*
+             * by_column:
+             *  0..R-1 down first column, R..2*R-1 down second column, ...
+             * otherwise:
+             *  0..C-1 across first row, C..2*C-1 across second row, ...
+             */
+            int row = by_column ? j % nrows : j / ncols;
+            int col = by_column ? j / nrows : j % ncols;
+            gl->addWidget(pb, row, col);
+            // these stretch settings prevent the grid from becoming very
+            // ugly when enableButtons() disables whole rows and/or columns
+            // as typed characters reduce the pool of possible matches
+            if (row == 0)
+                gl->setColumnStretch(col, 1);
+            if (col == 0)
+                gl->setRowStretch(row, 1);
+
             buttons.append(pb);
             ++j;
         }
@@ -116,23 +143,35 @@ void NetHackQtExtCmdRequestor::cancel()
     reject();
 }
 
+#define Ctrl(c) (0x1f & (c)) /* ASCII */
+// Note: we don't necessarily have access to a terminal to query
+// it for user's preferred kill character, so use hardcoded ^U.
+#define KILL_CHAR Ctrl('u')
+
 void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 {
-    QString text = event->text();
-    if (text == "\r" || text == "\n" || text == " " || text == "\033")
-    {
-	reject();
-    }
-    else if (text == "\b" || text == "\177")
-    {
-	QString promptstr = prompt->text();
-	if (promptstr != "#")
-	    prompt->setText(promptstr.left(promptstr.size()-1));
+    QString promptstr = prompt->text();
+    uchar uc = keyValue(event);
+    if (!uc) {
+        // shift or control or meta, another character should be coming
+        QWidget::keyPressEvent(event);
+    } else if (uc == '\033' || uc == KILL_CHAR) {
+        // Escape when some response is already present kills that text
+        // but keeps prompting; escape when response is empty cancels.
+        // Kill gets rid of current text, if any, and always re-prompts.
+        if (uc == '\033' && promptstr == "#")
+            reject(); // cancel() if ESC used when string is empty
+        prompt->setText("#");
         enableButtons();
-    }
-    else
-    {
-	QString promptstr = prompt->text() + text;
+    } else if (uc == '\b' || uc == '\177') {
+	if (promptstr != "#")
+	    prompt->setText(promptstr.left(promptstr.size() - 1));
+        enableButtons();
+  /*} else if (uc == '\r' || uc == '\n'; || uc  == ' ') {*/
+    } else if (uc < ' ' || uc > std::max('z', 'Z')) {
+	reject(); // done()
+    } else {
+	promptstr += QChar(uc); // event()->text()
 	QString typedstr = promptstr.mid(1); // skip the '#'
 	unsigned matches = 0;
 	unsigned match = 0;
@@ -171,19 +210,20 @@ int NetHackQtExtCmdRequestor::get()
     return result()-1;
 }
 
-/*
- * FIXME:
- *  This looks terrible.  [Possibly a difference between initial
- *  implementation using Qt2 and the current Qt version?]
- */
 // Enable only buttons that match the current prompt string
 void NetHackQtExtCmdRequestor::enableButtons()
 {
     QString typedstr = prompt->text().mid(1); // skip the '#'
     std::size_t len = typedstr.size();
 
+    // This used to look really bad when whole rows became empty:  the
+    // grid shrank and the one line prompt area expanded to fill the
+    // vacated vertical space.  Hiding whole columns looked bad too,
+    // remaining buttons were widened to take the space.  Now the grid is
+    // forced to have fixed layout (via stretch settings in constructor).
     for (auto b = buttons.begin(); b != buttons.end(); ++b) {
-        (*b)->setVisible((*b)->text().left(len) == typedstr);
+        bool showit = ((*b)->text().left(len) == typedstr);
+        (*b)->setVisible(showit);
     }
 }
 
