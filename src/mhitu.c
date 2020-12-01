@@ -1129,14 +1129,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_WERE:
-        hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4) && u.ulycn == NON_PM
-            && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
-            You_feel("feverish.");
-            exercise(A_CON, FALSE);
-            set_ulycn(monsndx(mdat));
-            retouch_equipment(2);
-        }
+        mhitm_ad_were(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SGLD:
         mhitm_ad_sgld(mtmp, mattk, &g.youmonst, &mhm);

@@ -964,6 +964,10 @@ int dieroll;
         }
         goto physical;
     case AD_WERE:
+        mhitm_ad_were(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_HEAL:
     case AD_PHYS:
  physical:

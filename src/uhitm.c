@@ -3644,6 +3644,42 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_were(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhitm_ad_phys(&g.youmonst, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        hitmsg(magr, mattk);
+        if (uncancelled && !rn2(4) && u.ulycn == NON_PM
+            && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
+            You_feel("feverish.");
+            exercise(A_CON, FALSE);
+            set_ulycn(monsndx(pa));
+            retouch_equipment(2);
+        }
+    } else {
+        /* mhitm */
+        mhitm_ad_phys(&g.youmonst, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3719,7 +3755,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         }
 #endif
         goto physical;
-    case AD_WERE: /* no special effect on monsters */
+    case AD_WERE:
+        mhitm_ad_were(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_HEAL: /* likewise */
     case AD_PHYS:
  physical:
