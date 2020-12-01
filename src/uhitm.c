@@ -3810,6 +3810,80 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_legs(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+#if 0
+        if (u.ucancelled) {
+            mhm->damage = 0;
+            return;
+        }
+#endif
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
+        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
+                   *Monst_name = Monnam(magr), *leg = body_part(LEG);
+
+        /* This case is too obvious to ignore, but Nethack is not in
+         * general very good at considering height--most short monsters
+         * still _can_ attack you when you're flying or mounted.
+         */
+        if ((u.usteed || Levitation || Flying) && !is_flyer(magr->data)) {
+            pline("%s tries to reach your %s %s!", Monst_name, sidestr, leg);
+            mhm->damage = 0;
+        } else if (magr->mcan) {
+            pline("%s nuzzles against your %s %s!", Monnam(magr),
+                  sidestr, leg);
+            mhm->damage = 0;
+        } else {
+            if (uarmf) {
+                if (rn2(2) && (uarmf->otyp == LOW_BOOTS
+                               || uarmf->otyp == IRON_SHOES)) {
+                    pline("%s pricks the exposed part of your %s %s!",
+                          Monst_name, sidestr, leg);
+                } else if (!rn2(5)) {
+                    pline("%s pricks through your %s boot!", Monst_name,
+                          sidestr);
+                } else {
+                    pline("%s scratches your %s boot!", Monst_name,
+                          sidestr);
+                    mhm->damage = 0;
+                    return;
+                }
+            } else
+                pline("%s pricks your %s %s!", Monst_name, sidestr, leg);
+
+            set_wounded_legs(side, rnd(60 - ACURR(A_DEX)));
+            exercise(A_STR, FALSE);
+            exercise(A_DEX, FALSE);
+        }
+    } else {
+        /* mhitm */
+        if (magr->mcan) {
+            mhm->damage = 0;
+            return;
+        }
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3877,13 +3951,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_LEGS:
-#if 0
-        if (u.ucancelled) {
-            mhm.damage = 0;
-            break;
-        }
-#endif
-        goto physical;
+        mhitm_ad_legs(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_WERE:
         mhitm_ad_were(&g.youmonst, mattk, mdef, &mhm);
         if (mhm.done)

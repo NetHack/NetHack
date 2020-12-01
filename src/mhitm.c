@@ -955,11 +955,10 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_LEGS:
-        if (magr->mcan) {
-            mhm.damage = 0;
-            break;
-        }
-        goto physical;
+        mhitm_ad_legs(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_WERE:
         mhitm_ad_were(magr, mattk, mdef, &mhm);
         if (mhm.done)

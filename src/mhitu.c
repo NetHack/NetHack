@@ -1073,46 +1073,11 @@ register struct attack *mattk;
         if (mhm.done)
             return mhm.hitflags;
         break;
-    case AD_LEGS: {
-        long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
-        const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
-                   *Monst_name = Monnam(mtmp), *leg = body_part(LEG);
-
-        /* This case is too obvious to ignore, but Nethack is not in
-         * general very good at considering height--most short monsters
-         * still _can_ attack you when you're flying or mounted.
-         */
-        if ((u.usteed || Levitation || Flying) && !is_flyer(mtmp->data)) {
-            pline("%s tries to reach your %s %s!", Monst_name, sidestr, leg);
-            mhm.damage = 0;
-        } else if (mtmp->mcan) {
-            pline("%s nuzzles against your %s %s!", Monnam(mtmp),
-                  sidestr, leg);
-            mhm.damage = 0;
-        } else {
-            if (uarmf) {
-                if (rn2(2) && (uarmf->otyp == LOW_BOOTS
-                               || uarmf->otyp == IRON_SHOES)) {
-                    pline("%s pricks the exposed part of your %s %s!",
-                          Monst_name, sidestr, leg);
-                } else if (!rn2(5)) {
-                    pline("%s pricks through your %s boot!", Monst_name,
-                          sidestr);
-                } else {
-                    pline("%s scratches your %s boot!", Monst_name,
-                          sidestr);
-                    mhm.damage = 0;
-                    break;
-                }
-            } else
-                pline("%s pricks your %s %s!", Monst_name, sidestr, leg);
-
-            set_wounded_legs(side, rnd(60 - ACURR(A_DEX)));
-            exercise(A_STR, FALSE);
-            exercise(A_DEX, FALSE);
-        }
+    case AD_LEGS:
+        mhitm_ad_legs(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
-    }
     case AD_STON:
         mhitm_ad_ston(mtmp, mattk, &g.youmonst, &mhm);
         if (mhm.done)
