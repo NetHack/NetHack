@@ -3884,6 +3884,81 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_dgst(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        mhm->damage = 0;
+    } else {
+        /* mhitm */
+        int num;
+        struct obj *obj;
+
+        /* eating a Rider or its corpse is fatal */
+        if (is_rider(pd)) {
+            if (g.vis && canseemon(magr))
+                pline("%s %s!", Monnam(magr),
+                      (pd == &mons[PM_FAMINE])
+                          ? "belches feebly, shrivels up and dies"
+                          : (pd == &mons[PM_PESTILENCE])
+                                ? "coughs spasmodically and collapses"
+                                : "vomits violently and drops dead");
+            mondied(magr);
+            if (!DEADMONSTER(magr)) {
+                mhm->hitflags = MM_MISS; /* lifesaved */
+                mhm->done = TRUE;
+                return;
+            } else if (magr->mtame && !g.vis)
+                You(brief_feeling, "queasy");
+            mhm->hitflags = MM_AGR_DIED;
+            mhm->done = TRUE;
+            return;
+        }
+        if (flags.verbose && !Deaf)
+            verbalize("Burrrrp!");
+        mhm->damage = mdef->mhp;
+        /* Use up amulet of life saving */
+        if ((obj = mlifesaver(mdef)) != 0)
+            m_useup(mdef, obj);
+
+        /* Is a corpse for nutrition possible?  It may kill magr */
+        if (!corpse_chance(mdef, magr, TRUE) || DEADMONSTER(magr))
+            return;
+
+        /* Pets get nutrition from swallowing monster whole.
+         * No nutrition from G_NOCORPSE monster, eg, undead.
+         * DGST monsters don't die from undead corpses
+         */
+        num = monsndx(pd);
+        if (magr->mtame && !magr->isminion
+            && !(g.mvitals[num].mvflags & G_NOCORPSE)) {
+            struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
+            int nutrit;
+
+            set_corpsenm(virtualcorpse, num);
+            nutrit = dog_nutrition(magr, virtualcorpse);
+            dealloc_obj(virtualcorpse);
+
+            /* only 50% nutrition, 25% of normal eating time */
+            if (magr->meating > 1)
+                magr->meating = (magr->meating + 3) / 4;
+            if (nutrit > 1)
+                nutrit /= 2;
+            EDOG(magr)->hungrytime += nutrit;
+        }
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE

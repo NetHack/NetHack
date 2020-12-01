@@ -900,54 +900,9 @@ int dieroll;
 
     switch (mattk->adtyp) {
     case AD_DGST:
-        /* eating a Rider or its corpse is fatal */
-        if (is_rider(pd)) {
-            if (g.vis && canseemon(magr))
-                pline("%s %s!", Monnam(magr),
-                      (pd == &mons[PM_FAMINE])
-                          ? "belches feebly, shrivels up and dies"
-                          : (pd == &mons[PM_PESTILENCE])
-                                ? "coughs spasmodically and collapses"
-                                : "vomits violently and drops dead");
-            mondied(magr);
-            if (!DEADMONSTER(magr))
-                return 0; /* lifesaved */
-            else if (magr->mtame && !g.vis)
-                You(brief_feeling, "queasy");
-            return MM_AGR_DIED;
-        }
-        if (flags.verbose && !Deaf)
-            verbalize("Burrrrp!");
-        mhm.damage = mdef->mhp;
-        /* Use up amulet of life saving */
-        if ((obj = mlifesaver(mdef)) != 0)
-            m_useup(mdef, obj);
-
-        /* Is a corpse for nutrition possible?  It may kill magr */
-        if (!corpse_chance(mdef, magr, TRUE) || DEADMONSTER(magr))
-            break;
-
-        /* Pets get nutrition from swallowing monster whole.
-         * No nutrition from G_NOCORPSE monster, eg, undead.
-         * DGST monsters don't die from undead corpses
-         */
-        num = monsndx(pd);
-        if (magr->mtame && !magr->isminion
-            && !(g.mvitals[num].mvflags & G_NOCORPSE)) {
-            struct obj *virtualcorpse = mksobj(CORPSE, FALSE, FALSE);
-            int nutrit;
-
-            set_corpsenm(virtualcorpse, num);
-            nutrit = dog_nutrition(magr, virtualcorpse);
-            dealloc_obj(virtualcorpse);
-
-            /* only 50% nutrition, 25% of normal eating time */
-            if (magr->meating > 1)
-                magr->meating = (magr->meating + 3) / 4;
-            if (nutrit > 1)
-                nutrit /= 2;
-            EDOG(magr)->hungrytime += nutrit;
-        }
+        mhitm_ad_dgst(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STUN:
         mhitm_ad_stun(magr, mattk, mdef, &mhm);
