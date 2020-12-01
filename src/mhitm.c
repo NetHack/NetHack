@@ -950,13 +950,10 @@ int dieroll;
         }
         break;
     case AD_STUN:
-        if (magr->mcan)
-            break;
-        if (canseemon(mdef))
-            pline("%s %s for a moment.", Monnam(mdef),
-                  makeplural(stagger(pd, "stagger")));
-        mdef->mstun = 1;
-        goto physical;
+        mhitm_ad_stun(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_LEGS:
         if (magr->mcan) {
             mhm.damage = 0;

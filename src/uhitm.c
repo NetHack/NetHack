@@ -3771,6 +3771,45 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_stun(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (!Blind)
+            pline("%s %s for a moment.", Monnam(mdef),
+                  makeplural(stagger(pd, "stagger")));
+        mdef->mstun = 1;
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!magr->mcan && !rn2(4)) {
+            make_stunned((HStun & TIMEOUT) + (long) mhm->damage, TRUE);
+            mhm->damage /= 2;
+        }
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            return;
+        if (canseemon(mdef))
+            pline("%s %s for a moment.", Monnam(mdef),
+                  makeplural(stagger(pd, "stagger")));
+        mdef->mstun = 1;
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3833,11 +3872,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     }
     switch (mattk->adtyp) {
     case AD_STUN:
-        if (!Blind)
-            pline("%s %s for a moment.", Monnam(mdef),
-                  makeplural(stagger(pd, "stagger")));
-        mdef->mstun = 1;
-        goto physical;
+        mhitm_ad_stun(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_LEGS:
 #if 0
         if (u.ucancelled) {

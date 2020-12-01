@@ -2789,6 +2789,7 @@ E void FDECL(mhitm_ad_phys, (struct monst *, struct attack *, struct monst *, st
 E void FDECL(mhitm_ad_ston, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_were, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E void FDECL(mhitm_ad_heal, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_stun, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E boolean FDECL(do_stone_u, (struct monst *));
 E void FDECL(do_stone_mon, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E int FDECL(damageum, (struct monst *, struct attack *, int));

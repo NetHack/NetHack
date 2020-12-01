@@ -1239,11 +1239,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_STUN:
-        hitmsg(mtmp, mattk);
-        if (!mtmp->mcan && !rn2(4)) {
-            make_stunned((HStun & TIMEOUT) + (long) mhm.damage, TRUE);
-            mhm.damage /= 2;
-        }
+        mhitm_ad_stun(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_ACID:
         mhitm_ad_acid(mtmp, mattk, &g.youmonst, &mhm);
