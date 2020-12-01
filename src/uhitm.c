@@ -3348,6 +3348,258 @@ struct mhitm_data *mhm;
     }
 }
 
+boolean
+do_stone_u(mtmp)
+struct monst *mtmp;
+{
+    if (!Stoned && !Stone_resistance
+        && !(poly_when_stoned(g.youmonst.data)
+             && polymon(PM_STONE_GOLEM))) {
+        int kformat = KILLED_BY_AN;
+        const char *kname = mtmp->data->mname;
+
+        if (mtmp->data->geno & G_UNIQ) {
+            if (!type_is_pname(mtmp->data))
+                kname = the(kname);
+            kformat = KILLED_BY;
+        }
+        make_stoned(5L, (char *) 0, kformat, kname);
+        return 1;
+        /* done_in_by(mtmp, STONING); */
+    }
+    return 0;
+}
+
+void
+do_stone_mon(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    /* may die from the acid if it eats a stone-curing corpse */
+    if (munstone(mdef, FALSE))
+        goto post_stone;
+    if (poly_when_stoned(pd)) {
+        mon_to_stone(mdef);
+        mhm->damage = 0;
+        return;
+    }
+    if (!resists_ston(mdef)) {
+        if (g.vis && canseemon(mdef))
+            pline("%s turns to stone!", Monnam(mdef));
+        monstone(mdef);
+ post_stone:
+        if (!DEADMONSTER(mdef)) {
+            mhm->hitflags = MM_MISS;
+            mhm->done = TRUE;
+            return;
+        }
+        else if (mdef->mtame && !g.vis)
+            You(brief_feeling, "peculiarly sad");
+        mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+        mhm->done = TRUE;
+        return;
+    }
+    mhm->damage = (mattk->adtyp == AD_STON ? 0 : 1);
+}
+
+void
+mhitm_ad_phys(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        int armpro = magic_negation(mdef);
+        /* since hero can't be cancelled, only defender's armor applies */
+        boolean negated = !(rn2(10) >= 3 * armpro);
+
+        if (pd == &mons[PM_SHADE]) {
+            mhm->damage = 0;
+            if (!mhm->specialdmg)
+                impossible("bad shade attack function flow?");
+        }
+        mhm->damage += mhm->specialdmg;
+
+        if (mattk->aatyp == AT_WEAP) {
+            /* hmonas() uses known_hitum() to deal physical damage,
+               then also damageum() for non-AD_PHYS; don't inflict
+               extra physical damage for unusual damage types */
+            mhm->damage = 0;
+        } else if (mattk->aatyp == AT_KICK
+                   || mattk->aatyp == AT_CLAW
+                   || mattk->aatyp == AT_TUCH
+                   || mattk->aatyp == AT_HUGS) {
+            if (thick_skinned(pd))
+                mhm->damage = (mattk->aatyp == AT_KICK) ? 0 : (mhm->damage + 1) / 2;
+            /* add ring(s) of increase damage */
+            if (u.udaminc > 0) {
+                /* applies even if damage was 0 */
+                mhm->damage += u.udaminc;
+            } else if (mhm->damage > 0) {
+                /* ring(s) might be negative; avoid converting
+                   0 to non-0 or positive to non-positive */
+                mhm->damage += u.udaminc;
+                if (mhm->damage < 1)
+                    mhm->damage = 1;
+            }
+        }
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        if (mattk->aatyp == AT_HUGS && !sticks(pd)) {
+            if (!u.ustuck && rn2(2)) {
+                if (u_slip_free(magr, mattk)) {
+                    mhm->damage = 0;
+                } else {
+                    set_ustuck(magr);
+                    pline("%s grabs you!", Monnam(magr));
+                }
+            } else if (u.ustuck == magr) {
+                exercise(A_STR, FALSE);
+                You("are being %s.", (magr->data == &mons[PM_ROPE_GOLEM])
+                                         ? "choked"
+                                         : "crushed");
+            }
+        } else { /* hand to hand weapon */
+            struct obj *otmp = MON_WEP(magr);
+
+            if (mattk->aatyp == AT_WEAP && otmp) {
+                struct obj *marmg;
+                int tmp;
+
+                if (otmp->otyp == CORPSE
+                    && touch_petrifies(&mons[otmp->corpsenm])) {
+                    mhm->damage = 1;
+                    pline("%s hits you with the %s corpse.", Monnam(magr),
+                          mons[otmp->corpsenm].mname);
+                    if (!Stoned) {
+                        if (do_stone_u(magr)) {
+                            mhm->hitflags = MM_HIT;
+                            mhm->done = 1;
+                            return;
+                        }
+                    }
+                }
+                mhm->damage += dmgval(otmp, mdef);
+                if ((marmg = which_armor(magr, W_ARMG)) != 0
+                    && marmg->otyp == GAUNTLETS_OF_POWER)
+                    mhm->damage += rn1(4, 3); /* 3..6 */
+                if (mhm->damage <= 0)
+                    mhm->damage = 1;
+                if (!(otmp->oartifact && artifact_hit(magr, mdef, otmp,
+                                                      &mhm->damage, g.mhitu_dieroll)))
+                    hitmsg(magr, mattk);
+                if (!mhm->damage)
+                    return;
+                if (objects[otmp->otyp].oc_material == SILVER
+                    && Hate_silver) {
+                    pline_The("silver sears your flesh!");
+                    exercise(A_CON, FALSE);
+                }
+                /* this redundancy necessary because you have
+                   to take the damage _before_ being cloned;
+                   need to have at least 2 hp left to split */
+                tmp = mhm->damage;
+                if (u.uac < 0)
+                    tmp -= rnd(-u.uac);
+                if (tmp < 1)
+                    tmp = 1;
+                if (u.mh - tmp > 1
+                    && (objects[otmp->otyp].oc_material == IRON
+                        /* relevant 'metal' objects are scalpel and tsurugi */
+                        || objects[otmp->otyp].oc_material == METAL)
+                    && (u.umonnum == PM_BLACK_PUDDING
+                        || u.umonnum == PM_BROWN_PUDDING)) {
+                    if (tmp > 1)
+                        exercise(A_STR, FALSE);
+                    /* inflict damage now; we know it can't be fatal */
+                    u.mh -= tmp;
+                    g.context.botl = 1;
+                    mhm->damage = 0; /* don't inflict more damage below */
+                    if (cloneu())
+                        You("divide as %s hits you!", mon_nam(magr));
+                }
+                rustm(&g.youmonst, otmp);
+            } else if (mattk->aatyp != AT_TUCH || mhm->damage != 0
+                       || magr != u.ustuck)
+                hitmsg(magr, mattk);
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+        struct obj *mwep = MON_WEP(magr);
+
+        if (mattk->aatyp != AT_WEAP && mattk->aatyp != AT_CLAW)
+            mwep = 0;
+
+        if (shade_miss(magr, mdef, mwep, FALSE, TRUE)) {
+            mhm->damage = 0;
+        } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
+            /* [no 'kicking boots' check needed; monsters with kick attacks
+               can't wear boots and monsters that wear boots don't kick] */
+            mhm->damage = 0;
+        } else if (mwep) { /* non-Null 'mwep' implies AT_WEAP || AT_CLAW */
+            struct obj *marmg;
+
+            if (mwep->otyp == CORPSE
+                && touch_petrifies(&mons[mwep->corpsenm])) {
+                do_stone_mon(magr, mattk, mdef, mhm);
+                if (mhm->done)
+                    return;
+            }
+
+            mhm->damage += dmgval(mwep, mdef);
+            if ((marmg = which_armor(magr, W_ARMG)) != 0
+                && marmg->otyp == GAUNTLETS_OF_POWER)
+                mhm->damage += rn1(4, 3); /* 3..6 */
+            if (mhm->damage < 1) /* is this necessary?  mhitu.c has it... */
+                mhm->damage = 1;
+            if (mwep->oartifact) {
+                /* when magr's weapon is an artifact, caller suppressed its
+                   usual 'hit' message in case artifact_hit() delivers one;
+                   now we'll know and might need to deliver skipped message
+                   (note: if there's no message there'll be no auxilliary
+                   damage so the message here isn't coming too late) */
+                if (!artifact_hit(magr, mdef, mwep, &mhm->damage, mhm->dieroll)) {
+                    if (g.vis)
+                        pline("%s hits %s.", Monnam(magr),
+                              mon_nam_too(mdef, magr));
+                }
+                /* artifact_hit updates 'tmp' but doesn't inflict any
+                   damage; however, it might cause carried items to be
+                   destroyed and they might do so */
+                if (DEADMONSTER(mdef)) {
+                    mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                    mhm->done = TRUE;
+                    return;
+                }
+            }
+            if (mhm->damage)
+                rustm(mdef, mwep);
+        } else if (pa == &mons[PM_PURPLE_WORM] && pd == &mons[PM_SHRIEKER]) {
+            /* hack to enhance mm_aggression(); we don't want purple
+               worm's bite attack to kill a shrieker because then it
+               won't swallow the corpse; but if the target survives,
+               the subsequent engulf attack should accomplish that */
+            if (mhm->damage >= mdef->mhp && mdef->mhp > 1)
+                mhm->damage = mdef->mhp - 1;
+        }
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3396,6 +3648,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
+    mhm.specialdmg = specialdmg;
 
     armpro = magic_negation(mdef);
     /* since hero can't be cancelled, only defender's armor applies */
@@ -3426,36 +3679,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     case AD_HEAL: /* likewise */
     case AD_PHYS:
  physical:
-        if (pd == &mons[PM_SHADE]) {
-            mhm.damage = 0;
-            if (!specialdmg)
-                impossible("bad shade attack function flow?");
-        }
-        mhm.damage += specialdmg;
-
-        if (mattk->aatyp == AT_WEAP) {
-            /* hmonas() uses known_hitum() to deal physical damage,
-               then also damageum() for non-AD_PHYS; don't inflict
-               extra physical damage for unusual damage types */
-            mhm.damage = 0;
-        } else if (mattk->aatyp == AT_KICK
-                   || mattk->aatyp == AT_CLAW
-                   || mattk->aatyp == AT_TUCH
-                   || mattk->aatyp == AT_HUGS) {
-            if (thick_skinned(pd))
-                mhm.damage = (mattk->aatyp == AT_KICK) ? 0 : (mhm.damage + 1) / 2;
-            /* add ring(s) of increase damage */
-            if (u.udaminc > 0) {
-                /* applies even if damage was 0 */
-                mhm.damage += u.udaminc;
-            } else if (mhm.damage > 0) {
-                /* ring(s) might be negative; avoid converting
-                   0 to non-0 or positive to non-positive */
-                mhm.damage += u.udaminc;
-                if (mhm.damage < 1)
-                    mhm.damage = 1;
-            }
-        }
+        mhitm_ad_phys(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_FIRE:
         mhitm_ad_fire(&g.youmonst, mattk, mdef, &mhm);

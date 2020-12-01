@@ -864,6 +864,8 @@ int dieroll;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
+    mhm.specialdmg = 0;
+    mhm.dieroll = dieroll;
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
          || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))
@@ -965,56 +967,9 @@ int dieroll;
     case AD_HEAL:
     case AD_PHYS:
  physical:
-        if (mattk->aatyp != AT_WEAP && mattk->aatyp != AT_CLAW)
-            mwep = 0;
-
-        if (shade_miss(magr, mdef, mwep, FALSE, TRUE)) {
-            mhm.damage = 0;
-        } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
-            /* [no 'kicking boots' check needed; monsters with kick attacks
-               can't wear boots and monsters that wear boots don't kick] */
-            mhm.damage = 0;
-        } else if (mwep) { /* non-Null 'mwep' implies AT_WEAP || AT_CLAW */
-            struct obj *marmg;
-
-            if (mwep->otyp == CORPSE
-                && touch_petrifies(&mons[mwep->corpsenm]))
-                goto do_stone;
-
-            mhm.damage += dmgval(mwep, mdef);
-            if ((marmg = which_armor(magr, W_ARMG)) != 0
-                && marmg->otyp == GAUNTLETS_OF_POWER)
-                mhm.damage += rn1(4, 3); /* 3..6 */
-            if (mhm.damage < 1) /* is this necessary?  mhitu.c has it... */
-                mhm.damage = 1;
-            if (mwep->oartifact) {
-                /* when magr's weapon is an artifact, caller suppressed its
-                   usual 'hit' message in case artifact_hit() delivers one;
-                   now we'll know and might need to deliver skipped message
-                   (note: if there's no message there'll be no auxilliary
-                   damage so the message here isn't coming too late) */
-                if (!artifact_hit(magr, mdef, mwep, &mhm.damage, dieroll)) {
-                    if (g.vis)
-                        pline("%s hits %s.", Monnam(magr),
-                              mon_nam_too(mdef, magr));
-                }
-                /* artifact_hit updates 'tmp' but doesn't inflict any
-                   damage; however, it might cause carried items to be
-                   destroyed and they might do so */
-                if (DEADMONSTER(mdef))
-                    return (MM_DEF_DIED
-                            | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-            }
-            if (mhm.damage)
-                rustm(mdef, mwep);
-        } else if (pa == &mons[PM_PURPLE_WORM] && pd == &mons[PM_SHRIEKER]) {
-            /* hack to enhance mm_aggression(); we don't want purple
-               worm's bite attack to kill a shrieker because then it
-               won't swallow the corpse; but if the target survives,
-               the subsequent engulf attack should accomplish that */
-            if (mhm.damage >= mdef->mhp && mdef->mhp > 1)
-                mhm.damage = mdef->mhp - 1;
-        }
+        mhitm_ad_phys(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_FIRE:
         mhitm_ad_fire(magr, mattk, mdef, &mhm);
@@ -1054,27 +1009,9 @@ int dieroll;
     case AD_STON:
         if (magr->mcan)
             break;
- do_stone:
-        /* may die from the acid if it eats a stone-curing corpse */
-        if (munstone(mdef, FALSE))
-            goto post_stone;
-        if (poly_when_stoned(pd)) {
-            mon_to_stone(mdef);
-            mhm.damage = 0;
-            break;
-        }
-        if (!resists_ston(mdef)) {
-            if (g.vis && canseemon(mdef))
-                pline("%s turns to stone!", Monnam(mdef));
-            monstone(mdef);
- post_stone:
-            if (!DEADMONSTER(mdef))
-                return 0;
-            else if (mdef->mtame && !g.vis)
-                You(brief_feeling, "peculiarly sad");
-            return (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-        }
-        mhm.damage = (mattk->adtyp == AD_STON ? 0 : 1);
+        do_stone_mon(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_TLPT:
         mhitm_ad_tlpt(magr, mattk, mdef, &mhm);

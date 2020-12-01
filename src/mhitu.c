@@ -974,6 +974,7 @@ register struct attack *mattk;
     struct mhitm_data mhm;
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
+    mhm.specialdmg = 0;
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
@@ -1016,79 +1017,9 @@ register struct attack *mattk;
     /*  Now, adjust damages via resistances or specific attacks */
     switch (mattk->adtyp) {
     case AD_PHYS:
-        if (mattk->aatyp == AT_HUGS && !sticks(g.youmonst.data)) {
-            if (!u.ustuck && rn2(2)) {
-                if (u_slip_free(mtmp, mattk)) {
-                    mhm.damage = 0;
-                } else {
-                    set_ustuck(mtmp);
-                    pline("%s grabs you!", Monnam(mtmp));
-                }
-            } else if (u.ustuck == mtmp) {
-                exercise(A_STR, FALSE);
-                You("are being %s.", (mtmp->data == &mons[PM_ROPE_GOLEM])
-                                         ? "choked"
-                                         : "crushed");
-            }
-        } else { /* hand to hand weapon */
-            struct obj *otmp = mon_currwep;
-
-            if (mattk->aatyp == AT_WEAP && otmp) {
-                struct obj *marmg;
-                int tmp;
-
-                if (otmp->otyp == CORPSE
-                    && touch_petrifies(&mons[otmp->corpsenm])) {
-                    mhm.damage = 1;
-                    pline("%s hits you with the %s corpse.", Monnam(mtmp),
-                          mons[otmp->corpsenm].mname);
-                    if (!Stoned)
-                        goto do_stone;
-                }
-                mhm.damage += dmgval(otmp, &g.youmonst);
-                if ((marmg = which_armor(mtmp, W_ARMG)) != 0
-                    && marmg->otyp == GAUNTLETS_OF_POWER)
-                    mhm.damage += rn1(4, 3); /* 3..6 */
-                if (mhm.damage <= 0)
-                    mhm.damage = 1;
-                if (!(otmp->oartifact && artifact_hit(mtmp, &g.youmonst, otmp,
-                                                      &mhm.damage, g.mhitu_dieroll)))
-                    hitmsg(mtmp, mattk);
-                if (!mhm.damage)
-                    break;
-                if (objects[otmp->otyp].oc_material == SILVER
-                    && Hate_silver) {
-                    pline_The("silver sears your flesh!");
-                    exercise(A_CON, FALSE);
-                }
-                /* this redundancy necessary because you have
-                   to take the damage _before_ being cloned;
-                   need to have at least 2 hp left to split */
-                tmp = mhm.damage;
-                if (u.uac < 0)
-                    tmp -= rnd(-u.uac);
-                if (tmp < 1)
-                    tmp = 1;
-                if (u.mh - tmp > 1
-                    && (objects[otmp->otyp].oc_material == IRON
-                        /* relevant 'metal' objects are scalpel and tsurugi */
-                        || objects[otmp->otyp].oc_material == METAL)
-                    && (u.umonnum == PM_BLACK_PUDDING
-                        || u.umonnum == PM_BROWN_PUDDING)) {
-                    if (tmp > 1)
-                        exercise(A_STR, FALSE);
-                    /* inflict damage now; we know it can't be fatal */
-                    u.mh -= tmp;
-                    g.context.botl = 1;
-                    mhm.damage = 0; /* don't inflict more damage below */
-                    if (cloneu())
-                        You("divide as %s hits you!", mon_nam(mtmp));
-                }
-                rustm(&g.youmonst, otmp);
-            } else if (mattk->aatyp != AT_TUCH || mhm.damage != 0
-                       || mtmp != u.ustuck)
-                hitmsg(mtmp, mattk);
-        }
+        mhitm_ad_phys(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DISE:
         hitmsg(mtmp, mattk);
@@ -1193,22 +1124,8 @@ register struct attack *mattk;
                     You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
                 if (!rn2(10)
                     || (flags.moonphase == NEW_MOON && !have_lizard())) {
- do_stone:
-                    if (!Stoned && !Stone_resistance
-                        && !(poly_when_stoned(g.youmonst.data)
-                             && polymon(PM_STONE_GOLEM))) {
-                        int kformat = KILLED_BY_AN;
-                        const char *kname = mtmp->data->mname;
-
-                        if (mtmp->data->geno & G_UNIQ) {
-                            if (!type_is_pname(mtmp->data))
-                                kname = the(kname);
-                            kformat = KILLED_BY;
-                        }
-                        make_stoned(5L, (char *) 0, kformat, kname);
-                        return 1;
-                        /* done_in_by(mtmp, STONING); */
-                    }
+                    if (do_stone_u(mtmp))
+                        return MM_HIT;
                 }
             }
         }
