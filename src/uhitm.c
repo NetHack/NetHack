@@ -3656,7 +3656,7 @@ struct mhitm_data *mhm;
 
     if (magr == &g.youmonst) {
         /* uhitm */
-        mhitm_ad_phys(&g.youmonst, mattk, mdef, mhm);
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
         if (mhm->done)
             return;
     } else if (mdef == &g.youmonst) {
@@ -3674,7 +3674,98 @@ struct mhitm_data *mhm;
         }
     } else {
         /* mhitm */
-        mhitm_ad_phys(&g.youmonst, mattk, mdef, mhm);
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
+void
+mhitm_ad_heal(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+
+        /* a cancelled nurse is just an ordinary monster,
+         * nurses don't heal those that cause petrification */
+        if (magr->mcan || (Upolyd && touch_petrifies(pd))) {
+            hitmsg(magr, mattk);
+            return;
+        }
+        /* weapon check should match the one in sounds.c for MS_NURSE */
+        if (!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
+            && !uarmu && !uarm && !uarmc
+            && !uarms && !uarmg && !uarmf && !uarmh) {
+            boolean goaway = FALSE;
+
+            pline("%s hits!  (I hope you don't mind.)", Monnam(magr));
+            if (Upolyd) {
+                u.mh += rnd(7);
+                if (!rn2(7)) {
+                    /* no upper limit necessary; effect is temporary */
+                    u.mhmax++;
+                    if (!rn2(13))
+                        goaway = TRUE;
+                }
+                if (u.mh > u.mhmax)
+                    u.mh = u.mhmax;
+            } else {
+                u.uhp += rnd(7);
+                if (!rn2(7)) {
+                    /* hard upper limit via nurse care: 25 * ulevel */
+                    if (u.uhpmax < 5 * u.ulevel + d(2 * u.ulevel, 10))
+                        u.uhpmax++;
+                    if (!rn2(13))
+                        goaway = TRUE;
+                }
+                if (u.uhp > u.uhpmax)
+                    u.uhp = u.uhpmax;
+            }
+            if (!rn2(3))
+                exercise(A_STR, TRUE);
+            if (!rn2(3))
+                exercise(A_CON, TRUE);
+            if (Sick)
+                make_sick(0L, (char *) 0, FALSE, SICK_ALL);
+            g.context.botl = 1;
+            if (goaway) {
+                mongone(magr);
+                mhm->done = TRUE;
+                mhm->hitflags = MM_DEF_DIED; /* return 2??? */
+                return;
+            } else if (!rn2(33)) {
+                if (!tele_restrict(magr))
+                    (void) rloc(magr, TRUE);
+                monflee(magr, d(3, 6), TRUE, FALSE);
+                mhm->done = TRUE;
+                mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+                return;
+            }
+            mhm->damage = 0;
+        } else {
+            if (Role_if(PM_HEALER)) {
+                if (!Deaf && !(g.moves % 5))
+                    verbalize("Doc, I can't help you unless you cooperate.");
+                mhm->damage = 0;
+            } else
+                hitmsg(magr, mattk);
+        }
+    } else {
+        /* mhitm */
+        mhitm_ad_phys(magr, mattk, mdef, mhm);
         if (mhm->done)
             return;
     }
@@ -3760,7 +3851,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         if (mhm.done)
             return mhm.hitflags;
         break;
-    case AD_HEAL: /* likewise */
+    case AD_HEAL:
+        mhitm_ad_heal(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_PHYS:
  physical:
         mhitm_ad_phys(&g.youmonst, mattk, mdef, &mhm);

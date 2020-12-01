@@ -1229,66 +1229,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_HEAL:
-        /* a cancelled nurse is just an ordinary monster,
-         * nurses don't heal those that cause petrification */
-        if (mtmp->mcan || (Upolyd && touch_petrifies(g.youmonst.data))) {
-            hitmsg(mtmp, mattk);
-            break;
-        }
-        /* weapon check should match the one in sounds.c for MS_NURSE */
-        if (!(uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep)))
-            && !uarmu && !uarm && !uarmc
-            && !uarms && !uarmg && !uarmf && !uarmh) {
-            boolean goaway = FALSE;
-
-            pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
-            if (Upolyd) {
-                u.mh += rnd(7);
-                if (!rn2(7)) {
-                    /* no upper limit necessary; effect is temporary */
-                    u.mhmax++;
-                    if (!rn2(13))
-                        goaway = TRUE;
-                }
-                if (u.mh > u.mhmax)
-                    u.mh = u.mhmax;
-            } else {
-                u.uhp += rnd(7);
-                if (!rn2(7)) {
-                    /* hard upper limit via nurse care: 25 * ulevel */
-                    if (u.uhpmax < 5 * u.ulevel + d(2 * u.ulevel, 10))
-                        u.uhpmax++;
-                    if (!rn2(13))
-                        goaway = TRUE;
-                }
-                if (u.uhp > u.uhpmax)
-                    u.uhp = u.uhpmax;
-            }
-            if (!rn2(3))
-                exercise(A_STR, TRUE);
-            if (!rn2(3))
-                exercise(A_CON, TRUE);
-            if (Sick)
-                make_sick(0L, (char *) 0, FALSE, SICK_ALL);
-            g.context.botl = 1;
-            if (goaway) {
-                mongone(mtmp);
-                return 2;
-            } else if (!rn2(33)) {
-                if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, TRUE);
-                monflee(mtmp, d(3, 6), TRUE, FALSE);
-                return 3;
-            }
-            mhm.damage = 0;
-        } else {
-            if (Role_if(PM_HEALER)) {
-                if (!Deaf && !(g.moves % 5))
-                    verbalize("Doc, I can't help you unless you cooperate.");
-                mhm.damage = 0;
-            } else
-                hitmsg(mtmp, mattk);
-        }
+        mhitm_ad_heal(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_CURS:
         mhitm_ad_curs(mtmp, mattk, &g.youmonst, &mhm);
