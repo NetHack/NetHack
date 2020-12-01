@@ -4149,6 +4149,40 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_ssex(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhitm_ad_sedu(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        if (SYSOPT_SEDUCE) {
+            if (could_seduce(magr, mdef, mattk) == 1 && !magr->mcan)
+                if (doseduce(magr)) {
+                    mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+                    mhm->done = TRUE;
+                    return;
+                }
+            return;
+        }
+        mhitm_ad_sedu(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    } else {
+        /* mhitm */
+        mhitm_ad_sedu(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -4262,6 +4296,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_SSEX:
+        mhitm_ad_ssex(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_SITM:
     case AD_SEDU:
         mhitm_ad_sedu(&g.youmonst, mattk, mdef, &mhm);

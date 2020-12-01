@@ -1020,6 +1020,10 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_SSEX:
+        mhitm_ad_ssex(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
         mhitm_ad_sedu(magr, mattk, mdef, &mhm);

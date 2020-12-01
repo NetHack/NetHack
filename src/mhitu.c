@@ -1105,13 +1105,10 @@ register struct attack *mattk;
         break;
 
     case AD_SSEX:
-        if (SYSOPT_SEDUCE) {
-            if (could_seduce(mtmp, &g.youmonst, mattk) == 1 && !mtmp->mcan)
-                if (doseduce(mtmp))
-                    return 3;
-            break;
-        }
-        /*FALLTHRU*/
+        mhitm_ad_ssex(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
+        break;
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
         mhitm_ad_sedu(mtmp, mattk, &g.youmonst, &mhm);
