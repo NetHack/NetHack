@@ -1757,8 +1757,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         erode_armor(mdef, ERODE_CORRODE);
@@ -1842,8 +1840,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -1882,8 +1878,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -2083,8 +2077,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -2150,8 +2142,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -2223,8 +2213,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         if (resists_acid(mdef))
@@ -2340,8 +2328,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -2442,8 +2428,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
@@ -2574,7 +2558,6 @@ struct monst *mdef;
 struct mhitm_data *mhm;
 {
     struct permonst *pa = magr->data;
-    struct permonst *pd = mdef->data;
 
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -2858,8 +2841,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -2914,8 +2895,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3047,8 +3026,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         /* there's no msomearmor() function, so just do damage */
@@ -3100,8 +3077,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3146,8 +3121,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         if (!mdef->mconf) {
@@ -3189,8 +3162,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3208,9 +3179,6 @@ struct mhitm_data *mhm;
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
     } else {
         /* mhitm */
-        int armpro = magic_negation(mdef);
-        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
-
         if (!magr->mcan && mhm->damage < mdef->mhp)
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
     }
@@ -3223,8 +3191,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         mhm->damage = 0;
@@ -3334,9 +3300,6 @@ struct mhitm_data *mhm;
         mhm->damage = 0;
     } else {
         /* mhitm */
-        int armpro = magic_negation(mdef);
-        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
-
         if (!magr->mcan && haseyes(pd) && mdef->mcansee) {
             if (g.vis && canseemon(mdef))
                 pline("%s looks %sconfused.", Monnam(mdef),
@@ -3377,7 +3340,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pa = magr->data;
     struct permonst *pd = mdef->data;
 
     /* may die from the acid if it eats a stone-curing corpse */
@@ -3419,10 +3381,6 @@ struct mhitm_data *mhm;
 
     if (magr == &g.youmonst) {
         /* uhitm */
-        int armpro = magic_negation(mdef);
-        /* since hero can't be cancelled, only defender's armor applies */
-        boolean negated = !(rn2(10) >= 3 * armpro);
-
         if (pd == &mons[PM_SHADE]) {
             mhm->damage = 0;
             if (!mhm->specialdmg)
@@ -3455,9 +3413,6 @@ struct mhitm_data *mhm;
         }
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        int armpro = magic_negation(mdef);
-        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
-
         if (mattk->aatyp == AT_HUGS && !sticks(pd)) {
             if (!u.ustuck && rn2(2)) {
                 if (u_slip_free(magr, mattk)) {
@@ -3538,8 +3493,6 @@ struct mhitm_data *mhm;
         }
     } else {
         /* mhitm */
-        int armpro = magic_negation(mdef);
-        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
         struct obj *mwep = MON_WEP(magr);
 
         if (mattk->aatyp != AT_WEAP && mattk->aatyp != AT_CLAW)
@@ -3607,8 +3560,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         if (!munstone(mdef, TRUE))
@@ -3652,7 +3603,6 @@ struct monst *mdef;
 struct mhitm_data *mhm;
 {
     struct permonst *pa = magr->data;
-    struct permonst *pd = mdef->data;
 
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -3696,9 +3646,6 @@ struct mhitm_data *mhm;
             return;
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        int armpro = magic_negation(mdef);
-        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
-
         /* a cancelled nurse is just an ordinary monster,
          * nurses don't heal those that cause petrification */
         if (magr->mcan || (Upolyd && touch_petrifies(pd))) {
@@ -3817,8 +3764,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
 #if 0
@@ -3832,9 +3777,6 @@ struct mhitm_data *mhm;
             return;
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        int armpro = magic_negation(mdef);
-        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
-
         long side = rn2(2) ? RIGHT_SIDE : LEFT_SIDE;
         const char *sidestr = (side == RIGHT_SIDE) ? "right" : "left",
                    *Monst_name = Monnam(magr), *leg = body_part(LEG);
@@ -3966,8 +3908,6 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
-    struct permonst *pd = mdef->data;
-
     if (magr == &g.youmonst) {
         /* uhitm */
         mhm->damage = 0;
@@ -3993,7 +3933,6 @@ struct monst *mdef;
 struct mhitm_data *mhm;
 {
     struct permonst *pa = magr->data;
-    struct permonst *pd = mdef->data;
 
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -4017,7 +3956,6 @@ struct monst *mdef;
 struct mhitm_data *mhm;
 {
     struct permonst *pa = magr->data;
-    struct permonst *pd = mdef->data;
 
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -4025,8 +3963,6 @@ struct mhitm_data *mhm;
         mhm->damage = 0;
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        int armpro = magic_negation(mdef);
-        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
         char buf[BUFSZ];
 
         if (is_animal(magr->data)) {
@@ -4087,8 +4023,6 @@ struct mhitm_data *mhm;
         }
     } else {
         /* mhitm */
-        int armpro = magic_negation(mdef);
-        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
         struct obj *obj;
 
         if (magr->mcan)
@@ -4244,7 +4178,6 @@ register struct monst *mdef;
 register struct attack *mattk;
 int specialdmg; /* blessed and/or silver bonus against various things */
 {
-    register struct permonst *pd = mdef->data;
     int armpro;
     boolean negated;
     struct mhitm_data mhm;

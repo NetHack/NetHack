@@ -964,9 +964,8 @@ register struct monst *mtmp;
 register struct attack *mattk;
 {
     struct permonst *mdat = mtmp->data;
-    int uncancelled, ptmp;
-    int armpro, tmphp;
-    char buf[BUFSZ];
+    int uncancelled;
+    int armpro;
     struct permonst *olduasmon = g.youmonst.data;
     int res;
     struct mhitm_data mhm;

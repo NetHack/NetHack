@@ -856,10 +856,8 @@ struct attack *mattk;
 struct obj *mwep;
 int dieroll;
 {
-    struct obj *obj;
-    char buf[BUFSZ];
     struct permonst *pa = magr->data, *pd = mdef->data;
-    int armpro, num;
+    int armpro;
     boolean cancelled;
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
