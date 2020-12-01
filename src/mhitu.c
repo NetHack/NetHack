@@ -1022,9 +1022,9 @@ register struct attack *mattk;
             return mhm.hitflags;
         break;
     case AD_DISE:
-        hitmsg(mtmp, mattk);
-        if (!diseasemu(mdat))
-            mhm.damage = 0;
+        mhitm_ad_dise(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_FIRE:
         mhitm_ad_fire(mtmp, mattk, &g.youmonst, &mhm);

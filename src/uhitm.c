@@ -3985,6 +3985,30 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_dise(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!diseasemu(pa))
+            mhm->damage = 0;
+    } else {
+        /* mhitm */
+        mhm->damage = 0;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
