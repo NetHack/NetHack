@@ -267,6 +267,7 @@ boolean quietly;
  *       /  /  /
  *      x  x  x
  *
+ *      0x8     MM_AGR_DONE
  *      0x4     MM_AGR_DIED
  *      0x2     MM_DEF_DIED
  *      0x1     MM_HIT
@@ -367,7 +368,7 @@ register struct monst *magr, *mdef;
         case AT_WEAP: /* "hand to hand" attacks */
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1) {
                 /* D: Do a ranged attack here! */
-                strike = thrwmm(magr, mdef);
+                strike = (thrwmm(magr, mdef) == MM_MISS) ? 0 : 1;
                 if (strike)
                     /* don't really know if we hit or not; pretend we did */
                     res[i] |= MM_HIT;
@@ -380,7 +381,7 @@ register struct monst *magr, *mdef;
             if (magr->weapon_check == NEED_WEAPON || !MON_WEP(magr)) {
                 magr->weapon_check = NEED_HTH_WEAPON;
                 if (mon_wield_item(magr) != 0)
-                    return 0;
+                    return MM_MISS;
             }
             possibly_unwield(magr, FALSE);
             if ((mwep = MON_WEP(magr)) != 0) {
@@ -489,7 +490,7 @@ register struct monst *magr, *mdef;
 
         case AT_BREA:
             if (!monnear(magr, mdef->mx, mdef->my)) {
-                strike = breamm(magr, mattk, mdef);
+                strike = (breamm(magr, mattk, mdef) == MM_MISS) ? 0 : 1;
 
                 /* We don't really know if we hit or not; pretend we did. */
                 if (strike)
@@ -505,7 +506,7 @@ register struct monst *magr, *mdef;
 
         case AT_SPIT:
             if (!monnear(magr, mdef->mx, mdef->my)) {
-                strike = spitmm(magr, mattk, mdef);
+                strike = (spitmm(magr, mattk, mdef) == MM_MISS) ? 0 : 1;
 
                 /* We don't really know if we hit or not; pretend we did. */
                 if (strike)
@@ -1107,9 +1108,9 @@ struct obj *otemp;
  * handled above.  Returns same values as mattackm.
  */
 static int
-passivemm(magr, mdef, mhit, mdead, mwep)
+passivemm(magr, mdef, mhitb, mdead, mwep)
 register struct monst *magr, *mdef;
-boolean mhit;
+boolean mhitb;
 int mdead;
 struct obj *mwep;
 {
@@ -1117,6 +1118,7 @@ struct obj *mwep;
     register struct permonst *madat = magr->data;
     char buf[BUFSZ];
     int i, tmp;
+    int mhit = mhitb ? MM_HIT : MM_MISS;
 
     for (i = 0;; i++) {
         if (i >= NATTK)
@@ -1134,7 +1136,7 @@ struct obj *mwep;
     /* These affect the enemy even if defender killed */
     switch (mddat->mattk[i].adtyp) {
     case AD_ACID:
-        if (mhit && !rn2(2)) {
+        if (mhitb && !rn2(2)) {
             Strcpy(buf, Monnam(magr));
             if (canseemon(magr))
                 pline("%s is splashed by %s %s!", buf,
@@ -1152,7 +1154,7 @@ struct obj *mwep;
             acid_damage(MON_WEP(magr));
         goto assess_dmg;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
-        if (mhit && !mdef->mcan && mwep) {
+        if (mhitb && !mdef->mcan && mwep) {
             (void) drain_item(mwep, FALSE);
             /* No message */
         }

@@ -285,7 +285,7 @@ struct attack *alt_attk_buf;
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
        already hit, switch to a stun attack for the second */
-    if (indx > 0 && prev_result[indx - 1] > 0
+    if (indx > 0 && prev_result[indx - 1] > MM_MISS
         && (attk->adtyp == AD_DISE || attk->adtyp == AD_PEST
             || attk->adtyp == AD_FAMN)
         && attk->adtyp == mptr->mattk[indx - 1].adtyp) {
@@ -622,7 +622,7 @@ register struct monst *mtmp;
     g.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
 
     for (i = 0; i < NATTK; i++) {
-        sum[i] = 0;
+        sum[i] = MM_MISS;
         if (i > 0 && foundyou /* previous attack might have moved hero */
             && (mtmp->mux != u.ux || mtmp->muy != u.uy))
             continue; /* fill in sum[] with 'miss' but skip other actions */
@@ -763,15 +763,15 @@ register struct monst *mtmp;
         if (g.context.botl)
             bot();
         /* give player a chance of waking up before dying -kaa */
-        if (sum[i] == 1) { /* successful attack */
+        if (sum[i] == MM_HIT) { /* successful attack */
             if (u.usleep && u.usleep < g.monstermoves && !rn2(10)) {
                 g.multi = -1;
                 g.nomovemsg = "The combat suddenly awakens you.";
             }
         }
-        if (sum[i] == 2)
+        if ((sum[i] & MM_AGR_DIED))
             return 1; /* attacker dead */
-        if (sum[i] == 3)
+        if ((sum[i] & MM_AGR_DONE))
             break; /* attacker teleported, no more attacks */
         /* sum[i] == 0: unsuccessful attack */
     }
@@ -956,10 +956,8 @@ struct monst *mon;
 
 /*
  * hitmu: monster hits you
- *        returns 2 if monster dies (e.g. "yellow light"), 1 otherwise
- *        3 if the monster lives but teleported/paralyzed, so it can't keep
- *             attacking you
- */
+ * returns MM_ flags
+*/
 static int
 hitmu(mtmp, mattk)
 register struct monst *mtmp;
@@ -1083,7 +1081,7 @@ register struct attack *mattk;
     if (mhm.damage)
         res = passiveum(olduasmon, mtmp, mattk);
     else
-        res = 1;
+        res = MM_HIT;
     stop_occupation();
     return res;
 }
@@ -1123,9 +1121,9 @@ struct attack *mattk;
         int omx = mtmp->mx, omy = mtmp->my;
 
         if (!engulf_target(mtmp, &g.youmonst))
-            return 0;
+            return MM_MISS;
         if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
-            return 0;
+            return MM_MISS;
 
         if (Punished)
             unplacebc(); /* ball&chain go away */
@@ -1176,7 +1174,7 @@ struct attack *mattk;
             if (Punished)
                 placebc();
             set_ustuck((struct monst *) 0);
-            return (!DEADMONSTER(mtmp)) ? 0 : 2;
+            return (!DEADMONSTER(mtmp)) ? MM_MISS : MM_AGR_DIED;
         }
 
         display_nhwindow(WIN_MESSAGE, FALSE);
@@ -1207,7 +1205,7 @@ struct attack *mattk;
     }
 
     if (mtmp != u.ustuck)
-        return 0;
+        return MM_MISS;
     if (Punished) {
         /* ball&chain are in limbo while swallowed; update their internal
            location to be at swallower's spot */
@@ -1362,7 +1360,7 @@ struct attack *mattk;
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
     }
-    return 1;
+    return MM_HIT;
 }
 
 /* monster explodes in your face */
@@ -1375,7 +1373,7 @@ boolean ufound;
     boolean physical_damage = TRUE, kill_agr = TRUE;
 
     if (mtmp->mcan)
-        return 0;
+        return MM_MISS;
 
     if (!ufound) {
         pline("%s explodes at a spot in %s!",
@@ -1467,7 +1465,7 @@ boolean ufound;
     if (kill_agr)
         mondead(mtmp);
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
-    return (!DEADMONSTER(mtmp)) ? 0 : 2;
+    return (!DEADMONSTER(mtmp)) ? MM_MISS : MM_AGR_DIED;
 }
 
 /* monster gazes at you */
@@ -1535,7 +1533,7 @@ struct attack *mattk;
 
             if (!DEADMONSTER(mtmp))
                 break;
-            return 2;
+            return MM_AGR_DIED;
         }
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
             && !Stone_resistance) {
@@ -1685,7 +1683,7 @@ struct attack *mattk;
                                      : (!rn2(2) ? "a bit " : "somewhat "),
               reactions[react]);
     }
-    return 0;
+    return MM_MISS;
 }
 
 /* mtmp hits you for n points damage */
@@ -2141,7 +2139,7 @@ struct attack *mattk;
      */
     for (i = 0; !oldu_mattk; i++) {
         if (i >= NATTK)
-            return 1;
+            return MM_HIT;
         if (olduasmon->mattk[i].aatyp == AT_NONE
             || olduasmon->mattk[i].aatyp == AT_BOOM)
             oldu_mattk = &olduasmon->mattk[i];
@@ -2194,10 +2192,10 @@ struct attack *mattk;
             g.stoned = 1;
             xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp))
-                return 1;
-            return 2;
+                return MM_HIT;
+            return MM_AGR_DIED;
         }
-        return 1;
+        return MM_HIT;
     }
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
         if (mon_currwep) {
@@ -2206,12 +2204,12 @@ struct attack *mattk;
             (void) drain_item(mon_currwep, TRUE);
             /* No message */
         }
-        return 1;
+        return MM_HIT;
     default:
         break;
     }
     if (!Upolyd)
-        return 1;
+        return MM_HIT;
 
     /* These affect the enemy only if you are still a monster */
     if (rn2(3))
@@ -2241,15 +2239,15 @@ struct attack *mattk;
                             return 1;
                         pline("%s is frozen by your gaze!", Monnam(mtmp));
                         paralyze_monst(mtmp, tmp);
-                        return 3;
+                        return MM_AGR_DONE;
                     }
                 }
             } else { /* gelatinous cube */
                 pline("%s is frozen by you.", Monnam(mtmp));
                 paralyze_monst(mtmp, tmp);
-                return 3;
+                return MM_AGR_DONE;
             }
-            return 1;
+            return MM_HIT;
         case AD_COLD: /* Brown mold or blue jelly */
             if (resists_cold(mtmp)) {
                 shieldeff(mtmp->mx, mtmp->my);
@@ -2305,10 +2303,10 @@ struct attack *mattk;
         pline("%s dies!", Monnam(mtmp));
         xkilled(mtmp, XKILL_NOMSG);
         if (!DEADMONSTER(mtmp))
-            return 1;
-        return 2;
+            return MM_HIT;
+        return MM_AGR_DIED;
     }
-    return 1;
+    return MM_HIT;
 }
 
 struct monst *
