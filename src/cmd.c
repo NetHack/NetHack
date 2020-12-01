@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1605779800 2020/11/19 09:56:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1606781767 2020/12/01 00:16:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1874,15 +1874,10 @@ struct ext_func_tab extcmdlist[] = {
     { ARMOR_SYM, "seearmor", "show the armor currently worn",
             doprarm, IFBURIED },
     { GOLD_SYM, "seegold", "count your gold", doprgold, IFBURIED },
-    { '\0', "seenv", "show seen vectors",
-            wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { RING_SYM, "seerings", "show the ring(s) currently worn",
             doprring, IFBURIED },
-    { SPBOOK_SYM, "seespells", "list and reorder known spells",
-            dovspell, IFBURIED },
     { TOOL_SYM, "seetools", "show the tools currently in use",
             doprtool, IFBURIED },
-    { '^', "seetrap", "show the type of adjacent trap", doidtrap, IFBURIED },
     { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
             doprwep, IFBURIED },
     { '!', "shell", "do a shell escape",
@@ -1891,6 +1886,9 @@ struct ext_func_tab extcmdlist[] = {
                        | CMD_NOT_AVAILABLE
 #endif /* SHELL */
     },
+    { SPBOOK_SYM, "showspells", "list and reorder known spells",
+            dovspell, IFBURIED },
+    { '^', "showtrap", "show the type of adjacent trap", doidtrap, IFBURIED },
     { M('s'), "sit", "sit down", dosit, AUTOCOMPLETE },
     { '\0', "stats", "show memory statistics",
             wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
@@ -1963,6 +1961,8 @@ struct ext_func_tab extcmdlist[] = {
             wiz_map, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizrumorcheck", "verify rumor boundaries",
             wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    { '\0', "wizseenv", "show map locations' seen vectors",
+            wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizsmell", "smell monster",
             wiz_smell, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "wizwhere", "show locations of special levels",

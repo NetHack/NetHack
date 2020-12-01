@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ $NHDT-Date: 1606328499 2020/11/25 18:21:39 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ $NHDT-Date: 1606781766 2020/12/01 00:16:06 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 25, 2020
+.ds f2 "November 30, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1005,6 +1005,7 @@ Suspend the game
 .\" .UX: print "UNIX" now and a trademark footnote at bottom of current page;
 .\"  2nd arg (literal '(') _precedes_ it, 1st arg (quoted string) follows it
 .UX " versions with job control only)." (
+See \(lq#suspend\(rq below for more details.
 .lp :
 Look at what is here.
 .lp ;
@@ -1058,6 +1059,7 @@ Show what types of objects have been discovered.
 Show discovered types for one class of objects.
 .lp !
 Escape to a shell.
+See \(lq#shell\(rq below for more details.
 .lp #
 Perform an extended command.
 .lp ""
@@ -1388,28 +1390,28 @@ Default key is \(oq[\(cq.
 .lp "#seegold "
 Count your gold.
 Default key is \(oq$\(cq.
-.lp "#seenv   "
-Show seen vectors.
-Autocompletes.
-Debug mode only.
 .lp #seerings
 Show the ring(s) currently worn.
 Default key is \(oq=\(cq.
-.lp #seespells
-List and reorder known spells.
-Default key is \(oq+\(cq.
 .lp #seetools
 Show the tools currently in use.
 Default key is \(oq(\(cq.
-.lp "#seetrap "
-Show the type of an adjacent trap.
-Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp #seeweapon
 Show the weapon currently wielded.
 Default key is \(oq)\(cq.
 .lp "#shell   "
-Do a shell escape.
+Do a shell escape, switching from NetHack to a subprocess.
+Can be disabled at the time the program is built.
+When enabled, access for specific users can be controlled by the system
+configuration file.
+Use the shell command \(oq\f(CRexit\fP\(cq to return to the game.
 Default key is \(oq!\(cq.
+.lp #showspells
+List and reorder known spells.
+Default key is \(oq+\(cq.
+.lp "#showtrap"
+Show the type of an adjacent trap.
+Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp "#sit     "
 Sit down.
 Autocompletes.
@@ -1419,7 +1421,12 @@ Show memory usage statistics.
 Autocompletes.
 Debug mode only.
 .lp "#suspend "
-Suspend the game.
+Suspend the game, switching from NetHack to the terminal it was started
+from without performing save-and-exit.
+Can be disabled at the time the program is built.
+When enabled, mainly useful for \fItty\fP and \fIcurses\fP interfaces on
+.UX \. \" yields "UNIX."
+Use the shell command \(oq\f(CRfg\fP\(cq to return to the game.
 Default key is \(oq\(haZ\(cq.
 .lp "#swap    "
 Swap wielded and secondary weapons.
@@ -1564,6 +1571,10 @@ first and last false rumors.
 Also displays first, second, and last random engravings, epitaphs,
 and hallucinatory monsters.
 .lp ""
+Autocompletes.
+Debug mode only.
+.lp #wizseenv
+Show map locations' seen vectors.
 Autocompletes.
 Debug mode only.
 .lp #wizsmell

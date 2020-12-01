@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{November 25, 2020}
+\date{November 30, 2020}
 
 \maketitle
 
@@ -1095,6 +1095,7 @@ Zap (cast) a spell.\\
 %.lp
 \item[\tb{\^{}Z}]
 Suspend the game (UNIX versions with job control only).
+See ``\#suspend'' below for more details.
 %.lp
 \item[\tb{:}]
 Look at what is here.
@@ -1159,6 +1160,7 @@ Show discovered types for one class of objects.
 %.lp
 \item[\tb{!}]
 Escape to a shell.
+See ``\#shell'' below for more details.
 %.lp
 \item[\tb{\#}]
 Perform an extended command.\\
@@ -1472,28 +1474,30 @@ Show the armor currently worn. Default key is `{\tt [}'.
 \item[\tb{\#seegold}]
 Count your gold. Default key is `{\tt \$}'.
 %.lp
-\item[\tb{\#seenv}]
-Show seen vectors.
-Autocompletes.
-Debug mode only.
-%.lp
 \item[\tb{\#seerings}]
 Show the ring(s) currently worn. Default key is `{\tt =}'.
 %.lp
-\item[\tb{\#seespells}]
-List and reorder known spells. Default key is `{\tt +}'.
-%.lp
 \item[\tb{\#seetools}]
 Show the tools currently in use. Default key is `{\tt (}'.
-%.lp
-\item[\tb{\#seetrap}]
-Show the type of an adjacent trap. Default key is `{\tt \^{}}'.
 %.lp
 \item[\tb{\#seeweapon}]
 Show the weapon currently wielded. Default key is `{\tt )}'.
 %.lp
 \item[\tb{\#shell}]
-Do a shell escape. Default key is `{\tt !}'.
+Do a shell escape, switching from NetHack to a subprocess.
+Can be disabled at the time the program is built.
+When enabled, access for specific users can be controlled by the system
+configuration file.
+Use the shell command `{\tt exit}' to return to the game.
+Default key is `{\tt !}'.
+%.lp
+\item[\tb{\#showspells}]
+List and reorder known spells.
+Default key is `{\tt +}'.
+%.lp
+\item[\tb{\#showtrap}]
+Show the type of an adjacent trap.
+Default key is `{\tt \^{}}'.
 %.lp
 \item[\tb{\#sit}]
 Sit down. Autocompletes. Default key is `{\tt M-s}'.
@@ -1504,7 +1508,14 @@ Autocompletes.
 Debug mode only.
 %.lp
 \item[\tb{\#suspend}]
-Suspend the game. Default key is `{\tt \^{}Z}'.
+Suspend the game, switching from NetHack to the terminal it was started
+from without performing save-and-exit.
+Can be disabled at the time the program is built.
+When enabled, mainly useful for {\it tty\/} and {\it curses\/} interfaces on
+%.UX \. \" yields "UNIX."
+UNIX.
+Use the shell command `{\tt fg}' to return to the game.
+Default key is `{\tt \^{}Z}'.
 %.lp
 \item[\tb{\#swap}]
 Swap wielded and secondary weapons. Default key is `{\tt x}'.
@@ -1658,6 +1669,11 @@ first and last false rumors.\\
 Also displays first, second, and last random engravings, epitaphs,
 and hallucinatory monsters.\\
 %.lp ""
+Autocompletes.
+Debug mode only.
+%.lp
+\item[\tb{\#wizseenv}]
+Show map locations' seen vectors.
 Autocompletes.
 Debug mode only.
 %.lp

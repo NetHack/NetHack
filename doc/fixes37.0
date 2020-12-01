@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ $NHDT-Date: 1606765210 2020/11/30 19:40:10 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ $NHDT-Date: 1606781767 2020/12/01 00:16:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -314,6 +314,8 @@ throwing or kicking a shop container (that's light enough to move) made the
 try to fix message sequencing for tame golems that "roast/rot/rust in peace"
 autodescribe when moving the cursor was erroneously honoring MSGTYPE=stop
 	and potentially delivering sounds
+reduce the number of "seeXYZ" commands by renaming some: #seenv -> #wizseenv,
+	#seespells -> #showspells, and #seetrap -> #showtrap
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -404,6 +406,7 @@ tins of spinach and 'dead' eggs could cause out of array bounds access
 options help ('? g') listed all boolean options, then repeated them among
 	the compound options; on OSX they showed a description of "(null)"
 	but for other sprintf implementations they might cause a crash
+change name of #wizlevelflip to #wizfliplevel
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
