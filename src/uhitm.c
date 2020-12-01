@@ -4009,6 +4009,146 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_sedu(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pa = magr->data;
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        steal_it(mdef, mattk);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        int armpro = magic_negation(mdef);
+        boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
+        char buf[BUFSZ];
+
+        if (is_animal(magr->data)) {
+            hitmsg(magr, mattk);
+            if (magr->mcan)
+                return;
+            /* Continue below */
+        } else if (dmgtype(g.youmonst.data, AD_SEDU)
+                   /* !SYSOPT_SEDUCE: when hero is attacking and AD_SSEX
+                      is disabled, it would be changed to another damage
+                      type, but when defending, it remains as-is */
+                   || dmgtype(g.youmonst.data, AD_SSEX)) {
+            pline("%s %s.", Monnam(magr),
+                  Deaf ? "says something but you can't hear it"
+                       : magr->minvent
+                      ? "brags about the goods some dungeon explorer provided"
+                  : "makes some remarks about how difficult theft is lately");
+            if (!tele_restrict(magr))
+                (void) rloc(magr, TRUE);
+            mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+            mhm->done = TRUE;
+            return;
+        } else if (magr->mcan) {
+            if (!Blind)
+                pline("%s tries to %s you, but you seem %s.",
+                      Adjmonnam(magr, "plain"),
+                      flags.female ? "charm" : "seduce",
+                      flags.female ? "unaffected" : "uninterested");
+            if (rn2(3)) {
+                if (!tele_restrict(magr))
+                    (void) rloc(magr, TRUE);
+                mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+                mhm->done = TRUE;
+                return;
+            }
+            return;
+        }
+        buf[0] = '\0';
+        switch (steal(magr, buf)) {
+        case -1:
+            mhm->hitflags = MM_DEF_DIED; /* return 2??? */
+            mhm->done = TRUE;
+            return;
+        case 0:
+            return;
+        default:
+            if (!is_animal(magr->data) && !tele_restrict(magr))
+                (void) rloc(magr, TRUE);
+            if (is_animal(magr->data) && *buf) {
+                if (canseemon(magr))
+                    pline("%s tries to %s away with %s.", Monnam(magr),
+                          locomotion(magr->data, "run"), buf);
+            }
+            monflee(magr, 0, FALSE, FALSE);
+            mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+            mhm->done = TRUE;
+            return;
+        }
+    } else {
+        /* mhitm */
+        int armpro = magic_negation(mdef);
+        boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+        struct obj *obj;
+
+        if (magr->mcan)
+            return;
+        /* find an object to steal, non-cursed if magr is tame */
+        for (obj = mdef->minvent; obj; obj = obj->nobj)
+            if (!magr->mtame || !obj->cursed)
+                return;
+
+        if (obj) {
+            char buf[BUFSZ];
+            char onambuf[BUFSZ], mdefnambuf[BUFSZ];
+
+            /* make a special x_monnam() call that never omits
+               the saddle, and save it for later messages */
+            Strcpy(mdefnambuf,
+                   x_monnam(mdef, ARTICLE_THE, (char *) 0, 0, FALSE));
+
+            if (u.usteed == mdef && obj == which_armor(mdef, W_SADDLE))
+                /* "You can no longer ride <steed>." */
+                dismount_steed(DISMOUNT_POLY);
+            obj_extract_self(obj);
+            if (obj->owornmask) {
+                mdef->misc_worn_check &= ~obj->owornmask;
+                if (obj->owornmask & W_WEP)
+                    mwepgone(mdef);
+                obj->owornmask = 0L;
+                update_mon_intrinsics(mdef, obj, FALSE, FALSE);
+                /* give monster a chance to wear other equipment on its next
+                   move instead of waiting until it picks something up */
+                mdef->misc_worn_check |= I_SPECIAL;
+            }
+            /* add_to_minv() might free 'obj' [if it merges] */
+            if (g.vis)
+                Strcpy(onambuf, doname(obj));
+            (void) add_to_minv(magr, obj);
+            if (g.vis && canseemon(mdef)) {
+                Strcpy(buf, Monnam(magr));
+                pline("%s steals %s from %s!", buf, onambuf, mdefnambuf);
+            }
+            possibly_unwield(mdef, FALSE);
+            mdef->mstrategy &= ~STRAT_WAITFORU;
+            mselftouch(mdef, (const char *) 0, FALSE);
+            if (DEADMONSTER(mdef)) {
+                mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                mhm->done = TRUE;
+                return;
+            }
+            if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
+                boolean couldspot = canspotmon(magr);
+
+                (void) rloc(magr, TRUE);
+                if (g.vis && couldspot && !canspotmon(magr))
+                    pline("%s suddenly disappears!", buf);
+            }
+        }
+        mhm->damage = 0;
+    }
+}
+
 
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
@@ -4122,10 +4262,11 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_SSEX:
-    case AD_SEDU:
     case AD_SITM:
-        steal_it(mdef, mattk);
-        mhm.damage = 0;
+    case AD_SEDU:
+        mhitm_ad_sedu(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SGLD:
         mhitm_ad_sgld(&g.youmonst, mattk, mdef, &mhm);

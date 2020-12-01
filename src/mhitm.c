@@ -1022,58 +1022,9 @@ int dieroll;
     case AD_SSEX:
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
-        if (magr->mcan)
-            break;
-        /* find an object to steal, non-cursed if magr is tame */
-        for (obj = mdef->minvent; obj; obj = obj->nobj)
-            if (!magr->mtame || !obj->cursed)
-                break;
-
-        if (obj) {
-            char onambuf[BUFSZ], mdefnambuf[BUFSZ];
-
-            /* make a special x_monnam() call that never omits
-               the saddle, and save it for later messages */
-            Strcpy(mdefnambuf,
-                   x_monnam(mdef, ARTICLE_THE, (char *) 0, 0, FALSE));
-
-            if (u.usteed == mdef && obj == which_armor(mdef, W_SADDLE))
-                /* "You can no longer ride <steed>." */
-                dismount_steed(DISMOUNT_POLY);
-            obj_extract_self(obj);
-            if (obj->owornmask) {
-                mdef->misc_worn_check &= ~obj->owornmask;
-                if (obj->owornmask & W_WEP)
-                    mwepgone(mdef);
-                obj->owornmask = 0L;
-                update_mon_intrinsics(mdef, obj, FALSE, FALSE);
-                /* give monster a chance to wear other equipment on its next
-                   move instead of waiting until it picks something up */
-                mdef->misc_worn_check |= I_SPECIAL;
-            }
-            /* add_to_minv() might free 'obj' [if it merges] */
-            if (g.vis)
-                Strcpy(onambuf, doname(obj));
-            (void) add_to_minv(magr, obj);
-            if (g.vis && canseemon(mdef)) {
-                Strcpy(buf, Monnam(magr));
-                pline("%s steals %s from %s!", buf, onambuf, mdefnambuf);
-            }
-            possibly_unwield(mdef, FALSE);
-            mdef->mstrategy &= ~STRAT_WAITFORU;
-            mselftouch(mdef, (const char *) 0, FALSE);
-            if (DEADMONSTER(mdef))
-                return (MM_DEF_DIED
-                        | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
-            if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
-                boolean couldspot = canspotmon(magr);
-
-                (void) rloc(magr, TRUE);
-                if (g.vis && couldspot && !canspotmon(magr))
-                    pline("%s suddenly disappears!", buf);
-            }
-        }
-        mhm.damage = 0;
+        mhitm_ad_sedu(magr, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_DREN:
         mhitm_ad_dren(magr, mattk, mdef, &mhm);

@@ -1114,56 +1114,10 @@ register struct attack *mattk;
         /*FALLTHRU*/
     case AD_SITM: /* for now these are the same */
     case AD_SEDU:
-        if (is_animal(mtmp->data)) {
-            hitmsg(mtmp, mattk);
-            if (mtmp->mcan)
-                break;
-            /* Continue below */
-        } else if (dmgtype(g.youmonst.data, AD_SEDU)
-                   /* !SYSOPT_SEDUCE: when hero is attacking and AD_SSEX
-                      is disabled, it would be changed to another damage
-                      type, but when defending, it remains as-is */
-                   || dmgtype(g.youmonst.data, AD_SSEX)) {
-            pline("%s %s.", Monnam(mtmp),
-                  Deaf ? "says something but you can't hear it"
-                       : mtmp->minvent
-                      ? "brags about the goods some dungeon explorer provided"
-                  : "makes some remarks about how difficult theft is lately");
-            if (!tele_restrict(mtmp))
-                (void) rloc(mtmp, TRUE);
-            return 3;
-        } else if (mtmp->mcan) {
-            if (!Blind)
-                pline("%s tries to %s you, but you seem %s.",
-                      Adjmonnam(mtmp, "plain"),
-                      flags.female ? "charm" : "seduce",
-                      flags.female ? "unaffected" : "uninterested");
-            if (rn2(3)) {
-                if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, TRUE);
-                return 3;
-            }
-            break;
-        }
-        buf[0] = '\0';
-        switch (steal(mtmp, buf)) {
-        case -1:
-            return 2;
-        case 0:
-            break;
-        default:
-            if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
-                (void) rloc(mtmp, TRUE);
-            if (is_animal(mtmp->data) && *buf) {
-                if (canseemon(mtmp))
-                    pline("%s tries to %s away with %s.", Monnam(mtmp),
-                          locomotion(mtmp->data, "run"), buf);
-            }
-            monflee(mtmp, 0, FALSE, FALSE);
-            return 3;
-        }
+        mhitm_ad_sedu(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
-
     case AD_SAMU:
         mhitm_ad_samu(mtmp, mattk, &g.youmonst, &mhm);
         if (mhm.done)
