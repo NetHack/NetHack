@@ -4185,6 +4185,7 @@ int specialdmg; /* blessed and/or silver bonus against various things */
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = specialdmg;
+    mhm.done = FALSE;
 
     armpro = magic_negation(mdef);
     /* since hero can't be cancelled, only defender's armor applies */

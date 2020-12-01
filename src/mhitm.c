@@ -865,6 +865,7 @@ int dieroll;
     mhm.permdmg = 0;
     mhm.specialdmg = 0;
     mhm.dieroll = dieroll;
+    mhm.done = FALSE;
 
     if ((touch_petrifies(pd) /* or flesh_petrifies() */
          || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))

@@ -972,6 +972,7 @@ register struct attack *mattk;
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = 0;
+    mhm.done = FALSE;
 
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
