@@ -3959,6 +3959,33 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_samu(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        /* when the Wizard or quest nemesis hits, there's a 1/20 chance
+           to steal a quest artifact (any, not just the one for the hero's
+           own role) or the Amulet or one of the invocation tools */
+        if (!rn2(20))
+            stealamulet(magr);
+    } else {
+        /* mhitm */
+        mhm->damage = 0;
+    }
+}
+
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
