@@ -3966,7 +3966,6 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_PHYS:
- physical:
         mhitm_ad_phys(&g.youmonst, mattk, mdef, &mhm);
         if (mhm.done)
             return mhm.hitflags;

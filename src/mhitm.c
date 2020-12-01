@@ -970,7 +970,6 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_PHYS:
- physical:
         mhitm_ad_phys(magr, mattk, mdef, &mhm);
         if (mhm.done)
             return mhm.hitflags;
