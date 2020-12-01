@@ -3600,6 +3600,50 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_ad_ston(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    struct permonst *pd = mdef->data;
+
+    if (magr == &g.youmonst) {
+        /* uhitm */
+        if (!munstone(mdef, TRUE))
+            minstapetrify(mdef, TRUE);
+        mhm->damage = 0;
+    } else if (mdef == &g.youmonst) {
+        /* mhitu */
+        hitmsg(magr, mattk);
+        if (!rn2(3)) {
+            if (magr->mcan) {
+                if (!Deaf)
+                    You_hear("a cough from %s!", mon_nam(magr));
+            } else {
+                if (!Deaf)
+                    You_hear("%s hissing!", s_suffix(mon_nam(magr)));
+                if (!rn2(10)
+                    || (flags.moonphase == NEW_MOON && !have_lizard())) {
+                    if (do_stone_u(magr)) {
+                        mhm->hitflags = MM_HIT;
+                        mhm->done = TRUE;
+                        return;
+                    }
+                }
+            }
+        }
+    } else {
+        /* mhitm */
+        if (magr->mcan)
+            return;
+        do_stone_mon(magr, mattk, mdef, mhm);
+        if (mhm->done)
+            return;
+    }
+}
+
 /* Template for monster hits monster for AD_FOO.
    - replace "break" with return
    - replace "return" with mhm->done = TRUE
@@ -3704,9 +3748,9 @@ int specialdmg; /* blessed and/or silver bonus against various things */
             return mhm.hitflags;
         break;
     case AD_STON:
-        if (!munstone(mdef, TRUE))
-            minstapetrify(mdef, TRUE);
-        mhm.damage = 0;
+        mhitm_ad_ston(&g.youmonst, mattk, mdef, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_SSEX:
     case AD_SEDU:

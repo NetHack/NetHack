@@ -1007,9 +1007,7 @@ int dieroll;
             return mhm.hitflags;
         break;
     case AD_STON:
-        if (magr->mcan)
-            break;
-        do_stone_mon(magr, mattk, mdef, &mhm);
+        mhitm_ad_ston(magr, mattk, mdef, &mhm);
         if (mhm.done)
             return mhm.hitflags;
         break;

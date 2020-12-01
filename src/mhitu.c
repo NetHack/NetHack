@@ -1113,22 +1113,10 @@ register struct attack *mattk;
         }
         break;
     }
-    case AD_STON: /* cockatrice */
-        hitmsg(mtmp, mattk);
-        if (!rn2(3)) {
-            if (mtmp->mcan) {
-                if (!Deaf)
-                    You_hear("a cough from %s!", mon_nam(mtmp));
-            } else {
-                if (!Deaf)
-                    You_hear("%s hissing!", s_suffix(mon_nam(mtmp)));
-                if (!rn2(10)
-                    || (flags.moonphase == NEW_MOON && !have_lizard())) {
-                    if (do_stone_u(mtmp))
-                        return MM_HIT;
-                }
-            }
-        }
+    case AD_STON:
+        mhitm_ad_ston(mtmp, mattk, &g.youmonst, &mhm);
+        if (mhm.done)
+            return mhm.hitflags;
         break;
     case AD_STCK:
         mhitm_ad_stck(mtmp, mattk, &g.youmonst, &mhm);
