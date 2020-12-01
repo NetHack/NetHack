@@ -4219,6 +4219,61 @@ struct mhitm_data *mhm;
     }
 }
 
+void
+mhitm_adtyping(magr, mattk, mdef, mhm)
+struct monst *magr;
+struct attack *mattk;
+struct monst *mdef;
+struct mhitm_data *mhm;
+{
+    switch (mattk->adtyp) {
+    case AD_STUN: mhitm_ad_stun(magr, mattk, mdef, mhm); break;
+    case AD_LEGS: mhitm_ad_legs(magr, mattk, mdef, mhm); break;
+    case AD_WERE: mhitm_ad_were(magr, mattk, mdef, mhm); break;
+    case AD_HEAL: mhitm_ad_heal(magr, mattk, mdef, mhm); break;
+    case AD_PHYS: mhitm_ad_phys(magr, mattk, mdef, mhm); break;
+    case AD_FIRE: mhitm_ad_fire(magr, mattk, mdef, mhm); break;
+    case AD_COLD: mhitm_ad_cold(magr, mattk, mdef, mhm); break;
+    case AD_ELEC: mhitm_ad_elec(magr, mattk, mdef, mhm); break;
+    case AD_ACID: mhitm_ad_acid(magr, mattk, mdef, mhm); break;
+    case AD_STON: mhitm_ad_ston(magr, mattk, mdef, mhm); break;
+    case AD_SSEX: mhitm_ad_ssex(magr, mattk, mdef, mhm); break;
+    case AD_SITM:
+    case AD_SEDU: mhitm_ad_sedu(magr, mattk, mdef, mhm); break;
+    case AD_SGLD: mhitm_ad_sgld(magr, mattk, mdef, mhm); break;
+    case AD_TLPT: mhitm_ad_tlpt(magr, mattk, mdef, mhm); break;
+    case AD_BLND: mhitm_ad_blnd(magr, mattk, mdef, mhm); break;
+    case AD_CURS: mhitm_ad_curs(magr, mattk, mdef, mhm); break;
+    case AD_DRLI: mhitm_ad_drli(magr, mattk, mdef, mhm); break;
+    case AD_RUST: mhitm_ad_rust(magr, mattk, mdef, mhm); break;
+    case AD_CORR: mhitm_ad_corr(magr, mattk, mdef, mhm); break;
+    case AD_DCAY: mhitm_ad_dcay(magr, mattk, mdef, mhm); break;
+    case AD_DREN: mhitm_ad_dren(magr, mattk, mdef, mhm); break;
+    case AD_DRST:
+    case AD_DRDX:
+    case AD_DRCO: mhitm_ad_drst(magr, mattk, mdef, mhm); break;
+    case AD_DRIN: mhitm_ad_drin(magr, mattk, mdef, mhm); break;
+    case AD_STCK: mhitm_ad_stck(magr, mattk, mdef, mhm); break;
+    case AD_WRAP: mhitm_ad_wrap(magr, mattk, mdef, mhm); break;
+    case AD_PLYS: mhitm_ad_plys(magr, mattk, mdef, mhm); break;
+    case AD_SLEE: mhitm_ad_slee(magr, mattk, mdef, mhm); break;
+    case AD_SLIM: mhitm_ad_slim(magr, mattk, mdef, mhm); break;
+    case AD_ENCH: mhitm_ad_ench(magr, mattk, mdef, mhm); break;
+    case AD_SLOW: mhitm_ad_slow(magr, mattk, mdef, mhm); break;
+    case AD_CONF: mhitm_ad_conf(magr, mattk, mdef, mhm); break;
+    case AD_POLY: mhitm_ad_poly(magr, mattk, mdef, mhm); break;
+    case AD_DISE: mhitm_ad_dise(magr, mattk, mdef, mhm); break;
+    case AD_SAMU: mhitm_ad_samu(magr, mattk, mdef, mhm); break;
+    case AD_DETH: mhitm_ad_deth(magr, mattk, mdef, mhm); break;
+    case AD_PEST: mhitm_ad_pest(magr, mattk, mdef, mhm); break;
+    case AD_FAMN: mhitm_ad_famn(magr, mattk, mdef, mhm); break;
+    case AD_DGST: mhitm_ad_dgst(magr, mattk, mdef, mhm); break;
+    case AD_HALU: mhitm_ad_halu(magr, mattk, mdef, mhm); break;
+    default:
+        mhm->damage = 0;
+    }
+}
+
 int
 damageum(mdef, mattk, specialdmg)
 register struct monst *mdef;
@@ -4244,174 +4299,10 @@ int specialdmg; /* blessed and/or silver bonus against various things */
         demonpet();
         return 0;
     }
-    switch (mattk->adtyp) {
-    case AD_STUN:
-        mhitm_ad_stun(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_LEGS:
-        mhitm_ad_legs(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_WERE:
-        mhitm_ad_were(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_HEAL:
-        mhitm_ad_heal(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_PHYS:
-        mhitm_ad_phys(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_FIRE:
-        mhitm_ad_fire(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_COLD:
-        mhitm_ad_cold(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_ELEC:
-        mhitm_ad_elec(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_ACID:
-        mhitm_ad_acid(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_STON:
-        mhitm_ad_ston(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SSEX:
-        mhitm_ad_ssex(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SITM:
-    case AD_SEDU:
-        mhitm_ad_sedu(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SGLD:
-        mhitm_ad_sgld(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_TLPT:
-        mhitm_ad_tlpt(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_BLND:
-        mhitm_ad_blnd(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_CURS:
-        mhitm_ad_curs(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_DRLI: /* drain life */
-        mhitm_ad_drli(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_RUST:
-        mhitm_ad_rust(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_CORR:
-        mhitm_ad_corr(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_DCAY:
-        mhitm_ad_dcay(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_DREN:
-        mhitm_ad_dren(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_DRST:
-    case AD_DRDX:
-    case AD_DRCO:
-        mhitm_ad_drst(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_DRIN:
-        mhitm_ad_drin(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_STCK:
-        mhitm_ad_stck(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_WRAP:
-        mhitm_ad_wrap(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_PLYS:
-        mhitm_ad_plys(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SLEE:
-        mhitm_ad_slee(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SLIM:
-        mhitm_ad_slim(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_ENCH:
-        mhitm_ad_ench(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_SLOW:
-        mhitm_ad_slow(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_CONF:
-        mhitm_ad_conf(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    case AD_POLY:
-        mhitm_ad_poly(&g.youmonst, mattk, mdef, &mhm);
-        if (mhm.done)
-            return mhm.hitflags;
-        break;
-    default:
-        mhm.damage = 0;
-        break;
-    }
+
+    mhitm_adtyping(&g.youmonst, mattk, mdef, &mhm);
+    if (mhm.done)
+        return mhm.hitflags;
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
     mdef->mhp -= mhm.damage;
