@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1606343573 2020/11/25 22:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.882 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1606919254 2020/12/02 14:27:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.886 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3122,6 +3122,7 @@ E void FDECL(flip_worm_segs_horizontal, (struct monst *, int, int));
 
 E void FDECL(setworn, (struct obj *, long));
 E void FDECL(setnotworn, (struct obj *));
+E void NDECL(allunworn);
 E struct obj *FDECL(wearmask_to_obj, (long));
 E long FDECL(wearslot, (struct obj *));
 E void FDECL(mon_set_minvis, (struct monst *));
