@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1606919257 2020/12/02 14:27:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1606949327 2020/12/02 22:48:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,15 +21,12 @@ int dotcnt, dotrow; /* also used in restore */
 #endif
 
 static void FDECL(savelevchn, (NHFILE *));
-static void FDECL(savedamage, (NHFILE *));
-/* static void FDECL(saveobj, (NHFILE *,struct obj *)); */
-/* static void FDECL(savemon, (NHFILE *,struct monst *)); */
-/* static void FDECL(savelevl, (NHFILE *, BOOLEAN_P)); */
-static void FDECL(saveobj, (NHFILE *,struct obj *));
-static void FDECL(savemon, (NHFILE *,struct monst *));
 static void FDECL(savelevl, (NHFILE *,BOOLEAN_P));
+static void FDECL(savedamage, (NHFILE *));
 static void FDECL(save_stairs, (NHFILE *));
+static void FDECL(saveobj, (NHFILE *,struct obj *));
 static void FDECL(saveobjchn, (NHFILE *,struct obj **));
+static void FDECL(savemon, (NHFILE *,struct monst *));
 static void FDECL(savemonchn, (NHFILE *,struct monst *));
 static void FDECL(savetrapchn, (NHFILE *,struct trap *));
 static void FDECL(savegamestate, (NHFILE *));
@@ -214,7 +211,7 @@ dosave0()
         getlev(onhfp, g.hackpid, ltmp);
         close_nhfile(onhfp);
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp); /* level number*/
+            bwrite(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp); /* lvl no. */
         savelev(nhfp, ltmp);     /* actual level*/
         delete_levelfile(ltmp);
     }
@@ -242,9 +239,7 @@ NHFILE *nhfp;
     unsigned long uid;
     struct obj *bc_objs = (struct obj *)0;
 
-    if (!g.program_state.saving)
-        impossible("savegamestate called when not saving or changing levels?");
-
+    g.program_state.saving++; /* caller should/did already set this... */
     uid = (unsigned long) getuid();
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &uid, sizeof uid);
@@ -326,8 +321,11 @@ NHFILE *nhfp;
     save_msghistory(nhfp);
     if (nhfp->structlevel)
         bflush(nhfp->fd);
+    g.program_state.saving--;
+    return;
 }
 
+/* potentially called from goto_level(do.c) as well as savestateinlock() */
 boolean
 tricked_fileremoved(nhfp, whynot)
 NHFILE *nhfp;
@@ -371,8 +369,10 @@ savestateinlock()
          * readable by an external utility
          */
         nhfp = open_levelfile(0, whynot);
-        if (tricked_fileremoved(nhfp, whynot))
+        if (tricked_fileremoved(nhfp, whynot)) {
+            g.program_state.saving--;
             return;
+        }
 
         if (nhfp->structlevel)
             (void) read(nhfp->fd, (genericptr_t) &hpid, sizeof hpid);
@@ -420,6 +420,7 @@ savestateinlock()
     }
     g.program_state.saving--;
     g.havestate = flags.ins_chkpt;
+    return;
 }
 #endif
 
@@ -537,6 +538,7 @@ xchar lev;
             bflush(nhfp->fd);
     }
     g.program_state.saving--;
+    return;
 }
 
 static void
@@ -598,6 +600,7 @@ boolean rlecomp;
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) levl, sizeof levl);
     }
+    return;
 }
 
 /* used when saving a level and also when saving dungeon overview data */
@@ -657,6 +660,32 @@ NHFILE *nhfp;
 }
 
 static void
+save_stairs(nhfp)
+NHFILE *nhfp;
+{
+    stairway *stway = g.stairs;
+    int buflen = (int) sizeof *stway;
+
+    while (stway) {
+        if (perform_bwrite(nhfp)) {
+            if (nhfp->structlevel) {
+                bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+                bwrite(nhfp->fd, (genericptr_t) stway, sizeof *stway);
+            }
+        }
+        stway = stway->next;
+    }
+    if (perform_bwrite(nhfp)) {
+        if (nhfp->structlevel) {
+            buflen = -1;
+            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        }
+    }
+}
+
+/* save one object;
+   caveat: this is only for perform_bwrite(); caller handles release_data() */
+static void
 saveobj(nhfp, otmp)
 NHFILE *nhfp;
 struct obj *otmp;
@@ -694,40 +723,14 @@ struct obj *otmp;
         }
         /* omid used to be indirect via a pointer in oextra but has
            become part of oextra itself; 0 means not applicable and
-           gets saved/restored whenever any other oxtra components do */
+           gets saved/restored whenever any other oextra components do */
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
     }
 }
 
-static void
-save_stairs(nhfp)
-NHFILE *nhfp;
-{
-    stairway *stway = g.stairs;
-    int buflen = (int) sizeof (stairway);
-    int len = 0;
-
-    while (stway) {
-        if (perform_bwrite(nhfp)) {
-            if (nhfp->structlevel) {
-                len += sizeof(buflen);
-                bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-                len += sizeof(stairway);
-                bwrite(nhfp->fd, (genericptr_t) stway, sizeof(stairway));
-            }
-        }
-        stway = stway->next;
-    }
-    if (perform_bwrite(nhfp)) {
-        if (nhfp->structlevel) {
-            buflen = -1;
-            len += sizeof(buflen);
-            bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
-        }
-    }
-}
-
+/* save an object chain; sets head of list to Null when done;
+   handles release_data() for each object in the list */
 static void
 saveobjchn(nhfp, obj_p)
 NHFILE *nhfp;
