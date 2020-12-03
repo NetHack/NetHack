@@ -167,26 +167,40 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 	if (promptstr != "#")
 	    prompt->setText(promptstr.left(promptstr.size() - 1));
         enableButtons();
-  /*} else if (uc == '\r' || uc == '\n'; || uc  == ' ') {*/
-    } else if (uc < ' ' || uc > std::max('z', 'Z')) {
+    } else if ((uc < ' ' && !(uc == '\n' || uc == '\r'))
+               || uc > std::max('z', 'Z')) {
 	reject(); // done()
     } else {
-	promptstr += QChar(uc); // event()->text()
+        // <return> is necessary if one command is a leading substring
+        // of another and superfluous otherwise
+        boolean checkexact = (uc == '\n' || uc == '\r' || uc == ' ');
+        if (!checkexact)
+            promptstr += QChar(uc); // event()->text()
 	QString typedstr = promptstr.mid(1); // skip the '#'
 	unsigned matches = 0;
-	unsigned match = 0;
+	unsigned matchindx = 0;
 	for (unsigned i=0; extcmdlist[i].ef_txt; i++) {
             if (!interesting_command(i))
                 continue;
-	    if (QString(extcmdlist[i].ef_txt).startsWith(typedstr)) {
-		++matches;
-		if (matches >= 2)
-		    break;
-		match = i;
+            QString cmdtxt = QString(extcmdlist[i].ef_txt);
+            if (cmdtxt.startsWith(typedstr)) {
+                if (checkexact) {
+                    if (cmdtxt == typedstr) {
+                        matchindx = i;
+                        matches = 1;
+                        break;
+                    }
+                } else {
+                    if (++matches >= 2)
+                        break;
+                    matchindx = i;
+                }
 	    }
 	}
 	if (matches == 1)
-	    done(match+1);
+            done(matchindx + 1);
+        else if (checkexact)
+            reject();
 	else if (matches >= 2)
 	    prompt->setText(promptstr);
         enableButtons();
