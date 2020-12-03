@@ -668,24 +668,24 @@ NHFILE *nhfp;
 
     while (stway) {
         if (perform_bwrite(nhfp)) {
+            if (stway->tolev.dnum == u.uz.dnum) {
+                /* make dlevel relative to current level */
+                stway->tolev.dlevel -= u.uz.dlevel;
+            }
             if (nhfp->structlevel) {
-                if (stway->tolev.dnum == u.uz.dnum) {
-                    /* make dlevel relative to current level */
-                    stway->tolev.dlevel -= u.uz.dlevel;
-                }
                 bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
                 bwrite(nhfp->fd, (genericptr_t) stway, sizeof *stway);
-                if (stway->tolev.dnum == u.uz.dnum) {
-                    /* reset staiway dlevel back to absolute */
-                    stway->tolev.dlevel += u.uz.dlevel;
-                }
+            }
+            if (stway->tolev.dnum == u.uz.dnum) {
+                /* reset staiway dlevel back to absolute */
+                stway->tolev.dlevel += u.uz.dlevel;
             }
         }
         stway = stway->next;
     }
     if (perform_bwrite(nhfp)) {
+        buflen = -1;
         if (nhfp->structlevel) {
-            buflen = -1;
             bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
         }
     }
