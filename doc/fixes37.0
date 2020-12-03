@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ $NHDT-Date: 1606919254 2020/12/02 14:27:34 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.371 $ $NHDT-Date: 1606954304 2020/12/03 00:11:44 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -507,6 +507,10 @@ Qt: don't get stuck in a loop after choosing "play" while the character name
 	field is empty in the character selection widget
 Qt: when a new message is issued, pan the message window to its left edge if
 	player panned it horizontally then didn't manually scroll it back
+Qt: there was no way to enter extended command "#version" by typing; command
+	name matching was waiting to disambiguate it from "#versionshort"
+	and the only way to that was to type #version<return> but <return>
+	explicitly triggered rejection, cancelling '#' processing
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
