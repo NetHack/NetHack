@@ -926,6 +926,10 @@ NHFILE *nhfp;
         if (nhfp->structlevel) {
             len += (int) sizeof (stairway);
             mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
+            if (stway.tolev.dnum == u.uz.dnum) {
+                /* stairway dlevel is relative, make it absolute */
+                stway.tolev.dlevel += u.uz.dlevel;
+            }
         }
 
         stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
