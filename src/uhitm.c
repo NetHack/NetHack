@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1606558760 2020/11/28 10:19:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1607076540 2020/12/04 10:09:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,13 +9,12 @@ static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
 static boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
-                                       int, int, struct attack *, int));
+                                   int, int, struct attack *, int));
 static boolean FDECL(theft_petrifies, (struct obj *));
 static void FDECL(steal_it, (struct monst *, struct attack *));
 static boolean FDECL(hitum_cleave, (struct monst *, struct attack *));
 static boolean FDECL(hitum, (struct monst *, struct attack *));
-static boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int,
-                                       int));
+static boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int, int));
 static int FDECL(joust, (struct monst *, struct obj *));
 static void NDECL(demonpet);
 static boolean FDECL(m_slips_free, (struct monst *, struct attack *));
@@ -2533,10 +2532,11 @@ struct mhitm_data *mhm;
                     mhm->hitflags = MM_MISS;
                     mhm->done = TRUE;
                     return;
-                }
-                else if (mdef->mtame && !g.vis)
+                } else if (mdef->mtame && !g.vis) {
                     You(brief_feeling, "strangely sad");
-                mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                }
+                mhm->hitflags = (MM_DEF_DIED
+                                 | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
                 mhm->done = TRUE;
                 return;
             }
@@ -2609,9 +2609,9 @@ struct mhitm_data *mhm;
                     pline_The("poison doesn't seem to affect %s.",
                               mon_nam(mdef));
             } else {
-                if (rn2(10))
+                if (rn2(10)) {
                     mhm->damage += rn1(10, 6);
-                else {
+                } else {
                     if (g.vis && canspotmon(mdef))
                         pline_The("poison was deadly...");
                     mhm->damage = mdef->mhp;
@@ -2895,6 +2895,8 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
+    mhm->damage = 0; /* no HP damage */
+
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3026,6 +3028,8 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
+    mhm->damage = 0; /* no HP damage */
+
     if (magr == &g.youmonst) {
         /* uhitm */
         /* there's no msomearmor() function, so just do damage */
@@ -3077,6 +3081,8 @@ struct attack *mattk;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
+    mhm->damage = 0; /* no HP damage */
+
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3158,7 +3164,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_poly(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED; /* implied */
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3175,7 +3181,8 @@ struct mhitm_data *mhm;
         int armpro = magic_negation(mdef);
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
 
-        if (uncancelled && Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp))
+        if (uncancelled
+            && Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp))
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
     } else {
         /* mhitm */
@@ -3187,7 +3194,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_famn(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3210,7 +3217,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_pest(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3233,7 +3240,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_deth(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3286,7 +3293,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_halu(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3336,7 +3343,7 @@ struct monst *mtmp;
 void
 do_stone_mon(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -3359,10 +3366,11 @@ struct mhitm_data *mhm;
             mhm->hitflags = MM_MISS;
             mhm->done = TRUE;
             return;
-        }
-        else if (mdef->mtame && !g.vis)
+        } else if (mdef->mtame && !g.vis) {
             You(brief_feeling, "peculiarly sad");
-        mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+        }
+        mhm->hitflags = (MM_DEF_DIED
+                         | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
         mhm->done = TRUE;
         return;
     }
@@ -3829,7 +3837,7 @@ struct mhitm_data *mhm;
 void
 mhitm_ad_dgst(magr, mattk, mdef, mhm)
 struct monst *magr;
-struct attack *mattk;
+struct attack *mattk UNUSED;
 struct monst *mdef;
 struct mhitm_data *mhm;
 {
@@ -4848,9 +4856,9 @@ register struct monst *mon;
                                    &attknum, &armorpenalty);
             if ((dhit = (tmp > rnd(20 + i)))) {
                 wakeup(mon, TRUE);
-                if (mon->data == &mons[PM_SHADE])
+                if (mon->data == &mons[PM_SHADE]) {
                     Your("attempt to surround %s is harmless.", mon_nam(mon));
-                else {
+                } else {
                     sum[i] = gulpum(mon, mattk);
                     if (sum[i] == MM_DEF_DIED && (mon->data->mlet == S_ZOMBIE
                                         || mon->data->mlet == S_MUMMY)
