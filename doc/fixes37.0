@@ -748,5 +748,7 @@ rework stairs structure into a linked list
 move 'restoring' to the program_state struct; add corresponding 'saving';
 	both used to enforce no updating of status lines or of persistent
 	inventory when the relevant activity is in progress
+unify special attack damages from separate you-hit-monster, monster-hits-you,
+	and monster-hits-monster into functions by damage type
 
 
