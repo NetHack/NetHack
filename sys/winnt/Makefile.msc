@@ -1192,6 +1192,32 @@ $(O)envchk.tag: $(O)obj.tag
 #==========================================
 #=========== SECONDARY TARGETS ============
 #==========================================
+fetch-lua: fetch-actual-Lua
+
+fetch-Lua: fetch-actual-Lua
+
+fetch-actual-Lua:
+	@if not exist ..\lib\*.* mkdir ..\lib
+	cd ..\lib
+	curl -R -O http://www.lua.org/ftp/lua-$(LUAVER).tar.gz
+	tar zxf lua-$(LUAVER).tar.gz
+	if exist lua-$(LUAVER).tar.gz del lua-$(LUAVER).tar.gz
+	if exist lua-$(LUAVER).tar del lua-$(LUAVER).tar
+	cd ..\src
+	@echo Lua has been fetched into ..\lib\lua-$(LUAVER)
+
+fetch-pdcurses:
+	@if not exist ..\lib\*.* mkdir ..\lib
+	cd ..\lib
+	curl -L -R https://codeload.github.com/wmcbrine/PDCurses/zip/master -o pdcurses.zip
+	powershell -command "Expand-Archive -Path .\pdcurses.zip -DestinationPath ./pdcurses-temp"
+	if exist .\pdcurses\* rd .\pdcurses /s /Q
+        move .\pdcurses-temp\PDCurses-master .
+        ren PDCurses-master pdcurses
+	if exist .\pdcurses-temp\* rd .\pdcurses-temp /s /Q
+	if exist .\pdcurses.zip del .\pdcurses.zip
+	cd ..\src
+	@echo pdcurses has been fetched into ..\lib\pdcurses
 
 #==========================================
 # DLB utility and nhdatNNN file creation
