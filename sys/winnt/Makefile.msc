@@ -1212,8 +1212,8 @@ fetch-pdcurses:
 	curl -L -R https://codeload.github.com/wmcbrine/PDCurses/zip/master -o pdcurses.zip
 	powershell -command "Expand-Archive -Path .\pdcurses.zip -DestinationPath ./pdcurses-temp"
 	if exist .\pdcurses\* rd .\pdcurses /s /Q
-        move .\pdcurses-temp\PDCurses-master .
-        ren PDCurses-master pdcurses
+	move .\pdcurses-temp\PDCurses-master .
+	ren PDCurses-master pdcurses
 	if exist .\pdcurses-temp\* rd .\pdcurses-temp /s /Q
 	if exist .\pdcurses.zip del .\pdcurses.zip
 	cd ..\src
