@@ -318,6 +318,8 @@ reduce the number of "seeXYZ" commands by renaming some: #seenv -> #wizseenv,
 	#seegold -> #showgold, #seespells -> #showspells, #seetrap -> #showtrap
 when saving while punished or game ends while punished, handling for ball and
 	chain might access freed memory with unpredictable consequences
+brown pudding monster hitting another monster with decay attack corroded armor
+	instead of rotting it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

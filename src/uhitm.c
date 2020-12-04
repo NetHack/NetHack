@@ -1826,7 +1826,7 @@ struct mhitm_data *mhm;
             mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             return;
         }
-        erode_armor(mdef, ERODE_CORRODE);
+        erode_armor(mdef, ERODE_ROT);
         mdef->mstrategy &= ~STRAT_WAITFORU;
         mhm->damage = 0;
     }
