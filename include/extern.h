@@ -2182,6 +2182,7 @@ E long NDECL(random);
 
 E void FDECL(learnscroll, (struct obj *));
 E char *FDECL(tshirt_text, (struct obj *, char *));
+E char *FDECL(apron_text, (struct obj *, char *));
 E const char *FDECL(candy_wrapper_text, (struct obj *));
 E void FDECL(assign_candy_wrapper, (struct obj *));
 E int NDECL(doread);

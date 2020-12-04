@@ -755,6 +755,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         case T_SHIRT:
             Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
             break;
+        case ALCHEMY_SMOCK:
+            Sprintf(eos(buf), " with text \"%s\"", apron_text(obj, tmpbuf));
+            break;
         case CANDY_BAR:
             lbl = candy_wrapper_text(obj);
             if (*lbl)
