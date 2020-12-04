@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.371 $ $NHDT-Date: 1606954304 2020/12/03 00:11:44 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.373 $ $NHDT-Date: 1607079461 2020/12/04 10:57:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -315,7 +315,7 @@ try to fix message sequencing for tame golems that "roast/rot/rust in peace"
 autodescribe when moving the cursor was erroneously honoring MSGTYPE=stop
 	and potentially delivering sounds
 reduce the number of "seeXYZ" commands by renaming some: #seenv -> #wizseenv,
-	#seespells -> #showspells, and #seetrap -> #showtrap
+	#seegold -> #showgold, #seespells -> #showspells, #seetrap -> #showtrap
 when saving while punished or game ends while punished, handling for ball and
 	chain might access freed memory with unpredictable consequences
 

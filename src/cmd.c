@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1606781767 2020/12/01 00:16:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607079461 2020/12/04 10:57:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.427 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1873,26 +1873,29 @@ struct ext_func_tab extcmdlist[] = {
             dopramulet, IFBURIED },
     { ARMOR_SYM, "seearmor", "show the armor currently worn",
             doprarm, IFBURIED },
-    { GOLD_SYM, "seegold", "count your gold", doprgold, IFBURIED },
     { RING_SYM, "seerings", "show the ring(s) currently worn",
             doprring, IFBURIED },
     { TOOL_SYM, "seetools", "show the tools currently in use",
             doprtool, IFBURIED },
     { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
             doprwep, IFBURIED },
-    { '!', "shell", "do a shell escape",
+    { '!', "shell", "leave game to enter a sub-shell ('exit' to come back)",
             dosh_core, IFBURIED | GENERALCMD
 #ifndef SHELL
                        | CMD_NOT_AVAILABLE
 #endif /* SHELL */
     },
+    /* $ is like ),=,&c but is not included with *, so not called "seegold" */
+    { GOLD_SYM, "showgold", "show gold, possibly shop credit or debt",
+            doprgold, IFBURIED },
     { SPBOOK_SYM, "showspells", "list and reorder known spells",
             dovspell, IFBURIED },
-    { '^', "showtrap", "show the type of adjacent trap", doidtrap, IFBURIED },
+    { '^', "showtrap", "describe an adjacent, discovered trap",
+            doidtrap, IFBURIED },
     { M('s'), "sit", "sit down", dosit, AUTOCOMPLETE },
     { '\0', "stats", "show memory statistics",
             wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
-    { C('z'), "suspend", "suspend the game",
+    { C('z'), "suspend", "push game to background ('fg' to come back)",
             dosuspend_core, IFBURIED | GENERALCMD
 #ifndef SUSPEND
                             | CMD_NOT_AVAILABLE
@@ -1922,7 +1925,8 @@ struct ext_func_tab extcmdlist[] = {
     { M('v'), "version",
             "list compile time options for this version of NetHack",
             doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD },
-    { 'v', "versionshort", "show version", doversion, IFBURIED | GENERALCMD },
+    { 'v', "versionshort", "show version and date/time program was built",
+            doversion, IFBURIED | GENERALCMD },
     { '\0', "vision", "show vision array",
             wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '.', "wait", "rest one move while doing nothing",
