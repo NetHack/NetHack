@@ -759,7 +759,7 @@ struct attack *mattk;
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
             break;
         default:
-            impossible("bad attack type in spitmu");
+            impossible("bad attack type in spitmm");
             /*FALLTHRU*/
         case AD_ACID:
             otmp = mksobj(ACID_VENOM, TRUE, FALSE);
