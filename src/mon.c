@@ -1586,17 +1586,11 @@ struct monst *mtmp;
     /* unicorn may not be able to avoid hero on a noteleport level */
     if (is_unicorn(mtmp->data) && !noteleport_level(mtmp))
         allowflags |= NOTONL;
-    if (passes_walls(mtmp->data))
-        allowflags |= (ALLOW_WALL | ALLOW_ROCK);
-    if (passes_bars(mtmp->data))
-        allowflags |= ALLOW_BARS;
     if (is_human(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
         allowflags |= ALLOW_SSM;
     if ((is_undead(mtmp->data) && mtmp->data->mlet != S_GHOST)
         || is_vampshifter(mtmp))
         allowflags |= NOGARLIC;
-    if (throws_rocks(mtmp->data))
-        allowflags |= ALLOW_ROCK;
 
     return allowflags;
 }
