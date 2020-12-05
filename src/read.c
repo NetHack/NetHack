@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1607200174 2020/12/05 20:29:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -214,8 +214,10 @@ struct obj *obj;
 int
 doread()
 {
+    static const char find_any_braille[] = "feel any Braille writing.";
     register struct obj *scroll;
     boolean confused, nodisappear;
+    int otyp;
 
     /*
      * Reading while blind is allowed in most cases, including the
@@ -241,9 +243,10 @@ doread()
     scroll = getobj(readable, "read");
     if (!scroll)
         return 0;
+    otyp = scroll->otyp;
 
     /* outrumor has its own blindness check */
-    if (scroll->otyp == FORTUNE_COOKIE) {
+    if (otyp == FORTUNE_COOKIE) {
         if (flags.verbose)
             You("break up the cookie and throw away the pieces.");
         outrumor(bcsign(scroll), BY_COOKIE);
@@ -251,16 +254,16 @@ doread()
             u.uconduct.literate++;
         useup(scroll);
         return 1;
-    } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
+    } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK) {
         char buf[BUFSZ], *mesg;
         const char *endpunct;
 
         if (Blind) {
-            You_cant("feel any Braille writing.");
+            You_cant(find_any_braille);
             return 0;
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
-        if (scroll->otyp == T_SHIRT && uarm && scroll == uarmu) {
+        if (otyp == T_SHIRT && uarm && scroll == uarmu) {
             pline("%s shirt is obscured by %s%s.",
                   scroll->unpaid ? "That" : "Your", shk_your(buf, uarm),
                   suit_simple_name(uarm));
@@ -268,8 +271,8 @@ doread()
         }
         u.uconduct.literate++;
         /* populate 'buf[]' */
-        mesg = (scroll->otyp == T_SHIRT) ? tshirt_text(scroll, buf)
-                                         : apron_text(scroll, buf);
+        mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
+                                 : apron_text(scroll, buf);
         endpunct = "";
         if (flags.verbose) {
             int ln = (int) strlen(mesg);
@@ -281,7 +284,37 @@ doread()
         }
         pline("\"%s\"%s", mesg, endpunct);
         return 1;
-    } else if (scroll->otyp == CREDIT_CARD) {
+    } else if ((otyp == DUNCE_CAP || otyp == CORNUTHAUM)
+        /* note: "DUNCE" isn't directly connected to tourists but
+           if everyone could read it, they would always be able to
+           trivially distinguish between the two types of conical hat;
+           limiting this to tourists is better than rejecting it */
+               && Role_if(PM_TOURIST)) {
+        /* another note: the misspelling, "wizzard", is correct;
+           that's what is written on Rincewind's pointy hat from
+           Pratchett's Discworld series, along with a lot of stars;
+           rather than inked on or painted on, treat them as stitched
+           or even separate pieces of fabric which have been attached
+           (don't recall whether the books mention anything like that...) */
+        const char *cap_text = (otyp == DUNCE_CAP) ? "DUNCE" : "WIZZARD";
+
+        if (scroll->o_id % 3) {
+            /* no need to vary this when blind; "on this ___" is important
+               because it suggests that there might be something on others */
+            You_cant("find anything to read on this %s.",
+                     simpleonames(scroll));
+            return 0;
+        }
+        pline("%s on the %s.  It reads:  %s.",
+              !Blind ? "There is writing" : "You feel lettering",
+              simpleonames(scroll), cap_text);
+        u.uconduct.literate++;
+        /* yet another note: despite the fact that player will recognize
+           the object type, don't make it become a discovery for hero */
+        if (!objects[otyp].oc_name_known && !objects[otyp].oc_uname)
+            docall(scroll);
+        return 1;
+    } else if (otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
             "Leprechaun Gold Tru$t - Shamrock Card",
             "Magic Memory Vault Charge Card",
@@ -320,12 +353,12 @@ doread()
               (flags.verbose || Blind) ? "." : "");
         u.uconduct.literate++;
         return 1;
-    } else if (scroll->otyp == CAN_OF_GREASE) {
+    } else if (otyp == CAN_OF_GREASE) {
         pline("This %s has no label.", singular(scroll, xname));
         return 0;
-    } else if (scroll->otyp == MAGIC_MARKER) {
+    } else if (otyp == MAGIC_MARKER) {
         if (Blind) {
-            You_cant("feel any Braille writing.");
+            You_cant(find_any_braille);
             return 0;
         }
         if (flags.verbose)
@@ -349,11 +382,11 @@ doread()
         pline("\"Odin.\"");
         u.uconduct.literate++;
         return 1;
-    } else if (scroll->otyp == CANDY_BAR) {
+    } else if (otyp == CANDY_BAR) {
         const char *wrapper = candy_wrapper_text(scroll);
 
         if (Blind) {
-            You_cant("feel any Braille writing.");
+            You_cant(find_any_braille);
             return 0;
         }
         if (!*wrapper) {
@@ -367,10 +400,10 @@ doread()
                && scroll->oclass != SPBOOK_CLASS) {
         pline(silly_thing_to, "read");
         return 0;
-    } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
+    } else if (Blind && otyp != SPE_BOOK_OF_THE_DEAD) {
         const char *what = 0;
 
-        if (scroll->otyp == SPE_NOVEL)
+        if (otyp == SPE_NOVEL)
             /* unseen novels are already distinguishable from unseen
                spellbooks so this isn't revealing any extra information */
             what = "words";
@@ -386,7 +419,7 @@ doread()
 
     confused = (Confusion != 0);
 #ifdef MAIL
-    if (scroll->otyp == SCR_MAIL) {
+    if (otyp == SCR_MAIL) {
         confused = FALSE; /* override */
         /* reading mail is a convenience for the player and takes
            place outside the game, so shouldn't affect gameplay;
@@ -405,24 +438,22 @@ doread()
 #endif
 
     /* Actions required to win the game aren't counted towards conduct */
-    /* Novel conduct is handled in read_tribute so exclude it too*/
-    if (scroll->otyp != SPE_BOOK_OF_THE_DEAD
-        && scroll->otyp != SPE_BLANK_PAPER && scroll->otyp != SCR_BLANK_PAPER
-        && scroll->otyp != SPE_NOVEL)
+    /* Novel conduct is handled in read_tribute so exclude it too */
+    if (otyp != SPE_BOOK_OF_THE_DEAD && otyp != SPE_NOVEL
+        && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
         u.uconduct.literate++;
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll);
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
-    if (scroll->otyp != SCR_BLANK_PAPER) {
+    if (otyp != SCR_BLANK_PAPER) {
         boolean silently = !can_chant(&g.youmonst);
 
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
-        nodisappear = (scroll->otyp == SCR_FIRE
-                       || (scroll->otyp == SCR_REMOVE_CURSE
-                           && scroll->cursed));
+        nodisappear = (otyp == SCR_FIRE
+                       || (otyp == SCR_REMOVE_CURSE && scroll->cursed));
         if (Blind)
             pline(nodisappear
                       ? "You %s the formula on the scroll."
@@ -440,14 +471,14 @@ doread()
         }
     }
     if (!seffects(scroll)) {
-        if (!objects[scroll->otyp].oc_name_known) {
+        if (!objects[otyp].oc_name_known) {
             if (g.known)
                 learnscroll(scroll);
-            else if (!objects[scroll->otyp].oc_uname)
+            else if (!objects[otyp].oc_uname)
                 docall(scroll);
         }
         scroll->in_use = FALSE;
-        if (scroll->otyp != SCR_BLANK_PAPER)
+        if (otyp != SCR_BLANK_PAPER)
             useup(scroll);
     }
     return 1;

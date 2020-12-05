@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.373 $ $NHDT-Date: 1607079461 2020/12/04 10:57:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ $NHDT-Date: 1607200174 2020/12/05 20:29:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -640,6 +640,7 @@ render the color names in the corresponding color when using the pick-a-color
 reading blessed scroll of teleportation confers one-shot teleport control
 mild zombie apocalypse
 list lamps and lanterns in charging prompt
+let tourists read conical hats
 
 
 Platform- and/or Interface-Specific New Features
