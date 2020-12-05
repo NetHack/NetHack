@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1606343578 2020/11/25 22:32:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1607200366 2020/12/05 20:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -23,8 +23,9 @@ static boolean FDECL(mhurtle_step, (genericptr_t, int, int));
 static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
                                            ALL_CLASSES, WEAPON_CLASS, 0 };
 /* different default choices when wielding a sling (gold must be included) */
-static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
-                                         GEM_CLASS, 0 };
+static NEARDATA const char t_bullets[] = {
+    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0
+};
 
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
@@ -295,7 +296,7 @@ dothrow()
     if (!ok_to_throw(&shotlimit))
         return 0;
 
-    obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+    obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
@@ -407,7 +408,7 @@ dofire()
                use direction of previous throw as getobj()'s choice here */
             g.in_doagain = 0;
             /* choose something from inventory, then usually quiver it */
-            obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+            obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
                 setuqwep(obj); /* demi-autoquiver */
