@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ $NHDT-Date: 1607200174 2020/12/05 20:29:34 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.376 $ $NHDT-Date: 1607252278 2020/12/06 10:57:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -662,6 +662,12 @@ Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
 Qt: clicking on the status window runs the #attributes command (^X)
 Qt: add a Search button to the toolbar
 Qt: support the 'hitpointbar' option
+Qt: add Filter, Layout, and Reset buttons to the extended command selector;
+	Filter is only useful in wizard mode, allowing changing the set of
+	extended commands between "all", "normal mode only", "extra wizard
+	mode only"; Layout redisplays the grid of command buttons, toggling
+	from down columns to across rows or vice versa; Reset puts both back
+	to their default settings and clears any pending typed input
 
 
 NetHack Community Patches (or Variation) Included

@@ -20,6 +20,7 @@ extern "C" {
 #include "qt_glyph.h"
 #include "qt_main.h"
 #include "qt_bind.h"
+#include "qt_xcmd.h"
 #include "qt_str.h"
 
 // Dialog box accessed via "Qt Settings..." in the games menu (non-OSX)
@@ -107,6 +108,12 @@ NetHackQtSettings::NetHackQtSettings() :
     settings.setValue("dollShown", QVariant(doll_is_shown));
 #endif
     default_fontsize = settings.value("fontsize", 2).toInt();
+
+    // these aren't currently part of the settings dialog; they're managed
+    // by the extended commands menu ('#' command) and updateXcmd() below
+    // but are included in qt_settings to be remembered across play sessions
+    xcmd_by_row = settings.value("xcmdByRow", false).toBool();
+    xcmd_set = settings.value("xcmdSet", all_cmds).toInt();
 
     // Tile/font sizes read from .nethackrc
     if (qt_tilewidth != NULL) {
@@ -273,6 +280,16 @@ void NetHackQtSettings::setDollShown(bool on_off)
     }
 }
 #endif
+
+// called from NetHackQtExtCmdRequestor::Retry()
+void NetHackQtSettings::updateXcmd(bool by_row, int which_set)
+{
+    // update 'settings' to have Qt store the revised values for next session
+    xcmd_by_row = by_row;
+    settings.setValue("xcmdByRow", QVariant(xcmd_by_row));
+    xcmd_set = which_set;
+    settings.setValue("xcmdSet", xcmd_set);
+}
 
 const QFont& NetHackQtSettings::normalFont()
 {
