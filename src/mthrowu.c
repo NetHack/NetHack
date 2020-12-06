@@ -753,6 +753,10 @@ struct attack *mattk;
         return MM_MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
+        boolean utarg = (mtarg == &g.youmonst);
+        xchar tx = utarg ? mtmp->mux : mtarg->mx;
+        xchar ty = utarg ? mtmp->muy : mtarg->my;
+
         switch (mattk->adtyp) {
         case AD_BLND:
         case AD_DRST:
@@ -765,12 +769,13 @@ struct attack *mattk;
             otmp = mksobj(ACID_VENOM, TRUE, FALSE);
             break;
         }
-        if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my))) {
+        if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,tx,ty))) {
             if (canseemon(mtmp))
                 pline("%s spits venom!", Monnam(mtmp));
-            g.mtarget = mtarg;
+            if (!utarg)
+                g.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
-                    distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
+                    distmin(mtmp->mx,mtmp->my,tx,ty), otmp);
             g.mtarget = (struct monst *)0;
             nomul(0);
 
@@ -785,6 +790,9 @@ struct attack *mattk;
             }
 
             return MM_HIT;
+        } else {
+            obj_extract_self(otmp);
+            obfree(otmp, (struct obj *) 0);
         }
     }
     return MM_MISS;
@@ -949,41 +957,7 @@ spitmu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
 {
-    struct obj *otmp;
-
-    if (mtmp->mcan) {
-        if (!Deaf)
-            pline("A dry rattle comes from %s throat.",
-                  s_suffix(mon_nam(mtmp)));
-        return 0;
-    }
-    if (lined_up(mtmp)) {
-        switch (mattk->adtyp) {
-        case AD_BLND:
-        case AD_DRST:
-            otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
-            break;
-        default:
-            impossible("bad attack type in spitmu");
-        /* fall through */
-        case AD_ACID:
-            otmp = mksobj(ACID_VENOM, TRUE, FALSE);
-            break;
-        }
-        if (!rn2(BOLT_LIM
-                 - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
-            if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
-            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
-                    distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
-            nomul(0);
-            return 0;
-        } else {
-            obj_extract_self(otmp);
-            obfree(otmp, (struct obj *) 0);
-        }
-    }
-    return 0;
+    return spitmm(mtmp, mattk, &g.youmonst);
 }
 
 /* monster breathes at you (ranged) */
