@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1597700875 2020/08/17 21:47:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1606919261 2020/12/02 14:27:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1690,6 +1690,10 @@ int cursor_on_u;
     static int flushing = 0;
     static int delay_flushing = 0;
     register int x, y;
+
+    /* 3.7: don't update map, status, or perm_invent during save/restore */
+    if (g.program_state.saving || g.program_state.restoring)
+        return;
 
     if (cursor_on_u == -1)
         delay_flushing = !delay_flushing;

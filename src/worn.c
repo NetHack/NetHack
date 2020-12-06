@@ -1,4 +1,4 @@
-/* NetHack 3.7	worn.c	$NHDT-Date: 1596498231 2020/08/03 23:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	worn.c	$NHDT-Date: 1606919259 2020/12/02 14:27:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -131,7 +131,7 @@ register struct obj *obj;
                is pending (via 'A' command for multiple items) */
             cancel_doff(obj, wp->w_mask);
 
-            *(wp->w_obj) = 0;
+            *(wp->w_obj) = (struct obj *) 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
             obj->owornmask &= ~wp->w_mask;
@@ -144,6 +144,24 @@ register struct obj *obj;
         iflags.tux_penalty = FALSE;
     update_inventory();
 }
+
+/* called when saving with FREEING flag set has just discarded inventory */
+void
+allunworn()
+{
+    const struct worn *wp;
+
+    u.twoweap = 0; /* uwep and uswapwep are going away */
+    /* remove stale pointers; called after the objects have been freed
+       (without first being unworn) while saving invent during game save;
+       note: uball and uchain might not be freed yet but we clear them
+       here anyway (savegamestate() and its callers deal with them) */
+    for (wp = worn; wp->w_mask; wp++) {
+        /* object is already gone so we don't/can't update is owornmask */
+        *(wp->w_obj) = (struct obj *) 0;
+    }
+}
+
 
 /* return item worn in slot indiciated by wornmask; needed by poly_obj() */
 struct obj *

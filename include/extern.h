@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1606343573 2020/11/25 22:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.882 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1606919254 2020/12/02 14:27:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.886 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1282,6 +1282,7 @@ E void FDECL(rustm, (struct monst *, struct obj *));
 
 /* ### mhitu.c ### */
 
+E void FDECL(hitmsg, (struct monst *, struct attack *));
 E const char *FDECL(mpoisons_subj, (struct monst *, struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);
@@ -1289,6 +1290,8 @@ E void FDECL(expels, (struct monst *, struct permonst *, BOOLEAN_P));
 E struct attack *FDECL(getmattk, (struct monst *, struct monst *,
                                   int, int *, struct attack *));
 E int FDECL(mattacku, (struct monst *));
+boolean FDECL(diseasemu, (struct permonst *));
+boolean FDECL(u_slip_free, (struct monst *, struct attack *));
 E int FDECL(magic_negation, (struct monst *));
 E boolean NDECL(gulp_blnd_check);
 E int FDECL(gazemu, (struct monst *, struct attack *));
@@ -2754,9 +2757,51 @@ E boolean FDECL(attack, (struct monst *));
 E boolean FDECL(hmon, (struct monst *, struct obj *, int, int));
 E boolean FDECL(shade_miss, (struct monst *, struct monst *, struct obj *,
                              BOOLEAN_P, BOOLEAN_P));
+E void FDECL(mhitm_ad_rust, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_corr, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_dcay, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_dren, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_drli, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_fire, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_cold, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_elec, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_acid, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_sgld, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_tlpt, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_blnd, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_curs, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_drst, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_drin, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_stck, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_wrap, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_plys, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_slee, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_slim, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_ench, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_slow, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_conf, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_poly, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_famn, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_pest, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_deth, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_halu, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_phys, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_ston, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_were, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_heal, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_stun, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_legs, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_dgst, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_samu, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_dise, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_sedu, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_ad_ssex, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E void FDECL(mhitm_adtyping, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
+E boolean FDECL(do_stone_u, (struct monst *));
+E void FDECL(do_stone_mon, (struct monst *, struct attack *, struct monst *, struct mhitm_data *));
 E int FDECL(damageum, (struct monst *, struct attack *, int));
 E void FDECL(missum, (struct monst *, struct attack *, BOOLEAN_P));
-E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, int,
+E int FDECL(passive, (struct monst *, struct obj *, BOOLEAN_P, BOOLEAN_P,
                       UCHAR_P, BOOLEAN_P));
 E void FDECL(passive_obj, (struct monst *, struct obj *, struct attack *));
 E void FDECL(stumble_onto_mimic, (struct monst *));
@@ -3122,6 +3167,7 @@ E void FDECL(flip_worm_segs_horizontal, (struct monst *, int, int));
 
 E void FDECL(setworn, (struct obj *, long));
 E void FDECL(setnotworn, (struct obj *));
+E void NDECL(allunworn);
 E struct obj *FDECL(wearmask_to_obj, (long));
 E long FDECL(wearslot, (struct obj *));
 E void FDECL(mon_set_minvis, (struct monst *));

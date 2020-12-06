@@ -86,6 +86,15 @@
 #define AD_SAMU 252 /* hits, may steal Amulet (Wizard) */
 #define AD_CURS 253 /* random curse (ex. gremlin) */
 
+struct mhitm_data {
+    int damage;
+    int hitflags; /* MM_DEF_DIED | MM_AGR_DIED | ... */
+    boolean done;
+    boolean permdmg;
+    int specialdmg;
+    int dieroll;
+};
+
 /*
  *  Monster to monster attacks.  When a monster attacks another (mattackm),
  *  any or all of the following can be returned.  See mattackm() for more
@@ -95,5 +104,6 @@
 #define MM_HIT 0x1      /* aggressor hit defender */
 #define MM_DEF_DIED 0x2 /* defender died */
 #define MM_AGR_DIED 0x4 /* aggressor died */
+#define MM_AGR_DONE 0x8 /* aggressor is done with their turn */
 
 #endif /* MONATTK_H */

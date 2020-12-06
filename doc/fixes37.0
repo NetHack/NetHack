@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ $NHDT-Date: 1606781767 2020/12/01 00:16:07 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ $NHDT-Date: 1607200174 2020/12/05 20:29:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -315,7 +315,11 @@ try to fix message sequencing for tame golems that "roast/rot/rust in peace"
 autodescribe when moving the cursor was erroneously honoring MSGTYPE=stop
 	and potentially delivering sounds
 reduce the number of "seeXYZ" commands by renaming some: #seenv -> #wizseenv,
-	#seespells -> #showspells, and #seetrap -> #showtrap
+	#seegold -> #showgold, #seespells -> #showspells, #seetrap -> #showtrap
+when saving while punished or game ends while punished, handling for ball and
+	chain might access freed memory with unpredictable consequences
+brown pudding monster hitting another monster with decay attack corroded armor
+	instead of rotting it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -505,6 +509,10 @@ Qt: don't get stuck in a loop after choosing "play" while the character name
 	field is empty in the character selection widget
 Qt: when a new message is issued, pan the message window to its left edge if
 	player panned it horizontally then didn't manually scroll it back
+Qt: there was no way to enter extended command "#version" by typing; command
+	name matching was waiting to disambiguate it from "#versionshort"
+	and the only way to that was to type #version<return> but <return>
+	explicitly triggered rejection, cancelling '#' processing
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
@@ -632,6 +640,7 @@ render the color names in the corresponding color when using the pick-a-color
 reading blessed scroll of teleportation confers one-shot teleport control
 mild zombie apocalypse
 list lamps and lanterns in charging prompt
+let tourists read conical hats
 
 
 Platform- and/or Interface-Specific New Features
@@ -742,5 +751,7 @@ rework stairs structure into a linked list
 move 'restoring' to the program_state struct; add corresponding 'saving';
 	both used to enforce no updating of status lines or of persistent
 	inventory when the relevant activity is in progress
+unify special attack damages from separate you-hit-monster, monster-hits-you,
+	and monster-hits-monster into functions by damage type
 
 

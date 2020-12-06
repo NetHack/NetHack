@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1600468453 2020/09/18 22:34:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1606919256 2020/12/02 14:27:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -611,6 +611,8 @@ const struct instance_globals g_init = {
     TRUE, /* havestate*/
     0, /* ustuck_id */
     0, /* usteed_id */
+    (struct obj *) 0, /* looseball */
+    (struct obj *) 0, /* loosechain */
 
     /* shk.c */
     'a', /* sell_response */
