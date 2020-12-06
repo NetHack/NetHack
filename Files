@@ -7,8 +7,9 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-.clang-format    .travis.yml      Cross-compiling  Files
-Porting          README
+.clang-format        .travis.yml          Cross-compiling
+Files                Porting              README
+azure-pipelines.yml
 
 DEVEL:
 (files for people developing changes to NetHack)
