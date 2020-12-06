@@ -1,0 +1,73 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-20.04'
+    mac:
+      imageName: 'macOS-10.15'
+    windows:
+      imageName: 'windows-latest'
+
+pool:
+  vmImage: $(imageName)
+
+resources:
+  repositories:
+  - repository: luarepo
+    type: github
+    name: lua/lua
+    ref: refs/tags/v5.4.1
+    endpoint: github.com_barthouse
+
+steps:
+- checkout: git://NetHack/NHsource@NetHack-3.7  # $(Agent.BuildDirectory)\s\NHsource
+- checkout: luarepo  # $(Agent.BuildDirectory)\s\lua
+
+- task: DownloadSecureFile@1
+  name: storeKey
+  displayName: 'Store Key Download'
+  inputs:
+    secureFile: 'NetHackPackage_StoreKey.pfx'
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- task: CopyFiles@2
+  inputs: 
+    contents: NetHackPackage_StoreKey.pfx
+    SourceFolder: $(Agent.TempDirectory)
+    TargetFolder: $(Agent.BuildDirectory)\s\NHsource\win\win32\vs
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- task: CopyFiles@2
+  inputs: 
+    SourceFolder: $(Agent.BuildDirectory)\s\lua
+    TargetFolder: $(Agent.BuildDirectory)\s\NHsource\lib\lua-5.4.1\src
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- task: MSBuild@1
+  inputs:
+    solution: $(Agent.BuildDirectory)\s\NHsource\win\win32\vs\NetHack.sln
+    platform: Win32
+    configuration: Debug
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- bash: |
+    cd NHsource/sys/unix
+    sh setup.sh hints/linux.2020
+    cd ../..
+    make fetch-lua
+    make all
+  condition: eq( variables['Agent.OS'], 'Linux' )
+  displayName: 'Linux Build'
+
+- bash: |
+    cd NHsource/sys/unix
+    sh setup.sh hints/macosx10.14
+    cd ../..
+    make fetch-lua
+    make all
+  condition: eq( variables['Agent.OS'], 'Darwin' )
+  displayName: 'Mac Build'
