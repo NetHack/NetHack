@@ -63,7 +63,6 @@ static boolean FDECL(search_door, (struct mkroom *,
 static void FDECL(create_corridor, (corridor *));
 static struct mkroom *FDECL(build_room, (room *, struct mkroom *));
 static void FDECL(light_region, (region *));
-static void FDECL(wallify_map, (int, int, int, int));
 static void FDECL(maze1xy, (coord *, int));
 static void NDECL(fill_empty_maze);
 static void FDECL(splev_initlev, (lev_init *));
@@ -2740,7 +2739,7 @@ region *tmpregion;
     }
 }
 
-static void
+void
 wallify_map(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {

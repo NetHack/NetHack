@@ -14,7 +14,6 @@ static schar FDECL(get_map, (int, int, SCHAR_P));
 static void FDECL(pass_one, (SCHAR_P, SCHAR_P));
 static void FDECL(pass_two, (SCHAR_P, SCHAR_P));
 static void FDECL(pass_three, (SCHAR_P, SCHAR_P));
-static void NDECL(wallify_map);
 static void FDECL(join_map, (SCHAR_P, SCHAR_P));
 static void FDECL(finish_map,
                       (SCHAR_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
@@ -247,29 +246,6 @@ boolean anyroom;
         g.max_ry = sy;
 }
 
-/*
- * If we have drawn a map without walls, this allows us to
- * auto-magically wallify it.  Taken from lev_main.c.
- */
-static void
-wallify_map()
-{
-    int x, y, xx, yy;
-
-    for (x = 1; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (levl[x][y].typ == STONE) {
-                for (yy = y - 1; yy <= y + 1; yy++)
-                    for (xx = x - 1; xx <= x + 1; xx++)
-                        if (isok(xx, yy) && levl[xx][yy].typ == ROOM) {
-                            if (yy != y)
-                                levl[x][y].typ = HWALL;
-                            else
-                                levl[x][y].typ = VWALL;
-                        }
-            }
-}
-
 static void
 join_map(bg_typ, fg_typ)
 schar bg_typ, fg_typ;
@@ -351,7 +327,7 @@ boolean lit, walled, icedpools;
     int i, j;
 
     if (walled)
-        wallify_map();
+        wallify_map(1, 0, COLNO-1, ROWNO-1);
 
     if (lit) {
         for (i = 1; i < COLNO; i++)
