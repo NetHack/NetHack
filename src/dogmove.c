@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1596498159 2020/08/03 23:42:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1607374000 2020/12/07 20:46:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1311,7 +1311,9 @@ xchar mx, my, fx, fy;
             if (dist2(i, j, fx, fy) >= dist)
                 continue;
             if (IS_ROCK(levl[i][j].typ) && !passes_walls(mon->data)
-                && (!may_dig(i, j) || !tunnels(mon->data)))
+                && (!may_dig(i, j) || !tunnels(mon->data)
+                    /* tunnelling monsters can't do that on the rogue level */
+                    || Is_rogue_level(&u.uz)))
                 continue;
             if (IS_DOOR(levl[i][j].typ)
                 && (levl[i][j].doormask & (D_CLOSED | D_LOCKED)))

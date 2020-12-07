@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.376 $ $NHDT-Date: 1607252278 2020/12/06 10:57:58 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.377 $ $NHDT-Date: 1607373999 2020/12/07 20:46:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -411,6 +411,7 @@ options help ('? g') listed all boolean options, then repeated them among
 	the compound options; on OSX they showed a description of "(null)"
 	but for other sprintf implementations they might cause a crash
 change name of #wizlevelflip to #wizfliplevel
+dwarves could sometimes pass through walls without digging their way
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

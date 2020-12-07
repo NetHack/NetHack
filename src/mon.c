@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1606623308 2020/11/29 04:15:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1607374002 2020/12/07 20:46:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1551,6 +1551,14 @@ struct monst *mtmp;
     boolean can_unlock = ((can_open && monhaskey(mtmp, TRUE))
                           || mtmp->iswiz || is_rider(mtmp->data));
     boolean doorbuster = is_giant(mtmp->data);
+    /* don't tunnel if on rogue level or if hostile and close enough
+       to prefer a weapon; same criteria as in m_move() */
+    boolean can_tunnel = (tunnels(mtmp->data) && !Is_rogue_level(&u.uz));
+
+    if (can_tunnel && needspick(mtmp->data)
+        && ((!mtmp->mpeaceful || Conflict)
+            && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 8))
+        can_tunnel = FALSE;
 
     if (mtmp->mtame)
         allowflags |= ALLOW_M | ALLOW_TRAPS | ALLOW_SANCT | ALLOW_SSM;
@@ -1568,8 +1576,7 @@ struct monst *mtmp;
         allowflags |= (ALLOW_ROCK | ALLOW_WALL);
     if (throws_rocks(mtmp->data))
         allowflags |= ALLOW_ROCK;
-    if (tunnels(mtmp->data)
-        && !Is_rogue_level(&u.uz)) /* same restriction as m_move() */
+    if (can_tunnel)
         allowflags |= ALLOW_DIG;
     if (doorbuster)
         allowflags |= BUSTDOOR;
