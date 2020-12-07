@@ -755,7 +755,7 @@ register struct monst *mtmp;
             (void) mongets(mtmp, MUMMY_WRAPPING);
         break;
     case S_QUANTMECH:
-        if (!rn2(20)) {
+        if (!rn2(20) && ptr == &mons[PM_QUANTUM_MECHANIC]) {
             struct obj *catcorpse;
 
             otmp = mksobj(LARGE_BOX, FALSE, FALSE);

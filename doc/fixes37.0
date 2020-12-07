@@ -412,6 +412,7 @@ options help ('? g') listed all boolean options, then repeated them among
 	but for other sprintf implementations they might cause a crash
 change name of #wizlevelflip to #wizfliplevel
 dwarves could sometimes pass through walls without digging their way
+fix genetic engineers dropping Schroedinger's cat box
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
