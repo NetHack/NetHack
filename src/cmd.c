@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607079461 2020/12/04 10:57:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.427 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607339290 2020/12/07 11:08:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -186,8 +186,7 @@ static int FDECL(ch2spkeys, (CHAR_P, int, int));
 static boolean FDECL(prefix_cmd, (CHAR_P));
 
 static int NDECL((*timed_occ_fn));
-static char *FDECL(doc_extcmd_flagstr, (winid, const struct ext_func_tab *,
-                                        BOOLEAN_P));
+static char *FDECL(doc_extcmd_flagstr, (winid, const struct ext_func_tab *));
 
 static const char *readchar_queue = "";
 /* for rejecting attempts to use wizard mode commands */
@@ -340,34 +339,43 @@ doextcmd(VOID_ARGS)
     return retval;
 }
 
+/* format extended command flags for display */
 static char *
-doc_extcmd_flagstr(menuwin, efp, doc)
+doc_extcmd_flagstr(menuwin, efp)
 winid menuwin;
-const struct ext_func_tab *efp;
-boolean doc;
+const struct ext_func_tab *efp; /* if Null, add a footnote to the menu */
 {
-    static char buf[BUFSZ];
+    static char Abuf[10]; /* 5 would suffice: {'[','m','A',']','\0'} */
 
-    if (doc) {
+    /* note: tag shown for menu prefix is 'm' even if m-prefix action
+       has been bound to some other key */
+    if (!efp) {
+        char qbuf[QBUFSZ];
         anything any = cg.zeroany;
 
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "[A] Command autocompletes", MENU_ITEMFLAGS_NONE);
-        Sprintf(buf, "[m] Command accepts '%c' prefix",
+        Sprintf(qbuf, "[m] Command accepts '%c' prefix",
                 g.Cmd.spkeys[NHKF_REQMENU]);
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE, qbuf,
                  MENU_ITEMFLAGS_NONE);
         return (char *) 0;
     } else {
-        buf[0] = '\0';
-        Sprintf(&buf[1], "%s%s",
-                (efp->flags & AUTOCOMPLETE) ? "A" : "",
-                accept_menu_prefix(efp->ef_funct) ? "m" : "");
-        if (buf[1]) {
-            buf[0] = '[';
-            Strcat(buf, "]");
+        boolean mprefix = accept_menu_prefix(efp->ef_funct),
+                autocomplete = (efp->flags & AUTOCOMPLETE) != 0;
+        char *p = Abuf;
+
+        /* "" or "[m]" or "[A]" or "[mA]" */
+        if (mprefix || autocomplete) {
+            *p++ = '[';
+            if (mprefix)
+                *p++ = 'm';
+            if (autocomplete)
+                *p++ = 'A';
+            *p++ = ']';
         }
-        return buf;
+        *p = '\0';
+        return Abuf;
     }
 }
 
@@ -400,10 +408,8 @@ doextlist(VOID_ARGS)
         add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "", MENU_ITEMFLAGS_NONE);
 
-        Strcpy(buf, menumode ? "Show" : "Hide");
-        Strcat(buf, " commands that don't autocomplete");
-        if (!menumode)
-            Strcat(buf, " (those not marked with [A])");
+        Sprintf(buf, "Switch to %s commands that don't autocomplete",
+                menumode ? "including" : "excluding");
         any.a_int = 1;
         add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf,
                  MENU_ITEMFLAGS_NONE);
@@ -419,7 +425,7 @@ doextlist(VOID_ARGS)
                      "Search extended commands",
                      MENU_ITEMFLAGS_NONE);
         } else {
-            Strcpy(buf, "Show all, clear search");
+            Strcpy(buf, "Switch back from search");
             if (strlen(buf) + strlen(searchbuf) + strlen(" (\"\")") < QBUFSZ)
                 Sprintf(eos(buf), " (\"%s\")", searchbuf);
             any.a_int = 3;
@@ -434,8 +440,8 @@ doextlist(VOID_ARGS)
         if (wizard) {
             any.a_int = 4;
             add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
-                     onelist ? "Show debugging commands in separate section"
-                    : "Show all alphabetically, including debugging commands",
+          onelist ? "Switch to showing debugging commands in separate section"
+       : "Switch to showing all alphabetically, including debugging commands",
                      MENU_ITEMFLAGS_NONE);
         }
         any = cg.zeroany;
@@ -486,10 +492,10 @@ doextlist(VOID_ARGS)
                              MENU_ITEMFLAGS_NONE);
                     menushown[pass] = 1;
                 }
-                Sprintf(buf, " %-14s %-4s %s",
-                        efp->ef_txt,
-                        doc_extcmd_flagstr(menuwin, efp, FALSE),
-                        efp->ef_desc);
+                /* longest ef_txt at present is "wizrumorcheck" (13 chars);
+                   2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
+                Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
+                        doc_extcmd_flagstr(menuwin, efp), efp->ef_desc);
                 add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                          buf, MENU_ITEMFLAGS_NONE);
                 ++n;
@@ -502,7 +508,7 @@ doextlist(VOID_ARGS)
             add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "no matches", MENU_ITEMFLAGS_NONE);
         else
-            (void) doc_extcmd_flagstr(menuwin, efp, TRUE);
+            (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
         end_menu(menuwin, (char *) 0);
         n = select_menu(menuwin, PICK_ONE, &selected);
