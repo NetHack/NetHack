@@ -1,4 +1,4 @@
-Cross-compiling NetHack 3.7 Last edit: October 6, 2020
+Cross-compiling NetHack 3.7 Last edit: December 7, 2020
 
 The NetHack 3.7 build process differs from the build process of previous
 versions in some important ways that make it possible to use a cross-compiler
@@ -18,7 +18,7 @@ Part B Contents:
     B3. What needs to be built for the TARGET?
     B4. Case sample: msdos
     B5. Case sample: amiga (started but incomplete)
-    B6. Case sample: Web Assembly, libnethack
+    B6. Case sample: Web Assembly, libnh
 
 --------------------------------------------------------------------------------
  Part A - Cross-compiling NetHack
@@ -668,7 +668,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
         make CROSS_TO_WASM=1
 
-    You can build src/nethacklib.a from pull request 385 as follows:
+    You can build src/libnh.a from pull request 385 as follows:
 
         make WANT_LIBNH=1
 
@@ -679,7 +679,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
     from pull request 385.
 
     Result: As mentioned, the wasm cross-compile will end up in
-            targets/wasm and the nethacklib.a will end up
+            targets/wasm and the nethacklib.a will end up in
             src.
 
     The cross-compiler hints additions are enclosed inside ifdef sections
