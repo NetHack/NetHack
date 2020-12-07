@@ -790,10 +790,17 @@ void NetHackQtBind::qt_getlin(const char *prompt, char *line)
     NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
 }
 
+// User has typed '#' to begin entering an extended command; core calls us.
 int NetHackQtBind::qt_get_ext_cmd()
 {
-    NetHackQtExtCmdRequestor requestor(mainWidget());
-    return requestor.get();
+    NetHackQtExtCmdRequestor *xcmd;
+    int result;
+    do {
+        xcmd = new NetHackQtExtCmdRequestor(mainWidget());
+        result = xcmd->get();
+        delete xcmd;
+    } while (result == xcmdNoMatch);
+    return result;
 }
 
 void NetHackQtBind::qt_number_pad(int)

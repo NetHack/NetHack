@@ -55,11 +55,10 @@
 // [cmd_N] are buttons labelled with command names; clicking returns the
 //   index for the name.
 //
-// Changing filter or layout returns 0 to caller who then calls us again
-//   (current filter and layout are kept in qt_settings so persist);
+// Changing filter or layout returns xcmdNoMatch to qt_get_ext_cmd() which
+//   then calls us again (current filter and layout are kept in qt_settings
+//   so persist, not just through return and call back but across games);
 //   much simpler than reorganizing the button grid's contents on the fly.
-//   [TODO: perform '0 => retry' handling in qt_get_ext_cmd() rather than
-//   relying on the core to maintain that behavior.]
 // Current grid size with SHELL and SUSPEND enabled is 13x9 for all
 //   commands, 13x7 for normal mode commands, and 7x4 (when by-column) or
 //   4x7 (if by-row) for wizard mode commands.  Column counts are hardcoded
@@ -120,6 +119,9 @@ interesting_command(unsigned indx, int cmds)
     // entry 0 is a no-op; don't bother displaying it in the command grid
     if (indx == 0 && !strcmp("#", extcmdlist[indx].ef_txt))
         return false;
+    // treat '?' as both normal mode and debug mode
+    if (!strcmp("?", extcmdlist[indx].ef_txt))
+        return true;
     // some commands might have been compiled-out; don't show them
     if ((extcmdlist[indx].flags & CMD_NOT_AVAILABLE) != 0)
         return false;
@@ -327,8 +329,8 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
 int NetHackQtExtCmdRequestor::Button(int butnum)
 {
     // 0..3 are control buttons, 4..N+3 are choice buttons.
-    // Widget return value is -1 for cancel (via reject),
-    // 0 for filter, layout, reset (via accept if circumstances warrant),
+    // Widget return value is -1 for cancel (via reject), xcmdNoMatch
+    // for filter, layout, reset (via accept if circumstances warrant),
     // 1..N for command choices (choice 0 is '#' and it isn't shown as
     // a candidate since picking it is not useful).
     switch (butnum) {
@@ -419,11 +421,11 @@ void NetHackQtExtCmdRequestor::Retry()
     // remember the current settings; they'll persist until changed again
     qt_settings->updateXcmd(byRow, set);
 
-    // result 0 means that caller in core will call get_ext_cmd() again;
+    // return to qt_get_ext_cmd() and have it run ExtCmdRequestor again;
     // current selection grid will be torn down, then new one created;
-    // TODO: have qt_get_ext_cmd() handle it instead of relying on core
-    setResult(0);
+    setResult(xcmdNoMatch);
     accept();
+    /*NOTREACHED*/
 }
 
 #define Ctrl(c) (0x1f & (c)) /* ASCII */
