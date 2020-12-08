@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607339290 2020/12/07 11:08:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607471879 2020/12/08 23:57:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.429 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2161,7 +2161,7 @@ dokeylist(VOID_ARGS)
 {
     char buf[BUFSZ], buf2[BUFSZ];
     uchar key;
-    boolean keys_used[256] = {0};
+    boolean keys_used[256];
     winid datawin;
     int i;
     static const char
@@ -2186,11 +2186,13 @@ dokeylist(VOID_ARGS)
           "Prefix: run without picking up objects/fighting", FALSE },
         { NHKF_DOINV, "view inventory", TRUE },
         { NHKF_REQMENU, "Prefix: request a menu", FALSE },
-#ifdef REDO
+        { NHKF_COUNT,
+          "Prefix: for digits when prefixing a command with a count", TRUE },
         { NHKF_DOAGAIN , "re-do: perform the previous command again", FALSE },
-#endif
         { 0, (const char *) 0, FALSE }
     };
+
+    (void) memset((genericptr_t) keys_used, 0, sizeof keys_used);
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
@@ -2226,12 +2228,24 @@ dokeylist(VOID_ARGS)
             = keys_used[(uchar) C(g.Cmd.move_SE)] = TRUE;
         putstr(datawin, 0, "");
         putstr(datawin, 0,
-          "Shift-<direction> will move in specified direction until you hit");
-        putstr(datawin, 0, "        a wall or run into something.");
-        putstr(datawin, 0,
-          "Ctrl-<direction> will run in specified direction until something");
-        putstr(datawin, 0, "        very interesting is seen.");
+     "Ctrl+<direction> will run in specified direction until something very");
+        Sprintf(buf, "%8s %s", "", "interesting is seen.");
+        putstr(datawin, 0, buf);
+        Strcpy(buf, "Shift");
+    } else {
+        /* num_pad */
+        keys_used[(uchar) M('1')] = keys_used[(uchar) M('2')]
+            = keys_used[(uchar) M('3')] = keys_used[(uchar) M('4')]
+            = keys_used[(uchar) M('6')] = keys_used[(uchar) M('7')]
+            = keys_used[(uchar) M('8')] = keys_used[(uchar) M('9')] = TRUE;
+        putstr(datawin, 0, "");
+        Strcpy(buf, "Meta");
     }
+    Strcat(buf,
+          "+<direction> will run in specified direction until you encounter");
+    putstr(datawin, 0, buf);
+    Sprintf(buf, "%8s %s", "", "an obstacle.");
+    putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
     putstr(datawin, 0, "Miscellaneous keys:");
@@ -2245,8 +2259,10 @@ dokeylist(VOID_ARGS)
         }
     }
 #ifndef NO_SIGNAL
-    putstr(datawin, 0, "^c       break out of NetHack (SIGINT)");
     keys_used[(uchar) C('c')] = TRUE;
+    Sprintf(buf, "%-8s %s", key2txt(C('c'), buf2),
+            "break out of NetHack (SIGINT)");
+    putstr(datawin, 0, buf);
 #endif
 
     putstr(datawin, 0, "");
@@ -2778,7 +2794,7 @@ wiz_migrate_mons()
 }
 #endif
 
-struct {
+static struct {
     int nhkf;
     char key;
     const char *name;

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.379 $ $NHDT-Date: 1607461111 2020/12/08 20:58:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.380 $ $NHDT-Date: 1607471879 2020/12/08 23:57:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -320,6 +320,8 @@ when saving while punished or game ends while punished, handling for ball and
 	chain might access freed memory with unpredictable consequences
 brown pudding monster hitting another monster with decay attack corroded armor
 	instead of rotting it
+<?> -> <full key bindings> omitted 'n' prefix and M-digit for number_pad mode,
+	and ^A/re-do was suppressed due lack of obsolete '#define REDO'
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
