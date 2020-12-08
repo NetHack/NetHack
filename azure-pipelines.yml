@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 strategy:
   matrix:
     linux:
@@ -24,7 +19,7 @@ resources:
     endpoint: github.com_barthouse
 
 steps:
-- checkout: git://NetHack/NHsource@NetHack-3.7  # $(Agent.BuildDirectory)\s\NHsource
+- checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
 - checkout: luarepo  # $(Agent.BuildDirectory)\s\lua
 
 - task: DownloadSecureFile@1
@@ -38,34 +33,37 @@ steps:
   inputs: 
     contents: NetHackPackage_StoreKey.pfx
     SourceFolder: $(Agent.TempDirectory)
-    TargetFolder: $(Agent.BuildDirectory)\s\NHsource\win\win32\vs
+    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\win\win32\vs
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - task: CopyFiles@2
   inputs: 
     SourceFolder: $(Agent.BuildDirectory)\s\lua
-    TargetFolder: $(Agent.BuildDirectory)\s\NHsource\lib\lua-5.4.1\src
+    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\lib\lua-5.4.1\src
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - task: MSBuild@1
   inputs:
-    solution: $(Agent.BuildDirectory)\s\NHsource\win\win32\vs\NetHack.sln
+    solution: $(Agent.BuildDirectory)\s\NetHack\win\win32\vs\NetHack.sln
     platform: Win32
     configuration: Debug
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - bash: |
-    cd NHsource/sys/unix
+    sudo apt-get -qq -y update
+    sudo apt-get -qq -y install libncurses5-dev
+    sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
+    cd NetHack/sys/unix
     sh setup.sh hints/linux.2020
     cd ../..
     make fetch-lua
-    make all
+    make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
   condition: eq( variables['Agent.OS'], 'Linux' )
   displayName: 'Linux Build'
 
 - bash: |
-    cd NHsource/sys/unix
-    sh setup.sh hints/macosx10.14
+    cd NetHack/sys/unix
+    sh setup.sh hints/macos.2020
     cd ../..
     make fetch-lua
     make all
