@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixconf.h	$NHDT-Date: 1596498567 2020/08/03 23:49:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.7	unixconf.h	$NHDT-Date: 1607461111 2020/12/08 20:58:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -273,8 +273,11 @@
 #endif
 #endif
 #endif
+
+#ifndef NOSUSPEND
 #if defined(BSD_JOB_CONTROL) || defined(POSIX_JOB_CONTROL) || defined(AUX)
-#define SUSPEND /* let ^Z suspend the game */
+#define SUSPEND /* let ^Z suspend the game (push to background) */
+#endif
 #endif
 
 /*

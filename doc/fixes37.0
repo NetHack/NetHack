@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.377 $ $NHDT-Date: 1607373999 2020/12/07 20:46:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.379 $ $NHDT-Date: 1607461111 2020/12/08 20:58:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -670,6 +670,8 @@ Qt: add Filter, Layout, and Reset buttons to the extended command selector;
 	mode only"; Layout redisplays the grid of command buttons, toggling
 	from down columns to across rows or vice versa; Reset puts both back
 	to their default settings and clears any pending typed input
+Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
+	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 
 
 NetHack Community Patches (or Variation) Included
