@@ -15,7 +15,7 @@ static struct obj *FDECL(t_missile, (int, struct trap *));
 static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_sqky_board, (struct trap *, unsigned));
+static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_bear_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_slp_gas_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_rust_trap, (struct trap *, unsigned));
@@ -1111,29 +1111,59 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_sqky_board(trap, trflags)
+static int
+trapeffect_sqky_board(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
 
-    if ((Levitation || Flying) && !forcetrap) {
-        if (!Blind) {
+    if (mtmp == &g.youmonst) {
+        if ((Levitation || Flying) && !forcetrap) {
+            if (!Blind) {
+                seetrap(trap);
+                if (Hallucination)
+                    You("notice a crease in the linoleum.");
+                else
+                    You("notice a loose board below you.");
+            }
+        } else {
             seetrap(trap);
-            if (Hallucination)
-                You("notice a crease in the linoleum.");
-            else
-                You("notice a loose board below you.");
+            pline("A board beneath you %s%s%s.",
+                  Deaf ? "vibrates" : "squeaks ",
+                  Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
+            wake_nearby();
         }
     } else {
-        seetrap(trap);
-        pline("A board beneath you %s%s%s.",
-              Deaf ? "vibrates" : "squeaks ",
-              Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
-        wake_nearby();
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+
+        if (is_flyer(mtmp->data))
+            return 0;
+        /* stepped on a squeaky board */
+        if (in_sight) {
+            if (!Deaf) {
+                pline("A board beneath %s squeaks %s loudly.",
+                      mon_nam(mtmp), trapnote(trap, 0));
+                seetrap(trap);
+            } else {
+                pline("%s stops momentarily and appears to cringe.",
+                      Monnam(mtmp));
+            }
+        } else {
+            /* same near/far threshold as mzapmsg() */
+            int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
+                ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
+
+            You_hear("a %s squeak %s.", trapnote(trap, 1),
+                     (distu(mtmp->mx, mtmp->my) <= range * range)
+                     ? "nearby" : "in the distance");
+        }
+        /* wake up nearby monsters */
+        wake_nearto(mtmp->mx, mtmp->my, 40);
     }
+    return 0;
 }
 
 static void
@@ -1782,7 +1812,7 @@ unsigned trflags;
         break;
 
     case SQKY_BOARD: /* stepped on a squeaky board */
-        trapeffect_sqky_board(trap, trflags);
+        (void) trapeffect_sqky_board(&g.youmonst, trap, trflags);
         break;
 
     case BEAR_TRAP:
@@ -2506,29 +2536,7 @@ register struct monst *mtmp;
         case ROCKTRAP:
             return trapeffect_rocktrap(mtmp, trap, 0);
         case SQKY_BOARD:
-            if (is_flyer(mptr))
-                break;
-            /* stepped on a squeaky board */
-            if (in_sight) {
-                if (!Deaf) {
-                    pline("A board beneath %s squeaks %s loudly.",
-                          mon_nam(mtmp), trapnote(trap, 0));
-                    seetrap(trap);
-                } else {
-                    pline("%s stops momentarily and appears to cringe.",
-                          Monnam(mtmp));
-                }
-            } else {
-                /* same near/far threshold as mzapmsg() */
-                int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
-                               ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
-
-                You_hear("a %s squeak %s.", trapnote(trap, 1),
-                         (distu(mtmp->mx, mtmp->my) <= range * range)
-                            ? "nearby" : "in the distance");
-            }
-            /* wake up nearby monsters */
-            wake_nearto(mtmp->mx, mtmp->my, 40);
+            return trapeffect_sqky_board(mtmp, trap, 0);
             break;
         case BEAR_TRAP:
             if (mptr->msize > MZ_SMALL && !amorphous(mptr) && !is_flyer(mptr)
