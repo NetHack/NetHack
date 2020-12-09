@@ -20,7 +20,7 @@ static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned)
 static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rust_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_fire_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_pit, (struct trap *, unsigned));
+static int FDECL(trapeffect_pit, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_hole, (struct trap *, unsigned));
 static void FDECL(trapeffect_telep_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_level_telep, (struct trap *, unsigned));
@@ -1479,127 +1479,174 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_pit(trap, trflags)
+static int
+trapeffect_pit(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     int ttype = trap->ttyp;
-    boolean plunged = (trflags & TOOKPLUNGE) != 0;
-    boolean conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
-    boolean adj_pit = adj_nonconjoined_pit(trap);
-    int steed_article = ARTICLE_THE;
-    int oldumort;
 
-    /* KMH -- You can't escape the Sokoban level traps */
-    if (!Sokoban && (Levitation || (Flying && !plunged)))
-        return;
-    feeltrap(trap);
-    if (!Sokoban && is_clinger(g.youmonst.data) && !plunged) {
-        if (trap->tseen) {
-            You_see("%s %spit below you.", a_your[trap->madeby_u],
-                    ttype == SPIKED_PIT ? "spiked " : "");
-        } else {
-            pline("%s pit %sopens up under you!", A_Your[trap->madeby_u],
-                  ttype == SPIKED_PIT ? "full of spikes " : "");
-            You("don't fall in!");
+    if (mtmp == &g.youmonst) {
+        boolean plunged = (trflags & TOOKPLUNGE) != 0;
+        boolean conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
+        boolean adj_pit = adj_nonconjoined_pit(trap);
+        int steed_article = ARTICLE_THE;
+        int oldumort;
+
+        /* KMH -- You can't escape the Sokoban level traps */
+        if (!Sokoban && (Levitation || (Flying && !plunged)))
+            return 0;
+        feeltrap(trap);
+        if (!Sokoban && is_clinger(g.youmonst.data) && !plunged) {
+            if (trap->tseen) {
+                You_see("%s %spit below you.", a_your[trap->madeby_u],
+                        ttype == SPIKED_PIT ? "spiked " : "");
+            } else {
+                pline("%s pit %sopens up under you!", A_Your[trap->madeby_u],
+                      ttype == SPIKED_PIT ? "full of spikes " : "");
+                You("don't fall in!");
+            }
+            return 0;
         }
-        return;
-    }
-    if (!Sokoban) {
-        char verbbuf[BUFSZ];
+        if (!Sokoban) {
+            char verbbuf[BUFSZ];
 
-        *verbbuf = '\0';
-        if (u.usteed) {
-            if ((trflags & RECURSIVETRAP) != 0)
-                Sprintf(verbbuf, "and %s fall",
-                        x_monnam(u.usteed, steed_article, (char *) 0,
-                                 SUPPRESS_SADDLE, FALSE));
-            else
-                Sprintf(verbbuf, "lead %s",
-                        x_monnam(u.usteed, steed_article, "poor",
-                                 SUPPRESS_SADDLE, FALSE));
-        } else if (conj_pit) {
-            You("move into an adjacent pit.");
-        } else if (adj_pit) {
-            You("stumble over debris%s.",
-                !rn2(5) ? " between the pits" : "");
-        } else {
-            Strcpy(verbbuf,
-                   !plunged ? "fall" : (Flying ? "dive" : "plunge"));
+            *verbbuf = '\0';
+            if (u.usteed) {
+                if ((trflags & RECURSIVETRAP) != 0)
+                    Sprintf(verbbuf, "and %s fall",
+                            x_monnam(u.usteed, steed_article, (char *) 0,
+                                     SUPPRESS_SADDLE, FALSE));
+                else
+                    Sprintf(verbbuf, "lead %s",
+                            x_monnam(u.usteed, steed_article, "poor",
+                                     SUPPRESS_SADDLE, FALSE));
+            } else if (conj_pit) {
+                You("move into an adjacent pit.");
+            } else if (adj_pit) {
+                You("stumble over debris%s.",
+                    !rn2(5) ? " between the pits" : "");
+            } else {
+                Strcpy(verbbuf,
+                       !plunged ? "fall" : (Flying ? "dive" : "plunge"));
+            }
+            if (*verbbuf)
+                You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
         }
-        if (*verbbuf)
-            You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
-    }
-    /* wumpus reference */
-    if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once
-        && In_quest(&u.uz) && Is_qlocate(&u.uz)) {
-        pline("Fortunately it has a bottom after all...");
-        trap->once = 1;
-    } else if (u.umonnum == PM_PIT_VIPER || u.umonnum == PM_PIT_FIEND) {
-        pline("How pitiful.  Isn't that the pits?");
-    }
-    if (ttype == SPIKED_PIT) {
-        const char *predicament = "on a set of sharp iron spikes";
-
-        if (u.usteed) {
-            pline("%s %s %s!",
-                  upstart(x_monnam(u.usteed, steed_article, "poor",
-                                   SUPPRESS_SADDLE, FALSE)),
-                  conj_pit ? "steps" : "lands", predicament);
-        } else
-            You("%s %s!", conj_pit ? "step" : "land", predicament);
-    }
-    /* FIXME:
-     * if hero gets killed here, setting u.utrap in advance will
-     * show "you were trapped in a pit" during disclosure's display
-     * of enlightenment, but hero is dying *before* becoming trapped.
-     */
-    set_utrap((unsigned) rn1(6, 2), TT_PIT);
-    if (!steedintrap(trap, (struct obj *) 0)) {
+        /* wumpus reference */
+        if (Role_if(PM_RANGER) && !trap->madeby_u && !trap->once
+            && In_quest(&u.uz) && Is_qlocate(&u.uz)) {
+            pline("Fortunately it has a bottom after all...");
+            trap->once = 1;
+        } else if (u.umonnum == PM_PIT_VIPER || u.umonnum == PM_PIT_FIEND) {
+            pline("How pitiful.  Isn't that the pits?");
+        }
         if (ttype == SPIKED_PIT) {
-            oldumort = u.umortality;
-            losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
-                   /* note: these don't need locomotion() handling;
-                      if fatal while poly'd and Unchanging, the
-                      death reason will be overridden with
-                      "killed while stuck in creature form" */
-                   plunged
-                   ? "deliberately plunged into a pit of iron spikes"
-                   : conj_pit
-                   ? "stepped into a pit of iron spikes"
-                   : adj_pit
-                   ? "stumbled into a pit of iron spikes"
-                   : "fell into a pit of iron spikes",
-                   NO_KILLER_PREFIX);
-            if (!rn2(6))
-                poisoned("spikes", A_STR,
-                         (conj_pit || adj_pit)
-                         ? "stepping on poison spikes"
-                         : "fall onto poison spikes",
-                         /* if damage triggered life-saving,
-                            poison is limited to attrib loss */
-                         (u.umortality > oldumort) ? 0 : 8, FALSE);
-        } else {
-            /* plunging flyers take spike damage but not pit damage */
-            if (!conj_pit
-                && !(plunged && (Flying || is_clinger(g.youmonst.data))))
-                losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
-                       plunged ? "deliberately plunged into a pit"
-                       : "fell into a pit",
+            const char *predicament = "on a set of sharp iron spikes";
+
+            if (u.usteed) {
+                pline("%s %s %s!",
+                      upstart(x_monnam(u.usteed, steed_article, "poor",
+                                       SUPPRESS_SADDLE, FALSE)),
+                      conj_pit ? "steps" : "lands", predicament);
+            } else
+                You("%s %s!", conj_pit ? "step" : "land", predicament);
+        }
+        /* FIXME:
+         * if hero gets killed here, setting u.utrap in advance will
+         * show "you were trapped in a pit" during disclosure's display
+         * of enlightenment, but hero is dying *before* becoming trapped.
+         */
+        set_utrap((unsigned) rn1(6, 2), TT_PIT);
+        if (!steedintrap(trap, (struct obj *) 0)) {
+            if (ttype == SPIKED_PIT) {
+                oldumort = u.umortality;
+                losehp(Maybe_Half_Phys(rnd(conj_pit ? 4 : adj_pit ? 6 : 10)),
+                       /* note: these don't need locomotion() handling;
+                          if fatal while poly'd and Unchanging, the
+                          death reason will be overridden with
+                          "killed while stuck in creature form" */
+                       plunged
+                       ? "deliberately plunged into a pit of iron spikes"
+                       : conj_pit
+                       ? "stepped into a pit of iron spikes"
+                       : adj_pit
+                       ? "stumbled into a pit of iron spikes"
+                       : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
+                if (!rn2(6))
+                    poisoned("spikes", A_STR,
+                             (conj_pit || adj_pit)
+                             ? "stepping on poison spikes"
+                             : "fall onto poison spikes",
+                             /* if damage triggered life-saving,
+                                poison is limited to attrib loss */
+                             (u.umortality > oldumort) ? 0 : 8, FALSE);
+            } else {
+                /* plunging flyers take spike damage but not pit damage */
+                if (!conj_pit
+                    && !(plunged && (Flying || is_clinger(g.youmonst.data))))
+                    losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
+                           plunged ? "deliberately plunged into a pit"
+                           : "fell into a pit",
+                           NO_KILLER_PREFIX);
+            }
+            if (Punished && !carried(uball)) {
+                unplacebc();
+                ballfall();
+                placebc();
+            }
+            if (!conj_pit)
+                selftouch("Falling, you");
+            g.vision_full_recalc = 1; /* vision limits change */
+            exercise(A_STR, FALSE);
+            exercise(A_DEX, FALSE);
         }
-        if (Punished && !carried(uball)) {
-            unplacebc();
-            ballfall();
-            placebc();
+    } else {
+        int tt = trap->ttyp;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean trapkilled = FALSE;
+        boolean inescapable = (g.force_mintrap
+                               || ((tt == HOLE || tt == PIT)
+                                   && Sokoban && !trap->madeby_u));
+        struct permonst *mptr = mtmp->data;
+        const char *fallverb;
+
+        fallverb = "falls";
+        if (is_flyer(mptr) || is_floater(mptr)
+            || (mtmp->wormno && count_wsegs(mtmp) > 5)
+            || is_clinger(mptr)) {
+            if (g.force_mintrap && !Sokoban) {
+                /* openfallingtrap; not inescapable here */
+                if (in_sight) {
+                    seetrap(trap);
+                    pline("%s doesn't fall into the pit.", Monnam(mtmp));
+                }
+                return 0;
+            }
+            if (!inescapable)
+                return 0;               /* avoids trap */
+            fallverb = "is dragged"; /* sokoban pit */
         }
-        if (!conj_pit)
-            selftouch("Falling, you");
-        g.vision_full_recalc = 1; /* vision limits change */
-        exercise(A_STR, FALSE);
-        exercise(A_DEX, FALSE);
+        if (!passes_walls(mptr))
+            mtmp->mtrapped = 1;
+        if (in_sight) {
+            pline("%s %s into %s pit!", Monnam(mtmp), fallverb,
+                  a_your[trap->madeby_u]);
+            if (mptr == &mons[PM_PIT_VIPER]
+                || mptr == &mons[PM_PIT_FIEND])
+                pline("How pitiful.  Isn't that the pits?");
+            seetrap(trap);
+        }
+        mselftouch(mtmp, "Falling, ", FALSE);
+        if (DEADMONSTER(mtmp) || thitm(0, mtmp, (struct obj *) 0,
+                                       rnd((tt == PIT) ? 6 : 10), FALSE))
+            trapkilled = TRUE;
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -2022,7 +2069,7 @@ unsigned trflags;
 
     case PIT:
     case SPIKED_PIT:
-        trapeffect_pit(trap, trflags);
+        (void) trapeffect_pit(&g.youmonst, trap, trflags);
         break;
 
     case HOLE:
@@ -2742,36 +2789,7 @@ register struct monst *mtmp;
             break;
         case PIT:
         case SPIKED_PIT:
-            fallverb = "falls";
-            if (is_flyer(mptr) || is_floater(mptr)
-                || (mtmp->wormno && count_wsegs(mtmp) > 5)
-                || is_clinger(mptr)) {
-                if (g.force_mintrap && !Sokoban) {
-                    /* openfallingtrap; not inescapable here */
-                    if (in_sight) {
-                        seetrap(trap);
-                        pline("%s doesn't fall into the pit.", Monnam(mtmp));
-                    }
-                    break; /* inescapable = FALSE; */
-                }
-                if (!inescapable)
-                    break;               /* avoids trap */
-                fallverb = "is dragged"; /* sokoban pit */
-            }
-            if (!passes_walls(mptr))
-                mtmp->mtrapped = 1;
-            if (in_sight) {
-                pline("%s %s into %s pit!", Monnam(mtmp), fallverb,
-                      a_your[trap->madeby_u]);
-                if (mptr == &mons[PM_PIT_VIPER]
-                    || mptr == &mons[PM_PIT_FIEND])
-                    pline("How pitiful.  Isn't that the pits?");
-                seetrap(trap);
-            }
-            mselftouch(mtmp, "Falling, ", FALSE);
-            if (DEADMONSTER(mtmp) || thitm(0, mtmp, (struct obj *) 0,
-                                        rnd((tt == PIT) ? 6 : 10), FALSE))
-                trapkilled = TRUE;
+            return trapeffect_pit(mtmp, trap, 0);
             break;
         case HOLE:
         case TRAPDOOR:
