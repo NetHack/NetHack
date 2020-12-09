@@ -18,7 +18,7 @@ static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned))
 static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_rust_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_rust_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_fire_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_pit, (struct trap *, unsigned));
 static void FDECL(trapeffect_hole, (struct trap *, unsigned));
@@ -1268,63 +1268,133 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_rust_trap(trap, trflags)
+static int
+trapeffect_rust_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     struct obj *otmp;
 
-    seetrap(trap);
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
 
-    /* Unlike monsters, traps cannot aim their rust attacks at
-     * you, so instead of looping through and taking either the
-     * first rustable one or the body, we take whatever we get,
-     * even if it is not rustable.
-     */
-    switch (rn2(5)) {
-    case 0:
-        pline("%s you on the %s!", A_gush_of_water_hits, body_part(HEAD));
-        (void) water_damage(uarmh, helm_simple_name(uarmh), TRUE);
-        break;
-    case 1:
-        pline("%s your left %s!", A_gush_of_water_hits, body_part(ARM));
-        if (water_damage(uarms, "shield", TRUE) != ER_NOTHING)
+        /* Unlike monsters, traps cannot aim their rust attacks at
+         * you, so instead of looping through and taking either the
+         * first rustable one or the body, we take whatever we get,
+         * even if it is not rustable.
+         */
+        switch (rn2(5)) {
+        case 0:
+            pline("%s you on the %s!", A_gush_of_water_hits, body_part(HEAD));
+            (void) water_damage(uarmh, helm_simple_name(uarmh), TRUE);
             break;
-        if (u.twoweap || (uwep && bimanual(uwep)))
-            (void) water_damage(u.twoweap ? uswapwep : uwep, 0, TRUE);
-glovecheck:
-        (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
-        break;
-    case 2:
-        pline("%s your right %s!", A_gush_of_water_hits, body_part(ARM));
-        (void) water_damage(uwep, 0, TRUE);
-        goto glovecheck;
-    default:
-        pline("%s you!", A_gush_of_water_hits);
-        /* note: exclude primary and seconary weapons from splashing
-           because cases 1 and 2 target them [via water_damage()] */
-        for (otmp = g.invent; otmp; otmp = otmp->nobj)
-            if (otmp->lamplit && otmp != uwep
-                && (otmp != uswapwep || !u.twoweap))
-                (void) splash_lit(otmp);
-        if (uarmc)
-            (void) water_damage(uarmc, cloak_simple_name(uarmc), TRUE);
-        else if (uarm)
-            (void) water_damage(uarm, suit_simple_name(uarm), TRUE);
-        else if (uarmu)
-            (void) water_damage(uarmu, "shirt", TRUE);
-    }
-    update_inventory();
+        case 1:
+            pline("%s your left %s!", A_gush_of_water_hits, body_part(ARM));
+            if (water_damage(uarms, "shield", TRUE) != ER_NOTHING)
+                break;
+            if (u.twoweap || (uwep && bimanual(uwep)))
+                (void) water_damage(u.twoweap ? uswapwep : uwep, 0, TRUE);
+ uglovecheck:
+            (void) water_damage(uarmg, gloves_simple_name(uarmg), TRUE);
+            break;
+        case 2:
+            pline("%s your right %s!", A_gush_of_water_hits, body_part(ARM));
+            (void) water_damage(uwep, 0, TRUE);
+            goto uglovecheck;
+        default:
+            pline("%s you!", A_gush_of_water_hits);
+            /* note: exclude primary and seconary weapons from splashing
+               because cases 1 and 2 target them [via water_damage()] */
+            for (otmp = g.invent; otmp; otmp = otmp->nobj)
+                if (otmp->lamplit && otmp != uwep
+                    && (otmp != uswapwep || !u.twoweap))
+                    (void) splash_lit(otmp);
+            if (uarmc)
+                (void) water_damage(uarmc, cloak_simple_name(uarmc), TRUE);
+            else if (uarm)
+                (void) water_damage(uarm, suit_simple_name(uarm), TRUE);
+            else if (uarmu)
+                (void) water_damage(uarmu, "shirt", TRUE);
+        }
+        update_inventory();
 
-    if (u.umonnum == PM_IRON_GOLEM) {
-        int dam = u.mhmax;
+        if (u.umonnum == PM_IRON_GOLEM) {
+            int dam = u.mhmax;
 
-        You("are covered with rust!");
-        losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
-    } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
-        (void) split_mon(&g.youmonst, (struct monst *) 0);
+            You("are covered with rust!");
+            losehp(Maybe_Half_Phys(dam), "rusting away", KILLED_BY);
+        } else if (u.umonnum == PM_GREMLIN && rn2(3)) {
+            (void) split_mon(&g.youmonst, (struct monst *) 0);
+        }
+    } else {
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean trapkilled = FALSE;
+        struct permonst *mptr = mtmp->data;
+        struct obj *target;
+
+        if (in_sight)
+            seetrap(trap);
+        switch (rn2(5)) {
+        case 0:
+            if (in_sight)
+                pline("%s %s on the %s!", A_gush_of_water_hits,
+                      mon_nam(mtmp), mbodypart(mtmp, HEAD));
+            target = which_armor(mtmp, W_ARMH);
+            (void) water_damage(target, helm_simple_name(target), TRUE);
+            break;
+        case 1:
+            if (in_sight)
+                pline("%s %s's left %s!", A_gush_of_water_hits,
+                      mon_nam(mtmp), mbodypart(mtmp, ARM));
+            target = which_armor(mtmp, W_ARMS);
+            if (water_damage(target, "shield", TRUE) != ER_NOTHING)
+                break;
+            target = MON_WEP(mtmp);
+            if (target && bimanual(target))
+                (void) water_damage(target, 0, TRUE);
+ mglovecheck:
+            target = which_armor(mtmp, W_ARMG);
+            (void) water_damage(target, gloves_simple_name(target), TRUE);
+            break;
+        case 2:
+            if (in_sight)
+                pline("%s %s's right %s!", A_gush_of_water_hits,
+                      mon_nam(mtmp), mbodypart(mtmp, ARM));
+            (void) water_damage(MON_WEP(mtmp), 0, TRUE);
+            goto mglovecheck;
+        default:
+            if (in_sight)
+                pline("%s %s!", A_gush_of_water_hits, mon_nam(mtmp));
+            for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+                if (otmp->lamplit
+                    /* exclude weapon(s) because cases 1 and 2 do them */
+                    && (otmp->owornmask & (W_WEP | W_SWAPWEP)) == 0)
+                    (void) splash_lit(otmp);
+            if ((target = which_armor(mtmp, W_ARMC)) != 0)
+                (void) water_damage(target, cloak_simple_name(target),
+                                    TRUE);
+            else if ((target = which_armor(mtmp, W_ARM)) != 0)
+                (void) water_damage(target, suit_simple_name(target),
+                                    TRUE);
+            else if ((target = which_armor(mtmp, W_ARMU)) != 0)
+                (void) water_damage(target, "shirt", TRUE);
+        }
+
+        if (completelyrusts(mptr)) {
+            if (in_sight)
+                pline("%s %s to pieces!", Monnam(mtmp),
+                      !mlifesaver(mtmp) ? "falls" : "starts to fall");
+            monkilled(mtmp, (const char *) 0, AD_RUST);
+            if (DEADMONSTER(mtmp))
+                trapkilled = TRUE;
+        } else if (mptr == &mons[PM_GREMLIN] && rn2(3)) {
+            (void) split_mon(mtmp, (struct monst *) 0);
+        }
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -1870,7 +1940,7 @@ unsigned trflags;
         break;
 
     case RUST_TRAP:
-        trapeffect_rust_trap(trap, trflags);
+        (void) trapeffect_rust_trap(&g.youmonst, trap, trflags);
         break;
 
     case FIRE_TRAP:
@@ -2590,69 +2660,9 @@ register struct monst *mtmp;
         case SLP_GAS_TRAP:
             return trapeffect_slp_gas_trap(mtmp, trap, 0);
             break;
-        case RUST_TRAP: {
-            struct obj *target;
-
-            if (in_sight)
-                seetrap(trap);
-            switch (rn2(5)) {
-            case 0:
-                if (in_sight)
-                    pline("%s %s on the %s!", A_gush_of_water_hits,
-                          mon_nam(mtmp), mbodypart(mtmp, HEAD));
-                target = which_armor(mtmp, W_ARMH);
-                (void) water_damage(target, helm_simple_name(target), TRUE);
-                break;
-            case 1:
-                if (in_sight)
-                    pline("%s %s's left %s!", A_gush_of_water_hits,
-                          mon_nam(mtmp), mbodypart(mtmp, ARM));
-                target = which_armor(mtmp, W_ARMS);
-                if (water_damage(target, "shield", TRUE) != ER_NOTHING)
-                    break;
-                target = MON_WEP(mtmp);
-                if (target && bimanual(target))
-                    (void) water_damage(target, 0, TRUE);
- glovecheck:
-                target = which_armor(mtmp, W_ARMG);
-                (void) water_damage(target, gloves_simple_name(target), TRUE);
-                break;
-            case 2:
-                if (in_sight)
-                    pline("%s %s's right %s!", A_gush_of_water_hits,
-                          mon_nam(mtmp), mbodypart(mtmp, ARM));
-                (void) water_damage(MON_WEP(mtmp), 0, TRUE);
-                goto glovecheck;
-            default:
-                if (in_sight)
-                    pline("%s %s!", A_gush_of_water_hits, mon_nam(mtmp));
-                for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-                    if (otmp->lamplit
-                        /* exclude weapon(s) because cases 1 and 2 do them */
-                        && (otmp->owornmask & (W_WEP | W_SWAPWEP)) == 0)
-                        (void) splash_lit(otmp);
-                if ((target = which_armor(mtmp, W_ARMC)) != 0)
-                    (void) water_damage(target, cloak_simple_name(target),
-                                        TRUE);
-                else if ((target = which_armor(mtmp, W_ARM)) != 0)
-                    (void) water_damage(target, suit_simple_name(target),
-                                        TRUE);
-                else if ((target = which_armor(mtmp, W_ARMU)) != 0)
-                    (void) water_damage(target, "shirt", TRUE);
-            }
-
-            if (completelyrusts(mptr)) {
-                if (in_sight)
-                    pline("%s %s to pieces!", Monnam(mtmp),
-                          !mlifesaver(mtmp) ? "falls" : "starts to fall");
-                monkilled(mtmp, (const char *) 0, AD_RUST);
-                if (DEADMONSTER(mtmp))
-                    trapkilled = TRUE;
-            } else if (mptr == &mons[PM_GREMLIN] && rn2(3)) {
-                (void) split_mon(mtmp, (struct monst *) 0);
-            }
+        case RUST_TRAP:
+            return trapeffect_rust_trap(mtmp, trap, 0);
             break;
-        } /* RUST_TRAP */
         case FIRE_TRAP:
  mfiretrap:
             if (in_sight)
