@@ -17,7 +17,7 @@ static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned)
 static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_slp_gas_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_rust_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_fire_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_pit, (struct trap *, unsigned));
@@ -1239,19 +1239,33 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_slp_gas_trap(trap, trflags)
+static int
+trapeffect_slp_gas_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    if (Sleep_resistance || breathless(g.youmonst.data)) {
-        You("are enveloped in a cloud of gas!");
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        if (Sleep_resistance || breathless(g.youmonst.data)) {
+            You("are enveloped in a cloud of gas!");
+        } else {
+            pline("A cloud of gas puts you to sleep!");
+            fall_asleep(-rnd(25), TRUE);
+        }
+        (void) steedintrap(trap, (struct obj *) 0);
     } else {
-        pline("A cloud of gas puts you to sleep!");
-        fall_asleep(-rnd(25), TRUE);
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+
+        if (!resists_sleep(mtmp) && !breathless(mtmp->data) && !mtmp->msleeping
+            && mtmp->mcanmove) {
+            if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
+                pline("%s suddenly falls asleep!", Monnam(mtmp));
+                seetrap(trap);
+            }
+        }
     }
-    (void) steedintrap(trap, (struct obj *) 0);
+    return 0;
 }
 
 static void
@@ -1852,7 +1866,7 @@ unsigned trflags;
         break;
 
     case SLP_GAS_TRAP:
-        trapeffect_slp_gas_trap(trap, trflags);
+        (void) trapeffect_slp_gas_trap(&g.youmonst, trap, trflags);
         break;
 
     case RUST_TRAP:
@@ -2574,13 +2588,7 @@ register struct monst *mtmp;
             return trapeffect_bear_trap(mtmp, trap, 0);
             break;
         case SLP_GAS_TRAP:
-            if (!resists_sleep(mtmp) && !breathless(mptr) && !mtmp->msleeping
-                && mtmp->mcanmove) {
-                if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
-                    pline("%s suddenly falls asleep!", Monnam(mtmp));
-                    seetrap(trap);
-                }
-            }
+            return trapeffect_slp_gas_trap(mtmp, trap, 0);
             break;
         case RUST_TRAP: {
             struct obj *target;
