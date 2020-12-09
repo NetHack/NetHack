@@ -12,7 +12,7 @@ static boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
 static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
                                             struct trap *));
 static struct obj *FDECL(t_missile, (int, struct trap *));
-static void FDECL(trapeffect_arrow_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_dart_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_rocktrap, (struct trap *, unsigned));
 static void FDECL(trapeffect_sqky_board, (struct trap *, unsigned));
@@ -922,35 +922,60 @@ boolean msg;
     }
 }
 
-static void
-trapeffect_arrow_trap(trap, trflags)
+static int
+trapeffect_arrow_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     struct obj *otmp;
 
-    if (trap->once && trap->tseen && !rn2(15)) {
-        You_hear("a loud click!");
-        deltrap(trap);
-        newsym(u.ux, u.uy);
-        return;
-    }
-    trap->once = 1;
-    seetrap(trap);
-    pline("An arrow shoots out at you!");
-    otmp = t_missile(ARROW, trap);
-    if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
-        ; /* nothing */
-    } else if (thitu(8, dmgval(otmp, &g.youmonst), &otmp, "arrow")) {
-        if (otmp)
-            obfree(otmp, (struct obj *) 0);
+    if (mtmp == &g.youmonst) {
+        if (trap->once && trap->tseen && !rn2(15)) {
+            You_hear("a loud click!");
+            deltrap(trap);
+            newsym(u.ux, u.uy);
+            return 0;
+        }
+        trap->once = 1;
+        seetrap(trap);
+        pline("An arrow shoots out at you!");
+        otmp = t_missile(ARROW, trap);
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
+            ; /* nothing */
+        } else if (thitu(8, dmgval(otmp, &g.youmonst), &otmp, "arrow")) {
+            if (otmp)
+                obfree(otmp, (struct obj *) 0);
+        } else {
+            place_object(otmp, u.ux, u.uy);
+            if (!Blind)
+                otmp->dknown = 1;
+            stackobj(otmp);
+            newsym(u.ux, u.uy);
+        }
     } else {
-        place_object(otmp, u.ux, u.uy);
-        if (!Blind)
-            otmp->dknown = 1;
-        stackobj(otmp);
-        newsym(u.ux, u.uy);
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        boolean trapkilled = FALSE;
+
+        if (trap->once && trap->tseen && !rn2(15)) {
+            if (in_sight && see_it)
+                pline("%s triggers a trap but nothing happens.",
+                      Monnam(mtmp));
+            deltrap(trap);
+            newsym(mtmp->mx, mtmp->my);
+            return 0;
+        }
+        trap->once = 1;
+        otmp = t_missile(ARROW, trap);
+        if (in_sight)
+            seetrap(trap);
+        if (thitm(8, mtmp, otmp, 0, FALSE))
+            trapkilled = TRUE;
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -1691,7 +1716,7 @@ unsigned trflags;
 
     switch (ttype) {
     case ARROW_TRAP:
-        trapeffect_arrow_trap(trap, trflags);
+        (void) trapeffect_arrow_trap(&g.youmonst, trap, trflags);
         break;
 
     case DART_TRAP:
@@ -2421,21 +2446,7 @@ register struct monst *mtmp;
             in_sight = TRUE;
         switch (tt) {
         case ARROW_TRAP:
-            if (trap->once && trap->tseen && !rn2(15)) {
-                if (in_sight && see_it)
-                    pline("%s triggers a trap but nothing happens.",
-                          Monnam(mtmp));
-                deltrap(trap);
-                newsym(mtmp->mx, mtmp->my);
-                break;
-            }
-            trap->once = 1;
-            otmp = t_missile(ARROW, trap);
-            if (in_sight)
-                seetrap(trap);
-            if (thitm(8, mtmp, otmp, 0, FALSE))
-                trapkilled = TRUE;
-            break;
+            return trapeffect_arrow_trap(mtmp, trap, 0);
         case DART_TRAP:
             if (trap->once && trap->tseen && !rn2(15)) {
                 if (in_sight && see_it)
