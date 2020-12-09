@@ -19,7 +19,7 @@ static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned
 static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rust_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_fire_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_fire_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_pit, (struct trap *, unsigned));
 static void FDECL(trapeffect_hole, (struct trap *, unsigned));
 static void FDECL(trapeffect_telep_trap, (struct trap *, unsigned));
@@ -1397,13 +1397,86 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_fire_trap(trap, trflags)
+static int
+trapeffect_fire_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    dofiretrap((struct obj *) 0);
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        dofiretrap((struct obj *) 0);
+    } else {
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        boolean trapkilled = FALSE;
+        struct permonst *mptr = mtmp->data;
+
+        if (in_sight)
+            pline("A %s erupts from the %s under %s!", tower_of_flame,
+                  surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
+        else if (see_it) /* evidently `mtmp' is invisible */
+            You_see("a %s erupt from the %s!", tower_of_flame,
+                    surface(mtmp->mx, mtmp->my));
+
+        if (resists_fire(mtmp)) {
+            if (in_sight) {
+                shieldeff(mtmp->mx, mtmp->my);
+                pline("%s is uninjured.", Monnam(mtmp));
+            }
+        } else {
+            int num = d(2, 4), alt;
+            boolean immolate = FALSE;
+
+            /* paper burns very fast, assume straw is tightly packed
+               and burns a bit slower
+               (note: this is inconsistent with mattackm()'s AD_FIRE
+               damage where completelyburns() includes straw golem) */
+            switch (monsndx(mptr)) {
+            case PM_PAPER_GOLEM:
+                immolate = TRUE;
+                alt = mtmp->mhpmax;
+                break;
+            case PM_STRAW_GOLEM:
+                alt = mtmp->mhpmax / 2;
+                break;
+            case PM_WOOD_GOLEM:
+                alt = mtmp->mhpmax / 4;
+                break;
+            case PM_LEATHER_GOLEM:
+                alt = mtmp->mhpmax / 8;
+                break;
+            default:
+                alt = 0;
+                break;
+            }
+            if (alt > num)
+                num = alt;
+
+            if (thitm(0, mtmp, (struct obj *) 0, num, immolate))
+                trapkilled = TRUE;
+            else
+                /* we know mhp is at least `num' below mhpmax,
+                   so no (mhp > mhpmax) check is needed here */
+                mtmp->mhpmax -= rn2(num + 1);
+        }
+        if (burnarmor(mtmp) || rn2(3)) {
+            (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
+            (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
+            (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+            ignite_items(mtmp->minvent);
+        }
+        if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE)
+            && !see_it && distu(mtmp->mx, mtmp->my) <= 3 * 3)
+            You("smell smoke.");
+        if (is_ice(mtmp->mx, mtmp->my))
+            melt_ice(mtmp->mx, mtmp->my, (char *) 0);
+        if (see_it && t_at(mtmp->mx, mtmp->my))
+            seetrap(trap);
+
+        return trapkilled ? 2 : mtmp->mtrapped;
+    }
+    return 0;
 }
 
 static void
@@ -1944,7 +2017,7 @@ unsigned trflags;
         break;
 
     case FIRE_TRAP:
-        trapeffect_fire_trap(trap, trflags);
+        (void) trapeffect_fire_trap(&g.youmonst, trap, trflags);
         break;
 
     case PIT:
@@ -2665,67 +2738,7 @@ register struct monst *mtmp;
             break;
         case FIRE_TRAP:
  mfiretrap:
-            if (in_sight)
-                pline("A %s erupts from the %s under %s!", tower_of_flame,
-                      surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
-            else if (see_it) /* evidently `mtmp' is invisible */
-                You_see("a %s erupt from the %s!", tower_of_flame,
-                        surface(mtmp->mx, mtmp->my));
-
-            if (resists_fire(mtmp)) {
-                if (in_sight) {
-                    shieldeff(mtmp->mx, mtmp->my);
-                    pline("%s is uninjured.", Monnam(mtmp));
-                }
-            } else {
-                int num = d(2, 4), alt;
-                boolean immolate = FALSE;
-
-                /* paper burns very fast, assume straw is tightly packed
-                   and burns a bit slower
-                   (note: this is inconsistent with mattackm()'s AD_FIRE
-                   damage where completelyburns() includes straw golem) */
-                switch (monsndx(mptr)) {
-                case PM_PAPER_GOLEM:
-                    immolate = TRUE;
-                    alt = mtmp->mhpmax;
-                    break;
-                case PM_STRAW_GOLEM:
-                    alt = mtmp->mhpmax / 2;
-                    break;
-                case PM_WOOD_GOLEM:
-                    alt = mtmp->mhpmax / 4;
-                    break;
-                case PM_LEATHER_GOLEM:
-                    alt = mtmp->mhpmax / 8;
-                    break;
-                default:
-                    alt = 0;
-                    break;
-                }
-                if (alt > num)
-                    num = alt;
-
-                if (thitm(0, mtmp, (struct obj *) 0, num, immolate))
-                    trapkilled = TRUE;
-                else
-                    /* we know mhp is at least `num' below mhpmax,
-                       so no (mhp > mhpmax) check is needed here */
-                    mtmp->mhpmax -= rn2(num + 1);
-            }
-            if (burnarmor(mtmp) || rn2(3)) {
-                (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
-                (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
-                (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
-                ignite_items(mtmp->minvent);
-            }
-            if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE)
-                && !see_it && distu(mtmp->mx, mtmp->my) <= 3 * 3)
-                You("smell smoke.");
-            if (is_ice(mtmp->mx, mtmp->my))
-                melt_ice(mtmp->mx, mtmp->my, (char *) 0);
-            if (see_it && t_at(mtmp->mx, mtmp->my))
-                seetrap(trap);
+            return trapeffect_fire_trap(mtmp, trap, 0);
             break;
         case PIT:
         case SPIKED_PIT:
