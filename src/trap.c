@@ -14,7 +14,7 @@ static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
 static struct obj *FDECL(t_missile, (int, struct trap *));
 static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_rocktrap, (struct trap *, unsigned));
+static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_sqky_board, (struct trap *, unsigned));
 static void FDECL(trapeffect_bear_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_slp_gas_trap, (struct trap *, unsigned));
@@ -1046,43 +1046,69 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_rocktrap(trap, trflags)
+static int
+trapeffect_rocktrap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    if (trap->once && trap->tseen && !rn2(15)) {
-        pline("A trap door in %s opens, but nothing falls out!",
-              the(ceiling(u.ux, u.uy)));
-        deltrap(trap);
-        newsym(u.ux, u.uy);
-    } else {
-        int dmg = d(2, 6); /* should be std ROCK dmg? */
-        struct obj *otmp;
+    struct obj *otmp;
 
-        trap->once = 1;
-        feeltrap(trap);
-        otmp = t_missile(ROCK, trap);
-        place_object(otmp, u.ux, u.uy);
+    if (mtmp == &g.youmonst) {
+        if (trap->once && trap->tseen && !rn2(15)) {
+            pline("A trap door in %s opens, but nothing falls out!",
+                  the(ceiling(u.ux, u.uy)));
+            deltrap(trap);
+            newsym(u.ux, u.uy);
+        } else {
+            int dmg = d(2, 6); /* should be std ROCK dmg? */
 
-        pline("A trap door in %s opens and %s falls on your %s!",
-              the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
-        if (uarmh) {
-            if (is_metallic(uarmh)) {
-                pline("Fortunately, you are wearing a hard helmet.");
-                dmg = 2;
-            } else if (flags.verbose) {
-                pline("%s does not protect you.", Yname2(uarmh));
+            trap->once = 1;
+            feeltrap(trap);
+            otmp = t_missile(ROCK, trap);
+            place_object(otmp, u.ux, u.uy);
+
+            pline("A trap door in %s opens and %s falls on your %s!",
+                  the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
+            if (uarmh) {
+                if (is_metallic(uarmh)) {
+                    pline("Fortunately, you are wearing a hard helmet.");
+                    dmg = 2;
+                } else if (flags.verbose) {
+                    pline("%s does not protect you.", Yname2(uarmh));
+                }
             }
-        }
-        if (!Blind)
-            otmp->dknown = 1;
-        stackobj(otmp);
-        newsym(u.ux, u.uy); /* map the rock */
+            if (!Blind)
+                otmp->dknown = 1;
+            stackobj(otmp);
+            newsym(u.ux, u.uy); /* map the rock */
 
-        losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
-        exercise(A_STR, FALSE);
+            losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+            exercise(A_STR, FALSE);
+        }
+    } else {
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        boolean trapkilled = FALSE;
+
+        if (trap->once && trap->tseen && !rn2(15)) {
+            if (in_sight && see_it)
+                pline("A trap door above %s opens, but nothing falls out!",
+                      mon_nam(mtmp));
+            deltrap(trap);
+            newsym(mtmp->mx, mtmp->my);
+            return 0;
+        }
+        trap->once = 1;
+        otmp = t_missile(ROCK, trap);
+        if (in_sight)
+            seetrap(trap);
+        if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
+            trapkilled = TRUE;
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -1752,7 +1778,7 @@ unsigned trflags;
         break;
 
     case ROCKTRAP:
-        trapeffect_rocktrap(trap, trflags);
+        (void) trapeffect_rocktrap(&g.youmonst, trap, trflags);
         break;
 
     case SQKY_BOARD: /* stepped on a squeaky board */
@@ -2477,23 +2503,8 @@ register struct monst *mtmp;
             return trapeffect_arrow_trap(mtmp, trap, 0);
         case DART_TRAP:
             return trapeffect_dart_trap(mtmp, trap, 0);
-            break;
         case ROCKTRAP:
-            if (trap->once && trap->tseen && !rn2(15)) {
-                if (in_sight && see_it)
-                    pline("A trap door above %s opens, but nothing falls out!",
-                          mon_nam(mtmp));
-                deltrap(trap);
-                newsym(mtmp->mx, mtmp->my);
-                break;
-            }
-            trap->once = 1;
-            otmp = t_missile(ROCK, trap);
-            if (in_sight)
-                seetrap(trap);
-            if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
-                trapkilled = TRUE;
-            break;
+            return trapeffect_rocktrap(mtmp, trap, 0);
         case SQKY_BOARD:
             if (is_flyer(mptr))
                 break;
