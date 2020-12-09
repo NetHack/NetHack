@@ -13,7 +13,7 @@ static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
                                             struct trap *));
 static struct obj *FDECL(t_missile, (int, struct trap *));
 static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_dart_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_rocktrap, (struct trap *, unsigned));
 static void FDECL(trapeffect_sqky_board, (struct trap *, unsigned));
 static void FDECL(trapeffect_bear_trap, (struct trap *, unsigned));
@@ -978,44 +978,72 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_dart_trap(trap, trflags)
+static int
+trapeffect_dart_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     struct obj *otmp;
-    int oldumort = u.umortality;
 
-    if (trap->once && trap->tseen && !rn2(15)) {
-        You_hear("a soft click.");
-        deltrap(trap);
-        newsym(u.ux, u.uy);
-        return;
-    }
-    trap->once = 1;
-    seetrap(trap);
-    pline("A little dart shoots out at you!");
-    otmp = t_missile(DART, trap);
-    if (!rn2(6))
-        otmp->opoisoned = 1;
-    if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
-        ; /* nothing */
-    } else if (thitu(7, dmgval(otmp, &g.youmonst), &otmp, "little dart")) {
-        if (otmp) {
-            if (otmp->opoisoned)
-                poisoned("dart", A_CON, "little dart",
-                         /* if damage triggered life-saving,
-                            poison is limited to attrib loss */
-                         (u.umortality > oldumort) ? 0 : 10, TRUE);
-            obfree(otmp, (struct obj *) 0);
+    if (mtmp == &g.youmonst) {
+        int oldumort = u.umortality;
+
+        if (trap->once && trap->tseen && !rn2(15)) {
+            You_hear("a soft click.");
+            deltrap(trap);
+            newsym(u.ux, u.uy);
+            return 0;
+        }
+        trap->once = 1;
+        seetrap(trap);
+        pline("A little dart shoots out at you!");
+        otmp = t_missile(DART, trap);
+        if (!rn2(6))
+            otmp->opoisoned = 1;
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
+            ; /* nothing */
+        } else if (thitu(7, dmgval(otmp, &g.youmonst), &otmp, "little dart")) {
+            if (otmp) {
+                if (otmp->opoisoned)
+                    poisoned("dart", A_CON, "little dart",
+                             /* if damage triggered life-saving,
+                                poison is limited to attrib loss */
+                             (u.umortality > oldumort) ? 0 : 10, TRUE);
+                obfree(otmp, (struct obj *) 0);
+            }
+        } else {
+            place_object(otmp, u.ux, u.uy);
+            if (!Blind)
+                otmp->dknown = 1;
+            stackobj(otmp);
+            newsym(u.ux, u.uy);
         }
     } else {
-        place_object(otmp, u.ux, u.uy);
-        if (!Blind)
-            otmp->dknown = 1;
-        stackobj(otmp);
-        newsym(u.ux, u.uy);
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        boolean trapkilled = FALSE;
+
+        if (trap->once && trap->tseen && !rn2(15)) {
+            if (in_sight && see_it)
+                pline("%s triggers a trap but nothing happens.",
+                      Monnam(mtmp));
+            deltrap(trap);
+            newsym(mtmp->mx, mtmp->my);
+            return 0;
+        }
+        trap->once = 1;
+        otmp = t_missile(DART, trap);
+        if (!rn2(6))
+            otmp->opoisoned = 1;
+        if (in_sight)
+            seetrap(trap);
+        if (thitm(7, mtmp, otmp, 0, FALSE))
+            trapkilled = TRUE;
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -1720,7 +1748,7 @@ unsigned trflags;
         break;
 
     case DART_TRAP:
-        trapeffect_dart_trap(trap, trflags);
+        (void) trapeffect_dart_trap(&g.youmonst, trap, trflags);
         break;
 
     case ROCKTRAP:
@@ -2448,22 +2476,7 @@ register struct monst *mtmp;
         case ARROW_TRAP:
             return trapeffect_arrow_trap(mtmp, trap, 0);
         case DART_TRAP:
-            if (trap->once && trap->tseen && !rn2(15)) {
-                if (in_sight && see_it)
-                    pline("%s triggers a trap but nothing happens.",
-                          Monnam(mtmp));
-                deltrap(trap);
-                newsym(mtmp->mx, mtmp->my);
-                break;
-            }
-            trap->once = 1;
-            otmp = t_missile(DART, trap);
-            if (!rn2(6))
-                otmp->opoisoned = 1;
-            if (in_sight)
-                seetrap(trap);
-            if (thitm(7, mtmp, otmp, 0, FALSE))
-                trapkilled = TRUE;
+            return trapeffect_dart_trap(mtmp, trap, 0);
             break;
         case ROCKTRAP:
             if (trap->once && trap->tseen && !rn2(15)) {
