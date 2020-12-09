@@ -16,7 +16,7 @@ static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned
 static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_bear_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_slp_gas_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_rust_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_fire_trap, (struct trap *, unsigned));
@@ -1166,45 +1166,77 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_bear_trap(trap, trflags)
+static int
+trapeffect_bear_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
 
-    int dmg = d(2, 4);
+    if (mtmp == &g.youmonst) {
+        int dmg = d(2, 4);
 
-    if ((Levitation || Flying) && !forcetrap)
-        return;
-    feeltrap(trap);
-    if (amorphous(g.youmonst.data) || is_whirly(g.youmonst.data)
-        || unsolid(g.youmonst.data)) {
-        pline("%s bear trap closes harmlessly through you.",
-              A_Your[trap->madeby_u]);
-        return;
-    }
-    if (!u.usteed && g.youmonst.data->msize <= MZ_SMALL) {
-        pline("%s bear trap closes harmlessly over you.",
-              A_Your[trap->madeby_u]);
-        return;
-    }
-    set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
-    if (u.usteed) {
-        pline("%s bear trap closes on %s %s!", A_Your[trap->madeby_u],
-              s_suffix(mon_nam(u.usteed)), mbodypart(u.usteed, FOOT));
-        if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
-            reset_utrap(TRUE); /* steed died, hero not trapped */
+        if ((Levitation || Flying) && !forcetrap)
+            return 0;
+        feeltrap(trap);
+        if (amorphous(g.youmonst.data) || is_whirly(g.youmonst.data)
+            || unsolid(g.youmonst.data)) {
+            pline("%s bear trap closes harmlessly through you.",
+                  A_Your[trap->madeby_u]);
+            return 0;
+        }
+        if (!u.usteed && g.youmonst.data->msize <= MZ_SMALL) {
+            pline("%s bear trap closes harmlessly over you.",
+                  A_Your[trap->madeby_u]);
+            return 0;
+        }
+        set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
+        if (u.usteed) {
+            pline("%s bear trap closes on %s %s!", A_Your[trap->madeby_u],
+                  s_suffix(mon_nam(u.usteed)), mbodypart(u.usteed, FOOT));
+            if (thitm(0, u.usteed, (struct obj *) 0, dmg, FALSE))
+                reset_utrap(TRUE); /* steed died, hero not trapped */
+        } else {
+            pline("%s bear trap closes on your %s!", A_Your[trap->madeby_u],
+                  body_part(FOOT));
+            set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
+            if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
+                You("howl in anger!");
+            losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
+        }
+        exercise(A_DEX, FALSE);
     } else {
-        pline("%s bear trap closes on your %s!", A_Your[trap->madeby_u],
-              body_part(FOOT));
-        set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10, 10));
-        if (u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
-            You("howl in anger!");
-        losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
+        struct permonst *mptr = mtmp->data;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean trapkilled = FALSE;
+
+        if (mptr->msize > MZ_SMALL && !amorphous(mptr) && !is_flyer(mptr)
+            && !is_whirly(mptr) && !unsolid(mptr)) {
+            mtmp->mtrapped = 1;
+            if (in_sight) {
+                pline("%s is caught in %s bear trap!", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            } else {
+                if (mptr == &mons[PM_OWLBEAR]
+                    || mptr == &mons[PM_BUGBEAR])
+                    You_hear("the roaring of an angry bear!");
+            }
+        } else if (g.force_mintrap) {
+            if (in_sight) {
+                pline("%s evades %s bear trap!", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            }
+        }
+        if (mtmp->mtrapped)
+            trapkilled = thitm(0, mtmp, (struct obj *) 0, d(2, 4), FALSE);
+
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
-    exercise(A_DEX, FALSE);
+    return 0;
 }
 
 static void
@@ -1816,7 +1848,7 @@ unsigned trflags;
         break;
 
     case BEAR_TRAP:
-        trapeffect_bear_trap(trap, trflags);
+        (void) trapeffect_bear_trap(&g.youmonst, trap, trflags);
         break;
 
     case SLP_GAS_TRAP:
@@ -2539,27 +2571,7 @@ register struct monst *mtmp;
             return trapeffect_sqky_board(mtmp, trap, 0);
             break;
         case BEAR_TRAP:
-            if (mptr->msize > MZ_SMALL && !amorphous(mptr) && !is_flyer(mptr)
-                && !is_whirly(mptr) && !unsolid(mptr)) {
-                mtmp->mtrapped = 1;
-                if (in_sight) {
-                    pline("%s is caught in %s bear trap!", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                } else {
-                    if (mptr == &mons[PM_OWLBEAR]
-                        || mptr == &mons[PM_BUGBEAR])
-                        You_hear("the roaring of an angry bear!");
-                }
-            } else if (g.force_mintrap) {
-                if (in_sight) {
-                    pline("%s evades %s bear trap!", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                }
-            }
-            if (mtmp->mtrapped)
-                trapkilled = thitm(0, mtmp, (struct obj *) 0, d(2, 4), FALSE);
+            return trapeffect_bear_trap(mtmp, trap, 0);
             break;
         case SLP_GAS_TRAP:
             if (!resists_sleep(mtmp) && !breathless(mptr) && !mtmp->msleeping
