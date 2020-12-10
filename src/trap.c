@@ -33,6 +33,7 @@ static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned))
 static int FDECL(trapeffect_rolling_boulder_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_magic_portal, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_vibrating_square, (struct monst *, struct trap *, unsigned));
+static int FDECL(trapeffect_selector, (struct monst *, struct trap *, unsigned));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
 static void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
@@ -2314,6 +2315,65 @@ unsigned trflags;
     return 0;
 }
 
+static int
+trapeffect_selector(mtmp, trap, trflags)
+struct monst *mtmp;
+struct trap *trap;
+unsigned trflags;
+{
+    switch (trap->ttyp) {
+    case ARROW_TRAP:
+        return trapeffect_arrow_trap(mtmp, trap, trflags);
+    case DART_TRAP:
+        return trapeffect_dart_trap(mtmp, trap, trflags);
+    case ROCKTRAP:
+        return trapeffect_rocktrap(mtmp, trap, trflags);
+    case SQKY_BOARD:
+        return trapeffect_sqky_board(mtmp, trap, trflags);
+    case BEAR_TRAP:
+        return trapeffect_bear_trap(mtmp, trap, trflags);
+    case SLP_GAS_TRAP:
+        return trapeffect_slp_gas_trap(mtmp, trap, trflags);
+    case RUST_TRAP:
+        return trapeffect_rust_trap(mtmp, trap, trflags);
+    case FIRE_TRAP:
+        return trapeffect_fire_trap(mtmp, trap, trflags);
+    case PIT:
+    case SPIKED_PIT:
+        return trapeffect_pit(mtmp, trap, trflags);
+    case HOLE:
+    case TRAPDOOR:
+        return trapeffect_hole(mtmp, trap, trflags);
+    case LEVEL_TELEP:
+        return trapeffect_level_telep(mtmp, trap, trflags);
+    case MAGIC_PORTAL:
+        return trapeffect_magic_portal(mtmp, trap, trflags);
+    case TELEP_TRAP:
+        return trapeffect_telep_trap(mtmp, trap, trflags);
+    case WEB:
+        return trapeffect_web(mtmp, trap, trflags);
+    case STATUE_TRAP:
+        return trapeffect_statue_trap(mtmp, trap, trflags);
+    case MAGIC_TRAP:
+        return trapeffect_magic_trap(mtmp, trap, trflags);
+    case ANTI_MAGIC:
+        return trapeffect_anti_magic(mtmp, trap, trflags);
+    case LANDMINE:
+        return trapeffect_landmine(mtmp, trap, trflags);
+    case POLY_TRAP:
+        return trapeffect_poly_trap(mtmp, trap, trflags);
+    case ROLLING_BOULDER_TRAP:
+        return trapeffect_rolling_boulder_trap(mtmp, trap, trflags);
+    case VIBRATING_SQUARE:
+        return trapeffect_vibrating_square(mtmp, trap, trflags);
+    default:
+        impossible("%s encountered a strange trap of type %d.",
+                   (mtmp == &g.youmonst) ? "You" : "Some monster",
+                   trap->ttyp);
+    }
+    return 0;
+}
+
 void
 dotrap(trap, trflags)
 register struct trap *trap;
@@ -2383,97 +2443,7 @@ unsigned trflags;
      *  would be somewhat harsh for what's usually a minor impairment.
      */
 
-    switch (ttype) {
-    case ARROW_TRAP:
-        (void) trapeffect_arrow_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case DART_TRAP:
-        (void) trapeffect_dart_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case ROCKTRAP:
-        (void) trapeffect_rocktrap(&g.youmonst, trap, trflags);
-        break;
-
-    case SQKY_BOARD: /* stepped on a squeaky board */
-        (void) trapeffect_sqky_board(&g.youmonst, trap, trflags);
-        break;
-
-    case BEAR_TRAP:
-        (void) trapeffect_bear_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case SLP_GAS_TRAP:
-        (void) trapeffect_slp_gas_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case RUST_TRAP:
-        (void) trapeffect_rust_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case FIRE_TRAP:
-        (void) trapeffect_fire_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case PIT:
-    case SPIKED_PIT:
-        (void) trapeffect_pit(&g.youmonst, trap, trflags);
-        break;
-
-    case HOLE:
-    case TRAPDOOR:
-        (void) trapeffect_hole(&g.youmonst, trap, trflags);
-        break;
-
-    case TELEP_TRAP:
-        (void) trapeffect_telep_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case LEVEL_TELEP:
-        (void) trapeffect_level_telep(&g.youmonst, trap, trflags);
-        break;
-
-    case WEB: /* Our luckless player has stumbled into a web. */
-        (void) trapeffect_web(&g.youmonst, trap, trflags);
-        break;
-
-    case STATUE_TRAP:
-        (void) trapeffect_statue_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case MAGIC_TRAP: /* A magic trap. */
-        (void) trapeffect_magic_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case ANTI_MAGIC:
-        (void) trapeffect_anti_magic(&g.youmonst, trap, trflags);
-        break;
-
-    case POLY_TRAP:
-        (void) trapeffect_poly_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case LANDMINE:
-        (void) trapeffect_landmine(&g.youmonst, trap, trflags);
-        break;
-
-    case ROLLING_BOULDER_TRAP:
-        (void) trapeffect_rolling_boulder_trap(&g.youmonst, trap, trflags);
-        break;
-
-    case MAGIC_PORTAL:
-        (void) trapeffect_magic_portal(&g.youmonst, trap, trflags);
-        break;
-
-    case VIBRATING_SQUARE:
-        (void) trapeffect_vibrating_square(&g.youmonst, trap, trflags);
-        break;
-
-    default:
-        feeltrap(trap);
-        impossible("You hit a trap of type %u", trap->ttyp);
-    }
+    (void) trapeffect_selector(&g.youmonst, trap, trflags);
 }
 
 static char *
@@ -3111,61 +3081,8 @@ register struct monst *mtmp;
         /* assume hero can tell what's going on for the steed */
         if (mtmp == u.usteed)
             in_sight = TRUE;
-        switch (tt) {
-        case ARROW_TRAP:
-            return trapeffect_arrow_trap(mtmp, trap, 0);
-        case DART_TRAP:
-            return trapeffect_dart_trap(mtmp, trap, 0);
-        case ROCKTRAP:
-            return trapeffect_rocktrap(mtmp, trap, 0);
-        case SQKY_BOARD:
-            return trapeffect_sqky_board(mtmp, trap, 0);
-        case BEAR_TRAP:
-            return trapeffect_bear_trap(mtmp, trap, 0);
-        case SLP_GAS_TRAP:
-            return trapeffect_slp_gas_trap(mtmp, trap, 0);
-        case RUST_TRAP:
-            return trapeffect_rust_trap(mtmp, trap, 0);
-        case FIRE_TRAP:
-            return trapeffect_fire_trap(mtmp, trap, 0);
-        case PIT:
-        case SPIKED_PIT:
-            return trapeffect_pit(mtmp, trap, 0);
-        case HOLE:
-        case TRAPDOOR:
-            return trapeffect_hole(mtmp, trap, 0);
-        case LEVEL_TELEP:
-            return trapeffect_level_telep(mtmp, trap, 0);
-        case MAGIC_PORTAL:
-            return trapeffect_magic_portal(mtmp, trap, 0);
-        case TELEP_TRAP:
-            return trapeffect_telep_trap(mtmp, trap, 0);
-        case WEB:
-            return trapeffect_web(mtmp, trap, 0);
-        case STATUE_TRAP:
-            return trapeffect_statue_trap(mtmp, trap, 0);
-        case MAGIC_TRAP:
-            return trapeffect_statue_trap(mtmp, trap, 0);
-            break;
-        case ANTI_MAGIC:
-            return trapeffect_anti_magic(mtmp, trap, 0);
-            break;
-        case LANDMINE:
-            return trapeffect_landmine(mtmp, trap, 0);
-            break;
-        case POLY_TRAP:
-            return trapeffect_poly_trap(mtmp, trap, 0);
-            break;
-        case ROLLING_BOULDER_TRAP:
-            return trapeffect_rolling_boulder_trap(mtmp, trap, 0);
-            break;
-        case VIBRATING_SQUARE:
-            return trapeffect_vibrating_square(mtmp, trap, 0);
-            break;
-        default:
-            impossible("Some monster encountered a strange trap of type %d.",
-                       tt);
-        }
+
+        return trapeffect_selector(mtmp, trap, 0);
     }
     if (trapkilled)
         return 2;
