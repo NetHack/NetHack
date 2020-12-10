@@ -26,7 +26,7 @@ static int FDECL(trapeffect_telep_trap, (struct monst *, struct trap *, unsigned
 static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_magic_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_anti_magic, (struct trap *, unsigned));
 static void FDECL(trapeffect_poly_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_landmine, (struct trap *, unsigned));
@@ -1926,24 +1926,32 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_magic_trap(trap, trflags)
+static int
+trapeffect_magic_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    if (!rn2(30)) {
-        deltrap(trap);
-        newsym(u.ux, u.uy); /* update position */
-        You("are caught in a magical explosion!");
-        losehp(rnd(10), "magical explosion", KILLED_BY_AN);
-        Your("body absorbs some of the magical energy!");
-        u.uen = (u.uenmax += 2);
-        return;
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        if (!rn2(30)) {
+            deltrap(trap);
+            newsym(u.ux, u.uy); /* update position */
+            You("are caught in a magical explosion!");
+            losehp(rnd(10), "magical explosion", KILLED_BY_AN);
+            Your("body absorbs some of the magical energy!");
+            u.uen = (u.uenmax += 2);
+            return 0;
+        } else {
+            domagictrap();
+        }
+        (void) steedintrap(trap, (struct obj *) 0);
     } else {
-        domagictrap();
+        /* A magic trap.  Monsters usually immune. */
+        if (!rn2(21))
+            return trapeffect_fire_trap(mtmp, trap, trflags);
     }
-    (void) steedintrap(trap, (struct obj *) 0);
+    return 0;
 }
 
 static void
@@ -2236,7 +2244,7 @@ unsigned trflags;
         break;
 
     case MAGIC_TRAP: /* A magic trap. */
-        trapeffect_magic_trap(trap, trflags);
+        (void) trapeffect_magic_trap(&g.youmonst, trap, trflags);
         break;
 
     case ANTI_MAGIC:
@@ -2940,9 +2948,7 @@ register struct monst *mtmp;
         case STATUE_TRAP:
             return trapeffect_statue_trap(mtmp, trap, 0);
         case MAGIC_TRAP:
-            /* A magic trap.  Monsters usually immune. */
-            if (!rn2(21))
-                goto mfiretrap;
+            return trapeffect_statue_trap(mtmp, trap, 0);
             break;
         case ANTI_MAGIC:
             /* similar to hero's case, more or less */
