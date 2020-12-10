@@ -32,6 +32,7 @@ static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned)
 static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rolling_boulder_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_magic_portal, (struct monst *, struct trap *, unsigned));
+static int FDECL(trapeffect_vibrating_square, (struct monst *, struct trap *, unsigned));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
 static void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
@@ -2270,6 +2271,49 @@ unsigned trflags;
     return 0;
 }
 
+static int
+trapeffect_vibrating_square(mtmp, trap, trflags)
+struct monst *mtmp;
+struct trap *trap;
+unsigned trflags;
+{
+    if (mtmp == &g.youmonst) {
+        feeltrap(trap);
+        /* messages handled elsewhere; the trap symbol is merely to mark the
+         * square for future reference */
+    } else {
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+
+        if (see_it && !Blind) {
+            seetrap(trap); /* before messages */
+            if (in_sight) {
+                char buf[BUFSZ], *p, *monnm = mon_nam(mtmp);
+
+                if (nolimbs(mtmp->data)
+                    || is_floater(mtmp->data) || is_flyer(mtmp->data)) {
+                    /* just "beneath <mon>" */
+                    Strcpy(buf, monnm);
+                } else {
+                    Strcpy(buf, s_suffix(monnm));
+                    p = eos(strcat(buf, " "));
+                    Strcpy(p, makeplural(mbodypart(mtmp, FOOT)));
+                    /* avoid "beneath 'rear paws'" or 'rear hooves' */
+                    (void) strsubst(p, "rear ", "");
+                }
+                You_see("a strange vibration beneath %s.", buf);
+            } else {
+                /* notice something (hearing uses a larger threshold
+                   for 'nearby') */
+                You_see("the ground vibrate %s.",
+                        (distu(mtmp->mx, mtmp->my) <= 2 * 2)
+                        ? "nearby" : "in the distance");
+            }
+        }
+    }
+    return 0;
+}
+
 void
 dotrap(trap, trflags)
 register struct trap *trap;
@@ -2423,9 +2467,7 @@ unsigned trflags;
         break;
 
     case VIBRATING_SQUARE:
-        feeltrap(trap);
-        /* messages handled elsewhere; the trap symbol is merely to mark the
-         * square for future reference */
+        (void) trapeffect_vibrating_square(&g.youmonst, trap, trflags);
         break;
 
     default:
@@ -3118,31 +3160,7 @@ register struct monst *mtmp;
             return trapeffect_rolling_boulder_trap(mtmp, trap, 0);
             break;
         case VIBRATING_SQUARE:
-            if (see_it && !Blind) {
-                seetrap(trap); /* before messages */
-                if (in_sight) {
-                    char buf[BUFSZ], *p, *monnm = mon_nam(mtmp);
-
-                    if (nolimbs(mtmp->data)
-                        || is_floater(mtmp->data) || is_flyer(mtmp->data)) {
-                        /* just "beneath <mon>" */
-                        Strcpy(buf, monnm);
-                    } else {
-                        Strcpy(buf, s_suffix(monnm));
-                        p = eos(strcat(buf, " "));
-                        Strcpy(p, makeplural(mbodypart(mtmp, FOOT)));
-                        /* avoid "beneath 'rear paws'" or 'rear hooves' */
-                        (void) strsubst(p, "rear ", "");
-                    }
-                    You_see("a strange vibration beneath %s.", buf);
-                } else {
-                    /* notice something (hearing uses a larger threshold
-                       for 'nearby') */
-                    You_see("the ground vibrate %s.",
-                            (distu(mtmp->mx, mtmp->my) <= 2 * 2)
-                               ? "nearby" : "in the distance");
-                }
-            }
+            return trapeffect_vibrating_square(mtmp, trap, 0);
             break;
         default:
             impossible("Some monster encountered a strange trap of type %d.",
