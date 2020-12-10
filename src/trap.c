@@ -928,7 +928,7 @@ static int
 trapeffect_arrow_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     struct obj *otmp;
 
@@ -984,7 +984,7 @@ static int
 trapeffect_dart_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     struct obj *otmp;
 
@@ -1052,7 +1052,7 @@ static int
 trapeffect_rocktrap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     struct obj *otmp;
 
@@ -1245,7 +1245,7 @@ static int
 trapeffect_slp_gas_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1274,7 +1274,7 @@ static int
 trapeffect_rust_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     struct obj *otmp;
 
@@ -1403,7 +1403,7 @@ static int
 trapeffect_fire_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1714,7 +1714,7 @@ static int
 trapeffect_telep_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1918,7 +1918,7 @@ static int
 trapeffect_statue_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         (void) activate_statue_trap(trap, u.ux, u.uy, FALSE);
@@ -1960,7 +1960,7 @@ static int
 trapeffect_anti_magic(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -2216,7 +2216,7 @@ static int
 trapeffect_rolling_boulder_trap(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
@@ -2276,7 +2276,7 @@ static int
 trapeffect_vibrating_square(mtmp, trap, trflags)
 struct monst *mtmp;
 struct trap *trap;
-unsigned trflags;
+unsigned trflags UNUSED;
 {
     if (mtmp == &g.youmonst) {
         feeltrap(trap);
