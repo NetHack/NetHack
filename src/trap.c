@@ -2380,17 +2380,13 @@ register struct trap *trap;
 unsigned trflags;
 {
     register int ttype = trap->ttyp;
-    struct obj *otmp;
     boolean already_seen = trap->tseen,
             forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0),
-            webmsgok = (trflags & NOWEBMSG) == 0,
             forcebungle = (trflags & FORCEBUNGLE) != 0,
             plunged = (trflags & TOOKPLUNGE) != 0,
-            viasitting = (trflags & VIASITTING) != 0,
             conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE),
             adj_pit = adj_nonconjoined_pit(trap);
-    int oldumort;
     int steed_article = ARTICLE_THE;
 
     nomul(0);
@@ -3009,7 +3005,6 @@ register struct monst *mtmp;
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
     boolean trapkilled = FALSE;
     struct permonst *mptr = mtmp->data;
-    struct obj *otmp;
 
     if (!trap) {
         mtmp->mtrapped = 0;      /* perhaps teleported? */
@@ -3052,12 +3047,10 @@ register struct monst *mtmp;
         }
     } else {
         register int tt = trap->ttyp;
-        boolean in_sight, tear_web, see_it,
+        boolean in_sight, see_it,
                 inescapable = (g.force_mintrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
-        const char *fallverb;
-        xchar tx = trap->tx, ty = trap->ty;
 
         /* true when called from dotrap, inescapable is not an option */
         if (mtmp == u.usteed)
