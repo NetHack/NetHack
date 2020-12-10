@@ -29,7 +29,7 @@ static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigne
 static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_landmine, (struct trap *, unsigned));
+static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_rolling_boulder_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_magic_portal, (struct trap *, unsigned));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
@@ -2095,63 +2095,119 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_landmine(trap, trflags)
+static int
+trapeffect_landmine(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    boolean already_seen = trap->tseen;
-    boolean forcetrap = ((trflags & FORCETRAP) != 0
-                         || (trflags & FAILEDUNTRAP) != 0);
-    boolean forcebungle = (trflags & FORCEBUNGLE) != 0;
-    unsigned steed_mid = 0;
-    struct obj *saddle = 0;
+    if (mtmp == &g.youmonst) {
+        boolean already_seen = trap->tseen;
+        boolean forcetrap = ((trflags & FORCETRAP) != 0
+                             || (trflags & FAILEDUNTRAP) != 0);
+        boolean forcebungle = (trflags & FORCEBUNGLE) != 0;
+        unsigned steed_mid = 0;
+        struct obj *saddle = 0;
 
-    if ((Levitation || Flying) && !forcetrap) {
-        if (!already_seen && rn2(3))
-            return;
-        feeltrap(trap);
-        pline("%s %s in a pile of soil below you.",
-              already_seen ? "There is" : "You discover",
-              trap->madeby_u ? "the trigger of your mine" : "a trigger");
-        if (already_seen && rn2(3))
-            return;
-        pline("KAABLAMM!!!  %s %s%s off!",
-              forcebungle ? "Your inept attempt sets"
-              : "The air currents set",
-              already_seen ? a_your[trap->madeby_u] : "",
-              already_seen ? " land mine" : "it");
+        if ((Levitation || Flying) && !forcetrap) {
+            if (!already_seen && rn2(3))
+                return 0;
+            feeltrap(trap);
+            pline("%s %s in a pile of soil below you.",
+                  already_seen ? "There is" : "You discover",
+                  trap->madeby_u ? "the trigger of your mine" : "a trigger");
+            if (already_seen && rn2(3))
+                return 0;
+            pline("KAABLAMM!!!  %s %s%s off!",
+                  forcebungle ? "Your inept attempt sets"
+                  : "The air currents set",
+                  already_seen ? a_your[trap->madeby_u] : "",
+                  already_seen ? " land mine" : "it");
+        } else {
+            /* prevent landmine from killing steed, throwing you to
+             * the ground, and you being affected again by the same
+             * mine because it hasn't been deleted yet
+             */
+            static boolean recursive_mine = FALSE;
+
+            if (recursive_mine)
+                return 0;
+            feeltrap(trap);
+            pline("KAABLAMM!!!  You triggered %s land mine!",
+                  a_your[trap->madeby_u]);
+            if (u.usteed)
+                steed_mid = u.usteed->m_id;
+            recursive_mine = TRUE;
+            (void) steedintrap(trap, (struct obj *) 0);
+            recursive_mine = FALSE;
+            saddle = sobj_at(SADDLE, u.ux, u.uy);
+            set_wounded_legs(LEFT_SIDE, rn1(35, 41));
+            set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
+            exercise(A_DEX, FALSE);
+        }
+        blow_up_landmine(trap);
+        if (steed_mid && saddle && !u.usteed)
+            (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
+        newsym(u.ux, u.uy); /* update trap symbol */
+        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
+        /* fall recursively into the pit... */
+        if ((trap = t_at(u.ux, u.uy)) != 0)
+            dotrap(trap, RECURSIVETRAP);
+        fill_pit(u.ux, u.uy);
     } else {
-        /* prevent landmine from killing steed, throwing you to
-         * the ground, and you being affected again by the same
-         * mine because it hasn't been deleted yet
-         */
-        static boolean recursive_mine = FALSE;
+        boolean trapkilled = FALSE;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        struct permonst *mptr = mtmp->data;
+        xchar tx = trap->tx, ty = trap->ty;
 
-        if (recursive_mine)
-            return;
-        feeltrap(trap);
-        pline("KAABLAMM!!!  You triggered %s land mine!",
-              a_your[trap->madeby_u]);
-        if (u.usteed)
-            steed_mid = u.usteed->m_id;
-        recursive_mine = TRUE;
-        (void) steedintrap(trap, (struct obj *) 0);
-        recursive_mine = FALSE;
-        saddle = sobj_at(SADDLE, u.ux, u.uy);
-        set_wounded_legs(LEFT_SIDE, rn1(35, 41));
-        set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
-        exercise(A_DEX, FALSE);
+        if (rn2(3))
+            return 0; /* monsters usually don't set it off */
+        if (is_flyer(mptr)) {
+            boolean already_seen = trap->tseen;
+
+            if (in_sight && !already_seen) {
+                pline("A trigger appears in a pile of soil below %s.",
+                      mon_nam(mtmp));
+                seetrap(trap);
+            }
+            if (rn2(3))
+                return 0;
+            if (in_sight) {
+                newsym(mtmp->mx, mtmp->my);
+                pline_The("air currents set %s off!",
+                          already_seen ? "a land mine" : "it");
+            }
+        } else if (in_sight) {
+            newsym(mtmp->mx, mtmp->my);
+            pline("%s%s triggers %s land mine!",
+                  !Deaf ? "KAABLAMM!!!  " : "", Monnam(mtmp),
+                  a_your[trap->madeby_u]);
+        }
+        if (!in_sight && !Deaf)
+            pline("Kaablamm!  %s an explosion in the distance!",
+                  "You hear");  /* Deaf-aware */
+        blow_up_landmine(trap);
+        /* explosion might have destroyed a drawbridge; don't
+           dish out more damage if monster is already dead */
+        if (DEADMONSTER(mtmp)
+            || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE)) {
+            trapkilled = TRUE;
+        } else {
+            /* monsters recursively fall into new pit */
+            if (mintrap(mtmp) == 2)
+                trapkilled = TRUE;
+        }
+        /* a boulder may fill the new pit, crushing monster */
+        fill_pit(tx, ty); /* thitm may have already destroyed the trap */
+        if (DEADMONSTER(mtmp))
+            trapkilled = TRUE;
+        if (unconscious()) {
+            g.multi = -1;
+            g.nomovemsg = "The explosion awakens you!";
+        }
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
-    blow_up_landmine(trap);
-    if (steed_mid && saddle && !u.usteed)
-        (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
-    newsym(u.ux, u.uy); /* update trap symbol */
-    losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
-    /* fall recursively into the pit... */
-    if ((trap = t_at(u.ux, u.uy)) != 0)
-        dotrap(trap, RECURSIVETRAP);
-    fill_pit(u.ux, u.uy);
+    return 0;
 }
 
 static void
@@ -2321,7 +2377,7 @@ unsigned trflags;
         break;
 
     case LANDMINE:
-        trapeffect_landmine(trap, trflags);
+        (void) trapeffect_landmine(&g.youmonst, trap, trflags);
         break;
 
     case ROLLING_BOULDER_TRAP:
@@ -3019,51 +3075,7 @@ register struct monst *mtmp;
             return trapeffect_anti_magic(mtmp, trap, 0);
             break;
         case LANDMINE:
-            if (rn2(3))
-                break; /* monsters usually don't set it off */
-            if (is_flyer(mptr)) {
-                boolean already_seen = trap->tseen;
-
-                if (in_sight && !already_seen) {
-                    pline("A trigger appears in a pile of soil below %s.",
-                          mon_nam(mtmp));
-                    seetrap(trap);
-                }
-                if (rn2(3))
-                    break;
-                if (in_sight) {
-                    newsym(mtmp->mx, mtmp->my);
-                    pline_The("air currents set %s off!",
-                              already_seen ? "a land mine" : "it");
-                }
-            } else if (in_sight) {
-                newsym(mtmp->mx, mtmp->my);
-                pline("%s%s triggers %s land mine!",
-                      !Deaf ? "KAABLAMM!!!  " : "", Monnam(mtmp),
-                      a_your[trap->madeby_u]);
-            }
-            if (!in_sight && !Deaf)
-                pline("Kaablamm!  %s an explosion in the distance!",
-                      "You hear");  /* Deaf-aware */
-            blow_up_landmine(trap);
-            /* explosion might have destroyed a drawbridge; don't
-               dish out more damage if monster is already dead */
-            if (DEADMONSTER(mtmp)
-                || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE)) {
-                trapkilled = TRUE;
-            } else {
-                /* monsters recursively fall into new pit */
-                if (mintrap(mtmp) == 2)
-                    trapkilled = TRUE;
-            }
-            /* a boulder may fill the new pit, crushing monster */
-            fill_pit(tx, ty); /* thitm may have already destroyed the trap */
-            if (DEADMONSTER(mtmp))
-                trapkilled = TRUE;
-            if (unconscious()) {
-                g.multi = -1;
-                g.nomovemsg = "The explosion awakens you!";
-            }
+            return trapeffect_landmine(mtmp, trap, 0);
             break;
         case POLY_TRAP:
             return trapeffect_poly_trap(mtmp, trap, 0);
