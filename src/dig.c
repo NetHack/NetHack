@@ -1420,6 +1420,7 @@ zap_dig()
                 You("pierce %s %s wall!", s_suffix(mon_nam(mtmp)),
                     mbodypart(mtmp, STOMACH));
             if (unique_corpstat(mtmp->data))
+                pline("%s looks half-shredded!", mon_nam(mtmp));
                 mtmp->mhp = (mtmp->mhp + 1) / 2;
             else
                 mtmp->mhp = 1; /* almost dead */
