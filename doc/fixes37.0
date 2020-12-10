@@ -768,5 +768,6 @@ move 'restoring' to the program_state struct; add corresponding 'saving';
 	inventory when the relevant activity is in progress
 unify special attack damages from separate you-hit-monster, monster-hits-you,
 	and monster-hits-monster into functions by damage type
+unify trap effects for hero and monster stepping on the trap by trap type
 
 
