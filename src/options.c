@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1607561571 2020/12/10 00:52:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.484 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1607591206 2020/12/10 09:06:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.485 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7721,7 +7721,7 @@ boolean dolist;
         int i;
 
         for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
-            Sprintf(buf, "%-8s %s",
+            Sprintf(buf, "%-7s %s",
                     visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
                     default_menu_cmd_info[i].desc);
             putstr(win, 0, buf);

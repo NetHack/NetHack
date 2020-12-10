@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607561570 2020/12/10 00:52:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607591200 2020/12/10 09:06:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.431 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -181,7 +181,8 @@ static void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 static boolean FDECL(help_dir, (CHAR_P, int, const char *));
 
 static void NDECL(commands_init);
-static int FDECL(dokeylist_putcmds, (winid, BOOLEAN_P, int, int, boolean *));
+static boolean FDECL(keylist_func_has_key, (const struct ext_func_tab *));
+static int FDECL(keylist_putcmds, (winid, BOOLEAN_P, int, int, boolean *));
 static int FDECL(ch2spkeys, (CHAR_P, int, int));
 static boolean FDECL(prefix_cmd, (CHAR_P));
 
@@ -1791,9 +1792,10 @@ struct ext_func_tab extcmdlist[] = {
             doapply },
     { C('x'), "attributes", "show your attributes",
             doattributes, IFBURIED },
-    { '@', "autopickup", "toggle the pickup option on/off",
+    { '@', "autopickup", "toggle the 'autopickup' option on/off",
             dotogglepickup, IFBURIED },
-    { 'C', "call", "call (name) something", docallcmd, IFBURIED },
+    { 'C', "call", "name a monster, a specific object, or a type of object",
+            docallcmd, IFBURIED },
     { 'Z', "cast", "zap (cast) a spell", docast, IFBURIED },
     { M('c'), "chat", "talk to someone", dotalk, IFBURIED | AUTOCOMPLETE },
     { 'c', "close", "close a door", doclose },
@@ -1808,14 +1810,14 @@ struct ext_func_tab extcmdlist[] = {
     { M('e'), "enhance", "advance or check weapon and spell skills",
             enhance_weapon_skill, IFBURIED | AUTOCOMPLETE },
     { '\0', "exploremode", "enter explore (discovery) mode",
-            enter_explore_mode, IFBURIED },
+            enter_explore_mode, IFBURIED | GENERALCMD },
     { 'f', "fire", "fire ammunition from quiver", dofire },
     { M('f'), "force", "force a lock", doforce, AUTOCOMPLETE },
     { ';', "glance", "show what type of thing a map symbol corresponds to",
             doquickwhatis, IFBURIED | GENERALCMD },
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },
     { '\0', "herecmdmenu", "show menu of commands you can do here",
-            doherecmdmenu, IFBURIED },
+            doherecmdmenu, IFBURIED | GENERALCMD },
     { 'V', "history", "show long version and game history",
             dohistory, IFBURIED | GENERALCMD },
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
@@ -1841,7 +1843,7 @@ struct ext_func_tab extcmdlist[] = {
 #endif
     { M('m'), "monster", "use monster's special ability",
             domonability, IFBURIED | AUTOCOMPLETE },
-    { 'N', "name", "name a monster or an object",
+    { 'N', "name", "same as call; name a monster or object or object type",
             docallcmd, IFBURIED | AUTOCOMPLETE },
     { M('o'), "offer", "offer a sacrifice to the gods",
             dosacrifice, AUTOCOMPLETE },
@@ -1915,7 +1917,7 @@ struct ext_func_tab extcmdlist[] = {
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
             "menu of commands you can do from here to adjacent spot",
-            dotherecmdmenu },
+            dotherecmdmenu, GENERALCMD },
     { 't', "throw", "throw something", dothrow },
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
             wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
@@ -1931,7 +1933,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('v'), "version",
             "list compile time options for this version of NetHack",
             doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD },
-    { 'v', "versionshort", "show version and date/time program was built",
+    { 'v', "versionshort", "show version and date+time program was built",
             doversion, IFBURIED | GENERALCMD },
     { '\0', "vision", "show vision array",
             wiz_show_vision, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
@@ -2117,20 +2119,32 @@ commands_init()
     (void) bind_key(' ',    "wait");
 }
 
-static int
-dokeylist_putcmds(datawin, docount, cmdflags, exflags, keys_used)
-winid datawin;
-boolean docount;
-int cmdflags, exflags;
-boolean *keys_used; /* boolean keys_used[256] */
+static boolean
+keylist_func_has_key(extcmd)
+const struct ext_func_tab *extcmd;
 {
     int i;
-    char buf[BUFSZ];
-    char buf2[QBUFSZ];
+
+    for (i = 0; i < 256; i++) {
+        if (g.Cmd.commands[i] == extcmd)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static int
+keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_used)
+winid datawin;
+boolean docount;
+int incl_flags, excl_flags;
+boolean *keys_used; /* boolean keys_used[256] */
+{
+    const struct ext_func_tab *extcmd;
+    int i;
+    char buf[BUFSZ], buf2[QBUFSZ];
     int count = 0;
 
     for (i = 0; i < 256; i++) {
-        const struct ext_func_tab *extcmd;
         uchar key = (uchar) i;
 
         if (keys_used[i])
@@ -2138,19 +2152,37 @@ boolean *keys_used; /* boolean keys_used[256] */
         if (key == ' ' && !flags.rest_on_space)
             continue;
         if ((extcmd = g.Cmd.commands[i]) != (struct ext_func_tab *) 0) {
-            if ((cmdflags && !(extcmd->flags & cmdflags))
-                || (exflags && (extcmd->flags & exflags)))
+            if ((incl_flags && !(extcmd->flags & incl_flags))
+                || (excl_flags && (extcmd->flags & excl_flags)))
                 continue;
             if (docount) {
                 count++;
                 continue;
             }
-            Sprintf(buf, "%-8s %-12s %s", key2txt(key, buf2),
-                    extcmd->ef_txt,
-                    extcmd->ef_desc);
+            Sprintf(buf, "%-7s %-13s %s", key2txt(key, buf2),
+                    extcmd->ef_txt, extcmd->ef_desc);
             putstr(datawin, 0, buf);
             keys_used[i] = TRUE;
         }
+    }
+    /* also list commands that lack key assignments; most are wizard mode */
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd) {
+        if ((incl_flags && !(extcmd->flags & incl_flags))
+            || (excl_flags && (extcmd->flags & excl_flags)))
+            continue;
+        /* can't just check for non-Null extcmd->key; it holds the
+           default assignment and a user-specified binding might hijack
+           the this command's default key for some other command */
+        if (keylist_func_has_key(extcmd))
+            continue;
+        /* found a command for current category without any key assignment */
+        if (docount) {
+            count++;
+            continue;
+        }
+        /* '#'+20 for one column here == 7+' '+13 for two columns above */
+        Sprintf(buf, "#%-20s %s", extcmd->ef_txt, extcmd->ef_desc);
+        putstr(datawin, 0, buf);
     }
     return count;
 }
@@ -2159,6 +2191,7 @@ boolean *keys_used; /* boolean keys_used[256] */
 void
 dokeylist(VOID_ARGS)
 {
+    const struct ext_func_tab *extcmd;
     char buf[BUFSZ], buf2[BUFSZ];
     uchar key;
     boolean keys_used[256];
@@ -2181,9 +2214,9 @@ dokeylist(VOID_ARGS)
         { NHKF_FIGHT, forcefight_desc, FALSE },
         { NHKF_FIGHT2, forcefight_desc, TRUE } ,
         { NHKF_NOPICKUP,
-          "Prefix: move without picking up objects/fighting", FALSE },
+          "Prefix: move without picking up objects or fighting", FALSE },
         { NHKF_RUN_NOPICKUP,
-          "Prefix: run without picking up objects/fighting", FALSE },
+          "Prefix: run without picking up objects or fighting", FALSE },
         { NHKF_DOINV, "view inventory", TRUE },
         { NHKF_REQMENU, "Prefix: request a menu", FALSE },
         { NHKF_COUNT,
@@ -2196,7 +2229,18 @@ dokeylist(VOID_ARGS)
 
     datawin = create_nhwindow(NHW_TEXT);
     putstr(datawin, 0, "");
-    putstr(datawin, 0, "            Full Current Key Bindings List");
+    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
+    putstr(datawin, 0, buf);
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        /* this can only check for commands without any key assigned, not
+           ones whose key has been hijacked by something that's processed
+           before it (in use as a prefix, for instance) */
+        if (!keylist_func_has_key(extcmd)) {
+            Sprintf(buf, "%7s %s", "",
+                               "(also commands with no key assignment)");
+            putstr(datawin, 0, buf);
+            break;
+        }
 
     /* directional keys */
     putstr(datawin, 0, "");
@@ -2229,7 +2273,7 @@ dokeylist(VOID_ARGS)
         putstr(datawin, 0, "");
         putstr(datawin, 0,
      "Ctrl+<direction> will run in specified direction until something very");
-        Sprintf(buf, "%8s %s", "", "interesting is seen.");
+        Sprintf(buf, "%7s %s", "", "interesting is seen.");
         putstr(datawin, 0, buf);
         Strcpy(buf, "Shift");
     } else {
@@ -2244,7 +2288,7 @@ dokeylist(VOID_ARGS)
     Strcat(buf,
           "+<direction> will run in specified direction until you encounter");
     putstr(datawin, 0, buf);
-    Sprintf(buf, "%8s %s", "", "an obstacle.");
+    Sprintf(buf, "%7s %s", "", "an obstacle.");
     putstr(datawin, 0, buf);
 
     putstr(datawin, 0, "");
@@ -2254,13 +2298,13 @@ dokeylist(VOID_ARGS)
         if (key && ((misc_keys[i].numpad && iflags.num_pad)
                     || !misc_keys[i].numpad)) {
             keys_used[(uchar) key] = TRUE;
-            Sprintf(buf, "%-8s %s", key2txt(key, buf2), misc_keys[i].desc);
+            Sprintf(buf, "%-7s %s", key2txt(key, buf2), misc_keys[i].desc);
             putstr(datawin, 0, buf);
         }
     }
 #ifndef NO_SIGNAL
     keys_used[(uchar) C('c')] = TRUE;
-    Sprintf(buf, "%-8s %s", key2txt(C('c'), buf2),
+    Sprintf(buf, "%-7s %s", key2txt(C('c'), buf2),
             "break out of NetHack (SIGINT)");
     putstr(datawin, 0, buf);
 #endif
@@ -2268,24 +2312,26 @@ dokeylist(VOID_ARGS)
     putstr(datawin, 0, "");
     show_menu_controls(datawin, TRUE);
 
-    if (dokeylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, keys_used)) {
+    if (keylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "General commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD,
+        (void) keylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD,
                                  keys_used);
     }
 
-    if (dokeylist_putcmds(datawin, TRUE, 0, WIZMODECMD, keys_used)) {
+    if (keylist_putcmds(datawin, TRUE, 0,
+                          GENERALCMD | WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Game commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, 0, WIZMODECMD, keys_used);
+        (void) keylist_putcmds(datawin, FALSE, 0,
+                                 GENERALCMD | WIZMODECMD, keys_used);
     }
 
     if (wizard
-        && dokeylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
+        && keylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
         putstr(datawin, 0, "");
-        putstr(datawin, 0, "Wizard-mode commands:");
-        (void) dokeylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
+        putstr(datawin, 0, "Debug mode commands:");
+        (void) keylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
     }
 
     display_nhwindow(datawin, FALSE);

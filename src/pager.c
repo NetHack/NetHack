@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1596498194 2020/08/03 23:43:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1607591207 2020/12/10 09:06:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2093,9 +2093,9 @@ static const struct {
     { hmenu_dowhatdoes, "Info on what a given key does." },
     { option_help, "List of game options." },
     { dispfile_optionfile, "Longer explanation of game options." },
-    { dokeylist, "Full list of keyboard commands" },
+    { dokeylist, "Full list of keyboard commands." },
     { hmenu_doextlist, "List of extended commands." },
-    { domenucontrols, "List menu control keys" },
+    { domenucontrols, "List menu control keys." },
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
 #ifdef PORT_HELP

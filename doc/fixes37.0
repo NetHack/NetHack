@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.380 $ $NHDT-Date: 1607471879 2020/12/08 23:57:59 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.381 $ $NHDT-Date: 1607591199 2020/12/10 09:06:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -645,6 +645,9 @@ reading blessed scroll of teleportation confers one-shot teleport control
 mild zombie apocalypse
 list lamps and lanterns in charging prompt
 let tourists read conical hats
+when "?i" (show key bindings) displays commands and their keys, also show
+	commands without any key (so useable via '#', or possibly menu, only;
+	the majority are debugging commands)
 
 
 Platform- and/or Interface-Specific New Features
