@@ -69,7 +69,7 @@ struct monst *victim;
     while (item) {
         if (is_wet_towel(item)) {
             oldspe = item->spe;
-            dry_a_towel(item, rn2(oldspe + 1), TRUE);
+            dry_a_towel(item, -1 * rn2(oldspe + 1), TRUE);
             if (item->spe != oldspe)
                 break; /* stop once one towel has been affected */
         }
@@ -3548,7 +3548,8 @@ boolean force;
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
     } else if (obj->otyp == TOWEL && obj->spe < 7) {
-        wet_a_towel(obj, rnd(7), TRUE);
+        /* increase wetness by random amount >= 1, but never past max of 7 */
+        wet_a_towel(obj, -1 * rnd(7 - obj->spe), TRUE);
         return ER_NOTHING;
     } else if (obj->greased) {
         if (!rn2(2))
