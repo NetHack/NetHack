@@ -25,7 +25,7 @@ static int FDECL(trapeffect_hole, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_telep_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_statue_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_magic_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_anti_magic, (struct trap *, unsigned));
 static void FDECL(trapeffect_poly_trap, (struct trap *, unsigned));
@@ -1912,12 +1912,18 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_statue_trap(trap, trflags)
+static int
+trapeffect_statue_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    (void) activate_statue_trap(trap, u.ux, u.uy, FALSE);
+    if (mtmp == &g.youmonst) {
+        (void) activate_statue_trap(trap, u.ux, u.uy, FALSE);
+    } else {
+        /* monsters don't trigger statue traps */
+    }
+    return 0;
 }
 
 static void
@@ -2226,7 +2232,7 @@ unsigned trflags;
         break;
 
     case STATUE_TRAP:
-        trapeffect_statue_trap(trap, trflags);
+        (void) trapeffect_statue_trap(&g.youmonst, trap, trflags);
         break;
 
     case MAGIC_TRAP: /* A magic trap. */
@@ -2932,7 +2938,7 @@ register struct monst *mtmp;
         case WEB:
             return trapeffect_web(mtmp, trap, 0);
         case STATUE_TRAP:
-            break;
+            return trapeffect_statue_trap(mtmp, trap, 0);
         case MAGIC_TRAP:
             /* A magic trap.  Monsters usually immune. */
             if (!rn2(21))
