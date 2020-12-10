@@ -30,7 +30,7 @@ static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned
 static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_rolling_boulder_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_rolling_boulder_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_magic_portal, (struct trap *, unsigned));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
@@ -2210,21 +2210,49 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_rolling_boulder_trap(trap, trflags)
+static int
+trapeffect_rolling_boulder_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
+    if (mtmp == &g.youmonst) {
+        int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
-    feeltrap(trap);
-    pline("Click!  You trigger a rolling boulder trap!");
-    if (!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
-                    trap->launch2.x, trap->launch2.y, style)) {
-        deltrap(trap);
-        newsym(u.ux, u.uy); /* get rid of trap symbol */
-        pline("Fortunately for you, no boulder was released.");
+        feeltrap(trap);
+        pline("Click!  You trigger a rolling boulder trap!");
+        if (!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
+                        trap->launch2.x, trap->launch2.y, style)) {
+            deltrap(trap);
+            newsym(u.ux, u.uy); /* get rid of trap symbol */
+            pline("Fortunately for you, no boulder was released.");
+        }
+    } else {
+        struct permonst *mptr = mtmp->data;
+
+        if (!is_flyer(mptr)) {
+            boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+            int style = ROLL | (in_sight ? 0 : LAUNCH_UNSEEN);
+            boolean trapkilled = FALSE;
+
+            newsym(mtmp->mx, mtmp->my);
+            if (in_sight)
+                pline("Click!  %s triggers %s.", Monnam(mtmp),
+                      trap->tseen ? "a rolling boulder trap" : something);
+            if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
+                           trap->launch2.x, trap->launch2.y, style)) {
+                if (in_sight)
+                    trap->tseen = TRUE;
+                if (DEADMONSTER(mtmp))
+                    trapkilled = TRUE;
+            } else {
+                deltrap(trap);
+                newsym(mtmp->mx, mtmp->my);
+            }
+            return trapkilled ? 2 : mtmp->mtrapped;
+        }
     }
+    return 0;
 }
 
 static void
@@ -2381,7 +2409,7 @@ unsigned trflags;
         break;
 
     case ROLLING_BOULDER_TRAP:
-        trapeffect_rolling_boulder_trap(trap, trflags);
+        (void) trapeffect_rolling_boulder_trap(&g.youmonst, trap, trflags);
         break;
 
     case MAGIC_PORTAL:
@@ -3081,24 +3109,7 @@ register struct monst *mtmp;
             return trapeffect_poly_trap(mtmp, trap, 0);
             break;
         case ROLLING_BOULDER_TRAP:
-            if (!is_flyer(mptr)) {
-                int style = ROLL | (in_sight ? 0 : LAUNCH_UNSEEN);
-
-                newsym(mtmp->mx, mtmp->my);
-                if (in_sight)
-                    pline("Click!  %s triggers %s.", Monnam(mtmp),
-                          trap->tseen ? "a rolling boulder trap" : something);
-                if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
-                               trap->launch2.x, trap->launch2.y, style)) {
-                    if (in_sight)
-                        trap->tseen = TRUE;
-                    if (DEADMONSTER(mtmp))
-                        trapkilled = TRUE;
-                } else {
-                    deltrap(trap);
-                    newsym(mtmp->mx, mtmp->my);
-                }
-            }
+            return trapeffect_rolling_boulder_trap(mtmp, trap, 0);
             break;
         case VIBRATING_SQUARE:
             if (see_it && !Blind) {
