@@ -24,7 +24,7 @@ static int FDECL(trapeffect_pit, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_hole, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_telep_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_web, (struct trap *, unsigned));
+static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_statue_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_magic_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_anti_magic, (struct trap *, unsigned));
@@ -1749,99 +1749,167 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_web(trap, trflags)
+static int
+trapeffect_web(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    boolean webmsgok = (trflags & NOWEBMSG) == 0;
-    boolean forcetrap = ((trflags & FORCETRAP) != 0
-                         || (trflags & FAILEDUNTRAP) != 0);
-    boolean viasitting = (trflags & VIASITTING) != 0;
-    int steed_article = ARTICLE_THE;
+    if (mtmp == &g.youmonst) {
+        boolean webmsgok = (trflags & NOWEBMSG) == 0;
+        boolean forcetrap = ((trflags & FORCETRAP) != 0
+                             || (trflags & FAILEDUNTRAP) != 0);
+        boolean viasitting = (trflags & VIASITTING) != 0;
+        int steed_article = ARTICLE_THE;
 
-    feeltrap(trap);
-    if (mu_maybe_destroy_web(&g.youmonst, webmsgok, trap))
-        return;
-    if (webmaker(g.youmonst.data)) {
-        if (webmsgok)
-            pline(trap->madeby_u ? "You take a walk on your web."
-                  : "There is a spider web here.");
-        return;
-    }
-    if (webmsgok) {
-        char verbbuf[BUFSZ];
-
-        if (forcetrap || viasitting) {
-            Strcpy(verbbuf, "are caught by");
-        } else if (u.usteed) {
-            Sprintf(verbbuf, "lead %s into",
-                    x_monnam(u.usteed, steed_article, "poor",
-                             SUPPRESS_SADDLE, FALSE));
-        } else {
-            Sprintf(verbbuf, "%s into",
-                    Levitation ? (const char *) "float"
-                    : locomotion(g.youmonst.data, "stumble"));
-        }
-        You("%s %s spider web!", verbbuf, a_your[trap->madeby_u]);
-    }
-
-    /* time will be adjusted below */
-    set_utrap(1, TT_WEB);
-
-    /* Time stuck in the web depends on your/steed strength. */
-    {
-        int tim, str = ACURR(A_STR);
-
-        /* If mounted, the steed gets trapped.  Use mintrap
-         * to do all the work.  If mtrapped is set as a result,
-         * unset it and set utrap instead.  In the case of a
-         * strongmonst and mintrap said it's trapped, use a
-         * short but non-zero trap time.  Otherwise, monsters
-         * have no specific strength, so use player strength.
-         * This gets skipped for webmsgok, which implies that
-         * the steed isn't a factor.
-         */
-        if (u.usteed && webmsgok) {
-            /* mtmp location might not be up to date */
-            u.usteed->mx = u.ux;
-            u.usteed->my = u.uy;
-
-            /* mintrap currently does not return 2(died) for webs */
-            if (mintrap(u.usteed)) {
-                u.usteed->mtrapped = 0;
-                if (strongmonst(u.usteed->data))
-                    str = 17;
-            } else {
-                reset_utrap(FALSE);
-                return;
-            }
-
-            webmsgok = FALSE; /* mintrap printed the messages */
-        }
-        if (str <= 3)
-            tim = rn1(6, 6);
-        else if (str < 6)
-            tim = rn1(6, 4);
-        else if (str < 9)
-            tim = rn1(4, 4);
-        else if (str < 12)
-            tim = rn1(4, 2);
-        else if (str < 15)
-            tim = rn1(2, 2);
-        else if (str < 18)
-            tim = rnd(2);
-        else if (str < 69)
-            tim = 1;
-        else {
-            tim = 0;
+        feeltrap(trap);
+        if (mu_maybe_destroy_web(&g.youmonst, webmsgok, trap))
+            return 0;
+        if (webmaker(g.youmonst.data)) {
             if (webmsgok)
-                You("tear through %s web!", a_your[trap->madeby_u]);
-            deltrap(trap);
-            newsym(u.ux, u.uy); /* get rid of trap symbol */
+                pline(trap->madeby_u ? "You take a walk on your web."
+                      : "There is a spider web here.");
+            return 0;
         }
-        set_utrap((unsigned) tim, TT_WEB);
+        if (webmsgok) {
+            char verbbuf[BUFSZ];
+
+            if (forcetrap || viasitting) {
+                Strcpy(verbbuf, "are caught by");
+            } else if (u.usteed) {
+                Sprintf(verbbuf, "lead %s into",
+                        x_monnam(u.usteed, steed_article, "poor",
+                                 SUPPRESS_SADDLE, FALSE));
+            } else {
+                Sprintf(verbbuf, "%s into",
+                        Levitation ? (const char *) "float"
+                        : locomotion(g.youmonst.data, "stumble"));
+            }
+            You("%s %s spider web!", verbbuf, a_your[trap->madeby_u]);
+        }
+
+        /* time will be adjusted below */
+        set_utrap(1, TT_WEB);
+
+        /* Time stuck in the web depends on your/steed strength. */
+        {
+            int tim, str = ACURR(A_STR);
+
+            /* If mounted, the steed gets trapped.  Use mintrap
+             * to do all the work.  If mtrapped is set as a result,
+             * unset it and set utrap instead.  In the case of a
+             * strongmonst and mintrap said it's trapped, use a
+             * short but non-zero trap time.  Otherwise, monsters
+             * have no specific strength, so use player strength.
+             * This gets skipped for webmsgok, which implies that
+             * the steed isn't a factor.
+             */
+            if (u.usteed && webmsgok) {
+                /* mtmp location might not be up to date */
+                u.usteed->mx = u.ux;
+                u.usteed->my = u.uy;
+
+                /* mintrap currently does not return 2(died) for webs */
+                if (mintrap(u.usteed)) {
+                    u.usteed->mtrapped = 0;
+                    if (strongmonst(u.usteed->data))
+                        str = 17;
+                } else {
+                    reset_utrap(FALSE);
+                    return 0;
+                }
+
+                webmsgok = FALSE; /* mintrap printed the messages */
+            }
+            if (str <= 3)
+                tim = rn1(6, 6);
+            else if (str < 6)
+                tim = rn1(6, 4);
+            else if (str < 9)
+                tim = rn1(4, 4);
+            else if (str < 12)
+                tim = rn1(4, 2);
+            else if (str < 15)
+                tim = rn1(2, 2);
+            else if (str < 18)
+                tim = rnd(2);
+            else if (str < 69)
+                tim = 1;
+            else {
+                tim = 0;
+                if (webmsgok)
+                    You("tear through %s web!", a_your[trap->madeby_u]);
+                deltrap(trap);
+                newsym(u.ux, u.uy); /* get rid of trap symbol */
+            }
+            set_utrap((unsigned) tim, TT_WEB);
+        }
+    } else {
+        /* Monster in a web. */
+        boolean tear_web;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        struct permonst *mptr = mtmp->data;
+
+        if (webmaker(mptr))
+            return 0;
+        if (mu_maybe_destroy_web(mtmp, in_sight, trap))
+            return 0;
+        tear_web = FALSE;
+        switch (monsndx(mptr)) {
+        case PM_OWLBEAR: /* Eric Backus */
+        case PM_BUGBEAR:
+            if (!in_sight) {
+                You_hear("the roaring of a confused bear!");
+                mtmp->mtrapped = 1;
+                break;
+            }
+            /*FALLTHRU*/
+        default:
+            if (mptr->mlet == S_GIANT
+                /* exclude baby dragons and relatively short worms */
+                || (mptr->mlet == S_DRAGON && extra_nasty(mptr))
+                || (mtmp->wormno && count_wsegs(mtmp) > 5)) {
+                tear_web = TRUE;
+            } else if (in_sight) {
+                pline("%s is caught in %s spider web.", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            }
+            mtmp->mtrapped = tear_web ? 0 : 1;
+            break;
+            /* this list is fairly arbitrary; it deliberately
+               excludes wumpus & giant/ettin zombies/mummies */
+        case PM_TITANOTHERE:
+        case PM_BALUCHITHERIUM:
+        case PM_PURPLE_WORM:
+        case PM_JABBERWOCK:
+        case PM_IRON_GOLEM:
+        case PM_BALROG:
+        case PM_KRAKEN:
+        case PM_MASTODON:
+        case PM_ORION:
+        case PM_NORN:
+        case PM_CYCLOPS:
+        case PM_LORD_SURTUR:
+            tear_web = TRUE;
+            break;
+        }
+        if (tear_web) {
+            if (in_sight)
+                pline("%s tears through %s spider web!", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+            deltrap(trap);
+            newsym(mtmp->mx, mtmp->my);
+        } else if (g.force_mintrap && !mtmp->mtrapped) {
+            if (in_sight) {
+                pline("%s avoids %s spider web!", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            }
+        }
+        return mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -2154,7 +2222,7 @@ unsigned trflags;
         break;
 
     case WEB: /* Our luckless player has stumbled into a web. */
-        trapeffect_web(trap, trflags);
+        (void) trapeffect_web(&g.youmonst, trap, trflags);
         break;
 
     case STATUE_TRAP:
@@ -2862,65 +2930,7 @@ register struct monst *mtmp;
         case TELEP_TRAP:
             return trapeffect_telep_trap(mtmp, trap, 0);
         case WEB:
-            /* Monster in a web. */
-            if (webmaker(mptr))
-                break;
-            if (mu_maybe_destroy_web(mtmp, in_sight, trap))
-                break;
-            tear_web = FALSE;
-            switch (monsndx(mptr)) {
-            case PM_OWLBEAR: /* Eric Backus */
-            case PM_BUGBEAR:
-                if (!in_sight) {
-                    You_hear("the roaring of a confused bear!");
-                    mtmp->mtrapped = 1;
-                    break;
-                }
-                /*FALLTHRU*/
-            default:
-                if (mptr->mlet == S_GIANT
-                    /* exclude baby dragons and relatively short worms */
-                    || (mptr->mlet == S_DRAGON && extra_nasty(mptr))
-                    || (mtmp->wormno && count_wsegs(mtmp) > 5)) {
-                    tear_web = TRUE;
-                } else if (in_sight) {
-                    pline("%s is caught in %s spider web.", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                }
-                mtmp->mtrapped = tear_web ? 0 : 1;
-                break;
-            /* this list is fairly arbitrary; it deliberately
-               excludes wumpus & giant/ettin zombies/mummies */
-            case PM_TITANOTHERE:
-            case PM_BALUCHITHERIUM:
-            case PM_PURPLE_WORM:
-            case PM_JABBERWOCK:
-            case PM_IRON_GOLEM:
-            case PM_BALROG:
-            case PM_KRAKEN:
-            case PM_MASTODON:
-            case PM_ORION:
-            case PM_NORN:
-            case PM_CYCLOPS:
-            case PM_LORD_SURTUR:
-                tear_web = TRUE;
-                break;
-            }
-            if (tear_web) {
-                if (in_sight)
-                    pline("%s tears through %s spider web!", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                deltrap(trap);
-                newsym(mtmp->mx, mtmp->my);
-            } else if (g.force_mintrap && !mtmp->mtrapped) {
-                if (in_sight) {
-                    pline("%s avoids %s spider web!", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                }
-            }
-            break;
+            return trapeffect_web(mtmp, trap, 0);
         case STATUE_TRAP:
             break;
         case MAGIC_TRAP:
