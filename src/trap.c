@@ -21,9 +21,9 @@ static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsign
 static int FDECL(trapeffect_rust_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_fire_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_pit, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_hole, (struct trap *, unsigned));
-static void FDECL(trapeffect_telep_trap, (struct trap *, unsigned));
-static void FDECL(trapeffect_level_telep, (struct trap *, unsigned));
+static int FDECL(trapeffect_hole, (struct monst *, struct trap *, unsigned));
+static int FDECL(trapeffect_telep_trap, (struct monst *, struct trap *, unsigned));
+static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_web, (struct trap *, unsigned));
 static void FDECL(trapeffect_statue_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_magic_trap, (struct trap *, unsigned));
@@ -1649,36 +1649,104 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_hole(trap, trflags)
+static int
+trapeffect_hole(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    if (!Can_fall_thru(&u.uz)) {
-        seetrap(trap); /* normally done in fall_through */
-        impossible("dotrap: %ss cannot exist on this level.",
-                   trapname(trap->ttyp, TRUE));
-        return; /* don't activate it after all */
+    if (mtmp == &g.youmonst) {
+        if (!Can_fall_thru(&u.uz)) {
+            seetrap(trap); /* normally done in fall_through */
+            impossible("dotrap: %ss cannot exist on this level.",
+                       trapname(trap->ttyp, TRUE));
+            return 0; /* don't activate it after all */
+        }
+        fall_through(TRUE, (trflags & TOOKPLUNGE));
+    } else {
+        int tt = trap->ttyp;
+        struct permonst *mptr = mtmp->data;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean inescapable = (g.force_mintrap
+                               || ((tt == HOLE || tt == PIT)
+                                   && Sokoban && !trap->madeby_u));
+
+        if (!Can_fall_thru(&u.uz)) {
+            impossible("mintrap: %ss cannot exist on this level.",
+                       trapname(tt, TRUE));
+            return 0; /* don't activate it after all */
+        }
+        if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
+            || (mtmp->wormno && count_wsegs(mtmp) > 5)
+            || mptr->msize >= MZ_HUGE) {
+            if (g.force_mintrap && !Sokoban) {
+                /* openfallingtrap; not inescapable here */
+                if (in_sight) {
+                    seetrap(trap);
+                    if (tt == TRAPDOOR)
+                        pline(
+                              "A trap door opens, but %s doesn't fall through.",
+                              mon_nam(mtmp));
+                    else /* (tt == HOLE) */
+                        pline("%s doesn't fall through the hole.",
+                              Monnam(mtmp));
+                }
+                return 0; /* inescapable = FALSE; */
+            }
+            if (inescapable) { /* sokoban hole */
+                if (in_sight) {
+                    pline("%s seems to be yanked down!", Monnam(mtmp));
+                    /* suppress message in mlevel_tele_trap() */
+                    in_sight = FALSE;
+                    seetrap(trap);
+                }
+            } else
+                return 0;
+        }
+        return trapeffect_level_telep(mtmp, trap, trflags);
     }
-    fall_through(TRUE, (trflags & TOOKPLUNGE));
+    return 0;
 }
 
-static void
-trapeffect_telep_trap(trap, trflags)
+static int
+trapeffect_telep_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    tele_trap(trap);
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        tele_trap(trap);
+    } else {
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+
+        mtele_trap(mtmp, trap, in_sight);
+    }
+    return 0;
 }
 
-static void
-trapeffect_level_telep(trap, trflags)
+static int
+trapeffect_level_telep(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    level_tele_trap(trap, trflags);
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        level_tele_trap(trap, trflags);
+    } else {
+        int mlev_res;
+        int tt = trap->ttyp;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean inescapable = (g.force_mintrap
+                               || ((tt == HOLE || tt == PIT)
+                                   && Sokoban && !trap->madeby_u));
+
+        mlev_res = mlevel_tele_trap(mtmp, trap, inescapable, in_sight);
+        if (mlev_res)
+            return mlev_res;
+    }
+    return 0;
 }
 
 static void
@@ -2074,15 +2142,15 @@ unsigned trflags;
 
     case HOLE:
     case TRAPDOOR:
-        trapeffect_hole(trap, trflags);
+        (void) trapeffect_hole(&g.youmonst, trap, trflags);
         break;
 
     case TELEP_TRAP:
-        trapeffect_telep_trap(trap, trflags);
+        (void) trapeffect_telep_trap(&g.youmonst, trap, trflags);
         break;
 
     case LEVEL_TELEP:
-        trapeffect_level_telep(trap, trflags);
+        (void) trapeffect_level_telep(&g.youmonst, trap, trflags);
         break;
 
     case WEB: /* Our luckless player has stumbled into a web. */
@@ -2773,71 +2841,26 @@ register struct monst *mtmp;
             return trapeffect_rocktrap(mtmp, trap, 0);
         case SQKY_BOARD:
             return trapeffect_sqky_board(mtmp, trap, 0);
-            break;
         case BEAR_TRAP:
             return trapeffect_bear_trap(mtmp, trap, 0);
-            break;
         case SLP_GAS_TRAP:
             return trapeffect_slp_gas_trap(mtmp, trap, 0);
-            break;
         case RUST_TRAP:
             return trapeffect_rust_trap(mtmp, trap, 0);
-            break;
         case FIRE_TRAP:
  mfiretrap:
             return trapeffect_fire_trap(mtmp, trap, 0);
-            break;
         case PIT:
         case SPIKED_PIT:
             return trapeffect_pit(mtmp, trap, 0);
-            break;
         case HOLE:
         case TRAPDOOR:
-            if (!Can_fall_thru(&u.uz)) {
-                impossible("mintrap: %ss cannot exist on this level.",
-                           trapname(tt, TRUE));
-                break; /* don't activate it after all */
-            }
-            if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
-                || (mtmp->wormno && count_wsegs(mtmp) > 5)
-                || mptr->msize >= MZ_HUGE) {
-                if (g.force_mintrap && !Sokoban) {
-                    /* openfallingtrap; not inescapable here */
-                    if (in_sight) {
-                        seetrap(trap);
-                        if (tt == TRAPDOOR)
-                            pline(
-                            "A trap door opens, but %s doesn't fall through.",
-                                  mon_nam(mtmp));
-                        else /* (tt == HOLE) */
-                            pline("%s doesn't fall through the hole.",
-                                  Monnam(mtmp));
-                    }
-                    break; /* inescapable = FALSE; */
-                }
-                if (inescapable) { /* sokoban hole */
-                    if (in_sight) {
-                        pline("%s seems to be yanked down!", Monnam(mtmp));
-                        /* suppress message in mlevel_tele_trap() */
-                        in_sight = FALSE;
-                        seetrap(trap);
-                    }
-                } else
-                    break;
-            }
-            /*FALLTHRU*/
+            return trapeffect_hole(mtmp, trap, 0);
         case LEVEL_TELEP:
-        case MAGIC_PORTAL: {
-            int mlev_res;
-
-            mlev_res = mlevel_tele_trap(mtmp, trap, inescapable, in_sight);
-            if (mlev_res)
-                return mlev_res;
-            break;
-        }
+        case MAGIC_PORTAL:
+            return trapeffect_level_telep(mtmp, trap, 0);
         case TELEP_TRAP:
-            mtele_trap(mtmp, trap, in_sight);
-            break;
+            return trapeffect_telep_trap(mtmp, trap, 0);
         case WEB:
             /* Monster in a web. */
             if (webmaker(mptr))
