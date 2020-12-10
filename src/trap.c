@@ -3079,7 +3079,6 @@ register struct monst *mtmp;
         case RUST_TRAP:
             return trapeffect_rust_trap(mtmp, trap, 0);
         case FIRE_TRAP:
- mfiretrap:
             return trapeffect_fire_trap(mtmp, trap, 0);
         case PIT:
         case SPIKED_PIT:
