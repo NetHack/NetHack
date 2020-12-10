@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607471879 2020/12/08 23:57:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.429 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607561570 2020/12/10 00:52:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -379,7 +379,7 @@ const struct ext_func_tab *efp; /* if Null, add a footnote to the menu */
     }
 }
 
-/* here after #? - now list all full-word commands and provid
+/* here after #? - now list all full-word commands and provide
    some navigation capability through the long list */
 int
 doextlist(VOID_ARGS)
@@ -2858,19 +2858,21 @@ const char *command;
     return FALSE;
 }
 
-/* returns a one-byte character from the text (it may massacre the txt
- * buffer) */
-char
+/* returns a one-byte character from the text; may change txt[] */
+uchar
 txt2key(txt)
 char *txt;
 {
+    uchar uc;
+    boolean makemeta = FALSE;
+
     txt = trimspaces(txt);
     if (!*txt)
         return '\0';
 
     /* simple character */
     if (!txt[1])
-        return txt[0];
+        return (uchar) txt[0];
 
     /* a few special entries */
     if (!strcmp(txt, "<enter>"))
@@ -2881,25 +2883,55 @@ char *txt;
         return '\033';
 
     /* control and meta keys */
-    switch (*txt) {
-    case 'm': /* can be mx, Mx, m-x, M-x */
-    case 'M':
-        txt++;
+    if (highc(*txt) == 'M') {
+        /*
+         * M <nothing>             return 'M'
+         * M - <nothing>           return M-'-'
+         * M <other><nothing>      return M-<other>
+         * otherwise M is pending until after ^/C- processing.
+         * Since trailing spaces are discarded, the only way to
+         * specify M-' ' is via "160".
+         */
+        if (!txt[1])
+            return (uchar) *txt;
+        /* skip past 'M' or 'm' and maybe '-' */
+        ++txt;
         if (*txt == '-' && txt[1])
-            txt++;
-        if (txt[1])
-            return '\0';
-        return M(*txt);
-    case 'c': /* can be cx, Cx, ^x, c-x, C-x, ^-x */
-    case 'C':
-    case '^':
-        txt++;
-        if (*txt == '-' && txt[1])
-            txt++;
-        if (txt[1])
-            return '\0';
-        return C(*txt);
+            ++txt;
+        if (!txt[1])
+            return M((uchar) *txt);
+        makemeta = TRUE;
     }
+    if (*txt == '^' || highc(*txt) == 'C') {
+        /*
+         * C <nothing>             return 'C' or M-'C'
+         * C - <nothing>           return '-' or M-'-'
+         * C [-] <other><nothing>  return C-<other> or M-C-<other>
+         * C [-] ?                 return <rubout>
+         * otherwise return C-<other> or M-C-<other>
+         */
+        uc = (uchar) *txt;
+        if (!txt[1])
+            return makemeta ? M(uc) : uc;
+        ++txt;
+        /* unlike M-x, lots of values of x are invalid for C-x;
+           checking and rejecting them is not worthwhile; GIGO;
+           we do accept "^-x" as synonym for "^x" or "C-x" */
+        if (*txt == '-' && txt[1])
+            ++txt;
+        /* and accept ^?, which gets used despite not being a control char */
+        if (*txt == '?')
+            return (uchar) (makemeta ? '\377' : '\177'); /* rubout/delete */
+        uc = C((uchar) *txt);
+        return makemeta ? M(uc) : uc;
+    }
+    if (makemeta && *txt)
+        return M((uchar) *txt);
+
+    /* FIXME: should accept single-quote single-character single-quote
+       and probably single-quote backslash octal-digits single-quote;
+       if we do that, the M- and C- results should be pending until
+       after, so that C-'X' becomes valid for ^X */
 
     /* ascii codes: must be three-digit decimal */
     if (*txt >= '0' && *txt <= '9') {
@@ -2929,9 +2961,9 @@ char *txt; /* sufficiently long buffer */
     if (c == ' ')
         Sprintf(txt, "<space>");
     else if (c == '\033')
-        Sprintf(txt, "<esc>");
+        Sprintf(txt, "<esc>"); /* "<escape>" won't fit */
     else if (c == '\n')
-        Sprintf(txt, "<enter>");
+        Sprintf(txt, "<enter>"); /* "<return>" won't fit */
     else if (c == '\177')
         Sprintf(txt, "<del>"); /* "<delete>" won't fit */
     else

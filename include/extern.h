@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1606919254 2020/12/02 14:27:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.886 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1607561572 2020/12/10 00:52:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.928 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -229,7 +229,7 @@ E void FDECL(pushch, (CHAR_P));
 E void FDECL(savech, (CHAR_P));
 E const char *FDECL(key2extcmddesc, (UCHAR_P));
 E boolean FDECL(bind_specialkey, (UCHAR_P, const char *));
-E char FDECL(txt2key, (char *));
+E uchar FDECL(txt2key, (char *));
 E void FDECL(parseautocomplete, (char *, BOOLEAN_P));
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));

@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1606445249 2020/11/27 02:47:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.482 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1607561571 2020/12/10 00:52:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.484 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -281,7 +281,7 @@ static boolean FDECL(is_wc2_option, (const char *));
 static boolean FDECL(wc2_supported, (const char *));
 static void FDECL(wc_set_font_name, (int, char *));
 static int FDECL(wc_set_window_colors, (char *));
-static boolean FDECL(illegal_menu_cmd_key, (CHAR_P));
+static boolean FDECL(illegal_menu_cmd_key, (UCHAR_P));
 #ifndef CHANGE_COLOR
 int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
 #endif
@@ -4664,7 +4664,7 @@ char *op;
             escapes(op, op_buf);
             c = *op_buf;
 
-            if (illegal_menu_cmd_key(c))
+            if (illegal_menu_cmd_key((uchar) c))
                 return optn_err;
             add_menu_cmd_alias(c, default_menu_cmd_info[midx].cmd);
         }
@@ -6362,10 +6362,10 @@ const char *optn;
 /* parse key:command */
 boolean
 parsebindings(bindings)
-char* bindings;
+char *bindings;
 {
     char *bind;
-    char key;
+    uchar key;
     int i;
     boolean ret = FALSE;
 
@@ -6400,7 +6400,7 @@ char* bindings;
                 config_error_add("Bad menu key %s:%s", visctrl(key), bind);
                 return FALSE;
             } else
-                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+                add_menu_cmd_alias((char) key, default_menu_cmd_info[i].cmd);
             return TRUE;
         }
     }
@@ -7151,18 +7151,19 @@ char **opp;
 /* Check if character c is illegal as a menu command key */
 boolean
 illegal_menu_cmd_key(c)
-char c;
+uchar c;
 {
-    if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-        || c == ' ' || digit(c) || (letter(c) && c != '@')) {
-        config_error_add("Reserved menu command key '%s'", visctrl(c));
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033' || c == ' '
+        || digit((char) c) || (letter((char) c) && c != '@')) {
+        config_error_add("Reserved menu command key '%s'", visctrl((char) c));
         return TRUE;
     } else { /* reject default object class symbols */
         int j;
+
         for (j = 1; j < MAXOCLASSES; j++)
-            if (c == def_oc_syms[j].sym) {
+            if (c == (uchar) def_oc_syms[j].sym) {
                 config_error_add("Menu command key '%s' is an object class",
-                                 visctrl(c));
+                                 visctrl((char) c));
                 return TRUE;
             }
     }
