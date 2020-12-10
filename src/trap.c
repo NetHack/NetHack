@@ -31,7 +31,7 @@ static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned
 static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_rolling_boulder_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_magic_portal, (struct trap *, unsigned));
+static int FDECL(trapeffect_magic_portal, (struct monst *, struct trap *, unsigned));
 static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 static int FDECL(steedintrap, (struct trap *, struct obj *));
 static void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
@@ -2255,13 +2255,19 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_magic_portal(trap, trflags)
+static int
+trapeffect_magic_portal(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    feeltrap(trap);
-    domagicportal(trap);
+    if (mtmp == &g.youmonst) {
+        feeltrap(trap);
+        domagicportal(trap);
+    } else {
+        return trapeffect_level_telep(mtmp, trap, trflags);
+    }
+    return 0;
 }
 
 void
@@ -2413,7 +2419,7 @@ unsigned trflags;
         break;
 
     case MAGIC_PORTAL:
-        trapeffect_magic_portal(trap, trflags);
+        (void) trapeffect_magic_portal(&g.youmonst, trap, trflags);
         break;
 
     case VIBRATING_SQUARE:
@@ -3087,8 +3093,9 @@ register struct monst *mtmp;
         case TRAPDOOR:
             return trapeffect_hole(mtmp, trap, 0);
         case LEVEL_TELEP:
-        case MAGIC_PORTAL:
             return trapeffect_level_telep(mtmp, trap, 0);
+        case MAGIC_PORTAL:
+            return trapeffect_magic_portal(mtmp, trap, 0);
         case TELEP_TRAP:
             return trapeffect_telep_trap(mtmp, trap, 0);
         case WEB:
