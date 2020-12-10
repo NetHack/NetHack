@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.381 $ $NHDT-Date: 1607591199 2020/12/10 09:06:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ $NHDT-Date: 1607641577 2020/12/10 23:06:17 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -322,6 +322,8 @@ brown pudding monster hitting another monster with decay attack corroded armor
 	instead of rotting it
 <?> -> <full key bindings> omitted 'n' prefix and M-digit for number_pad mode,
 	and ^A/re-do was suppressed due lack of obsolete '#define REDO'
+add missing key binding support for rush.numpad; default is M-5 for numpad==1
+	or plain 5 for numpad==2 where behavior of 5 and M-5 are swapped
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

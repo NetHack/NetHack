@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1606919254 2020/12/02 14:27:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1607641577 2020/12/10 23:06:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -416,15 +416,16 @@ enum nh_keyfunc {
     NHKF_REQMENU,
 
     /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,
-    NHKF_RUN2,
-    NHKF_RUSH,
-    NHKF_FIGHT,
-    NHKF_FIGHT2,
-    NHKF_NOPICKUP,
-    NHKF_RUN_NOPICKUP,
-    NHKF_DOINV,
-    NHKF_TRAVEL,
+    NHKF_RUN,          /* 'G' */
+    NHKF_RUN2,         /* '5' or M-5 */
+    NHKF_RUSH,         /* 'g' */
+    NHKF_RUSH2,        /* M-5 or '5' */
+    NHKF_FIGHT,        /* 'F' */
+    NHKF_FIGHT2,       /* '-' */
+    NHKF_NOPICKUP,     /* 'm' */
+    NHKF_RUN_NOPICKUP, /* 'M' */
+    NHKF_DOINV,        /* '0' */
+    NHKF_TRAVEL,       /* via mouse */
     NHKF_CLICKLOOK,
 
     NHKF_REDRAW,

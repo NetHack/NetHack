@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607591200 2020/12/10 09:06:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.431 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607641581 2020/12/10 23:06:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.432 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1821,7 +1821,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'V', "history", "show long version and game history",
             dohistory, IFBURIED | GENERALCMD },
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
-    { 'I', "inventtype", "inventory specific item types",
+    { 'I', "inventtype", "show inventory of one specific item class",
             dotypeinv, IFBURIED },
     { M('i'), "invoke", "invoke an object's special powers",
             doinvoke, IFBURIED | AUTOCOMPLETE },
@@ -2199,6 +2199,7 @@ dokeylist(VOID_ARGS)
     int i;
     static const char
         run_desc[] = "Prefix: run until something very interesting is seen",
+        rush_desc[] = "Prefix: rush until something interesting is seen",
         forcefight_desc[] =
                      "Prefix: force fight even if you don't see a monster";
     static const struct {
@@ -2206,9 +2207,9 @@ dokeylist(VOID_ARGS)
         const char *desc;
         boolean numpad;
     } misc_keys[] = {
-        { NHKF_ESC, "escape from the current query/action", FALSE },
-        { NHKF_RUSH,
-          "Prefix: rush until something interesting is seen", FALSE },
+        { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
+        { NHKF_RUSH, rush_desc, FALSE },
+        { NHKF_RUSH2, rush_desc, TRUE },
         { NHKF_RUN, run_desc, FALSE },
         { NHKF_RUN2, run_desc, TRUE },
         { NHKF_FIGHT, forcefight_desc, FALSE },
@@ -2217,7 +2218,9 @@ dokeylist(VOID_ARGS)
           "Prefix: move without picking up objects or fighting", FALSE },
         { NHKF_RUN_NOPICKUP,
           "Prefix: run without picking up objects or fighting", FALSE },
-        { NHKF_DOINV, "view inventory", TRUE },
+        { NHKF_DOINV, "view full inventory", TRUE },
+        /* NHKF_DOINV2 for num_pad+pcHack_compat isn't implemented */
+        /* { NHKF_DOINV2, "view inventory of one class of objects", TRUE }, */
         { NHKF_REQMENU, "Prefix: request a menu", FALSE },
         { NHKF_COUNT,
           "Prefix: for digits when prefixing a command with a count", TRUE },
@@ -2303,8 +2306,9 @@ dokeylist(VOID_ARGS)
         }
     }
 #ifndef NO_SIGNAL
-    keys_used[(uchar) C('c')] = TRUE;
-    Sprintf(buf, "%-7s %s", key2txt(C('c'), buf2),
+    key = (uchar) C('c');
+    keys_used[key] = TRUE;
+    Sprintf(buf, "%-7s %s", key2txt(key, buf2),
             "break out of NetHack (SIGINT)");
     putstr(datawin, 0, buf);
 #endif
@@ -2320,15 +2324,14 @@ dokeylist(VOID_ARGS)
     }
 
     if (keylist_putcmds(datawin, TRUE, 0,
-                          GENERALCMD | WIZMODECMD, keys_used)) {
+                        GENERALCMD | WIZMODECMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Game commands:");
         (void) keylist_putcmds(datawin, FALSE, 0,
-                                 GENERALCMD | WIZMODECMD, keys_used);
+                               GENERALCMD | WIZMODECMD, keys_used);
     }
 
-    if (wizard
-        && keylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
+    if (wizard && keylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Debug mode commands:");
         (void) keylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
@@ -2842,7 +2845,7 @@ wiz_migrate_mons()
 
 static struct {
     int nhkf;
-    char key;
+    uchar key;
     const char *name;
 } const spkeys_binds[] = {
     { NHKF_ESC,              '\033', (char *) 0 }, /* no binding */
@@ -2851,6 +2854,7 @@ static struct {
     { NHKF_RUN,              'G', "run" },
     { NHKF_RUN2,             '5', "run.numpad" },
     { NHKF_RUSH,             'g', "rush" },
+    { NHKF_RUSH2,            M('5'), "rush.numpad" },
     { NHKF_FIGHT,            'F', "fight" },
     { NHKF_FIGHT2,           '-', "fight.numpad" },
     { NHKF_NOPICKUP,         'm', "nopickup" },
@@ -3109,13 +3113,14 @@ boolean initial;
         if (flagtemp != g.Cmd.swap_yz) {
             g.Cmd.swap_yz = flagtemp;
             ++updated;
-            /* g.Cmd.swap_yz has been toggled;
+            /* FIXME? should Cmd.spkeys[] be scanned for y and/or z to swap?
+               Cmd.swap_yz has been toggled;
                perform the swap (or reverse previous one) */
             for (i = 0; i < SIZE(ylist); i++) {
                 c = ylist[i] & 0xff;
-                cmdtmp = g.Cmd.commands[c];              /* tmp = [y] */
+                cmdtmp = g.Cmd.commands[c];                /* tmp = [y] */
                 g.Cmd.commands[c] = g.Cmd.commands[c + 1]; /* [y] = [z] */
-                g.Cmd.commands[c + 1] = cmdtmp;          /* [z] = tmp */
+                g.Cmd.commands[c + 1] = cmdtmp;            /* [z] = tmp */
             }
         }
         /* MSDOS compatibility mode (only applicable for num_pad) */
@@ -3124,10 +3129,17 @@ boolean initial;
             g.Cmd.pcHack_compat = flagtemp;
             ++updated;
             /* pcHack_compat has been toggled */
+#if 0
             c = M('5') & 0xff;
             cmdtmp = g.Cmd.commands['5'];
             g.Cmd.commands['5'] = g.Cmd.commands[c];
             g.Cmd.commands[c] = cmdtmp;
+#else
+            c = g.Cmd.spkeys[NHKF_RUN2];
+            g.Cmd.spkeys[NHKF_RUN2] = g.Cmd.spkeys[NHKF_RUSH2];
+            g.Cmd.spkeys[NHKF_RUSH2] = c;
+#endif
+            /* FIXME: NHKF_DOINV2 ought to be implemented instead of this */
             c = M('0') & 0xff;
             g.Cmd.commands[c] = g.Cmd.pcHack_compat ? g.Cmd.commands['I'] : 0;
         }
@@ -3338,6 +3350,10 @@ register char *cmd;
     spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_CLICKLOOK);
 
     switch (spkey) {
+    case NHKF_RUSH2:
+        if (!g.Cmd.num_pad)
+            break;
+        /*FALLTHRU*/
     case NHKF_RUSH:
         if (movecmd(cmd[1])) {
             g.context.run = 2;
@@ -3597,7 +3613,8 @@ char c;
             || c == g.Cmd.spkeys[NHKF_RUN_NOPICKUP]
             || c == g.Cmd.spkeys[NHKF_FIGHT]
             || (g.Cmd.num_pad && (c == g.Cmd.spkeys[NHKF_RUN2]
-                                || c == g.Cmd.spkeys[NHKF_FIGHT2])));
+                                  || c == g.Cmd.spkeys[NHKF_RUSH2]
+                                  || c == g.Cmd.spkeys[NHKF_FIGHT2])));
 }
 
 /*
@@ -3751,6 +3768,10 @@ const char *msg;
     case NHKF_NOPICKUP:
         dothat = "move";
         break;
+    case NHKF_RUSH2:
+        if (!g.Cmd.num_pad)
+            break;
+        /*FALLTHRU*/
     case NHKF_RUSH:
         dothat = "rush";
         break;
