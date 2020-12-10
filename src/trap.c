@@ -28,7 +28,7 @@ static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_poly_trap, (struct trap *, unsigned));
+static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_landmine, (struct trap *, unsigned));
 static void FDECL(trapeffect_rolling_boulder_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_magic_portal, (struct trap *, unsigned));
@@ -2047,38 +2047,52 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_poly_trap(trap, trflags)
+static int
+trapeffect_poly_trap(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    boolean viasitting = (trflags & VIASITTING) != 0;
-    int steed_article = ARTICLE_THE;
-    char verbbuf[BUFSZ];
+    if (mtmp == &g.youmonst) {
+        boolean viasitting = (trflags & VIASITTING) != 0;
+        int steed_article = ARTICLE_THE;
+        char verbbuf[BUFSZ];
 
-    seetrap(trap);
-    if (viasitting)
-        Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
-    else if (u.usteed)
-        Sprintf(verbbuf, "lead %s onto",
-                x_monnam(u.usteed, steed_article, (char *) 0,
-                         SUPPRESS_SADDLE, FALSE));
-    else
-        Sprintf(verbbuf, "%s onto",
-                Levitation ? (const char *) "float"
-                : locomotion(g.youmonst.data, "step"));
-    You("%s a polymorph trap!", verbbuf);
-    if (Antimagic || Unchanging) {
-        shieldeff(u.ux, u.uy);
-        You_feel("momentarily different.");
-        /* Trap did nothing; don't remove it --KAA */
+        seetrap(trap);
+        if (viasitting)
+            Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
+        else if (u.usteed)
+            Sprintf(verbbuf, "lead %s onto",
+                    x_monnam(u.usteed, steed_article, (char *) 0,
+                             SUPPRESS_SADDLE, FALSE));
+        else
+            Sprintf(verbbuf, "%s onto",
+                    Levitation ? (const char *) "float"
+                    : locomotion(g.youmonst.data, "step"));
+        You("%s a polymorph trap!", verbbuf);
+        if (Antimagic || Unchanging) {
+            shieldeff(u.ux, u.uy);
+            You_feel("momentarily different.");
+            /* Trap did nothing; don't remove it --KAA */
+        } else {
+            (void) steedintrap(trap, (struct obj *) 0);
+            deltrap(trap);      /* delete trap before polymorph */
+            newsym(u.ux, u.uy); /* get rid of trap symbol */
+            You_feel("a change coming over you.");
+            polyself(0);
+        }
     } else {
-        (void) steedintrap(trap, (struct obj *) 0);
-        deltrap(trap);      /* delete trap before polymorph */
-        newsym(u.ux, u.uy); /* get rid of trap symbol */
-        You_feel("a change coming over you.");
-        polyself(0);
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+
+        if (resists_magm(mtmp)) {
+            shieldeff(mtmp->mx, mtmp->my);
+        } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
+            (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
+            if (in_sight)
+                seetrap(trap);
+        }
     }
+    return 0;
 }
 
 static void
@@ -2303,7 +2317,7 @@ unsigned trflags;
         break;
 
     case POLY_TRAP:
-        trapeffect_poly_trap(trap, trflags);
+        (void) trapeffect_poly_trap(&g.youmonst, trap, trflags);
         break;
 
     case LANDMINE:
@@ -3052,15 +3066,7 @@ register struct monst *mtmp;
             }
             break;
         case POLY_TRAP:
-            if (resists_magm(mtmp)) {
-                shieldeff(mtmp->mx, mtmp->my);
-            } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-                if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
-                    /* we're done with mptr but keep it up to date */
-                    mptr = mtmp->data;
-                if (in_sight)
-                    seetrap(trap);
-            }
+            return trapeffect_poly_trap(mtmp, trap, 0);
             break;
         case ROLLING_BOULDER_TRAP:
             if (!is_flyer(mptr)) {
