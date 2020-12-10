@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{November 30, 2020}
+\date{December 9, 2020}
 
 \maketitle
 
@@ -1136,7 +1136,7 @@ Combines the preceding five type-specific
 commands into one.
 %.lp
 \item[\tb{\$}]
-Count your gold pieces.
+Report the gold you're carrying, possibly shop credit and/or debt too.
 %.lp
 \item[\tb{+}]
 List the spells you know.\\
@@ -1471,9 +1471,6 @@ Show the amulet currently worn. Default key is `{\tt "}'.
 \item[\tb{\#seearmor}]
 Show the armor currently worn. Default key is `{\tt [}'.
 %.lp
-\item[\tb{\#seegold}]
-Count your gold. Default key is `{\tt \$}'.
-%.lp
 \item[\tb{\#seerings}]
 Show the ring(s) currently worn. Default key is `{\tt =}'.
 %.lp
@@ -1491,12 +1488,22 @@ configuration file.
 Use the shell command `{\tt exit}' to return to the game.
 Default key is `{\tt !}'.
 %.lp
+\item[\tb{\#showgold}]
+Report the gold in your inventory and if you are inside a shop,
+report any credit or debt you have in that shop.
+Does not report on any gold inside containers you're carrying.
+Default key is `{\tt \$}'.
+%.lp
 \item[\tb{\#showspells}]
 List and reorder known spells.
 Default key is `{\tt +}'.
 %.lp
 \item[\tb{\#showtrap}]
-Show the type of an adjacent trap.
+Describe an adjacent trap, possibly covered by objects or a monster.
+To be eligible, the trap must already be discovered.
+(The ``{\tt \#terrain}'' command can display your map with all objects and
+monsters temporarily removed, making it possible to see all discovered
+traps.)
 Default key is `{\tt \^{}}'.
 %.lp
 \item[\tb{\#sit}]
@@ -1586,10 +1593,19 @@ Debug mode only.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack\/}.
+
+%.lp
+The second paragraph lists the user interface(s) that are included.
+If there are more than one, you can use the {\it window\verb+_+type\/}
+option in your run-time configuration file to select the one you want.
+
+%.lp
 Autocompletes. Default key is `{\tt M-v}'.
 %.lp
 \item[\tb{\#versionshort}]
-Show version string. Default key is `{\tt v}'.
+Show the program's version number, plus the date and time that the
+running copy was built from sources (not the version's release date).
+Default key is `{\tt v}'.
 %.lp
 \item[\tb{\#vision}]
 Show vision array.
