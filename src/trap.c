@@ -27,7 +27,7 @@ static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigne
 static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigned));
 static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned));
-static void FDECL(trapeffect_anti_magic, (struct trap *, unsigned));
+static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned));
 static void FDECL(trapeffect_poly_trap, (struct trap *, unsigned));
 static void FDECL(trapeffect_landmine, (struct trap *, unsigned));
 static void FDECL(trapeffect_rolling_boulder_trap, (struct trap *, unsigned));
@@ -1954,46 +1954,97 @@ unsigned trflags;
     return 0;
 }
 
-static void
-trapeffect_anti_magic(trap, trflags)
+static int
+trapeffect_anti_magic(mtmp, trap, trflags)
+struct monst *mtmp;
 struct trap *trap;
 unsigned trflags;
 {
-    seetrap(trap);
-    /* hero without magic resistance loses spell energy,
-       hero with magic resistance takes damage instead;
-       possibly non-intuitive but useful for play balance */
-    if (!Antimagic) {
-        drain_en(rnd(u.ulevel) + 1);
+    if (mtmp == &g.youmonst) {
+        seetrap(trap);
+        /* hero without magic resistance loses spell energy,
+           hero with magic resistance takes damage instead;
+           possibly non-intuitive but useful for play balance */
+        if (!Antimagic) {
+            drain_en(rnd(u.ulevel) + 1);
+        } else {
+            struct obj *otmp;
+            int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
+
+            /* Half_XXX_damage has opposite its usual effect (approx)
+               but isn't cumulative if hero has more than one */
+            if (Half_physical_damage || Half_spell_damage)
+                dmgval2 += rnd(4);
+            /* give Magicbane wielder dose of own medicine */
+            if (uwep && uwep->oartifact == ART_MAGICBANE)
+                dmgval2 += rnd(4);
+            /* having an artifact--other than own quest one--which
+               confers magic resistance simply by being carried
+               also increases the effect */
+            for (otmp = g.invent; otmp; otmp = otmp->nobj)
+                if (otmp->oartifact && !is_quest_artifact(otmp)
+                    && defends_when_carried(AD_MAGM, otmp))
+                    break;
+            if (otmp)
+                dmgval2 += rnd(4);
+            if (Passes_walls)
+                dmgval2 = (dmgval2 + 3) / 4;
+
+            You_feel((dmgval2 >= hp) ? "unbearably torpid!"
+                     : (dmgval2 >= hp / 4) ? "very lethargic."
+                     : "sluggish.");
+            /* opposite of magical explosion */
+            losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
+        }
     } else {
-        struct obj *otmp;
-        int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
+        boolean trapkilled = FALSE;
+        boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        struct permonst *mptr = mtmp->data;
 
-        /* Half_XXX_damage has opposite its usual effect (approx)
-           but isn't cumulative if hero has more than one */
-        if (Half_physical_damage || Half_spell_damage)
-            dmgval2 += rnd(4);
-        /* give Magicbane wielder dose of own medicine */
-        if (uwep && uwep->oartifact == ART_MAGICBANE)
-            dmgval2 += rnd(4);
-        /* having an artifact--other than own quest one--which
-           confers magic resistance simply by being carried
-           also increases the effect */
-        for (otmp = g.invent; otmp; otmp = otmp->nobj)
-            if (otmp->oartifact && !is_quest_artifact(otmp)
-                && defends_when_carried(AD_MAGM, otmp))
-                break;
-        if (otmp)
-            dmgval2 += rnd(4);
-        if (Passes_walls)
-            dmgval2 = (dmgval2 + 3) / 4;
+        /* similar to hero's case, more or less */
+        if (!resists_magm(mtmp)) { /* lose spell energy */
+            if (!mtmp->mcan && (attacktype(mptr, AT_MAGC)
+                                || attacktype(mptr, AT_BREA))) {
+                mtmp->mspec_used += d(2, 2);
+                if (in_sight) {
+                    seetrap(trap);
+                    pline("%s seems lethargic.", Monnam(mtmp));
+                }
+            }
+        } else { /* take some damage */
+            struct obj *otmp;
+            int dmgval2 = rnd(4);
 
-        You_feel((dmgval2 >= hp) ? "unbearably torpid!"
-                 : (dmgval2 >= hp / 4) ? "very lethargic."
-                 : "sluggish.");
-        /* opposite of magical explosion */
-        losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
+            if ((otmp = MON_WEP(mtmp)) != 0
+                && otmp->oartifact == ART_MAGICBANE)
+                dmgval2 += rnd(4);
+            for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+                if (otmp->oartifact
+                    && defends_when_carried(AD_MAGM, otmp))
+                    break;
+            if (otmp)
+                dmgval2 += rnd(4);
+            if (passes_walls(mptr))
+                dmgval2 = (dmgval2 + 3) / 4;
+
+            if (in_sight)
+                seetrap(trap);
+            mtmp->mhp -= dmgval2;
+            if (DEADMONSTER(mtmp))
+                monkilled(mtmp,
+                          in_sight
+                          ? "compression from an anti-magic field"
+                          : (const char *) 0,
+                          -AD_MAGM);
+            if (DEADMONSTER(mtmp))
+                trapkilled = TRUE;
+            if (see_it)
+                newsym(trap->tx, trap->ty);
+        }
+        return trapkilled ? 2 : mtmp->mtrapped;
     }
+    return 0;
 }
 
 static void
@@ -2248,7 +2299,7 @@ unsigned trflags;
         break;
 
     case ANTI_MAGIC:
-        trapeffect_anti_magic(trap, trflags);
+        (void) trapeffect_anti_magic(&g.youmonst, trap, trflags);
         break;
 
     case POLY_TRAP:
@@ -2951,45 +3002,7 @@ register struct monst *mtmp;
             return trapeffect_statue_trap(mtmp, trap, 0);
             break;
         case ANTI_MAGIC:
-            /* similar to hero's case, more or less */
-            if (!resists_magm(mtmp)) { /* lose spell energy */
-                if (!mtmp->mcan && (attacktype(mptr, AT_MAGC)
-                                    || attacktype(mptr, AT_BREA))) {
-                    mtmp->mspec_used += d(2, 2);
-                    if (in_sight) {
-                        seetrap(trap);
-                        pline("%s seems lethargic.", Monnam(mtmp));
-                    }
-                }
-            } else { /* take some damage */
-                int dmgval2 = rnd(4);
-
-                if ((otmp = MON_WEP(mtmp)) != 0
-                    && otmp->oartifact == ART_MAGICBANE)
-                    dmgval2 += rnd(4);
-                for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-                    if (otmp->oartifact
-                        && defends_when_carried(AD_MAGM, otmp))
-                        break;
-                if (otmp)
-                    dmgval2 += rnd(4);
-                if (passes_walls(mptr))
-                    dmgval2 = (dmgval2 + 3) / 4;
-
-                if (in_sight)
-                    seetrap(trap);
-                mtmp->mhp -= dmgval2;
-                if (DEADMONSTER(mtmp))
-                    monkilled(mtmp,
-                              in_sight
-                                  ? "compression from an anti-magic field"
-                                  : (const char *) 0,
-                              -AD_MAGM);
-                if (DEADMONSTER(mtmp))
-                    trapkilled = TRUE;
-                if (see_it)
-                    newsym(trap->tx, trap->ty);
-            }
+            return trapeffect_anti_magic(mtmp, trap, 0);
             break;
         case LANDMINE:
             if (rn2(3))
