@@ -7,9 +7,8 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-.clang-format        .travis.yml          Cross-compiling
-Files                Porting              README
-azure-pipelines.yml
+.clang-format        Cross-compiling      Files
+Porting              README               azure-pipelines.yml
 
 DEVEL:
 (files for people developing changes to NetHack)
@@ -109,6 +108,10 @@ you.h         youprop.h
 
 (file for tty versions)
 wintty.h
+
+outdated:
+(files that are no longer maintained for current game code)
+.travis.yml
 
 outdated/include:
 (files that are no longer maintained for current game code)
