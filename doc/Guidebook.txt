@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  December 9, 2020
+                                  December 11, 2020
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -786,7 +786,7 @@
                Da  - drop all objects, without asking for confirmation.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -984,7 +984,7 @@
                an arrow while not wielding a bow, you are  throwing  it  by
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1050,7 +1050,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1182,7 +1182,7 @@
                into its own inventory slot.  If it  has  a  name  assigned,
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1380,7 +1380,7 @@
                Offer a sacrifice to the gods.  Autocompletes.  Default  key
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1446,7 +1446,7 @@
                your intent before praying.  It is enabled by  default,  and
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1578,7 +1578,7 @@
                the  shell  command `fg' to return to the game.  Default key
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1668,8 +1668,8 @@
 
                The second paragraph lists the user  interface(s)  that  are
                included.   If there are more than one, you can use the win-
-               dow_type option in your run-time configuration file  to  se-
-               lect the one you want.
+               dowtype option in your run-time configuration file to select
+               the one you want.
 
                Autocompletes.  Default key is `M-v'.
 
@@ -1710,7 +1710,7 @@
                mode only.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1908,7 +1908,7 @@
           which may be open, closed, or locked.  To open a closed door, use
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -1974,7 +1974,7 @@
           the  `s' (search) command (multiple attempts are often needed; if
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2040,7 +2040,7 @@
           new  boulders with a scroll of earth.  However, doing such things
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2106,7 +2106,7 @@
           needs  to  be  compatible with the type of merchandise carried by
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2172,7 +2172,7 @@
           list  all  objects  no  matter  how big a pile is.  Note that the
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2238,7 +2238,7 @@
           main   dungeon)   is  a  tribute  to  the  ancestor  game  hack's
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2304,7 +2304,7 @@
           ster has moved, you will attack empty air.  If you guess that the
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2436,7 +2436,7 @@
           Strained, Overtaxed, or Overloaded will be shown  on  the  bottom
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2502,7 +2502,7 @@
           curse state provided that you can see them land.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2568,7 +2568,7 @@
           taneously as primary and secondary; use the `X' command to engage
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2634,7 +2634,7 @@
           mode)  would  ensure  that  at most 2 arrows are shot even if you
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2700,7 +2700,7 @@
           use.   To  wield  two  weapons,  you need to use the "#twoweapon"
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2832,7 +2832,7 @@
           vegetarian  players  can,  but  with some rather unpleasant side-
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2898,7 +2898,7 @@
           warned,  however, for this is often unwise.  Other types of wands
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -2964,7 +2964,7 @@
           attempt backfires.  Reading a cursed spellbook or one with mystic
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3030,7 +3030,7 @@
           Amulets.   Other  tools  (such  as  pick-axe)  can  be wielded as
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3096,7 +3096,7 @@
           tile  weapons  (if  you  have a sling).  In the most desperate of
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3228,7 +3228,7 @@
           brains while polymorphed into a mind flayer, is considered eating
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3294,7 +3294,7 @@
           can't  be  bypassed,  such  as  being  unable  to  push a boulder
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3360,7 +3360,7 @@
           Soko-Prize - Explored to the top of Sokoban
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3426,7 +3426,7 @@
           NetHack should do things, there are options you can set to change
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3624,7 +3624,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3756,7 +3756,7 @@
             tion controls whether the description includes map coordinates.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3888,7 +3888,7 @@
             display for end-of-game disclosure follows a set sequence.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -3954,7 +3954,7 @@
             "no", you will exclude that gender from being picked  randomly.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4020,7 +4020,7 @@
             sistent.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4086,7 +4086,7 @@
             menu  of  matching  objects  for  selection.  Partial skips the
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4152,7 +4152,7 @@
             mented by the Amiga, Gem, X11 and tty ports.  Default `:'.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4218,7 +4218,7 @@
             news is shown at the beginning of the game, there's no point in
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4284,7 +4284,7 @@
                           ing a peaceful monster;
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4350,7 +4350,7 @@
             Specify the type of your initial pet,  if  you  are  playing  a
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4416,7 +4416,7 @@
             being  underwater or engulfed, ignore this option.  It does not
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4482,7 +4482,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4680,7 +4680,7 @@
             be  the  first non-comment line.  For a comma-separated list in
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4746,7 +4746,7 @@
             if NetHack can, it should use a font by the chosen name for the
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4812,7 +4812,7 @@
             If  NetHack  can, it should pop up dialog boxes, or use prompts
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4878,7 +4878,7 @@
             statuslines  can  only  be set in the configuration file or via
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -4944,7 +4944,7 @@
             foreground/background colors. Windows GUI only. The format is
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5076,7 +5076,7 @@
             Set  the  intensity  level  of  the three gray scales available
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5142,7 +5142,7 @@
           any  corpse  from  autopickup.   The  last example results in the
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5340,7 +5340,7 @@
             Prefix key to move without picking up items.  Default is `m'.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5406,7 +5406,7 @@
             norep - show  the  message  once,  but  not  again  if no other
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5472,7 +5472,7 @@
                  MENUCOLOR="* cursed *(being worn)"=red&underline
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5604,7 +5604,7 @@
             dice", an approximation  of  experience  level  displayed  when
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5670,7 +5670,7 @@
                  is below or above.  If the prefix  is  `<'  or  `>',  only
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6000,7 +6000,7 @@
           game messages to an external program, such  as  a  text-to-speech
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6066,7 +6066,7 @@
             coordinates relative to your character.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6132,7 +6132,7 @@
             bones file content in ascii text.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6198,7 +6198,7 @@
             %D - current time, YYYYMMDDhhmmss format
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6264,7 +6264,7 @@
           It  is  initiated  by  starting the game with the -D command-line
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6396,7 +6396,7 @@
           Michael Allison ported NetHack 3.1 to Windows NT.
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6528,7 +6528,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6594,7 +6594,7 @@
           Jessie  Collet,  Ken  Lorber,  Dean  Luick,  Pat   Rankin,   Mike
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-          NetHack 3.7                                      December 9, 2020
+          NetHack 3.7                                     December 11, 2020
 
 
 
