@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.404 $ $NHDT-Date: 1607643123 2020/12/10 23:32:03 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.405 $ $NHDT-Date: 1607693152 2020/12/11 13:25:52 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -1505,7 +1505,7 @@ Print compile time options for this version of NetHack.
 .lp ""
 The second paragraph lists the user interface(s) that are included.
 If there are more than one, you can use the
-.op window_type
+.op windowtype
 option in your run-time configuration file to select the one you want.
 .lp ""
 Autocompletes.
