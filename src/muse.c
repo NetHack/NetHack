@@ -20,6 +20,8 @@ static void FDECL(mplayhorn, (struct monst *, struct obj *, BOOLEAN_P));
 static void FDECL(mreadmsg, (struct monst *, struct obj *));
 static void FDECL(mquaffmsg, (struct monst *, struct obj *));
 static boolean FDECL(m_use_healing, (struct monst *));
+static boolean FDECL(linedup_chk_corpse, (int, int));
+static void FDECL(m_use_undead_turning, (struct monst *, struct obj *));
 static int FDECL(mbhitm, (struct monst *, struct obj *));
 static void FDECL(mbhit, (struct monst *, int,
                               int FDECL((*), (MONST_P, OBJ_P)),
@@ -1134,6 +1136,60 @@ struct monst *mtmp;
 /*#define MUSE_WAN_UNDEAD_TURNING 20*/ /* also a defensive item so don't
                                      * redefine; nonconsecutive value is ok */
 
+static boolean
+linedup_chk_corpse(x, y)
+int x, y;
+{
+    return (sobj_at(CORPSE, x, y) != 0);
+}
+
+static void
+m_use_undead_turning(mtmp, obj)
+struct monst *mtmp;
+struct obj *obj;
+{
+    int ax = u.ux + sgn(mtmp->mux - mtmp->mx) * 3,
+        ay = u.uy + sgn(mtmp->muy - mtmp->my) * 3;
+    int bx = mtmp->mx, by = mtmp->my;
+
+    if (!(obj->otyp == WAN_UNDEAD_TURNING && obj->spe > 0))
+        return;
+
+    /* not necrophiliac(); unlike deciding whether to pick this
+       type of wand up, we aren't interested in corpses within
+       carried containers until they're moved into open inventory;
+       we don't check whether hero is poly'd into an undead--the
+       wand's turning effect is too weak to be a useful direct
+       attack--only whether hero is carrying at least one corpse */
+    if (carrying(CORPSE)) {
+        /*
+         * Hero is carrying one or more corpses but isn't wielding
+         * a cockatrice corpse (unless being hit by one won't do
+         * the monster much harm); otherwise we'd be using this wand
+         * as a defensive item with higher priority.
+         *
+         * Might be cockatrice intended as a weapon (or being denied
+         * to glove-wearing monsters for use as a weapon) or lizard
+         * intended as a cure or lichen intended as veggy food or
+         * sacrifice fodder being lugged to an altar.  Zapping with
+         * this will deprive hero of one from each stack although
+         * they might subsequently be recovered after killing again.
+         * In the sacrifice fodder case, it could even be to the
+         * player's advantage (fresher corpse if a new one gets
+         * dropped; player might not choose to spend a wand charge
+         * on that when/if hero acquires this wand).
+         */
+        g.m.offensive = obj;
+        g.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
+    } else if (linedup_callback(ax, ay, bx, by, linedup_chk_corpse)) {
+        /* There's a corpse on the ground in a direct line from the
+         * monster to the hero, and up to 3 steps beyond.
+         */
+        g.m.offensive = obj;
+        g.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
+    }
+}
+
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
  */
@@ -1208,34 +1264,7 @@ struct monst *mtmp;
             }
         }
         nomore(MUSE_WAN_UNDEAD_TURNING);
-        if (obj->otyp == WAN_UNDEAD_TURNING && obj->spe > 0
-            /* not necrophiliac(); unlike deciding whether to pick this
-               type of wand up, we aren't interested in corpses within
-               carried containers until they're moved into open inventory;
-               we don't check whether hero is poly'd into an undead--the
-               wand's turning effect is too weak to be a useful direct
-               attack--only whether hero is carrying at least one corpse */
-            && carrying(CORPSE)) {
-            /*
-             * Hero is carrying one or more corpses but isn't wielding
-             * a cockatrice corpse (unless being hit by one won't do
-             * the monster much harm); otherwise we'd be using this wand
-             * as a defensive item with higher priority.
-             *
-             * Might be cockatrice intended as a weapon (or being denied
-             * to glove-wearing monsters for use as a weapon) or lizard
-             * intended as a cure or lichen intended as veggy food or
-             * sacrifice fodder being lugged to an altar.  Zapping with
-             * this will deprive hero of one from each stack although
-             * they might subsequently be recovered after killing again.
-             * In the sacrifice fodder case, it could even be to the
-             * player's advantage (fresher corpse if a new one gets
-             * dropped; player might not choose to spend a wand charge
-             * on that when/if hero acquires this wand).
-             */
-            g.m.offensive = obj;
-            g.m.has_offense = MUSE_WAN_UNDEAD_TURNING;
-        }
+        m_use_undead_turning(mtmp, obj);
         nomore(MUSE_WAN_STRIKING);
         if (obj->otyp == WAN_STRIKING && obj->spe > 0) {
             g.m.offensive = obj;
@@ -2342,11 +2371,9 @@ struct obj *obj;
         if (typ == WAN_POLYMORPH)
             return (boolean) (mons[monsndx(mon->data)].difficulty < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
+            || typ == WAN_UNDEAD_TURNING
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER)
             return TRUE;
-        if (typ == WAN_UNDEAD_TURNING)
-            return (necrophiliac(g.invent, TRUE)
-                    || (Upolyd && is_undead(g.youmonst.data)));
         break;
     case POTION_CLASS:
         if (typ == POT_HEALING || typ == POT_EXTRA_HEALING
