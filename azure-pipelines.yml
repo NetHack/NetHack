@@ -15,7 +15,7 @@ resources:
   - repository: luarepo
     type: github
     name: lua/lua
-    ref: refs/tags/v5.4.1
+    ref: refs/tags/v5.4.2
     endpoint: github.com_barthouse
 
 steps:
@@ -39,7 +39,7 @@ steps:
 - task: CopyFiles@2
   inputs: 
     SourceFolder: $(Agent.BuildDirectory)\s\lua
-    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\lib\lua-5.4.1\src
+    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\lib\lua-5.4.2\src
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
 - task: MSBuild@1
