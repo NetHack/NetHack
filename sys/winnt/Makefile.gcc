@@ -127,7 +127,7 @@ TARGET_CPU=x86
 #
 #---------------------------------------------------------------
 ifndef LUA_VERSION
-LUAVER=5.4.1
+LUAVER=5.4.2
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -135,7 +135,7 @@ endif
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.1.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -416,11 +416,11 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #=================================================================
 
 ifndef LUAVER
-LUAVER   = 5.4.1
+LUAVER   = 5.4.2
 endif
 LUASRC   = $(LUATOP)/src
 LUALIB   = $(O)lua-$(LUAVER).static.a
