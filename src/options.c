@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1607591206 2020/12/10 09:06:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.485 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1607692223 2020/12/11 13:10:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.486 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -204,18 +204,19 @@ static NEARDATA const char *runmodes[] = { "teleport", "run", "walk",
 static NEARDATA const char *sortltype[] = { "none", "loot", "full" };
 
 static const menu_cmd_t default_menu_cmd_info[] = {
- { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
- { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
  { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
  { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
- { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
- { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
- { "menu_invert_all", MENU_INVERT_ALL, "Invert selection" },
- { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
+ { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
+ { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
+ { "menu_select_all", MENU_SELECT_ALL, "Select all items in entire menu" },
+ { "menu_invert_all", MENU_INVERT_ALL, "Invert selection for all items" },
+ { "menu_deselect_all", MENU_UNSELECT_ALL,
+                                        "Unselect all items in entire menu" },
+ { "menu_select_page", MENU_SELECT_PAGE, "Select all items on current page" },
+ { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page's selections" },
  { "menu_deselect_page", MENU_UNSELECT_PAGE,
-   "Unselect items in current page" },
- { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
- { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
+                                       "Unselect all items on current page" },
+ { "menu_search", MENU_SEARCH, "Search and invert matching items" },
 };
 
 static void FDECL(nmcpy, (char *, const char *, int));
@@ -4808,11 +4809,13 @@ handler_disclose(VOID_ARGS)
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
             add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                      "Never disclose, without prompting",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
             add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                      "Always disclose, without prompting",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
@@ -4823,11 +4826,13 @@ handler_disclose(VOID_ARGS)
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
             add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"No\"",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
             add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"Yes\"",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
@@ -5080,7 +5085,8 @@ handler_sortloot(VOID_ARGS)
         any.a_char = *sortl_name;
         add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0, ATR_NONE,
                  sortl_name, (flags.sortloot == *sortl_name)
-                                ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                                ? MENU_ITEMFLAGS_SELECTED
+                                : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select loot sorting type:");
     n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
@@ -7706,58 +7712,97 @@ int nset;
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
-/*
- * used by cmd.c and pager.c
- */
+/* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
 void
 show_menu_controls(win, dolist)
 winid win;
 boolean dolist;
 {
+    struct xtra_cntrls {
+        const char *key, *desc;
+    };
+    static const struct xtra_cntrls hardcoded[] = {
+        { "Return", "Accept current choice(s) and dismiss menu" },
+        { "Enter",  "Same as Return" },
+        { "Space",  "If not on last page, advance one page;" },
+        { "     ",  "when on last page, treat like Return" },
+        { "Escape", "Cancel menu without making any choice(s)" },
+        { (char *) 0, (char *) 0}
+    };
+    static const char mc_fmt[] = "%8s     %-6s %s",
+                      mc_altfmt[] = "%9s  %-6s %s";
     char buf[BUFSZ];
+    const char *fmt, *arg;
+    const struct xtra_cntrls *xcp;
+
+    /*
+     * Relies on spaces to line things up in columns, so must be rendered
+     * with a fixed-width font or will look dreadful.
+     */
 
     putstr(win, 0, "Menu control keys:");
-    if (dolist) {
+    if (dolist) { /* key bindings help: '?i' */
         int i;
 
+        fmt = "%-7s %s";
         for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
-            Sprintf(buf, "%-7s %s",
+            Sprintf(buf, fmt,
                     visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
                     default_menu_cmd_info[i].desc);
             putstr(win, 0, buf);
         }
-    } else {
+        /* no separator before hardcoded */
+        fmt = "%s%-7s %s"; /* extra specifier to absorb 'arg' */
+        arg = ""; /* no extra prefix for 'dolist' */
+    } else { /* menu controls help: '?k' */
         putstr(win, 0, "");
-        putstr(win, 0, "          Page    All items");
-        Sprintf(buf, "  Select   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)));
+        Sprintf(buf, mc_altfmt, "", "Whole", "Current");
         putstr(win, 0, buf);
-        Sprintf(buf, "Deselect   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)));
+        Sprintf(buf, mc_altfmt, "", " Menu", " Page");
         putstr(win, 0, buf);
-        Sprintf(buf, "  Invert   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)));
+        Sprintf(buf, mc_fmt, "Select",
+                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
         putstr(win, 0, buf);
-        putstr(win, 0, "");
-        Sprintf(buf, "   Go to   %s   Next page",
-                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)));
+        Sprintf(buf, mc_fmt, "Invert",
+                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
         putstr(win, 0, buf);
-        Sprintf(buf, "           %s   Previous page",
-                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)));
-        putstr(win, 0, buf);
-        Sprintf(buf, "           %s   First page",
-                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)));
-        putstr(win, 0, buf);
-        Sprintf(buf, "           %s   Last page",
-                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)));
+        Sprintf(buf, mc_fmt, "Deselect",
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
         putstr(win, 0, buf);
         putstr(win, 0, "");
-        Sprintf(buf, "           %s   Search and toggle matching entries",
-                visctrl(get_menu_cmd_key(MENU_SEARCH)));
+        Sprintf(buf, mc_fmt, "Go to",
+                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)),
+                "Next page");
         putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)),
+                "Previous page");
+        putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)),
+                "First page");
+        putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
+                "Last page");
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, mc_fmt, "Search",
+                visctrl(get_menu_cmd_key(MENU_SEARCH)),
+                "Exter a target string and invert all matching entries");
+        putstr(win, 0, buf);
+        /* separator before hardcoded */
+        putstr(win, 0, "");
+        fmt = "%9s  %-8s %s";
+        arg = "Other "; /* prefix for first hardcoded[] entry, then reset */
+    }
+    for (xcp = hardcoded; xcp->key; ++xcp) {
+        Sprintf(buf, fmt, arg, xcp->key, xcp->desc);
+        putstr(win, 0, buf);
+        arg = "";
     }
 }
 static int
