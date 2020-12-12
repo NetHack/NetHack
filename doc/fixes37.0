@@ -332,6 +332,10 @@ selling a container to a shop for gold leaves any contents that the shop
 	contents without giving any additional credit; mark out of place
 	contents 'no_charge' so that hero can reclaim them without buying
 add some new demonic and angelic maledictions
+when fire damage dried a wet towel, it would never reduce the wetness to 0
+when water damage wet a towel, the new wetness might randomly become less
+when the wetness of a towel in inventory changed, persistent inventory wasn't
+	updated to show that
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

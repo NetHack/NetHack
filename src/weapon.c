@@ -984,16 +984,18 @@ boolean verbose;
        with your wet towel" message on next attack with it */
     if (obj == uwep)
         g.unweapon = !is_wet_towel(obj);
+    if (carried(obj))
+        update_inventory();
 }
 
-/* decrease a towel's wetness */
+/* decrease a towel's wetness; unlike when wetting, 0 is not a no-op */
 void
 dry_a_towel(obj, amt, verbose)
 struct obj *obj;
-int amt; /* positive: new value; negative: decrement by -amt; zero: no-op */
+int amt; /* positive or zero: new value; negative: decrement by abs(amt) */
 boolean verbose;
 {
-    int newspe = (amt <= 0) ? obj->spe + amt : amt;
+    int newspe = (amt < 0) ? obj->spe + amt : amt;
 
     /* new state is only reported if it's a decrease */
     if (newspe < obj->spe) {
@@ -1013,6 +1015,8 @@ boolean verbose;
        bashing with your towel" message on next attack with it */
     if (obj == uwep)
         g.unweapon = !is_wet_towel(obj);
+    if (carried(obj))
+        update_inventory();
 }
 
 /* copy the skill level name into the given buffer */

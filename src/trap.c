@@ -89,7 +89,7 @@ struct monst *victim;
     /* burning damage may dry wet towel */
     item = hitting_u ? carrying(TOWEL) : m_carrying(victim, TOWEL);
     while (item) {
-        if (is_wet_towel(item)) {
+        if (is_wet_towel(item)) { /* True => (item->spe > 0) */
             oldspe = item->spe;
             dry_a_towel(item, rn2(oldspe + 1), TRUE);
             if (item->spe != oldspe)
@@ -3882,7 +3882,10 @@ boolean force;
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
     } else if (obj->otyp == TOWEL && obj->spe < 7) {
-        wet_a_towel(obj, rnd(7), TRUE);
+        /* a negative change induces a reverse increment, adding abs(change);
+           spe starts 0..6, arg passed to rnd() is 1..7, change is -7..-1,
+           final spe is 1..7 and always greater than its starting value */
+        wet_a_towel(obj, -rnd(7 - obj->spe), TRUE);
         return ER_NOTHING;
     } else if (obj->greased) {
         if (!rn2(2))
