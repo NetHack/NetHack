@@ -331,6 +331,7 @@ selling a container to a shop for gold leaves any contents that the shop
 	container for credit resulted in the shop taking poesession of such
 	contents without giving any additional credit; mark out of place
 	contents 'no_charge' so that hero can reclaim them without buying
+add some new demonic and angelic maledictions
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
