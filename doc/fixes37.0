@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.383 $ $NHDT-Date: 1607641577 2020/12/10 23:06:17 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ $NHDT-Date: 1607754748 2020/12/12 06:32:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -326,6 +326,11 @@ add missing key binding support for rush.numpad; default is M-5 for numpad==1
 	or plain 5 for numpad==2 where behavior of 5 and M-5 are swapped
 allow monsters to use wand of undead turning to revive corpses on floor
 	in some situations
+selling a container to a shop for gold leaves any contents that the shop
+	doesn't ordinarily buy and sell owned by the hero, but selling the
+	container for credit resulted in the shop taking poesession of such
+	contents without giving any additional credit; mark out of place
+	contents 'no_charge' so that hero can reclaim them without buying
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -426,6 +431,8 @@ curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
+Qt: searching a text window for something that wasn't found and then searching
+	for some other target could crash
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on

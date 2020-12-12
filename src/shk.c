@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1606343581 2020/11/25 22:33:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1607754748 2020/12/12 06:32:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3192,13 +3192,14 @@ xchar x, y;
             c = 'n';
 
         if (c == 'y') {
-            shk_names_obj(
-                shkp, obj,
-                (g.sell_how != SELL_NORMAL)
-                    ? "traded %s for %ld zorkmid%s in %scredit."
-                    : "relinquish %s and acquire %ld zorkmid%s in %scredit.",
-                tmpcr, (eshkp->credit > 0L) ? "additional " : "");
+            shk_names_obj(shkp, obj,
+                          ((g.sell_how != SELL_NORMAL)
+                           ? "traded %s for %ld zorkmid%s in %scredit."
+                    : "relinquish %s and acquire %ld zorkmid%s in %scredit."),
+                          tmpcr, (eshkp->credit > 0L) ? "additional " : "");
             eshkp->credit += tmpcr;
+            if (container)
+                dropped_container(obj, shkp, TRUE);
             subfrombill(obj, shkp);
         } else {
             if (c == 'q')
