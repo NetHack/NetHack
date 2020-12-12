@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1605726852 2020/11/18 19:14:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1607734843 2020/12/12 01:00:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -30,7 +30,9 @@ static struct permonst *FDECL(muse_newcham_mon, (struct monst *));
 static int FDECL(mloot_container, (struct monst *mon, struct obj *,
                                    BOOLEAN_P));
 static void FDECL(you_aggravate, (struct monst *));
+#if 0
 static boolean FDECL(necrophiliac, (struct obj *, BOOLEAN_P));
+#endif
 static void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
                                             BOOLEAN_P, BOOLEAN_P));
 static boolean FDECL(cures_stoning, (struct monst *, struct obj *,
@@ -2321,6 +2323,7 @@ struct monst *mtmp;
     return 0;
 }
 
+#if 0
 /* check whether hero is carrying a corpse or contained petrifier corpse */
 static boolean
 necrophiliac(objlist, any_corpse)
@@ -2337,6 +2340,7 @@ boolean any_corpse;
     }
     return FALSE;
 }
+#endif
 
 boolean
 searches_for_item(mon, obj)
