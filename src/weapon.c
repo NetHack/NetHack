@@ -1,4 +1,4 @@
-/* NetHack 3.7	weapon.c	$NHDT-Date: 1596498226 2020/08/03 23:43:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	weapon.c	$NHDT-Date: 1607811730 2020/12/12 22:22:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,6 +11,7 @@
 #include "hack.h"
 
 static void FDECL(give_may_advance_msg, (int));
+static void FDECL(finish_towel_change, (struct obj *obj, int));
 static boolean FDECL(could_advance, (int));
 static boolean FDECL(peaked_skill, (int));
 static int FDECL(slots_required, (int));
@@ -954,6 +955,26 @@ dbon()
         return 6;
 }
 
+/* called when wet_a_towel() or dry_a_towel() is changing a towel's wetness */
+static void
+finish_towel_change(obj, newspe)
+struct obj *obj;
+int newspe;
+{
+    /* towel wetness is always between 0 (dry) and 7, inclusive */
+    newspe = min(newspe, 7);
+    obj->spe = max(newspe, 0);
+
+    /* if hero is wielding this towel, don't give "you begin bashing with
+       your [wet] towel" message if it's wet, do give one if it's dry */
+    if (obj == uwep)
+        g.unweapon = !is_wet_towel(obj);
+
+    /* description might change: "towel" vs "moist towel" vs "wet towel" */
+    if (carried(obj))
+        update_inventory();
+}
+
 /* increase a towel's wetness */
 void
 wet_a_towel(obj, amt, verbose)
@@ -978,14 +999,9 @@ boolean verbose;
                       xname(obj), wetness);
         }
     }
-    obj->spe = min(newspe, 7);
 
-    /* if hero is wielding this towel, don't give "you begin bashing
-       with your wet towel" message on next attack with it */
-    if (obj == uwep)
-        g.unweapon = !is_wet_towel(obj);
-    if (carried(obj))
-        update_inventory();
+    if (newspe != obj->spe)
+        finish_towel_change(obj, newspe);
 }
 
 /* decrease a towel's wetness; unlike when wetting, 0 is not a no-op */
@@ -1008,15 +1024,9 @@ boolean verbose;
                       xname(obj), !newspe ? " out" : "");
         }
     }
-    newspe = min(newspe, 7);
-    obj->spe = max(newspe, 0);
 
-    /* if hero is wielding this towel and it is now dry, give "you begin
-       bashing with your towel" message on next attack with it */
-    if (obj == uwep)
-        g.unweapon = !is_wet_towel(obj);
-    if (carried(obj))
-        update_inventory();
+    if (newspe != obj->spe)
+        finish_towel_change(obj, newspe);
 }
 
 /* copy the skill level name into the given buffer */
