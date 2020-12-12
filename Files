@@ -226,6 +226,10 @@ uhitm.c     vault.c     version.c   vision.c    weapon.c    were.c
 wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
 zap.c
 
+submodules:
+(file in top directory)
+lua
+
 sys/libnh:
 (files in top directory)
 README.md    libnhmain.c  sysconf
