@@ -20,7 +20,7 @@ resources:
 
 steps:
 - checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
-- checkout: luarepo  # $(Agent.BuildDirectory)\s\lua
+  submodules: true
 
 - task: DownloadSecureFile@1
   name: storeKey

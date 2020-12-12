@@ -10,7 +10,7 @@
     <DatDir>$(RootDir)dat\</DatDir>
     <DocDir>$(RootDir)doc\</DocDir>
     <IncDir>$(RootDir)include\</IncDir>
-    <LuaDir>$(RootDir)lib\lua-$(LUA_VERSION)\src\</LuaDir>
+    <LuaDir>$(RootDir)submodules\lua\</LuaDir>
     <SrcDir>$(RootDir)src\</SrcDir>
 	<SysDir>$(RootDir)sys\</SysDir>
     <UtilDir>$(RootDir)util\</UtilDir>
