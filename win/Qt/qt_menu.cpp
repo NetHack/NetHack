@@ -1192,6 +1192,8 @@ void NetHackQtTextWindow::Search()
     if (get_a_line) {
         int linecount = lines->count();
         int current = lines->currentRow();
+        if (current == -1)
+            current = 0;
         // when no row is highlighted (selected), start the search
         // on the current row, otherwise start on the row after it
         // [normally means that the very first row is a candidate
