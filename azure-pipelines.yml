@@ -21,6 +21,7 @@ resources:
 steps:
 - checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
   submodules: true
+  path: NetHack
 
 - task: DownloadSecureFile@1
   name: storeKey
