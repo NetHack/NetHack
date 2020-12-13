@@ -781,7 +781,28 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	info->setTitle("Info");
 	menubar->addMenu(info);
 	menubar->addSeparator();
+#ifndef MACOSX
 	help->setTitle("Help");
+#else
+        // On OSX, an entry in the menubar called "Help" will get an
+        // extra action, "Search [______]", inserted as the first entry.
+        // We have no control over what it does and don't want it.
+        //
+        // Using actions() to fetch a list of all entries doesn't find it,
+        // so we don't have its widget pointer to pass to removeAction().
+        //
+        // Altering the name with an invisible character to inhibit
+        // string matching is ludicrous but keeps the unwanted action
+        // from getting inserted into the "Help" menu behind our back.
+        // Underscore works too and is more robust but unless we prepend
+        // it to every entry, "_Help" would stand out as strange.
+	help->setTitle("\177Help");
+        // (Renaming back to "Help" after the fact does reset the menu's
+        // name but it also results in the Search action being added.
+        // Perhaps a custom context menu that changes its name to "Help"
+        // as it is being shown--and possibly changes back afterward--
+        // would work but the name mangling hack is much simpler.)
+#endif
 	menubar->addMenu(help);
     }
 

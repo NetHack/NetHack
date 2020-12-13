@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ $NHDT-Date: 1607754748 2020/12/12 06:32:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.390 $ $NHDT-Date: 1607895902 2020/12/13 21:45:02 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -551,6 +551,8 @@ Qt+OSX: add a separate nethack->Quit menu entry with different functionality;
 Qt+OSX: since menu entry help->"About Qt NetHack" gets hijacked and becomes
 	"nethack->About nethack", add a separate help->_About_Qt_NetHack_
 	which stays where intended and brings up the same information
+Qt+OSX: suppress unwanted "Search [______]" action from being inserted as the
+	first entry in the menubar's "Help" dropdown menu
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic

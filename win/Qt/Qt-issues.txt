@@ -26,12 +26,6 @@ around by giving focus to some other application (which will put up
 its own menu bar) and then back to nethack (thereby reloading nethack's
 menu bar).
 
-On OSX, a "Search [______]" action is inserted as the first entry of
-the dropdown Help menu on the toolbar.  NetHack has no control over
-what it does or where it looks, so it should be eliminated somehow.
-(It is not releated to nethack's search command, nor the interception
-of an attempt to insert "Search" into the dropdown Action menu.)
-
 Sometimes scrolling a menu leaves the displayed text not matching what
 nethack thinks is displayed, so making a selection by mouse click may
 occasionally pick the wrong item.  There's usually a visual clue when
