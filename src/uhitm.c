@@ -2581,7 +2581,7 @@ struct mhitm_data *mhm;
         /* mhitu */
         int armpro = magic_negation(mdef);
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
-        int ptmp;
+        int ptmp = A_STR;  /* A_STR == 0 */
         char buf[BUFSZ];
 
         switch (mattk->adtyp) {
