@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.390 $ $NHDT-Date: 1607895902 2020/12/13 21:45:02 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ $NHDT-Date: 1607901923 2020/12/13 23:25:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -432,6 +432,7 @@ dwarves could sometimes pass through walls without digging their way
 fix genetic engineers dropping Schroedinger's cat box
 the checks and handling for fountains, sinks, and drawbridges were being
 	missed during liquid_flow
+monster movement flags unification allowed displacer beasts to displace Riders
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

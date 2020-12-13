@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1607374002 2020/12/07 20:46:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1607901923 2020/12/13 23:25:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1586,8 +1586,10 @@ struct monst *mtmp;
         allowflags |= UNLOCKDOOR;
     if (passes_bars(mtmp->data))
         allowflags |= ALLOW_BARS;
+#if 0   /* can't do this here; leave it for mfndpos() */
     if (is_displacer(mtmp->data))
         allowflags |= ALLOW_MDISP;
+#endif
     if (is_minion(mtmp->data) || is_rider(mtmp->data))
         allowflags |= ALLOW_SANCT;
     /* unicorn may not be able to avoid hero on a noteleport level */
@@ -1712,7 +1714,7 @@ long flag;
                     || (m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny)
                         && !m_at(nx, ny) && (nx != u.ux || ny != u.uy))))
                 continue;
-            if ((is_pool(nx, ny) == wantpool || poolok)
+            if ((poolok || is_pool(nx, ny) == wantpool)
                 && (lavaok || !is_lava(nx, ny))) {
                 int dispx, dispy;
                 boolean monseeu = (mon->mcansee
@@ -1764,6 +1766,7 @@ long flag;
                                 info[cnt] |= ALLOW_TM;
                             }
                         } else {
+                            flag &= ~ALLOW_MDISP; /* depends upon defender */
                             mmflag = flag | mm_displacement(mon, mtmp2);
                             if (!(mmflag & ALLOW_MDISP))
                                 continue;
