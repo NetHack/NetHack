@@ -566,7 +566,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	optlist.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
 	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
@@ -852,7 +852,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/mextra.h ../include/skills.h ../include/onames.h \
 		../include/timeout.h ../include/trap.h ../include/flag.h \
 		../include/vision.h ../include/display.h ../include/winprocs.h \
-		../include/sys.h ../include/wintty.h ../include/trampoli.h
+		../include/sys.h ../include/wintty.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h

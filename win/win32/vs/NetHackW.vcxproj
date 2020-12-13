@@ -310,7 +310,6 @@
     <ClInclude Include="$(IncDir)tileset.h" />
     <ClInclude Include="$(IncDir)timeout.h" />
     <ClInclude Include="$(IncDir)tradstdc.h" />
-    <ClInclude Include="$(IncDir)trampoli.h" />
     <ClInclude Include="$(IncDir)trap.h" />
     <ClInclude Include="$(IncDir)unixconf.h" />
     <ClInclude Include="$(IncDir)vision.h" />

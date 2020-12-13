@@ -200,7 +200,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
 		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h \
-		$(INCL)\wintty.h $(INCL)\trampoli.h
+		$(INCL)\wintty.h
 
 DGN_FILE_H  = $(INCL)\dgn_file.h
 LEV_COMP_H  = $(INCL)\lev_comp.h

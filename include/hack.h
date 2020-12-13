@@ -272,22 +272,9 @@ typedef struct sortloot_item Loot;
 #include "display.h"
 #include "engrave.h"
 
-#ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
-#undef NDECL
-#define NDECL(f) f()
-#endif
-
 #include "extern.h"
 #include "winprocs.h"
 #include "sys.h"
-
-#ifdef USE_TRAMPOLI
-#include "wintty.h"
-#undef WINTTY_H
-#include "trampoli.h"
-#undef EXTERN_H
-#include "extern.h"
-#endif /* USE_TRAMPOLI */
 
 /* flags to control makemon(); goodpos() uses some plus has some of its own*/
 #define NO_MM_FLAGS 0x000000L /* use this rather than plain 0 */

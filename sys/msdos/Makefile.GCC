@@ -400,7 +400,7 @@ HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
 	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
 	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
 	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
+	     $(INCL)/hack.h     $(REGION_H)	       \
 	     $(INCL)/sys.h
 DLB_H      = $(INCL)/dlb.h
 

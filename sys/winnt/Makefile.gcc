@@ -501,7 +501,7 @@ HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
 	       $(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h $(INCL)/rm.h \
 	       $(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
 	       $(INCL)/rect.h $(INCL)/region.h $(INCL)/winprocs.h \
-	       $(INCL)/wintty.h $(INCL)/sys.h $(INCL)/trampoli.h
+	       $(INCL)/wintty.h $(INCL)/sys.h
 
 DGN_FILE_H  = $(INCL)/dgn_file.h
 SP_LEV_H    = $(INCL)/sp_lev.h

@@ -501,8 +501,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
 		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
-		$(INCL)\winprocs.h $(INCL)\sys.h $(INCL)\wintty.h \
-		$(INCL)\trampoli.h
+		$(INCL)\winprocs.h $(INCL)\sys.h $(INCL)\wintty.h
 
 TILE_H      = ..\win\share\tile.h
 

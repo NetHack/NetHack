@@ -261,7 +261,6 @@
 		3186A38921A4B0FB0052BF02 /* mttypriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mttypriv.h; path = ../../include/mttypriv.h; sourceTree = "<group>"; };
 		3186A38A21A4B0FB0052BF02 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = ../../include/system.h; sourceTree = "<group>"; };
 		3186A38B21A4B0FC0052BF02 /* onames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onames.h; path = ../../include/onames.h; sourceTree = "<group>"; };
-		3186A38C21A4B0FC0052BF02 /* trampoli.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trampoli.h; path = ../../include/trampoli.h; sourceTree = "<group>"; };
 		3186A38D21A4B0FC0052BF02 /* vis_tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vis_tab.h; path = ../../include/vis_tab.h; sourceTree = "<group>"; };
 		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
@@ -747,7 +746,6 @@
 				3186A39421A4B0FC0052BF02 /* tileset.h */,
 				3186A3CA21A4B0FE0052BF02 /* timeout.h */,
 				3186A3C721A4B0FE0052BF02 /* tradstdc.h */,
-				3186A38C21A4B0FC0052BF02 /* trampoli.h */,
 				3186A3CD21A4B0FE0052BF02 /* trap.h */,
 				3186A3AD21A4B0FD0052BF02 /* unixconf.h */,
 				3186A38D21A4B0FC0052BF02 /* vis_tab.h */,

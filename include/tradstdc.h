@@ -184,11 +184,10 @@ typedef const char *vA;
  * FDECL() is used for functions with a fixed number of arguments;
  * VDECL() is used for functions with a variable number of arguments.
  * Separate macros are needed because ANSI will mix old-style declarations
- * with prototypes, except in the case of varargs, and the OVERLAY-specific
- * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
- */
+ * with prototypes, except in the case of varargs
+  */
 
-#define NDECL(f) f(void) /* overridden later if USE_TRAMPOLI set */
+#define NDECL(f) f(void)
 
 #define FDECL(f, p) f p
 
