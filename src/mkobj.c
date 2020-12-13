@@ -1146,6 +1146,23 @@ int id;
     }
 }
 
+/* Return the number of turns after which a Rider corpse revives */
+long
+rider_revival_time(body, retry)
+struct obj *body;
+boolean retry;
+{
+    long when;
+    long minturn = retry ? 3L : (body->corpsenm == PM_DEATH) ? 6L : 12L;
+
+    /* Riders have a 1/3 chance per turn of reviving after 12, 6, or 3 turns.
+       Always revive by 67. */
+    for (when = minturn; when < 67L; when++)
+        if (!rn2(3))
+            break;
+    return when;
+}
+
 /*
  * Start a corpse decay or revive timer.
  * This takes the age of the corpse into consideration as of 3.4.0.
@@ -1178,15 +1195,8 @@ struct obj *body;
     when += (long) (rnz(rot_adjust) - rot_adjust);
 
     if (is_rider(&mons[body->corpsenm])) {
-        /*
-         * Riders always revive.  They have a 1/3 chance per turn
-         * of reviving after 12 turns.  Always revive by 500.
-         */
         action = REVIVE_MON;
-        for (when = 12L; when < 500L; when++)
-            if (!rn2(3))
-                break;
-
+        when = rider_revival_time(body, FALSE);
     } else if (mons[body->corpsenm].mlet == S_TROLL && !no_revival) {
         long age;
 

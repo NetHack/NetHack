@@ -336,6 +336,7 @@ when fire damage dried a wet towel, it would never reduce the wetness to 0
 when water damage wet a towel, the new wetness might randomly become less
 when the wetness of a towel in inventory changed, persistent inventory wasn't
 	updated to show that
+make Death revive earlier, and all the Riders after 67 turns at latest
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
