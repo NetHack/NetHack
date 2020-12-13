@@ -18,10 +18,16 @@ resources:
     ref: refs/tags/v5.4.2
     endpoint: github.com_barthouse
 
+variables:
+  ${{ if eq( variables['Agent.OS'], 'Windows_NT') }}:
+    NetHackPath: s\NetHack
+  ${{ if ne( variables['Agent.OS'], 'Windows_NT') }}:
+    NetHackPath: s/NetHack
+
 steps:
 - checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
   submodules: true
-  path: NetHack
+  path: $(NetHackPath)
 
 - task: DownloadSecureFile@1
   name: storeKey
@@ -37,12 +43,6 @@ steps:
     TargetFolder: $(Agent.BuildDirectory)\s\NetHack\win\win32\vs
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
-- task: CopyFiles@2
-  inputs: 
-    SourceFolder: $(Agent.BuildDirectory)\s\lua
-    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\lib\lua-5.4.2\src
-  condition: eq( variables['Agent.OS'], 'Windows_NT' )
-
 - task: MSBuild@1
   inputs:
     solution: $(Agent.BuildDirectory)\s\NetHack\win\win32\vs\NetHack.sln
@@ -54,7 +54,7 @@ steps:
     sudo apt-get -qq -y update
     sudo apt-get -qq -y install libncurses5-dev
     sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
-    cd NetHack/sys/unix
+    cd sys/unix
     sh setup.sh hints/linux.2020
     cd ../..
     make fetch-lua
@@ -63,7 +63,7 @@ steps:
   displayName: 'Linux Build'
 
 - bash: |
-    cd NetHack/sys/unix
+    cd sys/unix
     sh setup.sh hints/macos.2020
     cd ../..
     make fetch-lua
