@@ -143,26 +143,10 @@ endif
 #    successfully build NetHack-3.7.
 #
 # By default we add lua to the build.
-#
 ifndef ADD_LUA
 ADD_LUA=Y
 LUATOP=../submodules/lua
 endif
-
-#---------------------------------------------------------------
-# Standalone LUA interpreter
-#
-# The source for the standalone interpreter (luac.c) is not kept with the
-# rest of the LUA source.
-# The source is kept at:
-#     https://github.com/lua/luac
-#
-# By default we will not build it.
-#
-ifndef WANT_LUAC
-WANT_LUAC=N
-endif
-
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -446,11 +430,7 @@ LUALIB   = $(O)lua-$(LUAVER).static.a
 LUADLL   = $(O)lua-$(LUAVER).a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
-ifeq "$(WANT_LUAC)" "Y"
 LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
-else
-LUATARGETS = lua.exe $(LUADLL) $(LUALIB)
-endif
 
 LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
