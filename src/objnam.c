@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1606765213 2020/11/30 19:40:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.307 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1607945434 2020/12/14 11:30:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -753,7 +753,10 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
            players who aren't aware that something readable is present */
         switch (obj->otyp) {
         case T_SHIRT:
-            Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+        case ALCHEMY_SMOCK:
+            Sprintf(eos(buf), " with text \"%s\"",
+                    (obj->otyp == T_SHIRT) ? tshirt_text(obj, tmpbuf)
+                                           : apron_text(obj, tmpbuf));
             break;
         case CANDY_BAR:
             lbl = candy_wrapper_text(obj);

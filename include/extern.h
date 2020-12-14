@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1607561572 2020/12/10 00:52:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.928 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1607945415 2020/12/14 11:30:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.932 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2119,6 +2119,7 @@ E long NDECL(random);
 
 E void FDECL(learnscroll, (struct obj *));
 E char *FDECL(tshirt_text, (struct obj *, char *));
+E char *FDECL(apron_text, (struct obj *, char *));
 E const char *FDECL(candy_wrapper_text, (struct obj *));
 E void FDECL(assign_candy_wrapper, (struct obj *));
 E int NDECL(doread);
