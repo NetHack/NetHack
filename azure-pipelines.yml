@@ -50,13 +50,13 @@ strategy:
 pool:
   vmImage: $(imageName)
 
-resources:
-  repositories:
-  - repository: pdcursesrepo
-    type: github
-    name: wmcbrine/PDCurses
-    ref: refs/heads/master
-    endpoint: github.com_barthouse
+# resources:
+#  repositories:
+#  - repository: pdcursesrepo
+#    type: github
+#    name: wmcbrine/PDCurses
+#    ref: refs/heads/master
+#    endpoint: github.com_barthouse
 
 variables:
   buildMinimal: $(buildMinimalSetting)
@@ -70,21 +70,21 @@ variables:
     CXX: $(cxxName)
 
 steps:
-- bash: |
-    echo 'mingwBuildSetting' '$(mingwBuildSetting)'
-    echo 'mingwBuild' '$(mingwBuild)'
-    echo 'vsBuild' '$(vsBuild)'
-    echo 'NetHackPath' '$(NetHackPath)'
-    echo 'CC' '$(CC)'
-    echo 'CXX' '$(CXX)'
+# - bash: |
+#     echo 'mingwBuildSetting' '$(mingwBuildSetting)'
+#     echo 'mingwBuild' '$(mingwBuild)'
+#     echo 'vsBuild' '$(vsBuild)'
+#     echo 'NetHackPath' '$(NetHackPath)'
+#     echo 'CC' '$(CC)'
+#     echo 'CXX' '$(CXX)'
 
 - checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
   submodules: true
   path: $(NetHackPath)
 
-- checkout: pdcursesrepo
-  path: s\NetHack\lib\pdcurses
-  condition: and( eq( variables['Agent.OS'], 'Windows_NT' ), eq( variables.mingwBuild, true))
+# - checkout: pdcursesrepo
+#   path: s\NetHack\lib\pdcurses
+#   condition: and( eq( variables['Agent.OS'], 'Windows_NT' ), eq( variables.mingwBuild, true))
 
 - task: DownloadSecureFile@1
   name: storeKey
@@ -101,14 +101,6 @@ steps:
   condition: eq( variables['Agent.OS'], 'Windows_NT' )
   displayName: 'Copying store key'
 
-# Temporary need to copy lua files for minGW build
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: $(Agent.BuildDirectory)\s\NetHack\submodules\lua
-    TargetFolder: $(Agent.BuildDirectory)\s\NetHack\lib\lua-5.4.2\src
-  condition: and( eq( variables['Agent.OS'], 'Windows_NT' ), eq( variables.mingwBuild, true))
-  displayName: 'Copying lua files'
-
 - task: MSBuild@1
   inputs:
     solution: $(Agent.BuildDirectory)\s\NetHack\win\win32\vs\NetHack.sln
@@ -118,21 +110,17 @@ steps:
   displayName: 'Windows MSBuild'
 
 - bash: |
-    echo '/mingw64/bin'
-    ls /mingw64/bin
-    echo '/usr/bin'
-    ls /usr/bin
     echo 'gcc --version'
     gcc --version
     export ADD_CURSES=Y
     export PDCURSES_TOP=../lib/pdcurses
     export LUA_VERSION=5.4.2
     export TRAVIS_COMPILER=1
-    cd NetHack/src
     cp ../sys/winnt/Makefile.gcc ./Makefile
     mingw32-make LUA_VERSION=$LUA_VERSION install
   condition: and( eq( variables['Agent.OS'], 'Windows_NT' ), eq( variables.mingwBuild, true))
   displayName: 'Windows MinGW Build'
+  workingDirectory: $(Agent.BuildDirectory)/s/NetHack/src
 
 - bash: |
     sudo apt-get -qq -y update
@@ -140,9 +128,10 @@ steps:
     sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
   condition: eq( variables['Agent.OS'], 'Linux' )
   displayName: 'Getting linux build dependencies'
+  workingDirectory: $(Agent.BuildDirectory)/s/NetHack
 
 - bash: |
-    cd NetHack/sys/unix
+    cd sys/unix
     sh setup.sh hints/linux-minimal
     cd ../..
     sed -i '/^#define CLIPPING/d'       include/config.h
@@ -169,21 +158,24 @@ steps:
     make WANT_WIN_ALL=1 all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildMinimal, true))
   displayName: 'Building linux minimal build'
+  workingDirectory: $(Agent.BuildDirectory)/s/NetHack
 
 - bash: |
-    cd NetHack/sys/unix
+    cd sys/unix
     sh setup.sh hints/linux.2020
     cd ../..
     make fetch-lua
     make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildMinimal, false))
   displayName: 'Building linux full build'
+  workingDirectory: $(Agent.BuildDirectory)/s/NetHack
 
 - bash: |
-    cd NetHack/sys/unix
+    cd sys/unix
     sh setup.sh hints/macos.2020
     cd ../..
     make fetch-lua
     make all
   condition: eq( variables['Agent.OS'], 'Darwin' )
   displayName: 'Mac Build'
+  workingDirectory: $(Agent.BuildDirectory)/s/NetHack
