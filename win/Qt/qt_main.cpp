@@ -545,7 +545,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
      *  application menu (and renamed in the process) even if the code
      *  here tries to put them in another menu.
      *  See QtWidgets/doc/qmenubar.html for slightly more information.
-     *  setMenuRole() is supposed to be able to override this behavior.
+     *  setMenuRole() can be used to override this behavior.
      */
 #endif
     QMenu* game=new QMenu;
@@ -578,7 +578,9 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,
 #ifdef MACOSX
             /* Qt on OSX would rename "Options" to "Preferences..." and
-               move it from intended destination to the application menu */
+               move it from intended destination to the application menu;
+               the ampersand produces &O which makes Alt+O into a keyboard
+               shortcut--except those are disabled by default by Qt on OSX */
                    "Run-time &" // rely on adjacent string concatenation
 #endif
                    "Options",            3, doset},
@@ -587,9 +589,10 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,    "Save-and-exit",      3, dosave},
         { game,
 #ifdef MACOSX
-            /* need something to prevent matching leading "quit"
-               so that it isn't hijacked for the application menu */
-                   "_&"
+            /* need something to prevent matching leading "quit" so that it
+               isn't hijacked for the application menu; the ampersand is to
+               make &Q be a keyboard shortcut (but see Options above) */
+                   "\177&"
 #endif
                    "Quit-without-saving", 3, done2},
 
@@ -986,29 +989,34 @@ void NetHackQtMainWindow::doQuit(bool)
 {
     // there is a separate Quit-without-saving menu entry in the game menu
     // that leads to nethack's "Really quit?" prompt; OSX players can use
-    // either one, other implementations only have that other one but this
-    // routine is unconditional in case someone wants to change that
+    // either one, other implementations only have that other one (plus
+    // nethack's #quit command itself) but this routine is unconditional
+    // in case someone wants to change that
 #ifdef MACOSX
     QString info;
     info.sprintf("This will end your NetHack session.%s",
                  !g.program_state.something_worth_saving ? ""
                  : "\n(Cancel quitting and use the Save command"
                    "\nto save your current game.)");
-    /* this is similar to closeEvent but the details are different */
+    /* this is similar to closeEvent but the details are different;
+       first choice (Cancel) is the default action for most arbitrary keys;
+       the second choice (Quit) is the action for <return> or <space>;
+       <escape> leaves the popup waiting for some other response;
+       the &<char> settings for Alt+<char> shortcuts don't work on OSX */
     int act = QMessageBox::information(this, "NetHack", info,
-                                       "&Quit without saving",
                                        "&Cancel and return to game",
+                                       "&Quit without saving",
                                        0, 1);
     switch (act) {
     case 0:
+        // cancel
+        break; // return to game
+    case 1:
         // quit -- bypass the prompting preformed by done2()
         g.program_state.stopprint++;
         ::done(QUIT);
         /*NOTREACHED*/
         break;
-    case 1:
-        // cancel
-        break; // return to game
     }
 #endif
     return;
