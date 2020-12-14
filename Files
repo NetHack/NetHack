@@ -227,8 +227,8 @@ wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
 zap.c
 
 submodules:
-(file in top directory)
-lua
+(files in top directory)
+lua       pdcurses
 
 sys/libnh:
 (files in top directory)
