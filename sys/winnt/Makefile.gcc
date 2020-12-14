@@ -142,8 +142,11 @@ endif
 #    you'll need to specify the correct spot below in order to
 #    successfully build NetHack-3.7.
 #
+# By default we add lua to the build.
+ifndef ADD_LUA
 ADD_LUA=Y
-LUATOP=../submdules/lua
+LUATOP=../submodules/lua
+endif
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
