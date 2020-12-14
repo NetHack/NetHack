@@ -1,28 +1,56 @@
 strategy:
   matrix:
-    linux:
+    linux_focal_gcc8_minimal:
       imageName: 'ubuntu-20.04'
-    mac:
+      ccName: gcc-8
+      cxxName: g++-8
+      buildMinimalSetting: true
+    linux_focal_clang_all:
+      imageName: 'ubuntu-20.04'
+      ccName: clang
+      cxxName: clang++
+      buildMinimalSetting: false
+    linux_focal_gcc8_all:
+      imageName: 'ubuntu-20.04'
+      ccName: gcc-8
+      cxxName: g++-8
+      buildMinimalSetting: false
+    linux_focal_gcc9_all:
+      imageName: 'ubuntu-20.04'
+      ccName: gcc-9
+      cxxName: g++-9
+      buildMinimalSetting: false
+    linux_bionic_gcc7_all:
+      imageName: 'ubuntu-18.04'
+      ccName: gcc-7
+      cxxName: g++-7
+      buildMinimalSetting: false
+# build is currently broken build
+#    mac_catalina_gcc8_all:
+#      imageName: 'macOS-10.15'
+#      ccName: gcc-8
+#      cxxName: g++-8
+#      buildMinimalSetting: false
+    mac_catalina_clang_all:
       imageName: 'macOS-10.15'
+      ccName: clang
+      cxxName: clang++
+      buildMinimalSetting: false
     windows:
       imageName: 'windows-latest'
+      buildMinimalSetting: false
 
 pool:
   vmImage: $(imageName)
 
-resources:
-  repositories:
-  - repository: luarepo
-    type: github
-    name: lua/lua
-    ref: refs/tags/v5.4.2
-    endpoint: github.com_barthouse
-
 variables:
+  buildMinimal: $(buildMinimalSetting)
   ${{ if eq( variables['Agent.OS'], 'Windows_NT') }}:
     NetHackPath: s\NetHack
   ${{ if ne( variables['Agent.OS'], 'Windows_NT') }}:
     NetHackPath: s/NetHack
+    CC: $(ccName)
+    CXX: $(cxxName)
 
 steps:
 - checkout: git://NetHack/NetHack@NetHack-3.7  # $(Agent.BuildDirectory)\s\NetHack
@@ -54,13 +82,46 @@ steps:
     sudo apt-get -qq -y update
     sudo apt-get -qq -y install libncurses5-dev
     sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
+  condition: eq( variables['Agent.OS'], 'Linux' )
+  displayName: 'Getting linux build dependencies'
+
+- bash: |
+    cd sys/unix
+    sh setup.sh hints/linux-minimal
+    cd ../..
+    sed -i '/^#define CLIPPING/d'       include/config.h
+    sed -i '/^#define COMPRESS/d'       include/config.h
+    #sed -i '/^#define DOAGAIN/d'        include/config.h
+    sed -i '/^#define DUMPLOG/d'        include/config.h
+    #sed -i '/^#define GDBPATH/d'        include/config.h
+    #sed -i '/^#define GREPPATH/d'       include/config.h
+    sed -i '/^#define INSURANCE/d'      include/config.h
+    sed -i '/^#define LOGFILE/d'        include/config.h
+    sed -i '/^#define NEWS/d'           include/config.h
+    sed -i '/^#define PANICLOG/d'       include/config.h
+    #sed -i '/^#define STATUS_HILITES/d' include/config.h
+    sed -i '/^#define SYSCF/d'          include/config.h
+    sed -i '/^#define USER_SOUNDS/d'    include/config.h
+    sed -i '/^#define XLOGFILE/d'       include/config.h
+
+    sed -i '/^#define MAIL/d'           include/unixconf.h
+    sed -i '/^#define SHELL/d'          include/unixconf.h
+    sed -i '/^#define SUSPEND/d'        include/unixconf.h
+    sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
+    cat include/config.h
+    make fetch-lua
+    make WANT_WIN_ALL=1 all
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildMinimal, true))
+  displayName: 'Buildig linux minimal build'
+
+- bash: |
     cd sys/unix
     sh setup.sh hints/linux.2020
     cd ../..
     make fetch-lua
     make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
-  condition: eq( variables['Agent.OS'], 'Linux' )
-  displayName: 'Linux Build'
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildMinimal, false))
+  displayName: 'Building linux full build'
 
 - bash: |
     cd sys/unix
