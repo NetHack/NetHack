@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1596498211 2020/08/03 23:43:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1607980325 2020/12/14 21:12:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -416,7 +416,12 @@ learn(VOID_ARGS)
             g.spl_book[i].sp_lev = objects[booktype].oc_level;
             incrnknow(i, 1);
             book->spestudied++;
-            You(i > 0 ? "add %s to your repertoire." : "learn %s.", splname);
+            if (!i)
+                /* first is always 'a', so no need to mention the letter */
+                You("learn %s.", splname);
+            else
+                You("add %s to your repertoire, as '%c'.",
+                    splname, spellet(i));
         }
         makeknown((int) booktype);
     }
