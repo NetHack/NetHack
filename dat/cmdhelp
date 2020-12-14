@@ -1,4 +1,4 @@
-&# cmdhelp
+&# cmdhelp - became obsolete when 'BINDINGS=key:command' got added
 &	Tell what command a keystroke invokes
 ^	Show the type of an adjacent trap
 ^[	Cancel command (same as ESCape key)
@@ -145,6 +145,7 @@ _	Travel via a shortest-path algorithm to a point on the map
 *	Show all equipment in use (combination of the ),[,=,",( commands)
 $	Count your gold
 +	List known spells
+Del	Display map without monsters or objects obstructing the view.
 #	Perform an extended command (use '#?' to list choices)
 &# number_pad:
 &#  -1 = numpad off, swap y with z (including Y with Z, ^Y with ^Z, M-y &c)

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{December 11, 2020}
+\date{December 13, 2020}
 
 \maketitle
 
@@ -1162,6 +1162,21 @@ Show discovered types for one class of objects.
 Escape to a shell.
 See ``\#shell'' below for more details.
 %.lp
+\item[\tb{Del}]
+Show map without obstructions.
+You can view the explored portion of the current level's map without
+monsters; without monsters and objects; or without monsters, objects,
+and traps.\\
+%.lp ""
+The <del> key is also shown as <delete> on some keyboards or <rubout>
+on others.
+It is sometimes displayed as \^{}? even though that is not an actual
+control character.\\
+%.lp ""
+Many terminals have an option to swap the <delete> and <backspace> keys,
+so typing the <del> key might not execute this command.
+If that happens, you can use the extended command ``\#terrain'' instead.
+%.lp
 \item[\tb{\#}]
 Perform an extended command.\\
 %.lp ""
@@ -1537,8 +1552,17 @@ Remove all armor. Default key is `{\tt A}'.
 Teleport around the level. Default key is `{\tt \^{}T}'.
 %.lp
 \item[\tb{\#terrain}]
-Show bare map without displaying monsters, objects, or traps.
+Show map without obstructions.
+In normal play you can view the explored portion of the current level's
+map without monsters; without monsters and objects; or without monsters,
+objects, and traps.\\
+%.lp ""
+In explore mode, you can choose to view the full map rather than just
+its explored portion.
+In debug mode there are additional choices.\\
+%.lp ""
 Autocompletes.
+Default key is `<del>' or `<delete>' (see {\it Del\/} above).
 %.lp
 \item[\tb{\#therecmdmenu}]
 Show a menu of possible actions in a location next to you.

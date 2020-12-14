@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607641581 2020/12/10 23:06:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.432 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1607936399 2020/12/14 08:59:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.433 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1913,7 +1913,11 @@ struct ext_func_tab extcmdlist[] = {
     { 'T', "takeoff", "take off one piece of armor", dotakeoff },
     { 'A', "takeoffall", "remove all armor", doddoremarm },
     { C('t'), "teleport", "teleport around the level", dotelecmd, IFBURIED },
-    { '\0', "terrain", "show map without obstructions",
+    /* \177 == <del> aka <delete> aka <rubout>; some terminals have an
+       option to swap it with <backspace> so if there's a key labeled
+       <delete> it may or may not actually invoke the #terrain command */
+    { '\177', "terrain",
+            "view map without monsters or objects obstructing it",
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
             "menu of commands you can do from here to adjacent spot",

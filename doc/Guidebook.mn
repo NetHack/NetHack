@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.405 $ $NHDT-Date: 1607693152 2020/12/11 13:25:52 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.407 $ $NHDT-Date: 1607936398 2020/12/14 08:59:58 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 11, 2020
+.ds f2 "December 13, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1060,6 +1060,20 @@ Show discovered types for one class of objects.
 .lp !
 Escape to a shell.
 See \(lq#shell\(rq below for more details.
+.lp Del
+Show map without obstructions.
+You can view the explored portion of the current level's map without
+monsters; without monsters and objects; or without monsters, objects,
+and traps.
+.lp ""
+The <del> key is also shown as <delete> on some keyboards or <rubout>
+on others.
+It is sometimes displayed as \(ha? even though that is not an actual
+control character.
+.lp ""
+Many terminals have an option to swap the <delete> and <backspace> keys,
+so typing the <del> key might not execute this command.
+If that happens, you can use the extended command \(lq#terrain\(rq instead.
 .lp #
 Perform an extended command.
 .lp ""
@@ -1447,8 +1461,17 @@ Default key is \(oqA\(cq.
 Teleport around the level.
 Default key is \(oq\(haT\(cq.
 .lp "#terrain "
-Show bare map without displaying monsters, objects, or traps.
+Show map without obstructions.
+In normal play you can view the explored portion of the current level's
+map without monsters; without monsters and objects; or without monsters,
+objects, and traps.
+.lp ""
+In explore mode, you can choose to view the full map rather than just
+its explored portion.
+In debug mode there are additional choices.
+.lp ""
 Autocompletes.
+Default key is \(oq<del>\(cq or \(oq<delete>\(cq (see \fIDel\fP above).
 .lp #therecmdmenu
 Show a menu of possible actions in a location next to you.
 .lp "#throw   "

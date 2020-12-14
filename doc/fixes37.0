@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ $NHDT-Date: 1607901923 2020/12/13 23:25:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.392 $ $NHDT-Date: 1607936398 2020/12/14 08:59:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -670,6 +670,7 @@ let tourists read conical hats
 when "?i" (show key bindings) displays commands and their keys, also show
 	commands without any key (so useable via '#', or possibly menu, only;
 	the majority are debugging commands)
+assign default key binding for <del> or <delete> to execute #terrain
 
 
 Platform- and/or Interface-Specific New Features
