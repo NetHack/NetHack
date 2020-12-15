@@ -41,11 +41,12 @@ strategy:
       buildMinimalSetting: false
       vsBuildSetting: true
       mingwBuildSetting: false
-    windows-mingw:
-      imageName: 'windows-2019'
-      buildMinimalSetting: false
-      vsBuildSetting: false
-      mingwBuildSetting: true
+# build is currently broken
+#    windows-mingw:
+#      imageName: 'windows-2019'
+#      buildMinimalSetting: false
+#      vsBuildSetting: false
+#      mingwBuildSetting: true
 
 pool:
   vmImage: $(imageName)
