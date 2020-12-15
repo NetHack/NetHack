@@ -110,6 +110,10 @@ steps:
   displayName: 'Windows MSBuild'
 
 - bash: |
+    export ADD_LUA=Y
+    export WANT_LUAC=N
+    export LUATOP=../submodules/lua
+    export LUASRC=../submodules/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcurses
     export LUA_VERSION=5.4.2
