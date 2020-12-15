@@ -572,6 +572,7 @@ register xchar ox, oy;
 {
     /* optimize by leaving on the fobj chain? */
     remove_object(obj);
+    maybe_unhide_at(obj->ox, obj->oy);
     newsym(obj->ox, obj->oy);
     place_object(obj, ox, oy);
     newsym(ox, oy);
