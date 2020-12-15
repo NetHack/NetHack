@@ -41,12 +41,11 @@ strategy:
       buildMinimalSetting: false
       vsBuildSetting: true
       mingwBuildSetting: false
-# build is currently broken
-#    windows-mingw:
-#      imageName: 'windows-2019'
-#      buildMinimalSetting: false
-#      vsBuildSetting: false
-#      mingwBuildSetting: true
+    windows-mingw:
+      imageName: 'windows-2019'
+      buildMinimalSetting: false
+      vsBuildSetting: false
+      mingwBuildSetting: true
 
 pool:
   vmImage: $(imageName)
@@ -111,10 +110,8 @@ steps:
   displayName: 'Windows MSBuild'
 
 - bash: |
-    echo 'gcc --version'
-    gcc --version
     export ADD_CURSES=Y
-    export PDCURSES_TOP=../lib/pdcurses
+    export PDCURSES_TOP=../submodules/pdcurses
     export LUA_VERSION=5.4.2
     export TRAVIS_COMPILER=1
     cp ../sys/winnt/Makefile.gcc ./Makefile
