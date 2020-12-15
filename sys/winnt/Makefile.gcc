@@ -134,10 +134,7 @@ endif
 #---------------------------------------------------------------
 # Location of LUA
 #
-# Using appropriate tag, source can be obtained from the git repository:
-#    https://github.com/NetHack/NetHack.git
-#
-# Source for 5.4.2 could also be obtained from:
+# Original source needs to be obtained from:
 #    http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #
 #    This build assumes that the LUA sources are located
@@ -157,11 +154,8 @@ endif
 #
 # The source for the standalone interpreter (luac.c) is not kept with the
 # rest of the LUA source.
-#
 # The source is kept at:
-#     https://github.com/lua/luac.git
-#
-# If building, copy luac.c into the directory LUATOP.
+#     https://github.com/lua/luac
 #
 # By default we will not build it.
 #
@@ -447,7 +441,7 @@ OPTIONS_FILE = $(DAT)\options
 ifndef LUAVER
 LUAVER   = 5.4.2
 endif
-LUASRC   = $(LUATOP)
+LUASRC   = $(LUATOP)/src
 LUALIB   = $(O)lua-$(LUAVER).static.a
 LUADLL   = $(O)lua-$(LUAVER).a
 LUAINCL  = -I$(LUASRC)
