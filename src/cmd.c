@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1607936399 2020/12/14 08:59:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.433 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1608078812 2020/12/16 00:33:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.434 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -181,7 +181,8 @@ static void FDECL(show_direction_keys, (winid, CHAR_P, BOOLEAN_P));
 static boolean FDECL(help_dir, (CHAR_P, int, const char *));
 
 static void NDECL(commands_init);
-static boolean FDECL(keylist_func_has_key, (const struct ext_func_tab *));
+static boolean FDECL(keylist_func_has_key, (const struct ext_func_tab *,
+                                            boolean *));
 static int FDECL(keylist_putcmds, (winid, BOOLEAN_P, int, int, boolean *));
 static int FDECL(ch2spkeys, (CHAR_P, int, int));
 static boolean FDECL(prefix_cmd, (CHAR_P));
@@ -2124,12 +2125,16 @@ commands_init()
 }
 
 static boolean
-keylist_func_has_key(extcmd)
+keylist_func_has_key(extcmd, skip_keys_used)
 const struct ext_func_tab *extcmd;
+boolean *skip_keys_used; /* boolean keys_used[256] */
 {
     int i;
 
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < 256; ++i) {
+        if (skip_keys_used[i])
+            continue;
+
         if (g.Cmd.commands[i] == extcmd)
             return TRUE;
     }
@@ -2146,11 +2151,13 @@ boolean *keys_used; /* boolean keys_used[256] */
     const struct ext_func_tab *extcmd;
     int i;
     char buf[BUFSZ], buf2[QBUFSZ];
+    boolean keys_already_used[256]; /* copy of keys_used[] before updates */
     int count = 0;
 
     for (i = 0; i < 256; i++) {
         uchar key = (uchar) i;
 
+        keys_already_used[i] = keys_used[i];
         if (keys_used[i])
             continue;
         if (key == ' ' && !flags.rest_on_space)
@@ -2176,8 +2183,10 @@ boolean *keys_used; /* boolean keys_used[256] */
             continue;
         /* can't just check for non-Null extcmd->key; it holds the
            default assignment and a user-specified binding might hijack
-           the this command's default key for some other command */
-        if (keylist_func_has_key(extcmd))
+           this command's default key for some other command; or this
+           command might have been assigned a key being used for
+           movement or as a prefix, intercepting that keystroke */
+        if (keylist_func_has_key(extcmd, keys_already_used))
             continue;
         /* found a command for current category without any key assignment */
         if (docount) {
@@ -2234,32 +2243,11 @@ dokeylist(VOID_ARGS)
 
     (void) memset((genericptr_t) keys_used, 0, sizeof keys_used);
 
-    datawin = create_nhwindow(NHW_TEXT);
-    putstr(datawin, 0, "");
-    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
-    putstr(datawin, 0, buf);
-    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
-        /* this can only check for commands without any key assigned, not
-           ones whose key has been hijacked by something that's processed
-           before it (in use as a prefix, for instance) */
-        if (!keylist_func_has_key(extcmd)) {
-            Sprintf(buf, "%7s %s", "",
-                               "(also commands with no key assignment)");
-            putstr(datawin, 0, buf);
-            break;
-        }
-
-    /* directional keys */
-    putstr(datawin, 0, "");
-    putstr(datawin, 0, "Directional keys:");
-    show_direction_keys(datawin, '.', FALSE); /* '.'==self in direct'n grid */
-
     keys_used[(uchar) g.Cmd.move_NW] = keys_used[(uchar) g.Cmd.move_N]
         = keys_used[(uchar) g.Cmd.move_NE] = keys_used[(uchar) g.Cmd.move_W]
         = keys_used[(uchar) g.Cmd.move_E] = keys_used[(uchar) g.Cmd.move_SW]
         = keys_used[(uchar) g.Cmd.move_S] = keys_used[(uchar) g.Cmd.move_SE]
         = TRUE;
-
     if (!iflags.num_pad) {
         keys_used[(uchar) highc(g.Cmd.move_NW)]
             = keys_used[(uchar) highc(g.Cmd.move_N)]
@@ -2277,20 +2265,54 @@ dokeylist(VOID_ARGS)
             = keys_used[(uchar) C(g.Cmd.move_SW)]
             = keys_used[(uchar) C(g.Cmd.move_S)]
             = keys_used[(uchar) C(g.Cmd.move_SE)] = TRUE;
-        putstr(datawin, 0, "");
-        putstr(datawin, 0,
-     "Ctrl+<direction> will run in specified direction until something very");
-        Sprintf(buf, "%7s %s", "", "interesting is seen.");
-        putstr(datawin, 0, buf);
-        Strcpy(buf, "Shift");
     } else {
         /* num_pad */
         keys_used[(uchar) M('1')] = keys_used[(uchar) M('2')]
             = keys_used[(uchar) M('3')] = keys_used[(uchar) M('4')]
             = keys_used[(uchar) M('6')] = keys_used[(uchar) M('7')]
             = keys_used[(uchar) M('8')] = keys_used[(uchar) M('9')] = TRUE;
+    }
+    for (i = 0; misc_keys[i].desc; ++i) {
+        key = (uchar) g.Cmd.spkeys[misc_keys[i].nhkf];
+        if (key && ((misc_keys[i].numpad && iflags.num_pad)
+                    || !misc_keys[i].numpad)) {
+            keys_used[key] = TRUE;
+        }
+    }
+#ifndef NO_SIGNAL
+    /* this is actually ambiguous; tty raw mode will override SIGINT */
+    key = (uchar) C('c');
+    keys_used[key] = TRUE;
+#endif
+
+    datawin = create_nhwindow(NHW_TEXT);
+    putstr(datawin, 0, "");
+    Sprintf(buf, "%7s %s", "", "    Full Current Key Bindings List");
+    putstr(datawin, 0, buf);
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (!keylist_func_has_key(extcmd, keys_used)) {
+            Sprintf(buf, "%7s %s", "",
+                               "(also commands with no key assignment)");
+            putstr(datawin, 0, buf);
+            break;
+        }
+
+    /* directional keys */
+    putstr(datawin, 0, "");
+    putstr(datawin, 0, "Directional keys:");
+    show_direction_keys(datawin, '.', FALSE); /* '.'==self in direct'n grid */
+
+    if (!iflags.num_pad) {
         putstr(datawin, 0, "");
-        Strcpy(buf, "Meta");
+        putstr(datawin, 0,
+     "Ctrl+<direction> will run in specified direction until something very");
+        Sprintf(buf, "%7s %s", "", "interesting is seen.");
+        putstr(datawin, 0, buf);
+        Strcpy(buf, "Shift"); /* append the rest below */
+    } else {
+        /* num_pad */
+        putstr(datawin, 0, "");
+        Strcpy(buf, "Meta"); /* append the rest next */
     }
     Strcat(buf,
           "+<direction> will run in specified direction until you encounter");
@@ -2300,18 +2322,17 @@ dokeylist(VOID_ARGS)
 
     putstr(datawin, 0, "");
     putstr(datawin, 0, "Miscellaneous keys:");
-    for (i = 0; misc_keys[i].desc; i++) {
-        key = g.Cmd.spkeys[misc_keys[i].nhkf];
+    for (i = 0; misc_keys[i].desc; ++i) {
+        key = (uchar) g.Cmd.spkeys[misc_keys[i].nhkf];
         if (key && ((misc_keys[i].numpad && iflags.num_pad)
                     || !misc_keys[i].numpad)) {
-            keys_used[(uchar) key] = TRUE;
             Sprintf(buf, "%-7s %s", key2txt(key, buf2), misc_keys[i].desc);
             putstr(datawin, 0, buf);
         }
     }
 #ifndef NO_SIGNAL
+    /* (see above) */
     key = (uchar) C('c');
-    keys_used[key] = TRUE;
     Sprintf(buf, "%-7s %s", key2txt(key, buf2),
             "break out of NetHack (SIGINT)");
     putstr(datawin, 0, buf);
