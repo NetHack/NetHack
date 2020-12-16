@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1596334662 2020/08/02 02:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1608115734 2020/12/16 10:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,9 +259,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         characteristics_enlightenment(mode, final);
     }
     /* expanded status line information, including things which aren't
-       included there due to space considerations--such as obvious
-       alternative movement indicators (riding, levitation, &c), and
-       various troubles (turning to stone, trapped, confusion, &c);
+       included there due to space considerations;
        shown for both basic and magic enlightenment */
     status_enlightenment(mode, final);
     /* remaining attributes; shown for potion,&c or wizard mode and
@@ -269,6 +267,13 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     if (mode & MAGICENLIGHTENMENT) {
         /* intrinsics and other traditional enlightenment feedback */
         attributes_enlightenment(mode, final);
+    }
+    /* reminder to player and/or information for dumplog */
+    if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover)) {
+        enlght_out(""); /* separator */
+        enlght_out("Miscellaneous:");
+        Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
+        you_are(buf, "");
     }
 
     if (!g.en_via_menu) {
