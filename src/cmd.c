@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1608078812 2020/12/16 00:33:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.434 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1608116853 2020/12/16 11:07:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.435 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -750,30 +750,37 @@ domonability(VOID_ARGS)
 int
 enter_explore_mode(VOID_ARGS)
 {
-    if (wizard) {
-        You("are in debug mode.");
-    } else if (discover) {
+    if (discover) {
         You("are already in explore mode.");
     } else {
+        const char *oldmode = !wizard ? "normal game" : "debug mode";
+
 #ifdef SYSCF
 #if defined(UNIX)
         if (!sysopt.explorers || !sysopt.explorers[0]
             || !check_user_string(sysopt.explorers)) {
-            You("cannot access explore mode.");
-            return 0;
+            if (!wizard) {
+                You("cannot access explore mode.");
+                return 0;
+            } else {
+                pline(
+                 "Note: normally you wouldn't be allowed into explore mode.");
+                /* keep going */
+            }
         }
 #endif
 #endif
-        pline(
-        "Beware!  From explore mode there will be no return to normal game.");
+        pline("Beware!  From explore mode there will be no return to %s,",
+              oldmode);
         if (paranoid_query(ParanoidQuit,
                            "Do you want to enter explore mode?")) {
+            discover = TRUE;
+            wizard = FALSE;
             clear_nhwindow(WIN_MESSAGE);
             You("are now in non-scoring explore mode.");
-            discover = TRUE;
         } else {
             clear_nhwindow(WIN_MESSAGE);
-            pline("Resuming normal game.");
+            pline("Continuing with %s.", oldmode);
         }
     }
     return 0;
