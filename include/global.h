@@ -418,7 +418,7 @@ struct savefile_info {
 /* see end.c */
 #if !defined(CROSS_TO_WASM)
 #ifndef PANICTRACE
-#define PANICTRACE
+/* #define PANICTRACE */ /* don't want on public server */
 #endif  /* PANICTRACE */
 #endif  /* CROSS_TO_WASM */
 #endif  /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
