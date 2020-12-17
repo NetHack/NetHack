@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{December 13, 2020}
+\date{December 16, 2020}
 
 \maketitle
 
@@ -1059,9 +1059,9 @@ the exchange still takes place.
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``{\tt \#twoweapon}'' extended command.\\
 %.lp ""
-(In versions prior to 3.6 this was the command to switch from normal
+(In versions prior to 3.6 this keystroke ran the command to switch from normal
 play to ``explore mode'', also known as ``discovery mode'', which has now
-been moved to ``{\tt \#exploremode}''.)
+been moved to ``{\tt \#exploremode}'' and M-X.)
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\
@@ -1282,7 +1282,8 @@ Advance or check weapon and spell skills. Autocompletes.
 Default key is `{\tt M-e}'.
 %.lp
 \item[\tb{\#exploremode}]
-Enter the explore mode.\\
+Switch from normal play to non-scoring explore mode.
+Default key is `{\tt M-X}'.\\
 %.lp ""
 Requires confirmation; default response is `{\tt n}' (no).
 To really switch to explore mode, respond with `{\tt y}'.
@@ -1305,7 +1306,14 @@ Default key is `{\tt ?}',
 and also `{\tt h}' if {\it number\verb+_+pad\/} is on.
 %.lp
 \item[\tb{\#herecmdmenu}]
-Show a menu of possible actions in your current location.
+Show a menu of possible actions directed at your current location.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.\\
+%.lp ""
+If mouse support is enabled and the {\it herecmd\verb+_+menu\/}
+option is On, clicking on the hero (or steed when mounted) will
+execute this command.
 %.lp
 \item[\tb{\#history}]
 Show long version and game history. Default key is `{\tt V}'.
@@ -1565,7 +1573,15 @@ Autocompletes.
 Default key is `<del>' or `<delete>' (see {\it Del\/} above).
 %.lp
 \item[\tb{\#therecmdmenu}]
-Show a menu of possible actions in a location next to you.
+Show a menu of possible actions directed at a location next to you.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.
+%%--invoking it by mouse seems to be broken
+%% \\
+%% .lp ""
+%% If mouse support is enabled and the {\it herecmd\verb+_+menu\/}
+%% option is On, clicking on an adjacent location will execute this command.
 %.lp
 \item[\tb{\#throw}]
 Throw something. Default key is `{\tt t}'.
@@ -1750,13 +1766,26 @@ Help menu:  get the list of available extended commands.
 with another key, modifies it by setting the `meta' [8th, or `high']
 bit), you can invoke many extended commands by meta-ing the first
 letter of the command.
-In {\it Windows, OS/2, PC\/ {\rm and} ST NetHack},
-the `Alt' key can be used in this fashion;
-on the {\it Amiga}, set the {\it altmeta\/} option to get this behavior.
+
+On {\it Windows\/} and {\it MS-DOS\/},
+the `Alt' key can be used in this fashion.
+%% On the {\it Amiga}, set the {\it altmeta\/} option to get this behavior.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
 option to have {\it NetHack\/} combine them into meta\+key.
+(This combining action only takes place when NetHack is expecting a
+command to execute, not when accepting input to name something or to
+make a wish.)
+
+%.pg
+Unlike control characters, where ^{}x and ^{}X denote the same thing,
+meta characters are case-sensitive:  M-x and M-X represent different things.
+Some commands which can be run via a meta character require that the
+letter be capitalized because the lower-case equivalent is used for
+another command, so the three key combination meta+shift+letter is needed.
+
+%.BR 1
 \blist{}
 %.lp
 \item[\tb{M-?}]
@@ -1836,6 +1865,9 @@ option to have {\it NetHack\/} combine them into meta\+key.
 %.lp
 \item[\tb{M-w}]
 {\tt\#wipe}
+%.lp
+\item[\tb{M-X}]
+{\tt\#exploremode}
 \elist
 
 %.pg

@@ -223,3 +223,4 @@ M-T	Tip: empty a container
 M-u	Untrap something (trap, door, or chest)
 M-v	Print compile time options for this version of NetHack
 M-w	Wipe off your face
+M-X	Switch from normal play to explore mode

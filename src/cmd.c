@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1608116853 2020/12/16 11:07:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.435 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1608175318 2020/12/17 03:21:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.436 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1817,7 +1817,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'E', "engrave", "engrave writing on the floor", doengrave },
     { M('e'), "enhance", "advance or check weapon and spell skills",
             enhance_weapon_skill, IFBURIED | AUTOCOMPLETE },
-    { '\0', "exploremode", "enter explore (discovery) mode",
+    { M('X'), "exploremode", "enter explore (discovery) mode",
             enter_explore_mode, IFBURIED | GENERALCMD },
     { 'f', "fire", "fire ammunition from quiver", dofire },
     { M('f'), "force", "force a lock", doforce, AUTOCOMPLETE },
@@ -1825,7 +1825,7 @@ struct ext_func_tab extcmdlist[] = {
             doquickwhatis, IFBURIED | GENERALCMD },
     { '?', "help", "give a help message", dohelp, IFBURIED | GENERALCMD },
     { '\0', "herecmdmenu", "show menu of commands you can do here",
-            doherecmdmenu, IFBURIED | GENERALCMD },
+            doherecmdmenu, IFBURIED | AUTOCOMPLETE | GENERALCMD },
     { 'V', "history", "show long version and game history",
             dohistory, IFBURIED | GENERALCMD },
     { 'i', "inventory", "show your inventory", ddoinv, IFBURIED },
@@ -1929,7 +1929,7 @@ struct ext_func_tab extcmdlist[] = {
             doterrain, IFBURIED | AUTOCOMPLETE },
     { '\0', "therecmdmenu",
             "menu of commands you can do from here to adjacent spot",
-            dotherecmdmenu, GENERALCMD },
+            dotherecmdmenu, AUTOCOMPLETE | GENERALCMD },
     { 't', "throw", "throw something", dothrow },
     { '\0', "timeout", "look at timeout queue and hero's timed intrinsics",
             wiz_timeout_queue, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
