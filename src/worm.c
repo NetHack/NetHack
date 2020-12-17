@@ -1,4 +1,4 @@
-/* NetHack 3.7	worm.c	$NHDT-Date: 1599559380 2020/09/08 10:03:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1608236444 2020/12/17 20:20:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -755,15 +755,17 @@ xchar x, y;
         return;
     }
     if (wtails[wnum] == wheads[wnum]) {
-        /* single segment, co-located with worm so nothing to place */
-        if (curr->wx != worm->mx || curr->wy != worm->my) {
+        /* single segment, co-located with worm;
+           should either have same coordinates or have seg->wx==0
+           to indicate that it is not currently on the map */
+        if (curr->wx && (curr->wx != worm->mx || curr->wy != worm->my)) {
             impossible(
-        "place_worm_tail_randomly: tail segement at <%d,%d>, worm at <%d,%d>",
+         "place_worm_tail_randomly: tail segment at <%d,%d>, worm at <%d,%d>",
                        curr->wx, curr->wy, worm->mx, worm->my);
             if (m_at(curr->wx, curr->wy) == worm)
                 remove_monster(curr->wx, curr->wy);
-            curr->wx = worm->mx, curr->wy = worm->my;
         }
+        curr->wx = worm->mx, curr->wy = worm->my;
         return;
     }
     /* remove head segment from map in case we end up calling toss_wsegs();
