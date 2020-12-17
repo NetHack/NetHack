@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1608175318 2020/12/17 03:21:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.436 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1608233885 2020/12/17 19:38:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.437 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4001,6 +4001,9 @@ const char *text;
     }
 }
 
+/* offer choice of actions to perform at adjacent location <x,y>;
+   does not work as intended because the actions that get invoked
+   ask for a direction or target instead of using our <x,y> */
 static char
 there_cmd_menu(doit, x, y)
 boolean doit;
@@ -4074,6 +4077,18 @@ int x, y;
         add_herecmd_menuitem(win, doapply, buf);
     }
 #if 0
+    if (mtmp) {
+        Sprintf(buf, "%s %s", mon_nam(mtmp),
+                !has_mname(mtmp) ? "Name" : "Rename"), ++K;
+        /* need a way to pass mtmp or <ux+dx,uy+dy>to an 'int f()' function
+           as well as reorganizinging do_mname() to use that function */
+        add_herecmd_menuitem(win, XXX(), buf);
+    }
+#endif
+#if 0
+    /* these are necessary if click_to_cmd() is deferring to us; however,
+       moving/fighting aren't implmented as independent commands so don't
+       fit our menu's use of command functions */
     if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
         /* "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature" */
     } else {
@@ -4089,7 +4104,7 @@ int x, y;
         npick = 0;
     }
     destroy_nhwindow(win);
-    ch = '\0';
+    ch = '\033';
     if (npick > 0) {
         int NDECL((*func)) = picks->item.a_nfunc;
         free((genericptr_t) picks);
@@ -4183,7 +4198,7 @@ boolean doit;
     end_menu(win, "What do you want to do?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
-    ch = '\0';
+    ch = '\033';
     if (npick > 0) {
         int NDECL((*func)) = picks->item.a_nfunc;
         free((genericptr_t) picks);
@@ -4208,15 +4223,32 @@ int x, y, mod;
 {
     static char cmd[4];
     struct obj *o;
-    int dir;
+    int dir, udist;
 
-    cmd[1] = '\0';
-
+    cmd[0] = cmd[1] = '\0';
     if (iflags.clicklook && mod == CLICK_2) {
         g.clicklook_cc.x = x;
         g.clicklook_cc.y = y;
         cmd[0] = g.Cmd.spkeys[NHKF_CLICKLOOK];
         return cmd;
+    }
+    /* this used to be inside the 'if (flags.travelcmd)' block, but
+       handle click-on-self even when travel is disabled; unlike
+       accidentally zooming across the level because of a stray click,
+       clicking on self can easily be cancelled if it wasn't intended */
+    if (iflags.herecmd_menu && isok(x, y)) {
+        udist = distu(x, y);
+        if (!udist) {
+            cmd[0] = here_cmd_menu(FALSE);
+            return cmd;
+        } else if (udist <= 2) {
+#if 0       /* there_cmd_menu() is broken; the commands it invokes
+             * tend to ask for a direction or target instead of using
+             * the adjacent coordinates that are being passed to it */
+            cmd[0] = there_cmd_menu(FALSE, x, y);
+            return cmd;
+#endif
+        }
     }
 
     x -= u.ux;
@@ -4233,11 +4265,6 @@ int x, y, mod;
         }
 
         if (x == 0 && y == 0) {
-            if (iflags.herecmd_menu) {
-                cmd[0] = here_cmd_menu(FALSE);
-                return cmd;
-            }
-
             /* here */
             if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
                 || IS_SINK(levl[u.ux][u.uy].typ)) {
@@ -4264,17 +4291,10 @@ int x, y, mod;
         /* directional commands */
 
         dir = xytod(x, y);
-
         if (!m_at(u.ux + x, u.uy + y)
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
             cmd[1] = g.Cmd.dirchars[dir];
             cmd[2] = '\0';
-            if (iflags.herecmd_menu) {
-                cmd[0] = there_cmd_menu(FALSE, u.ux + x, u.uy + y);
-                if (cmd[0] == '\0')
-                    cmd[1] = '\0';
-                return cmd;
-            }
 
             if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
                 /* slight assistance to player: choose kick/open for them */
