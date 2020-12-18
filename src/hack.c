@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.270 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1608335164 2020/12/18 23:46:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1889,14 +1889,12 @@ domove_core()
             /* can't swap places when pet won't fit thru the opening */
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
-        } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
-            /* Since peaceful monsters simply being unable to move out of traps
-             * was inconsistent with pets being able to but being untamed in
-             * the process, apply this logic equally to pets and peacefuls. */
+        } else if (mtmp->mpeaceful && mtmp->mtrapped) {
+            /* all mtame are also mpeaceful, so this affects pets too */
             You("stop.  %s can't move out of that trap.",
                 upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
-        } else if (mtmp->mpeaceful && !mtmp->mtame
+        } else if (mtmp->mpeaceful
                    && (!goodpos(u.ux0, u.uy0, mtmp, 0)
                        || t_at(u.ux0, u.uy0) != NULL
                        || mundisplaceable(mtmp))) {

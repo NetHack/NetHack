@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.395 $ $NHDT-Date: 1608332750 2020/12/18 23:05:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.396 $ $NHDT-Date: 1608335163 2020/12/18 23:46:03 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -439,6 +439,8 @@ the checks and handling for fountains, sinks, and drawbridges were being
 monster movement flags unification allowed displacer beasts to displace Riders
 a long worm with no visible segments (but one internal segment) might trigger
 	warning: tail 'segement' at <0,some_y>, worm at <mx,my> if teleported
+adding displacer beast inadvertently introduced a regression in swapping with
+	pets, allowing them to be pulled into water by hero on/over water
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
