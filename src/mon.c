@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1607901923 2020/12/13 23:25:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1608332750 2020/12/18 23:05:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,11 +46,16 @@ struct monst *mtmp;
 boolean chk_geno;
 const char *msg;
 {
-    if (mtmp->data < &mons[LOW_PM] || mtmp->data >= &mons[NUMMONS]) {
-        impossible("illegal mon data %s; mnum=%d (%s)",
-                   fmt_ptr((genericptr_t) mtmp->data), mtmp->mnum, msg);
+    struct permonst *mptr = mtmp->data;
+    int mx = mtmp->mx, my = mtmp->my;
+
+    if (!mptr || mptr < &mons[LOW_PM] || mptr >= &mons[NUMMONS]) {
+        /* most sanity checks issue warnings if they detect a problem,
+           but this would be too extreme to keep going */
+        panic("illegal mon data %s; mnum=%d (%s)",
+              fmt_ptr((genericptr_t) mptr), mtmp->mnum, msg);
     } else {
-        int mndx = monsndx(mtmp->data);
+        int mndx = monsndx(mptr);
 
         if (mtmp->mnum != mndx) {
             impossible("monster mnum=%d, monsndx=%d (%s)",
@@ -79,7 +84,7 @@ const char *msg;
             /* bad if not fmons list or if not vault guard */
             if (strcmp(msg, "fmon") || !mtmp->isgd)
                 impossible("dead monster on %s; %s at <%d,%d>",
-                           msg, mons[mndx].mname, mtmp->mx, mtmp->my);
+                           msg, mons[mndx].mname, mx, my);
 #endif
             return;
         }
@@ -103,7 +108,7 @@ const char *msg;
     if (mtmp->mtrapped) {
         if (mtmp->wormno) {
             /* TODO: how to check worm in trap? */
-        } else if (!t_at(mtmp->mx, mtmp->my))
+        } else if (!t_at(mx, my))
             impossible("trapped without a trap (%s)", msg);
     }
 
@@ -111,17 +116,54 @@ const char *msg;
     if (mtmp->mundetected) {
         struct trap *t;
 
+        if (!isok(mx, my)) /* caller will have checked this but not fixed it */
+            mx = my = 0;
         if (mtmp == u.ustuck)
             impossible("hiding monster stuck to you (%s)", msg);
-        if (m_at(mtmp->mx, mtmp->my) == mtmp && hides_under(mtmp->data) && !OBJ_AT(mtmp->mx, mtmp->my))
+        if (m_at(mx, my) == mtmp && hides_under(mptr) && !OBJ_AT(mx, my))
             impossible("mon hiding under nonexistent obj (%s)", msg);
-        if (mtmp->data->mlet == S_EEL && !is_pool(mtmp->mx, mtmp->my) && !Is_waterlevel(&u.uz))
+        if (mptr->mlet == S_EEL
+            && !is_pool(mx, my) && !Is_waterlevel(&u.uz))
             impossible("eel hiding out of water (%s)", msg);
-        if (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0
+        if (ceiling_hider(mptr)
+            /* normally !accessible would be overridable with passes_walls,
+               but not for hiding on the ceiling */
+            && (!has_ceiling(&u.uz) || !accessible(mx, my)))
+            impossible("ceiling hider hiding %s (%s)",
+                       !has_ceiling(&u.uz) ? "without ceiling"
+                                           : "in solid stone",
+                       msg);
+        if (mtmp->mtrapped && (t = t_at(mx, my)) != 0
             && !(t->ttyp == PIT || t->ttyp == SPIKED_PIT))
             impossible("hiding while trapped in a non-pit (%s)", msg);
-    }
+    } else if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
+        boolean is_mimic = (mptr->mlet == S_MIMIC);
+        const char *what = (M_AP_TYPE(mtmp) == M_AP_FURNITURE) ? "furniture"
+                           : (M_AP_TYPE(mtmp) == M_AP_MONSTER) ? "a monster"
+                             : (M_AP_TYPE(mtmp) == M_AP_OBJECT) ? "an object"
+                               : "something strange";
 
+        if (Protection_from_shape_changers)
+            impossible(
+                "mimic%s concealed as %s despite Prot-from-shape-changers %s",
+                       is_mimic ? "" : "ker", what, msg);
+        /* pet's quickmimic can take on furniture and object shapes,
+           but only until the pet finishes eating a mimic corpse */
+        if (!(is_mimic || mtmp->meating))
+            impossible("non-mimic (%s) posing as %s (%s)",
+                       mptr->mname, what, msg);
+        if (!(accessible(mx, my) || passes_walls(mptr))) {
+            char buf[BUFSZ];
+            const char *typnam = levltyp_to_name(levl[mx][my].typ);
+
+            if (!typnam) {
+                Sprintf(buf, "[%d]", levl[mx][my].typ);
+                typnam = buf;
+            }
+            impossible("mimic%s concealed in inaccessible location: %s (%s)",
+                       is_mimic ? "" : "ker", typnam, msg);
+        }
+    }
 }
 
 void
@@ -3569,11 +3611,19 @@ rescham()
         }
         if (is_were(mtmp->data) && mtmp->data->mlet != S_HUMAN)
             new_were(mtmp);
-        if (M_AP_TYPE(mtmp) && cansee(mtmp->mx, mtmp->my)) {
-            seemimic(mtmp);
-            /* we pretend that the mimic doesn't
-               know that it has been unmasked */
-            mtmp->msleeping = 1;
+        if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
+            /* this used to include a cansee() check but Protection_from_
+               _shape_changers shouldn't be trumped by being unseen */
+            if (!mtmp->meating) {
+                /* make revealed mimic fall asleep in lieu of shape change */
+                if (M_AP_TYPE(mtmp) != M_AP_MONSTER)
+                    mtmp->msleeping = 1;
+                seemimic(mtmp);
+            } else {
+                /* quickmimic: pet is midst of eating a mimic corpse;
+                   this terminates the meal early */
+                finish_meating(mtmp);
+            }
         }
     }
 }

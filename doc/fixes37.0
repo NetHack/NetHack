@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.394 $ $NHDT-Date: 1608236443 2020/12/17 20:20:43 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.395 $ $NHDT-Date: 1608332750 2020/12/18 23:05:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -337,6 +337,10 @@ when water damage wet a towel, the new wetness might randomly become less
 when the wetness of a towel in inventory changed, persistent inventory wasn't
 	updated to show that
 make Death revive earlier, and all the Riders after 67 turns at latest
+when protection from shape changers begins, force mimic out of concealment
+	even if hero can't see its location; for locations that can be seen,
+	don't make double-trouble Wizard concealed as another monster--or pet
+	temporarily mimicking something while eating mimic corpse--fall asleep
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
