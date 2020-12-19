@@ -441,16 +441,17 @@ afterrecover.proj             aftertile2bmp.proj
 aftertilemap.proj             afteruudecode.proj
 build.bat                     common.props
 config.props                  console.props
-default.props                 default_dll.props
-default_lib.props             dirs.props
-dlb.vcxproj                   dll.props
-files.props                   makedefs.vcxproj
-nh340key.def                  nh340key.vcxproj
-nhdefkey.def                  nhdefkey.vcxproj
-nhraykey.def                  nhraykey.vcxproj
-recover.vcxproj               tile2bmp.vcxproj
-tilemap.vcxproj               tiles.vcxproj
-travisci.sh                   uudecode.vcxproj
+cpp.hint                      default.props
+default_dll.props             default_lib.props
+dirs.props                    dlb.vcxproj
+dll.props                     files.props
+makedefs.vcxproj              nh340key.def
+nh340key.vcxproj              nhdefkey.def
+nhdefkey.vcxproj              nhraykey.def
+nhraykey.vcxproj              recover.vcxproj
+tile2bmp.vcxproj              tilemap.vcxproj
+tiles.vcxproj                 travisci.sh
+uudecode.vcxproj
 
 win/win32/vs/Images:
 (files for Visual Studio 2017 or 2019 Community Edition builds)
