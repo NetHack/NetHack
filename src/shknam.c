@@ -495,7 +495,7 @@ const char *const *nlp;
     int i, trycnt, names_avail;
     const char *shname = 0;
     struct monst *mtmp;
-    int name_wanted;
+    int name_wanted = shk->m_id;
     s_level *sptr;
 
     if (nlp == shklight && In_mines(&u.uz)
@@ -510,13 +510,15 @@ const char *const *nlp;
            use ledger_no rather than depth to keep minetown distinct. */
         int nseed = (int) ((long) ubirthday / 257L);
 
-        name_wanted = ledger_no(&u.uz) + (nseed % 13) - (nseed % 5);
+        name_wanted += ledger_no(&u.uz) + (nseed % 13) - (nseed % 5);
         if (name_wanted < 0)
             name_wanted += (13 + 5);
         shk->female = name_wanted & 1;
 
         for (names_avail = 0; nlp[names_avail]; names_avail++)
             continue;
+
+        name_wanted = name_wanted % names_avail;
 
         for (trycnt = 0; trycnt < 50; trycnt++) {
             if (nlp == shktools) {
@@ -545,6 +547,7 @@ const char *const *nlp;
                     continue;
                 if (strcmp(ESHK(mtmp)->shknam, shname))
                     continue;
+                name_wanted = names_avail; /* try a random name */
                 break;
             }
             if (!mtmp)

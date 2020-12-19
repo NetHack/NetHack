@@ -35,6 +35,7 @@ static void FDECL(do_room_or_subroom, (struct mkroom *, int, int,
                                            int, int, BOOLEAN_P,
                                            SCHAR_P, BOOLEAN_P, BOOLEAN_P));
 static void NDECL(makerooms);
+static boolean FDECL(door_into_nonjoined, (XCHAR_P, XCHAR_P));
 static void FDECL(finddpos, (coord *, XCHAR_P, XCHAR_P,
                                  XCHAR_P, XCHAR_P));
 static void FDECL(mkinvpos, (XCHAR_P, XCHAR_P, int));
@@ -68,6 +69,33 @@ const genericptr vy;
 #endif /* LINT */
 }
 
+/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor() checks
+ * would be connecting into an area that was declared as joined = 0.
+ * Checking for this in finddpos() enables us to have rooms with sub-areas (such
+ * as shops) that will never randomly generate unwanted doors in order to
+ * connect them up to other areas.
+ */
+static boolean
+door_into_nonjoined(x, y)
+xchar x, y;
+{
+    xchar tx, ty, diridx;
+
+    for (diridx = 0; diridx <= 6; diridx += 2) {
+        tx = x + xdir[diridx];
+        ty = y + ydir[diridx];
+        if (!isok(tx, ty) || IS_ROCK(levl[tx][ty].typ))
+            continue;
+
+        /* Is this connecting to a room that doesn't want joining? */
+        if (levl[tx][ty].roomno >= ROOMOFFSET &&
+            !g.rooms[levl[tx][ty].roomno - ROOMOFFSET].needjoining) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void
 finddpos(cc, xl, yl, xh, yh)
 coord *cc;
@@ -77,12 +105,12 @@ xchar xl, yl, xh, yh;
 
     x = rn1(xh - xl + 1, xl);
     y = rn1(yh - yl + 1, yl);
-    if (okdoor(x, y))
+    if (okdoor(x, y) && !door_into_nonjoined(x, y))
         goto gotit;
 
     for (x = xl; x <= xh; x++)
         for (y = yl; y <= yh; y++)
-            if (okdoor(x, y))
+            if (okdoor(x, y) && !door_into_nonjoined(x, y))
                 goto gotit;
 
     for (x = xl; x <= xh; x++)
@@ -92,6 +120,8 @@ xchar xl, yl, xh, yh;
     /* cannot find something reasonable -- strange */
     x = xl;
     y = yh;
+    impossible("finddpos: couldn't find door pos within (%d,%d,%d,%d)",
+               xl, yl, xh, yh);
  gotit:
     cc->x = x;
     cc->y = y;
