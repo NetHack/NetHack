@@ -1330,7 +1330,7 @@ wiz_map_levltyp(VOID_ARGS)
     }
 
     {
-        char dsc[BUFSZ];
+        char dsc[COLBUFSZ];
         s_level *slev = Is_special(&u.uz);
 
         Sprintf(dsc, "D:%d,L:%d", u.uz.dnum, u.uz.dlevel);

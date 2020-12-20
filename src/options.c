@@ -8307,7 +8307,7 @@ const char *str;
     char *s;
 
     if (!buf)
-        *(buf = (char *) alloc(BUFSZ)) = '\0';
+        *(buf = (char *) alloc(COLBUFSZ)) = '\0';
 
     if (!*str) {
         s = eos(buf);
