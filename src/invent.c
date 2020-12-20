@@ -13,7 +13,6 @@
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'
 
-static void FDECL(loot_classify, (Loot *, struct obj *));
 static char *FDECL(loot_xname, (struct obj *));
 static int FDECL(invletter_value, (CHAR_P));
 static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
@@ -54,7 +53,7 @@ static char FDECL(obj_to_let, (struct obj *));
 static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
 /* sortloot() classification; called at most once [per sort] for each object */
-static void
+void
 loot_classify(sort_item, obj)
 Loot *sort_item;
 struct obj *obj;

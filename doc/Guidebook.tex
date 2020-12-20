@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{December 16, 2020}
+\date{December 19, 2020}
 
 \maketitle
 
@@ -1154,9 +1154,15 @@ ordering.)
 %.lp
 \item[\tb{$\backslash$}]
 Show what types of objects have been discovered.
+\\
+%.lp ""
+May be preceded by `{\tt m}' to select preferred display order.
 %.lp
 \item[\tb{\`}]
 Show discovered types for one class of objects.
+\\
+.lp ""
+May be preceded by `{\tt m}' to select preferred display order.
 %.lp
 \item[\tb{!}]
 Escape to a shell.
@@ -1340,10 +1346,18 @@ and also `{\tt k}' if {\it number\verb+_+pad\/} is on.
 \item[\tb{\#known}]
 Show what object types have been discovered.
 Default key is `{\tt $\backslash$}'.
+\\
+%.lp ""
+The `{\tt m}' prefix allows assigning a new value to the
+{\it sortdiscoveries\/}
+option to control the order in which the discoveries are displayed.
 %.lp
 \item[\tb{\#knownclass}]
 Show discovered types for one class of objects.
 Default key is `{\tt `}'.
+\\
+%.lp ""
+The `{\tt m}' prefix operates the same as for \(lq#known\(rq.
 %.lp
 \item[\tb{\#levelchange}]
 Change your experience level.
@@ -4450,17 +4464,44 @@ Persistent.
 \item[\ib{silent}]
 Suppress terminal beeps (default on).  Persistent.
 %.lp
+\item[\ib{sortdiscoveries}]
+Controls the sorting behavior for the output of the `{\tt $\backslash$}'
+and `{\tt \`}' commands.
+Persistent.
+\\
+%.lp ""
+The possible values are:
+%.PS o
+%.PL o
+(\tt o} --- list object types by class, in discovery order within each class;
+default;
+%.PL s
+{\tt s} --- list object types by {\it sortloot\/}
+classification: by class, by sub-class within class for classes which
+have substantial groupings (like helmets, boots, gloves, and so forth
+for armor), with object types partly-discovered via assigned name coming
+before fully identified types;
+\\
+%.PL c
+{\tt c} --- list by class, alphabetically within each class;\\
+%.PL a
+{\tt a} --- list alphabetically across all classes.\\
+%.PE
+Can be interactively set via the `{\tt O}' command or via using
+the `{\tt m}' prefix before the `{\tt $\backslash$}'
+or `{\tt \`}' command.
+%.lp
 \item[\ib{sortloot}]
 Controls the sorting behavior of pickup lists for inventory
 and \#loot commands and some others.  Persistent.
-
+\\
 The possible values are:
 %.sd
 %.si
 {\tt full} --- always sort the lists;\\
 {\tt loot} --- only sort the lists that don't use inventory
        letters, like with the \#loot and pickup commands;\\
-{\tt none} --- show lists the traditional way without sorting.
+{\tt none} --- show lists the traditional way without sorting; default.
 %.ei
 %.ed
 %.lp

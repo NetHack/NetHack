@@ -681,6 +681,7 @@ when "?i" (show key bindings) displays commands and their keys, also show
 assign default key binding for <del> or <delete> to execute #terrain
 assign M-X to #exploremode
 make #herecmdmenu and #therecmdmenu autocomplete
+add 'sortdiscoveries' option to control output of '\' and '`' commands
 
 
 Platform- and/or Interface-Specific New Features

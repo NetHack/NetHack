@@ -3236,6 +3236,8 @@ int NDECL((*cmd_func));
         /* 'm' for removing saddle from adjacent monster without checking
            for containers at <u.ux,u.uy> */
         || cmd_func == doloot
+        /* offer menu to choose discoveries sort order */
+        || cmd_func == dodiscovered || cmd_func == doclassdisco
         /* travel: pop up a menu of interesting targets in view */
         || cmd_func == dotravel
         /* wait and search: allow even if next to a hostile monster */

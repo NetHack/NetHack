@@ -205,6 +205,15 @@ scores        the parts of the score list you wish    [!own/3 top/2 around]
               to see when the game ends.  You choose a combination of
               top scores, scores around the top scores, and all of your
               own scores.
+sortdiscoveries preferred order when viewing list of discovered objects [o]
+              o -- in order of discovery within each class
+              s -- sortloot's "loot" order
+              c -- alphabetized within each class
+              a -- alphabetized across all classes
+sortloot      preferred order when examining a set of objects           [n]
+              none -- no sorting
+              loot -- sort piles of objects on floor and in containers
+              full -- 'loot' plus objects in inventory
 statushilites whether to display status highlights (when non-zero) and  [0]
               also how many turns to display temporary highlights (for
               'up', 'down', and 'changed' hilite_status rules)

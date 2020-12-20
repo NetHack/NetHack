@@ -80,6 +80,7 @@ struct flag {
 #define PARANOID_EATING     0x0200
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
+    char discosort;    /* order of dodiscovery/doclassdisco output: o,s,c,a */
     char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
@@ -93,8 +94,7 @@ struct flag {
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
                                                       info upon exit */
     char menu_style;    /* User interface style setting */
-    boolean made_fruit; /* don't easily let the user overflow the number of
-                           fruits */
+    boolean made_fruit; /* don't easily let user overflow fruit limit */
 
     /* KMH, role patch -- Variables used during startup.
      *

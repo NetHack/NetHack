@@ -3257,6 +3257,66 @@ char *op;
 }
 
 int
+optfn_sortdiscoveries(optidx, req, negated, opts, op)
+int optidx;
+int req;
+boolean negated;
+char *opts;
+char *op;
+{
+    if (req == do_init) {
+        flags.discosort = 'o';
+        return optn_ok;
+    }
+    if (req == do_set) {
+        op = string_for_env_opt(allopt[optidx].name, opts, FALSE);
+        if (negated) {
+            flags.discosort = 'o';
+        } else if (op != empty_optstr) {
+            switch (lowc(*op)) {
+            case '0':
+            case 'o': /* order of discovery */
+                flags.discosort = 'o';
+                break;
+            case '1':
+            case 's': /* sortloot order (subclasses for some classes) */
+                flags.discosort = 's';
+                break;
+            case '2':
+            case 'c': /* alphabetical within each class */
+                flags.discosort = 'c';
+                break;
+            case '3':
+            case 'a': /* alphabetical across all classes */
+                flags.discosort = 'a';
+                break;
+            default:
+                config_error_add("Unknown %s parameter '%s'",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            }
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val) {
+        extern const char *const disco_orders_descr[]; /* o_init.c */
+        extern const char disco_order_let[];
+        const char *p = index(disco_order_let, flags.discosort);
+
+        if (!p)
+            flags.discosort = 'o', p = disco_order_let;
+        Strcpy(opts, disco_orders_descr[p - disco_order_let]);
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        /* return handler_sortdiscoveries(); */
+        (void) choose_disco_sort(0); /* o_init.c */
+    }
+    return optn_ok;
+}
+
+int
 optfn_sortloot(optidx, req, negated, opts, op)
 int optidx;
 int req;

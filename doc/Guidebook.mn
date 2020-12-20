@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 16, 2020
+.ds f2 "December 19, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1055,8 +1055,12 @@ be added to the end of the list rather than be inserted into the sorted
 ordering.)
 .lp \\\\
 Show what types of objects have been discovered.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp \`
 Show discovered types for one class of objects.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp !
 Escape to a shell.
 See \(lq#shell\(rq below for more details.
@@ -1258,10 +1262,16 @@ Default key is \(oq\(haD\(cq, and \(oqk\(cq if
 is on.
 .lp "#known   "
 Show what object types have been discovered.
-Default key is \(oq\\\(cq.
+Default key is \(oq\f(CR\\\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix allows assigning a new value to the
+.op sortdiscoveries
+option to control the order in which the discoveries are displayed.
 .lp #knownclass
 Show discovered types for one class of objects.
-Default key is \(oq\`\(cq.
+Default key is \(oq\f(CR\`\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix operates the same as for \(lq#known\(rq.
 .lp #levelchange
 Change your experience level.
 Autocompletes.
@@ -4109,19 +4119,47 @@ Persistent.
 Show your approximate accumulated score on bottom line (default off).
 Persistent.
 .lp "silent  "
-Suppress terminal beeps (default on).  Persistent.
+Suppress terminal beeps (default on).
+Persistent.
+.lp sortdiscoveries
+Controls the sorting behavior for the output of the \(oq\f(CR\\\fP\(cq
+and \(oq\f(CR\`\fP\(cq commands.
+Persistent.
+.lp ""
+The possible values are:
+.PS o
+.PL o
+list object types by class, in discovery order within each class;
+default;
+.PL s
+list object types by
+.op sortloot
+classification: by class, by sub-class within class for classes which
+have substantial groupings (like helmets, boots, gloves, and so forth
+for armor), with object types partly-discovered via assigned name coming
+before fully identified types;
+.PL c
+list by class, alphabetically within each class;
+.PL a
+list alphabetically across all classes.
+.PE
+Can be interactively set via the \(oq\f(CRO\fP\(cq command or via using
+the \(oq\f(CRm\fP\(cq prefix before the \(oq\f(CR\\\fP\(cq
+or \(oq\f(CR\`\fP\(cq command.
 .lp sortloot
 Controls the sorting behavior of the pickup lists for inventory
 and #loot commands and some others.  Persistent.
+.lp ""
 The possible values are:
-.PS full
+.PS none \" note: with proportional font, "none" is wider than "full" or "loot"
 .PL full
 always sort the lists;
 .PL loot
 only sort the lists that don't use inventory letters, like with
 the #loot and pickup commands;
 .PL none
-show lists the traditional way without sorting.
+show lists the traditional way without sorting;
+default.
 .PE
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).

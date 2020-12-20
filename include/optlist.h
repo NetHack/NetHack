@@ -406,6 +406,8 @@ pfx_##a,
                 &flags.silent)
     NHOPTB(softkeyboard, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_softkeyboard)
+    NHOPTC(sortdiscoveries, 0, opt_in, set_in_game, Yes, Yes, No, Yes,
+                NoAlias, "preferred order when displaying discovered objects")
     NHOPTC(sortloot, 4, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "sort object selection lists by description")
     NHOPTB(sortpack, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
