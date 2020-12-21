@@ -1,0 +1,16 @@
+# howto build & install chrooted NetHack on avocado
+# also see https://github.com/mlehotay/dgamelaunch/blob/master/examples/floatingeye.txt
+# todo: do not clobber existing playground
+
+sudo rm -rf /opt/dgl
+cd ~/sandbox/nethack/NetHack
+make spotless
+cd sys/unix
+sh setup.sh hints/floatingeye
+cd ../..
+make all
+sudo make install
+cd /opt/dgl
+sudo chown -R games:games nh370/
+sudo /home/mlehotay/sandbox/nethack/NetHack/sys/unix/mkchroot.sh
+sudo chroot ./ nh370/nethack

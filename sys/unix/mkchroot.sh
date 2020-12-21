@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Modified from https://github.com/paxed/dgamelaunch/blob/master/dgl-create-chroot
+# Adapted from https://github.com/paxed/dgamelaunch/blob/master/dgl-create-chroot
 
 # Ideas and some parts from the original dgl-create-chroot (by joshk@triplehelix.org, modifications by jilles@stack.nl)
 # This one by paxed@alt.org
