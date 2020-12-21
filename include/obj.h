@@ -40,16 +40,19 @@ struct obj {
     unsigned owt;
     long quan; /* number of items */
 
+#define SPE_LIM 99 /* abs(obj->spe) <= 99, cap for enchanted and charged
+                    * objects (and others; named fruit index excepted) */
     schar spe; /* quality of weapon, weptool, armor or ring (+ or -);
-                  number of charges for wand or charged tool ( >= -1 );
-                  number of candles attached to candelabrum;
-                  marks your eggs, tin variety and spinach tins;
-                  candy bar wrapper index;
-                  Schroedinger's Box (1) or royal coffers for a court (2);
-                  tells which fruit a fruit is;
-                  special for uball and amulet;
-                  scroll of mail (normal==0, bones or wishing==1, written==2);
-                  historic and gender for statues */
+                * number of charges for wand or charged tool ( >= -1 );
+                * number of candles attached to candelabrum;
+                * marks your eggs, tin variety and spinach tins;
+                * candy bar wrapper index;
+                * Schroedinger's Box (1) or royal coffers for a court (2);
+                * tells which fruit a fruit is;
+                * special for uball and amulet;
+                * scroll of mail (normal==0, bones or wishing==1, written==2);
+                * splash of venom (normal==0, wishing==1);
+                * historic and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE 0x02
 #define STATUE_FEMALE 0x04

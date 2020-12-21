@@ -3431,8 +3431,11 @@ struct _readobjnam_data *d;
 {
     if (strlen(d->bp) > 1 && (d->p = rindex(d->bp, '(')) != 0) {
         boolean keeptrailingchars = TRUE;
+        int idx = 0;
 
-        d->p[(d->p > d->bp && d->p[-1] == ' ') ? -1 : 0] = '\0'; /*terminate bp */
+        if (d->p > d->bp && d->p[-1] == ' ')
+            idx = -1;
+        d->p[idx] = '\0'; /* terminate bp */
         ++d->p; /* advance past '(' */
         if (!strncmpi(d->p, "lit)", 4)) {
             d->islit = 1;
@@ -3478,8 +3481,9 @@ struct _readobjnam_data *d;
         d->spesgn = -1; /* cheaters get what they deserve */
         d->spe = abs(d->spe);
     }
-    if (d->spe > SCHAR_LIM)
-        d->spe = SCHAR_LIM;
+    /* cap on obj->spe is independent of (and less than) SCHAR_LIM */
+    if (d->spe > SPE_LIM)
+        d->spe = SPE_LIM; /* slime mold uses d.ftype, so not affected */
     if (d->rechrg < 0 || d->rechrg > 7)
         d->rechrg = 7; /* recharge_limit */
 }
@@ -4225,13 +4229,11 @@ struct obj *no_wish;
                               || d.typ == ROCK || is_missile(d.otmp)))))
         d.otmp->quan = (long) d.cnt;
 
-    if (d.oclass == VENOM_CLASS)
-        d.otmp->spe = 1;
-
     if (d.spesgn == 0) {
+        /* spe not specifed; retain the randomly assigned value */
         d.spe = d.otmp->spe;
     } else if (wizard) {
-        ; /* no alteration to spe */
+        ; /* no restrictions except SPE_LIM */
     } else if (d.oclass == ARMOR_CLASS || d.oclass == WEAPON_CLASS
                || is_weptool(d.otmp)
                || (d.oclass == RING_CLASS && objects[d.typ].oc_charged)) {
@@ -4240,7 +4242,8 @@ struct obj *no_wish;
         if (d.spe > 2 && Luck < 0)
             d.spesgn = -1;
     } else {
-        if (d.oclass == WAND_CLASS) {
+        /* crystal ball cancels like a wand, to (n:-1) */
+        if (d.oclass == WAND_CLASS || d.typ == CRYSTAL_BALL) {
             if (d.spe > 1 && d.spesgn == -1)
                 d.spe = 1;
         } else {
@@ -4281,12 +4284,16 @@ struct obj *no_wish;
         /* otmp->cobj already done in mksobj() */
         break;
 #ifdef MAIL_STRUCTURES
+    /* scroll of mail:  0: delivered in-game via external event (or randomly
+       for fake mail); 1: from bones or wishing; 2: written with marker */
     case SCR_MAIL:
-        /* 0: delivered in-game via external event (or randomly for fake mail);
-           1: from bones or wishing; 2: written with marker */
+        /*FALLTHRU*/
+#endif
+    /* splash of venom:  0: normal, and transitory; 1: wishing */
+    case ACID_VENOM:
+    case BLINDING_VENOM:
         d.otmp->spe = 1;
         break;
-#endif
     case WAN_WISHING:
         if (!wizard) {
             d.otmp->spe = (rn2(10) ? -1 : 0);

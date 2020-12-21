@@ -17,6 +17,7 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 static boolean FDECL(learnscrolltyp, (SHORT_P));
+static void FDECL(cap_spe, (struct obj *));
 static char *FDECL(erode_obj_text, (struct obj *, char *));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
@@ -52,6 +53,17 @@ struct obj *sobj;
        we couldn't be reading this scroll otherwise */
     if (sobj->oclass != SPBOOK_CLASS)
         (void) learnscrolltyp(sobj->otyp);
+}
+
+/* max spe is +99, min is -99 */
+static void
+cap_spe(obj)
+struct obj *obj;
+{
+    if (obj) {
+        if (abs(obj->spe) > SPE_LIM)
+            obj->spe = sgn(obj->spe) * SPE_LIM;
+    }
 }
 
 static char *
@@ -679,11 +691,10 @@ int curse_bless;
         case MAGIC_MARKER:
         case TINNING_KIT:
         case EXPENSIVE_CAMERA:
-            if (is_cursed)
+            if (is_cursed) {
                 stripspe(obj);
-            else if (rechrg
-                     && obj->otyp
-                            == MAGIC_MARKER) { /* previously recharged */
+            } else if (rechrg && obj->otyp == MAGIC_MARKER) {
+                /* previously recharged */
                 obj->recharged = 1; /* override increment done above */
                 if (obj->spe < 3)
                     Your("marker seems permanently dried out.");
@@ -709,8 +720,9 @@ int curse_bless;
                     obj->spe = 50;
                 else {
                     int chrg = (int) obj->spe;
-                    if ((chrg + n) > 127)
-                        obj->spe = 127;
+
+                    if (chrg + n > SPE_LIM)
+                        obj->spe = SPE_LIM;
                     else
                         obj->spe += n;
                 }
@@ -824,9 +836,12 @@ int curse_bless;
         } /* switch */
 
     } else {
-    not_chargable:
+ not_chargable:
         You("have a feeling of loss.");
     }
+
+    /* prevent enchantment from getting out of range */
+    cap_spe(obj);
 }
 
 /*
@@ -1039,6 +1054,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             otmp->otyp += GRAY_DRAGON_SCALE_MAIL - GRAY_DRAGON_SCALES;
             if (sblessed) {
                 otmp->spe++;
+                cap_spe(otmp);
                 if (!otmp->blessed)
                     bless(otmp);
             } else if (otmp->cursed)
@@ -1050,7 +1066,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             break;
         }
         pline("%s %s%s%s%s for a %s.", Yname2(otmp),
-              s == 0 ? "violently " : "",
+              (s == 0) ? "violently " : "",
               otense(otmp, Blind ? "vibrate" : "glow"),
               (!Blind && !same_color) ? " " : "",
               (Blind || same_color)
@@ -1067,8 +1083,15 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         else if (!scursed && otmp->cursed)
             uncurse(otmp);
         if (s) {
+            int oldspe = otmp->spe;
+            /* despite being schar, it shouldn't be possible for spe to wrap
+               here because it has been capped at 99 and s is quite small;
+               however, might need to change s if it takes spe past 99 */
             otmp->spe += s;
-            adj_abon(otmp, s);
+            cap_spe(otmp); /* make sure that it doesn't exceed SPE_LIM */
+            s = otmp->spe - oldspe; /* cap_spe() might have throttled 's' */
+            if (s) /* skip if it got changed to 0 */
+                adj_abon(otmp, s); /* adjust armor bonus for Dex or Int+Wis */
             g.known = otmp->known;
             /* update shop bill to reflect new higher price */
             if (s > 0 && otmp->unpaid)
@@ -1331,6 +1354,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                                  : sblessed ? rnd(3 - uwep->spe / 3)
                                    : 1))
             sobj = 0; /* nothing enchanted: strange_feeling -> useup */
+        if (uwep)
+            cap_spe(uwep);
         break;
     case SCR_TAMING:
     case SPE_CHARM_MONSTER: {

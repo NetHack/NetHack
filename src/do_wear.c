@@ -2213,19 +2213,26 @@ find_ac()
         uac -= u.ublessed;
     uac -= u.uspellprot;
 
-    /* [The magic binary numbers 127 and -128 should be replaced with the
-     * mystic decimal numbers 99 and -99 which require no explanation to
-     * the uninitiated and would cap the width of a status line value at
-     * one less character.]
-     */
-    if (uac < -128)
-        uac = -128; /* u.uac is an schar */
-    else if (uac > 127)
-        uac = 127; /* for completeness */
+    /* put a cap on armor class [3.7: was +127,-128, now reduced to +/- 99 */
+    if (abs(uac) > AC_MAX)
+        uac = sgn(uac) * AC_MAX;
 
     if (uac != u.uac) {
         u.uac = uac;
         g.context.botl = 1;
+#if 0
+        /* these could conceivably be achieved out of order (by being near
+           threshold and putting on +N dragon scale mail from bones, for
+           instance), but if that happens, that's the order it happened;
+           also, testing for these in the usual order would result in more
+           record_achievement() attempts and rejects for duplication */
+        if (u.uac <= -20)
+            record_achievement(ACH_AC_20);
+        else if (u.uac <= -10)
+            record_achievement(ACH_AC_10);
+        else if (u.uac <= 0)
+            record_achievement(ACH_AC_00);
+#endif
     }
 }
 

@@ -341,6 +341,9 @@ when protection from shape changers begins, force mimic out of concealment
 	even if hero can't see its location; for locations that can be seen,
 	don't make double-trouble Wizard concealed as another monster--or pet
 	temporarily mimicking something while eating mimic corpse--fall asleep
+best possible armor class reduced from -127 to -99; worst from +127 to +99;
+	charged or enchanted individual items also capped at +/- 99 (affects
+	wizard mode wishing, negligible effect on normal play)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -676,8 +679,8 @@ mild zombie apocalypse
 list lamps and lanterns in charging prompt
 let tourists read conical hats
 when "?i" (show key bindings) displays commands and their keys, also show
-	commands without any key (so useable via '#', or possibly menu, only;
-	the majority are debugging commands)
+	commands without any key (so ones useable via '#', or possibly menu,
+	only; the majority are debugging commands)
 assign default key binding for <del> or <delete> to execute #terrain
 assign M-X to #exploremode
 make #herecmdmenu and #therecmdmenu autocomplete

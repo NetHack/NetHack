@@ -590,7 +590,11 @@ int final;
         you_have(buf, "");
     }
 
+    find_ac(); /* enforces AC_MAX cap */
     Sprintf(buf, "%d", u.uac);
+    if (abs(u.uac) == AC_MAX)
+        Sprintf(eos(buf), ", the %s possible",
+                (u.uac < 0) ? "best" : "worst");
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
     /* gold; similar to doprgold(#seegold) but without shop billing info;

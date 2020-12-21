@@ -472,6 +472,9 @@ register struct monst *mon;
             /* since ARM_BONUS is positive, subtracting it increases AC */
         }
     }
+    /* same cap as for hero [find_ac(do_wear.c)] */
+    if (abs(base) > AC_MAX)
+        base = sgn(base) * AC_MAX;
     return base;
 }
 
