@@ -13,7 +13,7 @@
 COMPILEREVISION?=1
 
 # this is the chroot dir
-PREFIX=$(wildcard ~)/jail
+PREFIX=/opt/dgl
 
 # this is the dir where NetHack is inside the chroot
 #HACKDIR=/nh.$(shell date +%Y%m%d)-$(COMPILEREVISION)

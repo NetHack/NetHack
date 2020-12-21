@@ -6,7 +6,7 @@
 # This one by paxed@alt.org
 
 # Same as $PREFIX in hints file
-CHROOT="/home/mlehotay/jail"
+CHROOT="/opt/dgl"
 # COMPRESS from include/config.h; the compression binary to copy. leave blank to skip.
 COMPRESSBIN="/bin/gzip"
 # nethack binary
