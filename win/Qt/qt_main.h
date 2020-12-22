@@ -14,6 +14,11 @@
 #include "qt_kde0.h"
 #endif
 
+// Allow changing 'statuslines:2' to 'statuslines:3' or vice versa
+// while the game is running; deletes and re-creates the status window.
+// [Used in qt_bind.cpp and qt_main.cpp, but not referenced in qt_stat.cpp.]
+#define DYNAMIC_STATUSLINES
+
 namespace nethack_qt_ {
 
 class NetHackQtInvUsageWindow;
@@ -54,7 +59,7 @@ public:
         void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
 #ifdef DYNAMIC_STATUSLINES
         // called when 'statuslines' option has been changed
-        void redoStatus();
+        NetHackQtWindow *redoStatus();
 #endif
 
 public slots:

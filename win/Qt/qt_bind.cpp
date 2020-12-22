@@ -834,10 +834,11 @@ void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
 
 void NetHackQtBind::qt_preference_update(const char *optname)
 {
-#ifdef DYNAMIC_STATUSLINES  // leave disabled; redoStatus() doesn't work
+#ifdef DYNAMIC_STATUSLINES  // defined in qt_main.h
     if (!strcmp(optname, "statuslines")) {
         // delete and recreate status window
-        main->redoStatus();
+        // to toggle statuslines from 2 to 3 or vice versa
+        id_to_window[WIN_STATUS] = main->redoStatus();
     }
 #else
     nhUse(optname);

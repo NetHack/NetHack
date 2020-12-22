@@ -1180,14 +1180,14 @@ void NetHackQtMainWindow::layout()
     }
 }
 
-#ifdef DYNAMIC_STATUSLINES  // leave disabled; this doesn't work as intended
+#ifdef DYNAMIC_STATUSLINES
 // called when 'statuslines' changes from 2 to 3 or vice versa; simpler to
 // destroy and recreate the status window than to adjust existing fields
-void NetHackQtMainWindow::redoStatus()
+NetHackQtWindow *NetHackQtMainWindow::redoStatus()
 {
     NetHackQtStatusWindow *oldstatus = this->status;
     if (!oldstatus)
-        return; // not ready yet?
+        return NULL; // not ready yet?
     this->status = new NetHackQtStatusWindow;
 
     if (!qt_compact_mode)
@@ -1195,6 +1195,8 @@ void NetHackQtMainWindow::redoStatus()
 
     delete oldstatus;
     ShowIfReady();
+
+    return (NetHackQtWindow *) this->status;
 }
 #endif
 

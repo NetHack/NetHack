@@ -246,7 +246,8 @@ statushilites whether to display status highlights (when non-zero) and  [0]
               also how many turns to display temporary highlights (for
               'up', 'down', and 'changed' hilite_status rules)
 statuslines   whether to use expanded (3) or condensed (2) status       [2]
-              (for tty and curses; 2 is traditional, 3 is recommended)
+              (for tty and curses; 2 is traditional, 3 is recommended;
+              also for Qt, where 3 is traditional and 2 is recommended)
 suppress_alert disable various version-specific warnings about changes   []
               in game play or the user interface, such as notification given
               for the 'Q' command that quitting is now done via #quit
@@ -321,9 +322,6 @@ role       Your starting role (e.g., role:Barbarian, role:Valk).   [random]
            as possible.  You can also still denote your role by
            appending it to the "name" option (e.g., name:Vic-V), but
            the "role" option will take precedence.
-statuslines whether to use expanded (3) or condensed (2) status         [2]
-           (unlike for tty and curses, for Qt this can only be be set at
-           startup; also unlike tty and curses, 2 is recommended over 3)
 windowtype windowing system to be used    [depends on operating system and
            compile-time setup]    if more than one choice is available.
            Some instances of the program support only one window-type;

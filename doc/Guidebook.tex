@@ -4783,7 +4783,7 @@ Number of lines for traditional below-the-map status display.
 Acceptable values are {\tt 2} and {\tt 3} (default is {\tt 2}).
 
 %.lp ""
-For {\tt 3}, the {\tt tty} interface moves some fields around and
+When set to {\tt 3}, the {\tt tty} interface moves some fields around and
 mainly shows status conditions on their own line.
 A display capable of showing at least 25 lines is recommended.
 The value can be toggled back and forth during the game with the `O'
@@ -4806,10 +4806,6 @@ original format, with the status window spread out vertically.
 A value of {\tt 2} makes status be slightly condensed, moving some
 fields to different lines to eliminate one whole line, reducing the
 height needed.
-For {\tt Qt},
-{\it statuslines\/}
-can only be set in the configuration file or via NETHACKOPTIONS, not
-with the `O' command.
 %.lp
 \item[\ib{term\verb+_+cols} {\normalfont and}]
 %.lp

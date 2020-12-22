@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ $NHDT-Date: 1608175317 2020/12/17 03:21:57 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1608664223 2020/12/22 19:10:23 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -4387,7 +4387,7 @@ up (default yes).
 Number of lines for traditional below-the-map status display.
 Acceptable values are \f(CR2\fP and \f(CR3\fP (default is \f(CR2\fP).
 .lp ""
-For \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
+When set to \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
 mainly shows status conditions on their own line.
 A display capable of showing at least 25 lines is recommended.
 The value can be toggled back and forth during the game with the \(oqO\(cq
@@ -4408,10 +4408,6 @@ original format, with the status window spread out vertically.
 A value of \f(CR2\fP makes status be slightly condensed, moving some
 fields to different lines to eliminate one whole line, reducing the
 height needed.
-For \f(CRQt\fP,
-.op statuslines
-can only be set in the configuration file or via NETHACKOPTIONS, not
-with the \(oqO\(cq command.
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.
