@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1596498167 2020/08/03 23:42:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1608673691 2020/12/22 21:48:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -146,20 +146,23 @@ boolean check_pit;
 {
     struct trap *t;
 
-    if (u.uswallow)
+    if (u.uswallow || (u.ustuck && !sticks(g.youmonst.data))
+        || (Levitation && !(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))))
         return FALSE;
     /* Restricted/unskilled riders can't reach the floor */
     if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
         return FALSE;
-    if (check_pit && !Flying
-        && (t = t_at(u.ux, u.uy)) != 0
+    if (u.uundetected && ceiling_hider(g.youmonst.data))
+        return FALSE;
+
+    if (Flying || g.youmonst.data->msize >= MZ_HUGE)
+        return TRUE;
+
+    if (check_pit && (t = t_at(u.ux, u.uy)) != 0
         && (uteetering_at_seen_pit(t) || uescaped_shaft(t)))
         return FALSE;
 
-    return (boolean) ((!Levitation || Is_airlevel(&u.uz)
-                       || Is_waterlevel(&u.uz))
-                      && (!u.uundetected || !is_hider(g.youmonst.data)
-                          || u.umonnum == PM_TRAPPER));
+    return TRUE;
 }
 
 /* give a message after caller has determined that hero can't reach */

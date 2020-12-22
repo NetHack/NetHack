@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1601595711 2020/10/01 23:41:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.272 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1608673693 2020/12/22 21:48:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -598,11 +598,11 @@ int what; /* should be a long */
             return 0;
         }
         /* no pickup if levitating & not on air or water level */
-        if (!can_reach_floor(TRUE)) {
+        t = t_at(u.ux, u.uy);
+        if (!can_reach_floor(t && is_pit(t->ttyp))) {
             (void) describe_decor(); /* even when !flags.mention_decor */
             if ((g.multi && !g.context.run) || (autopickup && !flags.pickup)
-                || ((t = t_at(u.ux, u.uy)) != 0
-                    && (uteetering_at_seen_pit(t) || uescaped_shaft(t))))
+                || (t && (uteetering_at_seen_pit(t) || uescaped_shaft(t))))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
@@ -1780,8 +1780,9 @@ int x, y;
 boolean looting; /* loot vs tip */
 {
     const char *verb = looting ? "loot" : "tip";
+    struct trap *t = t_at(x, y);
 
-    if (!can_reach_floor(TRUE)) {
+    if (!can_reach_floor(t && is_pit(t->ttyp))) {
         if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
             rider_cant_reach(); /* not skilled enough to reach */
         else

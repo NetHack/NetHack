@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1608335164 2020/12/18 23:46:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1608673692 2020/12/22 21:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2692,6 +2692,8 @@ boolean newlev;
 static int
 pickup_checks()
 {
+    struct trap *traphere;
+
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck->minvent) {
@@ -2707,8 +2709,8 @@ pickup_checks()
         }
     }
     if (is_pool(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
-            || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(g.youmonst.data)
+            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
             You("cannot dive into the %s to pick things up.",
                 hliquid("water"));
             return 0;
@@ -2718,8 +2720,8 @@ pickup_checks()
         }
     }
     if (is_lava(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
-            || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(g.youmonst.data)
+            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
             You_cant("reach the bottom to pick things up.");
             return 0;
         } else if (!likes_lava(g.youmonst.data)) {
@@ -2749,18 +2751,27 @@ pickup_checks()
             There("is nothing here to pick up.");
         return 0;
     }
-    if (!can_reach_floor(TRUE)) {
-        struct trap *traphere = t_at(u.ux, u.uy);
-        if (traphere
-            && (uteetering_at_seen_pit(traphere) || uescaped_shaft(traphere)))
-            You("cannot reach the bottom of the %s.",
-                is_pit(traphere->ttyp) ? "pit" : "abyss");
-        else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
+    traphere = t_at(u.ux, u.uy);
+    if (!can_reach_floor(traphere && is_pit(traphere->ttyp))) {
+        /* it here's a hole here, any objects here clearly aren't at
+           the bottom so only check for pits */
+        if (traphere && uteetering_at_seen_pit(traphere)) {
+            You("cannot reach the bottom of the pit.");
+        } else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
             rider_cant_reach();
-        else if (Blind && !can_reach_floor(TRUE))
+        } else if (Blind) {
             You("cannot reach anything here.");
-        else
-            You("cannot reach the %s.", surface(u.ux, u.uy));
+        } else {
+            const char *surf = surface(u.ux, u.uy);
+
+            if (traphere) {
+                if (traphere->ttyp == HOLE)
+                    surf = "edge of the hole";
+                else if (traphere->ttyp == TRAPDOOR)
+                    surf = "trap door";
+            }
+            You("cannot reach the %s.", surf);
+        }
         return 0;
     }
     return -1; /* can do normal pickup */

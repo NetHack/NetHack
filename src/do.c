@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1608673689 2020/12/22 21:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -254,6 +254,8 @@ deletedwithboulder:
             pline("%s %s into %s %s.", The(xname(obj)),
                   otense(obj, "tumble"), the_your[t->madeby_u],
                   is_pit(t->ttyp) ? "pit" : "hole");
+        if (is_hole(t->ttyp) && ship_object(obj, x, y, FALSE))
+            return TRUE;
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
@@ -698,8 +700,6 @@ boolean with_impact;
     if (obj == uswapwep)
         setuswapwep((struct obj *) 0);
 
-    if (!u.uswallow && flooreffects(obj, u.ux, u.uy, "drop"))
-        return;
     if (u.uswallow) {
         /* hero has dropped an item while inside an engulfer */
         if (obj != uball) { /* mon doesn't pick up ball */
@@ -711,6 +711,8 @@ boolean with_impact;
                 (void) mpickobj(u.ustuck, obj);
         }
     } else {
+        if (flooreffects(obj, u.ux, u.uy, "drop"))
+            return;
         place_object(obj, u.ux, u.uy);
         if (with_impact)
             container_impact_dmg(obj, u.ux, u.uy);

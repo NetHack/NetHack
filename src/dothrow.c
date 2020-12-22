@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1607200366 2020/12/05 20:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1608673690 2020/12/22 21:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -451,11 +451,32 @@ boolean verbosely; /* usually True; False if caller has given drop message */
         dropy(obj);
         return;
     }
-    if (IS_ALTAR(levl[u.ux][u.uy].typ))
+    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         doaltarobj(obj);
-    else if (verbosely)
-        pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"),
-              surface(u.ux, u.uy));
+    } else if (verbosely) {
+        const char *surf = surface(u.ux, u.uy);
+        struct trap *t = t_at(u.ux, u.uy);
+
+        /* describe something that might keep the object where it is
+           or precede next message stating that it falls */
+        if (t && t->tseen) {
+            switch (t->ttyp) {
+            case TRAPDOOR:
+                surf = "trap door";
+                break;
+            case HOLE:
+                surf = "edge of the hole";
+                break;
+            case PIT:
+            case SPIKED_PIT:
+                surf = "edge of the pit";
+                break;
+            default:
+                break;
+            }
+        }
+        pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"), surf);
+    }
 
     if (hero_breaks(obj, u.ux, u.uy, TRUE))
         return;

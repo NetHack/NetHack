@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.396 $ $NHDT-Date: 1608335163 2020/12/18 23:46:03 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.399 $ $NHDT-Date: 1608673688 2020/12/22 21:48:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -344,6 +344,7 @@ when protection from shape changers begins, force mimic out of concealment
 best possible armor class reduced from -127 to -99; worst from +127 to +99;
 	charged or enchanted individual items also capped at +/- 99 (affects
 	wizard mode wishing, negligible effect on normal play)
+fix several inconsistencies for objects at hole locations
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

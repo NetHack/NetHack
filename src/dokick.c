@@ -1,4 +1,4 @@
-/* NetHack 3.7	dokick.c	$NHDT-Date: 1606343576 2020/11/25 22:32:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.7	dokick.c	$NHDT-Date: 1608673689 2020/12/22 21:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1814,23 +1814,22 @@ xchar x, y;
 
     g.gate_str = 0;
     /* this matches the player restriction in goto_level() */
-    if (on_level(&u.uz, &qstart_level) && !ok_to_quest())
+    if (on_level(&u.uz, &qstart_level) && !ok_to_quest()) {
         return MIGR_NOWHERE;
-
+    }
     if (stway && !stway->up && !stway->isladder) {
         g.gate_str = "down the stairs";
         return (stway->tolev.dnum == u.uz.dnum) ? MIGR_STAIRS_UP
-                                : MIGR_SSTAIRS;
+                                                : MIGR_SSTAIRS;
     }
     if (stway && !stway->up && stway->isladder) {
         g.gate_str = "down the ladder";
         return MIGR_LADDER_UP;
     }
-
-    if (((ttmp = t_at(x, y)) != 0 && ttmp->tseen)
-        && is_hole(ttmp->ttyp)) {
+    /* hole will always be flagged as seen; trap drop might or might not */
+    if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen && is_hole(ttmp->ttyp)) {
         g.gate_str = (ttmp->ttyp == TRAPDOOR) ? "through the trap door"
-                                            : "through the hole";
+                                              : "through the hole";
         return MIGR_RANDOM;
     }
     return MIGR_NOWHERE;
