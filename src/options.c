@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1607692223 2020/12/11 13:10:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.486 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1608606126 2020/12/22 03:02:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.489 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8226,6 +8226,7 @@ void
 option_help()
 {
     char buf[BUFSZ], buf2[BUFSZ];
+    const char *optname;
     register int i;
     winid datawin;
 
@@ -8237,22 +8238,28 @@ option_help()
 
     /* Boolean options */
     for (i = 0; allopt[i].name; i++) {
-        if (allopt[i].addr) {
-            if (allopt[i].addr == &iflags.sanity_check && !wizard)
-                continue;
-            if (allopt[i].addr == &iflags.menu_tab_sep && !wizard)
-                continue;
-            next_opt(datawin, allopt[i].name);
-        }
+        if ((allopt[i].opttyp != BoolOpt || !allopt[i].addr)
+            || (allopt[i].setwhere == set_wizonly && !wizard))
+            continue;
+        optname = allopt[i].name;
+        if ((is_wc_option(optname) && !wc_supported(optname))
+            || (is_wc2_option(optname) && !wc2_supported(optname)))
+            continue;
+        next_opt(datawin, optname);
     }
     next_opt(datawin, "");
 
     /* Compound options */
     putstr(datawin, 0, "Compound options:");
     for (i = 0; allopt[i].name; i++) {
-        if (allopt[i].opttyp != CompOpt) /* skip booleans */
+        if (allopt[i].opttyp != CompOpt
+            || (allopt[i].setwhere == set_wizonly && !wizard))
             continue;
-        Sprintf(buf2, "`%s'", allopt[i].name);
+        optname = allopt[i].name;
+        if ((is_wc_option(optname) && !wc_supported(optname))
+            || (is_wc2_option(optname) && !wc2_supported(optname)))
+            continue;
+        Sprintf(buf2, "`%s'", optname);
         Sprintf(buf, "%-20s - %s%c", buf2, allopt[i].descr,
                 allopt[i + 1].name ? ',' : '.');
         putstr(datawin, 0, buf);

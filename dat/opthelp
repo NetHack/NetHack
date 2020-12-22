@@ -2,122 +2,150 @@ Boolean options not under specific compile flags (with default values in []):
 (You can learn which options exist in your version by checking your current
 option setting, which is reached via the 'O' command.)
 
-acoustics      can your character hear anything                   [TRUE]
-autodescribe   describe the terrain under cursor                  [FALSE]
-autodig        dig if moving and wielding digging tool            [FALSE]
-autoopen       walking into a door attempts to open it            [TRUE]
-autopickup     automatically pick up objects you move over        [TRUE]
-autoquiver     when firing with an empty quiver, select some      [FALSE]
+acoustics      can your character hear anything                    [True]
+autodescribe   describe the terrain under cursor                  [False]
+autodig        dig if moving and wielding digging tool            [False]
+autoopen       walking into a door attempts to open it             [True]
+autopickup     automatically pick up objects you move over         [True]
+autoquiver     when firing with an empty quiver, select some      [False]
                suitable inventory weapon to fill the quiver
-autounlock     when opening a locked door or looting a locked     [TRUE]
+autounlock     when opening a locked door or looting a locked      [True]
                container while carrying a key, offer to use it
-BIOS           allow the use of IBM ROM BIOS calls                [FALSE]
-blind          your character is permanently blind                [FALSE]
-bones          allow loading bones files                          [TRUE]
-clicklook      look at map by clicking right mouse button         [FALSE]
-cmdassist      give help for errors on direction & other commands [TRUE]
-confirm        ask before hitting tame or peaceful monsters       [TRUE]
-dark_room      show floor not in sight in different color         [TRUE]
-eight_bit_tty  send 8-bit characters straight to terminal         [FALSE]
-extmenu        tty, curses: use menu for # (extended commands)    [FALSE]
+BIOS           allow the use of IBM ROM BIOS calls                [False]
+blind          your character is permanently blind                [False]
+bones          allow loading bones files                           [True]
+clicklook      look at map by clicking right mouse button         [False]
+cmdassist      give help for errors on direction & other commands  [True]
+confirm        ask before hitting tame or peaceful monsters        [True]
+dark_room      show floor not in sight in different color          [True]
+eight_bit_tty  send 8-bit characters straight to terminal         [False]
+extmenu        tty, curses: use menu for # (extended commands)    [False]
                X11: menu has all commands (T) or traditional subset (F)
-fixinv         try to retain the same letter for the same object  [TRUE]
-force_invmenu  commands asking for inventory item show a menu     [FALSE]
-goldX          when filtering objects by bless/curse state,       [FALSE]
+female         deprecated; use compound option gender:female      [False]
+fixinv         try to retain the same letter for the same object   [True]
+force_invmenu  commands asking for inventory item show a menu     [False]
+goldX          when filtering objects by bless/curse state,       [False]
                whether to classify gold as X (unknown) or U (uncursed)
-help           print all available info when using the / command  [TRUE]
+help           print all available info when using the / command   [True]
 herecmd_menu   show menu of some possible commands when clicking
-               on yourself or next to you with mouse              [FALSE]
-ignintr        ignore interrupt signal, including breaks          [FALSE]
-implicit_uncursed  omit "uncursed" from inventory, if possible    [TRUE]
-legacy         print introductory message                         [TRUE]
-lit_corridor   show a dark corridor as lit if in sight            [FALSE]
-lootabc        use a/b/c rather than o/i/b when looting           [FALSE]
-mail           enable the mail daemon                             [TRUE]
-mention_decor  give feedback when walking across stairs, altars,  [FALSE]
+               on yourself or next to you with mouse              [False]
+ignintr        ignore interrupt signal, including breaks          [False]
+implicit_uncursed  omit "uncursed" from inventory, if possible     [True]
+legacy         print introductory message                          [True]
+lit_corridor   show a dark corridor as lit if in sight            [False]
+lootabc        use a/b/c rather than o/i/b when looting           [False]
+mail           enable the mail daemon                              [True]
+mention_decor  give feedback when walking across stairs, altars,  [False]
                fountains, and such even when not obscured by objects
-mention_walls  give feedback when walking against a wall          [FALSE]
-menu_objsyms   show object symbols in menus if it is selectable   [FALSE]
-menu_overlay   overlay menus on the screen and align to right     [TRUE]
-nudist         start your character without armor                 [FALSE]
-null           allow nulls to be sent to your terminal            [TRUE]
+mention_walls  give feedback when walking against a wall          [False]
+menu_objsyms   show object symbols in menus if it is selectable   [False]
+menu_overlay   overlay menus on the screen and align to right      [True]
+menucolors     enable MENUCOLOR pattern matching to highlight     [False]
+               lines in object menus like inventory; might highlight with
+               bold, inverse, &c even when color is unavailable or toggled off
+nudist         start your character without armor                 [False]
+null           allow nulls to be sent to your terminal             [True]
                try turning this option off (forcing NetHack to use its own
                delay code) if moving objects seem to teleport across rooms
-perm_invent    keep inventory in a permanent window               [FALSE]
-pickup_thrown  override pickup_types for thrown objects           [TRUE]
-pushweapon     when wielding a new weapon, put your previously    [FALSE]
+perm_invent    keep inventory in a permanent window               [False]
+pickup_thrown  override pickup_types for thrown objects            [True]
+pushweapon     when wielding a new weapon, put your previously    [False]
                wielded weapon into the secondary weapon slot
-quick_farsight usually skip the chance to browse the map when     [FALSE]
+quick_farsight usually skip the chance to browse the map when     [False]
                randomly triggered clairvoyance takes place
-rawio          allow the use of raw I/O                           [FALSE]
-rest_on_space  count the space bar as a rest character            [FALSE]
-safe_pet       prevent you from (knowingly) attacking your pet(s) [TRUE]
-safe_wait      require use of 'm' prefix before '.' or 's' to     [TRUE]
+rawio          allow the use of raw I/O                           [False]
+rest_on_space  count the space bar as a rest character            [False]
+safe_pet       prevent you from (knowingly) attacking your pet(s)  [True]
+safe_wait      require use of 'm' prefix before '.' or 's' to      [True]
                wait or search when adjacent to a hostile monster
-sanity_check   perform data sanity checks                         [FALSE]
-showexp        display your accumulated experience points         [FALSE]
-showrace       show yourself by your race rather than by role     [FALSE]
-silent         don't use your terminal's bell sound               [TRUE]
-sortpack       group similar kinds of objects in inventory        [TRUE]
-sparkle        display sparkly effect for resisted magical        [TRUE]
+sanity_check   perform data sanity checks                         [False]
+showexp        display your accumulated experience points         [False]
+showrace       show yourself by your race rather than by role     [False]
+silent         don't use your terminal's bell sound                [True]
+sortpack       group similar kinds of objects in inventory         [True]
+sparkle        display sparkly effect for resisted magical         [True]
                attacks (e.g. fire attack on fire-resistant monster)
-standout       use standout mode for --More-- on messages         [FALSE]
-status_updates update the status lines                            [TRUE]
-time           display elapsed game time, in moves                [FALSE]
-tombstone      print tombstone when you die                       [TRUE]
-toptenwin      print topten in a window rather than stdout        [FALSE]
-travel         enables travelling via mouse click if supported;   [TRUE]
+standout       use standout mode for --More-- on messages         [False]
+status_updates update the status lines                             [True]
+time           display elapsed game time, in moves                [False]
+tombstone      print tombstone when you die                        [True]
+toptenwin      print topten in a window rather than stdout        [False]
+travel         enables travelling via mouse click if supported;    [True]
                can be toggled off to prevent mouse clicks on the map from
                attempting to move the hero; does not affect travel via '_'
-use_darkgray   use bold black instead of blue for black glyphs.   [TRUE]
-use_inverse    display detected monsters in highlighted manner    [FALSE]
-verbose        print more commentary during the game              [TRUE]
-whatis_menu    show menu when getting a map location              [FALSE]
-whatis_moveskip skip same glyphs when getting a map location      [FALSE]
+use_darkgray   use bold black instead of blue for black glyphs.    [True]
+use_inverse    display detected monsters in highlighted manner    [False]
+verbose        print more commentary during the game               [True]
+whatis_menu    show menu when getting a map location              [False]
+whatis_moveskip skip same glyphs when getting a map location      [False]
 
 
 There are further boolean options controlled by compilation flags.
 
 Boolean option if INSURANCE was set at compile time:
-checkpoint     save game state after each level change, for       [TRUE]
+checkpoint     save game state after each level change, for        [True]
                possible recovery after program crash
 
 Boolean option if NEWS was set at compile time:
-news           print any news from game administrator on startup  [TRUE]
+news           print any news from game administrator on startup   [True]
 
 Boolean option if SCORE_ON_BOTL was set at compile time:
-showscore      display your approximate accumulated score         [FALSE]
+showscore      display your approximate accumulated score         [False]
 
 Boolean options if TEXTCOLOR was set at compile time:
-color          use different colors for objects on screen [TRUE for micros]
-hilite_pet     display pets in a highlighted manner               [FALSE]
-hilite_pile    display item piles in a highlighted manner         [FALSE]
+color          use different colors for objects on screen  [True for micros]
+hilite_pet     display pets in a highlighted manner               [False]
+hilite_pile    display item piles in a highlighted manner         [False]
 
 Boolean option if TIMED_DELAY was set at compile time (tty interface only):
-timed_delay    on unix and VMS, use a timer instead of sending    [TRUE]
+timed_delay    on unix and VMS, use a timer instead of sending     [True]
                extra screen output when attempting to pause for
                display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.
 
 Boolean option for Amiga, or for others if ALTMETA was set at compile time:
-altmeta        For Amiga, treat Alt+key as Meta+key.              [TRUE]
+altmeta        For Amiga, treat Alt+key as Meta+key.               [True]
 altmeta        For unix and VMS, treat two character sequence
-               "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [FALSE]
+               "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [False]
                obtains a command from player's keyboard.
 
 Boolean option if USE_TILES was set at compile time (MSDOS protected mode):
-preload_tiles  control whether tiles get pre-loaded into RAM at   [TRUE]
+preload_tiles  control whether tiles get pre-loaded into RAM at    [True]
                the start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.
 
 Boolean option if TTY_TILES_ESCCODES was set at compile time (tty only):
-vt_tiledata    insert extra data escape code markers into output  [FALSE]
+vt_tiledata    insert extra data escape code markers into output  [False]
 
 Boolean option if TTY_SOUND_ESCCODES was set at compile time (tty only):
-vt_sounddata   insert sound data escape code markers into output  [FALSE]
+vt_sounddata   insert sound data escape code markers into output  [False]
 
-Any Boolean option can be negated by prefixing it with a '!' or 'no'.
+Boolean options which may be available depending upon which interfaces
+the program has been built to support.  If it supports multiple such,
+some of these may show as available for setting but not do anything if
+you happen to be using a different interface than the one(s) they're for:
+ascii_map      show map as text, forces tiles_map Off; Qt, X11
+guicolor       curses
+hitpointbar    curses, tty, Windows GUI if statushilites enabled;
+               Qt without statushilites; X11 if 'fancy_status' disabled
+               (via X application defaults) and statushilities enabled
+popup_dialog   curses, Qt, Windows GUI
+selectsaved    tty (Qt and Windows GUI do this unconditionally)
+splash_screen  curses, Qt, Windows GUI
+tiled_map      show map as tiles, forces ascii_map Off; Qt, X11
 
+Boolean options available when running in debug mode (aka wizard mode):
+menu_tab_sep   menu formatting--do not touch
+monpolycontrol have player choose shape-changing monsters' new shapes
+travel_debug   not implemented?
+wizweight      include item weights in inventory display
+
+Any Boolean option can be set to True by including it among options being
+set, or negated (set to False) by prefixing its name with a '!' or 'no'.
+Alternatively, the compound option syntax can be used: 'optname:true' and
+'optname:false'.
+
+ - - - - -
 
 Compound options are written as option_name:option_value.
 
@@ -131,8 +159,8 @@ disclose      the types of information you want         [ni na nv ng nc no]
               'n' prompt with default "no", 'y' prompt with default "yes",
               'a' prompt to select sorting order (for suffix 'v' only);
               suffix: 'i' inventory, 'a' attributes, 'v' vanquished
-              monsters, 'g' genocided and extinct monsters, 'c' conduct,
-              'o' dungeon overview)
+              monsters, 'g' genocided and extinct monsters, 'c' conduct
+              and achievements, 'o' dungeon overview)
 fruit         the name of a fruit you enjoy eating             [slime mold]
               (basically a whimsy which NetHack uses from time to time).
 hilite_status specifies a rule for highlighting a status field           []
@@ -298,7 +326,7 @@ statuslines whether to use expanded (3) or condensed (2) status         [2]
            startup; also unlike tty and curses, 2 is recommended over 3)
 windowtype windowing system to be used    [depends on operating system and
            compile-time setup]    if more than one choice is available.
-           Most instances of the program support only one window-type;
+           Some instances of the program support only one window-type;
            when that is the case, you don't need to specify anything.
            The list of supported window-types in your program can be
            seen while the program is running by using the #version
