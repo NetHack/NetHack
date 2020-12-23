@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1606009001 2020/11/22 01:36:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -419,6 +419,7 @@ int how;
         Strcat(buf, "the ");
         g.killer.format = KILLED_BY;
     }
+    (void) monhealthdescr(mtmp, TRUE, eos(buf));
     if (mtmp->minvis)
         Strcat(buf, "invisible ");
     if (distorted)

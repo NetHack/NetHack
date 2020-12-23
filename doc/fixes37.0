@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.399 $ $NHDT-Date: 1608673688 2020/12/22 21:48:08 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ $NHDT-Date: 1608749030 2020/12/23 18:43:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -686,6 +686,9 @@ assign default key binding for <del> or <delete> to execute #terrain
 assign M-X to #exploremode
 make #herecmdmenu and #therecmdmenu autocomplete
 add 'sortdiscoveries' option to control output of '\' and '`' commands
+include an indication of monsters' health during farlook feedback (including
+	/M and autodescribe); also include it in death reason when killed by
+	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
 
 
 Platform- and/or Interface-Specific New Features

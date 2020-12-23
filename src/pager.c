@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1607735717 2020/12/12 01:15:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,14 +12,13 @@
 static boolean FDECL(is_swallow_sym, (int));
 static int FDECL(append_str, (char *, const char *));
 static void FDECL(look_at_object, (char *, int, int, int));
-static void FDECL(look_at_monster, (char *, char *,
-                                        struct monst *, int, int));
+static void FDECL(look_at_monster, (char *, char *, struct monst *, int, int));
 static struct permonst *FDECL(lookat, (int, int, char *, char *));
 static void FDECL(checkfile, (char *, struct permonst *,
-                                  BOOLEAN_P, BOOLEAN_P, char *));
+                              BOOLEAN_P, BOOLEAN_P, char *));
 static void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 static void FDECL(do_supplemental_info, (char *, struct permonst *,
-                                             BOOLEAN_P));
+                                         BOOLEAN_P));
 static void NDECL(whatdoes_help);
 static void NDECL(docontact);
 static void NDECL(dispfile_help);
@@ -100,6 +99,32 @@ char *outbuf;
                 uball ? ansimpleoname(uball) : "nothing?");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
         Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+    return outbuf;
+}
+
+/* format description of 'mon's health for look_at_monster(), done_in_by() */
+char *
+monhealthdescr(mon, addspace, outbuf)
+struct monst *mon;
+boolean addspace;
+char *outbuf;
+{
+    int mhp_max = max(mon->mhpmax, 1), /* bullet proofing */
+        pct = (mon->mhp * 100) / mhp_max;
+
+    if (mon->mhp >= mhp_max)
+        Strcpy(outbuf, "uninjured");
+    else if (mon->mhp <= 1 || pct < 5)
+        Sprintf(outbuf, "%s%s", (mon->mhp > 0) ? "nearly " : "",
+                !nonliving(mon->data) ? "deceased" : "defunct");
+    else
+        Sprintf(outbuf, "%swounded",
+                (pct >= 95) ? "barely "
+                : (pct >= 80) ? "slightly "
+                  : (pct < 20) ? "heavily "
+                    : "");
+    if (addspace)
+        (void) strkitten(outbuf, ' ');
     return outbuf;
 }
 
@@ -280,16 +305,17 @@ char *buf, *monbuf; /* buf: output, monbuf: optional output */
 struct monst *mtmp;
 int x, y;
 {
-    char *name, monnambuf[BUFSZ];
+    char *name, monnambuf[BUFSZ], healthbuf[BUFSZ];
     boolean accurate = !Hallucination;
 
     name = (mtmp->data == &mons[PM_COYOTE] && accurate)
               ? coyotename(mtmp, monnambuf)
               : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-    Sprintf(buf, "%s%s%s",
+    Sprintf(buf, "%s%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
                 ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
                 : "",
+            accurate ? monhealthdescr(mtmp, TRUE, healthbuf) : "",
             (mtmp->mtame && accurate)
                 ? "tame "
                 : (mtmp->mpeaceful && accurate)

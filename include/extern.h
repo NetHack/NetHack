@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1607945415 2020/12/14 11:30:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.932 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1608749030 2020/12/23 18:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.934 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1866,6 +1866,7 @@ E void NDECL(msgtype_free);
 /* ### pager.c ### */
 
 E char *FDECL(self_lookat, (char *));
+E char *FDECL(monhealthdescr, (struct monst *mon, BOOLEAN_P, char *));
 E void FDECL(mhidden_description, (struct monst *, BOOLEAN_P, char *));
 E boolean FDECL(object_from_map, (int,int,int,struct obj **));
 E int FDECL(do_screen_description, (coord, BOOLEAN_P, int, char *,
