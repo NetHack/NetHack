@@ -1,5 +1,5 @@
 # NetHack 3.7	data.base
-# $NHDT-Date: 1605726848 2020/11/18 19:14:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $
+# $NHDT-Date: 1608767189 2020/12/23 23:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -1064,13 +1064,14 @@ cream pie
 	And welcomes little fishes in,
 	    With gently smiling jaws!
 		[ How Doth The Little Crocodile, by Lewis Carroll ]
+# Creosote is the Discworld analogue of Croesus
 croesus
 kroisos
 creosote
 	Croesus (in Greek: Kroisos), the wealthy last king of Lydia;
-	his empire was destroyed when he attacked Cyrus in 549, after
-	the Oracle of Delphi (q.v.) had told him:  "if you attack the
-	Persians, you will destroy a mighty empire".  Herodotus
+	his empire was destroyed when he attacked Cyrus in 549 BC,
+	after the Oracle of Delphi (q.v.) had told him: "if you attack
+	the Persians, you will destroy a mighty empire".  Herodotus
 	relates of his legendary conversation with Solon of Athens,
 	who impressed upon him that being rich does not imply being
 	happy and that no one should be considered fortunate before
