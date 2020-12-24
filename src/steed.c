@@ -650,6 +650,8 @@ int reason; /* Player was thrown off etc. */
                  */
                 g.in_steed_dismounting = TRUE;
                 teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
+                if (sobj_at(BOULDER, cc.x, cc.y))
+                    sokoban_guilt();
                 g.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */
