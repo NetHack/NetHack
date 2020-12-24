@@ -2407,7 +2407,8 @@ struct obj *obj;
                               && mon->data != &mons[PM_KI_RIN]);
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
-        if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed))
+        if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed)
+            && !obj->olocked)
             return TRUE;
         break;
     case FOOD_CLASS:
