@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1606765212 2020/11/30 19:40:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1608846067 2020/12/24 21:41:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3783,6 +3783,15 @@ register struct obj *otmp, *obj;
     if (!has_omailcmd(obj) ? has_omailcmd(otmp)
         : (!has_omailcmd(otmp) || strcmp(OMAILCMD(obj), OMAILCMD(otmp)) != 0))
         return FALSE;
+
+#ifdef MAIL_STRUCTURES
+    if (obj->otyp == SCR_MAIL
+        /* wished or bones mail and hand written stamped scrolls
+           each have two flavors; spe keeps them separate from each
+           other but we want to keep their flavors separate too */
+        && obj->spe > 0 && (obj->o_id % 2) != (otmp->o_id % 2))
+        return FALSE;
+#endif
 
     /* should be moot since matching artifacts wouldn't be unique */
     if (obj->oartifact != otmp->oartifact)

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ $NHDT-Date: 1608749030 2020/12/23 18:43:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.401 $ $NHDT-Date: 1608846067 2020/12/24 21:41:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -445,6 +445,9 @@ a long worm with no visible segments (but one internal segment) might trigger
 	warning: tail 'segement' at <0,some_y>, worm at <mx,my> if teleported
 adding displacer beast inadvertently introduced a regression in swapping with
 	pets, allowing them to be pulled into water by hero on/over water
+splitting #if MAIL into #if MAIL_STRUCTURES and #if MAIL made it possible to
+	wish for and write scrolls of mail with MAIL disabled, but attempting
+	to read such a scroll issued impossible "What weird effect is this?"
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

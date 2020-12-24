@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1607945439 2020/12/14 11:30:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1608846072 2020/12/24 21:41:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -436,7 +436,7 @@ doread()
     }
 
     confused = (Confusion != 0);
-#ifdef MAIL
+#ifdef MAIL_STRUCTURES
     if (otyp == SCR_MAIL) {
         confused = FALSE; /* override */
         /* reading mail is a convenience for the player and takes
@@ -953,22 +953,38 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                      || objects[otyp].oc_name_known);
 
     switch (otyp) {
-#ifdef MAIL
-    case SCR_MAIL:
+#ifdef MAIL_STRUCTURES
+    case SCR_MAIL: {
+        boolean odd = (sobj->o_id % 2) == 1;
+
         g.known = TRUE;
-        if (sobj->spe == 2)
+        switch (sobj->spe) {
+        case 2:
             /* "stamped scroll" created via magic marker--without a stamp */
-            pline("This scroll is marked \"postage due\".");
-        else if (sobj->spe)
+            pline("This scroll is marked \"%s\".",
+                  odd ? "Postage Due" : "Return to Sender");
+            break;
+        case 1:
             /* scroll of mail obtained from bones file or from wishing;
-             * note to the puzzled: the game Larn actually sends you junk
-             * mail if you win!
-             */
-            pline(
-    "This seems to be junk mail addressed to the finder of the Eye of Larn.");
-        else
+               note to the puzzled: the game Larn actually sends you junk
+               mail if you win! */
+            pline("This seems to be %s.",
+                  odd ? "a chain letter threatening your luck"
+                  : "junk mail addressed to the finder of the Eye of Larn");
+            break;
+        default:
+#ifdef MAIL
             readmail(sobj);
+#else
+            /* unreachable since with MAIL undefined, sobj->spe won't be 0;
+               as a precaution, be prepared to give arbitrary feedback;
+               caller has already reported that it disappears upon reading */
+            pline("That was a scroll of mail?");
+#endif
+            break;
+        }
         break;
+    }
 #endif
     case SCR_ENCHANT_ARMOR: {
         register schar s;
