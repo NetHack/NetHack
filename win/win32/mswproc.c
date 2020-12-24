@@ -2796,6 +2796,8 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
+    if (g.program_state.exiting && !strcmp(text, "\n"))
+        text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 
