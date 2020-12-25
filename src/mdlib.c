@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1596567095 2020/08/04 18:51:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1608933420 2020/12/25 21:57:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -478,6 +478,13 @@ static const char *build_opts[] = {
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     "external program as a message handler",
 #endif
+#if defined(HANGUPHANDLING) && !defined(NO_SIGNAL)
+#ifdef SAFERHANGUP
+    "deferred handling of hangup signal",
+#else
+    "immediate handling of hangup signal",
+#endif
+#endif
 #ifdef INSURANCE
     "insurance files for recovering from crashes",
 #endif
@@ -709,9 +716,9 @@ build_options()
             continue;
 #endif
 #endif /* !MAKEDEFS_C && FOR_RUNTIME */
-        opt_out_words(strcat(strcpy(buf, build_opts[i]),
-                             (i < SIZE(build_opts) - 1) ? "," : "."),
-                      &length);
+        Strcat(strcpy(buf, build_opts[i]),
+               (i < SIZE(build_opts) - 1) ? "," : ".");
+        opt_out_words(buf, &length);
     }
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))

@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1608233885 2020/12/17 19:38:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.437 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1608933418 2020/12/25 21:56:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.440 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2875,6 +2875,10 @@ wiz_migrate_mons()
 }
 #endif
 
+#ifndef DOAGAIN /* might have gotten undefined in config.h */
+#define DOAGAIN '\0' /* undefined => 0, '\0' => no key to activate redo */
+#endif
+
 static struct {
     int nhkf;
     uchar key;
@@ -3364,7 +3368,9 @@ register char *cmd;
         g.context.move = FALSE;
         return;
     }
-    if (*cmd == DOAGAIN && !g.in_doagain && g.saveq[0]) {
+    /* DOAGAIN might be '\0'; if so, don't execute it even if *cmd is too */
+    if ((*cmd && *cmd == g.Cmd.spkeys[NHKF_DOAGAIN])
+        && !g.in_doagain && g.saveq[0]) {
         g.in_doagain = TRUE;
         g.stail = 0;
         rhack((char *) 0); /* read and execute command */
@@ -3475,9 +3481,9 @@ register char *cmd;
         break;
     }
 
-    /* some special prefix handling */
-    /* overload 'm' prefix to mean "request a menu" */
-    if (prefix_seen && cmd[0] == g.Cmd.spkeys[NHKF_REQMENU]) {
+    /* after movement--if reqmenu duplicates a prefix, movement takes
+       precedence; "request a menu" (default 'm') */
+    if (cmd[0] == g.Cmd.spkeys[NHKF_REQMENU]) {
         /* (for func_tab cast, see below) */
         const struct ext_func_tab *ft = g.Cmd.commands[cmd[1] & 0xff];
         int NDECL((*func)) = ft ? ((struct ext_func_tab *) ft)->ef_funct : 0;
@@ -3485,6 +3491,9 @@ register char *cmd;
         if (func && accept_menu_prefix(func)) {
             iflags.menu_requested = TRUE;
             ++cmd;
+            prefix_seen = FALSE;
+        } else {
+            prefix_seen = TRUE;
         }
     }
 
@@ -3518,10 +3527,14 @@ register char *cmd;
         g.context.mv = TRUE;
         domove();
         return;
-    } else if (prefix_seen && cmd[1] == g.Cmd.spkeys[NHKF_ESC]) {
-        /* <prefix><escape> */
-        /* don't report "unknown command" for change of heart... */
-        bad_command = FALSE;
+    } else if (prefix_seen) {
+        if (cmd[1] == g.Cmd.spkeys[NHKF_ESC]) {
+            /* <prefix><escape> */
+            /* don't report "unknown command" for change of heart... */
+            bad_command = FALSE;
+        } else { /* prefix followed by non-movement command */
+            bad_command = TRUE; /* skip cmdlist[] loop */
+        }
     } else if (*cmd == ' ' && !flags.rest_on_space) {
         bad_command = TRUE; /* skip cmdlist[] loop */
 
@@ -3641,7 +3654,8 @@ static boolean
 prefix_cmd(c)
 char c;
 {
-    return (c == g.Cmd.spkeys[NHKF_RUSH]
+    return (c == g.Cmd.spkeys[NHKF_REQMENU]
+            || c == g.Cmd.spkeys[NHKF_RUSH]
             || c == g.Cmd.spkeys[NHKF_RUN]
             || c == g.Cmd.spkeys[NHKF_NOPICKUP]
             || c == g.Cmd.spkeys[NHKF_RUN_NOPICKUP]
@@ -4448,7 +4462,7 @@ parse()
     if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
         g.multi = g.last_multi = 0;
-    } else if (foo == g.Cmd.spkeys[NHKF_DOAGAIN] || g.in_doagain) {
+    } else if ((foo && foo == g.Cmd.spkeys[NHKF_DOAGAIN]) || g.in_doagain) {
         g.multi = g.last_multi;
     } else {
         g.last_multi = g.multi;

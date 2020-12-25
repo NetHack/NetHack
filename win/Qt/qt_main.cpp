@@ -814,7 +814,8 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     QSignalMapper* sm = new QSignalMapper(this);
     connect(sm, SIGNAL(mapped(const QString&)),
             this, SLOT(doKeys(const QString&)));
-    // 'donull' is a placeholder here; AddToolButton() will fix it up
+    // 'donull' is a placeholder here; AddToolButton() will fix it up;
+    // button will be omitted if DOAGAIN is bound to '\0'
     AddToolButton(toolbar, sm, "Again", donull, QPixmap(again_xpm));
     // this used to be called "Get" which is confusing to experienced players
     AddToolButton(toolbar, sm, "Pick up", dopickup, QPixmap(pickup_xpm));
@@ -888,20 +889,29 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     }
 }
 
+// add a toolbar button to invoke command 'name' via function '(*func)()'
 void NetHackQtMainWindow::AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
                                         const char *name, int NDECL((*func)),
                                         QPixmap xpm)
 {
-    QToolButton *tb = new SmallToolButton(xpm, QString(name), "Action",
-                                          sm, SLOT(map()), toolbar);
-    char actchar[32];
+    char actchar[2];
+    uchar key;
+
     // the ^A command is just a keystroke, not a full blown command function
-    if (!strcmp(name, "Again"))
-        (void) strkitten(actchar, ::g.Cmd.spkeys[NHKF_DOAGAIN]);
-    else
-        Sprintf(actchar, "%c", cmd_from_func(func));
-    sm->setMapping(tb, actchar);
-    toolbar->addWidget(tb);
+    if (!strcmp(name, "Again")) {
+        key = ::g.Cmd.spkeys[NHKF_DOAGAIN];
+    } else
+        key = (uchar) cmd_from_func(func);
+
+    // if key is valid, add a button for it; otherwise omit the command
+    // (won't work as intended if a different command is bound to same key)
+    if (key) {
+        QToolButton *tb = new SmallToolButton(xpm, QString(name), "Action",
+                                              sm, SLOT(map()), toolbar);
+        actchar[0] = '\0';
+        sm->setMapping(tb, strkitten(actchar, (char) key));
+        toolbar->addWidget(tb);
+    }
 }
 
 void NetHackQtMainWindow::zoomMap()

@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1596498529 2020/08/03 23:48:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1608933417 2020/12/25 21:56:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -482,7 +482,12 @@ typedef unsigned char uchar;
 #endif
 #endif
 
-#define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
+/* The "repeat" key used in cmd.c as NHKF_DOAGAIN; if commented out or the
+ * value is changed from C('A') to 0, it won't be bound to any keystroke
+ * unless you use the run-time configuration file's BIND directive for it.
+ * [Note: C() macro isn't defined yet but it will be before DOAGAIN is used.]
+ */
+#define DOAGAIN C('A') /* repeat previous command; default is ^A, '\001' */
 
 /* CONFIG_ERROR_SECURE: If user makes NETHACKOPTIONS point to a file ...
  *  TRUE: Show the first error, nothing else.

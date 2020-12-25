@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.401 $ $NHDT-Date: 1608846067 2020/12/24 21:41:07 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ $NHDT-Date: 1608933417 2020/12/25 21:56:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -345,6 +345,15 @@ best possible armor class reduced from -127 to -99; worst from +127 to +99;
 	charged or enchanted individual items also capped at +/- 99 (affects
 	wizard mode wishing, negligible effect on normal play)
 fix several inconsistencies for objects at hole locations
+make repeat (^A) work when bound to some other keystroke
+if a prefix key was bound to some character which ordinarily ran a regular
+	command and that command wasn't bound to another key, typing the
+	prefix followed by a non-movement key behaved strangely:  instead
+	of reporting "invalid direction" it would run the other command
+	(actually depended upon relative order of prefix's new and old key)
+reqmenu (the request-a-menu prefix supported by a handful of non-movement
+	commands) could be bound to some key other than 'm' but it only
+	worked if the new key was also a movement prefix
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -692,6 +701,8 @@ add 'sortdiscoveries' option to control output of '\' and '`' commands
 include an indication of monsters' health during farlook feedback (including
 	/M and autodescribe); also include it in death reason when killed by
 	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
+make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
+	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
 
 
 Platform- and/or Interface-Specific New Features
