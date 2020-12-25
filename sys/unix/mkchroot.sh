@@ -10,7 +10,8 @@ CHROOT="/opt/dgl"
 # COMPRESS from include/config.h; the compression binary to copy. leave blank to skip.
 COMPRESSBIN="/bin/gzip"
 # nethack binary
-NETHACKBIN="$CHROOT/nh370/nethack"
+#NETHACKBIN="$CHROOT/nh370/nethack"
+NETHACKBIN=$1
 
 # END OF CONFIG
 ##############################################################################
@@ -68,6 +69,7 @@ if [ -n "$NETHACKBIN" -a ! -e "$NETHACKBIN" ]; then
   echo
 fi
 
+LIBS="$LIBS $NETHACKBIN"
 LIBS="$LIBS `findlibs $NETHACKBIN`"
 
 # Curses junk
