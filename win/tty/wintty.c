@@ -1,4 +1,4 @@
- /* NetHack 3.7	wintty.c	$NHDT-Date: 1606011660 2020/11/22 02:21:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.263 $ */
+ /* NetHack 3.7	wintty.c	$NHDT-Date: 1608861214 2020/12/25 01:53:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -294,7 +294,7 @@ const char *mesg;
     /*NOTREACHED*/
 }
 
-#if defined(SIGWINCH) && defined(CLIPPING)
+#if defined(SIGWINCH) && defined(CLIPPING) && !defined(NO_SIGNAL)
 static void FDECL(winch_handler, (int));
 
     /*
@@ -369,7 +369,7 @@ int sig_unused UNUSED;
         }
     }
 }
-#endif
+#endif /* SIGWINCH && CLIPPING && !NO_SIGNAL */
 
 /* destroy and recreate status window; extracted from winch_handler()
    and augmented for use by tty_preference_update() */
