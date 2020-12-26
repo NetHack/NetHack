@@ -1888,14 +1888,14 @@ struct permonst *ptr;
         if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
             || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
             n += 2;
-        else if (strcmp(ptr->mname, "grid bug"))
+        else if (strcmp(ptr->pmnames[NEUTRAL], "grid bug"))
             n += (tmp2 != AD_PHYS);
         n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
     }
 
     /*	Leprechauns are special cases.  They have many hit dice so they
 	can hit and are hard to kill, but they don't really do much damage. */
-    if (!strcmp(ptr->mname, "leprechaun"))
+    if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun"))
         n -= 2;
 
     /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
@@ -1973,7 +1973,7 @@ do_monstr()
     Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
     for (ptr = &mons[0]; ptr->mlet; ptr++) {
         i = mstrength(ptr);
-        Fprintf(ofp, "%-24s %2u\n", ptr->mname, (unsigned int) (uchar) i);
+        Fprintf(ofp, "%-24s %2u\n", ptr->pmnames[NEUTRAL], (unsigned int) (uchar) i);
     }
     Fprintf(ofp, " *\n */\n\n");
 
@@ -2021,9 +2021,9 @@ do_permonst()
             Fprintf(ofp, "\n        PM_");
         else
             Fprintf(ofp, "\n#define\tPM_");
-        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].mname, "were", 4))
+        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].pmnames[NEUTRAL], "were", 4))
             Fprintf(ofp, "HUMAN_");
-        for (nam = c = tmpdup(mons[i].mname); *c; c++)
+        for (nam = c = tmpdup(mons[i].pmnames[NEUTRAL]); *c; c++)
             if (*c >= 'a' && *c <= 'z')
                 *c -= (char) ('a' - 'A');
             else if (*c < 'A' || *c > 'Z')

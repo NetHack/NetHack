@@ -1453,15 +1453,15 @@ long new_value;
             buf[0] = highc(buf[0]);
             Strcat(buf, " the ");
             if (Upolyd) {
-                char mname[BUFSZ];
+                char mnam[BUFSZ];
                 int k;
 
-                Strcpy(mname, mons[u.umonnum].mname);
-                for (k = 0; mname[k] != '\0'; k++) {
-                    if (k == 0 || mname[k - 1] == ' ')
-                        mname[k] = highc(mname[k]);
+                Strcpy(mnam, pmname(&mons[u.umonnum], Ugender));
+                for (k = 0; mnam[k] != '\0'; k++) {
+                    if (k == 0 || mnam[k - 1] == ' ')
+                        mnam[k] = highc(mnam[k]);
                 }
-                Strcat(buf, mname);
+                Strcat(buf, mnam);
             } else
                 Strcat(buf,
                        rank_of(u.ulevel, g.pl_character[0], flags.female));

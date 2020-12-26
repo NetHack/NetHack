@@ -1159,9 +1159,6 @@ dokick()
         }
         if (IS_SINK(g.maploc->typ)) {
             int gend = poly_gender();
-            short washerndx = (gend == 1 || (gend == 2 && rn2(2)))
-                                  ? PM_INCUBUS
-                                  : PM_SUCCUBUS;
 
             if (Levitation)
                 goto dumb;
@@ -1185,10 +1182,12 @@ dokick()
                 g.maploc->looted |= S_LPUDDING;
                 return 1;
             } else if (!(g.maploc->looted & S_LDWASHER) && !rn2(3)
-                       && !(g.mvitals[washerndx].mvflags & G_GONE)) {
+                       && !(g.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
                 /* can't resist... */
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
-                if (makemon(&mons[washerndx], x, y, NO_MM_FLAGS))
+                if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
+                            (gend == 1 || (gend == 2 && rn2(2)))
+                                  ? MM_FEMALE : MM_MALE))
                     newsym(x, y);
                 g.maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);
@@ -1746,7 +1745,7 @@ unsigned long deliverflags;
 
             /* special treatment for orcs and their kind */
             if ((otmp->corpsenm & M2_ORC) != 0 && has_oname(otmp)) {
-                if (!has_mname(mtmp)) {
+                if (!has_mgivenname(mtmp)) {
                     if (at_crime_scene || !rn2(2))
                         mtmp = christen_orc(mtmp,
                                             at_crime_scene ? ONAME(otmp)

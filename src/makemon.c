@@ -247,14 +247,14 @@ register struct monst *mtmp;
                 }
                 break;
             }
-            if (mm == PM_ELVENKING) {
+            if (mm == PM_ELVENMONARCH) {
                 if (rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
                 if (!rn2(50))
                     (void) mongets(mtmp, CRYSTAL_BALL);
             }
         } else if (ptr->msound == MS_PRIEST
-                   || quest_mon_represents_role(ptr, PM_PRIEST)) {
+                   || quest_mon_represents_role(ptr, PM_CLERIC)) {
             otmp = mksobj(MACE, FALSE, FALSE);
             otmp->spe = rnd(3);
             if (!rn2(2))
@@ -428,7 +428,7 @@ register struct monst *mtmp;
         }
         break;
     case S_OGRE:
-        if (!rn2(mm == PM_OGRE_KING ? 3 : mm == PM_OGRE_LORD ? 6 : 12))
+        if (!rn2(mm == PM_OGRE_TYRANT ? 3 : mm == PM_OGRE_LEADER ? 6 : 12))
             (void) mongets(mtmp, BATTLE_AXE);
         else
             (void) mongets(mtmp, CLUB);
@@ -700,7 +700,7 @@ register struct monst *mtmp;
                 (void) mongets(mtmp, WAN_STRIKING);
             }
         } else if (ptr->msound == MS_PRIEST
-                   || quest_mon_represents_role(ptr, PM_PRIEST)) {
+                   || quest_mon_represents_role(ptr, PM_CLERIC)) {
             (void) mongets(mtmp, rn2(7) ? ROBE
                                         : rn2(3) ? CLOAK_OF_PROTECTION
                                                  : CLOAK_OF_MAGIC_RESISTANCE);
@@ -882,8 +882,8 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
         new_light_source(m2->mx, m2->my, emits_light(m2->data), LS_MONSTER,
                          monst_to_any(m2));
     /* if 'parent' is named, give the clone the same name */
-    if (has_mname(mon)) {
-        m2 = christen_monst(m2, MNAME(mon));
+    if (has_mgivenname(mon)) {
+        m2 = christen_monst(m2, MGIVENNAME(mon));
     } else if (mon->isshk) {
         m2 = christen_monst(m2, shkname(mon));
     }
@@ -946,7 +946,7 @@ boolean ghostly;
     result = ((int) g.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
-    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_PRIEST)
+    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
         g.mvitals[mndx].mvflags |= G_EXTINCT;
 
     if (g.mvitals[mndx].born < 255 && tally && (!ghostly || result))
@@ -956,7 +956,7 @@ boolean ghostly;
         && !(g.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (wizard) {
             debugpline1("Automatically extinguished %s.",
-                        makeplural(mons[mndx].mname));
+                        makeplural(mons[mndx].pmnames[NEUTRAL]));
         }
         g.mvitals[mndx].mvflags |= G_EXTINCT;
     }
@@ -1184,7 +1184,7 @@ long mmflags;
             return (struct monst *) 0;
         if (wizard && (g.mvitals[mndx].mvflags & G_EXTINCT)) {
             debugpline1("Explicitly creating extinct monster %s.",
-                        mons[mndx].mname);
+                        mons[mndx].pmnames[NEUTRAL]);
         }
     } else {
         /* make a random (common) monster that can survive here.
@@ -1236,9 +1236,9 @@ long mmflags;
     /* set up level and hit points */
     newmonhp(mtmp, mndx);
 
-    if (is_female(ptr))
+    if (is_female(ptr) || ((mmflags & MM_FEMALE) && !is_male(ptr)))
         mtmp->female = TRUE;
-    else if (is_male(ptr))
+    else if (is_male(ptr) || ((mmflags & MM_MALE) && !is_female(ptr)))
         mtmp->female = FALSE;
     /* leader and nemesis gender is usually hardcoded in mons[],
        but for ones which can be random, it has already been chosen
@@ -1369,7 +1369,7 @@ long mmflags;
        types; make sure their extended data is initialized to
        something sensible if caller hasn't specified MM_EPRI|MM_EMIN
        (when they're specified, caller intends to handle this itself) */
-    if ((mndx == PM_ALIGNED_PRIEST || mndx == PM_HIGH_PRIEST)
+    if ((mndx == PM_ALIGNED_CLERIC || mndx == PM_HIGH_CLERIC)
             ? !(mmflags & (MM_EPRI | MM_EMIN))
             : (mndx == PM_ANGEL && !(mmflags & MM_EMIN) && !rn2(3))) {
         struct emin *eminp;
@@ -1857,8 +1857,11 @@ struct monst *mtmp, *victim;
     oldtype = monsndx(ptr);
     newtype = (oldtype == PM_KILLER_BEE && !victim) ? PM_QUEEN_BEE
                                                     : little_to_big(oldtype);
+#if 0
+    /* gender-neutral PM_CLERIC now */
     if (newtype == PM_PRIEST && mtmp->female)
         newtype = PM_PRIESTESS;
+#endif
 
     /* growth limits differ depending on method of advancement */
     if (victim) {                       /* killed a monster */
@@ -1914,7 +1917,7 @@ struct monst *mtmp, *victim;
         if (g.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
-                      an(ptr->mname), mhe(mtmp),
+                      an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
             set_mon_data(mtmp, ptr); /* keep g.mvitals[] accurate */
             mondied(mtmp);
@@ -1932,7 +1935,7 @@ struct monst *mtmp, *victim;
                            (can't happen with 3.6.0 mons[], but perhaps
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
-                    ptr->mname);
+                    pmname(ptr, fem));
             pline("%s %s %s.", upstart(y_monnam(mtmp)),
                   (fem != mtmp->female) ? "changes into"
                                         : humanoid(ptr) ? "becomes"

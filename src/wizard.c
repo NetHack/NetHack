@@ -35,10 +35,10 @@ static NEARDATA const int nasties[] = {
     PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME,
     PM_DISPLACER_BEAST, PM_GENETIC_ENGINEER,
     /* chaotic */
-    PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LORD,
+    PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LEADER,
     PM_MASTER_MIND_FLAYER, PM_DISENCHANTER, PM_WINGED_GARGOYLE,
-    PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_LORD, PM_ELVENKING,
-    PM_OGRE_KING, PM_CAPTAIN, PM_GREMLIN,
+    PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_NOBLE, PM_ELVENMONARCH,
+    PM_OGRE_TYRANT, PM_CAPTAIN, PM_GREMLIN,
     /* lawful */
     PM_SILVER_DRAGON, PM_ORANGE_DRAGON, PM_GREEN_DRAGON,
     PM_YELLOW_DRAGON, PM_GUARDIAN_NAGA, PM_FIRE_GIANT,
@@ -543,11 +543,11 @@ int difcap; /* if non-zero, try to make difficulty be lower than this */
         || (mons[res].geno & (Inhell ? G_NOHELL : G_HELL)) != 0)
         alt = big_to_little(res);
     if (alt != res && (g.mvitals[alt].mvflags & G_GENOD) == 0) {
-        const char *mname = mons[alt].mname,
-                   *lastspace = rindex(mname, ' ');
+        const char *mnam = mons[alt].pmnames[NEUTRAL],
+                   *lastspace = rindex(mnam, ' ');
 
         /* only non-juveniles can become alternate choice */
-        if (strncmp(mname, "baby ", 5)
+        if (strncmp(mnam, "baby ", 5)
             && (!lastspace
                 || (strcmp(lastspace, " hatchling")
                     && strcmp(lastspace, " pup")

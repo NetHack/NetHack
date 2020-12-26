@@ -225,7 +225,8 @@ long entflags;
         if (allow_xx_yy && goodpos(xx, yy, &fakemon, entflags)) {
             return TRUE; /* 'cc' is set */
         } else {
-            debugpline3("enexto(\"%s\",%d,%d) failed", mdat->mname, xx, yy);
+            debugpline3("enexto(\"%s\",%d,%d) failed",
+                        mdat->pmnames[NEUTRAL], xx, yy);
             return FALSE;
         }
     }

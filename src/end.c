@@ -409,13 +409,13 @@ int how;
     /* "killed by the high priest of Crom" is okay,
        "killed by the high priest" alone isn't */
     if ((mptr->geno & G_UNIQ) != 0 && !(imitator && !mimicker)
-        && !(mptr == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
+        && !(mptr == &mons[PM_HIGH_CLERIC] && !mtmp->ispriest)) {
         if (!type_is_pname(mptr))
             Strcat(buf, "the ");
         g.killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
-    if (mptr == &mons[PM_GHOST] && has_mname(mtmp)) {
+    if (mptr == &mons[PM_GHOST] && has_mgivenname(mtmp)) {
         Strcat(buf, "the ");
         g.killer.format = KILLED_BY;
     }
@@ -427,14 +427,15 @@ int how;
 
     if (imitator) {
         char shape[BUFSZ];
-        const char *realnm = champtr->mname, *fakenm = mptr->mname;
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+                             *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
-            fakenm = mptr->mname;
+            fakenm = pmname(mptr, Mgender(mtmp));
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
@@ -459,8 +460,8 @@ int how;
         mptr = mtmp->data; /* reset for mimicker case */
     } else if (mptr == &mons[PM_GHOST]) {
         Strcat(buf, "ghost");
-        if (has_mname(mtmp))
-            Sprintf(eos(buf), " of %s", MNAME(mtmp));
+        if (has_mgivenname(mtmp))
+            Sprintf(eos(buf), " of %s", MGIVENNAME(mtmp));
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
                    *honorific = shkname_is_pname(mtmp) ? ""
@@ -473,9 +474,9 @@ int how;
            it overrides the effect of Hallucination on priestname() */
         Strcat(buf, m_monnam(mtmp));
     } else {
-        Strcat(buf, mptr->mname);
-        if (has_mname(mtmp))
-            Sprintf(eos(buf), " called %s", MNAME(mtmp));
+        Strcat(buf, pmname(mptr, Mgender(mtmp)));
+        if (has_mgivenname(mtmp))
+            Sprintf(eos(buf), " called %s", MGIVENNAME(mtmp));
     }
 
     Strcpy(g.killer.name, buf);
@@ -1414,7 +1415,7 @@ int how;
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "body rises from the dead"
                  : "revenant persists",
-             an(mons[u.ugrave_arise].mname));
+             an(pmname(&mons[u.ugrave_arise], Ugender)));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
 

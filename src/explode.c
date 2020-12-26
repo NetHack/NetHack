@@ -66,7 +66,7 @@ int expltype;
                 type = 0;
         }
         switch (Role_switch) {
-        case PM_PRIEST:
+        case PM_CLERIC:
         case PM_MONK:
         case PM_WIZARD:
             damu /= 5;

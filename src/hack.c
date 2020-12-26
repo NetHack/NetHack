@@ -1913,10 +1913,10 @@ domove_core()
             You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 x_monnam(mtmp,
                          mtmp->mtame ? ARTICLE_YOUR
-                         : (!has_mname(mtmp) && !type_is_pname(mtmp->data))
+                         : (!has_mgivenname(mtmp) && !type_is_pname(mtmp->data))
                            ? ARTICLE_THE : ARTICLE_NONE,
                          (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
-                         has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+                         has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
             switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
@@ -3071,7 +3071,8 @@ const char *msg_override;
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(g.nomovemsg, "You survived that ", 18))
-            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+            You("are %s.",
+                an(pmname(&mons[u.umonnum], Ugender))); /* (ignore Hallu) */
     }
     g.nomovemsg = 0;
     u.usleep = 0;

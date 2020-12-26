@@ -32,6 +32,12 @@ private:
 	QFont *rogue_font;
 	unsigned short glyph[ROWNO][COLNO];
 	unsigned short& Glyph(int x, int y) { return glyph[y][x]; }
+        unsigned int glyphttychar[ROWNO][COLNO];
+	unsigned int& Glyphttychar(int x, int y) { return glyphttychar[y][x]; }
+        unsigned int glyphcolor[ROWNO][COLNO];
+	unsigned int& Glyphcolor(int x, int y) { return glyphcolor[y][x]; }
+        unsigned int glyphflags[ROWNO][COLNO]; 
+	unsigned int& Glyphflags(int x, int y) { return glyphflags[y][x]; }
 	QPoint cursor;
 	QPixmap pet_annotation;
         QPixmap pile_annotation;
@@ -42,7 +48,7 @@ private:
 	void Clear();
 	void Display(bool block);
 	void CursorTo(int x,int y);
-	void PrintGlyph(int x,int y,int glyph);
+	void PrintGlyph(int x,int y,int glyph,unsigned *glyphmod);
 	void Changed(int x, int y);
 	void updateTiles();
 
@@ -64,7 +70,7 @@ public:
 	virtual void CursorTo(int x,int y);
 	virtual void PutStr(int attr, const QString& text);
 	virtual void ClipAround(int x,int y);
-	virtual void PrintGlyph(int x,int y,int glyph);
+	virtual void PrintGlyph(int x,int y,int glyph,unsigned *glyphmod);
 
 signals:
 	void resized();

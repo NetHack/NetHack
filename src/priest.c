@@ -233,7 +233,7 @@ boolean sanctum; /* is it the seat of the high priest? */
     struct obj *otmp;
     int cnt;
     int px = 0, py = 0, i, si = rn2(8);
-    struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC];
 
     for (i = 0; i < 8; i++) {
         px = sx + xdir[(i+si) % 8];
@@ -310,10 +310,11 @@ register struct monst *mon;
 char *pname; /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
-            aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
-            high_priest = mon->data == &mons[PM_HIGH_PRIEST];
+            aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
     char whatcode = '\0';
-    const char *what = do_hallu ? rndmonnam(&whatcode) : mon->data->mname;
+    const char *what = do_hallu ? rndmonnam(&whatcode)
+                                : pmname(mon->data, Mgender(mon));
 
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
@@ -416,7 +417,7 @@ int roomno;
 
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
-        sanctum = (priest->data == &mons[PM_HIGH_PRIEST]
+        sanctum = (priest->data == &mons[PM_HIGH_CLERIC]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
         can_speak = (priest->mcanmove && !priest->msleeping);
         if (can_speak && !Deaf && g.moves >= epri_p->intone_time) {
@@ -668,7 +669,7 @@ boolean peaceful;
     register boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
-    if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
+    if (ptr != &mons[PM_ALIGNED_CLERIC] && ptr != &mons[PM_ANGEL])
         return (struct monst *) 0;
 #endif
 
@@ -697,7 +698,7 @@ register struct monst *roamer;
 {
     if (!roamer->isminion)
         return;
-    if (roamer->data != &mons[PM_ALIGNED_PRIEST]
+    if (roamer->data != &mons[PM_ALIGNED_CLERIC]
         && roamer->data != &mons[PM_ANGEL])
         return;
 

@@ -333,13 +333,13 @@ struct monst *mtmp;
     if (mtmp->mextra) {
         mtmp->mextra = newmextra();
 
-        /* mname - monster's name */
+        /* mgivenname - monster's name */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
         if (buflen > 0) { /* includes terminating '\0' */
-            new_mname(mtmp, buflen);
+            new_mgivenname(mtmp, buflen);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) MNAME(mtmp), buflen);
+                mread(nhfp->fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
         }
         /* egd - vault guard */
         if (nhfp->structlevel)

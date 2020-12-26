@@ -484,7 +484,7 @@ struct obj *obj;
                           ? TRUE : FALSE)
                        : TRUE; /* catchall: no filters specified, so accept */
 
-    if (Role_if(PM_PRIEST) && !obj->bknown)
+    if (Role_if(PM_CLERIC) && !obj->bknown)
         set_bknown(obj, 1);
 
     /*

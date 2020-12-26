@@ -428,7 +428,7 @@ Helmet_on(VOID_ARGS)
                inventory; do so now [set_bknown() calls update_inventory()] */
             if (Blind)
                 set_bknown(uarmh, 0); /* lose bknown if previously set */
-            else if (Role_if(PM_PRIEST))
+            else if (Role_if(PM_CLERIC))
                 set_bknown(uarmh, 1); /* (bknown should already be set) */
             else if (uarmh->bknown)
                 update_inventory(); /* keep bknown as-is; display the curse */
@@ -766,6 +766,8 @@ Amulet_on()
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
             g.context.botl = 1;
+            newsym(u.ux, u.uy); /* glyphmon flag and tile may have gone
+                                   from male to female or vice versa */
         } else
             /* already polymorphed into single-gender monster; only
                changed the character's base sex */

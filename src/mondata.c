@@ -681,15 +681,17 @@ struct permonst *ptr;
 struct alt_spl {
     const char *name;
     short pm_val;
+    int genderhint;
 };
 
 /* figure out what type of monster a user-supplied string is specifying;
    ingore anything past the monster name */
 int
-name_to_mon(in_str)
+name_to_mon(in_str, gender_name_var)
 const char *in_str;
+int *gender_name_var;
 {
-    return name_to_monplus(in_str, (const char **) 0);
+    return name_to_monplus(in_str, (const char **) 0, gender_name_var);
 }
 
 /* figure out what type of monster a user-supplied string is specifying;
@@ -697,9 +699,10 @@ const char *in_str;
    caller wants to strip off the name and it matches one of the alternate
    names rather the canonical mons[].mname */
 int
-name_to_monplus(in_str, remainder_p)
+name_to_monplus(in_str, remainder_p, gender_name_var)
 const char *in_str;
 const char **remainder_p;
+int *gender_name_var;
 {
     /* Be careful.  We must check the entire string in case it was
      * something such as "ettin zombie corpse".  The calling routine
@@ -717,7 +720,8 @@ const char **remainder_p;
     register int mntmp = NON_PM;
     register char *s, *str, *term;
     char buf[BUFSZ];
-    int len, slen;
+    int len, slen, mgend;
+    boolean exact_match = FALSE;
 
     if (remainder_p)
         *remainder_p = (const char *) 0;
@@ -749,70 +753,72 @@ const char **remainder_p;
     {
         static const struct alt_spl names[] = {
             /* Alternate spellings */
-            { "grey dragon", PM_GRAY_DRAGON },
-            { "baby grey dragon", PM_BABY_GRAY_DRAGON },
-            { "grey unicorn", PM_GRAY_UNICORN },
-            { "grey ooze", PM_GRAY_OOZE },
-            { "gray-elf", PM_GREY_ELF },
-            { "mindflayer", PM_MIND_FLAYER },
-            { "master mindflayer", PM_MASTER_MIND_FLAYER },
+            { "grey dragon", PM_GRAY_DRAGON, NEUTRAL },
+            { "baby grey dragon", PM_BABY_GRAY_DRAGON, NEUTRAL },
+            { "grey unicorn", PM_GRAY_UNICORN, NEUTRAL },
+            { "grey ooze", PM_GRAY_OOZE, NEUTRAL },
+            { "gray-elf", PM_GREY_ELF, NEUTRAL },
+            { "mindflayer", PM_MIND_FLAYER, NEUTRAL },
+            { "master mindflayer", PM_MASTER_MIND_FLAYER, NEUTRAL },
             /* More alternates; priest and priestess are separate monster
                types but that isn't the case for {aligned,high} priests */
-            { "aligned priestess", PM_ALIGNED_PRIEST },
-            { "high priestess", PM_HIGH_PRIEST },
+            { "aligned priestess", PM_ALIGNED_CLERIC, NEUTRAL },
+            { "high priestess", PM_HIGH_CLERIC, NEUTRAL },
             /* Inappropriate singularization by -ves check above */
-            { "master of thief", PM_MASTER_OF_THIEVES },
+            { "master of thief", PM_MASTER_OF_THIEVES, NEUTRAL },
             /* Potential misspellings where we want to avoid falling back
                to the rank title prefix (input has been singularized) */
-            { "master thief", PM_MASTER_OF_THIEVES },
-            { "master of assassin", PM_MASTER_ASSASSIN },
+            { "master thief", PM_MASTER_OF_THIEVES, NEUTRAL },
+            { "master of assassin", PM_MASTER_ASSASSIN, NEUTRAL },
             /* Outdated names */
-            { "invisible stalker", PM_STALKER },
-            { "high-elf", PM_ELVENKING }, /* PM_HIGH_ELF is obsolete */
+            { "invisible stalker", PM_STALKER, NEUTRAL },
+            { "high-elf", PM_ELVENMONARCH, NEUTRAL }, /* PM_HIGH_ELF is obsolete */
             /* other misspellings or incorrect words */
-            { "wood-elf", PM_WOODLAND_ELF },
-            { "wood elf", PM_WOODLAND_ELF },
-            { "woodland nymph", PM_WOOD_NYMPH },
-            { "halfling", PM_HOBBIT },    /* potential guess for polyself */
-            { "genie", PM_DJINNI }, /* potential guess for ^G/#wizgenesis */
+            { "wood-elf", PM_WOODLAND_ELF, NEUTRAL },
+            { "wood elf", PM_WOODLAND_ELF, NEUTRAL },
+            { "woodland nymph", PM_WOOD_NYMPH, NEUTRAL },
+            { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for polyself */
+            { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for ^G/#wizgenesis */
             /* prefix used to workaround duplicate monster names for
                monsters with alternate forms */
-            { "human wererat", PM_HUMAN_WERERAT },
-            { "human werejackal", PM_HUMAN_WEREJACKAL },
-            { "human werewolf", PM_HUMAN_WEREWOLF },
+            { "human wererat", PM_HUMAN_WERERAT, NEUTRAL },
+            { "human werejackal", PM_HUMAN_WEREJACKAL, NEUTRAL },
+            { "human werewolf", PM_HUMAN_WEREWOLF, NEUTRAL },
             /* for completeness */
-            { "rat wererat", PM_WERERAT },
-            { "jackal werejackal", PM_WEREJACKAL },
-            { "wolf werewolf", PM_WEREWOLF },
+            { "rat wererat", PM_WERERAT, NEUTRAL },
+            { "jackal werejackal", PM_WEREJACKAL, NEUTRAL },
+            { "wolf werewolf", PM_WEREWOLF, NEUTRAL },
             /* Hyphenated names -- it would be nice to handle these via
                fuzzymatch() but it isn't able to ignore trailing stuff */
-            { "ki rin", PM_KI_RIN },
-            { "kirin", PM_KI_RIN },
-            { "uruk hai", PM_URUK_HAI },
-            { "orc captain", PM_ORC_CAPTAIN },
-            { "woodland elf", PM_WOODLAND_ELF },
-            { "green elf", PM_GREEN_ELF },
-            { "grey elf", PM_GREY_ELF },
-            { "gray elf", PM_GREY_ELF },
-            { "elf lord", PM_ELF_LORD },
-            { "olog hai", PM_OLOG_HAI },
-            { "arch lich", PM_ARCH_LICH },
-            { "archlich", PM_ARCH_LICH },
+            { "ki rin", PM_KI_RIN, NEUTRAL },
+            { "kirin", PM_KI_RIN, NEUTRAL },
+            { "uruk hai", PM_URUK_HAI, NEUTRAL },
+            { "orc captain", PM_ORC_CAPTAIN, NEUTRAL },
+            { "woodland elf", PM_WOODLAND_ELF, NEUTRAL },
+            { "green elf", PM_GREEN_ELF, NEUTRAL },
+            { "grey elf", PM_GREY_ELF, NEUTRAL },
+            { "gray elf", PM_GREY_ELF, NEUTRAL },
+            { "elf lady", PM_ELF_NOBLE, FEMALE },
+            { "elf lord", PM_ELF_NOBLE, MALE },
+            { "elf noble", PM_ELF_NOBLE, NEUTRAL },
+            { "olog hai", PM_OLOG_HAI, NEUTRAL },
+            { "arch lich", PM_ARCH_LICH, NEUTRAL },
+            { "archlich", PM_ARCH_LICH, NEUTRAL },
             /* Some irregular plurals */
-            { "incubi", PM_INCUBUS },
-            { "succubi", PM_SUCCUBUS },
-            { "violet fungi", PM_VIOLET_FUNGUS },
-            { "homunculi", PM_HOMUNCULUS },
-            { "baluchitheria", PM_BALUCHITHERIUM },
-            { "lurkers above", PM_LURKER_ABOVE },
-            { "cavemen", PM_CAVEMAN },
-            { "cavewomen", PM_CAVEWOMAN },
-            { "watchmen", PM_WATCHMAN },
-            { "djinn", PM_DJINNI },
-            { "mumakil", PM_MUMAK },
-            { "erinyes", PM_ERINYS },
+            { "incubi", PM_AMOROUS_DEMON, MALE },
+            { "succubi", PM_AMOROUS_DEMON, FEMALE },
+            { "violet fungi", PM_VIOLET_FUNGUS, NEUTRAL },
+            { "homunculi", PM_HOMUNCULUS, NEUTRAL },
+            { "baluchitheria", PM_BALUCHITHERIUM, NEUTRAL },
+            { "lurkers above", PM_LURKER_ABOVE, NEUTRAL },
+            { "cavemen", PM_CAVE_DWELLER, MALE },
+            { "cavewomen", PM_CAVE_DWELLER, FEMALE },
+            { "watchmen", PM_WATCHMAN, NEUTRAL },
+            { "djinn", PM_DJINNI, NEUTRAL },
+            { "mumakil", PM_MUMAK, NEUTRAL },
+            { "erinyes", PM_ERINYS, NEUTRAL },
             /* end of list */
-            { 0, NON_PM }
+            { 0, NON_PM, NEUTRAL }
         };
         register const struct alt_spl *namep;
 
@@ -823,18 +829,28 @@ const char **remainder_p;
                 && (!str[len] || str[len] == ' ' || str[len] == '\'')) {
                 if (remainder_p)
                     *remainder_p = in_str + (&str[len] - buf);
+                if (gender_name_var != (int *) 0)
+                    *gender_name_var = namep->genderhint;
                 return namep->pm_val;
             }
         }
     }
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
-        register int m_i_len = (int) strlen(mons[i].mname);
+      for (mgend = MALE; mgend < NUM_MGENDERS; mgend++) {
+        int m_i_len;
 
-        if (m_i_len > len && !strncmpi(mons[i].mname, str, m_i_len)) {
+        if (!mons[i].pmnames[mgend])
+            continue;
+
+        m_i_len = (int) strlen(mons[i].pmnames[mgend]);
+        if (m_i_len > len && !strncmpi(mons[i].pmnames[mgend], str, m_i_len)) {
             if (m_i_len == slen) {
                 mntmp = i;
                 len = m_i_len;
+                if (gender_name_var != (int *) 0)
+                    *gender_name_var = mgend;
+                exact_match = TRUE;
                 break; /* exact match */
             } else if (slen > m_i_len
                        && (str[m_i_len] == ' '
@@ -850,6 +866,9 @@ const char **remainder_p;
                 len = m_i_len;
             }
         }
+      }
+      if (exact_match)
+        break;
     }
     if (mntmp == NON_PM)
         mntmp = title_to_mon(str, (int *) 0, &len);
@@ -868,8 +887,8 @@ int *mndx_p;
     /* Single letters are matched against def_monsyms[].sym; words
        or phrases are first matched against def_monsyms[].explain
        to check class description; if not found there, then against
-       mons[].mname to test individual monster types.  Input can be a
-       substring of the full description or mname, but to be accepted,
+       mons[].pmnames[] to test individual monster types.  Input can be a
+       substring of the full description or pmname, but to be accepted,
        such partial matches must start at beginning of a word.  Some
        class descriptions include "foo or bar" and "foo or other foo"
        so we don't want to accept "or", "other", "or other" there. */
@@ -881,16 +900,16 @@ int *mndx_p;
     static NEARDATA const struct alt_spl truematch[] = {
         /* "long worm" won't match "worm" class but would accidentally match
            "long worm tail" class before the comparison with monster types */
-        { "long worm", PM_LONG_WORM },
+        { "long worm", PM_LONG_WORM, NEUTRAL },
         /* matches wrong--or at least suboptimal--class */
-        { "demon", -S_DEMON }, /* hits "imp or minor demon" */
+        { "demon", -S_DEMON, NEUTRAL }, /* hits "imp or minor demon" */
         /* matches specific monster (overly restrictive) */
-        { "devil", -S_DEMON }, /* always "horned devil" */
+        { "devil", -S_DEMON, NEUTRAL }, /* always "horned devil" */
         /* some plausible guesses which need help */
-        { "bug", -S_XAN },  /* would match bugbear... */
-        { "fish", -S_EEL }, /* wouldn't match anything */
+        { "bug", -S_XAN, NEUTRAL },  /* would match bugbear... */
+        { "fish", -S_EEL, NEUTRAL }, /* wouldn't match anything */
         /* end of list */
-        { 0, NON_PM }
+        { 0, NON_PM, NEUTRAL}
     };
     const char *p, *x;
     int i, len;
@@ -941,7 +960,7 @@ int *mndx_p;
                 return i;
         }
         /* check individual species names */
-        i = name_to_mon(in_str);
+        i = name_to_mon(in_str, (int *) 0);
         if (i != NON_PM) {
             if (mndx_p)
                 *mndx_p = i;
@@ -1014,11 +1033,11 @@ static const short grownups[][2] = {
     { PM_PONY, PM_HORSE },
     { PM_HORSE, PM_WARHORSE },
     { PM_KOBOLD, PM_LARGE_KOBOLD },
-    { PM_LARGE_KOBOLD, PM_KOBOLD_LORD },
-    { PM_GNOME, PM_GNOME_LORD },
-    { PM_GNOME_LORD, PM_GNOME_KING },
-    { PM_DWARF, PM_DWARF_LORD },
-    { PM_DWARF_LORD, PM_DWARF_KING },
+    { PM_LARGE_KOBOLD, PM_KOBOLD_LEADER },
+    { PM_GNOME, PM_GNOME_LEADER },
+    { PM_GNOME_LEADER, PM_GNOME_RULER },
+    { PM_DWARF, PM_DWARF_LEADER },
+    { PM_DWARF_LEADER, PM_DWARF_RULER },
     { PM_MIND_FLAYER, PM_MASTER_MIND_FLAYER },
     { PM_ORC, PM_ORC_CAPTAIN },
     { PM_HILL_ORC, PM_ORC_CAPTAIN },
@@ -1026,17 +1045,17 @@ static const short grownups[][2] = {
     { PM_URUK_HAI, PM_ORC_CAPTAIN },
     { PM_SEWER_RAT, PM_GIANT_RAT },
     { PM_CAVE_SPIDER, PM_GIANT_SPIDER },
-    { PM_OGRE, PM_OGRE_LORD },
-    { PM_OGRE_LORD, PM_OGRE_KING },
-    { PM_ELF, PM_ELF_LORD },
-    { PM_WOODLAND_ELF, PM_ELF_LORD },
-    { PM_GREEN_ELF, PM_ELF_LORD },
-    { PM_GREY_ELF, PM_ELF_LORD },
-    { PM_ELF_LORD, PM_ELVENKING },
+    { PM_OGRE, PM_OGRE_LEADER },
+    { PM_OGRE_LEADER, PM_OGRE_TYRANT },
+    { PM_ELF, PM_ELF_NOBLE },
+    { PM_WOODLAND_ELF, PM_ELF_NOBLE },
+    { PM_GREEN_ELF, PM_ELF_NOBLE },
+    { PM_GREY_ELF, PM_ELF_NOBLE },
+    { PM_ELF_NOBLE, PM_ELVENMONARCH },
     { PM_LICH, PM_DEMILICH },
     { PM_DEMILICH, PM_MASTER_LICH },
     { PM_MASTER_LICH, PM_ARCH_LICH },
-    { PM_VAMPIRE, PM_VAMPIRE_LORD },
+    { PM_VAMPIRE, PM_VAMPIRE_LEADER },
     { PM_BAT, PM_GIANT_BAT },
     { PM_BABY_GRAY_DRAGON, PM_GRAY_DRAGON },
     { PM_BABY_SILVER_DRAGON, PM_SILVER_DRAGON },
@@ -1063,11 +1082,11 @@ static const short grownups[][2] = {
     { PM_SERGEANT, PM_LIEUTENANT },
     { PM_LIEUTENANT, PM_CAPTAIN },
     { PM_WATCHMAN, PM_WATCH_CAPTAIN },
-    { PM_ALIGNED_PRIEST, PM_HIGH_PRIEST },
+    { PM_ALIGNED_CLERIC, PM_HIGH_CLERIC },
     { PM_STUDENT, PM_ARCHEOLOGIST },
     { PM_ATTENDANT, PM_HEALER },
     { PM_PAGE, PM_KNIGHT },
-    { PM_ACOLYTE, PM_PRIEST },
+    { PM_ACOLYTE, PM_CLERIC },
     { PM_APPRENTICE, PM_WIZARD },
     { PM_MANES, PM_LEMURE },
     { PM_KEYSTONE_KOP, PM_KOP_SERGEANT },

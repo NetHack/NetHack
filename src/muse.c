@@ -241,7 +241,7 @@ struct obj *otmp;
     saverole = Role_switch;
     if (!vismon) {
         otmp->bknown = 0;
-        if (Role_if(PM_PRIEST))
+        if (Role_if(PM_CLERIC))
             Role_switch = 0;
     }
     Strcpy(onambuf, singular(otmp, doname));
@@ -2889,7 +2889,9 @@ struct monst *mon;
         return (ptr->mcolor == CLR_GREEN || ptr->mcolor == CLR_BRIGHT_GREEN);
 #endif
     /* approximation */
-    if (strstri(ptr->mname, "green"))
+    if (strstri(ptr->pmnames[NEUTRAL], "green")
+        || (ptr->pmnames[MALE] && strstri(ptr->pmnames[MALE], "green"))
+        || (ptr->pmnames[FEMALE] && strstri(ptr->pmnames[FEMALE], "green")))
         return TRUE;
     switch (monsndx(ptr)) {
     case PM_FOREST_CENTAUR:

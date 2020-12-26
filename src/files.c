@@ -3089,7 +3089,7 @@ struct obj *obj;
 
     /* subset of starting inventory pre-ID */
     obj->dknown = 1;
-    if (Role_if(PM_PRIEST))
+    if (Role_if(PM_CLERIC))
         obj->bknown = 1; /* ok to bypass set_bknown() */
     /* same criteria as lift_object()'s check for available inventory slot */
     if (obj->oclass != COIN_CLASS && inv_cnt(FALSE) >= 52

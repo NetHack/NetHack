@@ -524,6 +524,9 @@ struct trapinfo {
 typedef struct {
     xchar gnew; /* perhaps move this bit into the rm structure. */
     int glyph;
+#ifndef UNBUFFERED_GLYPHMOD
+    unsigned glyphmod[NUM_GLYPHMOD];
+#endif
 } gbuf_entry;
 
 enum vanq_order_modes {

@@ -387,7 +387,7 @@ int force;
                                     You("destroy %s!",
                                         mtmp->mtame
                                          ? x_monnam(mtmp, ARTICLE_THE, "poor",
-                                                    has_mname(mtmp)
+                                                    has_mgivenname(mtmp)
                                                      ? SUPPRESS_SADDLE : 0,
                                                     FALSE)
                                          : mon_nam(mtmp));

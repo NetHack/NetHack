@@ -89,7 +89,7 @@ char *outbuf;
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
-            mons[u.umonnum].mname, g.plname);
+            pmname(&mons[u.umonnum], Ugender), g.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE))
@@ -167,7 +167,7 @@ char *outbuf;
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
-                    an(mons[mon->mappearance].mname));
+                    an(pmname(&mons[mon->mappearance], Mgender(mon))));
     } else if (isyou ? u.uundetected : mon->mundetected) {
         Strcpy(outbuf, ", hiding");
         if (hides_under(mon->data)) {
@@ -403,7 +403,7 @@ int x, y;
                                         : (mW & M2_ELF & m2) ? "elf"
                                           : (mW & M2_ORC & m2) ? "orc"
                                             : (mW & M2_DEMON & m2) ? "demon"
-                                              : mtmp->data->mname);
+                                              : pmname(mtmp->data, Mgender(mtmp)));
 
                     Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
                 }
@@ -616,7 +616,7 @@ char *supplemental_name;
      * user_typed_name and picked name.
      */
     if (pm != (struct permonst *) 0 && !user_typed_name)
-        dbase_str = strcpy(newstr, pm->mname);
+        dbase_str = strcpy(newstr, pm->pmnames[NEUTRAL]);
     else
         dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
@@ -893,15 +893,14 @@ struct permonst **for_supplement;
             hallucinate = (Hallucination && !g.program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
+    unsigned glyphmod[NUM_GLYPHMOD];
 
     gobbledygook[0] = '\0'; /* no hallucinatory liquid (yet) */
     if (looked) {
-        int oc;
-        unsigned os;
-
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
+        map_glyphmod(cc.x, cc.y, glyph, 0, glyphmod);
+        sym = glyphmod[GM_TTYCHAR];
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -1154,12 +1153,9 @@ struct permonst **for_supplement;
                 break;
             case SYM_PET_OVERRIDE + SYM_OFF_X:
                 if (looked) {
-                    int oc = 0;
-                    unsigned os = 0;
-
                     /* convert to symbol without override in effect */
-                    (void) mapglyph(glyph, &sym, &oc, &os,
-                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    map_glyphmod(cc.x, cc.y, glyph, MG_FLAG_NOOVERRIDE, glyphmod);
+                    sym = (int) glyphmod[GM_TTYCHAR];                
                     goto check_monsters;
                 }
                 break;

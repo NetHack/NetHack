@@ -374,6 +374,7 @@ E void NDECL(reglyph_darkroom);
 E void NDECL(set_wall_state);
 E void FDECL(unset_seenv, (struct rm *, int, int, int, int));
 E int FDECL(warning_of, (struct monst *));
+E void FDECL(map_glyphmod, (XCHAR_P, XCHAR_P, int, unsigned, unsigned *));
 
 /* ### do.c ### */
 
@@ -415,8 +416,8 @@ E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
 E boolean FDECL(getpos_menu, (coord *, int));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int), boolean (*d)(int,int)));
-E void FDECL(new_mname, (struct monst *, int));
-E void FDECL(free_mname, (struct monst *));
+E void FDECL(new_mgivenname, (struct monst *, int));
+E void FDECL(free_mgivenname, (struct monst *));
 E void FDECL(new_oname, (struct obj *, int));
 E void FDECL(free_oname, (struct obj *));
 E const char *FDECL(safe_oname, (struct obj *));
@@ -457,6 +458,10 @@ E struct monst *FDECL(christen_orc, (struct monst *, const char *,
                                      const char *));
 E const char *FDECL(noveltitle, (int *));
 E const char *FDECL(lookup_novel, (const char *, int *));
+#ifndef PMNAME_MACROS
+E int FDECL(Mgender, (struct monst *));
+E const char *FDECL(pmname, (struct permonst *, int));
+#endif /* PMNAME_MACROS */
 
 /* ### do_wear.c ### */
 
@@ -1516,8 +1521,8 @@ E boolean FDECL(dmgtype, (struct permonst *, int));
 E int FDECL(max_passive_dmg, (struct monst *, struct monst *));
 E boolean FDECL(same_race, (struct permonst *, struct permonst *));
 E int FDECL(monsndx, (struct permonst *));
-E int FDECL(name_to_mon, (const char *));
-E int FDECL(name_to_monplus, (const char *, const char **));
+E int FDECL(name_to_mon, (const char *, int *));
+E int FDECL(name_to_monplus, (const char *, const char **, int *));
 E int FDECL(name_to_monclass, (const char *, int *));
 E int FDECL(gender, (struct monst *));
 E int FDECL(pronoun_gender, (struct monst *, unsigned));

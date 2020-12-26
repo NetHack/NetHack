@@ -688,6 +688,7 @@ unsigned char (*indexes)[TILE_X];
 {
     const struct TileImage *tile;
     unsigned x, y;
+    int row, col, ry, tilenum = 0;
 
     /* We don't have enough colors to show the statues */
     if (glyph >= GLYPH_STATUE_OFF) {
@@ -695,7 +696,16 @@ unsigned char (*indexes)[TILE_X];
     }
 
     /* Get the tile from the image */
-    tile = get_tile(glyph2tile[glyph]);
+    tilenum = glyph2tile[glyph];
+    row = currow;
+    col = curcol;
+    if ((col < 0 || col >= COLNO)
+        || (row < TOP_MAP_ROW || row >= (ROWNO + TOP_MAP_ROW)))
+        return;
+    ry = row - TOP_MAP_ROW;
+    if (map[ry][col].special & MG_FEMALE)
+        tilenum++;
+    tile = get_tile(tilenum);
 
     /* Map to a 16 bit palette; assume colors laid out as in default tileset */
     memset(indexes, 0, sizeof(indexes));

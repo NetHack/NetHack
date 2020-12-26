@@ -510,12 +510,12 @@ register struct monst *mtmp;
                         pline(
                              "Wait, %s!  There's a hidden %s named %s there!",
                               m_monnam(mtmp),
-                              g.youmonst.data->mname, g.plname);
+                              pmname(g.youmonst.data, Ugender), g.plname);
                     else
                         pline(
                           "Wait, %s!  There's a %s named %s hiding under %s!",
-                              m_monnam(mtmp), g.youmonst.data->mname, g.plname,
-                              doname(g.level.objects[u.ux][u.uy]));
+                              m_monnam(mtmp), pmname(g.youmonst.data, Ugender),
+                              g.plname, doname(g.level.objects[u.ux][u.uy]));
                     if (obj)
                         obj->spe = save_spe;
                 } else
@@ -537,7 +537,7 @@ register struct monst *mtmp;
             pline("It gets stuck on you.");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That's a %s named %s!", m_monnam(mtmp),
-                  g.youmonst.data->mname, g.plname);
+                  pmname(g.youmonst.data, Ugender), g.plname);
         if (sticky)
             set_ustuck(mtmp);
         g.youmonst.m_ap_type = M_AP_NOTHING;
@@ -557,13 +557,14 @@ register struct monst *mtmp;
                                            : "disturbs you");
         else /* see note about m_monnam() above */
             pline("Wait, %s!  That %s is really %s named %s!", m_monnam(mtmp),
-                  mimic_obj_name(&g.youmonst), an(mons[u.umonnum].mname),
-                  g.plname);
+                  mimic_obj_name(&g.youmonst),
+                  an(pmname(&mons[u.umonnum], Ugender)), g.plname);
         if (g.multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
 
             Sprintf(buf, "You appear to be %s again.",
-                    Upolyd ? (const char *) an(g.youmonst.data->mname)
+                    Upolyd ? (const char *) an(pmname(g.youmonst.data,
+                                                      flags.female))
                            : (const char *) "yourself");
             unmul(buf); /* immediately stop mimicking */
         }
@@ -793,8 +794,7 @@ boolean youseeit;
      */
 
     if (is_demon(mdat)) {
-        if (mdat != &mons[PM_BALROG]
-            && mdat != &mons[PM_SUCCUBUS] && mdat != &mons[PM_INCUBUS]) {
+        if (mdat != &mons[PM_BALROG] && mdat != &mons[PM_AMOROUS_DEMON]) {
             if (!rn2(13))
                 (void) msummon(mtmp);
         }
@@ -861,7 +861,7 @@ struct permonst *mdat;
         return FALSE;
     } else {
         make_sick(Sick ? Sick / 3L + 1L : (long) rn1(ACURR(A_CON), 20),
-                  mdat->mname, TRUE, SICK_NONVOMITABLE);
+                  mdat->pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
         return TRUE;
     }
 }
@@ -915,7 +915,7 @@ struct monst *mon;
             via_amul = FALSE,
             gotprot = is_you ? (EProtection != 0L)
                              /* high priests have innate protection */
-                             : (mon->data == &mons[PM_HIGH_PRIEST]);
+                             : (mon->data == &mons[PM_HIGH_CLERIC]);
 
     for (o = is_you ? g.invent : mon->minvent; o; o = o->nobj) {
         /* a_can field is only applicable for armor (which must be worn) */
@@ -948,7 +948,7 @@ struct monst *mon;
            protection is too easy); it confers minimum mc 1 instead of 0 */
         if ((is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
-            || (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
+            || (mon->data == &mons[PM_ALIGNED_CLERIC] || is_minion(mon->data)))
             mc = 1;
     }
     return mc;
@@ -1034,7 +1034,7 @@ register struct attack *mattk;
     if (mhm.damage) {
         if (Half_physical_damage
             /* Mitre of Holiness */
-            || (Role_if(PM_PRIEST) && uarmh && is_quest_artifact(uarmh)
+            || (Role_if(PM_CLERIC) && uarmh && is_quest_artifact(uarmh)
                 && (is_undead(mtmp->data) || is_demon(mtmp->data)
                     || is_vampshifter(mtmp))))
             mhm.damage = (mhm.damage + 1) / 2;
@@ -1543,7 +1543,7 @@ struct attack *mattk;
                 break;
             You("turn to stone...");
             g.killer.format = KILLED_BY;
-            Strcpy(g.killer.name, mtmp->data->mname);
+            Strcpy(g.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);
         }
         break;
@@ -1751,8 +1751,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
        for seduction, both pass the could_seduce() test;
        incubi/succubi have three attacks, their claw attacks for damage
        don't pass the test */
-    if ((pagr->mlet != S_NYMPH
-         && pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
+    if ((pagr->mlet != S_NYMPH && pagr != &mons[PM_AMOROUS_DEMON])
         || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
@@ -1765,7 +1764,8 @@ doseduce(mon)
 struct monst *mon;
 {
     struct obj *ring, *nring;
-    boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
+    boolean fem = (mon->data == &mons[PM_AMOROUS_DEMON]
+                   && Mgender(mon) == FEMALE); /* otherwise incubus */
     boolean seewho, naked; /* True iff no armor */
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
@@ -2232,7 +2232,8 @@ struct attack *mattk;
                     && (perceives(mtmp->data) || !Invis)) {
                     if (Blind)
                         pline("As a blind %s, you cannot defend yourself.",
-                              g.youmonst.data->mname);
+                              pmname(g.youmonst.data,
+                                     flags.female ? FEMALE : MALE));
                     else {
                         if (mon_reflects(mtmp,
                                          "Your gaze is reflected by %s %s."))

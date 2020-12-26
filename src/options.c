@@ -7376,13 +7376,13 @@ struct fruit *replace_fruit;
             || !strncmp(g.pl_fruit, "partly eaten ", 13)
             || (!strncmp(g.pl_fruit, "tin of ", 7)
                 && (!strcmp(g.pl_fruit + 7, "spinach")
-                    || name_to_mon(g.pl_fruit + 7) >= LOW_PM))
+                    || name_to_mon(g.pl_fruit + 7, (int *) 0) >= LOW_PM))
             || !strcmp(g.pl_fruit, "empty tin")
             || (!strcmp(g.pl_fruit, "glob")
                 || (globpfx > 0 && !strcmp("glob", &g.pl_fruit[globpfx])))
             || ((str_end_is(g.pl_fruit, " corpse")
                  || str_end_is(g.pl_fruit, " egg"))
-                && name_to_mon(g.pl_fruit) >= LOW_PM)) {
+                && name_to_mon(g.pl_fruit, (int *) 0) >= LOW_PM)) {
             Strcpy(buf, g.pl_fruit);
             Strcpy(g.pl_fruit, "candied ");
             nmcpy(g.pl_fruit + 8, buf, PL_FSIZ - 8);

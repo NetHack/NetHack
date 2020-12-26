@@ -2427,7 +2427,7 @@ unsigned trflags;
         u.usteed->mtrapseen |= (1 << (ttype - 1));
         /* suppress article in various steed messages when using its
            name (which won't occur when hallucinating) */
-        if (has_mname(u.usteed) && !Hallucination)
+        if (has_mgivenname(u.usteed) && !Hallucination)
             steed_article = ARTICLE_NONE;
     }
 
@@ -3133,8 +3133,10 @@ const char *arg;
 
     if (uwep && uwep->otyp == CORPSE && touch_petrifies(&mons[uwep->corpsenm])
         && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg, mons[uwep->corpsenm].mname);
-        Sprintf(kbuf, "%s corpse", an(mons[uwep->corpsenm].mname));
+        pline("%s touch the %s corpse.", arg,
+              mons[uwep->corpsenm].pmnames[NEUTRAL]);
+        Sprintf(kbuf, "%s corpse",
+              an(mons[uwep->corpsenm].pmnames[NEUTRAL]));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse if we can't handle it */
         if (!uarmg && !Stone_resistance)
@@ -3144,8 +3146,10 @@ const char *arg;
        allow two-weapon combat when either weapon is a corpse] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE
         && touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg, mons[uswapwep->corpsenm].mname);
-        Sprintf(kbuf, "%s corpse", an(mons[uswapwep->corpsenm].mname));
+        pline("%s touch the %s corpse.", arg,
+              mons[uswapwep->corpsenm].pmnames[NEUTRAL]);
+        Sprintf(kbuf, "%s corpse",
+                an(mons[uswapwep->corpsenm].pmnames[NEUTRAL]));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse */
         if (!uarmg && !Stone_resistance)
@@ -4672,7 +4676,8 @@ struct trap *ttmp;
 
     /* is it a cockatrice?... */
     if (touch_petrifies(mtmp->data) && !uarmg && !Stone_resistance) {
-        You("grab the trapped %s using your bare %s.", mtmp->data->mname,
+        You("grab the trapped %s using your bare %s.",
+            pmname(mtmp->data, Mgender(mtmp)),
             makeplural(body_part(HAND)));
 
         if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
@@ -4681,7 +4686,7 @@ struct trap *ttmp;
             char kbuf[BUFSZ];
 
             Sprintf(kbuf, "trying to help %s out of a pit",
-                    an(mtmp->data->mname));
+                    an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
             return 1;
         }

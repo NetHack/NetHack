@@ -170,7 +170,7 @@ makedog()
     /* default pet names */
     if (!*petname && pettype == PM_LITTLE_DOG) {
         /* All of these names were for dogs. */
-        if (Role_if(PM_CAVEMAN))
+        if (Role_if(PM_CAVE_DWELLER))
             petname = "Slasher"; /* The Warrior */
         if (Role_if(PM_SAMURAI))
             petname = "Hachi"; /* Shibuya Station */

@@ -175,7 +175,7 @@ struct edog {
  **     mextra.h -- collection of all monster extensions
  */
 struct mextra {
-    char *mname;
+    char *mgivenname;
     struct egd *egd;
     struct epri *epri;
     struct eshk *eshk;
@@ -186,7 +186,7 @@ struct mextra {
                     * or an alignment mask for one posing as an altar */
 };
 
-#define MNAME(mon) ((mon)->mextra->mname)
+#define MGIVENNAME(mon) ((mon)->mextra->mgivenname)
 #define EGD(mon) ((mon)->mextra->egd)
 #define EPRI(mon) ((mon)->mextra->epri)
 #define ESHK(mon) ((mon)->mextra->eshk)
@@ -194,7 +194,7 @@ struct mextra {
 #define EDOG(mon) ((mon)->mextra->edog)
 #define MCORPSENM(mon) ((mon)->mextra->mcorpsenm)
 
-#define has_mname(mon) ((mon)->mextra && MNAME(mon))
+#define has_mgivenname(mon) ((mon)->mextra && MGIVENNAME(mon))
 #define has_egd(mon)   ((mon)->mextra && EGD(mon))
 #define has_epri(mon)  ((mon)->mextra && EPRI(mon))
 #define has_eshk(mon)  ((mon)->mextra && ESHK(mon))

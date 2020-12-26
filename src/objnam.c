@@ -24,7 +24,7 @@ struct _readobjnam_data {
     int eroded, eroded2, erodeproof, locked, unlocked, broken, real, fake;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
-    int tmp, tinv, tvariety;
+    int tmp, tinv, tvariety, mgend;
     int wetness, gsize;
     int ftype;
     struct obj *otmp;
@@ -471,7 +471,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         obj->known = 0;
     if (!Blind && !g.distantname)
         obj->dknown = 1;
-    if (Role_if(PM_PRIEST))
+    if (Role_if(PM_CLERIC))
         obj->bknown = 1; /* actively avoid set_bknown();
                           * we mustn't call update_inventory() now because
                           * it would call xname() (via doname()) recursively
@@ -528,8 +528,8 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             char anbuf[10]; /* [4] would be enough: 'a','n',' ','\0' */
 
             Sprintf(eos(buf), " of %s%s",
-                    just_an(anbuf, mons[omndx].mname),
-                    mons[omndx].mname);
+                    just_an(anbuf, mons[omndx].pmnames[NEUTRAL]),
+                    mons[omndx].pmnames[NEUTRAL]);
         } else if (is_wet_towel(obj)) {
             if (wizard)
                 Sprintf(eos(buf), " (%d)", obj->spe);
@@ -617,6 +617,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case ROCK_CLASS:
         if (typ == STATUE && omndx != NON_PM) {
             char anbuf[10];
+            int mgend = (obj->spe & STATUE_FEMALE) ? FEMALE : MALE;
 
             Sprintf(buf, "%s%s of %s%s",
                     (Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC))
@@ -627,8 +628,8 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
                        ? ""
                        : the_unique_pm(&mons[omndx])
                           ? "the "
-                          : just_an(anbuf, mons[omndx].mname),
-                    mons[omndx].mname);
+                          : just_an(anbuf, pmname(&mons[omndx], mgend)),
+                    pmname(&mons[omndx], mgend));
         } else
             Strcpy(buf, actualn);
         break;
@@ -822,7 +823,7 @@ struct obj *obj;
 
     bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
     if (!strncmp(bufp, "uncursed ", 9))
-        bufp += 9; /* Role_if(PM_PRIEST) */
+        bufp += 9; /* Role_if(PM_CLERIC) */
 
     objects[otyp].oc_uname = saveobcls.oc_uname;
     objects[otyp].oc_name_known = saveobcls.oc_name_known;
@@ -878,7 +879,7 @@ struct permonst *ptr;
     /* high priest is unique if it includes "of <deity>", otherwise not
        (caller needs to handle the 1st possibility; we assume the 2nd);
        worm tail should be irrelevant but is included for completeness */
-    if (ptr == &mons[PM_HIGH_PRIEST] || ptr == &mons[PM_LONG_WORM_TAIL])
+    if (ptr == &mons[PM_HIGH_CLERIC] || ptr == &mons[PM_LONG_WORM_TAIL])
         uniq = FALSE;
     /* Wizard no longer needs this; he's flagged as unique these days */
     if (ptr == &mons[PM_WIZARD_OF_YENDOR])
@@ -1062,7 +1063,7 @@ unsigned doname_flags;
 #endif
                      && obj->otyp != FAKE_AMULET_OF_YENDOR
                      && obj->otyp != AMULET_OF_YENDOR
-                     && !Role_if(PM_PRIEST)))
+                     && !Role_if(PM_CLERIC)))
             Strcat(prefix, "uncursed ");
     }
 
@@ -1200,7 +1201,7 @@ unsigned doname_flags;
 #endif
             if (omndx >= LOW_PM
                 && (known || (g.mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
-                Strcat(prefix, mons[omndx].mname);
+                Strcat(prefix, mons[omndx].pmnames[NEUTRAL]);
                 Strcat(prefix, " ");
                 if (obj->spe == 1)
                     Strcat(bp, " (laid by you)");
@@ -1433,21 +1434,21 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
         possessive = FALSE,
         glob = (otmp->otyp != CORPSE && otmp->globby);
-    const char *mname;
+    const char *mnam;
 
     if (glob) {
-        mname = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
+        mnam = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
     } else if (omndx == NON_PM) { /* paranoia */
-        mname = "thing";
+        mnam = "thing";
         /* [Possible enhancement:  check whether corpse has monster traits
             attached in order to use priestname() for priests and minions.] */
-    } else if (omndx == PM_ALIGNED_PRIEST) {
+    } else if (omndx == PM_ALIGNED_CLERIC) {
         /* avoid "aligned priest"; it just exposes internal details */
-        mname = "priest";
+        mnam = "priest";
     } else {
-        mname = mons[omndx].mname;
+        mnam = mons[omndx].pmnames[NEUTRAL];
         if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
-            mname = s_suffix(mname);
+            mnam = s_suffix(mnam);
             possessive = TRUE;
             /* don't precede personal name like "Medusa" with an article */
             if (type_is_pname(&mons[omndx]))
@@ -1473,13 +1474,13 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 
     if (!adjective || !*adjective) {
         /* normal case:  newt corpse */
-        Strcat(nambuf, mname);
+        Strcat(nambuf, mnam);
     } else {
         /* adjective positioning depends upon format of monster name */
         if (possessive) /* Medusa's cursed partly eaten corpse */
-            Sprintf(eos(nambuf), "%s %s", mname, adjective);
+            Sprintf(eos(nambuf), "%s %s", mnam, adjective);
         else /* cursed partly eaten troll corpse */
-            Sprintf(eos(nambuf), "%s %s", adjective, mname);
+            Sprintf(eos(nambuf), "%s %s", adjective, mnam);
         /* in case adjective has a trailing space, squeeze it out */
         mungspaces(nambuf);
         /* doname() might include a count in the adjective argument;
@@ -3270,6 +3271,7 @@ struct _readobjnam_data *d;
         = d->ishistoric = d->isdiluted = d->trapped = d->locked
         = d->unlocked = d->broken = d->real = d->fake = 0;
     d->tvariety = RANDOM_TIN;
+    d->mgend = MALE;
     d->mntmp = NON_PM;
     d->contents = UNDEFINED;
     d->oclass = 0;
@@ -3597,7 +3599,8 @@ struct _readobjnam_data *d;
         || !strcmpi(d->bp, "globs") || !BSTRCMPI(d->bp, d->bp + i - 6, " globs")
         || (d->p = strstri(d->bp, "glob of ")) != 0
         || (d->p = strstri(d->bp, "globs of ")) != 0) {
-        d->mntmp = name_to_mon(!d->p ? d->bp : (strstri(d->p, " of ") + 4));
+        d->mntmp = name_to_mon(!d->p ? d->bp
+                                     : (strstri(d->p, " of ") + 4), (int *) 0);
         /* if we didn't recognize monster type, pick a valid one at random */
         if (d->mntmp == NON_PM)
             d->mntmp = rn1(PM_BLACK_PUDDING - PM_GRAY_OOZE, PM_GRAY_OOZE);
@@ -3605,7 +3608,7 @@ struct _readobjnam_data *d;
            variant (grey ooze) or player used inverted syntax (<foo> glob);
            if player has given a valid monster type but not valid glob type,
            object name lookup won't find it and wish attempt will fail */
-        Sprintf(d->globbuf, "glob of %s", mons[d->mntmp].mname);
+        Sprintf(d->globbuf, "glob of %s", mons[d->mntmp].pmnames[NEUTRAL]);
         d->bp = d->globbuf;
         d->mntmp = NON_PM; /* not useful for "glob of <foo>" object lookup */
         d->cnt = 0; /* globs don't stack */
@@ -3631,12 +3634,13 @@ struct _readobjnam_data *d;
                 } else {
                     d->tmp = tin_variety_txt(d->p + 7, &d->tinv);
                     d->tvariety = d->tinv;
-                    d->mntmp = name_to_mon(d->p + 7 + d->tmp);
+                    d->mntmp = name_to_mon(d->p + 7 + d->tmp, &d->mgend);
                 }
                 d->typ = TIN;
                 return 2; /*goto typfnd;*/
             } else if ((d->p = strstri(d->bp, " of ")) != 0
-                       && (d->mntmp = name_to_mon(d->p + 4)) >= LOW_PM)
+                       && (d->mntmp = name_to_mon(d->p + 4,
+                                                  &d->mgend)) >= LOW_PM)
                 *d->p = 0;
         }
     }
@@ -3649,7 +3653,8 @@ struct _readobjnam_data *d;
         const char *rest = 0;
 
         if (d->mntmp < LOW_PM && strlen(d->bp) > 2
-            && (d->mntmp = name_to_monplus(d->bp, &rest)) >= LOW_PM) {
+            && (d->mntmp = name_to_monplus(d->bp, &rest,
+                                           &d->mgend)) >= LOW_PM) {
             char *obp = d->bp;
 
             /* 'rest' is a pointer past the matching portion; if that was
@@ -4280,8 +4285,11 @@ struct obj *no_wish;
     case LARGE_BOX:
     case HEAVY_IRON_BALL:
     case IRON_CHAIN:
+        break;
     case STATUE:
         /* otmp->cobj already done in mksobj() */
+        if (d.mgend)
+            d.otmp->spe |= STATUE_FEMALE;
         break;
 #ifdef MAIL_STRUCTURES
     /* scroll of mail:  0: delivered in-game via external event (or randomly
@@ -4355,7 +4363,7 @@ struct obj *no_wish;
             d.otmp->corpsenm = d.mntmp;
             if (Has_contents(d.otmp) && verysmall(&mons[d.mntmp]))
                 delete_contents(d.otmp); /* no spellbook */
-            d.otmp->spe = d.ishistoric ? STATUE_HISTORIC : 0;
+            d.otmp->spe |= d.ishistoric ? STATUE_HISTORIC : 0;
             break;
         case SCALE_MAIL:
             /* Dragon mail - depends on the order of objects & dragons. */

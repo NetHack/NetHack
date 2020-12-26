@@ -298,7 +298,7 @@ boolean thrown_weapon; /* thrown weapons are less deadly */
     }
 
     /* suppress killer prefix if it already has one */
-    i = name_to_mon(pkiller);
+    i = name_to_mon(pkiller, (int *) 0);
     if (i >= LOW_PM && (mons[i].geno & G_UNIQ)) {
         kprefix = KILLED_BY;
         if (!type_is_pname(&mons[i]))
@@ -709,11 +709,11 @@ int r;
     } roleabils[] = {
         { PM_ARCHEOLOGIST, arc_abil },
         { PM_BARBARIAN, bar_abil },
-        { PM_CAVEMAN, cav_abil },
+        { PM_CAVE_DWELLER, cav_abil },
         { PM_HEALER, hea_abil },
         { PM_KNIGHT, kni_abil },
         { PM_MONK, mon_abil },
-        { PM_PRIEST, pri_abil },
+        { PM_CLERIC, pri_abil },
         { PM_RANGER, ran_abil },
         { PM_ROGUE, rog_abil },
         { PM_SAMURAI, sam_abil },
@@ -1054,8 +1054,8 @@ int x;
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
-            && (g.youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
-                || u.umonnum == PM_INCUBUS))
+            && (g.youmonst.data->mlet == S_NYMPH
+                || u.umonnum == PM_AMOROUS_DEMON))
             return (schar) 18;
     } else if (x == A_CON) {
         if (uwep && uwep->oartifact == ART_OGRESMASHER)

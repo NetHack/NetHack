@@ -272,12 +272,13 @@ char *posbar;
 
 /* XXX can we decode the glyph in a meaningful way? */
 void
-chainin_print_glyph(window, x, y, glyph, bkglyph)
+chainin_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
 int glyph, bkglyph;
+int glyphmod[NUM_GLYPHMOD];
 {
-    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyph, bkglyph);
+    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyph, bkglyph, glyphmod);
 }
 
 void

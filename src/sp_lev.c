@@ -1965,12 +1965,12 @@ struct mkroom *croom;
                 break;
 
             case M_AP_MONSTER: {
-                int mndx;
+                int mndx, gender_name_var = NEUTRAL;
 
                 if (!strcmpi(m->appear_as.str, "random"))
                     mndx = select_newcham_form(mtmp);
                 else
-                    mndx = name_to_mon(m->appear_as.str);
+                    mndx = name_to_mon(m->appear_as.str, &gender_name_var);
 
                 if (mndx == NON_PM || (is_vampshifter(mtmp)
                                        && !validvamp(mtmp, &mndx, S_HUMAN))) {
@@ -1998,6 +1998,8 @@ struct mkroom *croom;
                     struct permonst *olddata = mtmp->data;
 
                     mgender_from_permonst(mtmp, mdat);
+                    if (gender_name_var != NEUTRAL)
+                        mtmp->female = gender_name_var;
                     set_mon_data(mtmp, mdat);
                     if (emits_light(olddata) != emits_light(mtmp->data)) {
                         /* used to give light, now doesn't, or vice versa,
@@ -3016,7 +3018,11 @@ const char *s;
     int i;
 
     for (i = LOW_PM; i < NUMMONS; i++)
-        if (!strcmpi(mons[i].mname, s))
+        if (!strcmpi(mons[i].pmnames[NEUTRAL], s)
+            || (mons[i].pmnames[MALE] != 0
+                    && !strcmpi(mons[i].pmnames[MALE], s))
+            || (mons[i].pmnames[FEMALE] != 0
+                    && !strcmpi(mons[i].pmnames[FEMALE], s)))
             return i;
     return NON_PM;
 }
@@ -3428,7 +3434,11 @@ lua_State *L;
                 pm = mkclass(def_char_to_monclass(*montype), G_NOGEN|G_IGNORE);
             } else {
                 for (i = LOW_PM; i < NUMMONS; i++)
-                    if (!strcmpi(mons[i].mname, montype)) {
+                    if (!strcmpi(mons[i].pmnames[NEUTRAL], montype)
+                        || (mons[i].pmnames[MALE] != 0
+                               && !strcmpi(mons[i].pmnames[MALE], montype))
+                        || (mons[i].pmnames[FEMALE] != 0
+                               && !strcmpi(mons[i].pmnames[FEMALE], montype))) {
                         pm = &mons[i];
                         break;
                     }

@@ -18,10 +18,22 @@
 
 #define Fprintf (void) fprintf
 
-const char *FDECL(tilename, (int, int));
+/*
+ * Defining OBTAIN_TILEMAP to get a listing of the tile-mappings
+ * for debugging purposes requires that your link to produce
+ * the tilemap utility must also include:
+ *   objects.o, monst.o drawing.o
+ */
+/* #define OBTAIN_TILEMAP */
+
+#if defined(OBTAIN_TILEMAP) && !defined(TILETEXT)
+FILE *tilemap_file;
+#endif
+
+const char *FDECL(tilename, (int, int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
-boolean FDECL(acceptable_tilename, (int, const char *, const char *));
+boolean FDECL(acceptable_tilename, (int, int, const char *, const char *));
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
@@ -34,17 +46,14 @@ extern void FDECL(exit, (int));
 #define STATUES_LOOK_LIKE_MONSTERS
 #endif
 
-#define MON_GLYPH 1
-#define OBJ_GLYPH 2
-#define OTH_GLYPH 3 /* fortunately unnecessary */
-
+enum {MON_GLYPH, OBJ_GLYPH, OTH_GLYPH, TERMINATOR = -1};
 #define EXTRA_SCROLL_DESCR_COUNT ((SCR_BLANK_PAPER - SCR_STINKING_CLOUD) - 1)
 
 /* note that the ifdefs here should be the opposite sense from monst.c/
  * objects.c/rm.h
  */
 
-struct conditionals {
+struct conditionals_t {
     int sequence, predecessor;
     const char *name;
 } conditionals[] = {
@@ -56,7 +65,7 @@ struct conditionals {
     { MON_GLYPH, PM_BABY_SILVER_DRAGON, "baby shimmering dragon" },
     { MON_GLYPH, PM_SILVER_DRAGON, "shimmering dragon" },
     { MON_GLYPH, PM_JABBERWOCK, "vorpal jabberwock" },
-    { MON_GLYPH, PM_VAMPIRE_LORD, "vampire mage" },
+    { MON_GLYPH, PM_VAMPIRE_LEADER, "vampire mage" },
 #ifndef CHARON /* not supported yet */
     { MON_GLYPH, PM_CROESUS, "Charon" },
 #endif
@@ -79,7 +88,7 @@ struct conditionals {
     { OBJ_GLYPH, SCR_STINKING_CLOUD + EXTRA_SCROLL_DESCR_COUNT,
       "stamped / mail" },
 #endif
-    { 0, 0, 0 }
+    { TERMINATOR, 0, 0 }
 };
 
 /*
@@ -103,42 +112,42 @@ struct substitute {
                     { GLYPH_CMAP_OFF + S_vwall, GLYPH_CMAP_OFF + S_trwall,
                       "sokoban walls", "In_sokoban(plev)" } };
 
-#ifdef TILETEXT
-
+#if defined(TILETEXT) || defined(OBTAIN_TILEMAP)
 /*
- * entry is the position of the tile within the monsters/objects/other set
+ * file_entry is the position of the tile within the monsters/objects/other set
  */
 const char *
-tilename(set, entry)
-int set, entry;
+tilename(set, file_entry, gend)
+int set, file_entry, gend;
 {
-    int i, j, condnum, tilenum;
+    int i, j, condnum, tilenum, gendnum;
     static char buf[BUFSZ];
 
     (void) def_char_to_objclass(']');
 
-    condnum = tilenum = 0;
+    condnum = tilenum = gendnum = 0;
 
     for (i = 0; i < NUMMONS; i++) {
-        if (set == MON_GLYPH && tilenum == entry)
-            return mons[i].mname;
-        tilenum++;
-        while (conditionals[condnum].sequence == MON_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            if (set == MON_GLYPH && tilenum == entry)
-                return conditionals[condnum].name;
-            condnum++;
-            tilenum++;
+        if (set == MON_GLYPH && tilenum == file_entry && gend == 0)
+            return mons[i].pmnames[NEUTRAL];
+        for (condnum = 0; conditionals[condnum].sequence != -1; ++condnum) {
+            if (conditionals[condnum].sequence == MON_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum += 2;
+                if (set == MON_GLYPH && tilenum == file_entry)
+                    return conditionals[condnum].name;
+            }
         }
+        tilenum += 2;
     }
-    if (set == MON_GLYPH && tilenum == entry)
+    if (set == MON_GLYPH && tilenum == file_entry)
         return "invisible monster";
 
     tilenum = 0; /* set-relative number */
     for (i = 0; i < NUM_OBJECTS; i++) {
         /* prefer to give the description - that's all the tile's
          * appearance should reveal */
-        if (set == OBJ_GLYPH && tilenum == entry) {
+        if (set == OBJ_GLYPH && tilenum == file_entry) {
             if (!obj_descr[i].oc_descr)
                 return obj_descr[i].oc_name;
             if (!obj_descr[i].oc_name)
@@ -148,20 +157,20 @@ int set, entry;
                     obj_descr[i].oc_name);
             return buf;
         }
-
-        tilenum++;
-        while (conditionals[condnum].sequence == OBJ_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            if (set == OBJ_GLYPH && tilenum == entry)
-                return conditionals[condnum].name;
-            condnum++;
-            tilenum++;
+	for (condnum = 0; conditionals[condnum].sequence != -1; ++condnum) {
+            if (conditionals[condnum].sequence == OBJ_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum++;
+                if (set == OBJ_GLYPH && tilenum == file_entry)
+                    return conditionals[condnum].name;
+            }
         }
+        tilenum++;
     }
 
     tilenum = 0; /* set-relative number */
     for (i = 0; i < (MAXPCHARS - MAXEXPCHARS); i++) {
-        if (set == OTH_GLYPH && tilenum == entry) {
+        if (set == OTH_GLYPH && tilenum == file_entry) {
             if (*defsyms[i].explanation) {
                 return defsyms[i].explanation;
             } else {
@@ -169,18 +178,19 @@ int set, entry;
                 return buf;
             }
         }
-        tilenum++;
-        while (conditionals[condnum].sequence == OTH_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            if (set == OTH_GLYPH && tilenum == entry)
-                return conditionals[condnum].name;
-            condnum++;
-            tilenum++;
+	for (condnum = 0; conditionals[condnum].sequence != -1; ++condnum) {
+            if (conditionals[condnum].sequence == OTH_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum++;
+                if (set == OTH_GLYPH && tilenum == file_entry)
+                    return conditionals[condnum].name;
+            }
         }
+        tilenum++;
     }
     /* explosions */
     tilenum = MAXPCHARS - MAXEXPCHARS;
-    i = entry - tilenum;
+    i = file_entry - tilenum;
     if (i < (MAXEXPCHARS * EXPL_MAX)) {
         if (set == OTH_GLYPH) {
             static const char *explosion_types[] = {
@@ -195,7 +205,7 @@ int set, entry;
     }
     tilenum += (MAXEXPCHARS * EXPL_MAX);
 
-    i = entry - tilenum;
+    i = file_entry - tilenum;
     if (i < (NUM_ZAP << 2)) {
         if (set == OTH_GLYPH) {
             Sprintf(buf, "zap %d %d", i / 4, i % 4);
@@ -204,7 +214,7 @@ int set, entry;
     }
     tilenum += (NUM_ZAP << 2);
 
-    i = entry - tilenum;
+    i = file_entry - tilenum;
     if (i < WARNCOUNT) {
         if (set == OTH_GLYPH) {
             Sprintf(buf, "warning %d", i);
@@ -213,7 +223,7 @@ int set, entry;
     }
     tilenum += WARNCOUNT;
 
-    i = entry - tilenum;
+    i = file_entry - tilenum;
     if (i < 1) {
         if (set == OTH_GLYPH) {
             Sprintf(buf, "unexplored");
@@ -222,17 +232,17 @@ int set, entry;
     }
     tilenum += 1;
 
-    i = entry - tilenum;
+    i = file_entry - tilenum;
     if (i < 1) {
         if (set == OTH_GLYPH) {
             Sprintf(buf, "nothing");
             return buf;
         }
     }
-    tilenum += 1;
+    tilenum++;
 
     for (i = 0; i < SIZE(substitutes); i++) {
-        j = entry - tilenum;
+        j = file_entry - tilenum;
         if (j <= substitutes[i].last_glyph - substitutes[i].first_glyph) {
             if (set == OTH_GLYPH) {
                 Sprintf(buf, "sub %s %d", substitutes[i].sub_name, j);
@@ -242,12 +252,12 @@ int set, entry;
         tilenum += substitutes[i].last_glyph - substitutes[i].first_glyph + 1;
     }
 
-    Sprintf(buf, "unknown %d %d", set, entry);
+    Sprintf(buf, "unknown %d %d", set, file_entry);
     return buf;
 }
+#endif
 
-#else /* TILETEXT */
-
+#ifndef TILETEXT
 #define TILE_FILE "tile.c"
 
 #ifdef AMIGA
@@ -260,7 +270,14 @@ int set, entry;
 #endif
 #endif
 
-short tilemap[MAX_GLYPH];
+struct tilemap_t {
+    short tilenum;
+#ifdef OBTAIN_TILEMAP
+    char name[80];
+    int glyph;
+#endif
+} tilemap[MAX_GLYPH];
+
 
 #ifdef STATUES_LOOK_LIKE_MONSTERS
 int lastmontile, lastobjtile, lastothtile, laststatuetile;
@@ -275,7 +292,8 @@ int lastmontile, lastobjtile, lastothtile;
  * set up array to map glyph numbers to tile numbers
  *
  * assumes tiles are numbered sequentially through monsters/objects/other,
- * with entries for all supported compilation options
+ * with entries for all supported compilation options. monsters have two
+ * tiles for each (male + female).
  *
  * "other" contains cmap and zaps (the swallow sets are a repeated portion
  * of cmap), as well as the "flash" glyphs for the new warning system
@@ -286,20 +304,21 @@ init_tilemap()
 {
     int i, j, condnum, tilenum;
     int corpsetile, swallowbase;
+    int file_entry = 0;
 
     for (i = 0; i < MAX_GLYPH; i++) {
-        tilemap[i] = -1;
+        tilemap[i].tilenum = -1;
     }
 
-    corpsetile = NUMMONS + NUM_INVIS_TILES + CORPSE;
-    swallowbase = NUMMONS + NUM_INVIS_TILES + NUM_OBJECTS + S_sw_tl;
+    corpsetile =  NUMMONS + NUMMONS + NUM_INVIS_TILES + CORPSE;
+    swallowbase = NUMMONS + NUMMONS + NUM_INVIS_TILES + NUM_OBJECTS + S_sw_tl;
 
     /* add number compiled out */
-    for (i = 0; conditionals[i].sequence; i++) {
+    for (i = 0; conditionals[i].sequence != TERMINATOR; i++) {
         switch (conditionals[i].sequence) {
         case MON_GLYPH:
-            corpsetile++;
-            swallowbase++;
+            corpsetile += 2;
+            swallowbase += 2;
             break;
         case OBJ_GLYPH:
             if (conditionals[i].predecessor < CORPSE)
@@ -313,116 +332,238 @@ init_tilemap()
         }
     }
 
-    condnum = tilenum = 0;
+#ifdef OBTAIN_TILEMAP
+    tilemap_file = fopen("tilemappings.lst", "w");
+#endif
+    tilenum = 0;
     for (i = 0; i < NUMMONS; i++) {
-        tilemap[GLYPH_MON_OFF + i] = tilenum;
-        tilemap[GLYPH_PET_OFF + i] = tilenum;
-        tilemap[GLYPH_DETECT_OFF + i] = tilenum;
-        tilemap[GLYPH_RIDDEN_OFF + i] = tilenum;
-        tilemap[GLYPH_BODY_OFF + i] = corpsetile;
+#ifdef OBTAIN_TILEMAP
+        char buf[256];
+#endif
+        tilemap[GLYPH_MON_OFF + i].tilenum = tilenum;
+        tilemap[GLYPH_PET_OFF + i].tilenum = tilenum;
+        tilemap[GLYPH_DETECT_OFF + i].tilenum = tilenum;
+        tilemap[GLYPH_RIDDEN_OFF + i].tilenum = tilenum;
+        tilemap[GLYPH_BODY_OFF + i].tilenum = corpsetile;
         j = GLYPH_SWALLOW_OFF + 8 * i;
-        tilemap[j] = swallowbase;
-        tilemap[j + 1] = swallowbase + 1;
-        tilemap[j + 2] = swallowbase + 2;
-        tilemap[j + 3] = swallowbase + 3;
-        tilemap[j + 4] = swallowbase + 4;
-        tilemap[j + 5] = swallowbase + 5;
-        tilemap[j + 6] = swallowbase + 6;
-        tilemap[j + 7] = swallowbase + 7;
-        tilenum++;
-        while (conditionals[condnum].sequence == MON_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            condnum++;
-            tilenum++;
+        tilemap[j].tilenum = swallowbase;
+        tilemap[j + 1].tilenum = swallowbase + 1;
+        tilemap[j + 2].tilenum = swallowbase + 2;
+        tilemap[j + 3].tilenum = swallowbase + 3;
+        tilemap[j + 4].tilenum = swallowbase + 4;
+        tilemap[j + 5].tilenum = swallowbase + 5;
+        tilemap[j + 6].tilenum = swallowbase + 6;
+        tilemap[j + 7].tilenum = swallowbase + 7;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(buf, "%s (%d)", tilename(MON_GLYPH, file_entry, 0), file_entry);
+        Sprintf(tilemap[GLYPH_MON_OFF + i].name,
+                "%s (%d)", buf, i);
+        Sprintf(tilemap[GLYPH_PET_OFF + i].name,
+                "%s %s (%d)", buf, "pet", i);
+        Sprintf(tilemap[GLYPH_DETECT_OFF + i].name,
+                "%s %s (%d)", buf, "detected", i);
+        Sprintf(tilemap[GLYPH_RIDDEN_OFF + i].name,
+                "%s %s (%d)", buf, "ridden", i);
+        Sprintf(tilemap[GLYPH_BODY_OFF + i].name,
+                "%s %s (%d)", buf, "corpse", i);
+        Sprintf(tilemap[j + 0].name, "%s swallow0 (%d)", buf, i);
+        Sprintf(tilemap[j + 1].name, "%s swallow1 (%d)", buf, i);
+        Sprintf(tilemap[j + 2].name, "%s swallow2 (%d)", buf, i);
+        Sprintf(tilemap[j + 3].name, "%s swallow3 (%d)", buf, i);
+        Sprintf(tilemap[j + 4].name, "%s swallow4 (%d)", buf, i);
+        Sprintf(tilemap[j + 5].name, "%s swallow5 (%d)", buf, i);
+        Sprintf(tilemap[j + 6].name, "%s swallow6 (%d)", buf, i);
+        Sprintf(tilemap[j + 7].name, "%s swallow7 (%d)", buf, i);
+#endif
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == MON_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum += 2;
+                file_entry += 2;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping monst %s (%d)\n",
+                        tilename(MON_GLYPH, file_entry, 0), file_entry);
+#endif
+            }
         }
+        tilenum += 2;  /* male + female tiles for each */
+        file_entry += 2;
     }
-    tilemap[GLYPH_INVISIBLE] = tilenum++;
+    tilemap[GLYPH_INVISIBLE].tilenum = tilenum++;
+    file_entry++;
+#ifdef OBTAIN_TILEMAP
+    Sprintf(tilemap[GLYPH_INVISIBLE].name,
+            "%s (%d)", "invisible mon", file_entry);
+#endif
     lastmontile = tilenum - 1;
 
+    file_entry = 0;
     for (i = 0; i < NUM_OBJECTS; i++) {
-        tilemap[GLYPH_OBJ_OFF + i] = tilenum;
-        tilenum++;
-        while (conditionals[condnum].sequence == OBJ_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            condnum++;
-            tilenum++;
+        tilemap[GLYPH_OBJ_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_OBJ_OFF + i].name, "%s (%d)",
+                tilename(OBJ_GLYPH, file_entry, 0), file_entry);
+#endif
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == OBJ_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum++;
+                file_entry++;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping obj %s (%d)\n",
+                        tilename(OBJ_GLYPH, file_entry, 0), file_entry);
+#endif
+            }
         }
+        tilenum++;
+        file_entry++;
     }
     lastobjtile = tilenum - 1;
 
+    file_entry = 0;
     for (i = 0; i < (MAXPCHARS - MAXEXPCHARS); i++) {
-        tilemap[GLYPH_CMAP_OFF + i] = tilenum;
+        tilemap[GLYPH_CMAP_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_CMAP_OFF + i].name, "cmap %s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
         tilenum++;
-        while (conditionals[condnum].sequence == OTH_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            condnum++;
-            tilenum++;
+        file_entry++;
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == OTH_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                tilenum++;
+                file_entry++;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping cmap %s (%d)\n",
+                        tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
+            }
         }
     }
 
     for (i = 0; i < (MAXEXPCHARS * EXPL_MAX); i++) {
-        tilemap[GLYPH_EXPLODE_OFF + i] = tilenum;
-        tilenum++;
-        while (conditionals[condnum].sequence == OTH_GLYPH
-               && conditionals[condnum].predecessor == (i + MAXPCHARS)) {
-            condnum++;
-            tilenum++;
+        tilemap[GLYPH_EXPLODE_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_EXPLODE_OFF + i].name, "explosion %s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == OTH_GLYPH
+                && conditionals[condnum].predecessor == i + MAXPCHARS) {
+                tilenum++;
+                file_entry++;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping explosion %s (%d)\n",
+                        tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
+            }
         }
+        tilenum++;
+        file_entry++;
     }
 
     for (i = 0; i < NUM_ZAP << 2; i++) {
-        tilemap[GLYPH_ZAP_OFF + i] = tilenum;
+        tilemap[GLYPH_ZAP_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_ZAP_OFF + i].name, "zap %s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
         tilenum++;
-        while (conditionals[condnum].sequence == OTH_GLYPH
+        file_entry++;
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == OTH_GLYPH
                && conditionals[condnum].predecessor == (i + MAXEXPCHARS)) {
-            condnum++;
-            tilenum++;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping zap %s (%d)\n",
+                        tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
+                file_entry++;
+                tilenum++;
+           }
         }
     }
 
     for (i = 0; i < WARNCOUNT; i++) {
-        tilemap[GLYPH_WARNING_OFF + i] = tilenum;
+        tilemap[GLYPH_WARNING_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_WARNING_OFF + i].name, "%s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
         tilenum++;
+        file_entry++;
     }
 
     for (i = 0; i < 1; i++) {
-        tilemap[GLYPH_UNEXPLORED_OFF + i] = tilenum;
+        tilemap[GLYPH_UNEXPLORED_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_UNEXPLORED_OFF + i].name, "unexplored %s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
         tilenum++;
+        file_entry++;
     }
 
     for (i = 0; i < 1; i++) {
-        tilemap[GLYPH_NOTHING + i] = tilenum;
+        tilemap[GLYPH_NOTHING + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_NOTHING + i].name, " nothing %s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
         tilenum++;
+        file_entry++;
     }
 
 #ifndef STATUES_LOOK_LIKE_MONSTERS
     /* statue patch: statues still use the same glyph as in vanilla */
 
     for (i = 0; i < NUMMONS; i++) {
-        tilemap[GLYPH_STATUE_OFF + i] = tilemap[GLYPH_OBJ_OFF + STATUE];
+        tilemap[GLYPH_STATUE_OFF + i].tilenum = tilemap[GLYPH_OBJ_OFF + STATUE];
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_STATUE_OFF + i].name, "%s (%d)",
+                tilename(OTH_GLYPH, file_entry, 0), file_entry);
+#endif
     }
 #endif
 
     lastothtile = tilenum - 1;
 
 #ifdef STATUES_LOOK_LIKE_MONSTERS
-    /* skip over the substitutes to get to the grayscale statues */
+    file_entry = 0;
+    /* fast-forward over the substitutes to grayscale statues loc */
     for (i = 0; i < SIZE(substitutes); i++) {
         tilenum += substitutes[i].last_glyph - substitutes[i].first_glyph + 1;
     }
 
     /* statue patch: statues look more like the monster */
-    condnum = 0; /* doing monsters again, so reset */
     for (i = 0; i < NUMMONS; i++) {
-        tilemap[GLYPH_STATUE_OFF + i] = tilenum;
-        tilenum++;
-        while (conditionals[condnum].sequence == MON_GLYPH
-               && conditionals[condnum].predecessor == i) {
-            condnum++;
-            tilenum++;
+        tilemap[GLYPH_STATUE_OFF + i].tilenum = tilenum;
+#ifdef OBTAIN_TILEMAP
+        Sprintf(tilemap[GLYPH_STATUE_OFF + i].name, "statue of %s (%d)",
+                tilename(MON_GLYPH, file_entry, 0), file_entry);
+#endif
+        for (condnum = 0; conditionals[condnum].sequence != -1; condnum++) {
+            if (conditionals[condnum].sequence == MON_GLYPH
+                && conditionals[condnum].predecessor == i) {
+                file_entry += 2;   /* skip female tile too */
+                tilenum += 2;
+#ifdef OBTAIN_TILEMAP
+                Fprintf(tilemap_file, "skipping statue of %s (%d)\n",
+                        tilename(MON_GLYPH, file_entry, 0), file_entry);
+#endif
+            }
         }
+        tilenum += 2;
+        file_entry += 2;
     }
-    laststatuetile = tilenum - 1;
+    laststatuetile = tilenum - 2;
+#endif /* STATUES_LOOK_LIKE_MONSTERS */
+#ifdef OBTAIN_TILEMAP
+    for (i = 0; i < MAX_GLYPH; ++i) {
+        Fprintf(tilemap_file, "[%04d] [%04d] %-80s\n",
+                i, tilemap[i].tilenum, tilemap[i].name);
+    }
+    fclose(tilemap_file);
 #endif
 }
 
@@ -451,8 +592,8 @@ FILE *ofp;
             Fprintf(ofp, "short std_tiles%d[] = { ", span);
             for (k = substitutes[i].first_glyph;
                  k < substitutes[i].last_glyph; k++)
-                Fprintf(ofp, "%d, ", tilemap[k]);
-            Fprintf(ofp, "%d };\n", tilemap[substitutes[i].last_glyph]);
+                Fprintf(ofp, "%d, ", tilemap[k].tilenum);
+            Fprintf(ofp, "%d };\n", tilemap[substitutes[i].last_glyph].tilenum);
         }
     }
 
@@ -503,12 +644,22 @@ FILE *ofp;
     Fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
 }
 
+#ifdef OBTAIN_TILEMAP
+extern void NDECL(monst_globals_init);
+extern void NDECL(objects_globals_init);
+#endif
+
 int
 main()
 {
     register int i;
     char filename[30];
     FILE *ofp;
+
+#ifdef OBTAIN_TILEMAP
+    objects_globals_init();
+    monst_globals_init();
+#endif
 
     init_tilemap();
 
@@ -526,7 +677,7 @@ main()
     Fprintf(ofp, "\nshort glyph2tile[MAX_GLYPH] = {\n");
 
     for (i = 0; i < MAX_GLYPH; i++) {
-        Fprintf(ofp, " %4d,", tilemap[i]);
+        Fprintf(ofp, " %4d,", tilemap[i].tilenum);
         if ((i % 12) == 11 || i == MAX_GLYPH - 1)
             Fprintf(ofp, "\n");
     }
@@ -654,17 +805,20 @@ struct {
 };
 
 boolean
-acceptable_tilename(idx, encountered, expected)
-int idx;
+acceptable_tilename(glyph_set, idx, encountered, expected)
+int glyph_set, idx;
 const char *encountered, *expected;
 {
-    if (idx >= 0 && idx < SIZE(altlabels)) {
-        if (!strcmp(altlabels[idx].expectedlabel, expected)) {
-            if (!strcmp(altlabels[idx].betterlabel, encountered))
-                return TRUE;
+    if (glyph_set == OTH_GLYPH) {
+        if (idx >= 0 && idx < SIZE(altlabels)) {
+            if (!strcmp(altlabels[idx].expectedlabel, expected)) {
+                if (!strcmp(altlabels[idx].betterlabel, encountered))
+                    return TRUE;
+            }
         }
+        return FALSE;
     }
-    return FALSE;
+    return TRUE;
 }
 
 /*tilemap.c*/

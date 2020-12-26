@@ -508,11 +508,11 @@ register struct obj *otmp;
 
     if (!otmp) {
         impossible("monster (%s) taking or picking up nothing?",
-                   mtmp->data->mname);
+                   pmname(mtmp->data, Mgender(mtmp)));
         return 1;
     } else if (otmp == uball || otmp == uchain) {
         impossible("monster (%s) taking or picking up attached %s (%s)?",
-                   mtmp->data->mname,
+                   pmname(mtmp->data, Mgender(mtmp)),
                    (otmp == uchain) ? "chain" : "ball", simpleonames(otmp));
         return 0;
     }

@@ -318,7 +318,8 @@ lua_State *L;
     if (obj->corpsenm != NON_PM
         && (obj->otyp == TIN || obj->otyp == CORPSE || obj->otyp == EGG
             || obj->otyp == FIGURINE || obj->otyp == STATUE))
-        nhl_add_table_entry_str(L, "corpsenm_name", mons[obj->corpsenm].mname);
+        nhl_add_table_entry_str(L, "corpsenm_name",
+                                mons[obj->corpsenm].pmnames[NEUTRAL]);
     /* TODO: leashmon, fromsink, novelidx, record_achieve_special */
     nhl_add_table_entry_int(L, "usecount", obj->usecount);
     /* TODO: spestudied */

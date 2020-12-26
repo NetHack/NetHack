@@ -578,19 +578,20 @@ char *posbar;
 /* XXX can we decode the glyph in a meaningful way? see mapglyph()?
  genl_putmixed?  */
 void
-trace_print_glyph(vp, window, x, y, glyph, bkglyph)
+trace_print_glyph(vp, window, x, y, glyph, bkglyph, glyphmod)
 void *vp;
 winid window;
 xchar x, y;
 int glyph, bkglyph;
+int glyphmod[NUM_GLYPHMOD];
 {
     struct trace_data *tdp = vp;
 
-    fprintf(wc_tracelogf, "%sprint_glyph(%d, %d, %d, %d, %d)\n", INDENT, window,
-            x, y, glyph, bkglyph);
+    fprintf(wc_tracelogf, "%sprint_glyph(%d, %d, %d, %d, %d, %lu)\n", INDENT, window,
+            x, y, glyph, bkglyph, glyphmod);
 
     PRE;
-    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyph, bkglyph);
+    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyph, bkglyph, glyphmod);
     POST;
 }
 

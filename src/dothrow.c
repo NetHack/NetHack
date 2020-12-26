@@ -39,7 +39,7 @@ struct obj *launcher; /* can be NULL */
     schar skill = objects[ammo->otyp].oc_skill;
 
     switch (pm) {
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         /* give bonus for low-tech gear */
         if (skill == -P_SLING || skill == P_SPEAR)
             multishot++;
@@ -158,7 +158,7 @@ int shotlimit;
                          : obj->oclass == WEAPON_CLASS)
         && !(Confusion || Stunned)) {
         /* some roles don't get a volley bonus until becoming expert */
-        weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_PRIEST)
+        weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_CLERIC)
                          || (Role_if(PM_HEALER) && skill != P_KNIFE)
                          || (Role_if(PM_TOURIST) && skill != -P_DART)
                          /* poor dexterity also inhibits multishot */

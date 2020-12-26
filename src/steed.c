@@ -70,11 +70,12 @@ struct obj *otmp;
 
         You("touch %s.", mon_nam(mtmp));
         if (!(poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))) {
-            Sprintf(kbuf, "attempting to saddle %s", an(mtmp->data->mname));
+            Sprintf(kbuf, "attempting to saddle %s",
+                    an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
         }
     }
-    if (ptr == &mons[PM_INCUBUS] || ptr == &mons[PM_SUCCUBUS]) {
+    if (ptr == &mons[PM_AMOROUS_DEMON]) {
         pline("Shame on you!");
         exercise(A_WIS, FALSE);
         return 1;
@@ -275,7 +276,8 @@ boolean force;      /* Quietly force this animal */
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        Sprintf(kbuf, "attempting to ride %s", an(mtmp->data->mname));
+        Sprintf(kbuf, "attempting to ride %s",
+                an(pmname(mtmp->data, Mgender(mtmp))));
         instapetrify(kbuf);
     }
     if (!mtmp->mtame || mtmp->isminion) {
@@ -535,9 +537,9 @@ int reason; /* Player was thrown off etc. */
             You("can't.  There isn't anywhere for you to stand.");
             return;
         }
-        if (!has_mname(mtmp)) {
+        if (!has_mgivenname(mtmp)) {
             pline("You've been through the dungeon on %s with no name.",
-                  an(mtmp->data->mname));
+                  an(pmname(mtmp->data, Mgender(mtmp))));
             if (Hallucination)
                 pline("It felt good to get out of the rain.");
         } else

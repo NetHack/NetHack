@@ -84,7 +84,8 @@ E void FDECL(Gem_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(Gem_update_positionbar, (char *));
 #endif
-E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                                int, int, unsigned *));
 E void FDECL(Gem_raw_print, (const char *));
 E void FDECL(Gem_raw_print_bold, (const char *));
 E int NDECL(Gem_nhgetch);

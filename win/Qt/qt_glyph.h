@@ -24,13 +24,13 @@ public:
 	void setSize(int w, int h);
 
         void drawGlyph(QPainter &, int glyph, int pixelx, int pixely,
-                       bool reversed = false);
-        void drawCell(QPainter &, int glyph, int cellx, int celly);
+                       bool fem, bool reversed = false);
+        void drawCell(QPainter &, int glyph, int cellx, int celly, bool fem);
         void drawBorderedCell(QPainter &, int glyph,
                               int cellx, int celly, int bordercode,
-                              bool reversed);
-        QPixmap glyph(int glyphindx);
-        QPixmap reversed_pixmap(int glyphindx);
+                              bool reversed, bool fem = false);
+        QPixmap glyph(int glyphindx, bool fem = false);
+        QPixmap reversed_pixmap(int glyphindx, bool fem = false);
 
 private:
 	QImage img;

@@ -703,6 +703,12 @@ include an indication of monsters' health during farlook feedback (including
 	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
 make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
 	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
+add support for a single monster species to have distinct male, female,
+	and gender-neutral naming terms
+add support for a single monster species to have distinct male and female
+	tiles
+consolidate several monsters that differed only by their gender into their
+	single species
 
 
 Platform- and/or Interface-Specific New Features
@@ -730,6 +736,10 @@ Qt: add Filter, Layout, and Reset buttons to the extended command selector;
 	mode only"; Layout redisplays the grid of command buttons, toggling
 	from down columns to across rows or vice versa; Reset puts both back
 	to their default settings and clears any pending typed input
+tiles: male and female variations in monsters.txt; tested only with tile2bmp
+	conversion utility so far; also supported by tilemap utility to
+	generate tile.c; some window-port modifications still required to
+	integrate the male and female tile capability into the window port
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 
@@ -824,5 +834,8 @@ move 'restoring' to the program_state struct; add corresponding 'saving';
 unify special attack damages from separate you-hit-monster, monster-hits-you,
 	and monster-hits-monster into functions by damage type
 unify trap effects for hero and monster stepping on the trap by trap type
-
-
+replace the single permonst mname field with male, female, and gender-neutral
+	names pmnames[NUM_MGENDERS] fields
+add a new glyphmod parameter to window interface *_print_glyph() to be used
+	to provide additional details to the window port beyond the glyph;
+	begin to phase out the mapglyph() calls from within windows ports

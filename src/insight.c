@@ -327,10 +327,12 @@ int final;
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
         if (altphrasing)
-            Sprintf(eos(tmpbuf), "%s in ", mons[g.youmonst.cham].mname);
+            Sprintf(eos(tmpbuf), "%s in ",
+                    pmname(&mons[g.youmonst.cham],
+                           flags.female ? FEMALE : MALE));
         Sprintf(buf, "%s%s%s%s form", !final ? "currently " : "",
                 altphrasing ? just_an(anbuf, tmpbuf) : "in ",
-                tmpbuf, uasmon->mname);
+                tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
         you_are(buf, "");
     }
 
@@ -1367,7 +1369,7 @@ int final;
     }
     if (Warn_of_mon && g.context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-                makeplural(mons[g.context.warntype.speciesidx].mname));
+             makeplural(mons[g.context.warntype.speciesidx].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -1574,10 +1576,14 @@ int final;
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
         if (!vampshifted(&g.youmonst))
-            Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
+            Sprintf(buf, "polymorphed into %s",
+                    an(pmname(g.youmonst.data,
+                              flags.female ? FEMALE : MALE)));
         else
             Sprintf(buf, "polymorphed into %s in %s form",
-                    an(mons[g.youmonst.cham].mname), g.youmonst.data->mname);
+                    an(pmname(&mons[g.youmonst.cham],
+                              flags.female ? FEMALE : MALE)),
+                    pmname(g.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
@@ -1586,7 +1592,8 @@ int final;
         you_can("lay eggs", "");
     if (u.ulycn >= LOW_PM) {
         /* "you are a werecreature [in beast form]" */
-        Strcpy(buf, an(mons[u.ulycn].mname));
+        Strcpy(buf, an(pmname(&mons[u.ulycn],
+               flags.female ? FEMALE : MALE)));
         if (u.umonnum == u.ulycn) {
             Strcat(buf, " in beast form");
             if (wizard)
@@ -2226,15 +2233,16 @@ const genericptr vptr2;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
-        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_PRIEST);
-        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_PRIEST);
+        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_CLERIC);
+        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_CLERIC);
         if (uniq1 ^ uniq2) { /* one or other uniq, but not both */
             res = uniq2 - uniq1;
             break;
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].mname, name2 = mons[indx2].mname;
+        name1 = mons[indx1].pmnames[NEUTRAL],
+                name2 = mons[indx2].pmnames[NEUTRAL];
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -2344,7 +2352,7 @@ doborn()
                     g.mvitals[i].died, g.mvitals[i].born,
                     ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
                     ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
-                    mons[i].mname);
+                    mons[i].pmnames[NEUTRAL]);
             putstr(datawin, 0, buf);
             nborn += g.mvitals[i].born;
             ndied += g.mvitals[i].died;
@@ -2361,7 +2369,7 @@ doborn()
 
 /* high priests aren't unique but are flagged as such to simplify something */
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
-                               && mndx != PM_HIGH_PRIEST)
+                               && mndx != PM_HIGH_CLERIC)
 
 #define done_stopprint g.program_state.stopprint
 
@@ -2435,7 +2443,7 @@ boolean ask;
                 if (UniqCritterIndx(i)) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
-                            mons[i].mname);
+                            mons[i].pmnames[NEUTRAL]);
                     if (nkilled > 1) {
                         switch (nkilled) {
                         case 2:
@@ -2458,10 +2466,10 @@ boolean ask;
                     /* trolls or undead might have come back,
                        but we don't keep track of that */
                     if (nkilled == 1)
-                        Strcpy(buf, an(mons[i].mname));
+                        Strcpy(buf, an(mons[i].pmnames[NEUTRAL]));
                     else
                         Sprintf(buf, "%3d %s", nkilled,
-                                makeplural(mons[i].mname));
+                                makeplural(mons[i].pmnames[NEUTRAL]));
                 }
                 /* number of leading spaces to match 3 digit prefix */
                 pfx = !strncmpi(buf, "the ", 3) ? 0
@@ -2507,7 +2515,7 @@ num_genocides()
             ++n;
             if (UniqCritterIndx(i))
                 impossible("unique creature '%d: %s' genocided?",
-                           i, mons[i].mname);
+                           i, mons[i].pmnames[NEUTRAL]);
         }
     }
     return n;
@@ -2570,7 +2578,7 @@ boolean ask;
                 if (UniqCritterIndx(i))
                     continue;
                 if (g.mvitals[i].mvflags & G_GONE) {
-                    Sprintf(buf, " %s", makeplural(mons[i].mname));
+                    Sprintf(buf, " %s", makeplural(mons[i].pmnames[NEUTRAL]));
                     /*
                      * "Extinct" is unfortunate terminology.  A species
                      * is marked extinct when its birth limit is reached,

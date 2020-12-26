@@ -67,7 +67,7 @@ do_statusline1()
         char mbot[BUFSZ];
         int k = 0;
 
-        Strcpy(mbot, mons[u.umonnum].mname);
+        Strcpy(mbot, pmname(&mons[u.umonnum], Ugender));
         while (mbot[k] != 0) {
             if ((k == 0 || (k > 0 && mbot[k - 1] == ' ')) && 'a' <= mbot[k]
                 && mbot[k] <= 'z')
@@ -719,7 +719,7 @@ bot_via_windowport()
      */
     Strcpy(nb = buf, g.plname);
     nb[0] = highc(nb[0]);
-    titl = !Upolyd ? rank() : mons[u.umonnum].mname;
+    titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name
        but always keep at least 10 characters of it; when hitpintbar is

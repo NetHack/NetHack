@@ -814,12 +814,12 @@ struct monst *mtmp;
         bwrite(nhfp->fd, (genericptr_t) mtmp, buflen);
     }
     if (mtmp->mextra) {
-        buflen = MNAME(mtmp) ? (int) strlen(MNAME(mtmp)) + 1 : 0;
+        buflen = MGIVENNAME(mtmp) ? (int) strlen(MGIVENNAME(mtmp)) + 1 : 0;
         if (nhfp->structlevel)
             bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
         if (buflen > 0) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t) MNAME(mtmp), buflen);
+                bwrite(nhfp->fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
         }
         buflen = EGD(mtmp) ? (int) sizeof (struct egd) : 0;
         if (nhfp->structlevel)

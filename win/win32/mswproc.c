@@ -1281,7 +1281,7 @@ mswin_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph, bkglyph)
+print_glyph(window, x, y, glyph, bkglyph, glyphmod)
                 -- Print the glyph at (x,y) on the given window.  Glyphs are
                    integers at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
@@ -1290,12 +1290,15 @@ print_glyph(window, x, y, glyph, bkglyph)
 		   graphical or tiled environments to allow the depiction
 		   to fall against a background consistent with the grid 
 		   around x,y.
+                -- glyphmod provides extended information about the glyph
+                   that window ports can use to enhance the display in
+                   various ways.
                    
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod)
 {
-    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d)\n", wid, x, y, glyph, bkglyph);
+    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyph, bkglyph, glyphmod);
 
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
@@ -1306,6 +1309,9 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
         data.y = y;
         data.glyph = glyph;
         data.bkglyph = bkglyph;
+        data.glyphmod[GM_TTYCHAR] = glyphmod[GM_TTYCHAR];
+        data.glyphmod[GM_COLOR] = glyphmod[GM_COLOR];
+        data.glyphmod[GM_FLAGS] = glyphmod[GM_FLAGS];
         SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
     }

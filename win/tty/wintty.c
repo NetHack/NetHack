@@ -3415,15 +3415,15 @@ int x, y;
  */
 
 void
-tty_print_glyph(window, x, y, glyph, bkglyph)
+tty_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
 int glyph;
 int bkglyph UNUSED;
+unsigned *glyphmod;     /* don't mark UNUSED as we need to revisit */
 {
-    int ch;
     boolean inverse_on = FALSE;
-    int color;
+    int ch, color;
     unsigned special;
 
     HUPSKIP();
@@ -3433,8 +3433,10 @@ int bkglyph UNUSED;
             return;
     }
 #endif
-    /* map glyph to character and color */
-    (void) mapglyph(glyph, &ch, &color, &special, x, y, 0);
+    /* get glyph ttychar, color, and special flags */
+    ch = (int) glyphmod[GM_TTYCHAR];
+    color = (int) glyphmod[GM_COLOR];
+    special = glyphmod[GM_FLAGS];
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 

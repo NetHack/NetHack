@@ -82,14 +82,14 @@ public:
     {
     }
 
-    void setGlyph(int g)
+    void setGlyph(int g, bool fem)
     {
 	NetHackQtGlyphs& glyphs = qt_settings->glyphs();
 	int gw = glyphs.width();
 	int gh = glyphs.height();
 	QPixmap pm(gw,gh);
 	QPainter p(&pm);
-	glyphs.drawGlyph(p, g, 0, 0);
+	glyphs.drawGlyph(p, g, 0, 0, fem);
 	p.end();
 	setIcon(QIcon(pm));
 	//RLC setHeight(std::max(pm.height()+1,height()));
@@ -124,7 +124,7 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(roles[id].malenum));
+	setGlyph(monnum_to_glyph(roles[id].malenum), false);
     }
 };
 
@@ -139,7 +139,7 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(races[id].malenum));
+	setGlyph(monnum_to_glyph(races[id].malenum), false);
     }
 };
 
@@ -257,6 +257,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 
     chosen_gend = flags.initgend;
     chosen_align = flags.initalign;
+    bool fem = (chosen_gend > ROLE_NONE);
 
     // XXX QListView unsorted goes in rev.
     for (nrole=0; roles[nrole].name.m; nrole++)
@@ -264,8 +265,8 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     role->setRowCount(nrole);
     for (i=0; roles[i].name.m; i++) {
 	QTableWidgetItem *item = new QTableWidgetItem(
-		QIcon(qt_settings->glyphs().glyph(roles[i].malenum)),
-		roles[i].name.m);
+                QIcon(qt_settings->glyphs().glyph(roles[i].malenum, fem)),
+                roles[i].name.m);
 	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 	role->setItem(i, 0, item);
     }
@@ -280,7 +281,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     race->setRowCount(nrace);
     for (i=0; races[i].noun; i++) {
 	QTableWidgetItem *item = new QTableWidgetItem(
-		QIcon(qt_settings->glyphs().glyph(races[i].malenum)),
+                QIcon(qt_settings->glyphs().glyph(races[i].malenum, fem)),
 		races[i].noun);
 	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 	race->setItem(i, 0, item);
@@ -290,9 +291,13 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
     race->setHorizontalHeaderLabels(QStringList("Race"));
     race->resizeColumnToContents(0);
 
-    // TODO: render the alignment and gender labels smaller to match the
-    // horizontal header labels for role and race; getting the font from
-    // race table above and setting it for labels below made no difference
+    // TODO:
+    //  Render the alignment and gender labels smaller to match the
+    //  horizontal header labels for role and race; getting the font from
+    //  race table above and setting it for labels below made no difference.
+    //
+    // Maybe, if the order of choosing becomes more dynamic:
+    //  Replace the role and race glyphs when gender gets set.
 
     QLabel *gendlabel = new QLabel("Gender");
     genderbox->layout()->addWidget(gendlabel);

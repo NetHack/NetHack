@@ -2623,8 +2623,8 @@ boolean incl_wsegs;
 
     if (mtmp->mextra) {
         sz += (int) sizeof (struct mextra);
-        if (MNAME(mtmp))
-            sz += (int) strlen(MNAME(mtmp)) + 1;
+        if (MGIVENNAME(mtmp))
+            sz += (int) strlen(MGIVENNAME(mtmp)) + 1;
         if (EGD(mtmp))
             sz += (int) sizeof (struct egd);
         if (EPRI(mtmp))
@@ -4241,7 +4241,7 @@ boolean doit;
 #if 0
     if (Upolyd) { /* before objects */
         Sprintf(buf, "Use %s special ability",
-                s_suffix(mons[u.umonnum].mname));
+                s_suffix(pmname(&mons[u.umonnum], Ugender)));
         add_herecmd_menuitem(win, domonability, buf);
     }
 #endif

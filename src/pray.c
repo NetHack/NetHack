@@ -1979,7 +1979,7 @@ doturn()
     const char *Gname;
     int once, range, xlev;
 
-    if (!Role_if(PM_PRIEST) && !Role_if(PM_KNIGHT)) {
+    if (!Role_if(PM_CLERIC) && !Role_if(PM_KNIGHT)) {
         /* Try to use the "turn undead" spell.
          *
          * This used to be based on whether hero knows the name of the

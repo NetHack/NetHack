@@ -1468,7 +1468,7 @@ get_playerrank(char *rank)
     if (Upolyd) {
         int k = 0;
 
-        Strcpy(buf, mons[u.umonnum].mname);
+        Strcpy(buf, pmname(&mons[u.umonnum], flags.female ? FEMALE : MALE));
         while(buf[k] != 0) {
             if ((k == 0 || (k > 0 && buf[k-1] == ' ')) &&
                 'a' <= buf[k] && buf[k] <= 'z')

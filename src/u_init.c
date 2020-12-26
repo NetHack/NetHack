@@ -688,7 +688,7 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_B);
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         Cave_man[C_AMMO].trquan = rn1(11, 10); /* 10..20 */
         ini_inv(Cave_man);
         skill_init(Skill_C);
@@ -724,7 +724,7 @@ u_init()
         skill_init(Skill_Mon);
         break;
     }
-    case PM_PRIEST:
+    case PM_CLERIC:
         ini_inv(Priest);
         if (!rn2(10))
             ini_inv(Magicmarker);
@@ -811,7 +811,7 @@ u_init()
          * Non-warriors get an instrument.  We use a kludge to
          * get only non-magic instruments.
          */
-        if (Role_if(PM_PRIEST) || Role_if(PM_WIZARD)) {
+        if (Role_if(PM_CLERIC) || Role_if(PM_WIZARD)) {
             static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
                                     BELL,         BUGLE,       LEATHER_DRUM };
             Instrument[0].trotyp = trotyp[rn2(SIZE(trotyp))];
@@ -921,7 +921,7 @@ int otyp;
     case PM_BARBARIAN:
         skills = Skill_B;
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         skills = Skill_C;
         break;
     case PM_HEALER:
@@ -933,7 +933,7 @@ int otyp;
     case PM_MONK:
         skills = Skill_Mon;
         break;
-    case PM_PRIEST:
+    case PM_CLERIC:
         skills = Skill_P;
         break;
     case PM_RANGER:

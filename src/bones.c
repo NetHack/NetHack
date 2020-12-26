@@ -617,12 +617,12 @@ getbones()
              * set to the magic DEFUNCT_MONSTER cookie value.
              */
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (has_mname(mtmp))
-                    sanitize_name(MNAME(mtmp));
+                if (has_mgivenname(mtmp))
+                    sanitize_name(MGIVENNAME(mtmp));
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
                     if (wizard) {
                         debugpline1("Removing defunct monster %s from bones.",
-                                    mtmp->data->mname);
+                                    mtmp->data->pmnames[NEUTRAL]);
                     }
                     mongone(mtmp);
                 } else

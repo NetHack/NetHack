@@ -479,5 +479,6 @@ struct you {
 }; /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)
+#define Ugender ((Upolyd ? u.mfemale : flags.female) ? 1 : 0)
 
 #endif /* YOU_H */

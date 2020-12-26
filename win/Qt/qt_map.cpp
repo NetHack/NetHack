@@ -176,14 +176,19 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
+#if 0
 		unsigned short g=Glyph(i,j);
 		int color;
 		int ch;
 		unsigned special;
-
+#else
+		int color = Glyphcolor(i,j);
+		int ch = Glyphttychar(i,j);
+		unsigned special = Glyphflags(i,j);
+#endif
 		painter.setPen( Qt::green );
 		/* map glyph to character and color */
-		mapglyph(g, &ch, &color, &special, i, j, 0);
+//		mapglyph(g, &ch, &color, &special, i, j, 0);
 		ch = cp437(ch);
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
@@ -220,15 +225,20 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
         }
 
 	painter.setFont(font());
-    } else {
+    } else { // tiles
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
+#if 0
 		int color;
 		int ch;
 		unsigned special;
 		mapglyph(g, &ch, &color, &special, i, j, 0);
-		qt_settings->glyphs().drawCell(painter, g, i, j);
+#else
+		unsigned special = Glyphflags(i, j);
+#endif
+                bool femflag = (special & MG_FEMALE) ? true : false;
+                qt_settings->glyphs().drawCell(painter, g, i, j, femflag);
 #ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
@@ -559,8 +569,14 @@ void NetHackQtMapViewport::Clear()
         // FIXME:  map column 0 should be surpressed from being displayed
         //
         Glyph(0, j) = GLYPH_NOTHING;
+        Glyphttychar(0, j) = ' ';
+        Glyphcolor(0, j) = NO_COLOR;
+        Glyphflags(0, j) = 0;
         for (int i = 1; i < COLNO; ++i)
             Glyph(i, j) = GLYPH_UNEXPLORED;
+            Glyphttychar(0, j) = ' ';
+            Glyphcolor(0, j) = NO_COLOR;
+            Glyphflags(0, j) = 0;
     }
 
     change.clear();
@@ -594,9 +610,12 @@ void NetHackQtMapViewport::CursorTo(int x,int y)
     Changed(cursor.x(),cursor.y());
 }
 
-void NetHackQtMapViewport::PrintGlyph(int x,int y,int theglyph)
+void NetHackQtMapViewport::PrintGlyph(int x,int y,int theglyph,unsigned *glyphmod)
 {
     Glyph(x,y)=theglyph;
+    Glyphttychar(x,y)=glyphmod[GM_TTYCHAR];
+    Glyphcolor(x,y)=glyphmod[GM_COLOR];
+    Glyphflags(x,y)=glyphmod[GM_FLAGS];
     Changed(x,y);
 }
 
@@ -701,9 +720,9 @@ void NetHackQtMapWindow2::ClipAround(int x,int y)
     ensureVisible(x,y,width()*0.45,height()*0.45);
 }
 
-void NetHackQtMapWindow2::PrintGlyph(int x,int y,int glyph)
+void NetHackQtMapWindow2::PrintGlyph(int x,int y,int glyph, unsigned *glyphmod)
 {
-    m_viewport->PrintGlyph(x, y, glyph);
+    m_viewport->PrintGlyph(x, y, glyph, glyphmod);
 }
 
 #if 0 //RLC
@@ -825,8 +844,15 @@ void NetHackQtMapWindow::Clear()
 {
     for (int j = 0; j < ROWNO; ++j) {
         Glyph(0, j) = GLYPH_NOTHING;
-        for (int i = 1; i < COLNO; ++i)
+        Glyphcolor(0, j) = NO_COLOR;
+        Glyphttychar(0, j) = ' ';
+        Glyphflags(0, j) = 0;
+        for (int i = 1; i < COLNO; ++i) {
             Glyph(i, j) = GLYPH_UNEXPLORED;
+            Glyphcolor(i, j) = NO_COLOR;
+            Glyphttychar(i, j) = ' ';
+            Glyphflags(i, j) = 0;
+        }
     }
 
     change.clear();
@@ -897,13 +923,18 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
+#if 0
 		int color;
 		char32_t ch;
 		unsigned special;
-
+#else
+		int color = Glyphcolor(i,j);
+		char32_t ch = Glyphttychar(i,j);
+		unsigned special = Glyphflags(i,j);
+#endif
 		painter.setPen( Qt::green );
 		/* map glyph to character and color */
-    		mapglyph(g, &ch, &color, &special, i, j, 0);
+//    		mapglyph(g, &ch, &color, &special, i, j, 0);
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
 #endif
@@ -935,11 +966,18 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
+#if 0
 		int color;
 		int ch;
 		unsigned special;
 		mapglyph(g, &ch, &color, &special, i, j, 0);
-		qt_settings->glyphs().drawCell(painter, g, i, j);
+#else
+		int color = Glyphcolor(i,j);
+		int ch = Glyphttychar(i,j);
+		unsigned special = Glyphflags(i,j);
+#endif
+                bool femflag = (special & MG_FEMALE) ? true : false;
+                qt_settings->glyphs().drawCell(painter, g, i, j, femflag);
 #ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
@@ -1048,9 +1086,12 @@ void NetHackQtMapWindow::ClipAround(int x,int y)
     viewport.center(x,y,0.45,0.45);
 }
 
-void NetHackQtMapWindow::PrintGlyph(int x,int y,int glyph)
+void NetHackQtMapWindow::PrintGlyph(int x,int y,int glyph, unsigned *glyphmod)
 {
     Glyph(x,y)=glyph;
+    Glyphttychar(x,y)=glyphmod[GM_TTYCHAR];
+    Glyphcolor(x,y)=glyphmod[GM_COLOR];
+    Glyphflags(x,y)=glyphmod[GM_FLAGS];
     Changed(x,y);
 }
 

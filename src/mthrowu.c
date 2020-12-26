@@ -345,7 +345,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (vis) {
             if (otmp->otyp == EGG)
                 pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
-                      otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
+                      otmp->known ? an(mons[otmp->corpsenm].pmnames[NEUTRAL])
+                                  : "an");
             else
                 hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
         } else if (verbose && !g.mtarget)

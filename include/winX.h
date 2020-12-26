@@ -453,7 +453,8 @@ E void NDECL(X11_wait_synch);
 #ifdef CLIPPING
 E void FDECL(X11_cliparound, (int, int));
 #endif
-E void FDECL(X11_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(X11_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                               int, int, unsigned *));
 E void FDECL(X11_raw_print, (const char *));
 E void FDECL(X11_raw_print_bold, (const char *));
 E int NDECL(X11_nhgetch);

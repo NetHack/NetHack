@@ -1022,7 +1022,7 @@ struct monst *mon;
                 pline("%s%s suddenly %s%s%s!", owner, corpse,
                       nonliving(mtmp2->data) ? "reanimates" : "comes alive",
                       different_type ? " as " : "",
-                      different_type ? an(mtmp2->data->mname) : "");
+                      different_type ? an(pmname(mtmp2->data, Mgender(mtmp2))) : "");
             else if (canseemon(mtmp2))
                 pline("%s suddenly appears!", Amonnam(mtmp2));
         }

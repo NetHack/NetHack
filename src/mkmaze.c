@@ -569,7 +569,7 @@ fixup_special()
                 set_corpsenm(otmp, rndmonnum());
             }
         }
-    } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
+    } else if (Role_if(PM_CLERIC) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
@@ -742,7 +742,7 @@ stolen_booty(VOID_ARGS)
         if (DEADMONSTER(mtmp))
             continue;
 
-        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
+        if (is_orc(mtmp->data) && !has_mgivenname(mtmp) && rn2(10)) {
             /*
              * We'll consider the orc captain from the level
              * description to be the captain of a rival orc horde

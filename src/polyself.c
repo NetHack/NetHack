@@ -263,10 +263,13 @@ change_sex()
                      : g.urole.malenum;
     if (!already_polyd) {
         u.umonnum = u.umonster;
-    } else if (u.umonnum == PM_SUCCUBUS || u.umonnum == PM_INCUBUS) {
+    } else if (u.umonnum == PM_AMOROUS_DEMON) {
         flags.female = !flags.female;
-        /* change monster type to match new sex */
+#if 0
+        /* change monster type to match new sex; disabled with PM_AMOROUS_DEMON */
+
         u.umonnum = (u.umonnum == PM_SUCCUBUS) ? PM_INCUBUS : PM_SUCCUBUS;
+#endif
         set_uasmon();
     }
 }
@@ -394,7 +397,7 @@ polyself(psflags)
 int psflags;
 {
     char buf[BUFSZ] = DUMMY;
-    int old_light, new_light, mntmp, class, tryct;
+    int old_light, new_light, mntmp, class, tryct, gvariant = NEUTRAL;
     boolean forcecontrol = (psflags == 1),
             monsterpoly = (psflags == 2),
             formrevert = (psflags == 3),
@@ -449,7 +452,7 @@ int psflags;
                 continue;  /* end do-while(--tryct > 0) loop */
             }
             class = 0;
-            mntmp = name_to_mon(buf);
+            mntmp = name_to_mon(buf, &gvariant);
             if (mntmp < LOW_PM) {
  by_class:
                 class = name_to_monclass(buf, &mntmp);
@@ -489,7 +492,7 @@ int psflags;
                        0 and trigger thats_enough_tries message */
                     ++tryct;
                 }
-                pm_name = mons[mntmp].mname;
+                pm_name = pmname(&mons[mntmp], flags.female ? FEMALE : MALE);
                 if (the_unique_pm(&mons[mntmp]))
                     pm_name = the(pm_name);
                 else if (!type_is_pname(&mons[mntmp]))
@@ -552,7 +555,7 @@ int psflags;
         } else if (isvamp) {
  do_vampyr:
             if (mntmp < LOW_PM || (mons[mntmp].geno & G_UNIQ)) {
-                mntmp = (g.youmonst.data == &mons[PM_VAMPIRE_LORD] && !rn2(10))
+                mntmp = (g.youmonst.data == &mons[PM_VAMPIRE_LEADER] && !rn2(10))
                             ? PM_WOLF
                             : !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
                 if (g.youmonst.cham >= LOW_PM
@@ -560,7 +563,8 @@ int psflags;
                     mntmp = g.youmonst.cham;
             }
             if (controllable_poly) {
-                Sprintf(buf, "Become %s?", an(mons[mntmp].mname));
+                Sprintf(buf, "Become %s?",
+                        an(pmname(&mons[mntmp], gvariant)));
                 if (yn(buf) != 'y')
                     return;
             }
@@ -622,7 +626,8 @@ int mntmp;
     int mlvl;
 
     if (g.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
-        You_feel("rather %s-ish.", mons[mntmp].mname);
+        You_feel("rather %s-ish.",
+                 pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
         exercise(A_WIS, TRUE);
         return 0;
     }
@@ -676,7 +681,7 @@ int mntmp;
         Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
                        ? "" : flags.female ? "female " : "male ");
     }
-    Strcat(buf, mons[mntmp].mname);
+    Strcat(buf, pmname(&mons[mntmp], flags.female ? FEMALE : MALE));
     You("%s %s!", (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
 
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
@@ -774,7 +779,8 @@ int mntmp;
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
-            Sprintf(buf, "riding %s", an(u.usteed->data->mname));
+            Sprintf(buf, "riding %s",
+                    an(pmname(u.usteed->data, Mgender(u.usteed))));
             instapetrify(buf);
         }
         if (!can_ride(u.usteed))
@@ -1576,7 +1582,8 @@ dopoly()
     if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst)) {
         polyself(2);
         if (savedat != g.youmonst.data) {
-            You("transform into %s.", an(g.youmonst.data->mname));
+            You("transform into %s.",
+                an(pmname(g.youmonst.data, Ugender)));
             newsym(u.ux, u.uy);
         }
     }
@@ -1764,7 +1771,7 @@ int part;
     if ((part == HAND || part == HANDED)
         && (humanoid(mptr) && attacktype(mptr, AT_CLAW)
             && !index(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
-            && mptr != &mons[PM_INCUBUS] && mptr != &mons[PM_SUCCUBUS]))
+            && mptr != &mons[PM_AMOROUS_DEMON]))
         return (part == HAND) ? "claw" : "clawed";
     if ((mptr == &mons[PM_MUMAK] || mptr == &mons[PM_MASTODON])
         && part == NOSE)
@@ -1926,7 +1933,7 @@ polysense()
         warnidx = PM_SHRIEKER;
         break;
     case PM_VAMPIRE:
-    case PM_VAMPIRE_LORD:
+    case PM_VAMPIRE_LEADER:
         g.context.warntype.polyd = M2_HUMAN | M2_ELF;
         HWarn_of_mon |= FROMRACE;
         return;

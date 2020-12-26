@@ -700,6 +700,7 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
     int col, row;
     int attr;
     int ry;
+    int tilenum = 0;
 
     row = currow;
     col = curcol;
@@ -721,7 +722,10 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
             if (!iflags.over_view && map[ry][col].special)
                 decal_packed(packcell, special);
 #endif
-            vesa_DisplayCell(glyph2tile[glyphnum], col - clipx, ry - clipy);
+            tilenum = glyph2tile[glyphnum];
+            if (map[ry][col].special & MG_FEMALE)
+                tilenum++;
+            vesa_DisplayCell(tilenum, col - clipx, ry - clipy);
         }
     }
     if (col < (CO - 1))

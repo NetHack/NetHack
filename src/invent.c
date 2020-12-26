@@ -2980,7 +2980,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
 
     for (; list; list = list->nobj) {
         /* priests always know bless/curse state */
-        if (Role_if(PM_PRIEST))
+        if (Role_if(PM_CLERIC))
             list->bknown = (list->oclass != COIN_CLASS);
         /* some actions exclude some or most items */
         if (filterfunc && !(*filterfunc)(list))
@@ -3020,7 +3020,7 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
     *bcp = *ucp = *ccp = *xcp = *ocp = 0;
     for ( ; list; list = (by_nexthere ? list->nexthere : list->nobj)) {
         /* priests always know bless/curse state */
-        if (Role_if(PM_PRIEST))
+        if (Role_if(PM_CLERIC))
             list->bknown = (list->oclass != COIN_CLASS);
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
@@ -3731,7 +3731,7 @@ register struct obj *otmp, *obj;
         return FALSE;
 
     if (obj->dknown != otmp->dknown
-        || (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
+        || (obj->bknown != otmp->bknown && !Role_if(PM_CLERIC))
         || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
         || obj->greased != otmp->greased)
         return FALSE;

@@ -602,7 +602,8 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
 
-                if ((m_idx = name_to_mon(g.killer.name)) >= LOW_PM) {
+                if ((m_idx = name_to_mon(g.killer.name,
+                                         (int *) 0)) >= LOW_PM) {
                     if (type_is_pname(&mons[m_idx])) {
                         g.killer.format = KILLED_BY;
                     } else if (mons[m_idx].geno & G_UNIQ) {
@@ -706,7 +707,7 @@ nh_timeout()
                     g.context.warntype.speciesidx = NON_PM;
                     if (g.context.warntype.species) {
                         You("are no longer warned about %s.",
-                            makeplural(g.context.warntype.species->mname));
+                     makeplural(g.context.warntype.species->pmnames[NEUTRAL]));
                         g.context.warntype.species = (struct permonst *) 0;
                     }
                 }
@@ -1075,15 +1076,15 @@ slip_or_trip()
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
             Sprintf(g.killer.name, "tripping over %s corpse",
-                    an(mons[otmp->corpsenm].mname));
+                    an(mons[otmp->corpsenm].pmnames[NEUTRAL]));
             instapetrify(g.killer.name);
         }
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {
         pline("%s %s%s on the ice.",
               u.usteed ? upstart(x_monnam(u.usteed,
-                                          (has_mname(u.usteed)) ? ARTICLE_NONE
-                                                                : ARTICLE_THE,
-                                          (char *) 0, SUPPRESS_SADDLE, FALSE))
+                                      (has_mgivenname(u.usteed)) ? ARTICLE_NONE
+                                                                 : ARTICLE_THE,
+                                      (char *) 0, SUPPRESS_SADDLE, FALSE))
                        : "You",
               rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
     } else {

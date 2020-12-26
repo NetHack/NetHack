@@ -162,7 +162,7 @@ void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
+void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
 void mswin_raw_print_flush();

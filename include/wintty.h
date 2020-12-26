@@ -211,7 +211,7 @@ E void FDECL(tty_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(tty_update_positionbar, (char *));
 #endif
-E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int, unsigned *));
 E void FDECL(tty_raw_print, (const char *));
 E void FDECL(tty_raw_print_bold, (const char *));
 E int NDECL(tty_nhgetch);

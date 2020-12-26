@@ -2059,7 +2059,7 @@ do_class_genocide()
             return;
 
         class = name_to_monclass(buf, (int *) 0);
-        if (class == 0 && (i = name_to_mon(buf)) != NON_PM)
+        if (class == 0 && (i = name_to_mon(buf, (int *) 0)) != NON_PM)
             class = mons[i].mlet;
         immunecnt = gonecnt = goodcnt = 0;
         for (i = LOW_PM; i < NUMMONS; i++) {
@@ -2101,7 +2101,7 @@ do_class_genocide()
             if (mons[i].mlet == class) {
                 char nam[BUFSZ];
 
-                Strcpy(nam, makeplural(mons[i].mname));
+                Strcpy(nam, makeplural(mons[i].pmnames[NEUTRAL]));
                 /* Although "genus" is Latin for race, the hero benefits
                  * from both race and role; thus genocide affects either.
                  */
@@ -2165,12 +2165,12 @@ do_class_genocide()
                         named = type_is_pname(&mons[i]) ? TRUE : FALSE;
                         uniq = (mons[i].geno & G_UNIQ) ? TRUE : FALSE;
                         /* one special case */
-                        if (i == PM_HIGH_PRIEST)
+                        if (i == PM_HIGH_CLERIC)
                             uniq = FALSE;
 
                         You("aren't permitted to genocide %s%s.",
                             (uniq && !named) ? "the " : "",
-                            (uniq || named) ? mons[i].mname : nam);
+                            (uniq || named) ? mons[i].pmnames[NEUTRAL] : nam);
                     }
                 }
             }
@@ -2205,7 +2205,7 @@ int how;
     if (how & PLAYER) {
         mndx = u.umonster; /* non-polymorphed mon num */
         ptr = &mons[mndx];
-        Strcpy(buf, ptr->mname);
+        Strcpy(buf, pmname(ptr, Ugender));
         killplayer++;
     } else {
         for (i = 0;; i++) {
@@ -2230,7 +2230,7 @@ int how;
                 return;
             }
 
-            mndx = name_to_mon(buf);
+            mndx = name_to_mon(buf, (int *) 0);
             if (mndx == NON_PM || (g.mvitals[mndx].mvflags & G_GENOD)) {
                 pline("Such creatures %s exist in this world.",
                       (mndx == NON_PM) ? "do not" : "no longer");
@@ -2276,15 +2276,15 @@ int how;
     which = "all ";
     if (Hallucination) {
         if (Upolyd)
-            Strcpy(buf, g.youmonst.data->mname);
+            Strcpy(buf, pmname(g.youmonst.data, flags.female ? FEMALE : MALE));
         else {
             Strcpy(buf, (flags.female && g.urole.name.f) ? g.urole.name.f
                                                        : g.urole.name.m);
             buf[0] = lowc(buf[0]);
         }
     } else {
-        Strcpy(buf, ptr->mname); /* make sure we have standard singular */
-        if ((ptr->geno & G_UNIQ) && ptr != &mons[PM_HIGH_PRIEST])
+        Strcpy(buf, ptr->pmnames[NEUTRAL]); /* make sure we have standard singular */
+        if ((ptr->geno & G_UNIQ) && ptr != &mons[PM_HIGH_CLERIC])
             which = !type_is_pname(ptr) ? "the " : "";
     }
     if (how & REALLY) {
@@ -2425,7 +2425,7 @@ struct obj *from_obj;
 {
     /* SHOPKEEPERS can be revived now */
     if (*mtype == PM_GUARD || (*mtype == PM_SHOPKEEPER && !revival)
-        || *mtype == PM_HIGH_PRIEST || *mtype == PM_ALIGNED_PRIEST
+        || *mtype == PM_HIGH_CLERIC || *mtype == PM_ALIGNED_CLERIC
         || *mtype == PM_ANGEL) {
         *mtype = PM_HUMAN_ZOMBIE;
         return TRUE;
@@ -2447,6 +2447,7 @@ create_particular_parse(str, d)
 char *str;
 struct _create_particular_data *d;
 {
+    int gender_name_var = NEUTRAL;
     char *bufp = str;
     char *tmpp;
 
@@ -2516,7 +2517,13 @@ struct _create_particular_data *d;
         d->randmonst = TRUE;
         return TRUE;
     }
-    d->which = name_to_mon(bufp);
+    d->which = name_to_mon(bufp, &gender_name_var);
+    /*
+     * With the introduction of male and female monster names
+     * in 3.7, preserve that detail.
+     */
+    if (gender_name_var != NEUTRAL)
+        d->fem = gender_name_var;
     if (d->which >= LOW_PM)
         return TRUE; /* got one */
     d->monclass = name_to_monclass(bufp, &d->which);
@@ -2556,7 +2563,8 @@ struct _create_particular_data *d;
             char buf[BUFSZ];
 
             Sprintf(buf, "Creating %s instead; force %s?",
-                    mons[d->which].mname, mons[firstchoice].mname);
+                    mons[d->which].pmnames[NEUTRAL],
+                    mons[firstchoice].pmnames[NEUTRAL]);
             if (yn(buf) == 'y')
                 d->which = firstchoice;
         }

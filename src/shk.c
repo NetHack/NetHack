@@ -839,8 +839,8 @@ char rmno;
                        (int) rmno,
                        (int) g.rooms[rmno - ROOMOFFSET].rtype,
                        shkp->mnum,
-                       /* [real shopkeeper name is kept in ESHK, not MNAME] */
-                       has_mname(shkp) ? MNAME(shkp) : "anonymous");
+                       /* [real shopkeeper name is kept in ESHK, not MGIVENNAME] */
+                       has_mgivenname(shkp) ? MGIVENNAME(shkp) : "anonymous");
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying g.rooms[].resident issue but... */
             return (struct monst *) 0;

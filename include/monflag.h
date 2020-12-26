@@ -205,6 +205,9 @@ enum ms_sounds {
 #define G_GONE          (G_GENOD | G_EXTINCT)
 #define MV_KNOWS_EGG    0x08 /* player recognizes egg of this monster type */
 
+enum mgender { MALE, FEMALE, NEUTRAL,
+               NUM_MGENDERS };
+
 /* *INDENT-ON* */
 /* clang-format on */
 #endif /* MONFLAG_H */

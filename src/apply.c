@@ -272,7 +272,7 @@ int rx, ry, *resp;
                     humanoid(mptr) ? "person" : "creature");
             what = buf;
         } else {
-            what = mptr->mname;
+            what = pmname(mptr, NEUTRAL);
             if (!type_is_pname(mptr))
                 what = The(what);
         }
@@ -408,7 +408,7 @@ register struct obj *obj;
                               || odummy->otyp == LENSES);
                 break;
             case M_AP_MONSTER: /* ignore Hallucination here */
-                what = mons[mtmp->mappearance].mname;
+                what = pmname(&mons[mtmp->mappearance], Mgender(mtmp));
                 break;
             case M_AP_FURNITURE:
                 what = defsyms[mtmp->mappearance].explanation;
@@ -904,7 +904,7 @@ struct obj *obj;
             } else if (u.uhs >= WEAK) {
                 You(look_str, "undernourished");
             } else if (Upolyd) {
-                You("look like %s.", an(mons[u.umonnum].mname));
+                You("look like %s.", an(pmname(&mons[u.umonnum], Ugender)));
             } else {
                 You("look as %s as ever.", uvisage);
             }
@@ -985,8 +985,8 @@ struct obj *obj;
         if (vis)
             pline("%s confuses itself!", Monnam(mtmp));
         mtmp->mconf = 1;
-    } else if (monable && (mlet == S_NYMPH || mtmp->data == &mons[PM_SUCCUBUS]
-                           || mtmp->data == &mons[PM_INCUBUS])) {
+    } else if (monable &&
+               (mlet == S_NYMPH || mtmp->data == &mons[PM_AMOROUS_DEMON])) {
         if (vis) {
             char buf[BUFSZ]; /* "She" or "He" */
 
@@ -1951,12 +1951,12 @@ struct obj *obj;
 
         if (poly_when_stoned(g.youmonst.data))
             You("tin %s without wearing gloves.",
-                an(mons[corpse->corpsenm].mname));
+                an(mons[corpse->corpsenm].pmnames[NEUTRAL]));
         else {
             pline("Tinning %s without wearing gloves is a fatal mistake...",
-                  an(mons[corpse->corpsenm].mname));
+                  an(mons[corpse->corpsenm].pmnames[NEUTRAL]));
             Sprintf(kbuf, "trying to tin %s without gloves",
-                    an(mons[corpse->corpsenm].mname));
+                    an(mons[corpse->corpsenm].pmnames[NEUTRAL]));
         }
         instapetrify(kbuf);
     }
@@ -2895,7 +2895,7 @@ struct obj *obj;
                         char kbuf[BUFSZ];
 
                         Sprintf(kbuf, "%s corpse",
-                                an(mons[otmp->corpsenm].mname));
+                                an(mons[otmp->corpsenm].pmnames[NEUTRAL]));
                         pline("Snatching %s is a fatal mistake.", kbuf);
                         instapetrify(kbuf);
                     }

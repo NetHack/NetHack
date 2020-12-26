@@ -184,8 +184,8 @@ dosounds()
                 continue;
             if (is_mercenary(mtmp->data)
 #if 0 /* don't bother excluding these */
-                && !strstri(mtmp->data->mname, "watch")
-                && !strstri(mtmp->data->mname, "guard")
+                && !strstri(mtmp->data->pmnames[NEUTRAL], "watch")
+                && !strstri(mtmp->data->pmnames[NEUTRAL], "guard")
 #endif
                 && mon_in_room(mtmp, BARRACKS)
                 /* sleeping implies not-yet-disturbed (usually) */
@@ -634,7 +634,7 @@ register struct monst *mtmp;
          * night */
         boolean isnight = night();
         boolean kindred = (Upolyd && (u.umonnum == PM_VAMPIRE
-                                      || u.umonnum == PM_VAMPIRE_LORD));
+                                      || u.umonnum == PM_VAMPIRE_LEADER));
         boolean nightchild =
             (Upolyd && (u.umonnum == PM_WOLF || u.umonnum == PM_WINTER_WOLF
                         || u.umonnum == PM_WINTER_WOLF_CUB));
@@ -696,7 +696,8 @@ register struct monst *mtmp;
                     verbl_msg = verbuf;
                 } else if (vampindex == 1) {
                     Sprintf(verbuf, vampmsg[vampindex],
-                            Upolyd ? an(mons[u.umonnum].mname)
+                            Upolyd ? an(pmname(&mons[u.umonnum],
+                                               flags.female ? FEMALE : MALE))
                                    : an(racenoun));
                     verbl_msg = verbuf;
                 } else
@@ -1086,7 +1087,8 @@ dochat()
     struct obj *otmp;
 
     if (is_silent(g.youmonst.data)) {
-        pline("As %s, you cannot speak.", an(g.youmonst.data->mname));
+        pline("As %s, you cannot speak.",
+              an(pmname(g.youmonst.data, flags.female ? FEMALE : MALE)));
         return 0;
     }
     if (Strangled) {
