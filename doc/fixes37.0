@@ -837,5 +837,4 @@ replace the single permonst mname field with male, female, and gender-neutral
 	names pmnames[NUM_MGENDERS] fields
 add a new glyphmod parameter to window interface *_print_glyph() to be used
 	to provide additional details to the window port beyond the glyph;
-	begin to phase out the mapglyph() calls from within windows ports;
-
+	begin to phase out the mapglyph() calls from within windows ports
