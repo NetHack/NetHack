@@ -32,10 +32,10 @@ private:
 	QFont *rogue_font;
 	unsigned short glyph[ROWNO][COLNO];
 	unsigned short& Glyph(int x, int y) { return glyph[y][x]; }
-        unsigned int glyphttychar[ROWNO][COLNO];
-	unsigned int& Glyphttychar(int x, int y) { return glyphttychar[y][x]; }
-        unsigned int glyphcolor[ROWNO][COLNO];
-	unsigned int& Glyphcolor(int x, int y) { return glyphcolor[y][x]; }
+        uchar glyphttychar[ROWNO][COLNO];
+	uchar& Glyphttychar(int x, int y) { return glyphttychar[y][x]; }
+        uchar glyphcolor[ROWNO][COLNO];
+	uchar& Glyphcolor(int x, int y) { return glyphcolor[y][x]; }
         unsigned int glyphflags[ROWNO][COLNO]; 
 	unsigned int& Glyphflags(int x, int y) { return glyphflags[y][x]; }
 	QPoint cursor;
@@ -51,6 +51,7 @@ private:
 	void PrintGlyph(int x,int y,int glyph,unsigned *glyphmod);
 	void Changed(int x, int y);
 	void updateTiles();
+        void SetRogueFont(QPainter &painter);
 
 	// NetHackQtMapWindow2 passes through many calls to the viewport
 	friend class NetHackQtMapWindow2;

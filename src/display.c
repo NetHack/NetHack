@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1606919261 2020/12/02 14:27:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1609101156 2020/12/27 20:32:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1370,15 +1370,16 @@ see_traps()
     }
 }
 
-static unsigned no_gm[NUM_GLYPHMOD] =
-            {MG_BADXY, (unsigned) ' ', (unsigned) NO_COLOR};
+static unsigned no_gm[NUM_GLYPHMOD] = {
+    MG_BADXY, (unsigned) ' ', (unsigned) NO_COLOR
+};
 #ifndef UNBUFFERED_GLYPHMOD
-#define Glyphmod_at(x,y,glyph) (                                               \
-                      ((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO)     \
-                          ? &no_gm[0] : &g.gbuf[(y)][(x)].glyphmod[0])
+#define Glyphmod_at(x, y, glyph) \
+    (((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO) ? &no_gm[0]   \
+     : &g.gbuf[(y)][(x)].glyphmod[0])
 #else
 static unsigned gm[NUM_GLYPHMOD];
-#define Glyphmod_at(x,y,glyph) glyphmod_at(x, y, glyph)
+#define Glyphmod_at(x, y, glyph) glyphmod_at(x, y, glyph)
 #endif
 
 /*
@@ -2425,7 +2426,8 @@ unsigned mgflags, *glyphmod;
         }
     }
 
-    glyphmod[GM_TTYCHAR] = ((mgflags & MG_FLAG_RETURNIDX) != 0) ? idx : g.showsyms[idx];
+    glyphmod[GM_TTYCHAR] = ((mgflags & MG_FLAG_RETURNIDX) != 0) ? idx
+                           : g.showsyms[idx];
 
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */

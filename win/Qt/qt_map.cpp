@@ -110,16 +110,16 @@ static const QPen& nhcolor_to_pen(int c)
 #endif
 
 NetHackQtMapViewport::NetHackQtMapViewport(NetHackQtClickBuffer& click_sink) :
-	QWidget(NULL),
-	rogue_font(NULL),
-	clicksink(click_sink),
-	change(10)
+    QWidget(NULL),
+    rogue_font(NULL),
+    clicksink(click_sink),
+    change(10)
 {
     pet_annotation = QPixmap(qt_compact_mode ? pet_mark_small_xpm
                                              : pet_mark_xpm);
     pile_annotation = QPixmap(pile_mark_xpm);
 
-    Clear();
+    Clear(); // initializes glyph[][], glyphttychar, glyphcolor, glyphflags
     cursor.setX(0);
     cursor.setY(0);
 }
@@ -129,16 +129,42 @@ NetHackQtMapViewport::~NetHackQtMapViewport(void)
     delete rogue_font;
 }
 
+// pick a font to use for text map; rogue level is always displayed as text
+void NetHackQtMapViewport::SetRogueFont(QPainter &painter)
+{
+    QString fontfamily = iflags.wc_font_map ? iflags.wc_font_map
+                                            : "Monospace";
+    int maybebold = QFont::Normal;
+    if (fontfamily.right(5).toLower() == "-bold") {
+        fontfamily.truncate(fontfamily.length() - 5);
+        maybebold = QFont::Bold;
+    }
+    // Find font...
+    int pts = 5;
+    while (pts < 32) {
+        QFont f(fontfamily, pts, maybebold);
+        painter.setFont(QFont(fontfamily, pts));
+        QFontMetrics fm = painter.fontMetrics();
+        if (fm.width("M") > qt_settings->glyphs().width())
+            break;
+        if (fm.height() > qt_settings->glyphs().height())
+            break;
+        pts++;
+    }
+    rogue_font = new QFont(fontfamily, pts - 1);
+}
+
 void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 {
-    QRect area=event->rect();
+    NetHackQtGlyphs &glyphs = qt_settings->glyphs();
+    int gW = glyphs.width(),
+        gH = glyphs.height();
+    QRect area = event->rect();
     QRect garea;
-    garea.setCoords(
-	std::max(0,area.left()/qt_settings->glyphs().width()),
-	std::max(0,area.top()/qt_settings->glyphs().height()),
-	std::min(COLNO-1,area.right()/qt_settings->glyphs().width()),
-	std::min(ROWNO-1,area.bottom()/qt_settings->glyphs().height())
-    );
+    garea.setCoords(std::max(0, area.left() / gW),
+                    std::max(0, area.top() / gH),
+                    std::min(COLNO - 1, area.right() / gW),
+                    std::min(ROWNO - 1, area.bottom() / gH));
 
     QPainter painter;
 
@@ -150,74 +176,42 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 	painter.setClipRect( event->rect() ); // (normally we don't clip)
 	painter.fillRect( event->rect(), Qt::black );
 
-	if ( !rogue_font ) {
-	    // Find font...
-	    int pts = 5;
-	    QString fontfamily = iflags.wc_font_map
-		? iflags.wc_font_map : "Monospace";
-	    bool bold = false;
-	    if ( fontfamily.right(5).toLower() == "-bold" ) {
-		fontfamily.truncate(fontfamily.length()-5);
-		bold = true;
-	    }
-	    while ( pts < 32 ) {
-		QFont f(fontfamily, pts, bold ? QFont::Bold : QFont::Normal);
-		painter.setFont(QFont(fontfamily, pts));
-		QFontMetrics fm = painter.fontMetrics();
-		if ( fm.width("M") > qt_settings->glyphs().width() )
-		    break;
-		if ( fm.height() > qt_settings->glyphs().height() )
-		    break;
-		pts++;
-	    }
-	    rogue_font = new QFont(fontfamily,pts-1);
-	}
+	if (!rogue_font)
+            SetRogueFont(painter);
 	painter.setFont(*rogue_font);
 
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 #if 0
-		unsigned short g=Glyph(i,j);
-		int color;
-		int ch;
+                unsigned short g = Glyph(i, j);
+                int colortmp;
+                int chtmp;
 		unsigned special;
-#else
-		int color = Glyphcolor(i,j);
-		int ch = Glyphttychar(i,j);
-		unsigned special = Glyphflags(i,j);
-#endif
-		painter.setPen( Qt::green );
 		/* map glyph to character and color */
-//		mapglyph(g, &ch, &color, &special, i, j, 0);
+                mapglyph(g, &chtmp, &colortmp, &special, i, j, 0);
+                uchar ch = (uchar) chtmp, color = (uchar) colortmp;
+#else
+		uchar color = Glyphcolor(i, j);
+		uchar ch = Glyphttychar(i, j);
+		unsigned special = Glyphflags(i, j);
+#endif
 		ch = cp437(ch);
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
+#else
+		painter.setPen( Qt::green );
 #endif
-		if (!DrawWalls(
-			painter,
-			i*qt_settings->glyphs().width(),
-			j*qt_settings->glyphs().height(),
-			qt_settings->glyphs().width(),
-			qt_settings->glyphs().height(),
-			ch)) {
-		    painter.drawText(
-			i*qt_settings->glyphs().width(),
-			j*qt_settings->glyphs().height(),
-			qt_settings->glyphs().width(),
-			qt_settings->glyphs().height(),
-			Qt::AlignCenter,
-			QString(QChar(ch)).left(1)
-		    );
+		if (!DrawWalls(painter, i * gW, j * gH, gW, gH, ch)) {
+		    painter.drawText(i * gW, j * gH, gW, gH, Qt::AlignCenter,
+                                     QString(QChar(ch)).left(1));
 		}
 #ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
-                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
-                                             j*qt_settings->glyphs().height()),
+                    painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pet_annotation);
                 } else if ((special & MG_OBJPILE) != 0
                            && ::iflags.hilite_pile) {
-                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
-                                             j*qt_settings->glyphs().height()),
+                    painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
                 }
 #endif
@@ -238,19 +232,16 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 		unsigned special = Glyphflags(i, j);
 #endif
                 bool femflag = (special & MG_FEMALE) ? true : false;
-                qt_settings->glyphs().drawCell(painter, g, i, j, femflag);
-#ifdef TEXTCOLOR
+                glyphs.drawCell(painter, g, i, j, femflag);
+
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
-                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
-                                             j*qt_settings->glyphs().height()),
+                    painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pet_annotation);
                 } else if ((special & MG_OBJPILE) != 0
                            && ::iflags.hilite_pile) {
-                    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
-                                             j*qt_settings->glyphs().height()),
+                    painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
                 }
-#endif
 	    }
 	}
     }
@@ -262,31 +253,26 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 #else
 	    painter.setPen( Qt::green ); // REALLY primitive
 #endif
-	} else
-	{
-	    int hp100;
-	    if (Upolyd) {
-		hp100=u.mhmax ? u.mh*100/u.mhmax : 100;
-	    } else {
-		hp100=u.uhpmax ? u.uhp*100/u.uhpmax : 100;
-	    }
+	} else {
+	    int hp = !Upolyd ? u.uhp : u.mh,
+                hpmax = !Upolyd ? u.uhpmax :  u.mhmax,
+                hp100 = hpmax ? (hp * 100 / hpmax) : 100;
 
-            if (hp100 > 75)
-                painter.setPen(Qt::white);
-            else if (hp100 > 50)
-                painter.setPen(Qt::yellow);
-            else if (hp100 > 25)
-                painter.setPen(QColor(0xff, 0xbf, 0x00)); // orange
-            else if (hp100 > 10)
-                painter.setPen(Qt::red);
-            else
+            // this uses a different color scheme from hitpoint bar but has
+            // the same cutoff thresholds (except for lack of separate 100%)
+            if (hp100 < 10 || hp < 5)
                 painter.setPen(Qt::magenta);
+            else if (hp100 < 25 || hp < 10 )
+                painter.setPen(Qt::red);
+            else if (hp100 < 50)
+                painter.setPen(QColor(0xff, 0xbf, 0x00)); // orange
+            else if (hp100 < 75)
+                painter.setPen(Qt::yellow);
+            else
+                painter.setPen(Qt::white);
 	}
 
-	painter.drawRect(cursor.x() * qt_settings->glyphs().width(),
-                         cursor.y() * qt_settings->glyphs().height(),
-                         qt_settings->glyphs().width() - 1,
-                         qt_settings->glyphs().height() - 1);
+	painter.drawRect(cursor.x() * gW, cursor.y() * gH, gW - 1, gH - 1);
     }
 
 #if 0
@@ -312,8 +298,7 @@ bool NetHackQtMapViewport::DrawWalls(
 	int x, int y, int w, int h,
 	unsigned ch)
 {
-    enum
-    {
+    enum wallbits {
 	w_left      = 0x01,
 	w_right     = 0x02,
 	w_up        = 0x04,
@@ -562,6 +547,7 @@ void NetHackQtMapViewport::clickCursor()
     qApp->exit();
 }
 
+// [re-]init map display to unexplored with no changed cells
 void NetHackQtMapViewport::Clear()
 {
     for (int j = 0; j < ROWNO; ++j) {
@@ -572,11 +558,13 @@ void NetHackQtMapViewport::Clear()
         Glyphttychar(0, j) = ' ';
         Glyphcolor(0, j) = NO_COLOR;
         Glyphflags(0, j) = 0;
-        for (int i = 1; i < COLNO; ++i)
+
+        for (int i = 1; i < COLNO; ++i) {
             Glyph(i, j) = GLYPH_UNEXPLORED;
-            Glyphttychar(0, j) = ' ';
-            Glyphcolor(0, j) = NO_COLOR;
-            Glyphflags(0, j) = 0;
+            Glyphttychar(i, j) = ' ';
+            Glyphcolor(i, j) = NO_COLOR;
+            Glyphflags(i, j) = 0;
+        }
     }
 
     change.clear();
@@ -610,13 +598,14 @@ void NetHackQtMapViewport::CursorTo(int x,int y)
     Changed(cursor.x(),cursor.y());
 }
 
-void NetHackQtMapViewport::PrintGlyph(int x,int y,int theglyph,unsigned *glyphmod)
+void NetHackQtMapViewport::PrintGlyph(int x, int y, int theglyph,
+                                      unsigned *glyphmod)
 {
-    Glyph(x,y)=theglyph;
-    Glyphttychar(x,y)=glyphmod[GM_TTYCHAR];
-    Glyphcolor(x,y)=glyphmod[GM_COLOR];
-    Glyphflags(x,y)=glyphmod[GM_FLAGS];
-    Changed(x,y);
+    Glyph(x, y) = theglyph;
+    Glyphttychar(x, y) = (uchar) glyphmod[GM_TTYCHAR];
+    Glyphcolor(x, y) = (uchar) glyphmod[GM_COLOR];
+    Glyphflags(x, y) = glyphmod[GM_FLAGS];
+    Changed(x, y);
 }
 
 void NetHackQtMapViewport::Changed(int x, int y)
