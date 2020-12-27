@@ -247,7 +247,7 @@ register struct monst *mtmp;
                 }
                 break;
             }
-            if (mm == PM_ELVENMONARCH) {
+            if (mm == PM_ELVEN_MONARCH) {
                 if (rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
                 if (!rn2(50))

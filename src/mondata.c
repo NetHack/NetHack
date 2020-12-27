@@ -772,7 +772,7 @@ int *gender_name_var;
             { "master of assassin", PM_MASTER_ASSASSIN, NEUTRAL },
             /* Outdated names */
             { "invisible stalker", PM_STALKER, NEUTRAL },
-            { "high-elf", PM_ELVENMONARCH, NEUTRAL }, /* PM_HIGH_ELF is obsolete */
+            { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is obsolete */
             /* other misspellings or incorrect words */
             { "wood-elf", PM_WOODLAND_ELF, NEUTRAL },
             { "wood elf", PM_WOODLAND_ELF, NEUTRAL },
@@ -1051,7 +1051,7 @@ static const short grownups[][2] = {
     { PM_WOODLAND_ELF, PM_ELF_NOBLE },
     { PM_GREEN_ELF, PM_ELF_NOBLE },
     { PM_GREY_ELF, PM_ELF_NOBLE },
-    { PM_ELF_NOBLE, PM_ELVENMONARCH },
+    { PM_ELF_NOBLE, PM_ELVEN_MONARCH },
     { PM_LICH, PM_DEMILICH },
     { PM_DEMILICH, PM_MASTER_LICH },
     { PM_MASTER_LICH, PM_ARCH_LICH },

@@ -738,8 +738,7 @@ Qt: add Filter, Layout, and Reset buttons to the extended command selector;
 	to their default settings and clears any pending typed input
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
-	generate tile.c; some window-port modifications still required to
-	integrate the male and female tile capability into the window port
+	generate tile.c
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 
@@ -838,4 +837,5 @@ replace the single permonst mname field with male, female, and gender-neutral
 	names pmnames[NUM_MGENDERS] fields
 add a new glyphmod parameter to window interface *_print_glyph() to be used
 	to provide additional details to the window port beyond the glyph;
-	begin to phase out the mapglyph() calls from within windows ports
+	begin to phase out the mapglyph() calls from within windows ports;
+
