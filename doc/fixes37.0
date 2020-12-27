@@ -782,6 +782,7 @@ allow rereading spellbooks to refresh memory at any time (github #261)
 allow themed rooms constrained by level difficulty (github #344)
 add a varied form of LIBNH nethack library contribution (github #385, #403)
 add cross-compile to WASM (github #385, #403, #412)
+differentiating gendered monster tiles from NullCGT (#430)
 
 
 Code Cleanup and Reorganization
