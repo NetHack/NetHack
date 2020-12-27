@@ -3418,7 +3418,11 @@ void
 tty_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
+#ifdef TTY_TILES_ESCCODES
 int glyph;
+#else
+int glyph UNUSED;
+#endif
 int bkglyph UNUSED;
 unsigned *glyphmod;     /* don't mark UNUSED as we need to revisit */
 {
