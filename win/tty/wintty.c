@@ -1,4 +1,4 @@
- /* NetHack 3.7	wintty.c	$NHDT-Date: 1608861214 2020/12/25 01:53:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1608861214 2020/12/25 01:53:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3453,7 +3453,14 @@ unsigned *glyphmod;     /* don't mark UNUSED as we need to revisit */
 #endif
 
 #ifdef TEXTCOLOR
-    if (color != ttyDisplay->color) {
+    if (iflags.wizmgender && (special & MG_FEMALE) && iflags.use_inverse) {
+        if (ttyDisplay->color != NO_COLOR)
+            term_end_color();
+        term_start_attr(ATR_INVERSE);
+        inverse_on = TRUE;
+        ttyDisplay->color = CLR_RED;
+        term_start_color(ttyDisplay->color);
+    } else if (color != ttyDisplay->color) {
         if (ttyDisplay->color != NO_COLOR)
             term_end_color();
         ttyDisplay->color = color;

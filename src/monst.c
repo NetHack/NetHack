@@ -448,8 +448,7 @@ NEARDATA struct permonst mons_init[] = {
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
-        M2_DWARF | M2_STRONG | M2_LORD | M2_MALE | M2_GREEDY | M2_JEWELS
-            | M2_COLLECT,
+        M2_DWARF | M2_STRONG | M2_LORD | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 6, CLR_BLUE),
     MON3("dwarf king", "dwarf queen", "dwarf ruler",
         S_HUMANOID, LVL(6, 6, 10, 20, 6), (G_GENO | 1),

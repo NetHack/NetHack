@@ -1844,6 +1844,8 @@ struct ext_func_tab extcmdlist[] = {
             wiz_level_change, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { '\0', "lightsources", "show mobile light sources",
             wiz_light_sources, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
+    { '\0', "wizmgender", "force added info about monster gender",
+            wiz_mgender, IFBURIED | AUTOCOMPLETE | WIZMODECMD },
     { ':', "look", "look at what is here", dolook, IFBURIED },
     { M('l'), "loot", "loot a box on the floor", doloot, AUTOCOMPLETE },
 #ifdef DEBUG_MIGRATING_MONS

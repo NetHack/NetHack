@@ -457,6 +457,8 @@ adding displacer beast inadvertently introduced a regression in swapping with
 splitting #if MAIL into #if MAIL_STRUCTURES and #if MAIL made it possible to
 	wish for and write scrolls of mail with MAIL disabled, but attempting
 	to read such a scroll issued impossible "What weird effect is this?"
+remove M2_MALE flag that was unintentionally left on dwarf lord/lady/leader
+	entry and was preventing female incarnations
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -709,6 +711,9 @@ add support for a single monster species to have distinct male and female
 	tiles
 consolidate several monsters that differed only by their gender into their
 	single species
+added wizmgender debugging command to display female monsters in red inverse;
+	helpful for debugging gender-related matters on tty; currently ignored
+	on other window ports
 
 
 Platform- and/or Interface-Specific New Features

@@ -2096,4 +2096,15 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
     return;
 }
 
+int
+wiz_mgender(VOID_ARGS)
+{
+    iflags.wizmgender = !iflags.wizmgender;
+    pline("wizmgender toggled %s", iflags.wizmgender ? "on" : "off");
+    if (!u.uswallow)
+        see_monsters();
+    map_redisplay();
+    return 0;  /* no time */
+}
+
 /*detect.c*/
