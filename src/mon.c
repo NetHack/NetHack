@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1608332750 2020/12/18 23:05:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1609075599 2020/12/27 13:26:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.363 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -155,6 +155,7 @@ const char *msg;
         if (!(is_mimic || mtmp->meating))
             impossible("non-mimic (%s) posing as %s (%s)",
                        mptr->pmnames[NEUTRAL], what, msg);
+#if 0   /* mimics who end up in strange locations do still hide while there */
         if (!(accessible(mx, my) || passes_walls(mptr))) {
             char buf[BUFSZ];
             const char *typnam = levltyp_to_name(levl[mx][my].typ);
@@ -166,6 +167,7 @@ const char *msg;
             impossible("mimic%s concealed in inaccessible location: %s (%s)",
                        is_mimic ? "" : "ker", typnam, msg);
         }
+#endif
     }
 }
 
