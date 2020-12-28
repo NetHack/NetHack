@@ -2522,8 +2522,7 @@ struct _create_particular_data *d;
      * With the introduction of male and female monster names
      * in 3.7, preserve that detail.
      */
-    if (gender_name_var != NEUTRAL)
-        d->fem = gender_name_var;
+    d->fem = gender_name_var;
     if (d->which >= LOW_PM)
         return TRUE; /* got one */
     d->monclass = name_to_monclass(bufp, &d->which);
@@ -2578,7 +2577,8 @@ struct _create_particular_data *d;
         else if (d->randmonst)
             whichpm = rndmonst();
         if (d->fem != -1 && !is_male(whichpm) && !is_female(whichpm))
-            mmflags |= (d->fem == FEMALE) ? MM_FEMALE : MM_MALE;
+            mmflags |= (d->fem == FEMALE) ? MM_FEMALE
+                           : (d->fem == MALE) ? MM_MALE : 0;
         mtmp = makemon(whichpm, u.ux, u.uy, mmflags);
         if (!mtmp) {
             /* quit trying if creation failed and is going to repeat */
