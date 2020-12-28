@@ -44,7 +44,9 @@ static int grayscale = 0;
 /* grayscale color mapping */
 static const int graymappings[] = {
  /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
-    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14
+    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14,
+ /* Q  R   S   T   U   V   W */
+    1, 17, 18, 19, 20, 27, 22
 };
 
 void
