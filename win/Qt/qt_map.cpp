@@ -126,11 +126,11 @@ NetHackQtMapViewport::NetHackQtMapViewport(NetHackQtClickBuffer& click_sink) :
 
 NetHackQtMapViewport::~NetHackQtMapViewport(void)
 {
-    delete rogue_font;
+    delete rogue_font; //rogue_font = NULL;
 }
 
 // pick a font to use for text map; rogue level is always displayed as text
-void NetHackQtMapViewport::SetRogueFont(QPainter &painter)
+void NetHackQtMapViewport::SetupTextmapFont(QPainter &painter)
 {
     QString fontfamily = iflags.wc_font_map ? iflags.wc_font_map
                                             : "Monospace";
@@ -167,7 +167,6 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                     std::min(ROWNO - 1, area.bottom() / gH));
 
     QPainter painter;
-
     painter.begin(this);
 
     if (Is_rogue_level(&u.uz) || iflags.wc_ascii_map) {
@@ -177,11 +176,11 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 	painter.fillRect( event->rect(), Qt::black );
 
 	if (!rogue_font)
-            SetRogueFont(painter);
+            SetupTextmapFont(painter);
 	painter.setFont(*rogue_font);
 
-	for (int j=garea.top(); j<=garea.bottom(); j++) {
-	    for (int i=garea.left(); i<=garea.right(); i++) {
+        for (int j = garea.top(); j <= garea.bottom(); j++) {
+            for (int i = garea.left(); i <= garea.right(); i++) {
 #if 0
                 unsigned short g = Glyph(i, j);
                 int colortmp;
@@ -189,10 +188,11 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 		unsigned special;
 		/* map glyph to character and color */
                 mapglyph(g, &chtmp, &colortmp, &special, i, j, 0);
-                uchar ch = (uchar) chtmp, color = (uchar) colortmp;
+                unsigned short ch = (unsigned short) chtmp,
+                               color = (unsigned short) colortmp;
 #else
-		uchar color = Glyphcolor(i, j);
-		uchar ch = Glyphttychar(i, j);
+		unsigned short color = Glyphcolor(i, j);
+		unsigned short ch = Glyphttychar(i, j);
 		unsigned special = Glyphflags(i, j);
 #endif
 		ch = cp437(ch);
@@ -220,9 +220,9 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
 	painter.setFont(font());
     } else { // tiles
-	for (int j=garea.top(); j<=garea.bottom(); j++) {
-	    for (int i=garea.left(); i<=garea.right(); i++) {
-		unsigned short g=Glyph(i,j);
+        for (int j = garea.top(); j <= garea.bottom(); j++) {
+            for (int i = garea.left(); i <= garea.right(); i++) {
+                unsigned short g = Glyph(i,j);
 #if 0
 		int color;
 		int ch;
@@ -293,10 +293,8 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
     painter.end();
 }
 
-bool NetHackQtMapViewport::DrawWalls(
-	QPainter& painter,
-	int x, int y, int w, int h,
-	unsigned ch)
+bool NetHackQtMapViewport::DrawWalls(QPainter& painter, int x, int y,
+                                     int w, int h, unsigned short ch)
 {
     enum wallbits {
 	w_left      = 0x01,
@@ -312,89 +310,72 @@ bool NetHackQtMapViewport::DrawWalls(
     unsigned walls;
     int x1, y1, x2, y2, x3, y3;
  
-    linewidth = ((w < h) ? w : h)/8;
-    if (linewidth == 0) linewidth = 1;
+    linewidth = ((w < h) ? w : h) / 8;
+    if (linewidth == 0)
+        linewidth = 1;
 
     // Single walls
     walls = 0;
-    switch (ch)
-    {
-    case 0x2500: // BOX DRAWINGS LIGHT HORIZONTAL
+    switch (ch) {
+    case 0x2500: // box drawings light horizontal
 	walls = w_left | w_right;
 	break;
-
-    case 0x2502: // BOX DRAWINGS LIGHT VERTICAL
+    case 0x2502: // box drawings light vertical
 	walls = w_up | w_down;
 	break;
-
-    case 0x250C: // BOX DRAWINGS LIGHT DOWN AND RIGHT
+    case 0x250C: // box drawings light down and right
 	walls = w_down | w_right;
 	break;
-
-    case 0x2510: // BOX DRAWINGS LIGHT DOWN AND LEFT
+    case 0x2510: // box drawings light down and left
 	walls = w_down | w_left;
 	break;
-
-    case 0x2514: // BOX DRAWINGS LIGHT UP AND RIGHT
+    case 0x2514: // box drawings light up and right
 	walls = w_up | w_right;
 	break;
-
-    case 0x2518: // BOX DRAWINGS LIGHT UP AND LEFT
+    case 0x2518: // box drawings light up and left
 	walls = w_up | w_left;
 	break;
-
-    case 0x251C: // BOX DRAWINGS LIGHT VERTICAL AND RIGHT
+    case 0x251C: // box drawings light vertical and right
 	walls = w_up | w_down | w_right;
 	break;
-
-    case 0x2524: // BOX DRAWINGS LIGHT VERTICAL AND LEFT
+    case 0x2524: // box drawings light vertical and left
 	walls = w_up | w_down | w_left;
 	break;
-
-    case 0x252C: // BOX DRAWINGS LIGHT DOWN AND HORIZONTAL
+    case 0x252C: // box drawings light down and horizontal
 	walls = w_down | w_left | w_right;
 	break;
-
-    case 0x2534: // BOX DRAWINGS LIGHT UP AND HORIZONTAL
+    case 0x2534: // box drawings light up and horizontal
 	walls = w_up | w_left | w_right;
 	break;
-
-    case 0x253C: // BOX DRAWINGS LIGHT VERTICAL AND HORIZONTAL
+    case 0x253C: // box drawings light vertical and horizontal
 	walls = w_up | w_down | w_left | w_right;
 	break;
     }
 
-    if (walls != 0)
-    {
-	x1 = x + w/2;
-	switch (walls & (w_up | w_down))
-	{
+    if (walls != 0) {
+	x1 = x + w / 2;
+	switch (walls & (w_up | w_down)) {
 	case w_up:
-	    painter.drawLine(x1, y, x1, y+h/2);
+	    painter.drawLine(x1, y, x1, y + h / 2);
 	    break;
-
 	case w_down:
-	    painter.drawLine(x1, y+h/2, x1, y+h-1);
+	    painter.drawLine(x1, y + h / 2, x1, y + h - 1);
 	    break;
-
 	case w_up | w_down:
-	    painter.drawLine(x1, y, x1, y+h-1);
+	    painter.drawLine(x1, y, x1, y + h - 1);
 	    break;
 	}
 
-	y1 = y + h/2;
-	switch (walls & (w_left | w_right))
-	{
+	y1 = y + h / 2;
+	switch (walls & (w_left | w_right)) {
 	case w_left:
-	    painter.drawLine(x, y1, x+w/2, y1);
+	    painter.drawLine(x, y1, x + w / 2, y1);
 	    break;
-
 	case w_right:
-	    painter.drawLine(x+w/2, y1, x+w-1, y1);
+	    painter.drawLine(x + w / 2, y1, x + w - 1, y1);
 	    break;
-
 	case w_left | w_right:
-	    painter.drawLine(x, y1, x+w-1, y1);
+	    painter.drawLine(x, y1, x + w - 1, y1);
 	    break;
 	}
 
@@ -403,108 +384,88 @@ bool NetHackQtMapViewport::DrawWalls(
 
     // Double walls
     walls = 0;
-    switch (ch)
-    {
-    case 0x2550: // BOX DRAWINGS DOUBLE HORIZONTAL
+    switch (ch) {
+    case 0x2550: // box drawings double horizontal
 	walls = w_left | w_right | w_sq_top | w_sq_bottom;
 	break;
-
-    case 0x2551: // BOX DRAWINGS DOUBLE VERTICAL
+    case 0x2551: // box drawings double vertical
 	walls = w_up | w_down | w_sq_left | w_sq_right;
 	break;
-
-    case 0x2554: // BOX DRAWINGS DOUBLE DOWN AND RIGHT
+    case 0x2554: // box drawings double down and right
 	walls = w_down | w_right | w_sq_top | w_sq_left;
 	break;
-
-    case 0x2557: // BOX DRAWINGS DOUBLE DOWN AND LEFT
+    case 0x2557: // box drawings double down and left
 	walls = w_down | w_left | w_sq_top | w_sq_right;
 	break;
-
-    case 0x255A: // BOX DRAWINGS DOUBLE UP AND RIGHT
+    case 0x255A: // box drawings double up and right
 	walls = w_up | w_right | w_sq_bottom | w_sq_left;
 	break;
-
-    case 0x255D: // BOX DRAWINGS DOUBLE UP AND LEFT
+    case 0x255D: // box drawings double up and left
 	walls = w_up | w_left | w_sq_bottom | w_sq_right;
 	break;
-
-    case 0x2560: // BOX DRAWINGS DOUBLE VERTICAL AND RIGHT
+    case 0x2560: // box drawings double vertical and right
 	walls = w_up | w_down | w_right | w_sq_left;
 	break;
-
-    case 0x2563: // BOX DRAWINGS DOUBLE VERTICAL AND LEFT
+    case 0x2563: // box drawings double vertical and left
 	walls = w_up | w_down | w_left | w_sq_right;
 	break;
-
-    case 0x2566: // BOX DRAWINGS DOUBLE DOWN AND HORIZONTAL
+    case 0x2566: // box drawings double down and horizontal
 	walls = w_down | w_left | w_right | w_sq_top;
 	break;
-
-    case 0x2569: // BOX DRAWINGS DOUBLE UP AND HORIZONTAL
+    case 0x2569: // box drawings double up and horizontal
 	walls = w_up | w_left | w_right | w_sq_bottom;
 	break;
-
-    case 0x256C: // BOX DRAWINGS DOUBLE VERTICAL AND HORIZONTAL
+    case 0x256C: // box drawings double vertical and horizontal
 	walls = w_up | w_down | w_left | w_right;
 	break;
     }
-    if (walls != 0)
-    {
-	x1 = x + w/2 - linewidth;
-	x2 = x + w/2 + linewidth;
+
+    if (walls != 0) {
+	x1 = x + w / 2 - linewidth;
+	x2 = x + w / 2 + linewidth;
 	x3 = x + w - 1;
-	y1 = y + h/2 - linewidth;
-	y2 = y + h/2 + linewidth;
+	y1 = y + h / 2 - linewidth;
+	y2 = y + h / 2 + linewidth;
 	y3 = y + h - 1;
-	if (walls & w_up)
-	{
+	if (walls & w_up) {
 	    painter.drawLine(x1, y, x1, y1);
 	    painter.drawLine(x2, y, x2, y1);
 	}
-	if (walls & w_down)
-	{
+	if (walls & w_down) {
 	    painter.drawLine(x1, y2, x1, y3);
 	    painter.drawLine(x2, y2, x2, y3);
 	}
-	if (walls & w_left)
-	{
+	if (walls & w_left) {
 	    painter.drawLine(x, y1, x1, y1);
 	    painter.drawLine(x, y2, x1, y2);
 	}
-	if (walls & w_right)
-	{
+	if (walls & w_right) {
 	    painter.drawLine(x2, y1, x3, y1);
 	    painter.drawLine(x2, y2, x3, y2);
 	}
-	if (walls & w_sq_top)
-	{
+	if (walls & w_sq_top) {
 	    painter.drawLine(x1, y1, x2, y1);
 	}
-	if (walls & w_sq_bottom)
-	{
+	if (walls & w_sq_bottom) {
 	    painter.drawLine(x1, y2, x2, y2);
 	}
-	if (walls & w_sq_left)
-	{
+	if (walls & w_sq_left) {
 	    painter.drawLine(x1, y1, x1, y2);
 	}
-	if (walls & w_sq_right)
-	{
+	if (walls & w_sq_right) {
 	    painter.drawLine(x2, y1, x2, y2);
 	}
+
 	return true;
     }
 
     // Solid blocks
-    if (0x2591 <= ch && ch <= 0x2593)
-    {
+    if (0x2591 <= ch && ch <= 0x2593) {
 	unsigned shade = ch - 0x2590;
 	QColor rgb(painter.pen().color());
-	QColor rgb2(
-		rgb.red()*shade/4,
-		rgb.green()*shade/4,
-		rgb.blue()*shade/4);
+        QColor rgb2(rgb.red() * shade / 4,
+                    rgb.green() * shade / 4,
+                    rgb.blue() * shade / 4);
 	painter.fillRect(x, y, w, h, rgb2);
 	return true;
     }
@@ -514,26 +475,23 @@ bool NetHackQtMapViewport::DrawWalls(
 
 void NetHackQtMapViewport::mousePressEvent(QMouseEvent* event)
 {
-    clicksink.Put(
-	event->pos().x()/qt_settings->glyphs().width(),
-	event->pos().y()/qt_settings->glyphs().height(),
-	event->button()==Qt::LeftButton ? CLICK_1 : CLICK_2
-    );
+    clicksink.Put(event->pos().x() / qt_settings->glyphs().width(),
+                  event->pos().y() / qt_settings->glyphs().height(),
+                  (event->button() == Qt::LeftButton) ? CLICK_1 : CLICK_2);
     qApp->exit();
 }
 
 void NetHackQtMapViewport::updateTiles()
 {
     change.clear();
-    change.add(0,0,COLNO,ROWNO);
+    change.add(0, 0, COLNO, ROWNO);
     delete rogue_font; rogue_font = NULL;
 }
 
 QSize NetHackQtMapViewport::sizeHint() const
 {
-    return QSize(
-	    qt_settings->glyphs().width() * COLNO,
-	    qt_settings->glyphs().height() * ROWNO);
+    return QSize(qt_settings->glyphs().width() * COLNO,
+                 qt_settings->glyphs().height() * ROWNO);
 }
 
 QSize NetHackQtMapViewport::minimumSizeHint() const
@@ -543,7 +501,7 @@ QSize NetHackQtMapViewport::minimumSizeHint() const
 
 void NetHackQtMapViewport::clickCursor()
 {
-    clicksink.Put(cursor.x(),cursor.y(),CLICK_1);
+    clicksink.Put(cursor.x(), cursor.y(), CLICK_1);
     qApp->exit();
 }
 
@@ -557,65 +515,63 @@ void NetHackQtMapViewport::Clear()
         Glyph(0, j) = GLYPH_NOTHING;
         Glyphttychar(0, j) = ' ';
         Glyphcolor(0, j) = NO_COLOR;
-        Glyphflags(0, j) = 0;
+        Glyphflags(0, j) = 0U;
 
         for (int i = 1; i < COLNO; ++i) {
             Glyph(i, j) = GLYPH_UNEXPLORED;
             Glyphttychar(i, j) = ' ';
             Glyphcolor(i, j) = NO_COLOR;
-            Glyphflags(i, j) = 0;
+            Glyphflags(i, j) = 0U;
         }
     }
 
     change.clear();
-    change.add(0,0,COLNO,ROWNO);
+    change.add(0, 0, COLNO, ROWNO);
 }
 
 void NetHackQtMapViewport::Display(bool block)
 {
-    for (int i=0; i<change.clusters(); i++) {
-	const QRect& ch=change[i];
-	repaint(
-	    ch.x()*qt_settings->glyphs().width(),
-	    ch.y()*qt_settings->glyphs().height(),
-	    ch.width()*qt_settings->glyphs().width(),
-	    ch.height()*qt_settings->glyphs().height()
-	);
-    }
+    int gW = qt_settings->glyphs().width(),
+        gH = qt_settings->glyphs().height();
 
+    for (int i = 0; i < change.clusters(); i++) {
+	const QRect& chg = change[i];
+	repaint(chg.x() * gW, chg.y() * gH,
+                chg.width() * gW, chg.height() * gH);
+    }
     change.clear();
 
     if (block) {
-	yn_function("Press a key when done viewing",0,'\0');
+	yn_function("Press a key when done viewing", NULL, '\0');
     }
 }
 
 void NetHackQtMapViewport::CursorTo(int x,int y)
 {
-    Changed(cursor.x(),cursor.y());
+    Changed(cursor.x(), cursor.y());
     cursor.setX(x);
     cursor.setY(y);
-    Changed(cursor.x(),cursor.y());
+    Changed(cursor.x(), cursor.y());
 }
 
 void NetHackQtMapViewport::PrintGlyph(int x, int y, int theglyph,
                                       unsigned *glyphmod)
 {
-    Glyph(x, y) = theglyph;
-    Glyphttychar(x, y) = (uchar) glyphmod[GM_TTYCHAR];
-    Glyphcolor(x, y) = (uchar) glyphmod[GM_COLOR];
+    Glyph(x, y) = (unsigned short) theglyph;
+    Glyphttychar(x, y) = (unsigned short) glyphmod[GM_TTYCHAR];
+    Glyphcolor(x, y) = (unsigned short) glyphmod[GM_COLOR];
     Glyphflags(x, y) = glyphmod[GM_FLAGS];
     Changed(x, y);
 }
 
 void NetHackQtMapViewport::Changed(int x, int y)
 {
-    change.add(x,y);
+    change.add(x, y);
 }
 
 NetHackQtMapWindow2::NetHackQtMapWindow2(NetHackQtClickBuffer& click_sink) :
-	QScrollArea(NULL),
-	m_viewport(new NetHackQtMapViewport(click_sink))
+    QScrollArea(NULL),
+    m_viewport(new NetHackQtMapViewport(click_sink))
 {
     QPalette palette;
     palette.setColor(backgroundRole(), Qt::black);
@@ -623,22 +579,22 @@ NetHackQtMapWindow2::NetHackQtMapWindow2(NetHackQtClickBuffer& click_sink) :
 
     setWidget(m_viewport);
 
-    connect(qt_settings,SIGNAL(tilesChanged()),this,SLOT(updateTiles()));
+    connect(qt_settings, SIGNAL(tilesChanged()), this, SLOT(updateTiles()));
     updateTiles();
 }
 
 void NetHackQtMapWindow2::updateTiles()
 {
     NetHackQtGlyphs& glyphs = qt_settings->glyphs();
-    int gw = glyphs.width();
-    int gh = glyphs.height();
+    int gW = glyphs.width();
+    int gH = glyphs.height();
     // Be exactly the size we want to be - full map...
-    m_viewport->resize(COLNO*gw,ROWNO*gh);
+    m_viewport->resize(COLNO * gW, ROWNO * gH);
 
-    verticalScrollBar()->setSingleStep(gh);
-    verticalScrollBar()->setPageStep(gh);
-    horizontalScrollBar()->setSingleStep(gw);
-    horizontalScrollBar()->setPageStep(gw);
+    verticalScrollBar()->setSingleStep(gH);
+    verticalScrollBar()->setPageStep(gH);
+    horizontalScrollBar()->setSingleStep(gW);
+    horizontalScrollBar()->setPageStep(gW);
 
     m_viewport->updateTiles();
     Display(false);
