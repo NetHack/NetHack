@@ -18,7 +18,7 @@ WIZARDS=root games mlehotay
 # Which users can use explore mode (aka discover mode; accessed via '-X'
 # command line flag or OPTIONS=playmode:explore in runtime options file or
 # via '#exploremode' command during normal play).  Same syntax as WIZARDS.
-EXPLORERS=*
+EXPLORERS=
 
 # Users allowed to use the '!' (shell escape) and '^Z' (suspend process)
 # commands to temporarily leave the game and enter a shell process.
@@ -74,14 +74,14 @@ MAXPLAYERS=10
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!
 # Maximum entries for one person.
-#PERSMAX=10
+PERSMAX=13
 # Maximum entries in the record file.
-#ENTRYMAX=100
+ENTRYMAX=1000
 # Minimum points to get an entry.
-#POINTSMIN=1
+POINTSMIN=1
 # Determine identity of "person" in the score file with name (0) or
 # numeric (1) user id.
-#PERS_IS_UID=1
+PERS_IS_UID=0
 
 # Maximum number of score file entries to use for random statue names
 #MAX_STATUENAME_RANK=10
