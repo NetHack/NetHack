@@ -510,7 +510,7 @@ init_tilemap()
         file_entry++;
     }
 
-#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
+#ifdef STATUES_DONT_LOOK_LIKE_MONSTERS
     /* statue patch: statues still use the same glyph as in 3.4.x */
 
     for (i = 0; i < NUMMONS; i++) {
