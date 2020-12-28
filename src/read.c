@@ -2571,11 +2571,15 @@ struct _create_particular_data *d;
         whichpm = &mons[d->which];
     }
     for (i = 0; i < d->quan; i++) {
+        long mmflags = NO_MM_FLAGS;
+
         if (d->monclass != MAXMCLASSES)
             whichpm = mkclass(d->monclass, 0);
         else if (d->randmonst)
             whichpm = rndmonst();
-        mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);
+        if (d->fem != -1 && !is_male(whichpm) && !is_female(whichpm))
+            mmflags |= (d->fem == FEMALE) ? MM_FEMALE : MM_MALE;
+        mtmp = makemon(whichpm, u.ux, u.uy, mmflags);
         if (!mtmp) {
             /* quit trying if creation failed and is going to repeat */
             if (d->monclass == MAXMCLASSES && !d->randmonst)
@@ -2585,8 +2589,6 @@ struct _create_particular_data *d;
         }
         mx = mtmp->mx, my = mtmp->my;
         /* 'is_FOO()' ought to be called 'always_FOO()' */
-        if (d->fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
-            mtmp->female = d->fem; /* ignored for is_neuter() */
         if (d->maketame) {
             (void) tamedog(mtmp, (struct obj *) 0);
         } else if (d->makepeaceful || d->makehostile) {
