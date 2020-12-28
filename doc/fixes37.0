@@ -461,7 +461,10 @@ remove M2_MALE flag that was unintentionally left on dwarf lord/lady/leader
 	entry and was preventing female incarnations
 tilemap.c wasn't building if STATUES_LOOK_LIKE_MONSTERS wasn't defined; also,
 	to match the code that should be defined so change the preprocessor
-        test to 'ifndef STATUES_DONT_LOOK_LIKE_MONSTERS'
+	test to 'ifndef STATUES_DONT_LOOK_LIKE_MONSTERS'
+ensure that monster female name variation ends up as a female during ^G
+arbitrate when there is a conflict between gender term (male or female) and
+	a gender-tied monster name (cavewoman) during ^G; gender term wins
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

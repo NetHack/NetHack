@@ -628,7 +628,8 @@ struct role_filter {
 struct _create_particular_data {
     int quan;
     int which;
-    int fem;
+    int fem;        /* -1, MALE, FEMALE, NEUTRAL */
+    int genderconf;    /* conflicting gender */
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
