@@ -42,16 +42,14 @@ struct engr *head_engr;
  *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
-    HI_ZAP,     /* 0 - missile */
-    CLR_ORANGE, /* 1 - fire */
-    CLR_WHITE,  /* 2 - frost */
-    HI_ZAP,     /* 3 - sleep */
-    CLR_BLACK,  /* 4 - death */
-    CLR_WHITE,  /* 5 - lightning */
-    /* 3.6.3: poison gas zap used to be yellow and acid zap was green,
-       which conflicted with the corresponding dragon colors */
-    CLR_GREEN,  /* 6 - poison gas */
-    CLR_YELLOW, /* 7 - acid */
+    HI_BEAM_MISSILE,    /* 0 - missile */
+    HI_BEAM_FIRE,       /* 1 - fire */
+    HI_BEAM_FROST,      /* 2 - frost */
+    HI_BEAM_SLEEP,      /* 3 - sleep */
+    HI_BEAM_DEATH,      /* 4 - death */
+    HI_BEAM_LIGHTNING,  /* 5 - lightning */
+    HI_BEAM_POISON,     /* 6 - poison gas */
+    HI_BEAM_ACID,       /* 7 - acid */
 };
 #endif /* text color */
 
