@@ -42,10 +42,6 @@ extern void FDECL(exit, (int));
 #endif
 #endif
 
-#if defined(MSDOS) || defined(WIN32) || defined(X11_GRAPHICS)
-#define STATUES_LOOK_LIKE_MONSTERS
-#endif
-
 enum {MON_GLYPH, OBJ_GLYPH, OTH_GLYPH, TERMINATOR = -1};
 #define EXTRA_SCROLL_DESCR_COUNT ((SCR_BLANK_PAPER - SCR_STINKING_CLOUD) - 1)
 
@@ -279,7 +275,7 @@ struct tilemap_t {
 } tilemap[MAX_GLYPH];
 
 
-#ifdef STATUES_LOOK_LIKE_MONSTERS
+#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
 int lastmontile, lastobjtile, lastothtile, laststatuetile;
 #else
 int lastmontile, lastobjtile, lastothtile;
@@ -514,11 +510,12 @@ init_tilemap()
         file_entry++;
     }
 
-#ifndef STATUES_LOOK_LIKE_MONSTERS
-    /* statue patch: statues still use the same glyph as in vanilla */
+#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
+    /* statue patch: statues still use the same glyph as in 3.4.x */
 
     for (i = 0; i < NUMMONS; i++) {
-        tilemap[GLYPH_STATUE_OFF + i].tilenum = tilemap[GLYPH_OBJ_OFF + STATUE];
+        tilemap[GLYPH_STATUE_OFF + i].tilenum
+                    = tilemap[GLYPH_OBJ_OFF + STATUE].tilenum;
 #ifdef OBTAIN_TILEMAP
         Sprintf(tilemap[GLYPH_STATUE_OFF + i].name, "%s (%d)",
                 tilename(OTH_GLYPH, file_entry, 0), file_entry);
@@ -528,7 +525,7 @@ init_tilemap()
 
     lastothtile = tilenum - 1;
 
-#ifdef STATUES_LOOK_LIKE_MONSTERS
+#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
     file_entry = 0;
     /* fast-forward over the substitutes to grayscale statues loc */
     for (i = 0; i < SIZE(substitutes); i++) {
@@ -557,7 +554,7 @@ init_tilemap()
         file_entry += 2;
     }
     laststatuetile = tilenum - 2;
-#endif /* STATUES_LOOK_LIKE_MONSTERS */
+#endif /* STATUES_DONT_LOOK_LIKE_MONSTERS */
 #ifdef OBTAIN_TILEMAP
     for (i = 0; i < MAX_GLYPH; ++i) {
         Fprintf(tilemap_file, "[%04d] [%04d] %-80s\n",
@@ -638,7 +635,7 @@ FILE *ofp;
     }
 
     lastothtile = start - 1;
-#ifdef STATUES_LOOK_LIKE_MONSTERS
+#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
     start = laststatuetile + 1;
 #endif
     Fprintf(ofp, "\nint total_tiles_used = %d;\n", start);
@@ -688,7 +685,7 @@ main()
     Fprintf(ofp, "\n#define MAXMONTILE %d\n", lastmontile);
     Fprintf(ofp, "#define MAXOBJTILE %d\n", lastobjtile);
     Fprintf(ofp, "#define MAXOTHTILE %d\n", lastothtile);
-#ifdef STATUES_LOOK_LIKE_MONSTERS
+#ifndef STATUES_DONT_LOOK_LIKE_MONSTERS
     Fprintf(ofp, "/* #define MAXSTATUETILE %d */\n", laststatuetile);
 #endif
     Fprintf(ofp, "\n/*tile.c*/\n");
