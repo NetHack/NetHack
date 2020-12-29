@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1609075599 2020/12/27 13:26:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.363 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1609281168 2020/12/29 22:32:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -150,9 +150,12 @@ const char *msg;
             impossible(
                 "mimic%s concealed as %s despite Prot-from-shape-changers %s",
                        is_mimic ? "" : "ker", what, msg);
-        /* pet's quickmimic can take on furniture and object shapes,
-           but only until the pet finishes eating a mimic corpse */
-        if (!(is_mimic || mtmp->meating))
+        /* the Wizard's clone after "double trouble" starts out mimicking
+           some other monster; pet's quickmimic effect can temporarily take
+           on furniture, object, or monster shape, but only until the pet
+           finishes eating a mimic corpse */
+        if (!(is_mimic || mtmp->meating
+              || (mtmp->iswiz && M_AP_TYPE(mtmp) == M_AP_MONSTER)))
             impossible("non-mimic (%s) posing as %s (%s)",
                        mptr->pmnames[NEUTRAL], what, msg);
 #if 0   /* mimics who end up in strange locations do still hide while there */

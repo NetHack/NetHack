@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ $NHDT-Date: 1608933417 2020/12/25 21:56:57 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1609281273 2020/12/29 22:34:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -465,6 +465,7 @@ tilemap.c wasn't building if STATUES_LOOK_LIKE_MONSTERS wasn't defined; also,
 ensure that monster female name variation ends up as a female during ^G
 arbitrate when there is a conflict between gender term (male or female) and
 	a gender-tied monster name (cavewoman) during ^G; gender term wins
+wizard mode sanity check complained about Wizard's clone mimicking a monster
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
