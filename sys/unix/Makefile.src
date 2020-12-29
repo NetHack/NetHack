@@ -534,7 +534,7 @@ SYSCSRC = ../sys/share/pcmain.c ../sys/share/pcsys.c \
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	#tile.c
+GENCSRC = #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
 WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) $(WINSHIMSRC)
@@ -554,7 +554,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
-# all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
+# all .h files except date.h, onames.h, and pm.h which would
 # cause dependency loops if run through "make depend"
 # and dgn_file.h, special level & dungeon files.
 #
@@ -569,7 +569,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
 	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
+HSOURCES = $(HACKINCL) date.h onames.h pm.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
@@ -610,7 +610,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)steed.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
 	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
 	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)vault.o \
-	$(TARGETPFX)vision.o $(TARGETPFX)vis_tab.o $(TARGETPFX)weapon.o \
+	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
 	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
@@ -753,10 +753,6 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/onames.h )
 ../include/pm.h: $(MAKEDEFS) ../include/onames.h
 	@( cd ../util ; $(MAKE) ../include/pm.h )
-../include/vis_tab.h: $(MAKEDEFS) ../include/pm.h
-	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
-# makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
-vis_tab.c: ../include/vis_tab.h
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
 tile.c: ../win/share/tilemap.c $(HACK_H)
@@ -804,7 +800,7 @@ spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*
 	-rm -f ../lib/lua/liblua.a ../include/nhlua.h
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
-	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
+	-rm -f tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
 package:
@@ -1065,7 +1061,6 @@ $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainout.c
 $(TARGETPFX)wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_trace.c
-$(TARGETPFX)vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 $(TARGETPFX)allmain.o: allmain.c $(HACK_H)
 $(TARGETPFX)alloc.o: alloc.c $(CONFIG_H)
 $(TARGETPFX)apply.o: apply.c $(HACK_H)
@@ -1187,7 +1182,7 @@ $(TARGETPFX)u_init.o: u_init.c $(HACK_H)
 $(TARGETPFX)uhitm.o: uhitm.c $(HACK_H)
 $(TARGETPFX)vault.o: vault.c $(HACK_H)
 $(TARGETPFX)version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h
-$(TARGETPFX)vision.o: vision.c $(HACK_H) ../include/vis_tab.h
+$(TARGETPFX)vision.o: vision.c $(HACK_H)
 $(TARGETPFX)weapon.o: weapon.c $(HACK_H)
 $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)

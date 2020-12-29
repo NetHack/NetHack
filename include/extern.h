@@ -2852,12 +2852,6 @@ E int FDECL(assign_videoshades, (char *));
 E int FDECL(assign_videocolors, (char *));
 #endif
 
-/* ### vis_tab.c ### */
-
-#ifdef VISION_TABLES
-E void NDECL(vis_tab_init);
-#endif
-
 /* ### vision.c ### */
 
 E void NDECL(vision_init);
