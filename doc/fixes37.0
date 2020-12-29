@@ -466,6 +466,8 @@ ensure that monster female name variation ends up as a female during ^G
 arbitrate when there is a conflict between gender term (male or female) and
 	a gender-tied monster name (cavewoman) during ^G; gender term wins
 wizard mode sanity check complained about Wizard's clone mimicking a monster
+new ^G gender-naming handling code required a guard against null permonst
+	pointer which could occur under some circumstances
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
