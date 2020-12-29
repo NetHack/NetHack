@@ -2591,7 +2591,8 @@ struct _create_particular_data *d;
         if (d->genderconf == -1) {
             /* no confict exists between explicit gender term and
                the specified monster name */
-            if (d->fem != -1 && !is_male(whichpm) && !is_female(whichpm))
+            if (d->fem != -1
+                && (!whichpm || (!is_male(whichpm) && !is_female(whichpm))))
                 mmflags |= (d->fem == FEMALE) ? MM_FEMALE
                                : (d->fem == MALE) ? MM_MALE : 0;
         } else {
