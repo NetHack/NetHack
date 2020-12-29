@@ -25,6 +25,12 @@ struct flag {
     boolean biff;            /* enable checking for mail */
     boolean bones;           /* allow saving/loading bones */
     boolean confirm;         /* confirm before hitting tame monsters */
+    unsigned consent_asked;  /* player has been asked for consent to X */
+    unsigned consent_given;  /* player has consented to X */
+#define CONSENT_SEDUCE_MM   0x0001
+#define CONSENT_SEDUCE_MF   0x0002
+#define CONSENT_SEDUCE_FM   0x0004
+#define CONSENT_SEDUCE_FF   0x0008
     boolean dark_room;       /* show shadows in lit rooms */
     boolean debug;           /* in debugging mode (aka wizard mode) */
 #define wizard flags.debug

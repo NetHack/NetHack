@@ -929,8 +929,25 @@ register struct monst *mtmp;
         int swval;
 
         if (SYSOPT_SEDUCE) {
-            if (ptr->mlet != S_NYMPH
-                && could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
+            if (ptr->mlet != S_NYMPH) { /* ptr->mlet == S_AMOROUS_DEMON */
+                unsigned mask;
+                boolean fem;
+
+                /* ask for consent */
+                fem = (Mgender(mtmp) == FEMALE); /* otherwise incubus */
+                if (poly_gender() == FEMALE)
+                    mask = fem ? CONSENT_SEDUCE_FF : CONSENT_SEDUCE_MF;
+                else
+                    mask = fem ? CONSENT_SEDUCE_FM : CONSENT_SEDUCE_MM;
+                pline("%s comes onto you.", Monnam(mtmp));
+                Sprintf(verbuf, "Do you consent to %s affections?", noit_mhis(mtmp));
+                if(!doconsent(verbuf, mask)) {
+                    verbl_msg = "Very well, then.";
+                    break;
+                }
+            } /* S_AMOROUS_DEMON */
+
+            if (could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
                 (void) doseduce(mtmp);
                 break;
             }

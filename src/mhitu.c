@@ -1704,6 +1704,24 @@ int n;
     }
 }
 
+/* ask for consent */
+boolean
+doconsent(query, mask)
+const char *query;
+const unsigned mask;
+{
+    boolean consented = (yn(query) == 'y');
+    flags.consent_asked |= mask;
+
+    if (consented) {
+          flags.consent_given |= mask;
+    } else {
+          flags.consent_given &= ~mask;
+    }
+
+    return consented;
+}
+
 /* returns 0 if seduction impossible,
  *         1 if fine,
  *         2 if wrong gender for nymph
@@ -1717,6 +1735,8 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
     boolean agrinvis, defperc;
     xchar genagr, gendef;
     int adtyp;
+    boolean fem;
+    unsigned mask;
 
     if (is_animal(magr->data))
         return 0;
@@ -1728,6 +1748,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
         pagr = magr->data;
         agrinvis = magr->minvis;
         genagr = gender(magr);
+        fem = genagr;
     }
     if (mdef == &g.youmonst) {
         defperc = (See_invisible != 0);
@@ -1735,6 +1756,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
     } else {
         defperc = perceives(mdef->data);
         gendef = gender(mdef);
+        fem = gendef;
     }
 
     adtyp = mattk ? mattk->adtyp
@@ -1755,7 +1777,13 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
         || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
-    return (genagr == 1 - gendef) ? 1 : (pagr->mlet == S_NYMPH) ? 2 : 0;
+    if (poly_gender() == FEMALE)
+        mask = fem ? CONSENT_SEDUCE_FF : CONSENT_SEDUCE_MF;
+    else
+        mask = fem ? CONSENT_SEDUCE_FM : CONSENT_SEDUCE_MM;
+
+    return ((flags.consent_given & mask) != 0) ? 1 :
+                       (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
 /* returns 1 if monster teleported (or hero leaves monster's vicinity) */
@@ -1767,6 +1795,7 @@ struct monst *mon;
     boolean fem = (mon->data == &mons[PM_AMOROUS_DEMON]
                    && Mgender(mon) == FEMALE); /* otherwise incubus */
     boolean seewho, naked; /* True iff no armor */
+    boolean consent;
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
 
@@ -1912,7 +1941,28 @@ struct monst *mon;
     if (u.utotype || distu(mon->mx, mon->my) > 2)
         return 1;
 
-    if (uarm || uarmc) {
+    /* ask for consent */
+    if (!uarm && !uarmc) {
+        unsigned mask;
+
+        if (poly_gender() == FEMALE)
+            mask = fem ? CONSENT_SEDUCE_FF : CONSENT_SEDUCE_MF;
+        else
+            mask = fem ? CONSENT_SEDUCE_FM : CONSENT_SEDUCE_MM;
+
+        consent = ((flags.consent_given & mask) !=0);
+        if ((flags.consent_asked & mask) == 0) {
+            if (Deaf) {
+                Sprintf(qbuf, "Do you consent to %s affections?", noit_mhis(mon));
+            } else {
+                Sprintf(qbuf, "\"Shall I show you a good time, %s?\"",
+                    (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
+            }
+            consent = doconsent(qbuf, mask);
+        }
+    }
+
+    if (uarm || uarmc || !consent) {
         if (!Deaf) {
             if (!(ld() && mon->female)) {
                 verbalize("You're such a %s; I wish...",
@@ -1929,7 +1979,7 @@ struct monst *mon;
                                      : "twelve pairs of gloves",
                           yourgloves ? " and eleven more pairs of gloves" : "");
             }
-	} else if (seewho)
+       } else if (seewho)
             pline("%s appears to sigh.", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 
