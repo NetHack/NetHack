@@ -315,9 +315,9 @@ VOBJ22 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
 VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
 VOBJ24 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
 VOBJ25 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
-VOBJ26 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
-VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
-VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ26 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ27 = $(O)windows.o  $(O)wizard.o   $(O)worm.o     $(O)worn.o
+VOBJ28 = $(O)write.o    $(O)zap.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 
@@ -1030,7 +1030,7 @@ $(O)sp_lev.tag:
 	echo sp_levs done > $(O)sp_lev.tag
 
 $(O)utility.tag: $(INCL)\nhlua.h $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\vis_tab.c $(INCL)\vis_tab.h $(TILEUTIL16)
+		$(TILEUTIL16)
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1095,12 +1095,6 @@ $(INCL)\onames.h : $(U)makedefs.exe
 
 $(INCL)\pm.h : $(U)makedefs.exe
 	$(U)makedefs -p
-
-$(INCL)\vis_tab.h: $(U)makedefs.exe
-	$(U)makedefs -z
-
-$(SRC)\vis_tab.c: $(U)makedefs.exe
-	$(U)makedefs -z
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1630,8 +1624,6 @@ spotless: clean
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
 	if exist $(INCL)\pm.h            del $(INCL)\pm.h
-	if exist $(INCL)\vis_tab.h       del $(INCL)\vis_tab.h
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist $(SRC)\tile.c           del $(SRC)\tile.c
 	if exist $(U)*.lnk               del $(U)*.lnk
 	if exist $(U)*.map               del $(U)*.map
@@ -1643,7 +1635,6 @@ spotless: clean
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist nhdat$(NHV).	         del nhdat$(NHV).
 	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
@@ -1937,7 +1928,6 @@ $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_chainout.c
 $(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_trace.c
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
@@ -2055,7 +2045,7 @@ $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
-$(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
+$(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)

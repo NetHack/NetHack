@@ -330,9 +330,9 @@ VOBJ22 = $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o
 VOBJ23 = $(O)spell.o    $(O)steal.o    $(O)steed.o    $(O)symbols.o
 VOBJ24 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
 VOBJ25 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
-VOBJ26 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
-VOBJ27 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
-VOBJ28 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ26 = $(O)vault.o    $(O)vision.o   $(O)weapon.o   $(O)were.o
+VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
+VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
@@ -807,7 +807,7 @@ $(O)sp_lev.tag: $(O)utility.tag
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-	 $(SRC)/vis_tab.c $(INCL)/vis_tab.h $(TILEUTIL16)
+	 $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
 	@echo utilities made.
 
@@ -936,12 +936,6 @@ $(INCL)/onames.h : $(U)makedefs.exe
 
 $(INCL)/pm.h : $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -p)
-
-$(INCL)/vis_tab.h: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
-
-$(SRC)/vis_tab.c: $(U)makedefs.exe
-	$(subst /,\,$(U)makedefs -z)
 
 $(DAT)/data: $(O)utility.tag    $(DATABASE)
 	$(subst /,\,$(U)makedefs -d)
@@ -1212,9 +1206,7 @@ ifneq "$(W_GAMEDIR)" ""
 	if exist $(W_GAMEDIR)\nhdat$(NHV)  del $(W_GAMEDIR)\nhdat$(NHV)
 endif
 ifneq "$(W_SRC)" ""
-	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
 	if exist $(W_SRC)\tile.c           del $(W_SRC)\tile.c
-	if exist $(W_SRC)\vis_tab.c        del $(W_SRC)\vis_tab.c
 	if exist $(W_SRC)\nhdat$(NHV).	   del $(W_SRC)\nhdat$(NHV).
 endif
 ifneq "$(W_DAT)" ""
@@ -1265,7 +1257,6 @@ ifneq "$(W_INCL)" ""
 	if exist $(W_INCL)\date.h          del $(W_INCL)\date.h
 	if exist $(W_INCL)\onames.h        del $(W_INCL)\onames.h
 	if exist $(W_INCL)\pm.h            del $(W_INCL)\pm.h
-	if exist $(W_INCL)\vis_tab.h       del $(W_INCL)\vis_tab.h
 endif
 ifeq "$(ADD_CURSES)" "Y"
 ifneq "$(W_OBJ)" ""
@@ -1607,7 +1598,7 @@ $(O)qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_str.h
 #	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
 #---
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
+$(O)vis_tab.o: vis_tab.c $(CONFIG_H)
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
@@ -1715,7 +1706,7 @@ $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)/date.h
-$(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
+$(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)
