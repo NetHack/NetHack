@@ -1016,7 +1016,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\ncd ${NH_UTIL_DIR}\n./makedefs -o\n./makedefs -p\n./makedefs -z\n";
+			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\ncd ${NH_UTIL_DIR}\n./makedefs -o\n./makedefs -p\n";
 		};
 		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
 			isa = PBXShellScriptBuildPhase;
