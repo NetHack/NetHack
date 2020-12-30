@@ -190,7 +190,6 @@
     <ClCompile Include="$(SrcDir)vault.c" />
     <ClCompile Include="$(SrcDir)version.c" />
     <ClCompile Include="$(SrcDir)vision.c" />
-    <ClCompile Include="$(SrcDir)vis_tab.c" />
     <ClCompile Include="$(SrcDir)weapon.c" />
     <ClCompile Include="$(SrcDir)were.c" />
     <ClCompile Include="$(SrcDir)wield.c" />
@@ -313,7 +312,6 @@
     <ClInclude Include="$(IncDir)trap.h" />
     <ClInclude Include="$(IncDir)unixconf.h" />
     <ClInclude Include="$(IncDir)vision.h" />
-    <ClInclude Include="$(IncDir)vis_tab.h" />
     <ClInclude Include="$(IncDir)vmsconf.h" />
     <ClInclude Include="$(IncDir)winami.h" />
     <ClInclude Include="$(IncDir)wincurs.h" />

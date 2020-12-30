@@ -192,7 +192,6 @@ line options to produce several output files that are required for:
           util/makedefs -v
           util/makedefs -o
           util/makedefs -p
-          util/makedefs -z
           util/makedefs -d
           util/makedefs -r
           util/makedefs -h
