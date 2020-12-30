@@ -1011,8 +1011,6 @@
 				"$(NH_UTIL_DIR)/options",
 				"$(NH_INC_DIR)/date.h",
 				"$(NH_INC_DIR)/onames.h",
-				"$(NH_INC_DIR)/vis_tab.h",
-				"$(NH_SRC_DIR)/vis_tab.c",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
