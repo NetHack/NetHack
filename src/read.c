@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1609285441 2020/12/29 23:44:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.213 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1609323865 2020/12/30 10:24:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2709,7 +2709,7 @@ create_particular()
         /* no good; try again... */
         pline("I've never heard of such monsters.");
         /* when a second try is needed, expand the prompt */
-        if (tryct == CP_TRYLIM - 1)
+        if (tryct == CP_TRYLIM)
             Strcat(prompt, " [type name or symbol]");
     } while (--tryct > 0);
 
