@@ -1,4 +1,4 @@
--- NetHack 3.6	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -40,7 +40,10 @@ place:set(10,08);
 place:set(10,12);
 --
 des.region(selection.area(00,00,74,19),"lit")
-des.region({ region={13,03, 18,13}, lit=1, type="ordinary", prefilled=1 })
+-- fixup_special hack: The first "room" region in Medusa levels gets filled with
+-- some leaderboard statues, so this needs to be a room; setting irregular=1
+-- will force this
+des.region({ region={13,03, 18,13}, lit=1, type="ordinary", irregular=1 })
 --
 des.teleport_region({ region = {64,01,74,17}, dir="down" });
 des.teleport_region({ region = {02,02,18,13}, dir="up" });

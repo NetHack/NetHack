@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1593611274 2020/07/01 13:47:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1606765210 2020/11/30 19:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -534,7 +534,8 @@ long wp_mask;
          * that can print a message--need to guard against being printed
          * when restoring a game
          */
-        (void) make_hallucinated((long) !on, g.restoring ? FALSE : TRUE,
+        (void) make_hallucinated((long) !on,
+                                 g.program_state.restoring ? FALSE : TRUE,
                                  wp_mask);
     }
     if (spfx & SPFX_ESP) {
@@ -1192,6 +1193,8 @@ int dieroll; /* needed for Magicbane and vorpal blades */
             (void) destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
         if (!rn2(7))
             (void) destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
+        if (!rn2(4))
+            ignite_items(mdef->minvent);
         if (youdefend && Slimed)
             burn_away_slime();
         return realizes_damage;

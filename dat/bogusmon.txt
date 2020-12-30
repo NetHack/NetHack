@@ -1,4 +1,4 @@
-# NetHack 3.6  bogusmon.txt       $NHDT-Date: 1574387024 2019/11/22 01:43:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.8 $
+# NetHack 3.7  bogusmon.txt       $NHDT-Date: 1596498237 2020/08/03 23:43:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 #

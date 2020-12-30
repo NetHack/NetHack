@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1593953344 2020/07/05 12:49:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	bones.c	$NHDT-Date: 1596498151 2020/08/03 23:42:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -531,8 +531,10 @@ struct obj *corpse;
     store_version(nhfp);
     store_savefileinfo(nhfp);
     if (nhfp->structlevel) {
+        /* if a bones pool digit is in use, it precedes the bonesid
+           string and isn't recorded in the file */
         bwrite(nhfp->fd, (genericptr_t) &c, sizeof c);
-        bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c);	/* DD.nnn */
+        bwrite(nhfp->fd, (genericptr_t) bonesid, (unsigned) c); /* DD.nn */
         savefruitchn(nhfp);
     }
     update_mlstmv(); /* update monsters for eventual restoration */
@@ -585,22 +587,18 @@ getbones()
             }
         }
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
-            mread(nhfp->fd, (genericptr_t) oldbonesid, (unsigned) c); /* DD.nnn */
+            /* if a bones pool digit is in use, it precedes the bonesid
+               string and wasn't recorded in the file */
+            mread(nhfp->fd, (genericptr_t) &c,
+                  sizeof c); /* length including terminating '\0' */
+            mread(nhfp->fd, (genericptr_t) oldbonesid,
+                  (unsigned) c); /* DD.nn or Qrrr.n for role rrr */
         }
-        if (strcmp(bonesid, oldbonesid) != 0
-            /* from 3.3.0 through 3.6.0, bones in the quest branch stored
-               a bogus bonesid in the file; 3.6.1 fixed that, but for
-               3.6.0 bones to remain compatible, we need an extra test;
-               once compatibility with 3.6.x goes away, this can too
-               (we don't try to make this conditional upon the value of
-               VERSION_COMPATIBILITY) */
-            && (strlen(bonesid) <= 2
-                || strcmp(bonesid + 2, oldbonesid) != 0)) {
+        if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];
 
-            Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,
-                    bonesid);
+            Sprintf(errbuf, "This is bones level '%s', not '%s'!",
+                    oldbonesid, bonesid);
             if (wizard) {
                 pline1(errbuf);
                 ok = FALSE; /* won't die of trickery */
@@ -619,12 +617,12 @@ getbones()
              * set to the magic DEFUNCT_MONSTER cookie value.
              */
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (has_mname(mtmp))
-                    sanitize_name(MNAME(mtmp));
+                if (has_mgivenname(mtmp))
+                    sanitize_name(MGIVENNAME(mtmp));
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
                     if (wizard) {
                         debugpline1("Removing defunct monster %s from bones.",
-                                    mtmp->data->mname);
+                                    mtmp->data->pmnames[NEUTRAL]);
                     }
                     mongone(mtmp);
                 } else

@@ -1,4 +1,4 @@
--- NetHack 3.6	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -77,9 +77,9 @@ des.door("open",26,14)
 des.door("closed",06,15)
 -- Special rooms
 des.altar({ x=24,y=07,align="noalign",type="sanctum" })
-des.region({ region={22,12,25,16},lit=0,type="morgue", prefilled=0 })
-des.region({ region={32,09,37,12},lit=1,type="shop",prefilled=0 })
-des.region({ region={12,00,15,04},lit=1,type="shop",prefilled=0 })
+des.region({ region={22,12,25,16},lit=0,type="morgue",filled=1 })
+des.region({ region={32,09,37,12},lit=1,type="shop",filled=1 })
+des.region({ region={12,00,15,04},lit=1,type="shop",filled=1 })
 -- Some traps.
 des.trap("spiked pit")
 des.trap("sleep gas")

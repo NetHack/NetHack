@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1589326676 2020/05/12 23:37:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	role.c	$NHDT-Date: 1596498206 2020/08/03 23:43:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -123,8 +123,8 @@ const struct Role roles[NUM_ROLES+1] = {
       "Cav",
       "the Caves of the Ancestors",
       "the Dragon's Lair",
-      PM_CAVEMAN,
-      PM_CAVEWOMAN,
+      PM_CAVE_DWELLER,
+      NON_PM,
       PM_LITTLE_DOG,
       PM_SHAMAN_KARNOV,
       PM_NEANDERTHAL,
@@ -289,8 +289,8 @@ const struct Role roles[NUM_ROLES+1] = {
       "Pri",
       "the Great Temple",
       "the Temple of Nalzok",
-      PM_PRIEST,
-      PM_PRIESTESS,
+      PM_CLERIC,
+      NON_PM,
       NON_PM,
       PM_ARCH_PRIEST,
       PM_ACOLYTE,

@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1590971980 2020/06/01 00:39:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.230 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -40,7 +40,7 @@ static int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
 static boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
 
 /* also used to see if you're allowed to eat cats and dogs */
-#define CANNIBAL_ALLOWED() (Role_if(PM_CAVEMAN) || Race_if(PM_ORC))
+#define CANNIBAL_ALLOWED() (Role_if(PM_CAVE_DWELLER) || Race_if(PM_ORC))
 
 /* monster types that cause hero to be turned into stone if eaten */
 #define flesh_petrifies(pm) (touch_petrifies(pm) || (pm) == &mons[PM_MEDUSA])
@@ -516,7 +516,8 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
            tentacle-touch should have been caught before reaching this far) */
         if (magr == &g.youmonst) {
             if (!Stone_resistance && !Stoned)
-                make_stoned(5L, (char *) 0, KILLED_BY_AN, pd->mname);
+                make_stoned(5L, (char *) 0, KILLED_BY_AN,
+                            pmname(pd, Mgender(mdef)));
         } else {
             /* no need to check for poly_when_stoned or Stone_resistance;
                mind flayers don't have those capabilities */
@@ -546,7 +547,8 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             return MM_MISS;
         } else if (is_rider(pd)) {
             pline("Ingesting that is fatal.");
-            Sprintf(g.killer.name, "unwisely ate the brain of %s", pd->mname);
+            Sprintf(g.killer.name, "unwisely ate the brain of %s",
+                    pmname(pd, Mgender(mdef)));
             g.killer.format = NO_KILLER_PREFIX;
             done(DIED);
             /* life-saving needed to reach here */
@@ -676,7 +678,8 @@ register int pm;
         if (!Stone_resistance
             && !(poly_when_stoned(g.youmonst.data)
                  && polymon(PM_STONE_GOLEM))) {
-            Sprintf(g.killer.name, "tasting %s meat", mons[pm].mname);
+            Sprintf(g.killer.name, "tasting %s meat",
+                    mons[pm].pmnames[NEUTRAL]);
             g.killer.format = KILLED_BY;
             You("turn to stone.");
             done(STONING);
@@ -695,7 +698,8 @@ register int pm;
     case PM_LARGE_CAT:
         /* cannibals are allowed to eat domestic animals without penalty */
         if (!CANNIBAL_ALLOWED()) {
-            You_feel("that eating the %s was a bad idea.", mons[pm].mname);
+            You_feel("that eating the %s was a bad idea.",
+                     mons[pm].pmnames[NEUTRAL]);
             HAggravate_monster |= FROMOUTSIDE;
         }
         break;
@@ -707,7 +711,8 @@ register int pm;
     case PM_PESTILENCE:
     case PM_FAMINE: {
         pline("Eating that is instantly fatal.");
-        Sprintf(g.killer.name, "unwisely ate the body of %s", mons[pm].mname);
+        Sprintf(g.killer.name, "unwisely ate the body of %s",
+                mons[pm].pmnames[NEUTRAL]);
         g.killer.format = NO_KILLER_PREFIX;
         done(DIED);
         /* life-saving needed to reach here */
@@ -1033,7 +1038,7 @@ int pm;
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
-                    an(Upolyd ? g.youmonst.data->mname : g.urace.noun));
+                    an(Upolyd ? pmname(g.youmonst.data, Ugender) : g.urace.noun));
             g.eatmbuf = dupstr(buf);
             g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
@@ -1247,9 +1252,9 @@ char *buf;
                 Strcpy(eos(buf), " of ");
             }
             if (vegetarian(&mons[mnum]))
-                Sprintf(eos(buf), "%s", mons[mnum].mname);
+                Sprintf(eos(buf), "%s", mons[mnum].pmnames[NEUTRAL]);
             else
-                Sprintf(eos(buf), "%s meat", mons[mnum].mname);
+                Sprintf(eos(buf), "%s meat", mons[mnum].pmnames[NEUTRAL]);
         }
     }
 }
@@ -1343,7 +1348,7 @@ const char *mesg;
         } else if (Hallucination) {
             what = rndmonnam(NULL);
         } else {
-            what = mons[mnum].mname;
+            what = mons[mnum].pmnames[NEUTRAL];
             if (the_unique_pm(&mons[mnum]))
                 which = 2;
             else if (type_is_pname(&mons[mnum]))
@@ -1370,7 +1375,7 @@ const char *mesg;
         g.context.victual.fullwarn = g.context.victual.eating =
             g.context.victual.doreset = FALSE;
 
-        You("consume %s %s.", tintxts[r].txt, mons[mnum].mname);
+        You("consume %s %s.", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
 
         eating_conducts(&mons[mnum]);
 
@@ -1449,7 +1454,8 @@ opentin(VOID_ARGS)
 {
     /* perhaps it was stolen (although that should cause interruption) */
     if (!carried(g.context.tin.tin)
-        && (!obj_here(g.context.tin.tin, u.ux, u.uy) || !can_reach_floor(TRUE)))
+        && (!obj_here(g.context.tin.tin, u.ux, u.uy)
+            || !can_reach_floor(TRUE)))
         return 0; /* %% probably we should use tinoid */
     if (g.context.tin.usedtime++ >= 50) {
         You("give up your attempt to open the tin.");
@@ -2134,7 +2140,7 @@ eatspecial()
             pline("Yuck%c", otmp->blessed ? '!' : '.');
         else if (otmp->oclass == SCROLL_CLASS
                  /* check description after checking for specific scrolls */
-                 && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+                 && objdescr_is(otmp, "YUM YUM"))
             pline("Yum%c", otmp->blessed ? '!' : '.');
         else
             pline("Needs salt...");
@@ -2253,7 +2259,7 @@ struct obj *otmp;
                      && polymon(PM_STONE_GOLEM))) {
                 if (!Stoned) {
                     Sprintf(g.killer.name, "%s egg",
-                            mons[otmp->corpsenm].mname);
+                            mons[otmp->corpsenm].pmnames[NEUTRAL]);
                     make_stoned(5L, (char *) 0, KILLED_BY_AN, g.killer.name);
                 }
             }
@@ -2488,6 +2494,18 @@ doeat()
         }
     }
 
+    /* from floorfood(), &zeroobj means iron bars at current spot */
+    if (otmp == &cg.zeroobj) {
+        /* hero in metallivore form is eating [diggable] iron bars
+           at current location so skip the other assorted checks;
+           operates as if digging rather than via the eat occupation */
+        if (still_chewing(u.ux, u.uy) && levl[u.ux][u.uy].typ == IRONBARS) {
+            /* this is verbose, but player will see the hero rather than the
+               bars so wouldn't know that more turns of eating are required */
+            You("pause to swallow.");
+        }
+        return 1;
+    }
     /* We have to make non-foods take 1 move to eat, unless we want to
      * do ridiculous amounts of coding to deal with partly eaten plate
      * mails, players who polymorph back to human in the middle of their
@@ -2811,6 +2829,8 @@ bite()
 void
 gethungry()
 {
+    int accessorytime;
+
     if (u.uinvulnerable)
         return; /* you don't feel hungrier */
 
@@ -2825,14 +2845,25 @@ gethungry()
         && !Slow_digestion)
         u.uhunger--; /* ordinary food consumption */
 
-    if (g.moves % 2) { /* odd turns */
+    /*
+     * 3.7:  trigger is randomized instead of (moves % N).  Makes
+     * ring juggling (using the 'time' option to see the turn counter
+     * in order to time swapping of a pair of rings of slow digestion,
+     * wearing one on one hand, then putting on the other and taking
+     * off the first, then vice versa, over and over and over and ...
+     * to avoid any hunger from wearing a ring) become ineffective.
+     * Also causes melee-induced hunger to vary from turn-based hunger
+     * instead of just replicating that.
+     */
+    accessorytime = rn2(20); /* rn2(20) replaces (int) (g.moves % 20L) */
+    if (accessorytime % 2) { /* odd */
         /* Regeneration uses up food, unless due to an artifact */
         if ((HRegeneration & ~FROMFORM)
             || (ERegeneration & ~(W_ARTI | W_WEP)))
             u.uhunger--;
         if (near_capacity() > SLT_ENCUMBER)
             u.uhunger--;
-    } else { /* even turns */
+    } else { /* even */
         if (Hunger)
             u.uhunger--;
         /* Conflict uses up food too */
@@ -2851,7 +2882,7 @@ gethungry()
          * cancellation") if hero doesn't have protection from some
          * other source (cloak or second ring).
          */
-        switch ((int) (g.moves % 20)) { /* note: use even cases only */
+        switch (accessorytime) { /* note: use even cases among 0..19 only */
         case 4:
             if (uleft && uleft->otyp != MEAT_RING
                 /* more hungry if +/- is nonzero or +/- doesn't apply or
@@ -3143,18 +3174,18 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     register struct obj *otmp;
     char qbuf[QBUFSZ];
     char c;
-    boolean feeding = !strcmp(verb, "eat"),    /* corpsecheck==0 */
-        offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
+    struct permonst *uptr = g.youmonst.data;
+    boolean feeding = !strcmp(verb, "eat"),        /* corpsecheck==0 */
+            offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
     /* if we can't touch floor objects then use invent food only */
     if (iflags.menu_requested /* command was preceded by 'm' prefix */
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
-            && (Wwalking || is_clinger(g.youmonst.data)
-                || (Flying && !Breathless))))
+            && (Wwalking || is_clinger(uptr) || (Flying && !Breathless))))
         goto skipfloor;
 
-    if (feeding && metallivorous(g.youmonst.data)) {
+    if (feeding && metallivorous(uptr)) {
         struct obj *gold;
         struct trap *ttmp = t_at(u.ux, u.uy);
 
@@ -3175,8 +3206,30 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
                 return (struct obj *) 0;
             }
         }
+        if (levl[u.ux][u.uy].typ == IRONBARS) {
+            /* already verified that hero is metallivorous above */
+            boolean nodig = (levl[u.ux][u.uy].wall_info & W_NONDIGGABLE) != 0;
 
-        if (g.youmonst.data != &mons[PM_RUST_MONSTER]
+            c = 'n';
+            Strcpy(qbuf, "There are iron bars here");
+            if (nodig || u.uhunger > 1500) {
+                pline("%s but you %s eat them.", qbuf,
+                      nodig ? "cannot" : "are too full to");
+            } else {
+                Strcat(qbuf, ((!g.context.digging.chew
+                               || g.context.digging.pos.x != u.ux
+                               || g.context.digging.pos.y != u.uy
+                               || !on_level(&g.context.digging.level, &u.uz))
+                              ? "; eat them?"
+                              : "; resume eating them?"));
+                c = yn_function(qbuf, ynqchars, 'n');
+            }
+            if (c == 'y')
+                return (struct obj *) &cg.zeroobj; /* csst away 'const' */
+            else if (c == 'q')
+                return (struct obj *) 0;
+        }
+        if (uptr != &mons[PM_RUST_MONSTER]
             && (gold = g_at(u.ux, u.uy)) != 0) {
             if (gold->quan == 1L)
                 Sprintf(qbuf, "There is 1 gold piece here; eat it?");

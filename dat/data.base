@@ -1,5 +1,5 @@
-# NetHack 3.6	data.base
-# $NHDT-Date: 1590711596 2020/05/29 00:19:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $
+# NetHack 3.7	data.base
+# $NHDT-Date: 1608767189 2020/12/23 23:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -1064,13 +1064,14 @@ cream pie
 	And welcomes little fishes in,
 	    With gently smiling jaws!
 		[ How Doth The Little Crocodile, by Lewis Carroll ]
+# Creosote is the Discworld analogue of Croesus
 croesus
 kroisos
 creosote
 	Croesus (in Greek: Kroisos), the wealthy last king of Lydia;
-	his empire was destroyed when he attacked Cyrus in 549, after
-	the Oracle of Delphi (q.v.) had told him:  "if you attack the
-	Persians, you will destroy a mighty empire".  Herodotus
+	his empire was destroyed when he attacked Cyrus in 549 BC,
+	after the Oracle of Delphi (q.v.) had told him: "if you attack
+	the Persians, you will destroy a mighty empire".  Herodotus
 	relates of his legendary conversation with Solon of Athens,
 	who impressed upon him that being rich does not imply being
 	happy and that no one should be considered fortunate before
@@ -2699,10 +2700,11 @@ kelp*
 	specimens in their native setting.
 		[ 20,000 Leagues Under the Sea, by Jules Verne ]
 ki-rin
-	The ki-rin is a strange-looking flying creature.  It has
-	scales, a mane like a lion, a tail, hooves, and a horn.  It
-	is brightly colored, and can usually be found flying in the
-	sky looking for good deeds to reward.
+	The ki-rin is a strange-looking wingless flying creature.
+	It has scales, a mane like a lion, a tail, four legs with
+	hooves, and a horn like a unicorn's.  It is brightly colored,
+	and can usually be found flying in the sky looking for good
+	deeds to reward.
 king arthur
 *arthur
 	Ector took both his sons to the church before which the

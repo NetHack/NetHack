@@ -1,4 +1,4 @@
-/* NetHack 3.6  decl.h  $NHDT-Date: 1593953331 2020/07/05 12:48:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1607641577 2020/12/10 23:06:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,16 +75,6 @@ struct dgn_topology { /* special dungeon levels for speed */
 #define sokoend_level           (g.dungeon_topology.d_sokoend_level)
 /* clang-format on */
 
-#define xdnstair (g.dnstair.sx)
-#define ydnstair (g.dnstair.sy)
-#define xupstair (g.upstair.sx)
-#define yupstair (g.upstair.sy)
-
-#define xdnladder (g.dnladder.sx)
-#define ydnladder (g.dnladder.sy)
-#define xupladder (g.upladder.sx)
-#define yupladder (g.upladder.sy)
-
 #define dunlev_reached(x) (g.dungeons[(x)->dnum].dunlev_ureached)
 
 #include "quest.h"
@@ -104,6 +94,8 @@ struct sinfo {
     int something_worth_saving; /* in case of panic */
     int panicking;              /* `panic' is in progress */
     int exiting;                /* an exit handler is executing */
+    int saving;
+    int restoring;
     int in_moveloop;
     int in_impossible;
     int in_self_recover;
@@ -424,15 +416,16 @@ enum nh_keyfunc {
     NHKF_REQMENU,
 
     /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,
-    NHKF_RUN2,
-    NHKF_RUSH,
-    NHKF_FIGHT,
-    NHKF_FIGHT2,
-    NHKF_NOPICKUP,
-    NHKF_RUN_NOPICKUP,
-    NHKF_DOINV,
-    NHKF_TRAVEL,
+    NHKF_RUN,          /* 'G' */
+    NHKF_RUN2,         /* '5' or M-5 */
+    NHKF_RUSH,         /* 'g' */
+    NHKF_RUSH2,        /* M-5 or '5' */
+    NHKF_FIGHT,        /* 'F' */
+    NHKF_FIGHT2,       /* '-' */
+    NHKF_NOPICKUP,     /* 'm' */
+    NHKF_RUN_NOPICKUP, /* 'M' */
+    NHKF_DOINV,        /* '0' */
+    NHKF_TRAVEL,       /* via mouse */
     NHKF_CLICKLOOK,
 
     NHKF_REDRAW,
@@ -531,6 +524,9 @@ struct trapinfo {
 typedef struct {
     xchar gnew; /* perhaps move this bit into the rm structure. */
     int glyph;
+#ifndef UNBUFFERED_GLYPHMOD
+    unsigned glyphmod[NUM_GLYPHMOD];
+#endif
 } gbuf_entry;
 
 enum vanq_order_modes {
@@ -632,19 +628,15 @@ struct role_filter {
 struct _create_particular_data {
     int quan;
     int which;
-    int fem;
+    int fem;        /* -1, MALE, FEMALE, NEUTRAL */
+    int genderconf;    /* conflicting gender */
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
     boolean sleeping, saddled, invisible, hidden;
 };
 
-/* instance_globals holds engine state that does not need to be
- * persisted upon game exit.  The initialization state is well defined
- * an set in decl.c during early early engine initialization.
- *
- * unlike instance_flags, values in the structure can be of any type. */
-
+/* some array sizes for 'g' */
 #define BSIZE 20
 #define WIZKIT_MAX 128
 #define CVT_BUF_SIZE 64
@@ -652,6 +644,16 @@ struct _create_particular_data {
 #define LUA_VER_BUFSIZ 20
 #define LUA_COPYRIGHT_BUFSIZ 120
 
+/*
+ * 'g' -- instance_globals holds engine state that does not need to be
+ * persisted upon game exit.  The initialization state is well defined
+ * and set in decl.c during early early engine initialization.
+ *
+ * Unlike instance_flags, values in the structure can be of any type.
+ *
+ * Pulled from other files to be grouped in one place.  Some comments
+ * which came with them don't make much sense out of their original context.
+ */
 struct instance_globals {
 
     /* apply.c */
@@ -684,12 +686,12 @@ struct instance_globals {
 
     /* cmd.c */
     struct cmd Cmd; /* flag.h */
-    /* Provide a means to redo the last command.  The flag `in_doagain' is set
-     * to true while redoing the command.  This flag is tested in commands that
-     * require additional input (like `throw' which requires a thing and a
-     * direction), and the input prompt is not shown.  Also, while in_doagain is
-     * TRUE, no keystrokes can be saved into the saveq.
-     */
+    /* Provide a means to redo the last command.  The flag `in_doagain'
+       (decl.c below) is set to true while redoing the command.  This flag
+       is tested in commands that require additional input (like `throw'
+       which requires a thing and a direction), and the input prompt is
+       not shown.  Also, while in_doagain is TRUE, no keystrokes can be
+       saved into the saveq. */
     char pushq[BSIZE];
     char saveq[BSIZE];
     int phead;
@@ -721,10 +723,7 @@ struct instance_globals {
     int y_maze_max;
     int otg_temp; /* used by object_to_glyph() [otg] */
     int in_doagain;
-    stairway dnstair; /* stairs down */
-    stairway upstair; /* stairs up */
-    stairway dnladder; /* ladder down */
-    stairway upladder; /* ladder up */
+    stairway *stairs;
     int smeq[MAXNROFROOMS + 1];
     int doorindex;
     char *save_cm;
@@ -749,7 +748,6 @@ struct instance_globals {
        number of shots, index of current one, validity check, shoot vs throw */
     struct multishot m_shot;
     dungeon dungeons[MAXDUNGEON]; /* ini'ed by init_dungeon() */
-    stairway sstairs;
     dest_area updest;
     dest_area dndest;
     coord inv_pos;
@@ -760,9 +758,6 @@ struct instance_globals {
     boolean mrg_to_wielded; /* weapon picked is merged with wielded one */
     struct plinemsg_type *plinemsg_types;
     char toplines[TBUFSZ];
-    struct mkroom *upstairs_room;
-    struct mkroom *dnstairs_room;
-    struct mkroom *sstairs_room;
     coord bhitpos; /* place where throw or zap hits or stops */
     boolean in_steed_dismounting;
     coord doors[DOORMAX];
@@ -815,8 +810,8 @@ struct instance_globals {
 
     /* display.c */
     gbuf_entry gbuf[ROWNO][COLNO];
-    char gbuf_start[ROWNO];
-    char gbuf_stop[ROWNO];
+    xchar gbuf_start[ROWNO];
+    xchar gbuf_stop[ROWNO];
 
 
     /* do.c */
@@ -840,7 +835,7 @@ struct instance_globals {
     int petname_used; /* user preferred pet name has been used */
     xchar gtyp;  /* type of dog's current goal */
     xchar gx; /* x position of dog's current goal */
-    char  gy; /* y position of dog's current goal */
+    xchar gy; /* y position of dog's current goal */
     char dogname[PL_PSIZ];
     char catname[PL_PSIZ];
     char horsename[PL_PSIZ];
@@ -932,9 +927,10 @@ struct instance_globals {
     /* makemon.c */
 
     /* mhitm.c */
-    boolean vis;
-    boolean far_noise;
     long noisetime;
+    boolean far_noise;
+    boolean vis;
+    boolean skipdrin; /* mind flayer against headless target */
 
     /* mhitu.c */
     int mhitu_dieroll;
@@ -966,6 +962,7 @@ struct instance_globals {
     /* mon.c */
     boolean vamp_rise_msg;
     boolean disintegested;
+    boolean zombify;
     short *animal_list; /* list of PM values for animal monsters */
     int animal_list_count;
 
@@ -998,34 +995,35 @@ struct instance_globals {
     /* objname.c */
     /* distantname used by distant_name() to pass extra information to
        xname_flags(); it would be much cleaner if this were a parameter,
-       but that would require all of the xname() and doname() calls to be
-       modified */
+       but that would require all xname() and doname() calls to be modified */
     int distantname;
 
     /* options.c */
     struct symsetentry *symset_list; /* files.c will populate this with
-                                        list of available sets */
-    /*
-        * Allow the user to map incoming characters to various menu commands.
-        * The accelerator list must be a valid C string.
-        */
+                                      * list of available sets */
+    /* Allow the user to map incoming characters to various menu commands. */
     char mapped_menu_cmds[MAX_MENU_MAPPED_CMDS + 1]; /* exported */
     char mapped_menu_op[MAX_MENU_MAPPED_CMDS + 1];
     short n_menu_mapped;
+    /* options processing */
     boolean opt_initial;
     boolean opt_from_file;
     boolean opt_need_redraw; /* for doset() */
+    /* use menucolors to show colors in the pick-a-color menu */
+    boolean save_menucolors; /* copy of iflags.use_menu_colors */
+    struct menucoloring *save_colorings; /* copy of g.menu_colorings */
+    struct menucoloring *color_colorings; /* alternate set of menu colors */
 
     /* pickup.c */
     int oldcap; /* last encumberance */
     /* current_container is set in use_container(), to be used by the
        callback routines in_container() and out_container() from askchain()
-       and use_container(). Also used by menu_loot() and container_gone(). */
+       and use_container().  Also used by menu_loot() and container_gone(). */
     struct obj *current_container;
     boolean abort_looting;
     /* Value set by query_objlist() for n_or_more(). */
     long val_for_n_or_more;
-    /* list of valid menu classes for query_objlist() and allow_category callback
+    /* list of menu classes for query_objlist() and allow_category callback
        (with room for all object classes, 'u'npaid, BUCX, and terminator) */
     char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
     boolean class_filter;
@@ -1110,6 +1108,8 @@ struct instance_globals {
     boolean havestate;
     unsigned ustuck_id; /* need to preserve during save */
     unsigned usteed_id; /* need to preserve during save */
+    struct obj *looseball;  /* track uball during save and... */
+    struct obj *loosechain; /* track uchain since saving might free it */
 
     /* shk.c */
     /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
@@ -1140,7 +1140,6 @@ struct instance_globals {
     unsigned int stealmid; /* monster doing the stealing */
 
     /* teleport.c */
-    struct obj *telescroll; /* non-null when teleporting via this scroll */
 
     /* timeout.c */
     /* ordered timer list */
@@ -1179,9 +1178,9 @@ struct instance_globals {
                                       Stormbringer's maliciousness. */
 
     /* vision.c */
-    char **viz_array; /* used in cansee() and couldsee() macros */
-    char *viz_rmin;			/* min could see indices */
-    char *viz_rmax;			/* max could see indices */
+    xchar **viz_array; /* used in cansee() and couldsee() macros */
+    xchar *viz_rmin;			/* min could see indices */
+    xchar *viz_rmax;			/* max could see indices */
     boolean vision_full_recalc;
 
     /* weapon.c */

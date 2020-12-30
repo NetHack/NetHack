@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1593953369 2020/07/05 12:49:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.7	pcmain.c	$NHDT-Date: 1596498282 2020/08/03 23:44:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -268,7 +268,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (argc == 0)
         chdirx(HACKDIR, 1);
 #endif
-    ami_wininit_data();
+    ami_wininit_data(WININIT);
 #endif
     initoptions();
 
@@ -753,5 +753,41 @@ char *str;
     return tmp;
 }
 #endif /* EXEPATH */
+
+#ifdef CROSS_TO_AMIGA
+void msmsg
+VA_DECL(const char *, fmt)
+{
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    Vprintf(fmt, VA_ARGS);
+    flushout();
+    VA_END();
+    return;
+}
+
+unsigned long
+sys_random_seed()
+{
+    unsigned long seed = 0L;
+    unsigned long pid = (unsigned long) getpid();
+    boolean no_seed = TRUE;
+
+#ifdef AMIGA_STRONG_RANDOM_SEED_HERE
+    /* hypothetical - strong seed code is required */
+    /* then has_strong_seed could be set */
+#endif
+    if (no_seed) {
+        seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
+        /* Quick dirty band-aid to prevent PRNG prediction */
+        if (pid) {
+            if (!(pid & 3L))
+                pid -= 1L;
+            seed *= pid;
+        }
+    }
+    return seed;
+}
+#endif
 
 /*pcmain.c*/

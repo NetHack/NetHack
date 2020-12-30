@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1593771616 2020/07/03 10:20:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1608115734 2020/12/16 10:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,9 +259,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         characteristics_enlightenment(mode, final);
     }
     /* expanded status line information, including things which aren't
-       included there due to space considerations--such as obvious
-       alternative movement indicators (riding, levitation, &c), and
-       various troubles (turning to stone, trapped, confusion, &c);
+       included there due to space considerations;
        shown for both basic and magic enlightenment */
     status_enlightenment(mode, final);
     /* remaining attributes; shown for potion,&c or wizard mode and
@@ -269,6 +267,13 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     if (mode & MAGICENLIGHTENMENT) {
         /* intrinsics and other traditional enlightenment feedback */
         attributes_enlightenment(mode, final);
+    }
+    /* reminder to player and/or information for dumplog */
+    if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover)) {
+        enlght_out(""); /* separator */
+        enlght_out("Miscellaneous:");
+        Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
+        you_are(buf, "");
     }
 
     if (!g.en_via_menu) {
@@ -322,10 +327,12 @@ int final;
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
         if (altphrasing)
-            Sprintf(eos(tmpbuf), "%s in ", mons[g.youmonst.cham].mname);
+            Sprintf(eos(tmpbuf), "%s in ",
+                    pmname(&mons[g.youmonst.cham],
+                           flags.female ? FEMALE : MALE));
         Sprintf(buf, "%s%s%s%s form", !final ? "currently " : "",
                 altphrasing ? just_an(anbuf, tmpbuf) : "in ",
-                tmpbuf, uasmon->mname);
+                tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
         you_are(buf, "");
     }
 
@@ -585,7 +592,11 @@ int final;
         you_have(buf, "");
     }
 
+    find_ac(); /* enforces AC_MAX cap */
     Sprintf(buf, "%d", u.uac);
+    if (abs(u.uac) == AC_MAX)
+        Sprintf(eos(buf), ", the %s possible",
+                (u.uac < 0) ? "best" : "worst");
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
     /* gold; similar to doprgold(#seegold) but without shop billing info;
@@ -976,12 +987,18 @@ int final;
     }
     Strcpy(buf, hu_stat[u.uhs]); /* hunger status; omitted if "normal" */
     mungspaces(buf);             /* strip trailing spaces */
-    if (*buf) {
+    /* status line doesn't show hunger when state is "not hungry", we do;
+       needed for wizard mode's reveal of u.uhunger but add it for everyone */
+    if (!*buf)
+        Strcpy(buf, "not hungry");
+    if (*buf) { /* (since "not hungry" was added, this will always be True) */
         *buf = lowc(*buf); /* override capitalization */
         if (!strcmp(buf, "weak"))
             Strcat(buf, " from severe hunger");
         else if (!strncmp(buf, "faint", 5)) /* fainting, fainted */
             Strcat(buf, " due to starvation");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", u.uhunger);
         you_are(buf, "");
     }
     /* encumbrance */
@@ -1007,6 +1024,8 @@ int final;
             adj = "not possible";
             break;
         }
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
         Sprintf(eos(buf), "; movement %s %s%s", !final ? "is" : "was", adj,
                 (cap < OVERLOADED) ? " slowed" : "");
         you_are(buf, "");
@@ -1014,10 +1033,22 @@ int final;
         /* last resort entry, guarantees Status section is non-empty
            (no longer needed for that purpose since weapon status added;
            still useful though) */
-        you_are("unencumbered", "");
+        Strcpy(buf, "unencumbered");
+        if (wizard)
+            Sprintf(eos(buf), " <%d>", inv_weight());
+        you_are(buf, "");
     }
     /* current weapon(s) and corresponding skill level(s) */
     weapon_insight(final);
+    /* unlike ring of increase accuracy's effect, the monk's suit penalty
+       is too blatant to be restricted to magical enlightenment */
+    if (iflags.tux_penalty && !Upolyd) {
+        (void) enlght_combatinc("to hit", -g.urole.spelarmr, final, buf);
+        /* if from_what() ever gets extended from wizard mode to normal
+           play, it could be adapted to handle this */
+        Sprintf(eos(buf), " due to your %s", suit_simple_name(uarm));
+        you_have(buf, "");
+    }
     /* report 'nudity' */
     if (!uarm && !uarmu && !uarmc && !uarms && !uarmg && !uarmf && !uarmh) {
         if (u.uroleplay.nudist)
@@ -1338,7 +1369,7 @@ int final;
     }
     if (Warn_of_mon && g.context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-                makeplural(mons[g.context.warntype.speciesidx].mname));
+             makeplural(mons[g.context.warntype.speciesidx].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -1467,8 +1498,17 @@ int final;
         enl_msg("You regenerate", "", "d", "", from_what(REGENERATION));
     if (Slow_digestion)
         you_have("slower digestion", from_what(SLOW_DIGESTION));
-    if (u.uhitinc)
-        you_have(enlght_combatinc("to hit", u.uhitinc, final, buf), "");
+    if (u.uhitinc) {
+        (void) enlght_combatinc("to hit", u.uhitinc, final, buf);
+        if (iflags.tux_penalty && !Upolyd)
+            Sprintf(eos(buf), " %s your suit's penalty",
+                    (u.uhitinc < 0) ? "increasing"
+                    : (u.uhitinc < 4 * g.urole.spelarmr / 5)
+                      ? "partly offsetting"
+                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offseting"
+                        : "overcoming");
+        you_have(buf, "");
+    }
     if (u.udaminc)
         you_have(enlght_combatinc("damage", u.udaminc, final, buf), "");
     if (u.uspellprot || Protection) {
@@ -1536,10 +1576,14 @@ int final;
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
         if (!vampshifted(&g.youmonst))
-            Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
+            Sprintf(buf, "polymorphed into %s",
+                    an(pmname(g.youmonst.data,
+                              flags.female ? FEMALE : MALE)));
         else
             Sprintf(buf, "polymorphed into %s in %s form",
-                    an(mons[g.youmonst.cham].mname), g.youmonst.data->mname);
+                    an(pmname(&mons[g.youmonst.cham],
+                              flags.female ? FEMALE : MALE)),
+                    pmname(g.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
@@ -1548,7 +1592,8 @@ int final;
         you_can("lay eggs", "");
     if (u.ulycn >= LOW_PM) {
         /* "you are a werecreature [in beast form]" */
-        Strcpy(buf, an(mons[u.ulycn].mname));
+        Strcpy(buf, an(pmname(&mons[u.ulycn],
+               flags.female ? FEMALE : MALE)));
         if (u.umonnum == u.ulycn) {
             Strcat(buf, " in beast form");
             if (wizard)
@@ -2188,15 +2233,16 @@ const genericptr vptr2;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
-        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_PRIEST);
-        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_PRIEST);
+        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_CLERIC);
+        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_CLERIC);
         if (uniq1 ^ uniq2) { /* one or other uniq, but not both */
             res = uniq2 - uniq1;
             break;
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].mname, name2 = mons[indx2].mname;
+        name1 = mons[indx1].pmnames[NEUTRAL],
+                name2 = mons[indx2].pmnames[NEUTRAL];
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -2306,7 +2352,7 @@ doborn()
                     g.mvitals[i].died, g.mvitals[i].born,
                     ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
                     ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
-                    mons[i].mname);
+                    mons[i].pmnames[NEUTRAL]);
             putstr(datawin, 0, buf);
             nborn += g.mvitals[i].born;
             ndied += g.mvitals[i].died;
@@ -2323,7 +2369,7 @@ doborn()
 
 /* high priests aren't unique but are flagged as such to simplify something */
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
-                               && mndx != PM_HIGH_PRIEST)
+                               && mndx != PM_HIGH_CLERIC)
 
 #define done_stopprint g.program_state.stopprint
 
@@ -2397,7 +2443,7 @@ boolean ask;
                 if (UniqCritterIndx(i)) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
-                            mons[i].mname);
+                            mons[i].pmnames[NEUTRAL]);
                     if (nkilled > 1) {
                         switch (nkilled) {
                         case 2:
@@ -2420,10 +2466,10 @@ boolean ask;
                     /* trolls or undead might have come back,
                        but we don't keep track of that */
                     if (nkilled == 1)
-                        Strcpy(buf, an(mons[i].mname));
+                        Strcpy(buf, an(mons[i].pmnames[NEUTRAL]));
                     else
                         Sprintf(buf, "%3d %s", nkilled,
-                                makeplural(mons[i].mname));
+                                makeplural(mons[i].pmnames[NEUTRAL]));
                 }
                 /* number of leading spaces to match 3 digit prefix */
                 pfx = !strncmpi(buf, "the ", 3) ? 0
@@ -2469,7 +2515,7 @@ num_genocides()
             ++n;
             if (UniqCritterIndx(i))
                 impossible("unique creature '%d: %s' genocided?",
-                           i, mons[i].mname);
+                           i, mons[i].pmnames[NEUTRAL]);
         }
     }
     return n;
@@ -2532,7 +2578,7 @@ boolean ask;
                 if (UniqCritterIndx(i))
                     continue;
                 if (g.mvitals[i].mvflags & G_GONE) {
-                    Sprintf(buf, " %s", makeplural(mons[i].mname));
+                    Sprintf(buf, " %s", makeplural(mons[i].pmnames[NEUTRAL]));
                     /*
                      * "Extinct" is unfortunate terminology.  A species
                      * is marked extinct when its birth limit is reached,

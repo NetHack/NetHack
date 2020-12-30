@@ -13,14 +13,14 @@ namespace nethack_qt_ {
 // Bounded string copy
 size_t str_copy(char *dest, const char *src, size_t max)
 {
-    size_t len = strlen(src);
+    size_t len = 0;
     if (max != 0) {
-	size_t csize = len;
+        len = strlen(src);
 	if (len > max - 1) {
 	    len = max - 1;
 	}
-	memcpy(dest, src, csize);
-	dest[csize] = '\0';
+        memcpy(dest, src, len);
+        dest[len] = '\0';
     }
     return len;
 }
@@ -35,7 +35,7 @@ QString str_titlecase(const QString& str)
 QString nh_capitalize_words(const QString& str)
 {
     QStringList words = str.split(" ");
-    for (size_t i = 0; i < words.size(); ++i) {
+    for (size_t i = 0; i < (size_t) words.size(); ++i) {
 	words[i] = str_titlecase(words[i]);
     }
     return words.join(" ");

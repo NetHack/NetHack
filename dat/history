@@ -5,9 +5,14 @@ Behold, mortal, the origins of NetHack...
 Jay Fenlason wrote the original Hack, with help from Kenny Woodland,
 Mike Thome, and Jon Payne.
 
-Andries Brouwer did a major re-write, transforming Hack into a very different
-game, and published (at least) three versions (1.0.1, 1.0.2, and 1.0.3) for
-UNIX(tm) machines to the Usenet.
+Andries Brouwer did a major re-write while at Stichting Mathematisch Centrum
+(now Centrum Wiskunde & Informatica), transforming Hack into a very different
+game.  He published the Hack source code for use on UNIX(tm) systems by
+posting that to Usenet newsgroup net.sources (later renamed comp.sources)
+releasing version 1.0 in December of 1984, then versions 1.0.1, 1.0.2, and
+finally 1.0.3 in July of 1985.  Usenet newsgroup net.games.hack (later
+renamed rec.games.hack, eventually replaced by rec.games.roguelike.nethack)
+was created for discussing it.
 
 Don G. Kneller ported Hack 1.0.3 to Microsoft(tm) C and MS-DOS(tm), producing
 PC HACK 1.01e, added support for DEC Rainbow graphics in version 1.03g, and
@@ -20,7 +25,9 @@ producing ST Hack 1.03.
 Mike Stephenson merged these various versions back together, incorporating
 many of the added features, and produced NetHack version 1.4 in 1987.  He
 then coordinated a cast of thousands in enhancing and debugging NetHack 1.4
-and released NetHack versions 2.2 and 2.3.
+and released NetHack versions 2.2 and 2.3.  Like Hack, they were released by
+posting their source code to Usenet where they remained available in various
+archives accessible via ftp and uucp after expiring from the newsgroup.
 
 Later, Mike coordinated a major re-write of the game, heading a team which
 included Ken Arromdee, Jean-Christophe Collet, Steve Creps, Eric Hendrickson,
@@ -183,11 +190,11 @@ resurrected it for 3.3.1.
 The release of NetHack 3.4.3 in December 2003 marked the beginning of a
 long release hiatus.  3.4.3 proved to be a remarkably stable version that
 provided continued enjoyment by the community for more than a decade.  The
-NetHack Development Team slowly and quietly continued to work on the game behind the scenes
-during the tenure of 3.4.3.  It was during that same period that several
-new variants emerged within the NetHack community.  Notably sporkhack by
-Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors
-originally by Daniel Thaler and then by Alex Smith, and
+NetHack Development Team slowly and quietly continued to work on the game
+behind the scenes during the tenure of 3.4.3.  It was during that same
+period that several new variants emerged within the NetHack community.
+Notably sporkhack by Derek S. Ray, unnethack by Patric Mueller, nitrohack
+and its successors originally by Daniel Thaler and then by Alex Smith, and
 Dynahack by Tung Nguyen.  Some of those variants continue to be developed,
 maintained, and enjoyed by the community to this day.
 

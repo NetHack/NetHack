@@ -4,18 +4,13 @@
 
 // qt_delay.cpp -- implement a delay
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
+#include "qt_post.h"
 #include "qt_delay.h"
 
 namespace nethack_qt_ {
@@ -32,7 +27,7 @@ void NetHackQtDelay::wait()
     m_loop.exec();
 }
 
-void NetHackQtDelay::timerEvent(QTimerEvent* timer)
+void NetHackQtDelay::timerEvent(QTimerEvent* timer UNUSED)
 {
     m_loop.exit();
     killTimer(m_timer);

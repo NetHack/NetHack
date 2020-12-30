@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1594155889 2020/07/07 21:04:49 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+#	NetHack 3.7	Makefile.src	$NHDT-Date: 1596498302 2020/08/03 23:45:02 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -180,7 +180,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
 	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	   patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	   tradstdc.h trampoli.h trap.h unixconf.h vision.h \
+	   tradstdc.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -215,7 +215,7 @@ HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
 
 LUAOBJ = nhlua.o,nhlsel.o
 
-#  5.4.0 adds header files ljumptab.h and lopnames.h and removes lbitlib.c
+#  5.4.0 added header files ljumptab.h and lopnames.h and removes lbitlib.c
 #  so comment top two and uncomment bottom two for the previous version (5.3.5)
 LUA535SRCFILES =
 LUA535OBJFILES =
@@ -403,7 +403,7 @@ $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
 		$(INC)onames.h $(INC)timeout.h $(INC)trap.h \
 		$(INC)flag.h $(INC)rm.h $(INC)vision.h \
 		$(INC)display.h $(INC)engrave.h $(INC)rect.h $(INC)region.h \
-		$(INC)winprocs.h $(INC)wintty.h $(INC)trampoli.h $(INC)sys.h
+		$(INC)winprocs.h $(INC)wintty.h $(INC)sys.h
 	$(TOUCH) $(HACK_H)
 #	VMS-specific code
 vmsmain.obj :	$(VMS)vmsmain.c $(HACK_H) $(INC)dlb.h

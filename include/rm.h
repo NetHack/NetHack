@@ -1,4 +1,4 @@
-/* NetHack 3.6	rm.h	$NHDT-Date: 1589064684 2020/05/09 22:51:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.7	rm.h	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -243,6 +243,8 @@ enum screen_symbols {
 #define is_cmap_furniture(i) ((i) >= S_upstair && (i) <= S_fountain)
 #define is_cmap_water(i) ((i) == S_pool || (i) == S_water)
 #define is_cmap_lava(i) ((i) == S_lava)
+#define is_cmap_stairs(i) ((i) == S_upstair || (i) == S_dnstair || \
+                           (i) == S_upladder || (i) == S_dnladder)
 
 
 struct symdef {
@@ -334,11 +336,6 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 #define D_LOCKED 8
 #define D_TRAPPED 16
 #define D_SECRET 32 /* only used by sp_lev.c, NOT in rm-struct */
-
-/*
- * Some altars are considered as shrines, so we need a flag.
- */
-#define AM_SHRINE 8
 
 /*
  * Thrones should only be looted once.
@@ -435,22 +432,6 @@ struct rm {
     Bitfield(edge, 1);   /* marks boundaries for special rooms*/
     Bitfield(candig, 1); /* Exception to Can_dig_down; was a trapdoor */
 };
-
-#define SET_TYPLIT(x, y, ttyp, llit)                              \
-    {                                                             \
-        if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
-            if ((ttyp) < MAX_TYPE)                                \
-                levl[(x)][(y)].typ = (ttyp);                      \
-            if ((ttyp) == LAVAPOOL)                               \
-                levl[(x)][(y)].lit = 1;                           \
-            else if ((schar)(llit) != -2) {                       \
-                if ((schar)(llit) == -1)                          \
-                    levl[(x)][(y)].lit = rn2(2);                  \
-                else                                              \
-                    levl[(x)][(y)].lit = (llit);                  \
-            }                                                     \
-        }                                                         \
-    }
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
@@ -563,7 +544,7 @@ struct cemetery {
     /* date+time in string of digits rather than binary */
     char when[4 + 2 + 2 + 2 + 2 + 2 + 1]; /* "YYYYMMDDhhmmss\0" */
     /* final resting place spot */
-    schar frpx, frpy;
+    xchar frpx, frpy;
     boolean bonesknown;
 };
 
@@ -631,10 +612,10 @@ typedef struct {
  * Macros for encapsulation of level.monsters references.
  */
 #if 0
-#define MON_AT(x, y)                            \
+#define MON_AT(x, y) \
     (g.level.monsters[x][y] != (struct monst *) 0 \
      && !(g.level.monsters[x][y])->mburied)
-#define MON_BURIED_AT(x, y)                     \
+#define MON_BURIED_AT(x, y) \
     (g.level.monsters[x][y] != (struct monst *) 0 \
      && (g.level.monsters[x][y])->mburied)
 #else   /* without 'mburied' */
@@ -642,15 +623,15 @@ typedef struct {
 #endif
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
-    do {                                                        \
+    do {                                                            \
         if (g.level.monsters[x][y] && g.level.monsters[x][y] != m)  \
-            impossible("place_worm_seg over mon");              \
-        g.level.monsters[x][y] = m;                               \
+            impossible("place_worm_seg over mon");                  \
+        g.level.monsters[x][y] = m;                                 \
     } while(0)
 #define remove_monster(x, y) \
-    do {                                                \
+    do {                                                  \
         if (!g.level.monsters[x][y])                      \
-            impossible("no monster to remove");         \
+            impossible("no monster to remove");           \
         g.level.monsters[x][y] = (struct monst *) 0;      \
     } while(0)
 #else

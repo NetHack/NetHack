@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ $NHDT-Date: 1594377460 2020/07/10 10:37:40 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1608664223 2020/12/22 19:10:23 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "July 9, 2020
+.ds f2 "December 19, 2020
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -103,7 +103,7 @@ travel, you see the ancient ruins that mark the entrance to the
 Mazes of Menace.  It is late at night, so you make camp at the entrance
 and spend the night sleeping under the open skies.  In the morning, you
 gather your gear, eat what may be your last meal outside, and enter the
-dungeon...
+dungeon....
 .
 .hn 1
 What is going on here?
@@ -675,7 +675,9 @@ support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
 Wait or rest, do nothing for one turn. Precede with the \(oqm\(cq prefix
-to wait for a turn even next to a hostile monster.
+to wait for a turn even next to a hostile monster, if
+.op safe_wait
+is on.
 .lp a
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp ""
@@ -884,7 +886,9 @@ Redraw the screen.
 Search for secret doors and traps around you.
 It usually takes several tries to find something.
 Precede with the \(oqm\(cq prefix to search for a turn
-even next to a hostile monster.
+even next to a hostile monster, if
+.op safe_wait
+is on.
 .lp ""
 Can also be used to figure out whether there is still a monster at
 an adjacent \(lqremembered, unseen monster\(rq marker.
@@ -965,9 +969,9 @@ the exchange still takes place.
 Toggle two-weapon combat, if your character can do it.  Also available
 via the \(lq#twoweapon\(rq extended command.
 .lp ""
-(In versions prior to 3.6 this was the command to switch from normal
+(In versions prior to 3.6 this keystroke ran the command to switch from normal
 play to \(lqexplore mode\(rq, also known as \(lqdiscovery mode\(rq,
-which has now been moved to \(lq#exploremode\(rq.)
+which has now been moved to \(lq#exploremode\(rq and M-X.)
 .lp \(haX
 Display basic information about your character.
 .lp ""
@@ -1001,6 +1005,7 @@ Suspend the game
 .\" .UX: print "UNIX" now and a trademark footnote at bottom of current page;
 .\"  2nd arg (literal '(') _precedes_ it, 1st arg (quoted string) follows it
 .UX " versions with job control only)." (
+See \(lq#suspend\(rq below for more details.
 .lp :
 Look at what is here.
 .lp ;
@@ -1031,7 +1036,7 @@ Tell what equipment you are using.
 Combines the preceding five type-specific
 commands into one.
 .lp $
-Count your gold pieces.
+Report the gold you're carrying, possibly shop credit and/or debt too.
 .lp +
 List the spells you know.
 .lp ""
@@ -1050,10 +1055,29 @@ be added to the end of the list rather than be inserted into the sorted
 ordering.)
 .lp \\\\
 Show what types of objects have been discovered.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp \`
 Show discovered types for one class of objects.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp !
 Escape to a shell.
+See \(lq#shell\(rq below for more details.
+.lp Del
+Show map without obstructions.
+You can view the explored portion of the current level's map without
+monsters; without monsters and objects; or without monsters, objects,
+and traps.
+.lp ""
+The <del> key is also shown as <delete> on some keyboards or <rubout>
+on others.
+It is sometimes displayed as \(ha? even though that is not an actual
+control character.
+.lp ""
+Many terminals have an option to swap the <delete> and <backspace> keys,
+so typing the <del> key might not execute this command.
+If that happens, you can use the extended command \(lq#terrain\(rq instead.
 .lp #
 Perform an extended command.
 .lp ""
@@ -1179,7 +1203,8 @@ Advance or check weapon and spell skills.
 Autocompletes.
 Default key is \(oqM-e\(cq.
 .lp #exploremode
-Enter the explore mode.
+Switch from normal play to non-scoring explore mode.
+Default key is \(oqM-X\(cq.
 .lp ""
 Requires confirmation; default response is \f(CRn\fP (no).
 To really switch to explore mode, respond with \f(CRy\fP.
@@ -1202,7 +1227,15 @@ Default key is \(oq?\(cq, and also \(oqh\(cq if
 .op number_pad
 is on.
 .lp #herecmdmenu
-Show a menu of possible actions in your current location.
+Show a menu of possible actions directed at your current location.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.
+.lp ""
+If mouse support is enabled and the
+.op herecmd_menu
+option is On, clicking on the hero (or steed when mounted) will
+execute this command.
 .lp "#history "
 Show long version and game history.
 Default key is \(oqV\(cq.
@@ -1229,10 +1262,16 @@ Default key is \(oq\(haD\(cq, and \(oqk\(cq if
 is on.
 .lp "#known   "
 Show what object types have been discovered.
-Default key is \(oq\\\(cq.
+Default key is \(oq\f(CR\\\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix allows assigning a new value to the
+.op sortdiscoveries
+option to control the order in which the discoveries are displayed.
 .lp #knownclass
 Show discovered types for one class of objects.
-Default key is \(oq\`\(cq.
+Default key is \(oq\f(CR\`\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix operates the same as for \(lq#known\(rq.
 .lp #levelchange
 Change your experience level.
 Autocompletes.
@@ -1381,31 +1420,37 @@ Default key is \(oq\(dq\(cq. \" double quote
 .lp #seearmor
 Show the armor currently worn.
 Default key is \(oq[\(cq.
-.lp "#seegold "
-Count your gold.
-Default key is \(oq$\(cq.
-.lp "#seenv   "
-Show seen vectors.
-Autocompletes.
-Debug mode only.
 .lp #seerings
 Show the ring(s) currently worn.
 Default key is \(oq=\(cq.
-.lp #seespells
-List and reorder known spells.
-Default key is \(oq+\(cq.
 .lp #seetools
 Show the tools currently in use.
 Default key is \(oq(\(cq.
-.lp "#seetrap "
-Show the type of an adjacent trap.
-Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp #seeweapon
 Show the weapon currently wielded.
 Default key is \(oq)\(cq.
 .lp "#shell   "
-Do a shell escape.
+Do a shell escape, switching from NetHack to a subprocess.
+Can be disabled at the time the program is built.
+When enabled, access for specific users can be controlled by the system
+configuration file.
+Use the shell command \(oq\f(CRexit\fP\(cq to return to the game.
 Default key is \(oq!\(cq.
+.lp "#showgold"
+Report the gold in your inventory and if you are inside a shop,
+report any credit or debt you have in that shop.
+Does not report on any gold inside containers you're carrying.
+Default key is \(oq$\(cq.
+.lp #showspells
+List and reorder known spells.
+Default key is \(oq+\(cq.
+.lp "#showtrap"
+Describe an adjacent trap, possibly covered by objects or a monster.
+To be eligible, the trap must already be discovered.
+(The \(lq#terrain\(rq command can display your map with all objects and
+monsters temporarily removed, making it possible to see all discovered
+traps.)
+Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp "#sit     "
 Sit down.
 Autocompletes.
@@ -1415,7 +1460,12 @@ Show memory usage statistics.
 Autocompletes.
 Debug mode only.
 .lp "#suspend "
-Suspend the game.
+Suspend the game, switching from NetHack to the terminal it was started
+from without performing save-and-exit.
+Can be disabled at the time the program is built.
+When enabled, mainly useful for \fItty\fP and \fIcurses\fP interfaces on
+.UX \. \" yields "UNIX."
+Use the shell command \(oq\f(CRfg\fP\(cq to return to the game.
 Default key is \(oq\(haZ\(cq.
 .lp "#swap    "
 Swap wielded and secondary weapons.
@@ -1430,10 +1480,27 @@ Default key is \(oqA\(cq.
 Teleport around the level.
 Default key is \(oq\(haT\(cq.
 .lp "#terrain "
-Show bare map without displaying monsters, objects, or traps.
+Show map without obstructions.
+In normal play you can view the explored portion of the current level's
+map without monsters; without monsters and objects; or without monsters,
+objects, and traps.
+.lp ""
+In explore mode, you can choose to view the full map rather than just
+its explored portion.
+In debug mode there are additional choices.
+.lp ""
 Autocompletes.
+Default key is \(oq<del>\(cq or \(oq<delete>\(cq (see \fIDel\fP above).
 .lp #therecmdmenu
-Show a menu of possible actions in a location next to you.
+Show a menu of possible actions directed at a location next to you.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.
+.\"--invoking it by mouse seems to be broken
+.\" .lp ""
+.\" If mouse support is enabled and the
+.\" .op herecmd_menu
+.\" option is On, clicking on an adjacent location will execute this command.
 .lp "#throw   "
 Throw something.
 Default key is \(oqt\(cq.
@@ -1485,10 +1552,17 @@ Autocompletes.
 Debug mode only.
 .lp "#version "
 Print compile time options for this version of NetHack.
+.lp ""
+The second paragraph lists the user interface(s) that are included.
+If there are more than one, you can use the
+.op windowtype
+option in your run-time configuration file to select the one you want.
+.lp ""
 Autocompletes.
 Default key is \(oqM-v\(cq.
 .lp #versionshort
-Show version string.
+Show the program's version number, plus the date and time that the
+running copy was built from sources (not the version's release date).
 Default key is \(oqv\(cq.
 .lp "#vision  "
 Show vision array.
@@ -1562,6 +1636,10 @@ and hallucinatory monsters.
 .lp ""
 Autocompletes.
 Debug mode only.
+.lp #wizseenv
+Show map locations' seen vectors.
+Autocompletes.
+Debug mode only.
 .lp #wizsmell
 Smell monster.
 Autocompletes.
@@ -1591,16 +1669,27 @@ with another key, modifies it by setting the \(lqmeta\(rq [8th,
 or \(lqhigh\(rq] bit), you can invoke many extended commands by meta-ing
 the first letter of the command.
 .pg
-In \fIWindows\fP, \fIOS/2\fP, \fIPC\fP and \fIST\fP \fINetHack\fP,
-the \(lqAlt\(rq key can be used in this fashion;
-on the \fIAmiga\fP, set the
-.op altmeta
-option to get this behavior.
+On \fIWindows\fP and \fIMS-DOS\fP,
+the \(lqAlt\(rq key can be used in this fashion.
+.\" On the \fIAmiga\fP, set the
+.\" .op altmeta
+.\" option to get this behavior.
 On other systems, if typing \(lqAlt\(rq plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
 .op altmeta
 option to have NetHack combine them into meta+key.
+(This combining action only takes place when NetHack is expecting a
+command to execute, not when accepting input to name something or to
+make a wish.)
+.pg
+Unlike control characters, where \(hax and \(haX denote the same thing,
+meta characters are case-sensitive:  M-x and M-X represent different things.
+Some commands which can be run via a meta character require that the
+letter be capitalized because the lower-case equivalent is used for
+another command, so the three key combination meta+shift+letter is needed.
+.BR 1
+.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
@@ -1655,6 +1744,8 @@ option is enabled)
 #version
 .lp M-w
 #wipe
+.lp M-X
+#exploremode
 .lp ""
 .pg
 If the
@@ -1813,7 +1904,7 @@ For example, each level has at least one extra boulder.
 Also, it is possible to drop everything in order to be able to squeeze
 into the same location as a boulder (and then presumably move past it),
 or to destroy a boulder with magic or tools, or to create new boulders
-with a scroll of earth.
+with a \fIscroll of earth\fP.
 However, doing such things will lower your luck without any specific
 message given about that.
 See the \fIConduct\fP section for information about getting feedback for
@@ -1876,10 +1967,12 @@ If you drop something in a shop by accident, the shopkeeper will usually
 claim ownership without offering any compensation.  You'll have to buy
 it back if you want to reclaim it.
 .pg
-Shopkeepers sometimes run out of money.  When that happens, you'll be
-offered credit instead of gold when you try to sell something.  Credit
-can be used to pay for purchases, but it is only good in the shop where
-it was obtained; other shopkeepers won't honor it.  (If you happen to
+Shopkeepers sometime run out of money.
+When that happens, you'll be
+offered credit instead of gold when you try to sell something.
+Credit can be used to pay for purchases, but it is only good in the shop
+where it was obtained; other shopkeepers won't honor it.
+(If you happen to
 find a \(lqcredit card\(rq in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
 .pg
@@ -1901,7 +1994,7 @@ The price of a given item can vary due to a variety of factors.
 A shopkeeper treats the spot immediately inside the door as if it were
 outside the shop.
 .lp * 2
-While the shopkeeper watches you like a hawk, he will generally ignore
+While the shopkeeper watches you like a hawk, he or she will generally ignore
 any other customers.
 .lp * 2
 If a shop is \(lqclosed for inventory,\(rq it will not open of its own accord.
@@ -1985,6 +2078,23 @@ The
 .op run_mode
 option controls how frequently the map gets redrawn when moving more
 than one step in a single command (so when rushing, running, or traveling).
+.hn 2
+Rogue level
+.pg
+One dungeon level (occurring in mid to late teens of the main dungeon)
+is a tribute to the ancestor game \fIhack\fP's inspiration \fIrogue\fP.
+.pg
+It is usually displayed differently from other levels: possibly in
+characters instead of tiles, or without line-drawing symbols if already
+in characters; also, gold is shown as \f(CR*\fP rather than \f(CR$\fP
+and stairs are shown as \f(CR%\fP rather than \f(CR<\fP and \f(CR>\fP.
+There are some minor differences in actual game play: doorways lack
+doors; a scroll, wand, or spell of light used in a room lights up the
+whole room rather than within a radius around your character.
+And monsters represented by lower-case letters aren't randomly
+generated on the rogue level.
+.pg
+The slight strangeness of this level is a feature, not a bug....
 .
 .hn 1
 Monsters
@@ -2140,8 +2250,8 @@ to discard some of what you're carrying or collapse under its weight.
 .pg
 NetHack will tell you how badly you have loaded yourself.
 If you are encumbered, one of the conditions
-\(lq\fIBurdened\fP\(rq, \(lq\fIStressed\fP\(rq, \(lq\fIStrained\fP\(rq,
-\(lq\fIOvertaxed\fP\(rq or \(lq\fIOverloaded\fP\(rq will be
+\f(CRBurdened\fP, \f(CRStressed\fP, \f(CRStrained\fP,
+\f(CROvertaxed\fP, or \f(CROverloaded\fP will be
 shown on the bottom line status display.
 .pg
 When you pick up an object, it is assigned an inventory letter.  Many
@@ -2177,9 +2287,10 @@ usually, but not always, bear negative enchantments that make them
 less effective in combat.  Other cursed objects may act poorly or
 detrimentally in other ways.
 .pg
-Objects can also be blessed.  Blessed items usually work better or
-more beneficially than normal uncursed items.  For example, a blessed
-weapon will do more damage against demons.
+Objects can also be blessed instead.
+Blessed items usually work better or more beneficially than normal
+uncursed items.
+For example, a blessed weapon will do slightly more damage against demons.
 .pg
 Objects which are neither cursed nor blessed are referred to as uncursed.
 They could just as easily have been described as unblessed, but the
@@ -2189,20 +2300,28 @@ that what you will.
 .pg
 There are magical means of bestowing or removing curses upon objects,
 so even if you are stuck with one, you can still have the curse
-lifted and the item removed.  Priests and Priestesses have an innate
+lifted and the item removed.
+Priests and Priestesses have an innate
 sensitivity to this property in any object, so they can more easily avoid
 cursed objects than other character roles.
+Dropping objects onto an altar will reveal their bless or curse state
+provided that you can see them land.
 .pg
 An item with unknown status will be reported in your inventory with no prefix.
 An item which you know the state of will be distinguished in your inventory
-by the presence of the word \(lqcursed\(rq, \(lquncursed\(rq or
-\(lqblessed\(rq in the description of the item.
-In some cases \(lquncursed\(rq will be omitted as being redundant when
+by the presence of the word \f(CRcursed\fP, \f(CRuncursed\fP, or
+\f(CRblessed\fP in the description of the item.
+In some cases \f(CRuncursed\fP will be omitted as being redundant when
 enough other information is displayed.
 The
 .op implicit_uncursed
-option can be used to control this; toggle it off to have \(lquncursed\(rq
+option can be used to control this; toggle it off to have \f(CRuncursed\fP
 be displayed even when that can be deduced from other attributes.
+.pg
+Sometimes the bless or curse state of objects is referred to as their
+\(lq\f(CRBUC\fP\(rq attribute, for Blessed, Uncursed, or Cursed state,
+or \(lq\f(CRBUCX\fP\(rq for Blessed, Uncursed, Cursed, or unknown.
+(The term \fIbeatitude\fP is occasionally used as well.)
 .hn 2
 Weapons (\(oq)\(cq)
 .pg
@@ -2426,7 +2545,7 @@ NetHack.
 Here is a list of the armor class values provided by suits of armor:
 .
 .\" Replace the old one suit per line table with a more condensed one.
-.\" AC4 and AC7 have been split into two lines to accomodate plain text
+.\" AC4 and AC7 have been split into two lines to accommodate plain text
 .\" output (Guidebook.txt).  AC4 needs it to reduce overall width; after
 .\" that, AC7 became the longest and the table looks better by shortening
 .\" it to get the second column (number) closer to the text on most lines.
@@ -3119,24 +3238,28 @@ the configuration file for you using the default template file.
 .pg
 On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
-Any line in the configuration file starting with \(oq#\(cq is treated
-as a comment.
+Any line in the configuration file starting with \(oq\f(CR#\fP\(cq is treated
+as a comment and ignored.
 Empty lines are ignored.
 .pg
-Any line beginning with \(oq[\(cq and ending in \(oq]\(cq is considered
-a section marker.
+Any line beginning with \(oq\f(CR[\fP\(cq and ending in \(oq\f(CR]\fP\(cq
+is a section marker (the closing \(oq\f(CR]\fP\(cq can be followed
+by whitespace and then an arbitrary comment beginning with \(oq\f(CR#\fP\(cq).
 The text between the square brackets is the section name.
-Lines after a section marker belong to that section, and are
-ignored unless a CHOOSE statement was used to select that section.
-Section names are case insensitive.
+Section markers are only valid after a CHOOSE directive and their names
+are case insensitive.
+Lines after a section marker belong to that section up until another
+section starts or a marker without a name is encountered or the file ends.
+Lines within sections are ignored unless a CHOOSE directive has selected
+that section.
 .pg
-You can use different configuration statements in the file, some
+You can use different configuration directives in the file, some
 of which can be used multiple times.
-In general, the statements are
+In general, the directives are
 written in capital letters, followed by an equals sign, followed by
-settings particular to that statement.
+settings particular to that directive.
 .pg
-Here is a list of allowed statements:
+Here is a list of allowed directives:
 .lp OPTIONS
 There are two types of options, boolean and compound options.
 Boolean options toggle a setting on or off, while compound options
@@ -3144,8 +3267,8 @@ take more diverse values.
 Prefix a boolean option with \(lqno\(rq or \(oq!\(cq to turn it off.
 For compound options, the option name and value are separated by a colon.
 Some options are persistent, and apply only to new games.
-You can specify multiple OPTIONS statements, and multiple options
-separated by commas in a single OPTIONS statement.
+You can specify multiple OPTIONS directives, and multiple options
+separated by commas in a single OPTIONS directive.
 (Comma separated options are processed from right to left.)
 .lp ""
 Example:
@@ -3209,7 +3332,8 @@ Example:
 .ed
 .lp CHOOSE
 Chooses at random one of the comma-separated parameters as an active
-section name. Lines in other sections are ignored.
+section name.
+Lines in other sections are ignored.
 .lp ""
 Example:
 .sd
@@ -3220,8 +3344,14 @@ CHOOSE=char A,char B
 OPTIONS=role:arc,race:dwa,align:law,gender:fem
 [char B]
 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
+[] #end of CHOOSE
+OPTIONS=!rest_on_space
 .ft \" revert to previous font
 .ed
+.lp ""
+If \f(CR[]\fP is present, the preceding section is closed and no new
+section begins; whatever follows will be common to all sections.
+Otherwise the last section extends to the end of the options file.
 .lp MENUCOLOR
 Highlight menu lines with different colors.
 See the \(lqConfiguring Menu Colors\(rq section.
@@ -3331,10 +3461,10 @@ to that shell), or the pair of commands
 in \fIsh\fP, \fIksh\fP, or \fIbash\fP.
 .pg
 The NETHACKOPTIONS value is effectively the same as a single OPTIONS
-statement in a configuration file.
+directive in a configuration file.
 The \(lqOPTIONS=\(rq prefix is implied and comma separated options are
 processed from right to left.
-Other types of configuration statements such as BIND or MSGTYPE are
+Other types of configuration directives such as BIND or MSGTYPE are
 not allowed.
 .pg
 Instead of a comma-separated list of options,
@@ -3965,6 +4095,9 @@ Persistent.
 .lp safe_pet
 Prevent you from (knowingly) attacking your pets (default on).
 Persistent.
+.lp safe_wait
+Prevents you from waiting or searching when next to a hostile monster
+(default on). Persistent.
 .lp sanity_check
 Evaluate monsters, objects, and map prior to each turn (default off).
 Debug mode only.
@@ -3986,19 +4119,47 @@ Persistent.
 Show your approximate accumulated score on bottom line (default off).
 Persistent.
 .lp "silent  "
-Suppress terminal beeps (default on).  Persistent.
+Suppress terminal beeps (default on).
+Persistent.
+.lp sortdiscoveries
+Controls the sorting behavior for the output of the \(oq\f(CR\\\fP\(cq
+and \(oq\f(CR\`\fP\(cq commands.
+Persistent.
+.lp ""
+The possible values are:
+.PS o
+.PL o
+list object types by class, in discovery order within each class;
+default;
+.PL s
+list object types by
+.op sortloot
+classification: by class, by sub-class within class for classes which
+have substantial groupings (like helmets, boots, gloves, and so forth
+for armor), with object types partly-discovered via assigned name coming
+before fully identified types;
+.PL c
+list by class, alphabetically within each class;
+.PL a
+list alphabetically across all classes.
+.PE
+Can be interactively set via the \(oq\f(CRO\fP\(cq command or via using
+the \(oq\f(CRm\fP\(cq prefix before the \(oq\f(CR\\\fP\(cq
+or \(oq\f(CR\`\fP\(cq command.
 .lp sortloot
 Controls the sorting behavior of the pickup lists for inventory
 and #loot commands and some others.  Persistent.
+.lp ""
 The possible values are:
-.PS full
+.PS none \" note: with proportional font, "none" is wider than "full" or "loot"
 .PL full
 always sort the lists;
 .PL loot
 only sort the lists that don't use inventory letters, like with
 the #loot and pickup commands;
 .PL none
-show lists the traditional way without sorting.
+show lists the traditional way without sorting;
+default.
 .PE
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
@@ -4143,7 +4304,19 @@ Where to align or place the message window (top, bottom, left, or right)
 .lp align_status
 Where to align or place the status window (top, bottom, left, or right).
 .lp ascii_map
-If NetHack can, it should display an ascii character map if it can.
+.hw DECgraphics IBMgraphics \" don't hyphenate these
+If NetHack can, it should display the map using simple
+characters (letters and punctuation) rather than \fItiles\fP graphics.
+In some cases, characters can be augmented with line-drawing symbols;
+use the
+.op symset
+option to select a symbol set such as \fIDECgraphics\fP
+or \fIIBMgraphics\fP if your display supports them.
+Setting
+.op ascii_map
+to \fITrue\fP forces
+.op tiled_map
+to be \fIFalse\fP.
 .lp color
 If NetHack can, it should display color if it can for different monsters,
 objects, and dungeon features.
@@ -4212,8 +4385,29 @@ If NetHack can, it should display an opening splash screen when it starts
 up (default yes).
 .lp statuslines
 Number of lines for traditional below-the-map status display.
-Acceptable values are 2 and 3 (default is 2).
-Curses and tty interfaces only.
+Acceptable values are \f(CR2\fP and \f(CR3\fP (default is \f(CR2\fP).
+.lp ""
+When set to \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
+mainly shows status conditions on their own line.
+A display capable of showing at least 25 lines is recommended.
+The value can be toggled back and forth during the game with the \(oqO\(cq
+command.
+.lp ""
+The \f(CRcurses\fP interface does likewise if the
+.op align_status
+option is set to \fItop\fP or \fIbottom\fP but ignores
+.op statuslines
+when set to \fIleft\fP or \fIright\fP.
+.lp ""
+The \f(CRQt\fP interface already displays more than 3 lines for status
+so uses the
+.op statuslines
+value differently.
+A value of \f(CR3\fP renders status in the \f(CRQt\fP interface's
+original format, with the status window spread out vertically.
+A value of \f(CR2\fP makes status be slightly condensed, moving some
+fields to different lines to eliminate one whole line, reducing the
+height needed.
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.
@@ -4221,14 +4415,21 @@ Number of columns and rows to use for the display.
 Curses will attempt to resize to the values specified but will settle
 for smaller sizes if they are too big.
 Default is the current window size.
-.lp tiled_map
-If NetHack can, it should display a tiled map if it can.
 .lp tile_file
 Specify the name of an alternative tile file to override the default.
 .lp tile_height
 Specify the preferred height of each tile in a tile capable port.
 .lp tile_width
 Specify the preferred width of each tile in a tile capable port
+.lp tiled_map
+If NetHack can, it should display the map using \fItiles\fP graphics
+rather than simple characters (letters and punctuation, possibly
+augmented by line-drawing symbols).
+Setting
+.op tiled_map
+to \fITrue\fP forces
+.op ascii_map
+to be \fIFalse\fP.
 .lp use_darkgray
 Use bold black instead of blue for black glyphs (TTY only).
 .lp use_inverse
@@ -4327,7 +4528,7 @@ May be used to alter the value of keystrokes that the operating system
 returns to NetHack to help compensate for international keyboard issues.
 OPTIONS=subkeyvalue:171/92
 will return 92 to NetHack, if 171 was originally going to be returned.
-You can use multiple subkeyvalue statements in the configuration file
+You can use multiple subkeyvalue assignments in the configuration file
 if needed.
 Cannot be set with the \(oqO\(cq command.
 .lp video
@@ -4599,10 +4800,20 @@ Prefix key to run towards a direction.
 With
 .op number_pad
 only.
-Default is \(oq5\(cq.
+.lp ""
+Default is \(oq5\(cq when number_pad is set to 1 or 3,
+otherwise \(oqM-5\(cq when it is set to 2 or 4.
 .lp rush
 Prefix key to rush towards a direction.
 Default is \(oqg\(cq.
+.lp rush.numpad
+Prefix key to rush towards a direction.
+With
+.op number_pad
+only.
+.lp ""
+Default is \(oqM-5\(cq when number_pad is set to 1 or 3,
+otherwise \(oq5\(cq when it is set to 2 or 4.
 .hn 2
 Configuring Message Types
 .pg
@@ -5428,11 +5639,19 @@ Main events in the course of the game development are described below:
 \fBJay Fenlason\fP wrote the original Hack, with help from
 \fBKenny Woodland\fP, \fBMike Thome\fP, and \fBJon Payne\fP.
 .pg
-\fBAndries Brouwer\fP did a major re-write, transforming Hack into a
-very different game, and published (at least) three versions (1.0.1,
-1.0.2, and 1.0.3) for
+\fBAndries Brouwer\fP did a major re-write while at
+Stichting Mathematisch Centrum (now Centrum Wiskunde & Informatica),
+transforming Hack into a very different game.
+He published the Hack source code for use on
 .UX
-machines to the Usenet.
+systems by posting that to Usenet
+newsgroup \fInet.sources\fP (later renamed \fIcomp.sources\fP)
+releasing version 1.0 in December of 1984, then versions 1.0.1, 1.0.2,
+and finally 1.0.3 in July of 1985.
+Usenet newsgroup \fInet.games.hack\fP (later
+renamed \fIrec.games.hack\fP, eventually replaced
+by \fIrec.games.roguelike.nethack\fP)
+was created for discussing it.
 .pg
 \fBDon G. Kneller\fP ported Hack 1.0.3 to Microsoft C and MS-DOS, producing PC
 HACK 1.01e, added support for DEC Rainbow graphics in version 1.03g, and went
@@ -5447,6 +5666,9 @@ incorporating many of the added features, and produced NetHack version 1.4
 in 1987.
 He then coordinated a cast of thousands in enhancing and debugging
 NetHack 1.4 and released NetHack versions 2.2 and 2.3.
+Like Hack, they were released by posting their source code to Usenet where
+they remained available in various archives accessible
+via \fIftp\fP and \fIuucp\fP after expiring from the newsgroup.
 .pg
 Later, Mike coordinated a major re-write of the game, heading a
 team which included \fBKen Arromdee\fP, \fBJean-Christophe Collet\fP,

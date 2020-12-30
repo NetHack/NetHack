@@ -1,4 +1,4 @@
-/* NetHack 3.6	nh340key.c	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	nh340key.c	$NHDT-Date: 1596498312 2020/08/03 23:45:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

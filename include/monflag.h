@@ -1,4 +1,4 @@
-/* NetHack 3.6	monflag.h	$NHDT-Date: 1590879610 2020/05/30 23:00:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	monflag.h	$NHDT-Date: 1596498549 2020/08/03 23:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,6 +204,9 @@ enum ms_sounds {
 #define G_EXTINCT       0x01 /* population control; create no more */
 #define G_GONE          (G_GENOD | G_EXTINCT)
 #define MV_KNOWS_EGG    0x08 /* player recognizes egg of this monster type */
+
+enum mgender { MALE, FEMALE, NEUTRAL,
+               NUM_MGENDERS };
 
 /* *INDENT-ON* */
 /* clang-format on */

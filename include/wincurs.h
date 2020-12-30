@@ -1,4 +1,4 @@
-/* NetHack 3.6 wincurs.h */
+/* NetHack 3.7 wincurs.h */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -90,7 +90,7 @@ extern void curses_mark_synch(void);
 extern void curses_wait_synch(void);
 extern void curses_cliparound(int x, int y);
 extern void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
-                               int glyph, int bkglyph);
+                               int glyph, int bkglyph, unsigned *glyphmod);
 extern void curses_raw_print(const char *str);
 extern void curses_raw_print_bold(const char *str);
 extern int curses_nhgetch(void);
@@ -105,7 +105,7 @@ extern void curses_number_pad(int state);
 extern void curses_delay_output(void);
 extern void curses_start_screen(void);
 extern void curses_end_screen(void);
-extern void curses_outrip(winid wid, int how);
+extern void curses_outrip(winid wid, int how, time_t when);
 extern void genl_outrip(winid tmpwin, int how, time_t when);
 extern void curses_preference_update(const char *pref);
 extern void curs_reset_windows(boolean, boolean);

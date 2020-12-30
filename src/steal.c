@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1591196090 2020/06/03 14:54:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1596498213 2020/08/03 23:43:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -508,11 +508,11 @@ register struct obj *otmp;
 
     if (!otmp) {
         impossible("monster (%s) taking or picking up nothing?",
-                   mtmp->data->mname);
+                   pmname(mtmp->data, Mgender(mtmp)));
         return 1;
     } else if (otmp == uball || otmp == uchain) {
         impossible("monster (%s) taking or picking up attached %s (%s)?",
-                   mtmp->data->mname,
+                   pmname(mtmp->data, Mgender(mtmp)),
                    (otmp == uchain) ? "chain" : "ball", simpleonames(otmp));
         return 0;
     }

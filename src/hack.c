@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1585993266 2020/04/04 09:41:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1608673692 2020/12/22 21:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,7 +9,6 @@
 
 static void NDECL(maybe_wail);
 static int NDECL(moverock);
-static int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
 static void NDECL(dosinkfall);
 static boolean FDECL(findtravelpath, (int));
 static boolean FDECL(trapmove, (int, int, struct trap *));
@@ -394,7 +393,7 @@ moverock()
  *  Chew on a wall, door, or boulder.  [What about statues?]
  *  Returns TRUE if still eating, FALSE when done.
  */
-static int
+int
 still_chewing(x, y)
 xchar x, y;
 {
@@ -418,7 +417,15 @@ xchar x, y;
                     : "hard stone");
         nomul(0);
         return 1;
-    } else if (g.context.digging.pos.x != x || g.context.digging.pos.y != y
+    } else if (lev->typ == IRONBARS
+               && metallivorous(g.youmonst.data) && u.uhunger > 1500) {
+        /* finishing eating via 'morehungry()' doesn't handle choking */
+        You("are too full to eat the bars.");
+        nomul(0);
+        return 1;
+    } else if (!g.context.digging.chew
+               || g.context.digging.pos.x != x
+               || g.context.digging.pos.y != y
                || !on_level(&g.context.digging.level, &u.uz)) {
         g.context.digging.down = FALSE;
         g.context.digging.chew = TRUE;
@@ -504,7 +511,20 @@ xchar x, y;
         digtxt = "chew through the tree.";
         lev->typ = ROOM;
     } else if (lev->typ == IRONBARS) {
-        digtxt = "eat through the bars.";
+        if (metallivorous(g.youmonst.data)) { /* should always be True here */
+            /* arbitrary amount; unlike proper eating, nutrition is
+               bestowed in a lump sum at the end */
+            int nut = (int) objects[HEAVY_IRON_BALL].oc_weight;
+
+            /* lesshungry() requires that victual be set up, so skip it;
+               morehungry() of a negative amount will increase nutrition
+               without any possibility of choking to death on the meal;
+               updates hunger state and requests status update if changed */
+            morehungry(-nut);
+        }
+        digtxt = (x == u.ux && y == u.uy)
+                 ? "devour the iron bars."
+                 : "eat through the bars.";
         dissolve_bars(x, y);
     } else if (lev->typ == SDOOR) {
         if (lev->doormask & D_TRAPPED) {
@@ -552,6 +572,7 @@ register xchar ox, oy;
 {
     /* optimize by leaving on the fobj chain? */
     remove_object(obj);
+    maybe_unhide_at(obj->ox, obj->oy);
     newsym(obj->ox, obj->oy);
     place_object(obj, ox, oy);
     newsym(ox, oy);
@@ -745,8 +766,10 @@ int mode;
                 pline("There is an obstacle there.");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
-            if ((dmgtype(g.youmonst.data, AD_RUST)
-                 || dmgtype(g.youmonst.data, AD_CORR)) && mode == DO_MOVE
+            if (mode == DO_MOVE
+                && (dmgtype(g.youmonst.data, AD_RUST)
+                    || dmgtype(g.youmonst.data, AD_CORR)
+                    || metallivorous(g.youmonst.data))
                 && still_chewing(x, y)) {
                 return FALSE;
             }
@@ -1866,14 +1889,12 @@ domove_core()
             /* can't swap places when pet won't fit thru the opening */
             You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
-        } else if ((mtmp->mpeaceful || mtmp->mtame) && mtmp->mtrapped) {
-            /* Since peaceful monsters simply being unable to move out of traps
-             * was inconsistent with pets being able to but being untamed in
-             * the process, apply this logic equally to pets and peacefuls. */
+        } else if (mtmp->mpeaceful && mtmp->mtrapped) {
+            /* all mtame are also mpeaceful, so this affects pets too */
             You("stop.  %s can't move out of that trap.",
                 upstart(y_monnam(mtmp)));
             didnt_move = TRUE;
-        } else if (mtmp->mpeaceful && !mtmp->mtame
+        } else if (mtmp->mpeaceful
                    && (!goodpos(u.ux0, u.uy0, mtmp, 0)
                        || t_at(u.ux0, u.uy0) != NULL
                        || mundisplaceable(mtmp))) {
@@ -1892,10 +1913,10 @@ domove_core()
             You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 x_monnam(mtmp,
                          mtmp->mtame ? ARTICLE_YOUR
-                         : (!has_mname(mtmp) && !type_is_pname(mtmp->data))
+                         : (!has_mgivenname(mtmp) && !type_is_pname(mtmp->data))
                            ? ARTICLE_THE : ARTICLE_NONE,
                          (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
-                         has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+                         has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
             switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
@@ -2039,6 +2060,22 @@ int x1, y1, x2, y2;
     }
 }
 
+/* HP loss or passing out from overexerting yourself */
+void
+overexert_hp()
+{
+    int *hp = (!Upolyd ? &u.uhp : &u.mh);
+
+    if (*hp > 1) {
+        *hp -= 1;
+        g.context.botl = TRUE;
+    } else {
+        You("pass out from exertion!");
+        exercise(A_CON, FALSE);
+        fall_asleep(-10, FALSE);
+    }
+}
+
 /* combat increases metabolism */
 boolean
 overexertion()
@@ -2048,15 +2085,7 @@ overexertion()
        execute if you decline to attack a peaceful monster */
     gethungry();
     if ((g.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
-        int *hp = (!Upolyd ? &u.uhp : &u.mh);
-
-        if (*hp > 1) {
-            *hp -= 1;
-        } else {
-            You("pass out from exertion!");
-            exercise(A_CON, FALSE);
-            fall_asleep(-10, FALSE);
-        }
+        overexert_hp();
     }
     return (boolean) (g.multi < 0); /* might have fainted (forced to sleep) */
 }
@@ -2663,6 +2692,8 @@ boolean newlev;
 static int
 pickup_checks()
 {
+    struct trap *traphere;
+
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck->minvent) {
@@ -2678,8 +2709,8 @@ pickup_checks()
         }
     }
     if (is_pool(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
-            || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(g.youmonst.data)
+            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
             You("cannot dive into the %s to pick things up.",
                 hliquid("water"));
             return 0;
@@ -2689,8 +2720,8 @@ pickup_checks()
         }
     }
     if (is_lava(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
-            || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(g.youmonst.data)
+            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
             You_cant("reach the bottom to pick things up.");
             return 0;
         } else if (!likes_lava(g.youmonst.data)) {
@@ -2720,18 +2751,27 @@ pickup_checks()
             There("is nothing here to pick up.");
         return 0;
     }
-    if (!can_reach_floor(TRUE)) {
-        struct trap *traphere = t_at(u.ux, u.uy);
-        if (traphere
-            && (uteetering_at_seen_pit(traphere) || uescaped_shaft(traphere)))
-            You("cannot reach the bottom of the %s.",
-                is_pit(traphere->ttyp) ? "pit" : "abyss");
-        else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
+    traphere = t_at(u.ux, u.uy);
+    if (!can_reach_floor(traphere && is_pit(traphere->ttyp))) {
+        /* it here's a hole here, any objects here clearly aren't at
+           the bottom so only check for pits */
+        if (traphere && uteetering_at_seen_pit(traphere)) {
+            You("cannot reach the bottom of the pit.");
+        } else if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
             rider_cant_reach();
-        else if (Blind && !can_reach_floor(TRUE))
+        } else if (Blind) {
             You("cannot reach anything here.");
-        else
-            You("cannot reach the %s.", surface(u.ux, u.uy));
+        } else {
+            const char *surf = surface(u.ux, u.uy);
+
+            if (traphere) {
+                if (traphere->ttyp == HOLE)
+                    surf = "edge of the hole";
+                else if (traphere->ttyp == TRAPDOOR)
+                    surf = "trap door";
+            }
+            You("cannot reach the %s.", surf);
+        }
         return 0;
     }
     return -1; /* can do normal pickup */
@@ -2969,12 +3009,13 @@ monster_nearby()
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
             if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
-            if ((mtmp = m_at(x, y)) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
+            if ((mtmp = m_at(x, y)) != 0
+                && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
-                && (!mtmp->mpeaceful || Hallucination)
+                && (Hallucination
+                    || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
-                && !noattacks(mtmp->data) && mtmp->mcanmove
-                && !mtmp->msleeping  /* aplvax!jcn */
+                && mtmp->mcanmove && !mtmp->msleeping
                 && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
                 return 1;
         }
@@ -3030,7 +3071,8 @@ const char *msg_override;
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
         if (Upolyd && !strncmpi(g.nomovemsg, "You survived that ", 18))
-            You("are %s.", an(mons[u.umonnum].mname)); /* (ignore Hallu) */
+            You("are %s.",
+                an(pmname(&mons[u.umonnum], Ugender))); /* (ignore Hallu) */
     }
     g.nomovemsg = 0;
     u.usleep = 0;

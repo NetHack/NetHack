@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1590904090 2020/05/31 05:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1608749030 2020/12/23 18:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,7 +6,8 @@
 #include "hack.h"
 
 static char *NDECL(nextmbuf);
-static void FDECL(getpos_help_keyxhelp, (winid, const char *, const char *, int));
+static void FDECL(getpos_help_keyxhelp, (winid, const char *,
+                                         const char *, int));
 static void FDECL(getpos_help, (BOOLEAN_P, const char *));
 static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
 static int FDECL(gloc_filter_classify_glyph, (int));
@@ -17,7 +18,7 @@ static void NDECL(gloc_filter_done);
 static boolean FDECL(gather_locs_interesting, (int, int, int));
 static void FDECL(gather_locs, (coord **, int *, int));
 static void FDECL(auto_describe, (int, int));
-static void NDECL(do_mname);
+static void NDECL(do_mgivenname);
 static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 static void FDECL(do_oname, (struct obj *));
 static char *FDECL(docall_xname, (struct obj *));
@@ -556,7 +557,7 @@ int cx, cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-        custompline(SUPPRESS_HISTORY,
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE),
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
@@ -995,7 +996,7 @@ const char *goal;
 
 /* allocate space for a monster's name; removes old name if there is one */
 void
-new_mname(mon, lth)
+new_mgivenname(mon, lth)
 struct monst *mon;
 int lth; /* desired length (caller handles adding 1 for terminator) */
 {
@@ -1004,23 +1005,23 @@ int lth; /* desired length (caller handles adding 1 for terminator) */
         if (!mon->mextra)
             mon->mextra = newmextra();
         else
-            free_mname(mon); /* already has mextra, might also have name */
-        MNAME(mon) = (char *) alloc((unsigned) lth);
+            free_mgivenname(mon); /* already has mextra, might also have name */
+        MGIVENNAME(mon) = (char *) alloc((unsigned) lth);
     } else {
         /* zero length: the new name is empty; get rid of the old name */
-        if (has_mname(mon))
-            free_mname(mon);
+        if (has_mgivenname(mon))
+            free_mgivenname(mon);
     }
 }
 
 /* release a monster's name; retains mextra even if all fields are now null */
 void
-free_mname(mon)
+free_mgivenname(mon)
 struct monst *mon;
 {
-    if (has_mname(mon)) {
-        free((genericptr_t) MNAME(mon));
-        MNAME(mon) = (char *) 0;
+    if (has_mgivenname(mon)) {
+        free((genericptr_t) MGIVENNAME(mon));
+        MGIVENNAME(mon) = (char *) 0;
     }
 }
 
@@ -1086,14 +1087,14 @@ const char *name;
         name = strncpy(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
     }
-    new_mname(mtmp, lth); /* removes old name if one is present */
+    new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth)
-        Strcpy(MNAME(mtmp), name);
+        Strcpy(MGIVENNAME(mtmp), name);
     return mtmp;
 }
 
 /* check whether user-supplied name matches or nearly matches an unnameable
-   monster's name; if so, give an alternate reject message for do_mname() */
+   monster's name; if so, give an alternate reject message for do_mgivenname() */
 static boolean
 alreadynamed(mtmp, monnambuf, usrbuf)
 struct monst *mtmp;
@@ -1125,7 +1126,7 @@ char *monnambuf, *usrbuf;
 
 /* allow player to assign a name to some chosen monster */
 static void
-do_mname()
+do_mgivenname()
 {
     char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
     coord cc;
@@ -1169,8 +1170,8 @@ do_mname()
     buf[0] = '\0';
 #ifdef EDIT_GETLIN
     /* if there's an existing name, make it be the default answer */
-    if (has_mname(mtmp))
-        Strcpy(buf, MNAME(mtmp));
+    if (has_mgivenname(mtmp))
+        Strcpy(buf, MGIVENNAME(mtmp));
 #endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
@@ -1196,7 +1197,8 @@ do_mname()
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);
-    } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk) {
+    } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
+               || mtmp->data == &mons[PM_GHOST]) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             pline("%s will not accept the name %s.", upstart(monnambuf), buf);
     } else
@@ -1334,7 +1336,7 @@ const char *name;
 
 static NEARDATA const char callable[] = {
     SCROLL_CLASS, POTION_CLASS, WAND_CLASS,  RING_CLASS, AMULET_CLASS,
-    GEM_CLASS,    SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0
+    GEM_CLASS,    SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, VENOM_CLASS, 0
 };
 
 boolean
@@ -1396,7 +1398,7 @@ docallcmd()
     case 'q':
         break;
     case 'm': /* name a visible monster */
-        do_mname();
+        do_mgivenname();
         break;
     case 'i': /* name an individual object in inventory */
         allowall[0] = ALL_CLASSES;
@@ -1659,7 +1661,7 @@ boolean called;
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
-    const char *pm_name = mdat->mname;
+    const char *pm_name = pmname(mdat, Mgender(mtmp));
     boolean do_hallu, do_invis, do_it, do_saddle, do_name;
     boolean name_at_start, has_adjectives;
     char *bp;
@@ -1704,12 +1706,14 @@ boolean called;
             name += 4;
         return strcpy(buf, name);
     }
+#if 0
     /* an "aligned priest" not flagged as a priest or minion should be
        "priest" or "priestess" (normally handled by priestname()) */
-    if (mdat == &mons[PM_ALIGNED_PRIEST])
+    if (mdat == &mons[PM_ALIGNED_CLERIC])
         pm_name = mtmp->female ? "priestess" : "priest";
-    else if (mdat == &mons[PM_HIGH_PRIEST] && mtmp->female)
+    else if (mdat == &mons[PM_HIGH_CLERIC] && mtmp->female)
         pm_name = "high priestess";
+#endif
 
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
@@ -1753,8 +1757,8 @@ boolean called;
 
         Strcat(buf, rname);
         name_at_start = bogon_is_pname(rnamecode);
-    } else if (do_name && has_mname(mtmp)) {
-        char *name = MNAME(mtmp);
+    } else if (do_name && has_mgivenname(mtmp)) {
+        char *name = MGIVENNAME(mtmp);
 
         if (mdat == &mons[PM_GHOST]) {
             Sprintf(eos(buf), "%s ghost", s_suffix(name));
@@ -1827,7 +1831,7 @@ l_monnam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
 }
 
 char *
@@ -1835,7 +1839,7 @@ mon_nam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -1847,7 +1851,7 @@ noit_mon_nam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+                    (has_mgivenname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
                                       : SUPPRESS_IT,
                     FALSE);
 }
@@ -1898,7 +1902,7 @@ struct monst *mtmp;
     int prefix, suppression_flag;
 
     prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
-    suppression_flag = (has_mname(mtmp)
+    suppression_flag = (has_mgivenname(mtmp)
                         /* "saddled" is redundant when mounted */
                         || mtmp == u.usteed)
                            ? SUPPRESS_SADDLE
@@ -1913,7 +1917,7 @@ struct monst *mtmp;
 const char *adj;
 {
     char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
-                        has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                        has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 
     *bp = highc(*bp);
     return  bp;
@@ -1924,7 +1928,7 @@ a_monnam(mtmp)
 struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                    has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                    has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *
@@ -1948,7 +1952,7 @@ char *outbuf;
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
-    if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination
+    if (mon->data == &mons[PM_HIGH_CLERIC] && !Hallucination
         && Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
@@ -2046,16 +2050,44 @@ boolean ckloc;
     } else if (ckloc && ptr == &mons[PM_LONG_WORM]
                && g.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
-                mons[PM_LONG_WORM_TAIL].mname, mon->mx, mon->my);
+                pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)), mon->mx, mon->my);
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
                 mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
-                mon->data->mname, mon->mx, mon->my);
+                pmname(mon->data, Mgender(mon)), mon->mx, mon->my);
         if (mon->cham != NON_PM)
-            Sprintf(eos(outbuf), "{%s}", mons[mon->cham].mname);
+            Sprintf(eos(outbuf), "{%s}", pmname(&mons[mon->cham], Mgender(mon)));
     }
     return outbuf;
 }
+
+#ifndef PMNAME_MACROS
+int
+Mgender(mtmp)
+struct monst *mtmp;
+{
+    int mgender = MALE;
+
+    if (mtmp == &g.youmonst) {
+        if (Upolyd ? u.mfemale : flags.female)
+            mgender = FEMALE;
+    } else if (mtmp->female) {
+        mgender = FEMALE;
+    }
+    return mgender;
+}
+
+const char *
+pmname(pm, mgender)
+struct permonst *pm;
+int mgender;
+{
+    if ((mgender >= MALE && mgender < NUM_MGENDERS) && pm->pmnames[mgender])
+        return pm->pmnames[mgender];
+    else
+        return pm->pmnames[NEUTRAL];
+}
+#endif /* PMNAME_MACROS */
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
 char *
@@ -2063,20 +2095,20 @@ bogusmon(buf, code)
 char *buf, *code;
 {
     static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
-    char *mname = buf;
+    char *mnam = buf;
 
     if (code)
         *code = '\0';
     /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
-    if (!*mname) {
+    if (!*mnam) {
         Strcpy(buf, "bogon");
-    } else if (index(bogon_codes, *mname)) { /* strip prefix if present */
+    } else if (index(bogon_codes, *mnam)) { /* strip prefix if present */
         if (code)
-            *code = *mname;
-        ++mname;
+            *code = *mnam;
+        ++mnam;
     }
-    return mname;
+    return mnam;
 }
 
 /* return a random monster name, for hallucination */
@@ -2085,7 +2117,7 @@ rndmonnam(code)
 char *code;
 {
     static char buf[BUFSZ];
-    char *mname;
+    char *mnam;
     int name;
 #define BOGUSMONSIZE 100 /* arbitrary */
 
@@ -2098,11 +2130,11 @@ char *code;
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
     if (name >= SPECIAL_PM) {
-        mname = bogusmon(buf, code);
+        mnam = bogusmon(buf, code);
     } else {
-        mname = strcpy(buf, mons[name].mname);
+        mnam = strcpy(buf, pmname(&mons[name], rn2_on_display_rng(2)));
     }
-    return mname;
+    return mnam;
 #undef BOGUSMONSIZE
 }
 

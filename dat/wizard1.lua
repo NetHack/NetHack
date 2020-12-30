@@ -1,4 +1,4 @@
--- NetHack 3.6	yendor.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	yendor.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -28,12 +28,12 @@ des.levregion({ type="stair-up", region={01,00,79,20}, region_islev=1, exclude={
 des.levregion({ type="stair-down", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.levregion({ type="branch", region={01,00,79,20}, region_islev=1, exclude={0,0,28,12} })
 des.teleport_region({ region={01,00,79,20}, region_islev=1, exclude={0,0,27,12} })
-des.region({ region={12,01, 20,09}, lit=0, type="morgue", prefilled=1, contents=function()
+des.region({ region={12,01, 20,09}, lit=0, type="morgue", filled=2, contents=function()
                 local sdwall = { "south", "west", "east" };
                 des.door({ wall = sdwall[math.random(1, #sdwall)], state = "secret" });
 end })
 -- another region to constrain monster arrival
-des.region({ region={01,01, 10,11}, lit=0, type="ordinary", prefilled=0 })
+des.region({ region={01,01, 10,11}, lit=0, type="ordinary", arrival_room=true })
 des.mazewalk(28,05,"east")
 des.ladder("down", 06,05)
 -- Non diggable walls

@@ -3,9 +3,15 @@
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
+#else
+#include "windefs.h"
+#include "winext.h"
+#include "winproto.h"
+#endif
 
 /* Have to undef CLOSE as display.h and intuition.h both use it */
 #undef CLOSE
@@ -20,10 +26,21 @@ static int BufferGetchar(void);
 static void ProcessMessage(register struct IntuiMessage *message);
 
 #define BufferQueueChar(ch) (KbdBuffer[KbdBuffered++] = (ch))
-
+#ifndef CROSS_TO_AMIGA
 struct Library *ConsoleDevice;
+#else
+struct Device *
+# ifdef __CONSTLIBBASEDECL__
+     __CONSTLIBBASEDECL__
+# endif /* __CONSTLIBBASEDECL__ */
+       ConsoleDevice;
+#endif
 
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/amimenu.c"
+#else
+#include "amimenu.c"
+#endif
 
 /* Now our own variables */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmsgwnd.c	$NHDT-Date: 1432512812 2015/05/25 00:13:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	mhmsgwnd.c	$NHDT-Date: 1596498357 2020/08/03 23:45:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -769,7 +769,7 @@ mswin_message_window_size(HWND hWnd, LPSIZE sz)
     sz->cx = rt.right - rt.left;
     sz->cy = rt.bottom - rt.top;
 
-    /* set size to accomodate MSG_VISIBLE_LINES and
+    /* set size to accommodate MSG_VISIBLE_LINES and
        horizontal scroll bar (difference between window rect and client rect
        */
     GetClientRect(hWnd, &client_rt);

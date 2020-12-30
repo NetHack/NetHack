@@ -1,4 +1,4 @@
-/* NetHack 3.6	wingem.h	$NHDT-Date: 1433806582 2015/06/08 23:36:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	wingem.h	$NHDT-Date: 1596498570 2020/08/03 23:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Christian Bressler, 1999				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -84,7 +84,8 @@ E void FDECL(Gem_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(Gem_update_positionbar, (char *));
 #endif
-E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                                int, int, unsigned *));
 E void FDECL(Gem_raw_print, (const char *));
 E void FDECL(Gem_raw_print_bold, (const char *));
 E int NDECL(Gem_nhgetch);

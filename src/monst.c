@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1587502224 2020/04/21 20:50:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1605726850 2020/11/18 19:14:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -45,7 +45,13 @@
  */
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col) \
     {                                                                      \
-        nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+        {(const char *) 0, (const char *) 0, nam}, \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+    }
+#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col) \
+    {                                                                      \
+        {namm, namf, namn}, \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
     }
 /* LVL() and SIZ() collect several fields to cut down on number of args
  * for MON()
@@ -436,20 +442,21 @@ NEARDATA struct permonst mons_init[] = {
           NO_ATTK),
         SIZ(1250, 250, MS_GROWL, MZ_LARGE), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, 5, CLR_BROWN),
-    MON("dwarf lord", S_HUMANOID, LVL(4, 6, 10, 10, 5), (G_GENO | 2),
+    MON3("dwarf lord", "dwarf lady", "dwarf leader",
+        S_HUMANOID, LVL(4, 6, 10, 10, 5), (G_GENO | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
-        M2_DWARF | M2_STRONG | M2_LORD | M2_MALE | M2_GREEDY | M2_JEWELS
-            | M2_COLLECT,
+        M2_DWARF | M2_STRONG | M2_LORD | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 6, CLR_BLUE),
-    MON("dwarf king", S_HUMANOID, LVL(6, 6, 10, 20, 6), (G_GENO | 1),
+    MON3("dwarf king", "dwarf queen", "dwarf ruler",
+        S_HUMANOID, LVL(6, 6, 10, 20, 6), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 6), ATTK(AT_WEAP, AD_PHYS, 2, 6), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(900, 300, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
-        M2_DWARF | M2_STRONG | M2_PRINCE | M2_MALE | M2_GREEDY | M2_JEWELS
+        M2_DWARF | M2_STRONG | M2_PRINCE | M2_GREEDY | M2_JEWELS
             | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 8, HI_LORD),
     MON("mind flayer", S_HUMANOID, LVL(9, 12, 5, 90, -8), (G_GENO | 1),
@@ -547,12 +554,13 @@ NEARDATA struct permonst mons_init[] = {
         SIZ(450, 150, MS_ORC, MZ_SMALL), MR_POISON, 0,
         M1_HUMANOID | M1_POIS | M1_OMNIVORE, M2_HOSTILE | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 2, CLR_RED),
-    MON("kobold lord", S_KOBOLD, LVL(2, 6, 10, 0, -4), (G_GENO | 1),
+    MON3("kobold lord", "kobold lady", "kobold leader",
+        S_KOBOLD, LVL(2, 6, 10, 0, -4), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(500, 200, MS_ORC, MZ_SMALL), MR_POISON, 0,
         M1_HUMANOID | M1_POIS | M1_OMNIVORE,
-        M2_HOSTILE | M2_LORD | M2_MALE | M2_COLLECT,
+        M2_HOSTILE | M2_LORD | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 3, HI_LORD),
     MON("kobold shaman", S_KOBOLD, LVL(2, 6, 6, 10, -4), (G_GENO | 1),
         A(ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -1020,13 +1028,15 @@ NEARDATA struct permonst mons_init[] = {
         M1_FLY | M1_HUMANOID | M1_SEE_INVIS,
         M2_NOPOLY | M2_MINION | M2_STALK | M2_STRONG | M2_NASTY | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 19, CLR_WHITE),
+    /* the AD&D Monster Manual depicts ki-rin as very similar to unicorns
+       except that they fly (without wings) and can cast spells */
     MON("ki-rin", S_ANGEL, LVL(16, 18, -5, 90, 15),
         (G_NOHELL | G_NOCORPSE | 1),
         A(ATTK(AT_KICK, AD_PHYS, 2, 4), ATTK(AT_KICK, AD_PHYS, 2, 4),
           ATTK(AT_BUTT, AD_PHYS, 3, 6), ATTK(AT_MAGC, AD_SPEL, 2, 6), NO_ATTK,
           NO_ATTK),
-        SIZ(WT_HUMAN, 400, MS_NEIGH, MZ_LARGE), 0, 0,
-        M1_FLY | M1_ANIMAL | M1_NOHANDS | M1_SEE_INVIS,
+        SIZ(WT_HUMAN, 400, MS_SPELL, MZ_LARGE), MR_POISON, 0,
+        M1_FLY | M1_NOHANDS | M1_SEE_INVIS,
         M2_NOPOLY | M2_MINION | M2_STALK | M2_STRONG | M2_NASTY | M2_LORD,
         M3_INFRAVISIBLE | M3_INFRAVISION, 21, HI_GOLD),
     MON("Archon", S_ANGEL, LVL(19, 16, -6, 80, 15),
@@ -1357,22 +1367,24 @@ NEARDATA struct permonst mons_init[] = {
         SIZ(650, 100, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_GNOME | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION,
         3, CLR_BROWN),
-    MON("gnome lord", S_GNOME, LVL(3, 8, 10, 4, 0), (G_GENO | 2),
+    MON3("gnome lord", "gnome lady", "gnome leader",
+        S_GNOME, LVL(3, 8, 10, 4, 0), (G_GENO | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(700, 120, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
-        M2_GNOME | M2_LORD | M2_MALE | M2_COLLECT,
+        M2_GNOME | M2_LORD | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 4, CLR_BLUE),
     MON("gnomish wizard", S_GNOME, LVL(3, 10, 4, 10, 0), (G_GENO | 1),
         A(ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(700, 120, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_GNOME | M2_MAGIC, M3_INFRAVISIBLE | M3_INFRAVISION, 5, HI_ZAP),
-    MON("gnome king", S_GNOME, LVL(5, 10, 10, 20, 0), (G_GENO | 1),
+    MON3("gnome king", "gnome queen", "gnome ruler",
+        S_GNOME, LVL(5, 10, 10, 20, 0), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(750, 150, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
-        M2_GNOME | M2_PRINCE | M2_MALE | M2_COLLECT,
+        M2_GNOME | M2_PRINCE | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 6, HI_LORD),
 #ifdef SPLITMON_1
 };
@@ -1679,17 +1691,19 @@ struct permonst _mons2[] = {
         SIZ(1600, 500, MS_GRUNT, MZ_LARGE), 0, 0, M1_HUMANOID | M1_CARNIVORE,
         M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 7, CLR_BROWN),
-    MON("ogre lord", S_OGRE, LVL(7, 12, 3, 30, -5), (G_GENO | 2),
+    MON3("ogre lord", "ogre lady", "ogre leader",
+        S_OGRE, LVL(7, 12, 3, 30, -5), (G_GENO | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1700, 700, MS_GRUNT, MZ_LARGE), 0, 0, M1_HUMANOID | M1_CARNIVORE,
-        M2_STRONG | M2_LORD | M2_MALE | M2_GREEDY | M2_JEWELS | M2_COLLECT,
+        M2_STRONG | M2_LORD | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 9, CLR_RED),
-    MON("ogre king", S_OGRE, LVL(9, 14, 4, 60, -7), (G_GENO | 2),
+    MON3("ogre king", "ogre queen", "ogre tyrant",
+        S_OGRE, LVL(9, 14, 4, 60, -7), (G_GENO | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 3, 5), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(1700, 750, MS_GRUNT, MZ_LARGE), 0, 0, M1_HUMANOID | M1_CARNIVORE,
-        M2_STRONG | M2_PRINCE | M2_MALE | M2_GREEDY | M2_JEWELS | M2_COLLECT,
+        M2_STRONG | M2_PRINCE | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 11, HI_LORD),
     /*
      * Puddings
@@ -1869,14 +1883,15 @@ struct permonst _mons2[] = {
         M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY
             | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, 12, CLR_RED),
-    MON("vampire lord", S_VAMPIRE, LVL(12, 14, 0, 50, -9),
+    MON3("vampire lord", "vampire lady", "vampire leader",
+        S_VAMPIRE, LVL(12, 14, 0, 50, -9),
         (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_CLAW, AD_PHYS, 1, 8), ATTK(AT_BITE, AD_DRLI, 1, 8), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_VAMPIRE, MZ_HUMAN), MR_SLEEP | MR_POISON, 0,
         M1_FLY | M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
         M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_LORD
-            | M2_MALE | M2_SHAPESHIFTER,
+            | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, 14, CLR_BLUE),
 #if 0 /* DEFERRED */
     MON("vampire mage", S_VAMPIRE,
@@ -2185,19 +2200,21 @@ struct permonst _mons2[] = {
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS, M2_ELF | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 8, CLR_GRAY),
-    MON("elf-lord", S_HUMAN, LVL(8, 12, 10, 20, -9), (G_GENO | G_SGROUP | 2),
+    MON3("elf-lord", "elf-queen", "elf-noble",
+        S_HUMAN, LVL(8, 12, 10, 20, -9), (G_GENO | G_SGROUP | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
-        M2_ELF | M2_STRONG | M2_LORD | M2_MALE | M2_COLLECT,
+        M2_ELF | M2_STRONG | M2_LORD | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 11, CLR_BRIGHT_BLUE),
-    MON("Elvenking", S_HUMAN, LVL(9, 12, 10, 25, -10), (G_GENO | 1),
+    MON3("Elvenking", "Elvenqueen", "elven monarch",
+        S_HUMAN, LVL(9, 12, 10, 25, -10), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
-        M2_ELF | M2_STRONG | M2_PRINCE | M2_MALE | M2_COLLECT,
+        M2_ELF | M2_STRONG | M2_PRINCE | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 11, HI_LORD),
     MON("doppelganger", S_HUMAN, LVL(9, 12, 5, 20, 0), (G_GENO | 1),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 12),
@@ -2240,7 +2257,8 @@ struct permonst _mons2[] = {
     /* aligned priests always have the epri extension attached;
        individual instantiations should always have either ispriest
        or isminion set */
-    MON("aligned priest", S_HUMAN, LVL(12, 12, 10, 50, 0), G_NOGEN,
+    MON3("priest", "priestess", "aligned cleric",
+        S_HUMAN, LVL(12, 12, 10, 50, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_KICK, AD_PHYS, 1, 4),
           ATTK(AT_MAGC, AD_CLRC, 0, 0), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_PRIEST, MZ_HUMAN), MR_ELEC, 0,
@@ -2248,7 +2266,8 @@ struct permonst _mons2[] = {
         M2_NOPOLY | M2_HUMAN | M2_LORD | M2_PEACEFUL | M2_COLLECT,
         M3_INFRAVISIBLE, 15, CLR_WHITE),
     /* high priests always have epri and always have ispriest set */
-    MON("high priest", S_HUMAN, LVL(25, 15, 7, 70, 0), (G_NOGEN | G_UNIQ),
+    MON3("high priest", "high priestess", "high cleric",
+        S_HUMAN, LVL(25, 15, 7, 70, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_KICK, AD_PHYS, 2, 8),
           ATTK(AT_MAGC, AD_CLRC, 2, 8), ATTK(AT_MAGC, AD_CLRC, 2, 8), NO_ATTK,
           NO_ATTK),
@@ -2390,10 +2409,12 @@ struct permonst _mons2[] = {
 #define SEDUCTION_ATTACKS_NO                                      \
     A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
       ATTK(AT_BITE, AD_DRLI, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK)
-    MON("succubus", S_DEMON, LVL(6, 12, 0, 70, -9), (G_NOCORPSE | 1),
+    /* incubus and succubus */
+    MON3("incubus", "succubus", "amorous demon",
+        S_DEMON, LVL(6, 12, 0, 70, -9), (G_NOCORPSE | 1),
         SEDUCTION_ATTACKS_YES, SIZ(WT_HUMAN, 400, MS_SEDUCE, MZ_HUMAN),
         MR_FIRE | MR_POISON, 0, M1_HUMANOID | M1_FLY | M1_POIS,
-        M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY | M2_FEMALE,
+        M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY,
         M3_INFRAVISIBLE | M3_INFRAVISION, 8, CLR_GRAY),
     MON("horned devil", S_DEMON, LVL(6, 9, -5, 50, 11),
         (G_HELL | G_NOCORPSE | 2),
@@ -2403,11 +2424,6 @@ struct permonst _mons2[] = {
         SIZ(WT_HUMAN, 400, MS_SILENT, MZ_HUMAN), MR_FIRE | MR_POISON, 0,
         M1_POIS | M1_THICK_HIDE, M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY,
         M3_INFRAVISIBLE | M3_INFRAVISION, 9, CLR_BROWN),
-    MON("incubus", S_DEMON, LVL(6, 12, 0, 70, -9), (G_NOCORPSE | 1),
-        SEDUCTION_ATTACKS_YES, SIZ(WT_HUMAN, 400, MS_SEDUCE, MZ_HUMAN),
-        MR_FIRE | MR_POISON, 0, M1_HUMANOID | M1_FLY | M1_POIS,
-        M2_DEMON | M2_STALK | M2_HOSTILE | M2_NASTY | M2_MALE,
-        M3_INFRAVISIBLE | M3_INFRAVISION, 8, CLR_GRAY),
     /* Used by AD&D for a type of demon, originally one of the Furies
        and spelled this way */
     MON("erinys", S_DEMON, LVL(7, 12, 2, 30, 10),
@@ -2636,9 +2652,9 @@ struct permonst _mons2[] = {
         M1_SWIM | M1_AMPHIBIOUS | M1_SLITHY | M1_NOLIMBS | M1_NOHEAD
             | M1_NOTAKE | M1_POIS,
         M2_HOSTILE, 0, 5, CLR_BLUE),
-    MON("piranha", S_EEL, LVL(5, 12, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+    MON("piranha", S_EEL, LVL(5, 18, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BITE, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(60, 30, MS_SILENT, MZ_SMALL), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,
@@ -2755,19 +2771,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE,
         12, HI_DOMESTIC),
-    MON("caveman", S_HUMAN, LVL(10, 12, 10, 0, 1), G_NOGEN,
+    MON3("caveman", "cavewoman", "cave dweller",
+        S_HUMAN, LVL(10, 12, 10, 0, 1), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_MALE | M2_COLLECT,
-        M3_INFRAVISIBLE, 12, HI_DOMESTIC),
-    MON("cavewoman", S_HUMAN, LVL(10, 12, 10, 0, 1), G_NOGEN,
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
-        M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_FEMALE | M2_COLLECT,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, 12, HI_DOMESTIC),
     MON("healer", S_HUMAN, LVL(10, 12, 10, 1, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -2790,19 +2800,13 @@ struct permonst _mons2[] = {
         M1_HUMANOID | M1_HERBIVORE,
         M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT | M2_MALE,
         M3_INFRAVISIBLE, 11, HI_DOMESTIC),
-    MON("priest", S_HUMAN, LVL(10, 12, 10, 2, 0), G_NOGEN,
+    MON3("priest", "priestess", "cleric",
+        S_HUMAN, LVL(10, 12, 10, 2, 0), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_MALE | M2_COLLECT,
-        M3_INFRAVISIBLE, 12, HI_DOMESTIC),
-    MON("priestess", S_HUMAN, LVL(10, 12, 10, 2, 0), G_NOGEN,
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
-        M1_HUMANOID | M1_OMNIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_FEMALE | M2_COLLECT,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, 12, HI_DOMESTIC),
     MON("ranger", S_HUMAN, LVL(10, 12, 10, 2, -3), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,

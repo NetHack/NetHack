@@ -19,10 +19,13 @@ private:
 	QPushButton* cancel;
 
 public:
-	NetHackQtStringRequestor(QWidget *parent, const char* p,const char* cancelstr="Cancel");
-	void SetDefault(const char*);
-	bool Get(char* buffer, int maxchar=80);
-	virtual void resizeEvent(QResizeEvent*);
+        NetHackQtStringRequestor(QWidget *parent, const char *p,
+                                 const char *cancelstr = "Cancel",
+                                 const char *okaystr = "Okay");
+        void SetDefault(const char *);
+        // maxchar is size of buffer[], minchar is size of line edit widget
+        bool Get(char *buffer, int maxchar = 80, int minchar = 20);
+        virtual void resizeEvent(QResizeEvent *);
 };
 
 } // namespace nethack_qt_

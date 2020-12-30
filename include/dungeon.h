@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date: 1593953333 2020/07/05 12:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.7	dungeon.h	$NHDT-Date: 1596498535 2020/08/03 23:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -34,7 +34,9 @@ typedef struct s_level { /* special dungeon level element */
 typedef struct stairway { /* basic stairway identifier */
     xchar sx, sy;         /* x / y location of the stair */
     d_level tolev;        /* where does it go */
-    char up;              /* what type of stairway (up/down) */
+    boolean up;           /* up or down? */
+    boolean isladder;     /* ladder or stairway? */
+    struct stairway *next;
 } stairway;
 
 /* level region types */
@@ -181,14 +183,6 @@ struct linfo {
  * free concerns).  Therefore, this map is not exhaustive nor detailed ("some
  * fountains").  This makes it also subject to player conditions (amnesia).
  */
-
-/* Because clearly Nethack needs more ways to specify alignment */
-#define Amask2msa(x) ((x) == 4 ? 3 : (x) &AM_MASK)
-#define Msa2amask(x) ((x) == 3 ? 4 : (x))
-#define MSA_NONE 0 /* unaligned or multiple alignments */
-#define MSA_LAWFUL 1
-#define MSA_NEUTRAL 2
-#define MSA_CHAOTIC 3
 
 /* what the player knows about a single dungeon level */
 /* initialized in mklev() */

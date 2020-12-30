@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmap.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	mkmap.c	$NHDT-Date: 1596498181 2020/08/03 23:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,7 +14,6 @@ static schar FDECL(get_map, (int, int, SCHAR_P));
 static void FDECL(pass_one, (SCHAR_P, SCHAR_P));
 static void FDECL(pass_two, (SCHAR_P, SCHAR_P));
 static void FDECL(pass_three, (SCHAR_P, SCHAR_P));
-static void NDECL(wallify_map);
 static void FDECL(join_map, (SCHAR_P, SCHAR_P));
 static void FDECL(finish_map,
                       (SCHAR_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
@@ -193,7 +192,10 @@ boolean anyroom;
                         levl[ii][jj].edge = 1;
                         if (lit)
                             levl[ii][jj].lit = lit;
-                        if ((int) levl[ii][jj].roomno != rmno)
+
+                        if (levl[ii][jj].roomno == NO_ROOM)
+                            levl[ii][jj].roomno = rmno;
+                        else if ((int) levl[ii][jj].roomno != rmno)
                             levl[ii][jj].roomno = SHARED;
                     }
         }
@@ -242,29 +244,6 @@ boolean anyroom;
         g.max_rx = nx - 1; /* nx is just past valid region */
     if (sy > g.max_ry)
         g.max_ry = sy;
-}
-
-/*
- * If we have drawn a map without walls, this allows us to
- * auto-magically wallify it.  Taken from lev_main.c.
- */
-static void
-wallify_map()
-{
-    int x, y, xx, yy;
-
-    for (x = 1; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (levl[x][y].typ == STONE) {
-                for (yy = y - 1; yy <= y + 1; yy++)
-                    for (xx = x - 1; xx <= x + 1; xx++)
-                        if (isok(xx, yy) && levl[xx][yy].typ == ROOM) {
-                            if (yy != y)
-                                levl[x][y].typ = HWALL;
-                            else
-                                levl[x][y].typ = VWALL;
-                        }
-            }
 }
 
 static void
@@ -348,7 +327,7 @@ boolean lit, walled, icedpools;
     int i, j;
 
     if (walled)
-        wallify_map();
+        wallify_map(1, 0, COLNO-1, ROWNO-1);
 
     if (lit) {
         for (i = 1; i < COLNO; i++)

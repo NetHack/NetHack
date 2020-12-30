@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1593953357 2020/07/05 12:49:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1606765214 2020/11/30 19:40:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -294,27 +294,6 @@ boolean frozen;
             /* restore container back pointers */
             for (otmp3 = otmp->cobj; otmp3; otmp3 = otmp3->nobj)
                 otmp3->ocontainer = otmp;
-        } else if (SchroedingersBox(otmp)) {
-            struct obj *catcorpse;
-
-            /*
-             * TODO:  Remove this after 3.6.x save compatibility is dropped.
-             *
-             * As of 3.6.2, SchroedingersBox() always has a cat corpse in it.
-             * For 3.6.[01], it was empty and its weight was falsified
-             * to have the value it would have had if there was one inside.
-             * Put a non-rotting cat corpse in this box to convert to 3.6.2.
-             *
-             * [Note: after this fix up, future save/restore of this object
-             * will take the Has_contents() code path above.]
-             */
-            if ((catcorpse = mksobj(CORPSE, TRUE, FALSE)) != 0) {
-                otmp->spe = 1; /* flag for special SchroedingersBox */
-                set_corpsenm(catcorpse, PM_HOUSECAT);
-                (void) stop_timer(ROT_CORPSE, obj_to_any(catcorpse));
-                add_to_container(otmp, catcorpse);
-                otmp->owt = weight(otmp);
-            }
         }
         if (otmp->bypass)
             otmp->bypass = 0;
@@ -354,13 +333,13 @@ struct monst *mtmp;
     if (mtmp->mextra) {
         mtmp->mextra = newmextra();
 
-        /* mname - monster's name */
+        /* mgivenname - monster's name */
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
         if (buflen > 0) { /* includes terminating '\0' */
-            new_mname(mtmp, buflen);
+            new_mgivenname(mtmp, buflen);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) MNAME(mtmp), buflen);
+                mread(nhfp->fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
         }
         /* egd - vault guard */
         if (nhfp->structlevel)
@@ -664,9 +643,9 @@ unsigned int *stuckid, *steedid;
     while (bc_obj) {
         struct obj *nobj = bc_obj->nobj;
 
+        bc_obj->nobj = (struct obj *) 0;
         if (bc_obj->owornmask)
             setworn(bc_obj, bc_obj->owornmask);
-        bc_obj->nobj = (struct obj *) 0;
         bc_obj = nobj;
     }
     g.migrating_objs = restobjchn(nhfp, FALSE);
@@ -792,7 +771,7 @@ NHFILE *nhfp;
     int rtmp;
     struct obj *otmp;
 
-    g.restoring = TRUE;
+    g.program_state.restoring = 1;
     get_plname_from_file(nhfp, g.plname);
     getlev(nhfp, 0, (xchar) 0);
     if (!restgamestate(nhfp, &stuckid, &steedid)) {
@@ -807,7 +786,7 @@ NHFILE *nhfp;
            is not really affiliated with an open file */
         close_nhfile(nhfp);
         (void) delete_savefile();
-        g.restoring = FALSE;
+        g.program_state.restoring = 0;
         return 0;
     }
     restlevelstate(stuckid, steedid);
@@ -830,7 +809,7 @@ NHFILE *nhfp;
 #ifdef AMII_GRAPHICS
     {
         extern struct window_procs amii_procs;
-        if (WINDOWPORT("amii") {
+        if (WINDOWPORT("amii")) {
             extern winid WIN_BASE;
             clear_nhwindow(WIN_BASE); /* hack until there's a hook for this */
         }
@@ -916,14 +895,45 @@ NHFILE *nhfp;
     g.vision_full_recalc = 1; /* recompute vision (not saved) */
 
     run_timers(); /* expire all timers that have gone off while away */
+    g.program_state.restoring = 0; /* affects bot() so clear before docrt() */
     docrt();
-    g.restoring = FALSE;
     clear_nhwindow(WIN_MESSAGE);
 
     /* Success! */
     welcome(FALSE);
     check_special_room(FALSE);
     return 1;
+}
+
+void
+rest_stairs(nhfp)
+NHFILE *nhfp;
+{
+    int buflen = 0;
+    stairway stway;
+    int len = 0;
+
+    stairway_free_all();
+    while (1) {
+        if (nhfp->structlevel) {
+            len += (int) sizeof(buflen);
+            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+        }
+
+        if (buflen == -1)
+            break;
+
+        len += (int) sizeof (stairway);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
+        }
+        if (stway.tolev.dnum == u.uz.dnum) {
+            /* stairway dlevel is relative, make it absolute */
+            stway.tolev.dlevel += u.uz.dlevel;
+        }
+        stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
+                     &(stway.tolev));
+    }
 }
 
 void
@@ -954,7 +964,11 @@ struct cemetery **cemeteryaddr;
 static void
 rest_levl(nhfp, rlecomp)
 NHFILE *nhfp;
+#ifdef RLECOMP
 boolean rlecomp;
+#else
+boolean rlecomp UNUSED;
+#endif
 {
 #ifdef RLECOMP
     short i, j;
@@ -984,9 +998,7 @@ boolean rlecomp;
         }
         return;
     }
-#else /* !RLECOMP */
-    nhUse(rlecomp);
-#endif /* ?RLECOMP */
+#endif /* RLECOMP */
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) levl, sizeof levl);
     }
@@ -1069,11 +1081,7 @@ xchar lev;
     elapsed = g.monstermoves - g.omoves;
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t)&g.upstair, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.dnstair, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.upladder, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.dnladder, sizeof(stairway));
-        mread(nhfp->fd, (genericptr_t)&g.sstairs, sizeof(stairway));
+        rest_stairs(nhfp);
         mread(nhfp->fd, (genericptr_t)&g.updest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.dndest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.level.flags, sizeof(g.level.flags));
@@ -1123,6 +1131,8 @@ xchar lev;
         place_monster(mtmp, mtmp->mx, mtmp->my);
         if (mtmp->wormno)
             place_wsegs(mtmp, NULL);
+        if (hides_under(mtmp->data) && mtmp->mundetected)
+            (void) hideunder(mtmp);
 
         /* regenerate monsters while on another level */
         if (!u.uz.dlevel)
@@ -1151,16 +1161,27 @@ xchar lev;
     rest_regions(nhfp);
 
     if (ghostly) {
+        stairway *stway = g.stairs;
+        while (stway) {
+            if (!stway->isladder && !stway->up
+                && stway->tolev.dnum == u.uz.dnum)
+                break;
+            stway = stway->next;
+        }
+
         /* Now get rid of all the temp fruits... */
         freefruitchn(g.oldfruit), g.oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
-            && lev < ledger_no(&stronghold_level) && xdnstair == 0) {
+            && lev < ledger_no(&stronghold_level) && !stway) {
             coord cc;
+            d_level dest;
+
+            dest.dnum = u.uz.dnum;
+            dest.dlevel = u.uz.dlevel + 1;
 
             mazexy(&cc);
-            xdnstair = cc.x;
-            ydnstair = cc.y;
+            stairway_add(cc.x, cc.y, FALSE, FALSE, &dest);
             levl[cc.x][cc.y].typ = STAIRS;
         }
 
@@ -1176,8 +1197,15 @@ xchar lev;
             switch (br->type) {
             case BR_STAIR:
             case BR_NO_END1:
-            case BR_NO_END2: /* OK to assign to g.sstairs if it's not used */
-                assign_level(&g.sstairs.tolev, &ltmp);
+            case BR_NO_END2:
+                stway = g.stairs;
+                while (stway) {
+                    if (stway->tolev.dnum != u.uz.dnum)
+                        break;
+                    stway = stway->next;
+                }
+                if (stway)
+                    assign_level(&(stway->tolev), &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
                 for (trap = g.ftrap; trap; trap = trap->ntrap)

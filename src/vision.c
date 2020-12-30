@@ -1,4 +1,4 @@
-/* NetHack 3.6	vision.c	$NHDT-Date: 1448013598 2015/11/20 09:59:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.7	vision.c	$NHDT-Date: 1596498225 2020/08/03 23:43:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -23,7 +23,7 @@
  *              @...X   +4
  *
  */
-const char circle_data[] = {
+const xchar circle_data[] = {
     /*  0*/ 0,
     /*  1*/ 1,  1,
     /*  3*/ 2,  2,  1,
@@ -49,7 +49,7 @@ const char circle_data[] = {
  * used for a single point:  temporary light source of a camera flash
  * as it traverses its path.
  */
-const char circle_start[] = {
+const xchar circle_start[] = {
     /* 0*/ 0,
     /* 1*/ 1,
     /* 2*/ 3,
@@ -74,26 +74,26 @@ const char circle_start[] = {
 
 /*------ local variables ------*/
 
-static char could_see[2][ROWNO][COLNO]; /* vision work space */
-static char *cs_rows0[ROWNO], *cs_rows1[ROWNO];
-static char cs_rmin0[ROWNO], cs_rmax0[ROWNO];
-static char cs_rmin1[ROWNO], cs_rmax1[ROWNO];
+static xchar could_see[2][ROWNO][COLNO]; /* vision work space */
+static xchar *cs_rows0[ROWNO], *cs_rows1[ROWNO];
+static xchar cs_rmin0[ROWNO], cs_rmax0[ROWNO];
+static xchar cs_rmin1[ROWNO], cs_rmax1[ROWNO];
 
 static char viz_clear[ROWNO][COLNO]; /* vision clear/blocked map */
 static char *viz_clear_rows[ROWNO];
 
-static char left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
-static char right_ptrs[ROWNO][COLNO];
+static xchar left_ptrs[ROWNO][COLNO]; /* LOS algorithm helpers */
+static xchar right_ptrs[ROWNO][COLNO];
 
 /* Forward declarations. */
 static void FDECL(fill_point, (int, int));
 static void FDECL(dig_point, (int, int));
 static void NDECL(view_init);
-static void FDECL(view_from, (int, int, char **, char *, char *, int,
+static void FDECL(view_from, (int, int, xchar **, xchar *, xchar *, int,
                                   void (*)(int, int, genericptr_t),
                                   genericptr_t));
-static void FDECL(get_unused_cs, (char ***, char **, char **));
-static void FDECL(rogue_vision, (char **, char *, char *));
+static void FDECL(get_unused_cs, (xchar ***, xchar **, xchar **));
+static void FDECL(rogue_vision, (xchar **, xchar *, xchar *));
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
@@ -127,15 +127,8 @@ vision_init()
     g.vision_full_recalc = 0;
     (void) memset((genericptr_t) could_see, 0, sizeof(could_see));
 
-    /* Initialize the vision algorithm (currently C or D). */
+    /* Initialize the vision algorithm (currently C). */
     view_init();
-
-#ifdef VISION_TABLES
-    /* Note:  this initializer doesn't do anything except guarantee that
-     *        we're linked properly.
-     */
-    vis_tab_init();
-#endif
 }
 
 /*
@@ -246,11 +239,11 @@ vision_reset()
  */
 static void
 get_unused_cs(rows, rmin, rmax)
-char ***rows;
-char **rmin, **rmax;
+xchar ***rows;
+xchar **rmin, **rmax;
 {
     register int row;
-    register char *nrmin, *nrmax;
+    register xchar *nrmin, *nrmax;
 
     if (g.viz_array == cs_rows0) {
         *rows = cs_rows1;
@@ -287,8 +280,8 @@ char **rmin, **rmax;
  */
 static void
 rogue_vision(next, rmin, rmax)
-char **next; /* could_see array pointers */
-char *rmin, *rmax;
+xchar **next; /* could_see array pointers */
+xchar *rmin, *rmax;
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
@@ -494,13 +487,13 @@ int control;
 {
     extern unsigned char seenv_matrix[3][3]; /* from display.c */
     static unsigned char colbump[COLNO + 1]; /* cols to bump sv */
-    char **temp_array; /* points to the old vision array */
-    char **next_array; /* points to the new vision array */
-    char *next_row;    /* row pointer for the new array */
-    char *old_row;     /* row pointer for the old array */
-    char *next_rmin;   /* min pointer for the new array */
-    char *next_rmax;   /* max pointer for the new array */
-    const char *ranges; /* circle ranges -- used for xray & night vision */
+    xchar **temp_array; /* points to the old vision array */
+    xchar **next_array; /* points to the new vision array */
+    xchar *next_row;    /* row pointer for the new array */
+    xchar *old_row;     /* row pointer for the old array */
+    xchar *next_rmin;   /* min pointer for the new array */
+    xchar *next_rmax;   /* max pointer for the new array */
+    const xchar *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
     int dx, dy;        /* one step from a lit door or lit wall (see below) */
@@ -1083,24 +1076,22 @@ int row, col;
 
 /*==========================================================================*/
 /*==========================================================================*/
-/* Use either algorithm C or D.  See the config.h for more details.
- * =========*/
 
 /*
- * Variables local to both Algorithms C and D.
+ * Variables local to Algorithm C.
  */
 static int start_row;
 static int start_col;
 static int step;
-static char **cs_rows;
-static char *cs_left;
-static char *cs_right;
+static xchar **cs_rows;
+static xchar *cs_left;
+static xchar *cs_right;
 
 static void FDECL((*vis_func), (int, int, genericptr_t));
 static genericptr_t varg;
 
 /*
- * Both Algorithms C and D use the following macros.
+ * Algorithm C uses the following macros:
  *
  *      good_row(z)       - Return TRUE if the argument is a legal row.
  *      set_cs(rowp,col)  - Set the local could see array.
@@ -1583,704 +1574,6 @@ cleardone:
     return (boolean) result;
 }
 
-#ifdef VISION_TABLES
-/*==========================================================================*\
-                            GENERAL LINE OF SIGHT
-                                Algorithm D
-\*==========================================================================*/
-
-/*
- * Indicate caller for the shadow routines.
- */
-#define FROM_RIGHT 0
-#define FROM_LEFT 1
-
-/*
- * Include the table definitions.
- */
-#include "vis_tab.h"
-
-/* 3D table pointers. */
-static close2d *close_dy[CLOSE_MAX_BC_DY];
-static far2d *far_dy[FAR_MAX_BC_DY];
-
-static void FDECL(right_side,  (int, int, int, int, int,
-                                    int, int, const char *));
-static void FDECL(left_side, (int, int, int, int, int, int, int, 
-                                    const char *));
-static int FDECL(close_shadow, (int, int, int, int));
-static int FDECL(far_shadow, (int, int, int, int));
-
-/*
- * Initialize algorithm D's table pointers.  If we don't have these,
- * then we do 3D table lookups.  Verrrry slow.
- */
-static void
-view_init()
-{
-    int i;
-
-    for (i = 0; i < CLOSE_MAX_BC_DY; i++)
-        close_dy[i] = &close_table[i];
-
-    for (i = 0; i < FAR_MAX_BC_DY; i++)
-        far_dy[i] = &far_table[i];
-}
-
-/*
- * If the far table has an entry of OFF_TABLE, then the far block prevents
- * us from seeing the location just above/below it.  I.e. the first visible
- * location is one *before* the block.
- */
-#define OFF_TABLE 0xff
-
-static int
-close_shadow(side, this_row, block_row, block_col)
-int side, this_row, block_row, block_col;
-{
-    register int sdy, sdx, pdy, offset;
-
-    /*
-     * If on the same column (block_row = -1), then we can see it.
-     */
-    if (block_row < 0)
-        return block_col;
-
-    /* Take explicit absolute values.  Adjust. */
-    if ((sdy = (start_row - block_row)) < 0)
-        sdy = -sdy;
-    --sdy; /* src   dy */
-    if ((sdx = (start_col - block_col)) < 0)
-        sdx = -sdx; /* src   dx */
-    if ((pdy = (block_row - this_row)) < 0)
-        pdy = -pdy; /* point dy */
-
-    if (sdy < 0 || sdy >= CLOSE_MAX_SB_DY || sdx >= CLOSE_MAX_SB_DX
-        || pdy >= CLOSE_MAX_BC_DY) {
-        impossible("close_shadow:  bad value");
-        return block_col;
-    }
-    offset = close_dy[sdy]->close[sdx][pdy];
-    if (side == FROM_RIGHT)
-        return block_col + offset;
-
-    return block_col - offset;
-}
-
-static int
-far_shadow(side, this_row, block_row, block_col)
-int side, this_row, block_row, block_col;
-{
-    register int sdy, sdx, pdy, offset;
-
-    /*
-     * Take care of a bug that shows up only on the borders.
-     *
-     * If the block is beyond the border, then the row is negative.  Return
-     * the block's column number (should be 0 or COLNO-1).
-     *
-     * Could easily have the column be -1, but then wouldn't know if it was
-     * the left or right border.
-     */
-    if (block_row < 0)
-        return block_col;
-
-    /* Take explicit absolute values.  Adjust. */
-    if ((sdy = (start_row - block_row)) < 0)
-        sdy = -sdy; /* src   dy */
-    if ((sdx = (start_col - block_col)) < 0)
-        sdx = -sdx;
-    --sdx; /* src   dx */
-    if ((pdy = (block_row - this_row)) < 0)
-        pdy = -pdy;
-    --pdy; /* point dy */
-
-    if (sdy >= FAR_MAX_SB_DY || sdx < 0 || sdx >= FAR_MAX_SB_DX || pdy < 0
-        || pdy >= FAR_MAX_BC_DY) {
-        impossible("far_shadow:  bad value");
-        return block_col;
-    }
-    if ((offset = far_dy[sdy]->far_q[sdx][pdy]) == OFF_TABLE)
-        offset = -1;
-    if (side == FROM_RIGHT)
-        return block_col + offset;
-
-    return block_col - offset;
-}
-
-/*
- * right_side()
- *
- * Figure out what could be seen on the right side of the source.
- */
-static void
-right_side(row, cb_row, cb_col, fb_row, fb_col, left, right_mark, limits)
-int row;            /* current row */
-int cb_row, cb_col; /* close block row and col */
-int fb_row, fb_col; /* far block row and col */
-int left;           /* left mark of the previous row */
-int right_mark;     /* right mark of previous row */
-char *limits;       /* points at range limit for current row, or NULL */
-{
-    register int i;
-    register char *rowp = NULL;
-    int hit_stone = 0;
-    int left_shadow, right_shadow, loc_right;
-    int lblock_col; /* local block column (current row) */
-    int nrow, deeper;
-    char *row_min = NULL; /* left most */
-    char *row_max = NULL; /* right most */
-    int lim_max;          /* right most limit of circle */
-
-    nrow = row + step;
-    deeper = good_row(nrow) && (!limits || (*limits >= *(limits + 1)));
-    if (!vis_func) {
-        rowp = cs_rows[row];
-        row_min = &cs_left[row];
-        row_max = &cs_right[row];
-    }
-    if (limits) {
-        lim_max = start_col + *limits;
-        if (lim_max > COLNO - 1)
-            lim_max = COLNO - 1;
-        if (right_mark > lim_max)
-            right_mark = lim_max;
-        limits++; /* prepare for next row */
-    } else
-        lim_max = COLNO - 1;
-
-    /*
-     * Get the left shadow from the close block.  This value could be
-     * illegal.
-     */
-    left_shadow = close_shadow(FROM_RIGHT, row, cb_row, cb_col);
-
-    /*
-     * Mark all stone walls as seen before the left shadow.  All this work
-     * for a special case.
-     *
-     * NOTE.  With the addition of this code in here, it is now *required*
-     * for the algorithm to work correctly.  If this is commented out,
-     * change the above assignment so that left and not left_shadow is the
-     * variable that gets the shadow.
-     */
-    while (left <= right_mark) {
-        loc_right = right_ptrs[row][left];
-        if (loc_right > lim_max)
-            loc_right = lim_max;
-        if (viz_clear_rows[row][left]) {
-            if (loc_right >= left_shadow) {
-                left = left_shadow; /* opening ends beyond shadow */
-                break;
-            }
-            left = loc_right;
-            loc_right = right_ptrs[row][left];
-            if (loc_right > lim_max)
-                loc_right = lim_max;
-            if (left == loc_right)
-                return; /* boundary */
-
-            /* Shadow covers opening, beyond right mark */
-            if (left == right_mark && left_shadow > right_mark)
-                return;
-        }
-
-        if (loc_right > right_mark) /* can't see stone beyond the mark */
-            loc_right = right_mark;
-
-        if (vis_func) {
-            for (i = left; i <= loc_right; i++)
-                (*vis_func)(i, row, varg);
-        } else {
-            for (i = left; i <= loc_right; i++)
-                set_cs(rowp, i);
-            set_min(left);
-            set_max(loc_right);
-        }
-
-        if (loc_right == right_mark)
-            return; /* all stone */
-        if (loc_right >= left_shadow)
-            hit_stone = 1;
-        left = loc_right + 1;
-    }
-
-    /*
-     * At this point we are at the first visible clear spot on or beyond
-     * the left shadow, unless the left shadow is an illegal value.  If we
-     * have "hit stone" then we have a stone wall just to our left.
-     */
-
-    /*
-     * Get the right shadow.  Make sure that it is a legal value.
-     */
-    if ((right_shadow = far_shadow(FROM_RIGHT, row, fb_row, fb_col)) >= COLNO)
-        right_shadow = COLNO - 1;
-    /*
-     * Make vertical walls work the way we want them.  In this case, we
-     * note when the close block blocks the column just above/beneath
-     * it (right_shadow < fb_col [actually right_shadow == fb_col-1]).  If
-     * the location is filled, then we want to see it, so we put the
-     * right shadow back (same as fb_col).
-     */
-    if (right_shadow < fb_col && !viz_clear_rows[row][fb_col])
-        right_shadow = fb_col;
-    if (right_shadow > lim_max)
-        right_shadow = lim_max;
-
-    /*
-     * Main loop.  Within the range of sight of the previous row, mark all
-     * stone walls as seen.  Follow open areas recursively.
-     */
-    while (left <= right_mark) {
-        /* Get the far right of the opening or wall */
-        loc_right = right_ptrs[row][left];
-        if (loc_right > lim_max)
-            loc_right = lim_max;
-
-        if (!viz_clear_rows[row][left]) {
-            hit_stone = 1; /* use stone on this row as close block */
-            /*
-             * We can see all of the wall until the next open spot or the
-             * start of the shadow caused by the far block (right).
-             *
-             * Can't see stone beyond the right mark.
-             */
-            if (loc_right > right_mark)
-                loc_right = right_mark;
-
-            if (vis_func) {
-                for (i = left; i <= loc_right; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = left; i <= loc_right; i++)
-                    set_cs(rowp, i);
-                set_min(left);
-                set_max(loc_right);
-            }
-
-            if (loc_right == right_mark)
-                return; /* hit the end */
-            left = loc_right + 1;
-            loc_right = right_ptrs[row][left];
-            if (loc_right > lim_max)
-                loc_right = lim_max;
-            /* fall through... we know at least one position is visible */
-        }
-
-        /*
-         * We are in an opening.
-         *
-         * If this is the first open spot since the could see area  (this is
-         * true if we have hit stone), get the shadow generated by the wall
-         * just to our left.
-         */
-        if (hit_stone) {
-            lblock_col = left - 1; /* local block column */
-            left = close_shadow(FROM_RIGHT, row, row, lblock_col);
-            if (left > lim_max)
-                break; /* off the end */
-        }
-
-        /*
-         * Check if the shadow covers the opening.  If it does, then
-         * move to end of the opening.  A shadow generated on from a
-         * wall on this row does *not* cover the wall on the right
-         * of the opening.
-         */
-        if (left >= loc_right) {
-            if (loc_right == lim_max) { /* boundary */
-                if (left == lim_max) {
-                    if (vis_func)
-                        (*vis_func)(lim_max, row, varg);
-                    else {
-                        set_cs(rowp, lim_max); /* last pos */
-                        set_max(lim_max);
-                    }
-                }
-                return; /* done */
-            }
-            left = loc_right;
-            continue;
-        }
-
-        /*
-         * If the far wall of the opening (loc_right) is closer than the
-         * shadow limit imposed by the far block (right) then use the far
-         * wall as our new far block when we recurse.
-         *
-         * If the limits are the same, and the far block really exists
-         * (fb_row >= 0) then do the same as above.
-         *
-         * Normally, the check would be for the far wall being closer OR EQUAL
-         * to the shadow limit.  However, there is a bug that arises from the
-         * fact that the clear area pointers end in an open space (if it
-         * exists) on a boundary.  This then makes a far block exist where it
-         * shouldn't --- on a boundary.  To get around that, I had to
-         * introduce the concept of a non-existent far block (when the
-         * row < 0).  Next I have to check for it.  Here is where that check
-         * exists.
-         */
-        if ((loc_right < right_shadow)
-            || (fb_row >= 0 && loc_right == right_shadow)) {
-            if (vis_func) {
-                for (i = left; i <= loc_right; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = left; i <= loc_right; i++)
-                    set_cs(rowp, i);
-                set_min(left);
-                set_max(loc_right);
-            }
-
-            if (deeper) {
-                if (hit_stone)
-                    right_side(nrow, row, lblock_col, row, loc_right, left,
-                               loc_right, limits);
-                else
-                    right_side(nrow, cb_row, cb_col, row, loc_right, left,
-                               loc_right, limits);
-            }
-
-            /*
-             * The following line, setting hit_stone, is needed for those
-             * walls that are only 1 wide.  If hit stone is *not* set and
-             * the stone is only one wide, then the close block is the old
-             * one instead one on the current row.  A way around having to
-             * set it here is to make left = loc_right (not loc_right+1) and
-             * let the outer loop take care of it.  However, if we do that
-             * then we then have to check for boundary conditions here as
-             * well.
-             */
-            hit_stone = 1;
-
-            left = loc_right + 1;
-
-        /*
-         * The opening extends beyond the right mark.  This means that
-         * the next far block is the current far block.
-         */
-        } else {
-            if (vis_func) {
-                for (i = left; i <= right_shadow; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = left; i <= right_shadow; i++)
-                    set_cs(rowp, i);
-                set_min(left);
-                set_max(right_shadow);
-            }
-
-            if (deeper) {
-                if (hit_stone)
-                    right_side(nrow, row, lblock_col, fb_row, fb_col, left,
-                               right_shadow, limits);
-                else
-                    right_side(nrow, cb_row, cb_col, fb_row, fb_col, left,
-                               right_shadow, limits);
-            }
-
-            return; /* we're outta here */
-        }
-    }
-}
-
-/*
- * left_side()
- *
- * This routine is the mirror image of right_side().  Please see right_side()
- * for blow by blow comments.
- */
-static void
-left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
-int row;            /* the current row */
-int cb_row, cb_col; /* close block row and col */
-int fb_row, fb_col; /* far block row and col */
-int left_mark;      /* left mark of previous row */
-int right;          /* right mark of the previous row */
-const char *limits;
-{
-    register int i;
-    register char *rowp = NULL;
-    int hit_stone = 0;
-    int left_shadow, right_shadow, loc_left;
-    int lblock_col; /* local block column (current row) */
-    int nrow, deeper;
-    char *row_min = NULL; /* left most */
-    char *row_max = NULL; /* right most */
-    int lim_min;
-
-    nrow = row + step;
-    deeper = good_row(nrow) && (!limits || (*limits >= *(limits + 1)));
-    if (!vis_func) {
-        rowp = cs_rows[row];
-        row_min = &cs_left[row];
-        row_max = &cs_right[row];
-    }
-    if (limits) {
-        lim_min = start_col - *limits;
-        if (lim_min < 0)
-            lim_min = 0;
-        if (left_mark < lim_min)
-            left_mark = lim_min;
-        limits++; /* prepare for next row */
-    } else
-        lim_min = 0;
-
-    /* This value could be illegal. */
-    right_shadow = close_shadow(FROM_LEFT, row, cb_row, cb_col);
-
-    while (right >= left_mark) {
-        loc_left = left_ptrs[row][right];
-        if (loc_left < lim_min)
-            loc_left = lim_min;
-        if (viz_clear_rows[row][right]) {
-            if (loc_left <= right_shadow) {
-                right = right_shadow; /* opening ends beyond shadow */
-                break;
-            }
-            right = loc_left;
-            loc_left = left_ptrs[row][right];
-            if (loc_left < lim_min)
-                loc_left = lim_min;
-            if (right == loc_left)
-                return; /* boundary */
-        }
-
-        if (loc_left < left_mark) /* can't see beyond the left mark */
-            loc_left = left_mark;
-
-        if (vis_func) {
-            for (i = loc_left; i <= right; i++)
-                (*vis_func)(i, row, varg);
-        } else {
-            for (i = loc_left; i <= right; i++)
-                set_cs(rowp, i);
-            set_min(loc_left);
-            set_max(right);
-        }
-
-        if (loc_left == left_mark)
-            return; /* all stone */
-        if (loc_left <= right_shadow)
-            hit_stone = 1;
-        right = loc_left - 1;
-    }
-
-    /* At first visible clear spot on or beyond the right shadow. */
-
-    if ((left_shadow = far_shadow(FROM_LEFT, row, fb_row, fb_col)) < 0)
-        left_shadow = 0;
-
-    /* Do vertical walls as we want. */
-    if (left_shadow > fb_col && !viz_clear_rows[row][fb_col])
-        left_shadow = fb_col;
-    if (left_shadow < lim_min)
-        left_shadow = lim_min;
-
-    while (right >= left_mark) {
-        loc_left = left_ptrs[row][right];
-
-        if (!viz_clear_rows[row][right]) {
-            hit_stone = 1; /* use stone on this row as close block */
-
-            /* We can only see walls until the left mark */
-            if (loc_left < left_mark)
-                loc_left = left_mark;
-
-            if (vis_func) {
-                for (i = loc_left; i <= right; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = loc_left; i <= right; i++)
-                    set_cs(rowp, i);
-                set_min(loc_left);
-                set_max(right);
-            }
-
-            if (loc_left == left_mark)
-                return; /* hit end */
-            right = loc_left - 1;
-            loc_left = left_ptrs[row][right];
-            if (loc_left < lim_min)
-                loc_left = lim_min;
-            /* fall through...*/
-        }
-
-        /* We are in an opening. */
-        if (hit_stone) {
-            lblock_col = right + 1; /* stone block (local) */
-            right = close_shadow(FROM_LEFT, row, row, lblock_col);
-            if (right < lim_min)
-                return; /* off the end */
-        }
-
-        /*  Check if the shadow covers the opening. */
-        if (right <= loc_left) {
-            /*  Make a boundary condition work. */
-            if (loc_left == lim_min) { /* at boundary */
-                if (right == lim_min) {
-                    if (vis_func)
-                        (*vis_func)(lim_min, row, varg);
-                    else {
-                        set_cs(rowp, lim_min); /* caught the last pos */
-                        set_min(lim_min);
-                    }
-                }
-                return; /* and break out the loop */
-            }
-
-            right = loc_left;
-            continue;
-        }
-
-        /* If the far wall of the opening is closer than the shadow limit. */
-        if ((loc_left > left_shadow)
-            || (fb_row >= 0 && loc_left == left_shadow)) {
-            if (vis_func) {
-                for (i = loc_left; i <= right; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = loc_left; i <= right; i++)
-                    set_cs(rowp, i);
-                set_min(loc_left);
-                set_max(right);
-            }
-
-            if (deeper) {
-                if (hit_stone)
-                    left_side(nrow, row, lblock_col, row, loc_left, loc_left,
-                              right, limits);
-                else
-                    left_side(nrow, cb_row, cb_col, row, loc_left, loc_left,
-                              right, limits);
-            }
-
-            hit_stone = 1; /* needed for walls of width 1 */
-            right = loc_left - 1;
-
-        /*  The opening extends beyond the left mark. */
-        } else {
-            if (vis_func) {
-                for (i = left_shadow; i <= right; i++)
-                    (*vis_func)(i, row, varg);
-            } else {
-                for (i = left_shadow; i <= right; i++)
-                    set_cs(rowp, i);
-                set_min(left_shadow);
-                set_max(right);
-            }
-
-            if (deeper) {
-                if (hit_stone)
-                    left_side(nrow, row, lblock_col, fb_row, fb_col,
-                              left_shadow, right, limits);
-                else
-                    left_side(nrow, cb_row, cb_col, fb_row, fb_col,
-                              left_shadow, right, limits);
-            }
-
-            return; /* we're outta here */
-        }
-    }
-}
-
-/*
- * view_from
- *
- * Calculate a view from the given location.  Initialize and fill a
- * ROWNOxCOLNO array (could_see) with all the locations that could be
- * seen from the source location.  Initialize and fill the left most
- * and right most boundaries of what could be seen.
- */
-static void
-view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
-int srow, scol;               /* source row and column */
-char **loc_cs_rows;           /* could_see array (row pointers) */
-char *left_most, *right_most; /* limits of what could be seen */
-int range;                    /* 0 if unlimited */
-void FDECL((*func), (int, int, genericptr_t));
-genericptr_t arg;
-{
-    register int i;
-    char *rowp;
-    int nrow, left, right, left_row, right_row;
-    char *limits;
-
-    /* Set globals for near_shadow(), far_shadow(), etc. to use. */
-    start_col = scol;
-    start_row = srow;
-    cs_rows = loc_cs_rows;
-    cs_left = left_most;
-    cs_right = right_most;
-    vis_func = func;
-    varg = arg;
-
-    /*  Find the left and right limits of sight on the starting row. */
-    if (viz_clear_rows[srow][scol]) {
-        left = left_ptrs[srow][scol];
-        right = right_ptrs[srow][scol];
-    } else {
-        left = (!scol) ? 0 : (viz_clear_rows[srow][scol - 1]
-                                  ? left_ptrs[srow][scol - 1]
-                                  : scol - 1);
-        right = (scol == COLNO - 1) ? COLNO - 1
-                                    : (viz_clear_rows[srow][scol + 1]
-                                           ? right_ptrs[srow][scol + 1]
-                                           : scol + 1);
-    }
-
-    if (range) {
-        if (range > MAX_RADIUS || range < 1)
-            panic("view_from called with range %d", range);
-        limits = circle_ptr(range) + 1; /* start at next row */
-        if (left < scol - range)
-            left = scol - range;
-        if (right > scol + range)
-            right = scol + range;
-    } else
-        limits = (char *) 0;
-
-    if (func) {
-        for (i = left; i <= right; i++)
-            (*func)(i, srow, arg);
-    } else {
-        /* Row optimization */
-        rowp = cs_rows[srow];
-
-        /* We know that we can see our row. */
-        for (i = left; i <= right; i++)
-            set_cs(rowp, i);
-        cs_left[srow] = left;
-        cs_right[srow] = right;
-    }
-
-    /* The far block has a row number of -1 if we are on an edge. */
-    right_row = (right == COLNO - 1) ? -1 : srow;
-    left_row = (!left) ? -1 : srow;
-
-    /*
-     *  Check what could be seen in quadrants.
-     */
-    if ((nrow = srow + 1) < ROWNO) {
-        step = 1; /* move down */
-        if (scol < COLNO - 1)
-            right_side(nrow, -1, scol, right_row, right, scol, right, limits);
-        if (scol)
-            left_side(nrow, -1, scol, left_row, left, left, scol, limits);
-    }
-
-    if ((nrow = srow - 1) >= 0) {
-        step = -1; /* move up */
-        if (scol < COLNO - 1)
-            right_side(nrow, -1, scol, right_row, right, scol, right, limits);
-        if (scol)
-            left_side(nrow, -1, scol, left_row, left, left, scol, limits);
-    }
-}
-
-#else /*===== End of algorithm D =====*/
-
 /*==========================================================================*\
                             GENERAL LINE OF SIGHT
                                 Algorithm C
@@ -2289,8 +1582,8 @@ genericptr_t arg;
 /*
  * Defines local to Algorithm C.
  */
-static void FDECL(right_side, (int, int, int, const char *));
-static void FDECL(left_side, (int, int, int, const char *));
+static void FDECL(right_side, (int, int, int, const xchar *));
+static void FDECL(left_side, (int, int, int, const xchar *));
 
 /* Initialize algorithm C (nothing). */
 static void
@@ -2307,7 +1600,7 @@ right_side(row, left, right_mark, limits)
 int row;        /* current row */
 int left;       /* first (left side) visible spot on prev row */
 int right_mark; /* last (right side) visible spot on prev row */
-const char *limits;   /* points at range limit for current row, or NULL */
+const xchar *limits;   /* points at range limit for current row, or NULL */
 {
     int right;                  /* right limit of "could see" */
     int right_edge;             /* right edge of an opening */
@@ -2315,9 +1608,9 @@ const char *limits;   /* points at range limit for current row, or NULL */
     int deeper;                 /* if TRUE, call self as needed */
     int result;                 /* set by q?_path() */
     register int i;             /* loop counter */
-    register char *rowp = NULL; /* row optimization */
-    char *row_min = NULL;       /* left most  [used by macro set_min()] */
-    char *row_max = NULL;       /* right most [used by macro set_max()] */
+    register xchar *rowp = NULL; /* row optimization */
+    xchar *row_min = NULL;       /* left most  [used by macro set_min()] */
+    xchar *row_max = NULL;       /* right most [used by macro set_max()] */
     int lim_max;                /* right most limit of circle */
 
     nrow = row + step;
@@ -2497,13 +1790,13 @@ const char *limits;   /* points at range limit for current row, or NULL */
 static void
 left_side(row, left_mark, right, limits)
 int row, left_mark, right;
-const char *limits;
+const xchar *limits;
 {
     int left, left_edge, nrow, deeper, result;
     register int i;
-    register char *rowp = NULL;
-    char *row_min = NULL;
-    char *row_max = NULL;
+    register xchar *rowp = NULL;
+    xchar *row_min = NULL;
+    xchar *row_max = NULL;
     int lim_min;
 
 #ifdef GCC_WARN
@@ -2633,19 +1926,19 @@ const char *limits;
 static void
 view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg)
 int srow, scol;     /* starting row and column */
-char **loc_cs_rows; /* pointers to the rows of the could_see array */
-char *left_most;    /* min mark on each row */
-char *right_most;   /* max mark on each row */
+xchar **loc_cs_rows; /* pointers to the rows of the could_see array */
+xchar *left_most;    /* min mark on each row */
+xchar *right_most;   /* max mark on each row */
 int range;          /* 0 if unlimited */
 void FDECL((*func), (int, int, genericptr_t));
 genericptr_t arg;
 {
     register int i; /* loop counter */
-    char *rowp;     /* optimization for setting could_see */
+    xchar *rowp;     /* optimization for setting could_see */
     int nrow;       /* the next row */
     int left;       /* the left-most visible column */
     int right;      /* the right-most visible column */
-    const char *limits;   /* range limit for next row */
+    const xchar *limits;   /* range limit for next row */
 
     /* Set globals for q?_path(), left_side(), and right_side() to use. */
     start_col = scol;
@@ -2685,7 +1978,7 @@ genericptr_t arg;
         if (right > scol + range)
             right = scol + range;
     } else
-        limits = (char *) 0;
+        limits = (xchar *) 0;
 
     if (func) {
         for (i = left; i <= right; i++)
@@ -2723,7 +2016,7 @@ genericptr_t arg;
     }
 }
 
-#endif /*===== End of algorithm C =====*/
+/*===== End of algorithm C =====*/
 
 /*
  * AREA OF EFFECT "ENGINE"
@@ -2744,12 +2037,12 @@ genericptr_t arg;
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy) {
-        view_from(srow, scol, (char **) 0, (char *) 0, (char *) 0, range,
+        view_from(srow, scol, (xchar **) 0, (xchar *) 0, (xchar *) 0, range,
                   func, arg);
     } else {
         register int x;
         int y, min_x, max_x, max_y, offset;
-        const char *limits;
+        const xchar *limits;
         boolean override_vision;
 
         /* vision doesn't pass through water or clouds, detection should

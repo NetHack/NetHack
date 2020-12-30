@@ -1,4 +1,4 @@
--- NetHack 3.6	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+-- NetHack 3.7	gehennom.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
@@ -51,11 +51,11 @@ end
 
 -- Dungeon Description
 -- The shrine to Moloch.
-des.region({ region={01,06, 05,14},lit=1,type="temple" })
+des.region({ region={01,06, 05,14},lit=1,type="temple",filled=2 })
 -- The Morgues
-des.region({ region={19,01, 24,08},lit=0,type="morgue",prefilled=0,irregular=1 })
-des.region({ region={09,14, 16,18},lit=0,type="morgue",prefilled=0,irregular=1 })
-des.region({ region={37,09, 43,14},lit=0,type="morgue",prefilled=0,irregular=1 })
+des.region({ region={19,01, 24,08},lit=0,type="morgue",filled=1,irregular=1 })
+des.region({ region={09,14, 16,18},lit=0,type="morgue",filled=1,irregular=1 })
+des.region({ region={37,09, 43,14},lit=0,type="morgue",filled=1,irregular=1 })
 -- Stairs
 des.stair("down", 01,01)
 -- Branch location

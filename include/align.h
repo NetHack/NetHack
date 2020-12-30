@@ -1,4 +1,4 @@
-/* NetHack 3.6	align.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.7	align.h	$NHDT-Date: 1604269810 2020/11/01 22:30:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,15 +30,30 @@ typedef struct align { /* alignment & record */
 #define AM_LAWFUL 4
 
 #define AM_MASK 7
+/* Some altars are considered as shrines, so we need a flag for that
+   for the altarmask field of struct rm. */
+#define AM_SHRINE 8
 
-#define AM_SPLEV_CO 3
-#define AM_SPLEV_NONCO 7
+/* special level flags, gone by the time the level has been loaded */
+#define AM_SPLEV_CO     3 /* co-aligned: force alignment to match hero's  */
+#define AM_SPLEV_NONCO  7 /* non-co-aligned: force alignment to not match */
 #define AM_SPLEV_RANDOM 8
 
-#define Amask2align(x)                                          \
-    ((aligntyp)((!(x)) ? A_NONE : ((x) == AM_LAWFUL) ? A_LAWFUL \
-                                                     : ((int) x) - 2))
+#define Amask2align(x) \
+    ((aligntyp) ((((x) & AM_MASK) == 0) ? A_NONE                \
+                 : (((x) & AM_MASK) == AM_LAWFUL) ? A_LAWFUL    \
+                   : ((int) ((x) & AM_MASK)) - 2)) /* 2 => 0, 1 => -1 */
 #define Align2amask(x) \
-    (((x) == A_NONE) ? AM_NONE : ((x) == A_LAWFUL) ? AM_LAWFUL : (x) + 2)
+    ((unsigned) (((x) == A_NONE) ? AM_NONE                      \
+                 : ((x) == A_LAWFUL) ? AM_LAWFUL                \
+                   : ((x) + 2))) /* -1 => 1, 0 => 2 */
+
+/* Because clearly Nethack needs more ways to specify alignment...
+   Amask2msa(): 1, 2, 4 converted to 1, 2, 3 to fit within a width 2 bitfield;
+   Msa2amask(): 1, 2, 3 converted back to 1, 2, 4;
+   For Amask2msa(), 'x' might have the shrine bit set so strip that off. */
+#define Amask2msa(x) ((((x) & AM_MASK) == 4) ? 3 : (x) & AM_MASK)
+#define Msa2amask(x) (((x) == 3) ? 4 : (x))
+#define MSA_NONE    0  /* unaligned or multiple alignments */
 
 #endif /* ALIGN_H */

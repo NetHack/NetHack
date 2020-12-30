@@ -1,4 +1,4 @@
-Cross-compiling NetHack 3.7 Last edit: May 31, 2020
+Cross-compiling NetHack 3.7 Last edit: December 7, 2020
 
 The NetHack 3.7 build process differs from the build process of previous
 versions in some important ways that make it possible to use a cross-compiler
@@ -17,6 +17,8 @@ Part B Contents:
     B2. What needs to be built and executed on the HOST?
     B3. What needs to be built for the TARGET?
     B4. Case sample: msdos
+    B5. Case sample: amiga (started but incomplete)
+    B6. Case sample: Web Assembly, libnh
 
 --------------------------------------------------------------------------------
  Part A - Cross-compiling NetHack
@@ -45,7 +47,7 @@ may include, but not necessarily be limited to, any of the following:
 
   o Compilers: Some of the native compilers on historical platforms may only
     support the particular dialect of C that was popular when the platform and
-    compiler were in their prime. 
+    compiler were in their prime.
 
 Another useful potential result of cross-compiling, is that it paves the way
 for carrying out test and production builds of NetHack for multiple target
@@ -65,27 +67,27 @@ steps to be carried out:
         (a) additional build steps to follow, including some header
             files: pm.h, onames.h, date.h.
         (b) creation of files, containing information required by,
-            or about the game during its execution, that are stored in a 
+            or about the game during its execution, that are stored in a
             portable, platform-independent way, that need to be inserted
             into the game package.
         (c) creation of files containing information required by, or about
             the game during its execution, that are stored in an architecture
             and/or platform and/or operating system dependent way, that need
-            to be inserted into the game package (the quest text format is 
+            to be inserted into the game package (the quest text format is
             one example).
-    3. Compile and link the level compiler. This step needs to execute 
+    3. Compile and link the level compiler. This step needs to execute
        work-alike tools to lex and yacc, or needs to build pre-built lex and
        yacc output (.c, .h files) that are provided in the sys/share part of
        the NetHack source code tree.
     4. Execute the level compiler to read dat/*.des files and create
-       a set of binary output files that are architecture and/or operating 
+       a set of binary output files that are architecture and/or operating
        system dependent on the build platform, for use by the game during
        its execution.
     5. Compile and link the dungeon compiler. Like the level compiler, this
-       step needs to execute work-alike tools to lex and yacc, or needs to 
+       step needs to execute work-alike tools to lex and yacc, or needs to
        build pre-built lex and yacc output (.c, .h files) that are provided
        in the sys/share part of the NetHack source code tree.
-    6. Execute the dungeon compiler to read dat/dungeon.def and create 
+    6. Execute the dungeon compiler to read dat/dungeon.def and create
        a set of binary output files that are architecture and/or operating
        system dependent on the build platform, for use by the game during
        its execution.
@@ -126,7 +128,7 @@ steps to be carried out:
         (a) additional build steps to follow, including some header
             files: pm.h, onames.h, date.h.
         (b) creation of files, containing information required by,
-            or about the game during its execution, that are stored in a 
+            or about the game during its execution, that are stored in a
             portable, platform-independent way, that need to be inserted
             into the game package.
     3. Compile and link several less critical utilities such as uudecode,
@@ -143,7 +145,7 @@ steps to be carried out:
        previous steps 2b, 3 and 4 above.
 
 Step 4 is now the only impediment to cross-compiling NetHack, and is resolved
-by executing step 4 using a cross-compiler that runs on the build (host) 
+by executing step 4 using a cross-compiler that runs on the build (host)
 platform to produce a resulting binary for the target platform, instead of
 executing the native compiler.
 
@@ -158,18 +160,15 @@ cross-compiling possible:
     o  There is no creation of platform-dependent files, such as the quest
        text files, by makedefs during the build process. Instead, the quest
        text files have been converted to Lua and are inserted into the game
-       package for processing by the embedded Lua <fixme: interpreter?> 
-       during execution of NetHack.
+       package for processing by the embedded Lua during execution of NetHack.
 
     o  There is no build-time level compiler involved. Instead, the level
        descriptions have been converted to Lua and are inserted into the game
-       package for processing by the embeded Lua <fixme: interpreter?> 
-       during execution of NetHack. 
+       package for processing by the embeded Lua during execution of NetHack.
 
     o  There is no build-time dungeon compiler involved. Instead, the dungeon
        description has been converted to Lua and is inserted into the game
-       package for processing by the embeded Lua <fixme: interpreter?> 
-       during execution of NetHack. 
+       package for processing by the embeded Lua during execution of NetHack.
 
     o  Some of the build and option information that was formerly produced
        during build time by makedefs, and contained information about the
@@ -182,7 +181,7 @@ cross-compiling possible:
   +------------------------------------------------------------+
 
     o  If you have a favourite target platform (let's call it XX-Platform for
-       example purposes) that you'd like to see NetHack be able to run on, do 
+       example purposes) that you'd like to see NetHack be able to run on, do
        some research to find out if a cross-compiler exists that:
            - produces output for XX-Platform.
            - executes on a platform that you use and love (Linux, Windows,
@@ -191,9 +190,9 @@ cross-compiling possible:
 
     o  Then, make the community, devteam, and others aware that you're starting
        a cross-compile of NetHack for XX-Platform. You might need to ask some
-       "starting out" questions initially, and as you get deeper into it, you 
+       "starting out" questions initially, and as you get deeper into it, you
        might need to ask some tougher questions.
-       
+
     o  Perhaps consider forking from NetHack on GitHub, and do the
        cross-compiler work there in your fork. Strive to get it to a point where
        it's ready to play-test on XX-Platform, or perhaps even use an emulator
@@ -205,9 +204,9 @@ cross-compiling possible:
            - It will make it possible and straightforward to merge upstream
              NetHack changes into your work for the XX-Platform cross-compile
              so that it stays current with the game as it evolves.
-           - You may get help from others in the form of suggestions, or 
+           - You may get help from others in the form of suggestions, or
              pull-requests, or offers to join the development. Chances are,
-             you aren't the only person out there that would like to 
+             you aren't the only person out there that would like to
              establish/resurrect/maintain NetHack on XX-Platform.
 
        Have fun!
@@ -258,7 +257,7 @@ On the HOST, here are the mandatory things that have to be built.
     a) Using the HOST native compiler, build  HOST native utility makedefs
 
        Compile and link the following with these compiler switches:
-         -DCROSSCOMPILE and -DCROSSCOMPILE_HOST
+         -DCROSSCOMPILE
        from sources: util/makedefs.c, src/mdlib.c, src/monst.c, src/objects.c
 
     b) Execute HOST native makedefs utility, util/makedefs, as follows:
@@ -307,7 +306,7 @@ On the HOST, here are the mandatory things that have to be built.
           util/uudecode
 
                    from sources: sys/share/uudecode.c
-                   purpose:      convert some binary files, that are 
+                   purpose:      convert some binary files, that are
                                  distributed in the NetHack sources in
                                  uuencoded format, back into their
                                  original binary state
@@ -452,67 +451,240 @@ Using the cross-compiler, build the following targets:
 Cross-compiler used:     Andrew Wu's djgpp cross-compiler
 Cross-compiler url:      https://github.com/andrewwutw/build-djgpp
 Cross-compiler pre-built binary downloads:
-    https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/
-    Mac OS X pre-built binary: djgpp-osx-gcc550.tar.bz2              (tested)
-    Linux pre-built binary   : djgpp-linux64-gcc550.tar.bz2          (tested)
-    mingw pre-built binary   : djgpp-mingw-gcc550-standalone.zip     (untested)
+    https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/
+    Cross-compiler bits tested:
+           https://github.com/andrewwutw/build-djgpp
+       and the pre-built binary for your platform from:
+           https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/
+       and a DOS-extender (for including in msdos packaging) from
+           http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
+       and pdcurses from:
+           https://github.com/wmcbrine/PDCurses.git
 
-The msdos cross-compile for NetHack 3.7 uses two phases of compiles: 
-Phase1 is the host-side prerequisite stuff that needs to be done first. 
-Phase2 is the cross-compile pieces using the djgpp cross-compiler hosted on
-Linux, Mac OS X, or Windows mingw.
+    - A shell script to download that djgpp cross-compiler and associated
+      pieces for either linux or macOS is available:
 
-First, on the host platform, you need to set up for a native Unix NetHack
-build in the usual way. For example, on linux:
-    cd sys/unix
-    sh setup.sh hints/linux
-    cd ../..
-    make fetch-lua
+           sh sys/msdos/fetch-cross-compiler.sh
 
-Now, you could proceed to go ahead and issue
-    make all
-to build a native NetHack at that point if you wish, but it is not needed
-for the msdos cross-compile. 
+    That script won't install anything, it just does file fetches and stores
+    them in subfolders of lib. The linux.2020 and macOS.2020 hints files are
+    configured to find the cross-compiler there if you add
+        CROSS_TO_MSDOS=1
+    on your make command line.
 
-Instead, a test shell script has been put together that will next accomplish
-each of the following tasks when it is executed. The shell script can be
-invoked by:
-    sh sys/msdos/msdos-cross-compile.sh
-but before you do that, please read the paragraphs below.
+    Note: Both the fetch-cross-compiler.sh script and and the msdos
+    cross-compile and package procedures require unzip and zip to be available
+    on your host build system.
 
-The shell script is meant to accomplish the following things:
+    On your linux host:
 
-    Prep   : the script downloads the djgpp cross-compiler for the host
-             platform into lib/djgpp (it doesn't install anything on the
-             system, nor does it need to, it just downloads them into the
-             identified directories), it downloads a copy of the msdos
-             dos-extender into lib/djgpp/cwsdpmi for later packaging up with
-             the msdos game, and it downloads pdcurses into lib/pdcurses
-             for cross-compiling during the TARGET build.
+        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        make fetch-lua
 
-             Be certain to ensure the right products are at the url's
-             identified above *before* you execute the Case sample msdos
-             cross-compile script. The correct products were at those url's
-             at the time this was written in Dec 2019, but we don't assume
-             any responsibility for what is at those url's now or in the
-             future. You need to check before executing the script.
+    On your macOS host:
 
-    Phase1 : the script uses the Makefile sys/msdos/Makefile1.cross 
-             to complete the host-side build steps using the native gcc
-             compiler for the host platform. During phase1 the host obj
-             files are put in subfolder src/host_o to keep them separated
-             and distinguishable from the target obj files that will be
-             built in phase2.
+        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        make fetch-lua
 
-    Phase2 : the script uses the Makefile sys/msdos/Makefile2.cross
-             to complete the target-side build steps using the
-             cross-compiler that was obtained during the prep step of the
-             script described above. During phase2 the target obj files
-             are put in src/msdos_o to keep them separated and
-             distinguishable from the host obj files
+    The MSDOS cross-compile can then be carried out by specifying
+    CROSS_TO_MSDOS=1 on the make command line:
 
-    Package: the script then packages up the results that reside in
-             msdos-binary into a zip file which it places in lib called
-             nh370dos.zip.
+        make CROSS_TO_MSDOS=1 all
+        make CROSS_TO_MSDOS=1 package
 
+    You can explicitly include tty and curses support if desired. The default
+    you'll end up with is a tty-only cross-compile build:
+
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+
+    Result: The "make package" target will bundle all of the necessary
+            components to run NetHack on msdos into a folder:
+                targets/msdos/pkg
+            and then it zips the contents of that folder into:
+                targets/msdos/nh370dos.zip
+
+    Also note that building the msdos targets using the make command
+    above, does not preclude you from building local linux or macOS
+    targets as well. Just drop the CROSS_TO_MSDOS=1 from the make
+    command line. That's because the cross-compiler hints additions are
+    enclosed inside ifdef sections and won't interfere with the
+    non-cross-compile build in that case.
+
+  +-------------------------+
+  | B5. Case sample: amiga  |
+  +-------------------------+
+
+Disclaimer: This is a minimal recipe, just to help someone else get
+            started if they have a desire to get a full cross-compile of
+            NetHack going for the Amiga.
+            See CAVEATS below.
+
+Cross-compiler used:     bebbo's amiga-gcc
+Cross-compiler url:      https://github.com/bebbo/amiga-gcc
+
+    To our knowledge, a pre-built copy of the cross-compiler isn't available,
+    so you will likely have to obtain the cross-compiler sources via git and
+    build it on your system.
+
+    The build prerequisite packages for building the compiler on Ubuntu can be
+    easily obtained:
+
+        sudo apt install make wget git gcc g++ lhasa libgmp-dev \
+            libmpfr-dev libmpc-dev flex bison gettext texinfo ncurses-dev \
+            autoconf rsync
+
+    The build prerequisite packages for macOS via homebrew are documented but
+    not tested by us any of us to date.
+
+        brew install bash wget make lhasa gmp mpfr libmpc flex gettext \
+        texinfo gcc make autoconf
+
+    After installing the prerequite packages and the cross-compiler
+    it was a straightforward build:
+
+            git clone https://github.com/bebbo/amiga-gcc.git
+            cd amiga-gcc
+            make update
+
+           [Note that you may have to take ownership of the files in the bebbo
+            repo via chown before succesfully carrying out the next steps]
+
+            make clean
+            make clean-prefix
+            date; make all -j3 >&b.log; date
+
+    The compiler pieces are installed in /opt/amiga by default. If you prefer,
+    you can alter the prefix before you build if you want. The instructions
+    for doing so were spelled out at the time of this writing at:
+
+        https://github.com/bebbo/amiga-gcc
+
+    On your linux host:
+
+        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        make fetch-lua
+
+    On your macOS host:
+
+        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        make fetch-lua
+
+    The Amiga cross-compile can then be carried out by specifying
+    CROSS_TO_AMIGA=1 on the make command line:
+
+        make CROSS_TO_AMIGA=1 all
+        make CROSS_TO_AMIGA=1 package
+
+    You can explicitly include tty and curses support if desired, otherwise
+    you'll end up with a tty-only cross-compile build. The SDL1 pdcurses
+    support has not been tested.
+
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_AMIGA=1 all
+
+    Result: The "make package" target will bundle the (hopefully) necessary
+            components to run NetHack on msdos into a folder:
+                targets/amiga/pkg
+            and then it zips the contents of that folder into:
+                targets/amiga/nh370ami.zip
+
+    Also note that building the amiga targets using the make command
+    above, does not preclude you from building local linux or macOS
+    targets as well. Just drop the CROSS_TO_AMIGA=1 from the make
+    command line.
+
+    The cross-compiler hints additions are enclosed inside ifdef sections
+    and won't interfere with the non-cross-compile build in that case.
+
+    CAVEATS: The original NetHack Amiga build steps included the source for
+             some utilities that were built and executed on the amiga:
+                 txt2iff and xpm2iff
+             as part of the NetHack build procedure on amiga.
+             Those did not compile out-of-the-box on the linux host. They
+             will either have to be:
+             - ported to build and run on the linux or macOS cross-compile
+               host
+          or
+
+             - their functionality will have to be rolled into amiga NetHack
+               itself and executed on the target Amiga the first time the game
+               is run, perhaps.
+
+    If you make headway, or are successful getting a working copy of
+    NetHack going on the amiga, drop us a note at devteam@nethack.org.
+
+  +--------------------------------+
+  | B6. Case sample: Web Assembly  |
+  +--------------------------------+
+
+Credit: The initial Web Assembly cross compile was found in a pull request:
+            https://github.com/NetHack/NetHack/pull/385
+        by apowers313. The pull request was merged with some accompanying
+        NetHack source tree integration changes in early October 2020.
+
+Cross-compiler used: emscripten
+Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
+
+    Here's a brief guide to obtaining the cross-compiler sources via git and
+    building it on your system.
+
+    For Ubuntu, the build prerequisite packages for building the compiler can
+    be easily obtained:
+
+        sudo apt-get install python3 cmake default-jre
+
+    For macOS, you will need to install Xcode, git, cmake, Python 3.5 or new
+    (at time of this writing).
+
+    After installing the prerequite packages above, obtain the cross-compiler
+    via git and build it from the directory of your choice using steps similar
+    to these:
+
+            git clone https://github.com/emscripten-core/emsdk.git
+            cd emsdk
+            git pull
+            ./emsdk install latest
+            ./emsdk activate latest
+            source ./emsdk_env.sh
+
+    The steps above reflect what was outlined at this url at the time
+    of writing:
+
+            https://emscripten.org/docs/getting_started/downloads.html
+
+    That is the definitive source and trumps anything documented here.
+
+    On your linux host, prepare to cross-compile NetHack as follows:
+
+        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        make fetch-lua
+
+    On your macOS host, prepare to cross-compile NetHack as follows:
+
+        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        make fetch-lua
+
+    Then, cross-compile to targets/wasm as follows:
+
+        make CROSS_TO_WASM=1
+
+    You can build src/libnh.a from pull request 385 as follows:
+
+        make WANT_LIBNH=1
+
+    Do not add any additional windowport interfaces to your build
+    (such as WANT_WIN_TTY=1 WANT_WIN_CURSES=1 WANT_WIN_X11=1 or
+    WANT_WIN_QT=1) as those aren't applicable to the Web Assembly
+    or nethacklib builds. A "shim" pseudo-windowport is included
+    from pull request 385.
+
+    Result: As mentioned, the wasm cross-compile will end up in
+            targets/wasm and the nethacklib.a will end up in
+            src.
+
+    The cross-compiler hints additions are enclosed inside ifdef sections
+    and shouldn't interfere with the non-cross-compile builds using
+    hints/linux.2020 or hints/macOS.2020.
+
+---
 

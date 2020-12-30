@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixmain.c	$NHDT-Date: 1589326677 2020/05/12 23:37:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1605493691 2020/11/16 02:28:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -647,11 +647,11 @@ char *name;
 
 boolean
 check_user_string(optstr)
-char *optstr;
+const char *optstr;
 {
     struct passwd *pw;
     int pwlen;
-    char *eop, *w;
+    const char *eop, *w;
     char *pwname = 0;
 
     if (optstr[0] == '*')
@@ -663,7 +663,7 @@ char *optstr;
     if (!pwname || !*pwname)
         return FALSE;
     pwlen = (int) strlen(pwname);
-    eop = eos(optstr);
+    eop = eos((char *) optstr); /* temporarily cast away 'const' */
     w = optstr;
     while (w + pwlen <= eop) {
         if (!*w)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1582925432 2020/02/28 21:30:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1606243387 2020/11/24 18:43:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -46,9 +46,16 @@ const struct propname {
     { DETECT_MONSTERS, "monster detection" },
     { SEE_INVIS, "see invisible" },
     { INVIS, "invisible" },
-    /* properties beyond here don't have timed values during normal play,
-       so there's not much point in trying to order them sensibly;
-       they're either on or off based on equipment, role, actions, &c */
+    /* timed displacement is possible via eating a displacer beast corpse */
+    { DISPLACED, "displaced" },
+    /* timed pass-walls is a potential prayer result if surrounded by stone
+       with nowhere to be safely teleported to */
+    { PASSES_WALLS, "pass thru walls" },
+    /*
+     * Properties beyond here don't have timed values during normal play,
+     * so there's not much point in trying to order them sensibly.
+     * They're either on or off based on equipment, role, actions, &c.
+     */
     { FIRE_RES, "fire resistance" },
     { COLD_RES, "cold resistance" },
     { SLEEP_RES, "sleep resistance" },
@@ -70,7 +77,6 @@ const struct propname {
     { SEARCHING, "searching" },
     { INFRAVISION, "infravision" },
     { ADORNED, "adorned (+/- Cha)" },
-    { DISPLACED, "displaced" },
     { STEALTH, "stealthy" },
     { AGGRAVATE_MONSTER, "monster aggravation" },
     { CONFLICT, "conflict" },
@@ -80,7 +86,6 @@ const struct propname {
     { WWALKING, "water walking" },
     { SWIMMING, "swimming" },
     { MAGICAL_BREATHING, "magical breathing" },
-    { PASSES_WALLS, "pass thru walls" },
     { SLOW_DIGESTION, "slow digestion" },
     { HALF_SPDAM, "half spell damage" },
     { HALF_PHDAM, "half physical damage" },
@@ -315,16 +320,20 @@ static NEARDATA const char *const slime_texts[] = {
 static void
 slime_dialogue()
 {
-    register long i = (Slimed & TIMEOUT) / 2L;
+    long t = (Slimed & TIMEOUT), i = t / 2L;
 
-    if (i == 1L) {
+    if (t == 1L) {
         /* display as green slime during "You have become green slime."
            but don't worry about not being able to see self; if already
            mimicking something else at the time, implicitly be revealed */
         g.youmonst.m_ap_type = M_AP_MONSTER;
         g.youmonst.mappearance = PM_GREEN_SLIME;
+        /* no message given when 't' is odd, so no automatic update of
+           self; force one */
+        newsym(u.ux, u.uy);
     }
-    if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
+
+    if ((t % 2L) != 0L && i >= 0L && i < SIZE(slime_texts)) {
         char buf[BUFSZ];
 
         Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
@@ -593,7 +602,8 @@ nh_timeout()
                 }
                 dealloc_killer(kptr);
 
-                if ((m_idx = name_to_mon(g.killer.name)) >= LOW_PM) {
+                if ((m_idx = name_to_mon(g.killer.name,
+                                         (int *) 0)) >= LOW_PM) {
                     if (type_is_pname(&mons[m_idx])) {
                         g.killer.format = KILLED_BY;
                     } else if (mons[m_idx].geno & G_UNIQ) {
@@ -671,6 +681,12 @@ nh_timeout()
                 }
                 break;
             case LEVITATION:
+                /* timed Flying is via #wizintrinsic only; still, we want to
+                   avoid float_down() reporting "you have stopped levitating
+                   and are now flying" if both are timing out together;
+                   relies on knowing that Lev timeout is handled before Fly */
+                if ((HFlying & TIMEOUT) == 1L)
+                    --HFlying; /* bypass pending 'case FLYING' */
                 (void) float_down(I_SPECIAL | TIMEOUT, 0L);
                 break;
             case FLYING:
@@ -691,7 +707,7 @@ nh_timeout()
                     g.context.warntype.speciesidx = NON_PM;
                     if (g.context.warntype.species) {
                         You("are no longer warned about %s.",
-                            makeplural(g.context.warntype.species->mname));
+                     makeplural(g.context.warntype.species->pmnames[NEUTRAL]));
                         g.context.warntype.species = (struct permonst *) 0;
                     }
                 }
@@ -980,6 +996,8 @@ long timeout;
             /* free egg here because we use it above */
             obj_extract_self(egg);
             obfree(egg, (struct obj *) 0);
+            if ((mon = m_at(x,y)) && !hideunder(mon) && cansee(x, y))
+                redraw = TRUE;
         }
         if (redraw)
             newsym(x, y);
@@ -1058,15 +1076,15 @@ slip_or_trip()
         if (!uarmf && otmp->otyp == CORPSE
             && touch_petrifies(&mons[otmp->corpsenm]) && !Stone_resistance) {
             Sprintf(g.killer.name, "tripping over %s corpse",
-                    an(mons[otmp->corpsenm].mname));
+                    an(mons[otmp->corpsenm].pmnames[NEUTRAL]));
             instapetrify(g.killer.name);
         }
     } else if (rn2(3) && is_ice(u.ux, u.uy)) {
         pline("%s %s%s on the ice.",
               u.usteed ? upstart(x_monnam(u.usteed,
-                                          (has_mname(u.usteed)) ? ARTICLE_NONE
-                                                                : ARTICLE_THE,
-                                          (char *) 0, SUPPRESS_SADDLE, FALSE))
+                                      (has_mgivenname(u.usteed)) ? ARTICLE_NONE
+                                                                 : ARTICLE_THE,
+                                      (char *) 0, SUPPRESS_SADDLE, FALSE))
                        : "You",
               rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
     } else {
@@ -1740,6 +1758,7 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(rot_organic, (timeout_proc) 0, "rot_organic"),
     TTAB(rot_corpse, (timeout_proc) 0, "rot_corpse"),
     TTAB(revive_mon, (timeout_proc) 0, "revive_mon"),
+    TTAB(zombify_mon, (timeout_proc) 0, "zombify_mon"),
     TTAB(burn_object, cleanup_burn, "burn_object"),
     TTAB(hatch_egg, (timeout_proc) 0, "hatch_egg"),
     TTAB(fig_transform, (timeout_proc) 0, "fig_transform"),
@@ -2402,7 +2421,7 @@ long adjust;     /* how much to adjust timeout */
     /* restore elements */
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &count, sizeof count);
-       
+
     while (count-- > 0) {
         curr = (timer_element *) alloc(sizeof(timer_element));
         if (nhfp->structlevel)

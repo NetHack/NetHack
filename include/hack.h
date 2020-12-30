@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1591178395 2020/06/03 09:59:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -78,24 +78,6 @@ enum dismount_types {
     DISMOUNT_BONES    = 5,
     DISMOUNT_BYCHOICE = 6
 };
-
-/* mgflags for mapglyph() */
-#define MG_FLAG_NORMAL     0x00
-#define MG_FLAG_NOOVERRIDE 0x01
-
-/* Special returns from mapglyph() */
-#define MG_CORPSE  0x0001
-#define MG_INVIS   0x0002
-#define MG_DETECT  0x0004
-#define MG_PET     0x0008
-#define MG_RIDDEN  0x0010
-#define MG_STATUE  0x0020
-#define MG_OBJPILE 0x0040  /* more than one stack of objects */
-#define MG_BW_LAVA 0x0080  /* 'black & white lava': highlight lava if it
-                              can't be distringuished from water by color */
-#define MG_BW_ICE  0x0100  /* similar for ice vs floor */
-#define MG_NOTHING 0x0200  /* char represents GLYPH_NOTHING */
-#define MG_UNEXPL  0x0400  /* char represents GLYPH_UNEXPLORED */
 
 /* sellobj_state() states */
 #define SELL_NORMAL (0)
@@ -216,6 +198,9 @@ typedef struct {
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 
+/* glyphmod entries */
+enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD };
+
 #include "rect.h"
 #include "region.h"
 #include "decl.h"
@@ -272,22 +257,9 @@ typedef struct sortloot_item Loot;
 #include "display.h"
 #include "engrave.h"
 
-#ifdef USE_TRAMPOLI /* this doesn't belong here, but we have little choice */
-#undef NDECL
-#define NDECL(f) f()
-#endif
-
 #include "extern.h"
 #include "winprocs.h"
 #include "sys.h"
-
-#ifdef USE_TRAMPOLI
-#include "wintty.h"
-#undef WINTTY_H
-#include "trampoli.h"
-#undef EXTERN_H
-#include "extern.h"
-#endif /* USE_TRAMPOLI */
 
 /* flags to control makemon(); goodpos() uses some plus has some of its own*/
 #define NO_MM_FLAGS 0x000000L /* use this rather than plain 0 */
@@ -306,10 +278,12 @@ typedef struct sortloot_item Loot;
 #define MM_ASLEEP   0x002000L /* monsters should be generated asleep */
 #define MM_NOGRP    0x004000L /* suppress creation of monster groups */
 #define MM_NOTAIL   0x008000L /* if a long worm, don't give it a tail */
+#define MM_MALE     0x010000L /* male variation */
+#define MM_FEMALE   0x020000L /* female variation */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x010000L /* [actually used by enexto() to decide whether
+#define GP_ALLOW_XY 0x040000L /* [actually used by enexto() to decide whether
                                * to make an extra call to goodpos()]        */
-#define GP_ALLOW_U  0x020000L /* don't reject hero's location */
+#define GP_ALLOW_U  0x080000L /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat() */
 #define CORPSTAT_NONE 0x00
@@ -346,27 +320,29 @@ typedef struct sortloot_item Loot;
 #define ALL_FINISHED 0x01 /* called routine already finished the job */
 
 /* flags to control query_objlist() */
-#define BY_NEXTHERE     0x01   /* follow objlist by nexthere field */
-#define AUTOSELECT_SINGLE 0x02 /* if only 1 object, don't ask */
-#define USE_INVLET      0x04   /* use object's invlet */
-#define INVORDER_SORT   0x08   /* sort objects by packorder */
-#define SIGNAL_NOMENU   0x10   /* return -1 rather than 0 if none allowed */
-#define SIGNAL_ESCAPE   0x20   /* return -2 rather than 0 for ESC */
-#define FEEL_COCKATRICE 0x40   /* engage cockatrice checks and react */
-#define INCLUDE_HERO    0x80   /* show hero among engulfer's inventory */
+#define BY_NEXTHERE       0x0001 /* follow objlist by nexthere field */
+#define INCLUDE_VENOM     0x0002 /* include venom objects if present */
+#define AUTOSELECT_SINGLE 0x0004 /* if only 1 object, don't ask */
+#define USE_INVLET        0x0008 /* use object's invlet */
+#define INVORDER_SORT     0x0010 /* sort objects by packorder */
+#define SIGNAL_NOMENU     0x0020 /* return -1 rather than 0 if none allowed */
+#define SIGNAL_ESCAPE     0x0040 /* return -2 rather than 0 for ESC */
+#define FEEL_COCKATRICE   0x0080 /* engage cockatrice checks and react */
+#define INCLUDE_HERO      0x0100 /* show hero among engulfer's inventory */
 
 /* Flags to control query_category() */
-/* BY_NEXTHERE used by query_category() too, so skip 0x01 */
-#define UNPAID_TYPES 0x002
-#define GOLD_TYPES   0x004
-#define WORN_TYPES   0x008
-#define ALL_TYPES    0x010
-#define BILLED_TYPES 0x020
-#define CHOOSE_ALL   0x040
-#define BUC_BLESSED  0x080
-#define BUC_CURSED   0x100
-#define BUC_UNCURSED 0x200
-#define BUC_UNKNOWN  0x400
+/* BY_NEXTHERE and INCLUDE_VENOM are used by query_category() too, so
+   skip 0x0001 and 0x0002 */
+#define UNPAID_TYPES      0x0004
+#define GOLD_TYPES        0x0008
+#define WORN_TYPES        0x0010
+#define ALL_TYPES         0x0020
+#define BILLED_TYPES      0x0040
+#define CHOOSE_ALL        0x0080
+#define BUC_BLESSED       0x0100
+#define BUC_CURSED        0x0200
+#define BUC_UNCURSED      0x0400
+#define BUC_UNKNOWN       0x0800
 #define BUC_ALLBKNOWN (BUC_BLESSED | BUC_CURSED | BUC_UNCURSED)
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2
@@ -561,6 +537,6 @@ enum optset_restrictions {
 #endif
 
 #define DEVTEAM_EMAIL "devteam@nethack.org"
-#define DEVTEAM_URL "http://www.nethack.org"
+#define DEVTEAM_URL "https://www.nethack.org/"
 
 #endif /* HACK_H */

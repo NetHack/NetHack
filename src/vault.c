@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1549921171 2019/02/11 21:39:31 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.7	vault.c	$NHDT-Date: 1606009006 2020/11/22 01:36:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -249,7 +249,7 @@ struct monst *grd;
     }
     /* if carrying gold and arriving anywhere other than next to the guard,
        set the guard loose */
-    if ((money_cnt(g.invent) || hidden_gold())
+    if ((money_cnt(g.invent) || hidden_gold(TRUE))
         && um_dist(grd->mx, grd->my, 1)) {
         if (grd->mpeaceful) {
             if (canspotmon(grd)) /* see or sense via telepathy */
@@ -397,7 +397,7 @@ invault()
         gsensed = !canspotmon(guard);
         if (!gsensed)
             pline("Suddenly one of the Vault's %s enters!",
-                  makeplural(guard->data->mname));
+                  makeplural(pmname(guard->data, Mgender(guard))));
         else
             pline("Someone else has entered the Vault.");
         newsym(guard->mx, guard->my);
@@ -487,7 +487,7 @@ invault()
         else
             verbalize("I don't know you.");
         umoney = money_cnt(g.invent);
-        if (!umoney && !hidden_gold()) {
+        if (!umoney && !hidden_gold(TRUE)) {
             if (Deaf)
                 pline("%s stomps%s.", noit_Monnam(guard),
                       (Blind) ? "" : " and beckons");
@@ -795,7 +795,7 @@ register struct monst *grd;
     }
 
     umoney = money_cnt(g.invent);
-    u_carry_gold = umoney > 0L || hidden_gold() > 0L;
+    u_carry_gold = (umoney > 0L || hidden_gold(TRUE) > 0L);
     if (egrd->fcend == 1) {
         if (u_in_vault && (u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
             if (egrd->warncnt == 3 && !Deaf)
@@ -1091,7 +1091,8 @@ boolean silently;
         gx = g.rooms[EGD(grd)->vroom].lx + rn2(2);
         gy = g.rooms[EGD(grd)->vroom].ly + rn2(2);
         Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
-                g.plname, mons[u.umonster].mname);
+                g.plname,
+                pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
         make_grave(gx, gy, buf);
     }
     for (coins = g.invent; coins; coins = nextcoins) {
@@ -1107,15 +1108,17 @@ boolean silently;
     return;
 }
 
+/* amount of gold in carried containers */
 long
-hidden_gold()
+hidden_gold(even_if_unknown)
+boolean even_if_unknown; /* True: all gold; False: limit to known contents */
 {
     long value = 0L;
     struct obj *obj;
 
     for (obj = g.invent; obj; obj = obj->nobj)
-        if (Has_contents(obj))
-            value += contained_gold(obj);
+        if (Has_contents(obj) && (obj->cknown || even_if_unknown))
+            value += contained_gold(obj, even_if_unknown);
     /* unknown gold stuck inside statues may cause some consternation... */
 
     return value;

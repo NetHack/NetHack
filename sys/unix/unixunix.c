@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixunix.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	unixunix.c	$NHDT-Date: 1605493693 2020/11/16 02:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -271,9 +271,8 @@ dosh()
 #ifdef SYSCF
     if (!sysopt.shellers || !sysopt.shellers[0]
         || !check_user_string(sysopt.shellers)) {
-        /* FIXME: should no longer assume a particular command keystroke,
-           and perhaps ought to say "unavailable" rather than "unknown" */
-        Norep("Unknown command '!'.");
+        /* FIXME: should no longer assume a particular command keystroke */
+        Norep("Unavailable command '!'.");
         return 0;
     }
 #endif

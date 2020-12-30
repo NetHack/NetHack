@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1584350347 2020/03/16 09:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	dig.c	$NHDT-Date: 1596498156 2020/08/03 23:42:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,7 @@ static int NDECL(dig);
 static void FDECL(dig_up_grave, (coord *));
 static int FDECL(adj_pit_checks, (coord *, char *));
 static void FDECL(pit_flow, (struct trap *, SCHAR_P));
+static boolean FDECL(furniture_handled, (int, int, BOOLEAN_P));
 
 /* Indices returned by dig_typ() */
 enum dig_types {
@@ -188,7 +189,8 @@ int x, y;
         (madeby == BY_YOU && uwep && is_axe(uwep)) ? "chop" : "dig in";
 
     if (On_stairs(x, y)) {
-        if (x == xdnladder || x == xupladder) {
+        stairway *stway = stairway_at(x, y);
+        if (stway->isladder) {
             if (verbose)
                 pline_The("ladder resists your effort.");
         } else if (verbose)
@@ -488,6 +490,33 @@ dig(VOID_ARGS)
     return 1;
 }
 
+static boolean
+furniture_handled(x, y, madeby_u)
+int x, y;
+boolean madeby_u;
+{
+    struct rm *lev = &levl[x][y];
+
+    if (IS_FOUNTAIN(lev->typ)) {
+        dogushforth(FALSE);
+        SET_FOUNTAIN_WARNED(x, y); /* force dryup */
+        dryup(x, y, madeby_u);
+    } else if (IS_SINK(lev->typ)) {
+        breaksink(x, y);
+    } else if (lev->typ == DRAWBRIDGE_DOWN
+               || (is_drawbridge_wall(x, y) >= 0)) {
+        int bx = x, by = y;
+
+        /* if under the portcullis, the bridge is adjacent */
+        (void) find_drawbridge(&bx, &by);
+        destroy_drawbridge(bx, by);
+    } else {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
 /* When will hole be finished? Very rough indication used by shopkeeper. */
 int
 holetime()
@@ -557,25 +586,8 @@ int ttyp;
             reset_utrap(FALSE);
     }
 
-    /* these furniture checks were in dighole(), but wand
-       breaking bypasses that routine and calls us directly */
-    if (IS_FOUNTAIN(lev->typ)) {
-        dogushforth(FALSE);
-        SET_FOUNTAIN_WARNED(x, y); /* force dryup */
-        dryup(x, y, madeby_u);
+    if (furniture_handled(x, y, madeby_u))
         return;
-    } else if (IS_SINK(lev->typ)) {
-        breaksink(x, y);
-        return;
-    } else if (lev->typ == DRAWBRIDGE_DOWN
-               || (is_drawbridge_wall(x, y) >= 0)) {
-        int bx = x, by = y;
-
-        /* if under the portcullis, the bridge is adjacent */
-        (void) find_drawbridge(&bx, &by);
-        destroy_drawbridge(bx, by);
-        return;
-    }
 
     if (ttyp != PIT && (!Can_dig_down(&u.uz) && !lev->candig)) {
         impossible("digactualhole: can't dig %s on this level.",
@@ -875,9 +887,11 @@ coord *cc;
 
         lev->flags = 0;
         if (typ != ROOM) {
-            lev->typ = typ;
-            liquid_flow(dig_x, dig_y, typ, ttmp,
-                        "As you dig, the hole fills with %s!");
+            if (!furniture_handled((int) dig_x, (int) dig_y, TRUE)) {
+                lev->typ = typ;
+                liquid_flow(dig_x, dig_y, typ, ttmp,
+                            "As you dig, the hole fills with %s!");
+            }
             return TRUE;
         }
 
@@ -1431,12 +1445,12 @@ zap_dig()
         if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !Underwater) {
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 int dmg;
-                if (On_stairs(u.ux, u.uy))
+                if (On_stairs(u.ux, u.uy)) {
+                    stairway *stway = stairway_at(u.ux, u.uy);
                     pline_The("beam bounces off the %s and hits the %s.",
-                              (u.ux == xdnladder || u.ux == xupladder)
-                                  ? "ladder"
-                                  : "stairs",
+                              stway->isladder ? "ladder" : "stairs",
                               ceiling(u.ux, u.uy));
+                }
                 You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
                 pline("It falls on your %s!", body_part(HEAD));
                 dmg = rnd((uarmh && is_metallic(uarmh)) ? 2 : 6);

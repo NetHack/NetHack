@@ -1,4 +1,4 @@
-/* NetHack 3.6	monattk.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	monattk.h	$NHDT-Date: 1596498548 2020/08/03 23:49:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 /* Copyright 1988, M. Stephenson */
 
@@ -86,6 +86,15 @@
 #define AD_SAMU 252 /* hits, may steal Amulet (Wizard) */
 #define AD_CURS 253 /* random curse (ex. gremlin) */
 
+struct mhitm_data {
+    int damage;
+    int hitflags; /* MM_DEF_DIED | MM_AGR_DIED | ... */
+    boolean done;
+    boolean permdmg;
+    int specialdmg;
+    int dieroll;
+};
+
 /*
  *  Monster to monster attacks.  When a monster attacks another (mattackm),
  *  any or all of the following can be returned.  See mattackm() for more
@@ -95,5 +104,6 @@
 #define MM_HIT 0x1      /* aggressor hit defender */
 #define MM_DEF_DIED 0x2 /* defender died */
 #define MM_AGR_DIED 0x4 /* aggressor died */
+#define MM_AGR_DONE 0x8 /* aggressor is done with their turn */
 
 #endif /* MONATTK_H */

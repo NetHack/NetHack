@@ -1,4 +1,4 @@
-@REM  NetHack 3.6	nhsetup.bat	$NHDT-Date: 1554784485 2019/04/09 04:34:45 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
+@REM  NetHack 3.7	nhsetup.bat	$NHDT-Date: 1596498315 2020/08/03 23:45:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
 @REM  Copyright (c) NetHack PC Development Team 1993-2019
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.7	winprocs.h	$NHDT-Date: 1596498572 2020/08/03 23:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +45,8 @@ struct window_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (char *));
 #endif
-    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int, int));
+    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P,
+                                    int, int, unsigned *));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
     int NDECL((*win_nhgetch));
@@ -345,7 +346,8 @@ struct chain_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (CARGS, char *));
 #endif
-    void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P, int, int));
+    void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P,
+                                    int, int, unsigned *));
     void FDECL((*win_raw_print), (CARGS, const char *));
     void FDECL((*win_raw_print_bold), (CARGS, const char *));
     int FDECL((*win_nhgetch), (CARGS));
@@ -420,7 +422,8 @@ extern void FDECL(safe_cliparound, (int, int));
 #ifdef POSITIONBAR
 extern void FDECL(safe_update_positionbar, (char *));
 #endif
-extern void FDECL(safe_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+extern void FDECL(safe_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                                     int, int, unsigned *));
 extern void FDECL(safe_raw_print, (const char *));
 extern void FDECL(safe_raw_print_bold, (const char *));
 extern int NDECL(safe_nhgetch);

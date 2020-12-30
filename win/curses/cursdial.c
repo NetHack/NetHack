@@ -1,5 +1,5 @@
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
-/* NetHack 3.6 cursdial.c */
+/* NetHack 3.7 cursdial.c */
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1182,7 +1182,8 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
         if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs) {
             unsigned special;  /*notused */
 
-            mapglyph(menu_item_ptr->glyph, &curletter, &color, &special, 0, 0, 0);
+            /*mapglyph(menu_item_ptr->glyph, &curletter, &color, &special,
+                       0, 0, 0);*/
             curses_toggle_color_attr(win, color, NONE, ON);
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
             curses_toggle_color_attr(win, color, NONE, OFF);

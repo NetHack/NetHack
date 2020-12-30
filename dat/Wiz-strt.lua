@@ -1,4 +1,4 @@
--- NetHack 3.6	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Wizard.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1992 by David Cohrs
 -- NetHack may be freely redistributed.  See license for details.
 --
@@ -44,7 +44,7 @@ des.replace_terrain({ region={13,5, 33,15}, fromterrain="C", toterrain=".", chan
 des.region(selection.area(00,00,75,19), "lit")
 des.region(selection.area(35,00,49,03), "unlit")
 des.region(selection.area(43,12,49,16), "unlit")
-des.region({ region={19,11,33,15}, lit=0, type="ordinary", prefilled=0, irregular=1 })
+des.region({ region={19,11,33,15}, lit=0, type="ordinary", irregular=1 })
 des.region(selection.area(30,10,31,10), "unlit")
 -- Stairs
 des.stair("down", 30,10)

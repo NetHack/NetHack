@@ -63,14 +63,17 @@ public:
 
 	static void qt_cliparound(int x, int y);
 	static void qt_cliparound_window(winid wid, int x, int y);
-	static void qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,int bkglyph);
+        static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+                                   int glyph, int bkglyph, unsigned int *);
 	static void qt_raw_print(const char *str);
 	static void qt_raw_print_bold(const char *str);
 	static int qt_nhgetch();
 	static int qt_nh_poskey(int *x, int *y, int *mod);
 	static void qt_nhbell();
 	static int qt_doprev_message();
-	static char qt_yn_function(const char *question, const char *choices, CHAR_P def);
+        static char qt_more();
+        static char qt_yn_function(const char *question,
+                                   const char *choices, CHAR_P def);
 	static void qt_getlin(const char *prompt, char *line);
 	static int qt_get_ext_cmd();
 	static void qt_number_pad(int);
@@ -78,6 +81,7 @@ public:
 	static void qt_start_screen();
 	static void qt_end_screen();
 
+        static void qt_preference_update(const char *optname);
         static char *qt_getmsghistory(BOOLEAN_P init);
         static void qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring);
 

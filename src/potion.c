@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1581810073 2020/02/15 23:41:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1596498197 2020/08/03 23:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -486,7 +486,6 @@ int
 dodrink()
 {
     register struct obj *otmp;
-    const char *potion_descr;
 
     if (Strangled) {
         pline("If you can't breathe air, how can you drink liquid?");
@@ -538,21 +537,18 @@ dodrink()
     }
     otmp->in_use = TRUE; /* you've opened the stopper */
 
-    potion_descr = OBJ_DESCR(objects[otmp->otyp]);
-    if (potion_descr) {
-        if (!strcmp(potion_descr, "milky")
-            && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
-            && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
-            ghost_from_bottle();
-            useup(otmp);
-            return 1;
-        } else if (!strcmp(potion_descr, "smoky")
-                   && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
-                   && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
-            djinni_from_bottle(otmp);
-            useup(otmp);
-            return 1;
-        }
+    if (objdescr_is(otmp, "milky")
+        && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
+        && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
+        ghost_from_bottle();
+        useup(otmp);
+        return 1;
+    } else if (objdescr_is(otmp, "smoky")
+               && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
+               && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
+        djinni_from_bottle(otmp);
+        useup(otmp);
+        return 1;
     }
     return dopotion(otmp);
 }
@@ -664,7 +660,7 @@ register struct obj *otmp;
                 exercise(A_CON, FALSE);
                 if (u.ulycn >= LOW_PM) {
                     Your("affinity to %s disappears!",
-                         makeplural(mons[u.ulycn].mname));
+                         makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
                     if (g.youmonst.data == &mons[u.ulycn])
                         you_unwere(FALSE);
                     set_ulycn(NON_PM); /* cure lycanthropy */
@@ -729,11 +725,7 @@ register struct obj *otmp;
                 (void) adjattrib(A_INT, 1, FALSE);
                 (void) adjattrib(A_WIS, 1, FALSE);
             }
-            You_feel("self-knowledgeable...");
-            display_nhwindow(WIN_MESSAGE, FALSE);
-            enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
-            pline_The("feeling subsides.");
-            exercise(A_WIS, TRUE);
+            do_enlightenment_effect();
         }
         break;
     case SPE_INVISIBILITY:
@@ -1055,9 +1047,7 @@ register struct obj *otmp;
             HLevitation &= ~I_SPECIAL; /* can't descend upon demand */
             if (BLevitation) {
                 ; /* rising via levitation is blocked */
-            } else if ((u.ux == xupstair && u.uy == yupstair)
-                    || (g.sstairs.up && u.ux == g.sstairs.sx && u.uy == g.sstairs.sy)
-                    || (xupladder && u.ux == xupladder && u.uy == yupladder)) {
+            } else if (stairway_find_dir(TRUE)) {
                 (void) doup();
                 /* in case we're already Levitating, which would have
                    resulted in incrementing 'nothing' */
@@ -1983,11 +1973,7 @@ dodip()
             goto poof;
     } else if (obj->otyp == POT_POLYMORPH || potion->otyp == POT_POLYMORPH) {
         /* some objects can't be polymorphed */
-        if (obj->otyp == potion->otyp /* both POT_POLY */
-            || obj->otyp == WAN_POLYMORPH || obj->otyp == SPE_POLYMORPH
-            || obj == uball || obj == uskin
-            || obj_resists(obj->otyp == POT_POLYMORPH ? potion : obj,
-                           5, 95)) {
+        if (obj_unpolyable(obj->otyp == POT_POLYMORPH ? potion : obj)) {
             pline1(nothing_happens);
         } else {
             short save_otyp = obj->otyp;

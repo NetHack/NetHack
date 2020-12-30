@@ -14,14 +14,24 @@
 #ifdef TESTING
 #include "hack.h"
 #else
+#ifndef CROSS_TO_AMIGA
 #include "NH:src/tile.c"
+#else
+#include "../src/tile.c"
+#endif
 #endif
 
+#ifndef CROSS_TO_AMIGA
 #include "NH:win/share/tile.h"
-
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
+#else
+#include "tile.h"
+#include "windefs.h"
+#include "winext.h"
+#include "winproto.h"
+#endif
 
 #ifdef OPT_DISPMAP
 #define DISPMAP /* use display_map() from dispmap.s */

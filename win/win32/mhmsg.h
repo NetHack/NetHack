@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmsg.h	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.7	mhmsg.h	$NHDT-Date: 1596498356 2020/08/03 23:45:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,6 +38,7 @@ typedef struct mswin_nhmsg_print_glyph {
     XCHAR_P y;
     int glyph;
     int bkglyph;
+    int glyphmod[NUM_GLYPHMOD];
 } MSNHMsgPrintGlyph, *PMSNHMsgPrintGlyph;
 
 typedef struct mswin_nhmsg_cliparound {

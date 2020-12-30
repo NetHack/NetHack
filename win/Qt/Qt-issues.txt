@@ -1,0 +1,66 @@
+Qt-NetHack issues
+-----
+
+Urgent:  if the program crashes on OSX, a dialog box asking the user
+whether to [ignore], [report...], or [re-open] will eventually appear
+(it's slow).  That should be repressed even if the report choice could
+be directed at nethack.org.
+
+Launching Qt nethack as a synchronous subprocess (ie, no trailing '&')
+from a Terminal window, changing focus back to that terminal after
+NetHack has started, and typing ^C was sending the program into an
+endless loop in qt_nhgetch() with repeated messages to stderr
+(the terminal) complaining that the event loop is already running.
+Triggered by yn_function("Really quit?") in the core.  That situation
+has been reduced to a single event loop complaint, so downgraded from
+"Urgent", but the prompt is auto-answered with ESC instead of letting
+the user respond.
+
+On OSX, if the program is run from nethackdir/nethack rather than from
+NetHack.app/Contents/MacOS/nethack (plus having NetHack.app/Contents/
+Info.plist containing pertinent information) then the menu bar at the
+top of the screen won't accept mouse clicks and the application menu
+entry in that menu bar will show as "nethack" (filename) rather than
+"NetHack" (intended application name).  The click issue can be worked
+around by giving focus to some other application (which will put up
+its own menu bar) and then back to nethack (thereby reloading nethack's
+menu bar).
+
+Sometimes scrolling a menu leaves the displayed text not matching what
+nethack thinks is displayed, so making a selection by mouse click may
+occasionally pick the wrong item.  There's usually a visual clue when
+this happens.  As long as it's not a pick-one menu, scrolling up and
+down or back and worth a few times will usually get things back in
+sync, then you can click on the wrong entry to uncheck it and then on
+the right entry to check that.  Making a selection by typing its
+letter doesn't suffer from this, but isn't always possible (ie, long
+menu like 'O's where first 52 items have letters but remainder don't).
+
+On OSX, command+Q while a menu (which has its own key event handler)
+is popped up gets ignored.  It should at least close the popup like
+ESC and maybe also initiate quitting.
+
+On the map, ^V is a dead key (at least on OSX; all other ASCII control
+characters from ^A through ^U, ^W through ^Z, and ^[, ^\, ^], ^^, ^_
+work; no attempt to have ^@ generate NUL has been made).
+
+Map column #0, which the core reserves for its own purposes and isn't
+intended to be displayed, is displayed (as blank terrain).
+
+3.7 status conditions haven't been implemented.
+
+3.6 status conditions (Stone, Slime, Strngl, Deaf, Lev, Fly, Ride)
+have been implemented but need icon artwork (one 40x40 tile for each).
+
+Clicking on window close button pops up a confirmation dialog with
+  [  Save and exit  ]  [__Quit_without_saving__]
+with the second one highlighted.  Internally they're specified as
+"&Save" and "&Quit".  Typing <return> or <space> picks Quit, but
+typing 'Q' or 'q' picks Save-and-exit because Alt+Q is expected for
+the keyboard shortcut.
+
+The status window can't be resized while hitpointbar is active.
+Toggling it off, resizing as desired, then toggling it back on is a
+viable workaround.
+
+-----

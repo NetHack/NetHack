@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1593953335 2020/07/05 12:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1600933440 2020/09/24 07:44:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -52,6 +52,7 @@ struct flag {
                               * clairvoyance */
     boolean rest_on_space;   /* space means rest */
     boolean safe_dog;        /* give complete protection to the dog */
+    boolean safe_wait;       /* prevent wait or search next to hostile */
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
@@ -79,6 +80,7 @@ struct flag {
 #define PARANOID_EATING     0x0200
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
+    char discosort;    /* order of dodiscovery/doclassdisco output: o,s,c,a */
     char sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     char inv_order[MAXOCLASSES];
     char pickup_types[MAXOCLASSES];
@@ -92,8 +94,7 @@ struct flag {
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
                                                       info upon exit */
     char menu_style;    /* User interface style setting */
-    boolean made_fruit; /* don't easily let the user overflow the number of
-                           fruits */
+    boolean made_fruit; /* don't easily let user overflow fruit limit */
 
     /* KMH, role patch -- Variables used during startup.
      *
@@ -238,6 +239,7 @@ struct instance_flags {
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
+    boolean tux_penalty;      /* True iff hero is a monk and wearing a suit */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES
@@ -292,6 +294,7 @@ struct instance_flags {
     boolean cmdassist;       /* provide detailed assistance for some comnds */
     boolean time_botl;       /* context.botl for 'time' (moves) only */
     boolean wizweight;       /* display weight of everything in wizard mode */
+    boolean wizmgender;      /* test gender info from core in window port */
     /*
      * Window capability support.
      */
@@ -407,6 +410,7 @@ enum plnmsg_types {
     PLNMSG_OBJNAM_ONLY,         /* xname/doname only, for #tip */
     PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
     PLNMSG_BACK_ON_GROUND,      /* leaving water */
+    PLNMSG_GROWL,               /* growl() gave some message */
     PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
 };
 

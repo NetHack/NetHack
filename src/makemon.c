@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1591178397 2020/06/03 09:59:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1606033928 2020/11/22 08:32:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -247,14 +247,14 @@ register struct monst *mtmp;
                 }
                 break;
             }
-            if (mm == PM_ELVENKING) {
+            if (mm == PM_ELVEN_MONARCH) {
                 if (rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
                 if (!rn2(50))
                     (void) mongets(mtmp, CRYSTAL_BALL);
             }
         } else if (ptr->msound == MS_PRIEST
-                   || quest_mon_represents_role(ptr, PM_PRIEST)) {
+                   || quest_mon_represents_role(ptr, PM_CLERIC)) {
             otmp = mksobj(MACE, FALSE, FALSE);
             otmp->spe = rnd(3);
             if (!rn2(2))
@@ -428,7 +428,7 @@ register struct monst *mtmp;
         }
         break;
     case S_OGRE:
-        if (!rn2(mm == PM_OGRE_KING ? 3 : mm == PM_OGRE_LORD ? 6 : 12))
+        if (!rn2(mm == PM_OGRE_TYRANT ? 3 : mm == PM_OGRE_LEADER ? 6 : 12))
             (void) mongets(mtmp, BATTLE_AXE);
         else
             (void) mongets(mtmp, CLUB);
@@ -700,7 +700,7 @@ register struct monst *mtmp;
                 (void) mongets(mtmp, WAN_STRIKING);
             }
         } else if (ptr->msound == MS_PRIEST
-                   || quest_mon_represents_role(ptr, PM_PRIEST)) {
+                   || quest_mon_represents_role(ptr, PM_CLERIC)) {
             (void) mongets(mtmp, rn2(7) ? ROBE
                                         : rn2(3) ? CLOAK_OF_PROTECTION
                                                  : CLOAK_OF_MAGIC_RESISTANCE);
@@ -755,7 +755,7 @@ register struct monst *mtmp;
             (void) mongets(mtmp, MUMMY_WRAPPING);
         break;
     case S_QUANTMECH:
-        if (!rn2(20)) {
+        if (!rn2(20) && ptr == &mons[PM_QUANTUM_MECHANIC]) {
             struct obj *catcorpse;
 
             otmp = mksobj(LARGE_BOX, FALSE, FALSE);
@@ -882,8 +882,8 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
         new_light_source(m2->mx, m2->my, emits_light(m2->data), LS_MONSTER,
                          monst_to_any(m2));
     /* if 'parent' is named, give the clone the same name */
-    if (has_mname(mon)) {
-        m2 = christen_monst(m2, MNAME(mon));
+    if (has_mgivenname(mon)) {
+        m2 = christen_monst(m2, MGIVENNAME(mon));
     } else if (mon->isshk) {
         m2 = christen_monst(m2, shkname(mon));
     }
@@ -946,7 +946,7 @@ boolean ghostly;
     result = ((int) g.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
-    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_PRIEST)
+    if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
         g.mvitals[mndx].mvflags |= G_EXTINCT;
 
     if (g.mvitals[mndx].born < 255 && tally && (!ghostly || result))
@@ -956,7 +956,7 @@ boolean ghostly;
         && !(g.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (wizard) {
             debugpline1("Automatically extinguished %s.",
-                        makeplural(mons[mndx].mname));
+                        makeplural(mons[mndx].pmnames[NEUTRAL]));
         }
         g.mvitals[mndx].mvflags |= G_EXTINCT;
     }
@@ -997,13 +997,16 @@ struct monst *mon;
 int mndx;
 {
     struct permonst *ptr = &mons[mndx];
+    int basehp = 0;
 
     mon->m_lev = adj_lev(ptr);
     if (is_golem(ptr)) {
+        /* golems have a fixed amount of HP, varying by golem type */
         mon->mhpmax = mon->mhp = golemhp(mndx);
     } else if (is_rider(ptr)) {
         /* we want low HP, but a high mlevel so they can attack well */
-        mon->mhpmax = mon->mhp = d(10, 8);
+        basehp = 10; /* minimum is 1 per false (weaker) level */
+        mon->mhpmax = mon->mhp = d(basehp, 8);
     } else if (ptr->mlevel > 49) {
         /* "special" fixed hp monster
          * the hit points are encoded in the mlevel in a somewhat strange
@@ -1012,18 +1015,37 @@ int mndx;
         mon->mhpmax = mon->mhp = 2 * (ptr->mlevel - 6);
         mon->m_lev = mon->mhp / 4; /* approximation */
     } else if (ptr->mlet == S_DRAGON && mndx >= PM_GRAY_DRAGON) {
-        /* adult dragons */
-        mon->mhpmax = mon->mhp =
-            (int) (In_endgame(&u.uz)
-                       ? (8 * mon->m_lev)
-                       : (4 * mon->m_lev + d((int) mon->m_lev, 4)));
+        /* adult dragons; N*(4+rnd(4)) before endgame, N*8 once there */
+        basehp = (int) mon->m_lev; /* not really applicable; isolates cast */
+        mon->mhpmax = mon->mhp = In_endgame(&u.uz) ? (8 * basehp)
+                                 : (4 * basehp + d(basehp, 4));
     } else if (!mon->m_lev) {
+        basehp = 1; /* minimum is 1, increased to 2 below */
         mon->mhpmax = mon->mhp = rnd(4);
     } else {
-        mon->mhpmax = mon->mhp = d((int) mon->m_lev, 8);
+        basehp = (int) mon->m_lev; /* minimum possible is one per level */
+        mon->mhpmax = mon->mhp = d(basehp, 8);
         if (is_home_elemental(ptr))
-            mon->mhpmax = (mon->mhp *= 3);
+            mon->mhpmax = (mon->mhp *= 3); /* leave 'basehp' as-is */
     }
+
+    /* if d(X,8) rolled a 1 all X times, give a boost;
+       most beneficial for level 0 and level 1 monsters, making mhpmax
+       and starting mhp always be at least 2 */
+    if (mon->mhpmax == basehp) {
+        mon->mhpmax += 1;
+        mon->mhp = mon->mhpmax;
+    }
+}
+
+static const struct mextra zeromextra = DUMMY;
+
+static void
+init_mextra(mex)
+struct mextra *mex;
+{
+    *mex = zeromextra;
+    mex->mcorpsenm = NON_PM;
 }
 
 struct mextra *
@@ -1032,13 +1054,7 @@ newmextra()
     struct mextra *mextra;
 
     mextra = (struct mextra *) alloc(sizeof(struct mextra));
-    mextra->mname = 0;
-    mextra->egd = 0;
-    mextra->epri = 0;
-    mextra->eshk = 0;
-    mextra->emin = 0;
-    mextra->edog = 0;
-    mextra->mcorpsenm = NON_PM;
+    init_mextra(mextra);
     return mextra;
 }
 
@@ -1079,20 +1095,16 @@ coord *cc;
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {
+                stairway *stway = g.stairs;
                 /* all map positions are visible (or not good),
                    try to pick something logical */
-                if (g.dnstair.sx && !rn2(2)) {
-                    nx = g.dnstair.sx;
-                    ny = g.dnstair.sy;
-                } else if (g.upstair.sx && !rn2(2)) {
-                    nx = g.upstair.sx;
-                    ny = g.upstair.sy;
-                } else if (g.dnladder.sx && !rn2(2)) {
-                    nx = g.dnladder.sx;
-                    ny = g.dnladder.sy;
-                } else if (g.upladder.sx && !rn2(2)) {
-                    nx = g.upladder.sx;
-                    ny = g.upladder.sy;
+                while (stway) {
+                    if (stway->tolev.dnum == u.uz.dnum && !rn2(2)) {
+                        nx = stway->sx;
+                        ny = stway->sy;
+                        break;
+                    }
+                    stway = stway->next;
                 }
                 if (goodpos(nx, ny, mon, gpflags))
                     goto gotgood;
@@ -1172,7 +1184,7 @@ long mmflags;
             return (struct monst *) 0;
         if (wizard && (g.mvitals[mndx].mvflags & G_EXTINCT)) {
             debugpline1("Explicitly creating extinct monster %s.",
-                        mons[mndx].mname);
+                        mons[mndx].pmnames[NEUTRAL]);
         }
     } else {
         /* make a random (common) monster that can survive here.
@@ -1224,9 +1236,9 @@ long mmflags;
     /* set up level and hit points */
     newmonhp(mtmp, mndx);
 
-    if (is_female(ptr))
+    if (is_female(ptr) || ((mmflags & MM_FEMALE) && !is_male(ptr)))
         mtmp->female = TRUE;
-    else if (is_male(ptr))
+    else if (is_male(ptr) || ((mmflags & MM_MALE) && !is_female(ptr)))
         mtmp->female = FALSE;
     /* leader and nemesis gender is usually hardcoded in mons[],
        but for ones which can be random, it has already been chosen
@@ -1357,7 +1369,7 @@ long mmflags;
        types; make sure their extended data is initialized to
        something sensible if caller hasn't specified MM_EPRI|MM_EMIN
        (when they're specified, caller intends to handle this itself) */
-    if ((mndx == PM_ALIGNED_PRIEST || mndx == PM_HIGH_PRIEST)
+    if ((mndx == PM_ALIGNED_CLERIC || mndx == PM_HIGH_CLERIC)
             ? !(mmflags & (MM_EPRI | MM_EMIN))
             : (mndx == PM_ANGEL && !(mmflags & MM_EMIN) && !rn2(3))) {
         struct emin *eminp;
@@ -1490,8 +1502,12 @@ boolean neverask;
         if (!mptr && u.uinwater && enexto(&c, x, y, &mons[PM_GIANT_EEL]))
             x = c.x, y = c.y;
 
-        mon = makemon(mptr, x, y, NO_MM_FLAGS);
-        if (mon && canspotmon(mon))
+        if ((mon = makemon(mptr, x, y, NO_MM_FLAGS)) == 0)
+            continue; /* try again [should probably stop instead] */
+
+        if ((canseemon(mon) && (M_AP_TYPE(mon) == M_AP_NOTHING
+                                || M_AP_TYPE(mon) == M_AP_MONSTER))
+            || sensemon(mon))
             known = TRUE;
     }
     return known;
@@ -1841,8 +1857,11 @@ struct monst *mtmp, *victim;
     oldtype = monsndx(ptr);
     newtype = (oldtype == PM_KILLER_BEE && !victim) ? PM_QUEEN_BEE
                                                     : little_to_big(oldtype);
+#if 0
+    /* gender-neutral PM_CLERIC now */
     if (newtype == PM_PRIEST && mtmp->female)
         newtype = PM_PRIESTESS;
+#endif
 
     /* growth limits differ depending on method of advancement */
     if (victim) {                       /* killed a monster */
@@ -1898,7 +1917,7 @@ struct monst *mtmp, *victim;
         if (g.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
-                      an(ptr->mname), mhe(mtmp),
+                      an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
             set_mon_data(mtmp, ptr); /* keep g.mvitals[] accurate */
             mondied(mtmp);
@@ -1916,7 +1935,7 @@ struct monst *mtmp, *victim;
                            (can't happen with 3.6.0 mons[], but perhaps
                            slightly less sexist if prepared for it...) */
                       : (fem && !mtmp->female) ? "female " : "",
-                    ptr->mname);
+                    pmname(ptr, fem));
             pline("%s %s %s.", upstart(y_monnam(mtmp)),
                   (fem != mtmp->female) ? "changes into"
                                         : humanoid(ptr) ? "becomes"
@@ -2347,7 +2366,9 @@ int *seencount;  /* secondary output */
             mtmp = makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
             if (mtmp) {
                 ++moncount;
-                if (canspotmon(mtmp))
+                if ((canseemon(mtmp) && (M_AP_TYPE(mtmp) == M_AP_NOTHING
+                                         || M_AP_TYPE(mtmp) == M_AP_MONSTER))
+                    || sensemon(mtmp))
                     ++seecount;
             }
         } while (--creatcnt > 0);

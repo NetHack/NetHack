@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.h	$NHDT-Date: 1559994623 2019/06/08 11:50:23 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	monst.h	$NHDT-Date: 1596498550 2020/08/03 23:49:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -82,6 +82,7 @@ struct monst {
     xchar mx, my;
     xchar mux, muy;       /* where the monster thinks you are */
 #define MTSZ 4
+    /* mtrack[0..2] is used to keep extra data when migrating the monster */
     coord mtrack[MTSZ];   /* monster track */
     int mhp, mhpmax;
     unsigned mappearance; /* for undetected mimics and the wiz */
@@ -183,7 +184,7 @@ struct monst {
 #define DEADMONSTER(mon) ((mon)->mhp < 1)
 #define is_starting_pet(mon) ((mon)->m_id == g.context.startingpet_mid)
 #define is_vampshifter(mon)                                      \
-    ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LORD \
+    ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LEADER \
      || (mon)->cham == PM_VLAD_THE_IMPALER)
 #define vampshifted(mon) (is_vampshifter((mon)) && !is_vampire((mon)->data))
 
@@ -218,5 +219,9 @@ struct monst {
 /* Macros for whether a type of monster is too strong for a specific level. */
 #define montoostrong(monindx, lev) (mons[monindx].difficulty > lev)
 #define montooweak(monindx, lev) (mons[monindx].difficulty < lev)
+
+#ifdef PMNAME_MACROS
+#define Mgender(mon) ((mon)->female ? FEMALE : MALE)
+#endif
 
 #endif /* MONST_H */

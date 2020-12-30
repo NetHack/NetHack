@@ -1,6 +1,6 @@
-# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1594155873 2020/07/07 21:04:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $
+# NetHack 3.7	Makefile.GCC	$NHDT-Date: 1596498268 2020/08/03 23:44:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $
 #	Copyright (c) NetHack PC Development Team 1996-2019.
-#	PC NetHack 3.6 Makefile for djgpp V2
+#	PC NetHack 3.7 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
 #	Requires Gnu Make utility (V3.79.1 or greater) supplied with djgpp
@@ -42,13 +42,13 @@ PDCURSES_TOP=../../pdcurses
 ifeq "$(LUA_VERSION)" "5.3.5"
 LUAVER=5.3.5
 else
-LUAVER=5.4.0
+LUAVER=5.4.2
 endif
 #---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.4.0.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -273,7 +273,7 @@ VOBJ16 = $(O)role.o     $(O)rumors.o   $(O)save.o     $(O)sfstruct.o $(O)shk.o
 VOBJ17 = $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
 VOBJ18 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)termcap.o
 VOBJ19 = $(O)timeout.o  $(O)topl.o     $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ20 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vision.o   $(O)vis_tab.o
+VOBJ20 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vision.o
 VOBJ21 = $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wintty.o
 VOBJ22 = $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 VOBJ23 = $(O)light.o    $(O)dlb.o      $(O)dig.o      $(O)teleport.o $(O)region.o
@@ -305,7 +305,7 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.0.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
@@ -400,7 +400,7 @@ HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
 	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
 	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
 	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/trampoli.h $(INCL)/hack.h     $(REGION_H)	       \
+	     $(INCL)/hack.h     $(REGION_H)	       \
 	     $(INCL)/sys.h
 DLB_H      = $(INCL)/dlb.h
 
@@ -548,7 +548,7 @@ default: $(GAMEFILE)
 util: $(O)utility.tag
 
 $(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
-	$(INCL)/pm.h	  vis_tab.c $(TILEUTIL)
+	$(INCL)/pm.h	  $(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe
@@ -652,12 +652,6 @@ $(INCL)/onames.h: $(U)makedefs.exe
 
 $(INCL)/pm.h: $(U)makedefs.exe
 	-$(subst /,\,$(U)makedefs -p)
-
-$(INCL)/vis_tab.h: $(U)makedefs.exe
-	-$(subst /,\,$(U)makedefs -z)
-
-vis_tab.c: $(U)makedefs.exe
-	-$(subst /,\,$(U)makedefs -z)
 
 #==========================================
 #  Makedefs Stuff
@@ -913,12 +907,10 @@ spotless: clean
 	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
 	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
 	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
-	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
 	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
-	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
@@ -996,11 +988,9 @@ spotless: clean
 	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
 	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
 	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
-	$(subst /,\,if exist $(INCL)/vis_tab.h del $(INCL)/vis_tab.h)
 	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
 	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
 	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(SRC)/vis_tab.c del $(SRC)/vis_tab.c)
 	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
 	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
 	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
@@ -1218,7 +1208,6 @@ $(O)qt_clust.o: ../win/Qt/qt_clust.cpp $(INCL)/qt_clust.h
 $(O)qttableview.o: ../win/Qt/qttableview.cpp $(INCL)/qttableview.h
 	$(CXX) $(CXXFLAGS) -o$@ ../win/Qt/qttableview.cpp
 $(O)monstr.o: monstr.c $(CONFIG_H)
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)/vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
@@ -1325,7 +1314,7 @@ $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)/date.h
-$(O)vision.o: vision.c $(HACK_H) $(INCL)/vis_tab.h
+$(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)

@@ -76,7 +76,6 @@ extern int attrib_text_normal;  /* text mode normal attribute */
 extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
 extern boolean inmap;           /* in the map window */
-/* extern boolean g.restoring; */
 
 /*
  * Global Variables
@@ -701,6 +700,7 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
     int col, row;
     int attr;
     int ry;
+    int tilenum = 0;
 
     row = currow;
     col = curcol;
@@ -722,7 +722,10 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
             if (!iflags.over_view && map[ry][col].special)
                 decal_packed(packcell, special);
 #endif
-            vesa_DisplayCell(glyph2tile[glyphnum], col - clipx, ry - clipy);
+            tilenum = glyph2tile[glyphnum];
+            if (map[ry][col].special & MG_FEMALE)
+                tilenum++;
+            vesa_DisplayCell(tilenum, col - clipx, ry - clipy);
         }
     }
     if (col < (CO - 1))
@@ -786,7 +789,7 @@ int x, y;
         clipymax = ROWNO - 1;
     }
     if (clipx != oldx || clipy != oldy) {
-        if (on_level(&u.uz0, &u.uz) && !g.restoring)
+        if (on_level(&u.uz0, &u.uz) && !g.program_state.restoring)
             /* (void) doredraw(); */
             vesa_redrawmap();
     }

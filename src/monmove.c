@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1586091452 2020/04/05 12:57:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1603507386 2020/10/24 02:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -114,16 +114,18 @@ register struct monst *mtmp;
 
     /* a similar check is in monster_nearby() in hack.c */
     /* check whether hero notices monster and stops current activity */
-    if (g.occupation && !rd && !Confusion && (!mtmp->mpeaceful || Hallucination)
+    if (g.occupation && !rd
+        /* monster is hostile and can attack (or hallu distorts knowledge) */
+        && (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
         /* it's close enough to be a threat */
-        && distu(x, y) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
+        && distu(mtmp->mx, mtmp->my) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
         /* and either couldn't see it before, or it was too far away */
         && (!already_saw_mon || !couldsee(x, y)
             || distu(x, y) > (BOLT_LIM + 1) * (BOLT_LIM + 1))
         /* can see it now, or sense it and would normally see it */
-        && (canseemon(mtmp) || (sensemon(mtmp) && couldsee(x, y)))
-        && mtmp->mcanmove && !noattacks(mtmp->data)
-        && !onscary(u.ux, u.uy, mtmp))
+        && canspotmon(mtmp) && couldsee(mtmp->mx, mtmp->my)
+        /* monster isn't paralyzed or afraid (scare monster/Elbereth) */
+        && mtmp->mcanmove && !onscary(u.ux, u.uy, mtmp))
         stop_occupation();
 
     return rd;
@@ -562,13 +564,27 @@ register struct monst *mtmp;
             && (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
             pline("It feels quite soothing.");
         } else if (!u.uinvulnerable) {
-            register boolean m_sen = sensemon(mtmp);
+            int dmg;
+            boolean m_sen = sensemon(mtmp);
 
             if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
-                int dmg;
+                /* hiding monsters are brought out of hiding when hit by
+                   a psychic blast, so do the same for hiding poly'd hero */
+                if (u.uundetected) {
+                    u.uundetected = 0;
+                    newsym(u.ux, u.uy);
+                } else if (U_AP_TYPE != M_AP_NOTHING
+                           /* hero has no way to hide as monster but
+                              check for that theoretical case anyway */
+                           && U_AP_TYPE != M_AP_MONSTER) {
+                    g.youmonst.m_ap_type = M_AP_NOTHING;
+                    g.youmonst.mappearance = 0;
+                    newsym(u.ux, u.uy);
+                }
                 pline("It locks on to your %s!",
-                      m_sen ? "telepathy" : Blind_telepat ? "latent telepathy"
-                                                          : "mind");
+                      m_sen ? "telepathy"
+                      : Blind_telepat ? "latent telepathy"
+                        : "mind"); /* note: hero is never mindless */
                 dmg = rnd(15);
                 if (Half_spell_damage)
                     dmg = (dmg + 1) / 2;
@@ -587,13 +603,13 @@ register struct monst *mtmp;
                 continue;
             if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
                 || !rn2(10)) {
+                /* wake it up first, to bring hidden monster out of hiding */
+                wakeup(m2, FALSE);
                 if (cansee(m2->mx, m2->my))
                     pline("It locks on to %s.", mon_nam(m2));
                 m2->mhp -= rnd(15);
                 if (DEADMONSTER(m2))
                     monkilled(m2, "", AD_DRIN);
-                else
-                    m2->msleeping = 0;
             }
         }
     }
@@ -999,10 +1015,11 @@ register int after;
                     > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
             appr = -1;
 
-        /* hostile monsters with ranged thrown weapons try to stay away */
+        /* hostiles with ranged weapons or spit attack try to stay away */
         if (!mtmp->mpeaceful
             && (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) < 5*5)
-            && m_canseeu(mtmp) && m_has_launcher_and_ammo(mtmp))
+            && m_canseeu(mtmp) &&
+            (m_has_launcher_and_ammo(mtmp) || attacktype(mtmp->data, AT_SPIT)))
             appr = -1;
 
         if (!should_see && can_track(ptr)) {
@@ -1156,34 +1173,7 @@ register int after;
 
     nix = omx;
     niy = omy;
-    flag = 0L;
-    if (mtmp->mpeaceful && (!Conflict || resist(mtmp, RING_CLASS, 0, 0)))
-        flag |= (ALLOW_SANCT | ALLOW_SSM);
-    else
-        flag |= ALLOW_U;
-    if (is_minion(ptr) || is_rider(ptr))
-        flag |= ALLOW_SANCT;
-    /* unicorn may not be able to avoid hero on a noteleport level */
-    if (is_unicorn(ptr) && !noteleport_level(mtmp))
-        flag |= NOTONL;
-    if (passes_walls(ptr))
-        flag |= (ALLOW_WALL | ALLOW_ROCK);
-    if (passes_bars(ptr))
-        flag |= ALLOW_BARS;
-    if (can_tunnel)
-        flag |= ALLOW_DIG;
-    if (is_human(ptr) || ptr == &mons[PM_MINOTAUR])
-        flag |= ALLOW_SSM;
-    if ((is_undead(ptr) && ptr->mlet != S_GHOST) || is_vampshifter(mtmp))
-        flag |= NOGARLIC;
-    if (throws_rocks(ptr))
-        flag |= ALLOW_ROCK;
-    if (can_open)
-        flag |= OPENDOOR;
-    if (can_unlock)
-        flag |= UNLOCKDOOR;
-    if (doorbuster)
-        flag |= BUSTDOOR;
+    flag = mon_allowflags(mtmp);
     {
         register int i, j, nx, ny, nearer;
         int jcnt, cnt;
@@ -1276,29 +1266,8 @@ register int after;
          * Pets get taken care of above and shouldn't reach this code.
          * Conflict gets handled even farther away (movemon()).
          */
-        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy)) {
-            struct monst *mtmp2;
-            int mstatus;
-
-            mtmp2 = m_at(nix, niy);
-
-            g.notonhead = mtmp2 && (nix != mtmp2->mx || niy != mtmp2->my);
-            /* note: mstatus returns 0 if mtmp2 is nonexistent */
-            mstatus = mattackm(mtmp, mtmp2);
-
-            if (mstatus & MM_AGR_DIED) /* aggressor died */
-                return 2;
-
-            if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
-                && mtmp2->movement >= NORMAL_SPEED) {
-                mtmp2->movement -= NORMAL_SPEED;
-                g.notonhead = 0;
-                mstatus = mattackm(mtmp2, mtmp); /* return attack */
-                if (mstatus & MM_DEF_DIED)
-                    return 2;
-            }
-            return 3;
-        }
+        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy))
+            return m_move_aggress(mtmp, nix, niy);
 
         if ((info[chi] & ALLOW_MDISP)) {
             struct monst *mtmp2;
@@ -1481,9 +1450,12 @@ register int after;
                         add_damage(mtmp->mx, mtmp->my, 0L);
                 }
             } else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-                /* 3.6.2: was using may_dig() but it doesn't handle bars */
+                /* 3.6.2: was using may_dig() but that doesn't handle bars;
+                   AD_RUST catches rust monsters but metallivorous() is
+                   needed for xorns and rock moles */
                 if (!(levl[mtmp->mx][mtmp->my].wall_info & W_NONDIGGABLE)
-                    && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
+                    && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR)
+                        || metallivorous(ptr))) {
                     if (canseemon(mtmp))
                         pline("%s eats through the iron bars.", Monnam(mtmp));
                     dissolve_bars(mtmp->mx, mtmp->my);
@@ -1590,6 +1562,44 @@ register int after;
     return mmoved;
 }
 
+/* The part of m_move that deals with a monster attacking another monster (and
+ * that monster possibly retaliating).
+ * Extracted into its own function so that it can be called with monsters that
+ * have special move patterns (shopkeepers, priests, etc) that want to attack
+ * other monsters but aren't just roaming freely around the level (so allowing
+ * m_move to run fully for them could select an invalid move).
+ * x and y are the coordinates mtmp wants to attack.
+ * Return values are the same as for m_move, but this function only return 2
+ * (mtmp died) or 3 (mtmp made its move).
+ */
+int
+m_move_aggress(mtmp, x, y)
+struct monst * mtmp;
+xchar x, y;
+{
+    struct monst *mtmp2;
+    int mstatus;
+
+    mtmp2 = m_at(x, y);
+
+    g.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
+    /* note: mstatus returns 0 if mtmp2 is nonexistent */
+    mstatus = mattackm(mtmp, mtmp2);
+
+    if (mstatus & MM_AGR_DIED) /* aggressor died */
+        return 2;
+
+    if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+        && mtmp2->movement >= NORMAL_SPEED) {
+        mtmp2->movement -= NORMAL_SPEED;
+        g.notonhead = 0;
+        mstatus = mattackm(mtmp2, mtmp); /* return attack */
+        if (mstatus & MM_DEF_DIED)
+            return 2;
+    }
+    return 3;
+}
+
 void
 dissolve_bars(x, y)
 register int x, y;
@@ -1597,6 +1607,8 @@ register int x, y;
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;
     newsym(x, y);
+    if (x == u.ux && y == u.uy)
+        switch_terrain();
 }
 
 boolean

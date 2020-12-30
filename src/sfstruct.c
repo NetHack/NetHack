@@ -1,4 +1,4 @@
-/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1593953360 2020/07/05 12:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1606765215 2020/11/30 19:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,8 +75,8 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  * Some notes:
  *
  * Once buffered IO (stdio) has been enabled on the file
- * associated with a descriptor via fdopen(): 
- *                          
+ * associated with a descriptor via fdopen():
+ *
  *    1. If you use bufoff and bufon to try and toggle the
  *       use of write vs fwrite; the code just tracks which
  *       routine is to be called through the tracking
@@ -86,7 +86,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  *                               if it is a free slot.
  *             bw_buffered[]  -  indicator that buffered IO routines
  *                               are available for use.
- *             bw_FILE[]      -  the non-zero FILE * for use in calling 
+ *             bw_FILE[]      -  the non-zero FILE * for use in calling
  *                               fwrite() when bw_buffered[] is also
  *                               non-zero.
  *
@@ -265,7 +265,7 @@ register unsigned int len;
             return;
         } else {
             pline("Read %d instead of %u bytes.", rlen, len);
-            if (g.restoring) {
+            if (g.program_state.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();
                 error("Error restoring old game.");
@@ -291,7 +291,7 @@ int fd;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     bufon(fd);
 }
 
@@ -301,7 +301,7 @@ int fd;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     bufoff(fd);
 }
 
@@ -311,7 +311,7 @@ int fd;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     bflush(fd);
 }
 
@@ -323,7 +323,7 @@ register unsigned num;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     bwrite(fd, loc, num);
 }
 
@@ -333,7 +333,7 @@ int fd;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     bclose(fd);
 }
 
@@ -354,7 +354,7 @@ register unsigned int len;
 const char *fncname;
 int linenum;
 {
-    TRACE(fd);    
+    TRACE(fd);
     mread(fd, buf, len);
 }
 #endif

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wc_trace.c	$NHDT-Date: 1501464799 2017/07/31 01:33:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.7	wc_trace.c	$NHDT-Date: 1596498324 2020/08/03 23:45:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -578,19 +578,20 @@ char *posbar;
 /* XXX can we decode the glyph in a meaningful way? see mapglyph()?
  genl_putmixed?  */
 void
-trace_print_glyph(vp, window, x, y, glyph, bkglyph)
+trace_print_glyph(vp, window, x, y, glyph, bkglyph, glyphmod)
 void *vp;
 winid window;
 xchar x, y;
 int glyph, bkglyph;
+int glyphmod[NUM_GLYPHMOD];
 {
     struct trace_data *tdp = vp;
 
-    fprintf(wc_tracelogf, "%sprint_glyph(%d, %d, %d, %d, %d)\n", INDENT, window,
-            x, y, glyph, bkglyph);
+    fprintf(wc_tracelogf, "%sprint_glyph(%d, %d, %d, %d, %d, %lu)\n", INDENT, window,
+            x, y, glyph, bkglyph, glyphmod);
 
     PRE;
-    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyph, bkglyph);
+    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyph, bkglyph, glyphmod);
     POST;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	tile2bmp.c	$NHDT-Date: 1451442061 2015/12/30 02:21:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.7	tile2bmp.c	$NHDT-Date: 1596498340 2020/08/03 23:45:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 

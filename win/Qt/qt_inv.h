@@ -10,14 +10,26 @@
 
 namespace nethack_qt_ {
 
+// for calls to drawWorn
+enum drawWornFlag { dollNoFlag = 0, dollUnused = 1, dollReverse = 2 };
+
 class NetHackQtInvUsageWindow : public QWidget {
 public:
 	NetHackQtInvUsageWindow(QWidget* parent);
+	virtual ~NetHackQtInvUsageWindow();
 	virtual void paintEvent(QPaintEvent*);
 	virtual QSize sizeHint(void) const;
 
+protected:
+        virtual bool event(QEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
+
 private:
-	void drawWorn(QPainter& painter, obj*, int x, int y, bool canbe=true);
+        void drawWorn(QPainter &painter, obj *nhobj, int x, int y,
+                      const char *alttip, int flags = dollNoFlag);
+        bool tooltip_event(QHelpEvent *tipevent);
+
+        char *tips[3][6]; // PAPERDOLL is a grid of 3x6 cells for tiles
 };
 
 } // namespace nethack_qt_

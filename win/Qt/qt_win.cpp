@@ -2,7 +2,7 @@
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
 
-// Qt Binding for NetHack 3.4
+// Qt Windowing interface for NetHack 3.7
 //
 // Copyright (C) 1996-2001 by Warwick W. Allison (warwick@troll.no)
 // 
@@ -22,7 +22,7 @@
 // and also because this is my first major application of Qt.  
 // 
 // The problem of NetHack's getkey requirement is solved by intercepting
-// key events by overiding QApplicion::notify(...), and putting them in
+// key events by overiding QApplication::notify(...), and putting them in
 // a buffer.  Mouse clicks on the map window are treated with a similar
 // buffer.  When the NetHack engine calls for a key, one is taken from
 // the buffer, or if that is empty, QApplication::exec() is called.
@@ -43,24 +43,22 @@
 // This includes all the definitions we need from the NetHack main
 // engine.  We pretend MSC is a STDC compiler, because C++ is close
 // enough, and we undefine NetHack macros which conflict with Qt
-// identifiers.
+// identifiers (now done in qt_pre.h).
 
 #define QT_DEPRECATED_WARNINGS
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
+#include "qt_post.h"
+
+// Many of these headers are not needed here.  It's a holdover
+// from when most of the Qt code was in one big file.
 #include "qt_win.h"
 #include "qt_bind.h"
 #include "qt_click.h"
@@ -73,29 +71,7 @@
 #include "qt_msg.h"
 #include "qt_set.h"
 
-#include <ctype.h>
-
 #include "qt_clust.h"
-
-#include <dirent.h>
-
-#ifdef _WS_X11_
-// For userid control
-#include <unistd.h>
-#endif
-
-#ifdef USER_SOUNDS
-#if QT_VERSION >= 0x050000
-#  include <QtMultimedia/QSound>
-# else
-#  include <QtGui/QSound>
-# endif
-#endif
-
-
-#ifdef USER_SOUNDS
-extern void play_sound_for_message(const std::string& str);
-#endif
 
 namespace nethack_qt_ {
 
@@ -119,18 +95,22 @@ NetHackQtWindow::~NetHackQtWindow()
 // XXX Use "expected ..." for now, abort or default later.
 //
 void NetHackQtWindow::Clear() { puts("unexpected Clear"); }
-void NetHackQtWindow::Display(bool block) { puts("unexpected Display"); }
+void NetHackQtWindow::Display(bool block UNUSED) { puts("unexpected Display"); }
 bool NetHackQtWindow::Destroy() { return true; }
-void NetHackQtWindow::CursorTo(int x,int y) { puts("unexpected CursorTo"); }
-void NetHackQtWindow::PutStr(int attr, const QString& text) { puts("unexpected PutStr"); }
-void NetHackQtWindow::StartMenu() { puts("unexpected StartMenu"); }
-void NetHackQtWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-    const QString& str, unsigned itemflags) { puts("unexpected AddMenu"); }
-void NetHackQtWindow::EndMenu(const QString& prompt) { puts("unexpected EndMenu"); }
-int NetHackQtWindow::SelectMenu(int how, MENU_ITEM_P **menu_list) { puts("unexpected SelectMenu"); return 0; }
-void NetHackQtWindow::ClipAround(int x,int y) { puts("unexpected ClipAround"); }
-void NetHackQtWindow::PrintGlyph(int x,int y,int glyph) { puts("unexpected PrintGlyph"); }
+void NetHackQtWindow::CursorTo(int x UNUSED,int y UNUSED) { puts("unexpected CursorTo"); }
+void NetHackQtWindow::PutStr(int attr UNUSED, const QString& text UNUSED) { puts("unexpected PutStr"); }
+void NetHackQtWindow::StartMenu(bool using_WIN_INVEN UNUSED)
+                                { puts("unexpected StartMenu"); }
+void NetHackQtWindow::AddMenu(int glyph UNUSED, const ANY_P* identifier UNUSED,
+                              char ch UNUSED, char gch UNUSED, int attr UNUSED,
+                              const QString& str UNUSED, unsigned itemflags UNUSED)
+                              { puts("unexpected AddMenu"); }
+void NetHackQtWindow::EndMenu(const QString& prompt UNUSED) { puts("unexpected EndMenu"); }
+int NetHackQtWindow::SelectMenu(int how UNUSED, MENU_ITEM_P **menu_list UNUSED)
+                               { puts("unexpected SelectMenu"); return 0; }
+void NetHackQtWindow::ClipAround(int x UNUSED,int y UNUSED) { puts("unexpected ClipAround"); }
+void NetHackQtWindow::PrintGlyph(int x UNUSED,int y UNUSED,int glyph UNUSED, unsigned *glyphmod UNUSED) { puts("unexpected PrintGlyph"); }
 //void NetHackQtWindow::PrintGlyphCompose(int x,int y,int,int) { puts("unexpected PrintGlyphCompose"); }
-void NetHackQtWindow::UseRIP(int how, time_t when) { puts("unexpected UseRIP"); }
+void NetHackQtWindow::UseRIP(int how UNUSED, time_t when UNUSED) { puts("unexpected UseRIP"); }
 
 } // namespace nethack_qt_

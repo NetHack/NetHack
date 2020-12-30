@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcsys.c	$NHDT-Date: 1593953370 2020/07/05 12:49:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.7	pcsys.c	$NHDT-Date: 1596498283 2020/08/03 23:44:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /*      Copyright (c) 2012 by Michael Allison              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,10 +12,10 @@
 
 #include <ctype.h>
 #include <fcntl.h>
-#if !defined(MSDOS) && !defined(WIN_CE) /* already done */
+#if !defined(MSDOS) && !defined(WIN_CE) && !defined(CROSS_TO_AMIGA)
 #include <process.h>
 #endif
-#ifdef __GO32__
+#if defined(__GO32__) || defined(CROSS_TO_AMIGA)
 #define P_WAIT 0
 #define P_NOWAIT 1
 #endif
@@ -154,7 +154,11 @@ const char *str;
 #ifdef TOS
     msmsg("Hit <Return> %s.", str);
 #else
+#ifdef CROSS_TO_AMIGA
+    (void) printf("Hit <Enter> %s.", str);
+#else
     msmsg("Hit <Enter> %s.", str);
+#endif
 #endif
     while (pgetchar() != '\n')
         ;

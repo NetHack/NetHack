@@ -1,4 +1,4 @@
-/* NetHack 3.6	wc_chainin.c	$NHDT-Date: 1433806610 2015/06/08 23:36:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.7	wc_chainin.c	$NHDT-Date: 1596498323 2020/08/03 23:45:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,12 +272,13 @@ char *posbar;
 
 /* XXX can we decode the glyph in a meaningful way? */
 void
-chainin_print_glyph(window, x, y, glyph, bkglyph)
+chainin_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
 int glyph, bkglyph;
+int glyphmod[NUM_GLYPHMOD];
 {
-    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyph, bkglyph);
+    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyph, bkglyph, glyphmod);
 }
 
 void

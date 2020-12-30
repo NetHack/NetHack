@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1571436007 2019/10/18 22:00:07 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1607754748 2020/12/12 06:32:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,6 +362,13 @@ register boolean nearshop;
 
     {
         coord mm;
+        stairway *stway = g.stairs;
+
+        while (stway) {
+            if (!stway->isladder && !stway->up && stway->tolev.dnum == u.uz.dnum)
+                break;
+            stway = stway->next;
+        }
 
         if (nearshop) {
             /* Create swarm around you, if you merely "stepped out" */
@@ -375,8 +382,8 @@ register boolean nearshop;
         if (flags.verbose)
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
-        mm.x = xdnstair;
-        mm.y = ydnstair;
+        mm.x = stway->sx;
+        mm.y = stway->sy;
         makekops(&mm);
         /* Create swarm near shopkeeper (hinders return to shop) */
         mm.x = shkp->mx;
@@ -832,8 +839,8 @@ char rmno;
                        (int) rmno,
                        (int) g.rooms[rmno - ROOMOFFSET].rtype,
                        shkp->mnum,
-                       /* [real shopkeeper name is kept in ESHK, not MNAME] */
-                       has_mname(shkp) ? MNAME(shkp) : "anonymous");
+                       /* [real shopkeeper name is kept in ESHK, not MGIVENNAME] */
+                       has_mgivenname(shkp) ? MGIVENNAME(shkp) : "anonymous");
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying g.rooms[].resident issue but... */
             return (struct monst *) 0;
@@ -1238,7 +1245,7 @@ dopay()
     long ltmp;
     long umoney;
     int pass, tmp, sk = 0, seensk = 0;
-    boolean paid = FALSE, stashed_gold = (hidden_gold() > 0L);
+    boolean paid = FALSE, stashed_gold = (hidden_gold(TRUE) > 0L);
 
     g.multi = 0;
 
@@ -1588,7 +1595,8 @@ boolean itemize;
     long ltmp, quan, save_quan;
     long umoney = money_cnt(g.invent);
     int buy;
-    boolean stashed_gold = (hidden_gold() > 0L), consumed = (which == 0);
+    boolean stashed_gold = (hidden_gold(TRUE) > 0L),
+            consumed = (which == 0);
 
     if (!obj->unpaid && !bp->useup) {
         impossible("Paid object on bill??");
@@ -2219,8 +2227,9 @@ boolean unpaid_only;
 
 /* count amount of gold inside container 'obj' and any nested containers */
 long
-contained_gold(obj)
+contained_gold(obj, even_if_unknown)
 struct obj *obj;
+boolean even_if_unknown; /* True: all gold; False: limit to known contents */
 {
     register struct obj *otmp;
     register long value = 0L;
@@ -2229,8 +2238,8 @@ struct obj *obj;
     for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
         if (otmp->oclass == COIN_CLASS)
             value += otmp->quan;
-        else if (Has_contents(otmp))
-            value += contained_gold(otmp);
+        else if (Has_contents(otmp) && (otmp->cknown || even_if_unknown))
+            value += contained_gold(otmp, even_if_unknown);
 
     return value;
 }
@@ -2604,7 +2613,7 @@ boolean reset_nocharge;
     /* outer container might be marked no_charge but still have contents
        which should be charged for; clear no_charge when picking things up */
     if (obj->no_charge) {
-        if (!Has_contents(obj) || (contained_gold(obj) == 0L
+        if (!Has_contents(obj) || (contained_gold(obj, TRUE) == 0L
                                    && contained_cost(obj, shkp, 0L, FALSE,
                                                      !reset_nocharge) == 0L))
             shkp = 0; /* not billable */
@@ -2654,7 +2663,7 @@ boolean ininv, dummy, silent;
 
     if (container) {
         cltmp = contained_cost(obj, shkp, cltmp, FALSE, FALSE);
-        gltmp = contained_gold(obj);
+        gltmp = contained_gold(obj, TRUE);
 
         if (ltmp)
             add_one_tobill(obj, dummy, shkp);
@@ -2929,7 +2938,7 @@ boolean peaceful, silent;
 
             value += stolen_container(obj, shkp, 0L, ininv);
             if (!ininv)
-                gvalue += contained_gold(obj);
+                gvalue += contained_gold(obj, TRUE);
         }
     }
 
@@ -2994,6 +3003,44 @@ boolean peaceful, silent;
     return value;
 }
 
+/* opposite of costly_gold(); hero has dropped gold in a shop;
+   called from sellobj(); ought to be called from subfrombill() too */
+void
+donate_gold(gltmp, shkp, selling)
+long gltmp;
+struct monst *shkp;
+boolean selling; /* True: dropped in shop; False: kicked and landed in shop */
+{
+    struct eshk *eshkp = ESHK(shkp);
+
+    if (eshkp->debit >= gltmp) {
+        if (eshkp->loan) { /* you carry shop's gold */
+            if (eshkp->loan > gltmp)
+                eshkp->loan -= gltmp;
+            else
+                eshkp->loan = 0L;
+        }
+        eshkp->debit -= gltmp;
+        Your("debt is %spaid off.", eshkp->debit ? "partially " : "");
+    } else {
+        long delta = gltmp - eshkp->debit;
+
+        eshkp->credit += delta;
+        if (eshkp->debit) {
+            eshkp->debit = 0L;
+            eshkp->loan = 0L;
+            Your("debt is paid off.");
+        }
+        if (eshkp->credit == delta)
+            You("have %sestablished %ld %s credit.",
+                !selling ? "re-" : "", delta, currency(delta));
+        else
+            pline("%ld %s added%s to your credit; total is now %ld %s.",
+                  delta, currency(delta), !selling ? " back" : "",
+                  eshkp->credit, currency(eshkp->credit));
+    }
+}
+
 void
 sellobj_state(deliberate)
 int deliberate;
@@ -3036,7 +3083,7 @@ xchar x, y;
         /* find the price of content before subfrombill */
         cltmp = contained_cost(obj, shkp, cltmp, TRUE, FALSE);
         /* find the value of contained gold */
-        gltmp += contained_gold(obj);
+        gltmp += contained_gold(obj, TRUE);
         cgold = (gltmp > 0L);
     }
 
@@ -3079,7 +3126,7 @@ xchar x, y;
         return;
     }
 
-    if (eshkp->robbed) { /* shkp is not angry? */
+    if (eshkp->robbed) { /* bones; shop robbed by previous customer */
         if (isgold)
             offer = obj->quan;
         else if (cgold)
@@ -3097,32 +3144,7 @@ xchar x, y;
         if (!cgold)
             gltmp = obj->quan;
 
-        if (eshkp->debit >= gltmp) {
-            if (eshkp->loan) { /* you carry shop's gold */
-                if (eshkp->loan >= gltmp)
-                    eshkp->loan -= gltmp;
-                else
-                    eshkp->loan = 0L;
-            }
-            eshkp->debit -= gltmp;
-            Your("debt is %spaid off.", eshkp->debit ? "partially " : "");
-        } else {
-            long delta = gltmp - eshkp->debit;
-
-            eshkp->credit += delta;
-            if (eshkp->debit) {
-                eshkp->debit = 0L;
-                eshkp->loan = 0L;
-                Your("debt is paid off.");
-            }
-            if (eshkp->credit == delta)
-                You("have established %ld %s credit.", delta,
-                    currency(delta));
-            else
-                pline("%ld %s added to your credit; total is now %ld %s.",
-                      delta, currency(delta), eshkp->credit,
-                      currency(eshkp->credit));
-        }
+        donate_gold(gltmp, shkp, TRUE);
 
         if (!offer || g.sell_how == SELL_DONTSELL) {
             if (!isgold) {
@@ -3170,13 +3192,14 @@ xchar x, y;
             c = 'n';
 
         if (c == 'y') {
-            shk_names_obj(
-                shkp, obj,
-                (g.sell_how != SELL_NORMAL)
-                    ? "traded %s for %ld zorkmid%s in %scredit."
-                    : "relinquish %s and acquire %ld zorkmid%s in %scredit.",
-                tmpcr, (eshkp->credit > 0L) ? "additional " : "");
+            shk_names_obj(shkp, obj,
+                          ((g.sell_how != SELL_NORMAL)
+                           ? "traded %s for %ld zorkmid%s in %scredit."
+                    : "relinquish %s and acquire %ld zorkmid%s in %scredit."),
+                          tmpcr, (eshkp->credit > 0L) ? "additional " : "");
             eshkp->credit += tmpcr;
+            if (container)
+                dropped_container(obj, shkp, TRUE);
             subfrombill(obj, shkp);
         } else {
             if (c == 'q')

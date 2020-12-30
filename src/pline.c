@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1549327495 2019/02/05 00:44:55 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1606504240 2020/11/27 19:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,16 +50,16 @@ const char *line;
 }
 
 /* called during save (unlike the interface-specific message history,
-   this data isn't saved and restored); end-of-game releases saved_pline[]
+   this data isn't saved and restored); end-of-game releases saved_plines[]
    while writing its contents to the final dump log */
 void
 dumplogfreemessages()
 {
-    unsigned indx;
+    unsigned i;
 
-    for (indx = 0; indx < DUMPLOG_MSG_COUNT; ++indx)
-        if (g.saved_plines[indx])
-            free((genericptr_t) g.saved_plines[indx]), g.saved_plines[indx] = 0;
+    for (i = 0; i < DUMPLOG_MSG_COUNT; ++i)
+        if (g.saved_plines[i])
+            free((genericptr_t) g.saved_plines[i]), g.saved_plines[i] = 0;
     g.saved_pline_index = 0;
 }
 #endif
@@ -617,6 +617,24 @@ VA_DECL(const char *, str)
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     VA_END(); /* (see pline/vpline -- ends nested block for USE_OLDARGS) */
 #endif
+}
+
+/* nhassert_failed is called when an nhassert's condition is false */
+void
+nhassert_failed(expression, filepath, line)
+    const char* expression;
+    const char * filepath;
+    int line;
+{
+    const char * filename;
+
+    /* attempt to get filename from path.  TODO: we really need a port provided
+     * function to return a filename from a path */
+    filename = strrchr(filepath, '/');
+    filename = (filename == NULL ? strrchr(filepath, '\\') : filename);
+    filename = (filename == NULL ? filepath : filename + 1);
+
+    impossible("nhassert(%s) failed in file '%s' at line %d", expression, filename, line);
 }
 
 /*pline.c*/

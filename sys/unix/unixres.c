@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixres.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	unixres.c	$NHDT-Date: 1596498298 2020/08/03 23:44:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Slash'EM development team, 2001. */
 /* NetHack may be freely redistributed.  See license for details. */
 

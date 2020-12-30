@@ -1,4 +1,4 @@
-/* NetHack 3.6	were.c	$NHDT-Date: 1550524568 2019/02/18 21:16:08 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.7	were.c	$NHDT-Date: 1596498227 2020/08/03 23:43:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -99,13 +99,15 @@ register struct monst *mon;
 
     pm = counter_were(monsndx(mon->data));
     if (pm < LOW_PM) {
-        impossible("unknown lycanthrope %s.", mon->data->mname);
+        impossible("unknown lycanthrope %s.",
+                    mon->data->pmnames[NEUTRAL]);
         return;
     }
 
     if (canseemon(mon) && !Hallucination)
         pline("%s changes into a %s.", Monnam(mon),
-              is_human(&mons[pm]) ? "human" : mons[pm].mname + 4);
+              is_human(&mons[pm]) ? "human"
+                                  : pmname(&mons[pm], Mgender(mon)) + 4);
 
     set_mon_data(mon, &mons[pm]);
     if (mon->msleeping || !mon->mcanmove) {
@@ -183,7 +185,7 @@ you_were()
     if (controllable_poly) {
         /* `+4' => skip "were" prefix to get name of beast */
         Sprintf(qbuf, "Do you want to change into %s?",
-                an(mons[u.ulycn].mname + 4));
+                an(mons[u.ulycn].pmnames[NEUTRAL] + 4));
         if (!paranoid_query(ParanoidWerechange, qbuf))
             return;
     }

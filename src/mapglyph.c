@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1587110793 2020/04/17 08:06:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.7	mapglyph.c	$NHDT-Date: 1596498176 2020/08/03 23:42:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -77,9 +77,10 @@ unsigned mgflags;
     unsigned special = 0;
     /* condense multiple tests in macro version down to single */
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
-            is_you = (x == u.ux && y == u.uy),
+            is_you = (x == u.ux && y == u.uy && !u.usteed),
             has_rogue_color = (has_rogue_ibm_graphics
-                               && g.symset[g.currentgraphics].nocolor == 0);
+                               && g.symset[g.currentgraphics].nocolor == 0),
+            do_mon_checks = FALSE;
 
     if (!g.glyphmap_perlevel_flags) {
         /*
@@ -254,6 +255,7 @@ unsigned mgflags;
         else
             mon_color(offset);
         special |= MG_RIDDEN;
+        do_mon_checks = TRUE;
     } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) { /* a corpse */
         idx = objects[CORPSE].oc_class + SYM_OFF_O;
         if (has_rogue_color && iflags.use_color)
@@ -272,6 +274,7 @@ unsigned mgflags;
         /* Disabled for now; anyone want to get reverse video to work? */
         /* is_reverse = TRUE; */
         special |= MG_DETECT;
+        do_mon_checks = TRUE;
     } else if ((offset = (glyph - GLYPH_INVIS_OFF)) >= 0) { /* invisible */
         idx = SYM_INVISIBLE + SYM_OFF_X;
         if (has_rogue_color)
@@ -286,6 +289,7 @@ unsigned mgflags;
         else
             pet_color(offset);
         special |= MG_PET;
+        do_mon_checks = TRUE;
     } else { /* a monster */
         idx = mons[glyph].mlet + SYM_OFF_M;
         if (has_rogue_color && iflags.use_color) {
@@ -301,6 +305,21 @@ unsigned mgflags;
             if (iflags.use_color && is_you && flags.showrace && !Upolyd)
                 color = HI_DOMESTIC;
 #endif
+        }
+        do_mon_checks = TRUE;
+    }
+    if (do_mon_checks) {
+        struct monst *m;
+
+        if (is_you) {
+            if (Ugender == FEMALE)
+                special |= MG_FEMALE;
+        } else {
+            /* when hero is riding, steed will be shown at hero's location
+               but has not been placed on the map so m_at() won't find it */
+            m = (x == u.ux && y == u.uy && u.usteed) ? u.usteed : m_at(x, y);
+            if (m && m->female)
+                special |= MG_FEMALE;
         }
     }
 
@@ -354,14 +373,14 @@ const char *str;
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
+    unsigned glyphmod[NUM_GLYPHMOD];
 
     if (!str)
         return strcpy(buf, "");
 
     while (*str) {
         if (*str == '\\') {
-            int rndchk, dcount, so, gv, ch = 0, oc = 0;
-            unsigned os = 0;
+            int rndchk, dcount, so, gv;
             const char *dp, *save_str;
 
             save_str = str++;
@@ -380,7 +399,8 @@ const char *str;
                             gv = (gv * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
-                    so = mapglyph(gv, &ch, &oc, &os, 0, 0, 0);
+                    map_glyphmod(0, 0, gv, MG_FLAG_RETURNIDX, glyphmod);
+                    so = glyphmod[GM_TTYCHAR];
                     *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */

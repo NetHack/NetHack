@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1575245201 2019/12/02 00:06:41 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.7	mswproc.c	$NHDT-Date: 1596498364 2020/08/03 23:46:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1281,7 +1281,7 @@ mswin_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph, bkglyph)
+print_glyph(window, x, y, glyph, bkglyph, glyphmod)
                 -- Print the glyph at (x,y) on the given window.  Glyphs are
                    integers at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
@@ -1290,12 +1290,15 @@ print_glyph(window, x, y, glyph, bkglyph)
 		   graphical or tiled environments to allow the depiction
 		   to fall against a background consistent with the grid 
 		   around x,y.
+                -- glyphmod provides extended information about the glyph
+                   that window ports can use to enhance the display in
+                   various ways.
                    
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod)
 {
-    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d)\n", wid, x, y, glyph, bkglyph);
+    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyph, bkglyph, glyphmod);
 
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
@@ -1306,6 +1309,9 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
         data.y = y;
         data.glyph = glyph;
         data.bkglyph = bkglyph;
+        data.glyphmod[GM_TTYCHAR] = glyphmod[GM_TTYCHAR];
+        data.glyphmod[GM_COLOR] = glyphmod[GM_COLOR];
+        data.glyphmod[GM_FLAGS] = glyphmod[GM_FLAGS];
         SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
     }
@@ -2796,6 +2802,8 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
+    if (g.program_state.exiting && !strcmp(text, "\n"))
+        text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 

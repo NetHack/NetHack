@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1578855627 2020/01/12 19:00:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	u_init.c	$NHDT-Date: 1606009005 2020/11/22 01:36:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -614,7 +614,7 @@ u_init()
     u.udg_cnt = 0;
     u.mh = u.mhmax = u.mtimedone = 0;
     u.uz.dnum = u.uz0.dnum = 0;
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
 #endif /* 0 */
 
     u.uz.dlevel = 1;
@@ -688,7 +688,7 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_B);
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         Cave_man[C_AMMO].trquan = rn1(11, 10); /* 10..20 */
         ini_inv(Cave_man);
         skill_init(Skill_C);
@@ -724,7 +724,7 @@ u_init()
         skill_init(Skill_Mon);
         break;
     }
-    case PM_PRIEST:
+    case PM_CLERIC:
         ini_inv(Priest);
         if (!rn2(10))
             ini_inv(Magicmarker);
@@ -811,7 +811,7 @@ u_init()
          * Non-warriors get an instrument.  We use a kludge to
          * get only non-magic instruments.
          */
-        if (Role_if(PM_PRIEST) || Role_if(PM_WIZARD)) {
+        if (Role_if(PM_CLERIC) || Role_if(PM_WIZARD)) {
             static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
                                     BELL,         BUGLE,       LEATHER_DRUM };
             Instrument[0].trotyp = trotyp[rn2(SIZE(trotyp))];
@@ -876,7 +876,7 @@ u_init()
 
     if (u.umoney0)
         ini_inv(Money);
-    u.umoney0 += hidden_gold(); /* in case sack has gold in it */
+    u.umoney0 += hidden_gold(TRUE); /* in case sack has gold in it */
 
     find_ac();     /* get initial ac value */
     init_attr(75); /* init attribute values */
@@ -921,7 +921,7 @@ int otyp;
     case PM_BARBARIAN:
         skills = Skill_B;
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         skills = Skill_C;
         break;
     case PM_HEALER:
@@ -933,7 +933,7 @@ int otyp;
     case PM_MONK:
         skills = Skill_Mon;
         break;
-    case PM_PRIEST:
+    case PM_CLERIC:
         skills = Skill_P;
         break;
     case PM_RANGER:

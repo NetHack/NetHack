@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1578895348 2020/01/13 06:02:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1597931337 2020/08/20 13:48:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -52,6 +52,7 @@ register xchar omx, omy, gx, gy;
     schar chcnt, cnt;
     coord poss[9];
     long info[9];
+    long ninfo = 0;
     long allowflags;
 #if 0 /* dead code; see below */
     struct obj *ib = (struct obj *) 0;
@@ -66,23 +67,7 @@ register xchar omx, omy, gx, gy;
 
     nix = omx;
     niy = omy;
-    if (mtmp->isshk)
-        allowflags = ALLOW_SSM;
-    else
-        allowflags = ALLOW_SSM | ALLOW_SANCT;
-    if (passes_walls(mtmp->data))
-        allowflags |= (ALLOW_ROCK | ALLOW_WALL);
-    if (throws_rocks(mtmp->data))
-        allowflags |= ALLOW_ROCK;
-    if (tunnels(mtmp->data))
-        allowflags |= ALLOW_DIG;
-    if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
-        allowflags |= OPENDOOR;
-        if (monhaskey(mtmp, TRUE))
-            allowflags |= UNLOCKDOOR;
-    }
-    if (is_giant(mtmp->data))
-        allowflags |= BUSTDOOR;
+    allowflags = mon_allowflags(mtmp);
     cnt = mfndpos(mtmp, poss, info, allowflags);
 
     if (mtmp->isshk && avoid && uondoor) { /* perhaps we cannot avoid him */
@@ -100,12 +85,14 @@ pick_move:
         ny = poss[i].y;
         if (IS_ROOM(levl[nx][ny].typ)
             || (mtmp->isshk && (!in_his_shop || ESHK(mtmp)->following))) {
-            if (avoid && (info[i] & NOTONL))
+            if (avoid && (info[i] & NOTONL) && !(info[i] & ALLOW_M))
                 continue;
             if ((!appr && !rn2(++chcnt))
-                || (appr && GDIST(nx, ny) < GDIST(nix, niy))) {
+                || (appr && GDIST(nx, ny) < GDIST(nix, niy))
+                || (info[i] & ALLOW_M)) {
                 nix = nx;
                 niy = ny;
+                ninfo = info[i];
             }
         }
     }
@@ -118,6 +105,19 @@ pick_move:
     }
 
     if (nix != omx || niy != omy) {
+
+        if (ninfo & ALLOW_M) {
+            /* mtmp is deciding it would like to attack this turn.
+             * Returns from m_move_aggress don't correspond to the same things
+             * as this function should return, so we need to translate. */
+            switch (m_move_aggress(mtmp, nix, niy)) {
+            case 2:
+                return -2; /* died making the attack */
+            case 3:
+                return 1; /* attacked and spent this move */
+            }
+        }
+
         if (MON_AT(nix, niy))
             return 0;
         remove_monster(omx, omy);
@@ -233,7 +233,7 @@ boolean sanctum; /* is it the seat of the high priest? */
     struct obj *otmp;
     int cnt;
     int px = 0, py = 0, i, si = rn2(8);
-    struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC];
 
     for (i = 0; i < 8; i++) {
         px = sx + xdir[(i+si) % 8];
@@ -310,10 +310,11 @@ register struct monst *mon;
 char *pname; /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
-            aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
-            high_priest = mon->data == &mons[PM_HIGH_PRIEST];
+            aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
     char whatcode = '\0';
-    const char *what = do_hallu ? rndmonnam(&whatcode) : mon->data->mname;
+    const char *what = do_hallu ? rndmonnam(&whatcode)
+                                : pmname(mon->data, Mgender(mon));
 
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
@@ -416,7 +417,7 @@ int roomno;
 
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
-        sanctum = (priest->data == &mons[PM_HIGH_PRIEST]
+        sanctum = (priest->data == &mons[PM_HIGH_CLERIC]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
         can_speak = (priest->mcanmove && !priest->msleeping);
         if (can_speak && !Deaf && g.moves >= epri_p->intone_time) {
@@ -636,7 +637,7 @@ register struct monst *priest;
                    && (!(HProtection & INTRINSIC)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
-            verbalize("Thy devotion has been rewarded.");
+            verbalize("Thou hast been rewarded for thy devotion.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
                 if (!u.ublessed)
@@ -668,7 +669,7 @@ boolean peaceful;
     register boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
-    if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
+    if (ptr != &mons[PM_ALIGNED_CLERIC] && ptr != &mons[PM_ANGEL])
         return (struct monst *) 0;
 #endif
 
@@ -697,7 +698,7 @@ register struct monst *roamer;
 {
     if (!roamer->isminion)
         return;
-    if (roamer->data != &mons[PM_ALIGNED_PRIEST]
+    if (roamer->data != &mons[PM_ALIGNED_CLERIC]
         && roamer->data != &mons[PM_ANGEL])
         return;
 

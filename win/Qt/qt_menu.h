@@ -10,7 +10,12 @@
 #include "qt_win.h"
 #include "qt_rip.h"
 
+// some menu fields aren't wide enough even though sized for measured text
+#define MENU_WIDTH_SLOP 10 /* this should not be necessary */
+
 namespace nethack_qt_ {
+
+extern uchar keyValue(QKeyEvent *key_event); // also used in qt_xcmd.cpp
 
 class NetHackQtTextListBox : public QListWidget {
 public:
@@ -53,11 +58,14 @@ public:
 
 	virtual QWidget* Widget();
 
-	virtual void StartMenu();
-	virtual void AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-			const QString& str, unsigned itemflags);
+	virtual void StartMenu(bool using_WIN_INVEN = false);
+        virtual void AddMenu(int glyph, const ANY_P *identifier,
+                             char ch, char gch, int attr,
+                             const QString& str, unsigned itemflags);
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
+
+        bool is_invent;         // using core's WIN_INVEN
 
 public slots:
 	void All();
@@ -65,9 +73,9 @@ public slots:
 	void Invert();
 	void Search();
 
-	void ToggleSelect(int);
-        void cellToggleSelect(int, int);
-	void DoSelection(bool);
+        void ToggleSelect(int row, bool alyready_checked);
+        void TableCellClicked(int row, int col);
+        void CheckboxClicked(bool on_off);
 
 protected:
 	virtual void keyPressEvent(QKeyEvent*);
@@ -81,10 +89,11 @@ private:
 		ANY_P identifier;
 		int attr;
 		QString str;
-		int count;
+                long count;
 		char ch;
                 char gch;
-		bool selected;
+                bool selected;      // True if checkbox is set
+                bool preselected;   // True if caller told us to set checkbox
                 unsigned itemflags;
                 unsigned color;
 
@@ -108,19 +117,26 @@ private:
 	// Count replaces prompt while it is being input
 	QString promptstr;
 	QString countstr;
-	bool counting;
+        long biggestcount;      // determines width of field #0
+        int countdigits;        // number of digits to format biggestcount
+        bool counting;          // in midst of entering a count
+        bool searching;         // in midst of entering a search string
 	void InputCount(char key);
 	void ClearCount(void);
 
-	int how;
-
-	bool has_glyphs;
+        int how;                // pick-none, pick-one, pick-any
+        bool has_glyphs;        // at least one item specified a glyph
 
 	bool isSelected(int row);
-	int count(int row);
+        long count(int row);
 
 	void AddRow(int row, const MenuItem& mi);
 	void WidenColumn(int column, int width);
+        void PadMenuColumns(bool split_descr);
+        void MenuResize();
+        void UpdateCountColumn(long newcount);
+
+        void ClearSearch();
 };
 
 class NetHackQtTextWindow : public QDialog, public NetHackQtWindow {
@@ -141,15 +157,21 @@ public slots:
 	void Search();
 
 private slots:
+        void doDismiss();
 	void doUpdate();
+
+protected:
+	virtual void keyPressEvent(QKeyEvent *);
 
 private:
 	bool use_rip;
 	bool str_fixed;
+        bool textsearching;
 
 	QPushButton ok;
 	QPushButton search;
 	NetHackQtTextListBox* lines;
+        char target[BUFSZ];
 
 	NetHackQtRIP rip;
 };
@@ -157,7 +179,7 @@ private:
 class NetHackQtMenuOrTextWindow : public NetHackQtWindow {
 private:
 	NetHackQtWindow* actual;
-    QWidget *parent;
+        QWidget *parent;
 
 public:
 	NetHackQtMenuOrTextWindow(QWidget *parent = NULL);
@@ -171,9 +193,10 @@ public:
 	virtual void PutStr(int attr, const QString& text);
 
 	// Menu
-	virtual void StartMenu();
-	virtual void AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
-			const QString& str, unsigned itemflags);
+        virtual void StartMenu(bool using_WIN_INVENT = false);
+        virtual void AddMenu(int glyph, const ANY_P *identifier,
+                             char ch, char gch, int attr,
+                             const QString& str, unsigned itemflags);
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 

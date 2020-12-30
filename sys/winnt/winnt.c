@@ -1,4 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date: 1524321419 2018/04/21 14:36:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	winnt.c	$NHDT-Date: 1596498321 2020/08/03 23:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -483,23 +483,6 @@ char *buf;
 }
 #endif /* RUNTIME_PORT_ID */
 
-/* nhassert_failed is called when an nhassert's condition is false */
-void nhassert_failed(const char * exp, const char * file, int line)
-{
-    char message[128];
-    _snprintf(message, sizeof(message),
-                "NHASSERT(%s) in '%s' at line %d\n", exp, file, line);
-
-    if (IsDebuggerPresent()) {
-        OutputDebugStringA(message);
-        DebugBreak();
-    }
-
-    // strip off the newline
-    message[strlen(message) - 1] = '\0';
-    error(message);
-}
-
 void
 nethack_exit(code)
 int code;
@@ -732,6 +715,32 @@ sys_random_seed(VOID_ARGS)
         ourseed = (unsigned long) datetime;
     }
     return ourseed;
+}
+
+/* nt_assert_failed is called when an nhassert's condition is false */
+void
+nt_assert_failed(expression, filepath, line)
+    const char * expression;
+    const char * filepath;
+    int line;
+{
+    const char * filename;
+
+    filename = strrchr(filepath, '\\');
+    filename = (filename == NULL ? filepath : filename + 1);
+
+    if (IsDebuggerPresent()) {
+        char message[BUFSIZ];
+        snprintf(message, sizeof(message), 
+            "nhassert(%s) failed in file '%s' at line %d",
+            expression, filename, line);
+        OutputDebugStringA(message);
+        DebugBreak();
+    }
+
+    /* get file name from path */
+    impossible("nhassert(%s) failed in file '%s' at line %d",
+                expression, filename, line);
 }
 
 #endif /* WIN32 */

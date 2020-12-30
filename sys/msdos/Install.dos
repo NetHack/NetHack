@@ -1,30 +1,25 @@
 
-	   Copyright (c) NetHack PC Development Team 1990-2002.
+	   Copyright (c) NetHack PC Development Team 1990-2020.
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
-		     NetHack 3.6 on a DOS system
+		     NetHack 3.7 on a DOS system
          ======================================================
-                   (or, How to make PC NetHack 3.6)
-                 Last revision: $NHDT-Date: 1432512791 2015/05/25 00:13:11 $
+                   (or, How to make PC NetHack 3.7)
+        Last revision: $NHDT-Date: 1596508786 2020/08/04 02:39:46 $
 
-Credit for a runnable full PC NetHack 3.6 goes to the PC Development team
-of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer, 
-Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson, 
+Credit for a runnable full PC NetHack 3.7 goes to the PC Development team
+of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer,
+Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson,
 Stephen White, Ken Washikita and Janet Walz.  The present port is based
 on the previous effort of Pierre Martineau, Stephen Spackman, Steve Creps, Mike
 Threepoint, Mike Stephenson, Norm Meluch and Don Kneller.
 
-There has been very little port-specific maintenance for NetHack on DOS since 
-NetHack 3.3.0.
-
 CONTENTS:
 
-        I.  Dispelling the Myths
-        II. Compiling on a DOS machine
-        Appendix A - Building the "official binary"
-        Appendix B - DJGPP Compiler (gcc ported to msdos) notes
-        Appendix C - Additional Notes
+        I.   Dispelling the Myths
+        II.  Compiling on Linux or macOS via cross-compiler
+        Appendix A - Additional Notes
         Appendix D - Contacting Us
 
 I.  Dispelling the Myths:
@@ -33,233 +28,86 @@ I.  Dispelling the Myths:
     however it will behoove you to read this entire file through before
     beginning the task.
 
-    We have provided a proper Makefile for building NetHack using the
-    following compilers:
-    	djgpp V2.03 or later
 
-    For specific details concerning the djgpp compiler, please see the
-    appendix B.
+II. There once was a time when people built NetHack right on their DOS machine.
+    The arcane recipe often involved flat cylinders known as "floppy disks",
+    much gnashing of teeth, squeezing large things into small spaces, and
+    required the sacrifice of copious amounts of time and coffee.
 
-    The makefile named Makefile.GCC is for use with GNU Make that
-    accompanies djgpp.
+    These days, to compile your copy of NetHack on Linux or macOS machine using
+    Andrew Wu's djgpp cross-compiler from:
+        https://github.com/andrewwutw/build-djgpp
+    downloaded from:
+        https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/ 
+    a DOS-extender (for including in msdos packaging) from:
+        http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
+    and pdcurses from:
+        https://github.com/wmcbrine/PDCurses.git
+    and Lua from:
+        http://www.lua.org/ftp/lua-5.4.1.tar.gz
 
-    If you want to build a copy of NetHack that is identical to the
-    "official binary", please see appendix A.
+    - A shell script to download the above-mentioned djgpp cross-compiler and
+      associated support pieces for either linux or macOS is available:
+        sh sys/msdos/fetch-cross-compiler.sh
 
-    The unsupported sys/msdos/Makefile.MSC was for the old 16 bit
-    Microsoft Visual C 1.52c compiler and has not been made compliant
-    with 3.5.x.
+    That script won't install anything, it just does file fetches and stores
+    them in subfolders of lib. The linux.2020 and macOS.2020 hints files are
+    configured to find the cross-compiler there if you add
+        CROSS_TO_MSDOS=1
+    on your make command line.
 
-    You may find it useful to obtain copies of lex (flex) and yacc (bison
-    or byacc).  While not strictly necessary to compile nethack, they are 
-    required should you desire to make any changes to the level and dungeon 
-    compilers.  Flex and Bison are included with the DJGPP distribution and 
-    are also available on many archive sites. 
+    Note: Both the fetch-cross-compiler.sh script and and the msdos
+    cross-compile and package procedures require unzip and zip to be available
+    on your host build system.
 
-    Also be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and 
-    touch.exe, since the Makefile uses them by default.
+    On your linux host:
 
-II. To compile your copy of NetHack on a DOS machine:
-    (or "just follow these few 'simple' steps outlined below.")
+        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        make fetch-lua
 
-1.  It almost goes without saying that you should make sure that your tools
-    are set up and running correctly.
+    On your macOS host:
 
-2.  Make sure all the NetHack files are in the appropriate directory
-    structure.  You should have a main directory with subdirectories
-    dat, doc, include, src, sys\share, sys\msdos, util, win\tty and
-    win\share.  Other subdirectories may also be included in your
-    distribution, but they are not necessary for use with DOS.  You can
-    delete them to save space.
+        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        make fetch-lua
 
-    Required Source Directories for DOS NetHack:
+    The MSDOS cross-compile can then be carried out by specifying
+    CROSS_TO_MSDOS=1 on the make command line:
 
-                           (top)
-                             |
-        ------------------------------------------------- 
-        |       |     |        |       |     |          | 
-       util    dat   doc    include   src   sys        win
-                                             |          |
-                                          ------      ----- 
-                                          |    |      |   |  
-                                       share msdos   tty share
+        make CROSS_TO_MSDOS=1 all
+        make CROSS_TO_MSDOS=1 package
 
-    Check the file "Files" in your top level directory for an exact
-    listing of what files are in which directory.  In order for the
-    Makefiles to work, all the source files must be in the proper
-    locations.
+    You can explicitly include tty and curses support if desired. The default
+    you'll end up with is a tty-only cross-compile build:
 
-    If you downloaded or ftp'd the sources from a UNIX system, the lines
-    will probably end in UNIX-style newlines, instead of the carriage
-    return and line feed pairs used by DOS.  Some programs have trouble
-    with them, so you may need to convert them (with a utility like
-    Rahul Dhesi's "flip").
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
 
-3.  Go to the sys/msdos directory and ensure that the file setup.bat
-    has MSDOS style end-of-line characters rather than UNIX style
-    end-of-line characters.  You can do that using a utility like
-    Rahul Dhesi's "flip", or by invoking the MSDOS edit utility on
-    setup.bat and saving the file without making any changes. Failure to
-    do this will prevent the bat file from executing completely, yet no
-    warning message will be given.
+    Result: The "make package" target will bundle all of the necessary
+            components to run NetHack on msdos into a folder:
+                targets/msdos/pkg
+            and then it zips the contents of that folder into:
+                targets/msdos/nh370dos.zip
 
-    Run the setup.bat batch file with the following as the argument:
+    Also note that building the msdos targets using the make command
+    above, does not preclude you from building local linux or macOS
+    targets as well. Just drop the CROSS_TO_MSDOS=1 from the make
+    command line. That's because the cross-compiler hints additions are
+    enclosed inside ifdef sections and won't interfere with the
+    non-cross-compile build in that case.
 
-       GCC        For djgpp and GNU MAKE.
+Appendix A - Additional Notes
 
-    The appropriate and necessary Makefile movement will be accomplished
-    for you, as well as verifying a few files and fixing a few file names
-    on FAT systems with long file name support.
-
-4.  Now go to the include subdirectory to check a couple of the header
-    files there.  Things *should* work as they are, but since you have
-    probably set up your system in some sort of custom configuration
-    it doesn't hurt to check out the following:
-
-    First check config.h according to the comments to match your system and
-    desired set of features.  Mostly you need to check the WIZARD option,
-    and check TERMLIB and COMPRESS.  Also be sure to leave DLB support 
-    commented out in config.h.  MSDOS has support for DLB, but it must be 
-    done through the Makefile, rather than config.h, to ensure that the 
-    necessary packaging steps are done.
-
-    We've managed to enable all the special features.  You may include all
-    or as few of them as you wish.  To conserve disk space, you may wish
-    to disable LOGFILE and NEWS.
-
-    Also check pcconf.h, which should not need much editing (if you are
-    including random.c, and if you do not require termcap for screen
-    management).  If you are not including random.c you will need to
-    comment out RANDOM.
-
-    If using DJGPP, you can choose between SCREEN_BIOS
-    and SCREEN_DJGPPFAST.  Never, never, ever choose both.  Bad things
-    will happen.  We are not kidding.
-
-5.  If you want to change the high score list behavior, examine the top of
-    topten.c, in the src directory.  You may want to change the definitions of
-    PERSMAX, POINTSMIN, and ENTRYMAX.  We set POINTSMIN to 51 and ENTRYMAX to
-    50 to keep the size of the score list down.
-
-6.  Go to the src directory and edit the top of your Makefile.  Be sure the
-    directory you want the game installed in (GAMEDIR) actually exists.
-
-7.  Now that everything is set up,
-
-       Go to the src directory, and using the GNU Make utility,
-       "make install".
-
-    Depending on your particular machine and compiler, you can either
-    grab a cup of coffee or go home for the day.  Your computer will be
-    occupied for quite some time.  If all goes well, you will get an
-    NetHack executable.
-
-9.  If you chose DLB support (recommended), make sure that the file nhdat 
-    got copied into the game directory.
-
-    If you didn't choose DLB support, make sure the support files --
-    data, rumors, cmdhelp, opthelp, help, hh,history, guidebook.txt
-    license, and all the *.lev files -- were copied to the game directory.  
-    If not, move them there from the dat directory yourself.  rumors can 
-    be created manually be entering "makedefs -r", data by entering 
-    "makedefs -d".
-
-    Make sure the files NetHack1.tib and NetHacko.tib made it to your game
-    directory.  Copy them from src to the game directory yourself if
-    necessary.
-
-    Make sure the files defaults.nh and termcap made it to your game
-    directory.  If not, go to sys\share and copy NetHack.cnf to
-    your game directory as defaults.nh.  The name in previous versions was
-    nethack.cnf, but the CNF extension conflicted with the MS Windows
-    speed-dialer, making the file hidden on many machines.
-
-    If you changed your build settings to include TERMCAP support, copy
-    termcap to your game directory.  
-
-    Also, make sure the file msdoshlp.txt made it to your game directory.
-    If it didn't, move it from sys\msdos to your game directory
-    yourself.
-
-10. In your game directory, review the settings in defaults.nh and adjust
+1. In your game directory, review the settings in defaults.nh and adjust
     them according to your style of play.
 
-11. Play NetHack.  If it works, you're done!
-
-Appendix A - Building the "official binary"
-
-    If you wish to build a copy of NetHack identical to the one that
-    the pc team distributes, simply do the following:
-
-    The 32-bit Protected Mode DPMI version built with 32-bit djgpp 
-    compiler V2.03 or greater, make no changes to any of the defines and use 
-    the Makefile.GCC as distributed, and as moved in step 3.
-
-    Paths below are relative to the top of your unpacked
-    NetHack source distribution:
-
-       md \nethack\binary   (must match Makefile)
-       cd sys\msdos
-       setup GCC
-       cd ..\..\src
-       make install
-
-
-    Make sure the following files have been converted from the
-    unix style "^J" end of line, to the msdos style "^M^J":
-      license, defaults.nh.
-
-    Place all the files in a clean directory and test.
-
-Appendix B - DJGPP Compiler (gcc ported to msdos)
-
-    If you have a 386 or better machine, you are in luck.  You can compile
-    NetHack without spending money on a compiler.  DJGPP is available free
-    from many archive sites.
-    At the time of this release in April 2002, the URL
-	http://www.delorie.com/djgpp/zip-picker.html/
-    had information on how to obtain djgpp and what pieces to get.
-    Be sure to pick up djgpp v2gnu/fil41b.zip to get ls.exe and 
-    touch.exe, since the Makefile uses them by default (or change
-    the Makefile to use alternatives).
-
-    Special note for Windows 2000 / Windows XP users: You must have a 
-    recent djgpp distribution for the build process, and the generated
-    executables to work properly on those platforms.
-
-    Setting up DJGPP is more than adequately explained in the documentation
-    that comes with it.  Be sure to pick up the yacc and flex built with
-    DJGPP if you intend to do any modification of the special levels or
-    dungeon compilers.  They should be available at the same place you got
-    djgpp.
-
-    The latest version of djgpp, V2.03 with the most recent refresh
-    will produce a binary that will run under Microsoft Windows, or any 
-    other DPMI provider.  djgpp also comes with a DPMI provider called CWSDPMI.  
-    Place CWSDPMI.EXE in your path and it will be used in the absence of any 
-    other DPMI provider.
-
-    If you want to use the built-in DJGPP screen routines, uncomment
-    SCREEN_DJGPPFAST in pcconf.h (the default for djgpp).
-
-Appendix C - Additional Notes
-
-1)  Save files and bones files from versions of NetHack prior to 3.5.0 will not
-    work with this NetHack.  Don't bother trying to keep them.
-
-2)  To install an update of NetHack after changing something, type 'make' 
-    for DJGPP from the src directory.  If you add, delete, or reorder monsters or
-    objects, or you change the format of saved level files, delete any save
-    and bones files.  (Trying to use such files sometimes produces amusing
-    confusions on the game's part, but usually crashes.)
-
+2. Play NetHack.  If it works, you're done!
 
 Appendix D - Contacting the Development Team
 
     If you discover a bug and wish to report it, or if you have comments
     or suggestions we recommend using
     our "Contact Us" web page at:
-        http://www.nethack.org/common/contact.html
+        https://www.nethack.org/common/contact.html
 
     If you don't have access to the web, or you want to send us a patch
     to the NetHack source code feel free to drop us a line c/o:

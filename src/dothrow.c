@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1584398443 2020/03/16 22:40:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1608673690 2020/12/22 21:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -23,8 +23,9 @@ static boolean FDECL(mhurtle_step, (genericptr_t, int, int));
 static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
                                            ALL_CLASSES, WEAPON_CLASS, 0 };
 /* different default choices when wielding a sling (gold must be included) */
-static NEARDATA const char bullets[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES,
-                                         GEM_CLASS, 0 };
+static NEARDATA const char t_bullets[] = {
+    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0
+};
 
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
@@ -38,7 +39,7 @@ struct obj *launcher; /* can be NULL */
     schar skill = objects[ammo->otyp].oc_skill;
 
     switch (pm) {
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         /* give bonus for low-tech gear */
         if (skill == -P_SLING || skill == P_SPEAR)
             multishot++;
@@ -157,7 +158,7 @@ int shotlimit;
                          : obj->oclass == WEAPON_CLASS)
         && !(Confusion || Stunned)) {
         /* some roles don't get a volley bonus until becoming expert */
-        weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_PRIEST)
+        weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_CLERIC)
                          || (Role_if(PM_HEALER) && skill != P_KNIFE)
                          || (Role_if(PM_TOURIST) && skill != -P_DART)
                          /* poor dexterity also inhibits multishot */
@@ -295,7 +296,7 @@ dothrow()
     if (!ok_to_throw(&shotlimit))
         return 0;
 
-    obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+    obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
@@ -407,7 +408,7 @@ dofire()
                use direction of previous throw as getobj()'s choice here */
             g.in_doagain = 0;
             /* choose something from inventory, then usually quiver it */
-            obj = getobj(uslinging() ? bullets : toss_objs, "throw");
+            obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
                 setuqwep(obj); /* demi-autoquiver */
@@ -450,11 +451,32 @@ boolean verbosely; /* usually True; False if caller has given drop message */
         dropy(obj);
         return;
     }
-    if (IS_ALTAR(levl[u.ux][u.uy].typ))
+    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
         doaltarobj(obj);
-    else if (verbosely)
-        pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"),
-              surface(u.ux, u.uy));
+    } else if (verbosely) {
+        const char *surf = surface(u.ux, u.uy);
+        struct trap *t = t_at(u.ux, u.uy);
+
+        /* describe something that might keep the object where it is
+           or precede next message stating that it falls */
+        if (t && t->tseen) {
+            switch (t->ttyp) {
+            case TRAPDOOR:
+                surf = "trap door";
+                break;
+            case HOLE:
+                surf = "edge of the hole";
+                break;
+            case PIT:
+            case SPIKED_PIT:
+                surf = "edge of the pit";
+                break;
+            default:
+                break;
+            }
+        }
+        pline("%s %s the %s.", Doname2(obj), otense(obj, "hit"), surf);
+    }
 
     if (hero_breaks(obj, u.ux, u.uy, TRUE))
         return;
@@ -935,10 +957,15 @@ boolean broken;
         /* ushops0: in case we threw while levitating and recoiled
            out of shop (most likely to the shk's spot in front of door) */
         if (*oshops == *u.ushops || *oshops == *u.ushops0) {
-            if (is_unpaid(obj))
+            if (is_unpaid(obj)) {
+                long gt = Has_contents(obj) ? contained_gold(obj, TRUE) : 0L;
+
                 subfrombill(obj, shkp);
-            else if (x != shkp->mx || y != shkp->my)
+                if (gt > 0L)
+                    donate_gold(gt, shkp, TRUE);
+            } else if (x != shkp->mx || y != shkp->my) {
                 sellobj(obj, x, y);
+            }
         }
     }
 }
@@ -1071,7 +1098,7 @@ boolean hitsroof;
         }
         hitfloor(obj, TRUE);
         g.thrownobj = 0;
-        losehp(Maybe_Half_Phys(dmg), "falling object", KILLED_BY_AN);
+        losehp(dmg, "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }
@@ -1611,7 +1638,13 @@ register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
         tmp += 1000; /* Guaranteed hit */
     }
 
-    if (obj->oclass == GEM_CLASS && is_unicorn(mon->data)) {
+    /* throwing real gems to co-aligned unicorns boosts Luck,
+       to cross-aligned unicorns changes Luck by random amount;
+       throwing worthless glass doesn't affect Luck but doesn't anger them;
+       3.7: treat rocks and gray stones as attacks rather than like glass
+       and also treat gems or glass shot via sling as attacks */
+    if (obj->oclass == GEM_CLASS && is_unicorn(mon->data)
+        && objects[obj->otyp].oc_material != MINERAL && !uslinging()) {
         if (mon->msleeping || !mon->mcanmove) {
             tmiss(obj, mon, FALSE);
             return 0;
@@ -1628,8 +1661,8 @@ register struct obj *obj; /* g.thrownobj or g.kickedobj or uwep */
        at leader... (kicked artifact is ok too; HMON_APPLIED could
        occur if quest artifact polearm or grapnel ever gets added) */
     if (hmode != HMON_APPLIED && quest_arti_hits_leader(obj, mon)) {
-        /* AIS: changes to wakeup() means that it's now less inappropriate here
-           than it used to be, but the manual version works just as well */
+        /* AIS: changes to wakeup() means that it's now less inappropriate
+           here than it used to be, but manual version works just as well */
         mon->msleeping = 0;
         mon->mstrategy &= ~STRAT_WAITMASK;
 
@@ -1823,15 +1856,16 @@ gem_accept(mon, obj)
 register struct monst *mon;
 register struct obj *obj;
 {
+    static NEARDATA const char
+        nogood[]     = " is not interested in your junk.",
+        acceptgift[] = " accepts your gift.",
+        maybeluck[]  = " hesitatingly",
+        noluck[]     = " graciously",
+        addluck[]    = " gratefully";
     char buf[BUFSZ];
     boolean is_buddy = sgn(mon->data->maligntyp) == sgn(u.ualign.type);
     boolean is_gem = objects[obj->otyp].oc_material == GEMSTONE;
     int ret = 0;
-    static NEARDATA const char nogood[] = " is not interested in your junk.";
-    static NEARDATA const char acceptgift[] = " accepts your gift.";
-    static NEARDATA const char maybeluck[] = " hesitatingly";
-    static NEARDATA const char noluck[] = " graciously";
-    static NEARDATA const char addluck[] = " gratefully";
 
     Strcpy(buf, Monnam(mon));
     mon->mpeaceful = 1;
@@ -1851,7 +1885,8 @@ register struct obj *obj;
             Strcat(buf, nogood);
             goto nopick;
         }
-        /* making guesses */
+
+    /* making guesses */
     } else if (has_oname(obj) || objects[obj->otyp].oc_uname) {
         if (is_gem) {
             if (is_buddy) {
@@ -1865,7 +1900,8 @@ register struct obj *obj;
             Strcat(buf, nogood);
             goto nopick;
         }
-        /* value completely unknown to @ */
+
+    /* value completely unknown to @ */
     } else {
         if (is_gem) {
             if (is_buddy) {

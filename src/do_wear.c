@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1592951498 2020/06/23 22:31:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1605578866 2020/11/17 02:07:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -424,6 +424,14 @@ Helmet_on(VOID_ARGS)
                 pline("%s %s for a moment.", Tobjnam(uarmh, "glow"),
                       hcolor(NH_BLACK));
             curse(uarmh);
+            /* curse() doesn't touch bknown so doesn't update persistent
+               inventory; do so now [set_bknown() calls update_inventory()] */
+            if (Blind)
+                set_bknown(uarmh, 0); /* lose bknown if previously set */
+            else if (Role_if(PM_CLERIC))
+                set_bknown(uarmh, 1); /* (bknown should already be set) */
+            else if (uarmh->bknown)
+                update_inventory(); /* keep bknown as-is; display the curse */
         }
         g.context.botl = 1; /* reveal new alignment or INT & WIS */
         if (Hallucination) {
@@ -758,6 +766,8 @@ Amulet_on()
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
             g.context.botl = 1;
+            newsym(u.ux, u.uy); /* glyphmon flag and tile may have gone
+                                   from male to female or vice versa */
         } else
             /* already polymorphed into single-gender monster; only
                changed the character's base sex */
@@ -1982,6 +1992,7 @@ struct obj *obj;
                     answer = yn_function(qbuf, "rl", '\0');
                     switch (answer) {
                     case '\0':
+                    case '\033':
                         return 0;
                     case 'l':
                     case 'L':
@@ -2204,19 +2215,26 @@ find_ac()
         uac -= u.ublessed;
     uac -= u.uspellprot;
 
-    /* [The magic binary numbers 127 and -128 should be replaced with the
-     * mystic decimal numbers 99 and -99 which require no explanation to
-     * the uninitiated and would cap the width of a status line value at
-     * one less character.]
-     */
-    if (uac < -128)
-        uac = -128; /* u.uac is an schar */
-    else if (uac > 127)
-        uac = 127; /* for completeness */
+    /* put a cap on armor class [3.7: was +127,-128, now reduced to +/- 99 */
+    if (abs(uac) > AC_MAX)
+        uac = sgn(uac) * AC_MAX;
 
     if (uac != u.uac) {
         u.uac = uac;
         g.context.botl = 1;
+#if 0
+        /* these could conceivably be achieved out of order (by being near
+           threshold and putting on +N dragon scale mail from bones, for
+           instance), but if that happens, that's the order it happened;
+           also, testing for these in the usual order would result in more
+           record_achievement() attempts and rejects for duplication */
+        if (u.uac <= -20)
+            record_achievement(ACH_AC_20);
+        else if (u.uac <= -10)
+            record_achievement(ACH_AC_10);
+        else if (u.uac <= 0)
+            record_achievement(ACH_AC_00);
+#endif
     }
 }
 

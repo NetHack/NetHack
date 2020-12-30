@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1594169990 2020/07/08 00:59:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1608933417 2020/12/25 21:56:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -58,14 +58,13 @@
 /* #define CURSES_GRAPHICS *//* Curses interface - Karl Garrison*/
 /* #define X11_GRAPHICS */   /* X11 interface */
 /* #define QT_GRAPHICS */    /* Qt interface */
-/* #define GNOME_GRAPHICS */ /* Gnome interface */
 /* #define MSWIN_GRAPHICS */ /* Windows NT, CE, Graphics */
 
 /*
  * Define the default window system.  This should be one that is compiled
  * into your system (see defines above).  Known window systems are:
  *
- *      tty, X11, mac, amii, BeOS, Qt, Gem, Gnome
+ *      tty, X11, mac, amii, BeOS, Qt, Gem, Gnome, shim
  */
 
 /* MAC also means MAC windows */
@@ -103,16 +102,24 @@
 #ifndef NOUSER_SOUNDS
 #define USER_SOUNDS /* Use sounds */
 #endif
+#ifndef USE_XPM
 #define USE_XPM           /* Use XPM format for images (required) */
+#endif
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#endif
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "Qt"
 #endif
 #endif
 
 #ifdef GNOME_GRAPHICS
+#ifndef USE_XPM
 #define USE_XPM           /* Use XPM format for images (required) */
+#endif
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#endif
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "Gnome"
 #endif
@@ -125,13 +132,21 @@
 #define HACKDIR "\\nethack"
 #endif
 
+#ifdef TTY_GRAPHICS
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "tty"
+#endif
 #endif
 
 #ifdef CURSES_GRAPHICS
 #ifndef DEFAULT_WINDOW_SYS
 #define DEFAULT_WINDOW_SYS "curses"
+#endif
+#endif
+
+#ifdef SHIM_GRAPHICS
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "shim"
 #endif
 #endif
 
@@ -146,7 +161,9 @@
  */
 /* # define USE_XPM */ /* Disable if you do not have the XPM library */
 #ifdef USE_XPM
+#ifndef GRAPHIC_TOMBSTONE
 #define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.xpm) */
+#endif
 #endif
 #ifndef DEFAULT_WC_TILED_MAP
 #define DEFAULT_WC_TILED_MAP /* Default to tiles */
@@ -440,23 +457,14 @@ typedef unsigned char uchar;
 /* #define STRNCMPI */ /* compiler/library has the strncmpi function */
 
 /*
- * There are various choices for the NetHack vision system.  There is a
- * choice of two algorithms with the same behavior.  Defining VISION_TABLES
- * creates huge (60K) tables at compile time, drastically increasing data
- * size, but runs slightly faster than the alternate algorithm.  (MSDOS in
- * particular cannot tolerate the increase in data size; other systems can
- * flip a coin weighted to local conditions.)
+ * Vision choices.
  *
- * If VISION_TABLES is not defined, things will be faster if you can use
- * MACRO_CPATH.  Some cpps, however, cannot deal with the size of the
- * functions that have been macroized.
+ * Things will be faster if you can use MACRO_CPATH.  Some cpps, however,
+ * cannot deal with the size of the functions that have been macroized.
  */
 
-/* #define VISION_TABLES */ /* use vision tables generated at compile time */
-#ifndef VISION_TABLES
 #ifndef NO_MACRO_CPATH
 #define MACRO_CPATH /* use clear_path macros instead of functions */
-#endif
 #endif
 
 #if !defined(MAC)
@@ -465,7 +473,12 @@ typedef unsigned char uchar;
 #endif
 #endif
 
-#define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
+/* The "repeat" key used in cmd.c as NHKF_DOAGAIN; if commented out or the
+ * value is changed from C('A') to 0, it won't be bound to any keystroke
+ * unless you use the run-time configuration file's BIND directive for it.
+ * [Note: C() macro isn't defined yet but it will be before DOAGAIN is used.]
+ */
+#define DOAGAIN C('A') /* repeat previous command; default is ^A, '\001' */
 
 /* CONFIG_ERROR_SECURE: If user makes NETHACKOPTIONS point to a file ...
  *  TRUE: Show the first error, nothing else.

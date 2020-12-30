@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ $NHDT-Date: 1594395803 2020/07/10 15:43:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1609281273 2020/12/29 22:34:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -126,14 +126,16 @@ it's possible to wish for tins of the Riders in wizard mode; eating one is
 	fatal but if you're life-saved or decline to die, the game crashed
 revival via undead turning of corpse carried by hero said "your <mon> corpse
 	comes alive" even when revived monster was undead
-prevent searching or waiting next to a hostile monster - override with 'm'
+prevent searching or waiting next to a hostile monster if boolean option
+	safe_wait is on - override with 'm'
 allow random mimics to show up mimicing more furniture than just stairs
 scatter exploding bag of holding contents instead of outright deleting them
 male hero poly'd into nymph chooses charm vs seduce message based on being
 	male rather than on all nymphs being female but charm message was
 	using hardcoded pronouns She,her for target monster--wrong for male
 	target and noticable if "<mon> finishes taking off his suit" is given
-hostile monsters with launcher and ammo try to stay away from melee range
+hostile monsters with a spit attack or launcher and ammo try to stay away
+	from melee range
 allow displacing peaceful creatures
 unicorn horns don't restore attribute loss anymore
 when a shop is changed from food to health food, change room type to match
@@ -217,6 +219,141 @@ the default engraving, epitaph, and bogus monster inserted by 'makedefs -s'
 	when the corresponding file wasn't actually empty its first line ended
 	up concatenated; default portion of the bad combined entry would be
 	decrypted properly but the portion from the file's first line wouldn't
+if the Wizard of Yendor fled up the stairs on level 1, the game would behave
+	as if he was still in play, but he wouldn't be on migrating monsters
+	list so couldn't be brought back and wouldn't appear on Plane of Earth
+	(stale non-zero value for context.no_of_wizards)
+if a mind flayer's psychic blast targetted a hidden monster, feedback named
+	the monster but it wasn't brought out of hiding
+hero poly'd into a mind flayer who used #monster to emit a psychic blast was
+	able to harm mindless monsters with it
+some hero attacks that should have gotten a skill bonus or penalty didn't
+change internal name of "<foo> venom" to "splash of <foo> venom"
+some operations that made sense to handle venom ('D', scroll of identify, no
+	doubt others) ignored it because venom is suppressed from packorder;
+	matters for wizard mode or for normal play that loads wizard bones
+singularize "splashes" to "splash" instead of "splashe"
+treat slinging gems and tossing or slinging stones at unicorns as attacks
+give rot-away timer instead of revive timer to corpses of cancelled trolls
+switch revive timer to rot-away timer if a troll corpse gets cancelled
+uncancel an ice troll if its corpse is put into an ice box; give corpse a
+	revive timer if later taken out
+splitting a stack of candy bars gave new wrapper text depending upon the
+	obj->o_id value assigned; keep existing text for both halves of stack
+	(side-effect: separate candy bars usually won't merge anymore)
+describing tin variety (deep fried, pureed, &c) relied on the 'contents known'
+	flag but object identification wasn't setting obj->cknown for tins
+wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
+	intended because the check for that was being made too soon
+chatting to the quest leader in wizard mode with sufficient experience level
+	and insufficient piety, player is asked whether alignment should be
+	boosted; answering 'n' resulted in being prompted a second time
+leashing or unleashing pets wasn't updating persistent inventory window
+end of game inventory disclosure passed an inappropriate argument to the
+	inventory display routine; not noticeable for tty and curses,
+	noticeable but not harmful for X11, and slightly harmful for Qt
+turning into slime rendered hero as slime one turn too soon
+avoid potential infinite loop if hangup occurs at ring "right or left?" prompt
+randomize the turns where accessories and extrinsics affect nutrition
+handle being interrupted by approaching monsters more consistently
+if hero attacked a peaceful monster, some other peaceful monsters with humanoid
+	shape (minotaur, zruty, perhaps others) that witnessed it but which
+	shouldn't be capable of normal speech expressed their surprise audibly
+make gasp/exclamation message from peaceful monsters be more verbose to
+	indicate which monster is doing the gasping or exclaiming
+when make was invoked with -j makedefs instances could end up running in
+	parallel and could trample on each other's temp files; default to
+	using mkstemp(); allow a port runtime library implementation that lacks
+	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
+	provide a work-alike mkstemp() implementation for windows visual studio
+	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
+make piranhas faster and give them extra bite attack
+fire sources can ignite candles, lamps, and potions of oil
+for multiple drop ('D') with menustyle traditional or combination, if the only
+	object class player picked was '$' then it operated on all classes
+small monsters could seep through their shirt
+don't snuff brass lantern when it's hit by water unless it is submerged
+when reporting that hero can't repair a chest's broken lock with key/pick/card
+	just describe the base item without BUC, user assigned name, &c since
+	"You can't repair a chest's lock with an uncursed key." implicitly
+	suggests that you might be able to do so with a blessed or cursed one
+pre-populate teleport destination prompt with travel destination
+ghosts cannot be renamed
+tossed upwards objects got two times half physical damage reduction
+monster xorns could pass through iron bars but not eat them; monster rock
+	moles could no neither; now they can eat bars when adjacent and will
+	do so if the bars are blocking their path
+hero poly'd into rust monster could implicitly eat bars when adjacent by
+	trying to move there, now when in rock mole form too; in xorn form
+	can explicitly eat them via 'e' after moving onto their spot
+monster hiding under an egg that hatched was kept hidden
+restful sleep regenerates hit points
+attacking non-adjacent concealed mimic by applying a polearm would make the
+	hero be stuck to that mimic
+hero could break a wand ("raising the wand high over your head, you break it
+	in two") even if hands were welded to a two-handed weapon or to a
+	one-handed weapon and also to a shield
+if a monster threw a cocktrice egg at the hero but hit and petrified another
+	monster, the hero would get credit/blame for killing it
+update persistent inventory when putting on a helmet causes it to auto-curse
+since ki-rin look quite a bit like unicorns, make them be more like one:
+	allow them to use their own horn to cure themselves; remove M1_ANIMAL,
+	change MS_NEIGH to MS_SPELL, add MR_POISON, use horse body parts;
+	they're still 'A' rather than 'u' and don't care about gems
+wand/scroll of create monster or bag of tricks that makes a new monster which
+	can be seen or sensed becomes discovered, but was doing so even for a
+	concealed mimic seen as furniture or an object
+'showscore' could be used to determine how much gold was inside a container
+	whose contents were unknown
+wizard mode (only way to get timed flying): if levitation and flying time out
+	on same turn, player was told "You have stopped levitating and are
+	now flying."; status line wasn't updated to remove stale Fly condition
+throwing or kicking a shop container (that's light enough to move) made the
+	hero pay for any gold inside, then didn't refund that amount if the
+	container landed inside the shop
+try to fix message sequencing for tame golems that "roast/rot/rust in peace"
+autodescribe when moving the cursor was erroneously honoring MSGTYPE=stop
+	and potentially delivering sounds
+reduce the number of "seeXYZ" commands by renaming some: #seenv -> #wizseenv,
+	#seegold -> #showgold, #seespells -> #showspells, #seetrap -> #showtrap
+when saving while punished or game ends while punished, handling for ball and
+	chain might access freed memory with unpredictable consequences
+brown pudding monster hitting another monster with decay attack corroded armor
+	instead of rotting it
+<?> -> <full key bindings> omitted 'n' prefix and M-digit for number_pad mode,
+	and ^A/re-do was suppressed due lack of obsolete '#define REDO'
+add missing key binding support for rush.numpad; default is M-5 for numpad==1
+	or plain 5 for numpad==2 where behavior of 5 and M-5 are swapped
+allow monsters to use wand of undead turning to revive corpses on floor
+	in some situations
+selling a container to a shop for gold leaves any contents that the shop
+	doesn't ordinarily buy and sell owned by the hero, but selling the
+	container for credit resulted in the shop taking poesession of such
+	contents without giving any additional credit; mark out of place
+	contents 'no_charge' so that hero can reclaim them without buying
+add some new demonic and angelic maledictions
+when fire damage dried a wet towel, it would never reduce the wetness to 0
+when water damage wet a towel, the new wetness might randomly become less
+when the wetness of a towel in inventory changed, persistent inventory wasn't
+	updated to show that
+make Death revive earlier, and all the Riders after 67 turns at latest
+when protection from shape changers begins, force mimic out of concealment
+	even if hero can't see its location; for locations that can be seen,
+	don't make double-trouble Wizard concealed as another monster--or pet
+	temporarily mimicking something while eating mimic corpse--fall asleep
+best possible armor class reduced from -127 to -99; worst from +127 to +99;
+	charged or enchanted individual items also capped at +/- 99 (affects
+	wizard mode wishing, negligible effect on normal play)
+fix several inconsistencies for objects at hole locations
+make repeat (^A) work when bound to some other keystroke
+if a prefix key was bound to some character which ordinarily ran a regular
+	command and that command wasn't bound to another key, typing the
+	prefix followed by a non-movement key behaved strangely:  instead
+	of reporting "invalid direction" it would run the other command
+	(actually depended upon relative order of prefix's new and old key)
+reqmenu (the request-a-menu prefix supported by a handful of non-movement
+	commands) could be bound to some key other than 'm' but it only
+	worked if the new key was also a movement prefix
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -260,6 +397,7 @@ grammar for messages about a monster removing items from a container was bad
 some new status conditions didn't always update when they should
 fix flipping non-existent stairs and ladders (github #311)
 fix door created into random wall or position opening into solid wall
+handle gone portal when going back in quest
 'use_inverse' option was accidentally made Windows-only; change it back to
 	being more general; change its default to True
 change inconsistent achievement spelling of "Mine Town" to "Minetown"
@@ -279,11 +417,70 @@ only generate shop items on solid floor squares
 avoid gcc 10 warning by removing duplicate definition of 'head_engr'
 if a monster removed a corpse from an ice box, the corpse would never rot away
 monster creation on quest levels could make genocided creatures
+enabling wizard mode 'sanity_check' option would complain about invalid mhpmax
+	value for level N monsters created with a d8 value of 1 for all N d8's
+disable that extra check because gremlim HP split after cloning triggers it
+some versions of tiles processing (not X11's) complained about the rename of
+	"{acid,blinding} venom" to "splash of {acid,blinding} venom"
+wizard mode #timeout changed to show timed Displacement in 'can be timed in
+	normal play' section instead of 'timed via #wizintrinsic only' section
+the fix to make worm visibility checks work as intended forced the coordinates
+	of the extra tail segment co-located with the worm monster to match
+	the worm instead of leaving it off the map; place_worm_tail_randomly()
+	reverses the segments and can throw some away if there isn't room,
+	but throwing away the extra segment removed the worm from the map
+using 'O' to try to change 'symset' was a no-op; 'roguesymset' worked
+change default for lit attribute in special level des.terrain directives to
+	'unchanged' instead of 'unlit'
+replace worm tail placement code that reportedly led to a sanity_check warning
+	[no actual code problem found; might be compiler bug for 'xchar']
+learn scroll of teleportation after reading even when random destination is
+	right by starting spot
+fix off-by-one bug in dimensions of theme rooms
+fire/frost horn feedback when zapped by monster was inaccurate (falsely
+	claimed that it was "directed at self" when attacking hero)
+tins of spinach and 'dead' eggs could cause out of array bounds access
+	attempting to index into mons[] by polyfodder() macro
+options help ('? g') listed all boolean options, then repeated them among
+	the compound options; on OSX they showed a description of "(null)"
+	but for other sprintf implementations they might cause a crash
+change name of #wizlevelflip to #wizfliplevel
+dwarves could sometimes pass through walls without digging their way
+fix genetic engineers dropping Schroedinger's cat box
+the checks and handling for fountains, sinks, and drawbridges were being
+	missed during liquid_flow
+monster movement flags unification allowed displacer beasts to displace Riders
+a long worm with no visible segments (but one internal segment) might trigger
+	warning: tail 'segement' at <0,some_y>, worm at <mx,my> if teleported
+adding displacer beast inadvertently introduced a regression in swapping with
+	pets, allowing them to be pulled into water by hero on/over water
+splitting #if MAIL into #if MAIL_STRUCTURES and #if MAIL made it possible to
+	wish for and write scrolls of mail with MAIL disabled, but attempting
+	to read such a scroll issued impossible "What weird effect is this?"
+remove M2_MALE flag that was unintentionally left on dwarf lord/lady/leader
+	entry and was preventing female incarnations
+tilemap.c wasn't building if STATUES_LOOK_LIKE_MONSTERS wasn't defined; also,
+	to match the code that should be defined so change the preprocessor
+	test to 'ifndef STATUES_DONT_LOOK_LIKE_MONSTERS'
+ensure that monster female name variation ends up as a female during ^G
+arbitrate when there is a conflict between gender term (male or female) and
+	a gender-tied monster name (cavewoman) during ^G; gender term wins
+wizard mode sanity check complained about Wizard's clone mimicking a monster
+new ^G gender-naming handling code required a guard against null permonst
+	pointer which could occur under some circumstances
 
+curses: 'msg_window' option wasn't functional for curses unless the binary
+	also included tty support
+Qt: at Xp levels above 20 with 'showexp' On, the combined status field
+	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
+Qt: searching a text window for something that wasn't found and then searching
+	for some other target could crash
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
 	new level after level change when S_unexplored is <space>
+Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
+	left some generated data files which should have been deleted
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
@@ -300,9 +497,102 @@ curses: for vertical status, line up conditions in columns; usually two but
 	used to align entries in their columns--that's a feature...]
 msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
+Qt: quit if can't load tiles file instead of continuing and then segfaulting
+Qt: [later] tiles load failure at startup now continues using an ascii map
+Qt: use more columns for extended command selection dialog so that the number
+	of rows needed doesn't result in some commands being unaccessible
+Qt: suppress wizard mode commands from '#' handling when not in wizard mode
+Qt: organize extended command selection grid by columns instead of by rows
+	(first N entries down left column, next N entries down 2nd column, &c)
+Qt: when selecting an extended command by typing its name, support <delete>
+	(aka <rubout>) in addition to <backspace> to go back a character
+Qt: switch to fixed-width font for menus
+Qt: don't disable [cancel] button when viewing inventory or other pick-none
+	menus; ESC works to dismiss those and [cancel] should be the same
+Qt: clicking on the window's Close button brought up a dialog offering
+	choices of "Save" and "Cancel"; picking Cancel sent nethack into an
+	infinite loop with complaints about Qt's event loop already being
+	active; change dialog: offer "Save and exit" or "Quit without saving"
+	with no opportunity to try to back out of the Close operation
+Qt: add 3.6 status fields Stone, Slime, Strngl, Deaf, Lev, Fly, Ride
+Qt: add Attributes, Overview, and Annotate to the "Info" pull down menu
+Qt: rename menu entries game->Save to game->Save-and-exit and game->Quit
+	to game->Quit-without-saving
+Qt: menu commands are now working; commands invoked via M-c were having that
+	keystroke changed to '?', bringing up nethack's help menu; now those
+	send #abc with just enough letters to disambiguate from other commands
+	("Compilation" is one remaining problem; it yields "#version" which
+	brings up '#' menu subset with choices of "version" and "versionshort")
+Qt: "paper doll" subset of persistent inventory has undergone several changes:
+	show previously missing quiver below weapon instead of duplicating
+	gloves there; show secondary weapon in shield slot and blank out
+	alternate weapon slot when two-weapon combat is active; show wielded
+	two-handed weapon in both the shield and primary weapon slots; show
+	first active light source in a previously unused slot on lower right;
+	show first leash-in-use in a previously unused slot on lower left
+Qt: paper doll inventory view was inconsistently updated during Hallucination
+Qt: when hero died, gold on tombstone only included gold in inventory, not
+	any additional gold inside carried containers; also, inventory gold
+	will be zero if bones get created for all 3.6.x and for 3.4.x+GOLDOBJ
+Qt: tombstone showed newly constructed date instead of the value set up at
+	time of death; it only shows year but that could be wrong if player
+	stared at or ignored prior --More-- for long enough on 31 December
+Qt: menu choices All, None, Invert were setting, unsetting, or toggling menu
+	entry checkboxes internally but didn't redraw the menu to show that
+Qt: fix the F1/F2/Tab macro keys to not require that number_pad be On
+Qt: unhighlight highlighted message (last one issued) after player has seen it
+Qt: update message window's last message with player's response if it's a
+	prompt string for a single-character of input (ynaq or invent letter)
+Qt: for line input, display the prompt+response in the message window
+Qt: enable the popup_dialog WC option (result is a bit flakey but usable)
+Qt: 3.6 catchup - show unexplored locations as unexplored rather than as stone
+Qt: tried to honor 'showexp' but the value was unintentionally suppressed by
+	[lack of definition for] obsolete conditional EXP_ON_BOTL
+Qt: implement --More-- prompt to support MSGTYPE=stop
+Qt: for menu search, don't require clicking on the search target popup before
+	typing target string (was using typed letters to make menu selections
+	if player didn't click on the popup first)
+Qt: rest ("Zz") button on the toolbar only worked when 'rest_on_space' was On
+	(core issue, not Qt's fault)
+Qt: rename toolbar button "Get" and action menu choice "Get" to "Pick up"
+Qt: status icons for alignment|hunger|encumbrance which started out centered
+	relative to the label text below them would shift to being left
+	justified when status got updated
+Qt: handle '&' properly if it occurs as part of yn_function popup dialog
+Qt: fix the display side of saved game selection; character names for
+	available save files are shown in a column of push buttons instead
+	of each button overwriting all the ones before it
+Qt: don't clobber an existing save file after choosing "new game" in the
+	saved game selection widget
+Qt: don't get stuck in a loop after choosing "play" while the character name
+	field is empty in the character selection widget
+Qt: when a new message is issued, pan the message window to its left edge if
+	player panned it horizontally then didn't manually scroll it back
+Qt: there was no way to enter extended command "#version" by typing; command
+	name matching was waiting to disambiguate it from "#versionshort"
+	and the only way to that was to type #version<return> but <return>
+	explicitly triggered rejection, cancelling '#' processing
+Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
+	for instance), clicking on [Search], entering a search target in the
+	resulting popup and clicking on [Okay] or typing <return>, the text
+	window got pushed underneath the main window so seemed to go away
+Qt+OSX: fix control key
+Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
+	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
+	for making persistent Qt customizations to "nethack->Preferences..."
+Qt+OSX: prevent game->Quit-without-saving from being hijacked for the nethack
+	menu by renaming it game->_Quit-without-saving (OSX only)
+Qt+OSX: add a separate nethack->Quit menu entry with different functionality;
+	Command+Q invokes it
+Qt+OSX: since menu entry help->"About Qt NetHack" gets hijacked and becomes
+	"nethack->About nethack", add a separate help->_About_Qt_NetHack_
+	which stays where intended and brings up the same information
+Qt+OSX: suppress unwanted "Search [______]" action from being inserted as the
+	first entry in the menubar's "Help" dropdown menu
 tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
+tty: '$' can now select gold in a menu even when it isn't on current page
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
@@ -380,6 +670,7 @@ for !fixinv option where inventory letters normally don't stick, try to put
 	thrown from; only works if it does return and is successfully caught
 wizard mode #wizborn command
 include more skill information in ^X output when dual-wielding
+include monk's to-hit penalty for worn suit in the status section of ^X output
 item-using monsters will zap wand of undead turning at corpse-wielding hero
 	when the corpse is harmful
 boiling a pool or fountain now creates a temporary cloud of steam
@@ -391,12 +682,47 @@ new monsters:  displacer beast ('f') and genetic engineer ('Q')
 make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
 boolean options can optionally have the form "name:value" with value taken
-	from among "true", "yes", "on", or "false", "no", "off"
+	from among "true", "yes", "on", or 1 and "false", "no", "off", or 0
 record number of wishes and artifact wishes in xlogfile
 give feedback for '#chat' directed at walls
 add 'Sokoban' conduct, tracking the number of times the special Sokoban rules
 	which incur luck penalties have been violated; don't report it
 	unless/until Sokoban branch has been entered
+reduce verbosity when a mind flayer attacks a headless monster; when a
+	tentacle-to-head attack hits but fails to accomplish anything skip
+	remaining attacks (mind flayer has 3, master mind flayer has 5)
+add section marker [] support to run-time config file; CHOOSE section1,section2
+	followed by [section1] ... [section2] ... forced all the rest of the
+	file to be part of the last section; that still works the same, but []
+	can be used to terminate the last section and revert to common options
+	for the remainder of the file
+render the color names in the corresponding color when using the pick-a-color
+	menu for adding status highlights or menu colors via 'O'
+reading blessed scroll of teleportation confers one-shot teleport control
+mild zombie apocalypse
+list lamps and lanterns in charging prompt
+let tourists read conical hats
+when "?i" (show key bindings) displays commands and their keys, also show
+	commands without any key (so ones useable via '#', or possibly menu,
+	only; the majority are debugging commands)
+assign default key binding for <del> or <delete> to execute #terrain
+assign M-X to #exploremode
+make #herecmdmenu and #therecmdmenu autocomplete
+add 'sortdiscoveries' option to control output of '\' and '`' commands
+include an indication of monsters' health during farlook feedback (including
+	/M and autodescribe); also include it in death reason when killed by
+	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
+make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
+	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
+add support for a single monster species to have distinct male, female,
+	and gender-neutral naming terms
+add support for a single monster species to have distinct male and female
+	tiles
+consolidate several monsters that differed only by their gender into their
+	single species
+added wizmgender debugging command to display female monsters in red inverse;
+	helpful for debugging gender-related matters on tty; currently ignored
+	on other window ports
 
 
 Platform- and/or Interface-Specific New Features
@@ -406,6 +732,29 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
+Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
+	dialog box ("Preferences..." on OSX)
+Qt: draw a border around each tile in the paper doll inventory; when BUC is
+	known for a doll item, change the border's color and thicken it
+Qt: letting the mouse hover over the paper doll shows a tool tip describing
+	the object--or lack of same--in the slot under the pointer
+Qt: clicking on the paper doll runs the #seeall command (inventory of wielded
+	and worn items plus tools [lamps, leashes] actively in use; in other
+	words, same set of things whose tiles are used to populate the doll)
+Qt: clicking on the status window runs the #attributes command (^X)
+Qt: add a Search button to the toolbar
+Qt: support the 'hitpointbar' option
+Qt: add Filter, Layout, and Reset buttons to the extended command selector;
+	Filter is only useful in wizard mode, allowing changing the set of
+	extended commands between "all", "normal mode only", "extra wizard
+	mode only"; Layout redisplays the grid of command buttons, toggling
+	from down columns to across rows or vice versa; Reset puts both back
+	to their default settings and clears any pending typed input
+tiles: male and female variations in monsters.txt; tested only with tile2bmp
+	conversion utility so far; also supported by tilemap utility to
+	generate tile.c
+Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
+	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 
 
 NetHack Community Patches (or Variation) Included
@@ -432,10 +781,17 @@ always print a message when the hero level teleports (github #265)
 remove Sokoban luck penalties for actions you can't cheat with (github #260)
 sounds for minotaurs (github #298)
 correct the Guidebook descriptions for msdos video_width and video_height to
-	state that they work with video:vesa; the video:vga setting that was 
+	state that they work with video:vesa; the video:vga setting that was
 	described there forces the 640x480x16 mode where video_width and
 	video_height don't operate (github #294)
 redo rndmonst() to operate in a single pass (github pull request #286)
+fix the "stuck pets" issue (github #329)
+allow themed room subrooms to be filled (github #347)
+allow rereading spellbooks to refresh memory at any time (github #261)
+allow themed rooms constrained by level difficulty (github #344)
+add a varied form of LIBNH nethack library contribution (github #385, #403)
+add cross-compile to WASM (github #385, #403, #412)
+differentiating gendered monster tiles from NullCGT (#430)
 
 
 Code Cleanup and Reorganization
@@ -472,10 +828,28 @@ resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters
 convert obj->oextra->omid from pointer to scalar
 get rid of unused obj->oextra->olong
-relocated unmaintained code to outdated folder, specifically sys/amiga, 
+relocated unmaintained code to outdated folder, specifically sys/amiga,
 	sys/atari, sys/be, sys/mac, sys/os2, sys/wince, win/Qt3, win/gem,
 	win/gnome, include/amiconf.h, include/beconf.h, include/def_os2.h,
 	include/os2conf.h, include/macconf.h, include/tosconf.h,
 	include/wceconf.h
 removed SYSFLAGS conditional code
 removed MFLOPPY conditional code
+get rid of 3.6.1 workaround needed to retain compatibility with 3.6.0 bones
+	files after fix for 3.3.0 through 3.6.0 bug for invalid 'bonesid'
+	designation in bones of quest levels
+add an additional note to mextra.h and obj.h comments that reminds people to
+	appropriately init new fields if they need to initialize to something
+	other than zero
+rework stairs structure into a linked list
+move 'restoring' to the program_state struct; add corresponding 'saving';
+	both used to enforce no updating of status lines or of persistent
+	inventory when the relevant activity is in progress
+unify special attack damages from separate you-hit-monster, monster-hits-you,
+	and monster-hits-monster into functions by damage type
+unify trap effects for hero and monster stepping on the trap by trap type
+replace the single permonst mname field with male, female, and gender-neutral
+	names pmnames[NUM_MGENDERS] fields
+add a new glyphmod parameter to window interface *_print_glyph() to be used
+	to provide additional details to the window port beyond the glyph;
+	begin to phase out the mapglyph() calls from within windows ports

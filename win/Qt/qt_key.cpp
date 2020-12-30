@@ -4,18 +4,13 @@
 
 // qt_key.cpp -- a key buffer
 
+extern "C" {
 #include "hack.h"
-#undef Invisible
-#undef Warning
-#undef index
-#undef msleep
-#undef rindex
-#undef wizard
-#undef yn
-#undef min
-#undef max
+}
 
+#include "qt_pre.h"
 #include <QtGui/QtGui>
+#include "qt_post.h"
 #include "qt_key.h"
 
 namespace nethack_qt_ {
@@ -28,17 +23,19 @@ NetHackQtKeyBuffer::NetHackQtKeyBuffer() :
 bool NetHackQtKeyBuffer::Empty() const { return in==out; }
 bool NetHackQtKeyBuffer::Full() const { return (in+1)%maxkey==out; }
 
-void NetHackQtKeyBuffer::Put(int k, int a, int state)
+void NetHackQtKeyBuffer::Put(int k, int a, uint kbstate)
 {
+    //raw_printf("k:%3d a:'%s' s:0x%08x", k, visctrl((char) a), kbstate);
     if ( Full() ) return;	// Safety
-    key[in]=k;
-    ascii[in]=a;
-    in=(in+1)%maxkey;
+    key[in] = k;
+    ascii[in] = a;
+    state[in] = (Qt::KeyboardModifiers) kbstate;
+    in = (in + 1) % maxkey;
 }
 
 void NetHackQtKeyBuffer::Put(char a)
 {
-    Put(0,a,0);
+    Put(0, a, 0U);
 }
 
 void NetHackQtKeyBuffer::Put(const char* str)
@@ -86,6 +83,11 @@ Qt::KeyboardModifiers NetHackQtKeyBuffer::TopState() const
 {
     if ( Empty() ) return 0;
     return state[out];
+}
+
+void NetHackQtKeyBuffer::Drain()
+{
+    in = out = 0;
 }
 
 } // namespace nethack_qt_

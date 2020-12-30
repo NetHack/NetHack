@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1578297245 2020/01/06 07:54:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	lock.c	$NHDT-Date: 1602355548 2020/10/10 18:45:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -480,7 +480,8 @@ struct obj *container; /* container, for autounlock */
                 }
 
                 if (otmp->obroken) {
-                    You_cant("fix its broken lock with %s.", doname(pick));
+                    You_cant("fix its broken lock with %s.",
+                             ansimpleoname(pick));
                     return PICKLOCK_LEARNED_SOMETHING;
                 } else if (picktyp == CREDIT_CARD && !otmp->olocked) {
                     /* credit cards are only good for unlocking */

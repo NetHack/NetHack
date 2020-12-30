@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1583190253 2020/03/02 23:04:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -409,16 +409,17 @@ int how;
     /* "killed by the high priest of Crom" is okay,
        "killed by the high priest" alone isn't */
     if ((mptr->geno & G_UNIQ) != 0 && !(imitator && !mimicker)
-        && !(mptr == &mons[PM_HIGH_PRIEST] && !mtmp->ispriest)) {
+        && !(mptr == &mons[PM_HIGH_CLERIC] && !mtmp->ispriest)) {
         if (!type_is_pname(mptr))
             Strcat(buf, "the ");
         g.killer.format = KILLED_BY;
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
-    if (mptr == &mons[PM_GHOST] && has_mname(mtmp)) {
+    if (mptr == &mons[PM_GHOST] && has_mgivenname(mtmp)) {
         Strcat(buf, "the ");
         g.killer.format = KILLED_BY;
     }
+    (void) monhealthdescr(mtmp, TRUE, eos(buf));
     if (mtmp->minvis)
         Strcat(buf, "invisible ");
     if (distorted)
@@ -426,14 +427,15 @@ int how;
 
     if (imitator) {
         char shape[BUFSZ];
-        const char *realnm = champtr->mname, *fakenm = mptr->mname;
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+                             *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
             mptr = &mons[mtmp->mappearance];
-            fakenm = mptr->mname;
+            fakenm = pmname(mptr, Mgender(mtmp));
         } else if (alt && strstri(realnm, "vampire")
                    && !strcmp(fakenm, "vampire bat")) {
             /* special case: use "vampire in bat form" in preference
@@ -458,8 +460,8 @@ int how;
         mptr = mtmp->data; /* reset for mimicker case */
     } else if (mptr == &mons[PM_GHOST]) {
         Strcat(buf, "ghost");
-        if (has_mname(mtmp))
-            Sprintf(eos(buf), " of %s", MNAME(mtmp));
+        if (has_mgivenname(mtmp))
+            Sprintf(eos(buf), " of %s", MGIVENNAME(mtmp));
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
                    *honorific = shkname_is_pname(mtmp) ? ""
@@ -472,9 +474,9 @@ int how;
            it overrides the effect of Hallucination on priestname() */
         Strcat(buf, m_monnam(mtmp));
     } else {
-        Strcat(buf, mptr->mname);
-        if (has_mname(mtmp))
-            Sprintf(eos(buf), " called %s", MNAME(mtmp));
+        Strcat(buf, pmname(mptr, Mgender(mtmp)));
+        if (has_mgivenname(mtmp))
+            Sprintf(eos(buf), " called %s", MGIVENNAME(mtmp));
     }
 
     Strcpy(g.killer.name, buf);
@@ -491,6 +493,8 @@ int how;
         u.ugrave_arise = PM_WRAITH;
     else if (mptr->mlet == S_MUMMY && g.urace.mummynum != NON_PM)
         u.ugrave_arise = g.urace.mummynum;
+    else if (zombie_maker(mptr) && zombie_form(g.youmonst.data) != NON_PM)
+        u.ugrave_arise = zombie_form(g.youmonst.data);
     else if (mptr->mlet == S_VAMPIRE && Race_if(PM_HUMAN))
         u.ugrave_arise = PM_VAMPIRE;
     else if (mptr == &mons[PM_GHOUL])
@@ -784,7 +788,7 @@ boolean taken;
         c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
         if (c == 'y') {
             /* caller has already ID'd everything */
-            (void) display_inventory((char *) 0, TRUE);
+            (void) display_inventory((char *) 0, FALSE);
             container_contents(g.invent, TRUE, TRUE, FALSE);
         }
         if (c == 'q')
@@ -818,9 +822,14 @@ boolean taken;
         if (should_query_disclose_option('c', &defquery)) {
             int acnt = count_achievements();
 
-            Sprintf(qbuf, "Do you want to see your conduct%s%s?",
-                    (acnt > 0) ? " and achievement" : "",
-                    (acnt > 1) ? "s" : "");
+            Sprintf(qbuf, "Do you want to see your conduct%s?",
+                    /* this was distinguishing between one achievement and
+                       multiple achievements, but "conduct and achievement"
+                       looked strange if multiple conducts got shown (which
+                       is usual for an early game death); we could switch
+                       to plural vs singular for conducts but the less
+                       specific "conduct and achievements" is sufficient */
+                    (acnt > 0) ? " and achievements" : "");
             c = yn_function(qbuf, ynqchars, defquery);
         } else {
             c = defquery;
@@ -1315,8 +1324,7 @@ int how;
         for (obj = g.invent; obj; obj = obj->nobj) {
             discover_object(obj->otyp, TRUE, FALSE);
             obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-            if (Is_container(obj) || obj->otyp == STATUE)
-                obj->cknown = obj->lknown = 1;
+            set_cknown_lknown(obj); /* set flags when applicable */
             /* we resolve Schroedinger's cat now in case of both
                disclosure and dumplog, where the 50:50 chance for
                live cat has to be the same both times */
@@ -1376,8 +1384,8 @@ int how;
 
         umoney = money_cnt(g.invent);
         tmp = u.umoney0;
-        umoney += hidden_gold(); /* accumulate gold from containers */
-        tmp = umoney - tmp;      /* net gain */
+        umoney += hidden_gold(TRUE); /* accumulate gold from containers */
+        tmp = umoney - tmp;          /* net gain */
 
         if (tmp < 0L)
             tmp = 0L;
@@ -1407,7 +1415,7 @@ int how;
              (u.ugrave_arise != PM_GREEN_SLIME)
                  ? "body rises from the dead"
                  : "revenant persists",
-             an(mons[u.ugrave_arise].mname));
+             an(pmname(&mons[u.ugrave_arise], Ugender)));
         display_nhwindow(WIN_MESSAGE, FALSE);
     }
 

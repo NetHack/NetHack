@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1586567393 2020/04/11 01:09:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1605315160 2020/11/14 00:52:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -345,7 +345,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
         if (vis) {
             if (otmp->otyp == EGG)
                 pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
-                      otmp->known ? an(mons[otmp->corpsenm].mname) : "an");
+                      otmp->known ? an(mons[otmp->corpsenm].pmnames[NEUTRAL])
+                                  : "an");
             else
                 hit(distant_name(otmp, mshot_xname), mtmp, exclam(damage));
         } else if (verbose && !g.mtarget)
@@ -395,8 +396,8 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
             }
         }
         if (otmp->otyp == EGG && touch_petrifies(&mons[otmp->corpsenm])) {
-            if (!munstone(mtmp, TRUE))
-                minstapetrify(mtmp, TRUE);
+            if (!munstone(mtmp, FALSE))
+                minstapetrify(mtmp, FALSE);
             if (resists_ston(mtmp))
                 damage = 0;
         }
@@ -425,7 +426,14 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                                                                 : AT_WEAP),
                         otmp)) {
             if (vis && mtmp->mcansee)
-                pline("%s is blinded by %s.", Monnam(mtmp), the(xname(otmp)));
+                /* shorten object name to reduce redundancy in the
+                   two message [first via hit() above] sequence:
+                   "The {splash of venom,cream pie} hits <mon>."
+                   "<Mon> is blinded by the {venom,pie}." */
+                pline("%s is blinded by %s.", Monnam(mtmp),
+                      the((otmp->oclass == VENOM_CLASS) ? "venom"
+                          : (otmp->otyp == CREAM_PIE) ? "pie"
+                            : xname(otmp))); /* catchall; not used */
             mtmp->mcansee = 0;
             tmp = (int) mtmp->mblinded + rnd(25) + 20;
             if (tmp > 127)
@@ -697,13 +705,13 @@ struct monst *mtmp, *mtarg;
         mtmp->weapon_check = NEED_RANGED_WEAPON;
         /* mon_wield_item resets weapon_check as appropriate */
         if (mon_wield_item(mtmp) != 0)
-            return 0;
+            return MM_MISS;
     }
 
     /* Pick a weapon */
     otmp = select_rwep(mtmp);
     if (!otmp)
-        return 0;
+        return MM_MISS;
     ispole = is_pole(otmp);
 
     x = mtmp->mx;
@@ -718,17 +726,17 @@ struct monst *mtmp, *mtarg;
             if (ammo_and_launcher(otmp, mwep)
                 && dist2(mtmp->mx, mtmp->my, mtarg->mx, mtarg->my)
                    > PET_MISSILE_RANGE2)
-                return 0; /* Out of range */
+                return MM_MISS; /* Out of range */
             /* Set target monster */
             g.mtarget = mtarg;
             g.marcher = mtmp;
             monshoot(mtmp, otmp, mwep); /* multishot shooting or throwing */
             g.marcher = g.mtarget = (struct monst *) 0;
             nomul(0);
-            return 1;
+            return MM_HIT;
         }
     }
-    return 0;
+    return MM_MISS;
 }
 
 /* monster spits substance at monster */
@@ -743,27 +751,32 @@ struct attack *mattk;
         if (!Deaf)
             pline("A dry rattle comes from %s throat.",
                   s_suffix(mon_nam(mtmp)));
-        return 0;
+        return MM_MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
+        boolean utarg = (mtarg == &g.youmonst);
+        xchar tx = utarg ? mtmp->mux : mtarg->mx;
+        xchar ty = utarg ? mtmp->muy : mtarg->my;
+
         switch (mattk->adtyp) {
         case AD_BLND:
         case AD_DRST:
             otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
             break;
         default:
-            impossible("bad attack type in spitmu");
+            impossible("bad attack type in spitmm");
             /*FALLTHRU*/
         case AD_ACID:
             otmp = mksobj(ACID_VENOM, TRUE, FALSE);
             break;
         }
-        if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my))) {
+        if (!rn2(BOLT_LIM-distmin(mtmp->mx,mtmp->my,tx,ty))) {
             if (canseemon(mtmp))
                 pline("%s spits venom!", Monnam(mtmp));
-            g.mtarget = mtarg;
+            if (!utarg)
+                g.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
-                    distmin(mtmp->mx,mtmp->my,mtarg->mx,mtarg->my), otmp);
+                    distmin(mtmp->mx,mtmp->my,tx,ty), otmp);
             g.mtarget = (struct monst *)0;
             nomul(0);
 
@@ -777,10 +790,13 @@ struct attack *mattk;
                     dog->hungrytime -= 5;
             }
 
-            return 1;
+            return MM_HIT;
+        } else {
+            obj_extract_self(otmp);
+            obfree(otmp, (struct obj *) 0);
         }
     }
-    return 0;
+    return MM_MISS;
 }
 
 /* monster breathes at monster (ranged) */
@@ -800,7 +816,7 @@ struct attack  *mattk;
                 else
                     You_hear("a cough.");
             }
-            return 0;
+            return MM_MISS;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
@@ -829,9 +845,9 @@ struct attack  *mattk;
                 }
             } else impossible("Breath weapon %d used", typ-1);
         } else
-            return 0;
+            return MM_MISS;
     }
-    return 1;
+    return MM_HIT;
 }
 
 
@@ -942,41 +958,7 @@ spitmu(mtmp, mattk)
 struct monst *mtmp;
 struct attack *mattk;
 {
-    struct obj *otmp;
-
-    if (mtmp->mcan) {
-        if (!Deaf)
-            pline("A dry rattle comes from %s throat.",
-                  s_suffix(mon_nam(mtmp)));
-        return 0;
-    }
-    if (lined_up(mtmp)) {
-        switch (mattk->adtyp) {
-        case AD_BLND:
-        case AD_DRST:
-            otmp = mksobj(BLINDING_VENOM, TRUE, FALSE);
-            break;
-        default:
-            impossible("bad attack type in spitmu");
-        /* fall through */
-        case AD_ACID:
-            otmp = mksobj(ACID_VENOM, TRUE, FALSE);
-            break;
-        }
-        if (!rn2(BOLT_LIM
-                 - distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy))) {
-            if (canseemon(mtmp))
-                pline("%s spits venom!", Monnam(mtmp));
-            m_throw(mtmp, mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby),
-                    distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
-            nomul(0);
-            return 0;
-        } else {
-            obj_extract_self(otmp);
-            obfree(otmp, (struct obj *) 0);
-        }
-    }
-    return 0;
+    return spitmm(mtmp, mattk, &g.youmonst);
 }
 
 /* monster breathes at you (ranged) */
@@ -986,6 +968,43 @@ struct monst *mtmp;
 struct attack *mattk;
 {
     return breamm(mtmp, mattk, &g.youmonst);
+}
+
+/* Move from (ax,ay) to (bx,by), but only if distance is up to BOLT_LIM
+   and only in straight line or diagonal, calling fnc for each step.
+   Stops if fnc return TRUE, or if step was blocked by wall or closed door.
+   Returns TRUE if fnc returned TRUE. */
+boolean
+linedup_callback(ax, ay, bx, by, fnc)
+xchar ax, ay, bx, by;
+boolean FDECL((*fnc), (int, int));
+{
+    int dx, dy;
+
+    /* These two values are set for use after successful return. */
+    g.tbx = ax - bx;
+    g.tby = ay - by;
+
+    /* sometimes displacement makes a monster think that you're at its
+       own location; prevent it from throwing and zapping in that case */
+    if (!g.tbx && !g.tby)
+        return FALSE;
+
+    if ((!g.tbx || !g.tby || abs(g.tbx) == abs(g.tby)) /* straight line or diagonal */
+        && distmin(g.tbx, g.tby, 0, 0) < BOLT_LIM) {
+        dx = sgn(ax - bx), dy = sgn(ay - by);
+        do {
+            /* <bx,by> is guaranteed to eventually converge with <ax,ay> */
+            bx += dx, by += dy;
+            if (!isok(bx, by))
+                return FALSE;
+            if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by))
+                return FALSE;
+            if ((*fnc)(bx, by))
+                return TRUE;
+        } while (bx != ax || by != ay);
+    }
+    return FALSE;
 }
 
 boolean

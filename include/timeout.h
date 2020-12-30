@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.h	$NHDT-Date: 1564269131 2019/07/27 23:12:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	timeout.h	$NHDT-Date: 1596498564 2020/08/03 23:49:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
 /* Copyright 1994, Dean Luick					  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,6 +29,7 @@ enum timeout_types {
     ROT_ORGANIC = 0, /* for buried organics */
     ROT_CORPSE,
     REVIVE_MON,
+    ZOMBIFY_MON,
     BURN_OBJECT,
     HATCH_EGG,
     FIG_TRANSFORM,

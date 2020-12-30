@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1585361057 2020/03/28 02:04:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.7	wizard.c	$NHDT-Date: 1596498229 2020/08/03 23:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,10 +35,10 @@ static NEARDATA const int nasties[] = {
     PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME,
     PM_DISPLACER_BEAST, PM_GENETIC_ENGINEER,
     /* chaotic */
-    PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LORD,
+    PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LEADER,
     PM_MASTER_MIND_FLAYER, PM_DISENCHANTER, PM_WINGED_GARGOYLE,
-    PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_LORD, PM_ELVENKING,
-    PM_OGRE_KING, PM_CAPTAIN, PM_GREMLIN,
+    PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_NOBLE, PM_ELVEN_MONARCH,
+    PM_OGRE_TYRANT, PM_CAPTAIN, PM_GREMLIN,
     /* lawful */
     PM_SILVER_DRAGON, PM_ORANGE_DRAGON, PM_GREEN_DRAGON,
     PM_YELLOW_DRAGON, PM_GUARDIAN_NAGA, PM_FIRE_GIANT,
@@ -329,28 +329,24 @@ xchar *sx;
 xchar *sy;
 {
     xchar x = 0, y = 0;
+    stairway *stway = g.stairs;
+    boolean stdir = !builds_up(&u.uz);
 
-    if (builds_up(&u.uz)) {
-        if (xdnstair) {
-            x = xdnstair;
-            y = ydnstair;
-        } else if (xdnladder) {
-            x = xdnladder;
-            y = ydnladder;
-        }
+    if ((stway = stairway_find_type_dir(FALSE, stdir)) != 0) {
+        x = stway->sx;
+        y = stway->sy;
+    } else if ((stway = stairway_find_type_dir(TRUE, stdir)) != 0) {
+        x = stway->sx;
+        y = stway->sy;
     } else {
-        if (xupstair) {
-            x = xupstair;
-            y = yupstair;
-        } else if (xupladder) {
-            x = xupladder;
-            y = yupladder;
+        while (stway) {
+            if (stway->tolev.dnum != u.uz.dnum) {
+                x = stway->sx;
+                y = stway->sy;
+                break;
+            }
+            stway = stway->next;
         }
-    }
-
-    if (!x && g.sstairs.sx) {
-        x = g.sstairs.sx;
-        y = g.sstairs.sy;
     }
 
     if (x && y) {
@@ -547,11 +543,11 @@ int difcap; /* if non-zero, try to make difficulty be lower than this */
         || (mons[res].geno & (Inhell ? G_NOHELL : G_HELL)) != 0)
         alt = big_to_little(res);
     if (alt != res && (g.mvitals[alt].mvflags & G_GENOD) == 0) {
-        const char *mname = mons[alt].mname,
-                   *lastspace = rindex(mname, ' ');
+        const char *mnam = mons[alt].pmnames[NEUTRAL],
+                   *lastspace = rindex(mnam, ' ');
 
         /* only non-juveniles can become alternate choice */
-        if (strncmp(mname, "baby ", 5)
+        if (strncmp(mnam, "baby ", 5)
             && (!lastspace
                 || (strcmp(lastspace, " hatchling")
                     && strcmp(lastspace, " pup")

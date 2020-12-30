@@ -1,4 +1,4 @@
-/* NetHack 3.6	light.c	$NHDT-Date: 1559994625 2019/06/08 11:50:25 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	light.c	$NHDT-Date: 1604442297 2020/11/03 22:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -48,8 +48,8 @@ static void FDECL(write_ls, (NHFILE *, light_source *));
 static int FDECL(maybe_write_ls, (NHFILE *, int, BOOLEAN_P));
 
 /* imported from vision.c, for small circles */
-extern char circle_data[];
-extern char circle_start[];
+extern xchar circle_data[];
+extern xchar circle_start[];
 
 
 /* Create a new light source.  Caller (and extern.h) doesn't need to know
@@ -144,13 +144,13 @@ anything *id;
 /* Mark locations that are temporarily lit via mobile light sources. */
 void
 do_light_sources(cs_rows)
-char **cs_rows;
+xchar **cs_rows;
 {
     int x, y, min_x, max_x, max_y, offset;
-    char *limits;
+    xchar *limits;
     short at_hero_range = 0;
     light_source *ls;
-    char *row;
+    xchar *row;
 
     for (ls = g.light_base; ls; ls = ls->next) {
         ls->flags &= ~LSF_SHOW;
@@ -691,8 +691,7 @@ boolean
 obj_is_burning(obj)
 struct obj *obj;
 {
-    return (boolean) (obj->lamplit && (obj->otyp == MAGIC_LAMP
-                                       || ignitable(obj)
+    return (boolean) (obj->lamplit && (ignitable(obj)
                                        || artifact_light(obj)));
 }
 

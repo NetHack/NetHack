@@ -13,7 +13,7 @@ namespace nethack_qt_ {
 
 class NetHackQtMapWindow2;
 
-class NetHackQtMessageWindow : QObject, public NetHackQtWindow {
+class NetHackQtMessageWindow : QScrollArea, public NetHackQtWindow {
 	Q_OBJECT
 public:
 	NetHackQtMessageWindow();
@@ -30,9 +30,16 @@ public:
 
 	void setMap(NetHackQtMapWindow2*);
 
+        void RehighlightPrompt();
+        bool hilit_mesgs();
+        void unhighlight_mesgs();
+        // for adding the answer for yn() to its prompt string
+        void AddToStr(const char *answerbuf);
+
 private:
-	QListWidget* list;
-	bool changed;
+        QListWidget *list;
+        QScrollArea *scrollarea;
+        bool changed;
         int currgetmsg;
 	NetHackQtMapWindow2* map;
 

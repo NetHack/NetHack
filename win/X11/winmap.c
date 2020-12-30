@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1586202188 2020/04/06 19:43:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.7	winmap.c	$NHDT-Date: 1596498372 2020/08/03 23:46:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -73,11 +73,12 @@ static void FDECL(display_cursor, (struct xwindow *));
 /* Global functions ======================================================= */
 
 void
-X11_print_glyph(window, x, y, glyph, bkglyph)
+X11_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
 int glyph;
 int bkglyph UNUSED;
+unsigned *glyphmod UNUSED;
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -1295,6 +1296,8 @@ boolean inverted;
                 int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
 
+                if ((tile_map->glyphs[row][cur_col].special & MG_FEMALE))
+                    tile++; /* advance to the female tile variation */
                 src_x = (tile % TILES_PER_ROW) * tile_width;
                 src_y = (tile / TILES_PER_ROW) * tile_height;
                 XCopyArea(dpy, tile_pixmap, XtWindow(wp->w),

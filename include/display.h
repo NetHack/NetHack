@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1559994621 2019/06/08 11:50:21 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1605927391 2020/11/21 02:56:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -69,6 +69,15 @@ enum explosion_types {
  * hero can physically see the location of the monster.  The function
  * vobj_at() returns a pointer to an object that the hero can see there.
  * Infravision is not taken into account.
+ *
+ * Note:  not reliable for concealed mimics.  They don't have
+ * 'mon->mundetected' set even when mimicking objects or furniture.
+ * [Fixing this with a pair of mon->m_ap_type checks here (via either
+ * 'typ!=object && typ!=furniture' or 'typ==nothing || typ==monster')
+ * will require reviewing every instance of mon_visible(), canseemon(),
+ * canspotmon(), is_safemon() and perhaps others.  Fixing it by setting
+ * mon->mundetected when concealed would be better but also require
+ * reviewing all those instances and also existing mundetected instances.]
  */
 #if 0
 #define mon_visible(mon) \
@@ -328,18 +337,18 @@ enum explosion_types {
 
 /* This has the unfortunate side effect of needing a global variable    */
 /* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
-#define random_obj_to_glyph(rng)                \
-    ((g.otg_temp = random_object(rng)) == CORPSE  \
-         ? random_monster(rng) + GLYPH_BODY_OFF \
+#define random_obj_to_glyph(rng) \
+    ((g.otg_temp = random_object(rng)) == CORPSE                \
+         ? random_monster(rng) + GLYPH_BODY_OFF                 \
          : g.otg_temp + GLYPH_OBJ_OFF)
 
-#define obj_to_glyph(obj, rng)                                          \
-    (((obj)->otyp == STATUE)                                            \
-         ? statue_to_glyph(obj, rng)                                    \
-         : Hallucination                                                \
-               ? random_obj_to_glyph(rng)                               \
-               : ((obj)->otyp == CORPSE)                                \
-                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF           \
+#define obj_to_glyph(obj, rng) \
+    (((obj)->otyp == STATUE)                                    \
+         ? statue_to_glyph(obj, rng)                            \
+         : Hallucination                                        \
+               ? random_obj_to_glyph(rng)                       \
+               : ((obj)->otyp == CORPSE)                        \
+                     ? (int) (obj)->corpsenm + GLYPH_BODY_OFF   \
                      : (int) (obj)->otyp + GLYPH_OBJ_OFF)
 
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
@@ -348,6 +357,16 @@ enum explosion_types {
 #define statue_to_glyph(obj, rng)                              \
     (Hallucination ? random_monster(rng) + GLYPH_MON_OFF       \
                    : (int) (obj)->corpsenm + GLYPH_STATUE_OFF)
+
+/* briefly used for Qt's "paper doll" inventory which shows map tiles for
+   equipped objects; those vary like floor items during hallucination now
+   so this isn't used anywhere */
+#define obj_to_true_glyph(obj) \
+    (((obj)->otyp == STATUE)                            \
+     ? ((int) (obj)->corpsenm + GLYPH_STATUE_OFF)       \
+       : ((obj)->otyp == CORPSE)                        \
+         ? ((int) (obj)->corpsenm + GLYPH_BODY_OFF)     \
+           : ((int) (obj)->otyp + GLYPH_OBJ_OFF))
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx) + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype, idx) \
@@ -455,5 +474,28 @@ enum explosion_types {
      && (glyph) < (GLYPH_WARNING_OFF + WARNCOUNT))
 #define glyph_is_unexplored(glyph) ((glyph) == GLYPH_UNEXPLORED)
 #define glyph_is_nothing(glyph) ((glyph) == GLYPH_NOTHING)
+
+/* flags for map_glyphmod */
+
+/* mgflags for altering map_glyphmod() internal behaviour */
+#define MG_FLAG_NORMAL      0x00
+#define MG_FLAG_NOOVERRIDE  0x01
+#define MG_FLAG_RETURNIDX   0x02
+
+/* Special mapped glyph flags encoded in glyphmod[GM_FLAGS] by map_glyphmod() */
+#define MG_CORPSE  0x0001
+#define MG_INVIS   0x0002
+#define MG_DETECT  0x0004
+#define MG_PET     0x0008
+#define MG_RIDDEN  0x0010
+#define MG_STATUE  0x0020
+#define MG_OBJPILE 0x0040  /* more than one stack of objects */
+#define MG_BW_LAVA 0x0080  /* 'black & white lava': highlight lava if it
+                              can't be distringuished from water by color */
+#define MG_BW_ICE  0x0100  /* similar for ice vs floor */
+#define MG_NOTHING 0x0200  /* char represents GLYPH_NOTHING */
+#define MG_UNEXPL  0x0400  /* char represents GLYPH_UNEXPLORED */
+#define MG_FEMALE  0x0800  /* represents a female mon,detected mon,pet,ridden */
+#define MG_BADXY   0x1000  /* bad coordinates were passed */
 
 #endif /* DISPLAY_H */

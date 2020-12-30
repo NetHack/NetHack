@@ -1,4 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1524689272 2018/04/25 20:47:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.7	tiletext.c	$NHDT-Date: 1596498342 2020/08/03 23:45:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /*      Copyright (c) 2016 by Pasi Kallinen                       */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -26,12 +26,14 @@ static const char *text_sets[] = { "monsters.txt", "objects.txt",
                                    "other.txt" };
 #endif
 
-extern const char *FDECL(tilename, (int, int));
-extern boolean FDECL(acceptable_tilename, (int, const char *, const char *));
+extern const char *FDECL(tilename, (int, int, int));
+extern boolean FDECL(acceptable_tilename, (int, int, const char *, const char *));
 static void FDECL(read_text_colormap, (FILE *));
 static boolean FDECL(write_text_colormap, (FILE *));
 static boolean FDECL(read_txttile, (FILE *, pixel (*)[TILE_X]));
 static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
+
+enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
 
 /* Ugh.  DICE doesn't like %[A-Z], so we have to spell it out... */
 #define FORMAT_STRING                                                       \
@@ -42,7 +44,9 @@ static int grayscale = 0;
 /* grayscale color mapping */
 static const int graymappings[] = {
  /* .  A  B   C   D   E   F   G   H   I   J   K   L   M   N   O   P */
-    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14
+    0, 1, 17, 18, 19, 20, 27, 22, 23, 24, 25, 26, 21, 15, 13, 14, 14,
+ /* Q  R   S   T   U   V   W */
+    1, 17, 18, 19, 20, 27, 22
 };
 
 void
@@ -108,29 +112,37 @@ read_txttile(txtfile, pixels)
 FILE *txtfile;
 pixel (*pixels)[TILE_X];
 {
-    int ph, i, j, k;
-    char buf[BUFSZ], ttype[BUFSZ];
+    int ph, i, j, k, reslt;
+    char buf[BUFSZ], ttype[BUFSZ], gend[BUFSZ];
     const char *p;
     char c[2];
+    static int gidx = 0;
 
-    if (fscanf(txtfile, "# %s %d (%[^)])", ttype, &i, buf) <= 0)
+    gend[0] = '\0';
+    if (tile_set == MONSTER_SET)
+        reslt = fscanf(txtfile, "# %s %d (%[^,],%[^)])", ttype, &i, buf, gend);
+    else
+        reslt = fscanf(txtfile, "# %s %d (%[^)])", ttype, &i, buf);
+    if (reslt <= 0)
         return FALSE;
+
+    if (tile_set == MONSTER_SET && gend[0] == 'f')
+        gidx = 1;
 
     ph = strcmp(ttype, "placeholder") == 0;
 
     if (!ph && strcmp(ttype, "tile") != 0)
         Fprintf(stderr, "Keyword \"%s\" unexpected for entry %d\n", ttype, i);
 
-    if (tile_set != 0) {
-        /* check tile name, but not relative number, which will
-         * change when tiles are added
-         */
-        p = tilename(tile_set, tile_set_indx);
-        if (p && strcmp(p, buf) && !acceptable_tilename(tile_set_indx,buf,p)) {
-            Fprintf(stderr, "warning: for tile %d (numbered %d) of %s,\n",
-                    tile_set_indx, i, text_sets[tile_set - 1]);
-            Fprintf(stderr, "\tfound '%s' while expecting '%s'\n", buf, p);
-        }
+    /* check tile name, but not relative number, which will
+     * change when tiles are added
+     */
+    p = tilename(tile_set, tile_set_indx, gidx);
+    if (p && strcmp(p, buf)
+        && !acceptable_tilename(tile_set, tile_set_indx, buf, p)) {
+        Fprintf(stderr, "warning: for tile %d (numbered %d) of %s,\n",
+                tile_set_indx, i, text_sets[tile_set]);
+        Fprintf(stderr, "\tfound '%s' while expecting '%s'\n", buf, p);
     }
     tile_set_indx++;
 
@@ -196,21 +208,26 @@ pixel (*pixels)[TILE_X];
 {
     const char *p;
     const char *type;
-    int i, j, k;
+    int i = 0, j, k;
 
     if (memcmp(placeholder, pixels, sizeof(placeholder)) == 0)
         type = "placeholder";
     else
         type = "tile";
 
-    if (tile_set == 0)
-        Fprintf(txtfile, "# %s %d (unknown)\n", type, tile_set_indx);
-    else {
-        p = tilename(tile_set, tile_set_indx);
-        if (p)
-            Fprintf(txtfile, "# %s %d (%s)\n", type, tile_set_indx, p);
-        else
-            Fprintf(txtfile, "# %s %d (null)\n", type, tile_set_indx);
+    if (tile_set == MONSTER_SET) {
+        for (i = 0; i < 2; ++i) {
+            Fprintf(txtfile, "# %s %d (unknown,%s)\n", type, tile_set_indx,
+                    i ? "female" : "male");
+            if (i == 0)
+                tile_set_indx++;
+        }
+    } else {
+            p = tilename(tile_set, tile_set_indx, i);
+            if (p)
+                Fprintf(txtfile, "# %s %d (%s)\n", type, tile_set_indx, p);
+            else
+                Fprintf(txtfile, "# %s %d (null)\n", type, tile_set_indx);
     }
     tile_set_indx++;
 
@@ -302,7 +319,7 @@ const char *type;
     tile_set = 0;
     for (i = 0; i < SIZE(text_sets); i++) {
         if (!strcmp(p, text_sets[i]))
-            tile_set = i + 1;
+            tile_set = i;
     }
     tile_set_indx = 0;
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	getline.c	$NHDT-Date: 1543830347 2018/12/03 09:45:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.7	getline.c	$NHDT-Date: 1596498343 2020/08/03 23:45:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -52,10 +52,10 @@ getlin_hook_proc hook;
     struct WinDesc *cw = wins[WIN_MESSAGE];
     boolean doprev = 0;
 
-    if (ttyDisplay->toplin == 1 && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
         more();
     cw->flags &= ~WIN_STOP;
-    ttyDisplay->toplin = 3; /* special prompt state */
+    ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
     ttyDisplay->inread++;
 
     /* issue the prompt */
@@ -193,7 +193,7 @@ getlin_hook_proc hook;
         } else
             tty_nhbell();
     }
-    ttyDisplay->toplin = 2; /* nonempty, no --More-- required */
+    ttyDisplay->toplin = TOPLINE_NON_EMPTY;
     ttyDisplay->inread--;
     clear_nhwindow(WIN_MESSAGE); /* clean up after ourselves */
 

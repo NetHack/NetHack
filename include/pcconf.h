@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcconf.h	$NHDT-Date: 1593953338 2020/07/05 12:48:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.7	pcconf.h	$NHDT-Date: 1596498554 2020/08/03 23:49:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,7 +35,9 @@
 
 /*#define OVERLAY */ /* Manual overlay definition (MSC 6.0ax only) */
 
+#ifndef CROSS_TO_AMIGA
 #define SHELL /* via exec of COMMAND.COM */
+#endif
 
 /*
  * Screen control options
@@ -88,7 +90,9 @@
 #define ANSI_DEFAULT
 #endif
 
+#ifndef CROSS_TO_AMIGA
 #define RANDOM /* have Berkeley random(3) */
+#endif
 
 #define MAIL /* Allows for fake mail daemon to deliver mail */
              /* in the MSDOS version.  (For AMIGA MAIL see  */
@@ -99,6 +103,10 @@
 
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__SC__)
 #include <process.h> /* Provides prototypes of exit(), spawn()      */
+#endif
+
+#ifdef CROSS_TO_AMIGA
+#include <spawn.h>
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER >= 7)
@@ -155,7 +163,9 @@
 
 #endif /* MSDOS configuration stuff */
 
+#ifndef PATHLEN
 #define PATHLEN 64  /* maximum pathlength */
+#endif
 #define FILENAME 80 /* maximum filename length (conservative) */
 #ifndef MICRO_H
 #include "micro.h" /* contains necessary externs for [os_name].c */
@@ -248,22 +258,6 @@
 #endif
 
 /* Sanity check, do not modify these blocks. */
-
-/* OVERLAY must be defined with MOVERLAY or VROOMM */
-#if (defined(MOVERLAY) || defined(VROOMM))
-#ifndef OVERLAY
-#define OVERLAY
-#endif
-#endif
-
-#if defined(FUNCTION_LEVEL_LINKING)
-#define OVERLAY
-#endif
-
-#if defined(OVERLAY) && !defined(MOVERLAY) && !defined(VROOMM) \
-    && !defined(FUNCTION_LEVEL_LINKING)
-#define USE_TRAMPOLI
-#endif
 
 #if defined(MSDOS) && defined(NO_TERMS)
 #ifdef TERMLIB

@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1573940835 2019/11/16 21:47:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.7	ball.c	$NHDT-Date: 1596498150 2020/08/03 23:42:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) David Cohrs, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -162,12 +162,13 @@ unplacebc_core()
         obj_extract_self(uball);
         if (Blind && (u.bc_felt & BC_BALL)) /* drop glyph */
             levl[uball->ox][uball->oy].glyph = u.bglyph;
-
+        maybe_unhide_at(uball->ox, uball->oy);
         newsym(uball->ox, uball->oy);
     }
     obj_extract_self(uchain);
     if (Blind && (u.bc_felt & BC_CHAIN)) /* drop glyph */
         levl[uchain->ox][uchain->oy].glyph = u.cglyph;
+    maybe_unhide_at(uchain->ox, uchain->oy);
 
     newsym(uchain->ox, uchain->oy);
     u.bc_felt = 0; /* feel nothing */
@@ -536,9 +537,11 @@ xchar ballx, bally, chainx, chainy; /* only matter !before */
             }
 
             remove_object(uchain);
+            maybe_unhide_at(uchain->ox, uchain->oy);
             newsym(uchain->ox, uchain->oy);
             if (!carried(uball)) {
                 remove_object(uball);
+                maybe_unhide_at(uball->ox, uball->oy);
                 newsym(uball->ox, uball->oy);
             }
         } else {

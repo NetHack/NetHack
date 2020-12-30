@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1586178709 2020/04/06 13:11:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.7	wield.c	$NHDT-Date: 1607200367 2020/12/05 20:32:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -275,7 +275,7 @@ static NEARDATA const char wield_objs[] = {
 static NEARDATA const char ready_objs[] = {
     ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0
 };
-static NEARDATA const char bullets[] = { /* (note: different from dothrow.c) */
+static NEARDATA const char w_bullets[] = { /* (different from dothrow.c) */
     ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE,
     GEM_CLASS, WEAPON_CLASS, 0
 };
@@ -455,7 +455,7 @@ dowieldquiver()
     quivee_types = (uslinging()
                     || (uswapwep
                         && objects[uswapwep->otyp].oc_skill == P_SLING))
-                   ? bullets
+                   ? w_bullets
                    : ready_objs;
     newquiver = getobj(quivee_types, "ready");
 

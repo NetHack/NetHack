@@ -1,4 +1,4 @@
--- NetHack 3.6	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
+-- NetHack 3.7	medusa.des	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -36,8 +36,10 @@ des.map([[
 -- Dungeon Description
 des.region(selection.area(00,00,74,19),"lit")
 des.region(selection.area(31,07,45,07),"unlit")
--- (must maintain one room definition; `filled=0' forces its room to be kept)
-des.region({ region={35,09, 41,10}, lit = 0, type="ordinary", prefilled = 1 })
+-- make the downstairs room a real room to control arriving monsters, 
+-- and also as a fixup_special hack; the first room defined on Medusa's level
+-- receives some statues
+des.region({ region={35,09, 41,10}, lit = 0, type="ordinary", arrival_room=true })
 des.region(selection.area(31,12,45,12),"unlit")
 -- Teleport: down to up stairs island, up to Medusa's island
 des.teleport_region({ region = {01,01,05,17}, dir="down" })

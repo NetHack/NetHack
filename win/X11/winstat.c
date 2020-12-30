@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1584582374 2020/03/19 01:46:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.7	winstat.c	$NHDT-Date: 1596498375 2020/08/03 23:46:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1453,15 +1453,15 @@ long new_value;
             buf[0] = highc(buf[0]);
             Strcat(buf, " the ");
             if (Upolyd) {
-                char mname[BUFSZ];
+                char mnam[BUFSZ];
                 int k;
 
-                Strcpy(mname, mons[u.umonnum].mname);
-                for (k = 0; mname[k] != '\0'; k++) {
-                    if (k == 0 || mname[k - 1] == ' ')
-                        mname[k] = highc(mname[k]);
+                Strcpy(mnam, pmname(&mons[u.umonnum], Ugender));
+                for (k = 0; mnam[k] != '\0'; k++) {
+                    if (k == 0 || mnam[k - 1] == ' ')
+                        mnam[k] = highc(mnam[k]);
                 }
-                Strcat(buf, mname);
+                Strcat(buf, mnam);
             } else
                 Strcat(buf,
                        rank_of(u.ulevel, g.pl_character[0], flags.female));

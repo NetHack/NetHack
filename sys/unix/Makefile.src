@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src    $NHDT-Date: 1588776919 2020/05/06 14:55:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1601854487 2020/10/04 23:34:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -43,22 +43,29 @@ SHELL=/bin/sh
 # Usually, the C compiler driver is used for linking:
 #LINK=$(CC)
 
+# If we're cross-compiling, a hints file will override this
+# to a uniq target directory, but otherwise it just goes in
+# ../src
+TARGETPFX=
+
 # Pick the SYSSRC and SYSOBJ lines corresponding to your desired operating
 # system.
 #
 # for UNIX systems
 SYSSRC = ../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c
-SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
+SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
+	$(TARGETPFX)unixunix.o $(TARGETPFX)unixres.o
 #
 # for Systos
 # SYSSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 #	../sys/share/pctty.c ../sys/share/pcunix.c
-# SYSOBJ = tos.o pcmain.o pcsys.o pctty.o pcunix.o
+# SYSOBJ = $(TARGETPFX)tos.o $(TARGETPFX)pcmain.o $(TARGETPFX)pcsys.o \
+#	$(TARGETPFX)pctty.o $(TARGETPFX)pcunix.o
 #
 # for BeOS
 #SYSSRC = ../sys/be/bemain.c ../sys/share/unixtty.c ../sys/share/ioctl.c
-#SYSOBJ = bemain.o unixtty.o ioctl.o
+#SYSOBJ = $(TARGETPFX)bemain.o $(TARGETPFX)unixtty.o $(TARGETPFX)ioctl.o
 
 
 # if you are using gcc as your compiler:
@@ -153,7 +160,7 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
 #CFLAGS = -O -DXCURSES -I../include -I/usr/local/include/pdcurses
 # Compile against system curses library, such as ncurses
 #CFLAGS = -O -I../include
-
+#
 # files in ../win/X11 (relative to src) are passed $(CFLAGS) $(X11CFLAGS)
 # and by default will find <X11/foo.h> in /usr/include/X11/foo.h;
 # can be overridden via hints; post-10.7 OSX with XQuartz uses
@@ -165,7 +172,7 @@ SYSOBJ = ioctl.o unixmain.o unixtty.o unixunix.o unixres.o ../lib/lua/liblua.a
 # directories.  The ones given below is the usual spot for linux systems.
 # The paths are for glibconfig.h and gnomesupport.h respectively.
 #
-GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
+#GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 
 # flags for debugging:
 # CFLAGS = -g -I../include
@@ -173,19 +180,24 @@ GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
 #CFLAGS = -O -I../include
 #LFLAGS =
 
-# -lm required by lua
-LIBS += -lm
-
 # The Qt and Be window systems are written in C++, while the rest of
 # NetHack is standard C.  If using Qt, uncomment the LINK line here to get
 # the C++ libraries linked in.
-CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include
+CXXFLAGS = $(CFLAGS) -I. -I$(QTDIR)/include $(QTCXXFLAGS)
 CXX ?= g++
 MOC ?= moc
 #LINK=g++
-#	For cross-compiling, eg. with gcc on Linux (see also CC further up):
-#CXX=arm-linux-g++
-#LINK=arm-linux-gcc
+
+# The default is for the TARGET_* variables to match the defaults.
+# If we're cross-compiling these will get overridden elsewhere, likely via
+# a hints file. TARGETPFX was set above earlier.
+TARGET_CC = $(CC)
+TARGET_CFLAGS = $(CFLAGS)
+TARGET_LINK = $(LINK)
+TARGET_LFLAGS = $(LFLAGS)
+TARGET_CXX = $(CXX)
+TARGET_CXXFLAGS = $(CXXFLAGS)
+TARGET_LIBS = $(LIBS)
 
 # we specify C preprocessor flags via CFLAGS; files built with default rules
 # might include $(CPPFLAGS) which could get a value from user's environment;
@@ -193,9 +205,9 @@ MOC ?= moc
 CPPFLAGS =
 
 # file for regular expression matching
-REGEXOBJ = posixregex.o
-#REGEXOBJ = pmatchregex.o
-#REGEXOBJ = cppregex.o
+REGEXOBJ = $(TARGETPFX)posixregex.o
+#REGEXOBJ = $(TARGETPFX)pmatchregex.o
+#REGEXOBJ = $(TARGETPFX)cppregex.o
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
 # combination of windowing systems.  Also set windowing systems in config.h.
@@ -205,15 +217,18 @@ REGEXOBJ = posixregex.o
 # files for a straight tty port using no native windowing system
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
 	../win/tty/wintty.c
-WINTTYOBJ = getline.o termcap.o topl.o wintty.o
+WINTTYOBJ = $(TARGETPFX)getline.o $(TARGETPFX)termcap.o $(TARGETPFX)topl.o \
+	$(TARGETPFX)wintty.o
 #
 # Files for curses interface
 WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
 	../win/curses/cursmisc.c ../win/curses/cursdial.c \
 	../win/curses/cursstat.c ../win/curses/cursinit.c \
 	../win/curses/cursmesg.c ../win/curses/cursinvt.c
-WINCURSESOBJ = cursmain.o curswins.o cursmisc.o cursdial.o cursstat.o \
-	cursinit.o cursmesg.o cursinvt.o
+WINCURSESOBJ = $(TARGETPFX)cursmain.o $(TARGETPFX)curswins.o \
+	$(TARGETPFX)cursmisc.o $(TARGETPFX)cursdial.o \
+	$(TARGETPFX)cursstat.o $(TARGETPFX)cursinit.o \
+	$(TARGETPFX)cursmesg.o $(TARGETPFX)cursinvt.o
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -221,14 +236,21 @@ WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 	../win/X11/winmap.c  ../win/X11/winmenu.c ../win/X11/winmesg.c \
 	../win/X11/winmisc.c ../win/X11/winstat.c ../win/X11/wintext.c \
 	../win/X11/winval.c tile.c
-WINX11OBJ = Window.o dialogs.o winX.o winmap.o winmenu.o winmesg.o \
-	winmisc.o winstat.o wintext.o winval.o tile.o
+WINX11OBJ = $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
+	$(TARGETPFX)winmap.o $(TARGETPFX)winmenu.o $(TARGETPFX)winmesg.o \
+	$(TARGETPFX)winmisc.o $(TARGETPFX)winstat.o $(TARGETPFX)wintext.o \
+	$(TARGETPFX)winval.o $(TARGETPFX)tile.o
 #
 # Files for a Qt 3 port (renamed since nethack 3.6.x)
 #
-WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
-	../win/Qt3/qt3tableview.cpp
-WINQT3OBJ = qt3_win.o qt3_clust.o qt3tableview.o tile.o
+#WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
+#	../win/Qt3/qt3tableview.cpp
+#WINQT3OBJ = $(TARGETPFX)qt3_win.o $(TARGETPFX)qt3_clust.o \
+	$(TARGETPFX)qt3tableview.o $(TARGETPFX)tile.o
+# empty values for 'make depend'
+WINQT3SRC =
+WINQT3OBJ =
+
 #
 # Files for a Qt 4 or 5 port
 #
@@ -241,34 +263,58 @@ WINQTSRC = ../win/Qt/qt_bind.cpp ../win/Qt/qt_click.cpp \
 	../win/Qt/qt_stat.cpp ../win/Qt/qt_str.cpp ../win/Qt/qt_streq.cpp \
 	../win/Qt/qt_svsel.cpp ../win/Qt/qt_win.cpp ../win/Qt/qt_xcmd.cpp \
 	../win/Qt/qt_yndlg.cpp
-WINQTOBJ = qt_bind.o qt_click.o qt_clust.o qt_delay.o qt_glyph.o qt_icon.o \
-	qt_inv.o qt_key.o qt_line.o qt_main.o qt_map.o qt_menu.o qt_msg.o \
-	qt_plsel.o qt_rip.o qt_set.o qt_stat.o qt_str.o qt_streq.o qt_svsel.o \
-	qt_win.o qt_xcmd.o qt_yndlg.o tile.o
+WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
+	$(TARGETPFX)qt_clust.o $(TARGETPFX)qt_delay.o \
+	$(TARGETPFX)qt_glyph.o $(TARGETPFX)qt_icon.o \
+	$(TARGETPFX)qt_inv.o $(TARGETPFX)qt_key.o $(TARGETPFX)qt_line.o \
+	$(TARGETPFX)qt_main.o $(TARGETPFX)qt_map.o $(TARGETPFX)qt_menu.o \
+	$(TARGETPFX)qt_msg.o $(TARGETPFX)qt_plsel.o $(TARGETPFX)qt_rip.o \
+	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
+	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
+	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o
 #
 # Files for a Gnome port
 #
-WINGNOMESRC = ../win/gnome/gnaskstr.c ../win/gnome/gnbind.c \
-	../win/gnome/gnglyph.c ../win/gnome/gnmain.c ../win/gnome/gnmap.c \
-	../win/gnome/gnmenu.c ../win/gnome/gnmesg.c ../win/gnome/gnopts.c \
-	../win/gnome/gnplayer.c ../win/gnome/gnsignal.c \
-	../win/gnome/gnstatus.c ../win/gnome/gntext.c ../win/gnome/gnyesno.c \
-	../win/gnome/gnworn.c
-WINGNOMEOBJ = gnaskstr.o gnbind.o gnglyph.o gnmain.o gnmap.o gnmenu.o \
-	gnmesg.o gnopts.o gnplayer.o gnsignal.o gnstatus.o gntext.o \
-	gnyesno.o gnworn.o tile.o
+#WINGNOMESRC = ../win/gnome/gnaskstr.c ../win/gnome/gnbind.c \
+#	../win/gnome/gnglyph.c ../win/gnome/gnmain.c ../win/gnome/gnmap.c \
+#	../win/gnome/gnmenu.c ../win/gnome/gnmesg.c ../win/gnome/gnopts.c \
+#	../win/gnome/gnplayer.c ../win/gnome/gnsignal.c \
+#	../win/gnome/gnstatus.c ../win/gnome/gntext.c ../win/gnome/gnyesno.c \
+#	../win/gnome/gnworn.c
+#WINGNOMEOBJ = $(TARGETPFX)gnaskstr.o $(TARGETPFX)gnbind.o $(TARGETPFX)gnglyph.o \
+#	$(TARGETPFX)gnmain.o $(TARGETPFX)gnmap.o $(TARGETPFX)gnmenu.o \
+#	$(TARGETPFX)gnmesg.o $(TARGETPFX)gnopts.o $(TARGETPFX)gnplayer.o \
+#	$(TARGETPFX)gnsignal.o $(TARGETPFX)gnstatus.o $(TARGETPFX)gntext.o \
+#	$(TARGETPFX)gnyesno.o $(TARGETPFX)gnworn.o $(TARGETPFX)tile.o
+# empty values for 'make depend'
+WINGNOMESRC =
+WINGNOMEOBJ =
+
 #
 # Files for a Gem port
-WINGEMSRC = ../win/gem/wingem.c ../win/gem/wingem1.c ../win/gem/load_img.c \
-	../win/gem/gr_rect.c tile.c
-WINGEMOBJ = wingem.o wingem1.o load_img.o gr_rect.o tile.o
+#WINGEMSRC = ../win/gem/wingem.c ../win/gem/wingem1.c ../win/gem/load_img.c \
+#	../win/gem/gr_rect.c tile.c
+#WINGEMOBJ = $(TARGETPFX)wingem.o $(TARGETPFX)wingem1.o \
+#	$(TARGETPFX)load_img.o $(TARGETPFX)gr_rect.o $(TARGETPFX)tile.o
+# empty values for 'make depend'
+WINGEMSRC =
+WINGEMOBJ =
+
+# Files for Shim windowing interface for libnh -- doesn't do anything,
+# just passes along the API calls to the library
+#
+WINSHIMSRC = ../win/shim/winshim.c
+WINSHIMOBJ = winshim.o
+
 #
 # Files for a BeOS InterfaceKit port -- not ready for prime time
 WINBESRC =
 WINBEOBJ =
 #WINBESRC = ../win/BeOS/winbe.cpp ../win/BeOS/NHWindow.cpp \
 #	../win/BeOS/NHMenuWindow.cpp ../win/BeOS/NHMapWindow.cpp tile.c
-#WINBEOBJ = winbe.o NHWindow.o NHMenuWindow.o NHMapWindow.o tile.o
+#WINBEOBJ = $(TARGETPFX)winbe.o $(TARGETPFX)NHWindow.o \
+#	$(TARGETPFX)NHMenuWindow.o $(TARGETPFX)NHMapWindow.o \
+#	$(TARGETPFX)tile.o
 #
 #
 #WINSRC = $(WINTTYSRC)
@@ -336,6 +382,9 @@ WINCURSESLIB = -lncurses
 # For Curses
 #WINLIB = $(WINCURSESLIB)
 #
+# some platforms need to build the support libraries
+# BUILDMORE = $(TARGETPFX)pdcurses.a
+
 # any other strange libraries your system needs (for Sysunix only -- the more
 # specialized targets should already be right)
 #
@@ -369,15 +418,16 @@ WINCURSESLIB = -lncurses
 # make NetHack
 GAME     = nethack
 # GAME     = nethack.prg
+GAMEBIN = $(GAME)
 
 # if you defined RANDOM in unixconf.h since your system did not come
 # with a reasonable random number generator
-# RANDOBJ = random.o
+# RANDOBJ = $(TARGETPFX)random.o
 RANDOBJ =
 
-
 # used by `make depend' to reconstruct this Makefile; you shouldn't need this
-AWK	= nawk
+# at all but can override with 'make AWK=nawk' or 'make AWK=gawk' if necessary
+AWK	= awk
 
 # when using 'makedefs -v', also force dat/gitinfo.txt to be up to date;
 # changing this to 0 will change the behavior to only make that file if
@@ -402,6 +452,10 @@ QUIETCC=0
 #
 # Other things that have to be reconfigured are in config.h,
 # {unixconf.h, pcconf.h}, and possibly system.h
+
+# Add rule for possible cross-compiler
+$(TARGETPFX)%.o : %.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ $<
 
 # Verbosity definitions, begin
 #   Set QUIETCC=1 above to output less feedback while building.
@@ -433,7 +487,17 @@ AT_V1 := @
 AT = $(AT_V$(QUIETCC))
 # Verbosity, end
 
+# verbosity-adjacent; these will already have 'real' values if hints have
+# set up cross-compiling, in which case these assignments will be no-ops
+PREGAME=@true
+CLEANMORE=@true
+PACKAGE=@true
+
+
 MAKEDEFS = ../util/makedefs
+
+# -lm required by lua
+LUALIB = ../lib/lua/liblua.a -lm
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
@@ -461,26 +525,27 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 # all operating-system-dependent .c (for dependencies and such)
-SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
+SYSCSRC = ../sys/share/pcmain.c ../sys/share/pcsys.c \
 	../sys/share/pctty.c ../sys/share/pcunix.c \
 	../sys/share/pmatchregex.c ../sys/share/posixregex.c \
 	../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
-	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
+	../sys/unix/unixunix.c ../sys/unix/unixres.c
 SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	#tile.c
+GENCSRC = #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) $(WINSHIMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
 # Files for window system chaining. Requires SYSCF; include via HINTSRC/HINTOBJ
 CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
 	   ../win/chain/wc_trace.c
-CHAINOBJ = wc_chainin.o wc_chainout.o wc_trace.o
+CHAINOBJ = $(TARGETPFX)wc_chainin.o $(TARGETPFX)wc_chainout.o \
+	$(TARGETPFX)wc_trace.o
 
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
@@ -489,7 +554,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
-# all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
+# all .h files except date.h, onames.h, and pm.h which would
 # cause dependency loops if run through "make depend"
 # and dgn_file.h, special level & dungeon files.
 #
@@ -501,69 +566,102 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	optlist.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
 	region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h \
+	tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
 	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h dgn_file.h
+HSOURCES = $(HACKINCL) date.h onames.h pm.h dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
+HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 
-HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
-	bones.o botl.o cmd.o dbridge.o decl.o detect.o dig.o display.o dlb.o \
-	do.o do_name.o do_wear.o dog.o dogmove.o dokick.o dothrow.o \
-	drawing.o dungeon.o eat.o end.o engrave.o exper.o explode.o \
-	extralev.o files.o fountain.o hack.o hacklib.o \
-	insight.o invent.o isaac64.o \
-	light.o lock.o mail.o makemon.o mapglyph.o mcastu.o mdlib.o mhitm.o \
-	mhitu.o minion.o mklev.o mkmap.o mkmaze.o mkobj.o mkroom.o mon.o \
-	mondata.o monmove.o mplayer.o mthrowu.o muse.o music.o \
-	nhlua.o nhlsel.o nhlobj.o o_init.o objnam.o options.o \
-	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
-	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
-	role.o rumors.o save.o sfstruct.o \
-	shk.o shknam.o sit.o sounds.o sp_lev.o spell.o symbols.o sys.o \
-	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
-	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
-	wizard.o worm.o worn.o write.o zap.o \
-	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) version.o
+HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
+	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
+	$(TARGETPFX)ball.o $(TARGETPFX)bones.o $(TARGETPFX)botl.o \
+	$(TARGETPFX)cmd.o $(TARGETPFX)dbridge.o $(TARGETPFX)decl.o \
+	$(TARGETPFX)detect.o $(TARGETPFX)dig.o $(TARGETPFX)display.o \
+	$(TARGETPFX)dlb.o $(TARGETPFX)do.o $(TARGETPFX)do_name.o \
+	$(TARGETPFX)do_wear.o $(TARGETPFX)dog.o $(TARGETPFX)dogmove.o \
+	$(TARGETPFX)dokick.o $(TARGETPFX)dothrow.o $(TARGETPFX)drawing.o \
+	$(TARGETPFX)dungeon.o $(TARGETPFX)eat.o $(TARGETPFX)end.o \
+	$(TARGETPFX)engrave.o $(TARGETPFX)exper.o $(TARGETPFX)explode.o \
+	$(TARGETPFX)extralev.o $(TARGETPFX)files.o $(TARGETPFX)fountain.o \
+	$(TARGETPFX)hack.o $(TARGETPFX)hacklib.o $(TARGETPFX)insight.o \
+	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
+	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
+	$(TARGETPFX)mapglyph.o $(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
+	$(TARGETPFX)mhitm.o $(TARGETPFX)mhitu.o $(TARGETPFX)minion.o \
+	$(TARGETPFX)mklev.o $(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o \
+	$(TARGETPFX)mkobj.o $(TARGETPFX)mkroom.o $(TARGETPFX)mon.o \
+	$(TARGETPFX)mondata.o $(TARGETPFX)monmove.o $(TARGETPFX)monst.o \
+	$(TARGETPFX)mplayer.o $(TARGETPFX)mthrowu.o $(TARGETPFX)muse.o \
+	$(TARGETPFX)music.o $(TARGETPFX)nhlua.o $(TARGETPFX)nhlsel.o \
+	$(TARGETPFX)nhlobj.o $(TARGETPFX)objects.o $(TARGETPFX)o_init.o \
+	$(TARGETPFX)objnam.o $(TARGETPFX)options.o $(TARGETPFX)pager.o \
+	$(TARGETPFX)pickup.o $(TARGETPFX)pline.o $(TARGETPFX)polyself.o \
+	$(TARGETPFX)potion.o $(TARGETPFX)pray.o $(TARGETPFX)priest.o \
+	$(TARGETPFX)quest.o $(TARGETPFX)questpgr.o $(TARGETPFX)read.o \
+	$(TARGETPFX)rect.o $(TARGETPFX)region.o $(TARGETPFX)restore.o \
+	$(TARGETPFX)rip.o $(TARGETPFX)rnd.o $(TARGETPFX)role.o \
+	$(TARGETPFX)rumors.o $(TARGETPFX)save.o $(TARGETPFX)sfstruct.o \
+	$(TARGETPFX)shk.o $(TARGETPFX)shknam.o $(TARGETPFX)sit.o \
+	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o \
+	$(TARGETPFX)symbols.o $(TARGETPFX)sys.o $(TARGETPFX)steal.o \
+	$(TARGETPFX)steed.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
+	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
+	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)vault.o \
+	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
+	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
+	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
+	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) \
+	$(TARGETPFX)version.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 # first target is also the default target for 'make' without any arguments
 all:	$(GAME)
 	@echo ""
 
-$(GAME):	$(SYSTEM)
+pregame:
+	$(PREGAME)
+
+$(GAME):	pregame $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
-Sysunix:	$(HOBJ) Makefile
+Sysunix:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+		$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 	@touch Sysunix
 
-Sys3B2:	$(HOBJ) Makefile
+Sys3B2:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) -lmalloc
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+		$(HOBJ) $(WINLIB) $(LUALIB) -lmalloc
 	@touch Sys3B2
 
-Sysatt:	$(HOBJ) Makefile
+Sysatt:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Loading $(GAME)."
-	$(AT)$(LD) $(LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAME) $(HOBJ)
+	$(AT)$(LD) $(TARGET_LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAMEBIN) \
+		$(HOSTOBJ) $(HOBJ) $(LUALIB)
 	@touch Sysatt
 
-Systos:	$(HOBJ) Makefile
+Systos:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+		$(HOBJ) $(WINLIB) $(LUALIB)
 	@touch Systos
 
-SysV-AT:	DUMB.Setup $(HOBJ) Makefile
+SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB)
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
+		$(HOBJ) $(WINLIB) $(LUALIB)
 	@touch SysV-AT
 
-SysBe: $(HOBJ) Makefile
+SysBe: $(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
-	$(AT)$(LINK) $(LFLAGS) -o $(GAME) $(HOBJ) $(WINLIB) $(LIBS)
+	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAME) \
+		$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
@@ -598,11 +696,11 @@ DUMB.Setup:	../include/extern.h
 # special rules, to force update of makedefs, real dependencies should be
 # below in the 'make depend' output.
 monst.o:
-	$(CC) $(CFLAGS) -c monst.c
+	$(CC) $(CFLAGS) -c -o $@ monst.c
 	@rm -f $(MAKEDEFS)
 
 objects.o:
-	$(CC) $(CFLAGS) -c objects.c
+	$(CC) $(CFLAGS) -c -o $@ objects.c
 	@rm -f $(MAKEDEFS)
 
 # Qt 3 windowport meta-object-compiler output
@@ -655,10 +753,6 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 	@( cd ../util ; $(MAKE) ../include/onames.h )
 ../include/pm.h: $(MAKEDEFS) ../include/onames.h
 	@( cd ../util ; $(MAKE) ../include/pm.h )
-../include/vis_tab.h: $(MAKEDEFS) ../include/pm.h
-	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
-# makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
-vis_tab.c: ../include/vis_tab.h
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
 tile.c: ../win/share/tilemap.c $(HACK_H)
@@ -667,7 +761,7 @@ tile.c: ../win/share/tilemap.c $(HACK_H)
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
 
-sfstruct.o: sfstruct.c $(HACK_H)
+$(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
@@ -700,14 +794,18 @@ tags: $(CSOURCES)
 
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
+	$(CLEANMORE)
 
 spotless: clean
-	-rm -f a.out core $(GAME) Sys*
+	-rm -f a.out core $(GAMEBIN) Sys*
 	-rm -f ../lib/lua/liblua.a ../include/nhlua.h
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
-	-rm -f ../include/vis_tab.h vis_tab.c tile.c *.moc
+	-rm -f tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
+package:
+	$(PACKAGE)
+	@echo packaging complete.
 
 depend: ../sys/unix/depend.awk \
 		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
@@ -730,10 +828,10 @@ depend: ../sys/unix/depend.awk \
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
 # config.h timestamp
-$(CONFIG_H): ../include/config.h ../include/patchlevel.h ../include/config1.h \
+$(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/global.h ../include/coord.h \
 		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/micro.h ../include/pcconf.h \
+		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
 		../include/ntconf.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
@@ -745,423 +843,356 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/wintype.h ../include/context.h ../include/rm.h \
 		../include/botl.h ../include/rect.h ../include/region.h \
 		../include/decl.h ../include/quest.h ../include/spell.h \
-		../include/color.h ../include/obj.h ../include/you.h \
-		../include/attrib.h ../include/monst.h ../include/mextra.h \
-		../include/skills.h ../include/onames.h ../include/timeout.h \
-		../include/trap.h ../include/flag.h ../include/vision.h \
-		../include/display.h ../include/engrave.h \
-		../include/winprocs.h ../include/sys.h ../include/wintty.h \
-		../include/trampoli.h
+		../include/color.h ../include/obj.h ../include/engrave.h \
+		../include/you.h ../include/attrib.h ../include/monst.h \
+		../include/mextra.h ../include/skills.h ../include/onames.h \
+		../include/timeout.h ../include/trap.h ../include/flag.h \
+		../include/vision.h ../include/display.h ../include/winprocs.h \
+		../include/sys.h ../include/wintty.h
 	touch $(HACK_H)
 #
-tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c -o $@ ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcmain.c
-pcsys.o: ../sys/share/pcsys.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcsys.c
-pctty.o: ../sys/share/pctty.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pctty.c
-pcunix.o: ../sys/share/pcunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pcunix.c
-pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/pmatchregex.c
-posixregex.o: ../sys/share/posixregex.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/posixregex.c
-random.o: ../sys/share/random.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/random.c
-ioctl.o: ../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/ioctl.c
-unixtty.o: ../sys/share/unixtty.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/share/unixtty.c
-unixmain.o: ../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixmain.c
-unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixunix.c
-unixres.o: ../sys/unix/unixres.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c -o $@ ../sys/unix/unixres.c
-bemain.o: ../sys/be/bemain.c $(HACK_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c -o $@ ../sys/be/bemain.c
-getline.o: ../win/tty/getline.c $(HACK_H) ../include/func_tab.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/tty/getline.c
-termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/tty/termcap.c
-topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/tty/topl.c
-wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/tty/wintty.c
-cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmain.c
-curswins.o: ../win/curses/curswins.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/curswins.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/curswins.c
-cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursmisc.h ../include/func_tab.h ../include/dlb.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmisc.c
-cursdial.o: ../win/curses/cursdial.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursdial.h ../include/func_tab.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursdial.c
-cursstat.o: ../win/curses/cursstat.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursstat.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursstat.c
-cursinit.o: ../win/curses/cursinit.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinit.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinit.c
-cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursmesg.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursmesg.c
-cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) ../include/wincurs.h \
-		../win/curses/cursinvt.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/curses/cursinvt.c
-Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
-		$(CONFIG_H) ../include/lint.h ../include/winX.h \
-		../include/color.h ../include/wintype.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
-dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
-		../include/winX.h ../include/color.h ../include/wintype.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
-winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../include/xwindow.h ../win/X11/nh72icon ../win/X11/nh56icon \
-		../win/X11/nh32icon
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winX.c
-winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
-		../include/winX.h ../include/tile2x11.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmap.c
-winmenu.o: ../win/X11/winmenu.c $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmenu.c
-winmesg.o: ../win/X11/winmesg.c ../include/xwindow.h $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmesg.c
-winmisc.o: ../win/X11/winmisc.c $(HACK_H) ../include/func_tab.h \
-		../include/winX.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmisc.c
-winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h ../include/xwindow.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winstat.c
-wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h ../include/xwindow.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/wintext.c
-winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
-	$(CC) $(CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
-tile.o: tile.c $(HACK_H)
-gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
-		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnaskstr.c
-gnbind.o: ../win/gnome/gnbind.c ../win/gnome/gnbind.h ../win/gnome/gnomeprv.h \
-		$(HACK_H) ../include/dlb.h \
-		../include/winGnome.h ../win/gnome/gnmain.h \
-		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
-		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
-		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
-		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
-		../win/gnome/gnaskstr.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnbind.c
-gnglyph.o: ../win/gnome/gnglyph.c ../win/gnome/gnglyph.h $(CONFIG_H) \
-		../include/tile2x11.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnglyph.c
-gnmain.o: ../win/gnome/gnmain.c ../win/gnome/gnmain.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnbind.h ../win/gnome/gnmap.h \
-		../win/gnome/gnmenu.h ../win/gnome/gnplayer.h \
-		../win/gnome/gnstatus.h ../win/gnome/gntext.h \
-		../win/gnome/gnmesg.h ../win/gnome/gnyesno.h \
-		../win/gnome/gnworn.h ../win/gnome/gnopts.h ../include/date.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmain.c
-gnmap.o: ../win/gnome/gnmap.c ../win/gnome/gnmap.h $(CONFIG_H) \
-		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmap.c
-gnmenu.o: ../win/gnome/gnmenu.c ../win/gnome/gnmenu.h $(CONFIG_H) \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h ../win/gnome/gnmain.h \
-		../win/gnome/gnbind.h ../win/gnome/gnmap.h \
-		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
-		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
-		../win/gnome/gnyesno.h ../win/gnome/gnworn.h \
+$(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcmain.c
+$(TARGETPFX)pcsys.o: ../sys/share/pcsys.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcsys.c
+$(TARGETPFX)pctty.o: ../sys/share/pctty.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pctty.c
+$(TARGETPFX)pcunix.o: ../sys/share/pcunix.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcunix.c
+$(TARGETPFX)pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pmatchregex.c
+$(TARGETPFX)posixregex.o: ../sys/share/posixregex.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/posixregex.c
+$(TARGETPFX)random.o: ../sys/share/random.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/random.c
+$(TARGETPFX)ioctl.o: ../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/ioctl.c
+$(TARGETPFX)unixtty.o: ../sys/share/unixtty.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/unixtty.c
+$(TARGETPFX)unixmain.o: ../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/unix/unixmain.c
+$(TARGETPFX)unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/unix/unixunix.c
+$(TARGETPFX)unixres.o: ../sys/unix/unixres.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/unix/unixres.c
+$(TARGETPFX)getline.o: ../win/tty/getline.c $(HACK_H) ../include/func_tab.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/getline.c
+$(TARGETPFX)termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/termcap.c
+$(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/topl.c
+$(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
+		../include/tcap.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/wintty.c
+$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
+$(TARGETPFX)curswins.o: ../win/curses/curswins.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/curswins.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/curswins.c
+$(TARGETPFX)cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursmisc.h \
+		../include/func_tab.h ../include/dlb.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmisc.c
+$(TARGETPFX)cursdial.o: ../win/curses/cursdial.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursdial.h \
 		../include/func_tab.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmenu.c
-gnmesg.o: ../win/gnome/gnmesg.c ../win/gnome/gnmesg.h $(CONFIG_H) \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
-		../include/dlb.h ../include/winGnome.h ../win/gnome/gnglyph.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnmesg.c
-gnopts.o: ../win/gnome/gnopts.c ../win/gnome/gnopts.h ../win/gnome/gnglyph.h \
-		$(CONFIG_H) ../win/gnome/gnmain.h ../win/gnome/gnmap.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnopts.c
-gnplayer.o: ../win/gnome/gnplayer.c ../win/gnome/gnplayer.h \
-		../win/gnome/gnmain.h $(HACK_H)
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnplayer.c
-gnsignal.o: ../win/gnome/gnsignal.c ../win/gnome/gnsignal.h \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h ../win/gnome/gnglyph.h \
-		../win/gnome/gnmain.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnsignal.c
-gnstatus.o: ../win/gnome/gnstatus.c ../win/gnome/gnstatus.h $(CONFIG_H) \
-		../win/gnome/gnsignal.h ../win/gnome/gnomeprv.h $(HACK_H) \
-		../include/dlb.h ../include/winGnome.h \
-		../win/gnome/gnglyph.h ../win/gnome/gn_xpms.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnstatus.c
-gntext.o: ../win/gnome/gntext.c ../win/gnome/gntext.h $(CONFIG_H) \
-		../win/gnome/gnmain.h ../win/gnome/gn_rip.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gntext.c
-gnyesno.o: ../win/gnome/gnyesno.c ../win/gnome/gnbind.h \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h ../win/gnome/gnmain.h \
-		../win/gnome/gnmap.h ../win/gnome/gnmenu.h \
-		../win/gnome/gnplayer.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnglyph.h ../win/gnome/gnstatus.h \
-		../win/gnome/gntext.h ../win/gnome/gnmesg.h \
-		../win/gnome/gnyesno.h ../win/gnome/gnworn.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnyesno.c
-gnworn.o: ../win/gnome/gnworn.c ../win/gnome/gnworn.h $(CONFIG_H) \
-		../win/gnome/gnglyph.h ../win/gnome/gnsignal.h \
-		../win/gnome/gnomeprv.h $(HACK_H) ../include/dlb.h \
-		../include/winGnome.h
-	$(CC) $(CFLAGS) $(GNOMEINC) -c -o $@ ../win/gnome/gnworn.c
-wingem.o: ../win/gem/wingem.c $(HACK_H) ../include/func_tab.h ../include/dlb.h \
-		../include/wingem.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/gem/wingem.c
-wingem1.o: ../win/gem/wingem1.c ../include/gem_rsc.h ../include/load_img.h \
-		../include/gr_rect.h ../include/wintype.h ../include/wingem.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/gem/wingem1.c
-load_img.o: ../win/gem/load_img.c ../include/load_img.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/gem/load_img.c
-gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/gem/gr_rect.c
-tile.o: tile.c $(HACK_H)
-cppregex.o: ../sys/share/cppregex.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
-qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_bind.h \
-		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_click.h \
-		../win/Qt/qt_delay.h ../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h \
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursdial.c
+$(TARGETPFX)cursstat.o: ../win/curses/cursstat.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursstat.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursstat.c
+$(TARGETPFX)cursinit.o: ../win/curses/cursinit.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursinit.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinit.c
+$(TARGETPFX)cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursmesg.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmesg.c
+$(TARGETPFX)cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursinvt.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinvt.c
+$(TARGETPFX)Window.o: ../win/X11/Window.c ../include/xwindowp.h \
+		../include/xwindow.h $(CONFIG_H) ../include/lint.h \
+		../include/winX.h ../include/color.h ../include/wintype.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
+$(TARGETPFX)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
+		../include/winX.h ../include/color.h ../include/wintype.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
+$(TARGETPFX)winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h \
+		../include/dlb.h ../include/xwindow.h ../win/X11/nh72icon \
+		../win/X11/nh56icon ../win/X11/nh32icon
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winX.c
+$(TARGETPFX)winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) \
+		../include/dlb.h ../include/winX.h ../include/tile2x11.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmap.c
+$(TARGETPFX)winmenu.o: ../win/X11/winmenu.c $(HACK_H) ../include/winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmenu.c
+$(TARGETPFX)winmesg.o: ../win/X11/winmesg.c ../include/xwindow.h $(HACK_H) \
+		../include/winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmesg.c
+$(TARGETPFX)winmisc.o: ../win/X11/winmisc.c $(HACK_H) ../include/func_tab.h \
+		../include/winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winmisc.c
+$(TARGETPFX)winstat.o: ../win/X11/winstat.c $(HACK_H) ../include/winX.h \
+		../include/xwindow.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winstat.c
+$(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
+		../include/xwindow.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/wintext.c
+$(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
+	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
+$(TARGETPFX)tile.o: tile.c $(HACK_H)
+$(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
+$(TARGETPFX)qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_click.h ../win/Qt/qt_delay.h \
+		../win/Qt/qt_xcmd.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_menu.h \
+		../win/Qt/qt_rip.h ../win/Qt/qt_msg.h ../win/Qt/qt_plsel.h \
+		../win/Qt/qt_svsel.h ../win/Qt/qt_set.h ../win/Qt/qt_stat.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
+		../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h ../include/dlb.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
+$(TARGETPFX)qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_click.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
+$(TARGETPFX)qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
+$(TARGETPFX)qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_delay.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
+$(TARGETPFX)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) \
+		../include/tile2x11.h ../win/Qt/qt_pre.h ../win/Qt/qt_post.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_set.h ../win/Qt/qt_inv.h \
 		../win/Qt/qt_map.h ../win/Qt/qt_win.h ../win/Qt/qt_clust.h \
-		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
-		../win/Qt/qt_plsel.h ../win/Qt/qt_svsel.h ../win/Qt/qt_set.h \
-		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_streq.h \
-		../win/Qt/qt_line.h ../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h \
-		../include/dlb.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
-qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_click.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_click.cpp
-qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_clust.cpp
-qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_delay.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
-qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
-qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_icon.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
-qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_inv.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
-qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_key.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
-qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_line.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
-qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) \
-		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_main.moc \
-		../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
-		../win/Qt/qt_key.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
-		../win/Qt/qt_clust.h ../win/Qt/qt_msg.h ../win/Qt/qt_set.h \
-		../win/Qt/qt_stat.h ../win/Qt/qt_icon.h ../win/Qt/qt_str.h \
-		qt_kde0.moc
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
-qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
+$(TARGETPFX)qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_icon.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
+$(TARGETPFX)qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
+$(TARGETPFX)qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_key.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_key.cpp
+$(TARGETPFX)qt_line.o: ../win/Qt/qt_line.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_line.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_line.cpp
+$(TARGETPFX)qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		qt_main.moc ../win/Qt/qt_bind.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_inv.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_stat.h ../win/Qt/qt_icon.h \
+		../win/Qt/qt_str.h qt_kde0.moc
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
+$(TARGETPFX)qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
 		../win/Qt/qt_clust.h qt_map.moc ../win/Qt/qt_click.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_xpms.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
+$(TARGETPFX)qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_menu.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_rip.h qt_menu.moc ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
 		../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
-qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_menu.h \
-		../win/Qt/qt_win.h ../win/Qt/qt_rip.h qt_menu.moc \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_streq.h \
-		../win/Qt/qt_line.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
-qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
+$(TARGETPFX)qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
 		qt_msg.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
-qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_plsel.h qt_plsel.moc \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
+$(TARGETPFX)qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_plsel.h qt_plsel.moc \
 		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
-qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_rip.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
-		../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
-qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_set.h qt_set.moc \
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_plsel.cpp
+$(TARGETPFX)qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_rip.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_rip.cpp
+$(TARGETPFX)qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_set.moc \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
-qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_stat.h \
-		../win/Qt/qt_win.h ../win/Qt/qt_icon.h qt_stat.moc \
-		../win/Qt/qt_set.h ../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
-qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
-qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_streq.h \
-		../win/Qt/qt_line.h ../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
-qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_svsel.h \
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
+$(TARGETPFX)qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_stat.h ../win/Qt/qt_win.h \
+		../win/Qt/qt_icon.h qt_stat.moc ../win/Qt/qt_set.h \
 		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_str.h ../win/Qt/qt_xpms.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_stat.cpp
+$(TARGETPFX)qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
+$(TARGETPFX)qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
 		../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
-qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_win.h \
-		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
-		../win/Qt/qt_click.h ../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h \
-		../win/Qt/qt_key.h ../win/Qt/qt_icon.h ../win/Qt/qt_map.h \
-		../win/Qt/qt_clust.h ../win/Qt/qt_menu.h ../win/Qt/qt_rip.h \
-		../win/Qt/qt_msg.h ../win/Qt/qt_set.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
-qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
-		../win/Qt/qt_xcmd.h qt_xcmd.moc ../win/Qt/qt_bind.h \
-		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_set.h \
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
+$(TARGETPFX)qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_svsel.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_svsel.cpp
+$(TARGETPFX)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_win.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_click.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
+		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
+		../win/Qt/qt_set.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
+$(TARGETPFX)qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
+		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_xcmd.h \
+		qt_xcmd.moc ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
+$(TARGETPFX)qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_yndlg.h qt_yndlg.moc \
 		../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
-qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_yndlg.h qt_yndlg.moc \
-		../win/Qt/qt_str.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
-qt3_win.o: ../win/Qt3/qt3_win.cpp $(HACK_H) ../include/func_tab.h \
-		../include/dlb.h ../include/tile2x11.h \
-		../win/Qt3/qt3_win.h ../win/Qt3/qt3_clust.h \
-		../win/Qt3/qt3_kde0.h ../win/Qt3/qt3_xpms.h qt3_win.moc \
-		qt3_kde0.moc qt3tableview.moc
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_win.cpp
-qt3_clust.o: ../win/Qt3/qt3_clust.cpp ../win/Qt3/qt3_clust.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3_clust.cpp
-qt3tableview.o: ../win/Qt3/qt3tableview.cpp ../win/Qt3/qt3tableview.h
-	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt3/qt3tableview.cpp
-wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
-wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_chainout.c
-wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
-	$(CC) $(CFLAGS) -c -o $@ ../win/chain/wc_trace.c
-vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
-allmain.o: allmain.c $(HACK_H)
-alloc.o: alloc.c $(CONFIG_H)
-apply.o: apply.c $(HACK_H)
-artifact.o: artifact.c $(HACK_H) ../include/artifact.h ../include/artilist.h
-attrib.o: attrib.c $(HACK_H)
-ball.o: ball.c $(HACK_H)
-bones.o: bones.c $(HACK_H)
-botl.o: botl.c $(HACK_H)
-cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
-dbridge.o: dbridge.c $(HACK_H)
-decl.o: decl.c $(HACK_H)
-detect.o: detect.c $(HACK_H) ../include/artifact.h
-dig.o: dig.c $(HACK_H)
-display.o: display.c $(HACK_H)
-dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h
-do.o: do.c $(HACK_H)
-do_name.o: do_name.c $(HACK_H)
-do_wear.o: do_wear.c $(HACK_H)
-dog.o: dog.c $(HACK_H)
-dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
-dokick.o: dokick.c $(HACK_H)
-dothrow.o: dothrow.c $(HACK_H)
-drawing.o: drawing.c $(CONFIG_H)
-dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
-eat.o: eat.c $(HACK_H)
-end.o: end.c $(HACK_H) ../include/dlb.h
-engrave.o: engrave.c $(HACK_H)
-exper.o: exper.c $(HACK_H)
-explode.o: explode.c $(HACK_H)
-extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
-fountain.o: fountain.c $(HACK_H)
-hack.o: hack.c $(HACK_H)
-hacklib.o: hacklib.c $(HACK_H)
-insight.o: insight.c $(HACK_H)
-invent.o: invent.c $(HACK_H)
-isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
-light.o: light.c $(HACK_H)
-lock.o: lock.c $(HACK_H)
-mail.o: mail.c $(HACK_H) ../include/mail.h
-makemon.o: makemon.c $(HACK_H)
-mapglyph.o: mapglyph.c $(HACK_H)
-mcastu.o: mcastu.c $(HACK_H)
-mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
-		../include/monattk.h ../include/monflag.h \
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
+$(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
+$(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainout.c
+$(TARGETPFX)wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_trace.c
+$(TARGETPFX)allmain.o: allmain.c $(HACK_H)
+$(TARGETPFX)alloc.o: alloc.c $(CONFIG_H)
+$(TARGETPFX)apply.o: apply.c $(HACK_H)
+$(TARGETPFX)artifact.o: artifact.c $(HACK_H) ../include/artifact.h \
+		../include/artilist.h
+$(TARGETPFX)attrib.o: attrib.c $(HACK_H)
+$(TARGETPFX)ball.o: ball.c $(HACK_H)
+$(TARGETPFX)bones.o: bones.c $(HACK_H)
+$(TARGETPFX)botl.o: botl.c $(HACK_H)
+$(TARGETPFX)cmd.o: cmd.c $(HACK_H) ../include/func_tab.h
+$(TARGETPFX)dbridge.o: dbridge.c $(HACK_H)
+$(TARGETPFX)decl.o: decl.c $(HACK_H)
+$(TARGETPFX)detect.o: detect.c $(HACK_H) ../include/artifact.h
+$(TARGETPFX)dig.o: dig.c $(HACK_H)
+$(TARGETPFX)display.o: display.c $(HACK_H)
+$(TARGETPFX)dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h
+$(TARGETPFX)do.o: do.c $(HACK_H)
+$(TARGETPFX)do_name.o: do_name.c $(HACK_H)
+$(TARGETPFX)do_wear.o: do_wear.c $(HACK_H)
+$(TARGETPFX)dog.o: dog.c $(HACK_H)
+$(TARGETPFX)dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
+$(TARGETPFX)dokick.o: dokick.c $(HACK_H)
+$(TARGETPFX)dothrow.o: dothrow.c $(HACK_H)
+$(TARGETPFX)drawing.o: drawing.c $(CONFIG_H) ../include/color.h \
+		../include/rm.h ../include/objclass.h ../include/monsym.h
+$(TARGETPFX)dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h \
+		../include/dlb.h
+$(TARGETPFX)eat.o: eat.c $(HACK_H)
+$(TARGETPFX)end.o: end.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)engrave.o: engrave.c $(HACK_H)
+$(TARGETPFX)exper.o: exper.c $(HACK_H)
+$(TARGETPFX)explode.o: explode.c $(HACK_H)
+$(TARGETPFX)extralev.o: extralev.c $(HACK_H)
+$(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
+$(TARGETPFX)fountain.o: fountain.c $(HACK_H)
+$(TARGETPFX)hack.o: hack.c $(HACK_H)
+$(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
+$(TARGETPFX)insight.o: insight.c $(HACK_H)
+$(TARGETPFX)invent.o: invent.c $(HACK_H)
+$(TARGETPFX)isaac64.o: isaac64.c $(CONFIG_H) ../include/isaac64.h
+$(TARGETPFX)light.o: light.c $(HACK_H)
+$(TARGETPFX)lock.o: lock.c $(HACK_H)
+$(TARGETPFX)mail.o: mail.c $(HACK_H) ../include/mail.h
+$(TARGETPFX)makemon.o: makemon.c $(HACK_H)
+$(TARGETPFX)mapglyph.o: mapglyph.c $(HACK_H)
+$(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
+$(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
+		../include/align.h ../include/monattk.h ../include/monflag.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/mextra.h ../include/you.h \
 		../include/attrib.h ../include/prop.h ../include/skills.h \
 		../include/context.h ../include/flag.h ../include/dlb.h
-mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
-mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
-minion.o: minion.c $(HACK_H)
-mklev.o: mklev.c $(HACK_H)
-mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
-mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h
-mkobj.o: mkobj.c $(HACK_H)
-mkroom.o: mkroom.c $(HACK_H)
-mon.o: mon.c $(HACK_H) ../include/mfndpos.h
-mondata.o: mondata.c $(HACK_H)
-monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h ../include/artifact.h
-monst.o: monst.c $(CONFIG_H) ../include/permonst.h ../include/align.h \
-		../include/monattk.h ../include/monflag.h ../include/monsym.h \
+$(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
+$(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
+$(TARGETPFX)minion.o: minion.c $(HACK_H)
+$(TARGETPFX)mklev.o: mklev.c $(HACK_H)
+$(TARGETPFX)mkmap.o: mkmap.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)mkmaze.o: mkmaze.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)mkobj.o: mkobj.c $(HACK_H)
+$(TARGETPFX)mkroom.o: mkroom.c $(HACK_H)
+$(TARGETPFX)mon.o: mon.c $(HACK_H) ../include/mfndpos.h
+$(TARGETPFX)mondata.o: mondata.c $(HACK_H)
+$(TARGETPFX)monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h \
+		../include/artifact.h
+$(TARGETPFX)monst.o: monst.c $(CONFIG_H) ../include/permonst.h \
+		../include/align.h ../include/monattk.h ../include/monflag.h \
+		../include/monsym.h ../include/color.h
+$(TARGETPFX)mplayer.o: mplayer.c $(HACK_H)
+$(TARGETPFX)mthrowu.o: mthrowu.c $(HACK_H)
+$(TARGETPFX)muse.o: muse.c $(HACK_H)
+$(TARGETPFX)music.o: music.c $(HACK_H)
+$(TARGETPFX)nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)o_init.o: o_init.c $(HACK_H)
+$(TARGETPFX)objects.o: objects.c $(CONFIG_H) ../include/obj.h \
+		../include/objclass.h ../include/prop.h ../include/skills.h \
 		../include/color.h
-mplayer.o: mplayer.c $(HACK_H)
-mthrowu.o: mthrowu.c $(HACK_H)
-muse.o: muse.c $(HACK_H)
-music.o: music.c $(HACK_H)
-nhlua.o: nhlua.c $(HACK_H) ../include/dlb.h
-nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
-nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
-o_init.o: o_init.c $(HACK_H)
-objects.o: objects.c $(CONFIG_H) ../include/obj.h ../include/objclass.h \
-		../include/prop.h ../include/skills.h ../include/color.h
-objnam.o: objnam.c $(HACK_H)
-options.o: options.c $(CONFIG_H) ../include/objclass.h ../include/flag.h \
-		$(HACK_H) ../include/tcap.h ../include/optlist.h
-pager.o: pager.c $(HACK_H) ../include/dlb.h
-pickup.o: pickup.c $(HACK_H)
-pline.o: pline.c $(HACK_H)
-polyself.o: polyself.c $(HACK_H)
-potion.o: potion.c $(HACK_H)
-pray.o: pray.c $(HACK_H)
-priest.o: priest.c $(HACK_H) ../include/mfndpos.h
-quest.o: quest.c $(HACK_H)
-questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
-read.o: read.c $(HACK_H)
-rect.o: rect.c $(HACK_H)
-region.o: region.c $(HACK_H)
-restore.o: restore.c $(HACK_H) ../include/tcap.h
-rip.o: rip.c $(HACK_H)
-rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
-role.o: role.c $(HACK_H)
-rumors.o: rumors.c $(HACK_H) ../include/dlb.h
-save.o: save.c $(HACK_H)
-sfstruct.o: sfstruct.c $(HACK_H)
-shk.o: shk.c $(HACK_H)
-shknam.o: shknam.c $(HACK_H)
-sit.o: sit.c $(HACK_H) ../include/artifact.h
-sounds.o: sounds.c $(HACK_H)
-sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
-spell.o: spell.c $(HACK_H)
-steal.o: steal.c $(HACK_H)
-steed.o: steed.c $(HACK_H)
-symbols.o: symbols.c $(HACK_H) ../include/tcap.h
-sys.o: sys.c $(HACK_H)
-teleport.o: teleport.c $(HACK_H)
-timeout.o: timeout.c $(HACK_H)
-topten.o: topten.c $(HACK_H) ../include/dlb.h
-track.o: track.c $(HACK_H)
-trap.o: trap.c $(HACK_H)
-u_init.o: u_init.c $(HACK_H)
-uhitm.o: uhitm.c $(HACK_H)
-vault.o: vault.c $(HACK_H)
-version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h
-vision.o: vision.c $(HACK_H) ../include/vis_tab.h
-weapon.o: weapon.c $(HACK_H)
-were.o: were.c $(HACK_H)
-wield.o: wield.c $(HACK_H)
-windows.o: windows.c $(HACK_H) ../include/wingem.h ../include/winGnome.h
-wizard.o: wizard.c $(HACK_H)
-worm.o: worm.c $(HACK_H)
-worn.o: worn.c $(HACK_H)
-write.o: write.c $(HACK_H)
-zap.o: zap.c $(HACK_H)
+$(TARGETPFX)objnam.o: objnam.c $(HACK_H)
+$(TARGETPFX)options.o: options.c $(CONFIG_H) ../include/objclass.h \
+		../include/flag.h $(HACK_H) ../include/tcap.h \
+		../include/optlist.h
+$(TARGETPFX)pager.o: pager.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)pickup.o: pickup.c $(HACK_H)
+$(TARGETPFX)pline.o: pline.c $(HACK_H)
+$(TARGETPFX)polyself.o: polyself.c $(HACK_H)
+$(TARGETPFX)potion.o: potion.c $(HACK_H)
+$(TARGETPFX)pray.o: pray.c $(HACK_H)
+$(TARGETPFX)priest.o: priest.c $(HACK_H) ../include/mfndpos.h
+$(TARGETPFX)quest.o: quest.c $(HACK_H)
+$(TARGETPFX)questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)read.o: read.c $(HACK_H)
+$(TARGETPFX)rect.o: rect.c $(HACK_H)
+$(TARGETPFX)region.o: region.c $(HACK_H)
+$(TARGETPFX)restore.o: restore.c $(HACK_H) ../include/tcap.h
+$(TARGETPFX)rip.o: rip.c $(HACK_H)
+$(TARGETPFX)rnd.o: rnd.c $(HACK_H) ../include/isaac64.h
+$(TARGETPFX)role.o: role.c $(HACK_H)
+$(TARGETPFX)rumors.o: rumors.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)save.o: save.c $(HACK_H)
+$(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
+$(TARGETPFX)shk.o: shk.c $(HACK_H)
+$(TARGETPFX)shknam.o: shknam.c $(HACK_H)
+$(TARGETPFX)sit.o: sit.c $(HACK_H) ../include/artifact.h
+$(TARGETPFX)sounds.o: sounds.c $(HACK_H)
+$(TARGETPFX)sp_lev.o: sp_lev.c $(HACK_H) ../include/sp_lev.h
+$(TARGETPFX)spell.o: spell.c $(HACK_H)
+$(TARGETPFX)steal.o: steal.c $(HACK_H)
+$(TARGETPFX)steed.o: steed.c $(HACK_H)
+$(TARGETPFX)symbols.o: symbols.c $(HACK_H) ../include/tcap.h
+$(TARGETPFX)sys.o: sys.c $(HACK_H)
+$(TARGETPFX)teleport.o: teleport.c $(HACK_H)
+$(TARGETPFX)timeout.o: timeout.c $(HACK_H)
+$(TARGETPFX)topten.o: topten.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)track.o: track.c $(HACK_H)
+$(TARGETPFX)trap.o: trap.c $(HACK_H)
+$(TARGETPFX)u_init.o: u_init.c $(HACK_H)
+$(TARGETPFX)uhitm.o: uhitm.c $(HACK_H)
+$(TARGETPFX)vault.o: vault.c $(HACK_H)
+$(TARGETPFX)version.o: version.c $(HACK_H) ../include/dlb.h ../include/date.h
+$(TARGETPFX)vision.o: vision.c $(HACK_H)
+$(TARGETPFX)weapon.o: weapon.c $(HACK_H)
+$(TARGETPFX)were.o: were.c $(HACK_H)
+$(TARGETPFX)wield.o: wield.c $(HACK_H)
+$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wingem.h \
+		../include/winGnome.h
+$(TARGETPFX)wizard.o: wizard.c $(HACK_H)
+$(TARGETPFX)worm.o: worm.c $(HACK_H)
+$(TARGETPFX)worn.o: worn.c $(HACK_H)
+$(TARGETPFX)write.o: write.c $(HACK_H)
+$(TARGETPFX)zap.o: zap.c $(HACK_H)
 # DEPENDENCIES MUST END AT END OF FILE
 # IF YOU PUT STUFF HERE IT WILL GO AWAY
 # see make depend above

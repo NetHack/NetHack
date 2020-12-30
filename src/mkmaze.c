@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1577674536 2019/12/30 02:55:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1596498182 2020/08/03 23:43:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -541,7 +541,7 @@ fixup_special()
         struct obj *otmp;
         int tryct;
 
-        croom = &g.rooms[0]; /* only one room on the medusa level */
+        croom = &g.rooms[0]; /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct--) {
             x = somex(croom);
             y = somey(croom);
@@ -569,20 +569,11 @@ fixup_special()
                 set_corpsenm(otmp, rndmonnum());
             }
         }
-    } else if (Role_if(PM_PRIEST) && In_quest(&u.uz)) {
+    } else if (Role_if(PM_CLERIC) && In_quest(&u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
         g.level.flags.graveyard = 1;
     } else if (Is_stronghold(&u.uz)) {
         g.level.flags.graveyard = 1;
-    } else if (on_level(&u.uz, &orcus_level)) {
-        struct monst *mtmp, *mtmp2;
-
-        /* it's a ghost town, get rid of shopkeepers */
-        for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-            mtmp2 = mtmp->nmon;
-            if (mtmp->isshk)
-                mongone(mtmp);
-        }
     } else if (on_level(&u.uz, &baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
@@ -751,7 +742,7 @@ stolen_booty(VOID_ARGS)
         if (DEADMONSTER(mtmp))
             continue;
 
-        if (is_orc(mtmp->data) && !has_mname(mtmp) && rn2(10)) {
+        if (is_orc(mtmp->data) && !has_mgivenname(mtmp) && rn2(10)) {
             /*
              * We'll consider the orc captain from the level
              * description to be the captain of a rival orc horde
@@ -1024,6 +1015,7 @@ const char *s;
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0); /* down */
     } else { /* choose "vibrating square" location */
+        stairway *stway;
         int trycnt = 0;
 #define x_maze_min 2
 #define y_maze_min 2
@@ -1056,10 +1048,11 @@ const char *s;
                to be on a spot that's already in use (wall|trap) */
             if (++trycnt > 1000)
                 break;
-        } while (x == xupstair || y == yupstair /*(direct line)*/
-                 || abs(x - xupstair) == abs(y - yupstair)
-                 || distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE
-                 || !SPACE_POS(levl[x][y].typ) || occupied(x, y));
+        } while (((stway = stairway_find_dir(TRUE)) != 0)
+                 && (x == stway->sx || y == stway->sy /*(direct line)*/
+                 || abs(x - stway->sx) == abs(y - stway->sy)
+                 || distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE
+                 || !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
         g.inv_pos.x = x;
         g.inv_pos.y = y;
         maketrap(g.inv_pos.x, g.inv_pos.y, VIBRATING_SQUARE);

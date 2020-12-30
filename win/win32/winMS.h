@@ -1,4 +1,4 @@
-/* NetHack 3.6	winMS.h	$NHDT-Date: 1434804346 2015/06/20 12:45:46 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.7	winMS.h	$NHDT-Date: 1596498367 2020/08/03 23:46:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -162,7 +162,7 @@ void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
+void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
 void mswin_raw_print_flush();

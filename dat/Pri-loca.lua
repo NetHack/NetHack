@@ -1,4 +1,4 @@
--- NetHack 3.6	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack 3.7	Priest.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -26,11 +26,11 @@ des.map([[
 ........................................
 ]]);
 -- Dungeon Description
-des.region({ region={00,00, 09,13}, lit=0, type="morgue", prefilled=0 })
-des.region({ region={09,00, 30,01}, lit=0, type="morgue", prefilled=0 })
-des.region({ region={09,12, 30,13}, lit=0, type="morgue", prefilled=0 })
-des.region({ region={31,00, 39,13}, lit=0, type="morgue", prefilled=0 })
-des.region({ region={11,03, 29,10}, lit=1, type="temple", prefilled=0, irregular=1 })
+des.region({ region={00,00, 09,13}, lit=0, type="morgue", filled=1 })
+des.region({ region={09,00, 30,01}, lit=0, type="morgue", filled=1 })
+des.region({ region={09,12, 30,13}, lit=0, type="morgue", filled=1 })
+des.region({ region={31,00, 39,13}, lit=0, type="morgue", filled=1 })
+des.region({ region={11,03, 29,10}, lit=1, type="temple", filled=1, irregular=1 })
 -- The altar inside the temple
 des.altar({ x=20,y=07, align="noalign", type="shrine" })
 des.monster({ id = "aligned priest", x=20, y=07, align="noalign", peaceful = 0 })

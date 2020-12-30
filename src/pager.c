@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1588778117 2020/05/06 15:15:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,14 +12,13 @@
 static boolean FDECL(is_swallow_sym, (int));
 static int FDECL(append_str, (char *, const char *));
 static void FDECL(look_at_object, (char *, int, int, int));
-static void FDECL(look_at_monster, (char *, char *,
-                                        struct monst *, int, int));
+static void FDECL(look_at_monster, (char *, char *, struct monst *, int, int));
 static struct permonst *FDECL(lookat, (int, int, char *, char *));
 static void FDECL(checkfile, (char *, struct permonst *,
-                                  BOOLEAN_P, BOOLEAN_P, char *));
+                              BOOLEAN_P, BOOLEAN_P, char *));
 static void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 static void FDECL(do_supplemental_info, (char *, struct permonst *,
-                                             BOOLEAN_P));
+                                         BOOLEAN_P));
 static void NDECL(whatdoes_help);
 static void NDECL(docontact);
 static void NDECL(dispfile_help);
@@ -90,7 +89,7 @@ char *outbuf;
     Sprintf(outbuf, "%s%s%s called %s",
             /* being blinded may hide invisibility from self */
             (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
-            mons[u.umonnum].mname, g.plname);
+            pmname(&mons[u.umonnum], Ugender), g.plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     if (u.uundetected || (Upolyd && U_AP_TYPE))
@@ -100,6 +99,32 @@ char *outbuf;
                 uball ? ansimpleoname(uball) : "nothing?");
     if (u.utrap) /* bear trap, pit, web, in-floor, in-lava, tethered */
         Sprintf(eos(outbuf), ", %s", trap_predicament(trapbuf, 0, FALSE));
+    return outbuf;
+}
+
+/* format description of 'mon's health for look_at_monster(), done_in_by() */
+char *
+monhealthdescr(mon, addspace, outbuf)
+struct monst *mon;
+boolean addspace;
+char *outbuf;
+{
+    int mhp_max = max(mon->mhpmax, 1), /* bullet proofing */
+        pct = (mon->mhp * 100) / mhp_max;
+
+    if (mon->mhp >= mhp_max)
+        Strcpy(outbuf, "uninjured");
+    else if (mon->mhp <= 1 || pct < 5)
+        Sprintf(outbuf, "%s%s", (mon->mhp > 0) ? "nearly " : "",
+                !nonliving(mon->data) ? "deceased" : "defunct");
+    else
+        Sprintf(outbuf, "%swounded",
+                (pct >= 95) ? "barely "
+                : (pct >= 80) ? "slightly "
+                  : (pct < 20) ? "heavily "
+                    : "");
+    if (addspace)
+        (void) strkitten(outbuf, ' ');
     return outbuf;
 }
 
@@ -142,7 +167,7 @@ char *outbuf;
     } else if (M_AP_TYPE(mon) == M_AP_MONSTER) {
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
-                    an(mons[mon->mappearance].mname));
+                    an(pmname(&mons[mon->mappearance], Mgender(mon))));
     } else if (isyou ? u.uundetected : mon->mundetected) {
         Strcpy(outbuf, ", hiding");
         if (hides_under(mon->data)) {
@@ -280,16 +305,17 @@ char *buf, *monbuf; /* buf: output, monbuf: optional output */
 struct monst *mtmp;
 int x, y;
 {
-    char *name, monnambuf[BUFSZ];
+    char *name, monnambuf[BUFSZ], healthbuf[BUFSZ];
     boolean accurate = !Hallucination;
 
     name = (mtmp->data == &mons[PM_COYOTE] && accurate)
               ? coyotename(mtmp, monnambuf)
               : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-    Sprintf(buf, "%s%s%s",
+    Sprintf(buf, "%s%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
                 ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
                 : "",
+            accurate ? monhealthdescr(mtmp, TRUE, healthbuf) : "",
             (mtmp->mtame && accurate)
                 ? "tame "
                 : (mtmp->mpeaceful && accurate)
@@ -377,7 +403,7 @@ int x, y;
                                         : (mW & M2_ELF & m2) ? "elf"
                                           : (mW & M2_ORC & m2) ? "orc"
                                             : (mW & M2_DEMON & m2) ? "demon"
-                                              : mtmp->data->mname);
+                                              : pmname(mtmp->data, Mgender(mtmp)));
 
                     Sprintf(eos(monbuf), "warned of %s", makeplural(whom));
                 }
@@ -590,7 +616,7 @@ char *supplemental_name;
      * user_typed_name and picked name.
      */
     if (pm != (struct permonst *) 0 && !user_typed_name)
-        dbase_str = strcpy(newstr, pm->mname);
+        dbase_str = strcpy(newstr, pm->pmnames[NEUTRAL]);
     else
         dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
@@ -867,15 +893,14 @@ struct permonst **for_supplement;
             hallucinate = (Hallucination && !g.program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
+    unsigned glyphmod[NUM_GLYPHMOD];
 
     gobbledygook[0] = '\0'; /* no hallucinatory liquid (yet) */
     if (looked) {
-        int oc;
-        unsigned os;
-
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y, 0);
+        map_glyphmod(cc.x, cc.y, glyph, 0, glyphmod);
+        sym = glyphmod[GM_TTYCHAR];
 
         Sprintf(prefix, "%s        ", encglyph(glyph));
     } else
@@ -1128,12 +1153,9 @@ struct permonst **for_supplement;
                 break;
             case SYM_PET_OVERRIDE + SYM_OFF_X:
                 if (looked) {
-                    int oc = 0;
-                    unsigned os = 0;
-
                     /* convert to symbol without override in effect */
-                    (void) mapglyph(glyph, &sym, &oc, &os,
-                                    cc.x, cc.y, MG_FLAG_NOOVERRIDE);
+                    map_glyphmod(cc.x, cc.y, glyph, MG_FLAG_NOOVERRIDE, glyphmod);
+                    sym = (int) glyphmod[GM_TTYCHAR];                
                     goto check_monsters;
                 }
                 break;
@@ -1252,7 +1274,8 @@ coord *click_cc;
             any.a_char = '?';
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
-                     "something else (by symbol or name)", MENU_ITEMFLAGS_NONE);
+                     "something else (by symbol or name)",
+                     MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1489,7 +1512,10 @@ boolean do_mons; /* True => monsters, False => objects */
                         Sprintf(outbuf, "All %s currently shown on the map:",
                                 which);
                     putstr(win, 0, outbuf);
-                    putstr(win, 0, "");
+                    /* hack alert! Qt watches a text window for any line
+                       with 4 consecutive spaces and renders the window
+                       in a fixed-width font it if finds at least one */
+                    putstr(win, 0, "    "); /* separator */
                 }
                 /* prefix: "coords  C  " where 'C' is mon or obj symbol */
                 Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
@@ -2093,9 +2119,9 @@ static const struct {
     { hmenu_dowhatdoes, "Info on what a given key does." },
     { option_help, "List of game options." },
     { dispfile_optionfile, "Longer explanation of game options." },
-    { dokeylist, "Full list of keyboard commands" },
+    { dokeylist, "Full list of keyboard commands." },
     { hmenu_doextlist, "List of extended commands." },
-    { domenucontrols, "List menu control keys" },
+    { domenucontrols, "List menu control keys." },
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
 #ifdef PORT_HELP

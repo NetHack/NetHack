@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkroom.c	$NHDT-Date: 1446887530 2015/11/07 09:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	mkroom.c	$NHDT-Date: 1596498184 2020/08/03 23:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -199,8 +199,10 @@ gottype:
     topologize(sroom);
 #endif
 
-    /* stock the room with a shopkeeper and artifacts */
-    stock_room(i, sroom);
+    /* The shop used to be stocked here, but this no longer happens - all we do
+     * is set its rtype, and it gets stocked at the end of makelevel() along
+     * with other special rooms. */
+    sroom->needfill = FILL_NORMAL;
 }
 
 /* pick an unused room, preferably with only one door */
@@ -237,7 +239,9 @@ int type;
 
     if ((sroom = pick_room(FALSE)) != 0) {
         sroom->rtype = type;
-        fill_zoo(sroom);
+        /* room does not get stocked at this time - it will get stocked at the
+         * end of makelevel() */
+        sroom->needfill = FILL_NORMAL;
     }
 }
 
@@ -246,10 +250,10 @@ mk_zoo_thronemon(x,y)
 int x,y;
 {
     int i = rnd(level_difficulty());
-    int pm = (i > 9) ? PM_OGRE_KING
-        : (i > 5) ? PM_ELVENKING
-        : (i > 2) ? PM_DWARF_KING
-        : PM_GNOME_KING;
+    int pm = (i > 9) ? PM_OGRE_TYRANT
+        : (i > 5) ? PM_ELVEN_MONARCH
+        : (i > 2) ? PM_DWARF_RULER
+        : PM_GNOME_RULER;
     struct monst *mon = makemon(&mons[pm], x, y, NO_MM_FLAGS);
 
     if (mon) {
@@ -271,6 +275,8 @@ struct mkroom *sroom;
     int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     coord mm;
 
+    /* Note: This doesn't check needfill; it assumes the caller has already done
+     * that. */
     sh = sroom->fdoor;
     switch (type) {
     case COURT:
@@ -616,10 +622,13 @@ boolean
 has_dnstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == g.dnstairs_room)
-        return TRUE;
-    if (g.sstairs.sx && !g.sstairs.up)
-        return (boolean) (sroom == g.sstairs_room);
+    stairway *stway = g.stairs;
+
+    while (stway) {
+        if (!stway->up && inside_room(sroom, stway->sx, stway->sy))
+            return TRUE;
+        stway = stway->next;
+    }
     return FALSE;
 }
 
@@ -627,10 +636,13 @@ boolean
 has_upstairs(sroom)
 register struct mkroom *sroom;
 {
-    if (sroom == g.upstairs_room)
-        return TRUE;
-    if (g.sstairs.sx && g.sstairs.up)
-        return (boolean) (sroom == g.sstairs_room);
+    stairway *stway = g.stairs;
+
+    while (stway) {
+        if (stway->up && inside_room(sroom, stway->sx, stway->sy))
+            return TRUE;
+        stway = stway->next;
+    }
     return FALSE;
 }
 

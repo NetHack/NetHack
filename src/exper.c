@@ -1,4 +1,4 @@
-/* NetHack 3.6	exper.c	$NHDT-Date: 1562114352 2019/07/03 00:39:12 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.7	exper.c	$NHDT-Date: 1596498167 2020/08/03 23:42:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,7 +28,7 @@ enermod(en)
 int en;
 {
     switch (Role_switch) {
-    case PM_PRIEST:
+    case PM_CLERIC:
     case PM_WIZARD:
         return (2 * en);
     case PM_HEALER:

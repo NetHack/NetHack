@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1590870784 2020/05/30 20:33:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1604620981 2020/11/06 00:03:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -40,15 +40,19 @@ struct obj {
     unsigned owt;
     long quan; /* number of items */
 
+#define SPE_LIM 99 /* abs(obj->spe) <= 99, cap for enchanted and charged
+                    * objects (and others; named fruit index excepted) */
     schar spe; /* quality of weapon, weptool, armor or ring (+ or -);
-                  number of charges for wand or charged tool ( >= -1 );
-                  number of candles attached to candelabrum;
-                  marks your eggs, tin variety and spinach tins;
-                  Schroedinger's Box (1) or royal coffers for a court (2);
-                  tells which fruit a fruit is;
-                  special for uball and amulet;
-                  scroll of mail (normal==0, bones or wishing==1, written==2);
-                  historic and gender for statues */
+                * number of charges for wand or charged tool ( >= -1 );
+                * number of candles attached to candelabrum;
+                * marks your eggs, tin variety and spinach tins;
+                * candy bar wrapper index;
+                * Schroedinger's Box (1) or royal coffers for a court (2);
+                * tells which fruit a fruit is;
+                * special for uball and amulet;
+                * scroll of mail (normal==0, bones or wishing==1, written==2);
+                * splash of venom (normal==0, wishing==1);
+                * historic and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE 0x02
 #define STATUE_FEMALE 0x04
@@ -105,7 +109,8 @@ struct obj {
 
     Bitfield(in_use, 1); /* for magic items before useup items */
     Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
-    Bitfield(cknown, 1); /* contents of container assumed to be known */
+    Bitfield(cknown, 1); /* for containers (including statues): the contents
+                          * are known; also applicable to tins */
     Bitfield(lknown, 1); /* locked/unlocked status is known */
     /* 4 free bits */
 
@@ -113,12 +118,15 @@ struct obj {
 #define leashmon corpsenm /* gets m_id of attached pet */
 #define fromsink corpsenm /* a potion from a sink */
 #define novelidx corpsenm /* 3.6 tribute - the index of the novel title */
+#define migr_species corpsenm /* species to endow for MIGR_TO_SPECIES */
     int usecount;           /* overloaded for various things that tally */
 #define spestudied usecount /* # of times a spellbook has been studied */
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
     long age;               /* creation date */
     long owornmask;
     unsigned lua_ref_cnt;  /* # of lua script references for this object */
+    xchar omigr_from_dnum; /* where obj is migrating from */
+    xchar omigr_from_dlevel; /* where obj is migrating from */
     struct oextra *oextra; /* pointer to oextra struct */
 };
 
@@ -244,13 +252,16 @@ struct obj {
 #define stale_egg(egg) \
     ((g.monstermoves - (egg)->age) > (2 * MAX_EGG_HATCH_TIME))
 #define ofood(o) ((o)->otyp == CORPSE || (o)->otyp == EGG || (o)->otyp == TIN)
+    /* note: sometimes eggs and tins have special corpsenm values that
+       shouldn't be used as an index into mons[]                       */
 #define polyfodder(obj) \
-    (ofood(obj) && (pm_to_cham((obj)->corpsenm) != NON_PM       \
+    (ofood(obj) && (obj)->corpsenm >= LOW_PM                            \
+     && (pm_to_cham((obj)->corpsenm) != NON_PM                          \
                     || dmgtype(&mons[(obj)->corpsenm], AD_POLY)))
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj) (ofood(obj) && (obj)->corpsenm == PM_NURSE)
-#define Is_pudding(o)                                                 \
-    (o->otyp == GLOB_OF_GRAY_OOZE || o->otyp == GLOB_OF_BROWN_PUDDING \
+#define Is_pudding(o) \
+    (o->otyp == GLOB_OF_GRAY_OOZE || o->otyp == GLOB_OF_BROWN_PUDDING   \
      || o->otyp == GLOB_OF_GREEN_SLIME || o->otyp == GLOB_OF_BLACK_PUDDING)
 
 /* Containers */
@@ -305,22 +316,26 @@ struct obj {
     (otmp->otyp == TALLOW_CANDLE || otmp->otyp == WAX_CANDLE)
 #define MAX_OIL_IN_FLASK 400 /* maximum amount of oil in a potion of oil */
 
-/* MAGIC_LAMP intentionally excluded below */
-/* age field of this is relative age rather than absolute */
-#define age_is_relative(otmp)                                       \
+/* age field of this is relative age rather than absolute; does not include
+   magic lamp */
+#define age_is_relative(otmp) \
     ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)
-/* object can be ignited */
-#define ignitable(otmp)                                             \
+/* object can be ignited; magic lamp used to excluded here too but all
+   usage of this macro ended up testing
+     (ignitable(obj) || obj->otyp == MAGIC_LAMP)
+   so include it; brass lantern can be lit but not by fire */
+#define ignitable(otmp) \
     ((otmp)->otyp == BRASS_LANTERN || (otmp)->otyp == OIL_LAMP      \
+     || ((otmp)->otyp == MAGIC_LAMP && (otmp)->spe > 0)             \
      || (otmp)->otyp == CANDELABRUM_OF_INVOCATION                   \
      || (otmp)->otyp == TALLOW_CANDLE || (otmp)->otyp == WAX_CANDLE \
      || (otmp)->otyp == POT_OIL)
 
 /* things that can be read */
-#define is_readable(otmp)                                                    \
+#define is_readable(otmp) \
     ((otmp)->otyp == FORTUNE_COOKIE || (otmp)->otyp == T_SHIRT               \
      || (otmp)->otyp == ALCHEMY_SMOCK || (otmp)->otyp == CREDIT_CARD         \
      || (otmp)->otyp == CAN_OF_GREASE || (otmp)->otyp == MAGIC_MARKER        \
@@ -343,6 +358,10 @@ struct obj {
      || ((o)->oartifact == ART_EYES_OF_THE_OVERWORLD                    \
          && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)))
 #define pair_of(o) ((o)->otyp == LENSES || is_gloves(o) || is_boots(o))
+
+#define unpolyable(o) ((o)->otyp == WAN_POLYMORPH \
+                       || (o)->otyp == SPE_POLYMORPH \
+                       || (o)->otyp == POT_POLYMORPH)
 
 /* achievement tracking; 3.6.x did this differently */
 #define is_mines_prize(o) ((o)->o_id == g.context.achieveo.mines_prize_oid)
@@ -388,7 +407,9 @@ struct obj {
  *       4. Add a testing macro after the set of referencing macros
  *          (see has_oname(), has_omonst(), has_omailcmd(), and has_omin(),
  *          for examples).
- *       5. Create newXX(otmp) function and possibly free_XX(otmp) function
+ *       5. If your new field isn't a pointer and requires a non-zero value
+ *          on initialization, add code to init_oextra() in src/mkobj.c.
+ *       6. Create newXX(otmp) function and possibly free_XX(otmp) function
  *          in an appropriate new or existing source file and add a prototype
  *          for it to include/extern.h.  The majority of these are currently
  *          located in mkobj.c for convenience.
@@ -409,14 +430,14 @@ struct obj {
  *              }
  *         }
  *
- *       6. Adjust size_obj() in src/cmd.c appropriately.
- *       7. Adjust dealloc_oextra() in src/mkobj.c to clean up
+ *       7. Adjust size_obj() in src/cmd.c appropriately.
+ *       8. Adjust dealloc_oextra() in src/mkobj.c to clean up
  *          properly during obj deallocation.
- *       8. Adjust copy_oextra() in src/mkobj.c to make duplicate
+ *       9. Adjust copy_oextra() in src/mkobj.c to make duplicate
  *          copies of your struct or data onto another obj struct.
- *       9. Adjust restobj() in src/restore.c to deal with your
+ *      10. Adjust restobj() in src/restore.c to deal with your
  *          struct or data during a restore.
- *      10. Adjust saveobj() in src/save.c to deal with your
+ *      11. Adjust saveobj() in src/save.c to deal with your
  *          struct or data during a save.
  */
 

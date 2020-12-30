@@ -3,10 +3,21 @@
  */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifndef CROSS_TO_AMIGA
 #include "NH:sys/amiga/windefs.h"
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
+#else
+#include "windefs.h"
+#include "winext.h"
+#include "winproto.h"
+#endif
+
 #include "dlb.h"
+
+#ifdef CROSS_TO_AMIGA
+#define strnicmp strncmpi
+#endif
 
 #ifdef AMIGA_INTUITION
 
@@ -29,8 +40,9 @@ long amii_scrnmode;
  */
 struct window_procs amii_procs = {
     "amii", WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-    0L, amii_init_nhwindows,
+    amii_init_nhwindows,
     amii_player_selection, amii_askname, amii_get_nh_event,
     amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
     amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,
@@ -63,8 +75,9 @@ struct window_procs amii_procs = {
  */
 struct window_procs amiv_procs = {
     "amitile", WC_COLOR | WC_HILITE_PET | WC_INVERSE,
+    0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-    0L, amii_init_nhwindows,
+    amii_init_nhwindows,
     amii_player_selection, amii_askname, amii_get_nh_event,
     amii_exit_nhwindows, amii_suspend_nhwindows, amii_resume_nhwindows,
     amii_create_nhwindow, amii_clear_nhwindow, amii_display_nhwindow,
@@ -1134,7 +1147,7 @@ boolean complain;
     register int win;
     register dlb *fp;
     register char *t;
-    register char buf[200];
+    char buf[200];
 
     if (fn == NULL)
         panic("NULL file name in display_file()");

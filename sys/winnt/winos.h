@@ -1,4 +1,4 @@
-/* NetHack 3.6	winos.h	$NHDT-Date: 1524321419 2018/04/21 14:36:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	winos.h	$NHDT-Date: 1596498322 2020/08/03 23:45:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) NetHack PC Development Team 2018 */
 /* NetHack may be freely redistributed.  See license for details. */
 

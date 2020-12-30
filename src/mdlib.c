@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1593953352 2020/07/05 12:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1608933420 2020/12/25 21:57:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -60,11 +60,24 @@ static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *, const char *));
 static char *FDECL(bannerc_string, (char *, const char *));
 
-static int FDECL(case_insensitive_comp, (const char *, const char *));
 static void NDECL(make_version);
 static char *FDECL(eos, (char *));
+#if 0
 static char *FDECL(mdlib_strsubst, (char *, const char *, const char *));
+#endif
+
+#ifndef HAS_NO_MKSTEMP
+#ifdef _MSC_VER
+static int FDECL(mkstemp, (char *));
+#endif
+#endif
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
+
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
+    || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
+static int FDECL(case_insensitive_comp, (const char *, const char *));
+#endif
+
 #if !defined(MAKEDEFS_C) && defined(WIN32)
 extern int GUILaunched;
 #endif
@@ -79,7 +92,10 @@ static void FDECL(opt_out_words, (char *, int *));
 static void NDECL(build_savebones_compat_string);
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 40
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
+    && defined(__DATE__) && defined(__TIME__)
 static char rttimebuf[MAXOPT];
+#endif
 static char *opttext[120] = { 0 };
 char optbuf[BUFSZ];
 static struct version_info version;
@@ -118,6 +134,14 @@ static struct win_info window_opts[] = {
 #ifdef QT_GRAPHICS /* too vague; there are multiple incompatible versions */
     { "Qt", "Qt", TRUE },
 #endif
+#ifdef MSWIN_GRAPHICS /* win32 */
+    { "mswin", "Windows GUI", TRUE },
+#endif
+#ifdef SHIM_GRAPHICS
+    { "shim", "NetHack Library Windowing Shim", TRUE },
+#endif
+
+#if 0  /* remainder have been retired */
 #ifdef GNOME_GRAPHICS /* unmaintained/defunct */
     { "Gnome", "Gnome", TRUE },
 #endif
@@ -130,12 +154,10 @@ static struct win_info window_opts[] = {
 #ifdef GEM_GRAPHICS /* defunct Atari interface */
     { "Gem", "Gem", TRUE },
 #endif
-#ifdef MSWIN_GRAPHICS /* win32 */
-    { "mswin", "mswin", TRUE },
-#endif
 #ifdef BEOS_GRAPHICS /* unmaintained/defunct */
     { "BeOS", "BeOS InterfaceKit", TRUE },
 #endif
+#endif  /* 0 => retired */
     { 0, 0, FALSE }
 };
 
@@ -314,8 +336,27 @@ const char *build_date;
     return outbuf;
 }
 
+#ifndef HAS_NO_MKSTEMP
+#ifdef _MSC_VER
+int
+mkstemp(template)
+char *template;
+{
+    int err;
+
+    err = _mktemp_s(template, strlen(template) + 1);
+    if( err != 0 )
+        return -1;
+    return _open(template,
+                 _O_RDWR | _O_BINARY | _O_TEMPORARY | _O_CREAT,
+                 _S_IREAD | _S_IWRITE);
+}
+#endif /* _MSC_VER */
+#endif /* HAS_NO_MKSTEMP */
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
+#if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
+    || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
 static int
 case_insensitive_comp(s1, s2)
 const char *s1;
@@ -335,6 +376,7 @@ const char *s2;
     }
     return u1 - u2;
 }
+#endif
 
 static char *
 eos(str)
@@ -345,6 +387,7 @@ char *str;
     return str;
 }
 
+#if 0
 static char *
 mdlib_strsubst(bp, orig, replacement)
 char *bp;
@@ -363,6 +406,7 @@ const char *orig, *replacement;
     }
     return bp;
 }
+#endif
 
 static char save_bones_compat_buf[BUFSZ];
 
@@ -433,6 +477,13 @@ static const char *build_opts[] = {
 #endif
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     "external program as a message handler",
+#endif
+#if defined(HANGUPHANDLING) && !defined(NO_SIGNAL)
+#ifdef SAFERHANGUP
+    "deferred handling of hangup signal",
+#else
+    "immediate handling of hangup signal",
+#endif
 #endif
 #ifdef INSURANCE
     "insurance files for recovering from crashes",
@@ -615,8 +666,7 @@ int *length_p; /* in/out */
         } else {
             Sprintf(eos(optbuf), " "), (*length_p)++;
         }
-        Sprintf(eos(optbuf),
-                "%s", str), *length_p += (int) strlen(str);
+        Sprintf(eos(optbuf), "%s", str), *length_p += (int) strlen(str);
         str += strlen(str) + (word ? 1 : 0);
     }
 }
@@ -666,9 +716,9 @@ build_options()
             continue;
 #endif
 #endif /* !MAKEDEFS_C && FOR_RUNTIME */
-        opt_out_words(strcat(strcpy(buf, build_opts[i]),
-                             (i < SIZE(build_opts) - 1) ? "," : "."),
-                      &length);
+        Strcat(strcpy(buf, build_opts[i]),
+               (i < SIZE(build_opts) - 1) ? "," : ".");
+        opt_out_words(buf, &length);
     }
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
@@ -694,23 +744,24 @@ build_options()
             Sprintf(eos(buf), " (%s)", window_opts[i].name);
         /*
          * 1 : foo.
-         * 2 : foo and bar  (note no period; comes from 'with default' below)
-         * 3+: for, bar, and quux
+         * 2 : foo and bar,
+         * 3+: for, bar, and quux,
+         *
+         * 2+ will be followed by " with a default of..."
          */
-        if (cnt != (winsyscnt - 1)) {
-            Strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
-                          : (winsyscnt == 2 && cnt == 0) ? " and"
-                            : (cnt == winsyscnt - 2) ? ", and"
-                              : ",");
-        }
+        Strcat(buf, (winsyscnt == 1) ? "." /* no 'default' */
+                    : (winsyscnt == 2 && cnt == 0) ? " and"
+                      : (cnt == winsyscnt - 2) ? ", and"
+                        : ",");
         opt_out_words(buf, &length);
         cnt++;
     }
     if (cnt > 1) {
-        Sprintf(buf, ", with a default of \"%s\".", defwinsys);
+        /* loop ended with a comma; opt_out_words() will insert a space */
+        Sprintf(buf, "with a default of \"%s\".", defwinsys);
         opt_out_words(buf, &length);
     }
-    (void) mdlib_strsubst(optbuf, " , ", ", ");
+
     opttext[idxopttext] = strdup(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
@@ -765,6 +816,8 @@ build_options()
 void
 runtime_info_init()
 {
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
+    && defined(__DATE__) && defined(__TIME__)
     int i;
     char tmpbuf[BUFSZ], *strp;
     const char *mth[] = {
@@ -772,12 +825,15 @@ runtime_info_init()
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     struct tm t = {0};
     time_t timeresult;
+#endif
 
     if (!done_runtime_opt_init_once) {
         done_runtime_opt_init_once = 1;
         build_savebones_compat_string();
         /* construct the current version number */
         make_version();
+#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
+#if defined(__DATE__) && defined(__TIME__)
         /*
          * In a cross-compiled environment, you can't execute
          * the target binaries during the build, so we can't
@@ -797,8 +853,6 @@ runtime_info_init()
          *    gcc, msvc, clang   __TIME__  "23:59:01"
          *
          */
-
-#if defined(__DATE__) && defined(__TIME__)
         if (sizeof __DATE__ + sizeof __TIME__  + sizeof "123" <
             sizeof rttimebuf)
             Sprintf(rttimebuf, "%s %s", __DATE__, __TIME__);
@@ -825,35 +879,28 @@ runtime_info_init()
             extract_field(tmpbuf, rttimebuf, 2, 18);  /* sec  */
             t.tm_sec = atoi(tmpbuf);
             timeresult = mktime(&t);
-#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
             BUILD_TIME = (unsigned long) timeresult;
             BUILD_DATE = rttimebuf;
-#endif
-#else  /* __DATE__ && __TIME__ */
-            nhUse(strp);
+	}
 #endif /* __DATE__ && __TIME__ */
-
-#if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET)
-            VERSION_NUMBER = version.incarnation;
-            VERSION_FEATURES = version.feature_set;
+        VERSION_NUMBER = version.incarnation;
+        VERSION_FEATURES = version.feature_set;
 #ifdef MD_IGNORED_FEATURES
-            IGNORED_FEATURES = MD_IGNORED_FEATURES;
+        IGNORED_FEATURES = MD_IGNORED_FEATURES;
 #endif
-            VERSION_SANITY1 = version.entity_count;
-            VERSION_SANITY2 = version.struct_sizes1;
-            VERSION_SANITY3 = version.struct_sizes2;
-
-            VERSION_STRING = strdup(version_string(tmpbuf, "."));
-            VERSION_ID = strdup(version_id_string(tmpbuf, BUILD_DATE));
-            COPYRIGHT_BANNER_C = strdup(bannerc_string(tmpbuf, BUILD_DATE));
+        VERSION_SANITY1 = version.entity_count;
+        VERSION_SANITY2 = version.struct_sizes1;
+        VERSION_SANITY3 = version.struct_sizes2;
+        VERSION_STRING = strdup(version_string(tmpbuf, "."));
+        VERSION_ID = strdup(version_id_string(tmpbuf, BUILD_DATE));
+        COPYRIGHT_BANNER_C = strdup(bannerc_string(tmpbuf, BUILD_DATE));
 #ifdef NETHACK_HOST_GIT_SHA
-            NETHACK_GIT_SHA = strdup(NETHACK_HOST_GIT_SHA);
+        NETHACK_GIT_SHA = strdup(NETHACK_HOST_GIT_SHA);
 #endif
 #ifdef NETHACK_HOST_GIT_BRANCH
-            NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
+        NETHACK_GIT_BRANCH = strdup(NETHACK_HOST_GIT_BRANCH);
 #endif
 #endif /* !MAKEDEFS_C  && CROSSCOMPILE_TARGET */
-	}
         idxopttext = 0;
         build_options();
     }

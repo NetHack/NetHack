@@ -1,12 +1,9 @@
-/* NetHack 3.6	safeproc.c   */	
+/* NetHack 3.7	safeproc.c   */	
 /* Copyright (c) Michael Allison, 2018                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* must #define SAFEPROCS in xxxconf.h or via CFLAGS or this won't compile */
-#include "config.h"
-#include "color.h"
-#include "wintype.h"
-#include "winprocs.h"
+#include "hack.h"
 
 /*
  * ***********************************************************
@@ -324,11 +321,12 @@ int x, y;
  *  Print the glyph to the output device.  Don't flush the output device.
  */
 void
-safe_print_glyph(window, x, y, glyph, bkglyph)
+safe_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
 winid window;
 xchar x, y;
 int glyph;
 int bkglyph UNUSED;
+int glyphmod[NUM_GLYPHMOD] UNUSED;
 {
     return;
 }

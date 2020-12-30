@@ -1,4 +1,4 @@
-NetHack 3.6  window.doc	$NHDT-Date: 1433901374 2015/06/10 01:56:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $
+NetHack 3.7  window.doc	$NHDT-Date: 1596498145 2020/08/03 23:42:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $
 
 Introduction
 
@@ -192,7 +192,7 @@ int nh_poskey(int *x, int *y, int *mod)
 
 B.  High-level routines:
 
-print_glyph(window, x, y, glyph, bkglyph)
+print_glyph(window, x, y, glyph, bkglyph, glyphmod[3])
 		-- Print the glyph at (x,y) on the given window.  Glyphs are
 		   integers at the interface, mapped to whatever the window-
 		   port wants (symbol, font, color, attributes, ...there's
@@ -202,7 +202,10 @@ print_glyph(window, x, y, glyph, bkglyph)
 		   to fall against a background consistent with the grid 
 		   around x,y. If bkglyph is NO_GLYPH, then the parameter
 		   should be ignored (do nothing with it).
-                   
+                -- glyphmod (glyphmod[NUM_GLYPHNOD]) provides extended
+                   information about the glyph that window ports can use to
+                   enhance the display in various ways.
+
 char yn_function(const char *ques, const char *choices, char default)
 		-- Print a prompt made up of ques, choices and default.
 		   Read a single character response that is contained in
