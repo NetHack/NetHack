@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.7	Makefile.src	$NHDT-Date: 1596498302 2020/08/03 23:45:02 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
+#	NetHack 3.7	Makefile.src	$NHDT-Date: 1609347463 2020/12/30 16:57:43 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -77,6 +77,7 @@ WINTTYSRC = $(TTY)getline.c $(TTY)termcap.c $(TTY)topl.c $(TTY)wintty.c \
 WINTTYOBJ = getline.obj,termcap.obj,topl.obj,wintty.obj $(TERMCAPOBJ)
 #
 # curses; doesn't use termcap; may or may not support TERMTABLE for non-DEC tty
+# [native curses is incompatible with ncurses and PDcurses; it won't work]
 WINCURSESSRC = $(CURSES)cursdial.c $(CURSES)cursmesg.c $(CURSES)cursinit.c \
 	$(CURSES)cursmisc.c $(CURSES)cursinvt.c $(CURSES)cursstat.c \
 	$(CURSES)cursmain.c $(CURSES)curswins.c
@@ -104,11 +105,12 @@ WANT_WIN_TTY=1
 .endif
 
 .if WANT_WIN_TTY
+.if WANT_WIN_CURSES
+WINSRC = $(WINTTYSRC) $(WINCURSESSRC)
+WINOBJ = $(WINTTYOBJ),$(WINCURSESOBJ)
+.else
 WINSRC = $(WINTTYSRC)
 WINOBJ = $(WINTTYOBJ)
-.if WANT_WIN_CURSES
-WINSRC +=,$(WINCURSESSRC)
-WINOBJ += $(WINCURSESOBJ)
 .endif
 .else
 .if WANT_WIN_CURSES
@@ -163,15 +165,15 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
-# generated source files (tile.c is handled separately via WINxxxSRC)
-GENCSRC = vis_tab.c	#tile.c
+#-# generated source files (vis_tab.c is gone; tile.c is handled separately
+#-# via WINxxxSRC)
+#-GENCSRC = #tile.c
 
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 
-# all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
+# all .h files except date.h, onames.h, pm.h, which would
 # cause dependency loops if run through "make depend"
-# and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
 HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
 	   config.h config1.h context.h coord.h decl.h display.h \
@@ -183,8 +185,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
 	   tradstdc.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
-#HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
-#		lev_comp.h dgn_comp.h dgn_file.h
+#HSOURCES = $(HACKINCL) date.h onames.h pm.h
 
 # the following .obj's should be made before any others (for makedefs)
 FIRSTOBJ = vmsmisc.obj,vmsfiles.obj,monst.obj,objects.obj
@@ -204,10 +205,10 @@ HOBJ4 = mplayer.obj,mthrowu.obj,muse.obj,music.obj,o_init.obj,objnam.obj, \
 	options.obj,pager.obj,pickup.obj,pline.obj,polyself.obj, \
 	potion.obj,pray.obj,priest.obj,quest.obj,questpgr.obj,read.obj
 HOBJ5 = rect.obj,region.obj,restore.obj,rip.obj,rnd.obj,role.obj, \
-	rumors.obj,save.obj,shk.obj,shknam.obj,sit.obj,sounds.obj,sp_lev.obj, \
-	spell.obj,steal.obj,steed.obj,sys.obj,teleport.obj,timeout.obj, \
-	topten.obj, track.obj,trap.obj
-HOBJ6 = u_init.obj,uhitm.obj,vault.obj,vision.obj,vis_tab.obj,weapon.obj, \
+	rumors.obj,save.obj,sfstruct.obj,shk.obj,shknam.obj,sit.obj, \
+	sounds.obj,sp_lev.obj,spell.obj,steal.obj,steed.obj,sys.obj, \
+	teleport.obj,timeout.obj,topten.obj, track.obj,trap.obj
+HOBJ6 = u_init.obj,uhitm.obj,vault.obj,vision.obj,weapon.obj, \
 	were.obj,wield.obj,windows.obj,wizard.obj,worm.obj,worn.obj, \
 	write.obj,zap.obj,version.obj
 HOBJ  = $(FIRSTOBJ) $(SYSOBJ) $(WINOBJ) $(RANDOBJ) \
@@ -337,13 +338,7 @@ $(INC)pm.h :	$(MAKEDEFS)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(INC)pm.h
       @ $(CD) $(SRC)
-# both vis_tab.h and vis_tab.c are made at the same time by makedefs
-$(INC)vis_tab.h : vis_tab.c
-	$(TOUCH) $(INC)vis_tab.h
-vis_tab.c : $(MAKEDEFS)
-	$(CD) $(UTL)
-	$(MAKE)$(MAKEFLAGS) $(SRC)vis_tab.c
-      @ $(CD) $(SRC)
+
 $(SRC)tile.c : $(WINSHR)tilemap.c $(HACK_H)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(SRC)tile.c
@@ -363,12 +358,16 @@ $(INC)date.h :	$(VERSOURCES) $(HACK_H)
 	$(MAKE)$(MAKEFLAGS) $(INC)date.h
       @ $(CD) $(SRC)
 
-#	special targets (monstr.c is an obsolete generated source file)
+#	special targets (monstr.c, vis_tab.{c,h} are obsolete generated files;
+#	  pm.h, onames.h, date.h, and tile.c are current generated files)
 clean :
       - if f$search("*.*;-2").nes."" then  purge/Keep=2
-      - if f$search("$(INC)*.*;-2").nes."" then  purge/Keep=2 $(INC) /Exclude=*conf*.h
+      - if f$search("$(INC)*.*;-2").nes."" then \
+		purge/Keep=2 $(INC) /Exclude=*conf*.h
       - if f$search("*.obj").nes."" then  delete *.obj;*
       - if f$search("*.h-t").nes."" then  delete *.h-t;* !$(HACK_H),$(CONFIG_H)
+      - if f$search("$(INC)vis_tab.h").nes."" then  delete $(INC)vis_tab.h;*
+      - if f$search("vis_tab.c").nes."" then  delete vis_tab.c;*
       - if f$search("monstr.c").nes."" then  delete monstr.c;*
 
 spotless :	clean
@@ -376,8 +375,7 @@ spotless :	clean
       - if f$search("$(INC)*.*;-1").nes."" then  purge $(INC)
       - if f$search("$(SYSTEM)").nes."" then  delete $(SYSTEM)
       - if f$search("$(GAME)").nes."" then  delete $(GAME)
-      - delete vis_tab.c;,$(INC)vis_tab.h;,\
- $(INC)pm.h;,$(INC)onames.h;,$(INC)date.h;
+      - delete $(INC)pm.h;,$(INC)onames.h;,$(INC)date.h;
       - if f$search("tile.c").nes."" then  delete tile.c;
       - if f$search("tclib.c").nes."" then  delete tclib.c;
       - if f$search("random.c").nes."" then  delete random.c;
@@ -455,7 +453,7 @@ winstat.obj :	$(X11)winstat.c $(HACK_H) $(INC)winX.h
 wintext.obj :	$(X11)wintext.c $(HACK_H) $(INC)winX.h $(INC)xwindow.h
 winval.obj :	$(X11)winval.c $(HACK_H) $(INC)winX.h
 tile.obj :	$(SRC)tile.c $(HACK_H)
-vis_tab.obj :	vis_tab.c $(CONFIG_H) $(INC)vis_tab.h
+
 #	lua 5.4.0 code
 lapi.obj :	$(LUA)lapi.c	
 lauxlib.obj :	$(LUA)lauxlib.c
@@ -577,6 +575,7 @@ rnd.obj :	rnd.c $(HACK_H)
 role.obj :	role.c $(HACK_H)
 rumors.obj :	rumors.c $(HACK_H) $(INC)dlb.h
 save.obj :	save.c $(HACK_H)
+sfstruct.obj :	sfstruct.c $(HACK_H)
 shk.obj :	shk.c $(HACK_H)
 shknam.obj :	shknam.c $(HACK_H)
 sit.obj :	sit.c $(HACK_H) $(INC)artifact.h
@@ -595,7 +594,7 @@ u_init.obj :	u_init.c $(HACK_H)
 uhitm.obj :	uhitm.c $(HACK_H)
 vault.obj :	vault.c $(HACK_H)
 version.obj :	version.c $(HACK_H) $(INC)dlb.h $(INC)date.h
-vision.obj :	vision.c $(HACK_H) $(INC)vis_tab.h
+vision.obj :	vision.c $(HACK_H)
 weapon.obj :	weapon.c $(HACK_H)
 were.obj :	were.c $(HACK_H)
 wield.obj :	wield.c $(HACK_H)

@@ -1,6 +1,6 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.7.*			[pr]
 $	version_number = "3.7.0"
-$ ! $NHDT-Date: 1557701799 2019/05/12 22:56:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $
+$ ! $NHDT-Date: 1609347486 2020/12/30 16:58:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $
@@ -276,7 +276,7 @@ $     if c_opt.ne.o_SPCL .or. f$search(nethacklib).eqs."" then -
   libr/Obj 'nethacklib'/Create=(Block=3000,Hist=0)
 $ if f$search("''nethacklib';-1").nes."" then  purge 'nethacklib'
 $!
-$! compile and link makedefs, then nethack, lev_comp+dgn_comp, dlb+recover.
+$! compile and link makedefs, then nethack, dlb+recover.
 $!
 $ milestone "<compiling...>"
 $ c_list = "[-.sys.vms]vmsmisc,[-.sys.vms]vmsfiles,[]alloc,dlb,monst,objects"
@@ -292,8 +292,6 @@ $! create some build-time files
 $ makedefs -p	!pm.h
 $ makedefs -o	!onames.h
 $ makedefs -v	!date.h
-$ milestone " (*.h)"
-$ makedefs -z	!../src/vis_tab.c, ../include/vis_tab.h
 $ milestone " (*.c)"
 $ set default [-.src]
 $! compile most of the source files:
@@ -315,17 +313,17 @@ $ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
 	+ ",music,o_init,objnam,options,pager,pickup"
 $ gosub compile_list
 $ c_list = "pline,polyself,potion,pray,priest,quest,questpgr,read" -
-	+ ",rect,region,restore,rip,rnd,role,rumors,save,shk,shknam,sit" -
-	+ ",sounds,sp_lev,spell,steal,steed,sys,teleport,timeout,topten" -
-	+ ",track,trap,u_init"
+	+ ",rect,region,restore,rip,rnd,role,rumors,save,sfstruct,shk" -
+	+ ",shknam,sit,sounds,sp_lev,spell,steal,steed,sys,teleport" -
+	+ ",timeout,topten,track,trap,u_init"
 $ gosub compile_list
-$ c_list = "uhitm,vault,vision,vis_tab,weapon,were,wield,windows" -
+$ c_list = "uhitm,vault,vision,weapon,were,wield,windows" -
 	+ ",wizard,worm,worn,write,zap"
 $ gosub compile_list
 $!
 $! Files added in 3.7
 $!
-$ c_list = "nhlua,nhlobj,nhlsel" !,sfstruct
+$ c_list = "nhlua,nhlobj,nhlsel"
 $ gosub compile_list
 $!
 $! 3.7 runtime LUA level parser/loader
