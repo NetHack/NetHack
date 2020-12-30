@@ -945,12 +945,13 @@ register struct monst *mtmp;
                     verbl_msg = "Very well, then.";
                     break;
                 }
+
+                if (could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
+                    (void) doseduce(mtmp);
+                    break;
+                }
             } /* S_AMOROUS_DEMON */
 
-            if (could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
-                (void) doseduce(mtmp);
-                break;
-            }
             swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
         } else
             swval = ((poly_gender() == 0) ? rn2(3) : 0);
