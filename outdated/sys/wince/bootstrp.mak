@@ -146,18 +146,7 @@ U  = $(UTIL)^\
 
 MAKESRC        = $(U)makedefs.c
 
-SPLEVSRC       = $(U)lev_yacc.c	$(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
-
-DGNCOMPSRC     = $(U)dgn_yacc.c	$(U)dgn_$(LEX).c $(U)dgn_main.c
-
 MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
-
-SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_$(LEX).o $(O)lev_main.o \
-		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
-		 $(O)monst.o	$(O)objects.o	$(O)panic.o
-
-DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
-		 $(O)alloc.o	$(O)panic.o
 
 TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
 
@@ -202,8 +191,6 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h \
 		$(INCL)\wintty.h
 
-DGN_FILE_H  = $(INCL)\dgn_file.h
-LEV_COMP_H  = $(INCL)\lev_comp.h
 SP_LEV_H    = $(INCL)\sp_lev.h
 TILE_H      = ..\win\share\tile.h
 
@@ -227,50 +214,13 @@ default : all
 #
 
 all :	$(INCL)\date.h	$(INCL)\onames.h $(INCL)\pm.h \
-	$(SRC)\monstr.c	$(SRC)\vis_tab.c $(U)lev_comp.exe $(INCL)\vis_tab.h \
-	$(U)dgn_comp.exe $(U)uudecode.exe \
+	$(SRC)\monstr.c	$(U)uudecode.exe \
 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
-	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB) $(SRC)\tile.c \
+	$(DAT)\oracles	$(DAT)\quest.dat $(DLB) $(SRC)\tile.c \
 	$(SWINCE)\nethack.ico $(SWINCE)\tiles.bmp $(SWINCE)\mnsel.bmp \
 	$(SWINCE)\mnunsel.bmp $(SWINCE)\petmark.bmp $(SWINCE)\mnselcnt.bmp \
 	$(SWINCE)\keypad.bmp $(SWINCE)\menubar.bmp
 	@echo Done!
-
-$(O)sp_lev.tag:  $(DAT)\bigroom.des  $(DAT)\castle.des \
-	$(DAT)\endgame.des $(DAT)\gehennom.des $(DAT)\knox.des   \
-	$(DAT)\medusa.des  $(DAT)\oracle.des   $(DAT)\tower.des  \
-	$(DAT)\yendor.des  $(DAT)\arch.des     $(DAT)\barb.des   \
-	$(DAT)\caveman.des $(DAT)\healer.des   $(DAT)\knight.des \
-	$(DAT)\monk.des    $(DAT)\priest.des   $(DAT)\ranger.des \
-	$(DAT)\rogue.des   $(DAT)\samurai.des  $(DAT)\sokoban.des \
-	$(DAT)\tourist.des $(DAT)\valkyrie.des $(DAT)\wizard.des
-	cd $(DAT)
-	$(U)lev_comp bigroom.des
-	$(U)lev_comp castle.des
-	$(U)lev_comp endgame.des
-	$(U)lev_comp gehennom.des
-	$(U)lev_comp knox.des
-	$(U)lev_comp mines.des
-	$(U)lev_comp medusa.des
-	$(U)lev_comp oracle.des
-	$(U)lev_comp sokoban.des
-	$(U)lev_comp tower.des
-	$(U)lev_comp yendor.des
-	$(U)lev_comp arch.des
-	$(U)lev_comp barb.des
-	$(U)lev_comp caveman.des
-	$(U)lev_comp healer.des
-	$(U)lev_comp knight.des
-	$(U)lev_comp monk.des
-	$(U)lev_comp priest.des
-	$(U)lev_comp ranger.des
-	$(U)lev_comp rogue.des
-	$(U)lev_comp samurai.des
-	$(U)lev_comp tourist.des
-	$(U)lev_comp valkyrie.des
-	$(U)lev_comp wizard.des
-	cd $(WINCE)
-	echo sp_levs done > $(O)sp_lev.tag
 
 #$(NHRES): $(TILEBMP16) $(WINCE)\winhack.rc $(WINCE)\mnsel.bmp \
 #	$(WINCE)\mnselcnt.bmp $(WINCE)\mnunsel.bmp \
@@ -315,12 +265,6 @@ $(INCL)\pm.h : $(U)makedefs.exe
 
 $(SRC)\monstr.c: $(U)makedefs.exe
 	$(U)makedefs -m
-
-$(INCL)\vis_tab.h: $(U)makedefs.exe
-	$(U)makedefs -z
-
-$(SRC)\vis_tab.c: $(U)makedefs.exe
-	$(U)makedefs -z
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -375,77 +319,6 @@ $(SWINCE)\menubar.bmp: $(U)uudecode.exe $(SWINCE)\menubar.uu
 	chdir $(SWINCE)
 	..\util\uudecode.exe menubar.uu
 	chdir $(WINCE)
-
-#==========================================
-# Level Compiler Stuff
-#==========================================
-
-$(U)lev_comp.exe: $(SPLEVOBJS)
-	echo Linking $@...
-	$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
- 		$(SPLEVOBJS:^	=^
-		)
-<<
-
-$(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_yacc.c
-
-$(O)lev_$(LEX).o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
-               $(U)lev_$(LEX).c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_$(LEX).c
-
-$(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_main.c
-
-
-$(U)lev_yacc.c $(INCL)\lev_comp.h : $(U)lev_comp.y
-	   @echo We will copy the prebuilt lev_yacc.c and 
-	   @echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\lev_yacc.c $(U)lev_yacc.c >nul
-	   @copy $(SSYS)\lev_comp.h $(INCL)\lev_comp.h >nul
-	   @echo /**/ >>$(U)lev_yacc.c
-	   @echo /**/ >>$(INCL)\lev_comp.h
-
-$(U)lev_$(LEX).c: $(U)lev_comp.l
-	   @echo We will copy the prebuilt lev_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\lev_lex.c $@ >nul
-	   @echo /**/ >>$@
-
-#==========================================
-# Dungeon Compiler Stuff
-#==========================================
-
-$(U)dgn_comp.exe: $(DGNCOMPOBJS)
-    @echo Linking $@...
-	$(link) $(LFLAGSU) -out:$@ @<<$(@B).lnk
-		$(DGNCOMPOBJS:^	=^
-		)
-<<
-
-$(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_yacc.c
-
-$(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
-	$(U)dgn_$(LEX).c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_$(LEX).c
-
-$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_main.c
-
-$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
-	   @echo We will copy the prebuilt $(U)dgn_yacc.c and 
-	   @echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\dgn_yacc.c $(U)dgn_yacc.c >nul
-	   @copy $(SSYS)\dgn_comp.h $(INCL)\dgn_comp.h >nul
-	   @echo /**/ >>$(U)dgn_yacc.c
-	   @echo /**/ >>$(INCL)\dgn_comp.h
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l
-	   @echo We will copy the prebuilt dgn_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\dgn_lex.c $@ >nul
-	   @echo /**/ >>$@
 
 #==========================================
 # Create directory for holding object files
@@ -507,7 +380,7 @@ $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon  \
-	$(DAT)\license $(O)sp_lev.tag
+	$(DAT)\license
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -525,7 +398,7 @@ $(DAT)\nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo wizhelp >>dlb.lst
 	echo dungeon >>dlb.lst
 	echo license >>dlb.lst
-	for %%N in (*.lev) do echo %%N >>dlb.lst
+	for %%N in (*.lua) do echo %%N >>dlb.lst
 	$(U)dlb_main cIf dlb.lst nhdat
 	cd $(WINCE)
 
@@ -617,9 +490,6 @@ $(DAT)\oracles: $(UTIL)\makedefs.exe    $(DAT)\oracles.txt
 
 $(DAT)\dungeon: $(UTIL)\makedefs.exe  $(DAT)\dungeon.def
 	$(U)makedefs -e
-	cd $(DAT)
-	$(U)dgn_comp dungeon.pdf
-	cd $(WINCE)
 
 #
 # NT dependencies
@@ -760,7 +630,6 @@ $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ..\win\Qt\qt_clust.cpp
 $(O)monstr.o: $(SRC)\monstr.c $(CONFIG_H)
-$(O)vis_tab.o: $(SRC)\vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: $(SRC)\allmain.c $(HACK_H)
 $(O)alloc.o: $(SRC)\alloc.c $(CONFIG_H)
 $(O)apply.o: $(SRC)\apply.c $(HACK_H)
@@ -861,7 +730,7 @@ $(O)u_init.o: $(SRC)\u_init.c $(HACK_H)
 $(O)uhitm.o: $(SRC)\uhitm.c $(HACK_H)
 $(O)vault.o: $(SRC)\vault.c $(HACK_H)
 $(O)version.o: $(SRC)\version.c $(HACK_H) $(INCL)\date.h $(INCL)\patchlevel.h
-$(O)vision.o: $(SRC)\vision.c $(HACK_H) $(INCL)\vis_tab.h
+$(O)vision.o: $(SRC)\vision.c $(HACK_H)
 $(O)weapon.o: $(SRC)\weapon.c $(HACK_H)
 $(O)were.o: $(SRC)\were.c $(HACK_H)
 $(O)wield.o: $(SRC)\wield.c $(HACK_H)
