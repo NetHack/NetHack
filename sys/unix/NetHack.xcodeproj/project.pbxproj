@@ -114,7 +114,6 @@
 		31B8A3E221A238500055BD01 /* display.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3E121A2384F0055BD01 /* display.c */; };
 		31B8A3E521A238B30055BD01 /* dlb.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3E321A238B30055BD01 /* dlb.c */; };
 		31B8A3E621A238B30055BD01 /* dog.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3E421A238B30055BD01 /* dog.c */; };
-		31B8A3E821A23AB50055BD01 /* vis_tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3E721A23AB50055BD01 /* vis_tab.c */; };
 		31B8A3EC21A23CF20055BD01 /* posixregex.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3EB21A23CF20055BD01 /* posixregex.c */; };
 		31B8A3EF21A23D420055BD01 /* ioctl.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3ED21A23D420055BD01 /* ioctl.c */; };
 		31B8A3F021A23D420055BD01 /* unixtty.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A3EE21A23D420055BD01 /* unixtty.c */; };
@@ -258,7 +257,6 @@
 		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
 		3186A38A21A4B0FB0052BF02 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = ../../include/system.h; sourceTree = "<group>"; };
 		3186A38B21A4B0FC0052BF02 /* onames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onames.h; path = ../../include/onames.h; sourceTree = "<group>"; };
-		3186A38D21A4B0FC0052BF02 /* vis_tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vis_tab.h; path = ../../include/vis_tab.h; sourceTree = "<group>"; };
 		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
@@ -426,7 +424,6 @@
 		31B8A3E121A2384F0055BD01 /* display.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = display.c; path = ../../src/display.c; sourceTree = "<group>"; };
 		31B8A3E321A238B30055BD01 /* dlb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb.c; path = ../../src/dlb.c; sourceTree = "<group>"; };
 		31B8A3E421A238B30055BD01 /* dog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dog.c; path = ../../src/dog.c; sourceTree = "<group>"; };
-		31B8A3E721A23AB50055BD01 /* vis_tab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vis_tab.c; path = ../../src/vis_tab.c; sourceTree = "<group>"; };
 		31B8A3EB21A23CF20055BD01 /* posixregex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = posixregex.c; path = ../share/posixregex.c; sourceTree = "<group>"; };
 		31B8A3ED21A23D420055BD01 /* ioctl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ioctl.c; path = ../share/ioctl.c; sourceTree = "<group>"; };
 		31B8A3EE21A23D420055BD01 /* unixtty.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unixtty.c; path = ../share/unixtty.c; sourceTree = "<group>"; };
@@ -631,7 +628,6 @@
 				31B8A34721A238030055BD01 /* uhitm.c */,
 				31B8A37321A238050055BD01 /* vault.c */,
 				31B8A32721A238010055BD01 /* version.c */,
-				31B8A3E721A23AB50055BD01 /* vis_tab.c */,
 				31B8A33E21A238020055BD01 /* vision.c */,
 				31B8A34221A238020055BD01 /* weapon.c */,
 				31B8A32D21A238010055BD01 /* were.c */,
@@ -724,7 +720,6 @@
 				3186A3C721A4B0FE0052BF02 /* tradstdc.h */,
 				3186A3CD21A4B0FE0052BF02 /* trap.h */,
 				3186A3AD21A4B0FD0052BF02 /* unixconf.h */,
-				3186A38D21A4B0FC0052BF02 /* vis_tab.h */,
 				3186A37E21A4B0FA0052BF02 /* vision.h */,
 				3186A3BE21A4B0FD0052BF02 /* vmsconf.h */,
 				3186A3AA21A4B0FD0052BF02 /* winami.h */,
@@ -1458,7 +1453,6 @@
 				31B8A3DD21A238060055BD01 /* dothrow.c in Sources */,
 				31B8A39421A238060055BD01 /* mcastu.c in Sources */,
 				31B8A3C221A238060055BD01 /* role.c in Sources */,
-				31B8A3E821A23AB50055BD01 /* vis_tab.c in Sources */,
 				31B8A38821A238060055BD01 /* shknam.c in Sources */,
 				31B8A3A521A238060055BD01 /* ball.c in Sources */,
 				31B8A39E21A238060055BD01 /* mthrowu.c in Sources */,
