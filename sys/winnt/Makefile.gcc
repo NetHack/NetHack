@@ -1598,7 +1598,6 @@ $(O)qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_str.h
 #	$(CXX) $(CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
 #---
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H)
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
