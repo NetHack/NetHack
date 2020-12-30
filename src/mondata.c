@@ -762,8 +762,10 @@ int *gender_name_var;
             { "master mindflayer", PM_MASTER_MIND_FLAYER, NEUTRAL },
             /* More alternates; priest and priestess are separate monster
                types but that isn't the case for {aligned,high} priests */
-            { "aligned priestess", PM_ALIGNED_CLERIC, NEUTRAL },
-            { "high priestess", PM_HIGH_CLERIC, NEUTRAL },
+            { "aligned priest", PM_ALIGNED_CLERIC, MALE },
+            { "aligned priestess", PM_ALIGNED_CLERIC, FEMALE },
+            { "high priest", PM_HIGH_CLERIC, MALE },
+            { "high priestess", PM_HIGH_CLERIC, FEMALE },
             /* Inappropriate singularization by -ves check above */
             { "master of thief", PM_MASTER_OF_THIEVES, NEUTRAL },
             /* Potential misspellings where we want to avoid falling back
