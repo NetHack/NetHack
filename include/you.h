@@ -317,6 +317,8 @@ extern const struct Gender genders[]; /* table of available genders */
 #define noit_mhis(mtmp) \
     (genders[pronoun_gender(mtmp, (PRONOUN_NO_IT | PRONOUN_HALLU))].his)
 
+extern const char *orientations[2][4]; /* Table of all orientations */
+
 /*** Unified structure specifying alignment information ***/
 struct Align {
     const char *noun;     /* law/balance/chaos */

@@ -706,6 +706,12 @@ const struct Gender genders[] = {
     { "group", "they", "them", "their", "Grp", 0 },
 };
 
+/* Table of all orientations */
+const char *orientations[2][4] = {
+  { "ace", "gay", "straight", "bi" },
+  { "ace", "straight", "gay", "bi" }
+};
+
 /* Table of all alignments */
 const struct Align aligns[] = {
     { "law", "lawful", "Law", ROLE_LAWFUL, A_LAWFUL },
