@@ -1798,6 +1798,7 @@ struct monst *mon;
     boolean consent;
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
+    unsigned swval, chance;
 
     if (mon->mcan || mon->mspec_used) {
         pline("%s acts as though %s has got a %sheadache.", Monnam(mon),
@@ -2112,7 +2113,49 @@ struct monst *mon;
             g.context.botl = 1;
         }
     }
-    if (!rn2(25))
+
+    /*
+     * try to maintain game balance when player changes orientation
+     *
+     * vanilla:
+     * 50% of amorous demons have seduction attacks
+     *    - danger from disrobing
+     *    - good & bad outcomes after consorting
+     *    - 4% chance of severe headache (no more seduction)
+     *    - steals gold from player
+     *    - demons decide attack types
+     *
+     * consent patch:
+     *    - player can chat with demons to select attack type, exploit?
+     *    - straight: same as vanilla, 50% have seduction and 4% cancellation
+     *    - gay: 50% is the other gender demon, cancellation still 4%
+     *    - bi: 100% of demons have seduction, 8% probability of cancellation
+     *    - ace: random 50% (both genders) have seduction, but nymph-like
+     *               4% cancellation = same danger from disrobe attacks
+     *           no good/bad seduction outcomes, but no gold stealing either
+     *           player cannot tell from distance which gender demons will attack
+     *
+     *    not sure if ace is balanced, maybe add some new outcomes for demons
+     *    with nymph-like seduction? drain life?
+     */
+
+     /* probability of cancellation depends of player's orientation */
+    swval = ((poly_gender() == FEMALE) ?
+              (flags.consent_given & 0x0c)>>2 : (flags.consent_given & 0x03));
+    switch(swval) {
+      case 0: /* ace */
+      case 1: /* m:gay; f:straight */
+      case 2: /* m:straight; f:gay */
+          chance = 1;
+          break;
+      case 3: /* bi */
+          chance = 2;
+          break;
+      default:
+          impossible("bad consent flag bit fiddling");
+    }
+
+    if (rn2(25) < chance)
         mon->mcan = 1; /* monster is worn out */
     if (!tele_restrict(mon))
         (void) rloc(mon, TRUE);

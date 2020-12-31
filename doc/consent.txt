@@ -42,3 +42,6 @@ consent patch:
 first encounter with either gender always has disrobe attack
 based on consent, player will want disrobe attacks from 0% 50% or 100% of foocubi
 need to preserve game balance so that 50% of foocubi try to kill you and 50% seduce
+
+dont' forget to update sink kicking too
+double check nymph behaviour - chatting, seduction. change this too?
