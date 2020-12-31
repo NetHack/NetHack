@@ -671,12 +671,11 @@ const char *name;
     Strcat(buf, "-");
     len = strlen(buf);
 
-    if ((bp = g.level.bonesinfo)) {
-        do {
-            if (!strncmp(bp->who, buf, len))
-                return TRUE;
-        } while ((bp = bp->next) != (struct cemetery *) 0);
+    for (bp = g.level.bonesinfo; bp; bp = bp->next) {
+        if (!strncmp(bp->who, buf, len))
+            return TRUE;
     }
+
     return FALSE;
 }
 
