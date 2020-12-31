@@ -110,8 +110,8 @@ static long FDECL(line_dist_coord, (long, long, long, long, long, long));
 static void FDECL(l_push_wid_hei_table, (lua_State *, int, int));
 static int FDECL(get_table_align, (lua_State *));
 static int FDECL(get_table_monclass, (lua_State *));
-static int FDECL(find_montype, (lua_State *, const char *));
-static int FDECL(get_table_montype, (lua_State *));
+static int FDECL(find_montype, (lua_State *, const char *, int *));
+static int FDECL(get_table_montype, (lua_State *, int *));
 static int FDECL(get_table_int_or_random, (lua_State *, const char *, int));
 static int FDECL(get_table_buc, (lua_State *));
 static int FDECL(get_table_objclass, (lua_State *));
@@ -3011,31 +3011,39 @@ lua_State *L;
 }
 
 static int
-find_montype(L, s)
+find_montype(L, s, mgender)
 lua_State *L UNUSED;
 const char *s;
+int *mgender;
 {
-    int i;
+    int i, mgend = NEUTRAL;
 
-    for (i = LOW_PM; i < NUMMONS; i++)
-        if (!strcmpi(mons[i].pmnames[NEUTRAL], s)
-            || (mons[i].pmnames[MALE] != 0
-                    && !strcmpi(mons[i].pmnames[MALE], s))
-            || (mons[i].pmnames[FEMALE] != 0
-                    && !strcmpi(mons[i].pmnames[FEMALE], s)))
-            return i;
+    i = name_to_monplus(s, (const char **) 0, &mgend);
+    if (i >= LOW_PM && i < NUMMONS) {
+        if (is_male(&mons[i]) || is_female(&mons[i]))
+            mgend = is_female(&mons[i]) ? FEMALE : MALE;
+        else
+            mgend = (mgend == FEMALE) ? FEMALE
+                        : (mgend == MALE) ? MALE : rn2(2);
+        if (mgender)
+            *mgender = mgend;
+        return i;
+    }
+    if (mgender)
+        *mgender = NEUTRAL;
     return NON_PM;
 }
 
 static int
-get_table_montype(L)
+get_table_montype(L, mgender)
 lua_State *L;
+int *mgender;
 {
     char *s = get_table_str_opt(L, "id", NULL);
     int ret = NON_PM;
 
     if (s) {
-        ret = find_montype(L, s);
+        ret = find_montype(L, s, mgender);
         Free(s);
         if (ret == NON_PM)
             nhl_error(L, "Unknown monster id");
@@ -3074,7 +3082,7 @@ lua_State *L;
 {
     int argc = lua_gettop(L);
     monster tmpmons;
-    int mx = -1, my = -1;
+    int mx = -1, my = -1, mgend = NEUTRAL;
     char *mappear = NULL;
 
     create_des_coder();
@@ -3106,7 +3114,9 @@ lua_State *L;
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
-            tmpmons.id = find_montype(L, paramstr);
+            tmpmons.id = find_montype(L, paramstr, &mgend);
+            tmpmons.female = (mgend == FEMALE) ? FEMALE
+                                : (mgend == MALE) ? MALE : rn2(2);
         }
     } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
                && lua_type(L, 2) == LUA_TTABLE) {
@@ -3119,7 +3129,9 @@ lua_State *L;
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
-            tmpmons.id = find_montype(L, paramstr);
+            tmpmons.id = find_montype(L, paramstr, &mgend);
+            tmpmons.female = (mgend == FEMALE) ? FEMALE
+                                : (mgend == MALE) ? MALE : rn2(2);
         }
 
     } else if (argc == 3) {
@@ -3133,7 +3145,9 @@ lua_State *L;
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
-            tmpmons.id = find_montype(L, paramstr);
+            tmpmons.id = find_montype(L, paramstr, &mgend);
+            tmpmons.female = (mgend == FEMALE) ? FEMALE
+                                : (mgend == MALE) ? MALE : rn2(2);
         }
     } else {
         lcheck_param_table(L);
@@ -3174,7 +3188,10 @@ lua_State *L;
 
         get_table_xy_or_coord(L, &mx, &my);
 
-        tmpmons.id = get_table_montype(L);
+        tmpmons.id = get_table_montype(L, &mgend);
+        if (mgend != NEUTRAL)
+            tmpmons.female = mgend;
+
         tmpmons.class = get_table_monclass(L);
 
         lua_getfield(L, 1, "inventory");
