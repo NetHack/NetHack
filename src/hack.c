@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1608673692 2020/12/22 21:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1609442596 2020/12/31 19:23:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1913,8 +1913,9 @@ domove_core()
             You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
                 x_monnam(mtmp,
                          mtmp->mtame ? ARTICLE_YOUR
-                         : (!has_mgivenname(mtmp) && !type_is_pname(mtmp->data))
-                           ? ARTICLE_THE : ARTICLE_NONE,
+                         : (!has_mgivenname(mtmp)
+                            && !type_is_pname(mtmp->data)) ? ARTICLE_THE
+                           : ARTICLE_NONE,
                          (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
                          has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1609281273 2020/12/29 22:34:33 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.413 $ $NHDT-Date: 1609442596 2020/12/31 19:23:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -469,6 +469,7 @@ wizard mode sanity check complained about Wizard's clone mimicking a monster
 new ^G gender-naming handling code required a guard against null permonst
 	pointer which could occur under some circumstances
 replace some monster names in .lua files with their new equivalents
+attempting to swap places with a peaceful monster might cause it to flee
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

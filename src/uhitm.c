@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1607076540 2020/12/04 10:09:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.288 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1609442602 2020/12/31 19:23:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.292 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -346,9 +346,14 @@ register struct monst *mtmp;
              * if your pet is a long worm with a tail.
              * There's also a chance of displacing a "frozen" monster:
              * sleeping monsters might magically walk in their sleep.
+             * This block of code used to only be called for pets; now
+             * that it also applies to peacefuls, non-pets mustn't be
+             * forced to flee.
              */
             boolean foo = (Punished || !rn2(7)
-                           || (is_longworm(mtmp->data) && mtmp->wormno)),
+                           || (is_longworm(mtmp->data) && mtmp->wormno)
+                           || (IS_ROCK(levl[u.ux][u.uy].typ)
+                               && !passes_walls(mtmp->data))),
                     inshop = FALSE;
             char *p;
 
@@ -360,17 +365,17 @@ register struct monst *mtmp;
                         break;
                     }
             }
-            if (inshop || foo || (IS_ROCK(levl[u.ux][u.uy].typ)
-                                  && !passes_walls(mtmp->data))) {
+            if (inshop || foo) {
                 char buf[BUFSZ];
 
-                monflee(mtmp, rnd(6), FALSE, FALSE);
+                if (mtmp->mtame) /* see 'additional considerations' above */
+                    monflee(mtmp, rnd(6), FALSE, FALSE);
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
                 end_running(TRUE);
                 return TRUE;
-            } else if (mtmp->mfrozen || mtmp->msleeping || (!mtmp->mcanmove)
+            } else if (mtmp->mfrozen || mtmp->msleeping || !mtmp->mcanmove
                        || (mtmp->data->mmove == 0 && rn2(6))) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
                 end_running(TRUE);
