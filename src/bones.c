@@ -656,4 +656,27 @@ getbones()
     return ok;
 }
 
+/* check whether current level contains bones from a particular player */
+boolean
+bones_include_name(name)
+const char *name;
+{
+    struct cemetery *bp;
+    int len;
+    char buf[BUFSZ];
+
+    /* prepare buffer by appending terminal hyphen to name, to avoid partial
+     * matches producing false positives */
+    Strcpy(buf, name);
+    Strcat(buf, "-");
+    len = strlen(buf);
+
+    for (bp = g.level.bonesinfo; bp; bp = bp->next) {
+        if (!strncmp(bp->who, buf, len))
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 /*bones.c*/
