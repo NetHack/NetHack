@@ -1,4 +1,4 @@
-/* NetHack 3.7	termcap.c	$NHDT-Date: 1609454952 2020/12/31 22:49:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.7	termcap.c	$NHDT-Date: 1609459769 2021/01/01 00:09:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1160,6 +1160,11 @@ init_hilite()
 {
     register int c;
 
+    if (!hilites[CLR_BLACK])
+        hilites[CLR_BLACK] = adef_nilstring;
+    if (!hilites[CLR_BLACK | BRIGHT])
+        hilites[CLR_BLACK | BRIGHT] = hilites[CLR_BLACK];
+
     if (!hilites[CLR_GRAY])
         hilites[CLR_GRAY] = adef_nilstring;
     if (!hilites[NO_COLOR])
@@ -1190,12 +1195,12 @@ kill_hilite()
     register int c;
 
     for (c = 0; c < CLR_MAX / 2; c++) {
-        if (c == CLR_BLACK)
-            continue;
         if (c == CLR_GRAY || hilites[c] == adef_nilstring)
             hilites[c] = 0;
         if (hilites[c | BRIGHT] == adef_nilstring)
             hilites[c] = 0;
+        if (c == CLR_BLACK)
+            continue;
         if (hilites[c | BRIGHT] == hilites[c]) /* for blue */
             hilites[c | BRIGHT] = 0;
         if (hilites[c] && hilites[c] != nh_HI)
@@ -1336,7 +1341,7 @@ void
 term_start_color(color)
 int color;
 {
-    if (color < CLR_MAX)
+    if (color < CLR_MAX && hilites[color] && *hilites[color])
         xputs(hilites[color]);
 }
 
