@@ -1735,7 +1735,7 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
     boolean agrinvis, defperc;
     xchar genagr, gendef;
     int adtyp;
-    boolean fem;
+    boolean fem, ace;
     unsigned mask;
 
     if (is_animal(magr->data))
@@ -1777,10 +1777,16 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
         || (adtyp != AD_SEDU && adtyp != AD_SSEX && adtyp != AD_SITM))
         return 0;
 
-    if (poly_gender() == FEMALE)
+    if (poly_gender() == FEMALE) {
         mask = fem ? CONSENT_SEDUCE_FF : CONSENT_SEDUCE_MF;
-    else
+        ace = (((flags.consent_given & 0x0c)>>2) == 0);
+    } else {
         mask = fem ? CONSENT_SEDUCE_FM : CONSENT_SEDUCE_MM;
+        ace = ((flags.consent_given & 0x03) == 0);
+    }
+
+    if (ace & (magr->m_id%2)) /* if you are ace, random half will harrass you */
+      return 1;
 
     return ((flags.consent_given & mask) != 0) ? 1 :
                        (pagr->mlet == S_NYMPH) ? 2 : 0;
@@ -1795,10 +1801,13 @@ struct monst *mon;
     boolean fem = (mon->data == &mons[PM_AMOROUS_DEMON]
                    && Mgender(mon) == FEMALE); /* otherwise incubus */
     boolean seewho, naked; /* True iff no armor */
-    boolean consent;
+    boolean consent, ace;
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
     unsigned swval, chance;
+
+    ace = (poly_gender() == FEMALE) ? (((flags.consent_given & 0x0c)>>2) == 0)
+                                    : ((flags.consent_given & 0x03) == 0);
 
     if (mon->mcan || mon->mspec_used) {
         pline("%s acts as though %s has got a %sheadache.", Monnam(mon),
@@ -1812,8 +1821,11 @@ struct monst *mon;
     seewho = canseemon(mon);
     if (!seewho)
         pline("Someone caresses you...");
-    else
+    else if (!ace)
         You_feel("very attracted to %s.", mon_nam(mon));
+    else
+        pline("%s attempts to seduce you.", Monnam(mon));
+
     /* cache the seducer's name in a local buffer */
     Strcpy(Who, (!seewho ? (fem ? "She" : "He") : Monnam(mon)));
 
