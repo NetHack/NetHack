@@ -1473,7 +1473,7 @@ boolean at_stairs, falling, portal;
         mklev();
         new = TRUE; /* made the level */
 
-        familiar = (find_ghost_with_name(g.plname) != (struct monst *) 0);
+        familiar = bones_include_name(g.plname);
     } else {
         /* returning to previously visited level; reload it */
         nhfp = open_levelfile(new_ledger, whynot);
