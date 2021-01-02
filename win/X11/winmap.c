@@ -934,7 +934,7 @@ struct map_info_t *map_info;
     int x, y;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
-    int mgunexp = ' ', mgnothg = ' ', mgcolor = NO_COLOR;
+    int mgunexp = ' ', mgnothg = ' ';
     struct tile_map_info_t *tile_map = &map_info->tile_map;
     struct text_map_info_t *text_map = &map_info->text_map;
 
