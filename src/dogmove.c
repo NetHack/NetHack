@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1607374000 2020/12/07 20:46:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1609617569 2021/01/02 19:59:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1356,8 +1356,7 @@ static const struct qmchoices {
     { PM_HOUSECAT, 0, PM_DOG, M_AP_MONSTER },
     { PM_LARGE_CAT, 0, PM_LARGE_DOG, M_AP_MONSTER },
     { PM_HOUSECAT, 0, PM_GIANT_RAT, M_AP_MONSTER },
-    { 0, S_DOG, SINK,
-      M_AP_FURNITURE }, /* sorry, no fire hydrants in NetHack */
+    { 0, S_DOG, S_sink, M_AP_FURNITURE }, /* sorry, no fire hydrants */
     { 0, 0, TRIPE_RATION, M_AP_OBJECT }, /* leave this at end */
 };
 
@@ -1378,7 +1377,7 @@ static void
 quickmimic(mtmp)
 struct monst *mtmp;
 {
-    int idx = 0, trycnt = 5, spotted;
+    int idx = 0, trycnt = 5, spotted, seeloc;
     char buf[BUFSZ];
 
     if (Protection_from_shape_changers || !mtmp->meating)
@@ -1407,34 +1406,35 @@ struct monst *mtmp;
 
     Strcpy(buf, mon_nam(mtmp));
     spotted = canspotmon(mtmp);
+    seeloc = cansee(mtmp->mx, mtmp->my);
 
     mtmp->m_ap_type = qm[idx].m_ap_type;
     mtmp->mappearance = qm[idx].mappearance;
 
-    if (spotted || cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp)) {
-        /* this isn't quite right; if sensing a monster without being
-           able to see its location, you really shouldn't be told you
-           sense it becoming furniture or an object that you can't see
-           (on the other hand, perhaps you're sensing a brief glimpse
-           of its mind as it changes form) */
+    if (spotted || seeloc || canspotmon(mtmp)) {
+        int prev_glyph = glyph_at(mtmp->mx, mtmp->my);
+        const char *what = (M_AP_TYPE(mtmp) == M_AP_FURNITURE)
+                           ? defsyms[mtmp->mappearance].explanation
+                           : (M_AP_TYPE(mtmp) == M_AP_OBJECT
+                              && OBJ_DESCR(objects[mtmp->mappearance]))
+                             ? OBJ_DESCR(objects[mtmp->mappearance])
+                             : (M_AP_TYPE(mtmp) == M_AP_OBJECT
+                                && OBJ_NAME(objects[mtmp->mappearance]))
+                               ? OBJ_NAME(objects[mtmp->mappearance])
+                               : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
+                                 ? pmname(&mons[mtmp->mappearance],
+                                          Mgender(mtmp))
+                                 : something;
+
         newsym(mtmp->mx, mtmp->my);
-        You("%s %s %sappear%s where %s was!",
-            cansee(mtmp->mx, mtmp->my) ? "see" : "sense that",
-            (M_AP_TYPE(mtmp) == M_AP_FURNITURE)
-                ? an(defsyms[mtmp->mappearance].explanation)
-                : (M_AP_TYPE(mtmp) == M_AP_OBJECT
-                   && OBJ_DESCR(objects[mtmp->mappearance]))
-                      ? an(OBJ_DESCR(objects[mtmp->mappearance]))
-                      : (M_AP_TYPE(mtmp) == M_AP_OBJECT
-                         && OBJ_NAME(objects[mtmp->mappearance]))
-                            ? an(OBJ_NAME(objects[mtmp->mappearance]))
-                            : (M_AP_TYPE(mtmp) == M_AP_MONSTER)
-                                  ? an(pmname(&mons[mtmp->mappearance],
-                                              Mgender(mtmp)))
-                                  : something,
-            cansee(mtmp->mx, mtmp->my) ? "" : "has ",
-            cansee(mtmp->mx, mtmp->my) ? "" : "ed",
-            buf);
+        if (glyph_at(mtmp->mx, mtmp->my) != prev_glyph)
+            You("%s %s %s where %s was!",
+                seeloc ? "see" : "sense that",
+                (what != something) ? an(what) : what,
+                seeloc ? "appear" : "has appeared", buf);
+        else
+            You("sense that %s feels rather %s-ish.", buf, what);
+
         display_nhwindow(WIN_MAP, TRUE);
     }
 }

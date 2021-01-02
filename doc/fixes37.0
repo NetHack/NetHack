@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.413 $ $NHDT-Date: 1609442596 2020/12/31 19:23:16 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.417 $ $NHDT-Date: 1609617569 2021/01/02 19:59:29 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -354,6 +354,12 @@ if a prefix key was bound to some character which ordinarily ran a regular
 reqmenu (the request-a-menu prefix supported by a handful of non-movement
 	commands) could be bound to some key other than 'm' but it only
 	worked if the new key was also a movement prefix
+when telepathically sensed pet ate a mimic corpse and temporarily took on
+	a different shape, you were told that you sensed it changing into
+	something but the map continued to show its true shape (telepathy
+	overrides mimic hiding); give a different message in that case
+when a pet ate a mimic corpse and tried to temporarily look like a sink it
+	ended up looking like a throne (terrain type SINK == symbol S_throne)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
