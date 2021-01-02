@@ -932,7 +932,6 @@ map_all_unexplored(map_info) /* [was map_all_stone()] */
 struct map_info_t *map_info;
 {
     int x, y;
-    char buf1[BUFSZ], buf2[BUFSZ];
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
     int mgunexp = ' ', mgnothg = ' ', mgcolor = NO_COLOR;
