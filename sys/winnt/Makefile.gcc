@@ -315,24 +315,24 @@ VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
 VOBJ09 = $(O)hacklib.o  $(O)insight.o  $(O)invent.o   $(O)isaac64.o
 VOBJ10 = $(O)light.o    $(O)lock.o     $(O)mail.o     $(O)makemon.o
-VOBJ11 = $(O)mapglyph.o $(O)mdlib.o    $(O)mcastu.o   $(O)mhitm.o
-VOBJ12 = $(O)mhitu.o    $(O)minion.o   $(O)mklev.o    $(O)mkmap.o
-VOBJ13 = $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o
-VOBJ14 = $(O)mondata.o  $(O)monmove.o  $(O)monst.o    $(O)mplayer.o
-VOBJ15 = $(O)mthrowu.o  $(O)muse.o     $(O)music.o    $(O)o_init.o
-VOBJ16 = $(O)objects.o  $(O)objnam.o   $(O)options.o  $(O)pager.o
-VOBJ17 = $(O)pickup.o   $(O)pline.o    $(O)polyself.o $(O)potion.o
-VOBJ18 = $(O)pray.o     $(O)priest.o   $(O)quest.o    $(O)questpgr.o
-VOBJ19 = $(RANDOM)      $(O)read.o     $(O)rect.o     $(O)region.o
-VOBJ20 = $(O)restore.o  $(O)rip.o      $(O)rnd.o      $(O)role.o
-VOBJ21 = $(O)rumors.o   $(O)save.o     $(O)sfstruct.o $(O)shk.o
-VOBJ22 = $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o
-VOBJ23 = $(O)spell.o    $(O)steal.o    $(O)steed.o    $(O)symbols.o
-VOBJ24 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
-VOBJ25 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
-VOBJ26 = $(O)vault.o    $(O)vision.o   $(O)weapon.o   $(O)were.o
-VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
-VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ11 = $(O)mdlib.o    $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o
+VOBJ12 = $(O)minion.o   $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o
+VOBJ13 = $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o      $(O)mondata.o
+VOBJ14 = $(O)monmove.o  $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o
+VOBJ15 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o 
+VOBJ16 = $(O)objnam.o   $(O)options.o  $(O)pager.o    $(O)pickup.o
+VOBJ17 = $(O)pline.o    $(O)polyself.o $(O)potion.o   $(O)pray.o
+VOBJ18 = $(O)priest.o   $(O)quest.o    $(O)questpgr.o $(RANDOM)
+VOBJ19 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)restore.o
+VOBJ20 = $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
+VOBJ21 = $(O)save.o     $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
+VOBJ22 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
+VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
+VOBJ24 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
+VOBJ25 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ26 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ27 = $(O)windows.o  $(O)wizard.o   $(O)worm.o     $(O)worn.o
+VOBJ28 = $(O)write.o    $(O)zap.o
 
 ifeq "$(ADD_LUA)" "Y"
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
@@ -360,8 +360,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	 $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	 $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	 $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)  \
-	 $(CURSESOBJ)
+	 $(VOBJ26) $(VOBJ27) $(VOBJ28) $(REGEX)  $(CURSESOBJ)
 
 ifneq "$(SKIP_NETHACKW)" "Y"
 GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
@@ -1639,7 +1638,6 @@ $(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)/mail.h
 $(O)makemon.o: makemon.c $(HACK_H)
-$(O)mapglyph.o: mapglyph.c $(HACK_H)
 $(O)mcastu.o: mcastu.c $(HACK_H)
 $(O)mhitm.o: mhitm.c $(HACK_H) $(INCL)/artifact.h
 $(O)mhitu.o: mhitu.c $(HACK_H) $(INCL)/artifact.h

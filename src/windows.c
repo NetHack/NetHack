@@ -1430,4 +1430,157 @@ int color;
     );
 }
 
+int
+glyph2ttychar(glyph)
+int glyph;
+{
+    int so;
+    unsigned glyphmod[NUM_GLYPHMOD];
+
+    map_glyphmod(0, 0, glyph, MG_FLAG_RETURNIDX, glyphmod);
+    so = (int) glyphmod[GM_TTYCHAR];
+    if (so >= 0  && so < SYM_MAX)
+        return (int) g.showsyms[so];
+    else
+        return ' ';
+}
+
+char *
+encglyph(glyph)
+int glyph;
+{
+    static char encbuf[20]; /* 10+1 would suffice */
+
+    Sprintf(encbuf, "\\G%04X%04X", g.context.rndencode, glyph);
+    return encbuf;
+}
+
+char *
+decode_mixed(buf, str)
+char *buf;
+const char *str;
+{
+    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
+    char *put = buf;
+    unsigned glyphmod[NUM_GLYPHMOD];
+
+    if (!str)
+        return strcpy(buf, "");
+
+    while (*str) {
+        if (*str == '\\') {
+            int rndchk, dcount, so, gv;
+            const char *dp, *save_str;
+
+            save_str = str++;
+            switch (*str) {
+            case 'G': /* glyph value \GXXXXNNNN*/
+                rndchk = dcount = 0;
+                for (++str; *str && ++dcount <= 4; ++str)
+                    if ((dp = index(hex, *str)) != 0)
+                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+                    else
+                        break;
+                if (rndchk == g.context.rndencode) {
+                    gv = dcount = 0;
+                    for (; *str && ++dcount <= 4; ++str)
+                        if ((dp = index(hex, *str)) != 0)
+                            gv = (gv * 16) + ((int) (dp - hex) / 2);
+                        else
+                            break;
+                    map_glyphmod(0, 0, gv, MG_FLAG_RETURNIDX, glyphmod);
+                    so = glyphmod[GM_TTYCHAR];
+                    *put++ = g.showsyms[so];
+                    /* 'str' is ready for the next loop iteration and '*str'
+                       should not be copied at the end of this iteration */
+                    continue;
+                } else {
+                    /* possible forgery - leave it the way it is */
+                    str = save_str;
+                }
+                break;
+#if 0
+            case 'S': /* symbol offset */
+                so = rndchk = dcount = 0;
+                for (++str; *str && ++dcount <= 4; ++str)
+                    if ((dp = index(hex, *str)) != 0)
+                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+                    else
+                        break;
+                if (rndchk == g.context.rndencode) {
+                    dcount = 0;
+                    for (; *str && ++dcount <= 2; ++str)
+                        if ((dp = index(hex, *str)) != 0)
+                            so = (so * 16) + ((int) (dp - hex) / 2);
+                        else
+                            break;
+                }
+                *put++ = g.showsyms[so];
+                break;
+#endif
+            case '\\':
+                break;
+            case '\0':
+                /* String ended with '\\'.  This can happen when someone
+                   names an object with a name ending with '\\', drops the
+                   named object on the floor nearby and does a look at all
+                   nearby objects. */
+                /* brh - should we perhaps not allow things to have names
+                   that contain '\\' */
+                str = save_str;
+                break;
+            }
+        }
+        *put++ = *str++;
+    }
+    *put = '\0';
+    return buf;
+}
+
+/*
+ * This differs from putstr() because the str parameter can
+ * contain a sequence of characters representing:
+ *        \GXXXXNNNN    a glyph value, encoded by encglyph().
+ *
+ * For window ports that haven't yet written their own
+ * XXX_putmixed() routine, this general one can be used.
+ * It replaces the encoded glyph sequence with a single
+ * showsyms[] char, then just passes that string onto
+ * putstr().
+ */
+
+void
+genl_putmixed(window, attr, str)
+winid window;
+int attr;
+const char *str;
+{
+    char buf[BUFSZ];
+
+    /* now send it to the normal putstr */
+    putstr(window, attr, decode_mixed(buf, str));
+}
+
+/*
+ * Window port helper function for menu invert routines to move the decision
+ * logic into one place instead of 7 different window-port routines.
+ */
+boolean
+menuitem_invert_test(mode, itemflags, is_selected)
+int mode;
+unsigned itemflags;     /* The itemflags for the item               */
+boolean is_selected;    /* The current selection status of the item */
+{
+    boolean skipinvert = (itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0;
+
+    if ((iflags.menuinvertmode == 1 || iflags.menuinvertmode == 2)
+        && !mode && skipinvert && !is_selected)
+        return FALSE;
+    else if (iflags.menuinvertmode == 2
+        && !mode && skipinvert && is_selected)
+        return TRUE;
+    else
+        return TRUE;
+}
+
 /*windows.c*/

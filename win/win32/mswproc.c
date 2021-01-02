@@ -3077,8 +3077,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
     long cond, *condptr = (long *) ptr;
     char *text = (char *) ptr;
     MSNHMsgUpdateStatus update_cmd_data;
-    int ocolor, ochar, ci;
-    unsigned ospecial;
+    int ochar, ci;
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, condmasks);
 
@@ -3130,8 +3129,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
             if (iflags.invis_goldsym)
                 ochar = GOLD_SYM;
             else
-                mapglyph(objnum_to_glyph(GOLD_PIECE),
-                         &ochar, &ocolor, &ospecial, 0, 0, 0);
+                ochar = glyph2ttychar(objnum_to_glyph(GOLD_PIECE));
             buf[0] = ochar;
             p = strchr(text, ':');
             if (p) {

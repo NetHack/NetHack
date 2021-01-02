@@ -39,7 +39,6 @@ struct engr *head_engr;
 #ifdef TEXTCOLOR
 /*
  *  This must be the same order as used for buzz() in zap.c.
- *  (They're only used in mapglyph.c so probably shouldn't be here.)
  */
 const int zapcolors[NUM_ZAP] = {
     HI_ZAP,     /* 0 - missile */

@@ -308,7 +308,7 @@ $ c_list = "allmain,apply,artifact,attrib,ball,bones,botl,cmd,dbridge" -
 	+ ",extralev,files,fountain"
 $ gosub compile_list
 $ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
-	+ ",mapglyph,mcastu,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
+	+ ",mcastu,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
 	+ ",mkobj,mkroom,mon,mondata,monmove,mplayer,mthrowu,muse" -
 	+ ",music,o_init,objnam,options,pager,pickup"
 $ gosub compile_list

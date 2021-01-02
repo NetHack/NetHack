@@ -767,37 +767,9 @@ EM_JS(void, js_helpers_init, (), {
     globalThis.nethackGlobal = globalThis.nethackGlobal || {};
     globalThis.nethackGlobal.helpers = globalThis.nethackGlobal.helpers || {};
 
-    installHelper(mapglyphHelper);
     installHelper(displayInventory);
     installHelper(getPointerValue);
     installHelper(setPointerValue);
-
-    // used by print_glyph
-    function mapglyphHelper(glyph, x, y, mgflags) {
-        let ochar = _malloc(4);
-        let ocolor = _malloc(4);
-        let ospecial = _malloc(4);
-
-        _mapglyph(glyph, ochar, ocolor, ospecial, x, y, mgflags);
-
-        let ch = getValue(ochar, "i32");
-        let color = getValue(ocolor, "i32");
-        let special = getValue(ospecial, "i32");
-
-        _free (ochar);
-        _free (ocolor);
-        _free (ospecial);
-
-        return {
-            glyph,
-            ch,
-            color,
-            special,
-            x,
-            y,
-            mgflags
-        };
-    }
 
     // used by update_inventory
     function displayInventory() {

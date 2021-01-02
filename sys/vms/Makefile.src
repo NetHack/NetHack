@@ -152,7 +152,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c \
 	   insight.c invent.c light.c lock.c \
-	   mail.c makemon.c mapglyph.c mcastu.c mhitm.c mhitu.c minion.c \
+	   mail.c makemon.c mcastu.c mhitm.c mhitu.c minion.c \
 	   mklev.c mkmap.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
@@ -198,7 +198,7 @@ HOBJ2 = dog.obj,dogmove.obj,dokick.obj,dothrow.obj,drawing.obj, \
 	dungeon.obj,eat.obj,end.obj,engrave.obj,exper.obj,explode.obj, \
 	extralev.obj,files.obj,fountain.obj,hack.obj,hacklib.obj, \
 	insight.obj,invent.obj
-HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mapglyph.obj,mcastu.obj, \
+HOBJ3 = light.obj,lock.obj,mail.obj,makemon.obj,mcastu.obj, \
 	mhitm.obj,mhitu.obj,minion.obj,mklev.obj,mkmap.obj,mkmaze.obj, \
 	mkobj.obj,mkroom.obj,mon.obj,mondata.obj,monmove.obj
 HOBJ4 = mplayer.obj,mthrowu.obj,muse.obj,music.obj,o_init.obj,objnam.obj, \
@@ -531,7 +531,6 @@ light.obj :	light.c $(HACK_H)
 lock.obj :	lock.c $(HACK_H)
 mail.obj :	mail.c $(HACK_H) $(INC)mail.h
 makemon.obj :	makemon.c $(HACK_H)
-mapglyph.obj :	mapglyph.c $(HACK_H) $(INC)wintty.h $(INC)color.h
 mcastu.obj :	mcastu.c $(HACK_H)
 mhitm.obj :	mhitm.c $(HACK_H) $(INC)artifact.h
 mhitu.obj :	mhitu.c $(HACK_H) $(INC)artifact.h

@@ -667,10 +667,6 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
     unsigned int special;
     int attr = -1;
 
-#if 0
-    /* map glyph to character and color */
-    mapglyph(glyph, &ch, &color, &special, x, y, 0); */
-#endif
     special = glyphmod[GM_FLAGS];
     ch = (int) glyphmod[GM_TTYCHAR];
     color = (int) glyphmod[GM_COLOR];

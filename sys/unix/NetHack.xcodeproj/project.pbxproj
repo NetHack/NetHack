@@ -16,7 +16,6 @@
 		31B8A37E21A238060055BD01 /* steal.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31821A238000055BD01 /* steal.c */; };
 		31B8A37F21A238060055BD01 /* extralev.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31921A238000055BD01 /* extralev.c */; };
 		31B8A38021A238060055BD01 /* sit.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31A21A238000055BD01 /* sit.c */; };
-		31B8A38121A238060055BD01 /* mapglyph.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31B21A238000055BD01 /* mapglyph.c */; };
 		31B8A38221A238060055BD01 /* teleport.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31C21A238000055BD01 /* teleport.c */; };
 		31B8A38321A238060055BD01 /* mhitu.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31D21A238000055BD01 /* mhitu.c */; };
 		31B8A38421A238060055BD01 /* do_name.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A31E21A238000055BD01 /* do_name.c */; };
@@ -325,7 +324,6 @@
 		31B8A31821A238000055BD01 /* steal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = steal.c; path = ../../src/steal.c; sourceTree = "<group>"; };
 		31B8A31921A238000055BD01 /* extralev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = extralev.c; path = ../../src/extralev.c; sourceTree = "<group>"; };
 		31B8A31A21A238000055BD01 /* sit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sit.c; path = ../../src/sit.c; sourceTree = "<group>"; };
-		31B8A31B21A238000055BD01 /* mapglyph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mapglyph.c; path = ../../src/mapglyph.c; sourceTree = "<group>"; };
 		31B8A31C21A238000055BD01 /* teleport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = teleport.c; path = ../../src/teleport.c; sourceTree = "<group>"; };
 		31B8A31D21A238000055BD01 /* mhitu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mhitu.c; path = ../../src/mhitu.c; sourceTree = "<group>"; };
 		31B8A31E21A238000055BD01 /* do_name.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = do_name.c; path = ../../src/do_name.c; sourceTree = "<group>"; };
@@ -570,7 +568,6 @@
 				31B8A34921A238030055BD01 /* lock.c */,
 				31B8A33221A238010055BD01 /* mail.c */,
 				31B8A34021A238020055BD01 /* makemon.c */,
-				31B8A31B21A238000055BD01 /* mapglyph.c */,
 				31B8A32E21A238010055BD01 /* mcastu.c */,
 				31B8A33D21A238020055BD01 /* mhitm.c */,
 				31B8A31D21A238000055BD01 /* mhitu.c */,
@@ -1389,7 +1386,6 @@
 				31B8A3C621A238060055BD01 /* dbridge.c in Sources */,
 				31B8A38521A238060055BD01 /* rnd.c in Sources */,
 				31B8A38B21A238060055BD01 /* topten.c in Sources */,
-				31B8A38121A238060055BD01 /* mapglyph.c in Sources */,
 				5462D14823E7B19200969423 /* insight.c in Sources */,
 				31B8A41321A23F650055BD01 /* version.c in Sources */,
 				31B8A3BB21A238060055BD01 /* allmain.c in Sources */,

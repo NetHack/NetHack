@@ -18,11 +18,10 @@ Contents:
 	III.  Global variables
 	IV.   WINCAP preferences support
 	V.    New or respecified common, high level routines
-	VI.   Helper routines
-	VII.  Game startup
-	VIII. Conventions
-	IX.   Implementation and Multi-window support
-	X.    WINCHAIN
+	VI.   Game startup
+	VII.  Conventions
+	VIII. Implementation and Multi-window support
+	IX.   WINCHAIN
 
 I.  Window Types and Terminology
 
@@ -140,7 +139,7 @@ putmixed(window, attr, str)
 			     such as pet names, etc.
 			NNNN is a hexadecimal value representing the glyph.
 		   If a window port does not yet support special handling of
-		   the glyph value, it can use genl_putmixed (mapglyph.c)
+		   the glyph value, it can use genl_putmixed (windows.c)
 		   which converts the encoded glyph into a character symbol.
 
 		   Multiple putmixed()s are output on separate lines.  Attributes
@@ -945,33 +944,7 @@ pline(str, ...)
 		   by Norep() and pline().  If the window system is not active
 		   (!iflags.window_inited) pline() uses raw_print().
 
-VI.  Helper Routines
-
-These are not part of the interface. They may be called by your
-window port routines to perform the desired task, instead of duplicating
-the necessary code in each window port.
-
-int mapglyph(int glyph, int *ochar, int *ocolor, unsigned *special, 
-             int x, int y, unsigned mgflags)
-		-- Maps glyph at x,y to NetHack ascii character and color.
-		   The return value is an index into the showsyms[] array, in
-		   case a port wants to index into its own alternative 
-		   set of display symbols (such as a unicode set) instead of 
-		   the default set.
-
-		   If the glyph represents something special such as a pet, 
-		   that information is returned as set bits in "special.":
-			MG_CORPSE	0x01
-			MG_INVIS	0x02
-			MG_DETECT	0x04
-			MG_PET		0x08
-			MG_RIDDEN	0x10
-			MG_STATUE	0x20
-			MG_OBJPILE	0x40
-		   Usually called from the window port's print_glyph() 
-		   routine. 
-
-VII.  Game startup
+VI.  Game startup
 
 The following is the general order in which calls from main() should be made,
 as they relate to the window system.  The actual code may differ, but the
@@ -1010,7 +983,7 @@ Process_options() is currently still unique to each port.  There may be need
 in the future to make it possible to replace this on a per window-port basis.
 
 
-VIII.  Conventions
+VII.  Conventions
 
 init_nhwindows() is expected to display a gee-whiz banner window, including
 the Copyright message.  It is recommended that the COPYRIGHT_BANNER_A,
@@ -1036,7 +1009,7 @@ in win/X11.  The files in these directories contain _only_ window port code,
 and may be replaced completely by other window ports.
 
 
-IX.  Implementation and Multi-window support
+VIII.  Implementation and Multi-window support
 
 NetHack 3.2 and higher support multiple window systems in the same binary.
 When writing a new window-port, you need to follow the following guidelines:
@@ -1129,7 +1102,7 @@ printing any message, because raw_print() cannot function without first
 setting the window-port.
 
 
-X. WINCHAIN
+IX. WINCHAIN
 
 WINCHAIN is an optional facility that allows the SYSCF_FILE to specify a
 series of processors that will see each call from the core to the window

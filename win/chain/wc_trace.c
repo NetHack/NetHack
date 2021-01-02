@@ -575,7 +575,7 @@ char *posbar;
 }
 #endif
 
-/* XXX can we decode the glyph in a meaningful way? see mapglyph()?
+/* XXX can we decode the glyph in a meaningful way? see map_glyphmod()?
  genl_putmixed?  */
 void
 trace_print_glyph(vp, window, x, y, glyph, bkglyph, glyphmod)

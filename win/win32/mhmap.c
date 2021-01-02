@@ -721,11 +721,6 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
                     break;
                 if (data->map[col][row] == NO_GLYPH)
                     mgch = ' ';
-
-//                } else {
-//                    (void) mapglyph(data->map[col][row], &mgch, &color,
-//                                    &special, col, row, 0);
-//                }
                 msg_data->buffer[index] = data->glyphmod[col][row][GM_TTYCHAR];
                 index++;
             }
@@ -814,11 +809,6 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
         layer++;
     }
 
-//    (void) mapglyph(glyph, &mgch, &color, &special, i, j, 0);
-//                      mgch = (int) data.glyphmod[GM_TTYCHAR];
-//                      color = (int) data.glyphmod[GM_COLOR];
-//                      special = glyphmod[GM_FLAGS];
-
     if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
         /* rely on NetHack core helper routine */
         ntile = glyph2tile[glyph];
@@ -844,9 +834,6 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 
 #ifdef USE_PILEMARK
-    /* rely on NetHack core helper routine */
-//    (void) mapglyph(data->map[i][j], &mgch, &color, &special,
-//                    i, j, 0);
     if ((glyph != NO_GLYPH) && (data->glyphmod[i][j][GM_FLAGS] & MG_PET)
 #else
     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
@@ -919,9 +906,6 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         nhglyph2charcolor(data->map[i][j], &ch, &color);
         OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
     #else
-        /* rely on NetHack core helper routine */
-//        (void) mapglyph(data->map[i][j], &mgch, &color,
-//                        &special, i, j, 0);
         ch = (char) data->glyphmod[i][j][GM_TTYCHAR];
         color = (int) data->glyphmod[i][j][GM_COLOR];
         if (((data->glyphmod[i][j][GM_FLAGS] & MG_PET) && iflags.hilite_pet)

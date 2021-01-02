@@ -181,20 +181,9 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
-#if 0
-                unsigned short g = Glyph(i, j);
-                int colortmp;
-                int chtmp;
-		unsigned special;
-		/* map glyph to character and color */
-                mapglyph(g, &chtmp, &colortmp, &special, i, j, 0);
-                unsigned short ch = (unsigned short) chtmp,
-                               color = (unsigned short) colortmp;
-#else
 		unsigned short color = Glyphcolor(i, j);
 		unsigned short ch = Glyphttychar(i, j);
 		unsigned special = Glyphflags(i, j);
-#endif
 		ch = cp437(ch);
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
@@ -223,14 +212,7 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
                 unsigned short g = Glyph(i,j);
-#if 0
-		int color;
-		int ch;
-		unsigned special;
-		mapglyph(g, &ch, &color, &special, i, j, 0);
-#else
 		unsigned special = Glyphflags(i, j);
-#endif
                 bool femflag = (special & MG_FEMALE) ? true : false;
                 glyphs.drawCell(painter, g, i, j, femflag);
 
@@ -878,8 +860,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		unsigned special = Glyphflags(i,j);
 #endif
 		painter.setPen( Qt::green );
-		/* map glyph to character and color */
-//    		mapglyph(g, &ch, &color, &special, i, j, 0);
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
 #endif
@@ -911,16 +891,9 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
-#if 0
-		int color;
-		int ch;
-		unsigned special;
-		mapglyph(g, &ch, &color, &special, i, j, 0);
-#else
 		int color = Glyphcolor(i,j);
 		int ch = Glyphttychar(i,j);
 		unsigned special = Glyphflags(i,j);
-#endif
                 bool femflag = (special & MG_FEMALE) ? true : false;
                 qt_settings->glyphs().drawCell(painter, g, i, j, femflag);
 #ifdef TEXTCOLOR

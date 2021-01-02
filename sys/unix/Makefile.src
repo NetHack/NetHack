@@ -511,7 +511,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
 	   files.c fountain.c hack.c hacklib.c \
 	   insight.c invent.c isaac64.c light.c \
-	   lock.c mail.c makemon.c mapglyph.c mcastu.c mdlib.c mhitm.c \
+	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
 	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
 	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
 	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
@@ -589,7 +589,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)hack.o $(TARGETPFX)hacklib.o $(TARGETPFX)insight.o \
 	$(TARGETPFX)invent.o $(TARGETPFX)isaac64.o $(TARGETPFX)light.o \
 	$(TARGETPFX)lock.o $(TARGETPFX)mail.o $(TARGETPFX)makemon.o \
-	$(TARGETPFX)mapglyph.o $(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
+	$(TARGETPFX)mcastu.o $(TARGETPFX)mdlib.o \
 	$(TARGETPFX)mhitm.o $(TARGETPFX)mhitu.o $(TARGETPFX)minion.o \
 	$(TARGETPFX)mklev.o $(TARGETPFX)mkmap.o $(TARGETPFX)mkmaze.o \
 	$(TARGETPFX)mkobj.o $(TARGETPFX)mkroom.o $(TARGETPFX)mon.o \
@@ -1105,7 +1105,6 @@ $(TARGETPFX)light.o: light.c $(HACK_H)
 $(TARGETPFX)lock.o: lock.c $(HACK_H)
 $(TARGETPFX)mail.o: mail.c $(HACK_H) ../include/mail.h
 $(TARGETPFX)makemon.o: makemon.c $(HACK_H)
-$(TARGETPFX)mapglyph.o: mapglyph.c $(HACK_H)
 $(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
 $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/align.h ../include/monattk.h ../include/monflag.h \

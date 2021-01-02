@@ -124,7 +124,6 @@
     <ClCompile Include="$(SrcDir)lock.c" />
     <ClCompile Include="$(SrcDir)mail.c" />
     <ClCompile Include="$(SrcDir)makemon.c" />
-    <ClCompile Include="$(SrcDir)mapglyph.c" />
     <ClCompile Include="$(SrcDir)mcastu.c" />
     <ClCompile Include="$(SrcDir)mdlib.c" />
     <ClCompile Include="$(SrcDir)mhitm.c" />

@@ -1201,14 +1201,6 @@ E int FDECL(bagotricks, (struct obj *, BOOLEAN_P, int *));
 E boolean FDECL(propagate, (int, BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(usmellmon, (struct permonst *));
 
-/* ### mapglyph.c ### */
-
-E int FDECL(mapglyph, (int, int *, int *, unsigned *, int, int, unsigned));
-E char *FDECL(encglyph, (int));
-E char *FDECL(decode_mixed, (char *, const char *));
-E void FDECL(genl_putmixed, (winid, int, const char *));
-E boolean FDECL(menuitem_invert_test, (int, unsigned, BOOLEAN_P));
-
 /* ### mcastu.c ### */
 
 E int FDECL(castmu, (struct monst *, struct attack *, BOOLEAN_P, BOOLEAN_P));
@@ -3044,6 +3036,11 @@ E void NDECL(dump_close_log);
 E void FDECL(dump_redirect, (BOOLEAN_P));
 E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
 E int FDECL(has_color, (int));
+E int FDECL(glyph2ttychar, (int));
+E char *FDECL(encglyph, (int));
+E char *FDECL(decode_mixed, (char *, const char *));
+E void FDECL(genl_putmixed, (winid, int, const char *));
+E boolean FDECL(menuitem_invert_test, (int, unsigned, BOOLEAN_P));
 
 /* ### winnt.c ### */
 #ifdef WIN32

@@ -1617,7 +1617,7 @@ boolean at_stairs, falling, portal;
 
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
-    g.glyphmap_perlevel_flags = 0L; /* force per-level mapglyph() changes */
+    g.glyphmap_perlevel_flags = 0L; /* force per-level map_glyphmod() changes */
     docrt();        /* does a full vision recalc */
     flush_screen(-1);
 
