@@ -1180,10 +1180,11 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
 #if 0
         /* FIXME: menuglyphs not implemented yet */
         if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs) {
-            unsigned special;  /*notused */
+            unsigned glyphmod[NUM_GLYPHMOD];
 
-            /*mapglyph(menu_item_ptr->glyph, &curletter, &color, &special,
-                       0, 0, 0);*/
+            map_glyphmod(0, 0, menu_item_ptr->glyph, 0U, glyphmod);
+            color = (int) glyphmod[GM_COLOR];
+
             curses_toggle_color_attr(win, color, NONE, ON);
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
             curses_toggle_color_attr(win, color, NONE, OFF);

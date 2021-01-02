@@ -120,12 +120,14 @@ curses_add_inv(int y,
     }
 #if 0 /* FIXME: MENU GLYPHS */
     if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
-        unsigned dummy = 0; /* Not used */
-        int color = 0;
-        int symbol = 0;
+        unsigned glyphmod[NUM_GLYPHMOD];
+        int symbol;
         attr_t glyphclr;
 
-        /* mapglyph(glyph, &symbol, &color, &dummy, u.ux, u.uy, 0); */
+        map_glyphmod(0, 0, glyph, 0U, glyphmod);
+        symbol = (int) glyphmod[GM_TTYCHAR];
+        color = (int) glyphmod[GM_COLOR];
+
         glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);
         wprintw(win, "%c ", symbol);
