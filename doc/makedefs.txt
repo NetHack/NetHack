@@ -63,13 +63,13 @@ LONG COMMANDS
               newline.  If specified, the delimiter is used between each  part
               of the version string.
 
-       --grep Filter  the input file to the output file.  See the MDGREP FUNC‐
+       --grep Filter  the input file to the output file.  See the MDGREP FUNC-
               TIONS section below for information on controlling the filtering
               operation.
 
        --grep-showvars
-              Show  the name and value for each variable known to the grep op‐
-              tion.
+              Show  the  name  and  value  for each variable known to the grep
+              option.
 
        --grep-trace
               Turn on debug tracing for the grep function  (  --grep  must  be
@@ -86,32 +86,32 @@ LONG COMMANDS
 MDGREP FUNCTIONS
        The  --grep command (and certain other commands) filter their input, on
        a line-by-line basis, according to control lines embedded in the  input
-       and on information gleaned from the NetHack(6) configuration.  This al‐
-       lows certain changes such as embedding platform-specific  documentation
-       into the master documentation files.
+       and  on  information  gleaned  from the NetHack(6) configuration.  This
+       allows certain changes such as embedding  platform-specific  documenta-
+       tion into the master documentation files.
 
        Rules:
 
               -   The default conditional state is printing enabled.
 
               -   Any  line NOT starting with a caret (^) is either suppressed
-                  or passed through unchanged depending on the current  condi‐
+                  or passed through unchanged depending on the current  condi-
                   tional state.
 
               -   Any  line  starting with a caret is a control line; as in C,
-                  zero or more spaces may be embedded in the line almost  any‐
+                  zero or more spaces may be embedded in the line almost  any-
                   where  (except  immediately  after  the  caret); however the
                   caret must be in column 1.
 
               -   Conditionals may be nested.
 
-              -   Makedefs will exit with an error code if any errors are  de‐
-                  tected;  processing  will  continue  (if it can) to allow as
+              -   Makedefs will exit with an error  code  if  any  errors  are
+                  detected;  processing  will continue (if it can) to allow as
                   many errors as possible to be detected.
 
-              -   Unknown identifiers are treated as both TRUE and as  an  er‐
-                  ror.  Note that --undef or #undef in the NetHack(6) configu‐
-                  ration are different from unknown.
+              -   Unknown identifiers are treated  as  both  TRUE  and  as  an
+                  error.   Note  that --undef or #undef in the NetHack(6) con-
+                  figuration are different from unknown.
 
        Control lines:
 
@@ -137,7 +137,7 @@ SEE ALSO
 
 COPYRIGHT
        This file is  Copyright  (C)  Kenneth  Lorber  and  was  last  modified
-       2018/04/25  (version NetHack-3.6.0:1.10).  NetHack may be freely redis‐
+       2018/04/25  (version NetHack-3.6.0:1.10).  NetHack may be freely redis-
        tributed.  See license for details.
 
 
