@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{December 19, 2020}
+\date{January 2, 2021}
 
 \maketitle
 
@@ -3790,8 +3790,12 @@ Walking into a closed door attempts to open it (default true).
 Persistent.
 %.lp
 \item[\ib{autopickup}]
-Automatically pick up things onto which you move (default on).  Persistent.
-See ``{\it pickup\verb+_+types\/}'' to refine the behavior.
+Automatically pick up things onto which you move (default on).
+Persistent.
+\\
+%.lp ""
+See ``{\it pickup\verb+_+types\/}'' and also
+``{\it autopickup\verb+_+exceptions\/}'' to refine the behavior.
 %.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `f' (fire)
@@ -4337,14 +4341,32 @@ or overLoaded), you will be asked if you want to continue.
 If this option is on and ``{\it autopickup\/}'' is also on, try to pick up
 things that you threw, even if they aren't in
 ``{\it pickup\verb+_+types\/}'' or
-match an autopickup exception.  Default is on.  Persistent.
+match an autopickup exception.
+Default is on.
+Persistent.
 %.lp
 \item[\ib{pickup\verb+_+types}]
 Specify the object types to be picked up when ``{\it autopickup\/}''
-is on.  Default is all types.  You can use
+is on.
+Default is all types.
+Persistent.
+\\
+%.lp ""
+The value is a list of object symbols, such as
+{\tt \verb&pickup_types:$?!&} to pick up gold, scrolls, and potions.
+You can use
 ``{\it autopickup\verb+_+exception\/}''
 configuration file lines to further refine ``{\it autopickup\/}'' behavior.
-Persistent.
+\\
+%.lp ""
+There is no way to set {\it pickup\verb+_+types\/} to ``{\it none}''.
+(Setting it to an empty value reverts to ``{\it all}''.)
+If you want to avoid automatically picking up any types of items but do
+want to have {\it autopickup\/} on in order to have
+{\it autopickup\verb+_+exceptions\/} control what you do and don't pick
+up, you can set {\it pickup\verb+_+types\/} to `{\tt .}'.
+That is the type symbol for {\it venom\/} and you won't come across
+any venom items so won't unintentionally pick such up.
 %.lp
 \item[\ib{pile\verb+_+limit}]
 When walking across a pile of objects on the floor, threshold at which

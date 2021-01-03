@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ $NHDT-Date: 1608664223 2020/12/22 19:10:23 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.411 $ $NHDT-Date: 1609636060 2021/01/03 01:07:40 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 19, 2020
+.ds f2 "January 2, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -3511,8 +3511,11 @@ Persistent.
 .lp "autopickup  "
 Automatically pick up things onto which you move (default on).
 Persistent.
+.lp ""
 See
 .op pickup_types
+and also
+.op autopickup_exception
 to refine the behavior.
 .lp "autoquiver  "
 This option controls what happens when you attempt the \(oqf\(cq (fire)
@@ -4002,15 +4005,30 @@ If this option is on and
 .op autopickup
 is also on, try to pick up things that you threw, even if they aren't in
 .op pickup_types
-or match an autopickup exception.  Default is on.  Persistent.
+or match an autopickup exception.
+Default is on.
+Persistent.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  You can use
+is on.
+Default is all types.
+Persistent.
+.lp ""
+The value is a list of object symbols, such as
+\f(CRpickup_types:$?!\fP to pick up gold, scrolls, and potions.
+You can use
 .op autopickup_exception
-configuration file lines to further refine
-.op autopickup
-behavior.  Persistent.
+configuration file lines to further refine \f(CRautopickup\fP behavior.
+.lp ""
+There is no way to set \f(CRpickup_types\fP to \(lq\fInone\fP\(rq.
+(Setting it to an empty value reverts to \(lq\fIall\fP\(rq.)
+If you want to avoid automatically picking up any types of items but do
+want to have \f(CRautopickup\fP on in order to have
+\f(CRautopickup_exception\fP settings control what you do and don't pick
+up, you can set \f(CRpickup_types\fP to \(oq\f(CR.\fP\(cq.
+That is the type symbol for \fIvenom\fP and you won't come across
+any venom items so won't unintentionally pick such up.
 .lp pile_limit
 When walking across a pile of objects on the floor, threshold at which
 the message \(lqthere are few/several/many objects here\(rq is given instead
