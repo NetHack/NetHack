@@ -45,13 +45,16 @@ struct window_procs curses_procs = {
 #endif
      | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
     (WC2_DARKGRAY | WC2_HITPOINTBAR
+#ifdef SELECTSAVED
+     | WC2_SELECTSAVED
+#endif
 #if defined(STATUS_HILITES)
      | WC2_HILITE_STATUS
 #endif
      | WC2_FLUSH_STATUS | WC2_TERM_SIZE
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
      | WC2_SUPPRESS_HIST),
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,
     curses_player_selection,
     curses_askname,
@@ -242,6 +245,19 @@ curses_player_selection()
 void
 curses_askname()
 {
+#ifdef SELECTSAVED
+    if (iflags.wc2_selectsaved && !iflags.renameinprogress)
+        switch (restore_menu(MAP_WIN)) {
+        case -1:
+            curses_bail("Until next time then..."); /* quit */
+            /*NOTREACHED*/
+        case 0:
+            break; /* no game chosen; start new game */
+        case 1:
+            return; /* plname[] has been set */
+        }
+#endif /* SELECTSAVED */
+
     plname[0] = '\0';
     curses_line_input_dialog("Who are you?", plname, PL_NSIZ);
 }
