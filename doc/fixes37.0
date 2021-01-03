@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.417 $ $NHDT-Date: 1609617569 2021/01/02 19:59:29 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ $NHDT-Date: 1609642144 2021/01/03 02:49:04 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -742,6 +742,7 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
+curses: implement save file selection menu
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
