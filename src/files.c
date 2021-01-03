@@ -124,7 +124,9 @@ extern char *sounddir; /* defined in sounds.c */
 #endif
 
 #if defined(UNIX) && defined(QT_GRAPHICS)
+#ifndef SELECTSAVED
 #define SELECTSAVED
+#endif
 #endif
 
 static NHFILE *NDECL(new_nhfile);
@@ -895,6 +897,9 @@ boolean regularize_it;
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
+#if defined(WIN32)
+    char tmp[BUFSZ];
+#endif
 
     if (g.program_state.in_self_recover) {
         /* self_recover needs to be done as historical
@@ -917,17 +922,18 @@ boolean regularize_it;
         static const char okchars[] =
             "*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.";
         const char *legal = okchars;
-        char tmp[BUFSZ];
 
         ++legal; /* skip '*' wildcard character */
         (void) fname_encode(legal, '%', g.plname, tmp, sizeof tmp);
-        if (strlen(tmp) < (SAVESIZE - 1))
-            Strcpy(g.SAVEF, tmp);
-        else
-            overflow = 1;
-        indicator_spot = 1;
-        regularize_it = FALSE;
+    } else {
+        Sprintf(tmp, "%s", g.plname);
     }
+    if (strlen(tmp) < (SAVESIZE - 1))
+        Strcpy(g.SAVEF, tmp);
+    else
+        overflow = 1;
+    indicator_spot = 1;
+    regularize_it = FALSE;
 #endif
 #ifdef UNIX
     Sprintf(g.SAVEF, "save/%d%s", (int) getuid(), g.plname);
