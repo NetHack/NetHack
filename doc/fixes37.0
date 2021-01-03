@@ -478,6 +478,7 @@ replace "aligned priest" entries in Pri-loca.lua, astral.lua, minetn-1.lua,
 	and sanctum.lua, with "aligned cleric"
 attempting to swap places with a peaceful monster might cause it to flee
 gender-specific monster names can be used in .lua files with the gender upheld
+remove unused vision tables
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

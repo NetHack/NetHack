@@ -388,7 +388,7 @@ Using the cross-compiler, build the following targets:
                            src/symbols.c, src/sys.c, src/teleport.c,
                            src/timeout.c, src/topten.c, src/track.c,
                            src/trap.c, src/u_init.c, src/uhitm.c, src/vault.c,
-                           src/version.c, src/vis_tab.c, src/vision.c,
+                           src/version.c, src/vision.c,
                            src/weapon.c, src/were.c, src/wield.c, src/windows.c,
                            src/wizard.c, src/worm.c, src/worn.c, src/write.c,
                            src/zap.c, sys/share/cppregex.cpp
