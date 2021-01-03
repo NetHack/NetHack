@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1609074072 2020/12/27 13:01:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1609702004 2021/01/03 19:26:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -318,16 +318,27 @@ install: rootcheck $(GAME) recover $(VARDAT) spec_levs
 
 # 'make clean' removes all the .o files, but leaves around all the executables
 # and compiled data files
-clean:
+clean: clean-lib clean-keep-lib
+	@true
+
+clean-lib:
+	-( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
+
+clean-keep-lib:
 	( cd src ; $(MAKE) clean )
 	( cd util ; $(MAKE) clean )
 	( cd dat ; $(MAKE) clean )
 	( cd doc ; $(MAKE) clean )
-	-( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
-spotless:: clean
+spotless:: spotless-lib spotless-keep-lib
+	@true
+
+spotless-lib:: clean-lib
+	-( cd lib/lua && rm liblua.a )
+
+spotless-keep-lib: clean-keep-lib
 	( cd src ; $(MAKE) spotless )
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )

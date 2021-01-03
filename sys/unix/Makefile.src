@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1601854487 2020/10/04 23:34:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1609702027 2021/01/03 19:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -794,11 +794,12 @@ tags: $(CSOURCES)
 
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
+	-rm monstr.c vis_tab.c ../include/vis_tab.h  #obsolete generated files
 	$(CLEANMORE)
 
 spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*
-	-rm -f ../lib/lua/liblua.a ../include/nhlua.h
+	-rm -f ../include/nhlua.h
 	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
 	-rm -f tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
