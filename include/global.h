@@ -418,7 +418,7 @@ struct savefile_info {
 /* see end.c */
 #if !defined(CROSS_TO_WASM)
 #ifndef PANICTRACE
-/* #define PANICTRACE */ /* don't want on public server */
+#define PANICTRACE
 #endif  /* PANICTRACE */
 #endif  /* CROSS_TO_WASM */
 #endif  /* NH_DEVEL_STATUS != NH_STATUS_RELEASED */
@@ -432,7 +432,7 @@ struct savefile_info {
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX
-#if !defined(CROSS_TO_WASM) /* no popen in WASM */
+#if !defined(CROSS_TO_WASM) && !defined(PANICTRACE_GDB) /* no popen in WASM */
 #define PANICTRACE_GDB
 #endif
 #endif
