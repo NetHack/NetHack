@@ -3,7 +3,7 @@
 # todo: do not clobber existing playground
 
 sudo rm -rf /opt/dgl
-cd ~/sandbox/nethack/NetHack
+cd ~/sandbox/nethack
 make spotless
 cd sys/unix
 sh setup.sh hints/floatingeye
@@ -12,5 +12,5 @@ make all
 sudo make install
 cd /opt/dgl
 sudo chown -R games:games nh370/
-sudo /home/mlehotay/sandbox/nethack/NetHack/sys/unix/mkchroot.sh
+sudo /home/mlehotay/sandbox/nethack/sys/unix/mkchroot.sh nh370/nethack
 sudo chroot ./ nh370/nethack

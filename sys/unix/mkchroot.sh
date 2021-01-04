@@ -69,7 +69,7 @@ if [ -n "$NETHACKBIN" -a ! -e "$NETHACKBIN" ]; then
   echo
 fi
 
-LIBS="$LIBS $NETHACKBIN"
+#LIBS="$LIBS $NETHACKBIN"
 LIBS="$LIBS `findlibs $NETHACKBIN`"
 
 # Curses junk

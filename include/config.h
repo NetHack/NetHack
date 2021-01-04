@@ -244,7 +244,7 @@
 
 /* alternative paniclog format, better suited for public servers with
    many players, as it saves the player name and the game start time */
-/* #define PANICLOG_FMT2 */
+#define PANICLOG_FMT2
 
 /*
  *      PERSMAX, POINTSMIN, ENTRYMAX, PERS_IS_UID:
@@ -254,20 +254,16 @@
  *      maximum number of scores to keep, for example) if SYSCF is enabled.
  */
 #ifndef PERSMAX
-#define PERSMAX 3 /* entries per name/uid per char. allowed */
+#define PERSMAX 13 /* entries per name/uid per char. allowed */
 #endif
 #ifndef POINTSMIN
 #define POINTSMIN 1 /* must be > 0 */
 #endif
 #ifndef ENTRYMAX
-#define ENTRYMAX 100 /* must be >= 10 */
+#define ENTRYMAX 1000 /* must be >= 10 */
 #endif
 #ifndef PERS_IS_UID
-#if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
-#define PERS_IS_UID 1 /* delete for PERSMAX per name; now per uid */
-#else
-#define PERS_IS_UID 0
-#endif
+#define PERS_IS_UID 0 /* 0 = PERSMAX entries per name, 1 = per uid */
 #endif
 
 /*
@@ -290,11 +286,12 @@
 
 #if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS)
 /* path and file name extension for compression program */
-#define COMPRESS "/usr/bin/compress" /* Lempel-Ziv compression */
-#define COMPRESS_EXTENSION ".Z"      /* compress's extension */
+/* #define COMPRESS "/usr/bin/compress" */ /* Lempel-Ziv compression */
+/* #define COMPRESS_EXTENSION ".Z" */   /* compress's extension */
 /* An example of one alternative you might want to use: */
 /* #define COMPRESS "/usr/local/bin/gzip" */ /* FSF gzip compression */
-/* #define COMPRESS_EXTENSION ".gz" */       /* normal gzip extension */
+#define COMPRESS "/bin/gzip"
+#define COMPRESS_EXTENSION ".gz"       /* normal gzip extension */
 #endif
 
 #ifndef COMPRESS

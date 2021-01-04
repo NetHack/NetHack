@@ -13,17 +13,14 @@
 # for Ubuntu dapper, also works on Linux Mint (Tricia).
 # Does not copy required libraries or termcap files into the chroot.
 
-COMPILEREVISION?=1
-
 # this is the chroot dir
 PREFIX=/opt/dgl
 
 # this is the dir where NetHack is inside the chroot
 HACKDIR=/nh370
-INSTDIR=$(PREFIX)$(HACKDIR)
-#SHELLDIR=$(PREFIX)/games
-VARDIR=$(INSTDIR)/var
 
+INSTDIR=$(PREFIX)$(HACKDIR)
+VARDIR=$(INSTDIR)/var
 
 POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 
@@ -33,6 +30,7 @@ CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 CFLAGS+=-DTIMED_DELAY
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+=-DVAR_PLAYGROUND=\"$(HACKDIR)/var\"
+CFLAGS+=-DNOSUSPEND -DNOSHELL
 
 # when building liblua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
