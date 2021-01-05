@@ -52,7 +52,11 @@ enum any_types {
     ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
 };
 
-/* glyph plus additional info */
+/* glyph plus additional info
+   if you add fields or change the ordering, fix up the following:
+        g_info initialization in display.c
+        nul_glyphinfo initialization in decl.c
+ */
 typedef struct gi {
     int glyph;            /* the display entity */
     int color;            /* color for window ports not using a tile */
