@@ -5,7 +5,7 @@
 /*
  * Status window routines.  This file supports both the "traditional"
  * tty status display and a "fancy" status display.  A tty status is
- * made if a popup window is requested, otherewise a fancy status is
+ * made if a popup window is requested, otherwise a fancy status is
  * made.  This code assumes that only one fancy status will ever be made.
  * Currently, only one status window (of any type) is _ever_ made.
  */
@@ -107,6 +107,7 @@ static void FDECL(tt_reset_color, (int, int, unsigned long *));
 static void NDECL(tt_status_fixup);
 static Widget FDECL(create_tty_status_field, (int, int, Widget, Widget));
 static Widget FDECL(create_tty_status, (Widget, Widget));
+static void FDECL(update_fancy_status_field_and_color, (int, int));
 static void FDECL(update_fancy_status_field, (int));
 static void FDECL(update_fancy_status, (BOOLEAN_P));
 static Widget FDECL(create_fancy_status, (Widget, Widget));
@@ -809,12 +810,23 @@ unsigned long *colormasks; /* bitmask of highlights for conditions */
     (void) XFlush(XtDisplay(X11_status_labels[0]));
 }
 
+static int
+extract_condition_color_from_colormasks(condition, colormasks)
+int condition;
+unsigned long *colormasks;
+{
+	for (int color_iter=0; color_iter<CLR_MAX; color_iter++)
+		if (condition & colormasks[color_iter])
+			return color_iter;
+	return NO_COLOR;
+}
+
 /*ARGSUSED*/
 static void
 X11_status_update_fancy(fld, ptr, chg, percent, color, colormasks)
-int fld, chg UNUSED, percent UNUSED, color UNUSED;
+int fld, chg UNUSED, percent UNUSED, color;
 genericptr_t ptr;
-unsigned long *colormasks UNUSED;
+unsigned long *colormasks;
 {
     static const struct bl_to_ff {
         int bl, ff;
@@ -883,13 +895,13 @@ unsigned long *colormasks UNUSED;
         if (changed_bits) {
             for (i = 0; i < SIZE(mask_to_fancyfield); i++)
                 if ((changed_bits & mask_to_fancyfield[i].mask) != 0L)
-                    update_fancy_status_field(mask_to_fancyfield[i].ff);
+                    update_fancy_status_field_and_color(mask_to_fancyfield[i].ff, extract_condition_color_from_colormasks(mask_to_fancyfield[i].mask, colormasks));
             old_condition_bits = X11_condition_bits; /* remember 'On' bits */
         }
     } else {
         for (i = 0; i < SIZE(bl_to_fancyfield); i++)
             if (bl_to_fancyfield[i].bl == fld) {
-                update_fancy_status_field(bl_to_fancyfield[i].ff);
+                update_fancy_status_field_and_color(bl_to_fancyfield[i].ff, color);
                 break;
             }
     }
@@ -1227,8 +1239,6 @@ const char *str;
 /* Fancy ================================================================== */
 extern const char *hu_stat[];  /* from eat.c */
 extern const char *enc_stat[]; /* from botl.c */
-
-static int hilight_time = 1; /* number of turns to hilight a changed value */
 
 struct X_status_value {
     /* we have to cast away 'const' when assigning new names */
@@ -1661,6 +1671,29 @@ struct X_status_value *sv;
     }
 }
 
+static void
+update_color(sv, color)
+struct X_status_value *sv;
+int color;
+{
+    Pixel pixel;
+    Arg args[1];
+	XrmValue source;
+	XrmValue dest;
+    
+    color &= CLR_MAX - 1;
+	Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
+	char *arg_name = (sv->set ? XtNbackground : XtNforeground);
+	source.size = strlen(mapCLR_to_res[color]) + 1;
+	source.addr = (char *)mapCLR_to_res[color];
+	dest.size = sizeof(Pixel);
+	dest.addr = (XPointer)&pixel;
+	if (source.size > 0 && XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
+		XtSetArg(args[0], arg_name, pixel);
+		XtSetValues(w, args, ONE);
+	}
+}
+
 /*
  * Update the displayed status.  The current code in botl.c updates
  * two lines of information.  Both lines are always updated one after
@@ -1679,8 +1712,8 @@ struct X_status_value *sv;
  * [**] HD is shown instead of level and exp if Upolyd.
  */
 static void
-update_fancy_status_field(i)
-int i;
+update_fancy_status_field_and_color(i, color)
+int i, color;
 {
     struct X_status_value *sv = &shown_stats[i];
     unsigned long condmask = 0L;
@@ -1860,6 +1893,15 @@ int i;
         }
     }
     update_val(sv, val);
+    if (color >= 0 )
+        update_color(sv, color);
+}
+
+static void
+update_fancy_status_field(i)
+int i;
+{
+    update_fancy_status_field_and_color(i, -1);
 }
 
 /* fully update status after bl_flush or window resize */
@@ -1906,7 +1948,7 @@ check_turn_events()
         if (!sv->set)
             continue;
 
-        if (sv->turn_count++ >= hilight_time) {
+        if (sv->turn_count++ >= iflags.hilite_delta) {
             /* unhighlights by toggling a highlighted item back off again */
             if (sv->type == SV_LABEL || sv->type == SV_NAME)
                 hilight_label(sv->w);

@@ -258,6 +258,7 @@ struct xwindow {
 #define MAX_HISTORY 60             /* max history saved on message window */
 
 /* Window variables (winX.c). */
+E const char *mapCLR_to_res[CLR_MAX];
 E struct xwindow window_list[MAX_WINDOWS];
 E XtAppContext app_context; /* context of application */
 E Widget toplevel;          /* toplevel widget */
@@ -419,6 +420,7 @@ E Widget FDECL(create_value, (Widget, const char *));
 E void FDECL(set_name, (Widget, const char *));
 E void FDECL(set_name_width, (Widget, int));
 E int FDECL(get_name_width, (Widget));
+E Widget FDECL(get_value_widget, (Widget));
 E void FDECL(set_value, (Widget, const char *));
 E void FDECL(set_value_width, (Widget, int));
 E int FDECL(get_value_width, (Widget));
