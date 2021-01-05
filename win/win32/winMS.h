@@ -153,7 +153,8 @@ void mswin_putstr(winid wid, int attr, const char *text);
 void mswin_putstr_ex(winid wid, int attr, const char *text, int);
 void mswin_display_file(const char *filename, BOOLEAN_P must_exist);
 void mswin_start_menu(winid wid, unsigned long mbehavior);
-void mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
+void mswin_add_menu(winid wid, const glyph_info *glyphinfo,
+                    const ANY_P *identifier,
                     CHAR_P accelerator, CHAR_P group_accel, int attr,
                     const char *str, unsigned int itemflags);
 void mswin_end_menu(winid wid, const char *prompt);
@@ -162,7 +163,8 @@ void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod);
+void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+                       const glyph_info *glyph, const glyph_info *bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
 void mswin_raw_print_flush();

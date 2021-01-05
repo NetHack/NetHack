@@ -518,7 +518,7 @@ lua_State *L;
         any = cg.zeroany;
         if (*key)
             any.a_char = key[0];
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, str,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, str,
                  (*defval && *key && defval[0] == key[0])
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
 

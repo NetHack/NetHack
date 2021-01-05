@@ -56,7 +56,7 @@ private:
 	void Clear();
 	void Display(bool block);
 	void CursorTo(int x,int y);
-	void PrintGlyph(int x,int y,int glyph,unsigned *glyphmod);
+	void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
 	void Changed(int x, int y);
 	void updateTiles();
         void SetupTextmapFont(QPainter &painter);
@@ -79,7 +79,7 @@ public:
 	virtual void CursorTo(int x,int y);
 	virtual void PutStr(int attr, const QString& text);
 	virtual void ClipAround(int x,int y);
-	virtual void PrintGlyph(int x,int y,int glyph,unsigned *glyphmod);
+	virtual void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
 
 signals:
 	void resized();

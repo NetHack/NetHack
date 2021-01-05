@@ -36,7 +36,7 @@ E char NDECL(mar_ask_class);
 E char *NDECL(mar_ask_name);
 E int FDECL(mar_create_window, (int));
 E void FDECL(mar_destroy_nhwindow, (int));
-E void FDECL(mar_print_glyph, (int, int, int, int, int));
+E void FDECL(mar_print_glyph, (int, int, int, const glyph_info *, const glyph_info *));
 E void FDECL(mar_print_line, (int, int, int, char *));
 E void FDECL(mar_set_message, (char *, char *, char *));
 E Gem_menu_item *NDECL(mar_hol_inv);
@@ -70,7 +70,8 @@ E void FDECL(Gem_curs, (winid, int, int));
 E void FDECL(Gem_putstr, (winid, int, const char *));
 E void FDECL(Gem_display_file, (const char *, BOOLEAN_P));
 E void FDECL(Gem_start_menu, (winid, unsigned long));
-E void FDECL(Gem_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
+E void FDECL(Gem_add_menu, (winid, const glyph_info *,
+                            const ANY_P *, CHAR_P, CHAR_P, int,
                             const char *, unsigned int));
 E void FDECL(Gem_end_menu, (winid, const char *));
 E int FDECL(Gem_select_menu, (winid, int, MENU_ITEM_P **));
@@ -85,7 +86,7 @@ E void FDECL(Gem_cliparound, (int, int));
 E void FDECL(Gem_update_positionbar, (char *));
 #endif
 E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P,
-                                int, int, unsigned *));
+                               const glyph_info *, const glyph_info *));
 E void FDECL(Gem_raw_print, (const char *));
 E void FDECL(Gem_raw_print_bold, (const char *));
 E int NDECL(Gem_nhgetch);

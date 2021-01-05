@@ -617,8 +617,8 @@ dotelecmd()
         any = cg.zeroany;
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
-            add_menu(win, NO_GLYPH, &any, (char) any.a_int, 0, ATR_NONE,
-                     tports[i].menudesc,
+            add_menu(win, &nul_glyphinfo, &any, (char) any.a_int, 0,
+                     ATR_NONE, tports[i].menudesc,
                      (tports[i].menulet == 'w') ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
         }

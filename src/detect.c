@@ -2006,12 +2006,12 @@ dump_map()
         lastnonblank = -1; /* buf[] index rather than map's x */
         for (x = 1; x < COLNO; x++) {
             int ch;
-            unsigned glyphmod[NUM_GLYPHMOD];
+            glyph_info glyphinfo;
 
             glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
                                             default_glyph, subset);
-            map_glyphmod(x, y, glyph, 0, glyphmod);
-            ch = (int) glyphmod[GM_TTYCHAR];
+            map_glyphinfo(x, y, glyph, 0, &glyphinfo);
+            ch = glyphinfo.ttychar;
             buf[x - 1] = ch;
             if (ch != ' ') {
                 blankrow = FALSE;

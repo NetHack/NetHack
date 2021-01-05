@@ -9,7 +9,7 @@ hero polymorphed into a vampire can use #monster to shape-shift rather than
 adjust bones filename buffer sizes to accommodate suffix
 fix internal self-recover to work with recent fields added to checkpoint file
 improvements to pronoun usage when hallucinating
-function calls made from map_glyphmod() based on dungeon level are now called
+function calls made from map_glyphinfo() based on dungeon level are now called
 	once per level
 fast hero could have random clairvoyance happen more than once on same turn
 using 'Q' on wielded weapon would offer to split stack; make using 'w' on a
@@ -868,6 +868,7 @@ unify special attack damages from separate you-hit-monster, monster-hits-you,
 unify trap effects for hero and monster stepping on the trap by trap type
 replace the single permonst mname field with male, female, and gender-neutral
 	names pmnames[NUM_MGENDERS] fields
-add a new glyphmod parameter to window interface *_print_glyph() to be used
-	to provide additional details to the window port beyond the glyph;
-	window port mapglyph() calls and the function itself were removed
+adjust window port interface to pass a pointer to a glyph_info struct which
+	contains the glyph itself, the ttychar, the color, the glyphflags,
+	and the symset index; this affects two window port calls that get
+	passed glyphs: print_glyph() and add_menu().

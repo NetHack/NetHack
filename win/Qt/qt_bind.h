@@ -52,7 +52,7 @@ public:
 	static void qt_putstr(winid wid, int attr, const QString& text);
 	static void qt_display_file(const char *filename, BOOLEAN_P must_exist);
 	static void qt_start_menu(winid wid, unsigned long mbehavior);
-	static void qt_add_menu(winid wid, int glyph,
+	static void qt_add_menu(winid wid, const glyph_info *glyphinfo,
 		const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
 		const char *str, unsigned int itemflags);
 	static void qt_end_menu(winid wid, const char *prompt);
@@ -64,7 +64,8 @@ public:
 	static void qt_cliparound(int x, int y);
 	static void qt_cliparound_window(winid wid, int x, int y);
         static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
-                                   int glyph, int bkglyph, unsigned int *);
+                                   const glyph_info *glyphingo, 
+				   const glyph_info *bkglyphinfo);
 	static void qt_raw_print(const char *str);
 	static void qt_raw_print_bold(const char *str);
 	static int qt_nhgetch();

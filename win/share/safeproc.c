@@ -248,9 +248,9 @@ unsigned long mbehavior;
  * later.
  */
 void
-safe_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
+safe_add_menu(window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
-int glyph UNUSED;           /* glyph to display with item (not used) */
+const glyph_info *glyphinfo UNUSED; /* glyph plus glyph info */
 const anything *identifier; /* what to return if selected */
 char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
@@ -321,12 +321,11 @@ int x, y;
  *  Print the glyph to the output device.  Don't flush the output device.
  */
 void
-safe_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
-winid window;
-xchar x, y;
-int glyph;
-int bkglyph UNUSED;
-int glyphmod[NUM_GLYPHMOD] UNUSED;
+safe_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
+winid window UNUSED;
+xchar x UNUSED, y UNUSED;
+const glyph_info *glyphinfo UNUSED;
+const glyph_info *bkglyphinfo UNUSED;
 {
     return;
 }

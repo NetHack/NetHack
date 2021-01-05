@@ -197,8 +197,9 @@ E void FDECL(tty_curs, (winid, int, int));
 E void FDECL(tty_putstr, (winid, int, const char *));
 E void FDECL(tty_display_file, (const char *, BOOLEAN_P));
 E void FDECL(tty_start_menu, (winid, unsigned long));
-E void FDECL(tty_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, unsigned int));
+E void FDECL(tty_add_menu, (winid, const glyph_info *, const ANY_P *,
+                            CHAR_P, CHAR_P, int, const char *,
+                            unsigned int));
 E void FDECL(tty_end_menu, (winid, const char *));
 E int FDECL(tty_select_menu, (winid, int, MENU_ITEM_P **));
 E char FDECL(tty_message_menu, (CHAR_P, int, const char *));
@@ -211,7 +212,8 @@ E void FDECL(tty_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(tty_update_positionbar, (char *));
 #endif
-E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int, unsigned *));
+E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                               const glyph_info *, const glyph_info *));
 E void FDECL(tty_raw_print, (const char *));
 E void FDECL(tty_raw_print_bold, (const char *));
 E int NDECL(tty_nhgetch);

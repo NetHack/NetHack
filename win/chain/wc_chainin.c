@@ -183,9 +183,9 @@ unsigned long mbehavior;
 }
 
 void
-chainin_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
+chainin_add_menu(window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
 winid window;               /* window to use, must be of type NHW_MENU */
-int glyph;                  /* glyph to display with item (unused) */
+const glyph_info *glyphinfo; /* glyph and other glyph info to display with item */
 const anything *identifier; /* what to return if selected */
 char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
@@ -194,8 +194,8 @@ const char *str;            /* menu string */
 unsigned int itemflags;     /* flags such as item is marked as selected
                                MENU_ITEMFLAGS_SELECTED */
 {
-    (*cibase->nprocs->win_add_menu)(cibase->ndata, window, glyph, identifier,
-                                    ch, gch, attr, str, itemflags);
+    (*cibase->nprocs->win_add_menu)(cibase->ndata, window, glyphinfo,
+                                    identifier, ch, gch, attr, str, itemflags);
 }
 
 void
@@ -272,13 +272,13 @@ char *posbar;
 
 /* XXX can we decode the glyph in a meaningful way? */
 void
-chainin_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
+chainin_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
 winid window;
 xchar x, y;
-int glyph, bkglyph;
-int glyphmod[NUM_GLYPHMOD];
+const glyph_info *glyphinfo;
+const glyph_info *bkglyphinfo;
 {
-    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyph, bkglyph, glyphmod);
+    (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyphinfo, bkglyphinfo);
 }
 
 void

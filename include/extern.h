@@ -376,7 +376,7 @@ E void NDECL(reglyph_darkroom);
 E void NDECL(set_wall_state);
 E void FDECL(unset_seenv, (struct rm *, int, int, int, int));
 E int FDECL(warning_of, (struct monst *));
-E void FDECL(map_glyphmod, (XCHAR_P, XCHAR_P, int, unsigned, unsigned *));
+E void FDECL(map_glyphinfo, (XCHAR_P, XCHAR_P, int, unsigned, glyph_info *));
 
 /* ### do.c ### */
 
@@ -3037,6 +3037,7 @@ E void FDECL(dump_redirect, (BOOLEAN_P));
 E void FDECL(dump_forward_putstr, (winid, int, const char*, int));
 E int FDECL(has_color, (int));
 E int FDECL(glyph2ttychar, (int));
+E int FDECL(glyph2symidx, (int));
 E char *FDECL(encglyph, (int));
 E char *FDECL(decode_mixed, (char *, const char *));
 E void FDECL(genl_putmixed, (winid, int, const char *));

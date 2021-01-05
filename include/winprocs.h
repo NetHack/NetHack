@@ -31,8 +31,9 @@ struct window_procs {
     void FDECL((*win_putmixed), (winid, int, const char *));
     void FDECL((*win_display_file), (const char *, BOOLEAN_P));
     void FDECL((*win_start_menu), (winid, unsigned long));
-    void FDECL((*win_add_menu), (winid, int, const ANY_P *, CHAR_P, CHAR_P,
-                                 int, const char *, unsigned int));
+    void FDECL((*win_add_menu), (winid, const glyph_info *, const ANY_P *,
+                                 CHAR_P, CHAR_P, int,
+                                 const char *, unsigned int));
     void FDECL((*win_end_menu), (winid, const char *));
     int FDECL((*win_select_menu), (winid, int, MENU_ITEM_P **));
     char FDECL((*win_message_menu), (CHAR_P, int, const char *));
@@ -46,7 +47,7 @@ struct window_procs {
     void FDECL((*win_update_positionbar), (char *));
 #endif
     void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P,
-                                    int, int, unsigned *));
+                                    const glyph_info *, const glyph_info *));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
     int NDECL((*win_nhgetch));
@@ -332,8 +333,9 @@ struct chain_procs {
     void FDECL((*win_putmixed), (CARGS, winid, int, const char *));
     void FDECL((*win_display_file), (CARGS, const char *, BOOLEAN_P));
     void FDECL((*win_start_menu), (CARGS, winid, unsigned long));
-    void FDECL((*win_add_menu), (CARGS, winid, int, const ANY_P *, CHAR_P,
-                                 CHAR_P, int, const char *, unsigned int));
+    void FDECL((*win_add_menu), (CARGS, winid, const glyph_info *,
+                                 const ANY_P *, CHAR_P, CHAR_P, int,
+                                 const char *, unsigned int));
     void FDECL((*win_end_menu), (CARGS, winid, const char *));
     int FDECL((*win_select_menu), (CARGS, winid, int, MENU_ITEM_P **));
     char FDECL((*win_message_menu), (CARGS, CHAR_P, int, const char *));
@@ -347,7 +349,8 @@ struct chain_procs {
     void FDECL((*win_update_positionbar), (CARGS, char *));
 #endif
     void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P,
-                                    int, int, unsigned *));
+                                    const glyph_info *,
+                                    const glyph_info *));
     void FDECL((*win_raw_print), (CARGS, const char *));
     void FDECL((*win_raw_print_bold), (CARGS, const char *));
     int FDECL((*win_nhgetch), (CARGS));
@@ -408,8 +411,9 @@ extern void FDECL(safe_putstr, (winid, int, const char *));
 extern void FDECL(safe_putmixed, (winid, int, const char *));
 extern void FDECL(safe_display_file, (const char *, BOOLEAN_P));
 extern void FDECL(safe_start_menu, (winid, unsigned long));
-extern void FDECL(safe_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P,
-                                  int, const char *, unsigned int));
+extern void FDECL(safe_add_menu, (winid, const glyph_info *, const ANY_P *,
+                                  CHAR_P, CHAR_P, int, const char *,
+                                  unsigned int));
 extern void FDECL(safe_end_menu, (winid, const char *));
 extern int FDECL(safe_select_menu, (winid, int, MENU_ITEM_P **));
 extern char FDECL(safe_message_menu, (CHAR_P, int, const char *));
@@ -423,7 +427,7 @@ extern void FDECL(safe_cliparound, (int, int));
 extern void FDECL(safe_update_positionbar, (char *));
 #endif
 extern void FDECL(safe_print_glyph, (winid, XCHAR_P, XCHAR_P,
-                                     int, int, unsigned *));
+                                     const glyph_info *, const glyph_info *));
 extern void FDECL(safe_raw_print, (const char *));
 extern void FDECL(safe_raw_print_bold, (const char *));
 extern int NDECL(safe_nhgetch);

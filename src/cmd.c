@@ -356,11 +356,11 @@ const struct ext_func_tab *efp; /* if Null, add a footnote to the menu */
         char qbuf[QBUFSZ];
         anything any = cg.zeroany;
 
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "[A] Command autocompletes", MENU_ITEMFLAGS_NONE);
         Sprintf(qbuf, "[m] Command accepts '%c' prefix",
                 g.Cmd.spkeys[NHKF_REQMENU]);
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE, qbuf,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, qbuf,
                  MENU_ITEMFLAGS_NONE);
         return (char *) 0;
     } else {
@@ -405,16 +405,16 @@ doextlist(VOID_ARGS)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "Extended Commands List",
                  MENU_ITEMFLAGS_NONE);
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "", MENU_ITEMFLAGS_NONE);
 
         Sprintf(buf, "Switch to %s commands that don't autocomplete",
                 menumode ? "including" : "excluding");
         any.a_int = 1;
-        add_menu(menuwin, NO_GLYPH, &any, 'a', 0, ATR_NONE, buf,
+        add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, buf,
                  MENU_ITEMFLAGS_NONE);
 
         if (!*searchbuf) {
@@ -424,7 +424,7 @@ doextlist(VOID_ARGS)
                actual list of extended commands shown via separator lines;
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
-            add_menu(menuwin, NO_GLYPH, &any, ':', 's', ATR_NONE,
+            add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
                      "Search extended commands",
                      MENU_ITEMFLAGS_NONE);
         } else {
@@ -437,18 +437,18 @@ doextlist(VOID_ARGS)
                also want to hide it from general menu use) because it won't
                work for interfaces which support ':' to search; use as a
                general menu command takes precedence over group accelerator */
-            add_menu(menuwin, NO_GLYPH, &any, 's', ':', ATR_NONE,
+            add_menu(menuwin, &nul_glyphinfo, &any, 's', ':', ATR_NONE,
                      buf, MENU_ITEMFLAGS_NONE);
         }
         if (wizard) {
             any.a_int = 4;
-            add_menu(menuwin, NO_GLYPH, &any, 'z', 0, ATR_NONE,
+            add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE,
           onelist ? "Switch to showing debugging commands in separate section"
        : "Switch to showing all alphabetically, including debugging commands",
                      MENU_ITEMFLAGS_NONE);
         }
         any = cg.zeroany;
-        add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "", MENU_ITEMFLAGS_NONE);
         menushown[0] = menushown[1] = 0;
         n = 0;
@@ -490,7 +490,7 @@ doextlist(VOID_ARGS)
                    results menu. */
                 if (!menushown[pass]) {
                     Strcpy(buf, headings[pass]);
-                    add_menu(menuwin, NO_GLYPH, &any, 0, 0,
+                    add_menu(menuwin, &nul_glyphinfo, &any, 0, 0,
                              iflags.menu_headings, buf,
                              MENU_ITEMFLAGS_NONE);
                     menushown[pass] = 1;
@@ -499,16 +499,16 @@ doextlist(VOID_ARGS)
                    2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
                 Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
                         doc_extcmd_flagstr(menuwin, efp), efp->ef_desc);
-                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          buf, MENU_ITEMFLAGS_NONE);
                 ++n;
             }
             if (n)
-                add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          "", MENU_ITEMFLAGS_NONE);
         }
         if (*searchbuf && !n)
-            add_menu(menuwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      "no matches", MENU_ITEMFLAGS_NONE);
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
@@ -647,8 +647,8 @@ extcmd_via_menu()
                     /* flush extended cmds for that letter already in buf */
                     Sprintf(buf, fmtstr, prompt);
                     any.a_char = prevaccelerator;
-                    add_menu(win, NO_GLYPH, &any, any.a_char, 0, ATR_NONE,
-                             buf, MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &nul_glyphinfo, &any, any.a_char,
+                             0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
                     acount = 0;
                     if (!(accelerator != prevaccelerator || one_per_line))
                         wastoolong = TRUE;
@@ -671,8 +671,8 @@ extcmd_via_menu()
             /* flush buf */
             Sprintf(buf, fmtstr, prompt);
             any.a_char = prevaccelerator;
-            add_menu(win, NO_GLYPH, &any, any.a_char, 0, ATR_NONE, buf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
         }
         Sprintf(prompt, "Extended Command: %s", cbuf);
         end_menu(win, prompt);
@@ -1584,8 +1584,8 @@ wiz_intrinsic(VOID_ARGS)
                    ordering, not their numerical PROP values), can only be
                    set to timed values here so show a separator */
                 any.a_int = 0;
-                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "--",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, "--", MENU_ITEMFLAGS_NONE);
             }
             any.a_int = i + 1; /* +1: avoid 0 */
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
@@ -1593,7 +1593,7 @@ wiz_intrinsic(VOID_ARGS)
                 Sprintf(buf, "%-27s [%li]", propname, oldtimeout);
             else
                 Sprintf(buf, "%s", propname);
-            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
                      MENU_ITEMFLAGS_NONE);
         }
         end_menu(win, "Which intrinsics?");
@@ -1719,29 +1719,29 @@ doterrain(VOID_ARGS)
     start_menu(men, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = 1;
-    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              "known map without monsters, objects, and traps",
              MENU_ITEMFLAGS_SELECTED);
     any.a_int = 2;
-    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              "known map without monsters and objects",
              MENU_ITEMFLAGS_NONE);
     any.a_int = 3;
-    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              "known map without monsters",
              MENU_ITEMFLAGS_NONE);
     if (discover || wizard) {
         any.a_int = 4;
-        add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "full map without monsters, objects, and traps",
                  MENU_ITEMFLAGS_NONE);
         if (wizard) {
             any.a_int = 5;
-            add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      "internal levl[][].typ codes in base-36",
                      MENU_ITEMFLAGS_NONE);
             any.a_int = 6;
-            add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      "legend of base-36 levl[][].typ codes",
                      MENU_ITEMFLAGS_NONE);
         }
@@ -4072,7 +4072,7 @@ const char *text;
     if ((ch = cmd_from_func(func)) != '\0') {
         any = cg.zeroany;
         any.a_nfunc = func;
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, text,
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, text,
                  MENU_ITEMFLAGS_NONE);
     }
 }

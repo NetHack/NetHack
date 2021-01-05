@@ -893,16 +893,15 @@ struct permonst **for_supplement;
             hallucinate = (Hallucination && !g.program_state.gameover);
     const char *x_str;
     nhsym tmpsym;
-    unsigned glyphmod[NUM_GLYPHMOD];
+    glyph_info glyphinfo = nul_glyphinfo;
 
     gobbledygook[0] = '\0'; /* no hallucinatory liquid (yet) */
     if (looked) {
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
-        map_glyphmod(cc.x, cc.y, glyph, 0, glyphmod);
-        sym = glyphmod[GM_TTYCHAR];
-
-        Sprintf(prefix, "%s        ", encglyph(glyph));
+        map_glyphinfo(cc.x, cc.y, glyph, 0, &glyphinfo);
+        sym = glyphinfo.symidx;
+        Sprintf(prefix, "%s        ", encglyph(glyphinfo.glyph));
     } else
         Sprintf(prefix, "%c        ", sym);
 
@@ -1154,8 +1153,8 @@ struct permonst **for_supplement;
             case SYM_PET_OVERRIDE + SYM_OFF_X:
                 if (looked) {
                     /* convert to symbol without override in effect */
-                    map_glyphmod(cc.x, cc.y, glyph, MG_FLAG_NOOVERRIDE, glyphmod);
-                    sym = (int) glyphmod[GM_TTYCHAR];                
+                    map_glyphinfo(cc.x, cc.y, glyph, 0, &glyphinfo);
+                    sym = glyphinfo.ttychar;
                     goto check_monsters;
                 }
                 break;
@@ -1264,21 +1263,21 @@ coord *click_cc;
             any.a_char = '/';
             /* 'y' and 'n' to keep backwards compatibility with previous
                versions: "Specify unknown object by cursor?" */
-            add_menu(win, NO_GLYPH, &any,
+            add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
                      "something on the map", MENU_ITEMFLAGS_NONE);
             any.a_char = 'i';
-            add_menu(win, NO_GLYPH, &any,
+            add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                      "something you're carrying", MENU_ITEMFLAGS_NONE);
             any.a_char = '?';
-            add_menu(win, NO_GLYPH, &any,
+            add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
                      "something else (by symbol or name)",
                      MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
-                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          "", MENU_ITEMFLAGS_NONE);
                 /* these options work sensibly for the swallowed case,
                    but there's no reason for the player to use them then;
@@ -1286,19 +1285,19 @@ coord *click_cc;
                    symbol/monster class letter doesn't match up with
                    bogus monster type, so suppress when hallucinating */
                 any.a_char = 'm';
-                add_menu(win, NO_GLYPH, &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          "nearby monsters", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
-                add_menu(win, NO_GLYPH, &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          "all monsters shown on map", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
-                add_menu(win, NO_GLYPH, &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          "nearby objects", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
-                add_menu(win, NO_GLYPH, &any,
+                add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          "all objects shown on map", MENU_ITEMFLAGS_NONE);
             }
@@ -2154,7 +2153,7 @@ dohelp()
             Strcpy(helpbuf, help_menu_items[i].text);
         }
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  helpbuf, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select one item:");

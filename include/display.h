@@ -475,14 +475,14 @@ enum explosion_types {
 #define glyph_is_unexplored(glyph) ((glyph) == GLYPH_UNEXPLORED)
 #define glyph_is_nothing(glyph) ((glyph) == GLYPH_NOTHING)
 
-/* flags for map_glyphmod */
+/* glyphflags for map_glyphinfo */
 
-/* mgflags for altering map_glyphmod() internal behaviour */
+/* mgflags for altering map_glyphinfo() internal behaviour */
 #define MG_FLAG_NORMAL      0x00
 #define MG_FLAG_NOOVERRIDE  0x01
 #define MG_FLAG_RETURNIDX   0x02
 
-/* Special mapped glyph flags encoded in glyphmod[GM_FLAGS] by map_glyphmod() */
+/* Special mapped glyphflags encoded by map_glyphinfo() */
 #define MG_CORPSE  0x0001
 #define MG_INVIS   0x0002
 #define MG_DETECT  0x0004

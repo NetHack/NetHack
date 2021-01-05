@@ -373,16 +373,16 @@ curses_prev_mesg()
     for (count = 0; count < num_messages; ++count) {
         mesg = get_msg_line(do_lifo, count);
         if (turn != mesg->turn && count != 0) {
-            curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, "---",
-                            MENU_ITEMFLAGS_NONE);
+            curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
+                            A_NORMAL, "---", MENU_ITEMFLAGS_NONE);
         }
-        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL, mesg->str,
-                         MENU_ITEMFLAGS_NONE);
+        curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
+                        A_NORMAL, mesg->str, MENU_ITEMFLAGS_NONE);
         turn = mesg->turn;
     }
     if (!count)
-        curses_add_menu(wid, NO_GLYPH, &Id, 0, 0, A_NORMAL,
-                        "[No past messages available.]",
+        curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
+                        A_NORMAL, "[No past messages available.]",
                         MENU_ITEMFLAGS_NONE);
 
     curses_end_menu(wid, "");
