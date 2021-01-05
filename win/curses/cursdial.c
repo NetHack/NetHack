@@ -621,8 +621,7 @@ curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
     }
 
     new_item = curs_new_menu_item(wid, str);
-    if (glyphinfo)
-        new_item->glyphinfo = *glyphinfo;
+    new_item->glyphinfo = *glyphinfo;
     new_item->identifier = *identifier;
     new_item->accelerator = accelerator;
     new_item->group_accel = group_accel;
@@ -1039,7 +1038,8 @@ menu_win_size(nhmenu *menu)
             /* Add space for accelerator (selector letter) */
             curentrywidth += 4;
 #if 0 /* FIXME: menu glyphs */
-            if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs)
+            if (menu_item_ptr->glyphinfo.glyph != NO_GLYPH
+                && iflags.use_menu_glyphs)
                 curentrywidth += 2;
 #endif
         }

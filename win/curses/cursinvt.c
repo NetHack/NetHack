@@ -118,7 +118,8 @@ curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, CHAR_P accelerator,
             stroffset = 4;
     }
 #if 0 /* FIXME: MENU GLYPHS */
-    if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
+    if (accelerator && iflags.use_menu_glyphs
+            && glyphinfo->glyph != NO_GLYPH ) {
         int symbol;
         attr_t glyphclr;
 
