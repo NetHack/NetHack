@@ -1370,8 +1370,9 @@ see_traps()
     }
 }
 
+/*  glyph, color, ttychar, symidx, glyphflags */
 static glyph_info no_ginfo = {
-    NO_GLYPH, 0, NO_COLOR, ' ', MG_BADXY
+    NO_GLYPH, NO_COLOR, ' ', 0, MG_BADXY
 };
 #ifndef UNBUFFERED_GLYPHINFO
 #define Glyphinfo_at(x, y, glyph) \
