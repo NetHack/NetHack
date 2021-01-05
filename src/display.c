@@ -2161,10 +2161,8 @@ glyph_info *glyphinfo;
             do_mon_checks = FALSE;
 
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) {
-        glyphinfo->glyph = NO_GLYPH;
-        glyphinfo->glyphflags = MG_BADXY;
-        glyphinfo->color = NO_COLOR;
-        glyphinfo->ttychar = ' ';
+        *glyphinfo = nul_glyphinfo;
+        glyphinfo->glyphflags |= MG_BADXY;
         return;
     }
 
@@ -2437,8 +2435,6 @@ glyph_info *glyphinfo;
         }
     }
 
-    glyphinfo->symidx = idx;
-    glyphinfo->ttychar = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
     if (!has_color(color)
@@ -2446,6 +2442,8 @@ glyph_info *glyphinfo;
 #endif
         color = NO_COLOR;
     glyphinfo->color = color;
+    glyphinfo->symidx = idx;
+    glyphinfo->ttychar = g.showsyms[idx];
     glyphinfo->glyphflags = special;
     glyphinfo->glyph = glyph;
 }
