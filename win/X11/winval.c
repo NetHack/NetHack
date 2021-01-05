@@ -118,7 +118,7 @@ Widget
 get_value_widget(w)
 Widget w;
 {
-	return XtNameToWidget(w, WVALUE);
+    return XtNameToWidget(w, WVALUE);
 }
 
 void

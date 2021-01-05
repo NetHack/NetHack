@@ -107,7 +107,7 @@ static void FDECL(tt_reset_color, (int, int, unsigned long *));
 static void NDECL(tt_status_fixup);
 static Widget FDECL(create_tty_status_field, (int, int, Widget, Widget));
 static Widget FDECL(create_tty_status, (Widget, Widget));
-static void FDECL(update_fancy_status_field_and_color, (int, int));
+static void FDECL(update_fancy_status_field_with_hilites, (int, int, int));
 static void FDECL(update_fancy_status_field, (int));
 static void FDECL(update_fancy_status, (BOOLEAN_P));
 static Widget FDECL(create_fancy_status, (Widget, Widget));
@@ -810,17 +810,6 @@ unsigned long *colormasks; /* bitmask of highlights for conditions */
     (void) XFlush(XtDisplay(X11_status_labels[0]));
 }
 
-static int
-extract_condition_color_from_colormasks(condition, colormasks)
-int condition;
-unsigned long *colormasks;
-{
-	for (int color_iter=0; color_iter<CLR_MAX; color_iter++)
-		if (condition & colormasks[color_iter])
-			return color_iter;
-	return NO_COLOR;
-}
-
 /*ARGSUSED*/
 static void
 X11_status_update_fancy(fld, ptr, chg, percent, color, colormasks)
@@ -895,13 +884,16 @@ unsigned long *colormasks;
         if (changed_bits) {
             for (i = 0; i < SIZE(mask_to_fancyfield); i++)
                 if ((changed_bits & mask_to_fancyfield[i].mask) != 0L)
-                    update_fancy_status_field_and_color(mask_to_fancyfield[i].ff, extract_condition_color_from_colormasks(mask_to_fancyfield[i].mask, colormasks));
+                     update_fancy_status_field_with_hilites(mask_to_fancyfield[i].ff,
+                         condcolor(mask_to_fancyfield[i].mask, colormasks),
+                         condattr(mask_to_fancyfield[i].mask, colormasks));
             old_condition_bits = X11_condition_bits; /* remember 'On' bits */
         }
     } else {
         for (i = 0; i < SIZE(bl_to_fancyfield); i++)
             if (bl_to_fancyfield[i].bl == fld) {
-                update_fancy_status_field_and_color(bl_to_fancyfield[i].ff, color);
+                update_fancy_status_field_with_hilites(bl_to_fancyfield[i].ff,
+                    color & 0xff, color >> 8 & 0xff);
                 break;
             }
     }
@@ -1249,6 +1241,7 @@ struct X_status_value {
     int turn_count;     /* last time the value changed */
     boolean set;        /* if highlighted */
     boolean after_init; /* don't highlight on first change (init) */
+    boolean inverted_hilite; /* if highlighted due to hilite_status inverse rule */
 };
 
 /* valid type values */
@@ -1290,53 +1283,53 @@ static Widget FDECL(init_info_form, (Widget, Widget, Widget));
  * - These must be in the same order as the F_foo numbers.
  */
 static struct X_status_value shown_stats[NUM_STATS] = {
-    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 0 */
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /* 0 */
 
-    { "Strength",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 1*/
-    { "Dexterity",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Constitution", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Intelligence", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Wisdom",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /* 5*/
-    { "Charisma",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
+    { "Strength",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /* 1*/
+    { "Dexterity",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Constitution", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Intelligence", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Wisdom",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /* 5*/
+    { "Charisma",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
 
-    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*NAME*/
-    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*DLEVEL*/
-    { "Gold",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Hit Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*10*/
-    { "Max HP",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Power",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Max Power",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Armor Class",  SV_VALUE, (Widget) 0, 256L, 0, FALSE, FALSE },
-    { "Xp Level",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*15*/
-    /*{ "Hit Dice",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, ==15*/
-    { "Exp Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Alignment",    SV_VALUE, (Widget) 0,  -2L, 0, FALSE, FALSE },
-    { "Time",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE },
-    { "Score",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE }, /*19*/
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /*NAME*/
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /*DLEVEL*/
+    { "Gold",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Hit Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /*10*/
+    { "Max HP",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Power",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Max Power",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Armor Class",  SV_VALUE, (Widget) 0, 256L, 0, FALSE, FALSE, FALSE },
+    { "Xp Level",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /*15*/
+    /*{ "Hit Dice",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, ==15*/
+    { "Exp Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Alignment",    SV_VALUE, (Widget) 0,  -2L, 0, FALSE, FALSE, FALSE },
+    { "Time",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE },
+    { "Score",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE }, /*19*/
 
-    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE,  TRUE }, /*20 */
-    { "",             SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*ENCMBR*/
-    { "Trapped",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Tethered",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Levitating",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Flying",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*25*/
-    { "Riding",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, TRUE, FALSE }, /*20 */
+    { "",             SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*ENCMBR*/
+    { "Trapped",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Tethered",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Levitating",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Flying",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*25*/
+    { "Riding",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
 
-    { "Grabbed!",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*27*/
-    { "Petrifying",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*STONE*/
-    { "Slimed",       SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Strangled",    SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*30*/
-    { "Food Pois",    SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Term Ill",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Sinking",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*LAVA*/
+    { "Grabbed!",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*27*/
+    { "Petrifying",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*STONE*/
+    { "Slimed",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Strangled",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*30*/
+    { "Food Pois",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Term Ill",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Sinking",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*LAVA*/
 
-    { "Held",         SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*34*/
-    { "Holding",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*35*/
-    { "Blind",        SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Deaf",         SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Stunned",      SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Confused",     SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE },
-    { "Hallucinat",   SV_NAME,  (Widget) 0,   0L, 0, FALSE,  TRUE }, /*40*/
+    { "Held",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*34*/
+    { "Holding",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*35*/
+    { "Blind",        SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Deaf",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Stunned",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Confused",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE },
+    { "Hallucinat",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE }, /*40*/
 };
 /*
  * The following are supported by the core but not yet handled here:
@@ -1640,11 +1633,14 @@ long new_value;
             /* toggle if not highlighted and just set to nonblank or if
                already highlighted and just set to blank */
             if (!attr_rec->set ^ !*buf) {
-                if (attr_rec->type == SV_LABEL || attr_rec->type == SV_NAME)
-                    hilight_label(attr_rec->w);
-                else
-                    hilight_value(attr_rec->w);
-
+                /* But don't hilite if inverted from status_hilite since
+                   it will already be hilited by apply_hilite_attributes(). */
+                if (!attr_rec->inverted_hilite) {
+                    if (attr_rec->type == SV_VALUE)
+                        hilight_value(attr_rec->w);
+                    else
+                        hilight_label(attr_rec->w);
+                }
                 attr_rec->set = !attr_rec->set;
             }
             attr_rec->turn_count = 0;
@@ -1678,20 +1674,58 @@ int color;
 {
     Pixel pixel;
     Arg args[1];
-	XrmValue source;
-	XrmValue dest;
+    XrmValue source;
+    XrmValue dest;
     
     color &= CLR_MAX - 1;
-	Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
-	char *arg_name = (sv->set ? XtNbackground : XtNforeground);
-	source.size = strlen(mapCLR_to_res[color]) + 1;
-	source.addr = (char *)mapCLR_to_res[color];
-	dest.size = sizeof(Pixel);
-	dest.addr = (XPointer)&pixel;
-	if (source.size > 0 && XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
-		XtSetArg(args[0], arg_name, pixel);
-		XtSetValues(w, args, ONE);
-	}
+    Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
+    char *arg_name = (sv->set || sv->inverted_hilite ? XtNbackground : XtNforeground);
+    source.size = strlen(mapCLR_to_res[color]) + 1;
+    source.addr = (char *)mapCLR_to_res[color];
+    dest.size = sizeof(Pixel);
+    dest.addr = (XPointer)&pixel;
+    if (source.size > 0 && XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
+        XtSetArg(args[0], arg_name, pixel);
+        XtSetValues(w, args, ONE);
+    }
+}
+
+boolean
+name_widget_has_label(sv)
+struct X_status_value *sv;
+{
+    Arg args[1];
+    const char *label;
+
+    XtSetArg(args[0], XtNlabel, &label);
+    XtGetValues(sv->w, args, ONE);
+    return strlen(label) > 0;
+}
+
+static void
+apply_hilite_attributes(sv, attributes)
+struct X_status_value *sv;
+int attributes;
+{
+    boolean attr_inversion
+        = HL_INVERSE & attributes
+        && (sv->type != SV_NAME || name_widget_has_label(sv))
+        ? TRUE
+        : FALSE;
+
+    if (sv->inverted_hilite != attr_inversion) {
+        sv->inverted_hilite = attr_inversion;
+        if (!sv->set) {
+            if (sv->type == SV_VALUE)
+                hilight_value(sv->w);
+            else
+                hilight_label(sv->w);
+        }
+    }
+    /* Could possibly add more attributes here: HL_ATTCLR_DIM,
+       HL_ATTCLR_BLINK, HL_ATTCLR_ULINE, and HL_ATTCLR_BOLD. If so,
+       extract the above into its own function apply_hilite_inverse()
+       and each other attribute into its own to keep the code clean. */
 }
 
 /*
@@ -1712,8 +1746,8 @@ int color;
  * [**] HD is shown instead of level and exp if Upolyd.
  */
 static void
-update_fancy_status_field_and_color(i, color)
-int i, color;
+update_fancy_status_field_with_hilites(i, color, attributes)
+int i, color, attributes;
 {
     struct X_status_value *sv = &shown_stats[i];
     unsigned long condmask = 0L;
@@ -1895,13 +1929,15 @@ int i, color;
     update_val(sv, val);
     if (color >= 0 )
         update_color(sv, color);
+    if (attributes >=0 )
+	    apply_hilite_attributes(sv, attributes);
 }
 
 static void
 update_fancy_status_field(i)
 int i;
 {
-    update_fancy_status_field_and_color(i, -1);
+    update_fancy_status_field_with_hilites(i, -1, -1);
 }
 
 /* fully update status after bl_flush or window resize */
@@ -1949,11 +1985,14 @@ check_turn_events()
             continue;
 
         if (sv->turn_count++ >= iflags.hilite_delta) {
-            /* unhighlights by toggling a highlighted item back off again */
-            if (sv->type == SV_LABEL || sv->type == SV_NAME)
-                hilight_label(sv->w);
-            else
-                hilight_value(sv->w);
+            /* unhighlights by toggling a highlighted item back off again,
+               unless forced inverted by a status_hilite rule */
+            if (!sv->inverted_hilite) {
+                if (sv->type == SV_VALUE)
+                    hilight_value(sv->w);
+                else
+                    hilight_label(sv->w);
+            }
             sv->set = FALSE;
         }
     }

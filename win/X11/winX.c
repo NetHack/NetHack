@@ -68,22 +68,22 @@
 #include "../win/X11/nh32icon"
 
 const char *mapCLR_to_res[CLR_MAX] = {
-	XtNblack,
-	XtNred,
-	XtNgreen,
-	XtNbrown,
-	XtNblue,
-	XtNmagenta,
-	XtNcyan,
-	XtNgray,
-	"#a45125",	/* NO_COLOR. This value matchs what the app loads by default. Ideally this would come from the resource file or where ever we're loading the default colors. */
-	XtNorange,
-	XtNbright_green,
-	XtNyellow,
-	XtNbright_blue,
-	XtNbright_magenta,
-	XtNbright_cyan,
-	XtNwhite,
+    XtNblack,
+    XtNred,
+    XtNgreen,
+    XtNbrown,
+    XtNblue,
+    XtNmagenta,
+    XtNcyan,
+    XtNgray,
+    "#a45125",	/* NO_COLOR. This value matchs what the app loads by default. Ideally this would come from the resource file or where ever we're loading the default colors. */
+    XtNorange,
+    XtNbright_green,
+    XtNyellow,
+    XtNbright_blue,
+    XtNbright_magenta,
+    XtNbright_cyan,
+    XtNwhite,
 };
 
 static struct icon_info {
