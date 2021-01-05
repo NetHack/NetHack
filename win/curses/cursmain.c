@@ -706,11 +706,11 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                     int glyph;            the display entity
                     int color;            color for window ports not using a tile
                     int ttychar;          the character mapping for the original tty
-                                             interace. Most or all window ports wanted
-                                             and used this for various things so it is
-                                             provided in 3.7+
+                                          interface. Most or all window ports wanted
+                                          and used this for various things so it is
+                                          provided in 3.7+
                     short int symidx;     offset into syms array
-                    unsigned glyphflags;       more detail about the entity
+                    unsigned glyphflags;  more detail about the entity
 
 */
 
