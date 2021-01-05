@@ -240,21 +240,45 @@ curses_player_selection()
 void
 curses_askname()
 {
+    const char *bail_msg = "Until next time then...";
+    int trylimit = 10;
+
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(MAP_WIN)) {
-        case -1:
-            curses_bail("Until next time then..."); /* quit */
-            /*NOTREACHED*/
-        case 0:
-            break; /* no game chosen; start new game */
-        case 1:
-            return; /* g.plname[] has been set */
+        case -1: /* quit */
+            goto bail;
+        case 0: /* new game */
+            break;
+        case 1: /* picked a save file to restore and set plname[] for it */
+            return;
         }
 #endif /* SELECTSAVED */
 
-    g.plname[0] = '\0';
-    curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
+    do {
+        if (--trylimit < 0) {
+             bail_msg = "A name is required; giving up.";
+             goto bail;
+        }
+
+        g.plname[0] = '\0';
+        /* for askname(), this will use wgetnstr() which treats ESC like
+           an ordinary character; fake the behavior we want:  as kill_char
+           if it follows any input or as cancel if it is at the start;
+           player has to type <escape><return> to get back here though */
+        curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
+
+        if (g.plname[0] == '\033')
+            goto bail;
+        (void) mungspaces(g.plname);
+    } while (!g.plname[0] || index(g.plname, '\033') != 0);
+
+    /* we get here if input is non-empty and doesn't contain ESC */
+    return;
+
+ bail:
+    curses_bail(bail_msg);
+    /*NOTREACHED*/
 }
 
 
