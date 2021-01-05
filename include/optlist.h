@@ -306,6 +306,8 @@ opt_##a,
            No, Yes, No, NoAlias, "edit message types")
     NHOPTB(monpolycontrol, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.mon_polycontrol)
+    NHOPTO("monster colors", o_monstercolor, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit monster colors")
     NHOPTC(monsters, MAXMCLASSES, opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "list of symbols to use for monsters")
     NHOPTC(mouse_support, 0, opt_in, set_in_game, No, Yes, No, No, NoAlias,
@@ -412,10 +414,10 @@ opt_##a,
                 &flags.showrace)
 #ifdef SCORE_ON_BOTL
     NHOPTB(showscore, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
-                &flags.showscore) 
+                &flags.showscore)
 #else
     NHOPTB(showscore, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
-                (boolean *) 0) 
+                (boolean *) 0)
 #endif
     NHOPTB(silent, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.silent)
@@ -437,7 +439,7 @@ opt_##a,
                 &iflags.status_updates)
     NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in,
            set_in_game, No, Yes, No, NoAlias, "edit status condition fields")
-#ifdef STATUS_HILITES 
+#ifdef STATUS_HILITES
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
     NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,

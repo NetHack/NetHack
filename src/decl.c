@@ -349,6 +349,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* gbuf */
     UNDEFINED_VALUES, /* gbuf_start */
     UNDEFINED_VALUES, /* gbug_stop */
+    DUMMY, /* monstercolors */
 
     /* do.c */
     FALSE, /* at_ladder */
@@ -708,6 +709,7 @@ const glyph_info nul_glyphinfo =
 void
 decl_globals_init(void)
 {
+    int i;
     g = g_init;
 
     g.valuables[0].list = g.gems;
@@ -749,7 +751,10 @@ decl_globals_init(void)
     g.urole = urole_init_data;
     g.urace = urace_init_data;
 
-
+    /* monstercolors can't remain 0, since that's a valid color */
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        g.monstercolors[i] = MONSTERCOLOR_DEFAULT;
+    }
 }
 
 /*decl.c*/

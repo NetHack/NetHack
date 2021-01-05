@@ -2382,6 +2382,9 @@ parse_config_line(char *origbuf)
     } else if (match_varname(buf, "MSGTYPE", 7)) {
         if (!msgtype_parse_add(bufp))
             retval = FALSE;
+    } else if (match_varname(buf, "MONSTERCOLOR", 12)) {
+        if (!add_monstercolor(bufp))
+            retval = FALSE;
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);

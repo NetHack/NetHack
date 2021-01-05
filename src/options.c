@@ -261,6 +261,7 @@ static int handle_add_list_remove(const char *, int);
 static void remove_autopickup_exception(struct autopickup_exception *);
 static int count_apes(void);
 static int count_cond(void);
+static int count_monstercolors(void);
 
 static int handler_align_misc(int);
 static int handler_disclose(void);
@@ -281,6 +282,7 @@ static int handler_whatis_filter(void);
 static int handler_autopickup_exception(void);
 static int handler_menu_colors(void);
 static int handler_msgtype(void);
+static int handler_monstercolor(void);
 
 static boolean is_wc_option(const char *);
 static boolean wc_supported(const char *);
@@ -5300,6 +5302,95 @@ handler_msgtype(void)
     return optn_ok;
 }
 
+static int
+handler_monstercolor(void)
+{
+    winid tmpwin;
+    anything any;
+    int opt_idx, nummoncolors = 0;
+    int mndx = NON_PM, color = MONSTERCOLOR_DEFAULT;
+    char buf[BUFSZ];
+    do {
+        nummoncolors = count_monstercolors();
+        opt_idx = handle_add_list_remove("monster color", nummoncolors);
+        if (opt_idx == 3) { /* done */
+            break;
+        } else if (opt_idx == 0) { /* add new */
+            /* EDIT_GETLIN:  assume user doesn't user want previous
+            exception used as default input string for this one... */
+            buf[0] = '\0';
+            getlin("What monster do you want to recolor?", buf);
+            mungspaces(buf); /* regularize whitespace */
+            if (buf[0] == '\033')
+                break;
+
+            /* don't bother parsing the monster name here, it will be done in
+             * add_monstercolor() */
+
+            /* note: NO_COLOR is valid, despite not being default on any
+             * monsters */
+            color = query_color((const char *) 0);
+            if (color < 0) { /* escaped out of the prompt */
+                break;
+            }
+
+            /* prepare str in config-file format to pass to add_monstercolor */
+            Strcat(buf, ":");
+            Strcat(buf, clr2colorname(color));
+            add_monstercolor(buf);
+
+            continue;
+        } else { /* list (1) or remove (2) */
+            int pick_idx, pick_cnt;
+            menu_item *pick_list = (menu_item *) 0;
+
+            /* replace user patterns with color name ones and force 'menucolors'
+             * On */
+            basic_menu_colors(TRUE);
+
+            tmpwin = create_nhwindow(NHW_MENU);
+            start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+            if (nummoncolors) {
+                any = cg.zeroany;
+                for (mndx = LOW_PM; mndx < NUMMONS; ++mndx) {
+                    if (g.monstercolors[mndx] != MONSTERCOLOR_DEFAULT) {
+                        glyph_info info;
+                        map_glyphinfo(0, 0, monnum_to_glyph(mndx), 0, &info);
+                        any.a_int = mndx;
+                        Sprintf(buf, "%s (%s)", mons[mndx].pmnames[NEUTRAL],
+                                clr2colorname(g.monstercolors[mndx]));
+                        add_menu(tmpwin, &info, &any, 0, 0,
+                                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+                    }
+                }
+            }
+            Sprintf(buf, "%s monster colors",
+                    (opt_idx == 1) ? "List of" : "Remove which");
+            end_menu(tmpwin, buf);
+            pick_cnt = select_menu(tmpwin,
+                                (opt_idx == 1) ? PICK_NONE : PICK_ANY,
+                                &pick_list);
+            if (pick_cnt > 0) {
+                for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+                    mndx = pick_list[pick_idx].item.a_int;
+                    g.monstercolors[mndx] = MONSTERCOLOR_DEFAULT;
+                }
+                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+            }
+
+            /* remove temporary color name patterns and restore user-specified
+             * ones; reset 'menucolors' option to its previous value */
+            basic_menu_colors(FALSE);
+
+            destroy_nhwindow(tmpwin);
+            if (pick_cnt < 0)
+                break;
+        }
+    } while (TRUE); /* until something breaks out */
+    docrt();
+    return optn_ok;
+}
+
 
 /*
  **********************************
@@ -6736,6 +6827,47 @@ count_menucolors(void)
     return count;
 }
 
+/* Add a monster color specification.
+ * The string is expected to be of the format "monster:color", either direct
+ * from the config (we need to check syntax) or from the interactive option. */
+boolean
+add_monstercolor(char *str)
+{
+    if (!str) {
+        impossible("add_monstercolor with null str");
+        return FALSE;
+    }
+    int mndx = NON_PM, color = MONSTERCOLOR_DEFAULT;
+    char *mname = str;
+    char *colon = index(str, ':');
+    char *colorstr;
+    if (colon == (char *) 0) {
+        config_error_add("Malformed MONSTERCOLOR");
+        return FALSE;
+    }
+    colorstr = colon + 1; /* color starts at next character */
+    *colon = '\0'; /* terminate monster string */
+
+    mndx = name_to_mon(mname, (int *) 0); /* accept any gender */
+    if (mndx == NON_PM) {
+        config_error_add("Unrecognized monster species \"%s\"", mname);
+        return FALSE;
+    }
+
+    color = match_str2clr(colorstr); /* if invalid color, prints error and
+                                        returns CLR_MAX */
+    if (color == CLR_MAX) {
+        return FALSE;
+    }
+
+    /* now actually set the monster color - note that if there were ever a
+     * monster whose identity was deliberately fudged among multiple species (as
+     * happens with Riders in a couple variants), this would be a way to work
+     * around that, and a countermeasure would need to be added here. */
+    g.monstercolors[mndx] = color;
+    return TRUE;
+}
+
 static boolean
 parse_role_opts(int optidx, boolean negated, const char *fullname,
                 char *opts, char **opp)
@@ -7087,6 +7219,27 @@ optfn_o_status_cond(int optidx UNUSED, int req, boolean negated UNUSED,
     if (req == do_handler) {
         cond_menu();
         return optn_ok;
+    }
+    return optn_ok;
+}
+
+static int
+optfn_o_monstercolor(int optidx UNUSED, int req, boolean negated UNUSED,
+                     char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_monstercolors());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_monstercolor();
     }
     return optn_ok;
 }
@@ -7525,9 +7678,21 @@ count_apes(void)
     return numapes;
 }
 
+static int
+count_monstercolors(void)
+{
+    int i, numcolors = 0;
+    for (i = LOW_PM; i < NUMMONS; i++) {
+        if (g.monstercolors[i] != MONSTERCOLOR_DEFAULT) {
+            numcolors++;
+        }
+    }
+    return numcolors;
+}
+
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* common to msg-types, menu-colors, autopickup-exceptions */
+/* common to msg-types, menu-colors, autopickup-exceptions, monster-colors */
 static int
 handle_add_list_remove(const char *optname, int numtotal)
 {

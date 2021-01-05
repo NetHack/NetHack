@@ -814,7 +814,7 @@ struct instance_globals {
     gbuf_entry gbuf[ROWNO][COLNO];
     xchar gbuf_start[ROWNO];
     xchar gbuf_stop[ROWNO];
-
+    uchar monstercolors[NUMMONS];
 
     /* do.c */
     boolean at_ladder;
