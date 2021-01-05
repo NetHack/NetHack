@@ -3442,6 +3442,9 @@ const glyph_info *bkglyphinfo UNUSED;
     }
 #endif
     /* get glyph ttychar, color, and special flags */
+#if defined(TTY_TILES_ESCCODES) || defined(MSDOS)
+    glyph = glyphinfo->glyph;
+#endif
     ch = glyphinfo->ttychar;
     color = glyphinfo->color;
     special = glyphinfo->glyphflags;
