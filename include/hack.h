@@ -475,6 +475,9 @@ enum bodypart_types {
 #define TELEDS_ALLOW_DRAG 1
 #define TELEDS_TELEPORT   2
 
+#define MON_POLE_DIST 5 /* How far monsters can use pole-weapons */
+#define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */
+
 /*
  * option setting restrictions
  */
