@@ -132,8 +132,8 @@ static void FDECL(display_warning, (struct monst *));
 static int FDECL(check_pos, (int, int, int));
 static int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
 static int FDECL(tether_glyph, (int, int));
-#ifdef UNBUFFERED_GLYPHMOD
-static unsigned *FDECL(glyphmod_at, (XCHAR_P, XCHAR_P, int));
+#ifdef UNBUFFERED_GLYPHINFO
+static glyph_info *FDECL(glyphinfo_at, (XCHAR_P, XCHAR_P, int));
 #endif
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
@@ -1370,16 +1370,17 @@ see_traps()
     }
 }
 
-static unsigned no_gm[NUM_GLYPHMOD] = {
-    MG_BADXY, (unsigned) ' ', (unsigned) NO_COLOR
+/*  glyph, color, ttychar, symidx, glyphflags */
+static glyph_info no_ginfo = {
+    NO_GLYPH, NO_COLOR, ' ', 0, MG_BADXY
 };
-#ifndef UNBUFFERED_GLYPHMOD
-#define Glyphmod_at(x, y, glyph) \
-    (((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO) ? &no_gm[0]   \
-     : &g.gbuf[(y)][(x)].glyphmod[0])
+#ifndef UNBUFFERED_GLYPHINFO
+#define Glyphinfo_at(x, y, glyph) \
+    (((x) < 0 || (y) < 0 || (x) >= COLNO || (y) >= ROWNO) ? &no_ginfo   \
+     : &g.gbuf[(y)][(x)].glyphinfo)
 #else
-static unsigned gm[NUM_GLYPHMOD];
-#define Glyphmod_at(x, y, glyph) glyphmod_at(x, y, glyph)
+static glyph_info ginfo;
+#define Glyphinfo_at(x, y, glyph) glyphinfo_at(x, y, glyph)
 #endif
 
 /*
@@ -1457,6 +1458,7 @@ void
 redraw_map()
 {
     int x, y, glyph;
+    glyph_info bkglyphinfo = nul_glyphinfo;
 
     /*
      * Not sure whether this is actually necessary; save and restore did
@@ -1477,8 +1479,9 @@ redraw_map()
     for (y = 0; y < ROWNO; ++y)
         for (x = 1; x < COLNO; ++x) {
             glyph = glyph_at(x, y); /* not levl[x][y].glyph */
-            print_glyph(WIN_MAP, x, y, glyph, get_bk_glyph(x, y),
-                        Glyphmod_at(x, y, glyph));
+            bkglyphinfo.glyph = get_bk_glyph(x, y);
+            print_glyph(WIN_MAP, x, y,
+                        Glyphinfo_at(x, y, glyph), &bkglyphinfo);
         }
     flush_screen(1);
 }
@@ -1540,8 +1543,8 @@ void
 show_glyph(x, y, glyph)
 int x, y, glyph;
 {
-#ifndef UNBUFFERED_GLYPHMOD
-    unsigned glyphmod[NUM_GLYPHMOD];
+#ifndef UNBUFFERED_GLYPHINFO
+    glyph_info glyphinfo;
 #endif
 
     /*
@@ -1608,26 +1611,27 @@ int x, y, glyph;
                    MAX_GLYPH, x, y);
         return;
     }
-#ifndef UNBUFFERED_GLYPHMOD
-    /* without UNBUFFERED_GLYPHMOD defined the glyphmod values are buffered
+#ifndef UNBUFFERED_GLYPHINFO
+    /* without UNBUFFERED_GLYPHINFO defined the glyphinfo values are buffered
        alongside the glyphs themselves for better performance, increased
        buffer size */
-    map_glyphmod(x, y, glyph, 0, glyphmod);
+    map_glyphinfo(x, y, glyph, 0, &glyphinfo);
 #endif
 
     if (g.gbuf[y][x].glyph != glyph
-#ifndef UNBUFFERED_GLYPHMOD
+#ifndef UNBUFFERED_GLYPHINFO
            /* I don't think we have to test for changes in TTYCHAR or COLOR
               because they typically only change if the glyph changed */
-            || g.gbuf[y][x].glyphmod[GM_FLAGS] != glyphmod[GM_FLAGS]
+            || g.gbuf[y][x].glyphinfo.glyphflags != glyphinfo.glyphflags
 #endif
             || iflags.use_background_glyph ) {
         g.gbuf[y][x].glyph = glyph;
         g.gbuf[y][x].gnew = 1;
-#ifndef UNBUFFERED_GLYPHMOD
-        g.gbuf[y][x].glyphmod[GM_FLAGS] = glyphmod[GM_FLAGS];
-        g.gbuf[y][x].glyphmod[GM_TTYCHAR] = glyphmod[GM_TTYCHAR];
-        g.gbuf[y][x].glyphmod[GM_COLOR] = glyphmod[GM_COLOR];
+#ifndef UNBUFFERED_GLYPHINFO
+        g.gbuf[y][x].glyphinfo.glyph = glyphinfo.glyph;
+        g.gbuf[y][x].glyphinfo.glyphflags = glyphinfo.glyphflags;
+        g.gbuf[y][x].glyphinfo.ttychar = glyphinfo.ttychar;
+        g.gbuf[y][x].glyphinfo.color = glyphinfo.color;
 #endif
         if (g.gbuf_start[y] > x)
             g.gbuf_start[y] = x;
@@ -1653,7 +1657,7 @@ int x, y, glyph;
 static gbuf_entry nul_gbuf = {
         0,                      /* gnew */
         GLYPH_UNEXPLORED,       /* glyph */
-#ifndef UNBUFFERED_GLYPHMOD
+#ifndef UNBUFFERED_GLYPHINFO
         {(unsigned) ' ', (unsigned) NO_COLOR, MG_UNEXPL},
 #endif
 };
@@ -1666,22 +1670,22 @@ clear_glyph_buffer()
 {
     register int x, y;
     gbuf_entry *gptr = &g.gbuf[0][0];
-    unsigned *gmptr =
-#ifndef UNBUFFERED_GLYPHMOD
-                        &gptr->glyphmod[0];
+    glyph_info *giptr =
+#ifndef UNBUFFERED_GLYPHINFO
+                        &gptr->glyphinfo;
 #else
-                        &gm[0];
+                        &ginfo;
 
-    map_glyphmod(0, 0, GLYPH_UNEXPLORED, 0, gmptr);
+    map_glyphinfo(0, 0, GLYPH_UNEXPLORED, 0, giptr);
 #endif
-#ifndef UNBUFFERED_GLYPHMOD
-    nul_gbuf.gnew = (gmptr[GM_TTYCHAR] != nul_gbuf.glyphmod[GM_TTYCHAR]
-                     || gmptr[GM_COLOR] != nul_gbuf.glyphmod[GM_COLOR]
-                     || gmptr[GM_FLAGS] != nul_gbuf.glyphmod[GM_FLAGS])
+#ifndef UNBUFFERED_GLYPHINFO
+    nul_gbuf.gnew = (giptr->ttychar != nul_gbuf.glyphinfo.ttychar
+                     || giptr->color != nul_gbuf.glyphinfo.color
+                     || giptr->glyphflags != nul_gbuf.glyphinfo.glyphflags)
 #else
-    nul_gbuf.gnew = (gmptr[GM_TTYCHAR] != ' '
-                     || gmptr[GM_COLOR] != NO_COLOR
-                     || (gmptr[GM_FLAGS] & ~MG_UNEXPL) != 0)
+    nul_gbuf.gnew = (giptr->ttychar != ' '
+                     || giptr->color != NO_COLOR
+                     || (giptr->glyphflags & ~MG_UNEXPL) != 0)
 #endif
                          ? 1 : 0;
     for (y = 0; y < ROWNO; y++) {
@@ -1703,30 +1707,33 @@ int start, stop, y;
     register int x, glyph;
     register boolean force;
     gbuf_entry *gptr = &g.gbuf[0][0];
-    unsigned *gmptr =
-#ifndef UNBUFFERED_GLYPHMOD
-                        &gptr->glyphmod[0];
+    glyph_info bkglyphinfo = nul_glyphinfo;
+    glyph_info *giptr =
+#ifndef UNBUFFERED_GLYPHINFO
+                        &gptr->glyphinfo;
 #else
-                        &gm[0];
+                        &ginfo;
 
-    map_glyphmod(0, 0, GLYPH_UNEXPLORED, 0, gmptr);
+    map_glyphinfo(0, 0, GLYPH_UNEXPLORED, 0U, giptr);
 #endif
-#ifndef UNBUFFERED_GLYPHMOD
-    force = (gmptr[GM_TTYCHAR] != nul_gbuf.glyphmod[GM_TTYCHAR]
-                 || gmptr[GM_COLOR] != nul_gbuf.glyphmod[GM_COLOR]
-                 || gmptr[GM_FLAGS] != nul_gbuf.glyphmod[GM_FLAGS])
+#ifndef UNBUFFERED_GLYPHINFO
+    force = (giptr->ttychar != nul_gbuf.glyphinfo.ttychar
+                 || giptr->color != nul_gbuf.glyphinfo.color
+                 || giptr->glyphflags != nul_gbuf.glyphinfo.glyphflags)
 #else
-    force = (gmptr[GM_TTYCHAR] != ' '
-                 || gmptr[GM_COLOR] != NO_COLOR
-                 || (gmptr[GM_FLAGS] & ~MG_UNEXPL) != 0)
+    force = (giptr->ttychar != ' '
+                 || giptr->color != NO_COLOR
+                 || (giptr->glyphflags & ~MG_UNEXPL) != 0)
 #endif
                  ? 1 : 0;
     for (x = start; x <= stop; x++) {
         gptr = &g.gbuf[y][x];
         glyph = gptr->glyph;
-        if (force || glyph != GLYPH_UNEXPLORED)
-            print_glyph(WIN_MAP, x, y, glyph,
-                        get_bk_glyph(x, y), Glyphmod_at(x, y, glyph));
+        if (force || glyph != GLYPH_UNEXPLORED) {
+            bkglyphinfo.glyph = get_bk_glyph(x, y);
+            print_glyph(WIN_MAP, x, y,
+                        Glyphinfo_at(x, y, glyph), &bkglyphinfo);
+	}
     }
 }
 
@@ -1759,6 +1766,7 @@ int cursor_on_u;
     static int flushing = 0;
     static int delay_flushing = 0;
     register int x, y;
+    glyph_info bkglyphinfo = nul_glyphinfo;
 
     /* 3.7: don't update map, status, or perm_invent during save/restore */
     if (g.program_state.saving || g.program_state.restoring)
@@ -1781,8 +1789,9 @@ int cursor_on_u;
 
         for (; x <= g.gbuf_stop[y]; gptr++, x++)
             if (gptr->gnew) {
-                print_glyph(WIN_MAP, x, y, gptr->glyph,
-                            get_bk_glyph(x, y), Glyphmod_at(x, y, gptr->glyph));
+                bkglyphinfo.glyph = get_bk_glyph(x, y);            
+                print_glyph(WIN_MAP, x, y,
+                            Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
                 gptr->gnew = 0;
             }
     }
@@ -2000,14 +2009,14 @@ xchar x, y;
     return g.gbuf[y][x].glyph;
 }
 
-#ifdef UNBUFFERED_GLYPHMOD
-unsigned *
-glyphmod_at(x, y, glyph)
+#ifdef UNBUFFERED_GLYPHINFO
+glyph_info *
+glyphinfo_at(x, y, glyph)
 xchar x, y;
 int glyph;
 {
-    map_glyphmod(x, y, glyph, 0, gm);
-    return &gm[0];
+    map_glyphinfo(x, y, glyph, 0, &ginfo);
+    return &ginfo;
 }
 #endif
 
@@ -2133,10 +2142,11 @@ static const int explcolors[] = {
 #define GMAP_ALTARCOLOR          0x00000004
 
 void
-map_glyphmod(x, y, glyph, mgflags, glyphmod)
+map_glyphinfo(x, y, glyph, mgflags, glyphinfo)
 xchar x, y;
 int glyph;
-unsigned mgflags, *glyphmod;
+unsigned mgflags;
+glyph_info *glyphinfo;
 {
     register int offset, idx;
     int color = NO_COLOR;
@@ -2151,9 +2161,10 @@ unsigned mgflags, *glyphmod;
             do_mon_checks = FALSE;
 
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) {
-        glyphmod[GM_FLAGS] = MG_BADXY;
-        glyphmod[GM_COLOR] = NO_COLOR;
-        glyphmod[GM_TTYCHAR] = ' ';
+        glyphinfo->glyph = NO_GLYPH;
+        glyphinfo->glyphflags = MG_BADXY;
+        glyphinfo->color = NO_COLOR;
+        glyphinfo->ttychar = ' ';
         return;
     }
 
@@ -2426,17 +2437,17 @@ unsigned mgflags, *glyphmod;
         }
     }
 
-    glyphmod[GM_TTYCHAR] = ((mgflags & MG_FLAG_RETURNIDX) != 0) ? idx
-                           : g.showsyms[idx];
-
+    glyphinfo->symidx = idx;
+    glyphinfo->ttychar = g.showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
     if (!has_color(color)
         || ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL) && !has_rogue_color))
 #endif
         color = NO_COLOR;
-    glyphmod[GM_COLOR] = color;
-    glyphmod[GM_FLAGS] = special;
+    glyphinfo->color = color;
+    glyphinfo->glyphflags = special;
+    glyphinfo->glyph = glyph;
 }
 
 /* ------------------------------------------------------------------------ */

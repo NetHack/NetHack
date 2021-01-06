@@ -65,7 +65,7 @@ struct text_map_info_t {
 
 struct tile_glyph_info_t {
     unsigned short glyph;
-    unsigned special;
+    unsigned glyphflags;
 };
 
 struct tile_map_info_t {
@@ -445,7 +445,8 @@ E void FDECL(X11_curs, (winid, int, int));
 E void FDECL(X11_putstr, (winid, int, const char *));
 E void FDECL(X11_display_file, (const char *, BOOLEAN_P));
 E void FDECL(X11_start_menu, (winid, unsigned long));
-E void FDECL(X11_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
+E void FDECL(X11_add_menu, (winid, const glyph_info *, const ANY_P *,
+                            CHAR_P, CHAR_P, int,
                             const char *, unsigned int));
 E void FDECL(X11_end_menu, (winid, const char *));
 E int FDECL(X11_select_menu, (winid, int, MENU_ITEM_P **));
@@ -456,7 +457,7 @@ E void NDECL(X11_wait_synch);
 E void FDECL(X11_cliparound, (int, int));
 #endif
 E void FDECL(X11_print_glyph, (winid, XCHAR_P, XCHAR_P,
-                               int, int, unsigned *));
+                               const glyph_info *, const glyph_info *));
 E void FDECL(X11_raw_print, (const char *));
 E void FDECL(X11_raw_print_bold, (const char *));
 E int NDECL(X11_nhgetch);

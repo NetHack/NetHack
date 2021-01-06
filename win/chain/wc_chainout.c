@@ -224,11 +224,11 @@ unsigned long mbehavior;
 }
 
 void
-chainout_add_menu(vp, window, glyph, identifier, ch, gch, attr, str,
+chainout_add_menu(vp, window, glyphinfo, identifier, ch, gch, attr, str,
                   itemflags)
 void *vp;
 winid window;               /* window to use, must be of type NHW_MENU */
-int glyph;                  /* glyph to display with item (unused) */
+const glyph_info *glyphinfo /* glyph plus glyph info to display with item */
 const anything *identifier; /* what to return if selected */
 char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
@@ -238,8 +238,8 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_add_menu)(window, glyph, identifier, ch, gch, attr,
-                                 str, itemflags);
+    (*tdp->nprocs->win_add_menu)(window, glyphinfo, identifier, ch, gch,
+                                 attr, str, itemflags);
 }
 
 void
@@ -336,16 +336,16 @@ char *posbar;
 #endif
 
 void
-chainout_print_glyph(vp, window, x, y, glyph, bkglyph, glyphmod)
+chainout_print_glyph(vp, window, x, y, glyphinfo, bkglyphinfo)
 void *vp;
 winid window;
 xchar x, y;
-int glyph, bkglyph;
-int glyphmod[NUM_GLYPHMOD];
+const glyph_info *glyphinfo;
+const glyph_info *bkglyphinfo;
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_print_glyph)(window, x, y, glyph, bkglyph, glyphmod);
+    (*tdp->nprocs->win_print_glyph)(window, x, y, glyphinfo, bkglyphinfo);
 }
 
 void

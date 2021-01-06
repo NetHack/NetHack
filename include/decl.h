@@ -524,8 +524,8 @@ struct trapinfo {
 typedef struct {
     xchar gnew; /* perhaps move this bit into the rm structure. */
     int glyph;
-#ifndef UNBUFFERED_GLYPHMOD
-    unsigned glyphmod[NUM_GLYPHMOD];
+#ifndef UNBUFFERED_GLYPHINFO
+    glyph_info glyphinfo;
 #endif
 } gbuf_entry;
 
@@ -1212,6 +1212,8 @@ struct const_globals {
 };
 
 E const struct const_globals cg;
+
+E const glyph_info nul_glyphinfo;
 
 #undef E
 

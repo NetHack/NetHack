@@ -700,6 +700,10 @@ const struct const_globals cg = {
     DUMMY, /* zeroany */
 };
 
+/* glyph, color, ttychar, symidx, glyphflags */
+const glyph_info nul_glyphinfo =
+    { NO_GLYPH, NO_COLOR, ' ', 0, MG_UNEXPL };
+
 #define ZERO(x) memset(&x, 0, sizeof(x))
 
 void

@@ -1963,7 +1963,7 @@ boolean complain;
 
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
-        X11_add_menu(newwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        X11_add_menu(newwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      line, MENU_ITEMFLAGS_NONE);
     }
     (void) dlb_fclose(fp);

@@ -428,8 +428,8 @@ prompt_for_player_selection(void)
                         } else
                             Strcpy(rolenamebuf, roles[i].name.m);
                     }
-                    add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
-                             an(rolenamebuf), MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &nul_glyphinfo, &any, thisch, 0,
+                             ATR_NONE, an(rolenamebuf), MENU_ITEMFLAGS_NONE);
                     lastch = thisch;
                 }
             }
@@ -437,11 +437,11 @@ prompt_for_player_selection(void)
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
                 any.a_int = randrole(FALSE) + 1;
-            add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                     ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
             any.a_int = i + 1; /* must be non-zero */
-            add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                     ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
             Sprintf(pbuf, "Pick a role for your %s", plbuf);
             end_menu(win, pbuf);
             n = select_menu(win, PICK_ONE, &selected);
@@ -503,18 +503,19 @@ prompt_for_player_selection(void)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
                         any.a_int = i + 1; /* must be non-zero */
-                        add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                 ATR_NONE, races[i].noun, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 races[i].noun[0], 0, ATR_NONE,
+                                 races[i].noun, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randrace(flags.initrole) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the race of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -577,18 +578,19 @@ prompt_for_player_selection(void)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
-                                 ATR_NONE, genders[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 genders[i].adj[0], 0, ATR_NONE,
+                                 genders[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_gend(flags.initrole, flags.initrace,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randgend(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the gender of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -650,18 +652,19 @@ prompt_for_player_selection(void)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                 ATR_NONE, aligns[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 aligns[i].adj[0], 0, ATR_NONE,
+                                 aligns[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_align(flags.initrole, flags.initrace,
                                        flags.initgend, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randalign(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -1093,12 +1096,12 @@ mswin_start_menu(winid wid, unsigned long mbehavior)
 }
 
 /*
-add_menu(windid window, int glyph, const anything identifier,
+add_menu(windid window, const glyph_info *glyphinfo,
+                                const anything identifier,
                                 char accelerator, char groupacc,
                                 int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If
-identifier
-                   is 0, then the line cannot be selected (e.g. a title).
+                   identifier is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
                    selected.  Accelerator is a keyboard key that can be used
                    to select the line.  If the accelerator of a selectable
@@ -1106,8 +1109,8 @@ identifier
                    accelerator.  It is up to the window-port to make the
                    accelerator visible to the user (e.g. put "a - " in front
                    of str).  The value attr is the same as in putstr().
-                   Glyph is an optional glyph to accompany the line.  If
-                   window port cannot or does not want to display it, this
+                   Glyphinfo->glyph is an optional glyph to accompany the line.
+                   If window port cannot or does not want to display it, this
                    is OK.  If there is no glyph applicable, then this
                    value will be NO_GLYPH.
                 -- All accelerators should be in the range [A-Za-z].
@@ -1125,19 +1128,22 @@ identifier
                    menu is displayed, set preselected to TRUE.
 */
 void
-mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
+mswin_add_menu(winid wid, const glyph_info *glyphinfo,
+               const ANY_P *identifier,
                CHAR_P accelerator, CHAR_P group_accel, int attr,
                const char *str, unsigned int itemflags)
 {
     boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
-    logDebug("mswin_add_menu(%d, %d, %p, %c, %c, %d, %s, %u)\n", wid, glyph,
+    logDebug("mswin_add_menu(%d, %d, %u, %p, %c, %c, %d, %s, %u)\n", wid,
+             glyphinfo->glyph, glyphinfo->glyphflags,
              identifier, (char) accelerator, (char) group_accel, attr, str,
              itemflags);
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
         MSNHMsgAddMenu data;
         ZeroMemory(&data, sizeof(data));
-        data.glyph = glyph;
+        if (glyphinfo)
+            data.glyphinfo = *glyphinfo;
         data.identifier = identifier;
         data.accelerator = accelerator;
         data.group_accel = group_accel;
@@ -1281,24 +1287,22 @@ mswin_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph, bkglyph, glyphmod)
-                -- Print the glyph at (x,y) on the given window.  Glyphs are
-                   integers at the interface, mapped to whatever the window-
+print_glyph(window, x, y, glyphinfo, bkglyphinfo)
+                -- Print a glyph (glyphinfo->glyph) at (x,y) on the given
+                   window.  Glyphs are integers mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
-		-- bkglyph is a background glyph for potential use by some
-		   graphical or tiled environments to allow the depiction
+		-- bkglyphinfo contains a background glyph for potential use
+                   by some graphical or tiled environments to allow the depiction
 		   to fall against a background consistent with the grid 
 		   around x,y.
-                -- glyphmod provides extended information about the glyph
-                   that window ports can use to enhance the display in
-                   various ways.
                    
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsigned *glyphmod)
+mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+                  const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
-    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyph, bkglyph, glyphmod);
+    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyphinfo->glyph, bkglyphinfo->glyph);
 
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
@@ -1307,11 +1311,10 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph, unsig
         ZeroMemory(&data, sizeof(data));
         data.x = x;
         data.y = y;
-        data.glyph = glyph;
-        data.bkglyph = bkglyph;
-        data.glyphmod[GM_TTYCHAR] = glyphmod[GM_TTYCHAR];
-        data.glyphmod[GM_COLOR] = glyphmod[GM_COLOR];
-        data.glyphmod[GM_FLAGS] = glyphmod[GM_FLAGS];
+        if (glyphinfo)
+            data.glyphinfo = *glyphinfo;
+        if (bkglyphinfo)
+            data.bkglyphinfo = *bkglyphinfo;
         SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
     }

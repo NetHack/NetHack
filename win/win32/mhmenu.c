@@ -27,7 +27,7 @@
 #define CHECK_HEIGHT 16
 
 typedef struct mswin_menu_item {
-    int glyph;
+    glyph_info glyphinfo;
     ANY_P identifier;
     CHAR_P accelerator;
     CHAR_P group_accel;
@@ -78,7 +78,7 @@ static WNDPROC editControlWndProc = NULL;
 
 #define NHMENU_IS_SELECTABLE(item) ((item).identifier.a_obj != NULL)
 #define NHMENU_IS_SELECTED(item) ((item).count != 0)
-#define NHMENU_HAS_GLYPH(item) ((item).glyph != NO_GLYPH)
+#define NHMENU_HAS_GLYPH(item) ((item).glyphinfo.glyph != NO_GLYPH)
 
 INT_PTR CALLBACK MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK NHMenuListWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -618,7 +618,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         new_item = data->menu.size;
         ZeroMemory(&data->menu.items[new_item],
                    sizeof(data->menu.items[new_item]));
-        data->menu.items[new_item].glyph = msg_data->glyph;
+        data->menu.items[new_item].glyphinfo = msg_data->glyphinfo;
         data->menu.items[new_item].identifier = *msg_data->identifier;
         data->menu.items[new_item].accelerator = msg_data->accelerator;
         data->menu.items[new_item].group_accel = msg_data->group_accel;
@@ -1082,7 +1082,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             double monitorScale = win10_monitor_scale(hWnd);
 
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
-            ntile = glyph2tile[item->glyph];
+            ntile = glyph2tile[item->glyphinfo.glyph];
             t_x =
                 (ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X;
             t_y =
@@ -1166,7 +1166,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         client_rt.right = min(client_rt.right, lpdis->rcItem.right);
         if (NHMENU_IS_SELECTABLE(*item)
             && data->menu.items[lpdis->itemID].count != 0
-            && item->glyph != NO_GLYPH) {
+            && item->glyphinfo.glyph != NO_GLYPH) {
             if (data->menu.items[lpdis->itemID].count == -1) {
                 _stprintf(wbuf, TEXT("Count: All"));
             } else {

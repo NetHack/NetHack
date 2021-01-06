@@ -58,7 +58,7 @@ int func(CHAR_P arg) { ... }
 
 typedef struct nhmi {
     winid wid;                  /* NetHack window id */
-    int glyph;                  /* Menu glyphs */
+    glyph_info glyphinfo;       /* holds menu glyph and additional glyph info */
     anything identifier;        /* Value returned if item selected */
     CHAR_P accelerator;         /* Character used to select item from menu */
     CHAR_P group_accel;         /* Group accelerator for menu item, if any */
@@ -582,7 +582,7 @@ curs_new_menu_item(winid wid, const char *str)
     curses_rtrim(new_str);
     new_item = (nhmenu_item *) alloc((unsigned) sizeof (nhmenu_item));
     new_item->wid = wid;
-    new_item->glyph = NO_GLYPH;
+    new_item->glyphinfo = nul_glyphinfo;
     new_item->identifier = cg.zeroany;
     new_item->accelerator = '\0';
     new_item->group_accel = '\0';
@@ -601,8 +601,9 @@ curs_new_menu_item(winid wid, const char *str)
 /* Add a menu item to the given menu window */
 
 void
-curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
-                       CHAR_P accelerator, CHAR_P group_accel, int attr,
+curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
+                       const ANY_P *identifier, CHAR_P accelerator,
+                       CHAR_P group_accel, int attr,
                        const char *str, unsigned itemflags)
 {
     nhmenu_item *new_item, *current_items, *menu_item_ptr;
@@ -620,7 +621,8 @@ curses_add_nhmenu_item(winid wid, int glyph, const ANY_P *identifier,
     }
 
     new_item = curs_new_menu_item(wid, str);
-    new_item->glyph = glyph;
+    if (glyphinfo)
+        new_item->glyphinfo = *glyphinfo;
     new_item->identifier = *identifier;
     new_item->accelerator = accelerator;
     new_item->group_accel = group_accel;
@@ -1179,12 +1181,8 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
         }
 #if 0
         /* FIXME: menuglyphs not implemented yet */
-        if (menu_item_ptr->glyph != NO_GLYPH && iflags.use_menu_glyphs) {
-            unsigned glyphmod[NUM_GLYPHMOD];
-
-            map_glyphmod(0, 0, menu_item_ptr->glyph, 0U, glyphmod);
-            color = (int) glyphmod[GM_COLOR];
-
+        if (menu_item_ptr->glyphinfo.glyph != NO_GLYPH && iflags.use_menu_glyphs) {
+            color = (int) menu_item_ptr->glyphinfo.color;
             curses_toggle_color_attr(win, color, NONE, ON);
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
             curses_toggle_color_attr(win, color, NONE, OFF);

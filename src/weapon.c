@@ -1220,18 +1220,18 @@ enhance_weapon_skill()
                         (u.ulevel < MAXULEV)
                             ? "when you're more experienced"
                             : "if skill slots become available");
-                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
             if (maxxed_cnt > 0) {
                 Sprintf(buf,
                  "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
                         plur(maxxed_cnt));
-                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
-            add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, "", MENU_ITEMFLAGS_NONE);
         }
 
         /* List the skills, making ones that could be advanced
@@ -1244,7 +1244,8 @@ enhance_weapon_skill()
                 /* Print headings for skill types */
                 any = cg.zeroany;
                 if (i == skill_ranges[pass].first)
-                    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                             iflags.menu_headings,
                              skill_ranges[pass].name, MENU_ITEMFLAGS_NONE);
 
                 if (P_RESTRICTED(i))
@@ -1286,8 +1287,8 @@ enhance_weapon_skill()
                                 sklnambuf);
                 }
                 any.a_int = can_advance(i, speedy) ? i + 1 : 0;
-                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
 
         Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:"

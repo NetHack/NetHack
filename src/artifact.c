@@ -1545,8 +1545,8 @@ struct obj *obj;
                 if (!g.dungeons[i].dunlev_ureached)
                     continue;
                 any.a_int = i + 1;
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                         g.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, g.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
                 num_ok_dungeons++;
                 last_ok_dungeon = i;
             }

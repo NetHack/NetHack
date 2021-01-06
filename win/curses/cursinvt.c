@@ -55,9 +55,8 @@ curses_update_inv(void)
 
 /* Adds an inventory item.  'y' is 1 rather than 0 for the first item. */
 void
-curses_add_inv(int y,
-               int glyph UNUSED,
-               CHAR_P accelerator, attr_t attr, const char *str)
+curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, CHAR_P accelerator,
+               attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     int color = NO_COLOR;
@@ -120,13 +119,11 @@ curses_add_inv(int y,
     }
 #if 0 /* FIXME: MENU GLYPHS */
     if (accelerator && glyph != NO_GLYPH && iflags.use_menu_glyphs) {
-        unsigned glyphmod[NUM_GLYPHMOD];
         int symbol;
         attr_t glyphclr;
 
-        map_glyphmod(0, 0, glyph, 0U, glyphmod);
-        symbol = (int) glyphmod[GM_TTYCHAR];
-        color = (int) glyphmod[GM_COLOR];
+        symbol = glyphinfo->ttychar;
+        color = glyphinfo->color;
 
         glyphclr = curses_color_attr(color, 0);
         wattron(win, glyphclr);

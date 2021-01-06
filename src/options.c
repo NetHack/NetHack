@@ -4766,8 +4766,8 @@ handler_menustyle()
         /* note: separate `style_name' variable used
            to avoid an optimizer bug in VAX C V2.3 */
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, *style_name, 0, ATR_NONE,
-                 style_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *style_name, 0,
+                 ATR_NONE, style_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select menustyle:");
     if (select_menu(tmpwin, PICK_ONE, &style_pick) > 0) {
@@ -4791,16 +4791,16 @@ int optidx;
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = ALIGN_TOP;
-    add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE, "top",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE, "top",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_BOTTOM;
-    add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE, "bottom",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE, "bottom",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_LEFT;
-    add_menu(tmpwin, NO_GLYPH, &any, 'l', 0, ATR_NONE, "left",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'l', 0, ATR_NONE, "left",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_RIGHT;
-    add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "right",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'r', 0, ATR_NONE, "right",
              MENU_ITEMFLAGS_NONE);
     Sprintf(abuf, "Select %s window placement relative to the map:",
             (optidx == opt_align_message) ? "message" : "status");
@@ -4841,8 +4841,8 @@ handler_disclose(VOID_ARGS)
         Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
                 flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, disclosure_options[i], 0,
-                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, disclosure_options[i],
+                 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
     end_menu(tmpwin, "Change which disclosure options categories:");
@@ -4867,35 +4867,41 @@ handler_disclose(VOID_ARGS)
             any = cg.zeroany;
             /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Never disclose, without prompting",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Always disclose, without prompting",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
-                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                         any.a_char, ATR_NONE,
                          "Always disclose, pick sort order from menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"No\"",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"Yes\"",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
-                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                         any.a_char, ATR_NONE,
             "Prompt, with default answer of \"Ask\" to request sort menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
@@ -4940,18 +4946,18 @@ handler_msg_window(VOID_ARGS)
         any = cg.zeroany;
         if (!WINDOWPORT("curses")) {
             any.a_char = 's';
-            add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
-                     "single", MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 's',
+                     0, ATR_NONE, "single", MENU_ITEMFLAGS_NONE);
             any.a_char = 'c';
-            add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
-                     "combination", MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 'c',
+                     0, ATR_NONE, "combination", MENU_ITEMFLAGS_NONE);
         }
         any.a_char = 'f';
-        add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'f',
+                 0, ATR_NONE, "full", MENU_ITEMFLAGS_NONE);
         any.a_char = 'r';
-        add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'r',
+                 0, ATR_NONE, "reversed", MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Select message history display type:");
         if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
             iflags.prevmsg_window = window_pick->item.a_char;
@@ -4984,8 +4990,8 @@ handler_number_pad(VOID_ARGS)
     any = cg.zeroany;
     for (i = 0; i < SIZE(npchoices); i++) {
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0, ATR_NONE,
-                 npchoices[i], MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
+                 0, ATR_NONE, npchoices[i], MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select number_pad mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
@@ -5039,8 +5045,8 @@ handler_paranoid_confirmation(VOID_ARGS)
         if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
             continue;
         any.a_int = paranoia[i].flagmask;
-        add_menu(tmpwin, NO_GLYPH, &any, *paranoia[i].argname, 0,
-                 ATR_NONE, paranoia[i].explain,
+        add_menu(tmpwin, &nul_glyphinfo, &any, *paranoia[i].argname,
+                 0, ATR_NONE, paranoia[i].explain,
                  (flags.paranoia_bits & paranoia[i].flagmask)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
@@ -5078,8 +5084,8 @@ handler_pickup_burden(VOID_ARGS)
     for (i = 0; i < SIZE(burdentype); i++) {
         burden_name = burdentype[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, burden_letters[i], 0, ATR_NONE,
-                 burden_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, burden_letters[i],
+                 0, ATR_NONE, burden_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select encumbrance level:");
     if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
@@ -5116,8 +5122,8 @@ handler_runmode(VOID_ARGS)
     for (i = 0; i < SIZE(runmodes); i++) {
         mode_name = runmodes[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, *mode_name, 0, ATR_NONE,
-                 mode_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *mode_name,
+                 0, ATR_NONE, mode_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select run/travel display mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
@@ -5143,7 +5149,8 @@ handler_sortloot(VOID_ARGS)
     for (i = 0; i < SIZE(sortltype); i++) {
         sortl_name = sortltype[i];
         any.a_char = *sortl_name;
-        add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, *sortl_name,
+                 0, ATR_NONE,
                  sortl_name, (flags.sortloot == *sortl_name)
                                 ? MENU_ITEMFLAGS_SELECTED
                                 : MENU_ITEMFLAGS_NONE);
@@ -5176,38 +5183,42 @@ handler_whatis_coord(VOID_ARGS)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = GPCOORDS_COMPASS;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS, 0, ATR_NONE,
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMPASS,
+             0, ATR_NONE,
              "compass ('east' or '3s' or '2n,4w')",
              (gp == GPCOORDS_COMPASS)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMFULL, 0, ATR_NONE,
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMFULL,
+             0, ATR_NONE,
              "full compass ('east' or '3south' or '2north,4west')",
              (gp == GPCOORDS_COMFULL)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP, 0, ATR_NONE,
-             "map <x,y>",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_MAP,
+             0, ATR_NONE, "map <x,y>",
              (gp == GPCOORDS_MAP)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_SCREEN, 0, ATR_NONE,
-             "screen [row,column]",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_SCREEN,
+             0, ATR_NONE, "screen [row,column]",
              (gp == GPCOORDS_SCREEN)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_NONE, 0, ATR_NONE,
-             "none (no coordinates displayed)",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_NONE,
+             0, ATR_NONE, "none (no coordinates displayed)",
              (gp == GPCOORDS_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_long = 0L;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             "", MENU_ITEMFLAGS_NONE);
     Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
             1, 0, COLNO - 1, ROWNO - 1,
             flags.verbose ? "; column 0 unused, off left edge" : "");
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
    "screen: row is offset to accommodate tty interface's use of top line",
                  MENU_ITEMFLAGS_NONE);
 #if COLNO == 80
@@ -5218,8 +5229,10 @@ handler_whatis_coord(VOID_ARGS)
     Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
             0 + 2, 1, ROWNO - 1 + 2, COLNO - 1, COL80ARG);
 #undef COL80ARG
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             buf, MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             "", MENU_ITEMFLAGS_NONE);
     end_menu(tmpwin,
         "Select coordinate display when auto-describing a map position:");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
@@ -5247,17 +5260,17 @@ handler_whatis_filter(VOID_ARGS)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = (GFILTER_NONE + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'n',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'n',
              0, ATR_NONE, "no filtering",
              (gf == GFILTER_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_VIEW + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'v',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'v',
              0, ATR_NONE, "in view only",
              (gf == GFILTER_VIEW)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_AREA + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'a',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'a',
              0, ATR_NONE, "in same area",
              (gf == GFILTER_AREA)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
@@ -5337,7 +5350,7 @@ int optidx;
         any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
         if (!symset_name)
             defindx = any.a_int;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "Default Symbols",
                  (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
@@ -5358,7 +5371,8 @@ int optidx;
                 if (symset_name && !strcmpi(sl->name, symset_name))
                     defindx = any.a_int;
                 Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf,
                          (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
             }
@@ -5494,7 +5508,8 @@ handler_autopickup_exception(VOID_ARGS)
         if (numapes) {
             ape = g.apelist;
             any = cg.zeroany;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     iflags.menu_headings,
                      "Always pickup '<'; never pickup '>'",
                      MENU_ITEMFLAGS_NONE);
             for (i = 0; i < numapes && ape; i++) {
@@ -5503,8 +5518,8 @@ handler_autopickup_exception(VOID_ARGS)
                    less than BUFSZ */
                 Sprintf(apebuf, "\"%c%s\"", ape->grab ? '<' : '>',
                         ape->pattern);
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, apebuf, MENU_ITEMFLAGS_NONE);
                 ape = ape->next;
             }
         }
@@ -5602,8 +5617,8 @@ handler_menu_colors(VOID_ARGS)
                 Strcat(mcbuf, tmp->origstr);
             /* combine main string and suffix */
             Strcat(mcbuf, &buf[1]); /* skip buf[]'s initial quote */
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mcbuf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, mcbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
         Sprintf(mcbuf, "%s menu colors",
@@ -5672,8 +5687,8 @@ handler_msgtype(VOID_ARGS)
                 Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
             else
                 Strcat(strcat(mtbuf, tmp->pattern), "\"");
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, mtbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
         Sprintf(mtbuf, "%s message types",
@@ -6679,7 +6694,8 @@ const char *prompt;
         if (!colornames[i].name)
             break;
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                 ATR_NONE, colornames[i].name,
                  (colornames[i].color == NO_COLOR) ? MENU_ITEMFLAGS_SELECTED
                                                    : MENU_ITEMFLAGS_NONE);
     }
@@ -6730,8 +6746,8 @@ const char *prompt;
         if (!attrnames[i].name)
             break;
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, attrnames[i].attr,
-                 attrnames[i].name,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                 attrnames[i].attr, attrnames[i].name,
                  (attrnames[i].attr == default_attr) ? MENU_ITEMFLAGS_SELECTED
                                                      : MENU_ITEMFLAGS_NONE);
     }
@@ -6828,8 +6844,8 @@ query_msgtype()
     for (i = 0; i < SIZE(msgtype_names); i++)
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
         }
     end_menu(tmpwin, "How to show the message");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -7537,7 +7553,7 @@ doset() /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
              "Booleans (selecting will toggle value):", MENU_ITEMFLAGS_NONE);
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
@@ -7562,13 +7578,14 @@ doset() /* changing options via menu by Per Liboriussen */
                 else
                     Sprintf(buf, fmtstr_doset_tab,
                             name, *bool_p ? "true" : "false");
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
 
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
              "Compounds (selecting will prompt for new value):",
              MENU_ITEMFLAGS_NONE);
 
@@ -7599,9 +7616,10 @@ doset() /* changing options via menu by Per Liboriussen */
         }
 
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-             "Other settings:", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings, "Other settings:", MENU_ITEMFLAGS_NONE);
 
     for (i = 0; (name = othropt[i].name) != 0; i++) {
         if ((is_wc_option(name) && !wc_supported(name))
@@ -7613,8 +7631,10 @@ doset() /* changing options via menu by Per Liboriussen */
 
 #ifdef PREFIXES_IN_USE
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings,
              "Variable playground locations:", MENU_ITEMFLAGS_NONE);
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], -1, 0);
@@ -7745,7 +7765,8 @@ int indexoffset;    /* value to add to index in allopt[], or zero
                 value);
     else
         Sprintf(buf, fmtstr_doset_tab, option, value);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
 static void
@@ -7769,7 +7790,8 @@ int nset;
                 name, buf2);
     else
         Sprintf(buf, fmtstr_doset_tab, name, buf2);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
@@ -7924,8 +7946,9 @@ int numtotal;
             continue;
         Sprintf(tmpbuf, action_titles[i].desc,
                 (i == 1) ? makeplural(optname) : optname);
-        add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr, 0, ATR_NONE,
-                 tmpbuf, (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo,&any, action_titles[i].letr,
+                 0, ATR_NONE, tmpbuf,
+                 (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Do what?");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
@@ -8411,8 +8434,8 @@ char *class_select;
             }
         }
         any.a_int = *class_list;
-        add_menu(win, NO_GLYPH, &any, accelerator, category ? *class_list : 0,
-                 ATR_NONE, buf,
+        add_menu(win, &nul_glyphinfo, &any, accelerator,
+                 category ? *class_list : 0, ATR_NONE, buf,
                  selected ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         ++class_list;
         if (category > 0) {
@@ -8426,13 +8449,15 @@ char *class_select;
     if (category == 1 && next_accelerator <= 'z') {
         /* for objects, add "A - ' '  all classes", after a separator */
         any = cg.zeroany;
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
         any.a_int = (int) ' ';
         Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
-        add_menu(win, NO_GLYPH, &any, 'A', 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 'A', 0,
+                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, prompt);
     n = select_menu(win, way ? PICK_ANY : PICK_ONE, &pick_list);

@@ -36,9 +36,8 @@ typedef struct mswin_nhmsg_putstr {
 typedef struct mswin_nhmsg_print_glyph {
     XCHAR_P x;
     XCHAR_P y;
-    int glyph;
-    int bkglyph;
-    int glyphmod[NUM_GLYPHMOD];
+    glyph_info glyphinfo;
+    glyph_info bkglyphinfo;
 } MSNHMsgPrintGlyph, *PMSNHMsgPrintGlyph;
 
 typedef struct mswin_nhmsg_cliparound {
@@ -47,7 +46,7 @@ typedef struct mswin_nhmsg_cliparound {
 } MSNHMsgClipAround, *PMSNHMsgClipAround;
 
 typedef struct mswin_nhmsg_add_menu {
-    int glyph;
+    glyph_info glyphinfo;
     const ANY_P *identifier;
     CHAR_P accelerator;
     CHAR_P group_accel;

@@ -2898,10 +2898,8 @@ mhitm_ad_slee(magr, mattk, mdef, mhm)
 struct monst *magr;
 struct attack *mattk;
 struct monst *mdef;
-struct mhitm_data *mhm;
+struct mhitm_data *mhm UNUSED;
 {
-    mhm->damage = 0; /* no HP damage */
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3032,10 +3030,8 @@ mhitm_ad_ench(magr, mattk, mdef, mhm)
 struct monst *magr;
 struct attack *mattk;
 struct monst *mdef;
-struct mhitm_data *mhm;
+struct mhitm_data *mhm UNUSED;
 {
-    mhm->damage = 0; /* no HP damage */
-
     if (magr == &g.youmonst) {
         /* uhitm */
         /* there's no msomearmor() function, so just do damage */
@@ -3085,10 +3081,8 @@ mhitm_ad_slow(magr, mattk, mdef, mhm)
 struct monst *magr;
 struct attack *mattk;
 struct monst *mdef;
-struct mhitm_data *mhm;
+struct mhitm_data *mhm UNUSED;
 {
-    mhm->damage = 0; /* no HP damage */
-
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);

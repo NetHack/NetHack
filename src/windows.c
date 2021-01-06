@@ -70,7 +70,7 @@ static void FDECL(dump_clear_nhwindow, (winid));
 static void FDECL(dump_display_nhwindow, (winid, BOOLEAN_P));
 static void FDECL(dump_destroy_nhwindow, (winid));
 static void FDECL(dump_start_menu, (winid, unsigned long));
-static void FDECL(dump_add_menu, (winid, int, const ANY_P *, CHAR_P,
+static void FDECL(dump_add_menu, (winid, const glyph_info *, const ANY_P *, CHAR_P,
                                       CHAR_P, int, const char *, unsigned int));
 static void FDECL(dump_end_menu, (winid, const char *));
 static int FDECL(dump_select_menu, (winid, int, MENU_ITEM_P **));
@@ -516,11 +516,13 @@ static void FDECL(hup_init_nhwindows, (int *, char **));
 static void FDECL(hup_exit_nhwindows, (const char *));
 static winid FDECL(hup_create_nhwindow, (int));
 static int FDECL(hup_select_menu, (winid, int, MENU_ITEM_P **));
-static void FDECL(hup_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P,
-                                 int, const char *, unsigned int));
+static void FDECL(hup_add_menu, (winid, const glyph_info *, const anything *,
+                                 CHAR_P, CHAR_P, int, const char *,
+                                 unsigned int));
 static void FDECL(hup_end_menu, (winid, const char *));
 static void FDECL(hup_putstr, (winid, int, const char *));
-static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int, unsigned *));
+static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P,
+                                    const glyph_info *, const glyph_info *));
 static void FDECL(hup_outrip, (winid, int, time_t));
 static void FDECL(hup_curs, (winid, int, int));
 static void FDECL(hup_display_nhwindow, (winid, BOOLEAN_P));
@@ -704,9 +706,10 @@ struct mi **menu_list UNUSED;
 
 /*ARGSUSED*/
 static void
-hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, itemflags)
+hup_add_menu(window, glyphinfo, identifier, sel, grpsel, attr, txt, itemflags)
 winid window UNUSED;
-int glyph UNUSED, attr UNUSED;
+const glyph_info *glyphinfo UNUSED;
+int attr UNUSED;
 const anything *identifier UNUSED;
 char sel UNUSED, grpsel UNUSED;
 const char *txt UNUSED;
@@ -736,12 +739,11 @@ const char *text UNUSED;
 
 /*ARGSUSED*/
 static void
-hup_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
+hup_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
 winid window UNUSED;
 xchar x UNUSED, y UNUSED;
-int glyph UNUSED;
-int bkglyph UNUSED;
-unsigned *glyphmod UNUSED;
+const glyph_info *glyphinfo UNUSED;
+const glyph_info *bkglyphinfo UNUSED;
 {
     return;
 }
@@ -1340,9 +1342,9 @@ unsigned long mbehavior UNUSED;
 
 /*ARGSUSED*/
 static void
-dump_add_menu(win, glyph, identifier, ch, gch, attr, str, itemflags)
+dump_add_menu(win, glyphinfo, identifier, ch, gch, attr, str, itemflags)
 winid win UNUSED;
-int glyph;
+const glyph_info *glyphinfo;
 const anything *identifier UNUSED;
 char ch;
 char gch UNUSED;
@@ -1351,7 +1353,7 @@ const char *str;
 unsigned int itemflags UNUSED;
 {
     if (dumplog_file) {
-        if (glyph == NO_GLYPH)
+        if (glyphinfo->glyph == NO_GLYPH)
             fprintf(dumplog_file, " %s\n", str);
         else
             fprintf(dumplog_file, "  %c - %s\n", ch, str);
@@ -1434,15 +1436,20 @@ int
 glyph2ttychar(glyph)
 int glyph;
 {
-    int so;
-    unsigned glyphmod[NUM_GLYPHMOD];
+    glyph_info glyphinfo;
 
-    map_glyphmod(0, 0, glyph, MG_FLAG_RETURNIDX, glyphmod);
-    so = (int) glyphmod[GM_TTYCHAR];
-    if (so >= 0  && so < SYM_MAX)
-        return (int) g.showsyms[so];
-    else
-        return ' ';
+    map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
+    return glyphinfo.ttychar;
+}
+
+int
+glyph2symidx(glyph)
+int glyph;
+{
+    glyph_info glyphinfo;
+
+    map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
+    return glyphinfo.symidx;
 }
 
 char *
@@ -1462,7 +1469,7 @@ const char *str;
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
-    unsigned glyphmod[NUM_GLYPHMOD];
+    glyph_info glyphinfo = nul_glyphinfo;
 
     if (!str)
         return strcpy(buf, "");
@@ -1488,8 +1495,8 @@ const char *str;
                             gv = (gv * 16) + ((int) (dp - hex) / 2);
                         else
                             break;
-                    map_glyphmod(0, 0, gv, MG_FLAG_RETURNIDX, glyphmod);
-                    so = glyphmod[GM_TTYCHAR];
+                    map_glyphinfo(0, 0, gv, 0, &glyphinfo);
+                    so = glyphinfo.symidx;
                     *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */

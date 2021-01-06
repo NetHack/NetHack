@@ -423,12 +423,12 @@ void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
     window->StartMenu(wid == WIN_INVEN);
 }
 
-void NetHackQtBind::qt_add_menu(winid wid, int glyph,
+void NetHackQtBind::qt_add_menu(winid wid, const glyph_info *glyphinfo,
     const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
     const char *str, unsigned itemflags)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->AddMenu(glyph, identifier, ch, gch, attr,
+    window->AddMenu(glyphinfo->glyph, identifier, ch, gch, attr,
             QString::fromLatin1(str),
             itemflags);
 }
@@ -474,12 +474,13 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph,
-                                    int bkglyph UNUSED, unsigned *glyphmod)
+void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,
+                                   const glyph_info *glyphinfo,
+                                   const glyph_info *bkglyphinfo UNUSED)
 {
     /* TODO: bkglyph */
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->PrintGlyph(x,y,glyph,glyphmod);
+    window->PrintGlyph(x,y,glyphinfo);
 }
 //void NetHackQtBind::qt_print_glyph_compose(winid wid,xchar x,xchar y,int glyph1, int glyph2)
 //{

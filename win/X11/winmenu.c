@@ -631,9 +631,9 @@ unsigned long mbehavior UNUSED;
 
 /*ARGSUSED*/
 void
-X11_add_menu(window, glyph, identifier, ch, gch, attr, str, itemflags)
+X11_add_menu(window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
 winid window;
-int glyph; /* unused (for now) */
+const glyph_info *glyphinfo UNUSED;
 const anything *identifier;
 char ch;
 char gch; /* group accelerator (0 = no group) */
@@ -644,8 +644,6 @@ unsigned itemflags;
     x11_menu_item *item;
     struct menu_info_t *menu_info;
     boolean preselected = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
-
-    nhUse(glyph);
 
     check_winid(window);
     menu_info = window_list[window].menu_information;

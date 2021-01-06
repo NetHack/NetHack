@@ -118,9 +118,9 @@ VDECLCB(shim_putstr,(winid w, int attr, const char *str), "viis", A2P w, A2P att
 VDECLCB(shim_display_file,(const char *name, BOOLEAN_P complain), "vsi", P2V name, A2P complain)
 VDECLCB(shim_start_menu,(winid window, unsigned long mbehavior), "vii", A2P window, A2P mbehavior)
 VDECLCB(shim_add_menu,
-    (winid window, int glyph, const ANY_P *identifier, CHAR_P ch, CHAR_P gch, int attr, const char *str, unsigned int itemflags),
+    (winid window, const glyph_info *glyphinfo, const ANY_P *identifier, CHAR_P ch, CHAR_P gch, int attr, const char *str, unsigned int itemflags),
     "viipiiisi",
-    A2P window, A2P glyph, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
+    A2P window, P2VP glyphinfo, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
 VDECLCB(shim_end_menu,(winid window, const char *prompt), "vis", A2P window, P2V prompt)
 /* XXX: shim_select_menu menu_list is an output */
 DECLCB(int, shim_select_menu,(winid window, int how, MENU_ITEM_P **menu_list), "iiio", A2P window, A2P how, P2V menu_list)
@@ -129,7 +129,7 @@ VDECLCB(shim_mark_synch,(void), "v")
 VDECLCB(shim_wait_synch,(void), "v")
 VDECLCB(shim_cliparound,(int x, int y), "vii", A2P x, A2P y)
 VDECLCB(shim_update_positionbar,(char *posbar), "vp", P2V posbar)
-VDECLCB(shim_print_glyph,(winid w, int x, int y, int glyph, int bkglyph, int glyphmod[NUM_GLYPHMOD]), "viiiii", A2P w, A2P x, A2P y, A2P glyph, A2P bkglyph, A2P glyphmod)
+VDECLCB(shim_print_glyph,(winid w, int x, int y, const glyph_info *glyph, const glyph_info *bkglyph), "viiiii", A2P w, A2P x, A2P y, V2P glyphinfo, V2P bkglyphinfo)
 VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VDECLCB(shim_raw_print_bold,(const char *str), "vs", P2V str)
 DECLCB(int, shim_nhgetch,(void), "i")

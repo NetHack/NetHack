@@ -2183,8 +2183,8 @@ boolean unreachable;
     } else {
         any.a_int = lchoices->idx + 1;
     }
-    add_menu(win, NO_GLYPH, &any, lchoices->menuletter, 0, ATR_NONE, entry,
-             MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, lchoices->menuletter, 0,
+             ATR_NONE, entry, MENU_ITEMFLAGS_NONE);
     /* this assumes there are at most 52 interesting levels */
     if (lchoices->menuletter == 'z')
         lchoices->menuletter = 'A';
@@ -2295,8 +2295,8 @@ xchar *rdgn;
         }
         if (bymenu) {
             any = cg.zeroany;
-            add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     iflags.menu_headings, buf, MENU_ITEMFLAGS_NONE);
         } else
             putstr(win, 0, buf);
 

@@ -1075,19 +1075,19 @@ cond_menu(VOID_ARGS)
         Sprintf(mbuf, "change sort order from \"%s\" to \"%s\"",
                 menutitle[g.condmenu_sortorder],
                 menutitle[1 - g.condmenu_sortorder]);
-        add_menu(tmpwin, NO_GLYPH, &any, 'S', 0, ATR_NONE, mbuf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'S', 0, ATR_NONE,
+                 mbuf, MENU_ITEMFLAGS_NONE);
         any = cg.zeroany;
         Sprintf(mbuf, "sorted %s", menutitle[g.condmenu_sortorder]);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, mbuf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                 iflags.menu_headings, mbuf, MENU_ITEMFLAGS_NONE);
         for (i = 0; i < SIZE(condtests); i++) {
             idx = sequence[i];
             Sprintf(mbuf, "cond_%-14s", condtests[idx].useroption);
             any = cg.zeroany;
             any.a_int = idx + 2; /* avoid zero and the sort change pick */
             condtests[idx].choice = FALSE;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      mbuf,
                      condtests[idx].enabled
                         ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
@@ -2346,7 +2346,7 @@ int arrmin, arrmax;
     for (i = arrmin; i < arrmax; i++) {
         any = cg.zeroany;
         any.a_int = i + adj;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  arr[i], MENU_ITEMFLAGS_NONE);
     }
 
@@ -2691,7 +2691,7 @@ query_conditions()
     for (i = 0; i < SIZE(conditions); i++) {
         any = cg.zeroany;
         any.a_ulong = conditions[i].mask;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  conditions[i].text[0], MENU_ITEMFLAGS_NONE);
     }
 
@@ -3260,7 +3260,7 @@ status_hilite_menu_choose_field()
 #endif
         any = cg.zeroany;
         any.a_int = (i + 1);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  initblstats[i].fldname, MENU_ITEMFLAGS_NONE);
     }
 
@@ -3299,7 +3299,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_ALWAYS_HILITE;
         Sprintf(buf, "Always highlight %s", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 'a', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE,
                  buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3307,7 +3307,7 @@ int fld;
     if (fld == BL_CONDITION) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_CONDITION;
-        add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE,
                  "Bitmask of conditions", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3316,7 +3316,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_UPDOWN;
         Sprintf(buf, "%s value changes", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'c', 0, ATR_NONE,
                  buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3325,7 +3325,7 @@ int fld;
         && (at == ANY_INT || at == ANY_LONG)) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_ABSOLUTE;
-        add_menu(tmpwin, NO_GLYPH, &any, 'n', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'n', 0, ATR_NONE,
                  "Number threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3333,7 +3333,7 @@ int fld;
     if (initblstats[fld].idxmax >= 0) {
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
-        add_menu(tmpwin, NO_GLYPH, &any, 'p', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'p', 0, ATR_NONE,
                  "Percentage threshold", MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3343,7 +3343,7 @@ int fld;
         any = cg.zeroany;
         any.a_int = onlybeh = BL_TH_TEXTMATCH;
         Sprintf(buf, "%s text match", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE,
                  buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
@@ -3390,7 +3390,7 @@ boolean ltok, gtok;
             Sprintf(buf, "Value goes down");
         any = cg.zeroany;
         any.a_int = 10 + LT_VALUE;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  buf, MENU_ITEMFLAGS_NONE);
 
         if (str) {
@@ -3398,7 +3398,7 @@ boolean ltok, gtok;
                     str, (fld == BL_AC) ? "better (lower)" : "less");
             any = cg.zeroany;
             any.a_int = 10 + LE_VALUE;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      buf, MENU_ITEMFLAGS_NONE);
         }
     }
@@ -3409,7 +3409,7 @@ boolean ltok, gtok;
         Sprintf(buf, "Value changes");
     any = cg.zeroany;
     any.a_int = 10 + EQ_VALUE;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              buf, MENU_ITEMFLAGS_NONE);
 
     if (gtok) {
@@ -3418,7 +3418,7 @@ boolean ltok, gtok;
                     str, (fld == BL_AC) ? "worse (higher)" : "more");
             any = cg.zeroany;
             any.a_int = 10 + GE_VALUE;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                      buf, MENU_ITEMFLAGS_NONE);
         }
 
@@ -3429,7 +3429,7 @@ boolean ltok, gtok;
             Sprintf(buf, "Value goes up");
         any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              buf, MENU_ITEMFLAGS_NONE);
     }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
@@ -3931,7 +3931,7 @@ int fld;
             if (hlstr->fld == fld) {
                 any = cg.zeroany;
                 any.a_int = hlstr->id;
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          hlstr->str, MENU_ITEMFLAGS_NONE);
             }
             hlstr = hlstr->next;
@@ -3939,19 +3939,19 @@ int fld;
     } else {
         any = cg.zeroany;
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
                  MENU_ITEMFLAGS_NONE);
     }
 
     /* separator line */
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "",
              MENU_ITEMFLAGS_NONE);
 
     if (count) {
         any = cg.zeroany;
         any.a_int = -1;
-        add_menu(tmpwin, NO_GLYPH, &any, 'X', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'X', 0, ATR_NONE,
                  "Remove selected hilites",
                  MENU_ITEMFLAGS_NONE);
     }
@@ -3968,7 +3968,7 @@ int fld;
     {
         any = cg.zeroany;
         any.a_int = -2;
-        add_menu(tmpwin, NO_GLYPH, &any, 'Z', 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'Z', 0, ATR_NONE,
                  "Add a new hilite", MENU_ITEMFLAGS_NONE);
     }
 
@@ -4064,12 +4064,12 @@ shlmenu_redo:
     if (countall) {
         any = cg.zeroany;
         any.a_int = -1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "View all hilites in config format",
                  MENU_ITEMFLAGS_NONE);
 
         any = cg.zeroany;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "",
                  MENU_ITEMFLAGS_NONE);
     }
 
@@ -4090,7 +4090,7 @@ shlmenu_redo:
         Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
             Sprintf(eos(buf), " (%d defined)", count);
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  buf, MENU_ITEMFLAGS_NONE);
     }
 

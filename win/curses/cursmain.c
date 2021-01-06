@@ -240,21 +240,45 @@ curses_player_selection()
 void
 curses_askname()
 {
+    const char *bail_msg = "Until next time then...";
+    int trylimit = 10;
+
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(MAP_WIN)) {
-        case -1:
-            curses_bail("Until next time then..."); /* quit */
-            /*NOTREACHED*/
-        case 0:
-            break; /* no game chosen; start new game */
-        case 1:
-            return; /* g.plname[] has been set */
+        case -1: /* quit */
+            goto bail;
+        case 0: /* new game */
+            break;
+        case 1: /* picked a save file to restore and set plname[] for it */
+            return;
         }
 #endif /* SELECTSAVED */
 
-    g.plname[0] = '\0';
-    curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
+    do {
+        if (--trylimit < 0) {
+             bail_msg = "A name is required; giving up.";
+             goto bail;
+        }
+
+        g.plname[0] = '\0';
+        /* for askname(), this will use wgetnstr() which treats ESC like
+           an ordinary character; fake the behavior we want:  as kill_char
+           if it follows any input or as cancel if it is at the start;
+           player has to type <escape><return> to get back here though */
+        curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
+
+        if (g.plname[0] == '\033')
+            goto bail;
+        (void) mungspaces(g.plname);
+    } while (!g.plname[0] || index(g.plname, '\033') != 0);
+
+    /* we get here if input is non-empty and doesn't contain ESC */
+    return;
+
+ bail:
+    curses_bail(bail_msg);
+    /*NOTREACHED*/
 }
 
 
@@ -500,7 +524,8 @@ curses_start_menu(winid wid, unsigned long mbehavior)
 }
 
 /*
-add_menu(winid wid, int glyph, const anything identifier,
+add_menu(winid wid, const glyph_info *glyphinfo,
+                                const anything identifier,
                                 char accelerator, char groupacc,
                                 int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If identifier
@@ -512,7 +537,8 @@ add_menu(winid wid, int glyph, const anything identifier,
                    accelerator.  It is up to the window-port to make the
                    accelerator visible to the user (e.g. put "a - " in front
                    of str).  The value attr is the same as in putstr().
-                   Glyph is an optional glyph to accompany the line.  If
+                -- Glyph is an optional glyph to accompany the line and its
+                   modifiers (if any) can be found in glyphinfo.  If
                    window port cannot or does not want to display it, this
                    is OK.  If there is no glyph applicable, then this
                    value will be NO_GLYPH.
@@ -531,7 +557,8 @@ add_menu(winid wid, int glyph, const anything identifier,
                    menu is displayed, set bit MENU_ITEMFLAGS_SELECTED.
 */
 void
-curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
+curses_add_menu(winid wid, const glyph_info *glyphinfo,
+                const ANY_P * identifier,
                 CHAR_P accelerator, CHAR_P group_accel, int attr,
                 const char *str, unsigned itemflags)
 {
@@ -541,12 +568,12 @@ curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
     curses_attr = curses_convert_attr(attr);
 
     if (inv_update) {
-        curses_add_inv(inv_update, glyph, accelerator, curses_attr, str);
+        curses_add_inv(inv_update, glyphinfo, accelerator, curses_attr, str);
         inv_update++;
         return;
     }
 
-    curses_add_nhmenu_item(wid, glyph, identifier, accelerator, group_accel,
+    curses_add_nhmenu_item(wid, glyphinfo, identifier, accelerator, group_accel,
                            curses_attr, str, itemflags);
 }
 
@@ -662,30 +689,45 @@ curses_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph, bkglyph, glyphmod)
-                -- Print the glyph at (x,y) on the given window.  Glyphs are
-                   integers at the interface, mapped to whatever the window-
+print_glyph(window, x, y, glyphinfo, bkglyphinfo)
+                -- Print glyph at (x,y) on the given window.  Glyphs are
+                   integers within the glyph_info struct that is passed
+                   at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
-                   bkglyph is to render the background behind the glyph.
+                   bkglyphinfo is to render the background behind the glyph.
                    It's not used here.
-                -- glyphmod (glyphmod[NUM_GLYPHNOD]) provides extended
-                   information about the glyph that window ports can use to
-                   enhance the display in various ways.
+               -- bkglyphinfo contains a background glyph for potential use
+                   by some graphical or tiled environments to allow the depiction
+                   to fall against a background consistent with the grid 
+                   around x,y. If bkglyphinfo->glyph is NO_GLYPH, then the
+                   parameter should be ignored (do nothing with it).
+                -- glyph_info struct fields:
+                    int glyph;            the display entity
+                    int color;            color for window ports not using a tile
+                    int ttychar;          the character mapping for the original tty
+                                          interface. Most or all window ports wanted
+                                          and used this for various things so it is
+                                          provided in 3.7+
+                    short int symidx;     offset into syms array
+                    unsigned glyphflags;  more detail about the entity
 
 */
+
 void
-curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
-                   int bkglyph UNUSED, unsigned *glyphmod)
+curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+                   const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
 {
+    int glyph;
     int ch;
     int color;
     unsigned int special;
     int attr = -1;
 
-    special = glyphmod[GM_FLAGS];
-    ch = (int) glyphmod[GM_TTYCHAR];
-    color = (int) glyphmod[GM_COLOR];
+    glyph = glyphinfo->glyph;
+    special = glyphinfo->glyphflags;
+    ch = glyphinfo->ttychar;
+    color = glyphinfo->color;
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }
@@ -710,7 +752,7 @@ curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph,
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */
         if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
-            attr = A_REVERSE; /* map_glyphmod() only sets this if color is off */
+            attr = A_REVERSE; /* map_glyphinfo() only sets this if color is off */
         }
     }
 

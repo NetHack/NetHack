@@ -73,12 +73,11 @@ static void FDECL(display_cursor, (struct xwindow *));
 /* Global functions ======================================================= */
 
 void
-X11_print_glyph(window, x, y, glyph, bkglyph, glyphmod)
+X11_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
 winid window;
 xchar x, y;
-int glyph;
-int bkglyph UNUSED;
-unsigned *glyphmod UNUSED;
+const glyph_info *glyphinfo;
+const glyph_info *bkglyphinfo UNUSED;
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -94,8 +93,8 @@ unsigned *glyphmod UNUSED;
     {
         unsigned short *t_ptr = &map_info->tile_map.glyphs[y][x].glyph;
 
-        if (*t_ptr != glyph) {
-            *t_ptr = glyph;
+        if (*t_ptr != glyphinfo->glyph) {
+            *t_ptr = glyphinfo->glyph;
             if (map_info->is_tile)
                 update_bbox = TRUE;
         }
@@ -110,12 +109,13 @@ unsigned *glyphmod UNUSED;
         register unsigned char *co_ptr;
 #endif
 
-        /* map glyph to character and color */
-        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
+        color = glyphinfo->color;
+        special = glyphinfo->glyphflags;
+        och = glyphinfo->ttychar;
         ch = (uchar) och;
 
-        if (special != map_info->tile_map.glyphs[y][x].special) {
-            map_info->tile_map.glyphs[y][x].special = special;
+        if (special != map_info->tile_map.glyphs[y][x].glyphflags) {
+            map_info->tile_map.glyphs[y][x].glyphflags = special;
             update_bbox = TRUE;
         }
 
@@ -933,13 +933,13 @@ struct map_info_t *map_info;
     int x, y;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
-    int mgunexp = ' ', mgnothg = ' ', mgcolor = NO_COLOR;
-    unsigned mgspecial = 0;
+    int mgunexp = ' ', mgnothg = ' ';
     struct tile_map_info_t *tile_map = &map_info->tile_map;
     struct text_map_info_t *text_map = &map_info->text_map;
 
-    mapglyph(GLYPH_UNEXPLORED, &mgunexp, &mgcolor, &mgspecial, 0, 0, 0U);
-    mapglyph(GLYPH_NOTHING, &mgnothg, &mgcolor, &mgspecial, 0, 0, 0U);
+    mgunexp = glyph2ttychar(GLYPH_UNEXPLORED);
+    mgnothg = glyph2ttychar(GLYPH_NOTHING);
+
     /*
      * Tiles map tracks glyphs.
      * Text map tracks characters derived from glyphs.
@@ -947,7 +947,7 @@ struct map_info_t *map_info;
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
             tile_map->glyphs[y][x].glyph = !x ? g_nothg : g_unexp;
-            tile_map->glyphs[y][x].special = 0;
+            tile_map->glyphs[y][x].glyphflags = 0;
 
             text_map->text[y][x] = (uchar) (!x ? mgnothg : mgunexp);
 #ifdef TEXTCOLOR
@@ -1296,7 +1296,7 @@ boolean inverted;
                 int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
 
-                if ((tile_map->glyphs[row][cur_col].special & MG_FEMALE))
+                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_FEMALE))
                     tile++; /* advance to the female tile variation */
                 src_x = (tile % TILES_PER_ROW) * tile_width;
                 src_y = (tile / TILES_PER_ROW) * tile_height;
@@ -1305,7 +1305,7 @@ boolean inverted;
                           src_x, src_y, tile_width, tile_height,
                           dest_x, dest_y);
 
-                if (glyph_is_pet(glyph) && iflags.hilite_pet) {
+                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_PET) && iflags.hilite_pet) {
                     /* draw pet annotation (a heart) */
                     XSetForeground(dpy, tile_map->black_gc,
                                    pet_annotation.foreground);
@@ -1320,7 +1320,7 @@ boolean inverted;
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
                 }
-                if ((tile_map->glyphs[row][cur_col].special & MG_OBJPILE)) {
+                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_OBJPILE)) {
                     /* draw object pile annotation (a plus sign) */
                     XSetForeground(dpy, tile_map->black_gc,
                                    pile_annotation.foreground);

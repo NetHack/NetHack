@@ -80,7 +80,8 @@ extern void curses_curs(winid wid, int x, int y);
 extern void curses_putstr(winid wid, int attr, const char *text);
 extern void curses_display_file(const char *filename, BOOLEAN_P must_exist);
 extern void curses_start_menu(winid wid, unsigned long);
-extern void curses_add_menu(winid wid, int glyph, const ANY_P * identifier,
+extern void curses_add_menu(winid wid, const glyph_info *,
+                            const ANY_P * identifier,
                             CHAR_P accelerator, CHAR_P group_accel, int attr,
                             const char *str, unsigned int itemflags);
 extern void curses_end_menu(winid wid, const char *prompt);
@@ -90,7 +91,7 @@ extern void curses_mark_synch(void);
 extern void curses_wait_synch(void);
 extern void curses_cliparound(int x, int y);
 extern void curses_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
-                               int glyph, int bkglyph, unsigned *glyphmod);
+                                const glyph_info *, const glyph_info *);
 extern void curses_raw_print(const char *str);
 extern void curses_raw_print_bold(const char *str);
 extern int curses_nhgetch(void);
@@ -174,7 +175,7 @@ extern int curses_character_input_dialog(const char *prompt,
                                          const char *choices, CHAR_P def);
 extern int curses_ext_cmd(void);
 extern void curses_create_nhmenu(winid wid, unsigned long);
-extern void curses_add_nhmenu_item(winid wid, int glyph,
+extern void curses_add_nhmenu_item(winid wid, const glyph_info *,
                                    const ANY_P *identifier, CHAR_P accelerator,
                                    CHAR_P group_accel, int attr,
                                    const char *str, unsigned itemflags);
@@ -194,7 +195,8 @@ extern void curses_status_update(int, genericptr_t, int, int, int,
 /* cursinvt.c */
 
 extern void curses_update_inv(void);
-extern void curses_add_inv(int, int, CHAR_P, attr_t, const char *);
+extern void curses_add_inv(int, const glyph_info *,
+                           CHAR_P, attr_t, const char *);
 
 /* cursinit.c */
 

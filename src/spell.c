@@ -1583,13 +1583,14 @@ spellsortmenu()
             let = 'z'; /* assumes fewer than 26 sort choices... */
             /* separate final choice from others with a blank line */
             any.a_int = 0;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, "", MENU_ITEMFLAGS_NONE);
         } else {
             let = 'a' + i;
         }
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, let, 0, ATR_NONE, spl_sortchoices[i],
+        add_menu(tmpwin, &nul_glyphinfo, &any, let, 0,
+                 ATR_NONE, spl_sortchoices[i],
                  (i == g.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "View known spells list sorted");
@@ -1676,8 +1677,8 @@ int *spell_no;
         Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
     }
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, buf,
-             MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings, buf, MENU_ITEMFLAGS_NONE);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
         splnum = !g.spl_orderindx ? i : g.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),
@@ -1686,8 +1687,10 @@ int *spell_no;
                 spellretention(splnum, retentionbuf));
 
         any.a_int = splnum + 1; /* must be non-zero */
-        add_menu(tmpwin, NO_GLYPH, &any, spellet(splnum), 0, ATR_NONE, buf,
-                 (splnum == splaction) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, spellet(splnum), 0,
+                 ATR_NONE, buf,
+                 (splnum == splaction)
+                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     how = PICK_ONE;
     if (splaction == SPELLMENU_VIEW) {
@@ -1697,8 +1700,8 @@ int *spell_no;
         } else {
             /* more than 1 spell, add an extra menu entry */
             any.a_int = SPELLMENU_SORT + 1;
-            add_menu(tmpwin, NO_GLYPH, &any, '+', 0, ATR_NONE,
-                     "[sort spells]", MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, '+', 0,
+                     ATR_NONE, "[sort spells]", MENU_ITEMFLAGS_NONE);
         }
     }
     end_menu(tmpwin, prompt);

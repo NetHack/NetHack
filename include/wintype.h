@@ -52,6 +52,23 @@ enum any_types {
     ANY_MASK32       /* 32-bit mask (stored as unsigned long) */
 };
 
+/* glyph plus additional info
+   if you add fields or change the ordering, fix up the following:
+        g_info initialization in display.c
+        nul_glyphinfo initialization in decl.c
+ */
+typedef struct gi {
+    int glyph;            /* the display entity */
+    int color;            /* color for window ports not using a tile */
+    int ttychar;          /* the character mapping for the original tty
+                             interface. Most or all window ports wanted
+                             and used this for various things so it is
+                             provided in 3.7+ */
+    short int symidx;     /* offset into syms array */
+    unsigned glyphflags;  /* more detail about the nature of the entity */
+} glyph_info;
+#define GLYPH_INFO_P struct gi
+
 /* menu return list */
 typedef struct mi {
     anything item;     /* identifier */

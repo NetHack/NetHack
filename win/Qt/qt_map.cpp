@@ -536,13 +536,13 @@ void NetHackQtMapViewport::CursorTo(int x,int y)
     Changed(cursor.x(), cursor.y());
 }
 
-void NetHackQtMapViewport::PrintGlyph(int x, int y, int theglyph,
-                                      unsigned *glyphmod)
+void NetHackQtMapViewport::PrintGlyph(int x, int y,
+                                      const glyph_info *glyphinfo)
 {
-    Glyph(x, y) = (unsigned short) theglyph;
-    Glyphttychar(x, y) = (unsigned short) glyphmod[GM_TTYCHAR];
-    Glyphcolor(x, y) = (unsigned short) glyphmod[GM_COLOR];
-    Glyphflags(x, y) = glyphmod[GM_FLAGS];
+    Glyph(x, y) = (unsigned short) glyphinfo->glyph;
+    Glyphttychar(x, y) = (unsigned short) glyphinfo->ttychar;
+    Glyphcolor(x, y) = (unsigned short) glyphinfo->color;
+    Glyphflags(x, y) = glyphinfo->glyphflags;
     Changed(x, y);
 }
 
@@ -647,9 +647,10 @@ void NetHackQtMapWindow2::ClipAround(int x,int y)
     ensureVisible(x,y,width()*0.45,height()*0.45);
 }
 
-void NetHackQtMapWindow2::PrintGlyph(int x,int y,int glyph, unsigned *glyphmod)
+void NetHackQtMapWindow2::PrintGlyph(int x,int y,
+                                     const glyph_info *glyphinfo)
 {
-    m_viewport->PrintGlyph(x, y, glyph, glyphmod);
+    m_viewport->PrintGlyph(x, y, glyphinfo);
 }
 
 #if 0 //RLC
@@ -1004,12 +1005,12 @@ void NetHackQtMapWindow::ClipAround(int x,int y)
     viewport.center(x,y,0.45,0.45);
 }
 
-void NetHackQtMapWindow::PrintGlyph(int x,int y,int glyph, unsigned *glyphmod)
+void NetHackQtMapWindow::PrintGlyph(int x,int y, const glyph_info *glyphinfo)
 {
-    Glyph(x,y)=glyph;
-    Glyphttychar(x,y)=glyphmod[GM_TTYCHAR];
-    Glyphcolor(x,y)=glyphmod[GM_COLOR];
-    Glyphflags(x,y)=glyphmod[GM_FLAGS];
+    Glyph(x,y)=glyphinfo->glyph;
+    Glyphttychar(x,y)=glyphinfo->ttychar;
+    Glyphcolor(x,y)=glyphinfo->color;
+    Glyphflags(x,y)=glyphinfo->glyphflags;
     Changed(x,y);
 }
 
