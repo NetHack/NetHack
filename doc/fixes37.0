@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ $NHDT-Date: 1609811543 2021/01/05 01:52:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ $NHDT-Date: 1609977590 2021/01/06 23:59:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -482,10 +482,10 @@ remove unused vision tables
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
 curses: line input that doesn't take place on the bottom line of the message
-	window or in a popup doesn't support ESC to kill partial input or to
-	cancel; "Who are you?" prompt was willing to name a character "^[";
-	have askname() fake the usual ESC handling, but player has to type
-	<escape><return> for that to work
+	window uses a canned curses routine and doesn't support ESC to kill
+	partial input or to cancel; "Who are you?" prompt was willing to name
+	a character "^["; have the popup version of getlin() fake the usual
+	ESC handling, but player has to type <escape><return> for that to work
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching

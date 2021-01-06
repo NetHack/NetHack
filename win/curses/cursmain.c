@@ -240,9 +240,6 @@ curses_player_selection()
 void
 curses_askname()
 {
-    const char *bail_msg = "Until next time then...";
-    int trylimit = 10;
-
 #ifdef SELECTSAVED
     if (iflags.wc2_selectsaved && !iflags.renameinprogress)
         switch (restore_menu(MAP_WIN)) {
@@ -255,29 +252,16 @@ curses_askname()
         }
 #endif /* SELECTSAVED */
 
-    do {
-        if (--trylimit < 0) {
-             bail_msg = "A name is required; giving up.";
-             goto bail;
-        }
-
-        g.plname[0] = '\0';
-        /* for askname(), this will use wgetnstr() which treats ESC like
-           an ordinary character; fake the behavior we want:  as kill_char
-           if it follows any input or as cancel if it is at the start;
-           player has to type <escape><return> to get back here though */
-        curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
-
-        if (g.plname[0] == '\033')
-            goto bail;
-        (void) mungspaces(g.plname);
-    } while (!g.plname[0] || index(g.plname, '\033') != 0);
-
-    /* we get here if input is non-empty and doesn't contain ESC */
-    return;
+    curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
+    (void) mungspaces(g.plname);
+    if (g.plname[0] && g.plname[0] != '\033') {
+         iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
+         return;
+    }
 
  bail:
-    curses_bail(bail_msg);
+    /* message is delivered via raw_print() */
+    curses_bail("\nUntil next time then...\n");
     /*NOTREACHED*/
 }
 

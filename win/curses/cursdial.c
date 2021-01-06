@@ -131,7 +131,8 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
     int map_height, map_width, maxwidth, remaining_buf, winx, winy, count;
     WINDOW *askwin, *bwin;
     char *tmpstr;
-    int prompt_width, prompt_height = 1, height = prompt_height;
+    int prompt_width, prompt_height = 1, height = prompt_height,
+        answerx = 0, answery = 0, trylim;
     char input[BUFSZ];
 
     /* if messages were being suppressed for the remainder of the turn,
@@ -185,11 +186,28 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
                 wmove(askwin, count + 1, 0);
         }
         free(tmpstr);
+        /* remember where user's typed response will start, in case we
+           need to re-prompt */
+        getyx(askwin, answery, answerx);
     }
 
     echo();
     curs_set(1);
-    wgetnstr(askwin, input, buffer - 1);
+    trylim = 10;
+    do {
+        /* move and clear are only needed for 2nd and subsequent passes */
+        wmove(askwin, answery, answerx);
+        wclrtoeol(askwin);
+
+        wgetnstr(askwin, input, buffer - 1);
+        /* ESC after some input kills that input and tries again;
+           ESC at the start cancels, leaving ESC in the result buffer.
+           [Note: wgetnstr() treats <escape> as an ordinary character
+           so user has to type <escape><return> for it to behave the
+           way we want it to.] */
+        if (input[0] != '\033' && index(input, '\033') != 0)
+             input[0] = '\0';
+    } while (--trylim > 0 && !input[0]);
     curs_set(0);
     Strcpy(answer, input);
     werase(bwin);
