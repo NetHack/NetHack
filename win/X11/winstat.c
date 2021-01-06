@@ -893,7 +893,7 @@ unsigned long *colormasks;
         for (i = 0; i < SIZE(bl_to_fancyfield); i++)
             if (bl_to_fancyfield[i].bl == fld) {
                 update_fancy_status_field_with_hilites(bl_to_fancyfield[i].ff,
-                    color & 0xff, color >> 8 & 0xff);
+                    color & 0xf, color >> 8 & 0xff);
                 break;
             }
     }
@@ -1242,6 +1242,7 @@ struct X_status_value {
     boolean set;        /* if highlighted */
     boolean after_init; /* don't highlight on first change (init) */
     boolean inverted_hilite; /* if highlighted due to hilite_status inverse rule */
+    Pixel default_fg;   /* what FG color it initialized with */
 };
 
 /* valid type values */
@@ -1645,6 +1646,8 @@ long new_value;
             }
             attr_rec->turn_count = 0;
         } else {
+            XtSetArg(args[0], XtNforeground, &attr_rec->default_fg);
+            XtGetValues(attr_rec->w, args, ONE);
             attr_rec->after_init = TRUE;
         }
     }
@@ -1677,14 +1680,21 @@ int color;
     XrmValue source;
     XrmValue dest;
     
-    color &= CLR_MAX - 1;
     Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
-    char *arg_name = (sv->set || sv->inverted_hilite ? XtNbackground : XtNforeground);
-	source.size = strlen(mapCLR_to_res[color]) + 1;
-	source.addr = (char *)mapCLR_to_res[color];
-	dest.size = sizeof(Pixel);
-	dest.addr = (XPointer)&pixel;
-    if (source.size > 0 && XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
+    if (color == NO_COLOR) {
+        if (sv->after_init)
+            pixel = sv->default_fg;
+    }
+    else {
+    	source.size = strlen(mapCLR_to_res[color]) + 1;
+    	source.addr = (char *)mapCLR_to_res[color];
+    	dest.size = sizeof(Pixel);
+    	dest.addr = (XPointer)&pixel;
+        if (!XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest))
+            pixel = 0;
+    }
+    if (pixel != 0) {
+        char *arg_name = (sv->set || sv->inverted_hilite ? XtNbackground : XtNforeground);
         XtSetArg(args[0], arg_name, pixel);
         XtSetValues(w, args, ONE);
     }
