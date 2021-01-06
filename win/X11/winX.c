@@ -76,7 +76,9 @@ const char *mapCLR_to_res[CLR_MAX] = {
     XtNmagenta,
     XtNcyan,
     XtNgray,
-    XtNforeground,
+    "#a45125",	/* NO_COLOR. This value matchs what the app loads by
+                   default. Ideally this would come from the resource
+                   file or where ever it loads the default colors. */
     XtNorange,
     XtNbright_green,
     XtNyellow,
