@@ -1680,10 +1680,14 @@ int color;
     color &= CLR_MAX - 1;
     Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
     char *arg_name = (sv->set || sv->inverted_hilite ? XtNbackground : XtNforeground);
-    source.size = strlen(mapCLR_to_res[color]) + 1;
-    source.addr = (char *)mapCLR_to_res[color];
-    dest.size = sizeof(Pixel);
-    dest.addr = (XPointer)&pixel;
+    if (strcmp(mapCLR_to_res[color], XtNforeground) == 0)
+        pixel = 0;
+    else {
+        source.size = strlen(mapCLR_to_res[color]) + 1;
+        source.addr = (char *)mapCLR_to_res[color];
+        dest.size = sizeof(Pixel);
+        dest.addr = (XPointer)&pixel;
+    }
     if (source.size > 0 && XtConvertAndStore(w, XtRString, &source, XtRPixel, &dest)) {
         XtSetArg(args[0], arg_name, pixel);
         XtSetValues(w, args, ONE);

@@ -110,9 +110,8 @@ unsigned *glyphmod UNUSED;
         register unsigned char *co_ptr;
 #endif
 
-        color = glyphmod[GM_COLOR];
-        special = glyphmod[GM_FLAGS];
-        och = glyphmod[GM_TTYCHAR];
+        /* map glyph to character and color */
+        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
         ch = (uchar) och;
 
         if (special != map_info->tile_map.glyphs[y][x].special) {
@@ -934,13 +933,13 @@ struct map_info_t *map_info;
     int x, y;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
-    int mgunexp = ' ', mgnothg = ' ';
+    int mgunexp = ' ', mgnothg = ' ', mgcolor = NO_COLOR;
+    unsigned mgspecial = 0;
     struct tile_map_info_t *tile_map = &map_info->tile_map;
     struct text_map_info_t *text_map = &map_info->text_map;
 
-    mgunexp = glyph2ttychar(GLYPH_UNEXPLORED);
-    mgnothg = glyph2ttychar(GLYPH_NOTHING);
-
+    mapglyph(GLYPH_UNEXPLORED, &mgunexp, &mgcolor, &mgspecial, 0, 0, 0U);
+    mapglyph(GLYPH_NOTHING, &mgnothg, &mgcolor, &mgspecial, 0, 0, 0U);
     /*
      * Tiles map tracks glyphs.
      * Text map tracks characters derived from glyphs.
