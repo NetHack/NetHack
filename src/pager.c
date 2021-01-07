@@ -900,7 +900,7 @@ struct permonst **for_supplement;
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
         map_glyphinfo(cc.x, cc.y, glyph, 0, &glyphinfo);
-        sym = glyphinfo.symidx;
+        sym = glyphinfo.ttychar;
         Sprintf(prefix, "%s        ", encglyph(glyphinfo.glyph));
     } else
         Sprintf(prefix, "%c        ", sym);
