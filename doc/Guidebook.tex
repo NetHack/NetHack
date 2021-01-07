@@ -737,7 +737,7 @@ so no opportunity to answer `{\tt m}' at that prompt).
 The prefix will
 make ``{\tt \#travel}'' command show a menu of interesting targets in sight.
 It can also be used with the `{\tt $\backslash$}' (known, show a
-list of all discovered objects) and the `{\tt \`} (knownclass,
+list of all discovered objects) and the `{\tt \textasciigrave}' (knownclass,
 show a list of discovered objects in a particular class) commands to offer
 a menu of several sorting alternatives (which sets a new value for the
 {\it sortdiscoveries\/} option).
@@ -1368,7 +1368,7 @@ Show discovered types for one class of objects.
 Default key is `{\tt `}'.
 \\
 %.lp ""
-The `{\tt m}' prefix operates the same as for \(lq#known\(rq.
+The `{\tt m}' prefix operates the same as for {\tt \#known}.
 %.lp
 \item[\tb{\#levelchange}]
 Change your experience level.
@@ -1804,7 +1804,7 @@ command to execute, not when accepting input to name something or to
 make a wish.)
 
 %.pg
-Unlike control characters, where ^{}x and ^{}X denote the same thing,
+Unlike control characters, where \^x and \^X denote the same thing,
 meta characters are case-sensitive:  M-x and M-X represent different things.
 Some commands which can be run via a meta character require that the
 letter be capitalized because the lower-case equivalent is used for
@@ -4501,14 +4501,14 @@ Suppress terminal beeps (default on).  Persistent.
 %.lp
 \item[\ib{sortdiscoveries}]
 Controls the sorting behavior for the output of the `{\tt $\backslash$}'
-and `{\tt \`}' commands.
+and `{\tt \textasciigrave}' commands.
 Persistent.
 \\
 %.lp ""
 The possible values are:
 %.PS o
 %.PL o
-(\tt o} --- list object types by class, in discovery order within each class;
+{\tt o} --- list object types by class, in discovery order within each class;
 default;
 %.PL s
 {\tt s} --- list object types by {\it sortloot\/}
@@ -4524,7 +4524,7 @@ before fully identified types;
 %.PE
 Can be interactively set via the `{\tt O}' command or via using
 the `{\tt m}' prefix before the `{\tt $\backslash$}'
-or `{\tt \`}' command.
+or `{\tt \textasciigrave}' command.
 %.lp
 \item[\ib{sortloot}]
 Controls the sorting behavior of pickup lists for inventory
@@ -4861,7 +4861,7 @@ Specify the preferred height of each tile in a tile capable port.
 Specify the preferred width of each tile in a tile capable port
 %.lp
 \item[\ib{tiled\verb+_+map}]
-If {\it NetHack\/} can, it should display the map using \fItiles\fP graphics
+If {\it NetHack\/} can, it should display the map using {\it tiles} graphics
 rather than simple characters (letters and punctuation, possibly
 augmented by line-drawing symbols).
 Setting {\tt tiled\verb+_+map} to {\it True\/} forces
