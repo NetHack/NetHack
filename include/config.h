@@ -569,6 +569,13 @@ typedef unsigned char uchar;
    whole thing, then type a new end for the text. */
 /* #define EDIT_GETLIN */
 
+/* Extra server enhancements for
+   dgamelaunch-based server play */
+#define DGAMELAUNCH
+#ifdef DGAMELAUNCH
+#define MAILCKFREQ 5  /* SIMPLE_MAIL is in unixconf.h */
+#endif
+
 /* #define DUMPLOG */  /* End-of-game dump logs */
 #ifdef DUMPLOG
 
