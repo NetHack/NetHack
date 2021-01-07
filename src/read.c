@@ -12,13 +12,10 @@
     ((mndx) == g.urace.malenum \
      || (g.urace.femalenum != NON_PM && (mndx) == g.urace.femalenum))
 
-static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
-                                          SPBOOK_CLASS, 0 };
-static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
-
 static boolean FDECL(learnscrolltyp, (SHORT_P));
 static void FDECL(cap_spe, (struct obj *));
 static char *FDECL(erode_obj_text, (struct obj *, char *));
+static int FDECL(read_ok, (struct obj *));
 static void FDECL(stripspe, (struct obj *));
 static void FDECL(p_glow1, (struct obj *));
 static void FDECL(p_glow2, (struct obj *, const char *));
@@ -228,6 +225,20 @@ struct obj *obj;
     return;
 }
 
+/* getobj callback for object to read */
+static int
+read_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
+
 /* the 'r' command; read a scroll or spell book or various other things */
 int
 doread()
@@ -258,7 +269,7 @@ doread()
     if (check_capacity((char *) 0))
         return 0;
 
-    scroll = getobj(readable, "read");
+    scroll = getobj("read", read_ok, GETOBJ_PROMPT);
     if (!scroll)
         return 0;
     otyp = scroll->otyp;
@@ -534,33 +545,38 @@ register const char *color;
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 }
 
-/* Is the object chargeable?  For purposes of inventory display; it is
-   possible to be able to charge things for which this returns FALSE. */
-boolean
-is_chargeable(obj)
+/* getobj callback for object to charge */
+int
+charge_ok(obj)
 struct obj *obj;
 {
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
     if (obj->oclass == WAND_CLASS)
-        return TRUE;
-    /* known && !oc_name_known is possible after amnesia/mind flayer */
-    if (obj->oclass == RING_CLASS)
-        return (boolean) (objects[obj->otyp].oc_charged
-                          && (obj->known
-                              || (obj->dknown
-                                  && objects[obj->otyp].oc_name_known)));
+        return GETOBJ_SUGGEST;
+
+    if (obj->oclass == RING_CLASS && objects[obj->otyp].oc_charged
+        && obj->dknown && objects[obj->otyp].oc_name_known)
+        return GETOBJ_SUGGEST;
+
     if (is_weptool(obj)) /* specific check before general tools */
-        return FALSE;
+        return GETOBJ_EXCLUDE;
+
     if (obj->oclass == TOOL_CLASS) {
+        /* suggest tools that aren't oc_charged but can still be recharged */
         if (obj->otyp == BRASS_LANTERN
             || (obj->otyp == OIL_LAMP)
             /* only list magic lamps if they are not identified yet */
             || (obj->otyp == MAGIC_LAMP
                 && !objects[MAGIC_LAMP].oc_name_known)) {
-            return TRUE;
+            return GETOBJ_SUGGEST;
         }
-        return (boolean) objects[obj->otyp].oc_charged;
+        return objects[obj->otyp].oc_charged ? GETOBJ_SUGGEST : GETOBJ_EXCLUDE;
     }
-    return FALSE; /* why are weapons/armor considered charged anyway? */
+    /* why are weapons/armor considered charged anyway?
+     * make them selectable even so for "feeling of loss" message */
+    return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
 /* recharge an object; curse_bless is -1 if the recharging implement
@@ -1541,7 +1557,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
            was already delivered */
         useup(sobj);
         sobj = 0; /* it's gone */
-        otmp = getobj(all_count, "charge");
+        otmp = getobj("charge", charge_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
         if (otmp)
             recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
         break;

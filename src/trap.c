@@ -49,6 +49,7 @@ static int FDECL(try_disarm, (struct trap *, BOOLEAN_P));
 static void FDECL(reward_untrap, (struct trap *, struct monst *));
 static int FDECL(disarm_holdingtrap, (struct trap *));
 static int FDECL(disarm_landmine, (struct trap *));
+static int FDECL(unsqueak_ok, (struct obj *));
 static int FDECL(disarm_squeaky_board, (struct trap *));
 static int FDECL(disarm_shooting_trap, (struct trap *, int));
 static void FDECL(clear_conjoined_pits, (struct trap *));
@@ -4574,9 +4575,29 @@ struct trap *ttmp;
     return 1;
 }
 
-/* getobj will filter down to cans of grease and known potions of oil */
-static NEARDATA const char oil[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
-                                     0 };
+/* getobj callback for object to disarm a squeaky board with */
+static int
+unsqueak_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp == CAN_OF_GREASE)
+        return GETOBJ_SUGGEST;
+
+    if (obj->otyp == POT_OIL && obj->dknown &&
+        objects[POT_OIL].oc_name_known)
+        return GETOBJ_SUGGEST;
+
+    /* downplay all other potions, including unidentified oil
+     * Potential extension: if oil is known, skip this and exclude all other
+     * potions. */
+    if (obj->oclass == POTION_CLASS)
+        return GETOBJ_DOWNPLAY;
+
+    return GETOBJ_EXCLUDE;
+}
 
 /* it may not make much sense to use grease on floor boards, but so what? */
 static int
@@ -4587,7 +4608,7 @@ struct trap *ttmp;
     boolean bad_tool;
     int fails;
 
-    obj = getobj(oil, "untrap with");
+    obj = getobj("untrap with", unsqueak_ok, GETOBJ_PROMPT);
     if (!obj)
         return 0;
 

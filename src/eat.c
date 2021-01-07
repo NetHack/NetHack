@@ -30,6 +30,7 @@ static void FDECL(fprefx, (struct obj *));
 static void FDECL(fpostfx, (struct obj *));
 static int NDECL(bite);
 static int FDECL(edibility_prompts, (struct obj *));
+static int FDECL(tinopen_ok, (struct obj *));
 static int FDECL(rottenfood, (struct obj *));
 static void NDECL(eatspecial);
 static int FDECL(bounded_increase, (int, int, int));
@@ -38,6 +39,9 @@ static void FDECL(eataccessory, (struct obj *));
 static const char *FDECL(foodword, (struct obj *));
 static int FDECL(tin_variety, (struct obj *, BOOLEAN_P));
 static boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
+static int FDECL(eat_ok, (struct obj *));
+static int FDECL(offer_ok, (struct obj *));
+static int FDECL(tin_ok, (struct obj *));
 
 /* also used to see if you're allowed to eat cats and dogs */
 #define CANNIBAL_ALLOWED() (Role_if(PM_CAVE_DWELLER) || Race_if(PM_ORC))
@@ -54,18 +58,6 @@ static boolean FDECL(maybe_cannibal, (int, BOOLEAN_P));
    as if rotten if they are cursed (fortune cookies handled elsewhere) */
 #define nonrotting_food(otyp) \
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
-
-static NEARDATA const char comestibles[] = { FOOD_CLASS, 0 };
-static NEARDATA const char offerfodder[] = { FOOD_CLASS, AMULET_CLASS,
-                                                 0 };
-
-/* Gold must come first for getobj(). */
-static NEARDATA const char allobj[] = {
-    COIN_CLASS,   WEAPON_CLASS, ARMOR_CLASS,  POTION_CLASS,
-    SCROLL_CLASS, WAND_CLASS,   RING_CLASS,   AMULET_CLASS,
-    FOOD_CLASS,   TOOL_CLASS,   GEM_CLASS,    ROCK_CLASS,
-    BALL_CLASS,   CHAIN_CLASS,  SPBOOK_CLASS, 0
-};
 
 /* see hunger states in hack.h - texts used on bottom line */
 const char *hu_stat[] = { "Satiated", "        ", "Hungry  ", "Weak    ",
@@ -102,7 +94,6 @@ register struct obj *obj;
         && !Has_contents(obj))
         return TRUE;
 
-    /* return (boolean) !!index(comestibles, obj->oclass); */
     return (boolean) (obj->oclass == FOOD_CLASS);
 }
 
@@ -2763,6 +2754,18 @@ doeat()
     return 1;
 }
 
+/* getobj callback for object to be opened with a tin opener */
+static int
+tinopen_ok(obj)
+struct obj *obj;
+{
+    if (obj && obj->otyp == TIN)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
+
+
 int
 use_tin_opener(obj)
 struct obj *obj;
@@ -2788,7 +2791,7 @@ struct obj *obj;
         res = 1;
     }
 
-    otmp = getobj(comestibles, "open");
+    otmp = getobj("open", tinopen_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return res;
 
@@ -3163,6 +3166,60 @@ boolean incr;
     }
 }
 
+/* getobj callback for object to eat - effectively just wraps is_edible() */
+static int
+eat_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (is_edible(obj))
+        return GETOBJ_SUGGEST;
+
+    /* make sure to exclude, not downplay, gold (if not is_edible) in order to
+     * produce the "You cannot eat gold" message in getobj */
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_EXCLUDE_SELECTABLE;
+}
+
+/* getobj callback for object to be offered (corpses and things that look like
+ * the Amulet only */
+static int
+offer_ok(obj)
+struct obj *obj;
+{
+    if (!obj || (obj->oclass != FOOD_CLASS && obj->oclass != AMULET_CLASS))
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp != CORPSE && obj->otyp != AMULET_OF_YENDOR
+        && obj->otyp != FAKE_AMULET_OF_YENDOR)
+        return GETOBJ_EXCLUDE_SELECTABLE;
+
+    /* suppress corpses on astral, amulets elsewhere
+     * (!astral && amulet) || (astral && !amulet) */
+    if (Is_astralevel(&u.uz) ^ (obj->oclass == AMULET_CLASS))
+        return GETOBJ_DOWNPLAY;
+
+    return GETOBJ_SUGGEST;
+}
+
+/* getobj callback for object to be tinned */
+static int
+tin_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass != FOOD_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp != CORPSE || !tinnable(obj))
+        return GETOBJ_EXCLUDE_SELECTABLE;
+
+    return GETOBJ_SUGGEST;
+}
+
 /* Returns an object representing food.
  * Object may be either on floor or in inventory.
  */
@@ -3278,11 +3335,18 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
     }
 
  skipfloor:
-    /* We cannot use ALL_CLASSES since that causes getobj() to skip its
-     * "ugly checks" and we need to check for inedible items.
-     */
-    otmp = getobj(feeding ? allobj : offering ? offerfodder : comestibles,
-                  verb);
+    /* We cannot use GETOBJ_PROMPT since we don't want a prompt in the case
+     * where nothing edible is being carried. */
+    if (feeding)
+        otmp = getobj("eat", eat_ok, GETOBJ_NOFLAGS);
+    else if (offering)
+        otmp = getobj("sacrifice", offer_ok, GETOBJ_NOFLAGS);
+    else if (corpsecheck == 2)
+        otmp = getobj(verb, tin_ok, GETOBJ_NOFLAGS);
+    else {
+        impossible("floorfood: unknown request (%s)", verb);
+        return (struct obj *) 0;
+    }
     if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
             You_cant("%s that!", verb);

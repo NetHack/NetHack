@@ -5,14 +5,14 @@
 
 #include "hack.h"
 
-static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
-
 static long FDECL(itimeout, (long));
 static long FDECL(itimeout_incr, (long, int));
 static void NDECL(ghost_from_bottle);
+static int FDECL(drink_ok, (struct obj *));
 static boolean
 FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
 static short FDECL(mixtype, (struct obj *, struct obj *));
+static int FDECL(dip_ok, (struct obj *));
 
 /* force `val' to be within valid range for intrinsic timeout value */
 static long
@@ -481,6 +481,18 @@ ghost_from_bottle()
     g.nomovemsg = "You regain your composure.";
 }
 
+/* getobj callback for object to drink from, which also does double duty as the
+ * callback for dipping into (both just allow potions). */
+static int
+drink_ok(obj)
+struct obj *obj;
+{
+    if (obj && obj->oclass == POTION_CLASS)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
+
 /* "Quaffing is like drinking, except you spill more." - Terry Pratchett */
 int
 dodrink()
@@ -517,7 +529,7 @@ dodrink()
         }
     }
 
-    otmp = getobj(beverages, "drink");
+    otmp = getobj("drink", drink_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return 0;
 
@@ -1888,6 +1900,22 @@ register struct obj *o1, *o2;
     return STRANGE_OBJECT;
 }
 
+/* getobj callback for object to be dipped (not the thing being dipped into,
+ * that uses drink_ok) */
+static int
+dip_ok(obj)
+struct obj *obj;
+{
+    /* dipping hands and gold isn't currently implemented */
+    if (!obj || obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    if (inaccessible_equipment(obj, (const char *) 0, FALSE))
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    return GETOBJ_SUGGEST;
+}
+
 /* #dip command */
 int
 dodip()
@@ -1896,14 +1924,11 @@ dodip()
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
-    char allowall[2];
     short mixture;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
 
-    allowall[0] = ALL_CLASSES;
-    allowall[1] = '\0';
-    if (!(obj = getobj(allowall, "dip")))
+    if (!(obj = getobj("dip", dip_ok, GETOBJ_PROMPT)))
         return 0;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
@@ -1957,7 +1982,7 @@ dodip()
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
     Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
-    potion = getobj(beverages, qbuf);
+    potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {

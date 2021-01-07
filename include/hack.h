@@ -478,6 +478,40 @@ enum bodypart_types {
 #define MON_POLE_DIST 5 /* How far monsters can use pole-weapons */
 #define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */
 
+/* flags passed to getobj() to control how it responds to player input */
+#define GETOBJ_NOFLAGS  0x0
+#define GETOBJ_ALLOWCNT 0x1 /* is a count allowed with this command? */
+#define GETOBJ_PROMPT   0x2 /* should it force a prompt for input? (prevents it
+                               exiting early with "You don't have anything to
+                               foo" if nothing in inventory is valid) */
+
+/* values returned from getobj() callback functions */
+enum getobj_callback_returns {
+    /* generally invalid - can't be used for this purpose. will give a "silly
+     * thing" message if the player tries to pick it, unless a more specific
+     * failure message is in getobj itself - e.g. "You cannot foo gold". */
+    GETOBJ_EXCLUDE = -2,
+    /* invalid because it is an inaccessible or unwanted piece of gear, but
+     * psuedo-valid for the purposes of allowing the player to select it and
+     * getobj to return it if there is a prompt instead of getting "silly
+     * thing", in order for the getobj caller to present a specific failure
+     * message. Other than that, the only thing this does differently from
+     * GETOBJ_EXCLUDE is that it inserts an "else" in "You don't have anything
+     * else to foo". */
+    GETOBJ_EXCLUDE_INACCESS = -1,
+    /* invalid for purposes of not showing a prompt if nothing is valid but
+     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE_INACCESS but
+     * without the "else" in "You don't have anything else to foo". */
+    GETOBJ_EXCLUDE_SELECTABLE = 0,
+    /* valid - invlet not presented in the summary or the ? menu as a
+     * recommendation, but is selectable if the player enters it anyway. Used
+     * for objects that are actually valid but unimportantly so, such as shirts
+     * for reading. */
+    GETOBJ_DOWNPLAY = 1,
+    /* valid - will be shown in summary and ? menu */
+    GETOBJ_SUGGEST  = 2,
+};
+
 /*
  * option setting restrictions
  */

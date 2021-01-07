@@ -37,9 +37,11 @@ static long FDECL(boh_loss, (struct obj *, int));
 static int FDECL(in_container, (struct obj *));
 static int FDECL(out_container, (struct obj *));
 static long FDECL(mbag_item_gone, (int, struct obj *, BOOLEAN_P));
+static int FDECL(stash_ok, (struct obj *));
 static void FDECL(explain_container_prompt, (BOOLEAN_P));
 static int FDECL(traditional_loot, (BOOLEAN_P));
 static int FDECL(menu_loot, (int, BOOLEAN_P));
+static int FDECL(tip_ok, (struct obj *));
 static char FDECL(in_or_out_menu, (const char *, struct obj *, BOOLEAN_P,
                                        BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 static boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
@@ -2667,7 +2669,22 @@ u_handsy()
     return TRUE;
 }
 
-static const char stashable[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
+/* getobj callback for object to be stashed into a container */
+int
+stash_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    /* downplay the container being stashed into */
+    if (!ck_bag(obj))
+        return GETOBJ_EXCLUDE_SELECTABLE;
+    /* Possible extension: downplay things too big to fit into containers (in
+     * which case extract in_container()'s logic.) */
+
+    return GETOBJ_SUGGEST;
+}
 
 int
 use_container(objp, held, more_containers)
@@ -2863,7 +2880,8 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
         add_valid_menu_class(0);
     } else if (stash_one) {
         /* put one item into container */
-        if ((otmp = getobj(stashable, "stash")) != 0) {
+        if ((otmp = getobj("stash", stash_ok,
+                           GETOBJ_PROMPT | GETOBJ_ALLOWCNT)) != 0) {
             if (in_container(otmp)) {
                 used = 1;
             } else {
@@ -3122,7 +3140,26 @@ boolean outokay, inokay, alreadyused, more_containers;
     return (n == 0 && more_containers) ? 'n' : 'q'; /* next or quit */
 }
 
-static const char tippables[] = { ALL_CLASSES, TOOL_CLASS, 0 };
+/* getobj callback for object to tip */
+static int
+tip_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    if (Is_container(obj)) {
+        return GETOBJ_SUGGEST;
+    }
+
+    /* include horn of plenty if sufficiently discovered */
+    if (obj->otyp == HORN_OF_PLENTY && obj->dknown &&
+        objects[obj->otyp].oc_name_known)
+        return GETOBJ_SUGGEST;
+
+    /* allow trying anything else in inventory */
+    return GETOBJ_DOWNPLAY;
+}
 
 /* #tip command -- empty container contents onto floor */
 int
@@ -3222,7 +3259,7 @@ dotip()
     }
 
     /* either no floor container(s) or couldn't tip one or didn't tip any */
-    cobj = getobj(tippables, "tip");
+    cobj = getobj("tip", tip_ok, GETOBJ_PROMPT);
     if (!cobj)
         return 0;
 
