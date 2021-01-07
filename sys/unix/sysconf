@@ -53,7 +53,7 @@ MAXPLAYERS=0
 
 # If not null, added to string "To get local support, " in the support
 # information help.
-SUPPORT=email spleen at mlehotay@gmail.com.
+SUPPORT=send email to spleen <mlehotay@gmail.com>.
 
 # If not null, displayed at the end of a panic-save sequence.
 #RECOVER=Run the recover program.
