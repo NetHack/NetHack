@@ -145,6 +145,6 @@ PANICTRACE_LIBC=2
 # can override the overridden options set here by choosing their own
 # option settings via NETHACKOPTIONS in their environment or via
 # ~/.nethackrc run-time configuration file.
-#OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
+OPTIONS=!selectsaved,!null,timed_delay,toptenwin
 
 #eof
