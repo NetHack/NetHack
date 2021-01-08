@@ -15,18 +15,51 @@ extern "C" {
 
 namespace nethack_qt_ {
 
+// convert a Qt key event into a simple ASCII character
+uchar keyValue(QKeyEvent *key_event)
+{
+    // key_event manipulation derived from NetHackQtBind::notify();
+    // used for menus and text windows in qt_menu.cpp, also for
+    // extended commands in xcmd.cpp and popup yn_function in qt_yndlg.cpp
+
+    const int k = key_event->key();
+    Qt::KeyboardModifiers mod = key_event->modifiers();
+    const QString &txt = key_event->text();
+    QChar ch = !txt.isEmpty() ? txt.at(0) : 0;
+
+    if (ch >= 128)
+        ch = 0;
+    // on OSX, ascii control codes are not sent, force them
+    if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
+        if (k >= Qt::Key_A && k <= Qt::Key_Underscore)
+            ch = QChar((k - (Qt::Key_A - 1)));
+    }
+
+    uchar result = (uchar) ch.cell();
+    //raw_printf("kV: k=%d, ch=%u", k, (unsigned) result);
+    return result;
+}
+
 NetHackQtKeyBuffer::NetHackQtKeyBuffer() :
     in(0), out(0)
 {
 }
 
-bool NetHackQtKeyBuffer::Empty() const { return in==out; }
-bool NetHackQtKeyBuffer::Full() const { return (in+1)%maxkey==out; }
+bool NetHackQtKeyBuffer::Empty() const
+{
+    return (in == out);
+}
+
+bool NetHackQtKeyBuffer::Full() const
+{
+    return (((in + 1) % maxkey) == out);
+}
 
 void NetHackQtKeyBuffer::Put(int k, int a, uint kbstate)
 {
     //raw_printf("k:%3d a:'%s' s:0x%08x", k, visctrl((char) a), kbstate);
-    if ( Full() ) return;	// Safety
+    if (Full())
+        return; // Safety
     key[in] = k;
     ascii[in] = a;
     state[in] = (Qt::KeyboardModifiers) kbstate;

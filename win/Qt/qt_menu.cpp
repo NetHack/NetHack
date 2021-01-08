@@ -37,6 +37,7 @@ extern "C" {
 #include "qt_post.h"
 #include "qt_menu.h"
 #include "qt_menu.moc"
+#include "qt_key.h" // for keyValue()
 #include "qt_glyph.h"
 #include "qt_set.h"
 #include "qt_streq.h"
@@ -54,24 +55,6 @@ namespace nethack_qt_ {
 // temporary
 void centerOnMain( QWidget* w );
 // end temporary
-
-uchar keyValue(QKeyEvent *key_event)
-{
-    // key_event manipulation derived from NetHackQtBind::notify()
-    const int k = key_event->key();
-    Qt::KeyboardModifiers mod = key_event->modifiers();
-    QChar ch = !key_event->text().isEmpty() ? key_event->text().at(0) : 0;
-    if (ch >= 128)
-        ch = 0;
-    // on OSX, ascii control codes are not sent, force them
-    if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
-        if (k >= Qt::Key_A && k <= Qt::Key_Underscore)
-            ch = QChar((k - (Qt::Key_A - 1)));
-    }
-    uchar result = (uchar) ch.cell();
-    //raw_printf("kV: k=%d, ch=%d", k, result);
-    return result;
-}
 
 QSize NetHackQtTextListBox::sizeHint() const
 {

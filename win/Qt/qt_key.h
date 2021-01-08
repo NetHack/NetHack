@@ -9,6 +9,9 @@
 
 namespace nethack_qt_ {
 
+// not part of any class; used in qt_menu.cpp, qt_xcmd.cpp, qt_yndlg.cpp
+extern uchar keyValue(QKeyEvent *key_event);
+
 class NetHackQtKeyBuffer {
 public:
 	NetHackQtKeyBuffer();
