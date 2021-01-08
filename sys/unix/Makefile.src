@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1609702027 2021/01/03 19:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1610141602 2021/01/08 21:33:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -831,9 +831,9 @@ depend: ../sys/unix/depend.awk \
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/global.h ../include/coord.h \
-		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
-		../include/ntconf.h ../include/fnamesiz.h
+		../include/fnamesiz.h ../include/vmsconf.h ../include/system.h \
+		../include/nhlua.h ../include/unixconf.h ../include/pcconf.h \
+		../include/micro.h ../include/ntconf.h #../include/amiconf.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \

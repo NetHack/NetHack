@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1594032649 2020/07/06 10:50:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1610141601 2021/01/08 21:33:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -109,6 +109,8 @@ typedef uchar nhsym;
 #define LARGEST_INT 32767
 
 #include "coord.h"
+
+#include "fnamesiz.h" /* file sizes shared between nethack and recover */
 
 #if defined(CROSSCOMPILE)
 struct cross_target_s {
