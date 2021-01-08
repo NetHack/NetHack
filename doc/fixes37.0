@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ $NHDT-Date: 1610098651 2021/01/08 09:37:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ $NHDT-Date: 1610138674 2021/01/08 20:44:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -359,6 +359,8 @@ when telepathically sensed pet ate a mimic corpse and temporarily took on
 	overrides mimic hiding); give a different message in that case
 when a pet ate a mimic corpse and tried to temporarily look like a sink it
 	ended up looking like a throne (terrain type SINK == symbol S_throne)
+have dowhatdoes ('&') catch up with '?i' to describe ^A, ESC, and movement
+	prefix keystrokes correctly instead of reporting "no such command"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
