@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ $NHDT-Date: 1609977590 2021/01/06 23:59:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ $NHDT-Date: 1610098651 2021/01/08 09:37:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -591,7 +591,7 @@ Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
 	window got pushed underneath the main window so seemed to go away
-Qt+OSX: fix control key
+Qt+OSX: fix control key (fixed all except for ^V); handle ^V as a shortcut key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
 	for making persistent Qt customizations to "nethack->Preferences..."

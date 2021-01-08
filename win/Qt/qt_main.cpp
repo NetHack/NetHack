@@ -10,6 +10,8 @@ extern "C" {
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
+#include <QtWidgets/QShortcut>
+
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
 #endif
@@ -548,6 +550,13 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
      *  setMenuRole() can be used to override this behavior.
      */
 #endif
+
+#ifdef CTRL_V_HACK
+    // NetHackQtBind::notify() sees all control characters except for ^V
+    QShortcut *c_V = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_V), this);
+    connect(c_V, &QShortcut::activated, this, &NetHackQtMainWindow::CtrlV);
+#endif
+
     QMenu* game=new QMenu;
     QMenu* apparel=new QMenu;
     QMenu* act1=new QMenu;
@@ -888,6 +897,20 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	hsplitter->insertWidget(1, invusage);
     }
 }
+
+#ifdef CTRL_V_HACK
+#ifndef C
+#define C(c) (0x1f & (c))
+#endif
+
+// called when ^V is typed while the main window has keyboard focus;
+// all other control characters go through NetHackQtBind::notify()
+void NetHackQtMainWindow::CtrlV()
+{
+    static const char cV[] = { C('V'), '\0' };
+    doKeys(cV);
+}
+#endif
 
 // add a toolbar button to invoke command 'name' via function '(*func)()'
 void NetHackQtMainWindow::AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
