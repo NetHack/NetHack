@@ -254,10 +254,11 @@ curses_askname()
 
     curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
     (void) mungspaces(g.plname);
-    if (g.plname[0] && g.plname[0] != '\033') {
-         iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
-         return;
-    }
+    if (!g.plname[0] || g.plname[0] == '\033')
+         goto bail;
+
+    iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
+    return;
 
  bail:
     /* message is delivered via raw_print() */
