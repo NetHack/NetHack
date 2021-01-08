@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1610056944 2021/01/07 22:02:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1610149501 2021/01/08 23:45:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -51,10 +51,9 @@ struct obj {
                 * Schroedinger's Box (1) or royal coffers for a court (2);
                 * named fruit index;
                 * candy bar wrapper index;
-                * special for uball and amulet;
                 * scroll of mail (normal==0, bones or wishing==1, written==2);
                 * splash of venom (normal==0, wishing==1);
-                * historic and gender for statues */
+                * historic flag and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE 0x02
 #define STATUE_FEMALE 0x04

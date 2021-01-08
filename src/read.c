@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1609323865 2020/12/30 10:24:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1610149501 2021/01/08 23:45:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2399,7 +2399,6 @@ struct obj *sobj;
         setworn(mkobj(BALL_CLASS, TRUE), W_BALL);
     else
         setworn(reuse_ball, W_BALL);
-    uball->spe = 1; /* special ball (see save) */
 
     /*
      *  Place ball & chain if not swallowed.  If swallowed, the ball & chain
@@ -2424,8 +2423,7 @@ unpunish()
     newsym(uchain->ox, uchain->oy);
     setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
     dealloc_obj(savechain);
-    /* ball persists */
-    uball->spe = 0;
+    /* the chain is gone but the no longer attached ball persists */
     setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
 
