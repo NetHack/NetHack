@@ -27,7 +27,8 @@ dodrop()
 
     if (*u.ushops)
         sellobj_state(SELL_DELIBERATE);
-    result = drop(getobj("drop", any_obj_ok, GETOBJ_PROMPT));
+    result = drop(getobj("drop", any_obj_ok,
+                         GETOBJ_PROMPT | GETOBJ_ALLOWCNT));
     if (*u.ushops)
         sellobj_state(SELL_NORMAL);
     if (result)
