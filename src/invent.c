@@ -1560,7 +1560,7 @@ getobj(const char *word,
         else if (iflags.force_invmenu) {
             /* don't overwrite a possible quitchars */
             if (!oneloop)
-                ilet = forceprompt ? '*' : '?';
+                ilet = (*lets || *altlets) ? '?' : '*';
             if (!msggiven)
                 putmsghistory(qbuf, FALSE);
             msggiven = TRUE;
@@ -2614,7 +2614,8 @@ display_pickinv(
             goto nextclass;
         }
     }
-    if (iflags.force_invmenu && lets && want_reply) {
+    if (iflags.force_invmenu && lets && want_reply
+        && (int) strlen(lets) < inv_cnt(TRUE)) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
                  iflags.menu_headings, "Special", MENU_ITEMFLAGS_NONE);
