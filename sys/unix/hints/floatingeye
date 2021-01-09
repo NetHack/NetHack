@@ -10,8 +10,9 @@
 #-PRE
 # Linux hints file
 # This hints file provides a chrooted build for Linux, specifically
-# for Ubuntu dapper, also works on Linux Mint (Tricia).
+# for Linux Mint (Tricia) and Ubuntu 20.04 (LTS) x64
 # Does not copy required libraries or termcap files into the chroot.
+# Run sys/unix/mkchroot.sh to copy dependencies to the chroot.
 
 # this is the chroot dir
 PREFIX=/opt/dgl
@@ -32,6 +33,10 @@ CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+=-DVAR_PLAYGROUND=\"$(HACKDIR)/var\"
 CFLAGS+=-DNOSUSPEND -DNOSHELL -DPANICTRACE_GDB=0
 CFLAGS+=-DTIMED_DELAY -DDUMPLOG -DCURSES_GRAPHICS
+
+# TODO: why do I get sprintf format overflow warnings on illithid but not on avocado?
+# maybe related to https://gcc.gnu.org/bugzilla//show_bug.cgi?id=83733
+CFLAGS+=-Wno-format-overflow
 
 # when building liblua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so

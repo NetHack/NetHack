@@ -1,3 +1,17 @@
+###############################################################################
+# howto build & install single user NetHack on avocado
+
+cd ~/sandbox/nethack
+make spotless
+cd sys/unix
+sh setup.sh hints/avocado
+cd ../..
+make all
+make install
+cd doc
+sudo make manpages
+
+###############################################################################
 # howto build & install chrooted NetHack on avocado
 # also see https://github.com/mlehotay/dgamelaunch/blob/master/examples/floatingeye.txt
 
