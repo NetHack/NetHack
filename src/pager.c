@@ -1207,13 +1207,13 @@ struct permonst **for_supplement;
 
             *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Sprintf(temp_buf, " (%s)", *firstmatch);
+                Snprintf(temp_buf, sizeof(temp_buf), " (%s)", *firstmatch);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
-                Sprintf(temp_buf, " [seen: %s]", monbuf);
+                Snprintf(temp_buf, sizeof(temp_buf), " [seen: %s]", monbuf);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
             }

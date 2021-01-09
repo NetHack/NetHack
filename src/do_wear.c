@@ -1514,7 +1514,8 @@ struct obj *obj;
                     Strcat(what, " and ");
                 Strcat(what, suit_simple_name(uarm));
             }
-            Sprintf(why, " without taking off your %s first", what);
+            Snprintf(why, sizeof(why), " without taking off your %s first",
+                     what);
         } else {
             Strcpy(why, "; it's embedded");
         }

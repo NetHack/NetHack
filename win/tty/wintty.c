@@ -961,10 +961,10 @@ tty_player_selection()
             Sprintf(plbuf, " %s", genders[GEND].adj);
         else
             *plbuf = '\0'; /* omit redundant gender */
-        Sprintf(pbuf, "%s, %s%s %s %s", g.plname, aligns[ALGN].adj, plbuf,
-                races[RACE].adj,
-                (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
-                                                  : roles[ROLE].name.m);
+        Snprintf(pbuf, sizeof(pbuf), "%s, %s%s %s %s", g.plname,
+                 aligns[ALGN].adj, plbuf, races[RACE].adj,
+                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
+                                                   : roles[ROLE].name.m);
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, pbuf,
                  MENU_ITEMFLAGS_NONE);
         /* blank separator */

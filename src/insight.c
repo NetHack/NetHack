@@ -242,8 +242,8 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-    Sprintf(buf, "%s the %s's attributes:", tmpbuf,
-            ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
+    Snprintf(buf, sizeof(buf), "%s the %s's attributes:", tmpbuf,
+             ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
                 ? g.urole.name.f
                 : g.urole.name.m);
 
@@ -330,9 +330,10 @@ int final;
             Sprintf(eos(tmpbuf), "%s in ",
                     pmname(&mons[g.youmonst.cham],
                            flags.female ? FEMALE : MALE));
-        Sprintf(buf, "%s%s%s%s form", !final ? "currently " : "",
-                altphrasing ? just_an(anbuf, tmpbuf) : "in ",
-                tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
+        Snprintf(buf, sizeof(buf), "%s%s%s%s form",
+                 !final ? "currently " : "",
+                 altphrasing ? just_an(anbuf, tmpbuf) : "in ",
+                 tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
         you_are(buf, "");
     }
 
@@ -427,8 +428,8 @@ int final;
         int egdepth = observable_depth(&u.uz);
 
         (void) endgamelevelname(tmpbuf, egdepth);
-        Sprintf(buf, "in the endgame, on the %s%s",
-                !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
+        Snprintf(buf, sizeof(buf), "in the endgame, on the %s%s",
+                 !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
         Sprintf(buf, "on the %s level", g.dungeons[u.uz.dnum].dname);
@@ -448,7 +449,7 @@ int final;
             Strcat(tmpbuf, ", a primitive area");
         else if (Is_bigroom(&u.uz) && !Blind)
             Strcat(tmpbuf, ", a very big room");
-        Sprintf(buf, "in %s, on %s", dgnbuf, tmpbuf);
+        Snprintf(buf, sizeof(buf), "in %s, on %s", dgnbuf, tmpbuf);
     }
     you_are(buf, "");
 
@@ -1216,7 +1217,7 @@ int final;
                     Strcat(buf, " and two weapons");
                     if (also3) {
                         Strcpy(pfx, "You also ");
-                        Sprintf(sfx, " %s", buf), buf[0] = '\0';
+                        Snprintf(sfx, sizeof(sfx), " %s", buf), buf[0] = '\0';
                         verb_present = hav2 ? "have" : "are";
                         verb_past = hav2 ? "had" : "were";
                     }
@@ -2479,7 +2480,7 @@ boolean ask;
                           : !digit(buf[2]) ? 4 : 0;
                 if (class_header)
                     ++pfx;
-                Sprintf(buftoo, "%*s%s", pfx, "", buf);
+                Snprintf(buftoo, sizeof(buftoo), "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
             /*

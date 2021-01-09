@@ -2353,16 +2353,17 @@ struct obj *otmp;
      */
     if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
         /* Tainted meat */
-        Sprintf(buf, "%s like %s could be tainted!  %s", foodsmell, it_or_they,
-                eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s like %s could be tainted!  %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
             return 2;
     }
     if (stoneorslime) {
-        Sprintf(buf, "%s like %s could be something very dangerous!  %s",
-                foodsmell, it_or_they, eat_it_anyway);
+        Snprintf(buf, sizeof(buf),
+                 "%s like %s could be something very dangerous!  %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2370,8 +2371,8 @@ struct obj *otmp;
     }
     if (otmp->orotten || (cadaver && rotted > 3L)) {
         /* Rotten */
-        Sprintf(buf, "%s like %s could be rotten! %s",  foodsmell, it_or_they,
-                eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s like %s could be rotten! %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2379,8 +2380,8 @@ struct obj *otmp;
     }
     if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
         /* poisonous */
-        Sprintf(buf, "%s like %s might be poisonous!  %s", foodsmell,
-                it_or_they, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s like %s might be poisonous!  %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2388,20 +2389,22 @@ struct obj *otmp;
     }
     if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
         /* causes sleep, for long enough to be dangerous */
-        Sprintf(buf, "%s like %s might have been poisoned.  %s", foodsmell,
-                it_or_they, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s like %s might have been poisoned.  %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
     }
     if (cadaver && !vegetarian(&mons[mnum]) && !u.uconduct.unvegetarian
         && Role_if(PM_MONK)) {
-        Sprintf(buf, "%s unhealthy.  %s", foodsmell, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s unhealthy.  %s", foodsmell,
+                 eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
             return 2;
     }
     if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-        Sprintf(buf, "%s rather acidic.  %s", foodsmell, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s rather acidic.  %s",
+                 foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2409,8 +2412,8 @@ struct obj *otmp;
     }
     if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
         && otmp->oerodeproof) {
-        Sprintf(buf, "%s disgusting to you right now.  %s", foodsmell,
-                eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s disgusting to you right now.  %s",
+                 foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2424,8 +2427,8 @@ struct obj *otmp;
         && ((material == LEATHER || material == BONE
              || material == DRAGON_HIDE || material == WAX)
             || (cadaver && !vegan(&mons[mnum])))) {
-        Sprintf(buf, "%s foul and unfamiliar to you.  %s", foodsmell,
-                eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s foul and unfamiliar to you.  %s",
+                 foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2435,7 +2438,8 @@ struct obj *otmp;
         && ((material == LEATHER || material == BONE
              || material == DRAGON_HIDE)
             || (cadaver && !vegetarian(&mons[mnum])))) {
-        Sprintf(buf, "%s unfamiliar to you.  %s", foodsmell, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s unfamiliar to you.  %s",
+                 foodsmell, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else
@@ -2444,8 +2448,8 @@ struct obj *otmp;
 
     if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && Sick_resistance) {
         /* Tainted meat with Sick_resistance */
-        Sprintf(buf, "%s like %s could be tainted!  %s",
-                foodsmell, it_or_they, eat_it_anyway);
+        Snprintf(buf, sizeof(buf), "%s like %s could be tainted!  %s",
+                 foodsmell, it_or_they, eat_it_anyway);
         if (yn_function(buf, ynchars, 'n') == 'n')
             return 1;
         else

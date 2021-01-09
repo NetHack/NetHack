@@ -205,7 +205,8 @@ const char *goal;
         } else {
             Sprintf(kbuf, "'%s'", visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
-        Sprintf(sbuf, "Type a %s when you are at the right place.", kbuf);
+        Snprintf(sbuf, sizeof(sbuf),
+                 "Type a %s when you are at the right place.", kbuf);
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             Sprintf(sbuf,

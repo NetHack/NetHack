@@ -674,7 +674,7 @@ extcmd_via_menu()
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
         }
-        Sprintf(prompt, "Extended Command: %s", cbuf);
+        Snprintf(prompt, sizeof(prompt), "Extended Command: %s", cbuf);
         end_menu(win, prompt);
         n = select_menu(win, PICK_ONE, &pick_list);
         destroy_nhwindow(win);
@@ -2392,7 +2392,8 @@ dokeylist(VOID_ARGS)
                 Sprintf(buf2, "[%s]", spkey_name(j));
                 /* lines up with the other unassigned commands which use
                    "#%-20s ", but not with the other special keys */
-                Sprintf(buf, "%-21s %s", buf2, misc_keys[i].desc);
+                Snprintf(buf, sizeof(buf), "%-21s %s", buf2,
+                         misc_keys[i].desc);
                 putstr(datawin, 0, buf);
             }
         }
@@ -4807,7 +4808,8 @@ const char *prompt;
                 Strcpy(pbuf + (QBUFSZ - 1) - k - 4, "...?"); /* -4: "...?" */
             }
 
-            Sprintf(qbuf, "%s%s %s", promptprefix, pbuf, responsetype);
+            Snprintf(qbuf, sizeof(qbuf), "%s%s %s", promptprefix, pbuf,
+                     responsetype);
             *ans = '\0';
             getlin(qbuf, ans);
             (void) mungspaces(ans);

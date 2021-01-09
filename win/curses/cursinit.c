@@ -451,7 +451,7 @@ curses_choose_character()
     }
 
     prompt[count_off] = '\0';
-    sprintf(choice, "%s%c", tmpchoice, '\033');
+    Snprintf(choice, sizeof(choice), "%s%c", tmpchoice, '\033');
     if (strchr(tmpchoice, 't')) {       /* Tutorial mode */
         mvaddstr(0, 1, "New? Press t to enter a tutorial.");
     }

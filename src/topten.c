@@ -1058,7 +1058,7 @@ boolean so;
             topten_print_bold(linebuf);
         } else
             topten_print(linebuf);
-        Sprintf(linebuf, "%15s %s", "", linebuf3);
+        Snprintf(linebuf, sizeof(linebuf), "%15s %s", "", linebuf3);
         lngr = strlen(linebuf);
     }
     /* beginning of hp column not including padding */
