@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1596785343 2020/08/07 07:29:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1610153478 2021/01/09 00:51:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.322 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4558,6 +4558,8 @@ unsigned oid; /* book identifier */
                if lastline is empty, there were no non-empty lines between
                "%passage n" and "%e passage" so we leave 'grasped' False */
             if (*lastline) {
+                char *p;
+
                 display_nhwindow(tribwin, FALSE);
                 /* put the final attribution line into message history,
                    analogous to the summary line from long quest messages */
@@ -4565,6 +4567,8 @@ unsigned oid; /* book identifier */
                     mungspaces(lastline); /* to remove leading spaces */
                 else /* construct one if necessary */
                     Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
+                if ((p = rindex(lastline, ']')) != 0)
+                    Sprintf(p, "; passage #%d]", targetpassage);
                 putmsghistory(lastline, FALSE);
                 grasped = TRUE;
             }
