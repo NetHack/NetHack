@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1596498197 2020/08/03 23:43:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1610410780 2021/01/12 00:19:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,10 +9,12 @@ static long FDECL(itimeout, (long));
 static long FDECL(itimeout_incr, (long, int));
 static void NDECL(ghost_from_bottle);
 static int FDECL(drink_ok, (struct obj *));
-static boolean
-FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
+static boolean FDECL(H2Opotion_dip, (struct obj *, struct obj *,
+                                     BOOLEAN_P, const char *));
 static short FDECL(mixtype, (struct obj *, struct obj *));
 static int FDECL(dip_ok, (struct obj *));
+static void FDECL(hold_potion, (struct obj *, const char *,
+                                const char *, const char *));
 
 /* force `val' to be within valid range for intrinsic timeout value */
 static long
@@ -1916,6 +1918,28 @@ struct obj *obj;
     return GETOBJ_SUGGEST;
 }
 
+/* call hold_another_object() to deal with a transformed potion; its weight
+   won't have changed but it might require an extra slot that isn't available
+   or it might merge into some other carried stack */
+static void
+hold_potion(potobj, drop_fmt, drop_arg, hold_msg)
+struct obj *potobj;
+const char *drop_fmt, *drop_arg, *hold_msg;
+{
+    int cap = near_capacity(),
+        save_pickup_burden = flags.pickup_burden;
+
+    /* prevent a drop due to current setting of the 'pickup_burden' option */
+    if (flags.pickup_burden < cap)
+        flags.pickup_burden = cap;
+    /* remove from inventory after calculating near_capacity() */
+    obj_extract_self(potobj);
+    /* re-insert into inventory, possibly merging with compatible stack */
+    potobj = hold_another_object(potobj, drop_fmt, drop_arg, hold_msg);
+    flags.pickup_burden = save_pickup_burden;
+    return;
+}
+
 /* #dip command */
 int
 dodip()
@@ -2121,8 +2145,7 @@ dodip()
            been made in order to get the merge result for both cases;
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
-        (void) hold_another_object(obj, "You drop %s!", doname(obj),
-                                   (const char *) 0);
+        hold_potion(obj, "You drop %s!", doname(obj), (const char *) 0);
         return 1;
     }
 
@@ -2309,12 +2332,10 @@ dodip()
                 docall(&fakeobj);
             }
         }
-        obj_extract_self(singlepotion);
-        singlepotion = hold_another_object(singlepotion,
-                                           "You juggle and drop %s!",
-                                           doname(singlepotion),
-                                           (const char *) 0);
-        nhUse(singlepotion);
+        /* remove potion from inventory and re-insert it, possibly stacking
+           with compatible ones; override 'pickup_burden' while doing so */
+        hold_potion(singlepotion, "You juggle and drop %s!",
+                    doname(singlepotion), (const char *) 0);
         update_inventory();
         return 1;
     }

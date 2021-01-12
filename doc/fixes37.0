@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ $NHDT-Date: 1610138674 2021/01/08 20:44:34 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ $NHDT-Date: 1610410779 2021/01/12 00:19:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -361,6 +361,9 @@ when a pet ate a mimic corpse and tried to temporarily look like a sink it
 	ended up looking like a throne (terrain type SINK == symbol S_throne)
 have dowhatdoes ('&') catch up with '?i' to describe ^A, ESC, and movement
 	prefix keystrokes correctly instead of reporting "no such command"
+transforming a potion by dipping a unicorn horn into it could result in the
+	potion being dropped due to 'pickup_burden' if encumbrance was already
+	over threshold before dipping but within it after removal from invent
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
