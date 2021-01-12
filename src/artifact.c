@@ -20,6 +20,7 @@
 static boolean FDECL(bane_applies, (const struct artifact *,
                                         struct monst *));
 static int FDECL(spec_applies, (const struct artifact *, struct monst *));
+static int FDECL(invoke_ok, (struct obj *));
 static int FDECL(arti_invoke, (struct obj *));
 static boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
                                 struct obj *, int *, int, BOOLEAN_P, char *));
@@ -1411,9 +1412,28 @@ int dieroll; /* needed for Magicbane and vorpal blades */
     return FALSE;
 }
 
-static NEARDATA const char recharge_type[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
-static NEARDATA const char invoke_types[] = { ALL_CLASSES, 0 };
-/* #invoke: an "ugly check" filters out most objects */
+/* getobj callback for object to be invoked */
+static int
+invoke_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    /* artifacts and other special items */
+    if (obj->oartifact || objects[obj->otyp].oc_unique
+        || (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known))
+        return GETOBJ_SUGGEST;
+
+    /* synonym for apply, though actually invoking it will do different things
+     * depending if it's a regular crystal ball, an artifact one that has an
+     * invoke power, and a (theoretical) artifact one that doesn't have an
+     * invoke power */
+    if (obj->otyp == CRYSTAL_BALL)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
 
 /* the #invoke command */
 int
@@ -1421,7 +1441,7 @@ doinvoke()
 {
     struct obj *obj;
 
-    obj = getobj(invoke_types, "invoke");
+    obj = getobj("invoke", invoke_ok, GETOBJ_PROMPT);
     if (!obj)
         return 0;
     if (!retouch_object(&obj, FALSE))
@@ -1516,7 +1536,8 @@ struct obj *obj;
             break;
         }
         case CHARGE_OBJ: {
-            struct obj *otmp = getobj(recharge_type, "charge");
+            struct obj *otmp = getobj("charge", charge_ok,
+                                      GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
             boolean b_effect;
 
             if (!otmp) {

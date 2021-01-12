@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1608933417 2020/12/25 21:56:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1610141601 2021/01/08 21:33:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -608,6 +608,5 @@ typedef unsigned char uchar;
 #endif
 
 #include "global.h" /* Define everything else according to choices above */
-#include "fnamesiz.h" /* Define file sizes shared between nethack and recover */
 
 #endif /* CONFIG_H */

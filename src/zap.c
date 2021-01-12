@@ -23,6 +23,7 @@ static void FDECL(skiprange, (int, int *, int *));
 static int FDECL(zap_hit, (int, int));
 static void FDECL(disintegrate_mon, (struct monst *, int, const char *));
 static void FDECL(backfire, (struct obj *));
+static int FDECL(zap_ok, (struct obj *));
 static void FDECL(boxlock_invent, (struct obj *));
 static int FDECL(spell_hit_bonus, (int));
 static void FDECL(destroy_one_item, (struct obj *, int, int));
@@ -2302,7 +2303,15 @@ struct obj *otmp;
     useupall(otmp);
 }
 
-static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
+/* getobj callback for object to zap */
+static int
+zap_ok(obj)
+struct obj *obj;
+{
+    if (obj && obj->oclass == WAND_CLASS)
+        return GETOBJ_SUGGEST;
+    return GETOBJ_EXCLUDE;
+}
 
 /* 'z' command (or 'y' if numbed_pad==-1) */
 int
@@ -2317,7 +2326,7 @@ dozap()
     }
     if (check_capacity((char *) 0))
         return 0;
-    obj = getobj(zap_syms, "zap");
+    obj = getobj("zap", zap_ok, GETOBJ_NOFLAGS);
     if (!obj)
         return 0;
 

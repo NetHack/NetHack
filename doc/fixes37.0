@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ $NHDT-Date: 1609811543 2021/01/05 01:52:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ $NHDT-Date: 1610138674 2021/01/08 20:44:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -134,8 +134,7 @@ male hero poly'd into nymph chooses charm vs seduce message based on being
 	male rather than on all nymphs being female but charm message was
 	using hardcoded pronouns She,her for target monster--wrong for male
 	target and noticable if "<mon> finishes taking off his suit" is given
-hostile monsters with a spit attack or launcher and ammo try to stay away
-	from melee range
+hostile monsters with a ranged attack try to stay away from melee range
 allow displacing peaceful creatures
 unicorn horns don't restore attribute loss anymore
 when a shop is changed from food to health food, change room type to match
@@ -360,6 +359,8 @@ when telepathically sensed pet ate a mimic corpse and temporarily took on
 	overrides mimic hiding); give a different message in that case
 when a pet ate a mimic corpse and tried to temporarily look like a sink it
 	ended up looking like a throne (terrain type SINK == symbol S_throne)
+have dowhatdoes ('&') catch up with '?i' to describe ^A, ESC, and movement
+	prefix keystrokes correctly instead of reporting "no such command"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -483,10 +484,10 @@ remove unused vision tables
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
 curses: line input that doesn't take place on the bottom line of the message
-	window or in a popup doesn't support ESC to kill partial input or to
-	cancel; "Who are you?" prompt was willing to name a character "^[";
-	have askname() fake the usual ESC handling, but player has to type
-	<escape><return> for that to work
+	window uses a canned curses routine and doesn't support ESC to kill
+	partial input or to cancel; "Who are you?" prompt was willing to name
+	a character "^["; have the popup version of getlin() fake the usual
+	ESC handling, but player has to type <escape><return> for that to work
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
@@ -592,7 +593,7 @@ Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
 	window got pushed underneath the main window so seemed to go away
-Qt+OSX: fix control key
+Qt+OSX: fix control key (fixed all except for ^V); handle ^V as a shortcut key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
 	for making persistent Qt customizations to "nethack->Preferences..."

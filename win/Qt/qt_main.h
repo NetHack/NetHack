@@ -19,6 +19,11 @@
 // [Used in qt_bind.cpp and qt_main.cpp, but not referenced in qt_stat.cpp.]
 #define DYNAMIC_STATUSLINES
 
+// NetHackQtBind::notify() doesn't see ^V on OSX
+#ifdef MACOSX
+#define CTRL_V_HACK
+#endif
+
 namespace nethack_qt_ {
 
 class NetHackQtInvUsageWindow;
@@ -83,6 +88,9 @@ private slots:
 	void zoomMap();
 	void raiseMessages();
 	void raiseStatus();
+#ifdef CTRL_V_HACK
+        void CtrlV();
+#endif
 
 private:
 	void ShowIfReady();

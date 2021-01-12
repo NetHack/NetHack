@@ -5,6 +5,7 @@
 
 static int FDECL(cost, (struct obj *));
 static boolean FDECL(label_known, (int, struct obj *));
+static int FDECL(write_ok, (struct obj *));
 static char *FDECL(new_book_description, (int, char *));
 
 /*
@@ -87,7 +88,19 @@ struct obj *objlist;
     return FALSE;
 }
 
-static NEARDATA const char write_on[] = { SCROLL_CLASS, SPBOOK_CLASS, 0 };
+/* getobj callback for object to write on */
+static int
+write_ok(obj)
+struct obj *obj;
+{
+    if (!obj || (obj->oclass != SCROLL_CLASS && obj->oclass != SPBOOK_CLASS))
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp == SCR_BLANK_PAPER || obj->otyp == SPE_BLANK_PAPER)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
 
 /* write -- applying a magic marker */
 int
@@ -115,7 +128,7 @@ register struct obj *pen;
     }
 
     /* get paper to write on */
-    paper = getobj(write_on, "write on");
+    paper = getobj("write on", write_ok, GETOBJ_NOFLAGS);
     if (!paper)
         return 0;
     /* can't write on a novel (unless/until it's been converted into a blank

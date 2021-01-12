@@ -454,7 +454,8 @@ int forceit;
                 if (!isok(x, y) || (x == u.ux && y == u.uy))
                     continue;
 
-                if (accessible(x, y) && !MON_AT(x, y)) {
+                if (accessible(x, y) && !MON_AT(x, y)
+                    && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
                     distance = distu(x, y);
                     if (min_distance < 0 || distance < min_distance
                         || (distance == min_distance && rn2(2))) {
@@ -649,6 +650,8 @@ int reason; /* Player was thrown off etc. */
                  */
                 g.in_steed_dismounting = TRUE;
                 teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
+                if (sobj_at(BOULDER, cc.x, cc.y))
+                    sokoban_guilt();
                 g.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */

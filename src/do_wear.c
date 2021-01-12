@@ -42,6 +42,11 @@ static int FDECL(armor_or_accessory_off, (struct obj *));
 static int FDECL(accessory_or_armor_on, (struct obj *));
 static void FDECL(already_wearing, (const char *));
 static void FDECL(already_wearing2, (const char *, const char *));
+static int FDECL(equip_ok, (struct obj *, BOOLEAN_P, BOOLEAN_P));
+static int FDECL(puton_ok, (struct obj *));
+static int FDECL(remove_ok, (struct obj *));
+static int FDECL(wear_ok, (struct obj *));
+static int FDECL(takeoff_ok, (struct obj *));
 
 /* plural "fingers" or optionally "gloves" */
 const char *
@@ -1446,14 +1451,6 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     return result;
 }
 
-/* both 'clothes' and 'accessories' now include both armor and accessories;
-   TOOL_CLASS is for eyewear, FOOD_CLASS is for MEAT_RING */
-static NEARDATA const char clothes[] = {
-    ARMOR_CLASS, RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0
-};
-static NEARDATA const char accessories[] = {
-    RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, ARMOR_CLASS, 0
-};
 static NEARDATA int Narmorpieces, Naccessories;
 
 /* assign values to Narmorpieces and Naccessories */
@@ -1575,7 +1572,7 @@ dotakeoff()
         return 0;
     }
     if (Narmorpieces != 1 || ParanoidRemove)
-        otmp = getobj(clothes, "take off");
+        otmp = getobj("take off", takeoff_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return 0;
 
@@ -1594,7 +1591,7 @@ doremring()
         return 0;
     }
     if (Naccessories != 1 || ParanoidRemove)
-        otmp = getobj(accessories, "remove");
+        otmp = getobj("remove", remove_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return 0;
 
@@ -2159,7 +2156,7 @@ dowear()
         You("are already wearing a full complement of armor.");
         return 0;
     }
-    otmp = getobj(clothes, "wear");
+    otmp = getobj("wear", wear_ok, GETOBJ_NOFLAGS);
     return otmp ? accessory_or_armor_on(otmp) : 0;
 }
 
@@ -2178,7 +2175,7 @@ doputon()
              (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
         return 0;
     }
-    otmp = getobj(accessories, "put on");
+    otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
     return otmp ? accessory_or_armor_on(otmp) : 0;
 }
 
@@ -2932,6 +2929,86 @@ boolean only_if_known_cursed; /* ignore covering unless known to be cursed */
     }
     /* item is not inaccessible */
     return FALSE;
+}
+
+/* not a getobj callback - unifies code among the other four getobj callbacks */
+static int
+equip_ok(obj, removing, accessory)
+struct obj *obj;
+boolean removing;
+boolean accessory;
+{
+    boolean is_worn;
+    long dummymask = 0;
+
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    /* ignore for putting on if already worn, or removing if not already worn */
+    is_worn = ((obj->owornmask & (W_ARMOR | W_ACCESSORY)) != 0);
+    if (removing ^ is_worn)
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    /* exclude most object classes outright */
+    if (obj->oclass != ARMOR_CLASS && obj->oclass != RING_CLASS
+        && obj->oclass != AMULET_CLASS) {
+        /* ... except for a few wearable exceptions outside these classes */
+        if (obj->otyp != MEAT_RING && obj->otyp != BLINDFOLD
+            && obj->otyp != TOWEL && obj->otyp != LENSES)
+            return GETOBJ_EXCLUDE;
+    }
+
+    /* armor with 'P' or 'R' or accessory with 'W' or 'T' */
+    if (accessory ^ (obj->oclass != ARMOR_CLASS))
+        return GETOBJ_DOWNPLAY;
+
+    /* armor we can't wear, e.g. from polyform */
+    if (obj->oclass == ARMOR_CLASS && !removing &&
+        !canwearobj(obj, &dummymask, FALSE))
+        return GETOBJ_DOWNPLAY;
+
+    /* Possible extension: downplay items (both accessories and armor) which
+     * can't be worn because the slot is filled with something else. */
+
+    /* removing inaccessible equipment */
+    if (removing && inaccessible_equipment(obj, (const char *) 0,
+                                           (obj->oclass == RING_CLASS)))
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    /* all good to go */
+    return GETOBJ_SUGGEST;
+}
+
+/* getobj callback for P command */
+static int
+puton_ok(obj)
+struct obj *obj;
+{
+    return equip_ok(obj, FALSE, TRUE);
+}
+
+/* getobj callback for R command */
+static int
+remove_ok(obj)
+struct obj *obj;
+{
+    return equip_ok(obj, TRUE, TRUE);
+}
+
+/* getobj callback for W command */
+static int
+wear_ok(obj)
+struct obj *obj;
+{
+    return equip_ok(obj, FALSE, FALSE);
+}
+
+/* getobj callback for T command */
+static int
+takeoff_ok(obj)
+struct obj *obj;
+{
+    return equip_ok(obj, TRUE, FALSE);
 }
 
 /*do_wear.c*/

@@ -15,8 +15,6 @@
 
 namespace nethack_qt_ {
 
-extern uchar keyValue(QKeyEvent *key_event); // also used in qt_xcmd.cpp
-
 class NetHackQtTextListBox : public QListWidget {
 public:
     NetHackQtTextListBox(QWidget* parent = NULL) : QListWidget(parent) { }

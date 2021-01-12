@@ -1011,7 +1011,8 @@ E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int, int));
 E boolean FDECL(splittable, (struct obj *));
-E struct obj *FDECL(getobj, (const char *, const char *));
+E int FDECL(any_obj_ok, (struct obj *));
+E struct obj *FDECL(getobj, (const char *, int (*)(OBJ_P), unsigned int));
 E int FDECL(ggetobj, (const char *, int (*)(OBJ_P), int,
                       BOOLEAN_P, unsigned *));
 E int FDECL(askchain, (struct obj **, const char *, int, int (*)(OBJ_P),
@@ -2124,7 +2125,7 @@ E char *FDECL(apron_text, (struct obj *, char *));
 E const char *FDECL(candy_wrapper_text, (struct obj *));
 E void FDECL(assign_candy_wrapper, (struct obj *));
 E int NDECL(doread);
-E boolean FDECL(is_chargeable, (struct obj *));
+E int FDECL(charge_ok, (struct obj *));
 E void FDECL(recharge, (struct obj *, int));
 E int FDECL(seffects, (struct obj *));
 E void FDECL(drop_boulder_on_player,

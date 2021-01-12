@@ -18,25 +18,28 @@ static void FDECL(use_candelabrum, (struct obj *));
 static void FDECL(use_candle, (struct obj **));
 static void FDECL(use_lamp, (struct obj *));
 static void FDECL(light_cocktail, (struct obj **));
+static int FDECL(rub_ok, (struct obj *));
 static void FDECL(display_jump_positions, (int));
 static void FDECL(use_tinning_kit, (struct obj *));
 static void FDECL(use_figurine, (struct obj **));
+static int FDECL(grease_ok, (struct obj *));
 static void FDECL(use_grease, (struct obj *));
 static void FDECL(use_trap, (struct obj *));
+static int FDECL(touchstone_ok, (struct obj *));
 static void FDECL(use_stone, (struct obj *));
 static int NDECL(set_trap); /* occupation callback */
 static int FDECL(use_whip, (struct obj *));
 static void FDECL(display_polearm_positions, (int));
 static int FDECL(use_pole, (struct obj *));
 static int FDECL(use_cream_pie, (struct obj *));
+static int FDECL(jelly_ok, (struct obj *));
 static int FDECL(use_royal_jelly, (struct obj *));
 static int FDECL(use_grapple, (struct obj *));
 static int FDECL(do_break_wand, (struct obj *));
+static int FDECL(apply_ok, (struct obj *));
 static int FDECL(flip_through_book, (struct obj *));
 static boolean FDECL(figurine_location_checks, (struct obj *,
                                                     coord *, BOOLEAN_P));
-static void FDECL(add_class, (char *, CHAR_P));
-static void FDECL(setapplyclasses, (char *));
 static boolean FDECL(check_jump, (genericptr_t, int, int));
 static boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
 static boolean FDECL(get_valid_jump_position, (int, int));
@@ -1552,9 +1555,22 @@ struct obj **optr;
     *optr = obj;
 }
 
-static NEARDATA const char
-    cuddly[] = { TOOL_CLASS, GEM_CLASS, 0 },
-    cuddlier[] = { TOOL_CLASS, GEM_CLASS, FOOD_CLASS, 0 };
+/* getobj callback for object to be rubbed - not selecting a secondary object to
+ * rub on a gray stone or rub jelly on */
+static int
+rub_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
+        || obj->otyp == BRASS_LANTERN || is_graystone(obj)
+        || obj->otyp == LUMP_OF_ROYAL_JELLY)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
 
 int
 dorub()
@@ -1565,7 +1581,7 @@ dorub()
         You("aren't able to rub anything without hands.");
         return 0;
     }
-    obj = getobj(carrying(LUMP_OF_ROYAL_JELLY) ? cuddlier : cuddly, "rub");
+    obj = getobj("rub", rub_ok, GETOBJ_NOFLAGS);
     if (!obj) {
         /* pline1(Never_mind); -- handled by getobj() */
         return 0;
@@ -2331,7 +2347,24 @@ struct obj **optr;
     *optr = 0;
 }
 
-static NEARDATA const char lubricables[] = { ALL_CLASSES, ALLOW_NONE, 0 };
+/* getobj callback for object to apply grease to */
+static int
+grease_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_SUGGEST;
+
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    if (inaccessible_equipment(obj, (const char *) 0, FALSE))
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    /* Possible extension: don't suggest greasing objects which are already
+     * greased. */
+    return GETOBJ_SUGGEST;
+}
 
 static void
 use_grease(obj)
@@ -2357,7 +2390,7 @@ struct obj *obj;
             dropx(obj);
             return;
         }
-        otmp = getobj(lubricables, "grease");
+        otmp = getobj("grease", grease_ok, GETOBJ_PROMPT);
         if (!otmp)
             return;
         if (inaccessible_equipment(otmp, "grease", FALSE))
@@ -2386,31 +2419,52 @@ struct obj *obj;
     update_inventory();
 }
 
+/* getobj callback for object to rub on a known touchstone */
+static int
+touchstone_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    /* Gold being suggested as a rub target is questionable - it fits the
+     * real-world historic use of touchstones, but doesn't do anything
+     * significant in the game. */
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_SUGGEST;
+
+    /* don't suggest identified gems */
+    if (obj->oclass == GEM_CLASS
+        && !(obj->dknown && objects[obj->otyp].oc_name_known))
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
+
+
 /* touchstones - by Ken Arnold */
 static void
 use_stone(tstone)
 struct obj *tstone;
 {
     static const char scritch[] = "\"scritch, scritch\"";
-    static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
-    static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
     struct obj *obj;
     boolean do_scratch;
-    const char *streak_color, *choices;
+    const char *streak_color;
     char stonebuf[QBUFSZ];
     int oclass;
+    boolean known;
 
     /* in case it was acquired while blinded */
     if (!Blind)
         tstone->dknown = 1;
+    known = (tstone->otyp == TOUCHSTONE && tstone->dknown
+              && objects[TOUCHSTONE].oc_name_known);
+    Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */
-    choices = (tstone->otyp == TOUCHSTONE && tstone->dknown
-               && objects[TOUCHSTONE].oc_name_known)
-                  ? coins_gems
-                  : allowall;
-    Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
-    if ((obj = getobj(choices, stonebuf)) == 0)
+    if ((obj = getobj(stonebuf, known ? touchstone_ok : any_obj_ok,
+                      GETOBJ_PROMPT)) == 0)
         return;
 
     if (obj == tstone && obj->quan == 1L) {
@@ -3180,11 +3234,21 @@ struct obj *obj;
     return 0;
 }
 
+/* getobj callback for object to rub royal jelly on */
+static int
+jelly_ok(obj)
+struct obj *obj;
+{
+    if (obj && obj->otyp == EGG)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
+
 static int
 use_royal_jelly(obj)
 struct obj *obj;
 {
-    static const char allowall[2] = { ALL_CLASSES, 0 };
     int oldcorpsenm;
     unsigned was_timed;
     struct obj *eobj;
@@ -3196,7 +3260,7 @@ struct obj *obj;
     freeinv(obj);
 
     /* right now you can rub one royal jelly on an entire stack of eggs */
-    eobj = getobj(allowall, "rub the royal jelly on");
+    eobj = getobj("rub the royal jelly on", jelly_ok, GETOBJ_PROMPT);
     if (!eobj) {
         addinv(obj); /* put the unused lump back; if it came from
                       * a split, it should merge back */
@@ -3624,64 +3688,53 @@ discard_broken_wand:
     return 1;
 }
 
-static void
-add_class(cl, class)
-char *cl;
-char class;
+/* getobj callback for object to apply - this is more complex than most other
+ * callbacks because there are a lot of appliables */
+static int
+apply_ok(obj)
+struct obj *obj;
 {
-    char tmp[2];
+    if (!obj)
+        return GETOBJ_EXCLUDE;
 
-    tmp[0] = class;
-    tmp[1] = '\0';
-    Strcat(cl, tmp);
-}
+    /* all tools, all wands (breaking), all spellbooks (flipping through -
+     * including blank/novel/Book of the Dead) */
+    if (obj->oclass == TOOL_CLASS || obj->oclass == WAND_CLASS
+        || obj->oclass == SPBOOK_CLASS)
+        return GETOBJ_SUGGEST;
 
-static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
+    /* certain weapons */
+    if (obj->oclass == WEAPON_CLASS
+        && (is_pick(obj) || is_axe(obj) || is_pole(obj)
+            || obj->otyp == BULLWHIP))
+        return GETOBJ_SUGGEST;
 
-/* augment tools[] if various items are carried */
-static void
-setapplyclasses(class_list)
-char class_list[];
-{
-    register struct obj *otmp;
-    int otyp;
-    boolean knowoil, knowtouchstone;
-    boolean addpotions, addstones, addfood, addspellbooks;
+    /* only applicable potion is oil, and it will only be offered as a choice
+     * when already discovered */
+    if (obj->otyp == POT_OIL && obj->dknown
+        && objects[obj->otyp].oc_name_known)
+        return GETOBJ_SUGGEST;
 
-    knowoil = objects[POT_OIL].oc_name_known;
-    knowtouchstone = objects[TOUCHSTONE].oc_name_known;
-    addpotions = addstones = addfood = addspellbooks = FALSE;
-    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
-        otyp = otmp->otyp;
-        if (otyp == POT_OIL
-            || (otmp->oclass == POTION_CLASS
-                && (!otmp->dknown
-                    || (!knowoil && !objects[otyp].oc_name_known))))
-            addpotions = TRUE;
-        if (otyp == TOUCHSTONE
-            || (is_graystone(otmp)
-                && (!otmp->dknown
-                    || (!knowtouchstone && !objects[otyp].oc_name_known))))
-            addstones = TRUE;
-        if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF
-            || otyp == LUMP_OF_ROYAL_JELLY)
-            addfood = TRUE;
-        if (otmp->oclass == SPBOOK_CLASS)
-            addspellbooks = TRUE;
+    /* certain foods */
+    if (obj->otyp == CREAM_PIE || obj->otyp == EUCALYPTUS_LEAF
+        || obj->otyp == LUMP_OF_ROYAL_JELLY)
+        return GETOBJ_SUGGEST;
+
+    if (is_graystone(obj)) {
+        /* The only case where we don't suggest a gray stone is if we KNOW it
+         * isn't a touchstone. */
+        if (!obj->dknown)
+            return GETOBJ_SUGGEST;
+
+        if (obj->otyp != TOUCHSTONE
+            && (objects[TOUCHSTONE].oc_name_known
+                || objects[obj->otyp].oc_name_known))
+            return GETOBJ_EXCLUDE;
+
+        return GETOBJ_SUGGEST;
     }
 
-    class_list[0] = '\0';
-    if (addpotions || addstones)
-        add_class(class_list, ALL_CLASSES);
-    Strcat(class_list, tools);
-    if (addpotions)
-        add_class(class_list, POTION_CLASS);
-    if (addstones)
-        add_class(class_list, GEM_CLASS);
-    if (addfood)
-        add_class(class_list, FOOD_CLASS);
-    if (addspellbooks)
-        add_class(class_list, SPBOOK_CLASS);
+    return GETOBJ_EXCLUDE;
 }
 
 /* the 'a' command */
@@ -3690,7 +3743,6 @@ doapply()
 {
     struct obj *obj;
     register int res = 1;
-    char class_list[MAXOCLASSES + 2];
 
     if (nohands(g.youmonst.data)) {
         You("aren't able to use or apply tools in your current form.");
@@ -3699,8 +3751,7 @@ doapply()
     if (check_capacity((char *) 0))
         return 0;
 
-    setapplyclasses(class_list); /* tools[] */
-    obj = getobj(class_list, "use or apply");
+    obj = getobj("use or apply", apply_ok, GETOBJ_NOFLAGS);
     if (!obj)
         return 0;
 

@@ -900,7 +900,7 @@ struct permonst **for_supplement;
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
         map_glyphinfo(cc.x, cc.y, glyph, 0, &glyphinfo);
-        sym = glyphinfo.symidx;
+        sym = glyphinfo.ttychar;
         Sprintf(prefix, "%s        ", encglyph(glyphinfo.glyph));
     } else
         Sprintf(prefix, "%c        ", sym);
@@ -1153,7 +1153,7 @@ struct permonst **for_supplement;
             case SYM_PET_OVERRIDE + SYM_OFF_X:
                 if (looked) {
                     /* convert to symbol without override in effect */
-                    map_glyphinfo(cc.x, cc.y, glyph, 0, &glyphinfo);
+                    map_glyphinfo(cc.x, cc.y, glyph, MG_FLAG_NOOVERRIDE, &glyphinfo);
                     sym = glyphinfo.ttychar;
                     goto check_monsters;
                 }

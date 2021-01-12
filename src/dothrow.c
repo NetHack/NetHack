@@ -9,6 +9,7 @@
 
 static int FDECL(throw_obj, (struct obj *, int));
 static boolean FDECL(ok_to_throw, (int *));
+static int FDECL(throw_ok, (struct obj *));
 static void NDECL(autoquiver);
 static int FDECL(gem_accept, (struct monst *, struct obj *));
 static void FDECL(tmiss, (struct obj *, struct monst *, BOOLEAN_P));
@@ -19,13 +20,6 @@ static void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
 static boolean FDECL(toss_up, (struct obj *, BOOLEAN_P));
 static void FDECL(sho_obj_return_to_u, (struct obj * obj));
 static boolean FDECL(mhurtle_step, (genericptr_t, int, int));
-
-static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
-                                           ALL_CLASSES, WEAPON_CLASS, 0 };
-/* different default choices when wielding a sling (gold must be included) */
-static NEARDATA const char t_bullets[] = {
-    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, GEM_CLASS, 0
-};
 
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
@@ -275,6 +269,36 @@ int *shotlimit_p; /* (see dothrow()) */
     return TRUE;
 }
 
+/* getobj callback for object to be thrown */
+static int
+throw_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->quan == 1 && (obj == uwep || (obj == uswapwep && u.twoweap)))
+        return GETOBJ_DOWNPLAY;
+    /* Possible extension: return GETOBJ_SUGGEST for uwep if it will return when
+     * thrown. */
+
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_SUGGEST;
+
+    if (!uslinging() && obj->oclass == WEAPON_CLASS)
+        return GETOBJ_SUGGEST;
+    /* Possible extension: exclude weapons that make no sense to throw, such as
+     * whips, bows, slings, rubber hoses. */
+
+    if (uslinging() && obj->oclass == GEM_CLASS)
+        return GETOBJ_SUGGEST;
+
+    if (throws_rocks(g.youmonst.data) && obj->otyp == BOULDER)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
+
 /* t command - throw */
 int
 dothrow()
@@ -296,7 +320,7 @@ dothrow()
     if (!ok_to_throw(&shotlimit))
         return 0;
 
-    obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
+    obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
@@ -408,7 +432,7 @@ dofire()
                use direction of previous throw as getobj()'s choice here */
             g.in_doagain = 0;
             /* choose something from inventory, then usually quiver it */
-            obj = getobj(uslinging() ? t_bullets : toss_objs, "throw");
+            obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
             /* Q command doesn't allow gold in quiver */
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
                 setuqwep(obj); /* demi-autoquiver */

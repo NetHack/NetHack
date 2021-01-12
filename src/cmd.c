@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1608933418 2020/12/25 21:56:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.440 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1610138674 2021/01/08 20:44:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.445 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2002,6 +2002,40 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
+/* used by dokeylist() and by key2extcmdesc() for dowhatdoes() */
+static const char
+    run_desc[] = "Prefix: run until something very interesting is seen",
+    rush_desc[] = "Prefix: rush until something interesting is seen",
+    forcefight_desc[] = "Prefix: force fight even if you don't see a monster";
+
+static const struct {
+    int nhkf;
+    const char *desc;
+    boolean numpad;
+} misc_keys[] = {
+    { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
+    { NHKF_RUSH, rush_desc, FALSE },
+    { NHKF_RUSH2, rush_desc, TRUE },
+    { NHKF_RUN, run_desc, FALSE },
+    { NHKF_RUN2, run_desc, TRUE },
+    { NHKF_FIGHT, forcefight_desc, FALSE },
+    { NHKF_FIGHT2, forcefight_desc, TRUE } ,
+    { NHKF_NOPICKUP,
+      "Prefix: move without picking up objects or fighting", FALSE },
+    { NHKF_RUN_NOPICKUP,
+      "Prefix: run without picking up objects or fighting", FALSE },
+    { NHKF_REQMENU,
+      "Prefix: request a menu (for some non-movement commands)", FALSE },
+    { NHKF_COUNT,
+      "Prefix: for digits when preceding a command with a count", TRUE },
+    { NHKF_DOINV, "numpad: view full inventory", TRUE },
+    /* NHKF_DOINV2 for num_pad+pcHack_compat isn't implemented:
+    { NHKF_DOINV2, "numpad: view inventory of one class of objects", TRUE },
+    */
+    { NHKF_DOAGAIN , "repeat: perform the previous command again", FALSE },
+    { 0, (const char *) 0, FALSE }
+};
+
 /* for key2extcmddesc() to support dowhatdoes() */
 struct movcmd {
     uchar k1, k2, k3, k4; /* 'normal', 'qwertz', 'numpad', 'phone' */
@@ -2025,9 +2059,9 @@ const char *
 key2extcmddesc(key)
 uchar key;
 {
-    static char key2cmdbuf[48];
+    static char key2cmdbuf[QBUFSZ];
     const struct movcmd *mov;
-    int k, c;
+    int k, c, i, j;
     uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
 
     /* need to check for movement commands before checking the extended
@@ -2062,10 +2096,18 @@ uchar key;
         if (*key2cmdbuf)
             return key2cmdbuf;
     }
+    /* check prefixes before regular commands; includes ^A pseudo-command */
+    for (i = 0; misc_keys[i].desc; ++i) {
+        if (misc_keys[i].numpad && !iflags.num_pad)
+            continue;
+        j = misc_keys[i].nhkf;
+        if (key == (uchar) g.Cmd.spkeys[j])
+            return misc_keys[i].desc;
+    }
+    /* finally, check whether 'key' is a command */
     if (g.Cmd.commands[key]) {
         if (g.Cmd.commands[key]->ef_txt)
             return g.Cmd.commands[key]->ef_desc;
-
     }
     return (char *) 0;
 }
@@ -2214,38 +2256,6 @@ boolean *keys_used; /* boolean keys_used[256] */
 void
 dokeylist(VOID_ARGS)
 {
-    static const char
-        run_desc[] = "Prefix: run until something very interesting is seen",
-        rush_desc[] = "Prefix: rush until something interesting is seen",
-        forcefight_desc[] =
-                     "Prefix: force fight even if you don't see a monster";
-    static const struct {
-        int nhkf;
-        const char *desc;
-        boolean numpad;
-    } misc_keys[] = {
-        { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
-        { NHKF_RUSH, rush_desc, FALSE },
-        { NHKF_RUSH2, rush_desc, TRUE },
-        { NHKF_RUN, run_desc, FALSE },
-        { NHKF_RUN2, run_desc, TRUE },
-        { NHKF_FIGHT, forcefight_desc, FALSE },
-        { NHKF_FIGHT2, forcefight_desc, TRUE } ,
-        { NHKF_NOPICKUP,
-          "Prefix: move without picking up objects or fighting", FALSE },
-        { NHKF_RUN_NOPICKUP,
-          "Prefix: run without picking up objects or fighting", FALSE },
-        { NHKF_REQMENU,
-          "Prefix: request a menu (for some non-movement commands)", FALSE },
-        { NHKF_COUNT,
-          "Prefix: for digits when preceding a command with a count", TRUE },
-        { NHKF_DOINV, "numpad: view full inventory", TRUE },
-        /* NHKF_DOINV2 for num_pad+pcHack_compat isn't implemented */
-        /* { NHKF_DOINV2, "numpad: view inventory of one class of objects",
-             TRUE }, */
-        { NHKF_DOAGAIN , "repeat: perform the previous command again", FALSE },
-        { 0, (const char *) 0, FALSE }
-    };
     const struct ext_func_tab *extcmd;
     winid datawin;
     char buf[BUFSZ], buf2[BUFSZ];

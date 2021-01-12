@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1609702027 2021/01/03 19:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.117 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1610146766 2021/01/08 22:59:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -833,7 +833,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/global.h ../include/coord.h \
 		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
 		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
-		../include/ntconf.h ../include/fnamesiz.h
+		../include/ntconf.h ../include/fnamesiz.h #../include/amiconf.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
@@ -849,16 +849,16 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/mextra.h ../include/skills.h ../include/onames.h \
 		../include/timeout.h ../include/trap.h ../include/flag.h \
 		../include/vision.h ../include/display.h ../include/winprocs.h \
-		../include/sys.h ../include/wintty.h
+		../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcmain.c
-$(TARGETPFX)pcsys.o: ../sys/share/pcsys.c $(HACK_H)
+$(TARGETPFX)pcsys.o: ../sys/share/pcsys.c $(HACK_H) ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcsys.c
-$(TARGETPFX)pctty.o: ../sys/share/pctty.c $(HACK_H)
+$(TARGETPFX)pctty.o: ../sys/share/pctty.c $(HACK_H) ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pctty.c
-$(TARGETPFX)pcunix.o: ../sys/share/pcunix.c $(HACK_H)
+$(TARGETPFX)pcunix.o: ../sys/share/pcunix.c $(HACK_H) ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pcunix.c
 $(TARGETPFX)pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/share/pmatchregex.c
@@ -876,14 +876,17 @@ $(TARGETPFX)unixunix.o: ../sys/unix/unixunix.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/unix/unixunix.c
 $(TARGETPFX)unixres.o: ../sys/unix/unixres.c $(CONFIG_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../sys/unix/unixres.c
-$(TARGETPFX)getline.o: ../win/tty/getline.c $(HACK_H) ../include/func_tab.h
+$(TARGETPFX)getline.o: ../win/tty/getline.c $(HACK_H) ../include/wintty.h \
+		../include/func_tab.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/getline.c
-$(TARGETPFX)termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
+$(TARGETPFX)termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/wintty.h \
+		../include/tcap.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/termcap.c
-$(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
+$(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h \
+		../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/topl.c
 $(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
-		../include/tcap.h
+		../include/tcap.h ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/wintty.c
 $(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
@@ -941,6 +944,8 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
+$(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
 $(TARGETPFX)qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_pre.h \
@@ -961,20 +966,19 @@ $(TARGETPFX)qt_clust.o: ../win/Qt/qt_clust.cpp ../win/Qt/qt_clust.h
 $(TARGETPFX)qt_delay.o: ../win/Qt/qt_delay.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_delay.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_delay.cpp
-$(TARGETPFX)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) \
-		../include/tile2x11.h ../win/Qt/qt_pre.h ../win/Qt/qt_post.h \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
-		../win/Qt/qt_kde0.h ../win/Qt/qt_set.h ../win/Qt/qt_inv.h \
-		../win/Qt/qt_map.h ../win/Qt/qt_win.h ../win/Qt/qt_clust.h \
-		../win/Qt/qt_str.h
+$(TARGETPFX)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) ../include/tile2x11.h \
+		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_glyph.h \
+		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_inv.h ../win/Qt/qt_map.h \
+		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
 $(TARGETPFX)qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_icon.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
 $(TARGETPFX)qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
-		../win/Qt/qt_kde0.h
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_bind.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_inv.cpp
 $(TARGETPFX)qt_key.o: ../win/Qt/qt_key.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_key.h
@@ -998,10 +1002,10 @@ $(TARGETPFX)qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_map.cpp
 $(TARGETPFX)qt_menu.o: ../win/Qt/qt_menu.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_menu.h ../win/Qt/qt_win.h \
-		../win/Qt/qt_rip.h qt_menu.moc ../win/Qt/qt_glyph.h \
-		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
-		../win/Qt/qt_kde0.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
-		../win/Qt/qt_str.h
+		../win/Qt/qt_rip.h qt_menu.moc ../win/Qt/qt_key.h \
+		../win/Qt/qt_glyph.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_streq.h \
+		../win/Qt/qt_line.h ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_menu.cpp
 $(TARGETPFX)qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_msg.h ../win/Qt/qt_win.h \
@@ -1021,7 +1025,7 @@ $(TARGETPFX)qt_rip.o: ../win/Qt/qt_rip.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 $(TARGETPFX)qt_set.o: ../win/Qt/qt_set.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
 		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h qt_set.moc \
-		../win/Qt/qt_glyph.h ../win/Qt/qt_str.h
+		../win/Qt/qt_glyph.h ../win/Qt/qt_xcmd.h ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_set.cpp
 $(TARGETPFX)qt_stat.o: ../win/Qt/qt_stat.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_stat.h ../win/Qt/qt_win.h \
@@ -1033,7 +1037,8 @@ $(TARGETPFX)qt_str.o: ../win/Qt/qt_str.cpp ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_str.cpp
 $(TARGETPFX)qt_streq.o: ../win/Qt/qt_streq.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
-		../win/Qt/qt_str.h
+		../win/Qt/qt_str.h ../win/Qt/qt_set.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_streq.cpp
 $(TARGETPFX)qt_svsel.o: ../win/Qt/qt_svsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_svsel.h ../win/Qt/qt_bind.h \
@@ -1049,18 +1054,20 @@ $(TARGETPFX)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 $(TARGETPFX)qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
 		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_xcmd.h \
-		qt_xcmd.moc ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
-		../win/Qt/qt_kde0.h ../win/Qt/qt_set.h ../win/Qt/qt_str.h
+		qt_xcmd.moc ../win/Qt/qt_key.h ../win/Qt/qt_bind.h \
+		../win/Qt/qt_main.h ../win/Qt/qt_kde0.h ../win/Qt/qt_set.h \
+		../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_xcmd.cpp
 $(TARGETPFX)qt_yndlg.o: ../win/Qt/qt_yndlg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_yndlg.h qt_yndlg.moc \
-		../win/Qt/qt_str.h
+		../win/Qt/qt_key.h ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_yndlg.cpp
 $(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainout.c
-$(TARGETPFX)wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
+$(TARGETPFX)wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/wintty.h \
+		../include/func_tab.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_trace.c
 $(TARGETPFX)allmain.o: allmain.c $(HACK_H)
 $(TARGETPFX)alloc.o: alloc.c $(CONFIG_H)
@@ -1095,7 +1102,8 @@ $(TARGETPFX)engrave.o: engrave.c $(HACK_H)
 $(TARGETPFX)exper.o: exper.c $(HACK_H)
 $(TARGETPFX)explode.o: explode.c $(HACK_H)
 $(TARGETPFX)extralev.o: extralev.c $(HACK_H)
-$(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
+$(TARGETPFX)files.o: files.c $(HACK_H) ../include/dlb.h ../include/wintty.h \
+		#zlib.h
 $(TARGETPFX)fountain.o: fountain.c $(HACK_H)
 $(TARGETPFX)hack.o: hack.c $(HACK_H)
 $(TARGETPFX)hacklib.o: hacklib.c $(HACK_H)
@@ -1152,7 +1160,8 @@ $(TARGETPFX)potion.o: potion.c $(HACK_H)
 $(TARGETPFX)pray.o: pray.c $(HACK_H)
 $(TARGETPFX)priest.o: priest.c $(HACK_H) ../include/mfndpos.h
 $(TARGETPFX)quest.o: quest.c $(HACK_H)
-$(TARGETPFX)questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h
+$(TARGETPFX)questpgr.o: questpgr.c $(HACK_H) ../include/dlb.h \
+		../include/wintty.h
 $(TARGETPFX)read.o: read.c $(HACK_H)
 $(TARGETPFX)rect.o: rect.c $(HACK_H)
 $(TARGETPFX)region.o: region.c $(HACK_H)
@@ -1186,8 +1195,8 @@ $(TARGETPFX)vision.o: vision.c $(HACK_H)
 $(TARGETPFX)weapon.o: weapon.c $(HACK_H)
 $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)
-$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wingem.h \
-		../include/winGnome.h
+$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wintty.h \
+		../include/wingem.h ../include/winGnome.h
 $(TARGETPFX)wizard.o: wizard.c $(HACK_H)
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)

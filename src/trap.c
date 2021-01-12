@@ -49,6 +49,7 @@ static int FDECL(try_disarm, (struct trap *, BOOLEAN_P));
 static void FDECL(reward_untrap, (struct trap *, struct monst *));
 static int FDECL(disarm_holdingtrap, (struct trap *));
 static int FDECL(disarm_landmine, (struct trap *));
+static int FDECL(unsqueak_ok, (struct obj *));
 static int FDECL(disarm_squeaky_board, (struct trap *));
 static int FDECL(disarm_shooting_trap, (struct trap *, int));
 static void FDECL(clear_conjoined_pits, (struct trap *));
@@ -2147,11 +2148,15 @@ unsigned trflags;
             set_wounded_legs(RIGHT_SIDE, rn1(35, 41));
             exercise(A_DEX, FALSE);
         }
+        /* add a pit before calling losehp so bones won't keep the landmine;
+         * blow_up_landmine will remove the pit afterwards if inappropriate */
+        trap->ttyp = PIT;
+        trap->madeby_u = FALSE;
+        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
         blow_up_landmine(trap);
         if (steed_mid && saddle && !u.usteed)
             (void) keep_saddle_with_steedcorpse(steed_mid, fobj, saddle);
         newsym(u.ux, u.uy); /* update trap symbol */
-        losehp(Maybe_Half_Phys(rnd(16)), "land mine", KILLED_BY_AN);
         /* fall recursively into the pit... */
         if ((trap = t_at(u.ux, u.uy)) != 0)
             dotrap(trap, RECURSIVETRAP);
@@ -2552,6 +2557,7 @@ struct trap *trap;
 {
     int x = trap->tx, y = trap->ty, dbx, dby;
     struct rm *lev = &levl[x][y];
+    schar typ;
 
     (void) scatter(x, y, 4,
                    MAY_DESTROY | MAY_HIT | MAY_FRACTURE | VIS_EFFECTS,
@@ -2574,9 +2580,18 @@ struct trap *trap;
             /* no pits here */
             deltrap(trap);
         } else {
-            trap->ttyp = PIT;       /* explosion creates a pit */
-            trap->madeby_u = FALSE; /* resulting pit isn't yours */
-            seetrap(trap);          /* and it isn't concealed */
+            /* fill pit with water, if applicable */
+            typ = fillholetyp(x, y, FALSE);
+            if (typ != ROOM) {
+                lev->typ = typ;
+                liquid_flow(x, y, typ, trap,
+                            cansee(x, y) ? "The hole fills with %s!"
+                                         : (char *) 0);
+            } else {
+                trap->ttyp = PIT;       /* explosion creates a pit */
+                trap->madeby_u = FALSE; /* resulting pit isn't yours */
+                seetrap(trap);          /* and it isn't concealed */
+            }
         }
     }
 }
@@ -4560,9 +4575,29 @@ struct trap *ttmp;
     return 1;
 }
 
-/* getobj will filter down to cans of grease and known potions of oil */
-static NEARDATA const char oil[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
-                                     0 };
+/* getobj callback for object to disarm a squeaky board with */
+static int
+unsqueak_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->otyp == CAN_OF_GREASE)
+        return GETOBJ_SUGGEST;
+
+    if (obj->otyp == POT_OIL && obj->dknown &&
+        objects[POT_OIL].oc_name_known)
+        return GETOBJ_SUGGEST;
+
+    /* downplay all other potions, including unidentified oil
+     * Potential extension: if oil is known, skip this and exclude all other
+     * potions. */
+    if (obj->oclass == POTION_CLASS)
+        return GETOBJ_DOWNPLAY;
+
+    return GETOBJ_EXCLUDE;
+}
 
 /* it may not make much sense to use grease on floor boards, but so what? */
 static int
@@ -4573,7 +4608,7 @@ struct trap *ttmp;
     boolean bad_tool;
     int fails;
 
-    obj = getobj(oil, "untrap with");
+    obj = getobj("untrap with", unsqueak_ok, GETOBJ_PROMPT);
     if (!obj)
         return 0;
 

@@ -5,6 +5,7 @@
 
 #include "hack.h"
 
+static int FDECL(stylus_ok, (struct obj *));
 static const char *NDECL(blengr);
 
 char *
@@ -435,10 +436,28 @@ freehand()
             || (!bimanual(uwep) && (!uarms || !uarms->cursed)));
 }
 
-static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
-                                          TOOL_CLASS,  WEAPON_CLASS,
-                                          WAND_CLASS,  GEM_CLASS,
-                                          RING_CLASS,  0 };
+/* getobj callback for an object to engrave with */
+static int
+stylus_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_SUGGEST;
+
+    /* Potential extension: exclude weapons that don't make any sense (such as
+     * bullwhips) and downplay rings and gems that wouldn't be good to write
+     * with (such as glass and non-gem rings) */
+    if (obj->oclass == WEAPON_CLASS || obj->oclass == WAND_CLASS
+        || obj->oclass == GEM_CLASS || obj->oclass == RING_CLASS)
+        return GETOBJ_SUGGEST;
+
+    /* Only markers and towels are recommended tools. */
+    if (obj->oclass == TOOL_CLASS
+        && (obj->otyp == TOWEL || obj->otyp == MAGIC_MARKER))
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
 
 /* Mohs' Hardness Scale:
  *  1 - Talc             6 - Orthoclase
@@ -545,7 +564,7 @@ doengrave()
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
      */
 
-    otmp = getobj(styluses, "write with");
+    otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
     if (!otmp) /* otmp == cg.zeroobj if fingers */
         return 0;
 

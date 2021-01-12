@@ -90,6 +90,7 @@ extern "C" {
 #include "qt_post.h"
 #include "qt_xcmd.h"
 #include "qt_xcmd.moc"
+#include "qt_key.h" // for keyValue()
 #include "qt_bind.h"
 #include "qt_set.h"
 #include "qt_str.h"

@@ -29,6 +29,10 @@ static int FDECL(mfind0, (struct monst *, BOOLEAN_P));
 static int FDECL(reveal_terrain_getglyph, (int, int, int,
                                                unsigned, int, int));
 
+/* wildcard class for clear_stale_map - this used to be used as a getobj() input
+ * but it's no longer used for that function */
+#define ALL_CLASSES (MAXOCLASSES + 1)
+
 /* bring hero out from underwater or underground or being engulfed;
    return True iff any change occurred */
 static boolean

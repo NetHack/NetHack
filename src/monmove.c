@@ -12,6 +12,7 @@ static int FDECL(disturb, (struct monst *));
 static void FDECL(release_hero, (struct monst *));
 static void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 static int FDECL(m_arrival, (struct monst *));
+static boolean FDECL(m_balks_at_approaching, (struct monst *));
 static boolean FDECL(stuff_prevents_passage, (struct monst *));
 static int FDECL(vamp_shift, (struct monst *, struct permonst *,
                                   BOOLEAN_P));
@@ -847,6 +848,36 @@ xchar nix,niy;
     return FALSE;
 }
 
+/* does monster want to avoid you? */
+static boolean
+m_balks_at_approaching(mtmp)
+struct monst *mtmp;
+{
+    /* peaceful, far away, or can't see you */
+    if (mtmp->mpeaceful
+        || (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) >= 5*5)
+        || !m_canseeu(mtmp))
+        return FALSE;
+
+    /* has ammo+launcher or can spit */
+    if (m_has_launcher_and_ammo(mtmp)
+        || attacktype(mtmp->data, AT_SPIT))
+        return TRUE;
+
+    /* is using a polearm and in range */
+    if (MON_WEP(mtmp) && is_pole(MON_WEP(mtmp))
+        && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= MON_POLE_DIST)
+        return TRUE;
+
+    /* breath attack, and hp loss or breath not used */
+    if (attacktype(mtmp->data, AT_BREA)
+        && ((mtmp->mhp < (mtmp->mhpmax+1) / 3)
+            || !mtmp->mspec_used))
+        return TRUE;
+
+    return FALSE;
+}
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1015,11 +1046,8 @@ register int after;
                     > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
             appr = -1;
 
-        /* hostiles with ranged weapons or spit attack try to stay away */
-        if (!mtmp->mpeaceful
-            && (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) < 5*5)
-            && m_canseeu(mtmp) &&
-            (m_has_launcher_and_ammo(mtmp) || attacktype(mtmp->data, AT_SPIT)))
+        /* hostiles with ranged weapon or attack try to stay away */
+        if (m_balks_at_approaching(mtmp))
             appr = -1;
 
         if (!should_see && can_track(ptr)) {

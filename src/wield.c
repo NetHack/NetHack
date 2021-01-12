@@ -54,6 +54,8 @@
 
 static boolean FDECL(cant_wield_corpse, (struct obj *));
 static int FDECL(ready_weapon, (struct obj *));
+static int FDECL(ready_ok, (struct obj *));
+static int FDECL(wield_ok, (struct obj *));
 
 /* used by will_weld() */
 /* probably should be renamed */
@@ -267,18 +269,51 @@ register struct obj *obj;
     return;
 }
 
-/*** Commands to change particular slot(s) ***/
+/* getobj callback for object to ready for throwing/shooting */
+static int
+ready_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_SUGGEST;
 
-static NEARDATA const char wield_objs[] = {
-    ALLOW_COUNT, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0
-};
-static NEARDATA const char ready_objs[] = {
-    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0
-};
-static NEARDATA const char w_bullets[] = { /* (different from dothrow.c) */
-    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE,
-    GEM_CLASS, WEAPON_CLASS, 0
-};
+    /* exclude when wielded... */
+    if ((obj == uwep || (obj == uswapwep && u.twoweap))
+        && obj->quan == 1) /* ...unless more than one */
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    if (obj->oclass == WEAPON_CLASS || obj->oclass == COIN_CLASS)
+        return GETOBJ_SUGGEST;
+    /* Possible extension: exclude weapons that make no sense to throw, such as
+     * whips, bows, slings, rubber hoses. */
+
+    /* Include gems/stones as likely candidates if either primary
+       or secondary weapon is a sling. */
+    if (obj->oclass == GEM_CLASS
+        && (uslinging()
+            || (uswapwep && objects[uswapwep->otyp].oc_skill == P_SLING)))
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
+
+/* getobj callback for object to wield */
+static int
+wield_ok(obj)
+struct obj *obj;
+{
+    if (!obj)
+        return GETOBJ_SUGGEST;
+
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->oclass == WEAPON_CLASS
+        || (obj->oclass == TOOL_CLASS && is_weptool(obj)))
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_DOWNPLAY;
+}
 
 int
 dowield()
@@ -297,7 +332,7 @@ dowield()
 
     /* Prompt for a new weapon */
     clear_splitobjs();
-    if (!(wep = getobj(wield_objs, "wield"))) {
+    if (!(wep = getobj("wield", wield_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT))) {
         /* Cancelled */
         return 0;
     } else if (wep == uwep) {
@@ -438,7 +473,6 @@ dowieldquiver()
 {
     char qbuf[QBUFSZ];
     struct obj *newquiver;
-    const char *quivee_types;
     int res;
     boolean finish_splitting = FALSE,
             was_uwep = FALSE, was_twoweap = u.twoweap;
@@ -446,18 +480,11 @@ dowieldquiver()
     /* Since the quiver isn't in your hands, don't check cantwield(), */
     /* will_weld(), touch_petrifies(), etc. */
     g.multi = 0;
-    /* forget last splitobj() before calling getobj() with ALLOW_COUNT */
+    /* forget last splitobj() before calling getobj() with GETOBJ_ALLOWCNT */
     clear_splitobjs();
 
-    /* Prompt for a new quiver: "What do you want to ready?"
-       (Include gems/stones as likely candidates if either primary
-       or secondary weapon is a sling.) */
-    quivee_types = (uslinging()
-                    || (uswapwep
-                        && objects[uswapwep->otyp].oc_skill == P_SLING))
-                   ? w_bullets
-                   : ready_objs;
-    newquiver = getobj(quivee_types, "ready");
+    /* Prompt for a new quiver: "What do you want to ready?" */
+    newquiver = getobj("ready", ready_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
 
     if (!newquiver) {
         /* Cancelled */

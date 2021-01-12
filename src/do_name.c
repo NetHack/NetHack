@@ -21,6 +21,8 @@ static void FDECL(auto_describe, (int, int));
 static void NDECL(do_mgivenname);
 static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 static void FDECL(do_oname, (struct obj *));
+static int FDECL(name_ok, (struct obj *));
+static int FDECL(call_ok, (struct obj *));
 static char *FDECL(docall_xname, (struct obj *));
 static void NDECL(namefloorobj);
 
@@ -1334,18 +1336,53 @@ const char *name;
     return obj;
 }
 
-static NEARDATA const char callable[] = {
-    SCROLL_CLASS, POTION_CLASS, WAND_CLASS,  RING_CLASS, AMULET_CLASS,
-    GEM_CLASS,    SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, VENOM_CLASS, 0
-};
-
 boolean
 objtyp_is_callable(i)
 int i;
 {
-    return (boolean) (objects[i].oc_uname
-                      || (OBJ_DESCR(objects[i])
-                          && index(callable, objects[i].oc_class)));
+    if (objects[i].oc_uname)
+        return TRUE;
+
+    switch(objects[i].oc_class) {
+    case SCROLL_CLASS:
+    case POTION_CLASS:
+    case WAND_CLASS:
+    case RING_CLASS:
+    case AMULET_CLASS:
+    case GEM_CLASS:
+    case SPBOOK_CLASS:
+    case ARMOR_CLASS:
+    case TOOL_CLASS:
+    case VENOM_CLASS:
+        if (OBJ_DESCR(objects[i]))
+            return TRUE;
+        break;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
+/* getobj callback for object to name (specific item) - anything but gold */
+static int
+name_ok(obj)
+struct obj *obj;
+{
+    if (!obj || obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_SUGGEST;
+}
+
+/* getobj callback for object to call (name its type) */
+static int
+call_ok(obj)
+struct obj *obj;
+{
+    if (!obj || !objtyp_is_callable(obj->otyp))
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_SUGGEST;
 }
 
 /* C and #name commands - player can name monster or object or type of obj */
@@ -1356,7 +1393,7 @@ docallcmd()
     winid win;
     anything any;
     menu_item *pick_list = 0;
-    char ch, allowall[2];
+    char ch;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
 
@@ -1406,14 +1443,12 @@ docallcmd()
         do_mgivenname();
         break;
     case 'i': /* name an individual object in inventory */
-        allowall[0] = ALL_CLASSES;
-        allowall[1] = '\0';
-        obj = getobj(allowall, "name");
+        obj = getobj("name", name_ok, GETOBJ_PROMPT);
         if (obj)
             do_oname(obj);
         break;
     case 'o': /* name a type of object in inventory */
-        obj = getobj(callable, "call");
+        obj = getobj("call", call_ok, GETOBJ_NOFLAGS);
         if (obj) {
             /* behave as if examining it in inventory;
                this might set dknown if it was picked up
@@ -1423,7 +1458,7 @@ docallcmd()
             if (!obj->dknown) {
                 You("would never recognize another one.");
 #if 0
-            } else if (!objtyp_is_callable(obj->otyp)) {
+            } else if (!call_ok(obj)) {
                 You("know those as well as you ever will.");
 #endif
             } else {
@@ -1591,7 +1626,7 @@ namefloorobj()
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
               unames[rn2_on_display_rng(SIZE(unames))]);
-    } else if (!objtyp_is_callable(obj->otyp)) {
+    } else if (!call_ok(obj)) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
     } else if (!obj->dknown) {

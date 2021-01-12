@@ -13,10 +13,6 @@ static int FDECL(m_lined_up, (struct monst *, struct monst *));
 #define URETREATING(x, y) \
     (distmin(u.ux, u.uy, x, y) > distmin(u.ux0, u.uy0, x, y))
 
-#define POLE_LIM 5 /* How far monsters can use pole-weapons */
-
-#define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */
-
 /*
  * Keep consistent with breath weapons in zap.c, and AD_* in monattk.h.
  */
@@ -910,7 +906,7 @@ struct monst *mtmp;
 
         if (otmp != MON_WEP(mtmp))
             return; /* polearm must be wielded */
-        if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) > POLE_LIM
+        if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) > MON_POLE_DIST
             || !couldsee(mtmp->mx, mtmp->my))
             return; /* Out of range, or intervening wall */
 

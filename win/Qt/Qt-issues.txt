@@ -40,10 +40,6 @@ On OSX, command+Q while a menu (which has its own key event handler)
 is popped up gets ignored.  It should at least close the popup like
 ESC and maybe also initiate quitting.
 
-On the map, ^V is a dead key (at least on OSX; all other ASCII control
-characters from ^A through ^U, ^W through ^Z, and ^[, ^\, ^], ^^, ^_
-work; no attempt to have ^@ generate NUL has been made).
-
 Map column #0, which the core reserves for its own purposes and isn't
 intended to be displayed, is displayed (as blank terrain).
 
