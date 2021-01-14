@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1607754748 2020/12/12 06:32:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1610667899 2021/01/14 23:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4495,11 +4495,13 @@ static void
 kops_gone(silent)
 boolean silent;
 {
-    register int cnt = 0;
-    register struct monst *mtmp, *mtmp2;
+    int cnt = 0;
+    struct monst *mtmp, *mtmp2;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
+        if (DEADMONSTER(mtmp))
+            continue;
         if (mtmp->data->mlet == S_KOP) {
             if (canspotmon(mtmp))
                 cnt++;
