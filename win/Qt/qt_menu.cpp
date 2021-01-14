@@ -1175,7 +1175,7 @@ void NetHackQtTextWindow::Search()
         this->raise();
     }
 
-    if (get_a_line) {
+    if (get_a_line && target[0]) {
         int linecount = lines->count();
         int current = lines->currentRow();
         if (current == -1)
@@ -1215,13 +1215,16 @@ void NetHackQtTextWindow::keyPressEvent(QKeyEvent *key_event)
     if (key == MENU_SEARCH) {
         if (!use_rip)
             Search();
-    } else if (key == '\n' || key == '\r') {
+    } else if (key == '\n' || key == '\r' || key == ' ') {
         if (!textsearching)
             accept();
+        else
+            textsearching = FALSE;
     } else if (key == '\033') {
         reject();
     } else {
-        QDialog::keyPressEvent(key_event);
+        // ignore the current key instead of passing it along
+        //- QDialog::keyPressEvent(key_event);
     }
 }
 

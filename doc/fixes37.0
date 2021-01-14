@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ $NHDT-Date: 1610587460 2021/01/14 01:24:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.429 $ $NHDT-Date: 1610665839 2021/01/14 23:10:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -596,6 +596,10 @@ Qt: there was no way to enter extended command "#version" by typing; command
 	name matching was waiting to disambiguate it from "#versionshort"
 	and the only way to that was to type #version<return> but <return>
 	explicitly triggered rejection, cancelling '#' processing
+Qt: while a text window was shown (such as the "things that are here" popup
+	when stepping on items), typing commands had the input passed on to
+	the map and then executed; sometimes that caused the not-yet-dismissed
+	text window to hang
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
