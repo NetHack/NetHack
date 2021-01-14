@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ $NHDT-Date: 1610410779 2021/01/12 00:19:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ $NHDT-Date: 1610587460 2021/01/14 01:24:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -365,6 +365,9 @@ transforming a potion by dipping a unicorn horn into it could result in the
 	potion being dropped due to 'pickup_burden' if encumbrance was already
 	over threshold before dipping but within it after removal from invent
 give barrow wights a cold touch
+for configuration using external compression on save files that applied a name
+	suffix, 'selectsaved' (restore via menu) couldn't handle any which had
+	been manually uncompressed, mangling file name trying to remove suffix
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
