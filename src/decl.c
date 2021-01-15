@@ -153,9 +153,6 @@ NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 const char *ARGV0;
 #endif
 
-/* support for lint.h */
-unsigned nhUse_dummy = 0;
-
 #define IVMAGIC 0xdeadbeef
 
 #ifdef GCC_WARN
