@@ -1271,23 +1271,21 @@ enhance_weapon_skill()
                 (void) skill_level_name(i, sklnambuf);
                 if (wizard) {
                     if (!iflags.menu_tab_sep)
-                        n = snprintf(buf, sizeof(buf), " %s%-*s %-12s %5d(%4d)", prefix,
-				     longest, P_NAME(i), sklnambuf, P_ADVANCE(i),
-				     practice_needed_to_advance(P_SKILL(i)));
+                        Snprintf(buf, sizeof(buf), " %s%-*s %-12s %5d(%4d)", prefix,
+                                 longest, P_NAME(i), sklnambuf, P_ADVANCE(i),
+                                 practice_needed_to_advance(P_SKILL(i)));
                     else
-                        n = snprintf(buf, sizeof(buf), " %s%s\t%s\t%5d(%4d)", prefix, P_NAME(i),
-				     sklnambuf, P_ADVANCE(i),
-				     practice_needed_to_advance(P_SKILL(i)));
+                        Snprintf(buf, sizeof(buf), " %s%s\t%s\t%5d(%4d)", prefix, P_NAME(i),
+                                 sklnambuf, P_ADVANCE(i),
+                                 practice_needed_to_advance(P_SKILL(i)));
                 } else {
                     if (!iflags.menu_tab_sep)
-                        n = snprintf(buf, sizeof(buf), " %s %-*s [%s]", prefix, longest,
-				     P_NAME(i), sklnambuf);
+                        Snprintf(buf, sizeof(buf), " %s %-*s [%s]", prefix, longest,
+                                 P_NAME(i), sklnambuf);
                     else
-                        n = snprintf(buf, sizeof(buf), " %s%s\t[%s]", prefix, P_NAME(i),
-				     sklnambuf);
+                        Snprintf(buf, sizeof(buf), " %s%s\t[%s]", prefix, P_NAME(i),
+                                 sklnambuf);
                 }
-		if (n >= sizeof(buf)) /* check for overflow */
-		    buf[sizeof(buf)-1] = 0; /* terminate string */
                 any.a_int = can_advance(i, speedy) ? i + 1 : 0;
                 add_menu(win, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, buf, MENU_ITEMFLAGS_NONE);

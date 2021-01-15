@@ -953,6 +953,12 @@ E void FDECL(strbuf_nl_to_crlf, (strbuf_t *));
 E char *FDECL(nonconst, (const char *, char *));
 E int FDECL(swapbits, (int, int, int));
 E void FDECL(shuffle_int_array, (int *, int));
+/* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
+   (__VA_ARGS__) to allow for zero arguments after fmt */
+#define Snprintf(str, size, ...) \
+    nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
+extern void nh_snprintf(const char *func, int line, char *str, size_t size,
+                        const char *fmt, ...);
 
 /* ### insight.c ### */
 
