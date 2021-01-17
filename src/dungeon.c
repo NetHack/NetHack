@@ -1865,7 +1865,8 @@ assign_rnd_level(d_level *dest, d_level *src, int range)
         dest->dlevel = 1;
 }
 
-int
+/* return an alignment mask */
+unsigned int
 induced_align(int pct)
 {
     s_level *lev = Is_special(&u.uz);
