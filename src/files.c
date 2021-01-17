@@ -840,7 +840,6 @@ d_level *lev;
 char **bonesid;
 {
     const char *fq_bones;
-    int failed = 0;
     NHFILE *nhfp = (NHFILE *) 0;
 
     *bonesid = set_bonesfile_name(g.bones, lev);
@@ -859,8 +858,6 @@ char **bonesid;
 #else
             nhfp->fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
 #endif
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
     nhfp = viable_nhfile(nhfp);
@@ -1043,7 +1040,6 @@ set_error_savefile()
 NHFILE *
 create_savefile()
 {
-    int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
     boolean do_historical = TRUE;
@@ -1076,8 +1072,6 @@ create_savefile()
             nhfp->fd = creat(fq_save, FCMASK);
 #endif
 #endif /* MICRO || WIN32 */
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
 #if defined(VMS) && !defined(SECURE)
@@ -1099,7 +1093,6 @@ create_savefile()
 NHFILE *
 open_savefile()
 {
-    int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
     boolean do_historical = TRUE;
@@ -1128,8 +1121,6 @@ open_savefile()
 #else
             nhfp->fd = open(fq_save, O_RDONLY | O_BINARY, 0);
 #endif
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
     nhfp = viable_nhfile(nhfp);
