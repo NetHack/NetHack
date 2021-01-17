@@ -692,7 +692,7 @@ char *supplemental_name;
        (note: strncpy() only terminates output string if the specified
        count is bigger than the length of the substring being copied) */
     if (!strncmp(dbase_str, "moist towel", 11))
-        (void) strncpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
+        memcpy(dbase_str += 2, "wet", 3); /* skip "mo" replace "ist" */
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {

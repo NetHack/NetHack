@@ -1382,8 +1382,8 @@ int final;
     else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
         Strcpy(buf, from_what(-CLAIRVOYANT));
         if (!strncmp(buf, " because of ", 12))
-            /* overwrite substring; strncpy doesn't add terminator */
-            (void) strncpy(buf, " if not for ", 12);
+            /* overwrite substring */
+            memcpy(buf, " if not for ", 12);
         enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
     }
     if (Infravision)

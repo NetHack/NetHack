@@ -157,7 +157,7 @@ VA_DECL(const char *, line)
         /* truncate, preserving the final 3 characters:
            "___ extremely long text" -> "___ extremely l...ext"
            (this may be suboptimal if overflow is less than 3) */
-        (void) strncpy(pbuf + BUFSZ - 1 - 6, "...", 3);
+        memcpy(pbuf + BUFSZ - 1 - 6, "...", 3);
         /* avoid strncpy; buffers could overlap if excess is small */
         pbuf[BUFSZ - 1 - 3] = line[ln - 3];
         pbuf[BUFSZ - 1 - 2] = line[ln - 2];
