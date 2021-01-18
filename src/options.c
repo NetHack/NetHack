@@ -2544,7 +2544,6 @@ char *op;
                 flags.paranoia_bits &= ~PARANOID_PRAY;
             else
                 flags.paranoia_bits |= PARANOID_PRAY;
-            return optn_ok;
         }
         return optn_ok;
     }

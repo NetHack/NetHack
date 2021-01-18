@@ -2252,6 +2252,7 @@ struct monst *mtmp;
             }
             return 1;
         }
+        /*NOTREACHED*/
         return 0;
     case 0:
         return 0; /* i.e. an exploded wand */

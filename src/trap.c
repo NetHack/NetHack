@@ -2931,8 +2931,8 @@ long ocount;
     register int tmp;
     schar dx, dy;
     int distance;
-    coord cc;
-    coord bcc;
+    coord cc = UNDEFINED_VALUES,
+          bcc = UNDEFINED_VALUES;
     int trycount = 0;
     boolean success = FALSE;
     int mindist = 4;
