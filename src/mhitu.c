@@ -2137,18 +2137,19 @@ struct monst *mon;
      *    - steals gold from player
      *    - demons decide attack types
      *
-     * consent patch:
+     * with consent:
      *    - player can chat with demons to select attack type, exploit?
      *    - straight: same as vanilla, 50% have seduction and 4% cancellation
      *    - gay: 50% is the other gender demon, cancellation still 4%
      *    - bi: 100% of demons have seduction, 8% probability of cancellation
      *    - ace: random 50% (both genders) have seduction, but nymph-like
      *               4% cancellation = same danger from disrobe attacks
-     *           no good/bad seduction outcomes, but no gold stealing either
+     *           no good/bad seduction outcomes, no gold stealing
      *           player cannot tell from distance which gender demons will attack
      *
      *    not sure if ace is balanced, maybe add some new outcomes for demons
      *    with nymph-like seduction? drain life?
+     *    maybe limit number of times player can change orientation? just once?
      */
 
      /* probability of cancellation depends of player's orientation */

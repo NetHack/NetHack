@@ -1,47 +1,12 @@
-idea for new LGBTQ patch:
 instead of setting game options or maintaining conducts,
 change foocubus interactions to ask for consent
-based on players response, foocubi will learn player's preferences
-
-ask for consent 3 times:
--first time interacting with foocubus, learn not gay or not straight
--second consent query is the first time they encounter other type of foocubus,
-learn their orientation: straight, gay, bi, or asexual
--third consent is first time they encounter a foocubus after the player changes
-to the other gender, learn if orientation is relative or absolute
-
-consent is queried using same mechanics as "shall I take off your cloak?"
-maybe even use these questions that already exist in the game,
-only present new consent message if no other "shall i remove..." questions are asked
-use "such a nice guy, i wish" message when turned down
-try to keep foocubi messages as similar as possible to vanilla
-
---
-
-actually, relative/absolute is too simplistic, need to keep array of prefs for
-when player is either gender
-
-!!!!!!
-new foocubi behaviour is "activated" by talking to them, then they ask if you
-consent. if you do not talk to foocubi, game is exactly like vanilla and all
-foocubi are straight
-!!!!!
+based on players response, foocubi will learn player's gender preferences
+player can chat with foocubi at any time to change prefs
 
 if player is straight or gay, no change in headache/cancellation probability
 if player is bi, then foocubi are twice as likely to get headaches
-if player is asexual, need to come up with some way preserve game balance
-
-if player says yes, no change in outcome of encounter
-if player says no, need to add new or select existing foocubi outcome
-
-vanilla foocubi:
-opposite sex will undress you, same sex will not = 50% foocubi have disrobe attack
-the other 50% try to kill you
-
-consent patch:
-first encounter with either gender always has disrobe attack
-based on consent, player will want disrobe attacks from 0% 50% or 100% of foocubi
-need to preserve game balance so that 50% of foocubi try to kill you and 50% seduce
+if player is ace, random half of foocubi have nymph-like seduction (disrobing
+  but no laying in arms), no change in headache/cancellation probability
 
 dont' forget to update sink kicking too
 double check nymph behaviour - chatting, seduction. change this too?
