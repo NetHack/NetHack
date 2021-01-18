@@ -1187,7 +1187,7 @@ dokick()
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
                 if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
                             (gend == 1 || (gend == 2 && rn2(2)))
-                                  ? MM_FEMALE : MM_MALE))
+                                  ? MM_MALE : MM_FEMALE))
                     newsym(x, y);
                 g.maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);
