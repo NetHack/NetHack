@@ -757,7 +757,7 @@ void
 curses_raw_print(const char *str)
 {
 #ifdef PDCURSES
-    WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+    /* WINDOW *win = curses_get_nhwin(MESSAGE_WIN); */
 
     curses_message_win_puts(str, FALSE);
 #else
