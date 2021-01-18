@@ -1185,9 +1185,10 @@ dokick()
                        && !(g.mvitals[PM_AMOROUS_DEMON].mvflags & G_GONE)) {
                 /* can't resist... */
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
+                /* dishwasher gender should be compatible with hero */
                 if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
                             (gend == 1 || (gend == 2 && rn2(2)))
-                                  ? MM_FEMALE : MM_MALE))
+                                  ? MM_MALE : MM_FEMALE))
                     newsym(x, y);
                 g.maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);
