@@ -327,7 +327,7 @@ extern void get_widget_window_geometry(Widget, int *, int *, int *, int *);
 extern char *fontname_boldify(const char *);
 extern Dimension nhFontHeight(Widget);
 extern char key_event_to_char(XKeyEvent *);
-extern void msgkey(Widget, XtPointer, XEvent *);
+extern void msgkey(Widget, XtPointer, XEvent *, Boolean *);
 extern void highlight_yn(boolean);
 extern void nh_XtPopup(Widget, int, Widget);
 extern void nh_XtPopdown(Widget);

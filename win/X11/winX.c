@@ -942,7 +942,7 @@ X11_putstr(winid window, int attr, const char *str)
         X11_destroy_nhwindow(window);
         *wp = window_list[new_win];
         window_list[new_win].type = NHW_NONE; /* allow re-use */
-    /* fall though to add text */
+        /* fall through */
     case NHW_TEXT:
         add_to_text_window(wp, attr, str);
         break;
@@ -1437,6 +1437,21 @@ panic_on_error(Display *display, XErrorEvent *error)
     return 0;
 }
 
+static void
+X11_error_handler(String str)
+{
+    nhUse(str);
+    hangup(1);
+}
+
+static int
+X11_io_error_handler(Display *display)
+{
+    nhUse(display);
+    hangup(1);
+    return 0;
+}
+
 void
 X11_init_nhwindows(int *argcp, char **argv)
 {
@@ -1465,7 +1480,7 @@ X11_init_nhwindows(int *argcp, char **argv)
     savuid = geteuid();
     (void) seteuid(getuid());
 
-    XSetIOErrorHandler((XIOErrorHandler) hangup);
+    XSetIOErrorHandler((XIOErrorHandler) X11_io_error_handler);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
@@ -2248,12 +2263,13 @@ input_event(int exit_condition)
 
 /*ARGSUSED*/
 void
-msgkey(Widget w, XtPointer data, XEvent *event)
+msgkey(Widget w, XtPointer data, XEvent *event, Boolean *continue_to_dispatch)
 {
     Cardinal num = 0;
 
     nhUse(w);
     nhUse(data);
+    nhUse(continue_to_dispatch);
 
     map_input(window_list[WIN_MAP].w, event, (String *) 0, &num);
 }
@@ -2513,7 +2529,7 @@ init_standard_windows(void)
     set_message_slider(&window_list[message_win]);
 
     /* attempt to catch fatal X11 errors before the program quits */
-    (void) XtAppSetErrorHandler(app_context, (XtErrorHandler) hangup);
+    (void) XtAppSetErrorHandler(app_context, X11_error_handler);
 
     highlight_yn(TRUE); /* switch foreground and background */
 

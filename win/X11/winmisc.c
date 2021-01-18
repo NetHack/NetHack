@@ -474,7 +474,7 @@ X11_player_selection_randomize(void)
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
     int ro, ra, al, ge;
-    boolean fully_specified_role, choose_race_first;
+    boolean choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
                              || flags.initgend == ROLE_NONE
@@ -497,15 +497,11 @@ X11_player_selection_randomize(void)
     ro = flags.initrole;
     if (ro == ROLE_NONE || ro == ROLE_RANDOM) {
         ro = rn2(nrole);
-        if (flags.initrole != ROLE_RANDOM) {
-            fully_specified_role = FALSE;
-        }
     }
     ra = flags.initrace;
     if (ra == ROLE_NONE || ra == ROLE_RANDOM) {
         ra = rn2(nrace);
         if (flags.initrace != ROLE_RANDOM) {
-            fully_specified_role = FALSE;
         }
     }
 
@@ -519,21 +515,14 @@ X11_player_selection_randomize(void)
     while (!validrace(ro, ra)) {
         if (choose_race_first) {
             ro = rn2(nrole);
-            if (flags.initrole != ROLE_RANDOM) {
-                fully_specified_role = FALSE;
-            }
         } else {
             ra = rn2(nrace);
-            if (flags.initrace != ROLE_RANDOM) {
-                fully_specified_role = FALSE;
-            }
         }
     }
 
     ge = flags.initgend;
     if (ge == ROLE_NONE) {
         ge = rn2(ROLE_GENDERS);
-        fully_specified_role = FALSE;
     }
     while (!validgend(ro, ra, ge)) {
         ge = rn2(ROLE_GENDERS);
@@ -542,7 +531,6 @@ X11_player_selection_randomize(void)
     al = flags.initalign;
     if (al == ROLE_NONE) {
         al = rn2(ROLE_ALIGNS);
-        fully_specified_role = FALSE;
     }
     while (!validalign(ro, ra, al)) {
         al = rn2(ROLE_ALIGNS);

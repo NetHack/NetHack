@@ -1225,7 +1225,6 @@ map_exposed(Widget w, XtPointer client_data, /* unused */
 static void
 map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int stop_col, boolean inverted)
 {
-    int win_start_row, win_start_col;
     struct map_info_t *map_info = wp->map_information;
     int row;
     register int count;
@@ -1243,8 +1242,6 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
     printf("update: [0x%x] %d %d %d %d\n",
            (int) wp->w, start_row, stop_row, start_col, stop_col);
 #endif
-    win_start_row = start_row;
-    win_start_col = start_col;
 
     if (map_info->is_tile) {
         struct tile_map_info_t *tile_map = &map_info->tile_map;
@@ -1371,6 +1368,10 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 #else   /* !TEXTCOLOR */
         {
             int win_row, win_xstart;
+            int win_start_row, win_start_col;
+
+            win_start_row = start_row;
+            win_start_col = start_col;
 
             /* We always start at the same x window position and have
                the same character count. */
