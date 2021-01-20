@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1605184220 2020/11/12 12:30:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1611182249 2021/01/20 22:37:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1414,28 +1414,36 @@ struct obj *obj;
 {
     xchar x, y;
 
-    if (!obj->lamplit && ignitable(obj)) {
-        if ((obj->otyp == MAGIC_LAMP
-             || obj->otyp == CANDELABRUM_OF_INVOCATION) && obj->spe == 0)
-            return FALSE;
-        else if (obj->otyp != MAGIC_LAMP && obj->age == 0)
-            return FALSE;
-        if (!get_obj_location(obj, &x, &y, 0))
+    if (!obj->lamplit && ignitable(obj) && get_obj_location(obj, &x, &y, 0)) {
+        if (((obj->otyp == MAGIC_LAMP /* spe==0 => no djinni inside */
+              /* spe==0 => no candles attached */
+              || obj->otyp == CANDELABRUM_OF_INVOCATION) && obj->spe == 0)
+            /* age_is_relative && age==0 && still-exists means out of fuel */
+            || (age_is_relative(obj) && obj->age == 0)
+            /* lantern is classified as ignitable() but not by fire */
+            || obj->otyp == BRASS_LANTERN)
             return FALSE;
         if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->cursed)
             return FALSE;
-        if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
-             || obj->otyp == BRASS_LANTERN) && obj->cursed && !rn2(2))
+        if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP)
+            /* once lit, cursed lamp is as good as non-cursed one, so failure
+               to light is a minor inconvenience to make cursed be worse */
+            && obj->cursed && !rn2(2))
             return FALSE;
-        if (obj->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
-            pline("%s %s light!", Yname2(obj), otense(obj, "catch"));
+
+        if (obj->where == OBJ_INVENT || cansee(x, y))
+            pline("%s %s %s", Yname2(obj),
+                  /* "catches light!" or "feels warm." */
+                  otense(obj, Blind ? "feel" : "catch"),
+                  Blind ? "warm." : "light!");
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
         if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
             /* if it catches while you have it, then it's your tough luck */
             check_unpaid(obj);
             verbalize("That's in addition to the cost of %s %s, of course.",
-                      yname(obj), obj->quan == 1L ? "itself" : "themselves");
+                      yname(obj),
+                      (obj->quan == 1L) ? "itself" : "themselves");
             bill_dummy_object(obj);
         }
         begin_burn(obj, FALSE);

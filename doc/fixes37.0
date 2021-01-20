@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ $NHDT-Date: 1611104371 2021/01/20 00:59:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.431 $ $NHDT-Date: 1611182248 2021/01/20 22:37:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -368,6 +368,8 @@ give barrow wights a cold touch
 for configuration using external compression on save files that applied a name
 	suffix, 'selectsaved' (restore via menu) couldn't handle any which had
 	been manually uncompressed, mangling file name trying to remove suffix
+an empty lamp hit by fire reported "the oil lamp catches fire" (but at least
+	didn't light)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

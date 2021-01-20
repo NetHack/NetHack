@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1606558763 2020/11/28 10:19:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.367 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1611182256 2021/01/20 22:37:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5944,44 +5944,20 @@ boolean override;
     return defsyms[trap_to_defsym(ttyp)].explanation;
 }
 
-/* Ignite ignitable items in the given object chain, due to some external
- * source of fire.  The object chain should be somewhere exposed, like
- * someone's open inventory or the floor.
- * This is modeled after destroy_item() somewhat and hopefully will be able to
- * merge into it in the future.
- */
+/* Ignite ignitable items (limited to light sources) in the given object
+   chain, due to some external source of fire.  The object chain should
+   be somewhere exposed, like someone's open inventory or the floor. */
 void
 ignite_items(objchn)
 struct obj *objchn;
 {
     struct obj *obj;
-    boolean vis = FALSE;
-    if (!objchn)
-        return;
+    boolean bynexthere = (objchn && objchn->where == OBJ_FLOOR);
 
-    if (objchn->where == OBJ_INVENT)
-        vis = TRUE; /* even when blind; lit-state can be seen in inventory */
-    else if (objchn->where == OBJ_MINVENT)
-        vis = canseemon(objchn->ocarry);
-    else if (objchn->where == OBJ_FLOOR)
-        vis = cansee(objchn->ox, objchn->oy);
-    else {
-        impossible("igniting item in a weird location %d", objchn->where);
-        return;
-    }
-
-    for (obj = objchn; obj; obj = obj->nobj) {
-        if (!ignitable(obj)
-            /* The Candelabrum requires intention to be lit */
-            || obj->otyp == CANDELABRUM_OF_INVOCATION
-            || obj->otyp == BRASS_LANTERN /* doesn't ignite via fire */
-            || obj->in_use     /* not available */
-            || obj->lamplit) { /* already burning */
-            continue;
-        }
-        begin_burn(obj, FALSE);
-        if (vis)
-            pline("%s on fire!", Yobjnam2(obj, "catch"));
+    for (obj = objchn; obj; obj = bynexthere ? obj->nexthere : obj->nobj) {
+        /* ignitable items like lamps and candles will catch fire */
+        if (!obj->lamplit && !obj->in_use)
+            catch_lit(obj);
     }
 }
 
