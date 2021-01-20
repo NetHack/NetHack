@@ -1004,7 +1004,7 @@ static void dirty(PNHMapWindow data, int x, int y)
     data->mapDirty[x][y] = TRUE;
 
     RECT rt;
-    nhcoord2display(data, data->xCur, data->yCur, &rt);
+    nhcoord2display(data, x, y, &rt);
 
     InvalidateRect(data->hWnd, &rt, FALSE);
 }
