@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1611104371 2021/01/20 00:59:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1611105313 2021/01/20 01:15:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1795,6 +1795,8 @@ X11_askname()
         case 1: /* save game selected, plname[] has been set */
             return;
         }
+#else
+    nhUse(X11_bail);
 #endif /* SELECTSAVED */
 
     if (iflags.wc_player_selection == VIA_DIALOG) {
