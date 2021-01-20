@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.429 $ $NHDT-Date: 1610665839 2021/01/14 23:10:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ $NHDT-Date: 1611104371 2021/01/20 00:59:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -760,7 +760,7 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
-curses: implement save file selection menu
+curses: implement 'selectsaved', restore via menu of saved games
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
@@ -784,6 +784,7 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	generate tile.c
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
+X11: implement 'selectsaved', restore via menu of saved games
 
 
 NetHack Community Patches (or Variation) Included
