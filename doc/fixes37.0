@@ -753,6 +753,10 @@ consolidate several monsters that differed only by their gender into their
 added wizmgender debugging command to display female monsters in red inverse;
 	helpful for debugging gender-related matters on tty; currently ignored
 	on other window ports
+record number of encountered bones levels in xlogfile
+add bonesless to extended conducts field in xlogfile
+show bones levels information in enlightenment at end of game or in explore
+	and wizmode
 
 
 Platform- and/or Interface-Specific New Features

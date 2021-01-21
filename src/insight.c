@@ -269,11 +269,23 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         attributes_enlightenment(mode, final);
     }
     /* reminder to player and/or information for dumplog */
-    if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover)) {
+    if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover || final)) {
         enlght_out(""); /* separator */
         enlght_out("Miscellaneous:");
-        Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
-        you_are(buf, "");
+        if (wizard || discover) {
+            Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
+            you_are(buf, "");
+        }
+
+        if (!flags.bones) {
+            you_have_X("disabled loading of bones levels");
+        } else if (!u.uroleplay.numbones) {
+            you_have_never("encountered a bones level");
+        } else {
+            Sprintf(buf, "encountered %ld bones level%s",
+                    u.uroleplay.numbones, plur(u.uroleplay.numbones));
+            you_have_X(buf);
+        }
     }
 
     if (!g.en_via_menu) {
