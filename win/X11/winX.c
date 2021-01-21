@@ -67,25 +67,6 @@
 #include "../win/X11/nh56icon"
 #include "../win/X11/nh32icon"
 
-const char *mapCLR_to_res[CLR_MAX] = {
-    XtNblack,
-    XtNred,
-    XtNgreen,
-    XtNbrown,
-    XtNblue,
-    XtNmagenta,
-    XtNcyan,
-    XtNgray,
-    XtNforeground,
-    XtNorange,
-    XtNbright_green,
-    XtNyellow,
-    XtNbright_blue,
-    XtNbright_magenta,
-    XtNbright_cyan,
-    XtNwhite,
-};
-
 static struct icon_info {
     const char *name;
     unsigned char *bits;
@@ -303,6 +284,24 @@ void
 init_menu_nhcolors(wp)
 struct xwindow *wp;
 {
+    const char *mapCLR_to_res[CLR_MAX] = {
+        XtNblack,
+        XtNred,
+        XtNgreen,
+        XtNbrown,
+        XtNblue,
+        XtNmagenta,
+        XtNcyan,
+        XtNgray,
+        XtNforeground,
+        XtNorange,
+        XtNbright_green,
+        XtNyellow,
+        XtNbright_blue,
+        XtNbright_magenta,
+        XtNbright_cyan,
+        XtNwhite,
+    };
     static const char *wintypenames[NHW_TEXT] = {
         "message", "status", "map", "menu", "text"
     };
