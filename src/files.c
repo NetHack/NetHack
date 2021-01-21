@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1610153478 2021/01/09 00:51:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.322 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1610587460 2021/01/14 01:24:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1175,7 +1175,14 @@ const char *filename;
 
     Strcpy(g.SAVEF, filename);
 #ifdef COMPRESS_EXTENSION
-    g.SAVEF[strlen(g.SAVEF) - strlen(COMPRESS_EXTENSION)] = '\0';
+    {
+        /* if COMPRESS_EXTENSION is present, strip it off */
+        int sln = (int) strlen(g.SAVEF),
+            xln = (int) strlen(COMPRESS_EXTENSION);
+
+        if (sln > xln && !strcmp(&g.SAVEF[sln - xln], COMPRESS_EXTENSION))
+            g.SAVEF[sln - xln] = '\0';
+    }
 #endif
     nh_uncompress(g.SAVEF);
     if ((nhfp = open_savefile()) != 0) {
@@ -1374,8 +1381,15 @@ FILE *stream;
 boolean uncomp;
 {
     if (freopen(filename, mode, stream) == (FILE *) 0) {
-        (void) fprintf(stderr, "freopen of %s for %scompress failed\n",
-                       filename, uncomp ? "un" : "");
+        const char *details;
+
+#if defined(NHSTDC) && !defined(NOTSTDC)
+        if ((details = strerror(errno)) == 0)
+#endif
+            details = "";
+        (void) fprintf(stderr,
+                       "freopen of %s for %scompress failed; (%d) %s\n",
+                       filename, uncomp ? "un" : "", errno, details);
         nh_terminate(EXIT_FAILURE);
     }
 }
@@ -1392,7 +1406,7 @@ docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
 {
-    char cfn[80];
+    char cfn[SAVESIZE];
     FILE *cf;
     const char *args[10];
 #ifdef COMPRESS_OPTIONS

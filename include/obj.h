@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1610149501 2021/01/08 23:45:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1611097668 2021/01/19 23:07:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -45,6 +45,8 @@ struct obj {
     schar spe; /* quality of weapon, weptool, armor, or some rings (+ or -);
                 * number of charges for wand or charged tool ( >= -1 );
                 * number of candles attached to candelabrum (0..7);
+                * magic lamp (1 iff djinni inside => lamp is lightable);
+                * oil lamp, tallow/wax candle (1 for no apparent reason?);
                 * marks spinach tins (1 iff corpsenm==NON_PM);
                 * marks tin variety (various: homemade, stir fried, &c);
                 * eggs laid by you (1), eggs upgraded with rojal jelly (2);

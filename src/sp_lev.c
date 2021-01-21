@@ -5069,7 +5069,7 @@ lspo_terrain(L)
 lua_State *L;
 {
     terrain tmpterrain;
-    xchar x, y;
+    xchar x = 0, y = 0;
     struct selectionvar *sel = NULL;
     int argc = lua_gettop(L);
 

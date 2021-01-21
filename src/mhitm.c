@@ -576,29 +576,29 @@ int dieroll;
             buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
-                Sprintf(buf, "%s bites", magr_name);
+                Snprintf(buf, sizeof(buf), "%s bites", magr_name);
                 break;
             case AT_STNG:
-                Sprintf(buf, "%s stings", magr_name);
+                Snprintf(buf, sizeof(buf), "%s stings", magr_name);
                 break;
             case AT_BUTT:
-                Sprintf(buf, "%s butts", magr_name);
+                Snprintf(buf, sizeof(buf), "%s butts", magr_name);
                 break;
             case AT_TUCH:
-                Sprintf(buf, "%s touches", magr_name);
+                Snprintf(buf, sizeof(buf), "%s touches", magr_name);
                 break;
             case AT_TENT:
-                Sprintf(buf, "%s tentacles suck", s_suffix(magr_name));
+                Snprintf(buf, sizeof(buf), "%s tentacles suck", s_suffix(magr_name));
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Sprintf(buf, "%s squeezes", magr_name);
+                    Snprintf(buf, sizeof(buf), "%s squeezes", magr_name);
                     break;
                 }
                 /*FALLTHRU*/
             default:
                 if (!weaponhit || !mwep || !mwep->oartifact)
-                    Sprintf(buf, "%s hits", magr_name);
+                    Snprintf(buf, sizeof(buf), "%s hits", magr_name);
                 break;
             }
             if (*buf)

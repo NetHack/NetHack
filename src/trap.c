@@ -2931,8 +2931,8 @@ long ocount;
     register int tmp;
     schar dx, dy;
     int distance;
-    coord cc;
-    coord bcc;
+    coord cc = UNDEFINED_VALUES,
+          bcc = UNDEFINED_VALUES;
     int trycount = 0;
     boolean success = FALSE;
     int mindist = 4;
@@ -4838,11 +4838,14 @@ boolean force;
                     trap_skipped = TRUE;
                     deal_with_floor_trap = FALSE;
                 } else {
-                    Sprintf(
-                        qbuf, "There %s and %s here.  %s %s?",
-                        (boxcnt == 1) ? "is a container" : "are containers",
-                        an(trapdescr),
-                        (ttmp->ttyp == WEB) ? "Remove" : "Disarm", the_trap);
+                    Snprintf(qbuf, sizeof(qbuf),
+                             "There %s and %s here.  %s %s?",
+                             (boxcnt == 1) ? "is a container"
+                                           : "are containers",
+                             an(trapdescr),
+                             (ttmp->ttyp == WEB) ? "Remove"
+                                                 : "Disarm",
+                             the_trap);
                     switch (ynq(qbuf)) {
                     case 'q':
                         return 0;

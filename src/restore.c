@@ -910,7 +910,7 @@ rest_stairs(nhfp)
 NHFILE *nhfp;
 {
     int buflen = 0;
-    stairway stway;
+    stairway stway = UNDEFINED_VALUES;
     int len = 0;
 
     stairway_free_all();

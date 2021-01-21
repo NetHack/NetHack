@@ -2544,7 +2544,6 @@ char *op;
                 flags.paranoia_bits &= ~PARANOID_PRAY;
             else
                 flags.paranoia_bits |= PARANOID_PRAY;
-            return optn_ok;
         }
         return optn_ok;
     }
@@ -8283,8 +8282,8 @@ option_help()
             || (is_wc2_option(optname) && !wc2_supported(optname)))
             continue;
         Sprintf(buf2, "`%s'", optname);
-        Sprintf(buf, "%-20s - %s%c", buf2, allopt[i].descr,
-                allopt[i + 1].name ? ',' : '.');
+        Snprintf(buf, sizeof(buf), "%-20s - %s%c", buf2, allopt[i].descr,
+                 allopt[i + 1].name ? ',' : '.');
         putstr(datawin, 0, buf);
     }
     putstr(datawin, 0, "");

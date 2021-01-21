@@ -251,19 +251,23 @@ void
 early_version_info(pastebuf)
 boolean pastebuf;
 {
-    char buf[BUFSZ], buf2[BUFSZ];
-    char *tmp = getversionstring(buf);
+    char buf1[BUFSZ], buf2[BUFSZ];
+    char *buf, *tmp;
 
-    /* this is early enough that we have to do
-       our own line-splitting */
+    Snprintf(buf1, sizeof(buf1), "test");
+    /* this is early enough that we have to do our own line-splitting */
+    getversionstring(buf1);
+    tmp = strstri(buf1, " ("); /* split at start of version info */
     if (tmp) {
-        tmp = strstri(buf," (");
-        if (tmp) *tmp++ = '\0';
+        /* retain one buffer so that it all goes into the paste buffer */
+        *tmp++ = '\0';
+        Snprintf(buf2, sizeof(buf2), "%s\n%s", buf1, tmp);
+        buf = buf2;
+    } else {
+        buf = buf1;
     }
 
-    Sprintf(buf2, "%s\n", buf);
-    if (tmp) Sprintf(eos(buf2), "%s\n", tmp);
-    raw_printf("%s", buf2);
+    raw_printf("%s", buf);
 
     if (pastebuf) {
 #if defined(RUNTIME_PASTEBUF_SUPPORT) && !defined(LIBNH)
@@ -272,7 +276,7 @@ boolean pastebuf;
          * version information into a paste buffer. Useful for
          * easy inclusion in bug reports.
          */
-        port_insert_pastebuf(buf2);
+        port_insert_pastebuf(buf);
 #else
         raw_printf("%s", "Paste buffer copy is not available.\n");
 #endif

@@ -3537,8 +3537,8 @@ boolean printdun;
                 (void) strsubst(tmpbuf, " herself", " yourself");
                 (void) strsubst(tmpbuf, " his ", " your ");
                 (void) strsubst(tmpbuf, " her ", " your ");
-                Sprintf(buf, "%s%syou, %s%c", PREFIX, TAB, tmpbuf,
-                        --kncnt ? ',' : '.');
+                Snprintf(buf, sizeof(buf), "%s%syou, %s%c", PREFIX, TAB,
+                         tmpbuf, --kncnt ? ',' : '.');
                 putstr(win, 0, buf);
             }
             for (bp = mptr->final_resting_place; bp; bp = bp->next) {

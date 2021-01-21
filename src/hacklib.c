@@ -74,6 +74,8 @@
         char *          nonconst        (const char *, char *)
         int             swapbits        (int, int, int)
         void            shuffle_int_array (int *, int)
+        void            nh_snprintf     (const char *, int, char *, size_t,
+                                         const char *, ...)
 =*/
 #ifdef LINT
 #define Static /* pacify lint */
@@ -1316,6 +1318,41 @@ int count;
         temp = indices[i];
         indices[i] = indices[iswap];
         indices[iswap] = temp;
+    }
+}
+
+/*
+ * Wrap snprintf for use in the main code.
+ *
+ * Wrap reasons:
+ *   1. If there are any platform issues, we have one spot to fix them -
+ *      snprintf is a routine with a troubling history of bad implementations.
+ *   2. Add combersome error checking in one spot.  Problems with text wrangling
+ *      do not have to be fatal.
+ *   3. Gcc 9+ will issue a warning unless the return value is used.
+ *      Annoyingly, explicitly casting to void does not remove the error.
+ *      So, use the result - see reason #2.
+ */
+void
+nh_snprintf(const char *func, int line, char *str, size_t size,
+            const char *fmt, ...)
+{
+    va_list ap;
+    int n;
+
+    va_start(ap, fmt);
+#ifdef NO_VSNPRINTF
+    n = vsprintf(str, fmt, ap);
+#else
+    n = vsnprintf(str, size, fmt, ap);
+#endif
+    va_end(ap);
+    if (n < 0 || (size_t)n >= size) { /* is there a problem? */
+        impossible("snprintf %s: func %s, file line %d",
+                   n < 0 ? "format error"
+                         : "overflow",
+                   func, line);
+        str[size-1] = 0; /* make sure it is nul terminated */
     }
 }
 

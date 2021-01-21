@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ $NHDT-Date: 1610138674 2021/01/08 20:44:34 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ $NHDT-Date: 1611104371 2021/01/20 00:59:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -361,6 +361,13 @@ when a pet ate a mimic corpse and tried to temporarily look like a sink it
 	ended up looking like a throne (terrain type SINK == symbol S_throne)
 have dowhatdoes ('&') catch up with '?i' to describe ^A, ESC, and movement
 	prefix keystrokes correctly instead of reporting "no such command"
+transforming a potion by dipping a unicorn horn into it could result in the
+	potion being dropped due to 'pickup_burden' if encumbrance was already
+	over threshold before dipping but within it after removal from invent
+give barrow wights a cold touch
+for configuration using external compression on save files that applied a name
+	suffix, 'selectsaved' (restore via menu) couldn't handle any which had
+	been manually uncompressed, mangling file name trying to remove suffix
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -589,6 +596,10 @@ Qt: there was no way to enter extended command "#version" by typing; command
 	name matching was waiting to disambiguate it from "#versionshort"
 	and the only way to that was to type #version<return> but <return>
 	explicitly triggered rejection, cancelling '#' processing
+Qt: while a text window was shown (such as the "things that are here" popup
+	when stepping on items), typing commands had the input passed on to
+	the map and then executed; sometimes that caused the not-yet-dismissed
+	text window to hang
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
@@ -749,7 +760,7 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	requires compile-time definition of TTY_SOUND_ESCCODES (also requires
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
-curses: implement save file selection menu
+curses: implement 'selectsaved', restore via menu of saved games
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
@@ -773,6 +784,7 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	generate tile.c
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
+X11: implement 'selectsaved', restore via menu of saved games
 
 
 NetHack Community Patches (or Variation) Included

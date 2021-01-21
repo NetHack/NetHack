@@ -216,17 +216,21 @@ do_statusline2()
      * interface supports that.
      */
     if ((dln - dx) + 1 + hln + 1 + xln + 1 + tln + 1 + cln <= COLNO) {
-        Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, expr, tmmv, cond);
+        Snprintf(newbot2, sizeof(newbot2), "%s %s %s %s %s", dloc, hlth, expr,
+                 tmmv, cond);
     } else {
         if (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1 > MAXCO) {
             panic("bot2: second status line exceeds MAXCO (%u > %d)",
                   (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1), MAXCO);
         } else if ((dln - dx) + 1 + hln + 1 + xln + 1 + cln <= COLNO) {
-            Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, expr, cond, tmmv);
+            Snprintf(newbot2, sizeof(newbot2), "%s %s %s %s %s", dloc, hlth,
+                     expr, cond, tmmv);
         } else if ((dln - dx) + 1 + hln + 1 + cln <= COLNO) {
-            Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, cond, expr, tmmv);
+            Snprintf(newbot2, sizeof(newbot2), "%s %s %s %s %s", dloc, hlth,
+                     cond, expr, tmmv);
         } else {
-            Sprintf(newbot2, "%s %s %s %s %s", hlth, cond, dloc, expr, tmmv);
+            Snprintf(newbot2, sizeof(newbot2), "%s %s %s %s %s", hlth, cond,
+                     dloc, expr, tmmv);
         }
         /* only two or three consecutive spaces available to squeeze out */
         mungspaces(newbot2);
@@ -3134,8 +3138,8 @@ status_hilite_linestr_gather_conditions()
                 tmpattr = hlattr2attrname(atr, attrbuf, BUFSZ);
                 if (tmpattr)
                     Sprintf(eos(clrbuf), "&%s", tmpattr);
-                Sprintf(condbuf, "condition/%s/%s",
-                        conditionbitmask2str(cond_maps[i].bm), clrbuf);
+                Snprintf(condbuf, sizeof(condbuf), "condition/%s/%s",
+                         conditionbitmask2str(cond_maps[i].bm), clrbuf);
                 status_hilite_linestr_add(BL_CONDITION, 0,
                                           cond_maps[i].bm, condbuf);
             }
@@ -3236,7 +3240,8 @@ struct hilite_s *hl;
         if ((tmpattr = hlattr2attrname(attr, attrbuf, BUFSZ)) != 0)
             Sprintf(eos(clrbuf), "&%s", tmpattr);
     }
-    Sprintf(buf, "%s/%s/%s", initblstats[hl->fld].fldname, behavebuf, clrbuf);
+    Snprintf(buf, sizeof(buf), "%s/%s/%s", initblstats[hl->fld].fldname,
+             behavebuf, clrbuf);
 
     return buf;
 }

@@ -1320,11 +1320,12 @@ int dieroll;
             else if (silverobj && saved_oname[0]) {
                 /* guard constructed format string against '%' in
                    saved_oname[] from xname(via cxname()) */
-                Sprintf(silverobjbuf, "Your %s%s %s",
-                        strstri(saved_oname, "silver") ? "" : "silver ",
-                        saved_oname, vtense(saved_oname, "sear"));
+                Snprintf(silverobjbuf, sizeof(silverobjbuf), "Your %s%s %s",
+                         strstri(saved_oname, "silver") ? "" : "silver ",
+                         saved_oname, vtense(saved_oname, "sear"));
                 (void) strNsubst(silverobjbuf, "%", "%%", 0);
-                Strcat(silverobjbuf, " %s!");
+                strncat(silverobjbuf, " %s!",
+                        sizeof(silverobjbuf) - (strlen(silverobjbuf) + 1));
                 fmt = silverobjbuf;
             } else
                 fmt = "The silver sears %s!";

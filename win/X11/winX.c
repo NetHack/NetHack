@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1596498377 2020/08/03 23:46:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1611105313 2021/01/20 01:15:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -101,7 +101,7 @@ struct window_procs X11_procs = {
     ( WC_COLOR | WC_INVERSE | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
      | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT ),
     /* status requires VIA_WINDOWPORT(); WC2_FLUSH_STATUS ensures that */
-    ( WC2_FLUSH_STATUS
+    ( WC2_FLUSH_STATUS | WC2_SELECTSAVED
 #ifdef STATUS_HILITES
       | WC2_RESET_STATUS | WC2_HILITE_STATUS
 #endif
@@ -158,6 +158,7 @@ static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
 #endif
 static void FDECL(d_timeout, (XtPointer, XtIntervalId *));
 static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(X11_bail, (const char *));
 static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
 static void FDECL(askname_done, (Widget, XtPointer, XtPointer));
 static void FDECL(done_button, (Widget, XtPointer, XtPointer));
@@ -1709,6 +1710,19 @@ Cardinal *num_params;
     exit_x_event = TRUE;
 }
 
+/* X11_bail --------------------------------------------------------------- */
+/* clean up and quit */
+static void
+X11_bail(mesg)
+const char *mesg;
+{
+    g.program_state.something_worth_saving = 0;
+    clearlocks();
+    X11_exit_nhwindows(mesg);
+    nh_terminate(EXIT_SUCCESS);
+    /*NOTREACHED*/
+}
+
 /* askname ---------------------------------------------------------------- */
 /* ARGSUSED */
 static void
@@ -1770,6 +1784,21 @@ X11_askname()
     Widget popup, dialog;
     Arg args[1];
 
+#ifdef SELECTSAVED
+    if (iflags.wc2_selectsaved && !iflags.renameinprogress)
+        switch (restore_menu(WIN_MAP)) {
+        case -1: /* quit */
+            X11_bail("Until next time then...");
+            /*NOTREACHED*/
+        case 0: /* no game chosen; start new game */
+            break;
+        case 1: /* save game selected, plname[] has been set */
+            return;
+        }
+#else
+    nhUse(X11_bail);
+#endif /* SELECTSAVED */
+
     if (iflags.wc_player_selection == VIA_DIALOG) {
         /* X11_player_selection_dialog() handles name query */
         plsel_ask_name = TRUE;
@@ -1797,6 +1826,11 @@ X11_askname()
 
     /* The callback will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
+
+    /* tty's character selection uses this; we might someday;
+       since we let user pick an arbitrary name now, he/she can
+       pick another one during role selection */
+    iflags.renameallowed = TRUE;
 
     XtDestroyWidget(dialog);
     XtDestroyWidget(popup);
