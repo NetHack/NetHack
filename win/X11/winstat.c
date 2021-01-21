@@ -1696,7 +1696,7 @@ int color;
     Arg args[1];
     XrmValue source;
     XrmValue dest;
-    
+
     Widget w = (sv->type == SV_LABEL || sv->type == SV_NAME ? sv->w : get_value_widget(sv->w));
     if (color == NO_COLOR) {
         if (sv->after_init)

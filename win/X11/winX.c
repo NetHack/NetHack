@@ -285,7 +285,7 @@ void
 init_menu_nhcolors(wp)
 struct xwindow *wp;
 {
-    const char *mapCLR_to_res[CLR_MAX] = {
+    static const char *mapCLR_to_res[CLR_MAX] = {
         XtNblack,
         XtNred,
         XtNgreen,
