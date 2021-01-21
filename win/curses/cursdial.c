@@ -1107,6 +1107,62 @@ menu_win_size(nhmenu *menu)
     menu->height = max(maxheight, 5);
 }
 
+#ifdef NCURSES_MOUSE_VERSION
+nhmenu_item *
+get_menuitem_y(nhmenu *menu, WINDOW * win, int page_num, int liney)
+{
+    nhmenu_item *menu_item_ptr;
+    int count, num_lines, entry_cols;
+    char *tmpstr;
+
+    menu_item_ptr = menu->entries;
+
+    while (menu_item_ptr != NULL) {
+        if (menu_item_ptr->page_num == page_num) {
+            break;
+        }
+        menu_item_ptr = menu_item_ptr->next_item;
+    }
+
+    if (menu_item_ptr == NULL) {        /* Page not found */
+        impossible("get_menuitem_y: attempt to display nonexistent page");
+        return NULL;
+    }
+
+    if (menu->prompt && *menu->prompt) {
+        num_lines = curses_num_lines(menu->prompt, menu->width);
+
+        for (count = 0; count < num_lines; count++) {
+            tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
+            free(tmpstr);
+        }
+    }
+
+    while (menu_item_ptr != NULL) {
+        if (menu_item_ptr->page_num != page_num) {
+            break;
+        }
+        if (menu_item_ptr->identifier.a_void != NULL) {
+            if (menu_item_ptr->line_num + 1 == liney)
+                return menu_item_ptr;
+        }
+
+        num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
+        for (count = 0; count < num_lines; count++) {
+            if (menu_item_ptr->str && *menu_item_ptr->str) {
+                tmpstr = curses_break_str(menu_item_ptr->str,
+                                          entry_cols, count + 1);
+                free(tmpstr);
+            }
+        }
+
+        menu_item_ptr = menu_item_ptr->next_item;
+    }
+
+    return NULL;
+
+}
+#endif /*NCURSES_MOUSE_VERSION*/
 
 /* Displays menu selections in the given window */
 
@@ -1356,6 +1412,33 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
             case '\r':
                 dismiss = TRUE;
                 break;
+#ifdef NCURSES_MOUSE_VERSION
+            case KEY_MOUSE: {
+                MEVENT mev;
+
+                if (getmouse(&mev) == OK && how != PICK_NONE) {
+                    if (wmouse_trafo(win, &mev.y, &mev.x, FALSE)) {
+                        int y = mev.y;
+
+                        menu_item_ptr = get_menuitem_y(menu, win, curpage, y);
+
+                        if (menu_item_ptr) {
+                            if (how == PICK_ONE) {
+                                menu_clear_selections(menu);
+                                menu_select_deselect(win, menu_item_ptr,
+                                                     SELECT, curpage);
+                                num_selected = 1;
+                                dismiss = TRUE;
+                            } else {
+                                menu_select_deselect(win, menu_item_ptr,
+                                                     INVERT, curpage);
+                            }
+                        }
+                    }
+                }
+            }
+                break;
+#endif /*NCURSES_MOUSE_VERSION*/
             case KEY_RIGHT:
             case KEY_NPAGE:
             case MENU_NEXT_PAGE:
