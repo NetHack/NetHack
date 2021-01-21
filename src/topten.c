@@ -63,7 +63,7 @@ static void FDECL(readentry, (FILE *, struct toptenentry *));
 static void FDECL(writeentry, (FILE *, struct toptenentry *));
 #ifdef XLOGFILE
 static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
-static long NDECL(encodexlogflags);
+static const char *NDECL(encodegamemode);
 static long NDECL(encodeconduct);
 static long FDECL(encodeachieve, (BOOLEAN_P));
 static void FDECL(add_achieveX, (char *, const char *, BOOLEAN_P));
@@ -373,7 +373,7 @@ int how;
     Fprintf(rfile, "%cgender0=%s%calign0=%s", XLOG_SEP,
             genders[flags.initgend].filecode, XLOG_SEP,
             aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
-    Fprintf(rfile, "%cflags=0x%lx", XLOG_SEP, encodexlogflags());
+    Fprintf(rfile, "%cmode=%s", XLOG_SEP, encodegamemode());
     Fprintf(rfile, "%cgold=%ld", XLOG_SEP,
             money_cnt(g.invent) + hidden_gold(TRUE));
     Fprintf(rfile, "%cwish_cnt=%ld", XLOG_SEP, u.uconduct.wishes);
@@ -383,19 +383,15 @@ int how;
 #undef XLOG_SEP
 }
 
-static long
-encodexlogflags()
+static const char *
+encodegamemode()
 {
-    long e = 0L;
-
     if (wizard)
-        e |= 1L << 0;
+        return "wizard";
     if (discover)
-        e |= 1L << 1;
-    if (!u.uroleplay.numbones)
-        e |= 1L << 2;
-
-    return e;
+        return "explore";
+    else
+        return "normal";
 }
 
 static long
