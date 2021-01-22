@@ -1,0 +1,76 @@
+#------------------------------------------------------------------------------
+# NetHack 3.7  compiler.2020 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+
+# compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
+#	various -I, -D, and -W settings appended below;
+#	these are the settings of most interest for an end-user build
+#	(clang doesn't support '-Og', gcc needs 4.x or later)
+CCFLAGS = -g
+#CCFLAGS = -g -Og
+#CCFLAGS = -O2
+#	Note: this is not the usual 'CFLAGS' which is used in default
+#	rules for compiling C code; specifying a value for that on the
+#	'make' command line should be avoided.
+
+CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
+ifeq "$(CCISCLANG)" ""
+CXX=g++ -std=gnu++11
+else
+CXX=clang++ -std=gnu++11
+endif
+# if you want to override the compiler detection just carried out
+# uncomment one of the following pairs as desired.
+#CC= gcc
+#CXX= g++ -std-gnu++11
+#
+#CC= clang
+#CXX=clang++ -std=gnu++11
+
+CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
+
+ifndef WANT_WIN_QT
+ifndef WANT_LIBNH
+#	these are normally used when compiling nethack's core
+#	but -ansi forces -std=c90 for C or -std=c++98 for C++;
+#	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
+#In file included from .../qt5/include/QtCore/qglobal.h:105:
+#.../qt5/include/QtCore/qcompilerdetection.h:561:6:
+#  error Qt requires a C++11 compiler and yours does not seem to be that.
+#	so we suppress -ansi when the build includes Qt
+#CFLAGS+=-ansi -Wno-long-long
+#CFLAGS+=-std=c99
+#
+#LIBNH's winshim requires C99 for the way it is currently coded
+endif
+endif
+
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CFLAGS+=-pedantic
+CFLAGS+=-DGCC_WARN
+CFLAGS+=-Wimplicit-function-declaration
+CFLAGS+=-Wimplicit-int
+CFLAGS+=-Wmissing-declarations
+CFLAGS+=-Wmissing-prototypes
+ifeq "$(CCISCLANG)" ""
+#gcc-specific here
+CFLAGS+=-Wmissing-parameter-type
+# get the version of gcc
+GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GCCGTEQ9)" "1"
+# flags present in gcc version greater than or equal to 9 can go here
+#CFLAGS+=-Wno-format-overflow
+endif  #gcc version greater than or equal to 9
+else   # clang
+# clang-specific here
+endif  # clang
+# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
+# leave it out by default.
+#CFLAGS+=-Wunreachable-code
+#
+# Can't use these; NetHack uses old-style-definitions
+#CFLAGS+=-Wold-style-definition
+#CFLAGS+=-Wstrict-prototypes
+
+#end of compiler.2020
+#------------------------------------------------------------------------------
