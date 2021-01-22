@@ -1993,7 +1993,7 @@ doturn()
             if (g.spl_book[sp_no].sp_id == NO_SPELL)
                 break;
             else if (g.spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
-                return spelleffects(sp_no, FALSE);
+                return docastspecial(sp_no, TRUE);
         }
         You("don't know how to turn undead!");
         return 0;
