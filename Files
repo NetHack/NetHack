@@ -329,7 +329,8 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-cross-post.2020  cross-pre.2020   multiw-1.2020    multiw-2.2020
+compiler.2020    cross-post.2020  cross-pre.2020   multiw-1.2020
+multiw-2.2020
 
 sys/vms:
 (files for VMS version)
