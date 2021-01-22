@@ -1,0 +1,48 @@
+# recovery of messed up repo 2021-01-21
+
+cd ~/sandbox/
+tar -xzf backup/nethack.jan21.tar.gz
+mv nethack.jan21.bak/ nethack
+cd nethack
+git rebase -i --onto NetHack-3.7 floatingeye consent
+--
+reword c47ae5252 ask player for consent during foocubus concounters, remember preferences
+pick c4d849f36 fix chatting with nymphs
+pick a158fe06d add orientation to show attributes (^X) window
+reword b868d3b05 adjust probability severe headaches based on consent values
+pick 874800d9d maintain consortium size when ace
+pick b21b9febc update comments, description
+--
+git checkout floatingeye
+git rebase -i NetHack-3.7 floatingeye
+--
+reword 17b6d1190 change build config for floatingeye.net dgl server
+pick 153dae4f7 build config for avocado
+pick f3930304c copy required libraries and termcap files into the chroot
+pick 8208f4b90 use same chroot path on dev/test and prod
+pick 90b4f48c8 add build instructions, general cleanup
+pick deb903dfa get nethack path from command line
+pick d3dc359b2 Yer a wizard, Harry
+pick 1219caba2 disallow explore mode, allow more high score entries
+pick 3522906cf clean up build config, remove shell and suspend commands
+pick d420e9e4c more build config cleanup
+pick dd1c044a3 add dumplogs, update sysconf settings
+pick ebfd92bc6 set system default options
+pick 9aa04c305 add news file
+pick 987f2dc4c add curses window port
+pick e4448ecab enable simple mail for dgamelaunch
+pick e88a6d5d8 update build instructions
+pick a5ab26264 set directory for man pages
+--
+git cherry-pick -x 50389650b 7f7d3b15b
+git add include/config.h
+git add src/windows.c
+git cherry-pick --continue
+git add src/botl.c
+git cherry-pick --continue
+git push -f
+git checkout consent
+git push -f
+git gc
+cd ..
+tar -czf backup/nethack.jan21.recovered.tar.gz nethack
