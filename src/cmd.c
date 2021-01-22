@@ -130,7 +130,6 @@ static int NDECL(dotravel);
 static int NDECL(doterrain);
 static int NDECL(wiz_wish);
 static int NDECL(wiz_identify);
-static int NDECL(wiz_intrinsic);
 static int NDECL(wiz_map);
 static int NDECL(wiz_makemap);
 static int NDECL(wiz_genesis);
@@ -1548,6 +1547,8 @@ wiz_smell(VOID_ARGS)
     return 0;
 }
 
+#define DEFAULT_TIMEOUT_INCR 30
+
 /* #wizinstrinsic command to set some intrinsics for testing */
 static int
 wiz_intrinsic(VOID_ARGS)
@@ -1600,11 +1601,12 @@ wiz_intrinsic(VOID_ARGS)
         n = select_menu(win, PICK_ANY, &pick_list);
         destroy_nhwindow(win);
 
-        amt = 30; /* TODO: prompt for duration */
         for (j = 0; j < n; ++j) {
             i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
             p = propertynames[i].prop_num;
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
+            amt = (pick_list[j].count == -1L) ? DEFAULT_TIMEOUT_INCR
+                                              : (int) pick_list[j].count;
             newtimeout = oldtimeout + (long) amt;
             switch (p) {
             case SICK:
