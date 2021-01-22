@@ -254,7 +254,7 @@
  *      maximum number of scores to keep, for example) if SYSCF is enabled.
  */
 #ifndef PERSMAX
-#define PERSMAX 13 /* entries per name/uid per char. allowed */
+#define PERSMAX 25 /* entries per name/uid per char. allowed */
 #endif
 #ifndef POINTSMIN
 #define POINTSMIN 1 /* must be > 0 */
