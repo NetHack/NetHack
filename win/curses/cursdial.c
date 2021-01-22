@@ -1109,7 +1109,7 @@ menu_win_size(nhmenu *menu)
 
 #ifdef NCURSES_MOUSE_VERSION
 nhmenu_item *
-get_menuitem_y(nhmenu *menu, WINDOW * win, int page_num, int liney)
+get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED, int page_num, int liney)
 {
     nhmenu_item *menu_item_ptr;
     int count, num_lines, entry_cols = menu->width;
