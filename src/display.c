@@ -1484,6 +1484,9 @@ redraw_map()
                         Glyphinfo_at(x, y, glyph), &bkglyphinfo);
         }
     flush_screen(1);
+#ifndef UNBUFFERED_GLYPHINFO
+    nhUse(glyph);
+#endif
 }
 
 /*
