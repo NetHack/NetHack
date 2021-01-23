@@ -40,6 +40,7 @@ static void FDECL(menu_identify, (int));
 static boolean FDECL(tool_in_use, (struct obj *));
 static int FDECL(adjust_ok, (struct obj *));
 static char FDECL(obj_to_let, (struct obj *));
+static void FDECL(mime_action, (const char *));
 
 /* wizards can wish for venom, which will become an invisible inventory
  * item without this.  putting it in inv_order would mean venom would
@@ -1455,7 +1456,7 @@ const char *action;
     return !strcmp(action, "take off") || !strcmp(action, "remove");
 }
 
-void
+static void
 mime_action(word)
 const char *word;
 {
