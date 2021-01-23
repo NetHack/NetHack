@@ -906,10 +906,9 @@ int mode;
         struct trap *t = t_at(x, y);
 
         if ((t && t->tseen)
-            || (!Levitation && !Flying && !is_clinger(g.youmonst.data)
+            || (!Airborne && levl[x][y].seenv
                 && (is_lava(x, y) || (!(Wwalking && cause_known(WWALKING))
-                                      && is_pool(x, y)))
-                && levl[x][y].seenv))
+                                      && is_pool(x, y)))))
             return (mode == TEST_TRAP);
     }
 
@@ -1542,17 +1541,16 @@ domove_core()
             return;
         }
         if (((trap = t_at(x, y)) && trap->tseen)
-            || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
+            || (Blind && !Airborne && levl[x][y].seenv
                 && (is_lava(x, y) || (!(Wwalking && cause_known(WWALKING))
-                                      && is_pool(x, y)))
-                && levl[x][y].seenv)) {
+                                      && is_pool(x, y))))) {
             if (g.context.run >= 2) {
                 if (flags.mention_walls) {
                     if (trap && trap->tseen) {
                         You("stop in front of %s.",
                             an(trapname(trap->ttyp, FALSE)));
                     } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
-                        You("stop at the edge of the %s.",
+                        You("stop just short of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
                     }
                 }
@@ -2823,6 +2821,8 @@ lookaround()
         return;
     }
 
+#define DEAD_AHEAD(x,y) (x == u.ux + u.dx && y == u.uy + u.dy)
+
     if (Blind || g.context.run == 0)
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
@@ -2837,21 +2837,43 @@ lookaround()
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((g.context.run != 1 && !mtmp->mtame)
-                    || (x == u.ux + u.dx && y == u.uy + u.dy
-                        && !g.context.travel)) {
+                    || (DEAD_AHEAD(x, y) && !g.context.travel)) {
                     if (flags.mention_walls)
                         pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
                 }
             }
 
-            if (levl[x][y].typ == STONE)
+            if (levl[x][y].typ == STONE || IS_ROCK(levl[x][y].typ))
                 continue;
             if (x == u.ux - u.dx && y == u.uy - u.dy)
                 continue;
 
-            if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM
-                || IS_AIR(levl[x][y].typ)) {
+            /* stepping from dry land to pool/lava, or vice-versa */
+            if (is_pool_or_lava(x, y) != is_pool_or_lava(u.ux, u.uy)
+                && g.context.run >= 2 && !g.context.travel
+                && DEAD_AHEAD(x, y)) {
+                if (flags.mention_walls) {
+                    if (is_pool_or_lava(x, y)) {
+                        You("stop before you %s %s %s.",
+                            locomotion(g.youmonst.data, (Airborne ? "continue"
+                                                                  : "step")),
+                            Airborne ? "past" : "off",
+                            Is_medusa_level(&u.uz) ? "the shore"
+                                                   : "solid ground");
+                    } else {
+                        You("stop before you %s %s the %s.",
+                            locomotion(g.youmonst.data,
+                                       (Wwalking && !Airborne) ? "step"
+                                                               : "continue"),
+                            Underwater ? "out of" : "off",
+                            is_pool(u.ux, u.uy) ? "water" : "lava");
+                    }
+                }
+                goto stop;
+            }
+
+            if (levl[x][y].typ == ROOM || IS_AIR(levl[x][y].typ)) {
                 continue;
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 if (x != u.ux && y != u.uy)
@@ -2885,7 +2907,7 @@ lookaround()
             } else if ((trap = t_at(x, y)) && trap->tseen) {
                 if (g.context.run == 1)
                     goto bcorr; /* if you must */
-                if (x == u.ux + u.dx && y == u.uy + u.dy) {
+                if (DEAD_AHEAD(x, y)) {
                     if (flags.mention_walls)
                         You("stop in front of %s.",
                             an(trapname(trap->ttyp, FALSE)));
@@ -2896,13 +2918,16 @@ lookaround()
                 /* water and lava only stop you if directly in front, and stop
                  * you even if you are running
                  */
-                if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-                    && !(is_pool(x, y) && Wwalking && cause_known(WWALKING))
+                boolean known_wwalking = Wwalking && cause_known(WWALKING);
+                if (!Airborne && !Underwater
+                    && !(is_pool(x, y) && known_wwalking)
                     /* only respect water walking if the source has already
                      * been identified, to avoid cheap & risk-free ID */
-                    && x == u.ux + u.dx && y == u.uy + u.dy) {
+                    && DEAD_AHEAD(x, y)) {
                     if (flags.mention_walls)
-                        You("stop at the edge of the %s.",
+                        You("stop before you %s %s the %s ahead.",
+                            locomotion(g.youmonst.data, "step"),
+                            known_wwalking ? "onto" : "into",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
                     goto stop;
                 }
