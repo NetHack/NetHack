@@ -2120,9 +2120,11 @@ mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
 void
 mswin_main_loop()
 {
-    MSG msg;
-
     while (!mswin_have_input()) {
+        MSG msg;
+
+        mswin_map_update(mswin_hwnd_from_winid(WIN_MAP));
+
         if (!iflags.debug_fuzzer || PeekMessage(&msg, NULL, 0, 0, FALSE)) {
             if(GetMessage(&msg, NULL, 0, 0) != 0) {
                 if (GetNHApp()->regNetHackMode
@@ -2214,7 +2216,7 @@ initMapTiles(void)
 
     map_size.cx = GetNHApp()->mapTile_X * COLNO;
     map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
-    mswin_map_stretch(mswin_hwnd_from_winid(WIN_MAP), &map_size, TRUE);
+    mswin_map_layout(mswin_hwnd_from_winid(WIN_MAP), &map_size);
     return TRUE;
 }
 
