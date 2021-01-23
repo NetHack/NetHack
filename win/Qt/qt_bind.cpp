@@ -1062,7 +1062,10 @@ struct window_procs Qt_procs = {
 };
 
 #ifndef WIN32
-extern "C" void
+extern "C" void play_usersound(const char *, int);
+
+/* called from core, sounds.c */
+void
 play_usersound(const char *filename, int volume UNUSED)
 {
 #if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
