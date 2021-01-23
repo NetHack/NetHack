@@ -966,6 +966,7 @@ E int NDECL(doattributes);
 E void FDECL(enlightenment, (int, int));
 E void FDECL(youhiding, (BOOLEAN_P, int));
 E char *FDECL(trap_predicament, (char *, int, BOOLEAN_P));
+E boolean FDECL(cause_known, (int));
 E int NDECL(doconduct);
 E void FDECL(show_conduct, (int));
 E void FDECL(record_achievement, (SCHAR_P));

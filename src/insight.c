@@ -20,7 +20,6 @@ static void FDECL(enlght_line, (const char *, const char *, const char *,
 static char *FDECL(enlght_combatinc, (const char *, int, int, char *));
 static void FDECL(enlght_halfdmg, (int, int));
 static boolean NDECL(walking_on_water);
-static boolean FDECL(cause_known, (int));
 static char *FDECL(attrval, (int, int, char *));
 static void FDECL(background_enlightenment, (int, int));
 static void FDECL(basics_enlightenment, (int, int));
@@ -192,7 +191,7 @@ boolean wizxtra;
 /* check whether hero is wearing something that player definitely knows
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
-static boolean
+boolean
 cause_known(propindx)
 int propindx; /* index of a property which can be conveyed by worn item */
 {

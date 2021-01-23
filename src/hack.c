@@ -907,7 +907,9 @@ int mode;
 
         if ((t && t->tseen)
             || (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-                && is_pool_or_lava(x, y) && levl[x][y].seenv))
+                && (is_lava(x, y) || (!(Wwalking && cause_known(WWALKING))
+                                      && is_pool(x, y)))
+                && levl[x][y].seenv))
             return (mode == TEST_TRAP);
     }
 
@@ -1541,7 +1543,9 @@ domove_core()
         }
         if (((trap = t_at(x, y)) && trap->tseen)
             || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
-                && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
+                && (is_lava(x, y) || (!(Wwalking && cause_known(WWALKING))
+                                      && is_pool(x, y)))
+                && levl[x][y].seenv)) {
             if (g.context.run >= 2) {
                 if (flags.mention_walls) {
                     if (trap && trap->tseen) {
@@ -2893,11 +2897,10 @@ lookaround()
                  * you even if you are running
                  */
                 if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
+                    && !(is_pool(x, y) && Wwalking && cause_known(WWALKING))
+                    /* only respect water walking if the source has already
+                     * been identified, to avoid cheap & risk-free ID */
                     && x == u.ux + u.dx && y == u.uy + u.dy) {
-                    /* No Wwalking check; otherwise they'd be able
-                     * to test boots by trying to SHIFT-direction
-                     * into a pool and seeing if the game allowed it
-                     */
                     if (flags.mention_walls)
                         You("stop at the edge of the %s.",
                             hliquid(is_pool(x,y) ? "water" : "lava"));
