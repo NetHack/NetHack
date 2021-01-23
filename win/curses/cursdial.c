@@ -103,6 +103,10 @@ static char menu_get_accel(boolean first);
 static void menu_determine_pages(nhmenu *menu);
 static boolean menu_is_multipage(nhmenu *menu, int width, int height);
 static void menu_win_size(nhmenu *menu);
+#ifdef NCURSES_MOUSE_VERSION
+static nhmenu_item *get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED,
+                                   int page_num, int liney);
+#endif /*NCURSES_MOUSE_VERSION*/
 static void menu_display_page(nhmenu *menu, WINDOW * win, int page_num,
                               char *);
 static int menu_get_selections(WINDOW * win, nhmenu *menu, int how);
@@ -1108,7 +1112,7 @@ menu_win_size(nhmenu *menu)
 }
 
 #ifdef NCURSES_MOUSE_VERSION
-nhmenu_item *
+static nhmenu_item *
 get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED, int page_num, int liney)
 {
     nhmenu_item *menu_item_ptr;
