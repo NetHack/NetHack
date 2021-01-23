@@ -3071,8 +3071,7 @@ register struct monst *mtmp;
         }
     } else {
         register int tt = trap->ttyp;
-        boolean in_sight, see_it,
-                inescapable = (g.force_mintrap
+        boolean inescapable = (g.force_mintrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
@@ -3092,12 +3091,6 @@ register struct monst *mtmp;
            unreasonable; everybody has their own style. */
         if (trap->madeby_u && rnl(5))
             setmangry(mtmp, TRUE);
-
-        in_sight = canseemon(mtmp);
-        see_it = cansee(mtmp->mx, mtmp->my);
-        /* assume hero can tell what's going on for the steed */
-        if (mtmp == u.usteed)
-            in_sight = TRUE;
 
         return trapeffect_selector(mtmp, trap, 0);
     }
