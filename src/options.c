@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1608606126 2020/12/22 03:02:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.489 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1611442675 2021/01/23 22:57:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -287,6 +287,7 @@ static boolean FDECL(illegal_menu_cmd_key, (UCHAR_P));
 int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
 #endif
 #ifdef CURSES_GRAPHICS
+static int optfn_cursesgraphics(int, int, boolean, char *, char *op);
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
@@ -789,7 +790,8 @@ char *op;
     return optn_ok;
 }
 
-int
+#ifdef CURSES_GRAPHICS
+static int
 optfn_cursesgraphics(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -840,6 +842,7 @@ char *op UNUSED;
     }
     return optn_ok;
 }
+#endif
 
 int
 optfn_DECgraphics(optidx, req, negated, opts, op)
