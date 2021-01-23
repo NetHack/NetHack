@@ -1583,16 +1583,6 @@ boolean up;
 }
 
 stairway *
-stairway_find_ladder()
-{
-    stairway *tmp = g.stairs;
-
-    while (tmp && !tmp->isladder)
-        tmp = tmp->next;
-    return tmp;
-}
-
-stairway *
 stairway_find_type_dir(isladder, up)
 boolean isladder, up;
 {
