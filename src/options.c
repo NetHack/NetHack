@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1611442675 2021/01/23 22:57:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1611445306 2021/01/23 23:41:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.495 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -283,11 +283,11 @@ static boolean FDECL(wc2_supported, (const char *));
 static void FDECL(wc_set_font_name, (int, char *));
 static int FDECL(wc_set_window_colors, (char *));
 static boolean FDECL(illegal_menu_cmd_key, (UCHAR_P));
-#ifndef CHANGE_COLOR
-int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
+#ifdef CHANGE_COLOR
+static int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
 #endif
 #ifdef CURSES_GRAPHICS
-static int optfn_cursesgraphics(int, int, boolean, char *, char *op);
+static int optfn_cursesgraphics(int, int, BOOLEAN_P, char *, char *);
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
@@ -506,7 +506,7 @@ char *op UNUSED;
  **********************************
  */
 
-int
+static int
 optfn_align(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -536,7 +536,7 @@ char *op;
 }
 
 
-int
+static int
 optfn_align_message(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -590,7 +590,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_align_status(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -643,7 +643,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_altkeyhandler(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -679,7 +679,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_boulder(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -761,7 +761,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_catname(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated UNUSED;
@@ -844,7 +844,7 @@ char *op UNUSED;
 }
 #endif
 
-int
+static int
 optfn_DECgraphics(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -896,7 +896,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_disclose(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1021,7 +1021,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_dogname(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1050,7 +1050,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_dungeon(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1073,7 +1073,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_effects(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1096,7 +1096,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_font_map(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1107,7 +1107,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_menu(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1118,7 +1118,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_message(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1129,7 +1129,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_size_map(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1140,7 +1140,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_size_menu(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1151,7 +1151,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_size_message(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1162,7 +1162,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_size_status(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1173,7 +1173,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_size_text(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1184,7 +1184,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_status(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1195,7 +1195,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_font_text(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1206,7 +1206,7 @@ char *op;
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
+static int
 optfn_fruit(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1281,7 +1281,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_gender(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1312,7 +1312,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_hilite_status(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1351,7 +1351,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_horsename(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated UNUSED;
@@ -1380,7 +1380,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_IBMgraphics(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1442,7 +1442,7 @@ char *op UNUSED;
 }
 
 #if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
-int
+static int
 optfn_MACgraphics(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -1489,7 +1489,7 @@ char *op;
 }
 #endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
 
-int
+static int
 optfn_map_mode(optidx, req, negated, opts, op)
 int optidx, req;
 boolean negated;
@@ -1573,7 +1573,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_deselect_all(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1600,7 +1600,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_deselect_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1627,7 +1627,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_first_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1654,7 +1654,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_headings(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -1691,7 +1691,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_invert_all(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1718,7 +1718,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_invert_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1745,7 +1745,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_last_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1772,7 +1772,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_next_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1799,7 +1799,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_previous_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1826,7 +1826,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_search(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1853,7 +1853,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_select_all(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1880,7 +1880,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menu_select_page(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -1907,7 +1907,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_menuinvertmode(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -1941,7 +1941,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_menustyle(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2004,7 +2004,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_monsters(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -2027,7 +2027,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_mouse_support(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2096,7 +2096,7 @@ char *op;
 #define PREV_MSGS 0
 #endif
 
-int
+static int
 optfn_msg_window(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2168,7 +2168,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_msghistory(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2199,7 +2199,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_name(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2229,7 +2229,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_number_pad(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2304,7 +2304,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_objects(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -2327,7 +2327,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_packorder(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -2357,7 +2357,8 @@ char *op;
     return optn_ok;
 }
 
-int
+#ifdef CHANGE_COLOR
+static int
 optfn_palette(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -2366,11 +2367,9 @@ char *opts;
 char *op;
 {
 #ifndef WIN32
-#ifdef CHANGE_COLOR
     int cnt, tmp, reverse;
     char *pt = op;
     long rgb;
-#endif
 #endif
 
     if (req == do_init) {
@@ -2386,12 +2385,11 @@ char *op;
                  palette (adjust an RGB color in palette (color-R-G-B)
         */
 
-#ifdef CHANGE_COLOR
         if (match_optname(opts, "palette", 3, TRUE)
 #ifdef MAC
             || match_optname(opts, "hicolor", 3, TRUE)
 #endif
-                                                      ) {
+            ) {
             int color_number, color_incr;
 
 #ifndef WIN32
@@ -2453,23 +2451,20 @@ char *op;
                 g.opt_need_redraw = TRUE;
             }
         }
-#endif /* CHANGE_COLOR */
-            return optn_ok;
+        return optn_ok;
     }
     if (req == get_val) {
         if (!opts)
             return optn_err;
         opts[0] = '\0';
-#ifdef CHANGE_COLOR
         Sprintf(opts, "%s", get_color_string());
-#endif
         return optn_ok;
     }
     return optn_ok;
 }
+#endif /* CHANGE_COLOR */
 
-
-int
+static int
 optfn_paranoid_confirmation(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2568,7 +2563,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_petattr(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2633,7 +2628,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_pettype(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2689,7 +2684,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_pickup_burden(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2746,7 +2741,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_pickup_types(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2847,7 +2842,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_pile_limit(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2886,7 +2881,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_player_selection(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2923,7 +2918,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_playmode(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2964,7 +2959,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_race(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -2996,7 +2991,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_roguesymset(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3040,7 +3035,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_role(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3071,7 +3066,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_runmode(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3115,7 +3110,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_scores(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3187,7 +3182,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_scroll_amount(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3223,7 +3218,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_scroll_margin(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3258,7 +3253,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_sortdiscoveries(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3318,7 +3313,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_sortloot(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3367,7 +3362,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_statushilites(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -3417,7 +3412,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_statuslines(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3466,7 +3461,7 @@ char *op;
 }
 
 #ifdef WIN32
-int
+static int
 optfn_subkeyvalue(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -3495,7 +3490,7 @@ char *op UNUSED;
 }
 #endif /* WIN32 */
 
-int
+static int
 optfn_suppress_alert(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3527,7 +3522,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_symset(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -3570,7 +3565,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_term_cols(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3614,7 +3609,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_term_rows(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3658,7 +3653,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_tile_file(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -3689,7 +3684,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_tile_height(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3724,7 +3719,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_tile_width(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3759,7 +3754,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_traps(optidx, req, negated, opts, op)
 int optidx UNUSED;
 int req;
@@ -3782,7 +3777,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_vary_msgcount(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3818,7 +3813,7 @@ char *op;
 }
 
 #ifdef VIDEOSHADES
-int
+static int
 optfn_videocolors(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3858,7 +3853,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_videoshades(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3894,7 +3889,7 @@ char *op;
 #endif /* VIDEOSHADES */
 
 #ifdef MSDOS
-int
+static int
 optfn_video_width(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3920,7 +3915,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_video_height(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3947,7 +3942,7 @@ char *op;
 }
 
 #ifdef NO_TERMS
-int
+static int
 optfn_video(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -3983,7 +3978,7 @@ char *op;
 #endif /* NO_TERMS */
 #endif /* MSDOS */
 
-int
+static int
 optfn_warnings(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4009,7 +4004,7 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
+static int
 optfn_whatis_coord(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4059,7 +4054,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_whatis_filter(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4113,7 +4108,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_windowborders(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4165,7 +4160,7 @@ char *op;
 }
 
 #ifdef WINCHAIN
-int
+static int
 optfn_windowchain(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4197,7 +4192,7 @@ char *op;
 }
 #endif
 
-int
+static int
 optfn_windowcolors(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4243,7 +4238,7 @@ char *op;
     return optn_ok;
 }
 
-int
+static int
 optfn_windowtype(optidx, req, negated, opts, op)
 int optidx;
 int req;
@@ -4506,7 +4501,7 @@ char *op;
  *    (Use optidx to reference the specific option)
  */
 
-int
+static int
 optfn_boolean(optidx, req, negated, opts, op)
 int optidx;
 int req;

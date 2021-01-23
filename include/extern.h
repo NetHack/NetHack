@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1608749030 2020/12/23 18:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.934 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1611445282 2021/01/23 23:41:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.947 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2415,6 +2415,7 @@ E int NDECL(tiphat);
 #ifdef USER_SOUNDS
 E int FDECL(add_sound_mapping, (const char *));
 E void FDECL(play_sound_for_message, (const char *));
+E void FDECL(maybe_play_sound, (const char *));
 E void NDECL(release_sound_mappings);
 #endif
 
