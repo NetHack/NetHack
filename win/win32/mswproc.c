@@ -1852,6 +1852,7 @@ void
 mswin_delay_output()
 {
     logDebug("mswin_delay_output()\n");
+    mswin_map_update(mswin_hwnd_from_winid(WIN_MAP));
     Sleep(50);
 }
 
