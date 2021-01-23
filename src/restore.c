@@ -37,6 +37,7 @@ static int FDECL(restlevelfile, (XCHAR_P));
 static void FDECL(restore_msghistory, (NHFILE *));
 static void FDECL(reset_oattached_mids, (BOOLEAN_P));
 static void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
+static void FDECL(rest_stairs, (NHFILE *));
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -905,7 +906,7 @@ NHFILE *nhfp;
     return 1;
 }
 
-void
+static void
 rest_stairs(nhfp)
 NHFILE *nhfp;
 {
