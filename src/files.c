@@ -683,7 +683,6 @@ set_bonesfile_name(file, lev)
 char *file;
 d_level *lev;
 {
-    int idx = 0;
     s_level *sptr;
     char *dptr;
 
@@ -718,9 +717,6 @@ d_level *lev;
         Sprintf(eos(dptr), ".%c", sptr->boneid);
     else
         Sprintf(eos(dptr), ".%d", lev->dlevel);
-#ifdef SYSCF
-    idx = sysopt.bonesformat[0];
-#endif
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
@@ -890,7 +886,7 @@ void
 set_savefile_name(regularize_it)
 boolean regularize_it;
 {
-    int idx = historical, regoffset = 0, overflow = 0,  
+    int regoffset = 0, overflow = 0,
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
@@ -898,16 +894,6 @@ boolean regularize_it;
     char tmp[BUFSZ];
 #endif
 
-    if (g.program_state.in_self_recover) {
-        /* self_recover needs to be done as historical
-           structlevel content until that process is
-           re-written to use something other than
-           copy_bytes() to retrieve data content from
-           level files (which are structlevel) and
-           place it into the save file.
-        */
-        idx = historical;
-    }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
     regoffset = 7;
