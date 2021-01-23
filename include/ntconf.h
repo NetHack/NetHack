@@ -32,7 +32,6 @@
 #define TTY_SOUND_ESCCODES
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
-#define SELECTSAVED /* Provide menu of saved games to choose from at start */
 
 #define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
 

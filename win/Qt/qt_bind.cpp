@@ -191,6 +191,7 @@ void NetHackQtBind::qt_player_selection()
 void NetHackQtBind::qt_askname()
 {
     char default_plname[PL_NSIZ];
+    int ch = -1; // -1 => new game
 
     have_asked = true;
     str_copy(default_plname, g.plname, PL_NSIZ);
@@ -198,19 +199,23 @@ void NetHackQtBind::qt_askname()
     // We do it all here (plus qt_plsel.cpp and qt_svsel.cpp),
     // nothing in player_selection().
 
-    char** saved = get_saved_games();
-    int ch = -1; // -1 => new game
-    if ( saved && *saved ) {
-	if ( splash ) splash->hide();
-	NetHackQtSavedGameSelector sgsel((const char**)saved);
-	ch = sgsel.choose();
-	if ( ch >= 0 )
-	    str_copy(g.plname, saved[ch], SIZE(g.plname));
+#ifdef SELECTSAVED
+    char **saved = 0;
+    if (::iflags.wc2_selectsaved)
+        saved = get_saved_games();
+    if (saved && *saved) {
+        if (splash)
+            splash->hide();
+        NetHackQtSavedGameSelector sgsel((const char **) saved);
+        ch = sgsel.choose();
+        if (ch >= 0)
+            str_copy(g.plname, saved[ch], SIZE(g.plname));
         // caller needs new lock name even if plname[] hasn't changed
         // because successful get_saved_games() clobbers g.SAVEF[]
         ::iflags.renameinprogress = TRUE;
     }
     free_saved_games(saved);
+#endif
 
     switch (ch) {
     case -1:
@@ -981,7 +986,11 @@ struct window_procs Qt_procs = {
      | WC_ASCII_MAP | WC_TILED_MAP
      | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT
      | WC_POPUP_DIALOG | WC_PLAYER_SELECTION | WC_SPLASH_SCREEN),
-    (WC2_HITPOINTBAR | WC2_STATUSLINES),
+    (WC2_HITPOINTBAR
+#ifdef SELECTSAVED
+     | WC2_SELECTSAVED
+#endif
+     | WC2_STATUSLINES),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
@@ -1002,7 +1011,7 @@ struct window_procs Qt_procs = {
     nethack_qt_::NetHackQtBind::qt_add_menu,
     nethack_qt_::NetHackQtBind::qt_end_menu,
     nethack_qt_::NetHackQtBind::qt_select_menu,
-    genl_message_menu,      /* no need for X-specific handling */
+    genl_message_menu,      /* no need for Qt-specific handling */
     nethack_qt_::NetHackQtBind::qt_update_inventory,
     nethack_qt_::NetHackQtBind::qt_mark_synch,
     nethack_qt_::NetHackQtBind::qt_wait_synch,
@@ -1053,16 +1062,15 @@ struct window_procs Qt_procs = {
 };
 
 #ifndef WIN32
-#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
-extern "C" void play_usersound(const char* filename, int volume UNUSED)
-#else
-extern "C" void play_usersound(const char* filename UNUSED, int volume UNUSED)
-#endif
+extern "C" void
+play_usersound(const char *filename, int volume UNUSED)
 {
-#ifdef USER_SOUNDS
-#ifndef QT_NO_SOUND
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
     QSound::play(filename);
-#endif
+#else
+    nhUse(filename);
 #endif
 }
-#endif
+#endif /*!WIN32*/
+
+//qt_bind.cpp

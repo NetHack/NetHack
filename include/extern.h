@@ -804,7 +804,7 @@ E int FDECL(parse_sym_line, (char *, int));
 E void FDECL(paniclog, (const char *, const char *));
 E void FDECL(testinglog, (const char *, const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
-#if defined(SELECTSAVED) || (defined(UNIX) && defined(QT_GRAPHICS))
+#ifdef SELECTSAVED
 E char *FDECL(plname_from_file, (const char *));
 #endif
 E char **NDECL(get_saved_games);

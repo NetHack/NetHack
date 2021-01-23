@@ -42,7 +42,7 @@ const
 #endif
 #endif
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#if defined(UNIX) && defined(SELECTSAVED)
 #include <sys/types.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -121,12 +121,6 @@ extern char *FDECL(translate_path_variables, (const char *, char *));
 
 #ifdef USER_SOUNDS
 extern char *sounddir; /* defined in sounds.c */
-#endif
-
-#if defined(UNIX) && defined(QT_GRAPHICS)
-#ifndef SELECTSAVED
-#define SELECTSAVED
-#endif
 #endif
 
 static NHFILE *NDECL(new_nhfile);
@@ -1275,7 +1269,7 @@ get_saved_games()
 
     }
 #endif
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#ifdef UNIX
     /* posixly correct version */
     int myuid = getuid();
     DIR *dir;
