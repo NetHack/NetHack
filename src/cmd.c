@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1610138674 2021/01/08 20:44:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.445 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1611525309 2021/01/24 21:55:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.448 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1571,6 +1571,15 @@ wiz_intrinsic(VOID_ARGS)
         any = cg.zeroany;
         win = create_nhwindow(NHW_MENU);
         start_menu(win, MENU_BEHAVE_STANDARD);
+        if (iflags.cmdassist) {
+            /* start menu with a subtitle */
+            Sprintf(buf,
+        "[Precede any selection with a count to increment by other than %d.]",
+                    DEFAULT_TIMEOUT_INCR);
+            any.a_int = 0;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+                     MENU_ITEMFLAGS_NONE);
+        }
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
             p = propertynames[i].prop_num;
             if (p == HALLUC_RES) {
@@ -1607,7 +1616,10 @@ wiz_intrinsic(VOID_ARGS)
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
             amt = (pick_list[j].count == -1L) ? DEFAULT_TIMEOUT_INCR
                                               : (int) pick_list[j].count;
+            if (amt <= 0) /* paranoia */
+                continue;
             newtimeout = oldtimeout + (long) amt;
+
             switch (p) {
             case SICK:
             case SLIMED:
