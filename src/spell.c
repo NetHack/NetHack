@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1607980325 2020/12/14 21:12:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1611522041 2021/01/24 21:00:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1266,6 +1266,8 @@ throwspell()
     cc.y = u.uy;
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
+    clear_nhwindow(WIN_MESSAGE); /* discard any autodescribe feedback */
+
     /* The number of moves from hero to where the spell drops.*/
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
         pline_The("spell dissipates over the distance!");
@@ -1276,7 +1278,7 @@ throwspell()
         u.dx = 0;
         u.dy = 0;
         return 1;
-    } else if ((!cansee(cc.x, cc.y)
+    } else if (((cc.x != u.ux || cc.y != u.uy) && !cansee(cc.x, cc.y)
                 && (!(mtmp = m_at(cc.x, cc.y)) || !canspotmon(mtmp)))
                || IS_STWALL(levl[cc.x][cc.y].typ)) {
         Your("mind fails to lock onto that location!");

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.431 $ $NHDT-Date: 1611182248 2021/01/20 22:37:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.434 $ $NHDT-Date: 1611522041 2021/01/24 21:00:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -370,6 +370,11 @@ for configuration using external compression on save files that applied a name
 	been manually uncompressed, mangling file name trying to remove suffix
 an empty lamp hit by fire reported "the oil lamp catches fire" (but at least
 	didn't light)
+spells that require a target spot rather than a direction (like skilled
+	fireball) would not let a blinded hero target his/her own spot, with
+	feedback stating hero failed to hold location sufficiently in mind;
+	when not blind, such spells left autodescribe feedback for target spot
+	in the message window while the spell was being performed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
