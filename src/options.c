@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1611445306 2021/01/23 23:41:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.495 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1611456333 2021/01/24 02:45:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.496 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -283,11 +283,7 @@ static boolean FDECL(wc2_supported, (const char *));
 static void FDECL(wc_set_font_name, (int, char *));
 static int FDECL(wc_set_window_colors, (char *));
 static boolean FDECL(illegal_menu_cmd_key, (UCHAR_P));
-#ifdef CHANGE_COLOR
-static int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
-#endif
 #ifdef CURSES_GRAPHICS
-static int optfn_cursesgraphics(int, int, BOOLEAN_P, char *, char *);
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
