@@ -952,7 +952,7 @@ register struct monst *mtmp;
                 }
             } /* S_AMOROUS_DEMON */
 
-            swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
+            swval = ((could_seduce(mtmp, &g.youmonst, NULL) == 1) ? rn2(3) : 0);
         } else
             swval = ((poly_gender() == 0) ? rn2(3) : 0);
         switch (swval) {
