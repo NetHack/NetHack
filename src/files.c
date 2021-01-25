@@ -1204,7 +1204,10 @@ char **
 get_saved_games()
 {
 #if defined(SELECTSAVED)
-    int n, j = 0;
+#if defined(WIN32) || defined(UNIX)
+    int n;
+#endif
+    int j = 0;
     char **result = 0;
 #ifdef WIN32
     {

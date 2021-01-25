@@ -895,7 +895,7 @@ register int after;
     boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
             conceals = 0;
     boolean likerock = 0, can_tunnel = 0;
-    boolean can_open = 0, can_unlock = 0, doorbuster = 0;
+    boolean can_open = 0, can_unlock = 0 /*, doorbuster = 0 */;
     boolean uses_items = 0, setlikes = 0;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
@@ -937,7 +937,7 @@ register int after;
     can_open = !(nohands(ptr) || verysmall(ptr));
     can_unlock = ((can_open && monhaskey(mtmp, TRUE))
                   || mtmp->iswiz || is_rider(ptr));
-    doorbuster = is_giant(ptr);
+    /* doorbuster = is_giant(ptr); */
     if (mtmp->wormno)
         goto not_special;
     /* my dog gets special treatment */

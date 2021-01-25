@@ -964,7 +964,7 @@ register struct monst *mtmp;
 register struct attack *mattk;
 {
     struct permonst *mdat = mtmp->data;
-    int uncancelled;
+    /* int uncancelled; */
     int armpro;
     struct permonst *olduasmon = g.youmonst.data;
     int res;
@@ -1010,7 +1010,8 @@ register struct attack *mattk;
      *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
      */
     armpro = magic_negation(&g.youmonst);
-    uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro);
+    /* this was moved downstream during a 2020 refactor */
+    /* uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro); */
 
     mhitm_adtyping(mtmp, mattk, &g.youmonst, &mhm);
     if (mhm.done)
