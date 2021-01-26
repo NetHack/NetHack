@@ -1250,7 +1250,7 @@ xchar x, y; /* location */
     coord m = {0};
     d_level *dest;
     boolean make_stairs;
-    /* struct mkroom *br_room; */
+    struct mkroom *br_room;
 
     /*
      * Return immediately if there is no branch to make or we have
@@ -1261,13 +1261,14 @@ xchar x, y; /* location */
     if (!br || g.made_branch)
         return;
 
+    nhUse(br_room);
     if (!x) { /* find random coordinates for branch */
         /* br_room = find_branch_room(&m); */
         (void) find_branch_room(&m);  /* sets m via mazexy() or somexy() */
         x = m.x;
         y = m.y;
     } else {
-        /* br_room = pos_to_room(x, y); */
+        br_room = pos_to_room(x, y);
     }
 
     if (on_level(&br->end1, &u.uz)) {
