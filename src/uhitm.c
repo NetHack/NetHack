@@ -1622,9 +1622,12 @@ struct attack *mattk;
         /* 3.7: this uses hero's base gender rather than nymph feminimity
            but was using hardcoded pronouns She/her for target monster;
            switch to dynamic pronoun */
-        /* Update: use hero's consent values */
-
+#ifndef CONSENT
+        if (gender(mdef) == (int) u.mfemale
+#else
+        /* use hero's consent values */
         if (!could_seduce(&g.youmonst, mdef, mattk)
+#endif
             && g.youmonst.data->mlet == S_NYMPH)
             You("charm %s.  %s gladly hands over %s%s possessions.",
                 mon_nam(mdef), upstart(strcpy(heshe, mhe(mdef))),

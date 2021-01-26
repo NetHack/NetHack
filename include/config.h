@@ -604,6 +604,8 @@ typedef unsigned char uchar;
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
+#define CONSENT /* for foocubus interactions */
+
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES

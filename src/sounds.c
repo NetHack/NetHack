@@ -929,6 +929,7 @@ register struct monst *mtmp;
         int swval;
 
         if (SYSOPT_SEDUCE) {
+#ifdef CONSENT
             if (ptr->mlet != S_NYMPH) { /* ptr->mlet == S_AMOROUS_DEMON */
                 unsigned mask;
                 boolean fem;
@@ -953,6 +954,14 @@ register struct monst *mtmp;
             } /* S_AMOROUS_DEMON */
 
             swval = ((could_seduce(mtmp, &g.youmonst, NULL) == 1) ? rn2(3) : 0);
+#else
+            if (ptr->mlet != S_NYMPH
+                && could_seduce(mtmp, &g.youmonst, (struct attack *) 0) == 1) {
+                (void) doseduce(mtmp);
+                break;
+            }
+            swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
+#endif
         } else
             swval = ((poly_gender() == 0) ? rn2(3) : 0);
         switch (swval) {
