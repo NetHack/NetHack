@@ -31,7 +31,7 @@ BEGIN
             VALUE "FileDescription", "NetHack for Windows - TTY Interface\0"
             VALUE "FileVersion", "3.6.6\0"
             VALUE "InternalName", "NetHack\0"
-            VALUE "LegalCopyright", "Copyright (C) 1985 - 2020.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
+            VALUE "LegalCopyright", "Copyright (C) 1985 - 2021.  By Stichting Mathematisch Centrum and M. Stephenson.  See license for details.\0"
             VALUE "OriginalFilename", "NetHack.exe\0"
             VALUE "PrivateBuild", "050102\0"
             VALUE "ProductName", "NetHack\0"
