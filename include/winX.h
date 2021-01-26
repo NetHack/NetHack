@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.h	$NHDT-Date: 1596498574 2020/08/03 23:49:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.7	winX.h	$NHDT-Date: 1611697182 2021/01/26 21:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -419,6 +419,7 @@ E Widget FDECL(create_value, (Widget, const char *));
 E void FDECL(set_name, (Widget, const char *));
 E void FDECL(set_name_width, (Widget, int));
 E int FDECL(get_name_width, (Widget));
+E Widget FDECL(get_value_widget, (Widget));
 E void FDECL(set_value, (Widget, const char *));
 E void FDECL(set_value_width, (Widget, int));
 E int FDECL(get_value_width, (Widget));
