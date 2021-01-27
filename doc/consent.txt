@@ -1,3 +1,5 @@
+# readme
+
 instead of setting LGBTQ game options or maintaining conducts,
 change foocubus interactions to ask for consent
 based on players response, foocubi will learn player's gender preferences
@@ -10,3 +12,30 @@ if player is ace, random half of foocubi have nymph-like seduction (disrobing
 
 dish washers are created with compatible genders
 nymph chatting & stealing messages based on gender preferences
+
+--
+
+# test procedure
+
+test in wizard mode. wish for amulet of change and use ^G to summon
+succubus, incubus, and nymph for each gender and orientation (3*2*4 = 24 tests)
+  - ace male, gay male, straight male, bi male
+  - ace female, gay female, straight female, bi female
+
+build config #1: consent enabled
+1.1 succubi and incubi respect consent. test all gender and consent permutations.
+1.2 foocubi have seduction attack. consorting leads to sex.
+1.3 nymphs respect consent (and "charm" vs "seduce" you accordingly)
+
+build config #2: regular seduction (consent disabled)
+2.1 succubi and incubi are hetero. test with both male & female heroes.
+2.2 foocubi have seduction attack. consorting leads to sex.
+2.3 nymphs are hetero. test with both male & female heroes.
+
+build config #3: seduction & consent both disabled
+3.1 amorous demons are hetero
+3.2 foocubi attacks drain life, no disrobing, no sex
+3.3 nymphs are hetero
+
+build config #4: seduction disabled but consent enabled (bad config)
+4.1 same as config #3
