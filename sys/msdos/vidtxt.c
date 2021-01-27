@@ -24,14 +24,14 @@
 #if _MSC_VER >= 700
 #pragma warning(disable : 4018) /* signed/unsigned mismatch */
 #pragma warning(disable : 4127) /* conditional expression is constant */
-#pragma warning(disable : 4131) /* old style declarator */
+/* #pragma warning(disable : 4131) */ /* old style declarator */
 #pragma warning(disable : 4305) /* prevents complaints with MK_FP */
 #pragma warning(disable : 4309) /* initializing */
 #pragma warning(disable : 4759) /* prevents complaints with MK_FP */
 #endif
 #endif
 
-/* void FDECL(txt_xputc,(char, int)); */ /* write out character (and
+/* void txt_xputc(char, int);*/ /* write out character (and
                                             attribute) */
 
 extern int attrib_text_normal;  /* text mode normal attribute */
@@ -40,7 +40,7 @@ extern int attrib_text_intense; /* text mode intense attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
 
 void
-txt_get_scr_size()
+txt_get_scr_size(void)
 {
     union REGS regs;
 
@@ -98,10 +98,10 @@ txt_get_scr_size()
 #include <unistd.h>
 #endif
 
-void FDECL(txt_gotoxy, (int, int));
+void txt_gotoxy(int, int);
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
-void FDECL(txt_get_cursor, (int *, int *));
+void txt_get_cursor(int *, int *);
 #endif
 
 #ifdef SCREEN_DJGPPFAST
@@ -112,7 +112,7 @@ extern int g_attribute; /* Current attribute to use */
 extern int monoflag;    /* 0 = not monochrome, else monochrome */
 
 void
-txt_backsp()
+txt_backsp(void)
 {
 #ifdef PC9800
     union REGS regs;
@@ -134,7 +134,7 @@ txt_backsp()
 }
 
 void
-txt_nhbell()
+txt_nhbell(void)
 {
     union REGS regs;
 
@@ -146,7 +146,7 @@ txt_nhbell()
 }
 
 void
-txt_clear_screen()
+txt_clear_screen(void)
 /* djgpp provides ScreenClear(), but in version 1.09 it is broken
  * so for now we just use the BIOS Routines
  */
@@ -178,8 +178,8 @@ txt_clear_screen()
 #endif
 }
 
-void txt_cl_end(col, row) /* clear to end of line */
-int col, row;
+/* clear to end of line */
+void txt_cl_end(int col, int row)
 {
     union REGS regs;
 #ifndef PC9800
@@ -213,7 +213,7 @@ int col, row;
 #endif
 }
 
-void txt_cl_eos() /* clear to end of screen */
+void txt_cl_eos(void) /* clear to end of screen */
 {
     union REGS regs;
 #ifndef PC9800
@@ -252,8 +252,7 @@ void txt_cl_eos() /* clear to end of screen */
 }
 
 void
-txt_startup(wid, hgt)
-int *wid, *hgt;
+txt_startup(int *wid, int *hgt)
 {
     txt_get_scr_size();
     *wid = CO;
@@ -289,9 +288,7 @@ int *wid, *hgt;
  */
 
 void
-txt_xputs(s, col, row)
-const char *s;
-int col, row;
+txt_xputs(const char *s, int col, int row)
 {
     char c;
 
@@ -307,9 +304,8 @@ int col, row;
     }
 }
 
-void txt_xputc(ch, attr) /* write out character (and attribute) */
-char ch;
-int attr;
+/* write out character (and attribute) */
+void txt_xputc(char ch, int attr)
 {
 #ifdef PC9800
     union REGS regs;
@@ -390,10 +386,11 @@ int attr;
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
 /*
+ * get cursor position 
+ *
  * This is implemented as a macro under DJGPPFAST.
  */
-void txt_get_cursor(x, y) /* get cursor position */
-int *x, *y;
+void txt_get_cursor(int *x, int *y)
 {
     union REGS regs;
 
@@ -408,8 +405,7 @@ int *x, *y;
 #endif /* SCREEN_BIOS && !PC9800 */
 
 void
-txt_gotoxy(x, y)
-int x, y;
+txt_gotoxy(int x, int y)
 {
 #ifdef SCREEN_BIOS
     union REGS regs;
@@ -445,7 +441,7 @@ int x, y;
 
 #ifdef MONO_CHECK
 int
-txt_monoadapt_check()
+txt_monoadapt_check(void)
 {
     union REGS regs;
 

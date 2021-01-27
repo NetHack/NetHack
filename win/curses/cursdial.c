@@ -23,7 +23,7 @@ extern char erase_char, kill_char;
 
 /*
  * Note:
- *
+ * FIXME
  *  Prototypes need to use the widened/unwidened type macros (CHAR_P, &c)
  *  in order to match fields of the window_procs struct (see winprocs.h).
  *  But for a standard-conforming compiler, we'll end up with the widened
@@ -60,11 +60,11 @@ typedef struct nhmi {
     winid wid;                  /* NetHack window id */
     glyph_info glyphinfo;       /* holds menu glyph and additional glyph info */
     anything identifier;        /* Value returned if item selected */
-    CHAR_P accelerator;         /* Character used to select item from menu */
-    CHAR_P group_accel;         /* Group accelerator for menu item, if any */
+    char accelerator;         /* Character used to select item from menu */
+    char group_accel;         /* Group accelerator for menu item, if any */
     int attr;                   /* Text attributes for item */
     const char *str;            /* Text of menu item */
-    BOOLEAN_P presel;           /* Whether menu item should be preselected */
+    boolean presel;           /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
     unsigned itemflags;
     int page_num;               /* Display page number for entry */
@@ -225,7 +225,7 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 
 int
 curses_character_input_dialog(const char *prompt, const char *choices,
-                              CHAR_P def)
+                              char def)
 {
     WINDOW *askwin = NULL;
 #ifdef PDCURSES
@@ -390,7 +390,7 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 /* Return an extended command from the user */
 
 int
-curses_ext_cmd()
+curses_ext_cmd(void)
 {
     int count, letter, prompt_width, startx, starty, winx, winy;
     int messageh, messagew, maxlen = BUFSZ - 1;
@@ -624,8 +624,8 @@ curs_new_menu_item(winid wid, const char *str)
 
 void
 curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
-                       const ANY_P *identifier, CHAR_P accelerator,
-                       CHAR_P group_accel, int attr,
+                       const ANY_P *identifier, char accelerator,
+                       char group_accel, int attr,
                        const char *str, unsigned itemflags)
 {
     nhmenu_item *new_item, *current_items, *menu_item_ptr;

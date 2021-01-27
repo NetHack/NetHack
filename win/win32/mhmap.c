@@ -96,7 +96,7 @@ static void nhglyph2charcolor(short glyph, uchar *ch, int *color);
 extern boolean win32_cursorblink;       /* from sys\winnt\winnt.c */
 
 HWND
-mswin_init_map_window()
+mswin_init_map_window(void)
 {
     static int run_once = 0;
     HWND hWnd;
@@ -517,7 +517,7 @@ void mswin_map_update(HWND hWnd)
 
 /* register window class for map window */
 void
-register_map_window_class()
+register_map_window_class(void)
 {
     WNDCLASS wcex;
     ZeroMemory(&wcex, sizeof(wcex));

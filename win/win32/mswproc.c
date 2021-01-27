@@ -744,7 +744,7 @@ mswin_suspend_nhwindows(const char *str)
 
 /* Restore the windows after being suspended. */
 void
-mswin_resume_nhwindows()
+mswin_resume_nhwindows(void)
 {
     logDebug("mswin_resume_nhwindows()\n");
 
@@ -854,7 +854,7 @@ mswin_clear_nhwindow(winid wid)
                    --more--, if necessary, in the tty window-port.
 */
 void
-mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+mswin_display_nhwindow(winid wid, boolean block)
 {
     logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
     if (GetNHApp()->windowlist[wid].win != NULL) {
@@ -1035,7 +1035,7 @@ mswin_putstr_ex(winid wid, int attr, const char *text, int app)
                    iff complain is TRUE.
 */
 void
-mswin_display_file(const char *filename, BOOLEAN_P must_exist)
+mswin_display_file(const char *filename, boolean must_exist)
 {
     dlb *f;
     TCHAR wbuf[BUFSZ];
@@ -1130,7 +1130,7 @@ add_menu(windid window, const glyph_info *glyphinfo,
 void
 mswin_add_menu(winid wid, const glyph_info *glyphinfo,
                const ANY_P *identifier,
-               CHAR_P accelerator, CHAR_P group_accel, int attr,
+               char accelerator, char group_accel, int attr,
                const char *str, unsigned int itemflags)
 {
     boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
@@ -1232,7 +1232,7 @@ mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
         window up, otherwise empty.
 */
 void
-mswin_update_inventory()
+mswin_update_inventory(void)
 {
     logDebug("mswin_update_inventory()\n");
     if (iflags.perm_invent && g.program_state.something_worth_saving
@@ -1246,7 +1246,7 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
                    for the moment
 */
 void
-mswin_mark_synch()
+mswin_mark_synch(void)
 {
     logDebug("mswin_mark_synch()\n");
 }
@@ -1258,7 +1258,7 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
                    display is OK when return from wait_synch().
 */
 void
-mswin_wait_synch()
+mswin_wait_synch(void)
 {
     logDebug("mswin_wait_synch()\n");
     mswin_raw_print_flush();
@@ -1299,7 +1299,7 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                    
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+mswin_print_glyph(winid wid, xchar x, xchar y,
                   const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
     logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyphinfo->glyph, bkglyphinfo->glyph);
@@ -1338,7 +1338,7 @@ mswin_raw_print_accumulate(const char * str, boolean bold)
  *   dialog box and clear raw_print_strbuf.
  */
 void
-mswin_raw_print_flush()
+mswin_raw_print_flush(void)
 {
     if (raw_print_strbuf.str != NULL) {
         int wlen = strlen(raw_print_strbuf.str) + 1;
@@ -1408,7 +1408,7 @@ int nhgetch()   -- Returns a single character input from the user.
                    Returned character _must_ be non-zero.
 */
 int
-mswin_nhgetch()
+mswin_nhgetch(void)
 {
     PMSNHEvent event;
     int key = 0;
@@ -1467,7 +1467,7 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
 anyway.]
 */
 void
-mswin_nhbell()
+mswin_nhbell(void)
 {
     logDebug("mswin_nhbell()\n");
 }
@@ -1478,7 +1478,7 @@ doprev_message()
                 -- On the tty-port this scrolls WIN_MESSAGE back one line.
 */
 int
-mswin_doprev_message()
+mswin_doprev_message(void)
 {
     logDebug("mswin_doprev_message()\n");
     SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL,
@@ -1506,14 +1506,14 @@ char yn_function(const char *ques, const char *choices, char default)
                    ports might use a popup.
 */
 char
-mswin_yn_function(const char *question, const char *choices, CHAR_P def)
+mswin_yn_function(const char *question, const char *choices, char def)
 {
     char ch;
     char yn_esc_map = '\033';
     char message[BUFSZ];
     char res_ch[2];
     int createcaret;
-    boolean digit_ok, allow_num;
+    boolean digit_ok, allow_num = FALSE;
 
     logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
@@ -1746,7 +1746,7 @@ int get_ext_cmd(void)
                selection, -1 otherwise.
 */
 int
-mswin_get_ext_cmd()
+mswin_get_ext_cmd(void)
 {
     int ret;
     logDebug("mswin_get_ext_cmd()\n");
@@ -1849,7 +1849,7 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
                by a nap(50ms), but allows asynchronous operation.
 */
 void
-mswin_delay_output()
+mswin_delay_output(void)
 {
     logDebug("mswin_delay_output()\n");
     mswin_map_update(mswin_hwnd_from_winid(WIN_MAP));
@@ -1857,13 +1857,13 @@ mswin_delay_output()
 }
 
 void
-mswin_change_color()
+mswin_change_color(void)
 {
     logDebug("mswin_change_color()\n");
 }
 
 char *
-mswin_get_color_string()
+mswin_get_color_string(void)
 {
     logDebug("mswin_get_color_string()\n");
     return ("");
@@ -1877,7 +1877,7 @@ start_screen()  -- Only used on Unix tty ports, but must be declared for
                just declare an empty function.
 */
 void
-mswin_start_screen()
+mswin_start_screen(void)
 {
     /* Do Nothing */
     logDebug("mswin_start_screen()\n");
@@ -1888,7 +1888,7 @@ end_screen()    -- Only used on Unix tty ports, but must be declared for
                completeness.  The complement of start_screen().
 */
 void
-mswin_end_screen()
+mswin_end_screen(void)
 {
     /* Do Nothing */
     logDebug("mswin_end_screen()\n");
@@ -2064,7 +2064,7 @@ mswin_preference_update(const char *pref)
 
 #define TEXT_BUFFER_SIZE 4096
 char *
-mswin_getmsghistory(BOOLEAN_P init)
+mswin_getmsghistory(boolean init)
 {
     static PMSNHMsgGetText text = 0;
     static char *next_message = 0;
@@ -2101,7 +2101,7 @@ mswin_getmsghistory(BOOLEAN_P init)
 }
 
 void
-mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
+mswin_putmsghistory(const char *msg, boolean restoring)
 {
     BOOL save_sound_opt;
 
@@ -2119,7 +2119,7 @@ mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
 }
 
 void
-mswin_main_loop()
+mswin_main_loop(void)
 {
     while (!mswin_have_input()) {
         MSG msg;
@@ -2377,7 +2377,7 @@ logDebug(const char *fmt, ...)
 #define INTFKEY "Interface"
 
 void
-mswin_read_reg()
+mswin_read_reg(void)
 {
     HKEY key;
     DWORD size;
@@ -2489,7 +2489,7 @@ mswin_read_reg()
 }
 
 void
-mswin_write_reg()
+mswin_write_reg(void)
 {
     HKEY key;
     DWORD disposition;
@@ -2567,7 +2567,7 @@ mswin_write_reg()
 }
 
 void
-mswin_destroy_reg()
+mswin_destroy_reg(void)
 {
     char keystring[MAX_PATH];
     HKEY key;

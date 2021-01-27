@@ -40,14 +40,13 @@
  * and placed there by 'makedefs'.
  */
 
-static void FDECL(init_rumors, (dlb *));
-static void FDECL(init_oracles, (dlb *));
-static void FDECL(others_check, (const char *ftype, const char *, winid *));
-static void FDECL(couldnt_open_file, (const char *));
+static void init_rumors(dlb *);
+static void init_oracles(dlb *);
+static void others_check(const char *ftype, const char *, winid *);
+static void couldnt_open_file(const char *);
 
 static void
-init_rumors(fp)
-dlb *fp;
+init_rumors(dlb* fp)
 {
     static const char rumors_header[] = "%d,%ld,%lx;%d,%ld,%lx;0,0,%lx\n";
     int true_count, false_count; /* in file but not used here */
@@ -77,10 +76,10 @@ dlb *fp;
  * of them contain such references anyway.
  */
 char *
-getrumor(truth, rumor_buf, exclude_cookie)
-int truth; /* 1=true, -1=false, 0=either */
-char *rumor_buf;
-boolean exclude_cookie;
+getrumor(
+    int truth, /* 1=true, -1=false, 0=either */
+    char *rumor_buf,
+    boolean exclude_cookie)
 {
     dlb *rumors;
     long tidbit, beginning;
@@ -170,7 +169,7 @@ boolean exclude_cookie;
 /* test that the true/false rumor boundaries are valid and show the first
    two and very last epitaphs, engravings, and bogus monsters */
 void
-rumor_check()
+rumor_check(void)
 {
     dlb *rumors = 0;
     winid tmpwin = WIN_ERR;
@@ -275,9 +274,7 @@ rumor_check()
 
 /* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
 static void
-others_check(ftype, fname, winptr)
-const char *ftype, *fname;
-winid *winptr;
+others_check(const char* ftype, const char* fname, winid* winptr)
 {
     static const char errfmt[] = "others_check(\"%s\"): %s";
     dlb *fh;
@@ -379,10 +376,7 @@ winid *winptr;
 /* Gets a random line of text from file 'fname', and returns it.
    rng is the random number generator to use, and should act like rn2 does. */
 char *
-get_rnd_text(fname, buf, rng)
-const char *fname;
-char *buf;
-int FDECL((*rng), (int));
+get_rnd_text(const char* fname, char* buf, int (*rng)(int))
 {
     dlb *fh;
 
@@ -426,9 +420,9 @@ int FDECL((*rng), (int));
 }
 
 void
-outrumor(truth, mechanism)
-int truth; /* 1=true, -1=false, 0=either */
-int mechanism;
+outrumor(
+    int truth, /* 1=true, -1=false, 0=either */
+    int mechanism)
 {
     static const char fortune_msg[] =
         "This cookie has a scrap of paper inside.";
@@ -471,8 +465,7 @@ int mechanism;
 }
 
 static void
-init_oracles(fp)
-dlb *fp;
+init_oracles(dlb* fp)
 {
     register int i;
     char line[BUFSZ];
@@ -493,8 +486,7 @@ dlb *fp;
 }
 
 void
-save_oracles(nhfp)
-NHFILE *nhfp;
+save_oracles(NHFILE* nhfp)
 {
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
@@ -516,8 +508,7 @@ NHFILE *nhfp;
 }
 
 void
-restore_oracles(nhfp)
-NHFILE *nhfp;
+restore_oracles(NHFILE* nhfp)
 {
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
@@ -533,9 +524,7 @@ NHFILE *nhfp;
 }
 
 void
-outoracle(special, delphi)
-boolean special;
-boolean delphi;
+outoracle(boolean special, boolean delphi)
 {
     winid tmpwin;
     dlb *oracles;
@@ -591,8 +580,7 @@ boolean delphi;
 }
 
 int
-doconsult(oracl)
-struct monst *oracl;
+doconsult(struct monst* oracl)
 {
     long umoney;
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
@@ -666,8 +654,7 @@ struct monst *oracl;
 }
 
 static void
-couldnt_open_file(filename)
-const char *filename;
+couldnt_open_file(const char *filename)
 {
     int save_something = g.program_state.something_worth_saving;
 

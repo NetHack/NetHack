@@ -18,12 +18,12 @@ struct window_procs Qt_procs = { "-guistubs" };
 int qt_tilewidth, qt_tileheight, qt_fontsize, qt_compact_mode;
 #endif
 void
-mswin_destroy_reg()
+mswin_destroy_reg(void)
 {
     return;
 }
 void
-mswin_raw_print_flush()
+mswin_raw_print_flush(void)
 {
 }
 
@@ -41,9 +41,7 @@ extern char default_window_sys[];
 extern int mingw_main(int argc, char **argv);
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     boolean resuming;
 
@@ -69,54 +67,50 @@ char erase_char, kill_char;
 #endif
 
 void
-win_tty_init(dir)
-int dir;
+win_tty_init(int dir)
 {
     return;
 }
 
 void
-nttty_open(mode)
-int mode;
+nttty_open(int mode)
 {
     return;
 }
 
 int
-xputc(ch)
-int ch;
+xputc(int ch)
 {
     return 0;
 }
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
     return;
 }
 
 void
-raw_clear_screen()
+raw_clear_screen(void)
 {
     return;
 }
 
 void
-clear_screen()
+clear_screen(void)
 {
     return;
 }
 
 void
-backsp()
+backsp(void)
 {
     return;
 }
 
 #ifndef NO_MOUSE_ALLOWED
 void
-toggle_mouse_support()
+toggle_mouse_support(void)
 {
     return;
 }
@@ -124,20 +118,19 @@ toggle_mouse_support()
 
 #ifdef PORT_DEBUG
 void
-win32con_debug_keystrokes()
+win32con_debug_keystrokes(void)
 {
     return;
 }
 void
-win32con_handler_info()
+win32con_handler_info(void)
 {
     return;
 }
 #endif
 
 void
-map_subkeyvalue(op)
-register char *op;
+map_subkeyvalue(char *op)
 {
     return;
 }
@@ -166,20 +159,20 @@ VA_DECL(const char *, s)
 
 #ifdef TTY_GRAPHICS
 void
-synch_cursor()
+synch_cursor(void)
 {
     return;
 }
 #endif
 
 void
-more()
+more(void)
 {
     return;
 }
 
 void
-nethack_enter_nttty()
+nethack_enter_nttty(void)
 {
     return;
 }
@@ -192,8 +185,7 @@ set_altkeyhandler(const char *inName)
 
 #if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
 void
-play_usersound_via_idx(idx, volume)
-int idx, volume;
+play_usersound_via_idx(int idx, int volume)
 {
 }
 #endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */

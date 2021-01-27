@@ -6,8 +6,7 @@
 #include "hack.h"
 
 void
-newemin(mtmp)
-struct monst *mtmp;
+newemin(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -18,8 +17,7 @@ struct monst *mtmp;
 }
 
 void
-free_emin(mtmp)
-struct monst *mtmp;
+free_emin(struct monst *mtmp)
 {
     if (mtmp->mextra && EMIN(mtmp)) {
         free((genericptr_t) EMIN(mtmp));
@@ -30,8 +28,7 @@ struct monst *mtmp;
 
 /* count the number of monsters on the level */
 int
-monster_census(spotted)
-boolean spotted; /* seen|sensed vs all */
+monster_census(boolean spotted) /* seen|sensed vs all */
 {
     struct monst *mtmp;
     int count = 0;
@@ -50,8 +47,7 @@ boolean spotted; /* seen|sensed vs all */
 
 /* mon summons a monster */
 int
-msummon(mon)
-struct monst *mon;
+msummon(struct monst *mon)
 {
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
@@ -163,9 +159,7 @@ struct monst *mon;
 }
 
 void
-summon_minion(alignment, talk)
-aligntyp alignment;
-boolean talk;
+summon_minion(aligntyp alignment, boolean talk)
 {
     register struct monst *mon;
     int mnum;
@@ -225,8 +219,7 @@ boolean talk;
 
 /* returns 1 if it won't attack. */
 int
-demon_talk(mtmp)
-register struct monst *mtmp;
+demon_talk(register struct monst *mtmp)
 {
     long cash, demand, offer;
 
@@ -305,8 +298,7 @@ register struct monst *mtmp;
 }
 
 long
-bribe(mtmp)
-struct monst *mtmp;
+bribe(struct monst *mtmp)
 {
     char buf[BUFSZ] = DUMMY;
     long offer;
@@ -336,8 +328,7 @@ struct monst *mtmp;
 }
 
 int
-dprince(atyp)
-aligntyp atyp;
+dprince(aligntyp atyp)
 {
     int tryct, pm;
 
@@ -351,8 +342,7 @@ aligntyp atyp;
 }
 
 int
-dlord(atyp)
-aligntyp atyp;
+dlord(aligntyp atyp)
 {
     int tryct, pm;
 
@@ -367,7 +357,7 @@ aligntyp atyp;
 
 /* create lawful (good) lord */
 int
-llord()
+llord(void)
 {
     if (!(g.mvitals[PM_ARCHON].mvflags & G_GONE))
         return PM_ARCHON;
@@ -376,7 +366,7 @@ llord()
 }
 
 int
-lminion()
+lminion(void)
 {
     int tryct;
     struct permonst *ptr;
@@ -391,8 +381,7 @@ lminion()
 }
 
 int
-ndemon(atyp)
-aligntyp atyp; /* A_NONE is used for 'any alignment' */
+ndemon(aligntyp atyp) /* A_NONE is used for 'any alignment' */
 {
     struct permonst *ptr;
 
@@ -416,8 +405,7 @@ aligntyp atyp; /* A_NONE is used for 'any alignment' */
 
 /* guardian angel has been affected by conflict so is abandoning hero */
 void
-lose_guardian_angel(mon)
-struct monst *mon; /* if null, angel hasn't been created yet */
+lose_guardian_angel(struct monst *mon) /* if null, angel hasn't been created yet */
 {
     coord mm;
     int i;
@@ -445,7 +433,7 @@ struct monst *mon; /* if null, angel hasn't been created yet */
 
 /* just entered the Astral Plane; receive tame guardian angel if worthy */
 void
-gain_guardian_angel()
+gain_guardian_angel(void)
 {
     struct monst *mtmp;
     struct obj *otmp;

@@ -24,6 +24,13 @@
 #include <unistd.h> /* for getcwd() prototype */
 #endif
 
+#if defined(MICRO) || defined(OS2)
+void nethack_exit(int) NORETURN;
+#else
+#define nethack_exit exit
+#endif
+
+char *exepath(char *);
 char orgdir[PATHLEN]; /* also used in pcsys.c, amidos.c */
 
 #ifdef TOS
@@ -35,28 +42,24 @@ long _stksize = 16 * 1024;
 
 #ifdef AMIGA
 extern int bigscreen;
-void NDECL(preserve_icon);
+void preserve_icon(void);
 #endif
 
-static void FDECL(process_options, (int argc, char **argv));
-static void NDECL(nhusage);
+static void process_options(int argc, char **argv);
+static void nhusage(void);
 
-#if defined(MICRO) || defined(OS2)
-extern void FDECL(nethack_exit, (int)) NORETURN;
-#else
-#define nethack_exit exit
-#endif
+#ifdef PORT_HELP
+#if defined(MSDOS)
+void port_help(void);
+#endif /* MSDOS */
+#endif /* PORT_HELP */
 
-#ifdef EXEPATH
-static char *FDECL(exepath, (char *));
-#endif
+int main(int, char **);
 
-int FDECL(main, (int, char **));
-
-extern boolean FDECL(pcmain, (int, char **));
+extern boolean pcmain(int, char **);
 
 #if defined(__BORLANDC__)
-void NDECL(startup);
+void startup(void);
 unsigned _stklen = STKSIZ;
 #endif
 
@@ -66,12 +69,10 @@ unsigned _stklen = STKSIZ;
  */
 int
 #ifndef __MINGW32__ 
-main(argc, argv)
+main(int argc, char *argv[])
 #else
-mingw_main(argc, argv)
+mingw_main(int argc, char *argv[])
 #endif
-int argc;
-char *argv[];
 {
     boolean resuming;
 
@@ -84,9 +85,7 @@ char *argv[];
 }
 
 boolean
-pcmain(argc, argv)
-int argc;
-char *argv[];
+pcmain(int argc, char *argv[])
 {
     NHFILE *nhfp;
     register char *dir;
@@ -455,7 +454,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * We'll return here if new game player_selection() renames the hero.
  */
 attempt_restore:
-    if ((nhfp = restore_saved_game()) > 0) {
+    if ((nhfp = restore_saved_game()) != 0) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -515,9 +514,7 @@ attempt_restore:
 }
 
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i;
 
@@ -637,7 +634,7 @@ char *argv[];
 }
 
 static void
-nhusage()
+nhusage(void)
 {
     char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
 
@@ -678,9 +675,7 @@ nhusage()
 
 #ifdef CHDIR
 void
-chdirx(dir, wr)
-char *dir;
-boolean wr;
+chdirx(char *dir, boolean wr)
 {
 #ifdef AMIGA
     static char thisdir[] = "";
@@ -708,7 +703,7 @@ boolean wr;
 #ifdef PORT_HELP
 #if defined(MSDOS)
 void
-port_help()
+port_help(void)
 {
     /* display port specific help file */
     display_file(PORT_HELP, 1);
@@ -718,7 +713,7 @@ port_help()
 
 /* validate wizard mode if player has requested access to it */
 boolean
-authorize_wizard_mode()
+authorize_wizard_mode(void)
 {
     if (!strcmp(g.plname, WIZARD_NAME))
         return TRUE;
@@ -736,15 +731,12 @@ authorize_wizard_mode()
 char exepathbuf[EXEPATHBUFSZ];
 
 char *
-exepath(str)
-char *str;
+exepath(char *str)
 {
     char *tmp, *tmp2;
-    int bsize;
 
     if (!str)
         return (char *) 0;
-    bsize = EXEPATHBUFSZ;
     tmp = exepathbuf;
     Strcpy(tmp, str);
     tmp2 = strrchr(tmp, PATH_SEPARATOR);
@@ -767,7 +759,7 @@ VA_DECL(const char *, fmt)
 }
 
 unsigned long
-sys_random_seed()
+sys_random_seed(void)
 {
     unsigned long seed = 0L;
     unsigned long pid = (unsigned long) getpid();

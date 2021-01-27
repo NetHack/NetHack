@@ -59,7 +59,7 @@ public:
 
 	void fadeHighlighting(bool before_key);
 
-        void FuncAsCommand(int NDECL((*func)));
+        void FuncAsCommand(int (*func)(void));
         // this is unconditional in case qt_main.h comes before qt_set.h
         void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
 #ifdef DYNAMIC_STATUSLINES
@@ -95,7 +95,7 @@ private slots:
 private:
 	void ShowIfReady();
         void AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
-                           const char *name, int NDECL((*func)), QPixmap xpm);
+                           const char *name, int (*func)(void), QPixmap xpm);
 
 #ifdef KDE
 	KMenuBar* menubar;

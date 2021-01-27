@@ -3253,12 +3253,12 @@ struct permonst _mons2[] = {
 
 #ifndef SPLITMON_1
 
-void NDECL(monst_globals_init); /* in hack.h but we're using config.h */
+void monst_globals_init(void); /* in hack.h but we're using config.h */
 
 struct permonst mons[SIZE(mons_init)];
 
 void
-monst_globals_init()
+monst_globals_init(void)
 {
     memcpy(mons, mons_init, sizeof(mons));
     return;

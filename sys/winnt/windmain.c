@@ -17,23 +17,21 @@
 #error You must #define SAFEPROCS to build windmain.c
 #endif
 
-#define E extern
-static void FDECL(process_options, (int argc, char **argv));
-static void NDECL(nhusage);
-static char *NDECL(get_executable_path);
-char *FDECL(translate_path_variables, (const char *, char *));
-char *NDECL(exename);
-boolean NDECL(fakeconsole);
-void NDECL(freefakeconsole);
-E void FDECL(nethack_exit, (int)) NORETURN;
+static void process_options(int argc, char **argv);
+static void nhusage(void);
+static char *get_executable_path(void);
+char *translate_path_variables(const char *, char *);
+char *exename(void);
+boolean fakeconsole(void);
+void freefakeconsole(void);
+extern void nethack_exit(int) NORETURN;
 #if defined(MSWIN_GRAPHICS)
-E void NDECL(mswin_destroy_reg);
+extern void mswin_destroy_reg(void);
 #endif
 #ifdef TTY_GRAPHICS
-extern void NDECL(backsp);
+extern void backsp(void);
 #endif
-extern void NDECL(clear_screen);
-#undef E
+extern void clear_screen(void);
 
 #ifdef _MSC_VER
 #ifdef kbhit
@@ -43,18 +41,18 @@ extern void NDECL(clear_screen);
 #endif
 
 #ifdef PC_LOCKING
-static int NDECL(eraseoldlocks);
+static int eraseoldlocks(void);
 #endif
-int NDECL(windows_nhgetch);
-void NDECL(windows_nhbell);
-int FDECL(windows_nh_poskey, (int *, int *, int *));
-void FDECL(windows_raw_print, (const char *));
-char FDECL(windows_yn_function, (const char *, const char *, CHAR_P));
-static void FDECL(windows_getlin, (const char *, char *));
-extern int NDECL(windows_console_custom_nhgetch);
-void NDECL(safe_routines);
-int NDECL(tty_self_recover_prompt);
-int NDECL(other_self_recover_prompt);
+int windows_nhgetch(void);
+void windows_nhbell(void);
+int windows_nh_poskey(int *, int *, int *);
+void windows_raw_print(const char *);
+char windows_yn_function(const char *, const char *, char);
+static void windows_getlin(const char *, char *);
+extern int windows_console_custom_nhgetch(void);
+void safe_routines(void);
+int tty_self_recover_prompt(void);
+int other_self_recover_prompt(void);
 
 char orgdir[PATHLEN];
 boolean getreturn_enabled;
@@ -233,9 +231,6 @@ const char *get_portable_device()
 void
 set_default_prefix_locations(const char *programPath)
 {
-    char *envp = NULL;
-    char *sptr = NULL;
-
     static char executable_path[MAX_PATH];
     static char profile_path[MAX_PATH];
     static char versioned_profile_path[MAX_PATH];
@@ -404,18 +399,14 @@ copy_hack_content()
  */
 int
 #ifndef __MINGW32__ 
-main(argc, argv)
+main(int argc, char *argv[])
 #else
-mingw_main(argc, argv)
+mingw_main(int argc, char *argv[])
 #endif
-int argc;
-char *argv[];
 {
     boolean resuming = FALSE; /* assume new game */
     NHFILE *nhfp;
     char *windowtype = NULL;
-    char *envp = NULL;
-    char *sptr = NULL;
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     char failbuf[BUFSZ];
 
@@ -639,9 +630,7 @@ attempt_restore:
 }
 
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char * argv[])
 {
     int i;
 
@@ -805,7 +794,7 @@ char *argv[];
 }
 
 static void
-nhusage()
+nhusage(void)
 {
     char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
 
@@ -842,7 +831,7 @@ nhusage()
 }
 
 void
-safe_routines(VOID_ARGS)
+safe_routines(void)
 {
     /*
      * Get a set of valid safe windowport function
@@ -856,7 +845,7 @@ safe_routines(VOID_ARGS)
 
 #ifdef PORT_HELP
 void
-port_help()
+port_help(void)
 {
     /* display port specific help file */
     display_file(PORT_HELP, 1);
@@ -865,7 +854,7 @@ port_help()
 
 /* validate wizard mode if player has requested access to it */
 boolean
-authorize_wizard_mode()
+authorize_wizard_mode(void)
 {
     if (!strcmp(g.plname, WIZARD_NAME))
         return TRUE;
@@ -881,7 +870,7 @@ extern HANDLE hConOut;
 boolean has_fakeconsole;
 
 char *
-exename()
+exename(void)
 {
     int bsize = PATHLEN;
     char *tmp = exenamebuf, *tmp2;
@@ -940,7 +929,7 @@ void freefakeconsole()
 #endif
 
 char *
-get_executable_path()
+get_executable_path(void)
 {
     static char path_buffer[MAX_PATH];
 
@@ -964,9 +953,7 @@ get_executable_path()
 }
 
 char *
-translate_path_variables(str, buf)
-const char *str;
-char *buf;
+translate_path_variables(const char* str, char* buf)
 {
     const char *src;
     char evar[BUFSZ], *dest, *envp, *eptr = (char *) 0;
@@ -1020,8 +1007,7 @@ char *buf;
 
 /*ARGSUSED*/
 void
-windows_raw_print(str)
-const char *str;
+windows_raw_print(const char* str)
 {
     if (str)
         fprintf(stdout, "%s\n", str);
@@ -1031,56 +1017,49 @@ const char *str;
 
 /*ARGSUSED*/
 void
-windows_raw_print_bold(str)
-const char *str;
+windows_raw_print_bold(const char* str)
 {
     windows_raw_print(str);
     return;
 }
 
 int
-windows_nhgetch()
+windows_nhgetch(void)
 {
     return getchar();
 }
 
 
 void
-windows_nhbell()
+windows_nhbell(void)
 {
     return;
 }
 
 /*ARGSUSED*/
 int
-windows_nh_poskey(x, y, mod)
-int *x, *y, *mod;
+windows_nh_poskey(int *x, int *y, int *mod)
 {
     return '\033';
 }
 
 /*ARGSUSED*/
 char
-windows_yn_function(query, resp, def)
-const char *query;
-const char *resp;
-char def;
+windows_yn_function(const char* query, const char* resp, char def)
 {
     return '\033';
 }
 
 /*ARGSUSED*/
 static void
-windows_getlin(prompt, outbuf)
-const char *prompt UNUSED;
-char *outbuf;
+windows_getlin(const char* prompt UNUSED, char* outbuf)
 {
     Strcpy(outbuf, "\033");
 }
 
 #ifdef PC_LOCKING
 static int
-eraseoldlocks()
+eraseoldlocks(void)
 {
     register int i;
 
@@ -1103,9 +1082,9 @@ eraseoldlocks()
 }
 
 int
-getlock()
+getlock(void)
 {
-    register int fd, ern, prompt_result = 0;
+    int fd, ern = 0, prompt_result = 0;
     int fcmask = FCMASK;
 #ifndef SELF_RECOVER
     char tbuf[BUFSZ];
@@ -1230,8 +1209,7 @@ gotlock:
 #endif /* PC_LOCKING */
 
 boolean
-file_exists(path)
-const char *path;
+file_exists(const char* path)
 {
     struct stat sb;
 
@@ -1248,9 +1226,7 @@ const char *path;
   does not exist, it returns TRUE.
  */
 boolean
-file_newer(a_path, b_path)
-const char * a_path;
-const char * b_path;
+file_newer(const char* a_path, const char* b_path)
 {
     struct stat a_sb;
     struct stat b_sb;
@@ -1272,7 +1248,7 @@ const char * b_path;
  *    -1 if old game should be destroyed, allowing new game to proceed.
  */
 int
-tty_self_recover_prompt()
+tty_self_recover_prompt(void)
 {
     register int c, ci, ct, pl, retval = 0;
     /* for saving/replacing functions, if needed */
@@ -1339,7 +1315,7 @@ tty_self_recover_prompt()
 }
 
 int
-other_self_recover_prompt()
+other_self_recover_prompt(void)
 {
     register int c, ci, ct, pl, retval = 0;
     boolean ismswin = WINDOWPORT("mswin"),

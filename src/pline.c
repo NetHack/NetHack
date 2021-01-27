@@ -3,27 +3,25 @@
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
 #include "hack.h"
 
 #define BIGBUFSZ (5 * BUFSZ) /* big enough to format a 4*BUFSZ string (from
                               * config file parsing) with modest decoration;
                               * result will then be truncated to BUFSZ-1 */
 
-static void FDECL(putmesg, (const char *));
-static char *FDECL(You_buf, (int));
+static void putmesg(const char *);
+static char *You_buf(int);
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
-static void FDECL(execplinehandler, (const char *));
+static void execplinehandler(const char *);
 #endif
 #ifdef USER_SOUNDS
-extern void FDECL(maybe_play_sound, (const char *));
+extern void maybe_play_sound(const char *);
 #endif
 #ifdef DUMPLOG
 
 /* keep the most recent DUMPLOG_MSG_COUNT messages */
 void
-dumplogmsg(line)
-const char *line;
+dumplogmsg(const char *line)
 {
     /*
      * TODO:
@@ -53,7 +51,7 @@ const char *line;
    this data isn't saved and restored); end-of-game releases saved_plines[]
    while writing its contents to the final dump log */
 void
-dumplogfreemessages()
+dumplogfreemessages(void)
 {
     unsigned i;
 
@@ -66,8 +64,7 @@ dumplogfreemessages()
 
 /* keeps windowprocs usage out of pline() */
 static void
-putmesg(line)
-const char *line;
+putmesg(const char *line)
 {
     int attr = ATR_NONE;
 
@@ -81,44 +78,21 @@ const char *line;
     putstr(WIN_MESSAGE, attr, line);
 }
 
-/* Note that these declarations rely on knowledge of the internals
- * of the variable argument handling stuff in "tradstdc.h"
- */
+static void vpline(const char *, va_list);
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vpline, (const char *, va_list));
-
-/*VARARGS1*/
 void
-pline
-VA_DECL(const char *, line)
+pline(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, char *);
-    vpline(line, VA_ARGS);
-    VA_END();
+    va_list the_args;
+
+    va_start(the_args, line);
+    vpline(line, the_args);
+    va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vpline(const char *line, va_list the_args)
-# else
-static void
-vpline(line, the_args)
-const char *line;
-va_list the_args;
-# endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-# define vpline pline
-
-/*VARARGS1*/
-void
-pline
-VA_DECL(const char *, line)
-#endif /* USE_STDARG | USE_VARARG */
-{       /* start of vpline() or of nested block in USE_OLDARG's pline() */
+{
     static int in_pline = 0;
     char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
@@ -127,7 +101,6 @@ VA_DECL(const char *, line)
     int vlen = 0;
 #endif
     boolean no_repeat;
-    /* Do NOT use VA_START and VA_END in here... see above */
 
     if (!line || !*line)
         return;
@@ -140,14 +113,14 @@ VA_DECL(const char *, line)
 
     if (index(line, '%')) {
 #if !defined(NO_VSNPRINTF)
-        vlen = vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
+        vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
         if (vlen >= (int) sizeof pbuf)
             panic("%s: truncation of buffer at %zu of %d bytes",
                   "pline", sizeof pbuf, vlen);
 #endif
 #else
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
 #endif
         line = pbuf;
     }
@@ -222,49 +195,39 @@ VA_DECL(const char *, line)
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
- pline_done:
+pline_done:
     --in_pline;
-    return;
-
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    /* provide closing brace for the nested block
-       which immediately follows USE_OLDARGS's VA_DECL() */
-    VA_END();
-#endif
 }
 
 /* pline() variant which can override MSGTYPE handling or suppress
    message history (tty interface uses pline() to issue prompts and
    they shouldn't be blockable via MSGTYPE=hide) */
-/*VARARGS2*/
-void custompline
-VA_DECL2(unsigned, pflags, const char *, line)
+void
+custompline(unsigned pflags, const char * line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_list the_args;
+
+    va_start(the_args, line);
     g.pline_flags = pflags;
-    vpline(line, VA_ARGS);
+    vpline(line, the_args);
     g.pline_flags = 0;
-    VA_END();
-    return;
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void Norep
-VA_DECL(const char *, line)
+void
+Norep(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_list the_args;
+
+    va_start(the_args, line);
     g.pline_flags = PLINE_NOREPEAT;
-    vpline(line, VA_ARGS);
+    vpline(line, the_args);
     g.pline_flags = 0;
-    VA_END();
-    return;
+    va_end(the_args);
 }
 
 static char *
-You_buf(siz)
-int siz;
+You_buf(int siz)
 {
     if (siz > g.you_buf_siz) {
         if (g.you_buf)
@@ -276,7 +239,7 @@ int siz;
 }
 
 void
-free_youbuf()
+free_youbuf(void)
 {
     if (g.you_buf)
         free((genericptr_t) g.you_buf), g.you_buf = (char *) 0;
@@ -290,181 +253,153 @@ free_youbuf()
 #define YouMessage(pointer, prefix, text) \
     strcat((YouPrefix(pointer, prefix, text), pointer), text)
 
-/*VARARGS1*/
-void You
-VA_DECL(const char *, line)
+void
+You(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "You ", line), VA_ARGS);
-    VA_END();
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "You ", line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void Your
-VA_DECL(const char *, line)
+void
+Your(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "Your ", line), VA_ARGS);
-    VA_END();
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "Your ", line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void You_feel
-VA_DECL(const char *, line)
+void
+You_feel(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
     else
         YouPrefix(tmp, "You feel ", line);
-    vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    vpline(strcat(tmp, line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void You_cant
-VA_DECL(const char *, line)
+void
+You_cant(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "You can't ", line), VA_ARGS);
-    VA_END();
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "You can't ", line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void pline_The
-VA_DECL(const char *, line)
+void
+pline_The(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "The ", line), VA_ARGS);
-    VA_END();
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "The ", line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void There
-VA_DECL(const char *, line)
+void
+There(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "There ", line), VA_ARGS);
-    VA_END();
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "There ", line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void You_hear
-VA_DECL(const char *, line)
+void
+You_hear(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
     if (Deaf || !flags.acoustics)
         return;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
     else if (Unaware)
         YouPrefix(tmp, "You dream that you hear ", line);
     else
         YouPrefix(tmp, "You hear ", line);  /* Deaf-aware */
-    vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    vpline(strcat(tmp, line), the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-void You_see
-VA_DECL(const char *, line)
+void
+You_see(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Unaware)
         YouPrefix(tmp, "You dream that you see ", line);
     else if (Blind) /* caller should have caught this... */
         YouPrefix(tmp, "You sense ", line);
     else
         YouPrefix(tmp, "You see ", line);
-    vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    vpline(strcat(tmp, line), the_args);
+    va_end(the_args);
 }
 
 /* Print a message inside double-quotes.
  * The caller is responsible for checking deafness.
  * Gods can speak directly to you in spite of deafness.
  */
-/*VARARGS1*/
-void verbalize
-VA_DECL(const char *, line)
+void
+verbalize(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     tmp = You_buf((int) strlen(line) + sizeof "\"\"");
     Strcpy(tmp, "\"");
     Strcat(tmp, line);
     Strcat(tmp, "\"");
-    vpline(tmp, VA_ARGS);
-    VA_END();
+    vpline(tmp, the_args);
+    va_end(the_args);
 }
 
-/*VARARGS1*/
-/* Note that these declarations rely on knowledge of the internals
- * of the variable argument handling stuff in "tradstdc.h"
- */
+static void vraw_printf(const char *, va_list);
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vraw_printf, (const char *, va_list));
-
-void raw_printf
-VA_DECL(const char *, line)
+void
+raw_printf(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, char *);
-    vraw_printf(line, VA_ARGS);
-    VA_END();
+    va_list the_args;
+
+    va_start(the_args, line);
+    vraw_printf(line, the_args);
+    va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vraw_printf(const char *line, va_list the_args)
-# else
-static void
-vraw_printf(line, the_args)
-const char *line;
-va_list the_args;
-# endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-void raw_printf
-VA_DECL(const char *, line)
-#endif
 {
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
-    /* Do NOT use VA_START and VA_END in here... see above */
 
     if (index(line, '%')) {
 #if !defined(NO_VSNPRINTF)
-        (void) vsnprintf(pbuf, sizeof pbuf, line, VA_ARGS);
+        (void) vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #else
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
 #endif
         line = pbuf;
     }
@@ -478,53 +413,48 @@ VA_DECL(const char *, line)
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
     execplinehandler(line);
 #endif
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    VA_END(); /* (see vpline) */
-#endif
 }
 
-/*VARARGS1*/
-void impossible
-VA_DECL(const char *, s)
+void
+impossible(const char *s, ...)
 {
+    va_list the_args;
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     if (g.program_state.in_impossible)
         panic("impossible called impossible");
 
     g.program_state.in_impossible = 1;
 #if !defined(NO_VSNPRINTF)
-    (void) vsnprintf(pbuf, sizeof pbuf, s, VA_ARGS);
+    (void) vsnprintf(pbuf, sizeof(pbuf), s, the_args);
 #else
-    Vsprintf(pbuf, s, VA_ARGS);
+    Vsprintf(pbuf, s, the_args);
 #endif
+    va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     if (iflags.debug_fuzzer)
         panic("%s", pbuf);
-    pline("%s", VA_PASS1(pbuf));
+    pline("%s", pbuf);
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
     if (g.program_state.something_worth_saving)
         Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
-    pline("%s", VA_PASS1(pbuf));
+    pline("%s", pbuf);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
     if (sysopt.support) {
         pline("Alternatively, contact local support: %s", sysopt.support);
     }
 
     g.program_state.in_impossible = 0;
-    VA_END();
 }
 
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static boolean use_pline_handler = TRUE;
 
 static void
-execplinehandler(line)
-const char *line;
+execplinehandler(const char *line)
 {
     int f;
     const char *args[3];
@@ -556,7 +486,7 @@ const char *line;
     } else if (f == -1) {
         perror((char *) 0);
         use_pline_handler = FALSE;
-        pline("%s", VA_PASS1("Fork to message handler failed."));
+        pline("%s", "Fork to message handler failed.");
     }
 }
 #endif /* MSGHANDLER && (POSIX_TYPES || __GNUC__) */
@@ -564,37 +494,20 @@ const char *line;
 /*
  * varargs handling for files.c
  */
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vconfig_error_add, (const char *, va_list));
+static void vconfig_error_add(const char *, va_list);
 
-/*VARARGS1*/
 void
-config_error_add
-VA_DECL(const char *, str)
+config_error_add(const char *str, ...)
 {
-    VA_START(str);
-    VA_INIT(str, char *);
-    vconfig_error_add(str, VA_ARGS);
-    VA_END();
+    va_list the_args;
+
+    va_start(the_args, str);
+    vconfig_error_add(str, the_args);
+    va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vconfig_error_add(const char *str, va_list the_args)
-# else
-static void
-vconfig_error_add(str, the_args)
-const char *str;
-va_list the_args;
-# endif
-
-#else /* !(USE_STDARG || USE_VARARG) => USE_OLDARGS */
-
-/*VARARGS1*/
-void
-config_error_add
-VA_DECL(const char *, str)
-#endif /* ?(USE_STDARG || USE_VARARG) */
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
 #if !defined(NO_VSNPRINTF)
     int vlen = 0;
@@ -602,29 +515,22 @@ VA_DECL(const char *, str)
     char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
 #if !defined(NO_VSNPRINTF)
-    vlen = vsnprintf(buf, sizeof buf, str, VA_ARGS);
+    vlen = vsnprintf(buf, sizeof(buf), str, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
         panic("%s: truncation of buffer at %zu of %d bytes",
               "config_error_add", sizeof buf, vlen);
 #endif
 #else
-    Vsprintf(buf, str, VA_ARGS);
+    Vsprintf(buf, str, the_args);
 #endif
     buf[BUFSZ - 1] = '\0';
     config_erradd(buf);
-
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    VA_END(); /* (see pline/vpline -- ends nested block for USE_OLDARGS) */
-#endif
 }
 
 /* nhassert_failed is called when an nhassert's condition is false */
 void
-nhassert_failed(expression, filepath, line)
-    const char* expression;
-    const char * filepath;
-    int line;
+nhassert_failed(const char *expression, const char *filepath, int line)
 {
     const char * filename;
 

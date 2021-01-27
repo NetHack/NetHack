@@ -56,26 +56,26 @@
 /* REPRODUCIBLE_BUILD will change this to TRUE */
 static boolean date_via_env = FALSE;
 
-static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(version_id_string, (char *, const char *));
-static char *FDECL(bannerc_string, (char *, const char *));
+static char *version_string(char *, const char *);
+static char *version_id_string(char *, const char *);
+static char *bannerc_string(char *, const char *);
 
-static void NDECL(make_version);
-static char *FDECL(eos, (char *));
+static void make_version(void);
+static char *eos(char *);
 #if 0
-static char *FDECL(mdlib_strsubst, (char *, const char *, const char *));
+static char *mdlib_strsubst(char *, const char *, const char *);
 #endif
 
 #ifndef HAS_NO_MKSTEMP
 #ifdef _MSC_VER
-static int FDECL(mkstemp, (char *));
+static int mkstemp(char *);
 #endif
 #endif
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
 #if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
     || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
-static int FDECL(case_insensitive_comp, (const char *, const char *));
+static int case_insensitive_comp(const char *, const char *);
 #endif
 
 #if !defined(MAKEDEFS_C) && defined(WIN32)
@@ -83,13 +83,13 @@ extern int GUILaunched;
 #endif
 
 /* these two are in extern.h but we don't include hack.h */
-void NDECL(runtime_info_init);
-const char *FDECL(do_runtime_info, (int *));
+void runtime_info_init(void);
+const char *do_runtime_info(int *);
 
-void NDECL(build_options);
-static int NDECL(count_and_validate_winopts);
-static void FDECL(opt_out_words, (char *, int *));
-static void NDECL(build_savebones_compat_string);
+void build_options(void);
+static int count_and_validate_winopts(void);
+static void opt_out_words(char *, int *);
+static void build_savebones_compat_string(void);
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 40
 #if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
@@ -184,7 +184,7 @@ static struct win_info window_opts[] = {
 #endif /* MD_IGNORED_FEATUES */
 
 static void
-make_version()
+make_version(void)
 {
     register int i;
 
@@ -258,9 +258,7 @@ make_version()
 #if defined(MAKEDEFS_C) || defined(FOR_RUNTIME)
 
 static char *
-version_string(outbuf, delim)
-char *outbuf;
-const char *delim;
+version_string(char *outbuf, const char *delim)
 {
     Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR, delim,
             PATCHLEVEL);
@@ -271,9 +269,7 @@ const char *delim;
 }
 
 static char *
-version_id_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
+version_id_string(char *outbuf, const char *build_date)
 {
     char subbuf[64], versbuf[64];
     char statusbuf[64];
@@ -306,9 +302,7 @@ const char *build_date;
 /* still within #if MAKDEFS_C || FOR_RUNTIME */
 
 static char *
-bannerc_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
+bannerc_string(char *outbuf, const char *build_date)
 {
     char subbuf[64], versbuf[64];
 
@@ -339,8 +333,7 @@ const char *build_date;
 #ifndef HAS_NO_MKSTEMP
 #ifdef _MSC_VER
 int
-mkstemp(template)
-char *template;
+mkstemp(char *template)
 {
     int err;
 
@@ -358,9 +351,7 @@ char *template;
 #if defined(MAKEDEFS_C) || defined(FOR_RUNTIME) || defined(WIN32) \
     || (defined(CROSSCOMPILE_TARGET) && defined(__DATE__) && defined(__TIME__))
 static int
-case_insensitive_comp(s1, s2)
-const char *s1;
-const char *s2;
+case_insensitive_comp(const char *s1, const char *s2)
 {
     uchar u1, u2;
 
@@ -379,8 +370,7 @@ const char *s2;
 #endif
 
 static char *
-eos(str)
-char *str;
+eos(char *str)
 {
     while (*str)
         str++;
@@ -389,9 +379,7 @@ char *str;
 
 #if 0
 static char *
-mdlib_strsubst(bp, orig, replacement)
-char *bp;
-const char *orig, *replacement;
+mdlib_strsubst(char *bp, const char *orig, const char *replacement)
 {
     char *found, buf[BUFSZ];
 
@@ -411,7 +399,7 @@ const char *orig, *replacement;
 static char save_bones_compat_buf[BUFSZ];
 
 static void
-build_savebones_compat_string()
+build_savebones_compat_string(void)
 {
 #ifdef VERSION_COMPATIBILITY
     unsigned long uver = VERSION_COMPATIBILITY,
@@ -619,7 +607,7 @@ static const char *build_opts[] = {
 };
 
 int
-count_and_validate_winopts(VOID_ARGS)
+count_and_validate_winopts(void)
 {
     int i, cnt = 0;
 
@@ -642,9 +630,8 @@ count_and_validate_winopts(VOID_ARGS)
 }
 
 static void
-opt_out_words(str, length_p)
-char *str; /* input, but modified during processing */
-int *length_p; /* in/out */
+opt_out_words(char *str,     /* input, but modified during processing */
+              int *length_p) /* in/out */
 {
     char *word;
 
@@ -672,7 +659,7 @@ int *length_p; /* in/out */
 }
 
 void
-build_options()
+build_options(void)
 {
     char buf[BUFSZ];
     int i, length, winsyscnt, cnt = 0;
@@ -814,7 +801,7 @@ build_options()
 #endif
 
 void
-runtime_info_init()
+runtime_info_init(void)
 {
 #if !defined(MAKEDEFS_C) && defined(CROSSCOMPILE_TARGET) \
     && defined(__DATE__) && defined(__TIME__)
@@ -907,8 +894,7 @@ runtime_info_init()
 }
 
 const char *
-do_runtime_info(rtcontext)
-int *rtcontext;
+do_runtime_info(int *rtcontext)
 {
     const char *retval = (const char *) 0;
 

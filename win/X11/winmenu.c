@@ -35,34 +35,34 @@
 #include "hack.h"
 #include "winX.h"
 
-static void FDECL(menu_size_change_handler, (Widget, XtPointer,
-                                             XEvent *, Boolean *));
-static void FDECL(menu_select, (Widget, XtPointer, XtPointer));
-static void FDECL(invert_line, (struct xwindow *, x11_menu_item *, int, long));
-static void FDECL(menu_ok, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_cancel, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_all, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_none, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_invert, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_search, (Widget, XtPointer, XtPointer));
-static void FDECL(search_menu, (struct xwindow *));
-static void FDECL(select_all, (struct xwindow *));
-static void FDECL(select_none, (struct xwindow *));
-static void FDECL(select_match, (struct xwindow *, char *));
-static void FDECL(invert_all, (struct xwindow *));
-static void FDECL(invert_match, (struct xwindow *, char *));
-static void FDECL(menu_popdown, (struct xwindow *));
-static Widget FDECL(menu_create_buttons, (struct xwindow *, Widget, Widget));
-static void FDECL(menu_create_entries, (struct xwindow *, struct menu *));
-static void FDECL(destroy_menu_entry_widgets, (struct xwindow *));
-static void NDECL(create_menu_translation_tables);
+static void menu_size_change_handler(Widget, XtPointer, XEvent *,
+                                     Boolean *);
+static void menu_select(Widget, XtPointer, XtPointer);
+static void invert_line(struct xwindow *, x11_menu_item *, int, long);
+static void menu_ok(Widget, XtPointer, XtPointer);
+static void menu_cancel(Widget, XtPointer, XtPointer);
+static void menu_all(Widget, XtPointer, XtPointer);
+static void menu_none(Widget, XtPointer, XtPointer);
+static void menu_invert(Widget, XtPointer, XtPointer);
+static void menu_search(Widget, XtPointer, XtPointer);
+static void search_menu(struct xwindow *);
+static void select_all(struct xwindow *);
+static void select_none(struct xwindow *);
+static void select_match(struct xwindow *, char *);
+static void invert_all(struct xwindow *);
+static void invert_match(struct xwindow *, char *);
+static void menu_popdown(struct xwindow *);
+static Widget menu_create_buttons(struct xwindow *, Widget, Widget);
+static void menu_create_entries(struct xwindow *, struct menu *);
+static void destroy_menu_entry_widgets(struct xwindow *);
+static void create_menu_translation_tables(void);
 
-static void FDECL(move_menu, (struct menu *, struct menu *));
-static void FDECL(free_menu_line_entries, (struct menu *));
-static void FDECL(free_menu, (struct menu *));
-static void FDECL(reset_menu_to_default, (struct menu *));
-static void FDECL(clear_old_menu, (struct xwindow *));
-static char *FDECL(copy_of, (const char *));
+static void move_menu(struct menu *, struct menu *);
+static void free_menu_line_entries(struct menu *);
+static void free_menu(struct menu *);
+static void reset_menu_to_default(struct menu *);
+static void clear_old_menu(struct xwindow *);
+static char *copy_of(const char *);
 
 #define reset_menu_count(mi) ((mi)->counting = FALSE, (mi)->menu_count = 0L)
 
@@ -84,7 +84,7 @@ XtTranslations menu_translation_table = (XtTranslations) 0;
 XtTranslations menu_del_translation_table = (XtTranslations) 0;
 
 static void
-create_menu_translation_tables()
+create_menu_translation_tables(void)
 {
     if (!menu_translation_table) {
         menu_translation_table = XtParseTranslationTable(menu_translations);
@@ -97,11 +97,7 @@ create_menu_translation_tables()
 
 /*ARGSUSED*/
 static void
-menu_size_change_handler(w, ptr, event, flag)
-Widget w;
-XtPointer ptr;
-XEvent *event;
-Boolean *flag;
+menu_size_change_handler(Widget w, XtPointer ptr, XEvent *event, Boolean *flag)
 {
     struct xwindow *wp = (struct xwindow *) ptr;
 
@@ -127,9 +123,7 @@ Boolean *flag;
  */
 /* ARGSUSED */
 static void
-menu_select(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_select(Widget w, XtPointer client_data, XtPointer call_data)
 {
     struct menu_info_t *menu_info;
     long how_many;
@@ -178,11 +172,7 @@ XtPointer client_data, call_data;
  */
 /* ARGSUSED */
 void
-menu_delete(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+menu_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     nhUse(event);
     nhUse(params);
@@ -196,11 +186,7 @@ Cardinal *num_params;
  */
 /*ARGSUSED*/
 static void
-invert_line(wp, curr, which, how_many)
-struct xwindow *wp;
-x11_menu_item *curr;
-int which;
-long how_many;
+invert_line(struct xwindow *wp, x11_menu_item *curr, int which, long how_many)
 {
     Arg args[2];
 
@@ -229,11 +215,7 @@ long how_many;
  */
 /* ARGSUSED */
 void
-menu_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     struct menu_info_t *menu_info;
     x11_menu_item *curr;
@@ -382,9 +364,7 @@ menu_done:
 
 /* ARGSUSED */
 static void
-menu_ok(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_ok(Widget w, XtPointer client_data, XtPointer call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
 
@@ -396,9 +376,8 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-menu_cancel(w, client_data, call_data)
-Widget w; /* don't use - may be None */
-XtPointer client_data, call_data;
+menu_cancel(Widget w, /* don't use - may be None */
+            XtPointer client_data, XtPointer call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
 
@@ -414,9 +393,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-menu_all(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_all(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(call_data);
@@ -426,9 +403,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-menu_none(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_none(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(call_data);
@@ -438,9 +413,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-menu_invert(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_invert(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(call_data);
@@ -450,9 +423,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-menu_search(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+menu_search(Widget w, XtPointer client_data, XtPointer call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
     struct menu_info_t *menu_info = wp->menu_information;
@@ -467,8 +438,7 @@ XtPointer client_data, call_data;
 
 /* common to menu_search and menu_key */
 static void
-search_menu(wp)
-struct xwindow *wp;
+search_menu(struct xwindow *wp)
 {
     char *pat, buf[BUFSZ + 2]; /* room for '*' + BUFSZ-1 + '*' + '\0' */
     struct menu_info_t *menu_info = wp->menu_information;
@@ -500,8 +470,7 @@ struct xwindow *wp;
 }
 
 static void
-select_all(wp)
-struct xwindow *wp;
+select_all(struct xwindow *wp)
 {
     x11_menu_item *curr;
     int count;
@@ -517,8 +486,7 @@ struct xwindow *wp;
 }
 
 static void
-select_none(wp)
-struct xwindow *wp;
+select_none(struct xwindow *wp)
 {
     x11_menu_item *curr;
     int count;
@@ -534,8 +502,7 @@ struct xwindow *wp;
 }
 
 static void
-invert_all(wp)
-struct xwindow *wp;
+invert_all(struct xwindow *wp)
 {
     x11_menu_item *curr;
     int count;
@@ -551,9 +518,8 @@ struct xwindow *wp;
 }
 
 static void
-invert_match(wp, match)
-struct xwindow *wp;
-char *match; /* wildcard pattern for pmatch() */
+invert_match(struct xwindow *wp,
+             char *match) /* wildcard pattern for pmatch() */
 {
     x11_menu_item *curr;
     int count;
@@ -571,9 +537,8 @@ char *match; /* wildcard pattern for pmatch() */
 }
 
 static void
-select_match(wp, match)
-struct xwindow *wp;
-char *match; /* wildcard pattern for pmatch() */
+select_match(struct xwindow *wp,
+             char *match) /* wildcard pattern for pmatch() */
 {
     x11_menu_item *curr, *found = 0;
     int count;
@@ -598,8 +563,7 @@ char *match; /* wildcard pattern for pmatch() */
 }
 
 static void
-menu_popdown(wp)
-struct xwindow *wp;
+menu_popdown(struct xwindow *wp)
 {
     nh_XtPopdown(wp->popup); /* remove the event grab */
     XtDestroyWidget(wp->popup);
@@ -612,9 +576,7 @@ struct xwindow *wp;
 /* Global functions ======================================================= */
 
 void
-X11_start_menu(window, mbehavior)
-winid window;
-unsigned long mbehavior UNUSED;
+X11_start_menu(winid window, unsigned long mbehavior UNUSED)
 {
     struct xwindow *wp;
     check_winid(window);
@@ -631,15 +593,13 @@ unsigned long mbehavior UNUSED;
 
 /*ARGSUSED*/
 void
-X11_add_menu(window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
-winid window;
-const glyph_info *glyphinfo UNUSED;
-const anything *identifier;
-char ch;
-char gch; /* group accelerator (0 = no group) */
-int attr;
-const char *str;
-unsigned itemflags;
+X11_add_menu(winid window,
+             const glyph_info *glyphinfo UNUSED,
+             const anything *identifier,
+             char ch,
+             char gch, /* group accelerator (0 = no group) */
+             int attr,
+             const char *str, unsigned itemflags)
 {
     x11_menu_item *item;
     struct menu_info_t *menu_info;
@@ -708,9 +668,7 @@ unsigned itemflags;
 }
 
 void
-X11_end_menu(window, query)
-winid window;
-const char *query;
+X11_end_menu(winid window, const char *query)
 {
     struct menu_info_t *menu_info;
 
@@ -725,10 +683,7 @@ const char *query;
 }
 
 int
-X11_select_menu(window, how, menu_list)
-winid window;
-int how;
-menu_item **menu_list;
+X11_select_menu(winid window, int how, menu_item **menu_list)
 {
     x11_menu_item *curr;
     struct xwindow *wp;
@@ -1001,8 +956,7 @@ menu_item **menu_list;
  * zero length.
  */
 static char *
-copy_of(s)
-const char *s;
+copy_of(const char *s)
 {
     if (!s)
         s = "";
@@ -1013,9 +967,7 @@ const char *s;
  * Create ok, cancel, all, none, invert, and search buttons.
  */
 static Widget
-menu_create_buttons(wp, form, under)
-struct xwindow *wp;
-Widget form,under;
+menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
 {
     Arg args[15];
     Cardinal num_args;
@@ -1137,9 +1089,7 @@ Widget form,under;
 }
 
 static void
-menu_create_entries(wp, curr_menu)
-struct xwindow *wp;
-struct menu *curr_menu;
+menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
 {
     x11_menu_item *curr;
     int menulineidx = 0;
@@ -1217,8 +1167,7 @@ struct menu *curr_menu;
 }
 
 static void
-destroy_menu_entry_widgets(wp)
-struct xwindow *wp;
+destroy_menu_entry_widgets(struct xwindow *wp)
 {
     WidgetList wlist;
     Cardinal numchild;
@@ -1242,8 +1191,7 @@ struct xwindow *wp;
 }
 
 static void
-move_menu(src_menu, dest_menu)
-struct menu *src_menu, *dest_menu;
+move_menu(struct menu *src_menu, struct menu *dest_menu)
 {
     free_menu(dest_menu);   /* toss old menu */
     *dest_menu = *src_menu; /* make new menu current */
@@ -1252,8 +1200,7 @@ struct menu *src_menu, *dest_menu;
 }
 
 static void
-free_menu_line_entries(mp)
-struct menu *mp;
+free_menu_line_entries(struct menu *mp)
 {
     /* We're not freeing menu entry widgets here, but let XtDestroyWidget()
        on the parent widget take care of that */
@@ -1266,8 +1213,7 @@ struct menu *mp;
 }
 
 static void
-free_menu(mp)
-struct menu *mp;
+free_menu(struct menu *mp)
 {
     free_menu_line_entries(mp);
     if (mp->query)
@@ -1278,8 +1224,7 @@ struct menu *mp;
 }
 
 static void
-reset_menu_to_default(mp)
-struct menu *mp;
+reset_menu_to_default(struct menu *mp)
 {
     mp->base = mp->last = (x11_menu_item *) 0;
     mp->query = (const char *) 0;
@@ -1289,8 +1234,7 @@ struct menu *mp;
 }
 
 static void
-clear_old_menu(wp)
-struct xwindow *wp;
+clear_old_menu(struct xwindow *wp)
 {
     struct menu_info_t *menu_info = wp->menu_information;
 
@@ -1306,8 +1250,7 @@ struct xwindow *wp;
 }
 
 void
-create_menu_window(wp)
-struct xwindow *wp;
+create_menu_window(struct xwindow *wp)
 {
     wp->type = NHW_MENU;
     wp->menu_information =
@@ -1325,8 +1268,7 @@ struct xwindow *wp;
 }
 
 void
-destroy_menu_window(wp)
-struct xwindow *wp;
+destroy_menu_window(struct xwindow *wp)
 {
     clear_old_menu(wp); /* this will also destroy the widgets */
     free((genericptr_t) wp->menu_information);

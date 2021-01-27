@@ -92,7 +92,7 @@
 #if _MSC_VER >= 700
 #pragma warning(disable : 4018) /* signed/unsigned mismatch */
 #pragma warning(disable : 4127) /* conditional expression is constant */
-#pragma warning(disable : 4131) /* old style declarator */
+/* #pragma warning(disable : 4131) */ /* old style declarator */
 #pragma warning(disable : 4305) /* prevents complaints with MK_FP */
 #pragma warning(disable : 4309) /* initializing */
 #if _MSC_VER > 700
@@ -104,33 +104,34 @@
 
 extern short glyph2tile[];
 
-/* static void FDECL(vga_NoBorder, (int));  */
-void FDECL(vga_gotoloc, (int, int)); /* This should be made a macro */
-void NDECL(vga_backsp);
+/* static void vga_NoBorder(int);  */
+void vga_gotoloc(int, int); /* This should be made a macro */
+void vga_backsp(void);
+
 #ifdef SCROLLMAP
-static void FDECL(vga_scrollmap, (BOOLEAN_P));
+static void vga_scrollmap(boolean);
 #endif
-static void FDECL(vga_redrawmap, (BOOLEAN_P));
-static void FDECL(vga_cliparound, (int, int));
-static void FDECL(decal_planar, (struct planar_cell_struct *, unsigned));
+static void vga_redrawmap(boolean);
+static void vga_cliparound(int, int);
+static void decal_planar(struct planar_cell_struct *, unsigned);
 
 #ifdef POSITIONBAR
-static void NDECL(positionbar);
-static void FDECL(vga_special, (int, int, int));
+static void positionbar(void);
+static void vga_special(int, int, int);
 #endif
 
-static void FDECL(vga_DisplayCell, (struct planar_cell_struct *, int, int));
-static void FDECL(vga_DisplayCell_O,
-             (struct overview_planar_cell_struct *, int, int));
-static void FDECL(vga_SwitchMode, (unsigned int));
-static void FDECL(vga_SetPalette, (const struct Pixel *));
-static void FDECL(vga_WriteChar, (int, int, int, int));
-static void FDECL(vga_WriteStr, (char *, int, int, int, int));
+static void vga_DisplayCell(struct planar_cell_struct *, int, int);
+static void vga_DisplayCell_O(struct overview_planar_cell_struct *, int,
+                              int);
+static void vga_SwitchMode(unsigned int);
+static void vga_SetPalette(const struct Pixel *);
+static void vga_WriteChar(int, int, int, int);
+static void vga_WriteStr(char *, int, int, int, int);
 
-static void FDECL(read_planar_tile, (unsigned, struct planar_cell_struct *));
-static void FDECL(read_planar_tile_O,
-            (unsigned, struct overview_planar_cell_struct *));
-static void FDECL(read_tile_indexes, (unsigned, unsigned char (*)[TILE_X]));
+static void read_planar_tile(unsigned, struct planar_cell_struct *);
+static void read_planar_tile_O(unsigned,
+                               struct overview_planar_cell_struct *);
+static void read_tile_indexes(unsigned, unsigned char (*)[TILE_X]);
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */
 extern boolean clipping;    /* clipping on? from wintty.c */
@@ -208,14 +209,14 @@ static struct overview_planar_cell_struct planecell_O;
 /* static int  g_attribute;	*/ /* Current attribute to use */
 
 void
-vga_get_scr_size()
+vga_get_scr_size(void)
 {
     CO = 80;
     LI = 29;
 }
 
 void
-vga_backsp()
+vga_backsp(void)
 {
     int col, row;
 
@@ -228,8 +229,7 @@ vga_backsp()
 }
 
 void
-vga_clear_screen(colour)
-int colour;
+vga_clear_screen(int colour)
 {
     unsigned long __far *pch;
     unsigned j;
@@ -250,8 +250,8 @@ int colour;
     vga_gotoloc(0, 0); /* is this needed? */
 }
 
-void vga_cl_end(col, row) /* clear to end of line */
-int col, row;
+/* clear to end of line */
+void vga_cl_end(int col, int row)
 {
     int count;
 
@@ -265,8 +265,8 @@ int col, row;
     }
 }
 
-void vga_cl_eos(cy) /* clear to end of screen */
-int cy;
+/* clear to end of screen */
+void vga_cl_eos(int cy)
 {
     int count;
 
@@ -280,15 +280,14 @@ int cy;
 }
 
 void
-vga_tty_end_screen()
+vga_tty_end_screen(void)
 {
     vga_clear_screen(BACKGROUND_VGA_COLOR);
     vga_SwitchMode(MODETEXT);
 }
 
 void
-vga_tty_startup(wid, hgt)
-int *wid, *hgt;
+vga_tty_startup(int *wid, int *hgt)
 {
     /* code to sense display adapter is required here - MJA */
 
@@ -325,18 +324,15 @@ int *wid, *hgt;
  */
 
 void
-vga_xputs(s, col, row)
-const char *s;
-int col, row;
+vga_xputs(const char *s, int col, int row)
 {
     if (s != (char *) 0) {
         vga_WriteStr((char *) s, strlen(s), col, row, g_attribute);
     }
 }
 
-void vga_xputc(ch, attr) /* write out character (and attribute) */
-char ch;
-int attr;
+/* write out character (and attribute) */
+void vga_xputc(char ch, int attr)
 {
     int col, row;
 
@@ -358,13 +354,11 @@ int attr;
 }
 
 #if defined(USE_TILES)
+/* Place tile represent. a glyph at current location */
 void
-vga_xputg(glyphnum, ch,
-          special) /* Place tile represent. a glyph at current location */
-int glyphnum;
-int ch;
-unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
-                     hack.h */
+vga_xputg(int glyphnum, int ch,
+          unsigned special) /* special feature: corpse, invis, detected, pet, ridden -
+                               hack.h */
 {
     int col, row;
     int attr;
@@ -418,8 +412,7 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
  */
 
 void
-vga_gotoloc(col, row)
-int col, row;
+vga_gotoloc(int col, int row)
 {
     curcol = min(col, CO - 1); /* protection from callers */
     currow = min(row, LI - 1);
@@ -427,8 +420,7 @@ int col, row;
 
 #if defined(USE_TILES) && defined(CLIPPING)
 static void
-vga_cliparound(x, y)
-int x, y;
+vga_cliparound(int x, int y UNUSED)
 {
     int oldx = clipx;
 
@@ -450,8 +442,7 @@ int x, y;
 }
 
 static void
-vga_redrawmap(clearfirst)
-boolean clearfirst;
+vga_redrawmap(boolean clearfirst)
 {
     int x, y, t;
     unsigned long __far *pch;
@@ -501,8 +492,7 @@ boolean clearfirst;
 #endif /* USE_TILES && CLIPPING */
 
 void
-vga_userpan(pan)
-enum vga_pan_direction pan;
+vga_userpan(enum vga_pan_direction pan)
 {
     int x;
 
@@ -521,8 +511,7 @@ enum vga_pan_direction pan;
 }
 
 void
-vga_overview(on)
-boolean on;
+vga_overview(boolean on)
 {
     /*	vga_HideCursor(); */
     if (on) {
@@ -539,8 +528,7 @@ boolean on;
 }
 
 void
-vga_traditional(on)
-boolean on;
+vga_traditional(boolean on)
 {
     /*	vga_HideCursor(); */
     if (on) {
@@ -560,7 +548,7 @@ boolean on;
 }
 
 void
-vga_refresh()
+vga_refresh(void)
 {
     positionbar();
     vga_redrawmap(1);
@@ -632,9 +620,7 @@ boolean left;
 #endif /* SCROLLMAP */
 
 static void
-read_planar_tile(glyph, cell)
-unsigned glyph;
-struct planar_cell_struct *cell;
+read_planar_tile(unsigned glyph, struct planar_cell_struct *cell)
 {
     unsigned char indexes[TILE_Y][TILE_X];
     unsigned plane, y, byte, bit;
@@ -658,9 +644,7 @@ struct planar_cell_struct *cell;
 }
 
 static void
-read_planar_tile_O(glyph, cell)
-unsigned glyph;
-struct overview_planar_cell_struct *cell;
+read_planar_tile_O(unsigned glyph, struct overview_planar_cell_struct *cell)
 {
     unsigned char indexes[TILE_Y][TILE_X];
     unsigned plane, y, bit;
@@ -682,9 +666,7 @@ struct overview_planar_cell_struct *cell;
 }
 
 static void
-read_tile_indexes(glyph, indexes)
-unsigned glyph;
-unsigned char (*indexes)[TILE_X];
+read_tile_indexes(unsigned glyph, unsigned char (*indexes)[TILE_X])
 {
     const struct TileImage *tile;
     unsigned x, y;
@@ -708,7 +690,6 @@ unsigned char (*indexes)[TILE_X];
     tile = get_tile(tilenum);
 
     /* Map to a 16 bit palette; assume colors laid out as in default tileset */
-    memset(indexes, 0, sizeof(indexes));
     for (y = 0; y < TILE_Y && y < tile->height; ++y) {
         for (x = 0; x < TILE_X && x < tile->width; ++x) {
             unsigned i = tile->indexes[y * tile->width + x];
@@ -725,9 +706,7 @@ unsigned char (*indexes)[TILE_X];
 }
 
 static void
-decal_planar(gp, special)
-struct planar_cell_struct *gp;
-unsigned special;
+decal_planar(struct planar_cell_struct *gp UNUSED, unsigned special)
 {
     if (special & MG_CORPSE) {
     } else if (special & MG_INVIS) {
@@ -798,7 +777,7 @@ vga_Init(void)
 #endif
     vga_SetPalette(paletteptr);
     g_attribute = attrib_gr_normal;
-    font = vga_FontPtrs();
+    font = (unsigned char __far *) vga_FontPtrs();
     clear_screen();
     clipx = 0;
     clipxmax = clipx + (viewport_size - 1);
@@ -907,7 +886,7 @@ vga_FontPtrs(void)
  * 0xB=MCGA(mono-monitor), 0xC=MCGA(color-monitor), 0xFF=unknown)
  */
 int
-vga_detect()
+vga_detect(void)
 {
     union REGS regs;
 
@@ -935,8 +914,7 @@ vga_detect()
  *
  */
 static void
-vga_WriteChar(chr, col, row, colour)
-int chr, col, row, colour;
+vga_WriteChar(int chr, int col, int row, int colour)
 {
     int i;
     int x, pixy;
@@ -999,9 +977,7 @@ int chr, col, row, colour;
  *
  */
 static void
-vga_DisplayCell(gp, col, row)
-struct planar_cell_struct *gp;
-int col, row;
+vga_DisplayCell(struct planar_cell_struct *gp, int col, int row)
 {
     int i, pixx, pixy;
     char __far *tmp_s; /* source pointer */
@@ -1030,9 +1006,7 @@ int col, row;
 }
 
 static void
-vga_DisplayCell_O(gp, col, row)
-struct overview_planar_cell_struct *gp;
-int col, row;
+vga_DisplayCell_O(struct overview_planar_cell_struct *gp, int col, int row)
 {
     int i, pixx, pixy;
     char __far *tmp_s; /* source pointer */
@@ -1063,9 +1037,7 @@ int col, row;
  *
  */
 static void
-vga_WriteStr(s, len, col, row, colour)
-char *s;
-int len, col, row, colour;
+vga_WriteStr(char *s, int len, int col, int row, int colour)
 {
     unsigned char *us;
     int i = 0;
@@ -1091,8 +1063,7 @@ int len, col, row, colour;
  *
  */
 static void
-vga_SetPalette(p)
-const struct Pixel *p;
+vga_SetPalette(const struct Pixel *p)
 {
     union REGS regs;
     int i;
@@ -1127,20 +1098,24 @@ static unsigned char colorbits[] = { 0x08, 0x04, 0x02, 0x01 };
 static unsigned char pbar[COLNO];
 
 void
-vga_update_positionbar(posbar)
-char *posbar;
+vga_update_positionbar(char *posbar)
 {
-    char *p = pbar;
+    char *p = (char *) pbar;
     if (posbar)
         while (*posbar)
             *p++ = *posbar++;
     *p = 0;
 }
 
+#ifdef __DJGPP__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif /* __DJGPP__ */
+
 static void
-positionbar()
+positionbar(void)
 {
-    char *posbar = pbar;
+    char *posbar = (char *) pbar;
     int feature, ucol;
     int k, y, colour, row;
     char __far *pch;
@@ -1238,9 +1213,12 @@ positionbar()
 #endif
 }
 
+#ifdef __DJGPP__
+#pragma GCC diagnostic pop
+#endif /* __DJGPP__ */
+
 void
-vga_special(chr, col, color)
-int chr, col, color;
+vga_special(int chr, int col, int color)
 {
     int i, y, pixy;
     char __far *tmp_d; /* destination pointer */
@@ -1272,7 +1250,6 @@ int chr, col, color;
     }
     egawriteplane(15);
 }
-
 #endif /*POSITIONBAR*/
 
 #ifdef SIMULATE_CURSOR
@@ -1281,7 +1258,7 @@ static struct planar_cell_struct undercursor;
 static struct planar_cell_struct cursor;
 
 void
-vga_DrawCursor()
+vga_DrawCursor(void)
 {
     int i, pixx, pixy, x, y, p;
     char __far *tmp1;
@@ -1496,7 +1473,7 @@ vga_DrawCursor()
 }
 
 void
-vga_HideCursor()
+vga_HideCursor(void)
 {
     int i, pixx, pixy, x, y;
     char __far *tmp1;

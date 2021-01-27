@@ -44,16 +44,16 @@ public:
 	static void qt_resume_nhwindows();
 	static winid qt_create_nhwindow(int type);
 	static void qt_clear_nhwindow(winid wid);
-	static void qt_display_nhwindow(winid wid, BOOLEAN_P block);
+	static void qt_display_nhwindow(winid wid, boolean block);
 	static void qt_destroy_nhwindow(winid wid);
 	static void qt_curs(winid wid, int x, int y);
 	static void qt_putstr(winid wid, int attr, const char *text);
 	static void qt_putstr(winid wid, int attr, const std::string& text);
 	static void qt_putstr(winid wid, int attr, const QString& text);
-	static void qt_display_file(const char *filename, BOOLEAN_P must_exist);
+	static void qt_display_file(const char *filename, boolean must_exist);
 	static void qt_start_menu(winid wid, unsigned long mbehavior);
 	static void qt_add_menu(winid wid, const glyph_info *glyphinfo,
-		const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
+		const ANY_P * identifier, char ch, char gch, int attr,
 		const char *str, unsigned int itemflags);
 	static void qt_end_menu(winid wid, const char *prompt);
 	static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);
@@ -63,7 +63,7 @@ public:
 
 	static void qt_cliparound(int x, int y);
 	static void qt_cliparound_window(winid wid, int x, int y);
-        static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+        static void qt_print_glyph(winid wid, xchar x, xchar y,
                                    const glyph_info *glyphingo, 
 				   const glyph_info *bkglyphinfo);
 	static void qt_raw_print(const char *str);
@@ -74,7 +74,7 @@ public:
 	static int qt_doprev_message();
         static char qt_more();
         static char qt_yn_function(const char *question,
-                                   const char *choices, CHAR_P def);
+                                   const char *choices, char def);
 	static void qt_getlin(const char *prompt, char *line);
 	static int qt_get_ext_cmd();
 	static void qt_number_pad(int);
@@ -83,8 +83,8 @@ public:
 	static void qt_end_screen();
 
         static void qt_preference_update(const char *optname);
-        static char *qt_getmsghistory(BOOLEAN_P init);
-        static void qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring);
+        static char *qt_getmsghistory(boolean init);
+        static void qt_putmsghistory(const char *msg, boolean is_restoring);
 
 	static void qt_outrip(winid wid, int how, time_t when);
 	static int qt_kbhit();

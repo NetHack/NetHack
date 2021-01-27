@@ -52,7 +52,7 @@ struct nhregex {
 };
 
 struct nhregex *
-regex_init()
+regex_init(void)
 {
     return (struct nhregex *) alloc(sizeof(struct nhregex));
 }

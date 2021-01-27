@@ -34,7 +34,7 @@ mswin_nh_input_init(void)
 
 /* check for input */
 int
-mswin_have_input()
+mswin_have_input(void)
 {
     return
 #ifdef SAFERHANGUP
@@ -63,7 +63,7 @@ mswin_input_push(PMSNHEvent event)
 
 /* get event from the queue and delete it */
 PMSNHEvent
-mswin_input_pop()
+mswin_input_pop(void)
 {
     PMSNHEvent retval;
 
@@ -92,7 +92,7 @@ mswin_input_pop()
 
 /* get event from the queue but leave it there */
 PMSNHEvent
-mswin_input_peek()
+mswin_input_peek(void)
 {
     PMSNHEvent retval;
 

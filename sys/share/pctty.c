@@ -18,7 +18,7 @@ char erase_char, kill_char;
  * Called by startup() in termcap.c and after returning from ! or ^Z
  */
 void
-gettty()
+gettty(void)
 {
     erase_char = '\b';
     kill_char = 21; /* cntl-U */
@@ -33,8 +33,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
 #if defined(MSDOS) && defined(NO_TERMS)
     gr_finish();
@@ -49,15 +48,14 @@ const char *s;
 
 /* called by init_nhwindows() and resume_nhwindows() */
 void
-setftty()
+setftty(void)
 {
     start_screen();
 }
 
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 void
-msleep(mseconds)
-unsigned mseconds;
+msleep(unsigned mseconds)
 {
     /* now uses clock() which is ANSI C */
     clock_t goal;

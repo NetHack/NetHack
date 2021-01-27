@@ -8,16 +8,16 @@
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
 
 #if defined(TERMLIB) || defined(CURSES_GRAPHICS)
-void NDECL((*decgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
+void (*decgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 #endif /* TERMLIB || CURSES */
 
 #ifdef PC9800
-void NDECL((*ibmgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
-void NDECL((*ascgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
+void (*ibmgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
+void (*ascgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 #endif
 
 #ifdef CURSES_GRAPHICS
-void NDECL((*cursesgraphics_mode_callback)) = 0;
+void (*cursesgraphics_mode_callback)(void) = 0;
 #endif
 /*
  * Explanations of the functions found below:
@@ -72,7 +72,7 @@ void NDECL((*cursesgraphics_mode_callback)) = 0;
  */
 
 void
-init_symbols()
+init_symbols(void)
 {
     init_ov_primary_symbols();
     init_ov_rogue_symbols();
@@ -82,7 +82,7 @@ init_symbols()
 }
 
 void
-init_showsyms()
+init_showsyms(void)
 {
     register int i;
 
@@ -100,7 +100,7 @@ init_showsyms()
 
 /* initialize defaults for the overrides to the rogue symset */
 void
-init_ov_rogue_symbols()
+init_ov_rogue_symbols(void)
 {
     register int i;
 
@@ -109,7 +109,7 @@ init_ov_rogue_symbols()
 }
 /* initialize defaults for the overrides to the primary symset */
 void
-init_ov_primary_symbols()
+init_ov_primary_symbols(void)
 {
     register int i;
 
@@ -118,8 +118,7 @@ init_ov_primary_symbols()
 }
 
 nhsym
-get_othersym(idx, which_set)
-int idx, which_set;
+get_othersym(int idx, int which_set)
 {
     nhsym sym = (nhsym) 0;
     int oidx = idx + SYM_OFF_X;
@@ -155,7 +154,7 @@ int idx, which_set;
 
 /* initialize defaults for the primary symset */
 void
-init_primary_symbols()
+init_primary_symbols(void)
 {
     register int i;
 
@@ -175,7 +174,7 @@ init_primary_symbols()
 
 /* initialize defaults for the rogue symset */
 void
-init_rogue_symbols()
+init_rogue_symbols(void)
 {
     register int i;
 
@@ -204,8 +203,7 @@ init_rogue_symbols()
 }
 
 void
-assign_graphics(whichset)
-int whichset;
+assign_graphics(int whichset)
 {
     register int i;
 
@@ -240,8 +238,7 @@ int whichset;
 }
 
 void
-switch_symbols(nondefault)
-int nondefault;
+switch_symbols(int nondefault)
 {
     register int i;
 
@@ -275,41 +272,31 @@ int nondefault;
 }
 
 void
-update_ov_primary_symset(symp, val)
-struct symparse *symp;
-int val;
+update_ov_primary_symset(struct symparse* symp, int val)
 {
     g.ov_primary_syms[symp->idx] = val;
 }
 
 void
-update_ov_rogue_symset(symp, val)
-struct symparse *symp;
-int val;
+update_ov_rogue_symset(struct symparse* symp, int val)
 {
     g.ov_rogue_syms[symp->idx] = val;
 }
 
 void
-update_primary_symset(symp, val)
-struct symparse *symp;
-int val;
+update_primary_symset(struct symparse* symp, int val)
 {
     g.primary_syms[symp->idx] = val;
 }
 
 void
-update_rogue_symset(symp, val)
-struct symparse *symp;
-int val;
+update_rogue_symset(struct symparse* symp, int val)
 {
     g.rogue_syms[symp->idx] = val;
 }
 
 void
-clear_symsetentry(which_set, name_too)
-int which_set;
-boolean name_too;
+clear_symsetentry(int which_set, boolean name_too)
 {
     if (g.symset[which_set].desc)
         free((genericptr_t) g.symset[which_set].desc);

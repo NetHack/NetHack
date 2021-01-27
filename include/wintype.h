@@ -24,7 +24,7 @@ typedef union any {
     unsigned long *a_ulptr;
     unsigned *a_uptr;
     const char *a_string;
-    int NDECL((*a_nfunc));
+    int (*a_nfunc)(void);
     unsigned long a_mask32; /* used by status highlighting */
     /* add types as needed */
 } anything;

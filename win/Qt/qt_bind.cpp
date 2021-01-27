@@ -346,7 +346,7 @@ void NetHackQtBind::qt_clear_nhwindow(winid wid)
         window->Clear();
 }
 
-void NetHackQtBind::qt_display_nhwindow(winid wid, BOOLEAN_P block)
+void NetHackQtBind::qt_display_nhwindow(winid wid, boolean block)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
     if (window)
@@ -388,7 +388,7 @@ void NetHackQtBind::qt_putstr(winid wid, int attr, const QString& text)
     window->PutStr(attr,text);
 }
 
-void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
+void NetHackQtBind::qt_display_file(const char *filename, boolean must_exist)
 {
     NetHackQtTextWindow* window=new NetHackQtTextWindow(mainWidget());
     bool complain = false;
@@ -429,7 +429,7 @@ void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 }
 
 void NetHackQtBind::qt_add_menu(winid wid, const glyph_info *glyphinfo,
-    const ANY_P * identifier, CHAR_P ch, CHAR_P gch, int attr,
+    const ANY_P * identifier, char ch, char gch, int attr,
     const char *str, unsigned itemflags)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
@@ -479,7 +479,7 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,
+void NetHackQtBind::qt_print_glyph(winid wid,xchar x,xchar y,
                                    const glyph_info *glyphinfo,
                                    const glyph_info *bkglyphinfo UNUSED)
 {
@@ -647,7 +647,7 @@ char NetHackQtBind::qt_more()
 }
 
 char NetHackQtBind::qt_yn_function(const char *question_,
-                                   const char *choices, CHAR_P def)
+                                   const char *choices, char def)
 {
     QString question(QString::fromLatin1(question_));
     QString message;
@@ -852,7 +852,7 @@ void NetHackQtBind::qt_preference_update(const char *optname)
 #endif
 }
 
-char *NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
+char *NetHackQtBind::qt_getmsghistory(boolean init)
 {
     NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (window)
@@ -860,7 +860,7 @@ char *NetHackQtBind::qt_getmsghistory(BOOLEAN_P init)
     return NULL;
 }
 
-void NetHackQtBind::qt_putmsghistory(const char *msg, BOOLEAN_P is_restoring)
+void NetHackQtBind::qt_putmsghistory(const char *msg, boolean is_restoring)
 {
     NetHackQtMessageWindow *window = main->GetMessageWindow();
     if (!window)

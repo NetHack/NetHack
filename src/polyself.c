@@ -21,21 +21,21 @@
 
 #include "hack.h"
 
-static void FDECL(check_strangling, (BOOLEAN_P));
-static void FDECL(polyman, (const char *, const char *));
-static void FDECL(dropp, (struct obj *));
-static void NDECL(break_armor);
-static void FDECL(drop_weapon, (int));
-static int FDECL(armor_to_dragon, (int));
-static void NDECL(newman);
-static void NDECL(polysense);
+static void check_strangling(boolean);
+static void polyman(const char *, const char *);
+static void dropp(struct obj *);
+static void break_armor(void);
+static void drop_weapon(int);
+static int armor_to_dragon(int);
+static void newman(void);
+static void polysense(void);
 
 static const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
 
 /* update the g.youmonst.data structure pointer and intrinsics */
 void
-set_uasmon()
+set_uasmon(void)
 {
     struct permonst *mdat = &mons[u.umonnum];
     boolean was_vampshifter = valid_vampshiftform(g.youmonst.cham, u.umonnum);
@@ -115,7 +115,7 @@ set_uasmon()
 
 /* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */
 void
-float_vs_flight()
+float_vs_flight(void)
 {
     boolean stuck_in_floor = (u.utrap && u.utraptype != TT_PIT);
 
@@ -137,8 +137,7 @@ float_vs_flight()
 
 /* for changing into form that's immune to strangulation */
 static void
-check_strangling(on)
-boolean on;
+check_strangling(boolean on)
 {
     /* on -- maybe resume strangling */
     if (on) {
@@ -166,8 +165,7 @@ boolean on;
 
 /* make a (new) human out of the player */
 static void
-polyman(fmt, arg)
-const char *fmt, *arg;
+polyman(const char *fmt, const char *arg)
 {
     boolean sticky = (sticks(g.youmonst.data) && u.ustuck && !u.uswallow),
             was_mimicking = (U_AP_TYPE != M_AP_NOTHING);
@@ -234,7 +232,7 @@ const char *fmt, *arg;
 }
 
 void
-change_sex()
+change_sex(void)
 {
     /* setting u.umonster for caveman/cavewoman or priest/priestess
        swap unintentionally makes `Upolyd' appear to be true */
@@ -275,7 +273,7 @@ change_sex()
 }
 
 static void
-newman()
+newman(void)
 {
     int i, oldlvl, newlvl, hpmax, enmax;
 
@@ -393,8 +391,7 @@ newman()
 }
 
 void
-polyself(psflags)
-int psflags;
+polyself(int psflags)
 {
     char buf[BUFSZ] = DUMMY;
     int old_light, new_light, mntmp, class, tryct, gvariant = NEUTRAL;
@@ -617,8 +614,7 @@ int psflags;
 /* (try to) make a mntmp monster out of the player;
    returns 1 if polymorph successful */
 int
-polymon(mntmp)
-int mntmp;
+polymon(int mntmp)
 {
     char buf[BUFSZ];
     boolean sticky = sticks(g.youmonst.data) && u.ustuck && !u.uswallow,
@@ -889,8 +885,7 @@ int mntmp;
 
 /* dropx() jacket for break_armor() */
 static void
-dropp(obj)
-struct obj *obj;
+dropp(struct obj *obj)
 {
     struct obj *otmp;
 
@@ -915,7 +910,7 @@ struct obj *obj;
 }
 
 static void
-break_armor()
+break_armor(void)
 {
     register struct obj *otmp;
 
@@ -1044,8 +1039,7 @@ break_armor()
 }
 
 static void
-drop_weapon(alone)
-int alone;
+drop_weapon(int alone)
 {
     struct obj *otmp;
     const char *what, *which, *whichtoo;
@@ -1107,7 +1101,7 @@ int alone;
 /* return to original form, usually either due to polymorph timing out
    or dying from loss of hit points while being polymorphed */
 void
-rehumanize()
+rehumanize(void)
 {
     boolean was_flying = (Flying != 0);
 
@@ -1155,7 +1149,7 @@ rehumanize()
 }
 
 int
-dobreathe()
+dobreathe(void)
 {
     struct attack *mattk;
 
@@ -1185,7 +1179,7 @@ dobreathe()
 }
 
 int
-dospit()
+dospit(void)
 {
     struct obj *otmp;
     struct attack *mattk;
@@ -1215,7 +1209,7 @@ dospit()
 }
 
 int
-doremove()
+doremove(void)
 {
     if (!Punished) {
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
@@ -1231,7 +1225,7 @@ doremove()
 }
 
 int
-dospinweb()
+dospinweb(void)
 {
     register struct trap *ttmp = t_at(u.ux, u.uy);
 
@@ -1349,7 +1343,7 @@ dospinweb()
 }
 
 int
-dosummon()
+dosummon(void)
 {
     int placeholder;
     if (u.uen < 10) {
@@ -1367,7 +1361,7 @@ dosummon()
 }
 
 int
-dogaze()
+dogaze(void)
 {
     register struct monst *mtmp;
     int looked = 0;
@@ -1504,7 +1498,7 @@ dogaze()
 }
 
 int
-dohide()
+dohide(void)
 {
     boolean ismimic = g.youmonst.data->mlet == S_MIMIC,
             on_ceiling = is_clinger(g.youmonst.data) || Flying;
@@ -1575,7 +1569,7 @@ dohide()
 }
 
 int
-dopoly()
+dopoly(void)
 {
     struct permonst *savedat = g.youmonst.data;
 
@@ -1592,7 +1586,7 @@ dopoly()
 
 /* #monster for hero-as-mind_flayer giving psychic blast */
 int
-domindblast()
+domindblast(void)
 {
     struct monst *mtmp, *nmon;
     int dmg;
@@ -1639,7 +1633,7 @@ domindblast()
 }
 
 void
-uunstick()
+uunstick(void)
 {
     struct monst *mtmp = u.ustuck;
 
@@ -1652,8 +1646,7 @@ uunstick()
 }
 
 void
-skinback(silently)
-boolean silently;
+skinback(boolean silently)
 {
     if (uskin) {
         if (!silently)
@@ -1666,9 +1659,7 @@ boolean silently;
 }
 
 const char *
-mbodypart(mon, part)
-struct monst *mon;
-int part;
+mbodypart(struct monst *mon, int part)
 {
     static NEARDATA const char
         *humanoid_parts[] = { "arm",       "eye",  "face",         "finger",
@@ -1825,14 +1816,13 @@ int part;
 }
 
 const char *
-body_part(part)
-int part;
+body_part(int part)
 {
     return mbodypart(&g.youmonst, part);
 }
 
 int
-poly_gender()
+poly_gender(void)
 {
     /* Returns gender of polymorphed player;
      * 0/1=same meaning as flags.female, 2=none.
@@ -1843,8 +1833,7 @@ poly_gender()
 }
 
 void
-ugolemeffects(damtype, dam)
-int damtype, dam;
+ugolemeffects(int damtype, int dam)
 {
     int heal = 0;
 
@@ -1875,8 +1864,7 @@ int damtype, dam;
 }
 
 static int
-armor_to_dragon(atyp)
-int atyp;
+armor_to_dragon(int atyp)
 {
     switch (atyp) {
     case GRAY_DRAGON_SCALE_MAIL:
@@ -1918,7 +1906,7 @@ int atyp;
 
 /* some species have awareness of other species */
 static void
-polysense()
+polysense(void)
 {
     short warnidx = NON_PM;
 
@@ -1947,7 +1935,7 @@ polysense()
 
 /* True iff hero's role or race has been genocided */
 boolean
-ugenocided()
+ugenocided(void)
 {
     return (boolean) ((g.mvitals[g.urole.malenum].mvflags & G_GENOD)
                       || (g.urole.femalenum != NON_PM
@@ -1959,7 +1947,7 @@ ugenocided()
 
 /* how hero feels "inside" after self-genocide of role or race */
 const char *
-udeadinside()
+udeadinside(void)
 {
     /* self-genocide used to always say "you feel dead inside" but that
        seems silly when you're polymorphed into something undead;

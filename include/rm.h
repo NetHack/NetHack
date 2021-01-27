@@ -650,8 +650,8 @@ typedef struct {
  * includes config.h instead of hack.h so doesn't see extern.h.
  */
 /* ### drawing.c ### */
-extern int FDECL(def_char_to_objclass, (CHAR_P));
-extern int FDECL(def_char_to_monclass, (CHAR_P));
-extern int FDECL(def_char_is_furniture, (CHAR_P));
+extern int def_char_to_objclass(char);
+extern int def_char_to_monclass(char);
+extern int def_char_is_furniture(char);
 
 #endif /* RM_H */

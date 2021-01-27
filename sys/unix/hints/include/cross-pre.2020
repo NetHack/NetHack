@@ -165,7 +165,11 @@ override TARGET_AR = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc-ar
 override TARGET_STUBEDIT = ../lib/djgpp/i586-pc-msdosdjgpp/bin/stubedit
 override TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) \
-	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS
+	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
+        -Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings \
+        -Wimplicit-function-declaration -Wimplicit-int \
+        -Wmissing-declarations -Wmissing-prototypes -Wmissing-parameter-type 
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc
 override TARGET_LFLAGS=

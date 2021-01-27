@@ -13,14 +13,14 @@
 #endif
 
 #ifdef POSITIONBAR
-static void NDECL(do_positionbar);
+static void do_positionbar(void);
 #endif
-static void FDECL(regen_hp, (int));
-static void FDECL(interrupt_multi, (const char *));
-static void FDECL(debug_fields, (const char *));
+static void regen_hp(int);
+static void interrupt_multi(const char *);
+static void debug_fields(const char *);
 
 void
-early_init()
+early_init(void)
 {
     decl_globals_init();
     objects_globals_init();
@@ -29,8 +29,7 @@ early_init()
 }
 
 void
-moveloop(resuming)
-boolean resuming;
+moveloop(boolean resuming)
 {
 #if defined(MICRO) || defined(WIN32)
     char ch;
@@ -465,8 +464,7 @@ boolean resuming;
 
 /* maybe recover some lost health (or lose some when an eel out of water) */
 static void
-regen_hp(wtcap)
-int wtcap;
+regen_hp(int wtcap)
 {
     int heal = 0;
     boolean reached_full = FALSE,
@@ -538,7 +536,7 @@ int wtcap;
 #undef U_CAN_REGEN
 
 void
-stop_occupation()
+stop_occupation(void)
 {
     if (g.occupation) {
         if (!maybe_finished_meal(TRUE))
@@ -553,7 +551,7 @@ stop_occupation()
 }
 
 void
-display_gamewindows()
+display_gamewindows(void)
 {
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
@@ -589,7 +587,7 @@ display_gamewindows()
 }
 
 void
-newgame()
+newgame(void)
 {
     int i;
 
@@ -657,8 +655,7 @@ newgame()
 
 /* show "welcome [back] to nethack" message at program startup */
 void
-welcome(new_game)
-boolean new_game; /* false => restoring an old game */
+welcome(boolean new_game) /* false => restoring an old game */
 {
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
@@ -698,7 +695,7 @@ boolean new_game; /* false => restoring an old game */
 
 #ifdef POSITIONBAR
 static void
-do_positionbar()
+do_positionbar(void)
 {
     static char pbar[COLNO];
     char *p;
@@ -731,8 +728,7 @@ do_positionbar()
 #endif
 
 static void
-interrupt_multi(msg)
-const char *msg;
+interrupt_multi(const char *msg)
 {
     if (g.multi > 0 && !g.context.travel && !g.context.run) {
         nomul(0);
@@ -764,7 +760,7 @@ static const struct early_opt earlyopts[] = {
 };
 
 #ifdef WIN32
-extern int FDECL(windows_early_options, (const char *));
+extern int windows_early_options(const char *);
 #endif
 
 /*
@@ -775,10 +771,7 @@ extern int FDECL(windows_early_options, (const char *));
  */
 
 int
-argcheck(argc, argv, e_arg)
-int argc;
-char *argv[];
-enum earlyarg e_arg;
+argcheck(int argc, char *argv[], enum earlyarg e_arg)
 {
     int i, idx;
     boolean match = FALSE;
@@ -867,8 +860,7 @@ enum earlyarg e_arg;
  *                    can be debugged without buffering.
  */
 static void
-debug_fields(opts)
-const char *opts;
+debug_fields(const char *opts)
 {
     char *op;
     boolean negated = FALSE;
