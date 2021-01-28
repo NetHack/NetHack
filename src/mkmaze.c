@@ -664,7 +664,7 @@ migr_booty_item(int otyp, const char* gang)
 }
 
 static void
-stolen_booty(VOID_ARGS)
+stolen_booty(void)
 {
     char *gang, gang_name[BUFSZ];
     struct monst *mtmp;

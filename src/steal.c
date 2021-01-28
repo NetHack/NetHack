@@ -144,7 +144,7 @@ thiefdead(void)
 /* called via (*g.afternmv)() when hero finishes taking off armor that
    was slated to be stolen but the thief died in the interim */
 static int
-unstolenarm(VOID_ARGS)
+unstolenarm(void)
 {
     struct obj *obj;
 
@@ -161,7 +161,7 @@ unstolenarm(VOID_ARGS)
 }
 
 static int
-stealarm(VOID_ARGS)
+stealarm(void)
 {
     register struct monst *mtmp;
     register struct obj *otmp;

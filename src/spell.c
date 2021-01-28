@@ -338,7 +338,7 @@ book_cursed(struct obj* book)
 }
 
 static int
-learn(VOID_ARGS)
+learn(void)
 {
     int i;
     short booktype;

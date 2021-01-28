@@ -898,3 +898,4 @@ adjust window port interface to pass a pointer to a glyph_info struct which
 	contains the glyph itself, the ttychar, the color, the glyphflags,
 	and the symset index; this affects two window port calls that get
 	passed glyphs: print_glyph() and add_menu().
+switch from k&r C to C99

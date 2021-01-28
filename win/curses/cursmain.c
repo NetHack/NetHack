@@ -25,7 +25,7 @@ static void dummy_update_position_bar(char *);
 #endif
 #ifdef CHANGE_COLOR
 static void dummy_change_color(int, long, int);
-static char *dummy_get_color_string(VOID_ARGS);
+static char *dummy_get_color_string(void);
 #endif
 
 /* Public functions for curses NetHack interface */
