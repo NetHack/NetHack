@@ -544,7 +544,7 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that
 # is too old or untested.
 #
-#NMAKE version 1428293350 from latest VS 2019 (December 8, 2020 version 16.8.3)
+#NMAKE version 1428293360 from latest VS 2019 (Jan, 2021 version 16.8.4)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -568,9 +568,9 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1428293351)
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1428293361)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1428293350)
+!ELSEIF ($(MAKEVERSION) > 1428293360)
 VSVER=2999              #untested future version
 !ENDIF
 
@@ -671,7 +671,15 @@ scall  =
 !ENDIF
 
 !IF ($(VSVER) >= 2012)
-cflags = $(cflags:-W4=-W3)
+#cflags = $(cflags:-W4=-W3)
+# 4131 old-style declarator
+# 4820 padding in struct
+# 4706 assignment within conditional
+# 4244 conversion possible loss of data
+# 4245 conversion from 'char' to 'uchar', signed/unsigned mismatch
+# 4100 unreferenced formal parameter
+#cflags = $(cflags:-W3=-W4) -wd4131 -wd4820 -wd4706 -wd4244 -wd4245 -wd4100
+cflags = $(cflags:-W3=-W4) -wd4820 -wd4706 -wd4244 -wd4245 -wd4100 -wd4310
 !ENDIF
 
 #More verbose warning output options below
@@ -1945,12 +1953,15 @@ $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)\dlb.h
 $(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
+#	$(cc) $(cflagsBuild) -Fo$@ /EP $(@B).c > $(@B).c.preproc
 $(O)do_wear.o: do_wear.c $(HACK_H)
 $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)\mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
+	$(cc) $(cflagsBuild) -Fo$@ $(@B).c
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
+#	$(cc) $(cflagsBuild) -Fo$@ /EP $(@B).c > $(@B).c.preproc
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)\dlb.h
 $(O)engrave.o: engrave.c $(HACK_H)
