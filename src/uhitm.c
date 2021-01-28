@@ -4043,18 +4043,12 @@ int
 damageum(struct monst *mdef, struct attack *mattk,
          int specialdmg) /* blessed and/or silver bonus against various things */
 {
-    int armpro;
-    boolean negated;
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = specialdmg;
     mhm.done = FALSE;
-
-    armpro = magic_negation(mdef);
-    /* since hero can't be cancelled, only defender's armor applies */
-    negated = !(rn2(10) >= 3 * armpro);
 
     if (is_demon(g.youmonst.data) && !rn2(13) && !uwep
         && u.umonnum != PM_AMOROUS_DEMON && u.umonnum != PM_BALROG) {
