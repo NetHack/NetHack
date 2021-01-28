@@ -3002,9 +3002,7 @@ mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 
 /* TODO: turn this into a commmon helper; multiple identical implementations */
 static int
-mswin_condcolor(bm, bmarray)
-long bm;
-unsigned long *bmarray;
+mswin_condcolor(long bm, unsigned long *bmarray)
 {
     int i;
 
@@ -3017,9 +3015,7 @@ unsigned long *bmarray;
 }
 
 static int
-mswin_condattr(bm, bmarray)
-long bm;
-unsigned long *bmarray;
+mswin_condattr(long bm, unsigned long *bmarray)
 {
     if (bm && bmarray) {
         if (bm & bmarray[HL_ATTCLR_DIM]) return HL_DIM;
