@@ -707,8 +707,8 @@ struct instance_globals {
     struct entity occupants[ENTITIES];
 
     /* decl.c */
-    int NDECL((*occupation));
-    int NDECL((*afternmv));
+    int (*occupation)(void);
+    int (*afternmv)(void);
     const char *hname; /* name of the game (argv[0] of main) */
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];

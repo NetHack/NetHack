@@ -13,22 +13,21 @@
 #include "wintty.h"
 #endif
 
-static const char *NDECL(intermed);
-static struct obj *FDECL(find_qarti, (struct obj *));
-static const char *NDECL(neminame);
-static const char *NDECL(guardname);
-static const char *NDECL(homebase);
-static void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
-static void FDECL(convert_arg, (CHAR_P));
-static void FDECL(convert_line, (char *,char *));
-static void FDECL(deliver_by_pline, (const char *));
-static void FDECL(deliver_by_window, (const char *, int));
-static boolean FDECL(skip_pager, (BOOLEAN_P));
-static boolean FDECL(com_pager_core, (const char *, const char *, BOOLEAN_P));
+static const char *intermed(void);
+static struct obj *find_qarti(struct obj *);
+static const char *neminame(void);
+static const char *guardname(void);
+static const char *homebase(void);
+static void qtext_pronoun(char, char);
+static void convert_arg(char);
+static void convert_line(char *,char *);
+static void deliver_by_pline(const char *);
+static void deliver_by_window(const char *, int);
+static boolean skip_pager(boolean);
+static boolean com_pager_core(const char *, const char *, boolean);
 
 short
-quest_info(typ)
-int typ;
+quest_info(int typ)
 {
     switch (typ) {
     case 0:
@@ -47,7 +46,7 @@ int typ;
 
 /* return your role leader's name */
 const char *
-ldrname()
+ldrname(void)
 {
     int i = g.urole.ldrnum;
 
@@ -58,21 +57,19 @@ ldrname()
 
 /* return your intermediate target string */
 static const char *
-intermed()
+intermed(void)
 {
     return g.urole.intermed;
 }
 
 boolean
-is_quest_artifact(otmp)
-struct obj *otmp;
+is_quest_artifact(struct obj *otmp)
 {
     return (boolean) (otmp->oartifact == g.urole.questarti);
 }
 
 static struct obj *
-find_qarti(ochain)
-struct obj *ochain;
+find_qarti(struct obj *ochain)
 {
     struct obj *otmp, *qarti;
 
@@ -88,8 +85,7 @@ struct obj *ochain;
 /* check several object chains for the quest artifact to determine
    whether it is present on the current level */
 struct obj *
-find_quest_artifact(whichchains)
-unsigned whichchains;
+find_quest_artifact(unsigned whichchains)
 {
     struct monst *mtmp;
     struct obj *qarti = 0;
@@ -124,7 +120,7 @@ unsigned whichchains;
 
 /* return your role nemesis' name */
 static const char *
-neminame()
+neminame(void)
 {
     int i = g.urole.neminum;
 
@@ -134,7 +130,7 @@ neminame()
 }
 
 static const char *
-guardname() /* return your role leader's guard monster name */
+guardname(void) /* return your role leader's guard monster name */
 {
     int i = g.urole.guardnum;
 
@@ -142,7 +138,7 @@ guardname() /* return your role leader's guard monster name */
 }
 
 static const char *
-homebase() /* return your role leader's location */
+homebase(void) /* return your role leader's location */
 {
     return g.urole.homebase;
 }
@@ -150,9 +146,9 @@ homebase() /* return your role leader's location */
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
 static void
-qtext_pronoun(who, which)
-char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
-    which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
+qtext_pronoun(char who,   /* 'd' => deity, 'l' => leader, 'n' => nemesis,
+                             'o' => artifact */
+              char which) /* 'h'|'H'|'i'|'I'|'j'|'J' */
 {
     const char *pnoun;
     int godgend;
@@ -187,8 +183,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
 }
 
 static void
-convert_arg(c)
-char c;
+convert_arg(char c)
 {
     register const char *str;
 
@@ -279,8 +274,7 @@ char c;
 }
 
 static void
-convert_line(in_line, out_line)
-char *in_line, *out_line;
+convert_line(char *in_line, char *out_line)
 {
     char *c, *cc;
 
@@ -372,8 +366,7 @@ char *in_line, *out_line;
 }
 
 static void
-deliver_by_pline(str)
-const char *str;
+deliver_by_pline(const char *str)
 {
     const char *msgp = str;
     const char *msgend = eos((char *)str);
@@ -395,9 +388,7 @@ const char *str;
 }
 
 static void
-deliver_by_window(msg, how)
-const char *msg;
-int how;
+deliver_by_window(const char *msg, int how)
 {
     const char *msgp = msg;
     const char *msgend = eos((char *)msg);
@@ -423,8 +414,7 @@ int how;
 }
 
 static boolean
-skip_pager(common)
-boolean common UNUSED;
+skip_pager(boolean common UNUSED)
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (g.program_state.wizkit_wishing)
@@ -433,10 +423,7 @@ boolean common UNUSED;
 }
 
 static boolean
-com_pager_core(section, msgid, showerror)
-const char *section;
-const char *msgid;
-boolean showerror;
+com_pager_core(const char *section, const char *msgid, boolean showerror)
 {
     static const char *const howtoput[] = {
         "pline", "window", "text", "menu", "default", NULL
@@ -560,22 +547,20 @@ boolean showerror;
 }
 
 void
-com_pager(msgid)
-const char *msgid;
+com_pager(const char *msgid)
 {
     com_pager_core("common", msgid, TRUE);
 }
 
 void
-qt_pager(msgid)
-const char *msgid;
+qt_pager(const char *msgid)
 {
     if (!com_pager_core(g.urole.filecode, msgid, FALSE))
         com_pager_core("common", msgid, TRUE);
 }
 
 struct permonst *
-qt_montype()
+qt_montype(void)
 {
     int qpm;
 
@@ -593,7 +578,7 @@ qt_montype()
 
 /* special levels can include a custom arrival message; display it */
 void
-deliver_splev_message()
+deliver_splev_message(void)
 {
     char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
 

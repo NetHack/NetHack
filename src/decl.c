@@ -704,7 +704,7 @@ const glyph_info nul_glyphinfo =
 #define ZERO(x) memset(&x, 0, sizeof(x))
 
 void
-decl_globals_init()
+decl_globals_init(void)
 {
     g = g_init;
 

@@ -68,9 +68,8 @@ endif  # clang
 # leave it out by default.
 #CFLAGS+=-Wunreachable-code
 #
-# Can't use these; NetHack uses old-style-definitions
-#CFLAGS+=-Wold-style-definition
-#CFLAGS+=-Wstrict-prototypes
+CFLAGS+=-Wold-style-definition
+CFLAGS+=-Wstrict-prototypes
 
 #end of compiler.2020
 #------------------------------------------------------------------------------

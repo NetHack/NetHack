@@ -18,7 +18,7 @@
 #ifdef LAN_FEATURES
 
 void
-init_lan_features()
+init_lan_features(void)
 {
     lan_username();
 }
@@ -29,7 +29,7 @@ init_lan_features()
  */
 
 char *
-lan_username()
+lan_username(void)
 {
     char *lu;
     lu = get_username(&g.lusername_size);

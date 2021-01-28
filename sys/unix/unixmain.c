@@ -19,36 +19,34 @@
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
 #if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
 #if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid, (uid_t));
+extern struct passwd *getpwuid(uid_t);
 #else
-extern struct passwd *FDECL(getpwuid, (int));
+extern struct passwd *getpwuid(int);
 #endif
 #endif
 #endif
-extern struct passwd *FDECL(getpwnam, (const char *));
+extern struct passwd *getpwnam(const char *);
 #ifdef CHDIR
-static void FDECL(chdirx, (const char *, BOOLEAN_P));
+static void chdirx(const char *, boolean);
 #endif /* CHDIR */
-static boolean NDECL(whoami);
-static void FDECL(process_options, (int, char **));
+static boolean whoami(void);
+static void process_options(int, char **);
 
 #ifdef _M_UNIX
-extern void NDECL(check_sco_console);
-extern void NDECL(init_sco_cons);
+extern void check_sco_console(void);
+extern void init_sco_cons(void);
 #endif
 #ifdef __linux__
-extern void NDECL(check_linux_console);
-extern void NDECL(init_linux_cons);
+extern void check_linux_console(void);
+extern void init_linux_cons(void);
 #endif
 
-static void NDECL(wd_message);
+static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
-static struct passwd *NDECL(get_unix_pw);
+static struct passwd *get_unix_pw(void);
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
 #ifdef CHDIR
     register char *dir;
@@ -343,9 +341,7 @@ char *argv[];
 
 /* caveat: argv elements might be arbitrary long */
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i, l;
 
@@ -465,9 +461,7 @@ char *argv[];
 
 #ifdef CHDIR
 static void
-chdirx(dir, wr)
-const char *dir;
-boolean wr;
+chdirx(const char *dir, boolean wr)
 {
     if (dir /* User specified directory? */
 #ifdef HACKDIR
@@ -525,7 +519,7 @@ boolean wr;
 
 /* returns True iff we set plname[] to username which contains a hyphen */
 static boolean
-whoami()
+whoami(void)
 {
     /*
      * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
@@ -557,8 +551,7 @@ whoami()
 }
 
 void
-sethanguphandler(handler)
-void FDECL((*handler), (int));
+sethanguphandler(void (*handler)(int))
 {
 #ifdef SA_RESTART
     /* don't want reads to restart.  If SA_RESTART is defined, we know
@@ -585,7 +578,7 @@ void FDECL((*handler), (int));
 
 #ifdef PORT_HELP
 void
-port_help()
+port_help(void)
 {
     /*
      * Display unix-specific help.   Just show contents of the helpfile
@@ -597,7 +590,7 @@ port_help()
 
 /* validate wizard mode if player has requested access to it */
 boolean
-authorize_wizard_mode()
+authorize_wizard_mode(void)
 {
     struct passwd *pw = get_unix_pw();
 
@@ -610,7 +603,7 @@ authorize_wizard_mode()
 }
 
 static void
-wd_message()
+wd_message(void)
 {
     if (wiz_error_flag) {
         if (sysopt.wizards && sysopt.wizards[0]) {
@@ -630,8 +623,7 @@ wd_message()
  * be room for the /
  */
 void
-append_slash(name)
-char *name;
+append_slash(char *name)
 {
     char *ptr;
 
@@ -646,8 +638,7 @@ char *name;
 }
 
 boolean
-check_user_string(optstr)
-const char *optstr;
+check_user_string(const char *optstr)
 {
     struct passwd *pw;
     int pwlen;
@@ -683,7 +674,7 @@ const char *optstr;
 }
 
 static struct passwd *
-get_unix_pw()
+get_unix_pw(void)
 {
     char *user;
     unsigned uid;
@@ -714,7 +705,7 @@ get_unix_pw()
 }
 
 char *
-get_login_name()
+get_login_name(void)
 {
     static char buf[BUFSZ];
     struct passwd *pw = get_unix_pw();
@@ -730,8 +721,7 @@ get_login_name()
 extern int errno;
 
 void
-port_insert_pastebuf(buf)
-char *buf;
+port_insert_pastebuf(char *buf)
 {
     /* This should be replaced when there is a Cocoa port. */
     const char *errfmt;
@@ -765,7 +755,7 @@ char *buf;
 #endif /* __APPLE__ */
 
 unsigned long
-sys_random_seed()
+sys_random_seed(void)
 {
     unsigned long seed = 0L;
     unsigned long pid = (unsigned long) getpid();

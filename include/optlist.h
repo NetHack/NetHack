@@ -12,7 +12,7 @@
  *         updates that should accompany your change.
  */
 
-extern int FDECL(optfn_boolean, (int, int, BOOLEAN_P, char *, char *));
+static int optfn_boolean(int, int, boolean, char *, char *);
 enum OptType {BoolOpt, CompOpt};
 enum Y_N {No, Yes};
 enum Off_On {Off, On};
@@ -29,7 +29,7 @@ struct allopt_t {
     enum Y_N dupeok;
     enum Y_N pfx;
     boolean opt_in_out, *addr;
-    int FDECL((*optfn), (int, int, BOOLEAN_P, char *, char *));
+    int (*optfn)(int, int, boolean, char *, char *);
     const char *alias;
     const char *descr;
     const char *prefixgw;
@@ -45,9 +45,9 @@ struct allopt_t {
 #if defined(NHOPT_PROTO)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp)
 #define NHOPTC(a, b, c, s, n, v, d, h, al, z) \
-int FDECL(optfn_##a, (int, int, BOOLEAN_P, char *, char *));
+static int optfn_##a(int, int, boolean, char *, char *);
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
-int FDECL(pfxfn_##a, (int, int, BOOLEAN_P, char *, char *));
+static int pfxfn_##a(int, int, boolean, char *, char *);
 
 #elif defined(NHOPT_ENUM)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp) \

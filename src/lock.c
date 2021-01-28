@@ -6,16 +6,15 @@
 #include "hack.h"
 
 /* occupation callbacks */
-static int NDECL(picklock);
-static int NDECL(forcelock);
+static int picklock(void);
+static int forcelock(void);
 
-static const char *NDECL(lock_action);
-static boolean FDECL(obstructed, (int, int, BOOLEAN_P));
-static void FDECL(chest_shatter_msg, (struct obj *));
+static const char *lock_action(void);
+static boolean obstructed(int, int, boolean);
+static void chest_shatter_msg(struct obj *);
 
 boolean
-picking_lock(x, y)
-int *x, *y;
+picking_lock(int *x, int *y)
 {
     if (g.occupation == picklock) {
         *x = u.ux + u.dx;
@@ -28,15 +27,14 @@ int *x, *y;
 }
 
 boolean
-picking_at(x, y)
-int x, y;
+picking_at(int x, int y)
 {
     return (boolean) (g.occupation == picklock && g.xlock.door == &levl[x][y]);
 }
 
 /* produce an occupation string appropriate for the current activity */
 static const char *
-lock_action()
+lock_action(void)
 {
     /* "unlocking"+2 == "locking" */
     static const char *actions[] = {
@@ -66,7 +64,7 @@ lock_action()
 
 /* try to open/close a lock */
 static int
-picklock(VOID_ARGS)
+picklock(void)
 {
     if (g.xlock.box) {
         if (g.xlock.box->where != OBJ_FLOOR
@@ -157,9 +155,7 @@ picklock(VOID_ARGS)
 }
 
 void
-breakchestlock(box, destroyit)
-struct obj *box;
-boolean destroyit;
+breakchestlock(struct obj *box, boolean destroyit)
 {
     if (!destroyit) { /* bill for the box but not for its contents */
         struct obj *hide_contents = box->cobj;
@@ -212,7 +208,7 @@ boolean destroyit;
 
 /* try to force a locked chest */
 static int
-forcelock(VOID_ARGS)
+forcelock(void)
 {
     if ((g.xlock.box->ox != u.ux) || (g.xlock.box->oy != u.uy))
         return ((g.xlock.usedtime = 0)); /* you or it moved */
@@ -255,7 +251,7 @@ forcelock(VOID_ARGS)
 }
 
 void
-reset_pick()
+reset_pick(void)
 {
     g.xlock.usedtime = g.xlock.chance = g.xlock.picktyp = 0;
     g.xlock.magic_key = FALSE;
@@ -265,8 +261,7 @@ reset_pick()
 
 /* level change or object deletion; context may no longer be valid */
 void
-maybe_reset_pick(container)
-struct obj *container; /* passed from obfree() */
+maybe_reset_pick(struct obj *container) /* passed from obfree() */
 {
     /*
      * If a specific container, only clear context if it is for that
@@ -286,8 +281,7 @@ struct obj *container; /* passed from obfree() */
 
 /* pick a tool for autounlock */
 struct obj *
-autokey(opening)
-boolean opening; /* True: key, pick, or card; False: key or pick */
+autokey(boolean opening) /* True: key, pick, or card; False: key or pick */
 {
     struct obj *o, *key, *pick, *card, *akey, *apick, *acard;
 
@@ -354,11 +348,11 @@ boolean opening; /* True: key, pick, or card; False: key or pick */
 
 /* player is applying a key, lock pick, or credit card */
 int
-pick_lock(pick, rx, ry, container)
-struct obj *pick;
-xchar rx, ry; /* coordinates of doors/container, for autounlock: does not
-                 prompt for direction if these are set */
-struct obj *container; /* container, for autounlock */
+pick_lock(struct obj *pick,
+          xchar rx, xchar ry, /* coordinates of doors/container,
+                                 for autounlock: does not prompt
+                                 for direction if these are set */
+          struct obj *container) /* container, for autounlock */
 {
     int picktyp, c, ch;
     coord cc;
@@ -608,7 +602,7 @@ struct obj *container; /* container, for autounlock */
 
 /* try to force a chest with your weapon */
 int
-doforce()
+doforce(void)
 {
     register struct obj *otmp;
     register int c, picktyp;
@@ -688,8 +682,7 @@ doforce()
 }
 
 boolean
-stumble_on_door_mimic(x, y)
-int x, y;
+stumble_on_door_mimic(int x, int y)
 {
     struct monst *mtmp;
 
@@ -703,15 +696,14 @@ int x, y;
 
 /* the 'O' command - try to open a door */
 int
-doopen()
+doopen(void)
 {
     return doopen_indir(0, 0);
 }
 
 /* try to open a door in direction u.dx/u.dy */
 int
-doopen_indir(x, y)
-int x, y;
+doopen_indir(int x, int y)
 {
     coord cc;
     register struct rm *door;
@@ -825,9 +817,7 @@ int x, y;
 }
 
 static boolean
-obstructed(x, y, quietly)
-register int x, y;
-boolean quietly;
+obstructed(register int x, register int y, boolean quietly)
 {
     register struct monst *mtmp = m_at(x, y);
 
@@ -860,7 +850,7 @@ boolean quietly;
 
 /* the 'C' command - try to close a door */
 int
-doclose()
+doclose(void)
 {
     register int x, y;
     register struct rm *door;
@@ -958,8 +948,7 @@ doclose()
 /* box obj was hit with spell or wand effect otmp;
    returns true if something happened */
 boolean
-boxlock(obj, otmp)
-struct obj *obj, *otmp; /* obj *is* a box */
+boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
 {
     boolean res = 0;
 
@@ -1004,9 +993,7 @@ struct obj *obj, *otmp; /* obj *is* a box */
 /* Door/secret door was hit with spell or wand effect otmp;
    returns true if something happened */
 boolean
-doorlock(otmp, x, y)
-struct obj *otmp;
-int x, y;
+doorlock(struct obj *otmp, int x, int y)
 {
     register struct rm *door = &levl[x][y];
     boolean res = TRUE;
@@ -1158,8 +1145,7 @@ int x, y;
 }
 
 static void
-chest_shatter_msg(otmp)
-struct obj *otmp;
+chest_shatter_msg(struct obj *otmp)
 {
     const char *disposition;
     const char *thing;

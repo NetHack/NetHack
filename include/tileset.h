@@ -16,16 +16,16 @@ struct TileImage {
     unsigned char *indexes; /* for paletted images */
 };
 
-boolean FDECL(read_tiles, (const char *filename, BOOLEAN_P true_color));
-const struct Pixel *NDECL(get_palette);
-void FDECL(set_tile_type, (BOOLEAN_P true_color));
-void NDECL(free_tiles);
-const struct TileImage *FDECL(get_tile, (unsigned tile_index));
+boolean read_tiles(const char *filename, boolean true_color);
+const struct Pixel *get_palette(void);
+void set_tile_type(boolean true_color);
+void free_tiles(void);
+const struct TileImage *get_tile(unsigned tile_index);
 
 /* For resizing tiles */
-struct TileImage *FDECL(stretch_tile, (const struct TileImage *,
-                                       unsigned, unsigned));
-void FDECL(free_tile, (struct TileImage *));
+struct TileImage *stretch_tile(const struct TileImage *, unsigned,
+                               unsigned);
+void free_tile(struct TileImage *);
 
 /* Used internally by the tile set code */
 struct TileSetImage {
@@ -42,11 +42,8 @@ struct TileSetImage {
     unsigned tile_width, tile_height;
 };
 
-boolean FDECL(read_bmp_tiles, (const char *filename,
-                               struct TileSetImage *image));
-boolean FDECL(read_gif_tiles, (const char *filename,
-                               struct TileSetImage *image));
-boolean FDECL(read_png_tiles, (const char *filename,
-                               struct TileSetImage *image));
+boolean read_bmp_tiles(const char *filename, struct TileSetImage *image);
+boolean read_gif_tiles(const char *filename, struct TileSetImage *image);
+boolean read_png_tiles(const char *filename, struct TileSetImage *image);
 
 #endif

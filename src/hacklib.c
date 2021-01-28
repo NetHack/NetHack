@@ -83,45 +83,40 @@
 #define Static static
 #endif
 
-static boolean FDECL(pmatch_internal, (const char *, const char *,
-                                       BOOLEAN_P, const char *));
+static boolean pmatch_internal(const char *, const char *, boolean,
+                               const char *);
 
 /* is 'c' a digit? */
 boolean
-digit(c)
-char c;
+digit(char c)
 {
     return (boolean) ('0' <= c && c <= '9');
 }
 
 /* is 'c' a letter?  note: '@' classed as letter */
 boolean
-letter(c)
-char c;
+letter(char c)
 {
     return (boolean) ('@' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
 }
 
 /* force 'c' into uppercase */
 char
-highc(c)
-char c;
+highc(char c)
 {
     return (char) (('a' <= c && c <= 'z') ? (c & ~040) : c);
 }
 
 /* force 'c' into lowercase */
 char
-lowc(c)
-char c;
+lowc(char c)
 {
     return (char) (('A' <= c && c <= 'Z') ? (c | 040) : c);
 }
 
 /* convert a string into all lowercase */
 char *
-lcase(s)
-char *s;
+lcase(char *s)
 {
     register char *p;
 
@@ -133,8 +128,7 @@ char *s;
 
 /* convert a string into all uppercase */
 char *
-ucase(s)
-char *s;
+ucase(char *s)
 {
     register char *p;
 
@@ -146,8 +140,7 @@ char *s;
 
 /* convert first character of a string to uppercase */
 char *
-upstart(s)
-char *s;
+upstart(char *s)
 {
     if (s)
         *s = highc(*s);
@@ -156,8 +149,7 @@ char *s;
 
 /* remove excess whitespace from a string buffer (in place) */
 char *
-mungspaces(bp)
-char *bp;
+mungspaces(char *bp)
 {
     register char c, *p, *p2;
     boolean was_space = TRUE;
@@ -179,8 +171,7 @@ char *bp;
 
 /* skip leading whitespace; remove trailing whitespace, in place */
 char *
-trimspaces(txt)
-char *txt;
+trimspaces(char *txt)
 {
     char *end;
 
@@ -196,8 +187,7 @@ char *txt;
 
 /* remove \n from end of line; remove \r too if one is there */
 char *
-strip_newline(str)
-char *str;
+strip_newline(char *str)
 {
     char *p = rindex(str, '\n');
 
@@ -211,8 +201,7 @@ char *str;
 
 /* return the end of a string (pointing at '\0') */
 char *
-eos(s)
-register char *s;
+eos(register char *s)
 {
     while (*s)
         s++; /* s += strlen(s); */
@@ -221,8 +210,7 @@ register char *s;
 
 /* determine whether 'str' ends in 'chkstr' */
 boolean
-str_end_is(str, chkstr)
-const char *str, *chkstr;
+str_end_is(const char *str, const char *chkstr)
 {
     int clen = (int) strlen(chkstr);
 
@@ -233,8 +221,7 @@ const char *str, *chkstr;
 
 /* return the max line length from buffer comprising of newline-separated strings */
 int
-str_lines_maxlen(str)
-const char *str;
+str_lines_maxlen(const char *str)
 {
     const char *s1, *s2;
     int len, max_len = 0;
@@ -258,9 +245,7 @@ const char *str;
 
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
 char *
-strkitten(s, c)
-char *s;
-char c;
+strkitten(char *s, char c)
 {
     char *p = eos(s);
 
@@ -271,10 +256,7 @@ char c;
 
 /* truncating string copy */
 void
-copynchars(dst, src, n)
-char *dst;
-const char *src;
-int n;
+copynchars(char *dst, const char *src, int n)
 {
     /* copies at most n characters, stopping sooner if terminator reached;
        treats newline as input terminator; unlike strncpy, always supplies
@@ -288,8 +270,7 @@ int n;
 
 /* convert char nc into oc's case; mostly used by strcasecpy */
 char
-chrcasecpy(oc, nc)
-int oc, nc;
+chrcasecpy(int oc, int nc)
 {
 #if 0 /* this will be necessary if we switch to <ctype.h> */
     oc = (int) (unsigned char) oc;
@@ -311,9 +292,7 @@ int oc, nc;
    for case-insensitive editions of makeplural() and makesingular();
    src might be shorter, same length, or longer than dst */
 char *
-strcasecpy(dst, src)
-char *dst;
-const char *src;
+strcasecpy(char *dst, const char *src)
 {
     char *result = dst;
     int ic, oc, dst_exhausted = 0;
@@ -335,8 +314,7 @@ const char *src;
 
 /* return a name converted to possessive */
 char *
-s_suffix(s)
-const char *s;
+s_suffix(const char *s)
 {
     Static char buf[BUFSZ];
 
@@ -354,8 +332,7 @@ const char *s;
 
 /* construct a gerund (a verb formed by appending "ing" to a noun) */
 char *
-ing_suffix(s)
-const char *s;
+ing_suffix(const char *s)
 {
     static const char vowel[] = "aeiouwy";
     static char buf[BUFSZ];
@@ -390,9 +367,7 @@ const char *s;
 
 /* trivial text encryption routine (see makedefs) */
 char *
-xcrypt(str, buf)
-const char *str;
-char *buf;
+xcrypt(const char *str, char *buf)
 {
     register const char *p;
     register char *q;
@@ -411,8 +386,7 @@ char *buf;
 
 /* is a string entirely whitespace? */
 boolean
-onlyspace(s)
-const char *s;
+onlyspace(const char *s)
 {
     for (; *s; s++)
         if (*s != ' ' && *s != '\t')
@@ -422,9 +396,9 @@ const char *s;
 
 /* expand tabs into proper number of spaces (in place) */
 char *
-tabexpand(sbuf)
-char *sbuf; /* assumed to be [BUFSZ] but can be smaller provided that expanded
-             * string fits; expansion bigger than BUFSZ-1 will be truncated */
+tabexpand(char *sbuf) /* assumed to be [BUFSZ] but can be smaller provided that
+                       * expanded string fits; expansion bigger than BUFSZ-1
+                       * will be truncated */
 {
     char buf[BUFSZ + 10];
     register char *bp, *s = sbuf;
@@ -461,8 +435,7 @@ char *sbuf; /* assumed to be [BUFSZ] but can be smaller provided that expanded
 #define VISCTRL_NBUF 5
 /* make a displayable string from a character */
 char *
-visctrl(c)
-char c;
+visctrl(char c)
 {
     Static char visctrl_bufs[VISCTRL_NBUF][5];
     static int nbuf = 0;
@@ -492,9 +465,7 @@ char c;
 /* caller is responsible for ensuring that bp is a
    valid pointer to a BUFSZ buffer */
 char *
-stripchars(bp, stuff_to_strip, orig)
-char *bp;
-const char *stuff_to_strip, *orig;
+stripchars(char *bp, const char *stuff_to_strip, const char *orig)
 {
     int i = 0;
     char *s = bp;
@@ -515,8 +486,7 @@ const char *stuff_to_strip, *orig;
 
 /* remove digits from string */
 char *
-stripdigits(s)
-char *s;
+stripdigits(char *s)
 {
     char *s1, *s2;
 
@@ -531,9 +501,7 @@ char *s;
 /* substitute a word or phrase in a string (in place) */
 /* caller is responsible for ensuring that bp points to big enough buffer */
 char *
-strsubst(bp, orig, replacement)
-char *bp;
-const char *orig, *replacement;
+strsubst(char *bp, const char *orig, const char *replacement)
 {
     char *found, buf[BUFSZ];
 
@@ -553,11 +521,10 @@ const char *orig, *replacement;
    if N is 0, substitute all occurrences; returns the number of subsitutions;
    maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
 int
-strNsubst(inoutbuf, orig, replacement, n)
-char *inoutbuf; /* current string, and result buffer */
-const char *orig, /* old substring; if "" then insert in front of Nth char */
-           *replacement; /* new substring; if "" then delete old substring */
-int n; /* which occurrence to replace; 0 => all */
+strNsubst(char *inoutbuf,   /* current string, and result buffer */
+          const char *orig, /* old substring; if "" then insert in front of Nth char */
+          const char *replacement, /* new substring; if "" then delete old substring */
+          int n) /* which occurrence to replace; 0 => all */
 {
     char *bp, *op, workbuf[BUFSZ];
     const char *rp;
@@ -597,8 +564,7 @@ int n; /* which occurrence to replace; 0 => all */
 
 /* return the ordinal suffix of a number */
 const char *
-ordin(n)
-int n;               /* note: should be non-negative */
+ordin(int n)               /* note: should be non-negative */
 {
     register int dd = n % 10;
 
@@ -608,8 +574,7 @@ int n;               /* note: should be non-negative */
 
 /* make a signed digit string from a number */
 char *
-sitoa(n)
-int n;
+sitoa(int n)
 {
     Static char buf[13];
 
@@ -619,17 +584,14 @@ int n;
 
 /* return the sign of a number: -1, 0, or 1 */
 int
-sgn(n)
-int n;
+sgn(int n)
 {
     return (n < 0) ? -1 : (n != 0);
 }
 
 /* calculate x/y, rounding as appropriate */
 int
-rounddiv(x, y)
-long x;
-int y;
+rounddiv(long x, int y)
 {
     int r, m;
     int divsgn = 1;
@@ -654,8 +616,7 @@ int y;
 
 /* distance between two points, in moves */
 int
-distmin(x0, y0, x1, y1)
-int x0, y0, x1, y1;
+distmin(int x0, int y0, int x1, int y1)
 {
     register int dx = x0 - x1, dy = y0 - y1;
 
@@ -671,8 +632,7 @@ int x0, y0, x1, y1;
 
 /* square of euclidean distance between pair of pts */
 int
-dist2(x0, y0, x1, y1)
-int x0, y0, x1, y1;
+dist2(int x0, int y0, int x1, int y1)
 {
     register int dx = x0 - x1, dy = y0 - y1;
 
@@ -681,8 +641,7 @@ int x0, y0, x1, y1;
 
 /* integer square root function without using floating point */
 int
-isqrt(val)
-int val;
+isqrt(int val)
 {
     int rt = 0;
     int odd = 1;
@@ -704,8 +663,7 @@ int val;
 
 /* are two points lined up (on a straight line)? */
 boolean
-online2(x0, y0, x1, y1)
-int x0, y0, x1, y1;
+online2(int x0, int y0, int x1, int y1)
 {
     int dx = x0 - x1, dy = y0 - y1;
     /*  If either delta is zero then they're on an orthogonal line,
@@ -717,10 +675,10 @@ int x0, y0, x1, y1;
 /* guts of pmatch(), pmatchi(), and pmatchz();
    match a string against a pattern */
 static boolean
-pmatch_internal(patrn, strng, ci, sk)
-const char *patrn, *strng;
-boolean ci;     /* True => case-insensitive, False => case-sensitive */
-const char *sk; /* set of characters to skip */
+pmatch_internal(const char *patrn, const char *strng,
+                boolean ci,     /* True => case-insensitive,
+                                   False => case-sensitive */
+                const char *sk) /* set of characters to skip */
 {
     char s, p;
     /*
@@ -757,24 +715,21 @@ pmatch_top:
 
 /* case-sensitive wildcard match */
 boolean
-pmatch(patrn, strng)
-const char *patrn, *strng;
+pmatch(const char *patrn, const char *strng)
 {
     return pmatch_internal(patrn, strng, FALSE, (const char *) 0);
 }
 
 /* case-insensitive wildcard match */
 boolean
-pmatchi(patrn, strng)
-const char *patrn, *strng;
+pmatchi(const char *patrn, const char *strng)
 {
     return pmatch_internal(patrn, strng, TRUE, (const char *) 0);
 }
 
 /* case-insensitive wildcard fuzzymatch */
 boolean
-pmatchz(patrn, strng)
-const char *patrn, *strng;
+pmatchz(const char *patrn, const char *strng)
 {
     /* ignore spaces, tabs (just in case), dashes, and underscores */
     static const char fuzzychars[] = " \t-_";
@@ -784,10 +739,10 @@ const char *patrn, *strng;
 
 #ifndef STRNCMPI
 /* case insensitive counted string comparison */
+/*{ aka strncasecmp }*/
 int
-strncmpi(s1, s2, n) /*{ aka strncasecmp }*/
-register const char *s1, *s2;
-register int n; /*(should probably be size_t, which is unsigned)*/
+strncmpi(register const char *s1, register const char *s2,
+         register int n) /*(should probably be size_t, which is unsigned)*/
 {
     register char t1, t2;
 
@@ -808,9 +763,7 @@ register int n; /*(should probably be size_t, which is unsigned)*/
 #ifndef STRSTRI
 /* case insensitive substring search */
 char *
-strstri(str, sub)
-const char *str;
-const char *sub;
+strstri(const char *str, const char *sub)
 {
     register const char *s1, *s2;
     register int i, k;
@@ -855,10 +808,8 @@ const char *sub;
 /* compare two strings for equality, ignoring the presence of specified
    characters (typically whitespace) and possibly ignoring case */
 boolean
-fuzzymatch(s1, s2, ignore_chars, caseblind)
-const char *s1, *s2;
-const char *ignore_chars;
-boolean caseblind;
+fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
+           boolean caseblind)
 {
     register char c1, c2;
 
@@ -907,17 +858,16 @@ boolean caseblind;
 
 #if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) \
     && !defined(_DCC) && !defined(__GNUC__)
-extern struct tm *FDECL(localtime, (time_t *));
+extern struct tm *localtime(time_t *);
 #endif
-static struct tm *NDECL(getlt);
+static struct tm *getlt(void);
 
 /* Sets the seed for the random number generator */
 #ifdef USE_ISAAC64
 
 static void
-set_random(seed, fn)
-unsigned long seed;
-int FDECL((*fn), (int));
+set_random(unsigned long seed,
+           int (*fn)(int))
 {
     init_isaac64(seed, fn);
 }
@@ -926,9 +876,8 @@ int FDECL((*fn), (int));
 
 /*ARGSUSED*/
 static void
-set_random(seed, fn)
-unsigned long seed;
-int FDECL((*fn), (int)) UNUSED;
+set_random(unsigned long seed,
+           int (*fn)(int) UNUSED)
 {
     /* the types are different enough here that sweeping the different
      * routine names into one via #defines is even more confusing
@@ -957,23 +906,21 @@ int FDECL((*fn), (int)) UNUSED;
 /* An appropriate version of this must always be provided in
    port-specific code somewhere. It returns a number suitable
    as seed for the random number generator */
-extern unsigned long NDECL(sys_random_seed);
+extern unsigned long sys_random_seed(void);
 
 /*
  * Initializes the random number generator.
  * Only call once.
  */
 void
-init_random(fn)
-int FDECL((*fn), (int));
+init_random(int (*fn)(int))
 {
     set_random(sys_random_seed(), fn);
 }
 
 /* Reshuffles the random number generator. */
 void
-reseed_random(fn)
-int FDECL((*fn), (int));
+reseed_random(int (*fn)(int))
 {
    /* only reseed if we are certain that the seed generation is unguessable
     * by the players. */
@@ -982,7 +929,7 @@ int FDECL((*fn), (int));
 }
 
 time_t
-getnow()
+getnow(void)
 {
     time_t datetime = 0;
 
@@ -991,7 +938,7 @@ getnow()
 }
 
 static struct tm *
-getlt()
+getlt(void)
 {
     time_t date = getnow();
 
@@ -999,7 +946,7 @@ getlt()
 }
 
 int
-getyear()
+getyear(void)
 {
     return (1900 + getlt()->tm_year);
 }
@@ -1007,8 +954,7 @@ getyear()
 #if 0
 /* This routine is no longer used since in 20YY it yields "1YYmmdd". */
 char *
-yymmdd(date)
-time_t date;
+yymmdd(time_t date)
 {
     Static char datestr[10];
     struct tm *lt;
@@ -1025,8 +971,7 @@ time_t date;
 #endif
 
 long
-yyyymmdd(date)
-time_t date;
+yyyymmdd(time_t date)
 {
     long datenum;
     struct tm *lt;
@@ -1050,8 +995,7 @@ time_t date;
 }
 
 long
-hhmmss(date)
-time_t date;
+hhmmss(time_t date)
 {
     long timenum;
     struct tm *lt;
@@ -1066,8 +1010,7 @@ time_t date;
 }
 
 char *
-yyyymmddhhmmss(date)
-time_t date;
+yyyymmddhhmmss(time_t date)
 {
     long datenum;
     static char datestr[15];
@@ -1095,8 +1038,7 @@ time_t date;
 }
 
 time_t
-time_from_yyyymmddhhmmss(buf)
-char *buf;
+time_from_yyyymmddhhmmss(char *buf)
 {
     int k;
     time_t timeresult = (time_t) 0;
@@ -1163,7 +1105,7 @@ char *buf;
  * + 11/22 for rounding
  */
 int
-phase_of_the_moon() /* 0-7, with 0: new, 4: full */
+phase_of_the_moon(void) /* 0-7, with 0: new, 4: full */
 {
     register struct tm *lt = getlt();
     register int epact, diy, goldn;
@@ -1178,7 +1120,7 @@ phase_of_the_moon() /* 0-7, with 0: new, 4: full */
 }
 
 boolean
-friday_13th()
+friday_13th(void)
 {
     register struct tm *lt = getlt();
 
@@ -1187,7 +1129,7 @@ friday_13th()
 }
 
 int
-night()
+night(void)
 {
     register int hour = getlt()->tm_hour;
 
@@ -1195,15 +1137,14 @@ night()
 }
 
 int
-midnight()
+midnight(void)
 {
     return (getlt()->tm_hour == 0);
 }
 
 /* strbuf_init() initializes strbuf state for use */
 void
-strbuf_init(strbuf)
-strbuf_t *strbuf;
+strbuf_init(strbuf_t *strbuf)
 {
     strbuf->str = NULL;
     strbuf->len = 0;
@@ -1211,9 +1152,7 @@ strbuf_t *strbuf;
 
 /* strbuf_append() appends given str to strbuf->str */
 void
-strbuf_append(strbuf, str)
-strbuf_t *strbuf;
-const char *str;
+strbuf_append(strbuf_t *strbuf, const char *str)
 {
     int len = (int) strlen(str) + 1;
 
@@ -1224,9 +1163,7 @@ const char *str;
 
 /* strbuf_reserve() ensure strbuf->str has storage for len characters */
 void
-strbuf_reserve(strbuf, len)
-strbuf_t *strbuf;
-int len;
+strbuf_reserve(strbuf_t *strbuf, int len)
 {
     if (strbuf->str == NULL) {
         strbuf->str = strbuf->buf;
@@ -1247,8 +1184,7 @@ int len;
 
 /* strbuf_empty() frees allocated memory and set strbuf to initial state */
 void
-strbuf_empty(strbuf)
-strbuf_t *strbuf;
+strbuf_empty(strbuf_t *strbuf)
 {
     if (strbuf->str != NULL && strbuf->str != strbuf->buf)
         free((genericptr_t) strbuf->str);
@@ -1257,8 +1193,7 @@ strbuf_t *strbuf;
 
 /* strbuf_nl_to_crlf() converts all occurences of \n to \r\n */
 void
-strbuf_nl_to_crlf(strbuf)
-strbuf_t *strbuf;
+strbuf_nl_to_crlf(strbuf_t *strbuf)
 {
     if (strbuf->str) {
         int len = (int) strlen(strbuf->str);
@@ -1280,9 +1215,7 @@ strbuf_t *strbuf;
 }
 
 char *
-nonconst(str, buf)
-const char *str;
-char *buf;
+nonconst(const char *str, char *buf)
 {
     char *retval = emptystr;
 
@@ -1296,8 +1229,7 @@ char *buf;
 
 /* swapbits(val, bita, bitb) swaps bit a with bit b in val */
 int
-swapbits(val, bita, bitb)
-int val, bita, bitb;
+swapbits(int val, int bita, int bitb)
 {
     int tmp = ((val >> bita) & 1) ^ ((val >> bitb) & 1);
 
@@ -1306,9 +1238,7 @@ int val, bita, bitb;
 
 /* randomize the given list of numbers  0 <= i < count */
 void
-shuffle_int_array(indices, count)
-int *indices;
-int count;
+shuffle_int_array(int *indices, int count)
 {
     int i, iswap, temp;
 

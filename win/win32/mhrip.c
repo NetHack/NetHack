@@ -40,7 +40,7 @@ INT_PTR CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 HWND
-mswin_init_RIP_window()
+mswin_init_RIP_window(void)
 {
     HWND ret;
     PNHRIPWindow data;

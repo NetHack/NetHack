@@ -169,9 +169,8 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
-int FDECL(__declspec(dllexport) __stdcall ProcessKeystroke,
-          (HANDLE hConIn, INPUT_RECORD *ir, boolean *valid,
-           BOOLEAN_P numberpad, int portdebug));
+int __declspec(dllexport) __stdcall ProcessKeystroke(HANDLE hConIn,
+               INPUT_RECORD *ir, boolean *valid, boolean numberpad, int portdebug);
 
 static INPUT_RECORD bogus_key;
 
@@ -262,14 +261,13 @@ static const struct pad {
 #define inmap(x, vk) (((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
 /* Use process_keystroke for key commands, process_keystroke2 for prompts */
-/* int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid, int
- * portdebug)); */
-int FDECL(process_keystroke2, (HANDLE, INPUT_RECORD *ir, boolean *valid));
-static int FDECL(is_altseq, (unsigned long shiftstate));
+/* int process_keystroke(INPUT_RECORD *ir, boolean *valid, int
+ * portdebug); */
+int process_keystroke2(HANDLE, INPUT_RECORD *ir, boolean *valid);
+static int is_altseq(unsigned long shiftstate);
 
 static int
-is_altseq(shiftstate)
-unsigned long shiftstate;
+is_altseq(unsigned long shiftstate)
 {
     /* We need to distinguish the Alt keys from the AltGr key.
      * On NT-based Windows, AltGr signals as right Alt and left Ctrl together;
@@ -291,17 +289,16 @@ unsigned long shiftstate;
     }
 }
 
-int __declspec(dllexport) __stdcall ProcessKeystroke(hConIn, ir, valid,
-                                                     numberpad, portdebug)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-boolean *valid;
-boolean numberpad;
-int portdebug;
+int __declspec(dllexport) __stdcall 
+ProcessKeystroke(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    boolean *valid,
+    boolean numberpad,
+    int portdebug)
 {
-    int metaflags = 0, k = 0;
     int keycode, vk;
-    unsigned char ch, pre_ch, mk = 0;
+    unsigned char ch, pre_ch;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq = 0;
@@ -413,10 +410,10 @@ int portdebug;
 }
 
 int
-process_keystroke2(hConIn, ir, valid)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-boolean *valid;
+process_keystroke2(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    boolean *valid)
 {
     /* Use these values for the numeric keypad */
     static const char keypad_nums[] = "789-456+1230.";
@@ -479,20 +476,20 @@ boolean *valid;
     return ch;
 }
 
-int __declspec(dllexport) __stdcall CheckInput(hConIn, ir, count, numpad,
-                                               mode, mod, cc)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-DWORD *count;
-int mode;
-int *mod;
-boolean numpad;
-coord *cc;
+int __declspec(dllexport) __stdcall 
+CheckInput(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    DWORD *count,
+    boolean numpad,
+    int mode,
+    int *mod,
+    coord *cc)
 {
 #if defined(SAFERHANGUP)
     DWORD dwWait;
 #endif
-    int ch;
+    int ch = 0;
     boolean valid = 0, done = 0;
 
 #ifdef QWERTZ_SUPPORT
@@ -577,9 +574,9 @@ coord *cc;
     return ch;
 }
 
-int __declspec(dllexport) __stdcall NHkbhit(hConIn, ir)
-HANDLE hConIn;
-INPUT_RECORD *ir;
+int __declspec(dllexport) __stdcall NHkbhit(
+    HANDLE hConIn,
+    INPUT_RECORD *ir)
 {
     int done = 0; /* true =  "stop searching"        */
     int retval;   /* true =  "we had a match"        */
@@ -637,8 +634,8 @@ INPUT_RECORD *ir;
     return retval;
 }
 
-int __declspec(dllexport) __stdcall SourceWhere(buf)
-char **buf;
+int __declspec(dllexport) __stdcall 
+SourceWhere(char** buf)
 {
     if (!buf)
         return 0;
@@ -646,8 +643,8 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall SourceAuthor(buf)
-char **buf;
+int __declspec(dllexport) __stdcall 
+SourceAuthor(char** buf)
 {
     if (!buf)
         return 0;
@@ -655,9 +652,9 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall KeyHandlerName(buf, full)
-char **buf;
-int full;
+int __declspec(dllexport) __stdcall KeyHandlerName(
+    char **buf,
+    int full)
 {
     if (!buf)
         return 0;

@@ -252,8 +252,7 @@ const uchar def_r_oc_syms[MAXOCLASSES] = {
  * objnam.c, options.c, pickup.c, sp_lev.c, lev_main.c, and tilemap.c.
  */
 int
-def_char_to_objclass(ch)
-char ch;
+def_char_to_objclass(char ch)
 {
     int i;
 
@@ -269,8 +268,7 @@ char ch;
  * Used in detect.c, options.c, read.c, sp_lev.c, and lev_main.c
  */
 int
-def_char_to_monclass(ch)
-char ch;
+def_char_to_monclass(char ch)
 {
     int i;
 
@@ -282,8 +280,7 @@ char ch;
 
 /* does 'ch' represent a furniture character?  returns index into defsyms[] */
 int
-def_char_is_furniture(ch)
-char ch;
+def_char_is_furniture(char ch)
 {
     /* note: these refer to defsyms[] order which is much different from
        levl[][].typ order but both keep furniture in a contiguous block */

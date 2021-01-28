@@ -17,7 +17,7 @@
 #endif
 
 #ifdef TEXT_TOMBSTONE
-static void FDECL(center, (int, char *));
+static void center(int, char *);
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
@@ -69,9 +69,7 @@ static const char *rip_txt[] = {
 #define YEAR_LINE 12 /* *char[] line # for year */
 
 static void
-center(line, text)
-int line;
-char *text;
+center(int line, char *text)
 {
     register char *ip, *op;
     ip = text;
@@ -81,10 +79,7 @@ char *text;
 }
 
 void
-genl_outrip(tmpwin, how, when)
-winid tmpwin;
-int how;
-time_t when;
+genl_outrip(winid tmpwin, int how, time_t when)
 {
     register char **dp;
     register char *dpx;

@@ -15,12 +15,12 @@
 #define abort() exit()
 #endif
 #ifdef VMS
-extern void NDECL(vms_abort);
+extern void vms_abort(void);
 #endif
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (const char *, ...));
+void panic(const char *, ...);
 
 void panic
 VA_DECL(const char *, str)
@@ -53,8 +53,7 @@ VA_DECL(const char *, str)
  * systems, but they should either use yacc or get a real alloca routine.
  */
 long *
-alloca(cnt)
-unsigned cnt;
+alloca(unsigned int cnt)
 {
     return cnt ? alloc(cnt) : (long *) 0;
 }

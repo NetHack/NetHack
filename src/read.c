@@ -12,26 +12,26 @@
     ((mndx) == g.urace.malenum \
      || (g.urace.femalenum != NON_PM && (mndx) == g.urace.femalenum))
 
-static boolean FDECL(learnscrolltyp, (SHORT_P));
-static void FDECL(cap_spe, (struct obj *));
-static char *FDECL(erode_obj_text, (struct obj *, char *));
-static int FDECL(read_ok, (struct obj *));
-static void FDECL(stripspe, (struct obj *));
-static void FDECL(p_glow1, (struct obj *));
-static void FDECL(p_glow2, (struct obj *, const char *));
-static void FDECL(forget, (int));
-static int FDECL(maybe_tame, (struct monst *, struct obj *));
-static boolean FDECL(get_valid_stinking_cloud_pos, (int, int));
-static boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
-static void FDECL(display_stinking_cloud_positions, (int));
-static void FDECL(set_lit, (int, int, genericptr));
-static void NDECL(do_class_genocide);
-static boolean FDECL(create_particular_parse, (char *, struct _create_particular_data *));
-static boolean FDECL(create_particular_creation, (struct _create_particular_data *));
+static boolean learnscrolltyp(short);
+static void cap_spe(struct obj *);
+static char *erode_obj_text(struct obj *, char *);
+static int read_ok(struct obj *);
+static void stripspe(struct obj *);
+static void p_glow1(struct obj *);
+static void p_glow2(struct obj *, const char *);
+static void forget(int);
+static int maybe_tame(struct monst *, struct obj *);
+static boolean get_valid_stinking_cloud_pos(int, int);
+static boolean is_valid_stinking_cloud_pos(int, int, boolean);
+static void display_stinking_cloud_positions(int);
+static void set_lit(int, int, genericptr);
+static void do_class_genocide(void);
+static boolean create_particular_parse(char *,
+                                       struct _create_particular_data *);
+static boolean create_particular_creation(struct _create_particular_data *);
 
 static boolean
-learnscrolltyp(scrolltyp)
-short scrolltyp;
+learnscrolltyp(short scrolltyp)
 {
     if (!objects[scrolltyp].oc_name_known) {
         makeknown(scrolltyp);
@@ -43,8 +43,7 @@ short scrolltyp;
 
 /* also called from teleport.c for scroll of teleportation */
 void
-learnscroll(sobj)
-struct obj *sobj;
+learnscroll(struct obj* sobj)
 {
     /* it's implied that sobj->dknown is set;
        we couldn't be reading this scroll otherwise */
@@ -54,8 +53,7 @@ struct obj *sobj;
 
 /* max spe is +99, min is -99 */
 static void
-cap_spe(obj)
-struct obj *obj;
+cap_spe(struct obj* obj)
 {
     if (obj) {
         if (abs(obj->spe) > SPE_LIM)
@@ -64,9 +62,7 @@ struct obj *obj;
 }
 
 static char *
-erode_obj_text(otmp, buf)
-struct obj *otmp;
-char *buf;
+erode_obj_text(struct obj* otmp, char* buf)
 {
     int erosion = greatest_erosion(otmp);
 
@@ -77,9 +73,7 @@ char *buf;
 }
 
 char *
-tshirt_text(tshirt, buf)
-struct obj *tshirt;
-char *buf;
+tshirt_text(struct obj* tshirt, char* buf)
 {
     static const char *shirt_msgs[] = {
         /* Scott Bigham */
@@ -166,9 +160,7 @@ char *buf;
 }
 
 char *
-apron_text(apron, buf)
-struct obj *apron;
-char *buf;
+apron_text(struct obj* apron, char* buf)
 {
     static const char *apron_msgs[] = {
         "Kiss the cook",
@@ -206,8 +198,7 @@ static const char *candy_wrappers[] = {
 
 /* return the text of a candy bar's wrapper */
 const char *
-candy_wrapper_text(obj)
-struct obj *obj;
+candy_wrapper_text(struct obj* obj)
 {
     /* modulo operation is just bullet proofing; 'spe' is already in range */
     return candy_wrappers[obj->spe % SIZE(candy_wrappers)];
@@ -215,8 +206,7 @@ struct obj *obj;
 
 /* assign a wrapper to a candy bar stack */
 void
-assign_candy_wrapper(obj)
-struct obj *obj;
+assign_candy_wrapper(struct obj* obj)
 {
     if (obj->otyp == CANDY_BAR) {
         /* skips candy_wrappers[0] */
@@ -227,8 +217,7 @@ struct obj *obj;
 
 /* getobj callback for object to read */
 static int
-read_ok(obj)
-struct obj *obj;
+read_ok(struct obj* obj)
 {
     if (!obj)
         return GETOBJ_EXCLUDE;
@@ -241,7 +230,7 @@ struct obj *obj;
 
 /* the 'r' command; read a scroll or spell book or various other things */
 int
-doread()
+doread(void)
 {
     static const char find_any_braille[] = "feel any Braille writing.";
     register struct obj *scroll;
@@ -514,8 +503,7 @@ doread()
 }
 
 static void
-stripspe(obj)
-register struct obj *obj;
+stripspe(register struct obj* obj)
 {
     if (obj->blessed || obj->spe <= 0) {
         pline1(nothing_happens);
@@ -530,16 +518,13 @@ register struct obj *obj;
 }
 
 static void
-p_glow1(otmp)
-register struct obj *otmp;
+p_glow1(register struct obj* otmp)
 {
     pline("%s briefly.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"));
 }
 
 static void
-p_glow2(otmp, color)
-register struct obj *otmp;
-register const char *color;
+p_glow2(register struct obj* otmp, register const char* color)
 {
     pline("%s%s%s for a moment.", Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
           Blind ? "" : " ", Blind ? "" : hcolor(color));
@@ -547,8 +532,7 @@ register const char *color;
 
 /* getobj callback for object to charge */
 int
-charge_ok(obj)
-struct obj *obj;
+charge_ok(struct obj* obj)
 {
     if (!obj)
         return GETOBJ_EXCLUDE;
@@ -582,9 +566,7 @@ struct obj *obj;
 /* recharge an object; curse_bless is -1 if the recharging implement
    was cursed, +1 if blessed, 0 otherwise. */
 void
-recharge(obj, curse_bless)
-struct obj *obj;
-int curse_bless;
+recharge(struct obj* obj, int curse_bless)
 {
     register int n;
     boolean is_cursed, is_blessed;
@@ -870,8 +852,7 @@ int curse_bless;
  *      howmuch & ALL_SPELLS    = forget all spells
  */
 static void
-forget(howmuch)
-int howmuch;
+forget(int howmuch)
 {
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
@@ -885,9 +866,7 @@ int howmuch;
 
 /* monster is hit by scroll of taming's effect */
 static int
-maybe_tame(mtmp, sobj)
-struct monst *mtmp;
-struct obj *sobj;
+maybe_tame(struct monst* mtmp, struct obj* sobj)
 {
     int was_tame = mtmp->mtame;
     unsigned was_peaceful = mtmp->mpeaceful;
@@ -908,8 +887,7 @@ struct obj *sobj;
 }
 
 static boolean
-get_valid_stinking_cloud_pos(x,y)
-int x,y;
+get_valid_stinking_cloud_pos(int x,int y)
 {
     return (!(!isok(x,y) || !cansee(x, y)
               || !ACCESSIBLE(levl[x][y].typ)
@@ -917,9 +895,7 @@ int x,y;
 }
 
 static boolean
-is_valid_stinking_cloud_pos(x, y, showmsg)
-int x, y;
-boolean showmsg;
+is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
 {
     if (!get_valid_stinking_cloud_pos(x,y)) {
         if (showmsg)
@@ -930,8 +906,7 @@ boolean showmsg;
 }
 
 static void
-display_stinking_cloud_positions(state)
-int state;
+display_stinking_cloud_positions(int state)
 {
     if (state == 0) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
@@ -954,8 +929,7 @@ int state;
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
-seffects(sobj)
-struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
+seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll-like spell */
 {
     int cval, otyp = sobj->otyp;
     boolean confused = (Confusion != 0), sblessed = sobj->blessed,
@@ -1749,8 +1723,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 }
 
 void
-drop_boulder_on_player(confused, helmet_protects, byu, skip_uswallow)
-boolean confused, helmet_protects, byu, skip_uswallow;
+drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, boolean skip_uswallow)
 {
     int dmg;
     struct obj *otmp2;
@@ -1793,9 +1766,7 @@ boolean confused, helmet_protects, byu, skip_uswallow;
 }
 
 boolean
-drop_boulder_on_monster(x, y, confused, byu)
-int x, y;
-boolean confused, byu;
+drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
 {
     register struct obj *otmp2;
     register struct monst *mtmp;
@@ -1868,9 +1839,7 @@ boolean confused, byu;
 
 /* overcharging any wand or zapping/engraving cursed wand */
 void
-wand_explode(obj, chg)
-struct obj *obj;
-int chg; /* recharging */
+wand_explode(struct obj* obj, int chg /* recharging */)
 {
     const char *expl = !chg ? "suddenly" : "vibrates violently and";
     int dmg, n, k;
@@ -1927,9 +1896,7 @@ static struct litmon *gremlins = 0;
  * Low-level lit-field update routine.
  */
 static void
-set_lit(x, y, val)
-int x, y;
-genericptr_t val;
+set_lit(int x, int y, genericptr_t val)
 {
     struct monst *mtmp;
     struct litmon *gremlin;
@@ -1949,9 +1916,7 @@ genericptr_t val;
 }
 
 void
-litroom(on, obj)
-register boolean on;
-struct obj *obj;
+litroom(register boolean on, struct obj* obj)
 {
     char is_lit; /* value is irrelevant; we use its address
                     as a `not null' flag for set_lit() */
@@ -2054,7 +2019,7 @@ struct obj *obj;
 }
 
 static void
-do_class_genocide()
+do_class_genocide(void)
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
     char buf[BUFSZ] = DUMMY;
@@ -2205,8 +2170,8 @@ do_class_genocide()
 #define PLAYER 2
 #define ONTHRONE 4
 void
-do_genocide(how)
-int how;
+do_genocide(int how)
+/* how: */
 /* 0 = no genocide; create monsters (cursed scroll) */
 /* 1 = normal genocide */
 /* 3 = forced genocide of player */
@@ -2370,8 +2335,7 @@ int how;
 }
 
 void
-punish(sobj)
-struct obj *sobj;
+punish(struct obj* sobj)
 {
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL)
                                 ? sobj : (struct obj *) 0;
@@ -2414,7 +2378,7 @@ struct obj *sobj;
 
 /* remove the ball and chain */
 void
-unpunish()
+unpunish(void)
 {
     struct obj *savechain = uchain;
 
@@ -2432,10 +2396,7 @@ unpunish()
  * revive one, the disoriented creature becomes a zombie
  */
 boolean
-cant_revive(mtype, revival, from_obj)
-int *mtype;
-boolean revival;
-struct obj *from_obj;
+cant_revive(int* mtype, boolean revival, struct obj* from_obj)
 {
     /* SHOPKEEPERS can be revived now */
     if (*mtype == PM_GUARD || (*mtype == PM_SHOPKEEPER && !revival)
@@ -2457,9 +2418,7 @@ struct obj *from_obj;
 }
 
 static boolean
-create_particular_parse(str, d)
-char *str;
-struct _create_particular_data *d;
+create_particular_parse(char* str, struct _create_particular_data* d)
 {
     int gender_name_var = NEUTRAL;
     char *bufp = str;
@@ -2572,8 +2531,7 @@ struct _create_particular_data *d;
 }
 
 static boolean
-create_particular_creation(d)
-struct _create_particular_data *d;
+create_particular_creation(struct _create_particular_data* d)
 {
     struct permonst *whichpm = NULL;
     int i, mx, my, firstchoice = NON_PM;
@@ -2702,7 +2660,7 @@ struct _create_particular_data *d;
  * this code was also used for the scroll/spell in explore mode.
  */
 boolean
-create_particular()
+create_particular(void)
 {
 #define CP_TRYLIM 5
     struct _create_particular_data d;

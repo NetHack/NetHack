@@ -249,7 +249,7 @@ void
 trace_display_nhwindow(vp, window, blocking)
 void *vp;
 winid window;
-BOOLEAN_P blocking;
+boolean blocking;
 {
     struct trace_data *tdp = vp;
 

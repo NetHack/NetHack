@@ -26,12 +26,12 @@ static const char *text_sets[] = { "monsters.txt", "objects.txt",
                                    "other.txt" };
 #endif
 
-extern const char *FDECL(tilename, (int, int, int));
-extern boolean FDECL(acceptable_tilename, (int, int, const char *, const char *));
-static void FDECL(read_text_colormap, (FILE *));
-static boolean FDECL(write_text_colormap, (FILE *));
-static boolean FDECL(read_txttile, (FILE *, pixel (*)[TILE_X]));
-static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
+extern const char *tilename(int, int, int);
+extern boolean acceptable_tilename(int, int, const char *, const char *);
+static void read_text_colormap(FILE *);
+static boolean write_text_colormap(FILE *);
+static boolean read_txttile(FILE *, pixel (*)[TILE_X]);
+static void write_txttile(FILE *, pixel (*)[TILE_X]);
 
 enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
 
@@ -50,15 +50,13 @@ static const int graymappings[] = {
 };
 
 void
-set_grayscale(g)
-int g;
+set_grayscale(int g)
 {
     grayscale = g;
 }
 
 static void
-read_text_colormap(txtfile)
-FILE *txtfile;
+read_text_colormap(FILE *txtfile)
 {
     int i, r, g, b;
     char c[2];
@@ -80,8 +78,7 @@ FILE *txtfile;
 #undef FORMAT_STRING
 
 static boolean
-write_text_colormap(txtfile)
-FILE *txtfile;
+write_text_colormap(FILE *txtfile)
 {
     int i;
     char c;
@@ -108,9 +105,7 @@ FILE *txtfile;
 }
 
 static boolean
-read_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     int ph, i, j, k, reslt;
     char buf[BUFSZ], ttype[BUFSZ], gend[BUFSZ];
@@ -202,9 +197,7 @@ pixel (*pixels)[TILE_X];
 }
 
 static void
-write_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+write_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     const char *p;
     const char *type;
@@ -252,7 +245,7 @@ pixel (*pixels)[TILE_X];
 
 /* initialize main colormap from globally accessed ColorMap */
 void
-init_colormap()
+init_colormap(void)
 {
     int i;
 
@@ -266,7 +259,7 @@ init_colormap()
 
 /* merge new colors from ColorMap into MainColorMap */
 void
-merge_colormap()
+merge_colormap(void)
 {
     int i, j;
 
@@ -292,9 +285,7 @@ merge_colormap()
 }
 
 boolean
-fopen_text_file(filename, type)
-const char *filename;
-const char *type;
+fopen_text_file(const char *filename, const char *type)
 {
     const char *p;
     int i;
@@ -350,22 +341,20 @@ const char *type;
 }
 
 boolean
-read_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+read_text_tile(pixel (*pixels)[TILE_X])
 {
     return (read_txttile(tile_file, pixels));
 }
 
 boolean
-write_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+write_text_tile(pixel (*pixels)[TILE_X])
 {
     write_txttile(tile_file, pixels);
     return TRUE;
 }
 
 int
-fclose_text_file()
+fclose_text_file(void)
 {
     int ret;
 

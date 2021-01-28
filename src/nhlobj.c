@@ -10,25 +10,23 @@ struct _lua_obj {
     struct obj *obj;
 };
 
-static struct _lua_obj *FDECL(l_obj_check, (lua_State *, int));
-static int FDECL(l_obj_add_to_container, (lua_State *));
-static int FDECL(l_obj_gc, (lua_State *));
-static int FDECL(l_obj_getcontents, (lua_State *));
-static int FDECL(l_obj_isnull, (lua_State *));
-static int FDECL(l_obj_new_readobjnam, (lua_State *));
-static int FDECL(l_obj_nextobj, (lua_State *));
-static int FDECL(l_obj_objects_to_table, (lua_State *));
-static int FDECL(l_obj_placeobj, (lua_State *));
-static int FDECL(l_obj_to_table, (lua_State *));
-static int FDECL(l_obj_at, (lua_State *));
-static int FDECL(l_obj_container, (lua_State *));
+static struct _lua_obj *l_obj_check(lua_State *, int);
+static int l_obj_add_to_container(lua_State *);
+static int l_obj_gc(lua_State *);
+static int l_obj_getcontents(lua_State *);
+static int l_obj_isnull(lua_State *);
+static int l_obj_new_readobjnam(lua_State *);
+static int l_obj_nextobj(lua_State *);
+static int l_obj_objects_to_table(lua_State *);
+static int l_obj_placeobj(lua_State *);
+static int l_obj_to_table(lua_State *);
+static int l_obj_at(lua_State *);
+static int l_obj_container(lua_State *);
 
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
 static struct _lua_obj *
-l_obj_check(L, index)
-lua_State *L;
-int index;
+l_obj_check(lua_State *L, int index)
 {
     struct _lua_obj *lo;
 
@@ -40,8 +38,7 @@ int index;
 }
 
 static int
-l_obj_gc(L)
-lua_State *L;
+l_obj_gc(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
@@ -67,9 +64,7 @@ lua_State *L;
 }
 
 static struct _lua_obj *
-l_obj_push(L, otmp)
-lua_State *L;
-struct obj *otmp;
+l_obj_push(lua_State *L, struct obj *otmp)
 {
     struct _lua_obj *lo = (struct _lua_obj *)lua_newuserdata(L, sizeof(struct _lua_obj));
     luaL_getmetatable(L, "obj");
@@ -84,9 +79,7 @@ struct obj *otmp;
 }
 
 void
-nhl_push_obj(L, otmp)
-lua_State *L;
-struct obj *otmp;
+nhl_push_obj(lua_State *L, struct obj *otmp)
 {
     (void) l_obj_push(L, otmp);
 }
@@ -94,8 +87,7 @@ struct obj *otmp;
 /* local o = obj.new("large chest");
    local cobj = o:contents(); */
 static int
-l_obj_getcontents(L)
-lua_State *L;
+l_obj_getcontents(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
     struct obj *obj = lo->obj;
@@ -112,8 +104,7 @@ lua_State *L;
    box.addcontent(obj.new("rock"));
 */
 static int
-l_obj_add_to_container(L)
-lua_State *L;
+l_obj_add_to_container(lua_State *L)
 {
     struct _lua_obj *lobox = l_obj_check(L, 1);
     struct _lua_obj *lo = l_obj_check(L, 2);
@@ -140,8 +131,7 @@ lua_State *L;
 /* Put object into player's inventory */
 /* u.giveobj(obj.new("rock")); */
 int
-nhl_obj_u_giveobj(L)
-lua_State *L;
+nhl_obj_u_giveobj(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
     struct obj *otmp;
@@ -168,8 +158,7 @@ lua_State *L;
 /* local odata = obj.class(obj.new("rock")); */
 /* local odata = o:class(); */
 static int
-l_obj_objects_to_table(L)
-lua_State *L;
+l_obj_objects_to_table(lua_State *L)
 {
     int argc = lua_gettop(L);
     int otyp = -1;
@@ -241,8 +230,7 @@ lua_State *L;
    local o = obj.new("rock");
    local otbl = o:totable(); */
 static int
-l_obj_to_table(L)
-lua_State *L;
+l_obj_to_table(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
     struct obj *obj = lo->obj;
@@ -337,8 +325,7 @@ lua_State *L;
 /* create a new object via wishing routine */
 /* local o = obj.new("rock"); */
 static int
-l_obj_new_readobjnam(L)
-lua_State *L;
+l_obj_new_readobjnam(lua_State *L)
 {
     int argc = lua_gettop(L);
 
@@ -358,8 +345,7 @@ lua_State *L;
 /* Get the topmost object on the map at x,y */
 /* local o = obj.at(x, y); */
 static int
-l_obj_at(L)
-lua_State *L;
+l_obj_at(lua_State *L)
 {
     int argc = lua_gettop(L);
 
@@ -380,8 +366,7 @@ lua_State *L;
    local o = obj.new("rock");
    o:placeobj(u.ux, u.uy); */
 static int
-l_obj_placeobj(L)
-lua_State *L;
+l_obj_placeobj(lua_State *L)
 {
     int argc = lua_gettop(L);
     struct _lua_obj *lo = l_obj_check(L, 1);
@@ -408,8 +393,7 @@ lua_State *L;
    local o2 = o:next();
 */
 static int
-l_obj_nextobj(L)
-lua_State *L;
+l_obj_nextobj(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
@@ -421,8 +405,7 @@ lua_State *L;
 /* Get the container object is in */
 /* local box = o:container(); */
 static int
-l_obj_container(L)
-lua_State *L;
+l_obj_container(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
@@ -436,8 +419,7 @@ lua_State *L;
 /* Is the object a null? */
 /* local badobj = o:isnull(); */
 static int
-l_obj_isnull(L)
-lua_State *L;
+l_obj_isnull(lua_State *L)
 {
     struct _lua_obj *lo = l_obj_check(L, 1);
 
@@ -466,8 +448,7 @@ static const luaL_Reg l_obj_meta[] = {
 };
 
 int
-l_obj_register(L)
-lua_State *L;
+l_obj_register(lua_State *L)
 {
     int lib_id, meta_id;
 

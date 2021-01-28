@@ -86,7 +86,7 @@ static LRESULT onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #define DEFAULT_COLOR_FG_STATUS COLOR_WINDOWTEXT
 
 HWND
-mswin_init_status_window()
+mswin_init_status_window(void)
 {
     static int run_once = 0;
     HWND ret;
@@ -151,7 +151,7 @@ mswin_init_status_window()
 }
 
 void
-register_status_window_class()
+register_status_window_class(void)
 {
     WNDCLASS wcex;
     ZeroMemory(&wcex, sizeof(wcex));

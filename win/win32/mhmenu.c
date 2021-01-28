@@ -29,11 +29,11 @@
 typedef struct mswin_menu_item {
     glyph_info glyphinfo;
     ANY_P identifier;
-    CHAR_P accelerator;
-    CHAR_P group_accel;
+    char accelerator;
+    char group_accel;
     int attr;
     char str[NHMENU_STR_SIZE];
-    BOOLEAN_P presel;
+    boolean presel;
     unsigned int itemflags;
     int count;
     BOOL has_focus;

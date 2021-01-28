@@ -51,20 +51,18 @@ const char *NetHack_git_branch
 ;
 #endif
 
-static void FDECL(insert_rtoption, (char *));
+static void insert_rtoption(char *);
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
-version_string(buf)
-char *buf;
+version_string(char *buf)
 {
     return strcpy(buf, VERSION_STRING);
 }
 
 /* fill and return the given buffer with the long nethack version string */
 char *
-getversionstring(buf)
-char *buf;
+getversionstring(char *buf)
 {
     Strcpy(buf, VERSION_ID);
 
@@ -111,7 +109,7 @@ char *buf;
 
 /* the 'v' command */
 int
-doversion()
+doversion(void)
 {
     char buf[BUFSZ];
 
@@ -121,7 +119,7 @@ doversion()
 
 /* the '#version' command; also a choice for '?' */
 int
-doextversion()
+doextversion(void)
 {
     int rtcontext = 0;
     const char *rtbuf;
@@ -248,8 +246,7 @@ doextversion()
 }
 
 void
-early_version_info(pastebuf)
-boolean pastebuf;
+early_version_info(boolean pastebuf)
 {
     char buf1[BUFSZ], buf2[BUFSZ];
     char *buf, *tmp;
@@ -308,8 +305,7 @@ static struct rt_opt {
  * game image, so we insert those options here.
  */
 static void
-insert_rtoption(buf)
-char *buf;
+insert_rtoption(char *buf)
 {
     int i;
 
@@ -327,8 +323,7 @@ char *buf;
 
 #ifdef MICRO
 boolean
-comp_times(filetime)
-long filetime;
+comp_times(long filetime)
 {
     /* BUILD_TIME is constant but might have L suffix rather than UL;
        'filetime' is historically signed but ought to have been unsigned */
@@ -337,11 +332,8 @@ long filetime;
 #endif
 
 boolean
-check_version(version_data, filename, complain, utdflags)
-struct version_info *version_data;
-const char *filename;
-boolean complain;
-unsigned long utdflags;
+check_version(struct version_info *version_data, const char *filename,
+              boolean complain, unsigned long utdflags)
 {
     if (
 #ifdef VERSION_COMPATIBILITY
@@ -377,10 +369,7 @@ unsigned long utdflags;
 /* this used to be based on file date and somewhat OS-dependant,
    but now examines the initial part of the file's contents */
 boolean
-uptodate(nhfp, name, utdflags)
-NHFILE *nhfp;
-const char *name;
-unsigned long utdflags;
+uptodate(NHFILE *nhfp, const char *name, unsigned long utdflags)
 {
     int rlen = 0, cmc = 0, filecmc = 0;
     struct version_info vers_info;
@@ -415,8 +404,7 @@ unsigned long utdflags;
 }
 
 void
-store_formatindicator(nhfp)
-NHFILE *nhfp;
+store_formatindicator(NHFILE *nhfp)
 {
     char indicate = 'u';
     int cmc = 0;
@@ -431,8 +419,7 @@ NHFILE *nhfp;
 }
 
 void
-store_version(nhfp)
-NHFILE *nhfp;
+store_version(NHFILE *nhfp)
 {
 #if !defined(CROSSCOMPILE) || !defined(CROSSCOMPILE_TARGET)
     static const struct version_info version_data = {
@@ -467,8 +454,7 @@ const char amiga_version_string[] = AMIGA_VERSION_STRING;
 #endif
 
 unsigned long
-get_feature_notice_ver(str)
-char *str;
+get_feature_notice_ver(char *str)
 {
     char buf[BUFSZ];
     int ver_maj, ver_min, patch;
@@ -501,15 +487,14 @@ char *str;
 }
 
 unsigned long
-get_current_feature_ver()
+get_current_feature_ver(void)
 {
     return FEATURE_NOTICE_VER(VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 }
 
 /*ARGUSED*/
 const char *
-copyright_banner_line(indx)
-int indx;
+copyright_banner_line(int indx)
 {
 #ifdef COPYRIGHT_BANNER_A
     if (indx == 1)

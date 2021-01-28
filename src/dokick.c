@@ -11,23 +11,20 @@
 
 /* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
-static void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-static boolean FDECL(maybe_kick_monster, (struct monst *,
-                                              XCHAR_P, XCHAR_P));
-static void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
-static int FDECL(kick_object, (XCHAR_P, XCHAR_P, char *));
-static int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
-static char *FDECL(kickstr, (char *, const char *));
-static void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, BOOLEAN_P, long));
-static void FDECL(drop_to, (coord *, SCHAR_P, XCHAR_P, XCHAR_P));
+static void kickdmg(struct monst *, boolean);
+static boolean maybe_kick_monster(struct monst *, xchar, xchar);
+static void kick_monster(struct monst *, xchar, xchar);
+static int kick_object(xchar, xchar, char *);
+static int really_kick_object(xchar, xchar);
+static char *kickstr(char *, const char *);
+static void otransit_msg(struct obj *, boolean, boolean, long);
+static void drop_to(coord *, schar, xchar, xchar);
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
 /* kicking damage when not poly'd into a form with a kick attack */
 static void
-kickdmg(mon, clumsy)
-struct monst *mon;
-boolean clumsy;
+kickdmg(struct monst *mon, boolean clumsy)
 {
     int mdx, mdy;
     int dmg = (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 15;
@@ -118,9 +115,7 @@ boolean clumsy;
 }
 
 static boolean
-maybe_kick_monster(mon, x, y)
-struct monst *mon;
-xchar x, y;
+maybe_kick_monster(struct monst *mon, xchar x, xchar y)
 {
     if (mon) {
         boolean save_forcefight = g.context.forcefight;
@@ -140,9 +135,7 @@ xchar x, y;
 }
 
 static void
-kick_monster(mon, x, y)
-struct monst *mon;
-xchar x, y;
+kick_monster(struct monst *mon, xchar x, xchar y)
 {
     boolean clumsy = FALSE;
     int i, j;
@@ -281,9 +274,7 @@ xchar x, y;
  *  The gold object is *not* attached to the fobj chain!
  */
 boolean
-ghitm(mtmp, gold)
-register struct monst *mtmp;
-register struct obj *gold;
+ghitm(register struct monst *mtmp, register struct obj *gold)
 {
     boolean msg_given = FALSE;
 
@@ -384,9 +375,8 @@ register struct obj *gold;
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
 void
-container_impact_dmg(obj, x, y)
-struct obj *obj;
-xchar x, y; /* coordinates where object was before the impact, not after */
+container_impact_dmg(struct obj *obj, xchar x,
+                     xchar y) /* coordinates where object was before the impact, not after */
 {
     struct monst *shkp;
     struct obj *otmp, *otmp2;
@@ -452,9 +442,7 @@ xchar x, y; /* coordinates where object was before the impact, not after */
 
 /* jacket around really_kick_object */
 static int
-kick_object(x, y, kickobjnam)
-xchar x, y;
-char *kickobjnam;
+kick_object(xchar x, xchar y, char *kickobjnam)
 {
     int res = 0;
 
@@ -472,8 +460,7 @@ char *kickobjnam;
 
 /* guts of kick_object */
 static int
-really_kick_object(x, y)
-xchar x, y;
+really_kick_object(xchar x, xchar y)
 {
     int range;
     struct monst *mon, *shkp = 0;
@@ -678,8 +665,8 @@ xchar x, y;
     (void) snuff_candle(g.kickedobj);
     newsym(x, y);
     mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
-               (int FDECL((*), (MONST_P, OBJ_P))) 0,
-               (int FDECL((*), (OBJ_P, OBJ_P))) 0, &g.kickedobj);
+               (int (*) (struct monst *, struct obj *)) 0,
+               (int (*) (struct obj *, struct obj *)) 0, &g.kickedobj);
     if (!g.kickedobj)
         return 1; /* object broken */
 
@@ -731,9 +718,7 @@ xchar x, y;
 
 /* cause of death if kicking kills kicker */
 static char *
-kickstr(buf, kickobjnam)
-char *buf;
-const char *kickobjnam;
+kickstr(char *buf, const char *kickobjnam)
 {
     const char *what;
 
@@ -773,7 +758,7 @@ const char *kickobjnam;
 }
 
 int
-dokick()
+dokick(void)
 {
     int x, y;
     int avrg_attrib;
@@ -1331,10 +1316,7 @@ dokick()
 }
 
 static void
-drop_to(cc, loc, x,y)
-coord *cc;
-schar loc;
-xchar x,y;
+drop_to(coord *cc, schar loc, xchar x, xchar y)
 {
     stairway *stway = stairway_at(x, y);
 
@@ -1371,10 +1353,9 @@ xchar x,y;
 
 /* player or missile impacts location, causing objects to fall down */
 void
-impact_drop(missile, x, y, dlev)
-struct obj *missile; /* caused impact, won't drop itself */
-xchar x, y;          /* location affected */
-xchar dlev;          /* if !0 send to dlev near player */
+impact_drop(struct obj *missile, /* caused impact, won't drop itself */
+            xchar x, xchar y,    /* location affected */
+            xchar dlev)          /* if !0 send to dlev near player */
 {
     schar toloc;
     register struct obj *obj, *obj2;
@@ -1499,10 +1480,7 @@ xchar dlev;          /* if !0 send to dlev near player */
  * otmp is either a kicked, dropped, or thrown object.
  */
 boolean
-ship_object(otmp, x, y, shop_floor_obj)
-xchar x, y;
-struct obj *otmp;
-boolean shop_floor_obj;
+ship_object(struct obj *otmp, xchar x, xchar y, boolean shop_floor_obj)
 {
     schar toloc;
     xchar ox, oy;
@@ -1625,8 +1603,7 @@ boolean shop_floor_obj;
 }
 
 void
-obj_delivery(near_hero)
-boolean near_hero;
+obj_delivery(boolean near_hero)
 {
     register struct obj *otmp, *otmp2;
     int nx = 0, ny = 0;
@@ -1710,10 +1687,7 @@ boolean near_hero;
 }
 
 void
-deliver_obj_to_mon(mtmp, cnt, deliverflags)
-int cnt;
-struct monst *mtmp;
-unsigned long deliverflags;
+deliver_obj_to_mon(struct monst *mtmp, int cnt, unsigned long deliverflags)
 {
     struct obj *otmp, *otmp2;
     int where, maxobj = 1;
@@ -1768,10 +1742,7 @@ unsigned long deliverflags;
 }
 
 static void
-otransit_msg(otmp, nodrop, chainthere, num)
-register struct obj *otmp;
-boolean nodrop, chainthere;
-long num;
+otransit_msg(register struct obj *otmp, boolean nodrop, boolean chainthere, long num)
 {
     char *optr = 0, obuf[BUFSZ], xbuf[BUFSZ];
 
@@ -1805,8 +1776,7 @@ long num;
 
 /* migration destination for objects which fall down to next level */
 schar
-down_gate(x, y)
-xchar x, y;
+down_gate(xchar x, xchar y)
 {
     struct trap *ttmp;
     stairway *stway = stairway_at(x, y);

@@ -577,7 +577,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	QMenu* menu;
 	const char* name;
 	int flags;
-        int NDECL((*funct));
+        int (*funct)(void);
     } item[] = {
         { game,    0, 3},
         { game,    "Version",            3, doversion},
@@ -914,7 +914,7 @@ void NetHackQtMainWindow::CtrlV()
 
 // add a toolbar button to invoke command 'name' via function '(*func)()'
 void NetHackQtMainWindow::AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
-                                        const char *name, int NDECL((*func)),
+                                        const char *name, int (*func)(void),
                                         QPixmap xpm)
 {
     char actchar[2];
@@ -1084,7 +1084,7 @@ void NetHackQtMainWindow::doKeys(const QString& k)
 }
 
 // queue up the command name for a function, as if user had typed it
-void NetHackQtMainWindow::FuncAsCommand(int NDECL((*func)))
+void NetHackQtMainWindow::FuncAsCommand(int (*func)(void))
 {
     char cmdbuf[32];
     Strcpy(cmdbuf, "#");

@@ -76,13 +76,14 @@ extern "C" {
 namespace nethack_qt_ {
 
 void
-centerOnMain( QWidget* w )
+centerOnMain(QWidget *w)
 {
-    QWidget* m = NetHackQtBind::mainWidget();
-    if (!m) m = qApp->desktop();
-    QPoint p = m->mapToGlobal(QPoint(0,0));
-    w->move( p.x() + m->width()/2  - w->width()/2,
-              p.y() + m->height()/2 - w->height()/2 );
+    QWidget *m = NetHackQtBind::mainWidget();
+    if (!m)
+        m = qApp->desktop();
+    QPoint p = m->mapToGlobal(QPoint(0, 0));
+    w->move(p.x() + m->width() / 2  - w->width() / 2,
+            p.y() + m->height() / 2 - w->height() / 2);
 }
 
 NetHackQtWindow::NetHackQtWindow()

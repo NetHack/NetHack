@@ -91,11 +91,10 @@ static XtResource resources[] = {
 
 /* ARGSUSED */
 static void
-no_op(w, event, params, num_params)
-Widget w;             /* unused */
-XEvent *event;        /* unused */
-String *params;       /* unused */
-Cardinal *num_params; /* unused */
+no_op(Widget w,             /* unused */
+      XEvent *event,        /* unused */
+      String *params,       /* unused */
+      Cardinal *num_params) /* unused */
 {
     nhUse(w);
     nhUse(event);
@@ -114,10 +113,7 @@ static char translations[] = "<BtnDown>:     input() \
 
 /* ARGSUSED */
 static void
-Redisplay(w, event, region)
-Widget w;
-XEvent *event;
-Region region; /* unused */
+Redisplay(Widget w, XEvent *event, Region region /* unused */)
 {
     nhUse(region);
 
@@ -127,8 +123,7 @@ Region region; /* unused */
 
 /* ARGSUSED */
 static void
-Resize(w)
-Widget w;
+Resize(Widget w)
 {
     XtCallCallbacks(w, XtNresizeCallback, (XtPointer) 0);
 }
@@ -174,15 +169,13 @@ WindowClassRec windowClassRec = {
 WidgetClass windowWidgetClass = (WidgetClass) &windowClassRec;
 
 Font
-WindowFont(w)
-Widget w;
+WindowFont(Widget w)
 {
     return ((WindowWidget) w)->window.font->fid;
 }
 
 XFontStruct *
-WindowFontStruct(w)
-Widget w;
+WindowFontStruct(Widget w)
 {
     return ((WindowWidget) w)->window.font;
 }
