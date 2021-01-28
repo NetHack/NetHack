@@ -44,8 +44,7 @@ static void hack_resume(boolean);
 #endif
 
 static int
-veryold(fd)
-int fd;
+veryold(int fd)
 {
     register int i;
     time_t date;
@@ -87,7 +86,7 @@ int fd;
 }
 
 void
-getlock()
+getlock(void)
 {
     register int i = 0, fd;
 
@@ -154,8 +153,8 @@ getlock()
     }
 }
 
-void regularize(s) /* normalize file name */
-register char *s;
+/* normalize file name */
+void regularize(register char *s)
 {
     register char *lp;
 
@@ -166,7 +165,7 @@ register char *s;
 
 #undef getuid
 int
-vms_getuid()
+vms_getuid(void)
 {
     return ((getgid() << 16) | getuid());
 }
@@ -176,8 +175,7 @@ vms_getuid()
 #endif
 /* check whether the open file specified by `fd' is in stream-lf format */
 boolean
-file_is_stmlf(fd)
-int fd;
+file_is_stmlf(int fd)
 {
     int rfm;
     struct stat buf;
@@ -205,10 +203,7 @@ int fd;
 
 /* vms_define() - assign a value to a logical name */
 int
-vms_define(name, value, flag)
-const char *name;
-const char *value;
-int flag;
+vms_define(const char *name, const char *value, int flag)
 {
     struct dsc {
         unsigned short len, mbz;
@@ -251,8 +246,7 @@ int flag;
 
 /* vms_putenv() - create or modify an environment value */
 int
-vms_putenv(string)
-const char *string;
+vms_putenv(const char *string)
 {
     char name[ENVSIZ + 1], value[ENVSIZ + 1], *p; /* [255+1] */
 
@@ -277,7 +271,7 @@ const char *string;
    Called by verify_termcap() for convenience.
  */
 static char *
-verify_term()
+verify_term(void)
 {
     char *term = getenv("NETHACK_TERM");
     if (!term)
@@ -320,7 +314,7 @@ verify_term()
 #define NETHACK_DEF_TERMCAP "nethackdir:termcap"
 #define HACK_DEF_TERMCAP "hackdir:termcap"
 
-char *verify_termcap() /* called from startup(src/termcap.c) */
+char *verify_termcap(void) /* called from startup(src/termcap.c) */
 {
     struct stat dummy;
     const char *tc = getenv("TERMCAP");
@@ -356,7 +350,7 @@ char *verify_termcap() /* called from startup(src/termcap.c) */
 static unsigned long oprv[2];
 
 void
-privoff()
+privoff(void)
 {
     unsigned long pid = 0, prv[2] = { ~0, ~0 };
     unsigned short code = JPI$_PROCPRIV;
@@ -367,7 +361,7 @@ privoff()
 }
 
 void
-privon()
+privon(void)
 {
     (void) sys$setprv(1, oprv, 0, (unsigned long *) 0);
 }
@@ -375,8 +369,7 @@ privon()
 
 #ifdef SYSCF
 boolean
-check_user_string(userlist)
-const char *userlist;
+check_user_string(const char *userlist)
 {
     char usrnambuf[BUFSZ];
     const char *sptr, *p, *q;
@@ -414,9 +407,7 @@ const char *userlist;
 
 #if defined(SHELL) || defined(SUSPEND)
 static void
-hack_escape(screen_manip, msg_str)
-boolean screen_manip;
-const char *msg_str;
+hack_escape(boolean screen_manip, const char *msg_str)
 {
     if (screen_manip)
         suspend_nhwindows(msg_str);  /* clear screen, reset terminal, &c */
@@ -425,8 +416,7 @@ const char *msg_str;
 }
 
 static void
-hack_resume(screen_manip)
-boolean screen_manip;
+hack_resume(boolean screen_manip)
 {
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
     if (wizard)
@@ -443,7 +433,7 @@ unsigned long dosh_pid = 0, /* this should cover any interactive escape */
                                leave any process hanging around) */
 
 int
-dosh()
+dosh(void)
 {
 #ifdef SYSCF
     if (!sysopt.shellers || !sysopt.shellers[0]
@@ -469,9 +459,7 @@ dosh()
  * will be piped into oblivion.  Used for silent phone call rejection.
  */
 int
-vms_doshell(execstring, screenoutput)
-const char *execstring;
-boolean screenoutput;
+vms_doshell(const char *execstring, boolean screenoutput)
 {
     unsigned long status, new_pid, spawnflags = 0;
     struct dsc$descriptor_s comstring, *command, *inoutfile = 0;
@@ -531,7 +519,7 @@ boolean screenoutput;
  *                if not, there's nothing we can do.
  */
 int
-dosuspend()
+dosuspend(void)
 {
     static long owner_pid = -1;
     unsigned long status;
@@ -598,9 +586,8 @@ vmscond lib$find_file_end(void **);
 
 /* collect a list of character names from all save files for this player */
 int
-vms_get_saved_games(savetemplate, outarray)
-const char *savetemplate; /* wildcarded save file name in native VMS format */
-char ***outarray;
+vms_get_saved_games(const char *savetemplate, /* wildcarded save file name in native VMS format */
+                    char ***outarray)
 {
     struct dsc in, out;
     unsigned short l;
@@ -638,8 +625,7 @@ char ***outarray;
 /* nethack has detected an internal error; try to give a trace of call stack
  */
 void
-vms_traceback(how)
-int how; /* 1: exit after traceback; 2: stay in debugger */
+vms_traceback(int how) /* 1: exit after traceback; 2: stay in debugger */
 {
     /* assumes that a static initializer applies to the first union
        field and that no padding will be placed between len and str */
@@ -786,9 +772,8 @@ struct eiha { /* extended image header activation block, $EIHADEF */
    with magic arguments; C run-time library won't be initialized yet */
 /*ARGSUSED*/
 int
-vmsexeini(inirtn_unused, clirtn_unused, imghdr)
-const void *inirtn_unused, *clirtn_unused;
-const unsigned char *imghdr;
+vmsexeini(const void *inirtn_unused, const void *clirtn_unused,
+          const unsigned char *imghdr)
 {
     const struct ihd *vax_hdr;
     const struct eihd *axp_hdr;

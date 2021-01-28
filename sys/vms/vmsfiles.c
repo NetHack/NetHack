@@ -35,8 +35,7 @@ extern int VDECL(lib$match_cond, (int, int, ...));
 
 /* vms_link() -- create an additional directory for an existing file */
 int
-vms_link(file, new)
-const char *file, *new;
+vms_link(const char *file, const char *new)
 {
     struct FAB fab;
     struct NAM nam;
@@ -83,8 +82,7 @@ const char *file, *new;
    (because the file won't be deleted, just made inaccessible!).
  */
 int
-vms_unlink(file)
-const char *file;
+vms_unlink(const char *file)
 {
     struct FAB fab;
     struct NAM nam;
@@ -115,9 +113,7 @@ const char *file;
  */
 #undef creat
 int
-vms_creat(file, mode)
-const char *file;
-unsigned int mode;
+vms_creat(const char *file, unsigned int mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
 
@@ -141,10 +137,7 @@ unsigned int mode;
  */
 #undef open
 int
-vms_open(file, flags, mode)
-const char *file;
-int flags;
-unsigned int mode;
+vms_open(const char *file, int flags, unsigned int mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     int fd;
@@ -165,8 +158,7 @@ unsigned int mode;
 /* do likewise for fopen() */
 #undef fopen
 FILE *
-vms_fopen(file, mode)
-const char *file, *mode;
+vms_fopen(const char *file, const char *mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     FILE *fp;
@@ -191,8 +183,7 @@ const char *file, *mode;
    the command line).  This version doesn't handle Unix-style file specs.
  */
 boolean
-same_dir(d1, d2)
-const char *d1, *d2;
+same_dir(const char *d1, const char *d2)
 {
     if (!d1 || !*d1 || !d2 || !*d2)
         return FALSE;
@@ -247,8 +238,7 @@ const char *d1, *d2;
 #define CASE2(V, W) CASE1(V) : CASE1(W)
 
 int
-c__translate(code)
-int code;
+c__translate(int code)
 {
     register int trans;
 
@@ -306,8 +296,7 @@ static char base_name[NAM$C_MAXRSS + 1];
 
 /* return a copy of the 'base' portion of a filename */
 char *
-vms_basename(name)
-const char *name;
+vms_basename(const char *name)
 {
     unsigned len;
     char *base, *base_p;

@@ -107,8 +107,8 @@ static char nam_buf[63],      /* maximum onamelth, size of ONAME(object) */
 /* try to decipher and categorize broadcast message text
 */
 static struct mail_info *
-parse_brdcst(buf) /* called by parse_next_broadcast() */
-char *buf;        /* input: filtered broadcast text */
+parse_brdcst(char *buf) /* called by parse_next_broadcast() */
+                        /* input: filtered broadcast text */
 {
     int typ;
     char *txt;
@@ -294,8 +294,8 @@ char *buf;        /* input: filtered broadcast text */
 
 /* filter out non-printable characters and redundant noise
 */
-static void filter_brdcst(buf) /* called by parse_next_broadcast() */
-register char *buf;            /* in: original text; out: filtered text */
+static void filter_brdcst(register char *buf) /* called by parse_next_broadcast() */
+                                        /* in: original text; out: filtered text */
 {
     register char c, *p, *buf_p;
 
@@ -330,7 +330,7 @@ static char empty_string[] = "";
 
 /* fetch the text of a captured broadcast, then mangle and decipher it
  */
-struct mail_info *parse_next_broadcast() /* called by ckmailstatus(mail.c) */
+struct mail_info *parse_next_broadcast(void) /* called by ckmailstatus(mail.c) */
 {
     short length, msg_type;
     $DESCRIPTOR(message, empty_string); /* string descriptor for buf[] */
@@ -353,7 +353,7 @@ struct mail_info *parse_next_broadcast() /* called by ckmailstatus(mail.c) */
 
 /* spit out any pending broadcast messages whenever we leave
  */
-static void flush_broadcasts() /* called from disable_broadcast_trapping() */
+static void flush_broadcasts(void) /* called from disable_broadcast_trapping() */
 {
     if (broadcasts > 0) {
         short len, typ;
@@ -376,8 +376,7 @@ static void flush_broadcasts() /* called from disable_broadcast_trapping() */
  */
 /*ARGSUSED*/
 static void
-broadcast_ast(dummy) /* called asynchronously by terminal driver */
-int dummy UNUSED;
+broadcast_ast(int dummy UNUSED) /* called asynchronously by terminal driver */
 {
     broadcasts++;
 }
@@ -385,7 +384,7 @@ int dummy UNUSED;
 /* initialize the broadcast manipulation code; SMG makes this easy
 */
 unsigned long
-init_broadcast_trapping() /* called by setftty() [once only] */
+init_broadcast_trapping(void) /* called by setftty() [once only] */
 {
     unsigned long sts, preserve_screen_flag = 1;
 
@@ -405,7 +404,7 @@ init_broadcast_trapping() /* called by setftty() [once only] */
 /* set up the terminal driver to deliver $brkthru data to a mailbox device
  */
 unsigned long
-enable_broadcast_trapping() /* called by setftty() */
+enable_broadcast_trapping(void) /* called by setftty() */
 {
     unsigned long sts = 1;
 
@@ -427,7 +426,7 @@ enable_broadcast_trapping() /* called by setftty() */
 /* return to 'normal'; $brkthru data goes straight to the terminal
  */
 unsigned long
-disable_broadcast_trapping() /* called by settty() */
+disable_broadcast_trapping(void) /* called by settty() */
 {
     unsigned long sts = 1;
 
@@ -445,22 +444,22 @@ disable_broadcast_trapping() /* called by settty() */
 
 /* simple stubs for non-mail configuration */
 unsigned long
-init_broadcast_trapping()
+init_broadcast_trapping(void)
 {
     return 1;
 }
 unsigned long
-enable_broadcast_trapping()
+enable_broadcast_trapping(void)
 {
     return 1;
 }
 unsigned long
-disable_broadcast_trapping()
+disable_broadcast_trapping(void)
 {
     return 1;
 }
 struct mail_info *
-parse_next_broadcast()
+parse_next_broadcast(void)
 {
     return 0;
 }
@@ -494,7 +493,7 @@ struct mail_info *foo;
 }
 
 void
-ckmailstatus()
+ckmailstatus(void)
 {
     struct mail_info *brdcst, *parse_next_broadcast();
 
@@ -509,7 +508,7 @@ ckmailstatus()
 }
 
 int
-main()
+main(int argc UNUSED, char *argv[] UNUSED)
 {
     char dummy[BUFSIZ];
 
@@ -526,23 +525,21 @@ main()
 }
 
 void
-panic(s)
-char *s;
+panic(char *s)
 {
     raw_print(s);
     exit(EXIT_FAILURE);
 }
 
 void
-raw_print(s)
-char *s;
+raw_print(char *s)
 {
     puts(s);
     fflush(stdout);
 }
 
 void
-wait_synch()
+wait_synch(void)
 {
     char dummy[BUFSIZ];
 

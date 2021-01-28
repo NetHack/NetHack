@@ -28,9 +28,7 @@ static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     NHFILE *nhfp;
 #ifdef CHDIR
@@ -247,9 +245,7 @@ attempt_restore:
 }
 
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i;
 
@@ -341,9 +337,7 @@ char *argv[];
 
 #ifdef CHDIR
 void
-chdirx(dir, wr)
-const char *dir;
-boolean wr;
+chdirx(const char *dir, boolean wr)
 {
 #ifndef HACKDIR
     static const char *defdir = ".";
@@ -372,7 +366,7 @@ boolean wr;
 #endif /* CHDIR */
 
 static void
-whoami()
+whoami(void)
 {
     /*
      * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS;
@@ -422,8 +416,9 @@ byebye(void)
    from saving the game after a fatal error has occurred.  */
 /*ARGSUSED*/
 static vms_handler_type         /* should be `unsigned long', but the -*/
-vms_handler(sigargs, mechargs)  /*+ prototype in <signal.h> is screwed */
-genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
+vms_handler(                    /*+ prototype in <signal.h> is screwed */
+genericptr_t sigargs,
+genericptr_t mechargs)     /* [0] is argc, [1..argc] are the real args */
 {
     unsigned long condition = ((unsigned long *) sigargs)[1];
 
@@ -448,7 +443,7 @@ sethanguphandler(void (*handler)(int))
 
 #ifdef PORT_HELP
 void
-port_help()
+port_help(void)
 {
     /*
      * Display VMS-specific help.   Just show contents of the helpfile
@@ -460,7 +455,7 @@ port_help()
 
 /* validate wizard mode if player has requested access to it */
 boolean
-authorize_wizard_mode()
+authorize_wizard_mode(void)
 {
     if (!strcmpi(nh_getenv("USER"), WIZARD_NAME))
         return TRUE;
@@ -469,7 +464,7 @@ authorize_wizard_mode()
 }
 
 static void
-wd_message()
+wd_message(void)
 {
     if (wiz_error_flag) {
         pline("Only user \"%s\" may access debug (wizard) mode.",
@@ -481,7 +476,7 @@ wd_message()
 }
 
 unsigned long
-sys_random_seed()
+sys_random_seed(void)
 {
     unsigned long seed;
     unsigned long pid = (unsigned long) getpid();

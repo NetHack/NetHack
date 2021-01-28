@@ -108,7 +108,7 @@ extern int nh_vms_getchar(void);
 
 /* rename the real vms_getchar and interpose this one in front of it */
 int
-vms_getchar()
+vms_getchar(void)
 {
     static int althack = 0, altprefix;
     char *nhalthack;
@@ -135,7 +135,7 @@ vms_getchar()
 #endif /*DEBUG*/
 
 int
-vms_getchar()
+vms_getchar(void)
 {
     short key;
 #ifdef USE_QIO_INPUT
@@ -281,8 +281,7 @@ static const char *arrow_or_PF = "ABCDPQRS", /* suffix char */
 /* Ultimate return value is (index into smg_keypad_codes[] + 256). */
 
 static short
-parse_function_key(c)
-register int c;
+parse_function_key(register int c)
 {
     struct _rd_iosb iosb;
     unsigned long sts;
@@ -356,7 +355,7 @@ register int c;
 #endif /* USE_QIO_INPUT */
 
 static void
-setctty()
+setctty(void)
 {
     struct _sm_iosb iosb;
     unsigned long status;
@@ -378,7 +377,7 @@ setctty()
 
 /* atexit() routine */
 static void
-resettty()
+resettty(void)
 {
     if (settty_needed) {
         bombing = TRUE; /* don't clear screen; preserve traceback info */
@@ -394,7 +393,7 @@ resettty()
  * (for initial startup and for returning from '!' or ^Z).
  */
 void
-gettty()
+gettty(void)
 {
     static char dev_tty[] = "TT:";
     static $DESCRIPTOR(tty_dsc, dev_tty);
@@ -445,8 +444,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
     if (!bombing)
         end_screen();
@@ -474,8 +472,7 @@ const char *s;
 
 /* same as settty, with no clearing of the screen */
 void
-shuttty(s)
-const char *s;
+shuttty(const char *s)
 {
     bombing = TRUE;
     settty(s);
@@ -483,7 +480,7 @@ const char *s;
 }
 
 void
-setftty()
+setftty(void)
 {
     unsigned long mask = LIB$M_CLI_CTRLT | LIB$M_CLI_CTRLY;
 
@@ -510,14 +507,14 @@ setftty()
 
 /* enable kbd interupts if enabled when game started */
 void
-intron()
+intron(void)
 {
     intr_char = CTRL('C');
 }
 
 /* disable kbd interrupts if required*/
 void
-introff()
+introff(void)
 {
     intr_char = 0;
 }
@@ -535,8 +532,7 @@ static const long mseconds_to_delta = VMS_UNITS_PER_SECOND / 1000L * -1L;
 /* sleep for specified number of milliseconds (note: the timer used
    generally only has 10-millisecond resolution at the hardware level...) */
 void
-msleep(mseconds)
-unsigned mseconds; /* milliseconds */
+msleep(unsigned mseconds) /* milliseconds */
 {
     long pid = 0L, zero = 0L, msec, qtime[2];
 

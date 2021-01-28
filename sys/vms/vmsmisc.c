@@ -17,8 +17,7 @@ extern void VDECL(lib$signal, (unsigned, ...));
 
 /* terminate, converting Unix-style exit code into VMS status code */
 void
-vms_exit(status)
-int status;
+vms_exit(int status)
 {
     /* convert non-zero to failure, zero to success */
     exit(status ? (SS$_ABORT | STS$M_INHIB_MSG) : SS$_NORMAL);
@@ -27,7 +26,7 @@ int status;
 
 /* put the user into the debugger; used for abort() when in wizard mode */
 void
-vms_abort()
+vms_abort(void)
 {
     if (debuggable)
         lib$signal(SS$_DEBUG);
