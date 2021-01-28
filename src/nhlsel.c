@@ -442,7 +442,7 @@ l_selection_randline(lua_State *L)
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    xchar x1, y1, x2, y2;
+    xchar x1 = 0, y1 = 0, x2 = 0, y2 = 0;
     int roughness = 7;
 
     if (argc == 6) {
@@ -575,7 +575,7 @@ l_selection_flood(lua_State *L)
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
-    xchar x, y;
+    xchar x = 0, y = 0;
 
     if (argc == 2) {
         x = (xchar) luaL_checkinteger(L, 1);
