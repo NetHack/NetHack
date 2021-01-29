@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1607945434 2020/12/14 11:30:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1611882005 2021/01/29 01:00:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.312 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3577,8 +3577,9 @@ readobjnam_postparse1(struct _readobjnam_data* d)
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
     if (strncmpi(d->bp, "samurai sword", 13)  /* not the "samurai" monster! */
         && strncmpi(d->bp, "wizard lock", 11) /* not the "wizard" monster! */
-        && strncmpi(d->bp, "ninja-to", 8)     /* not the "ninja" rank */
+        && strncmpi(d->bp, "death wand", 10)  /* 'of inversion', not Rider */
         && strncmpi(d->bp, "master key", 10)  /* not the "master" rank */
+        && strncmpi(d->bp, "ninja-to", 8)     /* not the "ninja" rank */
         && strncmpi(d->bp, "magenta", 7)) {   /* not the "mage" rank */
         const char *rest = 0;
 
