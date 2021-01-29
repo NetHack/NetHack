@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.435 $ $NHDT-Date: 1611525309 2021/01/24 21:55:09 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.437 $ $NHDT-Date: 1611882611 2021/01/29 01:10:11 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -375,6 +375,8 @@ spells that require a target spot rather than a direction (like skilled
 	feedback stating hero failed to hold location sufficiently in mind;
 	when not blind, such spells left autodescribe feedback for target spot
 	in the message window while the spell was being performed
+prevent wish request "death wand" from matching Death monster and producing a
+	random wand instead of a wand of death
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -494,6 +496,10 @@ replace "aligned priest" entries in Pri-loca.lua, astral.lua, minetn-1.lua,
 attempting to swap places with a peaceful monster might cause it to flee
 gender-specific monster names can be used in .lua files with the gender upheld
 remove unused vision tables
+changes accompanying sorting of discoveries resulted in omitting very last
+	item for '`'/#knownclass on a class where every item was discoverable
+	and had no extra labels (so potions and rings, possibly others, but
+	not scrolls or wands) and every item was actually discovered
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
