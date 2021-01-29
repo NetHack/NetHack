@@ -1277,66 +1277,66 @@ static Widget init_info_form(Widget, Widget, Widget);
  */
 static struct X_status_value shown_stats[NUM_STATS] = {
     /* 0 */
-    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* 1 */
-    { "Strength",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Dexterity",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Constitution", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Intelligence", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Strength",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Dexterity",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Constitution", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Intelligence", SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* 5 */
-    { "Wisdom",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Charisma",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Wisdom",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Charisma",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* F_NAME: 7 */
-    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* F_DLEVEL: 8 */
-    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Gold",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "",             SV_LABEL, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Gold",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* F_HP: 10 */
-    { "Hit Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Max HP",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Power",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Max Power",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Armor Class",  SV_VALUE, (Widget) 0, 256L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Hit Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Max HP",       SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Power",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Max Power",    SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Armor Class",  SV_VALUE, (Widget) 0, 256L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* F_XP_LEVL: 15 */
-    { "Xp Level",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Xp Level",     SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* also 15 (overloaded field) */
-    /*{ "Hit Dice",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0},*/
+    /*{ "Hit Dice",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },*/
     /* F_EXP_PTS: 16 (optionally displayed) */
-    { "Exp Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
-    { "Alignment",    SV_VALUE, (Widget) 0,  -2L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Exp Points",   SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
+    { "Alignment",    SV_VALUE, (Widget) 0,  -2L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* 18, optionally displayed */
-    { "Time",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Time",         SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* 19, condtionally present, optionally displayed when present */
-    { "Score",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0 },
+    { "Score",        SV_VALUE, (Widget) 0,  -1L, 0, FALSE, FALSE, FALSE, 0, 0, 0 },
     /* F_HUNGER: 20 (blank if 'normal') */
-    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, TRUE, FALSE, 0 },
+    { "",             SV_NAME,  (Widget) 0,  -1L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* F_ENCUMBER: 21 (blank if unencumbered) */
-    { "",             SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Trapped",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Tethered",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Levitating",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "",             SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Trapped",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Tethered",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Levitating",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* 25 */
-    { "Flying",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Riding",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Grabbed!",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Flying",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Riding",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Grabbed!",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* F_STONE: 28 */
-    { "Petrifying",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Slimed",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Petrifying",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Slimed",       SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* 30 */
-    { "Strangled",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Food Pois",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Term Ill",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Strangled",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Food Pois",    SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Term Ill",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* F_IN_LAVA: 33 */
-    { "Sinking",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Held",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Sinking",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Held",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* 35 */
-    { "Holding",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Blind",        SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Deaf",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Stunned",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
-    { "Confused",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Holding",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Blind",        SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Deaf",         SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Stunned",      SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
+    { "Confused",     SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
     /* F_HALLU: 40 (full spelling truncated due to space limitations) */
-    { "Hallucinat",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0 },
+    { "Hallucinat",   SV_NAME,  (Widget) 0,   0L, 0, FALSE, TRUE, FALSE, 0, 0, 0 },
 };
 /*
  * The following are supported by the core but not yet handled here:
