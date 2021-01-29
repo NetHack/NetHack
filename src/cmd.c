@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1611946107 2021/01/29 18:48:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1611952382 2021/01/29 20:33:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.452 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1911,7 +1911,8 @@ struct ext_func_tab extcmdlist[] = {
               doremring, 0, NULL },
     { M('R'), "ride", "mount or dismount a saddled steed",
               doride, AUTOCOMPLETE, NULL },
-    { M('r'), "rub", "rub a lamp or a stone", dorub, AUTOCOMPLETE, NULL },
+    { M('r'), "rub", "rub a lamp or a stone",
+              dorub, AUTOCOMPLETE, NULL },
     { 'S',    "save", "save the game and exit",
               dosave, IFBURIED | GENERALCMD, NULL },
     { 's',    "search", "search for traps and secret doors",
