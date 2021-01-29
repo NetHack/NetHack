@@ -1418,7 +1418,7 @@ mswin_nhgetch(void)
     while ((event = mswin_input_pop()) == NULL || event->type != NHEVENT_CHAR)
         mswin_main_loop();
 
-    key = event->kbd.ch;
+    key = event->ei.kbd.ch;
     return (key);
 }
 
@@ -1450,13 +1450,13 @@ mswin_nh_poskey(int *x, int *y, int *mod)
 
     if (event->type == NHEVENT_MOUSE) {
 	if (iflags.wc_mouse_support) {
-            *mod = event->ms.mod;
-            *x = event->ms.x;
-            *y = event->ms.y;
+            *mod = event->ei.ms.mod;
+            *x = event->ei.ms.x;
+            *y = event->ei.ms.y;
         }
         key = 0;
     } else {
-        key = event->kbd.ch;
+        key = event->ei.kbd.ch;
     }
     return (key);
 }
@@ -2062,7 +2062,6 @@ mswin_preference_update(const char *pref)
     }
 }
 
-#define TEXT_BUFFER_SIZE 4096
 char *
 mswin_getmsghistory(boolean init)
 {

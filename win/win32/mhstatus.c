@@ -350,7 +350,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 BOOL useUnicode = fnt->supportsUnicode;
 
-                winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+                winos_ascii_to_wide_str((const unsigned char *) str, wbuf, SIZE(wbuf));
 
                 nFg = (clr == NO_COLOR ? status_fg_color
                     : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)

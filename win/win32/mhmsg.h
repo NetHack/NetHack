@@ -67,7 +67,7 @@ typedef struct mswin_nhmsg_end_menu {
 
 typedef struct mswin_nhmsg_get_text {
     size_t max_size;
-    char buffer[];
+    char buffer[TEXT_BUFFER_SIZE];
 } MSNHMsgGetText, *PMSNHMsgGetText;
 
 typedef struct mswin_nhmsg_update_status {

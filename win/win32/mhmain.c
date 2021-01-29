@@ -1248,7 +1248,6 @@ mswin_apply_window_style_all(void)
 }
 
 // returns strdup() created pointer - callee assumes the ownership
-#define TEXT_BUFFER_SIZE 4096
 char *
 nh_compose_ascii_screenshot(void)
 {

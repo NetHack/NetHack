@@ -35,6 +35,8 @@
 #include "hack.h"
 #include "color.h"
 
+#define TEXT_BUFFER_SIZE 4096
+
 /* Create an array to keep track of the various windows */
 
 #ifndef MAXWINDOWS

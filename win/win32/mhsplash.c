@@ -155,8 +155,8 @@ mswin_display_splash_window(BOOL show_ver)
         /* Show complete version information */
         dlb *f;
         char verbuf[BUFSZ];
-        int verstrsize = 0;
- 
+        /* int verstrsize = 0; */
+
         getversionstring(verbuf);
         strbuf_append(&strbuf, verbuf);
         strbuf_append(&strbuf, "\n\n");

@@ -664,7 +664,7 @@ onPaint(HWND hWnd)
             /* Find out the cursor (caret) position */
             if (i == MSG_LINES - 1) {
                 int nnum, numfit;
-                SIZE size;
+                SIZE size = {0};
                 TCHAR *nbuf;
                 int nlen;
 

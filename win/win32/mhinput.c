@@ -72,7 +72,7 @@ mswin_input_pop(void)
     if (g.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
-        hangup_event.kbd.ch = '\033';
+        hangup_event.ei.kbd.ch = '\033';
         return &hangup_event;
     }
 #endif
@@ -101,7 +101,7 @@ mswin_input_peek(void)
     if (g.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
-        hangup_event.kbd.ch = '\033';
+        hangup_event.ei.kbd.ch = '\033';
         return &hangup_event;
     }
 #endif
