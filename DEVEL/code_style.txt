@@ -13,7 +13,8 @@ should be styled in keeping with C.
 The code base in C files was, close to the 3.6 release, reformatted using a
 version of the clang-format tool patched to support K&R-style argument
 declarations. Due to some incompatibilities, the patch is not publicly
-available and clang-format is not expected to be regularly used.
+available and clang-format is not expected to be regularly used.  Since then,
+function declarations and definitions have been switched to ANSI.
 
 Developers should do their best to adhere to the coding style to promote
 legible, easy-to-edit code. Legibility is paramount, so in some cases, it may
@@ -47,14 +48,40 @@ Functions and Control Statements
 -------------------------------
 
 For a function definition, the return type, declarator, and opening brace
-should each appear on a line of their own. Arguments are never declared in the
-function declarator, but are declared, unindented, K&R-style before the
-opening brace:
+should each appear on a line of their own. Arguments are defined in the following
+parenthesis, per ANSI.  There are two general styles.  One with no comments, where
+arguments are added one after another, with a wrap aligning to the first argument
+if there is an overflow.
 
     void
-    foo(i, c)
-    int i;
-    char c;
+    foo(int i, char c)
+    {
+        /* function body */
+    }
+
+    void
+    long_function_name(int first_arg, struct long_name *second_arg,
+                       int third_arg, int forth_arg)
+    {
+        /* function body */
+    }
+
+Alternatively, arguments can be one per line if they are commented:
+
+    void
+    long_function_name(int first_arg,                /* main operation */
+                       struct long_name *second_arg, /* control details */
+                       int third_arg,                /* local conditions - if
+                                                        they apply */
+                       int forth_arg)                /* remote conditions */
+    {
+        /* function body */
+    }
+
+If the function takes no parameters:
+
+    int
+    long_function_name(void)
     {
         /* function body */
     }
@@ -192,7 +219,6 @@ Putting the following in ~/.emacs.el is one
 (defun hook-c ()
   (setq c-set-style "k&r")
   (setq c-basic-offset 4)
-  (setq indent-tabs-mode nil)
-  (c-set-offset 'knr-argdecl-intro 0))
+  (setq indent-tabs-mode nil))
 (add-hook 'c-mode-common-hook 'hook-c)
 
