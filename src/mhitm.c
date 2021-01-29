@@ -839,9 +839,6 @@ mdamagem(struct monst *magr, struct monst *mdef,
          struct attack *mattk, struct obj *mwep, int dieroll)
 {
     struct permonst *pa = magr->data, *pd = mdef->data;
-    int armpro;
-    /* this was moved downstream during a 2020 refactor */
-    /* boolean cancelled; */
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
@@ -876,10 +873,6 @@ mdamagem(struct monst *magr, struct monst *mdef,
             return MM_AGR_DIED;
         }
     }
-
-    /* cancellation factor is the same as when attacking the hero */
-    armpro = magic_negation(mdef);
-    /* cancelled = magr->mcan || !(rn2(10) >= 3 * armpro); */
 
     mhitm_adtyping(magr, mattk, mdef, &mhm);
     if (mhm.done)

@@ -940,8 +940,6 @@ static int
 hitmu(register struct monst *mtmp, register struct attack *mattk)
 {
     struct permonst *mdat = mtmp->data;
-    /* int uncancelled; */
-    int armpro;
     struct permonst *olduasmon = g.youmonst.data;
     int res;
     struct mhitm_data mhm;
@@ -980,14 +978,6 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     if ((is_undead(mdat) || is_vampshifter(mtmp)) && midnight())
         mhm.damage += d((int) mattk->damn, (int) mattk->damd); /* extra damage */
-
-    /*  Next a cancellation factor.
-     *  Use uncancelled when cancellation factor takes into account certain
-     *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
-     */
-    armpro = magic_negation(&g.youmonst);
-    /* this was moved downstream during a 2020 refactor */
-    /* uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro); */
 
     mhitm_adtyping(mtmp, mattk, &g.youmonst, &mhm);
     if (mhm.done)
