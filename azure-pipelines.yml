@@ -101,7 +101,7 @@ steps:
     echo "CXX: $CXX"
   displayName: 'Echoing variables'
 
-- checkout: git://NetHack/NetHackTest@pipeline-test
+- checkout: git://NetHack/NetHack@NetHack-3.7
   submodules: true
   path: $(netHackPath) # $(Agent.BuildDirectory)/$(netHackPath)
 
