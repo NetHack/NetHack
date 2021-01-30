@@ -15,27 +15,55 @@ nymph chatting & stealing messages based on gender preferences
 
 --
 
-# test procedure
+# test procedure (manual, informal)
 
 test in wizard mode. wish for amulet of change and use ^G to summon
 succubus, incubus, and nymph for each gender and orientation (3*2*4 = 24 tests)
   - ace male, gay male, straight male, bi male
   - ace female, gay female, straight female, bi female
 
-build config #1: consent enabled
+build config #1: seduction with consent enabled
 1.1 succubi and incubi respect consent. test all gender and consent permutations.
 1.2 foocubi have seduction attack. consorting leads to sex.
 1.3 nymphs respect consent (and "charm" vs "seduce" you accordingly)
+1.4 orientation is reported correctly in ^X screen
+1.5 can #chat with foocubi to change orientation
+1.6 dishwashers have compatible gender with consent values
 
 build config #2: regular seduction (consent disabled)
 2.1 succubi and incubi are hetero. test with both male & female heroes.
 2.2 foocubi have seduction attack. consorting leads to sex.
 2.3 nymphs are hetero. test with both male & female heroes.
+2.4 no orientation in ^X screen
+2.5 #chatting with foocubi results in cajoling, consent is not requested
+2.6 dishwashers are hetero
 
 build config #3: seduction & consent both disabled
-3.1 amorous demons are hetero
+3.1 foocubi do not have different attack types for different genders (ace)
 3.2 foocubi attacks drain life, no disrobing, no sex
 3.3 nymphs are hetero
 
-build config #4: seduction disabled but consent enabled (bad config)
-4.1 same as config #3
+build config #4: seduction disabled (runtime) but consent enabled (compile time)
+4.0 same as config #3
+
+build config #5: vanilla nh370, seduction disabled
+5.0 same as config #3
+
+--
+
+# test results
+
+2021-01-27 e0d6ebb0e build config #1
+ace male - nymph used seduce, says hello sailor. succubus & incubus ok
+straight male - nymph ok
+straight female - nymph ok
+gay male - nymphs cajole ok, but still seduce
+gay female - nymph says hello sailor but charms
+
+2021-01-30 0516fa9e3 build config #5
+male - succubus says hello sailor, drains levels
+     - incubus says hello sailor, drains levels
+     - nymph says hello sailor, seduces
+female - incubus cajoles you, drains levels
+       - succubus cajoles you, drains levels
+       - nymph cajoles you, charms
