@@ -14,11 +14,6 @@
 #include "hack.h"
 #include "sp_lev.h"
 
-#ifdef _MSC_VER
- #pragma warning(push)
- #pragma warning(disable : 4244)
-#endif
-
 typedef void (*select_iter_func)(int, int, genericptr);
 
 extern void mkmap(lev_init *);
@@ -6251,9 +6246,5 @@ load_special(const char *name)
 
     return result;
 }
-
-#ifdef _MSC_VER
- #pragma warning(pop)
-#endif
 
 /*sp_lev.c*/
