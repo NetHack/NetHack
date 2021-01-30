@@ -107,6 +107,8 @@ opt_##a,
                 &flags.autoopen)
     NHOPTB(autopickup, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.pickup)
+    NHOPTO("autopickup exceptions", o_autopickup_exceptions, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit autopickup exceptions")
     NHOPTB(autoquiver, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.autoquiver)
     NHOPTB(autounlock, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
@@ -294,10 +296,14 @@ opt_##a,
                 &iflags.menu_tab_sep)
     NHOPTB(menucolors, 0, opt_in, set_in_game, Off, Yes, Yes, No, NoAlias,
                 &iflags.use_menu_color)
+    NHOPTO("menu colors", o_menu_colors, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit menu colors")
     NHOPTC(menuinvertmode, 5, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "behaviour of menu iverts")
     NHOPTC(menustyle, MENUTYPELEN, opt_in, set_in_game, Yes, Yes, No, Yes,
                 NoAlias, "user interface for object selection")
+    NHOPTO("message types", o_message_types, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit message types")
     NHOPTB(monpolycontrol, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.mon_polycontrol)
     NHOPTC(monsters, MAXMCLASSES, opt_in, set_in_config, No, Yes, No, No,
@@ -429,9 +435,13 @@ opt_##a,
                 &flags.standout)
     NHOPTB(status_updates, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
                 &iflags.status_updates)
+    NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit status condition fields")
 #ifdef STATUS_HILITES 
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
+    NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit status hilites")
 #else
     NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No,
                 NoAlias, "highlight control")
@@ -545,18 +555,6 @@ opt_##a,
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_wraptext)
 
-    NHOPTO("autopickup exceptions", o_autopickup_exceptions, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit autopickup exceptions")
-    NHOPTO("menu colors", o_menu_colors, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit menu colors")
-    NHOPTO("message types", o_message_types, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit message types")
-    NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit status condition fields")
-#ifdef STATUS_HILITES
-    NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit status hilites")
-#endif
     /*
      * Prefix-based Options
      */
