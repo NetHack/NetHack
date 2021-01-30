@@ -818,6 +818,10 @@ curses_nh_poskey(int *x, int *y, int *mod)
     if (key == KEY_MOUSE) {
         key = curses_get_mouse(x, y, mod);
     }
+#else
+    nhUse(x);
+    nhUse(y);
+    nhUse(mod);
 #endif
 
     return key;

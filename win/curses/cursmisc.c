@@ -1023,6 +1023,10 @@ curses_get_mouse(int *mousex, int *mousey, int *mod)
             }
         }
     }
+#else
+    nhUse(mousex);
+    nhUse(mousey);
+    nhUse(mod);
 #endif /* NCURSES_MOUSE_VERSION */
 
     return key;
