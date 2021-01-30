@@ -3101,6 +3101,8 @@ extern void bypass_objlist(struct obj *, boolean);
 extern struct obj *nxt_unbypassed_obj(struct obj *);
 extern struct obj *nxt_unbypassed_loot(Loot *, struct obj *);
 extern int racial_exception(struct monst *, struct obj *);
+extern void extract_from_minvent(struct monst *, struct obj *, boolean,
+                                 boolean);
 
 /* ### write.c ### */
 

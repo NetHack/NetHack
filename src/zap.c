@@ -347,7 +347,6 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             } else if (canspotmon(mtmp)) {
                 pline("%s falls off.", buf);
             }
-            obj_extract_self(obj);
             mdrop_obj(mtmp, obj, FALSE);
         }
         break;
@@ -4052,16 +4051,7 @@ disintegrate_mon(struct monst *mon,
     for (otmp = mon->minvent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (!oresist_disintegration(otmp)) {
-            if (otmp->owornmask) {
-                /* in case monster's life gets saved */
-                mon->misc_worn_check &= ~otmp->owornmask;
-                if (otmp->owornmask & W_WEP)
-                    setmnotwielded(mon, otmp);
-                /* also dismounts hero if this object is steed's saddle */
-                update_mon_intrinsics(mon, otmp, FALSE, TRUE);
-                otmp->owornmask = 0L;
-            }
-            obj_extract_self(otmp);
+            extract_from_minvent(mon, otmp, TRUE, TRUE);
             obfree(otmp, (struct obj *) 0);
         }
     }

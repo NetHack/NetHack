@@ -1878,21 +1878,11 @@ remove_object(struct obj* otmp)
 void
 discard_minvent(struct monst* mtmp, boolean uncreate_artifacts)
 {
-    struct obj *otmp, *mwep = MON_WEP(mtmp);
-    boolean keeping_mon = !DEADMONSTER(mtmp);
+    struct obj *otmp;
 
     while ((otmp = mtmp->minvent) != 0) {
         /* this has now become very similar to m_useupall()... */
-        obj_extract_self(otmp);
-        if (otmp->owornmask) {
-            if (keeping_mon) {
-                if (otmp == mwep)
-                    mwepgone(mtmp), mwep = 0;
-                mtmp->misc_worn_check &= ~otmp->owornmask;
-                update_mon_intrinsics(mtmp, otmp, FALSE, TRUE);
-            }
-            otmp->owornmask = 0L; /* obfree() expects this */
-        }
+        extract_from_minvent(mtmp, otmp, TRUE, TRUE);
         if (uncreate_artifacts && otmp->oartifact)
             artifact_exists(otmp, safe_oname(otmp), FALSE);
         obfree(otmp, (struct obj *) 0); /* dealloc_obj() isn't sufficient */

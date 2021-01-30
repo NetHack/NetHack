@@ -709,12 +709,7 @@ which_armor(struct monst *mon, long flag)
 static void
 m_lose_armor(struct monst *mon, struct obj *obj)
 {
-    mon->misc_worn_check &= ~obj->owornmask;
-    if (obj->owornmask)
-        update_mon_intrinsics(mon, obj, FALSE, FALSE);
-    obj->owornmask = 0L;
-
-    obj_extract_self(obj);
+    extract_from_minvent(mon, obj, TRUE, FALSE);
     place_object(obj, mon->mx, mon->my);
     /* call stackobj() if we ever drop anything that can merge */
     newsym(mon->mx, mon->my);
@@ -1038,5 +1033,40 @@ racial_exception(struct monst *mon, struct obj *obj)
     /*  return -1; */
 
     return 0;
+}
+
+/* Remove an object from a monster's inventory.
+ * At its core this is just obj_extract_self(), but it also handles any updates
+ * that needs to happen if the gear is equipped or in some other sort of state
+ * that needs handling.
+ * Note that like obj_extract_self(), this leaves obj free. */
+void
+extract_from_minvent(struct monst *mon, struct obj *obj,
+                     boolean do_intrinsics, /* whether to call
+                                               update_mon_intrinsics */
+                     boolean silently) /* doesn't affect all possible messages,
+                                          just update_mon_intrinsics's */
+{
+    long unwornmask = obj->owornmask;
+
+    if (obj->where != OBJ_MINVENT) {
+        impossible("extract_from_minvent called on object not in minvent");
+        return;
+    }
+    obj_extract_self(obj);
+    obj->owornmask = 0L;
+    if (unwornmask) {
+        if (!DEADMONSTER(mon) && do_intrinsics) {
+            update_mon_intrinsics(mon, obj, FALSE, silently);
+        }
+        mon->misc_worn_check &= ~unwornmask;
+        /* give monster a chance to wear other equipment on its next
+           move instead of waiting until it picks something up */
+        mon->misc_worn_check |= I_SPECIAL;
+    }
+    obj_no_longer_held(obj);
+    if (unwornmask & W_WEP) {
+        mwepgone(mon); /* unwields and sets weapon_check to NEED_WEAPON */
+    }
 }
 /*worn.c*/
