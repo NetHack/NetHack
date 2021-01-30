@@ -9,22 +9,24 @@ To add an entirely new option macro type:
     NHOPTB (for boolean options)
     NHOPTC (for complex options that take values beyond off/on)
     NHOPTP (for handling a suite that all begin with a common prefix)
+    NHOPTO (for other options not easily handled as one of the above)
 
      1. You need to add three different expansions of your macro, one for
         the NHOPT_PROTO phase where function prototypes are generated,
         one for the NHOPT_ENUM phase where enums are generated, and
         NHOPT_PARSE phase.
 
-     2. If you are adding a new macro type to the current list of NHOPTB,
-        NHOPTC, or NHOPTP, don't forget to add the #undef near the bottom
-        of optlist.h, so that the macro is available for re-use during the
-        next usage phase.
+     2. If you are adding a new macro type to the current NHOPTB,
+        NHOPTC, NHOPTP, NHOPTO macros, don't forget to add the #undef near
+        the bottom of optlist.h, so that the macro is available for re-use
+        during the next usage phase.
 
  To add an option:
 
      1. Add an entry to include/optlist.h, using the NHOPTB macro for a
-       boolean on/off option, or NHOPTC macro for a compound option,
-       or NHOPTP macro if it handles an entire prefix.
+       boolean on/off option, or NHOPTC macro for a complex option,
+       or NHOPTP macro if it handles an entire prefix, or NHOPTO macro for
+       other types.
 
        The list of options is always kept in optlist.h in alphabetical order.
 
