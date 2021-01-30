@@ -8,18 +8,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
+  <Import Project="NetHackProperties.props" />
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
@@ -47,42 +36,9 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(LuaDir)lapi.c" />
-    <ClCompile Include="$(LuaDir)lauxlib.c" />
-    <ClCompile Include="$(LuaDir)lbaselib.c" />
-    <ClCompile Include="$(LuaDir)lbitlib.c">
-      <ExcludedFromBuild Condition="'$(LUA_VERSION.Substring(0,3))'=='5.4'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(LUA_VERSION.Substring(0,3))'=='5.3'">false</ExcludedFromBuild>
+    <ClCompile Include="@(Lua)">
+      <DisableSpecificWarnings>4701;4702;4244;4310</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="$(LuaDir)lcode.c" />
-    <ClCompile Include="$(LuaDir)lcorolib.c" />
-    <ClCompile Include="$(LuaDir)lctype.c" />
-    <ClCompile Include="$(LuaDir)ldblib.c" />
-    <ClCompile Include="$(LuaDir)ldebug.c" />
-    <ClCompile Include="$(LuaDir)ldo.c" />
-    <ClCompile Include="$(LuaDir)ldump.c" />
-    <ClCompile Include="$(LuaDir)lfunc.c" />
-    <ClCompile Include="$(LuaDir)lgc.c" />
-    <ClCompile Include="$(LuaDir)linit.c" />
-    <ClCompile Include="$(LuaDir)liolib.c" />
-    <ClCompile Include="$(LuaDir)llex.c" />
-    <ClCompile Include="$(LuaDir)lmathlib.c" />
-    <ClCompile Include="$(LuaDir)lmem.c" />
-    <ClCompile Include="$(LuaDir)loadlib.c" />
-    <ClCompile Include="$(LuaDir)lobject.c" />
-    <ClCompile Include="$(LuaDir)lopcodes.c" />
-    <ClCompile Include="$(LuaDir)loslib.c" />
-    <ClCompile Include="$(LuaDir)lparser.c" />
-    <ClCompile Include="$(LuaDir)lstate.c" />
-    <ClCompile Include="$(LuaDir)lstring.c" />
-    <ClCompile Include="$(LuaDir)lstrlib.c" />
-    <ClCompile Include="$(LuaDir)ltable.c" />
-    <ClCompile Include="$(LuaDir)ltablib.c" />
-    <ClCompile Include="$(LuaDir)ltm.c" />
-    <ClCompile Include="$(LuaDir)lundump.c" />
-    <ClCompile Include="$(LuaDir)lutf8lib.c" />
-    <ClCompile Include="$(LuaDir)lvm.c" />
-    <ClCompile Include="$(LuaDir)lzio.c" />
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
     <ClCompile Include="$(SrcDir)apply.c" />
