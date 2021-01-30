@@ -13,7 +13,7 @@
  */
 
 static int optfn_boolean(int, int, boolean, char *, char *);
-enum OptType {BoolOpt, CompOpt};
+enum OptType {BoolOpt, CompOpt, OthrOpt};
 enum Y_N {No, Yes};
 enum Off_On {Off, On};
 
@@ -48,6 +48,8 @@ struct allopt_t {
 static int optfn_##a(int, int, boolean, char *, char *);
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
 static int pfxfn_##a(int, int, boolean, char *, char *);
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+static int optfn_##a(int, int, boolean, char *, char *);
 
 #elif defined(NHOPT_ENUM)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp) \
@@ -56,6 +58,8 @@ opt_##a,
 opt_##a,
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
 pfx_##a,
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+opt_##a,
 
 #elif defined(NHOPT_PARSE)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp) \
@@ -67,6 +71,9 @@ pfx_##a,
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
 { #a, 0, b, pfx_##a, s, CompOpt, n, v, d, Yes, c, (boolean *) 0, &pfxfn_##a, \
  al, z, #a, Off, h, 0 },
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+{ m, 0, b, opt_##a, s, OthrOpt, n, v, d, No, c, (boolean *) 0, &optfn_##a, \
+ al, z, (const char *) 0, On, On, 0 },
 #endif
 
 /* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, bool_p */
@@ -537,6 +544,19 @@ pfx_##a,
                 &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_wraptext)
+
+    NHOPTO("autopickup exceptions", o_autopickup_exceptions, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit autopickup exceptions")
+    NHOPTO("menu colors", o_menu_colors, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit menu colors")
+    NHOPTO("message types", o_message_types, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit message types")
+    NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit status condition fields")
+#ifdef STATUS_HILITES
+    NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit status hilites")
+#endif
     /*
      * Prefix-based Options
      */
@@ -555,6 +575,7 @@ pfx_##a,
 #undef NHOPTB
 #undef NHOPTC
 #undef NHOPTP
+#undef NHOPTO
 
 #endif /* NHOPT_PROTO || NHOPT_ENUM || NHOPT_PARSE */
 

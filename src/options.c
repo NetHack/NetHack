@@ -249,7 +249,6 @@ static int count_menucolors(void);
 static boolean parse_role_opts(int, boolean, const char *,
                                char *, char **);
 static void doset_add_menu(winid, const char *, int, int);
-static void opts_add_others(winid, const char *, int, char *, int);
 static int handle_add_list_remove(const char *, int);
 static void remove_autopickup_exception(struct autopickup_exception *);
 static int count_apes(void);
@@ -6971,31 +6970,119 @@ static char fmtstr_doset[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
-enum opt_other_enums {
-    OPT_OTHER_COND = -5,
-    OPT_OTHER_MSGTYPE = -4,
-    OPT_OTHER_MENUCOLOR = -3,
-    OPT_OTHER_STATHILITE = -2,
-    OPT_OTHER_APEXC = -1
-    /* these must be < 0 */
-};
+static int
+optfn_o_autopickup_exceptions(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_apes());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_autopickup_exception();
+    }
+    return optn_ok;
+}
 
-static struct other_opts {
-    const char *name;
-    enum optset_restrictions setwhere;
-    enum opt_other_enums code;
-    int (*othr_count_func)(void);
-} othropt[] = {
-    { "autopickup exceptions", set_in_game, OPT_OTHER_APEXC, count_apes },
-    { "menu colors", set_in_game, OPT_OTHER_MENUCOLOR, count_menucolors },
-    { "message types", set_in_game, OPT_OTHER_MSGTYPE, msgtype_count },
-    { "status condition fields", set_in_game, OPT_OTHER_COND, count_cond },
+static int
+optfn_o_menu_colors(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_menucolors());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_menu_colors();
+    }
+    return optn_ok;
+}
+
+static int
+optfn_o_message_types(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, msgtype_count());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_msgtype();
+    }
+    return optn_ok;
+}
+
+static int
+optfn_o_status_cond(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_cond());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        cond_menu();
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
 #ifdef STATUS_HILITES
-    { "status hilite rules", set_in_game, OPT_OTHER_STATHILITE,
-      count_status_hilites },
-#endif
-    { (char *) 0, 0, (enum opt_other_enums) 0 },
-};
+static int
+optfn_o_status_hilites(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_status_hilites());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        if (!status_hilite_menu()) {
+            return optn_err; /*pline("Bad status hilite(s) specified.");*/
+        } else {
+            if (wc2_supported("hilite_status"))
+                preference_update("hilite_status");
+        }
+        return optn_ok;
+    }
+    return optn_ok;
+}
+#endif /*STATUS_HILITES*/
 
 /* the 'O' command */
 int
@@ -7030,14 +7117,12 @@ doset(void) /* changing options via menu by Per Liboriussen */
         /* spin through the options to find the longest name
            and adjust the format string accordingly */
         longest_name_len = 0;
-        for (pass = 0; pass <= 2; pass++)
-            for (i = 0; (name = ((pass < 2) ? allopt[i].name
-                                : othropt[i].name)) != 0; i++) {
+        for (pass = 0; pass < 2; pass++)
+            for (i = 0; (name = allopt[i].name) != 0; i++) {
                 if (pass == 0 &&
                     (allopt[i].opttyp != BoolOpt || !allopt[i].addr))
                     continue;
-                optflags = (pass < 2) ? allopt[i].setwhere
-                                      : othropt[i].setwhere;
+                optflags = allopt[i].setwhere;
                 if (optflags < startpass || optflags > endpass)
                     continue;
                 if ((is_wc_option(name) && !wc_supported(name))
@@ -7121,13 +7206,19 @@ doset(void) /* changing options via menu by Per Liboriussen */
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              iflags.menu_headings, "Other settings:", MENU_ITEMFLAGS_NONE);
 
-    for (i = 0; (name = othropt[i].name) != 0; i++) {
-        if ((is_wc_option(name) && !wc_supported(name))
-            || (is_wc2_option(name) && !wc2_supported(name)))
-            continue;
-        opts_add_others(tmpwin, name, othropt[i].code,
-                        (char *) 0, othropt[i].othr_count_func());
-    }
+    for (pass = startpass; pass <= endpass; pass++)
+        for (i = 0; (name = allopt[i].name) != 0; i++) {
+            if (allopt[i].opttyp != OthrOpt)
+                continue;
+            if ((int) allopt[i].setwhere == pass) {
+                if ((is_wc_option(name) && !wc_supported(name))
+                    || (is_wc2_option(name) && !wc2_supported(name)))
+                    continue;
+
+                doset_add_menu(tmpwin, name, i,
+                               (pass == set_gameview) ? 0 : indexoffset);
+            }
+        }
 
 #ifdef PREFIXES_IN_USE
     any = cg.zeroany;
@@ -7152,56 +7243,37 @@ doset(void) /* changing options via menu by Per Liboriussen */
             opt_indx = pick_list[pick_idx].item.a_int - 1;
             if (opt_indx < -1)
                 opt_indx++; /* -1 offset for select_menu() */
-            if (opt_indx == OPT_OTHER_APEXC) {
-                handler_autopickup_exception();
-#ifdef STATUS_HILITES
-            } else if (opt_indx == OPT_OTHER_STATHILITE) {
-                if (!status_hilite_menu()) {
-                    pline("Bad status hilite(s) specified.");
-                } else {
-                    if (wc2_supported("hilite_status"))
-                        preference_update("hilite_status");
-                }
-#endif
-            } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
-                handler_menu_colors();
-            } else if (opt_indx == OPT_OTHER_COND) {
-                cond_menu();
-            } else if (opt_indx == OPT_OTHER_MSGTYPE) {
-                handler_msgtype();
+            opt_indx -= indexoffset;
+            if (allopt[opt_indx].opttyp == BoolOpt) {
+                /* boolean option */
+                Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
+                        allopt[opt_indx].name);
+                (void) parseoptions(buf, setinitial, fromfile);
             } else {
-                opt_indx -= indexoffset;
-                if (allopt[opt_indx].opttyp == BoolOpt) {
-                    /* boolean option */
-                    Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
-                            allopt[opt_indx].name);
-                    (void) parseoptions(buf, setinitial, fromfile);
+                /* compound option */
+                int k = opt_indx, reslt UNUSED;
+
+                if (allopt[k].has_handler && allopt[k].optfn) {
+                    reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
+                                               FALSE, empty_optstr, empty_optstr);
                 } else {
-                    /* compound option */
-                    int k = opt_indx, reslt UNUSED;
+                    char abuf[BUFSZ];
 
-                    if (allopt[k].has_handler && allopt[k].optfn) {
-                        reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
-                                           FALSE, empty_optstr, empty_optstr);
-                    } else {
-                        char abuf[BUFSZ];
-
-                        Sprintf(buf, "Set %s to what?", allopt[opt_indx].name);
-                        abuf[0] = '\0';
-                        getlin(buf, abuf);
-                        if (abuf[0] == '\033')
-                            continue;
-                        Sprintf(buf, "%s:", allopt[opt_indx].name);
-                        (void) strncat(eos(buf), abuf,
+                    Sprintf(buf, "Set %s to what?", allopt[opt_indx].name);
+                    abuf[0] = '\0';
+                    getlin(buf, abuf);
+                    if (abuf[0] == '\033')
+                        continue;
+                    Sprintf(buf, "%s:", allopt[opt_indx].name);
+                    (void) strncat(eos(buf), abuf,
                                    (sizeof buf - 1 - strlen(buf)));
-                        /* pass the buck */
-                        (void) parseoptions(buf, setinitial, fromfile);
-                    }
+                    /* pass the buck */
+                    (void) parseoptions(buf, setinitial, fromfile);
                 }
-                if (wc_supported(allopt[opt_indx].name)
-                        || wc2_supported(allopt[opt_indx].name))
-                    preference_update(allopt[opt_indx].name);
             }
+            if (wc_supported(allopt[opt_indx].name)
+                || wc2_supported(allopt[opt_indx].name))
+                preference_update(allopt[opt_indx].name);
         }
         free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
     }
@@ -7264,26 +7336,6 @@ doset_add_menu(winid win,          /* window to add to */
                 value);
     else
         Sprintf(buf, fmtstr_doset_tab, option, value);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
-}
-
-static void
-opts_add_others(winid win, const char *name, int id, char *bufx, int nset)
-{
-    char buf[BUFSZ], buf2[BUFSZ];
-    anything any = cg.zeroany;
-
-    any.a_int = id;
-    if (!bufx)
-        Sprintf(buf2, n_currently_set, nset);
-    else
-        Sprintf(buf2, "%s", bufx);
-    if (!iflags.menu_tab_sep)
-        Sprintf(buf, fmtstr_doset, any.a_int ? "" : "    ",
-                name, buf2);
-    else
-        Sprintf(buf, fmtstr_doset_tab, name, buf2);
     add_menu(win, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
@@ -7772,11 +7824,16 @@ option_help(void)
     }
     putstr(datawin, 0, "");
 
+    /* Compound options */
     putstr(datawin, 0, "Other settings:");
-    for (i = 0; othropt[i].name; ++i) {
-        Sprintf(buf, " %s", othropt[i].name);
+    for (i = 0; allopt[i].name; i++) {
+        if (allopt[i].opttyp != OthrOpt)
+            continue;
+        Sprintf(buf, " %s", allopt[i].name);
         putstr(datawin, 0, buf);
     }
+
+    putstr(datawin, 0, "");
 
     for (i = 0; opt_epilog[i]; i++)
         putstr(datawin, 0, opt_epilog[i]);
