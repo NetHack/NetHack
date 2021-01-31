@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1611182256 2021/01/20 22:37:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1612053752 2021/01/31 00:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1132,7 +1132,8 @@ trapeffect_sqky_board(
             seetrap(trap);
             pline("A board beneath you %s%s%s.",
                   Deaf ? "vibrates" : "squeaks ",
-                  Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
+                  Deaf ? "" : trapnote(trap, FALSE),
+                  Deaf ? "" : " loudly");
             wake_nearby();
         }
     } else {
@@ -1144,7 +1145,7 @@ trapeffect_sqky_board(
         if (in_sight) {
             if (!Deaf) {
                 pline("A board beneath %s squeaks %s loudly.",
-                      mon_nam(mtmp), trapnote(trap, 0));
+                      mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else {
                 pline("%s stops momentarily and appears to cringe.",
@@ -1155,7 +1156,7 @@ trapeffect_sqky_board(
             int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                 ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
-            You_hear("a %s squeak %s.", trapnote(trap, 1),
+            You_hear("%s squeak %s.", trapnote(trap, FALSE),
                      (distu(mtmp->mx, mtmp->my) <= range * range)
                      ? "nearby" : "in the distance");
         }
@@ -2453,19 +2454,19 @@ dotrap(register struct trap* trap, unsigned int trflags)
 static char *
 trapnote(struct trap* trap, boolean noprefix)
 {
-    static char tnbuf[12];
-    const char *tn,
-        *tnnames[12] = { "C note",  "D flat", "D note",  "E flat",
-                         "E note",  "F note", "F sharp", "G note",
-                         "G sharp", "A note", "B flat",  "B note" };
+    static const char *const tnnames[] = {
+        "C note",  "D flat", "D note",  "E flat",
+        "E note",  "F note", "F sharp", "G note",
+        "G sharp", "A note", "B flat",  "B note",
+    };
+    static char tnbuf[12]; /* result buffer */
+    const char *tn;
 
     tnbuf[0] = '\0';
     tn = tnnames[trap->tnote];
     if (!noprefix)
-        Sprintf(tnbuf, "%s ",
-                (*tn == 'A' || *tn == 'E' || *tn == 'F') ? "an" : "a");
-    Sprintf(eos(tnbuf), "%s", tn);
-    return tnbuf;
+        (void) just_an(tnbuf, tn);
+    return strcat(tnbuf, tn);
 }
 
 static int

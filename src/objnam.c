@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1611882005 2021/01/29 01:00:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.312 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1612053751 2021/01/31 00:42:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.313 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1675,8 +1675,8 @@ just_an(char *outbuf, const char *str)
 
     *outbuf = '\0';
     c0 = lowc(*str);
-    if (!str[1]) {
-        /* single letter; might be used for named fruit */
+    if (!str[1] || str[1] == ' ') {
+        /* single letter; might be used for named fruit or a musical note */
         Strcpy(outbuf, index("aefhilmnosx", c0) ? "an " : "a ");
     } else if (!strncmpi(str, "the ", 4) || !strcmpi(str, "molten lava")
                || !strcmpi(str, "iron bars") || !strcmpi(str, "ice")) {
