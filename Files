@@ -81,12 +81,6 @@ recover.6       recover.txt     tmac.n          tmac.nh
 window.doc
 
 include:
-(files for GEM versions)
-bitmfile.h  gem_rsc.h   load_img.h  wingem.h
-
-(file for GNOME versions)
-winGnome.h
-
 (files for X versions)
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
@@ -115,9 +109,10 @@ outdated:
 
 outdated/include:
 (files that are no longer maintained for current game code)
-amiconf.h     beconf.h      def_os2.h     mac-carbon.h  mac-qt.h
-mac-term.h    macconf.h     macpopup.h    mactty.h      macwin.h
-mttypriv.h    os2conf.h     tosconf.h     trampoli.h    wceconf.h
+amiconf.h     beconf.h      bitmfile.h    def_os2.h     gem_rsc.h
+load_img.h    mac-carbon.h  mac-qt.h      mac-term.h    macconf.h
+macpopup.h    mactty.h      macwin.h      mttypriv.h    os2conf.h
+tosconf.h     trampoli.h    wceconf.h     winGnome.h    wingem.h
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
