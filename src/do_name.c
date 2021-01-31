@@ -8,7 +8,7 @@
 static char *nextmbuf(void);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
-static int cmp_coord_distu(const void *, const void *);
+static int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
 static int gloc_filter_classify_glyph(int);
 static int gloc_filter_floodfill_matcharea(int, int);
 static void gloc_filter_floodfill(int, int);
@@ -225,7 +225,7 @@ getpos_help(boolean force, const char *goal)
     destroy_nhwindow(tmpwin);
 }
 
-static int
+static int QSORTCALLBACK
 cmp_coord_distu(const void *a, const void *b)
 {
     const coord *c1 = a;
