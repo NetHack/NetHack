@@ -14,14 +14,14 @@
 #define C(c) (0x1f & (c))
 #endif
 
-static void FDECL(redotoplin, (const char *));
-static void FDECL(topl_putsym, (CHAR_P));
-static void FDECL(removetopl, (int));
-static void FDECL(msghistory_snapshot, (BOOLEAN_P));
-static void FDECL(free_msghistory_snapshot, (BOOLEAN_P));
+static void redotoplin(const char *);
+static void topl_putsym(char);
+static void removetopl(int);
+static void msghistory_snapshot(boolean);
+static void free_msghistory_snapshot(boolean);
 
 int
-tty_doprev_message()
+tty_doprev_message(void)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     winid prevmsg_win;
@@ -123,8 +123,7 @@ tty_doprev_message()
 }
 
 static void
-redotoplin(str)
-const char *str;
+redotoplin(const char *str)
 {
     int otoplin = ttyDisplay->toplin;
 
@@ -145,8 +144,7 @@ const char *str;
 
 /* for use by tty_putstr() */
 void
-show_topl(str)
-const char *str;
+show_topl(const char *str)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -166,7 +164,7 @@ const char *str;
 
 /* used by update_topl(); also by tty_putstr() */
 void
-remember_topl()
+remember_topl(void)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
     int idx = cw->maxrow;
@@ -188,8 +186,7 @@ remember_topl()
 }
 
 void
-addtopl(s)
-const char *s;
+addtopl(const char *s)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -200,7 +197,7 @@ const char *s;
 }
 
 void
-more()
+more(void)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -244,8 +241,7 @@ more()
 }
 
 void
-update_topl(bp)
-register const char *bp;
+update_topl(register const char *bp)
 {
     register char *tl, *otl;
     register int n0;
@@ -297,10 +293,8 @@ register const char *bp;
         redotoplin(g.toplines);
 }
 
-static
-void
-topl_putsym(c)
-char c;
+static void
+topl_putsym(char c)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -342,16 +336,14 @@ char c;
 }
 
 void
-putsyms(str)
-const char *str;
+putsyms(const char *str)
 {
     while (*str)
         topl_putsym(*str++);
 }
 
 static void
-removetopl(n)
-register int n;
+removetopl(register int n)
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0)
@@ -362,9 +354,7 @@ extern char erase_char; /* from xxxtty.c; don't need kill_char */
 
 /* returns a single keystroke; also sets 'yn_number' */
 char
-tty_yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+tty_yn_function(const char *query, const char *resp, char def)
 /*
  *   Generic yes/no function. 'def' is the default (returned by space or
  *   return; 'esc' returns 'q', or 'n', or the default, depending on
@@ -550,8 +540,8 @@ static char **snapshot_mesgs = 0;
 /* collect currently available message history data into a sequential array;
    optionally, purge that data from the active circular buffer set as we go */
 static void
-msghistory_snapshot(purge)
-boolean purge; /* clear message history buffer as we copy it */
+msghistory_snapshot(boolean purge) /* clear message history buffer
+                                      as we copy it */
 {
     char *mesg;
     int i, inidx, outidx;
@@ -596,8 +586,8 @@ boolean purge; /* clear message history buffer as we copy it */
 
 /* release memory allocated to message history snapshot */
 static void
-free_msghistory_snapshot(purged)
-boolean purged; /* True: took history's pointers, False: just cloned them */
+free_msghistory_snapshot(boolean purged) /* True: took history's pointers,
+                                            False: just cloned them */
 {
     if (snapshot_mesgs) {
         /* snapshot pointers are no longer in use */
@@ -627,8 +617,7 @@ boolean purged; /* True: took history's pointers, False: just cloned them */
  * included among the output of the subsequent calls.
  */
 char *
-tty_getmsghistory(init)
-boolean init;
+tty_getmsghistory(boolean init)
 {
     static int nxtidx;
     char *nextmesg;
@@ -668,9 +657,7 @@ boolean init;
  * into message history for ^P recall without having displayed it.
  */
 void
-tty_putmsghistory(msg, restoring_msghist)
-const char *msg;
-boolean restoring_msghist;
+tty_putmsghistory(const char *msg, boolean restoring_msghist)
 {
     static boolean initd = FALSE;
     int idx;

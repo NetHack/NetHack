@@ -1,18 +1,19 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1596498193 2020/08/03 23:43:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1611882611 2021/01/29 01:10:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-static void FDECL(setgemprobs, (d_level *));
-static void FDECL(shuffle, (int, int, BOOLEAN_P));
-static void NDECL(shuffle_all);
-static boolean FDECL(interesting_to_discover, (int));
-static char *FDECL(oclass_to_name, (CHAR_P, char *));
+static void setgemprobs(d_level *);
+static void shuffle(int, int, boolean);
+static void shuffle_all(void);
+static boolean interesting_to_discover(int);
+static int CFDECLSPEC discovered_cmp(const genericptr, const genericptr);
+static char *oclass_to_name(char, char *);
 
 #ifdef USE_TILES
-static void NDECL(shuffle_tiles);
+static void shuffle_tiles(void);
 extern short glyph2tile[]; /* from tile.c */
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't
@@ -25,7 +26,7 @@ extern short glyph2tile[]; /* from tile.c */
  * another routine.
  */
 static void
-shuffle_tiles()
+shuffle_tiles(void)
 {
     int i;
     short tmp_tilemap[NUM_OBJECTS];
@@ -39,8 +40,7 @@ shuffle_tiles()
 #endif /* USE_TILES */
 
 static void
-setgemprobs(dlev)
-d_level *dlev;
+setgemprobs(d_level* dlev)
 {
     int j, first, lev;
 
@@ -66,9 +66,7 @@ d_level *dlev;
 
 /* shuffle descriptions on objects o_low to o_high */
 static void
-shuffle(o_low, o_high, domaterial)
-int o_low, o_high;
-boolean domaterial;
+shuffle(int o_low, int o_high, boolean domaterial)
 {
     int i, j, num_to_shuffle;
     short sw;
@@ -106,7 +104,7 @@ boolean domaterial;
 }
 
 void
-init_objects()
+init_objects(void)
 {
     int i, first, last, sum, prevoclass;
     char oclass;
@@ -203,9 +201,9 @@ init_objects()
 
 /* retrieve the range of objects that otyp shares descriptions with */
 void
-obj_shuffle_range(otyp, lo_p, hi_p)
-int otyp;         /* input: representative item */
-int *lo_p, *hi_p; /* output: range that item belongs among */
+obj_shuffle_range(
+    int otyp,         /* input: representative item */
+    int *lo_p, int *hi_p) /* output: range that item belongs among */
 {
     int i, ocls = objects[otyp].oc_class;
 
@@ -256,7 +254,7 @@ int *lo_p, *hi_p; /* output: range that item belongs among */
 
 /* randomize object descriptions */
 static void
-shuffle_all()
+shuffle_all(void)
 {
     /* entire classes; obj_shuffle_range() handles their exceptions */
     static char shuffle_classes[] = {
@@ -285,9 +283,7 @@ shuffle_all()
 /* Return TRUE if the provided string matches the unidentified description of
  * the provided object. */
 boolean
-objdescr_is(obj, descr)
-struct obj *obj;
-const char *descr;
+objdescr_is(struct obj* obj, const char * descr)
 {
     const char *objdescr;
 
@@ -304,7 +300,7 @@ const char *descr;
 
 /* find the object index for snow boots; used [once] by slippery ice code */
 int
-find_skates()
+find_skates(void)
 {
     register int i;
     register const char *s;
@@ -319,14 +315,13 @@ find_skates()
 
 /* level dependent initialization */
 void
-oinit()
+oinit(void)
 {
     setgemprobs(&u.uz);
 }
 
 void
-savenames(nhfp)
-NHFILE *nhfp;
+savenames(NHFILE* nhfp)
 {
     int i;
     unsigned int len;
@@ -359,8 +354,7 @@ NHFILE *nhfp;
 }
 
 void
-restnames(nhfp)
-NHFILE *nhfp;
+restnames(NHFILE* nhfp)
 {
     int i;
     unsigned int len = 0;
@@ -388,10 +382,7 @@ NHFILE *nhfp;
 }
 
 void
-discover_object(oindx, mark_as_known, credit_hero)
-register int oindx;
-boolean mark_as_known;
-boolean credit_hero;
+discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
 {
     if (!objects[oindx].oc_name_known) {
         register int dindx, acls = objects[oindx].oc_class;
@@ -421,8 +412,7 @@ boolean credit_hero;
 
 /* if a class name has been cleared, we may need to purge it from disco[] */
 void
-undiscover_object(oindx)
-register int oindx;
+undiscover_object(int oindx)
 {
     if (!objects[oindx].oc_name_known) {
         register int dindx, acls = objects[oindx].oc_class;
@@ -450,8 +440,7 @@ register int oindx;
 }
 
 static boolean
-interesting_to_discover(i)
-register int i;
+interesting_to_discover(int i)
 {
     /* Pre-discovered objects are now printed with a '*' */
     return (boolean) (objects[i].oc_uname != (char *) 0
@@ -465,37 +454,164 @@ static const short uniq_objs[] = {
     BELL_OF_OPENING,
 };
 
-/* the '\' command - show discovered object types */
-int
-dodiscovered() /* free after Robert Viduya */
+/* discoveries qsort comparison function */
+static int CFDECLSPEC
+discovered_cmp(const genericptr v1, const genericptr v2)
 {
-    register int i, dis;
-    int ct = 0;
-    char *s, oclass, prev_class, classes[MAXOCLASSES], buf[BUFSZ];
+    const char *s1 = *(const char **) v1;
+    const char *s2 = *(const char **) v2;
+    /* each element starts with "* " or "  " but we don't sort by those */
+    int res = strcmpi(s1 + 2, s2 + 2);
+
+    if (res == 0) {
+        ; /* no tie-breaker needed */
+    }
+    return res;
+}
+
+static char *
+sortloot_descr(int otyp,char * outbuf)
+{
+    Loot sl_cookie;
+    struct obj o;
+
+    o = cg.zeroobj;
+    o.otyp = otyp;
+    o.oclass = objects[otyp].oc_class;
+    o.dknown = 1;
+    o.known = (objects[otyp].oc_name_known || !objects[otyp].oc_uses_known)
+              ? 1 : 0;
+    o.corpsenm = NON_PM; /* suppress statue and figurine details */
+    /* but suppressing fruit details leads to "bad fruit #0" */
+    if (otyp == SLIME_MOLD)
+        o.spe = g.context.current_fruit;
+
+    (void) memset((genericptr_t) &sl_cookie, 0, sizeof sl_cookie);
+    sl_cookie.obj = (struct obj *) 0;
+    sl_cookie.str = (char *) 0;
+
+    loot_classify(&sl_cookie, &o);
+    Sprintf(outbuf, "%02d%02d%1d ",
+            sl_cookie.orderclass, sl_cookie.subclass, sl_cookie.disco);
+    return outbuf;
+}
+
+#define DISCO_BYCLASS      0 /* by discovery order within each class */
+#define DISCO_SORTLOOT     1 /* by discovery order within each subclass */
+#define DISCO_ALPHABYCLASS 2 /* alphabetized within each class */
+#define DISCO_ALPHABETIZED 3 /* alphabetized across all classes */
+/* also used in options.c (optfn_sortdiscoveries) */
+const char disco_order_let[] = "osca";
+const char *const disco_orders_descr[] = {
+    "by order of discovery within each class",
+    "sortloot order (by class with some sub-class groupings)",
+    "alphabetical within each class",
+    "alphabetical across all classes",
+    (char *) 0
+};
+
+int
+choose_disco_sort(
+    int mode) /* 0 => 'O' cmd, 1 => full discoveries; 2 => class discoveries */
+{
     winid tmpwin;
+    menu_item *selected;
+    anything any;
+    int i, n, choice;
 
     tmpwin = create_nhwindow(NHW_MENU);
-    putstr(tmpwin, 0, "Discoveries");
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany; /* zero out all bits */
+    for (i = 0; disco_orders_descr[i]; ++i) {
+        any.a_int = disco_order_let[i];
+        add_menu(tmpwin, &nul_glyphinfo, &any, (char) any.a_int,
+                 0, ATR_NONE,
+                 disco_orders_descr[i],
+                 (disco_order_let[i] == flags.discosort)
+                    ? MENU_ITEMFLAGS_SELECTED
+                    : MENU_ITEMFLAGS_NONE);
+    }
+    if (mode == 2) {
+        /* called via 'm `' where full alphabetize doesn't make sense
+           (only showing one class so can't span all classes) but the
+           chosen sort will stick and also apply to '\' usage */
+        any = cg.zeroany;
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 "", MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 "Note: full alphabetical and alphabetical within class",
+                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 "      are equivalent for single class discovery, but",
+                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 "      will matter for future use of total discoveries.",
+                 MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(tmpwin, "Ordering of discoveries");
+
+    n = select_menu(tmpwin, PICK_ONE, &selected);
+    destroy_nhwindow(tmpwin);
+    if (n > 0) {
+        choice = selected[0].item.a_int;
+        /* skip preselected entry if we have more than one item chosen */
+        if (n > 1 && choice == (int) flags.discosort)
+            choice = selected[1].item.a_int;
+        free((genericptr_t) selected);
+        flags.discosort = choice;
+    }
+    return n;
+}
+
+/* the '\' command - show discovered object types */
+int
+dodiscovered(void) /* free after Robert Viduya */
+{
+    winid tmpwin;
+    char *s, *p, oclass, prev_class,
+         classes[MAXOCLASSES], buf[BUFSZ],
+         *sorted_lines[NUM_OBJECTS]; /* overkill */
+    int i, j, sortindx, dis, ct, uniq_ct, arti_ct, sorted_ct;
+    boolean alphabetized, alphabyclass, lootsort;
+
+    if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
+        flags.discosort = 'o';
+
+    if (iflags.menu_requested) {
+        if (choose_disco_sort(1) < 0)
+            return 0;
+    }
+    alphabyclass = (flags.discosort == 'c');
+    alphabetized = (flags.discosort == 'a' || alphabyclass);
+    lootsort = (flags.discosort == 's');
+    sortindx = index(disco_order_let, flags.discosort) - disco_order_let;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    Sprintf(buf, "Discoveries, %s", disco_orders_descr[sortindx]);
+    putstr(tmpwin, 0, buf);
     putstr(tmpwin, 0, "");
 
     /* gather "unique objects" into a pseudo-class; note that they'll
        also be displayed individually within their regular class */
+    uniq_ct = 0;
     for (i = dis = 0; i < SIZE(uniq_objs); i++)
         if (objects[uniq_objs[i]].oc_name_known) {
             if (!dis++)
                 putstr(tmpwin, iflags.menu_headings, "Unique items");
+            ++uniq_ct;
             Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
             putstr(tmpwin, 0, buf);
-            ++ct;
         }
     /* display any known artifacts as another pseudo-class */
-    ct += disp_artifact_discoveries(tmpwin);
+    arti_ct = disp_artifact_discoveries(tmpwin);
 
     /* several classes are omitted from packorder; one is of interest here */
     Strcpy(classes, flags.inv_order);
     if (!index(classes, VENOM_CLASS))
         (void) strkitten(classes, VENOM_CLASS); /* append char to string */
 
+    ct = uniq_ct + arti_ct;
+    sorted_ct = 0;
     for (s = classes; *s; s++) {
         oclass = *s;
         prev_class = oclass + 1; /* forced different from oclass */
@@ -504,21 +620,63 @@ dodiscovered() /* free after Robert Viduya */
             if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
                 ct++;
                 if (oclass != prev_class) {
-                    putstr(tmpwin, iflags.menu_headings,
-                           let_to_name(oclass, FALSE, FALSE));
-                    prev_class = oclass;
+                    if ((alphabyclass || lootsort) && sorted_ct) {
+                        /* output previous class */
+                        qsort(sorted_lines, sorted_ct, sizeof (char *),
+                              discovered_cmp);
+                        for (j = 0; j < sorted_ct; ++j) {
+                            p = sorted_lines[j];
+                            if (lootsort) {
+                                p[6] = p[0]; /* '*' or ' ' */
+                                p += 6;
+                            }
+                            putstr(tmpwin, 0, p);
+                            free(sorted_lines[j]), sorted_lines[j] = 0;
+                        }
+                        sorted_ct = 0;
+                    }
+                    if (!alphabetized || alphabyclass) {
+                        /* header for new class */
+                        putstr(tmpwin, iflags.menu_headings,
+                               let_to_name(oclass, FALSE, FALSE));
+                        prev_class = oclass;
+                    }
                 }
-                Sprintf(buf, "%s %s",
-                        (objects[dis].oc_pre_discovered ? "*" : " "),
-                        obj_typename(dis));
-                putstr(tmpwin, 0, buf);
+                Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
+                if (lootsort)
+                    (void) sortloot_descr(dis, &buf[2]);
+                Strcat(buf, obj_typename(dis));
+
+                if (!alphabetized && !lootsort)
+                    putstr(tmpwin, 0, buf);
+                else
+                    sorted_lines[sorted_ct++] = dupstr(buf);
             }
         }
     }
     if (ct == 0) {
         You("haven't discovered anything yet...");
-    } else
+    } else {
+        if (sorted_ct) {
+            /* if we're alphabetizing by class, we've already shown the
+               relevant header above; if we're alphabetizing across all
+               classes, we normally don't need a header; but it we showed
+               any unique items or any artifacts then we do need one */
+            if ((uniq_ct || arti_ct) && !alphabyclass)
+                putstr(tmpwin, iflags.menu_headings, "Discovered items");
+            qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
+            for (j = 0; j < sorted_ct; ++j) {
+                p = sorted_lines[j];
+                if (lootsort) {
+                    p[6] = p[0]; /* '*' or ' ' */
+                    p += 6;
+                }
+                putstr(tmpwin, 0, p);
+                free(sorted_lines[j]), sorted_lines[j] = 0;
+            }
+        }
         display_nhwindow(tmpwin, TRUE);
+    }
     destroy_nhwindow(tmpwin);
 
     return 0;
@@ -526,9 +684,7 @@ dodiscovered() /* free after Robert Viduya */
 
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
 static char *
-oclass_to_name(oclass, buf)
-char oclass;
-char *buf;
+oclass_to_name(char oclass, char *buf)
 {
     char *s;
 
@@ -540,20 +696,31 @@ char *buf;
 
 /* the '`' command - show discovered object types for one class */
 int
-doclassdisco()
+doclassdisco(void)
 {
     static NEARDATA const char
         prompt[] = "View discoveries for which sort of objects?",
         havent_discovered_any[] = "haven't discovered any %s yet.",
         unique_items[] = "unique items",
         artifact_items[] = "artifacts";
-    char *s, c, oclass, menulet, allclasses[MAXOCLASSES],
-        discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ];
-    int i, ct, dis, xtras;
-    boolean traditional;
     winid tmpwin = WIN_ERR;
-    anything any;
     menu_item *pick_list = 0;
+    anything any;
+    char *p, *s, c, oclass, menulet, allclasses[MAXOCLASSES],
+         discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ],
+         *sorted_lines[NUM_OBJECTS]; /* overkill */
+    int i, ct, dis, xtras, sorted_ct;
+    boolean traditional, alphabetized, lootsort;
+
+    if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
+        flags.discosort = 'o';
+
+    if (iflags.menu_requested) {
+        if (choose_disco_sort(2) < 0)
+            return 0;
+    }
+    alphabetized = (flags.discosort == 'a' || flags.discosort == 'c');
+    lootsort = (flags.discosort == 's');
 
     discosyms[0] = '\0';
     traditional = (flags.menu_style == MENU_TRADITIONAL
@@ -571,8 +738,8 @@ doclassdisco()
             Strcat(discosyms, "u");
             if (!traditional) {
                 any.a_int = 'u';
-                add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                         unique_items, MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, menulet++,
+                         0, ATR_NONE, unique_items, MENU_ITEMFLAGS_NONE);
             }
             break;
         }
@@ -582,8 +749,8 @@ doclassdisco()
         Strcat(discosyms, "a");
         if (!traditional) {
             any.a_int = 'a';
-            add_menu(tmpwin, NO_GLYPH, &any, menulet++, 0, ATR_NONE,
-                     artifact_items, MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, menulet++,
+                     0, ATR_NONE, artifact_items, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -603,8 +770,9 @@ doclassdisco()
                     Sprintf(eos(discosyms), "%c", c);
                     if (!traditional) {
                         any.a_int = c;
-                        add_menu(tmpwin, NO_GLYPH, &any, menulet++, c,
-                                 ATR_NONE, oclass_to_name(oclass, buf),
+                        add_menu(tmpwin, &nul_glyphinfo, &any,
+                                 menulet++, c, ATR_NONE,
+                                 oclass_to_name(oclass, buf),
                                  MENU_ITEMFLAGS_NONE);
                     }
                 }
@@ -670,9 +838,9 @@ doclassdisco()
                upstart(strcpy(buf, unique_items)));
         for (i = 0; i < SIZE(uniq_objs); i++)
             if (objects[uniq_objs[i]].oc_name_known) {
+                ++ct;
                 Sprintf(buf, "  %s", OBJ_NAME(objects[uniq_objs[i]]));
                 putstr(tmpwin, 0, buf);
-                ++ct;
             }
         if (!ct)
             You(havent_discovered_any, unique_items);
@@ -685,20 +853,40 @@ doclassdisco()
         break;
     default:
         oclass = def_char_to_objclass(c);
-        Sprintf(buf, "Discovered %s", let_to_name(oclass, FALSE, FALSE));
-        putstr(tmpwin, iflags.menu_headings, buf);
-        for (i = g.bases[(int) oclass];
-             i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
+        Sprintf(buf, "Discovered %s in %s", let_to_name(oclass, FALSE, FALSE),
+                (flags.discosort == 'o') ? "order of discovery"
+                : (flags.discosort == 's') ? "'sortloot' order"
+                  : "alphabetical order");
+        putstr(tmpwin, 0, buf); /* skip iflags.menu_headings */
+        sorted_ct = 0;
+        for (i = g.bases[(int) oclass]; i <= g.bases[oclass + 1] - 1; ++i) {
             if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
-                Sprintf(buf, "%s %s",
-                        objects[dis].oc_pre_discovered ? "*" : " ",
-                        obj_typename(dis));
-                putstr(tmpwin, 0, buf);
                 ++ct;
+                Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
+                if (lootsort)
+                    (void) sortloot_descr(dis, &buf[2]);
+                Strcat(buf, obj_typename(dis));
+
+                if (!alphabetized && !lootsort)
+                    putstr(tmpwin, 0, buf);
+                else
+                    sorted_lines[sorted_ct++] = dupstr(buf);
             }
         }
-        if (!ct)
+        if (!ct) {
             You(havent_discovered_any, oclass_to_name(oclass, buf));
+        } else if (sorted_ct) {
+            qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
+            for (i = 0; i < sorted_ct; ++i) {
+                p = sorted_lines[i];
+                if (lootsort) {
+                    p[6] = p[0]; /* '*' or ' ' */
+                    p += 6;
+                }
+                putstr(tmpwin, 0, p);
+                free(sorted_lines[i]), sorted_lines[i] = 0;
+            }
+        }
         break;
     }
     if (ct)
@@ -709,7 +897,7 @@ doclassdisco()
 
 /* put up nameable subset of discoveries list as a menu */
 void
-rename_disco()
+rename_disco(void)
 {
     register int i, dis;
     int ct = 0, mn = 0, sl;
@@ -745,13 +933,15 @@ rename_disco()
 
             if (oclass != prev_class) {
                 any.a_int = 0;
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         iflags.menu_headings,
                          let_to_name(oclass, FALSE, FALSE),
                          MENU_ITEMFLAGS_NONE);
                 prev_class = oclass;
             }
             any.a_int = dis;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE,
                      obj_typename(dis), MENU_ITEMFLAGS_NONE);
         }
     }

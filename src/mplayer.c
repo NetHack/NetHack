@@ -4,9 +4,9 @@
 
 #include "hack.h"
 
-static const char *NDECL(dev_name);
-static void FDECL(get_mplname, (struct monst *, char *));
-static void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
+static const char *dev_name(void);
+static void get_mplname(struct monst *, char *);
+static void mk_mplayer_armor(struct monst *, short);
 
 /* These are the names of those who
  * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
@@ -41,7 +41,7 @@ static const char *developers[] = {
 
 /* return a randomly chosen developer name */
 static const char *
-dev_name()
+dev_name(void)
 {
     register int i, m = 0, n = SIZE(developers);
     register struct monst *mtmp;
@@ -53,7 +53,8 @@ dev_name()
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (!is_mplayer(mtmp->data))
                 continue;
-            if (!strncmp(developers[i], (has_mname(mtmp)) ? MNAME(mtmp) : "",
+            if (!strncmp(developers[i],
+                         (has_mgivenname(mtmp)) ? MGIVENNAME(mtmp) : "",
                          strlen(developers[i]))) {
                 match = TRUE;
                 break;
@@ -68,9 +69,7 @@ dev_name()
 }
 
 static void
-get_mplname(mtmp, nam)
-register struct monst *mtmp;
-char *nam;
+get_mplname(register struct monst* mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
     const char *devnam;
@@ -93,9 +92,7 @@ char *nam;
 }
 
 static void
-mk_mplayer_armor(mon, typ)
-struct monst *mon;
-short typ;
+mk_mplayer_armor(struct monst* mon, short typ)
 {
     struct obj *obj;
 
@@ -117,10 +114,7 @@ short typ;
 }
 
 struct monst *
-mk_mplayer(ptr, x, y, special)
-register struct permonst *ptr;
-xchar x, y;
-register boolean special;
+mk_mplayer(register struct permonst* ptr, xchar x, xchar y, register boolean special)
 {
     register struct monst *mtmp;
     char nam[PL_NSIZ];
@@ -176,8 +170,7 @@ register boolean special;
             if (helm == HELM_OF_BRILLIANCE)
                 helm = STRANGE_OBJECT;
             break;
-        case PM_CAVEMAN:
-        case PM_CAVEWOMAN:
+        case PM_CAVE_DWELLER:
             if (rn2(4))
                 weapon = MACE;
             else if (rn2(2))
@@ -208,8 +201,7 @@ register boolean special;
             if (rn2(2))
                 shield = STRANGE_OBJECT;
             break;
-        case PM_PRIEST:
-        case PM_PRIESTESS:
+        case PM_CLERIC:
             if (rn2(2))
                 weapon = MACE;
             if (rn2(2))
@@ -328,9 +320,7 @@ register boolean special;
  * fill up the overflow.
  */
 void
-create_mplayers(num, special)
-register int num;
-boolean special;
+create_mplayers(register int num, boolean special)
 {
     int pm, x, y;
     struct monst fakemon;
@@ -359,8 +349,7 @@ boolean special;
 }
 
 void
-mplayer_talk(mtmp)
-register struct monst *mtmp;
+mplayer_talk(register struct monst* mtmp)
 {
     static const char
         *same_class_msg[3] = {

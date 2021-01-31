@@ -23,28 +23,43 @@ public:
 protected:
 	virtual void paintEvent(QPaintEvent* event);
         bool DrawWalls(QPainter& painter, int x, int y,
-                       int w, int h, unsigned ch);
+                       int w, int h, unsigned short ch);
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;
 	virtual void mousePressEvent(QMouseEvent* event);
 
 private:
-	QFont *rogue_font;
-	unsigned short glyph[ROWNO][COLNO];
-	unsigned short& Glyph(int x, int y) { return glyph[y][x]; }
-	QPoint cursor;
-	QPixmap pet_annotation;
+        QFont *rogue_font;
+        unsigned short glyph[ROWNO][COLNO];
+        unsigned short &Glyph(int x, int y) {
+            return glyph[y][x];
+        }
+        unsigned short glyphttychar[ROWNO][COLNO];
+        unsigned short &Glyphttychar(int x, int y) {
+            return glyphttychar[y][x];
+        }
+        unsigned short glyphcolor[ROWNO][COLNO];
+        unsigned short &Glyphcolor(int x, int y) {
+            return glyphcolor[y][x];
+        }
+        unsigned int glyphflags[ROWNO][COLNO];
+        unsigned int &Glyphflags(int x, int y) {
+            return glyphflags[y][x];
+        }
+        QPoint cursor;
+        QPixmap pet_annotation;
         QPixmap pile_annotation;
-	NetHackQtClickBuffer& clicksink;
-	Clusterizer change;
+        NetHackQtClickBuffer &clicksink;
+        Clusterizer change;
 
 	void clickCursor();
 	void Clear();
 	void Display(bool block);
 	void CursorTo(int x,int y);
-	void PrintGlyph(int x,int y,int glyph);
+	void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
 	void Changed(int x, int y);
 	void updateTiles();
+        void SetupTextmapFont(QPainter &painter);
 
 	// NetHackQtMapWindow2 passes through many calls to the viewport
 	friend class NetHackQtMapWindow2;
@@ -64,7 +79,7 @@ public:
 	virtual void CursorTo(int x,int y);
 	virtual void PutStr(int attr, const QString& text);
 	virtual void ClipAround(int x,int y);
-	virtual void PrintGlyph(int x,int y,int glyph);
+	virtual void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
 
 signals:
 	void resized();

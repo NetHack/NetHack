@@ -35,10 +35,10 @@ extern short glyph2tile[];
 typedef struct mswin_nethack_map_window {
     HWND hWnd;                  /* window */
 
-    int map[COLNO][ROWNO];      /* glyph map */
-    int bkmap[COLNO][ROWNO];    /* backround glyph map */
-    boolean mapDirty[COLNO][ROWNO]; /* dirty flag for map */
-
+    glyph_info map[COLNO][ROWNO];
+    glyph_info bkmap[COLNO][ROWNO];
+    boolean locDirty[COLNO][ROWNO]; /* dirty flag for map location */
+    boolean mapDirty;           /* one or more map locations are dirty */
     int mapMode;                /* current map mode */
     boolean bAsciiMode;         /* switch ASCII/tiled mode */
     boolean bFitToScreenMode;   /* switch Fit map to screen mode on/off */
@@ -86,7 +86,8 @@ static void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut);
 static void paint(PNHMapWindow data, int i, int j);
 static void dirtyAll(PNHMapWindow data);
 static void dirty(PNHMapWindow data, int i, int j);
-static void setGlyph(PNHMapWindow data, int i, int j, int fg, int bg);
+static void setGlyph(PNHMapWindow data, int i, int j,
+                     const glyph_info *fg, const glyph_info *bg);
 static void clearAll(PNHMapWindow data);
 
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
@@ -95,7 +96,7 @@ static void nhglyph2charcolor(short glyph, uchar *ch, int *color);
 extern boolean win32_cursorblink;       /* from sys\winnt\winnt.c */
 
 HWND
-mswin_init_map_window()
+mswin_init_map_window(void)
 {
     static int run_once = 0;
     HWND hWnd;
@@ -143,7 +144,7 @@ mswin_init_map_window()
 }
 
 void
-mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
+mswin_map_layout(HWND hWnd, LPSIZE map_size)
 {
     /* check arguments */
     if (!IsWindow(hWnd) || !map_size || map_size->cx <= 0
@@ -370,10 +371,11 @@ mswin_map_stretch(HWND hWnd, LPSIZE map_size, BOOL redraw)
 
     mswin_cliparound(data->xCur, data->yCur);
 
-    if (redraw) {
-        dirtyAll(data);
-        InvalidateRect(hWnd, NULL, TRUE);
-    }
+    // redraw all map locations
+    dirtyAll(data);
+
+    // invalidate entire map window
+    InvalidateRect(hWnd, NULL, TRUE);
 }
 
 /* set map mode */
@@ -481,16 +483,41 @@ mswin_map_mode(HWND hWnd, int mode)
     mapSize.cx = data->tileWidth * COLNO;
     mapSize.cy = data->tileHeight * ROWNO;
 
-    mswin_map_stretch(hWnd, &mapSize, TRUE);
+    mswin_map_layout(hWnd, &mapSize);
 
     mswin_update_inventory(); /* for perm_invent to hide/show tiles */
 
     return oldMode;
 }
 
+void mswin_map_update(HWND hWnd)
+{
+    PNHMapWindow data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+    if (data->mapDirty)
+    {
+        /* update back buffer */
+        HBITMAP savedBitmap = SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
+
+        for (int i = 0; i < COLNO; i++)
+            for (int j = 0; j < ROWNO; j++)
+                if (data->locDirty[i][j])
+                {
+                    paint(data, i, j);
+                    RECT rect;
+                    nhcoord2display(data, i, j, &rect);
+                    InvalidateRect(data->hWnd, &rect, FALSE);
+                }
+
+        SelectObject(data->tileDC, savedBitmap);
+        data->mapDirty = FALSE;
+    }
+
+}
+
 /* register window class for map window */
 void
-register_map_window_class()
+register_map_window_class(void)
 {
     WNDCLASS wcex;
     ZeroMemory(&wcex, sizeof(wcex));
@@ -559,7 +586,7 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             size.cx = data->xFrontTile * COLNO;
             size.cy = data->yFrontTile * ROWNO;
         }
-        mswin_map_stretch(hWnd, &size, TRUE);
+        mswin_map_layout(hWnd, &size);
 
         /* update window placement */
         GetWindowRect(hWnd, &rt);
@@ -639,7 +666,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case MSNH_MSG_PRINT_GLYPH: {
         PMSNHMsgPrintGlyph msg_data = (PMSNHMsgPrintGlyph) lParam;
         setGlyph(data, msg_data->x, msg_data->y, 
-            msg_data->glyph, msg_data->bkglyph);
+            &msg_data->glyphinfo, &msg_data->bkglyphinfo);
     } break;
 
     case MSNH_MSG_CLIPAROUND: {
@@ -708,8 +735,10 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         PMSNHMsgGetText msg_data = (PMSNHMsgGetText) lParam;
         size_t index;
         int col, row;
+#if 0
         int color;
-        unsigned special;
+        unsigned special = 0U;
+#endif
         int mgch;
 
         index = 0;
@@ -717,13 +746,9 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             for (col = 0; col < COLNO; col++) {
                 if (index >= msg_data->max_size)
                     break;
-                if (data->map[col][row] == NO_GLYPH) {
+                if (data->map[col][row].glyph == NO_GLYPH)
                     mgch = ' ';
-                } else {
-                    (void) mapglyph(data->map[col][row], &mgch, &color,
-                                    &special, col, row, 0);
-                }
-                msg_data->buffer[index] = mgch;
+                msg_data->buffer[index] = data->map[col][row].ttychar;
                 index++;
             }
             if (index >= msg_data->max_size - 1)
@@ -785,13 +810,13 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     int glyph, bkglyph;
     int layer;
 #ifdef USE_PILEMARK
-    int color;
-    unsigned special;
-    int mgch;
+//    int color;
+//    unsigned special = 0U;
+//    int mgch;
 #endif
     layer = 0;
-    glyph = data->map[i][j];
-    bkglyph = data->bkmap[i][j];
+    glyph = data->map[i][j].glyph;
+    bkglyph = data->bkmap[i][j].glyph;
 
     if (glyph == NO_GLYPH && bkglyph == NO_GLYPH) {
         HBRUSH blackBrush = CreateSolidBrush(RGB(0, 0, 0));
@@ -812,7 +837,10 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 
     if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
+        /* rely on NetHack core helper routine */
         ntile = glyph2tile[glyph];
+        if (data->map[i][j].glyphflags & MG_FEMALE)
+            ntile++;
         t_x = TILEBMP_X(ntile);
         t_y = TILEBMP_Y(ntile);
 
@@ -833,10 +861,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 
 #ifdef USE_PILEMARK
-    /* rely on NetHack core helper routine */
-    (void) mapglyph(data->map[i][j], &mgch, &color, &special,
-                    i, j, 0);
-    if ((glyph != NO_GLYPH) && (special & MG_PET)
+    if ((glyph != NO_GLYPH) && (data->map[i][j].glyphflags & MG_PET)
 #else
     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
 #endif
@@ -859,7 +884,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
         DeleteDC(hdcPetMark);
     }
 #ifdef USE_PILEMARK
-    if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)
+    if ((glyph != NO_GLYPH) && (data->map[i][j].glyphflags & MG_OBJPILE)
         && iflags.hilite_pile) {
         /* apply pilemark transparently over other image */
         HDC hdcPileMark;
@@ -888,13 +913,13 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
 static void
 paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
 {
-    if (data->map[i][j] >= 0) {
+    if (data->map[i][j].glyph >= 0) {
 
         char ch;
         WCHAR wch;
         int color;
-        unsigned special;
-        int mgch;
+//        unsigned special;
+//        int mgch;
         HBRUSH back_brush;
         COLORREF OldFg;
 
@@ -908,12 +933,10 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         nhglyph2charcolor(data->map[i][j], &ch, &color);
         OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
     #else
-        /* rely on NetHack core helper routine */
-        (void) mapglyph(data->map[i][j], &mgch, &color,
-                        &special, i, j, 0);
-        ch = (char) mgch;
-        if (((special & MG_PET) && iflags.hilite_pet)
-            || ((special & (MG_DETECT | MG_BW_LAVA))
+        ch = (char) data->map[i][j].ttychar;
+        color = (int) data->map[i][j].color;
+        if (((data->map[i][j].glyphflags & MG_PET) && iflags.hilite_pet)
+            || ((data->map[i][j].glyphflags & (MG_DETECT | MG_BW_LAVA))
                 && iflags.use_inverse)) {
             back_brush =
                 CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
@@ -972,16 +995,18 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
     }
 }
 
-static void setGlyph(PNHMapWindow data, int i, int j, int fg, int bg)
+static void setGlyph(PNHMapWindow data, int i, int j,
+                     const glyph_info *fg, const glyph_info *bg)
 {
-    if ((data->map[i][j] != fg) || (data->bkmap[i][j] != bg)) {
-        data->map[i][j] = fg;
-        data->bkmap[i][j] = bg;
-        data->mapDirty[i][j] = TRUE;
-
-        RECT rect;
-        nhcoord2display(data, i, j, &rect);
-        InvalidateRect(data->hWnd, &rect, FALSE);
+    if ((data->map[i][j].glyph != fg->glyph)
+            || (data->bkmap[i][j].glyph != bg->glyph)
+        || data->map[i][j].ttychar != fg->ttychar
+        || data->map[i][j].color != fg->color
+        || data->map[i][j].glyphflags != fg->glyphflags) {
+        data->map[i][j] = *fg;
+        data->bkmap[i][j] = *bg;
+        data->locDirty[i][j] = TRUE;
+        data->mapDirty = TRUE;
     }
 }
 
@@ -989,30 +1014,25 @@ static void clearAll(PNHMapWindow data)
 {
     for (int x = 0; x < COLNO; x++)
         for (int y = 0; y < ROWNO; y++) {
-            data->map[x][y] = NO_GLYPH;
-            data->bkmap[x][y] = NO_GLYPH;
-            data->mapDirty[x][y] = TRUE;
+            data->map[x][y] = nul_glyphinfo;
+            data->bkmap[x][y] = nul_glyphinfo;
+            data->locDirty[x][y] = TRUE;
         }
-    InvalidateRect(data->hWnd, NULL, FALSE);
+    data->mapDirty = TRUE;
 }
 
 static void dirtyAll(PNHMapWindow data)
 {
     for (int i = 0; i < COLNO; i++)
         for (int j = 0; j < ROWNO; j++)
-            data->mapDirty[i][j] = TRUE;
-
-    InvalidateRect(data->hWnd, NULL, FALSE);
+            data->locDirty[i][j] = TRUE;
+    data->mapDirty = TRUE;
 }
 
 static void dirty(PNHMapWindow data, int x, int y)
 {
-    data->mapDirty[x][y] = TRUE;
-
-    RECT rt;
-    nhcoord2display(data, data->xCur, data->yCur, &rt);
-
-    InvalidateRect(data->hWnd, &rt, FALSE);
+    data->locDirty[x][y] = TRUE;
+    data->mapDirty = TRUE;
 }
 
 static void
@@ -1031,7 +1051,7 @@ paint(PNHMapWindow data, int i, int j)
         paintTile(data, i, j, &rect);
     }
 
-    data->mapDirty[i][j] = FALSE;
+    data->locDirty[i][j] = FALSE;
 }
 
 
@@ -1040,16 +1060,6 @@ void
 onPaint(HWND hWnd)
 {
     PNHMapWindow data = (PNHMapWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
-    /* update back buffer */
-    HBITMAP savedBitmap = SelectObject(data->tileDC, GetNHApp()->bmpMapTiles);
-
-    for (int i = 0; i < COLNO; i++)
-        for (int j = 0; j < ROWNO; j++)
-            if (data->mapDirty[i][j])
-                paint(data, i, j);
-
-    SelectObject(data->tileDC, savedBitmap);
 
     PAINTSTRUCT ps;
     HDC hFrontBufferDC = BeginPaint(hWnd, &ps);

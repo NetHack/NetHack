@@ -45,14 +45,15 @@ struct DataBlock {
     unsigned char *data;
 };
 
-static boolean FDECL(read_data_block, (struct Bitstream *gif, struct DataBlock *block));
-static void FDECL(free_data_block, (struct DataBlock *block));
-static unsigned short FDECL(read_u16, (const unsigned char buf[2]));
-static void FDECL(init_decoder, (struct Bitstream *gif, unsigned bit_width));
-static void FDECL(reset_decoder, (struct Bitstream *gif));
-static int FDECL(decode, (struct Bitstream *gif, struct DataBlock *block));
-static int FDECL(get_code, (struct Bitstream *gif, struct DataBlock *block));
-static unsigned FDECL(interlace_incr, (unsigned y, unsigned height));
+static boolean read_data_block(struct Bitstream *gif,
+                               struct DataBlock *block);
+static void free_data_block(struct DataBlock *block);
+static unsigned short read_u16(const unsigned char buf[2]);
+static void init_decoder(struct Bitstream *gif, unsigned bit_width);
+static void reset_decoder(struct Bitstream *gif);
+static int decode(struct Bitstream *gif, struct DataBlock *block);
+static int get_code(struct Bitstream *gif, struct DataBlock *block);
+static unsigned interlace_incr(unsigned y, unsigned height);
 
 /*
  * GIF specifies a canvas, which may have a palette (the "global color table")
@@ -64,9 +65,7 @@ static unsigned FDECL(interlace_incr, (unsigned y, unsigned height));
  */
 
 boolean
-read_gif_tiles(filename, image)
-const char *filename;
-struct TileSetImage *image;
+read_gif_tiles(const char *filename, struct TileSetImage *image)
 {
     struct Bitstream gif;
     struct DataBlock block;
@@ -158,7 +157,7 @@ struct TileSetImage *image;
                 boolean have_lct, interlace;
                 unsigned lct_start, lct_size;
                 struct Pixel lct[256];
-                int b;
+                int new_b;
                 unsigned x, y, x2, y2;
 
                 size = fread(buf, 1, 9, gif.fp);
@@ -203,23 +202,23 @@ struct TileSetImage *image;
                     }
                 }
                 /* 22. Table based image data */
-                b = fgetc(gif.fp);
-                if (b == EOF) goto error;
-                if (b < MIN_LZW_BITS - 1 || MAX_LZW_BITS - 1 < b) goto error;
-                init_decoder(&gif, b);
+                new_b = fgetc(gif.fp);
+                if (new_b == EOF) goto error;
+                if (new_b < MIN_LZW_BITS - 1 || MAX_LZW_BITS - 1 < new_b) goto error;
+                init_decoder(&gif, new_b);
                 x = 0;
                 y = 0;
                 if (!read_data_block(&gif, &block)) goto error;
                 while (TRUE) {
-                    b = decode(&gif, &block);
-                    if (b == EOF) goto error;
-                    if (b == END_OF_DATA) break;
+                    new_b = decode(&gif, &block);
+                    if (new_b == EOF) goto error;
+                    if (new_b == END_OF_DATA) break;
                     if (y >= img_height) goto error;
                     x2 = img_left + x;
                     y2 = img_top + y;
                     if (x2 < image->width && y2 < image->height) {
-                        image->pixels[y2 * image->width + x2] = lct[b];
-                        image->indexes[y2 * image->width + x2] = b + lct_start;
+                        image->pixels[y2 * image->width + x2] = lct[new_b];
+                        image->indexes[y2 * image->width + x2] = new_b + lct_start;
                     }
                     ++x;
                     if (x >= img_width) {
@@ -310,9 +309,7 @@ error:
 }
 
 static void
-init_decoder(gif, bit_width)
-struct Bitstream *gif;
-unsigned bit_width;
+init_decoder(struct Bitstream *gif, unsigned bit_width)
 {
     unsigned i;
     unsigned clear;
@@ -335,8 +332,7 @@ unsigned bit_width;
 }
 
 static void
-reset_decoder(gif)
-struct Bitstream *gif;
+reset_decoder(struct Bitstream *gif)
 {
     /* Set the bit width */
     gif->bit_width = gif->initial_bit_width + 1;
@@ -349,9 +345,7 @@ struct Bitstream *gif;
 }
 
 static int
-decode(gif, block)
-struct Bitstream *gif;
-struct DataBlock *block;
+decode(struct Bitstream *gif, struct DataBlock *block)
 {
     int code;
     unsigned clear = 1 << gif->initial_bit_width;
@@ -364,12 +358,12 @@ struct DataBlock *block;
     /* Get the next code, until code other than clear */
     while (TRUE) {
         code = get_code(gif, block);
-        if (code != clear) break;
+        if ((unsigned) code != clear) break;
         reset_decoder(gif);
     }
 
     if (code == EOF) return EOF;
-    if (code == clear + 1) return END_OF_DATA;
+    if ((unsigned) code == clear + 1) return END_OF_DATA;
     if (code > gif->dict_size) return EOF;
 
     /* Add a new string to the dictionary */
@@ -396,7 +390,7 @@ struct DataBlock *block;
     /* code is less than gif->dict_size and not equal to clear or clear + 1 */
     /* Prepare the decoded string for return; note that it is stored in
      * reverse order */
-    while (code >= clear) {
+    while ((unsigned) code >= clear) {
         gif->string[gif->str_size++] = gif->dictionary[code].byte;
         code = gif->dictionary[code].next;
     }
@@ -405,9 +399,7 @@ struct DataBlock *block;
 }
 
 static int
-get_code(gif, block)
-struct Bitstream *gif;
-struct DataBlock *block;
+get_code(struct Bitstream *gif, struct DataBlock *block)
 {
     int code;
 
@@ -426,9 +418,7 @@ struct DataBlock *block;
 }
 
 static unsigned
-interlace_incr(y, height)
-unsigned y;
-unsigned height;
+interlace_incr(unsigned y, unsigned height)
 {
     static const unsigned char incr[] = { 8, 2, 4, 2 };
 
@@ -457,17 +447,14 @@ unsigned height;
 
 /* Decode an unsigned 16 bit quantity */
 static unsigned short
-read_u16(buf)
-const unsigned char buf[2];
+read_u16(const unsigned char buf[2])
 {
     return ((unsigned short)buf[0] << 0)
          | ((unsigned short)buf[1] << 8);
 }
 
 static boolean
-read_data_block(gif, block)
-struct Bitstream *gif;
-struct DataBlock *block;
+read_data_block(struct Bitstream *gif, struct DataBlock *block)
 {
     long pos = ftell(gif->fp);
     int b;
@@ -494,7 +481,8 @@ struct DataBlock *block;
         b = fgetc(gif->fp);
         if (b == EOF) return FALSE;
         if (b == 0) break;
-        if (fread(block->data + i, 1, b, gif->fp) != b) return FALSE;
+        if (fread(block->data + i, 1, b, gif->fp) != (unsigned) b)
+            return FALSE;
         i += b;
     }
 
@@ -503,8 +491,7 @@ struct DataBlock *block;
 }
 
 static void
-free_data_block(block)
-struct DataBlock *block;
+free_data_block(struct DataBlock *block)
 {
     free(block->data);
     block->size = 0;

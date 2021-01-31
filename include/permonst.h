@@ -40,7 +40,7 @@ struct attack {
 #include "monflag.h"
 
 struct permonst {
-    const char *mname;          /* full name */
+    const char *pmnames[NUM_MGENDERS];
     char mlet;                  /* symbol */
     schar mlevel,               /* base monster level */
         mmove,                  /* move speed */
@@ -78,4 +78,8 @@ extern NEARDATA struct permonst mons[]; /* the master list of monster types */
 /* mons[SPECIAL_PM] through mons[NUMMONS-1], inclusive, are
    never generated randomly and cannot be polymorphed into */
 
+#ifdef PMNAME_MACROS
+#define pmname(pm,g) ((((g) == MALE || (g) == FEMALE) && (pm)->pmnames[g]) \
+                        ? (pm)->pmnames[g] : (pm)->pmnames[NEUTRAL])
+#endif
 #endif /* PERMONST_H */

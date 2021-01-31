@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1606445249 2020/11/27 02:47:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.482 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1611456333 2021/01/24 02:45:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.496 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -59,7 +59,7 @@ static struct allopt_t allopt_init[] = {
 #include "optlist.h"
     {(const char *) 0, 0, 0, 0, set_in_sysconf, BoolOpt,
      No, No, No, No, 0, (boolean *) 0,
-     (int FDECL((*), (int, int, BOOLEAN_P, char *, char *))) 0,
+     (int (*)(int, int, boolean, char *, char *)) 0,
      (char *) 0, (const char *) 0, (const char *) 0, 0, 0, 0}
 };
 #undef NHOPT_PARSE
@@ -204,87 +204,83 @@ static NEARDATA const char *runmodes[] = { "teleport", "run", "walk",
 static NEARDATA const char *sortltype[] = { "none", "loot", "full" };
 
 static const menu_cmd_t default_menu_cmd_info[] = {
- { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
- { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
  { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
  { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
- { "menu_select_all", MENU_SELECT_ALL, "Select all items" },
- { "menu_deselect_all", MENU_UNSELECT_ALL, "Unselect all items" },
- { "menu_invert_all", MENU_INVERT_ALL, "Invert selection" },
- { "menu_select_page", MENU_SELECT_PAGE, "Select items in current page" },
+ { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
+ { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
+ { "menu_select_all", MENU_SELECT_ALL, "Select all items in entire menu" },
+ { "menu_invert_all", MENU_INVERT_ALL, "Invert selection for all items" },
+ { "menu_deselect_all", MENU_UNSELECT_ALL,
+                                        "Unselect all items in entire menu" },
+ { "menu_select_page", MENU_SELECT_PAGE, "Select all items on current page" },
+ { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page's selections" },
  { "menu_deselect_page", MENU_UNSELECT_PAGE,
-   "Unselect items in current page" },
- { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page selection" },
- { "menu_search", MENU_SEARCH, "Search and toggle matching items" },
+                                       "Unselect all items on current page" },
+ { "menu_search", MENU_SEARCH, "Search and invert matching items" },
 };
 
-static void FDECL(nmcpy, (char *, const char *, int));
-static void FDECL(escapes, (const char *, char *));
-static void FDECL(rejectoption, (const char *));
-static char *FDECL(string_for_opt, (char *, BOOLEAN_P));
-static char *FDECL(string_for_env_opt, (const char *, char *, BOOLEAN_P));
-static void FDECL(bad_negation, (const char *, BOOLEAN_P));
-static int FDECL(change_inv_order, (char *));
-static boolean FDECL(warning_opts, (char *, const char *));
-static int FDECL(feature_alert_opts, (char *, const char *));
-static boolean FDECL(duplicate_opt_detection, (int));
-static void FDECL(complain_about_duplicate, (int));
-static int FDECL(length_without_val, (const char *, int len));
-static void NDECL(determine_ambiguities);
-static int FDECL(check_misc_menu_command, (char *, char *));
-int FDECL(spcfn_misc_menu_cmd, (int, int, BOOLEAN_P, char *, char *));
+static void nmcpy(char *, const char *, int);
+static void escapes(const char *, char *);
+static void rejectoption(const char *);
+static char *string_for_opt(char *, boolean);
+static char *string_for_env_opt(const char *, char *, boolean);
+static void bad_negation(const char *, boolean);
+static int change_inv_order(char *);
+static boolean warning_opts(char *, const char *);
+static int feature_alert_opts(char *, const char *);
+static boolean duplicate_opt_detection(int);
+static void complain_about_duplicate(int);
+static int length_without_val(const char *, int len);
+static void determine_ambiguities(void);
+static int check_misc_menu_command(char *, char *);
+int spcfn_misc_menu_cmd(int, int, boolean, char *, char *);
 
-static const char *FDECL(attr2attrname, (int));
-static void FDECL(basic_menu_colors, (BOOLEAN_P));
-static const char * FDECL(msgtype2name, (int));
-static int NDECL(query_msgtype);
-static boolean FDECL(msgtype_add, (int, char *));
-static void FDECL(free_one_msgtype, (int));
-static int NDECL(msgtype_count);
-static boolean FDECL(test_regex_pattern, (const char *, const char *));
-static boolean FDECL(add_menu_coloring_parsed, (const char *, int, int));
-static void FDECL(free_one_menu_coloring, (int));
-static int NDECL(count_menucolors);
-static boolean FDECL(parse_role_opts, (int, BOOLEAN_P, const char *,
-                                       char *, char **));
-static void FDECL(doset_add_menu, (winid, const char *, int, int));
-static void FDECL(opts_add_others, (winid, const char *, int, char *, int));
-static int FDECL(handle_add_list_remove, (const char *, int));
-static void FDECL(remove_autopickup_exception,
-                  (struct autopickup_exception *));
-static int NDECL(count_apes);
-static int NDECL(count_cond);
+static const char *attr2attrname(int);
+static void basic_menu_colors(boolean);
+static const char * msgtype2name(int);
+static int query_msgtype(void);
+static boolean msgtype_add(int, char *);
+static void free_one_msgtype(int);
+static int msgtype_count(void);
+static boolean test_regex_pattern(const char *, const char *);
+static boolean add_menu_coloring_parsed(const char *, int, int);
+static void free_one_menu_coloring(int);
+static int count_menucolors(void);
+static boolean parse_role_opts(int, boolean, const char *,
+                               char *, char **);
+static void doset_add_menu(winid, const char *, int, int);
+static int handle_add_list_remove(const char *, int);
+static void remove_autopickup_exception(struct autopickup_exception *);
+static int count_apes(void);
+static int count_cond(void);
 
-static int FDECL(handler_align_misc, (int));
-static int NDECL(handler_disclose);
-static int NDECL(handler_menu_headings);
-static int NDECL(handler_menustyle);
-static int NDECL(handler_msg_window);
-static int NDECL(handler_number_pad);
-static int NDECL(handler_paranoid_confirmation);
-static int NDECL(handler_pickup_burden);
-static int NDECL(handler_pickup_types);
-static int NDECL(handler_runmode);
-static int NDECL(handler_sortloot);
-static int FDECL(handler_symset, (int));
-static int NDECL(handler_whatis_coord);
-static int NDECL(handler_whatis_filter);
+static int handler_align_misc(int);
+static int handler_disclose(void);
+static int handler_menu_headings(void);
+static int handler_menustyle(void);
+static int handler_msg_window(void);
+static int handler_number_pad(void);
+static int handler_paranoid_confirmation(void);
+static int handler_pickup_burden(void);
+static int handler_pickup_types(void);
+static int handler_runmode(void);
+static int handler_sortloot(void);
+static int handler_symset(int);
+static int handler_whatis_coord(void);
+static int handler_whatis_filter(void);
 /* next few are not allopts[] entries, so will only be called
    directly from doset, not from individual optfn's */
-static int NDECL(handler_autopickup_exception);
-static int NDECL(handler_menu_colors);
-static int NDECL(handler_msgtype);
+static int handler_autopickup_exception(void);
+static int handler_menu_colors(void);
+static int handler_msgtype(void);
 
-static boolean FDECL(is_wc_option, (const char *));
-static boolean FDECL(wc_supported, (const char *));
-static boolean FDECL(is_wc2_option, (const char *));
-static boolean FDECL(wc2_supported, (const char *));
-static void FDECL(wc_set_font_name, (int, char *));
-static int FDECL(wc_set_window_colors, (char *));
-static boolean FDECL(illegal_menu_cmd_key, (CHAR_P));
-#ifndef CHANGE_COLOR
-int FDECL(optfn_palette, (int, int, BOOLEAN_P, char *, char *));
-#endif
+static boolean is_wc_option(const char *);
+static boolean wc_supported(const char *);
+static boolean is_wc2_option(const char *);
+static boolean wc2_supported(const char *);
+static void wc_set_font_name(int, char *);
+static int wc_set_window_colors(char *);
+static boolean illegal_menu_cmd_key(uchar);
 #ifdef CURSES_GRAPHICS
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
@@ -298,9 +294,7 @@ extern char *curses_fmt_attrs(char *);
  **********************************
  */
 boolean
-parseoptions(opts, tinitial, tfrom_file)
-register char *opts;
-boolean tinitial, tfrom_file;
+parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
 {
     char *op;
     boolean negated, got_match = FALSE;
@@ -479,9 +473,7 @@ boolean tinitial, tfrom_file;
 }
 
 int
-check_misc_menu_command(opts, op)
-char *opts;
-char *op UNUSED;
+check_misc_menu_command(char *opts, char *op UNUSED)
 {
     int i;
     const char *name_to_check;
@@ -504,12 +496,8 @@ char *op UNUSED;
  **********************************
  */
 
-int
-optfn_align(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_align(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -534,12 +522,8 @@ char *op;
 }
 
 
-int
-optfn_align_message(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_align_message(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -588,12 +572,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_align_status(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_align_status(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -641,13 +621,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_altkeyhandler(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_altkeyhandler(int optidx UNUSED, int req, boolean negated UNUSED,
+                    char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -677,13 +653,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_boulder(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     int clash = 0;
@@ -759,12 +731,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_catname(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_catname(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -788,12 +756,10 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_cursesgraphics(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op UNUSED;
+#ifdef CURSES_GRAPHICS
+static int
+optfn_cursesgraphics(int optidx, int req, boolean negated,
+                     char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     boolean badflag = FALSE;
@@ -839,13 +805,11 @@ char *op UNUSED;
     }
     return optn_ok;
 }
+#endif
 
-int
-optfn_DECgraphics(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op UNUSED;
+static int
+optfn_DECgraphics(int optidx, int req, boolean negated,
+                  char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     boolean badflag = FALSE;
@@ -892,12 +856,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_disclose(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int i, idx, prefix_val;
     unsigned num;
@@ -1017,13 +977,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_dogname(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_dogname(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1046,13 +1002,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_dungeon(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_dungeon(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1069,13 +1021,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_effects(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_effects(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1092,123 +1040,79 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_font_map(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_map(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_menu(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_menu(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_message(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_message(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_size_map(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_size_map(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_size_menu(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_size_menu(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_size_message(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_size_message(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_size_status(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_size_status(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_size_text(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_size_text(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_status(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_status(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_font_text(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_font_text(int optidx, int req, boolean negated, char *opts, char *op)
 {
     /* send them over to the prefix handling for font_ */
     return pfxfn_font(optidx, req, negated, opts, op);
 }
 
-int
-optfn_fruit(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_fruit(int optidx UNUSED, int req, boolean negated,
+            char *opts, char *op)
 {
     struct fruit *forig = 0;
 
@@ -1277,12 +1181,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_gender(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_gender(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1308,13 +1208,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_hilite_status(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_hilite_status(int optidx UNUSED, int req, boolean negated,
+                    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1347,12 +1243,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_horsename(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_horsename(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1376,12 +1268,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_IBMgraphics(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op UNUSED;
+static int
+optfn_IBMgraphics(int optidx, int req, boolean negated,
+                  char *opts, char *op UNUSED)
 {
 #ifdef BACKWARD_COMPAT
     const char *sym_name = allopt[optidx].name;
@@ -1438,13 +1327,8 @@ char *op UNUSED;
 }
 
 #if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
-int
-optfn_MACgraphics(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_MACgraphics(int optidx, int req, boolean negated, char *opts, char *op)
 {
     boolean badflag = FALSE;
 
@@ -1485,12 +1369,8 @@ char *op;
 }
 #endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
 
-int
-optfn_map_mode(optidx, req, negated, opts, op)
-int optidx, req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int i;
 
@@ -1569,13 +1449,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_menu_deselect_all(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_deselect_all(int optidx UNUSED, int req, boolean negated UNUSED,
+                        char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1596,13 +1472,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_deselect_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_deselect_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                         char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1623,13 +1495,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_first_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_first_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                      char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1650,13 +1518,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_headings(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
+                    char *opts, char *op UNUSED)
 {
     int tmpattr;
 
@@ -1687,13 +1551,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_invert_all(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_invert_all(int optidx UNUSED, int req, boolean negated UNUSED,
+                      char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1714,13 +1574,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_invert_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_invert_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                       char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1741,13 +1597,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_last_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_last_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                     char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1768,13 +1620,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_next_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_next_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                     char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1795,13 +1643,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_previous_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_previous_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                         char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1822,13 +1666,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_search(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_search(int optidx UNUSED, int req, boolean negated UNUSED,
+                  char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1849,13 +1689,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_select_all(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_select_all(int optidx UNUSED, int req, boolean negated UNUSED,
+                      char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1876,13 +1712,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menu_select_page(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_menu_select_page(int optidx UNUSED, int req, boolean negated UNUSED,
+                       char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1903,13 +1735,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_menuinvertmode(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_menuinvertmode(int optidx, int req, boolean negated UNUSED,
+                     char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1937,13 +1765,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_menustyle(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_menustyle(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int tmp;
     boolean val_required; /* no initializer based on opts because this can be
@@ -2000,13 +1823,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_monsters(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_monsters(int optidx UNUSED, int req, boolean negated UNUSED,
+               char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2023,13 +1842,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_mouse_support(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_mouse_support(int optidx, int req, boolean negated, char *opts, char *op)
 {
     boolean compat;
 
@@ -2092,13 +1906,8 @@ char *op;
 #define PREV_MSGS 0
 #endif
 
-int
-optfn_msg_window(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok;
 #if PREV_MSGS
@@ -2164,13 +1973,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_msghistory(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_msghistory(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2195,13 +1999,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_name(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_name(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2225,13 +2024,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_number_pad(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_number_pad(int optidx, int req, boolean negated, char *opts, char *op)
 {
     boolean compat;
 
@@ -2300,13 +2094,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_objects(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_objects(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2323,13 +2113,9 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_packorder(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_packorder(int optidx UNUSED, int req, boolean negated UNUSED,
+                char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2353,20 +2139,14 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_palette(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+#ifdef CHANGE_COLOR
+static int
+optfn_palette(int optidx UNUSED, int req, boolean negated UNUSED, char *opts, char *op)
 {
 #ifndef WIN32
-#ifdef CHANGE_COLOR
     int cnt, tmp, reverse;
     char *pt = op;
     long rgb;
-#endif
 #endif
 
     if (req == do_init) {
@@ -2382,12 +2162,11 @@ char *op;
                  palette (adjust an RGB color in palette (color-R-G-B)
         */
 
-#ifdef CHANGE_COLOR
         if (match_optname(opts, "palette", 3, TRUE)
 #ifdef MAC
             || match_optname(opts, "hicolor", 3, TRUE)
 #endif
-                                                      ) {
+            ) {
             int color_number, color_incr;
 
 #ifndef WIN32
@@ -2449,29 +2228,21 @@ char *op;
                 g.opt_need_redraw = TRUE;
             }
         }
-#endif /* CHANGE_COLOR */
-            return optn_ok;
+        return optn_ok;
     }
     if (req == get_val) {
         if (!opts)
             return optn_err;
         opts[0] = '\0';
-#ifdef CHANGE_COLOR
         Sprintf(opts, "%s", get_color_string());
-#endif
         return optn_ok;
     }
     return optn_ok;
 }
+#endif /* CHANGE_COLOR */
 
-
-int
-optfn_paranoid_confirmation(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_paranoid_confirmation(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int i;
 
@@ -2543,7 +2314,6 @@ char *op;
                 flags.paranoia_bits &= ~PARANOID_PRAY;
             else
                 flags.paranoia_bits |= PARANOID_PRAY;
-            return optn_ok;
         }
         return optn_ok;
     }
@@ -2565,13 +2335,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_petattr(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_petattr(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok;
 
@@ -2630,13 +2395,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_pettype(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_pettype(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2686,13 +2446,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_pickup_burden(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_pickup_burden(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2743,13 +2498,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_pickup_types(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_pickup_types(int optidx, int req, boolean negated, char *opts, char *op)
 {
     char ocl[MAXOCLASSES + 1], tbuf[MAXOCLASSES + 1], qbuf[QBUFSZ],
         abuf[BUFSZ];
@@ -2844,13 +2594,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_pile_limit(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_pile_limit(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2883,13 +2628,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_player_selection(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_player_selection(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2920,13 +2660,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_playmode(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_playmode(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2961,13 +2696,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_race(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_race(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2993,13 +2723,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_roguesymset(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
+                  char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3037,13 +2763,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_role(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_role(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3068,13 +2789,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_runmode(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3112,13 +2828,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_scores(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3184,13 +2895,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_scroll_amount(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_scroll_amount(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3220,13 +2926,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_scroll_margin(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_scroll_margin(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3255,13 +2956,64 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_sortloot(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_sortdiscoveries(int optidx, int req, boolean negated, char *opts, char *op)
+{
+    if (req == do_init) {
+        flags.discosort = 'o';
+        return optn_ok;
+    }
+    if (req == do_set) {
+        op = string_for_env_opt(allopt[optidx].name, opts, FALSE);
+        if (negated) {
+            flags.discosort = 'o';
+        } else if (op != empty_optstr) {
+            switch (lowc(*op)) {
+            case '0':
+            case 'o': /* order of discovery */
+                flags.discosort = 'o';
+                break;
+            case '1':
+            case 's': /* sortloot order (subclasses for some classes) */
+                flags.discosort = 's';
+                break;
+            case '2':
+            case 'c': /* alphabetical within each class */
+                flags.discosort = 'c';
+                break;
+            case '3':
+            case 'a': /* alphabetical across all classes */
+                flags.discosort = 'a';
+                break;
+            default:
+                config_error_add("Unknown %s parameter '%s'",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            }
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val) {
+        extern const char *const disco_orders_descr[]; /* o_init.c */
+        extern const char disco_order_let[];
+        const char *p = index(disco_order_let, flags.discosort);
+
+        if (!p)
+            flags.discosort = 'o', p = disco_order_let;
+        Strcpy(opts, disco_orders_descr[p - disco_order_let]);
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        /* return handler_sortdiscoveries(); */
+        (void) choose_disco_sort(0); /* o_init.c */
+    }
+    return optn_ok;
+}
+
+static int
+optfn_sortloot(int optidx, int req, boolean negated UNUSED,
+               char *opts, char *op)
 {
     int i;
 
@@ -3304,13 +3056,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_statushilites(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_statushilites(int optidx UNUSED, int req, boolean negated,
+                    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3354,13 +3102,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_statuslines(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_statuslines(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok, itmp = 0;
 
@@ -3403,13 +3146,9 @@ char *op;
 }
 
 #ifdef WIN32
-int
-optfn_subkeyvalue(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_subkeyvalue(int optidx UNUSED, int req, boolean negated UNUSED,
+                  char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3432,13 +3171,9 @@ char *op UNUSED;
 }
 #endif /* WIN32 */
 
-int
-optfn_suppress_alert(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_suppress_alert(int optidx, int req, boolean negated,
+                     char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3464,13 +3199,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_symset(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_symset(int optidx UNUSED, int req, boolean negated UNUSED,
+             char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3507,13 +3238,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_term_cols(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_term_cols(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok;
     long ltmp;
@@ -3551,13 +3277,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_term_rows(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_term_rows(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok;
     long ltmp;
@@ -3595,13 +3316,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_tile_file(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_tile_file(int optidx UNUSED, int req, boolean negated UNUSED,
+                char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3626,13 +3343,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_tile_height(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_tile_height(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3661,13 +3373,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_tile_width(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_tile_width(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3696,13 +3403,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_traps(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_traps(int optidx UNUSED, int req, boolean negated UNUSED,
+            char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3719,13 +3422,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_vary_msgcount(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_vary_msgcount(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3755,13 +3453,9 @@ char *op;
 }
 
 #ifdef VIDEOSHADES
-int
-optfn_videocolors(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_videocolors(int optidx, int req, boolean negated UNUSED,
+                  char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3795,13 +3489,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_videoshades(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_videoshades(int optidx, int req, boolean negated UNUSED,
+                  char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3831,13 +3521,9 @@ char *op;
 #endif /* VIDEOSHADES */
 
 #ifdef MSDOS
-int
-optfn_video_width(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_video_width(int optidx UNUSED, int req, boolean negated,
+                  char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3857,13 +3543,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_video_height(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_video_height(int optidx UNUSED, int req, boolean negated,
+                   char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3884,13 +3566,9 @@ char *op;
 }
 
 #ifdef NO_TERMS
-int
-optfn_video(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_video(int optidx, int req, boolean negated UNUSED,
+            char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3920,13 +3598,9 @@ char *op;
 #endif /* NO_TERMS */
 #endif /* MSDOS */
 
-int
-optfn_warnings(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op UNUSED;
+static int
+optfn_warnings(int optidx, int req, boolean negated UNUSED,
+               char *opts, char *op UNUSED)
 {
     int reslt;
 
@@ -3946,13 +3620,8 @@ char *op UNUSED;
     return optn_ok;
 }
 
-int
-optfn_whatis_coord(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_whatis_coord(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3996,13 +3665,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_whatis_filter(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_whatis_filter(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4050,13 +3714,8 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_windowborders(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_windowborders(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int retval = optn_ok;
 
@@ -4102,13 +3761,8 @@ char *op;
 }
 
 #ifdef WINCHAIN
-int
-optfn_windowchain(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_windowchain(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4134,13 +3788,9 @@ char *op;
 }
 #endif
 
-int
-optfn_windowcolors(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
+                   char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4180,13 +3830,9 @@ char *op;
     return optn_ok;
 }
 
-int
-optfn_windowtype(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated UNUSED;
-char *opts;
-char *op;
+static int
+optfn_windowtype(int optidx, int req, boolean negated UNUSED,
+                 char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4233,12 +3879,8 @@ char *op;
  */
 
 int
-pfxfn_cond_(optidx, req, negated, opts, op)
-int optidx UNUSED;
-int req;
-boolean negated;
-char *opts;
-char *op UNUSED;
+pfxfn_cond_(int optidx UNUSED, int req, boolean negated,
+            char *opts, char *op UNUSED)
 {
     int reslt;
 
@@ -4278,12 +3920,7 @@ char *op UNUSED;
 }
 
 int
-pfxfn_font(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int opttype = -1;
 
@@ -4415,12 +4052,8 @@ char *op;
 
 #if defined(MICRO) && !defined(AMIGA)
 int
-pfxfn_IBM_(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
+           char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4443,13 +4076,8 @@ char *op;
  *    (Use optidx to reference the specific option)
  */
 
-int
-optfn_boolean(optidx, req, negated, opts, op)
-int optidx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+static int
+optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4644,12 +4272,7 @@ char *op;
 }
 
 int
-spcfn_misc_menu_cmd(midx, req, negated, opts, op)
-int midx;
-int req;
-boolean negated;
-char *opts;
-char *op;
+spcfn_misc_menu_cmd(int midx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4664,7 +4287,7 @@ char *op;
             escapes(op, op_buf);
             c = *op_buf;
 
-            if (illegal_menu_cmd_key(c))
+            if (illegal_menu_cmd_key((uchar) c))
                 return optn_err;
             add_menu_cmd_alias(c, default_menu_cmd_info[midx].cmd);
         }
@@ -4689,7 +4312,7 @@ char *op;
  */
 
 static int
-handler_menustyle()
+handler_menustyle(void)
 {
     winid tmpwin;
     anything any;
@@ -4705,8 +4328,8 @@ handler_menustyle()
         /* note: separate `style_name' variable used
            to avoid an optimizer bug in VAX C V2.3 */
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, *style_name, 0, ATR_NONE,
-                 style_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *style_name, 0,
+                 ATR_NONE, style_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select menustyle:");
     if (select_menu(tmpwin, PICK_ONE, &style_pick) > 0) {
@@ -4718,8 +4341,7 @@ handler_menustyle()
 }
 
 static int
-handler_align_misc(optidx)
-int optidx;
+handler_align_misc(int optidx)
 {
     winid tmpwin;
     anything any;
@@ -4730,16 +4352,16 @@ int optidx;
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = ALIGN_TOP;
-    add_menu(tmpwin, NO_GLYPH, &any, 't', 0, ATR_NONE, "top",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 't', 0, ATR_NONE, "top",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_BOTTOM;
-    add_menu(tmpwin, NO_GLYPH, &any, 'b', 0, ATR_NONE, "bottom",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'b', 0, ATR_NONE, "bottom",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_LEFT;
-    add_menu(tmpwin, NO_GLYPH, &any, 'l', 0, ATR_NONE, "left",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'l', 0, ATR_NONE, "left",
              MENU_ITEMFLAGS_NONE);
     any.a_int = ALIGN_RIGHT;
-    add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "right",
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'r', 0, ATR_NONE, "right",
              MENU_ITEMFLAGS_NONE);
     Sprintf(abuf, "Select %s window placement relative to the map:",
             (optidx == opt_align_message) ? "message" : "status");
@@ -4756,7 +4378,7 @@ int optidx;
 }
 
 static int
-handler_disclose(VOID_ARGS)
+handler_disclose(void)
 {
     winid tmpwin;
     anything any;
@@ -4780,8 +4402,8 @@ handler_disclose(VOID_ARGS)
         Sprintf(buf, "%-12s[%c%c]", disclosure_names[i],
                 flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, disclosure_options[i], 0,
-                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, disclosure_options[i],
+                 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
     end_menu(tmpwin, "Change which disclosure options categories:");
@@ -4806,31 +4428,41 @@ handler_disclose(VOID_ARGS)
             any = cg.zeroany;
             /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Never disclose, without prompting",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Always disclose, without prompting",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
-                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                         any.a_char, ATR_NONE,
                          "Always disclose, pick sort order from menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"No\"",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                     any.a_char, ATR_NONE,
                      "Prompt, with default answer of \"Yes\"",
-                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                     (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
+                                       : MENU_ITEMFLAGS_NONE);
             if (*disclosure_names[i] == 'v') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
-                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0,
+                         any.a_char, ATR_NONE,
             "Prompt, with default answer of \"Ask\" to request sort menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
@@ -4850,7 +4482,7 @@ handler_disclose(VOID_ARGS)
 }
 
 static int
-handler_menu_headings(VOID_ARGS)
+handler_menu_headings(void)
 {
     int mhattr = query_attr("How to highlight menu headings:");
 
@@ -4860,7 +4492,7 @@ handler_menu_headings(VOID_ARGS)
 }
 
 static int
-handler_msg_window(VOID_ARGS)
+handler_msg_window(void)
 {
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
     winid tmpwin;
@@ -4875,18 +4507,18 @@ handler_msg_window(VOID_ARGS)
         any = cg.zeroany;
         if (!WINDOWPORT("curses")) {
             any.a_char = 's';
-            add_menu(tmpwin, NO_GLYPH, &any, 's', 0, ATR_NONE,
-                     "single", MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 's',
+                     0, ATR_NONE, "single", MENU_ITEMFLAGS_NONE);
             any.a_char = 'c';
-            add_menu(tmpwin, NO_GLYPH, &any, 'c', 0, ATR_NONE,
-                     "combination", MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 'c',
+                     0, ATR_NONE, "combination", MENU_ITEMFLAGS_NONE);
         }
         any.a_char = 'f';
-        add_menu(tmpwin, NO_GLYPH, &any, 'f', 0, ATR_NONE, "full",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'f',
+                 0, ATR_NONE, "full", MENU_ITEMFLAGS_NONE);
         any.a_char = 'r';
-        add_menu(tmpwin, NO_GLYPH, &any, 'r', 0, ATR_NONE, "reversed",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'r',
+                 0, ATR_NONE, "reversed", MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Select message history display type:");
         if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
             iflags.prevmsg_window = window_pick->item.a_char;
@@ -4901,7 +4533,7 @@ handler_msg_window(VOID_ARGS)
 }
 
 static int
-handler_number_pad(VOID_ARGS)
+handler_number_pad(void)
 {
     winid tmpwin;
     anything any;
@@ -4919,8 +4551,8 @@ handler_number_pad(VOID_ARGS)
     any = cg.zeroany;
     for (i = 0; i < SIZE(npchoices); i++) {
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 'a' + i, 0, ATR_NONE,
-                 npchoices[i], MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
+                 0, ATR_NONE, npchoices[i], MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select number_pad mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
@@ -4960,7 +4592,7 @@ handler_number_pad(VOID_ARGS)
 }
 
 static int
-handler_paranoid_confirmation(VOID_ARGS)
+handler_paranoid_confirmation(void)
 {
     winid tmpwin;
     anything any;
@@ -4974,8 +4606,8 @@ handler_paranoid_confirmation(VOID_ARGS)
         if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
             continue;
         any.a_int = paranoia[i].flagmask;
-        add_menu(tmpwin, NO_GLYPH, &any, *paranoia[i].argname, 0,
-                 ATR_NONE, paranoia[i].explain,
+        add_menu(tmpwin, &nul_glyphinfo, &any, *paranoia[i].argname,
+                 0, ATR_NONE, paranoia[i].explain,
                  (flags.paranoia_bits & paranoia[i].flagmask)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
@@ -4999,7 +4631,7 @@ handler_paranoid_confirmation(VOID_ARGS)
 }
 
 static int
-handler_pickup_burden(VOID_ARGS)
+handler_pickup_burden(void)
 {
     winid tmpwin;
     anything any;
@@ -5013,8 +4645,8 @@ handler_pickup_burden(VOID_ARGS)
     for (i = 0; i < SIZE(burdentype); i++) {
         burden_name = burdentype[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, burden_letters[i], 0, ATR_NONE,
-                 burden_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, burden_letters[i],
+                 0, ATR_NONE, burden_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select encumbrance level:");
     if (select_menu(tmpwin, PICK_ONE, &burden_pick) > 0) {
@@ -5026,7 +4658,7 @@ handler_pickup_burden(VOID_ARGS)
 }
 
 static int
-handler_pickup_types(VOID_ARGS)
+handler_pickup_types(void)
 {
     char buf[BUFSZ];
 
@@ -5037,7 +4669,7 @@ handler_pickup_types(VOID_ARGS)
 }
 
 static int
-handler_runmode(VOID_ARGS)
+handler_runmode(void)
 {
     winid tmpwin;
     anything any;
@@ -5051,8 +4683,8 @@ handler_runmode(VOID_ARGS)
     for (i = 0; i < SIZE(runmodes); i++) {
         mode_name = runmodes[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, *mode_name, 0, ATR_NONE,
-                 mode_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *mode_name,
+                 0, ATR_NONE, mode_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select run/travel display mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
@@ -5064,7 +4696,7 @@ handler_runmode(VOID_ARGS)
 }
 
 static int
-handler_sortloot(VOID_ARGS)
+handler_sortloot(void)
 {
     winid tmpwin;
     anything any;
@@ -5078,9 +4710,11 @@ handler_sortloot(VOID_ARGS)
     for (i = 0; i < SIZE(sortltype); i++) {
         sortl_name = sortltype[i];
         any.a_char = *sortl_name;
-        add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, *sortl_name,
+                 0, ATR_NONE,
                  sortl_name, (flags.sortloot == *sortl_name)
-                                ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                                ? MENU_ITEMFLAGS_SELECTED
+                                : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select loot sorting type:");
     n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
@@ -5097,7 +4731,7 @@ handler_sortloot(VOID_ARGS)
 }
 
 static int
-handler_whatis_coord(VOID_ARGS)
+handler_whatis_coord(void)
 {
     winid tmpwin;
     anything any;
@@ -5110,38 +4744,42 @@ handler_whatis_coord(VOID_ARGS)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = GPCOORDS_COMPASS;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS, 0, ATR_NONE,
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMPASS,
+             0, ATR_NONE,
              "compass ('east' or '3s' or '2n,4w')",
              (gp == GPCOORDS_COMPASS)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMFULL, 0, ATR_NONE,
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_COMFULL,
+             0, ATR_NONE,
              "full compass ('east' or '3south' or '2north,4west')",
              (gp == GPCOORDS_COMFULL)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP, 0, ATR_NONE,
-             "map <x,y>",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_MAP,
+             0, ATR_NONE, "map <x,y>",
              (gp == GPCOORDS_MAP)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_SCREEN, 0, ATR_NONE,
-             "screen [row,column]",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_SCREEN,
+             0, ATR_NONE, "screen [row,column]",
              (gp == GPCOORDS_SCREEN)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
-    add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_NONE, 0, ATR_NONE,
-             "none (no coordinates displayed)",
+    add_menu(tmpwin, &nul_glyphinfo, &any, GPCOORDS_NONE,
+             0, ATR_NONE, "none (no coordinates displayed)",
              (gp == GPCOORDS_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_long = 0L;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             "", MENU_ITEMFLAGS_NONE);
     Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
             1, 0, COLNO - 1, ROWNO - 1,
             flags.verbose ? "; column 0 unused, off left edge" : "");
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
    "screen: row is offset to accommodate tty interface's use of top line",
                  MENU_ITEMFLAGS_NONE);
 #if COLNO == 80
@@ -5152,8 +4790,10 @@ handler_whatis_coord(VOID_ARGS)
     Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
             0 + 2, 1, ROWNO - 1 + 2, COLNO - 1, COL80ARG);
 #undef COL80ARG
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             buf, MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             "", MENU_ITEMFLAGS_NONE);
     end_menu(tmpwin,
         "Select coordinate display when auto-describing a map position:");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
@@ -5169,7 +4809,7 @@ handler_whatis_coord(VOID_ARGS)
 }
 
 static int
-handler_whatis_filter(VOID_ARGS)
+handler_whatis_filter(void)
 {
     winid tmpwin;
     anything any;
@@ -5181,17 +4821,17 @@ handler_whatis_filter(VOID_ARGS)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = (GFILTER_NONE + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'n',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'n',
              0, ATR_NONE, "no filtering",
              (gf == GFILTER_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_VIEW + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'v',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'v',
              0, ATR_NONE, "in view only",
              (gf == GFILTER_VIEW)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = (GFILTER_AREA + 1);
-    add_menu(tmpwin, NO_GLYPH, &any, 'a',
+    add_menu(tmpwin, &nul_glyphinfo, &any, 'a',
              0, ATR_NONE, "in same area",
              (gf == GFILTER_AREA)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
@@ -5210,8 +4850,7 @@ handler_whatis_filter(VOID_ARGS)
 }
 
 static int
-handler_symset(optidx)
-int optidx;
+handler_symset(int optidx)
 {
     winid tmpwin;
     anything any;
@@ -5271,7 +4910,7 @@ int optidx;
         any.a_int = 1; /* -1 + 2 [see 'if (sl->name) {' below]*/
         if (!symset_name)
             defindx = any.a_int;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "Default Symbols",
                  (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
@@ -5292,7 +4931,8 @@ int optidx;
                 if (symset_name && !strcmpi(sl->name, symset_name))
                     defindx = any.a_int;
                 Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf,
                          (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
             }
@@ -5387,7 +5027,7 @@ int optidx;
 }
 
 static int
-handler_autopickup_exception(VOID_ARGS)
+handler_autopickup_exception(void)
 {
     winid tmpwin;
     anything any;
@@ -5428,7 +5068,8 @@ handler_autopickup_exception(VOID_ARGS)
         if (numapes) {
             ape = g.apelist;
             any = cg.zeroany;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     iflags.menu_headings,
                      "Always pickup '<'; never pickup '>'",
                      MENU_ITEMFLAGS_NONE);
             for (i = 0; i < numapes && ape; i++) {
@@ -5437,8 +5078,8 @@ handler_autopickup_exception(VOID_ARGS)
                    less than BUFSZ */
                 Sprintf(apebuf, "\"%c%s\"", ape->grab ? '<' : '>',
                         ape->pattern);
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, apebuf, MENU_ITEMFLAGS_NONE);
                 ape = ape->next;
             }
         }
@@ -5463,7 +5104,7 @@ handler_autopickup_exception(VOID_ARGS)
 }
 
 static int
-handler_menu_colors(VOID_ARGS)
+handler_menu_colors(void)
 {
     winid tmpwin;
     anything any;
@@ -5536,8 +5177,8 @@ handler_menu_colors(VOID_ARGS)
                 Strcat(mcbuf, tmp->origstr);
             /* combine main string and suffix */
             Strcat(mcbuf, &buf[1]); /* skip buf[]'s initial quote */
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mcbuf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, mcbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
         Sprintf(mcbuf, "%s menu colors",
@@ -5560,7 +5201,7 @@ handler_menu_colors(VOID_ARGS)
 }
 
 static int
-handler_msgtype(VOID_ARGS)
+handler_msgtype(void)
 {
     winid tmpwin;
     anything any;
@@ -5606,8 +5247,8 @@ handler_msgtype(VOID_ARGS)
                 Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
             else
                 Strcat(strcat(mtbuf, tmp->pattern), "\"");
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, mtbuf, MENU_ITEMFLAGS_NONE);
             tmp = tmp->next;
         }
         Sprintf(mtbuf, "%s message types",
@@ -5639,9 +5280,7 @@ handler_msgtype(VOID_ARGS)
  */
 
 static char *
-string_for_opt(opts, val_optional)
-char *opts;
-boolean val_optional;
+string_for_opt(char *opts, boolean val_optional)
 {
     char *colon, *equals;
 
@@ -5659,10 +5298,7 @@ boolean val_optional;
 }
 
 static char *
-string_for_env_opt(optname, opts, val_optional)
-const char *optname;
-char *opts;
-boolean val_optional;
+string_for_env_opt(const char *optname, char *opts, boolean val_optional)
 {
     if (!g.opt_initial) {
         rejectoption(optname);
@@ -5672,9 +5308,7 @@ boolean val_optional;
 }
 
 static void
-bad_negation(optname, with_parameter)
-const char *optname;
-boolean with_parameter;
+bad_negation(const char *optname, boolean with_parameter)
 {
     pline_The("%s option may not %sbe negated.", optname,
               with_parameter ? "both have a value and " : "");
@@ -5684,7 +5318,7 @@ boolean with_parameter;
    based on what is needed for uniqueness of each individual
    option. Set a minimum of 3 characters. */
 void
-determine_ambiguities()
+determine_ambiguities(void)
 {
     int i, j, len, tmpneeded, needed[SIZE(allopt)];
     const char *p1, *p2;
@@ -5720,9 +5354,7 @@ determine_ambiguities()
 }
 
 int
-length_without_val(user_string, len)
-const char *user_string;
-int len;
+length_without_val(const char *user_string, int len)
 {
     const char *p = index(user_string, ':'),
                *q = index(user_string, '=');
@@ -5743,10 +5375,8 @@ int len;
    substring of a particular option name; option string might have
    a colon or equals sign and arbitrary value appended to it */
 boolean
-match_optname(user_string, optn_name, min_length, val_allowed)
-const char *user_string, *optn_name;
-int min_length;
-boolean val_allowed;
+match_optname(const char *user_string, const char *optn_name,
+              int min_length, boolean val_allowed)
 {
     int len = (int) strlen(user_string);
 
@@ -5758,7 +5388,7 @@ boolean val_allowed;
 }
 
 void
-reset_duplicate_opt_detection(VOID_ARGS)
+reset_duplicate_opt_detection(void)
 {
     int k;
 
@@ -5767,8 +5397,7 @@ reset_duplicate_opt_detection(VOID_ARGS)
 }
 
 static boolean
-duplicate_opt_detection(optidx)
-int optidx;
+duplicate_opt_detection(int optidx)
 {
     if (g.opt_initial && g.opt_from_file)
         return allopt[optidx].dupdetected++;
@@ -5776,8 +5405,7 @@ int optidx;
 }
 
 static void
-complain_about_duplicate(optidx)
-int optidx;
+complain_about_duplicate(int optidx)
 {
     char buf[BUFSZ];
 
@@ -5799,8 +5427,7 @@ int optidx;
 }
 
 static void
-rejectoption(optname)
-const char *optname;
+rejectoption(const char *optname)
 {
 #ifdef MICRO
     pline("\"%s\" settable only from %s.", optname, configfile);
@@ -5836,8 +5463,7 @@ OPTIONS=gender
  * bounds-check itself.
  */
 char *
-nh_getenv(ev)
-const char *ev;
+nh_getenv(const char *ev)
 {
     char *getev = getenv(ev);
 
@@ -5850,10 +5476,7 @@ const char *ev;
 /* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
    treat comma as alternate end of 'src' */
 static void
-nmcpy(dest, src, maxlen)
-char *dest;
-const char *src;
-int maxlen;
+nmcpy(char *dest, const char *src, int maxlen)
 {
     int count;
 
@@ -5888,9 +5511,8 @@ int maxlen;
  * or 'O', plus stop if the non-digit is end-of-string.
  */
 static void
-escapes(cp, tp)
-const char *cp; /* might be 'tp', updating in place */
-char *tp; /* result is never longer than 'cp' */
+escapes(const char *cp, /* might be 'tp', updating in place */
+        char *tp)       /* result is never longer than 'cp' */
 {
     static NEARDATA const char oct[] = "01234567", dec[] = "0123456789",
                                hex[] = "00112233445566778899aAbBcCdDeEfF";
@@ -5970,7 +5592,7 @@ char *tp; /* result is never longer than 'cp' */
 
 /* process options, possibly including SYSCF */
 void
-initoptions()
+initoptions(void)
 {
     int i;
 
@@ -6010,7 +5632,7 @@ initoptions()
 }
 
 void
-initoptions_init()
+initoptions_init(void)
 {
 #if (defined(UNIX) || defined(VMS)) && defined(TTY_GRAPHICS)
     char *opts;
@@ -6134,7 +5756,7 @@ initoptions_init()
 }
 
 void
-initoptions_finish()
+initoptions_finish(void)
 {
     nhsym sym = 0;
 #ifndef MAC
@@ -6227,8 +5849,7 @@ initoptions_finish()
  *
  */
 static int
-change_inv_order(op)
-char *op;
+change_inv_order(char *op)
 {
     int oc_sym, num;
     char *sp, buf[QBUFSZ];
@@ -6283,9 +5904,7 @@ char *op;
  */
 
 static boolean
-warning_opts(opts, optype)
-register char *opts;
-const char *optype;
+warning_opts(char *opts, const char *optype)
 {
     uchar translate[WARNCOUNT];
     int length, i;
@@ -6305,8 +5924,7 @@ const char *optype;
 }
 
 void
-assign_warnings(graph_chars)
-register uchar *graph_chars;
+assign_warnings(uchar *graph_chars)
 {
     int i;
 
@@ -6323,9 +5941,7 @@ register uchar *graph_chars;
  */
 
 static int
-feature_alert_opts(op, optn)
-char *op;
-const char *optn;
+feature_alert_opts(char *op, const char *optn)
 {
     char buf[BUFSZ];
     unsigned long fnv = get_feature_notice_ver(op); /* version.c */
@@ -6361,11 +5977,10 @@ const char *optn;
 
 /* parse key:command */
 boolean
-parsebindings(bindings)
-char* bindings;
+parsebindings(char *bindings)
 {
     char *bind;
-    char key;
+    uchar key;
     int i;
     boolean ret = FALSE;
 
@@ -6400,7 +6015,7 @@ char* bindings;
                 config_error_add("Bad menu key %s:%s", visctrl(key), bind);
                 return FALSE;
             } else
-                add_menu_cmd_alias(key, default_menu_cmd_info[i].cmd);
+                add_menu_cmd_alias((char) key, default_menu_cmd_info[i].cmd);
             return TRUE;
         }
     }
@@ -6470,8 +6085,7 @@ static const struct attr_names {
 };
 
 const char *
-clr2colorname(clr)
-int clr;
+clr2colorname(int clr)
 {
     int i;
 
@@ -6482,8 +6096,7 @@ int clr;
 }
 
 int
-match_str2clr(str)
-char *str;
+match_str2clr(char *str)
 {
     int i, c = CLR_MAX;
 
@@ -6507,8 +6120,7 @@ char *str;
 }
 
 static const char *
-attr2attrname(attr)
-int attr;
+attr2attrname(int attr)
 {
     int i;
 
@@ -6519,9 +6131,7 @@ int attr;
 }
 
 int
-match_str2attr(str, complain)
-const char *str;
-boolean complain;
+match_str2attr(const char *str, boolean complain)
 {
     int i, a = -1;
 
@@ -6546,8 +6156,7 @@ extern const char regex_id[]; /* from sys/share/<various>regex.{c,cpp} */
    suppresses black and white because one of those will likely be invisible
    due to matching the background; False: restore user-specified colorings */
 static void
-basic_menu_colors(load_colors)
-boolean load_colors;
+basic_menu_colors(boolean load_colors)
 {
     if (load_colors) {
         /* replace normal menu colors with a set specifically for colors */
@@ -6595,8 +6204,7 @@ boolean load_colors;
 }
 
 int
-query_color(prompt)
-const char *prompt;
+query_color(const char *prompt)
 {
     winid tmpwin;
     anything any;
@@ -6613,7 +6221,8 @@ const char *prompt;
         if (!colornames[i].name)
             break;
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                 ATR_NONE, colornames[i].name,
                  (colornames[i].color == NO_COLOR) ? MENU_ITEMFLAGS_SELECTED
                                                    : MENU_ITEMFLAGS_NONE);
     }
@@ -6645,8 +6254,7 @@ const char *prompt;
    for status highlighting, multiple attributes are allowed [overkill;
    life would be much simpler if that were restricted to one also...] */
 int
-query_attr(prompt)
-const char *prompt;
+query_attr(const char *prompt)
 {
     winid tmpwin;
     anything any;
@@ -6664,8 +6272,8 @@ const char *prompt;
         if (!attrnames[i].name)
             break;
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, attrnames[i].attr,
-                 attrnames[i].name,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                 attrnames[i].attr, attrnames[i].name,
                  (attrnames[i].attr == default_attr) ? MENU_ITEMFLAGS_SELECTED
                                                      : MENU_ITEMFLAGS_NONE);
     }
@@ -6737,8 +6345,7 @@ static const struct {
 };
 
 static const char *
-msgtype2name(typ)
-int typ;
+msgtype2name(int typ)
 {
     int i;
 
@@ -6749,7 +6356,7 @@ int typ;
 }
 
 static int
-query_msgtype()
+query_msgtype(void)
 {
     winid tmpwin;
     anything any;
@@ -6762,8 +6369,8 @@ query_msgtype()
     for (i = 0; i < SIZE(msgtype_names); i++)
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1;
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
         }
     end_menu(tmpwin, "How to show the message");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -6777,9 +6384,7 @@ query_msgtype()
 }
 
 static boolean
-msgtype_add(typ, pattern)
-int typ;
-char *pattern;
+msgtype_add(int typ, char *pattern)
 {
     static const char *re_error = "MSGTYPE regex error";
     struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof *tmp);
@@ -6804,7 +6409,7 @@ char *pattern;
 }
 
 void
-msgtype_free()
+msgtype_free(void)
 {
     struct plinemsg_type *tmp, *tmp2 = 0;
 
@@ -6818,8 +6423,7 @@ msgtype_free()
 }
 
 static void
-free_one_msgtype(idx)
-int idx; /* 0 .. */
+free_one_msgtype(int idx) /* 0 .. */
 {
     struct plinemsg_type *tmp = g.plinemsg_types;
     struct plinemsg_type *prev = NULL;
@@ -6844,9 +6448,8 @@ int idx; /* 0 .. */
 }
 
 int
-msgtype_type(msg, norepeat)
-const char *msg;
-boolean norepeat; /* called from Norep(via pline) */
+msgtype_type(const char *msg,
+             boolean norepeat) /* called from Norep(via pline) */
 {
     struct plinemsg_type *tmp = g.plinemsg_types;
 
@@ -6863,9 +6466,7 @@ boolean norepeat; /* called from Norep(via pline) */
 /* negate one or more types of messages so that their type handling will
    be disabled or re-enabled; MSGTYPE_NORMAL (value 0) is not affected */
 void
-hide_unhide_msgtypes(hide, hide_mask)
-boolean hide;
-int hide_mask;
+hide_unhide_msgtypes(boolean hide, int hide_mask)
 {
     struct plinemsg_type *tmp;
     int mt;
@@ -6881,7 +6482,7 @@ int hide_mask;
 }
 
 static int
-msgtype_count(VOID_ARGS)
+msgtype_count(void)
 {
     int c = 0;
     struct plinemsg_type *tmp = g.plinemsg_types;
@@ -6894,8 +6495,7 @@ msgtype_count(VOID_ARGS)
 }
 
 boolean
-msgtype_parse_add(str)
-char *str;
+msgtype_parse_add(char *str)
 {
     char pattern[256];
     char msgtype[11];
@@ -6922,9 +6522,7 @@ char *str;
 /* parse 'str' as a regular expression to check whether it's valid;
    compiled regexp gets thrown away regardless of the outcome */
 static boolean
-test_regex_pattern(str, errmsg)
-const char *str;
-const char *errmsg;
+test_regex_pattern(const char *str, const char *errmsg)
 {
     static const char def_errmsg[] = "NHregex error";
     struct nhregex *match;
@@ -6957,9 +6555,7 @@ const char *errmsg;
 }
 
 static boolean
-add_menu_coloring_parsed(str, c, a)
-const char *str;
-int c, a;
+add_menu_coloring_parsed(const char *str, int c, int a)
 {
     static const char re_error[] = "Menucolor regex error";
     struct menucoloring *tmp;
@@ -6989,8 +6585,7 @@ int c, a;
 
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
-add_menu_coloring(tmpstr)
-char *tmpstr; /* never Null but could be empty */
+add_menu_coloring(char *tmpstr) /* never Null but could be empty */
 {
     int c = NO_COLOR, a = ATR_NONE;
     char *tmps, *cs, *amp;
@@ -7036,9 +6631,7 @@ char *tmpstr; /* never Null but could be empty */
 }
 
 boolean
-get_menu_coloring(str, color, attr)
-const char *str;
-int *color, *attr;
+get_menu_coloring(const char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
 
@@ -7054,7 +6647,7 @@ int *color, *attr;
 
 /* release all menu color patterns */
 void
-free_menu_coloring()
+free_menu_coloring(void)
 {
     /* either menu_colorings or color_colorings or both might need to
        be freed or already be Null; do-loop will iterate at most twice */
@@ -7074,8 +6667,7 @@ free_menu_coloring()
 
 /* release a specific menu color pattern; not used for color_colorings */
 static void
-free_one_menu_coloring(idx)
-int idx; /* 0 .. */
+free_one_menu_coloring(int idx) /* 0 .. */
 {
     struct menucoloring *tmp = g.menu_colorings;
     struct menucoloring *prev = NULL;
@@ -7100,7 +6692,7 @@ int idx; /* 0 .. */
 }
 
 static int
-count_menucolors(VOID_ARGS)
+count_menucolors(void)
 {
     struct menucoloring *tmp;
     int count = 0;
@@ -7111,12 +6703,8 @@ count_menucolors(VOID_ARGS)
 }
 
 static boolean
-parse_role_opts(optidx, negated, fullname, opts, opp)
-int optidx;
-boolean negated;
-const char *fullname;
-char *opts;
-char **opp;
+parse_role_opts(int optidx, boolean negated, const char *fullname,
+                char *opts, char **opp)
 {
     char *op = *opp;
 
@@ -7150,19 +6738,19 @@ char **opp;
 
 /* Check if character c is illegal as a menu command key */
 boolean
-illegal_menu_cmd_key(c)
-char c;
+illegal_menu_cmd_key(uchar c)
 {
-    if (c == 0 || c == '\r' || c == '\n' || c == '\033'
-        || c == ' ' || digit(c) || (letter(c) && c != '@')) {
-        config_error_add("Reserved menu command key '%s'", visctrl(c));
+    if (c == 0 || c == '\r' || c == '\n' || c == '\033' || c == ' '
+        || digit((char) c) || (letter((char) c) && c != '@')) {
+        config_error_add("Reserved menu command key '%s'", visctrl((char) c));
         return TRUE;
     } else { /* reject default object class symbols */
         int j;
+
         for (j = 1; j < MAXOCLASSES; j++)
-            if (c == def_oc_syms[j].sym) {
+            if (c == (uchar) def_oc_syms[j].sym) {
                 config_error_add("Menu command key '%s' is an object class",
-                                 visctrl(c));
+                                 visctrl((char) c));
                 return TRUE;
             }
     }
@@ -7175,8 +6763,7 @@ char c;
  * symbols.
  */
 void
-oc_to_str(src, dest)
-char *src, *dest;
+oc_to_str(char *src, char *dest)
 {
     int i;
 
@@ -7194,8 +6781,7 @@ char *src, *dest;
  * maps valid C strings.
  */
 void
-add_menu_cmd_alias(from_ch, to_ch)
-char from_ch, to_ch;
+add_menu_cmd_alias(char from_ch, char to_ch)
 {
     if (g.n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
         pline("out of menu map space.");
@@ -7209,8 +6795,7 @@ char from_ch, to_ch;
 }
 
 char
-get_menu_cmd_key(ch)
-char ch;
+get_menu_cmd_key(char ch)
 {
     char *found = index(g.mapped_menu_op, ch);
 
@@ -7227,8 +6812,7 @@ char ch;
  * doesn't match anything, just return the original.
  */
 char
-map_menu_cmd(ch)
-char ch;
+map_menu_cmd(char ch)
 {
     char *found = index(g.mapped_menu_cmds, ch);
 
@@ -7247,9 +6831,7 @@ char ch;
  * adding a new entry--for user specified fruits only.
  */
 int
-fruitadd(str, replace_fruit)
-char *str;
-struct fruit *replace_fruit;
+fruitadd(char *str, struct fruit *replace_fruit)
 {
     register int i;
     register struct fruit *f;
@@ -7309,13 +6891,13 @@ struct fruit *replace_fruit;
             || !strncmp(g.pl_fruit, "partly eaten ", 13)
             || (!strncmp(g.pl_fruit, "tin of ", 7)
                 && (!strcmp(g.pl_fruit + 7, "spinach")
-                    || name_to_mon(g.pl_fruit + 7) >= LOW_PM))
+                    || name_to_mon(g.pl_fruit + 7, (int *) 0) >= LOW_PM))
             || !strcmp(g.pl_fruit, "empty tin")
             || (!strcmp(g.pl_fruit, "glob")
                 || (globpfx > 0 && !strcmp("glob", &g.pl_fruit[globpfx])))
             || ((str_end_is(g.pl_fruit, " corpse")
                  || str_end_is(g.pl_fruit, " egg"))
-                && name_to_mon(g.pl_fruit) >= LOW_PM)) {
+                && name_to_mon(g.pl_fruit, (int *) 0) >= LOW_PM)) {
             Strcpy(buf, g.pl_fruit);
             Strcpy(g.pl_fruit, "candied ");
             nmcpy(g.pl_fruit + 8, buf, PL_FSIZ - 8);
@@ -7388,35 +6970,123 @@ static char fmtstr_doset[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
-enum opt_other_enums {
-    OPT_OTHER_COND = -5,
-    OPT_OTHER_MSGTYPE = -4,
-    OPT_OTHER_MENUCOLOR = -3,
-    OPT_OTHER_STATHILITE = -2,
-    OPT_OTHER_APEXC = -1
-    /* these must be < 0 */
-};
+static int
+optfn_o_autopickup_exceptions(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_apes());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_autopickup_exception();
+    }
+    return optn_ok;
+}
 
-static struct other_opts {
-    const char *name;
-    enum optset_restrictions setwhere;
-    enum opt_other_enums code;
-    int NDECL((*othr_count_func));
-} othropt[] = {
-    { "autopickup exceptions", set_in_game, OPT_OTHER_APEXC, count_apes },
-    { "menu colors", set_in_game, OPT_OTHER_MENUCOLOR, count_menucolors },
-    { "message types", set_in_game, OPT_OTHER_MSGTYPE, msgtype_count },
-    { "status condition fields", set_in_game, OPT_OTHER_COND, count_cond },
+static int
+optfn_o_menu_colors(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_menucolors());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_menu_colors();
+    }
+    return optn_ok;
+}
+
+static int
+optfn_o_message_types(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, msgtype_count());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_msgtype();
+    }
+    return optn_ok;
+}
+
+static int
+optfn_o_status_cond(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_cond());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        cond_menu();
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
 #ifdef STATUS_HILITES
-    { "status hilite rules", set_in_game, OPT_OTHER_STATHILITE,
-      count_status_hilites },
-#endif
-    { (char *) 0, 0, (enum opt_other_enums) 0 },
-};
+static int
+optfn_o_status_hilites(int optidx UNUSED, int req, boolean negated UNUSED,
+              char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_status_hilites());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        if (!status_hilite_menu()) {
+            return optn_err; /*pline("Bad status hilite(s) specified.");*/
+        } else {
+            if (wc2_supported("hilite_status"))
+                preference_update("hilite_status");
+        }
+        return optn_ok;
+    }
+    return optn_ok;
+}
+#endif /*STATUS_HILITES*/
 
 /* the 'O' command */
 int
-doset() /* changing options via menu by Per Liboriussen */
+doset(void) /* changing options via menu by Per Liboriussen */
 {
     static boolean made_fmtstr = FALSE;
     char buf[BUFSZ];
@@ -7447,14 +7117,12 @@ doset() /* changing options via menu by Per Liboriussen */
         /* spin through the options to find the longest name
            and adjust the format string accordingly */
         longest_name_len = 0;
-        for (pass = 0; pass <= 2; pass++)
-            for (i = 0; (name = ((pass < 2) ? allopt[i].name
-                                : othropt[i].name)) != 0; i++) {
+        for (pass = 0; pass < 2; pass++)
+            for (i = 0; (name = allopt[i].name) != 0; i++) {
                 if (pass == 0 &&
                     (allopt[i].opttyp != BoolOpt || !allopt[i].addr))
                     continue;
-                optflags = (pass < 2) ? allopt[i].setwhere
-                                      : othropt[i].setwhere;
+                optflags = allopt[i].setwhere;
                 if (optflags < startpass || optflags > endpass)
                     continue;
                 if ((is_wc_option(name) && !wc_supported(name))
@@ -7470,7 +7138,7 @@ doset() /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
              "Booleans (selecting will toggle value):", MENU_ITEMFLAGS_NONE);
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
@@ -7495,13 +7163,14 @@ doset() /* changing options via menu by Per Liboriussen */
                 else
                     Sprintf(buf, fmtstr_doset_tab,
                             name, *bool_p ? "true" : "false");
-                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
 
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
              "Compounds (selecting will prompt for new value):",
              MENU_ITEMFLAGS_NONE);
 
@@ -7532,22 +7201,31 @@ doset() /* changing options via menu by Per Liboriussen */
         }
 
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-             "Other settings:", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings, "Other settings:", MENU_ITEMFLAGS_NONE);
 
-    for (i = 0; (name = othropt[i].name) != 0; i++) {
-        if ((is_wc_option(name) && !wc_supported(name))
-            || (is_wc2_option(name) && !wc2_supported(name)))
-            continue;
-        opts_add_others(tmpwin, name, othropt[i].code,
-                        (char *) 0, othropt[i].othr_count_func());
-    }
+    for (pass = startpass; pass <= endpass; pass++)
+        for (i = 0; (name = allopt[i].name) != 0; i++) {
+            if (allopt[i].opttyp != OthrOpt)
+                continue;
+            if ((int) allopt[i].setwhere == pass) {
+                if ((is_wc_option(name) && !wc_supported(name))
+                    || (is_wc2_option(name) && !wc2_supported(name)))
+                    continue;
+
+                doset_add_menu(tmpwin, name, i,
+                               (pass == set_gameview) ? 0 : indexoffset);
+            }
+        }
 
 #ifdef PREFIXES_IN_USE
     any = cg.zeroany;
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings,
              "Variable playground locations:", MENU_ITEMFLAGS_NONE);
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], -1, 0);
@@ -7565,56 +7243,37 @@ doset() /* changing options via menu by Per Liboriussen */
             opt_indx = pick_list[pick_idx].item.a_int - 1;
             if (opt_indx < -1)
                 opt_indx++; /* -1 offset for select_menu() */
-            if (opt_indx == OPT_OTHER_APEXC) {
-                handler_autopickup_exception();
-#ifdef STATUS_HILITES
-            } else if (opt_indx == OPT_OTHER_STATHILITE) {
-                if (!status_hilite_menu()) {
-                    pline("Bad status hilite(s) specified.");
-                } else {
-                    if (wc2_supported("hilite_status"))
-                        preference_update("hilite_status");
-                }
-#endif
-            } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
-                handler_menu_colors();
-            } else if (opt_indx == OPT_OTHER_COND) {
-                cond_menu();
-            } else if (opt_indx == OPT_OTHER_MSGTYPE) {
-                handler_msgtype();
+            opt_indx -= indexoffset;
+            if (allopt[opt_indx].opttyp == BoolOpt) {
+                /* boolean option */
+                Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
+                        allopt[opt_indx].name);
+                (void) parseoptions(buf, setinitial, fromfile);
             } else {
-                opt_indx -= indexoffset;
-                if (allopt[opt_indx].opttyp == BoolOpt) {
-                    /* boolean option */
-                    Sprintf(buf, "%s%s", *allopt[opt_indx].addr ? "!" : "",
-                            allopt[opt_indx].name);
-                    (void) parseoptions(buf, setinitial, fromfile);
+                /* compound option */
+                int k = opt_indx, reslt UNUSED;
+
+                if (allopt[k].has_handler && allopt[k].optfn) {
+                    reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
+                                               FALSE, empty_optstr, empty_optstr);
                 } else {
-                    /* compound option */
-                    int k = opt_indx, reslt UNUSED;
+                    char abuf[BUFSZ];
 
-                    if (allopt[k].has_handler && allopt[k].optfn) {
-                        reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
-                                           FALSE, empty_optstr, empty_optstr);
-                    } else {
-                        char abuf[BUFSZ];
-
-                        Sprintf(buf, "Set %s to what?", allopt[opt_indx].name);
-                        abuf[0] = '\0';
-                        getlin(buf, abuf);
-                        if (abuf[0] == '\033')
-                            continue;
-                        Sprintf(buf, "%s:", allopt[opt_indx].name);
-                        (void) strncat(eos(buf), abuf,
+                    Sprintf(buf, "Set %s to what?", allopt[opt_indx].name);
+                    abuf[0] = '\0';
+                    getlin(buf, abuf);
+                    if (abuf[0] == '\033')
+                        continue;
+                    Sprintf(buf, "%s:", allopt[opt_indx].name);
+                    (void) strncat(eos(buf), abuf,
                                    (sizeof buf - 1 - strlen(buf)));
-                        /* pass the buck */
-                        (void) parseoptions(buf, setinitial, fromfile);
-                    }
+                    /* pass the buck */
+                    (void) parseoptions(buf, setinitial, fromfile);
                 }
-                if (wc_supported(allopt[opt_indx].name)
-                        || wc2_supported(allopt[opt_indx].name))
-                    preference_update(allopt[opt_indx].name);
             }
+            if (wc_supported(allopt[opt_indx].name)
+                || wc2_supported(allopt[opt_indx].name))
+                preference_update(allopt[opt_indx].name);
         }
         free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
     }
@@ -7633,12 +7292,11 @@ doset() /* changing options via menu by Per Liboriussen */
 
 /* doset('O' command) menu entries for compound options */
 static void
-doset_add_menu(win, option, idx, indexoffset)
-winid win;          /* window to add to */
-const char *option; /* option name */
-int idx;            /* index in allopt[] */
-int indexoffset;    /* value to add to index in allopt[], or zero
-                       if option cannot be changed */
+doset_add_menu(winid win,          /* window to add to */
+               const char *option, /* option name */
+               int idx,            /* index in allopt[] */
+               int indexoffset)    /* value to add to index in allopt[],
+                                      or zero if option cannot be changed */
 {
     const char *value = "unknown"; /* current value */
     char buf[BUFSZ], buf2[BUFSZ];
@@ -7678,89 +7336,103 @@ int indexoffset;    /* value to add to index in allopt[], or zero
                 value);
     else
         Sprintf(buf, fmtstr_doset_tab, option, value);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
-static void
-opts_add_others(win, name, id, bufx, nset)
-winid win;
-const char *name;
-int id;
-char *bufx;
-int nset;
-{
-    char buf[BUFSZ], buf2[BUFSZ];
-    anything any = cg.zeroany;
-
-    any.a_int = id;
-    if (!bufx)
-        Sprintf(buf2, n_currently_set, nset);
-    else
-        Sprintf(buf2, "%s", bufx);
-    if (!iflags.menu_tab_sep)
-        Sprintf(buf, fmtstr_doset, any.a_int ? "" : "    ",
-                name, buf2);
-    else
-        Sprintf(buf, fmtstr_doset_tab, name, buf2);
-    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
-}
-
-/*
- * used by cmd.c and pager.c
- */
+/* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
 void
-show_menu_controls(win, dolist)
-winid win;
-boolean dolist;
+show_menu_controls(winid win, boolean dolist)
 {
+    struct xtra_cntrls {
+        const char *key, *desc;
+    };
+    static const struct xtra_cntrls hardcoded[] = {
+        { "Return", "Accept current choice(s) and dismiss menu" },
+        { "Enter",  "Same as Return" },
+        { "Space",  "If not on last page, advance one page;" },
+        { "     ",  "when on last page, treat like Return" },
+        { "Escape", "Cancel menu without making any choice(s)" },
+        { (char *) 0, (char *) 0}
+    };
+    static const char mc_fmt[] = "%8s     %-6s %s",
+                      mc_altfmt[] = "%9s  %-6s %s";
     char buf[BUFSZ];
+    const char *fmt, *arg;
+    const struct xtra_cntrls *xcp;
+
+    /*
+     * Relies on spaces to line things up in columns, so must be rendered
+     * with a fixed-width font or will look dreadful.
+     */
 
     putstr(win, 0, "Menu control keys:");
-    if (dolist) {
+    if (dolist) { /* key bindings help: '?i' */
         int i;
 
+        fmt = "%-7s %s";
         for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
-            Sprintf(buf, "%-8s %s",
+            Sprintf(buf, fmt,
                     visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
                     default_menu_cmd_info[i].desc);
             putstr(win, 0, buf);
         }
-    } else {
+        /* no separator before hardcoded */
+        fmt = "%s%-7s %s"; /* extra specifier to absorb 'arg' */
+        arg = ""; /* no extra prefix for 'dolist' */
+    } else { /* menu controls help: '?k' */
         putstr(win, 0, "");
-        putstr(win, 0, "          Page    All items");
-        Sprintf(buf, "  Select   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)));
+        Sprintf(buf, mc_altfmt, "", "Whole", "Current");
         putstr(win, 0, buf);
-        Sprintf(buf, "Deselect   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)));
+        Sprintf(buf, mc_altfmt, "", " Menu", " Page");
         putstr(win, 0, buf);
-        Sprintf(buf, "  Invert   %s       %s",
-                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)),
-                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)));
+        Sprintf(buf, mc_fmt, "Select",
+                visctrl(get_menu_cmd_key(MENU_SELECT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
         putstr(win, 0, buf);
-        putstr(win, 0, "");
-        Sprintf(buf, "   Go to   %s   Next page",
-                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)));
+        Sprintf(buf, mc_fmt, "Invert",
+                visctrl(get_menu_cmd_key(MENU_INVERT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
         putstr(win, 0, buf);
-        Sprintf(buf, "           %s   Previous page",
-                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)));
-        putstr(win, 0, buf);
-        Sprintf(buf, "           %s   First page",
-                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)));
-        putstr(win, 0, buf);
-        Sprintf(buf, "           %s   Last page",
-                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)));
+        Sprintf(buf, mc_fmt, "Deselect",
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)),
+                visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
         putstr(win, 0, buf);
         putstr(win, 0, "");
-        Sprintf(buf, "           %s   Search and toggle matching entries",
-                visctrl(get_menu_cmd_key(MENU_SEARCH)));
+        Sprintf(buf, mc_fmt, "Go to",
+                visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)),
+                "Next page");
         putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)),
+                "Previous page");
+        putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)),
+                "First page");
+        putstr(win, 0, buf);
+        Sprintf(buf, mc_fmt, "",
+                visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
+                "Last page");
+        putstr(win, 0, buf);
+        putstr(win, 0, "");
+        Sprintf(buf, mc_fmt, "Search",
+                visctrl(get_menu_cmd_key(MENU_SEARCH)),
+                "Exter a target string and invert all matching entries");
+        putstr(win, 0, buf);
+        /* separator before hardcoded */
+        putstr(win, 0, "");
+        fmt = "%9s  %-8s %s";
+        arg = "Other "; /* prefix for first hardcoded[] entry, then reset */
+    }
+    for (xcp = hardcoded; xcp->key; ++xcp) {
+        Sprintf(buf, fmt, arg, xcp->key, xcp->desc);
+        putstr(win, 0, buf);
+        arg = "";
     }
 }
 static int
-count_cond(VOID_ARGS)
+count_cond(void)
 {
     int i, cnt = 0;
 
@@ -7772,7 +7444,7 @@ count_cond(VOID_ARGS)
 }
 
 int
-count_apes(VOID_ARGS)
+count_apes(void)
 {
     int numapes = 0;
     struct autopickup_exception *ape = g.apelist;
@@ -7787,9 +7459,7 @@ count_apes(VOID_ARGS)
 
 /* common to msg-types, menu-colors, autopickup-exceptions */
 static int
-handle_add_list_remove(optname, numtotal)
-const char *optname;
-int numtotal;
+handle_add_list_remove(const char *optname, int numtotal)
 {
     winid tmpwin;
     anything any;
@@ -7818,8 +7488,9 @@ int numtotal;
             continue;
         Sprintf(tmpbuf, action_titles[i].desc,
                 (i == 1) ? makeplural(optname) : optname);
-        add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr, 0, ATR_NONE,
-                 tmpbuf, (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo,&any, action_titles[i].letr,
+                 0, ATR_NONE, tmpbuf,
+                 (i == 3) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Do what?");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
@@ -7834,7 +7505,7 @@ int numtotal;
 }
 
 int
-dotogglepickup()
+dotogglepickup(void)
 {
     char buf[BUFSZ], ocl[MAXOCLASSES + 1];
 
@@ -7855,8 +7526,7 @@ dotogglepickup()
 }
 
 int
-add_autopickup_exception(mapping)
-const char *mapping;
+add_autopickup_exception(const char *mapping)
 {
     static const char
         APE_regex_error[] = "regex error in AUTOPICKUP_EXCEPTION",
@@ -7904,8 +7574,7 @@ const char *mapping;
 }
 
 static void
-remove_autopickup_exception(whichape)
-struct autopickup_exception *whichape;
+remove_autopickup_exception(struct autopickup_exception *whichape)
 {
     struct autopickup_exception *ape, *freeape, *prev = 0;
 
@@ -7928,7 +7597,7 @@ struct autopickup_exception *whichape;
 }
 
 void
-free_autopickup_exceptions()
+free_autopickup_exceptions(void)
 {
     struct autopickup_exception *ape;
 
@@ -7942,9 +7611,7 @@ free_autopickup_exceptions()
 
 /* bundle some common usage into one easy-to-use routine */
 int
-load_symset(s, which_set)
-const char *s;
-int which_set;
+load_symset(const char *s, int which_set)
 {
     clear_symsetentry(which_set, TRUE);
 
@@ -7962,7 +7629,7 @@ int which_set;
 }
 
 void
-free_symsets()
+free_symsets(void)
 {
     clear_symsetentry(PRIMARY, TRUE);
     clear_symsetentry(ROGUESET, TRUE);
@@ -7974,9 +7641,7 @@ free_symsets()
 
 /* Parse the value of a SYMBOLS line from a config file */
 boolean
-parsesymbols(opts, which_set)
-register char *opts;
-int which_set;
+parsesymbols(register char *opts, int which_set)
 {
     int val;
     char *op, *symname, *strval;
@@ -8016,8 +7681,7 @@ int which_set;
 }
 
 struct symparse *
-match_sym(buf)
-char *buf;
+match_sym(char *buf)
 {
     size_t len = strlen(buf);
     const char *p = index(buf, ':'), *q = index(buf, '=');
@@ -8041,8 +7705,8 @@ char *buf;
 }
 
 int
-sym_val(strval)
-const char *strval; /* up to 4*BUFSZ-1 long; only first few chars matter */
+sym_val(const char *strval) /* up to 4*BUFSZ-1 long; only first few
+                               chars matter */
 {
     char buf[QBUFSZ], tmp[QBUFSZ]; /* to hold trucated copy of 'strval' */
 
@@ -8117,9 +7781,10 @@ static const char *opt_epilog[] = {
 };
 
 void
-option_help()
+option_help(void)
 {
     char buf[BUFSZ], buf2[BUFSZ];
+    const char *optname;
     register int i;
     winid datawin;
 
@@ -8131,33 +7796,44 @@ option_help()
 
     /* Boolean options */
     for (i = 0; allopt[i].name; i++) {
-        if (allopt[i].addr) {
-            if (allopt[i].addr == &iflags.sanity_check && !wizard)
-                continue;
-            if (allopt[i].addr == &iflags.menu_tab_sep && !wizard)
-                continue;
-            next_opt(datawin, allopt[i].name);
-        }
+        if ((allopt[i].opttyp != BoolOpt || !allopt[i].addr)
+            || (allopt[i].setwhere == set_wizonly && !wizard))
+            continue;
+        optname = allopt[i].name;
+        if ((is_wc_option(optname) && !wc_supported(optname))
+            || (is_wc2_option(optname) && !wc2_supported(optname)))
+            continue;
+        next_opt(datawin, optname);
     }
     next_opt(datawin, "");
 
     /* Compound options */
     putstr(datawin, 0, "Compound options:");
     for (i = 0; allopt[i].name; i++) {
-        if (allopt[i].opttyp != CompOpt) /* skip booleans */
+        if (allopt[i].opttyp != CompOpt
+            || (allopt[i].setwhere == set_wizonly && !wizard))
             continue;
-        Sprintf(buf2, "`%s'", allopt[i].name);
-        Sprintf(buf, "%-20s - %s%c", buf2, allopt[i].descr,
-                allopt[i + 1].name ? ',' : '.');
+        optname = allopt[i].name;
+        if ((is_wc_option(optname) && !wc_supported(optname))
+            || (is_wc2_option(optname) && !wc2_supported(optname)))
+            continue;
+        Sprintf(buf2, "`%s'", optname);
+        Snprintf(buf, sizeof(buf), "%-20s - %s%c", buf2, allopt[i].descr,
+                 allopt[i + 1].name ? ',' : '.');
         putstr(datawin, 0, buf);
     }
     putstr(datawin, 0, "");
 
+    /* Compound options */
     putstr(datawin, 0, "Other settings:");
-    for (i = 0; othropt[i].name; ++i) {
-        Sprintf(buf, " %s", othropt[i].name);
+    for (i = 0; allopt[i].name; i++) {
+        if (allopt[i].opttyp != OthrOpt)
+            continue;
+        Sprintf(buf, " %s", allopt[i].name);
         putstr(datawin, 0, buf);
     }
+
+    putstr(datawin, 0, "");
 
     for (i = 0; opt_epilog[i]; i++)
         putstr(datawin, 0, opt_epilog[i]);
@@ -8192,16 +7868,14 @@ option_help()
  * line if not. End with next_opt("").
  */
 void
-next_opt(datawin, str)
-winid datawin;
-const char *str;
+next_opt(winid datawin, const char *str)
 {
     static char *buf = 0;
     int i;
     char *s;
 
     if (!buf)
-        *(buf = (char *) alloc(BUFSZ)) = '\0';
+        *(buf = (char *) alloc(COLBUFSZ)) = '\0';
 
     if (!*str) {
         s = eos(buf);
@@ -8250,12 +7924,11 @@ const char *str;
  * Returns number selected.
  */
 int
-choose_classes_menu(prompt, category, way, class_list, class_select)
-const char *prompt;
-int category;
-boolean way;
-char *class_list;
-char *class_select;
+choose_classes_menu(const char *prompt,
+                    int category,
+                    boolean way,
+                    char *class_list,
+                    char *class_select)
 {
     menu_item *pick_list = (menu_item *) 0;
     winid win;
@@ -8298,8 +7971,8 @@ char *class_select;
             }
         }
         any.a_int = *class_list;
-        add_menu(win, NO_GLYPH, &any, accelerator, category ? *class_list : 0,
-                 ATR_NONE, buf,
+        add_menu(win, &nul_glyphinfo, &any, accelerator,
+                 category ? *class_list : 0, ATR_NONE, buf,
                  selected ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         ++class_list;
         if (category > 0) {
@@ -8313,13 +7986,15 @@ char *class_select;
     if (category == 1 && next_accelerator <= 'z') {
         /* for objects, add "A - ' '  all classes", after a separator */
         any = cg.zeroany;
-        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
         any.a_int = (int) ' ';
         Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
         /* we won't preselect this even if the incoming list is empty;
            having it selected means that it would have to be explicitly
            de-selected in order to select anything else */
-        add_menu(win, NO_GLYPH, &any, 'A', 0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, 'A', 0,
+                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, prompt);
     n = select_menu(win, way ? PICK_ANY : PICK_ONE, &pick_list);
@@ -8412,9 +8087,7 @@ static struct wc_Opt wc2_options[] = {
  * with the appropriate second argument.
  */
 void
-set_option_mod_status(optnam, status)
-const char *optnam;
-int status;
+set_option_mod_status(const char *optnam, int status)
 {
     int k;
 
@@ -8446,9 +8119,7 @@ int status;
  * set_in_game);
  */
 void
-set_wc_option_mod_status(optmask, status)
-unsigned long optmask;
-int status;
+set_wc_option_mod_status(unsigned long optmask, int status)
 {
     int k = 0;
 
@@ -8466,8 +8137,7 @@ int status;
 }
 
 static boolean
-is_wc_option(optnam)
-const char *optnam;
+is_wc_option(const char *optnam)
 {
     int k = 0;
 
@@ -8480,8 +8150,7 @@ const char *optnam;
 }
 
 static boolean
-wc_supported(optnam)
-const char *optnam;
+wc_supported(const char *optnam)
 {
     int k;
 
@@ -8504,9 +8173,7 @@ const char *optnam;
  */
 
 void
-set_wc2_option_mod_status(optmask, status)
-unsigned long optmask;
-int status;
+set_wc2_option_mod_status(unsigned long optmask, int status)
 {
     int k = 0;
 
@@ -8524,8 +8191,7 @@ int status;
 }
 
 static boolean
-is_wc2_option(optnam)
-const char *optnam;
+is_wc2_option(const char *optnam)
 {
     int k = 0;
 
@@ -8538,8 +8204,7 @@ const char *optnam;
 }
 
 static boolean
-wc2_supported(optnam)
-const char *optnam;
+wc2_supported(const char *optnam)
 {
     int k;
 
@@ -8552,9 +8217,7 @@ const char *optnam;
 }
 
 static void
-wc_set_font_name(opttype, fontname)
-int opttype;
-char *fontname;
+wc_set_font_name(int opttype, char *fontname)
 {
     char **fn = (char **) 0;
 
@@ -8588,8 +8251,7 @@ char *fontname;
 }
 
 static int
-wc_set_window_colors(op)
-char *op;
+wc_set_window_colors(char *op)
 {
     /* syntax:
      *  menu white/black message green/yellow status white/blue text
@@ -8688,7 +8350,7 @@ char *op;
    OPTIONS=playmode:debug, or from dorecover()'s restgamestate() if
    restoring a game which was saved in wizard mode */
 void
-set_playmode()
+set_playmode(void)
 {
     if (wizard) {
         if (authorize_wizard_mode())

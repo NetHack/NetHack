@@ -10,24 +10,23 @@
 #define EXTERN_H /* comment line for pre-compiled headers */
 #include "config.h"
 
-char *FDECL(fmt_ptr, (const genericptr));
+char *fmt_ptr(const genericptr);
 
 #ifdef MONITOR_HEAP
 #undef alloc
 #undef free
-extern void FDECL(free, (genericptr_t));
-static void NDECL(heapmon_init);
+extern void free(genericptr_t);
+static void heapmon_init(void);
 
 static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
 #endif
 
-long *FDECL(alloc, (unsigned int));
-extern void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
+long *alloc(unsigned int);
+extern void panic(const char *, ...);
 
 long *
-alloc(lth)
-register unsigned int lth;
+alloc(unsigned int lth)
 {
 #ifdef LINT
     /*
@@ -76,8 +75,7 @@ static int ptrbufidx = 0;
 
 /* format a pointer for display purposes; returns a static buffer */
 char *
-fmt_ptr(ptr)
-const genericptr ptr;
+fmt_ptr(const genericptr ptr)
 {
     char *buf;
 
@@ -94,7 +92,7 @@ const genericptr ptr;
 /* If ${NH_HEAPLOG} is defined and we can create a file by that name,
    then we'll log the allocation and release information to that file. */
 static void
-heapmon_init()
+heapmon_init(void)
 {
     char *logname = getenv("NH_HEAPLOG");
 
@@ -104,10 +102,7 @@ heapmon_init()
 }
 
 long *
-nhalloc(lth, file, line)
-unsigned int lth;
-const char *file;
-int line;
+nhalloc(unsigned int lth, const char *file, int line)
 {
     long *ptr = alloc(lth);
 
@@ -124,10 +119,7 @@ int line;
 }
 
 void
-nhfree(ptr, file, line)
-genericptr_t ptr;
-const char *file;
-int line;
+nhfree(genericptr_t ptr, const char *file, int line)
 {
     if (!tried_heaplog)
         heapmon_init();
@@ -141,10 +133,7 @@ int line;
 /* strdup() which uses our alloc() rather than libc's malloc(),
    with caller tracking */
 char *
-nhdupstr(string, file, line)
-const char *string;
-const char *file;
-int line;
+nhdupstr(const char *string, const char *file, int line)
 {
     return strcpy((char *) nhalloc(strlen(string) + 1, file, line), string);
 }
@@ -156,8 +145,7 @@ int line;
    not used when MONITOR_HEAP is enabled, but included unconditionally
    in case utility programs get built using a different setting for that */
 char *
-dupstr(string)
-const char *string;
+dupstr(const char *string)
 {
     return strcpy((char *) alloc(strlen(string) + 1), string);
 }

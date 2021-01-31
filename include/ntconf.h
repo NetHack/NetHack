@@ -32,7 +32,6 @@
 #define TTY_SOUND_ESCCODES
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
-#define SELECTSAVED /* Provide menu of saved games to choose from at start */
 
 #define QWERTZ_SUPPORT  /* when swap_yz is True, numpad 7 is 'z' not 'y' */
 
@@ -92,9 +91,8 @@
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
-extern void FDECL(interject_assistance,
-                  (int, int, genericptr_t, genericptr_t));
-extern void FDECL(interject, (int));
+extern void interject_assistance(int, int, genericptr_t, genericptr_t);
+extern void interject(int);
 
 /*
  *===============================================
@@ -109,7 +107,7 @@ extern void FDECL(interject, (int));
 #ifdef strcasecmp
 #undef strcasecmp
 #endif
-/* extern int NDECL(getlock); */
+/* extern int getlock(void); */
 #endif
  
 #ifdef _MSC_VER
@@ -224,14 +222,14 @@ extern const char *alllevels, *allbones;
 #define ABORT C('a')
 #define getuid() 1
 #define getlogin() ((char *) 0)
-extern void NDECL(win32_abort);
-extern void FDECL(nttty_preference_update, (const char *));
-extern void NDECL(toggle_mouse_support);
-extern void FDECL(map_subkeyvalue, (char *));
+extern void win32_abort(void);
+extern void nttty_preference_update(const char *);
+extern void toggle_mouse_support(void);
+extern void map_subkeyvalue(char *);
 #if defined(WIN32CON)
-extern void FDECL(set_altkeyhandler, (const char *));
+extern void set_altkeyhandler(const char *);
 #endif
-extern void NDECL(raw_clear_screen);
+extern void raw_clear_screen(void);
 
 #include <fcntl.h>
 #ifndef __BORLANDC__
@@ -266,19 +264,19 @@ int _RTLENTRY _EXPFUNC read(int __handle, void _FAR *__buf, unsigned __len);
 #define ALLOCA_HACK /* used in util/panic.c */
 #endif
 
-extern int FDECL(set_win32_option, (const char *, const char *));
+extern int set_win32_option(const char *, const char *);
 #define LEFTBUTTON FROM_LEFT_1ST_BUTTON_PRESSED
 #define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED
 #define MIDBUTTON FROM_LEFT_2ND_BUTTON_PRESSED
 #define MOUSEMASK (LEFTBUTTON | RIGHTBUTTON | MIDBUTTON)
 #ifdef CHANGE_COLOR
-extern int FDECL(alternative_palette, (char *));
+extern int alternative_palette(char *);
 #endif
 
 #define nethack_enter(argc, argv) nethack_enter_winnt()
-extern void FDECL(nethack_exit, (int)) NORETURN;
-extern boolean FDECL(file_exists, (const char *));
-extern boolean FDECL(file_newer, (const char *, const char *));
+extern void nethack_exit(int) NORETURN;
+extern boolean file_exists(const char *);
+extern boolean file_newer(const char *, const char *);
 #ifndef SYSTEM_H
 #include "system.h"
 #endif
@@ -288,7 +286,7 @@ extern boolean FDECL(file_newer, (const char *, const char *));
  * compatible with compilers which do not support macro stringization (i.e.
  * #x to turn x into its string form).
  */
-extern void FDECL(nt_assert_failed, (const char *, const char *, int));
+extern void nt_assert_failed(const char *, const char *, int);
 #define nhassert(expression) (void)((!!(expression)) || \
         (nt_assert_failed(#expression, __FILE__, __LINE__), 0))
 

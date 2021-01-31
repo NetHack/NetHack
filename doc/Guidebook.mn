@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ $NHDT-Date: 1606328499 2020/11/25 18:21:39 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.412 $ $NHDT-Date: 1609988081 2021/01/07 02:54:41 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "November 25, 2020
+.ds f2 "January 6, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -633,22 +633,29 @@ Go in that direction until you hit a wall or run into something.
 Prefix:  move without picking up objects or fighting (even if you remember
 a monster there).
 .lp ""
-A few non-movement commands use the \(oqm\(cq prefix to request operating
-via menu (to temporarily override the
+A few non-movement commands use the \(oq\f(CRm\fP\(cq prefix to request
+operating via menu (to temporarily override the
 .op menustyle:Traditional
 option).
-Primarily useful for \(oq,\(cq (pickup) when there is only one class of
-objects present (where there won't be any \(lqwhat kinds of objects?\(rq
-prompt,
-so no opportunity to answer \(oqm\(cq at that prompt).
+Primarily useful for \(oq\f(CR,\fP\(cq (pickup) when there is only one class
+of objects present (where there won't be any \(lqwhat kinds of objects?\(rq
+prompt, so no opportunity to answer \(oqm\(cq at that prompt).
 .lp ""
-A few other commands (eat food, offer sacrifice, apply tinning-kit) use
-the \(oqm\(cq prefix to skip checking for applicable objects on the floor
-and go straight to checking inventory,
-or (for \(lq#loot\(rq to remove a saddle),
-skip containers and go straight to adjacent monsters.
 The prefix will
 make \(lq#travel\(rq command show a menu of interesting targets in sight.
+It can also be used with the \(oq\f(CR\\\fP\(cq (known, show a
+list of all discovered objects) and the \(oq\f(CR\`\fP\(cq (knownclass,
+show a list of discovered objects in a particular class) commands to offer
+a menu of several sorting alternatives (which sets a new value for the
+.op sortdiscoveries
+option).
+.lp ""
+A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+the \(oq\f(CRm\fP\(cq prefix to skip checking for applicable objects on
+the floor and go straight to checking inventory,
+or (for \(lq#loot\(rq to remove a saddle),
+skip containers and go straight to adjacent monsters.
+.lp ""
 In debug mode (aka \(lqwizard mode\(rq), the \(oqm\(cq prefix may also be
 used with the \(lq#teleport\(rq and \(lq#wizlevelport\(rq commands.
 .lp F[yuhjklbn]
@@ -969,9 +976,9 @@ the exchange still takes place.
 Toggle two-weapon combat, if your character can do it.  Also available
 via the \(lq#twoweapon\(rq extended command.
 .lp ""
-(In versions prior to 3.6 this was the command to switch from normal
+(In versions prior to 3.6 this keystroke ran the command to switch from normal
 play to \(lqexplore mode\(rq, also known as \(lqdiscovery mode\(rq,
-which has now been moved to \(lq#exploremode\(rq.)
+which has now been moved to \(lq#exploremode\(rq and M-X.)
 .lp \(haX
 Display basic information about your character.
 .lp ""
@@ -1005,6 +1012,7 @@ Suspend the game
 .\" .UX: print "UNIX" now and a trademark footnote at bottom of current page;
 .\"  2nd arg (literal '(') _precedes_ it, 1st arg (quoted string) follows it
 .UX " versions with job control only)." (
+See \(lq#suspend\(rq below for more details.
 .lp :
 Look at what is here.
 .lp ;
@@ -1035,7 +1043,7 @@ Tell what equipment you are using.
 Combines the preceding five type-specific
 commands into one.
 .lp $
-Count your gold pieces.
+Report the gold you're carrying, possibly shop credit and/or debt too.
 .lp +
 List the spells you know.
 .lp ""
@@ -1054,10 +1062,29 @@ be added to the end of the list rather than be inserted into the sorted
 ordering.)
 .lp \\\\
 Show what types of objects have been discovered.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp \`
 Show discovered types for one class of objects.
+.lp ""
+May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 .lp !
 Escape to a shell.
+See \(lq#shell\(rq below for more details.
+.lp Del
+Show map without obstructions.
+You can view the explored portion of the current level's map without
+monsters; without monsters and objects; or without monsters, objects,
+and traps.
+.lp ""
+The <del> key is also shown as <delete> on some keyboards or <rubout>
+on others.
+It is sometimes displayed as \(ha? even though that is not an actual
+control character.
+.lp ""
+Many terminals have an option to swap the <delete> and <backspace> keys,
+so typing the <del> key might not execute this command.
+If that happens, you can use the extended command \(lq#terrain\(rq instead.
 .lp #
 Perform an extended command.
 .lp ""
@@ -1183,7 +1210,8 @@ Advance or check weapon and spell skills.
 Autocompletes.
 Default key is \(oqM-e\(cq.
 .lp #exploremode
-Enter the explore mode.
+Switch from normal play to non-scoring explore mode.
+Default key is \(oqM-X\(cq.
 .lp ""
 Requires confirmation; default response is \f(CRn\fP (no).
 To really switch to explore mode, respond with \f(CRy\fP.
@@ -1206,7 +1234,15 @@ Default key is \(oq?\(cq, and also \(oqh\(cq if
 .op number_pad
 is on.
 .lp #herecmdmenu
-Show a menu of possible actions in your current location.
+Show a menu of possible actions directed at your current location.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.
+.lp ""
+If mouse support is enabled and the
+.op herecmd_menu
+option is On, clicking on the hero (or steed when mounted) will
+execute this command.
 .lp "#history "
 Show long version and game history.
 Default key is \(oqV\(cq.
@@ -1233,10 +1269,16 @@ Default key is \(oq\(haD\(cq, and \(oqk\(cq if
 is on.
 .lp "#known   "
 Show what object types have been discovered.
-Default key is \(oq\\\(cq.
+Default key is \(oq\f(CR\\\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix allows assigning a new value to the
+.op sortdiscoveries
+option to control the order in which the discoveries are displayed.
 .lp #knownclass
 Show discovered types for one class of objects.
-Default key is \(oq\`\(cq.
+Default key is \(oq\f(CR\`\fP\(cq.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix operates the same as for \(lq#known\(rq.
 .lp #levelchange
 Change your experience level.
 Autocompletes.
@@ -1385,31 +1427,37 @@ Default key is \(oq\(dq\(cq. \" double quote
 .lp #seearmor
 Show the armor currently worn.
 Default key is \(oq[\(cq.
-.lp "#seegold "
-Count your gold.
-Default key is \(oq$\(cq.
-.lp "#seenv   "
-Show seen vectors.
-Autocompletes.
-Debug mode only.
 .lp #seerings
 Show the ring(s) currently worn.
 Default key is \(oq=\(cq.
-.lp #seespells
-List and reorder known spells.
-Default key is \(oq+\(cq.
 .lp #seetools
 Show the tools currently in use.
 Default key is \(oq(\(cq.
-.lp "#seetrap "
-Show the type of an adjacent trap.
-Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp #seeweapon
 Show the weapon currently wielded.
 Default key is \(oq)\(cq.
 .lp "#shell   "
-Do a shell escape.
+Do a shell escape, switching from NetHack to a subprocess.
+Can be disabled at the time the program is built.
+When enabled, access for specific users can be controlled by the system
+configuration file.
+Use the shell command \(oq\f(CRexit\fP\(cq to return to the game.
 Default key is \(oq!\(cq.
+.lp "#showgold"
+Report the gold in your inventory and if you are inside a shop,
+report any credit or debt you have in that shop.
+Does not report on any gold inside containers you're carrying.
+Default key is \(oq$\(cq.
+.lp #showspells
+List and reorder known spells.
+Default key is \(oq+\(cq.
+.lp "#showtrap"
+Describe an adjacent trap, possibly covered by objects or a monster.
+To be eligible, the trap must already be discovered.
+(The \(lq#terrain\(rq command can display your map with all objects and
+monsters temporarily removed, making it possible to see all discovered
+traps.)
+Default key is \(oq\(ha\(cq. \" 'hat' (circumflex character)
 .lp "#sit     "
 Sit down.
 Autocompletes.
@@ -1419,7 +1467,12 @@ Show memory usage statistics.
 Autocompletes.
 Debug mode only.
 .lp "#suspend "
-Suspend the game.
+Suspend the game, switching from NetHack to the terminal it was started
+from without performing save-and-exit.
+Can be disabled at the time the program is built.
+When enabled, mainly useful for \fItty\fP and \fIcurses\fP interfaces on
+.UX \. \" yields "UNIX."
+Use the shell command \(oq\f(CRfg\fP\(cq to return to the game.
 Default key is \(oq\(haZ\(cq.
 .lp "#swap    "
 Swap wielded and secondary weapons.
@@ -1434,10 +1487,27 @@ Default key is \(oqA\(cq.
 Teleport around the level.
 Default key is \(oq\(haT\(cq.
 .lp "#terrain "
-Show bare map without displaying monsters, objects, or traps.
+Show map without obstructions.
+In normal play you can view the explored portion of the current level's
+map without monsters; without monsters and objects; or without monsters,
+objects, and traps.
+.lp ""
+In explore mode, you can choose to view the full map rather than just
+its explored portion.
+In debug mode there are additional choices.
+.lp ""
 Autocompletes.
+Default key is \(oq<del>\(cq or \(oq<delete>\(cq (see \fIDel\fP above).
 .lp #therecmdmenu
-Show a menu of possible actions in a location next to you.
+Show a menu of possible actions directed at a location next to you.
+The menu is limited to a subset of the likeliest actions, not an
+exhaustive set of all possibilities.
+Autocompletes.
+.\"--invoking it by mouse seems to be broken
+.\" .lp ""
+.\" If mouse support is enabled and the
+.\" .op herecmd_menu
+.\" option is On, clicking on an adjacent location will execute this command.
 .lp "#throw   "
 Throw something.
 Default key is \(oqt\(cq.
@@ -1489,10 +1559,17 @@ Autocompletes.
 Debug mode only.
 .lp "#version "
 Print compile time options for this version of NetHack.
+.lp ""
+The second paragraph lists the user interface(s) that are included.
+If there are more than one, you can use the
+.op windowtype
+option in your run-time configuration file to select the one you want.
+.lp ""
 Autocompletes.
 Default key is \(oqM-v\(cq.
 .lp #versionshort
-Show version string.
+Show the program's version number, plus the date and time that the
+running copy was built from sources (not the version's release date).
 Default key is \(oqv\(cq.
 .lp "#vision  "
 Show vision array.
@@ -1566,6 +1643,10 @@ and hallucinatory monsters.
 .lp ""
 Autocompletes.
 Debug mode only.
+.lp #wizseenv
+Show map locations' seen vectors.
+Autocompletes.
+Debug mode only.
 .lp #wizsmell
 Smell monster.
 Autocompletes.
@@ -1595,16 +1676,27 @@ with another key, modifies it by setting the \(lqmeta\(rq [8th,
 or \(lqhigh\(rq] bit), you can invoke many extended commands by meta-ing
 the first letter of the command.
 .pg
-In \fIWindows\fP, \fIOS/2\fP, \fIPC\fP and \fIST\fP \fINetHack\fP,
-the \(lqAlt\(rq key can be used in this fashion;
-on the \fIAmiga\fP, set the
-.op altmeta
-option to get this behavior.
+On \fIWindows\fP and \fIMS-DOS\fP,
+the \(lqAlt\(rq key can be used in this fashion.
+.\" On the \fIAmiga\fP, set the
+.\" .op altmeta
+.\" option to get this behavior.
 On other systems, if typing \(lqAlt\(rq plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
 .op altmeta
 option to have NetHack combine them into meta+key.
+(This combining action only takes place when NetHack is expecting a
+command to execute, not when accepting input to name something or to
+make a wish.)
+.pg
+Unlike control characters, where \(hax and \(haX denote the same thing,
+meta characters are case-sensitive:  M-x and M-X represent different things.
+Some commands which can be run via a meta character require that the
+letter be capitalized because the lower-case equivalent is used for
+another command, so the three key combination meta+shift+letter is needed.
+.BR 1
+.
 .lp M-?
 #? (not supported by all platforms)
 .lp M-2
@@ -1659,6 +1751,8 @@ option is enabled)
 #version
 .lp M-w
 #wipe
+.lp M-X
+#exploremode
 .lp ""
 .pg
 If the
@@ -3424,8 +3518,11 @@ Persistent.
 .lp "autopickup  "
 Automatically pick up things onto which you move (default on).
 Persistent.
+.lp ""
 See
 .op pickup_types
+and also
+.op autopickup_exception
 to refine the behavior.
 .lp "autoquiver  "
 This option controls what happens when you attempt the \(oqf\(cq (fire)
@@ -3658,10 +3755,12 @@ Enable coloring menu lines (default off).
 See \(lqConfiguring Menu Colors\(rq on how to configure the colors.
 .lp menustyle
 Controls the interface used when you need to choose various objects (in
-response to the Drop command, for instance).  The value specified should
-be the first letter of one of the following:  traditional, combination,
-full, or partial.
-Traditional was the only interface available for
+response to the Drop command, for instance).
+The value specified should be the first letter of one of the following:
+traditional, combination, full, or partial.
+Persistent.
+.lp ""
+Traditional was the only interface available for very
 early versions; it consists of a prompt for object class characters,
 followed by an object-by-object prompt for all items matching the selected
 object class(es).
@@ -3673,7 +3772,6 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
-Persistent.
 .lp menu_deselect_all
 Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
@@ -3915,15 +4013,30 @@ If this option is on and
 .op autopickup
 is also on, try to pick up things that you threw, even if they aren't in
 .op pickup_types
-or match an autopickup exception.  Default is on.  Persistent.
+or match an autopickup exception.
+Default is on.
+Persistent.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  You can use
+is on.
+Default is all types.
+Persistent.
+.lp ""
+The value is a list of object symbols, such as
+\f(CRpickup_types:$?!\fP to pick up gold, scrolls, and potions.
+You can use
 .op autopickup_exception
-configuration file lines to further refine
-.op autopickup
-behavior.  Persistent.
+configuration file lines to further refine \f(CRautopickup\fP behavior.
+.lp ""
+There is no way to set \f(CRpickup_types\fP to \(lq\fInone\fP\(rq.
+(Setting it to an empty value reverts to \(lq\fIall\fP\(rq.)
+If you want to avoid automatically picking up any types of items but do
+want to have \f(CRautopickup\fP on in order to have
+\f(CRautopickup_exception\fP settings control what you do and don't pick
+up, you can set \f(CRpickup_types\fP to \(oq\f(CR.\fP\(cq.
+That is the type symbol for \fIvenom\fP and you won't come across
+any venom items so won't unintentionally pick such up.
 .lp pile_limit
 When walking across a pile of objects on the floor, threshold at which
 the message \(lqthere are few/several/many objects here\(rq is given instead
@@ -4032,19 +4145,47 @@ Persistent.
 Show your approximate accumulated score on bottom line (default off).
 Persistent.
 .lp "silent  "
-Suppress terminal beeps (default on).  Persistent.
+Suppress terminal beeps (default on).
+Persistent.
+.lp sortdiscoveries
+Controls the sorting behavior for the output of the \(oq\f(CR\\\fP\(cq
+and \(oq\f(CR\`\fP\(cq commands.
+Persistent.
+.lp ""
+The possible values are:
+.PS o
+.PL o
+list object types by class, in discovery order within each class;
+default;
+.PL s
+list object types by
+.op sortloot
+classification: by class, by sub-class within class for classes which
+have substantial groupings (like helmets, boots, gloves, and so forth
+for armor), with object types partly-discovered via assigned name coming
+before fully identified types;
+.PL c
+list by class, alphabetically within each class;
+.PL a
+list alphabetically across all classes.
+.PE
+Can be interactively set via the \(oq\f(CRO\fP\(cq command or via using
+the \(oq\f(CRm\fP\(cq prefix before the \(oq\f(CR\\\fP\(cq
+or \(oq\f(CR\`\fP\(cq command.
 .lp sortloot
 Controls the sorting behavior of the pickup lists for inventory
 and #loot commands and some others.  Persistent.
+.lp ""
 The possible values are:
-.PS full
+.PS none \" note: with proportional font, "none" is wider than "full" or "loot"
 .PL full
 always sort the lists;
 .PL loot
 only sort the lists that don't use inventory letters, like with
 the #loot and pickup commands;
 .PL none
-show lists the traditional way without sorting.
+show lists the traditional way without sorting;
+default.
 .PE
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
@@ -4272,7 +4413,7 @@ up (default yes).
 Number of lines for traditional below-the-map status display.
 Acceptable values are \f(CR2\fP and \f(CR3\fP (default is \f(CR2\fP).
 .lp ""
-For \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
+When set to \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
 mainly shows status conditions on their own line.
 A display capable of showing at least 25 lines is recommended.
 The value can be toggled back and forth during the game with the \(oqO\(cq
@@ -4293,10 +4434,6 @@ original format, with the status window spread out vertically.
 A value of \f(CR2\fP makes status be slightly condensed, moving some
 fields to different lines to eliminate one whole line, reducing the
 height needed.
-For \f(CRQt\fP,
-.op statuslines
-can only be set in the configuration file or via NETHACKOPTIONS, not
-with the \(oqO\(cq command.
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.
@@ -4689,10 +4826,20 @@ Prefix key to run towards a direction.
 With
 .op number_pad
 only.
-Default is \(oq5\(cq.
+.lp ""
+Default is \(oq5\(cq when number_pad is set to 1 or 3,
+otherwise \(oqM-5\(cq when it is set to 2 or 4.
 .lp rush
 Prefix key to rush towards a direction.
 Default is \(oqg\(cq.
+.lp rush.numpad
+Prefix key to rush towards a direction.
+With
+.op number_pad
+only.
+.lp ""
+Default is \(oqM-5\(cq when number_pad is set to 1 or 3,
+otherwise \(oq5\(cq when it is set to 2 or 4.
 .hn 2
 Configuring Message Types
 .pg

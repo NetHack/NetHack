@@ -24,8 +24,13 @@ public:
         int dollWidth = 32, dollHeight = 32;
         bool doll_is_shown = true;
 #endif
+        bool xcmd_by_row = false;
+        int xcmd_set = 0; // all_cmds
+
 	// dialog box for Qt-specific settings
 	NetHackQtSettings();
+
+        void updateXcmd(bool by_row, int which_set);
 
 	NetHackQtGlyphs& glyphs();
 	const QFont& normalFont();

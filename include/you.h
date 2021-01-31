@@ -93,7 +93,9 @@ enum achivements {
     ACH_NOVL = 20, /* read at least one passage from a Discworld novel */
     ACH_SOKO = 21, /* entered Sokoban */
     ACH_BGRM = 22, /* entered Bigroom (not guaranteed to be in every dgn) */
-    /* 23..30 are negated if hero is female at the time new rank is gained */
+    /* role's rank titles, beyond first (#0 at level one, not an achievement);
+       23..30 are negated if hero is female at the time new rank is gained
+       so that disclosing them can use the gender which applied at the time */
     ACH_RNK1 = 23, ACH_RNK2 = 24, ACH_RNK3 = 25, ACH_RNK4 = 26,
     ACH_RNK5 = 27, ACH_RNK6 = 28, ACH_RNK7 = 29, ACH_RNK8 = 30,
     /* foo=31, 1 available potential achievement; #32 currently off-limits */
@@ -102,6 +104,8 @@ enum achivements {
     /*
      * Other potential achievements to track (this comment briefly resided
      * in encodeachieve(topten.c) and has been revised since moving here:
+     *  AC <= 0, AC <= -10, AC <= -20 (stop there; lower is better but
+     *    not something to encourage with achievements),
      *  got quest summons,
      *  entered quest branch,
      *  chatted with leader,
@@ -431,14 +435,18 @@ struct you {
 #define A_CURRENT  0
     aligntyp ualignbase[CONVERT]; /* for ualign conversion record */
     schar uluck, moreluck;        /* luck and luck bonus */
+    /* default u.uluck is 0 except on special days (full moon: +1, Fri 13: -1,
+       both: 0); equilibrium for luck timeout is changed to those values,
+       but Luck max and min stay at 10+3 and -10-3 even on those days */
 #define Luck (u.uluck + u.moreluck)
 #define LUCKADD    3  /* value of u.moreluck when carrying luck stone;
-                         + when blessed or uncursed, - when cursed */
-#define LUCKMAX   10  /* maximum value of u.ulUck */
+                       * +3 when blessed or uncursed, -3 when cursed */
+#define LUCKMAX   10  /* maximum value of u.uluck */
 #define LUCKMIN (-10) /* minimum value of u.uluck */
     schar uhitinc;
     schar udaminc;
     schar uac;
+#define AC_MAX    99  /* abs(u.uac) <= 99; likewise for monster AC */
     uchar uspellprot;        /* protection by SPE_PROTECTION */
     uchar usptime;           /* #moves until uspellprot-- */
     uchar uspmtime;          /* #moves between uspellprot-- */
@@ -471,5 +479,6 @@ struct you {
 }; /* end of `struct you' */
 
 #define Upolyd (u.umonnum != u.umonster)
+#define Ugender ((Upolyd ? u.mfemale : flags.female) ? 1 : 0)
 
 #endif /* YOU_H */

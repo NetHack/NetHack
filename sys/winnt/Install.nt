@@ -47,7 +47,7 @@ version.  You can use one of the following build environments:
                                     |          |                 |
                                  +----+    +------+        +-----------+
                                  |    |    |      |        |           |
-                             share  winnt tty   win32  Lua-5.4.1    pdcurses
+                             share  winnt tty   win32  Lua-5.4.2    pdcurses
                                                   |
                                                  vs
 
@@ -55,11 +55,11 @@ version.  You can use one of the following build environments:
 | Building And Running Using Visual Studio 2017 or 2019  |
 \--------------------------------------------------------/
 
-Before proceeding, please obtain the lua-5.4.1 sources and copy them to
-the new directory lib\lua-5.4.1\src.  This source can be obtain either from
-http://www.lua.org/ftp/lua-5.4.1.tar.gz or from the git hub mirror
-https://github.com/lua/lua.git using the tag 'v5.4.1'.  The build expects
-to find lua files such as 'lua.h' at 'lib\lua-5.4.1\src\lua.h'.
+Before proceeding, please obtain the lua-5.4.2 sources and copy them to
+the new directory lib\lua-5.4.2\src.  This source can be obtain either from
+http://www.lua.org/ftp/lua-5.4.2.tar.gz or from the git hub mirror
+https://github.com/lua/lua.git using the tag 'v5.4.2'.  The build expects
+to find lua files such as 'lua.h' at 'lib\lua-5.4.2\src\lua.h'.
 
 If you are NOT using Visual Studio 2017 or 2019 IDE, or you prefer to build
 using a Make utility and a Makefile proceed to "Building Using Make".

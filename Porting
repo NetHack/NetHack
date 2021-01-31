@@ -192,7 +192,6 @@ line options to produce several output files that are required for:
           util/makedefs -v
           util/makedefs -o
           util/makedefs -p
-          util/makedefs -z
           util/makedefs -d
           util/makedefs -r
           util/makedefs -h
@@ -207,7 +206,7 @@ need to be included in the packaging of the game.
      4.3. Lua
 
 	Compile and link into a library, or obtain a prebuilt Lua library for
-your platform. Place the Lua source into lib/lua-5.4.1 (or other folder
+your platform. Place the Lua source into lib/lua-5.4.2 (or other folder
 representing an appropriate Lua version); place the compiled Lua library into
 lib.
 

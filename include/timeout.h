@@ -6,7 +6,7 @@
 #define TIMEOUT_H
 
 /* generic timeout function */
-typedef void FDECL((*timeout_proc), (ANY_P *, long));
+typedef void (*timeout_proc)(ANY_P *, long);
 
 /* kind of timer */
 enum timer_type {

@@ -10,34 +10,37 @@
 
 #define NHEVENT_CHAR 1
 #define NHEVENT_MOUSE 2
+
+union event_innards {
+    struct {
+        int ch;
+    } kbd;
+
+    struct {
+       int mod;
+       int x, y;
+    } ms;
+};
+
 typedef struct mswin_event {
     int type;
-    union {
-        struct {
-            int ch;
-        } kbd;
-
-        struct {
-            int mod;
-            int x, y;
-        } ms;
-    };
+    union event_innards ei;
 } MSNHEvent, *PMSNHEvent;
 
 #define NHEVENT_KBD(c)         \
     {                          \
         MSNHEvent e;           \
         e.type = NHEVENT_CHAR; \
-        e.kbd.ch = (c);        \
+        e.ei.kbd.ch = (c);        \
         mswin_input_push(&e);  \
     }
 #define NHEVENT_MS(_mod, _x, _y) \
     {                            \
         MSNHEvent e;             \
         e.type = NHEVENT_MOUSE;  \
-        e.ms.mod = (_mod);       \
-        e.ms.x = (_x);           \
-        e.ms.y = (_y);           \
+        e.ei.ms.mod = (_mod);       \
+        e.ei.ms.x = (_x);           \
+        e.ei.ms.y = (_y);           \
         mswin_input_push(&e);    \
     }
 

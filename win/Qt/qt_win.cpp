@@ -76,13 +76,14 @@ extern "C" {
 namespace nethack_qt_ {
 
 void
-centerOnMain( QWidget* w )
+centerOnMain(QWidget *w)
 {
-    QWidget* m = NetHackQtBind::mainWidget();
-    if (!m) m = qApp->desktop();
-    QPoint p = m->mapToGlobal(QPoint(0,0));
-    w->move( p.x() + m->width()/2  - w->width()/2,
-              p.y() + m->height()/2 - w->height()/2 );
+    QWidget *m = NetHackQtBind::mainWidget();
+    if (!m)
+        m = qApp->desktop();
+    QPoint p = m->mapToGlobal(QPoint(0, 0));
+    w->move(p.x() + m->width() / 2  - w->width() / 2,
+            p.y() + m->height() / 2 - w->height() / 2);
 }
 
 NetHackQtWindow::NetHackQtWindow()
@@ -109,7 +110,7 @@ void NetHackQtWindow::EndMenu(const QString& prompt UNUSED) { puts("unexpected E
 int NetHackQtWindow::SelectMenu(int how UNUSED, MENU_ITEM_P **menu_list UNUSED)
                                { puts("unexpected SelectMenu"); return 0; }
 void NetHackQtWindow::ClipAround(int x UNUSED,int y UNUSED) { puts("unexpected ClipAround"); }
-void NetHackQtWindow::PrintGlyph(int x UNUSED,int y UNUSED,int glyph UNUSED) { puts("unexpected PrintGlyph"); }
+void NetHackQtWindow::PrintGlyph(int x UNUSED,int y UNUSED,const glyph_info *glyphinfo UNUSED) { puts("unexpected PrintGlyph"); }
 //void NetHackQtWindow::PrintGlyphCompose(int x,int y,int,int) { puts("unexpected PrintGlyphCompose"); }
 void NetHackQtWindow::UseRIP(int how UNUSED, time_t when UNUSED) { puts("unexpected UseRIP"); }
 

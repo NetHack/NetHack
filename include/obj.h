@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1604620981 2020/11/06 00:03:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1611097668 2021/01/19 23:07:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -40,16 +40,22 @@ struct obj {
     unsigned owt;
     long quan; /* number of items */
 
-    schar spe; /* quality of weapon, weptool, armor or ring (+ or -);
-                  number of charges for wand or charged tool ( >= -1 );
-                  number of candles attached to candelabrum;
-                  marks your eggs, tin variety and spinach tins;
-                  candy bar wrapper index;
-                  Schroedinger's Box (1) or royal coffers for a court (2);
-                  tells which fruit a fruit is;
-                  special for uball and amulet;
-                  scroll of mail (normal==0, bones or wishing==1, written==2);
-                  historic and gender for statues */
+#define SPE_LIM 99 /* abs(obj->spe) <= 99, cap for enchanted and charged
+                    * objects (and others; named fruit index excepted) */
+    schar spe; /* quality of weapon, weptool, armor, or some rings (+ or -);
+                * number of charges for wand or charged tool ( >= -1 );
+                * number of candles attached to candelabrum (0..7);
+                * magic lamp (1 iff djinni inside => lamp is lightable);
+                * oil lamp, tallow/wax candle (1 for no apparent reason?);
+                * marks spinach tins (1 iff corpsenm==NON_PM);
+                * marks tin variety (various: homemade, stir fried, &c);
+                * eggs laid by you (1), eggs upgraded with rojal jelly (2);
+                * Schroedinger's Box (1) or royal coffers for a court (2);
+                * named fruit index;
+                * candy bar wrapper index;
+                * scroll of mail (normal==0, bones or wishing==1, written==2);
+                * splash of venom (normal==0, wishing==1);
+                * historic flag and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE 0x02
 #define STATUE_FEMALE 0x04
@@ -411,8 +417,8 @@ struct obj {
  *          for it to include/extern.h.  The majority of these are currently
  *          located in mkobj.c for convenience.
  *
- *          void FDECL(newXX, (struct obj *));
- *          void FDECL(free_XX, (struct obj *));
+ *          void newXX(struct obj *);
+ *          void free_XX(struct obj *);
  *
  *          void
  *          newxx(otmp)

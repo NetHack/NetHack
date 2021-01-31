@@ -66,8 +66,6 @@ static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2020/01/18";
 #define QTXT_I_FILE "quest.txt"
 #define QTXT_O_FILE "quest.dat"
 #endif
-#define VIS_TAB_H "vis_tab.h"
-#define VIS_TAB_C "vis_tab.c"
 #define GITINFO_FILE "gitinfo.txt"
 /* locations for those files */
 #ifdef AMIGA
@@ -114,24 +112,7 @@ static const char
 
 static struct version_info version;
 
-/* definitions used for vision tables */
-#define TEST_WIDTH COLNO
-#define TEST_HEIGHT ROWNO
-#define BLOCK_WIDTH (TEST_WIDTH + 10)
-#define BLOCK_HEIGHT TEST_HEIGHT /* don't need extra spaces */
-#define MAX_ROW (BLOCK_HEIGHT + TEST_HEIGHT)
-#define MAX_COL (BLOCK_WIDTH + TEST_WIDTH)
-/* Use this as an out-of-bound value in the close table.  */
-#define CLOSE_OFF_TABLE_STRING "99" /* for the close table */
-#define FAR_OFF_TABLE_STRING "0xff" /* for the far table */
 #define FLG_TEMPFILE  0x01              /* flag for temp file */
-
-#define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
-#ifdef VISION_TABLES
-static char xclear[MAX_ROW][MAX_COL];
-#endif
-/*-end of vision defs-*/
-
 #define MAXFNAMELEN 600
 
 static char filename[MAXFNAMELEN];
@@ -144,60 +125,46 @@ char *file_prefix = "";
 #endif
 
 #ifdef MACsansMPWTOOL
-int FDECL(main, (void));
+int main(void);
 #else
-int FDECL(main, (int, char **));
+int main(int, char **);
 #endif
-void FDECL(do_makedefs, (char *));
-void NDECL(do_objs);
-void NDECL(do_data);
-void NDECL(do_dungeon);
-void NDECL(do_options);
-void NDECL(do_monstr);
-void NDECL(do_permonst);
-void NDECL(do_questtxt);
-void NDECL(do_rumors);
-void NDECL(do_oracles);
-void NDECL(do_vision);
-void NDECL(do_date);
+void do_makedefs(char *);
+void do_objs(void);
+void do_data(void);
+void do_dungeon(void);
+void do_options(void);
+void do_monstr(void);
+void do_permonst(void);
+void do_questtxt(void);
+void do_rumors(void);
+void do_oracles(void);
+void do_date(void);
 
-extern void NDECL(monst_globals_init);   /* monst.c */
-extern void NDECL(objects_globals_init); /* objects.c */
+extern void monst_globals_init(void);   /* monst.c */
+extern void objects_globals_init(void); /* objects.c */
 
-static char *FDECL(name_file, (const char *, const char *));
-static FILE *FDECL(getfp, (const char *, const char *, const char *, int));
-static void FDECL(do_ext_makedefs, (int, char **));
-static char *FDECL(xcrypt, (const char *));
-static unsigned long FDECL(read_rumors_file,
-                           (const char *, int *, long *, unsigned long));
-static void FDECL(do_rnd_access_file, (const char *, const char *));
-static boolean FDECL(d_filter, (char *));
-static boolean FDECL(h_filter, (char *));
-static void FDECL(opt_out_words, (char *, int *));
+static char *name_file(const char *, const char *);
+static FILE *getfp(const char *, const char *, const char *, int);
+static void do_ext_makedefs(int, char **);
+static char *xcrypt(const char *);
+static unsigned long read_rumors_file(const char *, int *,
+                                      long *, unsigned long);
+static void do_rnd_access_file(const char *, const char *);
+static boolean d_filter(char *);
+static boolean h_filter(char *);
+static void opt_out_words(char *, int *);
 
-#ifdef VISION_TABLES
-static void NDECL(H_close_gen);
-static void NDECL(H_far_gen);
-static void NDECL(C_close_gen);
-static void NDECL(C_far_gen);
-static int FDECL(clear_path, (int, int, int, int));
-#endif
-
-static char *FDECL(fgetline, (FILE*));
-static char *FDECL(tmpdup, (const char *));
-static char *FDECL(limit, (char *, int));
-static void NDECL(windowing_sanity);
-static boolean FDECL(get_gitinfo, (char *, char *));
+static char *fgetline(FILE*);
+static char *tmpdup(const char *);
+static char *limit(char *, int);
+static void windowing_sanity(void);
+static boolean get_gitinfo(char *, char *);
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
 
-static boolean use_enum =
-#ifdef ENUM_PM
-    TRUE;
-#else
-    FALSE;
-#endif
+static boolean use_enum = TRUE;
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
@@ -247,9 +214,7 @@ main(void)
 #else /* ! MAC */
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     if ((argc == 1) ||
         ((argc != 2)
@@ -282,8 +247,7 @@ char *argv[];
 #endif
 
 void
-do_makedefs(options)
-char *options;
+do_makedefs(char *options)
 {
     boolean more_than_one;
 
@@ -355,10 +319,6 @@ char *options;
         case 'H':
             do_oracles();
             break;
-        case 'z':
-        case 'Z':
-            do_vision();
-            break;
 
         default:
             Fprintf(stderr, "Unknown option '%c'.\n", *options);
@@ -374,21 +334,17 @@ char *options;
 static char namebuf[1000];
 
 static char *
-name_file(template, tag)
-const char *template;
-const char *tag;
+name_file(const char* template, const char* tag)
 {
     Sprintf(namebuf, template, tag);
     return namebuf;
 }
 
 #ifdef HAS_NO_MKSTEMP
-static void FDECL(delete_file, (const char *template, const char *));
+static void delete_file(const char *template, const char *);
 
 static void
-delete_file(template, tag)
-const char *template;
-const char *tag;
+delete_file(const char *template, const char *tag)
 {
     char *name = name_file(template, tag);
 
@@ -397,15 +353,7 @@ const char *tag;
 #endif
 
 static FILE *
-getfp(template, tag, mode, flg)
-const char *template;
-const char *tag;
-const char *mode;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
+getfp(const char* template, const char* tag, const char* mode, int flg)
 {
     char *name = name_file(template, tag);
     FILE *rv = (FILE *) 0;
@@ -421,7 +369,10 @@ int flg UNUSED;
             rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
             Unlink(tmpfbuf);
         }
-    } else
+    }
+    else
+#else
+        flg; // unused
 #endif
     rv = fopen(name, mode);
     if (!rv) {
@@ -447,13 +398,13 @@ struct grep_var {
 /* struct grep_var grep_vars[] and TODO_* constants in include file: */
 #include "mdgrep.h"
 
-static void NDECL(do_grep_showvars);
-static struct grep_var *FDECL(grepsearch, (const char *));
-static int FDECL(grep_check_id, (const char *));
-static void FDECL(grep_show_wstack, (const char *));
-static char *FDECL(do_grep_control, (char *));
-static void NDECL(do_grep);
-static void FDECL(grep0, (FILE *, FILE *, int));
+static void do_grep_showvars(void);
+static struct grep_var *grepsearch(const char *);
+static int grep_check_id(const char *);
+static void grep_show_wstack(const char *);
+static char *do_grep_control(char *);
+static void do_grep(void);
+static void grep0(FILE *, FILE *, int);
 
 static int grep_trace = 0;
 
@@ -647,7 +598,7 @@ static int grep_stack[GREP_STACK_SIZE] = { ST_LD(1, 0) };
 static int grep_lineno = 0;
 
 static void
-do_grep_showvars()
+do_grep_showvars(void)
 {
     int x;
 
@@ -657,8 +608,7 @@ do_grep_showvars()
 }
 
 static struct grep_var *
-grepsearch(name)
-const char *name;
+grepsearch(const char* name)
 {
     /* XXX make into binary search */
     int x = 0;
@@ -672,8 +622,7 @@ const char *name;
 }
 
 static int
-grep_check_id(id)
-const char *id;
+grep_check_id(const char* id)
 {
     struct grep_var *rv;
 
@@ -702,8 +651,7 @@ const char *id;
 }
 
 static void
-grep_show_wstack(tag)
-const char *tag;
+grep_show_wstack(const char* tag)
 {
     int x;
 
@@ -718,8 +666,7 @@ const char *tag;
 }
 
 static char *
-do_grep_control(buf)
-char *buf;
+do_grep_control(char *buf)
 {
     int isif = 1;
     char *buf0 = buf;
@@ -805,7 +752,7 @@ char *buf;
 static void grep0(FILE *, FILE *, int);
 
 static void
-do_grep()
+do_grep(void)
 {
     if (!inputfp) {
         Fprintf(stderr, "--grep requires --input\n");
@@ -821,14 +768,7 @@ do_grep()
 }
 
 static void
-grep0(inputfp0, outputfp0, flg)
-FILE *inputfp0;
-FILE *outputfp0;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
+grep0(FILE *inputfp0, FILE* outputfp0, int flg)
 {
 #ifndef HAS_NO_MKSTEMP
     /* if grep0 is passed FLG_TEMPFILE flag, it will
@@ -836,6 +776,8 @@ int flg UNUSED;
        The caller will have to take care of calling
        fclose() when it is done with the file */
     boolean istemp = (flg & FLG_TEMPFILE) != 0;
+#else
+    flg; // unused
 #endif
     char buf[16384]; /* looong, just in case */
 
@@ -896,8 +838,7 @@ int flg UNUSED;
 
 /* trivial text encryption routine which can't be broken with `tr' */
 static char *
-xcrypt(str)
-const char *str;
+xcrypt(const char* str)
 { /* duplicated in src/hacklib.c */
     static char buf[BUFSZ];
     register const char *p;
@@ -918,11 +859,8 @@ const char *str;
 #define PAD_RUMORS_TO 60
 /* common code for do_rumors().  Return 0 on error. */
 static unsigned long
-read_rumors_file(file_ext, rumor_count, rumor_size, old_rumor_offset)
-const char *file_ext;
-int *rumor_count;
-long *rumor_size;
-unsigned long old_rumor_offset;
+read_rumors_file(const char* file_ext, int* rumor_count,
+                 long* rumor_size, unsigned long old_rumor_offset)
 {
     char infile[MAXFNAMELEN];
     char *line;
@@ -979,9 +917,7 @@ unsigned long old_rumor_offset;
 }
 
 static void
-do_rnd_access_file(fname, deflt_content)
-const char *fname;
-const char *deflt_content;
+do_rnd_access_file(const char* fname, const char* deflt_content)
 {
     char *line, buf[BUFSZ];
 
@@ -1033,7 +969,7 @@ const char *deflt_content;
 }
 
 void
-do_rumors()
+do_rumors(void)
 {
     char *line;
     static const char rumors_header[] =
@@ -1125,7 +1061,7 @@ rumors_failure:
 }
 
 void
-do_date()
+do_date(void)
 {
 #ifdef KR1ED
     long clocktim = 0;
@@ -1313,8 +1249,7 @@ do_date()
 }
 
 static boolean
-get_gitinfo(githash, gitbranch)
-char *githash, *gitbranch;
+get_gitinfo(char *githash, char *gitbranch)
 {
     FILE *gifp;
     size_t len;
@@ -1374,7 +1309,7 @@ char *githash, *gitbranch;
 }
 
 void
-do_options()
+do_options(void)
 {
     const char *optline;
     int infocontext = 0;
@@ -1396,7 +1331,7 @@ do_options()
 }
 
 static void
-windowing_sanity()
+windowing_sanity(void)
 {
 #ifndef DEFAULT_WINDOW_SYS
     /* pre-standard compilers didn't support #error; wait til run-time */
@@ -1436,8 +1371,7 @@ windowing_sanity()
 
 /* routine to decide whether to discard something from data.base */
 static boolean
-d_filter(line)
-char *line;
+d_filter(char *line)
 {
     if (*line == '#')
         return TRUE; /* ignore comment lines */
@@ -1467,7 +1401,7 @@ text-b/text-c           at fseek(0x01234567L + 456L)
  */
 
 void
-do_data()
+do_data(void)
 {
     char infile[60], tempfile[60];
     boolean ok;
@@ -1582,8 +1516,7 @@ do_data()
 
 /* routine to decide whether to discard something from oracles.txt */
 static boolean
-h_filter(line)
-char *line;
+h_filter(char *line)
 {
     static boolean skip = FALSE;
     char *tag;
@@ -1622,7 +1555,7 @@ static const char *special_oracle[] = {
  */
 
 void
-do_oracles()
+do_oracles(void)
 {
     char infile[60], tempfile[60];
     boolean in_oracle, ok;
@@ -1784,7 +1717,7 @@ do_oracles()
 }
 
 void
-do_dungeon()
+do_dungeon(void)
 {
     char *line;
 
@@ -1842,8 +1775,8 @@ do_dungeon()
  *      transfer relevant generated monstr values to src/monst.c;
  *      delete src/monstr.c.
  */
-static int FDECL(mstrength, (struct permonst *));
-static boolean FDECL(ranged_attk, (struct permonst *));
+static int mstrength(struct permonst *);
+static boolean ranged_attk(struct permonst *);
 
  /*
  * This routine is designed to return an integer value which represents
@@ -1851,8 +1784,7 @@ static boolean FDECL(ranged_attk, (struct permonst *));
  * determination as "experience()" to arrive at the strength.
  */
 static int
-mstrength(ptr)
-struct permonst *ptr;
+mstrength(struct permonst* ptr)
 {
     int	i, tmp2, n, tmp = ptr->mlevel;
 
@@ -1888,14 +1820,14 @@ struct permonst *ptr;
         if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
             || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
             n += 2;
-        else if (strcmp(ptr->mname, "grid bug"))
+        else if (strcmp(ptr->pmnames[NEUTRAL], "grid bug"))
             n += (tmp2 != AD_PHYS);
         n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
     }
 
     /*	Leprechauns are special cases.  They have many hit dice so they
 	can hit and are hard to kill, but they don't really do much damage. */
-    if (!strcmp(ptr->mname, "leprechaun"))
+    if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun"))
         n -= 2;
 
     /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
@@ -1911,8 +1843,7 @@ struct permonst *ptr;
 
 /* returns True if monster can attack at range */
 static boolean
-ranged_attk(ptr)
-register struct permonst *ptr;
+ranged_attk(register struct permonst* ptr)
 {
     register int i, j;
     register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
@@ -1926,7 +1857,7 @@ register struct permonst *ptr;
 }
 
 void
-do_monstr()
+do_monstr(void)
 {
     struct permonst *ptr;
     int i;
@@ -1973,13 +1904,13 @@ do_monstr()
     Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
     for (ptr = &mons[0]; ptr->mlet; ptr++) {
         i = mstrength(ptr);
-        Fprintf(ofp, "%-24s %2u\n", ptr->mname, (unsigned int) (uchar) i);
+        Fprintf(ofp, "%-24s %2u\n", ptr->pmnames[NEUTRAL], (unsigned int) (uchar) i);
     }
     Fprintf(ofp, " *\n */\n\n");
 
-    Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
+    Fprintf(ofp, "\nvoid monstr_init(void);\n");
     Fprintf(ofp, "\nvoid\n");
-    Fprintf(ofp, "monstr_init()\n");
+    Fprintf(ofp, "monstr_init(void)\n");
     Fprintf(ofp, "{\n");
     Fprintf(ofp, "    return;\n");
     Fprintf(ofp, "}\n");
@@ -1990,7 +1921,7 @@ do_monstr()
 }
 
 void
-do_permonst()
+do_permonst(void)
 {
     int i;
     char *c, *nam;
@@ -2021,9 +1952,9 @@ do_permonst()
             Fprintf(ofp, "\n        PM_");
         else
             Fprintf(ofp, "\n#define\tPM_");
-        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].mname, "were", 4))
+        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].pmnames[NEUTRAL], "were", 4))
             Fprintf(ofp, "HUMAN_");
-        for (nam = c = tmpdup(mons[i].mname); *c; c++)
+        for (nam = c = tmpdup(mons[i].pmnames[NEUTRAL]); *c; c++)
             if (*c >= 'a' && *c <= 'z')
                 *c -= (char) ('a' - 'A');
             else if (*c < 'A' || *c > 'Z')
@@ -2047,7 +1978,7 @@ do_permonst()
 /*      Start of Quest text file processing. */
 
 void
-do_questtxt()
+do_questtxt(void)
 {
     printf("DEPRECATION WARNINGS:\n");
     printf("'makedefs -q' is no longer required.  Remove all references\n");
@@ -2059,9 +1990,7 @@ do_questtxt()
 
 static char temp[32];
 
-static char *limit(name, pref) /* limit a name to 30 characters length */
-char *name;
-int pref;
+static char *limit(char* name, int pref) /* limit a name to 30 characters length */
 {
     (void) strncpy(temp, name, pref ? 26 : 30);
     temp[pref ? 26 : 30] = 0;
@@ -2069,7 +1998,7 @@ int pref;
 }
 
 void
-do_objs()
+do_objs(void)
 {
     int i, sum = 0;
     char *c, *objnam;
@@ -2216,8 +2145,7 @@ do_objs()
  * null pointer if no characters were read.
  */
 static char *
-fgetline(fd)
-FILE *fd;
+fgetline(FILE *fd)
 {
     static const int inc = 256;
     int len = inc;
@@ -2240,8 +2168,7 @@ FILE *fd;
 }
 
 static char *
-tmpdup(str)
-const char *str;
+tmpdup(const char* str)
 {
     static char buf[128];
 
@@ -2250,390 +2177,6 @@ const char *str;
     (void) strncpy(buf, str, 127);
     return buf;
 }
-
-/*
- * macro used to control vision algorithms:
- *      VISION_TABLES => generate tables
- */
-
-void
-do_vision()
-{
-#ifdef VISION_TABLES
-    int i, j;
-
-    /* Everything is clear.  xclear may be malloc'ed.
-     * Block the upper left corner (BLOCK_HEIGHTxBLOCK_WIDTH)
-     */
-    for (i = 0; i < MAX_ROW; i++)
-        for (j = 0; j < MAX_COL; j++)
-            if (i < BLOCK_HEIGHT && j < BLOCK_WIDTH)
-                xclear[i][j] = '\000';
-            else
-                xclear[i][j] = '\001';
-#endif /* VISION_TABLES */
-
-    SpinCursor(3);
-
-    /*
-     * create the include file, "vis_tab.h"
-     */
-    filename[0] = '\0';
-#ifdef FILE_PREFIX
-    Strcat(filename, file_prefix);
-#endif
-    Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
-    if (!(ofp = fopen(filename, WRTMODE))) {
-        perror(filename);
-        exit(EXIT_FAILURE);
-    }
-    Fprintf(ofp, "%s", Dont_Edit_Code);
-    Fprintf(ofp, "#ifdef VISION_TABLES\n");
-#ifdef VISION_TABLES
-    H_close_gen();
-    H_far_gen();
-#endif /* VISION_TABLES */
-    Fprintf(ofp, "\n#endif /* VISION_TABLES */\n");
-    Fclose(ofp);
-
-    SpinCursor(3);
-
-    /*
-     * create the source file, "vis_tab.c"
-     */
-    filename[0] = '\0';
-#ifdef FILE_PREFIX
-    Strcat(filename, file_prefix);
-#endif
-    Sprintf(eos(filename), SOURCE_TEMPLATE, VIS_TAB_C);
-    if (!(ofp = fopen(filename, WRTMODE))) {
-        perror(filename);
-        /* creating vis_tab.c failed; remove the vis_tab.h we just made */
-        filename[0] = '\0';
-#ifdef FILE_PREFIX
-        Strcat(filename, file_prefix);
-#endif
-        Sprintf(eos(filename), INCLUDE_TEMPLATE, VIS_TAB_H);
-        Unlink(filename);
-        exit(EXIT_FAILURE);
-    }
-    Fprintf(ofp, "%s", Dont_Edit_Code);
-    Fprintf(ofp, "#include \"config.h\"\n");
-    Fprintf(ofp, "#ifdef VISION_TABLES\n");
-    Fprintf(ofp, "#include \"vis_tab.h\"\n");
-
-    SpinCursor(3);
-
-#ifdef VISION_TABLES
-    C_close_gen();
-    C_far_gen();
-    Fprintf(ofp, "\nvoid vis_tab_init() { return; }\n");
-#endif /* VISION_TABLES */
-
-    SpinCursor(3);
-
-    Fprintf(ofp, "\n#endif /* VISION_TABLES */\n");
-    Fprintf(ofp, "\n/*vis_tab.c*/\n");
-
-    Fclose(ofp);
-    return;
-}
-
-#ifdef VISION_TABLES
-
-/*--------------  vision tables  --------------*\
- *
- *  Generate the close and far tables.  This is done by setting up a
- *  fake dungeon and moving our source to different positions relative
- *  to a block and finding the first/last visible position.  The fake
- *  dungeon is all clear execpt for the upper left corner (BLOCK_HEIGHT
- *  by BLOCK_WIDTH) is blocked.  Then we move the source around relative
- *  to the corner of the block.  For each new position of the source
- *  we check positions on rows "kittycorner" from the source.  We check
- *  positions until they are either in sight or out of sight (depends on
- *  which table we are generating).  The picture below shows the setup
- *  for the generation of the close table.  The generation of the far
- *  table would switch the quadrants of the '@' and the "Check rows
- *  here".
- *
- *
- *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
- *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
- *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,,,,,,,,, Check rows here ,,,,,,,,,,,,
- *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
- *  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXB,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
- *  ...............................
- *  ...............................
- *  .........@.....................
- *  ...............................
- *
- *      Table generation figure (close_table).  The 'X's are blocked points.
- *      The 'B' is a special blocked point.  The '@' is the source.  The ','s
- *      are the target area.  The '.' are just open areas.
- *
- *
- *  Example usage of close_table[][][].
- *
- *  The table is as follows:
- *
- *      dy = |row of '@' - row of 'B'|  - 1
- *      dx = |col of '@' - col of 'B'|
- *
- *  The first indices are the deltas from the source '@' and the block 'B'.
- *  You must check for the value inside the abs value bars being zero.  If
- *  so then the block is on the same row and you don't need to do a table
- *  lookup.  The last value:
- *
- *      dcy = |row of block - row to be checked|
- *
- *  Is the value of the first visible spot on the check row from the
- *  block column.  So
- *
- *  first visible col = close_table[dy][dx][dcy] + col of 'B'
- *
-\*--------------  vision tables  --------------*/
-
-static void
-H_close_gen()
-{
-    Fprintf(ofp, "\n/* Close */\n");
-    Fprintf(ofp,
-            "#define CLOSE_MAX_SB_DY %2d\t/* |src row - block row| - 1\t*/\n",
-            TEST_HEIGHT - 1);
-    Fprintf(ofp,
-            "#define CLOSE_MAX_SB_DX %2d\t/* |src col - block col|\t*/\n",
-            TEST_WIDTH);
-    Fprintf(ofp,
-            "#define CLOSE_MAX_BC_DY %2d\t/* |block row - check row|\t*/\n",
-            TEST_HEIGHT);
-    Fprintf(ofp, "typedef struct {\n");
-    Fprintf(ofp,
-            "    unsigned char close[CLOSE_MAX_SB_DX][CLOSE_MAX_BC_DY];\n");
-    Fprintf(ofp, "} close2d;\n");
-    Fprintf(ofp, "extern close2d close_table[CLOSE_MAX_SB_DY];\n");
-    return;
-}
-
-static void
-H_far_gen()
-{
-    Fprintf(ofp, "\n/* Far */\n");
-    Fprintf(ofp, "#define FAR_MAX_SB_DY %2d\t/* |src row - block row|\t*/\n",
-            TEST_HEIGHT);
-    Fprintf(ofp,
-            "#define FAR_MAX_SB_DX %2d\t/* |src col - block col| - 1\t*/\n",
-            TEST_WIDTH - 1);
-    Fprintf(ofp,
-            "#define FAR_MAX_BC_DY %2d\t/* |block row - check row| - 1\t*/\n",
-            TEST_HEIGHT - 1);
-    Fprintf(ofp, "typedef struct {\n");
-    Fprintf(ofp, "    unsigned char far_q[FAR_MAX_SB_DX][FAR_MAX_BC_DY];\n");
-    Fprintf(ofp, "} far2d;\n");
-    Fprintf(ofp, "extern far2d far_table[FAR_MAX_SB_DY];\n");
-    return;
-}
-
-static void
-C_close_gen()
-{
-    int i, dx, dy;
-    int src_row, src_col;     /* source */
-    int block_row, block_col; /* block */
-    int this_row;
-    int no_more;
-    const char *delim;
-
-    block_row = BLOCK_HEIGHT - 1;
-    block_col = BLOCK_WIDTH - 1;
-
-    Fprintf(ofp, "\n#ifndef FAR_TABLE_ONLY\n");
-    Fprintf(ofp, "\nclose2d close_table[CLOSE_MAX_SB_DY] = {\n");
-#ifndef no_vision_progress
-    Fprintf(stderr, "\nclose:");
-#endif
-
-    for (dy = 1; dy < TEST_HEIGHT; dy++) {
-        src_row = block_row + dy;
-        Fprintf(ofp, "/* DY = %2d (- 1)*/\n  {{\n", dy);
-#ifndef no_vision_progress
-        Fprintf(stderr, " %2d", dy), (void) fflush(stderr);
-#endif
-        for (dx = 0; dx < TEST_WIDTH; dx++) {
-            src_col = block_col - dx;
-            Fprintf(ofp, "  /*%2d*/ {", dx);
-
-            no_more = 0;
-            for (this_row = 0; this_row < TEST_HEIGHT; this_row++) {
-                delim = (this_row < TEST_HEIGHT - 1) ? "," : "";
-                if (no_more) {
-                    Fprintf(ofp, "%s%s", CLOSE_OFF_TABLE_STRING, delim);
-                    continue;
-                }
-                SpinCursor(3);
-
-                /* Find the first column that we can see. */
-                for (i = block_col + 1; i < MAX_COL; i++) {
-                    if (clear_path(src_row, src_col, block_row - this_row, i))
-                        break;
-                }
-
-                if (i == MAX_COL)
-                    no_more = 1;
-                Fprintf(ofp, "%2d%s", i - block_col, delim);
-            }
-            Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
-        }
-        Fprintf(ofp, "  }},\n");
-    }
-
-    Fprintf(ofp, "}; /* close_table[] */\n"); /* closing brace for table */
-    Fprintf(ofp, "#endif /* !FAR_TABLE_ONLY */\n");
-#ifndef no_vision_progress
-    Fprintf(stderr, "\n");
-#endif
-    return;
-}
-
-static void
-C_far_gen()
-{
-    int i, dx, dy;
-    int src_row, src_col;     /* source */
-    int block_row, block_col; /* block */
-    int this_row;
-    const char *delim;
-
-    block_row = BLOCK_HEIGHT - 1;
-    block_col = BLOCK_WIDTH - 1;
-
-    Fprintf(ofp, "\n#ifndef CLOSE_TABLE_ONLY\n");
-    Fprintf(ofp, "\nfar2d far_table[FAR_MAX_SB_DY] = {\n");
-#ifndef no_vision_progress
-    Fprintf(stderr, "\n_far_:");
-#endif
-
-    for (dy = 0; dy < TEST_HEIGHT; dy++) {
-        src_row = block_row - dy;
-        Fprintf(ofp, "/* DY = %2d */\n  {{\n", dy);
-#ifndef no_vision_progress
-        Fprintf(stderr, " %2d", dy), (void) fflush(stderr);
-#endif
-        for (dx = 1; dx < TEST_WIDTH; dx++) {
-            src_col = block_col + dx;
-            Fprintf(ofp, "  /*%2d(-1)*/ {", dx);
-
-            for (this_row = block_row + 1; this_row < block_row + TEST_HEIGHT;
-                 this_row++) {
-                delim = (this_row < block_row + TEST_HEIGHT - 1) ? "," : "";
-
-                SpinCursor(3);
-                /* Find first col that we can see. */
-                for (i = 0; i <= block_col; i++) {
-                    if (clear_path(src_row, src_col, this_row, i))
-                        break;
-                }
-
-                if (block_col - i < 0)
-                    Fprintf(ofp, "%s%s", FAR_OFF_TABLE_STRING, delim);
-                else
-                    Fprintf(ofp, "%2d%s", block_col - i, delim);
-            }
-            Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
-        }
-        Fprintf(ofp, "  }},\n");
-    }
-
-    Fprintf(ofp, "}; /* far_table[] */\n"); /* closing brace for table */
-    Fprintf(ofp, "#endif /* !CLOSE_TABLE_ONLY */\n");
-#ifndef no_vision_progress
-    Fprintf(stderr, "\n");
-#endif
-    return;
-}
-
-/*
- *  "Draw" a line from the hero to the given location.  Stop if we hit a
- *  wall.
- *
- *  Generalized integer Bresenham's algorithm (fast line drawing) for
- *  all quadrants.  From _Procedural Elements for Computer Graphics_, by
- *  David F. Rogers.  McGraw-Hill, 1985.
- *
- *  I have tried a little bit of optimization by pulling compares out of
- *  the inner loops.
- *
- *  NOTE:  This had better *not* be called from a position on the
- *  same row as the hero.
- */
-static int
-clear_path(you_row, you_col, y2, x2)
-int you_row, you_col, y2, x2;
-{
-    int dx, dy, s1, s2;
-    register int i, error, x, y, dxs, dys;
-
-    x = you_col;
-    y = you_row;
-    dx = abs(x2 - you_col);
-    dy = abs(y2 - you_row);
-    s1 = sign(x2 - you_col);
-    s2 = sign(y2 - you_row);
-
-    if (s1 == 0) {     /* same column */
-        if (s2 == 1) { /* below (larger y2 value) */
-            for (i = you_row + 1; i < y2; i++)
-                if (!xclear[i][you_col])
-                    return 0;
-        } else { /* above (smaller y2 value) */
-            for (i = y2 + 1; i < you_row; i++)
-                if (!xclear[i][you_col])
-                    return 0;
-        }
-        return 1;
-    }
-
-    /*
-     *  Lines at 0 and 90 degrees have been weeded out.
-     */
-    if (dy > dx) {
-        error = dx;
-        dx = dy;
-        dy = error;    /* swap the values */
-        dxs = dx << 1; /* save the shifted values */
-        dys = dy << 1;
-        error = dys - dx; /* NOTE: error is used as a temporary above */
-
-        for (i = 0; i < dx; i++) {
-            if (!xclear[y][x])
-                return 0; /* plot point */
-
-            while (error >= 0) {
-                x += s1;
-                error -= dxs;
-            }
-            y += s2;
-            error += dys;
-        }
-    } else {
-        dxs = dx << 1; /* save the shifted values */
-        dys = dy << 1;
-        error = dys - dx;
-
-        for (i = 0; i < dx; i++) {
-            if (!xclear[y][x])
-                return 0; /* plot point */
-
-            while (error >= 0) {
-                y += s2;
-                error -= dxs;
-            }
-            x += s1;
-            error += dys;
-        }
-    }
-    return 1;
-}
-#endif /* VISION_TABLES */
 
 #ifdef STRICT_REF_DEF
 NEARDATA struct flag flags;

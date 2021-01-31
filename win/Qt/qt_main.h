@@ -14,6 +14,16 @@
 #include "qt_kde0.h"
 #endif
 
+// Allow changing 'statuslines:2' to 'statuslines:3' or vice versa
+// while the game is running; deletes and re-creates the status window.
+// [Used in qt_bind.cpp and qt_main.cpp, but not referenced in qt_stat.cpp.]
+#define DYNAMIC_STATUSLINES
+
+// NetHackQtBind::notify() doesn't see ^V on OSX
+#ifdef MACOSX
+#define CTRL_V_HACK
+#endif
+
 namespace nethack_qt_ {
 
 class NetHackQtInvUsageWindow;
@@ -49,12 +59,12 @@ public:
 
 	void fadeHighlighting(bool before_key);
 
-        void FuncAsCommand(int NDECL((*func)));
+        void FuncAsCommand(int (*func)(void));
         // this is unconditional in case qt_main.h comes before qt_set.h
         void resizePaperDoll(bool); // ENHANCED_PAPERDOLL
 #ifdef DYNAMIC_STATUSLINES
         // called when 'statuslines' option has been changed
-        void redoStatus();
+        NetHackQtWindow *redoStatus();
 #endif
 
 public slots:
@@ -78,11 +88,14 @@ private slots:
 	void zoomMap();
 	void raiseMessages();
 	void raiseStatus();
+#ifdef CTRL_V_HACK
+        void CtrlV();
+#endif
 
 private:
 	void ShowIfReady();
         void AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
-                           const char *name, int NDECL((*func)), QPixmap xpm);
+                           const char *name, int (*func)(void), QPixmap xpm);
 
 #ifdef KDE
 	KMenuBar* menubar;

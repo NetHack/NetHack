@@ -9,36 +9,34 @@
 /* croom->lx etc are schar (width <= int), so % arith ensures that */
 /* conversion of result to int is reasonable */
 
-static boolean FDECL(generate_stairs_room_good, (struct mkroom *, int));
-static struct mkroom *NDECL(generate_stairs_find_room);
-static void NDECL(generate_stairs);
-static void FDECL(mkfount, (int, struct mkroom *));
-static boolean FDECL(find_okay_roompos, (struct mkroom *, coord *));
-static void FDECL(mksink, (struct mkroom *));
-static void FDECL(mkaltar, (struct mkroom *));
-static void FDECL(mkgrave, (struct mkroom *));
-static void NDECL(makevtele);
-void NDECL(clear_level_structures);
-static void FDECL(fill_ordinary_room, (struct mkroom *));
-static void NDECL(makelevel);
-static boolean FDECL(bydoor, (XCHAR_P, XCHAR_P));
-static struct mkroom *FDECL(find_branch_room, (coord *));
-static struct mkroom *FDECL(pos_to_room, (XCHAR_P, XCHAR_P));
-static boolean FDECL(place_niche, (struct mkroom *, int *, int *, int *));
-static void FDECL(makeniche, (int));
-static void NDECL(make_niches);
-static int FDECL(CFDECLSPEC do_comp, (const genericptr,
-                                          const genericptr));
-static void FDECL(dosdoor, (XCHAR_P, XCHAR_P, struct mkroom *, int));
-static void FDECL(join, (int, int, BOOLEAN_P));
-static void FDECL(do_room_or_subroom, (struct mkroom *, int, int,
-                                           int, int, BOOLEAN_P,
-                                           SCHAR_P, BOOLEAN_P, BOOLEAN_P));
-static void NDECL(makerooms);
-static void FDECL(finddpos, (coord *, XCHAR_P, XCHAR_P,
-                                 XCHAR_P, XCHAR_P));
-static void FDECL(mkinvpos, (XCHAR_P, XCHAR_P, int));
-static void FDECL(mk_knox_portal, (XCHAR_P, XCHAR_P));
+static boolean generate_stairs_room_good(struct mkroom *, int);
+static struct mkroom *generate_stairs_find_room(void);
+static void generate_stairs(void);
+static void mkfount(int, struct mkroom *);
+static boolean find_okay_roompos(struct mkroom *, coord *);
+static void mksink(struct mkroom *);
+static void mkaltar(struct mkroom *);
+static void mkgrave(struct mkroom *);
+static void makevtele(void);
+void clear_level_structures(void);
+static void fill_ordinary_room(struct mkroom *);
+static void makelevel(void);
+static boolean bydoor(xchar, xchar);
+static struct mkroom *find_branch_room(coord *);
+static struct mkroom *pos_to_room(xchar, xchar);
+static boolean place_niche(struct mkroom *, int *, int *, int *);
+static void makeniche(int);
+static void make_niches(void);
+static int CFDECLSPEC do_comp(const genericptr, const genericptr);
+static void dosdoor(xchar, xchar, struct mkroom *, int);
+static void join(int, int, boolean);
+static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
+                               schar, boolean, boolean);
+static void makerooms(void);
+static boolean door_into_nonjoined(xchar, xchar);
+static void finddpos(coord *, xchar, xchar, xchar, xchar);
+static void mkinvpos(xchar, xchar, int);
+static void mk_knox_portal(xchar, xchar);
 
 #define create_vault() create_room(-1, -1, 2, 2, -1, -1, VAULT, TRUE)
 #define init_vault() g.vault_x = -1
@@ -47,9 +45,7 @@ static void FDECL(mk_knox_portal, (XCHAR_P, XCHAR_P));
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
 static int CFDECLSPEC
-do_comp(vx, vy)
-const genericptr vx;
-const genericptr vy;
+do_comp(const genericptr vx, const genericptr vy)
 {
 #ifdef LINT
     /* lint complains about possible pointer alignment problems, but we know
@@ -68,21 +64,45 @@ const genericptr vy;
 #endif /* LINT */
 }
 
+/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor() checks
+ * would be connecting into an area that was declared as joined = 0.
+ * Checking for this in finddpos() enables us to have rooms with sub-areas (such
+ * as shops) that will never randomly generate unwanted doors in order to
+ * connect them up to other areas.
+ */
+static boolean
+door_into_nonjoined(xchar x, xchar y)
+{
+    xchar tx, ty, diridx;
+
+    for (diridx = 0; diridx <= 6; diridx += 2) {
+        tx = x + xdir[diridx];
+        ty = y + ydir[diridx];
+        if (!isok(tx, ty) || IS_ROCK(levl[tx][ty].typ))
+            continue;
+
+        /* Is this connecting to a room that doesn't want joining? */
+        if (levl[tx][ty].roomno >= ROOMOFFSET &&
+            !g.rooms[levl[tx][ty].roomno - ROOMOFFSET].needjoining) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void
-finddpos(cc, xl, yl, xh, yh)
-coord *cc;
-xchar xl, yl, xh, yh;
+finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
 {
     register xchar x, y;
 
     x = rn1(xh - xl + 1, xl);
     y = rn1(yh - yl + 1, yl);
-    if (okdoor(x, y))
+    if (okdoor(x, y) && !door_into_nonjoined(x, y))
         goto gotit;
 
     for (x = xl; x <= xh; x++)
         for (y = yl; y <= yh; y++)
-            if (okdoor(x, y))
+            if (okdoor(x, y) && !door_into_nonjoined(x, y))
                 goto gotit;
 
     for (x = xl; x <= xh; x++)
@@ -92,6 +112,8 @@ xchar xl, yl, xh, yh;
     /* cannot find something reasonable -- strange */
     x = xl;
     y = yh;
+    impossible("finddpos: couldn't find door pos within (%d,%d,%d,%d)",
+               xl, yl, xh, yh);
  gotit:
     cc->x = x;
     cc->y = y;
@@ -101,7 +123,7 @@ xchar xl, yl, xh, yh;
 /* Sort rooms on the level so they're ordered from left to right on the map.
    makecorridors() by default links rooms N and N+1 */
 void
-sort_rooms()
+sort_rooms(void)
 {
     int i, x, y;
     int ri[MAXNROFROOMS+1];
@@ -127,14 +149,9 @@ sort_rooms()
 }
 
 static void
-do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, special, is_room)
-register struct mkroom *croom;
-int lowx, lowy;
-register int hix, hiy;
-boolean lit;
-schar rtype;
-boolean special;
-boolean is_room;
+do_room_or_subroom(register struct mkroom *croom,
+                   int lowx, int lowy, register int hix, register int hiy,
+                   boolean lit, schar rtype, boolean special, boolean is_room)
 {
     register int x, y;
     struct rm *lev;
@@ -205,11 +222,8 @@ boolean is_room;
 }
 
 void
-add_room(lowx, lowy, hix, hiy, lit, rtype, special)
-int lowx, lowy, hix, hiy;
-boolean lit;
-schar rtype;
-boolean special;
+add_room(int lowx, int lowy, int hix, int hiy,
+         boolean lit, schar rtype, boolean special)
 {
     register struct mkroom *croom;
 
@@ -222,12 +236,8 @@ boolean special;
 }
 
 void
-add_subroom(proom, lowx, lowy, hix, hiy, lit, rtype, special)
-struct mkroom *proom;
-int lowx, lowy, hix, hiy;
-boolean lit;
-schar rtype;
-boolean special;
+add_subroom(struct mkroom *proom, int lowx, int lowy, int hix, int hiy,
+            boolean lit, schar rtype, boolean special)
 {
     register struct mkroom *croom;
 
@@ -241,8 +251,7 @@ boolean special;
 }
 
 void
-free_luathemes(keependgame)
-boolean keependgame; /* False: exiting, True: discarding main dungeon */
+free_luathemes(boolean keependgame) /* False: exiting, True: discarding main dungeon */
 {
     int i;
 
@@ -257,7 +266,7 @@ boolean keependgame; /* False: exiting, True: discarding main dungeon */
 }
 
 static void
-makerooms()
+makerooms(void)
 {
     boolean tried_vault = FALSE;
     int themeroom_tries = 0;
@@ -318,9 +327,7 @@ makerooms()
 }
 
 static void
-join(a, b, nxcor)
-register int a, b;
-boolean nxcor;
+join(register int a, register int b, boolean nxcor)
 {
     coord cc, tt, org, dest;
     register xchar tx, ty, xx, yy;
@@ -396,7 +403,7 @@ boolean nxcor;
 }
 
 void
-makecorridors()
+makecorridors(void)
 {
     int a, b, i;
     boolean any = TRUE;
@@ -428,9 +435,7 @@ makecorridors()
 }
 
 void
-add_door(x, y, aroom)
-register int x, y;
-register struct mkroom *aroom;
+add_door(register int x, register int y, register struct mkroom *aroom)
 {
     register struct mkroom *broom;
     register int tmp;
@@ -469,10 +474,7 @@ register struct mkroom *aroom;
 }
 
 static void
-dosdoor(x, y, aroom, type)
-register xchar x, y;
-struct mkroom *aroom;
-int type;
+dosdoor(register xchar x, register xchar y, struct mkroom *aroom, int type)
 {
     boolean shdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
 
@@ -536,9 +538,7 @@ int type;
 }
 
 static boolean
-place_niche(aroom, dy, xx, yy)
-register struct mkroom *aroom;
-int *dy, *xx, *yy;
+place_niche(register struct mkroom *aroom, int *dy, int *xx, int *yy)
 {
     coord dd;
 
@@ -569,8 +569,7 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
 };
 
 static void
-makeniche(trap_type)
-int trap_type;
+makeniche(int trap_type)
 {
     register struct mkroom *aroom;
     struct rm *rm;
@@ -634,7 +633,7 @@ int trap_type;
 }
 
 static void
-make_niches()
+make_niches(void)
 {
     int ct = rnd((g.nroom >> 1) + 1), dep = depth(&u.uz);
     boolean ltptr = (!g.level.flags.noteleport && dep > 15),
@@ -653,7 +652,7 @@ make_niches()
 }
 
 static void
-makevtele()
+makevtele(void)
 {
     makeniche(TELEP_TRAP);
 }
@@ -664,7 +663,7 @@ makevtele()
  * each type initializes what it needs to separately.
  */
 void
-clear_level_structures()
+clear_level_structures(void)
 {
     static struct rm zerorm = { GLYPH_UNEXPLORED,
                                 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -736,8 +735,7 @@ clear_level_structures()
  * Doom) with random monsters, objects, and dungeon features.
  */
 static void
-fill_ordinary_room(croom)
-struct mkroom *croom;
+fill_ordinary_room(struct mkroom *croom)
 {
     int trycnt = 0;
     coord pos;
@@ -837,7 +835,7 @@ struct mkroom *croom;
 }
 
 static void
-makelevel()
+makelevel(void)
 {
     register struct mkroom *croom;
     branch *branchp;
@@ -977,9 +975,8 @@ makelevel()
  *      mineralize(-1, -1, -1, -1, FALSE); => "default" behaviour
  */
 void
-mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_lvl_checks)
-int kelp_pool, kelp_moat, goldprob, gemprob;
-boolean skip_lvl_checks;
+mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob,
+           boolean skip_lvl_checks)
 {
     s_level *sp;
     struct obj *otmp;
@@ -1073,7 +1070,7 @@ boolean skip_lvl_checks;
 }
 
 void
-mklev()
+mklev(void)
 {
     struct mkroom *croom;
     int ridx;
@@ -1115,12 +1112,9 @@ mklev()
 
 void
 #ifdef SPECIALIZATION
-topologize(croom, do_ordinary)
-struct mkroom *croom;
-boolean do_ordinary;
+topologize(struct mkroom *croom, boolean do_ordinary)
 #else
-topologize(croom)
-struct mkroom *croom;
+topologize(struct mkroom *croom)
 #endif
 {
     register int x, y, roomno = (int) ((croom - g.rooms) + ROOMOFFSET);
@@ -1180,8 +1174,7 @@ struct mkroom *croom;
 
 /* Find an unused room for a branch location. */
 static struct mkroom *
-find_branch_room(mp)
-coord *mp;
+find_branch_room(coord *mp)
 {
     struct mkroom *croom = 0;
 
@@ -1198,8 +1191,7 @@ coord *mp;
 
 /* Find the room for (x,y).  Return null if not in a room. */
 static struct mkroom *
-pos_to_room(x, y)
-xchar x, y;
+pos_to_room(xchar x, xchar y)
 {
     int i;
     struct mkroom *curr;
@@ -1213,11 +1205,10 @@ xchar x, y;
 
 /* If given a branch, randomly place a special stair or portal. */
 void
-place_branch(br, x, y)
-branch *br; /* branch to place */
-xchar x, y; /* location */
+place_branch(branch *br,       /* branch to place */
+             xchar x, xchar y) /* location */
 {
-    coord m;
+    coord m = {0};
     d_level *dest;
     boolean make_stairs;
     struct mkroom *br_room;
@@ -1231,8 +1222,10 @@ xchar x, y; /* location */
     if (!br || g.made_branch)
         return;
 
+    nhUse(br_room);
     if (!x) { /* find random coordinates for branch */
-        br_room = find_branch_room(&m);
+        /* br_room = find_branch_room(&m); */
+        (void) find_branch_room(&m);  /* sets m via mazexy() or somexy() */
         x = m.x;
         y = m.y;
     } else {
@@ -1269,8 +1262,7 @@ xchar x, y; /* location */
 }
 
 static boolean
-bydoor(x, y)
-register xchar x, y;
+bydoor(register xchar x, register xchar y)
 {
     register int typ;
 
@@ -1299,8 +1291,7 @@ register xchar x, y;
 
 /* see whether it is allowable to create a door at [x,y] */
 int
-okdoor(x, y)
-xchar x, y;
+okdoor(xchar x, xchar y)
 {
     boolean near_door = bydoor(x, y);
 
@@ -1313,9 +1304,7 @@ xchar x, y;
 }
 
 void
-dodoor(x, y, aroom)
-int x, y;
-struct mkroom *aroom;
+dodoor(int x, int y, struct mkroom *aroom)
 {
     if (g.doorindex >= DOORMAX) {
         impossible("DOORMAX exceeded?");
@@ -1326,8 +1315,7 @@ struct mkroom *aroom;
 }
 
 boolean
-occupied(x, y)
-register xchar x, y;
+occupied(register xchar x, register xchar y)
 {
     return (boolean) (t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
                       || is_lava(x, y) || is_pool(x, y)
@@ -1337,10 +1325,7 @@ register xchar x, y;
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
 /* if tm != null, make trap at that location */
 void
-mktrap(num, mazeflag, croom, tm)
-int num, mazeflag;
-struct mkroom *croom;
-coord *tm;
+mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
 {
     register int kind;
     struct trap *t;
@@ -1600,10 +1585,9 @@ coord *tm;
 }
 
 void
-mkstairs(x, y, up, croom)
-xchar x, y;
-char up;	/* [why 'char' when usage is boolean?] */
-struct mkroom *croom UNUSED;
+mkstairs(xchar x, xchar y,
+         char up,	/* [why 'char' when usage is boolean?] */
+         struct mkroom *croom UNUSED)
 {
     d_level dest;
 
@@ -1637,9 +1621,7 @@ struct mkroom *croom UNUSED;
     -1 == allow an unjoined room
 */
 static boolean
-generate_stairs_room_good(croom, phase)
-struct mkroom *croom;
-int phase;
+generate_stairs_room_good(struct mkroom *croom, int phase)
 {
     return (croom && (croom->needjoining || (phase < 0))
             && ((!has_dnstairs(croom) && !has_upstairs(croom))
@@ -1650,7 +1632,7 @@ int phase;
 
 /* find a good room to generate an up or down stairs in */
 static struct mkroom *
-generate_stairs_find_room()
+generate_stairs_find_room(void)
 {
     struct mkroom *croom;
     int i, phase, tryct = 0;
@@ -1681,7 +1663,7 @@ generate_stairs_find_room()
 /* construct stairs up and down within the same branch,
    up and down in different rooms if possible */
 static void
-generate_stairs()
+generate_stairs(void)
 {
     struct mkroom *croom = generate_stairs_find_room();
     coord pos;
@@ -1707,9 +1689,7 @@ generate_stairs()
 }
 
 static void
-mkfount(mazeflag, croom)
-int mazeflag;
-struct mkroom *croom;
+mkfount(int mazeflag, struct mkroom *croom)
 {
     coord m;
     register int tryct = 0;
@@ -1733,9 +1713,7 @@ struct mkroom *croom;
 }
 
 static boolean
-find_okay_roompos(croom, crd)
-struct mkroom *croom;
-coord *crd;
+find_okay_roompos(struct mkroom *croom, coord *crd)
 {
     int tryct = 0;
 
@@ -1749,8 +1727,7 @@ coord *crd;
 }
 
 static void
-mksink(croom)
-struct mkroom *croom;
+mksink(struct mkroom *croom)
 {
     coord m;
 
@@ -1764,8 +1741,7 @@ struct mkroom *croom;
 }
 
 static void
-mkaltar(croom)
-struct mkroom *croom;
+mkaltar(struct mkroom *croom)
 {
     coord m;
     aligntyp al;
@@ -1785,8 +1761,7 @@ struct mkroom *croom;
 }
 
 static void
-mkgrave(croom)
-struct mkroom *croom;
+mkgrave(struct mkroom *croom)
 {
     coord m;
     register int tryct = 0;
@@ -1847,7 +1822,7 @@ struct mkroom *croom;
  * attempted while blind (in order to make blind-from-birth conduct viable).]
  */
 void
-mkinvokearea()
+mkinvokearea(void)
 {
     int dist;
     xchar xmin = g.inv_pos.x, xmax = g.inv_pos.x,
@@ -1906,9 +1881,7 @@ mkinvokearea()
  * Temporarily overrides vision in the name of a nice effect.
  */
 static void
-mkinvpos(x, y, dist)
-xchar x, y;
-int dist;
+mkinvpos(xchar x, xchar y, int dist)
 {
     struct trap *ttmp;
     struct obj *otmp;
@@ -2003,8 +1976,7 @@ int dist;
  * Ludios will remain isolated until the branch is corrected by this function.
  */
 static void
-mk_knox_portal(x, y)
-xchar x, y;
+mk_knox_portal(xchar x, xchar y)
 {
     d_level *source;
     branch *br;

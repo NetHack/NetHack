@@ -37,6 +37,7 @@ extern "C" {
 #include "qt_post.h"
 #include "qt_menu.h"
 #include "qt_menu.moc"
+#include "qt_key.h" // for keyValue()
 #include "qt_glyph.h"
 #include "qt_set.h"
 #include "qt_streq.h"
@@ -54,24 +55,6 @@ namespace nethack_qt_ {
 // temporary
 void centerOnMain( QWidget* w );
 // end temporary
-
-static uchar keyValue(QKeyEvent *key_event)
-{
-    // key_event manipulation derived from NetHackQtBind::notify()
-    const int k = key_event->key();
-    Qt::KeyboardModifiers mod = key_event->modifiers();
-    QChar ch = !key_event->text().isEmpty() ? key_event->text().at(0) : 0;
-    if (ch >= 128)
-        ch = 0;
-    // on OSX, ascii control codes are not sent, force them
-    if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
-        if (k >= Qt::Key_A && k <= Qt::Key_Underscore)
-            ch = QChar((k - (Qt::Key_A - 1)));
-    }
-    uchar result = (uchar) ch.cell();
-    //raw_printf("kV: k=%d, ch=%d", k, result);
-    return result;
-}
 
 QSize NetHackQtTextListBox::sizeHint() const
 {
@@ -999,6 +982,8 @@ NetHackQtTextWindow::NetHackQtTextWindow(QWidget *parent) :
     // we don't want keystrokes being sent to the main window for use as
     // commands while this text window is popped up
     setFocusPolicy(Qt::StrongFocus);
+    // needed so that keystrokes get sent to our keyPressEvent()
+    lines->setFocusPolicy(Qt::NoFocus);
 }
 
 void NetHackQtTextWindow::doUpdate()
@@ -1183,15 +1168,18 @@ void NetHackQtTextWindow::Search()
     //  Force text window to be on top.  Without this, it moves behind
     //  the map after the string requestor completes.  Then it can't
     //  be seen or accessed (unless the game window is minimized or
-    //  possibly dragged out of the way).  Unfortunately the window
-    //  noticeably vanishes and then immediately gets redrawn.
-    if (!this->isActiveWindow())
+    //  dragged out of the way).  Unfortunately the window noticeably
+    //  vanishes and then immediately gets redrawn.
+    if (!this->isActiveWindow()) {
         this->activateWindow();
-    this->raise();
+        this->raise();
+    }
 
-    if (get_a_line) {
+    if (get_a_line && target[0]) {
         int linecount = lines->count();
         int current = lines->currentRow();
+        if (current == -1)
+            current = 0;
         // when no row is highlighted (selected), start the search
         // on the current row, otherwise start on the row after it
         // [normally means that the very first row is a candidate
@@ -1224,22 +1212,19 @@ void NetHackQtTextWindow::keyPressEvent(QKeyEvent *key_event)
 {
     uchar key = keyValue(key_event);
 
-    //
-    // FIXME:
-    //  Typing ':' doesn't produce ':' so key won't match MENU_SEARCH,
-    //  despite the fact that it does produce ':' for menu input and
-    //  we're calling the exact same code for both types of window...?
-    //
     if (key == MENU_SEARCH) {
         if (!use_rip)
             Search();
-    } else if (key == '\n' || key == '\r') {
+    } else if (key == '\n' || key == '\r' || key == ' ') {
         if (!textsearching)
             accept();
+        else
+            textsearching = FALSE;
     } else if (key == '\033') {
         reject();
     } else {
-        QDialog::keyPressEvent(key_event);
+        // ignore the current key instead of passing it along
+        //- QDialog::keyPressEvent(key_event);
     }
 }
 

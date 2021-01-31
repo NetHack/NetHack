@@ -25,7 +25,7 @@ typedef struct {
 
 Win10 gWin10 = { 0 };
 
-void win10_init()
+void win10_init(void)
 {
     if (IsWindows10OrGreater())
     {
@@ -107,7 +107,7 @@ void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo)
 }
 
 BOOL
-win10_is_desktop_bridge_application()
+win10_is_desktop_bridge_application(void)
 {
     if (gWin10.Valid) {
         UINT32 length = 0;

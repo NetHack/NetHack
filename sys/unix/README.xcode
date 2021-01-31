@@ -5,9 +5,9 @@ Establish a developer team in XCode
 ===================================
 
 Your first step should be to establish a developer team within XCode.
-Launch XCode and open the preferences diaglog (XCode Menu->Preferences).
+Launch XCode and open the preferences dialog (XCode Menu->Preferences).
 Select the "Accounts" tab.  Add an account (usually this should just be
-your apple ID accoung you used to setup the Mac).  After adding the account,
+your apple ID account you used to setup the Mac).  After adding the account,
 select the account and then add a team (usually this will be just a
 personal team for Mac Development).
 

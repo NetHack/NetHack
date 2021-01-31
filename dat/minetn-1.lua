@@ -75,7 +75,7 @@ local place = { {05,04},{09,05},{13,04},{26,04},{31,05},{30,14},{05,14},{10,13},
 shuffle(place);
 
 -- scatter some bodies
-des.object({ id = "corpse", x=20,y=12, montype="aligned priest" })
+des.object({ id = "corpse", x=20,y=12, montype="aligned cleric" })
 des.object({ id = "corpse", coord = place[1], montype="shopkeeper" })
 des.object({ id = "corpse", coord = place[2], montype="shopkeeper" })
 des.object({ id = "corpse", coord = place[3], montype="shopkeeper" })

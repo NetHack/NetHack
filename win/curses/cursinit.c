@@ -108,7 +108,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
 
 /* Create the "main" nonvolatile windows used by nethack */
 void
-curses_create_main_windows()
+curses_create_main_windows(void)
 {
     int min_message_height = 1;
     int message_orientation = 0;
@@ -298,7 +298,7 @@ curses_create_main_windows()
 
 /* Initialize curses colors to colors used by NetHack */
 void
-curses_init_nhcolors()
+curses_init_nhcolors(void)
 {
 #ifdef TEXTCOLOR
     if (has_colors()) {
@@ -411,7 +411,7 @@ curses_init_nhcolors()
 /* Allow player to pick character's role, race, gender, and alignment.
    Borrowed from the Gnome window port. */
 void
-curses_choose_character()
+curses_choose_character(void)
 {
     int n, i, sel, count_off, pick4u;
     int count = 0;
@@ -451,7 +451,7 @@ curses_choose_character()
     }
 
     prompt[count_off] = '\0';
-    sprintf(choice, "%s%c", tmpchoice, '\033');
+    Snprintf(choice, sizeof(choice), "%s%c", tmpchoice, '\033');
     if (strchr(tmpchoice, 't')) {       /* Tutorial mode */
         mvaddstr(0, 1, "New? Press t to enter a tutorial.");
     }
@@ -742,20 +742,20 @@ curses_character_dialog(const char **choices, const char *prompt)
         }
 
         identifier.a_int = (count + 1); /* Must be non-zero */
-        curses_add_menu(wid, NO_GLYPH, &identifier, curletter, 0,
+        curses_add_menu(wid, &nul_glyphinfo, &identifier, curletter, 0,
                         A_NORMAL, choices[count], MENU_ITEMFLAGS_NONE);
         used_letters[count] = curletter;
     }
 
     /* Random Selection */
     identifier.a_int = ROLE_RANDOM;
-    curses_add_menu(wid, NO_GLYPH, &identifier, '*', 0, A_NORMAL, "Random",
-                    MENU_ITEMFLAGS_NONE);
+    curses_add_menu(wid, &nul_glyphinfo, &identifier, '*', 0,
+                    A_NORMAL, "Random", MENU_ITEMFLAGS_NONE);
 
     /* Quit prompt */
     identifier.a_int = ROLE_NONE;
-    curses_add_menu(wid, NO_GLYPH, &identifier, 'q', 0, A_NORMAL, "Quit",
-                    MENU_ITEMFLAGS_NONE);
+    curses_add_menu(wid, &nul_glyphinfo, &identifier, 'q', 0,
+                    A_NORMAL, "Quit", MENU_ITEMFLAGS_NONE);
     curses_end_menu(wid, prompt);
     ret = curses_select_menu(wid, PICK_ONE, &selected);
     if (ret == 1) {
@@ -775,7 +775,7 @@ curses_character_dialog(const char **choices, const char *prompt)
 
 /* Initialize and display options appropriately */
 void
-curses_init_options()
+curses_init_options(void)
 {
     /* change these from set_gameview to set_in_game */
     set_wc_option_mod_status(WC_ALIGN_MESSAGE | WC_ALIGN_STATUS, set_in_game);
@@ -846,7 +846,7 @@ curses_init_options()
 
 /* Display an ASCII splash screen if the splash_screen option is set */
 void
-curses_display_splash_window()
+curses_display_splash_window(void)
 {
      int i, x_start, y_start;
 
@@ -880,7 +880,7 @@ curses_display_splash_window()
 
 /* Restore colors and cursor state before exiting */
 void
-curses_cleanup()
+curses_cleanup(void)
 {
 #ifdef TEXTCOLOR
     if (has_colors() && can_change_color()) {

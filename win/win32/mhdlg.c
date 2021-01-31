@@ -134,7 +134,7 @@ GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_COMMAND: {
-        TCHAR wbuf[BUFSZ];
+        TCHAR wbuf2[BUFSZ];
 
         switch (LOWORD(wParam)) {
         /* OK button was pressed */
@@ -142,8 +142,8 @@ GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             data =
                 (struct getlin_data *) GetWindowLongPtr(hWnd, GWLP_USERDATA);
             SendDlgItemMessage(hWnd, IDC_GETLIN_EDIT, WM_GETTEXT,
-                               (WPARAM) sizeof(wbuf), (LPARAM) wbuf);
-            NH_W2A(wbuf, data->result, data->result_size);
+                               (WPARAM) sizeof(wbuf2), (LPARAM) wbuf2);
+            NH_W2A(wbuf2, data->result, data->result_size);
 
         /* Fall through. */
 
@@ -345,7 +345,7 @@ static boolean plselRandomize(plsel_data_t * data);
 static BOOL plselDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 boolean
-mswin_player_selection_window()
+mswin_player_selection_window(void)
 {
     INT_PTR ret;
     plsel_data_t data;
@@ -870,11 +870,16 @@ plselAdjustSelections(HWND hWnd)
 int
 plselFinalSelection(HWND hWnd)
 {
-    int role = flags.initrole;
-    int race = flags.initrace;
-    int gender = flags.initgend;
-    int alignment = flags.initalign;
+    int role, race, gender, alignment;
 
+    nhUse(role);
+    nhUse(race);
+    nhUse(gender);
+    nhUse(alignment);
+    role = flags.initrole;
+    race = flags.initrace;
+    gender = flags.initgend;
+    alignment = flags.initalign;
     assert(role != ROLE_RANDOM && role != ROLE_NONE);
     assert(race != ROLE_RANDOM && race != ROLE_NONE);
     assert(gender != ROLE_RANDOM && gender != ROLE_NONE);
@@ -889,6 +894,7 @@ plselFinalSelection(HWND hWnd)
 
 static boolean plselRandomize(plsel_data_t * data)
 {
+    int role, race, gender, alignment;
     boolean fully_specified = TRUE;
 
     // restore back to configuration settings
@@ -914,10 +920,10 @@ static boolean plselRandomize(plsel_data_t * data)
 
     rigid_role_checks();
 
-    int role = flags.initrole;
-    int race = flags.initrace;
-    int gender = flags.initgend;
-    int alignment = flags.initalign;
+    role = flags.initrole;
+    race = flags.initrace;
+    gender = flags.initgend;
+    alignment = flags.initalign;
 
     assert(role != ROLE_RANDOM && role != ROLE_NONE);
     assert(race != ROLE_RANDOM && race != ROLE_NONE);

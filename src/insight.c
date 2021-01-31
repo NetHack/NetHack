@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1596334662 2020/08/02 02:17:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1608115734 2020/12/16 10:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,26 +14,25 @@
 
 #include "hack.h"
 
-static void FDECL(enlght_out, (const char *));
-static void FDECL(enlght_line, (const char *, const char *, const char *,
-                                const char *));
-static char *FDECL(enlght_combatinc, (const char *, int, int, char *));
-static void FDECL(enlght_halfdmg, (int, int));
-static boolean NDECL(walking_on_water);
-static boolean FDECL(cause_known, (int));
-static char *FDECL(attrval, (int, int, char *));
-static void FDECL(background_enlightenment, (int, int));
-static void FDECL(basics_enlightenment, (int, int));
-static void FDECL(characteristics_enlightenment, (int, int));
-static void FDECL(one_characteristic, (int, int, int));
-static void FDECL(status_enlightenment, (int, int));
-static void FDECL(weapon_insight, (int));
-static void FDECL(attributes_enlightenment, (int, int));
-static void FDECL(show_achievements, (int));
-static int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
-                                           const genericptr));
-static int NDECL(set_vanq_order);
-static int NDECL(num_extinct);
+static void enlght_out(const char *);
+static void enlght_line(const char *, const char *, const char *,
+                        const char *);
+static char *enlght_combatinc(const char *, int, int, char *);
+static void enlght_halfdmg(int, int);
+static boolean walking_on_water(void);
+static boolean cause_known(int);
+static char *attrval(int, int, char *);
+static void background_enlightenment(int, int);
+static void basics_enlightenment(int, int);
+static void characteristics_enlightenment(int, int);
+static void one_characteristic(int, int, int);
+static void status_enlightenment(int, int);
+static void weapon_insight(int);
+static void attributes_enlightenment(int, int);
+static void show_achievements(int);
+static int CFDECLSPEC vanqsort_cmp(const genericptr, const genericptr);
+static int set_vanq_order(void);
+static int num_extinct(void);
 
 extern const char *hu_stat[];  /* hunger status from eat.c */
 extern const char *enc_stat[]; /* encumbrance status from botl.c */
@@ -56,22 +55,21 @@ static const char have_been[] = "have been ", have_never[] = "have never ",
     enl_msg(You_, have, (const char *) "", something, "")
 
 static void
-enlght_out(buf)
-const char *buf;
+enlght_out(const char *buf)
 {
     if (g.en_via_menu) {
         anything any;
 
         any = cg.zeroany;
-        add_menu(g.en_win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
+        add_menu(g.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
                  MENU_ITEMFLAGS_NONE);
     } else
         putstr(g.en_win, 0, buf);
 }
 
 static void
-enlght_line(start, middle, end, ps)
-const char *start, *middle, *end, *ps;
+enlght_line(const char *start, const char *middle, const char *end,
+            const char *ps)
 {
     char buf[BUFSZ];
 
@@ -81,10 +79,7 @@ const char *start, *middle, *end, *ps;
 
 /* format increased chance to hit or damage or defense (Protection) */
 static char *
-enlght_combatinc(inctyp, incamt, final, outbuf)
-const char *inctyp;
-int incamt, final;
-char *outbuf;
+enlght_combatinc(const char *inctyp, int incamt, int final, char *outbuf)
 {
     const char *modif, *bonus;
     boolean invrt;
@@ -121,9 +116,7 @@ char *outbuf;
 
 /* report half physical or half spell damage */
 static void
-enlght_halfdmg(category, final)
-int category;
-int final;
+enlght_halfdmg(int category, int final)
 {
     const char *category_name;
     char buf[BUFSZ];
@@ -146,7 +139,7 @@ int final;
 
 /* is hero actively using water walking capability on water (or lava)? */
 static boolean
-walking_on_water()
+walking_on_water(void)
 {
     if (u.uinwater || Levitation || Flying)
         return FALSE;
@@ -156,10 +149,7 @@ walking_on_water()
 
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
 char *
-trap_predicament(outbuf, final, wizxtra)
-char *outbuf;
-int final;
-boolean wizxtra;
+trap_predicament(char *outbuf, int final, boolean wizxtra)
 {
     struct trap *t;
 
@@ -193,8 +183,7 @@ boolean wizxtra;
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
 static boolean
-cause_known(propindx)
-int propindx; /* index of a property which can be conveyed by worn item */
+cause_known(int propindx) /* index of a property which can be conveyed by worn item */
 {
     register struct obj *o;
     long mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
@@ -213,9 +202,8 @@ int propindx; /* index of a property which can be conveyed by worn item */
 
 /* format a characteristic value, accommodating Strength's strangeness */
 static char *
-attrval(attrindx, attrvalue, resultbuf)
-int attrindx, attrvalue;
-char resultbuf[]; /* should be at least [7] to hold "18/100\0" */
+attrval(int attrindx, int attrvalue,
+        char resultbuf[]) /* should be at least [7] to hold "18/100\0" */
 {
     if (attrindx != A_STR || attrvalue <= 18)
         Sprintf(resultbuf, "%d", attrvalue);
@@ -227,9 +215,9 @@ char resultbuf[]; /* should be at least [7] to hold "18/100\0" */
 }
 
 void
-enlightenment(mode, final)
-int mode;  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
-int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
+enlightenment(int mode,  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
+              int final) /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE,
+                            ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
@@ -242,8 +230,8 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-    Sprintf(buf, "%s the %s's attributes:", tmpbuf,
-            ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
+    Snprintf(buf, sizeof(buf), "%s the %s's attributes:", tmpbuf,
+             ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
                 ? g.urole.name.f
                 : g.urole.name.m);
 
@@ -259,9 +247,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
         characteristics_enlightenment(mode, final);
     }
     /* expanded status line information, including things which aren't
-       included there due to space considerations--such as obvious
-       alternative movement indicators (riding, levitation, &c), and
-       various troubles (turning to stone, trapped, confusion, &c);
+       included there due to space considerations;
        shown for both basic and magic enlightenment */
     status_enlightenment(mode, final);
     /* remaining attributes; shown for potion,&c or wizard mode and
@@ -269,6 +255,25 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     if (mode & MAGICENLIGHTENMENT) {
         /* intrinsics and other traditional enlightenment feedback */
         attributes_enlightenment(mode, final);
+    }
+    /* reminder to player and/or information for dumplog */
+    if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover || final)) {
+        enlght_out(""); /* separator */
+        enlght_out("Miscellaneous:");
+        if (wizard || discover) {
+            Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
+            you_are(buf, "");
+        }
+
+        if (!flags.bones) {
+            you_have_X("disabled loading of bones levels");
+        } else if (!u.uroleplay.numbones) {
+            you_have_never("encountered a bones level");
+        } else {
+            Sprintf(buf, "encountered %ld bones level%s",
+                    u.uroleplay.numbones, plur(u.uroleplay.numbones));
+            you_have_X(buf);
+        }
     }
 
     if (!g.en_via_menu) {
@@ -288,9 +293,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 /*ARGSUSED*/
 /* display role, race, alignment and such to en_win */
 static void
-background_enlightenment(unused_mode, final)
-int unused_mode UNUSED;
-int final;
+background_enlightenment(int unused_mode UNUSED, int final)
 {
     const char *role_titl, *rank_titl;
     int innategend, difgend, difalgn;
@@ -322,10 +325,13 @@ int final;
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon))
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
         if (altphrasing)
-            Sprintf(eos(tmpbuf), "%s in ", mons[g.youmonst.cham].mname);
-        Sprintf(buf, "%s%s%s%s form", !final ? "currently " : "",
-                altphrasing ? just_an(anbuf, tmpbuf) : "in ",
-                tmpbuf, uasmon->mname);
+            Sprintf(eos(tmpbuf), "%s in ",
+                    pmname(&mons[g.youmonst.cham],
+                           flags.female ? FEMALE : MALE));
+        Snprintf(buf, sizeof(buf), "%s%s%s%s form",
+                 !final ? "currently " : "",
+                 altphrasing ? just_an(anbuf, tmpbuf) : "in ",
+                 tmpbuf, pmname(uasmon, flags.female ? FEMALE : MALE));
         you_are(buf, "");
     }
 
@@ -420,8 +426,8 @@ int final;
         int egdepth = observable_depth(&u.uz);
 
         (void) endgamelevelname(tmpbuf, egdepth);
-        Sprintf(buf, "in the endgame, on the %s%s",
-                !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
+        Snprintf(buf, sizeof(buf), "in the endgame, on the %s%s",
+                 !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
         Sprintf(buf, "on the %s level", g.dungeons[u.uz.dnum].dname);
@@ -441,7 +447,7 @@ int final;
             Strcat(tmpbuf, ", a primitive area");
         else if (Is_bigroom(&u.uz) && !Blind)
             Strcat(tmpbuf, ", a very big room");
-        Sprintf(buf, "in %s, on %s", dgnbuf, tmpbuf);
+        Snprintf(buf, sizeof(buf), "in %s, on %s", dgnbuf, tmpbuf);
     }
     you_are(buf, "");
 
@@ -539,9 +545,7 @@ int final;
    doesn't fit very well in other categories */
 /*ARGSUSED*/
 static void
-basics_enlightenment(mode, final)
-int mode UNUSED;
-int final;
+basics_enlightenment(int mode UNUSED, int final)
 {
     static char Power[] = "energy points (spell power)";
     char buf[BUFSZ];
@@ -585,7 +589,11 @@ int final;
         you_have(buf, "");
     }
 
+    find_ac(); /* enforces AC_MAX cap */
     Sprintf(buf, "%d", u.uac);
+    if (abs(u.uac) == AC_MAX)
+        Sprintf(eos(buf), ", the %s possible",
+                (u.uac < 0) ? "best" : "worst");
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
     /* gold; similar to doprgold(#seegold) but without shop billing info;
@@ -620,9 +628,7 @@ int final;
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
 static void
-characteristics_enlightenment(mode, final)
-int mode;
-int final;
+characteristics_enlightenment(int mode, int final)
 {
     char buf[BUFSZ];
 
@@ -641,8 +647,7 @@ int final;
 
 /* display one attribute value for characteristics_enlightenment() */
 static void
-one_characteristic(mode, final, attrindx)
-int mode, final, attrindx;
+one_characteristic(int mode, int final, int attrindx)
 {
     extern const char *const attrname[]; /* attrib.c */
     boolean hide_innate_value = FALSE, interesting_alimit;
@@ -736,9 +741,7 @@ int mode, final, attrindx;
 
 /* status: selected obvious capabilities, assorted troubles */
 static void
-status_enlightenment(mode, final)
-int mode;
-int final;
+status_enlightenment(int mode, int final)
 {
     boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
     int cap;
@@ -1049,8 +1052,7 @@ int final;
 
 /* extracted from status_enlightenment() to reduce clutter there */
 static void
-weapon_insight(final)
-int final;
+weapon_insight(int final)
 {
     char buf[BUFSZ];
     int wtype;
@@ -1205,7 +1207,7 @@ int final;
                     Strcat(buf, " and two weapons");
                     if (also3) {
                         Strcpy(pfx, "You also ");
-                        Sprintf(sfx, " %s", buf), buf[0] = '\0';
+                        Snprintf(sfx, sizeof(sfx), " %s", buf), buf[0] = '\0';
                         verb_present = hav2 ? "have" : "are";
                         verb_past = hav2 ? "had" : "were";
                     }
@@ -1255,9 +1257,7 @@ int final;
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
 static void
-attributes_enlightenment(unused_mode, final)
-int unused_mode UNUSED;
-int final;
+attributes_enlightenment(int unused_mode UNUSED, int final)
 {
     static NEARDATA const char if_surroundings_permitted[] =
         " if surroundings permitted";
@@ -1358,7 +1358,7 @@ int final;
     }
     if (Warn_of_mon && g.context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-                makeplural(mons[g.context.warntype.speciesidx].mname));
+             makeplural(mons[g.context.warntype.speciesidx].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -1370,8 +1370,8 @@ int final;
     else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
         Strcpy(buf, from_what(-CLAIRVOYANT));
         if (!strncmp(buf, " because of ", 12))
-            /* overwrite substring; strncpy doesn't add terminator */
-            (void) strncpy(buf, " if not for ", 12);
+            /* overwrite substring */
+            memcpy(buf, " if not for ", 12);
         enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
     }
     if (Infravision)
@@ -1565,10 +1565,14 @@ int final;
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
         if (!vampshifted(&g.youmonst))
-            Sprintf(buf, "polymorphed into %s", an(g.youmonst.data->mname));
+            Sprintf(buf, "polymorphed into %s",
+                    an(pmname(g.youmonst.data,
+                              flags.female ? FEMALE : MALE)));
         else
             Sprintf(buf, "polymorphed into %s in %s form",
-                    an(mons[g.youmonst.cham].mname), g.youmonst.data->mname);
+                    an(pmname(&mons[g.youmonst.cham],
+                              flags.female ? FEMALE : MALE)),
+                    pmname(g.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
@@ -1577,7 +1581,8 @@ int final;
         you_can("lay eggs", "");
     if (u.ulycn >= LOW_PM) {
         /* "you are a werecreature [in beast form]" */
-        Strcpy(buf, an(mons[u.ulycn].mname));
+        Strcpy(buf, an(pmname(&mons[u.ulycn],
+               flags.female ? FEMALE : MALE)));
         if (u.umonnum == u.ulycn) {
             Strcat(buf, " in beast form");
             if (wizard)
@@ -1713,7 +1718,7 @@ int final;
 
 /* ^X command */
 int
-doattributes(VOID_ARGS)
+doattributes(void)
 {
     int mode = BASICENLIGHTENMENT;
 
@@ -1726,9 +1731,8 @@ doattributes(VOID_ARGS)
 }
 
 void
-youhiding(via_enlghtmt, msgflag)
-boolean via_enlghtmt; /* englightment line vs topl message */
-int msgflag;          /* for variant message phrasing */
+youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
+          int msgflag)          /* for variant message phrasing */
 {
     char *bp, buf[BUFSZ];
 
@@ -1786,7 +1790,7 @@ int msgflag;          /* for variant message phrasing */
 
 /* #conduct command [KMH]; shares enlightenment's tense handling */
 int
-doconduct(VOID_ARGS)
+doconduct(void)
 {
     show_conduct(0);
     return 0;
@@ -1794,8 +1798,7 @@ doconduct(VOID_ARGS)
 
 /* display conducts; for doconduct(), also disclose() and dump_everything() */
 void
-show_conduct(final)
-int final;
+show_conduct(int final)
 {
     char buf[BUFSZ];
     int ngenocided;
@@ -1935,8 +1938,7 @@ int final;
  */
 
 static void
-show_achievements(final)
-int final; /* used "behind the curtain" by enl_foo() macros */
+show_achievements(int final) /* used "behind the curtain" by enl_foo() macros */
 {
     int i, achidx, absidx, acnt;
     char title[QBUFSZ], buf[QBUFSZ];
@@ -2095,8 +2097,7 @@ int final; /* used "behind the curtain" by enl_foo() macros */
 
 /* record an achievement (add at end of list unless already present) */
 void
-record_achievement(achidx)
-schar achidx;
+record_achievement(schar achidx)
 {
     int i, absidx;
 
@@ -2123,8 +2124,7 @@ schar achidx;
 
 /* discard a recorded achievement; return True if removed, False otherwise */
 boolean
-remove_achievement(achidx)
-schar achidx;
+remove_achievement(schar achidx)
 {
     int i;
 
@@ -2142,7 +2142,7 @@ schar achidx;
 
 /* used to decide whether there are any achievements to display */
 int
-count_achievements()
+count_achievements(void)
 {
     int i, acnt = 0;
 
@@ -2154,8 +2154,7 @@ count_achievements()
 /* convert a rank index to an achievement number; encode it when female
    in order to subsequently report gender-specific ranks accurately */
 schar
-achieve_rank(rank)
-int rank; /* 1..8 */
+achieve_rank(int rank) /* 1..8 */
 {
     schar achidx = (schar) ((rank - 1) + ACH_RNK1);
 
@@ -2166,7 +2165,7 @@ int rank; /* 1..8 */
 
 /* return True if sokoban branch has been entered, False otherwise */
 boolean
-sokoban_in_play()
+sokoban_in_play(void)
 {
     int achidx;
 
@@ -2195,9 +2194,7 @@ static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
 };
 
 static int CFDECLSPEC
-vanqsort_cmp(vptr1, vptr2)
-const genericptr vptr1;
-const genericptr vptr2;
+vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,
         mlev1, mlev2, mstr1, mstr2, uniq1, uniq2, died1, died2, res;
@@ -2217,15 +2214,16 @@ const genericptr vptr2;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
-        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_PRIEST);
-        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_PRIEST);
+        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_CLERIC);
+        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_CLERIC);
         if (uniq1 ^ uniq2) { /* one or other uniq, but not both */
             res = uniq2 - uniq1;
             break;
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].mname, name2 = mons[indx2].mname;
+        name1 = mons[indx1].pmnames[NEUTRAL],
+                name2 = mons[indx2].pmnames[NEUTRAL];
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -2276,7 +2274,7 @@ const genericptr vptr2;
 
 /* returns -1 if cancelled via ESC */
 static int
-set_vanq_order()
+set_vanq_order(void)
 {
     winid tmpwin;
     menu_item *selected;
@@ -2290,7 +2288,8 @@ set_vanq_order()
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;
         any.a_int = i + 1;
-        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, vanqorders[i],
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 vanqorders[i],
                  (i == g.vanq_sortmode)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -2311,7 +2310,7 @@ set_vanq_order()
 
 /* #vanquished command */
 int
-dovanquished()
+dovanquished(void)
 {
     list_vanquished('a', FALSE);
     return 0;
@@ -2319,7 +2318,7 @@ dovanquished()
 
 /* #wizborn extended command */
 int
-doborn()
+doborn(void)
 {
     static const char fmt[] = "%4i %4i %c %-30s";
     int i;
@@ -2335,7 +2334,7 @@ doborn()
                     g.mvitals[i].died, g.mvitals[i].born,
                     ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
                     ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
-                    mons[i].mname);
+                    mons[i].pmnames[NEUTRAL]);
             putstr(datawin, 0, buf);
             nborn += g.mvitals[i].born;
             ndied += g.mvitals[i].died;
@@ -2352,14 +2351,12 @@ doborn()
 
 /* high priests aren't unique but are flagged as such to simplify something */
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
-                               && mndx != PM_HIGH_PRIEST)
+                               && mndx != PM_HIGH_CLERIC)
 
 #define done_stopprint g.program_state.stopprint
 
 void
-list_vanquished(defquery, ask)
-char defquery;
-boolean ask;
+list_vanquished(char defquery, boolean ask)
 {
     register int i;
     int pfx, nkilled;
@@ -2426,7 +2423,7 @@ boolean ask;
                 if (UniqCritterIndx(i)) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
-                            mons[i].mname);
+                            mons[i].pmnames[NEUTRAL]);
                     if (nkilled > 1) {
                         switch (nkilled) {
                         case 2:
@@ -2449,10 +2446,10 @@ boolean ask;
                     /* trolls or undead might have come back,
                        but we don't keep track of that */
                     if (nkilled == 1)
-                        Strcpy(buf, an(mons[i].mname));
+                        Strcpy(buf, an(mons[i].pmnames[NEUTRAL]));
                     else
                         Sprintf(buf, "%3d %s", nkilled,
-                                makeplural(mons[i].mname));
+                                makeplural(mons[i].pmnames[NEUTRAL]));
                 }
                 /* number of leading spaces to match 3 digit prefix */
                 pfx = !strncmpi(buf, "the ", 3) ? 0
@@ -2461,7 +2458,7 @@ boolean ask;
                           : !digit(buf[2]) ? 4 : 0;
                 if (class_header)
                     ++pfx;
-                Sprintf(buftoo, "%*s%s", pfx, "", buf);
+                Snprintf(buftoo, sizeof(buftoo), "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
             /*
@@ -2489,7 +2486,7 @@ boolean ask;
 
 /* number of monster species which have been genocided */
 int
-num_genocides()
+num_genocides(void)
 {
     int i, n = 0;
 
@@ -2498,14 +2495,14 @@ num_genocides()
             ++n;
             if (UniqCritterIndx(i))
                 impossible("unique creature '%d: %s' genocided?",
-                           i, mons[i].mname);
+                           i, mons[i].pmnames[NEUTRAL]);
         }
     }
     return n;
 }
 
 static int
-num_extinct()
+num_extinct(void)
 {
     int i, n = 0;
 
@@ -2519,9 +2516,7 @@ num_extinct()
 }
 
 void
-list_genocided(defquery, ask)
-char defquery;
-boolean ask;
+list_genocided(char defquery, boolean ask)
 {
     register int i;
     int ngenocided, nextinct;
@@ -2561,7 +2556,7 @@ boolean ask;
                 if (UniqCritterIndx(i))
                     continue;
                 if (g.mvitals[i].mvflags & G_GONE) {
-                    Sprintf(buf, " %s", makeplural(mons[i].mname));
+                    Sprintf(buf, " %s", makeplural(mons[i].pmnames[NEUTRAL]));
                     /*
                      * "Extinct" is unfortunate terminology.  A species
                      * is marked extinct when its birth limit is reached,
@@ -2601,8 +2596,7 @@ boolean ask;
  */
 
 const char *
-align_str(alignment)
-aligntyp alignment;
+align_str(aligntyp alignment)
 {
     switch ((int) alignment) {
     case A_CHAOTIC:
@@ -2619,9 +2613,7 @@ aligntyp alignment;
 
 /* used for self-probing */
 char *
-piousness(showneg, suffix)
-boolean showneg;
-const char *suffix;
+piousness(boolean showneg, const char *suffix)
 {
     static char buf[32]; /* bigger than "insufficiently neutral" */
     const char *pio;
@@ -2661,8 +2653,7 @@ const char *suffix;
 
 /* stethoscope or probing applied to monster -- one-line feedback */
 void
-mstatusline(mtmp)
-struct monst *mtmp;
+mstatusline(struct monst *mtmp)
 {
     aligntyp alignment = mon_aligntyp(mtmp);
     char info[BUFSZ], monnambuf[BUFSZ];
@@ -2759,7 +2750,7 @@ struct monst *mtmp;
 
 /* stethoscope or probing applied to hero -- one-line feedback */
 void
-ustatusline()
+ustatusline(void)
 {
     char info[BUFSZ];
 

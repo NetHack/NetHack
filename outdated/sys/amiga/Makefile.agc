@@ -1185,7 +1185,7 @@ $(I)global.h:  $(I)coord.h $(I)pcconf.h $(I)amiconf.h
 $(I)hack.h:  $(I)config.h $(I)context.h $(I)trap.h $(I)decl.h $(I)dungeon.h 
 		$(I)monsym.h $(I)mkroom.h $(I)objclass.h $(I)flag.h $(I)rm.h 
 		$(I)vision.h $(I)display.h $(I)wintype.h $(I)engrave.h 
-		$(I)rect.h $(I)region.h $(I)trampoli.h $(I)sys.h
+		$(I)rect.h $(I)region.h $(I)sys.h
 	-setdate $(I)hack.h
 	-c:wait 2
 
@@ -1211,7 +1211,7 @@ $(I)dungeon.h: $(I)align.h
 	-setdate $(I)dungeon.h
 	-c:wait 2
 
-$(I)engrave.h: $(I)trampoli.h $(I)rect.h
+$(I)engrave.h: $(I)rect.h
 	-setdate $(I)engrave.h
 	-c:wait 2
 

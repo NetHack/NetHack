@@ -545,6 +545,59 @@ xx|.....|xx
 end });
    end,
 
+   -- Twin businesses
+   {
+      mindiff = 4; -- arbitrary
+      contents = function()
+         -- Due to the way room connections work in mklev.c, we must guarantee
+         -- that the "aisle" between the shops touches all four walls of the
+         -- larger room. Thus it has an extra width and height.
+         des.room({ type="themed", w=9, h=5, contents = function()
+               -- There are eight possible placements of the two shops, four of
+               -- which have the vertical aisle in the center.
+               southeast = function() return percent(50) and "south" or "east" end
+               northeast = function() return percent(50) and "north" or "east" end
+               northwest = function() return percent(50) and "north" or "west" end
+               southwest = function() return percent(50) and "south" or "west" end
+               placements = {
+                  { lx = 1, ly = 1, rx = 4, ry = 1, lwall = "south", rwall = southeast() },
+                  { lx = 1, ly = 2, rx = 4, ry = 2, lwall = "north", rwall = northeast() },
+                  { lx = 1, ly = 1, rx = 5, ry = 1, lwall = southeast(), rwall = southwest() },
+                  { lx = 1, ly = 1, rx = 5, ry = 2, lwall = southeast(), rwall = northwest() },
+                  { lx = 1, ly = 2, rx = 5, ry = 1, lwall = northeast(), rwall = southwest() },
+                  { lx = 1, ly = 2, rx = 5, ry = 2, lwall = northeast(), rwall = northwest() },
+                  { lx = 2, ly = 1, rx = 5, ry = 1, lwall = southwest(), rwall = "south" },
+                  { lx = 2, ly = 2, rx = 5, ry = 2, lwall = northwest(), rwall = "north" }
+               }
+               ltype,rtype = "weapon shop","armor shop"
+               if percent(50) then
+                  ltype,rtype = rtype,ltype
+               end
+               shopdoorstate = function()
+                  if percent(1) then
+                     return "locked"
+                  elseif percent(50) then
+                     return "closed"
+                  else
+                     return "open"
+                  end
+               end
+               p = placements[d(#placements)]
+               des.room({ type=ltype, x=p["lx"], y=p["ly"], w=3, h=3, filled=1, joined=0,
+                           contents = function()
+                     des.door({ state=shopdoorstate(), wall=p["lwall"] })
+                  end
+               });
+               des.room({ type=rtype, x=p["rx"], y=p["ry"], w=3, h=3, filled=1, joined=0,
+                           contents = function()
+                     des.door({ state=shopdoorstate(), wall=p["rwall"] })
+                  end
+               });
+            end
+         });
+      end
+   },
+
 };
 
 function is_eligible(room)

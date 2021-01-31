@@ -1,3 +1,4 @@
+
 #------------------------------------------------------------------------------
 # NetHack 3.7  multiw-1.2020 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
 
@@ -17,21 +18,6 @@
 #WANT_DEFAULT=curses
 #WANT_DEFAULT=Qt
 #WANT_DEFAULT=X11
-
-# 3. compiler detection or optional override
-CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
-ifeq "$(CCISCLANG)" ""
-CXX=g++ -std=gnu++11
-else
-CXX=clang++ -std=gnu++11
-endif
-# if you want to override the compiler detection just carried out
-# uncomment one of the following pairs as desired.
-#CC= gcc
-#CXX= g++ -std-gnu++11
-#
-#CC= clang
-#CXX=clang++ -std=gnu++11
 
 #end of multiw-1.2020
 #------------------------------------------------------------------------------

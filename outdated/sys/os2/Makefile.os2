@@ -307,28 +307,22 @@ WINCC	= $(BEG) cd $(WIN) $(SEP) $(CC) $(CFLAGS) $(OPT) $@ $(AB) $(END)
 .IF $(format) == omf
 GAMELN = $(LINK) @$(TEMP)\$(GAME).rsp
 MKDFLN = $(LINK) @$(TEMP)\makedefs.rsp
-LEVCLN = $(LINK) @$(TEMP)\lev_comp.rsp
-DGNCLN = $(LINK) @$(TEMP)\dgn_comp.rsp
 RCVRLN = $(LINK) @$(TEMP)\recover.rsp
 DLBRLN = $(LINK) @$(TEMP)\dlb.rsp
 .ELSE
 GAMELN = $(CC) $(LDFLAGS) -o $(GAMEDIR)\$(GAME).exe @$(TEMP)\$(GAME).r $(PLIBS) $(WINX11CFLAGS) $(WINX11LIB)
 MKDFLN	= $(CC) $(LDFLAGS) -o $(TEMP)\makedefs.exe $(TEMP)\$(MKDFDEF) $(SYSOBJ) $(MAKEOBJS) $(PLIBS)
-LEVCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\lev_comp.exe $(TEMP)\$(LEVCDEF) $(SYSOBJ) $(SPLEVOBJS) $(PLIBS)
-DGNCLN	= $(CC) $(LDFLAGS) -o $(TEMP)\dgn_comp.exe $(TEMP)\$(DGNCDEF) $(SYSOBJ) $(DGNCOMPOBJS) $(PLIBS)
 RCVRLN	= $(CC) $(LDFLAGS) -o $(GAMEDIR)\recover.exe $(TEMP)\$(RCVRDEF) $(SYSOBJ) $(RECOVOBJS) $(PLIBS)
  DLBRLN = $(CC) $(LDFLAGS) -o $(TEMP)\dlb.exe $(TEMP)\$(DLBDEF) $(SYSOBJ) $(DLBOBJS) $(PLIBS)
 .END
 
 #
 #	OS/2 module definition files for NetHack,
-#	makedefs, dgn_comp, lev_comp, recover, dlb.
+#	makedefs, recover, dlb.
 #
 
 GAMEDEF	= $(GAME).def
 MKDFDEF	= makedefs.def
-LEVCDEF	= lev_comp.def
-DGNCDEF	= dgn_comp.def
 RCVRDEF	= recover.def
 DLBDEF	= dlb.def
 
@@ -338,11 +332,7 @@ DLBDEF	= dlb.def
 #
 
 MKDFMD	= $(TEMP)\$(MKDFDEF)
-LEVCMD	= $(TEMP)\$(LEVCDEF)
-DGNCMD	= $(TEMP)\$(DGNCDEF)
 #MKDFMD	=
-#LEVCMD	=
-#DGNCMD	=
 
 #
 #	Optional high-quality BSD random number generation routines
@@ -405,21 +395,6 @@ WINOBJ = $(WINOBJ1) $(WINOBJ2) $(WINOBJ3) $(WINOBJ4) $(WINX11OBJ)
 default : all
 
 #
-#	If you have yacc and lex programs and make any changes, uncomment
-#	the lowermost two lines and comment out the others.  If you make
-#	changes to the .y and .l files but prefer processing the files
-#	separately elsewhere, activate the middle two lines, so your changes
-#	don't get overwritten.
-#
-
-do_yacc : yacc_cpy	# use pre-generated files
-do_lex :  lex_cpy	#	- " -
-#do_yacc : yacc_msg	# show message if changed
-#do_lex :  lex_msg	#	- " -
-#do_yacc : yacc_act	# re-process files
-#do_lex :  lex_act	#	- " -
-
-#
 #	If you have the TOUCH utility the upper line is ok.  Otherwise
 #	the lower one does the same albeit in an ugly manner.  Besides,
 #	the latter method only works for text files.
@@ -477,25 +452,6 @@ GAMEFILE = $(GAMEDIR)\$(GAME).exe
 MAKEOBJS = $(OBJ)\makedefs.o $(OBJ)\monst.o $(OBJ)\objects.o
 
 #
-#	Object files for special levels compiler.
-#
-
-SOBJ01	= $(OBJ)\lev_yacc.o $(OBJ)\lev_lex.o $(OBJ)\lev_main.o $(OBJ)\alloc.o
-SOBJ02	= $(OBJ)\monst.o $(OBJ)\objects.o $(OBJ)\panic.o $(OBJ)\decl.o
-SOBJ03	= $(OBJ)\drawing.o
-
-SPLEVOBJS = $(SOBJ01) $(SOBJ02) $(SOBJ03)
-
-#
-#	Object files for dungeon compiler.
-#
-
-DOBJ01	= $(OBJ)\dgn_yacc.o $(OBJ)\dgn_lex.o $(OBJ)\dgn_main.o
-DOBJ02	= $(OBJ)\panic.o $(OBJ)\alloc.o
-
-DGNCOMPOBJS = $(DOBJ01) $(DOBJ02)
-
-#
 #	Object files for recovery utility.
 #
 
@@ -514,35 +470,10 @@ DLBOBJS = $(OBJ)\dlb_main.o $(OBJ)\dlb.o $(OBJ)\alloc.o $(OBJ)\panic.o
 DATHELP = \
  help hh cmdhelp history opthelp wizhelp
 
-SPEC_LEVS = \
- asmodeus.lev baalz.lev    bigrm-1.lev \
- bigrm-2.lev  bigrm-3.lev  bigrm-4.lev castle.lev   fakewiz1.lev fakewiz2.lev \
- juiblex.lev  knox.lev     medusa-1.lev medusa-2.lev minend-1.lev minend-2.lev \
- minend-3.lev minefill.lev minetn-1.lev minetn-2.lev minetn-3.lev minetn-4.lev \
- minetn-5.lev minetn-6.lev minetn-7.lev oracle.lev   orcus.lev    sanctum.lev \
- tower1.lev   tower2.lev   tower3.lev valley.lev   wizard1.lev  wizard2.lev \
- wizard3.lev  astral.lev   air.lev earth.lev    fire.lev     water.lev \
- soko1-1.lev  soko1-2.lev  soko2-1.lev  soko2-2.lev  \
- soko3-1.lev  soko3-2.lev  soko4-1.lev  soko4-2.lev
-
-QUEST_LEVS = \
- Arc-goal.lev Arc-fila.lev Arc-filb.lev Arc-loca.lev Arc-strt.lev \
- Bar-goal.lev Bar-fila.lev Bar-filb.lev Bar-loca.lev Bar-strt.lev \
- Cav-goal.lev Cav-fila.lev Cav-filb.lev Cav-loca.lev Cav-strt.lev \
- Hea-goal.lev Hea-fila.lev Hea-filb.lev Hea-loca.lev Hea-strt.lev \
- Kni-goal.lev Kni-fila.lev Kni-filb.lev Kni-loca.lev Kni-strt.lev \
- Mon-goal.lev Mon-fila.lev Mon-filb.lev Mon-loca.lev Mon-strt.lev \
- Pri-goal.lev Pri-fila.lev Pri-filb.lev Pri-loca.lev Pri-strt.lev \
- Ran-goal.lev Ran-fila.lev Ran-filb.lev Ran-loca.lev Ran-strt.lev \
- Rog-goal.lev Rog-fila.lev Rog-filb.lev Rog-loca.lev Rog-strt.lev \
- Sam-goal.lev Sam-fila.lev Sam-filb.lev Sam-loca.lev Sam-strt.lev \
- Tou-goal.lev Tou-fila.lev Tou-filb.lev Tou-loca.lev Tou-strt.lev \
- Val-goal.lev Val-fila.lev Val-filb.lev Val-loca.lev Val-strt.lev \
- Wiz-goal.lev Wiz-fila.lev Wiz-filb.lev Wiz-loca.lev Wiz-strt.lev
 VARDATD = \
- data oracles options quest.dat rumors $(WINX11VARDAT)
+ data oracles options rumors $(WINX11VARDAT)
 
-DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD) \
+DATDLB = $(DATHELP) dungeon *.lua $(VARDATD) \
 	 $(do_dlb)
 
 #
@@ -607,7 +538,6 @@ VOBJ132 = $(OBJ)\mon.o
 VOBJ133 = $(OBJ)\mondata.o
 VOBJ134 = $(OBJ)\monmove.o
 VOBJ141 = $(OBJ)\monst.o
-VOBJ142 = $(OBJ)\monstr.o
 VOBJ143 = $(OBJ)\mplayer.o
 VOBJ144 = $(OBJ)\mthrowu.o
 VOBJ151 = $(OBJ)\muse.o
@@ -653,7 +583,6 @@ VOBJ243 = $(OBJ)\uhitm.o
 VOBJ244 = $(OBJ)\unix.o
 VOBJ251 = $(OBJ)\vault.o
 VOBJ252 = $(OBJ)\vision.o
-VOBJ253 = $(OBJ)\vis_tab.o
 VOBJ254 = $(OBJ)\weapon.o
 VOBJ261 = $(OBJ)\were.o
 VOBJ262 = $(OBJ)\wield.o
@@ -671,7 +600,7 @@ VOBJ01 = $(VOBJ011) $(VOBJ012) $(VOBJ013) $(VOBJ014)
 VOBJ02 = $(VOBJ021) $(VOBJ022) $(VOBJ023) $(VOBJ024)
 VOBJ03 = $(VOBJ031) $(VOBJ032) $(VOBJ033) $(VOBJ034)
 VOBJ04 = $(VOBJ041) $(VOBJ042) $(VOBJ043) $(VOBJ044)
-VOBJ05 = $(VOBJ051) $(VOBJ052) $(VOBJ053) $(VOBJ054)
+VOBJ05 = $(VOBJ051) $(VOBJ052) $(VOBJ054)
 VOBJ06 = $(VOBJ061) $(VOBJ062) $(VOBJ063) $(VOBJ064)
 VOBJ07 = $(VOBJ071) $(VOBJ072) $(VOBJ073) $(VOBJ074)
 VOBJ08 = $(VOBJ081) $(VOBJ082) $(VOBJ083) $(VOBJ084)
@@ -680,7 +609,7 @@ VOBJ10 = $(VOBJ101) $(VOBJ102) $(VOBJ103) $(VOBJ104)
 VOBJ11 = $(VOBJ111) $(VOBJ112) $(VOBJ113) $(VOBJ114) $(VOBJ115)
 VOBJ12 = $(VOBJ121) $(VOBJ122) $(VOBJ123) $(VOBJ124)
 VOBJ13 = $(VOBJ131) $(VOBJ132) $(VOBJ133) $(VOBJ134)
-VOBJ14 = $(VOBJ141) $(VOBJ142) $(VOBJ143) $(VOBJ144)
+VOBJ14 = $(VOBJ141) $(VOBJ143) $(VOBJ144)
 VOBJ15 = $(VOBJ151) $(VOBJ152) $(VOBJ153) $(VOBJ154)
 VOBJ16 = $(VOBJ161) $(VOBJ162) $(VOBJ163) $(VOBJ164)
 VOBJ17 = $(VOBJ171) $(VOBJ172) $(VOBJ173) $(VOBJ174)
@@ -726,7 +655,7 @@ HACK_H	   = $(CONFIG_H) $(INCL)\context.h $(DECL_H) $(INCL)\monsym.h $(INCL)\mkr
 #	The default target.
 #
 
-all :	makedefs dgn_comp lev_comp recover $(GAME) dat $(GUIDE)
+all :	makedefs recover $(GAME) dat $(GUIDE)
 	$(ECHO) Done.
 
 #
@@ -737,10 +666,6 @@ $(TEMP)\$(GAMEDEF) :
 	$(MAKEB) DD_NAME=$(GAME) DD_DESC=$(GAMEDES) DD_TARG=$@ do_def
 $(TEMP)\$(MKDFDEF) :
 	$(MAKEB) DD_NAME=makedefs DD_DESC="Definitions compiler" DD_TARG=$@ do_def
-$(TEMP)\$(DGNCDEF) :
-	$(MAKEB) DD_NAME=dgn_comp DD_DESC="Dungeon compiler" DD_TARG=$@ do_def
-$(TEMP)\$(LEVCDEF) :
-	$(MAKEB) DD_NAME=lev_comp DD_DESC="Level compiler" DD_TARG=$@ do_def
 $(TEMP)\$(RCVRDEF) :
 	$(MAKEB) DD_NAME=recover DD_DESC="Recovery utility" DD_TARG=$@ do_def
 $(TEMP)\$(DLBDEF) :
@@ -953,103 +878,8 @@ $(OBJ)\makedefs.o : $(UTIL)\$(CB) $(CONFIG_H) $(INCL)\permonst.h $(INCL)\objclas
 		    $(INCL)\monsym.h $(INCL)\artilist.h
 	$(UTILCC)
 
-#
-#	Targets for the special levels compiler.
-#
-
-lev_comp : $(TEMP)\lev_comp.exe
-$(TEMP)\lev_comp.exe : $(TEMP)\lev_comp.rsp
-	$(LEVCLN)
-
-$(TEMP)\lev_comp.rsp : $(SPLEVOBJS) $(TEMP)\$(LEVCDEF)
-	$(ECHO) $(SYSOBJ) $(SOBJ01) +> $@
-	$(ECHO) $(SOBJ02) +>> $@
-	$(ECHO) $(SOBJ03)>> $@
-	$(ECHO) $(TEMP)\lev_comp.exe>> $@
-	$(ECHO) nul>> $@
-	$(ECHO) $(RLIBS)>> $@
-	$(ECHO) $(LEVCMD) $(LFLAGS);>> $@
-
-$(OBJ)\lev_yacc.o : $(UTIL)\$(CB) $(HACK_H) $(INCL)\sp_lev.h
-	$(UTILCC)
-$(OBJ)\lev_lex.o  : $(UTIL)\$(CB) $(HACK_H) $(INCL)\sp_lev.h $(INCL)\lev_comp.h
-	$(UTILCC)
-$(OBJ)\lev_main.o : $(UTIL)\$(CB) $(HACK_H) $(INCL)\sp_lev.h $(INCL)\tcap.h
-	$(UTILCC)
-
-$(UTIL)\lev_yacc.c : $(UTIL)\lev_comp.y
-	$(MAKEB) YY=lev do_yacc
-
-$(UTIL)\lev_lex.c  : $(UTIL)\lev_comp.l
-	$(MAKEB) YY=lev do_lex
-
-#
-#	Targets for the dungeon compiler.
-#
-
-dgn_comp : $(TEMP)\dgn_comp.exe
-$(TEMP)\dgn_comp.exe : $(TEMP)\dgn_comp.rsp
-	$(DGNCLN)
-
-$(TEMP)\dgn_comp.rsp : $(DGNCOMPOBJS) $(TEMP)\$(DGNCDEF)
-	$(ECHO) $(SYSOBJ) $(DOBJ01) +> $@
-	$(ECHO) $(DOBJ02)>> $@
-	$(ECHO) $(TEMP)\dgn_comp.exe>> $@
-	$(ECHO) nul>> $@
-	$(ECHO) $(RLIBS)>> $@
-	$(ECHO) $(DGNCMD) $(LFLAGS);>> $@
-
-$(OBJ)\dgn_yacc.o : $(UTIL)\$(CB) $(CONFIG_H) $(INCL)\date.h $(INCL)\dgn_file.h
-	$(UTILCC)
-$(OBJ)\dgn_lex.o  : $(UTIL)\$(CB) $(CONFIG_H) $(INCL)\dgn_comp.h $(INCL)\dgn_file.h
-	$(UTILCC)
-$(OBJ)\dgn_main.o : $(UTIL)\$(CB) $(CONFIG_H)
-	$(UTILCC)
-
-$(UTIL)\dgn_yacc.c : $(UTIL)\dgn_comp.y
-	$(MAKEB) YY=dgn do_yacc
-
-$(UTIL)\dgn_lex.c  : $(UTIL)\dgn_comp.l
-	$(MAKEB) YY=dgn do_lex
-
-#
-#	For both lev_comp and dgn_comp.
-#
-
 $(OBJ)\panic.o : $(UTIL)\$(CB) $(CONFIG_H)
 	$(UTILCC)
-
-#
-#	Yacc and Lex targets.
-#
-
-yacc_cpy :
-	$(CP) $(SSYS)\$(YY)_yacc.c $(UTIL)
-	$(CP) $(SSYS)\$(YY)_comp.h $(INCL)
-	$(MAKEB) TT=$(UTIL)\$(YY)_yacc.c do_touch
-	$(MAKEB) TT=$(INCL)\$(YY)_comp.h do_touch
-
-yacc_msg :
-	$(ECHO) $(YY)_comp.y has changed. To update $(YY)_yacc.c and $(YY)_comp.h run $(YACC).
-
-yacc_act :
-	$(YACC) -d $(UTIL)\$(YY)_comp.y
-	$(CP) $(YTABC) $(UTIL)\$(YY)_yacc.c
-	$(CP) $(YTABH) $(INCL)\$(YY)_comp.h
-	$(RM) $(YTABC)
-	$(RM) $(YTABH)
-
-lex_cpy :
-	$(CP) $(SSYS)\$(YY)_lex.c $(UTIL)
-	$(MAKEB) TT=$(UTIL)\$(YY)_lex.c do_touch
-
-lex_msg :
-	$(ECHO) $(YY)_comp.l has changed. To update $(YY)_lex.c run $(LEX).
-
-lex_act :
-	$(LEX) $(UTIL)\$(YY)_comp.l
-	$(CP) $(LEXYYC) $(UTIL)\$(YY)_lex.c
-	$(RM) $(LEXYYC)
 
 #
 #	Why must this be so kludgy?
@@ -1108,39 +938,12 @@ dlb_yup : dlb
 	-$(RM) $(GAMEDIR)\history
 	-$(RM) $(GAMEDIR)\opthelp
 	-$(RM) $(GAMEDIR)\wizhelp
-	-$(RM) $(GAMEDIR)\asmodeus.lev
-	-$(RM) $(GAMEDIR)\baalz.lev
-	-$(RM) $(GAMEDIR)\bigrm-?.lev
-	-$(RM) $(GAMEDIR)\castle.lev
-	-$(RM) $(GAMEDIR)\fakewiz?.lev
-	-$(RM) $(GAMEDIR)\juiblex.lev
-	-$(RM) $(GAMEDIR)\knox.lev
-	-$(RM) $(GAMEDIR)\medusa-?.lev
-	-$(RM) $(GAMEDIR)\minend-?.lev
-	-$(RM) $(GAMEDIR)\minefill.lev
-	-$(RM) $(GAMEDIR)\minetn-?.lev
-	-$(RM) $(GAMEDIR)\oracle.lev
-	-$(RM) $(GAMEDIR)\orcus.lev
-	-$(RM) $(GAMEDIR)\sanctum.lev
-	-$(RM) $(GAMEDIR)\tower?.lev
-	-$(RM) $(GAMEDIR)\valley.lev
-	-$(RM) $(GAMEDIR)\wizard?.lev
-	-$(RM) $(GAMEDIR)\astral.lev
-	-$(RM) $(GAMEDIR)\air.lev
-	-$(RM) $(GAMEDIR)\earth.lev
-	-$(RM) $(GAMEDIR)\fire.lev
-	-$(RM) $(GAMEDIR)\water.lev
-	-$(RM) $(GAMEDIR)\???-goal.lev
-	-$(RM) $(GAMEDIR)\???-fil?.lev
-	-$(RM) $(GAMEDIR)\???-loca.lev
-	-$(RM) $(GAMEDIR)\???-strt.lev
 	-$(RM) $(GAMEDIR)\data
 	-$(RM) $(GAMEDIR)\oracles
 	-$(RM) $(GAMEDIR)\options
-	-$(RM) $(GAMEDIR)\quest.dat
 	-$(RM) $(GAMEDIR)\rumors
-	-$(RM) $(GAMEDIR)\dungeon
-	-$(RM) $(GAMEDIR)\soko?-?.lev
+#	-$(RM) $(GAMEDIR)\quest.dat
+#	-$(RM) $(GAMEDIR)\dungeon
 #	-$(RM) $(GAMEDIR)\pet_mark.xbm
 #	-$(RM) $(GAMEDIR)\rip.xpm
 
@@ -1165,12 +968,6 @@ $(INCL)\onames.h : $(TEMP)\makedefs.exe
 $(INCL)\pm.h : $(TEMP)\makedefs.exe
 	$(TEMP)\makedefs -p
 
-monstr.c : $(TEMP)\makedefs.exe
-	$(TEMP)\makedefs -m
-
-$(OBJ)\monstr.o : $(CB)
-	$(SRCCC)
-
 $(GAMEDIR)\data : $(DAT)\$(DATABASE) $(TEMP)\makedefs.exe
 	$(TEMP)\makedefs -d
 	$(CP) $(DAT)\data $(GAMEDIR)
@@ -1186,21 +983,9 @@ $(GAMEDIR)\oracles : $(DAT)\oracles.txt $(TEMP)\makedefs.exe
 	$(CP) $(DAT)\oracles $(GAMEDIR)
 	$(RM) $(DAT)\oracles
 
-$(GAMEDIR)\quest.dat : $(DAT)\quest.txt $(TEMP)\makedefs.exe
-	$(TEMP)\makedefs -q
-	$(CP) $(DAT)\quest.dat $(GAMEDIR)
-	$(RM) $(DAT)\quest.dat
-
 #
 #	Vision tables for algorithm D.
 #
-
-vis_tab.c : $(INCL)\vis_tab.h
-$(INCL)\vis_tab.h : $(TEMP)\makedefs.exe
-	$(TEMP)\makedefs -z
-
-$(OBJ)\vis_tab.o : $(CB)
-	$(SRCCC)
 
 #
 #	The following programs vary depending on what OS you are using.
@@ -1246,7 +1031,7 @@ $(OBJ)\wintty.o  : $(WIN)\$(CB) $(HACK_H) $(INCL)\tcap.h $(INCL)\date.h
 #	Secondary targets.
 #
 
-dat :	spec_lev help_fil $(GAMEDIR)\dungeon $(GAMEDIR)\data $(GAMEDIR)\rumors \
+dat :	help_fil $(GAMEDIR)\data $(GAMEDIR)\rumors \
 	$(GAMEDIR)\oracles $(GAMEDIR)\quest.dat	$(GAMEDIR)\$(GAME).ico \
 	$(GAMEDIR)\$(GAME).cmd $(GAMEDIR)\nethack.cnf $(GAMEDIR)\nhdat \
 	$(WINX11VARDAT)
@@ -1269,155 +1054,10 @@ $(GAMEDIR)\opthelp : $(DAT)\opthelp
 $(GAMEDIR)\wizhelp : $(DAT)\wizhelp
 	$(CP) $(DAT)\wizhelp $(GAMEDIR)
 
-$(GAMEDIR)\dungeon : $(DAT)\dungeon.def $(TEMP)\makedefs.exe $(TEMP)\dgn_comp.exe
-	$(TEMP)\makedefs -e
-	$(TEMP)\dgn_comp $(DAT)\dungeon.pdf
-	$(CP) $(DAT)\dungeon $(GAMEDIR)
-	$(RM) $(DAT)\dungeon.pdf
-	$(RM) $(DAT)\dungeon
-
-AFILES = $(GAMEDIR)\Arc-goal.lev
-BFILES = $(GAMEDIR)\Bar-goal.lev
-CFILES = $(GAMEDIR)\Cav-goal.lev
-HFILES = $(GAMEDIR)\Hea-goal.lev
-KFILES = $(GAMEDIR)\Kni-goal.lev
-MFILES = $(GAMEDIR)\Mon-goal.lev
-PFILES = $(GAMEDIR)\Pri-goal.lev
-RANFILES = $(GAMEDIR)\Ran-goal.lev
-RFILES = $(GAMEDIR)\Rog-goal.lev
-SFILES = $(GAMEDIR)\Sam-goal.lev
-TFILES = $(GAMEDIR)\Tou-goal.lev
-VFILES = $(GAMEDIR)\Val-goal.lev
-WFILES = $(GAMEDIR)\Wiz-goal.lev
-
-XFILES = $(AFILES) $(BFILES) $(CFILES) $(HFILES) $(KFILES) $(MFILES) \
-	 $(PFILES) $(RANFILES) $(RFILES) $(SFILES) $(TFILES) $(VFILES) $(WFILES)
-
-spec_lev : $(GAMEDIR)\astral.lev $(GAMEDIR)\bigrm-1.lev $(GAMEDIR)\castle.lev \
-	   $(GAMEDIR)\knox.lev $(GAMEDIR)\medusa-1.lev $(GAMEDIR)\minefill.lev \
-	   $(GAMEDIR)\oracle.lev $(GAMEDIR)\tower1.lev $(GAMEDIR)\valley.lev \
-	   $(GAMEDIR)\wizard1.lev $(GAMEDIR)\soko1-1.lev $(XFILES)
-
-#	Single special level files
-
-$(GAMEDIR)\castle.lev : $(DAT)\castle.des $(TEMP)\lev_comp.exe
-	$(MAKEB) LF=castle do_slev
-$(GAMEDIR)\knox.lev : $(DAT)\knox.des $(TEMP)\lev_comp.exe
-	$(MAKEB) LF=knox do_slev
-$(GAMEDIR)\oracle.lev : $(DAT)\oracle.des $(TEMP)\lev_comp.exe
-	$(MAKEB) LF=oracle do_slev
-
 do_slev :
-	$(TEMP)\lev_comp $(DAT)\$(LF).des
-	$(CP) $(LF).lev $(GAMEDIR)
-	$(RM) $(LF).lev
-
-#	Multiple special level files
-
-$(GAMEDIR)\astral.lev : $(DAT)\endgame.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\endgame.des
-	$(CP) air.lev $(GAMEDIR)
-	$(CP) astral.lev $(GAMEDIR)
-	$(CP) earth.lev $(GAMEDIR)
-	$(CP) fire.lev $(GAMEDIR)
-	$(CP) water.lev $(GAMEDIR)
-	$(RM) air.lev
-	$(RM) astral.lev
-	$(RM) earth.lev
-	$(RM) fire.lev
-	$(RM) water.lev
-
-$(GAMEDIR)\bigrm-1.lev : $(DAT)\bigroom.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\bigroom.des
-	$(CP) bigrm-?.lev $(GAMEDIR)
-	$(RM) bigrm-?.lev
-
-$(GAMEDIR)\medusa-1.lev : $(DAT)\medusa.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\medusa.des
-	$(CP) medusa-?.lev $(GAMEDIR)
-	$(RM) medusa-?.lev
-
-$(GAMEDIR)\minefill.lev : $(DAT)\mines.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\mines.des
-	$(CP) minend-?.lev $(GAMEDIR)
-	$(CP) minefill.lev $(GAMEDIR)
-	$(CP) minetn-?.lev $(GAMEDIR)
-	$(RM) minend-?.lev
-	$(RM) minefill.lev
-	$(RM) minetn-?.lev
-
-$(GAMEDIR)\tower1.lev : $(DAT)\tower.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\tower.des
-	$(CP) tower?.lev $(GAMEDIR)
-	$(RM) tower?.lev
-
-$(GAMEDIR)\valley.lev : $(DAT)\gehennom.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\gehennom.des
-	$(CP) asmodeus.lev $(GAMEDIR)
-	$(CP) baalz.lev $(GAMEDIR)
-	$(CP) juiblex.lev $(GAMEDIR)
-	$(CP) orcus.lev $(GAMEDIR)
-	$(CP) sanctum.lev $(GAMEDIR)
-	$(CP) valley.lev $(GAMEDIR)
-	$(RM) asmodeus.lev
-	$(RM) baalz.lev
-	$(RM) juiblex.lev
-	$(RM) orcus.lev
-	$(RM) sanctum.lev
-	$(RM) valley.lev
-
-$(GAMEDIR)\wizard1.lev : $(DAT)\yendor.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\yendor.des
-	$(CP) wizard?.lev $(GAMEDIR)
-	$(CP) fakewiz?.lev $(GAMEDIR)
-	$(RM) wizard?.lev
-	$(RM) fakewiz?.lev
-
-$(GAMEDIR)\soko1-1.lev : $(DAT)\sokoban.des $(TEMP)\lev_comp.exe
-	$(TEMP)\lev_comp $(DAT)\sokoban.des
-	$(CP) soko?-?.lev $(GAMEDIR)
-	$(RM) soko?-?.lev
+	$(CP) $(LF).lua $(GAMEDIR)
 
 
-#	Quest dungeons
-
-$(AFILES) : $(DAT)\Arch.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Arc QF=Arch do_quest
-$(BFILES) : $(DAT)\Barb.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Bar QF=Barb do_quest
-$(CFILES) : $(DAT)\Caveman.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Cav QF=Caveman do_quest
-$(HFILES) : $(DAT)\Healer.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Hea QF=Healer do_quest
-$(KFILES) : $(DAT)\Knight.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Kni QF=Knight do_quest
-$(MFILES) : $(DAT)\Monk.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Mon QF=Monk do_quest
-$(PFILES) : $(DAT)\Priest.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Pri QF=Priest do_quest
-$(RANFILES) : $(DAT)\Ranger.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Ran QF=Ranger do_quest
-$(RFILES) : $(DAT)\Rogue.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Rog QF=Rogue do_quest
-$(SFILES) : $(DAT)\Samurai.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Sam QF=Samurai do_quest
-$(TFILES) : $(DAT)\Tourist.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Tou QF=Tourist do_quest
-$(VFILES) : $(DAT)\Valkyrie.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Val QF=Valkyrie do_quest
-$(WFILES) : $(DAT)\Wizard.des $(TEMP)\lev_comp.exe
-	$(MAKEB) QQ=Wiz QF=Wizard do_quest
-
-do_quest :
-	$(TEMP)\lev_comp $(DAT)\$(QF).des
-	$(CP) $(QQ)-fil?.lev $(GAMEDIR)
-	$(CP) $(QQ)-goal.lev $(GAMEDIR)
-	$(CP) $(QQ)-loca.lev $(GAMEDIR)
-	$(CP) $(QQ)-strt.lev $(GAMEDIR)
-	$(RM) $(QQ)-fil?.lev
-	$(RM) $(QQ)-goal.lev
-	$(RM) $(QQ)-loca.lev
-	$(RM) $(QQ)-strt.lev
 
 #
 #	NetHack icon for Presentation Manager.
@@ -1485,14 +1125,8 @@ spotless : clean
 	-$(RM) $(INCL)\date.h
 	-$(RM) $(INCL)\onames.h
 	-$(RM) $(INCL)\pm.h
-	-$(RM) $(INCL)\vis_tab.h
-	-$(RM) vis_tab.c
-	-$(RM) monstr.c
-	-$(RM) *.lev
 	-$(RM) nethack.ico
 	-$(RM) $(TEMP)\makedefs.exe
-	-$(RM) $(TEMP)\lev_comp.exe
-	-$(RM) $(TEMP)\dgn_comp.exe
 	-$(RM) $(TEMP)\*.rsp
 	-$(RM) $(TEMP)\*.def
 	-$(RM) $(TEMP)\*.map
@@ -1701,7 +1335,7 @@ $(OBJ)\vault.o    : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\version.o  : $(SRC)\$(CB) $(HACK_H) $(INCL)\date.h $(INCL)\$(PATCHLEV).h
 	$(SRCCC)
-$(OBJ)\vision.o   : $(SRC)\$(CB) $(HACK_H) $(INCL)\vis_tab.h
+$(OBJ)\vision.o   : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)
 $(OBJ)\weapon.o   : $(SRC)\$(CB) $(HACK_H)
 	$(SRCCC)

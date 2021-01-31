@@ -9,12 +9,11 @@
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
 #define ALGN_PIOUS 14    /* better than fervent (9..13) */
 
-static boolean FDECL(histemple_at, (struct monst *, XCHAR_P, XCHAR_P));
-static boolean FDECL(has_shrine, (struct monst *));
+static boolean histemple_at(struct monst *, xchar, xchar);
+static boolean has_shrine(struct monst *);
 
 void
-newepri(mtmp)
-struct monst *mtmp;
+newepri(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -25,8 +24,7 @@ struct monst *mtmp;
 }
 
 void
-free_epri(mtmp)
-struct monst *mtmp;
+free_epri(struct monst *mtmp)
 {
     if (mtmp->mextra && EPRI(mtmp)) {
         free((genericptr_t) EPRI(mtmp));
@@ -40,12 +38,9 @@ struct monst *mtmp;
  * Valid returns are  1: moved  0: didn't  -1: let m_move do it  -2: died.
  */
 int
-move_special(mtmp, in_his_shop, appr, uondoor, avoid, omx, omy, gx, gy)
-register struct monst *mtmp;
-boolean in_his_shop;
-schar appr;
-boolean uondoor, avoid;
-register xchar omx, omy, gx, gy;
+move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
+             boolean uondoor, boolean avoid,
+             xchar omx, xchar omy, xchar gx, xchar gy)
 {
     register xchar nx, ny, nix, niy;
     register schar i;
@@ -140,8 +135,7 @@ pick_move:
 }
 
 char
-temple_occupied(array)
-register char *array;
+temple_occupied(char *array)
 {
     register char *ptr;
 
@@ -152,9 +146,7 @@ register char *array;
 }
 
 static boolean
-histemple_at(priest, x, y)
-register struct monst *priest;
-register xchar x, y;
+histemple_at(struct monst *priest, xchar x, xchar y)
 {
     return (boolean) (priest && priest->ispriest
                       && (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
@@ -162,8 +154,7 @@ register xchar x, y;
 }
 
 boolean
-inhistemple(priest)
-struct monst *priest;
+inhistemple(struct monst *priest)
 {
     /* make sure we have a priest */
     if (!priest || !priest->ispriest)
@@ -179,8 +170,7 @@ struct monst *priest;
  * pri_move: return 1: moved  0: didn't  -1: let m_move do it  -2: died
  */
 int
-pri_move(priest)
-register struct monst *priest;
+pri_move(struct monst *priest)
 {
     register xchar gx, gy, omx, omy;
     schar temple;
@@ -223,17 +213,14 @@ register struct monst *priest;
 
 /* exclusively for mktemple() */
 void
-priestini(lvl, sroom, sx, sy, sanctum)
-d_level *lvl;
-struct mkroom *sroom;
-int sx, sy;
-boolean sanctum; /* is it the seat of the high priest? */
+priestini(d_level *lvl, struct mkroom *sroom, int sx, int sy,
+          boolean sanctum) /* is it the seat of the high priest? */
 {
     struct monst *priest;
     struct obj *otmp;
     int cnt;
     int px = 0, py = 0, i, si = rn2(8);
-    struct permonst *prim = &mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST];
+    struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC];
 
     for (i = 0; i < 8; i++) {
         px = sx + xdir[(i+si) % 8];
@@ -282,8 +269,7 @@ boolean sanctum; /* is it the seat of the high priest? */
 
 /* get a monster's alignment type without caller needing EPRI & EMIN */
 aligntyp
-mon_aligntyp(mon)
-struct monst *mon;
+mon_aligntyp(struct monst *mon)
 {
     aligntyp algn = mon->ispriest ? EPRI(mon)->shralign
                                   : mon->isminion ? EMIN(mon)->min_align
@@ -305,15 +291,15 @@ struct monst *mon;
  *              the true name even when under that influence
  */
 char *
-priestname(mon, pname)
-register struct monst *mon;
-char *pname; /* caller-supplied output buffer */
+priestname(struct monst *mon,
+           char *pname) /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
-            aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
-            high_priest = mon->data == &mons[PM_HIGH_PRIEST];
+            aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
+            high_priest = mon->data == &mons[PM_HIGH_CLERIC];
     char whatcode = '\0';
-    const char *what = do_hallu ? rndmonnam(&whatcode) : mon->data->mname;
+    const char *what = do_hallu ? rndmonnam(&whatcode)
+                                : pmname(mon->data, Mgender(mon));
 
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
@@ -355,15 +341,13 @@ char *pname; /* caller-supplied output buffer */
 }
 
 boolean
-p_coaligned(priest)
-struct monst *priest;
+p_coaligned(struct monst *priest)
 {
     return (boolean) (u.ualign.type == mon_aligntyp(priest));
 }
 
 static boolean
-has_shrine(pri)
-struct monst *pri;
+has_shrine(struct monst *pri)
 {
     struct rm *lev;
     struct epri *epri_p;
@@ -379,8 +363,7 @@ struct monst *pri;
 }
 
 struct monst *
-findpriest(roomno)
-char roomno;
+findpriest(char roomno)
 {
     register struct monst *mtmp;
 
@@ -396,8 +379,7 @@ char roomno;
 
 /* called from check_special_room() when the player enters the temple room */
 void
-intemple(roomno)
-int roomno;
+intemple(int roomno)
 {
     struct monst *priest, *mtmp;
     struct epri *epri_p;
@@ -416,7 +398,7 @@ int roomno;
 
         epri_p = EPRI(priest);
         shrined = has_shrine(priest);
-        sanctum = (priest->data == &mons[PM_HIGH_PRIEST]
+        sanctum = (priest->data == &mons[PM_HIGH_CLERIC]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
         can_speak = (priest->mcanmove && !priest->msleeping);
         if (can_speak && !Deaf && g.moves >= epri_p->intone_time) {
@@ -529,8 +511,7 @@ int roomno;
 /* reset the move counters used to limit temple entry feedback;
    leaving the level and then returning yields a fresh start */
 void
-forget_temple_entry(priest)
-struct monst *priest;
+forget_temple_entry(struct monst *priest)
 {
     struct epri *epri_p = priest->ispriest ? EPRI(priest) : 0;
 
@@ -543,8 +524,7 @@ struct monst *priest;
 }
 
 void
-priest_talk(priest)
-register struct monst *priest;
+priest_talk(struct monst *priest)
 {
     boolean coaligned = p_coaligned(priest);
     boolean strayed = (u.ualign.record < 0);
@@ -658,17 +638,14 @@ register struct monst *priest;
 }
 
 struct monst *
-mk_roamer(ptr, alignment, x, y, peaceful)
-register struct permonst *ptr;
-aligntyp alignment;
-xchar x, y;
-boolean peaceful;
+mk_roamer(struct permonst *ptr, aligntyp alignment, xchar x, xchar y,
+          boolean peaceful)
 {
     register struct monst *roamer;
     register boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
-    if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
+    if (ptr != &mons[PM_ALIGNED_CLERIC] && ptr != &mons[PM_ANGEL])
         return (struct monst *) 0;
 #endif
 
@@ -692,12 +669,11 @@ boolean peaceful;
 }
 
 void
-reset_hostility(roamer)
-register struct monst *roamer;
+reset_hostility(struct monst *roamer)
 {
     if (!roamer->isminion)
         return;
-    if (roamer->data != &mons[PM_ALIGNED_PRIEST]
+    if (roamer->data != &mons[PM_ALIGNED_CLERIC]
         && roamer->data != &mons[PM_ANGEL])
         return;
 
@@ -709,9 +685,8 @@ register struct monst *roamer;
 }
 
 boolean
-in_your_sanctuary(mon, x, y)
-struct monst *mon; /* if non-null, <mx,my> overrides <x,y> */
-xchar x, y;
+in_your_sanctuary(struct monst *mon, /* if non-null, <mx,my> overrides <x,y> */
+                  xchar x, xchar y)
 {
     register char roomno;
     register struct monst *priest;
@@ -734,8 +709,7 @@ xchar x, y;
 
 /* when attacking "priest" in his temple */
 void
-ghod_hitsu(priest)
-struct monst *priest;
+ghod_hitsu(struct monst *priest)
 {
     int x, y, ax, ay, roomno = (int) temple_occupied(u.urooms);
     struct mkroom *troom;
@@ -807,7 +781,7 @@ struct monst *priest;
 }
 
 void
-angry_priest()
+angry_priest(void)
 {
     register struct monst *priest;
     struct rm *lev;
@@ -848,7 +822,7 @@ angry_priest()
  * [Perhaps we should convert them into roamers instead?]
  */
 void
-clearpriests()
+clearpriests(void)
 {
     struct monst *mtmp;
 
@@ -862,9 +836,7 @@ clearpriests()
 
 /* munge priest-specific structure when restoring -dlc */
 void
-restpriest(mtmp, ghostly)
-register struct monst *mtmp;
-boolean ghostly;
+restpriest(struct monst *mtmp, boolean ghostly)
 {
     if (u.uz.dlevel) {
         if (ghostly)

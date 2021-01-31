@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1600468452 2020/09/18 22:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1607641577 2020/12/10 23:06:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -94,6 +94,8 @@ struct sinfo {
     int something_worth_saving; /* in case of panic */
     int panicking;              /* `panic' is in progress */
     int exiting;                /* an exit handler is executing */
+    int saving;
+    int restoring;
     int in_moveloop;
     int in_impossible;
     int in_self_recover;
@@ -414,15 +416,16 @@ enum nh_keyfunc {
     NHKF_REQMENU,
 
     /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,
-    NHKF_RUN2,
-    NHKF_RUSH,
-    NHKF_FIGHT,
-    NHKF_FIGHT2,
-    NHKF_NOPICKUP,
-    NHKF_RUN_NOPICKUP,
-    NHKF_DOINV,
-    NHKF_TRAVEL,
+    NHKF_RUN,          /* 'G' */
+    NHKF_RUN2,         /* '5' or M-5 */
+    NHKF_RUSH,         /* 'g' */
+    NHKF_RUSH2,        /* M-5 or '5' */
+    NHKF_FIGHT,        /* 'F' */
+    NHKF_FIGHT2,       /* '-' */
+    NHKF_NOPICKUP,     /* 'm' */
+    NHKF_RUN_NOPICKUP, /* 'M' */
+    NHKF_DOINV,        /* '0' */
+    NHKF_TRAVEL,       /* via mouse */
     NHKF_CLICKLOOK,
 
     NHKF_REDRAW,
@@ -521,6 +524,9 @@ struct trapinfo {
 typedef struct {
     xchar gnew; /* perhaps move this bit into the rm structure. */
     int glyph;
+#ifndef UNBUFFERED_GLYPHINFO
+    glyph_info glyphinfo;
+#endif
 } gbuf_entry;
 
 enum vanq_order_modes {
@@ -622,7 +628,8 @@ struct role_filter {
 struct _create_particular_data {
     int quan;
     int which;
-    int fem;
+    int fem;        /* -1, MALE, FEMALE, NEUTRAL */
+    int genderconf;    /* conflicting gender */
     char monclass;
     boolean randmonst;
     boolean maketame, makepeaceful, makehostile;
@@ -694,19 +701,21 @@ struct instance_globals {
     coord clicklook_cc;
     winid en_win;
     boolean en_via_menu;
-    int last_multi;
+    long last_command_count;
 
     /* dbridge.c */
     struct entity occupants[ENTITIES];
 
     /* decl.c */
-    int NDECL((*occupation));
-    int NDECL((*afternmv));
+    int (*occupation)(void);
+    int (*afternmv)(void);
     const char *hname; /* name of the game (argv[0] of main) */
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
     int bases[MAXOCLASSES + 1];
     int multi;
+    char command_line[COLNO];
+    long command_count;
     const char *multi_reason;
     int nroom;
     int nsubroom;
@@ -1101,6 +1110,8 @@ struct instance_globals {
     boolean havestate;
     unsigned ustuck_id; /* need to preserve during save */
     unsigned usteed_id; /* need to preserve during save */
+    struct obj *looseball;  /* track uball during save and... */
+    struct obj *loosechain; /* track uchain since saving might free it */
 
     /* shk.c */
     /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
@@ -1203,6 +1214,8 @@ struct const_globals {
 };
 
 E const struct const_globals cg;
+
+E const glyph_info nul_glyphinfo;
 
 #undef E
 

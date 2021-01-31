@@ -54,38 +54,38 @@ struct toptenentry {
    room for separating space or trailing newline plus string terminator */
 #define SCANBUFSZ (4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
 
-static void FDECL(topten_print, (const char *));
-static void FDECL(topten_print_bold, (const char *));
-static void NDECL(outheader);
-static void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
-static void FDECL(discardexcess, (FILE *));
-static void FDECL(readentry, (FILE *, struct toptenentry *));
-static void FDECL(writeentry, (FILE *, struct toptenentry *));
+static void topten_print(const char *);
+static void topten_print_bold(const char *);
+static void outheader(void);
+static void outentry(int, struct toptenentry *, boolean);
+static void discardexcess(FILE *);
+static void readentry(FILE *, struct toptenentry *);
+static void writeentry(FILE *, struct toptenentry *);
 #ifdef XLOGFILE
-static void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
-static long NDECL(encodexlogflags);
-static long NDECL(encodeconduct);
-static long FDECL(encodeachieve, (BOOLEAN_P));
-static void FDECL(add_achieveX, (char *, const char *, BOOLEAN_P));
-static char *NDECL(encode_extended_achievements);
-static char *NDECL(encode_extended_conducts);
+static void writexlentry(FILE *, struct toptenentry *, int);
+static long encodexlogflags(void);
+static long encodeconduct(void);
+static long encodeachieve(boolean);
+static void add_achieveX(char *, const char *, boolean);
+static char *encode_extended_achievements(void);
+static char *encode_extended_conducts(void);
 #endif
-static void FDECL(free_ttlist, (struct toptenentry *));
-static int FDECL(classmon, (char *, BOOLEAN_P));
-static int FDECL(score_wanted, (BOOLEAN_P, int, struct toptenentry *, int,
-                                    const char **, int));
+static void free_ttlist(struct toptenentry *);
+static int classmon(char *, boolean);
+static int score_wanted(boolean, int, struct toptenentry *, int,
+                        const char **, int);
 #ifdef NO_SCAN_BRACK
-static void FDECL(nsb_mung_line, (char *));
-static void FDECL(nsb_unmung_line, (char *));
+static void nsb_mung_line(char *);
+static void nsb_unmung_line(char *);
 #endif
 
 /* "killed by",&c ["an"] 'g.killer.name' */
 void
-formatkiller(buf, siz, how, incl_helpless)
-char *buf;
-unsigned siz;
-int how;
-boolean incl_helpless;
+formatkiller(
+    char *buf,
+    unsigned siz,
+    int how,
+    boolean incl_helpless)
 {
     static NEARDATA const char *const killed_by_prefix[] = {
         /* DIED, CHOKING, POISONING, STARVING, */
@@ -153,8 +153,7 @@ boolean incl_helpless;
 }
 
 static void
-topten_print(x)
-const char *x;
+topten_print(const char *x)
 {
     if (g.toptenwin == WIN_ERR)
         raw_print(x);
@@ -163,8 +162,7 @@ const char *x;
 }
 
 static void
-topten_print_bold(x)
-const char *x;
+topten_print_bold(const char* x)
 {
     if (g.toptenwin == WIN_ERR)
         raw_print_bold(x);
@@ -173,8 +171,7 @@ const char *x;
 }
 
 int
-observable_depth(lev)
-d_level *lev;
+observable_depth(d_level* lev)
 {
 #if 0
     /* if we ever randomize the order of the elemental planes, we
@@ -199,8 +196,7 @@ d_level *lev;
 
 /* throw away characters until current record has been entirely consumed */
 static void
-discardexcess(rfile)
-FILE *rfile;
+discardexcess(FILE* rfile)
 {
     int c;
 
@@ -210,9 +206,7 @@ FILE *rfile;
 }
 
 static void
-readentry(rfile, tt)
-FILE *rfile;
-struct toptenentry *tt;
+readentry(FILE* rfile, struct toptenentry* tt)
 {
     char inbuf[SCANBUFSZ], s1[SCANBUFSZ], s2[SCANBUFSZ], s3[SCANBUFSZ],
         s4[SCANBUFSZ], s5[SCANBUFSZ], s6[SCANBUFSZ];
@@ -293,9 +287,7 @@ struct toptenentry *tt;
 }
 
 static void
-writeentry(rfile, tt)
-FILE *rfile;
-struct toptenentry *tt;
+writeentry(FILE* rfile, struct toptenentry* tt)
 {
     static const char fmt32[] = "%c%c ";        /* role,gender */
     static const char fmt33[] = "%s %s %s %s "; /* role,race,gndr,algn */
@@ -332,10 +324,7 @@ struct toptenentry *tt;
 
 /* as tab is never used in eg. g.plname or death, no need to mangle those. */
 static void
-writexlentry(rfile, tt, how)
-FILE *rfile;
-struct toptenentry *tt;
-int how;
+writexlentry(FILE* rfile, struct toptenentry* tt, int how)
 {
 #define Fprintf (void) fprintf
 #define XLOG_SEP '\t' /* xlogfile field separator. */
@@ -378,12 +367,13 @@ int how;
             money_cnt(g.invent) + hidden_gold(TRUE));
     Fprintf(rfile, "%cwish_cnt=%ld", XLOG_SEP, u.uconduct.wishes);
     Fprintf(rfile, "%carti_wish_cnt=%ld", XLOG_SEP, u.uconduct.wisharti);
+    Fprintf(rfile, "%cbones=%ld", XLOG_SEP, u.uroleplay.numbones);
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
 }
 
 static long
-encodexlogflags()
+encodexlogflags(void)
 {
     long e = 0L;
 
@@ -398,7 +388,7 @@ encodexlogflags()
 }
 
 static long
-encodeconduct()
+encodeconduct(void)
 {
     long e = 0L;
 
@@ -440,8 +430,8 @@ encodeconduct()
 }
 
 static long
-encodeachieve(secondlong)
-boolean secondlong; /* False: handle achievements 1..31, True: 32..62 */
+encodeachieve(
+    boolean secondlong) /* False: handle achievements 1..31, True: 32..62 */
 {
     int i, achidx, offset;
     long r = 0L;
@@ -465,10 +455,7 @@ boolean secondlong; /* False: handle achievements 1..31, True: 32..62 */
 
 /* add the achievement or conduct comma-separated to string */
 static void
-add_achieveX(buf, achievement, condition)
-char *buf;
-const char *achievement;
-boolean condition;
+add_achieveX(char* buf, const char* achievement, boolean condition)
 {
     if (condition) {
         if (buf[0] != '\0') {
@@ -479,7 +466,7 @@ boolean condition;
 }
 
 static char *
-encode_extended_achievements()
+encode_extended_achievements(void)
 {
     static char buf[N_ACH * 40];
     char rnkbuf[40];
@@ -570,7 +557,7 @@ encode_extended_achievements()
 }
 
 static char *
-encode_extended_conducts()
+encode_extended_conducts(void)
 {
     static char buf[BUFSZ];
 
@@ -591,6 +578,7 @@ encode_extended_conducts()
         add_achieveX(buf, "sokoban",  !u.uconduct.sokocheat);
     add_achieveX(buf, "blind",        u.uroleplay.blind);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
+    add_achieveX(buf, "bonesless",    !flags.bones);
 
     return buf;
 }
@@ -598,8 +586,7 @@ encode_extended_conducts()
 #endif /* XLOGFILE */
 
 static void
-free_ttlist(tt)
-struct toptenentry *tt;
+free_ttlist(struct toptenentry* tt)
 {
     struct toptenentry *ttnext;
 
@@ -612,9 +599,7 @@ struct toptenentry *tt;
 }
 
 void
-topten(how, when)
-int how;
-time_t when;
+topten(int how, time_t when)
 {
     int uid = getuid();
     int rank, rank0 = -1, rank1 = 0;
@@ -910,7 +895,7 @@ destroywin:
 }
 
 static void
-outheader()
+outheader(void)
 {
     char linebuf[BUFSZ];
     register char *bp;
@@ -925,10 +910,7 @@ outheader()
 
 /* so>0: standout line; so=0: ordinary line */
 static void
-outentry(rank, t1, so)
-struct toptenentry *t1;
-int rank;
-boolean so;
+outentry(int rank, struct toptenentry* t1, boolean so)
 {
     boolean second_line = TRUE;
     char linebuf[BUFSZ];
@@ -1058,7 +1040,7 @@ boolean so;
             topten_print_bold(linebuf);
         } else
             topten_print(linebuf);
-        Sprintf(linebuf, "%15s %s", "", linebuf3);
+        Snprintf(linebuf, sizeof(linebuf), "%15s %s", "", linebuf3);
         lngr = strlen(linebuf);
     }
     /* beginning of hp column not including padding */
@@ -1088,13 +1070,13 @@ boolean so;
 }
 
 static int
-score_wanted(current_ver, rank, t1, playerct, players, uid)
-boolean current_ver;
-int rank;
-struct toptenentry *t1;
-int playerct;
-const char **players;
-int uid;
+score_wanted(
+    boolean current_ver,
+    int rank,
+    struct toptenentry *t1,
+    int playerct,
+    const char **players,
+    int uid)
 {
     int i;
 
@@ -1133,9 +1115,7 @@ int uid;
  * caveat: some shells might allow argv elements to be arbitrarily long.
  */
 void
-prscore(argc, argv)
-int argc;
-char **argv;
+prscore(int argc, char **argv)
 {
     const char **players;
     int playerct, rank;
@@ -1281,9 +1261,7 @@ char **argv;
 }
 
 static int
-classmon(plch, fem)
-char *plch;
-boolean fem;
+classmon(char *plch, boolean fem)
 {
     int i;
 
@@ -1309,7 +1287,7 @@ boolean fem;
  * Get a random player name and class from the high score list,
  */
 struct toptenentry *
-get_rnd_toptenentry()
+get_rnd_toptenentry(void)
 {
     int rank, i;
     FILE *rfile;
@@ -1350,8 +1328,7 @@ pickentry:
  * to an object (for statues or morgue corpses).
  */
 struct obj *
-tt_oname(otmp)
-struct obj *otmp;
+tt_oname(struct obj* otmp)
 {
     struct toptenentry *tt;
     if (!otmp)

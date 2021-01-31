@@ -6,7 +6,7 @@ NAME
        makedefs - NetHack miscellaneous build-time functions
 
 SYNOPSIS
-       makedefs { -o | -d | -e | -m | -v | -p | -q | -r | -h | -z }
+       makedefs { -o | -d | -e | -m | -v | -p | -q | -r | -h }
 
        makedefs --input file --output file --command
 
@@ -26,18 +26,21 @@ SHORT COMMANDS
 
        -d     Generate data.base.
 
-       -v     Generate  date.h and options file. It will read dat/gitinfo.txt,
+       -e     Generate  dungeon.pdf.   The  input  file  dungeon.def is passed
+              through the same logic as that used by the --grep  command;  see
+              the MDGREP FUNCTIONS section below for details.
+
+       -m     Generate  date.h and options file. It will read dat/gitinfo.txt,
               only if it is present, to obtain githash= and gitbranch=
+               info and include related preprocessor #defines in date.h file.
 
        -p     Generate pm.h
 
-       -r     Generate the rumors file.
+       -q     Generate the rumors file.
 
        -s     Generate the bogusmon , engrave and epitaphfiles.
 
        -h     Generate the oracles file.
-
-       -z     Generate vis_tab.c and vis_tab.h.
 
 LONG COMMANDS
        --debug
@@ -136,7 +139,6 @@ COPYRIGHT
        This file is  Copyright  (C)  Kenneth  Lorber  and  was  last  modified
        2018/04/25  (version NetHack-3.6.0:1.10).  NetHack may be freely redis-
        tributed.  See license for details.
-
 
 
 

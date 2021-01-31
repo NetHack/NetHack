@@ -13,10 +13,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-static void FDECL(ini_inv, (struct trobj *));
-static void FDECL(knows_object, (int));
-static void FDECL(knows_class, (CHAR_P));
-static boolean FDECL(restricted_spell_discipline, (int));
+static void ini_inv(struct trobj *);
+static void knows_object(int);
+static void knows_class(char);
+static boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'
@@ -558,8 +558,7 @@ static const struct def_skill Skill_W[] = {
 };
 
 static void
-knows_object(obj)
-register int obj;
+knows_object(int obj)
 {
     discover_object(obj, TRUE, FALSE);
     objects[obj].oc_pre_discovered = 1; /* not a "discovery" */
@@ -569,8 +568,7 @@ register int obj;
  * like all gems except the loadstone and luckstone.
  */
 static void
-knows_class(sym)
-register char sym;
+knows_class(char sym)
 {
     register int ct;
     for (ct = 1; ct < NUM_OBJECTS; ct++)
@@ -579,7 +577,7 @@ register char sym;
 }
 
 void
-u_init()
+u_init(void)
 {
     register int i;
     struct u_roleplay tmpuroleplay = u.uroleplay; /* set by rcfile options */
@@ -688,7 +686,7 @@ u_init()
         knows_class(ARMOR_CLASS);
         skill_init(Skill_B);
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         Cave_man[C_AMMO].trquan = rn1(11, 10); /* 10..20 */
         ini_inv(Cave_man);
         skill_init(Skill_C);
@@ -724,7 +722,7 @@ u_init()
         skill_init(Skill_Mon);
         break;
     }
-    case PM_PRIEST:
+    case PM_CLERIC:
         ini_inv(Priest);
         if (!rn2(10))
             ini_inv(Magicmarker);
@@ -811,7 +809,7 @@ u_init()
          * Non-warriors get an instrument.  We use a kludge to
          * get only non-magic instruments.
          */
-        if (Role_if(PM_PRIEST) || Role_if(PM_WIZARD)) {
+        if (Role_if(PM_CLERIC) || Role_if(PM_WIZARD)) {
             static int trotyp[] = { WOODEN_FLUTE, TOOLED_HORN, WOODEN_HARP,
                                     BELL,         BUGLE,       LEATHER_DRUM };
             Instrument[0].trotyp = trotyp[rn2(SIZE(trotyp))];
@@ -908,8 +906,7 @@ u_init()
 
 /* skills aren't initialized, so we use the role-specific skill lists */
 static boolean
-restricted_spell_discipline(otyp)
-int otyp;
+restricted_spell_discipline(int otyp)
 {
     const struct def_skill *skills;
     int this_skill = spell_skilltype(otyp);
@@ -921,7 +918,7 @@ int otyp;
     case PM_BARBARIAN:
         skills = Skill_B;
         break;
-    case PM_CAVEMAN:
+    case PM_CAVE_DWELLER:
         skills = Skill_C;
         break;
     case PM_HEALER:
@@ -933,7 +930,7 @@ int otyp;
     case PM_MONK:
         skills = Skill_Mon;
         break;
-    case PM_PRIEST:
+    case PM_CLERIC:
         skills = Skill_P;
         break;
     case PM_RANGER:
@@ -968,8 +965,7 @@ int otyp;
 }
 
 static void
-ini_inv(trop)
-register struct trobj *trop;
+ini_inv(struct trobj *trop)
 {
     struct obj *obj;
     int otyp, i;

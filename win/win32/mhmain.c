@@ -44,7 +44,7 @@ static void mswin_apply_window_style_all();
 // returns strdup() created pointer - callee assumes the ownership
 
 HWND
-mswin_init_main_window()
+mswin_init_main_window(void)
 {
     static int run_once = 0;
     HWND ret;
@@ -98,7 +98,7 @@ mswin_init_main_window()
 }
 
 void
-register_main_window_class()
+register_main_window_class(void)
 {
     WNDCLASS wcex;
 
@@ -1102,7 +1102,7 @@ About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 void
-mswin_menu_check_intf_mode()
+mswin_menu_check_intf_mode(void)
 {
     HMENU hMenu = GetMenu(GetNHApp()->hMainWnd);
 
@@ -1235,7 +1235,8 @@ mswin_apply_window_style(HWND hwnd) {
 }
 
 void
-mswin_apply_window_style_all() {
+mswin_apply_window_style_all(void)
+{
     int i;
     for (i = 0; i < MAXWINDOWS; i++) {
         if (IsWindow(GetNHApp()->windowlist[i].win)
@@ -1247,9 +1248,8 @@ mswin_apply_window_style_all() {
 }
 
 // returns strdup() created pointer - callee assumes the ownership
-#define TEXT_BUFFER_SIZE 4096
 char *
-nh_compose_ascii_screenshot()
+nh_compose_ascii_screenshot(void)
 {
     char *retval;
     PMSNHMsgGetText text;

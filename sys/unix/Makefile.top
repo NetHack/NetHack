@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1597031649 2020/08/10 03:54:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1609702004 2021/01/03 19:26:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.66 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -75,7 +75,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 #CHGRP = chgrp
 
 # Lua version
-LUA_VERSION = 5.4.1
+LUA_VERSION = 5.4.2
 
 #
 # end of configuration
@@ -160,6 +160,7 @@ spec_levs:
 	( cd dat ; $(MAKE) quest_levs )
 
 nhtiles.bmp: $(GAME)
+	( cd util ; $(MAKE) tile2bmp )
 	( cd dat ; $(MAKE) nhtiles.bmp )
 
 x11tiles: $(GAME)
@@ -270,6 +271,8 @@ fetch-Lua:
 	( mkdir -p lib && cd lib && \
 	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
 	  tar zxf lua-$(LUA_VERSION).tar.gz && rm -f lua-$(LUA_VERSION).tar.gz )
+#if we just fetched lua, force include/nhlua.h to be built based on it
+	-rm include/nhlua.h
 
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
@@ -315,16 +318,27 @@ install: rootcheck $(GAME) recover $(VARDAT) spec_levs
 
 # 'make clean' removes all the .o files, but leaves around all the executables
 # and compiled data files
-clean:
+clean: clean-lib clean-keep-lib
+	@true
+
+clean-lib:
+	-( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
+
+clean-keep-lib:
 	( cd src ; $(MAKE) clean )
 	( cd util ; $(MAKE) clean )
 	( cd dat ; $(MAKE) clean )
 	( cd doc ; $(MAKE) clean )
-	( cd lib/lua-$(LUA_VERSION)/src && $(MAKE) clean )
 
 # 'make spotless' returns the source tree to near-distribution condition.
 # it removes .o files, executables, and compiled data files
-spotless:: clean
+spotless:: spotless-lib spotless-keep-lib
+	@true
+
+spotless-lib:: clean-lib
+	-( cd lib/lua && rm liblua.a )
+
+spotless-keep-lib: clean-keep-lib
 	( cd src ; $(MAKE) spotless )
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )

@@ -34,10 +34,10 @@ typedef struct mswin_nhmsg_putstr {
 } MSNHMsgPutstr, *PMSNHMsgPutstr;
 
 typedef struct mswin_nhmsg_print_glyph {
-    XCHAR_P x;
-    XCHAR_P y;
-    int glyph;
-    int bkglyph;
+    xchar x;
+    xchar y;
+    glyph_info glyphinfo;
+    glyph_info bkglyphinfo;
 } MSNHMsgPrintGlyph, *PMSNHMsgPrintGlyph;
 
 typedef struct mswin_nhmsg_cliparound {
@@ -46,13 +46,13 @@ typedef struct mswin_nhmsg_cliparound {
 } MSNHMsgClipAround, *PMSNHMsgClipAround;
 
 typedef struct mswin_nhmsg_add_menu {
-    int glyph;
+    glyph_info glyphinfo;
     const ANY_P *identifier;
-    CHAR_P accelerator;
-    CHAR_P group_accel;
+    char accelerator;
+    char group_accel;
     int attr;
     const char *str;
-    BOOLEAN_P presel;
+    boolean presel;
     unsigned int itemflags;
 } MSNHMsgAddMenu, *PMSNHMsgAddMenu;
 
@@ -67,7 +67,7 @@ typedef struct mswin_nhmsg_end_menu {
 
 typedef struct mswin_nhmsg_get_text {
     size_t max_size;
-    char buffer[];
+    char buffer[TEXT_BUFFER_SIZE];
 } MSNHMsgGetText, *PMSNHMsgGetText;
 
 typedef struct mswin_nhmsg_update_status {

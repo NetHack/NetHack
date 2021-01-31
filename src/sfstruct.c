@@ -1,4 +1,4 @@
-/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1593953360 2020/07/05 12:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 3.7	sfstruct.c	$NHDT-Date: 1606765215 2020/11/30 19:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -32,16 +32,16 @@
 #ifdef minit
 #undef minit
 #endif
-void FDECL(newread, (NHFILE *, int, int, genericptr_t, unsigned int));
-void FDECL(bufon, (int));
-void FDECL(bufoff, (int));
-void FDECL(bflush, (int));
-void FDECL(bwrite, (int, genericptr_t, unsigned int));
-void FDECL(mread, (int, genericptr_t, unsigned int));
-void NDECL(minit);
-void FDECL(bclose, (int));
+void newread(NHFILE *, int, int, genericptr_t, unsigned int);
+void bufon(int);
+void bufoff(int);
+void bflush(int);
+void bwrite(int, genericptr_t, unsigned int);
+void mread(int, genericptr_t, unsigned int);
+void minit(void);
+void bclose(int);
 #endif /* TRACE_BUFFERING */
-static int FDECL(getidx, (int, int));
+static int getidx(int, int);
 
 #if defined(UNIX) || defined(WIN32)
 #define USE_BUFFERING
@@ -75,8 +75,8 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  * Some notes:
  *
  * Once buffered IO (stdio) has been enabled on the file
- * associated with a descriptor via fdopen(): 
- *                          
+ * associated with a descriptor via fdopen():
+ *
  *    1. If you use bufoff and bufon to try and toggle the
  *       use of write vs fwrite; the code just tracks which
  *       routine is to be called through the tracking
@@ -86,7 +86,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  *                               if it is a free slot.
  *             bw_buffered[]  -  indicator that buffered IO routines
  *                               are available for use.
- *             bw_FILE[]      -  the non-zero FILE * for use in calling 
+ *             bw_FILE[]      -  the non-zero FILE * for use in calling
  *                               fwrite() when bw_buffered[] is also
  *                               non-zero.
  *
@@ -98,8 +98,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  */
 
 static int
-getidx(fd, flg)
-int fd, flg;
+getidx(int fd, int flg)
 {
     int i, retval = -1;
 
@@ -119,8 +118,7 @@ int fd, flg;
 
 /* Let caller know that bclose() should handle it (TRUE) */
 boolean
-close_check(fd)
-int fd;
+close_check(int fd)
 {
     int idx = getidx(fd, NOSLOT);
     boolean retval = FALSE;
@@ -131,8 +129,7 @@ int fd;
 }
 
 void
-bufon(fd)
-int fd;
+bufon(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -153,8 +150,7 @@ int fd;
 }
 
 void
-bufoff(fd)
-int fd;
+bufoff(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -165,8 +161,7 @@ int fd;
 }
 
 void
-bclose(fd)
-int fd;
+bclose(int fd)
 {
     int idx = getidx(fd, NOSLOT);
 
@@ -186,8 +181,7 @@ int fd;
 }
 
 void
-bflush(fd)
-int fd;
+bflush(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -203,10 +197,7 @@ int fd;
 }
 
 void
-bwrite(fd, loc, num)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
+bwrite(register int fd, register genericptr_t loc, register unsigned num)
 {
     boolean failed;
     int idx = getidx(fd, NOFLG);
@@ -240,16 +231,13 @@ register unsigned num;
 /*  ===================================================== */
 
 void
-minit()
+minit(void)
 {
     return;
 }
 
 void
-mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
+mread(register int fd, register genericptr_t buf, register unsigned int len)
 {
     register int rlen;
 #if defined(BSD) || defined(ULTRIX)
@@ -265,7 +253,7 @@ register unsigned int len;
             return;
         } else {
             pline("Read %d instead of %u bytes.", rlen, len);
-            if (g.restoring) {
+            if (g.program_state.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();
                 error("Error restoring old game.");
@@ -286,75 +274,61 @@ static FILE *tracefile;
     fclose(tracefile);
 
 void
-Bufon(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bufon(int fd, const char *fncname, int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     bufon(fd);
 }
 
 void
-Bufoff(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bufoff(int fd, const char *fncname, int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     bufoff(fd);
 }
 
 void
-Bflush(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bflush(int fd, const char* fncname, int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     bflush(fd);
 }
 
 void
-Bwrite(fd, loc, num, fncname, linenum)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
-const char *fncname;
-int linenum;
+Bwrite(
+    register int fd,
+    register genericptr_t loc,
+    register unsigned num,
+    const char *fncname,
+    int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     bwrite(fd, loc, num);
 }
 
 void
-Bclose(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bclose(int fd, const char *fncname, int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     bclose(fd);
 }
 
 void
-Minit(fncname, linenum)
-const char *fncname;
-int linenum;
+Minit(const char*fncname, int linenum)
 {
     TRACE(-1);
     minit();
 }
 
 void
-Mread(fd, buf, len, fncname, linenum)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
-const char *fncname;
-int linenum;
+Mread(
+    register int fd,
+    register genericptr_t buf,
+    register unsigned int len,
+    const char *fncname,
+    int linenum)
 {
-    TRACE(fd);    
+    TRACE(fd);
     mread(fd, buf, len);
 }
 #endif

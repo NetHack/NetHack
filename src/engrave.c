@@ -1,15 +1,15 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1596498167 2020/08/03 23:42:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1612055954 2021/01/31 01:19:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-static const char *NDECL(blengr);
+static int stylus_ok(struct obj *);
+static const char *blengr(void);
 
 char *
-random_engraving(outbuf)
-char *outbuf;
+random_engraving(char *outbuf)
 {
     const char *rumor;
 
@@ -77,10 +77,8 @@ static const struct {
 
 /* degrade some of the characters in a string */
 void
-wipeout_text(engr, cnt, seed)
-char *engr;
-int cnt;
-unsigned seed; /* for semi-controlled randomization */
+wipeout_text(char *engr, int cnt,
+             unsigned seed) /* for semi-controlled randomization */
 {
     char *s;
     int i, j, nxt, use_rubout, lth = (int) strlen(engr);
@@ -141,32 +139,38 @@ unsigned seed; /* for semi-controlled randomization */
 
 /* check whether hero can reach something at ground level */
 boolean
-can_reach_floor(check_pit)
-boolean check_pit;
+can_reach_floor(boolean check_pit)
 {
     struct trap *t;
 
-    if (u.uswallow)
+    if (u.uswallow
+        || (u.ustuck && !sticks(g.youmonst.data)
+            /* assume that arms are pinned rather than that the hero
+               has been lifted up above the floor [doesn't explain
+               how hero can attack the creature holding him or her;
+               that's life in nethack...] */
+            && attacktype(u.ustuck->data, AT_HUGS))
+        || (Levitation && !(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))))
         return FALSE;
     /* Restricted/unskilled riders can't reach the floor */
     if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
         return FALSE;
-    if (check_pit && !Flying
-        && (t = t_at(u.ux, u.uy)) != 0
+    if (u.uundetected && ceiling_hider(g.youmonst.data))
+        return FALSE;
+
+    if (Flying || g.youmonst.data->msize >= MZ_HUGE)
+        return TRUE;
+
+    if (check_pit && (t = t_at(u.ux, u.uy)) != 0
         && (uteetering_at_seen_pit(t) || uescaped_shaft(t)))
         return FALSE;
 
-    return (boolean) ((!Levitation || Is_airlevel(&u.uz)
-                       || Is_waterlevel(&u.uz))
-                      && (!u.uundetected || !is_hider(g.youmonst.data)
-                          || u.umonnum == PM_TRAPPER));
+    return TRUE;
 }
 
 /* give a message after caller has determined that hero can't reach */
 void
-cant_reach_floor(x, y, up, check_pit)
-int x, y;
-boolean up, check_pit;
+cant_reach_floor(int x, int y, boolean up, boolean check_pit)
 {
     You("can't reach the %s.",
         up ? ceiling(x, y)
@@ -176,8 +180,7 @@ boolean up, check_pit;
 }
 
 const char *
-surface(x, y)
-register int x, y;
+surface(register int x, register int y)
 {
     register struct rm *lev = &levl[x][y];
 
@@ -208,8 +211,7 @@ register int x, y;
 }
 
 const char *
-ceiling(x, y)
-register int x, y;
+ceiling(register int x, register int y)
 {
     register struct rm *lev = &levl[x][y];
     const char *what;
@@ -240,8 +242,7 @@ register int x, y;
 }
 
 struct engr *
-engr_at(x, y)
-xchar x, y;
+engr_at(xchar x, xchar y)
 {
     register struct engr *ep = head_engr;
 
@@ -261,10 +262,7 @@ xchar x, y;
  * present if it is intact and is the entire content of the engraving.
  */
 int
-sengr_at(s, x, y, strict)
-const char *s;
-xchar x, y;
-boolean strict;
+sengr_at(const char *s, xchar x, xchar y, boolean strict)
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -277,17 +275,14 @@ boolean strict;
 }
 
 void
-u_wipe_engr(cnt)
-int cnt;
+u_wipe_engr(int cnt)
 {
     if (can_reach_floor(TRUE))
         wipe_engr_at(u.ux, u.uy, cnt, FALSE);
 }
 
 void
-wipe_engr_at(x, y, cnt, magical)
-xchar x, y, cnt;
-boolean magical;
+wipe_engr_at(xchar x, xchar y, xchar cnt, boolean magical)
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -309,8 +304,7 @@ boolean magical;
 }
 
 void
-read_engr_at(x, y)
-int x, y;
+read_engr_at(int x, int y)
 {
     register struct engr *ep = engr_at(x, y);
     int sensed = 0;
@@ -384,11 +378,7 @@ int x, y;
 }
 
 void
-make_engr_at(x, y, s, e_time, e_type)
-int x, y;
-const char *s;
-long e_time;
-xchar e_type;
+make_engr_at(int x, int y, const char *s, long e_time, xchar e_type)
 {
     struct engr *ep;
     unsigned smem = strlen(s) + 1;
@@ -413,8 +403,7 @@ xchar e_type;
 
 /* delete any engraving at location <x,y> */
 void
-del_engr_at(x, y)
-int x, y;
+del_engr_at(int x, int y)
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -426,16 +415,33 @@ int x, y;
  * freehand - returns true if player has a free hand
  */
 int
-freehand()
+freehand(void)
 {
     return (!uwep || !welded(uwep)
             || (!bimanual(uwep) && (!uarms || !uarms->cursed)));
 }
 
-static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
-                                          TOOL_CLASS,  WEAPON_CLASS,
-                                          WAND_CLASS,  GEM_CLASS,
-                                          RING_CLASS,  0 };
+/* getobj callback for an object to engrave with */
+static int
+stylus_ok(struct obj *obj)
+{
+    if (!obj)
+        return GETOBJ_SUGGEST;
+
+    /* Potential extension: exclude weapons that don't make any sense (such as
+     * bullwhips) and downplay rings and gems that wouldn't be good to write
+     * with (such as glass and non-gem rings) */
+    if (obj->oclass == WEAPON_CLASS || obj->oclass == WAND_CLASS
+        || obj->oclass == GEM_CLASS || obj->oclass == RING_CLASS)
+        return GETOBJ_SUGGEST;
+
+    /* Only markers and towels are recommended tools. */
+    if (obj->oclass == TOOL_CLASS
+        && (obj->otyp == TOWEL || obj->otyp == MAGIC_MARKER))
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE;
+}
 
 /* Mohs' Hardness Scale:
  *  1 - Talc             6 - Orthoclase
@@ -466,7 +472,7 @@ static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
 
 /* return 1 if action took 1 (or more) moves, 0 if error or aborted */
 int
-doengrave()
+doengrave(void)
 {
     boolean dengr = FALSE;    /* TRUE if we wipe out the current engraving */
     boolean doblind = FALSE;  /* TRUE if engraving blinds the player */
@@ -542,7 +548,7 @@ doengrave()
      * Edited by GAN 10/20/86 so as not to change weapon wielded.
      */
 
-    otmp = getobj(styluses, "write with");
+    otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
     if (!otmp) /* otmp == cg.zeroobj if fingers */
         return 0;
 
@@ -1167,7 +1173,7 @@ doengrave()
 /* while loading bones, clean up text which might accidentally
    or maliciously disrupt player's terminal when displayed */
 void
-sanitize_engravings()
+sanitize_engravings(void)
 {
     struct engr *ep;
 
@@ -1177,8 +1183,7 @@ sanitize_engravings()
 }
 
 void
-save_engravings(nhfp)
-NHFILE *nhfp;
+save_engravings(NHFILE *nhfp)
 {
     struct engr *ep, *ep2;
     unsigned no_more_engr = 0;
@@ -1203,8 +1208,7 @@ NHFILE *nhfp;
 }
 
 void
-rest_engravings(nhfp)
-NHFILE *nhfp;
+rest_engravings(NHFILE *nhfp)
 {
     struct engr *ep;
     unsigned lth = 0;
@@ -1232,10 +1236,7 @@ NHFILE *nhfp;
 
 /* to support '#stats' wizard-mode command */
 void
-engr_stats(hdrfmt, hdrbuf, count, size)
-const char *hdrfmt;
-char *hdrbuf;
-long *count, *size;
+engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
 {
     struct engr *ep;
 
@@ -1248,8 +1249,7 @@ long *count, *size;
 }
 
 void
-del_engr(ep)
-register struct engr *ep;
+del_engr(register struct engr *ep)
 {
     if (ep == head_engr) {
         head_engr = ep->nxt_engr;
@@ -1271,8 +1271,7 @@ register struct engr *ep;
 
 /* randomly relocate an engraving */
 void
-rloc_engr(ep)
-struct engr *ep;
+rloc_engr(struct engr *ep)
 {
     int tx, ty, tryct = 200;
 
@@ -1291,9 +1290,7 @@ struct engr *ep;
  * The caller is responsible for newsym(x, y).
  */
 void
-make_grave(x, y, str)
-int x, y;
-const char *str;
+make_grave(int x, int y, const char *str)
 {
     char buf[BUFSZ];
 
@@ -1332,7 +1329,7 @@ static const char blind_writing[][21] = {
 };
 
 static const char *
-blengr(VOID_ARGS)
+blengr(void)
 {
     return blind_writing[rn2(SIZE(blind_writing))];
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1596498529 2020/08/03 23:48:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1610141601 2021/01/08 21:33:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -457,23 +457,14 @@ typedef unsigned char uchar;
 /* #define STRNCMPI */ /* compiler/library has the strncmpi function */
 
 /*
- * There are various choices for the NetHack vision system.  There is a
- * choice of two algorithms with the same behavior.  Defining VISION_TABLES
- * creates huge (60K) tables at compile time, drastically increasing data
- * size, but runs slightly faster than the alternate algorithm.  (MSDOS in
- * particular cannot tolerate the increase in data size; other systems can
- * flip a coin weighted to local conditions.)
+ * Vision choices.
  *
- * If VISION_TABLES is not defined, things will be faster if you can use
- * MACRO_CPATH.  Some cpps, however, cannot deal with the size of the
- * functions that have been macroized.
+ * Things will be faster if you can use MACRO_CPATH.  Some cpps, however,
+ * cannot deal with the size of the functions that have been macroized.
  */
 
-/* #define VISION_TABLES */ /* use vision tables generated at compile time */
-#ifndef VISION_TABLES
 #ifndef NO_MACRO_CPATH
 #define MACRO_CPATH /* use clear_path macros instead of functions */
-#endif
 #endif
 
 #if !defined(MAC)
@@ -482,7 +473,12 @@ typedef unsigned char uchar;
 #endif
 #endif
 
-#define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
+/* The "repeat" key used in cmd.c as NHKF_DOAGAIN; if commented out or the
+ * value is changed from C('A') to 0, it won't be bound to any keystroke
+ * unless you use the run-time configuration file's BIND directive for it.
+ * [Note: C() macro isn't defined yet but it will be before DOAGAIN is used.]
+ */
+#define DOAGAIN C('A') /* repeat previous command; default is ^A, '\001' */
 
 /* CONFIG_ERROR_SECURE: If user makes NETHACKOPTIONS point to a file ...
  *  TRUE: Show the first error, nothing else.
@@ -499,6 +495,25 @@ typedef unsigned char uchar;
  * Enable any of these at your own risk -- there are almost certainly
  * bugs left here.
  */
+
+/* SELECTSAVED: Enable the 'selectsaved' run-time option, allowing it
+ * to be set in user's config file or NETHACKOPTIONS.  When set, if
+ * player is about to be given the "who are you?" prompt, check for
+ * save files and if any are found, put up a menu of them for choosing
+ * one to restore (plus extra menu entries "new game" and "quit").
+ *
+ * Not useful if players are forced to use a specific character name
+ * such as their user name.  However in some cases, players can set
+ * their character name to one which is classified as generic in the
+ * sysconf file (such as "player" or "games")
+ *  nethack -u player
+ * to force the "who are you?" prompt in which case 'selectsaved' will
+ * be honored.
+ *
+ * Comment out if the wildcard file name lookup in files.c doesn't
+ * compile or doesn't work as intended.
+ */
+#define SELECTSAVED /* support for restoring via menu */
 
 /* TTY_TILES_ESCCODES: Enable output of special console escape codes
  * which act as hints for external programs such as EbonHack, or hterm.
@@ -539,6 +554,8 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
+/* enable status highlighting via STATUS_HILITE directives in run-time
+   config file and the 'statushilites' option */
 #define STATUS_HILITES         /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */
@@ -612,6 +629,5 @@ typedef unsigned char uchar;
 #endif
 
 #include "global.h" /* Define everything else according to choices above */
-#include "fnamesiz.h" /* Define file sizes shared between nethack and recover */
 
 #endif /* CONFIG_H */

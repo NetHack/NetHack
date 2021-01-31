@@ -47,9 +47,9 @@ endif
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #=================================================================
-LUA_VERSION ?=5.4.1
+LUA_VERSION ?=5.4.2
 LUATOP ?= ../lib/lua-$(LUA_VERSION)
 LUASRCDIR ?= $(LUATOP)/src
 LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
@@ -148,7 +148,7 @@ ifdef CROSS_TO_MSDOS
 # 2. Then
 #     make CROSS_TO_MSDOS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
 #
-# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
@@ -165,7 +165,11 @@ override TARGET_AR = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc-ar
 override TARGET_STUBEDIT = ../lib/djgpp/i586-pc-msdosdjgpp/bin/stubedit
 override TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) \
-	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS
+	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
+        -Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings \
+        -Wimplicit-function-declaration -Wimplicit-int \
+        -Wmissing-declarations -Wmissing-prototypes -Wmissing-parameter-type 
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc
 override TARGET_LFLAGS=
@@ -311,7 +315,7 @@ EMCC_LFLAGS += -s ALLOW_TABLE_GROWTH
 EMCC_LFLAGS += -s ASYNCIFY -s ASYNCIFY_IMPORTS='["local_callback"]'
 EMCC_LFLAGS += -O3
 EMCC_LFLAGS += -s MODULARIZE
-EMCC_LFLAGS += -s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_mapglyph", "_display_inventory"]'
+EMCC_LFLAGS += -s EXPORTED_FUNCTIONS='["_main", "_shim_graphics_set_callback", "_display_inventory"]'
 EMCC_LFLAGS += -s EXPORTED_RUNTIME_METHODS='["cwrap", "ccall", "addFunction", \
 			"removeFunction", "UTF8ToString", "getValue", "setValue"]'
 EMCC_LFLAGS += -s ERROR_ON_UNDEFINED_SYMBOLS=0

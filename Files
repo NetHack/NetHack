@@ -7,8 +7,8 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-.clang-format    .travis.yml      Cross-compiling  Files
-Porting          README
+.clang-format        Cross-compiling      Files
+Porting              README               azure-pipelines.yml
 
 DEVEL:
 (files for people developing changes to NetHack)
@@ -102,18 +102,22 @@ ntconf.h      obj.h         objclass.h    optlist.h     patchlevel.h
 pcconf.h      permonst.h    prop.h        quest.h       rect.h
 region.h      rm.h          skills.h      sp_lev.h      spell.h
 sys.h         system.h      tcap.h        tileset.h     timeout.h
-tradstdc.h    trampoli.h    trap.h        unixconf.h    vision.h
-vmsconf.h     winami.h      wincurs.h     winprocs.h    wintype.h
-you.h         youprop.h
+tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
+winami.h      wincurs.h     winprocs.h    wintype.h     you.h
+youprop.h
 
 (file for tty versions)
 wintty.h
+
+outdated:
+(files that are no longer maintained for current game code)
+.travis.yml
 
 outdated/include:
 (files that are no longer maintained for current game code)
 amiconf.h     beconf.h      def_os2.h     mac-carbon.h  mac-qt.h
 mac-term.h    macconf.h     macpopup.h    mactty.h      macwin.h
-mttypriv.h    os2conf.h     tosconf.h     wceconf.h
+mttypriv.h    os2conf.h     tosconf.h     trampoli.h    wceconf.h
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
@@ -207,20 +211,23 @@ dig.c       display.c   dlb.c       do.c        do_name.c   do_wear.c
 dog.c       dogmove.c   dokick.c    dothrow.c   drawing.c   dungeon.c
 eat.c       end.c       engrave.c   exper.c     explode.c   extralev.c
 files.c     fountain.c  hack.c      hacklib.c   insight.c   invent.c
-isaac64.c   light.c     lock.c      mail.c      makemon.c   mapglyph.c
-mcastu.c    mdlib.c     mhitm.c     mhitu.c     minion.c    mklev.c
-mkmap.c     mkmaze.c    mkobj.c     mkroom.c    mon.c       mondata.c
-monmove.c   monst.c     mplayer.c   mthrowu.c   muse.c      music.c
-nhlobj.c    nhlsel.c    nhlua.c     o_init.c    objects.c   objnam.c
-options.c   pager.c     pickup.c    pline.c     polyself.c  potion.c
-pray.c      priest.c    quest.c     questpgr.c  read.c      rect.c
-region.c    restore.c   rip.c       rnd.c       role.c      rumors.c
-save.c      sfstruct.c  shk.c       shknam.c    sit.c       sounds.c
-sp_lev.c    spell.c     steal.c     steed.c     symbols.c   sys.c
-teleport.c  timeout.c   topten.c    track.c     trap.c      u_init.c
-uhitm.c     vault.c     version.c   vision.c    weapon.c    were.c
-wield.c     windows.c   wizard.c    worm.c      worn.c      write.c
-zap.c
+isaac64.c   light.c     lock.c      mail.c      makemon.c   mcastu.c
+mdlib.c     mhitm.c     mhitu.c     minion.c    mklev.c     mkmap.c
+mkmaze.c    mkobj.c     mkroom.c    mon.c       mondata.c   monmove.c
+monst.c     mplayer.c   mthrowu.c   muse.c      music.c     nhlobj.c
+nhlsel.c    nhlua.c     o_init.c    objects.c   objnam.c    options.c
+pager.c     pickup.c    pline.c     polyself.c  potion.c    pray.c
+priest.c    quest.c     questpgr.c  read.c      rect.c      region.c
+restore.c   rip.c       rnd.c       role.c      rumors.c    save.c
+sfstruct.c  shk.c       shknam.c    sit.c       sounds.c    sp_lev.c
+spell.c     steal.c     steed.c     symbols.c   sys.c       teleport.c
+timeout.c   topten.c    track.c     trap.c      u_init.c    uhitm.c
+vault.c     version.c   vision.c    weapon.c    were.c      wield.c
+windows.c   wizard.c    worm.c      worn.c      write.c     zap.c
+
+submodules:
+(files in top directory)
+lua       pdcurses
 
 sys/libnh:
 (files in top directory)
@@ -322,7 +329,8 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-cross-post.2020  cross-pre.2020   multiw-1.2020    multiw-2.2020
+compiler.2020    cross-post.2020  cross-pre.2020   multiw-1.2020
+multiw-2.2020
 
 sys/vms:
 (files for VMS version)
@@ -433,16 +441,17 @@ afterrecover.proj             aftertile2bmp.proj
 aftertilemap.proj             afteruudecode.proj
 build.bat                     common.props
 config.props                  console.props
-default.props                 default_dll.props
-default_lib.props             dirs.props
-dlb.vcxproj                   dll.props
-files.props                   makedefs.vcxproj
-nh340key.def                  nh340key.vcxproj
-nhdefkey.def                  nhdefkey.vcxproj
-nhraykey.def                  nhraykey.vcxproj
-recover.vcxproj               tile2bmp.vcxproj
-tilemap.vcxproj               tiles.vcxproj
-travisci.sh                   uudecode.vcxproj
+cpp.hint                      default.props
+default_dll.props             default_lib.props
+dirs.props                    dlb.vcxproj
+dll.props                     files.props
+makedefs.vcxproj              nh340key.def
+nh340key.vcxproj              nhdefkey.def
+nhdefkey.vcxproj              nhraykey.def
+nhraykey.vcxproj              recover.vcxproj
+tile2bmp.vcxproj              tilemap.vcxproj
+tiles.vcxproj                 travisci.sh
+uudecode.vcxproj
 
 win/win32/vs/Images:
 (files for Visual Studio 2017 or 2019 Community Edition builds)
@@ -529,7 +538,7 @@ tile.h
 win32api.h
 
 (files generated by makedefs at compile time)
-date.h     onames.h   pm.h       vis_tab.h
+date.h    onames.h  pm.h
 
 (files generated by yacc (or copied from sys/share) at compile time)
 dgn_comp.h  lev_comp.h
@@ -543,9 +552,6 @@ qt_kde0.moc      qt_win.moc       qttableview.moc
 
 (file generated by makedefs at compile time by some ports)
 monstr.c
-
-(file generated by makedefs at compile time)
-vis_tab.c
 
 (file optionally generated by tilemap at compile time)
 tile.c

@@ -2,7 +2,6 @@
 date.h
 onames.h
 pm.h
-vis_tab.h
 dgn_comp.h
 lev_comp.h
 tile.h

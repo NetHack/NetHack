@@ -1175,13 +1175,13 @@ OBJECT(OBJ(None, None),
 /* clang-format on */
 /* *INDENT-ON* */
 
-void NDECL(objects_globals_init); /* in hack.h but we're using config.h */
+void objects_globals_init(void); /* in hack.h but we're using config.h */
 
 struct objdescr obj_descr[SIZE(obj_descr_init)];
 struct objclass objects[SIZE(obj_init)];
 
 void
-objects_globals_init()
+objects_globals_init(void)
 {
     memcpy(obj_descr, obj_descr_init, sizeof(obj_descr));
     memcpy(objects, obj_init, sizeof(objects));

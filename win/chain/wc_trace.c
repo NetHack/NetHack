@@ -249,7 +249,7 @@ void
 trace_display_nhwindow(vp, window, blocking)
 void *vp;
 winid window;
-BOOLEAN_P blocking;
+boolean blocking;
 {
     struct trace_data *tdp = vp;
 
@@ -372,10 +372,10 @@ unsigned long mbehavior;
 }
 
 void
-trace_add_menu(vp, window, glyph, identifier, ch, gch, attr, str, itemflags)
+trace_add_menu(vp, window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
 void *vp;
 winid window;               /* window to use, must be of type NHW_MENU */
-int glyph;                  /* glyph to display with item (unused) */
+const glyph_info *glyphinfo /* glyph plus glyph info to display with item */
 const anything *identifier; /* what to return if selected */
 char ch;                    /* keyboard accelerator (0 = pick our own) */
 char gch;                   /* group accelerator (0 = no group) */
@@ -402,19 +402,19 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
 
     if (str) {
         fprintf(wc_tracelogf,
-                "%sadd_menu(%d, %d, %p, %s, %s, %d, '%s'(%d), %u)\n", INDENT,
-                window, glyph, (void *) identifier, buf_ch, buf_gch, attr,
-                str, (int) strlen(str), itemflags);
+                "%sadd_menu(%d, %d, %u, %p, %s, %s, %d, '%s'(%d), %u)\n", INDENT,
+                window, glyphinfo->glyph, glyphinfo->flags, (void *) identifier,
+                buf_ch, buf_gch, attr, str, (int) strlen(str), itemflags);
     } else {
         fprintf(wc_tracelogf,
-                "%sadd_menu(%d, %d, %p, %s, %s, %d, NULL, %u)\n", INDENT,
-                window, glyph, (void *) identifier, buf_ch, buf_gch, attr,
-                itemflags);
+                "%sadd_menu(%d, %d, %u, %p, %s, %s, %d, NULL, %u)\n", INDENT,
+                window, glyphinfo->glyph, glyphinfo->flags, (void *) identifier,
+                buf_ch, buf_gch, attr, itemflags);
     }
 
     PRE;
-    (*tdp->nprocs->win_add_menu)(tdp->ndata, window, glyph, identifier, ch,
-                                 gch, attr, str, itemflags);
+    (*tdp->nprocs->win_add_menu)(tdp->ndata, window, glyphinfo,
+                                 identifier,ch, gch, attr, str, itemflags);
     POST;
 }
 
@@ -575,22 +575,23 @@ char *posbar;
 }
 #endif
 
-/* XXX can we decode the glyph in a meaningful way? see mapglyph()?
+/* XXX can we decode the glyph in a meaningful way? see map_glyphinfo()?
  genl_putmixed?  */
 void
-trace_print_glyph(vp, window, x, y, glyph, bkglyph)
+trace_print_glyph(vp, window, x, y, glyphinfo, bkglyphinfo)
 void *vp;
 winid window;
 xchar x, y;
-int glyph, bkglyph;
+const glyph_info *glyphinfo;
+const glyph_info *bkglyphinfo;
 {
     struct trace_data *tdp = vp;
 
     fprintf(wc_tracelogf, "%sprint_glyph(%d, %d, %d, %d, %d)\n", INDENT, window,
-            x, y, glyph, bkglyph);
+            x, y, glyphinfo->glyph, bkglyphinfo->glyph);
 
     PRE;
-    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyph, bkglyph);
+    (*tdp->nprocs->win_print_glyph)(tdp->ndata, window, x, y, glyphinfo, bkglyphinfo);
     POST;
 }
 

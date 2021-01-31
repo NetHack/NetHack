@@ -131,7 +131,7 @@ DEBUGINFO = Y
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 !IFNDEF LUA_VERSION
-LUAVER=5.4.1
+LUAVER=5.4.2
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -140,7 +140,7 @@ LUAVER=$(LUA_VERSION)
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.1.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -300,24 +300,24 @@ VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o
 VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o
 VOBJ09 = $(O)hacklib.o  $(O)insight.o  $(O)invent.o   $(O)isaac64.o
 VOBJ10 = $(O)light.o    $(O)lock.o     $(O)mail.o     $(O)makemon.o
-VOBJ11 = $(O)mapglyph.o $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o
-VOBJ12 = $(O)minion.o   $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o
-VOBJ13 = $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o      $(O)mondata.o
-VOBJ14 = $(O)monmove.o  $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o
-VOBJ15 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o
-VOBJ16 = $(O)objnam.o   $(O)options.o  $(O)pager.o    $(O)pickup.o
-VOBJ17 = $(O)pline.o    $(O)polyself.o $(O)potion.o   $(O)pray.o
-VOBJ18 = $(O)priest.o   $(O)quest.o    $(O)questpgr.o $(RANDOM)
-VOBJ19 = $(O)read.o     $(O)rect.o     $(O)region.o   $(O)restore.o
-VOBJ20 = $(O)rip.o      $(O)rnd.o      $(O)role.o     $(O)rumors.o
-VOBJ21 = $(O)save.o     $(O)sfstruct.o $(O)shk.o      $(O)shknam.o
-VOBJ22 = $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o
-VOBJ23 = $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
-VOBJ24 = $(O)teleport.o $(O)timeout.o  $(O)topten.o   $(O)track.o
-VOBJ25 = $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
-VOBJ26 = $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o   $(O)were.o
-VOBJ27 = $(O)wield.o    $(O)windows.o  $(O)wizard.o   $(O)worm.o
-VOBJ28 = $(O)worn.o     $(O)write.o    $(O)zap.o
+VOBJ11 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o
+VOBJ12 = $(O)mklev.o    $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o
+VOBJ13 = $(O)mkroom.o   $(O)mon.o      $(O)mondata.o  $(O)monmove.o
+VOBJ14 = $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
+VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o
+VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o
+VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o
+VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o
+VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o
+VOBJ21 = $(O)sfstruct.o $(O)shk.o      $(O)shknam.o   $(O)sit.o
+VOBJ22 = $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o    $(O)steal.o
+VOBJ23 = $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)teleport.o
+VOBJ24 = $(O)timeout.o  $(O)topten.o   $(O)track.o    $(O)trap.o
+VOBJ25 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vision.o
+VOBJ26 = $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o
+VOBJ27 = $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o
+VOBJ28 = $(O)zap.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 
@@ -384,7 +384,7 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.1.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
 #=================================================================
 
 !IFNDEF LUAVER
@@ -397,6 +397,9 @@ LUAVER   = 5.4.0
 !IF "$(LUATMP)" == "5.4.1"
 LUAVER   = 5.4.1
 !ENDIF
+!IF "$(LUATMP)" == "5.4.2"
+LUAVER   = 5.4.2
+!ENDIF
 !ELSE
 !ERROR NetHack 3.7 requires LUA so LUATOP must be defined
 !ENDIF
@@ -407,7 +410,7 @@ LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
 !IF "$(LUATMP)" == "5.3.5"
 LUAVER   = 5.3.5
 !ELSE
-LUAVER   = 5.4.1
+LUAVER   = 5.4.2
 !ENDIF
 !ENDIF
 !ENDIF
@@ -498,8 +501,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
 		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
-		$(INCL)\winprocs.h $(INCL)\sys.h $(INCL)\wintty.h \
-		$(INCL)\trampoli.h
+		$(INCL)\winprocs.h $(INCL)\sys.h $(INCL)\wintty.h
 
 TILE_H      = ..\win\share\tile.h
 
@@ -542,7 +544,7 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that
 # is too old or untested.
 #
-#NMAKE version 1428293340 from latest VS 2019 (November 19, 2020 version 16.8.2)
+#NMAKE version 1428293360 from latest VS 2019 (Jan, 2021 version 16.8.4)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -566,9 +568,9 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1428293341)
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1428293361)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1428293340)
+!ELSEIF ($(MAKEVERSION) > 1428293360)
 VSVER=2999              #untested future version
 !ENDIF
 
@@ -669,7 +671,15 @@ scall  =
 !ENDIF
 
 !IF ($(VSVER) >= 2012)
-cflags = $(cflags:-W4=-W3)
+#cflags = $(cflags:-W4=-W3)
+# 4131 old-style declarator
+# 4820 padding in struct
+# 4706 assignment within conditional
+# 4244 conversion possible loss of data
+# 4245 conversion from 'char' to 'uchar', signed/unsigned mismatch
+# 4100 unreferenced formal parameter
+#cflags = $(cflags:-W3=-W4) -wd4131 -wd4820 -wd4706 -wd4244 -wd4245 -wd4100
+cflags = $(cflags:-W3=-W4) -wd4820 -wd4706 -wd4244 -wd4245 -wd4100 -wd4310
 !ENDIF
 
 #More verbose warning output options below
@@ -1028,7 +1038,7 @@ $(O)sp_lev.tag:
 	echo sp_levs done > $(O)sp_lev.tag
 
 $(O)utility.tag: $(INCL)\nhlua.h $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(SRC)\vis_tab.c $(INCL)\vis_tab.h $(TILEUTIL16)
+		$(TILEUTIL16)
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1093,12 +1103,6 @@ $(INCL)\onames.h : $(U)makedefs.exe
 
 $(INCL)\pm.h : $(U)makedefs.exe
 	$(U)makedefs -p
-
-$(INCL)\vis_tab.h: $(U)makedefs.exe
-	$(U)makedefs -z
-
-$(SRC)\vis_tab.c: $(U)makedefs.exe
-	$(U)makedefs -z
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1192,6 +1196,32 @@ $(O)envchk.tag: $(O)obj.tag
 #==========================================
 #=========== SECONDARY TARGETS ============
 #==========================================
+fetch-lua: fetch-actual-Lua
+
+fetch-Lua: fetch-actual-Lua
+
+fetch-actual-Lua:
+	@if not exist ..\lib\*.* mkdir ..\lib
+	cd ..\lib
+	curl -R -O http://www.lua.org/ftp/lua-$(LUAVER).tar.gz
+	tar zxf lua-$(LUAVER).tar.gz
+	if exist lua-$(LUAVER).tar.gz del lua-$(LUAVER).tar.gz
+	if exist lua-$(LUAVER).tar del lua-$(LUAVER).tar
+	cd ..\src
+	@echo Lua has been fetched into ..\lib\lua-$(LUAVER)
+
+fetch-pdcurses:
+	@if not exist ..\lib\*.* mkdir ..\lib
+	cd ..\lib
+	curl -L -R https://codeload.github.com/wmcbrine/PDCurses/zip/master -o pdcurses.zip
+	powershell -command "Expand-Archive -Path .\pdcurses.zip -DestinationPath ./pdcurses-temp"
+	if exist .\pdcurses\* rd .\pdcurses /s /Q
+	move .\pdcurses-temp\PDCurses-master .
+	ren PDCurses-master pdcurses
+	if exist .\pdcurses-temp\* rd .\pdcurses-temp /s /Q
+	if exist .\pdcurses.zip del .\pdcurses.zip
+	cd ..\src
+	@echo pdcurses has been fetched into ..\lib\pdcurses
 
 #==========================================
 # DLB utility and nhdatNNN file creation
@@ -1602,8 +1632,6 @@ spotless: clean
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
 	if exist $(INCL)\pm.h            del $(INCL)\pm.h
-	if exist $(INCL)\vis_tab.h       del $(INCL)\vis_tab.h
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist $(SRC)\tile.c           del $(SRC)\tile.c
 	if exist $(U)*.lnk               del $(U)*.lnk
 	if exist $(U)*.map               del $(U)*.map
@@ -1615,7 +1643,6 @@ spotless: clean
 	if exist $(DAT)\dlb.lst		 del $(DAT)\dlb.lst
 	if exist $(DAT)\porthelp	 del $(DAT)\porthelp
 	if exist $(O)sp_lev.tag	         del $(O)sp_lev.tag
-	if exist $(SRC)\vis_tab.c        del $(SRC)\vis_tab.c
 	if exist nhdat$(NHV).	         del nhdat$(NHV).
 	if exist $(O)obj.tag             del $(O)obj.tag
 	if exist $(O)gamedir.tag         del $(O)gamedir.tag
@@ -1909,7 +1936,6 @@ $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_chainout.c
 $(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_trace.c
-$(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
@@ -1927,12 +1953,15 @@ $(O)display.o: display.c $(HACK_H)
 $(O)dlb.o: dlb.c $(CONFIG_H) $(INCL)\dlb.h
 $(O)do.o: do.c $(HACK_H)
 $(O)do_name.o: do_name.c $(HACK_H)
+#	$(cc) $(cflagsBuild) -Fo$@ /EP $(@B).c > $(@B).c.preproc
 $(O)do_wear.o: do_wear.c $(HACK_H)
 $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)\mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
+	$(cc) $(cflagsBuild) -Fo$@ $(@B).c
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)\dgn_file.h $(INCL)\dlb.h
+#	$(cc) $(cflagsBuild) -Fo$@ /EP $(@B).c > $(@B).c.preproc
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)\dlb.h
 $(O)engrave.o: engrave.c $(HACK_H)
@@ -1950,7 +1979,6 @@ $(O)light.o: light.c $(HACK_H)
 $(O)lock.o: lock.c $(HACK_H)
 $(O)mail.o: mail.c $(HACK_H) $(INCL)\mail.h
 $(O)makemon.o: makemon.c $(HACK_H)
-$(O)mapglyph.o: mapglyph.c $(HACK_H)
 $(O)mcastu.o: mcastu.c $(HACK_H)
 $(O)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h \
@@ -2027,7 +2055,7 @@ $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
 $(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
-$(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
+$(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
 $(O)wield.o: wield.c $(HACK_H)

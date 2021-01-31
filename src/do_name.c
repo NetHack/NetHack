@@ -1,27 +1,29 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1606504240 2020/11/27 19:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1608749030 2020/12/23 18:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-static char *NDECL(nextmbuf);
-static void FDECL(getpos_help_keyxhelp, (winid, const char *, const char *, int));
-static void FDECL(getpos_help, (BOOLEAN_P, const char *));
-static int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
-static int FDECL(gloc_filter_classify_glyph, (int));
-static int FDECL(gloc_filter_floodfill_matcharea, (int, int));
-static void FDECL(gloc_filter_floodfill, (int, int));
-static void NDECL(gloc_filter_init);
-static void NDECL(gloc_filter_done);
-static boolean FDECL(gather_locs_interesting, (int, int, int));
-static void FDECL(gather_locs, (coord **, int *, int));
-static void FDECL(auto_describe, (int, int));
-static void NDECL(do_mname);
-static boolean FDECL(alreadynamed, (struct monst *, char *, char *));
-static void FDECL(do_oname, (struct obj *));
-static char *FDECL(docall_xname, (struct obj *));
-static void NDECL(namefloorobj);
+static char *nextmbuf(void);
+static void getpos_help_keyxhelp(winid, const char *, const char *, int);
+static void getpos_help(boolean, const char *);
+static int CFDECLSPEC cmp_coord_distu(const void *, const void *);
+static int gloc_filter_classify_glyph(int);
+static int gloc_filter_floodfill_matcharea(int, int);
+static void gloc_filter_floodfill(int, int);
+static void gloc_filter_init(void);
+static void gloc_filter_done(void);
+static boolean gather_locs_interesting(int, int, int);
+static void gather_locs(coord **, int *, int);
+static void auto_describe(int, int);
+static void do_mgivenname(void);
+static boolean alreadynamed(struct monst *, char *, char *);
+static void do_oname(struct obj *);
+static int name_ok(struct obj *);
+static int call_ok(struct obj *);
+static char *docall_xname(struct obj *);
+static void namefloorobj(void);
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -29,7 +31,7 @@ extern const char what_is_an_unknown_object[]; /* from pager.c */
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
 static char *
-nextmbuf()
+nextmbuf(void)
 {
     static char NEARDATA bufs[NUMMBUF][BUFSZ];
     static int bufidx = 0;
@@ -41,14 +43,11 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
-static boolean FDECL((*getpos_getvalid), (int, int)) =
-                                           (boolean FDECL((*), (int, int))) 0;
+static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
+static boolean (*getpos_getvalid)(int, int) = (boolean (*)(int, int)) 0;
 
 void
-getpos_sethilite(gp_hilitef, gp_getvalidf)
-void FDECL((*gp_hilitef), (int));
-boolean FDECL((*gp_getvalidf), (int, int));
+getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(int, int))
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -74,11 +73,7 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
 };
 
 static void
-getpos_help_keyxhelp(tmpwin, k1, k2, gloc)
-winid tmpwin;
-const char *k1;
-const char *k2;
-int gloc;
+getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
 {
     char sbuf[BUFSZ], fbuf[QBUFSZ];
     const char *move_cursor_to = "move the cursor to ",
@@ -103,9 +98,7 @@ int gloc;
 
 /* the response for '?' help request in getpos() */
 static void
-getpos_help(force, goal)
-boolean force;
-const char *goal;
+getpos_help(boolean force, const char *goal)
 {
     static const char *const fastmovemode[2] = { "8 units at a time",
                                                  "skipping same glyphs" };
@@ -202,7 +195,8 @@ const char *goal;
         } else {
             Sprintf(kbuf, "'%s'", visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
-        Sprintf(sbuf, "Type a %s when you are at the right place.", kbuf);
+        Snprintf(sbuf, sizeof(sbuf),
+                 "Type a %s when you are at the right place.", kbuf);
         putstr(tmpwin, 0, sbuf);
         if (doing_what_is) {
             Sprintf(sbuf,
@@ -232,9 +226,7 @@ const char *goal;
 }
 
 static int
-cmp_coord_distu(a, b)
-const void *a;
-const void *b;
+cmp_coord_distu(const void *a, const void *b)
 {
     const coord *c1 = a;
     const coord *c2 = b;
@@ -263,8 +255,7 @@ const void *b;
      && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
 static int
-gloc_filter_classify_glyph(glyph)
-int glyph;
+gloc_filter_classify_glyph(int glyph)
 {
     int c;
 
@@ -287,8 +278,7 @@ int glyph;
 }
 
 static int
-gloc_filter_floodfill_matcharea(x, y)
-int x, y;
+gloc_filter_floodfill_matcharea(int x, int y)
 {
     int glyph = back_to_glyph(x, y);
 
@@ -306,8 +296,7 @@ int x, y;
 }
 
 static void
-gloc_filter_floodfill(x, y)
-int x, y;
+gloc_filter_floodfill(int x, int y)
 {
     g.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
@@ -316,7 +305,7 @@ int x, y;
 }
 
 static void
-gloc_filter_init()
+gloc_filter_init(void)
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
         if (!g.gloc_filter_map) {
@@ -337,7 +326,7 @@ gloc_filter_init()
 }
 
 static void
-gloc_filter_done()
+gloc_filter_done(void)
 {
     if (g.gloc_filter_map) {
         selection_free(g.gloc_filter_map, TRUE);
@@ -347,8 +336,7 @@ gloc_filter_done()
 }
 
 static boolean
-gather_locs_interesting(x, y, gloc)
-int x, y, gloc;
+gather_locs_interesting(int x, int y, int gloc)
 {
     int glyph, sym;
 
@@ -416,10 +404,7 @@ int x, y, gloc;
 
 /* gather locations for monsters or objects shown on the map */
 static void
-gather_locs(arr_p, cnt_p, gloc)
-coord **arr_p;
-int *cnt_p;
-int gloc;
+gather_locs(coord **arr_p, int *cnt_p, int gloc)
 {
     int x, y, pass, idx;
 
@@ -463,9 +448,7 @@ int gloc;
 }
 
 char *
-dxdy_to_dist_descr(dx, dy, fulldir)
-int dx, dy;
-boolean fulldir;
+dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
 {
     static char buf[30];
     int dst;
@@ -501,9 +484,7 @@ boolean fulldir;
 
 /* coordinate formatting for 'whatis_coord' option */
 char *
-coord_desc(x, y, outbuf, cmode)
-int x, y;
-char *outbuf, cmode;
+coord_desc(int x, int y, char *outbuf, char cmode)
 {
     static char screen_fmt[16]; /* [12] suffices: "[%02d,%02d]" */
     int dx, dy;
@@ -543,8 +524,7 @@ char *outbuf, cmode;
 }
 
 static void
-auto_describe(cx, cy)
-int cx, cy;
+auto_describe(int cx, int cy)
 {
     coord cc;
     int sym = 0;
@@ -569,9 +549,7 @@ int cx, cy;
 }
 
 boolean
-getpos_menu(ccp, gloc)
-coord *ccp;
-int gloc;
+getpos_menu(coord *ccp, int gloc)
 {
     coord *garr = DUMMY;
     int gcount = 0;
@@ -611,8 +589,8 @@ int gloc;
                               iflags.getpos_coords);
             Sprintf(fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
-            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fullbuf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, fullbuf, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -633,10 +611,7 @@ int gloc;
 }
 
 int
-getpos(ccp, force, goal)
-coord *ccp;
-boolean force;
-const char *goal;
+getpos(coord *ccp, boolean force, const char *goal)
 {
     const char *cp;
     static struct {
@@ -988,47 +963,46 @@ const char *goal;
     for (i = 0; i < NUM_GLOCS; i++)
         if (garr[i])
             free((genericptr_t) garr[i]);
-    getpos_hilitefunc = (void FDECL((*), (int))) 0;
-    getpos_getvalid = (boolean FDECL((*), (int, int))) 0;
+    getpos_hilitefunc = (void (*)(int)) 0;
+    getpos_getvalid = (boolean (*)(int, int)) 0;
     return result;
 }
 
 /* allocate space for a monster's name; removes old name if there is one */
 void
-new_mname(mon, lth)
-struct monst *mon;
-int lth; /* desired length (caller handles adding 1 for terminator) */
+new_mgivenname(struct monst *mon,
+               int lth) /* desired length (caller handles adding 1
+                           for terminator) */
 {
     if (lth) {
         /* allocate mextra if necessary; otherwise get rid of old name */
         if (!mon->mextra)
             mon->mextra = newmextra();
         else
-            free_mname(mon); /* already has mextra, might also have name */
-        MNAME(mon) = (char *) alloc((unsigned) lth);
+            free_mgivenname(mon); /* already has mextra, might also have name */
+        MGIVENNAME(mon) = (char *) alloc((unsigned) lth);
     } else {
         /* zero length: the new name is empty; get rid of the old name */
-        if (has_mname(mon))
-            free_mname(mon);
+        if (has_mgivenname(mon))
+            free_mgivenname(mon);
     }
 }
 
 /* release a monster's name; retains mextra even if all fields are now null */
 void
-free_mname(mon)
-struct monst *mon;
+free_mgivenname(struct monst *mon)
 {
-    if (has_mname(mon)) {
-        free((genericptr_t) MNAME(mon));
-        MNAME(mon) = (char *) 0;
+    if (has_mgivenname(mon)) {
+        free((genericptr_t) MGIVENNAME(mon));
+        MGIVENNAME(mon) = (char *) 0;
     }
 }
 
 /* allocate space for an object's name; removes old name if there is one */
 void
-new_oname(obj, lth)
-struct obj *obj;
-int lth; /* desired length (caller handles adding 1 for terminator) */
+new_oname(struct obj *obj,
+          int lth) /* desired length (caller handles adding 1
+                      for terminator) */
 {
     if (lth) {
         /* allocate oextra if necessary; otherwise get rid of old name */
@@ -1046,8 +1020,7 @@ int lth; /* desired length (caller handles adding 1 for terminator) */
 
 /* release an object's name; retains oextra even if all fields are now null */
 void
-free_oname(obj)
-struct obj *obj;
+free_oname(struct obj *obj)
 {
     if (has_oname(obj)) {
         free((genericptr_t) ONAME(obj));
@@ -1061,8 +1034,7 @@ struct obj *obj;
  *  if it doesn't.
  */
 const char *
-safe_oname(obj)
-struct obj *obj;
+safe_oname(struct obj *obj)
 {
     if (has_oname(obj))
         return ONAME(obj);
@@ -1072,9 +1044,7 @@ struct obj *obj;
 /* historical note: this returns a monster pointer because it used to
    allocate a new bigger block of memory to hold the monster and its name */
 struct monst *
-christen_monst(mtmp, name)
-struct monst *mtmp;
-const char *name;
+christen_monst(struct monst *mtmp, const char *name)
 {
     int lth;
     char buf[PL_PSIZ];
@@ -1086,18 +1056,16 @@ const char *name;
         name = strncpy(buf, name, PL_PSIZ - 1);
         buf[PL_PSIZ - 1] = '\0';
     }
-    new_mname(mtmp, lth); /* removes old name if one is present */
+    new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth)
-        Strcpy(MNAME(mtmp), name);
+        Strcpy(MGIVENNAME(mtmp), name);
     return mtmp;
 }
 
 /* check whether user-supplied name matches or nearly matches an unnameable
-   monster's name; if so, give an alternate reject message for do_mname() */
+   monster's name; if so, give an alternate reject message for do_mgivenname() */
 static boolean
-alreadynamed(mtmp, monnambuf, usrbuf)
-struct monst *mtmp;
-char *monnambuf, *usrbuf;
+alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
 {
     char pronounbuf[10], *p;
 
@@ -1125,7 +1093,7 @@ char *monnambuf, *usrbuf;
 
 /* allow player to assign a name to some chosen monster */
 static void
-do_mname()
+do_mgivenname(void)
 {
     char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
     coord cc;
@@ -1169,8 +1137,8 @@ do_mname()
     buf[0] = '\0';
 #ifdef EDIT_GETLIN
     /* if there's an existing name, make it be the default answer */
-    if (has_mname(mtmp))
-        Strcpy(buf, MNAME(mtmp));
+    if (has_mgivenname(mtmp))
+        Strcpy(buf, MGIVENNAME(mtmp));
 #endif
     getlin(qbuf, buf);
     if (!*buf || *buf == '\033')
@@ -1209,10 +1177,8 @@ do_mname()
  * used with extreme care.  Applying a name to an object no longer
  * allocates a replacement object, so that old risk is gone.
  */
-static
-void
-do_oname(obj)
-register struct obj *obj;
+static void
+do_oname(register struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
@@ -1287,9 +1253,7 @@ register struct obj *obj;
 }
 
 struct obj *
-oname(obj, name)
-struct obj *obj;
-const char *name;
+oname(struct obj *obj, const char *name)
 {
     int lth;
     char buf[PL_PSIZ];
@@ -1333,29 +1297,61 @@ const char *name;
     return obj;
 }
 
-static NEARDATA const char callable[] = {
-    SCROLL_CLASS, POTION_CLASS, WAND_CLASS,  RING_CLASS, AMULET_CLASS,
-    GEM_CLASS,    SPBOOK_CLASS, ARMOR_CLASS, TOOL_CLASS, 0
-};
-
 boolean
-objtyp_is_callable(i)
-int i;
+objtyp_is_callable(int i)
 {
-    return (boolean) (objects[i].oc_uname
-                      || (OBJ_DESCR(objects[i])
-                          && index(callable, objects[i].oc_class)));
+    if (objects[i].oc_uname)
+        return TRUE;
+
+    switch(objects[i].oc_class) {
+    case SCROLL_CLASS:
+    case POTION_CLASS:
+    case WAND_CLASS:
+    case RING_CLASS:
+    case AMULET_CLASS:
+    case GEM_CLASS:
+    case SPBOOK_CLASS:
+    case ARMOR_CLASS:
+    case TOOL_CLASS:
+    case VENOM_CLASS:
+        if (OBJ_DESCR(objects[i]))
+            return TRUE;
+        break;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
+/* getobj callback for object to name (specific item) - anything but gold */
+static int
+name_ok(struct obj *obj)
+{
+    if (!obj || obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_SUGGEST;
+}
+
+/* getobj callback for object to call (name its type) */
+static int
+call_ok(struct obj *obj)
+{
+    if (!obj || !objtyp_is_callable(obj->otyp))
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_SUGGEST;
 }
 
 /* C and #name commands - player can name monster or object or type of obj */
 int
-docallcmd()
+docallcmd(void)
 {
     struct obj *obj;
     winid win;
     anything any;
     menu_item *pick_list = 0;
-    char ch, allowall[2];
+    char ch;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
 
@@ -1363,27 +1359,32 @@ docallcmd()
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
-    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
-             "a monster", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
+             ATR_NONE, "a monster", MENU_ITEMFLAGS_NONE);
     if (g.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
-        add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'y', ATR_NONE,
-                 "a particular object in inventory", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
+                 ATR_NONE, "a particular object in inventory",
+                 MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
-        add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'n', ATR_NONE,
-                 "the type of an object in inventory", MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
+                 ATR_NONE, "the type of an object in inventory",
+                 MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
-    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, ',', ATR_NONE,
-             "the type of an object upon the floor", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
+             ATR_NONE, "the type of an object upon the floor",
+             MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
-    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, '\\', ATR_NONE,
-             "the type of an object on discoveries list", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
+             ATR_NONE, "the type of an object on discoveries list",
+             MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
-    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'l', ATR_NONE,
-             "record an annotation for the current level", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
+             ATR_NONE, "record an annotation for the current level",
+             MENU_ITEMFLAGS_NONE);
     end_menu(win, "What do you want to name?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
@@ -1397,17 +1398,15 @@ docallcmd()
     case 'q':
         break;
     case 'm': /* name a visible monster */
-        do_mname();
+        do_mgivenname();
         break;
     case 'i': /* name an individual object in inventory */
-        allowall[0] = ALL_CLASSES;
-        allowall[1] = '\0';
-        obj = getobj(allowall, "name");
+        obj = getobj("name", name_ok, GETOBJ_PROMPT);
         if (obj)
             do_oname(obj);
         break;
     case 'o': /* name a type of object in inventory */
-        obj = getobj(callable, "call");
+        obj = getobj("call", call_ok, GETOBJ_NOFLAGS);
         if (obj) {
             /* behave as if examining it in inventory;
                this might set dknown if it was picked up
@@ -1417,7 +1416,7 @@ docallcmd()
             if (!obj->dknown) {
                 You("would never recognize another one.");
 #if 0
-            } else if (!objtyp_is_callable(obj->otyp)) {
+            } else if (!call_ok(obj)) {
                 You("know those as well as you ever will.");
 #endif
             } else {
@@ -1440,8 +1439,7 @@ docallcmd()
 
 /* for use by safe_qbuf() */
 static char *
-docall_xname(obj)
-struct obj *obj;
+docall_xname(struct obj *obj)
 {
     struct obj otemp;
 
@@ -1472,8 +1470,7 @@ struct obj *obj;
 }
 
 void
-docall(obj)
-struct obj *obj;
+docall(struct obj *obj)
 {
     char buf[BUFSZ], qbuf[QBUFSZ];
     char **str1;
@@ -1521,7 +1518,7 @@ struct obj *obj;
 }
 
 static void
-namefloorobj()
+namefloorobj(void)
 {
     coord cc;
     int glyph;
@@ -1585,7 +1582,7 @@ namefloorobj()
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
               unames[rn2_on_display_rng(SIZE(unames))]);
-    } else if (!objtyp_is_callable(obj->otyp)) {
+    } else if (!call_ok(obj)) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
     } else if (!obj->dknown) {
@@ -1613,7 +1610,7 @@ static const char *const ghostnames[] = {
 
 /* ghost names formerly set by x_monnam(), now by makemon() instead */
 const char *
-rndghostname()
+rndghostname(void)
 {
     return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))] : (const char *) g.plname;
 }
@@ -1636,31 +1633,32 @@ rndghostname()
  *              article newt    art xan art invisible orc       art dog
  */
 
-/* Bug: if the monster is a priest or shopkeeper, not every one of these
- * options works, since those are special cases.
- */
-char *
-x_monnam(mtmp, article, adjective, suppress, called)
-register struct monst *mtmp;
-int article;
-/* ARTICLE_NONE, ARTICLE_THE, ARTICLE_A: obvious
+/*
+ * article
+ *
+ * ARTICLE_NONE, ARTICLE_THE, ARTICLE_A: obvious
  * ARTICLE_YOUR: "your" on pets, "the" on everything else
  *
  * If the monster would be referred to as "it" or if the monster has a name
  * _and_ there is no adjective, "invisible", "saddled", etc., override this
  * and always use no article.
- */
-const char *adjective;
-int suppress;
-/* SUPPRESS_IT, SUPPRESS_INVISIBLE, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE.
+ *
+ * suppress
+ *
+ * SUPPRESS_IT, SUPPRESS_INVISIBLE, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE.
  * EXACT_NAME: combination of all the above
  * SUPPRESS_NAME: omit monster's assigned name (unless uniq w/ pname).
+ *
+ * Bug: if the monster is a priest or shopkeeper, not every one of these
+ * options works, since those are special cases.
  */
-boolean called;
+char *
+x_monnam(register struct monst *mtmp, int article,
+         const char *adjective, int suppress, boolean called)
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
-    const char *pm_name = mdat->mname;
+    const char *pm_name = pmname(mdat, Mgender(mtmp));
     boolean do_hallu, do_invis, do_it, do_saddle, do_name;
     boolean name_at_start, has_adjectives;
     char *bp;
@@ -1705,12 +1703,14 @@ boolean called;
             name += 4;
         return strcpy(buf, name);
     }
+#if 0
     /* an "aligned priest" not flagged as a priest or minion should be
        "priest" or "priestess" (normally handled by priestname()) */
-    if (mdat == &mons[PM_ALIGNED_PRIEST])
+    if (mdat == &mons[PM_ALIGNED_CLERIC])
         pm_name = mtmp->female ? "priestess" : "priest";
-    else if (mdat == &mons[PM_HIGH_PRIEST] && mtmp->female)
+    else if (mdat == &mons[PM_HIGH_CLERIC] && mtmp->female)
         pm_name = "high priestess";
+#endif
 
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
@@ -1754,8 +1754,8 @@ boolean called;
 
         Strcat(buf, rname);
         name_at_start = bogon_is_pname(rnamecode);
-    } else if (do_name && has_mname(mtmp)) {
-        char *name = MNAME(mtmp);
+    } else if (do_name && has_mgivenname(mtmp)) {
+        char *name = MGIVENNAME(mtmp);
 
         if (mdat == &mons[PM_GHOST]) {
             Sprintf(eos(buf), "%s ghost", s_suffix(name));
@@ -1824,19 +1824,17 @@ boolean called;
 }
 
 char *
-l_monnam(mtmp)
-struct monst *mtmp;
+l_monnam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
 }
 
 char *
-mon_nam(mtmp)
-struct monst *mtmp;
+mon_nam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+                    (has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -1844,18 +1842,16 @@ struct monst *mtmp;
  * the player with a cursed potion of invisibility
  */
 char *
-noit_mon_nam(mtmp)
-struct monst *mtmp;
+noit_mon_nam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+                    (has_mgivenname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
                                       : SUPPRESS_IT,
                     FALSE);
 }
 
 char *
-Monnam(mtmp)
-struct monst *mtmp;
+Monnam(struct monst *mtmp)
 {
     register char *bp = mon_nam(mtmp);
 
@@ -1864,8 +1860,7 @@ struct monst *mtmp;
 }
 
 char *
-noit_Monnam(mtmp)
-struct monst *mtmp;
+noit_Monnam(struct monst *mtmp)
 {
     register char *bp = noit_mon_nam(mtmp);
 
@@ -1875,9 +1870,7 @@ struct monst *mtmp;
 
 /* return "a dog" rather than "Fido", honoring hallucination and visibility */
 char *
-noname_monnam(mtmp, article)
-struct monst *mtmp;
-int article;
+noname_monnam(struct monst *mtmp, int article)
 {
     return x_monnam(mtmp, article, (char *) 0, SUPPRESS_NAME, FALSE);
 }
@@ -1885,21 +1878,19 @@ int article;
 /* monster's own name -- overrides hallucination and [in]visibility
    so shouldn't be used in ordinary messages (mainly for disclosure) */
 char *
-m_monnam(mtmp)
-struct monst *mtmp;
+m_monnam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_NONE, (char *) 0, EXACT_NAME, FALSE);
 }
 
 /* pet name: "your little dog" */
 char *
-y_monnam(mtmp)
-struct monst *mtmp;
+y_monnam(struct monst *mtmp)
 {
     int prefix, suppression_flag;
 
     prefix = mtmp->mtame ? ARTICLE_YOUR : ARTICLE_THE;
-    suppression_flag = (has_mname(mtmp)
+    suppression_flag = (has_mgivenname(mtmp)
                         /* "saddled" is redundant when mounted */
                         || mtmp == u.usteed)
                            ? SUPPRESS_SADDLE
@@ -1909,28 +1900,24 @@ struct monst *mtmp;
 }
 
 char *
-Adjmonnam(mtmp, adj)
-struct monst *mtmp;
-const char *adj;
+Adjmonnam(struct monst *mtmp, const char *adj)
 {
     char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
-                        has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                        has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 
     *bp = highc(*bp);
     return  bp;
 }
 
 char *
-a_monnam(mtmp)
-struct monst *mtmp;
+a_monnam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                    has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
+                    has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *
-Amonnam(mtmp)
-struct monst *mtmp;
+Amonnam(struct monst *mtmp)
 {
     char *bp = a_monnam(mtmp);
 
@@ -1941,15 +1928,15 @@ struct monst *mtmp;
 /* used for monster ID by the '/', ';', and 'C' commands to block remote
    identification of the endgame altars via their attending priests */
 char *
-distant_monnam(mon, article, outbuf)
-struct monst *mon;
-int article; /* only ARTICLE_NONE and ARTICLE_THE are handled here */
-char *outbuf;
+distant_monnam(struct monst *mon,
+               int article, /* only ARTICLE_NONE and ARTICLE_THE
+                               are handled here */
+               char *outbuf)
 {
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
-    if (mon->data == &mons[PM_HIGH_PRIEST] && !Hallucination
+    if (mon->data == &mons[PM_HIGH_CLERIC] && !Hallucination
         && Is_astralevel(&u.uz) && distu(mon->mx, mon->my) > 2) {
         Strcpy(outbuf, article == ARTICLE_THE ? "the " : "");
         Strcat(outbuf, mon->female ? "high priestess" : "high priest");
@@ -1962,8 +1949,7 @@ char *outbuf;
 /* returns mon_nam(mon) relative to other_mon; normal name unless they're
    the same, in which case the reference is to {him|her|it} self */
 char *
-mon_nam_too(mon, other_mon)
-struct monst *mon, *other_mon;
+mon_nam_too(struct monst *mon, struct monst *other_mon)
 {
     char *outbuf;
 
@@ -1993,10 +1979,9 @@ struct monst *mon, *other_mon;
 /* construct "<monnamtext> <verb> <othertext> {him|her|it}self" which might
    be distorted by Hallu; if that's plural, adjust monnamtext and verb */
 char *
-monverbself(mon, monnamtext, verb, othertext)
-struct monst *mon;
-char *monnamtext; /* modifiable 'mbuf' with adequare room at end */
-const char *verb, *othertext;
+monverbself(struct monst *mon,
+            char *monnamtext, /* modifiable 'mbuf' with adequare room at end */
+            const char *verb, const char *othertext)
 {
     char *verbs, selfbuf[40]; /* sizeof "themselves" suffices */
 
@@ -2025,9 +2010,7 @@ const char *verb, *othertext;
 /* for debugging messages, where data might be suspect and we aren't
    taking what the hero does or doesn't know into consideration */
 char *
-minimal_monnam(mon, ckloc)
-struct monst *mon;
-boolean ckloc;
+minimal_monnam(struct monst *mon, boolean ckloc)
 {
     struct permonst *ptr;
     char *outbuf = nextmbuf();
@@ -2047,46 +2030,69 @@ boolean ckloc;
     } else if (ckloc && ptr == &mons[PM_LONG_WORM]
                && g.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
-                mons[PM_LONG_WORM_TAIL].mname, mon->mx, mon->my);
+                pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)), mon->mx, mon->my);
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
                 mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
-                mon->data->mname, mon->mx, mon->my);
+                pmname(mon->data, Mgender(mon)), mon->mx, mon->my);
         if (mon->cham != NON_PM)
-            Sprintf(eos(outbuf), "{%s}", mons[mon->cham].mname);
+            Sprintf(eos(outbuf), "{%s}", pmname(&mons[mon->cham], Mgender(mon)));
     }
     return outbuf;
 }
 
+#ifndef PMNAME_MACROS
+int
+Mgender(struct monst *mtmp)
+{
+    int mgender = MALE;
+
+    if (mtmp == &g.youmonst) {
+        if (Upolyd ? u.mfemale : flags.female)
+            mgender = FEMALE;
+    } else if (mtmp->female) {
+        mgender = FEMALE;
+    }
+    return mgender;
+}
+
+const char *
+pmname(struct permonst *pm, int mgender)
+{
+    if ((mgender >= MALE && mgender < NUM_MGENDERS) && pm->pmnames[mgender])
+        return pm->pmnames[mgender];
+    else
+        return pm->pmnames[NEUTRAL];
+}
+#endif /* PMNAME_MACROS */
+
 /* fake monsters used to be in a hard-coded array, now in a data file */
 char *
-bogusmon(buf, code)
-char *buf, *code;
+bogusmon(char *buf, char *code)
 {
     static const char bogon_codes[] = "-_+|="; /* see dat/bonusmon.txt */
-    char *mname = buf;
+    char *mnam = buf;
 
     if (code)
         *code = '\0';
     /* might fail (return empty buf[]) if the file isn't available */
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng);
-    if (!*mname) {
+    if (!*mnam) {
         Strcpy(buf, "bogon");
-    } else if (index(bogon_codes, *mname)) { /* strip prefix if present */
+    } else if (index(bogon_codes, *mnam)) { /* strip prefix if present */
         if (code)
-            *code = *mname;
-        ++mname;
+            *code = *mnam;
+        ++mnam;
     }
-    return mname;
+    return mnam;
 }
 
 /* return a random monster name, for hallucination */
 char *
-rndmonnam(code)
-char *code;
+rndmonnam(char *code)
 {
     static char buf[BUFSZ];
-    char *mname;
+    char *mnam;
     int name;
 #define BOGUSMONSIZE 100 /* arbitrary */
 
@@ -2099,18 +2105,17 @@ char *code;
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
     if (name >= SPECIAL_PM) {
-        mname = bogusmon(buf, code);
+        mnam = bogusmon(buf, code);
     } else {
-        mname = strcpy(buf, mons[name].mname);
+        mnam = strcpy(buf, pmname(&mons[name], rn2_on_display_rng(2)));
     }
-    return mname;
+    return mnam;
 #undef BOGUSMONSIZE
 }
 
 /* check bogusmon prefix to decide whether it's a personal name */
 boolean
-bogon_is_pname(code)
-char code;
+bogon_is_pname(char code)
 {
     if (!code)
         return FALSE;
@@ -2119,7 +2124,7 @@ char code;
 
 /* name of a Rogue player */
 const char *
-roguename()
+roguename(void)
 {
     char *i, *opts;
 
@@ -2148,8 +2153,7 @@ static NEARDATA const char *const hcolors[] = {
 };
 
 const char *
-hcolor(colorpref)
-const char *colorpref;
+hcolor(const char *colorpref)
 {
     return (Hallucination || !colorpref)
         ? hcolors[rn2_on_display_rng(SIZE(hcolors))]
@@ -2158,7 +2162,7 @@ const char *colorpref;
 
 /* return a random real color unless hallucinating */
 const char *
-rndcolor()
+rndcolor(void)
 {
     int k = rn2(CLR_MAX);
 
@@ -2180,8 +2184,7 @@ static NEARDATA const char *const hliquids[] = {
 
 /* if hallucinating, return a random liquid instead of 'liquidpref' */
 const char *
-hliquid(liquidpref)
-const char *liquidpref; /* use as-is when not hallucinating (unless empty) */
+hliquid(const char *liquidpref) /* use as-is when not hallucinating (unless empty) */
 {
     if (Hallucination || !liquidpref || !*liquidpref) {
         int indx, count = SIZE(hliquids);
@@ -2211,9 +2214,7 @@ static const char *const coynames[] = {
 };
 
 char *
-coyotename(mtmp, buf)
-struct monst *mtmp;
-char *buf;
+coyotename(struct monst *mtmp, char *buf)
 {
     if (mtmp && buf) {
         Sprintf(buf, "%s - %s",
@@ -2225,8 +2226,7 @@ char *buf;
 }
 
 char *
-rndorcname(s)
-char *s;
+rndorcname(char *s)
 {
     static const char *v[] = { "a", "ai", "og", "u" };
     static const char *snd[] = { "gor", "gris", "un", "bane", "ruk",
@@ -2245,9 +2245,7 @@ char *s;
 }
 
 struct monst *
-christen_orc(mtmp, gang, other)
-struct monst *mtmp;
-const char *gang, *other;
+christen_orc(struct monst *mtmp, const char *gang, const char *other)
 {
     int sz = 0;
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
@@ -2293,8 +2291,7 @@ static const char *const sir_Terry_novels[] = {
 };
 
 const char *
-noveltitle(novidx)
-int *novidx;
+noveltitle(int *novidx)
 {
     int j, k = SIZE(sir_Terry_novels);
 
@@ -2309,9 +2306,7 @@ int *novidx;
 }
 
 const char *
-lookup_novel(lookname, idx)
-const char *lookname;
-int *idx;
+lookup_novel(const char *lookname, int *idx)
 {
     int k;
 

@@ -2,11 +2,21 @@
 // Qt4 conversion copyright (c) Ray Chason, 2012-2014.
 // NetHack may be freely redistributed.  See license for details.
 
-// qt_inv.cpp -- inventory usage window
+// qt_inv.cpp -- inventory subset of equipment in use,
+//               displayed in a rectangular grid of object tiles
 //
 // Essentially a "paper doll" style display.  [grep fodder]
 //
-// This is at the top center of the main window
+// This is at the top center of the main window, between messages and
+// status.  Qt settings (non-OSX) or Preferences (OSX) has a checkbox to
+// show it or hide it, plus the tile size to use (independent of map's
+// tile size).  Supported tile size is 6..48x6..48 with default of 32x32.
+//
+// TODO?
+// When yn_function() is asking for an inventory letter (not sure whether
+// that is currently discernable...), allow clicking on a cell in the
+// paper doll grid to return the invlet of the item clicked upon.
+//
 
 extern "C" {
 #include "hack.h"
@@ -81,10 +91,15 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
                      : !nhobj->blessed ? BORDER_UNCURSED
                        : BORDER_BLESSED;
 
+        // border color is used to indicate BUC state; make tip text match
+        boolean save_implicit_uncursed = ::flags.implicit_uncursed;
+        ::flags.implicit_uncursed = FALSE;
         // set up a tool tip describing the item that will be displayed here
         Sprintf(tipstr, " %s ", // extra spaces for enhanced readability
                 // xprname: invlet, space, dash, space, object description
                 xprname(nhobj, (char *) NULL, nhobj->invlet, FALSE, 0L, 0L));
+        ::flags.implicit_uncursed = save_implicit_uncursed;
+
         // tips are managed with nethack's alloc(); we don't track allocation
         // amount; allocated buffers get reused when big enough (usual case
         // since paperdoll updates occur more often than equipment changes)
@@ -139,15 +154,15 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     //                                       W wielded two-handed weapon
     //                                       X wielded secondary weapon
     //
-    // 3.7: use a different legend for the layout:
+    // 3.7: use a different layout (also different legend for it, above):
     //      show gloves in only one slot;
     //      move alternate weapon to former right hand glove slot;
     //      move blindfold to former alternate weapon slot;
     //      add quiver to former blindfold slot;
     //      show secondary weapon in shield slot when two-weapon is active;
     //      show two-handed primary weapon in both shield and uwep slots;
-    //      show lit lamp/lantern/candle/candelabrum on lower right side;
-    //      show leash-in-use on lower left side
+    //      add lit lamp/lantern/candle/candelabrum on lower right side;
+    //      add leash-in-use on lower left side
     //
     // Actually indexed by grid[column][row].
 

@@ -259,22 +259,6 @@
 
 /* Sanity check, do not modify these blocks. */
 
-/* OVERLAY must be defined with MOVERLAY or VROOMM */
-#if (defined(MOVERLAY) || defined(VROOMM))
-#ifndef OVERLAY
-#define OVERLAY
-#endif
-#endif
-
-#if defined(FUNCTION_LEVEL_LINKING)
-#define OVERLAY
-#endif
-
-#if defined(OVERLAY) && !defined(MOVERLAY) && !defined(VROOMM) \
-    && !defined(FUNCTION_LEVEL_LINKING)
-#define USE_TRAMPOLI
-#endif
-
 #if defined(MSDOS) && defined(NO_TERMS)
 #ifdef TERMLIB
 #if defined(_MSC_VER) || defined(__SC__)

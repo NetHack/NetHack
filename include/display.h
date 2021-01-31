@@ -475,4 +475,27 @@ enum explosion_types {
 #define glyph_is_unexplored(glyph) ((glyph) == GLYPH_UNEXPLORED)
 #define glyph_is_nothing(glyph) ((glyph) == GLYPH_NOTHING)
 
+/* glyphflags for map_glyphinfo */
+
+/* mgflags for altering map_glyphinfo() internal behaviour */
+#define MG_FLAG_NORMAL      0x00
+#define MG_FLAG_NOOVERRIDE  0x01
+#define MG_FLAG_RETURNIDX   0x02
+
+/* Special mapped glyphflags encoded by map_glyphinfo() */
+#define MG_CORPSE  0x0001
+#define MG_INVIS   0x0002
+#define MG_DETECT  0x0004
+#define MG_PET     0x0008
+#define MG_RIDDEN  0x0010
+#define MG_STATUE  0x0020
+#define MG_OBJPILE 0x0040  /* more than one stack of objects */
+#define MG_BW_LAVA 0x0080  /* 'black & white lava': highlight lava if it
+                              can't be distringuished from water by color */
+#define MG_BW_ICE  0x0100  /* similar for ice vs floor */
+#define MG_NOTHING 0x0200  /* char represents GLYPH_NOTHING */
+#define MG_UNEXPL  0x0400  /* char represents GLYPH_UNEXPLORED */
+#define MG_FEMALE  0x0800  /* represents a female mon,detected mon,pet,ridden */
+#define MG_BADXY   0x1000  /* bad coordinates were passed */
+
 #endif /* DISPLAY_H */

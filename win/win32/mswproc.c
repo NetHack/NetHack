@@ -428,8 +428,8 @@ prompt_for_player_selection(void)
                         } else
                             Strcpy(rolenamebuf, roles[i].name.m);
                     }
-                    add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
-                             an(rolenamebuf), MENU_ITEMFLAGS_NONE);
+                    add_menu(win, &nul_glyphinfo, &any, thisch, 0,
+                             ATR_NONE, an(rolenamebuf), MENU_ITEMFLAGS_NONE);
                     lastch = thisch;
                 }
             }
@@ -437,11 +437,11 @@ prompt_for_player_selection(void)
                                   flags.initalign, PICK_RANDOM) + 1;
             if (any.a_int == 0) /* must be non-zero */
                 any.a_int = randrole(FALSE) + 1;
-            add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                     ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
             any.a_int = i + 1; /* must be non-zero */
-            add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                     ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
             Sprintf(pbuf, "Pick a role for your %s", plbuf);
             end_menu(win, pbuf);
             n = select_menu(win, PICK_ONE, &selected);
@@ -503,18 +503,19 @@ prompt_for_player_selection(void)
                     if (ok_race(flags.initrole, i, flags.initgend,
                                 flags.initalign)) {
                         any.a_int = i + 1; /* must be non-zero */
-                        add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                 ATR_NONE, races[i].noun, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 races[i].noun[0], 0, ATR_NONE,
+                                 races[i].noun, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_race(flags.initrole, flags.initgend,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randrace(flags.initrole) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the race of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -577,18 +578,19 @@ prompt_for_player_selection(void)
                     if (ok_gend(flags.initrole, flags.initrace, i,
                                 flags.initalign)) {
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
-                                 ATR_NONE, genders[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 genders[i].adj[0], 0, ATR_NONE,
+                                 genders[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_gend(flags.initrole, flags.initrace,
                                       flags.initalign, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randgend(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the gender of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -650,18 +652,19 @@ prompt_for_player_selection(void)
                     if (ok_align(flags.initrole, flags.initrace,
                                  flags.initgend, i)) {
                         any.a_int = i + 1;
-                        add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                 ATR_NONE, aligns[i].adj, MENU_ITEMFLAGS_NONE);
+                        add_menu(win, &nul_glyphinfo, &any,
+                                 aligns[i].adj[0], 0, ATR_NONE,
+                                 aligns[i].adj, MENU_ITEMFLAGS_NONE);
                     }
                 any.a_int = pick_align(flags.initrole, flags.initrace,
                                        flags.initgend, PICK_RANDOM) + 1;
                 if (any.a_int == 0) /* must be non-zero */
                     any.a_int = randalign(flags.initrole, flags.initrace) + 1;
-                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, '*', 0,
+                         ATR_NONE, "Random", MENU_ITEMFLAGS_NONE);
                 any.a_int = i + 1; /* must be non-zero */
-                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu(win, &nul_glyphinfo, &any, 'q', 0,
+                         ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
                 Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
                 end_menu(win, pbuf);
                 n = select_menu(win, PICK_ONE, &selected);
@@ -741,7 +744,7 @@ mswin_suspend_nhwindows(const char *str)
 
 /* Restore the windows after being suspended. */
 void
-mswin_resume_nhwindows()
+mswin_resume_nhwindows(void)
 {
     logDebug("mswin_resume_nhwindows()\n");
 
@@ -851,7 +854,7 @@ mswin_clear_nhwindow(winid wid)
                    --more--, if necessary, in the tty window-port.
 */
 void
-mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+mswin_display_nhwindow(winid wid, boolean block)
 {
     logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
     if (GetNHApp()->windowlist[wid].win != NULL) {
@@ -1032,7 +1035,7 @@ mswin_putstr_ex(winid wid, int attr, const char *text, int app)
                    iff complain is TRUE.
 */
 void
-mswin_display_file(const char *filename, BOOLEAN_P must_exist)
+mswin_display_file(const char *filename, boolean must_exist)
 {
     dlb *f;
     TCHAR wbuf[BUFSZ];
@@ -1093,12 +1096,12 @@ mswin_start_menu(winid wid, unsigned long mbehavior)
 }
 
 /*
-add_menu(windid window, int glyph, const anything identifier,
+add_menu(windid window, const glyph_info *glyphinfo,
+                                const anything identifier,
                                 char accelerator, char groupacc,
                                 int attr, char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If
-identifier
-                   is 0, then the line cannot be selected (e.g. a title).
+                   identifier is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
                    selected.  Accelerator is a keyboard key that can be used
                    to select the line.  If the accelerator of a selectable
@@ -1106,8 +1109,8 @@ identifier
                    accelerator.  It is up to the window-port to make the
                    accelerator visible to the user (e.g. put "a - " in front
                    of str).  The value attr is the same as in putstr().
-                   Glyph is an optional glyph to accompany the line.  If
-                   window port cannot or does not want to display it, this
+                   Glyphinfo->glyph is an optional glyph to accompany the line.
+                   If window port cannot or does not want to display it, this
                    is OK.  If there is no glyph applicable, then this
                    value will be NO_GLYPH.
                 -- All accelerators should be in the range [A-Za-z].
@@ -1125,19 +1128,22 @@ identifier
                    menu is displayed, set preselected to TRUE.
 */
 void
-mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
-               CHAR_P accelerator, CHAR_P group_accel, int attr,
+mswin_add_menu(winid wid, const glyph_info *glyphinfo,
+               const ANY_P *identifier,
+               char accelerator, char group_accel, int attr,
                const char *str, unsigned int itemflags)
 {
     boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
-    logDebug("mswin_add_menu(%d, %d, %p, %c, %c, %d, %s, %u)\n", wid, glyph,
+    logDebug("mswin_add_menu(%d, %d, %u, %p, %c, %c, %d, %s, %u)\n", wid,
+             glyphinfo->glyph, glyphinfo->glyphflags,
              identifier, (char) accelerator, (char) group_accel, attr, str,
              itemflags);
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
         MSNHMsgAddMenu data;
         ZeroMemory(&data, sizeof(data));
-        data.glyph = glyph;
+        if (glyphinfo)
+            data.glyphinfo = *glyphinfo;
         data.identifier = identifier;
         data.accelerator = accelerator;
         data.group_accel = group_accel;
@@ -1226,7 +1232,7 @@ mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
         window up, otherwise empty.
 */
 void
-mswin_update_inventory()
+mswin_update_inventory(void)
 {
     logDebug("mswin_update_inventory()\n");
     if (iflags.perm_invent && g.program_state.something_worth_saving
@@ -1240,7 +1246,7 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
                    for the moment
 */
 void
-mswin_mark_synch()
+mswin_mark_synch(void)
 {
     logDebug("mswin_mark_synch()\n");
 }
@@ -1252,7 +1258,7 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
                    display is OK when return from wait_synch().
 */
 void
-mswin_wait_synch()
+mswin_wait_synch(void)
 {
     logDebug("mswin_wait_synch()\n");
     mswin_raw_print_flush();
@@ -1281,21 +1287,22 @@ mswin_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph, bkglyph)
-                -- Print the glyph at (x,y) on the given window.  Glyphs are
-                   integers at the interface, mapped to whatever the window-
+print_glyph(window, x, y, glyphinfo, bkglyphinfo)
+                -- Print a glyph (glyphinfo->glyph) at (x,y) on the given
+                   window.  Glyphs are integers mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
-		-- bkglyph is a background glyph for potential use by some
-		   graphical or tiled environments to allow the depiction
+		-- bkglyphinfo contains a background glyph for potential use
+                   by some graphical or tiled environments to allow the depiction
 		   to fall against a background consistent with the grid 
 		   around x,y.
                    
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+mswin_print_glyph(winid wid, xchar x, xchar y,
+                  const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
-    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d)\n", wid, x, y, glyph, bkglyph);
+    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n", wid, x, y, glyphinfo->glyph, bkglyphinfo->glyph);
 
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {
@@ -1304,8 +1311,10 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
         ZeroMemory(&data, sizeof(data));
         data.x = x;
         data.y = y;
-        data.glyph = glyph;
-        data.bkglyph = bkglyph;
+        if (glyphinfo)
+            data.glyphinfo = *glyphinfo;
+        if (bkglyphinfo)
+            data.bkglyphinfo = *bkglyphinfo;
         SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
     }
@@ -1329,7 +1338,7 @@ mswin_raw_print_accumulate(const char * str, boolean bold)
  *   dialog box and clear raw_print_strbuf.
  */
 void
-mswin_raw_print_flush()
+mswin_raw_print_flush(void)
 {
     if (raw_print_strbuf.str != NULL) {
         int wlen = strlen(raw_print_strbuf.str) + 1;
@@ -1399,7 +1408,7 @@ int nhgetch()   -- Returns a single character input from the user.
                    Returned character _must_ be non-zero.
 */
 int
-mswin_nhgetch()
+mswin_nhgetch(void)
 {
     PMSNHEvent event;
     int key = 0;
@@ -1409,7 +1418,7 @@ mswin_nhgetch()
     while ((event = mswin_input_pop()) == NULL || event->type != NHEVENT_CHAR)
         mswin_main_loop();
 
-    key = event->kbd.ch;
+    key = event->ei.kbd.ch;
     return (key);
 }
 
@@ -1441,13 +1450,13 @@ mswin_nh_poskey(int *x, int *y, int *mod)
 
     if (event->type == NHEVENT_MOUSE) {
 	if (iflags.wc_mouse_support) {
-            *mod = event->ms.mod;
-            *x = event->ms.x;
-            *y = event->ms.y;
+            *mod = event->ei.ms.mod;
+            *x = event->ei.ms.x;
+            *y = event->ei.ms.y;
         }
         key = 0;
     } else {
-        key = event->kbd.ch;
+        key = event->ei.kbd.ch;
     }
     return (key);
 }
@@ -1458,7 +1467,7 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
 anyway.]
 */
 void
-mswin_nhbell()
+mswin_nhbell(void)
 {
     logDebug("mswin_nhbell()\n");
 }
@@ -1469,7 +1478,7 @@ doprev_message()
                 -- On the tty-port this scrolls WIN_MESSAGE back one line.
 */
 int
-mswin_doprev_message()
+mswin_doprev_message(void)
 {
     logDebug("mswin_doprev_message()\n");
     SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL,
@@ -1497,14 +1506,14 @@ char yn_function(const char *ques, const char *choices, char default)
                    ports might use a popup.
 */
 char
-mswin_yn_function(const char *question, const char *choices, CHAR_P def)
+mswin_yn_function(const char *question, const char *choices, char def)
 {
     char ch;
     char yn_esc_map = '\033';
     char message[BUFSZ];
     char res_ch[2];
     int createcaret;
-    boolean digit_ok, allow_num;
+    boolean digit_ok, allow_num = FALSE;
 
     logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
@@ -1737,7 +1746,7 @@ int get_ext_cmd(void)
                selection, -1 otherwise.
 */
 int
-mswin_get_ext_cmd()
+mswin_get_ext_cmd(void)
 {
     int ret;
     logDebug("mswin_get_ext_cmd()\n");
@@ -1840,20 +1849,21 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
                by a nap(50ms), but allows asynchronous operation.
 */
 void
-mswin_delay_output()
+mswin_delay_output(void)
 {
     logDebug("mswin_delay_output()\n");
+    mswin_map_update(mswin_hwnd_from_winid(WIN_MAP));
     Sleep(50);
 }
 
 void
-mswin_change_color()
+mswin_change_color(void)
 {
     logDebug("mswin_change_color()\n");
 }
 
 char *
-mswin_get_color_string()
+mswin_get_color_string(void)
 {
     logDebug("mswin_get_color_string()\n");
     return ("");
@@ -1867,7 +1877,7 @@ start_screen()  -- Only used on Unix tty ports, but must be declared for
                just declare an empty function.
 */
 void
-mswin_start_screen()
+mswin_start_screen(void)
 {
     /* Do Nothing */
     logDebug("mswin_start_screen()\n");
@@ -1878,7 +1888,7 @@ end_screen()    -- Only used on Unix tty ports, but must be declared for
                completeness.  The complement of start_screen().
 */
 void
-mswin_end_screen()
+mswin_end_screen(void)
 {
     /* Do Nothing */
     logDebug("mswin_end_screen()\n");
@@ -2052,9 +2062,8 @@ mswin_preference_update(const char *pref)
     }
 }
 
-#define TEXT_BUFFER_SIZE 4096
 char *
-mswin_getmsghistory(BOOLEAN_P init)
+mswin_getmsghistory(boolean init)
 {
     static PMSNHMsgGetText text = 0;
     static char *next_message = 0;
@@ -2091,7 +2100,7 @@ mswin_getmsghistory(BOOLEAN_P init)
 }
 
 void
-mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
+mswin_putmsghistory(const char *msg, boolean restoring)
 {
     BOOL save_sound_opt;
 
@@ -2109,11 +2118,13 @@ mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
 }
 
 void
-mswin_main_loop()
+mswin_main_loop(void)
 {
-    MSG msg;
-
     while (!mswin_have_input()) {
+        MSG msg;
+
+        mswin_map_update(mswin_hwnd_from_winid(WIN_MAP));
+
         if (!iflags.debug_fuzzer || PeekMessage(&msg, NULL, 0, 0, FALSE)) {
             if(GetMessage(&msg, NULL, 0, 0) != 0) {
                 if (GetNHApp()->regNetHackMode
@@ -2205,7 +2216,7 @@ initMapTiles(void)
 
     map_size.cx = GetNHApp()->mapTile_X * COLNO;
     map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
-    mswin_map_stretch(mswin_hwnd_from_winid(WIN_MAP), &map_size, TRUE);
+    mswin_map_layout(mswin_hwnd_from_winid(WIN_MAP), &map_size);
     return TRUE;
 }
 
@@ -2365,7 +2376,7 @@ logDebug(const char *fmt, ...)
 #define INTFKEY "Interface"
 
 void
-mswin_read_reg()
+mswin_read_reg(void)
 {
     HKEY key;
     DWORD size;
@@ -2477,7 +2488,7 @@ mswin_read_reg()
 }
 
 void
-mswin_write_reg()
+mswin_write_reg(void)
 {
     HKEY key;
     DWORD disposition;
@@ -2555,7 +2566,7 @@ mswin_write_reg()
 }
 
 void
-mswin_destroy_reg()
+mswin_destroy_reg(void)
 {
     char keystring[MAX_PATH];
     HKEY key;
@@ -2796,6 +2807,8 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
+    if (g.program_state.exiting && !strcmp(text, "\n"))
+        text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 
@@ -2988,9 +3001,7 @@ mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 
 /* TODO: turn this into a commmon helper; multiple identical implementations */
 static int
-mswin_condcolor(bm, bmarray)
-long bm;
-unsigned long *bmarray;
+mswin_condcolor(long bm, unsigned long *bmarray)
 {
     int i;
 
@@ -3003,9 +3014,7 @@ unsigned long *bmarray;
 }
 
 static int
-mswin_condattr(bm, bmarray)
-long bm;
-unsigned long *bmarray;
+mswin_condattr(long bm, unsigned long *bmarray)
 {
     if (bm && bmarray) {
         if (bm & bmarray[HL_ATTCLR_DIM]) return HL_DIM;
@@ -3069,8 +3078,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
     long cond, *condptr = (long *) ptr;
     char *text = (char *) ptr;
     MSNHMsgUpdateStatus update_cmd_data;
-    int ocolor, ochar, ci;
-    unsigned ospecial;
+    int ochar, ci;
 
     logDebug("mswin_status_update(%d, %p, %d, %d, %x, %p)\n", idx, ptr, chg, percent, color, condmasks);
 
@@ -3122,8 +3130,7 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
             if (iflags.invis_goldsym)
                 ochar = GOLD_SYM;
             else
-                mapglyph(objnum_to_glyph(GOLD_PIECE),
-                         &ochar, &ocolor, &ospecial, 0, 0, 0);
+                ochar = glyph2ttychar(objnum_to_glyph(GOLD_PIECE));
             buf[0] = ochar;
             p = strchr(text, ':');
             if (p) {

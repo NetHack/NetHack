@@ -152,7 +152,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '.', "floor of a room", C(CLR_GRAY) },      /* room */
 /*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
        { '#', "corridor", C(CLR_GRAY) },             /* dark corr */
-       { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr (see mapglyph.c) */
+       { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr, see map_glyphinfo() */
        { '<', "staircase up", C(CLR_GRAY) },         /* upstair */
        { '>', "staircase down", C(CLR_GRAY) },       /* dnstair */
        { '<', "ladder up", C(CLR_BROWN) },           /* upladder */
@@ -195,7 +195,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
        { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
        { '~', "vibrating square", C(CLR_MAGENTA) },    /* "trap" */
-       /* zap colors are changed by mapglyph() to match type of beam */
+       /* zap colors are changed by map_glyphinfo() to match type of beam */
        { '|', "", C(CLR_GRAY) },                /* vbeam */
        { '-', "", C(CLR_GRAY) },                /* hbeam */
        { '\\', "", C(CLR_GRAY) },               /* lslant */
@@ -210,7 +210,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '*', "", C(HI_ZAP) },
        { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
        { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
-       /* swallow colors are changed by mapglyph() to match engulfing monst */
+       /* swallow colors are changed by map_glyphinfo() to match engulfing monst */
        { '/', "", C(CLR_GREEN) },         /* swallow top left      */
        { '-', "", C(CLR_GREEN) },         /* swallow top center    */
        { '\\', "", C(CLR_GREEN) },        /* swallow top right     */
@@ -219,7 +219,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '\\', "", C(CLR_GREEN) },        /* swallow bottom left   */
        { '-', "", C(CLR_GREEN) },         /* swallow bottom center */
        { '/', "", C(CLR_GREEN) },         /* swallow bottom right  */
-       /* explosion colors are changed by mapglyph() to match type of expl. */
+       /* explosion colors are changed by map_glyphinfo() to match type of expl. */
        { '/', "", C(CLR_ORANGE) },        /* explosion top left     */
        { '-', "", C(CLR_ORANGE) },        /* explosion top center   */
        { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
@@ -252,8 +252,7 @@ const uchar def_r_oc_syms[MAXOCLASSES] = {
  * objnam.c, options.c, pickup.c, sp_lev.c, lev_main.c, and tilemap.c.
  */
 int
-def_char_to_objclass(ch)
-char ch;
+def_char_to_objclass(char ch)
 {
     int i;
 
@@ -269,8 +268,7 @@ char ch;
  * Used in detect.c, options.c, read.c, sp_lev.c, and lev_main.c
  */
 int
-def_char_to_monclass(ch)
-char ch;
+def_char_to_monclass(char ch)
 {
     int i;
 
@@ -282,8 +280,7 @@ char ch;
 
 /* does 'ch' represent a furniture character?  returns index into defsyms[] */
 int
-def_char_is_furniture(ch)
-char ch;
+def_char_is_furniture(char ch)
 {
     /* note: these refer to defsyms[] order which is much different from
        levl[][].typ order but both keep furniture in a contiguous block */

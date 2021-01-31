@@ -11,8 +11,9 @@
 
 COLORREF nhcolor_to_RGB(int c);
 HWND mswin_init_map_window(void);
-void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw);
+void mswin_map_layout(HWND hWnd, LPSIZE lpsz);
 int mswin_map_mode(HWND hWnd, int mode);
+void mswin_map_update(HWND hWnd);
 
 #define ROGUE_LEVEL_MAP_MODE MAP_MODE_ASCII12x16
 #define ROGUE_LEVEL_MAP_MODE_FIT_TO_SCREEN MAP_MODE_ASCII_FIT_TO_SCREEN

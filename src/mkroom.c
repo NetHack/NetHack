@@ -17,24 +17,23 @@
 
 #include "hack.h"
 
-static boolean FDECL(isbig, (struct mkroom *));
-static struct mkroom *FDECL(pick_room, (BOOLEAN_P));
-static void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
-static void FDECL(mk_zoo_thronemon, (int, int));
-static void NDECL(mktemple);
-static coord *FDECL(shrine_pos, (int));
-static struct permonst *NDECL(morguemon);
-static struct permonst *NDECL(squadmon);
-static void FDECL(save_room, (NHFILE *, struct mkroom *));
-static void FDECL(rest_room, (NHFILE *, struct mkroom *));
+static boolean isbig(struct mkroom *);
+static struct mkroom *pick_room(boolean);
+static void mkshop(void), mkzoo(int), mkswamp(void);
+static void mk_zoo_thronemon(int, int);
+static void mktemple(void);
+static coord *shrine_pos(int);
+static struct permonst *morguemon(void);
+static struct permonst *squadmon(void);
+static void save_room(NHFILE *, struct mkroom *);
+static void rest_room(NHFILE *, struct mkroom *);
 
 #define sq(x) ((x) * (x))
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
 static boolean
-isbig(sroom)
-register struct mkroom *sroom;
+isbig(struct mkroom* sroom)
 {
     register int area = (sroom->hx - sroom->lx + 1)
                         * (sroom->hy - sroom->ly + 1);
@@ -44,8 +43,7 @@ register struct mkroom *sroom;
 
 /* make and stock a room of a given type */
 void
-mkroom(roomtype)
-int roomtype;
+mkroom(int roomtype)
 {
     if (roomtype >= SHOPBASE)
         mkshop(); /* someday, we should be able to specify shop type */
@@ -87,7 +85,7 @@ int roomtype;
 }
 
 static void
-mkshop()
+mkshop(void)
 {
     register struct mkroom *sroom;
     int i = -1;
@@ -207,8 +205,7 @@ gottype:
 
 /* pick an unused room, preferably with only one door */
 static struct mkroom *
-pick_room(strict)
-register boolean strict;
+pick_room(boolean strict)
 {
     register struct mkroom *sroom;
     register int i = g.nroom;
@@ -232,8 +229,7 @@ register boolean strict;
 }
 
 static void
-mkzoo(type)
-int type;
+mkzoo(int type)
 {
     register struct mkroom *sroom;
 
@@ -246,14 +242,13 @@ int type;
 }
 
 static void
-mk_zoo_thronemon(x,y)
-int x,y;
+mk_zoo_thronemon(int x,int y)
 {
     int i = rnd(level_difficulty());
-    int pm = (i > 9) ? PM_OGRE_KING
-        : (i > 5) ? PM_ELVENKING
-        : (i > 2) ? PM_DWARF_KING
-        : PM_GNOME_KING;
+    int pm = (i > 9) ? PM_OGRE_TYRANT
+        : (i > 5) ? PM_ELVEN_MONARCH
+        : (i > 2) ? PM_DWARF_RULER
+        : PM_GNOME_RULER;
     struct monst *mon = makemon(&mons[pm], x, y, NO_MM_FLAGS);
 
     if (mon) {
@@ -266,8 +261,7 @@ int x,y;
 }
 
 void
-fill_zoo(sroom)
-struct mkroom *sroom;
+fill_zoo(struct mkroom* sroom)
 {
     struct monst *mon;
     register int sx, sy, i;
@@ -442,10 +436,10 @@ struct mkroom *sroom;
 
 /* make a swarm of undead around mm */
 void
-mkundead(mm, revive_corpses, mm_flags)
-coord *mm;
-boolean revive_corpses;
-int mm_flags;
+mkundead(
+    coord *mm,
+    boolean revive_corpses,
+    int mm_flags)
 {
     int cnt = (level_difficulty() + 1) / 10 + rnd(5);
     struct permonst *mdat;
@@ -464,7 +458,7 @@ int mm_flags;
 }
 
 static struct permonst *
-morguemon()
+morguemon(void)
 {
     register int i = rn2(100), hd = rn2(level_difficulty());
 
@@ -488,7 +482,7 @@ morguemon()
 }
 
 struct permonst *
-antholemon()
+antholemon(void)
 {
     int mtyp, indx, trycnt = 0;
 
@@ -516,7 +510,7 @@ antholemon()
 }
 
 static void
-mkswamp() /* Michiel Huisjes & Fred de Wilde */
+mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
 {
     register struct mkroom *sroom;
     register int sx, sy, i, eelct = 0;
@@ -554,8 +548,7 @@ mkswamp() /* Michiel Huisjes & Fred de Wilde */
 }
 
 static coord *
-shrine_pos(roomno)
-int roomno;
+shrine_pos(int roomno)
 {
     static coord buf;
     int delta;
@@ -576,7 +569,7 @@ int roomno;
 }
 
 static void
-mktemple()
+mktemple(void)
 {
     register struct mkroom *sroom;
     coord *shrine_spot;
@@ -601,8 +594,7 @@ mktemple()
 }
 
 boolean
-nexttodoor(sx, sy)
-register int sx, sy;
+nexttodoor(int sx, int sy)
 {
     register int dx, dy;
     register struct rm *lev;
@@ -619,8 +611,7 @@ register int sx, sy;
 }
 
 boolean
-has_dnstairs(sroom)
-register struct mkroom *sroom;
+has_dnstairs(struct mkroom* sroom)
 {
     stairway *stway = g.stairs;
 
@@ -633,8 +624,7 @@ register struct mkroom *sroom;
 }
 
 boolean
-has_upstairs(sroom)
-register struct mkroom *sroom;
+has_upstairs(struct mkroom* sroom)
 {
     stairway *stway = g.stairs;
 
@@ -647,23 +637,19 @@ register struct mkroom *sroom;
 }
 
 int
-somex(croom)
-register struct mkroom *croom;
+somex(struct mkroom* croom)
 {
     return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
-somey(croom)
-register struct mkroom *croom;
+somey(struct mkroom* croom)
 {
     return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
 
 boolean
-inside_room(croom, x, y)
-struct mkroom *croom;
-xchar x, y;
+inside_room(struct mkroom* croom, xchar x, xchar y)
 {
     if (croom->irregular) {
         int i = (int) ((croom - g.rooms) + ROOMOFFSET);
@@ -675,9 +661,7 @@ xchar x, y;
 }
 
 boolean
-somexy(croom, c)
-struct mkroom *croom;
-coord *c;
+somexy(struct mkroom* croom,coord * c)
 {
     int try_cnt = 0;
     int i;
@@ -726,9 +710,7 @@ coord *c;
 }
 
 boolean
-somexyspace(croom, c)
-struct mkroom *croom;
-coord *c;
+somexyspace(struct mkroom* croom, coord *c)
 {
     int trycnt = 0;
     boolean okay;
@@ -749,8 +731,7 @@ coord *c;
  *              - ANY_TYPE
  */
 struct mkroom *
-search_special(type)
-schar type;
+search_special(schar type)
 {
     register struct mkroom *croom;
 
@@ -768,7 +749,7 @@ schar type;
 }
 
 struct permonst *
-courtmon()
+courtmon(void)
 {
     int i = rn2(60) + rn2(3 * level_difficulty());
 
@@ -802,7 +783,7 @@ static const struct {
 
 /* return soldier types. */
 static struct permonst *
-squadmon()
+squadmon(void)
 {
     int sel_prob, i, cpro, mndx;
 
@@ -829,9 +810,7 @@ gotone:
  * (if any).
  */
 static void
-save_room(nhfp, r)
-NHFILE *nhfp;
-struct mkroom *r;
+save_room(NHFILE* nhfp, struct mkroom* r)
 {
     short i;
 
@@ -851,8 +830,7 @@ struct mkroom *r;
  * save_rooms : Save all the rooms on disk!
  */
 void
-save_rooms(nhfp)
-NHFILE *nhfp;
+save_rooms(NHFILE* nhfp)
 {
     short i;
 
@@ -864,9 +842,7 @@ NHFILE *nhfp;
 }
 
 static void
-rest_room(nhfp, r)
-NHFILE *nhfp;
-struct mkroom *r;
+rest_room(NHFILE* nhfp, struct mkroom* r)
 {
     short i;
 
@@ -885,8 +861,7 @@ struct mkroom *r;
  * the disk.
  */
 void
-rest_rooms(nhfp)
-NHFILE *nhfp;
+rest_rooms(NHFILE* nhfp)
 {
     short i;
 
@@ -905,8 +880,7 @@ NHFILE *nhfp;
 /* convert a display symbol for terrain into topology type;
    used for remembered terrain when mimics pose as furniture */
 int
-cmap_to_type(sym)
-int sym;
+cmap_to_type(int sym)
 {
     int typ = STONE; /* catchall */
 

@@ -18,8 +18,8 @@ extern char orgdir[];
 #endif
 
 #if defined(TTY_GRAPHICS)
-extern void NDECL(backsp);
-extern void NDECL(clear_screen);
+extern void backsp(void);
+extern void clear_screen(void);
 #endif
 
 #if 0
@@ -30,14 +30,13 @@ static struct stat buf;
 static struct stat hbuf;
 #endif
 
-#ifdef PC_LOCKING
-static int NDECL(eraseoldlocks);
+#if defined(PC_LOCKING) && !defined(SELF_RECOVER)
+static int eraseoldlocks(void);
 #endif
 
 #if 0
 int
-uptodate(fd)
-int fd;
+uptodate(int fd)
 {
 #ifdef WANT_GETHDATE
     if(fstat(fd, &buf)) {
@@ -73,9 +72,10 @@ int fd;
 }
 #endif
 
-#ifdef PC_LOCKING
+#if defined(PC_LOCKING)
+#if !defined(SELF_RECOVER)
 static int
-eraseoldlocks()
+eraseoldlocks(void)
 {
     register int i;
 
@@ -96,11 +96,12 @@ eraseoldlocks()
         return 0; /* cannot remove it */
     return (1);   /* success! */
 }
+#endif /* SELF_RECOVER */
 
 void
-getlock()
+getlock(void)
 {
-    register int fd, c, ci, ct, ern;
+    register int fd, c, ci, ct;
     int fcmask = FCMASK;
     char tbuf[BUFSZ];
     const char *fq_lock;
@@ -209,8 +210,6 @@ getlock()
 
 gotlock:
     fd = creat(fq_lock, fcmask);
-    if (fd == -1)
-        ern = errno;
     unlock_file(HLOCK);
     if (fd == -1) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
@@ -240,12 +239,11 @@ gotlock:
 #endif /* PC_LOCKING */
 
 void
-regularize(s)
+regularize(register char *s)
 /*
  * normalize file name - we don't like .'s, /'s, spaces, and
  * lots of other things
  */
-register char *s;
 {
     register char *lp;
 

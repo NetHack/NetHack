@@ -53,7 +53,7 @@ Version     _WIN_32IE   Platform/IE
 /*#define COMCTL_URL
  * "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"*/
 
-extern void FDECL(nethack_exit, (int)) NORETURN;
+extern void nethack_exit(int) NORETURN;
 static TCHAR *_get_cmd_arg(TCHAR *pCmdLine);
 static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
 BOOL WINAPI
@@ -72,7 +72,7 @@ extern int GUILaunched;     /* We tell shared startup code in windmain.c
 #endif
 
 // Foward declarations of functions included in this code module:
-extern boolean FDECL(main, (int, char **));
+extern boolean main(int, char **);
 static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255
@@ -178,21 +178,21 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     // init controls
     if (FAILED(GetComCtlVersion(&major, &minor))) {
-        char buf[TBUFSZ];
-        Sprintf(buf, "Cannot load common control library.\n%s\n%s",
+        char buf2[TBUFSZ];
+        Sprintf(buf2, "Cannot load common control library.\n%s\n%s",
                 "For further information, refer to the installation notes at",
                 INSTALL_NOTES);
-        panic(buf);
+        panic(buf2);
     }
     if (major < MIN_COMCTLMAJOR
         || (major == MIN_COMCTLMAJOR && minor < MIN_COMCTLMINOR)) {
-        char buf[TBUFSZ];
-        Sprintf(buf, "Common control library is outdated.\n%s %d.%d\n%s\n%s",
+        char buf2[TBUFSZ];
+        Sprintf(buf2, "Common control library is outdated.\n%s %d.%d\n%s\n%s",
                 "NetHack requires at least version ", MIN_COMCTLMAJOR,
                 MIN_COMCTLMINOR,
                 "For further information, refer to the installation notes at",
                 INSTALL_NOTES);
-        panic(buf);
+        panic(buf2);
     }
     ZeroMemory(&InitCtrls, sizeof(InitCtrls));
     InitCtrls.dwSize = sizeof(InitCtrls);
@@ -242,7 +242,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 }
 
 PNHWinApp
-GetNHApp()
+GetNHApp(void)
 {
     return &_nethack_app;
 }

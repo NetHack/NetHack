@@ -1,0 +1,214 @@
+strategy:
+  matrix:
+    linux_focal_gcc8_minimal:
+      imageName: 'ubuntu-20.04'
+      toolchainName: gcc8
+      buildTargetName: minimal
+    linux_focal_clang_all:
+      imageName: 'ubuntu-20.04'
+      toolchainName: clang
+      buildTargetName: all
+    linux_focal_gcc8_all:
+      imageName: 'ubuntu-20.04'
+      toolchainName: gcc8
+      buildTargetName: all
+    linux_focal_gcc9_all:
+      imageName: 'ubuntu-20.04'
+      toolchainName: gcc9
+      buildTargetName: all
+    linux_bionic_gcc7_all:
+      imageName: 'ubuntu-18.04'
+      toolchainName: gcc7
+      buildTargetName: all
+# build is currently broken
+#    mac_catalina_gcc8_all:
+#      imageName: 'macOS-10.15'
+#      ccName: gcc-8
+#      cxxName: g++-8
+#      buildSetting: 'all'
+    mac_catalina_clang_all:
+      imageName: 'macOS-10.15'
+      toolchainName: clang
+      buildTargetName: all
+    windows-visualstudio:
+      imageName: 'windows-2019'
+      toolchainName: vs
+      buildTargetName: all
+    windows-mingw:
+      imageName: 'windows-2019'
+      toolchainName: mingw
+      buildTargetName: all
+    linux_focal_cross_msdos:
+      imageName: 'ubuntu-20.04'
+      toolchainName: cross
+      buildTargetName: msdos
+
+pool:
+  vmImage: $(imageName)
+
+# resources:
+#  repositories:
+#  - repository: pdcursesrepo
+#    type: github
+#    name: wmcbrine/PDCurses
+#    ref: refs/heads/master
+#    endpoint: github.com_barthouse
+
+variables:
+  toolchain: $(toolchainName)
+  buildTarget: $(buildTargetName)
+  netHackPath: s/NetHack
+
+steps:
+- bash: |
+    if [ "$(toolchain)" == "gcc7" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-7"
+      echo "##vso[task.setvariable variable=CXX]g++-7"
+    fi
+    if [ "$(toolchain)" == "gcc8" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-8"
+      echo "##vso[task.setvariable variable=CXX]g++-8"
+    fi
+    if [ "$(toolchain)" == "gcc9" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-9"
+      echo "##vso[task.setvariable variable=CXX]g++-9"
+    fi
+    if [ "$(toolchain)" == "gcc10" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-10"
+      echo "##vso[task.setvariable variable=CXX]g++-10"
+    fi
+    if [ "$(toolchain)" == "clang" ]
+    then
+      echo "##vso[task.setvariable variable=CC]clang"
+      echo "##vso[task.setvariable variable=CXX]clang++"
+    fi
+    if [ "$(toolchain)" == "cross" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-8"
+      echo "##vso[task.setvariable variable=CXX]g++-8"
+    fi
+  displayName: 'Setting variables'
+
+- bash: |
+    echo "toolchain: $(toolchain)"
+    echo "buildTarget: $(buildTarget)"
+    echo "netHackPath: $NETHACKPATH"
+    echo "CC: $CC"
+    echo "CXX: $CXX"
+  displayName: 'Echoing variables'
+
+- checkout: git://NetHack/NetHack@NetHack-3.7
+  submodules: true
+  path: $(netHackPath) # $(Agent.BuildDirectory)/$(netHackPath)
+
+- task: DownloadSecureFile@1
+  name: storeKey
+  inputs:
+    secureFile: 'NetHackPackage_StoreKey.pfx'
+  condition: eq( variables.toolchain, 'vs' )
+  displayName: 'Store Key Download'
+
+- task: CopyFiles@2
+  inputs:
+    contents: NetHackPackage_StoreKey.pfx
+    SourceFolder: $(Agent.TempDirectory)
+    TargetFolder: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs
+  condition: eq( variables.toolchain, 'vs' )
+  displayName: 'Copying store key'
+
+- task: MSBuild@1
+  inputs:
+    solution: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs/NetHack.sln
+    platform: Win32
+    configuration: Debug
+  condition: eq( variables.toolchain, 'vs' )
+  displayName: 'Visual Studio Build'
+
+- bash: |
+    export ADD_LUA=Y
+    export WANT_LUAC=N
+    export LUATOP=../submodules/lua
+    export LUASRC=../submodules/lua
+    export ADD_CURSES=Y
+    export PDCURSES_TOP=../submodules/pdcurses
+    export LUA_VERSION=5.4.2
+    export TRAVIS_COMPILER=1
+    cp ../sys/winnt/Makefile.gcc ./Makefile
+    mingw32-make LUA_VERSION=$LUA_VERSION install
+  condition: eq( variables.toolchain, 'mingw' )
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src
+  displayName: 'MinGW Build'
+
+- bash: |
+    sudo apt-get -qq -y update
+    sudo apt-get -qq -y install libncurses5-dev
+    sudo apt-get -qq -y install libx11-dev libxaw7-dev xfonts-utils qtbase5-dev qtmultimedia5-dev qtbase5-dev-tools
+  condition: eq( variables['Agent.OS'], 'Linux' )
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Getting linux build dependencies'
+
+- bash: |
+    cd sys/unix
+    sh setup.sh hints/linux.2020
+    cd ../..
+    make fetch-lua
+    make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'all'))
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Building linux full build'
+
+- bash: |
+    cd sys/unix
+    sh setup.sh hints/linux-minimal
+    cd ../..
+    sed -i '/^#define CLIPPING/d'       include/config.h
+    sed -i '/^#define COMPRESS/d'       include/config.h
+    #sed -i '/^#define DOAGAIN/d'        include/config.h
+    sed -i '/^#define DUMPLOG/d'        include/config.h
+    #sed -i '/^#define GDBPATH/d'        include/config.h
+    #sed -i '/^#define GREPPATH/d'       include/config.h
+    sed -i '/^#define INSURANCE/d'      include/config.h
+    sed -i '/^#define LOGFILE/d'        include/config.h
+    sed -i '/^#define NEWS/d'           include/config.h
+    sed -i '/^#define PANICLOG/d'       include/config.h
+    #sed -i '/^#define STATUS_HILITES/d' include/config.h
+    sed -i '/^#define SYSCF/d'          include/config.h
+    sed -i '/^#define USER_SOUNDS/d'    include/config.h
+    sed -i '/^#define XLOGFILE/d'       include/config.h
+
+    sed -i '/^#define MAIL/d'           include/unixconf.h
+    sed -i '/^#define SHELL/d'          include/unixconf.h
+    sed -i '/^#define SUSPEND/d'        include/unixconf.h
+    sed -i 's/^#define TEXTCOLOR//'     include/unixconf.h
+    make fetch-lua
+    make WANT_WIN_ALL=1 all
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.buildTarget, 'minimal'))
+  displayName: 'Building linux minimal build'
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+
+- bash: |
+    cd sys/unix
+    sh setup.sh hints/macos.2020
+    cd ../..
+    make fetch-lua
+    make all
+  condition: eq( variables['Agent.OS'], 'Darwin' )
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Building mac full build'
+
+- bash: |
+    export GCCVER=gcc1020
+    cd sys/unix
+    sh setup.sh hints/linux.2020
+    cd ../..
+    make fetch-lua
+    sh sys/msdos/fetch-cross-compiler.sh
+    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Building MSDOS build'

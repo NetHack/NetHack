@@ -2,7 +2,7 @@ Qt-NetHack issues
 -----
 
 Urgent:  if the program crashes on OSX, a dialog box asking the user
-whether to [ignore], [report], or [restart] will eventually appear
+whether to [ignore], [report...], or [re-open] will eventually appear
 (it's slow).  That should be repressed even if the report choice could
 be directed at nethack.org.
 
@@ -12,7 +12,7 @@ NetHack has started, and typing ^C was sending the program into an
 endless loop in qt_nhgetch() with repeated messages to stderr
 (the terminal) complaining that the event loop is already running.
 Triggered by yn_function("Really quit?") in the core.  That situation
-has been reduced to a single event loop complaint, do downgraded from
+has been reduced to a single event loop complaint, so downgraded from
 "Urgent", but the prompt is auto-answered with ESC instead of letting
 the user respond.
 
@@ -40,10 +40,6 @@ On OSX, command+Q while a menu (which has its own key event handler)
 is popped up gets ignored.  It should at least close the popup like
 ESC and maybe also initiate quitting.
 
-On the map, ^V is a dead key (at least on OSX; all other ASCII control
-characters from ^A through ^U, ^W through ^Z, and ^[, ^\, ^], ^^, ^_
-work; no attempt to have ^@ generate NUL has been made).
-
 Map column #0, which the core reserves for its own purposes and isn't
 intended to be displayed, is displayed (as blank terrain).
 
@@ -51,13 +47,6 @@ intended to be displayed, is displayed (as blank terrain).
 
 3.6 status conditions (Stone, Slime, Strngl, Deaf, Lev, Fly, Ride)
 have been implemented but need icon artwork (one 40x40 tile for each).
-
-In a menu window, typing ':' (via shift+something) works to initiate
-a search without the need to click on the [Search] button.  In a text
-window, it does not, despite moving the menu key press interpretation
-code into its own routine and calling that for both types of windows.
-From the text window code, it sees the initial shift but not the ':'
-that should follow.
 
 Clicking on window close button pops up a confirmation dialog with
   [  Save and exit  ]  [__Quit_without_saving__]

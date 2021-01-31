@@ -1,4 +1,4 @@
-Cross-compiling NetHack 3.7 Last edit: October 6, 2020
+Cross-compiling NetHack 3.7 Last edit: December 7, 2020
 
 The NetHack 3.7 build process differs from the build process of previous
 versions in some important ways that make it possible to use a cross-compiler
@@ -18,7 +18,7 @@ Part B Contents:
     B3. What needs to be built for the TARGET?
     B4. Case sample: msdos
     B5. Case sample: amiga (started but incomplete)
-    B6. Case sample: Web Assembly, libnethack
+    B6. Case sample: Web Assembly, libnh
 
 --------------------------------------------------------------------------------
  Part A - Cross-compiling NetHack
@@ -369,7 +369,7 @@ Using the cross-compiler, build the following targets:
                            src/fountain.c, src/hack.c, src/hacklib.c,
                            src/insight.c, src/invent.c, src/isaac64.c,
                            src/light.c, src/lock.c, src/mail.c,
-                           src/makemon.c, src/mapglyph.c, src/mcastu.c,
+                           src/makemon.c, src/mcastu.c,
                            src/mdlib.c, src/mhitm.c, src/mhitu.c, src/minion.c,
                            src/mklev.c, src/mkmap.c, src/mkmaze.c, src/mkobj.c,
                            src/mkroom.c, src/mon.c, src/mondata.c,
@@ -388,7 +388,7 @@ Using the cross-compiler, build the following targets:
                            src/symbols.c, src/sys.c, src/teleport.c,
                            src/timeout.c, src/topten.c, src/track.c,
                            src/trap.c, src/u_init.c, src/uhitm.c, src/vault.c,
-                           src/version.c, src/vis_tab.c, src/vision.c,
+                           src/version.c, src/vision.c,
                            src/weapon.c, src/were.c, src/wield.c, src/windows.c,
                            src/wizard.c, src/worm.c, src/worn.c, src/write.c,
                            src/zap.c, sys/share/cppregex.cpp
@@ -668,7 +668,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
         make CROSS_TO_WASM=1
 
-    You can build src/nethacklib.a from pull request 385 as follows:
+    You can build src/libnh.a from pull request 385 as follows:
 
         make WANT_LIBNH=1
 
@@ -679,7 +679,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
     from pull request 385.
 
     Result: As mentioned, the wasm cross-compile will end up in
-            targets/wasm and the nethacklib.a will end up
+            targets/wasm and the nethacklib.a will end up in
             src.
 
     The cross-compiler hints additions are enclosed inside ifdef sections

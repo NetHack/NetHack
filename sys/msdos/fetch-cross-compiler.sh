@@ -8,11 +8,11 @@ else
 fi
 
 if [ -z "$GCCVER" ]; then
-	export GCCVER=gcc1010
+	export GCCVER=gcc1020
 fi
 
 if [ -z "$LUA_VERSION" ]; then
-	export LUA_VERSION=5.4.1
+	export LUA_VERSION=5.4.2
 fi
 
 if [ ! -d "$(pwd)/lib" ]; then
@@ -21,7 +21,8 @@ if [ ! -d "$(pwd)/lib" ]; then
 fi
 
 #DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v2.9/"
-DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/"
+#DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/"
+DJGPP_URL="https://github.com/andrewwutw/build-djgpp/releases/download/v3.1/"
 if [ "$(uname)" = "Darwin" ]; then
     #Mac
     DJGPP_FILE="djgpp-osx-$GCCVER.tar.bz2"

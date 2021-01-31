@@ -8,18 +8,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="NetHackProperties.props" />
-  </ImportGroup>
+  <Import Project="NetHackProperties.props" />
   <Import Project="common.props" />
   <Import Project="dirs.props" />
   <Import Project="files.props" />
@@ -47,43 +36,9 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(LuaDir)lapi.c" />
-    <ClCompile Include="$(LuaDir)lauxlib.c" />
-    <ClCompile Include="$(LuaDir)lbaselib.c" />
-    <ClCompile Include="$(LuaDir)lbitlib.c">
-      <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.4.0'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.4.1'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(LUA_VERSION)'=='5.3.5'">false</ExcludedFromBuild>
+    <ClCompile Include="@(Lua)">
+      <DisableSpecificWarnings>4701;4702;4244;4310</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="$(LuaDir)lcode.c" />
-    <ClCompile Include="$(LuaDir)lcorolib.c" />
-    <ClCompile Include="$(LuaDir)lctype.c" />
-    <ClCompile Include="$(LuaDir)ldblib.c" />
-    <ClCompile Include="$(LuaDir)ldebug.c" />
-    <ClCompile Include="$(LuaDir)ldo.c" />
-    <ClCompile Include="$(LuaDir)ldump.c" />
-    <ClCompile Include="$(LuaDir)lfunc.c" />
-    <ClCompile Include="$(LuaDir)lgc.c" />
-    <ClCompile Include="$(LuaDir)linit.c" />
-    <ClCompile Include="$(LuaDir)liolib.c" />
-    <ClCompile Include="$(LuaDir)llex.c" />
-    <ClCompile Include="$(LuaDir)lmathlib.c" />
-    <ClCompile Include="$(LuaDir)lmem.c" />
-    <ClCompile Include="$(LuaDir)loadlib.c" />
-    <ClCompile Include="$(LuaDir)lobject.c" />
-    <ClCompile Include="$(LuaDir)lopcodes.c" />
-    <ClCompile Include="$(LuaDir)loslib.c" />
-    <ClCompile Include="$(LuaDir)lparser.c" />
-    <ClCompile Include="$(LuaDir)lstate.c" />
-    <ClCompile Include="$(LuaDir)lstring.c" />
-    <ClCompile Include="$(LuaDir)lstrlib.c" />
-    <ClCompile Include="$(LuaDir)ltable.c" />
-    <ClCompile Include="$(LuaDir)ltablib.c" />
-    <ClCompile Include="$(LuaDir)ltm.c" />
-    <ClCompile Include="$(LuaDir)lundump.c" />
-    <ClCompile Include="$(LuaDir)lutf8lib.c" />
-    <ClCompile Include="$(LuaDir)lvm.c" />
-    <ClCompile Include="$(LuaDir)lzio.c" />
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
     <ClCompile Include="$(SrcDir)apply.c" />
@@ -125,7 +80,6 @@
     <ClCompile Include="$(SrcDir)lock.c" />
     <ClCompile Include="$(SrcDir)mail.c" />
     <ClCompile Include="$(SrcDir)makemon.c" />
-    <ClCompile Include="$(SrcDir)mapglyph.c" />
     <ClCompile Include="$(SrcDir)mcastu.c" />
     <ClCompile Include="$(SrcDir)mdlib.c" />
     <ClCompile Include="$(SrcDir)mhitm.c" />
@@ -191,7 +145,6 @@
     <ClCompile Include="$(SrcDir)vault.c" />
     <ClCompile Include="$(SrcDir)version.c" />
     <ClCompile Include="$(SrcDir)vision.c" />
-    <ClCompile Include="$(SrcDir)vis_tab.c" />
     <ClCompile Include="$(SrcDir)weapon.c" />
     <ClCompile Include="$(SrcDir)were.c" />
     <ClCompile Include="$(SrcDir)wield.c" />
@@ -311,11 +264,9 @@
     <ClInclude Include="$(IncDir)tileset.h" />
     <ClInclude Include="$(IncDir)timeout.h" />
     <ClInclude Include="$(IncDir)tradstdc.h" />
-    <ClInclude Include="$(IncDir)trampoli.h" />
     <ClInclude Include="$(IncDir)trap.h" />
     <ClInclude Include="$(IncDir)unixconf.h" />
     <ClInclude Include="$(IncDir)vision.h" />
-    <ClInclude Include="$(IncDir)vis_tab.h" />
     <ClInclude Include="$(IncDir)vmsconf.h" />
     <ClInclude Include="$(IncDir)winami.h" />
     <ClInclude Include="$(IncDir)wincurs.h" />
