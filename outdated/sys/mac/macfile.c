@@ -41,11 +41,11 @@ typedef struct handlefile {
     Handle data; /* The resource, purgeable */
 } HandleFile;
 
-static HandleFile *FDECL(IsHandleFile, (int));
-static int FDECL(OpenHandleFile, (const unsigned char *, long));
-static int FDECL(CloseHandleFile, (int));
-static int FDECL(ReadHandleFile, (int, void *, unsigned));
-static long FDECL(SetHandleFilePos, (int, short, long));
+static HandleFile *IsHandleFile(int);
+static int OpenHandleFile(const unsigned char *, long);
+static int CloseHandleFile(int);
+static int ReadHandleFile(int, void *, unsigned);
+static long SetHandleFilePos(int, short, long);
 
 HandleFile theHandleFiles[MAX_HF];
 MacDirs theDirs; /* also referenced in macwin.c */

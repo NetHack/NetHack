@@ -20,8 +20,8 @@
 #include <clib/dos_protos.h>
 #endif
 
-void NDECL(tty_change_color);
-char *NDECL(tty_get_color_string);
+void tty_change_color(void);
+char *tty_get_color_string(void);
 
 #ifdef TTY_GRAPHICS
 
