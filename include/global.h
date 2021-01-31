@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1610146765 2021/01/08 22:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1612127119 2021/01/31 21:05:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -165,19 +165,10 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
-/*
- * Note:  placing this before amiconf.h is to avoid complications for
- * 'make depend' after amiconf.h got moved to the outdated/ sub-tree.
- * Inclusion really belongs somewhere after the define for SHORT_FILENAMES
- * below, and for that we either need to resurrect amiconf.h or supply
- * an empty stub for it in include/amiconf.h.
- */
-#include "fnamesiz.h" /* file sizes shared between nethack and recover */
-
 /* amiconf.h needs to be the last nested #include of config.h because
    'make depend' will turn it into a comment, hiding anything after it */
 #ifdef AMIGA
-#include "amiconf.h"
+/*#include "amiconf.h"*/
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
@@ -234,6 +225,8 @@ extern struct cross_target_s cross_target;
 #endif
 #endif
 #endif
+
+#include "fnamesiz.h" /* file sizes shared between nethack and recover */
 
 #ifdef VMS
 /* vms_exit() (sys/vms/vmsmisc.c) expects the non-VMS EXIT_xxx values below.

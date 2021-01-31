@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1596498228 2020/08/03 23:43:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.7	windows.c	$NHDT-Date: 1612127121 2021/01/31 21:05:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,7 +19,7 @@ extern void win_X11_init(int);
 extern struct window_procs Qt_procs;
 #endif
 #ifdef GEM_GRAPHICS
-#include "wingem.h"
+/*#include "wingem.h"*/
 #endif
 #ifdef MAC
 extern struct window_procs mac_procs;
@@ -38,7 +38,7 @@ extern void ami_wininit_data(int);
 extern struct window_procs win32_procs;
 #endif
 #ifdef GNOME_GRAPHICS
-#include "winGnome.h"
+/*#include "winGnome.h"*/
 extern struct window_procs Gnome_procs;
 #endif
 #ifdef MSWIN_GRAPHICS
