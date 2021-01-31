@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.438 $ $NHDT-Date: 1612053751 2021/01/31 00:42:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.439 $ $NHDT-Date: 1612055953 2021/01/31 01:19:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -501,6 +501,8 @@ changes accompanying sorting of discoveries resulted in omitting very last
 	item for '`'/#knownclass on a class where every item was discoverable
 	and had no extra labels (so potions and rings, possibly others, but
 	not scrolls or wands) and every item was actually discovered
+change to can_reach_floor() resulted in hero being unable to reach the floor
+	when held by a lichen
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

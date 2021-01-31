@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1608673691 2020/12/22 21:48:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1612055954 2021/01/31 01:19:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -143,7 +143,13 @@ can_reach_floor(boolean check_pit)
 {
     struct trap *t;
 
-    if (u.uswallow || (u.ustuck && !sticks(g.youmonst.data))
+    if (u.uswallow
+        || (u.ustuck && !sticks(g.youmonst.data)
+            /* assume that arms are pinned rather than that the hero
+               has been lifted up above the floor [doesn't explain
+               how hero can attack the creature holding him or her;
+               that's life in nethack...] */
+            && attacktype(u.ustuck->data, AT_HUGS))
         || (Levitation && !(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))))
         return FALSE;
     /* Restricted/unskilled riders can't reach the floor */
