@@ -246,8 +246,7 @@ throw_obj(struct obj *obj, int shotlimit)
 static boolean
 ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
 {
-    /* kludge to work around parse()'s pre-decrement of `multi' */
-    *shotlimit_p = (g.multi || g.save_cm) ? g.multi + 1 : 0;
+    *shotlimit_p = g.command_count;
     g.multi = 0; /* reset; it's been used up */
 
     if (notake(g.youmonst.data)) {

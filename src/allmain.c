@@ -435,7 +435,8 @@ moveloop(boolean resuming)
                 domove();
             } else {
                 --g.multi;
-                rhack(g.save_cm);
+                nhassert(g.command_count != 0);
+                rhack(g.command_line);
             }
         } else if (g.multi == 0) {
 #ifdef MAIL

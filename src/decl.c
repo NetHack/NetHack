@@ -243,7 +243,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* clicklook_cc */
     WIN_ERR, /* en_win */
     FALSE, /* en_via_menu */
-    UNDEFINED_VALUE, /* last_multi */
+    UNDEFINED_VALUE, /* last_command_count */
 
     /* dbridge.c */
     UNDEFINED_VALUES, /* occupants */
@@ -256,7 +256,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* chosen_windowtype */
     DUMMY, /* bases */
     0, /* multi */
-    NULL, /* g.multi_reason */
+    UNDEFINED_VALUES, /* command_line */
+    0, /* command_count */
+    NULL, /* multi_reason */
     0, /* nroom */
     0, /* nsubroom */
     0, /* occtime */

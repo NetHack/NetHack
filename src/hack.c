@@ -2753,9 +2753,7 @@ dopickup(void)
 {
     int count, tmpcount, ret;
 
-    /* awful kludge to work around parse()'s pre-decrement */
-    count = (g.multi || (g.save_cm && *g.save_cm == cmd_from_func(dopickup)))
-              ? g.multi + 1 : 0;
+    count = g.command_count;
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks()) >= 0) {
@@ -3002,6 +3000,10 @@ end_running(boolean and_travel)
        all clear it too */
     if (and_travel)
         g.context.travel = g.context.travel1 = g.context.mv = 0;
+    
+    // Cancel mutli
+    if (g.multi > 0) 
+        g.multi = 0;
 }
 
 void

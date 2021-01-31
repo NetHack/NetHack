@@ -4477,15 +4477,10 @@ get_count(char *allowchars, char inkey,
 static char *
 parse(void)
 {
-#ifdef LINT /* static char in_line[COLNO]; */
-    char in_line[COLNO];
-#else
-    static char in_line[COLNO];
-#endif
     register int foo;
 
     iflags.in_parse = TRUE;
-    g.multi = 0;
+    g.command_count = 0;
     g.context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
@@ -4493,10 +4488,8 @@ parse(void)
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
     if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
-        long tmpmulti = g.multi;
-
-        foo = get_count((char *) 0, '\0', LARGEST_INT, &tmpmulti, FALSE);
-        g.last_multi = g.multi = tmpmulti;
+        foo = get_count((char *) 0, '\0', LARGEST_INT, &g.command_count, FALSE);
+        g.last_command_count = g.command_count;
     }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
@@ -4510,18 +4503,25 @@ parse(void)
 
     if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);
-        g.multi = g.last_multi = 0;
-    } else if ((foo && foo == g.Cmd.spkeys[NHKF_DOAGAIN]) || g.in_doagain) {
-        g.multi = g.last_multi;
+        g.command_count = 0;
+        g.last_command_count = 0;
+    } else if (g.in_doagain) {
+        g.command_count = g.last_command_count;
+    } else if (foo && foo == g.Cmd.spkeys[NHKF_DOAGAIN]) {
+        // g.command_count will be set again when we
+        // re-enter with g.in_doagain set true
+        g.command_count = g.last_command_count;
     } else {
-        g.last_multi = g.multi;
+        g.last_command_count = g.command_count;
         savech(0); /* reset input queue */
         savech((char) foo);
     }
 
+    g.multi = g.command_count;
+
     if (g.multi) {
         g.multi--;
-        g.save_cm = in_line;
+        g.save_cm = g.command_line;
     } else {
         g.save_cm = (char *) 0;
     }
@@ -4546,18 +4546,18 @@ parse(void)
         }
     }
 
-    in_line[0] = foo;
-    in_line[1] = '\0';
+    g.command_line[0] = foo;
+    g.command_line[1] = '\0';
     if (prefix_cmd(foo)) {
         foo = readchar();
         savech((char) foo);
-        in_line[1] = foo;
-        in_line[2] = 0;
+        g.command_line[1] = foo;
+        g.command_line[2] = 0;
     }
     clear_nhwindow(WIN_MESSAGE);
 
     iflags.in_parse = FALSE;
-    return in_line;
+    return g.command_line;
 }
 
 #ifdef HANGUPHANDLING

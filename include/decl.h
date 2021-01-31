@@ -701,7 +701,7 @@ struct instance_globals {
     coord clicklook_cc;
     winid en_win;
     boolean en_via_menu;
-    int last_multi;
+    long last_command_count;
 
     /* dbridge.c */
     struct entity occupants[ENTITIES];
@@ -714,6 +714,8 @@ struct instance_globals {
     char chosen_windowtype[WINTYPELEN];
     int bases[MAXOCLASSES + 1];
     int multi;
+    char command_line[COLNO];
+    long command_count;
     const char *multi_reason;
     int nroom;
     int nsubroom;
