@@ -270,8 +270,6 @@
     <ClInclude Include="$(IncDir)vmsconf.h" />
     <ClInclude Include="$(IncDir)winami.h" />
     <ClInclude Include="$(IncDir)wincurs.h" />
-    <ClInclude Include="$(IncDir)wingem.h" />
-    <ClInclude Include="$(IncDir)winGnome.h" />
     <ClInclude Include="$(IncDir)winprocs.h" />
     <ClInclude Include="$(IncDir)wintty.h" />
     <ClInclude Include="$(IncDir)wintype.h" />
