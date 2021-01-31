@@ -167,13 +167,6 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # X11CFLAGS=-I/opt/X11/include to find <X11/foo.h> in /opt/X11/include/X11/foo.h
 #X11CFLAGS=
 
-# Only used for the Gnome interface.
-# When including the Gnome interface, you need to include gnome specific
-# directories.  The ones given below is the usual spot for linux systems.
-# The paths are for glibconfig.h and gnomesupport.h respectively.
-#
-#GNOMEINC=-I/usr/lib/glib/include -I/usr/lib/gnome-libs/include -I../win/gnome
-
 # flags for debugging:
 # CFLAGS = -g -I../include
 
@@ -272,33 +265,6 @@ WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
 	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
 	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o
-#
-# Files for a Gnome port
-#
-#WINGNOMESRC = ../win/gnome/gnaskstr.c ../win/gnome/gnbind.c \
-#	../win/gnome/gnglyph.c ../win/gnome/gnmain.c ../win/gnome/gnmap.c \
-#	../win/gnome/gnmenu.c ../win/gnome/gnmesg.c ../win/gnome/gnopts.c \
-#	../win/gnome/gnplayer.c ../win/gnome/gnsignal.c \
-#	../win/gnome/gnstatus.c ../win/gnome/gntext.c ../win/gnome/gnyesno.c \
-#	../win/gnome/gnworn.c
-#WINGNOMEOBJ = $(TARGETPFX)gnaskstr.o $(TARGETPFX)gnbind.o $(TARGETPFX)gnglyph.o \
-#	$(TARGETPFX)gnmain.o $(TARGETPFX)gnmap.o $(TARGETPFX)gnmenu.o \
-#	$(TARGETPFX)gnmesg.o $(TARGETPFX)gnopts.o $(TARGETPFX)gnplayer.o \
-#	$(TARGETPFX)gnsignal.o $(TARGETPFX)gnstatus.o $(TARGETPFX)gntext.o \
-#	$(TARGETPFX)gnyesno.o $(TARGETPFX)gnworn.o $(TARGETPFX)tile.o
-# empty values for 'make depend'
-WINGNOMESRC =
-WINGNOMEOBJ =
-
-#
-# Files for a Gem port
-#WINGEMSRC = ../win/gem/wingem.c ../win/gem/wingem1.c ../win/gem/load_img.c \
-#	../win/gem/gr_rect.c tile.c
-#WINGEMOBJ = $(TARGETPFX)wingem.o $(TARGETPFX)wingem1.o \
-#	$(TARGETPFX)load_img.o $(TARGETPFX)gr_rect.o $(TARGETPFX)tile.o
-# empty values for 'make depend'
-WINGEMSRC =
-WINGEMOBJ =
 
 # Files for Shim windowing interface for libnh -- doesn't do anything,
 # just passes along the API calls to the library
@@ -359,12 +325,6 @@ WINQT5LIB = `pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs`
 #
 # libraries for KDE (with Qt)
 WINKDELIB = -lkdecore -lkdeui -lXext
-#
-# libraries for Gnome
-WINGNOMELIB = -lgnomeui -lgnome -lart_lgpl -lgtk -lgdk -lpopt
-#
-# libraries for Gem port
-WINGEMLIB = -le_gem -lgem
 #
 # libraries for BeOS
 WINBELIB = -lbe
@@ -537,7 +497,7 @@ SYSCXXSRC = ../sys/share/cppregex.cpp
 GENCSRC = #tile.c
 
 # all windowing-system-dependent .c (for dependencies and such)
-WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC) $(WINSHIMSRC)
+WINCSRC = $(WINTTYSRC) $(WINCURSESSRC) $(WINX11SRC) $(WINSHIMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINQT3SRC) $(WINBESRC)
 
@@ -1195,8 +1155,7 @@ $(TARGETPFX)vision.o: vision.c $(HACK_H)
 $(TARGETPFX)weapon.o: weapon.c $(HACK_H)
 $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)
-$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wintty.h \
-		../include/wingem.h ../include/winGnome.h
+$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wintty.h
 $(TARGETPFX)wizard.o: wizard.c $(HACK_H)
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)

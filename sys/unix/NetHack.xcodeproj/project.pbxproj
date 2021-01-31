@@ -244,7 +244,6 @@
 		3186A37A21A4B0FA0052BF02 /* integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = integer.h; path = ../../include/integer.h; sourceTree = "<group>"; };
 		3186A37B21A4B0FA0052BF02 /* region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = region.h; path = ../../include/region.h; sourceTree = "<group>"; };
 		3186A37C21A4B0FA0052BF02 /* rect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rect.h; path = ../../include/rect.h; sourceTree = "<group>"; };
-		3186A37D21A4B0FA0052BF02 /* wingem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wingem.h; path = ../../include/wingem.h; sourceTree = "<group>"; };
 		3186A37E21A4B0FA0052BF02 /* vision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vision.h; path = ../../include/vision.h; sourceTree = "<group>"; };
 		3186A37F21A4B0FA0052BF02 /* prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = prop.h; path = ../../include/prop.h; sourceTree = "<group>"; };
 		3186A38121A4B0FB0052BF02 /* pcconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pcconf.h; path = ../../include/pcconf.h; sourceTree = "<group>"; };
@@ -303,7 +302,6 @@
 		3186A3CB21A4B0FE0052BF02 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys.h; path = ../../include/sys.h; sourceTree = "<group>"; };
 		3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gem_rsc.h; path = ../../include/gem_rsc.h; sourceTree = "<group>"; };
 		3186A3CD21A4B0FE0052BF02 /* trap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trap.h; path = ../../include/trap.h; sourceTree = "<group>"; };
-		3186A3CE21A4B0FE0052BF02 /* winGnome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = winGnome.h; path = ../../include/winGnome.h; sourceTree = "<group>"; };
 		3186A3D021A4B0FE0052BF02 /* decl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decl.h; path = ../../include/decl.h; sourceTree = "<group>"; };
 		3186A3D321A4B14B0052BF02 /* cursstat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursstat.h; path = ../../win/curses/cursstat.h; sourceTree = "<group>"; };
 		3186A3D421A4B14B0052BF02 /* cursdial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursdial.h; path = ../../win/curses/cursdial.h; sourceTree = "<group>"; };
@@ -721,8 +719,6 @@
 				3186A3BE21A4B0FD0052BF02 /* vmsconf.h */,
 				3186A3AA21A4B0FD0052BF02 /* winami.h */,
 				3186A37621A4B0FA0052BF02 /* wincurs.h */,
-				3186A37D21A4B0FA0052BF02 /* wingem.h */,
-				3186A3CE21A4B0FE0052BF02 /* winGnome.h */,
 				3186A36F21A4B0FA0052BF02 /* winprocs.h */,
 				3186A39A21A4B0FD0052BF02 /* wintty.h */,
 				3186A3C021A4B0FD0052BF02 /* wintype.h */,
