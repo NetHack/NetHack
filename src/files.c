@@ -126,7 +126,7 @@ extern char *sounddir; /* defined in sounds.c */
 static NHFILE *new_nhfile(void);
 static void free_nhfile(NHFILE *);
 #ifdef SELECTSAVED
-static int CFDECLSPEC strcmp_wrap(const void *, const void *);
+static int QSORTCALLBACK strcmp_wrap(const void *, const void *);
 #endif
 static char *set_bonesfile_name(char *, d_level *);
 static char *set_bonestemp_name(void);
@@ -613,7 +613,7 @@ clearlocks(void)
 
 #if defined(SELECTSAVED)
 /* qsort comparison routine */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 strcmp_wrap(const void *p, const void *q)
 {
 #if defined(UNIX) && defined(QT_GRAPHICS)

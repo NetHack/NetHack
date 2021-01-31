@@ -8,7 +8,7 @@
 static char *nextmbuf(void);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
-static int CFDECLSPEC cmp_coord_distu(const void *, const void *);
+static int cmp_coord_distu(const void *, const void *);
 static int gloc_filter_classify_glyph(int);
 static int gloc_filter_floodfill_matcharea(int, int);
 static void gloc_filter_floodfill(int, int);

@@ -15,7 +15,7 @@
 
 static char *loot_xname(struct obj *);
 static int invletter_value(char);
-static int CFDECLSPEC sortloot_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 static void reorder_invent(void);
 static struct obj *addinv_core0(struct obj *, struct obj *, boolean);
 static void noarmor(boolean);
@@ -303,7 +303,7 @@ invletter_value(char c)
 }
 
 /* qsort comparison routine for sortloot() */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,

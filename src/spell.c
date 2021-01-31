@@ -32,7 +32,7 @@ static void deadbook(struct obj *);
 static int learn(void);
 static boolean rejectcasting(void);
 static boolean getspell(int *);
-static int CFDECLSPEC spell_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK spell_cmp(const genericptr, const genericptr);
 static void sortspells(void);
 static boolean spellsortmenu(void);
 static boolean dospellmenu(const char *, int, int *);
@@ -1443,7 +1443,7 @@ static const char *spl_sortchoices[NUM_SPELL_SORTBY] = {
 };
 
 /* qsort callback routine */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 spell_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     /*

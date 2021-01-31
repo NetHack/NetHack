@@ -449,8 +449,8 @@ static int compare_blstats(struct istat_s *, struct istat_s *);
 static char *anything_to_s(char *, anything *, int);
 static int percentage(struct istat_s *, struct istat_s *);
 static int exp_percentage(void);
-static int CFDECLSPEC cond_cmp(const genericptr, const genericptr);
-static int CFDECLSPEC menualpha_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK cond_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK menualpha_cmp(const genericptr, const genericptr);
 
 #ifdef STATUS_HILITES
 static void s_to_anything(anything *, char *, int);
@@ -989,7 +989,7 @@ condopt(int idx, boolean *addr, boolean negated)
 }
 
 /* qsort callback routine for sorting the condition index */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 cond_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
@@ -1002,7 +1002,7 @@ cond_cmp(const genericptr vptr1, const genericptr vptr2)
 }
 
 /* qsort callback routine for alphabetical sorting of index */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 menualpha_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2;

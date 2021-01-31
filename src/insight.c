@@ -30,7 +30,7 @@ static void status_enlightenment(int, int);
 static void weapon_insight(int);
 static void attributes_enlightenment(int, int);
 static void show_achievements(int);
-static int CFDECLSPEC vanqsort_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
 static int set_vanq_order(void);
 static int num_extinct(void);
 
@@ -2193,7 +2193,7 @@ static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
     "by count, low to high, by internal index within tied count",
 };
 
-static int CFDECLSPEC
+static int QSORTCALLBACK
 vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,

@@ -27,7 +27,7 @@ static struct mkroom *pos_to_room(xchar, xchar);
 static boolean place_niche(struct mkroom *, int *, int *, int *);
 static void makeniche(int);
 static void make_niches(void);
-static int CFDECLSPEC do_comp(const genericptr, const genericptr);
+static int QSORTCALLBACK do_comp(const genericptr, const genericptr);
 static void dosdoor(xchar, xchar, struct mkroom *, int);
 static void join(int, int, boolean);
 static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
@@ -44,7 +44,7 @@ static void mk_knox_portal(xchar, xchar);
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-static int CFDECLSPEC
+static int QSORTCALLBACK
 do_comp(const genericptr vx, const genericptr vy)
 {
 #ifdef LINT
