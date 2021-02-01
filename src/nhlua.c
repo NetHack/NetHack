@@ -382,7 +382,7 @@ nhl_getmap(lua_State *L)
     return 1;
 }
 
-RESTORE_WARNINGS
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 /* pline("It hits!") */
 static int
