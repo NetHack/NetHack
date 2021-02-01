@@ -709,8 +709,8 @@ const struct Gender genders[] = {
 #ifdef CONSENT
 /* Table of all orientations */
 const char *orientations[2][4] = {
-  { "ace", "gay", "straight", "bi" },
-  { "ace", "straight", "gay", "bi" }
+  { "asexual", "homosexual", "heterosexual", "bisexual" },
+  { "asexual", "heterosexual", "homosexual", "bisexual" }
 };
 #endif
 
