@@ -49,6 +49,8 @@ extern unsigned _stklen = STKSIZ;
 /* SAVESIZE is defined in "fnamesiz.h" */
 char savename[SAVESIZE]; /* holds relative path of save file from playground */
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc, char *argv[])
 {
@@ -135,6 +137,8 @@ main(int argc, char *argv[])
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 static char lock[256];
 
