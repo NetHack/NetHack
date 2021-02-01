@@ -837,7 +837,7 @@ DLB =
 #==========================================
 
 {$(LUASRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) $(cflagsBuild) -wd4701 -wd4702 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -1445,7 +1445,7 @@ $(O)lua$(LUAVER)-static.lib: $(LUAOBJFILES)
 $(O)lua.o: $(LUASRC)\lua.c
 $(O)luac.o: $(LUASRC)\luac.c
 $(O)lapi.o: $(LUASRC)\lapi.c
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -wd4244 -Fo$@ $(LUASRC)\lapi.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -wd4244 -wd4701 -wd4702 -Fo$@ $(LUASRC)\lapi.c
 
 #===================================================================
 # sys/winnt dependencies
