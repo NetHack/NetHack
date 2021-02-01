@@ -1793,6 +1793,9 @@ struct attack *mattk; /* non-Null: current attack; Null: general capability */
         ace = ((flags.consent_given & 0x03) == 0);
     }
 
+    /* pline("poly_gender:%d fem:%d consent:%x mask:%x ace:%d m_id:%d",
+        poly_gender(), fem, flags.consent_given, mask, ace, magr->m_id); */
+
     if (ace & (magr->m_id%2)) /* if you are ace, random half will harrass you */
         return 1;
 
