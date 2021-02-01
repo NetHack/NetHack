@@ -1626,22 +1626,14 @@ steal_it(struct monst *mdef, struct attack *mattk)
             mpickobj(mdef, gold), gold = 0;
         if (!Upolyd)
             break; /* no longer have ability to steal */
+        unwornmask = otmp->owornmask;
         /* take the object away from the monster */
-        obj_extract_self(otmp);
-        if ((unwornmask = otmp->owornmask) != 0L) {
-            mdef->misc_worn_check &= ~unwornmask;
-            if (otmp->owornmask & W_WEP)
-                setmnotwielded(mdef, otmp);
-            otmp->owornmask = 0L;
-            update_mon_intrinsics(mdef, otmp, FALSE, FALSE);
-            /* give monster a chance to wear other equipment on its next
-               move instead of waiting until it picks something up */
-            mdef->misc_worn_check |= I_SPECIAL;
-
-            if (otmp == ustealo) /* special message for final item */
-                pline("%s finishes taking off %s suit.", Monnam(mdef),
-                      mhis(mdef));
-        }
+        extract_from_minvent(mdef, otmp, TRUE, FALSE);
+        /* special message for final item; no need to check owornmask because
+         * ustealo is only set on objects with (owornmask & W_ARM) */
+        if (otmp == ustealo)
+            pline("%s finishes taking off %s suit.", Monnam(mdef),
+                  mhis(mdef));
         /* give the object to the character */
         otmp = hold_another_object(otmp, "You snatched but dropped %s.",
                                    doname(otmp), "You steal: ");
@@ -3917,17 +3909,7 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (u.usteed == mdef && obj == which_armor(mdef, W_SADDLE))
                 /* "You can no longer ride <steed>." */
                 dismount_steed(DISMOUNT_POLY);
-            obj_extract_self(obj);
-            if (obj->owornmask) {
-                mdef->misc_worn_check &= ~obj->owornmask;
-                if (obj->owornmask & W_WEP)
-                    mwepgone(mdef);
-                obj->owornmask = 0L;
-                update_mon_intrinsics(mdef, obj, FALSE, FALSE);
-                /* give monster a chance to wear other equipment on its next
-                   move instead of waiting until it picks something up */
-                mdef->misc_worn_check |= I_SPECIAL;
-            }
+            extract_from_minvent(mdef, obj, TRUE, FALSE);
             /* add_to_minv() might free 'obj' [if it merges] */
             if (g.vis)
                 Strcpy(onambuf, doname(obj));

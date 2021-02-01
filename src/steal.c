@@ -671,27 +671,16 @@ mdrop_obj(
     boolean verbosely)
 {
     int omx = mon->mx, omy = mon->my;
-    boolean update_mon = FALSE;
+    boolean unwornmask = obj->owornmask;
 
-    if (obj->owornmask) {
-        /* perform worn item handling if the monster is still alive */
-        if (!DEADMONSTER(mon)) {
-            mon->misc_worn_check &= ~obj->owornmask;
-            update_mon = TRUE;
-
-        /* don't charge for an owned saddle on dead steed (provided
-           that the hero is within the same shop at the time) */
-        } else if (mon->mtame && (obj->owornmask & W_SADDLE) != 0L
-                   && !obj->unpaid && costly_spot(omx, omy)
-                   /* being at costly_spot guarantees lev->roomno is not 0 */
-                   && index(in_rooms(u.ux, u.uy, SHOPBASE),
-                            levl[omx][omy].roomno)) {
-            obj->no_charge = 1;
-        }
-        /* this should be done even if the monster has died */
-        if (obj->owornmask & W_WEP)
-            setmnotwielded(mon, obj);
-        obj->owornmask = 0L;
+    extract_from_minvent(mon, obj, FALSE, TRUE);
+    /* don't charge for an owned saddle on dead steed (provided
+        that the hero is within the same shop at the time) */
+    if (unwornmask && mon->mtame && (unwornmask & W_SADDLE) != 0L
+        && !obj->unpaid && costly_spot(omx, omy)
+        /* being at costly_spot guarantees lev->roomno is not 0 */
+        && index(in_rooms(u.ux, u.uy, SHOPBASE), levl[omx][omy].roomno)) {
+        obj->no_charge = 1;
     }
     /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy))
@@ -701,8 +690,9 @@ mdrop_obj(
         stackobj(obj);
     }
     /* do this last, after placing obj on floor; removing steed's saddle
-       throws rider, possibly inflicting fatal damage and producing bones */
-    if (update_mon)
+       throws rider, possibly inflicting fatal damage and producing bones; this
+       is why we had to call extract_from_minvent() with do_intrinsics=FALSE */
+    if (!DEADMONSTER(mon) && unwornmask)
         update_mon_intrinsics(mon, obj, FALSE, TRUE);
 }
 
@@ -721,16 +711,10 @@ mdrop_special_objs(struct monst* mon)
            current role's quest artifact is rescued too--quest artifacts
            for the other roles are not */
         if (obj_resists(obj, 0, 0) || is_quest_artifact(obj)) {
-            obj_extract_self(obj);
             if (mon->mx) {
                 mdrop_obj(mon, obj, FALSE);
             } else { /* migrating monster not on map */
-                if (obj->owornmask) {
-                    mon->misc_worn_check &= ~obj->owornmask;
-                    if (obj->owornmask & W_WEP)
-                        setmnotwielded(mon, obj);
-                    obj->owornmask = 0L;
-                }
+                extract_from_minvent(mon, obj, TRUE, TRUE);
                 rloco(obj);
             }
         }
@@ -757,7 +741,6 @@ relobj(
     } /* isgd && has gold */
 
     while ((otmp = (is_pet ? droppables(mtmp) : mtmp->minvent)) != 0) {
-        obj_extract_self(otmp);
         mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
     }
 
