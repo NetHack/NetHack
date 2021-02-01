@@ -56,7 +56,7 @@
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT \
                            _Pragma("warning( push )") \
                            _Pragma("warning( disable : 4127 )")
-#define RESTORE_WARNINGCONDEXPR_IS_CONSTANT _Pragma("warning( pop )")
+#define RESTORE_WARNING_CONDEXPR_IS_CONSTANT _Pragma("warning( pop )")
 #define RESTORE_WARNINGS _Pragma("warning( pop )")
 #define STDC_Pragma_AVAILABLE
 
