@@ -538,8 +538,9 @@ explode(int x, int y,
                     g.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     g.killer.format = NO_KILLER_PREFIX;
-                    Sprintf(g.killer.name, "caught %sself in %s own %s", uhim(),
-                            uhis(), str);
+                    Snprintf(g.killer.name, sizeof g.killer.name,
+                             "caught %sself in %s own %s", uhim(),
+                             uhis(), str);
                 } else {
                     g.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))

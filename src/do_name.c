@@ -591,7 +591,7 @@ getpos_menu(coord *ccp, int gloc)
                               &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
-            Sprintf(fullbuf, "%s%s%s", firstmatch,
+            Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, fullbuf, MENU_ITEMFLAGS_NONE);

@@ -3658,7 +3658,7 @@ choose_value:
                 Sprintf(mbuf, "\"%s\"", g.urole.rank[i].m);
                 if (g.urole.rank[i].f) {
                     Sprintf(fbuf, "\"%s\"", g.urole.rank[i].f);
-                    Sprintf(obuf, "%s or %s",
+                    Snprintf(obuf, sizeof obuf, "%s or %s",
                             flags.female ? fbuf : mbuf,
                             flags.female ? mbuf : fbuf);
                 } else {

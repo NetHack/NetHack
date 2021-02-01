@@ -66,7 +66,7 @@ static void traverse_mapseenchn(boolean, winid, int, int, int *);
 static const char *seen_string(xchar, const char *);
 static const char *br_string2(branch *);
 static const char *shop_string(int);
-static char *tunesuffix(mapseen *, char *);
+static char *tunesuffix(mapseen *, char *, size_t);
 
 #ifdef DEBUG
 #define DD g.dungeons[i]
@@ -2166,10 +2166,12 @@ print_dungeon(boolean bymenu, schar *rlev, xchar *rdgn)
         descr = unplaced ? "depth" : "level";
         nlev = dptr->num_dunlevs;
         if (nlev > 1)
-            Sprintf(buf, "%s: %s %d to %d", dptr->dname, makeplural(descr),
-                    dptr->depth_start, dptr->depth_start + nlev - 1);
+            Snprintf(buf, sizeof buf, "%s: %s %d to %d", dptr->dname,
+                     makeplural(descr), dptr->depth_start,
+                     dptr->depth_start + nlev - 1);
         else
-            Sprintf(buf, "%s: %s %d", dptr->dname, descr, dptr->depth_start);
+            Snprintf(buf, sizeof buf, "%s: %s %d", dptr->dname,
+                     descr, dptr->depth_start);
 
         /* Most entrances are uninteresting. */
         if (dptr->entry_lev != 1) {
@@ -3172,7 +3174,8 @@ shop_string(int rtype)
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
 static char *
-tunesuffix(mapseen *mptr, char *outbuf)
+tunesuffix(mapseen *mptr, char *outbuf,
+           size_t bsz) /* sz of outbuf */
 {
     *outbuf = '\0';
     if (mptr->flags.castletune && u.uevent.uheard_tune) {
@@ -3182,7 +3185,7 @@ tunesuffix(mapseen *mptr, char *outbuf)
             Sprintf(tmp, "notes \"%s\"", g.tune);
         else
             Strcpy(tmp, "5-note tune");
-        Sprintf(outbuf, " (play %s to open or close drawbridge)", tmp);
+        Snprintf(outbuf, bsz, " (play %s to open or close drawbridge)", tmp);
     }
     return outbuf;
 }
@@ -3347,7 +3350,8 @@ print_mapseen(winid win, mapseen *mptr,
            indicates that the fort's entrance has been seen (or mapped) */
         Sprintf(buf, "%sFort Ludios.", PREFIX);
     } else if (mptr->flags.castle) {
-        Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
+        Snprintf(buf, sizeof buf, "%sThe castle%s.", PREFIX,
+                tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {
