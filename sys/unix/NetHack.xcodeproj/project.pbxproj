@@ -262,7 +262,6 @@
 		3186A39421A4B0FC0052BF02 /* tileset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tileset.h; path = ../../include/tileset.h; sourceTree = "<group>"; };
 		3186A39521A4B0FC0052BF02 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = obj.h; path = ../../include/obj.h; sourceTree = "<group>"; };
 		3186A39721A4B0FC0052BF02 /* rm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rm.h; path = ../../include/rm.h; sourceTree = "<group>"; };
-		3186A39921A4B0FD0052BF02 /* load_img.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = load_img.h; path = ../../include/load_img.h; sourceTree = "<group>"; };
 		3186A39A21A4B0FD0052BF02 /* wintty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintty.h; path = ../../include/wintty.h; sourceTree = "<group>"; };
 		3186A39B21A4B0FD0052BF02 /* ntconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ntconf.h; path = ../../include/ntconf.h; sourceTree = "<group>"; };
 		3186A39C21A4B0FD0052BF02 /* mkroom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mkroom.h; path = ../../include/mkroom.h; sourceTree = "<group>"; };
@@ -280,7 +279,6 @@
 		3186A3AC21A4B0FD0052BF02 /* dungeon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dungeon.h; path = ../../include/dungeon.h; sourceTree = "<group>"; };
 		3186A3AD21A4B0FD0052BF02 /* unixconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unixconf.h; path = ../../include/unixconf.h; sourceTree = "<group>"; };
 		3186A3B021A4B0FD0052BF02 /* date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = date.h; path = ../../include/date.h; sourceTree = "<group>"; };
-		3186A3B121A4B0FD0052BF02 /* bitmfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bitmfile.h; path = ../../include/bitmfile.h; sourceTree = "<group>"; };
 		3186A3B321A4B0FD0052BF02 /* mfndpos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mfndpos.h; path = ../../include/mfndpos.h; sourceTree = "<group>"; };
 		3186A3B521A4B0FD0052BF02 /* flag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flag.h; path = ../../include/flag.h; sourceTree = "<group>"; };
 		3186A3B621A4B0FD0052BF02 /* sp_lev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sp_lev.h; path = ../../include/sp_lev.h; sourceTree = "<group>"; };
@@ -300,7 +298,6 @@
 		3186A3C821A4B0FE0052BF02 /* mondata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mondata.h; path = ../../include/mondata.h; sourceTree = "<group>"; };
 		3186A3CA21A4B0FE0052BF02 /* timeout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timeout.h; path = ../../include/timeout.h; sourceTree = "<group>"; };
 		3186A3CB21A4B0FE0052BF02 /* sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys.h; path = ../../include/sys.h; sourceTree = "<group>"; };
-		3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gem_rsc.h; path = ../../include/gem_rsc.h; sourceTree = "<group>"; };
 		3186A3CD21A4B0FE0052BF02 /* trap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trap.h; path = ../../include/trap.h; sourceTree = "<group>"; };
 		3186A3D021A4B0FE0052BF02 /* decl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decl.h; path = ../../include/decl.h; sourceTree = "<group>"; };
 		3186A3D321A4B14B0052BF02 /* cursstat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursstat.h; path = ../../win/curses/cursstat.h; sourceTree = "<group>"; };
@@ -657,7 +654,6 @@
 				3186A38821A4B0FB0052BF02 /* artifact.h */,
 				3186A3AB21A4B0FD0052BF02 /* artilist.h */,
 				3186A37421A4B0FA0052BF02 /* attrib.h */,
-				3186A3B121A4B0FD0052BF02 /* bitmfile.h */,
 				3186A36E21A4B0FA0052BF02 /* botl.h */,
 				3186A38721A4B0FB0052BF02 /* color.h */,
 				31B8A30A21A20D730055BD01 /* config.h */,
@@ -674,12 +670,10 @@
 				3186A37021A4B0FA0052BF02 /* extern.h */,
 				3186A3B521A4B0FD0052BF02 /* flag.h */,
 				3186A37321A4B0FA0052BF02 /* func_tab.h */,
-				3186A3CC21A4B0FE0052BF02 /* gem_rsc.h */,
 				3186A3C121A4B0FD0052BF02 /* global.h */,
 				3186A3A521A4B0FD0052BF02 /* hack.h */,
 				3186A37A21A4B0FA0052BF02 /* integer.h */,
 				3186A3BC21A4B0FD0052BF02 /* lint.h */,
-				3186A39921A4B0FD0052BF02 /* load_img.h */,
 				3186A3B821A4B0FD0052BF02 /* mail.h */,
 				3186A38521A4B0FB0052BF02 /* mextra.h */,
 				3186A3B321A4B0FD0052BF02 /* mfndpos.h */,
