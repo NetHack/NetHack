@@ -1497,6 +1497,8 @@ wiz_levltyp_legend(void)
     return;
 }
 
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 /* #wizsmell command - test usmellmon(). */
 static int
 wiz_smell(void)
@@ -1536,6 +1538,8 @@ wiz_smell(void)
     } while (TRUE);
     return 0;
 }
+
+RESTORE_WARNINGS
 
 #define DEFAULT_TIMEOUT_INCR 30
 

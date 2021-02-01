@@ -341,6 +341,8 @@ choose_stairs(xchar *sx, xchar *sy)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 tactics(struct monst *mtmp)
 {
@@ -431,6 +433,8 @@ tactics(struct monst *mtmp)
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 /* are there any monsters mon could aggravate? */
 boolean

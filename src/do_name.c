@@ -335,6 +335,8 @@ gloc_filter_done(void)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static boolean
 gather_locs_interesting(int x, int y, int gloc)
 {
@@ -401,6 +403,8 @@ gather_locs_interesting(int x, int y, int gloc)
     /*NOTREACHED*/
     return FALSE;
 }
+
+RESTORE_WARNINGS
 
 /* gather locations for monsters or objects shown on the map */
 static void

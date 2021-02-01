@@ -165,6 +165,8 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
+#include "warnings.h"
+
 /* amiconf.h needs to be the last nested #include of config.h because
    'make depend' will turn it into a comment, hiding anything after it */
 #ifdef AMIGA

@@ -81,11 +81,15 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #include <stdlib.h>
 #endif
 
+#include "warnings.h"
+
 static void decode(FILE *, FILE *);
 static void outdec(char *, FILE *, int);
 
 /* single-character decode */
 #define DEC(c) (((c) - ' ') & 077)
+
+DISABLE_WARNING_UNREACHABLE_CODE
 
 int
 main(int argc, char **argv)
@@ -172,6 +176,8 @@ main(int argc, char **argv)
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 /*
  * copy from in to out, decoding as you go along.

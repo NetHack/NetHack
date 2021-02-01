@@ -521,7 +521,7 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
-	func_tab.h global.h hack.h lint.h mextra.h mfndpos.h \
+	func_tab.h global.h warnings.h hack.h lint.h mextra.h mfndpos.h \
 	micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	optlist.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
@@ -790,9 +790,9 @@ depend: ../sys/unix/depend.awk \
 
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
-		../include/tradstdc.h ../include/global.h ../include/coord.h \
-		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
+		../include/tradstdc.h ../include/global.h ../include/warnings.h \
+		../include/coord.h ../include/vmsconf.h ../include/system.h \
+		../include/nhlua.h ../include/unixconf.h ../include/pcconf.h \
 		../include/ntconf.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp

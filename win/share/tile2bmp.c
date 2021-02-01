@@ -183,6 +183,8 @@ int yoffset, xoffset;
 char bmpname[128];
 FILE *fp;
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc, char *argv[])
 {
@@ -267,6 +269,8 @@ main(int argc, char *argv[])
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 static void
 build_bmfh(BITMAPFILEHEADER* pbmfh)

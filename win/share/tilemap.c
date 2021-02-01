@@ -644,6 +644,8 @@ extern void monst_globals_init(void);
 extern void objects_globals_init(void);
 #endif
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc UNUSED, char *argv[] UNUSED)
 {
@@ -693,6 +695,8 @@ main(int argc UNUSED, char *argv[] UNUSED)
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 #endif /* TILETEXT */
 

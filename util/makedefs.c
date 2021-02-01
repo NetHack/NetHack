@@ -213,6 +213,8 @@ main(void)
 
 #else /* ! MAC */
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc, char *argv[])
 {
@@ -245,6 +247,8 @@ main(int argc, char *argv[])
     return 0;
 }
 #endif
+
+RESTORE_WARNINGS
 
 void
 do_makedefs(char *options)

@@ -289,6 +289,8 @@ nhl_deltrap(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* local loc = getmap(x,y) */
 static int
 nhl_getmap(lua_State *L)
@@ -379,6 +381,8 @@ nhl_getmap(lua_State *L)
     }
     return 1;
 }
+
+RESTORE_WARNINGS
 
 /* pline("It hits!") */
 static int
@@ -1123,6 +1127,8 @@ load_lua(const char *name)
     return ret;
 }
 
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 const char *
 get_lua_version(void)
 {
@@ -1154,3 +1160,8 @@ get_lua_version(void)
     }
     return (const char *) g.lua_ver;
 }
+
+RESTORE_WARNINGS
+
+
+
