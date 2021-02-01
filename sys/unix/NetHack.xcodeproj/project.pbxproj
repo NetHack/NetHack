@@ -965,7 +965,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -r\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -r\n";
 		};
 		317E7C4B21A35F0500F6E4E5 /* Copy makedefs */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -985,7 +985,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/makedefs ${NH_UTIL_DIR}/makedefs\n";
+			shellScript = "cp \"${BUILT_PRODUCTS_DIR}\"/makedefs \"${NH_UTIL_DIR}\"/makedefs\n";
 		};
 		317E7C4E21A3697300F6E4E5 /* Build options and headers */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1007,7 +1007,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -v\ncd ${NH_UTIL_DIR}\n./makedefs -o\n./makedefs -p\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -v\ncd \"${NH_UTIL_DIR}\"\n./makedefs -o\n./makedefs -p\n";
 		};
 		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1031,7 +1031,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -s\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -s\n";
 		};
 		317E7C5421A3804400F6E4E5 /* Build Guidebook */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1054,7 +1054,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DOC_DIR}\ncat Guidebook.mn | ${NH_UTIL_DIR}/makedefs --grep --input - --output - | tbl tmac.n - | nroff -c -Tascii | col -bx > Guidebook\n";
+			shellScript = "cd \"${NH_DOC_DIR}\"\ncat Guidebook.mn | ${NH_UTIL_DIR}/makedefs --grep --input - --output - | tbl tmac.n - | nroff -c -Tascii | col -bx > Guidebook\n";
 		};
 		317E7C5521A3912D00F6E4E5 /* Build nhdat */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1210,7 +1210,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon.lua tribute asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua tower?.lua valley.lua wizard?.lua astral.lua air.lua earth.lua fire.lua water.lua ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua bogusmon data engrave epitaph oracles options quest.lua rumors\n\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/dlb cf nhdat help hh cmdhelp keyhelp history opthelp wizhelp dungeon.lua tribute asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua tower?.lua valley.lua wizard?.lua astral.lua air.lua earth.lua fire.lua water.lua ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua bogusmon data engrave epitaph oracles options quest.lua rumors\n\n";
 		};
 		3192867021A39F6A00325BEB /* Install */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1241,7 +1241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p ${NH_INSTALL_DIR}/save\ncd ${NH_DAT_DIR}\ncp nhdat license symbols ${NH_INSTALL_DIR}\ncp ${NH_SRC_DIR}/nethack ${NH_INSTALL_DIR}\ncp ${NH_UTIL_DIR}/recover ${NH_INSTALL_DIR}\ntouch ${NH_INSTALL_DIR}/perm\ntouch ${NH_INSTALL_DIR}/record\ntouch ${NH_INSTALL_DIR}/logfile\ntouch ${NH_INSTALL_DIR}/xlogfile\ncd ${NH_UNIX_DIR}\nsh hints/macosx.sh editsysconf sysconf ${NH_INSTALL_DIR}/sysconf\n";
+			shellScript = "mkdir -p \"${NH_INSTALL_DIR}\"/save\ncd \"${NH_DAT_DIR}\"\ncp nhdat license symbols \"${NH_INSTALL_DIR}\"\ncp \"${NH_SRC_DIR}\"/nethack \"${NH_INSTALL_DIR}\"\ncp \"${NH_UTIL_DIR}\"/recover \"${NH_INSTALL_DIR}\"\ntouch \"${NH_INSTALL_DIR}\"/perm\ntouch \"${NH_INSTALL_DIR}\"/record\ntouch \"${NH_INSTALL_DIR}\"/logfile\ntouch \"${NH_INSTALL_DIR}\"/xlogfile\ncd \"${NH_UNIX_DIR}\"\nsh hints/macosx.sh editsysconf sysconf \"${NH_INSTALL_DIR}\"/sysconf\n";
 		};
 		3192867121A3A2D500325BEB /* Copy nethack */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1261,7 +1261,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/nethack ${NH_SRC_DIR}/nethack\n";
+			shellScript = "cp \"${BUILT_PRODUCTS_DIR}\"/nethack \"${NH_SRC_DIR}\"/nethack\n";
 		};
 		3192867221A3AA5700325BEB /* copy dlb */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1281,7 +1281,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp ${BUILT_PRODUCTS_DIR}/dlb ${NH_UTIL_DIR}/dlb\n";
+			shellScript = "cp \"${BUILT_PRODUCTS_DIR}\"/dlb \"${NH_UTIL_DIR}\"/dlb\n";
 		};
 		3192867F21A3AF8000325BEB /* Build oracles */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1301,7 +1301,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -h\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -h\n";
 		};
 		319CBA3821A3458100150830 /* Build data */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1322,7 +1322,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# make data from data.base\ncd ${NH_DAT_DIR}\n${NH_UTIL_DIR}/makedefs -d\n";
+			shellScript = "# make data from data.base\ncd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -d\n";
 		};
 		544768B223995106004B9739 /* Build nhlua header */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1341,7 +1341,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${NH_INC_DIR}\necho '/* nhlua.h - generated by Xcode script */' > nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lua.h\"' >> nhlua.h\nsed -e '/(lua_error)/!d' -e '/(lua_error)/s/;/ NORETURN;/1' < ${NH_LIB_DIR}/lua-5.4.2/src/lua.h >> nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lualib.h\"' >> nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lauxlib.h\"' >> nhlua.h\necho '/*nhlua.h*/' >> nhlua.h\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${NH_INC_DIR}\"\necho '/* nhlua.h - generated by Xcode script */' > nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lua.h\"' >> nhlua.h\nsed -e '/(lua_error)/!d' -e '/(lua_error)/s/;/ NORETURN;/1' < \"${NH_LIB_DIR}\"/lua-5.4.2/src/lua.h >> nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lualib.h\"' >> nhlua.h\necho '#include \"../lib/lua-5.4.2/src/lauxlib.h\"' >> nhlua.h\necho '/*nhlua.h*/' >> nhlua.h\n";
 		};
 		544768B8239954B9004B9739 /* Build Lua library */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1360,7 +1360,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ${NH_LIB_DIR}\nmkdir -p lua\ncd ${NH_LIB_DIR}/lua-5.4.2/src\nmake a\ncp liblua.a ../../lua\ncd ../../..\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${NH_LIB_DIR}\"\nmkdir -p lua\ncd \"${NH_LIB_DIR}\"/lua-5.4.2/src\nmake a\ncp liblua.a ../../lua\ncd ../../..\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
