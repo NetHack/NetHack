@@ -97,8 +97,8 @@ pcconf.h      permonst.h    prop.h        quest.h       rect.h
 region.h      rm.h          skills.h      sp_lev.h      spell.h
 sys.h         system.h      tcap.h        tileset.h     timeout.h
 tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
-winami.h      wincurs.h     winprocs.h    wintype.h     you.h
-youprop.h
+warnings.h    winami.h      wincurs.h     winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
