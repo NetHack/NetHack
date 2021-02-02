@@ -493,6 +493,25 @@ typedef unsigned char uchar;
  * bugs left here.
  */
 
+/* SELECTSAVED: Enable the 'selectsaved' run-time option, allowing it
+ * to be set in user's config file or NETHACKOPTIONS.  When set, if
+ * player is about to be given the "who are you?" prompt, check for
+ * save files and if any are found, put up a menu of them for choosing
+ * one to restore (plus extra menu entries "new game" and "quit").
+ *
+ * Not useful if players are forced to use a specific character name
+ * such as their user name.  However in some cases, players can set
+ * their character name to one which is classified as generic in the
+ * sysconf file (such as "player" or "games")
+ *  nethack -u player
+ * to force the "who are you?" prompt in which case 'selectsaved' will
+ * be honored.
+ *
+ * Comment out if the wildcard file name lookup in files.c doesn't
+ * compile or doesn't work as intended.
+ */
+#define SELECTSAVED /* support for restoring via menu */
+
 /* TTY_TILES_ESCCODES: Enable output of special console escape codes
  * which act as hints for external programs such as EbonHack, or hterm.
  *
@@ -532,6 +551,8 @@ typedef unsigned char uchar;
  * Only available with POSIX_TYPES or GNU C */
 /* #define MSGHANDLER */
 
+/* enable status highlighting via STATUS_HILITE directives in run-time
+   config file and the 'statushilites' option */
 #define STATUS_HILITES         /* support hilites of status fields */
 
 /* #define WINCHAIN */              /* stacked window systems */

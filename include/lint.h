@@ -15,19 +15,7 @@
    (also caller's responsibility to ensure it isn't actually modified!) */
 #define nhStr(str) ((char *) str)
 
-#if defined(GCC_WARN) && !defined(FORCE_ARG_USAGE)
-#define FORCE_ARG_USAGE
-#endif
-
-#ifdef FORCE_ARG_USAGE
-/* force an unused function argument to become used in an arbitrary
-   manner in order to suppress warning about unused function arguments;
-   viable for scalar and pointer arguments */
-#define nhUse(arg) nhUse_dummy += (unsigned) !(arg)
-extern unsigned nhUse_dummy;
-#else
-#define nhUse(arg) /*empty*/
-#endif
+#define nhUse(arg) (void)(arg)
 
 /*
  * This stuff isn't related to lint suppression but lives here to

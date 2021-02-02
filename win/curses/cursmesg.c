@@ -242,7 +242,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
 }
 
 int
-curses_more()
+curses_more(void)
 {
     return curses_block(FALSE);
 }
@@ -251,7 +251,7 @@ curses_more()
 /* Clear the message window if one line; otherwise unhighlight old messages */
 
 void
-curses_clear_unhighlight_message_window()
+curses_clear_unhighlight_message_window(void)
 {
     int mh, mw, count,
         brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
@@ -279,7 +279,7 @@ curses_clear_unhighlight_message_window()
    recent messages. */
 
 void
-curses_last_messages()
+curses_last_messages(void)
 {
     nhprev_mesg *mesg;
     int i, height, width;
@@ -324,7 +324,7 @@ curses_last_messages()
 /* Initialize list for message history */
 
 void
-curses_init_mesg_history()
+curses_init_mesg_history(void)
 {
     max_messages = iflags.msg_history;
 
@@ -356,7 +356,7 @@ curses_teardown_messages(void)
 /* Display previous messages in a popup (via menu so can scroll backwards) */
 
 void
-curses_prev_mesg()
+curses_prev_mesg(void)
 {
     int count;
     winid wid;
@@ -838,8 +838,7 @@ get_msg_line(boolean reverse, int mindex)
    puts it into save file; if any new messages are added to the list while
    that is taking place, the results are likely to be scrambled */
 char *
-curses_getmsghistory(init)
-boolean init;
+curses_getmsghistory(boolean init)
 {
     static int nxtidx;
     nhprev_mesg *mesg;
@@ -882,9 +881,7 @@ boolean init;
  * into message history for ^P recall without having displayed it.
  */
 void
-curses_putmsghistory(msg, restoring_msghist)
-const char *msg;
-boolean restoring_msghist;
+curses_putmsghistory(const char *msg, boolean restoring_msghist)
 {
     static boolean initd = FALSE;
     static int stash_count;

@@ -35,6 +35,8 @@
 #include "hack.h"
 #include "color.h"
 
+#define TEXT_BUFFER_SIZE 4096
+
 /* Create an array to keep track of the various windows */
 
 #ifndef MAXWINDOWS
@@ -146,16 +148,16 @@ void mswin_suspend_nhwindows(const char *);
 void mswin_resume_nhwindows(void);
 winid mswin_create_nhwindow(int type);
 void mswin_clear_nhwindow(winid wid);
-void mswin_display_nhwindow(winid wid, BOOLEAN_P block);
+void mswin_display_nhwindow(winid wid, boolean block);
 void mswin_destroy_nhwindow(winid wid);
 void mswin_curs(winid wid, int x, int y);
 void mswin_putstr(winid wid, int attr, const char *text);
 void mswin_putstr_ex(winid wid, int attr, const char *text, int);
-void mswin_display_file(const char *filename, BOOLEAN_P must_exist);
+void mswin_display_file(const char *filename, boolean must_exist);
 void mswin_start_menu(winid wid, unsigned long mbehavior);
 void mswin_add_menu(winid wid, const glyph_info *glyphinfo,
                     const ANY_P *identifier,
-                    CHAR_P accelerator, CHAR_P group_accel, int attr,
+                    char accelerator, char group_accel, int attr,
                     const char *str, unsigned int itemflags);
 void mswin_end_menu(winid wid, const char *prompt);
 int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
@@ -163,7 +165,7 @@ void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+void mswin_print_glyph(winid wid, xchar x, xchar y,
                        const glyph_info *glyph, const glyph_info *bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
@@ -172,7 +174,7 @@ int mswin_nhgetch(void);
 int mswin_nh_poskey(int *x, int *y, int *mod);
 void mswin_nhbell(void);
 int mswin_doprev_message(void);
-char mswin_yn_function(const char *question, const char *choices, CHAR_P def);
+char mswin_yn_function(const char *question, const char *choices, char def);
 void mswin_getlin(const char *question, char *input);
 int mswin_get_ext_cmd(void);
 void mswin_number_pad(int state);
@@ -183,8 +185,8 @@ void mswin_start_screen(void);
 void mswin_end_screen(void);
 void mswin_outrip(winid wid, int how, time_t when);
 void mswin_preference_update(const char *pref);
-char *mswin_getmsghistory(BOOLEAN_P init);
-void mswin_putmsghistory(const char *msg, BOOLEAN_P);
+char *mswin_getmsghistory(boolean init);
+void mswin_putmsghistory(const char *msg, boolean);
 
 void mswin_status_init(void);
 void mswin_status_finish(void);

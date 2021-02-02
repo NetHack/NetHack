@@ -17,6 +17,8 @@
 
 namespace nethack_qt_ {
 
+void centerOnMain(QWidget *); /* in the namespace but not in any class */
+
 class NetHackQtWindow {
 public:
 	NetHackQtWindow();

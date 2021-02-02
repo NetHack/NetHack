@@ -91,47 +91,44 @@ static const char popup_entry_translations[] = "#override\n\
      <Btn4Down>: scroll(8)\n\
      <Btn5Down>: scroll(2)";
 
-static void NDECL(plsel_dialog_acceptvalues);
-static void FDECL(plsel_set_play_button, (BOOLEAN_P));
-static void FDECL(plsel_set_sensitivities, (BOOLEAN_P));
-static void NDECL(X11_player_selection_randomize);
-static void NDECL(X11_player_selection_setupOthers);
-static void FDECL(racetoggleCallback, (Widget, XtPointer, XtPointer));
-static void FDECL(roletoggleCallback, (Widget, XtPointer, XtPointer));
-static void FDECL(gendertoggleCallback, (Widget, XtPointer, XtPointer));
-static void FDECL(aligntoggleCallback, (Widget, XtPointer, XtPointer));
-static void FDECL(plsel_random_btn_callback, (Widget, XtPointer, XtPointer));
-static void FDECL(plsel_play_btn_callback, (Widget, XtPointer, XtPointer));
-static void FDECL(plsel_quit_btn_callback, (Widget, XtPointer, XtPointer));
-static Widget FDECL(X11_create_player_selection_name, (Widget));
-static void NDECL(X11_player_selection_dialog);
-static void NDECL(X11_player_selection_prompts);
-static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
-static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
-static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_select, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_dismiss, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_help, (Widget, XtPointer, XtPointer));
-static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(ec_dismiss);
-static void FDECL(ec_scroll_to_view, (int));
-static void NDECL(init_extended_commands_popup);
-static Widget FDECL(make_menu, (const char *, const char *, const char *,
-                                const char *, XtCallbackProc, const char *,
-                                XtCallbackProc, int, const char **,
-                                Widget **, XtCallbackProc, Widget *));
+static void plsel_dialog_acceptvalues(void);
+static void plsel_set_play_button(boolean);
+static void plsel_set_sensitivities(boolean);
+static void X11_player_selection_randomize(void);
+static void X11_player_selection_setupOthers(void);
+static void racetoggleCallback(Widget, XtPointer, XtPointer);
+static void roletoggleCallback(Widget, XtPointer, XtPointer);
+static void gendertoggleCallback(Widget, XtPointer, XtPointer);
+static void aligntoggleCallback(Widget, XtPointer, XtPointer);
+static void plsel_random_btn_callback(Widget, XtPointer, XtPointer);
+static void plsel_play_btn_callback(Widget, XtPointer, XtPointer);
+static void plsel_quit_btn_callback(Widget, XtPointer, XtPointer);
+static Widget X11_create_player_selection_name(Widget);
+static void X11_player_selection_dialog(void);
+static void X11_player_selection_prompts(void);
+static void ps_quit(Widget, XtPointer, XtPointer);
+static void ps_random(Widget, XtPointer, XtPointer);
+static void ps_select(Widget, XtPointer, XtPointer);
+static void extend_select(Widget, XtPointer, XtPointer);
+static void extend_dismiss(Widget, XtPointer, XtPointer);
+static void extend_help(Widget, XtPointer, XtPointer);
+static void popup_delete(Widget, XEvent *, String *, Cardinal *);
+static void ec_dismiss(void);
+static void ec_scroll_to_view(int);
+static void init_extended_commands_popup(void);
+static Widget make_menu(const char *, const char *, const char *, const char *,
+                        XtCallbackProc, const char *, XtCallbackProc, int,
+                        const char **, Widget **, XtCallbackProc, Widget *);
 
 /* Bad Hack alert. Using integers instead of XtPointers */
 XtPointer
-i2xtp(i)
-int i;
+i2xtp(int i)
 {
     return (XtPointer) (ptrdiff_t) i;
 }
 
 int
-xtp2i(x)
-XtPointer x;
+xtp2i(XtPointer x)
 {
     return (int) (ptrdiff_t) x;
 }
@@ -139,9 +136,7 @@ XtPointer x;
 /* Player Selection ------------------------------------------------------- */
 /* ARGSUSED */
 static void
-ps_quit(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_quit(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -153,9 +148,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-ps_random(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_random(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -167,9 +160,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-ps_select(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_select(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(call_data);
@@ -180,11 +171,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 void
-ps_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     char rolechars[QBUFSZ];
@@ -230,11 +217,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-race_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     char racechars[QBUFSZ];
@@ -278,11 +261,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-gend_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+gend_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     static char gendchars[] = "mf";
@@ -315,11 +294,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-algn_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     static char algnchars[] = "LNC";
@@ -361,7 +336,7 @@ Widget plsel_name_input;
 Widget plsel_btn_play;
 
 static void
-plsel_dialog_acceptvalues()
+plsel_dialog_acceptvalues(void)
 {
     Arg args[2];
     String s;
@@ -384,11 +359,7 @@ plsel_dialog_acceptvalues()
 
 /* ARGSUSED */
 void
-plsel_quit(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+plsel_quit(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     nhUse(w);
     nhUse(event);
@@ -401,11 +372,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-plsel_play(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+plsel_play(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     Arg args[2];
     Boolean state;
@@ -428,11 +395,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-plsel_randomize(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+plsel_randomize(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     nhUse(w);
     nhUse(event);
@@ -444,8 +407,7 @@ Cardinal *num_params;
 
 /* enable or disable the Play button */
 static void
-plsel_set_play_button(state)
-boolean state;
+plsel_set_play_button(boolean state)
 {
     Arg args[2];
 
@@ -454,8 +416,7 @@ boolean state;
 }
 
 static void
-plsel_set_sensitivities(setcurr)
-boolean setcurr;
+plsel_set_sensitivities(boolean setcurr)
 {
     Arg args[2];
     int j, valid;
@@ -508,12 +469,12 @@ boolean setcurr;
 }
 
 static void
-X11_player_selection_randomize()
+X11_player_selection_randomize(void)
 {
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
     int ro, ra, al, ge;
-    boolean fully_specified_role, choose_race_first;
+    boolean choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
                              || flags.initgend == ROLE_NONE
@@ -536,15 +497,11 @@ X11_player_selection_randomize()
     ro = flags.initrole;
     if (ro == ROLE_NONE || ro == ROLE_RANDOM) {
         ro = rn2(nrole);
-        if (flags.initrole != ROLE_RANDOM) {
-            fully_specified_role = FALSE;
-        }
     }
     ra = flags.initrace;
     if (ra == ROLE_NONE || ra == ROLE_RANDOM) {
         ra = rn2(nrace);
         if (flags.initrace != ROLE_RANDOM) {
-            fully_specified_role = FALSE;
         }
     }
 
@@ -558,21 +515,14 @@ X11_player_selection_randomize()
     while (!validrace(ro, ra)) {
         if (choose_race_first) {
             ro = rn2(nrole);
-            if (flags.initrole != ROLE_RANDOM) {
-                fully_specified_role = FALSE;
-            }
         } else {
             ra = rn2(nrace);
-            if (flags.initrace != ROLE_RANDOM) {
-                fully_specified_role = FALSE;
-            }
         }
     }
 
     ge = flags.initgend;
     if (ge == ROLE_NONE) {
         ge = rn2(ROLE_GENDERS);
-        fully_specified_role = FALSE;
     }
     while (!validgend(ro, ra, ge)) {
         ge = rn2(ROLE_GENDERS);
@@ -581,7 +531,6 @@ X11_player_selection_randomize()
     al = flags.initalign;
     if (al == ROLE_NONE) {
         al = rn2(ROLE_ALIGNS);
-        fully_specified_role = FALSE;
     }
     while (!validalign(ro, ra, al)) {
         al = rn2(ROLE_ALIGNS);
@@ -595,7 +544,7 @@ X11_player_selection_randomize()
 }
 
 static void
-X11_player_selection_setupOthers()
+X11_player_selection_setupOthers(void)
 {
     Arg args[2];
     int ra = xtp2i(XawToggleGetCurrent(plsel_race_radios[0])) - 1;
@@ -641,9 +590,7 @@ X11_player_selection_setupOthers()
 }
 
 static void
-racetoggleCallback(w, client, call)
-Widget w;
-XtPointer client, call;
+racetoggleCallback(Widget w, XtPointer client, XtPointer call)
 {
     Arg args[2];
     int j, valid;
@@ -682,9 +629,7 @@ XtPointer client, call;
 }
 
 static void
-roletoggleCallback(w, client, call)
-Widget w;
-XtPointer client, call;
+roletoggleCallback(Widget w, XtPointer client, XtPointer call)
 {
     Arg args[2];
     int j, valid;
@@ -723,9 +668,7 @@ XtPointer client, call;
 }
 
 static void
-gendertoggleCallback(w, client, call)
-Widget w;
-XtPointer client, call;
+gendertoggleCallback(Widget w, XtPointer client, XtPointer call)
 {
     int i, r = xtp2i(XawToggleGetCurrent(plsel_gend_radios[0])) - 1;
 
@@ -747,9 +690,7 @@ XtPointer client, call;
 }
 
 static void
-aligntoggleCallback(w, client, call)
-Widget w;
-XtPointer client, call;
+aligntoggleCallback(Widget w, XtPointer client, XtPointer call)
 {
     int r = xtp2i(XawToggleGetCurrent(plsel_align_radios[0])) - 1;
 
@@ -761,10 +702,7 @@ XtPointer client, call;
 }
 
 static void
-plsel_random_btn_callback(w, client, call)
-Widget w;
-XtPointer client;
-XtPointer call;
+plsel_random_btn_callback(Widget w, XtPointer client, XtPointer call)
 {
     nhUse(w);
     nhUse(client);
@@ -774,10 +712,7 @@ XtPointer call;
 }
 
 static void
-plsel_play_btn_callback(w, client, call)
-Widget w;
-XtPointer client;
-XtPointer call;
+plsel_play_btn_callback(Widget w, XtPointer client, XtPointer call)
 {
     nhUse(w);
     nhUse(client);
@@ -788,10 +723,7 @@ XtPointer call;
 }
 
 static void
-plsel_quit_btn_callback(w, client, call)
-Widget w;
-XtPointer client;
-XtPointer call;
+plsel_quit_btn_callback(Widget w, XtPointer client, XtPointer call)
 {
     nhUse(w);
     nhUse(client);
@@ -802,8 +734,7 @@ XtPointer call;
 }
 
 static Widget
-X11_create_player_selection_name(form)
-Widget form;
+X11_create_player_selection_name(Widget form)
 {
     Widget namelabel, name_vp, name_form;
     Arg args[10];
@@ -865,7 +796,7 @@ Widget form;
 }
 
 static void
-X11_player_selection_dialog()
+X11_player_selection_dialog(void)
 {
     Widget popup, popup_vp;
     Widget form;
@@ -1290,7 +1221,7 @@ X11_player_selection_dialog()
 }
 
 static void
-X11_player_selection_prompts()
+X11_player_selection_prompts(void)
 {
     int num_roles, num_races, num_gends, num_algns, i, availcount, availindex;
     Widget popup, player_form;
@@ -1578,7 +1509,7 @@ X11_player_selection_prompts()
 /* Global functions ======================================================== */
 
 void
-X11_player_selection()
+X11_player_selection(void)
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
         if (!*g.plname) {
@@ -1600,7 +1531,7 @@ X11_player_selection()
 
 /* called by core to have the player pick an extended command */
 int
-X11_get_ext_cmd()
+X11_get_ext_cmd(void)
 {
     if (iflags.extmenu != ec_full_list) {
         /* player has toggled the 'extmenu' option, toss the old widgets */
@@ -1627,7 +1558,7 @@ X11_get_ext_cmd()
 }
 
 void
-release_extended_cmds()
+release_extended_cmds(void)
 {
     if (extended_commands) {
         XtDestroyWidget(extended_command_popup), extended_command_popup = 0;
@@ -1642,9 +1573,7 @@ release_extended_cmds()
 /* Extended Command ------------------------------------------------------- */
 /* ARGSUSED */
 static void
-extend_select(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_select(Widget w, XtPointer client_data, XtPointer call_data)
 {
     int selected = (int) (ptrdiff_t) client_data;
 
@@ -1670,9 +1599,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-extend_dismiss(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_dismiss(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -1683,9 +1610,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-extend_help(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_help(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -1697,11 +1622,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 void
-ec_delete(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ec_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     if (w == extended_command_popup) {
         ec_dismiss();
@@ -1712,11 +1633,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 static void
-popup_delete(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+popup_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     nhUse(event);
     nhUse(params);
@@ -1728,7 +1645,7 @@ Cardinal *num_params;
 }
 
 static void
-ec_dismiss()
+ec_dismiss(void)
 {
     /* unselect while still visible */
     if (extended_cmd_selected >= 0)
@@ -1742,8 +1659,7 @@ ec_dismiss()
 /* scroll the extended command menu if necessary
    so that choices extended_cmd_selected through ec_indx will be visible */
 static void
-ec_scroll_to_view(ec_indx)
-int ec_indx; /* might be greater than extended_cmd_selected */
+ec_scroll_to_view(int ec_indx) /* might be greater than extended_cmd_selected */
 {
     Widget viewport, scrollbar, tmpw;
     Arg args[5];
@@ -1846,8 +1762,7 @@ int ec_indx; /* might be greater than extended_cmd_selected */
 
 /* decide whether extcmdlist[idx] should be part of extended commands menu */
 static boolean
-ignore_extcmd(idx)
-int idx;
+ignore_extcmd(int idx)
 {
     /* #shell or #suspect might not be available;
        'extmenu' option controls whether we show full list
@@ -1862,11 +1777,7 @@ int idx;
 
 /* ARGSUSED */
 void
-ec_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch;
     int i, pass;
@@ -1984,7 +1895,7 @@ Cardinal *num_params;
  * be used from a menubox.
  */
 static void
-init_extended_commands_popup()
+init_extended_commands_popup(void)
 {
     int i, j, num_commands, ignore_cmds = 0;
 
@@ -2036,21 +1947,13 @@ init_extended_commands_popup()
  *              ------------------------
  */
 static Widget
-make_menu(popup_name, popup_label, popup_translations, left_name,
-          left_callback, right_name, right_callback, num_names, widget_names,
-          command_widgets, name_callback, formp)
-const char *popup_name;
-const char *popup_label;
-const char *popup_translations;
-const char *left_name;
-XtCallbackProc left_callback;
-const char *right_name;
-XtCallbackProc right_callback;
-int num_names;
-const char **widget_names; /* return array of command widgets */
-Widget **command_widgets;
-XtCallbackProc name_callback;
-Widget *formp; /* return */
+make_menu(const char *popup_name, const char *popup_label,
+          const char *popup_translations, const char *left_name,
+          XtCallbackProc left_callback, const char *right_name,
+          XtCallbackProc right_callback, int num_names,
+          const char **widget_names, /* return array of command widgets */
+          Widget **command_widgets,
+          XtCallbackProc name_callback, Widget *formp) /* return */
 {
     Widget popup, popform, form, label, above, left, right, view;
     Widget *commands, *curr;

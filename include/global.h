@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1610146765 2021/01/08 22:59:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1612127119 2021/01/31 21:05:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -165,19 +165,12 @@ extern struct cross_target_s cross_target;
 #include "ntconf.h"
 #endif
 
-/*
- * Note:  placing this before amiconf.h is to avoid complications for
- * 'make depend' after amiconf.h got moved to the outdated/ sub-tree.
- * Inclusion really belongs somewhere after the define for SHORT_FILENAMES
- * below, and for that we either need to resurrect amiconf.h or supply
- * an empty stub for it in include/amiconf.h.
- */
-#include "fnamesiz.h" /* file sizes shared between nethack and recover */
+#include "warnings.h"
 
 /* amiconf.h needs to be the last nested #include of config.h because
    'make depend' will turn it into a comment, hiding anything after it */
 #ifdef AMIGA
-#include "amiconf.h"
+/*#include "amiconf.h"*/
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
@@ -234,6 +227,8 @@ extern struct cross_target_s cross_target;
 #endif
 #endif
 #endif
+
+#include "fnamesiz.h" /* file sizes shared between nethack and recover */
 
 #ifdef VMS
 /* vms_exit() (sys/vms/vmsmisc.c) expects the non-VMS EXIT_xxx values below.
@@ -302,7 +297,7 @@ extern struct cross_target_s cross_target;
    if nethack is built with MONITOR_HEAP enabled and they aren't; this
    declaration has been moved out of the '#else' below to avoid getting
    a complaint from -Wmissing-prototypes when building with MONITOR_HEAP */
-extern char *FDECL(dupstr, (const char *));
+extern char *dupstr(const char *);
 
 /*
  * MONITOR_HEAP is conditionally used for primitive memory leak debugging.
@@ -314,9 +309,9 @@ extern char *FDECL(dupstr, (const char *));
  */
 #ifdef MONITOR_HEAP
 /* plain alloc() is not declared except in alloc.c */
-extern long *FDECL(nhalloc, (unsigned int, const char *, int));
-extern void FDECL(nhfree, (genericptr_t, const char *, int));
-extern char *FDECL(nhdupstr, (const char *, const char *, int));
+extern long *nhalloc(unsigned int, const char *, int);
+extern void nhfree(genericptr_t, const char *, int);
+extern char *nhdupstr(const char *, const char *, int);
 /* this predates C99's __func__; that is trickier to use conditionally
    because it is not implemented as a preprocessor macro; MONITOR_HEAP
    wouldn't gain much benefit from it anyway so continue to live without it;
@@ -332,7 +327,7 @@ extern char *FDECL(nhdupstr, (const char *, const char *, int));
 #define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else /* !MONITOR_HEAP */
 /* declare alloc.c's alloc(); allocations made with it use ordinary free() */
-extern long *FDECL(alloc, (unsigned int));  /* alloc.c */
+extern long *alloc(unsigned int);  /* alloc.c */
 #endif /* ?MONITOR_HEAP */
 
 /* Used for consistency checks of various data files; declare it here so

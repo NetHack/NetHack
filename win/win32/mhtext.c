@@ -24,7 +24,7 @@ static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
 HWND
-mswin_init_text_window()
+mswin_init_text_window(void)
 {
     HWND ret;
     RECT rt;

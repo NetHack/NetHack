@@ -57,27 +57,23 @@ extern int total_tiles_used;
 
 #define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
-static boolean FDECL(init_tiles, (struct xwindow *));
-static void FDECL(set_button_values, (Widget, int, int, unsigned));
-static void FDECL(map_check_size_change, (struct xwindow *));
-static void FDECL(map_update, (struct xwindow *, int, int, int, int,
-                               BOOLEAN_P));
-static void FDECL(init_text, (struct xwindow *));
-static void FDECL(map_exposed, (Widget, XtPointer, XtPointer));
-static void FDECL(set_gc, (Widget, Font, const char *, Pixel, GC *, GC *));
-static void FDECL(get_text_gc, (struct xwindow *, Font));
-static void FDECL(map_all_unexplored, (struct map_info_t *));
-static void FDECL(get_char_info, (struct xwindow *));
-static void FDECL(display_cursor, (struct xwindow *));
+static boolean init_tiles(struct xwindow *);
+static void set_button_values(Widget, int, int, unsigned);
+static void map_check_size_change(struct xwindow *);
+static void map_update(struct xwindow *, int, int, int, int, boolean);
+static void init_text(struct xwindow *);
+static void map_exposed(Widget, XtPointer, XtPointer);
+static void set_gc(Widget, Font, const char *, Pixel, GC *, GC *);
+static void get_text_gc(struct xwindow *, Font);
+static void map_all_unexplored(struct map_info_t *);
+static void get_char_info(struct xwindow *);
+static void display_cursor(struct xwindow *);
 
 /* Global functions ======================================================= */
 
 void
-X11_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
-winid window;
-xchar x, y;
-const glyph_info *glyphinfo;
-const glyph_info *bkglyphinfo UNUSED;
+X11_print_glyph(winid window, xchar x, xchar y, const glyph_info *glyphinfo,
+                const glyph_info *bkglyphinfo UNUSED)
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -156,9 +152,7 @@ const glyph_info *bkglyphinfo UNUSED;
  */
 /*ARGSUSED*/
 void
-X11_cliparound(x, y)
-int x UNUSED;
-int y UNUSED;
+X11_cliparound(int x UNUSED, int y UNUSED)
 {
     return;
 }
@@ -194,10 +188,7 @@ static struct tile_annotation pet_annotation;
 static struct tile_annotation pile_annotation;
 
 static void
-init_annotation(annotation, filename, colorpixel)
-struct tile_annotation *annotation;
-char *filename;
-Pixel colorpixel;
+init_annotation(struct tile_annotation *annotation, char *filename, Pixel colorpixel)
 {
     Display *dpy = XtDisplay(toplevel);
 
@@ -224,7 +215,7 @@ Pixel colorpixel;
  * map viewport.
  */
 void
-post_process_tiles()
+post_process_tiles(void)
 {
     Display *dpy = XtDisplay(toplevel);
     unsigned int width, height;
@@ -261,8 +252,7 @@ post_process_tiles()
  * Return FALSE otherwise.
  */
 static boolean
-init_tiles(wp)
-struct xwindow *wp;
+init_tiles(struct xwindow *wp)
 {
 #ifdef USE_XPM
     XpmAttributes attributes;
@@ -578,8 +568,7 @@ ntiles %ld\n",
  * Make sure the map's cursor is always visible.
  */
 void
-check_cursor_visibility(wp)
-struct xwindow *wp;
+check_cursor_visibility(struct xwindow *wp)
 {
     Arg arg[2];
     Widget viewport, horiz_sb, vert_sb;
@@ -730,8 +719,7 @@ struct xwindow *wp;
  * on the screen when the user resizes the nethack window.
  */
 static void
-map_check_size_change(wp)
-struct xwindow *wp;
+map_check_size_change(struct xwindow *wp)
 {
     struct map_info_t *map_info = wp->map_information;
     Arg arg[2];
@@ -785,12 +773,8 @@ struct xwindow *wp;
  * by querying the widget with the resource name.
  */
 static void
-set_gc(w, font, resource_name, bgpixel, regular, inverse)
-Widget w;
-Font font;
-const char *resource_name;
-Pixel bgpixel;
-GC *regular, *inverse;
+set_gc(Widget w, Font font, const char *resource_name, Pixel bgpixel,
+       GC *regular, GC *inverse)
 {
     XGCValues values;
     XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
@@ -820,9 +804,7 @@ GC *regular, *inverse;
  * background colors on the current GC as needed.
  */
 static void
-get_text_gc(wp, font)
-struct xwindow *wp;
-Font font;
+get_text_gc(struct xwindow *wp, Font font)
 {
     struct map_info_t *map_info = wp->map_information;
     Pixel bgpixel;
@@ -865,8 +847,7 @@ Font font;
  * Display the cursor on the map window.
  */
 static void
-display_cursor(wp)
-struct xwindow *wp;
+display_cursor(struct xwindow *wp)
 {
     /* Redisplay the cursor location inverted. */
     map_update(wp, wp->cursy, wp->cursy, wp->cursx, wp->cursx, TRUE);
@@ -877,8 +858,7 @@ struct xwindow *wp;
  * the screen.
  */
 void
-display_map_window(wp)
-struct xwindow *wp;
+display_map_window(struct xwindow *wp)
 {
     register int row;
     struct map_info_t *map_info = wp->map_information;
@@ -927,8 +907,7 @@ struct xwindow *wp;
  * (Actually, column 0 is set to S_nothing and 1..COLNO-1 to S_unexplored.)
  */
 static void
-map_all_unexplored(map_info) /* [was map_all_stone()] */
-struct map_info_t *map_info;
+map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
 {
     int x, y;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
@@ -963,8 +942,7 @@ struct map_info_t *map_info;
  * display_map_window().
  */
 void
-clear_map_window(wp)
-struct xwindow *wp;
+clear_map_window(struct xwindow *wp)
 {
     struct map_info_t *map_info = wp->map_information;
 
@@ -985,8 +963,7 @@ struct xwindow *wp;
  * that are used when updating it.
  */
 static void
-get_char_info(wp)
-struct xwindow *wp;
+get_char_info(struct xwindow *wp)
 {
     XFontStruct *fs;
     struct map_info_t *map_info = wp->map_information;
@@ -1033,11 +1010,7 @@ static int inptr = 0; /* points to valid data */
  * Keyboard and button event handler for map window.
  */
 void
-map_input(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+map_input(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     XKeyEvent *key;
     XButtonEvent *button;
@@ -1133,11 +1106,7 @@ Cardinal *num_params;
 }
 
 static void
-set_button_values(w, x, y, button)
-Widget w;
-int x;
-int y;
-unsigned int button;
+set_button_values(Widget w, int x, int y, unsigned int button)
 {
     struct xwindow *wp;
     struct map_info_t *map_info;
@@ -1170,10 +1139,8 @@ unsigned int button;
  */
 /*ARGSUSED*/
 static void
-map_exposed(w, client_data, widget_data)
-Widget w;
-XtPointer client_data; /* unused */
-XtPointer widget_data; /* expose event from Window widget */
+map_exposed(Widget w, XtPointer client_data, /* unused */
+            XtPointer widget_data) /* expose event from Window widget */
 {
     int x, y;
     struct xwindow *wp;
@@ -1256,12 +1223,8 @@ XtPointer widget_data; /* expose event from Window widget */
  * The start and stop columns are *inclusive*.
  */
 static void
-map_update(wp, start_row, stop_row, start_col, stop_col, inverted)
-struct xwindow *wp;
-int start_row, stop_row, start_col, stop_col;
-boolean inverted;
+map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int stop_col, boolean inverted)
 {
-    int win_start_row, win_start_col;
     struct map_info_t *map_info = wp->map_information;
     int row;
     register int count;
@@ -1279,8 +1242,6 @@ boolean inverted;
     printf("update: [0x%x] %d %d %d %d\n",
            (int) wp->w, start_row, stop_row, start_col, stop_col);
 #endif
-    win_start_row = start_row;
-    win_start_col = start_col;
 
     if (map_info->is_tile) {
         struct tile_map_info_t *tile_map = &map_info->tile_map;
@@ -1407,6 +1368,10 @@ boolean inverted;
 #else   /* !TEXTCOLOR */
         {
             int win_row, win_xstart;
+            int win_start_row, win_start_col;
+
+            win_start_row = start_row;
+            win_start_col = start_col;
 
             /* We always start at the same x window position and have
                the same character count. */
@@ -1433,9 +1398,7 @@ boolean inverted;
 
 /* Adjust the number of rows and columns on the given map window */
 void
-set_map_size(wp, cols, rows)
-struct xwindow *wp;
-Dimension cols, rows;
+set_map_size(struct xwindow *wp, Dimension cols, Dimension rows)
 {
     Arg args[4];
     Cardinal num_args;
@@ -1456,8 +1419,7 @@ Dimension cols, rows;
 }
 
 static void
-init_text(wp)
-struct xwindow *wp;
+init_text(struct xwindow *wp)
 {
     struct map_info_t *map_info = wp->map_information;
 
@@ -1480,10 +1442,9 @@ static char map_translations[] = "#override\n\
  * The map window creation routine.
  */
 void
-create_map_window(wp, create_popup, parent)
-struct xwindow *wp;
-boolean create_popup; /* parent is a popup shell that we create */
-Widget parent;
+create_map_window(struct xwindow *wp,
+                  boolean create_popup, /* parent is a popup shell that we create */
+                  Widget parent)
 {
     struct map_info_t *map_info; /* map info pointer */
     Widget map, viewport;
@@ -1610,8 +1571,7 @@ Widget parent;
  * Destroy this map window.
  */
 void
-destroy_map_window(wp)
-struct xwindow *wp;
+destroy_map_window(struct xwindow *wp)
 {
     struct map_info_t *map_info = wp->map_information;
 
@@ -1659,8 +1619,7 @@ boolean exit_x_event; /* exit condition for the event loop */
 
 #if 0   /*******/
 void
-pkey(k)
-int k;
+pkey(int k)
 {
     printf("key = '%s%c'\n", (k < 32) ? "^" : "", (k < 32) ? '@' + k : k);
 }
@@ -1671,8 +1630,7 @@ int k;
  * under certain circumstances.
  */
 int
-x_event(exit_condition)
-int exit_condition;
+x_event(int exit_condition)
 {
     XEvent event;
     int retval = 0;

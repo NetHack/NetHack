@@ -3,13 +3,35 @@ February 2020 in 3.7 WIP.
 
 Boolean and compound options are combined into a single allopt[] array.
 
-To add an option:
+To add an entirely new option macro type:
 
-    1. Add an entry to include/optlist.h, using the NHOPTB macro for a
-       boolean on/off option, or NHOPTC macro for a compound option. The
-       list of options is kept in alphabetical order.
+    The current list of option macros:
+    NHOPTB (for boolean options)
+    NHOPTC (for complex options that take values beyond off/on)
+    NHOPTP (for handling a suite that all begin with a common prefix)
+    NHOPTO (for other options not easily handled as one of the above)
+
+     1. You need to add three different expansions of your macro, one for
+        the NHOPT_PROTO phase where function prototypes are generated,
+        one for the NHOPT_ENUM phase where enums are generated, and
+        NHOPT_PARSE phase.
+
+     2. If you are adding a new macro type to the current NHOPTB,
+        NHOPTC, NHOPTP, NHOPTO macros, don't forget to add the #undef near
+        the bottom of optlist.h, so that the macro is available for re-use
+        during the next usage phase.
+
+ To add an option:
+
+     1. Add an entry to include/optlist.h, using the NHOPTB macro for a
+       boolean on/off option, or NHOPTC macro for a complex option,
+       or NHOPTP macro if it handles an entire prefix, or NHOPTO macro for
+       other types.
+
+       The list of options is always kept in optlist.h in alphabetical order.
+
        When the list of options is processed during the compile of options.c,
-       the following will be automatically generated and included in 
+       the following will be automatically generated and included in
        options.c:
 
             i) an optfn_xxxx function prototype (xxxx is the option name).
@@ -52,7 +74,7 @@ To add an option:
                     /* this is optional. If the option needs its own
                        special handling after the doset menu, do it here
                        or call a function to do it. The naming convention
-                       for such a function in options.c has been 
+                       for such a function in options.c has been
                        handler_xxxx(), but the function does not need to
                        reside in options.c */
 

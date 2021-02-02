@@ -28,22 +28,21 @@
 
 #include "hack.h"
 
-static void FDECL(awaken_monsters, (int));
-static void FDECL(put_monsters_to_sleep, (int));
-static void FDECL(charm_snakes, (int));
-static void FDECL(calm_nymphs, (int));
-static void FDECL(charm_monsters, (int));
-static void FDECL(do_earthquake, (int));
-static const char *NDECL(generic_lvl_desc);
-static int FDECL(do_improvisation, (struct obj *));
+static void awaken_monsters(int);
+static void put_monsters_to_sleep(int);
+static void charm_snakes(int);
+static void calm_nymphs(int);
+static void charm_monsters(int);
+static void do_earthquake(int);
+static const char *generic_lvl_desc(void);
+static int do_improvisation(struct obj *);
 
 /*
  * Wake every monster in range...
  */
 
 static void
-awaken_monsters(distance)
-int distance;
+awaken_monsters(int distance)
 {
     register struct monst *mtmp;
     register int distm;
@@ -73,8 +72,7 @@ int distance;
  */
 
 static void
-put_monsters_to_sleep(distance)
-int distance;
+put_monsters_to_sleep(int distance)
 {
     register struct monst *mtmp;
 
@@ -94,8 +92,7 @@ int distance;
  */
 
 static void
-charm_snakes(distance)
-int distance;
+charm_snakes(int distance)
 {
     register struct monst *mtmp;
     int could_see_mon, was_peaceful;
@@ -129,8 +126,7 @@ int distance;
  */
 
 static void
-calm_nymphs(distance)
-int distance;
+calm_nymphs(int distance)
 {
     register struct monst *mtmp;
 
@@ -153,8 +149,7 @@ int distance;
 
 /* Awake soldiers anywhere the level (and any nearby monster). */
 void
-awaken_soldiers(bugler)
-struct monst *bugler; /* monster that played instrument */
+awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
 {
     register struct monst *mtmp;
     int distance, distm;
@@ -196,8 +191,7 @@ struct monst *bugler; /* monster that played instrument */
  * If swallowed, range is reduced to 0.
  */
 static void
-charm_monsters(distance)
-int distance;
+charm_monsters(int distance)
 {
     struct monst *mtmp, *mtmp2;
 
@@ -222,8 +216,7 @@ int distance;
  * That is:  create random chasms (pits).
  */
 static void
-do_earthquake(force)
-int force;
+do_earthquake(int force)
 {
     static const char into_a_chasm[] = " into a chasm";
     register int x, y;
@@ -465,7 +458,7 @@ int force;
 }
 
 static const char *
-generic_lvl_desc()
+generic_lvl_desc(void)
 {
     if (Is_astralevel(&u.uz))
         return "astral plane";
@@ -490,8 +483,7 @@ const char *beats[] = {
  * The player is trying to extract something from his/her instrument.
  */
 static int
-do_improvisation(instr)
-struct obj *instr;
+do_improvisation(struct obj* instr)
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
@@ -690,8 +682,7 @@ struct obj *instr;
  * So you want music...
  */
 int
-do_play_instrument(instr)
-struct obj *instr;
+do_play_instrument(struct obj* instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;

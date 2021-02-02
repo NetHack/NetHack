@@ -22,7 +22,7 @@
 #endif
 
 #ifdef SCREEN_DJGPPFAST
-/*# define MONO_CHECK 		/* djgpp should be able to do check  */
+/*# define MONO_CHECK */		/* djgpp should be able to do check  */
 #endif
 
 /*
@@ -66,14 +66,14 @@
  * VGA Specific Stuff
  */
 #ifdef SCREEN_VGA
-/* #define HW_PANNING		/* Hardware panning enabled */
+/* #define HW_PANNING	*/	/* Hardware panning enabled */
 #define USHORT unsigned short
 #define MODE640x480 0x0012 /* Switch to VGA 640 x 480 Graphics mode */
 #define MODETEXT 0x0003    /* Switch to Text mode 3 */
 
 #ifdef HW_PANNING
 #define PIXELINC 16 /* How much to increment by when panning */
-/*#define PIXELINC 1	/* How much to increment by when panning */
+/*#define PIXELINC 1 */	/* How much to increment by when panning */
 #define SCREENBYTES 128
 #define CharRows 30
 #define VERT_RETRACE                          \
@@ -227,96 +227,92 @@ extern int cursor_color;
  *
  */
 
-#define E extern
-
 /* ### video.c ### */
 
 #ifdef SIMULATE_CURSOR
-E void NDECL(DrawCursor);
-E void NDECL(HideCursor);
+extern void DrawCursor(void);
+extern void HideCursor(void);
 #endif
 
 /* ### vidtxt.c ### */
 
 #ifdef NO_TERMS
-E void NDECL(txt_backsp);
-E void NDECL(txt_clear_screen);
-E void FDECL(txt_cl_end, (int, int));
-E void NDECL(txt_cl_eos);
-E void NDECL(txt_get_scr_size);
-E void FDECL(txt_gotoxy, (int, int));
-E int NDECL(txt_monoadapt_check);
-E void NDECL(txt_nhbell);
-E void FDECL(txt_startup, (int *, int *));
-E void FDECL(txt_xputs, (const char *, int, int));
-E void FDECL(txt_xputc, (CHAR_P, int));
+extern void txt_backsp(void);
+extern void txt_clear_screen(void);
+extern void txt_cl_end(int, int);
+extern void txt_cl_eos(void);
+extern void txt_get_scr_size(void);
+extern void txt_gotoxy(int, int);
+extern int txt_monoadapt_check(void);
+extern void txt_nhbell(void);
+extern void txt_startup(int *, int *);
+extern void txt_xputs(const char *, int, int);
+extern void txt_xputc(char, int);
 
 /* ### vidvga.c ### */
 
 enum vga_pan_direction { pan_left, pan_up, pan_right, pan_down };
 #ifdef SCREEN_VGA
-E void NDECL(vga_backsp);
-E void FDECL(vga_clear_screen, (int));
-E void FDECL(vga_cl_end, (int, int));
-E void FDECL(vga_cl_eos, (int));
-E int NDECL(vga_detect);
+extern void vga_backsp(void);
+extern void vga_clear_screen(int);
+extern void vga_cl_end(int, int);
+extern void vga_cl_eos(int);
+extern int vga_detect(void);
 #ifdef SIMULATE_CURSOR
-E void NDECL(vga_DrawCursor);
+extern void vga_DrawCursor(void);
 #endif
-E void NDECL(vga_Finish);
-E char __far *NDECL(vga_FontPtrs);
-E void NDECL(vga_get_scr_size);
-E void FDECL(vga_gotoloc, (int, int));
+extern void vga_Finish(void);
+extern char __far *vga_FontPtrs(void);
+extern void vga_get_scr_size(void);
+extern void vga_gotoloc(int, int);
 #ifdef POSITIONBAR
-E void FDECL(vga_update_positionbar, (char *));
+extern void vga_update_positionbar(char *);
 #endif
 #ifdef SIMULATE_CURSOR
-E void NDECL(vga_HideCursor);
+extern void vga_HideCursor(void);
 #endif
-E void NDECL(vga_Init);
-E void NDECL(vga_tty_end_screen);
-E void FDECL(vga_tty_startup, (int *, int *));
-E void FDECL(vga_xputs, (const char *, int, int));
-E void FDECL(vga_xputc, (CHAR_P, int));
-E void FDECL(vga_xputg, (int, int, unsigned));
-E void FDECL(vga_userpan, (enum vga_pan_direction));
-E void FDECL(vga_overview, (BOOLEAN_P));
-E void FDECL(vga_traditional, (BOOLEAN_P));
-E void NDECL(vga_refresh);
+extern void vga_Init(void);
+extern void vga_tty_end_screen(void);
+extern void vga_tty_startup(int *, int *);
+extern void vga_xputs(const char *, int, int);
+extern void vga_xputc(char, int);
+extern void vga_xputg(int, int, unsigned);
+extern void vga_userpan(enum vga_pan_direction);
+extern void vga_overview(boolean);
+extern void vga_traditional(boolean);
+extern void vga_refresh(void);
 #endif /* SCREEN_VGA */
 #ifdef SCREEN_VESA
-E void NDECL(vesa_backsp);
-E void FDECL(vesa_clear_screen, (int));
-E void FDECL(vesa_cl_end, (int, int));
-E void FDECL(vesa_cl_eos, (int));
-E int NDECL(vesa_detect);
+extern void vesa_backsp(void);
+extern void vesa_clear_screen(int);
+extern void vesa_cl_end(int, int);
+extern void vesa_cl_eos(int);
+extern int vesa_detect(void);
 #ifdef SIMULATE_CURSOR
-E void NDECL(vesa_DrawCursor);
+extern void vesa_DrawCursor(void);
 #endif
-E void NDECL(vesa_Finish);
-E void NDECL(vesa_get_scr_size);
-E void FDECL(vesa_gotoloc, (int, int));
+extern void vesa_Finish(void);
+extern void vesa_get_scr_size(void);
+extern void vesa_gotoloc(int, int);
 #ifdef POSITIONBAR
-E void FDECL(vesa_update_positionbar, (char *));
+extern void vesa_update_positionbar(char *);
 #endif
 #ifdef SIMULATE_CURSOR
-E void NDECL(vesa_HideCursor);
+extern void vesa_HideCursor(void);
 #endif
-E void NDECL(vesa_Init);
-E void NDECL(vesa_tty_end_screen);
-E void FDECL(vesa_tty_startup, (int *, int *));
-E void FDECL(vesa_xputs, (const char *, int, int));
-E void FDECL(vesa_xputc, (CHAR_P, int));
-E void FDECL(vesa_xputg, (int, int, unsigned));
-E void FDECL(vesa_userpan, (enum vga_pan_direction));
-E void FDECL(vesa_overview, (BOOLEAN_P));
-E void FDECL(vesa_traditional, (BOOLEAN_P));
-E void NDECL(vesa_refresh);
-E void NDECL(vesa_flush_text);
+extern void vesa_Init(void);
+extern void vesa_tty_end_screen(void);
+extern void vesa_tty_startup(int *, int *);
+extern void vesa_xputs(const char *, int, int);
+extern void vesa_xputc(char, int);
+extern void vesa_xputg(int, int, unsigned);
+extern void vesa_userpan(enum vga_pan_direction);
+extern void vesa_overview(boolean);
+extern void vesa_traditional(boolean);
+extern void vesa_refresh(void);
+extern void vesa_flush_text(void);
 #endif /* SCREEN_VESA */
 #endif /* NO_TERMS   */
-
-#undef E
 
 #endif /* PCVIDEO_H  */
 /* pcvideo.h */

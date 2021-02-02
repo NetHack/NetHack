@@ -12,31 +12,32 @@ extern int dotrow; /* shared with save */
 #endif
 
 #ifdef USE_TILES
-extern void FDECL(substitute_tiles, (d_level *)); /* from tile.c */
+extern void substitute_tiles(d_level *); /* from tile.c */
 #endif
 
 #ifdef ZEROCOMP
-static void NDECL(zerocomp_minit);
-static void FDECL(zerocomp_mread, (int, genericptr_t, unsigned int));
-static int NDECL(zerocomp_mgetc);
+static void zerocomp_minit(void);
+static void zerocomp_mread(int, genericptr_t, unsigned int);
+static int zerocomp_mgetc(void);
 #endif
 
-static void NDECL(find_lev_obj);
-static void FDECL(restlevchn, (NHFILE *));
-static void FDECL(restdamage, (NHFILE *));
-static void FDECL(restobj, (NHFILE *, struct obj *));
-static struct obj *FDECL(restobjchn, (NHFILE *, BOOLEAN_P));
-static void FDECL(restmon, (NHFILE *, struct monst *));
-static struct monst *FDECL(restmonchn, (NHFILE *));
-static struct fruit *FDECL(loadfruitchn, (NHFILE *));
-static void FDECL(freefruitchn, (struct fruit *));
-static void FDECL(ghostfruit, (struct obj *));
-static boolean FDECL(restgamestate, (NHFILE *, unsigned int *, unsigned int *));
-static void FDECL(restlevelstate, (unsigned int, unsigned int));
-static int FDECL(restlevelfile, (XCHAR_P));
-static void FDECL(restore_msghistory, (NHFILE *));
-static void FDECL(reset_oattached_mids, (BOOLEAN_P));
-static void FDECL(rest_levl, (NHFILE *, BOOLEAN_P));
+static void find_lev_obj(void);
+static void restlevchn(NHFILE *);
+static void restdamage(NHFILE *);
+static void restobj(NHFILE *, struct obj *);
+static struct obj *restobjchn(NHFILE *, boolean);
+static void restmon(NHFILE *, struct monst *);
+static struct monst *restmonchn(NHFILE *);
+static struct fruit *loadfruitchn(NHFILE *);
+static void freefruitchn(struct fruit *);
+static void ghostfruit(struct obj *);
+static boolean restgamestate(NHFILE *, unsigned int *, unsigned int *);
+static void restlevelstate(unsigned int, unsigned int);
+static int restlevelfile(xchar);
+static void restore_msghistory(NHFILE *);
+static void reset_oattached_mids(boolean);
+static void rest_levl(NHFILE *, boolean);
+static void rest_stairs(NHFILE *);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -51,11 +52,11 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-static void NDECL(clear_id_mapping);
-static void FDECL(add_id_mapping, (unsigned, unsigned));
+static void clear_id_mapping(void);
+static void add_id_mapping(unsigned, unsigned);
 
 #ifdef AMII_GRAPHICS
-void FDECL(amii_setpens, (int)); /* use colors from save file */
+void amii_setpens(int); /* use colors from save file */
 extern int amii_numcolors;
 #endif
 
@@ -65,7 +66,7 @@ extern int amii_numcolors;
 
 /* Recalculate g.level.objects[x][y], since this info was not saved. */
 static void
-find_lev_obj()
+find_lev_obj(void)
 {
     register struct obj *fobjtmp = (struct obj *) 0;
     register struct obj *otmp;
@@ -99,8 +100,7 @@ find_lev_obj()
  * infamous "HUP" cheat) get used up here.
  */
 void
-inven_inuse(quietly)
-boolean quietly;
+inven_inuse(boolean quietly)
 {
     register struct obj *otmp, *otmp2;
 
@@ -115,8 +115,7 @@ boolean quietly;
 }
 
 static void
-restlevchn(nhfp)
-NHFILE *nhfp;
+restlevchn(NHFILE* nhfp)
 {
     int cnt = 0;
     s_level *tmplev, *x;
@@ -142,8 +141,7 @@ NHFILE *nhfp;
 }
 
 static void
-restdamage(nhfp)
-NHFILE *nhfp;
+restdamage(NHFILE* nhfp)
 {
     unsigned int dmgcount = 0;
     int counter;
@@ -192,9 +190,7 @@ NHFILE *nhfp;
 
 /* restore one object */
 static void
-restobj(nhfp, otmp)
-NHFILE *nhfp;
-struct obj *otmp;
+restobj(NHFILE* nhfp, struct obj *otmp)
 {
     int buflen = 0;
 
@@ -249,9 +245,7 @@ struct obj *otmp;
 }
 
 static struct obj *
-restobjchn(nhfp, frozen)
-NHFILE *nhfp;
-boolean frozen;
+restobjchn(NHFILE* nhfp, boolean frozen)
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
@@ -318,9 +312,7 @@ boolean frozen;
 
 /* restore one monster */
 static void
-restmon(nhfp, mtmp)
-NHFILE *nhfp;
-struct monst *mtmp;
+restmon(NHFILE* nhfp, struct monst* mtmp)
 {
     int buflen = 0;
 
@@ -390,8 +382,7 @@ struct monst *mtmp;
 }
 
 static struct monst *
-restmonchn(nhfp)
-NHFILE *nhfp;
+restmonchn(NHFILE* nhfp)
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
@@ -465,8 +456,7 @@ NHFILE *nhfp;
 }
 
 static struct fruit *
-loadfruitchn(nhfp)
-NHFILE *nhfp;
+loadfruitchn(NHFILE* nhfp)
 {
     register struct fruit *flist, *fnext;
 
@@ -486,8 +476,7 @@ NHFILE *nhfp;
 }
 
 static void
-freefruitchn(flist)
-register struct fruit *flist;
+freefruitchn(register struct fruit* flist)
 {
     register struct fruit *fnext;
 
@@ -499,8 +488,7 @@ register struct fruit *flist;
 }
 
 static void
-ghostfruit(otmp)
-register struct obj *otmp;
+ghostfruit(register struct obj* otmp)
 {
     register struct fruit *oldf;
 
@@ -522,9 +510,7 @@ register struct obj *otmp;
 
 static
 boolean
-restgamestate(nhfp, stuckid, steedid)
-NHFILE *nhfp;
-unsigned int *stuckid, *steedid;
+restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
 {
     struct flag newgameflags;
     struct context_info newgamecontext; /* all 0, but has some pointers */
@@ -717,8 +703,7 @@ unsigned int *stuckid, *steedid;
  * don't dereference a wild u.ustuck when saving the game state, for instance)
  */
 static void
-restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;
+restlevelstate(unsigned int stuckid, unsigned int steedid)
 {
     register struct monst *mtmp;
 
@@ -743,8 +728,7 @@ unsigned int stuckid, steedid;
 
 /*ARGSUSED*/
 static int
-restlevelfile(ltmp)
-xchar ltmp;
+restlevelfile(xchar ltmp)
 {
     char whynot[BUFSZ];
     NHFILE *nhfp = (NHFILE *) 0;
@@ -763,8 +747,7 @@ xchar ltmp;
 }
 
 int
-dorecover(nhfp)
-NHFILE *nhfp;
+dorecover(NHFILE* nhfp)
 {
     unsigned int stuckid = 0, steedid = 0; /* not a register */
     xchar ltmp = 0;
@@ -905,9 +888,8 @@ NHFILE *nhfp;
     return 1;
 }
 
-void
-rest_stairs(nhfp)
-NHFILE *nhfp;
+static void
+rest_stairs(NHFILE* nhfp)
 {
     int buflen = 0;
     stairway stway = UNDEFINED_VALUES;
@@ -937,9 +919,7 @@ NHFILE *nhfp;
 }
 
 void
-restcemetery(nhfp, cemeteryaddr)
-NHFILE *nhfp;
-struct cemetery **cemeteryaddr;
+restcemetery(NHFILE* nhfp, struct cemetery** cemeteryaddr)
 {
     struct cemetery *bonesinfo, **bonesaddr;
     int cflag = 0;
@@ -962,13 +942,14 @@ struct cemetery **cemeteryaddr;
 
 /*ARGSUSED*/
 static void
-rest_levl(nhfp, rlecomp)
-NHFILE *nhfp;
+rest_levl(
+    NHFILE *nhfp,
 #ifdef RLECOMP
-boolean rlecomp;
+    boolean rlecomp
 #else
-boolean rlecomp UNUSED;
+    boolean rlecomp UNUSED
 #endif
+)
 {
 #ifdef RLECOMP
     short i, j;
@@ -1005,8 +986,7 @@ boolean rlecomp UNUSED;
 }
 
 void
-trickery(reason)
-char *reason;
+trickery(char *reason)
 {
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
@@ -1016,10 +996,7 @@ char *reason;
 }
 
 void
-getlev(nhfp, pid, lev)
-NHFILE *nhfp;
-int pid;
-xchar lev;
+getlev(NHFILE* nhfp, int pid, xchar lev)
 {
     register struct trap *trap;
     register struct monst *mtmp;
@@ -1238,9 +1215,7 @@ xchar lev;
 }
 
 void
-get_plname_from_file(nhfp, plbuf)
-NHFILE *nhfp;
-char *plbuf;
+get_plname_from_file(NHFILE* nhfp, char *plbuf)
 {
     int pltmpsiz = 0;
 
@@ -1252,8 +1227,7 @@ char *plbuf;
 }
 
 static void
-restore_msghistory(nhfp)
-NHFILE *nhfp;
+restore_msghistory(NHFILE* nhfp)
 {
     int msgsize = 0, msgcount = 0;
     char msg[BUFSZ];
@@ -1278,7 +1252,7 @@ NHFILE *nhfp;
 
 /* Clear all structures for object and monster ID mapping. */
 static void
-clear_id_mapping()
+clear_id_mapping(void)
 {
     struct bucket *curr;
 
@@ -1291,8 +1265,7 @@ clear_id_mapping()
 
 /* Add a mapping to the ID map. */
 static void
-add_id_mapping(gid, nid)
-unsigned gid, nid;
+add_id_mapping(unsigned int gid, unsigned int nid)
 {
     int idx;
 
@@ -1316,8 +1289,7 @@ unsigned gid, nid;
  * ID.
  */
 boolean
-lookup_id_mapping(gid, nidp)
-unsigned gid, *nidp;
+lookup_id_mapping(unsigned int gid, unsigned int *nidp)
 {
     int i;
     struct bucket *curr;
@@ -1343,8 +1315,7 @@ unsigned gid, *nidp;
 }
 
 static void
-reset_oattached_mids(ghostly)
-boolean ghostly;
+reset_oattached_mids(boolean ghostly)
 {
     struct obj *otmp;
     unsigned oldid, nid;
@@ -1370,8 +1341,8 @@ boolean ghostly;
 /* put up a menu listing each character from this player's saved games;
    returns 1: use g.plname[], 0: new game, -1: quit */
 int
-restore_menu(bannerwin)
-winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
+restore_menu(
+    winid bannerwin) /* if not WIN_ERR, clear window and show copyright in menu */
 {
     winid tmpwin;
     anything any;
@@ -1438,9 +1409,7 @@ winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 #endif /* SELECTSAVED */
 
 int
-validate(nhfp, name)
-NHFILE *nhfp;
-const char *name;
+validate(NHFILE* nhfp, const char *name)
 {
     int rlen = 0;
     struct savefile_info sfi;

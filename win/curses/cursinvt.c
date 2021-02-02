@@ -55,7 +55,7 @@ curses_update_inv(void)
 
 /* Adds an inventory item.  'y' is 1 rather than 0 for the first item. */
 void
-curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, CHAR_P accelerator,
+curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, char accelerator,
                attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);

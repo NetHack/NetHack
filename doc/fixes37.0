@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.430 $ $NHDT-Date: 1611104371 2021/01/20 00:59:31 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.439 $ $NHDT-Date: 1612055953 2021/01/31 01:19:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -368,6 +368,16 @@ give barrow wights a cold touch
 for configuration using external compression on save files that applied a name
 	suffix, 'selectsaved' (restore via menu) couldn't handle any which had
 	been manually uncompressed, mangling file name trying to remove suffix
+an empty lamp hit by fire reported "the oil lamp catches fire" (but at least
+	didn't light)
+spells that require a target spot rather than a direction (like skilled
+	fireball) would not let a blinded hero target his/her own spot, with
+	feedback stating hero failed to hold location sufficiently in mind;
+	when not blind, such spells left autodescribe feedback for target spot
+	in the message window while the spell was being performed
+prevent wish request "death wand" from matching Death monster and producing a
+	random wand instead of a wand of death
+grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -487,6 +497,12 @@ replace "aligned priest" entries in Pri-loca.lua, astral.lua, minetn-1.lua,
 attempting to swap places with a peaceful monster might cause it to flee
 gender-specific monster names can be used in .lua files with the gender upheld
 remove unused vision tables
+changes accompanying sorting of discoveries resulted in omitting very last
+	item for '`'/#knownclass on a class where every item was discoverable
+	and had no extra labels (so potions and rings, possibly others, but
+	not scrolls or wands) and every item was actually discovered
+change to can_reach_floor() resulted in hero being unable to reach the floor
+	when held by a lichen
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -519,6 +535,9 @@ curses: for vertical status, line up conditions in columns; usually two but
 	condense to three per line if the status window isn't tall enough
 	[at present, highlighting with inverse video includes trailing spaces
 	used to align entries in their columns--that's a feature...]
+macOS: Xcode project was failing to build if the path to the NetHack source
+	tree contained a space; the issue was within some shell script code
+	contained within the project
 msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
@@ -751,6 +770,11 @@ consolidate several monsters that differed only by their gender into their
 added wizmgender debugging command to display female monsters in red inverse;
 	helpful for debugging gender-related matters on tty; currently ignored
 	on other window ports
+record number of encountered bones levels in xlogfile
+add bonesless to extended conducts field in xlogfile
+show bones levels information in enlightenment at end of game or in explore
+	and wizmode
+for #wizintrinsic, use any counts entered during menu selection
 
 
 Platform- and/or Interface-Specific New Features
@@ -761,6 +785,7 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	terminal-side code external to NetHack to recognize the sequence and
 	act on it)
 curses: implement 'selectsaved', restore via menu of saved games
+curses: implement selecting menu items via mouse
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
@@ -823,6 +848,7 @@ add a varied form of LIBNH nethack library contribution (github #385, #403)
 add cross-compile to WASM (github #385, #403, #412)
 differentiating gendered monster tiles from NullCGT (#430)
 check bones data directly for deja vu messages (#374)
+unify code for extracting an object from a monster's inventory (#455)
 
 
 Code Cleanup and Reorganization
@@ -885,3 +911,4 @@ adjust window port interface to pass a pointer to a glyph_info struct which
 	contains the glyph itself, the ttychar, the color, the glyphflags,
 	and the symset index; this affects two window port calls that get
 	passed glyphs: print_glyph() and add_menu().
+switch from k&r C to C99

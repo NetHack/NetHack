@@ -30,15 +30,15 @@
 FILE *tilemap_file;
 #endif
 
-const char *FDECL(tilename, (int, int, int));
-void NDECL(init_tilemap);
-void FDECL(process_substitutions, (FILE *));
-boolean FDECL(acceptable_tilename, (int, int, const char *, const char *));
+const char *tilename(int, int, int);
+void init_tilemap(void);
+void process_substitutions(FILE *);
+boolean acceptable_tilename(int, int, const char *, const char *);
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
 #if !defined(MSDOS) && !defined(WIN32)
-extern void FDECL(exit, (int));
+extern void exit(int);
 #endif
 #endif
 
@@ -113,8 +113,7 @@ struct substitute {
  * file_entry is the position of the tile within the monsters/objects/other set
  */
 const char *
-tilename(set, file_entry, gend)
-int set, file_entry, gend;
+tilename(int set, int file_entry, int gend)
 {
     int i, j, condnum, tilenum, gendnum;
     static char buf[BUFSZ];
@@ -296,7 +295,7 @@ int lastmontile, lastobjtile, lastothtile;
  * introduced in 3.3.1.
  */
 void
-init_tilemap()
+init_tilemap(void)
 {
     int i, j, condnum, tilenum;
     int corpsetile, swallowbase;
@@ -564,15 +563,14 @@ init_tilemap()
 #endif
 }
 
-const char *prolog[] = { "", "void", "substitute_tiles(plev)",
-                         "d_level *plev;", "{", "    int i;", "" };
+const char *prolog[] = { "", "void", "substitute_tiles(d_level *plev)",
+                         "{", "    int i;", "" };
 
 const char *epilog[] = { "    return;", "}" };
 
 /* write out the substitutions in an easily-used form. */
 void
-process_substitutions(ofp)
-FILE *ofp;
+process_substitutions(FILE *ofp)
 {
     static const char Dent[] = "    "; /* 4 space indentation */
     int i, j, k, span, start;
@@ -642,12 +640,14 @@ FILE *ofp;
 }
 
 #ifdef OBTAIN_TILEMAP
-extern void NDECL(monst_globals_init);
-extern void NDECL(objects_globals_init);
+extern void monst_globals_init(void);
+extern void objects_globals_init(void);
 #endif
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
-main()
+main(int argc UNUSED, char *argv[] UNUSED)
 {
     register int i;
     char filename[30];
@@ -695,6 +695,8 @@ main()
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 #endif /* TILETEXT */
 
@@ -802,9 +804,8 @@ struct {
 };
 
 boolean
-acceptable_tilename(glyph_set, idx, encountered, expected)
-int glyph_set, idx;
-const char *encountered, *expected;
+acceptable_tilename(int glyph_set, int idx, const char *encountered,
+                    const char *expected)
 {
     if (glyph_set == OTH_GLYPH) {
         if (idx >= 0 && idx < SIZE(altlabels)) {

@@ -86,7 +86,7 @@ static LRESULT onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam);
 #define DEFAULT_COLOR_FG_STATUS COLOR_WINDOWTEXT
 
 HWND
-mswin_init_status_window()
+mswin_init_status_window(void)
 {
     static int run_once = 0;
     HWND ret;
@@ -151,7 +151,7 @@ mswin_init_status_window()
 }
 
 void
-register_status_window_class()
+register_status_window_class(void)
 {
     WNDCLASS wcex;
     ZeroMemory(&wcex, sizeof(wcex));
@@ -350,7 +350,7 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
                 BOOL useUnicode = fnt->supportsUnicode;
 
-                winos_ascii_to_wide_str(str, wbuf, SIZE(wbuf));
+                winos_ascii_to_wide_str((const unsigned char *) str, wbuf, SIZE(wbuf));
 
                 nFg = (clr == NO_COLOR ? status_fg_color
                     : ((clr >= 0 && clr < CLR_MAX) ? nhcolor_to_RGB(clr)

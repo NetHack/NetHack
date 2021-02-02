@@ -12,8 +12,8 @@
  *         updates that should accompany your change.
  */
 
-extern int FDECL(optfn_boolean, (int, int, BOOLEAN_P, char *, char *));
-enum OptType {BoolOpt, CompOpt};
+static int optfn_boolean(int, int, boolean, char *, char *);
+enum OptType {BoolOpt, CompOpt, OthrOpt};
 enum Y_N {No, Yes};
 enum Off_On {Off, On};
 
@@ -29,7 +29,7 @@ struct allopt_t {
     enum Y_N dupeok;
     enum Y_N pfx;
     boolean opt_in_out, *addr;
-    int FDECL((*optfn), (int, int, BOOLEAN_P, char *, char *));
+    int (*optfn)(int, int, boolean, char *, char *);
     const char *alias;
     const char *descr;
     const char *prefixgw;
@@ -45,9 +45,11 @@ struct allopt_t {
 #if defined(NHOPT_PROTO)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp)
 #define NHOPTC(a, b, c, s, n, v, d, h, al, z) \
-int FDECL(optfn_##a, (int, int, BOOLEAN_P, char *, char *));
+static int optfn_##a(int, int, boolean, char *, char *);
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
-int FDECL(pfxfn_##a, (int, int, BOOLEAN_P, char *, char *));
+static int pfxfn_##a(int, int, boolean, char *, char *);
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+static int optfn_##a(int, int, boolean, char *, char *);
 
 #elif defined(NHOPT_ENUM)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp) \
@@ -56,6 +58,8 @@ opt_##a,
 opt_##a,
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
 pfx_##a,
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+opt_##a,
 
 #elif defined(NHOPT_PARSE)
 #define NHOPTB(a, b, c, s, i, n, v, d, al, bp) \
@@ -67,6 +71,9 @@ pfx_##a,
 #define NHOPTP(a, b, c, s, n, v, d, h, al, z) \
 { #a, 0, b, pfx_##a, s, CompOpt, n, v, d, Yes, c, (boolean *) 0, &pfxfn_##a, \
  al, z, #a, Off, h, 0 },
+#define NHOPTO(m, a, b, c, s, n, v, d, al, z) \
+{ m, 0, b, opt_##a, s, OthrOpt, n, v, d, No, c, (boolean *) 0, &optfn_##a, \
+ al, z, (const char *) 0, On, On, 0 },
 #endif
 
 /* B:nm, ln, opt_*, setwhere?, on?, negat?, val?, dup?, hndlr? Alias, bool_p */
@@ -100,6 +107,8 @@ pfx_##a,
                 &flags.autoopen)
     NHOPTB(autopickup, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.pickup)
+    NHOPTO("autopickup exceptions", o_autopickup_exceptions, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit autopickup exceptions")
     NHOPTB(autoquiver, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.autoquiver)
     NHOPTB(autounlock, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
@@ -287,10 +296,14 @@ pfx_##a,
                 &iflags.menu_tab_sep)
     NHOPTB(menucolors, 0, opt_in, set_in_game, Off, Yes, Yes, No, NoAlias,
                 &iflags.use_menu_color)
+    NHOPTO("menu colors", o_menu_colors, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit menu colors")
     NHOPTC(menuinvertmode, 5, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "behaviour of menu iverts")
     NHOPTC(menustyle, MENUTYPELEN, opt_in, set_in_game, Yes, Yes, No, Yes,
                 NoAlias, "user interface for object selection")
+    NHOPTO("message types", o_message_types, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit message types")
     NHOPTB(monpolycontrol, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.mon_polycontrol)
     NHOPTC(monsters, MAXMCLASSES, opt_in, set_in_config, No, Yes, No, No,
@@ -422,9 +435,13 @@ pfx_##a,
                 &flags.standout)
     NHOPTB(status_updates, 0, opt_out, set_in_config, On, Yes, No, No, NoAlias,
                 &iflags.status_updates)
+    NHOPTO("status condition fields", o_status_cond, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit status condition fields")
 #ifdef STATUS_HILITES 
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
+    NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
+           No, Yes, No, NoAlias, "edit status hilites")
 #else
     NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No,
                 NoAlias, "highlight control")
@@ -537,6 +554,7 @@ pfx_##a,
                 &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_wraptext)
+
     /*
      * Prefix-based Options
      */
@@ -555,6 +573,7 @@ pfx_##a,
 #undef NHOPTB
 #undef NHOPTC
 #undef NHOPTP
+#undef NHOPTO
 
 #endif /* NHOPT_PROTO || NHOPT_ENUM || NHOPT_PARSE */
 

@@ -29,9 +29,8 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
-int FDECL(__declspec(dllexport) __stdcall ProcessKeystroke,
-          (HANDLE hConIn, INPUT_RECORD *ir, boolean *valid,
-           BOOLEAN_P numberpad, int portdebug));
+int __declspec(dllexport) __stdcall ProcessKeystroke(HANDLE hConIn,
+               INPUT_RECORD *ir, boolean *valid, boolean numberpad, int portdebug);
 
 int WINAPI
 DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)
@@ -110,17 +109,17 @@ static const struct pad {
 
 static BYTE KeyState[256];
 
-int __declspec(dllexport) __stdcall ProcessKeystroke(hConIn, ir, valid,
-                                                     numberpad, portdebug)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-boolean *valid;
-boolean numberpad;
-int portdebug;
+int __declspec(dllexport) __stdcall
+ProcessKeystroke(
+    HANDLE hConIn,
+    INPUT_RECORD* ir,
+    boolean* valid,
+    boolean numberpad,
+    int portdebug)
 {
-    int metaflags = 0, k = 0;
+    int k = 0;
     int keycode, vk;
-    unsigned char ch, pre_ch, mk = 0;
+    unsigned char ch, pre_ch;
     unsigned short int scan;
     unsigned long shiftstate;
     int altseq = 0;
@@ -224,9 +223,8 @@ int portdebug;
     return ch;
 }
 
-int __declspec(dllexport) __stdcall NHkbhit(hConIn, ir)
-HANDLE hConIn;
-INPUT_RECORD *ir;
+int __declspec(dllexport) __stdcall
+NHkbhit(HANDLE hConIn, INPUT_RECORD *ir)
 {
     int done = 0; /* true =  "stop searching"        */
     int retval;   /* true =  "we had a match"        */
@@ -278,20 +276,20 @@ INPUT_RECORD *ir;
     return retval;
 }
 
-int __declspec(dllexport) __stdcall CheckInput(hConIn, ir, count, numpad,
-                                               mode, mod, cc)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-DWORD *count;
-boolean numpad;
-int mode;
-int *mod;
-coord *cc;
+int __declspec(dllexport) __stdcall
+CheckInput(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    DWORD* count,
+    boolean numpad,
+    int mode,
+    int *mod,
+    coord *cc)
 {
 #if defined(SAFERHANGUP)
     DWORD dwWait;
 #endif
-    int ch;
+    int ch = 0;
     boolean valid = 0, done = 0;
 
 #ifdef QWERTZ_SUPPORT
@@ -355,8 +353,8 @@ coord *cc;
     return mode ? 0 : ch;
 }
 
-int __declspec(dllexport) __stdcall SourceWhere(buf)
-char **buf;
+int __declspec(dllexport) __stdcall
+SourceWhere(char** buf)
 {
     if (!buf)
         return 0;
@@ -364,8 +362,8 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall SourceAuthor(buf)
-char **buf;
+int __declspec(dllexport) __stdcall 
+SourceAuthor(char **buf)
 {
     if (!buf)
         return 0;
@@ -373,9 +371,8 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall KeyHandlerName(buf, full)
-char **buf;
-int full;
+int __declspec(dllexport) __stdcall 
+KeyHandlerName(char **buf, int full)
 {
     if (!buf)
         return 0;

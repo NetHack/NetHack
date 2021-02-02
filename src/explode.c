@@ -25,12 +25,9 @@ static const int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
  *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
-explode(x, y, type, dam, olet, expltype)
-int x, y;
-int type; /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
-int dam;
-char olet;
-int expltype;
+explode(int x, int y, 
+        int type, /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
+        int dam, char olet, int expltype)
 {
     int i, j, k, damu = dam;
     boolean starting = 1;
@@ -541,8 +538,9 @@ int expltype;
                     g.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     g.killer.format = NO_KILLER_PREFIX;
-                    Sprintf(g.killer.name, "caught %sself in %s own %s", uhim(),
-                            uhis(), str);
+                    Snprintf(g.killer.name, sizeof g.killer.name,
+                             "caught %sself in %s own %s", uhim(),
+                             uhis(), str);
                 } else {
                     g.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
@@ -603,11 +601,10 @@ struct scatter_chain {
 
 /* returns number of scattered objects */
 long
-scatter(sx, sy, blastforce, scflags, obj)
-int sx, sy;     /* location of objects to scatter */
-int blastforce; /* force behind the scattering */
-unsigned int scflags;
-struct obj *obj; /* only scatter this obj        */
+scatter(int sx, int sy,  /* location of objects to scatter */
+        int blastforce,  /* force behind the scattering */
+        unsigned int scflags,
+        struct obj *obj) /* only scatter this obj        */
 {
     register struct obj *otmp;
     register int tmp;
@@ -797,9 +794,7 @@ struct obj *obj; /* only scatter this obj        */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(x, y, diluted_oil)
-int x, y;
-boolean diluted_oil;
+splatter_burning_oil(int x, int y, boolean diluted_oil)
 {
     int dmg = d(diluted_oil ? 3 : 4, 4);
 
@@ -811,9 +806,7 @@ boolean diluted_oil;
 /* lit potion of oil is exploding; extinguish it as a light source before
    possibly killing the hero and attempting to save bones */
 void
-explode_oil(obj, x, y)
-struct obj *obj;
-int x, y;
+explode_oil(struct obj *obj, int x, int y)
 {
     boolean diluted_oil = obj->odiluted;
 

@@ -26,7 +26,7 @@ tileedit: tileedit.cpp $(TEXT_IO)
 extern "C" {
 #include "config.h"
 #include "tile.h"
-extern const char *FDECL(tilename, (int, int));
+extern const char *tilename(int, int);
 }
 
 #define TILES_ACROSS 20

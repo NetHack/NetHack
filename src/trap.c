@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1606558763 2020/11/28 10:19:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.367 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1612053752 2021/01/31 00:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,62 +7,61 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
-static boolean FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *,
-                                                    struct obj *));
-static boolean FDECL(mu_maybe_destroy_web, (struct monst *, BOOLEAN_P,
-                                            struct trap *));
-static struct obj *FDECL(t_missile, (int, struct trap *));
-static int FDECL(trapeffect_arrow_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_dart_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_rocktrap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_sqky_board, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_bear_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_slp_gas_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_rust_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_fire_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_pit, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_hole, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_telep_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_level_telep, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_web, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_statue_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_magic_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_anti_magic, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_poly_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_landmine, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_rolling_boulder_trap, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_magic_portal, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_vibrating_square, (struct monst *, struct trap *, unsigned));
-static int FDECL(trapeffect_selector, (struct monst *, struct trap *, unsigned));
-static char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
-static int FDECL(steedintrap, (struct trap *, struct obj *));
-static void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
-static int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
-                                 SHORT_P, long));
-static boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
-static void FDECL(dofiretrap, (struct obj *));
-static void NDECL(domagictrap);
-static boolean FDECL(emergency_disrobe, (boolean *));
-static int FDECL(untrap_prob, (struct trap *));
-static void FDECL(move_into_trap, (struct trap *));
-static int FDECL(try_disarm, (struct trap *, BOOLEAN_P));
-static void FDECL(reward_untrap, (struct trap *, struct monst *));
-static int FDECL(disarm_holdingtrap, (struct trap *));
-static int FDECL(disarm_landmine, (struct trap *));
-static int FDECL(unsqueak_ok, (struct obj *));
-static int FDECL(disarm_squeaky_board, (struct trap *));
-static int FDECL(disarm_shooting_trap, (struct trap *, int));
-static void FDECL(clear_conjoined_pits, (struct trap *));
-static boolean FDECL(adj_nonconjoined_pit, (struct trap *));
-static int FDECL(try_lift, (struct monst *, struct trap *, int,
-                            BOOLEAN_P));
-static int FDECL(help_monster_out, (struct monst *, struct trap *));
+static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
+                                            struct obj *);
+static boolean mu_maybe_destroy_web(struct monst *, boolean,
+                                    struct trap *);
+static struct obj *t_missile(int, struct trap *);
+static int trapeffect_arrow_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_dart_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_rocktrap(struct monst *, struct trap *, unsigned);
+static int trapeffect_sqky_board(struct monst *, struct trap *, unsigned);
+static int trapeffect_bear_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_slp_gas_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_rust_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_fire_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_pit(struct monst *, struct trap *, unsigned);
+static int trapeffect_hole(struct monst *, struct trap *, unsigned);
+static int trapeffect_telep_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_level_telep(struct monst *, struct trap *, unsigned);
+static int trapeffect_web(struct monst *, struct trap *, unsigned);
+static int trapeffect_statue_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_magic_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_anti_magic(struct monst *, struct trap *, unsigned);
+static int trapeffect_poly_trap(struct monst *, struct trap *, unsigned);
+static int trapeffect_landmine(struct monst *, struct trap *, unsigned);
+static int trapeffect_rolling_boulder_trap(struct monst *, struct trap *,
+                                           unsigned);
+static int trapeffect_magic_portal(struct monst *, struct trap *, unsigned);
+static int trapeffect_vibrating_square(struct monst *, struct trap *,
+                                       unsigned);
+static int trapeffect_selector(struct monst *, struct trap *, unsigned);
+static char *trapnote(struct trap *, boolean);
+static int steedintrap(struct trap *, struct obj *);
+static void launch_drop_spot(struct obj *, xchar, xchar);
+static int mkroll_launch(struct trap *, xchar, xchar, short, long);
+static boolean isclearpath(coord *, int, schar, schar);
+static void dofiretrap(struct obj *);
+static void domagictrap(void);
+static boolean emergency_disrobe(boolean *);
+static int untrap_prob(struct trap *);
+static void move_into_trap(struct trap *);
+static int try_disarm(struct trap *, boolean);
+static void reward_untrap(struct trap *, struct monst *);
+static int disarm_holdingtrap(struct trap *);
+static int disarm_landmine(struct trap *);
+static int unsqueak_ok(struct obj *);
+static int disarm_squeaky_board(struct trap *);
+static int disarm_shooting_trap(struct trap *, int);
+static void clear_conjoined_pits(struct trap *);
+static boolean adj_nonconjoined_pit(struct trap *);
+static int try_lift(struct monst *, struct trap *, int, boolean);
+static int help_monster_out(struct monst *, struct trap *);
 #if 0
-static void FDECL(join_adjacent_pits, (struct trap *));
+static void join_adjacent_pits(struct trap *);
 #endif
-static boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
-                             BOOLEAN_P));
-static void NDECL(maybe_finish_sokoban);
+static boolean thitm(int, struct monst *, struct obj *, int, boolean);
+static void maybe_finish_sokoban(void);
 
 static const char *const a_your[2] = { "a", "your" };
 static const char *const A_Your[2] = { "A", "Your" };
@@ -75,8 +74,7 @@ static const char *const blindgas[6] = { "humid",   "odorless",
 /* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
    returns TRUE if hit on torso */
 boolean
-burnarmor(victim)
-struct monst *victim;
+burnarmor(struct monst* victim)
 {
     struct obj *item;
     char buf[BUFSZ];
@@ -159,11 +157,11 @@ struct monst *victim;
  * Returns an erosion return value (ER_*)
  */
 int
-erode_obj(otmp, ostr, type, ef_flags)
-register struct obj *otmp;
-const char *ostr;
-int type;
-int ef_flags;
+erode_obj(
+    register struct obj *otmp,
+    const char *ostr,
+    int type,
+    int ef_flags)
 {
     static NEARDATA const char
         *const action[] = { "smoulder", "rust", "rot", "corrode" },
@@ -307,10 +305,10 @@ int ef_flags;
  * wears off.
  */
 boolean
-grease_protect(otmp, ostr, victim)
-register struct obj *otmp;
-const char *ostr;
-struct monst *victim;
+grease_protect(
+    register struct obj *otmp,
+    const char *ostr,
+    struct monst *victim)
 {
     static const char txt[] = "protected by the layer of grease!";
     boolean vismon = victim && (victim != &g.youmonst) && canseemon(victim);
@@ -336,8 +334,7 @@ struct monst *victim;
 }
 
 struct trap *
-maketrap(x, y, typ)
-int x, y, typ;
+maketrap(int x, int y, int typ)
 {
     static union vlaunchinfo zero_vl;
     boolean oldplace;
@@ -468,9 +465,9 @@ int x, y, typ;
 }
 
 void
-fall_through(td, ftflags)
-boolean td; /* td == TRUE : trap door or hole */
-unsigned ftflags;
+fall_through(
+    boolean td, /* td == TRUE : trap door or hole */
+    unsigned ftflags)
 {
     d_level dtmp;
     char msgbuf[BUFSZ];
@@ -591,11 +588,12 @@ unsigned ftflags;
  *       shop status--it's not worth the hassle.]
  */
 struct monst *
-animate_statue(statue, x, y, cause, fail_reason)
-struct obj *statue;
-xchar x, y;
-int cause;
-int *fail_reason;
+animate_statue(
+    struct obj *statue,
+    xchar x, 
+    xchar y,
+    int cause,
+    int *fail_reason)
 {
     int mnum = statue->corpsenm;
     struct permonst *mptr = &mons[mnum];
@@ -769,10 +767,11 @@ int *fail_reason;
  * or pick-axe.
  */
 struct monst *
-activate_statue_trap(trap, x, y, shatter)
-struct trap *trap;
-xchar x, y;
-boolean shatter;
+activate_statue_trap(
+    struct trap *trap,
+    xchar x, 
+    xchar y,
+    boolean shatter)
 {
     struct monst *mtmp = (struct monst *) 0;
     struct obj *otmp = sobj_at(STATUE, x, y);
@@ -799,9 +798,10 @@ boolean shatter;
 }
 
 static boolean
-keep_saddle_with_steedcorpse(steed_mid, objchn, saddle)
-unsigned steed_mid;
-struct obj *objchn, *saddle;
+keep_saddle_with_steedcorpse(
+    unsigned steed_mid,
+    struct obj *objchn,
+    struct obj *saddle)
 {
     if (!saddle)
         return FALSE;
@@ -831,10 +831,10 @@ struct obj *objchn, *saddle;
 /* monster or you go through and possibly destroy a web.
    return TRUE if could go through. */
 static boolean
-mu_maybe_destroy_web(mtmp, domsg, trap)
-struct monst *mtmp;
-boolean domsg;
-struct trap *trap;
+mu_maybe_destroy_web(
+    struct monst *mtmp,
+    boolean domsg,
+    struct trap *trap)
 {
     boolean isyou = (mtmp == &g.youmonst);
     struct permonst *mptr = mtmp->data;
@@ -875,9 +875,7 @@ struct trap *trap;
 
 /* make a single arrow/dart/rock for a trap to shoot or drop */
 static struct obj *
-t_missile(otyp, trap)
-int otyp;
-struct trap *trap;
+t_missile(int otyp, struct trap* trap)
 {
     struct obj *otmp = mksobj(otyp, TRUE, FALSE);
 
@@ -889,8 +887,7 @@ struct trap *trap;
 }
 
 void
-set_utrap(tim, typ)
-unsigned tim, typ;
+set_utrap(unsigned int tim, unsigned int typ)
 {
     /* if we get here through reset_utrap(), the caller of that might
        have already set u.utrap to 0 so this check won't be sufficient
@@ -910,8 +907,7 @@ unsigned tim, typ;
 }
 
 void
-reset_utrap(msg)
-boolean msg;
+reset_utrap(boolean msg)
 {
     boolean was_Lev = (Levitation != 0), was_Fly = (Flying != 0);
 
@@ -926,10 +922,10 @@ boolean msg;
 }
 
 static int
-trapeffect_arrow_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_arrow_trap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned trflags UNUSED)
 {
     struct obj *otmp;
 
@@ -982,10 +978,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_dart_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_dart_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     struct obj *otmp;
 
@@ -1050,10 +1046,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_rocktrap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_rocktrap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned trflags UNUSED)
 {
     struct obj *otmp;
 
@@ -1115,10 +1111,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_sqky_board(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_sqky_board(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned trflags)
 {
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
@@ -1136,7 +1132,8 @@ unsigned trflags;
             seetrap(trap);
             pline("A board beneath you %s%s%s.",
                   Deaf ? "vibrates" : "squeaks ",
-                  Deaf ? "" : trapnote(trap, 0), Deaf ? "" : " loudly");
+                  Deaf ? "" : trapnote(trap, FALSE),
+                  Deaf ? "" : " loudly");
             wake_nearby();
         }
     } else {
@@ -1148,7 +1145,7 @@ unsigned trflags;
         if (in_sight) {
             if (!Deaf) {
                 pline("A board beneath %s squeaks %s loudly.",
-                      mon_nam(mtmp), trapnote(trap, 0));
+                      mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
             } else {
                 pline("%s stops momentarily and appears to cringe.",
@@ -1159,7 +1156,7 @@ unsigned trflags;
             int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                 ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
-            You_hear("a %s squeak %s.", trapnote(trap, 1),
+            You_hear("%s squeak %s.", trapnote(trap, FALSE),
                      (distu(mtmp->mx, mtmp->my) <= range * range)
                      ? "nearby" : "in the distance");
         }
@@ -1170,10 +1167,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_bear_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_bear_trap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned trflags)
 {
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
@@ -1243,10 +1240,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_slp_gas_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_slp_gas_trap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1272,10 +1269,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_rust_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_rust_trap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned int trflags UNUSED)
 {
     struct obj *otmp;
 
@@ -1401,10 +1398,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_fire_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_fire_trap(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1483,10 +1480,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_pit(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_pit(
+    struct monst *mtmp,
+    struct trap *trap,
+    unsigned int trflags)
 {
     int ttype = trap->ttyp;
 
@@ -1496,6 +1493,11 @@ unsigned trflags;
         boolean adj_pit = adj_nonconjoined_pit(trap);
         int steed_article = ARTICLE_THE;
         int oldumort;
+
+        /* suppress article in various steed messages when using its
+           name (which won't occur when hallucinating) */
+        if (u.usteed && has_mgivenname(u.usteed) && !Hallucination)
+            steed_article = ARTICLE_NONE;
 
         /* KMH -- You can't escape the Sokoban level traps */
         if (!Sokoban && (Levitation || (Flying && !plunged)))
@@ -1653,10 +1655,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_hole(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_hole(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         if (!Can_fall_thru(&u.uz)) {
@@ -1712,10 +1714,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_telep_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_telep_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1729,10 +1731,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_level_telep(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_level_telep(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1753,10 +1755,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_web(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_web(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         boolean webmsgok = (trflags & NOWEBMSG) == 0;
@@ -1764,6 +1766,11 @@ unsigned trflags;
                              || (trflags & FAILEDUNTRAP) != 0);
         boolean viasitting = (trflags & VIASITTING) != 0;
         int steed_article = ARTICLE_THE;
+
+        /* suppress article in various steed messages when using its
+           name (which won't occur when hallucinating) */
+        if (u.usteed && has_mgivenname(u.usteed) && !Hallucination)
+            steed_article = ARTICLE_NONE;
 
         feeltrap(trap);
         if (mu_maybe_destroy_web(&g.youmonst, webmsgok, trap))
@@ -1916,10 +1923,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_statue_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_statue_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         (void) activate_statue_trap(trap, u.ux, u.uy, FALSE);
@@ -1930,10 +1937,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_magic_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_magic_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -1958,10 +1965,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_anti_magic(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_anti_magic(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         seetrap(trap);
@@ -2051,15 +2058,20 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_poly_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_poly_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         boolean viasitting = (trflags & VIASITTING) != 0;
         int steed_article = ARTICLE_THE;
         char verbbuf[BUFSZ];
+
+        /* suppress article in various steed messages when using its
+           name (which won't occur when hallucinating) */
+        if (u.usteed && has_mgivenname(u.usteed) && !Hallucination)
+            steed_article = ARTICLE_NONE;
 
         seetrap(trap);
         if (viasitting)
@@ -2099,10 +2111,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_landmine(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_landmine(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         boolean already_seen = trap->tseen;
@@ -2218,10 +2230,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_rolling_boulder_trap(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_rolling_boulder_trap(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
@@ -2263,10 +2275,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_magic_portal(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_magic_portal(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     if (mtmp == &g.youmonst) {
         feeltrap(trap);
@@ -2278,10 +2290,10 @@ unsigned trflags;
 }
 
 static int
-trapeffect_vibrating_square(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags UNUSED;
+trapeffect_vibrating_square(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
         feeltrap(trap);
@@ -2321,10 +2333,10 @@ unsigned trflags UNUSED;
 }
 
 static int
-trapeffect_selector(mtmp, trap, trflags)
-struct monst *mtmp;
-struct trap *trap;
-unsigned trflags;
+trapeffect_selector(
+    struct monst* mtmp,
+    struct trap* trap,
+    unsigned int trflags)
 {
     switch (trap->ttyp) {
     case ARROW_TRAP:
@@ -2380,9 +2392,7 @@ unsigned trflags;
 }
 
 void
-dotrap(trap, trflags)
-register struct trap *trap;
-unsigned trflags;
+dotrap(register struct trap* trap, unsigned int trflags)
 {
     register int ttype = trap->ttyp;
     boolean already_seen = trap->tseen,
@@ -2392,7 +2402,6 @@ unsigned trflags;
             plunged = (trflags & TOOKPLUNGE) != 0,
             conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE),
             adj_pit = adj_nonconjoined_pit(trap);
-    int steed_article = ARTICLE_THE;
 
     nomul(0);
 
@@ -2428,13 +2437,8 @@ unsigned trflags;
         }
     }
 
-    if (u.usteed) {
+    if (u.usteed)
         u.usteed->mtrapseen |= (1 << (ttype - 1));
-        /* suppress article in various steed messages when using its
-           name (which won't occur when hallucinating) */
-        if (has_mgivenname(u.usteed) && !Hallucination)
-            steed_article = ARTICLE_NONE;
-    }
 
     /*
      * Note:
@@ -2448,29 +2452,25 @@ unsigned trflags;
 }
 
 static char *
-trapnote(trap, noprefix)
-struct trap *trap;
-boolean noprefix;
+trapnote(struct trap* trap, boolean noprefix)
 {
-    static char tnbuf[12];
-    const char *tn,
-        *tnnames[12] = { "C note",  "D flat", "D note",  "E flat",
-                         "E note",  "F note", "F sharp", "G note",
-                         "G sharp", "A note", "B flat",  "B note" };
+    static const char *const tnnames[] = {
+        "C note",  "D flat", "D note",  "E flat",
+        "E note",  "F note", "F sharp", "G note",
+        "G sharp", "A note", "B flat",  "B note",
+    };
+    static char tnbuf[12]; /* result buffer */
+    const char *tn;
 
     tnbuf[0] = '\0';
     tn = tnnames[trap->tnote];
     if (!noprefix)
-        Sprintf(tnbuf, "%s ",
-                (*tn == 'A' || *tn == 'E' || *tn == 'F') ? "an" : "a");
-    Sprintf(eos(tnbuf), "%s", tn);
-    return tnbuf;
+        (void) just_an(tnbuf, tn);
+    return strcat(tnbuf, tn);
 }
 
 static int
-steedintrap(trap, otmp)
-struct trap *trap;
-struct obj *otmp;
+steedintrap(struct trap* trap, struct obj* otmp)
 {
     struct monst *steed = u.usteed;
     int tt;
@@ -2552,8 +2552,7 @@ struct obj *otmp;
 
 /* some actions common to both player and monsters for triggered landmine */
 void
-blow_up_landmine(trap)
-struct trap *trap;
+blow_up_landmine(struct trap* trap)
 {
     int x = trap->tx, y = trap->ty, dbx, dby;
     struct rm *lev = &levl[x][y];
@@ -2597,9 +2596,7 @@ struct trap *trap;
 }
 
 static void
-launch_drop_spot(obj, x, y)
-struct obj *obj;
-xchar x, y;
+launch_drop_spot(struct obj* obj, xchar x, xchar y)
 {
     if (!obj) {
         g.launchplace.obj = (struct obj *) 0;
@@ -2613,7 +2610,7 @@ xchar x, y;
 }
 
 boolean
-launch_in_progress()
+launch_in_progress(void)
 {
     if (g.launchplace.obj)
         return TRUE;
@@ -2621,7 +2618,7 @@ launch_in_progress()
 }
 
 void
-force_launch_placement()
+force_launch_placement(void)
 {
     if (g.launchplace.obj) {
         g.launchplace.obj->otrapped = 0;
@@ -2637,10 +2634,13 @@ force_launch_placement()
  *        2 if an object was launched, but used up.
  */
 int
-launch_obj(otyp, x1, y1, x2, y2, style)
-short otyp;
-register int x1, y1, x2, y2;
-int style;
+launch_obj(
+    short otyp,
+    register int x1,
+    register int y1,
+    register int x2,
+    register int y2,
+    int style)
 {
     register struct monst *mtmp;
     register struct obj *otmp, *otmp2;
@@ -2900,8 +2900,7 @@ int style;
 }
 
 void
-seetrap(trap)
-struct trap *trap;
+seetrap(struct trap* trap)
 {
     if (!trap->tseen) {
         trap->tseen = 1;
@@ -2911,8 +2910,7 @@ struct trap *trap;
 
 /* like seetrap() but overrides vision */
 void
-feeltrap(trap)
-struct trap *trap;
+feeltrap(struct trap* trap)
 {
     trap->tseen = 1;
     map_trap(trap, 1);
@@ -2921,11 +2919,12 @@ struct trap *trap;
 }
 
 static int
-mkroll_launch(ttmp, x, y, otyp, ocount)
-struct trap *ttmp;
-xchar x, y;
-short otyp;
-long ocount;
+mkroll_launch(
+    struct trap *ttmp,
+    xchar x, 
+    xchar y,
+    short otyp,
+    long ocount)
 {
     struct obj *otmp;
     register int tmp;
@@ -2991,10 +2990,11 @@ long ocount;
 }
 
 static boolean
-isclearpath(cc, distance, dx, dy)
-coord *cc;
-int distance;
-schar dx, dy;
+isclearpath(
+    coord *cc,
+    int distance,
+    schar dx,
+    schar dy)
 {
     uchar typ;
     xchar x, y;
@@ -3014,8 +3014,7 @@ schar dx, dy;
 }
 
 int
-mintrap(mtmp)
-register struct monst *mtmp;
+mintrap(register struct monst *mtmp)
 {
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
     boolean trapkilled = FALSE;
@@ -3062,8 +3061,7 @@ register struct monst *mtmp;
         }
     } else {
         register int tt = trap->ttyp;
-        boolean in_sight, see_it,
-                inescapable = (g.force_mintrap
+        boolean inescapable = (g.force_mintrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
@@ -3084,12 +3082,6 @@ register struct monst *mtmp;
         if (trap->madeby_u && rnl(5))
             setmangry(mtmp, TRUE);
 
-        in_sight = canseemon(mtmp);
-        see_it = cansee(mtmp->mx, mtmp->my);
-        /* assume hero can tell what's going on for the steed */
-        if (mtmp == u.usteed)
-            in_sight = TRUE;
-
         return trapeffect_selector(mtmp, trap, 0);
     }
     if (trapkilled)
@@ -3099,8 +3091,7 @@ register struct monst *mtmp;
 
 /* Combine cockatrice checks into single functions to avoid repeating code. */
 void
-instapetrify(str)
-const char *str;
+instapetrify(const char *str)
 {
     if (Stone_resistance)
         return;
@@ -3114,9 +3105,7 @@ const char *str;
 }
 
 void
-minstapetrify(mon, byplayer)
-struct monst *mon;
-boolean byplayer;
+minstapetrify(struct monst *mon, boolean byplayer)
 {
     if (resists_ston(mon))
         return;
@@ -3141,8 +3130,7 @@ boolean byplayer;
 }
 
 void
-selftouch(arg)
-const char *arg;
+selftouch(const char *arg)
 {
     char kbuf[BUFSZ];
 
@@ -3173,10 +3161,10 @@ const char *arg;
 }
 
 void
-mselftouch(mon, arg, byplayer)
-struct monst *mon;
-const char *arg;
-boolean byplayer;
+mselftouch(
+    struct monst *mon,
+    const char *arg,
+    boolean byplayer)
 {
     struct obj *mwep = MON_WEP(mon);
 
@@ -3197,7 +3185,7 @@ boolean byplayer;
 
 /* start levitating */
 void
-float_up()
+float_up(void)
 {
     g.context.botl = TRUE;
     if (u.utrap) {
@@ -3267,8 +3255,7 @@ float_up()
 }
 
 void
-fill_pit(x, y)
-int x, y;
+fill_pit(int x, int y)
 {
     struct obj *otmp;
     struct trap *t;
@@ -3282,8 +3269,9 @@ int x, y;
 
 /* stop levitating */
 int
-float_down(hmask, emask)
-long hmask, emask; /* might cancel timeout */
+float_down(
+    long hmask,
+    long emask) /* might cancel timeout */
 {
     register struct trap *trap = (struct trap *) 0;
     d_level current_dungeon_level;
@@ -3439,7 +3427,7 @@ long hmask, emask; /* might cancel timeout */
 
 /* shared code for climbing out of a pit */
 void
-climb_pit()
+climb_pit(void)
 {
     const char *pitname;
 
@@ -3489,8 +3477,8 @@ climb_pit()
 }
 
 static void
-dofiretrap(box)
-struct obj *box; /* null for floor trap */
+dofiretrap(
+    struct obj *box) /* null for floor trap */
 {
     boolean see_it = !Blind;
     int num, alt;
@@ -3560,7 +3548,7 @@ struct obj *box; /* null for floor trap */
 }
 
 static void
-domagictrap()
+domagictrap(void)
 {
     register int fate = rnd(20);
 
@@ -3682,10 +3670,11 @@ domagictrap()
  * Return whether the object was destroyed.
  */
 boolean
-fire_damage(obj, force, x, y)
-struct obj *obj;
-boolean force;
-xchar x, y;
+fire_damage(
+    struct obj *obj,
+    boolean force,
+    xchar x,
+    xchar y)
 {
     int chance;
     struct obj *otmp, *ncobj;
@@ -3772,10 +3761,12 @@ xchar x, y;
  * Return number of objects destroyed. --ALI
  */
 int
-fire_damage_chain(chain, force, here, x, y)
-struct obj *chain;
-boolean force, here;
-xchar x, y;
+fire_damage_chain(
+    struct obj *chain,
+    boolean force, 
+    boolean here,
+    xchar x,
+    xchar y)
 {
     struct obj *obj, *nobj;
     int num = 0;
@@ -3797,9 +3788,7 @@ xchar x, y;
 
 /* obj has been thrown or dropped into lava; damage is worse than mere fire */
 boolean
-lava_damage(obj, x, y)
-struct obj *obj;
-xchar x, y;
+lava_damage(struct obj* obj, xchar x, xchar y)
 {
     int otyp = obj->otyp, ocls = obj->oclass;
 
@@ -3841,8 +3830,7 @@ xchar x, y;
 }
 
 void
-acid_damage(obj)
-struct obj *obj;
+acid_damage(struct obj* obj)
 {
     /* Scrolls but not spellbooks can be erased by acid. */
     struct monst *victim;
@@ -3884,10 +3872,10 @@ struct obj *obj;
  * Returns an erosion return value (ER_*)
  */
 int
-water_damage(obj, ostr, force)
-struct obj *obj;
-const char *ostr;
-boolean force;
+water_damage(
+    struct obj *obj,
+    const char *ostr,
+    boolean force)
 {
     if (!obj)
         return ER_NOTHING;
@@ -4034,9 +4022,9 @@ boolean force;
 }
 
 void
-water_damage_chain(obj, here)
-struct obj *obj;
-boolean here;
+water_damage_chain(
+    struct obj *obj,
+    boolean here)
 {
     struct obj *otmp;
     xchar x, y;
@@ -4071,8 +4059,7 @@ boolean here;
  * crawl out of the current predicament.
  */
 static boolean
-emergency_disrobe(lostsome)
-boolean *lostsome;
+emergency_disrobe(boolean *lostsome)
 {
     int invc = inv_cnt(TRUE);
 
@@ -4118,7 +4105,7 @@ boolean *lostsome;
 
 /*  return TRUE iff player relocated */
 boolean
-drown()
+drown(void)
 {
     const char *pool_of_water;
     boolean inpool_ok = FALSE, crawl_ok;
@@ -4272,8 +4259,7 @@ drown()
 }
 
 void
-drain_en(n)
-int n;
+drain_en(int n)
 {
     if (!u.uenmax) {
         /* energy is completely gone */
@@ -4297,7 +4283,7 @@ int n;
 
 /* disarm a trap */
 int
-dountrap()
+dountrap(void)
 {
     if (near_capacity() >= HVY_ENCUMBER) {
         pline("You're too strained to do that.");
@@ -4320,8 +4306,7 @@ dountrap()
 
 /* Probability of disabling a trap.  Helge Hafting */
 static int
-untrap_prob(ttmp)
-struct trap *ttmp;
+untrap_prob(struct trap* ttmp)
 {
     int chance = 3;
 
@@ -4351,11 +4336,11 @@ struct trap *ttmp;
 
 /* Replace trap with object(s).  Helge Hafting */
 void
-cnv_trap_obj(otyp, cnt, ttmp, bury_it)
-int otyp;
-int cnt;
-struct trap *ttmp;
-boolean bury_it;
+cnv_trap_obj(
+    int otyp,
+    int cnt,
+    struct trap *ttmp,
+    boolean bury_it)
 {
     struct obj *otmp = mksobj(otyp, TRUE, FALSE);
 
@@ -4382,8 +4367,7 @@ boolean bury_it;
 
 /* while attempting to disarm an adjacent trap, we've fallen into it */
 static void
-move_into_trap(ttmp)
-struct trap *ttmp;
+move_into_trap(struct trap* ttmp)
 {
     int bc = 0;
     xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
@@ -4425,9 +4409,7 @@ struct trap *ttmp;
  * 2: succeeds
  */
 static int
-try_disarm(ttmp, force_failure)
-struct trap *ttmp;
-boolean force_failure;
+try_disarm(struct trap* ttmp, boolean force_failure)
 {
     struct monst *mtmp = m_at(ttmp->tx, ttmp->ty);
     int ttype = ttmp->ttyp;
@@ -4508,9 +4490,7 @@ boolean force_failure;
 }
 
 static void
-reward_untrap(ttmp, mtmp)
-struct trap *ttmp;
-struct monst *mtmp;
+reward_untrap(struct trap* ttmp, struct monst* mtmp)
 {
     if (!ttmp->madeby_u) {
         if (rnl(10) < 8 && !mtmp->mpeaceful && !mtmp->msleeping
@@ -4530,8 +4510,7 @@ struct monst *mtmp;
 }
 
 static int
-disarm_holdingtrap(ttmp) /* Helge Hafting */
-struct trap *ttmp;
+disarm_holdingtrap(struct trap* ttmp) /* Helge Hafting */
 {
     struct monst *mtmp;
     int fails = try_disarm(ttmp, FALSE);
@@ -4563,8 +4542,7 @@ struct trap *ttmp;
 }
 
 static int
-disarm_landmine(ttmp) /* Helge Hafting */
-struct trap *ttmp;
+disarm_landmine(struct trap* ttmp) /* Helge Hafting */
 {
     int fails = try_disarm(ttmp, FALSE);
 
@@ -4577,8 +4555,7 @@ struct trap *ttmp;
 
 /* getobj callback for object to disarm a squeaky board with */
 static int
-unsqueak_ok(obj)
-struct obj *obj;
+unsqueak_ok(struct obj* obj)
 {
     if (!obj)
         return GETOBJ_EXCLUDE;
@@ -4601,8 +4578,7 @@ struct obj *obj;
 
 /* it may not make much sense to use grease on floor boards, but so what? */
 static int
-disarm_squeaky_board(ttmp)
-struct trap *ttmp;
+disarm_squeaky_board(struct trap* ttmp)
 {
     struct obj *obj;
     boolean bad_tool;
@@ -4636,9 +4612,7 @@ struct trap *ttmp;
 
 /* removes traps that shoot arrows, darts, etc. */
 static int
-disarm_shooting_trap(ttmp, otyp)
-struct trap *ttmp;
-int otyp;
+disarm_shooting_trap(struct trap* ttmp, int otyp)
 {
     int fails = try_disarm(ttmp, FALSE);
 
@@ -4652,11 +4626,11 @@ int otyp;
 /* Is the weight too heavy?
  * Formula as in near_capacity() & check_capacity() */
 static int
-try_lift(mtmp, ttmp, wt, stuff)
-struct monst *mtmp;
-struct trap *ttmp;
-int wt;
-boolean stuff;
+try_lift(
+    struct monst *mtmp,
+    struct trap *ttmp,
+    int wt,
+    boolean stuff)
 {
     int wc = weight_cap();
 
@@ -4677,9 +4651,9 @@ boolean stuff;
 
 /* Help trapped monster (out of a (spiked) pit) */
 static int
-help_monster_out(mtmp, ttmp)
-struct monst *mtmp;
-struct trap *ttmp;
+help_monster_out(
+    struct monst *mtmp,
+    struct trap *ttmp)
 {
     int wt;
     struct obj *otmp;
@@ -4768,8 +4742,7 @@ struct trap *ttmp;
 }
 
 int
-untrap(force)
-boolean force;
+untrap(boolean force)
 {
     register struct obj *otmp;
     register int x, y;
@@ -5014,10 +4987,10 @@ boolean force;
 /* for magic unlocking; returns true if targetted monster (which might
    be hero) gets untrapped; the trap remains intact */
 boolean
-openholdingtrap(mon, noticed)
-struct monst *mon;
-boolean *noticed; /* set to true iff hero notices the effect; */
-{                 /* otherwise left with its previous value intact */
+openholdingtrap(
+    struct monst *mon,
+    boolean *noticed) /* set to true iff hero notices the effect; */
+{                     /* otherwise left with its previous value intact */
     struct trap *t;
     char buf[BUFSZ], whichbuf[20];
     const char *trapdescr = 0, *which = 0;
@@ -5106,10 +5079,10 @@ boolean *noticed; /* set to true iff hero notices the effect; */
 /* for magic locking; returns true if targetted monster (which might
    be hero) gets hit by a trap (might avoid actually becoming trapped) */
 boolean
-closeholdingtrap(mon, noticed)
-struct monst *mon;
-boolean *noticed; /* set to true iff hero notices the effect; */
-{                 /* otherwise left with its previous value intact */
+closeholdingtrap(
+    struct monst *mon,
+    boolean *noticed) /* set to true iff hero notices the effect; */
+{                     /* otherwise left with its previous value intact */
     struct trap *t;
     unsigned dotrapflags;
     boolean ishero = (mon == &g.youmonst), result;
@@ -5151,11 +5124,11 @@ boolean *noticed; /* set to true iff hero notices the effect; */
 /* for magic unlocking; returns true if targetted monster (which might
    be hero) gets hit by a trap (target might avoid its effect) */
 boolean
-openfallingtrap(mon, trapdoor_only, noticed)
-struct monst *mon;
-boolean trapdoor_only;
-boolean *noticed; /* set to true iff hero notices the effect; */
-{                 /* otherwise left with its previous value intact */
+openfallingtrap(
+    struct monst *mon,
+    boolean trapdoor_only,
+    boolean *noticed) /* set to true iff hero notices the effect; */
+{                     /* otherwise left with its previous value intact */
     struct trap *t;
     boolean ishero = (mon == &g.youmonst), result;
 
@@ -5194,10 +5167,10 @@ boolean *noticed; /* set to true iff hero notices the effect; */
 
 /* only called when the player is doing something to the chest directly */
 boolean
-chest_trap(obj, bodypart, disarm)
-register struct obj *obj;
-register int bodypart;
-boolean disarm;
+chest_trap(
+    register struct obj *obj,
+    register int bodypart,
+    boolean disarm)
 {
     register struct obj *otmp = obj, *otmp2;
     char buf[80];
@@ -5384,8 +5357,7 @@ boolean disarm;
 }
 
 struct trap *
-t_at(x, y)
-register int x, y;
+t_at(register int x, register int y)
 {
     register struct trap *trap = g.ftrap;
 
@@ -5398,8 +5370,7 @@ register int x, y;
 }
 
 void
-deltrap(trap)
-register struct trap *trap;
+deltrap(register struct trap* trap)
 {
     register struct trap *ttmp;
 
@@ -5420,9 +5391,10 @@ register struct trap *trap;
 }
 
 boolean
-conjoined_pits(trap2, trap1, u_entering_trap2)
-struct trap *trap2, *trap1;
-boolean u_entering_trap2;
+conjoined_pits(
+    struct trap *trap2,
+    struct trap *trap1,
+    boolean u_entering_trap2)
 {
     int dx, dy, diridx, adjidx;
 
@@ -5449,8 +5421,7 @@ boolean u_entering_trap2;
 }
 
 static void
-clear_conjoined_pits(trap)
-struct trap *trap;
+clear_conjoined_pits(struct trap* trap)
 {
     int diridx, adjidx, x, y;
     struct trap *t;
@@ -5473,8 +5444,7 @@ struct trap *trap;
 }
 
 static boolean
-adj_nonconjoined_pit(adjtrap)
-struct trap *adjtrap;
+adj_nonconjoined_pit(struct trap* adjtrap)
 {
     struct trap *trap_with_u = t_at(u.ux0, u.uy0);
 
@@ -5496,8 +5466,7 @@ struct trap *adjtrap;
  * (currently not called from anywhere)
  */
 static void
-join_adjacent_pits(trap)
-struct trap *trap;
+join_adjacent_pits(struct trap* trap)
 {
     struct trap *t;
     int diridx, x, y;
@@ -5522,8 +5491,7 @@ struct trap *trap;
  * Returns TRUE if you escaped a pit and are standing on the precipice.
  */
 boolean
-uteetering_at_seen_pit(trap)
-struct trap *trap;
+uteetering_at_seen_pit(struct trap* trap)
 {
     return (trap && is_pit(trap->ttyp) && trap->tseen
             && trap->tx == u.ux && trap->ty == u.uy
@@ -5535,8 +5503,7 @@ struct trap *trap;
  * release a trap door
  */
 boolean
-uescaped_shaft(trap)
-struct trap *trap;
+uescaped_shaft(struct trap* trap)
 {
     return (trap && is_hole(trap->ttyp) && trap->tseen
             && trap->tx == u.ux && trap->ty == u.uy);
@@ -5544,8 +5511,7 @@ struct trap *trap;
 
 /* Destroy a trap that emanates from the floor. */
 boolean
-delfloortrap(ttmp)
-register struct trap *ttmp;
+delfloortrap(struct trap* ttmp)
 {
     /* some of these are arbitrary -dlc */
     if (ttmp && ((ttmp->ttyp == SQKY_BOARD) || (ttmp->ttyp == BEAR_TRAP)
@@ -5571,9 +5537,7 @@ register struct trap *ttmp;
 
 /* used for doors (also tins).  can be used for anything else that opens. */
 void
-b_trapped(item, bodypart)
-const char *item;
-int bodypart;
+b_trapped(const char* item, int bodypart)
 {
     int lvl = level_difficulty(),
         dmg = rnd(5 + (lvl < 5 ? lvl : 2 + lvl / 2));
@@ -5590,12 +5554,12 @@ int bodypart;
 /* Monster is hit by trap. */
 /* Note: doesn't work if both obj and d_override are null */
 static boolean
-thitm(tlev, mon, obj, d_override, nocorpse)
-int tlev;
-struct monst *mon;
-struct obj *obj;
-int d_override;
-boolean nocorpse;
+thitm(
+    int tlev,
+    struct monst *mon,
+    struct obj *obj,
+    int d_override,
+    boolean nocorpse)
 {
     int strike;
     boolean trapkilled = FALSE;
@@ -5646,7 +5610,7 @@ boolean nocorpse;
 }
 
 boolean
-unconscious()
+unconscious(void)
 {
     if (g.multi >= 0)
         return FALSE;
@@ -5661,7 +5625,7 @@ unconscious()
 static const char lava_killer[] = "molten lava";
 
 boolean
-lava_effects()
+lava_effects(void)
 {
     register struct obj *obj, *obj2;
     int dmg = d(6, 6); /* only applicable for water walking */
@@ -5789,7 +5753,7 @@ lava_effects()
 
 /* called each turn when trapped in lava */
 void
-sink_into_lava()
+sink_into_lava(void)
 {
     static const char sink_deeper[] = "You sink deeper into the lava.";
 
@@ -5837,7 +5801,7 @@ sink_into_lava()
 /* called when something has been done (breaking a boulder, for instance)
    which entails a luck penalty if performed on a sokoban level */
 void
-sokoban_guilt()
+sokoban_guilt(void)
 {
     if (Sokoban) {
         u.uconduct.sokocheat++;
@@ -5857,7 +5821,7 @@ sokoban_guilt()
 
 /* called when a trap has been deleted or had its ttyp replaced */
 static void
-maybe_finish_sokoban()
+maybe_finish_sokoban(void)
 {
     struct trap *t;
 
@@ -5890,9 +5854,7 @@ maybe_finish_sokoban()
  * calls).
  */
 const char *
-trapname(ttyp, override)
-int ttyp;
-boolean override;
+trapname(int ttyp, boolean override)
 {
     static const char *halu_trapnames[] = {
         /* riffs on actual nethack traps */
@@ -5944,44 +5906,19 @@ boolean override;
     return defsyms[trap_to_defsym(ttyp)].explanation;
 }
 
-/* Ignite ignitable items in the given object chain, due to some external
- * source of fire.  The object chain should be somewhere exposed, like
- * someone's open inventory or the floor.
- * This is modeled after destroy_item() somewhat and hopefully will be able to
- * merge into it in the future.
- */
+/* Ignite ignitable items (limited to light sources) in the given object
+   chain, due to some external source of fire.  The object chain should
+   be somewhere exposed, like someone's open inventory or the floor. */
 void
-ignite_items(objchn)
-struct obj *objchn;
+ignite_items(struct obj* objchn)
 {
     struct obj *obj;
-    boolean vis = FALSE;
-    if (!objchn)
-        return;
+    boolean bynexthere = (objchn && objchn->where == OBJ_FLOOR);
 
-    if (objchn->where == OBJ_INVENT)
-        vis = TRUE; /* even when blind; lit-state can be seen in inventory */
-    else if (objchn->where == OBJ_MINVENT)
-        vis = canseemon(objchn->ocarry);
-    else if (objchn->where == OBJ_FLOOR)
-        vis = cansee(objchn->ox, objchn->oy);
-    else {
-        impossible("igniting item in a weird location %d", objchn->where);
-        return;
-    }
-
-    for (obj = objchn; obj; obj = obj->nobj) {
-        if (!ignitable(obj)
-            /* The Candelabrum requires intention to be lit */
-            || obj->otyp == CANDELABRUM_OF_INVOCATION
-            || obj->otyp == BRASS_LANTERN /* doesn't ignite via fire */
-            || obj->in_use     /* not available */
-            || obj->lamplit) { /* already burning */
-            continue;
-        }
-        begin_burn(obj, FALSE);
-        if (vis)
-            pline("%s on fire!", Yobjnam2(obj, "catch"));
+    for (obj = objchn; obj; obj = bynexthere ? obj->nexthere : obj->nobj) {
+        /* ignitable items like lamps and candles will catch fire */
+        if (!obj->lamplit && !obj->in_use)
+            catch_lit(obj);
     }
 }
 

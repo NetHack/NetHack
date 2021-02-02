@@ -568,9 +568,9 @@ enum optset_restrictions {
  * in that environment.
  */
 #if defined(WIN_CE)
-#define CFDECLSPEC __cdecl
+#define QSORTCALLBACK __cdecl
 #else
-#define CFDECLSPEC
+#define QSORTCALLBACK
 #endif
 
 #define DEVTEAM_EMAIL "devteam@nethack.org"

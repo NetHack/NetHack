@@ -81,12 +81,6 @@ recover.6       recover.txt     tmac.n          tmac.nh
 window.doc
 
 include:
-(files for GEM versions)
-bitmfile.h  gem_rsc.h   load_img.h  wingem.h
-
-(file for GNOME versions)
-winGnome.h
-
 (files for X versions)
 tile2x11.h  winX.h      xwindow.h   xwindowp.h
 
@@ -103,8 +97,8 @@ pcconf.h      permonst.h    prop.h        quest.h       rect.h
 region.h      rm.h          skills.h      sp_lev.h      spell.h
 sys.h         system.h      tcap.h        tileset.h     timeout.h
 tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
-winami.h      wincurs.h     winprocs.h    wintype.h     you.h
-youprop.h
+warnings.h    winami.h      wincurs.h     winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -115,9 +109,10 @@ outdated:
 
 outdated/include:
 (files that are no longer maintained for current game code)
-amiconf.h     beconf.h      def_os2.h     mac-carbon.h  mac-qt.h
-mac-term.h    macconf.h     macpopup.h    mactty.h      macwin.h
-mttypriv.h    os2conf.h     tosconf.h     trampoli.h    wceconf.h
+amiconf.h     beconf.h      bitmfile.h    def_os2.h     gem_rsc.h
+load_img.h    mac-carbon.h  mac-qt.h      mac-term.h    macconf.h
+macpopup.h    mactty.h      macwin.h      mttypriv.h    os2conf.h
+tosconf.h     trampoli.h    wceconf.h     winGnome.h    wingem.h
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
@@ -329,7 +324,8 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-cross-post.2020  cross-pre.2020   multiw-1.2020    multiw-2.2020
+compiler.2020    cross-post.2020  cross-pre.2020   multiw-1.2020
+multiw-2.2020
 
 sys/vms:
 (files for VMS version)

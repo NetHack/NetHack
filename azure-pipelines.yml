@@ -101,7 +101,7 @@ steps:
     echo "CXX: $CXX"
   displayName: 'Echoing variables'
 
-- checkout: git://NetHack/NetHackTest@pipeline-test
+- checkout: git://NetHack/NetHack@NetHack-3.7
   submodules: true
   path: $(netHackPath) # $(Agent.BuildDirectory)/$(netHackPath)
 
@@ -201,7 +201,7 @@ steps:
   displayName: 'Building mac full build'
 
 - bash: |
-    export GCCVER=gcc1010
+    export GCCVER=gcc1020
     cd sys/unix
     sh setup.sh hints/linux.2020
     cd ../..

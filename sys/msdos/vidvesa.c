@@ -26,46 +26,43 @@ struct VesaCharacter {
     int chr;
 };
 
-static unsigned long FDECL(vesa_SetWindow, (int window, unsigned long offset));
-static unsigned long FDECL(vesa_ReadPixel32, (unsigned x, unsigned y));
-static void FDECL(vesa_WritePixel32, (unsigned x, unsigned y,
-        unsigned long color));
-static void FDECL(vesa_WritePixel, (unsigned x, unsigned y, unsigned color));
-static void FDECL(vesa_WritePixelRow, (unsigned long offset,
-        unsigned char const *p_row, unsigned p_row_size));
-static unsigned long FDECL(vesa_MakeColor, (struct Pixel));
-static void FDECL(vesa_FillRect, (
-        unsigned left, unsigned top,
-        unsigned width, unsigned height,
-        unsigned color));
+static unsigned long vesa_SetWindow(int window, unsigned long offset);
+static unsigned long vesa_ReadPixel32(unsigned x, unsigned y);
+static void vesa_WritePixel32(unsigned x, unsigned y, unsigned long color);
+static void vesa_WritePixel(unsigned x, unsigned y, unsigned color);
+static void vesa_WritePixelRow(unsigned long offset,
+                               unsigned char const *p_row, unsigned p_row_size);
+static unsigned long vesa_MakeColor(struct Pixel);
+static void vesa_FillRect(unsigned left, unsigned top, unsigned width,
+                          unsigned height, unsigned color);
 
-static void NDECL(vesa_redrawmap);
-static void FDECL(vesa_cliparound, (int, int));
+static void vesa_redrawmap(void);
+static void vesa_cliparound(int, int);
 #if 0
-static void FDECL(decal_packed, (const struct TileImage *tile, unsigned special));
+static void decal_packed(const struct TileImage *tile, unsigned special);
 #endif
-static void FDECL(vesa_SwitchMode, (unsigned mode));
-static void NDECL(vesa_SetViewPort);
-static boolean FDECL(vesa_SetPalette, (const struct Pixel *));
-static boolean FDECL(vesa_SetHardPalette, (const struct Pixel *));
-static boolean FDECL(vesa_SetSoftPalette, (const struct Pixel *));
-static void FDECL(vesa_DisplayCell, (int, int, int));
-static unsigned FDECL(vesa_FindMode, (unsigned long mode_addr, unsigned bits));
-static void FDECL(vesa_WriteChar, (int, int, int, int));
-static void FDECL(vesa_WriteCharXY, (int, int, int, int));
-static void FDECL(vesa_WriteCharTransparent, (int, int, int, int));
-static void FDECL(vesa_WriteTextRow, (int pixx, int pixy,
-        struct VesaCharacter const *t_row, unsigned t_row_width));
-static boolean FDECL(vesa_GetCharPixel, (int, unsigned, unsigned));
-static unsigned char FDECL(vesa_GetCharPixelRow, (int, unsigned, unsigned));
-static unsigned long FDECL(vesa_DoublePixels, (unsigned long));
-static unsigned long FDECL(vesa_TriplePixels, (unsigned long));
-static void FDECL(vesa_WriteStr, (const char *, int, int, int, int));
-static unsigned char __far *NDECL(vesa_FontPtrs);
-static void FDECL(vesa_process_tile, (struct TileImage *tile));
+static void vesa_SwitchMode(unsigned mode);
+static void vesa_SetViewPort(void);
+static boolean vesa_SetPalette(const struct Pixel *);
+static boolean vesa_SetHardPalette(const struct Pixel *);
+static boolean vesa_SetSoftPalette(const struct Pixel *);
+static void vesa_DisplayCell(int, int, int);
+static unsigned vesa_FindMode(unsigned long mode_addr, unsigned bits);
+static void vesa_WriteChar(int, int, int, int);
+static void vesa_WriteCharXY(int, int, int, int);
+static void vesa_WriteCharTransparent(int, int, int, int);
+static void vesa_WriteTextRow(int pixx, int pixy,
+                              struct VesaCharacter const *t_row, unsigned t_row_width);
+static boolean vesa_GetCharPixel(int, unsigned, unsigned);
+static unsigned char vesa_GetCharPixelRow(int, unsigned, unsigned);
+static unsigned long vesa_DoublePixels(unsigned long);
+static unsigned long vesa_TriplePixels(unsigned long);
+static void vesa_WriteStr(const char *, int, int, int, int);
+static unsigned char __far *vesa_FontPtrs(void);
+/* static void vesa_process_tile(struct TileImage *tile); */
 
 #ifdef POSITIONBAR
-static void NDECL(positionbar);
+static void positionbar(void);
 #endif
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */
@@ -193,9 +190,7 @@ static const struct OldModeInfo old_mode_table[] = {
 
 /* Retrieve the mode info block */
 static boolean
-vesa_GetModeInfo(mode, info)
-unsigned mode;
-struct ModeInfoBlock *info;
+vesa_GetModeInfo(unsigned mode, struct ModeInfoBlock *info)
 {
     int mode_info_sel = -1; /* custodial */
     int mode_info_seg;
@@ -266,9 +261,7 @@ vesa_map_frame_buffer(unsigned phys_addr, unsigned size)
 
 /* Set the memory window and return the offset */
 static unsigned long
-vesa_SetWindow(window, offset)
-int window;
-unsigned long offset;
+vesa_SetWindow(int window, unsigned long offset)
 {
     /* If the desired offset is already within the window, leave the window
        as it is and return the address based on the current window position.
@@ -311,8 +304,7 @@ unsigned long offset;
 }
 
 static unsigned long
-vesa_ReadPixel32(x, y)
-unsigned x, y;
+vesa_ReadPixel32(unsigned x, unsigned y)
 {
     unsigned long offset = y * vesa_scan_line + x * vesa_pixel_bytes;
     unsigned long addr, color;
@@ -383,9 +375,7 @@ unsigned x, y;
 }
 
 static void
-vesa_WritePixel32(x, y, color)
-unsigned x, y;
-unsigned long color;
+vesa_WritePixel32(unsigned x, unsigned y, unsigned long color)
 {
     unsigned long offset = y * vesa_scan_line + x * vesa_pixel_bytes;
     unsigned long addr;
@@ -451,9 +441,7 @@ unsigned long color;
 }
 
 static void
-vesa_WritePixel(x, y, color)
-unsigned x, y;
-unsigned color;
+vesa_WritePixel(unsigned x, unsigned y, unsigned color)
 {
     if (vesa_pixel_size == 8) {
         vesa_WritePixel32(x, y, color);
@@ -463,10 +451,8 @@ unsigned color;
 }
 
 static void
-vesa_WritePixelRow(offset, p_row, p_row_size)
-unsigned long offset;
-unsigned char const *p_row;
-unsigned p_row_size;
+vesa_WritePixelRow(unsigned long offset,
+                   unsigned char const *p_row, unsigned p_row_size)
 {
     if (vesa_segment != 0) {
         /* Linear frame buffer in use */
@@ -489,20 +475,19 @@ unsigned p_row_size;
 }
 
 static unsigned long
-vesa_MakeColor(p)
-struct Pixel p;
+vesa_MakeColor(struct Pixel p)
 {
     unsigned long r = p.r >> vesa_red_shift;
-    unsigned long g = p.g >> vesa_green_shift;
+    unsigned long gr = p.g >> vesa_green_shift;
     unsigned long b = p.b >> vesa_blue_shift;
     return (r << vesa_red_pos)
-         | (g << vesa_green_pos)
+         | (gr << vesa_green_pos)
          | (b << vesa_blue_pos);
 }
 
 static void
-vesa_FillRect(left, top, width, height, color)
-unsigned left, top, width, height, color;
+vesa_FillRect(unsigned left, unsigned top, unsigned width,
+              unsigned height, unsigned color)
 {
     unsigned p_row_size = width * vesa_pixel_bytes;
     unsigned char *p_row = (unsigned char *) alloc(p_row_size);
@@ -545,14 +530,14 @@ unsigned left, top, width, height, color;
 }
 
 void
-vesa_get_scr_size()
+vesa_get_scr_size(void)
 {
     CO = vesa_x_res / vesa_char_width;
     LI = vesa_y_res / vesa_char_height - 1;
 }
 
 void
-vesa_backsp()
+vesa_backsp(void)
 {
     int col, row;
 
@@ -565,8 +550,7 @@ vesa_backsp()
 }
 
 void
-vesa_clear_screen(colour)
-int colour;
+vesa_clear_screen(int colour)
 {
     vesa_FillRect(0, 0, vesa_x_res, vesa_y_res, colour);
     if (iflags.tile_view)
@@ -576,8 +560,7 @@ int colour;
 
 /* clear to end of line */
 void
-vesa_cl_end(col, row)
-int col, row;
+vesa_cl_end(int col, int row)
 {
     unsigned left = vesa_x_center + col * vesa_char_width;
     unsigned top  = vesa_y_center + row * vesa_char_height;
@@ -590,8 +573,7 @@ int col, row;
 
 /* clear to end of screen */
 void
-vesa_cl_eos(cy)
-int cy;
+vesa_cl_eos(int cy)
 {
     cl_end();
     if (cy < LI - 1) {
@@ -605,15 +587,14 @@ int cy;
 }
 
 void
-vesa_tty_end_screen()
+vesa_tty_end_screen(void)
 {
     vesa_clear_screen(BACKGROUND_VESA_COLOR);
     vesa_SwitchMode(MODETEXT);
 }
 
 void
-vesa_tty_startup(wid, hgt)
-int *wid, *hgt;
+vesa_tty_startup(int *wid, int *hgt)
 {
     /* code to sense display adapter is required here - MJA */
 
@@ -650,9 +631,7 @@ int *wid, *hgt;
  */
 
 void
-vesa_xputs(s, col, row)
-const char *s;
-int col, row;
+vesa_xputs(const char *s, int col, int row)
 {
     if (s != NULL) {
         vesa_WriteStr(s, strlen(s), col, row, g_attribute);
@@ -661,9 +640,7 @@ int col, row;
 
 /* write out character (and attribute) */
 void
-vesa_xputc(ch, attr)
-char ch;
-int attr;
+vesa_xputc(char ch, int attr)
 {
     int col, row;
 
@@ -690,12 +667,9 @@ int attr;
 #if defined(USE_TILES)
 /* Place tile represent. a glyph at current location */
 void
-vesa_xputg(glyphnum, ch,
-          special)
-int glyphnum;
-int ch;
-unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
-                     hack.h */
+vesa_xputg(int glyphnum, int ch,
+           unsigned special) /* special feature: corpse, invis, detected, pet, ridden -
+                                hack.h */
 {
     int col, row;
     int attr;
@@ -747,8 +721,7 @@ unsigned special; /* special feature: corpse, invis, detected, pet, ridden -
  */
 
 void
-vesa_gotoloc(col, row)
-int col, row;
+vesa_gotoloc(int col, int row)
 {
     curcol = min(col, CO - 1); /* protection from callers */
     currow = min(row, LI - 1);
@@ -756,8 +729,7 @@ int col, row;
 
 #if defined(USE_TILES) && defined(CLIPPING)
 static void
-vesa_cliparound(x, y)
-int x, y;
+vesa_cliparound(int x, int y)
 {
     int oldx = clipx, oldy = clipy;
 
@@ -796,12 +768,12 @@ int x, y;
 }
 
 static void
-vesa_redrawmap()
+vesa_redrawmap(void)
 {
     unsigned y_top = TOP_MAP_ROW * vesa_char_height;
     unsigned y_bottom = vesa_y_res - 5 * vesa_char_height;
-    unsigned x, y, cx, cy, px, py;
-    unsigned long color;
+    unsigned x, y, cx, cy, py /*, px */ ;
+    /* unsigned long color; */
     unsigned long offset = y_top * (unsigned long) vesa_scan_line;
     unsigned char *p_row = NULL;
     unsigned p_row_width;
@@ -813,9 +785,9 @@ vesa_redrawmap()
     if (iflags.traditional_view) {
         /* Text mode */
         y = y_top;
-        for (cy = clipy; cy <= clipymax && cy < ROWNO; ++cy) {
+        for (cy = clipy; cy <= (unsigned) clipymax && cy < ROWNO; ++cy) {
             struct VesaCharacter t_row[COLNO];
-            for (cx = clipx; cx <= clipxmax && cx < COLNO; ++cx) {
+            for (cx = clipx; cx <= (unsigned) clipxmax && cx < COLNO; ++cx) {
                 t_row[cx].chr = map[cy][cx].ch;
                 t_row[cx].colour = map[cy][cx].attr;
             }
@@ -852,9 +824,9 @@ vesa_redrawmap()
 
         p_row_width = iflags.wc_tile_width * vesa_pixel_bytes;
         y = y_top;
-        for (cy = clipy; cy <= clipymax && cy < ROWNO; ++cy) {
-            for (py = 0; py < iflags.wc_tile_height; ++py) {
-                for (cx = clipx; cx <= clipxmax && cx < COLNO; ++cx) {
+        for (cy = clipy; cy <= (unsigned) clipymax && cy < ROWNO; ++cy) {
+            for (py = 0; py < (unsigned) iflags.wc_tile_height; ++py) {
+                for (cx = clipx; cx <= (unsigned) clipxmax && cx < COLNO; ++cx) {
                     tile = vesa_tiles[glyph2tile[map[cy][cx].glyph]];
                     vesa_WritePixelRow(offset + p_row_width * (cx - clipx), tile + p_row_width * py, p_row_width);
                 }
@@ -877,8 +849,7 @@ vesa_redrawmap()
 #endif /* USE_TILES && CLIPPING */
 
 void
-vesa_userpan(pan)
-enum vga_pan_direction pan;
+vesa_userpan(enum vga_pan_direction pan)
 {
     /*	pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
@@ -934,8 +905,7 @@ enum vga_pan_direction pan;
 }
 
 void
-vesa_overview(on)
-boolean on;
+vesa_overview(boolean on)
 {
     /*	vesa_HideCursor(); */
     if (on) {
@@ -968,8 +938,7 @@ boolean on;
 }
 
 void
-vesa_traditional(on)
-boolean on;
+vesa_traditional(boolean on)
 {
     /*	vesa_HideCursor(); */
     if (on) {
@@ -1005,7 +974,7 @@ boolean on;
 }
 
 void
-vesa_refresh()
+vesa_refresh(void)
 {
     positionbar();
     vesa_redrawmap();
@@ -1014,9 +983,7 @@ vesa_refresh()
 
 #if 0
 static void
-decal_packed(gp, special)
-const struct TileImage *gp;
-unsigned special;
+decal_packed(const struct TileImage *gp, unsigned special)
 {
     /* FIXME: the tile array is fixed in memory and should not be changed;
        if we ever implement this, we'll have to copy the pixels */
@@ -1114,13 +1081,13 @@ vesa_Init(void)
 
     /* Set the size of the tiles for the overview mode */
     vesa_oview_width = vesa_x_res / COLNO;
-    if (vesa_oview_width > iflags.wc_tile_width) {
-        vesa_oview_width = iflags.wc_tile_width;
+    if (vesa_oview_width > (unsigned) iflags.wc_tile_width) {
+        vesa_oview_width = (unsigned) iflags.wc_tile_width;
     }
     vesa_oview_height = (vesa_y_res - (TOP_MAP_ROW + 4) * vesa_char_height)
                       / ROWNO;
-    if (vesa_oview_height > iflags.wc_tile_height) {
-        vesa_oview_height = iflags.wc_tile_height;
+    if (vesa_oview_height > (unsigned) iflags.wc_tile_height) {
+        vesa_oview_height = (unsigned) iflags.wc_tile_height;
     }
 
     /* Use the map font size to set the font size */
@@ -1146,7 +1113,7 @@ vesa_Init(void)
     num_pixels = iflags.wc_tile_width * iflags.wc_tile_height;
     num_oview_pixels = vesa_oview_width * vesa_oview_height;
     set_tile_type(vesa_pixel_size > 8);
-    for (i = 0; i < total_tiles_used; ++i) {
+    for (i = 0; i < (unsigned) total_tiles_used; ++i) {
         const struct TileImage *tile = get_tile(i);
         struct TileImage *ov_tile = stretch_tile(tile, vesa_oview_width, vesa_oview_height);
         unsigned j;
@@ -1200,7 +1167,7 @@ vesa_Init(void)
 
 /* Set the size of the map viewport */
 static void
-vesa_SetViewPort()
+vesa_SetViewPort(void)
 {
     unsigned y_reserved = (TOP_MAP_ROW + 5) * vesa_char_height;
     unsigned y_map = vesa_y_res - y_reserved;
@@ -1220,8 +1187,7 @@ vesa_SetViewPort()
  *
  */
 static void
-vesa_SwitchMode(mode)
-unsigned mode;
+vesa_SwitchMode(unsigned mode)
 {
     __dpmi_regs regs;
 
@@ -1307,7 +1273,7 @@ vesa_FontPtrs(void)
  * returns a VbeInfoBlock describing the features of the VESA BIOS.
  */
 int
-vesa_detect()
+vesa_detect(void)
 {
     int vbe_info_sel = -1; /* custodial */
     int vbe_info_seg;
@@ -1489,9 +1455,7 @@ error:
 }
 
 static unsigned
-vesa_FindMode(mode_addr, bits)
-unsigned long mode_addr;
-unsigned bits;
+vesa_FindMode(unsigned long mode_addr, unsigned bits)
 {
     unsigned selected_mode;
     struct ModeInfoBlock mode_info0, mode_info;
@@ -1542,8 +1506,7 @@ unsigned bits;
  *
  */
 static void
-vesa_WriteChar(chr, col, row, colour)
-int chr, col, row, colour;
+vesa_WriteChar(int chr, int col, int row, int colour)
 {
     int pixx, pixy;
 
@@ -1562,17 +1525,16 @@ int chr, col, row, colour;
  * transparency
  */
 static void
-vesa_WriteCharXY(chr, pixx, pixy, colour)
-int chr, pixx, pixy, colour;
+vesa_WriteCharXY(int chr, int pixx, int pixy, int colour)
 {
     /* Flush if cache is full or if not contiguous to the last character */
     if (chr_cache_size >= SIZE(chr_cache)) {
         vesa_flush_text();
     }
-    if (chr_cache_size != 0 && chr_cache_lastx + vesa_char_width != pixx) {
+    if (chr_cache_size != 0 && chr_cache_lastx + vesa_char_width != (unsigned) pixx) {
         vesa_flush_text();
     }
-    if (chr_cache_size != 0 && chr_cache_pixy != pixy) {
+    if (chr_cache_size != 0 && chr_cache_pixy != (unsigned) pixy) {
         vesa_flush_text();
     }
     /* Add to cache and write later */
@@ -1591,13 +1553,12 @@ int chr, pixx, pixy, colour;
  * Don't bother cacheing; only the position bar and the cursor use this
  */
 static void
-vesa_WriteCharTransparent(chr, pixx, pixy, colour)
-int chr, pixx, pixy, colour;
+vesa_WriteCharTransparent(int chr, int pixx, int pixy, int colour)
 {
     int px, py;
 
-    for (py = 0; py < vesa_char_height; ++py) {
-        for (px = 0; px < vesa_char_width; ++px) {
+    for (py = 0; py < (int) vesa_char_height; ++py) {
+        for (px = 0; px < (int) vesa_char_width; ++px) {
             if (vesa_GetCharPixel(chr, px, py)) {
                 vesa_WritePixel(pixx + px, pixy + py, colour + FIRST_TEXT_COLOR);
             }
@@ -1606,7 +1567,7 @@ int chr, pixx, pixy, colour;
 }
 
 void
-vesa_flush_text()
+vesa_flush_text(void)
 {
     if (chr_cache_size == 0) return;
 
@@ -1615,10 +1576,8 @@ vesa_flush_text()
 }
 
 static void
-vesa_WriteTextRow(pixx, pixy, t_row, t_row_width)
-int pixx, pixy;
-struct VesaCharacter const *t_row;
-unsigned t_row_width;
+vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
+                  unsigned t_row_width)
 {
     int x, px, py;
     unsigned i;
@@ -1639,7 +1598,7 @@ unsigned t_row_width;
     }
 
     /* First loop: draw one raster line of all row entries */
-    for (py = 0; py < vesa_char_height; ++py) {
+    for (py = 0; py < (int) vesa_char_height; ++py) {
         /* Second loop: draw one raster line of one character */
         x = 0;
         for (i = 0; i < t_row_width; ++i) {
@@ -1656,7 +1615,7 @@ unsigned t_row_width;
                 fg[3] = (pix >> 24) & 0xFF;
             }
             /* Third loop: draw eight pixels */
-            for (px = 0; px < vesa_char_width; px += 8) {
+            for (px = 0; px < (int) vesa_char_width; px += 8) {
                 /* Fourth loop: draw one pixel */
                 int px2;
                 unsigned char fnt = vesa_GetCharPixelRow(chr, px, py);
@@ -1682,9 +1641,7 @@ unsigned t_row_width;
 }
 
 static boolean
-vesa_GetCharPixel(ch, x, y)
-int ch;
-unsigned x, y;
+vesa_GetCharPixel(int ch, unsigned x, unsigned y)
 {
     unsigned x2;
     unsigned char fnt;
@@ -1696,9 +1653,7 @@ unsigned x, y;
 }
 
 static unsigned char
-vesa_GetCharPixelRow(ch, x, y)
-int ch;
-unsigned x, y;
+vesa_GetCharPixelRow(int ch, unsigned x, unsigned y)
 {
     unsigned x1;
     unsigned char fnt;
@@ -1736,8 +1691,7 @@ unsigned x, y;
 
 /* Scale font pixels horizontally */
 static unsigned long
-vesa_DoublePixels(fnt)
-unsigned long fnt;
+vesa_DoublePixels(unsigned long fnt)
 {
     static const unsigned char double_bits[] = {
         0x00, 0x03, 0x0C, 0x0F,
@@ -1757,8 +1711,7 @@ unsigned long fnt;
 }
 
 static unsigned long
-vesa_TriplePixels(fnt)
-unsigned long fnt;
+vesa_TriplePixels(unsigned long fnt)
 {
     static const unsigned short triple_bits[] = {
         00000, 00007, 00070, 00077,
@@ -1787,14 +1740,12 @@ unsigned long fnt;
  *
  */
 static void
-vesa_DisplayCell(tilenum, col, row)
-int tilenum;
-int col, row;
+vesa_DisplayCell(int tilenum, int col, int row)
 {
     unsigned char const *tile;
     unsigned t_width, t_height;
     unsigned char const *tptr;
-    int px, py, pixx, pixy;
+    int /* px, */ py, pixx, pixy;
     unsigned long offset;
     unsigned p_row_width;
 
@@ -1817,7 +1768,7 @@ int col, row;
     offset = pixy * (unsigned long)vesa_scan_line + pixx * vesa_pixel_bytes;
     tptr = tile;
 
-    for (py = 0; py < t_height; ++py) {
+    for (py = 0; py < (int) t_height; ++py) {
         vesa_WritePixelRow(offset, tptr, p_row_width);
         offset += vesa_scan_line;
         tptr += p_row_width;
@@ -1830,9 +1781,7 @@ int col, row;
  *
  */
 static void
-vesa_WriteStr(s, len, col, row, colour)
-const char *s;
-int len, col, row, colour;
+vesa_WriteStr(const char *s, int len, int col, int row, int colour)
 {
     const unsigned char *us;
     int i = 0;
@@ -1859,8 +1808,7 @@ int len, col, row, colour;
  *
  */
 static boolean
-vesa_SetPalette(palette)
-const struct Pixel *palette;
+vesa_SetPalette(const struct Pixel *palette)
 {
     if (vesa_pixel_size == 8) {
         return vesa_SetHardPalette(palette);
@@ -1870,8 +1818,7 @@ const struct Pixel *palette;
 }
 
 static boolean
-vesa_SetHardPalette(palette)
-const struct Pixel *palette;
+vesa_SetHardPalette(const struct Pixel *palette)
 {
     int palette_sel = -1; /* custodial */
     int palette_seg;
@@ -1958,8 +1905,7 @@ error:
 }
 
 static boolean
-vesa_SetSoftPalette(palette)
-const struct Pixel *palette;
+vesa_SetSoftPalette(const struct Pixel *palette)
 {
     const struct Pixel *p;
     unsigned i;
@@ -1993,8 +1939,7 @@ const struct Pixel *palette;
 static unsigned char pbar[COLNO];
 
 void
-vesa_update_positionbar(posbar)
-char *posbar;
+vesa_update_positionbar(char *posbar)
 {
     unsigned char *p = pbar;
     if (posbar)
@@ -2004,7 +1949,7 @@ char *posbar;
 }
 
 static void
-positionbar()
+positionbar(void)
 {
     unsigned char *posbar = pbar;
     int feature, ucol;
@@ -2084,7 +2029,7 @@ positionbar()
 #ifdef SIMULATE_CURSOR
 
 void
-vesa_DrawCursor()
+vesa_DrawCursor(void)
 {
     static boolean last_inmap = FALSE;
     unsigned x, y, left, top, right, bottom, width, height;
@@ -2111,7 +2056,8 @@ vesa_DrawCursor()
     x = min(curcol, (CO - 1)); /* protection from callers */
     y = min(currow, (LI - 1)); /* protection from callers */
     if (!halfwidth
-    &&  ((x < clipx) || (x > clipxmax) || (y < clipy) || (y > clipymax)))
+    &&  ((x < (unsigned) clipx) || (x > (unsigned) clipxmax)
+      || (y < (unsigned) clipy) || (y > (unsigned) clipymax)))
         return;
     if (inmap) {
         x -= clipx;
@@ -2198,7 +2144,7 @@ vesa_DrawCursor()
 }
 
 void
-vesa_HideCursor()
+vesa_HideCursor(void)
 {
     unsigned x, y, left, top, width, height;
     boolean isrogue = Is_rogue_level(&u.uz);
@@ -2213,7 +2159,9 @@ vesa_HideCursor()
     x = min(curcol, (CO - 1)); /* protection from callers */
     y = min(currow, (LI - 1)); /* protection from callers */
     if (!halfwidth
-    &&  ((x < clipx) || (x > clipxmax) || (y < clipy) || (y > clipymax)))
+    &&  ((x < (unsigned) clipx) || (x > (unsigned) clipxmax)
+                                || (y < (unsigned) clipy)
+                                || (y > (unsigned) clipymax)))
         return;
     if (inmap) {
         x -= clipx;

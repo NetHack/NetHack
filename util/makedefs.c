@@ -125,51 +125,46 @@ char *file_prefix = "";
 #endif
 
 #ifdef MACsansMPWTOOL
-int FDECL(main, (void));
+int main(void);
 #else
-int FDECL(main, (int, char **));
+int main(int, char **);
 #endif
-void FDECL(do_makedefs, (char *));
-void NDECL(do_objs);
-void NDECL(do_data);
-void NDECL(do_dungeon);
-void NDECL(do_options);
-void NDECL(do_monstr);
-void NDECL(do_permonst);
-void NDECL(do_questtxt);
-void NDECL(do_rumors);
-void NDECL(do_oracles);
-void NDECL(do_date);
+void do_makedefs(char *);
+void do_objs(void);
+void do_data(void);
+void do_dungeon(void);
+void do_options(void);
+void do_monstr(void);
+void do_permonst(void);
+void do_questtxt(void);
+void do_rumors(void);
+void do_oracles(void);
+void do_date(void);
 
-extern void NDECL(monst_globals_init);   /* monst.c */
-extern void NDECL(objects_globals_init); /* objects.c */
+extern void monst_globals_init(void);   /* monst.c */
+extern void objects_globals_init(void); /* objects.c */
 
-static char *FDECL(name_file, (const char *, const char *));
-static FILE *FDECL(getfp, (const char *, const char *, const char *, int));
-static void FDECL(do_ext_makedefs, (int, char **));
-static char *FDECL(xcrypt, (const char *));
-static unsigned long FDECL(read_rumors_file,
-                           (const char *, int *, long *, unsigned long));
-static void FDECL(do_rnd_access_file, (const char *, const char *));
-static boolean FDECL(d_filter, (char *));
-static boolean FDECL(h_filter, (char *));
-static void FDECL(opt_out_words, (char *, int *));
+static char *name_file(const char *, const char *);
+static FILE *getfp(const char *, const char *, const char *, int);
+static void do_ext_makedefs(int, char **);
+static char *xcrypt(const char *);
+static unsigned long read_rumors_file(const char *, int *,
+                                      long *, unsigned long);
+static void do_rnd_access_file(const char *, const char *);
+static boolean d_filter(char *);
+static boolean h_filter(char *);
+static void opt_out_words(char *, int *);
 
-static char *FDECL(fgetline, (FILE*));
-static char *FDECL(tmpdup, (const char *));
-static char *FDECL(limit, (char *, int));
-static void NDECL(windowing_sanity);
-static boolean FDECL(get_gitinfo, (char *, char *));
+static char *fgetline(FILE*);
+static char *tmpdup(const char *);
+static char *limit(char *, int);
+static void windowing_sanity(void);
+static boolean get_gitinfo(char *, char *);
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
 
-static boolean use_enum =
-#ifdef ENUM_PM
-    TRUE;
-#else
-    FALSE;
-#endif
+static boolean use_enum = TRUE;
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
@@ -218,10 +213,10 @@ main(void)
 
 #else /* ! MAC */
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     if ((argc == 1) ||
         ((argc != 2)
@@ -253,9 +248,10 @@ char *argv[];
 }
 #endif
 
+RESTORE_WARNINGS
+
 void
-do_makedefs(options)
-char *options;
+do_makedefs(char *options)
 {
     boolean more_than_one;
 
@@ -342,21 +338,17 @@ char *options;
 static char namebuf[1000];
 
 static char *
-name_file(template, tag)
-const char *template;
-const char *tag;
+name_file(const char* template, const char* tag)
 {
     Sprintf(namebuf, template, tag);
     return namebuf;
 }
 
 #ifdef HAS_NO_MKSTEMP
-static void FDECL(delete_file, (const char *template, const char *));
+static void delete_file(const char *template, const char *);
 
 static void
-delete_file(template, tag)
-const char *template;
-const char *tag;
+delete_file(const char *template, const char *tag)
 {
     char *name = name_file(template, tag);
 
@@ -365,15 +357,7 @@ const char *tag;
 #endif
 
 static FILE *
-getfp(template, tag, mode, flg)
-const char *template;
-const char *tag;
-const char *mode;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
+getfp(const char* template, const char* tag, const char* mode, int flg)
 {
     char *name = name_file(template, tag);
     FILE *rv = (FILE *) 0;
@@ -389,7 +373,10 @@ int flg UNUSED;
             rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
             Unlink(tmpfbuf);
         }
-    } else
+    }
+    else
+#else
+        flg; // unused
 #endif
     rv = fopen(name, mode);
     if (!rv) {
@@ -415,13 +402,13 @@ struct grep_var {
 /* struct grep_var grep_vars[] and TODO_* constants in include file: */
 #include "mdgrep.h"
 
-static void NDECL(do_grep_showvars);
-static struct grep_var *FDECL(grepsearch, (const char *));
-static int FDECL(grep_check_id, (const char *));
-static void FDECL(grep_show_wstack, (const char *));
-static char *FDECL(do_grep_control, (char *));
-static void NDECL(do_grep);
-static void FDECL(grep0, (FILE *, FILE *, int));
+static void do_grep_showvars(void);
+static struct grep_var *grepsearch(const char *);
+static int grep_check_id(const char *);
+static void grep_show_wstack(const char *);
+static char *do_grep_control(char *);
+static void do_grep(void);
+static void grep0(FILE *, FILE *, int);
 
 static int grep_trace = 0;
 
@@ -615,7 +602,7 @@ static int grep_stack[GREP_STACK_SIZE] = { ST_LD(1, 0) };
 static int grep_lineno = 0;
 
 static void
-do_grep_showvars()
+do_grep_showvars(void)
 {
     int x;
 
@@ -625,8 +612,7 @@ do_grep_showvars()
 }
 
 static struct grep_var *
-grepsearch(name)
-const char *name;
+grepsearch(const char* name)
 {
     /* XXX make into binary search */
     int x = 0;
@@ -640,8 +626,7 @@ const char *name;
 }
 
 static int
-grep_check_id(id)
-const char *id;
+grep_check_id(const char* id)
 {
     struct grep_var *rv;
 
@@ -670,8 +655,7 @@ const char *id;
 }
 
 static void
-grep_show_wstack(tag)
-const char *tag;
+grep_show_wstack(const char* tag)
 {
     int x;
 
@@ -686,8 +670,7 @@ const char *tag;
 }
 
 static char *
-do_grep_control(buf)
-char *buf;
+do_grep_control(char *buf)
 {
     int isif = 1;
     char *buf0 = buf;
@@ -773,7 +756,7 @@ char *buf;
 static void grep0(FILE *, FILE *, int);
 
 static void
-do_grep()
+do_grep(void)
 {
     if (!inputfp) {
         Fprintf(stderr, "--grep requires --input\n");
@@ -789,14 +772,7 @@ do_grep()
 }
 
 static void
-grep0(inputfp0, outputfp0, flg)
-FILE *inputfp0;
-FILE *outputfp0;
-#ifndef HAS_NO_MKSTEMP
-int flg;
-#else
-int flg UNUSED;
-#endif
+grep0(FILE *inputfp0, FILE* outputfp0, int flg)
 {
 #ifndef HAS_NO_MKSTEMP
     /* if grep0 is passed FLG_TEMPFILE flag, it will
@@ -804,6 +780,8 @@ int flg UNUSED;
        The caller will have to take care of calling
        fclose() when it is done with the file */
     boolean istemp = (flg & FLG_TEMPFILE) != 0;
+#else
+    flg; // unused
 #endif
     char buf[16384]; /* looong, just in case */
 
@@ -864,8 +842,7 @@ int flg UNUSED;
 
 /* trivial text encryption routine which can't be broken with `tr' */
 static char *
-xcrypt(str)
-const char *str;
+xcrypt(const char* str)
 { /* duplicated in src/hacklib.c */
     static char buf[BUFSZ];
     register const char *p;
@@ -886,11 +863,8 @@ const char *str;
 #define PAD_RUMORS_TO 60
 /* common code for do_rumors().  Return 0 on error. */
 static unsigned long
-read_rumors_file(file_ext, rumor_count, rumor_size, old_rumor_offset)
-const char *file_ext;
-int *rumor_count;
-long *rumor_size;
-unsigned long old_rumor_offset;
+read_rumors_file(const char* file_ext, int* rumor_count,
+                 long* rumor_size, unsigned long old_rumor_offset)
 {
     char infile[MAXFNAMELEN];
     char *line;
@@ -947,9 +921,7 @@ unsigned long old_rumor_offset;
 }
 
 static void
-do_rnd_access_file(fname, deflt_content)
-const char *fname;
-const char *deflt_content;
+do_rnd_access_file(const char* fname, const char* deflt_content)
 {
     char *line, buf[BUFSZ];
 
@@ -1001,7 +973,7 @@ const char *deflt_content;
 }
 
 void
-do_rumors()
+do_rumors(void)
 {
     char *line;
     static const char rumors_header[] =
@@ -1093,7 +1065,7 @@ rumors_failure:
 }
 
 void
-do_date()
+do_date(void)
 {
 #ifdef KR1ED
     long clocktim = 0;
@@ -1281,8 +1253,7 @@ do_date()
 }
 
 static boolean
-get_gitinfo(githash, gitbranch)
-char *githash, *gitbranch;
+get_gitinfo(char *githash, char *gitbranch)
 {
     FILE *gifp;
     size_t len;
@@ -1342,7 +1313,7 @@ char *githash, *gitbranch;
 }
 
 void
-do_options()
+do_options(void)
 {
     const char *optline;
     int infocontext = 0;
@@ -1364,7 +1335,7 @@ do_options()
 }
 
 static void
-windowing_sanity()
+windowing_sanity(void)
 {
 #ifndef DEFAULT_WINDOW_SYS
     /* pre-standard compilers didn't support #error; wait til run-time */
@@ -1404,8 +1375,7 @@ windowing_sanity()
 
 /* routine to decide whether to discard something from data.base */
 static boolean
-d_filter(line)
-char *line;
+d_filter(char *line)
 {
     if (*line == '#')
         return TRUE; /* ignore comment lines */
@@ -1435,7 +1405,7 @@ text-b/text-c           at fseek(0x01234567L + 456L)
  */
 
 void
-do_data()
+do_data(void)
 {
     char infile[60], tempfile[60];
     boolean ok;
@@ -1550,8 +1520,7 @@ do_data()
 
 /* routine to decide whether to discard something from oracles.txt */
 static boolean
-h_filter(line)
-char *line;
+h_filter(char *line)
 {
     static boolean skip = FALSE;
     char *tag;
@@ -1590,7 +1559,7 @@ static const char *special_oracle[] = {
  */
 
 void
-do_oracles()
+do_oracles(void)
 {
     char infile[60], tempfile[60];
     boolean in_oracle, ok;
@@ -1752,7 +1721,7 @@ do_oracles()
 }
 
 void
-do_dungeon()
+do_dungeon(void)
 {
     char *line;
 
@@ -1810,8 +1779,8 @@ do_dungeon()
  *      transfer relevant generated monstr values to src/monst.c;
  *      delete src/monstr.c.
  */
-static int FDECL(mstrength, (struct permonst *));
-static boolean FDECL(ranged_attk, (struct permonst *));
+static int mstrength(struct permonst *);
+static boolean ranged_attk(struct permonst *);
 
  /*
  * This routine is designed to return an integer value which represents
@@ -1819,8 +1788,7 @@ static boolean FDECL(ranged_attk, (struct permonst *));
  * determination as "experience()" to arrive at the strength.
  */
 static int
-mstrength(ptr)
-struct permonst *ptr;
+mstrength(struct permonst* ptr)
 {
     int	i, tmp2, n, tmp = ptr->mlevel;
 
@@ -1879,8 +1847,7 @@ struct permonst *ptr;
 
 /* returns True if monster can attack at range */
 static boolean
-ranged_attk(ptr)
-register struct permonst *ptr;
+ranged_attk(register struct permonst* ptr)
 {
     register int i, j;
     register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
@@ -1894,7 +1861,7 @@ register struct permonst *ptr;
 }
 
 void
-do_monstr()
+do_monstr(void)
 {
     struct permonst *ptr;
     int i;
@@ -1945,9 +1912,9 @@ do_monstr()
     }
     Fprintf(ofp, " *\n */\n\n");
 
-    Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
+    Fprintf(ofp, "\nvoid monstr_init(void);\n");
     Fprintf(ofp, "\nvoid\n");
-    Fprintf(ofp, "monstr_init()\n");
+    Fprintf(ofp, "monstr_init(void)\n");
     Fprintf(ofp, "{\n");
     Fprintf(ofp, "    return;\n");
     Fprintf(ofp, "}\n");
@@ -1958,7 +1925,7 @@ do_monstr()
 }
 
 void
-do_permonst()
+do_permonst(void)
 {
     int i;
     char *c, *nam;
@@ -2015,7 +1982,7 @@ do_permonst()
 /*      Start of Quest text file processing. */
 
 void
-do_questtxt()
+do_questtxt(void)
 {
     printf("DEPRECATION WARNINGS:\n");
     printf("'makedefs -q' is no longer required.  Remove all references\n");
@@ -2027,9 +1994,7 @@ do_questtxt()
 
 static char temp[32];
 
-static char *limit(name, pref) /* limit a name to 30 characters length */
-char *name;
-int pref;
+static char *limit(char* name, int pref) /* limit a name to 30 characters length */
 {
     (void) strncpy(temp, name, pref ? 26 : 30);
     temp[pref ? 26 : 30] = 0;
@@ -2037,7 +2002,7 @@ int pref;
 }
 
 void
-do_objs()
+do_objs(void)
 {
     int i, sum = 0;
     char *c, *objnam;
@@ -2184,8 +2149,7 @@ do_objs()
  * null pointer if no characters were read.
  */
 static char *
-fgetline(fd)
-FILE *fd;
+fgetline(FILE *fd)
 {
     static const int inc = 256;
     int len = inc;
@@ -2208,8 +2172,7 @@ FILE *fd;
 }
 
 static char *
-tmpdup(str)
-const char *str;
+tmpdup(const char* str)
 {
     static char buf[128];
 

@@ -55,8 +55,8 @@
  */
 #define STRNCMPI
 #undef strcmpi
-extern int FDECL(strcmpi, (const char *, const char *));
-extern int FDECL(strncmpi, (const char *, const char *, size_t));
+extern int strcmpi(const char *, const char *);
+extern int strncmpi(const char *, const char *, size_t);
 #endif
 
 #include <termcap.h>

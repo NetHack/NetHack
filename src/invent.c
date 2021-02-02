@@ -13,33 +13,32 @@
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'
 
-static char *FDECL(loot_xname, (struct obj *));
-static int FDECL(invletter_value, (CHAR_P));
-static int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
-                                               const genericptr));
-static void NDECL(reorder_invent);
-static struct obj *FDECL(addinv_core0, (struct obj *, struct obj *,
-                                        BOOLEAN_P));
-static void FDECL(noarmor, (BOOLEAN_P));
-static void FDECL(invdisp_nothing, (const char *, const char *));
-static boolean FDECL(worn_wield_only, (struct obj *));
-static boolean FDECL(only_here, (struct obj *));
-static void FDECL(compactify, (char *));
-static boolean FDECL(taking_off, (const char *));
-static int FDECL(ckvalidcat, (struct obj *));
-static int FDECL(ckunpaid, (struct obj *));
-static char *FDECL(safeq_xprname, (struct obj *));
-static char *FDECL(safeq_shortxprname, (struct obj *));
-static char FDECL(display_pickinv, (const char *, const char *,
-                                        const char *, BOOLEAN_P, long *));
-static char FDECL(display_used_invlets, (CHAR_P));
-static boolean FDECL(this_type_only, (struct obj *));
-static void NDECL(dounpaid);
-static struct obj *FDECL(find_unpaid, (struct obj *, struct obj **));
-static void FDECL(menu_identify, (int));
-static boolean FDECL(tool_in_use, (struct obj *));
-static int FDECL(adjust_ok, (struct obj *));
-static char FDECL(obj_to_let, (struct obj *));
+static char *loot_xname(struct obj *);
+static int invletter_value(char);
+static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
+static void reorder_invent(void);
+static struct obj *addinv_core0(struct obj *, struct obj *, boolean);
+static void noarmor(boolean);
+static void invdisp_nothing(const char *, const char *);
+static boolean worn_wield_only(struct obj *);
+static boolean only_here(struct obj *);
+static void compactify(char *);
+static boolean taking_off(const char *);
+static int ckvalidcat(struct obj *);
+static int ckunpaid(struct obj *);
+static char *safeq_xprname(struct obj *);
+static char *safeq_shortxprname(struct obj *);
+static char display_pickinv(const char *, const char *, const char *,
+                            boolean, long *);
+static char display_used_invlets(char);
+static boolean this_type_only(struct obj *);
+static void dounpaid(void);
+static struct obj *find_unpaid(struct obj *, struct obj **);
+static void menu_identify(int);
+static boolean tool_in_use(struct obj *);
+static int adjust_ok(struct obj *);
+static char obj_to_let(struct obj *);
+static void mime_action(const char *);
 
 /* wizards can wish for venom, which will become an invisible inventory
  * item without this.  putting it in inv_order would mean venom would
@@ -54,9 +53,7 @@ static const char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
 /* sortloot() classification; called at most once [per sort] for each object */
 void
-loot_classify(sort_item, obj)
-Loot *sort_item;
-struct obj *obj;
+loot_classify(Loot *sort_item, struct obj *obj)
 {
     /* we may eventually make this a settable option to always use
        with sortloot instead of only when the 'sortpack' option isn't
@@ -214,8 +211,7 @@ struct obj *obj;
 
 /* sortloot() formatting routine; for alphabetizing, not shown to user */
 static char *
-loot_xname(obj)
-struct obj *obj;
+loot_xname(struct obj *obj)
 {
     struct obj saveo;
     boolean save_debug;
@@ -297,8 +293,7 @@ struct obj *obj;
 }
 
 static int
-invletter_value(c)
-char c;
+invletter_value(char c)
 {
     return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
         : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
@@ -308,10 +303,8 @@ char c;
 }
 
 /* qsort comparison routine for sortloot() */
-static int CFDECLSPEC
-sortloot_cmp(vptr1, vptr2)
-const genericptr vptr1;
-const genericptr vptr2;
+static int QSORTCALLBACK
+sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
                          *sli2 = (struct sortloot_item *) vptr2;
@@ -477,11 +470,10 @@ const genericptr vptr2;
  *      instead of simple 'struct obj *' entries.
  */
 Loot *
-sortloot(olist, mode, by_nexthere, filterfunc)
-struct obj **olist; /* previous version might have changed *olist, we don't */
-unsigned mode; /* flags for sortloot_cmp() */
-boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
-boolean FDECL((*filterfunc), (OBJ_P));
+sortloot(struct obj **olist, /* previous version might have changed *olist, we don't */
+         unsigned mode, /* flags for sortloot_cmp() */
+         boolean by_nexthere, /* T: traverse via obj->nexthere, F: via obj->nobj */
+         boolean (*filterfunc)(OBJ_P))
 {
     Loot *sliarray;
     struct obj *o;
@@ -532,8 +524,7 @@ boolean FDECL((*filterfunc), (OBJ_P));
 
 /* sortloot() callers should use this to free up memory it allocates */
 void
-unsortloot(loot_array_p)
-Loot **loot_array_p;
+unsortloot(Loot **loot_array_p)
 {
     if (*loot_array_p)
         free((genericptr_t) *loot_array_p), *loot_array_p = (Loot *) 0;
@@ -541,10 +532,9 @@ Loot **loot_array_p;
 
 #if 0 /* 3.6.0 'revamp' */
 void
-sortloot(olist, mode, by_nexthere)
-struct obj **olist;
-unsigned mode; /* flags for sortloot_cmp() */
-boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
+sortloot(struct obj **olist, unsigned mode, /* flags for sortloot_cmp() */
+         boolean by_nexthere) /* T: traverse via obj->nexthere,
+                                 F: via obj->nobj */
 {
     struct sortloot_item *sliarray, osli, nsli;
     struct obj *o, **nxt_p;
@@ -580,8 +570,7 @@ boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
 #endif /*0*/
 
 void
-assigninvlet(otmp)
-register struct obj *otmp;
+assigninvlet(register struct obj *otmp)
 {
     boolean inuse[52];
     register int i;
@@ -626,7 +615,7 @@ register struct obj *otmp;
 
 /* sort the inventory; used by addinv() and doorganize() */
 static void
-reorder_invent()
+reorder_invent(void)
 {
     struct obj *otmp, *prev, *next;
     boolean need_more_sorting;
@@ -662,8 +651,7 @@ reorder_invent()
    one of them; used in pickup.c when all 52 inventory slots are in use,
    to figure out whether another object could still be picked up */
 struct obj *
-merge_choice(objlist, obj)
-struct obj *objlist, *obj;
+merge_choice(struct obj *objlist, struct obj *obj)
 {
     struct monst *shkp;
     int save_nocharge;
@@ -699,8 +687,7 @@ struct obj *objlist, *obj;
 
 /* merge obj with otmp and delete obj if types agree */
 int
-merged(potmp, pobj)
-struct obj **potmp, **pobj;
+merged(struct obj **potmp, struct obj **pobj)
 {
     register struct obj *otmp = *potmp, *obj = *pobj;
 
@@ -802,8 +789,7 @@ struct obj **potmp, **pobj;
  * It may be valid to merge this code with with addinv_core2().
  */
 void
-addinv_core1(obj)
-struct obj *obj;
+addinv_core1(struct obj *obj)
 {
     if (obj->oclass == COIN_CLASS) {
         g.context.botl = 1;
@@ -860,8 +846,7 @@ struct obj *obj;
  * in-place.
  */
 void
-addinv_core2(obj)
-struct obj *obj;
+addinv_core2(struct obj *obj)
 {
     if (confers_luck(obj)) {
         /* new luckstone must be in inventory by this point
@@ -875,9 +860,8 @@ struct obj *obj;
  * Adjust hero attributes as necessary.
  */
 static struct obj *
-addinv_core0(obj, other_obj, update_perm_invent)
-struct obj *obj, *other_obj;
-boolean update_perm_invent;
+addinv_core0(struct obj *obj, struct obj *other_obj,
+             boolean update_perm_invent)
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
@@ -958,16 +942,14 @@ boolean update_perm_invent;
 
 /* add obj to the hero's inventory in the default fashion */
 struct obj *
-addinv(obj)
-struct obj *obj;
+addinv(struct obj *obj)
 {
     return addinv_core0(obj, (struct obj *) 0, TRUE);
 }
 
 /* add obj to the hero's inventory by inserting in front of a specific item */
 struct obj *
-addinv_before(obj, other_obj)
-struct obj *obj, *other_obj;
+addinv_before(struct obj *obj, struct obj *other_obj)
 {
     return addinv_core0(obj, other_obj, TRUE);
 }
@@ -979,8 +961,7 @@ struct obj *obj, *other_obj;
  * and after hero's intrinsics have been updated.
  */
 void
-carry_obj_effects(obj)
-struct obj *obj;
+carry_obj_effects(struct obj *obj)
 {
     /* Cursed figurines can spontaneously transform when carried. */
     if (obj->otyp == FIGURINE) {
@@ -999,9 +980,8 @@ struct obj *obj;
  * touch_artifact will print its own messages if they are warranted.
  */
 struct obj *
-hold_another_object(obj, drop_fmt, drop_arg, hold_msg)
-struct obj *obj;
-const char *drop_fmt, *drop_arg, *hold_msg;
+hold_another_object(struct obj *obj, const char *drop_fmt,
+                    const char *drop_arg, const char *hold_msg)
 {
     char buf[BUFSZ];
 
@@ -1091,8 +1071,7 @@ const char *drop_fmt, *drop_arg, *hold_msg;
 
 /* useup() all of an item regardless of its quantity */
 void
-useupall(obj)
-struct obj *obj;
+useupall(struct obj *obj)
 {
     setnotworn(obj);
     freeinv(obj);
@@ -1100,8 +1079,7 @@ struct obj *obj;
 }
 
 void
-useup(obj)
-register struct obj *obj;
+useup(register struct obj *obj)
 {
     /* Note:  This works correctly for containers because they (containers)
        don't merge. */
@@ -1117,9 +1095,8 @@ register struct obj *obj;
 
 /* use one charge from an item and possibly incur shop debt for it */
 void
-consume_obj_charge(obj, maybe_unpaid)
-struct obj *obj;
-boolean maybe_unpaid; /* false if caller handles shop billing */
+consume_obj_charge(struct obj *obj,
+                   boolean maybe_unpaid) /* false if caller handles shop billing */
 {
     if (maybe_unpaid)
         check_unpaid(obj);
@@ -1136,8 +1113,7 @@ boolean maybe_unpaid; /* false if caller handles shop billing */
  * Should think of a better name...
  */
 void
-freeinv_core(obj)
-struct obj *obj;
+freeinv_core(struct obj *obj)
 {
     if (obj->oclass == COIN_CLASS) {
         g.context.botl = 1;
@@ -1179,8 +1155,7 @@ struct obj *obj;
 
 /* remove an object from the hero's inventory */
 void
-freeinv(obj)
-register struct obj *obj;
+freeinv(register struct obj *obj)
 {
     extract_nobj(obj, &g.invent);
     freeinv_core(obj);
@@ -1188,8 +1163,7 @@ register struct obj *obj;
 }
 
 void
-delallobj(x, y)
-int x, y;
+delallobj(int x, int y)
 {
     struct obj *otmp, *otmp2;
 
@@ -1206,8 +1180,7 @@ int x, y;
 
 /* destroy object in fobj chain (if unpaid, it remains on the bill) */
 void
-delobj(obj)
-register struct obj *obj;
+delobj(register struct obj *obj)
 {
     boolean update_map;
 
@@ -1233,9 +1206,7 @@ register struct obj *obj;
 
 /* try to find a particular type of object at designated map location */
 struct obj *
-sobj_at(otyp, x, y)
-int otyp;
-int x, y;
+sobj_at(int otyp, int x, int y)
 {
     register struct obj *otmp;
 
@@ -1248,10 +1219,7 @@ int x, y;
 
 /* sobj_at(&c) traversal -- find next object of specified type */
 struct obj *
-nxtobj(obj, type, by_nexthere)
-struct obj *obj;
-int type;
-boolean by_nexthere;
+nxtobj(struct obj *obj, int type, boolean by_nexthere)
 {
     register struct obj *otmp;
 
@@ -1266,8 +1234,7 @@ boolean by_nexthere;
 }
 
 struct obj *
-carrying(type)
-register int type;
+carrying(register int type)
 {
     register struct obj *otmp;
 
@@ -1305,8 +1272,7 @@ static const char *const currencies[] = {
 };
 
 const char *
-currency(amount)
-long amount;
+currency(long amount)
 {
     const char *res;
 
@@ -1317,7 +1283,7 @@ long amount;
 }
 
 boolean
-have_lizard()
+have_lizard(void)
 {
     register struct obj *otmp;
 
@@ -1328,7 +1294,7 @@ have_lizard()
 }
 
 struct obj *
-u_carried_gloves() {
+u_carried_gloves(void) {
     struct obj *otmp, *gloves = (struct obj *) 0;
 
     if (uarmg) {
@@ -1346,7 +1312,7 @@ u_carried_gloves() {
 
 /* 3.6 tribute */
 struct obj *
-u_have_novel()
+u_have_novel(void)
 {
     register struct obj *otmp;
 
@@ -1357,9 +1323,7 @@ u_have_novel()
 }
 
 struct obj *
-o_on(id, objchn)
-unsigned int id;
-register struct obj *objchn;
+o_on(unsigned int id, register struct obj *objchn)
 {
     struct obj *temp;
 
@@ -1374,9 +1338,7 @@ register struct obj *objchn;
 }
 
 boolean
-obj_here(obj, x, y)
-register struct obj *obj;
-int x, y;
+obj_here(register struct obj *obj, int x, int y)
 {
     register struct obj *otmp;
 
@@ -1387,8 +1349,7 @@ int x, y;
 }
 
 struct obj *
-g_at(x, y)
-register int x, y;
+g_at(register int x, register int y)
 {
     register struct obj *obj = g.level.objects[x][y];
 
@@ -1402,8 +1363,7 @@ register int x, y;
 
 /* compact a string of inventory letters by dashing runs of letters */
 static void
-compactify(buf)
-register char *buf;
+compactify(register char *buf)
 {
     register int i1 = 1, i2 = 1;
     register char ilet, ilet1, ilet2;
@@ -1440,8 +1400,7 @@ register char *buf;
 
 /* some objects shouldn't be split when count given to getobj or askchain */
 boolean
-splittable(obj)
-struct obj *obj;
+splittable(struct obj *obj)
 {
     return !((obj->otyp == LOADSTONE && obj->cursed)
              || (obj == uwep && welded(uwep)));
@@ -1449,15 +1408,13 @@ struct obj *obj;
 
 /* match the prompt for either 'T' or 'R' command */
 static boolean
-taking_off(action)
-const char *action;
+taking_off(const char *action)
 {
     return !strcmp(action, "take off") || !strcmp(action, "remove");
 }
 
-void
-mime_action(word)
-const char *word;
+static void
+mime_action(const char *word)
 {
     char buf[BUFSZ];
     char *bp = buf;
@@ -1480,8 +1437,7 @@ const char *word;
 
 /* getobj callback that allows any object - but not hands. */
 int
-any_obj_ok(obj)
-struct obj *obj;
+any_obj_ok(struct obj *obj)
 {
     if (obj)
         return GETOBJ_SUGGEST;
@@ -1501,10 +1457,9 @@ struct obj *obj;
  * it with &cg.zeroobj, so its behavior can be undefined in that case.
  */
 struct obj *
-getobj(word, obj_ok, ctrlflags)
-register const char *word;
-int FDECL((*obj_ok), (OBJ_P)); /* callback */
-unsigned int ctrlflags;
+getobj(register const char *word,
+       int (*obj_ok)(OBJ_P), /* callback */
+       unsigned int ctrlflags)
 {
     register struct obj *otmp;
     register char ilet = 0;
@@ -1536,7 +1491,7 @@ unsigned int ctrlflags;
     /* force invent to be in invlet order before collecting candidate
        inventory letters */
     sortedinvent = sortloot(&g.invent, SORTLOOT_INVLET, FALSE,
-                            (boolean FDECL((*), (OBJ_P))) 0);
+                            (boolean (*)(OBJ_P)) 0);
 
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         if (&bp[suggested] == &buf[sizeof buf - 1]
@@ -1754,12 +1709,11 @@ unsigned int ctrlflags;
 }
 
 void
-silly_thing(word, otmp)
-const char *word;
+silly_thing(const char *word,
 #ifdef OBSOLETE_HANDLING
-struct obj *otmp;
+            struct obj *otmp)
 #else
-struct obj *otmp UNUSED;
+            struct obj *otmp UNUSED)
 #endif
 {
 #ifdef OBSOLETE_HANDLING
@@ -1792,30 +1746,27 @@ struct obj *otmp UNUSED;
 }
 
 static int
-ckvalidcat(otmp)
-struct obj *otmp;
+ckvalidcat(struct obj *otmp)
 {
     /* use allow_category() from pickup.c */
     return (int) allow_category(otmp);
 }
 
 static int
-ckunpaid(otmp)
-struct obj *otmp;
+ckunpaid(struct obj *otmp)
 {
     return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp->cobj)));
 }
 
 boolean
-wearing_armor()
+wearing_armor(void)
 {
     return (boolean) (uarm || uarmc || uarmf || uarmg
                       || uarmh || uarms || uarmu);
 }
 
 boolean
-is_worn(otmp)
-struct obj *otmp;
+is_worn(struct obj *otmp)
 {
     return (otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE | W_WEAPONS))
             ? TRUE
@@ -1830,8 +1781,7 @@ static struct xprnctx {
 
 /* safe_qbuf() -> short_oname() callback */
 static char *
-safeq_xprname(obj)
-struct obj *obj;
+safeq_xprname(struct obj *obj)
 {
     return xprname(obj, (char *) 0, safeq_xprn_ctx.let, safeq_xprn_ctx.dot,
                    0L, 0L);
@@ -1839,8 +1789,7 @@ struct obj *obj;
 
 /* alternate safe_qbuf() -> short_oname() callback */
 static char *
-safeq_shortxprname(obj)
-struct obj *obj;
+safeq_shortxprname(struct obj *obj)
 {
     return xprname(obj, ansimpleoname(obj), safeq_xprn_ctx.let,
                    safeq_xprn_ctx.dot, 0L, 0L);
@@ -1854,14 +1803,12 @@ static NEARDATA const char removeables[] = { ARMOR_CLASS, WEAPON_CLASS,
    Return the number of times fn was called successfully.
    If combo is TRUE, we just use this to get a category list. */
 int
-ggetobj(word, fn, mx, combo, resultflags)
-const char *word;
-int FDECL((*fn), (OBJ_P)), mx;
-boolean combo; /* combination menu flag */
-unsigned *resultflags;
+ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
+        boolean combo, /* combination menu flag */
+        unsigned *resultflags)
 {
-    int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    boolean FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    int (*ckfn)(OBJ_P) = (int (*)(OBJ_P)) 0;
+    boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -2028,11 +1975,11 @@ unsigned *resultflags;
  * of objects to be treated.  Return the number of objects treated.
  */
 int
-askchain(objchn, olets, allflag, fn, ckfn, mx, word)
-struct obj **objchn; /* *objchn might change */
-int allflag, mx;
-const char *olets, *word; /* olets is an Obj Class char array */
-int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
+askchain(struct obj **objchn, /* *objchn might change */
+         const char *olets,   /* olets is an Obj Class char array */
+         int allflag,
+         int (*fn)(OBJ_P), int (*ckfn)(OBJ_P),
+         int mx, const char *word)
 {
     struct obj *otmp, *otmpo;
     register char sym, ilet;
@@ -2055,7 +2002,7 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
     sortedchn = sortloot(objchn, SORTLOOT_INVLET, FALSE,
-                         (boolean FDECL((*), (OBJ_P))) 0);
+                         (boolean (*)(OBJ_P)) 0);
 
     first = TRUE;
     /*
@@ -2185,8 +2132,7 @@ int FDECL((*fn), (OBJ_P)), FDECL((*ckfn), (OBJ_P));
 
 /* set the cknown and lknown flags on an object if they're applicable */
 void
-set_cknown_lknown(obj)
-struct obj *obj;
+set_cknown_lknown(struct obj *obj)
 {
     if (Is_container(obj) || obj->otyp == STATUE)
         obj->cknown = obj->lknown = 1;
@@ -2199,8 +2145,7 @@ struct obj *obj;
 
 /* make an object actually be identified; no display updating */
 void
-fully_identify_obj(otmp)
-struct obj *otmp;
+fully_identify_obj(struct obj *otmp)
 {
     makeknown(otmp->otyp);
     if (otmp->oartifact)
@@ -2213,8 +2158,7 @@ struct obj *otmp;
 
 /* ggetobj callback routine; identify an object and give immediate feedback */
 int
-identify(otmp)
-struct obj *otmp;
+identify(struct obj *otmp)
 {
     fully_identify_obj(otmp);
     prinv((char *) 0, otmp, 0L);
@@ -2223,8 +2167,7 @@ struct obj *otmp;
 
 /* menu of unidentified objects; select and identify up to id_limit of them */
 static void
-menu_identify(id_limit)
-int id_limit;
+menu_identify(int id_limit)
 {
     menu_item *pick_list;
     int n, i, first = 1, tryct = 5;
@@ -2261,8 +2204,7 @@ int id_limit;
 }
 /* count the unidentified items */
 int
-count_unidentified(objchn)
-struct obj *objchn;
+count_unidentified(struct obj *objchn)
 {
     int unid_cnt = 0;
     struct obj *obj;
@@ -2275,9 +2217,9 @@ struct obj *objchn;
 
 /* dialog with user to identify a given number of items; 0 means all */
 void
-identify_pack(id_limit, learning_id)
-int id_limit;
-boolean learning_id; /* true if we just read unknown identify scroll */
+identify_pack(int id_limit,
+              boolean learning_id) /* true if we just read unknown
+                                      identify scroll */
 {
     struct obj *obj;
     int n, unid_cnt = count_unidentified(g.invent);
@@ -2314,7 +2256,7 @@ boolean learning_id; /* true if we just read unknown identify scroll */
 /* called when regaining sight; mark inventory objects which were picked
    up while blind as now having been seen */
 void
-learn_unseen_invent()
+learn_unseen_invent(void)
 {
     struct obj *otmp;
 
@@ -2339,7 +2281,7 @@ learn_unseen_invent()
    (*windowprocs.win_update_inventory) but the restore hackery
    was getting out of hand; this is now a central call point */
 void
-update_inventory()
+update_inventory(void)
 {
     if (g.program_state.saving || g.program_state.restoring)
         return;
@@ -2356,8 +2298,7 @@ update_inventory()
 
 /* should of course only be called for things in invent */
 static char
-obj_to_let(obj)
-struct obj *obj;
+obj_to_let(struct obj *obj)
 {
     if (!flags.invlet_constant) {
         obj->invlet = NOINVSYM;
@@ -2371,10 +2312,7 @@ struct obj *obj;
  * the current quantity.
  */
 void
-prinv(prefix, obj, quan)
-const char *prefix;
-struct obj *obj;
-long quan;
+prinv(const char *prefix, struct obj *obj, long quan)
 {
     if (!prefix)
         prefix = "";
@@ -2383,13 +2321,12 @@ long quan;
 }
 
 char *
-xprname(obj, txt, let, dot, cost, quan)
-struct obj *obj;
-const char *txt; /* text to print instead of obj */
-char let;        /* inventory letter */
-boolean dot;     /* append period; (dot && cost => Iu) */
-long cost;       /* cost (for inventory of unpaid or expended items) */
-long quan;       /* if non-0, print this quantity, not obj->quan */
+xprname(struct obj *obj,
+        const char *txt, /* text to print instead of obj */
+        char let,        /* inventory letter */
+        boolean dot,     /* append period; (dot && cost => Iu) */
+        long cost,       /* cost (for inventory of unpaid or expended items) */
+        long quan)       /* if non-0, print this quantity, not obj->quan */
 {
 #ifdef LINT /* handle static char li[BUFSZ]; */
     char li[BUFSZ];
@@ -2430,7 +2367,7 @@ long quan;       /* if non-0, print this quantity, not obj->quan */
 
 /* the 'i' command */
 int
-ddoinv()
+ddoinv(void)
 {
     (void) display_inventory((char *) 0, FALSE);
     return 0;
@@ -2446,8 +2383,7 @@ ddoinv()
  * containers.
  */
 static struct obj *
-find_unpaid(list, last_found)
-struct obj *list, **last_found;
+find_unpaid(struct obj *list, struct obj **last_found)
 {
     struct obj *obj;
 
@@ -2470,7 +2406,7 @@ struct obj *list, **last_found;
 }
 
 void
-free_pickinv_cache()
+free_pickinv_cache(void)
 {
     if (g.cached_pickinv_win != WIN_ERR) {
         destroy_nhwindow(g.cached_pickinv_win);
@@ -2484,12 +2420,10 @@ free_pickinv_cache()
  * any count returned from the menu selection is placed here.
  */
 static char
-display_pickinv(lets, xtra_choice, query, want_reply, out_cnt)
-register const char *lets;
-const char *xtra_choice; /* "fingers", pick hands rather than an object */
-const char *query;
-boolean want_reply;
-long *out_cnt;
+display_pickinv(register const char *lets,
+                const char *xtra_choice, /* "fingers", pick hands rather than
+                                            an object */
+                const char *query, boolean want_reply, long *out_cnt)
 {
     static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp, wizid_fakeobj;
@@ -2579,7 +2513,7 @@ long *out_cnt;
     if (flags.sortpack)
         sortflags |= SORTLOOT_PACK;
     sortedinvent = sortloot(&g.invent, sortflags, FALSE,
-                            (boolean FDECL((*), (OBJ_P))) 0);
+                            (boolean (*)(OBJ_P)) 0);
 
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
@@ -2731,9 +2665,7 @@ long *out_cnt;
  * was selected.
  */
 char
-display_inventory(lets, want_reply)
-const char *lets;
-boolean want_reply;
+display_inventory(const char *lets, boolean want_reply)
 {
     return display_pickinv(lets, (char *) 0, (char *) 0,
                            want_reply, (long *) 0);
@@ -2744,8 +2676,7 @@ boolean want_reply;
  *
  */
 static char
-display_used_invlets(avoidlet)
-char avoidlet;
+display_used_invlets(char avoidlet)
 {
     struct obj *otmp;
     char ilet, ret = 0;
@@ -2804,8 +2735,7 @@ char avoidlet;
  * contained objects.
  */
 int
-count_unpaid(list)
-struct obj *list;
+count_unpaid(struct obj *list)
 {
     int count = 0;
 
@@ -2827,10 +2757,7 @@ struct obj *list;
  * at some point:  bknown is forced for priest[ess], like in xname().
  */
 int
-count_buc(list, type, filterfunc)
-struct obj *list;
-int type;
-boolean FDECL((*filterfunc), (OBJ_P));
+count_buc(struct obj *list, int type, boolean (*filterfunc)(OBJ_P))
 {
     int count = 0;
 
@@ -2862,10 +2789,8 @@ boolean FDECL((*filterfunc), (OBJ_P));
 /* similar to count_buc(), but tallies all states at once
    rather than looking for a specific type */
 void
-tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp)
-struct obj *list;
-boolean by_nexthere;
-int *bcp, *ucp, *ccp, *xcp, *ocp;
+tally_BUCX(struct obj *list, boolean by_nexthere,
+           int *bcp, int *ucp, int *ccp, int *xcp, int *ocp)
 {
     /* Future extensions:
      *  Skip current_container when list is invent, uchain when
@@ -2900,14 +2825,14 @@ int *bcp, *ucp, *ccp, *xcp, *ocp;
 
 /* count everything inside a container, or just shop-owned items inside */
 long
-count_contents(container, nested, quantity, everything, newdrop)
-struct obj *container;
-boolean nested, /* include contents of any nested containers */
-    quantity,   /* count all vs count separate stacks */
-    everything, /* all objects vs only unpaid objects */
-    newdrop;    /* on floor, but hero-owned items haven't been marked
-                 * no_charge yet and shop-owned items are still marked
-                 * unpaid -- used when asking the player whether to sell */
+count_contents(struct obj *container,
+               boolean nested,  /* include contents of any nested containers */
+               boolean quantity,   /* count all vs count separate stacks     */
+               boolean everything, /* all objects vs only unpaid objects     */
+               boolean newdrop)    /* on floor, but hero-owned items haven't
+                                    * been marked no_charge yet and shop-owned
+                                    * items are still marked unpaid -- used
+                                    * when asking the player whether to sell */
 {
     struct obj *otmp, *topc;
     boolean shoppy = FALSE;
@@ -2933,7 +2858,7 @@ boolean nested, /* include contents of any nested containers */
 }
 
 static void
-dounpaid()
+dounpaid(void)
 {
     winid win;
     struct obj *otmp, *marker, *contnr;
@@ -3035,8 +2960,7 @@ dounpaid()
 
 
 static boolean
-this_type_only(obj)
-struct obj *obj;
+this_type_only(struct obj *obj)
 {
     boolean res = (obj->oclass == g.this_type);
 
@@ -3068,7 +2992,7 @@ struct obj *obj;
 
 /* the 'I' command */
 int
-dotypeinv()
+dotypeinv(void)
 {
     char c = '\0';
     int n, i = 0;
@@ -3114,7 +3038,7 @@ dotypeinv()
         /* collect list of classes of objects carried, for use as a prompt */
         types[0] = 0;
         class_count = collect_obj_classes(types, g.invent, FALSE,
-                                          (boolean FDECL((*), (OBJ_P))) 0,
+                                          (boolean (*)(OBJ_P)) 0,
                                           &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
             types[class_count++] = ' ';
@@ -3236,9 +3160,7 @@ dotypeinv()
 /* return a string describing the dungeon feature at <x,y> if there
    is one worth mentioning at that location; otherwise null */
 const char *
-dfeature_at(x, y, buf)
-int x, y;
-char *buf;
+dfeature_at(int x, int y, char *buf)
 {
     struct rm *lev = &levl[x][y];
     int ltyp = lev->typ, cmap = -1;
@@ -3314,9 +3236,8 @@ char *buf;
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(obj_cnt, lookhere_flags)
-int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
-unsigned lookhere_flags;
+look_here(int obj_cnt, /* obj_cnt > 0 implies that autopickup is in progress */
+          unsigned lookhere_flags)
 {
     struct obj *otmp;
     struct trap *trap;
@@ -3490,7 +3411,7 @@ unsigned lookhere_flags;
 
 /* the ':' command - explicitly look at what is here, including all objects */
 int
-dolook()
+dolook(void)
 {
     int res;
 
@@ -3505,9 +3426,7 @@ dolook()
 }
 
 boolean
-will_feel_cockatrice(otmp, force_touch)
-struct obj *otmp;
-boolean force_touch;
+will_feel_cockatrice(struct obj *otmp, boolean force_touch)
 {
     if ((Blind || force_touch) && !uarmg && !Stone_resistance
         && (otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])))
@@ -3516,9 +3435,7 @@ boolean force_touch;
 }
 
 void
-feel_cockatrice(otmp, force_touch)
-struct obj *otmp;
-boolean force_touch;
+feel_cockatrice(struct obj *otmp, boolean force_touch)
 {
     char kbuf[BUFSZ];
 
@@ -3539,8 +3456,7 @@ boolean force_touch;
 }
 
 void
-stackobj(obj)
-struct obj *obj;
+stackobj(struct obj *obj)
 {
     struct obj *otmp;
 
@@ -3552,8 +3468,7 @@ struct obj *obj;
 
 /* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
 boolean
-mergable(otmp, obj)
-register struct obj *otmp, *obj;
+mergable(register struct obj *otmp, register struct obj *obj)
 {
     int objnamelth = 0, otmpnamelth = 0;
 
@@ -3661,7 +3576,7 @@ register struct obj *otmp, *obj;
 
 /* the '$' command */
 int
-doprgold()
+doprgold(void)
 {
     /* the messages used to refer to "carrying gold", but that didn't
        take containers into account */
@@ -3677,7 +3592,7 @@ doprgold()
 
 /* the ')' command */
 int
-doprwep()
+doprwep(void)
 {
     if (!uwep) {
         You("are empty %s.", body_part(HANDED));
@@ -3691,8 +3606,7 @@ doprwep()
 
 /* caller is responsible for checking !wearing_armor() */
 static void
-noarmor(report_uskin)
-boolean report_uskin;
+noarmor(boolean report_uskin)
 {
     if (!uskin || !report_uskin) {
         You("are not wearing any armor.");
@@ -3715,7 +3629,7 @@ boolean report_uskin;
 
 /* the '[' command */
 int
-doprarm()
+doprarm(void)
 {
     char lets[8];
     register int ct = 0;
@@ -3750,7 +3664,7 @@ doprarm()
 
 /* the '=' command */
 int
-doprring()
+doprring(void)
 {
     if (!uleft && !uright)
         You("are not wearing any rings.");
@@ -3770,7 +3684,7 @@ doprring()
 
 /* the '"' command */
 int
-dopramulet()
+dopramulet(void)
 {
     if (!uamul)
         You("are not wearing an amulet.");
@@ -3780,8 +3694,7 @@ dopramulet()
 }
 
 static boolean
-tool_in_use(obj)
-struct obj *obj;
+tool_in_use(struct obj *obj)
 {
     if ((obj->owornmask & (W_TOOL | W_SADDLE)) != 0L)
         return TRUE;
@@ -3793,7 +3706,7 @@ struct obj *obj;
 
 /* the '(' command */
 int
-doprtool()
+doprtool(void)
 {
     struct obj *otmp;
     int ct = 0;
@@ -3813,7 +3726,7 @@ doprtool()
 /* '*' command; combines the ')' + '[' + '=' + '"' + '(' commands;
    show inventory of all currently wielded, worn, or used objects */
 int
-doprinuse()
+doprinuse(void)
 {
     struct obj *otmp;
     int ct = 0;
@@ -3834,9 +3747,7 @@ doprinuse()
  * uses up an object that's on the floor, charging for it as necessary
  */
 void
-useupf(obj, numused)
-register struct obj *obj;
-long numused;
+useupf(register struct obj *obj, long numused)
 {
     register struct obj *otmp;
     boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
@@ -3871,9 +3782,7 @@ static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
 char *
-let_to_name(let, unpaid, showsym)
-char let;
-boolean unpaid, showsym;
+let_to_name(char let, boolean unpaid, boolean showsym)
 {
     const char *ocsymfmt = "  ('%c')";
     const int invbuf_sympadding = 8; /* arbitrary */
@@ -3916,7 +3825,7 @@ boolean unpaid, showsym;
 
 /* release the static buffer used by let_to_name() */
 void
-free_invbuf()
+free_invbuf(void)
 {
     if (g.invbuf)
         free((genericptr_t) g.invbuf), g.invbuf = (char *) 0;
@@ -3926,7 +3835,7 @@ free_invbuf()
 /* give consecutive letters to every item in inventory (for !fixinv mode);
    gold is always forced to '$' slot at head of list */
 void
-reassign()
+reassign(void)
 {
     int i;
     struct obj *obj, *prevobj, *goldobj;
@@ -3959,8 +3868,7 @@ reassign()
 
 /* getobj callback for item to #adjust */
 int
-adjust_ok(obj)
-struct obj *obj;
+adjust_ok(struct obj *obj)
 {
     if (!obj)
         return GETOBJ_EXCLUDE;
@@ -4035,7 +3943,7 @@ struct obj *obj;
  *      is unnamed and source is named.
  */
 int
-doorganize() /* inventory organizer by Del Lamb */
+doorganize(void) /* inventory organizer by Del Lamb */
 {
     struct obj *obj, *otmp, *splitting, *bumped;
     int ix, cur, trycnt;
@@ -4248,8 +4156,7 @@ doorganize() /* inventory organizer by Del Lamb */
 
 /* common to display_minventory and display_cinventory */
 static void
-invdisp_nothing(hdr, txt)
-const char *hdr, *txt;
+invdisp_nothing(const char *hdr, const char *txt)
 {
     winid win;
     anything any;
@@ -4273,8 +4180,7 @@ const char *hdr, *txt;
 
 /* query_objlist callback: return things that are worn or wielded */
 static boolean
-worn_wield_only(obj)
-struct obj *obj;
+worn_wield_only(struct obj *obj)
 {
 #if 1
     /* check for things that *are* worn or wielded (only used for monsters,
@@ -4306,10 +4212,7 @@ struct obj *obj;
  *      MINV_ALL            - display all inventory
  */
 struct obj *
-display_minventory(mon, dflags, title)
-register struct monst *mon;
-int dflags;
-char *title;
+display_minventory(register struct monst *mon, int dflags, char *title)
 {
     struct obj *ret;
     char tmp[QBUFSZ];
@@ -4357,8 +4260,7 @@ char *title;
  * Currently, this is only used for statues, via wand of probing.
  */
 struct obj *
-display_cinventory(obj)
-register struct obj *obj;
+display_cinventory(register struct obj *obj)
 {
     struct obj *ret;
     char qbuf[QBUFSZ];
@@ -4386,8 +4288,7 @@ register struct obj *obj;
 
 
 static boolean
-only_here(obj)
-struct obj *obj;
+only_here(struct obj *obj)
 {
     return (obj->ox == g.only.x && obj->oy == g.only.y);
 }
@@ -4399,9 +4300,7 @@ struct obj *obj;
  * Currently, this is only used with a wand of probing zapped downwards.
  */
 int
-display_binventory(x, y, as_if_seen)
-int x, y;
-boolean as_if_seen;
+display_binventory(int x, int y, boolean as_if_seen)
 {
     struct obj *obj;
     menu_item *selected = 0;

@@ -42,7 +42,7 @@ const
 #endif
 #endif
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#if defined(UNIX) && defined(SELECTSAVED)
 #include <sys/types.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -81,8 +81,8 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #include <share.h>
 #endif
 
-static FILE *NDECL(fopen_wizkit_file);
-static void FDECL(wizkit_addinv, (struct obj *));
+static FILE *fopen_wizkit_file(void);
+static void wizkit_addinv(struct obj *);
 
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
@@ -92,7 +92,7 @@ extern char bbs_id[];
 #endif
 
 #include <libraries/dos.h>
-extern void FDECL(amii_set_text_font, (char *, int));
+extern void amii_set_text_font(char *, int);
 #endif
 
 #if defined(WIN32) || defined(MSDOS)
@@ -105,7 +105,7 @@ extern void FDECL(amii_set_text_font, (char *, int));
 #endif
 #ifdef WIN32
 /*from windmain.c */
-extern char *FDECL(translate_path_variables, (const char *, char *));
+extern char *translate_path_variables(const char *, char *);
 #endif
 #endif
 
@@ -123,57 +123,49 @@ extern char *FDECL(translate_path_variables, (const char *, char *));
 extern char *sounddir; /* defined in sounds.c */
 #endif
 
-#if defined(UNIX) && defined(QT_GRAPHICS)
-#ifndef SELECTSAVED
-#define SELECTSAVED
-#endif
-#endif
-
-static NHFILE *NDECL(new_nhfile);
-static void FDECL(free_nhfile, (NHFILE *));
+static NHFILE *new_nhfile(void);
+static void free_nhfile(NHFILE *);
 #ifdef SELECTSAVED
-static int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
+static int QSORTCALLBACK strcmp_wrap(const void *, const void *);
 #endif
-static char *FDECL(set_bonesfile_name, (char *, d_level *));
-static char *NDECL(set_bonestemp_name);
+static char *set_bonesfile_name(char *, d_level *);
+static char *set_bonestemp_name(void);
 #ifdef COMPRESS
-static void FDECL(redirect, (const char *, const char *, FILE *,
-                                 BOOLEAN_P));
+static void redirect(const char *, const char *, FILE *, boolean);
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
-static void FDECL(docompress_file, (const char *, BOOLEAN_P));
+static void docompress_file(const char *, boolean);
 #endif
 #if defined(ZLIB_COMP)
-static boolean FDECL(make_compressed_name, (const char *, char *));
+static boolean make_compressed_name(const char *, char *);
 #endif
 #ifndef USE_FCNTL
-static char *FDECL(make_lockname, (const char *, char *));
+static char *make_lockname(const char *, char *);
 #endif
-static void FDECL(set_configfile_name, (const char *));
-static FILE *FDECL(fopen_config_file, (const char *, int));
-static int FDECL(get_uchars, (char *, uchar *, BOOLEAN_P,
-                                  int, const char *));
-boolean FDECL(proc_wizkit_line, (char *));
-boolean FDECL(parse_config_line, (char *));
-static boolean FDECL(parse_conf_file, (FILE *, boolean (*proc)(char *)));
-static FILE *NDECL(fopen_sym_file);
-boolean FDECL(proc_symset_line, (char *));
-static void FDECL(set_symhandling, (char *, int));
+static void set_configfile_name(const char *);
+static FILE *fopen_config_file(const char *, int);
+static int get_uchars(char *, uchar *, boolean, int, const char *);
+boolean proc_wizkit_line(char *);
+boolean parse_config_line(char *);
+static boolean parse_conf_file(FILE *, boolean (*proc)(char *));
+static FILE *fopen_sym_file(void);
+boolean proc_symset_line(char *);
+static void set_symhandling(char *, int);
 #ifdef NOCWD_ASSUMPTIONS
-static void FDECL(adjust_prefix, (char *, int));
+static void adjust_prefix(char *, int);
 #endif
-static boolean FDECL(config_error_nextline, (const char *));
-static void NDECL(free_config_sections);
-static char *FDECL(choose_random_part, (char *, CHAR_P));
-static char *FDECL(is_config_section, (char *));
-static boolean FDECL(handle_config_section, (char *));
-static char *FDECL(find_optparam, (const char *));
-static void FDECL(parseformat, (int *, char *));
+static boolean config_error_nextline(const char *);
+static void free_config_sections(void);
+static char *choose_random_part(char *, char);
+static char *is_config_section(char *);
+static boolean handle_config_section(char *);
+static char *find_optparam(const char *);
+static void parseformat(int *, char *);
 
 #ifdef SELF_RECOVER
-static boolean FDECL(copy_bytes, (int, int));
+static boolean copy_bytes(int, int);
 #endif
-static NHFILE *FDECL(viable_nhfile, (NHFILE *));
+static NHFILE *viable_nhfile(NHFILE *);
 
 /*
  * fname_encode()
@@ -199,11 +191,7 @@ static NHFILE *FDECL(viable_nhfile, (NHFILE *));
  *          "This%20is%20a%20%25%20test%21"
  */
 char *
-fname_encode(legal, quotechar, s, callerbuf, bufsz)
-const char *legal;
-char quotechar;
-char *s, *callerbuf;
-int bufsz;
+fname_encode(const char *legal, char quotechar, char *s, char *callerbuf, int bufsz)
 {
     char *sp, *op;
     int cnt = 0;
@@ -247,10 +235,7 @@ int bufsz;
  *      bufsz       size of callerbuf
  */
 char *
-fname_decode(quotechar, s, callerbuf, bufsz)
-char quotechar;
-char *s, *callerbuf;
-int bufsz;
+fname_decode(char quotechar, char *s, char *callerbuf, int bufsz)
 {
     char *sp, *op;
     int k, calc, cnt = 0;
@@ -300,10 +285,9 @@ int bufsz;
 
 /*ARGSUSED*/
 const char *
-fqname(basenam, whichprefix, buffnum)
-const char *basenam;
-int whichprefix UNUSED_if_not_PREFIXES_IN_USE;
-int buffnum UNUSED_if_not_PREFIXES_IN_USE;
+fqname(const char *basenam,
+       int whichprefix UNUSED_if_not_PREFIXES_IN_USE,
+       int buffnum UNUSED_if_not_PREFIXES_IN_USE)
 {
 #ifdef PREFIXES_IN_USE
     char *bufptr;
@@ -338,9 +322,9 @@ int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 #endif /* !PREFIXES_IN_USE */
 }
 
+/* reasonbuf must be at least BUFSZ, supplied by caller */
 int
-validate_prefix_locations(reasonbuf)
-char *reasonbuf; /* reasonbuf must be at least BUFSZ, supplied by caller */
+validate_prefix_locations(char *reasonbuf)
 {
 #if defined(NOCWD_ASSUMPTIONS)
     FILE *fp;
@@ -390,9 +374,7 @@ char *reasonbuf; /* reasonbuf must be at least BUFSZ, supplied by caller */
 /* fopen a file, with OS-dependent bells and whistles */
 /* NOTE: a simpler version of this routine also exists in util/dlb_main.c */
 FILE *
-fopen_datafile(filename, mode, prefix)
-const char *filename, *mode;
-int prefix;
+fopen_datafile(const char *filename, const char *mode, int prefix)
 {
     FILE *fp;
 
@@ -408,8 +390,7 @@ const int bei = 1;
 #define IS_BIGENDIAN() ( (*(char*)&bei) == 0 )
 
 void
-zero_nhfile(nhfp)
-NHFILE *nhfp;
+zero_nhfile(NHFILE *nhfp)
 {
     if (nhfp) {
         nhfp->fd = -1;
@@ -428,7 +409,7 @@ NHFILE *nhfp;
 }
 
 static NHFILE *
-new_nhfile()
+new_nhfile(void)
 {
     NHFILE *nhfp = (NHFILE *)alloc(sizeof(NHFILE));
 
@@ -437,8 +418,7 @@ new_nhfile()
 }
 
 static void
-free_nhfile(nhfp)
-NHFILE *nhfp;
+free_nhfile(NHFILE *nhfp)
 {
     if (nhfp) {
         zero_nhfile(nhfp);
@@ -447,8 +427,7 @@ NHFILE *nhfp;
 }
 
 void
-close_nhfile(nhfp)
-NHFILE *nhfp;
+close_nhfile(NHFILE *nhfp)
 {
     if (nhfp) {
         if (nhfp->structlevel && nhfp->fd != -1)
@@ -459,8 +438,7 @@ NHFILE *nhfp;
 }
 
 void
-rewind_nhfile(nhfp)
-NHFILE *nhfp;
+rewind_nhfile(NHFILE *nhfp)
 {
     if (nhfp->structlevel) {
 #ifdef BSD
@@ -473,8 +451,7 @@ NHFILE *nhfp;
 
 static
 NHFILE *
-viable_nhfile(nhfp)
-NHFILE *nhfp;
+viable_nhfile(NHFILE *nhfp)
 {
     /* perform some sanity checks before returning
        the pointer to the nethack file descriptor */
@@ -501,9 +478,7 @@ NHFILE *nhfp;
  * but be careful if you use it for other things -dgk
  */
 void
-set_levelfile_name(file, lev)
-char *file;
-int lev;
+set_levelfile_name(char *file, int lev)
 {
     char *tf;
 
@@ -518,9 +493,7 @@ int lev;
 }
 
 NHFILE *
-create_levelfile(lev, errbuf)
-int lev;
-char errbuf[];
+create_levelfile(int lev, char errbuf[])
 {
     const char *fq_lock;
     NHFILE *nhfp = (NHFILE *) 0;
@@ -565,9 +538,7 @@ char errbuf[];
 }
 
 NHFILE *
-open_levelfile(lev, errbuf)
-int lev;
-char errbuf[];
+open_levelfile(int lev, char errbuf[])
 {
     const char *fq_lock;
     NHFILE *nhfp = (NHFILE *) 0;
@@ -607,8 +578,7 @@ char errbuf[];
 }
 
 void
-delete_levelfile(lev)
-int lev;
+delete_levelfile(int lev)
 {
     /*
      * Level 0 might be created by port specific code that doesn't
@@ -622,7 +592,7 @@ int lev;
 }
 
 void
-clearlocks()
+clearlocks(void)
 {
     int x;
 
@@ -633,7 +603,7 @@ clearlocks()
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
 #if defined(UNIX) || defined(VMS)
-    sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
+    sethanguphandler((void (*)(int)) SIG_IGN);
 #endif
 #endif /* NO_SIGNAL */
     /* can't access maxledgerno() before dungeons are created -dlc */
@@ -643,10 +613,8 @@ clearlocks()
 
 #if defined(SELECTSAVED)
 /* qsort comparison routine */
-static int CFDECLSPEC
-strcmp_wrap(p, q)
-const void *p;
-const void *q;
+static int QSORTCALLBACK
+strcmp_wrap(const void *p, const void *q)
 {
 #if defined(UNIX) && defined(QT_GRAPHICS)
     return strncasecmp(*(char **) p, *(char **) q, 16);
@@ -657,8 +625,7 @@ const void *q;
 #endif
 
 int
-nhclose(fd)
-int fd;
+nhclose(int fd)
 {
     int retval = 0;
 
@@ -679,11 +646,8 @@ int fd;
  * bonesid to be read/written in the bones file.
  */
 static char *
-set_bonesfile_name(file, lev)
-char *file;
-d_level *lev;
+set_bonesfile_name(char *file, d_level *lev)
 {
-    int idx = 0;
     s_level *sptr;
     char *dptr;
 
@@ -718,9 +682,6 @@ d_level *lev;
         Sprintf(eos(dptr), ".%c", sptr->boneid);
     else
         Sprintf(eos(dptr), ".%d", lev->dlevel);
-#ifdef SYSCF
-    idx = sysopt.bonesformat[0];
-#endif
 #ifdef VMS
     Strcat(dptr, ";1");
 #endif
@@ -734,7 +695,7 @@ d_level *lev;
  * the same array may be used instead of copying.)
  */
 static char *
-set_bonestemp_name()
+set_bonestemp_name(void)
 {
     char *tf;
 
@@ -749,10 +710,7 @@ set_bonestemp_name()
 }
 
 NHFILE *
-create_bonesfile(lev, bonesid, errbuf)
-d_level *lev;
-char **bonesid;
-char errbuf[];
+create_bonesfile(d_level *lev, char **bonesid, char errbuf[])
 {
     const char *file;
     NHFILE *nhfp = (NHFILE *) 0;
@@ -809,8 +767,7 @@ char errbuf[];
 
 /* move completed bones file to proper name */
 void
-commit_bonesfile(lev)
-d_level *lev;
+commit_bonesfile(d_level *lev)
 {
     const char *fq_bones, *tempname;
     int ret;
@@ -835,12 +792,9 @@ d_level *lev;
 }
 
 NHFILE *
-open_bonesfile(lev, bonesid)
-d_level *lev;
-char **bonesid;
+open_bonesfile(d_level *lev, char **bonesid)
 {
     const char *fq_bones;
-    int failed = 0;
     NHFILE *nhfp = (NHFILE *) 0;
 
     *bonesid = set_bonesfile_name(g.bones, lev);
@@ -859,8 +813,6 @@ char **bonesid;
 #else
             nhfp->fd = open(fq_bones, O_RDONLY | O_BINARY, 0);
 #endif
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
     nhfp = viable_nhfile(nhfp);
@@ -868,8 +820,7 @@ char **bonesid;
 }
 
 int
-delete_bonesfile(lev)
-d_level *lev;
+delete_bonesfile(d_level *lev)
 {
     (void) set_bonesfile_name(g.bones, lev);
     return !(unlink(fqname(g.bones, BONESPREFIX, 0)) < 0);
@@ -878,7 +829,7 @@ d_level *lev;
 /* assume we're compressing the recently read or created bonesfile, so the
  * file name is already set properly */
 void
-compress_bonesfile()
+compress_bonesfile(void)
 {
     nh_compress(fqname(g.bones, BONESPREFIX, 0));
 }
@@ -890,10 +841,9 @@ compress_bonesfile()
 /* set savefile name in OS-dependent manner from pre-existing g.plname,
  * avoiding troublesome characters */
 void
-set_savefile_name(regularize_it)
-boolean regularize_it;
+set_savefile_name(boolean regularize_it)
 {
-    int idx = historical, regoffset = 0, overflow = 0,  
+    int regoffset = 0, overflow = 0,
         indicator_spot = 0; /* 0=no indicator, 1=before ext, 2=after ext */
     const char *postappend = (const char *) 0,
                *sfindicator = (const char *) 0;
@@ -901,16 +851,6 @@ boolean regularize_it;
     char tmp[BUFSZ];
 #endif
 
-    if (g.program_state.in_self_recover) {
-        /* self_recover needs to be done as historical
-           structlevel content until that process is
-           re-written to use something other than
-           copy_bytes() to retrieve data content from
-           level files (which are structlevel) and
-           place it into the save file.
-        */
-        idx = historical;
-    }
 #ifdef VMS
     Sprintf(g.SAVEF, "[.save]%d%s", getuid(), g.plname);
     regoffset = 7;
@@ -1008,8 +948,7 @@ boolean regularize_it;
 
 #ifdef INSURANCE
 void
-save_savefile_name(nhfp)
-NHFILE *nhfp;
+save_savefile_name(NHFILE *nhfp)
 {
     if (nhfp->structlevel)
         (void) write(nhfp->fd, (genericptr_t) g.SAVEF, sizeof(g.SAVEF));
@@ -1019,7 +958,7 @@ NHFILE *nhfp;
 #ifndef MICRO
 /* change pre-existing savefile name to indicate an error savefile */
 void
-set_error_savefile()
+set_error_savefile(void)
 {
 #ifdef VMS
     {
@@ -1041,9 +980,8 @@ set_error_savefile()
 
 /* create save file, overwriting one if it already exists */
 NHFILE *
-create_savefile()
+create_savefile(void)
 {
-    int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
     boolean do_historical = TRUE;
@@ -1076,8 +1014,6 @@ create_savefile()
             nhfp->fd = creat(fq_save, FCMASK);
 #endif
 #endif /* MICRO || WIN32 */
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
 #if defined(VMS) && !defined(SECURE)
@@ -1097,9 +1033,8 @@ create_savefile()
 
 /* open savefile for reading */
 NHFILE *
-open_savefile()
+open_savefile(void)
 {
-    int failed = 0;
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
     boolean do_historical = TRUE;
@@ -1128,8 +1063,6 @@ open_savefile()
 #else
             nhfp->fd = open(fq_save, O_RDONLY | O_BINARY, 0);
 #endif
-            if (nhfp->fd < 0)
-                failed = errno;
         }
     }
     nhfp = viable_nhfile(nhfp);
@@ -1138,7 +1071,7 @@ open_savefile()
 
 /* delete savefile */
 int
-delete_savefile()
+delete_savefile(void)
 {
     (void) unlink(fqname(g.SAVEF, SAVEPREFIX, 0));
     return 0; /* for restore_saved_game() (ex-xxxmain.c) test */
@@ -1146,7 +1079,7 @@ delete_savefile()
 
 /* try to open up a save file and prepare to restore it */
 NHFILE *
-restore_saved_game()
+restore_saved_game(void)
 {
     const char *fq_save;
     NHFILE *nhfp = (NHFILE *) 0;
@@ -1167,8 +1100,7 @@ restore_saved_game()
 
 #if defined(SELECTSAVED)
 char *
-plname_from_file(filename)
-const char *filename;
+plname_from_file(const char *filename)
 {
     NHFILE *nhfp = (NHFILE *) 0;
     char *result = 0;
@@ -1230,10 +1162,13 @@ const char *filename;
 #endif /* defined(SELECTSAVED) */
 
 char **
-get_saved_games()
+get_saved_games(void)
 {
 #if defined(SELECTSAVED)
-    int n, j = 0;
+#if defined(WIN32) || defined(UNIX)
+    int n;
+#endif
+    int j = 0;
     char **result = 0;
 #ifdef WIN32
     {
@@ -1298,7 +1233,7 @@ get_saved_games()
 
     }
 #endif
-#if defined(UNIX) && defined(QT_GRAPHICS)
+#ifdef UNIX
     /* posixly correct version */
     int myuid = getuid();
     DIR *dir;
@@ -1356,8 +1291,7 @@ get_saved_games()
 }
 
 void
-free_saved_games(saved)
-char **saved;
+free_saved_games(char **saved)
 {
     if (saved) {
         int i = 0;
@@ -1375,10 +1309,7 @@ char **saved;
 #ifdef COMPRESS
 
 static void
-redirect(filename, mode, stream, uncomp)
-const char *filename, *mode;
-FILE *stream;
-boolean uncomp;
+redirect(const char *filename, const char *mode, FILE *stream, boolean uncomp)
 {
     if (freopen(filename, mode, stream) == (FILE *) 0) {
         const char *details;
@@ -1402,9 +1333,7 @@ boolean uncomp;
  * cf. child() in unixunix.c.
  */
 static void
-docompress_file(filename, uncomp)
-const char *filename;
-boolean uncomp;
+docompress_file(const char *filename, boolean uncomp)
 {
     char cfn[SAVESIZE];
     FILE *cf;
@@ -1559,8 +1488,7 @@ boolean uncomp;
 
 /* compress file */
 void
-nh_compress(filename)
-const char *filename UNUSED_if_not_COMPRESS;
+nh_compress(const char *filename UNUSED_if_not_COMPRESS)
 {
 #if !defined(COMPRESS) && !defined(ZLIB_COMP)
 #ifdef PRAGMA_UNUSED
@@ -1573,8 +1501,7 @@ const char *filename UNUSED_if_not_COMPRESS;
 
 /* uncompress file if it exists */
 void
-nh_uncompress(filename)
-const char *filename UNUSED_if_not_COMPRESS;
+nh_uncompress(const char *filename UNUSED_if_not_COMPRESS)
 {
 #if !defined(COMPRESS) && !defined(ZLIB_COMP)
 #ifdef PRAGMA_UNUSED
@@ -1587,9 +1514,7 @@ const char *filename UNUSED_if_not_COMPRESS;
 
 #ifdef ZLIB_COMP /* RLC 09 Mar 1999: Support internal ZLIB */
 static boolean
-make_compressed_name(filename, cfn)
-const char *filename;
-char *cfn;
+make_compressed_name(const char *filename, char *cfn)
 {
 #ifndef SHORT_FILENAMES
     /* Assume free-form filename with no 8.3 restrictions */
@@ -1620,9 +1545,7 @@ char *cfn;
 }
 
 static void
-docompress_file(filename, uncomp)
-const char *filename;
-boolean uncomp;
+docompress_file(const char *filename, boolean uncomp)
 {
     gzFile compressedfile;
     FILE *uncompressedfile;
@@ -1760,9 +1683,7 @@ struct flock sflock; /* for unlocking, same as above */
 
 #ifndef USE_FCNTL
 static char *
-make_lockname(filename, lockname)
-const char *filename;
-char *lockname;
+make_lockname(const char *filename, char *lockname)
 {
 #if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(WIN32) \
     || defined(MSDOS)
@@ -1796,10 +1717,7 @@ char *lockname;
 
 /* lock a file */
 boolean
-lock_file(filename, whichprefix, retryct)
-const char *filename;
-int whichprefix;
-int retryct;
+lock_file(const char *filename, int whichprefix, int retryct)
 {
 #if defined(PRAGMA_UNUSED) && !(defined(UNIX) || defined(VMS)) \
     && !(defined(AMIGA) || defined(WIN32) || defined(MSDOS))
@@ -1962,8 +1880,7 @@ int retryct;
 
 /* unlock file, which must be currently locked by lock_file */
 void
-unlock_file(filename)
-const char *filename;
+unlock_file(const char *filename)
 {
 #ifndef USE_FCNTL
     char locknambuf[BUFSZ];
@@ -2041,17 +1958,14 @@ const char *backward_compat_configfile = "nethack.cnf";
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
 static void
-set_configfile_name(fname)
-const char *fname;
+set_configfile_name(const char *fname)
 {
     (void) strncpy(configfile, fname, sizeof configfile - 1);
     configfile[sizeof configfile - 1] = '\0';
 }
 
 static FILE *
-fopen_config_file(filename, src)
-const char *filename;
-int src;
+fopen_config_file(const char *filename, int src)
 {
     FILE *fp;
 #if defined(UNIX) || defined(VMS)
@@ -2192,12 +2106,11 @@ int src;
  *  location is unchanged.  Callers must handle zeros if modlist is FALSE.
  */
 static int
-get_uchars(bufp, list, modlist, size, name)
-char *bufp;       /* current pointer */
-uchar *list;      /* return list */
-boolean modlist;  /* TRUE: list is being modified in place */
-int size;         /* return list size */
-const char *name; /* name of option for error message */
+get_uchars(char *bufp,       /* current pointer */
+           uchar *list,      /* return list */
+           boolean modlist,  /* TRUE: list is being modified in place */
+           int size,         /* return list size */
+           const char *name) /* name of option for error message */
 {
     unsigned int num = 0;
     int count = 0;
@@ -2253,9 +2166,7 @@ const char *name; /* name of option for error message */
 
 #ifdef NOCWD_ASSUMPTIONS
 static void
-adjust_prefix(bufp, prefixid)
-char *bufp;
-int prefixid;
+adjust_prefix(char *bufp, int prefixid)
 {
     char *ptr;
 
@@ -2278,9 +2189,7 @@ int prefixid;
 
 /* Choose at random one of the sep separated parts from str. Mangles str. */
 static char *
-choose_random_part(str, sep)
-char *str;
-char sep;
+choose_random_part(char *str, char sep)
 {
     int nsep = 1;
     int csep;
@@ -2318,7 +2227,7 @@ char sep;
 }
 
 static void
-free_config_sections()
+free_config_sections(void)
 {
     if (g.config_section_chosen) {
         free(g.config_section_chosen);
@@ -2334,8 +2243,8 @@ free_config_sections()
    with spaces optional; returns pointer to "anything-except..." (with
    trailing " ] #..." stripped) if ok, otherwise Null */
 static char *
-is_config_section(str)
-char *str; /* trailing spaces will be stripped, ']' too iff result is good */
+is_config_section(char *str) /* trailing spaces will be stripped,
+                                ']' too iff result is good */
 {
     char *a, *c, *z;
 
@@ -2362,8 +2271,7 @@ char *str; /* trailing spaces will be stripped, ']' too iff result is good */
 }
 
 static boolean
-handle_config_section(buf)
-char *buf;
+handle_config_section(char *buf)
 {
     char *sect = is_config_section(buf);
 
@@ -2398,8 +2306,7 @@ char *buf;
 
 /* find the '=' or ':' */
 static char *
-find_optparam(buf)
-const char *buf;
+find_optparam(const char *buf)
 {
     char *bufp, *altp;
 
@@ -2412,8 +2319,7 @@ const char *buf;
 }
 
 boolean
-parse_config_line(origbuf)
-char *origbuf;
+parse_config_line(char *origbuf)
 {
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
     static boolean ramdisk_specified = FALSE;
@@ -2880,8 +2786,7 @@ char *origbuf;
 
 #ifdef USER_SOUNDS
 boolean
-can_read_file(filename)
-const char *filename;
+can_read_file(const char *filename)
 {
     return (boolean) (access(filename, 4) == 0);
 }
@@ -2901,10 +2806,7 @@ struct _config_error_frame {
 static struct _config_error_frame *config_error_data = 0;
 
 void
-config_error_init(from_file, sourcename, secure)
-boolean from_file;
-const char *sourcename;
-boolean secure;
+config_error_init(boolean from_file, const char *sourcename, boolean secure)
 {
     struct _config_error_frame *tmp = (struct _config_error_frame *)
         alloc(sizeof (struct _config_error_frame));
@@ -2927,8 +2829,7 @@ boolean secure;
 }
 
 static boolean
-config_error_nextline(line)
-const char *line;
+config_error_nextline(const char *line)
 {
     struct _config_error_frame *ced = config_error_data;
 
@@ -2951,8 +2852,7 @@ const char *line;
 
 /* varargs 'config_error_add()' moved to pline.c */
 void
-config_erradd(buf)
-const char *buf;
+config_erradd(const char *buf)
 {
     char lineno[QBUFSZ];
 
@@ -2982,7 +2882,7 @@ const char *buf;
 }
 
 int
-config_error_done()
+config_error_done(void)
 {
     int n;
     struct _config_error_frame *tmp = config_error_data;
@@ -3004,9 +2904,7 @@ config_error_done()
 }
 
 boolean
-read_config_file(filename, src)
-const char *filename;
-int src;
+read_config_file(const char *filename, int src)
 {
     FILE *fp;
     boolean rv = TRUE;
@@ -3029,7 +2927,7 @@ int src;
 }
 
 static FILE *
-fopen_wizkit_file()
+fopen_wizkit_file(void)
 {
     FILE *fp;
 #if defined(VMS) || defined(UNIX)
@@ -3101,8 +2999,7 @@ fopen_wizkit_file()
 
 /* add to hero's inventory if there's room, otherwise put item on floor */
 static void
-wizkit_addinv(obj)
-struct obj *obj;
+wizkit_addinv(struct obj *obj)
 {
     if (!obj || obj == &cg.zeroobj)
         return;
@@ -3128,8 +3025,7 @@ struct obj *obj;
 
 
 boolean
-proc_wizkit_line(buf)
-char *buf;
+proc_wizkit_line(char *buf)
 {
     struct obj *otmp;
 
@@ -3149,7 +3045,7 @@ char *buf;
 }
 
 void
-read_wizkit()
+read_wizkit(void)
 {
     FILE *fp;
 
@@ -3176,9 +3072,7 @@ read_wizkit()
  * Continued lines are merged together with one space in between.
  */
 static boolean
-parse_conf_file(fp, proc)
-FILE *fp;
-boolean FDECL((*proc), (char *));
+parse_conf_file(FILE *fp, boolean (*proc)(char *))
 {
     char inbuf[4 * BUFSZ];
     boolean rv = TRUE; /* assume successful parse */
@@ -3317,7 +3211,7 @@ extern const char *known_restrictions[]; /* drawing.c */
 
 static
 FILE *
-fopen_sym_file()
+fopen_sym_file(void)
 {
     FILE *fp;
 
@@ -3337,8 +3231,7 @@ fopen_sym_file()
  *         0 if it wasn't found in the sym file or other problem.
  */
 int
-read_sym_file(which_set)
-int which_set;
+read_sym_file(int which_set)
 {
     FILE *fp;
 
@@ -3384,17 +3277,14 @@ int which_set;
 }
 
 boolean
-proc_symset_line(buf)
-char *buf;
+proc_symset_line(char *buf)
 {
     return !((boolean) parse_sym_line(buf, g.symset_which_set));
 }
 
 /* returns 0 on error */
 int
-parse_sym_line(buf, which_set)
-char *buf;
-int which_set;
+parse_sym_line(char *buf, int which_set)
 {
     int val, i;
     struct symparse *symp;
@@ -3580,9 +3470,7 @@ int which_set;
 }
 
 static void
-set_symhandling(handling, which_set)
-char *handling;
-int which_set;
+set_symhandling(char *handling, int which_set)
 {
     int i = 0;
 
@@ -3597,9 +3485,7 @@ int which_set;
 }
 
 void
-parseformat(arr, str)
-int *arr;
-char *str;
+parseformat(int *arr, char *str)
 {
     const char *legal[] = {"historical", "lendian", "ascii"};
     int i, kwi = 0, words = 0;
@@ -3644,8 +3530,7 @@ char *str;
 /* verify that we can write to scoreboard file; if not, try to create one */
 /*ARGUSED*/
 void
-check_recordfile(dir)
-const char *dir UNUSED_if_not_OS2_CODEVIEW;
+check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
 {
 #if defined(PRAGMA_UNUSED) && !defined(OS2_CODEVIEW)
 #pragma unused(dir)
@@ -3758,9 +3643,8 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
 
 /*ARGSUSED*/
 void
-paniclog(type, reason)
-const char *type;   /* panic, impossible, trickery */
-const char *reason; /* explanation */
+paniclog(const char *type,   /* panic, impossible, trickery */
+         const char *reason) /* explanation */
 {
 #ifdef PANICLOG
     FILE *lfile;
@@ -3792,10 +3676,9 @@ const char *reason; /* explanation */
 }
 
 void
-testinglog(filenm, type, reason)
-const char *filenm;   /* ad hoc file name */
-const char *type;
-const char *reason;   /* explanation */
+testinglog(const char *filenm,   /* ad hoc file name */
+           const char *type,
+           const char *reason)   /* explanation */
 {
     FILE *lfile;
     char fnbuf[BUFSZ];
@@ -3819,7 +3702,7 @@ const char *reason;   /* explanation */
 
 /* ----------  BEGIN INTERNAL RECOVER ----------- */
 boolean
-recover_savefile()
+recover_savefile(void)
 {
     NHFILE *gnhfp, *lnhfp, *snhfp;
     int lev, savelev, hpid, pltmpsiz, filecmc;
@@ -4014,8 +3897,7 @@ recover_savefile()
 }
 
 boolean
-copy_bytes(ifd, ofd)
-int ifd, ofd;
+copy_bytes(int ifd, int ofd)
 {
     char buf[BUFSIZ];
     int nfrom, nto;
@@ -4037,7 +3919,7 @@ int ifd, ofd;
 #ifdef SYSCF
 #ifdef SYSCF_FILE
 void
-assure_syscf_file()
+assure_syscf_file(void)
 {
     int fd;
 
@@ -4084,9 +3966,7 @@ assure_syscf_file()
  * like dungeon.c and questpgr.c, which generate a ridiculous amount of
  * output if DEBUG is defined and effectively block the use of a wildcard */
 boolean
-debugcore(filename, wildcards)
-const char *filename;
-boolean wildcards;
+debugcore(const char *filename, boolean wildcards)
 {
     const char *debugfiles, *p;
 
@@ -4156,7 +4036,7 @@ boolean wildcards;
 #endif
 
 void
-reveal_paths(VOID_ARGS)
+reveal_paths(void)
 {
     const char *fqn, *nodumpreason;
     char buf[BUFSZ];
@@ -4373,14 +4253,14 @@ reveal_paths(VOID_ARGS)
 
 #define MAXPASSAGES SIZE(g.context.novel.pasg) /* 20 */
 
-static int FDECL(choose_passage, (int, unsigned));
+static int choose_passage(int, unsigned);
 
 /* choose a random passage that hasn't been chosen yet; once all have
    been chosen, reset the tracking to make all passages available again */
 static int
-choose_passage(passagecnt, oid)
-int passagecnt; /* total of available passages */
-unsigned oid; /* book.o_id, used to determine whether re-reading same book */
+choose_passage(int passagecnt, /* total of available passages */
+               unsigned oid)   /* book.o_id, used to determine whether
+                                  re-reading same book */
 {
     int idx, res;
 
@@ -4420,11 +4300,9 @@ unsigned oid; /* book.o_id, used to determine whether re-reading same book */
 
 /* Returns True if you were able to read something. */
 boolean
-read_tribute(tribsection, tribtitle, tribpassage, nowin_buf, bufsz, oid)
-const char *tribsection, *tribtitle;
-int tribpassage, bufsz;
-char *nowin_buf;
-unsigned oid; /* book identifier */
+read_tribute(const char *tribsection, const char *tribtitle,
+             int tribpassage, char *nowin_buf, int bufsz,
+             unsigned oid) /* book identifier */
 {
     dlb *fp;
     char line[BUFSZ], lastline[BUFSZ];
@@ -4596,9 +4474,7 @@ unsigned oid; /* book identifier */
 }
 
 boolean
-Death_quote(buf, bufsz)
-char *buf;
-int bufsz;
+Death_quote(char *buf, int bufsz)
 {
     unsigned death_oid = 1; /* chance of oid #1 being a novel is negligible */
 

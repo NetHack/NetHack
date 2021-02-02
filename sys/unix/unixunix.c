@@ -15,12 +15,12 @@
 #include <signal.h>
 
 #ifdef _M_UNIX
-extern void NDECL(sco_mapon);
-extern void NDECL(sco_mapoff);
+extern void sco_mapon(void);
+extern void sco_mapoff(void);
 #endif
 #ifdef __linux__
-extern void NDECL(linux_mapon);
-extern void NDECL(linux_mapoff);
+extern void linux_mapon(void);
+extern void linux_mapoff(void);
 #endif
 
 #ifndef NHSTDC
@@ -32,8 +32,7 @@ static struct stat buf;
 /* see whether we should throw away this xlock file;
    if yes, close it, otherwise leave it open */
 static int
-veryold(fd)
-int fd;
+veryold(int fd)
 {
     time_t date;
 
@@ -71,7 +70,7 @@ int fd;
 }
 
 static int
-eraseoldlocks()
+eraseoldlocks(void)
 {
     register int i;
 
@@ -92,7 +91,7 @@ eraseoldlocks()
 }
 
 void
-getlock()
+getlock(void)
 {
     register int i = 0, fd, c;
     const char *fq_lock;
@@ -215,8 +214,7 @@ gotlock:
 
 /* normalize file name - we don't like .'s, /'s, spaces */
 void
-regularize(s)
-register char *s;
+regularize(char *s)
 {
     register char *lp;
 
@@ -250,8 +248,7 @@ register char *s;
 #include <poll.h>
 
 void
-msleep(msec)
-unsigned msec; /* milliseconds */
+msleep(unsigned msec) /* milliseconds */
 {
     struct pollfd unused;
     int msecs = msec; /* poll API is signed */
@@ -264,7 +261,7 @@ unsigned msec; /* milliseconds */
 
 #ifdef SHELL
 int
-dosh()
+dosh(void)
 {
     char *str;
 
@@ -290,8 +287,7 @@ dosh()
 
 #if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 int
-child(wt)
-int wt;
+child(int wt)
 {
     register int f;
 
@@ -342,44 +338,42 @@ int wt;
 
 #ifdef GETRES_SUPPORT
 
-extern int FDECL(nh_getresuid, (uid_t *, uid_t *, uid_t *));
-extern uid_t NDECL(nh_getuid);
-extern uid_t NDECL(nh_geteuid);
-extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
-extern gid_t NDECL(nh_getgid);
-extern gid_t NDECL(nh_getegid);
+extern int nh_getresuid(uid_t *, uid_t *, uid_t *);
+extern uid_t nh_getuid(void);
+extern uid_t nh_geteuid(void);
+extern int nh_getresgid(gid_t *, gid_t *, gid_t *);
+extern gid_t nh_getgid(void);
+extern gid_t nh_getegid(void);
 
 /* the following several functions assume __STDC__ where parentheses
    around the name of a function-like macro prevent macro expansion */
 
-int (getresuid)(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+int (getresuid)(uid_t *ruid, *euid, *suid)
 {
     return nh_getresuid(ruid, euid, suid);
 }
 
-uid_t (getuid)()
+uid_t (getuid)(void)
 {
     return nh_getuid();
 }
 
-uid_t (geteuid)()
+uid_t (geteuid)(void)
 {
     return nh_geteuid();
 }
 
-int (getresgid)(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+int (getresgid)(gid_t *rgid, *egid, *sgid)
 {
     return nh_getresgid(rgid, egid, sgid);
 }
 
-gid_t (getgid)()
+gid_t (getgid)(void)
 {
     return nh_getgid();
 }
 
-gid_t (getegid)()
+gid_t (getegid)(void)
 {
     return nh_getegid();
 }
@@ -389,8 +383,7 @@ gid_t (getegid)()
 /* XXX should be ifdef PANICTRACE_GDB, but there's no such symbol yet */
 #ifdef PANICTRACE
 boolean
-file_exists(path)
-const char *path;
+file_exists(const char *path)
 {
     struct stat sb;
 

@@ -29,37 +29,39 @@
 typedef struct mswin_menu_item {
     glyph_info glyphinfo;
     ANY_P identifier;
-    CHAR_P accelerator;
-    CHAR_P group_accel;
+    char accelerator;
+    char group_accel;
     int attr;
     char str[NHMENU_STR_SIZE];
-    BOOLEAN_P presel;
+    boolean presel;
     unsigned int itemflags;
     int count;
     BOOL has_focus;
 } NHMenuItem, *PNHMenuItem;
 
+union menu_innards {
+    struct menu_list {
+        int size;            /* number of items in items[] */
+        int allocated;       /* number of allocated slots in items[] */
+        PNHMenuItem items;   /* menu items */
+        char gacc[QBUFSZ];   /* group accelerators */
+        BOOL counting;       /* counting flag */
+        char prompt[QBUFSZ]; /* menu prompt */
+        int tab_stop_size[NUMTABS]; /* tabstops to align option values */
+        int menu_cx;                /* menu width */
+    } menu;
+
+    struct menu_text {
+        TCHAR *text;
+        SIZE text_box_size;
+    } text;
+};
+
 typedef struct mswin_nethack_menu_window {
     int type; /* MENU_TYPE_TEXT or MENU_TYPE_MENU */
     int how;  /* for menus: PICK_NONE, PICK_ONE, PICK_ANY */
 
-    union {
-        struct menu_list {
-            int size;            /* number of items in items[] */
-            int allocated;       /* number of allocated slots in items[] */
-            PNHMenuItem items;   /* menu items */
-            char gacc[QBUFSZ];   /* group accelerators */
-            BOOL counting;       /* counting flag */
-            char prompt[QBUFSZ]; /* menu prompt */
-            int tab_stop_size[NUMTABS]; /* tabstops to align option values */
-            int menu_cx;                /* menu width */
-        } menu;
-
-        struct menu_text {
-            TCHAR *text;
-            SIZE text_box_size;
-        } text;
-    };
+    union menu_innards menui;
     int result;
     int done;
 
@@ -162,23 +164,23 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
     if (data->type == MENU_TYPE_MENU) {
         char next_char = 'a';
 
-        data->menu.gacc[0] = '\0';
-        ap = data->menu.gacc;
-        for (i = 0; i < data->menu.size; i++) {
-            if (data->menu.items[i].accelerator != 0) {
-                if (isalpha(data->menu.items[i].accelerator)) {
-                    next_char = (char)(data->menu.items[i].accelerator + 1);
+        data->menui.menu.gacc[0] = '\0';
+        ap = data->menui.menu.gacc;
+        for (i = 0; i < data->menui.menu.size; i++) {
+            if (data->menui.menu.items[i].accelerator != 0) {
+                if (isalpha(data->menui.menu.items[i].accelerator)) {
+                    next_char = (char)(data->menui.menu.items[i].accelerator + 1);
                 }
-            } else if (NHMENU_IS_SELECTABLE(data->menu.items[i])) {
+            } else if (NHMENU_IS_SELECTABLE(data->menui.menu.items[i])) {
                 if (isalpha(next_char)) {
-                    data->menu.items[i].accelerator = next_char;
+                    data->menui.menu.items[i].accelerator = next_char;
                 } else {
                     if (next_char > 'z')
                         next_char = 'A';
                     else if (next_char > 'Z')
                         next_char = 'a';
 
-                    data->menu.items[i].accelerator = next_char;
+                    data->menui.menu.items[i].accelerator = next_char;
                 }
 
                 next_char++;
@@ -186,12 +188,12 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         }
 
         /* collect group accelerators */
-        for (i = 0; i < data->menu.size; i++) {
+        for (i = 0; i < data->menui.menu.size; i++) {
             if (data->how != PICK_NONE) {
-                if (data->menu.items[i].group_accel
-                    && !strchr(data->menu.gacc,
-                               data->menu.items[i].group_accel)) {
-                    *ap++ = data->menu.items[i].group_accel;
+                if (data->menui.menu.items[i].group_accel
+                    && !strchr(data->menui.menu.gacc,
+                               data->menui.menu.items[i].group_accel)) {
+                    *ap++ = data->menui.menu.items[i].group_accel;
                     *ap = '\x0';
                 }
             }
@@ -219,9 +221,9 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         } else if (how == PICK_ONE || how == PICK_ANY) {
             /* count selected items */
             ret_val = 0;
-            for (i = 0; i < data->menu.size; i++) {
-                if (NHMENU_IS_SELECTABLE(data->menu.items[i])
-                    && NHMENU_IS_SELECTED(data->menu.items[i])) {
+            for (i = 0; i < data->menui.menu.size; i++) {
+                if (NHMENU_IS_SELECTABLE(data->menui.menu.items[i])
+                    && NHMENU_IS_SELECTED(data->menui.menu.items[i])) {
                     ret_val++;
                 }
             }
@@ -234,12 +236,12 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
                     panic("out of memory");
 
                 sel_ind = 0;
-                for (i = 0; i < data->menu.size; i++) {
-                    if (NHMENU_IS_SELECTABLE(data->menu.items[i])
-                        && NHMENU_IS_SELECTED(data->menu.items[i])) {
+                for (i = 0; i < data->menui.menu.size; i++) {
+                    if (NHMENU_IS_SELECTABLE(data->menui.menu.items[i])
+                        && NHMENU_IS_SELECTED(data->menui.menu.items[i])) {
                         selected[sel_ind].item =
-                            data->menu.items[i].identifier;
-                        selected[sel_ind].count = data->menu.items[i].count;
+                            data->menui.menu.items[i].identifier;
+                        selected[sel_ind].count = data->menui.menu.items[i].count;
                         sel_ind++;
                     }
                 }
@@ -259,10 +261,10 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
          */
         if (iflags.perm_invent && mswin_winid_from_handle(hWnd) == WIN_INVEN
             && how != PICK_NONE) {
-            data->menu.prompt[0] = '\0';
+            data->menui.menu.prompt[0] = '\0';
             SetMenuListType(hWnd, PICK_NONE);
-            for (i = 0; i < data->menu.size; i++)
-                data->menu.items[i].count = 0;
+            for (i = 0; i < data->menui.menu.size; i++)
+                data->menui.menu.items[i].count = 0;
             LayoutMenu(hWnd);
         }
     }
@@ -362,7 +364,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDCANCEL:
             if (data->type == MENU_TYPE_MENU
                 && (data->how == PICK_ONE || data->how == PICK_ANY)
-                && data->menu.counting) {
+                && data->menui.menu.counting) {
                 HWND list;
                 int i;
 
@@ -397,9 +399,9 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case LVN_ITEMACTIVATE: {
                 LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW) lParam;
                 if (data->how == PICK_ONE) {
-                    if (lpnmlv->iItem >= 0 && lpnmlv->iItem < data->menu.size
+                    if (lpnmlv->iItem >= 0 && lpnmlv->iItem < data->menui.menu.size
                         && NHMENU_IS_SELECTABLE(
-                               data->menu.items[lpnmlv->iItem])) {
+                               data->menui.menu.items[lpnmlv->iItem])) {
                         SelectMenuItem(lpnmlv->hdr.hwndFrom, data,
                                        lpnmlv->iItem, -1);
                         data->done = 1;
@@ -416,7 +418,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (data->how == PICK_ANY) {
                     SelectMenuItem(
                         lpnmitem->hdr.hwndFrom, data, lpnmitem->iItem,
-                        NHMENU_IS_SELECTED(data->menu.items[lpnmitem->iItem])
+                        NHMENU_IS_SELECTED(data->menui.menu.items[lpnmitem->iItem])
                             ? 0
                             : -1);
                 }
@@ -430,7 +432,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     return 0;
 
                 if (data->how == PICK_ONE || data->how == PICK_ANY) {
-                    data->menu.items[lpnmlv->iItem].has_focus =
+                    data->menui.menu.items[lpnmlv->iItem].has_focus =
                         !!(lpnmlv->uNewState & LVIS_FOCUSED);
                     ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem,
                                          lpnmlv->iItem);
@@ -447,7 +449,7 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 /* check item focus */
                 if (data->how == PICK_ONE || data->how == PICK_ANY) {
-                    data->menu.items[lpnmlv->iItem].has_focus =
+                    data->menui.menu.items[lpnmlv->iItem].has_focus =
                         !!(lpnmlv->uNewState & LVIS_FOCUSED);
                     ListView_RedrawItems(lpnmlv->hdr.hwndFrom, lpnmlv->iItem,
                                          lpnmlv->iItem);
@@ -512,8 +514,8 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteObject(data->bmpCheckedCount);
             DeleteObject(data->bmpNotChecked);
             if (data->type == MENU_TYPE_TEXT) {
-                if (data->text.text)
-                    free(data->text.text);
+                if (data->menui.text.text)
+                    free(data->menui.text.text);
             }
             free(data);
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
@@ -542,27 +544,27 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (data->type != MENU_TYPE_TEXT)
             SetMenuType(hWnd, MENU_TYPE_TEXT);
 
-        if (!data->text.text) {
+        if (!data->menui.text.text) {
             text_size = strlen(msg_data->text) + 4;
-            data->text.text =
-                (TCHAR *) malloc(text_size * sizeof(data->text.text[0]));
-            ZeroMemory(data->text.text,
-                       text_size * sizeof(data->text.text[0]));
+            data->menui.text.text =
+                (TCHAR *) malloc(text_size * sizeof(data->menui.text.text[0]));
+            ZeroMemory(data->menui.text.text,
+                       text_size * sizeof(data->menui.text.text[0]));
         } else {
-            text_size = _tcslen(data->text.text) + strlen(msg_data->text) + 4;
-            data->text.text = (TCHAR *) realloc(
-                data->text.text, text_size * sizeof(data->text.text[0]));
+            text_size = _tcslen(data->menui.text.text) + strlen(msg_data->text) + 4;
+            data->menui.text.text = (TCHAR *) realloc(
+                data->menui.text.text, text_size * sizeof(data->menui.text.text[0]));
         }
-        if (!data->text.text)
+        if (!data->menui.text.text)
             break;
 
-        _tcscat(data->text.text, NH_A2W(msg_data->text, wbuf, BUFSZ));
-        _tcscat(data->text.text, TEXT("\r\n"));
+        _tcscat(data->menui.text.text, NH_A2W(msg_data->text, wbuf, BUFSZ));
+        _tcscat(data->menui.text.text, TEXT("\r\n"));
 
         text_view = GetDlgItem(hWnd, IDC_MENU_TEXT);
         if (!text_view)
             panic("cannot get text view window");
-        SetWindowText(text_view, data->text.text);
+        SetWindowText(text_view, data->menui.text.text);
 
         /* calculate dimensions of the added line of text */
         hdc = GetDC(text_view);
@@ -572,9 +574,9 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         DrawTextA(hdc, msg_data->text, strlen(msg_data->text), &text_rt,
                  DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOPREFIX
                      | DT_SINGLELINE);
-        data->text.text_box_size.cx =
-            max(text_rt.right - text_rt.left, data->text.text_box_size.cx);
-        data->text.text_box_size.cy += text_rt.bottom - text_rt.top;
+        data->menui.text.text_box_size.cx =
+            max(text_rt.right - text_rt.left, data->menui.text.text_box_size.cx);
+        data->menui.text.text_box_size.cy += text_rt.bottom - text_rt.top;
         SelectObject(hdc, saveFont);
         ReleaseDC(text_view, hdc);
     } break;
@@ -584,16 +586,16 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (data->type != MENU_TYPE_MENU)
             SetMenuType(hWnd, MENU_TYPE_MENU);
 
-        if (data->menu.items)
-            free(data->menu.items);
+        if (data->menui.menu.items)
+            free(data->menui.menu.items);
         data->how = PICK_NONE;
-        data->menu.items = NULL;
-        data->menu.size = 0;
-        data->menu.allocated = 0;
+        data->menui.menu.items = NULL;
+        data->menui.menu.size = 0;
+        data->menui.menu.allocated = 0;
         data->done = 0;
         data->result = 0;
         for (i = 0; i < NUMTABS; ++i)
-            data->menu.tab_stop_size[i] = MIN_TABSTOP_SIZE;
+            data->menui.menu.tab_stop_size[i] = MIN_TABSTOP_SIZE;
     } break;
 
     case MSNH_MSG_ADDMENU: {
@@ -609,34 +611,34 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (data->type != MENU_TYPE_MENU)
             break;
 
-        if (data->menu.size == data->menu.allocated) {
-            data->menu.allocated += 10;
-            data->menu.items = (PNHMenuItem) realloc(
-                data->menu.items, data->menu.allocated * sizeof(NHMenuItem));
+        if (data->menui.menu.size == data->menui.menu.allocated) {
+            data->menui.menu.allocated += 10;
+            data->menui.menu.items = (PNHMenuItem) realloc(
+                data->menui.menu.items, data->menui.menu.allocated * sizeof(NHMenuItem));
         }
 
-        new_item = data->menu.size;
-        ZeroMemory(&data->menu.items[new_item],
-                   sizeof(data->menu.items[new_item]));
-        data->menu.items[new_item].glyphinfo = msg_data->glyphinfo;
-        data->menu.items[new_item].identifier = *msg_data->identifier;
-        data->menu.items[new_item].accelerator = msg_data->accelerator;
-        data->menu.items[new_item].group_accel = msg_data->group_accel;
-        data->menu.items[new_item].attr = msg_data->attr;
-        strncpy(data->menu.items[new_item].str, msg_data->str,
+        new_item = data->menui.menu.size;
+        ZeroMemory(&data->menui.menu.items[new_item],
+                   sizeof(data->menui.menu.items[new_item]));
+        data->menui.menu.items[new_item].glyphinfo = msg_data->glyphinfo;
+        data->menui.menu.items[new_item].identifier = *msg_data->identifier;
+        data->menui.menu.items[new_item].accelerator = msg_data->accelerator;
+        data->menui.menu.items[new_item].group_accel = msg_data->group_accel;
+        data->menui.menu.items[new_item].attr = msg_data->attr;
+        strncpy(data->menui.menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
 	/* prevent & being interpreted as a mnemonic start */
-        strNsubst(data->menu.items[new_item].str, "&", "&&", 0);
-        data->menu.items[new_item].presel = msg_data->presel;
-        data->menu.items[new_item].itemflags = msg_data->itemflags;
+        strNsubst(data->menui.menu.items[new_item].str, "&", "&&", 0);
+        data->menui.menu.items[new_item].presel = msg_data->presel;
+        data->menui.menu.items[new_item].itemflags = msg_data->itemflags;
 
         /* calculate tabstop size */
         hDC = GetDC(hWnd);
         cached_font * font = mswin_get_font(NHW_MENU, msg_data->attr, hDC, FALSE);
         saveFont = SelectObject(hDC, font->hFont);
         GetTextMetrics(hDC, &tm);
-        p1 = data->menu.items[new_item].str;
-        p = strchr(data->menu.items[new_item].str, '\t');
+        p1 = data->menui.menu.items[new_item].str;
+        p = strchr(data->menui.menu.items[new_item].str, '\t');
         column = 0;
         for (;;) {
             TCHAR wbuf[BUFSZ];
@@ -647,11 +649,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             DrawText(hDC, NH_A2W(p1, wbuf, BUFSZ), strlen(p1), &drawRect,
                      DT_CALCRECT | DT_LEFT | DT_VCENTER | DT_EXPANDTABS
                          | DT_SINGLELINE);
-            data->menu.tab_stop_size[column] =
-                max(data->menu.tab_stop_size[column],
+            data->menui.menu.tab_stop_size[column] =
+                max(data->menui.menu.tab_stop_size[column],
                     drawRect.right - drawRect.left);
 
-            menuitemwidth += data->menu.tab_stop_size[column];
+            menuitemwidth += data->menui.menu.tab_stop_size[column];
 
             if (p != NULL)
                 *p = '\t';
@@ -671,22 +673,22 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         ReleaseDC(hWnd, hDC);
 
         /* calculate new menu width */
-        data->menu.menu_cx =
-            max(data->menu.menu_cx,
+        data->menui.menu.menu_cx =
+            max(data->menui.menu.menu_cx,
                 2 * TILE_X + menuitemwidth
                     + (tm.tmAveCharWidth + tm.tmOverhang) * 12);
 
         /* increment size */
-        data->menu.size++;
+        data->menui.menu.size++;
     } break;
 
     case MSNH_MSG_ENDMENU: {
         PMSNHMsgEndMenu msg_data = (PMSNHMsgEndMenu) lParam;
         if (msg_data->text) {
-            strncpy(data->menu.prompt, msg_data->text,
-                    sizeof(data->menu.prompt) - 1);
+            strncpy(data->menui.menu.prompt, msg_data->text,
+                    sizeof(data->menui.menu.prompt) - 1);
         } else {
-            ZeroMemory(data->menu.prompt, sizeof(data->menu.prompt));
+            ZeroMemory(data->menui.menu.prompt, sizeof(data->menui.menu.prompt));
         }
     } break;
 
@@ -768,7 +770,7 @@ LayoutMenu(HWND hWnd)
         ListView_SetColumnWidth(
             GetMenuControl(hWnd), 0,
             max(clrt.right - clrt.left - GetSystemMetrics(SM_CXVSCROLL),
-                data->menu.menu_cx));
+                data->menui.menu.menu_cx));
     }
 
     MoveWindow(GetMenuControl(hWnd), pt_elem.x, pt_elem.y, sz_elem.cx,
@@ -845,7 +847,7 @@ SetMenuListType(HWND hWnd, int how)
         panic("how should be one of PICK_NONE, PICK_ONE or PICK_ANY");
     };
 
-    if (strlen(data->menu.prompt) == 0) {
+    if (strlen(data->menui.menu.prompt) == 0) {
         dwStyles |= LVS_NOCOLUMNHEADER;
     }
 
@@ -882,22 +884,22 @@ SetMenuListType(HWND hWnd, int how)
     ZeroMemory(&lvcol, sizeof(lvcol));
     lvcol.mask = LVCF_WIDTH | LVCF_TEXT;
     lvcol.cx = monitorInfo.width;
-    lvcol.pszText = NH_A2W(data->menu.prompt, wbuf, BUFSZ);
+    lvcol.pszText = NH_A2W(data->menui.menu.prompt, wbuf, BUFSZ);
     ListView_InsertColumn(control, 0, &lvcol);
 
     /* add items to the list view */
-    for (i = 0; i < data->menu.size; i++) {
+    for (i = 0; i < data->menui.menu.size; i++) {
         LVITEM lvitem;
         ZeroMemory(&lvitem, sizeof(lvitem));
-        sprintf(buf, "%c - %s", max(data->menu.items[i].accelerator, ' '),
-                data->menu.items[i].str);
+        sprintf(buf, "%c - %s", max(data->menui.menu.items[i].accelerator, ' '),
+                data->menui.menu.items[i].str);
 
         lvitem.mask = LVIF_PARAM | LVIF_STATE | LVIF_TEXT;
         lvitem.iItem = i;
         lvitem.iSubItem = 0;
-        lvitem.state = data->menu.items[i].presel ? LVIS_SELECTED : 0;
+        lvitem.state = data->menui.menu.items[i].presel ? LVIS_SELECTED : 0;
         lvitem.pszText = NH_A2W(buf, wbuf, BUFSZ);
-        lvitem.lParam = (LPARAM) &data->menu.items[i];
+        lvitem.lParam = (LPARAM) &data->menui.menu.items[i];
         nItem = (int) SendMessage(control, LB_ADDSTRING, (WPARAM) 0,
                                   (LPARAM) buf);
         if (ListView_InsertItem(control, &lvitem) == -1) {
@@ -951,8 +953,8 @@ onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     /* Set the height of the list box items to max height of the individual
      * items */
-    for (i = 0; i < data->menu.size; i++) {
-        if (NHMENU_HAS_GLYPH(data->menu.items[i])
+    for (i = 0; i < data->menui.menu.size; i++) {
+        if (NHMENU_HAS_GLYPH(data->menui.menu.items[i])
             && !IS_MAP_ASCII(iflags.wc_map_mode)) {
             lpmis->itemHeight =
                 max(lpmis->itemHeight,
@@ -1006,7 +1008,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-    item = &data->menu.items[lpdis->itemID];
+    item = &data->menui.menu.items[lpdis->itemID];
 
     tileDC = CreateCompatibleDC(lpdis->hDC);
     cached_font * font = mswin_get_font(NHW_MENU, item->attr, lpdis->hDC, FALSE);
@@ -1046,7 +1048,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             y = (lpdis->rcItem.bottom + lpdis->rcItem.top - tileYScaled) / 2;
             bmpSaved = SelectBitmap(data->bmpDC, bmpCheck);
-            StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+            StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled,
                 data->bmpDC, 0, 0,  CHECK_WIDTH, CHECK_HEIGHT, SRCCOPY);
             SelectObject(data->bmpDC, bmpSaved);
         }
@@ -1079,7 +1081,10 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     if (NHMENU_HAS_GLYPH(*item)) {
         if (!IS_MAP_ASCII(iflags.wc_map_mode)) {
             HGDIOBJ saveBmp;
-            double monitorScale = win10_monitor_scale(hWnd);
+            double monitorScale2;
+
+            nhUse(monitorScale2);
+            monitorScale2 = win10_monitor_scale(hWnd);
 
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
             ntile = glyph2tile[item->glyphinfo.glyph];
@@ -1092,13 +1097,13 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             if (GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles) {
                 /* using original nethack tiles - apply image transparently */
-                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, 
+                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y,
                                           tileXScaled, tileYScaled,
                                           tileDC, t_x, t_y, TILE_X, TILE_Y,
                                           TILE_BK_COLOR);
             } else {
                 /* using custom tiles - simple blt */
-                StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled, 
+                StretchBlt(lpdis->hDC, x, y, tileXScaled, tileYScaled,
                     tileDC, t_x, t_y, GetNHApp()->mapTile_X, GetNHApp()->mapTile_Y, SRCCOPY);
             }
             SelectObject(tileDC, saveBmp);
@@ -1136,13 +1141,13 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     p = strchr(item->str, '\t');
     column = 0;
     SetRect(&drawRect, x, lpdis->rcItem.top,
-            min(x + data->menu.tab_stop_size[0], lpdis->rcItem.right),
+            min(x + data->menui.menu.tab_stop_size[0], lpdis->rcItem.right),
             lpdis->rcItem.bottom);
     for (;;) {
-        TCHAR wbuf[BUFSZ];
+        TCHAR wbuf2[BUFSZ];
         if (p != NULL)
             *p = '\0'; /* for time being, view tab field as zstring */
-        DrawText(lpdis->hDC, NH_A2W(p1, wbuf, BUFSZ), strlen(p1), &drawRect,
+        DrawText(lpdis->hDC, NH_A2W(p1, wbuf2, BUFSZ), strlen(p1), &drawRect,
                  DT_LEFT | DT_VCENTER | DT_SINGLELINE);
         if (p != NULL)
             *p = '\t';
@@ -1153,25 +1158,25 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         p = strchr(p1, '\t');
         drawRect.left = drawRect.right + TAB_SEPARATION;
         ++column;
-        drawRect.right = min(drawRect.left + data->menu.tab_stop_size[column],
+        drawRect.right = min(drawRect.left + data->menui.menu.tab_stop_size[column],
                              lpdis->rcItem.right);
     }
 
     /* draw focused item */
     if (item->has_focus || (NHMENU_IS_SELECTABLE(*item)
-                            && data->menu.items[lpdis->itemID].count != -1)) {
+                            && data->menui.menu.items[lpdis->itemID].count != -1)) {
         RECT client_rt;
 
         GetClientRect(lpdis->hwndItem, &client_rt);
         client_rt.right = min(client_rt.right, lpdis->rcItem.right);
         if (NHMENU_IS_SELECTABLE(*item)
-            && data->menu.items[lpdis->itemID].count != 0
+            && data->menui.menu.items[lpdis->itemID].count != 0
             && item->glyphinfo.glyph != NO_GLYPH) {
-            if (data->menu.items[lpdis->itemID].count == -1) {
+            if (data->menui.menu.items[lpdis->itemID].count == -1) {
                 _stprintf(wbuf, TEXT("Count: All"));
             } else {
                 _stprintf(wbuf, TEXT("Count: %d"),
-                          data->menu.items[lpdis->itemID].count);
+                          data->menui.menu.items[lpdis->itemID].count);
             }
 
             /* TOOD: add blinking for blink text */
@@ -1231,8 +1236,8 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     is_accelerator = FALSE;
-    for (i = 0; i < data->menu.size; i++) {
-        if (data->menu.items[i].accelerator == ch) {
+    for (i = 0; i < data->menui.menu.size; i++) {
+        if (data->menui.menu.items[i].accelerator == ch) {
             is_accelerator = TRUE;
             break;
         }
@@ -1253,7 +1258,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         return -2;
 
     case MENU_LAST_PAGE:
-        i = max(0, data->menu.size - 1);
+        i = max(0, data->menui.menu.size - 1);
         ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
         ListView_EnsureVisible(hwndList, i, FALSE);
         return -2;
@@ -1263,10 +1268,10 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         pageSize = ListView_GetCountPerPage(hwndList);
         curIndex = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
         /* Focus down one page */
-        i = min(curIndex + pageSize, data->menu.size - 1);
+        i = min(curIndex + pageSize, data->menui.menu.size - 1);
         ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
         /* Scrollpos down one page */
-        i = min(topIndex + (2 * pageSize - 1), data->menu.size - 1);
+        i = min(topIndex + (2 * pageSize - 1), data->menui.menu.size - 1);
         ListView_EnsureVisible(hwndList, i, FALSE);
         return -2;
 
@@ -1285,7 +1290,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
     case MENU_SELECT_ALL:
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
-            for (i = 0; i < data->menu.size; i++) {
+            for (i = 0; i < data->menui.menu.size; i++) {
                 SelectMenuItem(hwndList, data, i, -1);
             }
             return -2;
@@ -1295,7 +1300,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
     case MENU_UNSELECT_ALL:
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
-            for (i = 0; i < data->menu.size; i++) {
+            for (i = 0; i < data->menui.menu.size; i++) {
                 SelectMenuItem(hwndList, data, i, 0);
             }
             return -2;
@@ -1305,11 +1310,11 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
     case MENU_INVERT_ALL:
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
-            for (i = 0; i < data->menu.size; i++) {
-                if (menuitem_invert_test(0, data->menu.items[i].itemflags,
-                                         NHMENU_IS_SELECTED(data->menu.items[i])))
+            for (i = 0; i < data->menui.menu.size; i++) {
+                if (menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
+                                         NHMENU_IS_SELECTED(data->menui.menu.items[i])))
                     SelectMenuItem(hwndList, data, i,
-                               NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                               NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                        : -1);
             }
             return -2;
@@ -1323,7 +1328,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             topIndex = ListView_GetTopIndex(hwndList);
             pageSize = ListView_GetCountPerPage(hwndList);
             from = max(0, topIndex);
-            to = min(data->menu.size, from + pageSize);
+            to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
                 SelectMenuItem(hwndList, data, i, -1);
             }
@@ -1338,7 +1343,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             topIndex = ListView_GetTopIndex(hwndList);
             pageSize = ListView_GetCountPerPage(hwndList);
             from = max(0, topIndex);
-            to = min(data->menu.size, from + pageSize);
+            to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
                 SelectMenuItem(hwndList, data, i, 0);
             }
@@ -1353,12 +1358,12 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             topIndex = ListView_GetTopIndex(hwndList);
             pageSize = ListView_GetCountPerPage(hwndList);
             from = max(0, topIndex);
-            to = min(data->menu.size, from + pageSize);
+            to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
-                if (menuitem_invert_test(0, data->menu.items[i].itemflags,
-                                         NHMENU_IS_SELECTED(data->menu.items[i])))                    
+                if (menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
+                                         NHMENU_IS_SELECTED(data->menui.menu.items[i])))                    
                     SelectMenuItem(hwndList, data, i,
-                               NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                               NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                        : -1);
             }
             return -2;
@@ -1377,13 +1382,13 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                 SetFocus(hwndList); // set focus back to the list control
             if (!*buf || *buf == '\033')
                 return -2;
-            for (i = 0; i < data->menu.size; i++) {
-                if (NHMENU_IS_SELECTABLE(data->menu.items[i])
-                    && strstr(data->menu.items[i].str, buf)) {
+            for (i = 0; i < data->menui.menu.size; i++) {
+                if (NHMENU_IS_SELECTABLE(data->menui.menu.items[i])
+                    && strstr(data->menui.menu.items[i].str, buf)) {
                     if (data->how == PICK_ANY) {
                         SelectMenuItem(
                             hwndList, data, i,
-                            NHMENU_IS_SELECTED(data->menu.items[i]) ? 0 : -1);
+                            NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0 : -1);
                     } else if (data->how == PICK_ONE) {
                         SelectMenuItem(hwndList, data, i, -1);
                         ListView_SetItemState(hwndList, i, LVIS_FOCUSED,
@@ -1418,10 +1423,10 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             pageSize = ListView_GetCountPerPage(hwndList);
             curIndex = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
             /* Focus down one page */
-            i = min(curIndex + pageSize, data->menu.size - 1);
+            i = min(curIndex + pageSize, data->menui.menu.size - 1);
             ListView_SetItemState(hwndList, i, LVIS_FOCUSED, LVIS_FOCUSED);
             /* Scrollpos down one page */
-            i = min(topIndex + (2 * pageSize - 1), data->menu.size - 1);
+            i = min(topIndex + (2 * pageSize - 1), data->menui.menu.size - 1);
             ListView_EnsureVisible(hwndList, i, FALSE);
 
             return -2;
@@ -1437,7 +1442,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                 if (i >= 0) {
                     SelectMenuItem(
                         hwndList, data, i,
-                        NHMENU_IS_SELECTED(data->menu.items[i]) ? 0 : -1);
+                        NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0 : -1);
                 }
             }
         }
@@ -1445,18 +1450,18 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
 
     accelerator:
     default:
-        if (strchr(data->menu.gacc, ch)
-            && !(ch == '0' && data->menu.counting)) {
+        if (strchr(data->menui.menu.gacc, ch)
+            && !(ch == '0' && data->menui.menu.counting)) {
             /* matched a group accelerator */
             if (data->how == PICK_ANY || data->how == PICK_ONE) {
                 reset_menu_count(hwndList, data);
-                for (i = 0; i < data->menu.size; i++) {
-                    if (NHMENU_IS_SELECTABLE(data->menu.items[i])
-                        && data->menu.items[i].group_accel == ch) {
+                for (i = 0; i < data->menui.menu.size; i++) {
+                    if (NHMENU_IS_SELECTABLE(data->menui.menu.items[i])
+                        && data->menui.menu.items[i].group_accel == ch) {
                         if (data->how == PICK_ANY) {
                             SelectMenuItem(
                                 hwndList, data, i,
-                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                         : -1);
                         } else if (data->how == PICK_ONE) {
                             SelectMenuItem(hwndList, data, i, -1);
@@ -1477,14 +1482,14 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             int count;
             i = ListView_GetNextItem(hwndList, -1, LVNI_FOCUSED);
             if (i >= 0) {
-                count = data->menu.items[i].count;
+                count = data->menui.menu.items[i].count;
                 if (count == -1)
                     count = 0;
                 count *= 10L;
                 count += (int) (ch - '0');
                 if (count != 0) /* ignore leading zeros */ {
-                    data->menu.counting = TRUE;
-                    data->menu.items[i].count = min(100000, count);
+                    data->menui.menu.counting = TRUE;
+                    data->menui.menu.items[i].count = min(100000, count);
                     ListView_RedrawItems(hwndList, i,
                                          i); /* update count mark */
                 }
@@ -1496,15 +1501,15 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             || is_accelerator) {
             if (data->how == PICK_ANY || data->how == PICK_ONE) {
                 topIndex = ListView_GetTopIndex(hwndList);
-                if( topIndex < 0 || topIndex > data->menu.size ) break; // impossible?
+                if( topIndex < 0 || topIndex > data->menui.menu.size ) break; // impossible?
                 int iter = topIndex;
                 do {
-                    i = iter % data->menu.size;
-                    if (data->menu.items[i].accelerator == ch) {
+                    i = iter % data->menui.menu.size;
+                    if (data->menui.menu.items[i].accelerator == ch) {
                         if (data->how == PICK_ANY) {
                             SelectMenuItem(
                                 hwndList, data, i,
-                                NHMENU_IS_SELECTED(data->menu.items[i]) ? 0
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                         : -1);
                             ListView_SetItemState(hwndList, i, LVIS_FOCUSED,
                                                   LVIS_FOCUSED);
@@ -1517,7 +1522,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                             return -2;
                         }
                     }
-                } while( (++iter % data->menu.size) != topIndex ); 
+                } while( (++iter % data->menui.menu.size) != topIndex );
             }
         }
         break;
@@ -1549,10 +1554,10 @@ mswin_menu_window_size(HWND hWnd, LPSIZE sz)
         extra_cx = (wrt.right - wrt.left) - sz->cx;
 
         if (data->type == MENU_TYPE_MENU) {
-            sz->cx = data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL);
+            sz->cx = data->menui.menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL);
         } else {
             /* Use the width of the text box */
-            sz->cx = data->text.text_box_size.cx
+            sz->cx = data->menui.text.text_box_size.cx
                      + 2 * GetSystemMetrics(SM_CXVSCROLL);
         }
         sz->cx += extra_cx;
@@ -1569,18 +1574,18 @@ SelectMenuItem(HWND hwndList, PNHMenuWindow data, int item, int count)
 {
     int i;
 
-    if (item < 0 || item >= data->menu.size)
+    if (item < 0 || item >= data->menui.menu.size)
         return;
 
     if (data->how == PICK_ONE && count != 0) {
-        for (i = 0; i < data->menu.size; i++)
-            if (item != i && data->menu.items[i].count != 0) {
-                data->menu.items[i].count = 0;
+        for (i = 0; i < data->menui.menu.size; i++)
+            if (item != i && data->menui.menu.items[i].count != 0) {
+                data->menui.menu.items[i].count = 0;
                 ListView_RedrawItems(hwndList, i, i);
             };
     }
 
-    data->menu.items[item].count = count;
+    data->menui.menu.items[item].count = count;
     ListView_RedrawItems(hwndList, item, item);
     reset_menu_count(hwndList, data);
 }
@@ -1589,7 +1594,7 @@ void
 reset_menu_count(HWND hwndList, PNHMenuWindow data)
 {
     int i;
-    data->menu.counting = FALSE;
+    data->menui.menu.counting = FALSE;
     if (IsWindow(hwndList)) {
         i = ListView_GetNextItem((hwndList), -1, LVNI_FOCUSED);
         if (i >= 0)

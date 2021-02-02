@@ -8,11 +8,11 @@
 
 #include "hack.h"
 
-static int NDECL(bc_order);
-static void NDECL(litter);
-static void NDECL(placebc_core);
-static void NDECL(unplacebc_core);
-static boolean FDECL(check_restriction, (int));
+static int bc_order(void);
+static void litter(void);
+static void placebc_core(void);
+static void unplacebc_core(void);
+static boolean check_restriction(int);
 
 static int bcrestriction = 0;
 #ifdef BREADCRUMBS
@@ -20,8 +20,7 @@ static struct breadcrumbs bcpbreadcrumbs = {0}, bcubreadcrumbs = {0};
 #endif
 
 void
-ballrelease(showmsg)
-boolean showmsg;
+ballrelease(boolean showmsg)
 {
     if (carried(uball)) {
         if (showmsg)
@@ -41,7 +40,7 @@ boolean showmsg;
 
 /* ball&chain might hit hero when falling through a trap door */
 void
-ballfall()
+ballfall(void)
 {
     boolean gets_hit;
 
@@ -115,7 +114,7 @@ ballfall()
  *  Should not be called while swallowed except on waterlevel.
  */
 static void
-placebc_core()
+placebc_core(void)
 {
     if (!uchain || !uball) {
         impossible("Where are your ball and chain?");
@@ -142,7 +141,7 @@ placebc_core()
 }
 
 static void
-unplacebc_core()
+unplacebc_core(void)
 {
     if (u.uswallow) {
         if (Is_waterlevel(&u.uz)) {
@@ -175,8 +174,7 @@ unplacebc_core()
 }
 
 static boolean
-check_restriction(restriction)
-int restriction;
+check_restriction(int restriction)
 {
     boolean ret = FALSE;
 
@@ -189,7 +187,7 @@ int restriction;
 
 #ifndef BREADCRUMBS
 void
-placebc()
+placebc(void)
 {
     if (!check_restriction(0)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -208,7 +206,7 @@ placebc()
 }
 
 void
-unplacebc()
+unplacebc(void)
 {
     if (bcrestriction) {
         impossible("unplacebc denied, restriction in place");
@@ -218,7 +216,7 @@ unplacebc()
 }
 
 int
-unplacebc_and_covet_placebc()
+unplacebc_and_covet_placebc(void)
 {
     int restriction = 0;
 
@@ -232,8 +230,7 @@ unplacebc_and_covet_placebc()
 }
 
 void
-lift_covet_and_placebc(pin)
-int pin;
+lift_covet_and_placebc(int pin)
 {
     if (!check_restriction(pin)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -256,9 +253,7 @@ int pin;
 #else  /* BREADCRUMBS */
 
 void
-Placebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Placebc(const char *funcnm, int linenum)
 {
     if (!check_restriction(0)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -286,9 +281,7 @@ int linenum;
 }
 
 void
-Unplacebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Unplacebc(const char *funcnm, int linenum)
 {
 
     if (bcrestriction) {
@@ -307,9 +300,7 @@ int linenum;
 }
 
 int
-Unplacebc_and_covet_placebc(funcnm, linenum)
-const char *funcnm;
-int linenum;
+Unplacebc_and_covet_placebc(const char *funcnm, int linenum)
 {
     int restriction = 0;
 
@@ -330,10 +321,7 @@ int linenum;
 }
 
 void
-Lift_covet_and_placebc(pin, funcnm, linenum)
-int pin;
-char *funcnm;
-int linenum;
+Lift_covet_and_placebc(int pin, char *funcnm, int linenum)
 {
     if (!check_restriction(pin)) {
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -360,7 +348,7 @@ int linenum;
  *  hero is being punished.
  */
 static int
-bc_order()
+bc_order(void)
 {
     struct obj *obj;
 
@@ -386,8 +374,7 @@ bc_order()
  *  Set up the ball and chain variables so that the ball and chain are "felt".
  */
 void
-set_bc(already_blind)
-int already_blind;
+set_bc(int already_blind)
 {
     int ball_on_floor = !carried(uball);
 
@@ -444,9 +431,8 @@ int already_blind;
  *  Should not be called while swallowed.
  */
 void
-move_bc(before, control, ballx, bally, chainx, chainy)
-int before, control;
-xchar ballx, bally, chainx, chainy; /* only matter !before */
+move_bc(int before, int control, xchar ballx, xchar bally,
+        xchar chainx, xchar chainy)
 {
     if (Blind) {
         /*
@@ -568,13 +554,9 @@ xchar ballx, bally, chainx, chainy; /* only matter !before */
 
 /* return TRUE if the caller needs to place the ball and chain down again */
 boolean
-drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, cause_delay,
-          allow_drag)
-xchar x, y;
-int *bc_control;
-xchar *ballx, *bally, *chainx, *chainy;
-boolean *cause_delay;
-boolean allow_drag;
+drag_ball(xchar x, xchar y, int *bc_control,
+          xchar *ballx, xchar *bally, xchar *chainx, xchar *chainy,
+          boolean *cause_delay, boolean allow_drag)
 {
     struct trap *t = (struct trap *) 0;
     boolean already_in_rock;
@@ -893,8 +875,7 @@ boolean allow_drag;
  *  Should not be called while swallowed.
  */
 void
-drop_ball(x, y)
-xchar x, y;
+drop_ball(xchar x, xchar y)
 {
     if (Blind) {
         /* get the order */
@@ -976,7 +957,7 @@ xchar x, y;
 
 /* ball&chain cause hero to randomly lose stuff from inventory */
 static void
-litter()
+litter(void)
 {
     struct obj *otmp, *nextobj = 0;
     int capacity = weight_cap();
@@ -997,7 +978,7 @@ litter()
 }
 
 void
-drag_down()
+drag_down(void)
 {
     boolean forward;
     uchar dragchance = 3;
@@ -1044,7 +1025,7 @@ drag_down()
 }
 
 void
-bc_sanity_check()
+bc_sanity_check(void)
 {
     int otyp, freeball, freechain;
     const char *onam;

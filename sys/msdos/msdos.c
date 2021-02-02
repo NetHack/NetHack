@@ -45,22 +45,25 @@
 #define GETKEYFLAGS 0x02    /* Get Keyboard Flags */
 /*#define KEY_DEBUG	 */ /* print values of unexpected key codes - devel*/
 
-void FDECL(get_cursor, (int *, int *));
+void get_cursor(int *, int *);
 
 /* direct bios calls are used only when iflags.BIOS is set */
 
-static char NDECL(DOSgetch);
-static char NDECL(BIOSgetch);
+static char DOSgetch(void);
+static char BIOSgetch(void);
+/* static long freediskspace(char *path); */
+unsigned long sys_random_seed(void);
+
 #ifndef __GO32__
-static char *NDECL(getdta);
+static char *getdta(void);
 #endif
-static unsigned int FDECL(dos_ioctl, (int, int, unsigned));
+static unsigned int dos_ioctl(int, int, unsigned);
 #ifdef USE_TILES
-extern boolean FDECL(pckeys, (unsigned char, unsigned char)); /* pckeys.c */
+extern boolean pckeys(unsigned char, unsigned char); /* pckeys.c */
 #endif
 
 int
-tgetch()
+tgetch(void)
 {
     char ch;
 
@@ -249,7 +252,7 @@ static const char numeric_scanmap[] = { /* ... */
 #endif /* PC9800 */
 
 static char
-BIOSgetch()
+BIOSgetch(void)
 {
     unsigned char scan, shift, ch = 0;
     const struct pad *kpad;
@@ -309,7 +312,7 @@ BIOSgetch()
 }
 
 static char
-DOSgetch()
+DOSgetch(void)
 {
     union REGS regs;
     char ch;
@@ -348,7 +351,7 @@ DOSgetch()
 }
 
 char
-switchar()
+switchar(void)
 {
     union REGS regs;
 
@@ -357,9 +360,9 @@ switchar()
     return regs.h.dl;
 }
 
-long
-freediskspace(path)
-char *path;
+#if 0
+static long
+freediskspace(char *path)
 {
     union REGS regs;
 
@@ -374,14 +377,14 @@ char *path;
     else
         return ((long) regs.x.bx * regs.x.cx * regs.x.ax);
 }
+#endif /* 0 */
 
 #ifndef __GO32__
 /*
  * Functions to get filenames using wildcards
  */
 int
-findfirst_file(path)
-char *path;
+findfirst_file(char *path)
 {
     union REGS regs;
     struct SREGS sregs;
@@ -395,7 +398,7 @@ char *path;
 }
 
 int
-findnext_file()
+findnext_file(void)
 {
     union REGS regs;
 
@@ -405,14 +408,14 @@ findnext_file()
 }
 
 char *
-foundfile_buffer()
+foundfile_buffer(void)
 {
     return (getdta() + 30);
 }
 
 /* Get disk transfer area */
 static char *
-getdta()
+getdta(void)
 {
     union REGS regs;
     struct SREGS sregs;
@@ -430,8 +433,7 @@ getdta()
 }
 
 long
-filesize_nh(file)
-char *file;
+filesize_nh(char *file)
 {
     char *dta;
 
@@ -448,8 +450,7 @@ char *file;
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *str)
 {
 #define SELECTDISK 0x0E
     char *ptr;
@@ -482,7 +483,7 @@ char *str;
 static unsigned int old_stdin, old_stdout;
 
 void
-disable_ctrlP()
+disable_ctrlP(void)
 {
     if (!iflags.rawio)
         return;
@@ -497,7 +498,7 @@ disable_ctrlP()
 }
 
 void
-enable_ctrlP()
+enable_ctrlP(void)
 {
     if (!iflags.rawio)
         return;
@@ -509,9 +510,7 @@ enable_ctrlP()
 }
 
 static unsigned int
-dos_ioctl(handle, mode, setvalue)
-int handle, mode;
-unsigned setvalue;
+dos_ioctl(int handle, int mode, unsigned setvalue)
 {
     union REGS regs;
 
@@ -525,7 +524,7 @@ unsigned setvalue;
 }
 
 unsigned long
-sys_random_seed(VOID_ARGS)
+sys_random_seed(void)
 {
     unsigned long ourseed = 0UL;
     time_t datetime = 0;

@@ -10,14 +10,14 @@
 
 #include "hack.h"
 
-static short FDECL(which_arti, (int));
-static boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));
-static struct monst *FDECL(other_mon_has_arti, (struct monst *, SHORT_P));
-static struct obj *FDECL(on_ground, (SHORT_P));
-static boolean FDECL(you_have, (int));
-static unsigned long FDECL(target_on, (int, struct monst *));
-static unsigned long FDECL(strategy, (struct monst *));
-static void FDECL(choose_stairs, (xchar *, xchar *));
+static short which_arti(int);
+static boolean mon_has_arti(struct monst *, short);
+static struct monst *other_mon_has_arti(struct monst *, short);
+static struct obj *on_ground(short);
+static boolean you_have(int);
+static unsigned long target_on(int, struct monst *);
+static unsigned long strategy(struct monst *);
+static void choose_stairs(xchar *, xchar *);
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -56,7 +56,7 @@ static NEARDATA const unsigned wizapp[] = {
 /* If you've found the Amulet, make the Wizard appear after some time */
 /* Also, give hints about portal locations, if amulet is worn/wielded -dlc */
 void
-amulet()
+amulet(void)
 {
     struct monst *mtmp;
     struct trap *ttmp;
@@ -101,8 +101,7 @@ amulet()
 }
 
 int
-mon_has_amulet(mtmp)
-register struct monst *mtmp;
+mon_has_amulet(struct monst *mtmp)
 {
     register struct obj *otmp;
 
@@ -113,8 +112,7 @@ register struct monst *mtmp;
 }
 
 int
-mon_has_special(mtmp)
-register struct monst *mtmp;
+mon_has_special(struct monst *mtmp)
 {
     register struct obj *otmp;
 
@@ -142,8 +140,7 @@ register struct monst *mtmp;
 #define M_Wants(mask) (mtmp->data->mflags3 & (mask))
 
 static short
-which_arti(mask)
-register int mask;
+which_arti(int mask)
 {
     switch (mask) {
     case M3_WANTSAMUL:
@@ -166,9 +163,7 @@ register int mask;
  *      artifacts right now.  [MRS]
  */
 static boolean
-mon_has_arti(mtmp, otyp)
-register struct monst *mtmp;
-register short otyp;
+mon_has_arti(struct monst *mtmp, short otyp)
 {
     register struct obj *otmp;
 
@@ -183,9 +178,7 @@ register short otyp;
 }
 
 static struct monst *
-other_mon_has_arti(mtmp, otyp)
-register struct monst *mtmp;
-register short otyp;
+other_mon_has_arti(struct monst *mtmp, short otyp)
 {
     register struct monst *mtmp2;
 
@@ -199,8 +192,7 @@ register short otyp;
 }
 
 static struct obj *
-on_ground(otyp)
-register short otyp;
+on_ground(short otyp)
 {
     register struct obj *otmp;
 
@@ -214,8 +206,7 @@ register short otyp;
 }
 
 static boolean
-you_have(mask)
-register int mask;
+you_have(int mask)
 {
     switch (mask) {
     case M3_WANTSAMUL:
@@ -235,9 +226,7 @@ register int mask;
 }
 
 static unsigned long
-target_on(mask, mtmp)
-register int mask;
-register struct monst *mtmp;
+target_on(int mask, struct monst *mtmp)
 {
     register short otyp;
     register struct obj *otmp;
@@ -263,8 +252,7 @@ register struct monst *mtmp;
 }
 
 static unsigned long
-strategy(mtmp)
-register struct monst *mtmp;
+strategy(struct monst *mtmp)
 {
     unsigned long strat, dstrat;
 
@@ -324,9 +312,7 @@ register struct monst *mtmp;
 }
 
 static void
-choose_stairs(sx, sy)
-xchar *sx;
-xchar *sy;
+choose_stairs(xchar *sx, xchar *sy)
 {
     xchar x = 0, y = 0;
     stairway *stway = g.stairs;
@@ -355,9 +341,10 @@ xchar *sy;
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
-tactics(mtmp)
-register struct monst *mtmp;
+tactics(struct monst *mtmp)
 {
     unsigned long strat = strategy(mtmp);
     xchar sx = 0, sy = 0, mx, my;
@@ -447,10 +434,11 @@ register struct monst *mtmp;
     return 0;
 }
 
+RESTORE_WARNINGS
+
 /* are there any monsters mon could aggravate? */
 boolean
-has_aggravatables(mon)
-struct monst *mon;
+has_aggravatables(struct monst *mon)
 {
     struct monst *mtmp;
     boolean in_w_tower = In_W_tower(mon->mx, mon->my, &u.uz);
@@ -471,7 +459,7 @@ struct monst *mon;
 }
 
 void
-aggravate()
+aggravate(void)
 {
     register struct monst *mtmp;
     boolean in_w_tower = In_W_tower(u.ux, u.uy, &u.uz);
@@ -494,7 +482,7 @@ aggravate()
    only casting this when there is currently one wizard in existence;
    the clone can't use it unless/until its creator has been killed off */
 void
-clonewiz()
+clonewiz(void)
 {
     register struct monst *mtmp2;
 
@@ -513,8 +501,8 @@ clonewiz()
 
 /* also used by newcham() */
 int
-pick_nasty(difcap)
-int difcap; /* if non-zero, try to make difficulty be lower than this */
+pick_nasty(int difcap) /* if non-zero, try to make difficulty be lower
+                          than this */
 {
     int alt, res = nasties[rn2(SIZE(nasties))];
 
@@ -566,8 +554,7 @@ int difcap; /* if non-zero, try to make difficulty be lower than this */
    creatures on average (in 3.6.0 and earlier, Null was treated as chaotic);
    returns the number of monsters created */
 int
-nasty(summoner)
-struct monst *summoner;
+nasty(struct monst *summoner)
 {
     struct monst *mtmp;
     coord bypos;
@@ -685,7 +672,7 @@ struct monst *summoner;
 
 /* Let's resurrect the wizard, for some unexpected fun. */
 void
-resurrect()
+resurrect(void)
 {
     struct monst *mtmp, **mmtmp;
     long elapsed;
@@ -740,7 +727,7 @@ resurrect()
 /* Here, we make trouble for the poor shmuck who actually
    managed to do in the Wizard. */
 void
-intervene()
+intervene(void)
 {
     int which = Is_astralevel(&u.uz) ? rnd(4) : rn2(6);
     /* cases 0 and 5 don't apply on the Astral level */
@@ -767,7 +754,7 @@ intervene()
 }
 
 void
-wizdead()
+wizdead(void)
 {
     g.context.no_of_wizards--;
     if (!u.uevent.udemigod) {
@@ -798,8 +785,7 @@ const char *const random_malediction[] = {
 
 /* Insult or intimidate the player */
 void
-cuss(mtmp)
-register struct monst *mtmp;
+cuss(struct monst *mtmp)
 {
     if (Deaf)
         return;

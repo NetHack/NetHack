@@ -188,4 +188,39 @@
     <DlbList Include = "$(DatDir)license"/>
     <DlbList Include = "$(DatDir)*.lua"/>
   </ItemGroup>
- </Project>
+  <ItemGroup>
+    <Lua Include="$(LuaDir)lapi.c"/>
+    <Lua Include="$(LuaDir)lauxlib.c" />
+    <Lua Include="$(LuaDir)lbaselib.c" />
+    <Lua Include="$(LuaDir)lbitlib.c" Condition="'$(LUA_MAJOR_VERSION).$(LUA_MINOR_VERSION)'=='5.3'" />
+    <Lua Include="$(LuaDir)lcode.c" />
+    <Lua Include="$(LuaDir)lcorolib.c" />
+    <Lua Include="$(LuaDir)lctype.c" />
+    <Lua Include="$(LuaDir)ldblib.c" />
+    <Lua Include="$(LuaDir)ldebug.c" />
+    <Lua Include="$(LuaDir)ldo.c" />
+    <Lua Include="$(LuaDir)ldump.c" />
+    <Lua Include="$(LuaDir)lfunc.c" />
+    <Lua Include="$(LuaDir)lgc.c" />
+    <Lua Include="$(LuaDir)linit.c" />
+    <Lua Include="$(LuaDir)liolib.c" />
+    <Lua Include="$(LuaDir)llex.c" />
+    <Lua Include="$(LuaDir)lmathlib.c" />
+    <Lua Include="$(LuaDir)lmem.c" />
+    <Lua Include="$(LuaDir)loadlib.c" />
+    <Lua Include="$(LuaDir)lobject.c" />
+    <Lua Include="$(LuaDir)lopcodes.c" />
+    <Lua Include="$(LuaDir)loslib.c" />
+    <Lua Include="$(LuaDir)lparser.c" />
+    <Lua Include="$(LuaDir)lstate.c" />
+    <Lua Include="$(LuaDir)lstring.c" />
+    <Lua Include="$(LuaDir)lstrlib.c" />
+    <Lua Include="$(LuaDir)ltable.c" />
+    <Lua Include="$(LuaDir)ltablib.c" />
+    <Lua Include="$(LuaDir)ltm.c" />
+    <Lua Include="$(LuaDir)lundump.c" />
+    <Lua Include="$(LuaDir)lutf8lib.c" />
+    <Lua Include="$(LuaDir)lvm.c" />
+    <Lua Include="$(LuaDir)lzio.c" />
+  </ItemGroup>
+</Project>

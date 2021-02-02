@@ -18,7 +18,7 @@
 struct sysopt sysopt;
 
 void
-sys_early_init()
+sys_early_init(void)
 {
     sysopt.support = (char *) 0;
     sysopt.recover = (char *) 0;
@@ -43,20 +43,14 @@ sys_early_init()
     sysopt.bones_pools = 0;
 
     /* record file */
-    sysopt.persmax = PERSMAX;
-    sysopt.entrymax = ENTRYMAX;
-    sysopt.pointsmin = POINTSMIN;
+    sysopt.persmax = max(PERSMAX, 1);
+    sysopt.entrymax = max(ENTRYMAX, 10);
+    sysopt.pointsmin = max(POINTSMIN, 1);
     sysopt.pers_is_uid = PERS_IS_UID;
     sysopt.tt_oname_maxrank = 10;
 
     /* sanity checks */
-    if (PERSMAX < 1)
-        sysopt.persmax = 1;
-    if (ENTRYMAX < 10)
-        sysopt.entrymax = 10;
-    if (POINTSMIN < 1)
-        sysopt.pointsmin = 1;
-    if (PERS_IS_UID != 0 && PERS_IS_UID != 1)
+    if (sysopt.pers_is_uid != 0 && sysopt.pers_is_uid != 1)
         panic("config error: PERS_IS_UID must be either 0 or 1");
 
 #ifdef PANICTRACE
@@ -90,7 +84,7 @@ sys_early_init()
 }
 
 void
-sysopt_release()
+sysopt_release(void)
 {
     if (sysopt.support)
         free((genericptr_t) sysopt.support), sysopt.support = (char *) 0;
@@ -129,9 +123,9 @@ extern const struct attack c_sa_yes[NATTK];
 extern const struct attack c_sa_no[NATTK];
 
 void
-sysopt_seduce_set(val)
+sysopt_seduce_set(
 #if 0
-int val;
+int val)
 {
 /*
  * Attack substitution is now done on the fly in getmattk(mhitu.c).
@@ -144,7 +138,7 @@ int val;
         mons[PM_SUCCUBUS].mattk[x] = setval[x];
     }
 #else
-int val UNUSED;
+int val UNUSED)
 {
 #endif
     return;

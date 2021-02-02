@@ -32,16 +32,16 @@
 #ifdef minit
 #undef minit
 #endif
-void FDECL(newread, (NHFILE *, int, int, genericptr_t, unsigned int));
-void FDECL(bufon, (int));
-void FDECL(bufoff, (int));
-void FDECL(bflush, (int));
-void FDECL(bwrite, (int, genericptr_t, unsigned int));
-void FDECL(mread, (int, genericptr_t, unsigned int));
-void NDECL(minit);
-void FDECL(bclose, (int));
+void newread(NHFILE *, int, int, genericptr_t, unsigned int);
+void bufon(int);
+void bufoff(int);
+void bflush(int);
+void bwrite(int, genericptr_t, unsigned int);
+void mread(int, genericptr_t, unsigned int);
+void minit(void);
+void bclose(int);
 #endif /* TRACE_BUFFERING */
-static int FDECL(getidx, (int, int));
+static int getidx(int, int);
 
 #if defined(UNIX) || defined(WIN32)
 #define USE_BUFFERING
@@ -98,8 +98,7 @@ static FILE *bw_FILE[MAXFD] = {0,0,0,0,0};
  */
 
 static int
-getidx(fd, flg)
-int fd, flg;
+getidx(int fd, int flg)
 {
     int i, retval = -1;
 
@@ -119,8 +118,7 @@ int fd, flg;
 
 /* Let caller know that bclose() should handle it (TRUE) */
 boolean
-close_check(fd)
-int fd;
+close_check(int fd)
 {
     int idx = getidx(fd, NOSLOT);
     boolean retval = FALSE;
@@ -131,8 +129,7 @@ int fd;
 }
 
 void
-bufon(fd)
-int fd;
+bufon(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -153,8 +150,7 @@ int fd;
 }
 
 void
-bufoff(fd)
-int fd;
+bufoff(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -165,8 +161,7 @@ int fd;
 }
 
 void
-bclose(fd)
-int fd;
+bclose(int fd)
 {
     int idx = getidx(fd, NOSLOT);
 
@@ -186,8 +181,7 @@ int fd;
 }
 
 void
-bflush(fd)
-int fd;
+bflush(int fd)
 {
     int idx = getidx(fd, NOFLG);
 
@@ -203,10 +197,7 @@ int fd;
 }
 
 void
-bwrite(fd, loc, num)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
+bwrite(register int fd, register genericptr_t loc, register unsigned num)
 {
     boolean failed;
     int idx = getidx(fd, NOFLG);
@@ -240,16 +231,13 @@ register unsigned num;
 /*  ===================================================== */
 
 void
-minit()
+minit(void)
 {
     return;
 }
 
 void
-mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
+mread(register int fd, register genericptr_t buf, register unsigned int len)
 {
     register int rlen;
 #if defined(BSD) || defined(ULTRIX)
@@ -286,73 +274,59 @@ static FILE *tracefile;
     fclose(tracefile);
 
 void
-Bufon(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bufon(int fd, const char *fncname, int linenum)
 {
     TRACE(fd);
     bufon(fd);
 }
 
 void
-Bufoff(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bufoff(int fd, const char *fncname, int linenum)
 {
     TRACE(fd);
     bufoff(fd);
 }
 
 void
-Bflush(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bflush(int fd, const char* fncname, int linenum)
 {
     TRACE(fd);
     bflush(fd);
 }
 
 void
-Bwrite(fd, loc, num, fncname, linenum)
-register int fd;
-register genericptr_t loc;
-register unsigned num;
-const char *fncname;
-int linenum;
+Bwrite(
+    register int fd,
+    register genericptr_t loc,
+    register unsigned num,
+    const char *fncname,
+    int linenum)
 {
     TRACE(fd);
     bwrite(fd, loc, num);
 }
 
 void
-Bclose(fd, fncname, linenum)
-int fd;
-const char *fncname;
-int linenum;
+Bclose(int fd, const char *fncname, int linenum)
 {
     TRACE(fd);
     bclose(fd);
 }
 
 void
-Minit(fncname, linenum)
-const char *fncname;
-int linenum;
+Minit(const char*fncname, int linenum)
 {
     TRACE(-1);
     minit();
 }
 
 void
-Mread(fd, buf, len, fncname, linenum)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
-const char *fncname;
-int linenum;
+Mread(
+    register int fd,
+    register genericptr_t buf,
+    register unsigned int len,
+    const char *fncname,
+    int linenum)
 {
     TRACE(fd);
     mread(fd, buf, len);
