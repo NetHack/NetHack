@@ -1378,7 +1378,7 @@ add_sound_mapping(const char* mapping)
             raw_print("sound file name too long");
             return 0;
 	}
-        Sprintf(filespec, "%s/%s", sounddir, filename);
+        Snprintf(filespec, sizeof filespec, "%s/%s", sounddir, filename);
 
         if (idx >= 0 || can_read_file(filespec)) {
             new_map = (audio_mapping *) alloc(sizeof *new_map);
