@@ -88,7 +88,7 @@ do_statusline1(void)
             get_strength_str(),
             ACURR(A_DEX), ACURR(A_CON), ACURR(A_INT), ACURR(A_WIS),
             ACURR(A_CHA));
-    Sprintf(nb = eos(nb),
+    Sprintf(nb = eos(nb), "%s",
             (u.ualign.type == A_CHAOTIC)
                 ? "  Chaotic"
                 : (u.ualign.type == A_NEUTRAL) ? "  Neutral" : "  Lawful");
