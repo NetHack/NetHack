@@ -1727,9 +1727,10 @@ domove_core(void)
                because you don't see remembered terrain while underwater;
                although the hero can attack an adjacent monster this way,
                assume he can't reach out far enough to distinguish terrain */
-            Sprintf(buf, (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
-                             ? "an air bubble"
-                             : "nothing");
+            Sprintf(buf, "%s",
+                    (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
+                         ? "an air bubble"
+                         : "nothing");
         } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is
