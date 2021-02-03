@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1612316744 2021/02/03 01:45:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,7 +195,7 @@ NH_panictrace_libc(void)
     size_t count, x;
     char **info, buf[BUFSZ];
 
-    raw_print("Generating more information you may report:\n");
+    raw_print("  Generating more information you may report:\n");
     count = backtrace(bt, SIZE(bt));
     info = backtrace_symbols(bt, count);
     for (x = 0; x < count; x++) {
@@ -246,7 +246,7 @@ NH_panictrace_gdb(void)
             gdbpath, ARGV0, getpid(), greppath);
     gdb = popen(buf, "w");
     if (gdb) {
-        raw_print("Generating more information you may report:\n");
+        raw_print("  Generating more information you may report:\n");
         fprintf(gdb, "bt\nquit\ny");
         fflush(gdb);
         sleep(4); /* ugly */
