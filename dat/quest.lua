@@ -2326,7 +2326,7 @@ become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"]],
 being my vassal?"]],
       },
       leader_other = {
-         synopsis = "[Are you truely a samurai?]",
+         synopsis = "[Are you truly a samurai?]",
          output = "text",
          text = [["You begin to test my matsu, %p-san.
 If you cannot determine what I want in a samurai, how can I rely on you
