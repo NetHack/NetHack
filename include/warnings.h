@@ -31,11 +31,13 @@
 #define ACTIVATE_WARNING_PRAGMAS
 #endif
 #endif
-#if defined(__clang__) && defined(__cplusplus)
+#if defined(__GNUC__) || defined(__clang__)
+#if defined(__cplusplus)
 #ifndef ACTIVATE_WARNING_PRAGMAS
 #define ACTIVATE_WARNING_PRAGMAS
 #endif
-#endif
+#endif /* __cplusplus */
+#endif /* __GNUC__ || __clang__ */
 
 #ifdef ACTIVATE_WARNING_PRAGMAS
 #if defined(__clang__)
@@ -89,6 +91,7 @@
 #endif /* DISABLE_WARNING_PRAGMAS */
 
 #if !defined(STDC_Pragma_AVAILABLE)
+#error not good
 #define DISABLE_WARNING_UNREACHABLE_CODE
 #define DISABLE_WARNING_FORMAT_NONLITERAL
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT

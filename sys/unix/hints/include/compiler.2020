@@ -27,32 +27,35 @@ endif
 #CXX=clang++ -std=gnu++11
 
 CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
-
-ifndef WANT_WIN_QT
-ifndef WANT_LIBNH
-#	these are normally used when compiling nethack's core
-#	but -ansi forces -std=c90 for C or -std=c++98 for C++;
-#	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
-#In file included from .../qt5/include/QtCore/qglobal.h:105:
-#.../qt5/include/QtCore/qcompilerdetection.h:561:6:
-#  error Qt requires a C++11 compiler and yours does not seem to be that.
-#	so we suppress -ansi when the build includes Qt
-#CFLAGS+=-ansi -Wno-long-long
-#CFLAGS+=-std=c99
-#
-#LIBNH's winshim requires C99 for the way it is currently coded
-endif
-endif
-
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
+CFLAGS+=-Wmissing-declarations
+CFLAGS+=-Wformat-nonliteral
 CFLAGS+=-DGCC_WARN
+# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
+# # leave it out by default.
+# #CFLAGS+=-Wunreachable-code
+# #
+#
+# the following are not allowed in C++
+CFLAGS+=-Wimplicit
 CFLAGS+=-Wimplicit-function-declaration
 CFLAGS+=-Wimplicit-int
-CFLAGS+=-Wmissing-declarations
 CFLAGS+=-Wmissing-prototypes
-CFLAGS+=-Wformat-nonliteral
+CFLAGS+=-Wold-style-definition
+CFLAGS+=-Wstrict-prototypes
+
+ifdef WANT_WIN_QT
+QTCXXFLAGS = -g -I../include -DNOTPARMDECL
+QTCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
+        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+QTCXXFLAGS+=-pedantic
+QTCXXFLAGS+=-Wmissing-declarations
+QTCXXFLAGS+=-Wformat-nonliteral
+QTCXXFLAGS+=-DGCC_WARN
+endif
+
 ifeq "$(CCISCLANG)" ""
 #gcc-specific here
 CFLAGS+=-Wmissing-parameter-type
@@ -62,15 +65,20 @@ ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
 #CFLAGS+=-Wno-format-overflow
 endif  #gcc version greater than or equal to 9
+
+ifdef WANT_WIN_QT
+# get the version of g++
+GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GPPGTEQ9)" "1"
+#QTCXXFLAGS+=-Wno-format-overflow
+endif  #g++ version greater than or equal to 9
+#QTCXXFLAGS+= -Wno-format-truncation
+QTCXXFLAGS+= -Wno-deprecated-copy
+endif  #WANT_WIN_QT
+
 else   # clang
 # clang-specific here
 endif  # clang
-# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
-# leave it out by default.
-#CFLAGS+=-Wunreachable-code
-#
-CFLAGS+=-Wold-style-definition
-CFLAGS+=-Wstrict-prototypes
 
 #end of compiler.2020
 #------------------------------------------------------------------------------
