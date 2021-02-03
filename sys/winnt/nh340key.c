@@ -183,7 +183,7 @@ ProcessKeystroke(
     if (portdebug) {
         char buf[BUFSZ];
         Sprintf(buf,
-                "PORTDEBUG (%s): ch=%u, sc=%u, vk=%d, sh=0x%X (ESC to end)",
+                "PORTDEBUG (%s): ch=%u, sc=%u, vk=%d, sh=0x%lX (ESC to end)",
                 shortdllname, ch, scan, vk, shiftstate);
         fprintf(stdout, "\n%s", buf);
     }
