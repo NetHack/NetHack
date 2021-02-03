@@ -136,6 +136,8 @@ curses_status_finish(void)
 
 static int changed_fields = 0;
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
                      int color_and_attr, unsigned long *colormasks)
@@ -201,6 +203,8 @@ curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
         changed_fields = 0;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 draw_status(void)
@@ -981,6 +985,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 extern const struct conditions_t conditions[]; /* botl.c */
 extern int cond_idx[CONDITION_COUNT];
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 curs_stat_conds(
     int vert_cond,     /* 0 => horizontal, 1 => vertical */
@@ -1103,6 +1109,8 @@ curs_stat_conds(
     }
     return;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* status_update() sets up values for horizontal status; do vertical */
 void

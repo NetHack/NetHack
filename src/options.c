@@ -4849,6 +4849,8 @@ handler_whatis_filter(void)
     return optn_ok;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static int
 handler_symset(int optidx)
 {
@@ -5025,6 +5027,8 @@ handler_symset(int optidx)
     g.opt_need_redraw = TRUE;
     return optidx;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int
 handler_autopickup_exception(void)
@@ -6150,6 +6154,8 @@ match_str2attr(const char *str, boolean complain)
 
 extern const char regex_id[]; /* from sys/share/<various>regex.{c,cpp} */
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* True: temporarily replace menu color entries with a fake set of menu
    colors, { "light blue"=light_blue, "blue"=blue, "red"=red, &c }, that
    illustrates most colors for use when the pick-a-color menu is rendered;
@@ -6202,6 +6208,8 @@ basic_menu_colors(boolean load_colors)
         g.menu_colorings = g.save_colorings;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
 query_color(const char *prompt)
@@ -6970,6 +6978,8 @@ static char fmtstr_doset[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
+DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after show_menucontrols() */
+
 static int
 optfn_o_autopickup_exceptions(int optidx UNUSED, int req, boolean negated UNUSED,
               char *opts, char *op UNUSED)
@@ -7340,6 +7350,7 @@ doset_add_menu(winid win,          /* window to add to */
              ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
+
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
 void
 show_menu_controls(winid win, boolean dolist)
@@ -7431,6 +7442,9 @@ show_menu_controls(winid win, boolean dolist)
         arg = "";
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 static int
 count_cond(void)
 {
@@ -7456,6 +7470,8 @@ count_apes(void)
 
     return numapes;
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* common to msg-types, menu-colors, autopickup-exceptions */
 static int
@@ -7503,6 +7519,8 @@ handle_add_list_remove(const char *optname, int numtotal)
     destroy_nhwindow(tmpwin);
     return opt_idx;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
 dotogglepickup(void)

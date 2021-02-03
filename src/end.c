@@ -385,6 +385,9 @@ done_hangup(int sig)
 #endif
 #endif /* NO_SIGNAL */
 
+DISABLE_WARNING_FORMAT_NONLITERAL /* one compiler warns if the format
+                                     string is the result of a ? x : y */
+
 void
 done_in_by(struct monst *mtmp, int how)
 {
@@ -503,6 +506,8 @@ done_in_by(struct monst *mtmp, int how)
     done(how);
     return;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* some special cases for overriding while-helpless reason */
 static const struct {

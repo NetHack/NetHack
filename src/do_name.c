@@ -96,6 +96,8 @@ getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
     putstr(tmpwin, 0, sbuf);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* the response for '?' help request in getpos() */
 static void
 getpos_help(boolean force, const char *goal)
@@ -224,6 +226,8 @@ getpos_help(boolean force, const char *goal)
     display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int QSORTCALLBACK
 cmp_coord_distu(const void *a, const void *b)
@@ -486,6 +490,8 @@ dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
     return buf;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* coordinate formatting for 'whatis_coord' option */
 char *
 coord_desc(int x, int y, char *outbuf, char cmode)
@@ -526,6 +532,8 @@ coord_desc(int x, int y, char *outbuf, char cmode)
     }
     return outbuf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 auto_describe(int cx, int cy)

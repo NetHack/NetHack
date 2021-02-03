@@ -205,6 +205,8 @@ discardexcess(FILE* rfile)
     } while (c != '\n' && c != EOF);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 readentry(FILE* rfile, struct toptenentry* tt)
 {
@@ -319,6 +321,8 @@ writeentry(FILE* rfile, struct toptenentry* tt)
     nsb_unmung_line(tt->death);
 #endif
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 #ifdef XLOGFILE
 
@@ -908,6 +912,8 @@ outheader(void)
     topten_print(linebuf);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* so>0: standout line; so=0: ordinary line */
 static void
 outentry(int rank, struct toptenentry* t1, boolean so)
@@ -1068,6 +1074,8 @@ outentry(int rank, struct toptenentry* t1, boolean so)
     } else
         topten_print(linebuf);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int
 score_wanted(

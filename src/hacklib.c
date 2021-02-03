@@ -572,6 +572,9 @@ ordin(int n)               /* note: should be non-negative */
                : (dd == 1) ? "st" : (dd == 2) ? "nd" : "rd";
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL  /* one compiler complains about
+                                      result of ?: for format string */
+
 /* make a signed digit string from a number */
 char *
 sitoa(int n)
@@ -581,6 +584,8 @@ sitoa(int n)
     Sprintf(buf, (n < 0) ? "%d" : "+%d", n);
     return buf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* return the sign of a number: -1, 0, or 1 */
 int

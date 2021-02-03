@@ -71,6 +71,8 @@ pre_mm_attack(struct monst *magr, struct monst *mdef)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static
 void
 missmm(register struct monst *magr, register struct monst *mdef,
@@ -90,6 +92,8 @@ missmm(register struct monst *magr, register struct monst *mdef,
     } else
         noises(magr, mattk);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*
  *  fightm()  -- fight some other monster

@@ -52,6 +52,7 @@ CFLAGS+=-Wimplicit-function-declaration
 CFLAGS+=-Wimplicit-int
 CFLAGS+=-Wmissing-declarations
 CFLAGS+=-Wmissing-prototypes
+CFLAGS+=-Wformat-nonliteral
 ifeq "$(CCISCLANG)" ""
 #gcc-specific here
 CFLAGS+=-Wmissing-parameter-type

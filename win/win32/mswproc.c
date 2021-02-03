@@ -3072,6 +3072,9 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percent, int color, u
                    longs telling which conditions should be displayed in each
                    color and attriubte.
 */
+
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *condmasks)
 {
@@ -3172,4 +3175,6 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, 
             (WPARAM)MSNH_MSG_UPDATE_STATUS, (LPARAM)&update_cmd_data);
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 

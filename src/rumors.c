@@ -45,6 +45,8 @@ static void init_oracles(dlb *);
 static void others_check(const char *ftype, const char *, winid *);
 static void couldnt_open_file(const char *);
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 init_rumors(dlb* fp)
 {
@@ -69,6 +71,8 @@ init_rumors(dlb* fp)
         (void) dlb_fclose(fp);
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* exclude_cookie is a hack used because we sometimes want to get rumors in a
  * context where messages such as "You swallowed the fortune!" that refer to
@@ -272,6 +276,8 @@ rumor_check(void)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
 static void
 others_check(const char* ftype, const char* fname, winid* winptr)
@@ -372,6 +378,8 @@ others_check(const char* ftype, const char* fname, winid* winptr)
         couldnt_open_file(fname);
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Gets a random line of text from file 'fname', and returns it.
    rng is the random number generator to use, and should act like rn2 does. */

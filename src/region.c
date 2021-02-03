@@ -802,6 +802,8 @@ rest_regions(NHFILE* nhfp)
             reset_region_mids(g.regions[i]);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 region_stats(const char* hdrfmt, char* hdrbuf, long* count, long* size)
@@ -824,6 +826,8 @@ region_stats(const char* hdrfmt, char* hdrbuf, long* count, long* size)
     }
     /* ? */
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* update monster IDs for region being loaded from bones; `ghostly' implied */
 static void

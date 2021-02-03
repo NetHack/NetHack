@@ -5256,6 +5256,8 @@ resist(struct monst *mtmp, char oclass, int damage, int tell)
 
 #define MAXWISHTRY 5
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 wishcmdassist(int triesleft)
 {
@@ -5312,6 +5314,8 @@ wishcmdassist(int triesleft)
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 makewish(void)

@@ -1425,6 +1425,8 @@ do_look(int mode, coord *click_cc)
     return 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL /* RESTORE is after do_supplemental_info() */
+
 static void
 look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
          boolean do_mons) /* True => monsters, False => objects */
@@ -1599,6 +1601,8 @@ do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
         }
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the '/' command */
 int
@@ -2098,6 +2102,8 @@ static const struct {
     { (void (*)(void)) 0, (char *) 0 }
 };
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* the '?' command */
 int
 dohelp(void)
@@ -2134,6 +2140,8 @@ dohelp(void)
     }
     return 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the 'V' command; also a choice for '?' */
 int

@@ -29,7 +29,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Gs /Oi- /w44774 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -43,7 +43,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="@(Lua)">
-      <DisableSpecificWarnings>4701;4702;4244;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4701;4702;4244;4310;4774</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />

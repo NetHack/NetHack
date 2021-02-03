@@ -799,6 +799,8 @@ is_innate(int propidx)
     return FROM_NONE;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 char *
 from_what(int propidx) /* special cases can have negative values */
 {
@@ -890,6 +892,8 @@ from_what(int propidx) /* special cases can have negative values */
     } /*wizard*/
     return buf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 adjabil(int oldlevel, int newlevel)

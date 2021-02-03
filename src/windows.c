@@ -888,6 +888,8 @@ genl_status_enablefield(int fieldidx, const char *nm, const char *fmt,
     status_activefields[fieldidx] = enable;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* call once for each field, then call with BL_FLUSH to output the result */
 void
 genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
@@ -1067,6 +1069,8 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
     curs(WIN_STATUS, 1, 1);
     putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static struct window_procs dumplog_windowprocs_backup;
 static FILE *dumplog_file;

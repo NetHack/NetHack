@@ -678,8 +678,10 @@ scall  =
 # 4244 conversion possible loss of data
 # 4245 conversion from 'char' to 'uchar', signed/unsigned mismatch
 # 4100 unreferenced formal parameter
+# 4774 format string is not a string literal (default is off at W4)
+#
 #cflags = $(cflags:-W3=-W4) -wd4131 -wd4820 -wd4706 -wd4244 -wd4245 -wd4100
-cflags = $(cflags:-W3=-W4) -wd4820 -wd4706 -wd4244 -wd4245 -wd4100 -wd4310
+cflags = $(cflags:-W3=-W4) -wd4820 -wd4706 -wd4244 -wd4245 -wd4100 -wd4310 -w44774
 !ENDIF
 
 #More verbose warning output options below

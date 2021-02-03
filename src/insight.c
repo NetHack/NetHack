@@ -2316,6 +2316,8 @@ dovanquished(void)
     return 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* #wizborn extended command */
 int
 doborn(void)
@@ -2348,6 +2350,8 @@ doborn(void)
 
     return 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* high priests aren't unique but are flagged as such to simplify something */
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \

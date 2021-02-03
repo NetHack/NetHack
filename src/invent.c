@@ -2320,6 +2320,8 @@ prinv(const char *prefix, struct obj *obj, long quan)
           xprname(obj, (char *) 0, obj_to_let(obj), TRUE, 0L, quan));
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 char *
 xprname(struct obj *obj,
         const char *txt, /* text to print instead of obj */
@@ -2364,6 +2366,8 @@ xprname(struct obj *obj,
 
     return li;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the 'i' command */
 int
@@ -3781,6 +3785,8 @@ static NEARDATA const char *names[] = {
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 char *
 let_to_name(char let, boolean unpaid, boolean showsym)
 {
@@ -3822,6 +3828,8 @@ let_to_name(char let, boolean unpaid, boolean showsym)
     }
     return g.invbuf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* release the static buffer used by let_to_name() */
 void

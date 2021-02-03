@@ -2517,6 +2517,8 @@ load_mapseen(NHFILE *nhfp)
     return load;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 overview_stats(winid win, const char *statsfmt,
@@ -2558,6 +2560,8 @@ overview_stats(winid win, const char *statsfmt,
     *total_count += ocount + bcount + acount;
     *total_size += osize + bsize + asize;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.

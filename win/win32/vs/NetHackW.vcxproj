@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Gs /Oi- /w44774 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -37,7 +37,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="@(Lua)">
-      <DisableSpecificWarnings>4701;4702;4244;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4701;4702;4244;4310;4774</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />

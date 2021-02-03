@@ -548,6 +548,8 @@ mon_is_gecko(struct monst* mon)
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static int
 domonnoise(register struct monst* mtmp)
 {
@@ -1047,6 +1049,8 @@ domonnoise(register struct monst* mtmp)
     }
     return 1;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* #chat command */
 int

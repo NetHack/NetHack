@@ -337,6 +337,8 @@ book_cursed(struct obj* book)
         stop_occupation();
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static int
 learn(void)
 {
@@ -434,6 +436,8 @@ learn(void)
     g.context.spbook.o_id = 0;
     return 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
 study_book(register struct obj* spellbook)
@@ -1628,6 +1632,8 @@ dovspell(void)
     return 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static boolean
 dospellmenu(
     const char *prompt,
@@ -1711,6 +1717,8 @@ dospellmenu(
     }
     return FALSE;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int
 percent_success(int spell)

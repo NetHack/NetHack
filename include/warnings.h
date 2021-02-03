@@ -12,8 +12,11 @@
  * When STDC_Pragma_AVAILABLE is not defined, these are defined as no-ops:
  *     DISABLE_WARNING_UNREACHABLE_CODE
  *     DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+ *     DISABLE_WARNING_FORMAT_NONLITERAL
  *       ...
  *     RESTORE_WARNINGS
+ *     RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+ *     RESTORE_WARNING_FORMAT_NONLITERAL
  *
  */
 
@@ -34,8 +37,12 @@
 #define DISABLE_WARNING_UNREACHABLE_CODE \
                            _Pragma("clang diagnostic push") \
                            _Pragma("clang diagnostic ignored \"-Wunreachable-code\"")
+#define DISABLE_WARNING_FORMAT_NONLITERAL \
+                           _Pragma("clang diagnostic push") \
+                           _Pragma("clang diagnostic ignored \"-Wformat-nonliteral\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+#define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("clang diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 #define STDC_Pragma_AVAILABLE
 
@@ -44,8 +51,12 @@
 #define DISABLE_WARNING_UNREACHABLE_CODE \
                            _Pragma("GCC diagnostic push") \
                            _Pragma("GCC diagnostic ignored \"-Wunreachable-code\"")
+#define DISABLE_WARNING_FORMAT_NONLITERAL \
+                           _Pragma("GCC diagnostic push") \
+                           _Pragma("GCC diagnostic ignored \"-Wformat-nonliteral\"")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+#define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("GCC diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
 #define STDC_Pragma_AVAILABLE
 
@@ -53,10 +64,14 @@
 #define DISABLE_WARNING_UNREACHABLE_CODE \
                            _Pragma("warning( push )") \
                            _Pragma("warning( disable : 4702 )")
+#define DISABLE_WARNING_FORMAT_NONLITERAL \
+                           _Pragma("warning( push )") \
+                           _Pragma("warning( disable : 4774 )")
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT \
                            _Pragma("warning( push )") \
                            _Pragma("warning( disable : 4127 )")
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT _Pragma("warning( pop )")
+#define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("warning( pop )")
 #define RESTORE_WARNINGS _Pragma("warning( pop )")
 #define STDC_Pragma_AVAILABLE
 
@@ -70,8 +85,10 @@
 
 #if !defined(STDC_Pragma_AVAILABLE)
 #define DISABLE_WARNING_UNREACHABLE_CODE
+#define DISABLE_WARNING_FORMAT_NONLITERAL
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+#define RESTORE_WARNING_FORMAT_NONLITERAL
 #define RESTORE_WARNINGS
 #endif
 

@@ -1234,6 +1234,8 @@ rest_engravings(NHFILE *nhfp)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
@@ -1247,6 +1249,8 @@ engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
         *size += (long) sizeof *ep + (long) ep->engr_lth;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 del_engr(register struct engr *ep)
