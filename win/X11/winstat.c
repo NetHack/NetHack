@@ -642,6 +642,8 @@ tt_status_fixup(void)
     XtGetValues(X11_status_labels[0], args, num_args);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* core requests updating one status field (or is indicating that it's time
    to flush all updated fields); tty-style handling */
 static void
@@ -809,6 +811,8 @@ X11_status_update_tty(int fld, genericptr_t ptr, int chg UNUSED, int percent,
        that nethack will immediately ask for input (triggering auto-flush) */
     (void) XFlush(XtDisplay(X11_status_labels[0]));
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*ARGSUSED*/
 static void
@@ -1444,6 +1448,8 @@ hilight_label(Widget w) /* label widget */
     swap_fg_bg(w);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 update_val(struct X_status_value *attr_rec, long new_value)
 {
@@ -1651,6 +1657,8 @@ update_val(struct X_status_value *attr_rec, long new_value)
         attr_rec->after_init = TRUE;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* overloaded condition is being cleared without going through update_val()
    so that an alternate can be shown; put this one back to default settings */

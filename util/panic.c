@@ -22,6 +22,8 @@ extern void vms_abort(void);
 boolean panicking;
 void panic(const char *, ...);
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void panic
 VA_DECL(const char *, str)
 {
@@ -45,6 +47,8 @@ VA_DECL(const char *, str)
     VA_END();
     exit(EXIT_FAILURE); /* redundant */
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 #ifdef ALLOCA_HACK
 /*
