@@ -550,6 +550,8 @@ fixup_death(int how)
 #define NOTIFY_NETHACK_BUGS
 #endif
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*VARARGS1*/
 void panic
 VA_DECL(const char *, str)
@@ -629,6 +631,8 @@ VA_DECL(const char *, str)
     VA_END();
     really_done(PANICKED);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static boolean
 should_query_disclose_option(int category, char *defquery)

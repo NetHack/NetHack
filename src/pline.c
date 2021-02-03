@@ -80,6 +80,8 @@ putmesg(const char *line)
 
 static void vpline(const char *, va_list);
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 pline(const char *line, ...)
 {
@@ -198,6 +200,8 @@ vpline(const char *line, va_list the_args)
 pline_done:
     --in_pline;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* pline() variant which can override MSGTYPE handling or suppress
    message history (tty interface uses pline() to issue prompts and
@@ -390,6 +394,8 @@ raw_printf(const char *line, ...)
     va_end(the_args);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 vraw_printf(const char *line, va_list the_args)
 {
@@ -450,6 +456,8 @@ impossible(const char *s, ...)
     g.program_state.in_impossible = 0;
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
 static boolean use_pline_handler = TRUE;
 
@@ -496,6 +504,8 @@ execplinehandler(const char *line)
  */
 static void vconfig_error_add(const char *, va_list);
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 config_error_add(const char *str, ...)
 {
@@ -527,6 +537,8 @@ vconfig_error_add(const char *str, va_list the_args)
     buf[BUFSZ - 1] = '\0';
     config_erradd(buf);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* nhassert_failed is called when an nhassert's condition is false */
 void
