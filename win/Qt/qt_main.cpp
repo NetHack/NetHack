@@ -1385,7 +1385,8 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
 	switch (act) {
         case 0:
             // See dosave() function
-            ok = dosave0();
+            // ok = dosave0();
+            (void) dosave0();
             break;
         case 1:
             // quit -- bypass the prompting preformed by done2()
