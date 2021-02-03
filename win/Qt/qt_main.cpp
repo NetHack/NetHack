@@ -1374,7 +1374,7 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 // game window's Close button has been activated
 void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
 {
-    int ok = 0;
+//    int ok = 0;
     if ( g.program_state.something_worth_saving ) {
         /* this used to offer "Save" and "Cancel"
            but cancel (ignoring the close attempt) won't work
@@ -1389,7 +1389,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
             break;
         case 1:
             // quit -- bypass the prompting preformed by done2()
-            ok = 1;
+//            ok = 1;
             g.program_state.stopprint++;
             ::done(QUIT);
             /*NOTREACHED*/
@@ -1397,7 +1397,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
 	}
     } else {
         /* nothing worth saving; just close/quit */
-        ok = 1;
+//        ok = 1;
     }
     /* if !ok, we should try to continue, but we don't... */
     u.uhp = -1;
