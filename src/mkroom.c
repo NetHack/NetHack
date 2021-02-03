@@ -5,7 +5,7 @@
 
 /*
  * Entry points:
- *      mkroom() -- make and stock a room of a given type
+ *      do_mkroom() -- make and stock a room of a given type
  *      nexttodoor() -- return TRUE if adjacent to a door
  *      has_dnstairs() -- return TRUE if given room has a down staircase
  *      has_upstairs() -- return TRUE if given room has an up staircase
@@ -43,7 +43,7 @@ isbig(struct mkroom* sroom)
 
 /* make and stock a room of a given type */
 void
-mkroom(int roomtype)
+do_mkroom(int roomtype)
 {
     if (roomtype >= SHOPBASE)
         mkshop(); /* someday, we should be able to specify shop type */

@@ -2732,7 +2732,7 @@ use_whip(struct obj *obj)
     if (proficient < 0)
         proficient = 0;
 
-    if (u.uswallow && attack(u.ustuck)) {
+    if (u.uswallow && do_attack(u.ustuck)) {
         There("is not enough room to flick your bullwhip.");
 
     } else if (Underwater) {
@@ -2806,7 +2806,7 @@ use_whip(struct obj *obj)
             if (bigmonst(mtmp->data)) {
                 wrapped_what = strcpy(buf, mon_nam(mtmp));
             } else if (proficient) {
-                if (attack(mtmp))
+                if (do_attack(mtmp))
                     return 1;
                 else
                     pline1(msg_snap);
@@ -2936,7 +2936,7 @@ use_whip(struct obj *obj)
             else
                 You("flick your bullwhip towards %s.", mon_nam(mtmp));
             if (proficient) {
-                if (attack(mtmp))
+                if (do_attack(mtmp))
                     return 1;
                 else
                     pline1(msg_snap);

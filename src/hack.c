@@ -1612,22 +1612,22 @@ domove_core(void)
     /* attack monster */
     if (mtmp) {
         /* don't stop travel when displacing pets; if the
-           displace fails for some reason, attack() in uhitm.c
+           displace fails for some reason, do_attack() in uhitm.c
            will stop travel rather than domove */
         if (!is_safemon(mtmp) || g.context.forcefight)
             nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
-        /* or if it hides_under, in which case we call attack() to print
+        /* or if it hides_under, in which case we call do_attack() to print
          * the Wait! message.
          * This is different from ceiling hiders, who aren't handled in
-         * attack().
+         * do_attack().
          */
 
         /* If they used a 'm' command, trying to move onto a monster
          * prints the below message and wastes a turn.  The exception is
          * if the monster is unseen and the player doesn't remember an
-         * invisible monster--then, we fall through to attack() and
+         * invisible monster--then, we fall through to do_attack() and
          * attack_check(), which still wastes a turn, but prints a
          * different message and makes the player remember the monster.
          */
@@ -1663,7 +1663,7 @@ domove_core(void)
 
             /* try to attack; note that it might evade;
                also, we don't attack tame when _safepet_ */
-            else if (attack(mtmp))
+            else if (do_attack(mtmp))
                 return;
         }
     }
@@ -1826,7 +1826,7 @@ domove_core(void)
 
     /*
      * If safepet at destination then move the pet to the hero's
-     * previous location using the same conditions as in attack().
+     * previous location using the same conditions as in do_attack().
      * there are special extenuating circumstances:
      * (1) if the pet dies then your god angers,
      * (2) if the pet gets trapped then your god may disapprove.
@@ -2062,7 +2062,7 @@ boolean
 overexertion(void)
 {
     /* this used to be part of domove() when moving to a monster's
-       position, but is now called by attack() so that it doesn't
+       position, but is now called by do_attack() so that it doesn't
        execute if you decline to attack a peaceful monster */
     gethungry();
     if ((g.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {

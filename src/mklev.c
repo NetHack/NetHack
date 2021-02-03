@@ -923,34 +923,34 @@ makelevel(void)
          * note that mkroom doesn't guarantee a room gets created, and that this
          * step only sets the room's rtype - it doesn't fill it yet. */
         if (wizard && nh_getenv("SHOPTYPE"))
-            mkroom(SHOPBASE);
+            do_mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
                  && g.nroom >= room_threshold && rn2(u_depth) < 3)
-            mkroom(SHOPBASE);
+            do_mkroom(SHOPBASE);
         else if (u_depth > 4 && !rn2(6))
-            mkroom(COURT);
+            do_mkroom(COURT);
         else if (u_depth > 5 && !rn2(8)
                  && !(g.mvitals[PM_LEPRECHAUN].mvflags & G_GONE))
-            mkroom(LEPREHALL);
+            do_mkroom(LEPREHALL);
         else if (u_depth > 6 && !rn2(7))
-            mkroom(ZOO);
+            do_mkroom(ZOO);
         else if (u_depth > 8 && !rn2(5))
-            mkroom(TEMPLE);
+            do_mkroom(TEMPLE);
         else if (u_depth > 9 && !rn2(5)
                  && !(g.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
-            mkroom(BEEHIVE);
+            do_mkroom(BEEHIVE);
         else if (u_depth > 11 && !rn2(6))
-            mkroom(MORGUE);
+            do_mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
-            mkroom(ANTHOLE);
+            do_mkroom(ANTHOLE);
         else if (u_depth > 14 && !rn2(4)
                  && !(g.mvitals[PM_SOLDIER].mvflags & G_GONE))
-            mkroom(BARRACKS);
+            do_mkroom(BARRACKS);
         else if (u_depth > 15 && !rn2(6))
-            mkroom(SWAMP);
+            do_mkroom(SWAMP);
         else if (u_depth > 16 && !rn2(8)
                  && !(g.mvitals[PM_COCKATRICE].mvflags & G_GONE))
-            mkroom(COCKNEST);
+            do_mkroom(COCKNEST);
 
  skip0:
         /* Place multi-dungeon branch. */

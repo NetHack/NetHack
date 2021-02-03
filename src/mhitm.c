@@ -197,7 +197,7 @@ mdisplacem(register struct monst *magr, register struct monst *mdef,
     if (m_at(fx, fy) != magr || m_at(tx, ty) != mdef)
         return MM_MISS;
 
-    /* The 1 in 7 failure below matches the chance in attack()
+    /* The 1 in 7 failure below matches the chance in do_attack()
      * for pet displacement.
      */
     if (!rn2(7))

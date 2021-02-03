@@ -93,7 +93,7 @@ erode_armor(struct monst *mdef, int hurt)
 /* FALSE means it's OK to attack */
 boolean
 attack_checks(struct monst *mtmp,
-              struct obj *wep) /* uwep for attack(), null for kick_monster() */
+              struct obj *wep) /* uwep for do_attack(), null for kick_monster() */
 {
     int glyph;
 
@@ -319,7 +319,7 @@ find_roll_to_hit(struct monst *mtmp,
 /* try to attack; return False if monster evaded;
    u.dx and u.dy must be set */
 boolean
-attack(struct monst *mtmp)
+do_attack(struct monst *mtmp)
 {
     register struct permonst *mdat = mtmp->data;
 
@@ -571,7 +571,8 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
                                &attknum, &armorpenalty);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
-        g.bhitpos.x = tx, g.bhitpos.y = ty; /* normally set up by attack() */
+        g.bhitpos.x = tx, g.bhitpos.y = ty; /* normally set up by
+					       do_attack() */
         (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);

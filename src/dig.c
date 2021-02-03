@@ -1029,7 +1029,7 @@ use_pick_axe2(struct obj *obj)
     boolean ispick = is_pick(obj);
     const char *verbing = ispick ? "digging" : "chopping";
 
-    if (u.uswallow && attack(u.ustuck)) {
+    if (u.uswallow && do_attack(u.ustuck)) {
         ; /* return 1 */
     } else if (Underwater) {
         pline("Turbulence torpedoes your %s attempts.", verbing);
@@ -1060,7 +1060,7 @@ use_pick_axe2(struct obj *obj)
             return 1;
         }
         lev = &levl[rx][ry];
-        if (MON_AT(rx, ry) && attack(m_at(rx, ry)))
+        if (MON_AT(rx, ry) && do_attack(m_at(rx, ry)))
             return 1;
         dig_target = dig_typ(obj, rx, ry);
         if (dig_target == DIGTYP_UNDIGGABLE) {

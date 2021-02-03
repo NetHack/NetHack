@@ -1347,7 +1347,7 @@ extern struct obj *init_dummyobj(struct obj *, short, long);
 
 /* ### mkroom.c ### */
 
-extern void mkroom(int);
+extern void do_mkroom(int);
 extern void fill_zoo(struct mkroom *);
 extern struct permonst *antholemon(void);
 extern boolean nexttodoor(int, int);
@@ -2630,7 +2630,7 @@ extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);
 extern int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
-extern boolean attack(struct monst *);
+extern boolean do_attack(struct monst *);
 extern boolean hmon(struct monst *, struct obj *, int, int);
 extern boolean shade_miss(struct monst *, struct monst *, struct obj *,
                           boolean, boolean);
