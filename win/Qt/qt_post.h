@@ -10,6 +10,6 @@
 #pragma clang diagnostic pop
 #elif defined(__GNUC__) && defined(__cplusplus)
 #pragma GCC diagnostic pop
-#endif /* OS-specific bits */
+#endif /* compiler-specific bits */
 
 /*qt_post.h*/
