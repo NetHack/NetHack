@@ -565,6 +565,8 @@ QHBoxLayout *NetHackQtStatusWindow::InitHitpointBar()
     return hpbar; // caller will add our result to vbox layout
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 // when hitpoint bar is enabled, calculate and draw it, otherwise remove it
 void NetHackQtStatusWindow::HitpointBar()
 {
@@ -664,6 +666,8 @@ void NetHackQtStatusWindow::HitpointBar()
         alreadyfullhp = false;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*
  * Update the displayed status.  The current code in botl.c updates

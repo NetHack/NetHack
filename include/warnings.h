@@ -31,6 +31,11 @@
 #define ACTIVATE_WARNING_PRAGMAS
 #endif
 #endif
+#if defined(__clang__) && defined(__cplusplus)
+#ifndef ACTIVATE_WARNING_PRAGMAS
+#define ACTIVATE_WARNING_PRAGMAS
+#endif
+#endif
 
 #ifdef ACTIVATE_WARNING_PRAGMAS
 #if defined(__clang__)

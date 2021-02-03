@@ -1257,6 +1257,8 @@ shuffle_int_array(int *indices, int count)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*
  * Wrap snprintf for use in the main code.
  *
@@ -1291,5 +1293,7 @@ nh_snprintf(const char *func, int line, char *str, size_t size,
         str[size-1] = 0; /* make sure it is nul terminated */
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*hacklib.c*/
