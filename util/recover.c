@@ -417,6 +417,7 @@ exepath(char *str)
 
     if (!str)
         return (char *) 0;
+    nhUse(bsize);
     bsize = EXEPATHBUFSZ;
     tmp = exepathbuf;
 #if !defined(WIN32)
