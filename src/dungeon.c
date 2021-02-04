@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1605305480 2020/11/13 22:11:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1612400967 2021/02/04 01:09:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -753,6 +753,10 @@ init_dungeons(void)
     pd.n_levs = pd.n_brs = 0;
 
     L = nhl_init();
+    if (!L) {
+        panic1("'nhl_init' failed; can't continue.");
+        /*NOTREACHED*/
+    }
     if (!nhl_loadlua(L, DUNGEON_FILE)) {
         char tbuf[BUFSZ];
         Sprintf(tbuf, "Cannot open dungeon description - \"%s", DUNGEON_FILE);

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.439 $ $NHDT-Date: 1612055953 2021/01/31 01:19:13 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.443 $ $NHDT-Date: 1612400970 2021/02/04 01:09:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -503,6 +503,7 @@ changes accompanying sorting of discoveries resulted in omitting very last
 	not scrolls or wands) and every item was actually discovered
 change to can_reach_floor() resulted in hero being unable to reach the floor
 	when held by a lichen
+panic if lua init fails
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
