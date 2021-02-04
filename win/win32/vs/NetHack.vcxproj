@@ -44,6 +44,7 @@
   <ItemGroup>
     <ClCompile Include="@(Lua)">
       <DisableSpecificWarnings>4701;4702;4244;4310;4774</DisableSpecificWarnings>
+      <AdditionalOptions>%(AdditionalOptions) /wd4774</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
