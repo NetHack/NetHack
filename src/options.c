@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1611456333 2021/01/24 02:45:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.496 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1612431350 2021/02/04 09:35:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.500 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -159,10 +159,24 @@ static const struct paranoia_opts {
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
+static NEARDATA const char *menutype[] = {
+    "traditional",  "combination",  "full",     "partial"
+};
+static NEARDATA const char *burdentype[] = {
+    "unencumbered", "burdened",     "stressed",
+    "strained",     "overtaxed",    "overloaded"
+};
+static NEARDATA const char *runmodes[] = {
+    "teleport",     "run",          "walk",     "crawl"
+};
+static NEARDATA const char *sortltype[] = {
+    "none",         "loot",         "full"
+};
+
 /*
  * Default menu manipulation command accelerators.  These may _not_ be:
  *
- *      + a number - reserved for counts
+ *      + a number or '#' - reserved for counts
  *      + an upper or lower case US ASCII letter - used for accelerators
  *      + ESC - reserved for escaping the menu
  *      + NULL, CR or LF - reserved for commiting the selection(s).  NULL
@@ -191,32 +205,26 @@ typedef struct {
     const char *desc;
 } menu_cmd_t;
 
-static NEARDATA const char *menutype[] = { "traditional", "combination",
-                                           "full", "partial" };
-
-static NEARDATA const char *burdentype[] = { "unencumbered", "burdened",
-                                             "stressed",     "strained",
-                                             "overtaxed",    "overloaded" };
-
-static NEARDATA const char *runmodes[] = { "teleport", "run", "walk",
-                                           "crawl" };
-
-static NEARDATA const char *sortltype[] = { "none", "loot", "full" };
-
 static const menu_cmd_t default_menu_cmd_info[] = {
- { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
- { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
- { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
- { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
- { "menu_select_all", MENU_SELECT_ALL, "Select all items in entire menu" },
- { "menu_invert_all", MENU_INVERT_ALL, "Invert selection for all items" },
- { "menu_deselect_all", MENU_UNSELECT_ALL,
-                                        "Unselect all items in entire menu" },
- { "menu_select_page", MENU_SELECT_PAGE, "Select all items on current page" },
- { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page's selections" },
- { "menu_deselect_page", MENU_UNSELECT_PAGE,
-                                       "Unselect all items on current page" },
- { "menu_search", MENU_SEARCH, "Search and invert matching items" },
+    { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
+    { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+    { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
+    { "menu_last_page",     MENU_LAST_PAGE,     "Go to last page" },
+    { "menu_select_all",    MENU_SELECT_ALL,
+                            "Select all items in entire menu" },
+    { "menu_invert_all",    MENU_INVERT_ALL,
+                            "Invert selection for all items" },
+    { "menu_deselect_all",  MENU_UNSELECT_ALL,
+                            "Unselect all items in entire menu" },
+    { "menu_select_page",   MENU_SELECT_PAGE,
+                            "Select all items on current page" },
+    { "menu_invert_page",   MENU_INVERT_PAGE,
+                            "Invert current page's selections" },
+    { "menu_deselect_page", MENU_UNSELECT_PAGE,
+                            "Unselect all items on current page" },
+    { "menu_search",        MENU_SEARCH,
+                            "Search and invert matching items" },
+    { (char *) 0, '\0', (char *) 0 }
 };
 
 static void nmcpy(char *, const char *, int);
@@ -7382,7 +7390,7 @@ show_menu_controls(winid win, boolean dolist)
         int i;
 
         fmt = "%-7s %s";
-        for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+        for (i = 0; default_menu_cmd_info[i].desc; i++) {
             Sprintf(buf, fmt,
                     visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
                     default_menu_cmd_info[i].desc);
