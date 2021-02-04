@@ -1061,7 +1061,6 @@
 				"$(NH_DAT_DIR)/bogusmon",
 				"$(NH_DAT_DIR)/cmdhelp",
 				"$(NH_DAT_DIR)/data",
-				"$(NH_DAT_DIR)/earth.lua",
 				"$(NH_DAT_DIR)/engrave",
 				"$(NH_DAT_DIR)/epitaph",
 				"$(NH_DAT_DIR)/help",
