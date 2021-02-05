@@ -487,7 +487,7 @@ check_misc_menu_command(char *opts, char *op UNUSED)
     const char *name_to_check;
 
     /* check for menu command mapping */
-    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+    for (i = 0; default_menu_cmd_info[i].name; i++) {
         name_to_check = default_menu_cmd_info[i].name;
         if (match_optname(opts, name_to_check,
                           (int) strlen(name_to_check), TRUE))
@@ -6021,7 +6021,7 @@ parsebindings(char *bindings)
         return TRUE;
 
     /* is it a menu command? */
-    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+    for (i = 0; default_menu_cmd_info[i].name; i++) {
         if (!strcmp(default_menu_cmd_info[i].name, bind)) {
             if (illegal_menu_cmd_key(key)) {
                 config_error_add("Bad menu key %s:%s", visctrl(key), bind);
