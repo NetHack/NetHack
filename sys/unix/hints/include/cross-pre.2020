@@ -106,19 +106,9 @@ PDCOBJS = $(TARGETPFX)pdcclip.o $(TARGETPFX)pdcdisp.o \
 		$(TARGETPFX)pdcutil.o
 override TARGET_LIBS += $(PDCLIB)
 ifdef CROSS_TO_MSDOS
-PDCINCL += -I$(PDCTOP)/dos
-endif
-ifdef CROSS_TO_AMIGA
-PDCINCL += -I$(PDCTOP)/sdl1 -I/opt/amiga/m68k-amigaos/include/SDL
-override TARGET_LIBS += -lSDL
 endif
 override BUILDMORE += $(PDCLIB)
 override CLEANMORE += rm -f $(PDCLIB) ;
-ifndef CROSS_TO_MSDOS
-# Rules for PDCurses files
-$(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
-	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
-endif  # CROSS_TO_MSDOS
 else   #WANT_WIN_CURSES
 PDCURSESDEF=
 PDCLIBOBJS=
@@ -157,10 +147,18 @@ override TARGET_STUBEDIT = ../lib/djgpp/i586-pc-msdosdjgpp/bin/stubedit
 MSDOS_TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) \
 	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
-        -Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
-        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings \
-        -Wimplicit-function-declaration -Wimplicit-int -Wmissing-parameter-type
-override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations -Wmissing-prototypes
+        -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
+        -Wformat -Wswitch -Wshadow -Wwrite-strings \
+	-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
+	-Wmissing-parameter-type -Wold-style-definition -Wstrict-prototypes \
+	-DGCC_WARN
+PDCINCL += -I$(PDCTOP)/dos
+PDC_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
+			-Wno-missing-prototypes
+LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
+override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations \
+			-Wmissing-prototypes -pedantic -Wmissing-declarations \
+			-Wformat-nonliteral
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc
 override TARGET_LFLAGS=
@@ -189,14 +187,9 @@ override CLEANMORE += rm -f -r $(TARGETDIR) ;
 VARDATND += nhtiles.bmp
 #
 ifdef WANT_WIN_CURSES
-# Rules for PDCurses files
-$(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
-	$(TARGET_CC) $(PDCINCL) $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
-		-Wno-missing-prototypes -o$@  $<
 # rules for pdcurses dos-specific files
 $(TARGETPFX)%.o : $(PDCTOP)/dos/%.c
-	$(TARGET_CC) $(PDCINCL) $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
-		-Wno-missing-prototypes -o$@  $<
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 #
 # Rule for files in sys/msdos
@@ -285,6 +278,7 @@ WASM_TARGET_CFLAGS = -DCROSSCOMPILE_TARGET -DCROSS_TO_WASM
 override CFLAGS = $(WASM_CFLAGS)
 override TARGET_CFLAGS = $(EMCC_CFLAGS) $(WASM_CFLAGS) $(WASM_TARGET_CFLAGS)
 #
+LUA_TARGET_CFLAGS = $(TARGET_CFLAGS)
 override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 override TARGET_LINK = $(TARGET_CC)
 override TARGET_LFLAGS= $(EMCC_LFLAGS)
@@ -327,7 +321,7 @@ ifdef WANT_WIN_CURSES
 ifdef BUILD_PDCURSES
 # Rules for PDCurses files
 $(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
-	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -c -o$@  $<
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) -c -o$@  $<
 endif  # BUILD_PDCURSES
 endif  # WANT_WIN_CURSES
 
@@ -343,7 +337,7 @@ endif  # CROSS_SHARED
 ifdef BUILD_TARGET_LUA
 # Rule for LUA files
 $(TARGETPFX)%.o : $(LUATOP)/src/%.c
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(LUA_FLAGS) -o$@ $<
+	$(TARGET_CC) $(LUA_TARGET_CFLAGS) -c $(LUA_FLAGS) -o$@ $<
 endif  # BUILD_TARGET_LUA
 #
 # End of cross-compiling -PRE section

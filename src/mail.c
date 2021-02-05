@@ -452,6 +452,8 @@ ckmailstatus(void)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*ARGSUSED*/
 void
 readmail(struct obj *otmp UNUSED)
@@ -521,6 +523,8 @@ readmail(struct obj *otmp UNUSED)
     } else
         pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 #endif /* !UNIX && !VMS */
 
