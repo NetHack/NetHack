@@ -69,10 +69,21 @@ endif  #gcc version greater than or equal to 9
 GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GPPGTEQ9)" "1"
 CCXXFLAGS+=-Wformat-overflow
-endif  #g++ version greater than or equal to 9
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-copy
+endif  # WANT_WIN_QT
+endif  # g++ version greater than or equal to 9
 # end of gcc-specific
 
 else   # clang-specific follows
+# get the version of clang++
+CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(CLANGPPGTEQ9)" "1"
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-copy
+endif  # WANT_WIN_QT
+endif  #clang++ greater than or equal to 9
+
 ifdef WANT_WIN_QT
 CCXXFLAGS+=-Wno-deprecated-declarations
 endif  # WANT_WIN_QT
