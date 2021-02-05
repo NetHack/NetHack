@@ -562,9 +562,7 @@ read_s32(const unsigned char buf[4])
 /* Build a pixel structure, given the mask words in the second header and
  * a packed 16 or 32 bit pixel */
 static struct Pixel
-build_pixel(header, color)
-const struct BitmapInfoHeader *header;
-uint32 color;
+build_pixel(const struct BitmapInfoHeader *header, uint32 color)
 {
     struct Pixel pixel;
 
