@@ -378,6 +378,7 @@ spells that require a target spot rather than a direction (like skilled
 prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
+curses interface failed to honor menu_xxx option settings for menu interaction
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
