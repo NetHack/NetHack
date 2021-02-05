@@ -32,7 +32,6 @@ CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
 CFLAGS+=-Wformat-nonliteral
-CFLAGS+=-DGCC_WARN
 # As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
 # # leave it out by default.
 # #CFLAGS+=-Wunreachable-code
@@ -46,39 +45,42 @@ CFLAGS+=-Wmissing-prototypes
 CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
 
-ifdef WANT_WIN_QT
-QTCXXFLAGS = -g -I../include -DNOTPARMDECL
-QTCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
+CCXXFLAGS = -g -I../include -DNOTPARMDECL
+CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
-QTCXXFLAGS+=-pedantic
-QTCXXFLAGS+=-Wmissing-declarations
-QTCXXFLAGS+=-Wformat-nonliteral
-QTCXXFLAGS+=-DGCC_WARN
-endif
+CCXXFLAGS+=-pedantic
+CCXXFLAGS+=-Wmissing-declarations
+CCXXFLAGS+=-Wformat-nonliteral
 
 ifeq "$(CCISCLANG)" ""
-#gcc-specific here
+# gcc-specific follows
 CFLAGS+=-Wmissing-parameter-type
+ifdef WANT_WIN_QT
+CCXXFLAGS+= -Wno-deprecated-copy
+endif  # WANT_WIN_QT
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
-#CFLAGS+=-Wno-format-overflow
+CFLAGS+=-Wformat-overflow
 endif  #gcc version greater than or equal to 9
-
-ifdef WANT_WIN_QT
+#still in gcc-specific section here
 # get the version of g++
 GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GPPGTEQ9)" "1"
-#QTCXXFLAGS+=-Wno-format-overflow
+CCXXFLAGS+=-Wformat-overflow
 endif  #g++ version greater than or equal to 9
-#QTCXXFLAGS+= -Wno-format-truncation
-QTCXXFLAGS+= -Wno-deprecated-copy
-endif  #WANT_WIN_QT
+# end of gcc-specific
 
-else   # clang
-# clang-specific here
-endif  # clang
+else   # clang-specific follows
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # WANT_WIN_QT
+endif  # clang-specific ends here
+
+# enable some optional code in various NetHack source files
+CFLAGS+=-DGCC_WARN
+CCXXFLAGS+=-DGCC_WARN
 
 #end of compiler.2020
 #------------------------------------------------------------------------------
