@@ -70,6 +70,16 @@ Example:
  local loc = nh.getmap(x,y);
  nh.pline("Map location at (" .. x .. "," .. y .. ) is " .. (loc.lit ? "lit" : "unlit") );
 
+
+=== get_config
+
+Get current value of a boolean or a compound configuration option.
+
+Example:
+
+ local wt = nh.get_config("windowtype");
+
+
 === gettrap
 
 Get trap info at x,y
@@ -156,6 +166,15 @@ Example:
 
  local selected = nh.menu("prompt", default, pickX, { "a" = "option a", "b" = "option b" });
  local selected = nh.menu("prompt", default, pickX, { {key:"a", text:"option a"}, {key:"b", text:"option b"} } );
+
+
+=== parse_config
+
+Parse string as if it was read from a config file.
+
+Example:
+
+ nh.parse_config("OPTIONS=color");
 
 
 === pline

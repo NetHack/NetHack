@@ -25,6 +25,7 @@ static int nhl_setmap(lua_State *);
 #endif
 static int nhl_pline(lua_State *);
 static int nhl_verbalize(lua_State *);
+static int nhl_parse_config(lua_State *);
 static int nhl_menu(lua_State *);
 static int nhl_getlin(lua_State *);
 static int nhl_makeplural(lua_State *);
@@ -407,6 +408,35 @@ nhl_verbalize(lua_State *L)
     if (argc == 1)
         verbalize("%s", luaL_checkstring(L, 1));
     else
+        nhl_error(L, "Wrong args");
+
+    return 0;
+}
+
+/* parse_config("OPTIONS=!color") */
+static int
+nhl_parse_config(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1)
+        parse_conf_str(luaL_checkstring(L, 1), parse_config_line);
+    else
+        nhl_error(L, "Wrong args");
+
+    return 0;
+}
+
+/* local windowtype = get_config("windowtype"); */
+static int
+nhl_get_config(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        lua_pushstring(L, get_option_value(luaL_checkstring(L, 1)));
+        return 1;
+    } else
         nhl_error(L, "Wrong args");
 
     return 0;
@@ -798,6 +828,8 @@ static const struct luaL_Reg nhl_functions[] = {
     {"rn2", nhl_rn2},
     {"random", nhl_random},
     {"level_difficulty", nhl_level_difficulty},
+    {"parse_config", nhl_parse_config},
+    {"get_config", nhl_get_config},
     {NULL, NULL}
 };
 

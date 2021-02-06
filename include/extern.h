@@ -775,6 +775,7 @@ extern void nh_compress(const char *);
 extern void nh_uncompress(const char *);
 extern boolean lock_file(const char *, int, int);
 extern void unlock_file(const char *);
+extern boolean parse_config_line(char *);
 #ifdef USER_SOUNDS
 extern boolean can_read_file(const char *);
 #endif
@@ -784,6 +785,7 @@ extern int config_error_done(void);
 extern boolean read_config_file(const char *, int);
 extern void check_recordfile(const char *);
 extern void read_wizkit(void);
+extern boolean parse_conf_str(const char *str, boolean (*proc)(char *));
 extern int read_sym_file(int);
 extern int parse_sym_line(char *, int);
 extern void paniclog(const char *, const char *);
@@ -1782,6 +1784,7 @@ extern void initoptions(void);
 extern void initoptions_init(void);
 extern void initoptions_finish(void);
 extern boolean parseoptions(char *, boolean, boolean);
+extern char *get_option_value(const char *);
 extern int doset(void);
 extern int dotogglepickup(void);
 extern void option_help(void);

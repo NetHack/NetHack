@@ -3064,146 +3064,214 @@ read_wizkit(void)
     return;
 }
 
-/* parse_conf_file
- *
- * Read from file fp, handling comments, empty lines, config sections,
+struct _cnf_parser_state {
+    char *inbuf;
+    size_t inbufsz;
+    int rv;
+    char *ep;
+    char *buf;
+    boolean skip, morelines;
+    boolean cont;
+    boolean pbreak;
+};
+
+/* Initialize config parser data */
+static void
+cnf_parser_init(struct _cnf_parser_state *parser)
+{
+    parser->rv = TRUE; /* assume successful parse */
+    parser->ep = parser->buf = (char *) 0;
+    parser->skip = FALSE;
+    parser->morelines = FALSE;
+    parser->inbufsz = 4 * BUFSZ;
+    parser->inbuf = (char *) alloc(parser->inbufsz);
+    parser->cont = FALSE;
+    parser->pbreak = FALSE;
+    memset(parser->inbuf, 0, parser->inbufsz);
+}
+
+/*
+ * Parse config buffer, handling comments, empty lines, config sections,
  * CHOOSE, and line continuation, calling proc for every valid line.
  *
  * Continued lines are merged together with one space in between.
  */
+static void
+parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
+{
+    p->cont = FALSE;
+    p->pbreak = FALSE;
+    p->ep = index(p->inbuf, '\n');
+    if (p->skip) { /* in case previous line was too long */
+        if (p->ep)
+            p->skip = FALSE; /* found newline; next line is normal */
+    } else {
+        if (!p->ep) {  /* newline missing */
+            if (strlen(p->inbuf) < (p->inbufsz - 2)) {
+                /* likely the last line of file is just
+                   missing a newline; process it anyway  */
+                p->ep = eos(p->inbuf);
+            } else {
+                config_error_add("Line too long, skipping");
+                p->skip = TRUE; /* discard next fgets */
+            }
+        } else {
+            *p->ep = '\0'; /* remove newline */
+        }
+        if (p->ep) {
+            char *tmpbuf = (char *) 0;
+            int len;
+            boolean ignoreline = FALSE;
+            boolean oldline = FALSE;
+
+            /* line continuation (trailing '\') */
+            p->morelines = (--p->ep >= p->inbuf && *p->ep == '\\');
+            if (p->morelines)
+                *p->ep = '\0';
+
+            /* trim off spaces at end of line */
+            while (p->ep >= p->inbuf
+                   && (*p->ep == ' ' || *p->ep == '\t' || *p->ep == '\r'))
+                *p->ep-- = '\0';
+
+            if (!config_error_nextline(p->inbuf)) {
+                p->rv = FALSE;
+                if (p->buf)
+                    free(p->buf), p->buf = (char *) 0;
+                p->pbreak = TRUE;
+                return;
+            }
+
+            p->ep = p->inbuf;
+            while (*p->ep == ' ' || *p->ep == '\t')
+                ++p->ep;
+
+            /* ignore empty lines and full-line comment lines */
+            if (!*p->ep || *p->ep == '#')
+                ignoreline = TRUE;
+
+            if (p->buf)
+                oldline = TRUE;
+
+            /* merge now read line with previous ones, if necessary */
+            if (!ignoreline) {
+                len = (int) strlen(p->ep) + 1; /* +1: final '\0' */
+                if (p->buf)
+                    len += (int) strlen(p->buf) + 1; /* +1: space */
+                tmpbuf = (char *) alloc(len);
+                *tmpbuf = '\0';
+                if (p->buf) {
+                    Strcat(strcpy(tmpbuf, p->buf), " ");
+                    free(p->buf);
+                }
+                p->buf = strcat(tmpbuf, p->ep);
+                if (strlen(p->buf) >= p->inbufsz)
+                    p->buf[p->inbufsz - 1] = '\0';
+            }
+
+            if (p->morelines || (ignoreline && !oldline))
+                return;
+
+            if (handle_config_section(p->buf)) {
+                free(p->buf);
+                p->buf = (char *) 0;
+                return;
+            }
+
+            /* from here onwards, we'll handle buf only */
+
+            if (match_varname(p->buf, "CHOOSE", 6)) {
+                char *section;
+                char *bufp = find_optparam(p->buf);
+
+                if (!bufp) {
+                    config_error_add("Format is CHOOSE=section1,section2,...");
+                    p->rv = FALSE;
+                    free(p->buf);
+                    p->buf = (char *) 0;
+                    return;
+                }
+                bufp++;
+                if (g.config_section_chosen)
+                    free(g.config_section_chosen),
+                        g.config_section_chosen = 0;
+                section = choose_random_part(bufp, ',');
+                if (section) {
+                    g.config_section_chosen = dupstr(section);
+                } else {
+                    config_error_add("No config section to choose");
+                    p->rv = FALSE;
+                }
+                free(p->buf);
+                p->buf = (char *) 0;
+                return;
+            }
+
+            if (!(*proc)(p->buf))
+                p->rv = FALSE;
+
+            free(p->buf);
+            p->buf = (char *) 0;
+        }
+    }
+}
+
+boolean
+parse_conf_str(const char *str, boolean (*proc)(char *))
+{
+    size_t len;
+    struct _cnf_parser_state parser;
+
+    cnf_parser_init(&parser);
+    free_config_sections();
+    config_error_init(FALSE, "parse_conf_str", FALSE);
+    while (str && *str) {
+        len = 0;
+        while (*str && len < (parser.inbufsz-1)) {
+            parser.inbuf[len] = *str;
+            len++;
+            str++;
+            if (parser.inbuf[len-1] == '\n')
+                break;
+        }
+        parser.inbuf[len] = '\0';
+        parse_conf_buf(&parser, proc);
+        if (parser.pbreak)
+            break;
+    }
+
+    if (parser.buf)
+        free(parser.buf);
+
+    free_config_sections();
+    config_error_done();
+    return parser.rv;
+}
+
+/* parse_conf_file
+ *
+ * Read from file fp, calling parse_conf_buf for each line.
+ */
 static boolean
 parse_conf_file(FILE *fp, boolean (*proc)(char *))
 {
-    char inbuf[4 * BUFSZ];
-    boolean rv = TRUE; /* assume successful parse */
-    char *ep;
-    boolean skip = FALSE, morelines = FALSE;
-    char *buf = (char *) 0;
-    size_t inbufsz = sizeof inbuf;
+    struct _cnf_parser_state parser;
+
+    cnf_parser_init(&parser);
 
     free_config_sections();
 
-    while (fgets(inbuf, (int) inbufsz, fp)) {
-        ep = index(inbuf, '\n');
-        if (skip) { /* in case previous line was too long */
-            if (ep)
-                skip = FALSE; /* found newline; next line is normal */
-        } else {
-            if (!ep) {  /* newline missing */
-                if (strlen(inbuf) < (inbufsz - 2)) {
-                    /* likely the last line of file is just
-                       missing a newline; process it anyway  */
-                    ep = eos(inbuf);
-                } else {
-                    config_error_add("Line too long, skipping");
-                    skip = TRUE; /* discard next fgets */
-                }
-            } else {
-                *ep = '\0'; /* remove newline */
-            }
-            if (ep) {
-                char *tmpbuf = (char *) 0;
-                int len;
-                boolean ignoreline = FALSE;
-                boolean oldline = FALSE;
-
-                /* line continuation (trailing '\') */
-                morelines = (--ep >= inbuf && *ep == '\\');
-                if (morelines)
-                    *ep = '\0';
-
-                /* trim off spaces at end of line */
-                while (ep >= inbuf
-                       && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
-                    *ep-- = '\0';
-
-                if (!config_error_nextline(inbuf)) {
-                    rv = FALSE;
-                    if (buf)
-                        free(buf), buf = (char *) 0;
-                    break;
-                }
-
-                ep = inbuf;
-                while (*ep == ' ' || *ep == '\t')
-                    ++ep;
-
-                /* ignore empty lines and full-line comment lines */
-                if (!*ep || *ep == '#')
-                    ignoreline = TRUE;
-
-                if (buf)
-                    oldline = TRUE;
-
-                /* merge now read line with previous ones, if necessary */
-                if (!ignoreline) {
-                    len = (int) strlen(ep) + 1; /* +1: final '\0' */
-                    if (buf)
-                        len += (int) strlen(buf) + 1; /* +1: space */
-                    tmpbuf = (char *) alloc(len);
-                    *tmpbuf = '\0';
-                    if (buf) {
-                        Strcat(strcpy(tmpbuf, buf), " ");
-                        free(buf);
-                    }
-                    buf = strcat(tmpbuf, ep);
-                    if (strlen(buf) >= sizeof inbuf)
-                        buf[sizeof inbuf - 1] = '\0';
-                }
-
-                if (morelines || (ignoreline && !oldline))
-                    continue;
-
-                if (handle_config_section(buf)) {
-                    free(buf);
-                    buf = (char *) 0;
-                    continue;
-                }
-
-                /* from here onwards, we'll handle buf only */
-
-                if (match_varname(buf, "CHOOSE", 6)) {
-                    char *section;
-                    char *bufp = find_optparam(buf);
-
-                    if (!bufp) {
-                        config_error_add(
-                                    "Format is CHOOSE=section1,section2,...");
-                        rv = FALSE;
-                        free(buf);
-                        buf = (char *) 0;
-                        continue;
-                    }
-                    bufp++;
-                    if (g.config_section_chosen)
-                        free(g.config_section_chosen),
-                            g.config_section_chosen = 0;
-                    section = choose_random_part(bufp, ',');
-                    if (section) {
-                        g.config_section_chosen = dupstr(section);
-                    } else {
-                        config_error_add("No config section to choose");
-                        rv = FALSE;
-                    }
-                    free(buf);
-                    buf = (char *) 0;
-                    continue;
-                }
-
-                if (!(*proc)(buf))
-                    rv = FALSE;
-
-                free(buf);
-                buf = (char *) 0;
-            }
-        }
+    while (fgets(parser.inbuf, parser.inbufsz, fp)) {
+        parse_conf_buf(&parser, proc);
+        if (parser.pbreak)
+            break;
     }
 
-    if (buf)
-        free(buf);
+    if (parser.buf)
+        free(parser.buf);
 
     free_config_sections();
-    return rv;
+    return parser.rv;
 }
 
 extern const char *known_handling[];     /* drawing.c */
