@@ -255,6 +255,10 @@ struct instance_flags {
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */
     boolean extmenu;          /* extended commands use menu interface */
+#ifdef REALTIME_ON_BOTL
+    char show_realtime;       /* type of time to show in status display */
+    char realtime_format;     /* format of time shown */
+#endif
 #ifdef MICRO
     boolean BIOS; /* use IBM or ST BIOS calls when appropriate */
 #endif

@@ -409,6 +409,48 @@ botl_score(void)
 }
 #endif /* SCORE_ON_BOTL */
 
+#ifdef REALTIME_ON_BOTL
+const char *
+botl_realtime(void)
+{
+    time_t currenttime;
+
+    if (iflags.show_realtime == 'p') {
+        /* play time */
+        currenttime = urealtime.realtime + (getnow() - urealtime.start_timing);
+    } else if (iflags.show_realtime == 'w') {
+        /* wallclock time */
+        currenttime = getnow() - ubirthday;
+    } else {
+        return "";
+    }
+
+    static char buf[BUFSZ] = { 0 };
+    switch (iflags.realtime_format) {
+    case 's':
+        Sprintf(buf, "%ld", currenttime);
+        break;
+
+    case 'c':
+        Sprintf(buf, "%ld:%2.2ld", currenttime / 3600, (currenttime % 3600) / 60);
+        break;
+
+    case 'u':
+    default: {
+        long ss, mm, hh;
+        ss = currenttime % 60;
+        currenttime /= 60;
+        mm = currenttime % 60;
+        currenttime /= 60;
+        hh = currenttime;
+        Sprintf(buf, "%02ld:%02ld:%02ld", hh, mm, ss);
+    }
+    }
+    return buf;
+}
+
+#endif
+
 /* provide the name of the current level for display by various ports */
 int
 describe_level(char *buf)
@@ -524,6 +566,7 @@ static struct istat_s initblstats[MAXBLSTATS] = {
     INIT_BLSTAT("armor-class", " AC:%s", ANY_INT, 10, BL_AC),
     INIT_BLSTAT("HD", " HD:%s", ANY_INT, 10, BL_HD),
     INIT_BLSTAT("time", " T:%s", ANY_LONG, 20, BL_TIME),
+    INIT_BLSTAT("realtime", " %s", ANY_STR, 10, BL_REALTIME),
     /* hunger used to be 'ANY_UINT'; see note below in bot_via_windowport() */
     INIT_BLSTAT("hunger", " %s", ANY_INT, 40, BL_HUNGER),
     INIT_BLSTATP("hitpoints", " HP:%s", ANY_INT, 10, BL_HPMAX, BL_HP),
@@ -811,6 +854,9 @@ bot_via_windowport(void)
     /* Time (moves) */
     g.blstats[idx][BL_TIME].a.a_long = g.moves;
 
+    /* Realtime */
+    Strcpy(g.blstats[idx][BL_REALTIME].val, botl_realtime());
+
     /* Hunger */
     /* note: u.uhs is unsigned, and 3.6.1's STATUS_HILITE defined
        BL_HUNGER to be ANY_UINT, but that was the only non-int/non-long
@@ -939,18 +985,25 @@ bot_via_windowport(void)
 }
 
 
-/* update just the status lines' 'time' field */
+/* update just the status lines' 'time' and 'realtime' fields */
 static void
 stat_update_time(void)
 {
     int idx = g.now_or_before_idx; /* no 0/1 toggle */
-    int fld = BL_TIME;
+    int fld;
 
     /* Time (moves) */
+    fld = BL_TIME;
     g.blstats[idx][fld].a.a_long = g.moves;
     g.valset[fld] = FALSE;
-
     eval_notify_windowport_field(fld, g.valset, idx);
+
+    /* Realtime */
+    fld = BL_REALTIME;
+    Strcpy(g.blstats[idx][fld].val, botl_realtime());
+    g.valset[fld] = FALSE;
+    eval_notify_windowport_field(fld, g.valset, idx);
+
     if ((windowprocs.wincap2 & WC2_FLUSH_STATUS) != 0L)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0,
                       NO_COLOR, (unsigned long *) 0);
@@ -1241,6 +1294,7 @@ evaluate_and_notify_windowport(boolean *valsetlist, int idx)
         if (((i == BL_SCORE) && !flags.showscore)
             || ((i == BL_EXP) && !flags.showexp)
             || ((i == BL_TIME) && !flags.time)
+            || ((i == BL_REALTIME) && !iflags.show_realtime)
             || ((i == BL_HD) && !Upolyd)
             || ((i == BL_XP || i == BL_EXP) && Upolyd)) {
             notpresent++;
@@ -1308,7 +1362,8 @@ status_initialize(boolean reassessment) /* TRUE: just recheck fields w/o other i
                      : (fld == BL_EXP) ? (boolean) (flags.showexp && !Upolyd)
                        : (fld == BL_XP) ? (boolean) !Upolyd
                          : (fld == BL_HD) ? (boolean) Upolyd
-                           : TRUE;
+                           : (fld == BL_REALTIME) ? (boolean) iflags.show_realtime
+                             : TRUE;
 
         fieldname = initblstats[i].fldname;
         fieldfmt = (fld == BL_TITLE && iflags.wc2_hitpointbar) ? "%-30.30s"
@@ -1768,6 +1823,7 @@ static struct fieldid_t {
     { "ac",       BL_AC },
     { "hit-dice", BL_HD },
     { "turns",    BL_TIME },
+    { "realtime", BL_REALTIME },
     { "hp",       BL_HP },
     { "hp-max",   BL_HPMAX },
     { "dgn",      BL_LEVELDESC },

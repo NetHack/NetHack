@@ -902,16 +902,16 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
     enum statusfields idx1, idx2, *fieldlist;
     char *nb, *text = (char *) ptr;
 
-    static enum statusfields fieldorder[][15] = {
+    static enum statusfields fieldorder[][16] = {
         /* line one */
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
           BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-          BL_FLUSH },
+          BL_FLUSH, BL_FLUSH },
         /* line two, default order */
         { BL_LEVELDESC, BL_GOLD,
           BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
           BL_XP, BL_EXP, BL_HD,
-          BL_TIME,
+          BL_TIME, BL_REALTIME,
           BL_HUNGER, BL_CAP, BL_CONDITION,
           BL_FLUSH },
         /* move time to the end */
@@ -919,16 +919,16 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
           BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
           BL_XP, BL_EXP, BL_HD,
           BL_HUNGER, BL_CAP, BL_CONDITION,
-          BL_TIME, BL_FLUSH },
+          BL_TIME, BL_REALTIME, BL_FLUSH },
         /* move experience and time to the end */
         { BL_LEVELDESC, BL_GOLD,
           BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
           BL_HUNGER, BL_CAP, BL_CONDITION,
-          BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH },
+          BL_XP, BL_EXP, BL_HD, BL_TIME, BL_REALTIME, BL_FLUSH },
         /* move level description plus gold and experience and time to end */
         { BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
           BL_HUNGER, BL_CAP, BL_CONDITION,
-          BL_LEVELDESC, BL_GOLD, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH },
+          BL_LEVELDESC, BL_GOLD, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_REALTIME, BL_FLUSH },
     };
 
     /* in case interface is using genl_status_update() but has not
@@ -1016,7 +1016,7 @@ genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
                 case BL_HP: /* for pass 4, Hp comes first; mungspaces()
                                will strip the unwanted leading spaces */
                 case BL_XP: case BL_HD:
-                case BL_TIME:
+                case BL_TIME: case BL_REALTIME:
                     Strcpy(nb = eos(nb), " ");
                     break;
                 case BL_LEVELDESC:
