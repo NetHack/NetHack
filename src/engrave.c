@@ -1143,7 +1143,7 @@ doengrave(void)
     /* Chop engraving down to size if necessary */
     if (len > maxelen) {
         for (sp = ebuf; maxelen && *sp; sp++)
-            if (*sp == ' ')
+            if (!(*sp == ' '))
                 maxelen--;
         if (!maxelen && *sp) {
             *sp = '\0';
