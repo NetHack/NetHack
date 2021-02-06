@@ -1764,7 +1764,7 @@ create_monster(monster* m, struct mkroom* croom)
     struct monst *mtmp;
     xchar x, y;
     char class;
-    unsigned int amask;
+    aligntyp amask;
     coord cc;
     struct permonst *pm;
     unsigned g_mvflags;
@@ -1783,7 +1783,7 @@ create_monster(monster* m, struct mkroom* croom)
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
                   : (m->align == AM_SPLEV_RANDOM)
                      ? induced_align(80)
-                     : Align2amask(m->align);
+                     : m->align;
 
     if (!class)
         pm = (struct permonst *) 0;
@@ -2261,7 +2261,7 @@ create_altar(altar* a, struct mkroom* croom)
 {
     schar sproom;
     xchar x = -1, y = -1;
-    unsigned int amask;
+    aligntyp amask;
     boolean croom_is_temple = TRUE;
     int oldtyp;
 
@@ -2295,7 +2295,7 @@ create_altar(altar* a, struct mkroom* croom)
                   ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
                   : (a->align == AM_SPLEV_RANDOM)
                      ? induced_align(80)
-                     : Align2amask(a->align);
+                     : a->align;
 
     levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;
