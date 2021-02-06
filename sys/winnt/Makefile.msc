@@ -672,16 +672,17 @@ scall  =
 
 !IF ($(VSVER) >= 2012)
 #cflags = $(cflags:-W4=-W3)
+# 4100 unreferenced formal parameter
 # 4131 old-style declarator
-# 4820 padding in struct
-# 4706 assignment within conditional
 # 4244 conversion possible loss of data
 # 4245 conversion from 'char' to 'uchar', signed/unsigned mismatch
-# 4100 unreferenced formal parameter
+# 4310 a constant value is cast to a smaller type
+# 4706 assignment within conditional
 # 4774 format string is not a string literal (default is off at W4)
-#
-#cflags = $(cflags:-W3=-W4) -wd4131 -wd4820 -wd4706 -wd4244 -wd4245 -wd4100
-cflags = $(cflags:-W3=-W4) -wd4820 -wd4706 -wd4244 -wd4245 -wd4100 -wd4310 -w44774
+# 4777 format string requires an argument of type ‘type’,
+#      but variadic argument ‘position’ has type ‘type’
+# 4820 padding in struct
+cflags = $(cflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44774 -w44777 -wd4820
 !ENDIF
 
 #More verbose warning output options below
@@ -839,7 +840,7 @@ DLB =
 #==========================================
 
 {$(LUASRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) -wd4701 -wd4702 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) $(cflagsBuild) -wd4701 -wd4702 -wd4774 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
