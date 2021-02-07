@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1611105313 2021/01/20 01:15:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1612656277 2021/02/07 00:04:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -559,7 +559,9 @@ nhCvtStringToPixel(Display *dpy, XrmValuePtr args, Cardinal *num_args,
 
 /* Ask the WM for window frame size */
 void
-get_window_frame_extents(Widget w, long *top, long *bottom, long *left, long *right)
+get_window_frame_extents(Widget w,
+                         long *top, long *bottom,
+                         long *left, long *right)
 {
     XEvent event;
     Display *dpy = XtDisplay(w);
@@ -571,16 +573,19 @@ get_window_frame_extents(Widget w, long *top, long *bottom, long *left, long *ri
     unsigned char *data = 0;
     long *extents;
 
+    *top = *bottom = *left = *right = 0L;
+
     prop = XInternAtom(dpy, "_NET_FRAME_EXTENTS", True);
+    if (prop == None)
+        return;
 
     while (XGetWindowProperty(dpy, win, prop,
                               0, 4, False, AnyPropertyType,
                               &retprop, &retfmt,
                               &nitems, &nbytes, &data) != Success
-           || nitems != 4 || nbytes != 0)
-        {
-            XNextEvent(dpy, &event);
-        }
+           || nitems != 4 || nbytes != 0) {
+        XNextEvent(dpy, &event);
+    }
 
     extents = (long *) data;
 

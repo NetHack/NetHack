@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.443 $ $NHDT-Date: 1612400970 2021/02/04 01:09:30 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.446 $ $NHDT-Date: 1612656277 2021/02/07 00:04:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -657,6 +657,8 @@ X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
 X11: stop including unused column 0 in the map
+X11: avoid 'bad Atom X Error' when perm_invent is enabled (seemingly window
+	manager dependent)
 
 
 General New Features
