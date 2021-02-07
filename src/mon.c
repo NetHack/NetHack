@@ -2935,7 +2935,10 @@ xkilled(
             You_hear("the rumble of distant thunder...");
         else
             You_hear("the studio audience applaud!");
-    } else if (mtmp->mpeaceful)
+    } else if (mtmp->mpeaceful
+               && !(wep && wep->oartifact == ART_STORMBRINGER
+               && u.ualign.type == CHAOTIC))
+               /* it's not murder if stormbringer made you do it! */
         adjalign(-5);
 
     /* malign was already adjusted for u.ualign.type and randomization */
