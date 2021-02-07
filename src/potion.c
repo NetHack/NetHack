@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1610410780 2021/01/12 00:19:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1612658075 2021/02/07 00:34:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1901,6 +1901,7 @@ hold_potion(struct obj *potobj, const char *drop_fmt, const char *drop_arg,
     /* re-insert into inventory, possibly merging with compatible stack */
     potobj = hold_another_object(potobj, drop_fmt, drop_arg, hold_msg);
     flags.pickup_burden = save_pickup_burden;
+    update_inventory();
     return;
 }
 
@@ -2301,7 +2302,6 @@ dodip(void)
            with compatible ones; override 'pickup_burden' while doing so */
         hold_potion(singlepotion, "You juggle and drop %s!",
                     doname(singlepotion), (const char *) 0);
-        update_inventory();
         return 1;
     }
 
