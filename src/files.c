@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1610587460 2021/01/14 01:24:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1612819003 2021/02/08 21:16:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -81,9 +81,6 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #include <share.h>
 #endif
 
-static FILE *fopen_wizkit_file(void);
-static void wizkit_addinv(struct obj *);
-
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
 extern char bbs_id[];
@@ -145,22 +142,31 @@ static char *make_lockname(const char *, char *);
 static void set_configfile_name(const char *);
 static FILE *fopen_config_file(const char *, int);
 static int get_uchars(char *, uchar *, boolean, int, const char *);
-boolean proc_wizkit_line(char *);
-boolean parse_config_line(char *);
-static boolean parse_conf_file(FILE *, boolean (*proc)(char *));
-static FILE *fopen_sym_file(void);
-boolean proc_symset_line(char *);
-static void set_symhandling(char *, int);
 #ifdef NOCWD_ASSUMPTIONS
 static void adjust_prefix(char *, int);
 #endif
+static char *choose_random_part(char *, char);
 static boolean config_error_nextline(const char *);
 static void free_config_sections(void);
-static char *choose_random_part(char *, char);
 static char *is_config_section(char *);
 static boolean handle_config_section(char *);
+boolean parse_config_line(char *);
 static char *find_optparam(const char *);
+struct _cnf_parser_state; /* defined below (far below...) */
+static void cnf_parser_init(struct _cnf_parser_state *parser);
+static void cnf_parser_done(struct _cnf_parser_state *parser);
+static void parse_conf_buf(struct _cnf_parser_state *parser,
+                           boolean (*proc)(char *arg));
+boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
+static boolean parse_conf_file(FILE *fp, boolean (*proc)(char *arg));
 static void parseformat(int *, char *);
+static FILE *fopen_wizkit_file(void);
+static void wizkit_addinv(struct obj *);
+boolean proc_wizkit_line(char *buf);
+void read_wizkit(void);
+static FILE *fopen_sym_file(void);
+boolean proc_symset_line(char *);
+static void set_symhandling(char *, int);
 
 #ifdef SELF_RECOVER
 static boolean copy_bytes(int, int);
@@ -2926,144 +2932,6 @@ read_config_file(const char *filename, int src)
     return rv;
 }
 
-static FILE *
-fopen_wizkit_file(void)
-{
-    FILE *fp;
-#if defined(VMS) || defined(UNIX)
-    char tmp_wizkit[BUFSZ];
-#endif
-    char *envp;
-
-    envp = nh_getenv("WIZKIT");
-    if (envp && *envp)
-        (void) strncpy(g.wizkit, envp, WIZKIT_MAX - 1);
-    if (!g.wizkit[0])
-        return (FILE *) 0;
-
-#ifdef UNIX
-    if (access(g.wizkit, 4) == -1) {
-        /* 4 is R_OK on newer systems */
-        /* nasty sneaky attempt to read file through
-         * NetHack's setuid permissions -- this is a
-         * place a file name may be wholly under the player's
-         * control
-         */
-        raw_printf("Access to %s denied (%d).", g.wizkit, errno);
-        wait_synch();
-        /* fall through to standard names */
-    } else
-#endif
-        if ((fp = fopen(g.wizkit, "r")) != (FILE *) 0) {
-        return fp;
-#if defined(UNIX) || defined(VMS)
-    } else {
-        /* access() above probably caught most problems for UNIX */
-        raw_printf("Couldn't open requested config file %s (%d).", g.wizkit,
-                   errno);
-        wait_synch();
-#endif
-    }
-
-#if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-    if ((fp = fopen(fqname(g.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
-        return fp;
-#else
-#ifdef VMS
-    envp = nh_getenv("HOME");
-    if (envp)
-        Sprintf(tmp_wizkit, "%s%s", envp, g.wizkit);
-    else
-        Sprintf(tmp_wizkit, "%s%s", "sys$login:", g.wizkit);
-    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
-        return fp;
-#else /* should be only UNIX left */
-    envp = nh_getenv("HOME");
-    if (envp)
-        Sprintf(tmp_wizkit, "%s/%s", envp, g.wizkit);
-    else
-        Strcpy(tmp_wizkit, g.wizkit);
-    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
-        return fp;
-    else if (errno != ENOENT) {
-        /* e.g., problems when setuid NetHack can't search home
-         * directory restricted to user */
-        raw_printf("Couldn't open default g.wizkit file %s (%d).", tmp_wizkit,
-                   errno);
-        wait_synch();
-    }
-#endif
-#endif
-    return (FILE *) 0;
-}
-
-/* add to hero's inventory if there's room, otherwise put item on floor */
-static void
-wizkit_addinv(struct obj *obj)
-{
-    if (!obj || obj == &cg.zeroobj)
-        return;
-
-    /* subset of starting inventory pre-ID */
-    obj->dknown = 1;
-    if (Role_if(PM_CLERIC))
-        obj->bknown = 1; /* ok to bypass set_bknown() */
-    /* same criteria as lift_object()'s check for available inventory slot */
-    if (obj->oclass != COIN_CLASS && inv_cnt(FALSE) >= 52
-        && !merge_choice(g.invent, obj)) {
-        /* inventory overflow; can't just place & stack object since
-           hero isn't in position yet, so schedule for arrival later */
-        add_to_migration(obj);
-        obj->ox = 0; /* index of main dungeon */
-        obj->oy = 1; /* starting level number */
-        obj->owornmask =
-            (long) (MIGR_WITH_HERO | MIGR_NOBREAK | MIGR_NOSCATTER);
-    } else {
-        (void) addinv(obj);
-    }
-}
-
-
-boolean
-proc_wizkit_line(char *buf)
-{
-    struct obj *otmp;
-
-    if (strlen(buf) >= BUFSZ)
-        buf[BUFSZ - 1] = '\0';
-    otmp = readobjnam(buf, (struct obj *) 0);
-
-    if (otmp) {
-        if (otmp != &cg.zeroobj)
-            wizkit_addinv(otmp);
-    } else {
-        /* .60 limits output line width to 79 chars */
-        config_error_add("Bad wizkit item: \"%.60s\"", buf);
-        return FALSE;
-    }
-    return TRUE;
-}
-
-void
-read_wizkit(void)
-{
-    FILE *fp;
-
-    if (!wizard || !(fp = fopen_wizkit_file()))
-        return;
-
-    g.program_state.wizkit_wishing = 1;
-    config_error_init(TRUE, "WIZKIT", FALSE);
-
-    parse_conf_file(fp, proc_wizkit_line);
-    (void) fclose(fp);
-
-    config_error_done();
-    g.program_state.wizkit_wishing = 0;
-
-    return;
-}
-
 struct _cnf_parser_state {
     char *inbuf;
     size_t inbufsz;
@@ -3090,6 +2958,17 @@ cnf_parser_init(struct _cnf_parser_state *parser)
     memset(parser->inbuf, 0, parser->inbufsz);
 }
 
+/* caller has finished with 'parser' (except for 'rv' so leave that intact) */
+static void
+cnf_parser_done(struct _cnf_parser_state *parser)
+{
+    parser->ep = 0; /* points into parser->inbuf, so becoming stale */
+    if (parser->inbuf)
+        free(parser->inbuf), parser->inbuf = 0;
+    if (parser->buf)
+        free(parser->buf), parser->buf = 0;
+}
+
 /*
  * Parse config buffer, handling comments, empty lines, config sections,
  * CHOOSE, and line continuation, calling proc for every valid line.
@@ -3097,7 +2976,7 @@ cnf_parser_init(struct _cnf_parser_state *parser)
  * Continued lines are merged together with one space in between.
  */
 static void
-parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
+parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *arg))
 {
     p->cont = FALSE;
     p->pbreak = FALSE;
@@ -3162,7 +3041,7 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
                 *tmpbuf = '\0';
                 if (p->buf) {
                     Strcat(strcpy(tmpbuf, p->buf), " ");
-                    free(p->buf);
+                    free(p->buf), p->buf = 0;
                 }
                 p->buf = strcat(tmpbuf, p->ep);
                 if (strlen(p->buf) >= p->inbufsz)
@@ -3173,8 +3052,7 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
                 return;
 
             if (handle_config_section(p->buf)) {
-                free(p->buf);
-                p->buf = (char *) 0;
+                free(p->buf), p->buf = (char *) 0;
                 return;
             }
 
@@ -3187,8 +3065,7 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
                 if (!bufp) {
                     config_error_add("Format is CHOOSE=section1,section2,...");
                     p->rv = FALSE;
-                    free(p->buf);
-                    p->buf = (char *) 0;
+                    free(p->buf), p->buf = (char *) 0;
                     return;
                 }
                 bufp++;
@@ -3202,22 +3079,20 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *))
                     config_error_add("No config section to choose");
                     p->rv = FALSE;
                 }
-                free(p->buf);
-                p->buf = (char *) 0;
+                free(p->buf), p->buf = (char *) 0;
                 return;
             }
 
             if (!(*proc)(p->buf))
                 p->rv = FALSE;
 
-            free(p->buf);
-            p->buf = (char *) 0;
+            free(p->buf), p->buf = (char *) 0;
         }
     }
 }
 
 boolean
-parse_conf_str(const char *str, boolean (*proc)(char *))
+parse_conf_str(const char *str, boolean (*proc)(char *arg))
 {
     size_t len;
     struct _cnf_parser_state parser;
@@ -3239,9 +3114,7 @@ parse_conf_str(const char *str, boolean (*proc)(char *))
         if (parser.pbreak)
             break;
     }
-
-    if (parser.buf)
-        free(parser.buf);
+    cnf_parser_done(&parser);
 
     free_config_sections();
     config_error_done();
@@ -3253,12 +3126,11 @@ parse_conf_str(const char *str, boolean (*proc)(char *))
  * Read from file fp, calling parse_conf_buf for each line.
  */
 static boolean
-parse_conf_file(FILE *fp, boolean (*proc)(char *))
+parse_conf_file(FILE *fp, boolean (*proc)(char *arg))
 {
     struct _cnf_parser_state parser;
 
     cnf_parser_init(&parser);
-
     free_config_sections();
 
     while (fgets(parser.inbuf, parser.inbufsz, fp)) {
@@ -3266,13 +3138,189 @@ parse_conf_file(FILE *fp, boolean (*proc)(char *))
         if (parser.pbreak)
             break;
     }
-
-    if (parser.buf)
-        free(parser.buf);
+    cnf_parser_done(&parser);
 
     free_config_sections();
     return parser.rv;
 }
+
+static void
+parseformat(int *arr, char *str)
+{
+    const char *legal[] = { "historical", "lendian", "ascii" };
+    int i, kwi = 0, words = 0;
+    char *p = str, *keywords[2];
+
+    while (*p) {
+        while (*p && isspace((uchar) *p)) {
+            *p = '\0';
+            p++;
+        }
+        if (*p) {
+            words++;
+            if (kwi < 2)
+                keywords[kwi++] = p;
+        }
+        while (*p && !isspace((uchar) *p))
+            p++;
+    }
+    if (!words) {
+        impossible("missing format list");
+        return;
+    }
+    while (--kwi >= 0)
+        if (kwi < 2) {
+            for (i = 0; i < SIZE(legal); ++i) {
+               if (!strcmpi(keywords[kwi], legal[i]))
+                   arr[kwi] = i + 1;
+            }
+        }
+}
+
+/* ----------  END CONFIG FILE HANDLING ----------- */
+
+/* ----------  BEGIN WIZKIT FILE HANDLING ----------- */
+
+static FILE *
+fopen_wizkit_file(void)
+{
+    FILE *fp;
+#if defined(VMS) || defined(UNIX)
+    char tmp_wizkit[BUFSZ];
+#endif
+    char *envp;
+
+    envp = nh_getenv("WIZKIT");
+    if (envp && *envp)
+        (void) strncpy(g.wizkit, envp, WIZKIT_MAX - 1);
+    if (!g.wizkit[0])
+        return (FILE *) 0;
+
+#ifdef UNIX
+    if (access(g.wizkit, 4) == -1) {
+        /* 4 is R_OK on newer systems */
+        /* nasty sneaky attempt to read file through
+         * NetHack's setuid permissions -- this is a
+         * place a file name may be wholly under the player's
+         * control
+         */
+        raw_printf("Access to %s denied (%d).", g.wizkit, errno);
+        wait_synch();
+        /* fall through to standard names */
+    } else
+#endif
+        if ((fp = fopen(g.wizkit, "r")) != (FILE *) 0) {
+        return fp;
+#if defined(UNIX) || defined(VMS)
+    } else {
+        /* access() above probably caught most problems for UNIX */
+        raw_printf("Couldn't open requested wizkit file %s (%d).", g.wizkit,
+                   errno);
+        wait_synch();
+#endif
+    }
+
+#if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
+    if ((fp = fopen(fqname(g.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
+        return fp;
+#else
+#ifdef VMS
+    envp = nh_getenv("HOME");
+    if (envp)
+        Sprintf(tmp_wizkit, "%s%s", envp, g.wizkit);
+    else
+        Sprintf(tmp_wizkit, "%s%s", "sys$login:", g.wizkit);
+    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
+        return fp;
+#else /* should be only UNIX left */
+    envp = nh_getenv("HOME");
+    if (envp)
+        Sprintf(tmp_wizkit, "%s/%s", envp, g.wizkit);
+    else
+        Strcpy(tmp_wizkit, g.wizkit);
+    if ((fp = fopen(tmp_wizkit, "r")) != (FILE *) 0)
+        return fp;
+    else if (errno != ENOENT) {
+        /* e.g., problems when setuid NetHack can't search home
+         * directory restricted to user */
+        raw_printf("Couldn't open default g.wizkit file %s (%d).", tmp_wizkit,
+                   errno);
+        wait_synch();
+    }
+#endif
+#endif
+    return (FILE *) 0;
+}
+
+/* add to hero's inventory if there's room, otherwise put item on floor */
+static void
+wizkit_addinv(struct obj *obj)
+{
+    if (!obj || obj == &cg.zeroobj)
+        return;
+
+    /* subset of starting inventory pre-ID */
+    obj->dknown = 1;
+    if (Role_if(PM_CLERIC))
+        obj->bknown = 1; /* ok to bypass set_bknown() */
+    /* same criteria as lift_object()'s check for available inventory slot */
+    if (obj->oclass != COIN_CLASS && inv_cnt(FALSE) >= 52
+        && !merge_choice(g.invent, obj)) {
+        /* inventory overflow; can't just place & stack object since
+           hero isn't in position yet, so schedule for arrival later */
+        add_to_migration(obj);
+        obj->ox = 0; /* index of main dungeon */
+        obj->oy = 1; /* starting level number */
+        obj->owornmask =
+            (long) (MIGR_WITH_HERO | MIGR_NOBREAK | MIGR_NOSCATTER);
+    } else {
+        (void) addinv(obj);
+    }
+}
+
+boolean
+proc_wizkit_line(char *buf)
+{
+    struct obj *otmp;
+
+    if (strlen(buf) >= BUFSZ)
+        buf[BUFSZ - 1] = '\0';
+    otmp = readobjnam(buf, (struct obj *) 0);
+
+    if (otmp) {
+        if (otmp != &cg.zeroobj)
+            wizkit_addinv(otmp);
+    } else {
+        /* .60 limits output line width to 79 chars */
+        config_error_add("Bad wizkit item: \"%.60s\"", buf);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void
+read_wizkit(void)
+{
+    FILE *fp;
+
+    if (!wizard || !(fp = fopen_wizkit_file()))
+        return;
+
+    g.program_state.wizkit_wishing = 1;
+    config_error_init(TRUE, "WIZKIT", FALSE);
+
+    parse_conf_file(fp, proc_wizkit_line);
+    (void) fclose(fp);
+
+    config_error_done();
+    g.program_state.wizkit_wishing = 0;
+
+    return;
+}
+
+/* ----------  END WIZKIT FILE HANDLING ----------- */
+
+/* ----------  BEGIN SYMSET FILE HANDLING ----------- */
 
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
@@ -3552,40 +3600,7 @@ set_symhandling(char *handling, int which_set)
     }
 }
 
-void
-parseformat(int *arr, char *str)
-{
-    const char *legal[] = {"historical", "lendian", "ascii"};
-    int i, kwi = 0, words = 0;
-    char *p = str, *keywords[2];
-
-    while (*p) {
-        while (*p && isspace((uchar) *p)) {
-            *p = '\0';
-            p++;
-        }
-        if (*p) {
-            words++;
-            if (kwi < 2)
-                keywords[kwi++] = p;
-        }
-        while (*p && !isspace((uchar) *p))
-            p++;
-    }
-    if (!words) {
-        impossible("missing format list");
-        return;
-    }
-    while (--kwi >= 0)
-        if (kwi < 2) {
-            for (i = 0; i < SIZE(legal); ++i) {
-               if (!strcmpi(keywords[kwi], legal[i]))
-                   arr[kwi] = i + 1;
-            }
-        }
-}
-
-/* ----------  END CONFIG FILE HANDLING ----------- */
+/* ----------  END SYMSET FILE HANDLING ----------- */
 
 /* ----------  BEGIN SCOREBOARD CREATION ----------- */
 
