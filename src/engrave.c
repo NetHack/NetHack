@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static int stylus_ok(struct obj *);
+static int engrave(void);
 static const char *blengr(void);
 
 char *
@@ -493,7 +494,6 @@ doengrave(void)
     const char *eloc; /* Where the engraving is (ie dust/floor/...) */
     char *sp;         /* Place holder for space count of engr text */
     int len;          /* # of nonspace chars of new engraving text */
-    int maxelen;      /* Max allowable length of engraving text */
     struct engr *oep = engr_at(u.ux, u.uy);
     /* The current engraving */
     struct obj *otmp; /* Object selected with which to engrave */
@@ -505,7 +505,6 @@ doengrave(void)
     buf[0] = (char) 0;
     ebuf[0] = (char) 0;
     post_engr_text[0] = (char) 0;
-    maxelen = BUFSZ - 1;
     if (oep)
         oetype = oep->engr_type;
     if (is_demon(g.youmonst.data) || is_vampire(g.youmonst.data))
@@ -1069,95 +1068,14 @@ doengrave(void)
         oep = (struct engr *) 0;
     }
 
-    /* Figure out how long it took to engrave, and if player has
-     * engraved too much.
-     */
-    switch (type) {
-    default:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish your weird engraving.";
-        break;
-    case DUST:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish writing in the dust.";
-        break;
-    case HEADSTONE:
-    case ENGRAVE:
-        g.multi = -(len / 10);
-        if (otmp->oclass == WEAPON_CLASS
-            && (otmp->otyp != ATHAME || otmp->cursed)) {
-            g.multi = -len;
-            maxelen = ((otmp->spe + 3) * 2) + 1;
-            /* -2 => 3, -1 => 5, 0 => 7, +1 => 9, +2 => 11
-             * Note: this does not allow a +0 anything (except an athame)
-             * to engrave "Elbereth" all at once.
-             * However, you can engrave "Elb", then "ere", then "th".
-             */
-            pline("%s dull.", Yobjnam2(otmp, "get"));
-            costly_alteration(otmp, COST_DEGRD);
-            if (len > maxelen) {
-                g.multi = -maxelen;
-                otmp->spe = -3;
-            } else if (len > 1)
-                otmp->spe -= len >> 1;
-            else
-                otmp->spe -= 1; /* Prevent infinite engraving */
-        } else if (otmp->oclass == RING_CLASS || otmp->oclass == GEM_CLASS) {
-            g.multi = -len;
-        }
-        if (g.multi)
-            g.nomovemsg = "You finish engraving.";
-        break;
-    case BURN:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = is_ice(u.ux, u.uy)
-                          ? "You finish melting your message into the ice."
-                          : "You finish burning your message into the floor.";
-        break;
-    case MARK:
-        g.multi = -(len / 10);
-        if (otmp->otyp == MAGIC_MARKER) {
-            maxelen = otmp->spe * 2; /* one charge / 2 letters */
-            if (len > maxelen) {
-                Your("marker dries out.");
-                otmp->spe = 0;
-                g.multi = -(maxelen / 10);
-            } else if (len > 1)
-                otmp->spe -= len >> 1;
-            else
-                otmp->spe -= 1; /* Prevent infinite graffiti */
-        }
-        if (g.multi)
-            g.nomovemsg = "You finish defacing the dungeon.";
-        break;
-    case ENGR_BLOOD:
-        g.multi = -(len / 10);
-        if (g.multi)
-            g.nomovemsg = "You finish scrawling.";
-        break;
-    }
-
-    /* Chop engraving down to size if necessary */
-    if (len > maxelen) {
-        for (sp = ebuf; maxelen && *sp; sp++)
-            if (!(*sp == ' '))
-                maxelen--;
-        if (!maxelen && *sp) {
-            *sp = '\0';
-            if (g.multi)
-                g.nomovemsg = "You cannot write any more.";
-            You("are only able to write \"%s\".", ebuf);
-        }
-    }
-
-    if (oep) /* add to existing engraving */
-        Strcpy(buf, oep->engr_txt);
-    (void) strncat(buf, ebuf, BUFSZ - (int) strlen(buf) - 1);
-    /* Put the engraving onto the map */
-    make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, type);
+    Strcpy(g.context.engraving.text, ebuf);
+    g.context.engraving.nextc = g.context.engraving.text;
+    g.context.engraving.stylus = otmp;
+    g.context.engraving.type = type;
+    g.context.engraving.pos.x = u.ux;
+    g.context.engraving.pos.y = u.uy;
+    g.context.engraving.actionct = 0;
+    set_occupation(engrave, "engraving", 0);
 
     if (post_engr_text[0])
         pline("%s", post_engr_text);
@@ -1167,7 +1085,198 @@ doengrave(void)
         if (!Blind)
             Your1(vision_clears);
     }
-    return 1;
+
+    /* Engraving will always take at least one action via being run as an
+     * occupation, so do not count this setup as taking time. */
+    return 0;
+}
+
+/* occupation callback for engraving some text */
+static int
+engrave(void)
+{
+    struct engr *oep;
+    char buf[BUFSZ]; /* holds the post-this-action engr text, including anything
+                      * already there */
+    const char *finishverb; /* "You finish [foo]." */
+    struct obj * stylus; /* shorthand for g.context.engraving.stylus */
+    boolean firsttime = (g.context.engraving.actionct == 0);
+    int rate = 10; /* # characters we are capable of engraving in this action */
+    boolean truncate = FALSE;
+
+    boolean carving = (g.context.engraving.type == ENGRAVE
+                       || g.context.engraving.type == HEADSTONE);
+    boolean dulling_wep, marker;
+    char *endc; /* points at character 1 beyond the last character to engrave
+                   this action */
+    int i;
+
+    if (g.context.engraving.pos.x != u.ux
+        || g.context.engraving.pos.y != u.uy) { /* teleported? */
+        pline("You are unable to continue engraving.");
+        return 0;
+    }
+    /* Stylus might have been taken out of inventory and destroyed somehow.
+     * Not safe to dereference stylus until after this. */
+    if (g.context.engraving.stylus == &cg.zeroobj) { /* bare finger */
+        stylus = (struct obj *) 0;
+    }
+    else {
+        for (stylus = g.invent; stylus; stylus = stylus->nobj) {
+            if (stylus == g.context.engraving.stylus) {
+                break;
+            }
+        }
+        if (!stylus) {
+            pline("You are unable to continue engraving.");
+            return 0;
+        }
+    }
+
+    dulling_wep = (stylus && stylus->oclass == WEAPON_CLASS
+                   && (stylus->otyp != ATHAME || stylus->cursed));
+    marker = (stylus && stylus->otyp == MAGIC_MARKER);
+
+    g.context.engraving.actionct++;
+
+    /* sanity checks */
+    if (dulling_wep && !carving) {
+        impossible("using weapon for non-carve engraving");
+    }
+    else if (g.context.engraving.type == MARK && !marker) {
+        impossible("making graffiti with non-marker stylus");
+    }
+
+    /* Step 1: Compute rate. */
+    if (carving && stylus
+        && (dulling_wep || stylus->oclass == RING_CLASS
+            || stylus->oclass == GEM_CLASS)) {
+        /* slow engraving methods */
+        rate = 1;
+    }
+    else if (marker) {
+        /* one charge / 2 letters */
+        rate = min(rate, stylus->spe * 2);
+    }
+
+    /* Step 2: Compute last character that can be engraved this action. */
+    i = rate;
+    for (endc = g.context.engraving.nextc; *endc && i > 0; endc++) {
+        if (*endc != ' ') {
+            i--;
+        }
+    }
+
+    /* Step 3: affect stylus from engraving - it might wear out. */
+    if (dulling_wep) {
+        /* Dull the weapon at a rate of -1 enchantment per 2 characters,
+         * rounding down.
+         * The number of characters obtainable given starting enchantment:
+         * -2 => 3, -1 => 5, 0 => 7, +1 => 9, +2 => 11
+         * Note: this does not allow a +0 anything (except an athame) to
+         * engrave "Elbereth" all at once.
+         * However, you can engrave "Elb", then "ere", then "th", by taking
+         * advantage of the rounding down. */
+        if (firsttime) {
+            pline("%s dull.", Yobjnam2(stylus, "get"));
+        }
+        if (g.context.engraving.actionct % 2 == 1) { /* 1st, 3rd, ... action */
+            /* deduct a point on 1st, 3rd, 5th, ... turns, unless this is the
+             * last character being engraved (a rather convoluted way to round
+             * down).
+             * Check for truncation *before* deducting a point - otherwise,
+             * attempting to e.g. engrave 3 characters with a -2 weapon will
+             * stop at the 1st. */
+            if (stylus->spe <= -3) {
+                if (firsttime) {
+                    impossible("<= -3 weapon valid for engraving");
+                }
+                truncate = TRUE;
+            }
+            else if (*endc) {
+                stylus->spe -= 1;
+            }
+        }
+    }
+    else if (marker) {
+        int ink_cost = max(rate / 2, 1); /* Prevent infinite graffiti */
+        if (stylus->spe < ink_cost) {
+            impossible("dry marker valid for graffiti");
+            truncate = TRUE;
+        }
+        stylus->spe -= ink_cost;
+        if (stylus->spe == 0) {
+            /* can't engrave any further; truncate the string */
+            Your("marker dries out.");
+            truncate = TRUE;
+        }
+    }
+
+    switch (g.context.engraving.type) {
+    default:
+        finishverb = "your weird engraving";
+        break;
+    case DUST:
+        finishverb = "writing in the dust";
+        break;
+    case HEADSTONE:
+    case ENGRAVE:
+        finishverb = "engraving";
+        break;
+    case BURN:
+        finishverb = is_ice(u.ux, u.uy) ? "melting your message into the ice"
+                                        : "burning your message into the floor";
+        break;
+    case MARK:
+        finishverb = "defacing the dungeon";
+        break;
+    case ENGR_BLOOD:
+        finishverb = "scrawling";
+    }
+
+    /* actions that happen at the end of every engraving action go here */
+
+    /* If the stylus did wear out mid-engraving, truncate the input so that we
+     * can't go any further. */
+    if (truncate && *endc != '\0') {
+        *endc = '\0';
+        You("are only able to write \"%s\".", g.context.engraving.text);
+    }
+    else {
+        /* input was not truncated; stylus may still have worn out on the last
+         * character, though */
+        truncate = FALSE;
+    }
+
+    Strcpy(buf, "");
+    oep = engr_at(u.ux, u.uy);
+    if (oep) /* add to existing engraving */
+        Strcpy(buf, oep->engr_txt);
+    (void) strncat(buf, g.context.engraving.nextc,
+                   endc - g.context.engraving.nextc);
+    make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, g.context.engraving.type);
+
+    if (*endc) {
+        g.context.engraving.nextc = endc;
+        return 1; /* not yet finished this turn */
+    }
+    else { /* finished engraving */
+        /* actions that happen after the engraving is finished go here */
+
+        if (truncate) {
+            /* Now that "You are only able to write 'foo'" also prints at the
+             * end of engraving, this might be redundant. */
+            You("cannot write any more.");
+        }
+        else if (!firsttime) {
+            /* only print this if engraving took multiple actions */
+            You("finish %s.", finishverb);
+        }
+        g.context.engraving.text[0] = '\0';
+        g.context.engraving.nextc = (char *) 0;
+        g.context.engraving.stylus = (struct obj *) 0;
+    }
+    return 0;
 }
 
 /* while loading bones, clean up text which might accidentally
