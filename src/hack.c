@@ -2836,7 +2836,7 @@ lookaround(void)
                                        (Wwalking && !Airborne) ? "step"
                                                                : "continue"),
                             Underwater ? "out of" : "off",
-                            is_pool(u.ux, u.uy) ? "water" : "lava");
+                            hliquid(is_pool(u.ux, u.uy) ? "water" : "lava"));
                     }
                 }
                 goto stop;
