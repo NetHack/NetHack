@@ -319,12 +319,21 @@ draw_horizontal(boolean border)
      *  for gold so would recover only 2 columns.  n >>= 10 might have
      *  greater geek appeal but could lead to bug reports and couldn't
      *  be accomplished via simple string truncation.)
+     *
      *  For experience point and score suppression, might try that first
      *  (better chance for column recovery, with "/nM" freeing 5 out of
      *  7+ digits; in rare instances, "/nG" could free 8 out of 10+ digits)
      *  before deciding to remove them altogether.
      *  tty's shorter condition designations combined with comparable
      *  trimming of hunger and encumbrance would be better overall.
+     *
+     *  For first line when hitpointbar is off, treat trailing spaces
+     *  on Title as discardable leading spaces on Str.  (Enabling
+     *  perm_invent without having a wide terminal size results in status
+     *  being narrower than usual and possibly truncating by omitting
+     *  right hand fields, emphasizing the wasted space devoted to
+     *  title's trailing spaces.  Same issue without perm_invent if main
+     *  window gets clipped to fit a narrow terminal.)
      */
 
     number_of_lines = (iflags.wc2_statuslines < 3) ? 2 : 3;
