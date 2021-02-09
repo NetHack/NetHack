@@ -55,8 +55,7 @@ curses_update_inv(void)
 
 /* Adds an inventory item.  'y' is 1 rather than 0 for the first item. */
 void
-curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, char accelerator,
-               attr_t attr, const char *str)
+curses_add_inv(int y, char accelerator, attr_t attr, const char *str)
 {
     WINDOW *win = curses_get_nhwin(INV_WIN);
     int color = NO_COLOR;
@@ -70,12 +69,8 @@ curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, char accelerator,
     curses_get_window_size(INV_WIN, &height, &width);
     /*
      * TODO:
-     *  If border is On and 'y' is too big, turn border Off in order to
-     *  get two more lines of perm_invent.
-     *
-     *  And/or implement a way to switch focus from map to inventory
-     *  so that the latter can be scrolled.  Must not require use of a
-     *  mouse.
+     *  Implement a way to switch focus from map to inventory so that
+     *  the latter can be scrolled.  Must not require use of a mouse.
      *
      *  Also, when entries are omitted due to lack of space, mark the
      *  last line to indicate "there's more that you can't see" (like
@@ -88,28 +83,22 @@ curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, char accelerator,
 
     wmove(win, y, x);
     if (accelerator) {
-#if 0
-        attr_t bold = A_BOLD;
-
-        wattron(win, bold);
-        waddch(win, accelerator);
-        wattroff(win, bold);
-        wprintw(win, ") ");
-#else
         /* despite being shown as a menu, nothing is selectable from the
-           persistent inventory window so don't highlight inventory letters */
+           persistent inventory window so avoid the usual highlighting of
+           inventory letters */
         wprintw(win, "%c) ", accelerator);
-#endif
         available_width -= 3; /* letter+parenthesis+space */
-
-        /* narrow the entries to fit more of the interesting text; do so
-           unconditionally rather than trying to figure whether it's needed;
-           when 'sortpack' is enabled we could also strip out "<class> of"
-           from "<prefix><class> of <item><suffix> but if that's to be done,
-           core ought to do it;
-           'stroffset': defer skipping the article prefix until after menu
-           color pattern matching has taken place so that the persistent
-           inventory window always gets same coloring as regular inventory */
+        /*
+         * Narrow the entries to fit more of the interesting text.  Do so
+         * unconditionally rather than trying to figure whether it's needed.
+         * When 'sortpack' is enabled we could also strip out "<class> of"
+         * from "<prefix><class> of <item><suffix> but if that's to be done,
+         * the core ought to do it.
+         *
+         * 'stroffset': defer skipping the article prefix until after menu
+         * color pattern matching has taken place so that the persistent
+         * inventory window always gets same coloring as regular inventory.
+         */
         if (!strncmpi(str, "a ", 2))
             stroffset = 2;
         else if (!strncmpi(str, "an ", 3))
@@ -117,24 +106,8 @@ curses_add_inv(int y, const glyph_info *glyphinfo UNUSED, char accelerator,
         else if (!strncmpi(str, "the ", 4))
             stroffset = 4;
     }
-#if 0 /* FIXME: MENU GLYPHS */
-    if (accelerator && iflags.use_menu_glyphs
-            && glyphinfo->glyph != NO_GLYPH ) {
-        int symbol;
-        attr_t glyphclr;
-
-        symbol = glyphinfo->ttychar;
-        color = glyphinfo->color;
-
-        glyphclr = curses_color_attr(color, 0);
-        wattron(win, glyphclr);
-        wprintw(win, "%c ", symbol);
-        wattroff(win, glyphclr);
-        available_width -= 2;
-    }
-#endif
-    if (accelerator /* Don't colorize categories */
-        && iflags.use_menu_color) {
+    /* only perform menu coloring on item entries, not subtitles */
+    if (accelerator && iflags.use_menu_color) {
         attr = 0;
         get_menu_coloring(str, &color, (int *) &attr);
         attr = curses_convert_attr(attr);

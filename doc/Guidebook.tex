@@ -4888,20 +4888,32 @@ Acceptable values are
 {\tt 0} --- off, never show borders\\
 {\tt 1} --- on, always show borders\\
 {\tt 2} --- auto, on display is at least
-(\verb&24+2&)x(\verb&80+2&)\ \ (default)\\
+(\verb&24+2&)x(\verb&80+2&) [default]\\
+{\tt 3} --- on, except forced off for perm\verb+_+invent\\
+{\tt 4} --- auto, except forced off for perm\verb+_+invent\\
 %.ei
 %.ed
 
-%.lp "
+%.lp ""
 (The 26x82 size threshold for `2' refers to number of rows and
 columns of the display.
 A width of at least 110 columns (\verb&80+2+26+2&) is needed for
 {\it align_status\/}
 set to {tt left} or {\tt right}.)
+
+%.lp ""
+The persistent inventory window, when enabled, can grow until it is
+too big to fit on most displays, resulting in truncation of its contents.
+If borders are forced on (1) or the display is big enough to show them (2),
+setting the value to 3 or 4 instead will keep borders for the map, message,
+and status windows but have room for two additional lines of inventory
+plus widen each inventory line by two columns.
 %.lp
 \item[\ib{windowcolors}]
 If {\it NetHack\/} can, it should display windows with the specified
-foreground/background colors. Windows GUI only. The format is
+foreground/background colors.
+Windows GUI only.
+The format is
 \begin{verbatim}
     OPTION=windowcolors:wintype foreground/background
 \end{verbatim}

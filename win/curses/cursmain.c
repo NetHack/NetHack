@@ -543,7 +543,7 @@ add_menu(winid wid, const glyph_info *glyphinfo,
 */
 void
 curses_add_menu(winid wid, const glyph_info *glyphinfo,
-                const ANY_P * identifier,
+                const ANY_P *identifier,
                 char accelerator, char group_accel, int attr,
                 const char *str, unsigned itemflags)
 {
@@ -553,12 +553,16 @@ curses_add_menu(winid wid, const glyph_info *glyphinfo,
     curses_attr = curses_convert_attr(attr);
 
     if (inv_update) {
-        curses_add_inv(inv_update, glyphinfo, accelerator, curses_attr, str);
+        /* persistent inventory window; nothing is selectable;
+           omit glyphinfo because perm_invent is to the side of
+           the map so usually cramped for space */
+        curses_add_inv(inv_update, accelerator, curses_attr, str);
         inv_update++;
         return;
     }
 
-    curses_add_nhmenu_item(wid, glyphinfo, identifier, accelerator, group_accel,
+    curses_add_nhmenu_item(wid, glyphinfo, identifier,
+                           accelerator, group_accel,
                            curses_attr, str, itemflags);
 }
 

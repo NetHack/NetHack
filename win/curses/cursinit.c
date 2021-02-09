@@ -115,20 +115,27 @@ curses_create_main_windows(void)
     int status_orientation = 0;
     int border_space = 0;
     int hspace = term_cols - 80;
-    boolean borders = FALSE;
+    boolean borders = FALSE, noperminv_borders = FALSE;
 
     switch (iflags.wc2_windowborders) {
+    default:
     case 0:                     /* Off */
         borders = FALSE;
         break;
+
+    case 3:
+        noperminv_borders = TRUE;
+        /*FALLTHRU*/
     case 1:                     /* On */
         borders = TRUE;
         break;
+
+    case 4:
+        noperminv_borders = TRUE;
+        /*FALLTHRU*/
     case 2:                     /* Auto */
-        borders = (term_cols > 81 && term_rows > 25);
+        borders = (term_cols >= 80 + 2 && term_rows >= 24 + 2);
         break;
-    default:
-        borders = FALSE;
     }
 
     if (borders) {
@@ -228,6 +235,9 @@ curses_create_main_windows(void)
                                 ALIGN_RIGHT, &map_x, &map_y,
                                 &map_width, &map_height,
                                 border_space, -1, width);
+            /* suppress borders on perm_invent window, part I */
+            if (noperminv_borders)
+                inv_width += border_space, inv_height += border_space; /*+=2*/
         }
 
         if (msg_vertical)
@@ -276,7 +286,9 @@ curses_create_main_windows(void)
 
         if (iflags.perm_invent)
             curses_add_nhwin(INV_WIN, inv_height, inv_width, inv_y, inv_x,
-                             ALIGN_RIGHT, borders);
+                             ALIGN_RIGHT,
+                             /* suppress perm_invent borders, part II */
+                             borders && !noperminv_borders);
 
         curses_add_nhwin(MAP_WIN, map_height, map_width,
                          map_y, map_x, 0, borders);

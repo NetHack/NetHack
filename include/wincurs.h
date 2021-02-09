@@ -195,8 +195,7 @@ extern void curses_status_update(int, genericptr_t, int, int, int,
 /* cursinvt.c */
 
 extern void curses_update_inv(void);
-extern void curses_add_inv(int, const glyph_info *,
-                           char, attr_t, const char *);
+extern void curses_add_inv(int, char, attr_t, const char *);
 
 /* cursinit.c */
 

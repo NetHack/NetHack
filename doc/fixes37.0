@@ -791,6 +791,8 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	act on it)
 curses: implement 'selectsaved', restore via menu of saved games
 curses: implement selecting menu items via mouse
+curses: 'windowborders' can be set to 3 or 4 to suppress perm_invent borders
+	to provide slightly more room for actual inventory info
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
