@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1612738685 2021/02/07 22:58:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.318 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1612912018 2021/02/09 23:06:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2218,8 +2218,7 @@ count_unidentified(struct obj *objchn)
 /* dialog with user to identify a given number of items; 0 means all */
 void
 identify_pack(int id_limit,
-              boolean learning_id) /* true if we just read unknown
-                                      identify scroll */
+              boolean learning_id) /* T: just read unknown identify scroll */
 {
     struct obj *obj;
     int n, unid_cnt = count_unidentified(g.invent);
@@ -2635,6 +2634,7 @@ display_pickinv(
                     &selected);
     if (n > 0) {
         if (wizid) {
+            boolean all_id = FALSE;
             int i;
 
             /* identifying items will update perm_invent, calling this
@@ -2646,11 +2646,17 @@ display_pickinv(
                 otmp = selected[i].item.a_obj;
                 if (otmp == &wizid_fakeobj) {
                     identify_pack(0, FALSE);
+                    /* identify_pack() performs update_inventory() */
+                    all_id = TRUE;
+                    break;
                 } else {
                     if (not_fully_identified(otmp))
                         (void) identify(otmp);
+                    /* identify() does not perform update_inventory() */
                 }
             }
+            if (!all_id)
+                update_inventory();
         } else {
             ret = selected[0].item.a_char;
             if (out_cnt)
