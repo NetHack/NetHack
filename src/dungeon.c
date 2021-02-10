@@ -1175,7 +1175,7 @@ init_dungeons(void)
            so that it's hidden from '#wizwhere' feedback. */
     }
 
-    lua_close(L);
+    nhl_done(L);
 
     for (i = 0; i < pd.n_brs; i++) {
         free((genericptr_t) pd.tmpbranch[i].name);

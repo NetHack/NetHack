@@ -259,7 +259,7 @@ free_luathemes(boolean keependgame) /* False: exiting, True: discarding main dun
         if (keependgame && i == astral_level.dnum)
             continue;
         if (g.luathemes[i]) {
-            lua_close((lua_State *) g.luathemes[i]);
+            nhl_done((lua_State *) g.luathemes[i]);
             g.luathemes[i] = (lua_State *) 0;
         }
     }
@@ -277,7 +277,7 @@ makerooms(void)
         if ((themes = nhl_init()) != 0) {
             if (!nhl_loadlua(themes, fname)) {
                 /* loading lua failed, don't use themed rooms */
-                lua_close(themes);
+                nhl_done(themes);
                 themes = (lua_State *) 0;
             } else {
                 /* success; save state for this dungeon branch */

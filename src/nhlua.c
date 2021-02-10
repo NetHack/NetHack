@@ -1110,6 +1110,7 @@ nhl_init(void)
 {
     lua_State *L = luaL_newstate();
 
+    iflags.in_lua = TRUE;
     luaL_openlibs(L);
     nhl_set_package_path(L, "./?.lua");
 
@@ -1130,11 +1131,18 @@ nhl_init(void)
     l_obj_register(L);
 
     if (!nhl_loadlua(L, "nhlib.lua")) {
-        lua_close(L);
+        nhl_done(L);
         return (lua_State *) 0;
     }
 
     return L;
+}
+
+void
+nhl_done(lua_State *L)
+{
+    lua_close(L);
+    iflags.in_lua = FALSE;
 }
 
 boolean
@@ -1154,7 +1162,7 @@ load_lua(const char *name)
     }
 
  give_up:
-    lua_close(L);
+    nhl_done(L);
 
     return ret;
 }
