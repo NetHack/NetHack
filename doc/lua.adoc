@@ -171,10 +171,21 @@ Example:
 === parse_config
 
 Parse string as if it was read from a config file.
+Always call parse_config_errors afterwards to check for any parsing errors.
 
 Example:
 
  nh.parse_config("OPTIONS=color");
+
+
+=== parse_config_errors
+
+Returns any errors found when parsing a config file string with parse_config.
+
+Example:
+
+ local errors = nh.parse_config("OPTIONS=color\nOPTIONS=!color");
+ nh.pline("Line: " .. errors[1].line .. ", " .. errors[1].error);
 
 
 === pline

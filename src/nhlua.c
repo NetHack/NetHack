@@ -830,6 +830,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"level_difficulty", nhl_level_difficulty},
     {"parse_config", nhl_parse_config},
     {"get_config", nhl_get_config},
+    {"get_config_errors", l_get_config_errors},
     {NULL, NULL}
 };
 

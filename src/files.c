@@ -2798,6 +2798,12 @@ can_read_file(const char *filename)
 }
 #endif /* USER_SOUNDS */
 
+struct _config_error_errmsg {
+    int line_num;
+    char *errormsg;
+    struct _config_error_errmsg *next;
+};
+
 struct _config_error_frame {
     int line_num;
     int num_errors;
@@ -2810,6 +2816,7 @@ struct _config_error_frame {
 };
 
 static struct _config_error_frame *config_error_data = 0;
+static struct _config_error_errmsg *config_error_msg = 0;
 
 void
 config_error_init(boolean from_file, const char *sourcename, boolean secure)
@@ -2856,6 +2863,32 @@ config_error_nextline(const char *line)
     return TRUE;
 }
 
+int
+l_get_config_errors(lua_State *L)
+{
+    struct _config_error_errmsg *dat = config_error_msg;
+    struct _config_error_errmsg *tmp;
+    int idx = 1;
+
+    lua_newtable(L);
+
+    while (dat) {
+        lua_pushinteger(L, idx++);
+        lua_newtable(L);
+        nhl_add_table_entry_int(L, "line", dat->line_num);
+        nhl_add_table_entry_str(L, "error", dat->errormsg);
+        lua_settable(L, -3);
+        tmp = dat->next;
+        free(dat->errormsg);
+        dat->errormsg = (char *) 0;
+        free(dat);
+        dat = tmp;
+    }
+    config_error_msg = (struct _config_error_errmsg *) 0;
+
+    return 1;
+}
+
 /* varargs 'config_error_add()' moved to pline.c */
 void
 config_erradd(const char *buf)
@@ -2864,6 +2897,16 @@ config_erradd(const char *buf)
 
     if (!buf || !*buf)
         buf = "Unknown error";
+
+    if (iflags.in_lua) {
+        struct _config_error_errmsg *dat = (struct _config_error_errmsg *) alloc(sizeof (struct _config_error_errmsg));
+
+        dat->next = config_error_msg;
+        dat->line_num = config_error_data->line_num;
+        dat->errormsg = dupstr(buf);
+        config_error_msg = dat;
+        return;
+    }
 
     if (!config_error_data) {
         /* either very early, where pline() will use raw_print(), or

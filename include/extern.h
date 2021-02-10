@@ -743,6 +743,9 @@ extern void makerogueghost(void);
 
 /* ### files.c ### */
 
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+extern int l_get_config_errors(lua_State *);
+#endif
 extern char *fname_encode(const char *, char, char *, char *, int);
 extern char *fname_decode(char, char *, char *, int);
 extern const char *fqname(const char *, int, int);
