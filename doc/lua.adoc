@@ -184,7 +184,8 @@ Returns any errors found when parsing a config file string with parse_config.
 
 Example:
 
- local errors = nh.parse_config("OPTIONS=color\nOPTIONS=!color");
+ nh.parse_config("OPTIONS=color\nOPTIONS=!color");
+ local errors = nh.parse_config_errors();
  nh.pline("Line: " .. errors[1].line .. ", " .. errors[1].error);
 
 
