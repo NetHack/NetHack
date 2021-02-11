@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1612656277 2021/02/07 00:04:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613011899 2021/02/11 02:51:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -158,7 +158,7 @@ static void X11_sig_cb(XtPointer, XtSignalId *);
 #endif
 static void d_timeout(XtPointer, XtIntervalId *);
 static void X11_hangup(Widget, XEvent *, String *, Cardinal *);
-static void X11_bail(const char *);
+static void X11_bail(const char *) NORETURN;
 static void askname_delete(Widget, XEvent *, String *, Cardinal *);
 static void askname_done(Widget, XtPointer, XtPointer);
 static void done_button(Widget, XtPointer, XtPointer);
