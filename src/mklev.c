@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1613085478 2021/02/11 23:17:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,7 +27,7 @@ static struct mkroom *pos_to_room(xchar, xchar);
 static boolean place_niche(struct mkroom *, int *, int *, int *);
 static void makeniche(int);
 static void make_niches(void);
-static int QSORTCALLBACK do_comp(const genericptr, const genericptr);
+static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
 static void dosdoor(xchar, xchar, struct mkroom *, int);
 static void join(int, int, boolean);
 static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
@@ -45,7 +45,7 @@ static void mk_knox_portal(xchar, xchar);
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
 static int QSORTCALLBACK
-do_comp(const genericptr vx, const genericptr vy)
+mkroom_cmp(const genericptr vx, const genericptr vy)
 {
 #ifdef LINT
     /* lint complains about possible pointer alignment problems, but we know
@@ -64,11 +64,11 @@ do_comp(const genericptr vx, const genericptr vy)
 #endif /* LINT */
 }
 
-/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor() checks
- * would be connecting into an area that was declared as joined = 0.
- * Checking for this in finddpos() enables us to have rooms with sub-areas (such
- * as shops) that will never randomly generate unwanted doors in order to
- * connect them up to other areas.
+/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor()
+ * checks would be connecting into an area that was declared as joined = 0.
+ * Checking for this in finddpos() enables us to have rooms with sub-areas
+ * (such as shops) that will never randomly generate unwanted doors in order
+ * to connect them up to other areas.
  */
 static boolean
 door_into_nonjoined(xchar x, xchar y)
@@ -125,25 +125,20 @@ finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
 void
 sort_rooms(void)
 {
-    int i, x, y;
-    int ri[MAXNROFROOMS+1];
+    int x, y;
+    unsigned i, ri[MAXNROFROOMS + 1], n = (unsigned) g.nroom;
 
-#if defined(SYSV) || defined(DGUX)
-#define CAST_nroom (unsigned) g.nroom
-#else
-#define CAST_nroom g.nroom /*as-is*/
-#endif
-    qsort((genericptr_t) g.rooms, CAST_nroom, sizeof (struct mkroom), do_comp);
-#undef CAST_nroom
+    qsort((genericptr_t) g.rooms, n, sizeof (struct mkroom), mkroom_cmp);
 
     /* Update the roomnos on the map */
-    for (i = 0; i < g.nroom; i++)
+    for (i = 0; i < n; i++)
         ri[g.rooms[i].roomnoidx] = i;
 
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            int rno = levl[x][y].roomno;
-            if (rno >= ROOMOFFSET && rno < MAXNROFROOMS+1)
+            unsigned rno = levl[x][y].roomno;
+
+            if (rno >= ROOMOFFSET && rno < MAXNROFROOMS + 1)
                 levl[x][y].roomno = ri[rno - ROOMOFFSET] + ROOMOFFSET;
         }
 }
@@ -251,7 +246,7 @@ add_subroom(struct mkroom *proom, int lowx, int lowy, int hix, int hiy,
 }
 
 void
-free_luathemes(boolean keependgame) /* False: exiting, True: discarding main dungeon */
+free_luathemes(boolean keependgame) /* F: done, T: discarding main dungeon */
 {
     int i;
 
@@ -920,8 +915,8 @@ makelevel(void)
         }
 
         /* make up to 1 special room, with type dependent on depth;
-         * note that mkroom doesn't guarantee a room gets created, and that this
-         * step only sets the room's rtype - it doesn't fill it yet. */
+           note that mkroom doesn't guarantee a room gets created, and that
+           this step only sets the room's rtype - it doesn't fill it yet. */
         if (wizard && nh_getenv("SHOPTYPE"))
             do_mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
