@@ -858,6 +858,7 @@ add cross-compile to WASM (github #385, #403, #412)
 differentiating gendered monster tiles from NullCGT (#430)
 check bones data directly for deja vu messages (#374)
 unify code for extracting an object from a monster's inventory (#455)
+make engraving an occupation (#460)
 
 
 Code Cleanup and Reorganization
