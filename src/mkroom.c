@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkroom.c	$NHDT-Date: 1596498184 2020/08/03 23:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.7	mkroom.c	$NHDT-Date: 1613086701 2021/02/11 23:38:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -45,9 +45,9 @@ isbig(struct mkroom* sroom)
 void
 do_mkroom(int roomtype)
 {
-    if (roomtype >= SHOPBASE)
+    if (roomtype >= SHOPBASE) {
         mkshop(); /* someday, we should be able to specify shop type */
-    else
+    } else {
         switch (roomtype) {
         case COURT:
             mkzoo(COURT);
@@ -82,6 +82,7 @@ do_mkroom(int roomtype)
         default:
             impossible("Tried to make a room of type %d.", roomtype);
         }
+    }
 }
 
 static void
@@ -93,7 +94,6 @@ mkshop(void)
 
     /* first determine shoptype */
     if (wizard) {
-#ifndef MAC
         ep = nh_getenv("SHOPTYPE");
         if (ep) {
             if (*ep == 'z' || *ep == 'Z') {
@@ -146,23 +146,21 @@ mkshop(void)
             else
                 i = -1;
         }
-#endif
     }
-#ifndef MAC
-gottype:
-#endif
+
+ gottype:
     for (sroom = &g.rooms[0];; sroom++) {
         if (sroom->hx < 0)
             return;
         if (sroom - g.rooms >= g.nroom) {
-            pline("g.rooms not closed by -1?");
+            impossible("rooms[] not closed by -1?");
             return;
         }
         if (sroom->rtype != OROOM)
             continue;
         if (has_dnstairs(sroom) || has_upstairs(sroom))
             continue;
-        if ((wizard && ep && sroom->doorct != 0) || sroom->doorct == 1)
+        if (sroom->doorct == 1 || (wizard && ep && sroom->doorct != 0))
             break;
     }
     if (!sroom->rlit) {
@@ -197,9 +195,9 @@ gottype:
     topologize(sroom);
 #endif
 
-    /* The shop used to be stocked here, but this no longer happens - all we do
-     * is set its rtype, and it gets stocked at the end of makelevel() along
-     * with other special rooms. */
+    /* The shop used to be stocked here, but this no longer happens--all we do
+       is set its rtype, and it gets stocked at the end of makelevel() along
+       with other special rooms. */
     sroom->needfill = FILL_NORMAL;
 }
 
@@ -269,8 +267,8 @@ fill_zoo(struct mkroom* sroom)
     int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     coord mm;
 
-    /* Note: This doesn't check needfill; it assumes the caller has already done
-     * that. */
+    /* Note: This doesn't check needfill; it assumes the caller has already
+       done that. */
     sh = sroom->fdoor;
     switch (type) {
     case COURT:
