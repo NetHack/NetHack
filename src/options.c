@@ -472,6 +472,8 @@ parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
 
     if (optresult == optn_silenterr)
         return FALSE;
+    if (got_match && optresult == optn_err)
+        return FALSE;
     if (optresult == optn_ok)
         return retval;
 
