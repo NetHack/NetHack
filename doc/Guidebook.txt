@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                   January 6, 2021
+                                 February 11, 2021
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -918,7 +918,7 @@
                (See the `W' command below.  It lists armor as the inventory
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1050,7 +1050,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1182,7 +1182,7 @@
                <backspace> keys, so typing the <del> key might not  execute
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1248,7 +1248,7 @@
                prefix skips those items.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1578,7 +1578,7 @@
                Show the ring(s) currently worn.  Default key is `='.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1710,7 +1710,7 @@
                u', and `u' if number_pad is on.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1776,7 +1776,7 @@
                mode only.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2040,7 +2040,7 @@
           with the `s' (search) command but it might  take  multiple  tries
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2106,7 +2106,7 @@
           in the four cardinal directions, and a boulder which fills a  pit
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2238,7 +2238,7 @@
             tory depletion.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2304,7 +2304,7 @@
           a visible monster's spot without the  move  being  considered  an
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2370,7 +2370,7 @@
           business unless you attack them.  Some of them are very dangerous
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2436,7 +2436,7 @@
           riding, in the same manner as you would move yourself.  It is the
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2568,7 +2568,7 @@
           demons.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2634,7 +2634,7 @@
           factors.  Among them are:  type  of  weapon,  quality  of  weapon
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2700,7 +2700,7 @@
           for `Q' runs out.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2766,7 +2766,7 @@
           boost  your  training towards the next skill level (unless you've
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2832,7 +2832,7 @@
           protection in NetHack.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2898,7 +2898,7 @@
           protected.   Food  stored  in  ice  boxes  or  tins ("cans") will
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -2964,7 +2964,7 @@
           is  the  bane  of  the  undead, so potions of holy water are good
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3030,7 +3030,7 @@
           ing  a  ring and then re-wear them after.  That's done implicitly
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3096,7 +3096,7 @@
           mand casts a spell.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3228,7 +3228,7 @@
           map.  That remains the case even if it is not actually there  any
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3294,7 +3294,7 @@
           and candy bars), and lumps of royal jelly.  Monks are expected to
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3360,7 +3360,7 @@
           The identity of scrolls and spellbooks (and knowledge of  spells)
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3426,7 +3426,7 @@
           <Rank>     - Attained rank title <Rank>.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3492,7 +3492,7 @@
           abled  by   setting   the   correspondingly   named   option   in
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3558,7 +3558,7 @@
           a CHOOSE directive has selected that section.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3624,7 +3624,7 @@
             extended command.  Prefix the command with "!" to  disable  the
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3690,7 +3690,7 @@
             Define a sound mapping.   See  the  "Configuring  User  Sounds"
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3756,7 +3756,7 @@
           option to the list, and turn it off  by  typing  a  `!'  or  "no"
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3822,7 +3822,7 @@
             command.  Persistent.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -3954,7 +3954,7 @@
             Asking refers to picking one of the orderings from a menu.  The
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4020,7 +4020,7 @@
             Apples,  oranges,  pears,  bananas, and melons already exist in
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4086,7 +4086,7 @@
             available for TTY and Windows GUI, and only when  statushilites
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4152,7 +4152,7 @@
             jects (in response to the Drop  command,  for  instance).   The
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4218,7 +4218,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4284,7 +4284,7 @@
             (which  defaults  to  "full"),  or  it  can  be  negated (which
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4350,7 +4350,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4482,7 +4482,7 @@
             of 1 effectively means "never show the objects" since the  pile
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4548,7 +4548,7 @@
             When writing out a save file, perform run length compression of
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4614,7 +4614,7 @@
             Suppress terminal beeps (default on).  Persistent.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4680,7 +4680,7 @@
             alert notification messages about feature changes for that  and
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4746,7 +4746,7 @@
                  n - none (no coordinates shown) [default].
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4812,7 +4812,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4878,7 +4878,7 @@
             If NetHack can, it should use a font by the chosen name for the
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5010,7 +5010,7 @@
             default.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5142,7 +5142,7 @@
             (default off, Amiga NetHack only).
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5208,7 +5208,7 @@
             not correct the problem, try !color.  Cannot be  set  with  the
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5340,7 +5340,7 @@
             fault is `.'.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5472,7 +5472,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5604,7 +5604,7 @@
             specifies that any menu line with " blessed " contained  in  it
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5670,7 +5670,7 @@
           will cause the hitpoints field to display in  the  color  red  if
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5736,7 +5736,7 @@
             ally displayed depending upon your other option settings.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6132,7 +6132,7 @@
           program as a message handler", your  NetHack  has  been  compiled
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6264,7 +6264,7 @@
             bones file content in ascii text.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6330,7 +6330,7 @@
             %D - current time, YYYYMMDDhhmmss format
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6396,7 +6396,7 @@
           It  is  initiated  by  starting the game with the -D command-line
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6528,7 +6528,7 @@
           Michael Allison ported NetHack 3.1 to Windows NT.
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6726,7 +6726,7 @@
           Jessie  Collet,  Ken  Lorber,  Dean  Luick,  Pat   Rankin,   Mike
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6858,7 +6858,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7                                       January 6, 2021
+          NetHack 3.7                                     February 11, 2021
 
 
 
