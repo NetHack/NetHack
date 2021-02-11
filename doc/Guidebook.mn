@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.412 $ $NHDT-Date: 1609988081 2021/01/07 02:54:41 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.414 $ $NHDT-Date: 1613011698 2021/02/11 02:48:18 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -621,8 +621,8 @@ y  k  u	\ 	7  8  9\ 	\"
 h\- . \-l	\ 	4\- . \-6\ 	\"
 / | \\	\ 	/ | \\\ 	\"
 b  j  n	\ 	1  2  3\ 	\"
-\fR\ 	\ 	(if \fBnumber_pad\fP is set)\ 	\fP\"
-\fR\ 	Figure 3\ 	\ 	\fP\"
+\fR\ 	\ 	(if \fBnumber_pad\fR is set)\ 	\"
+\fR\ 	Figure 3\ 	\ 	\"
 .TE
 .ft
 .ED
