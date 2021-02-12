@@ -11,6 +11,20 @@ local configtests = {
  { test = "OPTIONS=!color\nOPTIONS=color",
    result = { { line = 2, error = "boolean option specified multiple times: color" } }
    },
+ { test = "OPTIONS=runmode:crawl",
+   result = {  },
+   extra = function() return nh.get_config("runmode") == "crawl" end
+   },
+ { test = "OPTIONS=runmode:foo",
+   result = { { line = 1, error = "Unknown runmode parameter 'foo'" } },
+   },
+ { test = "OPTIONS=runmode",
+   result = { { line = 1, error = "Value is mandatory for runmode" } },
+   },
+ { test = "OPTIONS=!runmode",
+   result = {  },
+   extra = function() return nh.get_config("runmode") == "teleport" end
+   },
 };
 
 
@@ -37,7 +51,7 @@ for k, v in pairs(configtests) do
    local res = nh.get_config_errors();
 
    if not testtable(err, res) then
-      error("Config: Results don't match");
+      error("Config: Results don't match for test \"" .. cnf .. "\"");
    end
 
    if (type(configtests[k].extra) == "function") then

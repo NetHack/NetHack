@@ -2822,8 +2822,10 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
                                  allopt[optidx].name, op);
                 return optn_err;
             }
-        } else
+        } else {
+            config_error_add("Value is mandatory for %s", allopt[optidx].name);
             return optn_err;
+        }
         return optn_ok;
     }
     if (req == get_val) {
