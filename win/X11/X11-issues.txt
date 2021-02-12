@@ -1,0 +1,15 @@
+End of game stalls after death is reported if the persistent inventory
+window is shown at the time.  Closing it manually lets the game-over
+sequence proceed.  Answering 'y' to "Really quit?" and any valid response
+to "Dump core?" behaves likewise.
+
+Toggling 'perm_invent' Off with the 'O' command while the persistent
+inventory window is displayed does not remove it.
+
+Starting or restoring a game with 'perm_invent' enabled via config file
+or NETHACKOPTIONS does not begin with inventory shown.
+
+When persistent inventory window is displayed, an update that ought to
+make it grow won't do so even if there is room on the screen for that.
+It will add scrollbar(s) when not already there, and it can be resized
+manually.

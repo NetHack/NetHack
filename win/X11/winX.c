@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613011899 2021/02/11 02:51:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613171266 2021/02/12 23:07:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -573,11 +573,25 @@ get_window_frame_extents(Widget w,
     unsigned char *data = 0;
     long *extents;
 
-    *top = *bottom = *left = *right = 0L;
-
     prop = XInternAtom(dpy, "_NET_FRAME_EXTENTS", True);
-    if (prop == None)
+    if (prop == None) {
+        /*
+         * FIXME!
+         */
+#ifdef MACOSX
+        /*
+         * Default window manager doesn't support _NET_FRAME_EXTENTS.
+         * Without this position tweak, the persistent inventory window
+         * creeps downward by approximately the height of its title bar
+         * and also a smaller amount to the left every time it gets
+         * updated.  Caveat:  amount determined by trial and error and
+         * could change depending upon monitor resolution....
+         */
+        *top = 22;
+        *left = 0;
+#endif
         return;
+    }
 
     while (XGetWindowProperty(dpy, win, prop,
                               0, 4, False, AnyPropertyType,
