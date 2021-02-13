@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.450 $ $NHDT-Date: 1613171268 2021/02/12 23:07:48 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ $NHDT-Date: 1613258116 2021/02/13 23:15:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -382,6 +382,7 @@ prevent wish request "death wand" from matching Death monster and producing a
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
 curses interface failed to honor menu_xxx option settings for menu interaction
 during engraving, spaces were counted instead of non-spaces
+when an explosion scatters objects, make any that fly over sinks stop there
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

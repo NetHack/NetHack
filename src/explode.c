@@ -1,4 +1,4 @@
-/* NetHack 3.7	explode.c	$NHDT-Date: 1596498168 2020/08/03 23:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.7	explode.c	$NHDT-Date: 1613258116 2021/02/13 23:15:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -754,6 +754,8 @@ scatter(int sx, int sy,  /* location of objects to scatter */
                 }
                 stmp->ox = g.bhitpos.x;
                 stmp->oy = g.bhitpos.y;
+                if (IS_SINK(levl[stmp->ox][stmp->oy].typ))
+                    stmp->stopped = TRUE;
             }
         }
     }
