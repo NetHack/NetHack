@@ -1,4 +1,4 @@
-/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1605315160 2020/11/14 00:52:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1613258169 2021/02/13 23:16:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -444,33 +444,32 @@ ohitmon(
     return 0;
 }
 
-#define MT_FLIGHTCHECK(pre)                                             \
+#define MT_FLIGHTCHECK(pre) \
     (/* missile hits edge of screen */                                  \
-     !isok(g.bhitpos.x + dx, g.bhitpos.y + dy)                              \
+     !isok(g.bhitpos.x + dx, g.bhitpos.y + dy)                          \
      /* missile hits the wall */                                        \
-     || IS_ROCK(levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ)               \
+     || IS_ROCK(levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ)           \
      /* missile hit closed door */                                      \
-     || closed_door(g.bhitpos.x + dx, g.bhitpos.y + dy)                     \
+     || closed_door(g.bhitpos.x + dx, g.bhitpos.y + dy)                 \
      /* missile might hit iron bars */                                  \
      /* the random chance for small objects hitting bars is */          \
      /* skipped when reaching them at point blank range */              \
-     || (levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ == IRONBARS           \
+     || (levl[g.bhitpos.x + dx][g.bhitpos.y + dy].typ == IRONBARS       \
          && hits_bars(&singleobj,                                       \
-                      g.bhitpos.x, g.bhitpos.y,                             \
-                      g.bhitpos.x + dx, g.bhitpos.y + dy,                   \
+                      g.bhitpos.x, g.bhitpos.y,                         \
+                      g.bhitpos.x + dx, g.bhitpos.y + dy,               \
                       ((pre) ? 0 : !rn2(5)), 0))                        \
      /* Thrown objects "sink" */                                        \
-     || (!(pre) && IS_SINK(levl[g.bhitpos.x][g.bhitpos.y].typ)))
+     || (!(pre) && IS_SINK(levl[g.bhitpos.x][g.bhitpos.y].typ))         \
+     )
 
 void
 m_throw(
-    struct monst *mon,       /* launching monster */
-    int x,
-    int y,
-    int dx,
-    int dy,
-    int range,               /* launch point, direction, and range */
-    struct obj *obj)         /* missile (or stack providing it) */
+    struct monst *mon,      /* launching monster */
+    int x, int y,           /* launch point */
+    int dx, int dy,         /* direction */
+    int range,              /* maximum distance */
+    struct obj *obj)        /* missile (or stack providing it) */
 {
     struct monst *mtmp;
     struct obj *singleobj;
@@ -492,8 +491,8 @@ m_throw(
          * The extract below does nothing.
          */
 
-        /* not possibly_unwield, which checks the object's */
-        /* location, not its existence */
+        /* not possibly_unwield(), which checks the object's location,
+           not its existence */
         if (MON_WEP(mon) == obj)
             setmnotwielded(mon, obj);
         obj_extract_self(obj);
@@ -658,14 +657,21 @@ m_throw(
                 break;
             }
         }
-        if (!range /* reached end of path */
-            || MT_FLIGHTCHECK(FALSE)) {
+        if (!range || MT_FLIGHTCHECK(FALSE)) { /* end of path or blocked */
             if (singleobj) { /* hits_bars might have destroyed it */
-                if (g.m_shot.n > 1
-                    && (!g.mesg_given || g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)
-                    && (cansee(g.bhitpos.x, g.bhitpos.y)
-                        || (g.marcher && canseemon(g.marcher))))
+                /* note: pline(The(missile)) rather than pline_The(missile)
+                   in order to get "Grimtooth" rather than "The Grimtooth" */
+                if (range && cansee(g.bhitpos.x, g.bhitpos.y)
+                    && IS_SINK(levl[g.bhitpos.x][g.bhitpos.y].typ))
+                    pline("%s %s onto the sink.", The(mshot_xname(singleobj)),
+                          otense(singleobj, Hallucination ? "plop" : "drop"));
+                else if (g.m_shot.n > 1
+                         && (!g.mesg_given
+                             || g.bhitpos.x != u.ux || g.bhitpos.y != u.uy)
+                         && (cansee(g.bhitpos.x, g.bhitpos.y)
+                             || (g.marcher && canseemon(g.marcher))))
                     pline("%s misses.", The(mshot_xname(singleobj)));
+
                 (void) drop_throw(singleobj, 0, g.bhitpos.x, g.bhitpos.y);
             }
             break;
