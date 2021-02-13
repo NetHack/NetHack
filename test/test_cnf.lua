@@ -11,6 +11,9 @@ local configtests = {
  { test = "OPTIONS=!color\nOPTIONS=color",
    result = { { line = 2, error = "boolean option specified multiple times: color" } }
    },
+ { test = "OPTIONS=!color,color",
+   result = { { line = 1, error = "boolean option specified multiple times: color" } }
+   },
  { test = "OPTIONS=runmode:crawl",
    result = {  },
    extra = function() return nh.get_config("runmode") == "crawl" end
@@ -24,6 +27,12 @@ local configtests = {
  { test = "OPTIONS=!runmode",
    result = {  },
    extra = function() return nh.get_config("runmode") == "teleport" end
+   },
+ { test = "OPTIONS=runmode:crawl\nOPTIONS=runmode:teleport",
+   result = { { line = 2, error = "compound option specified multiple times: runmode" } }
+   },
+ { test = "OPTIONS=runmode:run,runmode:walk",
+   result = { { line = 1, error = "compound option specified multiple times: runmode" } }
    },
 };
 
