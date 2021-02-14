@@ -9,7 +9,7 @@ static void setgemprobs(d_level *);
 static void shuffle(int, int, boolean);
 static void shuffle_all(void);
 static boolean interesting_to_discover(int);
-static int CFDECLSPEC discovered_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *oclass_to_name(char, char *);
 
 #ifdef USE_TILES
@@ -455,7 +455,7 @@ static const short uniq_objs[] = {
 };
 
 /* discoveries qsort comparison function */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 discovered_cmp(const genericptr v1, const genericptr v2)
 {
     const char *s1 = *(const char **) v1;

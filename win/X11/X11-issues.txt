@@ -1,0 +1,9 @@
+When persistent inventory window is first populated, focus is given to
+its window (behavior might be window manager-specific; it happens with
+default window manager on OSX).  Focus should be explicitly directed
+back to the main window.
+
+When persistent inventory window is displayed, an update that ought to
+make it grow won't do so even if there is room on the screen for that.
+It will add scrollbar(s) when not already there, and it can be resized
+manually.

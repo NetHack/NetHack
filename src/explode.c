@@ -1,4 +1,4 @@
-/* NetHack 3.7	explode.c	$NHDT-Date: 1596498168 2020/08/03 23:42:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.7	explode.c	$NHDT-Date: 1613258116 2021/02/13 23:15:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -538,8 +538,9 @@ explode(int x, int y,
                     g.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     g.killer.format = NO_KILLER_PREFIX;
-                    Sprintf(g.killer.name, "caught %sself in %s own %s", uhim(),
-                            uhis(), str);
+                    Snprintf(g.killer.name, sizeof g.killer.name,
+                             "caught %sself in %s own %s", uhim(),
+                             uhis(), str);
                 } else {
                     g.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
@@ -753,6 +754,8 @@ scatter(int sx, int sy,  /* location of objects to scatter */
                 }
                 stmp->ox = g.bhitpos.x;
                 stmp->oy = g.bhitpos.y;
+                if (IS_SINK(levl[stmp->ox][stmp->oy].typ))
+                    stmp->stopped = TRUE;
             }
         }
     }

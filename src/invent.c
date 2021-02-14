@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1608846067 2020/12/24 21:41:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1612912018 2021/02/09 23:06:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.319 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,7 +15,7 @@
 
 static char *loot_xname(struct obj *);
 static int invletter_value(char);
-static int CFDECLSPEC sortloot_cmp(const genericptr, const genericptr);
+static int QSORTCALLBACK sortloot_cmp(const genericptr, const genericptr);
 static void reorder_invent(void);
 static struct obj *addinv_core0(struct obj *, struct obj *, boolean);
 static void noarmor(boolean);
@@ -303,7 +303,7 @@ invletter_value(char c)
 }
 
 /* qsort comparison routine for sortloot() */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
@@ -2218,8 +2218,7 @@ count_unidentified(struct obj *objchn)
 /* dialog with user to identify a given number of items; 0 means all */
 void
 identify_pack(int id_limit,
-              boolean learning_id) /* true if we just read unknown
-                                      identify scroll */
+              boolean learning_id) /* T: just read unknown identify scroll */
 {
     struct obj *obj;
     int n, unid_cnt = count_unidentified(g.invent);
@@ -2320,6 +2319,8 @@ prinv(const char *prefix, struct obj *obj, long quan)
           xprname(obj, (char *) 0, obj_to_let(obj), TRUE, 0L, quan));
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 char *
 xprname(struct obj *obj,
         const char *txt, /* text to print instead of obj */
@@ -2364,6 +2365,8 @@ xprname(struct obj *obj,
 
     return li;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the 'i' command */
 int
@@ -2416,14 +2419,15 @@ free_pickinv_cache(void)
 
 /*
  * Internal function used by display_inventory and getobj that can display
- * inventory and return a count as well as a letter. If out_cnt is not null,
- * any count returned from the menu selection is placed here.
+ * inventory and return a count as well as a letter.
  */
 static char
-display_pickinv(register const char *lets,
-                const char *xtra_choice, /* "fingers", pick hands rather than
-                                            an object */
-                const char *query, boolean want_reply, long *out_cnt)
+display_pickinv(
+    const char *lets,        /* non-compacted list of invlet values */
+    const char *xtra_choice, /* non-object "bare hands" or "fingers" */
+    const char *query,       /* optional; prompt string for menu */
+    boolean want_reply,      /* True: select an item, False: just display */
+    long *out_cnt) /* optional; count player entered when selecting an item */
 {
     static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp, wizid_fakeobj;
@@ -2471,7 +2475,7 @@ display_pickinv(register const char *lets,
     /* for xtra_choice, there's another 'item' not included in initial 'n';
        for !lets (full g.invent) and for override_ID (wizard mode identify),
        skip message_menu handling of single item even if item count was 1 */
-    if (xtra_choice || (n == 1 && (!lets || iflags.override_ID)))
+    if (xtra_choice || (n == 1 && (!lets || wizid)))
         ++n;
 
     if (n == 0) {
@@ -2517,7 +2521,7 @@ display_pickinv(register const char *lets,
 
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
-    if (wizard && iflags.override_ID) {
+    if (wizid) {
         int unid_cnt;
         char prompt[QBUFSZ];
 
@@ -2561,6 +2565,7 @@ display_pickinv(register const char *lets,
                  xtra_choice, MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
+
  nextclass:
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
@@ -2622,13 +2627,14 @@ display_pickinv(register const char *lets,
                  not_carrying_anything, MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
-    end_menu(win, query && *query ? query : (char *) 0);
+    end_menu(win, (query && *query) ? query : (char *) 0);
 
     n = select_menu(win,
                     wizid ? PICK_ANY : want_reply ? PICK_ONE : PICK_NONE,
                     &selected);
     if (n > 0) {
         if (wizid) {
+            boolean all_id = FALSE;
             int i;
 
             /* identifying items will update perm_invent, calling this
@@ -2640,11 +2646,17 @@ display_pickinv(register const char *lets,
                 otmp = selected[i].item.a_obj;
                 if (otmp == &wizid_fakeobj) {
                     identify_pack(0, FALSE);
+                    /* identify_pack() performs update_inventory() */
+                    all_id = TRUE;
+                    break;
                 } else {
                     if (not_fully_identified(otmp))
                         (void) identify(otmp);
+                    /* identify() does not perform update_inventory() */
                 }
             }
+            if (!all_id)
+                update_inventory();
         } else {
             ret = selected[0].item.a_char;
             if (out_cnt)
@@ -3781,6 +3793,8 @@ static NEARDATA const char *names[] = {
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
 static NEARDATA const char *oth_names[] = { "Bagged/Boxed items" };
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 char *
 let_to_name(char let, boolean unpaid, boolean showsym)
 {
@@ -3822,6 +3836,8 @@ let_to_name(char let, boolean unpaid, boolean showsym)
     }
     return g.invbuf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* release the static buffer used by let_to_name() */
 void

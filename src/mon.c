@@ -2597,13 +2597,7 @@ monstone(struct monst* mdef)
         oldminvent = 0;
         /* some objects may end up outside the statue */
         while ((obj = mdef->minvent) != 0) {
-            obj_extract_self(obj);
-            if (obj->owornmask)
-                update_mon_intrinsics(mdef, obj, FALSE, TRUE);
-            obj_no_longer_held(obj);
-            if (obj->owornmask & W_WEP)
-                setmnotwielded(mdef, obj);
-            obj->owornmask = 0L;
+            extract_from_minvent(mdef, obj, TRUE, TRUE);
             if (obj->otyp == BOULDER
 #if 0 /* monsters don't carry statues */
                 ||  (obj->otyp == STATUE

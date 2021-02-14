@@ -71,6 +71,8 @@ pre_mm_attack(struct monst *magr, struct monst *mdef)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static
 void
 missmm(register struct monst *magr, register struct monst *mdef,
@@ -90,6 +92,8 @@ missmm(register struct monst *magr, register struct monst *mdef,
     } else
         noises(magr, mattk);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*
  *  fightm()  -- fight some other monster
@@ -193,7 +197,7 @@ mdisplacem(register struct monst *magr, register struct monst *mdef,
     if (m_at(fx, fy) != magr || m_at(tx, ty) != mdef)
         return MM_MISS;
 
-    /* The 1 in 7 failure below matches the chance in attack()
+    /* The 1 in 7 failure below matches the chance in do_attack()
      * for pet displacement.
      */
     if (!rn2(7))

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.439 $ $NHDT-Date: 1612055953 2021/01/31 01:19:13 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ $NHDT-Date: 1613292825 2021/02/14 08:53:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -74,8 +74,27 @@ if the orc-town version of mine town has been loaded, creation of orc zombies
 when punished, involuntarily teleporting and landing within chain range of
 	attached ball while encumbered worse than burdened could trigger
 	"remove_object: obj not on floor" panic on hero's next move
+update persistent inventory when putting on a helmet causes it to auto-curse
 inventory cursing caused by "this water's no good" effect when drinking from
 	a fountain didn't update persistent inventory window
+leashing or unleashing pets wasn't updating persistent inventory window
+when the wetness of a towel in inventory changed, persistent inventory wasn't
+	updated to show that
+using wizard mode identify to ID 'all' updated perm_invent window but IDing
+	specific items--even every one of them--did not
+hold_another_object added item to inventory first, then maybe removed and
+	dropped it, resulting in spurious add and remove perm_invent updates
+when hold_another_object fails while hero is swallowed, drop the item into
+	swallower's inventory instead of onto the floor
+hold_another_object (for wishing, horn of plenty, theft while poly'd, other
+	non-pickup actions giving hero another inventory item) wasn't
+	reporting change in encumbrance; that would catch up on next turn but
+	could be off during additional move(s) for current turn
+hold_another_object used hardcoded Stressed to limit carrying instead of
+	using the 'pickup_burden' option for that
+transforming a potion by dipping a unicorn horn into it could result in the
+	potion being dropped due to 'pickup_burden' if encumbrance was already
+	over threshold before dipping but within it after removal from invent
 fix priest created inside temple wall
 fix vault guard occasionally encasing monsters in stone
 tone down scare monster by excluding humans and uniques
@@ -178,16 +197,6 @@ falling while going down stairs and dropping items due to encumbrance or
 	punishment wasn't subjecting fragile ones to breakage
 objects scattered by an explosion which land on water or lava weren't affected
 	by the water or lava
-hold_another_object (for wishing, horn of plenty, theft while poly'd, other
-	non-pickup actions giving hero another inventory item) wasn't
-	reporting change in encumbrance; that would catch up on next turn but
-	could be off during additional move(s) for current turn
-hold_another_object added item to inventory first, then maybe removed and
-	dropped it, resulting in spurious add and remove perm_invent updates
-hold_another_object used hardcoded Stressed to limit carrying instead of
-	using the 'pickup_burden' option for that
-when hold_another_object fails while hero is swallowed, drop the item into
-	swallower's inventory instead of onto the floor
 change mkclass() to usually honor (always honor for L class) the hell-only and
 	never-in-hell monster creation flags; no more achi-lich in the Castle
 	(nor master lich there unless demilich gets a potion of gain level)
@@ -247,7 +256,6 @@ wizard mode #wizintrinsic: setting Levitation wouldn't block Flying as
 chatting to the quest leader in wizard mode with sufficient experience level
 	and insufficient piety, player is asked whether alignment should be
 	boosted; answering 'n' resulted in being prompted a second time
-leashing or unleashing pets wasn't updating persistent inventory window
 end of game inventory disclosure passed an inappropriate argument to the
 	inventory display routine; not noticeable for tty and curses,
 	noticeable but not harmful for X11, and slightly harmful for Qt
@@ -294,7 +302,6 @@ hero could break a wand ("raising the wand high over your head, you break it
 	one-handed weapon and also to a shield
 if a monster threw a cocktrice egg at the hero but hit and petrified another
 	monster, the hero would get credit/blame for killing it
-update persistent inventory when putting on a helmet causes it to auto-curse
 since ki-rin look quite a bit like unicorns, make them be more like one:
 	allow them to use their own horn to cure themselves; remove M1_ANIMAL,
 	change MS_NEIGH to MS_SPELL, add MR_POISON, use horse body parts;
@@ -333,8 +340,6 @@ selling a container to a shop for gold leaves any contents that the shop
 add some new demonic and angelic maledictions
 when fire damage dried a wet towel, it would never reduce the wetness to 0
 when water damage wet a towel, the new wetness might randomly become less
-when the wetness of a towel in inventory changed, persistent inventory wasn't
-	updated to show that
 make Death revive earlier, and all the Riders after 67 turns at latest
 when protection from shape changers begins, force mimic out of concealment
 	even if hero can't see its location; for locations that can be seen,
@@ -361,9 +366,6 @@ when a pet ate a mimic corpse and tried to temporarily look like a sink it
 	ended up looking like a throne (terrain type SINK == symbol S_throne)
 have dowhatdoes ('&') catch up with '?i' to describe ^A, ESC, and movement
 	prefix keystrokes correctly instead of reporting "no such command"
-transforming a potion by dipping a unicorn horn into it could result in the
-	potion being dropped due to 'pickup_burden' if encumbrance was already
-	over threshold before dipping but within it after removal from invent
 give barrow wights a cold touch
 for configuration using external compression on save files that applied a name
 	suffix, 'selectsaved' (restore via menu) couldn't handle any which had
@@ -378,6 +380,9 @@ spells that require a target spot rather than a direction (like skilled
 prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
+curses interface failed to honor menu_xxx option settings for menu interaction
+during engraving, spaces were counted instead of non-spaces
+when an explosion scatters objects, make any that fly over sinks stop there
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -503,6 +508,7 @@ changes accompanying sorting of discoveries resulted in omitting very last
 	not scrolls or wands) and every item was actually discovered
 change to can_reach_floor() resulted in hero being unable to reach the floor
 	when held by a lichen
+panic if lua init fails
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -525,6 +531,10 @@ X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
+X11: if perm_invent is set in NETHACKOPTIONS or config file, start with the
+	persistent inventory window displayed
+X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
+	crept downward every time it got updated
 
 
 Platform- and/or Interface-Specific Fixes
@@ -535,6 +545,9 @@ curses: for vertical status, line up conditions in columns; usually two but
 	condense to three per line if the status window isn't tall enough
 	[at present, highlighting with inverse video includes trailing spaces
 	used to align entries in their columns--that's a feature...]
+macOS: Xcode project was failing to build if the path to the NetHack source
+	tree contained a space; the issue was within some shell script code
+	contained within the project
 msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
@@ -651,6 +664,13 @@ X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
 X11: stop including unused column 0 in the map
+X11: avoid 'bad Atom X Error' when perm_invent is enabled (seemingly window
+	manager dependent)
+X11: toggling 'perm_invent' off via 'O' didn't dismiss persistent inventory
+	window
+X11: (possibly X11+OSX): if persistent inventory was displayed at time of
+	end-of-game prompting, prompting would stall until that window was
+	manually dismissed
 
 
 General New Features
@@ -783,6 +803,8 @@ user_sounds: provide an experimental mechanism for terminal-side sounds similar
 	act on it)
 curses: implement 'selectsaved', restore via menu of saved games
 curses: implement selecting menu items via mouse
+curses: 'windowborders' can be set to 3 or 4 to suppress perm_invent borders
+	to provide slightly more room for actual inventory info
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
@@ -845,6 +867,8 @@ add a varied form of LIBNH nethack library contribution (github #385, #403)
 add cross-compile to WASM (github #385, #403, #412)
 differentiating gendered monster tiles from NullCGT (#430)
 check bones data directly for deja vu messages (#374)
+unify code for extracting an object from a monster's inventory (#455)
+make engraving an occupation (#460)
 
 
 Code Cleanup and Reorganization

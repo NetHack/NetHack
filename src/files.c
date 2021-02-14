@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1610587460 2021/01/14 01:24:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.323 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1612819003 2021/02/08 21:16:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -81,9 +81,6 @@ static char fqn_filename_buffer[FQN_NUMBUF][FQN_MAX_FILENAME];
 #include <share.h>
 #endif
 
-static FILE *fopen_wizkit_file(void);
-static void wizkit_addinv(struct obj *);
-
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
 extern char bbs_id[];
@@ -126,7 +123,7 @@ extern char *sounddir; /* defined in sounds.c */
 static NHFILE *new_nhfile(void);
 static void free_nhfile(NHFILE *);
 #ifdef SELECTSAVED
-static int CFDECLSPEC strcmp_wrap(const void *, const void *);
+static int QSORTCALLBACK strcmp_wrap(const void *, const void *);
 #endif
 static char *set_bonesfile_name(char *, d_level *);
 static char *set_bonestemp_name(void);
@@ -145,22 +142,31 @@ static char *make_lockname(const char *, char *);
 static void set_configfile_name(const char *);
 static FILE *fopen_config_file(const char *, int);
 static int get_uchars(char *, uchar *, boolean, int, const char *);
-boolean proc_wizkit_line(char *);
-boolean parse_config_line(char *);
-static boolean parse_conf_file(FILE *, boolean (*proc)(char *));
-static FILE *fopen_sym_file(void);
-boolean proc_symset_line(char *);
-static void set_symhandling(char *, int);
 #ifdef NOCWD_ASSUMPTIONS
 static void adjust_prefix(char *, int);
 #endif
+static char *choose_random_part(char *, char);
 static boolean config_error_nextline(const char *);
 static void free_config_sections(void);
-static char *choose_random_part(char *, char);
 static char *is_config_section(char *);
 static boolean handle_config_section(char *);
+boolean parse_config_line(char *);
 static char *find_optparam(const char *);
+struct _cnf_parser_state; /* defined below (far below...) */
+static void cnf_parser_init(struct _cnf_parser_state *parser);
+static void cnf_parser_done(struct _cnf_parser_state *parser);
+static void parse_conf_buf(struct _cnf_parser_state *parser,
+                           boolean (*proc)(char *arg));
+boolean parse_conf_str(const char *str, boolean (*proc)(char *arg));
+static boolean parse_conf_file(FILE *fp, boolean (*proc)(char *arg));
 static void parseformat(int *, char *);
+static FILE *fopen_wizkit_file(void);
+static void wizkit_addinv(struct obj *);
+boolean proc_wizkit_line(char *buf);
+void read_wizkit(void);
+static FILE *fopen_sym_file(void);
+boolean proc_symset_line(char *);
+static void set_symhandling(char *, int);
 
 #ifdef SELF_RECOVER
 static boolean copy_bytes(int, int);
@@ -613,7 +619,7 @@ clearlocks(void)
 
 #if defined(SELECTSAVED)
 /* qsort comparison routine */
-static int CFDECLSPEC
+static int QSORTCALLBACK
 strcmp_wrap(const void *p, const void *q)
 {
 #if defined(UNIX) && defined(QT_GRAPHICS)
@@ -2792,6 +2798,12 @@ can_read_file(const char *filename)
 }
 #endif /* USER_SOUNDS */
 
+struct _config_error_errmsg {
+    int line_num;
+    char *errormsg;
+    struct _config_error_errmsg *next;
+};
+
 struct _config_error_frame {
     int line_num;
     int num_errors;
@@ -2804,6 +2816,7 @@ struct _config_error_frame {
 };
 
 static struct _config_error_frame *config_error_data = 0;
+static struct _config_error_errmsg *config_error_msg = 0;
 
 void
 config_error_init(boolean from_file, const char *sourcename, boolean secure)
@@ -2850,6 +2863,32 @@ config_error_nextline(const char *line)
     return TRUE;
 }
 
+int
+l_get_config_errors(lua_State *L)
+{
+    struct _config_error_errmsg *dat = config_error_msg;
+    struct _config_error_errmsg *tmp;
+    int idx = 1;
+
+    lua_newtable(L);
+
+    while (dat) {
+        lua_pushinteger(L, idx++);
+        lua_newtable(L);
+        nhl_add_table_entry_int(L, "line", dat->line_num);
+        nhl_add_table_entry_str(L, "error", dat->errormsg);
+        lua_settable(L, -3);
+        tmp = dat->next;
+        free(dat->errormsg);
+        dat->errormsg = (char *) 0;
+        free(dat);
+        dat = tmp;
+    }
+    config_error_msg = (struct _config_error_errmsg *) 0;
+
+    return 1;
+}
+
 /* varargs 'config_error_add()' moved to pline.c */
 void
 config_erradd(const char *buf)
@@ -2858,6 +2897,16 @@ config_erradd(const char *buf)
 
     if (!buf || !*buf)
         buf = "Unknown error";
+
+    if (iflags.in_lua) {
+        struct _config_error_errmsg *dat = (struct _config_error_errmsg *) alloc(sizeof (struct _config_error_errmsg));
+
+        dat->next = config_error_msg;
+        dat->line_num = config_error_data->line_num;
+        dat->errormsg = dupstr(buf);
+        config_error_msg = dat;
+        return;
+    }
 
     if (!config_error_data) {
         /* either very early, where pline() will use raw_print(), or
@@ -2926,6 +2975,255 @@ read_config_file(const char *filename, int src)
     return rv;
 }
 
+struct _cnf_parser_state {
+    char *inbuf;
+    size_t inbufsz;
+    int rv;
+    char *ep;
+    char *buf;
+    boolean skip, morelines;
+    boolean cont;
+    boolean pbreak;
+};
+
+/* Initialize config parser data */
+static void
+cnf_parser_init(struct _cnf_parser_state *parser)
+{
+    parser->rv = TRUE; /* assume successful parse */
+    parser->ep = parser->buf = (char *) 0;
+    parser->skip = FALSE;
+    parser->morelines = FALSE;
+    parser->inbufsz = 4 * BUFSZ;
+    parser->inbuf = (char *) alloc(parser->inbufsz);
+    parser->cont = FALSE;
+    parser->pbreak = FALSE;
+    memset(parser->inbuf, 0, parser->inbufsz);
+}
+
+/* caller has finished with 'parser' (except for 'rv' so leave that intact) */
+static void
+cnf_parser_done(struct _cnf_parser_state *parser)
+{
+    parser->ep = 0; /* points into parser->inbuf, so becoming stale */
+    if (parser->inbuf)
+        free(parser->inbuf), parser->inbuf = 0;
+    if (parser->buf)
+        free(parser->buf), parser->buf = 0;
+}
+
+/*
+ * Parse config buffer, handling comments, empty lines, config sections,
+ * CHOOSE, and line continuation, calling proc for every valid line.
+ *
+ * Continued lines are merged together with one space in between.
+ */
+static void
+parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *arg))
+{
+    p->cont = FALSE;
+    p->pbreak = FALSE;
+    p->ep = index(p->inbuf, '\n');
+    if (p->skip) { /* in case previous line was too long */
+        if (p->ep)
+            p->skip = FALSE; /* found newline; next line is normal */
+    } else {
+        if (!p->ep) {  /* newline missing */
+            if (strlen(p->inbuf) < (p->inbufsz - 2)) {
+                /* likely the last line of file is just
+                   missing a newline; process it anyway  */
+                p->ep = eos(p->inbuf);
+            } else {
+                config_error_add("Line too long, skipping");
+                p->skip = TRUE; /* discard next fgets */
+            }
+        } else {
+            *p->ep = '\0'; /* remove newline */
+        }
+        if (p->ep) {
+            char *tmpbuf = (char *) 0;
+            int len;
+            boolean ignoreline = FALSE;
+            boolean oldline = FALSE;
+
+            /* line continuation (trailing '\') */
+            p->morelines = (--p->ep >= p->inbuf && *p->ep == '\\');
+            if (p->morelines)
+                *p->ep = '\0';
+
+            /* trim off spaces at end of line */
+            while (p->ep >= p->inbuf
+                   && (*p->ep == ' ' || *p->ep == '\t' || *p->ep == '\r'))
+                *p->ep-- = '\0';
+
+            if (!config_error_nextline(p->inbuf)) {
+                p->rv = FALSE;
+                if (p->buf)
+                    free(p->buf), p->buf = (char *) 0;
+                p->pbreak = TRUE;
+                return;
+            }
+
+            p->ep = p->inbuf;
+            while (*p->ep == ' ' || *p->ep == '\t')
+                ++p->ep;
+
+            /* ignore empty lines and full-line comment lines */
+            if (!*p->ep || *p->ep == '#')
+                ignoreline = TRUE;
+
+            if (p->buf)
+                oldline = TRUE;
+
+            /* merge now read line with previous ones, if necessary */
+            if (!ignoreline) {
+                len = (int) strlen(p->ep) + 1; /* +1: final '\0' */
+                if (p->buf)
+                    len += (int) strlen(p->buf) + 1; /* +1: space */
+                tmpbuf = (char *) alloc(len);
+                *tmpbuf = '\0';
+                if (p->buf) {
+                    Strcat(strcpy(tmpbuf, p->buf), " ");
+                    free(p->buf), p->buf = 0;
+                }
+                p->buf = strcat(tmpbuf, p->ep);
+                if (strlen(p->buf) >= p->inbufsz)
+                    p->buf[p->inbufsz - 1] = '\0';
+            }
+
+            if (p->morelines || (ignoreline && !oldline))
+                return;
+
+            if (handle_config_section(p->buf)) {
+                free(p->buf), p->buf = (char *) 0;
+                return;
+            }
+
+            /* from here onwards, we'll handle buf only */
+
+            if (match_varname(p->buf, "CHOOSE", 6)) {
+                char *section;
+                char *bufp = find_optparam(p->buf);
+
+                if (!bufp) {
+                    config_error_add("Format is CHOOSE=section1,section2,...");
+                    p->rv = FALSE;
+                    free(p->buf), p->buf = (char *) 0;
+                    return;
+                }
+                bufp++;
+                if (g.config_section_chosen)
+                    free(g.config_section_chosen),
+                        g.config_section_chosen = 0;
+                section = choose_random_part(bufp, ',');
+                if (section) {
+                    g.config_section_chosen = dupstr(section);
+                } else {
+                    config_error_add("No config section to choose");
+                    p->rv = FALSE;
+                }
+                free(p->buf), p->buf = (char *) 0;
+                return;
+            }
+
+            if (!(*proc)(p->buf))
+                p->rv = FALSE;
+
+            free(p->buf), p->buf = (char *) 0;
+        }
+    }
+}
+
+boolean
+parse_conf_str(const char *str, boolean (*proc)(char *arg))
+{
+    size_t len;
+    struct _cnf_parser_state parser;
+
+    cnf_parser_init(&parser);
+    free_config_sections();
+    config_error_init(FALSE, "parse_conf_str", FALSE);
+    while (str && *str) {
+        len = 0;
+        while (*str && len < (parser.inbufsz-1)) {
+            parser.inbuf[len] = *str;
+            len++;
+            str++;
+            if (parser.inbuf[len-1] == '\n')
+                break;
+        }
+        parser.inbuf[len] = '\0';
+        parse_conf_buf(&parser, proc);
+        if (parser.pbreak)
+            break;
+    }
+    cnf_parser_done(&parser);
+
+    free_config_sections();
+    config_error_done();
+    return parser.rv;
+}
+
+/* parse_conf_file
+ *
+ * Read from file fp, calling parse_conf_buf for each line.
+ */
+static boolean
+parse_conf_file(FILE *fp, boolean (*proc)(char *arg))
+{
+    struct _cnf_parser_state parser;
+
+    cnf_parser_init(&parser);
+    free_config_sections();
+
+    while (fgets(parser.inbuf, parser.inbufsz, fp)) {
+        parse_conf_buf(&parser, proc);
+        if (parser.pbreak)
+            break;
+    }
+    cnf_parser_done(&parser);
+
+    free_config_sections();
+    return parser.rv;
+}
+
+static void
+parseformat(int *arr, char *str)
+{
+    const char *legal[] = { "historical", "lendian", "ascii" };
+    int i, kwi = 0, words = 0;
+    char *p = str, *keywords[2];
+
+    while (*p) {
+        while (*p && isspace((uchar) *p)) {
+            *p = '\0';
+            p++;
+        }
+        if (*p) {
+            words++;
+            if (kwi < 2)
+                keywords[kwi++] = p;
+        }
+        while (*p && !isspace((uchar) *p))
+            p++;
+    }
+    if (!words) {
+        impossible("missing format list");
+        return;
+    }
+    while (--kwi >= 0)
+        if (kwi < 2) {
+            for (i = 0; i < SIZE(legal); ++i) {
+               if (!strcmpi(keywords[kwi], legal[i]))
+                   arr[kwi] = i + 1;
+            }
+        }
+}
+
+/* ----------  END CONFIG FILE HANDLING ----------- */
+
+/* ----------  BEGIN WIZKIT FILE HANDLING ----------- */
+
 static FILE *
 fopen_wizkit_file(void)
 {
@@ -2959,7 +3257,7 @@ fopen_wizkit_file(void)
 #if defined(UNIX) || defined(VMS)
     } else {
         /* access() above probably caught most problems for UNIX */
-        raw_printf("Couldn't open requested config file %s (%d).", g.wizkit,
+        raw_printf("Couldn't open requested wizkit file %s (%d).", g.wizkit,
                    errno);
         wait_synch();
 #endif
@@ -3023,7 +3321,6 @@ wizkit_addinv(struct obj *obj)
     }
 }
 
-
 boolean
 proc_wizkit_line(char *buf)
 {
@@ -3064,147 +3361,9 @@ read_wizkit(void)
     return;
 }
 
-/* parse_conf_file
- *
- * Read from file fp, handling comments, empty lines, config sections,
- * CHOOSE, and line continuation, calling proc for every valid line.
- *
- * Continued lines are merged together with one space in between.
- */
-static boolean
-parse_conf_file(FILE *fp, boolean (*proc)(char *))
-{
-    char inbuf[4 * BUFSZ];
-    boolean rv = TRUE; /* assume successful parse */
-    char *ep;
-    boolean skip = FALSE, morelines = FALSE;
-    char *buf = (char *) 0;
-    size_t inbufsz = sizeof inbuf;
+/* ----------  END WIZKIT FILE HANDLING ----------- */
 
-    free_config_sections();
-
-    while (fgets(inbuf, (int) inbufsz, fp)) {
-        ep = index(inbuf, '\n');
-        if (skip) { /* in case previous line was too long */
-            if (ep)
-                skip = FALSE; /* found newline; next line is normal */
-        } else {
-            if (!ep) {  /* newline missing */
-                if (strlen(inbuf) < (inbufsz - 2)) {
-                    /* likely the last line of file is just
-                       missing a newline; process it anyway  */
-                    ep = eos(inbuf);
-                } else {
-                    config_error_add("Line too long, skipping");
-                    skip = TRUE; /* discard next fgets */
-                }
-            } else {
-                *ep = '\0'; /* remove newline */
-            }
-            if (ep) {
-                char *tmpbuf = (char *) 0;
-                int len;
-                boolean ignoreline = FALSE;
-                boolean oldline = FALSE;
-
-                /* line continuation (trailing '\') */
-                morelines = (--ep >= inbuf && *ep == '\\');
-                if (morelines)
-                    *ep = '\0';
-
-                /* trim off spaces at end of line */
-                while (ep >= inbuf
-                       && (*ep == ' ' || *ep == '\t' || *ep == '\r'))
-                    *ep-- = '\0';
-
-                if (!config_error_nextline(inbuf)) {
-                    rv = FALSE;
-                    if (buf)
-                        free(buf), buf = (char *) 0;
-                    break;
-                }
-
-                ep = inbuf;
-                while (*ep == ' ' || *ep == '\t')
-                    ++ep;
-
-                /* ignore empty lines and full-line comment lines */
-                if (!*ep || *ep == '#')
-                    ignoreline = TRUE;
-
-                if (buf)
-                    oldline = TRUE;
-
-                /* merge now read line with previous ones, if necessary */
-                if (!ignoreline) {
-                    len = (int) strlen(ep) + 1; /* +1: final '\0' */
-                    if (buf)
-                        len += (int) strlen(buf) + 1; /* +1: space */
-                    tmpbuf = (char *) alloc(len);
-                    *tmpbuf = '\0';
-                    if (buf) {
-                        Strcat(strcpy(tmpbuf, buf), " ");
-                        free(buf);
-                    }
-                    buf = strcat(tmpbuf, ep);
-                    if (strlen(buf) >= sizeof inbuf)
-                        buf[sizeof inbuf - 1] = '\0';
-                }
-
-                if (morelines || (ignoreline && !oldline))
-                    continue;
-
-                if (handle_config_section(buf)) {
-                    free(buf);
-                    buf = (char *) 0;
-                    continue;
-                }
-
-                /* from here onwards, we'll handle buf only */
-
-                if (match_varname(buf, "CHOOSE", 6)) {
-                    char *section;
-                    char *bufp = find_optparam(buf);
-
-                    if (!bufp) {
-                        config_error_add(
-                                    "Format is CHOOSE=section1,section2,...");
-                        rv = FALSE;
-                        free(buf);
-                        buf = (char *) 0;
-                        continue;
-                    }
-                    bufp++;
-                    if (g.config_section_chosen)
-                        free(g.config_section_chosen),
-                            g.config_section_chosen = 0;
-                    section = choose_random_part(bufp, ',');
-                    if (section) {
-                        g.config_section_chosen = dupstr(section);
-                    } else {
-                        config_error_add("No config section to choose");
-                        rv = FALSE;
-                    }
-                    free(buf);
-                    buf = (char *) 0;
-                    continue;
-                }
-
-                if (!(*proc)(buf))
-                    rv = FALSE;
-
-                free(buf);
-                buf = (char *) 0;
-            }
-        }
-    }
-
-    if (buf)
-        free(buf);
-
-    free_config_sections();
-    return rv;
-}
+/* ----------  BEGIN SYMSET FILE HANDLING ----------- */
 
 extern const char *known_handling[];     /* drawing.c */
 extern const char *known_restrictions[]; /* drawing.c */
@@ -3484,40 +3643,7 @@ set_symhandling(char *handling, int which_set)
     }
 }
 
-void
-parseformat(int *arr, char *str)
-{
-    const char *legal[] = {"historical", "lendian", "ascii"};
-    int i, kwi = 0, words = 0;
-    char *p = str, *keywords[2];
-
-    while (*p) {
-        while (*p && isspace((uchar) *p)) {
-            *p = '\0';
-            p++;
-        }
-        if (*p) {
-            words++;
-            if (kwi < 2)
-                keywords[kwi++] = p;
-        }
-        while (*p && !isspace((uchar) *p))
-            p++;
-    }
-    if (!words) {
-        impossible("missing format list");
-        return;
-    }
-    while (--kwi >= 0)
-        if (kwi < 2) {
-            for (i = 0; i < SIZE(legal); ++i) {
-               if (!strcmpi(keywords[kwi], legal[i]))
-                   arr[kwi] = i + 1;
-            }
-        }
-}
-
-/* ----------  END CONFIG FILE HANDLING ----------- */
+/* ----------  END SYMSET FILE HANDLING ----------- */
 
 /* ----------  BEGIN SCOREBOARD CREATION ----------- */
 

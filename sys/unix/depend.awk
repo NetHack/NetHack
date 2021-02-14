@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1610141602 2021/01/08 21:33:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $
+# $NHDT-Date: 1612127123 2021/01/31 21:05:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $
 #
 # usage:
 #   cd src ; nawk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -31,7 +31,6 @@ BEGIN		{ FS = "\""			#for `#include "X"', $2 is X
 		  alt_deps["../include/patchlev.h"] = ""
 		  alt_deps["interp.c"] = " #interp.c"	#comment it out
 		  alt_deps["../include/win32api.h"] = " #../include/win32api.h"
-		  alt_deps["../include/amiconf.h"] = " #../include/amiconf.h"
 		  alt_deps["../include/zlib.h"] = " #zlib.h"	#comment it out
 		}
 FNR == 1	{ output_dep()			#finish previous file

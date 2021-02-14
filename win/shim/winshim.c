@@ -119,7 +119,7 @@ VDECLCB(shim_display_file,(const char *name, boolean complain), "vsi", P2V name,
 VDECLCB(shim_start_menu,(winid window, unsigned long mbehavior), "vii", A2P window, A2P mbehavior)
 VDECLCB(shim_add_menu,
     (winid window, const glyph_info *glyphinfo, const ANY_P *identifier, char ch, char gch, int attr, const char *str, unsigned int itemflags),
-    "viipiiisi",
+    "vippiiisi",
     A2P window, P2V glyphinfo, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
 VDECLCB(shim_end_menu,(winid window, const char *prompt), "vis", A2P window, P2V prompt)
 /* XXX: shim_select_menu menu_list is an output */
@@ -129,7 +129,7 @@ VDECLCB(shim_mark_synch,(void), "v")
 VDECLCB(shim_wait_synch,(void), "v")
 VDECLCB(shim_cliparound,(int x, int y), "vii", A2P x, A2P y)
 VDECLCB(shim_update_positionbar,(char *posbar), "vp", P2V posbar)
-VDECLCB(shim_print_glyph,(winid w, int x, int y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo), "viiiii", A2P w, A2P x, A2P y, P2V glyphinfo, P2V bkglyphinfo)
+VDECLCB(shim_print_glyph,(winid w, xchar x, xchar y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo), "viiipp", A2P w, A2P x, A2P y, P2V glyphinfo, P2V bkglyphinfo)
 VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VDECLCB(shim_raw_print_bold,(const char *str), "vs", P2V str)
 DECLCB(int, shim_nhgetch,(void), "i")

@@ -235,7 +235,7 @@ E int chdir(const char *);
 E int chmod(const char *, int);
 E mode_t umask(int);
 #endif
-E int FDECL(read, (int, genericptr_t, unsigned));
+E int read(int, genericptr_t, unsigned);
 /* these aren't quite right, but this saves including lots of system files */
 E int stty(int, genericptr_t);
 E int gtty(int, genericptr_t);

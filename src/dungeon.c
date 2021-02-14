@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1605305480 2020/11/13 22:11:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1612400967 2021/02/04 01:09:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,7 +66,7 @@ static void traverse_mapseenchn(boolean, winid, int, int, int *);
 static const char *seen_string(xchar, const char *);
 static const char *br_string2(branch *);
 static const char *shop_string(int);
-static char *tunesuffix(mapseen *, char *);
+static char *tunesuffix(mapseen *, char *, size_t);
 
 #ifdef DEBUG
 #define DD g.dungeons[i]
@@ -753,6 +753,10 @@ init_dungeons(void)
     pd.n_levs = pd.n_brs = 0;
 
     L = nhl_init();
+    if (!L) {
+        panic1("'nhl_init' failed; can't continue.");
+        /*NOTREACHED*/
+    }
     if (!nhl_loadlua(L, DUNGEON_FILE)) {
         char tbuf[BUFSZ];
         Sprintf(tbuf, "Cannot open dungeon description - \"%s", DUNGEON_FILE);
@@ -1171,7 +1175,7 @@ init_dungeons(void)
            so that it's hidden from '#wizwhere' feedback. */
     }
 
-    lua_close(L);
+    nhl_done(L);
 
     for (i = 0; i < pd.n_brs; i++) {
         free((genericptr_t) pd.tmpbranch[i].name);
@@ -2166,10 +2170,12 @@ print_dungeon(boolean bymenu, schar *rlev, xchar *rdgn)
         descr = unplaced ? "depth" : "level";
         nlev = dptr->num_dunlevs;
         if (nlev > 1)
-            Sprintf(buf, "%s: %s %d to %d", dptr->dname, makeplural(descr),
-                    dptr->depth_start, dptr->depth_start + nlev - 1);
+            Snprintf(buf, sizeof buf, "%s: %s %d to %d", dptr->dname,
+                     makeplural(descr), dptr->depth_start,
+                     dptr->depth_start + nlev - 1);
         else
-            Sprintf(buf, "%s: %s %d", dptr->dname, descr, dptr->depth_start);
+            Snprintf(buf, sizeof buf, "%s: %s %d", dptr->dname,
+                     descr, dptr->depth_start);
 
         /* Most entrances are uninteresting. */
         if (dptr->entry_lev != 1) {
@@ -2515,6 +2521,8 @@ load_mapseen(NHFILE *nhfp)
     return load;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 overview_stats(winid win, const char *statsfmt,
@@ -2556,6 +2564,8 @@ overview_stats(winid win, const char *statsfmt,
     *total_count += ocount + bcount + acount;
     *total_size += osize + bsize + asize;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.
@@ -3172,7 +3182,8 @@ shop_string(int rtype)
 /* if player knows about the mastermind tune, append it to Castle annotation;
    if drawbridge has been destroyed, flags.castletune will be zero */
 static char *
-tunesuffix(mapseen *mptr, char *outbuf)
+tunesuffix(mapseen *mptr, char *outbuf,
+           size_t bsz) /* sz of outbuf */
 {
     *outbuf = '\0';
     if (mptr->flags.castletune && u.uevent.uheard_tune) {
@@ -3182,7 +3193,7 @@ tunesuffix(mapseen *mptr, char *outbuf)
             Sprintf(tmp, "notes \"%s\"", g.tune);
         else
             Strcpy(tmp, "5-note tune");
-        Sprintf(outbuf, " (play %s to open or close drawbridge)", tmp);
+        Snprintf(outbuf, bsz, " (play %s to open or close drawbridge)", tmp);
     }
     return outbuf;
 }
@@ -3347,7 +3358,8 @@ print_mapseen(winid win, mapseen *mptr,
            indicates that the fort's entrance has been seen (or mapped) */
         Sprintf(buf, "%sFort Ludios.", PREFIX);
     } else if (mptr->flags.castle) {
-        Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
+        Snprintf(buf, sizeof buf, "%sThe castle%s.", PREFIX,
+                tunesuffix(mptr, tmpbuf, sizeof tmpbuf));
     } else if (mptr->flags.valley) {
         Sprintf(buf, "%sValley of the Dead.", PREFIX);
     } else if (mptr->flags.vibrating_square) {

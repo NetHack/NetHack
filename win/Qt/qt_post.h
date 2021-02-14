@@ -8,6 +8,8 @@
 
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif /* __clang__ */
+#elif defined(__GNUC__) && defined(__cplusplus)
+#pragma GCC diagnostic pop
+#endif /* compiler-specific bits */
 
 /*qt_post.h*/

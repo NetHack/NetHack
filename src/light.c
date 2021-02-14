@@ -436,6 +436,8 @@ restore_light_sources(NHFILE *nhfp)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 light_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
@@ -449,6 +451,8 @@ light_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
         *size += (long) sizeof *ls;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Relink all lights that are so marked. */
 void

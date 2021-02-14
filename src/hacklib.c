@@ -572,6 +572,9 @@ ordin(int n)               /* note: should be non-negative */
                : (dd == 1) ? "st" : (dd == 2) ? "nd" : "rd";
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL  /* one compiler complains about
+                                      result of ?: for format string */
+
 /* make a signed digit string from a number */
 char *
 sitoa(int n)
@@ -581,6 +584,8 @@ sitoa(int n)
     Sprintf(buf, (n < 0) ? "%d" : "+%d", n);
     return buf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* return the sign of a number: -1, 0, or 1 */
 int
@@ -1031,8 +1036,9 @@ yyyymmddhhmmss(time_t date)
         datenum = (long) lt->tm_year + 2000L;
     else
         datenum = (long) lt->tm_year + 1900L;
-    Sprintf(datestr, "%04ld%02d%02d%02d%02d%02d", datenum, lt->tm_mon + 1,
-            lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
+    Snprintf(datestr, sizeof datestr, "%04ld%02d%02d%02d%02d%02d",
+             datenum, lt->tm_mon + 1,
+             lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
     debugpline1("yyyymmddhhmmss() produced date string %s", datestr);
     return datestr;
 }
@@ -1251,6 +1257,8 @@ shuffle_int_array(int *indices, int count)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*
  * Wrap snprintf for use in the main code.
  *
@@ -1285,5 +1293,7 @@ nh_snprintf(const char *func, int line, char *str, size_t size,
         str[size-1] = 0; /* make sure it is nul terminated */
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*hacklib.c*/

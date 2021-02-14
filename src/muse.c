@@ -2027,6 +2027,8 @@ mloot_container(
     return res;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 use_misc(struct monst* mtmp)
 {
@@ -2239,6 +2241,8 @@ use_misc(struct monst* mtmp)
     }
     return 0;
 }
+
+RESTORE_WARNINGS
 
 static void
 you_aggravate(struct monst* mtmp)

@@ -22,6 +22,10 @@ extern int vms_creat(const char *, unsigned);
 extern int vms_open(const char *, int, unsigned);
 #endif /* VMS */
 
+#ifndef nhUse
+#define nhUse(arg) (void)(arg)
+#endif
+
 int restore_savefile(char *);
 void set_levelfile_name(int);
 int open_levelfile(int);
@@ -48,6 +52,8 @@ extern unsigned _stklen = STKSIZ;
 
 /* SAVESIZE is defined in "fnamesiz.h" */
 char savename[SAVESIZE]; /* holds relative path of save file from playground */
+
+DISABLE_WARNING_UNREACHABLE_CODE
 
 int
 main(int argc, char *argv[])
@@ -135,6 +141,8 @@ main(int argc, char *argv[])
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNINGS
 
 static char lock[256];
 
@@ -413,6 +421,7 @@ exepath(char *str)
 
     if (!str)
         return (char *) 0;
+    nhUse(bsize);
     bsize = EXEPATHBUFSZ;
     tmp = exepathbuf;
 #if !defined(WIN32)

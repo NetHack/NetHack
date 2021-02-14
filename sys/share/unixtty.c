@@ -462,6 +462,8 @@ init_linux_cons(void)
 }
 #endif /* __linux__ */
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 #ifndef __begui__ /* the Be GUI will define its own error proc */
 /* fatal error */
 void
@@ -480,3 +482,6 @@ error(const char *s, ...)
     exit(EXIT_FAILURE);
 }
 #endif /* !__begui__ */
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+

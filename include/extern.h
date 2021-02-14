@@ -743,6 +743,9 @@ extern void makerogueghost(void);
 
 /* ### files.c ### */
 
+#if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+extern int l_get_config_errors(lua_State *);
+#endif
 extern char *fname_encode(const char *, char, char *, char *, int);
 extern char *fname_decode(char, char *, char *, int);
 extern const char *fqname(const char *, int, int);
@@ -775,6 +778,7 @@ extern void nh_compress(const char *);
 extern void nh_uncompress(const char *);
 extern boolean lock_file(const char *, int, int);
 extern void unlock_file(const char *);
+extern boolean parse_config_line(char *);
 #ifdef USER_SOUNDS
 extern boolean can_read_file(const char *);
 #endif
@@ -784,6 +788,7 @@ extern int config_error_done(void);
 extern boolean read_config_file(const char *, int);
 extern void check_recordfile(const char *);
 extern void read_wizkit(void);
+extern boolean parse_conf_str(const char *str, boolean (*proc)(char *));
 extern int read_sym_file(int);
 extern int parse_sym_line(char *, int);
 extern void paniclog(const char *, const char *);
@@ -1347,7 +1352,7 @@ extern struct obj *init_dummyobj(struct obj *, short, long);
 
 /* ### mkroom.c ### */
 
-extern void mkroom(int);
+extern void do_mkroom(int);
 extern void fill_zoo(struct mkroom *);
 extern struct permonst *antholemon(void);
 extern boolean nexttodoor(int, int);
@@ -1644,6 +1649,7 @@ extern int l_obj_register(lua_State *);
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 extern lua_State * nhl_init(void);
+extern void nhl_done(lua_State *);
 extern boolean nhl_loadlua(lua_State *, const char *);
 extern boolean load_lua(const char *);
 extern void nhl_error(lua_State *, const char *) NORETURN;
@@ -1782,6 +1788,7 @@ extern void initoptions(void);
 extern void initoptions_init(void);
 extern void initoptions_finish(void);
 extern boolean parseoptions(char *, boolean, boolean);
+extern char *get_option_value(const char *);
 extern int doset(void);
 extern int dotogglepickup(void);
 extern void option_help(void);
@@ -2630,7 +2637,7 @@ extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);
 extern int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
-extern boolean attack(struct monst *);
+extern boolean do_attack(struct monst *);
 extern boolean hmon(struct monst *, struct obj *, int, int);
 extern boolean shade_miss(struct monst *, struct monst *, struct obj *,
                           boolean, boolean);
@@ -3101,6 +3108,8 @@ extern void bypass_objlist(struct obj *, boolean);
 extern struct obj *nxt_unbypassed_obj(struct obj *);
 extern struct obj *nxt_unbypassed_loot(Loot *, struct obj *);
 extern int racial_exception(struct monst *, struct obj *);
+extern void extract_from_minvent(struct monst *, struct obj *, boolean,
+                                 boolean);
 
 /* ### write.c ### */
 

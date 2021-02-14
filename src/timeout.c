@@ -2377,6 +2377,8 @@ restore_timers(NHFILE* nhfp, int range, long adjust)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* to support '#stats' wizard-mode command */
 void
 timer_stats(const char* hdrfmt, char *hdrbuf, long *count, long *size)
@@ -2390,6 +2392,8 @@ timer_stats(const char* hdrfmt, char *hdrbuf, long *count, long *size)
         *size += (long) sizeof *te;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* reset all timers that are marked for reseting */
 void

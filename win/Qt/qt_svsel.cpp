@@ -7,7 +7,7 @@
 // Popup's layout:
 //----
 //         NetHack 3.7.x          (literal text w/ dynamic version number)
-//    /----------------------\
+//    /----------------------\    (text to prevent multi-line comment warning)
 //    |                      |
 //    |                      |
 //    |     splash image     |    nhsplash.xpm (red dragon w/ rider)

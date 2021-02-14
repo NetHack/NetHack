@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalOptions>/Gs /Oi- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Gs /Oi- /w44774 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWinntDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -37,7 +37,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="@(Lua)">
-      <DisableSpecificWarnings>4701;4702;4244;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4701;4702;4244;4310;4774</DisableSpecificWarnings>
+      <AdditionalOptions>%(AdditionalOptions) /wd4774</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="$(SrcDir)allmain.c" />
     <ClCompile Include="$(SrcDir)alloc.c" />
@@ -270,8 +271,6 @@
     <ClInclude Include="$(IncDir)vmsconf.h" />
     <ClInclude Include="$(IncDir)winami.h" />
     <ClInclude Include="$(IncDir)wincurs.h" />
-    <ClInclude Include="$(IncDir)wingem.h" />
-    <ClInclude Include="$(IncDir)winGnome.h" />
     <ClInclude Include="$(IncDir)winprocs.h" />
     <ClInclude Include="$(IncDir)wintty.h" />
     <ClInclude Include="$(IncDir)wintype.h" />

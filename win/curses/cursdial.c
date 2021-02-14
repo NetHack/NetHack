@@ -1305,7 +1305,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
 static int
 menu_get_selections(WINDOW * win, nhmenu *menu, int how)
 {
-    int curletter;
+    int curletter, menucmd;
     int count = -1;
     int count_letter = '\0';
     int curpage = !menu->bottom_heavy ? 1 : menu->num_pages;
@@ -1342,7 +1342,9 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
             break;
         case PICK_ANY:
             if (curletter <= 0 || curletter >= 256 || !selectors[curletter]) {
-                switch (curletter) {
+                menucmd = (curletter <= 0 || curletter >= 255) ? curletter
+                          : (int) (uchar) map_menu_cmd(curletter);
+                switch (menucmd) {
                 case MENU_SELECT_PAGE:
                     (void) menu_operation(win, menu, SELECT, curpage);
                     break;
@@ -1377,7 +1379,9 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
         }
 
         if (curletter <= 0 || curletter >= 256 || !selectors[curletter]) {
-            switch (curletter) {
+            menucmd = (curletter <= 0 || curletter >= 255) ? curletter
+                      : (int) (uchar) map_menu_cmd(curletter);
+            switch (menucmd) {
             case KEY_ESC:
                 num_selected = -1;
                 dismiss = TRUE;

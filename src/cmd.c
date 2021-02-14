@@ -551,6 +551,8 @@ doextlist(void)
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 #define MAX_EXT_CMD 200 /* Change if we ever have more ext cmds */
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*
  * This is currently used only by the tty interface and is
  * controlled via runtime option 'extmenu'.  (Most other interfaces
@@ -692,6 +694,9 @@ extcmd_via_menu(void)
     }
     return ret;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #endif /* TTY_GRAPHICS */
 
 /* #monster command - use special monster ability while polymorphed */
@@ -1457,6 +1462,8 @@ levltyp_to_name(int typ)
     return NULL;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* explanation of base-36 output from wiz_map_levltyp() */
 static void
 wiz_levltyp_legend(void)
@@ -1497,6 +1504,10 @@ wiz_levltyp_legend(void)
     return;
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 /* #wizsmell command - test usmellmon(). */
 static int
 wiz_smell(void)
@@ -1536,6 +1547,10 @@ wiz_smell(void)
     } while (TRUE);
     return 0;
 }
+
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 #define DEFAULT_TIMEOUT_INCR 30
 
@@ -1690,6 +1705,8 @@ wiz_intrinsic(void)
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_intrinsic)));
     return 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* #wizrumorcheck command - verify each rumor access */
 static int
@@ -2585,6 +2602,8 @@ count_obj(struct obj *chain, long *total_count, long *total_size,
     *total_size += size;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL  /* RESTORE_WARNING follows show_wiz_stats */
+
 static void
 obj_chain(winid win, const char *src, struct obj *chain, boolean force,
           long *total_count, long *total_size)
@@ -2900,6 +2919,8 @@ wiz_show_stats(void)
     destroy_nhwindow(win);
     return 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 sanity_check(void)

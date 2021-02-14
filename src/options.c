@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1611456333 2021/01/24 02:45:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.496 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1613293046 2021/02/14 08:57:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.506 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -159,10 +159,24 @@ static const struct paranoia_opts {
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
+static NEARDATA const char *menutype[] = {
+    "traditional",  "combination",  "full",     "partial"
+};
+static NEARDATA const char *burdentype[] = {
+    "unencumbered", "burdened",     "stressed",
+    "strained",     "overtaxed",    "overloaded"
+};
+static NEARDATA const char *runmodes[] = {
+    "teleport",     "run",          "walk",     "crawl"
+};
+static NEARDATA const char *sortltype[] = {
+    "none",         "loot",         "full"
+};
+
 /*
  * Default menu manipulation command accelerators.  These may _not_ be:
  *
- *      + a number - reserved for counts
+ *      + a number or '#' - reserved for counts
  *      + an upper or lower case US ASCII letter - used for accelerators
  *      + ESC - reserved for escaping the menu
  *      + NULL, CR or LF - reserved for commiting the selection(s).  NULL
@@ -191,32 +205,26 @@ typedef struct {
     const char *desc;
 } menu_cmd_t;
 
-static NEARDATA const char *menutype[] = { "traditional", "combination",
-                                           "full", "partial" };
-
-static NEARDATA const char *burdentype[] = { "unencumbered", "burdened",
-                                             "stressed",     "strained",
-                                             "overtaxed",    "overloaded" };
-
-static NEARDATA const char *runmodes[] = { "teleport", "run", "walk",
-                                           "crawl" };
-
-static NEARDATA const char *sortltype[] = { "none", "loot", "full" };
-
 static const menu_cmd_t default_menu_cmd_info[] = {
- { "menu_next_page", MENU_NEXT_PAGE, "Go to next page" },
- { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
- { "menu_first_page", MENU_FIRST_PAGE, "Go to first page" },
- { "menu_last_page", MENU_LAST_PAGE, "Go to last page" },
- { "menu_select_all", MENU_SELECT_ALL, "Select all items in entire menu" },
- { "menu_invert_all", MENU_INVERT_ALL, "Invert selection for all items" },
- { "menu_deselect_all", MENU_UNSELECT_ALL,
-                                        "Unselect all items in entire menu" },
- { "menu_select_page", MENU_SELECT_PAGE, "Select all items on current page" },
- { "menu_invert_page", MENU_INVERT_PAGE, "Invert current page's selections" },
- { "menu_deselect_page", MENU_UNSELECT_PAGE,
-                                       "Unselect all items on current page" },
- { "menu_search", MENU_SEARCH, "Search and invert matching items" },
+    { "menu_next_page",     MENU_NEXT_PAGE,     "Go to next page" },
+    { "menu_previous_page", MENU_PREVIOUS_PAGE, "Go to previous page" },
+    { "menu_first_page",    MENU_FIRST_PAGE,    "Go to first page" },
+    { "menu_last_page",     MENU_LAST_PAGE,     "Go to last page" },
+    { "menu_select_all",    MENU_SELECT_ALL,
+                            "Select all items in entire menu" },
+    { "menu_invert_all",    MENU_INVERT_ALL,
+                            "Invert selection for all items" },
+    { "menu_deselect_all",  MENU_UNSELECT_ALL,
+                            "Unselect all items in entire menu" },
+    { "menu_select_page",   MENU_SELECT_PAGE,
+                            "Select all items on current page" },
+    { "menu_invert_page",   MENU_INVERT_PAGE,
+                            "Invert current page's selections" },
+    { "menu_deselect_page", MENU_UNSELECT_PAGE,
+                            "Unselect all items on current page" },
+    { "menu_search",        MENU_SEARCH,
+                            "Search and invert matching items" },
+    { (char *) 0, '\0', (char *) 0 }
 };
 
 static void nmcpy(char *, const char *, int);
@@ -464,6 +472,8 @@ parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
 
     if (optresult == optn_silenterr)
         return FALSE;
+    if (got_match && optresult == optn_err)
+        return FALSE;
     if (optresult == optn_ok)
         return retval;
 
@@ -479,7 +489,7 @@ check_misc_menu_command(char *opts, char *op UNUSED)
     const char *name_to_check;
 
     /* check for menu command mapping */
-    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+    for (i = 0; default_menu_cmd_info[i].name; i++) {
         name_to_check = default_menu_cmd_info[i].name;
         if (match_optname(opts, name_to_check,
                           (int) strlen(name_to_check), TRUE))
@@ -2812,8 +2822,10 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
                                  allopt[optidx].name, op);
                 return optn_err;
             }
-        } else
+        } else {
+            config_error_add("Value is mandatory for %s", allopt[optidx].name);
             return optn_err;
+        }
         return optn_ok;
     }
     if (req == get_val) {
@@ -3734,13 +3746,15 @@ optfn_windowborders(int optidx, int req, boolean negated, char *opts, char *op)
                 itmp = 0; /* Off */
             else if (op == empty_optstr)
                 itmp = 1; /* On */
-            else /* Value supplied; expect 0 (off), 1 (on), or 2 (auto) */
+            else /* Value supplied; expect 0 (off), 1 (on), 2 (auto)
+                  * or 3 (on for most windows, off for perm_invent)
+                  * or 4 (auto for most windows, off for perm_invent) */
                 itmp = atoi(op);
 
-            if (itmp < 0 || itmp > 2) {
-                config_error_add("Invalid %s (should be 0, 1, or 2): %s",
+            if (itmp < 0 || itmp > 4) {
+                config_error_add("Invalid %s (should be within 0 to 4): %s",
                                  allopt[optidx].name, opts);
-                retval = optn_err;
+                retval = optn_silenterr;
             } else {
                 iflags.wc2_windowborders = itmp;
             }
@@ -3754,7 +3768,11 @@ optfn_windowborders(int optidx, int req, boolean negated, char *opts, char *op)
                 (iflags.wc2_windowborders == 0) ? "0=off"
                 : (iflags.wc2_windowborders == 1) ? "1=on"
                   : (iflags.wc2_windowborders == 2) ? "2=auto"
-                    : defopt);
+                    : (iflags.wc2_windowborders == 3)
+                      ? "3=on, except off for perm_invent"
+                      : (iflags.wc2_windowborders == 4)
+                        ? "4=auto, except off for perm_invent"
+                        : defopt);
         return optn_ok;
     }
     return optn_ok;
@@ -4849,6 +4867,8 @@ handler_whatis_filter(void)
     return optn_ok;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static int
 handler_symset(int optidx)
 {
@@ -5025,6 +5045,8 @@ handler_symset(int optidx)
     g.opt_need_redraw = TRUE;
     return optidx;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int
 handler_autopickup_exception(void)
@@ -6009,7 +6031,7 @@ parsebindings(char *bindings)
         return TRUE;
 
     /* is it a menu command? */
-    for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+    for (i = 0; default_menu_cmd_info[i].name; i++) {
         if (!strcmp(default_menu_cmd_info[i].name, bind)) {
             if (illegal_menu_cmd_key(key)) {
                 config_error_add("Bad menu key %s:%s", visctrl(key), bind);
@@ -6150,6 +6172,8 @@ match_str2attr(const char *str, boolean complain)
 
 extern const char regex_id[]; /* from sys/share/<various>regex.{c,cpp} */
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* True: temporarily replace menu color entries with a fake set of menu
    colors, { "light blue"=light_blue, "blue"=blue, "red"=red, &c }, that
    illustrates most colors for use when the pick-a-color menu is rendered;
@@ -6202,6 +6226,8 @@ basic_menu_colors(boolean load_colors)
         g.menu_colorings = g.save_colorings;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
 query_color(const char *prompt)
@@ -6970,6 +6996,8 @@ static char fmtstr_doset[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
+DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after show_menucontrols() */
+
 static int
 optfn_o_autopickup_exceptions(int optidx UNUSED, int req, boolean negated UNUSED,
               char *opts, char *op UNUSED)
@@ -7083,6 +7111,34 @@ optfn_o_status_hilites(int optidx UNUSED, int req, boolean negated UNUSED,
     return optn_ok;
 }
 #endif /*STATUS_HILITES*/
+
+/* Get string value of configuration option.
+ * Currently handles only boolean and compound options.
+ */
+char *
+get_option_value(const char *optname)
+{
+    static char retbuf[BUFSZ];
+    boolean *bool_p;
+    int i;
+
+    for (i = 0; allopt[i].name != 0; i++)
+        if (!strcmp(optname, allopt[i].name)) {
+            if (allopt[i].opttyp == BoolOpt && (bool_p = allopt[i].addr) != 0) {
+                Sprintf(retbuf, "%s", *bool_p ? "true" : "false");
+                return retbuf;
+            } else if (allopt[i].opttyp == CompOpt && allopt[i].optfn) {
+                int reslt = optn_err;
+
+                reslt = (*allopt[i].optfn)(allopt[i].idx, get_val,
+                                           FALSE, retbuf, empty_optstr);
+                if (reslt == optn_ok && retbuf[0])
+                    return retbuf;
+                return (char *) 0;
+            }
+        }
+    return (char *) 0;
+}
 
 /* the 'O' command */
 int
@@ -7340,6 +7396,7 @@ doset_add_menu(winid win,          /* window to add to */
              ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
 }
 
+
 /* display keys for menu actions; used by cmd.c '?i' and pager.c '?k' */
 void
 show_menu_controls(winid win, boolean dolist)
@@ -7371,7 +7428,7 @@ show_menu_controls(winid win, boolean dolist)
         int i;
 
         fmt = "%-7s %s";
-        for (i = 0; i < SIZE(default_menu_cmd_info); i++) {
+        for (i = 0; default_menu_cmd_info[i].desc; i++) {
             Sprintf(buf, fmt,
                     visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
                     default_menu_cmd_info[i].desc);
@@ -7431,6 +7488,9 @@ show_menu_controls(winid win, boolean dolist)
         arg = "";
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 static int
 count_cond(void)
 {
@@ -7456,6 +7516,8 @@ count_apes(void)
 
     return numapes;
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* common to msg-types, menu-colors, autopickup-exceptions */
 static int
@@ -7503,6 +7565,8 @@ handle_add_list_remove(const char *optname, int numtotal)
     destroy_nhwindow(tmpwin);
     return opt_idx;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
 dotogglepickup(void)
@@ -8027,6 +8091,7 @@ static struct wc_Opt wc_options[] = {
     { "color", WC_COLOR },
     { "eight_bit_tty", WC_EIGHT_BIT_IN },
     { "hilite_pet", WC_HILITE_PET },
+    { "perm_invent", WC_PERM_INVENT },
     { "popup_dialog", WC_POPUP_DIALOG },
     { "player_selection", WC_PLAYER_SELECTION },
     { "preload_tiles", WC_PRELOAD_TILES },
@@ -8034,15 +8099,11 @@ static struct wc_Opt wc_options[] = {
     { "tile_file", WC_TILE_FILE },
     { "tile_width", WC_TILE_WIDTH },
     { "tile_height", WC_TILE_HEIGHT },
-    { "use_inverse", WC_INVERSE },
     { "align_message", WC_ALIGN_MESSAGE },
     { "align_status", WC_ALIGN_STATUS },
     { "font_map", WC_FONT_MAP },
     { "font_menu", WC_FONT_MENU },
     { "font_message", WC_FONT_MESSAGE },
-#if 0
-    {"perm_invent", WC_PERM_INVENT},
-#endif
     { "font_size_map", WC_FONTSIZ_MAP },
     { "font_size_menu", WC_FONTSIZ_MENU },
     { "font_size_message", WC_FONTSIZ_MESSAGE },
@@ -8054,6 +8115,7 @@ static struct wc_Opt wc_options[] = {
     { "scroll_amount", WC_SCROLL_AMOUNT },
     { "scroll_margin", WC_SCROLL_MARGIN },
     { "splash_screen", WC_SPLASH_SCREEN },
+    { "use_inverse", WC_INVERSE },
     { "vary_msgcount", WC_VARY_MSGCOUNT },
     { "windowcolors", WC_WINDOWCOLORS },
     { "mouse_support", WC_MOUSE_SUPPORT },

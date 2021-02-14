@@ -25,6 +25,7 @@ static int nhl_setmap(lua_State *);
 #endif
 static int nhl_pline(lua_State *);
 static int nhl_verbalize(lua_State *);
+static int nhl_parse_config(lua_State *);
 static int nhl_menu(lua_State *);
 static int nhl_getlin(lua_State *);
 static int nhl_makeplural(lua_State *);
@@ -289,6 +290,8 @@ nhl_deltrap(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* local loc = getmap(x,y) */
 static int
 nhl_getmap(lua_State *L)
@@ -380,6 +383,8 @@ nhl_getmap(lua_State *L)
     return 1;
 }
 
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+
 /* pline("It hits!") */
 static int
 nhl_pline(lua_State *L)
@@ -403,6 +408,35 @@ nhl_verbalize(lua_State *L)
     if (argc == 1)
         verbalize("%s", luaL_checkstring(L, 1));
     else
+        nhl_error(L, "Wrong args");
+
+    return 0;
+}
+
+/* parse_config("OPTIONS=!color") */
+static int
+nhl_parse_config(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1)
+        parse_conf_str(luaL_checkstring(L, 1), parse_config_line);
+    else
+        nhl_error(L, "Wrong args");
+
+    return 0;
+}
+
+/* local windowtype = get_config("windowtype"); */
+static int
+nhl_get_config(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        lua_pushstring(L, get_option_value(luaL_checkstring(L, 1)));
+        return 1;
+    } else
         nhl_error(L, "Wrong args");
 
     return 0;
@@ -794,6 +828,9 @@ static const struct luaL_Reg nhl_functions[] = {
     {"rn2", nhl_rn2},
     {"random", nhl_random},
     {"level_difficulty", nhl_level_difficulty},
+    {"parse_config", nhl_parse_config},
+    {"get_config", nhl_get_config},
+    {"get_config_errors", l_get_config_errors},
     {NULL, NULL}
 };
 
@@ -1074,6 +1111,7 @@ nhl_init(void)
 {
     lua_State *L = luaL_newstate();
 
+    iflags.in_lua = TRUE;
     luaL_openlibs(L);
     nhl_set_package_path(L, "./?.lua");
 
@@ -1094,11 +1132,18 @@ nhl_init(void)
     l_obj_register(L);
 
     if (!nhl_loadlua(L, "nhlib.lua")) {
-        lua_close(L);
+        nhl_done(L);
         return (lua_State *) 0;
     }
 
     return L;
+}
+
+void
+nhl_done(lua_State *L)
+{
+    lua_close(L);
+    iflags.in_lua = FALSE;
 }
 
 boolean
@@ -1118,10 +1163,12 @@ load_lua(const char *name)
     }
 
  give_up:
-    lua_close(L);
+    nhl_done(L);
 
     return ret;
 }
+
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 
 const char *
 get_lua_version(void)
@@ -1154,3 +1201,8 @@ get_lua_version(void)
     }
     return (const char *) g.lua_ver;
 }
+
+RESTORE_WARNINGS
+
+
+

@@ -213,6 +213,8 @@ main(void)
 
 #else /* ! MAC */
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc, char *argv[])
 {
@@ -245,6 +247,8 @@ main(int argc, char *argv[])
     return 0;
 }
 #endif
+
+RESTORE_WARNINGS
 
 void
 do_makedefs(char *options)
@@ -333,6 +337,8 @@ do_makedefs(char *options)
 
 static char namebuf[1000];
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static char *
 name_file(const char* template, const char* tag)
 {
@@ -385,6 +391,8 @@ getfp(const char* template, const char* tag, const char* mode, int flg)
     }
     return rv;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static boolean debug = FALSE;
 
@@ -968,6 +976,8 @@ do_rnd_access_file(const char* fname, const char* deflt_content)
     return;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 do_rumors(void)
 {
@@ -1059,6 +1069,8 @@ rumors_failure:
     Unlink(tempfile); /* and temporary file */
     exit(EXIT_FAILURE);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 do_date(void)

@@ -27,49 +27,71 @@ endif
 #CXX=clang++ -std=gnu++11
 
 CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
-
-ifndef WANT_WIN_QT
-ifndef WANT_LIBNH
-#	these are normally used when compiling nethack's core
-#	but -ansi forces -std=c90 for C or -std=c++98 for C++;
-#	win/Qt/qt_*.cpp compiled with C++98 semantics trigger
-#In file included from .../qt5/include/QtCore/qglobal.h:105:
-#.../qt5/include/QtCore/qcompilerdetection.h:561:6:
-#  error Qt requires a C++11 compiler and yours does not seem to be that.
-#	so we suppress -ansi when the build includes Qt
-#CFLAGS+=-ansi -Wno-long-long
-#CFLAGS+=-std=c99
-#
-#LIBNH's winshim requires C99 for the way it is currently coded
-endif
-endif
-
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit \
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
-CFLAGS+=-DGCC_WARN
+CFLAGS+=-Wmissing-declarations
+CFLAGS+=-Wformat-nonliteral
+# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
+# # leave it out by default.
+# #CFLAGS+=-Wunreachable-code
+# #
+#
+# the following are not allowed in C++
+CFLAGS+=-Wimplicit
 CFLAGS+=-Wimplicit-function-declaration
 CFLAGS+=-Wimplicit-int
-CFLAGS+=-Wmissing-declarations
 CFLAGS+=-Wmissing-prototypes
+CFLAGS+=-Wold-style-definition
+CFLAGS+=-Wstrict-prototypes
+
+CCXXFLAGS = -g -I../include -DNOTPARMDECL
+CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
+        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CCXXFLAGS+=-pedantic
+CCXXFLAGS+=-Wmissing-declarations
+CCXXFLAGS+=-Wformat-nonliteral
+
 ifeq "$(CCISCLANG)" ""
-#gcc-specific here
+# gcc-specific follows
 CFLAGS+=-Wmissing-parameter-type
+ifdef WANT_WIN_QT
+CCXXFLAGS+= -Wno-deprecated-copy
+endif  # WANT_WIN_QT
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
-#CFLAGS+=-Wno-format-overflow
+CFLAGS+=-Wformat-overflow
 endif  #gcc version greater than or equal to 9
-else   # clang
-# clang-specific here
-endif  # clang
-# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
-# leave it out by default.
-#CFLAGS+=-Wunreachable-code
-#
-CFLAGS+=-Wold-style-definition
-CFLAGS+=-Wstrict-prototypes
+#still in gcc-specific section here
+# get the version of g++
+GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(GPPGTEQ9)" "1"
+CCXXFLAGS+=-Wformat-overflow
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-copy
+endif  # WANT_WIN_QT
+endif  # g++ version greater than or equal to 9
+# end of gcc-specific
+
+else   # clang-specific follows
+# get the version of clang++
+CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+ifeq "$(CLANGPPGTEQ9)" "1"
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-copy
+endif  # WANT_WIN_QT
+endif  #clang++ greater than or equal to 9
+
+ifdef WANT_WIN_QT
+CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # WANT_WIN_QT
+endif  # clang-specific ends here
+
+# enable some optional code in various NetHack source files
+CFLAGS+=-DGCC_WARN
+CCXXFLAGS+=-DGCC_WARN
 
 #end of compiler.2020
 #------------------------------------------------------------------------------

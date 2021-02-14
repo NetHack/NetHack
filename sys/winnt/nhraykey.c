@@ -401,7 +401,7 @@ ProcessKeystroke(
     if (portdebug) {
         char buf[BUFSZ];
         Sprintf(buf, "PORTDEBUG: ch=%u, scan=%u, vk=%d, pre=%d, "
-                     "shiftstate=0x%X (ESC to end)\n",
+                     "shiftstate=0x%lX (ESC to end)\n",
                 ch, scan, vk, pre_ch, shiftstate);
         fprintf(stdout, "\n%s", buf);
     }

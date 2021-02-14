@@ -1384,7 +1384,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
                               "&Save and exit", "&Quit without saving", 0, 1);
 	switch (act) {
         case 0:
-            // See dosave() function
+            // save portion of save-and-exit
             ok = dosave0();
             break;
         case 1:
@@ -1400,6 +1400,7 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
         ok = 1;
     }
     /* if !ok, we should try to continue, but we don't... */
+    nhUse(ok);
     u.uhp = -1;
     NetHackQtBind::qt_exit_nhwindows(0);
     nh_terminate(EXIT_SUCCESS);

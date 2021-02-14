@@ -548,6 +548,8 @@ mon_is_gecko(struct monst* mon)
     return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static int
 domonnoise(register struct monst* mtmp)
 {
@@ -1048,6 +1050,8 @@ domonnoise(register struct monst* mtmp)
     return 1;
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 /* #chat command */
 int
 dotalk(void)
@@ -1378,7 +1382,7 @@ add_sound_mapping(const char* mapping)
             raw_print("sound file name too long");
             return 0;
 	}
-        Sprintf(filespec, "%s/%s", sounddir, filename);
+        Snprintf(filespec, sizeof filespec, "%s/%s", sounddir, filename);
 
         if (idx >= 0 || can_read_file(filespec)) {
             new_map = (audio_mapping *) alloc(sizeof *new_map);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1605305491 2020/11/13 22:11:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1613085478 2021/02/11 23:17:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,7 +27,7 @@ static struct mkroom *pos_to_room(xchar, xchar);
 static boolean place_niche(struct mkroom *, int *, int *, int *);
 static void makeniche(int);
 static void make_niches(void);
-static int CFDECLSPEC do_comp(const genericptr, const genericptr);
+static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
 static void dosdoor(xchar, xchar, struct mkroom *, int);
 static void join(int, int, boolean);
 static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
@@ -44,8 +44,8 @@ static void mk_knox_portal(xchar, xchar);
 
 /* Args must be (const genericptr) so that qsort will always be happy. */
 
-static int CFDECLSPEC
-do_comp(const genericptr vx, const genericptr vy)
+static int QSORTCALLBACK
+mkroom_cmp(const genericptr vx, const genericptr vy)
 {
 #ifdef LINT
     /* lint complains about possible pointer alignment problems, but we know
@@ -64,11 +64,11 @@ do_comp(const genericptr vx, const genericptr vy)
 #endif /* LINT */
 }
 
-/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor() checks
- * would be connecting into an area that was declared as joined = 0.
- * Checking for this in finddpos() enables us to have rooms with sub-areas (such
- * as shops) that will never randomly generate unwanted doors in order to
- * connect them up to other areas.
+/* Return TRUE if a door placed at (x, y) which otherwise passes okdoor()
+ * checks would be connecting into an area that was declared as joined = 0.
+ * Checking for this in finddpos() enables us to have rooms with sub-areas
+ * (such as shops) that will never randomly generate unwanted doors in order
+ * to connect them up to other areas.
  */
 static boolean
 door_into_nonjoined(xchar x, xchar y)
@@ -125,25 +125,20 @@ finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
 void
 sort_rooms(void)
 {
-    int i, x, y;
-    int ri[MAXNROFROOMS+1];
+    int x, y;
+    unsigned i, ri[MAXNROFROOMS + 1], n = (unsigned) g.nroom;
 
-#if defined(SYSV) || defined(DGUX)
-#define CAST_nroom (unsigned) g.nroom
-#else
-#define CAST_nroom g.nroom /*as-is*/
-#endif
-    qsort((genericptr_t) g.rooms, CAST_nroom, sizeof (struct mkroom), do_comp);
-#undef CAST_nroom
+    qsort((genericptr_t) g.rooms, n, sizeof (struct mkroom), mkroom_cmp);
 
     /* Update the roomnos on the map */
-    for (i = 0; i < g.nroom; i++)
+    for (i = 0; i < n; i++)
         ri[g.rooms[i].roomnoidx] = i;
 
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
-            int rno = levl[x][y].roomno;
-            if (rno >= ROOMOFFSET && rno < MAXNROFROOMS+1)
+            unsigned rno = levl[x][y].roomno;
+
+            if (rno >= ROOMOFFSET && rno < MAXNROFROOMS + 1)
                 levl[x][y].roomno = ri[rno - ROOMOFFSET] + ROOMOFFSET;
         }
 }
@@ -251,7 +246,7 @@ add_subroom(struct mkroom *proom, int lowx, int lowy, int hix, int hiy,
 }
 
 void
-free_luathemes(boolean keependgame) /* False: exiting, True: discarding main dungeon */
+free_luathemes(boolean keependgame) /* F: done, T: discarding main dungeon */
 {
     int i;
 
@@ -259,7 +254,7 @@ free_luathemes(boolean keependgame) /* False: exiting, True: discarding main dun
         if (keependgame && i == astral_level.dnum)
             continue;
         if (g.luathemes[i]) {
-            lua_close((lua_State *) g.luathemes[i]);
+            nhl_done((lua_State *) g.luathemes[i]);
             g.luathemes[i] = (lua_State *) 0;
         }
     }
@@ -277,7 +272,7 @@ makerooms(void)
         if ((themes = nhl_init()) != 0) {
             if (!nhl_loadlua(themes, fname)) {
                 /* loading lua failed, don't use themed rooms */
-                lua_close(themes);
+                nhl_done(themes);
                 themes = (lua_State *) 0;
             } else {
                 /* success; save state for this dungeon branch */
@@ -920,37 +915,37 @@ makelevel(void)
         }
 
         /* make up to 1 special room, with type dependent on depth;
-         * note that mkroom doesn't guarantee a room gets created, and that this
-         * step only sets the room's rtype - it doesn't fill it yet. */
+           note that mkroom doesn't guarantee a room gets created, and that
+           this step only sets the room's rtype - it doesn't fill it yet. */
         if (wizard && nh_getenv("SHOPTYPE"))
-            mkroom(SHOPBASE);
+            do_mkroom(SHOPBASE);
         else if (u_depth > 1 && u_depth < depth(&medusa_level)
                  && g.nroom >= room_threshold && rn2(u_depth) < 3)
-            mkroom(SHOPBASE);
+            do_mkroom(SHOPBASE);
         else if (u_depth > 4 && !rn2(6))
-            mkroom(COURT);
+            do_mkroom(COURT);
         else if (u_depth > 5 && !rn2(8)
                  && !(g.mvitals[PM_LEPRECHAUN].mvflags & G_GONE))
-            mkroom(LEPREHALL);
+            do_mkroom(LEPREHALL);
         else if (u_depth > 6 && !rn2(7))
-            mkroom(ZOO);
+            do_mkroom(ZOO);
         else if (u_depth > 8 && !rn2(5))
-            mkroom(TEMPLE);
+            do_mkroom(TEMPLE);
         else if (u_depth > 9 && !rn2(5)
                  && !(g.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
-            mkroom(BEEHIVE);
+            do_mkroom(BEEHIVE);
         else if (u_depth > 11 && !rn2(6))
-            mkroom(MORGUE);
+            do_mkroom(MORGUE);
         else if (u_depth > 12 && !rn2(8) && antholemon())
-            mkroom(ANTHOLE);
+            do_mkroom(ANTHOLE);
         else if (u_depth > 14 && !rn2(4)
                  && !(g.mvitals[PM_SOLDIER].mvflags & G_GONE))
-            mkroom(BARRACKS);
+            do_mkroom(BARRACKS);
         else if (u_depth > 15 && !rn2(6))
-            mkroom(SWAMP);
+            do_mkroom(SWAMP);
         else if (u_depth > 16 && !rn2(8)
                  && !(g.mvitals[PM_COCKATRICE].mvflags & G_GONE))
-            mkroom(COCKNEST);
+            do_mkroom(COCKNEST);
 
  skip0:
         /* Place multi-dungeon branch. */

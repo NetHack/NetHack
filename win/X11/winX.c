@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1611105313 2021/01/20 01:15:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613292827 2021/02/14 08:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -158,7 +158,7 @@ static void X11_sig_cb(XtPointer, XtSignalId *);
 #endif
 static void d_timeout(XtPointer, XtIntervalId *);
 static void X11_hangup(Widget, XEvent *, String *, Cardinal *);
-static void X11_bail(const char *);
+static void X11_bail(const char *) NORETURN;
 static void askname_delete(Widget, XEvent *, String *, Cardinal *);
 static void askname_done(Widget, XtPointer, XtPointer);
 static void done_button(Widget, XtPointer, XtPointer);
@@ -559,7 +559,9 @@ nhCvtStringToPixel(Display *dpy, XrmValuePtr args, Cardinal *num_args,
 
 /* Ask the WM for window frame size */
 void
-get_window_frame_extents(Widget w, long *top, long *bottom, long *left, long *right)
+get_window_frame_extents(Widget w,
+                         long *top, long *bottom,
+                         long *left, long *right)
 {
     XEvent event;
     Display *dpy = XtDisplay(w);
@@ -572,15 +574,32 @@ get_window_frame_extents(Widget w, long *top, long *bottom, long *left, long *ri
     long *extents;
 
     prop = XInternAtom(dpy, "_NET_FRAME_EXTENTS", True);
+    if (prop == None) {
+        /*
+         * FIXME!
+         */
+#ifdef MACOSX
+        /*
+         * Default window manager doesn't support _NET_FRAME_EXTENTS.
+         * Without this position tweak, the persistent inventory window
+         * creeps downward by approximately the height of its title bar
+         * and also a smaller amount to the left every time it gets
+         * updated.  Caveat:  amount determined by trial and error and
+         * could change depending upon monitor resolution....
+         */
+        *top = 22;
+        *left = 0;
+#endif
+        return;
+    }
 
     while (XGetWindowProperty(dpy, win, prop,
                               0, 4, False, AnyPropertyType,
                               &retprop, &retfmt,
                               &nitems, &nbytes, &data) != Success
-           || nitems != 4 || nbytes != 0)
-        {
-            XNextEvent(dpy, &event);
-        }
+           || nitems != 4 || nbytes != 0) {
+        XNextEvent(dpy, &event);
+    }
 
     extents = (long *) data;
 
@@ -1223,10 +1242,22 @@ X11_destroy_nhwindow(winid window)
 void
 X11_update_inventory(void)
 {
-    if (x_inited && window_list[WIN_INVEN].menu_information->is_up) {
-        updated_inventory = 1; /* hack to avoid mapping&raising window */
-        (void) display_inventory((char *) 0, FALSE);
-        updated_inventory = 0;
+    struct xwindow *wp = 0;
+
+    if (!x_inited)
+        return;
+
+    if (iflags.perm_invent) {
+        /* skip any calls to update_inventory() before in_moveloop starts */
+        if (g.program_state.in_moveloop || g.program_state.gameover) {
+            updated_inventory = 1; /* hack to avoid mapping&raising window */
+            (void) display_inventory((char *) 0, FALSE);
+            updated_inventory = 0;
+        }
+    } else if ((wp = &window_list[WIN_INVEN]) != 0
+               && wp->type == NHW_MENU && wp->menu_information->is_up) {
+        /* persistent inventory is up but perm_invent is off, take it down */
+        x11_no_perminv(wp);
     }
 }
 

@@ -77,7 +77,7 @@ NetHackQtYnDialog::NetHackQtYnDialog(QWidget *parent, const QString &q,
 char NetHackQtYnDialog::Exec()
 {
     QString ch(QString::fromLatin1(choices));
-    int ch_per_line=6;
+//    int ch_per_line=6;
     QString qlabel;
     QString enable;
     if ( qt_compact_mode && !choices ) {
@@ -129,7 +129,7 @@ char NetHackQtYnDialog::Exec()
 	    ch.append(d[5]);
 	    ch.append(d[8]);
 	    ch.append(d[9]);
-	    ch_per_line = 3;
+//	    ch_per_line = 3;
 	    def = ' ';
 	} else {
 	    // Hmm... they'll have to use a virtual keyboard

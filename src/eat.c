@@ -915,6 +915,8 @@ givit(int type, register struct permonst *ptr)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* called after completely consuming a corpse */
 static void
 cpostfx(int pm)
@@ -1141,6 +1143,8 @@ cpostfx(int pm)
     }
     return;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 violated_vegetarian(void)

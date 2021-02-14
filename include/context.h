@@ -65,6 +65,16 @@ struct victual_info {
     Bitfield(doreset, 1);  /* stop eating at end of turn */
 };
 
+struct engrave_info {
+    char text[BUFSZ];   /* actual text being engraved - doengrave() handles all
+                           the possible mutations of this */
+    char *nextc;        /* next character(s) in text[] to engrave */
+    struct obj *stylus; /* object doing the writing */
+    xchar type;         /* type of engraving (DUST, MARK, etc) */
+    coord pos;          /* location the engraving is being placed on */
+    int actionct;       /* nth turn spent engraving */
+};
+
 struct warntype_info {
     unsigned long obj;        /* object warn_of_mon monster type M2 */
     unsigned long polyd;      /* warn_of_mon monster type M2 due to poly */
@@ -142,6 +152,7 @@ struct context_info {
     boolean enhance_tip; /* player is informed about #enhance */
     struct dig_info digging;
     struct victual_info victual;
+    struct engrave_info engraving;
     struct tin_info tin;
     struct book_info spbook;
     struct takeoff_info takeoff;

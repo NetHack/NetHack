@@ -49,6 +49,7 @@ static void create_trap(spltrap *, struct mkroom *);
 static int noncoalignment(aligntyp);
 static boolean m_bad_boulder_spot(int, int);
 static int pm_to_humidity(struct permonst *);
+static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
 static void create_altar(altar *, struct mkroom *);
@@ -1758,6 +1759,29 @@ pm_to_humidity(struct permonst* pm)
     return loc;
 }
 
+/*
+ * Convert a special level alignment mask (an alignment mask with possible
+ * extra values/flags) to a "normal" alignment mask (no extra flags).
+ *
+ * When random: there is an 80% chance that the altar will be co-aligned.
+ */
+static unsigned int
+sp_amask_to_amask(unsigned int sp_amask)
+{
+    unsigned int amask;
+
+    if (sp_amask == AM_SPLEV_CO)
+        amask = Align2amask(u.ualignbase[A_ORIGINAL]);
+    else if (sp_amask == AM_SPLEV_NONCO)
+        amask = Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]));
+    else if (sp_amask == AM_SPLEV_RANDOM)
+        amask = induced_align(80);
+    else
+        amask = sp_amask & AM_MASK;
+
+    return amask;
+}
+
 static void
 create_monster(monster* m, struct mkroom* croom)
 {
@@ -1777,13 +1801,7 @@ create_monster(monster* m, struct mkroom* croom)
     if (class == MAXMCLASSES)
         panic("create_monster: unknown monster class '%c'", m->class);
 
-    amask = (m->align == AM_SPLEV_CO)
-               ? Align2amask(u.ualignbase[A_ORIGINAL])
-               : (m->align == AM_SPLEV_NONCO)
-                  ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
-                  : (m->align == AM_SPLEV_RANDOM)
-                     ? induced_align(80)
-                     : Align2amask(m->align);
+    amask = sp_amask_to_amask(m->sp_amask);
 
     if (!class)
         pm = (struct permonst *) 0;
@@ -1823,7 +1841,7 @@ create_monster(monster* m, struct mkroom* croom)
     if (croom && !inside_room(croom, x, y))
         return;
 
-    if (m->align != AM_SPLEV_RANDOM)
+    if (m->sp_amask != AM_SPLEV_RANDOM)
         mtmp = mk_roamer(pm, Amask2align(amask), x, y, m->peaceful);
     else if (PM_ARCHEOLOGIST <= m->id && m->id <= PM_WIZARD)
         mtmp = mk_mplayer(pm, x, y, FALSE);
@@ -2282,20 +2300,7 @@ create_altar(altar* a, struct mkroom* croom)
     if (oldtyp == STAIRS || oldtyp == LADDER)
         return;
 
-    /* Is the alignment random ?
-     * If so, it's an 80% chance that the altar will be co-aligned.
-     *
-     * The alignment is encoded as amask values instead of alignment
-     * values to avoid conflicting with the rest of the encoding,
-     * shared by many other parts of the special level code.
-     */
-    amask = (a->align == AM_SPLEV_CO)
-               ? Align2amask(u.ualignbase[A_ORIGINAL])
-               : (a->align == AM_SPLEV_NONCO)
-                  ? Align2amask(noncoalignment(u.ualignbase[A_ORIGINAL]))
-                  : (a->align == AM_SPLEV_RANDOM)
-                     ? induced_align(80)
-                     : Align2amask(a->align);
+    amask = sp_amask_to_amask(a->sp_amask);
 
     levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;
@@ -3008,7 +3013,7 @@ lspo_monster(lua_State* L)
     tmpmons.name.str = NULL;
     tmpmons.appear = 0;
     tmpmons.appear_as.str = (char *) 0;
-    tmpmons.align = AM_SPLEV_RANDOM;
+    tmpmons.sp_amask = AM_SPLEV_RANDOM;
     tmpmons.female = 0;
     tmpmons.invis = 0;
     tmpmons.cancelled = 0;
@@ -3073,7 +3078,7 @@ lspo_monster(lua_State* L)
         tmpmons.name.str = get_table_str_opt(L, "name", NULL);
         tmpmons.appear = 0;
         tmpmons.appear_as.str = (char *) 0;
-        tmpmons.align = get_table_align(L);
+        tmpmons.sp_amask = get_table_align(L);
         tmpmons.female = get_table_int_opt(L, "female", 0);
         tmpmons.invis = get_table_int_opt(L, "invisible", 0);
         tmpmons.cancelled = get_table_int_opt(L, "cancelled", 0);
@@ -3907,7 +3912,7 @@ lspo_altar(lua_State* L)
         acoord = SP_COORD_PACK(x, y);
 
     tmpaltar.coord = acoord;
-    tmpaltar.align = al;
+    tmpaltar.sp_amask = al;
     tmpaltar.shrine = shrine;
 
     create_altar(&tmpaltar, g.coder->croom);

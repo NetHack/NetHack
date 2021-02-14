@@ -8,7 +8,7 @@
 static char *nextmbuf(void);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
-static int CFDECLSPEC cmp_coord_distu(const void *, const void *);
+static int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
 static int gloc_filter_classify_glyph(int);
 static int gloc_filter_floodfill_matcharea(int, int);
 static void gloc_filter_floodfill(int, int);
@@ -95,6 +95,8 @@ getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
             gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
     putstr(tmpwin, 0, sbuf);
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* the response for '?' help request in getpos() */
 static void
@@ -225,7 +227,9 @@ getpos_help(boolean force, const char *goal)
     destroy_nhwindow(tmpwin);
 }
 
-static int
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+static int QSORTCALLBACK
 cmp_coord_distu(const void *a, const void *b)
 {
     const coord *c1 = a;
@@ -335,6 +339,8 @@ gloc_filter_done(void)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static boolean
 gather_locs_interesting(int x, int y, int gloc)
 {
@@ -401,6 +407,8 @@ gather_locs_interesting(int x, int y, int gloc)
     /*NOTREACHED*/
     return FALSE;
 }
+
+RESTORE_WARNINGS
 
 /* gather locations for monsters or objects shown on the map */
 static void
@@ -482,6 +490,8 @@ dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
     return buf;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* coordinate formatting for 'whatis_coord' option */
 char *
 coord_desc(int x, int y, char *outbuf, char cmode)
@@ -522,6 +532,8 @@ coord_desc(int x, int y, char *outbuf, char cmode)
     }
     return outbuf;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 auto_describe(int cx, int cy)
@@ -587,7 +599,7 @@ getpos_menu(coord *ccp, int gloc)
                               &firstmatch, (struct permonst **)0)) {
             (void) coord_desc(garr[i].x, garr[i].y, tmpbuf,
                               iflags.getpos_coords);
-            Sprintf(fullbuf, "%s%s%s", firstmatch,
+            Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, fullbuf, MENU_ITEMFLAGS_NONE);

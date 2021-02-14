@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1612316744 2021/02/03 01:45:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -195,7 +195,7 @@ NH_panictrace_libc(void)
     size_t count, x;
     char **info, buf[BUFSZ];
 
-    raw_print("Generating more information you may report:\n");
+    raw_print("  Generating more information you may report:\n");
     count = backtrace(bt, SIZE(bt));
     info = backtrace_symbols(bt, count);
     for (x = 0; x < count; x++) {
@@ -246,7 +246,7 @@ NH_panictrace_gdb(void)
             gdbpath, ARGV0, getpid(), greppath);
     gdb = popen(buf, "w");
     if (gdb) {
-        raw_print("Generating more information you may report:\n");
+        raw_print("  Generating more information you may report:\n");
         fprintf(gdb, "bt\nquit\ny");
         fflush(gdb);
         sleep(4); /* ugly */
@@ -385,6 +385,9 @@ done_hangup(int sig)
 #endif
 #endif /* NO_SIGNAL */
 
+DISABLE_WARNING_FORMAT_NONLITERAL /* one compiler warns if the format
+                                     string is the result of a ? x : y */
+
 void
 done_in_by(struct monst *mtmp, int how)
 {
@@ -504,6 +507,8 @@ done_in_by(struct monst *mtmp, int how)
     return;
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 /* some special cases for overriding while-helpless reason */
 static const struct {
     int why, unmulti;
@@ -544,6 +549,8 @@ fixup_death(int how)
 #if defined(WIN32) && !defined(SYSCF)
 #define NOTIFY_NETHACK_BUGS
 #endif
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 /*VARARGS1*/
 void panic
@@ -624,6 +631,8 @@ VA_DECL(const char *, str)
     VA_END();
     really_done(PANICKED);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static boolean
 should_query_disclose_option(int category, char *defquery)

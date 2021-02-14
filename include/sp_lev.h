@@ -132,7 +132,7 @@ typedef struct {
 typedef struct {
     Str_or_Len name, appear_as;
     short id;
-    aligntyp align;
+    unsigned int sp_amask; /* splev amask */
     packed_coord coord;
     xchar x, y, class, appear;
     schar peaceful, asleep;
@@ -159,7 +159,7 @@ typedef struct {
 typedef struct {
     packed_coord coord;
     xchar x, y;
-    aligntyp align;
+    unsigned int sp_amask; /* splev amask */
     xchar shrine;
 } altar;
 

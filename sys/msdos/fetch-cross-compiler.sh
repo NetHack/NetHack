@@ -1,5 +1,5 @@
 #!/bin/sh
-#set -x
+set -x
 
 if [ -z "$TRAVIS_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/lib/djgpp
@@ -57,7 +57,7 @@ if [ ! -f "$DJGPP_FILE" ]; then
         #Mac
 	curl -L $DJGPP_URL -o $DJGPP_FILE
    else
-        wget --no-hsts "$DJGPP_URL"
+        wget --quiet --no-hsts "$DJGPP_URL"
    fi
 fi
 
@@ -72,7 +72,7 @@ if [ ! -d djgpp/cwsdpmi ]; then
       	#Mac
 	curl http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip -o csdpmi7b.zip
     else
-	wget --no-hsts http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
+	wget --quiet --no-hsts http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
     fi
     cd djgpp
     mkdir -p cwsdpmi

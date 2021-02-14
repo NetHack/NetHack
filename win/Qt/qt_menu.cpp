@@ -559,7 +559,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
 
         // Check box, set if pre-selected
 	QCheckBox *cb = new QCheckBox();
-        cb->setChecked(mi.preselected ? Qt::Checked : Qt::Unchecked);
+        cb->setChecked(mi.preselected);
 	cb->setFocusPolicy(Qt::NoFocus);
         // CheckboxClicked() will call ToggleSelect() for item whose checkbox
         // gets clicked upon
@@ -760,7 +760,7 @@ void NetHackQtMenuWindow::All()
         }
         QCheckBox *cb = dynamic_cast<QCheckBox *> (table->cellWidget(row, 1));
         if (cb != NULL) {
-            cb->setChecked(Qt::Checked);
+            cb->setChecked(true);
         }
     }
     if (biggestcount > 0L) { // had one or more counts
@@ -864,8 +864,7 @@ void NetHackQtMenuWindow::ToggleSelect(int row, bool already_toggled)
         QTableWidgetItem *countfield = table->item(row, 0);
         if (!counting) {
             if (!already_toggled)
-                cb->setChecked((cb->checkState() == Qt::Unchecked) // toggle
-                               ? Qt::Checked : Qt::Unchecked);
+                cb->setChecked((cb->checkState() == Qt::Unchecked)); // toggle
             itemlist[row].selected = (cb->checkState() != Qt::Unchecked);
             if (countfield != NULL)
                 countfield->setText("");
@@ -885,7 +884,7 @@ void NetHackQtMenuWindow::ToggleSelect(int row, bool already_toggled)
             // [maybe not necessary since unlike tty menus, count is visible]
 
             // uncheck if count is explicitly 0, otherwise check
-            cb->setChecked((amt > 0L) ? Qt::Checked : Qt::Unchecked);
+            cb->setChecked((amt > 0L));
             itemlist[row].selected = (cb->checkState() != Qt::Unchecked);
 
             // if this count is larger than the biggest we've seen

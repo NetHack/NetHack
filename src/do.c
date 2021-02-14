@@ -1232,6 +1232,8 @@ u_collide_m(struct monst *mtmp)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
 {
@@ -1729,6 +1731,8 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* usually called from goto_level(); might be called from Sting_effects() */
 void

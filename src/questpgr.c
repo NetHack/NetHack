@@ -542,7 +542,7 @@ com_pager_core(const char *section, const char *msgid, boolean showerror)
         free((genericptr_t) synopsis);
     if (fallback_msgid)
         free((genericptr_t) fallback_msgid);
-    lua_close(L);
+    nhl_done(L);
     return res;
 }
 
