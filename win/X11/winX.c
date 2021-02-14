@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613272634 2021/02/14 03:17:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613292827 2021/02/14 08:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1242,17 +1242,22 @@ X11_destroy_nhwindow(winid window)
 void
 X11_update_inventory(void)
 {
+    struct xwindow *wp = 0;
+
     if (!x_inited)
         return;
 
-    if (window_list[WIN_INVEN].menu_information->is_up) {
-        if (iflags.perm_invent) {
+    if (iflags.perm_invent) {
+        /* skip any calls to update_inventory() before in_moveloop starts */
+        if (g.program_state.in_moveloop || g.program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
             (void) display_inventory((char *) 0, FALSE);
             updated_inventory = 0;
-        } else {
-            x11_no_perminv(&window_list[WIN_INVEN]);
         }
+    } else if ((wp = &window_list[WIN_INVEN]) != 0
+               && wp->type == NHW_MENU && wp->menu_information->is_up) {
+        /* persistent inventory is up but perm_invent is off, take it down */
+        x11_no_perminv(wp);
     }
 }
 

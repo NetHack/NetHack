@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1612431350 2021/02/04 09:35:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.500 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1613293046 2021/02/14 08:57:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.506 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8091,6 +8091,7 @@ static struct wc_Opt wc_options[] = {
     { "color", WC_COLOR },
     { "eight_bit_tty", WC_EIGHT_BIT_IN },
     { "hilite_pet", WC_HILITE_PET },
+    { "perm_invent", WC_PERM_INVENT },
     { "popup_dialog", WC_POPUP_DIALOG },
     { "player_selection", WC_PLAYER_SELECTION },
     { "preload_tiles", WC_PRELOAD_TILES },
@@ -8098,15 +8099,11 @@ static struct wc_Opt wc_options[] = {
     { "tile_file", WC_TILE_FILE },
     { "tile_width", WC_TILE_WIDTH },
     { "tile_height", WC_TILE_HEIGHT },
-    { "use_inverse", WC_INVERSE },
     { "align_message", WC_ALIGN_MESSAGE },
     { "align_status", WC_ALIGN_STATUS },
     { "font_map", WC_FONT_MAP },
     { "font_menu", WC_FONT_MENU },
     { "font_message", WC_FONT_MESSAGE },
-#if 0
-    {"perm_invent", WC_PERM_INVENT},
-#endif
     { "font_size_map", WC_FONTSIZ_MAP },
     { "font_size_menu", WC_FONTSIZ_MENU },
     { "font_size_message", WC_FONTSIZ_MESSAGE },
@@ -8118,6 +8115,7 @@ static struct wc_Opt wc_options[] = {
     { "scroll_amount", WC_SCROLL_AMOUNT },
     { "scroll_margin", WC_SCROLL_MARGIN },
     { "splash_screen", WC_SPLASH_SCREEN },
+    { "use_inverse", WC_INVERSE },
     { "vary_msgcount", WC_VARY_MSGCOUNT },
     { "windowcolors", WC_WINDOWCOLORS },
     { "mouse_support", WC_MOUSE_SUPPORT },

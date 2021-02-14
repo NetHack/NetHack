@@ -1,6 +1,3 @@
-Starting or restoring a game with 'perm_invent' enabled via config file
-or NETHACKOPTIONS does not begin with inventory shown.
-
 When persistent inventory window is first populated, focus is given to
 its window (behavior might be window manager-specific; it happens with
 default window manager on OSX).  Focus should be explicitly directed

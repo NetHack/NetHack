@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1596498146 2020/08/03 23:42:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1613292825 2021/02/14 08:53:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -68,7 +68,6 @@ moveloop(boolean resuming)
         g.context.seer_turn = (long) rnd(30);
     }
     g.context.botlx = TRUE; /* for STATUS_HILITES */
-    update_inventory(); /* for perm_invent */
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
     }
@@ -85,6 +84,11 @@ moveloop(boolean resuming)
     g.context.move = 0;
 
     g.program_state.in_moveloop = 1;
+    /* for perm_invent preset at startup, display persistent inventory after
+       invent is fully populated and the in_moveloop flag has been set */
+    if (iflags.perm_invent)
+        update_inventory();
+
     for (;;) {
 #ifdef SAFERHANGUP
         if (g.program_state.done_hup)

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.452 $ $NHDT-Date: 1613272633 2021/02/14 03:17:13 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ $NHDT-Date: 1613292825 2021/02/14 08:53:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -531,6 +531,8 @@ X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
+X11: if perm_invent is set in NETHACKOPTIONS or config file, start with the
+	persistent inventory window displayed
 X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 
