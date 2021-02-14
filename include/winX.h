@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.h	$NHDT-Date: 1611697182 2021/01/26 21:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.7	winX.h	$NHDT-Date: 1613272633 2021/02/14 03:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -357,6 +357,7 @@ extern int x_event(int);
 /* ### winmenu.c ### */
 extern void menu_delete(Widget, XEvent *, String *, Cardinal *);
 extern void menu_key(Widget, XEvent *, String *, Cardinal *);
+extern void x11_no_perminv(struct xwindow *);
 extern void create_menu_window(struct xwindow *);
 extern void destroy_menu_window(struct xwindow *);
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1596498373 2020/08/03 23:46:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.7	winmenu.c	$NHDT-Date: 1613272635 2021/02/14 03:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -574,6 +574,20 @@ menu_popdown(struct xwindow *wp)
 }
 
 /* Global functions ======================================================= */
+
+/* called by X11_update_inventory() if persistent inventory is currently
+   displayed but the 'perm_invent' option is now Off */
+void
+x11_no_perminv(struct xwindow *wp)
+{
+    if (wp && wp->type == NHW_MENU && wp->menu_information->is_up) {
+        destroy_menu_entry_widgets(wp);
+        nh_XtPopdown(wp->popup);
+        XtDestroyWidget(wp->popup);
+        wp->w = wp->popup = (Widget) 0;
+        wp->menu_information->is_up = FALSE;
+    }
+}
 
 void
 X11_start_menu(winid window, unsigned long mbehavior UNUSED)

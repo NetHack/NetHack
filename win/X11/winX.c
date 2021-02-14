@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613171266 2021/02/12 23:07:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613272634 2021/02/14 03:17:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1242,10 +1242,17 @@ X11_destroy_nhwindow(winid window)
 void
 X11_update_inventory(void)
 {
-    if (x_inited && window_list[WIN_INVEN].menu_information->is_up) {
-        updated_inventory = 1; /* hack to avoid mapping&raising window */
-        (void) display_inventory((char *) 0, FALSE);
-        updated_inventory = 0;
+    if (!x_inited)
+        return;
+
+    if (window_list[WIN_INVEN].menu_information->is_up) {
+        if (iflags.perm_invent) {
+            updated_inventory = 1; /* hack to avoid mapping&raising window */
+            (void) display_inventory((char *) 0, FALSE);
+            updated_inventory = 0;
+        } else {
+            x11_no_perminv(&window_list[WIN_INVEN]);
+        }
     }
 }
 
