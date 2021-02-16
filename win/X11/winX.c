@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613292827 2021/02/14 08:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613444929 2021/02/16 03:08:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2123,9 +2123,10 @@ release_yn_widgets(void)
 /* X11-specific edition of yn_function(), the routine called by the core
    to show a prompt and get a single keystroke answer, often 'y' vs 'n' */
 char
-X11_yn_function(const char *ques,
-                const char *choices, /* string of possible response chars; any char if Null */
-                char def)            /* default response if user hits <space> or <return> */
+X11_yn_function(
+    const char *ques,     /* prompt text */
+    const char *choices,  /* allowed response chars; any char if Null */
+    char def)             /* default if user hits <space> or <return> */
 {
     char buf[BUFSZ];
     Arg args[4];
@@ -2161,11 +2162,15 @@ X11_yn_function(const char *ques,
         if ((cb = index(choicebuf, '\033')) != 0)
             *cb = '\0';
         /* ques [choices] (def) */
-        if ((int) (1 + strlen(ques) + 2 + strlen(choicebuf) + 4) >= BUFSZ)
-            panic("X11_yn_function:  question too long");
-        (void) strncpy(buf, ques, QBUFSZ - 1);
-        buf[QBUFSZ - 1] = '\0';
-        Sprintf(eos(buf), " [%s]", choicebuf);
+        int ln = ((int) strlen(ques)        /* prompt text */
+                  + 3                       /* " []" */
+                  + (int) strlen(choicebuf) /* choices within "[]" */
+                  + 4                       /* " (c)" */
+                  + 1                       /* a trailing space */
+                  + 1);                     /* \0 terminator */
+        if (ln >= BUFSZ)
+            panic("X11_yn_function:  question too long (%d)", ln);
+        Snprintf(buf, sizeof buf, "%.*s [%s]", QBUFSZ - 1, ques, choicebuf);
         if (def)
             Sprintf(eos(buf), " (%c)", def);
         Strcat(buf, " ");
@@ -2175,10 +2180,22 @@ X11_yn_function(const char *ques,
                       : index(choices, 'n') ? 'n'
                         : def);
     } else {
-        if ((int) (1 + strlen(ques) + 1) >= BUFSZ)
-            panic("X11_yn_function:  question too long");
+        int ln = ((int) strlen(ques)        /* prompt text */
+                  + 1                       /* a trailing space */
+                  + 1);                     /* \0 terminator */
+        if (ln >= BUFSZ)
+            panic("X11_yn_function:  question too long (%d)", ln);
         Strcpy(buf, ques);
         Strcat(buf, " ");
+    }
+    /* for popup-style, add some extra elbow room to the prompt to
+       enhance its visibility; there's no cursor shown, just the text */
+    if (!appResources.slow) {
+        char buf2[BUFSZ];
+
+        /* insert one leading space and two extra trailing spaces */
+        Strcpy(buf2, buf);
+        Snprintf(buf, sizeof buf, " %s  ", buf2);
     }
 
     /*
@@ -2245,19 +2262,19 @@ X11_yn_function(const char *ques,
     yn_getting_num = FALSE;
     (void) x_event(EXIT_ON_EXIT); /* get keystroke(s) */
 
+    /* erase and then remove the prompt */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNlabel, " "); num_args++;
+    XtSetValues(yn_label, args, num_args);
     if (appResources.slow) {
-        /* keystrokes now belong to the map */
-        input_func = 0;
-        /* erase the prompt */
-        num_args = 0;
-        XtSetArg(args[num_args], XtNlabel, " "); num_args++;
-        XtSetValues(yn_label, args, num_args);
+        input_func = 0; /* keystrokes now belong to the map */
         highlight_yn(FALSE); /* disguise yn_label as part of map */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
 
-    pline("%s%c", buf, (yn_return != '\033') ? yn_return : '\0');
+    char *p = trimspaces(buf); /* remove !slow's extra whitespace */
+    pline("%s %s", p, (yn_return == '\033') ? "ESC" : visctrl(yn_return));
 
     return yn_return;
 }

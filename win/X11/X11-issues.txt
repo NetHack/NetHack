@@ -7,3 +7,9 @@ When persistent inventory window is displayed, an update that ought to
 make it grow won't do so even if there is room on the screen for that.
 It will add scrollbar(s) when not already there, and it can be resized
 manually.
+
+When the 'slow' resource is off, popup yn_function sometimes doesn't
+resize to fit the prompt properly.  There's a hack to set the label
+text twice with comment suggesting that it's there to deal with this,
+but it isn't adequate to fix the problem.
+

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ $NHDT-Date: 1613292825 2021/02/14 08:53:45 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.454 $ $NHDT-Date: 1613444931 2021/02/16 03:08:51 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -533,6 +533,8 @@ X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
 X11: if perm_invent is set in NETHACKOPTIONS or config file, start with the
 	persistent inventory window displayed
+X11: use visctrl(response) when X11_yn_function() echoes prompt+response in
+	message window
 X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 
