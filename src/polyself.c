@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1605959204 2020/11/21 11:46:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1613600809 2021/02/17 22:26:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.160 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1525,7 +1525,7 @@ dohide(void)
        such critters aren't offered the option of hiding via #monster */
     if (g.youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy)) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
-            The("fountain is not deep enough to hide in.");
+            pline_The("fountain is not deep enough to hide in.");
         else
             There("is no %s to hide in here.", hliquid("water"));
         u.uundetected = 0;
