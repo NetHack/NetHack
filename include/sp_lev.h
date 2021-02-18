@@ -91,7 +91,7 @@ struct sp_coder {
     struct mkroom *tmproomlist[MAX_NESTED_ROOMS + 1];
     boolean failed_room[MAX_NESTED_ROOMS + 1];
     int n_subroom;
-    int lvl_is_joined;
+    boolean lvl_is_joined;
     boolean check_inaccessibles;
     int allow_flips;
 };

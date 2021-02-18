@@ -6103,7 +6103,7 @@ sp_level_coder_init(void)
     coder->allow_flips = 3; /* allow flipping level horiz/vert */
     coder->croom = NULL;
     coder->n_subroom = 1;
-    coder->lvl_is_joined = 0;
+    coder->lvl_is_joined = FALSE;
     coder->room_stack = 0;
 
     splev_init_present = FALSE;
