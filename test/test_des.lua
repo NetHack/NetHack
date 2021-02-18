@@ -61,7 +61,7 @@ function test_level_init()
    des.level_init({ style = "mines", fg = ".", bg = "}", joined = true });
 
    des.reset_level();
-   des.level_init({ style = "mines", fg = ".", bg = "L", smoothed = 1, joined = 1, lit = 0 });
+   des.level_init({ style = "mines", fg = ".", bg = "L", smoothed = true, joined = true, lit = 0 });
 
    des.reset_level();
    des.level_init({ style = "mines", fg = ".", bg = " ", smoothed = true, joined = true, walled = true });
