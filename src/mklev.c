@@ -65,7 +65,7 @@ mkroom_cmp(const genericptr vx, const genericptr vy)
 }
 
 /* Return TRUE if a door placed at (x, y) which otherwise passes okdoor()
- * checks would be connecting into an area that was declared as joined = 0.
+ * checks would be connecting into an area that was declared as joined = false.
  * Checking for this in finddpos() enables us to have rooms with sub-areas
  * (such as shops) that will never randomly generate unwanted doors in order
  * to connect them up to other areas.
