@@ -229,7 +229,7 @@ themerooms = {
                  contents = function(rm)
                     des.room({ type = "themed",
 			       x = (rm.width - 1) / 2, y = (rm.height - 1) / 2,
-			       w = 1, h = 1, joined = 0,
+			       w = 1, h = 1, joined = false,
                                contents = function()
                                   if (percent(50)) then
                                      local mons = { "M", "V", "L", "Z" };
@@ -583,12 +583,12 @@ end });
                   end
                end
                p = placements[d(#placements)]
-               des.room({ type=ltype, x=p["lx"], y=p["ly"], w=3, h=3, filled=1, joined=0,
+               des.room({ type=ltype, x=p["lx"], y=p["ly"], w=3, h=3, filled=1, joined=false,
                            contents = function()
                      des.door({ state=shopdoorstate(), wall=p["lwall"] })
                   end
                });
-               des.room({ type=rtype, x=p["rx"], y=p["ry"], w=3, h=3, filled=1, joined=0,
+               des.room({ type=rtype, x=p["rx"], y=p["ry"], w=3, h=3, filled=1, joined=false,
                            contents = function()
                      des.door({ state=shopdoorstate(), wall=p["rwall"] })
                   end

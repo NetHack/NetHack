@@ -3480,7 +3480,7 @@ lspo_level_flags(lua_State* L)
 }
 
 /* level_init({ style = "solidfill", fg = " " }); */
-/* level_init({ style = "mines", fg = ".", bg = "}", smoothed=1, joined=1, lit=0 }) */
+/* level_init({ style = "mines", fg = ".", bg = "}", smoothed=true, joined=true, lit=0 }) */
 int
 lspo_level_init(lua_State* L)
 {
@@ -3694,7 +3694,7 @@ lspo_room(lua_State* L)
         tmproom.rlit = get_table_int_opt(L, "lit", -1);
         /* theme rooms default to unfilled */
         tmproom.needfill = get_table_int_opt(L, "filled", g.in_mk_themerooms ? 0 : 1);
-        tmproom.joined = get_table_int_opt(L, "joined", 1);
+        tmproom.joined = get_table_boolean_opt(L, "joined", TRUE);
 
         if (!g.coder->failed_room[g.coder->n_subroom - 1]) {
             tmpcr = build_room(&tmproom, g.coder->croom);
@@ -5430,7 +5430,7 @@ lspo_region(lua_State* L)
          * "lvflags_only" ==> filled=2, probably in a get_table_needfill_opt */
         needfill = get_table_int_opt(L, "filled", 0);
         irregular = get_table_boolean_opt(L, "irregular", 0);
-        joined = get_table_boolean_opt(L, "joined", 1);
+        joined = get_table_boolean_opt(L, "joined", TRUE);
         do_arrival_room = get_table_boolean_opt(L, "arrival_room", 0);
         rtype = get_table_roomtype_opt(L, "type", OROOM);
         rlit = get_table_int_opt(L, "lit", -1);
