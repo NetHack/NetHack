@@ -3,13 +3,36 @@ its window (behavior might be window manager-specific; it happens with
 default window manager on OSX).  Focus should be explicitly directed
 back to the main window.
 
+More focus:  although the menu window gets focus, the menu inside that
+window does not accept focus, so scrolling persistent inventory via
+keyboard won't work.
+
 When persistent inventory window is displayed, an update that ought to
 make it grow won't do so even if there is room on the screen for that.
 It will add scrollbar(s) when not already there, and it can be resized
 manually.
 
+If the permsistent inventory window is manually made taller, it will
+fill that space immediately.  But if it is made wider, handling of the
+extra space seems to be erratic and it is sometimes left blank until
+window is dismissed and re-created via 'i' or toggling 'perm_invent'.
+
 When the 'slow' resource is off, popup yn_function sometimes doesn't
 resize to fit the prompt properly.  There's a hack to set the label
 text twice with comment suggesting that it's there to deal with this,
 but it isn't adequate to fix the problem.
+
+When the map is clipped, sometimes panning leaves a gap in the display.
+Test case was with the map manually resized to avoid overlap with the
+persistent inventory window (resizing added scrollbars which hadn't
+been there previously).  The level was fully mapped and hero was in a
+room on the left side; clicking on horizontal scrollbar to pan to the
+right rendered the map correctly.  However, issuing a command that
+caused the map to auto-pan back to show the hero didn't render it
+correctly.  A portion of map which had been hidden beneath the vertical
+scrollbar while panned got moved into the middle of the window but got
+shown there with a vertical strip of unrendered background that was
+approximately half the width of the vertical scrollbar.  It wasn't
+inserted space in between two sides of map; it was undrawn map.  If it
+had been drawn, the map would have been normal.
 
