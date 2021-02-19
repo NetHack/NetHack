@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.456 $ $NHDT-Date: 1613723080 2021/02/19 08:24:40 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ $NHDT-Date: 1613777904 2021/02/19 23:38:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -835,6 +835,8 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 X11: implement 'selectsaved', restore via menu of saved games
+X11: echo getline prompt and response (wishes, applying names) to message
+	window and dumplog message history
 
 
 NetHack Community Patches (or Variation) Included

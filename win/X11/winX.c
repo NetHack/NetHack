@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613444929 2021/02/16 03:08:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613777904 2021/02/19 23:38:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1826,7 +1826,7 @@ X11_askname(void)
 static Widget getline_popup, getline_dialog;
 
 #define CANCEL_STR "\033"
-static char *getline_input;
+static char *getline_input; /* buffer to hold user input; getline's output */
 
 /* Callback for getline dialog widget. */
 /* ARGSUSED */
@@ -1892,12 +1892,14 @@ release_getline_widgets(void)
         XtDestroyWidget(getline_popup), getline_popup = (Widget) 0;
 }
 
+/* ask user for a line of text */
 void
-X11_getlin(const char *question, char *input)
+X11_getlin(const char *question, /* prompt */
+           char *input)          /* user's input, getlin's _output_ buffer */
 {
-    getline_input = input;
+    getline_input = input; /* used by popup actions */
 
-    flush_screen(1);
+    flush_screen(1); /* tell core to make sure that map is up to date */
     if (!getline_popup) {
         Arg args[1];
 
@@ -1935,6 +1937,22 @@ X11_getlin(const char *question, char *input)
 
     /* The callback will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
+
+    /* we get here after the popup has exited;
+       put prompt and response into the message window (and into
+       core's dumplog history) unless play hasn't started yet */
+    if (g.program_state.in_moveloop || g.program_state.gameover) {
+        const char *visanswer = (*input == '\033') ? "ESC" : input;
+        int promptlen = (int) strlen(question),
+            answerlen = (int) strlen(visanswer);
+
+        pline("%.*s %.*s", /* note: (QBUFSZ-1 + 1 + QBUFSZ-1) == (BUFSZ-1) */
+              min(promptlen, QBUFSZ - 1), question,
+              min(answerlen, QBUFSZ - 1), visanswer);
+    }
+
+    /* clear static pointer that's about to go stale */
+    getline_input = 0;
 }
 
 /* Display file ----------------------------------------------------------- */
