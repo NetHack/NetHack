@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1613293046 2021/02/14 08:57:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.506 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1613721262 2021/02/19 07:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.507 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4225,6 +4225,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             if (iflags.use_color)
                 g.opt_need_redraw = TRUE; /* darkroom refresh */
             break;
+        case opt_wizmgender:
         case opt_showrace:
         case opt_use_inverse:
         case opt_hilite_pile:

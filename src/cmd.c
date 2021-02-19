@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1611952382 2021/01/29 20:33:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.452 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1613721260 2021/02/19 07:54:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2050,8 +2050,6 @@ struct ext_func_tab extcmdlist[] = {
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
     { C('f'), "wizmap", "map the level",
               wiz_map, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
-    { '\0',   "wizmgender", "force added info about monster gender",
-              wiz_mgender, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizrumorcheck", "verify rumor boundaries",
               wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizseenv", "show map locations' seen vectors",

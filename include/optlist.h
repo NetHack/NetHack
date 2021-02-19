@@ -550,6 +550,8 @@ opt_##a,
                 "the foreground/background colors of windows")
     NHOPTC(windowtype, WINTYPELEN, opt_in, set_gameview, No, Yes, No, No,
                 NoAlias, "windowing system to use (should be specified first)")
+    NHOPTB(wizmgender, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
+                &iflags.wizmgender)
     NHOPTB(wizweight, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,

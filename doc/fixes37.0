@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.454 $ $NHDT-Date: 1613444931 2021/02/16 03:08:51 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.455 $ $NHDT-Date: 1613721260 2021/02/19 07:54:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -509,6 +509,7 @@ changes accompanying sorting of discoveries resulted in omitting very last
 change to can_reach_floor() resulted in hero being unable to reach the floor
 	when held by a lichen
 panic if lua init fails
+change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -788,7 +789,7 @@ consolidate several monsters that differed only by their gender into their
 	single species
 added wizmgender debugging command to display female monsters in red inverse;
 	helpful for debugging gender-related matters on tty; currently ignored
-	on other window ports
+	on other window ports [later: changed from command to boolean option]
 record number of encountered bones levels in xlogfile
 add bonesless to extended conducts field in xlogfile
 show bones levels information in enlightenment at end of game or in explore
