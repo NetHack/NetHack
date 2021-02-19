@@ -840,6 +840,8 @@ getpos(coord *ccp, boolean force, const char *goal)
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
+            msg_given = TRUE;
+            goto nxtc;
         } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
