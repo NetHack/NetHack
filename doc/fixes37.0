@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.455 $ $NHDT-Date: 1613721260 2021/02/19 07:54:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.456 $ $NHDT-Date: 1613723080 2021/02/19 08:24:40 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -795,6 +795,7 @@ add bonesless to extended conducts field in xlogfile
 show bones levels information in enlightenment at end of game or in explore
 	and wizmode
 for #wizintrinsic, use any counts entered during menu selection
+give feedback when boolean options are toggled interactively ('O' command)
 
 
 Platform- and/or Interface-Specific New Features

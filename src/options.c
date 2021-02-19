@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1613721262 2021/02/19 07:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.507 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1613723080 2021/02/19 08:24:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4279,6 +4279,13 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             iflags.prev_decor = STONE;
             break;
         }
+
+        /* boolean value has been toggled but some option changes can
+           still be pending at this point (mainly for opt_need_redraw);
+           give the toggled message now regardless */
+        pline("'%s' option toggled %s.", allopt[optidx].name,
+              !negated ? "on" : "off");
+
         return optn_ok;
     }
     if (req == get_val) {
