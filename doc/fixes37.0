@@ -511,6 +511,7 @@ change to can_reach_floor() resulted in hero being unable to reach the floor
 	when held by a lichen
 panic if lua init fails
 change wizard mode command #wizmgender to wizard mode option 'wizmgender'
+engraving with non-blade dulled the weapon anyway (pr #464)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
