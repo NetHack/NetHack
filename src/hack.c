@@ -1751,7 +1751,7 @@ domove_core(void)
 
         nomul(0);
         if (explo) {
-            wake_nearby();
+            wake_nearto(u.ux, u.uy, 7 * 7);
             u.mh = -1; /* dead in the current form */
             rehumanize();
         }

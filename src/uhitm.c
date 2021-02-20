@@ -4109,6 +4109,7 @@ explum(struct monst *mdef, struct attack *mattk)
     default:
         break;
     }
+    wake_nearto(u.ux, u.uy, 7 * 7);
     return MM_HIT;
 }
 
