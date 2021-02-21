@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1613870144 2021/02/21 01:15:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1613870658 2021/02/21 01:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,6 +107,7 @@ tshirt_text(struct obj* tshirt, char* buf)
         "Hey!  Nymphs!  Steal This T-Shirt!",
         "I <3 Dungeon of Doom",
         "I <3 Maud",
+        /* note: there is a similarly worded apron (alchemy smock) slogan */
         "I am a Valkyrie.  If you see me running, try to keep up.",
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
@@ -120,6 +121,7 @@ tshirt_text(struct obj* tshirt, char* buf)
         "Meat is Mordor",
         "Minetown Better Business Bureau",
         "Minetown Watch",
+        /* Discworld riff; unfortunately long */
  "Ms. Palm's House of Negotiable Affection--A Very Reputable House Of Disrepute",
         "Protection Racketeer",
         "Real men love Crom",
@@ -177,8 +179,12 @@ apron_text(struct obj* apron, char* buf)
            bomb technician, if you see me running ... try to catch up."
            In nethack, the quote is far more suitable to an alchemy smock
            (particularly since so many of these others are about cooking)
-           than a T-shirt and is paraphrased to simplify/shorten it. */
-        "If you see me running, try to keep up...",
+           than a T-shirt and is paraphrased to simplify/shorten it.
+           [later... turns out that this is already a T-shirt message:
+            "I am a Valkyrie.  If you see me running, try to keep up."
+           so this one has been revised a little:  added alchemist prefix,
+           changed "keep up" to original source's "catch up"] */
+        "I am an alchemist; if you see me running, try to catch up...",
     };
 
     Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);
