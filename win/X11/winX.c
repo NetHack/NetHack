@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613777904 2021/02/19 23:38:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613867106 2021/02/21 00:25:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1942,13 +1942,25 @@ X11_getlin(const char *question, /* prompt */
        put prompt and response into the message window (and into
        core's dumplog history) unless play hasn't started yet */
     if (g.program_state.in_moveloop || g.program_state.gameover) {
-        const char *visanswer = (*input == '\033') ? "ESC" : input;
+        /* single space has meaning (to remove a previously applied name) so
+           show it clearly; don't care about legibility of multiple spaces */
+        const char *visanswer = !input[0] ? "<empty>"
+                                : (input[0] == ' ' && !input[1]) ? "<space>"
+                                  : (input[0] == '\033') ? "<esc>"
+                                    : input;
         int promptlen = (int) strlen(question),
             answerlen = (int) strlen(visanswer);
 
-        pline("%.*s %.*s", /* note: (QBUFSZ-1 + 1 + QBUFSZ-1) == (BUFSZ-1) */
-              min(promptlen, QBUFSZ - 1), question,
-              min(answerlen, QBUFSZ - 1), visanswer);
+        /* prompt should be limited to QBUFSZ-1 by caller; enforce that
+           here for the echoed value; answer could be up to BUFSZ-1 long;
+           pline() will truncate the whole message to that amount so we
+           truncate the answer for display; this only affects the echoed
+           response, not the actual response being returned to the core */
+        if (promptlen >= QBUFSZ)
+            promptlen = QBUFSZ - 1;
+        if (answerlen + 1 + promptlen >= BUFSZ) /* +1: separating space */
+            answerlen = BUFSZ - (1 + promptlen) - 1;
+        pline("%.*s %.*s", promptlen, question, answerlen, visanswer);
     }
 
     /* clear static pointer that's about to go stale */
