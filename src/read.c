@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1610149501 2021/01/08 23:45:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1613870144 2021/02/21 01:15:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2665,7 +2665,7 @@ create_particular(void)
 #define CP_TRYLIM 5
     struct _create_particular_data d;
     char *bufp, buf[BUFSZ], prompt[QBUFSZ];
-    int  tryct = CP_TRYLIM;
+    int  tryct = CP_TRYLIM, altmsg = 0;
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
     Strcpy(prompt, "Create what kind of monster?");
@@ -2679,7 +2679,12 @@ create_particular(void)
             break;
 
         /* no good; try again... */
-        pline("I've never heard of such monsters.");
+        if (*bufp || altmsg || tryct < 2) {
+            pline("I've never heard of such monsters.");
+        } else {
+            pline("Try again (type * for random, ESC to cancel).");
+            ++altmsg;
+        }
         /* when a second try is needed, expand the prompt */
         if (tryct == CP_TRYLIM)
             Strcat(prompt, " [type name or symbol]");
