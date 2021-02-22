@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613957400 2021/02/22 01:30:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613985000 2021/02/22 09:10:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2159,6 +2159,7 @@ X11_yn_function(
     char def)             /* default if user hits <space> or <return> */
 {
     static XFontStruct *yn_font = 0;
+    static Dimension yn_minwidth = 0;
     char buf[BUFSZ], buf2[BUFSZ];
     Arg args[4];
     Cardinal num_args;
@@ -2261,6 +2262,8 @@ X11_yn_function(
                XtParseTranslationTable("<Message>WM_PROTOCOLS: yn_delete()"));
 
             num_args = 0;
+            XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft);
+                                                                   num_args++;
             XtSetArg(args[num_args], XtNtranslations,
                      XtParseTranslationTable(yn_translations)); num_args++;
             yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
@@ -2274,6 +2277,12 @@ X11_yn_function(
             (void) memset((genericptr_t) args, 0, sizeof args);
             XtSetArg(args[0], nhStr(XtNfont), &yn_font);
             XtGetValues(yn_label, args, ONE);
+
+            /* set up minimum yn_label width; we don't actually set
+               the XtNminWidth attribute */
+            (void) memset(buf2, 'X', 25), buf2[25] = '\0'; /* 25 'X's */
+            yn_minwidth = (Dimension) XTextWidth(yn_font, buf2,
+                                                 (int) strlen(buf2));
         }
     }
 
@@ -2294,30 +2303,21 @@ X11_yn_function(
          * It also enforces a minimum prompt width, which wasn't being
          * done before, so that really short prompts are more noticeable
          * if they pop up where the pointer is parked and it happens to
-         * be parked somewhere other than where it usually sits.
+         * be setting somewhere the player isn't looking.
          */
-        int promptwidth, minwidth, labelwidth = 0;
+        Dimension promptwidth, labelwidth = 0;
 
         (void) memset((genericptr_t) args, 0, sizeof args);
         num_args = 0;
-        XtSetArg(args[num_args], nhStr(XtNfont), &yn_font); num_args++;
         XtSetArg(args[num_args], XtNwidth, &labelwidth); num_args++;
         XtGetValues(yn_label, args, num_args);
 
-        (void) memset(buf2, 'X', 25), buf2[25] = '\0';
-        minwidth = XTextWidth(yn_font, buf2, (int) strlen(buf2)); /* 25 'X' */
-        promptwidth = XTextWidth(yn_font, buf, (int) strlen(buf));
-
-        if (labelwidth != promptwidth || labelwidth < minwidth) {
-            labelwidth = max(promptwidth, minwidth);
+        promptwidth = (Dimension) XTextWidth(yn_font, buf, (int) strlen(buf));
+        if (labelwidth != promptwidth || labelwidth < yn_minwidth) {
+            labelwidth = max(promptwidth, yn_minwidth);
             (void) memset((genericptr_t) args, 0, sizeof args);
             num_args = 0;
             XtSetArg(args[num_args], XtNwidth, labelwidth); num_args++;
-            if (promptwidth < minwidth) {
-                /* [This could be set just once during widget creation.] */
-                XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft);
-                                                                   num_args++;
-            }
             XtSetValues(yn_label, args, num_args);
         }
 
@@ -2328,7 +2328,7 @@ X11_yn_function(
     yn_getting_num = FALSE;
     (void) x_event(EXIT_ON_EXIT); /* get keystroke(s) */
 
-    /* erase and/or remove the prompt */
+    /* erase or remove the prompt */
     if (appResources.slow) {
         (void) memset((genericptr_t) args, 0, sizeof args);
         num_args = 0;
