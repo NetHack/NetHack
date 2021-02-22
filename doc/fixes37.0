@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ $NHDT-Date: 1613777904 2021/02/19 23:38:24 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.460 $ $NHDT-Date: 1613957400 2021/02/22 01:30:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -673,6 +673,8 @@ X11: avoid 'bad Atom X Error' when perm_invent is enabled (seemingly window
 	manager dependent)
 X11: toggling 'perm_invent' off via 'O' didn't dismiss persistent inventory
 	window
+X11: with 'slow' resource set to False, the pop up yn_function didn't always
+	resize properly when re-used
 X11: (possibly X11+OSX): if persistent inventory was displayed at time of
 	end-of-game prompting, prompting would stall until that window was
 	manually dismissed

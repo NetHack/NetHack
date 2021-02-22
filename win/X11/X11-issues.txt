@@ -17,11 +17,6 @@ fill that space immediately.  But if it is made wider, handling of the
 extra space seems to be erratic and it is sometimes left blank until
 window is dismissed and re-created via 'i' or toggling 'perm_invent'.
 
-When the 'slow' resource is off, popup yn_function sometimes doesn't
-resize to fit the prompt properly.  There's a hack to set the label
-text twice with comment suggesting that it's there to deal with this,
-but it isn't adequate to fix the problem.
-
 When the map is clipped, sometimes panning leaves a gap in the display.
 Test case was with the map manually resized to avoid overlap with the
 persistent inventory window (resizing added scrollbars which hadn't

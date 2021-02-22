@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613867106 2021/02/21 00:25:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613957400 2021/02/22 01:30:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2158,14 +2158,15 @@ X11_yn_function(
     const char *choices,  /* allowed response chars; any char if Null */
     char def)             /* default if user hits <space> or <return> */
 {
-    char buf[BUFSZ];
+    static XFontStruct *yn_font = 0;
+    char buf[BUFSZ], buf2[BUFSZ];
     Arg args[4];
     Cardinal num_args;
 
     yn_choices = choices; /* set up globals for callback to use */
     yn_def = def;
     yn_preserve_case = !choices; /* preserve case when an arbitrary
-                                    response is allowed */
+                                  * response is allowed */
 
     /*
      * This is sort of a kludge.  There are quite a few places in the main
@@ -2221,8 +2222,6 @@ X11_yn_function(
     /* for popup-style, add some extra elbow room to the prompt to
        enhance its visibility; there's no cursor shown, just the text */
     if (!appResources.slow) {
-        char buf2[BUFSZ];
-
         /* insert one leading space and two extra trailing spaces */
         Strcpy(buf2, buf);
         Snprintf(buf, sizeof buf, " %s  ", buf2);
@@ -2240,50 +2239,87 @@ X11_yn_function(
 
     if (appResources.slow) {
         /*
-         * 'slow':  the yn_label widget was created when the map and
-         * status widgets were, and is positioned between them.  It
+         * 'slow' is True:  the yn_label widget was created when the map
+         * and status widgets were, and is positioned between them.  It
          * will persist until end of game.  All we need to do for
          * yn_function is direct keystroke input to the yn response
          * handler and reset its label to be the prompt text (below).
          */
         input_func = yn_key;
         highlight_yn(FALSE); /* expose yn_label as separate from map */
-    } else if (!yn_label) {
+    } else {
         /*
-         * Not 'slow'; create a persistent widget that will be popped up
-         * as needed, then down again, and last until end of game.  The
+         * 'slow' is False; create a persistent widget that will be popped
+         * up as needed, then down again, and last until end of game.  The
          * associated yn_label widget is used to track whether it exists.
          */
-        XtSetArg(args[0], XtNallowShellResize, True);
-        yn_popup = XtCreatePopupShell("query", transientShellWidgetClass,
-                                      toplevel, args, ONE);
-        XtOverrideTranslations(yn_popup,
+        if (!yn_label) {
+            XtSetArg(args[0], XtNallowShellResize, True);
+            yn_popup = XtCreatePopupShell("query", transientShellWidgetClass,
+                                          toplevel, args, ONE);
+            XtOverrideTranslations(yn_popup,
                XtParseTranslationTable("<Message>WM_PROTOCOLS: yn_delete()"));
 
-        num_args = 0;
-        XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(yn_translations)); num_args++;
-        yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
-                                         yn_popup, args, num_args);
+            num_args = 0;
+            XtSetArg(args[num_args], XtNtranslations,
+                     XtParseTranslationTable(yn_translations)); num_args++;
+            yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
+                                             yn_popup, args, num_args);
 
-        XtRealizeWidget(yn_popup);
-        XSetWMProtocols(XtDisplay(yn_popup), XtWindow(yn_popup),
-                        &wm_delete_window, 1);
+            XtRealizeWidget(yn_popup);
+            XSetWMProtocols(XtDisplay(yn_popup), XtWindow(yn_popup),
+                            &wm_delete_window, 1);
+
+            /* get font that will be used; we'll need it to measure text */
+            (void) memset((genericptr_t) args, 0, sizeof args);
+            XtSetArg(args[0], nhStr(XtNfont), &yn_font);
+            XtGetValues(yn_label, args, ONE);
+        }
     }
 
     /* set the label of the yn widget to be the prompt text */
+    (void) memset((genericptr_t) args, 0, sizeof args);
     num_args = 0;
     XtSetArg(args[num_args], XtNlabel, buf); num_args++;
     XtSetValues(yn_label, args, num_args);
 
+    /* for !slow, pop up the prompt+response widget */
     if (!appResources.slow) {
         /*
-         * Due to some kind of weird bug in the X11R4 and X11R5 shell, we
-         * need to set the label twice to get the size to change.
+         * Setting the text doesn't always perform a resize when it
+         * should.  We used to just set the text a second time, but that
+         * wasn't a reliable workaround, at least on OSX with XQuartz.
+         * This seems to work reliably.
+         *
+         * It also enforces a minimum prompt width, which wasn't being
+         * done before, so that really short prompts are more noticeable
+         * if they pop up where the pointer is parked and it happens to
+         * be parked somewhere other than where it usually sits.
          */
+        int promptwidth, minwidth, labelwidth = 0;
+
+        (void) memset((genericptr_t) args, 0, sizeof args);
         num_args = 0;
-        XtSetArg(args[num_args], XtNlabel, buf); num_args++;
-        XtSetValues(yn_label, args, num_args);
+        XtSetArg(args[num_args], nhStr(XtNfont), &yn_font); num_args++;
+        XtSetArg(args[num_args], XtNwidth, &labelwidth); num_args++;
+        XtGetValues(yn_label, args, num_args);
+
+        (void) memset(buf2, 'X', 25), buf2[25] = '\0';
+        minwidth = XTextWidth(yn_font, buf2, (int) strlen(buf2)); /* 25 'X' */
+        promptwidth = XTextWidth(yn_font, buf, (int) strlen(buf));
+
+        if (labelwidth != promptwidth || labelwidth < minwidth) {
+            labelwidth = max(promptwidth, minwidth);
+            (void) memset((genericptr_t) args, 0, sizeof args);
+            num_args = 0;
+            XtSetArg(args[num_args], XtNwidth, labelwidth); num_args++;
+            if (promptwidth < minwidth) {
+                /* [This could be set just once during widget creation.] */
+                XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft);
+                                                                   num_args++;
+            }
+            XtSetValues(yn_label, args, num_args);
+        }
 
         positionpopup(yn_popup, TRUE);
         nh_XtPopup(yn_popup, (int) XtGrabExclusive, yn_label);
@@ -2292,11 +2328,13 @@ X11_yn_function(
     yn_getting_num = FALSE;
     (void) x_event(EXIT_ON_EXIT); /* get keystroke(s) */
 
-    /* erase and then remove the prompt */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNlabel, " "); num_args++;
-    XtSetValues(yn_label, args, num_args);
+    /* erase and/or remove the prompt */
     if (appResources.slow) {
+        (void) memset((genericptr_t) args, 0, sizeof args);
+        num_args = 0;
+        XtSetArg(args[num_args], XtNlabel, " "); num_args++;
+        XtSetValues(yn_label, args, num_args);
+
         input_func = 0; /* keystrokes now belong to the map */
         highlight_yn(FALSE); /* disguise yn_label as part of map */
     } else {
