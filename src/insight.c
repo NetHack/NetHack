@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1608115734 2020/12/16 10:48:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1614076940 2021/02/23 10:42:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -614,13 +614,18 @@ basics_enlightenment(int mode UNUSED, int final)
         char ocl[MAXOCLASSES + 1];
 
         Strcpy(buf, "on");
-        oc_to_str(flags.pickup_types, ocl);
-        Sprintf(eos(buf), " for %s%s%s",
-                *ocl ? "'" : "", *ocl ? ocl : "all types", *ocl ? "'" : "");
-        if (flags.pickup_thrown && *ocl) /* *ocl: don't show if 'all types' */
-            Strcat(buf, " plus thrown");
-        if (g.apelist)
-            Strcat(buf, ", with exceptions");
+        if (costly_spot(u.ux, u.uy)) {
+            /* being in a shop inhibits autopickup, even 'pickup_thrown' */
+            Strcat(buf, ", but temporarily disabled while inside the shop");
+        } else {
+            oc_to_str(flags.pickup_types, ocl);
+            Sprintf(eos(buf), " for %s%s%s", *ocl ? "'" : "",
+                    *ocl ? ocl : "all types", *ocl ? "'" : "");
+            if (flags.pickup_thrown && *ocl)
+                Strcat(buf, " plus thrown"); /* show when not 'all types' */
+            if (g.apelist)
+                Strcat(buf, ", with exceptions");
+        }
     } else
         Strcpy(buf, "off");
     enl_msg("Autopickup ", "is ", "was ", buf, "");

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.461 $ $NHDT-Date: 1614074653 2021/02/23 10:04:13 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.462 $ $NHDT-Date: 1614076940 2021/02/23 10:42:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -386,6 +386,7 @@ when an explosion scatters objects, make any that fly over sinks stop there
 output message when changing fastmove mode while cursor targetting
 messages when Minetown watchmen become angry could report "you see an angry
 	guard approaching" even if he was invisible and hero can't see invis
+when autopickup is on but disabled due to being inside a shop, have ^X say so
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
