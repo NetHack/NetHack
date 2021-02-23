@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1609281168 2020/12/29 22:32:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1614074654 2021/02/23 10:04:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4505,6 +4505,7 @@ golemeffects(register struct monst* mon, int damtype, int dam)
     }
 }
 
+/* anger the Minetown watch */
 boolean
 angry_guards(boolean silent)
 {
@@ -4516,8 +4517,8 @@ angry_guards(boolean silent)
             continue;
         if (is_watch(mtmp->data) && mtmp->mpeaceful) {
             ct++;
-            if (cansee(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
-                if (distu(mtmp->mx, mtmp->my) == 2)
+            if (canspotmon(mtmp) && mtmp->mcanmove) {
+                if (distu(mtmp->mx, mtmp->my) <= 2)
                     nct++;
                 else
                     sct++;
@@ -4531,18 +4532,25 @@ angry_guards(boolean silent)
     }
     if (ct) {
         if (!silent) { /* do we want pline msgs? */
-            if (slct)
-                pline_The("guard%s wake%s up!", slct > 1 ? "s" : "",
-                          slct == 1 ? "s" : "");
-            if (nct || sct) {
-                if (nct)
-                    pline_The("guard%s get%s angry!", nct == 1 ? "" : "s",
-                              nct == 1 ? "s" : "");
-                else if (!Blind)
-                    You_see("%sangry guard%s approaching!",
-                            sct == 1 ? "an " : "", sct > 1 ? "s" : "");
-            } else
-                You_hear("the shrill sound of a guard's whistle.");
+            char buf[BUFSZ];
+
+            if (slct) { /* sleeping guard(s) */
+                Sprintf(buf, "guard%s", plur(slct));
+                pline_The("%s %s up.", buf, vtense(buf, "wake"));
+            }
+
+            if (nct) { /* seen/sensed adjacent guard(s) */
+                Sprintf(buf, "guard%s", plur(nct));
+                pline_The("%s %s angry!", buf, vtense(buf, "get"));
+            } else if (sct) { /* seen/sensed non-adjcent guard(s) */
+                Sprintf(buf, "guard%s", plur(sct));
+                pline("%s %s %s approaching!",
+                      (sct == 1) ? "An angry" : "Angry",
+                      buf, vtense(buf, "are"));
+            } else {
+                Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
+                You_hear("the shrill sound of %s whistle%s.", buf, plur(ct));
+            }
         }
         return TRUE;
     }

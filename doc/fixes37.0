@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.460 $ $NHDT-Date: 1613957400 2021/02/22 01:30:00 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.461 $ $NHDT-Date: 1614074653 2021/02/23 10:04:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -384,6 +384,8 @@ curses interface failed to honor menu_xxx option settings for menu interaction
 during engraving, spaces were counted instead of non-spaces
 when an explosion scatters objects, make any that fly over sinks stop there
 output message when changing fastmove mode while cursor targetting
+messages when Minetown watchmen become angry could report "you see an angry
+	guard approaching" even if he was invisible and hero can't see invis
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
