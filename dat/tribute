@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1610152952 2021/01/09 00:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $
+# NetHack 3.7  tribute       $NHDT-Date: 1614206487 2021/02/24 22:41:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -1094,8 +1094,10 @@ MANY HAVE, said Death evenly.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# pp. 40-41 (text has 'the moment and the words' which is obviously a typo;
-#            it might have intended 'that' for 'and'; we just drop 'and')
+# pp. 40-41 (this used to have a correction for "an obvious typo" in the last
+#            sentence [before the footnote] which was actually a transciption
+#            error, with "were" erroneously inserted [causing the sentence to
+#            parse oddly] but not present in the original text; fixed now)
 %passage 4
 The thief, as will become apparent, was a special type of thief.  This
 thief was an artist of theft.  Other thieves merely stole everything that
@@ -1113,8 +1115,8 @@ while it was in the process of winning a race.  When Gritoller Mimpsey,
 vice-president of the Thieves' Guild, was jostled in the marketplace and
 then found on returning home that a freshly-stolen handful of diamonds
 had vanished from their place of concealment, he knew who to blame.(1)
-This was the type of thief that could steal the initiative, the moment the
-words were out of your mouth.
+This was the type of thief that could steal the initiative, the moment
+and the words out of your mouth.
 
 (1) This was because Gritoller had swallowed the jewels for safe keeping.
 
