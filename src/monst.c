@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.c	$NHDT-Date: 1605726850 2020/11/18 19:14:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1614291055 2021/02/25 22:10:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2799,7 +2799,7 @@ struct permonst _mons2[] = {
           NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
         M1_HUMANOID | M1_HERBIVORE,
-        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT | M2_MALE,
+        M2_NOPOLY | M2_HUMAN | M2_STRONG | M2_COLLECT,
         M3_INFRAVISIBLE, 11, HI_DOMESTIC),
     MON3("priest", "priestess", "cleric",
         S_HUMAN, LVL(10, 12, 10, 2, 0), G_NOGEN,

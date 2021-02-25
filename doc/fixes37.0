@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.462 $ $NHDT-Date: 1614076940 2021/02/23 10:42:20 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ $NHDT-Date: 1614291055 2021/02/25 22:10:55 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -381,12 +381,12 @@ prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
 curses interface failed to honor menu_xxx option settings for menu interaction
-during engraving, spaces were counted instead of non-spaces
 when an explosion scatters objects, make any that fly over sinks stop there
 output message when changing fastmove mode while cursor targetting
 messages when Minetown watchmen become angry could report "you see an angry
 	guard approaching" even if he was invisible and hero can't see invis
 when autopickup is on but disabled due to being inside a shop, have ^X say so
+don't force fake player monks to always be male
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -515,6 +515,7 @@ change to can_reach_floor() resulted in hero being unable to reach the floor
 panic if lua init fails
 change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 engraving with non-blade dulled the weapon anyway (pr #464)
+during engraving, spaces were counted instead of non-spaces
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
