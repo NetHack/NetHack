@@ -1226,7 +1226,7 @@ nonconst(const char *str, char *buf, size_t bufsz)
     char *retval = emptystr;
 
     if (str && buf)
-        if (strlen(str) < (bufsz - 1)) {
+        if (strlen(str) <= (bufsz - 1)) {
 	    Strcpy(buf, str);
             retval = buf;
         }
