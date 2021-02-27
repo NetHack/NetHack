@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1613272635 2021/02/14 03:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.7	winmenu.c	$NHDT-Date: 1614387993 2021/02/27 01:06:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -304,6 +304,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
             if (vbar) {
                 float shown, top;
                 Arg arg[2];
+
                 XtSetArg(arg[0], nhStr(XtNshown), &shown);
                 XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
                 XtGetValues(vbar, arg, TWO);
@@ -313,7 +314,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
             }
             return;
         } else if (index(menu_info->curr_menu.gacc, ch)) {
-        group_accel:
+ group_accel:
             /* matched a group accelerator */
             if (menu_info->how == PICK_ANY || menu_info->how == PICK_ONE) {
                 for (count = 0, curr = menu_info->curr_menu.base; curr;
@@ -332,7 +333,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 X11_nhbell();
             return;
         } else {
-        make_selection:
+ make_selection:
             selected_something = FALSE;
             for (count = 0, curr = menu_info->curr_menu.base; curr;
                  curr = curr->next, count++)
@@ -358,7 +359,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* pop down on ESC */
     }
 
-menu_done:
+ menu_done:
     menu_popdown(wp);
 }
 
@@ -582,10 +583,7 @@ x11_no_perminv(struct xwindow *wp)
 {
     if (wp && wp->type == NHW_MENU && wp->menu_information->is_up) {
         destroy_menu_entry_widgets(wp);
-        nh_XtPopdown(wp->popup);
-        XtDestroyWidget(wp->popup);
-        wp->w = wp->popup = (Widget) 0;
-        wp->menu_information->is_up = FALSE;
+        menu_popdown(wp);
     }
 }
 
@@ -610,10 +608,11 @@ void
 X11_add_menu(winid window,
              const glyph_info *glyphinfo UNUSED,
              const anything *identifier,
-             char ch,
+             char ch,  /* selector letter; 0 if not selectable */
              char gch, /* group accelerator (0 = no group) */
              int attr,
-             const char *str, unsigned itemflags)
+             const char *str,
+             unsigned itemflags)
 {
     x11_menu_item *item;
     struct menu_info_t *menu_info;
@@ -780,14 +779,9 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
 
     permi = (window == WIN_INVEN && iflags.perm_invent && how == PICK_NONE);
 
-    if (menu_info->is_up) {
-        if (!menu_info->permi) {
-            destroy_menu_entry_widgets(wp);
-            nh_XtPopdown(wp->popup);
-            XtDestroyWidget(wp->popup);
-            wp->w = wp->popup = (Widget) 0;
-            menu_info->is_up = FALSE;
-        }
+    if (menu_info->is_up && !menu_info->permi) {
+        destroy_menu_entry_widgets(wp);
+        menu_popdown(wp);
     }
 
     if (!menu_info->is_up) {
@@ -852,10 +846,9 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
         XtSetArg(args[num_args], nhStr(XtNright), XtChainRight); num_args++;
         XtSetArg(args[num_args], XtNtranslations,
                  menu_translation_table); num_args++;
-        viewport_widget = XtCreateManagedWidget(
-            "menu_viewport",           /* name */
-            viewportWidgetClass, form, /* parent widget */
-            args, num_args);           /* values, and number of values */
+        viewport_widget = XtCreateManagedWidget("menu_viewport",
+                                                viewportWidgetClass, form,
+                                                args, num_args);
 
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, 100);
@@ -905,7 +898,7 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
 
     menu_info->is_up = TRUE;
     if (permi) {
-        if (permi && menu_info->permi_x != -1) {
+        if (menu_info->permi_x != -1) {
             /* Cannot set window x,y at creation time,
                we must move the window now instead */
             XMoveWindow(XtDisplay(wp->popup), XtWindow(wp->popup),
@@ -913,7 +906,7 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
         }
         /* cant use nh_XtPopup() because it may try to grab the focus */
         XtPopup(wp->popup, (int) XtGrabNone);
-        if (permi && menu_info->permi_x == -1) {
+        if (menu_info->permi_x == -1) {
             /* remember perm_invent window geometry the first time */
             get_widget_window_geometry(wp->popup,
                                        &menu_info->permi_x,
@@ -1149,7 +1142,8 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         }
 
         if (menulineidx) {
-            XtSetArg(args[num_args], nhStr(XtNfromVert), prevlinewidget); num_args++;
+            XtSetArg(args[num_args], nhStr(XtNfromVert), prevlinewidget);
+                                                                   num_args++;
         } else {
             XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
         }
