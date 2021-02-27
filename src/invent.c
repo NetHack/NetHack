@@ -1479,10 +1479,17 @@ getobj(const char *word,
     Loot *sortedinvent, *srtinv;
 
     /* is "hands"/"self" a valid thing to do this action on? */
-    if ((*obj_ok)((struct obj *) 0) == GETOBJ_SUGGEST) {
-	allownone = TRUE;
+    switch ((*obj_ok)((struct obj *) 0)) {
+    case GETOBJ_SUGGEST:
         *bp++ = HANDS_SYM;
         *bp++ = ' '; /* put a space after the '-' in the prompt */
+        /* FALLTHRU */
+    case GETOBJ_DOWNPLAY:
+        allownone = TRUE;
+        *ap++ = HANDS_SYM;
+        /* FALLTHRU */
+    default:
+        break;
     }
 
     if (!flags.invlet_constant)
@@ -2570,7 +2577,7 @@ display_pickinv(
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         int tmpglyph;
-	glyph_info tmpglyphinfo = nul_glyphinfo;
+        glyph_info tmpglyphinfo = nul_glyphinfo;
 
         if (lets && !index(lets, otmp->invlet))
             continue;
@@ -2592,7 +2599,7 @@ display_pickinv(
             else
                 any.a_char = ilet;
             tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
-            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);            
+            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
             add_menu(win, &tmpglyphinfo, &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
                      ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
