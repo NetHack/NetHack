@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1612912018 2021/02/09 23:06:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.319 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1614474790 2021/02/28 01:13:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.320 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -570,7 +570,7 @@ sortloot(struct obj **olist, unsigned mode, /* flags for sortloot_cmp() */
 #endif /*0*/
 
 void
-assigninvlet(register struct obj *otmp)
+assigninvlet(struct obj *otmp)
 {
     boolean inuse[52];
     register int i;
@@ -1079,7 +1079,7 @@ useupall(struct obj *obj)
 }
 
 void
-useup(register struct obj *obj)
+useup(struct obj *obj)
 {
     /* Note:  This works correctly for containers because they (containers)
        don't merge. */
@@ -1155,7 +1155,7 @@ freeinv_core(struct obj *obj)
 
 /* remove an object from the hero's inventory */
 void
-freeinv(register struct obj *obj)
+freeinv(struct obj *obj)
 {
     extract_nobj(obj, &g.invent);
     freeinv_core(obj);
@@ -1180,7 +1180,7 @@ delallobj(int x, int y)
 
 /* destroy object in fobj chain (if unpaid, it remains on the bill) */
 void
-delobj(register struct obj *obj)
+delobj(struct obj *obj)
 {
     boolean update_map;
 
@@ -1234,7 +1234,7 @@ nxtobj(struct obj *obj, int type, boolean by_nexthere)
 }
 
 struct obj *
-carrying(register int type)
+carrying(int type)
 {
     register struct obj *otmp;
 
@@ -1323,7 +1323,7 @@ u_have_novel(void)
 }
 
 struct obj *
-o_on(unsigned int id, register struct obj *objchn)
+o_on(unsigned int id, struct obj *objchn)
 {
     struct obj *temp;
 
@@ -1338,7 +1338,7 @@ o_on(unsigned int id, register struct obj *objchn)
 }
 
 boolean
-obj_here(register struct obj *obj, int x, int y)
+obj_here(struct obj *obj, int x, int y)
 {
     register struct obj *otmp;
 
@@ -1349,7 +1349,7 @@ obj_here(register struct obj *obj, int x, int y)
 }
 
 struct obj *
-g_at(register int x, register int y)
+g_at(int x, int y)
 {
     register struct obj *obj = g.level.objects[x][y];
 
@@ -1363,7 +1363,7 @@ g_at(register int x, register int y)
 
 /* compact a string of inventory letters by dashing runs of letters */
 static void
-compactify(register char *buf)
+compactify(char *buf)
 {
     register int i1 = 1, i2 = 1;
     register char ilet, ilet1, ilet2;
@@ -1457,7 +1457,7 @@ any_obj_ok(struct obj *obj)
  * it with &cg.zeroobj, so its behavior can be undefined in that case.
  */
 struct obj *
-getobj(register const char *word,
+getobj(const char *word,
        int (*obj_ok)(OBJ_P), /* callback */
        unsigned int ctrlflags)
 {
@@ -1982,7 +1982,7 @@ askchain(struct obj **objchn, /* *objchn might change */
          int mx, const char *word)
 {
     struct obj *otmp, *otmpo;
-    register char sym, ilet;
+    char sym, ilet;
     int cnt = 0, dud = 0, tmp;
     boolean takeoff, nodot, ident, take_out, put_in, first, ininv, bycat;
     char qbuf[QBUFSZ], qpfx[QBUFSZ];
@@ -2874,7 +2874,7 @@ dounpaid(void)
 {
     winid win;
     struct obj *otmp, *marker, *contnr;
-    register char ilet;
+    char ilet;
     char *invlet = flags.inv_order;
     int classcount, count, num_so_far;
     long cost, totcost;
@@ -3644,7 +3644,7 @@ int
 doprarm(void)
 {
     char lets[8];
-    register int ct = 0;
+    int ct = 0;
     /*
      * Note:  players sometimes get here by pressing a function key which
      * transmits ''ESC [ <something>'' rather than by pressing '[';
@@ -3678,11 +3678,11 @@ doprarm(void)
 int
 doprring(void)
 {
-    if (!uleft && !uright)
+    if (!uleft && !uright) {
         You("are not wearing any rings.");
-    else {
+    } else {
         char lets[3];
-        register int ct = 0;
+        int ct = 0;
 
         if (uleft)
             lets[ct++] = obj_to_let(uleft);
@@ -3725,8 +3725,13 @@ doprtool(void)
     char lets[52 + 1];
 
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (tool_in_use(otmp))
+        if (tool_in_use(otmp)) {
+            /* we could be carrying more than 52 items; theoretically they
+               might all be lit candles so avoid potential lets[] overflow */
+            if (ct >= (int) sizeof lets - 1)
+                break;
             lets[ct++] = obj_to_let(otmp);
+        }
     lets[ct] = '\0';
     if (!ct)
         You("are not using any tools.");
@@ -3745,8 +3750,13 @@ doprinuse(void)
     char lets[52 + 1];
 
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (is_worn(otmp) || tool_in_use(otmp))
+        if (is_worn(otmp) || tool_in_use(otmp)) {
+            /* we could be carrying more than 52 items; theoretically they
+               might all be lit candles so avoid potential lets[] overflow */
+            if (ct >= (int) sizeof lets - 1)
+                break;
             lets[ct++] = obj_to_let(otmp);
+        }
     lets[ct] = '\0';
     if (!ct)
         You("are not wearing or wielding anything.");
@@ -3759,9 +3769,9 @@ doprinuse(void)
  * uses up an object that's on the floor, charging for it as necessary
  */
 void
-useupf(register struct obj *obj, long numused)
+useupf(struct obj *obj, long numused)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
 
     /* burn_floor_objects() keeps an object pointer that it tries to
@@ -4228,7 +4238,7 @@ worn_wield_only(struct obj *obj)
  *      MINV_ALL            - display all inventory
  */
 struct obj *
-display_minventory(register struct monst *mon, int dflags, char *title)
+display_minventory(struct monst *mon, int dflags, char *title)
 {
     struct obj *ret;
     char tmp[QBUFSZ];
@@ -4276,7 +4286,7 @@ display_minventory(register struct monst *mon, int dflags, char *title)
  * Currently, this is only used for statues, via wand of probing.
  */
 struct obj *
-display_cinventory(register struct obj *obj)
+display_cinventory(struct obj *obj)
 {
     struct obj *ret;
     char qbuf[QBUFSZ];

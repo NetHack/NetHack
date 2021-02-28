@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ $NHDT-Date: 1614291055 2021/02/25 22:10:55 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.465 $ $NHDT-Date: 1614474790 2021/02/28 01:13:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -389,6 +389,9 @@ messages when Minetown watchmen become angry could report "you see an angry
 	guard approaching" even if he was invisible and hero can't see invis
 when autopickup is on but disabled due to being inside a shop, have ^X say so
 don't force fake player monks to always be male
+it was theoretically possible to overflow an internal buffer containing
+	inventory letters by carrying more than 52 separate lit candles and
+	using the '(' or '*' commands
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
