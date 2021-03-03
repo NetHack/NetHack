@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1609442602 2020/12/31 19:23:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.292 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1614811212 2021/03/03 22:40:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1848,7 +1848,8 @@ mhitm_ad_drli(struct monst *magr, struct attack *mattk, struct monst *mdef,
         boolean negated = !(rn2(10) >= 3 * armpro);
 
         if (!negated && !rn2(3) && !resists_drli(mdef)) {
-            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl
+                                    * (usually 1d8) */
             pline("%s becomes weaker!", Monnam(mdef));
             if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
                 mdef->mhpmax -= mhm->damage;
@@ -2321,14 +2322,15 @@ mhitm_ad_tlpt(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 >= (tmphp = (Upolyd ? u.mh : u.uhp))) {
                 mhm->damage = tmphp - 1;
                 if (Half_physical_damage)
-                    mhm->damage *= 2; /* doesn't actually increase damage; we only
-                               * get here if half the original damage would
-                               * would have been fatal, so double reduced
-                               * damage will be less than original damage */
+                    mhm->damage *= 2; /* doesn't actually increase damage;
+                                       * we only get here if half the
+                                       * original damage would would have
+                                       * been fatal, so double reduced
+                                       * damage will be less than original */
                 if (mhm->damage < 1) { /* implies (tmphp <= 1) */
                     mhm->damage = 1;
-                    /* this might increase current HP beyond maximum HP but
-                       it will be immediately reduced below, so that should
+                    /* this might increase current HP beyond maximum HP but it
+                       will be immediately reduced by caller, so that should
                        be indistinguishable from zero damage; we don't drop
                        damage all the way to zero because that inhibits any
                        passive counterattack if poly'd hero has one */
@@ -2367,8 +2369,11 @@ mhitm_ad_tlpt(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_blnd(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_blnd(
+    struct monst *magr,     /* attacker */
+    struct attack *mattk,   /* magr's attack */
+    struct monst *mdef,     /* defender */
+    struct mhitm_data *mhm) /* optional for monster vs monster */
 {
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -2388,17 +2393,26 @@ mhitm_ad_blnd(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (!Blind)
                 pline("%s blinds you!", Monnam(magr));
             make_blinded(Blinded + (long) mhm->damage, FALSE);
-            if (!Blind)
+            if (!Blind) /* => Eyes of the Overworld */
                 Your1(vision_clears);
         }
         mhm->damage = 0;
     } else {
         /* mhitm */
         if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
-            register unsigned rnd_tmp;
+            char buf[BUFSZ];
+            unsigned rnd_tmp;
 
-            if (g.vis && mdef->mcansee && canspotmon(mdef))
-                pline("%s is blinded.", Monnam(mdef));
+            if (g.vis && mdef->mcansee && canspotmon(mdef)) {
+                /* feedback for becoming blinded is given if observed
+                   telepathically (canspotmon suffices) but additional
+                   info about archon's glow is only given if seen */
+                Snprintf(buf, sizeof buf, "%s is blinded", Monnam(mdef));
+                if (mdef->data == &mons[PM_ARCHON] && canseemon(mdef))
+                    Snprintf(eos(buf), sizeof buf - strlen(buf),
+                             " by %s radiance", s_suffix(mon_nam(magr)));
+                pline("%s.", buf);
+            }
             rnd_tmp = d((int) mattk->damn, (int) mattk->damd);
             if ((rnd_tmp += mdef->mblinded) > 127)
                 rnd_tmp = 127;
@@ -2406,7 +2420,8 @@ mhitm_ad_blnd(struct monst *magr, struct attack *mattk, struct monst *mdef,
             mdef->mcansee = 0;
             mdef->mstrategy &= ~STRAT_WAITFORU;
         }
-        mhm->damage = 0;
+        if (mhm)
+            mhm->damage = 0;
     }
 }
 
@@ -4023,8 +4038,10 @@ mhitm_adtyping(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 int
-damageum(struct monst *mdef, struct attack *mattk,
-         int specialdmg) /* blessed and/or silver bonus against various things */
+damageum(
+    struct monst *mdef,   /* target */
+    struct attack *mattk, /* hero's attack */
+    int specialdmg) /* blessed and/or silver bonus against various things */
 {
     struct mhitm_data mhm;
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);

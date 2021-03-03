@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1606558747 2020/11/28 10:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1614811211 2021/03/03 22:40:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -628,21 +628,25 @@ hitmm(register struct monst *magr, register struct monst *mdef,
 
 /* Returns the same values as mdamagem(). */
 static int
-gazemm(register struct monst *magr, register struct monst *mdef,
-       struct attack *mattk)
+gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     char buf[BUFSZ];
+    /* an Archon's gaze affects target even if Archon itself is blinded */
+    boolean archon = (magr->data == &mons[PM_ARCHON]
+                      && mattk->adtyp == AD_BLND);
 
     if (g.vis) {
         if (mdef->data->mlet == S_MIMIC
             && M_AP_TYPE(mdef) != M_AP_NOTHING)
             seemimic(mdef);
-        Sprintf(buf, "%s gazes at", Monnam(magr));
+        Sprintf(buf, "%s gazes %s", Monnam(magr),
+                (archon && !mdef->mcansee) ? "toward" : "at");
         pline("%s %s...", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "something");
     }
 
-    if (magr->mcan || !magr->mcansee || !mdef->mcansee
+    if (magr->mcan || !mdef->mcansee
+        || (archon ? resists_blnd(mdef) : !magr->mcansee)
         || (magr->minvis && !perceives(mdef->data)) || mdef->msleeping) {
         if (g.vis && canspotmon(mdef))
             pline("but nothing happens.");
@@ -674,6 +678,15 @@ gazemm(register struct monst *magr, register struct monst *mdef,
                 return MM_MISS;
             return MM_AGR_DIED;
         }
+    } else if (archon) {
+        mhitm_ad_blnd(magr, mattk, mdef, (struct mhitm_data *) 0);
+        /* an Archon's blinding radiance also stuns;
+           this is different from the way the hero gets stunned because
+           a stunned monster recovers randomly instead of via countdown;
+           both cases make an effort to prevent the target from being
+           continuously stunned due to repeated gaze attacks */
+        if (rn2(2))
+            mdef->mstun = 1;
     }
 
     return mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
