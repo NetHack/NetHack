@@ -2160,6 +2160,11 @@ throw_gold(struct obj *obj)
 
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw gold at yourself.");
+        /* If we tried to throw part of a stack, force it to merge back
+         * together. Same as in throw_obj. */
+        if (obj->o_id == g.context.objsplit.parent_oid
+            || obj->o_id == g.context.objsplit.child_oid)
+            (void) unsplitobj(obj);
         return 0;
     }
     freeinv(obj);
