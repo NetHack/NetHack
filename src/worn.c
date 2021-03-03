@@ -1051,6 +1051,7 @@ extract_from_minvent(struct monst *mon, struct obj *obj,
 
     if (obj->where != OBJ_MINVENT) {
         impossible("extract_from_minvent called on object not in minvent");
+        obj_extract_self(obj); /* free it anyway to avoid a panic */
         return;
     }
     obj_extract_self(obj);
