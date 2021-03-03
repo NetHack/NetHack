@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1611882611 2021/01/29 01:10:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1614812489 2021/03/03 23:01:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -662,7 +662,7 @@ dodiscovered(void) /* free after Robert Viduya */
                relevant header above; if we're alphabetizing across all
                classes, we normally don't need a header; but it we showed
                any unique items or any artifacts then we do need one */
-            if ((uniq_ct || arti_ct) && !alphabyclass)
+            if ((uniq_ct || arti_ct) && alphabetized && !alphabyclass)
                 putstr(tmpwin, iflags.menu_headings, "Discovered items");
             qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
             for (j = 0; j < sorted_ct; ++j) {

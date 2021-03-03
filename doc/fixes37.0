@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.466 $ $NHDT-Date: 1614811211 2021/03/03 22:40:11 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.467 $ $NHDT-Date: 1614812488 2021/03/03 23:01:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -522,6 +522,8 @@ change to can_reach_floor() resulted in hero being unable to reach the floor
 panic if lua init fails
 change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 engraving with non-blade dulled the weapon anyway (pr #464)
+'sortdiscoveries:s' had a spurious generic header shown at the start of the
+	last class if there were any artifacts or unique items discovered
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
