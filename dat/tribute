@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1614206487 2021/02/24 22:41:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $
+# NetHack 3.7  tribute       $NHDT-Date: 1614818317 2021/03/04 00:38:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -1064,7 +1064,7 @@ The bursar scowled at him.  "No need to get carried away," he said.
 #
 #
 #
-%title Sourcery (10)
+%title Sourcery (11)
 # p. 9 (Signet edition; passage starts mid-paragraph and ends mid-paragraph)
 %passage 1
 "[...]  And what would humans be without love?"
@@ -1073,6 +1073,7 @@ RARE, said Death.  [...]
 
   [Sourcery, by Terry Pratchett]
 %e passage
+# p. 180 (passage starts mid-paragraph)
 %passage 2
 They suffered from the terrible delusion that something could be done.
 They seemed prepared to make the world the way they wanted it or die in the
@@ -1258,6 +1259,24 @@ themselves.
 They are not necessarily very good at it.
 
 (1) He always argued that he was.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# additional passage added for 3.7.0
+# p. 164 (passage begins mid-sentence)
+%passage 11
+[...] killing a brother wizard with magic was well-nigh impossible on
+account of the layers of protective spells that any cautious wizard
+maintained about his person at all times.(1)  The first thing a young
+wizard learns at Unseen University--apart from where his peg is, and
+which way to the lavatory--is that he must protect himself at all times.
+
+Some people think this is paranoia, but it isn't.  Paranoids only think
+everyone is out to get them.  Wizards /know/ it.
+
+(1) Of course, wizards often killed one another by ordinary, non-magical
+means, but this was perfectly allowable and death by assassination was
+considered natural causes for a wizard.
 
   [Sourcery, by Terry Pratchett]
 %e passage
