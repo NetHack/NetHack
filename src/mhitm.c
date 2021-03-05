@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1614811211 2021/03/03 22:40:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1614910020 2021/03/05 02:07:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -633,14 +633,15 @@ gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     char buf[BUFSZ];
     /* an Archon's gaze affects target even if Archon itself is blinded */
     boolean archon = (magr->data == &mons[PM_ARCHON]
-                      && mattk->adtyp == AD_BLND);
+                      && mattk->adtyp == AD_BLND),
+            altmesg = (archon && !magr->mcansee);
 
     if (g.vis) {
-        if (mdef->data->mlet == S_MIMIC
-            && M_AP_TYPE(mdef) != M_AP_NOTHING)
+        if (mdef->data->mlet == S_MIMIC && M_AP_TYPE(mdef) != M_AP_NOTHING)
             seemimic(mdef);
-        Sprintf(buf, "%s gazes %s", Monnam(magr),
-                (archon && !mdef->mcansee) ? "toward" : "at");
+        Sprintf(buf, "%s gazes %s",
+                altmesg ? Adjmonnam(magr, "blinded") : Monnam(magr),
+                altmesg ? "toward" : "at");
         pline("%s %s...", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "something");
     }
