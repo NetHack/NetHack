@@ -318,6 +318,9 @@ makerooms(void)
         wallification(1, 0, COLNO - 1, ROWNO - 1);
         free(g.coder);
         g.coder = NULL;
+        /* Exiting lua code now, so this needs to be unset, but nhl_done() can't
+         * be used because that would free g.luathemes */
+        iflags.in_lua = FALSE;
     }
 }
 
