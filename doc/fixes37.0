@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.467 $ $NHDT-Date: 1614812488 2021/03/03 23:01:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.468 $ $NHDT-Date: 1615158479 2021/03/07 23:07:59 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -394,6 +394,9 @@ it was theoretically possible to overflow an internal buffer containing
 	using the '(' or '*' commands
 hero would be blinded and stunned by an Archon's radiance (gaze attack) even
 	if the Archon was blind, but monsters would not
+applying a polearm to attempt to attack a hidden monster would report "wait!
+	there's a monster hidden there" and display the "remembered, unseen
+	monster" glyph but only use a turn if polearm wasn't already wielded
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1611182249 2021/01/20 22:37:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1615158480 2021/03/07 23:08:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.340 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3118,8 +3118,12 @@ use_pole(struct obj *obj)
     /* Attack the monster there */
     g.bhitpos = cc;
     if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != (struct monst *) 0) {
-        if (attack_checks(mtmp, uwep))
-            return res;
+        if (attack_checks(mtmp, uwep)) /* can attack proceed? */
+            /* no, abort the attack attempt; result depends on
+               res: 1 => polearm became wielded, 0 => already wielded;
+               g.context.move: 1 => discovered hidden monster at target spot,
+               0 => answered 'n' to "Really attack?" prompt */
+            return res || g.context.move;
         if (overexertion())
             return 1; /* burn nutrition; maybe pass out */
         g.context.polearm.hitmon = mtmp;
