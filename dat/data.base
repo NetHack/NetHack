@@ -34,6 +34,10 @@ ac
 armor*
 armour*
 suit or piece of armor
+~*dragon*scale*
+~scroll of mail
+*mail
+*leather armor
 	"The last spot on the school jousting team came down to another
 	boy and me.  He was poor, and his only armor was a blanket his
 	mother had made him from her hair.  I, on the other hand, had
@@ -531,6 +535,7 @@ ooze
 	kind had swept so evilly free of all litter.
 		[ At the Mountains of Madness, by H.P. Lovecraft ]
 blue jelly
+ochre jelly
 spotted jelly
 	I'd planned how to prevent the lock from sealing behind me; it
 	required a temporary sacrifice, not cleverness.  I used the door
@@ -2651,6 +2656,7 @@ jubilex
 	alive, spits acidic secretions, and causes disease in his
 	victims which can be almost instantly fatal.
 k?ration
+c?ration
 	The K ration was the [ Quartermaster Subsistence Research
 	and Development Laboratory's ] answer to the demand for an
 	individual, easy-to-carry ration that could be used in
@@ -2766,6 +2772,7 @@ knight
 	Elven race, and will go out of their way to cause trouble
 	for Elves at any time.
 *kop*
+rubber hose
 	The Kops are a brilliant concept.  To take a gaggle of inept
 	policemen and display them over and over again in a series of
 	riotously funny physical punishments plays equally well to the
@@ -3084,6 +3091,7 @@ lord surt*
 			[ The Prose Edda, by Snorri Sturluson ]
 # if a quote for good luck gets added, make this one exclusively bad luck
 luck
+luckstone
 bad luck
 	"[...]  We'll succeed and you'll get all the fortune you came
 	seeking."
@@ -3296,6 +3304,7 @@ huge chunk of meat
 		[ Grace Before Meat, by Robert Burns ]
 medusa
 perseus
+shield of reflection
 	Medusa, one of the three Gorgons or Graeae, is the only one
 	of her sisters to have assumed mortal form and inhabited the
 	dungeon world.
@@ -5527,13 +5536,19 @@ water troll
 	across its chest.
 	    [ The Colour of Magic, by Terry Pratchett ]
 weapon
+battle axe
+club
+flail
+~*broadsword
+~sunsword
+*sword
 	A weapon is a device for making your enemy change his mind.
 		[ The Vor Game, by Lois McMaster Bujold ]
 web
 	Oh what a tangled web we weave,
 	When first we practise to deceive!
 		[ Marmion, by Sir Walter Scott ]
-whistle
+*whistle
 	There were legends both on the front and on the back of the
 	whistle. The one read thus:
 
