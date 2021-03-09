@@ -299,6 +299,19 @@ curses_get_nh_event(void)
     }
 }
 
+/* restore terminal state; extracted from curses_exit_nhwindows() */
+void
+curses_uncurse_terminal(void)
+{
+   /* also called by panictrace_handler(), a signal handler, so somewhat
+      iffy in that situation; but without this, newlines behave as raw
+      line feeds so subseqent backtrace gets scrawled all over the screen
+      and is nearly useless */
+    curses_cleanup();
+    curs_set(orig_cursor);
+    endwin();
+}
+
 /* Exits the window system.  This should dismiss all windows,
    except the "window" used for raw_print().  str is printed if possible.
 */
@@ -311,9 +324,8 @@ curses_exit_nhwindows(const char *str)
     curses_destroy_nhwindow(MESSAGE_WIN);
     curs_destroy_all_wins();
 
-    curses_cleanup();
-    curs_set(orig_cursor);
-    endwin();
+    curses_uncurse_terminal();
+
     iflags.window_inited = 0;
     if (str != NULL) {
         raw_print(str);

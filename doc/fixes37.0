@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.468 $ $NHDT-Date: 1615158479 2021/03/07 23:07:59 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.469 $ $NHDT-Date: 1615304752 2021/03/09 15:45:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -828,6 +828,7 @@ curses: implement 'selectsaved', restore via menu of saved games
 curses: implement selecting menu items via mouse
 curses: 'windowborders' can be set to 3 or 4 to suppress perm_invent borders
 	to provide slightly more room for actual inventory info
+curses: if panictrace is triggered, reset the terminal before giving backtrace
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is

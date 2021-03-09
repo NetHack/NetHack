@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1612316744 2021/02/03 01:45:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1615304753 2021/03/09 15:45:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -109,6 +109,20 @@ panictrace_handler(int sig_unused UNUSED)
 {
 #define SIG_MSG "\nSignal received.\n"
     int f2;
+
+#ifdef CURSES_GRAPHICS
+    if (iflags.window_inited && WINDOWPORT("curses")) {
+        extern void curses_uncurse_terminal(void); /* wincurs.h */
+
+        /* it is risky calling this during a program-terminating signal,
+           but without it the subsequent backtrace is useless because
+           that ends up being scrawled all over the screen; call is
+           here rather than in NH_abort() because panic() calls both
+           exit_nhwindows(), which makes this same call under curses,
+           then NH_abort() and we don't want to call this twice */
+        curses_uncurse_terminal();
+    }
+#endif
     
     f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
@@ -156,8 +170,10 @@ NH_abort(void)
 {
     int gdb_prio = SYSOPT_PANICTRACE_GDB;
     int libc_prio = SYSOPT_PANICTRACE_LIBC;
-    static boolean aborting = FALSE;
+    static volatile boolean aborting = FALSE;
 
+    /* don't execute this code recursively if a second abort is requested
+       while this routine or the code it calls is executing */
     if (aborting)
         return;
     aborting = TRUE;
@@ -553,8 +569,8 @@ fixup_death(int how)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /*VARARGS1*/
-void panic
-VA_DECL(const char *, str)
+void
+panic VA_DECL(const char *, str)
 {
     VA_START(str);
     VA_INIT(str, char *);

@@ -69,6 +69,7 @@ extern void curses_init_nhwindows(int* argcp, char** argv);
 extern void curses_player_selection(void);
 extern void curses_askname(void);
 extern void curses_get_nh_event(void);
+extern void curses_uncurse_terminal(void);
 extern void curses_exit_nhwindows(const char *str);
 extern void curses_suspend_nhwindows(const char *str);
 extern void curses_resume_nhwindows(void);
