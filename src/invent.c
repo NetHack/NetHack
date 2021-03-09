@@ -1649,7 +1649,7 @@ getobj(const char *word,
             /* guard against the [hypothetical] chace of having more
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
-            if (obj_ok(otmp) <= GETOBJ_EXCLUDE) {
+            if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
                 You("cannot %s gold.", word);
                 return (struct obj *) 0;
             }
