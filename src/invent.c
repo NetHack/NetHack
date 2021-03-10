@@ -5,10 +5,6 @@
 
 #include "hack.h"
 
-#ifndef C /* same as cmd.c */
-#define C(c) (0x1f & (c))
-#endif
-
 #define NOINVSYM '#'
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'

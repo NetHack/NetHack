@@ -241,7 +241,8 @@ static void complain_about_duplicate(int);
 static int length_without_val(const char *, int len);
 static void determine_ambiguities(void);
 static int check_misc_menu_command(char *, char *);
-int spcfn_misc_menu_cmd(int, int, boolean, char *, char *);
+static int shared_menu_optfn(int, int, boolean, char *, char *);
+static int spcfn_misc_menu_cmd(int, int, boolean, char *, char *);
 
 static const char *attr2attrname(int);
 static void basic_menu_colors(boolean);
@@ -1459,9 +1460,11 @@ optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
     return optn_ok;
 }
 
+/* all the key assignment options for menu_* commands are identical
+   but optlist.h treats them as distinct rather than sharing one */
 static int
-optfn_menu_deselect_all(int optidx UNUSED, int req, boolean negated UNUSED,
-                        char *opts, char *op UNUSED)
+shared_menu_optfn(int optidx UNUSED, int req, boolean negated UNUSED,
+                   char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1483,50 +1486,83 @@ optfn_menu_deselect_all(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_menu_deselect_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                         char *opts, char *op UNUSED)
+optfn_menu_deselect_all(int optidx, int req, boolean negated,
+                        char *opts, char *op)
 {
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
+    return shared_menu_optfn(optidx, req, negated, opts, op);
 }
 
 static int
-optfn_menu_first_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                      char *opts, char *op UNUSED)
+optfn_menu_deselect_page(int optidx, int req, boolean negated,
+                         char *opts, char *op)
 {
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
+    return shared_menu_optfn(optidx, req, negated, opts, op);
 }
+
+static int
+optfn_menu_first_page(int optidx, int req, boolean negated,
+                      char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_invert_all(int optidx, int req, boolean negated,
+                      char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_invert_page(int optidx, int req, boolean negated,
+                       char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_last_page(int optidx, int req, boolean negated,
+                     char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_next_page(int optidx , int req, boolean negated,
+                     char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_previous_page(int optidx, int req, boolean negated,
+                         char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_search(int optidx, int req, boolean negated,
+                  char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_select_all(int optidx, int req, boolean negated,
+                      char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_select_page(int optidx, int req, boolean negated,
+                       char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+/* end of shared key assignments for menu commands */
 
 static int
 optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
@@ -1556,190 +1592,6 @@ optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
     }
     if (req == do_handler) {
         return handler_menu_headings();
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_invert_all(int optidx UNUSED, int req, boolean negated UNUSED,
-                      char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_invert_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                       char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_last_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                     char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_next_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                     char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_previous_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                         char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_search(int optidx UNUSED, int req, boolean negated UNUSED,
-                  char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_select_all(int optidx UNUSED, int req, boolean negated UNUSED,
-                      char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
-    }
-    return optn_ok;
-}
-
-static int
-optfn_menu_select_page(int optidx UNUSED, int req, boolean negated UNUSED,
-                       char *opts, char *op UNUSED)
-{
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        int res = check_misc_menu_command(opts, op);
-
-        if (res < 0)
-            return optn_err;
-        return spcfn_misc_menu_cmd(res, req, negated, opts, op);
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", to_be_done);
-        return optn_ok;
     }
     return optn_ok;
 }
@@ -4296,7 +4148,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
     return optn_ok;
 }
 
-int
+static int
 spcfn_misc_menu_cmd(int midx, int req, boolean negated, char *opts, char *op)
 {
     if (req == do_init) {
