@@ -74,6 +74,7 @@ if the orc-town version of mine town has been loaded, creation of orc zombies
 when punished, involuntarily teleporting and landing within chain range of
 	attached ball while encumbered worse than burdened could trigger
 	"remove_object: obj not on floor" panic on hero's next move
+update persistent inventory when 'menu_headings' or 'sortloot' options change
 update persistent inventory when putting on a helmet causes it to auto-curse
 inventory cursing caused by "this water's no good" effect when drinking from
 	a fountain didn't update persistent inventory window

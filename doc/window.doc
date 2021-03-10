@@ -806,13 +806,18 @@ to support:
   | player option      | bit in wincap mask |   for value        | type   |
   |--------------------+--------------------+--------------------+--------+
   |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
-  |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
-  |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
-  |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  guicolor          | WC2_GUICOLOR       | wc2_guicolor       |boolean |
+  |  hilite_status     | WC2_HILITE_STATUS  | wc2_hilite_status  |strings |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
-  |  term_cols         | WC2_TERM_COLS      | wc2_term_cols      |int     |
-  |  term_rows         | WC2_TERM_ROWS      | wc2_term_rows      |int     |
+  |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
+  |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
+  |  statuslines       | WC2_STATUSLINES    | wc2_statuslines    |int     |
+  |  term_cols         | WC2_TERM_SIZE      | wc2_term_cols      |int     |
+  |  term_rows         | WC2_TERM_SIZE      | wc2_term_rows      |int     |
+  |  use_darkgray      | WC2_DARKGRAY       | wc2_darkgray       |boolean |
   |  windowborders     | WC2_WINDOWBORDERS  | wc2_windowborders  |int     |
+  |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   +--------------------+--------------------+--------------------+--------+
 
   more wincap2 for STATUS_HILITES support and control
@@ -827,6 +832,13 @@ to support:
   |----------------------------------+---------------------------+
   | BL_RESET to indicate that all    | WC2_RESET_STATUS          |
   |          fields should be redone |                           |
+  +----------------------------------+---------------------------+
+
+  additional wincap2 flag bits for supported putstr() attributes
+  +----------------------------------+---------------------------+
+  |  avoid putting message into      | WC2_SUPPRESS_HIST         |
+  |          recall history          |                           |
+  |  draw extra attention to message | WC2_URGENT_MESG           |
   +----------------------------------+---------------------------+
 
 align_message	-- where to place message window (top, bottom, left, right)

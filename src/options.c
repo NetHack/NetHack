@@ -302,7 +302,7 @@ extern char *curses_fmt_attrs(char *);
  **********************************
  */
 boolean
-parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
+parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
 {
     char *op;
     boolean negated, got_match = FALSE;
@@ -353,12 +353,11 @@ parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
         has_val = TRUE;
 #endif
         optlen = optlen_wo_val;
-    }
 #if 0
-    else {
+    } else {
         has_val = FALSE;
-    }
 #endif
+    }
 
     for (i = 0; i < OPTCOUNT; ++i) {
         got_match = FALSE;
@@ -482,7 +481,7 @@ parseoptions(register char *opts,boolean tinitial, boolean tfrom_file)
     return FALSE;
 }
 
-int
+static int
 check_misc_menu_command(char *opts, char *op UNUSED)
 {
     int i;
@@ -711,8 +710,9 @@ optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
                initoptions_finish(), after all symset options
                have been processed */
             if (!g.opt_initial) {
-                nhsym sym = get_othersym(
-                    SYM_BOULDER, Is_rogue_level(&u.uz) ? ROGUESET : PRIMARY);
+                nhsym sym = get_othersym(SYM_BOULDER,
+                                         Is_rogue_level(&u.uz) ? ROGUESET
+                                                               : PRIMARY);
 
                 if (sym)
                     g.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
@@ -1545,8 +1545,7 @@ optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
         tmpattr = match_str2attr(opts, TRUE);
         if (tmpattr == -1)
             return optn_err;
-        else
-            iflags.menu_headings = tmpattr;
+        iflags.menu_headings = tmpattr;
         return optn_ok;
     }
     if (req == get_val) {
@@ -4512,8 +4511,12 @@ handler_menu_headings(void)
 {
     int mhattr = query_attr("How to highlight menu headings:");
 
-    if (mhattr != -1)
+    if (mhattr != -1) {
         iflags.menu_headings = mhattr;
+        /* header highlighting affects persistent inventory display */
+        if (iflags.perm_invent)
+            update_inventory();
+    }
     return optn_ok;
 }
 
@@ -4689,8 +4692,7 @@ handler_pickup_types(void)
     char buf[BUFSZ];
 
     /* parseoptions will prompt for the list of types */
-    (void) parseoptions(strcpy(buf, "pickup_types"),
-                        FALSE, FALSE);
+    (void) parseoptions(strcpy(buf, "pickup_types"), FALSE, FALSE);
     return optn_ok;
 }
 
@@ -4750,6 +4752,9 @@ handler_sortloot(void)
         if (n > 1 && c == flags.sortloot)
             c = sortl_pick[1].item.a_char;
         flags.sortloot = c;
+        /* changing to or from 'f' affects persistent inventory display */
+        if (iflags.perm_invent)
+            update_inventory();
         free((genericptr_t) sortl_pick);
     }
     destroy_nhwindow(tmpwin);
@@ -5151,7 +5156,7 @@ handler_menu_colors(void)
            inventory window; we don't track whether an actual changed
            occurred, so just assume there was one and that it matters;
            if we're wrong, a redundant update is cheap... */
-        if (iflags.use_menu_color)
+        if (iflags.use_menu_color && iflags.perm_invent)
             update_inventory();
 
         /* menu colors aren't being used; if any are defined, remind
@@ -5855,6 +5860,7 @@ initoptions_finish(void)
         }
     }
 #endif
+    g.opt_initial = FALSE;
     return;
 }
 
@@ -8131,21 +8137,21 @@ static struct wc_Opt wc_options[] = {
 };
 static struct wc_Opt wc2_options[] = {
     { "fullscreen", WC2_FULLSCREEN },
-    { "softkeyboard", WC2_SOFTKEYBOARD },
-    { "wraptext", WC2_WRAPTEXT },
-    { "use_darkgray", WC2_DARKGRAY },
-    { "hitpointbar", WC2_HITPOINTBAR },
+    { "guicolor", WC2_GUICOLOR },
     { "hilite_status", WC2_HILITE_STATUS },
+    { "hitpointbar", WC2_HITPOINTBAR },
+    { "petattr", WC2_PETATTR },
+    { "softkeyboard", WC2_SOFTKEYBOARD },
     /* name shown in 'O' menu is different */
     { "status hilite rules", WC2_HILITE_STATUS },
     /* statushilites doesn't have its own bit */
     { "statushilites", WC2_HILITE_STATUS },
+    { "statuslines", WC2_STATUSLINES },
     { "term_cols", WC2_TERM_SIZE },
     { "term_rows", WC2_TERM_SIZE },
-    { "petattr", WC2_PETATTR },
-    { "guicolor", WC2_GUICOLOR },
-    { "statuslines", WC2_STATUSLINES },
+    { "use_darkgray", WC2_DARKGRAY },
     { "windowborders", WC2_WINDOWBORDERS },
+    { "wraptext", WC2_WRAPTEXT },
     { (char *) 0, 0L }
 };
 
