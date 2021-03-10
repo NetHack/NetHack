@@ -21,19 +21,6 @@ static int curs_y = -1;
 
 static int parse_escape_sequence(void);
 
-/* Macros for Control and Alt keys */
-
-#ifndef M
-# ifndef NHSTDC
-#  define M(c)          (0x80 | (c))
-# else
-#  define M(c)          ((c) - 128)
-# endif/* NHSTDC */
-#endif
-#ifndef C
-# define C(c)           (0x1f & (c))
-#endif
-
 
 /* Read a character of input from the user */
 
