@@ -398,6 +398,11 @@ hero would be blinded and stunned by an Archon's radiance (gaze attack) even
 applying a polearm to attempt to attack a hidden monster would report "wait!
 	there's a monster hidden there" and display the "remembered, unseen
 	monster" glyph but only use a turn if polearm wasn't already wielded
+key parsing during options processing was inconsistent between OPTIONS=foo:k
+	BINDINGS=k:foo where k represents a key designation; the OPTIONS form
+	recognized backslash escape sequences but not M-x meta characters,
+	vice versa for BINDINGS (most noticeable for menu interaction keys
+	such as menu_next_page because those can be set via either directive)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -263,8 +263,8 @@ opt_##a,
                 NoAlias, "deselect all items in a menu")
     NHOPTC(menu_deselect_page, 4, opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "deselect all items on this page of a menu")
-    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, No, Yes, No, NoAlias,
-                "jump to the first page in a menu")
+    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "jump to the first page in a menu")
     NHOPTC(menu_headings, 4, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "display style for menu headings")
     NHOPTC(menu_invert_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,

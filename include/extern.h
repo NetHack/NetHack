@@ -210,7 +210,6 @@ extern void pushch(char);
 extern void savech(char);
 extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);
-extern uchar txt2key(char *);
 extern void parseautocomplete(char *, boolean);
 extern void reset_commands(boolean);
 extern void rhack(char *);
@@ -1784,6 +1783,7 @@ extern int shiny_obj(char);
 /* ### options.c ### */
 
 extern boolean match_optname(const char *, const char *, int, boolean);
+extern uchar txt2key(char *);
 extern void initoptions(void);
 extern void initoptions_init(void);
 extern void initoptions_finish(void);

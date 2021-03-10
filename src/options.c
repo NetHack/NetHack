@@ -4307,10 +4307,7 @@ spcfn_misc_menu_cmd(int midx, int req, boolean negated, char *opts, char *op)
             bad_negation(default_menu_cmd_info[midx].name, FALSE);
             return optn_err;
         } else if ((op = string_for_opt(opts, FALSE)) != empty_optstr) {
-            char c, op_buf[BUFSZ];
-
-            escapes(op, op_buf);
-            c = *op_buf;
+            char c = txt2key(op);
 
             if (illegal_menu_cmd_key((uchar) c))
                 return optn_err;
@@ -5615,6 +5612,107 @@ escapes(const char *cp, /* might be 'tp', updating in place */
         *tp++ = (char) cval;
     }
     *tp = '\0';
+}
+
+/* returns a one-byte character from the text; may change txt[];
+   moved from cmd.c in order to get access to escapes() */
+uchar
+txt2key(char *txt)
+{
+    uchar uc;
+    boolean makemeta = FALSE;
+
+    txt = trimspaces(txt);
+    if (!*txt)
+        return '\0';
+
+    /* simple character */
+    if (!txt[1])
+        return (uchar) txt[0];
+
+    /* a few special entries */
+    if (!strcmp(txt, "<enter>"))
+        return '\n';
+    if (!strcmp(txt, "<space>"))
+        return ' ';
+    if (!strcmp(txt, "<esc>"))
+        return '\033';
+
+    /* handle things like \b and \7 and \mX */
+    if (*txt == '\\') {
+        char tbuf[QBUFSZ];
+
+        if (strlen(txt) >= sizeof tbuf)
+            txt[sizeof tbuf - 1] = '\0';
+        escapes(txt, tbuf);
+        return *tbuf;
+    }
+
+    /* control and meta keys */
+    if (highc(*txt) == 'M') {
+        /*
+         * M <nothing>             return 'M'
+         * M - <nothing>           return M-'-'
+         * M <other><nothing>      return M-<other>
+         * otherwise M is pending until after ^/C- processing.
+         * Since trailing spaces are discarded, the only way to
+         * specify M-' ' is via "160".
+         */
+        if (!txt[1])
+            return (uchar) *txt;
+        /* skip past 'M' or 'm' and maybe '-' */
+        ++txt;
+        if (*txt == '-' && txt[1])
+            ++txt;
+        if (!txt[1])
+            return M((uchar) *txt);
+        makemeta = TRUE;
+    }
+    if (*txt == '^' || highc(*txt) == 'C') {
+        /*
+         * C <nothing>             return 'C' or M-'C'
+         * C - <nothing>           return '-' or M-'-'
+         * C [-] <other><nothing>  return C-<other> or M-C-<other>
+         * C [-] ?                 return <rubout>
+         * otherwise return C-<other> or M-C-<other>
+         */
+        uc = (uchar) *txt;
+        if (!txt[1])
+            return makemeta ? M(uc) : uc;
+        ++txt;
+        /* unlike M-x, lots of values of x are invalid for C-x;
+           checking and rejecting them is not worthwhile; GIGO;
+           we do accept "^-x" as synonym for "^x" or "C-x" */
+        if (*txt == '-' && txt[1])
+            ++txt;
+        /* and accept ^?, which gets used despite not being a control char */
+        if (*txt == '?')
+            return (uchar) (makemeta ? '\377' : '\177'); /* rubout/delete */
+        uc = C((uchar) *txt);
+        return makemeta ? M(uc) : uc;
+    }
+    if (makemeta && *txt)
+        return M((uchar) *txt);
+
+    /* FIXME: should accept single-quote single-character single-quote
+       and probably single-quote backslash octal-digits single-quote;
+       if we do that, the M- and C- results should be pending until
+       after, so that C-'X' becomes valid for ^X */
+
+    /* ascii codes: must be three-digit decimal */
+    if (*txt >= '0' && *txt <= '9') {
+        uchar key = 0;
+        int i;
+
+        for (i = 0; i < 3; i++) {
+            if (txt[i] < '0' || txt[i] > '9')
+                return '\0';
+            key = 10 * key + txt[i] - '0';
+        }
+        return key;
+    }
+
+    return '\0';
 }
 
 /*
