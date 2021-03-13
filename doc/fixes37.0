@@ -559,6 +559,8 @@ X11: if perm_invent is set in NETHACKOPTIONS or config file, start with the
 	persistent inventory window displayed
 X11: use visctrl(response) when X11_yn_function() echoes prompt+response in
 	message window
+X11: when trying to lookup scrollbars in order to handle scrolling via keys,
+	menu handling always ended up finding the top window
 X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 

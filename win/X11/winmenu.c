@@ -290,17 +290,17 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 X11_nhbell();
             return;
         } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
-            Widget hbar = (Widget) 0, vbar = (Widget) 0;
+            Widget hbar, vbar;
             float top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
 
-            find_scrollbars(wp->w, &hbar, &vbar);
+            find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
             if (vbar)
                 XtCallCallbacks(vbar, XtNjumpProc, &top);
             return;
         } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
-            Widget hbar = (Widget) 0, vbar = (Widget) 0;
+            Widget hbar, vbar;
 
-            find_scrollbars(wp->w, &hbar, &vbar);
+            find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
             if (vbar) {
                 float shown, top;
                 Arg arg[2];
@@ -309,8 +309,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
                 XtGetValues(vbar, arg, TWO);
                 top += ((ch == MENU_NEXT_PAGE) ? shown : -shown);
-                if (vbar)
-                    XtCallCallbacks(vbar, XtNjumpProc, &top);
+                XtCallCallbacks(vbar, XtNjumpProc, &top);
             }
             return;
         } else if (index(menu_info->curr_menu.gacc, ch)) {

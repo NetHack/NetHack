@@ -1814,16 +1814,14 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         ec_active = FALSE;
         return;
     } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
-        hbar = vbar = (Widget) 0;
-        find_scrollbars(w, &hbar, &vbar);
+        find_scrollbars(w, (Widget) 0, &hbar, &vbar);
         if (vbar) {
             top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
             XtCallCallbacks(vbar, XtNjumpProc, &top);
         }
         return;
     } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
-        hbar = vbar = (Widget) 0;
-        find_scrollbars(w, &hbar, &vbar);
+        find_scrollbars(w, (Widget) 0, &hbar, &vbar);
         if (vbar) {
             XtSetArg(arg[0], nhStr(XtNshown), &shown);
             XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);

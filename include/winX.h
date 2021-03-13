@@ -332,7 +332,7 @@ extern void highlight_yn(boolean);
 extern void nh_XtPopup(Widget, int, Widget);
 extern void nh_XtPopdown(Widget);
 extern void win_X11_init(int);
-extern void find_scrollbars(Widget, Widget *, Widget *);
+extern void find_scrollbars(Widget, Widget, Widget *, Widget *);
 extern void nh_keyscroll(Widget, XEvent *, String *, Cardinal *);
 
 /* ### winmesg.c ### */

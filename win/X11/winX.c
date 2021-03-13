@@ -2682,14 +2682,24 @@ win_X11_init(int dir)
 }
 
 void
-find_scrollbars(Widget w, Widget *horiz, Widget *vert)
+find_scrollbars(
+    Widget w,      /* widget of interest; scroll bars are probably attached
+                      to its parent or grandparent */
+    Widget last_w, /* if non-zero, don't search ancestory beyond this point */
+    Widget *horiz, /* output: horizontal scrollbar */
+    Widget *vert)  /* output: vertical scrollbar */
 {
+    *horiz = *vert = (Widget) 0;
+    /* for 3.6 this looked for an ancestor with both scrollbars but
+       menus might have only vertical */
     if (w) {
         do {
             *horiz = XtNameToWidget(w, "*horizontal");
             *vert = XtNameToWidget(w, "*vertical");
+            if (*horiz || *vert)
+                break;
             w = XtParent(w);
-        } while (!*horiz && !*vert && w);
+        } while (w && (!last_w || w != last_w));
     }
 }
 
@@ -2715,7 +2725,7 @@ nh_keyscroll(Widget viewport, XEvent *event, String *params,
 
     direction = atoi(params[0]);
 
-    find_scrollbars(viewport, &horiz_sb, &vert_sb);
+    find_scrollbars(viewport, (Widget) 0, &horiz_sb, &vert_sb);
 
 #define H_DELTA 0.25 /* distance of horiz shift */
     /* vert shift is half of curr distance */
