@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1612053752 2021/01/31 00:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1615759958 2021/03/14 22:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.403 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2996,6 +2996,7 @@ isclearpath(
     schar dx,
     schar dy)
 {
+    struct trap *t;
     uchar typ;
     xchar x, y;
 
@@ -3006,6 +3007,9 @@ isclearpath(
         y += dy;
         typ = levl[x][y].typ;
         if (!isok(x, y) || !ZAP_POS(typ) || closed_door(x, y))
+            return FALSE;
+        if ((t = t_at(x, y)) != 0
+            && (is_pit(t->ttyp) || is_hole(t->ttyp) || is_xport(t->ttyp)))
             return FALSE;
     }
     cc->x = x;

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.469 $ $NHDT-Date: 1615304752 2021/03/09 15:45:52 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.474 $ $NHDT-Date: 1615759956 2021/03/14 22:12:36 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -403,6 +403,9 @@ key parsing during options processing was inconsistent between OPTIONS=foo:k
 	recognized backslash escape sequences but not M-x meta characters,
 	vice versa for BINDINGS (most noticeable for menu interaction keys
 	such as menu_next_page because those can be set via either directive)
+when creating a rolling boulder trap, don't place boulder on a path that
+	starts on or passes over a pit/spiked pit, hole/trap door,
+	teleport trap/level teleporter/magic portal
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
