@@ -22,5 +22,8 @@ void curses_finalize_nhmenu(winid wid, const char *prompt);
 int curses_display_nhmenu(winid wid, int how, MENU_ITEM_P **_selected);
 boolean curses_menu_exists(winid wid);
 void curses_del_menu(winid, boolean);
+boolean curs_nonselect_menu_action(WINDOW *win, void *menu, int how,
+                                   int curletter, int *curpage_p,
+                                   char selectors[256], int *num_selected_p);
 
 #endif /* CURSDIAL_H */

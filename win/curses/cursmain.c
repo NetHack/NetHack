@@ -631,10 +631,10 @@ curses_select_menu(winid wid, int how, MENU_ITEM_P ** selected)
 }
 
 void
-curses_update_inventory(void)
+curses_update_inventory(int arg UNUSED)
 {
-    /* Don't do anything if perm_invent is off unless we
-       changed the option. */
+    /* Don't do anything if perm_invent is off unless it was on and
+       player just changed the option. */
     if (!iflags.perm_invent) {
         if (curses_get_nhwin(INV_WIN)) {
             curs_reset_windows(TRUE, FALSE);

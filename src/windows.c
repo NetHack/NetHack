@@ -551,15 +551,14 @@ static struct window_procs hup_procs = {
     hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
     hup_display_file, hup_void_fdecl_winid_ulong,      /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
-    hup_void_ndecl,                                    /* update_inventory */
+    hup_void_fdecl_int,                                /* update_inventory */
     hup_void_ndecl,                                    /* mark_synch */
     hup_void_ndecl,                                    /* wait_synch */
 #ifdef CLIPPING
     hup_cliparound,
 #endif
 #ifdef POSITIONBAR
-    (void (*)(char *)) hup_void_fdecl_constchar_p,
-                                                      /* update_positionbar */
+    (void (*)(char *)) hup_void_fdecl_constchar_p,    /* update_positionbar */
 #endif
     hup_print_glyph,
     hup_void_fdecl_constchar_p,                       /* raw_print */

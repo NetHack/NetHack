@@ -450,10 +450,11 @@ int NetHackQtBind::qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list)
     return window->SelectMenu(how,menu_list);
 }
 
-void NetHackQtBind::qt_update_inventory()
+void NetHackQtBind::qt_update_inventory(int arg UNUSED)
 {
     if (main)
 	main->updateInventory(); // update the paper doll inventory subset
+
     /* doesn't work yet
     if (g.program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, false);

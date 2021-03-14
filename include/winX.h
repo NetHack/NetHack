@@ -253,6 +253,11 @@ struct xwindow {
 #define DEFAULT_LINES_DISPLAYED 12 /* # of lines displayed message window */
 #define MAX_HISTORY 60             /* max history saved on message window */
 
+/* flags for X11_yn_function_core() */
+#define YN_NORMAL     0U /* no flags */
+#define YN_NO_LOGMESG 1U /* suppress echo of prompt+response to message window
+                          * and dumplog message history */
+
 /* Window variables (winX.c). */
 extern struct xwindow window_list[MAX_WINDOWS];
 extern XtAppContext app_context; /* context of application */
@@ -442,7 +447,7 @@ extern void X11_add_menu(winid, const glyph_info *, const ANY_P *, char,
                          char, int, const char *, unsigned int);
 extern void X11_end_menu(winid, const char *);
 extern int X11_select_menu(winid, int, MENU_ITEM_P **);
-extern void X11_update_inventory(void);
+extern void X11_update_inventory(int);
 extern void X11_mark_synch(void);
 extern void X11_wait_synch(void);
 #ifdef CLIPPING
@@ -456,6 +461,7 @@ extern int X11_nhgetch(void);
 extern int X11_nh_poskey(int *, int *, int *);
 extern void X11_nhbell(void);
 extern int X11_doprev_message(void);
+extern char X11_yn_function_core(const char *, const char *, char, unsigned);
 extern char X11_yn_function(const char *, const char *, char);
 extern void X11_getlin(const char *, char *);
 extern int X11_get_ext_cmd(void);

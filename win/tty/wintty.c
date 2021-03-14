@@ -3151,9 +3151,11 @@ tty_message_menu(char let, int how, const char *mesg)
     return ((how == PICK_ONE && morc == let) || morc == '\033') ? morc : '\0';
 }
 
+/* update persistent inventory window */
 void
-tty_update_inventory(void)
+tty_update_inventory(int arg UNUSED)
 {
+    /* tty doesn't support persistent inventory window */
     return;
 }
 

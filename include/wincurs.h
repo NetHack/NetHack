@@ -87,7 +87,7 @@ extern void curses_add_menu(winid wid, const glyph_info *,
                             const char *str, unsigned int itemflags);
 extern void curses_end_menu(winid wid, const char *prompt);
 extern int curses_select_menu(winid wid, int how, MENU_ITEM_P **selected);
-extern void curses_update_inventory(void);
+extern void curses_update_inventory(int);
 extern void curses_mark_synch(void);
 extern void curses_wait_synch(void);
 extern void curses_cliparound(int x, int y);

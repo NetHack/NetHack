@@ -2282,13 +2282,13 @@ update_inventory(void)
         return;
 
     /*
-     * Ought to check (windowprocs.wincap2 & WC2_PERM_INVENT) here....
+     * Ought to check (windowprocs.wincap & WC_PERM_INVENT) here....
      *
      * We currently don't skip this call when iflags.perm_invent is False
      * because curses uses that to disable a previous perm_invent window
      * (after toggle via 'O'; perhaps the options code should handle that).
      */
-    (*windowprocs.win_update_inventory)();
+    (*windowprocs.win_update_inventory)(0);
 }
 
 /* should of course only be called for things in invent */

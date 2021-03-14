@@ -67,13 +67,15 @@
 
 struct window_procs safe_procs = {
     "safe-startup", 0L, 0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
-    safe_init_nhwindows, safe_player_selection, safe_askname, safe_get_nh_event,
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    safe_init_nhwindows, safe_player_selection, safe_askname,
+    safe_get_nh_event,
     safe_exit_nhwindows, safe_suspend_nhwindows, safe_resume_nhwindows,
     safe_create_nhwindow, safe_clear_nhwindow, safe_display_nhwindow,
     safe_destroy_nhwindow, safe_curs, safe_putstr, safe_putmixed,
     safe_display_file, safe_start_menu, safe_add_menu, safe_end_menu,
-    safe_select_menu, safe_message_menu, safe_update_inventory, safe_mark_synch,
+    safe_select_menu, safe_message_menu, safe_update_inventory,
+    safe_mark_synch,
     safe_wait_synch,
 #ifdef CLIPPING
     safe_cliparound,
@@ -269,7 +271,7 @@ safe_message_menu(
 }
 
 void
-safe_update_inventory(void)
+safe_update_inventory(int arg UNUSED)
 {
     return;
 }

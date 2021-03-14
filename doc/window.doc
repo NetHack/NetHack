@@ -258,11 +258,12 @@ player_selection()
 display_file(str, boolean complain)
 		-- Display the file named str.  Complain about missing files
 		   iff complain is TRUE.
-update_inventory()
+update_inventory(arg)
 		-- Indicate to the window port that the inventory has been
 		   changed.
 		-- Merely calls display_inventory() for window-ports that
 		   leave the window up, otherwise empty.
+		-- 'arg' is not used yet
 doprev_message()
 		-- Display previous messages.  Used by the ^P command.
 		-- On the tty-port this scrolls WIN_MESSAGE back one line.
