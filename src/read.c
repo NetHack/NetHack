@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1613870658 2021/02/21 01:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1615760296 2021/03/14 22:18:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2133,7 +2133,7 @@ do_class_genocide(void)
                     }
                 } else if (g.mvitals[i].mvflags & G_GENOD) {
                     if (!gameover)
-                        pline("All %s are already nonexistent.", nam);
+                        pline("%s are already nonexistent.", upstart(nam));
                 } else if (!gameover) {
                     /* suppress feedback about quest beings except
                        for those applicable to our own role */

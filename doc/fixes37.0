@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.474 $ $NHDT-Date: 1615759956 2021/03/14 22:12:36 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.475 $ $NHDT-Date: 1615760296 2021/03/14 22:18:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -406,6 +406,8 @@ key parsing during options processing was inconsistent between OPTIONS=foo:k
 when creating a rolling boulder trap, don't place boulder on a path that
 	starts on or passes over a pit/spiked pit, hole/trap door,
 	teleport trap/level teleporter/magic portal
+remove superfluous "All" from "All foos are already nonexistent." when blessed
+	genocide tries to remove something which has already been genocided
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
