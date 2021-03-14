@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{February 11, 2021}
+\date{March 12, 2021}
 
 \maketitle
 
@@ -1174,6 +1174,23 @@ Show discovered types for one class of objects.
 \\
 .lp ""
 May be preceded by `{\tt m}' to select preferred display order.
+
+%.lp
+\item[\tb{|}]
+If persistent inventory display is supported and enabled (with the
+{\it perm_invent\/}
+option), interact with it instead of with the map.
+\\
+%.lp ""
+Allows scrolling with the
+menu\verb+_+first\verb+_+page, menu\verb+_+previous\verb+_+page,
+menu\verb+_+next\verb+_+page, and menu\verb+_+last\verb+_+page
+keys (`{\tt \^{}}', `{\tt <}', `{\tt >}', `{\tt |}' by default).
+Some interfaces also support menu_shift_left and menu_shift_right
+keys (`{\tt \verb+{+}' and `{\tt \verb+}+}' by default).
+Use the {\it Return\/} (aka {\it Enter\/}) or {\it Escape\/} key to
+resume play.
+
 %.lp
 \item[\tb{!}]
 Escape to a shell.
@@ -4137,6 +4154,21 @@ Default `.'.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
+
+%.lp
+\item[\ib{menu\verb+_+shift\verb+_+left}]
+Menu character accelerator to scroll a menu---one which has been
+scrolled right---back to the left.
+Implemented by curses for {\it perm\verb+_+invent\/} only and by X11.
+Default `{\tt \verb+{+}'.
+
+%.lp
+\item[\ib{menu\verb+_+shift\verb+_+right}]
+Menu character accelerator to scroll a menu which has text beyond the
+right edge to the right.
+Implemented by curses for {\it perm\verb+_+invent\/} only and by X11.
+Default `{\tt \verb+}+}'.
+Default \(oq}\(cq.
 % %.lp
 % \item[\ib{menu\verb+_+tab\verb+_+sep}]
 % Format menu entries using TAB to separate columns (default off).

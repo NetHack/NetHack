@@ -823,6 +823,11 @@ show bones levels information in enlightenment at end of game or in explore
 	and wizmode
 for #wizintrinsic, use any counts entered during menu selection
 give feedback when boolean options are toggled interactively ('O' command)
+'|' command (#perminv) for interacting with persistent inventory display
+	(curses and X11 only)
+menu_shift_left, menu_shift_right menu command keys; default '{' and '}'
+	(curses for perm_invent only; implemented for X11 too but menus for
+	it lack horizontal scroll bars so the shifts don't work there)
 
 
 Platform- and/or Interface-Specific New Features

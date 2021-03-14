@@ -1885,6 +1885,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { 'p',    "pay", "pay your shopping bill",
               dopay, 0, NULL },
+    { '|',    "perminv", "scroll persistent inventory display",
+              doperminv, IFBURIED | GENERALCMD, NULL },
     { ',',    "pickup", "pick up things at the current location",
               dopickup, 0, NULL },
     { '\0',   "polyself", "polymorph self",

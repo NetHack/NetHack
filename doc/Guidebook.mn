@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 11, 2021
+.ds f2 "March 12, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1068,6 +1068,20 @@ May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 Show discovered types for one class of objects.
 .lp ""
 May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
+.lp |
+If persistent inventory display is supported and enabled (with the
+.op perm_invent
+option), interact with it instead of with the map.
+.lp ""
+Allows scrolling with the
+menu_first_page, menu_previous_page,
+menu_next_page, and menu_last_page
+keys (\(oq\f(CR\(ha\fP\(cq, \(oq\f(CR<\fP\(cq,
+\(oq\f(CR>\fP\(cq, \(oq\f(CR|\fP\(cq by default).
+Some interfaces also support menu_shift_left and menu_shift_right
+keys (\(oq\f(CR{\fP\(cq and \(oq\f(CR}\fP\(cq by default).
+Use the \fIReturn\fP (aka \fIEnter\fP) or \fIEscape\fP key to
+resume play.
 .lp !
 Escape to a shell.
 See \(lq#shell\(rq below for more details.
@@ -3828,6 +3842,20 @@ Default \(oq.\(cq.
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default \(oq,\(cq.
+.lp menu_shift_left
+Menu character accelerator to scroll a menu\(emone which has been
+scrolled right\(emback to the left.
+Implemented by curses for
+.op perm_invent
+only and by X11.
+Default \(oq{\(cq.
+.lp menu_shift_right
+Menu character accelerator to scroll a menu which has text beyond the
+right edge to the right.
+Implemented by curses for
+.op perm_invent
+only and by X11.
+Default \(oq}\(cq.
 ." .lp menu_tab_sep
 ." Format menu entries using TAB to separate columns (default off).
 ." Only applicable to some menus, and only useful to some interfaces.

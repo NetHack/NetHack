@@ -110,12 +110,15 @@ typedef struct mi {
 /* invalid winid */
 #define WIN_ERR ((winid) -1)
 
-/* menu window keyboard commands (may be mapped) */
+/* menu window keyboard commands (may be mapped); menu_shift_right and
+   menu_shift_left are for interacting with persistent inventory window */
 /* clang-format off */
 #define MENU_FIRST_PAGE         '^'
 #define MENU_LAST_PAGE          '|'
 #define MENU_NEXT_PAGE          '>'
 #define MENU_PREVIOUS_PAGE      '<'
+#define MENU_SHIFT_RIGHT        '}'
+#define MENU_SHIFT_LEFT         '{'
 #define MENU_SELECT_ALL         '.'
 #define MENU_UNSELECT_ALL       '-'
 #define MENU_INVERT_ALL         '@'

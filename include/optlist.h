@@ -274,7 +274,7 @@ opt_##a,
     NHOPTC(menu_last_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "jump to the last page in a menu")
     NHOPTC(menu_next_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
-                "goto the next menu page")
+                "go to the next menu page")
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
 #ifdef TTY_GRAPHICS
@@ -285,13 +285,17 @@ opt_##a,
                 (boolean *) 0)
 #endif
     NHOPTC(menu_previous_page, 4, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "goto the previous menu page")
+                NoAlias, "go to the previous menu page")
     NHOPTC(menu_search, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "search for a menu item")
     NHOPTC(menu_select_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "select all items in a menu")
     NHOPTC(menu_select_page, 4, opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "select all items on this page of a menu")
+    NHOPTC(menu_shift_left, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "pan current menu page left")
+    NHOPTC(menu_shift_right, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "pan current menu page right")
     NHOPTB(menu_tab_sep, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.menu_tab_sep)
     NHOPTB(menucolors, 0, opt_in, set_in_game, Off, Yes, Yes, No, NoAlias,

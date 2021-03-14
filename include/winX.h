@@ -363,6 +363,7 @@ extern int x_event(int);
 extern void menu_delete(Widget, XEvent *, String *, Cardinal *);
 extern void menu_key(Widget, XEvent *, String *, Cardinal *);
 extern void x11_no_perminv(struct xwindow *);
+extern void x11_scroll_perminv(int);
 extern void create_menu_window(struct xwindow *);
 extern void destroy_menu_window(struct xwindow *);
 

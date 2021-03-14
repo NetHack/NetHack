@@ -224,6 +224,10 @@ static const menu_cmd_t default_menu_cmd_info[] = {
                             "Unselect all items on current page" },
     { "menu_search",        MENU_SEARCH,
                             "Search and invert matching items" },
+    { "menu_shift_right",   MENU_SHIFT_RIGHT,
+                            "Pan current page to right (perm_invent only)" },
+    { "menu_shift_left",    MENU_SHIFT_LEFT,
+                            "Pan current page to left (perm_invent only)" },
     { (char *) 0, '\0', (char *) 0 }
 };
 
@@ -1557,6 +1561,20 @@ optfn_menu_select_all(int optidx, int req, boolean negated,
 
 static int
 optfn_menu_select_page(int optidx, int req, boolean negated,
+                       char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_shift_left(int optidx, int req, boolean negated,
+                      char *opts, char *op)
+{
+    return shared_menu_optfn(optidx, req, negated, opts, op);
+}
+
+static int
+optfn_menu_shift_right(int optidx, int req, boolean negated,
                        char *opts, char *op)
 {
     return shared_menu_optfn(optidx, req, negated, opts, op);
@@ -6814,6 +6832,46 @@ map_menu_cmd(char ch)
     return ch;
 }
 
+/* get keystrokes that are used for menu scrolling operations which apply;
+   printable: for use in a prompt, non-printable: for yn_function() choices */
+char *
+collect_menu_keys(
+    char *outbuf,        /* at least big enough for 6 "M-^X" sequences +'\0'*/
+    unsigned scrollmask, /* 1: backwards, "^<"; 2: forwards, ">|";
+                          * 4: left, "{";       8: right, "}"; */
+    boolean printable)   /* False: output is string of raw characters,
+                          * True: output is a string of visctrl() sequences;
+                          * matters iff user has mapped any menu scrolling
+                          * commands to control or meta characters */
+{
+    struct menuscrollinfo {
+        char cmdkey;
+        uchar maskindx;
+    };
+    static const struct menuscrollinfo scroll_keys[] = {
+        { MENU_FIRST_PAGE,    1 },
+        { MENU_PREVIOUS_PAGE, 1 },
+        { MENU_NEXT_PAGE,     2 },
+        { MENU_LAST_PAGE,     2 },
+        { MENU_SHIFT_LEFT,    4 },
+        { MENU_SHIFT_RIGHT,   8 },
+    };
+    int i;
+
+    outbuf[0] = '\0';
+    for (i = 0; i < SIZE(scroll_keys); ++i) {
+        if (scrollmask & scroll_keys[i].maskindx) {
+            char c = get_menu_cmd_key(scroll_keys[i].cmdkey);
+
+            if (printable)
+                Strcat(outbuf, visctrl(c));
+            else
+                (void) strkitten(outbuf, c);
+        }
+    }
+    return outbuf;
+}
+
 /* Returns the fid of the fruit type; if that type already exists, it
  * returns the fid of that one; if it does not exist, it adds a new fruit
  * type to the chain and returns the new one.
@@ -7381,6 +7439,7 @@ show_menu_controls(winid win, boolean dolist)
     char buf[BUFSZ];
     const char *fmt, *arg;
     const struct xtra_cntrls *xcp;
+    boolean has_menu_shift = wc2_supported("menu_shift");
 
     /*
      * Relies on spaces to line things up in columns, so must be rendered
@@ -7390,11 +7449,16 @@ show_menu_controls(winid win, boolean dolist)
     putstr(win, 0, "Menu control keys:");
     if (dolist) { /* key bindings help: '?i' */
         int i;
+        char ch;
 
         fmt = "%-7s %s";
         for (i = 0; default_menu_cmd_info[i].desc; i++) {
+            ch = default_menu_cmd_info[i].cmd;
+            if ((ch == MENU_SHIFT_RIGHT
+                 || ch == MENU_SHIFT_LEFT) && !has_menu_shift)
+                continue;
             Sprintf(buf, fmt,
-                    visctrl(get_menu_cmd_key(default_menu_cmd_info[i].cmd)),
+                    visctrl(get_menu_cmd_key(ch)),
                     default_menu_cmd_info[i].desc);
             putstr(win, 0, buf);
         }
@@ -7436,6 +7500,16 @@ show_menu_controls(winid win, boolean dolist)
                 visctrl(get_menu_cmd_key(MENU_LAST_PAGE)),
                 "Last page");
         putstr(win, 0, buf);
+        if (has_menu_shift) {
+            Sprintf(buf, mc_fmt, "Pan view",
+                    visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)),
+                    "Right (perm_invent only)");
+            putstr(win, 0, buf);
+            Sprintf(buf, mc_fmt, "",
+                    visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)),
+                    "Left");
+            putstr(win, 0, buf);
+        }
         putstr(win, 0, "");
         Sprintf(buf, mc_fmt, "Search",
                 visctrl(get_menu_cmd_key(MENU_SEARCH)),
@@ -8090,6 +8164,7 @@ static struct wc_Opt wc2_options[] = {
     { "guicolor", WC2_GUICOLOR },
     { "hilite_status", WC2_HILITE_STATUS },
     { "hitpointbar", WC2_HITPOINTBAR },
+    { "menu_shift", WC2_MENU_SHIFT },
     { "petattr", WC2_PETATTR },
     { "softkeyboard", WC2_SOFTKEYBOARD },
     /* name shown in 'O' menu is different */

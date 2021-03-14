@@ -52,6 +52,7 @@ static void select_match(struct xwindow *, char *);
 static void invert_all(struct xwindow *);
 static void invert_match(struct xwindow *, char *);
 static void menu_popdown(struct xwindow *);
+static unsigned menu_scrollmask(struct xwindow *);
 static Widget menu_create_buttons(struct xwindow *, Widget, Widget);
 static void menu_create_entries(struct xwindow *, struct menu *);
 static void destroy_menu_entry_widgets(struct xwindow *);
@@ -210,6 +211,8 @@ invert_line(struct xwindow *wp, x11_menu_item *curr, int which, long how_many)
     }
 }
 
+static XEvent fake_perminv_event;
+
 /*
  * Called when we get a key press event on a menu window.
  */
@@ -220,9 +223,11 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     struct menu_info_t *menu_info;
     x11_menu_item *curr;
     struct xwindow *wp;
+    Widget hbar, vbar;
     char ch;
     int count;
-    boolean selected_something;
+    boolean selected_something,
+            perminv_scrolling = (event == &fake_perminv_event);
 
     nhUse(params);
     nhUse(num_params);
@@ -230,7 +235,10 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     wp = find_widget(w);
     menu_info = wp->menu_information;
 
-    ch = key_event_to_char((XKeyEvent *) event);
+    if (!perminv_scrolling)
+        ch = key_event_to_char((XKeyEvent *) event);
+    else
+        ch = (char) fake_perminv_event.type;
 
     if (ch == '\0') { /* don't accept nul char/modifier event */
         /* don't beep */
@@ -238,7 +246,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     }
 
     /* don't exclude PICK_NONE menus; doing so disables scrolling via keys */
-    if (menu_info->is_active) { /* waiting for input */
+    if (menu_info->is_active || perminv_scrolling) { /* handle the input */
         /* first check for an explicit selector match, so that it won't be
            overridden if it happens to duplicate a mapped menu command (':'
            to look inside a container vs ':' to select via search string) */
@@ -290,7 +298,6 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 X11_nhbell();
             return;
         } else if (ch == MENU_FIRST_PAGE || ch == MENU_LAST_PAGE) {
-            Widget hbar, vbar;
             float top = (ch == MENU_FIRST_PAGE) ? 0.0 : 1.0;
 
             find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
@@ -298,8 +305,6 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 XtCallCallbacks(vbar, XtNjumpProc, &top);
             return;
         } else if (ch == MENU_NEXT_PAGE || ch == MENU_PREVIOUS_PAGE) {
-            Widget hbar, vbar;
-
             find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
             if (vbar) {
                 float shown, top;
@@ -310,6 +315,20 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 XtGetValues(vbar, arg, TWO);
                 top += ((ch == MENU_NEXT_PAGE) ? shown : -shown);
                 XtCallCallbacks(vbar, XtNjumpProc, &top);
+            }
+            return;
+        } else if (ch == MENU_SHIFT_RIGHT || ch == MENU_SHIFT_LEFT) {
+            find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
+            if (hbar) {
+                float shown, halfshown, left;
+                Arg arg[2];
+
+                XtSetArg(arg[0], nhStr(XtNshown), &shown);
+                XtSetArg(arg[1], nhStr(XtNtopOfThumb), &left);
+                XtGetValues(hbar, arg, TWO);
+                halfshown = shown * 0.5;
+                left += ((ch == MENU_NEXT_PAGE) ? halfshown : -halfshown);
+                XtCallCallbacks(hbar, XtNjumpProc, &left);
             }
             return;
         } else if (index(menu_info->curr_menu.gacc, ch)) {
@@ -573,6 +592,39 @@ menu_popdown(struct xwindow *wp)
     wp->menu_information->is_up = FALSE; /* menu is down */
 }
 
+/* construct a bit mask specifying which scrolling operations are allowed */
+static unsigned
+menu_scrollmask(struct xwindow *wp)
+{
+    float shown, top;
+    Arg args[2];
+    Widget hbar = (Widget) 0, vbar = (Widget) 0;
+    unsigned scrlmask = 0U;
+
+    /* set up args once, then use twice (provided that both scrollbars are
+       present); 'top' is left for horizontal scrollbar */
+    (void) memset(args, 0, sizeof args);
+    XtSetArg(args[0], nhStr(XtNshown), &shown);
+    XtSetArg(args[1], nhStr(XtNtopOfThumb), &top);
+
+    find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
+    if (vbar) {
+        XtGetValues(vbar, args, TWO);
+        if (top > 0.0)
+            scrlmask |= 1U; /* not at top; can scroll up */
+        if (top + shown < 1.0)
+            scrlmask |= 2U; /* more beyond bottom; can scroll down */
+    }
+    if (hbar) {
+        XtGetValues(hbar, args, TWO);
+        if (top > 0.0)
+            scrlmask |= 4U; /* not at left edge; can scroll to left */
+        if (top + shown < 1.0)
+            scrlmask |= 8U; /* more beyond right side; can scroll to right */
+    }
+    return scrlmask;
+}
+
 /* Global functions ======================================================= */
 
 /* called by X11_update_inventory() if persistent inventory is currently
@@ -584,6 +636,91 @@ x11_no_perminv(struct xwindow *wp)
         destroy_menu_entry_widgets(wp);
         menu_popdown(wp);
     }
+}
+
+/* called by X11_update_inventory() if user has executed #perminv command */
+void
+x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
+{
+    static const char extrakeys[] = "\033 \n\r\003\177\b";
+    char ch, menukeys[QBUFSZ];
+    boolean save_is_active;
+    unsigned scrlmask;
+    Cardinal no_args = 0;
+    struct xwindow *wp = &window_list[WIN_INVEN];
+
+    /* caller has ensured that perm_invent is enabled, but the window
+       might not be displayed; if that's the case, display it */
+    if (wp->type == NHW_MENU && !wp->menu_information->is_up)
+        X11_update_inventory(0);
+    /* if it's still not displayed for some reason, bail out now */
+    if (wp->type != NHW_MENU || !wp->menu_information->is_up) {
+        X11_nhbell();
+        return;
+    }
+
+    do {
+        scrlmask = menu_scrollmask(wp);
+        (void) collect_menu_keys(menukeys, scrlmask, FALSE);
+        /*
+         * Add quitchars plus a few others to the player's scrolling keys.
+         * We accept some extra characters that menus usually ignore:
+         * ^C will be treated like <escape>, leaving menu positioned as-is
+         * and returning to play; <delete> or <backspace> will be treated
+         * like <return> and <space>, reseting the menu to its top and
+         * returning to play; other charcters will either be rejected by
+         * yn_function or stay here for scrolling.
+         */
+        Strcat(menukeys, extrakeys);
+        /* append any scrolling keys excluded by scrlmask, after the \033
+           added by extrakeys; they'll be acceptable but not shown */
+        (void) collect_menu_keys(eos(menukeys), ~scrlmask, FALSE);
+
+        /* normally the perm_invent menu is not flagged 'is_active' because
+           it doesn't accept input, so menu_popdown() doesn't set the flag
+           for the event loop to exit; force 'is_active' while this prompt
+           is in progress so that it won't be left pending if player closes
+           the menu via mouse */
+        save_is_active = wp->menu_information->is_active;
+        wp->menu_information->is_active = TRUE;
+        ch = X11_yn_function_core("Inventory scroll:", menukeys,
+                                  0, YN_NO_LOGMESG);
+        if (wp->menu_information->is_up)
+            wp->menu_information->is_active = save_is_active;
+        else
+            ch = 0;
+
+        if (ch == C('c')) /* ^C */
+            ch = '\033';
+        else if (ch == '\177' || ch == '\b') /* <delete> or <backspace> */
+            ch = '\n';
+
+        if (ch && ch != '\033') {
+            /* in case persistent inventory window is covered, force it
+               to be on top; does not grab pointer or keyboard focus */
+            XMapRaised(XtDisplay(wp->popup), XtWindow(wp->popup));
+
+            /* the fake event never goes onto X's event queue; it is only
+               examined by menu_key(), so we shortcut the messy details in
+               favor of easy to handle union type code; might conceivably
+               confuse a sophisticated debugger so we should possibly redo
+               this to set it up properly:  event->keyevent->keycode */
+            fake_perminv_event.type = !index(quitchars, ch) ? ch
+                                      : MENU_FIRST_PAGE;
+            menu_key(wp->w, &fake_perminv_event, (String *) 0, &no_args);
+            fake_perminv_event.type = 0;
+        }
+
+        /* if yn_function() is using a popup (the 'slow=False' setting
+           in NetHack.ad) for its prompt+response and there is any
+           overlap between the persistent inventory and main windows,
+           perm_invent would be pushed behind the map every iteration of
+           this loop, so handle only one character at a time for !slow */
+        if (!appResources.slow)
+            break;
+    } while (ch && !index(quitchars, ch));
+
+    return;
 }
 
 void

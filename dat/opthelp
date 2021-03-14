@@ -290,6 +290,8 @@ menu_*     specify single character accelerators for menu commands.
            menu_last_page     jump to the last page in a menu      [|](tcwxq)
            menu_next_page     advance to the next menu page        [>](tcwxq)
            menu_previous_page back up to the previous menu page    [<](tcwxq)
+           menu_shift_left    pan view to left (perm_invent only)  [{](cx)
+           menu_shift_right   pan view to right (perm_invent only) [}](cx)
            menu_select_all    select all items in a menu           [.](tcwxq)
            menu_select_page   select all items on this menu page   [,](tcwq)
            menu_deselect_all  deselect all items in a menu         [-](tcwxq)

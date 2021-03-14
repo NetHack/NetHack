@@ -105,7 +105,7 @@ struct window_procs X11_procs = {
 #ifdef STATUS_HILITES
       | WC2_RESET_STATUS | WC2_HILITE_STATUS
 #endif
-      | 0L ),
+      | WC2_MENU_SHIFT ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
@@ -1241,7 +1241,7 @@ X11_destroy_nhwindow(winid window)
 
 /* display persistent inventory in its own window */
 void
-X11_update_inventory(int arg UNUSED)
+X11_update_inventory(int arg)
 {
     struct xwindow *wp = 0;
 
@@ -1252,7 +1252,11 @@ X11_update_inventory(int arg UNUSED)
         /* skip any calls to update_inventory() before in_moveloop starts */
         if (g.program_state.in_moveloop || g.program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
-            (void) display_inventory((char *) 0, FALSE);
+            if (!arg) {
+                (void) display_inventory((char *) 0, FALSE);
+            } else {
+                x11_scroll_perminv(arg);
+            }
             updated_inventory = 0;
         }
     } else if ((wp = &window_list[WIN_INVEN]) != 0

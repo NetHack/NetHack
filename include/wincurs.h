@@ -195,8 +195,9 @@ extern void curses_status_update(int, genericptr_t, int, int, int,
 
 /* cursinvt.c */
 
-extern void curses_update_inv(void);
-extern void curses_add_inv(int, char, attr_t, const char *);
+extern void curs_purge_perminv_data(boolean);
+extern void curs_update_invt(int);
+extern void curs_add_invt(int, char, attr_t, const char *);
 
 /* cursinit.c */
 

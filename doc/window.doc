@@ -259,11 +259,16 @@ display_file(str, boolean complain)
 		-- Display the file named str.  Complain about missing files
 		   iff complain is TRUE.
 update_inventory(arg)
-		-- Indicate to the window port that the inventory has been
-		   changed.
-		-- Merely calls display_inventory() for window-ports that
-		   leave the window up, otherwise empty.
-		-- 'arg' is not used yet
+		-- For an argument of 0:
+		   -- Indicate to the window port that the inventory has
+		      been changed.
+		   -- Merely calls display_inventory() for window-ports
+		      that leave the window up, otherwise empty.
+		-- or for a non-zero argument:
+		   -- Prompts the user for a menu scrolling action and
+		      executes that.
+		   -- May repeat until user finishes (typically by using
+		      <return> or <esc> but interface may use other means).
 doprev_message()
 		-- Display previous messages.  Used by the ^P command.
 		-- On the tty-port this scrolls WIN_MESSAGE back one line.
@@ -810,6 +815,8 @@ to support:
   |  guicolor          | WC2_GUICOLOR       | wc2_guicolor       |boolean |
   |  hilite_status     | WC2_HILITE_STATUS  | wc2_hilite_status  |strings |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
+  |  menu_shift_left   | WC2_MENU_SHIFT     |  n/a               |char    |
+  |  menu_shift_right  | WC2_MENU_SHIFT     |  n/a               |char    |
   |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
