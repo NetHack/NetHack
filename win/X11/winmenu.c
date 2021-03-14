@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1614387993 2021/02/27 01:06:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.7	winmenu.c	$NHDT-Date: 1615712422 2021/03/14 09:00:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -327,7 +327,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 XtSetArg(arg[1], nhStr(XtNtopOfThumb), &left);
                 XtGetValues(hbar, arg, TWO);
                 halfshown = shown * 0.5;
-                left += ((ch == MENU_NEXT_PAGE) ? halfshown : -halfshown);
+                left += ((ch == MENU_SHIFT_RIGHT) ? halfshown : -halfshown);
                 XtCallCallbacks(hbar, XtNjumpProc, &left);
             }
             return;
