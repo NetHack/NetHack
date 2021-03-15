@@ -255,11 +255,11 @@ pi_article_skip(const char *str)
     unsigned skip = 0; /* number of chars to skip when displaying str */
 
     /*
-     * if (!strncmpi(str, "a ", 2))
+     * if (!strncmp(str, "a ", 2))
      *     skip = 2;
-     * else if (!strncmpi(str, "an ", 3))
+     * else if (!strncmp(str, "an ", 3))
      *     skip = 3;
-     * else if (!strncmpi(str, "the ", 4))
+     * else if (!strncmp(str, "the ", 4))
      *     skip = 4;
      */
     if (str[0] == 'a') {
