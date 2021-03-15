@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.475 $ $NHDT-Date: 1615760296 2021/03/14 22:18:16 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.476 $ $NHDT-Date: 1615794750 2021/03/15 07:52:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -538,6 +538,8 @@ change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 engraving with non-blade dulled the weapon anyway (pr #464)
 'sortdiscoveries:s' had a spurious generic header shown at the start of the
 	last class if there were any artifacts or unique items discovered
+after getobj refactor: "#dip <item> into -" produced a scrambled message:
+	You mime dip <item> intoing something.
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

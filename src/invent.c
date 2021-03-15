@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1614474790 2021/02/28 01:13:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.320 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1615794750 2021/03/15 07:52:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.324 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1413,22 +1413,29 @@ static void
 mime_action(const char *word)
 {
     char buf[BUFSZ];
-    char *bp = buf;
-    char *suf = (char *) 0;
+    char *bp, *pfx, *sfx;
 
-    strcpy(buf, word);
+    Strcpy(buf, word);
+    bp = pfx = sfx = (char *) 0;
+
     if ((bp = strstr(buf, " on the ")) != 0) {
         /* rub on the stone[s] */
         *bp = '\0';
-        suf = (bp + 1);
+        sfx = (bp + 1); /* "something <sfx>" */
+    }
+    if (!strncmp(buf, "dip ", 4) && strstr(buf + 4, " into")) {
+        /* "dip <foo> into" => "dipping <foo> into" */
+        buf[3] = '\0';
+        pfx = &buf[4]; /* "<pfx> something" */
     }
     if ((bp = strstr(buf, " or ")) != 0) {
         *bp = '\0';
         bp = (rn2(2) ? buf : (bp + 4));
     } else
         bp = buf;
-    You("mime %s something%s%s.", ing_suffix(bp), suf ? " " : "",
-        suf ? suf : "");
+
+    You("mime %s%s%s something%s%s.", ing_suffix(bp),
+        pfx ? " " : "", pfx ? pfx : "", sfx ? " " : "", sfx ? sfx : "");
 }
 
 /* getobj callback that allows any object - but not hands. */
