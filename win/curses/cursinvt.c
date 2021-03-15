@@ -399,7 +399,7 @@ curs_show_invt(WINDOW *win)
         /* some lines aren't shown; overwrite rightmost portion of
            last line with something like "[1-24 of 30>"; right justified
            so that the line might still show something useful; could be on
-           line of its own, in which case we needed to erase that first */
+           line of its own, in which case we need to erase that first */
         y = height - (1 - border);
         if ((unsigned) y == pi.inuseindx - pi.rowoffset) {
             wmove(win, y, x);

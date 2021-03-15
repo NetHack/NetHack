@@ -668,7 +668,7 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
          * ^C will be treated like <escape>, leaving menu positioned as-is
          * and returning to play; <delete> or <backspace> will be treated
          * like <return> and <space>, reseting the menu to its top and
-         * returning to play; other charcters will either be rejected by
+         * returning to play; other characters will either be rejected by
          * yn_function or stay here for scrolling.
          */
         Strcat(menukeys, extrakeys);
@@ -679,8 +679,8 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
         /* normally the perm_invent menu is not flagged 'is_active' because
            it doesn't accept input, so menu_popdown() doesn't set the flag
            for the event loop to exit; force 'is_active' while this prompt
-           is in progress so that it won't be left pending if player closes
-           the menu via mouse */
+           is in progress so that the prompt won't be left pending if
+           player closes the menu via mouse */
         save_is_active = wp->menu_information->is_active;
         wp->menu_information->is_active = TRUE;
         ch = X11_yn_function_core("Inventory scroll:", menukeys,
@@ -1205,7 +1205,8 @@ menu_create_buttons(struct xwindow *wp, Widget form, Widget under)
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
     XtSetArg(args[num_args], nhStr(XtNfromHoriz), invert); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNsensitive), how != PICK_NONE); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNsensitive), how != PICK_NONE);
+                                                                   num_args++;
     XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop); num_args++;
     XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
