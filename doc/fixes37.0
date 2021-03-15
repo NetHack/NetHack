@@ -408,6 +408,8 @@ when creating a rolling boulder trap, don't place boulder on a path that
 	teleport trap/level teleporter/magic portal
 remove superfluous "All" from "All foos are already nonexistent." when blessed
 	genocide tries to remove something which has already been genocided
+"#dip <item> into -" produced a scrambled message:
+	You mime dip <item> intoing something.
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -538,8 +540,6 @@ change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 engraving with non-blade dulled the weapon anyway (pr #464)
 'sortdiscoveries:s' had a spurious generic header shown at the start of the
 	last class if there were any artifacts or unique items discovered
-after getobj refactor: "#dip <item> into -" produced a scrambled message:
-	You mime dip <item> intoing something.
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
