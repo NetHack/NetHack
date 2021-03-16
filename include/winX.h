@@ -257,6 +257,7 @@ struct xwindow {
 #define YN_NORMAL     0U /* no flags */
 #define YN_NO_LOGMESG 1U /* suppress echo of prompt+response to message window
                           * and dumplog message history */
+#define YN_NO_DEFAULT 2U /* don't convert quitchars to 0 or ESC to q/n/def */
 
 /* Window variables (winX.c). */
 extern struct xwindow window_list[MAX_WINDOWS];

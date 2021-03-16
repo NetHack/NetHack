@@ -2029,6 +2029,7 @@ static Widget yn_popup;          /* popup for the yn fuction (created once) */
 static Widget yn_label;          /* label for yn function (created once) */
 static boolean yn_getting_num;   /* TRUE if accepting digits */
 static boolean yn_preserve_case; /* default is to force yn to lower case */
+static boolean yn_no_default;    /* don't convert ESC or quitchars to def */
 static int yn_ndigits;           /* digit count */
 static long yn_val;              /* accumulated value */
 
@@ -2094,7 +2095,8 @@ yn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         return;
     }
 
-    if (!yn_choices) { /* accept any input */
+    if (!yn_choices /* accept any input */
+        || (yn_no_default && (ch == '\033' || index(yn_quitchars, ch)))) {
         yn_return = ch;
     } else {
         if (!yn_preserve_case)
@@ -2170,10 +2172,12 @@ X11_yn_function_core(
     char buf[BUFSZ], buf2[BUFSZ];
     Arg args[4];
     Cardinal num_args;
-    boolean suppress_logging = (ynflags & YN_NO_LOGMESG) != 0U;
+    boolean suppress_logging = (ynflags & YN_NO_LOGMESG) != 0U,
+            no_default_cnvrt = (ynflags & YN_NO_DEFAULT) != 0U;
 
     yn_choices = choices; /* set up globals for callback to use */
     yn_def = def;
+    yn_no_default = no_default_cnvrt;
     yn_preserve_case = !choices; /* preserve case when an arbitrary
                                   * response is allowed */
 

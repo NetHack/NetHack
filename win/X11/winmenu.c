@@ -53,6 +53,7 @@ static void invert_all(struct xwindow *);
 static void invert_match(struct xwindow *, char *);
 static void menu_popdown(struct xwindow *);
 static unsigned menu_scrollmask(struct xwindow *);
+static void menu_unscroll(struct xwindow *);
 static Widget menu_create_buttons(struct xwindow *, Widget, Widget);
 static void menu_create_entries(struct xwindow *, struct menu *);
 static void destroy_menu_entry_widgets(struct xwindow *);
@@ -256,7 +257,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 
         ch = map_menu_cmd(ch);
         if (ch == '\033') { /* quit */
-            if (menu_info->counting) {
+            if (menu_info->counting || perminv_scrolling) {
                 /* when there's a count in progress, ESC discards it
                    rather than dismissing the whole menu */
                 reset_menu_count(menu_info);
@@ -264,6 +265,10 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
             }
             select_none(wp);
         } else if (ch == '\n' || ch == '\r') {
+            if (perminv_scrolling) {
+                menu_unscroll(wp);
+                return; /* skip menu_popdown() */
+            }
             ; /* accept */
         } else if (digit(ch)) {
             /* special case: '0' is also the default ball class */
@@ -625,6 +630,31 @@ menu_scrollmask(struct xwindow *wp)
     return scrlmask;
 }
 
+/* if a menu is scrolled vertically and/horizontallty, return it to the top
+   and far left */
+static void
+menu_unscroll(struct xwindow *wp)
+{
+    float top, left, zero = 0.0;
+    Arg arg;
+    Widget hbar = (Widget) 0, vbar = (Widget) 0;
+
+    find_scrollbars(wp->w, wp->popup, &hbar, &vbar);
+    if (hbar) {
+        XtSetArg(arg, nhStr(XtNtopOfThumb), &left);
+        XtGetValues(hbar, &arg, ONE);
+        if (left > 0.0)
+            XtCallCallbacks(hbar, XtNjumpProc, &zero);
+    }
+    if (vbar) {
+        XtSetArg(arg, nhStr(XtNtopOfThumb), &top);
+        XtGetValues(vbar, &arg, ONE);
+        if (top > 0.0)
+            XtCallCallbacks(vbar, XtNjumpProc, &zero);
+    }
+    return;
+}
+
 /* Global functions ======================================================= */
 
 /* called by X11_update_inventory() if persistent inventory is currently
@@ -684,7 +714,7 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
         save_is_active = wp->menu_information->is_active;
         wp->menu_information->is_active = TRUE;
         ch = X11_yn_function_core("Inventory scroll:", menukeys,
-                                  0, YN_NO_LOGMESG);
+                                  0, (YN_NO_LOGMESG | YN_NO_DEFAULT));
         if (wp->menu_information->is_up)
             wp->menu_information->is_active = save_is_active;
         else
@@ -705,8 +735,7 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
                favor of easy to handle union type code; might conceivably
                confuse a sophisticated debugger so we should possibly redo
                this to set it up properly:  event->keyevent->keycode */
-            fake_perminv_event.type = !index(quitchars, ch) ? ch
-                                      : MENU_FIRST_PAGE;
+            fake_perminv_event.type = ch;
             menu_key(wp->w, &fake_perminv_event, (String *) 0, &no_args);
             fake_perminv_event.type = 0;
         }
