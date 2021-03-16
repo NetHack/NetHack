@@ -410,6 +410,8 @@ remove superfluous "All" from "All foos are already nonexistent." when blessed
 	genocide tries to remove something which has already been genocided
 "#dip <item> into -" produced a scrambled message:
 	You mime dip <item> intoing something.
+mounted hero falling out of saddle shouldn't hit ground and take damage when
+	levitating or flying (if done without steed's help)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -540,6 +542,7 @@ change wizard mode command #wizmgender to wizard mode option 'wizmgender'
 engraving with non-blade dulled the weapon anyway (pr #464)
 'sortdiscoveries:s' had a spurious generic header shown at the start of the
 	last class if there were any artifacts or unique items discovered
+loss of saddle by opening magic left hero mounted on unsaddled steed
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

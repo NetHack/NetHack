@@ -482,30 +482,38 @@ dismount_steed(
 {
     struct monst *mtmp;
     struct obj *otmp;
+    const char *verb;
     coord cc, steedcc;
-    const char *verb = "fall";
-    boolean repair_leg_damage = (Wounded_legs != 0L);
     unsigned save_utrap = u.utrap;
-    boolean have_spot = landing_spot(&cc, reason, 0);
+    boolean ulev, ufly,
+            repair_leg_damage = (Wounded_legs != 0L),
+            have_spot = landing_spot(&cc, reason, 0);
 
     mtmp = u.usteed; /* make a copy of steed pointer */
     /* Sanity check */
     if (!mtmp) /* Just return silently */
         return;
+    u.usteed = 0; /* affects Fly test; could hypothetically affect Lev */
+    ufly = Flying ? TRUE : FALSE;
+    ulev = Levitation ? TRUE : FALSE;
+    u.usteed = mtmp;
 
     /* Check the reason for dismounting */
     otmp = which_armor(mtmp, W_SADDLE);
     switch (reason) {
     case DISMOUNT_THROWN:
-        verb = "are thrown";
-        /*FALLTHRU*/
     case DISMOUNT_FELL:
+        verb = (reason == DISMOUNT_THROWN) ? "are thrown"
+               : ulev ? "float" : ufly ? "fly" : "fall";
         You("%s off of %s!", verb, mon_nam(mtmp));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
-        losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident", KILLED_BY_AN);
-        set_wounded_legs(BOTH_SIDES, (int) HWounded_legs + rn1(5, 5));
-        repair_leg_damage = FALSE;
+        if (!ulev && !ufly) {
+            losehp(Maybe_Half_Phys(rn1(10, 10)), "riding accident",
+                   KILLED_BY_AN);
+            set_wounded_legs(BOTH_SIDES, (int) HWounded_legs + rn1(5, 5));
+            repair_leg_damage = FALSE;
+        }
         break;
     case DISMOUNT_POLY:
         You("can no longer ride %s.", mon_nam(u.usteed));

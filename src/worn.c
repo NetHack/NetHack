@@ -1035,19 +1035,23 @@ racial_exception(struct monst *mon, struct obj *obj)
     return 0;
 }
 
-/* Remove an object from a monster's inventory.
- * At its core this is just obj_extract_self(), but it also handles any updates
- * that needs to happen if the gear is equipped or in some other sort of state
- * that needs handling.
- * Note that like obj_extract_self(), this leaves obj free. */
+/* Remove an object from a monster's inventory. */
 void
-extract_from_minvent(struct monst *mon, struct obj *obj,
-                     boolean do_intrinsics, /* whether to call
-                                               update_mon_intrinsics */
-                     boolean silently) /* doesn't affect all possible messages,
-                                          just update_mon_intrinsics's */
+extract_from_minvent(
+    struct monst *mon,
+    struct obj *obj,
+    boolean do_intrinsics,  /* whether to call update_mon_intrinsics */
+    boolean silently)       /* doesn't affect all possible messages,
+                             * just update_mon_intrinsics's */
 {
     long unwornmask = obj->owornmask;
+
+    /*
+     * At its core this is just obj_extract_self(), but it also handles
+     * any updates that need to happen if the gear is equipped or in
+     * some other sort of state that needs handling.
+     * Note that like obj_extract_self(), this leaves obj free.
+     */
 
     if (obj->where != OBJ_MINVENT) {
         impossible("extract_from_minvent called on object not in minvent");
