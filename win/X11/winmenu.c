@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1615712422 2021/03/14 09:00:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	winmenu.c	$NHDT-Date: 1615911117 2021/03/16 16:11:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -969,7 +969,11 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNallowVert), True); num_args++;
-        XtSetArg(args[num_args], nhStr(XtNallowHoriz), False); num_args++;
+        /* allow horizontal scroll bar for persistent inventory window;
+           it could be allowed for any menu, but when scrolled to the side
+           the selector letters aren't visible so we won't do that [yet?] */
+        XtSetArg(args[num_args], nhStr(XtNallowHoriz), permi ? True : False);
+                                                                   num_args++;
         XtSetArg(args[num_args], nhStr(XtNuseBottom), True); num_args++;
         XtSetArg(args[num_args], nhStr(XtNuseRight), True); num_args++;
 #if 0

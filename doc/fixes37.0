@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.476 $ $NHDT-Date: 1615794750 2021/03/15 07:52:30 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.478 $ $NHDT-Date: 1615911117 2021/03/16 16:11:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -568,6 +568,7 @@ X11: use visctrl(response) when X11_yn_function() echoes prompt+response in
 	message window
 X11: when trying to lookup scrollbars in order to handle scrolling via keys,
 	menu handling always ended up finding the top window
+X11: enable horizontal scrollbar for persistent inventory window
 X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 
