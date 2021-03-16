@@ -413,6 +413,10 @@ remove superfluous "All" from "All foos are already nonexistent." when blessed
 mounted hero falling out of saddle shouldn't hit ground and take damage when
 	levitating or flying (if done without steed's help)
 avoid "obj not free" panic if monster kills itself by reading scroll of earth
+attempting to throw a partial stack of gold at self was prevented but left
+	the partial stack in an extra $ inventory slot
+quivering a partial stack of gold succeeded and put the partial stack in an
+	extra $ inventory slot
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------

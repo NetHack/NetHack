@@ -102,8 +102,9 @@ throw_obj(struct obj *obj, int shotlimit)
     if (obj->oclass == COIN_CLASS && obj != uquiver)
         return throw_gold(obj);
 
-    if (!canletgo(obj, "throw"))
+    if (!canletgo(obj, "throw")) {
         return 0;
+    }
     if (obj->oartifact == ART_MJOLLNIR && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
         return 0;
@@ -2160,6 +2161,11 @@ throw_gold(struct obj *obj)
 
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw gold at yourself.");
+        /* If we tried to throw part of a stack, force it to merge back
+           together (same as in throw_obj).  Essential for gold. */
+        if (obj->o_id == g.context.objsplit.parent_oid
+            || obj->o_id == g.context.objsplit.child_oid)
+            (void) unsplitobj(obj);
         return 0;
     }
     freeinv(obj);
