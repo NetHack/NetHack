@@ -334,6 +334,8 @@ athen*
 	bird was the owl, and the plant sacred to her is the olive.
 	    [ Bulfinch's Mythology, by Thomas Bulfinch ]
 axe
+battle?axe
+double?headed?axe
 	"For ev'ry silver ringing blow,
 	Cities and palaces shall grow!"
 
@@ -778,6 +780,7 @@ kitten
 	the cats appear, and sonorous with purring content.
 		[ The Cats of Ulthar, by H.P. Lovecraft ]
 # this one doesn't work very well for dwarven and gnomish cavemen
+cave dweller
 cave*man
 human cave*man
 	Now it was light enough to leave.  Moon-Watcher picked up
@@ -1528,10 +1531,13 @@ electric eel
 ~elf ??m*
 *elf*
 elvenking
+elvenqueen
+elven monarch
 	The Elves sat round the fire upon the grass or upon the sawn
 	rings of old trunks.  Some went to and fro bearing cups and
 	pouring drinks; others brought food on heaped plates and
 	dishes.
+
 	"This is poor fare," they said to the hobbits; "for we are
 	lodging in the greenwood far from our halls.  If ever you are
 	our guests at home, we will treat you better."
@@ -1540,6 +1546,7 @@ elvenking
 	his mind was filled with the light upon the elf-faces, and the
 	sound of voices so various and so beautiful that he felt in a
 	waking dream.  [...]
+
 	Sam could never describe in words, nor picture clearly to
 	himself, what he felt or thought that night, though it remained
 	in his memory as one of the chief events of his life.  The
@@ -2490,8 +2497,10 @@ imp or minor demon
 	The fairies of tradition often hover uneasily between the
 	ghostly and the diabolic state.
 		[ A Dictionary of Fairies, by Katharine Briggs ]
+# "amorous demon" is a placeholder until something better comes along
 incubus
 succubus
+amorous demon
 	The incubus and succubus are male and female versions of the
 	same demon, one who lies with a human for its own purposes,
 	usually to the detriment of the mortals who are unwise in
@@ -2837,7 +2846,9 @@ kraken
 	for help.  Twenty other arms came rippling out.  The dark
 	water boiled, and there was a hideous stench.
 	   [ The Fellowship of the Ring, by J.R.R. Tolkien ]
-*lady
+the lady
+lady
+lady luck
 offler
 	Blind Io took up the dice-box, which was a skull whose various
 	orifices had been stoppered with rubies, and with several of
@@ -4132,6 +4143,8 @@ pray*
 		[ Fathers and Sons, by Ivan Turgenev ]
 priest*
 * priest*
+cleric
+* cleric
 acolyte
 	[...]  For the two priests were talking exactly like priests,
 	piously, with learning and leisure, about the most aerial
@@ -5398,7 +5411,7 @@ valkyrie
 		by Herbert Spencer Robinson and Knox Wilson ]
 vampire
 ~vampire bat
-vampire lord
+vampire l*
 	He can transform himself to wolf, as we gather from the ship
 	arrival in Whitby, when he tear open the dog; he can be as
 	bat, as Madam Mina saw him on the window at Whitby, and as
@@ -5564,7 +5577,6 @@ water troll
 # exclusion keys for broadsword and sunsword aren't really necessarily
 # because their entries precede this one
 weapon
-battle axe
 club
 flail
 ~*broadsword
