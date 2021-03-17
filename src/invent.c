@@ -33,6 +33,7 @@ static struct obj *find_unpaid(struct obj *, struct obj **);
 static void menu_identify(int);
 static boolean tool_in_use(struct obj *);
 static int adjust_ok(struct obj *);
+static int adjust_gold_ok(struct obj *);
 static char obj_to_let(struct obj *);
 static void mime_action(const char *);
 
@@ -3944,37 +3945,51 @@ reassign(void)
     g.lastinvnr = i;
 }
 
-/* getobj callback for item to #adjust */
+/* invent gold sanity check; used by doorganize() to control how getobj()
+   deals with gold and also by wizard mode sanity_check() */
+boolean
+check_invent_gold(const char *why) /* 'why' == caller in case of warning */
+{
+    struct obj *otmp;
+    int goldstacks = 0, wrongslot = 0;
+
+    /* there should be at most one stack of gold in invent, in slot '$' */
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (otmp->oclass == COIN_CLASS) {
+            ++goldstacks;
+            if (otmp->invlet != GOLD_SYM)
+                ++wrongslot;
+        }
+
+    if (goldstacks > 1 || wrongslot > 0) {
+        impossible("%s: %s%s%s", why,
+                   (wrongslot > 1) ? "gold in wrong slots"
+                      : (wrongslot > 0) ? "gold in wrong slot"
+                           : "",
+                   (wrongslot > 0 && goldstacks > 1) ? " and " : "",
+                   (goldstacks > 1) ? "multiple gold stacks" : "");
+        return TRUE; /* gold can be #adjusted */
+    }
+
+    return FALSE; /* gold can't be #adjusted */
+}
+
+/* normal getobj callback for item to #adjust; excludes gold */
 int
 adjust_ok(struct obj *obj)
 {
+    if (!obj || obj->oclass == COIN_CLASS)
+        return GETOBJ_EXCLUDE;
+
+    return GETOBJ_SUGGEST;
+}
+
+/* getobj callback for item to #adjust if gold is wonky; allows gold */
+int
+adjust_gold_ok(struct obj *obj)
+{
     if (!obj)
         return GETOBJ_EXCLUDE;
-
-    /* gold should never end up in a letter slot, nor should two '$' slots
-     * occur, but if they ever do, allow #adjust to handle them (in the
-     * past, things like this have happened, usually due to bknown being
-     * erroneously set on one stack, clear on another; object merger isn't
-     * fooled by that anymore) */
-    if (obj->oclass == COIN_CLASS) {
-        int goldstacks = 0;
-        struct obj *otmp;
-        if (obj->invlet != GOLD_SYM)
-            return GETOBJ_SUGGEST;
-        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
-            if (otmp->oclass == COIN_CLASS) {
-                goldstacks++;
-            }
-        }
-
-        if (goldstacks > 1) {
-            impossible("getobj: multiple gold stacks in inventory");
-            return GETOBJ_SUGGEST;
-        }
-        /* assuming this impossible case doesn't happen, gold should be
-         * outright ignored as far as #adjust is concerned */
-        return GETOBJ_EXCLUDE;
-    }
 
     return GETOBJ_SUGGEST;
 }
@@ -4019,6 +4034,10 @@ adjust_ok(struct obj *obj)
  *      However, when splitting results in a merger, the name of the
  *      destination overrides that of the source, even if destination
  *      is unnamed and source is named.
+ *
+ *      Gold is only a candidate to adjust if we've somehow managed
+ *      to get multiple stacks and/or it is in a slot other than '$'.
+ *      Specifying a count to split it into two stacks is not allowed.
  */
 int
 doorganize(void) /* inventory organizer by Del Lamb */
@@ -4033,7 +4052,8 @@ doorganize(void) /* inventory organizer by Del Lamb */
     char qbuf[QBUFSZ];
     char *objname, *otmpname;
     const char *adj_type;
-    boolean ever_mind = FALSE, collect;
+    int (*adjust_filter)(struct obj *);
+    boolean ever_mind = FALSE, collect, isgold;
 
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!g.invent || (g.invent->oclass == COIN_CLASS
@@ -4045,10 +4065,19 @@ doorganize(void) /* inventory organizer by Del Lamb */
 
     if (!flags.invlet_constant)
         reassign();
+
+    /* filter passed to getobj() depends upon gold sanity */
+    adjust_filter = check_invent_gold("adjust") ? adjust_gold_ok : adjust_ok;
+
     /* get object the user wants to organize (the 'from' slot) */
-    obj = getobj("adjust", adjust_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
+    obj = getobj("adjust", adjust_filter, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     if (!obj)
         return 0;
+    /* can only be gold if check_invent_gold() found a problem:  multiple '$'
+       stacks and/or gold in some other slot, otherwise (*adjust_filter)()
+       won't allow gold to be picked; if player has picked any stack of gold
+       as #adjust 'from' slot, we'll force the 'to' slot to be '$' below */
+    isgold = (obj->oclass == COIN_CLASS);
 
     /* figure out whether user gave a split count to getobj() */
     splitting = bumped = 0;
@@ -4099,7 +4128,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     Sprintf(qbuf, "Adjust letter to what [%s]%s?", lets,
             g.invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
-        let = yn_function(qbuf, (char *) 0, '\0');
+        let = !isgold ? yn_function(qbuf, (char *) 0, '\0') : GOLD_SYM;
         if (let == '?' || let == '*') {
             let = display_used_invlets(splitting ? obj->invlet : 0);
             if (!let)

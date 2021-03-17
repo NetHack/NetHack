@@ -417,6 +417,10 @@ attempting to throw a partial stack of gold at self was prevented but left
 	the partial stack in an extra $ inventory slot
 quivering a partial stack of gold succeeded and put the partial stack in an
 	extra $ inventory slot
+if player managed to get multiple $ items, all but the last could be moved to
+	normal letter slots via #adjust and then subsequent #adjust with a
+	count could split them into even more slots
+
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------

@@ -1046,6 +1046,7 @@ extern void useupf(struct obj *, long);
 extern char *let_to_name(char, boolean, boolean);
 extern void free_invbuf(void);
 extern void reassign(void);
+extern boolean check_invent_gold(const char *);
 extern int doorganize(void);
 extern void free_pickinv_cache(void);
 extern int count_unpaid(struct obj *);

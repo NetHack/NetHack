@@ -2906,6 +2906,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 void
 sanity_check(void)
 {
+    (void) check_invent_gold("invent");
     obj_sanity_check();
     timer_sanity_check();
     mon_sanity_check();
