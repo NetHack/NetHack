@@ -2899,7 +2899,8 @@ config_erradd(const char *buf)
         buf = "Unknown error";
 
     if (iflags.in_lua) {
-        struct _config_error_errmsg *dat = (struct _config_error_errmsg *) alloc(sizeof (struct _config_error_errmsg));
+        struct _config_error_errmsg *dat
+                         = (struct _config_error_errmsg *) alloc(sizeof *dat);
 
         dat->next = config_error_msg;
         dat->line_num = config_error_data->line_num;

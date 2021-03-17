@@ -277,6 +277,8 @@ makerooms(void)
             } else {
                 /* success; save state for this dungeon branch */
                 g.luathemes[u.uz.dnum] = (genericptr_t) themes;
+                /* keep themes context, so not 'nhl_done(themes);' */
+                iflags.in_lua = FALSE; /* can affect error messages */
             }
         }
         if (!themes) /* don't try again when making next level */
@@ -299,11 +301,11 @@ makerooms(void)
             }
         } else {
             if (themes) {
-                g.in_mk_themerooms = TRUE;
+                iflags.in_lua = g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
                 lua_call(themes, 0, 0);
-                g.in_mk_themerooms = FALSE;
+                iflags.in_lua = g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)
                         || (g.nroom >= (MAXNROFROOMS / 6))))

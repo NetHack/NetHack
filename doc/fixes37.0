@@ -547,6 +547,8 @@ engraving with non-blade dulled the weapon anyway (pr #464)
 'sortdiscoveries:s' had a spurious generic header shown at the start of the
 	last class if there were any artifacts or unique items discovered
 loss of saddle by opening magic left hero mounted on unsaddled steed
+avoid segfault during error reporting for bad 'O' value(s) after theme rooms
+	have been initialized, leaving iflags.in_lua set
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
