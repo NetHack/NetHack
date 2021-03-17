@@ -107,6 +107,18 @@ sanity_check_single_mon(
     /* guardian angel on astral level is tame but has emin rather than edog */
     if (mtmp->mtame && !has_edog(mtmp) && !mtmp->isminion)
         impossible("pet without edog (%s)", msg);
+    /* steed should be tame and saddled */
+    if (mtmp == u.usteed) {
+        const char *ns, *nt = !mtmp->mtame ? "not tame" : 0;
+
+        ns = !m_carrying(mtmp, SADDLE) ? ns = "no saddle"
+             : !which_armor(mtmp, W_SADDLE) ? ns = "saddle not worn"
+               : 0;
+        if (ns || nt)
+            impossible("steed: %s%s%s (%s)",
+                       ns ? ns : "", (ns && nt) ? ", " : "", nt ? nt : "",
+                       msg);
+    }
 
     if (mtmp->mtrapped) {
         if (mtmp->wormno) {
