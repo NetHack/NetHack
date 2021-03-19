@@ -4152,7 +4152,6 @@ Implemented by the Amiga, Gem and tty ports.
 Default `\verb+<+'.
 \item[\ib{menu\verb+_+search}]
 Key to search for a menu item.
-Implemented by the Amiga, Gem, X11 and tty ports.
 Default `:'.
 \item[\ib{menu\verb+_+select\verb+_+all}]
 Key to select all items in a menu.
@@ -5165,7 +5164,7 @@ For example:
 
 \begin{verbatim}
     BIND=^X:getpos.autodescribe
-    BIND={:menu_first_page
+    BIND=\:menu_first_page
     BIND=v:loot
 \end{verbatim}
 
@@ -5181,6 +5180,7 @@ the ``{\tt <esc>}'', ``{\tt <enter>}'', and ``{\tt <space>}'' keys.
 The menu control or accelerator keys can also be rebound via OPTIONS lines
 in the configuration file.
 You cannot bind object symbols or selection letters into menu accelerators.
+Some interfaces only support some of the menu accelerators.
 
 %.lp "Special command keys"
 \item[\tb{Special command keys}]

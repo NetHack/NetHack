@@ -3796,15 +3796,12 @@ Partial skips the object class filtering and
 immediately displays a menu of all objects.
 .lp menu_deselect_all
 Key to deselect all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
 Default \(oq\-\(cq.
 .lp menu_deselect_page
 Key to deselect all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq\\\(cq.
 .lp menu_first_page
 Key to jump to the first page in a menu.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq\(ha\(cq.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
@@ -3813,19 +3810,15 @@ Values are \(lqnone\(rq, \(lqbold\(rq, \(lqdim\(rq, \(lqunderline\(rq,
 Not all ports can actually display all types.
 .lp menu_invert_all
 Key to invert all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
 Default \(oq@\(cq.
 .lp menu_invert_page
 Key to invert all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq\(ti\(cq. \" ~
 .lp menu_last_page
 Key to jump to the last page in a menu.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq|\(cq.
 .lp menu_next_page
 Key to go to the next menu page.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq>\(cq.
 .lp menu_objsyms
 Show object symbols in menu headings in menus where
@@ -3836,19 +3829,15 @@ menus to the right edge of the screen. Only for the tty port.
 (default on)
 .lp menu_previous_page
 Key to go to the previous menu page.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq<\(cq.
 .lp menu_search
-Key to search for a menu item.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to search for some text and toggle selection state of matching menu items.
 Default \(oq:\(cq.
 .lp menu_select_all
 Key to select all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
 Default \(oq.\(cq.
 .lp menu_select_page
 Key to select all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
 Default \(oq,\(cq.
 .lp menu_shift_left
 Key to scroll a menu\(emone which has been
@@ -4713,7 +4702,7 @@ For example:
 .sd
 .si
 BIND=\(haX:getpos.autodescribe
-BIND={:menu_first_page
+BIND=\\:menu_first_page
 BIND=v:loot
 .ei
 .ed
@@ -4725,7 +4714,8 @@ You can also bind the \(lq<esc>\(rq, \(lq<enter>\(rq, and \(lq<space>\(rq keys.
 .lp "Menu accelerator keys"
 The menu control or accelerator keys can also be rebound via OPTIONS lines
 in the configuration file.
-You cannot bind object symbols into menu accelerators.
+You cannot bind object symbols or selection letters into menu accelerators.
+Some interfaces only support some of the menu accelerators.
 .lp "Special command keys"
 Below are the special commands you can rebind.
 Some of them can be bound to
