@@ -1474,8 +1474,9 @@ getobj(const char *word,
     boolean allowcnt = (ctrlflags & GETOBJ_ALLOWCNT),
             forceprompt = (ctrlflags & GETOBJ_PROMPT),
             allownone = FALSE;
-    xchar inaccess = 0; /* counts GETOBJ_EXCLUDE_INACCESS items for a message
-                           tweak */
+    int inaccess = 0; /* counts GETOBJ_EXCLUDE_INACCESS items to decide
+                       * between "you don't have anything to <foo>"
+                       * versus "you don't have anything _else_ to <foo>" */
     long cnt;
     boolean cntgiven = FALSE;
     boolean msggiven = FALSE;
@@ -1483,10 +1484,21 @@ getobj(const char *word,
     Loot *sortedinvent, *srtinv;
 
     /* is "hands"/"self" a valid thing to do this action on? */
-    if ((*obj_ok)((struct obj *) 0) == GETOBJ_SUGGEST) {
-	allownone = TRUE;
+    switch ((*obj_ok)((struct obj *) 0)) {
+    case GETOBJ_SUGGEST: /* treat as likely candidate */
+        allownone = TRUE;
         *bp++ = HANDS_SYM;
         *bp++ = ' '; /* put a space after the '-' in the prompt */
+        break;
+    case GETOBJ_DOWNPLAY: /* acceptable but not shown as likely chioce */
+    case GETOBJ_EXCLUDE_INACCESS:   /* nothing currently gives this for '-' but
+                                     * theoretically could if wearing gloves */
+    case GETOBJ_EXCLUDE_SELECTABLE: /* ditto, I think... */
+        allownone = TRUE;
+        *ap++ = HANDS_SYM;
+        break;
+    default:
+        break;
     }
 
     if (!flags.invlet_constant)
@@ -1552,12 +1564,12 @@ getobj(const char *word,
         cnt = 0;
         cntgiven = FALSE;
         Sprintf(qbuf, "What do you want to %s?", word);
-        if (g.in_doagain)
+        if (g.in_doagain) {
             ilet = readchar();
-        else if (iflags.force_invmenu) {
+        } else if (iflags.force_invmenu) {
             /* don't overwrite a possible quitchars */
             if (!oneloop)
-                ilet = forceprompt ? '*' : '?';
+                ilet = (*lets || *altlets) ? '?' : '*';
             if (!msggiven)
                 putmsghistory(qbuf, FALSE);
             msggiven = TRUE;
@@ -1642,19 +1654,19 @@ getobj(const char *word,
             if (otmp->invlet == ilet)
                 break;
         /* some items have restrictions */
-        if (ilet == def_oc_syms[COIN_CLASS].sym
-            /* guard against the [hypothetical] chace of having more
+        if (ilet == GOLD_SYM
+            /* guard against the [hypothetical] chance of having more
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
-            if (obj_ok(otmp) <= GETOBJ_EXCLUDE) {
+            if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
                 You("cannot %s gold.", word);
                 return (struct obj *) 0;
             }
-            /* Historic note: early Nethack had a bug which was
+            /*
+             * Historical note: early Nethack had a bug which was
              * first reported for Larn, where trying to drop 2^32-n
-             * gold pieces was allowed, and did interesting things
-             * to your money supply.  The LRS is the tax bureau
-             * from Larn.
+             * gold pieces was allowed, and did interesting things to
+             * your money supply.  The LRS is the tax bureau from Larn.
              */
             if (cntgiven && cnt <= 0) {
                 if (cnt < 0)
@@ -2623,7 +2635,7 @@ display_pickinv(
     classcount = 0;
     for (srtinv = sortedinvent; (otmp = srtinv->obj) != 0; ++srtinv) {
         int tmpglyph;
-	glyph_info tmpglyphinfo = nul_glyphinfo;
+        glyph_info tmpglyphinfo = nul_glyphinfo;
 
         if (lets && !index(lets, otmp->invlet))
             continue;
@@ -2645,7 +2657,7 @@ display_pickinv(
             else
                 any.a_char = ilet;
             tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
-            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);            
+            map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
             add_menu(win, &tmpglyphinfo, &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
                      ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
@@ -2660,7 +2672,12 @@ display_pickinv(
             goto nextclass;
         }
     }
-    if (iflags.force_invmenu && lets && want_reply) {
+    /* default for force_invmenu is a list of likely candidates;
+       add '*' for 'show all' as an extra choice unless list already
+       includes everything; won't work via keyboard if current menu
+       uses '*' as group accelerator for gems but might work via mouse */
+    if (iflags.force_invmenu && lets && want_reply
+        && (int) strlen(lets) < inv_cnt(TRUE)) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
                  iflags.menu_headings, "Special", MENU_ITEMFLAGS_NONE);
@@ -4057,7 +4074,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
 
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!g.invent || (g.invent->oclass == COIN_CLASS
-                    && g.invent->invlet == GOLD_SYM && !g.invent->nobj)) {
+                      && g.invent->invlet == GOLD_SYM && !g.invent->nobj)) {
         You("aren't carrying anything %s.",
             !g.invent ? "to adjust" : "adjustable");
         return 0;

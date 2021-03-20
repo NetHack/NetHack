@@ -500,7 +500,7 @@ enum getobj_callback_returns {
      * else to foo". */
     GETOBJ_EXCLUDE_INACCESS = -1,
     /* invalid for purposes of not showing a prompt if nothing is valid but
-     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE_INACCESS but
+     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE but
      * without the "else" in "You don't have anything else to foo". */
     GETOBJ_EXCLUDE_SELECTABLE = 0,
     /* valid - invlet not presented in the summary or the ? menu as a
