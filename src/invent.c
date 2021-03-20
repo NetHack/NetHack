@@ -1632,8 +1632,11 @@ getobj(const char *word,
             ilet = display_pickinv(allowed_choices, *qbuf ? qbuf : (char *) 0,
                                    menuquery,
                                    TRUE, allowcnt ? &ctmp : (long *) 0);
-            if (!ilet)
+            if (!ilet) {
+                if (oneloop)
+                    return (struct obj *) 0;
                 continue;
+            }
             if (ilet == HANDS_SYM)
                 return (struct obj *) &cg.zeroobj; /* cast away 'const' */
             if (ilet == '\033') {

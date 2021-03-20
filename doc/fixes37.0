@@ -553,6 +553,9 @@ engraving with non-blade dulled the weapon anyway (pr #464)
 loss of saddle by opening magic left hero mounted on unsaddled steed
 avoid segfault during error reporting for bad 'O' value(s) after theme rooms
 	have been initialized, leaving iflags.in_lua set
+avoid complaints of "nothing to foo" for 'force_invmenu' if there are no
+	likely candidates to foo with but there are hidden acceptable choices
+avoid "Not carrying anything.  Never mind." for 'force_invmenu'
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
