@@ -1315,7 +1315,8 @@ m_move(register struct monst* mtmp, register int after)
     }
  postmov:
     if (mmoved == 1 || mmoved == 3) {
-        boolean canseeit = cansee(mtmp->mx, mtmp->my);
+        boolean canseeit = cansee(mtmp->mx, mtmp->my),
+                didseeit = canseeit;
 
         if (mmoved == 1) {
             /* normal monster move will already have <nix,niy>,
@@ -1364,8 +1365,18 @@ m_move(register struct monst* mtmp, register int after)
                 && !passes_walls(ptr) /* doesn't need to open doors */
                 && !can_tunnel) {     /* taken care of below */
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
-                boolean btrapped = (here->doormask & D_TRAPPED) != 0,
-                        observeit = canseeit && canspotmon(mtmp);
+                boolean btrapped = (here->doormask & D_TRAPPED) != 0;
+    /* used after monster 'who' has been moved to closed door spot 'where'
+       which will now be changed to door state 'what' with map update */
+#define UnblockDoor(where,who,what) \
+    do {                                                        \
+        (where)->doormask = (what);                             \
+        newsym((who)->mx, (who)->my);                           \
+        unblock_point((who)->mx, (who)->my);                    \
+        vision_recalc(0);                                       \
+        /* update cached value since it might change */         \
+        canseeit = didseeit || cansee((who)->mx, (who)->my);    \
+    } while (0)
 
                 /* if mon has MKoT, disarm door trap; no message given */
                 if (btrapped && has_magic_key(mtmp)) {
@@ -1384,15 +1395,17 @@ m_move(register struct monst* mtmp, register int after)
                               (ptr == &mons[PM_FOG_CLOUD]
                                || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
                 } else if (here->doormask & D_LOCKED && can_unlock) {
+                    /* like the vampshift hack above, there are sequencing
+                       issues when the monster is moved to the door's spot
+                       first then door handling plus feedback comes after */
+
+                    UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
-                        here->doormask = D_NODOOR;
-                        newsym(mtmp->mx, mtmp->my);
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                         if (mb_trapped(mtmp))
                             return 2;
                     } else {
                         if (flags.verbose) {
-                            if (observeit)
+                            if (canseeit && canspotmon(mtmp))
                                 pline("%s unlocks and opens a door.",
                                       Monnam(mtmp));
                             else if (canseeit)
@@ -1400,41 +1413,36 @@ m_move(register struct monst* mtmp, register int after)
                             else if (!Deaf)
                                 You_hear("a door unlock and open.");
                         }
-                        here->doormask = D_ISOPEN;
-                        /* newsym(mtmp->mx, mtmp->my); */
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                     }
                 } else if (here->doormask == D_CLOSED && can_open) {
+                    UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
-                        here->doormask = D_NODOOR;
-                        newsym(mtmp->mx, mtmp->my);
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                         if (mb_trapped(mtmp))
                             return 2;
                     } else {
                         if (flags.verbose) {
-                            if (observeit)
+                            if (canseeit && canspotmon(mtmp))
                                 pline("%s opens a door.", Monnam(mtmp));
                             else if (canseeit)
                                 You_see("a door open.");
                             else if (!Deaf)
                                 You_hear("a door open.");
                         }
-                        here->doormask = D_ISOPEN;
-                        /* newsym(mtmp->mx, mtmp->my); */  /* done below */
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                     }
                 } else if (here->doormask & (D_LOCKED | D_CLOSED)) {
                     /* mfndpos guarantees this must be a doorbuster */
+                    unsigned mask;
+
+                    mask = ((btrapped || ((here->doormask & D_LOCKED) != 0
+                                          && !rn2(2))) ? D_NODOOR
+                            : D_BROKEN);
+                    UnblockDoor(here, mtmp, mask);
                     if (btrapped) {
-                        here->doormask = D_NODOOR;
-                        newsym(mtmp->mx, mtmp->my);
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                         if (mb_trapped(mtmp))
                             return 2;
                     } else {
                         if (flags.verbose) {
-                            if (observeit)
+                            if (canseeit && canspotmon(mtmp))
                                 pline("%s smashes down a door.",
                                       Monnam(mtmp));
                             else if (canseeit)
@@ -1442,12 +1450,6 @@ m_move(register struct monst* mtmp, register int after)
                             else if (!Deaf)
                                 You_hear("a door crash open.");
                         }
-                        if ((here->doormask & D_LOCKED) != 0 && !rn2(2))
-                            here->doormask = D_NODOOR;
-                        else
-                            here->doormask = D_BROKEN;
-                        /* newsym(mtmp->mx, mtmp->my); */  /* done below */
-                        unblock_point(mtmp->mx, mtmp->my); /* vision */
                     }
                     /* if it's a shop door, schedule repair */
                     if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))

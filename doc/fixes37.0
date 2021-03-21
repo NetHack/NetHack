@@ -420,6 +420,8 @@ quivering a partial stack of gold succeeded and put the partial stack in an
 if player managed to get multiple $ items, all but the last could be moved to
 	normal letter slots via #adjust and then subsequent #adjust with a
 	count could split them into even more slots
+when a monster on the far side of a closed door opens it, sometimes the hero
+	was told about the monster without it being displayed on the map
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

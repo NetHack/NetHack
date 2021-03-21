@@ -1213,14 +1213,11 @@ wiz_show_vision(void)
     putstr(win, 0, "");
     for (y = 0; y < ROWNO; y++) {
         for (x = 1; x < COLNO; x++) {
-            if (x == u.ux && y == u.uy)
+            if (x == u.ux && y == u.uy) {
                 row[x] = '@';
-            else {
+            } else {
                 v = g.viz_array[y][x]; /* data access should be hidden */
-                if (v == 0)
-                    row[x] = ' ';
-                else
-                    row[x] = '0' + g.viz_array[y][x];
+                row[x] = (v == 0) ? ' ' : ('0' + v);
             }
         }
         /* remove trailing spaces */
