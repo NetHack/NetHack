@@ -1491,7 +1491,7 @@ extern boolean olfaction(struct permonst *);
 /* ### monmove.c ### */
 
 extern boolean itsstuck(struct monst *);
-extern boolean mb_trapped(struct monst *);
+extern boolean mb_trapped(struct monst *, boolean);
 extern boolean monhaskey(struct monst *, boolean);
 extern void mon_regen(struct monst *, boolean);
 extern int dochugw(struct monst *);

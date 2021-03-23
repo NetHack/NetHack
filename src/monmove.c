@@ -18,23 +18,24 @@ static int vamp_shift(struct monst *, struct permonst *, boolean);
 
 /* True if mtmp died */
 boolean
-mb_trapped(struct monst* mtmp)
+mb_trapped(struct monst *mtmp, boolean canseeit)
 {
     if (flags.verbose) {
-        if (cansee(mtmp->mx, mtmp->my) && !Unaware)
+        if (canseeit && !Unaware)
             pline("KABOOM!!  You see a door explode.");
         else if (!Deaf)
-            You_hear("a distant explosion.");
+            You_hear("a %s explosion.",
+                     (distu(mtmp->mx, mtmp->my) > 7 * 7) ? "distant"
+                                                         : "nearby");
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
     mtmp->mhp -= rnd(15);
     if (DEADMONSTER(mtmp)) {
         mondied(mtmp);
-        if (!DEADMONSTER(mtmp)) /* lifesaved */
-            return FALSE;
-        else
+        if (DEADMONSTER(mtmp))
             return TRUE;
+        /* will get here if lifesaved */
     }
     return FALSE;
 }
@@ -1401,7 +1402,7 @@ m_move(register struct monst* mtmp, register int after)
 
                     UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
-                        if (mb_trapped(mtmp))
+                        if (mb_trapped(mtmp, canseeit))
                             return 2;
                     } else {
                         if (flags.verbose) {
@@ -1417,7 +1418,7 @@ m_move(register struct monst* mtmp, register int after)
                 } else if (here->doormask == D_CLOSED && can_open) {
                     UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
-                        if (mb_trapped(mtmp))
+                        if (mb_trapped(mtmp, canseeit))
                             return 2;
                     } else {
                         if (flags.verbose) {
@@ -1438,7 +1439,7 @@ m_move(register struct monst* mtmp, register int after)
                             : D_BROKEN);
                     UnblockDoor(here, mtmp, mask);
                     if (btrapped) {
-                        if (mb_trapped(mtmp))
+                        if (mb_trapped(mtmp, canseeit))
                             return 2;
                     } else {
                         if (flags.verbose) {
