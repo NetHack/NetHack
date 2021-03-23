@@ -6027,9 +6027,10 @@ some bug fixes.
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
 .UR https://www.nethack.org/ .
+.BR 1
 .pg
 .hn 2
-SPECIAL THANKS
+Special Thanks
 .pg
 On behalf of the NetHack community, thank you very much once
 again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
@@ -6038,15 +6039,20 @@ and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
 NetHack tournaments such as Junethack, The November NetHack Tournament,
 and in days past, devnull.net (gone for now, but not forgotten).
+.\" .pg
+.\" .ce
+.\" - - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too
+.\" .                          \" far to right, so pad them with a few spaces
+.BR 1
 .pg
-.ce
-- - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too far
-.                          \" to the right, so pad them with a few spaces
+.hn 2
+Dungeoneers
 .pg
 From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The NetHack
 Development Team sometimes makes note of the names of the worst of these
 miscreants in this, the list of Dungeoneers:
+.BR 1
 .
 .TS S
 center;
@@ -6096,6 +6102,7 @@ Irina Rempt-Drijfhout	Mike Passaretti
 Izchak Miller	Mike Stephenson
 .\"TABLE_END  Do not delete this line.
 .TE
+.BR 1
 .pg
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.
