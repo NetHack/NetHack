@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 18, 2021
+.ds f2 "March 25, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -793,6 +793,10 @@ You may select ammunition with a previous \(oqQ\(cq command, or let the
 computer pick something appropriate if
 .op autoquiver
 is true.
+If your wielded weapon has the throw-and-return property, your quiver
+is empty, and
+.op autoquiver
+is false, you will throw that wielded weapon instead of filling the quiver.
 .lp ""
 See also \(oqt\(cq (throw) for more general throwing and shooting.
 .lp i
@@ -2434,6 +2438,16 @@ Arrows can be thrown by hand, but can be thrown
 much farther and will be more likely to hit when thrown while you are
 wielding a bow.
 .pg
+Some weapons will return when thrown.
+A boomerang\(emprovided it fails to hit anything\(emis an obvious example.
+If an aklys (thonged club) is thrown while it is wielded, it will return
+even when it hits something.
+A sufficiently strong hero can throw the warhammer \fIMjollnir\fP;
+when thrown by a \fIValkyrie\fP it will return too.
+However, aklyses and \fIMjollnir\fP occasionally fail to return.
+Returning thrown objects occasionally fail to be caught, sometimes even
+hitting the thrower, but when caught they become re-wielded.
+.pg
 You can simplify the throwing operation by using the \(oqQ\(cq command to
 select your preferred \(lqmissile\(rq, then using the \(oqf\(cq command to
 throw it.
@@ -2444,9 +2458,13 @@ There is also an option,
 which has NetHack choose another item to automatically fill your
 quiver (or quiver sack, or have at the ready) when the inventory slot used
 for \(oqQ\(cq runs out.
+If your quiver is empty,
+.op autoquiver
+is false, and you are wielding a weapon which returns when thrown,
+you will throw that weapon instead of filling the quiver.
 .pg
-Some characters have the ability to fire a volley of multiple items in a
-single turn.
+Some characters have the ability to throw or shoot a volley of multiple
+items (from the same stack) in a single action.
 Knowing how to load several rounds of ammunition at
 once\(emor hold several missiles in your hand\(emand
 still hit a target is not an easy task.

@@ -855,6 +855,9 @@ give feedback when boolean options are toggled interactively ('O' command)
 menu_shift_left, menu_shift_right menu command keys; default '{' and '}'
 	(curses for perm_invent only; implemented for X11 too but menus for
 	it lack horizontal scroll bars so the shifts don't work there)
+using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
+	thrown-and-return weapon will throw that weapon instead of filling
+	the quiver (inspired by xNetHack)
 
 
 Platform- and/or Interface-Specific New Features
