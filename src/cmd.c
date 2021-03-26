@@ -2150,8 +2150,12 @@ key2extcmddesc(uchar key)
     }
     /* finally, check whether 'key' is a command */
     if (g.Cmd.commands[key]) {
-        if (g.Cmd.commands[key]->ef_txt)
-            return g.Cmd.commands[key]->ef_desc;
+        if (g.Cmd.commands[key]->ef_txt) {
+            Sprintf(key2cmdbuf, "%s (#%s)",
+                    g.Cmd.commands[key]->ef_desc,
+                    g.Cmd.commands[key]->ef_txt);
+            return key2cmdbuf;
+        }
     }
     return (char *) 0;
 }
