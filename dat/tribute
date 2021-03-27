@@ -2205,7 +2205,9 @@ so far was the ability to turn gold into less gold.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
-# pp. 44, 45, 46 (multiple paragraphs skipped in the first two gaps)
+# pp. 44, 45, 46 (multiple paragraphs skipped in the first two gaps;
+#                 the dog is Gaspode, who can talk but conceals that from
+#                 almost everybody; his use of 'bin' for 'been' is accurate)
 %passage 3
 He looked down.  There was a dog sitting by his feet.
 
@@ -2349,7 +2351,7 @@ nearest salad growing district was thirty slow miles away.
 
 Fruntkin the short-order chef hazarded a guess.
 
-'Celery?" he said.  He peered closer.  "Yeah, celery."
+"Celery?" he said.  He peered closer.  "Yeah, celery."
 
 "It /brown/."
 
@@ -2417,7 +2419,8 @@ All over the entire room, sometimes.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
-# p. 204 (passage ends mid-paragraph; musings are by Gaspode the dog)
+# p. 204 (passage ends mid-paragraph; musings are by Gaspode the dog;
+#         'sunnink', 'fings', 'wot' are accurate, as is 'finds' for 'find')
 %passage 13
 Sunnink dreadful in there, he thought.  Prob'ly tentacled fings that rips
 your face off.  I mean, when you finds mysterious doors in old hills, it
@@ -2440,7 +2443,7 @@ megalomaniac!"
 
 Dibbler removed his cigar.
 
-"That's /Mister/ Megalomanic to you," he said.
+"That's /Mister/ Megalomaniac to you," he said.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
