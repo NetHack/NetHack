@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.c	$NHDT-Date: 1614291055 2021/02/25 22:10:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1616891049 2021/03/28 00:24:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1923,7 +1923,7 @@ struct permonst _mons2[] = {
           NO_ATTK, NO_ATTK),
         SIZ(1200, 0, MS_SPELL, MZ_HUMAN), MR_COLD | MR_SLEEP | MR_POISON, 0,
         M1_BREATHLESS | M1_HUMANOID,
-        M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_COLLECT, 0, 7, CLR_GRAY),
+        M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_COLLECT, 0, 8, CLR_GRAY),
     MON("wraith", S_WRAITH, LVL(6, 12, 4, 15, -6), (G_GENO | 2),
         A(ATTK(AT_TUCH, AD_DRLI, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
