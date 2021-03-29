@@ -902,7 +902,7 @@ magic_negation(struct monst *mon)
             if (armpro > mc)
                 mc = armpro;
         } else if ((o->owornmask & W_AMUL) != 0L) {
-            via_amul = TRUE;
+            via_amul = (o->otyp == AMULET_OF_GUARDING);
         }
         /* if we've already confirmed Protection, skip additional checks */
         if (is_you || gotprot)
@@ -917,7 +917,8 @@ magic_negation(struct monst *mon)
     }
 
     if (gotprot) {
-        /* extrinsic Protection increases mc by 1; 2 for amulet */
+        /* extrinsic Protection increases mc by 1 (2 for amulet of guarding);
+           multiple sources don't provide multiple increments */
         mc += via_amul ? 2 : 1;
         if (mc > 3)
             mc = 3;
