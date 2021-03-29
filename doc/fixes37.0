@@ -426,6 +426,8 @@ also show extended command name when showing what a key does in help
 poly'd hero who exploded when attacking a monster didn't wake up other
 	monsters in the vicinity; when attacking thin air, hero's explosion
 	woke other monsters within different radius than same monster's would
+troll corpse revival was inhibited by hero wielding Trollsbane; do that if
+	anyone on level is wielding it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

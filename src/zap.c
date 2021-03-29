@@ -784,8 +784,7 @@ revive(struct obj *corpse, boolean by_hero)
     }
 
     if ((mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))
-        || (mons[montype].mlet == S_TROLL
-            && uwep && uwep->oartifact == ART_TROLLSBANE)) {
+        || (mons[montype].mlet == S_TROLL && Trollsbane_wielded())) {
         if (by_hero && cansee(x, y))
             pline("%s twitches feebly.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));

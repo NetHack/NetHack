@@ -2176,4 +2176,25 @@ has_magic_key(struct monst *mon) /* if null, hero assumed */
     return (struct obj *) 0;
 }
 
+/* True if anyone on the level is wielding Trollsbane, False otherwise;
+   used to prevent troll resurrection (FIXME: really ought to be inhibited
+   when killed by Trollsbane rather than whether anyone wields that) */
+boolean
+Trollsbane_wielded(void)
+{
+    struct monst *mtmp;
+    struct obj *mw_tmp;
+
+    if (uwep && uwep->oartifact == ART_TROLLSBANE)
+        return TRUE;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if ((mw_tmp = MON_WEP(mtmp)) != 0
+            && mw_tmp->oartifact == ART_TROLLSBANE)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /*artifact.c*/
