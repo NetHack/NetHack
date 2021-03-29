@@ -91,10 +91,10 @@ opt_##a,
     NHOPTC(altkeyhandler, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                "alternate key handler")
 #ifdef ALTMETA
-    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
                &iflags.altmeta)
 #else
-    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, Yes, No, No, NoAlias,
                (boolean *) 0)
 #endif
     NHOPTB(ascii_map, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
