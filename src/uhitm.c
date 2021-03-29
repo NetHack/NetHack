@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1614811212 2021/03/03 22:40:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.299 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1617035737 2021/03/29 16:35:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4063,16 +4063,18 @@ damageum(
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
     mdef->mhp -= mhm.damage;
     if (DEADMONSTER(mdef)) {
+        /* (DEADMONSTER(mdef) and !mhm.damage => already killed) */
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
             if (mhm.damage)
-                xkilled(mdef, XKILL_NOMSG); /* !mhm.damage but hp<1: already killed */
+                xkilled(mdef, XKILL_NOMSG);
         } else if (!flags.verbose) {
             You("destroy it!");
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
-        } else if (mhm.damage)
-            killed(mdef);
+        } else if (mhm.damage) {
+            killed(mdef); /* regular "you kill <mdef>" message */
+        }
         return MM_DEF_DIED;
     }
     return MM_HIT;
@@ -4126,6 +4128,7 @@ explum(struct monst *mdef, struct attack *mattk)
     default:
         break;
     }
+    wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as exploding monster */
     return MM_HIT;
 }
 
@@ -4746,7 +4749,8 @@ hmonas(struct monst *mon)
             (void) passive(mon, weapon, 1, 0, mattk->aatyp, FALSE);
             nsum = MM_MISS; /* return value below used to be 'nsum > 0' */
         } else {
-            (void) passive(mon, weapon, (sum[i] != MM_MISS), 1, mattk->aatyp, FALSE);
+            (void) passive(mon, weapon, (sum[i] != MM_MISS), 1,
+                           mattk->aatyp, FALSE);
             nsum |= sum[i];
         }
 

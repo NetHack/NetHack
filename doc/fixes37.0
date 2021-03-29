@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.488 $ $NHDT-Date: 1617034646 2021/03/29 16:17:26 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.489 $ $NHDT-Date: 1617035736 2021/03/29 16:35:36 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -423,6 +423,9 @@ if player managed to get multiple $ items, all but the last could be moved to
 when a monster on the far side of a closed door opens it, sometimes the hero
 	was told about the monster without it being displayed on the map
 also show extended command name when showing what a key does in help
+poly'd hero who exploded when attacking a monster didn't wake up other
+	monsters in the vicinity; when attacking thin air, hero's explosion
+	woke other monsters within different radius than same monster's would
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

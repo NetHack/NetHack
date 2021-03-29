@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1609442596 2020/12/31 19:23:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1617035736 2021/03/29 16:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1751,7 +1751,8 @@ domove_core(void)
 
         nomul(0);
         if (explo) {
-            wake_nearby();
+            /* no monster has been attacked so we have bypassed explum() */
+            wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
             u.mh = -1; /* dead in the current form */
             rehumanize();
         }
