@@ -2203,10 +2203,9 @@ create_object(object* o, struct mkroom* croom)
          * setting corpsenm).
          */
         for (wastyp = otmp->corpsenm; i < 1000; i++, wastyp = rndmonnum()) {
-            /* makemon without rndmonst() might create a group */
-            was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH);
+            was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH | MM_NOGRP);
             if (was) {
-                if (!resists_ston(was)) {
+                if (!resists_ston(was) && !poly_when_stoned(&mons[wastyp])) {
                     (void) propagate(wastyp, TRUE, FALSE);
                     break;
                 }
