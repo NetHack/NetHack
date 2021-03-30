@@ -1354,6 +1354,10 @@ consume_tin(const char *mesg)
 
         if (tintxts[r].nut < 0) /* rotten */
             make_vomiting((long) rn1(15, 10), FALSE);
+        else if (r == HOMEMADE_TIN)
+            /* presume a homemade tin is made from a single corpse; it can't
+             * contain more nutrition than the corpse did */
+            lesshungry(min(tintxts[HOMEMADE_TIN].nut, mons[mnum].cnutrit));
         else
             lesshungry(tintxts[r].nut);
 
