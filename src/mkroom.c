@@ -385,10 +385,17 @@ fill_zoo(struct mkroom* sroom)
                     struct obj *sobj = mk_tt_object(STATUE, sx, sy);
 
                     if (sobj) {
-                        for (i = rn2(5); i; i--)
-                            (void) add_to_container(
-                                sobj, mkobj(RANDOM_CLASS, FALSE));
-                        sobj->owt = weight(sobj);
+                        if (poly_when_stoned(&mons[sobj->corpsenm])
+                            || (mons[sobj->corpsenm].mresists & MR_STONE)) {
+                            /* remove statue of stone-resistant monster (can
+                             * be produced when high-score list is empty) */
+                            delobj(sobj);
+                        } else {
+                            for (i = rn2(5); i; i--)
+                                (void) add_to_container(
+                                        sobj, mkobj(RANDOM_CLASS, FALSE));
+                            sobj->owt = weight(sobj);
+                        }
                     }
                 }
                 break;
