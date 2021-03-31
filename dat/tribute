@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1614818317 2021/03/04 00:38:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $
+# NetHack 3.7  tribute       $NHDT-Date: 1617150563 2021/03/31 00:29:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -2461,6 +2461,37 @@ Dibbler removed his cigar.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
+#
+# New for 3.7 - these are worthy but 16 passages are already more than enough.
+#-#
+#-# p. 304
+#-%passage 17
+#-"Did I hear things, or can that little dog speak?" said Dibbler.
+#-
+#-"He says he can't," said Victor.
+#-
+#-Dibbler hesitated.  The excitement was unhinging him a little.  "Well," he
+#-said, "I suppose he should know."
+#-
+#-  [Moving Pictures, by Terry Pratchett]
+#-%e passage
+#-# p. 329 (two farmers have just watched a pair of wizards incompetently
+#-#         flying together on a broom crash into a barn containing harvested
+#-#         cabbages; one of them had predicted, accurately as it turned out,
+#-#         that the flyers would crash out the far side accompanied by
+#-#         scattering chickens and a shower of feathers; 'believer' had
+#-#         scoffed at the prediction because there were no chickens inside;
+#-#         they've just looked inside and confirmed the lack of any poultry)
+#-%passage 18
+#-The farmers crept away.
+#-
+#-"Dang me," said the believer in cabbages.  "They're wizards.  Best not to
+#-meddle in the affairs of danged wizards."
+#-
+#-"Yeah," said the other farmer.  "Er... what does dang mean?  Exactly?"
+#-
+#-  [Moving Pictures, by Terry Pratchett]
+#-%e passage
 %e title
 #
 #
