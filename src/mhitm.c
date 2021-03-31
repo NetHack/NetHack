@@ -906,11 +906,11 @@ mdamagem(struct monst *magr, struct monst *mdef,
             place_monster(mdef, mdef->mx, mdef->my);
             mdef->mhp = 0;
         }
-        g.zombify = !mwep && zombie_maker(magr->data)
-            && ((mattk->aatyp == AT_TUCH
-                 || mattk->aatyp == AT_CLAW
-                 || mattk->aatyp == AT_BITE)
-                && zombie_form(mdef->data) != NON_PM);
+        g.zombify = (!mwep && zombie_maker(magr)
+                     && (mattk->aatyp == AT_TUCH
+                         || mattk->aatyp == AT_CLAW
+                         || mattk->aatyp == AT_BITE)
+                     && zombie_form(mdef->data) != NON_PM);
         monkilled(mdef, "", (int) mattk->adtyp);
         g.zombify = FALSE; /* reset */
         if (!DEADMONSTER(mdef))

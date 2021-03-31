@@ -476,7 +476,7 @@ const struct instance_globals g_init = {
 
     /* mkmaze.c */
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} }, /* bughack */
-    UNDEFINED_VALUE, /* was_waterlevel */
+    FALSE, /* was_waterlevel */
     UNDEFINED_PTR, /* bbubbles */
     UNDEFINED_PTR, /* ebubbles */
     UNDEFINED_PTR, /* wportal */
@@ -487,9 +487,9 @@ const struct instance_globals g_init = {
     0, /* ransacked */
 
     /* mon.c */
-    UNDEFINED_VALUE, /* vamp_rise_msg */
-    UNDEFINED_VALUE, /* disintegested */
-    UNDEFINED_VALUE, /* zombify */
+    FALSE, /* vamp_rise_msg */
+    FALSE, /* disintegested */
+    FALSE, /* zombify */
     NULL, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
 
@@ -502,7 +502,7 @@ const struct instance_globals g_init = {
     FALSE, /* m_using */
     UNDEFINED_VALUE, /* trapx */
     UNDEFINED_VALUE, /* trapy */
-    UNDEFINED_VALUE, /* zap_oseen */
+    FALSE, /* zap_oseen */
     UNDEFINED_VALUES, /* m */
 
     /* nhlan.c */

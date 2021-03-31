@@ -1375,7 +1375,7 @@ extern int cmap_to_type(int);
 /* ### mon.c ### */
 
 extern void mon_sanity_check(void);
-extern boolean zombie_maker(struct permonst *);
+extern boolean zombie_maker(struct monst *);
 extern int zombie_form(struct permonst *);
 extern int m_poisongas_ok(struct monst *);
 extern int undead_to_corpse(int);
