@@ -3082,9 +3082,7 @@ mhitm_ad_conf(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_poly(struct monst *magr,
-              struct attack *mattk UNUSED, /* implied */
-              struct monst *mdef,
+mhitm_ad_poly(struct monst *magr, struct attack *mattk, struct monst *mdef,
               struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
@@ -3097,6 +3095,7 @@ mhitm_ad_poly(struct monst *magr,
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
     } else if (mdef == &g.youmonst) {
         /* mhitu */
+        hitmsg(magr, mattk);
         int armpro = magic_negation(mdef);
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
 
