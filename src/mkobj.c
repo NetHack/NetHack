@@ -1627,10 +1627,15 @@ mk_tt_object(
     /* player statues never contain books */
     initialize_it = (objtype != STATUE);
     otmp = mksobj_at(objtype, x, y, initialize_it, FALSE);
-    /* tt_oname() will return null if the scoreboard is empty;
-       assigning an object name used to allocate a new obj but
-       doesn't any more so we can safely ignore the return value */
-    (void) tt_oname(otmp);
+
+    /* tt_oname() will return null if the scoreboard is empty, which in
+       turn leaves the random corpsenm value; force it to match a player */
+    if (!tt_oname(otmp)) {
+        int pm = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+
+        /* update weight for either, force timer sanity for corpses */
+        set_corpsenm(otmp, pm);
+    }
 
     return otmp;
 }

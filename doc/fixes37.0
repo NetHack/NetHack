@@ -428,6 +428,11 @@ poly'd hero who exploded when attacking a monster didn't wake up other
 	woke other monsters within different radius than same monster's would
 troll corpse revival was inhibited by hero wielding Trollsbane; do that if
 	anyone on level is wielding it
+statues representing petrified creatures on Medusa's level might be from
+	monsters who change form (golems) when hit with stoning damage
+attempt to make corpse or statue of a named player character would yield that
+	of a random monster instead when 'record' was empty; could result in
+	statues of non-stonable creatures in cockatrice nests
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
