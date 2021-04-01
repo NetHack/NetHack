@@ -434,6 +434,8 @@ attempt to make corpse or statue of a named player character would yield that
 	of a random monster instead when 'record' was empty; could result in
 	statues of non-stonable creatures in cockatrice nests
 homemade tin of very low nutrition corpse gave more nutrition than the corpse
+magic mapping performed while engulfed or underwater would display whole map
+	but then not switch back to the engulfed or underwater restricted view
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

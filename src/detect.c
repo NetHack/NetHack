@@ -1334,9 +1334,12 @@ do_mapping(void)
         /* browse_map() instead of display_nhwindow(WIN_MAP, TRUE) */
         browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ,
                    "anything of interest");
-        docrt();
+        map_redisplay(); /* calls reconstrain_map() and docrt() */
+    } else {
+        /* we only get here when unconstrained is False, so reconstrain_map
+           will be a no-op; call it anyway */
+        reconstrain_map();
     }
-    reconstrain_map();
     exercise(A_WIS, TRUE);
 }
 
