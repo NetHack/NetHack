@@ -1352,10 +1352,19 @@ consume_tin(const char *mesg)
         /* charge for one at pre-eating cost */
         tin = costly_tin(COST_OPEN);
 
-        if (tintxts[r].nut < 0) /* rotten */
+        if (tintxts[r].nut < 0) { /* rotten */
             make_vomiting((long) rn1(15, 10), FALSE);
-        else
-            lesshungry(tintxts[r].nut);
+        } else {
+            int nutamt = tintxts[r].nut;
+
+            /* nutrition from a homemade tin (made from a single corpse)
+               shouldn't be more than nutrition from the corresponding
+               corpse; other tinning modes might use more than one corpse
+               or add extra ingredients so aren't similarly restricted */
+            if (r == HOMEMADE_TIN && nutamt > mons[mnum].cnutrit)
+                nutamt = mons[mnum].cnutrit;
+            lesshungry(nutamt);
+        }
 
         if (tintxts[r].greasy) {
             /* Assume !Glib, because you can't open tins when Glib. */

@@ -433,7 +433,7 @@ statues representing petrified creatures on Medusa's level might be from
 attempt to make corpse or statue of a named player character would yield that
 	of a random monster instead when 'record' was empty; could result in
 	statues of non-stonable creatures in cockatrice nests
-indent items in perm_invent window
+homemade tin of very low nutrition corpse gave more nutrition than the corpse
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -615,6 +615,7 @@ curses: for vertical status, line up conditions in columns; usually two but
 	condense to three per line if the status window isn't tall enough
 	[at present, highlighting with inverse video includes trailing spaces
 	used to align entries in their columns--that's a feature...]
+curses: indent items in perm_invent window by one space
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
