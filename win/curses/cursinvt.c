@@ -302,9 +302,9 @@ curs_add_invt(
 
     len = strlen(str);
     if (accelerator) {
-        /* +3: ")c " inventory letter will be inserted before invtxt;
+        /* +4: " )c " inventory letter will be inserted before invtxt;
            invtxt's "a "/"an "/"the " prefix, if any, will be skipped */
-        len += 3;
+        len += 4;
         if (len > pi.widest)
             len -= pi_article_skip(str);
     }
