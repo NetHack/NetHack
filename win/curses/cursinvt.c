@@ -362,8 +362,9 @@ curs_show_invt(WINDOW *win)
             /* despite being shown as a menu, nothing is selectable from the
                persistent inventory window so avoid the usual highlighting
                of inventory letters */
-            wprintw(win, "%c) ", accelerator);
-            available_width -= 3; /* letter+parenthesis+space */
+            wprintw(win, " %c) ", accelerator);
+            available_width -= 4; /* space+letter+parenthesis+space */
+
             /*
              * Narrow the entries to fit more of the interesting text,
              * but defer the removal until after menu colors matching.
