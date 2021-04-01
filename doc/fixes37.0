@@ -580,6 +580,7 @@ curses: line input that doesn't take place on the bottom line of the message
 	partial input or to cancel; "Who are you?" prompt was willing to name
 	a character "^["; have the popup version of getlin() fake the usual
 	ESC handling, but player has to type <escape><return> for that to work
+curses: menu headings didn't use default text color
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching

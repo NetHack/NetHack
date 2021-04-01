@@ -1238,16 +1238,16 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
             start_col += 2;
         }
 #endif
-        color = NO_COLOR;
+        color = NONE;
         menu_color = iflags.use_menu_color
                      && get_menu_coloring(menu_item_ptr->str, &color, &attr);
         if (menu_color) {
             attr = curses_convert_attr(attr);
-            if (color != NO_COLOR || attr != A_NORMAL)
+            if (color != NONE || attr != A_NORMAL)
                 curses_menu_color_attr(win, color, attr, ON);
         } else {
             attr = menu_item_ptr->attr;
-            if (color != NO_COLOR || attr != A_NORMAL)
+            if (color != NONE || attr != A_NORMAL)
                 curses_toggle_color_attr(win, color, attr, ON);
         }
 
@@ -1261,7 +1261,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
                 free(tmpstr);
             }
         }
-        if (color != NO_COLOR || attr != A_NORMAL) {
+        if (color != NONE || attr != A_NORMAL) {
             if (menu_color)
                 curses_menu_color_attr(win, color, attr, OFF);
             else
