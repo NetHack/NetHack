@@ -3000,12 +3000,13 @@ end_running(boolean and_travel)
     g.context.run = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
-    if (and_travel)
+    if (and_travel) {
         g.context.travel = g.context.travel1 = g.context.mv = 0;
-    
-    // Cancel mutli
-    if (g.multi > 0) 
-        g.multi = 0;
+
+        /* Cancel multi */
+        if (g.multi > 0) 
+            g.multi = 0;
+    }
 }
 
 void
