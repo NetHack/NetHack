@@ -289,14 +289,15 @@ loot_xname(struct obj *obj)
     return res;
 }
 
+/* '$'==1, 'a'-'z'==2..27, 'A'-'Z'==28..53, '#'==54, catchall 55 */
 static int
 invletter_value(char c)
 {
     return ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-        : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
-        : (c == '$') ? 1
-        : (c == '#') ? 1 + 52 + 1
-        : 1 + 52 + 1 + 1; /* none of the above */
+           : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
+             : (c == '$') ? 1
+               : (c == '#') ? 1 + 52 + 1
+                 : 1 + 52 + 1 + 1; /* none of the above (shouldn't happen) */
 }
 
 /* qsort comparison routine for sortloot() */
@@ -467,10 +468,11 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
  *      instead of simple 'struct obj *' entries.
  */
 Loot *
-sortloot(struct obj **olist, /* previous version might have changed *olist, we don't */
-         unsigned mode, /* flags for sortloot_cmp() */
-         boolean by_nexthere, /* T: traverse via obj->nexthere, F: via obj->nobj */
-         boolean (*filterfunc)(OBJ_P))
+sortloot(
+    struct obj **olist,  /* old version might have changed *olist, we don't */
+    unsigned mode,       /* flags for sortloot_cmp() */
+    boolean by_nexthere, /* T: traverse via obj->nexthere, F: via obj->nobj */
+    boolean (*filterfunc)(struct obj *)) /* optional filter */
 {
     Loot *sliarray;
     struct obj *o;
@@ -527,11 +529,12 @@ unsortloot(Loot **loot_array_p)
         free((genericptr_t) *loot_array_p), *loot_array_p = (Loot *) 0;
 }
 
-#if 0 /* 3.6.0 'revamp' */
+#if 0 /* 3.6.0 'revamp' -- simpler than current, but ultimately too simple */
 void
-sortloot(struct obj **olist, unsigned mode, /* flags for sortloot_cmp() */
-         boolean by_nexthere) /* T: traverse via obj->nexthere,
-                                 F: via obj->nobj */
+sortloot(
+    struct obj **olist,
+    unsigned mode,       /* flags for sortloot_cmp() */
+    boolean by_nexthere) /* T: traverse via obj->nexthere, F: via obj->nobj */
 {
     struct sortloot_item *sliarray, osli, nsli;
     struct obj *o, **nxt_p;
@@ -623,7 +626,7 @@ reorder_invent(void)
          * isn't nearly as inefficient as it may first appear.
          */
         need_more_sorting = FALSE;
-        for (otmp = g.invent, prev = 0; otmp;) {
+        for (otmp = g.invent, prev = 0; otmp; ) {
             next = otmp->nobj;
             if (next && inv_rank(next) < inv_rank(otmp)) {
                 need_more_sorting = TRUE;

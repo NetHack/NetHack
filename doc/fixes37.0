@@ -438,6 +438,10 @@ magic mapping performed while engulfed or underwater would display whole map
 	but then not switch back to the engulfed or underwater restricted view
 #overview used hardcoded bold and inverse for highlighting; switch to the
 	'menu_headings' option value so player has some control
+for menustyle:full, the 'A' menu choice to auto-select everything now only
+	does so if no other choices have been picked; when any have (object
+	class or BUCX state or both), it auto-selects every item that matches
+	those choices (so still skips the second menu) rather than every item
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

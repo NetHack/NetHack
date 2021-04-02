@@ -819,8 +819,7 @@ menu_drop(int retry)
     long cnt;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
-    boolean all_categories = TRUE;
-    boolean drop_everything = FALSE;
+    boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
 
     if (retry) {
         all_categories = (retry == -2);
@@ -834,12 +833,14 @@ menu_drop(int retry)
         if (!n)
             goto drop_done;
         for (i = 0; i < n; i++) {
-            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED)
+            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
-            else if (pick_list[i].item.a_int == 'A')
-                drop_everything = TRUE;
-            else
+            } else if (pick_list[i].item.a_int == 'A') {
+                drop_everything = autopick = TRUE;
+            } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
+                drop_everything = FALSE;
+            }
         }
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
@@ -856,7 +857,7 @@ menu_drop(int retry)
         }
     }
 
-    if (drop_everything) {
+    if (autopick) {
         /*
          * Dropping a burning potion of oil while levitating can cause
          * an explosion which might destroy some of hero's inventory,
@@ -870,10 +871,16 @@ menu_drop(int retry)
          * Use the bypass bit to mark items already processed (hence
          * not droppable) and rescan inventory until no unbypassed
          * items remain.
+         *
+         * FIXME?  if something explodes, or even breaks, we probably
+         * ought to halt the traversal or perhaps ask player whether
+         * to halt it.
          */
         bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */
-        while ((otmp = nxt_unbypassed_obj(g.invent)) != 0)
-            n_dropped += drop(otmp);
+        while ((otmp = nxt_unbypassed_obj(g.invent)) != 0) {
+            if (drop_everything || all_categories || allow_category(otmp))
+                n_dropped += drop(otmp);
+        }
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
         bypass_objlist(g.invent, FALSE);
