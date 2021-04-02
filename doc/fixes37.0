@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.489 $ $NHDT-Date: 1617035736 2021/03/29 16:35:36 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.498 $ $NHDT-Date: 1617388018 2021/04/02 18:26:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -426,8 +426,8 @@ also show extended command name when showing what a key does in help
 poly'd hero who exploded when attacking a monster didn't wake up other
 	monsters in the vicinity; when attacking thin air, hero's explosion
 	woke other monsters within different radius than same monster's would
-troll corpse revival was inhibited by hero wielding Trollsbane; do that if
-	anyone on level is wielding it
+troll corpse revival was inhibited by hero wielding Trollsbane; change that
+	to being killed by Trollsbane instead (wielded by hero or by monster)
 statues representing petrified creatures on Medusa's level might be from
 	monsters who change form (golems) when hit with stoning damage
 attempt to make corpse or statue of a named player character would yield that
