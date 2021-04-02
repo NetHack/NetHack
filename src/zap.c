@@ -783,9 +783,9 @@ revive(struct obj *corpse, boolean by_hero)
             x = xy.x, y = xy.y;
     }
 
-    if ((mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))
-        || (mons[montype].mlet == S_TROLL && Trollsbane_wielded())) {
-        if (by_hero && cansee(x, y))
+    if (corpse->norevive
+        || (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ))) {
+        if (cansee(x, y))
             pline("%s twitches feebly.",
                 upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
         return (struct monst *) 0;
@@ -961,6 +961,7 @@ unturn_dead(struct monst *mon)
     struct obj *otmp, *otmp2;
     struct monst *mtmp2;
     char owner[BUFSZ], corpse[BUFSZ];
+    unsigned save_norevive;
     boolean youseeit, different_type, is_u = (mon == &g.youmonst);
     int corpsenm, res = 0;
 
@@ -987,6 +988,10 @@ unturn_dead(struct monst *mon)
         /* for a stack, only one is revived; if is_u, revive() calls
            useup() which calls update_inventory() but not encumber_msg() */
         corpsenm = otmp->corpsenm;
+        /* norevive applies to revive timer, not to explicit unturn_dead() */
+        save_norevive = otmp->norevive;
+        otmp->norevive = 0;
+
         if ((mtmp2 = revive(otmp, !g.context.mon_moving)) != 0) {
             ++res;
             /* might get revived as a zombie rather than corpse's monster */
@@ -1005,9 +1010,13 @@ unturn_dead(struct monst *mon)
                 pline("%s%s suddenly %s%s%s!", owner, corpse,
                       nonliving(mtmp2->data) ? "reanimates" : "comes alive",
                       different_type ? " as " : "",
-                      different_type ? an(pmname(mtmp2->data, Mgender(mtmp2))) : "");
+                      different_type ? an(pmname(mtmp2->data, Mgender(mtmp2)))
+                                     : "");
             else if (canseemon(mtmp2))
                 pline("%s suddenly appears!", Amonnam(mtmp2));
+        } else {
+            /* revival failed; corpse 'otmp' is intact */
+            otmp->norevive = save_norevive ? 1 : 0;
         }
     }
     if (is_u && res)

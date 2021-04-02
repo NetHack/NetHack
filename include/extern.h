@@ -98,7 +98,6 @@ extern void retouch_equipment(int);
 extern void mkot_trap_warn(void);
 extern boolean is_magic_key(struct monst *, struct obj *);
 extern struct obj *has_magic_key(struct monst *);
-extern boolean Trollsbane_wielded(void);
 
 /* ### attrib.c ### */
 

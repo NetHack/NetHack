@@ -1941,7 +1941,7 @@ revive_mon(anything *arg, long timeout UNUSED)
         } else { /* rot this corpse away */
             You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
             action = ROT_CORPSE;
-            when = 250L - (g.monstermoves - body->age);
+            when = (long) d(5, 50) - (g.monstermoves - body->age);
             if (when < 1L)
                 when = 1L;
         }
@@ -1950,15 +1950,13 @@ revive_mon(anything *arg, long timeout UNUSED)
 }
 
 /* Timeout callback. Revive the corpse as a zombie. */
-/*ARGSUSED*/
 void
-zombify_mon(anything *arg, long timeout UNUSED)
+zombify_mon(anything *arg, long timeout)
 {
     struct obj *body = arg->a_obj;
     int zmon = zombie_form(&mons[body->corpsenm]);
 
     if (zmon != NON_PM) {
-
         if (has_omid(body))
             free_omid(body);
         if (has_omonst(body))
@@ -1966,6 +1964,8 @@ zombify_mon(anything *arg, long timeout UNUSED)
 
         body->corpsenm = zmon;
         revive_mon(arg, timeout);
+    } else {
+        rot_corpse(arg, timeout);
     }
 }
 

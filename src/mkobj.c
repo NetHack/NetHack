@@ -1136,44 +1136,43 @@ void
 start_corpse_timeout(struct obj* body)
 {
     long when;       /* rot away when this old */
-    long corpse_age; /* age of corpse          */
+    long age;        /* age of corpse          */
     int rot_adjust;
     short action;
-    boolean no_revival;
 
-    /* if a troll corpse was frozen, it won't get a revive timer */
-    no_revival = (body->norevive != 0);
-    body->norevive = 0; /* always clear corpse's 'frozen' flag */
+    /*
+     * Note:
+     *      if body->norevive is set, the corpse will rot away instead
+     *      of revive when its REVIVE_MON timer finishes.
+     */
 
     /* lizards and lichen don't rot or revive */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
         return;
 
-    action = ROT_CORPSE;             /* default action: rot away */
+    action = ROT_CORPSE;               /* default action: rot away */
     rot_adjust = g.in_mklev ? 25 : 10; /* give some variation */
-    corpse_age = g.monstermoves - body->age;
-    if (corpse_age > ROT_AGE)
+    age = g.monstermoves - body->age;
+    if (age > ROT_AGE)
         when = rot_adjust;
     else
-        when = ROT_AGE - corpse_age;
+        when = ROT_AGE - age;
     when += (long) (rnz(rot_adjust) - rot_adjust);
 
     if (is_rider(&mons[body->corpsenm])) {
         action = REVIVE_MON;
         when = rider_revival_time(body, FALSE);
-    } else if (mons[body->corpsenm].mlet == S_TROLL && !no_revival) {
-        long age;
-
+    } else if (mons[body->corpsenm].mlet == S_TROLL) {
         for (age = 2; age <= TAINT_AGE; age++)
             if (!rn2(TROLL_REVIVE_CHANCE)) { /* troll revives */
                 action = REVIVE_MON;
                 when = age;
                 break;
             }
-    } else if (!no_revival && g.zombify
-               && zombie_form(&mons[body->corpsenm]) != NON_PM) {
+    } else if (g.zombify && zombie_form(&mons[body->corpsenm]) != NON_PM
+               && !body->norevive) {
         action = ZOMBIFY_MON;
-        when = 5 + rn2(15);
+        when = rn1(15, 5); /* 5..19 */
     }
 
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
@@ -1463,10 +1462,10 @@ mkgold(long amount, int x, int y)
  */
 struct obj *
 mkcorpstat(
-    int objtype, /* CORPSE or STATUE */
-    struct monst *mtmp,
-    struct permonst *ptr,
-    int x, int y,
+    int objtype,          /* CORPSE or STATUE */
+    struct monst *mtmp,   /* dead monster, might be Null */
+    struct permonst *ptr, /* if non-Null, overrides mtmp->mndx */
+    int x, int y,         /* where to place corpse; <0,0> => random */
     unsigned corpstatflags)
 {
     struct obj *otmp;
@@ -1480,6 +1479,7 @@ mkcorpstat(
     } else {
         otmp = mksobj_at(objtype, x, y, init, FALSE);
     }
+    otmp->norevive = g.mkcorpstat_norevive;
 
     /* when 'mtmp' is non-null save the monster's details with the
        corpse or statue; it will also force the 'ptr' override below */

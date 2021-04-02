@@ -1361,6 +1361,7 @@ hmon_hitmon(struct monst *mon,
     /* [note: thrown obj might go away during killed()/xkilled() call
        (via 'thrownobj'; if swallowed, it gets added to engulfer's
        minvent and might merge with a stack that's already there)] */
+    /* already_killed and poiskilled won't apply for Trollsbane */
 
     if (needpoismsg)
         pline_The("poison doesn't seem to affect %s.", mon_nam(mon));
@@ -1370,8 +1371,12 @@ hmon_hitmon(struct monst *mon,
             xkilled(mon, XKILL_NOMSG);
         destroyed = TRUE; /* return FALSE; */
     } else if (destroyed) {
-        if (!already_killed)
+        if (!already_killed) {
+            if (troll_baned(mon, obj))
+                g.mkcorpstat_norevive = TRUE;
             killed(mon); /* takes care of most messages */
+            g.mkcorpstat_norevive = FALSE;
+        }
     } else if (u.umconf && hand_to_hand) {
         nohandglow(mon);
         if (!mon->mconf && !resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
@@ -3306,7 +3311,8 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                    || mattk->aatyp == AT_TUCH
                    || mattk->aatyp == AT_HUGS) {
             if (thick_skinned(pd))
-                mhm->damage = (mattk->aatyp == AT_KICK) ? 0 : (mhm->damage + 1) / 2;
+                mhm->damage = (mattk->aatyp == AT_KICK) ? 0
+                              : (mhm->damage + 1) / 2;
             /* add ring(s) of increase damage */
             if (u.udaminc > 0) {
                 /* applies even if damage was 0 */
@@ -3362,7 +3368,8 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 if (mhm->damage <= 0)
                     mhm->damage = 1;
                 if (!(otmp->oartifact && artifact_hit(magr, mdef, otmp,
-                                                      &mhm->damage, g.mhitu_dieroll)))
+                                                      &mhm->damage,
+                                                      g.mhitu_dieroll)))
                     hitmsg(magr, mattk);
                 if (!mhm->damage)
                     return;
@@ -3434,7 +3441,8 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                    now we'll know and might need to deliver skipped message
                    (note: if there's no message there'll be no auxilliary
                    damage so the message here isn't coming too late) */
-                if (!artifact_hit(magr, mdef, mwep, &mhm->damage, mhm->dieroll)) {
+                if (!artifact_hit(magr, mdef, mwep, &mhm->damage,
+                                  mhm->dieroll)) {
                     if (g.vis)
                         pline("%s hits %s.", Monnam(magr),
                               mon_nam_too(mdef, magr));
@@ -3443,7 +3451,8 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
                 if (DEADMONSTER(mdef)) {
-                    mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                    mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0
+                                                    : MM_AGR_DIED));
                     mhm->done = TRUE;
                     return;
                 }
@@ -4044,6 +4053,7 @@ damageum(
     int specialdmg) /* blessed and/or silver bonus against various things */
 {
     struct mhitm_data mhm;
+
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     mhm.hitflags = MM_MISS;
     mhm.permdmg = 0;
@@ -4063,6 +4073,12 @@ damageum(
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
     mdef->mhp -= mhm.damage;
     if (DEADMONSTER(mdef)) {
+        /* troll killed by Trollsbane won't auto-revive; FIXME? same when
+           Trollsbane is wielded as primary and two-weaponing kills with
+           secondary, which matches monster vs monster behavior but is
+           different from the non-poly'd hero vs monster behavior */
+        if (mattk->aatyp == AT_WEAP || mattk->aatyp == AT_CLAW)
+            g.mkcorpstat_norevive = troll_baned(mdef, uwep) ? TRUE : FALSE;
         /* (DEADMONSTER(mdef) and !mhm.damage => already killed) */
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
@@ -4075,6 +4091,7 @@ damageum(
         } else if (mhm.damage) {
             killed(mdef); /* regular "you kill <mdef>" message */
         }
+        g.mkcorpstat_norevive = FALSE;
         return MM_DEF_DIED;
     }
     return MM_HIT;
@@ -4393,7 +4410,8 @@ hmonas(struct monst *mon)
     struct attack *mattk, alt_attk;
     struct obj *weapon, **originalweapon;
     boolean altwep = FALSE, weapon_used = FALSE, odd_claw = TRUE;
-    int i, tmp, armorpenalty, sum[NATTK], nsum = MM_MISS, dhit = 0, attknum = 0;
+    int i, tmp, armorpenalty, sum[NATTK], nsum = MM_MISS,
+        dhit = 0, attknum = 0;
     int dieroll, multi_claw = 0;
 
     /* with just one touch/claw/weapon attack, both rings matter;
@@ -4425,7 +4443,8 @@ hmonas(struct monst *mon)
                get to make another weapon attack (note:  monsters who
                use weapons do not have this restriction, but they also
                never have the opportunity to use two weapons) */
-            if (weapon_used && (sum[i - 1] > MM_MISS) && uwep && bimanual(uwep))
+            if (weapon_used && (sum[i - 1] > MM_MISS)
+                && uwep && bimanual(uwep))
                 continue;
             /* Certain monsters don't use weapons when encountered as enemies,
              * but players who polymorph into them have hands or claws and
@@ -4674,7 +4693,8 @@ hmonas(struct monst *mon)
                 if (silverhit && flags.verbose)
                     silver_sears(&g.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
-            } else if (i >= 2 && (sum[i - 1] > MM_MISS) && (sum[i - 2] > MM_MISS)) {
+            } else if (i >= 2 && (sum[i - 1] > MM_MISS)
+                       && (sum[i - 2] > MM_MISS)) {
                 /* in case we're hugging a new target while already
                    holding something else; yields feedback
                    "<u.ustuck> is no longer in your clutches" */

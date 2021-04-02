@@ -486,6 +486,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ymax */
     0, /* ransacked */
 
+    /* mkobj.c */
+    FALSE, /* mkcorpstat_norevive */
+
     /* mon.c */
     FALSE, /* vamp_rise_msg */
     FALSE, /* disintegested */

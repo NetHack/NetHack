@@ -961,6 +961,9 @@ struct instance_globals {
     int xmin, ymin, xmax, ymax; /* level boundaries */
     boolean ransacked;
 
+    /* mkobj.c */
+    boolean mkcorpstat_norevive; /* for trolls */
+
     /* mon.c */
     boolean vamp_rise_msg;
     boolean disintegested;
