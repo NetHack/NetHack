@@ -945,7 +945,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
 {
     if (mdef == &g.youmonst) {
         if (Antimagic) {
-            shieldeff(mdef->mx, mdef->my);
+            shieldeff(u.ux, u.uy);
         } else if (Unchanging) {
             ; /* just take a little damage */
         } else {
