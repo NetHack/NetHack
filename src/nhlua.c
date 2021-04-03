@@ -330,7 +330,7 @@ nhl_getmap(lua_State *L)
 
             if (IS_DOOR(levl[x][y].typ)) {
                 nhl_add_table_entry_bool(L, "nodoor",
-                                         (levl[x][y].flags & D_NODOOR));
+                                         (levl[x][y].flags == D_NODOOR));
                 nhl_add_table_entry_bool(L, "broken",
                                          (levl[x][y].flags & D_BROKEN));
                 nhl_add_table_entry_bool(L, "isopen",
