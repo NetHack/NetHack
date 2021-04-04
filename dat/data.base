@@ -5804,3 +5804,377 @@ yumi
 zruty
 	The zruty are wild and gigantic beings, living in the
 	wildernesses of the Tatra mountains.
+##
+# Rank titles for the various roles.  Some of these keys won't reach here
+# because they'll have matched entries above.  The usual three letter role
+# designation plus " ranks" should always find the set for that role.
+#
+arc* ranks
+archeologist
+digger
+field worker
+investigator
+exhumer
+excavator
+spelunker
+speleologist
+collector
+curator
+	Archelogist ranks
+	  title            level
+	Digger            1 to 2
+	Field Worker      3 to 5
+	Investigator      6 to 9
+	Exhumer          10 to 13
+	Excavator        14 to 17
+	Spelunker        18 to 21
+	Speleologist     22 to 25
+	Collector        26 to 29
+	Curator             30
+bar* ranks
+barbarian
+plunder?*
+pillager
+bandit
+brigand
+raider
+reaver
+slayer
+chieftain*
+conquer*
+	Barbarian ranks
+	  title            level
+	Plunderer,
+	 Plunderess       1 to 2
+	Pillager          3 to 5
+	Bandit            6 to 9
+	Brigand          10 to 13
+	Raider           14 to 17
+	Reaver           18 to 21
+	Slayer           22 to 25
+	Chieftain,
+	 Chieftainess    26 to 29
+	Conqueror,
+	 Conqueress         30
+cav* ranks
+caveman
+cavewoman
+cave dweller
+troglodyte
+aborigine
+wanderer
+vagrant
+wayfarer
+roamer
+nomad
+rover
+pioneer
+	Caveman/Cavewoman/Cave Dweller ranks
+	  title            level
+	Troglodyte        1 to 2
+	Aborigine         3 to 5
+	Wanderer          6 to 9
+	Vagrant          10 to 13
+	Wayfarer         14 to 17
+	Roamer           18 to 21
+	Nomad            22 to 25
+	Rover            26 to 29
+	Pioneer             30
+hea* ranks
+healer
+rhizotomist
+empiric
+embalmer
+dresser
+medic* ossium
+herbalist
+magister
+magistra
+physician
+chirurgeon
+	Healer ranks
+	  title            level
+	Rhizotomist       1 to 2
+	Empiric           3 to 5
+	Embalmer          6 to 9
+	Dresser          10 to 13
+	Medicus ossium,
+	 Medica ossium   14 to 17
+	Herbalist        18 to 21
+	Magister,
+	 Magistra        22 to 25
+	Physician        26 to 29
+	Chirurgeon          30
+kni* ranks
+knight
+gallant
+esquire
+bachelor
+sergeant
+knight
+banneret
+chevalier*
+seignieur
+dame
+paladin
+	Knight ranks
+	  title            level
+	Gallant           1 to 2
+	Esquire           3 to 5
+	Bachelor          6 to 9
+	Sergeant         10 to 13
+	Knight           14 to 17
+	Banneret         18 to 21
+	Chevalier,
+	 Chevaliere      22 to 25
+	Seignieur,
+	 Dame            26 to 29
+	Paladin             30
+mon* ranks
+monk
+candidate
+novice
+initiate
+student of stones
+student of waters
+student of metals
+student of winds
+student of fire
+master
+	Monk ranks
+	  title            level
+	Candidate         1 to 2
+	Novice            3 to 5
+	Initiate          6 to 9
+	Student
+	  of Stones      10 to 13
+	  of Waters      14 to 17
+	  of Metals      18 to 21
+	  of Winds       22 to 25
+	  of Fire        26 to 29
+	Master              30
+pri* ranks
+priest*
+aspirant
+acolyte
+adept
+#priest*
+curate
+canon*
+lama
+?atriarch
+high priest*
+	Priest/Priestess/Cleric ranks
+	  title            level
+	Aspirant          1 to 2
+	Acolyte           3 to 5
+	Adept             6 to 9
+	Priest,
+	 Priestess       10 to 13
+	Curate           14 to 17
+	Canon,
+	 Canoness        18 to 21
+	Lama             22 to 25
+	Patriarch,
+	 Matriarch       26 to 29
+	High Priest,
+	 High Priestess     30
+ran* ranks
+ranger
+tenderfoot
+lookout
+trailblazer
+reconnoiter*
+scout
+arbalester
+archer
+sharpshooter
+marks*man
+	Ranger ranks
+	  title            level
+	Tenderfoot        1 to 2
+	Lookout           3 to 5
+	Trailblazer       6 to 9
+	Reconnoiterer,
+	 Reconnoiteress  10 to 13
+	Scout            14 to 17
+	Arbalester       18 to 21
+	Archer           22 to 25
+	Sharpshooter     26 to 29
+	Marksman,
+	 Markswoman         30
+rog* ranks
+rogue
+footpad
+cutpurse
+rogue
+pilferer
+robber
+burglar
+filcher
+mags*man
+thief
+	Rogue ranks
+	  title            level
+	Footpad           1 to 2
+	Cutpurse          3 to 5
+	Rogue             6 to 9
+	Pilferer         10 to 13
+	Robber           14 to 17
+	Burglar          18 to 21
+	Filcher          22 to 25
+	Magsman,
+	 Magswoman       26 to 29
+	Thief               30
+sam* ranks
+samurai
+hatamoto
+ronin
+ninja
+kunoichi
+joshu
+ryoshu
+kokushu
+daimyo
+kuge
+shogun
+	Samurai ranks
+	  title            level
+	Hatamoto          1 to 2
+	Ronin             3 to 5
+	Ninja,
+	 Kunoichi         6 to 9
+	Joshu            10 to 13
+	Ryoshu           14 to 17
+	Kokushu          18 to 21
+	Daimyo           22 to 25
+	Kuge             26 to 29
+	Shogun              30
+tou* ranks
+tourist
+rambler
+sightseer
+excursionist
+peregrinat*
+traveler
+journeyer
+voyager
+explorer
+adventurer
+	Tourist ranks
+	  title            level
+	Rambler           1 to 2
+	Sightseer         3 to 5
+	Excursionist      6 to 9
+	Peregrinator,
+	 Peregrinatrix   10 to 13
+	Traveler         14 to 17
+	Journeyer        18 to 21
+	Voyager          22 to 25
+	Explorer         26 to 29
+	Adventurer          30
+val* ranks
+valkyrie
+stripling
+skirmisher
+fighter
+*man-at-arms
+warrior
+swashbuckler
+hero
+heroine
+champion
+lord
+lady
+	Valkyrie ranks
+	  title            level
+	Stripling         1 to 2
+	Skirmisher        3 to 5
+	Fighter           6 to 9
+	Man-at-arms,
+	 Woman-at-arms   10 to 13
+	Warrior          14 to 17
+	Swashbuckler     18 to 21
+	Hero,
+	 Heroine         22 to 25
+	Champion         26 to 29
+	Lord,
+	 Lady               30
+wiz* ranks
+wizard
+evoker
+conjurer
+thaumaturge
+magician
+enchanter
+enchantress
+sorcerer
+sorceress
+necromancer
+mage
+	Wizard ranks
+	  title            level
+	Evoker            1 to 2
+	Conjurer          3 to 5
+	Thaumaturge       6 to 9
+	Magician         10 to 13
+	Enchanter,
+	 Enchantress     14 to 17
+	Sorcerer,
+	 Sorceress       18 to 21
+	Necromancer      22 to 25
+	Wizard           26 to 29
+	Mage                30
+##
+# list the titles for all the Discworld novels (3.6 tribute);
+# the extra leading spaces are intentional--tty displays the whole list
+# full screen flush-left (at least for 80 columns) and without them to
+# give some indentation it doesn't look very good
+#
+novel
+paperback book
+discworld novel*
+	    Discworld novel titles
+	      by Sir Terry Pratchett
+	    The Colour of Magic
+	    The Light Fantastic
+	    Equal Rites
+	    Mort
+	    Sourcery
+	    Wyrd Sisters
+	    Pyramids
+	    Guards! Guards!
+	    Eric
+	    Moving Pictures
+	    Reaper Man
+	    Witches Abroad
+	    Small Gods
+	    Lords and Ladies
+	    Men at Arms
+	    Soul Music
+	    Interesting Times
+	    Maskerade
+	    Feet of Clay
+	    Hogfather
+	    Jingo
+	    The Last Continent
+	    Carpe Jugulum
+	    The Fifth Elephant
+	    The Truth
+	    Thief of Time
+	    The Last Hero
+	    The Amazing Maurice and His Educated Rodents
+	    Night Watch
+	    The Wee Free Men
+	    Monstrous Regiment
+	    A Hat Full of Sky
+	    Going Postal
+	    Thud!
+	    Wintersmith
+	    Making Money
+	    Unseen Academicals
+	    I Shall Wear Midnight
+	    Snuff
+	    Raising Steam
+	    The Shepherd's Crown
+#
