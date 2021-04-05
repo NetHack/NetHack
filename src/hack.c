@@ -958,8 +958,10 @@ findtravelpath(int mode)
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
-        && distmin(u.ux, u.uy, u.tx, u.ty) == 1
-        && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
+        /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
+        && distu(u.tx, u.ty) <= 2 /* one step away */
+        /* handle restricted diagonals */
+        && crawl_destination(u.tx, u.ty)) {
         end_running(FALSE);
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
             if (mode == TRAVP_TRAVEL) {
@@ -2939,7 +2941,8 @@ doorless_door(int x, int y)
     return !(lev_p->doormask & ~(D_NODOOR | D_BROKEN));
 }
 
-/* used by drown() to check whether hero can crawl from water to <x,y> */
+/* used by drown() to check whether hero can crawl from water to <x,y>;
+   also used by findtravelpath() when destination is one step away */
 boolean
 crawl_destination(int x, int y)
 {
@@ -3002,9 +3005,8 @@ end_running(boolean and_travel)
        all clear it too */
     if (and_travel)
         g.context.travel = g.context.travel1 = g.context.mv = 0;
-    
-    // Cancel mutli
-    if (g.multi > 0) 
+    /* cancel mutli */
+    if (g.multi > 0)
         g.multi = 0;
 }
 

@@ -442,6 +442,9 @@ for menustyle:full, the 'A' menu choice to auto-select everything now only
 	does so if no other choices have been picked; when any have (object
 	class or BUCX state or both), it auto-selects every item that matches
 	those choices (so still skips the second menu) rather than every item
+using travel to move one step diagonally where that step was blocked by being
+	too narrow to squeeze through stopped travel instead of considering
+	alternate routes to the destination
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
