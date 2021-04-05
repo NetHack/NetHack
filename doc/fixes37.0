@@ -584,6 +584,9 @@ avoid "Not carrying anything.  Never mind." for 'force_invmenu'
 'altmeta' option could be toggled On but once On could not be toggled back Off
 wearing a ring of protection and any amulet behaved as if wearing an amulet of
 	guarding when determining MC value
+messaging for genetic engineer attacks had several problems
+give genetic engineers teleport capability (as they had in slash'em); 'port
+	away after polymorphing someone so that they don't just repeat that
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

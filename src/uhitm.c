@@ -3087,27 +3087,27 @@ mhitm_ad_conf(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_poly(struct monst *magr,
-              struct attack *mattk UNUSED, /* implied */
-              struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_poly(struct monst *magr, struct attack *mattk,
+              struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
-        /* since hero can't be cancelled, only defender's armor applies */
-        boolean negated = !(rn2(10) >= 3 * armpro);
+        /* require weaponless attack in order to honor AD_POLY;
+           since hero can't be cancelled, only defender's armor applies */
+        boolean negated = uwep || !(rn2(10) >= 3 * armpro);
 
         if (!negated && mhm->damage < mdef->mhp)
-            mhm->damage = mon_poly(magr, mdef, mhm->damage);
+            mhm->damage = mon_poly(&g.youmonst, mdef, mhm->damage);
     } else if (mdef == &g.youmonst) {
         /* mhitu */
-        int armpro = magic_negation(mdef);
+        int armpro = magic_negation(&g.youmonst);
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
 
+        hitmsg(magr, mattk);
         if (uncancelled
             && Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp))
-            mhm->damage = mon_poly(magr, mdef, mhm->damage);
+            mhm->damage = mon_poly(magr, &g.youmonst, mhm->damage);
     } else {
         /* mhitm */
         if (!magr->mcan && mhm->damage < mdef->mhp)
@@ -4414,6 +4414,9 @@ hmonas(struct monst *mon)
         dhit = 0, attknum = 0;
     int dieroll, multi_claw = 0;
 
+    /* not used here but umpteen mhitm_ad_xxxx() need this */
+    g.vis = (canseemon(mon) || distu(mon->mx, mon->my) <= 2);
+
     /* with just one touch/claw/weapon attack, both rings matter;
        with more than one, alternate right and left when checking
        whether silver ring causes successful hit */
@@ -4793,6 +4796,8 @@ hmonas(struct monst *mon)
         if (g.multi < 0)
             break; /* If paralyzed while attacking, i.e. floating eye */
     }
+
+    g.vis = FALSE; /* reset */
     /* return value isn't used, but make it match hitum()'s */
     return !DEADMONSTER(mon);
 }

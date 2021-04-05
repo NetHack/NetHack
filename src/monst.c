@@ -1760,7 +1760,7 @@ struct permonst _mons2[] = {
         A(ATTK(AT_CLAW, AD_POLY, 1, 4),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 20, MS_HUMANOID, MZ_HUMAN), MR_POISON, 0,
-        M1_HUMANOID | M1_OMNIVORE | M1_POIS, M2_HOSTILE | M2_NASTY,
+        M1_HUMANOID | M1_OMNIVORE | M1_POIS | M1_TPORT, M2_HOSTILE | M2_NASTY,
         M3_INFRAVISIBLE, 14, CLR_GREEN),
     /*
      * Rust monster or disenchanter
