@@ -3662,11 +3662,16 @@ apply_ok(struct obj *obj)
             || obj->otyp == BULLWHIP))
         return GETOBJ_SUGGEST;
 
-    /* only applicable potion is oil, and it will only be offered as a choice
-     * when already discovered */
-    if (obj->otyp == POT_OIL && obj->dknown
-        && objects[obj->otyp].oc_name_known)
-        return GETOBJ_SUGGEST;
+    if (obj->oclass == POTION_CLASS) {
+        /* permit applying unknown potions, but don't suggest them */
+        if (!obj->dknown || !objects[obj->otyp].oc_name_known)
+            return GETOBJ_DOWNPLAY;
+
+        /* only applicable potion is oil, and it will only be suggested as a
+         * choice when already discovered */
+        if (obj->otyp == POT_OIL)
+            return GETOBJ_SUGGEST;
+    }
 
     /* certain foods */
     if (obj->otyp == CREAM_PIE || obj->otyp == EUCALYPTUS_LEAF
@@ -3682,12 +3687,12 @@ apply_ok(struct obj *obj)
         if (obj->otyp != TOUCHSTONE
             && (objects[TOUCHSTONE].oc_name_known
                 || objects[obj->otyp].oc_name_known))
-            return GETOBJ_EXCLUDE;
+            return GETOBJ_EXCLUDE_SELECTABLE;
 
         return GETOBJ_SUGGEST;
     }
 
-    return GETOBJ_EXCLUDE;
+    return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
 /* the 'a' command */
