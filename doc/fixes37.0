@@ -709,7 +709,14 @@ Qt: when a new message is issued, pan the message window to its left edge if
 Qt: there was no way to enter extended command "#version" by typing; command
 	name matching was waiting to disambiguate it from "#versionshort"
 	and the only way to that was to type #version<return> but <return>
-	explicitly triggered rejection, cancelling '#' processing
+	explicitly triggered rejection, cancelling '#' processing; #drop vs
+	"droptype, "known vs "knownclass, and #takeoff vs #takeoffall are in
+	similar ambiguous situation but usually invoked via keystroke
+Qt: render all text windows in fixed-width font instead of just ones which
+	have one or more lines with four consecutive spaces; some data.base
+	entries do have those (usually final attribution) and some don't,
+	so display from one entry to another was inconsistent if default
+	proportional font was ever used
 Qt: while a text window was shown (such as the "things that are here" popup
 	when stepping on items), typing commands had the input passed on to
 	the map and then executed; sometimes that caused the not-yet-dismissed
