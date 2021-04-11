@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.498 $ $NHDT-Date: 1617388018 2021/04/02 18:26:58 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.503 $ $NHDT-Date: 1618175625 2021/04/11 21:13:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -445,6 +445,10 @@ for menustyle:full, the 'A' menu choice to auto-select everything now only
 using travel to move one step diagonally where that step was blocked by being
 	too narrow to squeeze through stopped travel instead of considering
 	alternate routes to the destination
+turn off input autocompletion for '#twoweapon' since simple 'X' invokes it;
+	likewise for #wizdetect (^E), #wizgenesis (^G), #wizidentify (^I),
+	#wizlevelport (^V), #wizmap (^F), and #wizwish (^W); probably ought
+	to do so for #overview (^O) too but that one still autocompletes
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1613721260 2021/02/19 07:54:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1618175625 2021/04/11 21:13:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1140,7 +1140,7 @@ wiz_panic(void)
         u.uen = u.uenmax = 1000;
         return 0;
     }
-    if (paranoid_query(ParanoidQuit,
+    if (paranoid_query(TRUE,
                        "Do you want to call panic() and end your game?"))
         panic("Crash test.");
     return 0;
@@ -1786,7 +1786,11 @@ doterrain(void)
     return 0; /* no time elapses */
 }
 
-/* ordered by command name */
+/* extcmdlist: full command list, ordered by command name;
+   commands with no keystroke or with only a meta keystroke generally
+   need to be flagged as autocomplete and ones with a regular keystroke
+   or control keystroke generally should not be; there are a few exceptions
+   such as ^O/#overview and C/N/#name */
 struct ext_func_tab extcmdlist[] = {
     { '#',    "#", "perform an extended command",
               doextcmd, IFBURIED | GENERALCMD, NULL },
@@ -1826,6 +1830,8 @@ struct ext_func_tab extcmdlist[] = {
               doengrave, 0, NULL },
     { M('e'), "enhance", "advance or check weapon and spell skills",
               enhance_weapon_skill, IFBURIED | AUTOCOMPLETE, NULL },
+    /* #exploremode should be flagged AUTOCOMPETE but that would negatively
+       impact frequently used #enhance by making #e become ambiguous */
     { M('X'), "exploremode", "enter explore (discovery) mode",
               enter_explore_mode, IFBURIED | GENERALCMD, NULL },
     { 'f',    "fire", "fire ammunition from quiver",
@@ -1876,8 +1882,11 @@ struct ext_func_tab extcmdlist[] = {
               doopen, 0, NULL },
     { 'O',    "options", "show option settings, possibly change them",
               doset, IFBURIED | GENERALCMD, NULL },
+    /* #overview used to need autocomplete and has retained that even
+       after being assigned to ^O [old wizard mode ^O is now #wizwhere] */
     { C('o'), "overview", "show a summary of the explored dungeon",
               dooverview, IFBURIED | AUTOCOMPLETE, NULL },
+    /* [should #panic actually autocomplete?] */
     { '\0',   "panic", "test panic routine (fatal to game)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { 'p',    "pay", "pay your shopping bill",
@@ -1978,7 +1987,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('t'), "turn", "turn undead away",
               doturn, IFBURIED | AUTOCOMPLETE, NULL },
     { 'X',    "twoweapon", "toggle two-weapon combat",
-              dotwoweapon, AUTOCOMPLETE, NULL },
+              dotwoweapon, 0, NULL },
     { M('u'), "untrap", "untrap something",
               dountrap, AUTOCOMPLETE, NULL },
     { '<',    "up", "go up a staircase",
@@ -2011,17 +2020,17 @@ struct ext_func_tab extcmdlist[] = {
               wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
-              wiz_detect, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_detect, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizfliplevel", "flip the level",
               wiz_flip_level, IFBURIED | WIZMODECMD, NULL },
     { C('g'), "wizgenesis", "create a monster",
-              wiz_genesis, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_genesis, IFBURIED | WIZMODECMD, NULL },
     { C('i'), "wizidentify", "identify all items in inventory",
-              wiz_identify, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_identify, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizintrinsic", "set an intrinsic",
               wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { C('v'), "wizlevelport", "teleport to another level",
-              wiz_level_tele, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_level_tele, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizloaddes", "load and execute a des-file lua script",
               wiz_load_splua, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizloadlua", "load and execute a lua script",
@@ -2029,7 +2038,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "wizmakemap", "recreate the current level",
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
     { C('f'), "wizmap", "map the level",
-              wiz_map, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_map, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizrumorcheck", "verify rumor boundaries",
               wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizseenv", "show map locations' seen vectors",
@@ -2039,7 +2048,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "wizwhere", "show locations of special levels",
               wiz_where, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { C('w'), "wizwish", "wish for something",
-              wiz_wish, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_wish, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wmode", "show wall modes",
               wiz_show_wmodes, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { 'z',    "zap", "zap a wand",
