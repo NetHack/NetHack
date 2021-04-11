@@ -9,7 +9,13 @@
 
 namespace nethack_qt_ {
 
-enum xcmdSets { all_cmds = 0, normal_cmds = 1, wizard_cmds = 2 };
+// [Filter] setting; the X11 interface uses the autocomplete list
+enum xcmdSets {
+    all_cmds = 0,           // everything in extcmdlist[]
+    normal_cmds = 1,        // all non-wizard mode commands
+    autocomplete_cmds = 2,  // mostly commands which need Alt+char
+    wizard_cmds = 3         // commands only useable in wizard mode
+};
 enum xcmdMisc { xcmdNone = -10, xcmdNoMatch = 9999 };
 
 class NetHackQtExtCmdRequestor : public QDialog {

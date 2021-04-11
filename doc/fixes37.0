@@ -931,6 +931,10 @@ Qt: add Filter, Layout, and Reset buttons to the extended command selector;
 	mode only"; Layout redisplays the grid of command buttons, toggling
 	from down columns to across rows or vice versa; Reset puts both back
 	to their default settings and clears any pending typed input
+Qt: [later] augment extended command selection dialog's Filter to add a
+	fourth subset, those commands which autocomplete when typed for tty,
+	typically commands with no keystroke or only meta character keystroke;
+	that makes Filter useful in normal mode (much shorter list of choices)
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
