@@ -449,6 +449,9 @@ turn off input autocompletion for '#twoweapon' since simple 'X' invokes it;
 	likewise for #wizdetect (^E), #wizgenesis (^G), #wizidentify (^I),
 	#wizlevelport (^V), #wizmap (^F), and #wizwish (^W); probably ought
 	to do so for #overview (^O) too but that one still autocompletes
+if a branch has only one level (Fort Ludios), prevent creation of any level
+	teleporters there (level definition doesn't have any but wizard mode
+	wishing could attempt to place one)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -178,6 +178,9 @@ moverock(void)
             }
 
             if (ttmp) {
+                int newlev = 0; /* lint suppression */
+                d_level dest;
+
                 /* if a trap operates on the boulder, don't attempt
                    to move any others at this location; return -1
                    if another boulder is in hero's way, or 0 if he
@@ -236,16 +239,14 @@ moverock(void)
                         newsym(rx, ry);
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case LEVEL_TELEP:
-                case TELEP_TRAP: {
-                    int newlev = 0; /* lint suppression */
-                    d_level dest;
-
-                    if (ttmp->ttyp == LEVEL_TELEP) {
-                        newlev = random_teleport_level();
-                        if (newlev == depth(&u.uz) || In_endgame(&u.uz))
-                            /* trap didn't work; skip "disappears" message */
-                            goto dopush;
-                    }
+                    /* 20% chance of picking current level; 100% chance for
+                       that if in single-level branch (Knox) or in endgame */
+                    newlev = random_teleport_level();
+                    /* if trap doesn't work, skip "disappears" message */
+                    if (newlev == depth(&u.uz))
+                        goto dopush;
+                    /*FALLTHRU*/
+                case TELEP_TRAP:
                     if (u.usteed)
                         pline("%s pushes %s and suddenly it disappears!",
                               upstart(y_monnam(u.usteed)), the(xname(otmp)));
@@ -264,7 +265,6 @@ moverock(void)
                     }
                     seetrap(ttmp);
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                }
                 default:
                     break; /* boulder not affected by this trap */
                 }

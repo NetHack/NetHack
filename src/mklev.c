@@ -1377,7 +1377,8 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
                     kind = NO_TRAP;
                 break;
             case LEVEL_TELEP:
-                if (lvl < 5 || g.level.flags.noteleport)
+                if (lvl < 5 || g.level.flags.noteleport
+                    || single_level_branch(&u.uz))
                     kind = NO_TRAP;
                 break;
             case SPIKED_PIT:

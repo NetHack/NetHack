@@ -892,7 +892,7 @@ level_tele(void)
         /* if in Knox and the requested level > 0, stay put.
          * we let negative values requests fall into the "heaven" loop.
          */
-        if (Is_knox(&u.uz) && newlev > 0 && !force_dest) {
+        if (single_level_branch(&u.uz) && newlev > 0 && !force_dest) {
             You1(shudder_for_moment);
             return;
         }
@@ -1532,7 +1532,7 @@ random_teleport_level(void)
     int nlev, max_depth, min_depth, cur_depth = (int) depth(&u.uz);
 
     /* [the endgame case can only occur in wizard mode] */
-    if (!rn2(5) || Is_knox(&u.uz) || In_endgame(&u.uz))
+    if (!rn2(5) || single_level_branch(&u.uz) || In_endgame(&u.uz))
         return cur_depth;
 
     /* What I really want to do is as follows:

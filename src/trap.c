@@ -352,10 +352,12 @@ maketrap(int x, int y, int typ)
                 || (u.utraptype == TT_LAVA && !is_lava(x, y))))
             reset_utrap(FALSE);
         /* old <tx,ty> remain valid */
-    } else if (IS_FURNITURE(lev->typ)
-               && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE))) {
+    } else if ((IS_FURNITURE(lev->typ)
+                && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE)))
+               || (typ == LEVEL_TELEP && single_level_branch(&u.uz))) {
         /* no trap on top of furniture (caller usually screens the
-           location to inhibit this, but wizard mode wishing doesn't) */
+           location to inhibit this, but wizard mode wishing doesn't)
+           and no level teleporter in branch with only one level */
         return (struct trap *) 0;
     } else {
         oldplace = FALSE;
@@ -2778,6 +2780,9 @@ launch_obj(
                 }
             }
             if ((t = t_at(g.bhitpos.x, g.bhitpos.y)) != 0 && otyp == BOULDER) {
+                int newlev = 0;
+                d_level dest;
+
                 switch (t->ttyp) {
                 case LANDMINE:
                     if (rn2(10) > 2) {
@@ -2801,20 +2806,22 @@ launch_obj(
                     }
                     break;
                 case LEVEL_TELEP:
+                    /* 20% chance of picking current level; 100% chance for
+                       that if in single-level branch (Knox) or in endgame */
+                    newlev = random_teleport_level();
+                    /* if trap doesn't work, skip "disappears" message */
+                    if (newlev == depth(&u.uz))
+                        break;
+                    /*FALLTHRU*/
                 case TELEP_TRAP:
                     if (cansee(g.bhitpos.x, g.bhitpos.y))
                         pline("Suddenly the rolling boulder disappears!");
-                    else
+                    else if (!Deaf)
                         You_hear("a rumbling stop abruptly.");
                     singleobj->otrapped = 0;
-                    if (t->ttyp == TELEP_TRAP)
+                    if (t->ttyp == TELEP_TRAP) {
                         (void) rloco(singleobj);
-                    else {
-                        int newlev = random_teleport_level();
-                        d_level dest;
-
-                        if (newlev == depth(&u.uz) || In_endgame(&u.uz))
-                            continue;
+                    } else {
                         add_to_migration(singleobj);
                         get_level(&dest, newlev);
                         singleobj->ox = dest.dnum;
@@ -2838,9 +2845,12 @@ launch_obj(
                     }
                     dist = -1; /* stop rolling immediately */
                     break;
-                }
-                if (used_up || dist == -1)
+                default:
                     break;
+                }
+
+                if (used_up || dist == -1)
+                    break; /* from 'while' loop */
             }
             if (flooreffects(singleobj, g.bhitpos.x, g.bhitpos.y, "fall")) {
                 used_up = TRUE;

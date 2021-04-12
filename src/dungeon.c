@@ -1848,6 +1848,17 @@ goto_hell(boolean at_stairs, boolean falling)
     goto_level(&lev, at_stairs, falling, FALSE);
 }
 
+/* is 'lev' the only level in its branch?  affects level teleporters */
+boolean
+single_level_branch(d_level *lev)
+{
+    /*
+     * TODO:  this should be generalized instead of assuming that
+     * Fort Ludios is the only single level branch in the dungeon.
+     */
+    return Is_knox(lev);
+}
+
 /* equivalent to dest = source */
 void
 assign_level(d_level *dest, d_level *src)

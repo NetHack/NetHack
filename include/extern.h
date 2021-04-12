@@ -618,6 +618,7 @@ extern boolean On_W_tower_level(d_level *);
 extern boolean In_W_tower(int, int, d_level *);
 extern void find_hell(d_level *);
 extern void goto_hell(boolean, boolean);
+extern boolean single_level_branch(d_level *);
 extern void assign_level(d_level *, d_level *);
 extern void assign_rnd_level(d_level *, d_level *, int);
 extern unsigned int induced_align(int);
