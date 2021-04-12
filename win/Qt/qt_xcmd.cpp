@@ -442,6 +442,9 @@ void NetHackQtExtCmdRequestor::Retry()
 // Player who prefers something else can cope by using ESC instead.
 #define KILL_CHAR Ctrl('u')
 
+// used by keyPressEvent() and enableButtons()
+static const QString &rest = "rest"; // informal synonym for "wait"
+
 // Receive the next character of typed input
 void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
 {
@@ -508,10 +511,13 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
                 uc = tolower(uc);
             promptstr += QChar(uc); // add new char to typed text
         }
-	QString typedstr = promptstr.mid(1); // skip the '#'
-	unsigned matches = 0;
-	unsigned matchindx = 0;
-	for (unsigned i = 0; extcmdlist[i].ef_txt; ++i) {
+        QString typedstr = promptstr.mid(1); // skip the '#'
+        if (typedstr == rest)
+            typedstr = "wait";
+        std::size_t len = typedstr.size();
+        unsigned matches = 0;
+        unsigned matchindx = 0;
+        for (unsigned i = 0; extcmdlist[i].ef_txt; ++i) {
             if (!interesting_command(i, set))
                 continue;
             const QString &cmdtxt = QString(extcmdlist[i].ef_txt);
@@ -537,9 +543,10 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
         } else if (checkexact) {
             // <return> or <space> without a pending exact match; cancel
             reject();
-        } else if (matches >= 2) {
+        } else if (matches >= 2
+                   || promptstr.midRef(1, len) == rest.leftRef(len)) {
             // update the text-so-far
-	    prompt->setText(promptstr);
+            prompt->setText(promptstr);
         } else if (saveexactmatchindx != xcmdNoMatch) {
             // had a pending exact match but typed something other than
             // <return> which didn't yield another match; prompt string
@@ -579,7 +586,10 @@ void NetHackQtExtCmdRequestor::enableButtons()
     // remaining buttons were widened to take the space.  Now the grid is
     // forced to have fixed layout (via stretch settings in constructor).
     for (auto b = buttons.begin(); b != buttons.end(); ++b) {
-        bool showit = ((*b)->text().left(len) == typedstr);
+        const QString &buttext = (*b)->text();
+        bool showit = (buttext.left(len) == typedstr
+                       || (buttext.contains("(rest)")
+                           && typedstr == rest.left(len)));
         (*b)->setVisible(showit);
     }
 }
