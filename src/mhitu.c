@@ -298,8 +298,14 @@ getmattk(struct monst *magr, struct monst *mdef,
             /* note: 3d9 is slightly higher than previous 4d6 */
         }
 
-    } else if (attk->aatyp == AT_ENGL && magr->mspec_used) {
-        /* can't re-engulf yet; switch to simpler attack */
+    /* holders/engulfers who release the hero have mspec_used set to rnd(2)
+       and can't re-hold/re-engulf until it has been decremented to zero */
+    } else if (magr->mspec_used && (attk->aatyp == AT_ENGL
+                                    || attk->aatyp == AT_HUGS
+                                    || attk->adtyp == AD_STCK)) {
+        boolean wimpy = (attk->damd == 0); /* lichen, violet fungus */
+
+        /* can't re-engulf or re-grab yet; switch to simpler attack */
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
@@ -311,6 +317,10 @@ getmattk(struct monst *magr, struct monst *mdef,
         }
         attk->damn = 1; /* relatively weak: 1d6 */
         attk->damd = 6;
+        if (wimpy && attk->aatyp == AT_CLAW) {
+            attk->aatyp = AT_TUCH;
+            attk->damn = attk->damd = 0;
+        }
 
     /* barrow wight, Nazgul, erinys have weapon attack for non-physical
        damage; force physical damage if attacker has been cancelled or

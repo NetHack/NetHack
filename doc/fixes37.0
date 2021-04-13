@@ -452,6 +452,8 @@ turn off input autocompletion for '#twoweapon' since simple 'X' invokes it;
 if a branch has only one level (Fort Ludios), prevent creation of any level
 	teleporters there (level definition doesn't have any but wizard mode
 	wishing could attempt to place one)
+opening/unlocking magic zapped at monster holding the hero will release hold
+	(zap at engulfer already expels hero); zapping at self has same effect
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

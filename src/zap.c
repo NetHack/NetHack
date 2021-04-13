@@ -318,17 +318,15 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     case WAN_OPENING:
     case SPE_KNOCK:
         wake = FALSE; /* don't want immediate counterattack */
-        if (u.uswallow && mtmp == u.ustuck) {
-            if (is_animal(mtmp->data)) {
-                if (Blind)
-                    You_feel("a sudden rush of air!");
-                else
-                    pline("%s opens its mouth!", Monnam(mtmp));
-            }
-            expels(mtmp, mtmp->data, TRUE);
-            /* zap which hits steed will only release saddle if it
-               doesn't hit a holding or falling trap; playability
-               here overrides the more logical target ordering */
+        if (mtmp == u.ustuck) {
+            /* zapping either holder/holdee or self [zapyourself()] will
+               release hero from holder's grasp or holdee from hero's grasp */
+            release_hold();
+            learn_it = TRUE;
+
+        /* zap which hits steed will only release saddle if it
+           doesn't hit a holding or falling trap; playability
+           here overrides the more logical target ordering */
         } else if (openholdingtrap(mtmp, &learn_it)) {
             break;
         } else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
@@ -469,6 +467,42 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     if (learn_it)
         learnwand(otmp);
     return 0;
+}
+
+/* hero is held by a monster or engulfed or holding a monster and has zapped
+   opening/unlocking magic at holder/engulfer/holdee or at self */
+void
+release_hold()
+{
+    struct monst *mtmp = u.ustuck;
+
+    if (!mtmp) {
+        impossible("release_hold when not held?");
+    } else if (sticks(g.youmonst.data)) {
+        /* order matters if 'holding' status condition is enabled;
+           set_ustuck() will set flag for botl update, You() pline will
+           trigger a status update with "UHold" removed */
+        set_ustuck((struct monst *) 0);
+        You("release %s.", mon_nam(mtmp));
+    } else if (u.uswallow) {
+        if (is_animal(mtmp->data)) {
+            if (!Blind)
+                pline("%s opens its mouth!", Monnam(mtmp));
+            else
+                You_feel("a sudden rush of air!");
+        }
+        /* gives "you get regurgitated" or "you get expelled from <mon>" */
+        expels(mtmp, mtmp->data, TRUE);
+    } else { /* held but not swallowed */
+        char relbuf[BUFSZ];
+
+        unstuck(u.ustuck);
+        if (!nohands(mtmp->data))
+            Sprintf(relbuf, "from %s grasp", s_suffix(mon_nam(mtmp)));
+        else
+            Sprintf(relbuf, "by %s", mon_nam(mtmp));
+        You("are released %s.", relbuf);
+    }
 }
 
 void
@@ -2577,6 +2611,12 @@ zapyourself(struct obj *obj, boolean ordinary)
         break;
     case WAN_OPENING:
     case SPE_KNOCK:
+        if (u.ustuck) {
+            /* zapping either self or holder/holdee [bhitm()] will release
+               holder's grasp from the hero or hero's grasp from holdee */
+            release_hold();
+            learn_it = TRUE;
+        }
         if (Punished) {
             learn_it = TRUE;
             unpunish();

@@ -2689,7 +2689,7 @@ mhitm_ad_stck(struct monst *magr, struct attack *mattk, struct monst *mdef,
         boolean negated = !(rn2(10) >= 3 * armpro);
 
         if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
-            u.ustuck = mdef; /* it's now stuck to you */
+            set_ustuck(mdef); /* it's now stuck to you */
     } else if (mdef == &g.youmonst) {
         /* mhitu */
         int armpro = magic_negation(mdef);

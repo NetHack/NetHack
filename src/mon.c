@@ -2725,6 +2725,8 @@ void
 unstuck(struct monst* mtmp)
 {
     if (u.ustuck == mtmp) {
+        struct permonst *ptr = mtmp->data;
+
         /* do this first so that docrt()'s botl update is accurate;
            safe to do as long as u.uswallow is also cleared before docrt() */
         set_ustuck((struct monst *) 0);
@@ -2738,11 +2740,16 @@ unstuck(struct monst* mtmp)
                 placebc();
             g.vision_full_recalc = 1;
             docrt();
-            /* prevent swallower (mtmp might have just poly'd into something
-               without an engulf attack) from immediately re-engulfing */
-            if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
-                mtmp->mspec_used = rnd(2);
         }
+
+        /* prevent holder/engulfer from immediately re-holding/re-engulfing
+           [note: this call to unstuck() might be because u.ustuck has just
+           changed shape and doesn't have a holding attack any more, hence
+           don't set mspec_used uncondtionally] */
+        if (!mtmp->mspec_used && (dmgtype(ptr, AD_STCK)
+                                  || attacktype(ptr, AT_ENGL)
+                                  || attacktype(ptr, AT_HUGS)))
+            mtmp->mspec_used = rnd(2);
     }
 }
 
