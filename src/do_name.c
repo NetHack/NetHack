@@ -2044,13 +2044,15 @@ minimal_monnam(struct monst *mon, boolean ckloc)
     } else if (ckloc && ptr == &mons[PM_LONG_WORM]
                && g.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
-                pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)), mon->mx, mon->my);
+                pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)),
+                mon->mx, mon->my);
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
                 mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
                 pmname(mon->data, Mgender(mon)), mon->mx, mon->my);
         if (mon->cham != NON_PM)
-            Sprintf(eos(outbuf), "{%s}", pmname(&mons[mon->cham], Mgender(mon)));
+            Sprintf(eos(outbuf), "{%s}",
+                    pmname(&mons[mon->cham], Mgender(mon)));
     }
     return outbuf;
 }
