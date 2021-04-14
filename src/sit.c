@@ -394,7 +394,9 @@ rndcurse(void)
         if (!Blind) {
             pline("%s %s.", Yobjnam2(otmp, "glow"),
                   hcolor(otmp->cursed ? NH_BLACK : (const char *) "brown"));
-            otmp->bknown = 1; /* ok to bypass set_bknown() here */
+            otmp->bknown = Hallucination ? 0 : 1; /* bypass set_bknown() */
+        } else {
+            otmp->bknown = 0; /* bypass set_bknown() */
         }
     }
 }

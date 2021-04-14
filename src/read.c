@@ -935,7 +935,7 @@ display_stinking_cloud_positions(int state)
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
-seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll-like spell */
+seffects(struct obj *sobj) /* sobj - scroll or fake spellbook for spell */
 {
     int cval, otyp = sobj->otyp;
     boolean confused = (Confusion != 0), sblessed = sobj->blessed,
@@ -1300,9 +1300,26 @@ seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll
                            known not to be, make the scroll known; it's
                            trivial to identify anyway by comparing inventory
                            before and after */
-                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE)
                             learnscrolltyp(SCR_REMOVE_CURSE);
-                        }
+                    }
+                }
+            }
+            /* if riding, treat steed's saddle as if part of hero's invent */
+            if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
+                if (confused) {
+                    blessorcurse(obj, 2);
+                    obj->bknown = 0; /* skip set_bknown() */
+                } else if (obj->cursed) {
+                    uncurse(obj);
+                    /* like rndcurse(sit.c), effect on regular inventory
+                       doesn't show things glowing but saddle does */
+                    if (!Blind) {
+                        pline("%s %s.", Yobjnam2(obj, "glow"),
+                              hcolor("amber"));
+                        obj->bknown = Hallucination ? 0 : 1;
+                    } else {
+                        obj->bknown = 0; /* skip set_bknown() */
                     }
                 }
             }

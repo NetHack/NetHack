@@ -58,7 +58,8 @@ use_saddle(struct obj* otmp)
     }
 
     /* Is this a valid monster? */
-    if (mtmp->misc_worn_check & W_SADDLE || which_armor(mtmp, W_SADDLE)) {
+    if ((mtmp->misc_worn_check & W_SADDLE) != 0L
+        || which_armor(mtmp, W_SADDLE)) {
         pline("%s doesn't need another one.", Monnam(mtmp));
         return 1;
     }
