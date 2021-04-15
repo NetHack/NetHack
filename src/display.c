@@ -1593,9 +1593,10 @@ show_glyph(int x, int y, int glyph)
 
     if (g.gbuf[y][x].glyph != glyph
 #ifndef UNBUFFERED_GLYPHINFO
-           /* I don't think we have to test for changes in TTYCHAR or COLOR
-              because they typically only change if the glyph changed */
+           /* I don't think we have to test for changes in TTYCHAR
+              because it typically only changes if the glyph changed */
             || g.gbuf[y][x].glyphinfo.glyphflags != glyphinfo.glyphflags
+            || g.gbuf[y][x].glyphinfo.color != glyphinfo.color
 #endif
             || iflags.use_background_glyph ) {
         g.gbuf[y][x].glyph = glyph;
