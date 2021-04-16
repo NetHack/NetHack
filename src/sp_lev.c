@@ -4624,7 +4624,10 @@ struct selectionvar *ov)
 
     selection_setpoint(x1, y1, ov, 1);
 
-    if (dx > dy) {
+    if (!dx && !dy) {
+        /* it's just this one point - no line */
+        return;
+    } else if (dx > dy) {
         ai = (dy - dx) * 2;
         bi = dy * 2;
         d0 = bi - dx;
