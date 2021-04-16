@@ -2721,44 +2721,61 @@ optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
         if ((op = string_for_opt(opts, FALSE)) == empty_optstr)
             return optn_err;
 
+        /* 3.7: earlier versions left old values for unspecified arguments
+           if player's scores:foo option only specified some of the three;
+           in particular, attempting to use 'scores:own' rather than
+           'scores:0 top/0 around/own' didn't work as intended */
+        flags.end_top = flags.end_around = 0, flags.end_own = FALSE;
+
+        if (negated)
+            op = eos(op);
+
         while (*op) {
             int inum = 1;
+
+            negated = (*op == '!');
+            if (negated)
+                op++;
 
             if (digit(*op)) {
                 inum = atoi(op);
                 while (digit(*op))
                     op++;
-            } else if (*op == '!') {
-                negated = !negated;
-                op++;
             }
             while (*op == ' ')
                 op++;
 
-            switch (*op) {
+            switch (lowc(*op)) {
             case 't':
-            case 'T':
-                flags.end_top = inum;
+                flags.end_top = negated ? 0 : inum;
                 break;
             case 'a':
-            case 'A':
-                flags.end_around = inum;
+                flags.end_around = negated ? 0 : inum;
                 break;
             case 'o':
-            case 'O':
-                flags.end_own = !negated;
+                flags.end_own = (negated || !inum) ? FALSE : TRUE;
                 break;
+            case 'n': /* none */
+                flags.end_top = flags.end_around = 0, flags.end_own = FALSE;
+                break;
+            case '-':
+                if (digit(*(op + 1))) {
+                    config_error_add(
+                       "Values for %s:top and %s:around must not be negative",
+                                     allopt[optidx].name,
+                                     allopt[optidx].name);
+                    return optn_silenterr;
+                }
+                /*FALLTHRU*/
             default:
                 config_error_add("Unknown %s parameter '%s'",
                                  allopt[optidx].name, op);
-                return optn_err;
+                return optn_silenterr;
             }
-            /* "3a" is sufficient but accept "3around" (or "3abracadabra")
-             */
+            /* "3a" is sufficient but accept "3around" (or "3abracadabra") */
             while (letter(*op))
                 op++;
-            /* t, a, and o can be separated by space(s) or slash or both
-             */
+            /* t, a, and o can be separated by space(s) or slash or both */
             while (*op == ' ')
                 op++;
             if (*op == '/')
@@ -2769,8 +2786,17 @@ optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
     if (req == get_val) {
         if (!opts)
             return optn_err;
-        Sprintf(opts, "%d top/%d around%s", flags.end_top, flags.end_around,
-                flags.end_own ? "/own" : "");
+        *opts = '\0';
+        if (flags.end_top > 0)
+            Sprintf(opts, "%d top", flags.end_top);
+        if (flags.end_around > 0)
+            Sprintf(eos(opts), "%s%d around",
+                    (flags.end_top > 0) ? "/" : "", flags.end_around);
+        if (flags.end_own)
+            Sprintf(eos(opts), "%sown",
+                    (flags.end_top > 0 || flags.end_around > 0) ? "/" : "");
+        if (!*opts)
+            Strcpy(opts, "none");
         return optn_ok;
     }
     return optn_ok;

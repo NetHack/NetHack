@@ -455,6 +455,11 @@ if a branch has only one level (Fort Ludios), prevent creation of any level
 opening/unlocking magic zapped at monster holding the hero will release hold
 	(zap at engulfer already expels hero); zapping at self has same effect
 when riding, allow scroll of remove curse to affect to affect steed's saddle
+the 'scores' option for final top ten display left default values in place if
+	only some of the three settings were set; 'scores:own' should have
+	produced '0 top/0 around/own' but ended up as '3 top/2 around/own';
+	also, allow 'scores:none' as shorthand for 'scores:0 t/0 a/!o' (player
+	will to told whether new score made the list but no scores get shown)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
