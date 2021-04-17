@@ -1153,10 +1153,6 @@ struct instance_globals {
 
     /* topten.c */
     winid toptenwin;
-#ifdef UPDATE_RECORD_IN_PLACE
-    long final_fpos;
-#endif
-
 
     /* trap.c */
     int force_mintrap; /* mintrap() should take a flags argument, but for time

@@ -650,9 +650,6 @@ const struct instance_globals g_init = {
 
     /* topten.c */
     WIN_ERR, /* topten */
-#ifdef UPDATE_RECORD_IN_PLACE
-    UNDEFINED_VALUE, /* final_fpos */
-#endif
 
     /* trap.c */
     0, /* force_mintrap */

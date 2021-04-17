@@ -6,13 +6,13 @@
 #include "hack.h"
 #include "dlb.h"
 
-/* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the
- * whole file, because that entails creating a new version which
- * requires that the old one be deletable. UPDATE_RECORD_IN_PLACE
- * had to be defined more centrally in 3.7 to ensure that the
- * final_fpos field gets included in struct instance_globals aka 'g'.
-*/
-
+#if defined(VMS) && !defined(UPDATE_RECORD_IN_PLACE)
+/* We don't want to rewrite the whole file, because that entails
+   creating a new version which requires that the old one be deletable.
+   [Write and Delete are separate permissions on VMS.  'record' should
+   be writable but not deletable there.]  */
+#define UPDATE_RECORD_IN_PLACE
+#endif
 
 /*
  * Updating in place can leave junk at the end of the file in some
@@ -20,6 +20,9 @@
  * way to truncate it).  The trailing junk is harmless and the code
  * which reads the scores will ignore it.
  */
+#ifdef UPDATE_RECORD_IN_PLACE
+static long final_fpos; /* [note: do not move this to the 'g' struct] */
+#endif
 
 #define done_stopprint g.program_state.stopprint
 
@@ -145,7 +148,8 @@ formatkiller(
 
     if (incl_helpless && g.multi) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
-        if (g.multi_reason && strlen(g.multi_reason) + sizeof ", while " <= siz)
+        if (g.multi_reason
+            && strlen(g.multi_reason) + sizeof ", while " <= siz)
             Sprintf(buf, ", while %s", g.multi_reason);
         /* either g.multi_reason wasn't specified or wouldn't fit */
         else if (sizeof ", while helpless" <= siz)
@@ -227,7 +231,7 @@ readentry(FILE* rfile, struct toptenentry* tt)
 
 #ifdef UPDATE_RECORD_IN_PLACE
     /* note: input below must read the record's terminating newline */
-    g.final_fpos = tt->fpos = ftell(rfile);
+    final_fpos = tt->fpos = ftell(rfile);
 #endif
 #define TTFIELDS 13
     if (fscanf(rfile, fmt, &tt->ver_major, &tt->ver_minor, &tt->patchlevel,
@@ -622,6 +626,9 @@ topten(int how, time_t when)
     int flg = 0;
     boolean t0_used, skip_scores;
 
+#ifdef UPDATE_RECORD_IN_PLACE
+    final_fpos = 0L;
+#endif
     /* If we are in the midst of a panic, cut out topten entirely.
      * topten uses alloc() several times, which will lead to
      * problems if the panic was the result of an alloc() failure.
@@ -792,8 +799,7 @@ topten(int how, time_t when)
     }
     if (flg) { /* rewrite record file */
 #ifdef UPDATE_RECORD_IN_PLACE
-        (void) fseek(rfile, (t0->fpos >= 0 ? t0->fpos : g.final_fpos),
-                     SEEK_SET);
+        (void) fseek(rfile, (t0->fpos >= 0) ? t0->fpos : final_fpos, SEEK_SET);
 #else
         (void) fclose(rfile);
         if (!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))) {
@@ -885,7 +891,7 @@ topten(int how, time_t when)
 
  showwin:
     if (iflags.toptenwin && !done_stopprint)
-        display_nhwindow(g.toptenwin, 1);
+        display_nhwindow(g.toptenwin, TRUE);
  destroywin:
     if (!t0_used)
         dealloc_ttentry(t0);
