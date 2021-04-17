@@ -3914,17 +3914,17 @@ water_damage(
         if (carried(obj))
             update_inventory();
         return ER_GREASED;
-    } else if (Is_container(obj) && !Is_box(obj)
-               && (obj->otyp != OILSKIN_SACK || (obj->cursed && !rn2(3)))) {
+    } else if (Is_container(obj)
+               && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (carried(obj))
-            pline("Water gets into your %s!", ostr);
-
+            pline("Some water gets into your %s!", ostr);
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
-    } else if (obj->otyp == OILSKIN_SACK) {
-        if (carried(obj))
-            pline("Some water slides right off your %s.", ostr);
-        makeknown(OILSKIN_SACK);
+    } else if (Waterproof_container(obj)) {
+        if (carried(obj)) {
+            pline_The("water slides right off your %s.", ostr);
+            makeknown(obj->otyp);
+        }
         /* not actually damaged, but because we /didn't/ get the "water
            gets into!" message, the player now has more information and
            thus we need to waste any potion they may have used (also,
