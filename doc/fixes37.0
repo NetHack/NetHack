@@ -463,6 +463,8 @@ allow 'scores:none' as shorthand for 'scores:0 t/0 a/!o' (player will be told
 contents of chests, large boxes, and ice boxes are now immune to water damage
 	unless the container is cursed, same as for oilskin sacks (previously,
 	chests+large boxes were always immune and ice boxes always vulnerable)
+applying an empty brass lantern in an attempt to light it reported "your lamp
+	has run out of power"; change to "your lantern is out of power"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
