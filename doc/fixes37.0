@@ -605,6 +605,8 @@ wearing a ring of protection and any amulet behaved as if wearing an amulet of
 messaging for genetic engineer attacks had several problems
 give genetic engineers teleport capability (as they had in slash'em); 'port
 	away after polymorphing someone so that they don't just repeat that
+if an invisible hero managed to convert an unaligned altar to an aligned one
+	with color enabled, altar wasn't immediately redrawn with new color
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
