@@ -465,6 +465,10 @@ contents of chests, large boxes, and ice boxes are now immune to water damage
 	chests+large boxes were always immune and ice boxes always vulnerable)
 applying an empty brass lantern in an attempt to light it reported "your lamp
 	has run out of power"; change to "your lantern is out of power"
+when swallowed or underwater, player could be told about events (such as a
+	shapechanger taking on a new form) that the hero sensed but which
+	were not shown on the screen; treat being swallowed or underwater as
+	situations which block telepathy, extended monster detection, warning
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

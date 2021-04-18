@@ -826,10 +826,13 @@ peffects(struct obj *otmp)
                         g.potion_unkn = 0;
                 }
             }
-            see_monsters();
-            if (g.potion_unkn)
-                You_feel("lonely.");
-            break;
+            /* if swallowed or underwater, fall through to uncursed case */
+            if (!u.uswallow && !Underwater) {
+                see_monsters();
+                if (g.potion_unkn)
+                    You_feel("lonely.");
+                break;
+            }
         }
         if (monster_detect(otmp, 0))
             return 1; /* nothing detected */
