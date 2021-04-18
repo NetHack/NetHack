@@ -469,6 +469,7 @@ when swallowed or underwater, player could be told about events (such as a
 	shapechanger taking on a new form) that the hero sensed but which
 	were not shown on the screen; treat being swallowed or underwater as
 	situations which block telepathy, extended monster detection, warning
+some rolling boulder trap feedback was inconsistent
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -2241,7 +2241,8 @@ trapeffect_rolling_boulder_trap(
         int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
         feeltrap(trap);
-        pline("Click!  You trigger a rolling boulder trap!");
+        pline("%sYou trigger a rolling boulder trap!",
+              !Deaf ? "Click!  " : "");
         if (!launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                         trap->launch2.x, trap->launch2.y, style)) {
             deltrap(trap);
@@ -2252,13 +2253,16 @@ trapeffect_rolling_boulder_trap(
         struct permonst *mptr = mtmp->data;
 
         if (!is_flyer(mptr)) {
-            boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+            boolean in_sight = (mtmp == u.usteed
+                                || (cansee(mtmp->mx, mtmp->my)
+                                    && canspotmon(mtmp)));
             int style = ROLL | (in_sight ? 0 : LAUNCH_UNSEEN);
             boolean trapkilled = FALSE;
 
             newsym(mtmp->mx, mtmp->my);
             if (in_sight)
-                pline("Click!  %s triggers %s.", Monnam(mtmp),
+                pline("%s%s triggers %s.",
+                      !Deaf ? "Click!  " : "", Monnam(mtmp),
                       trap->tseen ? "a rolling boulder trap" : something);
             if (launch_obj(BOULDER, trap->launch.x, trap->launch.y,
                            trap->launch2.x, trap->launch2.y, style)) {
@@ -2699,8 +2703,15 @@ launch_obj(
     switch (style) {
     case ROLL | LAUNCH_UNSEEN:
         if (otyp == BOULDER) {
-            You_hear(Hallucination ? "someone bowling."
-                                   : "rumbling in the distance.");
+            if (cansee(x1, y1)) {
+                You_see("%s start to roll.", an(xname(singleobj)));
+            } else if (Hallucination) {
+                You_hear("someone bowling.");
+            } else {
+                You_hear("rumbling %s.", (distu(x1, y1) <= 4 * 4) ? "nearby"
+                                         : "in the distance");
+            }
+
         }
         style &= ~LAUNCH_UNSEEN;
         goto roll;
