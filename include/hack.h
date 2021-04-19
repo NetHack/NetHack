@@ -500,13 +500,13 @@ enum getobj_callback_returns {
      * else to foo". */
     GETOBJ_EXCLUDE_INACCESS = -1,
     /* invalid for purposes of not showing a prompt if nothing is valid but
-     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE but
+     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE_INACCESS but
      * without the "else" in "You don't have anything else to foo". */
     GETOBJ_EXCLUDE_SELECTABLE = 0,
     /* valid - invlet not presented in the summary or the ? menu as a
-     * recommendation, but is selectable if the player enters it anyway. Used
-     * for objects that are actually valid but unimportantly so, such as shirts
-     * for reading. */
+     * recommendation, but is selectable if the player enters it anyway.
+     * Used for objects that are actually valid but unimportantly so, such
+     * as shirts for reading. */
     GETOBJ_DOWNPLAY = 1,
     /* valid - will be shown in summary and ? menu */
     GETOBJ_SUGGEST  = 2,

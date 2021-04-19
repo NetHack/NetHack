@@ -3658,7 +3658,7 @@ apply_ok(struct obj *obj)
         return GETOBJ_EXCLUDE;
 
     /* all tools, all wands (breaking), all spellbooks (flipping through -
-     * including blank/novel/Book of the Dead) */
+       including blank/novel/Book of the Dead) */
     if (obj->oclass == TOOL_CLASS || obj->oclass == WAND_CLASS
         || obj->oclass == SPBOOK_CLASS)
         return GETOBJ_SUGGEST;
@@ -3669,11 +3669,16 @@ apply_ok(struct obj *obj)
             || obj->otyp == BULLWHIP))
         return GETOBJ_SUGGEST;
 
-    /* only applicable potion is oil, and it will only be offered as a choice
-     * when already discovered */
-    if (obj->otyp == POT_OIL && obj->dknown
-        && objects[obj->otyp].oc_name_known)
-        return GETOBJ_SUGGEST;
+    if (obj->oclass == POTION_CLASS) {
+        /* permit applying unknown potions, but don't suggest them */
+        if (!obj->dknown || !objects[obj->otyp].oc_name_known)
+            return GETOBJ_DOWNPLAY;
+
+        /* only applicable potion is oil, and it will only be suggested as a
+           choice when already discovered */
+        if (obj->otyp == POT_OIL)
+            return GETOBJ_SUGGEST;
+    }
 
     /* certain foods */
     if (obj->otyp == CREAM_PIE || obj->otyp == EUCALYPTUS_LEAF
@@ -3682,19 +3687,22 @@ apply_ok(struct obj *obj)
 
     if (is_graystone(obj)) {
         /* The only case where we don't suggest a gray stone is if we KNOW it
-         * isn't a touchstone. */
+           isn't a touchstone. */
         if (!obj->dknown)
             return GETOBJ_SUGGEST;
 
         if (obj->otyp != TOUCHSTONE
             && (objects[TOUCHSTONE].oc_name_known
                 || objects[obj->otyp].oc_name_known))
-            return GETOBJ_EXCLUDE;
+            return GETOBJ_EXCLUDE_SELECTABLE;
 
         return GETOBJ_SUGGEST;
     }
 
-    return GETOBJ_EXCLUDE;
+    /* item can't be applied; if picked anyway,
+       _EXCLUDE would yield "That is a silly thing to apply.",
+       _EXCLUDE_SELECTABLE yields "Sorry, I don't know how to use that." */
+    return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
 /* the 'a' command */
