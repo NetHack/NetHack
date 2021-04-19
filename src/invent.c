@@ -1427,10 +1427,12 @@ mime_action(const char *word)
         *bp = '\0';
         sfx = (bp + 1); /* "something <sfx>" */
     }
-    if (!strncmp(buf, "dip ", 4) && strstr(buf + 4, " into")) {
-        /* "dip <foo> into" => "dipping <foo> into" */
+    if ((!strncmp(buf, "rub the ", 8) && strstr(buf + 8, " on"))
+        || (!strncmp(buf, "dip ", 4) && strstr(buf + 4, " into"))) {
+        /* "rub the royal jelly on" -> "rubbing the royal jelly on", or
+           "dip <foo> into" => "dipping <foo> into" */
         buf[3] = '\0';
-        pfx = &buf[4]; /* "<pfx> something" */
+        pfx = &buf[3 + 1]; /* "<pfx> something" */
     }
     if ((bp = strstr(buf, " or ")) != 0) {
         *bp = '\0';

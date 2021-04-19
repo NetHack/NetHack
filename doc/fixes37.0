@@ -410,6 +410,8 @@ remove superfluous "All" from "All foos are already nonexistent." when blessed
 	genocide tries to remove something which has already been genocided
 "#dip <item> into -" produced a scrambled message:
 	You mime dip <item> intoing something.
+similarly, "#rub the royal jelly on -" produced
+	You mime rub the royal jellying on something.
 mounted hero falling out of saddle shouldn't hit ground and take damage when
 	levitating or flying (if done without steed's help)
 avoid "obj not free" panic if monster kills itself by reading scroll of earth
