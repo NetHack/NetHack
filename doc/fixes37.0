@@ -110,7 +110,23 @@ correctly account for fuel remaining when lit candles are attached
 	there were 15 or fewer turns remaining)
 praying on an unaligned altar outside of Gehennom behaved like an ordinary
 	prayer; make that always fail
-Discworld typo: Moving Pictures passage 12 "or" -> "of"
+tribute (Discworld snippets) typos, in book order rather than fix order:
+	Sourcery passage #4 "the moment the words were out of your mouth" ->
+	 "the moment and the words out of your mouth" where "were" didn't
+	 belong and awkward phrasing because of it caused "and" to be removed
+	 (would be much clearer if optional comma after "moment" was included)
+	Moving Pictures passage #10 initial single quote should be double,
+	 #12 "or" -> "of", #14 second instance of "megalomaniac" misspelled
+	Lords and Ladies passage #5, near end add missing opening double
+	 quote, passage #7 last paragraph, "to" -> "be"
+	Hogfather passage #7 missing initial double quote for "Oh, just ...",
+	 also #7 insert missing "you" into "Why are you feeling [...]"
+	Jingo passage #2 "Vines" -> "Vimes", "profferred" -> "proffered",
+	 missing opening single quote on second sentence of Lord Downey's
+	 line, passage #11 both in footnote:  "genious" -> "genius",
+	 "was, oddly enough, was one [...]" -> "was, oddly enough, one [...]"
+	A Hat Full of Sky passage #9 "though" -> "thought"
+	various, including Death quotes:  separate sentences by two spaces
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
@@ -925,6 +941,7 @@ menu_shift_left, menu_shift_right menu command keys; default '{' and '}'
 using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	thrown-and-return weapon will throw that weapon instead of filling
 	the quiver (inspired by xNetHack)
+3.6's tribute: add one new passage to Sourcery, three to Small Gods
 
 
 Platform- and/or Interface-Specific New Features

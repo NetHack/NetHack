@@ -2984,15 +2984,22 @@ The witches watched with interest.
 #
 #
 #
-%title Small Gods (12)
+%title Small Gods (15)
+# p. 174 (Harper Torch edition; passage starts mid-paragraph; speaker is
+#         the blind philosopher Didactylos referring to a book in scroll
+#         form called /On Religion/ by another philosopher, Abraxas;
+#         Didactylos mentions that Old 'Charcoal' Abraxas had been hit by
+#         lightning 15 times)
 %passage 1
-He says gods like to see an atheist around.  Gives them something to aim at.
+"[...]  He says gods like to see an atheist around.  Gives them something
+to aim at."
 
   [Small Gods, by Terry Pratchett]
 %e passage
+# p. 79 (passage starts mid-paragraph; speaker is Cut-Me-Own-Hand-Off Dhblah)
 %passage 2
-Pets are always a great help in times of stress.  And in times of starvation
-too, o'course.
+[...]  "Pets are always a great help in times of stress.  And in times of
+starvation too, o'course."
 
   [Small Gods, by Terry Pratchett]
 %e passage
@@ -3191,6 +3198,35 @@ But, on the whole, there are worse places to be buried than inside a lion.
 
   [Small Gods, by Terry Pratchett]
 %e passage
+#
+# 3 more passages added for 3.7
+#
+# p. 7 (Brother Nhumrod is in charge of a group of novices; he's thinking
+#       about one of them, Brutha, the main character of the story)
+%passage 13
+There was something creepy about the boy, Nhumrod thought.  It was the way
+he looked at you when you were talking, as if he was /listening/.
+
+  [Small Gods, by Terry Pratchett]
+%e passage
+# p. 11 (musing by the Great God Om)
+%passage 14
+The trouble with being a god is that you've got no one to pray to.
+
+  [Small Gods, by Terry Pratchett]
+%e passage
+# p. 210 (speaker is Didactylos the Ephebian philosopher)
+%passage 15
+"Life in this world," he said, "is, as it were, a sojourn in a cave.  What
+can we know of reality?  For all we see of the true nature of existence
+is, shall we say, no more than bewildering and amusing shadows cast upon
+the inner wall of the cave by the unseen blinding light of absolute truth,
+from which we may or may not deduce some glimmer of veracity, and we as
+troglodyte seekers of wisdom can only lift our voices to the unseen and
+say, humbly, 'Go on, do Deformed Rabbit... it's my favorite.'"
+
+  [Small Gods, by Terry Pratchett]
+%e passage
 %e title
 #
 #
@@ -3215,7 +3251,7 @@ Elves are bad.
 
   [Lords and Ladies, by Terry Pratchett]
 %e passage
-# p. 32
+# p. 32 (talking about Magrat who has married Verence, Lancre's new king)
 %passage 2
 "Hope she does all right as queen," said Nanny.
 
@@ -3326,7 +3362,7 @@ Younger witches, on the other hand, talk about it all the time and believe
 it involves crystals, mystic forces, and dancing about without yer drawers
 on.
 
-Everyone may to right, all at the same time.  That's the thing about
+Everyone may be right, all at the same time.  That's the thing about
 quantum.
 
   [Lords and Ladies, by Terry Pratchett]
@@ -5061,8 +5097,8 @@ Patrician up the ladder.
 called it the Going-Under-the-Water-Safely Device," said Leonard, behind
 him.(1)  "But usually I just think of it as the boat."
 
-(1) Thinking up good names was, oddly enough, was one area where Leonard
-of Quirm's genious tended to give up.
+(1) Thinking up good names was, oddly enough, one area where Leonard of
+Quirm's genius tended to give up.
 
   [Jingo, by Terry Pratchett]
 %e passage
@@ -5974,6 +6010,12 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 # libraries.  In the UK, _The_Amazing_Maurice..._ won the Carnegie Medal
 # which is awarded for best children's book of the year.
 # (The other Young Adult Discworld books are the five Tiffany Aching ones.)
+#
+# "Mr so-called Amazing Maurice and His Educated Rodents!" (the characters
+# rather than the book named for them) were first mentioned--in passing
+# rather than part of the story--about 1/3 of the way through _Reaper_Man_.
+# (p. 115, ROC edition; the text there does capitalize 'His'; 'Mr' without
+# period is accurate; the exclamation is derogatory).
 #
 # _The_Amazing_Maurice..._ may well be the most serious Discworld book.
 # (Don't worry, it has lots of humor/humour in it....)
