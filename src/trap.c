@@ -3928,12 +3928,12 @@ water_damage(
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
         if (carried(obj))
-            pline("Some water gets into your %s!", ostr);
+            pline("Some %s gets into your %s!", hliquid("water"), ostr);
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
         if (carried(obj)) {
-            pline_The("water slides right off your %s.", ostr);
+            pline_The("%s slides right off your %s.", hliquid("water"), ostr);
             makeknown(obj->otyp);
         }
         /* not actually damaged, but because we /didn't/ get the "water
