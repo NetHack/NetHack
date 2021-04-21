@@ -912,7 +912,7 @@ status_enlightenment(int mode, int final)
         if (!strcmp(heldmon, "it")
             && (!has_mgivenname(u.ustuck)
                 || strcmp(MGIVENNAME(u.ustuck), "it") != 0))
-            Strcpy(heldmon, "an unseen createure");
+            Strcpy(heldmon, "an unseen creature");
     }
     if (u.uswallow) { /* implies u.ustuck is non-Null */
         Sprintf(buf, "%s by %s",
