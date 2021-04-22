@@ -2637,6 +2637,7 @@ extern void u_init(void);
 
 /* ### uhitm.c ### */
 
+extern void dynamic_multi_reason(struct monst *, const char *, boolean);
 extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);

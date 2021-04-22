@@ -494,6 +494,37 @@ done_in_by(struct monst *mtmp, int how)
     }
 
     Strcpy(g.killer.name, buf);
+
+    /* might need to fix up multi_reason if 'mtmp' caused the reason */
+    if (g.multi_reason
+        && g.multi_reason > g.multireasonbuf
+        && g.multi_reason < g.multireasonbuf + sizeof g.multireasonbuf - 1) {
+        char reasondummy, *p;
+        unsigned reasonmid = 0;
+
+        /*
+         * multireasonbuf[] contains 'm_id:reason' and multi_reason
+         * points at the text past the colon, so we have something
+         * like "42:paralyzed by a ghoul"; if mtmp->m_id matches 42
+         * then we truncate 'reason' at its first space so that final
+         * death reason becomes "Killed by a ghoul, while paralyzed."
+         * instead of "Killed by a ghoul, while paralyzed by a ghoul."
+         * (3.6.x gave "Killed by a ghoul, while paralyzed by a monster."
+         * which is potenitally misleading when the monster is also
+         * the killer.)
+         *
+         * Note that if the hero is life-saved and then killed again
+         * before the helplessness has cleared, the second death will
+         * report the truncated helplessness reason even if some other
+         * monster peforms the /coup de grace/.
+         */
+        if (sscanf(g.multireasonbuf, "%u:%c", &reasonmid, &reasondummy) == 2
+            && mtmp->m_id == reasonmid) {
+            if ((p = index(g.multireasonbuf, ' ')) != 0)
+                *p = '\0';
+        }
+    }
+
     /*
      * Chicken and egg issue:
      *  Ordinarily Unchanging ought to override something like this,
@@ -555,6 +586,7 @@ fixup_death(int how)
                     g.multi_reason = death_fixups[i].include;
                 else /* remove the helplessness reason */
                     g.multi_reason = (char *) 0;
+                g.multireasonbuf[0] = '\0'; /* dynamic buf stale either way */
                 if (death_fixups[i].unmulti) /* possibly hide helplessness */
                     g.multi = 0L;
                 break;

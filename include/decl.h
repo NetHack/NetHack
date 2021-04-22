@@ -717,6 +717,7 @@ struct instance_globals {
     char command_line[COLNO];
     long command_count;
     const char *multi_reason;
+    char multireasonbuf[QBUFSZ]; /* note: smaller than usual [BUFSZ] */
     int nroom;
     int nsubroom;
     int occtime;

@@ -28,6 +28,30 @@ static boolean shade_aware(struct obj *);
 
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
 
+/* multi_reason is usually a literal string; here we generate one that
+   has the causing monster's type included */
+void
+dynamic_multi_reason(struct monst *mon, const char *verb, boolean by_gaze)
+{
+    /* combination of noname_monnam() and m_monnam(), more or less;
+       accurate regardless of visibility or hallucination (only seen
+       if game ends) and without personal name (M2_PNAME excepted) */
+    char *who = x_monnam(mon, ARTICLE_A, (char *) 0,
+                         (SUPPRESS_IT | SUPPRESS_INVISIBLE
+                          | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE
+                          | SUPPRESS_NAME),
+                         FALSE),
+         *p = g.multireasonbuf;
+
+    /* prefix info for done_in_by() */
+    Sprintf(p, "%u:", mon->m_id);
+    p = eos(p);
+    Sprintf(p, "%s by %s%s", verb,
+            !by_gaze ? who : s_suffix(who),
+            !by_gaze ? "" : " gaze");
+    g.multi_reason = p;
+}
+
 void
 erode_armor(struct monst *mdef, int hurt)
 {
@@ -2813,7 +2837,9 @@ mhitm_ad_plys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     You("are frozen by %s!", mon_nam(magr));
                 g.nomovemsg = You_can_move_again;
                 nomul(-rnd(10));
-                g.multi_reason = "paralyzed by a monster";
+                /* set g.multi_reason;
+                   3.6.x used "paralyzed by a monster"; be more specific */
+                dynamic_multi_reason(magr, "paralyzed", FALSE);
                 exercise(A_DEX, FALSE);
             }
         }
@@ -4967,7 +4993,9 @@ passive(struct monst *mon,
                     } else {
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
-                        g.multi_reason = "frozen by a monster's gaze";
+                        /* set g.multi_reason;
+                           3.6.x used "frozen by a monster's gaze" */
+                        dynamic_multi_reason(mon, "frozen", TRUE);
                         g.nomovemsg = 0;
                     }
                 } else {
@@ -4982,7 +5010,9 @@ passive(struct monst *mon,
                 You("are frozen by %s!", mon_nam(mon));
                 g.nomovemsg = You_can_move_again;
                 nomul(-tmp);
-                g.multi_reason = "frozen by a monster";
+                /* set g.multi_reason;
+                   3.6.x used "frozen by a monster"; be more specific */
+                dynamic_multi_reason(mon, "frozen", FALSE);
                 exercise(A_DEX, FALSE);
             }
             break;

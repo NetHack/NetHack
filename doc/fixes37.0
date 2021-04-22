@@ -472,7 +472,7 @@ if a branch has only one level (Fort Ludios), prevent creation of any level
 	wishing could attempt to place one)
 opening/unlocking magic zapped at monster holding the hero will release hold
 	(zap at engulfer already expels hero); zapping at self has same effect
-when riding, allow scroll of remove curse to affect to affect steed's saddle
+when riding, allow scroll of remove curse read by hero to affect steed's saddle
 the 'scores' option for final top ten display left default values in place if
 	only some of the three settings were set; 'scores:own' should have
 	produced '0 top/0 around/own' but ended up as '3 top/2 around/own'
@@ -488,6 +488,9 @@ when swallowed or underwater, player could be told about events (such as a
 	were not shown on the screen; treat being swallowed or underwater as
 	situations which block telepathy, extended monster detection, warning
 some rolling boulder trap feedback was inconsistent
+change "killed by <a foo>, while {paralyzed|frozen} by <a foo>" into
+	"killed by <a foo>, while {paralyzed|frozen}" if the killer caused
+	hero's helplessness
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

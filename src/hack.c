@@ -3020,7 +3020,7 @@ nomul(int nval)
     u.usleep = 0;
     g.multi = nval;
     if (nval == 0)
-        g.multi_reason = NULL;
+        g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
     end_running(TRUE);
 }
 
@@ -3047,7 +3047,7 @@ unmul(const char *msg_override)
     }
     g.nomovemsg = 0;
     u.usleep = 0;
-    g.multi_reason = NULL;
+    g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
     if (g.afternmv) {
         int (*f)(void) = g.afternmv;
 

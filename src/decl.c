@@ -259,6 +259,9 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* command_line */
     0, /* command_count */
     NULL, /* multi_reason */
+    /* multi_reason usually points to a string literal (when not Null)
+       but multireasonbuf[] is available for when it needs to be dynamic */
+    DUMMY, /* multireasonbuf[] */
     0, /* nroom */
     0, /* nsubroom */
     0, /* occtime */
