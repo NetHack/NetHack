@@ -1,4 +1,4 @@
-/* NetHack 3.7	explode.c	$NHDT-Date: 1613258116 2021/02/13 23:15:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.7	explode.c	$NHDT-Date: 1619553210 2021/04/27 19:53:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,9 +25,12 @@ static const int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
  *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
-explode(int x, int y, 
-        int type, /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
-        int dam, char olet, int expltype)
+explode(
+    int x, int y, /* explosion's location; adjacent spots are also affected */
+    int type,     /* same as in zap.c; -(wand typ) for some WAND_CLASS */
+    int dam,      /* damage amount */
+    char olet,    /* object class or BURNING_OIL or MON_EXPLODE */
+    int expltype) /* explosion type: controls color of explosion glyphs */
 {
     int i, j, k, damu = dam;
     boolean starting = 1;
@@ -532,7 +535,7 @@ explode(int x, int y,
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* g.killer.name=="gas spore's explosion"    */
+                        ;        /* g.killer.name=="gas spore's explosion". */
                     else if (str != g.killer.name && str != hallu_buf)
                         Strcpy(g.killer.name, str);
                     g.killer.format = KILLED_BY_AN;
