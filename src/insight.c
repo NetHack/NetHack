@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1614076940 2021/02/23 10:42:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1619640466 2021/04/28 20:07:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -912,7 +912,7 @@ status_enlightenment(int mode, int final)
         if (!strcmp(heldmon, "it")
             && (!has_mgivenname(u.ustuck)
                 || strcmp(MGIVENNAME(u.ustuck), "it") != 0))
-            Strcpy(heldmon, "an unseen createure");
+            Strcpy(heldmon, "an unseen creature");
     }
     if (u.uswallow) { /* implies u.ustuck is non-Null */
         Sprintf(buf, "%s by %s",
