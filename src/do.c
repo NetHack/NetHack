@@ -1969,6 +1969,11 @@ zombify_mon(anything *arg, long timeout)
         if (has_omonst(body))
             free_omonst(body);
 
+        /* Ensure we get a new oeaten proportional to the new zombie form's
+         * total possible nutrition, so that the ratio stays the same and can
+         * be used by eaten_stat to determine the zombie's HP. */
+        body->oeaten = (unsigned) (body->oeaten * mons[zmon].cnutrit
+                                   / mons[body->corpsenm].cnutrit);
         body->corpsenm = zmon;
         revive_mon(arg, timeout);
     } else {
