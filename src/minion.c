@@ -225,7 +225,8 @@ demon_talk(register struct monst *mtmp)
 
     if (uwep && (uwep->oartifact == ART_EXCALIBUR
                  || uwep->oartifact == ART_DEMONBANE)) {
-        pline("%s looks very angry.", Amonnam(mtmp));
+        if (canspotmon(mtmp))
+            pline("%s looks very angry.", Amonnam(mtmp));
         mtmp->mpeaceful = mtmp->mtame = 0;
         set_malign(mtmp);
         newsym(mtmp->mx, mtmp->my);
