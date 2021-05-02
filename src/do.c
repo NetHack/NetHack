@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1608673689 2020/12/22 21:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1619919402 2021/05/02 01:36:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.267 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1969,7 +1969,7 @@ zombify_mon(anything *arg, long timeout)
         if (has_omonst(body))
             free_omonst(body);
 
-        body->corpsenm = zmon;
+        set_corpsenm(body, zmon);
         revive_mon(arg, timeout);
     } else {
         rot_corpse(arg, timeout);

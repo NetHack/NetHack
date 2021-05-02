@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1606343579 2020/11/25 22:32:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1619919403 2021/05/02 01:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1060,7 +1060,7 @@ mksobj(int otyp, boolean init, boolean artif)
 
 /*
  * Several areas of the code made direct reassignments
- * to obj->corpsenm. Because some special handling is
+ * to obj->corpsenm.  Because some special handling is
  * required in certain cases, place that handling here
  * and call this routine in place of the direct assignment.
  *
@@ -1079,18 +1079,35 @@ mksobj(int otyp, boolean init, boolean artif)
  *
  */
 void
-set_corpsenm(struct obj* obj, int id)
+set_corpsenm(struct obj *obj, int id)
 {
+    int old_id = obj->corpsenm;
     long when = 0L;
 
     if (obj->timed) {
-        if (obj->otyp == EGG)
+        if (obj->otyp == EGG) {
             when = stop_timer(HATCH_EGG, obj_to_any(obj));
-        else {
+        } else {
             when = 0L;
             obj_stop_timers(obj); /* corpse or figurine */
         }
     }
+    /* oeaten is used to determine how much nutrition is left in
+       multiple-bite food and also used to derive how many hit points
+       a creature resurrected from a partly eaten corpse gets; latter
+       is of interest when a <foo> corpse revives as a <foo> zombie
+       in case they are defined with different mons[].cnutrit values */
+    if (obj->otyp == CORPSE && obj->oeaten != 0
+        /* when oeaten is non-zero, index old_id can't be NON_PM
+           and divisor mons[old_id].cnutrit can't be zero */
+        && mons[old_id].cnutrit != mons[id].cnutrit) {
+        /* oeaten and cnutrit are unsigned; theoretically that could
+           be 16 bits and the calculation might overflow, so force long */
+        obj->oeaten = (unsigned) ((long) obj->oeaten
+                                  * (long) mons[id].cnutrit
+                                  / (long) mons[old_id].cnutrit);
+    }
+
     obj->corpsenm = id;
     switch (obj->otyp) {
     case CORPSE:

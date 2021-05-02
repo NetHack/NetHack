@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.518 $ $NHDT-Date: 1619640466 2021/04/28 20:07:46 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.519 $ $NHDT-Date: 1619919402 2021/05/02 01:36:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -637,6 +637,11 @@ if an invisible hero managed to convert an unaligned altar to an aligned one
 	with color enabled, altar wasn't immediately redrawn with new color
 repair some regressions to (a)pply introduced by "getobj refactor" patch
 fix ^X feedback when held typo: "unseen createure" -> "unseen creature"
+if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
+	eaten at revival time and monster <foo> is defined as providing more
+	nutrition that <foo> zombie, oeaten_stat() could give the warning
+	"partly eaten food more nutritious than untouched food" when used to
+	calculate zombie's hit points (depended upon how much had been eaten)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
