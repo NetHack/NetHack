@@ -296,7 +296,8 @@ curs_add_invt(
     }
 
     newelement.invtxt = dupstr(str);
-    newelement.c_attr = attr ? A_NORMAL : NONE; /* override menu_headings */
+    newelement.c_attr = attr; /* note: caller has already converted 'attr'
+                               * from tty-style attribute to curses one */
     newelement.letter = accelerator;
     aptr[pi.inuseindx++] = newelement;
 
