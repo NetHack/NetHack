@@ -491,6 +491,8 @@ some rolling boulder trap feedback was inconsistent
 change "killed by <a foo>, while {paralyzed|frozen} by <a foo>" into
 	"killed by <a foo>, while {paralyzed|frozen}" if the killer caused
 	hero's helplessness
+"It looks very angry" would be given if a hero wielding Excalibur or Demonbane
+	offended an unseen demon lord
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
