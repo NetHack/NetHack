@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1617150563 2021/03/31 00:29:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
+# NetHack 3.7  tribute       $NHDT-Date: 1620076692 2021/05/03 21:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -3231,7 +3231,7 @@ say, humbly, 'Go on, do Deformed Rabbit... it's my favorite.'"
 #
 #
 #
-%title Lords and Ladies (12)
+%title Lords and Ladies (13)
 # p. 122 (Harper Torch edition)
 %passage 1
 Elves are wonderful.  They provoke wonder.
@@ -3251,7 +3251,7 @@ Elves are bad.
 
   [Lords and Ladies, by Terry Pratchett]
 %e passage
-# p. 32 (talking about Magrat who has married Verence, Lancre's new king)
+# p. 32 (Magrat has given up being a witch to marry Verence II, Lancre's king)
 %passage 2
 "Hope she does all right as queen," said Nanny.
 
@@ -3460,13 +3460,35 @@ kingdom.
 
   [Lords and Ladies, by Terry Pratchett]
 %e passage
+#
+# passage added for 3.7
+# p. 60 (passage starts mid-paragraph; "paddlin'" is accurate but unclear;
+#        "ooh-jar" is accurate for ouija after having been butchered by
+#        Nanny Ogg's previously established 'mastery' of foreign languages)
+%passage 13
+"[...]  Playing at witches.  You know, ooh-jar boards and cards and wearing
+black lace gloves with no fingers to 'em and paddlin' with the occult."
+
+"I don't hold with paddlin' with the occult," said Granny firmly.  "Once
+you start paddlin' with the occult you start believing in spirits, and
+when you start believing in spirits you start believing in demons, and then
+before you know where you are you're believing in gods.  And then you're
+in /trouble/."
+
+"But all them things exist," said Nanny Ogg.
+
+"That's no call to go around believing in them.  It only encourages 'em."
+
+  [Lords and Ladies, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
 %title Men at Arms (14)
+# p. 72 (Harper Torch edition)
 %passage 1
-The maze was so small that people got lost looking for it.
+The maze was so small that people got lost looking /for/ it.
 
   [Men at Arms, by Terry Pratchett]
 %e passage
@@ -3474,11 +3496,11 @@ The maze was so small that people got lost looking for it.
 %passage 2
 Ankh-Morpork had a king again.
 
-And this was /right/.  And it was /fate/ that let Edward recognize this
+And this was /right/.  And it was /fate/ that had let Edward recognize this
 /just/ when he'd got his Plan.  And it was /right/ that it was /Fate/,
 and the city would be /Saved/ from its ignoble present by its /glorius/
-past.  He had the /Means/, and he had the /end/.  And so on ...
-Edward's thoughts often ran like this.
+past.  He had the /Means/, and he had the /end/.  And so on ...  Edward's
+thoughts often ran like this.
 
 He could think in /italics/.  Such people need watching.
 

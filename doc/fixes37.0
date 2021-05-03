@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.520 $ $NHDT-Date: 1620075044 2021/05/03 20:50:44 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.522 $ $NHDT-Date: 1620076691 2021/05/03 21:18:11 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -119,6 +119,8 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	 #12 "or" -> "of", #14 second instance of "megalomaniac" misspelled
 	Lords and Ladies passage #5, near end add missing opening double
 	 quote, passage #7 last paragraph, "to" -> "be"
+	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
+	word "had": 'it was /fate/ that _had_ let Edward'
 	Hogfather passage #7 missing initial double quote for "Oh, just ...",
 	 also #7 insert missing "you" into "Why are you feeling [...]"
 	Jingo passage #2 "Vines" -> "Vimes", "profferred" -> "proffered",
@@ -954,7 +956,8 @@ menu_shift_left, menu_shift_right menu command keys; default '{' and '}'
 using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	thrown-and-return weapon will throw that weapon instead of filling
 	the quiver (inspired by xNetHack)
-3.6's tribute: add one new passage to Sourcery, three to Small Gods
+3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
+	Lords and Ladies
 
 
 Platform- and/or Interface-Specific New Features
