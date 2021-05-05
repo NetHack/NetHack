@@ -3946,7 +3946,7 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
         /* find an object to steal, non-cursed if magr is tame */
         for (obj = mdef->minvent; obj; obj = obj->nobj)
             if (!magr->mtame || !obj->cursed)
-                return;
+                break;
 
         if (obj) {
             char buf[BUFSZ];
