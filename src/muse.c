@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1607734843 2020/12/12 01:00:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1620329779 2021/05/06 19:36:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -163,7 +163,7 @@ mzapwand(
 
         You_hear("a %s zap.", (distu(mtmp->mx, mtmp->my) <= range * range)
                                  ? "nearby" : "distant");
-        otmp->known = 0;
+        unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         pline("%s with %s!",
               monverbself(mtmp, Monnam(mtmp), "zap", (char *) 0),
@@ -191,7 +191,7 @@ mplayhorn(
         You_hear("a horn being played %s.",
                  (distu(mtmp->mx, mtmp->my) <= range * range)
                  ? "nearby" : "in the distance");
-        otmp->known = 0; /* hero doesn't know how many charges are left */
+        unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         otmp->dknown = 1;
         objnamp = xname(otmp);

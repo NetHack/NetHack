@@ -1,4 +1,4 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1596498213 2020/08/03 23:43:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1620329782 2021/05/06 19:36:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -527,6 +527,11 @@ mpickobj(register struct monst* mtmp, register struct obj* otmp)
        and if it's eventually dropped in a shop, shk will claim it */
     if (!mtmp->mtame)
         otmp->no_charge = 0;
+    /* if monster is unseen, info hero knows about this object becomes lost;
+       continual pickup and drop by pets makes this too annoying if it is
+       applied to them */
+    if (!mtmp->mtame && !canseemon(mtmp))
+        unknow_object(otmp);
     /* Must do carrying effects on object prior to add_to_minv() */
     carry_obj_effects(otmp);
     /* add_to_minv() might free otmp [if merged with something else],

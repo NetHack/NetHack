@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.524 $ $NHDT-Date: 1620326528 2021/05/06 18:42:08 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ $NHDT-Date: 1620329775 2021/05/06 19:36:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -499,6 +499,9 @@ Entering a special room, only wake up the monsters in that room instead of
 	doing a level-wide wake-up
 any blessed key was behaving as if was the rogue's Master Key when unlocking
 	a trapped chest or box
+when an unseen non-pet picks up or uses an item, hero loses known/dknown/
+	bknown/cknown/lknown memory of that item (so becomes unidentified; in
+	particular, player won't be asked what to call unseen thrown potion)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
