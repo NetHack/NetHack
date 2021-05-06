@@ -3398,6 +3398,8 @@ consume_oeaten(struct obj *obj, int amt)
      * huge positive value instead.  So far, no one has figured out
      * _why_ that inappropriate subtraction might sometimes happen.
      */
+    if (!obj_nutrition(obj))
+        return;
 
     if (amt > 0) {
         /* bit shift to divide the remaining amount of food */
