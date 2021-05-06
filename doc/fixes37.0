@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.522 $ $NHDT-Date: 1620076691 2021/05/03 21:18:11 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.524 $ $NHDT-Date: 1620326528 2021/05/06 18:42:08 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -497,6 +497,8 @@ change "killed by <a foo>, while {paralyzed|frozen} by <a foo>" into
 	offended an unseen demon lord
 Entering a special room, only wake up the monsters in that room instead of
 	doing a level-wide wake-up
+any blessed key was behaving as if was the rogue's Master Key when unlocking
+	a trapped chest or box
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
