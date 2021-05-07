@@ -2104,6 +2104,8 @@ bhito(struct obj *obj, struct obj *otmp)
                 boolean by_u = !g.context.mon_moving;
                 int corpsenm = corpse_revive_type(obj);
                 char *corpsname = cxname_singular(obj);
+                unsigned save_norevive = obj->norevive;
+                obj->norevive = 0;  /* deliberate revival ignores norevive */
 
                 /* get corpse's location before revive() uses it up */
                 if (!get_obj_location(obj, &ox, &oy, 0))
@@ -2111,6 +2113,7 @@ bhito(struct obj *obj, struct obj *otmp)
 
                 mtmp = revive(obj, TRUE);
                 if (!mtmp) {
+                    obj->norevive = save_norevive;
                     res = 0; /* no monster implies corpse was left intact */
                 } else {
                     if (cansee(ox, oy)) {
