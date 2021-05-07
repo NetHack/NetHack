@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1596498233 2020/08/03 23:43:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1620413928 2021/05/07 18:58:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2101,6 +2101,7 @@ bhito(struct obj *obj, struct obj *otmp)
             } else if (obj->otyp == CORPSE) {
                 struct monst *mtmp;
                 xchar ox, oy;
+                unsigned save_norevive;
                 boolean by_u = !g.context.mon_moving;
                 int corpsenm = corpse_revive_type(obj);
                 char *corpsname = cxname_singular(obj);
@@ -2109,8 +2110,13 @@ bhito(struct obj *obj, struct obj *otmp)
                 if (!get_obj_location(obj, &ox, &oy, 0))
                     ox = obj->ox, oy = obj->oy; /* won't happen */
 
+                /* explicit revival magic overrides timer-based no-revive */
+                save_norevive = obj->norevive;
+                obj->norevive = 0;
+
                 mtmp = revive(obj, TRUE);
                 if (!mtmp) {
+                    obj->norevive = save_norevive;
                     res = 0; /* no monster implies corpse was left intact */
                 } else {
                     if (cansee(ox, oy)) {

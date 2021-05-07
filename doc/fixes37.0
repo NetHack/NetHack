@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.526 $ $NHDT-Date: 1620348705 2021/05/07 00:51:45 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.527 $ $NHDT-Date: 1620413928 2021/05/07 18:58:48 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -655,6 +655,8 @@ if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
 	nutrition that <foo> zombie, oeaten_stat() could give the warning
 	"partly eaten food more nutritious than untouched food" when used to
 	calculate zombie's hit points (depended upon how much had been eaten)
+undead turning magic revived corpses flagged as no-revive if they were being
+	carried but not if they were zapped while on the floor
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
