@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ $NHDT-Date: 1620329775 2021/05/06 19:36:15 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.526 $ $NHDT-Date: 1620348705 2021/05/07 00:51:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -502,6 +502,8 @@ any blessed key was behaving as if was the rogue's Master Key when unlocking
 when an unseen non-pet picks up or uses an item, hero loses known/dknown/
 	bknown/cknown/lknown memory of that item (so becomes unidentified; in
 	particular, player won't be asked what to call unseen thrown potion)
+wishing for a partly eaten wraith corpse yielded "partly eaten food (1) more
+	nutritious than untouched food (0)"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

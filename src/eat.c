@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1620348708 2021/05/07 00:51:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.242 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,7 +14,6 @@ static int unfaint(void);
 static const char *food_xname(struct obj *, boolean);
 static void choke(struct obj *);
 static void recalc_wt(void);
-static unsigned obj_nutrition(struct obj *);
 static struct obj *touchfood(struct obj *);
 static void do_reset_eat(void);
 static void done_eating(boolean);
@@ -293,7 +292,7 @@ reset_eat(void)
 }
 
 /* base nutrition of a food-class object */
-static unsigned
+unsigned
 obj_nutrition(struct obj *otmp)
 {
     unsigned nut = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
@@ -1012,7 +1011,8 @@ cpostfx(int pm)
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
-                    an(Upolyd ? pmname(g.youmonst.data, Ugender) : g.urace.noun));
+                    an(Upolyd ? pmname(g.youmonst.data, Ugender)
+                              : g.urace.noun));
             g.eatmbuf = dupstr(buf);
             g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
@@ -3373,6 +3373,24 @@ eaten_stat(int base, struct obj *obj)
 void
 consume_oeaten(struct obj *obj, int amt)
 {
+    if (!obj_nutrition(obj)) {
+        char itembuf[40];
+        int otyp = obj->otyp;
+
+        if (otyp == CORPSE || otyp == EGG || otyp == TIN) {
+            Strcpy(itembuf, (otyp == CORPSE) ? "corpse"
+                            : (otyp == EGG) ? "egg"
+                              : (otyp == TIN) ? "tin" : "other?");
+            Sprintf(eos(itembuf), " [%d]", obj->corpsenm);
+        } else {
+            Sprintf(itembuf, "%d", otyp);
+        }
+        impossible(
+            "oeaten: attempting to set 0 nutrition food (%s) partially eaten",
+                   itembuf);
+        return;
+    }
+
     /*
      * This is a hack to try to squelch several long standing mystery
      * food bugs.  A better solution would be to rewrite the entire

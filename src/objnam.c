@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1612053751 2021/01/31 00:42:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.313 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4515,12 +4515,16 @@ readobjnam(char* bp, struct obj* no_wish)
     }
 
     if (d.halfeaten && d.otmp->oclass == FOOD_CLASS) {
-        if (d.otmp->otyp == CORPSE)
-            d.otmp->oeaten = mons[d.otmp->corpsenm].cnutrit;
-        else
-            d.otmp->oeaten = objects[d.otmp->otyp].oc_nutrition;
-        /* (do this adjustment before setting up object's weight) */
-        consume_oeaten(d.otmp, 1);
+        unsigned nut = obj_nutrition(d.otmp);
+
+        /* do this adjustment before setting up object's weight; skip
+           "partly eaten" for food with 0 nutrition (wraith corpse) or for
+           anything that couldn't take more than one bite (1 nutrition;
+           ought to check for one-bite instead but that's complicated) */
+        if (nut > 1) {
+            d.otmp->oeaten = nut;
+            consume_oeaten(d.otmp, 1);
+        }
     }
     d.otmp->owt = weight(d.otmp);
     if (d.very && d.otmp->otyp == HEAVY_IRON_BALL)
