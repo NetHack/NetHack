@@ -234,7 +234,7 @@ themerooms = {
                                   if (percent(50)) then
                                      local mons = { "M", "V", "L", "Z" };
                                      shuffle(mons);
-                                     des.monster(mons[1], 0,0);
+                                     des.monster({ class = mons[1], x=0,y=0, waiting = 1 });
                                   else
                                      des.object({ id = "corpse", montype = "@", coord = {0,0} });
                                   end
