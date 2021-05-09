@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.528 $ $NHDT-Date: 1620522110 2021/05/09 01:01:50 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.529 $ $NHDT-Date: 1620548001 2021/05/09 08:13:21 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -508,6 +508,9 @@ if PREFIXES_IN_USE was defined (and VAR_PLAYGROUND forces it to be) when
 	COMPRESS was also defined (external save and bones file compression
 	via fork()+exec()), the file name buffer in docompress_file() wasn't
 	big enough so could overflow and trigger a crash
+suppress "This <foo> corpse takes {delicious|okay|terrible}" if preceded by
+	"You have a bad case of stomach acid" or "Ecch - that must have been
+	poisonous"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
