@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1608749031 2020/12/23 18:43:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1620590081 2021/05/09 19:54:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -97,10 +97,12 @@ self_lookat(char *outbuf)
     return outbuf;
 }
 
-/* format description of 'mon's health for look_at_monster(), done_in_by() */
+/* format a description of 'mon's health for look_at_monster(), done_in_by();
+   result isn't Healer-specific (not trained for arbitrary creatures) */
 char *
 monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
 {
+#if 0   /* [disable this for the time being] */
     int mhp_max = max(mon->mhpmax, 1), /* bullet proofing */
         pct = (mon->mhp * 100) / mhp_max;
 
@@ -117,6 +119,11 @@ monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
                     : "");
     if (addspace)
         (void) strkitten(outbuf, ' ');
+#else
+    nhUse(mon);
+    nhUse(addspace);
+    *outbuf = '\0';
+#endif
     return outbuf;
 }
 

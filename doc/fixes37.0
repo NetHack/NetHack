@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.529 $ $NHDT-Date: 1620548001 2021/05/09 08:13:21 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.530 $ $NHDT-Date: 1620590081 2021/05/09 19:54:41 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -949,6 +949,7 @@ add 'sortdiscoveries' option to control output of '\' and '`' commands
 include an indication of monsters' health during farlook feedback (including
 	/M and autodescribe); also include it in death reason when killed by
 	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
+[later: suppress the indication of monsters' health]
 make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
 	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
 add support for a single monster species to have distinct male, female,
