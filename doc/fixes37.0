@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.527 $ $NHDT-Date: 1620413928 2021/05/07 18:58:48 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.528 $ $NHDT-Date: 1620522110 2021/05/09 01:01:50 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -504,6 +504,10 @@ when an unseen non-pet picks up or uses an item, hero loses known/dknown/
 	particular, player won't be asked what to call unseen thrown potion)
 wishing for a partly eaten wraith corpse yielded "partly eaten food (1) more
 	nutritious than untouched food (0)"
+if PREFIXES_IN_USE was defined (and VAR_PLAYGROUND forces it to be) when
+	COMPRESS was also defined (external save and bones file compression
+	via fork()+exec()), the file name buffer in docompress_file() wasn't
+	big enough so could overflow and trigger a crash
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
