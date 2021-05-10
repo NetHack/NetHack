@@ -3735,19 +3735,23 @@ Willie the Vampire masks in order, he said, to take him out of himself.
 #
 #
 #
-%title Soul Music (11)
+%title Soul Music (13)
+# p. 121 (Harper Torch edition; passage starts mid-paragraph)
 %passage 1
-But this didn't feel like magic.  It felt a lot older than that.  It felt
+But this didn't /feel/ like magic.  It felt a lot older than that.  It felt
 like music.
 
   [Soul Music, by Terry Pratchett]
 %e passage
+# p. 49 (the skull is a traditional decoration for a wizard's abode; this one
+#        is the usual perch for, and is conversing with, a talking raven that
+#        has been translating the Death of Rats' SQUEAKs for Susan Sto Helit)
 %passage 2
 "Yes," said the skull.  "Quit while you're a head, that's what I say."
 
   [Soul Music, by Terry Pratchett]
 %e passage
-# p.2 (Harper Torch edition)
+# p. 2
 %passage 3
 But if it is true that the act of observing changes the thing which is
 observed,(1) it's even more true that it changes the observer.
@@ -3756,7 +3760,7 @@ observed,(1) it's even more true that it changes the observer.
 
   [Soul Music, by Terry Pratchett]
 %e passage
-# p.8
+# p. 8
 %passage 4
 It is said that whomsoever the gods wish to destroy, they first make mad.
 In fact, whomsoever the gods wish to destroy, they first hand the
@@ -3833,7 +3837,7 @@ Some religions say that the universe was started with a word, a song,
 a dance, a piece of music.  The Listening Monks of the Ramtops have
 trained their hearing until they can tell the value of a playing card by
 listening to it, and have made it their task to listen intently to the
-subtle sounds of the universe to piece together, from the fossile echoes,
+subtle sounds of the universe to piece together, from the fossil echoes,
 the very first noises.
 
 There was certainly, they say, a very strange noise at the beginning of
@@ -3954,12 +3958,36 @@ The Chair came down slowly, occasionally glancing fearfully up the stairs.
 
   [Soul Music, by Terry Pratchett]
 %e passage
+#
+# 2 more passages added for 3.7
+#
+# p. 242 (passage starts and ends mid-paragraph; "the Old" rather than "the
+#         Old <some language>" is accurate)
+%passage 12
+Wizards were rumored to be wise--in fact, that's where the word came
+from.(1)
+
+(1) From the Old /wys-ars/, lit: one who, at bottom, is very smart.
+
+  [Soul Music, by Terry Pratchett]
+%e passage
+# p. 351 (passage starts mid-paragraph; Death normally isn't bound by time
+#         and space so can be everywhere at once, more or less, but in this
+#         case he is speeding out of Ankh-Morpork and across the countryside
+#         on a motorcycle invented by UU's Librarian; despite racing along
+#         at such high speed that the vehicle has steadily disintegrated out
+#         from under him, progress is slow by his usual standard)
+%passage 13
+The fastest way to travel is to be there already.
+
+  [Soul Music, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
 %title Interesting Times (10)
-# p.1 (footnote)
+# p. 1 (Harper Torch edition; passage is a footnote)
 %passage 1
 Whatever happens, they say afterwards, it must have been fate.  People are
 always a little confused about this, as they are in the case of miracles.
@@ -5164,7 +5192,7 @@ Rest of Your Life."
 
   [The Last Continent, by Terry Pratchett]
 %e passage
-# p.3 (Harper Torch edition)
+# p. 3 (Harper Torch edition)
 %passage 3
 All tribal myths are true, for a given value of "true."
 
