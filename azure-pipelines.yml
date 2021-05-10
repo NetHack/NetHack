@@ -12,9 +12,9 @@ strategy:
       imageName: 'ubuntu-20.04'
       toolchainName: gcc9
       buildTargetName: all
-    linux_focal_gcc9_all:
+    linux_focal_gcc10_all:
       imageName: 'ubuntu-20.04'
-      toolchainName: gcc9
+      toolchainName: gcc10
       buildTargetName: all
     linux_bionic_gcc7_all:
       imageName: 'ubuntu-18.04'
@@ -66,11 +66,6 @@ steps:
       echo "##vso[task.setvariable variable=CC]gcc-7"
       echo "##vso[task.setvariable variable=CXX]g++-7"
     fi
-#    if [ "$(toolchain)" == "gcc8" ]
-#    then
-#      echo "##vso[task.setvariable variable=CC]gcc-8"
-#      echo "##vso[task.setvariable variable=CXX]g++-8"
-#    fi
     if [ "$(toolchain)" == "gcc9" ]
     then
       echo "##vso[task.setvariable variable=CC]gcc-9"
