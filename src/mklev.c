@@ -769,7 +769,7 @@ fill_ordinary_room(struct mkroom *croom)
     if (x <= 1)
         x = 2;
     while (!rn2(x) && (++trycnt < 1000))
-        mktrap(0, 0, croom, (coord *) 0);
+        mktrap(0, MKTRAP_NOFLAGS, croom, (coord *) 0);
     if (!rn2(3) && somexyspace(croom, &pos))
         (void) mkgold(0L, pos.x, pos.y);
     if (Is_rogue_level(&u.uz))
@@ -1322,7 +1322,7 @@ occupied(register xchar x, register xchar y)
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
 /* if tm != null, make trap at that location */
 void
-mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
+mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
 {
     register int kind;
     struct trap *t;
@@ -1390,7 +1390,7 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
                     kind = NO_TRAP;
                 break;
             case WEB:
-                if (lvl < 7)
+                if (lvl < 7 && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
                     kind = NO_TRAP;
                 break;
             case STATUE_TRAP:
@@ -1427,7 +1427,7 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
         do {
             if (++tryct > 200)
                 return;
-            if (mazeflag)
+            if (mktrapflags & MKTRAP_MAZEFLAG)
                 mazexy(&m);
             else if (!somexy(croom, &m))
                 return;
@@ -1440,7 +1440,7 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
        should prevent cases where that might not happen) but be paranoid */
     kind = t ? t->ttyp : NO_TRAP;
 
-    if (kind == WEB)
+    if (kind == WEB && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
 
     /* The hero isn't the only person who's entered the dungeon in

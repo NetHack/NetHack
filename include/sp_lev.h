@@ -127,6 +127,7 @@ typedef struct {
 typedef struct {
     packed_coord coord;
     xchar x, y, type;
+    boolean spider_on_web;
 } spltrap;
 
 typedef struct {

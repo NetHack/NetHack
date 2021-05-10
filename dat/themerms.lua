@@ -101,22 +101,21 @@ themerooms = {
    },
 
    -- Spider nest
-   {
-      mindiff = 10,
-      contents = function()
-         des.room({ type = "themed",
+   function()
+      des.room({ type = "themed",
                   contents = function(rm)
+                     local spooders = nh.level_difficulty() > 8;
                      for x = 0, rm.width - 1 do
                         for y = 0, rm.height - 1 do
                            if (percent(30)) then
-                              des.trap("web", x, y);
+                              des.trap({ type = "web", x = x, y = y,
+                                   spider_on_web = spooders and percent(80) });
                            end
                         end
                      end
                   end
-         });
-      end
-   },
+      });
+   end,
 
    -- Trap room
    function()
