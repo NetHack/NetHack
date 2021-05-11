@@ -915,7 +915,7 @@ status_enlightenment(int mode, int final)
             Strcpy(heldmon, "an unseen creature");
     }
     if (u.uswallow) { /* implies u.ustuck is non-Null */
-        Sprintf(buf, "%s by %s",
+        Snprintf(buf, sizeof buf, "%s by %s",
                 is_animal(u.ustuck->data) ? "swallowed" : "engulfed",
                 heldmon);
         if (dmgtype(u.ustuck->data, AD_DGST)) {
@@ -934,8 +934,9 @@ status_enlightenment(int mode, int final)
         boolean ustick = (Upolyd && sticks(g.youmonst.data));
         int dx = u.ustuck->mx - u.ux, dy = u.ustuck->my - u.uy;
 
-        Sprintf(buf, "%s %s (%s)", ustick ? "holding" : "held by",
-                heldmon, dxdy_to_dist_descr(dx, dy, TRUE));
+        Snprintf(buf, sizeof buf, "%s %s (%s)",
+                 ustick ? "holding" : "held by",
+                 heldmon, dxdy_to_dist_descr(dx, dy, TRUE));
         you_are(buf, "");
     }
     if (Riding) {

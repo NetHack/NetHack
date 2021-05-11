@@ -472,7 +472,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
 /* hero is held by a monster or engulfed or holding a monster and has zapped
    opening/unlocking magic at holder/engulfer/holdee or at self */
 void
-release_hold()
+release_hold(void)
 {
     struct monst *mtmp = u.ustuck;
 
