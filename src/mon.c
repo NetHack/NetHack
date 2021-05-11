@@ -111,8 +111,8 @@ sanity_check_single_mon(
     if (mtmp == u.usteed) {
         const char *ns, *nt = !mtmp->mtame ? "not tame" : 0;
 
-        ns = !m_carrying(mtmp, SADDLE) ? ns = "no saddle"
-             : !which_armor(mtmp, W_SADDLE) ? ns = "saddle not worn"
+        ns = !m_carrying(mtmp, SADDLE) ? "no saddle"
+             : !which_armor(mtmp, W_SADDLE) ? "saddle not worn"
                : 0;
         if (ns || nt)
             impossible("steed: %s%s%s (%s)",
