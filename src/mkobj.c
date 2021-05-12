@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1619919403 2021/05/02 01:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1620861208 2021/05/12 23:13:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -708,6 +708,30 @@ static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
                                 SCROLL_CLASS, GEM_CLASS,  SPBOOK_CLASS,
                                 WEAPON_CLASS, TOOL_CLASS, 0 };
 
+/* some init for a brand new object, or partial re-init when hero loses
+   potentially known info about an object (called when an unseen monster
+   picks up or uses it); moved from invent.c to here for access to dknowns */
+void
+unknow_object(struct obj *obj)
+{
+    obj->dknown = index(dknowns, obj->oclass) ? 0 : 1;
+    if ((obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD)
+        || obj->otyp == SHIELD_OF_REFLECTION
+        || objects[obj->otyp].oc_merge)
+        obj->dknown = 0;
+    /* globs always have dknown flag set (to maximize merging) but for new
+       object, globby flag won't be set yet so isn't available to check */
+    if (Is_pudding(obj))
+        obj->dknown = 1;
+
+    obj->bknown = obj->rknown = 0;
+    obj->cknown = obj->lknown = 0;
+    /* for an existing object, awareness of charges or enchantment has
+       gone poof...  [object types which don't use the known flag have
+       it set True for some reason] */
+    obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
+}
+
 /* mksobj(): create a specific type of object; result it always non-Null */
 struct obj *
 mksobj(int otyp, boolean init, boolean artif)
@@ -726,15 +750,7 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp->oclass = let;
     otmp->otyp = otyp;
     otmp->where = OBJ_FREE;
-    otmp->dknown = index(dknowns, let) ? 0 : 1;
-    if ((otmp->otyp >= ELVEN_SHIELD && otmp->otyp <= ORCISH_SHIELD)
-        || otmp->otyp == SHIELD_OF_REFLECTION
-        || objects[otmp->otyp].oc_merge)
-        otmp->dknown = 0;
-    if (!objects[otmp->otyp].oc_uses_known)
-        otmp->known = 1;
-    otmp->lknown = 0;
-    otmp->cknown = 0;
+    unknow_object(otmp); /* set up dknown and known: non-0 for some things */
     otmp->corpsenm = NON_PM;
     otmp->lua_ref_cnt = 0;
 

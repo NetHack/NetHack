@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1620329776 2021/05/06 19:36:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.330 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1620861205 2021/05/12 23:13:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2148,19 +2148,6 @@ askchain(struct obj **objchn, /* *objchn might change */
     unsortloot(&sortedchn);
     bypass_objlist(*objchn, FALSE);
     return cnt;
-}
-
-/* hero is losing access to previously known info about an object
-   (called when an unseen monster picks up or uses the object) */
-void
-unknow_object(struct obj *obj)
-{
-    obj->dknown = 0;
-    obj->bknown = obj->rknown = 0;
-    obj->cknown = obj->lknown = 0;
-    /* awareness of charges or enchantment has gone poof... */
-    if (objects[obj->otyp].oc_uses_known)
-        obj->known = 0;
 }
 
 /*

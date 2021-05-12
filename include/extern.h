@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1620348705 2021/05/07 00:51:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.969 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1620861202 2021/05/12 23:13:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.970 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1014,7 +1014,6 @@ extern int ggetobj(const char *, int(*)(struct obj *), int, boolean,
                    unsigned *);
 extern int askchain(struct obj **, const char *, int, int(*)(struct obj *),
                     int(*)(struct obj *), int, const char *);
-extern void unknow_object(struct obj *);
 extern void set_cknown_lknown(struct obj *);
 extern void fully_identify_obj(struct obj *);
 extern int identify(struct obj *);
@@ -1308,6 +1307,7 @@ extern void replace_object(struct obj *, struct obj *);
 extern struct obj *unknwn_contnr_contents(struct obj *);
 extern void bill_dummy_object(struct obj *);
 extern void costly_alteration(struct obj *, int);
+extern void unknow_object(struct obj *);
 extern struct obj *mksobj(int, boolean, boolean);
 extern int bcsign(struct obj *);
 extern int weight(struct obj *);

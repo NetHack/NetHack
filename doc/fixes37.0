@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.530 $ $NHDT-Date: 1620590081 2021/05/09 19:54:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ $NHDT-Date: 1620861202 2021/05/12 23:13:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -665,6 +665,10 @@ if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
 	calculate zombie's hit points (depended upon how much had been eaten)
 undead turning magic revived corpses flagged as no-revive if they were being
 	carried but not if they were zapped while on the floor
+forgetting an item's known/dknown/bknown/&c settings when picked up by unseen
+	monster made it possible to trigger a latent shop bug with globs;
+	avoid clearing dknown flag for globs
+fix globby_bill_fixup to use shopkeeper instead of Null for glob pricing
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
