@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1614074654 2021/02/23 10:04:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.370 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1620923921 2021/05/13 16:38:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -663,7 +663,7 @@ make_corpse(register struct monst* mtmp, unsigned int corpseflags)
      *  if the corpse's obj->dknown is 0.
      */
     if (Blind && !sensemon(mtmp))
-        obj->dknown = 0;
+        clear_dknown(obj); /* obj->dknown = 0; */
 
     stackobj(obj);
     newsym(x, y);

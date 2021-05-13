@@ -1,4 +1,4 @@
-/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1620329778 2021/05/06 19:36:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.7	mthrowu.c	$NHDT-Date: 1620923922 2021/05/13 16:38:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -505,7 +505,7 @@ m_throw(
 
     singleobj->owornmask = 0; /* threw one of multiple weapons in hand? */
     if (!canseemon(mon))
-        singleobj->dknown = 0;
+        clear_dknown(singleobj); /* singleobj->dknown = 0; */
 
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
         if (canseemon(mon) && flags.verbose) {

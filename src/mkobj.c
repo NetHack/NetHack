@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1620861208 2021/05/12 23:13:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1620923920 2021/05/13 16:38:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -706,13 +706,12 @@ costly_alteration(struct obj* obj, int alter_type)
 
 static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
                                 SCROLL_CLASS, GEM_CLASS,  SPBOOK_CLASS,
-                                WEAPON_CLASS, TOOL_CLASS, 0 };
+                                WEAPON_CLASS, TOOL_CLASS, VENOM_CLASS, 0 };
 
-/* some init for a brand new object, or partial re-init when hero loses
-   potentially known info about an object (called when an unseen monster
-   picks up or uses it); moved from invent.c to here for access to dknowns */
+/* set obj->dknown to 0 for most types of objects, to 1 otherwise;
+   split off from unknow_object() */
 void
-unknow_object(struct obj *obj)
+clear_dknown(struct obj *obj)
 {
     obj->dknown = index(dknowns, obj->oclass) ? 0 : 1;
     if ((obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD)
@@ -723,6 +722,15 @@ unknow_object(struct obj *obj)
        object, globby flag won't be set yet so isn't available to check */
     if (Is_pudding(obj))
         obj->dknown = 1;
+}
+
+/* some init for a brand new object, or partial re-init when hero loses
+   potentially known info about an object (called when an unseen monster
+   picks up or uses it); moved from invent.c to here for access to dknowns */
+void
+unknow_object(struct obj *obj)
+{
+    clear_dknown(obj); /* obj->dknown = 0; */
 
     obj->bknown = obj->rknown = 0;
     obj->cknown = obj->lknown = 0;

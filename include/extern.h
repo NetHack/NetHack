@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1620861202 2021/05/12 23:13:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.970 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1620923916 2021/05/13 16:38:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.971 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1307,6 +1307,7 @@ extern void replace_object(struct obj *, struct obj *);
 extern struct obj *unknwn_contnr_contents(struct obj *);
 extern void bill_dummy_object(struct obj *);
 extern void costly_alteration(struct obj *, int);
+extern void clear_dknown(struct obj *);
 extern void unknow_object(struct obj *);
 extern struct obj *mksobj(int, boolean, boolean);
 extern int bcsign(struct obj *);
