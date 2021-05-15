@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1608673690 2020/12/22 21:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1621037618 2021/05/15 00:13:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,6 +15,7 @@ static int gem_accept(struct monst *, struct obj *);
 static void tmiss(struct obj *, struct monst *, boolean);
 static int throw_gold(struct obj *);
 static void check_shop_obj(struct obj *, xchar, xchar, boolean);
+static boolean harmless_missile(struct obj *);
 static void breakmsg(struct obj *, boolean);
 static boolean toss_up(struct obj *, boolean);
 static void sho_obj_return_to_u(struct obj * obj);
@@ -986,6 +987,39 @@ check_shop_obj(struct obj *obj, xchar x, xchar y, boolean broken)
     }
 }
 
+/* Will 'obj' cause damage if it falls on hero's head when thrown upward?
+   Not used to handle things which break when they hit. */
+static boolean
+harmless_missile(struct obj *obj)
+{
+    int otyp = obj->otyp;
+
+    /* this list is fairly arbitrary */
+    switch (otyp) {
+    case SLING:
+    case EUCALYPTUS_LEAF:
+    case KELP_FROND:
+    case SPRIG_OF_WOLFSBANE:
+    case FORTUNE_COOKIE:
+    case PANCAKE:
+        return TRUE;
+    case RUBBER_HOSE:
+    case BAG_OF_TRICKS:
+        return (obj->spe < 1);
+    case SACK:
+    case OILSKIN_SACK:
+    case BAG_OF_HOLDING:
+        return !Has_contents(obj);
+    default:
+        if (obj->oclass == SCROLL_CLASS) /* scrolls but not all paper objs */
+            return TRUE;
+        if (objects[otyp].oc_material == CLOTH)
+            return TRUE;
+        break;
+    }
+    return FALSE;
+}
+
 /*
  * Hero tosses an object upwards with appropriate consequences.
  *
@@ -1060,6 +1094,10 @@ toss_up(struct obj *obj, boolean hitsroof)
             break;
         }
         return FALSE;
+    } else if (harmless_missile(obj)) {
+        pline("It doesn't hurt.");
+        hitfloor(obj, FALSE);
+        g.thrownobj = 0;
     } else { /* neither potion nor other breaking object */
         boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
         int dmg = dmgval(obj, &g.youmonst);
@@ -1091,8 +1129,8 @@ toss_up(struct obj *obj, boolean hitsroof)
             if (less_damage && dmg < (Upolyd ? u.mh : u.uhp)) {
                 if (!artimsg)
                     pline("Fortunately, you are wearing a hard helmet.");
-                /* helmet definitely protects you when it blocks petrification
-                 */
+
+            /* helmet definitely protects you when it blocks petrification */
             } else if (!petrifier) {
                 if (flags.verbose)
                     Your("%s does not protect you.", helm_simple_name(uarmh));
@@ -1102,7 +1140,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                         && polymon(PM_STONE_GOLEM))) {
  petrify:
             g.killer.format = KILLED_BY;
-            Strcpy(g.killer.name, "elementary physics"); /* "what goes up..." */
+            Strcpy(g.killer.name, "elementary physics"); /* what goes up... */
             You("turn to stone.");
             if (obj)
                 dropy(obj); /* bypass most of hitfloor() */

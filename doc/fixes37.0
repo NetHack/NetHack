@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ $NHDT-Date: 1620861202 2021/05/12 23:13:22 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.533 $ $NHDT-Date: 1621037617 2021/05/15 00:13:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -512,6 +512,8 @@ if PREFIXES_IN_USE was defined (and VAR_PLAYGROUND forces it to be) when
 suppress "This <foo> corpse takes {delicious|okay|terrible}" if preceded by
 	"You have a bad case of stomach acid" or "Ecch - that must have been
 	poisonous"
+innocuous items like scrolls or eucalyptus leaves did harm when falling on
+	hero's head after being thrown upward
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
