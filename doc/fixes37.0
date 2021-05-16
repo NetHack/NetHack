@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.533 $ $NHDT-Date: 1621037617 2021/05/15 00:13:37 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.534 $ $NHDT-Date: 1621131203 2021/05/16 02:13:23 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -514,6 +514,11 @@ suppress "This <foo> corpse takes {delicious|okay|terrible}" if preceded by
 	poisonous"
 innocuous items like scrolls or eucalyptus leaves did harm when falling on
 	hero's head after being thrown upward
+fighter types who start out knowing all non-magic armor should not know
+	cornuthaum and dunce cap
+prediscovered weapons adjustmens:  only knights and samurai know polearms;
+	rangers know launchers (bows), ammo (arrows), and spears regardless
+	of their race/species; likewise, rogues know all daggers
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
