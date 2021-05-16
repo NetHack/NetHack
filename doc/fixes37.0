@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.534 $ $NHDT-Date: 1621131203 2021/05/16 02:13:23 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ $NHDT-Date: 1621208908 2021/05/16 23:48:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -519,6 +519,7 @@ fighter types who start out knowing all non-magic armor should not know
 prediscovered weapons adjustmens:  only knights and samurai know polearms;
 	rangers know launchers (bows), ammo (arrows), and spears regardless
 	of their race/species; likewise, rogues know all daggers
+if the move counter ever reaches 1000000000, end the game
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

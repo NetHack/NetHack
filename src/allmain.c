@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1613292825 2021/02/14 08:53:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1621208846 2021/05/16 23:47:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -180,6 +180,19 @@ moveloop(boolean resuming)
 
                     g.monstermoves++; /* [obsolete (for a long time...)] */
                     g.moves++;
+                    /*
+                     * Never allow 'moves' to grow big enough to wrap.
+                     * We don't care what the maximum possible 'long int'
+                     * is for the current configuration, we want a value
+                     * that is the same for all viable configurations.
+                     * When imposing the limit, use a mystic decimal value
+                     * instead of a magic binary one such as 0x7fffffffL.
+                     */
+                    if (g.moves >= 1000000000L) {
+                        display_nhwindow(WIN_MESSAGE, TRUE);
+                        pline_The("dungeon capitulates.");
+                        done(ESCAPED);
+                    }
 
                     if (flags.time && !g.context.run)
                         iflags.time_botl = TRUE; /* 'moves' just changed */
