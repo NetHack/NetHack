@@ -3952,12 +3952,14 @@ unfixable_trouble_count(boolean is_horn)
 static int
 flip_through_book(struct obj *obj)
 {
+    boolean normal_book = (obj->otyp == SPE_NOVEL);
     if (Underwater) {
         pline("You don't want to get the pages even more soggy, do you?");
         return 0;
     }
 
-    You("flip through the pages of the spellbook.");
+    You("flip through the pages of the %sbook.",
+        normal_book ? "" : "spell");
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (Deaf) {
@@ -3967,22 +3969,19 @@ flip_through_book(struct obj *obj)
                     Hallucination ? "chuckling"
                                   : "rustling");
         }
-        return 1;
     } else if (Blind) {
         pline("The pages feel %s.",
               Hallucination ? "freshly picked"
                             : "rough and dry");
-        return 1;
     } else if (obj->otyp == SPE_BLANK_PAPER) {
         pline("This spellbook %s.",
               Hallucination ? "doesn't have much of a plot"
                             : "has nothing written in it");
         makeknown(obj->otyp);
-        return 1;
-    }
-
-    if (Hallucination) {
+    } else if (Hallucination) {
         You("enjoy the animated initials.");
+    } else if (normal_book) {
+        pline("This looks like it might be interesting to read.");
     } else {
         static const char* fadeness[] = {
             "fresh",
