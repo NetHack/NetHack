@@ -1251,6 +1251,7 @@ trapeffect_slp_gas_trap(
         seetrap(trap);
         if (Sleep_resistance || breathless(g.youmonst.data)) {
             You("are enveloped in a cloud of gas!");
+            monstseesu(M_SEEN_SLEEP);
         } else {
             pline("A cloud of gas puts you to sleep!");
             fall_asleep(-rnd(25), TRUE);
@@ -3525,6 +3526,7 @@ dofiretrap(
           the(box ? xname(box) : surface(u.ux, u.uy)));
     if (Fire_resistance) {
         shieldeff(u.ux, u.uy);
+        monstseesu(M_SEEN_FIRE);
         num = rn2(2);
     } else if (Upolyd) {
         num = d(2, 4);
@@ -5331,6 +5333,7 @@ chest_trap(
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
                 You("don't seem to be affected.");
+                monstseesu(M_SEEN_ELEC);
                 dmg = 0;
             } else
                 dmg = d(4, 4);
@@ -5763,6 +5766,8 @@ lava_effects(void)
         You("sink into the %s%s!", hliquid("lava"),
             !boil_away ? ", but it only burns slightly"
                        : " and are about to be immolated");
+        if (Fire_resistance)
+            monstseesu(M_SEEN_FIRE);
         if (u.uhp > 1)
             losehp(!boil_away ? 1 : (u.uhp / 2), lava_killer,
                    KILLED_BY); /* lava damage */

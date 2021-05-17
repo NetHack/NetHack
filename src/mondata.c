@@ -1223,4 +1223,36 @@ olfaction(struct permonst* mdat)
     return TRUE;
 }
 
+/* Convert attack damage type AD_foo to M_SEEN_bar */
+unsigned long
+cvt_adtyp_to_mseenres(uchar adtyp)
+{
+    switch (adtyp) {
+    case AD_MAGM: return M_SEEN_MAGR;
+    case AD_FIRE: return M_SEEN_FIRE;
+    case AD_COLD: return M_SEEN_COLD;
+    case AD_SLEE: return M_SEEN_SLEEP;
+    case AD_DISN: return M_SEEN_DISINT;
+    case AD_ELEC: return M_SEEN_ELEC;
+    case AD_DRST: return M_SEEN_POISON;
+    case AD_ACID: return M_SEEN_ACID;
+    /* M_SEEN_REFL has no corresponding AD_foo type */
+    default: return M_SEEN_NOTHING;
+    }
+}
+
+/* Monsters remember hero resisting effect M_SEEN_foo */
+void
+monstseesu(unsigned long seenres)
+{
+    struct monst *mtmp;
+
+    if (seenres == M_SEEN_NOTHING)
+        return;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp) && m_canseeu(mtmp))
+            m_setseenres(mtmp, seenres);
+}
+
 /*mondata.c*/

@@ -1002,6 +1002,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             return FALSE;
         } else {
             You("cough!");
+            monstseesu(M_SEEN_POISON);
             return FALSE;
         }
     } else { /* A monster is inside the cloud */

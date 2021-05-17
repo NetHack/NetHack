@@ -1183,7 +1183,8 @@ boolean
 find_offensive(struct monst* mtmp)
 {
     register struct obj *obj;
-    boolean reflection_skip = (Reflecting && rn2(2));
+    boolean reflection_skip = m_seenres(mtmp, M_SEEN_REFL) != 0
+        || monnear(mtmp, mtmp->mux, mtmp->muy);
     struct obj *helmet = which_armor(mtmp, W_ARMH);
 
     g.m.offensive = (struct obj *) 0;
@@ -1208,42 +1209,50 @@ find_offensive(struct monst* mtmp)
     for (obj = mtmp->minvent; obj; obj = obj->nobj) {
         if (!reflection_skip) {
             nomore(MUSE_WAN_DEATH);
-            if (obj->otyp == WAN_DEATH && obj->spe > 0) {
+            if (obj->otyp == WAN_DEATH && obj->spe > 0
+                && !m_seenres(mtmp, M_SEEN_MAGR)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_DEATH;
             }
             nomore(MUSE_WAN_SLEEP);
-            if (obj->otyp == WAN_SLEEP && obj->spe > 0 && g.multi >= 0) {
+            if (obj->otyp == WAN_SLEEP && obj->spe > 0 && g.multi >= 0
+                && !m_seenres(mtmp, M_SEEN_SLEEP)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_SLEEP;
             }
             nomore(MUSE_WAN_FIRE);
-            if (obj->otyp == WAN_FIRE && obj->spe > 0) {
+            if (obj->otyp == WAN_FIRE && obj->spe > 0
+                && !m_seenres(mtmp, M_SEEN_FIRE)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_FIRE;
             }
             nomore(MUSE_FIRE_HORN);
-            if (obj->otyp == FIRE_HORN && obj->spe > 0 && can_blow(mtmp)) {
+            if (obj->otyp == FIRE_HORN && obj->spe > 0 && can_blow(mtmp)
+                && !m_seenres(mtmp, M_SEEN_FIRE)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_FIRE_HORN;
             }
             nomore(MUSE_WAN_COLD);
-            if (obj->otyp == WAN_COLD && obj->spe > 0) {
+            if (obj->otyp == WAN_COLD && obj->spe > 0
+                && !m_seenres(mtmp, M_SEEN_COLD)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_COLD;
             }
             nomore(MUSE_FROST_HORN);
-            if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
+            if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)
+                && !m_seenres(mtmp, M_SEEN_COLD)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_FROST_HORN;
             }
             nomore(MUSE_WAN_LIGHTNING);
-            if (obj->otyp == WAN_LIGHTNING && obj->spe > 0) {
+            if (obj->otyp == WAN_LIGHTNING && obj->spe > 0
+                && !m_seenres(mtmp, M_SEEN_ELEC)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_LIGHTNING;
             }
             nomore(MUSE_WAN_MAGIC_MISSILE);
-            if (obj->otyp == WAN_MAGIC_MISSILE && obj->spe > 0) {
+            if (obj->otyp == WAN_MAGIC_MISSILE && obj->spe > 0
+                && !m_seenres(mtmp, M_SEEN_MAGR)) {
                 g.m.offensive = obj;
                 g.m.has_offense = MUSE_WAN_MAGIC_MISSILE;
             }
@@ -1251,7 +1260,8 @@ find_offensive(struct monst* mtmp)
         nomore(MUSE_WAN_UNDEAD_TURNING);
         m_use_undead_turning(mtmp, obj);
         nomore(MUSE_WAN_STRIKING);
-        if (obj->otyp == WAN_STRIKING && obj->spe > 0) {
+        if (obj->otyp == WAN_STRIKING && obj->spe > 0
+            && !m_seenres(mtmp, M_SEEN_MAGR)) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_STRIKING;
         }
@@ -1285,12 +1295,14 @@ find_offensive(struct monst* mtmp)
             g.m.has_offense = MUSE_POT_CONFUSION;
         }
         nomore(MUSE_POT_SLEEPING);
-        if (obj->otyp == POT_SLEEPING) {
+        if (obj->otyp == POT_SLEEPING
+            && !m_seenres(mtmp, M_SEEN_SLEEP)) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_POT_SLEEPING;
         }
         nomore(MUSE_POT_ACID);
-        if (obj->otyp == POT_ACID) {
+        if (obj->otyp == POT_ACID
+            && !m_seenres(mtmp, M_SEEN_ACID)) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_POT_ACID;
         }
@@ -1315,7 +1327,8 @@ find_offensive(struct monst* mtmp)
         nomore(MUSE_SCR_FIRE);
         if (obj->otyp == SCR_FIRE && resists_fire(mtmp)
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
-            && mtmp->mcansee && haseyes(mtmp->data)) {
+            && mtmp->mcansee && haseyes(mtmp->data)
+            && !m_seenres(mtmp, M_SEEN_FIRE)) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_SCR_FIRE;
         }

@@ -1233,6 +1233,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     case AD_ACID:
         if (Acid_resistance) {
             You("are covered with a seemingly harmless goo.");
+            monstseesu(M_SEEN_ACID);
             tmp = 0;
         } else {
             if (Hallucination)
@@ -1264,6 +1265,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Shock_resistance) {
                 shieldeff(u.ux, u.uy);
                 You("seem unhurt.");
+                monstseesu(M_SEEN_ELEC);
                 ugolemeffects(AD_ELEC, tmp);
                 tmp = 0;
             }
@@ -1275,6 +1277,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Cold_resistance) {
                 shieldeff(u.ux, u.uy);
                 You_feel("mildly chilly.");
+                monstseesu(M_SEEN_COLD);
                 ugolemeffects(AD_COLD, tmp);
                 tmp = 0;
             } else
@@ -1287,6 +1290,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             if (Fire_resistance) {
                 shieldeff(u.ux, u.uy);
                 You_feel("mildly hot.");
+                monstseesu(M_SEEN_FIRE);
                 ugolemeffects(AD_FIRE, tmp);
                 tmp = 0;
             } else
@@ -1393,7 +1397,8 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
                 if (physical_damage)
                     tmp = Maybe_Half_Phys(tmp);
                 mdamageu(mtmp, tmp);
-            }
+            } else
+                monstseesu_ad(mattk->adtyp);
             break;
 
         case AD_BLND:
@@ -1596,6 +1601,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 stop_occupation();
                 if (Fire_resistance) {
                     pline_The("fire doesn't feel hot!");
+                    monstseesu(M_SEEN_FIRE);
                     dmg = 0;
                 }
                 burn_away_slime();

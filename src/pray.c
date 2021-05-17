@@ -597,9 +597,11 @@ god_zaps_you(aligntyp resp_god)
                 pline("For some reason you're unaffected.");
             else
                 (void) ureflects("%s reflects from your %s.", "It");
+            monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);
             pline("It seems not to affect you.");
+            monstseesu(M_SEEN_ELEC);
         } else
             fry_by_god(resp_god, FALSE);
     }
@@ -635,6 +637,7 @@ god_zaps_you(aligntyp resp_god)
         } else {
             You("bask in its %s glow for a minute...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
+            monstseesu(M_SEEN_DISINT);
         }
         if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
             /* one more try for high altars */

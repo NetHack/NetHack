@@ -796,6 +796,7 @@ peffects(struct obj *otmp)
         break;
     case POT_SLEEPING:
         if (Sleep_resistance || Free_action) {
+            monstseesu(M_SEEN_SLEEP);
             You("yawn.");
         } else {
             You("suddenly fall asleep!");
@@ -1729,8 +1730,10 @@ potionbreathe(struct obj *obj)
             g.multi_reason = "sleeping off a magical draught";
             g.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
-        } else
+        } else {
             You("yawn.");
+            monstseesu(M_SEEN_SLEEP);
+        }
         break;
     case POT_SPEED:
         if (!Fast)

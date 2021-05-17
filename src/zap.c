@@ -2411,6 +2411,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
             pline("Boing!");
+            monstseesu(M_SEEN_MAGR);
         } else {
             if (ordinary) {
                 You("bash yourself!");
@@ -2430,6 +2431,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         } else {
             shieldeff(u.ux, u.uy);
             You("zap yourself, but seem unharmed.");
+            monstseesu(M_SEEN_ELEC);
             ugolemeffects(AD_ELEC, d(12, 6));
         }
         destroy_item(WAND_CLASS, AD_ELEC);
@@ -2447,6 +2449,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
             You_feel("rather warm.");
+            monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, d(12, 6));
         } else {
             pline("You've set yourself afire!");
@@ -2468,6 +2471,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
             You_feel("a little chill.");
+            monstseesu(M_SEEN_COLD);
             ugolemeffects(AD_COLD, d(12, 6));
         } else {
             You("imitate a popsicle!");
@@ -2482,6 +2486,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
             pline_The("missiles bounce!");
+            monstseesu(M_SEEN_MAGR);
         } else {
             damage = d(4, 6);
             pline("Idiot!  You've shot yourself!");
@@ -2551,6 +2556,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         if (Sleep_resistance) {
             shieldeff(u.ux, u.uy);
             You("don't feel sleepy!");
+            monstseesu(M_SEEN_SLEEP);
         } else {
             pline_The("sleep ray hits you!");
             fall_asleep(-rnd(50), TRUE);
@@ -3875,6 +3881,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (Antimagic) {
             shieldeff(sx, sy);
             pline_The("missiles bounce off!");
+            monstseesu(M_SEEN_MAGR);
         } else {
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
@@ -3884,6 +3891,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (Fire_resistance) {
             shieldeff(sx, sy);
             You("don't feel hot!");
+            monstseesu(M_SEEN_FIRE);
             ugolemeffects(AD_FIRE, d(nd, 6));
         } else {
             dam = d(nd, 6);
@@ -3905,6 +3913,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (Cold_resistance) {
             shieldeff(sx, sy);
             You("don't feel cold.");
+            monstseesu(M_SEEN_COLD);
             ugolemeffects(AD_COLD, d(nd, 6));
         } else {
             dam = d(nd, 6);
@@ -3916,6 +3925,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (Sleep_resistance) {
             shieldeff(u.ux, u.uy);
             You("don't feel sleepy.");
+            monstseesu(M_SEEN_SLEEP);
         } else {
             fall_asleep(-d(nd, 25), TRUE); /* sleep ray */
         }
@@ -3924,6 +3934,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (abstyp == ZT_BREATH(ZT_DEATH)) {
             if (Disint_resistance) {
                 You("are not disintegrated.");
+                monstseesu(M_SEEN_DISINT);
                 break;
             } else if (uarms) {
                 /* destroy shield; other possessions are safe */
@@ -3948,6 +3959,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
             break;
         } else if (Antimagic) {
             shieldeff(sx, sy);
+            monstseesu(M_SEEN_MAGR);
             You("aren't affected.");
             break;
         }
@@ -3961,6 +3973,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
         if (Shock_resistance) {
             shieldeff(sx, sy);
             You("aren't affected.");
+            monstseesu(M_SEEN_ELEC);
             ugolemeffects(AD_ELEC, d(nd, 6));
         } else {
             dam = d(nd, 6);
@@ -3977,6 +3990,7 @@ zhitu(int type, int nd, const char *fltxt, xchar sx, xchar sy)
     case ZT_ACID:
         if (Acid_resistance) {
             pline_The("%s doesn't hurt.", hliquid("acid"));
+            monstseesu(M_SEEN_ACID);
             dam = 0;
         } else {
             pline_The("%s burns!", hliquid("acid"));
@@ -4309,6 +4323,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                                          "it");
                     } else
                         pline("For some reason you are not affected.");
+                    monstseesu(M_SEEN_REFL);
                     dx = -dx;
                     dy = -dy;
                     shieldeff(sx, sy);

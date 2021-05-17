@@ -89,6 +89,7 @@ thitu(
 
         if (is_acid && Acid_resistance) {
             pline("It doesn't seem to hurt you.");
+            monstseesu(M_SEEN_ACID);
         } else if (obj && obj->oclass == POTION_CLASS) {
             /* an explosion which scatters objects might hit hero with one
                (potions deliberately thrown at hero are handled by m_throw) */
@@ -821,6 +822,14 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
             }
             return MM_MISS;
         }
+
+	/* if we've seen the actual resistance, don't bother, or
+	 * if we're close by and they reflect, just jump the player */
+	if (m_seenres(mtmp, cvt_adtyp_to_mseenres(typ))
+	    || (m_seenres(mtmp, M_SEEN_REFL)
+                && monnear(mtmp, mtmp->mux, mtmp->muy)))
+	    return MM_HIT;
+
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 boolean utarget = (mtarg == &g.youmonst);

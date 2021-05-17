@@ -68,6 +68,23 @@ enum m_ap_types {
 #define M_AP_TYPE(m) ((m)->m_ap_type & M_AP_TYPMASK)
 #define M_AP_FLAG(m) ((m)->m_ap_type & ~M_AP_TYPMASK)
 
+enum m_seen_resistance {
+    M_SEEN_NOTHING = 0x0000,
+    M_SEEN_MAGR    = 0x0001, /* Antimagic, AD_MAGM */
+    M_SEEN_FIRE    = 0x0002, /* Fire_resistance, AD_FIRE */
+    M_SEEN_COLD    = 0x0004, /* Cold_resistance, AD_COLD */
+    M_SEEN_SLEEP   = 0x0008, /* Sleep_resistance, AD_SLEE */
+    M_SEEN_DISINT  = 0x0010, /* Disint_resistance, AD_DISN */
+    M_SEEN_ELEC    = 0x0020, /* Shock_resistance, AD_ELEC */
+    M_SEEN_POISON  = 0x0040, /* AD_DRST */
+    M_SEEN_ACID    = 0x0080, /* Acid_resistance, AD_ACID */
+    M_SEEN_REFL    = 0x0100, /* reflection, no corresponding AD_foo */
+};
+
+#define m_seenres(mon, mask) ((mon)->seen_resistance & (mask))
+#define m_setseenres(mon, mask) ((mon)->seen_resistance |= (mask))
+#define monstseesu_ad(adtyp) monstseesu(cvt_adtyp_to_mseenres(adtyp))
+
 struct monst {
     struct monst *nmon;
     struct permonst *data;
@@ -90,6 +107,7 @@ struct monst {
 
     schar mtame;                /* level of tameness, implies peaceful */
     unsigned short mextrinsics; /* low 8 correspond to mresists */
+    unsigned long seen_resistance; /* M_SEEN_x; saw you resist an effect */
     int mspec_used;             /* monster's special ability attack timeout */
 
     Bitfield(female, 1);      /* is female */
