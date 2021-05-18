@@ -346,6 +346,24 @@ m_cure_self(struct monst *mtmp, int dmg)
     return dmg;
 }
 
+void
+touch_of_death(void)
+{
+    int dmg = 50 + d(8, 6);
+    int drain = dmg / 2;
+
+    You_feel("drained...");
+
+    if (drain >= u.uhpmax) {
+        g.killer.format = KILLED_BY_AN;
+        Strcpy(g.killer.name, "touch of death");
+        done(DIED);
+    } else {
+        u.uhpmax -= drain;
+        losehp(dmg, "touch of death", KILLED_BY_AN);
+    }
+}
+
 /* monster wizard and cleric spellcasting functions */
 /*
    If dmg is zero, then the monster is not casting at you.
@@ -373,9 +391,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             if (Hallucination) {
                 You("have an out of body experience.");
             } else {
-                g.killer.format = KILLED_BY_AN;
-                Strcpy(g.killer.name, "touch of death");
-                done(DIED);
+                touch_of_death();
             }
         } else {
             if (Antimagic) {
