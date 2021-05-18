@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1618175625 2021/04/11 21:13:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1621377703 2021/05/18 22:41:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -728,6 +728,9 @@ domonability(void)
 int
 enter_explore_mode(void)
 {
+    if (iflags.debug_fuzzer)
+        return 0;
+
     if (discover) {
         You("are already in explore mode.");
     } else {
