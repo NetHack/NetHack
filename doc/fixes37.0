@@ -520,6 +520,7 @@ prediscovered weapons adjustmens:  only knights and samurai know polearms;
 	rangers know launchers (bows), ammo (arrows), and spears regardless
 	of their race/species; likewise, rogues know all daggers
 if the move counter ever reaches 1000000000, end the game
+knights get no metal armor penalty for clerical spells
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
