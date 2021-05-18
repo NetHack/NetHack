@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1615304753 2021/03/09 15:45:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1621380392 2021/05/18 23:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -902,8 +902,13 @@ disclose(int how, boolean taken)
 static void
 savelife(int how)
 {
-    int uhpmin = max(2 * u.ulevel, 10);
+    int uhpmin;
 
+    /* life-drain/level-loss to experience level 0 kills without actually
+       reducing ulevel below 1, but include this for bulletproofing */
+    if (u.ulevel < 1)
+        u.ulevel = 1;
+    uhpmin = max(2 * u.ulevel, 10);
     if (u.uhpmax < uhpmin)
         u.uhpmax = uhpmin;
     u.uhp = u.uhpmax;

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ $NHDT-Date: 1621208908 2021/05/16 23:48:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.539 $ $NHDT-Date: 1621380392 2021/05/18 23:26:32 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -522,6 +522,8 @@ prediscovered weapons adjustmens:  only knights and samurai know polearms;
 if the move counter ever reaches 1000000000, end the game
 knights get no metal armor penalty for clerical spells
 change touch of death from instadeath to maxhp reduction and damage
+dying from being level-drained below level 1 killed hero without saying so
+	and jumped straight to "do you want your possessions identified?"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

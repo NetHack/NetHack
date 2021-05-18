@@ -1,4 +1,4 @@
-/* NetHack 3.7	exper.c	$NHDT-Date: 1596498167 2020/08/03 23:42:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.7	exper.c	$NHDT-Date: 1621380393 2021/05/18 23:26:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -205,8 +205,14 @@ losexp(const char *drainer) /* cause of death, if drain should be fatal */
     else if (resists_drli(&g.youmonst))
         return;
 
+    /* level-loss message; "Goodbye level 1." is fatal; divine anger
+       (drainer==NULL) resets a level 1 character to 0 experience points
+       without reducing level and that isn't fatal so suppress the message
+       in that situation */
+    if (u.ulevel > 1 || drainer)
+        pline("%s level %d.", Goodbye(), u.ulevel);
     if (u.ulevel > 1) {
-        pline("%s level %d.", Goodbye(), u.ulevel--);
+        u.ulevel -= 1;
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
     } else {
