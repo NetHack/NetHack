@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1615158480 2021/03/07 23:08:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.340 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1621387861 2021/05/19 01:31:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3957,45 +3957,43 @@ flip_through_book(struct obj *obj)
         return 0;
     }
 
-    You("flip through the pages of the spellbook.");
+    You("flip through the pages of %s.", thesimpleoname(obj));
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-        if (Deaf) {
-            You_see("the pages glow faintly %s.", hcolor(NH_RED));
-        } else {
+        if (!Deaf)
             You_hear("the pages make an unpleasant %s sound.",
-                    Hallucination ? "chuckling"
-                                  : "rustling");
-        }
-        return 1;
+                     Hallucination ? "chuckling"
+                                   : "rustling");
+        else if (!Blind)
+            You_see("the pages glow faintly %s.", hcolor(NH_RED));
+        else
+            You_feel("the pages tremble.");
     } else if (Blind) {
         pline("The pages feel %s.",
               Hallucination ? "freshly picked"
                             : "rough and dry");
-        return 1;
     } else if (obj->otyp == SPE_BLANK_PAPER) {
         pline("This spellbook %s.",
               Hallucination ? "doesn't have much of a plot"
                             : "has nothing written in it");
         makeknown(obj->otyp);
-        return 1;
-    }
-
-    if (Hallucination) {
+    } else if (Hallucination) {
         You("enjoy the animated initials.");
+    } else if (obj->otyp == SPE_NOVEL) {
+        pline("This looks like it might be interesting to read.");
     } else {
-        static const char* fadeness[] = {
+        static const char *fadeness[] = {
             "fresh",
             "slightly faded",
             "very faded",
             "extremely faded",
             "barely visible"
         };
+        int findx = min(obj->spestudied, MAX_SPELL_STUDY);
 
-        int index = min(obj->spestudied, MAX_SPELL_STUDY);
         pline("The%s ink in this spellbook is %s.",
               objects[obj->otyp].oc_magic ? " magical" : "",
-              fadeness[index]);
+              fadeness[findx]);
     }
 
     return 1;
