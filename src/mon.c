@@ -1019,7 +1019,7 @@ movemon(void)
         }
 
         /* continue if the monster died fighting */
-        if (Conflict && !mtmp->iswiz && mtmp->mcansee) {
+        if (Conflict && !mtmp->iswiz && m_canseeu(mtmp)) {
             /* Note:
              *  Conflict does not take effect in the first round.
              *  Therefore, A monster when stepping into the area will
@@ -1028,7 +1028,7 @@ movemon(void)
              *  The call to fightm() must be _last_.  The monster might
              *  have died if it returns 1.
              */
-            if (couldsee(mtmp->mx, mtmp->my)
+            if (cansee(mtmp->mx, mtmp->my)
                 && (distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM)
                 && fightm(mtmp))
                 continue; /* mon might have died */
@@ -1611,7 +1611,7 @@ mon_allowflags(struct monst* mtmp)
         allowflags |= ALLOW_SANCT | ALLOW_SSM;
     else
         allowflags |= ALLOW_U;
-    if (Conflict && !resist(mtmp, RING_CLASS, 0, 0))
+    if (Conflict && !resist_conflict(mtmp))
         allowflags |= ALLOW_U;
     if (mtmp->isshk)
         allowflags |= ALLOW_SSM;

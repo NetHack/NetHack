@@ -885,7 +885,7 @@ dog_move(register struct monst *mtmp,
     udist = distu(omx, omy);
     /* Let steeds eat and maybe throw rider during Conflict */
     if (mtmp == u.usteed) {
-        if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
+        if (Conflict && !resist_conflict(mtmp)) {
             dismount_steed(DISMOUNT_THROWN);
             return 1;
         }
@@ -915,7 +915,7 @@ dog_move(register struct monst *mtmp,
     if (appr == -2)
         return 0;
 
-    if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
+    if (Conflict && !resist_conflict(mtmp)) {
         if (!has_edog) {
             /* Guardian angel refuses to be conflicted; rather,
              * it disappears, angrily, and sends in some nasties

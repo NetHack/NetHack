@@ -1494,6 +1494,7 @@ extern const struct permonst *raceptr(struct monst *);
 extern boolean olfaction(struct permonst *);
 unsigned long cvt_adtyp_to_mseenres(uchar);
 extern void monstseesu(unsigned long);
+extern boolean resist_conflict(struct monst *);
 
 /* ### monmove.c ### */
 

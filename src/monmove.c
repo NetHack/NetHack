@@ -544,7 +544,7 @@ dochug(register struct monst* mtmp)
         }
         pline("A wave of psychic energy pours over you!");
         if (mtmp->mpeaceful
-            && (!Conflict || resist(mtmp, RING_CLASS, 0, 0))) {
+            && (!Conflict || resist_conflict(mtmp))) {
             pline("It feels quite soothing.");
         } else if (!u.uinvulnerable) {
             int dmg;
@@ -710,7 +710,7 @@ dochug(register struct monst* mtmp)
      */
 
     if (tmp != 3 && (!mtmp->mpeaceful
-                     || (Conflict && !resist(mtmp, RING_CLASS, 0, 0)))) {
+                     || (Conflict && !resist_conflict(mtmp)))) {
         if (inrange && !scared && !noattacks(mdat)
             /* [is this hp check really needed?] */
             && (Upolyd ? u.mh : u.uhp) > 0) {

@@ -1255,4 +1255,19 @@ monstseesu(unsigned long seenres)
             m_setseenres(mtmp, seenres);
 }
 
+/* Can monster resist conflict caused by hero?
+
+   High-CHA heroes will be able to 'convince' monsters
+   (through the magic of the ring, of course) to fight
+   for them much more easily than low-CHA ones.
+*/
+boolean
+resist_conflict(struct monst* mtmp)
+{
+    /* always a small chance at 19 */
+    int resist_chance = min(19, (ACURR(A_CHA) - mtmp->m_lev + u.ulevel));
+
+    return (rnd(20) > resist_chance);
+}
+
 /*mondata.c*/

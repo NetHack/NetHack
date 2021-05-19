@@ -116,7 +116,7 @@ fightm(register struct monst *mtmp)
     nmon = 0;
 #endif
     /* perhaps the monster will resist Conflict */
-    if (resist(mtmp, RING_CLASS, 0, 0))
+    if (resist_conflict(mtmp))
         return 0;
 
     if (u.ustuck == mtmp) {

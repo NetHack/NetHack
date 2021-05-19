@@ -3757,7 +3757,7 @@ shk_move(struct monst* shkp)
 
     if ((udist = distu(omx, omy)) < 3 && (shkp->data != &mons[PM_GRID_BUG]
                                           || (omx == u.ux || omy == u.uy))) {
-        if (ANGRY(shkp) || (Conflict && !resist(shkp, RING_CLASS, 0, 0))) {
+        if (ANGRY(shkp) || (Conflict && !resist_conflict(shkp))) {
             if (Displaced)
                 Your("displaced image doesn't fool %s!", shkname(shkp));
             (void) mattacku(shkp);
