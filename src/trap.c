@@ -1974,15 +1974,17 @@ trapeffect_anti_magic(
     unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
+        int drain = (u.uen > 1) ? (rnd(u.uen / 2) + 2) : 4;
+
         seetrap(trap);
         /* hero without magic resistance loses spell energy,
            hero with magic resistance takes damage instead;
            possibly non-intuitive but useful for play balance */
         if (!Antimagic) {
-            drain_en(rnd(u.ulevel) + 1);
+            drain_en(drain);
         } else {
             struct obj *otmp;
-            int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
+            int dmgval2 = rnd(drain), hp = Upolyd ? u.mh : u.uhp;
 
             /* Half_XXX_damage has opposite its usual effect (approx)
                but isn't cumulative if hero has more than one */
@@ -4293,7 +4295,7 @@ drain_en(int n)
         You_feel("momentarily lethargic.");
     } else {
         /* throttle further loss a bit when there's not much left to lose */
-        if (n > u.uenmax || n > u.ulevel)
+        if (n > (u.uen + u.uenmax) / 3)
             n = rnd(n);
 
         You_feel("your magical energy drain away%c", (n > u.uen) ? '!' : '.');

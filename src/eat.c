@@ -20,6 +20,7 @@ static void done_eating(boolean);
 static void cprefx(int);
 static int intrinsic_possible(int, struct permonst *);
 static void givit(int, struct permonst *);
+static void eye_of_newt_buzz(void);
 static void cpostfx(int);
 static void consume_tin(const char *);
 static void start_tin(struct obj *);
@@ -916,6 +917,26 @@ givit(int type, register struct permonst *ptr)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+static void
+eye_of_newt_buzz(void)
+{
+    /* MRKR: "eye of newt" may give small magical energy boost */
+    if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
+        int old_uen = u.uen;
+
+        u.uen += rnd(3);
+        if (u.uen > u.uenmax) {
+            if (!rn2(3))
+                u.uenmax++;
+            u.uen = u.uenmax;
+        }
+        if (old_uen != u.uen) {
+            You_feel("a mild buzz.");
+            g.context.botl = 1;
+        }
+    }
+}
+
 /* called after completely consuming a corpse */
 static void
 cpostfx(int pm)
@@ -930,23 +951,6 @@ cpostfx(int pm)
         (void) eatmdone();
 
     switch (pm) {
-    case PM_NEWT:
-        /* MRKR: "eye of newt" may give small magical energy boost */
-        if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
-            int old_uen = u.uen;
-
-            u.uen += rnd(3);
-            if (u.uen > u.uenmax) {
-                if (!rn2(3))
-                    u.uenmax++;
-                u.uen = u.uenmax;
-            }
-            if (old_uen != u.uen) {
-                You_feel("a mild buzz.");
-                g.context.botl = 1;
-            }
-        }
-        break;
     case PM_WRAITH:
         pluslvl(FALSE);
         break;
@@ -1099,6 +1103,10 @@ cpostfx(int pm)
             (void) make_hallucinated((HHallucination & TIMEOUT) + 200L, FALSE,
                                      0L);
         }
+
+        /* Eating magical monsters can give you some magical energy. */
+        if (attacktype(ptr, AT_MAGC) || pm == PM_NEWT)
+            eye_of_newt_buzz();
 
         /* Check the monster for all of the intrinsics.  If this
          * monster can give more than one, pick one to try to give
