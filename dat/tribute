@@ -3986,16 +3986,16 @@ The fastest way to travel is to be there already.
 #
 #
 #
-%title Interesting Times (10)
+%title Interesting Times (13)
 # p. 1 (Harper Torch edition; passage is a footnote)
 %passage 1
 Whatever happens, they say afterwards, it must have been fate.  People are
 always a little confused about this, as they are in the case of miracles.
 When someone is saved from certain death by a strange concatenation of
 circumstances, they say that's a miracle.  But of course if someone is
-killed by a freak chain of events--the oil spilled just there, the safety
-fence broken just there--that must also be a miracle.  Just because it's
-not nice doesn't mean it's not miraculous.
+/killed/ by a freak chain of events--the oil spilled just /there/, the
+safety fence broken just /there/--that must /also/ be a miracle.  Just
+because it's not nice doesn't mean it's not miraculous.
 
   [Interesting Times, by Terry Pratchett]
 %e passage
@@ -4131,6 +4131,74 @@ there's long periods of boredom followed by short periods of excitement."
 
 "Not really," said Cohen.  "It's more like short periods of waiting
 followed by long periods of being dead."
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
+#
+# 3 new passages for 3.7
+# p. 45
+%passage 11
+Adventure!  People talked about the idea as if it was something worthwhile,
+rather than a mess of bad food, no sleep, and strange people inexplicably
+trying to stick pointed objects in bits of you.
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
+# p. 52
+%passage 12
+"How /will/ I get back?" he said.
+
+"Same way you went.  We'll find you and bring you out.  With surgical
+precision."
+
+Rincewind groaned.  He knew what surgical precision meant in Ankh-Morpork.
+It meant "to within an inch or two, accompanied by a lot of screaming, and
+then they pour hot tar on you just where your leg was."
+
+But... if you put aside for the moment the certainty that something would
+definitely go horribly wrong, it looked foolproof.  The trouble was that
+wizards were such ingenious fools.
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
+# pp. 272-274 (most of page 273, is omitted:  War introduces his children and
+#              Rincewind asks Death about the outcome of a battle which is
+#              imminent; Death's response is that he wouldn't answer even if
+#              he knew, and Rincewind is astonished that he might not know;
+#              Death holds a finger up and a butterfly--as a symbol of chaos
+#              theory--briefly lands on it, then flies away)
+%passage 13
+RINCEWIND, ISN'T IT? said Death.  YES.  GOOD EVENING.  I DON'T BELIEVE YOU
+HAVE MET WAR.  RINCEWIND, WAR.  WAR, RINCEWIND.
+
+[...]
+
+ON A NIGHT LIKE THIS, said Death, THE ONLY CERTAIN THING IS UNCERTAINTY.
+TRITE, I KNOW, BUT TRUE.
+
+Somewhere on the horizon, thunder rumbled.
+
+"I'll, er, just be sort of going, then," said Rincewind.
+
+DON'T BE A STRANGER, said Death, as the wizard hurried off.
+
+"Odd person," said War.
+
+WITH HIM HERE, EVEN UNCERTAINTY IS UNCERTAIN.  AND I'M NOT SURE EVEN
+ABOUT THAT.
+
+War pulled a large paper-wrapped package out of his saddlebag.
+
+"We've got... let's see now... Egg and Cress, Chicken Tikka, and Mature
+Cheese with Chunky Pickle, I think."
+
+THEY DO SUCH MARVELOUS THINGS WITH SANDWICHES THESE DAYS.
+
+"Oh... and Bacon Surpise."
+
+REALLY?  WHAT IS SO SURPRISING ABOUT BACON?
+
+"I don't know.  I suppose it comes as something of a shock to the pig."
 
   [Interesting Times, by Terry Pratchett]
 %e passage
