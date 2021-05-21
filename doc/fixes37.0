@@ -688,6 +688,9 @@ forgetting an item's known/dknown/bknown/&c settings when picked up by unseen
 	avoid clearing dknown flag for globs
 fix globby_bill_fixup to use shopkeeper instead of Null for glob pricing
 applying a book to check readability treated novels as if they were spellbooks
+#version was leaving the 'in_lua' flag set and if subsequent 'O' issued an
+	error (example was an attempt to interactively set bouldersym to an
+	invalid value), the error routine reporting crashed via segfault
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

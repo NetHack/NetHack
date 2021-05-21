@@ -1193,7 +1193,7 @@ get_lua_version(void)
                 Strcpy(g.lua_ver, vs);
             }
         }
-        lua_close(L);
+        nhl_done(L);
 #ifdef LUA_COPYRIGHT
         if (sizeof LUA_COPYRIGHT <= sizeof g.lua_copyright)
             Strcpy(g.lua_copyright, LUA_COPYRIGHT);
