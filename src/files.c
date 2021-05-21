@@ -2837,7 +2837,7 @@ void
 config_error_init(boolean from_file, const char *sourcename, boolean secure)
 {
     struct _config_error_frame *tmp = (struct _config_error_frame *)
-        alloc(sizeof (struct _config_error_frame));
+                                                           alloc(sizeof *tmp);
 
     tmp->line_num = 0;
     tmp->num_errors = 0;
@@ -2913,6 +2913,14 @@ config_erradd(const char *buf)
     if (!buf || !*buf)
         buf = "Unknown error";
 
+    if (!g.program_state.config_error_ready) {
+        /* either very early, where pline() will use raw_print(), or
+           player gave bad value when prompted by interactive 'O' command */
+        pline("%s%s.", !iflags.window_inited ? "config_error_add: " : "", buf);
+        wait_synch();
+        return;
+    }
+
     if (iflags.in_lua) {
         struct _config_error_errmsg *dat
                          = (struct _config_error_errmsg *) alloc(sizeof *dat);
@@ -2921,14 +2929,6 @@ config_erradd(const char *buf)
         dat->line_num = config_error_data->line_num;
         dat->errormsg = dupstr(buf);
         config_error_msg = dat;
-        return;
-    }
-
-    if (!config_error_data) {
-        /* either very early, where pline() will use raw_print(), or
-           player gave bad value when prompted by interactive 'O' command */
-        pline("%s%s.", !iflags.window_inited ? "config_error_add: " : "", buf);
-        wait_synch();
         return;
     }
 
@@ -2956,15 +2956,14 @@ config_error_done(void)
         return 0;
     n = config_error_data->num_errors;
     if (n) {
-        pline("\n%d error%s in %s.\n", n,
-                   (n > 1) ? "s" : "",
-                   *config_error_data->source
-              ? config_error_data->source : configfile);
+        pline("\n%d error%s in %s.\n", n, plur(n),
+              *config_error_data->source ? config_error_data->source
+                                         : configfile);
         wait_synch();
     }
     config_error_data = tmp->next;
     free(tmp);
-    g.program_state.config_error_ready = FALSE;
+    g.program_state.config_error_ready = (config_error_data != 0);
     return n;
 }
 
