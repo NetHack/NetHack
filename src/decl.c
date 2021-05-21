@@ -517,6 +517,9 @@ const struct instance_globals g_init = {
     MAX_LAN_USERNAME, /* lusername_size */
 #endif /* MAX_LAN_USERNAME */
 
+    /* nhlua.c */
+    UNDEFINED_VALUE, /* luacore */
+
     /* o_init.c */
     DUMMY, /* disco */
 

@@ -890,6 +890,7 @@ split off some of the functionality that was in makedefs (compiled-in options
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
 	Lua quest texts loaded at runtime
+callback lua functions from core at certain game actions
 some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the

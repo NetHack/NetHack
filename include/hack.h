@@ -421,6 +421,16 @@ typedef struct sortloot_item Loot;
 #define SUPPRESS_HISTORY 4
 #define URGENT_MESSAGE   8
 
+/* Lua callback functions */
+enum nhcore_calls {
+    NHCORE_START_NEW_GAME = 0,
+    NHCORE_RESTORE_OLD_GAME,
+    NHCORE_MOVELOOP_TURN,
+    NHCORE_GAME_EXIT,
+
+    NUM_NHCORE_CALLS
+};
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 enum bodypart_types {
     ARM       =  0,

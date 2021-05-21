@@ -1657,6 +1657,9 @@ extern int l_obj_register(lua_State *);
 /* ### nhlua.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+extern void l_nhcore_init(void);
+extern void l_nhcore_done(void);
+extern void l_nhcore_call(int);
 extern lua_State * nhl_init(void);
 extern void nhl_done(lua_State *);
 extern boolean nhl_loadlua(lua_State *, const char *);

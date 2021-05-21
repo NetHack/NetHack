@@ -14,6 +14,35 @@ Example:
 
  local str = nh.an("unicorn");
 
+=== dnum_name
+
+Returns the full dungeon name (as defined in dungeon.lua) for the dungeon
+number given as parameter.
+
+Example:
+
+ local dungeon_name = nh.dnum_name(u.dnum);
+
+=== dump_fmtstr
+
+Returns a string replacing special format chars with game data.
+Only available if NetHack was compiled with DUMPLOG.
+
+|===
+| %% | literal '%'
+| %t | game start, timestamp
+| %T | current time, timestamp
+| %d | game start, YYYYMMDDhhmmss
+| %D | current time, YYYYMMDDhhmmss
+| %v | game version, eg. '3.7.0-0'
+| %u | UID
+| %n | player name
+| %N | first character of player name
+|===
+
+Example:
+
+ local filename = nh.dump_fmtstr("/tmp/nethack.%n.%d.log");
 
 === getlin
 
