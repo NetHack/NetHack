@@ -167,14 +167,14 @@ init_objects(void)
                 break;
             }
         }
-    check:
+ checkprob:
         sum = 0;
         for (i = first; i < last; i++)
             sum += objects[i].oc_prob;
         if (sum == 0) {
             for (i = first; i < last; i++)
                 objects[i].oc_prob = (1000 + i - first) / (last - first);
-            goto check;
+            goto checkprob;
         }
         if (sum != 1000)
             error("init-prob error for class %d (%d%%)", oclass, sum);
@@ -190,6 +190,23 @@ init_objects(void)
     for (last = MAXOCLASSES - 1; last >= 0; --last)
         if (!g.bases[last])
             g.bases[last] = g.bases[last + 1];
+
+    /* check objects[].oc_name_known */
+    for (i = 0; i < NUM_OBJECTS; ++i) {
+        int nmkn = objects[i].oc_name_known != 0;
+
+        if (!OBJ_DESCR(objects[i]) ^ nmkn) {
+            if (iflags.sanity_check) {
+                impossible(
+                    "obj #%d (%s) name is %s despite%s alternate description",
+                           i, OBJ_NAME(objects[i]),
+                           nmkn ? "pre-known" : "not known",
+                           nmkn ? "" : " no");
+            }
+            /* repair the mistake and keep going */
+            objects[i].oc_name_known = nmkn ? 0 : 1;
+        }
+    }
 
     /* shuffle descriptions */
     shuffle_all();
