@@ -827,7 +827,15 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     else
         noises(magr, mattk);
 
-    result = mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
+    /* monster explosion types which actually create an explosion */
+    if (mattk->adtyp == AD_FIRE || mattk->adtyp == AD_COLD
+        || mattk->adtyp == AD_ELEC) {
+        mon_explodes(magr, mattk);
+        /* unconditionally set AGR_DIED here; lifesaving is accounted below */
+        result = MM_AGR_DIED | (DEADMONSTER(mdef) ? MM_DEF_DIED : 0);
+    } else {
+        result = mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
+    }
 
     /* Kill off aggressor if it didn't die. */
     if (!(result & MM_AGR_DIED)) {

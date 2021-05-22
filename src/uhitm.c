@@ -18,7 +18,6 @@ static boolean hmon_hitmon(struct monst *, struct obj *, int, int);
 static int joust(struct monst *, struct obj *);
 static void demonpet(void);
 static boolean m_slips_free(struct monst *, struct attack *);
-static int explum(struct monst *, struct attack *);
 static void start_engulf(struct monst *);
 static void end_engulf(void);
 static int gulpum(struct monst *, struct attack *);
@@ -4127,49 +4126,41 @@ damageum(
     return MM_HIT;
 }
 
-static int
+/* Hero, as a monster which is capable of an exploding attack mattk, is
+ * exploding at a target monster mdef, or just exploding at nothing (e.g. with
+ * forcefight) if mdef is null.
+ */
+int
 explum(struct monst *mdef, struct attack *mattk)
 {
-    boolean resistance; /* only for cold/fire/elec */
     register int tmp = d((int) mattk->damn, (int) mattk->damd);
 
-    You("explode!");
     switch (mattk->adtyp) {
     case AD_BLND:
-        if (!resists_blnd(mdef)) {
+        if (mdef && !resists_blnd(mdef)) {
             pline("%s is blinded by your flash of light!", Monnam(mdef));
             mdef->mblinded = min((int) mdef->mblinded + tmp, 127);
             mdef->mcansee = 0;
         }
         break;
     case AD_HALU:
-        if (haseyes(mdef->data) && mdef->mcansee) {
+        if (mdef && haseyes(mdef->data) && mdef->mcansee) {
             pline("%s is affected by your flash of light!", Monnam(mdef));
             mdef->mconf = 1;
         }
         break;
     case AD_COLD:
-        resistance = resists_cold(mdef);
-        goto common;
     case AD_FIRE:
-        resistance = resists_fire(mdef);
-        goto common;
     case AD_ELEC:
-        resistance = resists_elec(mdef);
- common:
-        if (!resistance) {
-            pline("%s gets blasted!", Monnam(mdef));
-            mdef->mhp -= tmp;
-            if (DEADMONSTER(mdef)) {
-                killed(mdef);
-                return MM_DEF_DIED;
-            }
-        } else {
-            shieldeff(mdef->mx, mdef->my);
-            if (is_golem(mdef->data))
-                golemeffects(mdef, (int) mattk->adtyp, tmp);
-            else
-                pline_The("blast doesn't seem to affect %s.", mon_nam(mdef));
+        /* See comment in mon_explodes() and in zap.c for an explanation of this
+         * math.  Here, the player is causing the explosion, so it should be in
+         * the +20 to +29 range instead of negative. */
+        explode(u.ux, u.uy, (mattk->adtyp - 1) + 20, tmp, MON_EXPLODE,
+                adtyp_to_expltype(mattk->adtyp));
+        if (mdef && DEADMONSTER(mdef)) {
+            /* Other monsters may have died too, but return this if the actual
+             * target died. */
+            return MM_DEF_DIED;
         }
         break;
     default:
@@ -4745,6 +4736,7 @@ hmonas(struct monst *mon)
         case AT_EXPL: /* automatic hit if next to */
             dhit = -1;
             wakeup(mon, TRUE);
+            You("explode!");
             sum[i] = explum(mon, mattk);
             break;
 

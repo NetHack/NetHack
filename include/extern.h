@@ -735,6 +735,8 @@ extern void explode(int, int, int, int, char, int);
 extern long scatter(int, int, int, unsigned int, struct obj *);
 extern void splatter_burning_oil(int, int, boolean);
 extern void explode_oil(struct obj *, int, int);
+extern int adtyp_to_expltype(int);
+extern void mon_explodes(struct monst *, struct attack *);
 
 /* ### extralev.c ### */
 
@@ -2740,6 +2742,7 @@ extern boolean do_stone_u(struct monst *);
 extern void do_stone_mon(struct monst *, struct attack *, struct monst *,
                          struct mhitm_data *);
 extern int damageum(struct monst *, struct attack *, int);
+extern int explum(struct monst *, struct attack *);
 extern void missum(struct monst *, struct attack *, boolean);
 extern int passive(struct monst *, struct obj *, boolean, boolean, uchar,
                    boolean);

@@ -2522,12 +2522,7 @@ corpse_chance(
                 return FALSE;
             }
 
-            Sprintf(g.killer.name, "%s explosion",
-                    s_suffix(pmname(mdat, Mgender(mon))));
-            g.killer.format = KILLED_BY_AN;
-            explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
-            g.killer.name[0] = '\0';
-            g.killer.format = 0;
+            mon_explodes(mon, &mdat->mattk[i]);
             return FALSE;
         }
     }

@@ -530,6 +530,7 @@ boost hit points of some golems
 make anti-magic fields drain more energy and prevent them from showing up
 	too early in the dungeon
 eating magical monsters such as wizards or shamans may give a mild buzz
+make exploding spheres create an actual explosion
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

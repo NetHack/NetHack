@@ -324,21 +324,21 @@ NEARDATA struct permonst mons_init[] = {
         SIZ(10, 10, MS_SILENT, MZ_SMALL), MR_COLD, MR_COLD,
         M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
-        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 8, CLR_WHITE),
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 9, CLR_WHITE),
     MON("flaming sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_GENO | 2), A(ATTK(AT_EXPL, AD_FIRE, 4, 6), NO_ATTK,
                                      NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(10, 10, MS_SILENT, MZ_SMALL), MR_FIRE, MR_FIRE,
         M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
-        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 8, CLR_RED),
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 9, CLR_RED),
     MON("shocking sphere", S_EYE, LVL(6, 13, 4, 0, 0),
         (G_NOCORPSE | G_GENO | 2), A(ATTK(AT_EXPL, AD_ELEC, 4, 6), NO_ATTK,
                                      NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(10, 10, MS_SILENT, MZ_SMALL), MR_ELEC, MR_ELEC,
         M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS
             | M1_NOTAKE,
-        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 8, HI_ZAP),
+        M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, 10, HI_ZAP),
 #if 0 /* not yet implemented */
     MON("beholder", S_EYE,
         LVL(6, 3, 4, 0, -10), (G_GENO | 2),
