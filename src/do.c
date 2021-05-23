@@ -7,7 +7,6 @@
 
 #include "hack.h"
 
-static void trycall(struct obj *);
 static void polymorph_sink(void);
 static boolean teleport_sink(void);
 static void dosinkring(struct obj *);
@@ -315,7 +314,9 @@ doaltarobj(struct obj *obj)
     }
 }
 
-static void
+/* If obj is neither formally identified nor informally called something
+ * already, prompt the player to call its object type. */
+void
 trycall(struct obj *obj)
 {
     if (!objects[obj->otyp].oc_name_known && !objects[obj->otyp].oc_uname)

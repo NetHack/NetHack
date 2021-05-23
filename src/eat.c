@@ -2620,9 +2620,8 @@ doeat(void)
     if (otmp->otyp == RIN_SLOW_DIGESTION) {
         pline("This ring is indigestible!");
         (void) rottenfood(otmp);
-        if (otmp->dknown && !objects[otmp->otyp].oc_name_known
-            && !objects[otmp->otyp].oc_uname)
-            docall(otmp);
+        if (otmp->dknown)
+            trycall(otmp);
         return ECMD_TIME;
     }
     if (otmp->oclass != FOOD_CLASS) {

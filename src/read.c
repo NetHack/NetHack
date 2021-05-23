@@ -440,8 +440,7 @@ doread(void)
 
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
-        if (!objects[otyp].oc_name_known && !objects[otyp].oc_uname)
-            docall(scroll);
+        trycall(scroll);
         return ECMD_TIME;
     } else if (otyp == CREDIT_CARD) {
         static const char *const card_msgs[] = {
@@ -631,8 +630,8 @@ doread(void)
         if (!objects[otyp].oc_name_known) {
             if (g.known)
                 learnscroll(scroll);
-            else if (!objects[otyp].oc_uname)
-                docall(scroll);
+            else
+                trycall(scroll);
         }
         scroll->in_use = FALSE;
         if (otyp != SCR_BLANK_PAPER)

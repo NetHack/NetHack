@@ -591,8 +591,8 @@ dopotion(struct obj *otmp)
         if (!g.potion_unkn) {
             makeknown(otmp->otyp);
             more_experienced(0, 10);
-        } else if (!objects[otmp->otyp].oc_uname)
-            docall(otmp);
+        } else
+            trycall(otmp);
     }
     useup(otmp);
     return ECMD_TIME;
@@ -1414,9 +1414,8 @@ strange_feeling(struct obj *obj, const char *txt)
     if (!obj) /* e.g., crystal ball finds no traps */
         return;
 
-    if (obj->dknown && !objects[obj->otyp].oc_name_known
-        && !objects[obj->otyp].oc_uname)
-        docall(obj);
+    if (obj->dknown)
+        trycall(obj);
 
     useup(obj);
 }
@@ -1837,9 +1836,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
     if ((distance == 0 || (distance < 3 && rn2(5)))
         && (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)))
         potionbreathe(obj);
-    else if (obj->dknown && !objects[obj->otyp].oc_name_known
-             && !objects[obj->otyp].oc_uname && cansee(tx, ty))
-        docall(obj);
+    else if (obj->dknown && cansee(tx, ty))
+        trycall(obj);
 
     if (*u.ushops && obj->unpaid) {
         struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
@@ -2040,9 +2038,8 @@ potionbreathe(struct obj *obj)
     if (obj->dknown) {
         if (kn)
             makeknown(obj->otyp);
-        else if (!objects[obj->otyp].oc_name_known
-                 && !objects[obj->otyp].oc_uname)
-            docall(obj);
+        else
+            trycall(obj);
     }
     return;
 }
@@ -2391,10 +2388,8 @@ dodip(void)
                                    : potion->odiluted ? hcolor(NH_ORANGE)
                                      : hcolor(NH_RED));
         potion->in_use = FALSE; /* didn't go poof */
-        if (potion->dknown
-            && !objects[potion->otyp].oc_name_known
-            && !objects[potion->otyp].oc_uname)
-            docall(potion);
+        if (potion->dknown)
+            trycall(potion);
         return ECMD_TIME;
     }
 
@@ -2578,10 +2573,8 @@ dodip(void)
     return ECMD_TIME;
 
  poof:
-    if (potion->dknown
-        && !objects[potion->otyp].oc_name_known
-        && !objects[potion->otyp].oc_uname)
-        docall(potion);
+    if (potion->dknown)
+        trycall(potion);
     useup(potion);
     return ECMD_TIME;
 }

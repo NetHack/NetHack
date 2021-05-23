@@ -1666,9 +1666,7 @@ pickup_object(struct obj *obj, long count,
             pline_The("scroll%s %s to dust as you %s %s up.", plur(obj->quan),
                       otense(obj, "turn"), telekinesis ? "raise" : "pick",
                       (obj->quan == 1L) ? "it" : "them");
-            if (!objects[SCR_SCARE_MONSTER].oc_name_known
-                && !objects[SCR_SCARE_MONSTER].oc_uname)
-                docall(obj);
+            trycall(obj);
             useupf(obj, obj->quan);
             return 1; /* tried to pick something up and failed, but
                          don't want to terminate pickup loop yet   */

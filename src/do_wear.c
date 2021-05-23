@@ -888,10 +888,8 @@ Amulet_on(void)
         }
         livelog_newform(FALSE, orig_sex, new_sex);
         pline_The("amulet disintegrates!");
-        if (orig_sex == poly_gender() && uamul->dknown
-            && !objects[AMULET_OF_CHANGE].oc_name_known
-            && !objects[AMULET_OF_CHANGE].oc_uname)
-            docall(uamul);
+        if (orig_sex == poly_gender() && uamul->dknown)
+            trycall(uamul);
         useup(uamul);
         break;
     }

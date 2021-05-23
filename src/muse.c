@@ -857,9 +857,8 @@ use_defensive(struct monst* mtmp)
          */
         if (known)
             makeknown(SCR_CREATE_MONSTER);
-        else if (!objects[SCR_CREATE_MONSTER].oc_name_known
-                 && !objects[SCR_CREATE_MONSTER].oc_uname)
-            docall(otmp);
+        else
+            trycall(otmp);
         m_useup(mtmp, otmp);
         return 2;
     }
@@ -2076,9 +2075,7 @@ use_misc(struct monst* mtmp)
                 if (vismon) {
                     pline("%s rises up, through the %s!", Monnam(mtmp),
                           ceiling(mtmp->mx, mtmp->my));
-                    if (!objects[POT_GAIN_LEVEL].oc_name_known
-                        && !objects[POT_GAIN_LEVEL].oc_uname)
-                        docall(otmp);
+                    trycall(otmp);
                 }
                 m_useup(mtmp, otmp);
                 migrate_to_level(mtmp, ledger_no(&tolevel), MIGR_RANDOM,
@@ -2088,9 +2085,7 @@ use_misc(struct monst* mtmp)
  skipmsg:
                 if (vismon) {
                     pline("%s looks uneasy.", Monnam(mtmp));
-                    if (!objects[POT_GAIN_LEVEL].oc_name_known
-                        && !objects[POT_GAIN_LEVEL].oc_uname)
-                        docall(otmp);
+                    trycall(otmp);
                 }
                 m_useup(mtmp, otmp);
                 return 2;
@@ -2789,10 +2784,9 @@ muse_unslime(
         if (mon->mconf) {
             if (cansee(mon->mx, mon->my))
                 pline("Oh, what a pretty fire!");
-            if (vis && !objects[otyp].oc_name_known
-                && !objects[otyp].oc_uname)
-                docall(obj);
-            m_useup(mon, obj); /* after docall() */
+            if (vis)
+                trycall(obj);
+            m_useup(mon, obj); /* after trycall() */
             vis = FALSE;       /* skip makeknown() below */
             res = FALSE;       /* failed to cure sliming */
         } else {

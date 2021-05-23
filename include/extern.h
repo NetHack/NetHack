@@ -435,6 +435,7 @@ extern int dodrop(void);
 extern boolean boulder_hits_pool(struct obj *, int, int, boolean);
 extern boolean flooreffects(struct obj *, int, int, const char *);
 extern void doaltarobj(struct obj *);
+extern void trycall(struct obj *);
 extern boolean canletgo(struct obj *, const char *);
 extern void dropx(struct obj *);
 extern void dropy(struct obj *);

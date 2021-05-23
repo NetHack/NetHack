@@ -185,9 +185,7 @@ confused_book(struct obj* spellbook)
          "Being confused you have difficulties in controlling your actions.");
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("accidentally tear the spellbook to pieces.");
-        if (!objects[spellbook->otyp].oc_name_known
-            && !objects[spellbook->otyp].oc_uname)
-            docall(spellbook);
+        trycall(spellbook);
         useup(spellbook);
         gone = TRUE;
     } else {
@@ -587,9 +585,7 @@ study_book(register struct obj* spellbook)
             if (gone || !rn2(3)) {
                 if (!gone)
                     pline_The("spellbook crumbles to dust!");
-                if (!objects[spellbook->otyp].oc_name_known
-                    && !objects[spellbook->otyp].oc_uname)
-                    docall(spellbook);
+                trycall(spellbook);
                 useup(spellbook);
             } else
                 spellbook->in_use = FALSE;
