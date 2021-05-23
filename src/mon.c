@@ -2205,6 +2205,8 @@ m_detach(
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
+    if (mtmp->data->msound == MS_LEADER)
+        leaddead();
     if (mtmp->m_id == g.stealmid)
         thiefdead();
     relobj(mtmp, 0, FALSE);
@@ -2926,12 +2928,17 @@ xkilled(
     /* adjust alignment points */
     if (mtmp->m_id == g.quest_status.leader_m_id) { /* REAL BAD! */
         adjalign(-(u.ualign.record + (int) ALIGNLIM / 2));
+        u.ugangr += 7; /* instantly become "extremely" angry */
+        change_luck(-20);
         pline("That was %sa bad idea...",
               u.uevent.qcompleted ? "probably " : "");
     } else if (mdat->msound == MS_NEMESIS) { /* Real good! */
-        adjalign((int) (ALIGNLIM / 4));
+        if (!g.quest_status.killed_leader)
+            adjalign((int) (ALIGNLIM / 4));
     } else if (mdat->msound == MS_GUARDIAN) { /* Bad */
         adjalign(-(int) (ALIGNLIM / 8));
+        u.ugangr++;
+        change_luck(-4);
         if (!Hallucination)
             pline("That was probably a bad idea...");
         else
@@ -3368,8 +3375,7 @@ setmangry(struct monst* mtmp, boolean via_attack)
     }
 
     /* attacking your own quest leader will anger his or her guardians */
-    if (!g.context.mon_moving /* should always be the case here */
-        && mtmp->data == &mons[quest_info(MS_LEADER)]) {
+    if (mtmp->data == &mons[quest_info(MS_LEADER)]) {
         struct monst *mon;
         struct permonst *q_guardian = &mons[quest_info(MS_GUARDIAN)];
         int got_mad = 0;

@@ -532,6 +532,8 @@ make anti-magic fields drain more energy and prevent them from showing up
 eating magical monsters such as wizards or shamans may give a mild buzz
 make exploding spheres create an actual explosion
 pets are more careful about attacking monsters at low health
+allow killing your quest leader to open the quest
+give King Arthur Excalibur
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

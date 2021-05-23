@@ -2064,6 +2064,7 @@ extern void free_epri(struct monst *);
 
 extern void onquest(void);
 extern void nemdead(void);
+extern void leaddead(void);
 extern void artitouch(struct obj *);
 extern boolean ok_to_quest(void);
 extern void leader_speaks(struct monst *);
