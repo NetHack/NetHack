@@ -204,7 +204,7 @@ dog_eat(struct monst *mtmp,
 {
     register struct edog *edog = EDOG(mtmp);
     boolean poly, grow, heal, eyes, slimer, deadmimic;
-    int nutrit, res;
+    int nutrit, res, corpsenm;
     long oprice;
     char objnambuf[BUFSZ];
 
@@ -221,6 +221,7 @@ dog_eat(struct monst *mtmp,
     grow = mlevelgain(obj);
     heal = mhealup(obj);
     eyes = (obj->otyp == CARROT);
+    corpsenm = (obj->otyp == CORPSE ? obj->corpsenm : NON_PM);
 
     if (devour) {
         if (mtmp->meating > 1)
@@ -347,6 +348,8 @@ dog_eat(struct monst *mtmp,
         mcureblindness(mtmp, canseemon(mtmp));
     if (deadmimic)
         quickmimic(mtmp);
+    if (corpsenm != NON_PM)
+        mon_givit(mtmp, &mons[corpsenm]);
     return 1;
 }
 

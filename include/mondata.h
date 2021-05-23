@@ -10,22 +10,24 @@
 
 #define pm_resistance(ptr, typ) (((ptr)->mresists & (typ)) != 0)
 
+#define mon_resistancebits(mon) \
+    ((mon)->data->mresists | (mon)->mextrinsics | (mon)->mintrinsics)
 #define resists_fire(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_FIRE) != 0)
+    ((mon_resistancebits(mon) & MR_FIRE) != 0)
 #define resists_cold(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_COLD) != 0)
+    ((mon_resistancebits(mon) & MR_COLD) != 0)
 #define resists_sleep(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_SLEEP) != 0)
+    ((mon_resistancebits(mon) & MR_SLEEP) != 0)
 #define resists_disint(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_DISINT) != 0)
+    ((mon_resistancebits(mon) & MR_DISINT) != 0)
 #define resists_elec(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ELEC) != 0)
+    ((mon_resistancebits(mon) & MR_ELEC) != 0)
 #define resists_poison(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_POISON) != 0)
+    ((mon_resistancebits(mon) & MR_POISON) != 0)
 #define resists_acid(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_ACID) != 0)
+    ((mon_resistancebits(mon) & MR_ACID) != 0)
 #define resists_ston(mon) \
-    ((((mon)->data->mresists | (mon)->mextrinsics) & MR_STONE) != 0)
+    ((mon_resistancebits(mon) & MR_STONE) != 0)
 
 #define immune_poisongas(ptr) ((ptr) == &mons[PM_HEZROU])
 

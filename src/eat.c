@@ -802,15 +802,15 @@ intrinsic_possible(int type, register struct permonst *ptr)
     return res;
 }
 
-/* givit() tries to give you an intrinsic based on the monster's level
- * and what type of intrinsic it is trying to give you.
+/* The "do we or do we not give the intrinsic" logic from givit(), extracted
+ * into its own function. Depends on the monster's level and the type of
+ * intrinsic it is trying to give you.
  */
-static void
-givit(int type, register struct permonst *ptr)
+boolean
+should_givit(int type, struct permonst *ptr)
 {
-    register int chance;
+    int chance;
 
-    debugpline1("Attempting to give intrinsic %d", type);
     /* some intrinsics are easier to get than others */
     switch (type) {
     case POISON_RES:
@@ -834,8 +834,19 @@ givit(int type, register struct permonst *ptr)
         break;
     }
 
-    if (ptr->mlevel <= rn2(chance))
-        return; /* failed die roll */
+    return (ptr->mlevel > rn2(chance));
+}
+
+/* givit() tries to give you an intrinsic based on the monster's level
+ * and what type of intrinsic it is trying to give you.
+ */
+static void
+givit(int type, register struct permonst *ptr)
+{
+    debugpline1("Attempting to give intrinsic %d", type);
+
+    if (!should_givit(type, ptr))
+        return;
 
     switch (type) {
     case FIRE_RES:
@@ -1094,8 +1105,6 @@ cpostfx(int pm)
     /* possibly convey an intrinsic */
     if (check_intrinsics) {
         struct permonst *ptr = &mons[pm];
-        boolean conveys_STR = is_giant(ptr);
-        int i, count;
 
         if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU)
             || pm == PM_VIOLET_FUNGUS) {
@@ -1108,36 +1117,8 @@ cpostfx(int pm)
         if (attacktype(ptr, AT_MAGC) || pm == PM_NEWT)
             eye_of_newt_buzz();
 
-        /* Check the monster for all of the intrinsics.  If this
-         * monster can give more than one, pick one to try to give
-         * from among all it can give.
-         *
-         * Strength from giants is now treated like an intrinsic
-         * rather than being given unconditionally.
-         */
-        count = 0; /* number of possible intrinsics */
-        tmp = 0;   /* which one we will try to give */
-        if (conveys_STR) {
-            count = 1;
-            tmp = -1; /* use -1 as fake prop index for STR */
-            debugpline1("\"Intrinsic\" strength, %d", tmp);
-        }
-        for (i = 1; i <= LAST_PROP; i++) {
-            if (!intrinsic_possible(i, ptr))
-                continue;
-            ++count;
-            /* a 1 in count chance of replacing the old choice
-               with this one, and a count-1 in count chance
-               of keeping the old choice (note that 1 in 1 and
-               0 in 1 are what we want for the first candidate) */
-            if (!rn2(count)) {
-                debugpline2("Intrinsic %d replacing %d", i, tmp);
-                tmp = i;
-            }
-        }
-        /* if strength is the only candidate, give it 50% chance */
-        if (conveys_STR && count == 1 && !rn2(2))
-            tmp = 0;
+        tmp = corpse_intrinsic(ptr);
+
         /* if something was chosen, give it now (givit() might fail) */
         if (tmp == -1)
             gainstr((struct obj *) 0, 0, TRUE);
@@ -1153,6 +1134,49 @@ cpostfx(int pm)
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
+
+/* Choose (one of) the intrinsics granted by a corpse, and return it.
+ * If this corpse gives no intrinsics, return 0.
+ * For the special not-real-prop cases of strength gain from giants
+ * return fake prop value of -1.
+ * Non-deterministic; should only be called once per corpse.
+ */
+int
+corpse_intrinsic(struct permonst *ptr)
+{
+    /* Check the monster for all of the intrinsics.  If this
+     * monster can give more than one, pick one to try to give
+     * from among all it can give.
+     */
+    boolean conveys_STR = is_giant(ptr);
+    int i;
+    int count = 0; /* number of possible intrinsics */
+    int prop = 0;   /* which one we will try to give */
+
+    if (conveys_STR) {
+        count = 1;
+        prop = -1; /* use -1 as fake prop index for STR */
+        debugpline1("\"Intrinsic\" strength, %d", prop);
+    }
+    for (i = 1; i <= LAST_PROP; i++) {
+        if (!intrinsic_possible(i, ptr))
+            continue;
+        ++count;
+        /* a 1 in count chance of replacing the old choice
+           with this one, and a count-1 in count chance
+           of keeping the old choice (note that 1 in 1 and
+           0 in 1 are what we want for the first candidate) */
+        if (!rn2(count)) {
+            debugpline2("Intrinsic %d replacing %d", i, prop);
+            prop = i;
+        }
+    }
+    /* if strength is the only candidate, give it 50% chance */
+    if (conveys_STR && count == 1 && !rn2(2))
+        prop = 0;
+
+    return prop;
+}
 
 void
 violated_vegetarian(void)

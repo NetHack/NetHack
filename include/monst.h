@@ -106,6 +106,7 @@ struct monst {
     uchar m_ap_type;      /* what mappearance is describing, m_ap_types */
 
     schar mtame;                /* level of tameness, implies peaceful */
+    unsigned short mintrinsics; /* low 8 correspond to mresists */
     unsigned short mextrinsics; /* low 8 correspond to mresists */
     unsigned long seen_resistance; /* M_SEEN_x; saw you resist an effect */
     int mspec_used;             /* monster's special ability attack timeout */
