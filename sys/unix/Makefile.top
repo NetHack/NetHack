@@ -3,30 +3,33 @@
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
-# Root of source tree:
+#	Root of source tree:  (Note: dot is after setup.sh has been used
+#	to create the active Makefiles from sys/unix/Makefile.*.
+#	It isn't sys/unix/ where you might happen to be reading this.)
 NHSROOT=.
 
-# newer makes predefine $(MAKE) to 'make' and do smarter processing of
-# recursive make calls if $(MAKE) is used
-# these makes allow $(MAKE) to be overridden by the environment if someone
-# wants to (or has to) use something other than the standard make, so we do
-# not want to unconditionally set $(MAKE) here
+#	Newer makes predefine $(MAKE) to 'make' and do smarter processing
+#	of recursive make calls if $(MAKE) is used.
+#	These makes allow $(MAKE) to be overridden by the environment if
+#	someone wants to (or has to) use something other than the standard
+#	make, so we do not want to unconditionally set $(MAKE) here.
 #
-# unfortunately, some older makes do not predefine $(MAKE); if you have one of
-# these, uncomment the following line
-# (you will know that you have one if you get complaints about unable to
-# execute things like 'data' and 'rumors')
+#	Unfortunately, some older makes do not predefine $(MAKE); if you
+#	have one of these, uncomment the following line.
+#	(You will know that you have one if you get complaints about unable
+#	to execute things like 'data' and 'rumors'.)
 # MAKE = make
 
-# make NetHack
+#	make NetHack (as opposite to variants or such)
 #PREFIX	 = /usr
 GAME     = nethack
+# GAME     = nethack.exe
 # GAME     = nethack.prg
 #GAMEUID  = games
 #GAMEGRP  = bin
 
-# Permissions - some places use setgid instead of setuid, for instance
-# See also the option "SECURE" in include/config.h
+#	Permissions - some places use setgid instead of setuid, for instance.
+#	See also the option "SECURE" in include/config.h.
 #GAMEPERM = 04755
 FILEPERM = 0644
 # VARFILEPERM = 0644
@@ -34,42 +37,49 @@ EXEPERM  = 0755
 DIRPERM  = 0755
 # VARDIRPERM = 0755
 
-# VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else HACKDIR
+#	VARDIR may also appear in unixconf.h as "VAR_PLAYGROUND" else HACKDIR
 #
-# note that 'make install' believes in creating a nice tidy HACKDIR for
-# installation, free of debris from previous NetHack versions --
-# therefore there should not be anything in HACKDIR that you want to keep
-# (if there is, you'll have to do the installation by hand or modify the
-# instructions)
+#	Note well!  'make install' believes in creating a nice tidy HACKDIR
+#	for installation, free of debris from previous NetHack versions --
+#	therefore there should not be anything in HACKDIR that you want to
+#	keep (if there is, you'll have to do the installation by hand or
+#	modify the install commands below).
 #HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
 #VARDIR  = $(HACKDIR)
-# Where nethack.sh in installed.  If this is not defined, the wrapper is not used.
+#	Where nethack.sh is installed (as 'nethack').
+#	If this is not defined, the shell wrapper script is not used.
 #SHELLDIR = $(PREFIX)/games
 
+#	Extra data files depending upon the interface(s) built into nethack.
 # per discussion in Install.X11 and Install.Qt
+# Qt prefers nhtiles.bmp but can use x11tiles, and it ignores NetHack.ad.
+# X11 uses those last two.
+# Both can display a convential text map instead of tiles.
+#	tty and/or curses (no extra data files outside of the dlb container):
 #VARDATND =
+#	All X11 and/or Qt variations may also include tty or curses or both):
+#	X11 without Qt:
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+#	X11 with GRAPHIC_TOMBSTONE (requires 'xpm'):
 # VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
-# for Atari/Gem
-# VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
-# for BeOS
-# VARDATND = beostiles
-# for Gnome
-# VARDATND = x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
+#	both X11 and Qt:
+# VARDATND = x11tiles nhtiles.bmp NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
+#	Qt without X11; assumes GRAPHIC_TOMBSTONE:
+# VARDATND = nhtiles.bmp pet_mark.xbm pilemark.xbm rip.xpm
 
 VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
-# Some versions of make use the SHELL environment variable as the shell
-# for running commands.  We need this to be a Bourne shell.
+#	Some versions of make use the SHELL environment variable as the
+#	shell for running commands.  We need this to be a Bourne shell.
 # SHELL = /bin/sh
-# for Atari
+# for Atari (obsolete)
 # SHELL=E:/GEMINI2/MUPFEL.TTP
 
 # Commands for setting the owner and group on files during installation.
 # Some systems fail with one or the other when installing over NFS or for
 # other permission-related reasons.  If that happens, you may want to set the
-# command to "true", which is a no-op. Note that disabling chown or chgrp
+# command to "true", which is a no-op.  Note that disabling chown or chgrp
 # will only work if setuid (or setgid) behavior is not desired or required.
 #CHOWN = chown
 #CHGRP = chgrp
@@ -167,6 +177,7 @@ x11tiles: $(GAME)
 	( cd util ; $(MAKE) tile2x11 )
 	( cd dat ; $(MAKE) x11tiles )
 
+# obsolete
 beostiles: $(GAME)
 	( cd util ; $(MAKE) tile2beos )
 	( cd dat ; $(MAKE) beostiles )
@@ -270,19 +281,21 @@ fetch-lua: fetch-Lua
 fetch-Lua:
 	( mkdir -p lib && cd lib && \
 	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
-	  tar zxf lua-$(LUA_VERSION).tar.gz && rm -f lua-$(LUA_VERSION).tar.gz )
+	  tar zxf lua-$(LUA_VERSION).tar.gz && \
+	  rm -f lua-$(LUA_VERSION).tar.gz )
 #if we just fetched lua, force include/nhlua.h to be built based on it
 	-rm include/nhlua.h
 
+# 'make update' can be used to install a revised version after making
+# customizations or such.  Unlike 'make install', it doesn't delete everything
+# from the target directory to have a clean start.
 update: $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
 # set up new versions of the game files
 	( $(MAKE) dofiles )
-# touch time-sensitive files
-	-touch -c $(VARDIR)/bones* $(VARDIR)/?lock* $(VARDIR)/wizard*
-	-touch -c $(VARDIR)/save/*
+# should already be present, but make sure
 	touch $(VARDIR)/perm $(VARDIR)/record
 # and a reminder
 	@echo You may also want to install the man pages via the doc Makefile.
