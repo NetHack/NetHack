@@ -3361,6 +3361,8 @@ floorfood(const char *verb,
 void
 vomit(void) /* A good idea from David Neves */
 {
+    struct attack *mattk;
+    
     if (cantvomit(g.youmonst.data)) {
         /* doesn't cure food poisoning; message assumes that we aren't
            dealing with some esoteric body_part() */
@@ -3382,6 +3384,20 @@ vomit(void) /* A good idea from David Neves */
         nomul(-2);
         g.multi_reason = "vomiting";
         g.nomovemsg = You_can_move_again;
+    }
+
+    /* Currently, only yellow dragons can breathe acid. */
+    mattk = attacktype_fordmg(g.youmonst.data, AT_BREA, AD_ACID);
+    if (mattk)
+        ubreatheu(mattk);
+    /* Vomiting on an altar is, all things considered, rather impolite. */
+    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
+        altar_wrath(u.ux, u.uy);
+    }
+    if (acidic(g.youmonst.data)) {
+        if (is_ice(u.ux, u.uy)) {
+            melt_ice(u.ux, u.uy, "Your stomach acid melts straight through the ice!");
+        }
     }
 }
 
