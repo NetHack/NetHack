@@ -3390,15 +3390,6 @@ vomit(void) /* A good idea from David Neves */
     mattk = attacktype_fordmg(g.youmonst.data, AT_BREA, AD_ACID);
     if (mattk)
         ubreatheu(mattk);
-    /* Vomiting on an altar is, all things considered, rather impolite. */
-    if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
-        altar_wrath(u.ux, u.uy);
-    }
-    if (acidic(g.youmonst.data)) {
-        if (is_ice(u.ux, u.uy)) {
-            melt_ice(u.ux, u.uy, "Your stomach acid melts straight through the ice!");
-        }
-    }
 }
 
 int
