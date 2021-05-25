@@ -3375,6 +3375,15 @@ vomit(void) /* A good idea from David Neves */
            reaches 0, but only if u.uhs < FAINTING (and !cantvomit()) */
         if (u.uhs >= FAINTING)
             Your("%s heaves convulsively!", body_part(STOMACH));
+         /* Vomiting on an altar is, all things considered, rather impolite. */
+        if (IS_ALTAR(levl[u.ux][u.uy].typ)) {
+            altar_wrath(u.ux, u.uy);
+        }
+        if (acidic(g.youmonst.data)) {
+            if (is_ice(u.ux, u.uy)) {
+                melt_ice(u.ux, u.uy, "Your stomach acid melts straight through the ice!");
+            }
+        }
     }
 
     /* nomul()/You_can_move_again used to be unconditional, which was
