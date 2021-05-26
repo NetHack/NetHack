@@ -4206,7 +4206,7 @@ REALLY?  WHAT IS SO SURPRISING ABOUT BACON?
 #
 #
 #
-%title Maskerade (9)
+%title Maskerade (13)
 # pp. 81-82, continued on pp. 87-89 (Harper Torch edition; apparently
 #       transcribed from some other edition based on quote marks used;
 #       a great number of very short paragraphs--it stretches a long way
@@ -4321,7 +4321,9 @@ barely noticeable even to the closest observation, one winked off.
 
   [Maskerade, by Terry Pratchett]
 %e passage
-# p. 67 (Harper Torch edition; as above, transcribed from some other edition)
+# p. 67 (Harper Torch edition; as above, transcribed from some other edition;
+#        passage ends mid-paragraph; the text of the note uses irregular
+#        indentation and a distinct font that hints at cursive handwriting)
 %passage 2
 The letter inside was on a sheet of the Opera House's own note paper.
 In neat, copperplate writing, it said:
@@ -4457,6 +4459,75 @@ Come on.  I want to try a leg of the elephant that bit me."
 "Was dat irony?"
 
 "That was metaphor."
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# pp. 51-52 (Granny Weatherwax and Nanny Ogg are traveling to Ankh-Morpork
+#            and Nanny feels that the weather is too chilly for flying;
+#            Cando Cutoff is a bystander who has told them that the next
+#            stagecoach won't stop here; they stand in the road to block it)
+%passage 10
+"Why've you got broomsticks?" shouted the driver.  "Are you witches?"
+
+"Yes.  Have you got any special low terms for witches?"
+
+"Yeah, how about 'meddling, interfering old baggages'?"
+
+Cutoff felt that he must have missed part of the conversation, because the
+next exchange went like this:
+
+"What was that again, young man?"
+
+"Two complimentary tickets to Ankh-Morpork, ma'am.  No problem."
+
+"Inside seats, mind.  No traveling on the top."
+
+"Certainly, ma'am.  Excuse me while I just kneel in the dirt so's you can
+step up, ma'am."
+
+Cutoff nodded happily to himself as the coach pulled away again.  It was
+nice to see that good manners and courtesy were still alive.
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# p. 69 (passage starts mid-paragraph)
+%passage 11
+"[...]  If you wanted a quiet retirement, Mr. Bucket, you shouldn't have
+bought the Opera House.  You should have done something peaceful, like
+alligator dentistry."
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# pp. 108-109 (Mr. Pounder, the Opera House rat catcher, has been murdered;
+#              instead of Death coming to release his soul, the Death of Rats
+#              is attending; we skip a couple of very short paragraphs)
+%passage 12
+"Er... I'm dead, aren't I...?"
+
+SQUEAK.
+
+[...]
+
+The soul of Mr. Pounder looked at his hands.  They seemed to be elongating,
+and getting hairier.  He could feel his ears growing, and a certain rather
+embarrassing elongation at the base of his spine.  He'd spent most of his
+life in a single-minded activity in dark places, yet even so...
+
+"But I don't /believe/ in reincarnation!" he protested.
+
+SQUEAK.
+
+And this, Mr. Pounder understood with absolute rodent clarity, meant:
+reincarnation believes in /you/.
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# p. 198 (Nanny has come into a substantial sum of money and has grumbled
+#         about Granny spending so much of it)
+%passage 13
+"Money don't buy happiness, Gytha."
+
+"I only wanted to rent it for a few weeks."
 
   [Maskerade, by Terry Pratchett]
 %e passage

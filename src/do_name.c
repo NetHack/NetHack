@@ -2344,6 +2344,8 @@ lookup_novel(const char *lookname, int *idx)
         lookname = sir_Terry_novels[0];
     else if (!strcmpi(lookname, "Sorcery"))
         lookname = "Sourcery"; /* [4] */
+    else if (!strcmpi(lookname, "Masquerade"))
+        lookname = "Maskerade"; /* [17] */
 
     for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
         if (!strcmpi(lookname, sir_Terry_novels[k])
