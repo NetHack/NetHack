@@ -1963,7 +1963,7 @@ zombify_mon(anything *arg, long timeout)
     struct obj *body = arg->a_obj;
     int zmon = zombie_form(&mons[body->corpsenm]);
 
-    if (zmon != NON_PM) {
+    if (zmon != NON_PM && !(g.mvitals[zmon].mvflags & G_GENOD)) {
         if (has_omid(body))
             free_omid(body);
         if (has_omonst(body))
