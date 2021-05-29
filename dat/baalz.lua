@@ -3,7 +3,7 @@
 --	Copyright (c) 1992 by M. Stephenson and Izchak Miller
 -- NetHack may be freely redistributed.  See license for details.
 --
-des.level_init({ style = "solidfill", fg = " " });
+des.level_init({ style = "solidfill", fg = " ", lit = 0 });
 
 -- TODO FIXME: see baalz_fixup - the legs get removed currently.
 

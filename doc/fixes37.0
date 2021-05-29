@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.540 $ $NHDT-Date: 1621387861 2021/05/19 01:31:01 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.553 $ $NHDT-Date: 1622320390 2021/05/29 20:33:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -695,6 +695,7 @@ applying a book to check readability treated novels as if they were spellbooks
 #version was leaving the 'in_lua' flag set and if subsequent 'O' issued an
 	error (example was an attempt to interactively set bouldersym to an
 	invalid value), the error reporting routine crashed via segfault
+lighting for baalz level defaulted to random and could end up being lit
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
