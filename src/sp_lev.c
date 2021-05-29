@@ -3153,10 +3153,9 @@ lspo_monster(lua_State* L)
 }
 
 /* the hash key 'name' is an integer or "random",
-   or if not existent, also return rndval.
- */
+   or if not existent, also return rndval */
 static int
-get_table_int_or_random(lua_State* L, const char* name, int  rndval)
+get_table_int_or_random(lua_State *L, const char *name, int rndval)
 {
     int ret;
     char buf[BUFSZ];
@@ -3173,8 +3172,11 @@ get_table_int_or_random(lua_State* L, const char* name, int  rndval)
             lua_pop(L, 1);
             return rndval;
         }
-        Sprintf(buf, "Expected integer or \"random\" for \"%s\", got %s",
-                name, tmp);
+        Sprintf(buf, "Expected integer or \"random\" for \"%s\", got ", name);
+        if (tmp)
+            Sprintf(eos(buf), "\"%s\"", tmp);
+        else
+            Strcat(buf, "<Null>");
         nhl_error(L, buf);
         lua_pop(L, 1);
         return 0;
@@ -3488,7 +3490,8 @@ lspo_level_flags(lua_State* L)
 }
 
 /* level_init({ style = "solidfill", fg = " " }); */
-/* level_init({ style = "mines", fg = ".", bg = "}", smoothed=true, joined=true, lit=0 }) */
+/* level_init({ style = "mines", fg = ".", bg = "}",
+                smoothed=true, joined=true, lit=0 }) */
 int
 lspo_level_init(lua_State* L)
 {
@@ -5424,7 +5427,8 @@ sel_set_lit(int x, int y, genericptr_t arg)
 }
 
 /* region(selection, lit); */
-/* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
+/* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL,
+            irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
 /* region({ region={x1,y1, x2,y2}, type="ordinary" }); */
 int
 lspo_region(lua_State* L)
@@ -5491,16 +5495,17 @@ lspo_region(lua_State* L)
     get_location(&dx1, &dy1, ANY_LOC, (struct mkroom *) 0);
     get_location(&dx2, &dy2, ANY_LOC, (struct mkroom *) 0);
 
-    /* Many regions are simple, rectangular areas that just need to set lighting
-     * in an area. In that case, we don't need to do anything complicated by
-     * creating a room. The exceptions are:
+    /* Many regions are simple, rectangular areas that just need to set
+     * lighting in an area. In that case, we don't need to do anything
+     * complicated by creating a room. The exceptions are:
      *  - Special rooms (which usually need to be filled).
      *  - Irregular regions (more convenient to use the room-making code).
      *  - Themed room regions (which often have contents).
      *  - When a room is desired to constrain the arrival of migrating monsters
      *    (see the mon_arrive function for details).
      */
-    room_not_needed = (rtype == OROOM && !irregular && !do_arrival_room && !g.in_mk_themerooms);
+    room_not_needed = (rtype == OROOM && !irregular
+                       && !do_arrival_room && !g.in_mk_themerooms);
     if (room_not_needed || g.nroom >= MAXNROFROOMS) {
         region tmpregion;
         if (!room_not_needed)
@@ -6189,13 +6194,15 @@ static const struct luaL_Reg nhl_functions[] = {
 
 /* TODO:
 
- - if des-file used MAZE_ID to start a level, the level needs des.level_flags("mazelevel")
+ - if des-file used MAZE_ID to start a level, the level needs
+   des.level_flags("mazelevel")
  - expose g.coder->croom or g.[xy]start and g.xy[size] to lua.
  - detect a "subroom" automatically.
  - new function get_mapchar(x,y) to return the mapchar on map
  - many params should accept their normal type (eg, int or bool), AND "random"
  - automatically add shuffle(array)
- - automatically add align = { "law", "neutral", "chaos" } and shuffle it. (remove from lua files)
+ - automatically add align = { "law", "neutral", "chaos" } and shuffle it.
+   (remove from lua files)
  - grab the header comments from des-files and add add them to the lua files
 
 */
