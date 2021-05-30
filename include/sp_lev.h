@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.h	$NHDT-Date: 1599434249 2020/09/06 23:17:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.7	sp_lev.h	$NHDT-Date: 1622361649 2021/05/30 08:00:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -196,7 +196,7 @@ struct mapfragment {
 };
 
 #define SET_TYPLIT(x, y, ttyp, llit) \
-    {                                                             \
+    do {                                                          \
         if ((x) >= 1 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
             if ((ttyp) < MAX_TYPE && levl[(x)][(y)].typ != STAIRS \
                 && levl[(x)][(y)].typ != LADDER)                  \
@@ -210,6 +210,6 @@ struct mapfragment {
                     levl[(x)][(y)].lit = (llit);                  \
             }                                                     \
         }                                                         \
-    }
+    } while (0)
 
 #endif /* SP_LEV_H */
