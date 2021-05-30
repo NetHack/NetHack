@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1614818323 2021/03/04 00:38:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1622363509 2021/05/30 08:31:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -884,7 +884,12 @@ getpos(coord *ccp, boolean force, const char *goal)
                         || glyph_to_cmap(k) == S_corr
                         || glyph_to_cmap(k) == S_litcorr)
                         continue;
-                    if (c == defsyms[sidx].sym || c == (int) g.showsyms[sidx])
+                    if (c == defsyms[sidx].sym
+                        || c == (int) g.showsyms[sidx]
+                        /* have '^' match webs and vibrating square or any
+                           other trap that uses something other than '^' */
+                        || (c == '^' && (is_cmap_trap(sidx)
+                                         || sidx == S_vibrating_square)))
                         matching[sidx] = (char) ++k;
                 }
                 if (k) {
