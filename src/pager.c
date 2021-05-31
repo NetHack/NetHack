@@ -60,16 +60,18 @@ is_swallow_sym(int c)
 static int
 append_str(char *buf, const char *new_str)
 {
-    int space_left; /* space remaining in buf */
+    size_t size2append, space_left;
+    const char sep[] = " or ";
 
     if (strstri(buf, new_str))
         return 0;
 
-    space_left = BUFSZ - strlen(buf) - 1;
-    if (space_left < 1)
+    space_left = BUFSZ - strlen(buf);  /* space remaining in buf */
+    size2append = strlen(new_str) + sizeof sep; /* latter includes '\0' */
+    if (space_left < size2append)
         return 0;
-    (void) strncat(buf, " or ", space_left);
-    (void) strncat(buf, new_str, space_left - 4);
+    Strcat(buf, sep);
+    Strcat(buf, new_str);
     return 1;
 }
 
