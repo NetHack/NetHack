@@ -1262,7 +1262,9 @@ They are not necessarily very good at it.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# additional passage added for 3.7.0
+#
+# additional passage added for 3.7
+#
 # p. 164 (passage begins mid-sentence)
 %passage 11
 [...] killing a brother wizard with magic was well-nigh impossible on
@@ -3462,6 +3464,7 @@ kingdom.
 %e passage
 #
 # passage added for 3.7
+#
 # p. 60 (passage starts mid-paragraph; "paddlin'" is accurate but unclear;
 #        "ooh-jar" is accurate for ouija after having been butchered by
 #        Nanny Ogg's previously established 'mastery' of foreign languages)
@@ -4136,6 +4139,7 @@ followed by long periods of being dead."
 %e passage
 #
 # 3 new passages for 3.7
+#
 # p. 45
 %passage 11
 Adventure!  People talked about the idea as if it was something worthwhile,
@@ -4462,6 +4466,9 @@ Come on.  I want to try a leg of the elephant that bit me."
 
   [Maskerade, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
 # pp. 51-52 (Granny Weatherwax and Nanny Ogg are traveling to Ankh-Morpork
 #            and Nanny feels that the weather is too chilly for flying;
 #            Cando Cutoff is a bystander who has told them that the next
@@ -4536,15 +4543,16 @@ reincarnation believes in /you/.
 #
 #
 %title Feet of Clay (14)
+# pp. 66-67 (Harper Torch edition)
 %passage 1
 Rumour is information distilled so finely that it can filter through
-anything.  It does not need doors and windows -- sometimes it does not need
-people.  It can exist free and wild, running from ear to ear without ever
-touching lips.
+anything.  It does not need doors and windows--sometimes it doesn't even
+need people.  It can exist free and wild, running from ear to ear without
+ever touching lips.
 
   [Feet of Clay, by Terry Pratchett]
 %e passage
-# p. 337 (Harper Torch edition)
+# p. 337
 %passage 2
 It was hard enough to kill a vampire.  You could stake them down and turn
 them into dust and ten years later someone drops a drop of blood in the
