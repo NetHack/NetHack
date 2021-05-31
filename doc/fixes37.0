@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.554 $ $NHDT-Date: 1622363511 2021/05/30 08:31:51 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.555 $ $NHDT-Date: 1622421099 2021/05/31 00:31:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1015,6 +1015,8 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	to Maskerade
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
+menu for what-is command supports /^ and /" to view a list of nearby or whole
+	level visible and remembered traps
 
 
 Platform- and/or Interface-Specific New Features
