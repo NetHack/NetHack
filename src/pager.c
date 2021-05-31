@@ -52,27 +52,32 @@ is_swallow_sym(int c)
     return FALSE;
 }
 
-/*
- * Append new_str to the end of buf if new_str doesn't already exist as
- * a substring of buf.  Return 1 if the string was appended, 0 otherwise.
- * It is expected that buf is of size BUFSZ.
- */
+/* Append " or "+new_str to the end of buf if new_str doesn't already exist
+   as a substring of buf.  Return 1 if the string was appended, 0 otherwise.
+   It is expected that buf is of size BUFSZ. */
 static int
 append_str(char *buf, const char *new_str)
 {
-    size_t size2append, space_left;
-    const char sep[] = " or ";
+    static const char sep[] = " or ";
+    size_t oldlen, space_left;
 
     if (strstri(buf, new_str))
-        return 0;
+        return 0; /* already present */
 
-    space_left = BUFSZ - strlen(buf);  /* space remaining in buf */
-    size2append = strlen(new_str) + sizeof sep; /* latter includes '\0' */
-    if (space_left < size2append)
-        return 0;
-    Strcat(buf, sep);
-    Strcat(buf, new_str);
-    return 1;
+    oldlen = strlen(buf);
+    if (oldlen >= BUFSZ - 1) {
+        if (oldlen > BUFSZ - 1)
+            impossible("append_str: 'buf' contains %lu characters.",
+                       (unsigned long) oldlen);
+        return 0; /* no space available */
+    }
+
+    /* some space available, but not necessarily enough for full append */
+    space_left = BUFSZ - 1 - oldlen;  /* space remaining in buf */
+    (void) strncat(buf, sep, space_left);
+    if (space_left > sizeof sep - 1)
+        (void) strncat(buf, new_str, space_left - (sizeof sep - 1));
+    return 1; /* something was appended, possibly just part of " or " */
 }
 
 /* shared by monster probing (via query_objlist!) as well as lookat() */
