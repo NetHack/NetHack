@@ -132,8 +132,8 @@ include/nhlua.h: $(TOPLUALIB)
 	@echo '#include "../lib/lua-$(LUA_VERSION)/src/lauxlib.h"' >> $@
 	@echo '/*nhlua.h*/' >> $@
 lib/lua-$(LUA_VERSION)/src/lua.h:
-	echo "Please do 'make fetch-lua' to obtain lua-$(LUA_VERSION)"
-	false
+	@echo "Please do 'make fetch-lua' to obtain lua-$(LUA_VERSION)"
+	@false
 
 # Note: many of the dependencies below are here to allow parallel make
 # to generate valid output
