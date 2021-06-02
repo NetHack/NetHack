@@ -537,6 +537,8 @@ allow killing your quest leader to open the quest
 give King Arthur Excalibur
 when moving the cursor to examine the map, have '^' move to next trap even if
 	that trap is displayed with some other symbol (web, vibrating square)
+change valkyrie and warrior (valk quest) monsters from chaotic to lawful
+change attendant (healer quest) monster from lawful to neutral
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
