@@ -12,7 +12,7 @@ if [ -z "$GCCVER" ]; then
 fi
 
 if [ -z "$LUA_VERSION" ]; then
-	export LUA_VERSION=5.4.2
+	export LUA_VERSION=5.4.3
 fi
 
 if [ ! -d "$(pwd)/lib" ]; then

@@ -130,7 +130,7 @@ steps:
     export LUASRC=../submodules/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcurses
-    export LUA_VERSION=5.4.2
+    export LUA_VERSION=5.4.3
     export TRAVIS_COMPILER=1
     cp ../sys/winnt/Makefile.gcc ./Makefile
     mingw32-make LUA_VERSION=$LUA_VERSION install
@@ -202,8 +202,8 @@ steps:
     cd ../..
     make fetch-lua
     sh sys/msdos/fetch-cross-compiler.sh
-    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
-    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+    make LUA_VERSION=5.4.3 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+    make LUA_VERSION=5.4.3 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building MSDOS build'
