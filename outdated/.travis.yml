@@ -130,11 +130,11 @@ matrix:
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
         - export LUA_VERSION=5.4.3
-        - sh sys/winnt/travis-gcc.sh
+        - sh sys/windows/travis-gcc.sh
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - test -d "lib/pdcurses" || exit 0
         - cd src
-        - cp ../sys/winnt/Makefile.gcc ./Makefile
+        - cp ../sys/windows/Makefile.gcc ./Makefile
         - mingw32-make LUA_VERSION=$LUA_VERSION install
     - name: msdos-linux-focal-djgpp-crosscompile
       os: linux

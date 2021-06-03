@@ -577,7 +577,7 @@ endif
 	@$(subst /,\,copy $(SSHR)/NetHack.cnf  $(GAMEDIR)/defaults.nh)
 	-@$(subst /,\,touch $(GAMEDIR)/record)
 	@$(subst /,\,copy $(DOC)/guideb*.txt  $(GAMEDIR))
-	@$(subst /,\,copy ../sys/winnt/sysconf  $(GAMEDIR))
+	@$(subst /,\,copy ../sys/windows/sysconf  $(GAMEDIR))
 	@$(subst /,\,if not exist $(GAMEDIR)/sysconf touch $(GAMEDIR)/sysconf)
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI

@@ -230,11 +230,6 @@ static struct grep_var grep_vars[] = { { "0", 0 },
 #else
                                        { "WIN32_PLATFORM_WFSP", 0 },
 #endif
-#if defined(WINNT)
-                                       { "WINNT", 1 },
-#else
-                                       { "WINNT", 0 },
-#endif
 #if defined(WIN_CE)
                                        { "WIN_CE", 1 },
 #else

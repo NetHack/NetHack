@@ -162,7 +162,7 @@ extern struct cross_target_s cross_target;
 #endif
 
 #ifdef WIN32
-#include "ntconf.h"
+#include "windconf.h"
 #endif
 
 #include "warnings.h"

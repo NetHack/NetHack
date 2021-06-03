@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <RootDir>$(MSBuildProjectDirectory)\..\..\..\..\</RootDir>
+    <vsDir>$(RootDir)sys\windows\vs\</vsDir>
+    <BinDir>$(RootDir)binary\$(Configuration)\$(Platform)\</BinDir>
+    <ObjDir>$(ProjectDir)obj\$(Configuration)\$(Platform)\$(TargetName)\</ObjDir>
+    <SymbolsDir>$(ProjectDir)symbols\$(Configuration)\$(Platform)\$(TargetName)\</SymbolsDir>
+    <ToolsDir>$(RootDir)tools\$(Configuration)\$(Platform)\</ToolsDir>
+    <ImageDir>$(vsDir)\Images\</ImageDir>
+    <UtilDir>$(RootDir)util\</UtilDir>
+    <DatDir>$(RootDir)dat\</DatDir>
+    <DocDir>$(RootDir)doc\</DocDir>
+    <IncDir>$(RootDir)include\</IncDir>
+    <LuaDir>$(RootDir)submodules\lua\</LuaDir>
+    <SrcDir>$(RootDir)src\</SrcDir>
+    <SysDir>$(RootDir)sys\</SysDir>
+    <UtilDir>$(RootDir)util\</UtilDir>
+    <SysShareDir>$(RootDir)sys\share\</SysShareDir>
+    <SysWindDir>$(RootDir)sys\windows\</SysWindDir>
+    <WinShareDir>$(RootDir)win\share\</WinShareDir>
+    <WinTtyDir>$(RootDir)win\tty\</WinTtyDir>
+    <WinWin32Dir>$(RootDir)win\win32\</WinWin32Dir>
+    <OutDir>$(ToolsDir)</OutDir>
+    <IntDir>$(ObjDir)</IntDir>
+    <WinCursDir>$(RootDir)win\curses\</WinCursDir>
+    <SubmodulesDir>$(RootDir)submodules\</SubmodulesDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PDCURSES)'=='' AND Exists('$(RootDir)lib\PDCurses')">
+    <PDCURSES>$(RootDir)lib\PDCurses\</PDCURSES>
+  </PropertyGroup>
+</Project>

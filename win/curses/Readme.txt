@@ -30,8 +30,8 @@ against ncurses.  Edit Makefile.src if you wish to compile against a
 different curses library, such as PDCurses for SDL.
 
 Windows build instructions: If you are using Mingw32 as your compiler,
-then follow the instructions in sys/winnt/Install.nt with the following
-changes:
+then follow the instructions in sys/windows/Install.windows with the
+following changes:
 
  * After running nhsetup, manually copy the file cursmake.gcc to the
  src/ subdirectory

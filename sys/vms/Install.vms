@@ -42,7 +42,7 @@
         [.sys   .wince]  -- Windows CE
         [.sys   .wince   .ceinc] -- more WinCE
         [.sys   .wince   .ceinc   .sys] -- ditto
-        [.sys   .winnt]  -- Windows NT
+        [.sys   .windows]  -- MS Windows
         [.win   .curses] - window routines for curses interface
         [.win   .gem]    -- window routines for Atari/GEM
         [.win   .gnome]  -- window routines for Unix/GNOME

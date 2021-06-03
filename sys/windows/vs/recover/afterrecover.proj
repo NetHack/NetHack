@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\dirs.props"/>
+  <Import Project="$(vsDir)files.props"/>
+  <Target Name="Build"
+     Inputs="$(DocDir)recover.txt"
+	 Outputs="$(BinDir)recover.txt">
+	<Copy SourceFiles="$(DocDir)recover.txt" DestinationFiles="$(BinDir)recover.txt"/>
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="$(BinDir)recover.txt"/>
+  </Target>
+</Project>

@@ -132,7 +132,7 @@ steps:
     export PDCURSES_TOP=../submodules/pdcurses
     export LUA_VERSION=5.4.3
     export TRAVIS_COMPILER=1
-    cp ../sys/winnt/Makefile.gcc ./Makefile
+    cp ../sys/windows/Makefile.gcc ./Makefile
     mingw32-make LUA_VERSION=$LUA_VERSION install
   condition: eq( variables.toolchain, 'mingw' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src

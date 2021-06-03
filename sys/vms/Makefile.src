@@ -386,7 +386,7 @@ spotless :	clean
 # config.h timestamp
 $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
 		$(INC)coord.h $(INC)vmsconf.h $(INC)system.h $(INC)unixconf.h \
-		$(INC)micro.h $(INC)pcconf.h $(INC)ntconf.h
+		$(INC)micro.h $(INC)pcconf.h $(INC)windconf.h
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \

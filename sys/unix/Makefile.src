@@ -793,7 +793,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/global.h ../include/warnings.h \
 		../include/coord.h ../include/vmsconf.h ../include/system.h \
 		../include/nhlua.h ../include/unixconf.h ../include/pcconf.h \
-		../include/ntconf.h ../include/fnamesiz.h
+		../include/windconf.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \

@@ -24,7 +24,7 @@ DOC   = ..\doc       # NetHack documentation files
 UTIL  = ..\util      # Utility source
 SRC   = ..\src       # Main source
 SSYS  = ..\sys\share # Shared system files
-NTSYS = ..\sys\winnt # NT Win32 specific files
+NTSYS = ..\sys\windows # NT Win32 specific files
 TTY   = ..\win\tty   # window port files (tty)
 WIN32 = ..\win\win32 # window port files (WINCE)
 WSHR  = ..\win\share # Tile support files 
@@ -77,7 +77,7 @@ LEVCFLAGS= -c -nologo -DWINVER=0x0400 -DWIN32 -D_WIN32 \
 	$(CC) $(CFLAGSU)  -Fo$@  $<
 
 #==========================================
-# Rules for files in sys\winnt
+# Rules for files in sys\windows
 #==========================================
 
 {$(NTSYS)}.c{$(OBJ)}.o:
@@ -175,7 +175,7 @@ CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
 		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
 		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
 		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
-		$(INCL)\ntconf.h $(INCL)\wceconf.h
+		$(INCL)\windconf.h $(INCL)\wceconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h \
 		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
@@ -495,10 +495,10 @@ $(DAT)\dungeon: $(UTIL)\makedefs.exe  $(DAT)\dungeon.def
 # NT dependencies
 #
 #
-#$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nttty.c
-#	$(CC) $(CFLAGSU) -I$(WSHR) -Fo$@  $(NTSYS)\nttty.c
-#$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\winnt.c
-#	$(CC) $(CFLAGSU) -Fo$@  $(NTSYS)\winnt.c
+#$(O)consoletty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\consoletty.c
+#	$(CC) $(CFLAGSU) -I$(WSHR) -Fo$@  $(NTSYS)\consoletty.c
+#$(O)windsys.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\windsys.c
+#	$(CC) $(CFLAGSU) -Fo$@  $(NTSYS)\windsys.c
 #$(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
 #	$(CC) $(CFLAGSU)  -Fo$@ $(NTSYS)\ntsound.c
 

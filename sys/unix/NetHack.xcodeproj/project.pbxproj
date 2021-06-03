@@ -263,7 +263,7 @@
 		3186A39521A4B0FC0052BF02 /* obj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = obj.h; path = ../../include/obj.h; sourceTree = "<group>"; };
 		3186A39721A4B0FC0052BF02 /* rm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rm.h; path = ../../include/rm.h; sourceTree = "<group>"; };
 		3186A39A21A4B0FD0052BF02 /* wintty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wintty.h; path = ../../include/wintty.h; sourceTree = "<group>"; };
-		3186A39B21A4B0FD0052BF02 /* ntconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ntconf.h; path = ../../include/ntconf.h; sourceTree = "<group>"; };
+		3186A39B21A4B0FD0052BF02 /* windconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = windconf.h; path = ../../include/windconf.h; sourceTree = "<group>"; };
 		3186A39C21A4B0FD0052BF02 /* mkroom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mkroom.h; path = ../../include/mkroom.h; sourceTree = "<group>"; };
 		3186A39E21A4B0FD0052BF02 /* quest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quest.h; path = ../../include/quest.h; sourceTree = "<group>"; };
 		3186A3A021A4B0FD0052BF02 /* dgn_file.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dgn_file.h; path = ../../include/dgn_file.h; sourceTree = "<group>"; };
@@ -684,7 +684,7 @@
 				3186A38F21A4B0FC0052BF02 /* monflag.h */,
 				3186A3BB21A4B0FD0052BF02 /* monst.h */,
 				3186A38421A4B0FB0052BF02 /* monsym.h */,
-				3186A39B21A4B0FD0052BF02 /* ntconf.h */,
+				3186A39B21A4B0FD0052BF02 /* windconf.h */,
 				3186A39521A4B0FC0052BF02 /* obj.h */,
 				3186A3A821A4B0FD0052BF02 /* objclass.h */,
 				3186A38B21A4B0FC0052BF02 /* onames.h */,

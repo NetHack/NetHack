@@ -1539,7 +1539,7 @@ extern void mplayer_talk(struct monst *);
 
 #if defined(MICRO) || defined(WIN32)
 
-/* ### msdos.c,os2.c,tos.c,winnt.c ### */
+/* ### msdos.c,os2.c,tos.c,windows.c ### */
 
 #ifndef WIN32
 extern int tgetch(void);
@@ -1565,7 +1565,7 @@ extern void chdrive(char *);
 extern void disable_ctrlP(void);
 extern void enable_ctrlP(void);
 #endif
-#if defined(MICRO) && !defined(WINNT)
+#if defined(MICRO) && !defined(WIN32)
 extern void get_scr_size(void);
 #ifndef TOS
 extern void gotoxy(int, int);
@@ -1699,19 +1699,19 @@ extern const char *regex_error_desc(struct nhregex *);
 extern boolean regex_match(const char *, struct nhregex *);
 extern void regex_free(struct nhregex *);
 
-/* ### nttty.c ### */
+/* ### consoletty.c ### */
 
 #ifdef WIN32
 extern void get_scr_size(void);
-extern int nttty_kbhit(void);
-extern void nttty_open(int);
-extern void nttty_rubout(void);
+extern int consoletty_kbhit(void);
+extern void consoletty_open(int);
+extern void consoletty_rubout(void);
 extern int tgetch(void);
-extern int ntposkey(int *, int *, int *);
+extern int console_poskey(int *, int *, int *);
 extern void set_output_mode(int);
 extern void synch_cursor(void);
-extern void nethack_enter_nttty(void);
-extern void nttty_exit(void);
+extern void nethack_enter_consoletty(void);
+extern void consoletty_exit(void);
 #endif /* WIN32 */
 
 /* ### o_init.c ### */
@@ -3061,10 +3061,10 @@ extern char *decode_mixed(char *, const char *);
 extern void genl_putmixed(winid, int, const char *);
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 
-/* ### winnt.c ### */
+/* ### windows.c ### */
 
 #ifdef WIN32
-extern void nethack_enter_winnt(void);
+extern void nethack_enter_windows(void);
 #endif
 
 /* ### wizard.c ### */
