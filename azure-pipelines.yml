@@ -111,13 +111,13 @@ steps:
   inputs:
     contents: NetHackPackage_StoreKey.pfx
     SourceFolder: $(Agent.TempDirectory)
-    TargetFolder: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs
+    TargetFolder: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs
   condition: eq( variables.toolchain, 'vs' )
   displayName: 'Copying store key'
 
 - task: MSBuild@1
   inputs:
-    solution: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs/NetHack.sln
+    solution: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln
     platform: Win32
     configuration: Debug
   condition: eq( variables.toolchain, 'vs' )
