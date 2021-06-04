@@ -870,9 +870,6 @@ Quaff (drink) something (potion, water, etc).
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).
 You can then throw this (or one of these) using the \(oqf\(cq command.
-.lp ""
-(In versions prior to 3.3 this was the command to quit
-the game, which has been moved to \(lq#quit\(rq.)
 .lp r
 Read a scroll or spellbook.
 .lp R
@@ -1407,7 +1404,6 @@ Default key is \(oqq\(cq.
 .lp "#quit    "
 Quit the program without saving your game.
 Autocompletes.
-Default key is \(oqM-q\(cq.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.
@@ -1759,8 +1755,6 @@ option is enabled)
 #overview
 .lp M-p
 #pray
-.lp M-q
-#quit
 .lp M-r
 #rub
 .lp M-R
