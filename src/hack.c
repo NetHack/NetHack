@@ -2654,7 +2654,7 @@ check_special_room(boolean newlev)
                     if (DEADMONSTER(mtmp))
                         continue;
                     if (!isok(mtmp->mx,mtmp->my)
-                        || roomno != levl[mtmp->mx][mtmp->my].roomno)
+                        || roomno != (int) levl[mtmp->mx][mtmp->my].roomno)
                         continue;
                     if (!Stealth && !rn2(3))
                         mtmp->msleeping = 0;
