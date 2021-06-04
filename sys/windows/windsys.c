@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1596498321 2020/08/03 23:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.7	windsys.c	$NHDT-Date: 1596498321 2020/08/03 23:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -724,4 +724,4 @@ nt_assert_failed(const char *expression, const char *filepath, int line)
 
 #endif /* WIN32 */
 
-/*windows.c*/
+/*windsys.c*/
