@@ -2190,7 +2190,11 @@ bhito(struct obj *obj, struct obj *otmp)
 
 /* returns nonzero if something was hit */
 int
-bhitpile(struct obj *obj, int (*fhito)(OBJ_P, OBJ_P), int tx, int ty, schar zz)
+bhitpile(
+    struct obj *obj, /* wand or fake spellbook for type of zap */
+    int (*fhito)(OBJ_P, OBJ_P), /* callback for each object being hit */
+    int tx, int ty,  /* target location */
+    schar zz)        /* direction for up/down zaps */
 {
     int hitanything = 0;
     register struct obj *otmp, *next_obj;
@@ -2951,7 +2955,8 @@ zap_updown(struct obj *obj) /* wand or spell */
     case WAN_OPENING:
     case SPE_KNOCK:
         while (stway) {
-            if (!stway->isladder && !stway->up && stway->tolev.dnum == u.uz.dnum)
+            if (!stway->isladder && !stway->up
+                && stway->tolev.dnum == u.uz.dnum)
                 break;
             stway = stway->next;
         }
@@ -3193,7 +3198,8 @@ weffects(struct obj *obj)
 
 /* augment damage for a spell dased on the hero's intelligence (and level) */
 int
-spell_damage_bonus(int dmg) /* base amount to be adjusted by bonus or penalty */
+spell_damage_bonus(
+    int dmg) /* base amount to be adjusted by bonus or penalty */
 {
     int intell = ACURR(A_INT);
 
@@ -3282,11 +3288,9 @@ hit(const char *str, struct monst *mtmp,
 void
 miss(const char *str, struct monst *mtmp)
 {
-    pline(
-        "%s %s %s.", The(str), vtense(str, "miss"),
-        ((cansee(g.bhitpos.x, g.bhitpos.y) || canspotmon(mtmp)) && flags.verbose)
-            ? mon_nam(mtmp)
-            : "it");
+    pline("%s %s %s.", The(str), vtense(str, "miss"),
+          ((cansee(g.bhitpos.x, g.bhitpos.y) || canspotmon(mtmp))
+           && flags.verbose) ? mon_nam(mtmp) : "it");
 }
 
 static void
@@ -3309,8 +3313,8 @@ skiprange(int range, int *skipstart, int *skipend)
  *      when a light beam is flashed (FLASHED_LIGHT)
  *      when a mirror is applied (INVIS_BEAM)
  *  A thrown/kicked object falls down at end of its range or when a monster
- *  is hit.  The variable 'g.bhitpos' is set to the final position of the weapon
- *  thrown/zapped.  The ray of a wand may affect (by calling a provided
+ *  is hit.  The variable 'g.bhitpos' is set to the final position of the
+ *  weapon thrown/zapped.  The ray of a wand may affect (by calling a provided
  *  function) several objects and monsters on its path.  The return value
  *  is the monster hit (weapon != ZAPPED_WAND), or a null monster pointer.
  *
@@ -3474,7 +3478,8 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
             mtmp = (struct monst *) 0;
 
         if (mtmp) {
-            g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
+            g.notonhead = (g.bhitpos.x != mtmp->mx
+                           || g.bhitpos.y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
                    pass through instead of stop so we call
@@ -3710,11 +3715,14 @@ boomhit(struct obj *obj, int dx, int dy)
 /* used by buzz(); also used by munslime(muse.c); returns damage applied
    to mon; note: caller is responsible for killing mon if damage is fatal */
 int
-zhitm(struct monst *mon, int type, int nd,
-      struct obj **ootmp) /* to return worn armor for caller to disintegrate */
+zhitm(
+    struct monst *mon,  /* monster being hit */
+    int type,           /* zap or breath type */
+    int nd,             /* number of hit dice to use */
+    struct obj **ootmp) /* to return worn armor for caller to disintegrate */
 {
-    register int tmp = 0;
-    register int abstype = abs(type) % 10;
+    int tmp = 0; /* damage amount */
+    int abstype = abs(type) % 10;
     boolean sho_shieldeff = FALSE;
     boolean spellcaster = is_hero_spell(type); /* maybe get a bonus! */
 
@@ -4619,7 +4627,8 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
                 bury_objs(x, y);
                 if (see_it) {
                     if (lava)
-                        Norep("The %s cools and solidifies.", hliquid("lava"));
+                        Norep("The %s cools and solidifies.",
+                              hliquid("lava"));
                     else if (moat)
                         Norep("The %s is bridged with ice!", buf);
                     else
