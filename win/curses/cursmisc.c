@@ -100,7 +100,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     if (color == 0) {           /* make black fg visible */
 # ifdef USE_DARKGRAY
         if (iflags.wc2_darkgray) {
-            if (can_change_color() && (COLORS > 16)) {
+            if (COLORS > 16) {
                 /* colorpair for black is already darkgray */
             } else {            /* Use bold for a bright black */
                 wattron(win, A_BOLD);
@@ -135,7 +135,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
                 wattroff(win, A_BOLD);
             }
 # ifdef USE_DARKGRAY
-            if ((color == 0) && (!can_change_color() || (COLORS <= 16))) {
+            if ((color == 0) && (COLORS <= 16)) {
                 wattroff(win, A_BOLD);
             }
 # else

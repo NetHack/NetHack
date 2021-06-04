@@ -748,6 +748,7 @@ curses: for vertical status, line up conditions in columns; usually two but
 	used to align entries in their columns--that's a feature...]
 curses: indent items in perm_invent window by one space
 curses: don't change the terminal's default colors
+curses: remove unnecessary special handling for dark gray
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

@@ -1553,7 +1553,7 @@ curses_color_attr(int nh_color, int bg_color)
     if (!nh_color) {
 #ifdef USE_DARKGRAY
         if (iflags.wc2_darkgray) {
-            if (!can_change_color() || COLORS <= 16)
+            if (COLORS <= 16)
                 cattr |= A_BOLD;
         } else
 #endif
