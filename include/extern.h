@@ -1539,7 +1539,7 @@ extern void mplayer_talk(struct monst *);
 
 #if defined(MICRO) || defined(WIN32)
 
-/* ### msdos.c,os2.c,tos.c,windows.c ### */
+/* ### msdos.c,os2.c,tos.c,windsys.c ### */
 
 #ifndef WIN32
 extern int tgetch(void);
