@@ -5049,14 +5049,15 @@ handler_menu_colors(void)
            inventory window; we don't track whether an actual changed
            occurred, so just assume there was one and that it matters;
            if we're wrong, a redundant update is cheap... */
-        if (iflags.use_menu_color && iflags.perm_invent)
-            update_inventory();
-
-        /* menu colors aren't being used; if any are defined, remind
-           player how to use them */
-        else if (nmc > 0)
+        if (iflags.use_menu_color) {
+            if (iflags.perm_invent)
+                update_inventory();
+        } else if (nmc > 0) {
+            /* menu colors aren't being used; if any are defined, remind
+               player how to use them */
             pline(
     "To have menu colors become active, toggle 'menucolors' option to True.");
+        }
         return optn_ok;
 
     } else if (opt_idx == 0) { /* add new */
