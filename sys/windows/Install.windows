@@ -69,7 +69,7 @@ solution file within the IDE, build the solution and  run the version
 of NetHack you wish to run.
 
 The Visual Studio NetHack solution file can be found here:
-    win\win32\vs\NetHack.sln
+    sys\windows\vs\NetHack.sln
 
 Before executing the steps to build listed in the next paragraph,
 decide if you want to include optional curses window-port. See
@@ -81,12 +81,6 @@ So the steps are:
     3. Select the build configuration you wish to use (Release, Debug, etc.).
     4. From the build menu, select build solution.
     5. Type F5 to start debugging.
-
-You can also build all the projects for all platforms and configurations
-using a "build.bat" batch file found in the same directory as the solution.
-
-Open a developer command prompt for the version of Visual Studio you are
-using.  Change to the directory win\win32\vs and run "build.bat".
 
  * Optional curses window-port support *
 
