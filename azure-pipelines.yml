@@ -115,6 +115,12 @@ steps:
   condition: eq( variables.toolchain, 'vs' )
   displayName: 'Copying store key'
 
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln'
+    feedsToUse: 'select'
+
 - task: MSBuild@1
   inputs:
     solution: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln
