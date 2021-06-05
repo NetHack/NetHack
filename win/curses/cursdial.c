@@ -1497,12 +1497,15 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         default:
             if (isdigit(curletter)) {
                 count = curses_get_count(curletter - '0');
-                touchwin(win);
-                refresh();
+                /* after count, we know some non-digit is already pending */
                 curletter = getch();
-                if (count > 0) {
-                    count_letter = curletter;
-                }
+                count_letter = (count > 0) ? curletter : '\0';
+
+                /* remove the count wind (erases last line of message wind) */
+                curses_count_window(NULL);
+                /* force redraw of the menu that is receiving the count */
+                touchwin(win);
+                wrefresh(win);
             }
         }
 

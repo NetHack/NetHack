@@ -65,7 +65,7 @@ curses_read_char(void)
     }
 #endif
 
-    if (counting && !isdigit(ch)) { /* Dismiss count window if necissary */
+    if (counting && !isdigit(ch)) { /* dismiss count window if necessary */
         curses_count_window(NULL);
         curses_refresh_nethack_windows();
     }

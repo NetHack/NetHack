@@ -754,6 +754,10 @@ curses: for vertical status, line up conditions in columns; usually two but
 curses: indent items in perm_invent window by one space
 curses: don't change the terminal's default colors
 curses: remove unnecessary special handling for dark gray
+curses: sometimes entering a count during menu selection caused the menu to
+	disappear (example was apply/loot in-out container menu with two or
+	more digits typed followed by non-digit); in-out menu was still active
+	but no longer displayed
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
