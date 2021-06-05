@@ -1033,13 +1033,15 @@ peffects(struct obj *otmp)
             g.potion_nothing++;
 
         if (otmp->cursed) {
+            stairway *stway;
+
             /* 'already levitating' used to block the cursed effect(s)
                aside from ~I_SPECIAL; it was not clear whether that was
                intentional; either way, it no longer does (as of 3.6.1) */
             HLevitation &= ~I_SPECIAL; /* can't descend upon demand */
             if (BLevitation) {
                 ; /* rising via levitation is blocked */
-            } else if (stairway_find_dir(TRUE)) {
+            } else if ((stway = stairway_at(u.ux, u.uy)) != 0 && stway->up) {
                 (void) doup();
                 /* in case we're already Levitating, which would have
                    resulted in incrementing 'nothing' */

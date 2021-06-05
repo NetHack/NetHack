@@ -705,6 +705,8 @@ lighting for baalz level defaulted to random and could end up being lit
 when using 'O' to set menu color patterns, the reminder message that the
 	boolean menucolors option needs to be set to True for them to work
 	was sometimes given even when already True
+stair revamp unintentionally resulted in cursed potion of levitation no longer
+	causing hero to hit head on ceiling
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
