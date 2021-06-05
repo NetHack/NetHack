@@ -23,14 +23,9 @@
   <Import Project="$(vsDir)console.props" />
   <Import Project="$(vsDir)common.props" />
   <Import Project="$(vsDir)files.props" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(IncDir)</AdditionalIncludeDirectories>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(IncDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysShareDir);</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

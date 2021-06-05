@@ -352,7 +352,7 @@ else
 CURSESOBJ=
 endif
 
-SOBJ   = $(O)windmain.o $(O)windsyso $(O)win10.o \
+SOBJ   = $(O)windmain.o $(O)windsys.o $(O)win10.o \
 	$(O)safeproc.o $(O)nhlan.o $(SOUND)
 
 OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
@@ -796,7 +796,7 @@ endif
 #
 	$(subst /,\,echo install done > $@)
 
-#  copy $(MSWSYS)/windsyshlp    $(GAMEDIR)
+#  copy $(MSWSYS)/windsys.hlp    $(GAMEDIR)
 
 recover: $(U)recover.exe
 	$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR))
@@ -1324,8 +1324,8 @@ endif
 
 $(O)consoletty.o:   $(HACK_H) $(TILE_H) $(MSWSYS)/win32api.h $(MSWSYS)/consoletty.c
 	$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(MSWSYS)/consoletty.c
-$(O)windsyso: $(HACK_H) $(MSWSYS)/win32api.h $(MSWSYS)/windsysc
-	$(cc) $(CFLAGS) -o$@  $(MSWSYS)/windsysc
+$(O)windsys.o: $(HACK_H) $(MSWSYS)/win32api.h $(MSWSYS)/windsys.c
+	$(cc) $(CFLAGS) -o$@  $(MSWSYS)/windsys.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
 	$(cc) $(CFLAGS)  -o$@ $(MSWSYS)/ntsound.c
 
