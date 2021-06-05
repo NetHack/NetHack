@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1606558747 2020/11/28 10:19:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1614910020 2021/03/05 02:07:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -116,7 +116,7 @@ fightm(register struct monst *mtmp)
     nmon = 0;
 #endif
     /* perhaps the monster will resist Conflict */
-    if (resist(mtmp, RING_CLASS, 0, 0))
+    if (resist_conflict(mtmp))
         return 0;
 
     if (u.ustuck == mtmp) {
@@ -628,21 +628,26 @@ hitmm(register struct monst *magr, register struct monst *mdef,
 
 /* Returns the same values as mdamagem(). */
 static int
-gazemm(register struct monst *magr, register struct monst *mdef,
-       struct attack *mattk)
+gazemm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     char buf[BUFSZ];
+    /* an Archon's gaze affects target even if Archon itself is blinded */
+    boolean archon = (magr->data == &mons[PM_ARCHON]
+                      && mattk->adtyp == AD_BLND),
+            altmesg = (archon && !magr->mcansee);
 
     if (g.vis) {
-        if (mdef->data->mlet == S_MIMIC
-            && M_AP_TYPE(mdef) != M_AP_NOTHING)
+        if (mdef->data->mlet == S_MIMIC && M_AP_TYPE(mdef) != M_AP_NOTHING)
             seemimic(mdef);
-        Sprintf(buf, "%s gazes at", Monnam(magr));
+        Sprintf(buf, "%s gazes %s",
+                altmesg ? Adjmonnam(magr, "blinded") : Monnam(magr),
+                altmesg ? "toward" : "at");
         pline("%s %s...", buf,
               canspotmon(mdef) ? mon_nam(mdef) : "something");
     }
 
-    if (magr->mcan || !magr->mcansee || !mdef->mcansee
+    if (magr->mcan || !mdef->mcansee
+        || (archon ? resists_blnd(mdef) : !magr->mcansee)
         || (magr->minvis && !perceives(mdef->data)) || mdef->msleeping) {
         if (g.vis && canspotmon(mdef))
             pline("but nothing happens.");
@@ -674,6 +679,15 @@ gazemm(register struct monst *magr, register struct monst *mdef,
                 return MM_MISS;
             return MM_AGR_DIED;
         }
+    } else if (archon) {
+        mhitm_ad_blnd(magr, mattk, mdef, (struct mhitm_data *) 0);
+        /* an Archon's blinding radiance also stuns;
+           this is different from the way the hero gets stunned because
+           a stunned monster recovers randomly instead of via countdown;
+           both cases make an effort to prevent the target from being
+           continuously stunned due to repeated gaze attacks */
+        if (rn2(2))
+            mdef->mstun = 1;
     }
 
     return mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
@@ -813,7 +827,15 @@ explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
     else
         noises(magr, mattk);
 
-    result = mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
+    /* monster explosion types which actually create an explosion */
+    if (mattk->adtyp == AD_FIRE || mattk->adtyp == AD_COLD
+        || mattk->adtyp == AD_ELEC) {
+        mon_explodes(magr, mattk);
+        /* unconditionally set AGR_DIED here; lifesaving is accounted below */
+        result = MM_AGR_DIED | (DEADMONSTER(mdef) ? MM_DEF_DIED : 0);
+    } else {
+        result = mdamagem(magr, mdef, mattk, (struct obj *) 0, 0);
+    }
 
     /* Kill off aggressor if it didn't die. */
     if (!(result & MM_AGR_DIED)) {
@@ -892,13 +914,16 @@ mdamagem(struct monst *magr, struct monst *mdef,
             place_monster(mdef, mdef->mx, mdef->my);
             mdef->mhp = 0;
         }
-        g.zombify = !mwep && zombie_maker(magr->data)
-            && ((mattk->aatyp == AT_TUCH
-                 || mattk->aatyp == AT_CLAW
-                 || mattk->aatyp == AT_BITE)
-                && zombie_form(mdef->data) != NON_PM);
+        if (mattk->aatyp == AT_WEAP || mattk->aatyp == AT_CLAW)
+            g.mkcorpstat_norevive = troll_baned(mdef, mwep) ? TRUE : FALSE;
+        g.zombify = (!mwep && zombie_maker(magr)
+                     && (mattk->aatyp == AT_TUCH
+                         || mattk->aatyp == AT_CLAW
+                         || mattk->aatyp == AT_BITE)
+                     && zombie_form(mdef->data) != NON_PM);
         monkilled(mdef, "", (int) mattk->adtyp);
         g.zombify = FALSE; /* reset */
+        g.mkcorpstat_norevive = FALSE;
         if (!DEADMONSTER(mdef))
             return mhm.hitflags; /* mdef lifesaved */
         else if (mhm.hitflags == MM_AGR_DIED)
@@ -929,9 +954,11 @@ mdamagem(struct monst *magr, struct monst *mdef,
 int
 mon_poly(struct monst *magr, struct monst *mdef, int dmg)
 {
+    static const char freaky[] = " undergoes a freakish metamorphosis";
+
     if (mdef == &g.youmonst) {
         if (Antimagic) {
-            shieldeff(mdef->mx, mdef->my);
+            shieldeff(u.ux, u.uy);
         } else if (Unchanging) {
             ; /* just take a little damage */
         } else {
@@ -977,14 +1004,27 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                     monkilled(mdef, "", AD_RBRE);
             }
         } else if (newcham(mdef, (struct permonst *) 0, FALSE, FALSE)) {
-            if (g.vis && canspotmon(mdef))
-                pline("%s%s turns into %s.", Before,
-                      !flags.verbose ? ""
-                       : " undergoes a freakish metamorphosis and",
-                      x_monnam(mdef, ARTICLE_A, (char *) 0,
-                               (SUPPRESS_NAME | SUPPRESS_IT
-                                | SUPPRESS_INVISIBLE), FALSE));
+            if (g.vis) { /* either seen or adjacent */
+                boolean was_seen = !!strcmpi("It", Before),
+                        verbosely = flags.verbose || !was_seen;
+
+                if (canspotmon(mdef))
+                    pline("%s%s%s turns into %s.", Before,
+                          verbosely ? freaky : "", verbosely ? " and" : "",
+                          x_monnam(mdef, ARTICLE_A, (char *) 0,
+                                   (SUPPRESS_NAME | SUPPRESS_IT
+                                    | SUPPRESS_INVISIBLE), FALSE));
+                else if (was_seen || magr == &g.youmonst)
+                    pline("%s%s%s.", Before, freaky,
+                          !was_seen ? "" : " and disappears");
+            }
             dmg = 0;
+            if (can_teleport(magr->data)) {
+                if (magr == &g.youmonst)
+                    tele();
+                else if (!tele_restrict(magr))
+                    (void) rloc(magr, TRUE);
+            }
         } else {
             if (g.vis && flags.verbose)
                 pline1(nothing_happens);

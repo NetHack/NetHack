@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "February 11, 2021
+.ds f2 "March 25, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -793,6 +793,10 @@ You may select ammunition with a previous \(oqQ\(cq command, or let the
 computer pick something appropriate if
 .op autoquiver
 is true.
+If your wielded weapon has the throw-and-return property, your quiver
+is empty, and
+.op autoquiver
+is false, you will throw that wielded weapon instead of filling the quiver.
 .lp ""
 See also \(oqt\(cq (throw) for more general throwing and shooting.
 .lp i
@@ -866,9 +870,6 @@ Quaff (drink) something (potion, water, etc).
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).
 You can then throw this (or one of these) using the \(oqf\(cq command.
-.lp ""
-(In versions prior to 3.3 this was the command to quit
-the game, which has been moved to \(lq#quit\(rq.)
 .lp r
 Read a scroll or spellbook.
 .lp R
@@ -1068,6 +1069,20 @@ May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
 Show discovered types for one class of objects.
 .lp ""
 May be preceded by \(oq\f(CRm\fP\(cq to select preferred display order.
+.lp |
+If persistent inventory display is supported and enabled (with the
+.op perm_invent
+option), interact with it instead of with the map.
+.lp ""
+Allows scrolling with the
+menu_first_page, menu_previous_page,
+menu_next_page, and menu_last_page
+keys (\(oq\f(CR\(ha\fP\(cq, \(oq\f(CR<\fP\(cq,
+\(oq\f(CR>\fP\(cq, \(oq\f(CR|\fP\(cq by default).
+Some interfaces also support menu_shift_left and menu_shift_right
+keys (\(oq\f(CR{\fP\(cq and \(oq\f(CR}\fP\(cq by default).
+Use the \fIReturn\fP (aka \fIEnter\fP) or \fIEscape\fP key to
+resume play.
 .lp !
 Escape to a shell.
 See \(lq#shell\(rq below for more details.
@@ -1348,6 +1363,14 @@ option to require a response of \f(CRyes\fP instead.
 .lp "#pay     "
 Pay your shopping bill.
 Default key is \(oqp\(cq.
+.lp "#perminv "
+If persistent inventory display is supported and enabled (with the
+.op perm_invent
+option), interact with it instead of with the map.
+You'll be prompted for menu scrolling keystrokes such
+as \(oq\f(CR>\fP\(cq and \(oq\f(CR<\fP\(cq.
+Press \f(CRReturn\fP or \f(CREscape\fP to resume normal play.
+Default key is \(oq|\(cq.
 .lp "#pickup  "
 Pick up things at the current location.
 Default key is \(oq,\(cq.
@@ -1381,7 +1404,6 @@ Default key is \(oqq\(cq.
 .lp "#quit    "
 Quit the program without saving your game.
 Autocompletes.
-Default key is \(oqM-q\(cq.
 .lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.
@@ -1733,8 +1755,6 @@ option is enabled)
 #overview
 .lp M-p
 #pray
-.lp M-q
-#quit
 .lp M-r
 #rub
 .lp M-R
@@ -2412,6 +2432,16 @@ Arrows can be thrown by hand, but can be thrown
 much farther and will be more likely to hit when thrown while you are
 wielding a bow.
 .pg
+Some weapons will return when thrown.
+A boomerang\(emprovided it fails to hit anything\(emis an obvious example.
+If an aklys (thonged club) is thrown while it is wielded, it will return
+even when it hits something.
+A sufficiently strong hero can throw the warhammer \fIMjollnir\fP;
+when thrown by a \fIValkyrie\fP it will return too.
+However, aklyses and \fIMjollnir\fP occasionally fail to return.
+Returning thrown objects occasionally fail to be caught, sometimes even
+hitting the thrower, but when caught they become re-wielded.
+.pg
 You can simplify the throwing operation by using the \(oqQ\(cq command to
 select your preferred \(lqmissile\(rq, then using the \(oqf\(cq command to
 throw it.
@@ -2422,9 +2452,13 @@ There is also an option,
 which has NetHack choose another item to automatically fill your
 quiver (or quiver sack, or have at the ready) when the inventory slot used
 for \(oqQ\(cq runs out.
+If your quiver is empty,
+.op autoquiver
+is false, and you are wielding a weapon which returns when thrown,
+you will throw that weapon instead of filling the quiver.
 .pg
-Some characters have the ability to fire a volley of multiple items in a
-single turn.
+Some characters have the ability to throw or shoot a volley of multiple
+items (from the same stack) in a single action.
 Knowing how to load several rounds of ammunition at
 once\(emor hold several missiles in your hand\(emand
 still hit a target is not an easy task.
@@ -3773,16 +3807,13 @@ objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
 .lp menu_deselect_all
-Menu character accelerator to deselect all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to deselect all items in a menu.
 Default \(oq\-\(cq.
 .lp menu_deselect_page
-Menu character accelerator to deselect all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Key to deselect all items on this page of a menu.
 Default \(oq\\\(cq.
 .lp menu_first_page
-Menu character accelerator to jump to the first page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Key to jump to the first page in a menu.
 Default \(oq\(ha\(cq.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
@@ -3790,20 +3821,16 @@ Values are \(lqnone\(rq, \(lqbold\(rq, \(lqdim\(rq, \(lqunderline\(rq,
 \(lqblink\(rq, or \(lqinverse\(rq.
 Not all ports can actually display all types.
 .lp menu_invert_all
-Menu character accelerator to invert all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to invert all items in a menu.
 Default \(oq@\(cq.
 .lp menu_invert_page
-Menu character accelerator to invert all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Key to invert all items on this page of a menu.
 Default \(oq\(ti\(cq. \" ~
 .lp menu_last_page
-Menu character accelerator to jump to the last page in a menu.
-Implemented by the Amiga, Gem and tty ports.
+Key to jump to the last page in a menu.
 Default \(oq|\(cq.
 .lp menu_next_page
-Menu character accelerator to goto the next menu page.
-Implemented by the Amiga, Gem and tty ports.
+Key to go to the next menu page.
 Default \(oq>\(cq.
 .lp menu_objsyms
 Show object symbols in menu headings in menus where
@@ -3813,21 +3840,31 @@ Do not clear the screen before drawing menus, and align
 menus to the right edge of the screen. Only for the tty port.
 (default on)
 .lp menu_previous_page
-Menu character accelerator to goto the previous menu page.
-Implemented by the Amiga, Gem and tty ports.
+Key to go to the previous menu page.
 Default \(oq<\(cq.
 .lp menu_search
-Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to search for some text and toggle selection state of matching menu items.
 Default \(oq:\(cq.
 .lp menu_select_all
-Menu character accelerator to select all items in a menu.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to select all items in a menu.
 Default \(oq.\(cq.
 .lp menu_select_page
-Menu character accelerator to select all items on this page of a menu.
-Implemented by the Amiga, Gem and tty ports.
+Key to select all items on this page of a menu.
 Default \(oq,\(cq.
+.lp menu_shift_left
+Key to scroll a menu\(emone which has been
+scrolled right\(emback to the left.
+Implemented for
+.op perm_invent
+only by curses and X11.
+Default \(oq{\(cq.
+.lp menu_shift_right
+Key to scroll a menu which has text beyond the
+right edge to the right.
+Implemented for
+.op perm_invent
+only by curses and X11.
+Default \(oq}\(cq.
 ." .lp menu_tab_sep
 ." Format menu entries using TAB to separate columns (default off).
 ." Only applicable to some menus, and only useful to some interfaces.
@@ -4677,7 +4714,7 @@ For example:
 .sd
 .si
 BIND=\(haX:getpos.autodescribe
-BIND={:menu_first_page
+BIND=\\:menu_first_page
 BIND=v:loot
 .ei
 .ed
@@ -4689,7 +4726,8 @@ You can also bind the \(lq<esc>\(rq, \(lq<enter>\(rq, and \(lq<space>\(rq keys.
 .lp "Menu accelerator keys"
 The menu control or accelerator keys can also be rebound via OPTIONS lines
 in the configuration file.
-You cannot bind object symbols into menu accelerators.
+You cannot bind object symbols or selection letters into menu accelerators.
+Some interfaces only support some of the menu accelerators.
 .lp "Special command keys"
 Below are the special commands you can rebind.
 Some of them can be bound to
@@ -6001,9 +6039,10 @@ some bug fixes.
 The official NetHack web site is maintained by \fBKen Lorber\fP
 at
 .UR https://www.nethack.org/ .
+.BR 1
 .pg
 .hn 2
-SPECIAL THANKS
+Special Thanks
 .pg
 On behalf of the NetHack community, thank you very much once
 again to \fBM. Drew Streib\fP and \fBPasi Kallinen\fP for providing a
@@ -6012,15 +6051,20 @@ and \fBAndy Thomson\fP for hardfought.org. Thanks to all those
 unnamed dungeoneers who invest their time and effort into annual
 NetHack tournaments such as Junethack, The November NetHack Tournament,
 and in days past, devnull.net (gone for now, but not forgotten).
+.\" .pg
+.\" .ce
+.\" - - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too
+.\" .                          \" far to right, so pad them with a few spaces
+.BR 1
 .pg
-.ce
-- - - - - - - - - -\ \ \ \ \" when centered, the dashes look a little too far
-.                          \" to the right, so pad them with a few spaces
+.hn 2
+Dungeoneers
 .pg
 From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The NetHack
 Development Team sometimes makes note of the names of the worst of these
 miscreants in this, the list of Dungeoneers:
+.BR 1
 .
 .TS S
 center;
@@ -6070,6 +6114,7 @@ Irina Rempt-Drijfhout	Mike Passaretti
 Izchak Miller	Mike Stephenson
 .\"TABLE_END  Do not delete this line.
 .TE
+.BR 1
 .pg
 .\"Microsoft and MS-DOS are registered trademarks of Microsoft Corporation.
 .\"Lattice is a trademark of Lattice, Inc.

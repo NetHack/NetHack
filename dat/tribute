@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1610152952 2021/01/09 00:42:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $
+# NetHack 3.7  tribute       $NHDT-Date: 1620076692 2021/05/03 21:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -1064,7 +1064,7 @@ The bursar scowled at him.  "No need to get carried away," he said.
 #
 #
 #
-%title Sourcery (10)
+%title Sourcery (11)
 # p. 9 (Signet edition; passage starts mid-paragraph and ends mid-paragraph)
 %passage 1
 "[...]  And what would humans be without love?"
@@ -1073,6 +1073,7 @@ RARE, said Death.  [...]
 
   [Sourcery, by Terry Pratchett]
 %e passage
+# p. 180 (passage starts mid-paragraph)
 %passage 2
 They suffered from the terrible delusion that something could be done.
 They seemed prepared to make the world the way they wanted it or die in the
@@ -1094,8 +1095,10 @@ MANY HAVE, said Death evenly.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# pp. 40-41 (text has 'the moment and the words' which is obviously a typo;
-#            it might have intended 'that' for 'and'; we just drop 'and')
+# pp. 40-41 (this used to have a correction for "an obvious typo" in the last
+#            sentence [before the footnote] which was actually a transciption
+#            error, with "were" erroneously inserted [causing the sentence to
+#            parse oddly] but not present in the original text; fixed now)
 %passage 4
 The thief, as will become apparent, was a special type of thief.  This
 thief was an artist of theft.  Other thieves merely stole everything that
@@ -1113,8 +1116,8 @@ while it was in the process of winning a race.  When Gritoller Mimpsey,
 vice-president of the Thieves' Guild, was jostled in the marketplace and
 then found on returning home that a freshly-stolen handful of diamonds
 had vanished from their place of concealment, he knew who to blame.(1)
-This was the type of thief that could steal the initiative, the moment the
-words were out of your mouth.
+This was the type of thief that could steal the initiative, the moment
+and the words out of your mouth.
 
 (1) This was because Gritoller had swallowed the jewels for safe keeping.
 
@@ -1256,6 +1259,26 @@ themselves.
 They are not necessarily very good at it.
 
 (1) He always argued that he was.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+#
+# additional passage added for 3.7
+#
+# p. 164 (passage begins mid-sentence)
+%passage 11
+[...] killing a brother wizard with magic was well-nigh impossible on
+account of the layers of protective spells that any cautious wizard
+maintained about his person at all times.(1)  The first thing a young
+wizard learns at Unseen University--apart from where his peg is, and
+which way to the lavatory--is that he must protect himself at all times.
+
+Some people think this is paranoia, but it isn't.  Paranoids only think
+everyone is out to get them.  Wizards /know/ it.
+
+(1) Of course, wizards often killed one another by ordinary, non-magical
+means, but this was perfectly allowable and death by assassination was
+considered natural causes for a wizard.
 
   [Sourcery, by Terry Pratchett]
 %e passage
@@ -2184,7 +2207,9 @@ so far was the ability to turn gold into less gold.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
-# pp. 44, 45, 46 (multiple paragraphs skipped in the first two gaps)
+# pp. 44, 45, 46 (multiple paragraphs skipped in the first two gaps;
+#                 the dog is Gaspode, who can talk but conceals that from
+#                 almost everybody; his use of 'bin' for 'been' is accurate)
 %passage 3
 He looked down.  There was a dog sitting by his feet.
 
@@ -2328,7 +2353,7 @@ nearest salad growing district was thirty slow miles away.
 
 Fruntkin the short-order chef hazarded a guess.
 
-'Celery?" he said.  He peered closer.  "Yeah, celery."
+"Celery?" he said.  He peered closer.  "Yeah, celery."
 
 "It /brown/."
 
@@ -2396,7 +2421,8 @@ All over the entire room, sometimes.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
-# p. 204 (passage ends mid-paragraph; musings are by Gaspode the dog)
+# p. 204 (passage ends mid-paragraph; musings are by Gaspode the dog;
+#         'sunnink', 'fings', 'wot' are accurate, as is 'finds' for 'find')
 %passage 13
 Sunnink dreadful in there, he thought.  Prob'ly tentacled fings that rips
 your face off.  I mean, when you finds mysterious doors in old hills, it
@@ -2419,7 +2445,7 @@ megalomaniac!"
 
 Dibbler removed his cigar.
 
-"That's /Mister/ Megalomanic to you," he said.
+"That's /Mister/ Megalomaniac to you," he said.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
@@ -2437,6 +2463,37 @@ Dibbler removed his cigar.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
+#
+# New for 3.7 - these are worthy but 16 passages are already more than enough.
+#-#
+#-# p. 304
+#-%passage 17
+#-"Did I hear things, or can that little dog speak?" said Dibbler.
+#-
+#-"He says he can't," said Victor.
+#-
+#-Dibbler hesitated.  The excitement was unhinging him a little.  "Well," he
+#-said, "I suppose he should know."
+#-
+#-  [Moving Pictures, by Terry Pratchett]
+#-%e passage
+#-# p. 329 (two farmers have just watched a pair of wizards incompetently
+#-#         flying together on a broom crash into a barn containing harvested
+#-#         cabbages; one of them had predicted, accurately as it turned out,
+#-#         that the flyers would crash out the far side accompanied by
+#-#         scattering chickens and a shower of feathers; 'believer' had
+#-#         scoffed at the prediction because there were no chickens inside;
+#-#         they've just looked inside and confirmed the lack of any poultry)
+#-%passage 18
+#-The farmers crept away.
+#-
+#-"Dang me," said the believer in cabbages.  "They're wizards.  Best not to
+#-meddle in the affairs of danged wizards."
+#-
+#-"Yeah," said the other farmer.  "Er... what does dang mean?  Exactly?"
+#-
+#-  [Moving Pictures, by Terry Pratchett]
+#-%e passage
 %e title
 #
 #
@@ -2929,15 +2986,22 @@ The witches watched with interest.
 #
 #
 #
-%title Small Gods (12)
+%title Small Gods (15)
+# p. 174 (Harper Torch edition; passage starts mid-paragraph; speaker is
+#         the blind philosopher Didactylos referring to a book in scroll
+#         form called /On Religion/ by another philosopher, Abraxas;
+#         Didactylos mentions that Old 'Charcoal' Abraxas had been hit by
+#         lightning 15 times)
 %passage 1
-He says gods like to see an atheist around.  Gives them something to aim at.
+"[...]  He says gods like to see an atheist around.  Gives them something
+to aim at."
 
   [Small Gods, by Terry Pratchett]
 %e passage
+# p. 79 (passage starts mid-paragraph; speaker is Cut-Me-Own-Hand-Off Dhblah)
 %passage 2
-Pets are always a great help in times of stress.  And in times of starvation
-too, o'course.
+[...]  "Pets are always a great help in times of stress.  And in times of
+starvation too, o'course."
 
   [Small Gods, by Terry Pratchett]
 %e passage
@@ -3136,11 +3200,40 @@ But, on the whole, there are worse places to be buried than inside a lion.
 
   [Small Gods, by Terry Pratchett]
 %e passage
+#
+# 3 more passages added for 3.7
+#
+# p. 7 (Brother Nhumrod is in charge of a group of novices; he's thinking
+#       about one of them, Brutha, the main character of the story)
+%passage 13
+There was something creepy about the boy, Nhumrod thought.  It was the way
+he looked at you when you were talking, as if he was /listening/.
+
+  [Small Gods, by Terry Pratchett]
+%e passage
+# p. 11 (musing by the Great God Om)
+%passage 14
+The trouble with being a god is that you've got no one to pray to.
+
+  [Small Gods, by Terry Pratchett]
+%e passage
+# p. 210 (speaker is Didactylos the Ephebian philosopher)
+%passage 15
+"Life in this world," he said, "is, as it were, a sojourn in a cave.  What
+can we know of reality?  For all we see of the true nature of existence
+is, shall we say, no more than bewildering and amusing shadows cast upon
+the inner wall of the cave by the unseen blinding light of absolute truth,
+from which we may or may not deduce some glimmer of veracity, and we as
+troglodyte seekers of wisdom can only lift our voices to the unseen and
+say, humbly, 'Go on, do Deformed Rabbit... it's my favorite.'"
+
+  [Small Gods, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Lords and Ladies (12)
+%title Lords and Ladies (13)
 # p. 122 (Harper Torch edition)
 %passage 1
 Elves are wonderful.  They provoke wonder.
@@ -3160,7 +3253,7 @@ Elves are bad.
 
   [Lords and Ladies, by Terry Pratchett]
 %e passage
-# p. 32
+# p. 32 (Magrat has given up being a witch to marry Verence II, Lancre's king)
 %passage 2
 "Hope she does all right as queen," said Nanny.
 
@@ -3271,7 +3364,7 @@ Younger witches, on the other hand, talk about it all the time and believe
 it involves crystals, mystic forces, and dancing about without yer drawers
 on.
 
-Everyone may to right, all at the same time.  That's the thing about
+Everyone may be right, all at the same time.  That's the thing about
 quantum.
 
   [Lords and Ladies, by Terry Pratchett]
@@ -3369,13 +3462,36 @@ kingdom.
 
   [Lords and Ladies, by Terry Pratchett]
 %e passage
+#
+# passage added for 3.7
+#
+# p. 60 (passage starts mid-paragraph; "paddlin'" is accurate but unclear;
+#        "ooh-jar" is accurate for ouija after having been butchered by
+#        Nanny Ogg's previously established 'mastery' of foreign languages)
+%passage 13
+"[...]  Playing at witches.  You know, ooh-jar boards and cards and wearing
+black lace gloves with no fingers to 'em and paddlin' with the occult."
+
+"I don't hold with paddlin' with the occult," said Granny firmly.  "Once
+you start paddlin' with the occult you start believing in spirits, and
+when you start believing in spirits you start believing in demons, and then
+before you know where you are you're believing in gods.  And then you're
+in /trouble/."
+
+"But all them things exist," said Nanny Ogg.
+
+"That's no call to go around believing in them.  It only encourages 'em."
+
+  [Lords and Ladies, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
 %title Men at Arms (14)
+# p. 72 (Harper Torch edition)
 %passage 1
-The maze was so small that people got lost looking for it.
+The maze was so small that people got lost looking /for/ it.
 
   [Men at Arms, by Terry Pratchett]
 %e passage
@@ -3383,11 +3499,11 @@ The maze was so small that people got lost looking for it.
 %passage 2
 Ankh-Morpork had a king again.
 
-And this was /right/.  And it was /fate/ that let Edward recognize this
+And this was /right/.  And it was /fate/ that had let Edward recognize this
 /just/ when he'd got his Plan.  And it was /right/ that it was /Fate/,
 and the city would be /Saved/ from its ignoble present by its /glorius/
-past.  He had the /Means/, and he had the /end/.  And so on ...
-Edward's thoughts often ran like this.
+past.  He had the /Means/, and he had the /end/.  And so on ...  Edward's
+thoughts often ran like this.
 
 He could think in /italics/.  Such people need watching.
 
@@ -3622,19 +3738,23 @@ Willie the Vampire masks in order, he said, to take him out of himself.
 #
 #
 #
-%title Soul Music (11)
+%title Soul Music (13)
+# p. 121 (Harper Torch edition; passage starts mid-paragraph)
 %passage 1
-But this didn't feel like magic.  It felt a lot older than that.  It felt
+But this didn't /feel/ like magic.  It felt a lot older than that.  It felt
 like music.
 
   [Soul Music, by Terry Pratchett]
 %e passage
+# p. 49 (the skull is a traditional decoration for a wizard's abode; this one
+#        is the usual perch for, and is conversing with, a talking raven that
+#        has been translating the Death of Rats' SQUEAKs for Susan Sto Helit)
 %passage 2
 "Yes," said the skull.  "Quit while you're a head, that's what I say."
 
   [Soul Music, by Terry Pratchett]
 %e passage
-# p.2 (Harper Torch edition)
+# p. 2
 %passage 3
 But if it is true that the act of observing changes the thing which is
 observed,(1) it's even more true that it changes the observer.
@@ -3643,7 +3763,7 @@ observed,(1) it's even more true that it changes the observer.
 
   [Soul Music, by Terry Pratchett]
 %e passage
-# p.8
+# p. 8
 %passage 4
 It is said that whomsoever the gods wish to destroy, they first make mad.
 In fact, whomsoever the gods wish to destroy, they first hand the
@@ -3720,7 +3840,7 @@ Some religions say that the universe was started with a word, a song,
 a dance, a piece of music.  The Listening Monks of the Ramtops have
 trained their hearing until they can tell the value of a playing card by
 listening to it, and have made it their task to listen intently to the
-subtle sounds of the universe to piece together, from the fossile echoes,
+subtle sounds of the universe to piece together, from the fossil echoes,
 the very first noises.
 
 There was certainly, they say, a very strange noise at the beginning of
@@ -3841,20 +3961,44 @@ The Chair came down slowly, occasionally glancing fearfully up the stairs.
 
   [Soul Music, by Terry Pratchett]
 %e passage
+#
+# 2 more passages added for 3.7
+#
+# p. 242 (passage starts and ends mid-paragraph; "the Old" rather than "the
+#         Old <some language>" is accurate)
+%passage 12
+Wizards were rumored to be wise--in fact, that's where the word came
+from.(1)
+
+(1) From the Old /wys-ars/, lit: one who, at bottom, is very smart.
+
+  [Soul Music, by Terry Pratchett]
+%e passage
+# p. 351 (passage starts mid-paragraph; Death normally isn't bound by time
+#         and space so can be everywhere at once, more or less, but in this
+#         case he is speeding out of Ankh-Morpork and across the countryside
+#         on a motorcycle invented by UU's Librarian; despite racing along
+#         at such high speed that the vehicle has steadily disintegrated out
+#         from under him, progress is slow by his usual standard)
+%passage 13
+The fastest way to travel is to be there already.
+
+  [Soul Music, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Interesting Times (10)
-# p.1 (footnote)
+%title Interesting Times (13)
+# p. 1 (Harper Torch edition; passage is a footnote)
 %passage 1
 Whatever happens, they say afterwards, it must have been fate.  People are
 always a little confused about this, as they are in the case of miracles.
 When someone is saved from certain death by a strange concatenation of
 circumstances, they say that's a miracle.  But of course if someone is
-killed by a freak chain of events--the oil spilled just there, the safety
-fence broken just there--that must also be a miracle.  Just because it's
-not nice doesn't mean it's not miraculous.
+/killed/ by a freak chain of events--the oil spilled just /there/, the
+safety fence broken just /there/--that must /also/ be a miracle.  Just
+because it's not nice doesn't mean it's not miraculous.
 
   [Interesting Times, by Terry Pratchett]
 %e passage
@@ -3993,11 +4137,80 @@ followed by long periods of being dead."
 
   [Interesting Times, by Terry Pratchett]
 %e passage
+#
+# 3 new passages for 3.7
+#
+# p. 45
+%passage 11
+Adventure!  People talked about the idea as if it was something worthwhile,
+rather than a mess of bad food, no sleep, and strange people inexplicably
+trying to stick pointed objects in bits of you.
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
+# p. 52
+%passage 12
+"How /will/ I get back?" he said.
+
+"Same way you went.  We'll find you and bring you out.  With surgical
+precision."
+
+Rincewind groaned.  He knew what surgical precision meant in Ankh-Morpork.
+It meant "to within an inch or two, accompanied by a lot of screaming, and
+then they pour hot tar on you just where your leg was."
+
+But... if you put aside for the moment the certainty that something would
+definitely go horribly wrong, it looked foolproof.  The trouble was that
+wizards were such ingenious fools.
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
+# pp. 272-274 (most of page 273, is omitted:  War introduces his children and
+#              Rincewind asks Death about the outcome of a battle which is
+#              imminent; Death's response is that he wouldn't answer even if
+#              he knew, and Rincewind is astonished that he might not know;
+#              Death holds a finger up and a butterfly--as a symbol of chaos
+#              theory--briefly lands on it, then flies away)
+%passage 13
+RINCEWIND, ISN'T IT? said Death.  YES.  GOOD EVENING.  I DON'T BELIEVE YOU
+HAVE MET WAR.  RINCEWIND, WAR.  WAR, RINCEWIND.
+
+[...]
+
+ON A NIGHT LIKE THIS, said Death, THE ONLY CERTAIN THING IS UNCERTAINTY.
+TRITE, I KNOW, BUT TRUE.
+
+Somewhere on the horizon, thunder rumbled.
+
+"I'll, er, just be sort of going, then," said Rincewind.
+
+DON'T BE A STRANGER, said Death, as the wizard hurried off.
+
+"Odd person," said War.
+
+WITH HIM HERE, EVEN UNCERTAINTY IS UNCERTAIN.  AND I'M NOT SURE EVEN
+ABOUT THAT.
+
+War pulled a large paper-wrapped package out of his saddlebag.
+
+"We've got... let's see now... Egg and Cress, Chicken Tikka, and Mature
+Cheese with Chunky Pickle, I think."
+
+THEY DO SUCH MARVELOUS THINGS WITH SANDWICHES THESE DAYS.
+
+"Oh... and Bacon Surpise."
+
+REALLY?  WHAT IS SO SURPRISING ABOUT BACON?
+
+"I don't know.  I suppose it comes as something of a shock to the pig."
+
+  [Interesting Times, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Maskerade (9)
+%title Maskerade (13)
 # pp. 81-82, continued on pp. 87-89 (Harper Torch edition; apparently
 #       transcribed from some other edition based on quote marks used;
 #       a great number of very short paragraphs--it stretches a long way
@@ -4112,7 +4325,9 @@ barely noticeable even to the closest observation, one winked off.
 
   [Maskerade, by Terry Pratchett]
 %e passage
-# p. 67 (Harper Torch edition; as above, transcribed from some other edition)
+# p. 67 (Harper Torch edition; as above, transcribed from some other edition;
+#        passage ends mid-paragraph; the text of the note uses irregular
+#        indentation and a distinct font that hints at cursive handwriting)
 %passage 2
 The letter inside was on a sheet of the Opera House's own note paper.
 In neat, copperplate writing, it said:
@@ -4251,20 +4466,93 @@ Come on.  I want to try a leg of the elephant that bit me."
 
   [Maskerade, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
+# pp. 51-52 (Granny Weatherwax and Nanny Ogg are traveling to Ankh-Morpork
+#            and Nanny feels that the weather is too chilly for flying;
+#            Cando Cutoff is a bystander who has told them that the next
+#            stagecoach won't stop here; they stand in the road to block it)
+%passage 10
+"Why've you got broomsticks?" shouted the driver.  "Are you witches?"
+
+"Yes.  Have you got any special low terms for witches?"
+
+"Yeah, how about 'meddling, interfering old baggages'?"
+
+Cutoff felt that he must have missed part of the conversation, because the
+next exchange went like this:
+
+"What was that again, young man?"
+
+"Two complimentary tickets to Ankh-Morpork, ma'am.  No problem."
+
+"Inside seats, mind.  No traveling on the top."
+
+"Certainly, ma'am.  Excuse me while I just kneel in the dirt so's you can
+step up, ma'am."
+
+Cutoff nodded happily to himself as the coach pulled away again.  It was
+nice to see that good manners and courtesy were still alive.
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# p. 69 (passage starts mid-paragraph)
+%passage 11
+"[...]  If you wanted a quiet retirement, Mr. Bucket, you shouldn't have
+bought the Opera House.  You should have done something peaceful, like
+alligator dentistry."
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# pp. 108-109 (Mr. Pounder, the Opera House rat catcher, has been murdered;
+#              instead of Death coming to release his soul, the Death of Rats
+#              is attending; we skip a couple of very short paragraphs)
+%passage 12
+"Er... I'm dead, aren't I...?"
+
+SQUEAK.
+
+[...]
+
+The soul of Mr. Pounder looked at his hands.  They seemed to be elongating,
+and getting hairier.  He could feel his ears growing, and a certain rather
+embarrassing elongation at the base of his spine.  He'd spent most of his
+life in a single-minded activity in dark places, yet even so...
+
+"But I don't /believe/ in reincarnation!" he protested.
+
+SQUEAK.
+
+And this, Mr. Pounder understood with absolute rodent clarity, meant:
+reincarnation believes in /you/.
+
+  [Maskerade, by Terry Pratchett]
+%e passage
+# p. 198 (Nanny has come into a substantial sum of money and has grumbled
+#         about Granny spending so much of it)
+%passage 13
+"Money don't buy happiness, Gytha."
+
+"I only wanted to rent it for a few weeks."
+
+  [Maskerade, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
 %title Feet of Clay (14)
+# pp. 66-67 (Harper Torch edition)
 %passage 1
 Rumour is information distilled so finely that it can filter through
-anything.  It does not need doors and windows -- sometimes it does not need
-people.  It can exist free and wild, running from ear to ear without ever
-touching lips.
+anything.  It does not need doors and windows--sometimes it doesn't even
+need people.  It can exist free and wild, running from ear to ear without
+ever touching lips.
 
   [Feet of Clay, by Terry Pratchett]
 %e passage
-# p. 337 (Harper Torch edition)
+# p. 337
 %passage 2
 It was hard enough to kill a vampire.  You could stake them down and turn
 them into dust and ten years later someone drops a drop of blood in the
@@ -5006,8 +5294,8 @@ Patrician up the ladder.
 called it the Going-Under-the-Water-Safely Device," said Leonard, behind
 him.(1)  "But usually I just think of it as the boat."
 
-(1) Thinking up good names was, oddly enough, was one area where Leonard
-of Quirm's genious tended to give up.
+(1) Thinking up good names was, oddly enough, one area where Leonard of
+Quirm's genius tended to give up.
 
   [Jingo, by Terry Pratchett]
 %e passage
@@ -5051,7 +5339,7 @@ Rest of Your Life."
 
   [The Last Continent, by Terry Pratchett]
 %e passage
-# p.3 (Harper Torch edition)
+# p. 3 (Harper Torch edition)
 %passage 3
 All tribal myths are true, for a given value of "true."
 
@@ -5919,6 +6207,12 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 # libraries.  In the UK, _The_Amazing_Maurice..._ won the Carnegie Medal
 # which is awarded for best children's book of the year.
 # (The other Young Adult Discworld books are the five Tiffany Aching ones.)
+#
+# "Mr so-called Amazing Maurice and His Educated Rodents!" (the characters
+# rather than the book named for them) were first mentioned--in passing
+# rather than part of the story--about 1/3 of the way through _Reaper_Man_.
+# (p. 115, ROC edition; the text there does capitalize 'His'; 'Mr' without
+# period is accurate; the exclamation is derogatory).
 #
 # _The_Amazing_Maurice..._ may well be the most serious Discworld book.
 # (Don't worry, it has lots of humor/humour in it....)

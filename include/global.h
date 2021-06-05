@@ -162,7 +162,7 @@ extern struct cross_target_s cross_target;
 #endif
 
 #ifdef WIN32
-#include "ntconf.h"
+#include "windconf.h"
 #endif
 
 #include "warnings.h"
@@ -442,5 +442,24 @@ struct savefile_info {
 #define nhassert(expression) (void)((!!(expression)) || \
         (nhassert_failed(#expression, __FILE__, __LINE__), 0))
 #endif
+
+/* Macros for meta and ctrl modifiers:
+ *   M and C return the meta/ctrl code for the given character;
+ *     e.g., (C('c') is ctrl-c
+ */
+#ifndef M
+#ifndef NHSTDC
+#define M(c) (0x80 | (c))
+#else
+#define M(c) ((c) - 128)
+#endif /* NHSTDC */
+#endif
+
+#ifndef C
+#define C(c) (0x1f & (c))
+#endif
+
+#define unctrl(c) ((c) <= C('z') ? (0x60 | (c)) : (c))
+#define unmeta(c) (0x7f & (c))
 
 #endif /* GLOBAL_H */

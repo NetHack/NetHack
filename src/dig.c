@@ -1254,6 +1254,7 @@ boolean
 mdig_tunnel(struct monst *mtmp)
 {
     register struct rm *here;
+    boolean sawit, seeit, trapped;
     int pile = rnd(12);
 
     here = &levl[mtmp->mx][mtmp->my];
@@ -1264,19 +1265,24 @@ mdig_tunnel(struct monst *mtmp)
     if (closed_door(mtmp->mx, mtmp->my)) {
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
+        /* sawit: closed door location is more visible than an open one */
+        sawit = canseemon(mtmp); /* before door state change and unblock_pt */
+        trapped = (here->doormask & D_TRAPPED) ? TRUE : FALSE;
+        here->doormask = trapped ? D_NODOOR : D_BROKEN;
         unblock_point(mtmp->mx, mtmp->my); /* vision */
-        if (here->doormask & D_TRAPPED) {
-            here->doormask = D_NODOOR;
-            if (mb_trapped(mtmp)) { /* mtmp is killed */
+        newsym(mtmp->mx, mtmp->my);
+        if (trapped) {
+            seeit = canseemon(mtmp);
+            if (mb_trapped(mtmp, sawit || seeit)) { /* mtmp is killed */
                 newsym(mtmp->mx, mtmp->my);
                 return TRUE;
             }
         } else {
-            if (!rn2(3) && flags.verbose) /* not too often.. */
-                draft_message(TRUE); /* "You feel an unexpected draft." */
-            here->doormask = D_BROKEN;
+            if (flags.verbose) {
+                if (!Unaware && !rn2(3)) /* not too often.. */
+                    draft_message(TRUE); /* "You feel an unexpected draft." */
+            }
         }
-        newsym(mtmp->mx, mtmp->my);
         return FALSE;
     } else if (here->typ == SCORR) {
         here->typ = CORR, here->flags = 0;
@@ -2016,7 +2022,8 @@ rot_corpse(anything *arg, long timeout)
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(g.youmonst.data))
+        } else if (x == u.ux && y == u.uy
+                   && u.uundetected && hides_under(g.youmonst.data))
             (void) hideunder(&g.youmonst);
         newsym(x, y);
     } else if (in_invent)

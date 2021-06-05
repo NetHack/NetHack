@@ -421,6 +421,16 @@ typedef struct sortloot_item Loot;
 #define SUPPRESS_HISTORY 4
 #define URGENT_MESSAGE   8
 
+/* Lua callback functions */
+enum nhcore_calls {
+    NHCORE_START_NEW_GAME = 0,
+    NHCORE_RESTORE_OLD_GAME,
+    NHCORE_MOVELOOP_TURN,
+    NHCORE_GAME_EXIT,
+
+    NUM_NHCORE_CALLS
+};
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 enum bodypart_types {
     ARM       =  0,
@@ -475,6 +485,11 @@ enum bodypart_types {
 #define TELEDS_ALLOW_DRAG 1
 #define TELEDS_TELEPORT   2
 
+/* flags for mktrap() */
+#define MKTRAP_NOFLAGS       0x0
+#define MKTRAP_MAZEFLAG      0x1 /* trap placed on coords as if in maze */
+#define MKTRAP_NOSPIDERONWEB 0x2 /* web will not generate a spider */
+
 #define MON_POLE_DIST 5 /* How far monsters can use pole-weapons */
 #define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */
 
@@ -504,13 +519,20 @@ enum getobj_callback_returns {
      * without the "else" in "You don't have anything else to foo". */
     GETOBJ_EXCLUDE_SELECTABLE = 0,
     /* valid - invlet not presented in the summary or the ? menu as a
-     * recommendation, but is selectable if the player enters it anyway. Used
-     * for objects that are actually valid but unimportantly so, such as shirts
-     * for reading. */
+     * recommendation, but is selectable if the player enters it anyway.
+     * Used for objects that are actually valid but unimportantly so, such
+     * as shirts for reading. */
     GETOBJ_DOWNPLAY = 1,
     /* valid - will be shown in summary and ? menu */
     GETOBJ_SUGGEST  = 2,
 };
+
+/* constant passed to explode() for gas spores because gas spores are weird
+ * Specifically, this is an exception to the whole "explode() uses dobuzz types"
+ * system (the range -1 to -9 isn't used by it, for some reason), where this is
+ * effectively an extra dobuzz type, and some zap.c code needs to be aware of
+ * it.  */
+#define PHYS_EXPL_TYPE -1
 
 /*
  * option setting restrictions

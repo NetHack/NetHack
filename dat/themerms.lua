@@ -101,22 +101,21 @@ themerooms = {
    },
 
    -- Spider nest
-   {
-      mindiff = 10,
-      contents = function()
-         des.room({ type = "themed",
+   function()
+      des.room({ type = "themed",
                   contents = function(rm)
+                     local spooders = nh.level_difficulty() > 8;
                      for x = 0, rm.width - 1 do
                         for y = 0, rm.height - 1 do
                            if (percent(30)) then
-                              des.trap("web", x, y);
+                              des.trap({ type = "web", x = x, y = y,
+                                   spider_on_web = spooders and percent(80) });
                            end
                         end
                      end
                   end
-         });
-      end
-   },
+      });
+   end,
 
    -- Trap room
    function()
@@ -229,12 +228,12 @@ themerooms = {
                  contents = function(rm)
                     des.room({ type = "themed",
 			       x = (rm.width - 1) / 2, y = (rm.height - 1) / 2,
-			       w = 1, h = 1, joined = 0,
+			       w = 1, h = 1, joined = false,
                                contents = function()
                                   if (percent(50)) then
                                      local mons = { "M", "V", "L", "Z" };
                                      shuffle(mons);
-                                     des.monster(mons[1], 0,0);
+                                     des.monster({ class = mons[1], x=0,y=0, waiting = 1 });
                                   else
                                      des.object({ id = "corpse", montype = "@", coord = {0,0} });
                                   end
@@ -583,12 +582,12 @@ end });
                   end
                end
                p = placements[d(#placements)]
-               des.room({ type=ltype, x=p["lx"], y=p["ly"], w=3, h=3, filled=1, joined=0,
+               des.room({ type=ltype, x=p["lx"], y=p["ly"], w=3, h=3, filled=1, joined=false,
                            contents = function()
                      des.door({ state=shopdoorstate(), wall=p["lwall"] })
                   end
                });
-               des.room({ type=rtype, x=p["rx"], y=p["ry"], w=3, h=3, filled=1, joined=0,
+               des.room({ type=rtype, x=p["rx"], y=p["ry"], w=3, h=3, filled=1, joined=false,
                            contents = function()
                      des.door({ state=shopdoorstate(), wall=p["rwall"] })
                   end

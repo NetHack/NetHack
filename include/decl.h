@@ -717,6 +717,7 @@ struct instance_globals {
     char command_line[COLNO];
     long command_count;
     const char *multi_reason;
+    char multireasonbuf[QBUFSZ]; /* note: smaller than usual [BUFSZ] */
     int nroom;
     int nsubroom;
     int occtime;
@@ -961,6 +962,9 @@ struct instance_globals {
     int xmin, ymin, xmax, ymax; /* level boundaries */
     boolean ransacked;
 
+    /* mkobj.c */
+    boolean mkcorpstat_norevive; /* for trolls */
+
     /* mon.c */
     boolean vamp_rise_msg;
     boolean disintegested;
@@ -990,6 +994,9 @@ struct instance_globals {
     char lusername[MAX_LAN_USERNAME];
     int lusername_size;
 #endif
+
+    /* nhlua.c */
+    genericptr_t luacore; /* lua_State * */
 
     /* o_init.c */
     short disco[NUM_OBJECTS];
@@ -1150,10 +1157,6 @@ struct instance_globals {
 
     /* topten.c */
     winid toptenwin;
-#ifdef UPDATE_RECORD_IN_PLACE
-    long final_fpos;
-#endif
-
 
     /* trap.c */
     int force_mintrap; /* mintrap() should take a flags argument, but for time

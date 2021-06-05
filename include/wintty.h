@@ -202,7 +202,7 @@ E void tty_add_menu(winid, const glyph_info *, const ANY_P *, char, char,
 E void tty_end_menu(winid, const char *);
 E int tty_select_menu(winid, int, MENU_ITEM_P **);
 E char tty_message_menu(char, int, const char *);
-E void tty_update_inventory(void);
+E void tty_update_inventory(int);
 E void tty_mark_synch(void);
 E void tty_wait_synch(void);
 #ifdef CLIPPING

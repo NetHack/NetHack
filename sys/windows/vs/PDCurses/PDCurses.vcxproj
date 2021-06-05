@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\dirs.props" />
+  <Import Project="$(vsDir)config.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PDCurses</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(vsDir)default_lib.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemGroup>
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\addch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\addchstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\addstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\attr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\beep.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\bkgd.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\border.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\clear.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\color.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\debug.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\delch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\deleteln.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\getyx.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\inch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\inchstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\initscr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\inopts.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\insch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\insstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\kernel.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\keyname.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\mouse.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\move.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\outopts.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\overlay.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\pad.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\panel.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\printw.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\refresh.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\scanw.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\scroll.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\scr_dump.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\slk.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\termattr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\touch.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\util.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\window.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcclip.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcdisp.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcgetsc.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdckbd.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcscrn.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcsetsc.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcutil.c" />
+  </ItemGroup>
+  <PropertyGroup >
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <DisableSpecificWarnings>4996;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <OmitDefaultLibName>true</OmitDefaultLibName>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

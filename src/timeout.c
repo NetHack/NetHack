@@ -499,6 +499,9 @@ nh_timeout(void)
     if (flags.friday13)
         baseluck -= 1;
 
+    if (g.quest_status.killed_leader)
+        baseluck -= 4;
+
     if (u.uluck != baseluck
         && g.moves % ((u.uhave.amulet || u.ugangr) ? 300 : 600) == 0) {
         /* Cursed luckstones stop bad luck from timing out; blessed luckstones

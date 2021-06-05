@@ -234,9 +234,9 @@ const char *mesg;
 }
 
 void
-chainin_update_inventory()
+chainin_update_inventory(int arg)
 {
-    (*cibase->nprocs->win_update_inventory)(cibase->ndata);
+    (*cibase->nprocs->win_update_inventory)(cibase->ndata, arg);
 }
 
 void

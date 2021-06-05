@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1611445282 2021/01/23 23:41:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.947 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1620923916 2021/05/13 16:38:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.971 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -210,7 +210,6 @@ extern void pushch(char);
 extern void savech(char);
 extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);
-extern uchar txt2key(char *);
 extern void parseautocomplete(char *, boolean);
 extern void reset_commands(boolean);
 extern void rhack(char *);
@@ -619,6 +618,7 @@ extern boolean On_W_tower_level(d_level *);
 extern boolean In_W_tower(int, int, d_level *);
 extern void find_hell(d_level *);
 extern void goto_hell(boolean, boolean);
+extern boolean single_level_branch(d_level *);
 extern void assign_level(d_level *, d_level *);
 extern void assign_rnd_level(d_level *, d_level *, int);
 extern unsigned int induced_align(int);
@@ -647,6 +647,7 @@ extern boolean is_edible(struct obj *);
 extern void init_uhunger(void);
 extern int Hear_again(void);
 extern void reset_eat(void);
+extern unsigned obj_nutrition(struct obj *);
 extern int doeat(void);
 extern int use_tin_opener(struct obj *);
 extern void gethungry(void);
@@ -654,6 +655,7 @@ extern void morehungry(int);
 extern void lesshungry(int);
 extern boolean is_fainted(void);
 extern void reset_faint(void);
+extern int corpse_intrinsic(struct permonst *);
 extern void violated_vegetarian(void);
 extern void newuhs(boolean);
 extern struct obj *floorfood(const char *, int);
@@ -664,6 +666,7 @@ extern void food_substitution(struct obj *, struct obj *);
 extern void eating_conducts(struct permonst *);
 extern int eat_brains(struct monst *, struct monst *, boolean, int *);
 extern void fix_petrification(void);
+extern boolean should_givit(int, struct permonst *);
 extern void consume_oeaten(struct obj *, int);
 extern boolean maybe_finished_meal(boolean);
 extern void set_tin_variety(struct obj *, int);
@@ -734,6 +737,8 @@ extern void explode(int, int, int, int, char, int);
 extern long scatter(int, int, int, unsigned int, struct obj *);
 extern void splatter_burning_oil(int, int, boolean);
 extern void explode_oil(struct obj *, int, int);
+extern int adtyp_to_expltype(int);
+extern void mon_explodes(struct monst *, struct attack *);
 
 /* ### extralev.c ### */
 
@@ -940,7 +945,7 @@ extern void strbuf_append(strbuf_t *, const char *);
 extern void strbuf_reserve(strbuf_t *, int);
 extern void strbuf_empty(strbuf_t *);
 extern void strbuf_nl_to_crlf(strbuf_t *);
-extern char *nonconst(const char *, char *);
+extern char *nonconst(const char *, char *, size_t);
 extern int swapbits(int, int, int);
 extern void shuffle_int_array(int *, int);
 /* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
@@ -1020,6 +1025,7 @@ extern int count_unidentified(struct obj *);
 extern void identify_pack(int, boolean);
 extern void learn_unseen_invent(void);
 extern void update_inventory(void);
+extern int doperminv(void);
 extern void prinv(const char *, struct obj *, long);
 extern char *xprname(struct obj *, const char *, char, boolean, long, long);
 extern int ddoinv(void);
@@ -1046,6 +1052,7 @@ extern void useupf(struct obj *, long);
 extern char *let_to_name(char, boolean, boolean);
 extern void free_invbuf(void);
 extern void reassign(void);
+extern boolean check_invent_gold(const char *);
 extern int doorganize(void);
 extern void free_pickinv_cache(void);
 extern int count_unpaid(struct obj *);
@@ -1168,6 +1175,7 @@ extern boolean usmellmon(struct permonst *);
 /* ### mcastu.c ### */
 
 extern int castmu(struct monst *, struct attack *, boolean, boolean);
+extern void touch_of_death(void);
 extern int buzzmu(struct monst *, struct attack *);
 
 /* ### mdlib.c ### */
@@ -1304,6 +1312,8 @@ extern void replace_object(struct obj *, struct obj *);
 extern struct obj *unknwn_contnr_contents(struct obj *);
 extern void bill_dummy_object(struct obj *);
 extern void costly_alteration(struct obj *, int);
+extern void clear_dknown(struct obj *);
+extern void unknow_object(struct obj *);
 extern struct obj *mksobj(int, boolean, boolean);
 extern int bcsign(struct obj *);
 extern int weight(struct obj *);
@@ -1373,7 +1383,7 @@ extern int cmap_to_type(int);
 /* ### mon.c ### */
 
 extern void mon_sanity_check(void);
-extern boolean zombie_maker(struct permonst *);
+extern boolean zombie_maker(struct monst *);
 extern int zombie_form(struct permonst *);
 extern int m_poisongas_ok(struct monst *);
 extern int undead_to_corpse(int);
@@ -1384,6 +1394,7 @@ extern int movemon(void);
 extern int meatmetal(struct monst *);
 extern int meatobj(struct monst *);
 extern int meatcorpse(struct monst *);
+extern void mon_givit(struct monst *, struct permonst *);
 extern void mpickgold(struct monst *);
 extern boolean mpickstuff(struct monst *, const char *);
 extern int curr_mon_load(struct monst *);
@@ -1486,11 +1497,14 @@ extern const char *stagger(const struct permonst *, const char *);
 extern const char *on_fire(struct permonst *, struct attack *);
 extern const struct permonst *raceptr(struct monst *);
 extern boolean olfaction(struct permonst *);
+unsigned long cvt_adtyp_to_mseenres(uchar);
+extern void monstseesu(unsigned long);
+extern boolean resist_conflict(struct monst *);
 
 /* ### monmove.c ### */
 
 extern boolean itsstuck(struct monst *);
-extern boolean mb_trapped(struct monst *);
+extern boolean mb_trapped(struct monst *, boolean);
 extern boolean monhaskey(struct monst *, boolean);
 extern void mon_regen(struct monst *, boolean);
 extern int dochugw(struct monst *);
@@ -1525,7 +1539,7 @@ extern void mplayer_talk(struct monst *);
 
 #if defined(MICRO) || defined(WIN32)
 
-/* ### msdos.c,os2.c,tos.c,winnt.c ### */
+/* ### msdos.c,os2.c,tos.c,windsys.c ### */
 
 #ifndef WIN32
 extern int tgetch(void);
@@ -1551,7 +1565,7 @@ extern void chdrive(char *);
 extern void disable_ctrlP(void);
 extern void enable_ctrlP(void);
 #endif
-#if defined(MICRO) && !defined(WINNT)
+#if defined(MICRO) && !defined(WIN32)
 extern void get_scr_size(void);
 #ifndef TOS
 extern void gotoxy(int, int);
@@ -1648,6 +1662,9 @@ extern int l_obj_register(lua_State *);
 /* ### nhlua.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
+extern void l_nhcore_init(void);
+extern void l_nhcore_done(void);
+extern void l_nhcore_call(int);
 extern lua_State * nhl_init(void);
 extern void nhl_done(lua_State *);
 extern boolean nhl_loadlua(lua_State *, const char *);
@@ -1682,19 +1699,19 @@ extern const char *regex_error_desc(struct nhregex *);
 extern boolean regex_match(const char *, struct nhregex *);
 extern void regex_free(struct nhregex *);
 
-/* ### nttty.c ### */
+/* ### consoletty.c ### */
 
 #ifdef WIN32
 extern void get_scr_size(void);
-extern int nttty_kbhit(void);
-extern void nttty_open(int);
-extern void nttty_rubout(void);
+extern int consoletty_kbhit(void);
+extern void consoletty_open(int);
+extern void consoletty_rubout(void);
 extern int tgetch(void);
-extern int ntposkey(int *, int *, int *);
+extern int console_poskey(int *, int *, int *);
 extern void set_output_mode(int);
 extern void synch_cursor(void);
-extern void nethack_enter_nttty(void);
-extern void nttty_exit(void);
+extern void nethack_enter_consoletty(void);
+extern void consoletty_exit(void);
 #endif /* WIN32 */
 
 /* ### o_init.c ### */
@@ -1784,6 +1801,7 @@ extern int shiny_obj(char);
 /* ### options.c ### */
 
 extern boolean match_optname(const char *, const char *, int, boolean);
+extern uchar txt2key(char *);
 extern void initoptions(void);
 extern void initoptions_init(void);
 extern void initoptions_finish(void);
@@ -1800,6 +1818,7 @@ extern void oc_to_str(char *, char *);
 extern void add_menu_cmd_alias(char, char);
 extern char get_menu_cmd_key(char);
 extern char map_menu_cmd(char);
+extern char *collect_menu_keys(char *, unsigned, boolean);
 extern void show_menu_controls(winid, boolean);
 extern void assign_warnings(uchar *);
 extern char *nh_getenv(const char *);
@@ -2048,6 +2067,7 @@ extern void free_epri(struct monst *);
 
 extern void onquest(void);
 extern void nemdead(void);
+extern void leaddead(void);
 extern void artitouch(struct obj *);
 extern boolean ok_to_quest(void);
 extern void leader_speaks(struct monst *);
@@ -2633,6 +2653,7 @@ extern void u_init(void);
 
 /* ### uhitm.c ### */
 
+extern void dynamic_multi_reason(struct monst *, const char *, boolean);
 extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);
@@ -2725,6 +2746,7 @@ extern boolean do_stone_u(struct monst *);
 extern void do_stone_mon(struct monst *, struct attack *, struct monst *,
                          struct mhitm_data *);
 extern int damageum(struct monst *, struct attack *, int);
+extern int explum(struct monst *, struct attack *);
 extern void missum(struct monst *, struct attack *, boolean);
 extern int passive(struct monst *, struct obj *, boolean, boolean, uchar,
                    boolean);
@@ -3039,10 +3061,10 @@ extern char *decode_mixed(char *, const char *);
 extern void genl_putmixed(winid, int, const char *);
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 
-/* ### winnt.c ### */
+/* ### windows.c ### */
 
 #ifdef WIN32
-extern void nethack_enter_winnt(void);
+extern void nethack_enter_windows(void);
 #endif
 
 /* ### wizard.c ### */
@@ -3119,6 +3141,7 @@ extern int dowrite(struct obj *);
 
 extern void learnwand(struct obj *);
 extern int bhitm(struct monst *, struct obj *);
+extern void release_hold(void);
 extern void probe_monster(struct monst *);
 extern boolean get_obj_location(struct obj *, xchar *, xchar *, int);
 extern boolean get_mon_location(struct monst *, xchar *, xchar *, int);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	pray.c	$NHDT-Date: 1596498198 2020/08/03 23:43:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.7	pray.c	$NHDT-Date: 1621208529 2021/05/16 23:42:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -597,9 +597,11 @@ god_zaps_you(aligntyp resp_god)
                 pline("For some reason you're unaffected.");
             else
                 (void) ureflects("%s reflects from your %s.", "It");
+            monstseesu(M_SEEN_REFL);
         } else if (Shock_resistance) {
             shieldeff(u.ux, u.uy);
             pline("It seems not to affect you.");
+            monstseesu(M_SEEN_ELEC);
         } else
             fry_by_god(resp_god, FALSE);
     }
@@ -635,6 +637,7 @@ god_zaps_you(aligntyp resp_god)
         } else {
             You("bask in its %s glow for a minute...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
+            monstseesu(M_SEEN_DISINT);
         }
         if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
             /* one more try for high altars */
@@ -1210,13 +1213,22 @@ pleased(aligntyp g_align)
     if (kick_on_butt)
         u.ublesscnt += kick_on_butt * rnz(1000);
 
-    /* Avoid games that go into infinite loops of copy-pasted commands with no
-       human interaction; this is a DoS vector against the computer running
-       NetHack. Once the turn counter is over 100000, every additional 100 turns
-       increases the prayer timeout by 1, thus eventually nutrition prayers will
-       fail and some other source of nutrition will be required. */
-    if (g.moves > 100000L)
-        u.ublesscnt += (g.moves - 100000L) / 100;
+    /* Avoid games that go into infinite loops of copy-pasted commands
+       with no human interaction; this is a DoS vector against the
+       computer running NetHack.  Once the turn counter is over 100000,
+       every additional 100 turns increases the prayer timeout by 1,
+       thus eventually hunger prayers will fail and some other source
+       of nutrition will be required.  The increase gets throttled if
+       it ever reaches 32K so that configurations using 16-bit ints are
+       still viable. */
+    if (g.moves > 100000L) {
+        long incr = (g.moves - 100000L) / 100L,
+             largest_ublesscnt_incr = (long) (LARGEST_INT - u.ublesscnt);
+
+        if (incr > largest_ublesscnt_incr)
+            incr = largest_ublesscnt_incr;
+        u.ublesscnt += (int) incr;
+    }
 
     return;
 }

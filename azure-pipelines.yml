@@ -1,20 +1,20 @@
 strategy:
   matrix:
-    linux_focal_gcc8_minimal:
+    linux_focal_gcc9_minimal:
       imageName: 'ubuntu-20.04'
-      toolchainName: gcc8
+      toolchainName: gcc9
       buildTargetName: minimal
     linux_focal_clang_all:
       imageName: 'ubuntu-20.04'
       toolchainName: clang
       buildTargetName: all
-    linux_focal_gcc8_all:
-      imageName: 'ubuntu-20.04'
-      toolchainName: gcc8
-      buildTargetName: all
     linux_focal_gcc9_all:
       imageName: 'ubuntu-20.04'
       toolchainName: gcc9
+      buildTargetName: all
+    linux_focal_gcc10_all:
+      imageName: 'ubuntu-20.04'
+      toolchainName: gcc10
       buildTargetName: all
     linux_bionic_gcc7_all:
       imageName: 'ubuntu-18.04'
@@ -66,11 +66,6 @@ steps:
       echo "##vso[task.setvariable variable=CC]gcc-7"
       echo "##vso[task.setvariable variable=CXX]g++-7"
     fi
-    if [ "$(toolchain)" == "gcc8" ]
-    then
-      echo "##vso[task.setvariable variable=CC]gcc-8"
-      echo "##vso[task.setvariable variable=CXX]g++-8"
-    fi
     if [ "$(toolchain)" == "gcc9" ]
     then
       echo "##vso[task.setvariable variable=CC]gcc-9"
@@ -88,8 +83,8 @@ steps:
     fi
     if [ "$(toolchain)" == "cross" ]
     then
-      echo "##vso[task.setvariable variable=CC]gcc-8"
-      echo "##vso[task.setvariable variable=CXX]g++-8"
+      echo "##vso[task.setvariable variable=CC]gcc-9"
+      echo "##vso[task.setvariable variable=CXX]g++-9"
     fi
   displayName: 'Setting variables'
 
@@ -116,13 +111,19 @@ steps:
   inputs:
     contents: NetHackPackage_StoreKey.pfx
     SourceFolder: $(Agent.TempDirectory)
-    TargetFolder: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs
+    TargetFolder: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs
   condition: eq( variables.toolchain, 'vs' )
   displayName: 'Copying store key'
 
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln'
+    feedsToUse: 'select'
+
 - task: MSBuild@1
   inputs:
-    solution: $(Agent.BuildDirectory)/$(netHackPath)/win/win32/vs/NetHack.sln
+    solution: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln
     platform: Win32
     configuration: Debug
   condition: eq( variables.toolchain, 'vs' )
@@ -135,9 +136,9 @@ steps:
     export LUASRC=../submodules/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcurses
-    export LUA_VERSION=5.4.2
+    export LUA_VERSION=5.4.3
     export TRAVIS_COMPILER=1
-    cp ../sys/winnt/Makefile.gcc ./Makefile
+    cp ../sys/windows/Makefile.gcc ./Makefile
     mingw32-make LUA_VERSION=$LUA_VERSION install
   condition: eq( variables.toolchain, 'mingw' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src
@@ -207,8 +208,8 @@ steps:
     cd ../..
     make fetch-lua
     sh sys/msdos/fetch-cross-compiler.sh
-    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
-    make LUA_VERSION=5.4.2 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+    make LUA_VERSION=5.4.3 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
+    make LUA_VERSION=5.4.3 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building MSDOS build'

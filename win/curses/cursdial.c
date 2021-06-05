@@ -50,14 +50,14 @@ typedef struct nhm {
     const char *prompt;         /* Menu prompt text */
     nhmenu_item *entries;       /* Menu entries */
     int num_entries;            /* Number of menu entries */
-    int num_pages;              /* Number of display pages for entry */
+    int num_pages;              /* Number of display pages for menu */
     int height;                 /* Window height of menu */
     int width;                  /* Window width of menu */
     unsigned long mbehavior;    /* menu flags */
     boolean reuse_accels;       /* Non-unique accelerators per page */
     boolean bottom_heavy;       /* display multi-page menu starting at end */
-    struct nhm *prev_menu;      /* Pointer to previous entry */
-    struct nhm *next_menu;      /* Pointer to next entry */
+    struct nhm *prev_menu;      /* Pointer to previous menu */
+    struct nhm *next_menu;      /* Pointer to next menu */
 } nhmenu;
 
 typedef enum menu_op_type {
@@ -877,7 +877,6 @@ get_menu(winid wid)
     return NULL;                /* Not found */
 }
 
-
 static char
 menu_get_accel(boolean first)
 {
@@ -1239,16 +1238,16 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
             start_col += 2;
         }
 #endif
-        color = NO_COLOR;
+        color = NONE;
         menu_color = iflags.use_menu_color
                      && get_menu_coloring(menu_item_ptr->str, &color, &attr);
         if (menu_color) {
             attr = curses_convert_attr(attr);
-            if (color != NO_COLOR || attr != A_NORMAL)
+            if (color != NONE || attr != A_NORMAL)
                 curses_menu_color_attr(win, color, attr, ON);
         } else {
             attr = menu_item_ptr->attr;
-            if (color != NO_COLOR || attr != A_NORMAL)
+            if (color != NONE || attr != A_NORMAL)
                 curses_toggle_color_attr(win, color, attr, ON);
         }
 
@@ -1262,7 +1261,7 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
                 free(tmpstr);
             }
         }
-        if (color != NO_COLOR || attr != A_NORMAL) {
+        if (color != NONE || attr != A_NORMAL) {
             if (menu_color)
                 curses_menu_color_attr(win, color, attr, OFF);
             else
@@ -1301,9 +1300,138 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
     wrefresh(win);
 }
 
+/* split out from menu_get_selections() so that perm_invent scrolling
+   can be controlled from outside the normal menu activity */
+boolean
+curs_nonselect_menu_action(WINDOW *win, void *menu_v, int how,
+                           int curletter, int *curpage_p,
+                           char selectors[256], int *num_selected_p)
+{
+    nhmenu_item *menu_item_ptr;
+    nhmenu *menu = (nhmenu *) menu_v;
+    boolean dismiss = FALSE;
+    int menucmd = (curletter <= 0 || curletter >= 255) ? curletter
+                  : (int) (uchar) map_menu_cmd(curletter);
+
+    switch (menucmd) {
+    case KEY_ESC:
+        *num_selected_p = -1;
+        dismiss = TRUE;
+        break;
+    case '\n':
+    case '\r':
+        dismiss = TRUE;
+        break;
+#ifdef NCURSES_MOUSE_VERSION
+    case KEY_MOUSE: {
+        MEVENT mev;
+
+        if (getmouse(&mev) == OK && how != PICK_NONE) {
+            if (wmouse_trafo(win, &mev.y, &mev.x, FALSE)) {
+                int y = mev.y;
+
+                menu_item_ptr = get_menuitem_y(menu, win, *curpage_p, y);
+
+                if (menu_item_ptr) {
+                    if (how == PICK_ONE) {
+                        menu_clear_selections(menu);
+                        menu_select_deselect(win, menu_item_ptr,
+                                             SELECT, *curpage_p);
+                        *num_selected_p = 1;
+                        dismiss = TRUE;
+                    } else {
+                        menu_select_deselect(win, menu_item_ptr,
+                                             INVERT, *curpage_p);
+                    }
+                }
+            }
+        }
+        break;
+    } /* case KEY_MOUSE */
+#endif /*NCURSES_MOUSE_VERSION*/
+    case KEY_RIGHT:
+    case KEY_NPAGE:
+    case MENU_NEXT_PAGE:
+    case ' ':
+        if (*curpage_p < menu->num_pages) {
+             ++(*curpage_p);
+            menu_display_page(menu, win, *curpage_p, selectors);
+        } else if (menucmd == ' ') {
+            dismiss = TRUE;
+            break;
+        }
+        break;
+    case KEY_LEFT:
+    case KEY_PPAGE:
+    case MENU_PREVIOUS_PAGE:
+        if (*curpage_p > 1) {
+            --(*curpage_p);
+            menu_display_page(menu, win, *curpage_p, selectors);
+        }
+        break;
+    case KEY_END:
+    case MENU_LAST_PAGE:
+        if (*curpage_p != menu->num_pages) {
+            *curpage_p = menu->num_pages;
+            menu_display_page(menu, win, *curpage_p, selectors);
+        }
+        break;
+    case KEY_HOME:
+    case MENU_FIRST_PAGE:
+        if (*curpage_p != 1) {
+            *curpage_p = 1;
+            menu_display_page(menu, win, *curpage_p, selectors);
+        }
+        break;
+    case MENU_SEARCH: {
+        char search_key[BUFSZ];
+
+        search_key[0] = '\0';
+        curses_line_input_dialog("Search for:", search_key, BUFSZ);
+
+        refresh();
+        touchwin(win);
+        wrefresh(win);
+
+        if (!*search_key)
+            break;
+
+        menu_item_ptr = menu->entries;
+
+        while (menu_item_ptr != NULL) {
+            if (menu_item_ptr->identifier.a_void != NULL
+                && strstri(menu_item_ptr->str, search_key)) {
+                if (how == PICK_ONE) {
+                    menu_clear_selections(menu);
+                    menu_select_deselect(win, menu_item_ptr,
+                                         SELECT, *curpage_p);
+                    *num_selected_p = 1;
+                    dismiss = TRUE;
+                    break;
+                } else {
+                    menu_select_deselect(win, menu_item_ptr,
+                                         INVERT, *curpage_p);
+                }
+            }
+            menu_item_ptr = menu_item_ptr->next_item;
+        }
+
+        menu_item_ptr = menu->entries;
+        break;
+    } /* case MENU_SEARCH */
+    default:
+        if (how == PICK_NONE) {
+            *num_selected_p = 0;
+            dismiss = TRUE;
+            break;
+        }
+    }
+
+    return dismiss;
+}
 
 static int
-menu_get_selections(WINDOW * win, nhmenu *menu, int how)
+menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 {
     int curletter, menucmd;
     int count = -1;
@@ -1311,7 +1439,7 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
     int curpage = !menu->bottom_heavy ? 1 : menu->num_pages;
     int num_selected = 0;
     boolean dismiss = FALSE;
-    char search_key[BUFSZ], selectors[256];
+    char selectors[256];
     nhmenu_item *menu_item_ptr = menu->entries;
 
     menu_display_page(menu, win, curpage, selectors);
@@ -1379,119 +1507,11 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
         }
 
         if (curletter <= 0 || curletter >= 256 || !selectors[curletter]) {
-            menucmd = (curletter <= 0 || curletter >= 255) ? curletter
-                      : (int) (uchar) map_menu_cmd(curletter);
-            switch (menucmd) {
-            case KEY_ESC:
-                num_selected = -1;
-                dismiss = TRUE;
-                break;
-            case '\n':
-            case '\r':
-                dismiss = TRUE;
-                break;
-#ifdef NCURSES_MOUSE_VERSION
-            case KEY_MOUSE: {
-                MEVENT mev;
-
-                if (getmouse(&mev) == OK && how != PICK_NONE) {
-                    if (wmouse_trafo(win, &mev.y, &mev.x, FALSE)) {
-                        int y = mev.y;
-
-                        menu_item_ptr = get_menuitem_y(menu, win, curpage, y);
-
-                        if (menu_item_ptr) {
-                            if (how == PICK_ONE) {
-                                menu_clear_selections(menu);
-                                menu_select_deselect(win, menu_item_ptr,
-                                                     SELECT, curpage);
-                                num_selected = 1;
-                                dismiss = TRUE;
-                            } else {
-                                menu_select_deselect(win, menu_item_ptr,
-                                                     INVERT, curpage);
-                            }
-                        }
-                    }
-                }
-            }
-                break;
-#endif /*NCURSES_MOUSE_VERSION*/
-            case KEY_RIGHT:
-            case KEY_NPAGE:
-            case MENU_NEXT_PAGE:
-            case ' ':
-                if (curpage < menu->num_pages) {
-                    curpage++;
-                    menu_display_page(menu, win, curpage, selectors);
-                } else if (curletter == ' ') {
-                    dismiss = TRUE;
-                    break;
-                }
-                break;
-            case KEY_LEFT:
-            case KEY_PPAGE:
-            case MENU_PREVIOUS_PAGE:
-                if (curpage > 1) {
-                     curpage--;
-                     menu_display_page(menu, win, curpage, selectors);
-                }
-                break;
-            case KEY_END:
-            case MENU_LAST_PAGE:
-                if (curpage != menu->num_pages) {
-                    curpage = menu->num_pages;
-                    menu_display_page(menu, win, curpage, selectors);
-                }
-                break;
-            case KEY_HOME:
-            case MENU_FIRST_PAGE:
-                if (curpage != 1) {
-                    curpage = 1;
-                    menu_display_page(menu, win, curpage, selectors);
-                }
-                break;
-            case MENU_SEARCH:
-                search_key[0] = '\0';
-                curses_line_input_dialog("Search for:", search_key, BUFSZ);
-
-                refresh();
-                touchwin(win);
-                wrefresh(win);
-
-                if (!*search_key)
-                    break;
-
-                menu_item_ptr = menu->entries;
-
-                while (menu_item_ptr != NULL) {
-                    if (menu_item_ptr->identifier.a_void != NULL
-                        && strstri(menu_item_ptr->str, search_key)) {
-                        if (how == PICK_ONE) {
-                            menu_clear_selections(menu);
-                            menu_select_deselect(win, menu_item_ptr,
-                                                 SELECT, curpage);
-                            num_selected = 1;
-                            dismiss = TRUE;
-                            break;
-                        } else {
-                            menu_select_deselect(win, menu_item_ptr,
-                                                 INVERT, curpage);
-                        }
-                    }
-
-                    menu_item_ptr = menu_item_ptr->next_item;
-                }
-
-                menu_item_ptr = menu->entries;
-                break;
-            default:
-                if (how == PICK_NONE) {
-                    num_selected = 0;
-                    dismiss = TRUE;
-                    break;
-                }
-            }
+            dismiss = curs_nonselect_menu_action(win, (void *) menu, how,
+                                                 curletter, &curpage,
+                                                 selectors, &num_selected);
+            if (num_selected == -1)
+                return -1;
         }
 
         menu_item_ptr = menu->entries;
@@ -1548,7 +1568,6 @@ menu_get_selections(WINDOW * win, nhmenu *menu, int how)
 
     return num_selected;
 }
-
 
 /* Select, deselect, or toggle selected for the given menu entry.
    For search operations, the toggled entry might be on a different

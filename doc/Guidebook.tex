@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{February 11, 2021}
+\date{March 25, 2021}
 
 \maketitle
 
@@ -875,8 +875,12 @@ often useful to give yourself a breather.
 Fire (shoot or throw) one of the objects placed in your quiver (or
 quiver sack, or that you have at the ready).
 You may select ammunition with a previous `{\tt Q}' command, or let the
-computer pick something appropriate if {\it autoquiver\/} is true.\\
+computer pick something appropriate if {\it autoquiver\/} is true.
+If your wielded weapon has the throw-and-return property, your quiver
+is empty, and {\it autoquiver\/}
+is false, you will throw that wielded weapon instead of filling the quiver.
 %.lp ""
+\\
 See also `{\tt t}' (throw) for more general throwing and shooting.
 %.lp
 \item[\tb{i}]
@@ -949,11 +953,7 @@ Quaff (drink) something (potion, water, etc).
 \item[\tb{Q}]
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).  You can then throw
-this (or one of these) using
-the `f' command.\\
-%.lp ""
-(In versions prior to 3.3 this was the command to quit
-the game, which has been moved to ``{\tt \#quit}''.)
+this (or one of these) using the `f' command.
 %.lp
 \item[\tb{r}]
 Read a scroll or spellbook.
@@ -1174,6 +1174,23 @@ Show discovered types for one class of objects.
 \\
 .lp ""
 May be preceded by `{\tt m}' to select preferred display order.
+
+%.lp
+\item[\tb{|}]
+If persistent inventory display is supported and enabled (with the
+{\it perm_invent\/}
+option), interact with it instead of with the map.
+\\
+%.lp ""
+Allows scrolling with the
+menu\verb+_+first\verb+_+page, menu\verb+_+previous\verb+_+page,
+menu\verb+_+next\verb+_+page, and menu\verb+_+last\verb+_+page
+keys (`{\tt \^{}}', `{\tt <}', `{\tt >}', `{\tt \verb+|+}' by default).
+Some interfaces also support menu_shift_left and menu_shift_right
+keys (`{\tt \verb+{+}' and `{\tt \verb+}+}' by default).
+Use the {\it Return\/} (aka {\it Enter\/}) or {\it Escape\/} key to
+resume play.
+
 %.lp
 \item[\tb{!}]
 Escape to a shell.
@@ -1440,6 +1457,14 @@ option to require a response of ``{\tt yes}'' instead.
 \item[\tb{\#pay}]
 Pay your shopping bill. Default key is `{\tt p}'.
 %.lp
+\item[\tb{\#perminv}]
+If persistent inventory display is supported and enabled (with the
+{\it perm\verb+_+invent\/} option), interact with it instead of with the map.
+You'll be prompted for menu scrolling keystrokes such
+as `{\tt >}' and `\{\tt <}'.
+Press {\tt RReturn} or {\tt Escape} to resume normal play.
+Default key is {\tt \verb+|+}.
+%.lp
 \item[\tb{\#pickup}]
 Pick up things at the current location. Default key is `{\tt ,}'.
 The `{\tt m}' prefix forces use of a menu.
@@ -1471,8 +1496,7 @@ Put on an accessory (ring, amulet, etc). Default key is `{\tt P}'.
 Quaff (drink) something. Default key is `{\tt q}'.
 %.lp
 \item[\tb{\#quit}]
-Quit the program without saving your game. Autocompletes.
-Default key is `{\tt M-q}'.\\
+Quit the program without saving your game. Autocompletes.\\
 %.lp ""
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.
@@ -1864,9 +1888,6 @@ another command, so the three key combination meta+shift+letter is needed.
 \item[\tb{M-p}]
 {\tt\#pray}
 %.Ip
-\item[\tb{M-q}]
-{\tt\#quit}
-%.lp
 \item[\tb{M-r}]
 {\tt\#rub}
 %.lp
@@ -2629,6 +2650,17 @@ much farther and will be more likely to hit when thrown while you are
 wielding a bow.
 
 %.pg
+Some weapons will return when thrown.
+A boomerang---provided it fails to hit anything---is an obvious example.
+If an aklys (thonged club) is thrown while it is wielded, it will return
+even when it hits something.
+A sufficiently strong hero can throw the warhammer {\it Mjollnir\/};
+when thrown by a {\it Valkyrie\/} it will return too.
+However, aklyses and {\it Mjollnir\/} occasionally fail to return.
+Returning thrown objects occasionally fail to be caught, sometimes even
+hitting the thrower, but when caught they become re-wielded.
+
+%.pg
 You can simplify the throwing operation by using the `{\tt Q}' command to
 select your preferred ``missile'', then using the `{\tt f}' command to
 throw it.  You'll be prompted for a direction as above, but you don't
@@ -2638,10 +2670,14 @@ also an option,
 which has {\it NetHack\/} choose another item to automatically fill your
 quiver (or quiver sack, or have at the ready) when the inventory slot used
 for `{\tt Q}' runs out.
+If your quiver is empty, {\it autoquiver\/}
+is false, and you are wielding a weapon which returns when thrown,
+you will throw that weapon instead of filling the quiver.
 
 %.pg
-Some characters have the ability to fire a volley of multiple items in a
-single turn.  Knowing how to load several rounds of ammunition at
+Some characters have the ability to throw or shoot a volley of multiple
+items (from the same stack) in a single action.
+Knowing how to load several rounds of ammunition at
 once---or hold several missiles in your hand---and
 still hit a target is not an easy task.
 Rangers are among those who are adept
@@ -4082,15 +4118,15 @@ objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
 \item[\ib{menu\verb+_+deselect\verb+_+all}]
-Menu character accelerator to deselect all items in a menu.
+Key to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `-'.
 \item[\ib{menu\verb+_+deselect\verb+_+page}]
-Menu character accelerator to deselect all items on this page of a menu.
+Key to deselect all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+\+'.
 \item[\ib{menu\verb+_+first\verb+_+page}]
-Menu character accelerator to jump to the first page in a menu.
+Key to jump to the first page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+^+'.
 \item[\ib{menu\verb+_+headings}]
@@ -4099,19 +4135,19 @@ Values are ``{\tt none}'', ``{\tt bold}'', ``{\tt dim}'',
 ``{\tt underline}'', ``{\tt blink}'', or ``{\tt inverse}''.
 Not all ports can actually display all types.
 \item[\ib{menu\verb+_+invert\verb+_+all}]
-Menu character accelerator to invert all items in a menu.
+Key to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `@'.
 \item[\ib{menu\verb+_+invert\verb+_+page}]
-Menu character accelerator to invert all items on this page of a menu.
+Key to invert all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+~+'.
 \item[\ib{menu\verb+_+last\verb+_+page}]
-Menu character accelerator to jump to the last page in a menu.
+Key to jump to the last page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+|+'.
 \item[\ib{menu\verb+_+next\verb+_+page}]
-Menu character accelerator to goto the next menu page.
+Key to go to the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+>+'.
 \item[\ib{menu\verb+_+objsyms}]
@@ -4122,21 +4158,34 @@ Do not clear the screen before drawing menus, and align
 menus to the right edge of the screen. Only for the tty port.
 (default on)
 \item[\ib{menu\verb+_+previous\verb+_+page}]
-Menu character accelerator to goto the previous menu page.
+Key to go to the previous menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+<+'.
 \item[\ib{menu\verb+_+search}]
-Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem, X11 and tty ports.
+Key to search for a menu item.
 Default `:'.
 \item[\ib{menu\verb+_+select\verb+_+all}]
-Menu character accelerator to select all items in a menu.
+Key to select all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `.'.
 \item[\ib{menu\verb+_+select\verb+_+page}]
-Menu character accelerator to select all items on this page of a menu.
+Key to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
+
+%.lp
+\item[\ib{menu\verb+_+shift\verb+_+left}]
+Key to scroll a menu---one which has been
+scrolled right---back to the left.
+Implemented for {\it perm\verb+_+invent\/} only by curses and X11.
+Default `{\tt \verb+{+}'.
+
+%.lp
+\item[\ib{menu\verb+_+shift\verb+_+right}]
+Key to scroll a menu which has text beyond the
+right edge to the right.
+Implemented for {\it perm\verb+_+invent\/} only by curses by X11.
+Default `{\tt \verb+}+}'.
 % %.lp
 % \item[\ib{menu\verb+_+tab\verb+_+sep}]
 % Format menu entries using TAB to separate columns (default off).
@@ -5126,7 +5175,7 @@ For example:
 
 \begin{verbatim}
     BIND=^X:getpos.autodescribe
-    BIND={:menu_first_page
+    BIND=\:menu_first_page
     BIND=v:loot
 \end{verbatim}
 
@@ -5141,7 +5190,8 @@ the ``{\tt <esc>}'', ``{\tt <enter>}'', and ``{\tt <space>}'' keys.
 \item[\tb{Menu accelerator keys}]
 The menu control or accelerator keys can also be rebound via OPTIONS lines
 in the configuration file.
-You cannot bind object symbols into menu accelerators.
+You cannot bind object symbols or selection letters into menu accelerators.
+Some interfaces only support some of the menu accelerators.
 
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
@@ -6649,13 +6699,14 @@ unnamed dungeoneers who invest their time and effort into annual
 {\it devnull.net\/} (gone for now, but not forgotten).
 \clearpage
 
-%.hn
-\section*{Dungeoneers}
+%.hn 2
+\subsection*{Dungeoneers}
 %.pg
 \nd From time to time, some depraved individual out there in netland sends a
 particularly intriguing modification to help out with the game.  The
 {\it NetHack Development Team} sometimes makes note of the names of the worst
 of these miscreants in this, the list of Dungeoneers:
+\medskip
 %.sd
 \begin{center}
 \begin{tabular}{llll}

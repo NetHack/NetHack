@@ -1,4 +1,4 @@
-NetHack 3.7  window.doc	$NHDT-Date: 1596498145 2020/08/03 23:42:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.58 $
+NetHack 3.7  window.doc	$NHDT-Date: 1615154657 2021/03/07 22:04:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $
 
 Introduction
 
@@ -36,7 +36,7 @@ The tty window-port also uses NHW_BASE (the base display) internally.
 
 (The genl_status_* routines use NHW_STATUS for backward compatibility
  when displaying status information on the bottom lines.  New code
- should not use NHW_STATUS. NHW_STATUS will be phased out over time.)
+ should not use NHW_STATUS.  NHW_STATUS will be phased out over time.)
 
 NHW_MENU windows can be used for either menu or text display.  Their
 basic feature is that for the tty-port, if the window is small enough,
@@ -68,7 +68,7 @@ Other windows are created and destroyed as needed.
 
 (The genl_status_* routines use WIN_STATUS for backward compatibility
  when displaying status information on the bottom lines.  New code
- should not use WIN_STATUS, or assume its presence. NHW_STATUS will 
+ should not use WIN_STATUS, or assume its presence. NHW_STATUS will
  be phased out over time.)
 
 "Port" in this document refers to a CPU/OS/hardware platform (UNIX, MSDOS
@@ -101,7 +101,7 @@ curs(window, x, y)
 		   behavior when curs() is called outside the window's limits
 		   is unspecified. The mac port wraps to 0, with the status
 		   window being 2 lines high and 80 columns wide.
-		-- Still used by curs_on_u(), obsolete status updates, 
+		-- Still used by curs_on_u(), obsolete status updates,
 		   screen locating (identify, teleport).
 		-- NHW_MESSAGE, NHW_MENU and NHW_TEXT windows do not
 		   currently support curs in the tty window-port.
@@ -127,23 +127,23 @@ putstr(window, attr, str)
 		   by calling more() or displaying both on the same line.
 putmixed(window, attr, str)
 		-- Print str on the window with the given attribute.  In
-		   addition to printable ASCII characters (040-0126), 
+		   addition to printable ASCII characters (040-0126),
 		   sequences of encoded glyph values are supported.
 		   The glyph encoding sequence is \GXXXXNNNN, where:
 			XXXX is a hexadecimal value. The value must match
-			     the randomly generated value for the current 
-			     game in progress in order to be decoded. 
-			     The value for the game in progress is stored in 
-			     context.rndencode. This field minimizes 
-			     unintentional decoding of player-supplied strings 
+			     the randomly generated value for the current
+			     game in progress in order to be decoded.
+			     The value for the game in progress is stored in
+			     context.rndencode.  This field minimizes
+			     unintentional decoding of player-supplied strings
 			     such as pet names, etc.
 			NNNN is a hexadecimal value representing the glyph.
 		   If a window port does not yet support special handling of
 		   the glyph value, it can use genl_putmixed (windows.c)
 		   which converts the encoded glyph into a character symbol.
 
-		   Multiple putmixed()s are output on separate lines.  Attributes
-		   can be one of
+		   Multiple putmixed()s are output on separate lines.
+		   Attributes can be one of
 			ATR_NONE (or 0)
 			ATR_ULINE
 			ATR_BOLD
@@ -198,19 +198,19 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
 		   port wants (symbol, font, color, attributes, ...there's
 		   a 1-1 map between glyphs and distinct things on the map).
 		-- bkglyphinfo contains a background glyph for potential use
-                   by some graphical or tiled environments to allow the depiction
-		   to fall against a background consistent with the grid 
-		   around x,y. If bkglyphinfo->glyph is NO_GLYPH, then the
-                   parameter should be ignored (do nothing with it).
+		   by some graphical or tiled environments to allow the
+		   depiction to fall against a background consistent with the
+		   grid around x,y.  If bkglyphinfo->glyph is NO_GLYPH, then
+		   the parameter should be ignored (do nothing with it).
                 -- glyph_info struct fields:
-                    int glyph;            /* the display entity */
-                    int color;            /* color for window ports not using a tile */
-                    int ttychar;          /* the character mapping for the original tty
-                                             interface. Most or all window ports wanted
-                                             and used this for various things so it is
-                                             provided in 3.7+ */
+                    int glyph;    /* the display entity */
+                    int color;    /* color for window ports not using a tile */
+                    int ttychar;  /* the character mapping for the original tty
+                                   * interface. Most or all window ports wanted
+                                   * and used this for various things so it is
+                                   * provided in 3.7+ */
                     short int symidx;    /* offset into syms array */
-                    unsigned glyphflags;      /* more detail about the entity */
+                    unsigned glyphflags; /* more detail about the entity */
 
 
 char yn_function(const char *ques, const char *choices, char default)
@@ -258,17 +258,23 @@ player_selection()
 display_file(str, boolean complain)
 		-- Display the file named str.  Complain about missing files
 		   iff complain is TRUE.
-update_inventory()
-		-- Indicate to the window port that the inventory has been
-		   changed.
-		-- Merely calls display_inventory() for window-ports that
-		   leave the window up, otherwise empty.
+update_inventory(arg)
+		-- For an argument of 0:
+		   -- Indicate to the window port that the inventory has
+		      been changed.
+		   -- Merely calls display_inventory() for window-ports
+		      that leave the window up, otherwise empty.
+		-- or for a non-zero argument:
+		   -- Prompts the user for a menu scrolling action and
+		      executes that.
+		   -- May repeat until user finishes (typically by using
+		      <return> or <esc> but interface may use other means).
 doprev_message()
 		-- Display previous messages.  Used by the ^P command.
 		-- On the tty-port this scrolls WIN_MESSAGE back one line.
 
 update_positionbar(char *features)
-		-- Optional, POSITIONBAR must be defined. Provide some 
+		-- Optional, POSITIONBAR must be defined. Provide some
 		   additional information for use in a horizontal
 		   position bar (most useful on clipped displays).
 		   Features is a series of char pairs.  The first char
@@ -399,35 +405,36 @@ char message_menu(char let, int how, const char *mesg)
 D.  Status Display Routines
 
 status_init()   -- core calls this to notify the window port that a status
-		   display is required. The window port should perform 
+		   display is required. The window port should perform
 		   the necessary initialization in here, allocate memory, etc.
-status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)   
+status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)
                 -- notifies the window port which fields it is authorized to
 		   display.
 		-- This may be called at any time, and is used
-		   to disable as well as enable fields, depending on the 
+		   to disable as well as enable fields, depending on the
 		   value of the final argument (TRUE = enable).
 		-- fldindex could be one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
 		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- There are MAXBLSTATS status fields (from botl.h)
-status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color, long *colormasks)
+status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
+              int color, long *colormasks)
 		-- update the value of a status field.
 		-- the fldindex identifies which field is changing and
 		   is an integer index value from botl.h
 		-- fldindex could be any one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
 		   BL_LEVELDESC, BL_EXP, BL_CONDITION
 		-- fldindex could also be BL_FLUSH (-1), which is not really
-		   a field index, but is a special trigger to tell the 
+		   a field index, but is a special trigger to tell the
 		   windowport that it should output all changes received
                    to this point. It marks the end of a bot() cycle.
 		-- fldindex could also be BL_RESET (-2), which is not really
-		   a field index, but is a special advisory to to tell the 
+		   a field index, but is a special advisory to to tell the
 		   windowport that it should redisplay all its status fields,
 		   even if no changes have been presented to it.
 		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
@@ -464,8 +471,8 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
                         BL_MASK_WOUNDEDL     0x10000000L
                         BL_MASK_HOLDING      0x20000000L
 		-- The value passed for BL_GOLD includes a leading
-		   symbol for GOLD "$:nnn". If the window port needs to use 
-		   the textual gold amount without the leading "$:" the port 
+		   symbol for GOLD "$:nnn". If the window port needs to use
+		   the textual gold amount without the leading "$:" the port
 		   will have to add 2 to the passed "ptr" for the BL_GOLD case.
                 -- color is an unsigned int.
                    int & 0x00FF = color CLR_*
@@ -474,13 +481,12 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
                    This contains the color and attribute that the field should
                    be displayed in.
 
-                   This is relevant for everything except BL_CONDITION fldindex.
-                   If fldindex is BL_CONDITION, this parameter should be ignored,
-                   as condition hilighting is done via the next colormasks
-                   parameter instead.
+                   This is relevant for everything except BL_CONDITION.
+                   If fldindex is BL_CONDITION, this parameter should be
+                   ignored, as condition hilighting is done via the next
+                   colormasks parameter instead.
 
                 -- colormasks - pointer to cond_hilites[] array of colormasks.
-
                    Only relevant for BL_CONDITION fldindex. The window port
                    should ignore this parameter for other fldindex values.
 
@@ -552,7 +558,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, int color
                    +------+----------------------+--------------------+
                    |  20  |   HL_ATTCLR_BOLD     |                    |
                    +------+----------------------+--------------------+
-                   |  21  |  beyond array boundary                    | BL_ATTCLR_MAX
+                   |  21  | beyond array boundary|              | BL_ATTCLR_MAX
 
                    The window port can AND (&) the bits passed in the
                    ptr argument to status_update() with any non-zero
@@ -616,29 +622,30 @@ preference_update(preference)
 		   port of that change.  If your window-port is capable of
 		   dynamically adjusting to the change then it should do so.
 		   Your window-port will only be notified of a particular
-		   change if it indicated that it wants to be by setting the 
+		   change if it indicated that it wants to be by setting the
 		   corresponding bit in the wincap mask.
 
-getmsghistory(init) 
+getmsghistory(init)
 		-- This is used to preserve message history between games by
-		   obtaining the messages from the window port so that the core
-		   can put them into the savefile.
+		   obtaining the messages from the window port so that the
+		   core can put them into the savefile.
 		   The routine is called repeatedly from the core save routine,
-		   and the window port routine is expected to successively return
-		   each message that it wants the game to store in the savefile, 
-		   starting with the oldest message first, finishing
+		   and the window port routine is expected to successively
+		   return each message that it wants the game to store in the
+		   savefile,  starting with the oldest message first, finishing
 		   with the most recent.
 		   If init is TRUE, start over again from most recent message.
 
 putmsghistory(msg)
 		-- This is the counterpart to getmsghistory() for restores
 		   used to reload the port's message recall buffer.
-		   The routine is called repeatedly from the core restore 
+		   The routine is called repeatedly from the core restore
 		   routine, starting with the oldest message first, and
-		   finishing with the most recent one that it read from the savefile.
-		   The window port routine is expected to load the message 
-		   recall buffers in such a way that the ordering remains correct.
-		   The window port routine should make no assumptions about how 
+		   finishing with the most recent one that it read from the
+		   savefile.  The window port routine is expected to load the
+		   message recall buffers in such a way that the ordering
+		   remains correct.  The window port routine should make no
+		   assumptions about how
 		   many messages are forthcoming, nor should it assume that
 		   another message will follow this one, so it must be careful
 		   to keep all pointers/indexes intact at the end of each call.
@@ -660,8 +667,9 @@ winid WIN_MESSAGE, WIN_MAP, WIN_INVEN
 			There is also a window called WIN_STATUS that is used
 			only for backward compatibility in the genl_status_*
 			set of generic status display functions.
-char *AE, *AS;		Checked in options.c to see if we should load and 
-			switch to DECGraphics symset.  It is #ifdefed VMS and UNIX.
+char *AE, *AS;		Checked in options.c to see if we should load and
+			switch to DECGraphics symset.  It is #ifdefed VMS
+			and UNIX.
 int LI, CO;		Set in sys/unix/ioctl.c.
 
 The following appears to be Unix specific.  Other ports using the tty
@@ -670,83 +678,83 @@ window-port should also declare this variable in one of your sys/*.c files.
 short ospeed;		Set and declared in sys/unix/unixtty.c (don't
 			know about other sys files).
 
-The following global variable is defined in options.c. It equates a 
+The following global variable is defined in options.c. It equates a
 list of wincap option names with their associated bit-mask [see
 section IV WINCAP preferences support].  The array is zero-terminated.
 
 struct wc_Opt wc_options[];
 			One entry for each available WINCAP option.
 			Each entry has a wc_name field and a wc_bit
-			field.  
+			field.
 
 IV. WINCAP preferences support
 
 Starting with NetHack 3.4.0, the window interface was enhanced to provide
-a common way of setting window port user preferences from the config file, 
+a common way of setting window port user preferences from the config file,
 and from the command line for some settings.
 
 The wincap preference settings all have their underlying values stored
 in iflags fields.  The names of the wincap related fields are all pre-
-fixed with wc_ or wc2_ to make it easy to identify them.  Your window 
+fixed with wc_ or wc2_ to make it easy to identify them.  Your window
 port can access the fields directly.
 
 Your window port identifies what options it will react to and support
-by setting bits in the window_procs wincap mask and/or wincap2 mask. 
+by setting bits in the window_procs wincap mask and/or wincap2 mask.
 Your window port can also fill in the color-availability table for
-the window port, has_color[CLR_MAX] to flag the colors it supports 
+the window port, has_color[CLR_MAX] to flag the colors it supports
 1 it does, or 0 it doesn't. [CLR_MAX is 16 as of 3.6.3.]
 
-See section IX for details of where the wincap masks reside. 
+See section IX for details of where the wincap masks reside.
 
-Two things control whether any preference setting appears in the 
+Two things control whether any preference setting appears in the
 'O' command options menu during the game:
- 1. The option must be marked as being supported by having its 
+ 1. The option must be marked as being supported by having its
     bit set in the window_procs wincap or wincap2 mask.
  2. The option must have its optflag field set to set_in_game in order
     to be able to set the option, or marked set_gameview if you just
-    want to reveal what the option is set to. 
+    want to reveal what the option is set to.
 Both conditions must be true to be able to see or set the option from
-within NetHack.  
+within NetHack.
 
-The default values for the optflag field for all the options are 
-hard-coded into the option in options.c.  The default value for 
-the wc_ options can be altered by calling 
+The default values for the optflag field for all the options are
+hard-coded into the option in options.c.  The default value for
+the wc_ options can be altered by calling
 	set_wc_option_mod_status(optmask, status)
-The default value for the wc2_ options can be altered by calling 
+The default value for the wc2_ options can be altered by calling
 	set_wc2_option_mod_status(optmask, status)
-In each case, set the option modification status to one of set_in_config, 
+In each case, set the option modification status to one of set_in_config,
 set_gameview, or set_in_game.
 
-The setting of any wincap or wincap2 option is handled by the NetHack 
-core option processing code. You do not have to provide a parser in 
-your window port, nor should you set the values for the 
-iflags.wc_* and iflags.wc2_* fields directly within the port code. 
-The port code should honor whatever values were put there by the core 
-when processing options, either in the config file, or by the 'O' command.  
+The setting of any wincap or wincap2 option is handled by the NetHack
+core option processing code. You do not have to provide a parser in
+your window port, nor should you set the values for the
+iflags.wc_* and iflags.wc2_* fields directly within the port code.
+The port code should honor whatever values were put there by the core
+when processing options, either in the config file, or by the 'O' command.
 
-You may be wondering what values your window port will find in the 
-iflags.wc_* and iflags.wc2_* fields for options that the user has not 
+You may be wondering what values your window port will find in the
+iflags.wc_* and iflags.wc2_* fields for options that the user has not
 specified in his/her config file. Put another way, how does your port code
 tell if an option has not been set? The next paragraph explains that.
 
-If the core does not set an option, it will still be initialized 
-to its default value. Those default values for the 
+If the core does not set an option, it will still be initialized
+to its default value. Those default values for the
 iflags.wc_* and iflags.wc_* fields are:
 
- o All boolean fields are initialized to the starting 
-   value specified for that option in the boolopt array in 
-   options.c.  The window-port should respect that setting 
-   unless it has a very good reason for not doing so. 
+ o All boolean fields are initialized to the starting
+   value specified for that option in the boolopt array in
+   options.c.  The window-port should respect that setting
+   unless it has a very good reason for not doing so.
  o All int fields are initialized to zero. Zero is not a valid
    setting for any of the int options, so if your port code
    encounters a zero there, it can assume that the preference
    option was not specified.  In that case, the window-port code
-   should use a default setting that the port is comfortable with.  
+   should use a default setting that the port is comfortable with.
    It should write the default setting back into the iflags.wc_*
    field.  That is the only time that your window-port could should
    update those fields.
  o All "char *" fields will be null pointers. Be sure to check for
-   that in your window-port code before using such a pointer, or 
+   that in your window-port code before using such a pointer, or
    you'll end up triggering a nasty fault.
 
 Here are the wincap and wincap2 preference settings that your port can choose
@@ -774,6 +782,7 @@ to support:
   |  font_size_text    | WC_FONTSIZ_TEXT    | wc_fontsiz_text    |int     |
   |  hilite_pet        | WC_HILITE_PET      | wc_hilite_pet      |boolean |
   |  map_mode          | WC_MAP_MODE        | wc_map_mode        |int     |
+  |  perm_invent       | WC_PERM_INVENT     | wc_perm_invent     |boolean |
   |  player_selection  | WC_PLAYER_SELECTION| wc_player_selection|int     |
   |  popup_dialog      | WC_POPUP_DIALOG    | wc_popup_dialog    |boolean |
   |  preload_tiles     | WC_PRELOAD_TILES   | wc_preload_tiles   |boolean |
@@ -803,13 +812,20 @@ to support:
   | player option      | bit in wincap mask |   for value        | type   |
   |--------------------+--------------------+--------------------+--------+
   |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
-  |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
-  |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
-  |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  guicolor          | WC2_GUICOLOR       | wc2_guicolor       |boolean |
+  |  hilite_status     | WC2_HILITE_STATUS  | wc2_hilite_status  |strings |
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
-  |  term_cols         | WC2_TERM_COLS      | wc2_term_cols      |int     |
-  |  term_rows         | WC2_TERM_ROWS      | wc2_term_rows      |int     |
+  |  menu_shift_left   | WC2_MENU_SHIFT     |  n/a               |char    |
+  |  menu_shift_right  | WC2_MENU_SHIFT     |  n/a               |char    |
+  |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
+  |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
+  |  statuslines       | WC2_STATUSLINES    | wc2_statuslines    |int     |
+  |  term_cols         | WC2_TERM_SIZE      | wc2_term_cols      |int     |
+  |  term_rows         | WC2_TERM_SIZE      | wc2_term_rows      |int     |
+  |  use_darkgray      | WC2_DARKGRAY       | wc2_darkgray       |boolean |
   |  windowborders     | WC2_WINDOWBORDERS  | wc2_windowborders  |int     |
+  |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   +--------------------+--------------------+--------------------+--------+
 
   more wincap2 for STATUS_HILITES support and control
@@ -826,6 +842,13 @@ to support:
   |          fields should be redone |                           |
   +----------------------------------+---------------------------+
 
+  additional wincap2 flag bits for supported putstr() attributes
+  +----------------------------------+---------------------------+
+  |  avoid putting message into      | WC2_SUPPRESS_HIST         |
+  |          recall history          |                           |
+  |  draw extra attention to message | WC2_URGENT_MESG           |
+  +----------------------------------+---------------------------+
+
 align_message	-- where to place message window (top, bottom, left, right)
 align_status	-- where to place status display (top, bottom, left, right).
 ascii_map	-- port should display an ascii map if it can.
@@ -836,7 +859,7 @@ font_menu	-- port should use a font by this name for menu windows.
 font_message	-- port should use a font by this name for message window.
 font_size_map	-- port should use this size font for the map window.
 font_size_menu	-- port should use this size font for menu windows.
-font_size_message 
+font_size_message
 		-- port should use this size font for the message window.
 font_size_status-- port should use this size font for the status display.
 font_size_text	-- port should use this size font for text windows.
@@ -857,14 +880,14 @@ selectsaved     -- if port can display a menu of the user's saved games do so.
 softkeyboard    -- handhelds should display an on-screen keyboard if possible.
 splash_screen   -- port should/should not display an opening splashscreen.
 term_cols       -- Terminal should size itself to specified width, if possible.
-term_rows       -- Terminal should size itself to specified height, if possible.
+term_rows       -- Terminal should size to specified height, if possible.
 tiled_map	-- port should display a tiled map if it can.
-tile_width	-- port should display tiles with this width or round to closest
-		   if it can.
-tile_height	-- port should display tiles with this height or round to closest
-		   if it can.
-tile_file	-- open this alternative tile file. The file name is likely to be
-		   window-port or platform specific.
+tile_width	-- port should display tiles with this width or round to
+		   closest if it can.
+tile_height	-- port should display tiles with this height or round to
+		   closest if it can.
+tile_file	-- open this alternative tile file.  The file name is likely to
+		   be window-port or platform specific.
 use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
@@ -874,33 +897,33 @@ windowcolors
 		-- port should use these colors for window foreground/background
 		   colors.  Syntax:
 		     menu fore/back message fore/back status fore/back text fore/back
-wraptext	-- port should wrap long lines of text if they don't fit in 
+wraptext	-- port should wrap long lines of text if they don't fit in
 		   the visible area of the window
 mouse_support	-- port should enable mouse support if possible
 
 Whenever one of these settings is adjusted, the port is notified of a change
 to the setting by calling the port's preference_update() routine. The port
 is only notified if it has indicated that it supports that option by setting
-the option's bit in the port's wincap mask.  The port can choose to adjust 
+the option's bit in the port's wincap mask.  The port can choose to adjust
 for the change to an option that it receives notification about, or ignore it.
 The former approach is recommended.  If you don't want to deal with a
-user-initiated setting change, then the port should call 
-set_wc_option_mod_status(mask, set_in_config) to make the option invisible to 
+user-initiated setting change, then the port should call
+set_wc_option_mod_status(mask, set_in_config) to make the option invisible to
 the user.
 
 Functions available for the window port to call:
 
 set_wc_option_mod_status(optmask, status)
-		-- Adjust the optflag field for a set of wincap options to 
-		   specify whether the port wants the option to appear 
+		-- Adjust the optflag field for a set of wincap options to
+		   specify whether the port wants the option to appear
 		   in the 'O' command options menu, The second parameter,
 		   "status" can be set to set_in_config, set_gameview,
 		   or set_in_game (set_in_config implies that the option
 		   is completely hidden during the game).
 
 set_wc2_option_mod_status(optmask, status)
-		-- Adjust the optflag field for a set of wincap2 options to 
-		   specify whether the port wants the option to appear 
+		-- Adjust the optflag field for a set of wincap2 options to
+		   specify whether the port wants the option to appear
 		   in the 'O' command options menu, The second parameter,
 		   "status" can be set to set_in_config, set_gameview,
 		   or set_in_game (set_in_config implies that the option
@@ -911,7 +934,7 @@ set_option_mod_status(optnam, status)
 		   that is not part of the wincap suite.  A port might use
 		   this to override the default initialization setting for
 		   status specified in options.c.  Note that you have to
-		   specify the option by name and that you can only set 
+		   specify the option by name and that you can only set
 		   one option per call unlike set_wc_option_mod_status().
 
 
@@ -921,7 +944,7 @@ To add a new wincap option, please follow all these steps:
 	1. Add the option to the wincap preference settings table above. Since
 	   wincap is full, your option will likely target wincap2 field.
 	2. Add the description to the paragraph below the chart.
-	3. Add the WC_ or WC2_ to the bit list in include/winprocs.h 
+	3. Add the WC_ or WC2_ to the bit list in include/winprocs.h
 	   (in wincap2 if there is no room in wincap).
 	4. Add the wc_ or wc2_ field(s) to the iflags structure in flag.h.
 	5. Add the name and value to wc_options[] or wc2_options[] in options.c
@@ -985,7 +1008,7 @@ any) will be called with an argument of WININIT_UNDO before the new
 ini_routine (if any) is called (with WININIT).
 
 Display_gamewindows() is a common routine that displays the two standard
-game windows (WIN_MESSAGE, WIN_MAP), and the status display.  It is normally 
+game windows (WIN_MESSAGE, WIN_MAP), and the status display.  It is normally
 called just before the "Hello, welcome" message.
 
 Process_options() is currently still unique to each port.  There may be need
@@ -998,13 +1021,14 @@ init_nhwindows() is expected to display a gee-whiz banner window, including
 the Copyright message.  It is recommended that the COPYRIGHT_BANNER_A,
 COPYRIGHT_BANNER_B, COPYRIGHT_BANNER_C, and COPYRIGHT_BANNER_D macros from
 patchlevel.h and date.h be used for constructing the Copyright message.
-COPYRIGHT_BANNER_A is a quoted string that has the NetHack copyright declaration,
+COPYRIGHT_BANNER_A is a quoted string that has NetHack copyright declaration,
 COPYRIGHT_BANNER_B is a quoted string that states who the copyright belongs to,
-COPYRIGHT_BANNER_C is a quoted string generated by makedefs that includes version
-and build information.  and COPYRIGHT_BANNER_D simply says "See License for details."
-Be sure to #include "patchlevel.h" and date.h to define these macros.  Using the
-macros will prevent having to update the Copyright information in each window-port
-prior to each release.
+COPYRIGHT_BANNER_C is a quoted string generated by makedefs that includes
+version and build information, and
+COPYRIGHT_BANNER_D simply says "See License for details."
+Be sure to #include "patchlevel.h" and date.h to define these macros.  Using
+the macros will prevent having to update the Copyright information in each
+window-port prior to each release.
 
 Ports (MSDOS, TOS, MAC, etc) _may_ use window-port specific routines in
 their port specific files, _AT_THEIR_OWN_RISK_.  Since "port" and

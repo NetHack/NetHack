@@ -53,13 +53,13 @@ fire.lua      help          hh            history       juiblex.lua
 keyhelp       knox.lua      license       medusa-1.lua  medusa-2.lua
 medusa-3.lua  medusa-4.lua  minefill.lua  minend-1.lua  minend-2.lua
 minend-3.lua  minetn-1.lua  minetn-2.lua  minetn-3.lua  minetn-4.lua
-minetn-5.lua  minetn-6.lua  minetn-7.lua  nhlib.lua     opthelp
-oracle.lua    oracles.txt   orcus.lua     quest.lua     rumors.fal
-rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua   soko2-1.lua
-soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua   soko4-2.lua
-symbols       themerms.lua  tower1.lua    tower2.lua    tower3.lua
-tribute       valley.lua    water.lua     wizard1.lua   wizard2.lua
-wizard3.lua   wizhelp
+minetn-5.lua  minetn-6.lua  minetn-7.lua  nhcore.lua    nhlib.lua
+opthelp       oracle.lua    oracles.txt   orcus.lua     quest.lua
+rumors.fal    rumors.tru    sanctum.lua   soko1-1.lua   soko1-2.lua
+soko2-1.lua   soko2-2.lua   soko3-1.lua   soko3-2.lua   soko4-1.lua
+soko4-2.lua   symbols       themerms.lua  tower1.lua    tower2.lua
+tower3.lua    tribute       valley.lua    water.lua     wizard1.lua
+wizard2.lua   wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
@@ -92,12 +92,12 @@ engrave.h     extern.h      flag.h        fnamesiz.h    func_tab.h
 global.h      hack.h        integer.h     isaac64.h     lint.h
 mail.h        mextra.h      mfndpos.h     micro.h       mkroom.h
 monattk.h     mondata.h     monflag.h     monst.h       monsym.h
-ntconf.h      obj.h         objclass.h    optlist.h     patchlevel.h
-pcconf.h      permonst.h    prop.h        quest.h       rect.h
-region.h      rm.h          skills.h      sp_lev.h      spell.h
-sys.h         system.h      tcap.h        tileset.h     timeout.h
-tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
-warnings.h    winami.h      wincurs.h     winprocs.h    wintype.h
+obj.h         objclass.h    optlist.h     patchlevel.h  pcconf.h
+permonst.h    prop.h        quest.h       rect.h        region.h
+rm.h          skills.h      sp_lev.h      spell.h       sys.h
+system.h      tcap.h        tileset.h     timeout.h     tradstdc.h
+trap.h        unixconf.h    vision.h      vmsconf.h     warnings.h
+winami.h      wincurs.h     windconf.h    winprocs.h    wintype.h
 you.h         youprop.h
 
 (file for tty versions)
@@ -334,16 +334,135 @@ Makefile.utl  install.com   lev_lex.h     nethack.com   oldcrtl.c
 spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
-sys/winnt:
+sys/windows:
 (files for Windows 7/8.x/10 version)
-.nethackrc.template  Install.nt           Makefile.gcc
-Makefile.msc         console.rc           nethack.def
-nh340key.c           nhdefkey.c           nhico.uu
-nhraykey.c           nhsetup.bat          ntsound.c
-nttty.c              porthelp             stub-pdcscrn.c
+.nethackrc.template  Install.windows      Makefile.gcc
+Makefile.msc         console.rc           consoletty.c
+nethack.def          nh340key.c           nhdefkey.c
+nhico.uu             nhraykey.c           nhsetup.bat
+ntsound.c            porthelp             stub-pdcscrn.c
 stubs.c              sysconf.template     travis-gcc.sh
 win10.c              win10.h              win32api.h
-windmain.c           winnt.c              winos.h
+windmain.c           windsys.c            winos.h
+
+sys/windows/vs:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+NetHack.sln                   NetHackPackage.appxmanifest
+NetHackPackage.wapproj        NetHackProperties.props
+Package.StoreAssociation.xml  ScreenShot.PNG
+build.bat                     common.props
+config.props                  console.props
+cpp.hint                      default.props
+default_dll.props             default_lib.props
+dirs.props                    dll.props
+files.props                   travisci.sh
+
+sys/windows/vs/Images:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+BadgeLogo.scale-100.png
+BadgeLogo.scale-125.png
+BadgeLogo.scale-150.png
+BadgeLogo.scale-200.png
+BadgeLogo.scale-400.png
+LargeTile.scale-100.png
+LargeTile.scale-125.png
+LargeTile.scale-150.png
+LargeTile.scale-200.png
+LargeTile.scale-400.png
+LockScreenLogo.scale-200.png
+SmallTile.scale-100.png
+SmallTile.scale-125.png
+SmallTile.scale-150.png
+SmallTile.scale-200.png
+SmallTile.scale-400.png
+SplashScreen.scale-100.png
+SplashScreen.scale-125.png
+SplashScreen.scale-150.png
+SplashScreen.scale-200.png
+SplashScreen.scale-400.png
+Square150x150Logo.scale-100.png
+Square150x150Logo.scale-125.png
+Square150x150Logo.scale-150.png
+Square150x150Logo.scale-200.png
+Square150x150Logo.scale-400.png
+Square44x44Logo.altform-unplated_targetsize-16.png
+Square44x44Logo.altform-unplated_targetsize-256.png
+Square44x44Logo.altform-unplated_targetsize-32.png
+Square44x44Logo.altform-unplated_targetsize-48.png
+Square44x44Logo.scale-100.png
+Square44x44Logo.scale-125.png
+Square44x44Logo.scale-150.png
+Square44x44Logo.scale-200.png
+Square44x44Logo.scale-400.png
+Square44x44Logo.targetsize-16.png
+Square44x44Logo.targetsize-24.png
+Square44x44Logo.targetsize-24_altform-unplated.png
+Square44x44Logo.targetsize-256.png
+Square44x44Logo.targetsize-32.png
+Square44x44Logo.targetsize-48.png
+StoreLogo.backup.png
+StoreLogo.scale-100.png
+StoreLogo.scale-125.png
+StoreLogo.scale-150.png
+StoreLogo.scale-200.png
+StoreLogo.scale-400.png
+Wide310x150Logo.scale-100.png
+Wide310x150Logo.scale-125.png
+Wide310x150Logo.scale-150.png
+Wide310x150Logo.scale-200.png
+Wide310x150Logo.scale-400.png
+
+sys/windows/vs/NetHack:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+NetHack.vcxproj    afternethack.proj
+
+sys/windows/vs/NetHackW:
+(file for Visual Studio 2017 or 2019 Community Edition builds)
+NetHackW.vcxproj
+
+sys/windows/vs/PDCurses:
+(file for Visual Studio 2017 or 2019 Community Edition builds)
+PDCurses.vcxproj
+
+sys/windows/vs/dlb:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+afterdlb.proj  dlb.vcxproj
+
+sys/windows/vs/makedefs:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+aftermakedefs.proj  makedefs.vcxproj
+
+sys/windows/vs/nh340key:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+nh340key.def      nh340key.vcxproj
+
+sys/windows/vs/nhdefkey:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+nhdefkey.def      nhdefkey.vcxproj
+
+sys/windows/vs/nhraykey:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+nhraykey.def      nhraykey.vcxproj
+
+sys/windows/vs/recover:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+afterrecover.proj  recover.vcxproj
+
+sys/windows/vs/tile2bmp:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+aftertile2bmp.proj  tile2bmp.vcxproj
+
+sys/windows/vs/tilemap:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+aftertilemap.proj  tilemap.vcxproj
+
+sys/windows/vs/tiles:
+(file for Visual Studio 2017 or 2019 Community Edition builds)
+tiles.vcxproj
+
+sys/windows/vs/uudecode:
+(files for Visual Studio 2017 or 2019 Community Edition builds)
+afteruudecode.proj  uudecode.vcxproj
 
 test:
 (files in top directory)
@@ -425,85 +544,6 @@ record.uu              resource.h             rip.uu
 splash.uu              tiles-mingw32.mak      tiles.mak
 winMS.h
 
-win/win32/vs:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
-NetHack.sln                   NetHack.vcxproj
-NetHackPackage.appxmanifest   NetHackPackage.wapproj
-NetHackProperties.props       NetHackW.vcxproj
-PDCurses.vcxproj              Package.StoreAssociation.xml
-ScreenShot.PNG                afterdlb.proj
-aftermakedefs.proj            afternethack.proj
-afterrecover.proj             aftertile2bmp.proj
-aftertilemap.proj             afteruudecode.proj
-build.bat                     common.props
-config.props                  console.props
-cpp.hint                      default.props
-default_dll.props             default_lib.props
-dirs.props                    dlb.vcxproj
-dll.props                     files.props
-makedefs.vcxproj              nh340key.def
-nh340key.vcxproj              nhdefkey.def
-nhdefkey.vcxproj              nhraykey.def
-nhraykey.vcxproj              recover.vcxproj
-tile2bmp.vcxproj              tilemap.vcxproj
-tiles.vcxproj                 travisci.sh
-uudecode.vcxproj
-
-win/win32/vs/Images:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
-BadgeLogo.scale-100.png
-BadgeLogo.scale-125.png
-BadgeLogo.scale-150.png
-BadgeLogo.scale-200.png
-BadgeLogo.scale-400.png
-LargeTile.scale-100.png
-LargeTile.scale-125.png
-LargeTile.scale-150.png
-LargeTile.scale-200.png
-LargeTile.scale-400.png
-LockScreenLogo.scale-200.png
-SmallTile.scale-100.png
-SmallTile.scale-125.png
-SmallTile.scale-150.png
-SmallTile.scale-200.png
-SmallTile.scale-400.png
-SplashScreen.scale-100.png
-SplashScreen.scale-125.png
-SplashScreen.scale-150.png
-SplashScreen.scale-200.png
-SplashScreen.scale-400.png
-Square150x150Logo.scale-100.png
-Square150x150Logo.scale-125.png
-Square150x150Logo.scale-150.png
-Square150x150Logo.scale-200.png
-Square150x150Logo.scale-400.png
-Square44x44Logo.altform-unplated_targetsize-16.png
-Square44x44Logo.altform-unplated_targetsize-256.png
-Square44x44Logo.altform-unplated_targetsize-32.png
-Square44x44Logo.altform-unplated_targetsize-48.png
-Square44x44Logo.scale-100.png
-Square44x44Logo.scale-125.png
-Square44x44Logo.scale-150.png
-Square44x44Logo.scale-200.png
-Square44x44Logo.scale-400.png
-Square44x44Logo.targetsize-16.png
-Square44x44Logo.targetsize-24.png
-Square44x44Logo.targetsize-24_altform-unplated.png
-Square44x44Logo.targetsize-256.png
-Square44x44Logo.targetsize-32.png
-Square44x44Logo.targetsize-48.png
-StoreLogo.backup.png
-StoreLogo.scale-100.png
-StoreLogo.scale-125.png
-StoreLogo.scale-150.png
-StoreLogo.scale-200.png
-StoreLogo.scale-400.png
-Wide310x150Logo.scale-100.png
-Wide310x150Logo.scale-125.png
-Wide310x150Logo.scale-150.png
-Wide310x150Logo.scale-200.png
-Wide310x150Logo.scale-400.png
-
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
 
@@ -552,7 +592,67 @@ monstr.c
 (file optionally generated by tilemap at compile time)
 tile.c
 
-sys/winnt:
+sys/windows:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/Images:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/NetHack:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/NetHackW:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/PDCurses:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/dlb:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/makedefs:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/nh340key:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/nhdefkey:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/nhraykey:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/recover:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/tile2bmp:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/tilemap:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/tiles:
+(file generated by uudecode at compile time)
+nethack.ico
+
+sys/windows/vs/uudecode:
 (file generated by uudecode at compile time)
 nethack.ico
 

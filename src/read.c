@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1610149501 2021/01/08 23:45:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1615760296 2021/03/14 22:18:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,6 +107,7 @@ tshirt_text(struct obj* tshirt, char* buf)
         "Hey!  Nymphs!  Steal This T-Shirt!",
         "I <3 Dungeon of Doom",
         "I <3 Maud",
+        /* note: there is a similarly worded apron (alchemy smock) slogan */
         "I am a Valkyrie.  If you see me running, try to keep up.",
         "I am not a pack rat - I am a collector",
         "I bounced off a rubber tree",         /* Monkey Island */
@@ -120,6 +121,7 @@ tshirt_text(struct obj* tshirt, char* buf)
         "Meat is Mordor",
         "Minetown Better Business Bureau",
         "Minetown Watch",
+        /* Discworld riff; unfortunately long */
  "Ms. Palm's House of Negotiable Affection--A Very Reputable House Of Disrepute",
         "Protection Racketeer",
         "Real men love Crom",
@@ -177,8 +179,12 @@ apron_text(struct obj* apron, char* buf)
            bomb technician, if you see me running ... try to catch up."
            In nethack, the quote is far more suitable to an alchemy smock
            (particularly since so many of these others are about cooking)
-           than a T-shirt and is paraphrased to simplify/shorten it. */
-        "If you see me running, try to keep up...",
+           than a T-shirt and is paraphrased to simplify/shorten it.
+           [later... turns out that this is already a T-shirt message:
+            "I am a Valkyrie.  If you see me running, try to keep up."
+           so this one has been revised a little:  added alchemist prefix,
+           changed "keep up" to original source's "catch up"] */
+        "I am an alchemist; if you see me running, try to catch up...",
     };
 
     Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);
@@ -929,7 +935,7 @@ display_stinking_cloud_positions(int state)
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
-seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll-like spell */
+seffects(struct obj *sobj) /* sobj - scroll or fake spellbook for spell */
 {
     int cval, otyp = sobj->otyp;
     boolean confused = (Confusion != 0), sblessed = sobj->blessed,
@@ -1294,9 +1300,26 @@ seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll
                            known not to be, make the scroll known; it's
                            trivial to identify anyway by comparing inventory
                            before and after */
-                        if (obj->bknown && otyp == SCR_REMOVE_CURSE) {
+                        if (obj->bknown && otyp == SCR_REMOVE_CURSE)
                             learnscrolltyp(SCR_REMOVE_CURSE);
-                        }
+                    }
+                }
+            }
+            /* if riding, treat steed's saddle as if part of hero's invent */
+            if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
+                if (confused) {
+                    blessorcurse(obj, 2);
+                    obj->bknown = 0; /* skip set_bknown() */
+                } else if (obj->cursed) {
+                    uncurse(obj);
+                    /* like rndcurse(sit.c), effect on regular inventory
+                       doesn't show things glowing but saddle does */
+                    if (!Blind) {
+                        pline("%s %s.", Yobjnam2(obj, "glow"),
+                              hcolor("amber"));
+                        obj->bknown = Hallucination ? 0 : 1;
+                    } else {
+                        obj->bknown = 0; /* skip set_bknown() */
                     }
                 }
             }
@@ -1605,6 +1628,7 @@ seffects(struct obj* sobj) /* sobj - scroll, or fake spellbook object for scroll
             }
             else if (Fire_resistance) {
                 shieldeff(u.ux, u.uy);
+                monstseesu(M_SEEN_FIRE);
                 if (!Blind)
                     pline("Oh, look, what a pretty fire in your %s.",
                           makeplural(body_part(HAND)));
@@ -2127,7 +2151,7 @@ do_class_genocide(void)
                     }
                 } else if (g.mvitals[i].mvflags & G_GENOD) {
                     if (!gameover)
-                        pline("All %s are already nonexistent.", nam);
+                        pline("%s are already nonexistent.", upstart(nam));
                 } else if (!gameover) {
                     /* suppress feedback about quest beings except
                        for those applicable to our own role */
@@ -2665,7 +2689,7 @@ create_particular(void)
 #define CP_TRYLIM 5
     struct _create_particular_data d;
     char *bufp, buf[BUFSZ], prompt[QBUFSZ];
-    int  tryct = CP_TRYLIM;
+    int  tryct = CP_TRYLIM, altmsg = 0;
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
     Strcpy(prompt, "Create what kind of monster?");
@@ -2679,7 +2703,12 @@ create_particular(void)
             break;
 
         /* no good; try again... */
-        pline("I've never heard of such monsters.");
+        if (*bufp || altmsg || tryct < 2) {
+            pline("I've never heard of such monsters.");
+        } else {
+            pline("Try again (type * for random, ESC to cancel).");
+            ++altmsg;
+        }
         /* when a second try is needed, expand the prompt */
         if (tryct == CP_TRYLIM)
             Strcat(prompt, " [type name or symbol]");

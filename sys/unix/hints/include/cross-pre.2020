@@ -36,9 +36,9 @@ endif
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.3.tar.gz
 #=================================================================
-LUA_VERSION ?=5.4.2
+LUA_VERSION ?=5.4.3
 LUATOP ?= ../lib/lua-$(LUA_VERSION)
 LUASRCDIR ?= $(LUATOP)/src
 LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
@@ -129,7 +129,7 @@ ifdef CROSS_TO_MSDOS
 # 2. Then
 #     make CROSS_TO_MSDOS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
 #
-# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.3.tar.gz
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE

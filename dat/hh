@@ -32,6 +32,7 @@ S       save    save the game (to be continued later) and exit
 O       options set options
 /       what-is tell what a map symbol represents
 \       known   display list of what's been discovered
+|       perminv interact with persistent inventory window instead of hero+map
 v       version display version number
 V       history display game history
 ^A      again   redo the previous command (^A denotes the keystroke CTRL-A)

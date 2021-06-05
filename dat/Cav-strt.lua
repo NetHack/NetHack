@@ -54,7 +54,10 @@ des.door("locked",19,06)
 -- The temple altar (this will force a priest(ess) to be created)
 des.altar({ x=36,y=02, align="coaligned", type="shrine" })
 -- Shaman Karnov
-des.monster("Shaman Karnov", 35, 02)
+des.monster({ id = "Shaman Karnov", coord = {35, 02}, inventory = function()
+   des.object({ id = "leather armor", spe = 5 });
+   des.object({ id = "club", spe = 5 });
+end })
 -- The treasure of Shaman Karnov
 des.object("chest", 34, 02)
 -- neanderthal guards for the audience chamber

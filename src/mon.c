@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1609281168 2020/12/29 22:32:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1620923921 2021/05/13 16:38:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,6 +107,18 @@ sanity_check_single_mon(
     /* guardian angel on astral level is tame but has emin rather than edog */
     if (mtmp->mtame && !has_edog(mtmp) && !mtmp->isminion)
         impossible("pet without edog (%s)", msg);
+    /* steed should be tame and saddled */
+    if (mtmp == u.usteed) {
+        const char *ns, *nt = !mtmp->mtame ? "not tame" : 0;
+
+        ns = !m_carrying(mtmp, SADDLE) ? "no saddle"
+             : !which_armor(mtmp, W_SADDLE) ? "saddle not worn"
+               : 0;
+        if (ns || nt)
+            impossible("steed: %s%s%s (%s)",
+                       ns ? ns : "", (ns && nt) ? ", " : "", nt ? nt : "",
+                       msg);
+    }
 
     if (mtmp->mtrapped) {
         if (mtmp->wormno) {
@@ -264,12 +276,16 @@ m_poisongas_ok(struct monst* mtmp)
     return M_POISONGAS_BAD;
 }
 
-/* Return TRUE if this monster is capable of converting other monsters into
- * zombies. */
+/* return True if mon is capable of converting other monsters into zombies */
 boolean
-zombie_maker(struct permonst* pm)
+zombie_maker(struct monst *mon)
 {
-    switch(pm->mlet) {
+    struct permonst *pm = mon->data;
+
+    if (mon->mcan)
+        return FALSE;
+
+    switch (pm->mlet) {
     case S_ZOMBIE:
         /* Z-class monsters that aren't actually zombies go here */
         if (pm == &mons[PM_GHOUL] || pm == &mons[PM_SKELETON])
@@ -282,15 +298,15 @@ zombie_maker(struct permonst* pm)
     return FALSE;
 }
 
-/* return the monster index of the zombie monster which this monster could be
- * turned into, or NON_PM if it doesn't have a direct counterpart. Sort of the
- * zombie-specific inverse of undead_to_corpse.
- * If a zombie gets passed to this function, it should return NON_PM, not the
- * same monster again. */
+/* Return monster index of zombie monster which this monster could
+   be turned into, or NON_PM if it doesn't have a direct counterpart.
+   Sort of the zombie-specific inverse of undead_to_corpse. */
 int
-zombie_form(struct permonst* pm)
+zombie_form(struct permonst *pm)
 {
-    switch(pm->mlet) {
+    switch (pm->mlet) {
+    case S_ZOMBIE: /* when already a zombie/ghoul/skeleton, will stay as is */
+        return NON_PM;
     case S_KOBOLD:
         return PM_KOBOLD_ZOMBIE;
     case S_ORC:
@@ -647,7 +663,7 @@ make_corpse(register struct monst* mtmp, unsigned int corpseflags)
      *  if the corpse's obj->dknown is 0.
      */
     if (Blind && !sensemon(mtmp))
-        obj->dknown = 0;
+        clear_dknown(obj); /* obj->dknown = 0; */
 
     stackobj(obj);
     newsym(x, y);
@@ -1003,7 +1019,7 @@ movemon(void)
         }
 
         /* continue if the monster died fighting */
-        if (Conflict && !mtmp->iswiz && mtmp->mcansee) {
+        if (Conflict && !mtmp->iswiz && m_canseeu(mtmp)) {
             /* Note:
              *  Conflict does not take effect in the first round.
              *  Therefore, A monster when stepping into the area will
@@ -1012,7 +1028,7 @@ movemon(void)
              *  The call to fightm() must be _last_.  The monster might
              *  have died if it returns 1.
              */
-            if (couldsee(mtmp->mx, mtmp->my)
+            if (cansee(mtmp->mx, mtmp->my)
                 && (distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM)
                 && fightm(mtmp))
                 continue; /* mon might have died */
@@ -1231,6 +1247,8 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                 if (otmp->oclass == SCROLL_CLASS
                     && objdescr_is(otmp, "YUM YUM"))
                     pline("Yum%c", otmp->blessed ? '!' : '.');
+                if (otmp->otyp == CORPSE)
+                    mon_givit(mtmp, &mons[otmp->corpsenm]);
             } else {
                 if (flags.verbose)
                     You_hear("a slurping sound.");
@@ -1344,6 +1362,8 @@ meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters 
                 You_hear("a masticating sound.");
         }
 
+        mon_givit(mtmp, &mons[otmp->corpsenm]);
+
         /* [should include quickmimic but can't handle that unless this
            gets changed to set mtmp->meating] */
         poly = polyfodder(otmp);
@@ -1373,6 +1393,67 @@ meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters 
         return 1;
     }
     return 0;
+}
+
+/* Maybe give an intrinsic to a monster from eating a corpse that confers it. */
+void
+mon_givit(struct monst* mtmp, struct permonst* ptr)
+{
+    int prop = corpse_intrinsic(ptr);
+    boolean vis = canseemon(mtmp);
+    const char* msg = NULL;
+    unsigned short intrinsic = 0; /* MR_* constant */
+
+    if (prop == 0)
+        return; /* no intrinsic from this corpse */
+
+    if (!should_givit(prop, ptr))
+        return; /* failed die roll */
+
+    /* Pets don't have all the fields that the hero does, so they can't get all
+     * the same intrinsics. If it happens to choose strength gain or teleport
+     * control or whatever, ignore it. */
+    switch (prop) {
+    case FIRE_RES:
+        intrinsic = MR_FIRE;
+        msg = "%s shivers slightly.";
+        break;
+    case COLD_RES:
+        intrinsic = MR_COLD;
+        msg = "%s looks quite warm.";
+        break;
+    case SLEEP_RES:
+        intrinsic = MR_SLEEP;
+        msg = "%s looks wide awake.";
+        break;
+    case DISINT_RES:
+        intrinsic = MR_DISINT;
+        msg = "%s looks very firm.";
+        break;
+    case SHOCK_RES:
+        intrinsic = MR_ELEC;
+        msg = "%s crackles with static electricity.";
+        break;
+    case POISON_RES:
+        intrinsic = MR_POISON;
+        msg = "%s looks healthy.";
+        break;
+    default:
+        break;
+    }
+
+    /* Don't give message if it already had this property intrinsically, but
+     * still do grant the intrinsic if it only had it from mresists.
+     * Do print the message if it only had this property extrinsically, which is
+     * why mon_resistancebits isn't used here. */
+    if ((mtmp->data->mresists | mtmp->mintrinsics) & intrinsic)
+        msg = (const char *) 0;
+
+    if (intrinsic)
+        mtmp->mintrinsics |= intrinsic;
+
+    if (vis && msg)
+        pline(msg, Monnam(mtmp));
 }
 
 void
@@ -1595,7 +1676,7 @@ mon_allowflags(struct monst* mtmp)
         allowflags |= ALLOW_SANCT | ALLOW_SSM;
     else
         allowflags |= ALLOW_U;
-    if (Conflict && !resist(mtmp, RING_CLASS, 0, 0))
+    if (Conflict && !resist_conflict(mtmp))
         allowflags |= ALLOW_U;
     if (mtmp->isshk)
         allowflags |= ALLOW_SSM;
@@ -1880,18 +1961,15 @@ mfndpos(
     return cnt;
 }
 
-/* Part of mm_aggression that represents two-way aggression. To avoid having to
- * code each case twice, this function contains those cases that ought to
- * happen twice, and mm_aggression will call it twice. */
+/* Part of mm_aggression that represents two-way aggression.  To avoid
+   having to code each case twice, this function contains those cases that
+   ought to happen twice, and mm_aggression will call it twice. */
 static long
-mm_2way_aggression(struct monst* magr, struct monst* mdef)
+mm_2way_aggression(struct monst *magr, struct monst *mdef)
 {
-    struct permonst *ma = magr->data;
-    struct permonst *md = mdef->data;
-
     /* zombies vs things that can be zombified */
-    if (zombie_maker(ma) && zombie_form(md) != NON_PM)
-        return ALLOW_M|ALLOW_TM;
+    if (zombie_maker(magr) && zombie_form(mdef->data) != NON_PM)
+        return (ALLOW_M | ALLOW_TM);
 
     return 0;
 }
@@ -2192,6 +2270,8 @@ m_detach(
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS)
         nemdead();
+    if (mtmp->data->msound == MS_LEADER)
+        leaddead();
     if (mtmp->m_id == g.stealmid)
         thiefdead();
     relobj(mtmp, 0, FALSE);
@@ -2509,12 +2589,7 @@ corpse_chance(
                 return FALSE;
             }
 
-            Sprintf(g.killer.name, "%s explosion",
-                    s_suffix(pmname(mdat, Mgender(mon))));
-            g.killer.format = KILLED_BY_AN;
-            explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
-            g.killer.name[0] = '\0';
-            g.killer.format = 0;
+            mon_explodes(mon, &mdat->mattk[i]);
             return FALSE;
         }
     }
@@ -2712,6 +2787,8 @@ void
 unstuck(struct monst* mtmp)
 {
     if (u.ustuck == mtmp) {
+        struct permonst *ptr = mtmp->data;
+
         /* do this first so that docrt()'s botl update is accurate;
            safe to do as long as u.uswallow is also cleared before docrt() */
         set_ustuck((struct monst *) 0);
@@ -2725,11 +2802,16 @@ unstuck(struct monst* mtmp)
                 placebc();
             g.vision_full_recalc = 1;
             docrt();
-            /* prevent swallower (mtmp might have just poly'd into something
-               without an engulf attack) from immediately re-engulfing */
-            if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
-                mtmp->mspec_used = rnd(2);
         }
+
+        /* prevent holder/engulfer from immediately re-holding/re-engulfing
+           [note: this call to unstuck() might be because u.ustuck has just
+           changed shape and doesn't have a holding attack any more, hence
+           don't set mspec_used uncondtionally] */
+        if (!mtmp->mspec_used && (dmgtype(ptr, AD_STCK)
+                                  || attacktype(ptr, AT_ENGL)
+                                  || attacktype(ptr, AT_HUGS)))
+            mtmp->mspec_used = rnd(2);
     }
 }
 
@@ -2868,7 +2950,7 @@ xkilled(
         /* corpse--none if hero was inside the monster */
         if (!wasinside && corpse_chance(mtmp, (struct monst *) 0, FALSE)) {
             g.zombify = (!g.thrownobj && !g.stoned && !uwep
-                         && zombie_maker(g.youmonst.data)
+                         && zombie_maker(&g.youmonst)
                          && zombie_form(mtmp->data) != NON_PM);
             cadaver = make_corpse(mtmp, burycorpse ? CORPSTAT_BURIED
                                                    : CORPSTAT_NONE);
@@ -2911,12 +2993,17 @@ xkilled(
     /* adjust alignment points */
     if (mtmp->m_id == g.quest_status.leader_m_id) { /* REAL BAD! */
         adjalign(-(u.ualign.record + (int) ALIGNLIM / 2));
+        u.ugangr += 7; /* instantly become "extremely" angry */
+        change_luck(-20);
         pline("That was %sa bad idea...",
               u.uevent.qcompleted ? "probably " : "");
     } else if (mdat->msound == MS_NEMESIS) { /* Real good! */
-        adjalign((int) (ALIGNLIM / 4));
+        if (!g.quest_status.killed_leader)
+            adjalign((int) (ALIGNLIM / 4));
     } else if (mdat->msound == MS_GUARDIAN) { /* Bad */
         adjalign(-(int) (ALIGNLIM / 8));
+        u.ugangr++;
+        change_luck(-4);
         if (!Hallucination)
             pline("That was probably a bad idea...");
         else
@@ -3353,8 +3440,7 @@ setmangry(struct monst* mtmp, boolean via_attack)
     }
 
     /* attacking your own quest leader will anger his or her guardians */
-    if (!g.context.mon_moving /* should always be the case here */
-        && mtmp->data == &mons[quest_info(MS_LEADER)]) {
+    if (mtmp->data == &mons[quest_info(MS_LEADER)]) {
         struct monst *mon;
         struct permonst *q_guardian = &mons[quest_info(MS_GUARDIAN)];
         int got_mad = 0;
@@ -4505,6 +4591,7 @@ golemeffects(register struct monst* mon, int damtype, int dam)
     }
 }
 
+/* anger the Minetown watch */
 boolean
 angry_guards(boolean silent)
 {
@@ -4516,8 +4603,8 @@ angry_guards(boolean silent)
             continue;
         if (is_watch(mtmp->data) && mtmp->mpeaceful) {
             ct++;
-            if (cansee(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
-                if (distu(mtmp->mx, mtmp->my) == 2)
+            if (canspotmon(mtmp) && mtmp->mcanmove) {
+                if (distu(mtmp->mx, mtmp->my) <= 2)
                     nct++;
                 else
                     sct++;
@@ -4531,18 +4618,25 @@ angry_guards(boolean silent)
     }
     if (ct) {
         if (!silent) { /* do we want pline msgs? */
-            if (slct)
-                pline_The("guard%s wake%s up!", slct > 1 ? "s" : "",
-                          slct == 1 ? "s" : "");
-            if (nct || sct) {
-                if (nct)
-                    pline_The("guard%s get%s angry!", nct == 1 ? "" : "s",
-                              nct == 1 ? "s" : "");
-                else if (!Blind)
-                    You_see("%sangry guard%s approaching!",
-                            sct == 1 ? "an " : "", sct > 1 ? "s" : "");
-            } else
-                You_hear("the shrill sound of a guard's whistle.");
+            char buf[BUFSZ];
+
+            if (slct) { /* sleeping guard(s) */
+                Sprintf(buf, "guard%s", plur(slct));
+                pline_The("%s %s up.", buf, vtense(buf, "wake"));
+            }
+
+            if (nct) { /* seen/sensed adjacent guard(s) */
+                Sprintf(buf, "guard%s", plur(nct));
+                pline_The("%s %s angry!", buf, vtense(buf, "get"));
+            } else if (sct) { /* seen/sensed non-adjcent guard(s) */
+                Sprintf(buf, "guard%s", plur(sct));
+                pline("%s %s %s approaching!",
+                      (sct == 1) ? "An angry" : "Angry",
+                      buf, vtense(buf, "are"));
+            } else {
+                Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
+                You_hear("the shrill sound of %s whistle%s.", buf, plur(ct));
+            }
         }
         return TRUE;
     }

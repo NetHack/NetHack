@@ -1143,7 +1143,7 @@ query_category(const char *qstr,      /* query string */
         itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
-                                       : "Auto-select every item",
+                                       : "Auto-select every relevant item",
                  itemflags);
 
         any = cg.zeroany;
@@ -2899,7 +2899,7 @@ static int
 menu_loot(int retry, boolean put_in)
 {
     int n, i, n_looted = 0;
-    boolean all_categories = TRUE, loot_everything = FALSE;
+    boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
     const char *action = put_in ? "Put in" : "Take out";
     struct obj *otmp, *otmp2;
@@ -2918,30 +2918,41 @@ menu_loot(int retry, boolean put_in)
         if (!n)
             return 0;
         for (i = 0; i < n; i++) {
-            if (pick_list[i].item.a_int == 'A')
-                loot_everything = TRUE;
-            else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED)
+            if (pick_list[i].item.a_int == 'A') {
+                loot_everything = autopick = TRUE;
+            } else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
-            else
+            } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
+                loot_everything = FALSE;
+            }
         }
         free((genericptr_t) pick_list);
     }
 
-    if (loot_everything) {
+    if (autopick) {
+        int (*inout_func)(struct obj *); /* in_container or out_container */
+        struct obj *firstobj;
+
         if (!put_in) {
             g.current_container->cknown = 1;
-            for (otmp = g.current_container->cobj; otmp; otmp = otmp2) {
-                otmp2 = otmp->nobj;
-                res = out_container(otmp);
-                if (res < 0)
-                    break;
-                n_looted += res;
-            }
+            inout_func = out_container;
+            firstobj = g.current_container->cobj;
         } else {
-            for (otmp = g.invent; otmp && g.current_container; otmp = otmp2) {
-                otmp2 = otmp->nobj;
-                res = in_container(otmp);
+            inout_func = in_container;
+            firstobj = g.invent;
+        }
+        /*
+         * Note:  for put_in, current_container might be destroyed during
+         * mid-traversal by a magic bag explosion.
+         * Note too:  items are processed in internal list order rather
+         * than menu display order ('sortpack') or 'sortloot' order;
+         * for put_in that should be item->invlet order so reasonable.
+         */
+        for (otmp = firstobj; otmp && g.current_container; otmp = otmp2) {
+            otmp2 = otmp->nobj;
+            if (loot_everything || all_categories || allow_category(otmp)) {
+                res = (*inout_func)(otmp);
                 if (res < 0)
                     break;
                 n_looted += res;

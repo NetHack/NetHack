@@ -14,6 +14,10 @@
 /*  */
 
 /* lua_CFunction prototypes */
+#ifdef DUMPLOG
+static int nhl_dump_fmtstr(lua_State *);
+#endif /* DUMPLOG */
+static int nhl_dnum_name(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
@@ -45,6 +49,68 @@ static int nhl_u_giveobj(lua_State *);
 static void init_u_data(lua_State *);
 static int nhl_set_package_path(lua_State *, const char *);
 static int traceback_handler(lua_State *);
+
+static const char *nhcore_call_names[NUM_NHCORE_CALLS] = {
+    "start_new_game",
+    "restore_old_game",
+    "moveloop_turn",
+    "game_exit",
+};
+static boolean nhcore_call_available[NUM_NHCORE_CALLS];
+
+void
+l_nhcore_init(void)
+{
+    if ((g.luacore = nhl_init()) != 0) {
+        if (!nhl_loadlua(g.luacore, "nhcore.lua")) {
+            g.luacore = (lua_State *) 0;
+        } else {
+            int i;
+
+            for (i = 0; i < NUM_NHCORE_CALLS; i++)
+                nhcore_call_available[i] = TRUE;
+        }
+    }
+}
+
+void
+l_nhcore_done(void)
+{
+    if (g.luacore) {
+        nhl_done(g.luacore);
+        g.luacore = 0;
+    }
+}
+
+void
+l_nhcore_call(int callidx)
+{
+    int ltyp;
+
+    if (callidx < 0 || callidx >= NUM_NHCORE_CALLS
+        || !g.luacore || !nhcore_call_available[callidx])
+        return;
+
+    lua_getglobal(g.luacore, "nhcore");
+    if (!lua_istable(g.luacore, -1)) {
+        /*impossible("nhcore is not a lua table");*/
+        nhl_done(g.luacore);
+        g.luacore = 0;
+        return;
+    }
+
+    lua_getfield(g.luacore, -1, nhcore_call_names[callidx]);
+    ltyp = lua_type(g.luacore, -1);
+    if (ltyp == LUA_TFUNCTION) {
+        lua_remove(g.luacore, -2); /* nhcore_call_names[callidx] */
+        lua_remove(g.luacore, -2); /* nhcore */
+        lua_call(g.luacore, 0, 1);
+    } else {
+        /*impossible("nhcore.%s is not a lua function",
+          nhcore_call_names[callidx]);*/
+        nhcore_call_available[callidx] = FALSE;
+    }
+}
 
 void
 nhl_error(lua_State *L, const char *msg)
@@ -330,7 +396,7 @@ nhl_getmap(lua_State *L)
 
             if (IS_DOOR(levl[x][y].typ)) {
                 nhl_add_table_entry_bool(L, "nodoor",
-                                         (levl[x][y].flags & D_NODOOR));
+                                         (levl[x][y].flags == D_NODOOR));
                 nhl_add_table_entry_bool(L, "broken",
                                          (levl[x][y].flags & D_BROKEN));
                 nhl_add_table_entry_bool(L, "isopen",
@@ -780,6 +846,40 @@ get_table_option(lua_State *L,
     return ret;
 }
 
+#ifdef DUMPLOG
+/* local fname = dump_fmtstr("/tmp/nethack.%n.%d.log"); */
+static int
+nhl_dump_fmtstr(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    char buf[512];
+
+    if (argc == 1)
+        lua_pushstring(L, dump_fmtstr(luaL_checkstring(L, 1), buf, TRUE));
+    else
+        nhl_error(L, "Expected a string parameter");
+    return 1;
+}
+#endif /* DUMPLOG */
+
+/* local dungeon_name = dnum_name(u.dnum); */
+static int
+nhl_dnum_name(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        int dnum = luaL_checkinteger(L, 1);
+
+        if (dnum >= 0 && dnum < g.n_dgns)
+            lua_pushstring(L, g.dungeons[dnum].dname);
+        else
+            lua_pushstring(L, "");
+    } else
+        nhl_error(L, "Expected an integer parameter");
+    return 1;
+}
+
 /*
   test( { x = 123, y = 456 } );
 */
@@ -831,6 +931,10 @@ static const struct luaL_Reg nhl_functions[] = {
     {"parse_config", nhl_parse_config},
     {"get_config", nhl_get_config},
     {"get_config_errors", l_get_config_errors},
+#ifdef DUMPLOG
+    {"dump_fmtstr", nhl_dump_fmtstr},
+#endif /* DUMPLOG */
+    {"dnum_name", nhl_dnum_name},
     {NULL, NULL}
 };
 
@@ -926,6 +1030,15 @@ nhl_meta_u_index(lua_State *L)
         return 1;
     } else if (!strcmp(tkey, "role")) {
         lua_pushstring(L, g.urole.name.m);
+        return 1;
+    } else if (!strcmp(tkey, "moves")) {
+        lua_pushinteger(L, g.moves);
+        return 1;
+    } else if (!strcmp(tkey, "uhave_amulet")) {
+        lua_pushinteger(L, u.uhave.amulet);
+        return 1;
+    } else if (!strcmp(tkey, "depth")) {
+        lua_pushinteger(L, depth(&u.uz));
         return 1;
     }
 
@@ -1193,7 +1306,7 @@ get_lua_version(void)
                 Strcpy(g.lua_ver, vs);
             }
         }
-        lua_close(L);
+        nhl_done(L);
 #ifdef LUA_COPYRIGHT
         if (sizeof LUA_COPYRIGHT <= sizeof g.lua_copyright)
             Strcpy(g.lua_copyright, LUA_COPYRIGHT);

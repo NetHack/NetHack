@@ -284,12 +284,11 @@ const char *mesg;
 }
 
 void
-chainout_update_inventory(vp)
-void *vp;
+chainout_update_inventory(void *vp, int arg)
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_update_inventory)();
+    (*tdp->nprocs->win_update_inventory)(arg);
 }
 
 void

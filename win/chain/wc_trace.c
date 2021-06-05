@@ -500,15 +500,14 @@ const char *mesg;
 }
 
 void
-trace_update_inventory(vp)
-void *vp;
+trace_update_inventory(void *vp, int arg)
 {
     struct trace_data *tdp = vp;
 
-    fprintf(wc_tracelogf, "%supdate_inventory()\n", INDENT);
+    fprintf(wc_tracelogf, "%supdate_inventory(%d)\n", INDENT, arg);
 
     PRE;
-    (*tdp->nprocs->win_update_inventory)(tdp->ndata);
+    (*tdp->nprocs->win_update_inventory)(tdp->ndata, arg);
     POST;
 }
 

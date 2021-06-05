@@ -61,7 +61,10 @@ des.feature("fountain", 53,02)
 des.door("locked",26,10)
 des.door("locked",43,10)
 -- Norn
-des.monster("Norn", 35, 10)
+des.monster({ id = "Norn", coord = {35, 10}, inventory = function()
+   des.object({ id = "banded mail", spe = 5 });
+   des.object({ id = "long sword", spe = 4 });
+end })
 -- The treasure of the Norn
 des.object("chest", 36, 10)
 -- valkyrie guards for the audience chamber

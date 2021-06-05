@@ -1147,9 +1147,24 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
     textsearching = false;
 }
 
+// handle a line of text for a text window
 void NetHackQtTextWindow::PutStr(int attr UNUSED, const QString& text)
 {
-    str_fixed=str_fixed || text.contains("    ");
+#if 1
+    // 3.7:  Always render text windows with fixed-width font.  The majority
+    // of text files we'll ever display including ('license' and 'history')
+    // happen to have some lines with four spaces anyway and/or they have
+    // been pre-formatted to fit within less than 80 columns.  For data.base
+    // entries, some do have four spaces (usually the final attribution)
+    // and some don't, resulting in inconsistent display from one entry to
+    // another if the default proportional font is ever used.
+    str_fixed = true;
+#else
+    // if any line contains four consecutive spaces, render this text window
+    // using fixed-width font; skip substring lookup if flag is already set
+    str_fixed = str_fixed || text.contains("    ");
+#endif
+    // instead of outputting the line directly, save it for future rendering
     lines->addItem(text);
 }
 

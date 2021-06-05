@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1612316744 2021/02/03 01:45:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1621380392 2021/05/18 23:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -109,6 +109,20 @@ panictrace_handler(int sig_unused UNUSED)
 {
 #define SIG_MSG "\nSignal received.\n"
     int f2;
+
+#ifdef CURSES_GRAPHICS
+    if (iflags.window_inited && WINDOWPORT("curses")) {
+        extern void curses_uncurse_terminal(void); /* wincurs.h */
+
+        /* it is risky calling this during a program-terminating signal,
+           but without it the subsequent backtrace is useless because
+           that ends up being scrawled all over the screen; call is
+           here rather than in NH_abort() because panic() calls both
+           exit_nhwindows(), which makes this same call under curses,
+           then NH_abort() and we don't want to call this twice */
+        curses_uncurse_terminal();
+    }
+#endif
     
     f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
@@ -156,8 +170,10 @@ NH_abort(void)
 {
     int gdb_prio = SYSOPT_PANICTRACE_GDB;
     int libc_prio = SYSOPT_PANICTRACE_LIBC;
-    static boolean aborting = FALSE;
+    static volatile boolean aborting = FALSE;
 
+    /* don't execute this code recursively if a second abort is requested
+       while this routine or the code it calls is executing */
     if (aborting)
         return;
     aborting = TRUE;
@@ -478,6 +494,37 @@ done_in_by(struct monst *mtmp, int how)
     }
 
     Strcpy(g.killer.name, buf);
+
+    /* might need to fix up multi_reason if 'mtmp' caused the reason */
+    if (g.multi_reason
+        && g.multi_reason > g.multireasonbuf
+        && g.multi_reason < g.multireasonbuf + sizeof g.multireasonbuf - 1) {
+        char reasondummy, *p;
+        unsigned reasonmid = 0;
+
+        /*
+         * multireasonbuf[] contains 'm_id:reason' and multi_reason
+         * points at the text past the colon, so we have something
+         * like "42:paralyzed by a ghoul"; if mtmp->m_id matches 42
+         * then we truncate 'reason' at its first space so that final
+         * death reason becomes "Killed by a ghoul, while paralyzed."
+         * instead of "Killed by a ghoul, while paralyzed by a ghoul."
+         * (3.6.x gave "Killed by a ghoul, while paralyzed by a monster."
+         * which is potenitally misleading when the monster is also
+         * the killer.)
+         *
+         * Note that if the hero is life-saved and then killed again
+         * before the helplessness has cleared, the second death will
+         * report the truncated helplessness reason even if some other
+         * monster peforms the /coup de grace/.
+         */
+        if (sscanf(g.multireasonbuf, "%u:%c", &reasonmid, &reasondummy) == 2
+            && mtmp->m_id == reasonmid) {
+            if ((p = index(g.multireasonbuf, ' ')) != 0)
+                *p = '\0';
+        }
+    }
+
     /*
      * Chicken and egg issue:
      *  Ordinarily Unchanging ought to override something like this,
@@ -491,7 +538,7 @@ done_in_by(struct monst *mtmp, int how)
         u.ugrave_arise = PM_WRAITH;
     else if (mptr->mlet == S_MUMMY && g.urace.mummynum != NON_PM)
         u.ugrave_arise = g.urace.mummynum;
-    else if (zombie_maker(mptr) && zombie_form(g.youmonst.data) != NON_PM)
+    else if (zombie_maker(mtmp) && zombie_form(g.youmonst.data) != NON_PM)
         u.ugrave_arise = zombie_form(g.youmonst.data);
     else if (mptr->mlet == S_VAMPIRE && Race_if(PM_HUMAN))
         u.ugrave_arise = PM_VAMPIRE;
@@ -539,6 +586,7 @@ fixup_death(int how)
                     g.multi_reason = death_fixups[i].include;
                 else /* remove the helplessness reason */
                     g.multi_reason = (char *) 0;
+                g.multireasonbuf[0] = '\0'; /* dynamic buf stale either way */
                 if (death_fixups[i].unmulti) /* possibly hide helplessness */
                     g.multi = 0L;
                 break;
@@ -553,8 +601,8 @@ fixup_death(int how)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /*VARARGS1*/
-void panic
-VA_DECL(const char *, str)
+void
+panic VA_DECL(const char *, str)
 {
     VA_START(str);
     VA_INIT(str, char *);
@@ -854,8 +902,13 @@ disclose(int how, boolean taken)
 static void
 savelife(int how)
 {
-    int uhpmin = max(2 * u.ulevel, 10);
+    int uhpmin;
 
+    /* life-drain/level-loss to experience level 0 kills without actually
+       reducing ulevel below 1, but include this for bulletproofing */
+    if (u.ulevel < 1)
+        u.ulevel = 1;
+    uhpmin = max(2 * u.ulevel, 10);
     if (u.uhpmax < uhpmin)
         u.uhpmax = uhpmin;
     u.uhp = u.uhpmax;
@@ -1700,6 +1753,8 @@ void
 nh_terminate(int status)
 {
     g.program_state.in_moveloop = 0; /* won't be returning to normal play */
+
+    l_nhcore_call(NHCORE_GAME_EXIT);
 #ifdef MAC
     getreturn("to exit");
 #endif
@@ -1708,6 +1763,7 @@ nh_terminate(int status)
     if (!g.program_state.panicking) {
         freedynamicdata();
         dlb_cleanup();
+        l_nhcore_done();
     }
 
 #ifdef VMS

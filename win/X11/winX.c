@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613292827 2021/02/14 08:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1613985000 2021/02/22 09:10:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -84,7 +84,7 @@ AppResources appResources;
 void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 int click_x, click_y, click_button; /* Click position on a map window   */
                                     /* (filled by set_button_values()). */
-int updated_inventory;
+int updated_inventory; /* used to indicate perm_invent updating */
 
 static int (*old_error_handler) (Display *, XErrorEvent *);
 
@@ -105,7 +105,7 @@ struct window_procs X11_procs = {
 #ifdef STATUS_HILITES
       | WC2_RESET_STATUS | WC2_HILITE_STATUS
 #endif
-      | 0L ),
+      | WC2_MENU_SHIFT ),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     X11_init_nhwindows,
     X11_player_selection, X11_askname, X11_get_nh_event, X11_exit_nhwindows,
@@ -1239,8 +1239,9 @@ X11_destroy_nhwindow(winid window)
     }
 }
 
+/* display persistent inventory in its own window */
 void
-X11_update_inventory(void)
+X11_update_inventory(int arg)
 {
     struct xwindow *wp = 0;
 
@@ -1251,7 +1252,11 @@ X11_update_inventory(void)
         /* skip any calls to update_inventory() before in_moveloop starts */
         if (g.program_state.in_moveloop || g.program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
-            (void) display_inventory((char *) 0, FALSE);
+            if (!arg) {
+                (void) display_inventory((char *) 0, FALSE);
+            } else {
+                x11_scroll_perminv(arg);
+            }
             updated_inventory = 0;
         }
     } else if ((wp = &window_list[WIN_INVEN]) != 0
@@ -1259,6 +1264,7 @@ X11_update_inventory(void)
         /* persistent inventory is up but perm_invent is off, take it down */
         x11_no_perminv(wp);
     }
+    return;
 }
 
 /* The current implementation has all of the saved lines on the screen. */
@@ -1826,7 +1832,7 @@ X11_askname(void)
 static Widget getline_popup, getline_dialog;
 
 #define CANCEL_STR "\033"
-static char *getline_input;
+static char *getline_input; /* buffer to hold user input; getline's output */
 
 /* Callback for getline dialog widget. */
 /* ARGSUSED */
@@ -1892,12 +1898,14 @@ release_getline_widgets(void)
         XtDestroyWidget(getline_popup), getline_popup = (Widget) 0;
 }
 
+/* ask user for a line of text */
 void
-X11_getlin(const char *question, char *input)
+X11_getlin(const char *question, /* prompt */
+           char *input)          /* user's input, getlin's _output_ buffer */
 {
-    getline_input = input;
+    getline_input = input; /* used by popup actions */
 
-    flush_screen(1);
+    flush_screen(1); /* tell core to make sure that map is up to date */
     if (!getline_popup) {
         Arg args[1];
 
@@ -1935,6 +1943,34 @@ X11_getlin(const char *question, char *input)
 
     /* The callback will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
+
+    /* we get here after the popup has exited;
+       put prompt and response into the message window (and into
+       core's dumplog history) unless play hasn't started yet */
+    if (g.program_state.in_moveloop || g.program_state.gameover) {
+        /* single space has meaning (to remove a previously applied name) so
+           show it clearly; don't care about legibility of multiple spaces */
+        const char *visanswer = !input[0] ? "<empty>"
+                                : (input[0] == ' ' && !input[1]) ? "<space>"
+                                  : (input[0] == '\033') ? "<esc>"
+                                    : input;
+        int promptlen = (int) strlen(question),
+            answerlen = (int) strlen(visanswer);
+
+        /* prompt should be limited to QBUFSZ-1 by caller; enforce that
+           here for the echoed value; answer could be up to BUFSZ-1 long;
+           pline() will truncate the whole message to that amount so we
+           truncate the answer for display; this only affects the echoed
+           response, not the actual response being returned to the core */
+        if (promptlen >= QBUFSZ)
+            promptlen = QBUFSZ - 1;
+        if (answerlen + 1 + promptlen >= BUFSZ) /* +1: separating space */
+            answerlen = BUFSZ - (1 + promptlen) - 1;
+        pline("%.*s %.*s", promptlen, question, answerlen, visanswer);
+    }
+
+    /* clear static pointer that's about to go stale */
+    getline_input = 0;
 }
 
 /* Display file ----------------------------------------------------------- */
@@ -1993,6 +2029,7 @@ static Widget yn_popup;          /* popup for the yn fuction (created once) */
 static Widget yn_label;          /* label for yn function (created once) */
 static boolean yn_getting_num;   /* TRUE if accepting digits */
 static boolean yn_preserve_case; /* default is to force yn to lower case */
+static boolean yn_no_default;    /* don't convert ESC or quitchars to def */
 static int yn_ndigits;           /* digit count */
 static long yn_val;              /* accumulated value */
 
@@ -2058,7 +2095,8 @@ yn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         return;
     }
 
-    if (!yn_choices) { /* accept any input */
+    if (!yn_choices /* accept any input */
+        || (yn_no_default && (ch == '\033' || index(yn_quitchars, ch)))) {
         yn_return = ch;
     } else {
         if (!yn_preserve_case)
@@ -2120,21 +2158,28 @@ release_yn_widgets(void)
         XtDestroyWidget(yn_popup), yn_popup = (Widget) 0;
 }
 
-/* X11-specific edition of yn_function(), the routine called by the core
-   to show a prompt and get a single keystroke answer, often 'y' vs 'n' */
+/* guts of the X11_yn_function(), not to be confused with core code;
+   requires an extra argument: ynflags */
 char
-X11_yn_function(const char *ques,
-                const char *choices, /* string of possible response chars; any char if Null */
-                char def)            /* default response if user hits <space> or <return> */
+X11_yn_function_core(
+    const char *ques,     /* prompt text */
+    const char *choices,  /* allowed response chars; any char if Null */
+    char def,             /* default if user hits <space> or <return> */
+    unsigned ynflags)     /* flags; currently just log-it or not */
 {
-    char buf[BUFSZ];
+    static XFontStruct *yn_font = 0;
+    static Dimension yn_minwidth = 0;
+    char buf[BUFSZ], buf2[BUFSZ];
     Arg args[4];
     Cardinal num_args;
+    boolean suppress_logging = (ynflags & YN_NO_LOGMESG) != 0U,
+            no_default_cnvrt = (ynflags & YN_NO_DEFAULT) != 0U;
 
     yn_choices = choices; /* set up globals for callback to use */
     yn_def = def;
+    yn_no_default = no_default_cnvrt;
     yn_preserve_case = !choices; /* preserve case when an arbitrary
-                                    response is allowed */
+                                  * response is allowed */
 
     /*
      * This is sort of a kludge.  There are quite a few places in the main
@@ -2161,11 +2206,15 @@ X11_yn_function(const char *ques,
         if ((cb = index(choicebuf, '\033')) != 0)
             *cb = '\0';
         /* ques [choices] (def) */
-        if ((int) (1 + strlen(ques) + 2 + strlen(choicebuf) + 4) >= BUFSZ)
-            panic("X11_yn_function:  question too long");
-        (void) strncpy(buf, ques, QBUFSZ - 1);
-        buf[QBUFSZ - 1] = '\0';
-        Sprintf(eos(buf), " [%s]", choicebuf);
+        int ln = ((int) strlen(ques)        /* prompt text */
+                  + 3                       /* " []" */
+                  + (int) strlen(choicebuf) /* choices within "[]" */
+                  + 4                       /* " (c)" */
+                  + 1                       /* a trailing space */
+                  + 1);                     /* \0 terminator */
+        if (ln >= BUFSZ)
+            panic("X11_yn_function:  question too long (%d)", ln);
+        Snprintf(buf, sizeof buf, "%.*s [%s]", QBUFSZ - 1, ques, choicebuf);
         if (def)
             Sprintf(eos(buf), " (%c)", def);
         Strcat(buf, " ");
@@ -2175,10 +2224,20 @@ X11_yn_function(const char *ques,
                       : index(choices, 'n') ? 'n'
                         : def);
     } else {
-        if ((int) (1 + strlen(ques) + 1) >= BUFSZ)
-            panic("X11_yn_function:  question too long");
+        int ln = ((int) strlen(ques)        /* prompt text */
+                  + 1                       /* a trailing space */
+                  + 1);                     /* \0 terminator */
+        if (ln >= BUFSZ)
+            panic("X11_yn_function:  question too long (%d)", ln);
         Strcpy(buf, ques);
         Strcat(buf, " ");
+    }
+    /* for popup-style, add some extra elbow room to the prompt to
+       enhance its visibility; there's no cursor shown, just the text */
+    if (!appResources.slow) {
+        /* insert one leading space and two extra trailing spaces */
+        Strcpy(buf2, buf);
+        Snprintf(buf, sizeof buf, " %s  ", buf2);
     }
 
     /*
@@ -2193,50 +2252,86 @@ X11_yn_function(const char *ques,
 
     if (appResources.slow) {
         /*
-         * 'slow':  the yn_label widget was created when the map and
-         * status widgets were, and is positioned between them.  It
+         * 'slow' is True:  the yn_label widget was created when the map
+         * and status widgets were, and is positioned between them.  It
          * will persist until end of game.  All we need to do for
          * yn_function is direct keystroke input to the yn response
          * handler and reset its label to be the prompt text (below).
          */
         input_func = yn_key;
         highlight_yn(FALSE); /* expose yn_label as separate from map */
-    } else if (!yn_label) {
+    } else {
         /*
-         * Not 'slow'; create a persistent widget that will be popped up
-         * as needed, then down again, and last until end of game.  The
+         * 'slow' is False; create a persistent widget that will be popped
+         * up as needed, then down again, and last until end of game.  The
          * associated yn_label widget is used to track whether it exists.
          */
-        XtSetArg(args[0], XtNallowShellResize, True);
-        yn_popup = XtCreatePopupShell("query", transientShellWidgetClass,
-                                      toplevel, args, ONE);
-        XtOverrideTranslations(yn_popup,
+        if (!yn_label) {
+            XtSetArg(args[0], XtNallowShellResize, True);
+            yn_popup = XtCreatePopupShell("query", transientShellWidgetClass,
+                                          toplevel, args, ONE);
+            XtOverrideTranslations(yn_popup,
                XtParseTranslationTable("<Message>WM_PROTOCOLS: yn_delete()"));
 
-        num_args = 0;
-        XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(yn_translations)); num_args++;
-        yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
-                                         yn_popup, args, num_args);
+            num_args = 0;
+            XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft);
+                                                                   num_args++;
+            XtSetArg(args[num_args], XtNtranslations,
+                     XtParseTranslationTable(yn_translations)); num_args++;
+            yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
+                                             yn_popup, args, num_args);
 
-        XtRealizeWidget(yn_popup);
-        XSetWMProtocols(XtDisplay(yn_popup), XtWindow(yn_popup),
-                        &wm_delete_window, 1);
+            XtRealizeWidget(yn_popup);
+            XSetWMProtocols(XtDisplay(yn_popup), XtWindow(yn_popup),
+                            &wm_delete_window, 1);
+
+            /* get font that will be used; we'll need it to measure text */
+            (void) memset((genericptr_t) args, 0, sizeof args);
+            XtSetArg(args[0], nhStr(XtNfont), &yn_font);
+            XtGetValues(yn_label, args, ONE);
+
+            /* set up minimum yn_label width; we don't actually set
+               the XtNminWidth attribute */
+            (void) memset(buf2, 'X', 25), buf2[25] = '\0'; /* 25 'X's */
+            yn_minwidth = (Dimension) XTextWidth(yn_font, buf2,
+                                                 (int) strlen(buf2));
+        }
     }
 
     /* set the label of the yn widget to be the prompt text */
+    (void) memset((genericptr_t) args, 0, sizeof args);
     num_args = 0;
     XtSetArg(args[num_args], XtNlabel, buf); num_args++;
     XtSetValues(yn_label, args, num_args);
 
+    /* for !slow, pop up the prompt+response widget */
     if (!appResources.slow) {
         /*
-         * Due to some kind of weird bug in the X11R4 and X11R5 shell, we
-         * need to set the label twice to get the size to change.
+         * Setting the text doesn't always perform a resize when it
+         * should.  We used to just set the text a second time, but that
+         * wasn't a reliable workaround, at least on OSX with XQuartz.
+         * This seems to work reliably.
+         *
+         * It also enforces a minimum prompt width, which wasn't being
+         * done before, so that really short prompts are more noticeable
+         * if they pop up where the pointer is parked and it happens to
+         * be setting somewhere the player isn't looking.
          */
+        Dimension promptwidth, labelwidth = 0;
+
+        (void) memset((genericptr_t) args, 0, sizeof args);
         num_args = 0;
-        XtSetArg(args[num_args], XtNlabel, buf); num_args++;
-        XtSetValues(yn_label, args, num_args);
+        XtSetArg(args[num_args], XtNwidth, &labelwidth); num_args++;
+        XtGetValues(yn_label, args, num_args);
+
+        promptwidth = (Dimension) XTextWidth(yn_font, buf, (int) strlen(buf));
+        if (labelwidth != promptwidth || labelwidth < yn_minwidth) {
+            labelwidth = max(promptwidth, yn_minwidth);
+            (void) memset((genericptr_t) args, 0, sizeof args);
+            num_args = 0;
+            XtSetArg(args[num_args], XtNwidth, labelwidth); num_args++;
+            XtSetValues(yn_label, args, num_args);
+        }
 
         positionpopup(yn_popup, TRUE);
         nh_XtPopup(yn_popup, (int) XtGrabExclusive, yn_label);
@@ -2245,21 +2340,39 @@ X11_yn_function(const char *ques,
     yn_getting_num = FALSE;
     (void) x_event(EXIT_ON_EXIT); /* get keystroke(s) */
 
+    /* erase or remove the prompt */
     if (appResources.slow) {
-        /* keystrokes now belong to the map */
-        input_func = 0;
-        /* erase the prompt */
+        (void) memset((genericptr_t) args, 0, sizeof args);
         num_args = 0;
         XtSetArg(args[num_args], XtNlabel, " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+
+        input_func = 0; /* keystrokes now belong to the map */
         highlight_yn(FALSE); /* disguise yn_label as part of map */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
 
-    pline("%s%c", buf, (yn_return != '\033') ? yn_return : '\0');
+    if (!suppress_logging) {
+        char *p = trimspaces(buf); /* remove !slow's extra whitespace */
+
+        pline("%s %s", p, (yn_return == '\033') ? "ESC" : visctrl(yn_return));
+    }
 
     return yn_return;
+}
+
+/* X11-specific edition of yn_function(), the routine called by the core
+   to show a prompt and get a single key answer, often 'y' vs 'n' */
+char
+X11_yn_function(
+    const char *ques,     /* prompt text */
+    const char *choices,  /* allowed response chars; any char if Null */
+    char def)             /* default if user hits <space> or <return> */
+{
+    char res = X11_yn_function_core(ques, choices, def, YN_NORMAL);
+
+    return res;
 }
 
 /* used when processing window-capability-specific run-time options;
@@ -2270,6 +2383,8 @@ X11_preference_update(const char *pref)
     if (!strcmp(pref, "tiled_map")) {
         if (WIN_MAP != WIN_ERR)
             display_map_window(&window_list[WIN_MAP]);
+    } else if (!strcmp(pref, "perm_invent")) {
+        ; /* TODO... */
     }
 }
 
@@ -2597,14 +2712,24 @@ win_X11_init(int dir)
 }
 
 void
-find_scrollbars(Widget w, Widget *horiz, Widget *vert)
+find_scrollbars(
+    Widget w,      /* widget of interest; scroll bars are probably attached
+                      to its parent or grandparent */
+    Widget last_w, /* if non-zero, don't search ancestory beyond this point */
+    Widget *horiz, /* output: horizontal scrollbar */
+    Widget *vert)  /* output: vertical scrollbar */
 {
+    *horiz = *vert = (Widget) 0;
+    /* for 3.6 this looked for an ancestor with both scrollbars but
+       menus might have only vertical */
     if (w) {
         do {
             *horiz = XtNameToWidget(w, "*horizontal");
             *vert = XtNameToWidget(w, "*vertical");
+            if (*horiz || *vert)
+                break;
             w = XtParent(w);
-        } while (!*horiz && !*vert && w);
+        } while (w && (!last_w || w != last_w));
     }
 }
 
@@ -2630,7 +2755,7 @@ nh_keyscroll(Widget viewport, XEvent *event, String *params,
 
     direction = atoi(params[0]);
 
-    find_scrollbars(viewport, &horiz_sb, &vert_sb);
+    find_scrollbars(viewport, (Widget) 0, &horiz_sb, &vert_sb);
 
 #define H_DELTA 0.25 /* distance of horiz shift */
     /* vert shift is half of curr distance */

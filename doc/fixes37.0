@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.453 $ $NHDT-Date: 1613292825 2021/02/14 08:53:45 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.555 $ $NHDT-Date: 1622421099 2021/05/31 00:31:39 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -74,6 +74,7 @@ if the orc-town version of mine town has been loaded, creation of orc zombies
 when punished, involuntarily teleporting and landing within chain range of
 	attached ball while encumbered worse than burdened could trigger
 	"remove_object: obj not on floor" panic on hero's next move
+update persistent inventory when 'menu_headings' or 'sortloot' options change
 update persistent inventory when putting on a helmet causes it to auto-curse
 inventory cursing caused by "this water's no good" effect when drinking from
 	a fountain didn't update persistent inventory window
@@ -109,7 +110,28 @@ correctly account for fuel remaining when lit candles are attached
 	there were 15 or fewer turns remaining)
 praying on an unaligned altar outside of Gehennom behaved like an ordinary
 	prayer; make that always fail
-Discworld typo: Moving Pictures passage 12 "or" -> "of"
+tribute (Discworld snippets) typos, in book order rather than fix order:
+	Sourcery passage #4 "the moment the words were out of your mouth" ->
+	 "the moment and the words out of your mouth" where "were" didn't
+	 belong and awkward phrasing because of it caused "and" to be removed
+	 (would be much clearer if optional comma after "moment" was included)
+	Moving Pictures passage #10 initial single quote should be double,
+	 #12 "or" -> "of", #14 second instance of "megalomaniac" misspelled
+	Lords and Ladies passage #5, near end add missing opening double
+	 quote, passage #7 last paragraph, "to" -> "be"
+	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
+	 word "had": 'it was /fate/ that _had_ let Edward'
+	Interesting Times passage #1, italicize several words
+	Feet of Clay passage #1, "does not need" -> "doesn't even need"
+	Hogfather passage #7 missing initial double quote for "Oh, just ...",
+	 also #7 insert missing "you" into "Why are you feeling [...]"
+	Soul Music passage #1, italicize /feel/, #8, "fossile" -> "fossil"
+	Jingo passage #2 "Vines" -> "Vimes", "profferred" -> "proffered",
+	 missing opening single quote on second sentence of Lord Downey's
+	 line, passage #11 both in footnote:  "genious" -> "genius",
+	 "was, oddly enough, was one [...]" -> "was, oddly enough, one [...]"
+	A Hat Full of Sky passage #9 "though" -> "thought"
+	various, including Death quotes:  separate sentences by two spaces
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
@@ -381,8 +403,143 @@ prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
 curses interface failed to honor menu_xxx option settings for menu interaction
-during engraving, spaces were counted instead of non-spaces
+during engraving, spaces were counted instead of non-spaces [later: affected
+	code is gone, removed when engraving was converted into an occupation]
 when an explosion scatters objects, make any that fly over sinks stop there
+output message when changing fastmove mode while cursor targetting
+messages when Minetown watchmen become angry could report "you see an angry
+	guard approaching" even if he was invisible and hero can't see invis
+when autopickup is on but disabled due to being inside a shop, have ^X say so
+don't force fake player monks to always be male
+it was theoretically possible to overflow an internal buffer containing
+	inventory letters by carrying more than 52 separate lit candles and
+	using the '(' or '*' commands
+hero would be blinded and stunned by an Archon's radiance (gaze attack) even
+	if the Archon was blind, but monsters would not
+applying a polearm to attempt to attack a hidden monster would report "wait!
+	there's a monster hidden there" and display the "remembered, unseen
+	monster" glyph but only use a turn if polearm wasn't already wielded
+key parsing during options processing was inconsistent between OPTIONS=foo:k
+	BINDINGS=k:foo where k represents a key designation; the OPTIONS form
+	recognized backslash escape sequences but not M-x meta characters,
+	vice versa for BINDINGS (most noticeable for menu interaction keys
+	such as menu_next_page because those can be set via either directive)
+when creating a rolling boulder trap, don't place boulder on a path that
+	starts on or passes over a pit/spiked pit, hole/trap door,
+	teleport trap/level teleporter/magic portal
+remove superfluous "All" from "All foos are already nonexistent." when blessed
+	genocide tries to remove something which has already been genocided
+"#dip <item> into -" produced a scrambled message:
+	You mime dip <item> intoing something.
+similarly, "#rub the royal jelly on -" produced
+	You mime rub the royal jellying on something.
+mounted hero falling out of saddle shouldn't hit ground and take damage when
+	levitating or flying (if done without steed's help)
+avoid "obj not free" panic if monster kills itself by reading scroll of earth
+attempting to throw a partial stack of gold at self was prevented but left
+	the partial stack in an extra $ inventory slot
+quivering a partial stack of gold succeeded and put the partial stack in an
+	extra $ inventory slot
+if player managed to get multiple $ items, all but the last could be moved to
+	normal letter slots via #adjust and then subsequent #adjust with a
+	count could split them into even more slots
+when a monster on the far side of a closed door opens it, sometimes the hero
+	was told about the monster without it being displayed on the map
+also show extended command name when showing what a key does in help
+poly'd hero who exploded when attacking a monster didn't wake up other
+	monsters in the vicinity; when attacking thin air, hero's explosion
+	woke other monsters within different radius than same monster's would
+troll corpse revival was inhibited by hero wielding Trollsbane; change that
+	to being killed by Trollsbane instead (wielded by hero or by monster)
+statues representing petrified creatures on Medusa's level might be from
+	monsters who change form (golems) when hit with stoning damage
+attempt to make corpse or statue of a named player character would yield that
+	of a random monster instead when 'record' was empty; could result in
+	statues of non-stonable creatures in cockatrice nests
+homemade tin of very low nutrition corpse gave more nutrition than the corpse
+magic mapping performed while engulfed or underwater would display whole map
+	but then not switch back to the engulfed or underwater restricted view
+#overview used hardcoded bold and inverse for highlighting; switch to the
+	'menu_headings' option value so player has some control
+for menustyle:full, the 'A' menu choice to auto-select everything now only
+	does so if no other choices have been picked; when any have (object
+	class or BUCX state or both), it auto-selects every item that matches
+	those choices (so still skips the second menu) rather than every item
+using travel to move one step diagonally where that step was blocked by being
+	too narrow to squeeze through stopped travel instead of considering
+	alternate routes to the destination
+turn off input autocompletion for '#twoweapon' since simple 'X' invokes it;
+	likewise for #wizdetect (^E), #wizgenesis (^G), #wizidentify (^I),
+	#wizlevelport (^V), #wizmap (^F), and #wizwish (^W); probably ought
+	to do so for #overview (^O) too but that one still autocompletes
+if a branch has only one level (Fort Ludios), prevent creation of any level
+	teleporters there (level definition doesn't have any but wizard mode
+	wishing could attempt to place one)
+opening/unlocking magic zapped at monster holding the hero will release hold
+	(zap at engulfer already expels hero); zapping at self has same effect
+when riding, allow scroll of remove curse read by hero to affect steed's saddle
+the 'scores' option for final top ten display left default values in place if
+	only some of the three settings were set; 'scores:own' should have
+	produced '0 top/0 around/own' but ended up as '3 top/2 around/own'
+allow 'scores:none' as shorthand for 'scores:0 t/0 a/!o' (player will be told
+	whether new score made the list but no scores will be shown)
+contents of chests, large boxes, and ice boxes are now immune to water damage
+	unless the container is cursed, same as for oilskin sacks (previously,
+	chests+large boxes were always immune and ice boxes always vulnerable)
+applying an empty brass lantern in an attempt to light it reported "your lamp
+	has run out of power"; change to "your lantern is out of power"
+when swallowed or underwater, player could be told about events (such as a
+	shapechanger taking on a new form) that the hero sensed but which
+	were not shown on the screen; treat being swallowed or underwater as
+	situations which block telepathy, extended monster detection, warning
+some rolling boulder trap feedback was inconsistent
+change "killed by <a foo>, while {paralyzed|frozen} by <a foo>" into
+	"killed by <a foo>, while {paralyzed|frozen}" if the killer caused
+	hero's helplessness
+"It looks very angry" would be given if a hero wielding Excalibur or Demonbane
+	offended an unseen demon lord
+Entering a special room, only wake up the monsters in that room instead of
+	doing a level-wide wake-up
+any blessed key was behaving as if was the rogue's Master Key when unlocking
+	a trapped chest or box
+when an unseen non-pet picks up or uses an item, hero loses known/dknown/
+	bknown/cknown/lknown memory of that item (so becomes unidentified; in
+	particular, player won't be asked what to call unseen thrown potion)
+wishing for a partly eaten wraith corpse yielded "partly eaten food (1) more
+	nutritious than untouched food (0)"
+if PREFIXES_IN_USE was defined (and VAR_PLAYGROUND forces it to be) when
+	COMPRESS was also defined (external save and bones file compression
+	via fork()+exec()), the file name buffer in docompress_file() wasn't
+	big enough so could overflow and trigger a crash
+suppress "This <foo> corpse takes {delicious|okay|terrible}" if preceded by
+	"You have a bad case of stomach acid" or "Ecch - that must have been
+	poisonous"
+innocuous items like scrolls or eucalyptus leaves did harm when falling on
+	hero's head after being thrown upward
+fighter types who start out knowing all non-magic armor should not know
+	cornuthaum and dunce cap
+prediscovered weapons adjustmens:  only knights and samurai know polearms;
+	rangers know launchers (bows), ammo (arrows), and spears regardless
+	of their race/species; likewise, rogues know all daggers
+if the move counter ever reaches 1000000000, end the game
+knights get no metal armor penalty for clerical spells
+change touch of death from instadeath to maxhp reduction and damage
+dying from being level-drained below level 1 killed hero without saying so
+	and jumped straight to "do you want your possessions identified?"
+conflict will now consider your charisma and requires line of sight
+boost hit points of some golems
+make anti-magic fields drain more energy and prevent them from showing up
+	too early in the dungeon
+eating magical monsters such as wizards or shamans may give a mild buzz
+make exploding spheres create an actual explosion
+pets are more careful about attacking monsters at low health
+allow killing your quest leader to open the quest
+give King Arthur Excalibur
+when moving the cursor to examine the map, have '^' move to next trap even if
+	that trap is displayed with some other symbol (web, vibrating square)
+change valkyrie and warrior (valk quest) monsters from chaotic to lawful
+change attendant (healer quest) monster from lawful to neutral
+quit is not longer bound to M-q
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -509,6 +666,42 @@ changes accompanying sorting of discoveries resulted in omitting very last
 change to can_reach_floor() resulted in hero being unable to reach the floor
 	when held by a lichen
 panic if lua init fails
+change wizard mode command #wizmgender to wizard mode option 'wizmgender'
+engraving with non-blade dulled the weapon anyway (pr #464)
+'sortdiscoveries:s' had a spurious generic header shown at the start of the
+	last class if there were any artifacts or unique items discovered
+loss of saddle by opening magic left hero mounted on unsaddled steed
+avoid segfault during error reporting for bad 'O' value(s) after theme rooms
+	have been initialized, leaving iflags.in_lua set
+avoid complaints of "nothing to foo" for 'force_invmenu' if there are no
+	likely candidates to foo with but there are hidden acceptable choices
+avoid "Not carrying anything.  Never mind." for 'force_invmenu'
+'altmeta' option could be toggled On but once On could not be toggled back Off
+wearing a ring of protection and any amulet behaved as if wearing an amulet of
+	guarding when determining MC value
+messaging for genetic engineer attacks had several problems
+give genetic engineers teleport capability (as they had in slash'em); 'port
+	away after polymorphing someone so that they don't just repeat that
+if an invisible hero managed to convert an unaligned altar to an aligned one
+	with color enabled, altar wasn't immediately redrawn with new color
+repair some regressions to (a)pply introduced by "getobj refactor" patch
+fix ^X feedback when held typo: "unseen createure" -> "unseen creature"
+if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
+	eaten at revival time and monster <foo> is defined as providing more
+	nutrition that <foo> zombie, oeaten_stat() could give the warning
+	"partly eaten food more nutritious than untouched food" when used to
+	calculate zombie's hit points (depended upon how much had been eaten)
+undead turning magic revived corpses flagged as no-revive if they were being
+	carried but not if they were zapped while on the floor
+forgetting an item's known/dknown/bknown/&c settings when picked up by unseen
+	monster made it possible to trigger a latent shop bug with globs;
+	avoid clearing dknown flag for globs
+fix globby_bill_fixup to use shopkeeper instead of Null for glob pricing
+applying a book to check readability treated novels as if they were spellbooks
+#version was leaving the 'in_lua' flag set and if subsequent 'O' issued an
+	error (example was an attempt to interactively set bouldersym to an
+	invalid value), the error reporting routine crashed via segfault
+lighting for baalz level defaulted to random and could end up being lit
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -517,6 +710,9 @@ curses: line input that doesn't take place on the bottom line of the message
 	partial input or to cancel; "Who are you?" prompt was willing to name
 	a character "^["; have the popup version of getlin() fake the usual
 	ESC handling, but player has to type <escape><return> for that to work
+curses: menu headings didn't use default text color
+curses: #perminv changes disabled menu_headings attribute for persistent
+	inventory window headings; reinstate that
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
@@ -533,6 +729,11 @@ X11: for text map without color, add support for black&white ice; draw it in
 	inverse video to distinguish from ordinary floor
 X11: if perm_invent is set in NETHACKOPTIONS or config file, start with the
 	persistent inventory window displayed
+X11: use visctrl(response) when X11_yn_function() echoes prompt+response in
+	message window
+X11: when trying to lookup scrollbars in order to handle scrolling via keys,
+	menu handling always ended up finding the top window
+X11: enable horizontal scrollbar for persistent inventory window
 X11+OSX: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 
@@ -545,6 +746,7 @@ curses: for vertical status, line up conditions in columns; usually two but
 	condense to three per line if the status window isn't tall enough
 	[at present, highlighting with inverse video includes trailing spaces
 	used to align entries in their columns--that's a feature...]
+curses: indent items in perm_invent window by one space
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -624,7 +826,14 @@ Qt: when a new message is issued, pan the message window to its left edge if
 Qt: there was no way to enter extended command "#version" by typing; command
 	name matching was waiting to disambiguate it from "#versionshort"
 	and the only way to that was to type #version<return> but <return>
-	explicitly triggered rejection, cancelling '#' processing
+	explicitly triggered rejection, cancelling '#' processing; #drop vs
+	"droptype, "known vs "knownclass, and #takeoff vs #takeoffall are in
+	similar ambiguous situation but usually invoked via keystroke
+Qt: render all text windows in fixed-width font instead of just ones which
+	have one or more lines with four consecutive spaces; some data.base
+	entries do have those (usually final attribution) and some don't,
+	so display from one entry to another was inconsistent if default
+	proportional font was ever used
 Qt: while a text window was shown (such as the "things that are here" popup
 	when stepping on items), typing commands had the input passed on to
 	the map and then executed; sometimes that caused the not-yet-dismissed
@@ -668,6 +877,8 @@ X11: avoid 'bad Atom X Error' when perm_invent is enabled (seemingly window
 	manager dependent)
 X11: toggling 'perm_invent' off via 'O' didn't dismiss persistent inventory
 	window
+X11: with 'slow' resource set to False, the pop up yn_function didn't always
+	resize properly when re-used
 X11: (possibly X11+OSX): if persistent inventory was displayed at time of
 	end-of-game prompting, prompting would stall until that window was
 	manually dismissed
@@ -690,6 +901,7 @@ split off some of the functionality that was in makedefs (compiled-in options
 	and accessed on the target platform
 replace quest.txt and associated conversion to quest.dat via makedefs with
 	Lua quest texts loaded at runtime
+callback lua functions from core at certain game actions
 some altars are displayed in different colors (for tty and curses at least)
 add 'quick_farsight' option to provide some control over random clairvoyance
 	where pausing to be able to browse temporarily visible aspects of the
@@ -776,6 +988,7 @@ add 'sortdiscoveries' option to control output of '\' and '`' commands
 include an indication of monsters' health during farlook feedback (including
 	/M and autodescribe); also include it in death reason when killed by
 	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
+[later: suppress the indication of monsters' health]
 make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
 	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
 add support for a single monster species to have distinct male, female,
@@ -786,12 +999,28 @@ consolidate several monsters that differed only by their gender into their
 	single species
 added wizmgender debugging command to display female monsters in red inverse;
 	helpful for debugging gender-related matters on tty; currently ignored
-	on other window ports
+	on other window ports [later: changed from command to boolean option]
 record number of encountered bones levels in xlogfile
 add bonesless to extended conducts field in xlogfile
 show bones levels information in enlightenment at end of game or in explore
 	and wizmode
 for #wizintrinsic, use any counts entered during menu selection
+give feedback when boolean options are toggled interactively ('O' command)
+'|' command (#perminv) for interacting with persistent inventory display
+	(curses and X11 only)
+menu_shift_left, menu_shift_right menu command keys; default '{' and '}'
+	(curses for perm_invent only; implemented for X11 too but menus for
+	it lack horizontal scroll bars so the shifts don't work there)
+using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
+	thrown-and-return weapon will throw that weapon instead of filling
+	the quiver (inspired by xNetHack)
+3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
+	Lords and Ladies, two to Soul Music, three to Interesting Times, four
+	to Maskerade
+monsters can see and remember hero resistances
+monsters can gain resistances by eating corpses
+menu for what-is command supports /^ and /" to view a list of nearby or whole
+	level visible and remembered traps
 
 
 Platform- and/or Interface-Specific New Features
@@ -805,6 +1034,7 @@ curses: implement 'selectsaved', restore via menu of saved games
 curses: implement selecting menu items via mouse
 curses: 'windowborders' can be set to 3 or 4 to suppress perm_invent borders
 	to provide slightly more room for actual inventory info
+curses: if panictrace is triggered, reset the terminal before giving backtrace
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is
@@ -823,12 +1053,18 @@ Qt: add Filter, Layout, and Reset buttons to the extended command selector;
 	mode only"; Layout redisplays the grid of command buttons, toggling
 	from down columns to across rows or vice versa; Reset puts both back
 	to their default settings and clears any pending typed input
+Qt: [later] augment extended command selection dialog's Filter to add a
+	fourth subset, those commands which autocomplete when typed for tty,
+	typically commands with no keystroke or only meta character keystroke;
+	that makes Filter useful in normal mode (much shorter list of choices)
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 X11: implement 'selectsaved', restore via menu of saved games
+X11: echo getline prompt and response (wishes, applying names) to message
+	window and dumplog message history
 
 
 NetHack Community Patches (or Variation) Included

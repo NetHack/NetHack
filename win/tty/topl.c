@@ -10,10 +10,6 @@
 #include "tcap.h"
 #include "wintty.h"
 
-#ifndef C /* this matches src/cmd.c */
-#define C(c) (0x1f & (c))
-#endif
-
 static void redotoplin(const char *);
 static void topl_putsym(char);
 static void removetopl(int);

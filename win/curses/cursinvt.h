@@ -9,6 +9,6 @@
 
 /* Global declarations */
 
-void curses_update_inv(void);
+void curses_update_inv(int);
 
 #endif /* CURSINVT_H */

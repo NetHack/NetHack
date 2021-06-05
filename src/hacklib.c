@@ -1221,12 +1221,12 @@ strbuf_nl_to_crlf(strbuf_t *strbuf)
 }
 
 char *
-nonconst(const char *str, char *buf)
+nonconst(const char *str, char *buf, size_t bufsz)
 {
     char *retval = emptystr;
 
     if (str && buf)
-        if ((int) strlen(str) < BUFSZ - 1) {
+        if (strlen(str) <= (bufsz - 1)) {
 	    Strcpy(buf, str);
             retval = buf;
         }

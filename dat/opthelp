@@ -103,8 +103,7 @@ timed_delay    on unix and VMS, use a timer instead of sending     [True]
                display effect.  on MSDOS without the termcap
                lib, whether or not to pause for visual effect.
 
-Boolean option for Amiga, or for others if ALTMETA was set at compile time:
-altmeta        For Amiga, treat Alt+key as Meta+key.               [True]
+Boolean option if ALTMETA was set at compile time:
 altmeta        For unix and VMS, treat two character sequence
                "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [False]
                obtains a command from player's keyboard.
@@ -286,18 +285,21 @@ horsename  name of your starting pet if it is a pony                 [none]
 menu_*     specify single character accelerators for menu commands.
            Here is a list of all commands with their default keystroke
            followed by a list of window-ports that implement them:
-           'x' is X11, 't' is tty, 'g' is Gem, 'a' is Amiga.
-           menu_deselect_all  deselect all items in a menu         [-](xtga)
-           menu_deselect_page deselect all items on this menu page [\](tga)
-           menu_first_page    jump to the first page in a menu     [^](tga)
-           menu_invert_all    invert all items in a menu           [@](xtga)
-           menu_invert_page   invert all items on this menu page   [~](tga)
-           menu_last_page     jump to the last page in a menu      [|](tga)
-           menu_next_page     goto the next menu page              [>](tga)
-           menu_previous_page goto the previous menu page          [<](tga)
-           menu_search        search for a menu item               [:](xtga)
-           menu_select_all    select all items in a menu           [.](xtga)
-           menu_select_page   select all items on this menu page   [,](tga)
+           (t is tty, c is curses, w is Windows GUI, x is X11, q is Qt)
+           menu_first_page    jump to the first page in a menu     [^](tcwxq)
+           menu_last_page     jump to the last page in a menu      [|](tcwxq)
+           menu_next_page     advance to the next menu page        [>](tcwxq)
+           menu_previous_page back up to the previous menu page    [<](tcwxq)
+           menu_shift_left    pan view to left (perm_invent only)  [{](cx)
+           menu_shift_right   pan view to right (perm_invent only) [}](cx)
+           menu_select_all    select all items in a menu           [.](tcwxq)
+           menu_select_page   select all items on this menu page   [,](tcwq)
+           menu_deselect_all  deselect all items in a menu         [-](tcwxq)
+           menu_deselect_page deselect all items on this menu page [\](tcwq)
+           menu_invert_all    invert all items in a menu           [@](tcwxq)
+           menu_invert_page   invert all items on this menu page   [~](tcwq)
+           menu_search        prompt for target text and invert    [:](tcwxq)
+                              items which match that
 msghistory number of top line messages to save                         [20]
 name       the name of your character      [defaults to username on multi-
            user systems, asks "who are you?" on single-user systems or if

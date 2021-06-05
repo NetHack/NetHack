@@ -1092,30 +1092,44 @@ doorlock(struct obj *otmp, int x, int y)
     case WAN_STRIKING:
     case SPE_FORCE_BOLT:
         if (door->doormask & (D_LOCKED | D_CLOSED)) {
+            /* sawit: closed door location is more visible than open */
+            boolean sawit, seeit;
+
             if (door->doormask & D_TRAPPED) {
-                if (MON_AT(x, y))
-                    (void) mb_trapped(m_at(x, y));
-                else if (flags.verbose) {
-                    if (cansee(x, y))
-                        pline("KABOOM!!  You see a door explode.");
-                    else
-                        You_hear("a distant explosion.");
-                }
+                struct monst *mtmp = m_at(x, y);
+
+                sawit = mtmp ? canseemon(mtmp) : cansee(x, y);
                 door->doormask = D_NODOOR;
                 unblock_point(x, y);
                 newsym(x, y);
-                loudness = 40;
+                seeit = mtmp ? canseemon(mtmp) : cansee(x, y);
+                if (mtmp) {
+                    (void) mb_trapped(mtmp, sawit || seeit);
+                } else {
+                    /* for mtmp, mb_trapped() does is own wake_nearto() */
+                    loudness = 40;
+                    if (flags.verbose) {
+                        if ((sawit || seeit) && !Unaware)
+                            pline("KABOOM!!  You see a door explode.");
+                        else if (!Deaf)
+                            You_hear("a %s explosion.",
+                                     (distu(x, y) > 7 * 7) ? "distant"
+                                                           : "nearby");
+                    }
+                }
                 break;
             }
+            sawit = cansee(x, y);
             door->doormask = D_BROKEN;
+            unblock_point(x, y);
+            seeit = cansee(x, y);
+            newsym(x, y);
             if (flags.verbose) {
-                if (cansee(x, y))
+                if ((sawit || seeit) && !Unaware)
                     pline_The("door crashes open!");
-                else
+                else if (!Deaf)
                     You_hear("a crashing sound.");
             }
-            unblock_point(x, y);
-            newsym(x, y);
             /* force vision recalc before printing more messages */
             if (g.vision_full_recalc)
                 vision_recalc(0);

@@ -180,7 +180,7 @@ extern char hackdir[];
 #define getlogin() ((char *) 0)
 extern void win32_abort(void);
 #ifdef WIN32CON
-extern void nttty_preference_update(const char *);
+extern void consoletty_preference_update(const char *);
 extern void toggle_mouse_support(void);
 #endif
 

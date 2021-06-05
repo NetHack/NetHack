@@ -91,10 +91,10 @@ opt_##a,
     NHOPTC(altkeyhandler, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                "alternate key handler")
 #ifdef ALTMETA
-    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
                &iflags.altmeta)
 #else
-    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, No, No, No, NoAlias,
+    NHOPTB(altmeta, 0, opt_out, set_in_config, Off, Yes, No, No, NoAlias,
                (boolean *) 0)
 #endif
     NHOPTB(ascii_map, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
@@ -263,8 +263,8 @@ opt_##a,
                 NoAlias, "deselect all items in a menu")
     NHOPTC(menu_deselect_page, 4, opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "deselect all items on this page of a menu")
-    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, No, Yes, No, NoAlias,
-                "jump to the first page in a menu")
+    NHOPTC(menu_first_page, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "jump to the first page in a menu")
     NHOPTC(menu_headings, 4, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
                 "display style for menu headings")
     NHOPTC(menu_invert_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
@@ -274,7 +274,7 @@ opt_##a,
     NHOPTC(menu_last_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "jump to the last page in a menu")
     NHOPTC(menu_next_page, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
-                "goto the next menu page")
+                "go to the next menu page")
     NHOPTB(menu_objsyms, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.menu_head_objsym)
 #ifdef TTY_GRAPHICS
@@ -285,13 +285,17 @@ opt_##a,
                 (boolean *) 0)
 #endif
     NHOPTC(menu_previous_page, 4, opt_in, set_in_config, No, Yes, No, No,
-                NoAlias, "goto the previous menu page")
+                NoAlias, "go to the previous menu page")
     NHOPTC(menu_search, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "search for a menu item")
     NHOPTC(menu_select_all, 4, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "select all items in a menu")
     NHOPTC(menu_select_page, 4, opt_in, set_in_config, No, Yes, No, No,
                 NoAlias, "select all items on this page of a menu")
+    NHOPTC(menu_shift_left, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "pan current menu page left")
+    NHOPTC(menu_shift_right, 4, opt_in, set_in_config, No, Yes, No, No,
+                NoAlias, "pan current menu page right")
     NHOPTB(menu_tab_sep, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.menu_tab_sep)
     NHOPTB(menucolors, 0, opt_in, set_in_game, Off, Yes, Yes, No, NoAlias,
@@ -550,6 +554,8 @@ opt_##a,
                 "the foreground/background colors of windows")
     NHOPTC(windowtype, WINTYPELEN, opt_in, set_gameview, No, Yes, No, No,
                 NoAlias, "windowing system to use (should be specified first)")
+    NHOPTB(wizmgender, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
+                &iflags.wizmgender)
     NHOPTB(wizweight, 0, opt_in, set_wizonly, Off, Yes, No, No, NoAlias,
                 &iflags.wizweight)
     NHOPTB(wraptext, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,

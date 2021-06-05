@@ -70,7 +70,10 @@ des.door("locked",24,14)
 des.door("closed",31,14)
 des.door("locked",49,14)
 -- Lord Carnarvon
-des.monster("Lord Carnarvon", 25, 10)
+des.monster({ id = "Lord Carnarvon", coord = {25, 10}, inventory = function()
+   des.object({ id = "fedora", spe = 5 });
+   des.object({ id = "bullwhip", spe = 4 });
+end })
 -- The treasure of Lord Carnarvon
 des.object("chest", 25, 10)
 -- student guards for the audience chamber

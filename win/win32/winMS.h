@@ -161,7 +161,7 @@ void mswin_add_menu(winid wid, const glyph_info *glyphinfo,
                     const char *str, unsigned int itemflags);
 void mswin_end_menu(winid wid, const char *prompt);
 int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
-void mswin_update_inventory(void);
+void mswin_update_inventory(int);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);

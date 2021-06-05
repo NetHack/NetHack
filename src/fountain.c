@@ -542,9 +542,10 @@ drinksink(void)
         break;
     case 2:
         You("take a sip of scalding hot %s.", hliquid("water"));
-        if (Fire_resistance)
+        if (Fire_resistance) {
             pline("It seems quite tasty.");
-        else
+            monstseesu(M_SEEN_FIRE);
+        } else
             losehp(rnd(6), "sipping boiling water", KILLED_BY);
         /* boiling water burns considered fire damage */
         break;

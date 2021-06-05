@@ -475,7 +475,7 @@ tty_preference_update(const char *pref)
     }
 
 #if defined(WIN32)
-    nttty_preference_update(pref);
+    consoletty_preference_update(pref);
 #else
     genl_preference_update(pref);
 #endif
@@ -1430,7 +1430,7 @@ tty_exit_nhwindows(const char *str)
     tty_shutdown(); /* cleanup termcap/terminfo/whatever */
 #endif
 #ifdef WIN32
-    nttty_exit();
+    consoletty_exit();
 #endif
     iflags.window_inited = 0;
 }
@@ -3151,9 +3151,11 @@ tty_message_menu(char let, int how, const char *mesg)
     return ((how == PICK_ONE && morc == let) || morc == '\033') ? morc : '\0';
 }
 
+/* update persistent inventory window */
 void
-tty_update_inventory(void)
+tty_update_inventory(int arg UNUSED)
 {
+    /* tty doesn't support persistent inventory window */
     return;
 }
 
@@ -3564,7 +3566,7 @@ tty_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
      */
     if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
         wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
-    i = ntposkey(x, y, mod);
+    i = console_poskey(x, y, mod);
     if (!i && mod && (*mod == 0 || *mod == EOF))
         i = '\033'; /* map NUL or EOF to ESC, nethack doesn't expect either */
     /* topline has been seen - we can clear need for more */

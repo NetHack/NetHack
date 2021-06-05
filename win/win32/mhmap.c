@@ -93,7 +93,7 @@ static void clearAll(PNHMapWindow data);
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 static void nhglyph2charcolor(short glyph, uchar *ch, int *color);
 #endif
-extern boolean win32_cursorblink;       /* from sys\winnt\winnt.c */
+extern boolean win32_cursorblink;       /* from sys\windows\windsys.c */
 
 HWND
 mswin_init_map_window(void)
@@ -485,7 +485,7 @@ mswin_map_mode(HWND hWnd, int mode)
 
     mswin_map_layout(hWnd, &mapSize);
 
-    mswin_update_inventory(); /* for perm_invent to hide/show tiles */
+    mswin_update_inventory(0); /* for perm_invent to hide/show tiles */
 
     return oldMode;
 }

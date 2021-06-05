@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1611182249 2021/01/20 22:37:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.337 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1621387861 2021/05/19 01:31:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1452,7 +1452,7 @@ use_lamp(struct obj *obj)
     if ((!Is_candle(obj) && obj->age == 0)
         || (obj->otyp == MAGIC_LAMP && obj->spe == 0)) {
         if (obj->otyp == BRASS_LANTERN)
-            Your("lamp has run out of power.");
+            Your("lantern is out of power.");
         else
             pline("This %s has no oil.", xname(obj));
         return;
@@ -3118,8 +3118,12 @@ use_pole(struct obj *obj)
     /* Attack the monster there */
     g.bhitpos = cc;
     if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != (struct monst *) 0) {
-        if (attack_checks(mtmp, uwep))
-            return res;
+        if (attack_checks(mtmp, uwep)) /* can attack proceed? */
+            /* no, abort the attack attempt; result depends on
+               res: 1 => polearm became wielded, 0 => already wielded;
+               g.context.move: 1 => discovered hidden monster at target spot,
+               0 => answered 'n' to "Really attack?" prompt */
+            return res || g.context.move;
         if (overexertion())
             return 1; /* burn nutrition; maybe pass out */
         g.context.polearm.hitmon = mtmp;
@@ -3476,12 +3480,19 @@ do_break_wand(struct obj *obj)
     affects_objects = FALSE;
 
     switch (obj->otyp) {
+    case WAN_OPENING:
+        if (u.ustuck) {
+            release_hold();
+            if (obj->dknown)
+                makeknown(WAN_OPENING);
+            goto discard_broken_wand;
+        }
+        /*FALLTHRU*/
     case WAN_WISHING:
     case WAN_NOTHING:
     case WAN_LOCKING:
     case WAN_PROBING:
     case WAN_ENLIGHTENMENT:
-    case WAN_OPENING:
     case WAN_SECRET_DOOR_DETECTION:
         pline(nothing_else_happens);
         goto discard_broken_wand;
@@ -3498,7 +3509,7 @@ do_break_wand(struct obj *obj)
         dmg *= 2;
         /*FALLTHRU*/
     case WAN_MAGIC_MISSILE:
-    wanexpl:
+ wanexpl:
         explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
         makeknown(obj->otyp); /* explode describes the effect */
         goto discard_broken_wand;
@@ -3629,7 +3640,7 @@ do_break_wand(struct obj *obj)
     if (obj->otyp == WAN_LIGHT)
         litroom(TRUE, obj); /* only needs to be done once */
 
-discard_broken_wand:
+ discard_broken_wand:
     obj = g.current_wand; /* [see dozap() and destroy_item()] */
     g.current_wand = 0;
     if (obj)
@@ -3647,7 +3658,7 @@ apply_ok(struct obj *obj)
         return GETOBJ_EXCLUDE;
 
     /* all tools, all wands (breaking), all spellbooks (flipping through -
-     * including blank/novel/Book of the Dead) */
+       including blank/novel/Book of the Dead) */
     if (obj->oclass == TOOL_CLASS || obj->oclass == WAND_CLASS
         || obj->oclass == SPBOOK_CLASS)
         return GETOBJ_SUGGEST;
@@ -3658,11 +3669,16 @@ apply_ok(struct obj *obj)
             || obj->otyp == BULLWHIP))
         return GETOBJ_SUGGEST;
 
-    /* only applicable potion is oil, and it will only be offered as a choice
-     * when already discovered */
-    if (obj->otyp == POT_OIL && obj->dknown
-        && objects[obj->otyp].oc_name_known)
-        return GETOBJ_SUGGEST;
+    if (obj->oclass == POTION_CLASS) {
+        /* permit applying unknown potions, but don't suggest them */
+        if (!obj->dknown || !objects[obj->otyp].oc_name_known)
+            return GETOBJ_DOWNPLAY;
+
+        /* only applicable potion is oil, and it will only be suggested as a
+           choice when already discovered */
+        if (obj->otyp == POT_OIL)
+            return GETOBJ_SUGGEST;
+    }
 
     /* certain foods */
     if (obj->otyp == CREAM_PIE || obj->otyp == EUCALYPTUS_LEAF
@@ -3671,19 +3687,22 @@ apply_ok(struct obj *obj)
 
     if (is_graystone(obj)) {
         /* The only case where we don't suggest a gray stone is if we KNOW it
-         * isn't a touchstone. */
+           isn't a touchstone. */
         if (!obj->dknown)
             return GETOBJ_SUGGEST;
 
         if (obj->otyp != TOUCHSTONE
             && (objects[TOUCHSTONE].oc_name_known
                 || objects[obj->otyp].oc_name_known))
-            return GETOBJ_EXCLUDE;
+            return GETOBJ_EXCLUDE_SELECTABLE;
 
         return GETOBJ_SUGGEST;
     }
 
-    return GETOBJ_EXCLUDE;
+    /* item can't be applied; if picked anyway,
+       _EXCLUDE would yield "That is a silly thing to apply.",
+       _EXCLUDE_SELECTABLE yields "Sorry, I don't know how to use that." */
+    return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
 /* the 'a' command */
@@ -3938,45 +3957,43 @@ flip_through_book(struct obj *obj)
         return 0;
     }
 
-    You("flip through the pages of the spellbook.");
+    You("flip through the pages of %s.", thesimpleoname(obj));
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-        if (Deaf) {
-            You_see("the pages glow faintly %s.", hcolor(NH_RED));
-        } else {
+        if (!Deaf)
             You_hear("the pages make an unpleasant %s sound.",
-                    Hallucination ? "chuckling"
-                                  : "rustling");
-        }
-        return 1;
+                     Hallucination ? "chuckling"
+                                   : "rustling");
+        else if (!Blind)
+            You_see("the pages glow faintly %s.", hcolor(NH_RED));
+        else
+            You_feel("the pages tremble.");
     } else if (Blind) {
         pline("The pages feel %s.",
               Hallucination ? "freshly picked"
                             : "rough and dry");
-        return 1;
     } else if (obj->otyp == SPE_BLANK_PAPER) {
         pline("This spellbook %s.",
               Hallucination ? "doesn't have much of a plot"
                             : "has nothing written in it");
         makeknown(obj->otyp);
-        return 1;
-    }
-
-    if (Hallucination) {
+    } else if (Hallucination) {
         You("enjoy the animated initials.");
+    } else if (obj->otyp == SPE_NOVEL) {
+        pline("This looks like it might be interesting to read.");
     } else {
-        static const char* fadeness[] = {
+        static const char *fadeness[] = {
             "fresh",
             "slightly faded",
             "very faded",
             "extremely faded",
             "barely visible"
         };
+        int findx = min(obj->spestudied, MAX_SPELL_STUDY);
 
-        int index = min(obj->spestudied, MAX_SPELL_STUDY);
         pline("The%s ink in this spellbook is %s.",
               objects[obj->otyp].oc_magic ? " magical" : "",
-              fadeness[index]);
+              fadeness[findx]);
     }
 
     return 1;

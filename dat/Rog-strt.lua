@@ -103,7 +103,11 @@ des.door("closed",  6,18)
 des.door("closed", 65,18)
 des.door("closed", 68,18)
 -- Master of Thieves
-des.monster("Master of Thieves", 36, 11)
+des.monster({ id = "Master of Thieves", coord = {36, 11}, inventory = function()
+   des.object({ id = "leather armor", spe = 5 });
+   des.object({ id = "silver dagger", spe = 4 });
+   des.object({ id = "dagger", spe = 2, quantity = d(2,4), buc = "not-cursed" });
+end })
 -- The treasure of Master of Thieves
 des.object("chest", 36, 11)
 -- thug guards, room #1

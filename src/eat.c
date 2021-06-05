@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1603507384 2020/10/24 02:43:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1620548002 2021/05/09 08:13:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,13 +14,13 @@ static int unfaint(void);
 static const char *food_xname(struct obj *, boolean);
 static void choke(struct obj *);
 static void recalc_wt(void);
-static unsigned obj_nutrition(struct obj *);
 static struct obj *touchfood(struct obj *);
 static void do_reset_eat(void);
 static void done_eating(boolean);
 static void cprefx(int);
 static int intrinsic_possible(int, struct permonst *);
 static void givit(int, struct permonst *);
+static void eye_of_newt_buzz(void);
 static void cpostfx(int);
 static void consume_tin(const char *);
 static void start_tin(struct obj *);
@@ -293,7 +293,7 @@ reset_eat(void)
 }
 
 /* base nutrition of a food-class object */
-static unsigned
+unsigned
 obj_nutrition(struct obj *otmp)
 {
     unsigned nut = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
@@ -802,15 +802,15 @@ intrinsic_possible(int type, register struct permonst *ptr)
     return res;
 }
 
-/* givit() tries to give you an intrinsic based on the monster's level
- * and what type of intrinsic it is trying to give you.
+/* The "do we or do we not give the intrinsic" logic from givit(), extracted
+ * into its own function. Depends on the monster's level and the type of
+ * intrinsic it is trying to give you.
  */
-static void
-givit(int type, register struct permonst *ptr)
+boolean
+should_givit(int type, struct permonst *ptr)
 {
-    register int chance;
+    int chance;
 
-    debugpline1("Attempting to give intrinsic %d", type);
     /* some intrinsics are easier to get than others */
     switch (type) {
     case POISON_RES:
@@ -834,8 +834,19 @@ givit(int type, register struct permonst *ptr)
         break;
     }
 
-    if (ptr->mlevel <= rn2(chance))
-        return; /* failed die roll */
+    return (ptr->mlevel > rn2(chance));
+}
+
+/* givit() tries to give you an intrinsic based on the monster's level
+ * and what type of intrinsic it is trying to give you.
+ */
+static void
+givit(int type, register struct permonst *ptr)
+{
+    debugpline1("Attempting to give intrinsic %d", type);
+
+    if (!should_givit(type, ptr))
+        return;
 
     switch (type) {
     case FIRE_RES:
@@ -917,6 +928,26 @@ givit(int type, register struct permonst *ptr)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+static void
+eye_of_newt_buzz(void)
+{
+    /* MRKR: "eye of newt" may give small magical energy boost */
+    if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
+        int old_uen = u.uen;
+
+        u.uen += rnd(3);
+        if (u.uen > u.uenmax) {
+            if (!rn2(3))
+                u.uenmax++;
+            u.uen = u.uenmax;
+        }
+        if (old_uen != u.uen) {
+            You_feel("a mild buzz.");
+            g.context.botl = 1;
+        }
+    }
+}
+
 /* called after completely consuming a corpse */
 static void
 cpostfx(int pm)
@@ -931,23 +962,6 @@ cpostfx(int pm)
         (void) eatmdone();
 
     switch (pm) {
-    case PM_NEWT:
-        /* MRKR: "eye of newt" may give small magical energy boost */
-        if (rn2(3) || 3 * u.uen <= 2 * u.uenmax) {
-            int old_uen = u.uen;
-
-            u.uen += rnd(3);
-            if (u.uen > u.uenmax) {
-                if (!rn2(3))
-                    u.uenmax++;
-                u.uen = u.uenmax;
-            }
-            if (old_uen != u.uen) {
-                You_feel("a mild buzz.");
-                g.context.botl = 1;
-            }
-        }
-        break;
     case PM_WRAITH:
         pluslvl(FALSE);
         break;
@@ -1012,7 +1026,8 @@ cpostfx(int pm)
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
                        : "You now prefer mimicking %s again.",
-                    an(Upolyd ? pmname(g.youmonst.data, Ugender) : g.urace.noun));
+                    an(Upolyd ? pmname(g.youmonst.data, Ugender)
+                              : g.urace.noun));
             g.eatmbuf = dupstr(buf);
             g.nomovemsg = g.eatmbuf;
             g.afternmv = eatmdone;
@@ -1090,8 +1105,6 @@ cpostfx(int pm)
     /* possibly convey an intrinsic */
     if (check_intrinsics) {
         struct permonst *ptr = &mons[pm];
-        boolean conveys_STR = is_giant(ptr);
-        int i, count;
 
         if (dmgtype(ptr, AD_STUN) || dmgtype(ptr, AD_HALU)
             || pm == PM_VIOLET_FUNGUS) {
@@ -1100,36 +1113,12 @@ cpostfx(int pm)
                                      0L);
         }
 
-        /* Check the monster for all of the intrinsics.  If this
-         * monster can give more than one, pick one to try to give
-         * from among all it can give.
-         *
-         * Strength from giants is now treated like an intrinsic
-         * rather than being given unconditionally.
-         */
-        count = 0; /* number of possible intrinsics */
-        tmp = 0;   /* which one we will try to give */
-        if (conveys_STR) {
-            count = 1;
-            tmp = -1; /* use -1 as fake prop index for STR */
-            debugpline1("\"Intrinsic\" strength, %d", tmp);
-        }
-        for (i = 1; i <= LAST_PROP; i++) {
-            if (!intrinsic_possible(i, ptr))
-                continue;
-            ++count;
-            /* a 1 in count chance of replacing the old choice
-               with this one, and a count-1 in count chance
-               of keeping the old choice (note that 1 in 1 and
-               0 in 1 are what we want for the first candidate) */
-            if (!rn2(count)) {
-                debugpline2("Intrinsic %d replacing %d", i, tmp);
-                tmp = i;
-            }
-        }
-        /* if strength is the only candidate, give it 50% chance */
-        if (conveys_STR && count == 1 && !rn2(2))
-            tmp = 0;
+        /* Eating magical monsters can give you some magical energy. */
+        if (attacktype(ptr, AT_MAGC) || pm == PM_NEWT)
+            eye_of_newt_buzz();
+
+        tmp = corpse_intrinsic(ptr);
+
         /* if something was chosen, give it now (givit() might fail) */
         if (tmp == -1)
             gainstr((struct obj *) 0, 0, TRUE);
@@ -1145,6 +1134,49 @@ cpostfx(int pm)
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
+
+/* Choose (one of) the intrinsics granted by a corpse, and return it.
+ * If this corpse gives no intrinsics, return 0.
+ * For the special not-real-prop cases of strength gain from giants
+ * return fake prop value of -1.
+ * Non-deterministic; should only be called once per corpse.
+ */
+int
+corpse_intrinsic(struct permonst *ptr)
+{
+    /* Check the monster for all of the intrinsics.  If this
+     * monster can give more than one, pick one to try to give
+     * from among all it can give.
+     */
+    boolean conveys_STR = is_giant(ptr);
+    int i;
+    int count = 0; /* number of possible intrinsics */
+    int prop = 0;   /* which one we will try to give */
+
+    if (conveys_STR) {
+        count = 1;
+        prop = -1; /* use -1 as fake prop index for STR */
+        debugpline1("\"Intrinsic\" strength, %d", prop);
+    }
+    for (i = 1; i <= LAST_PROP; i++) {
+        if (!intrinsic_possible(i, ptr))
+            continue;
+        ++count;
+        /* a 1 in count chance of replacing the old choice
+           with this one, and a count-1 in count chance
+           of keeping the old choice (note that 1 in 1 and
+           0 in 1 are what we want for the first candidate) */
+        if (!rn2(count)) {
+            debugpline2("Intrinsic %d replacing %d", i, prop);
+            prop = i;
+        }
+    }
+    /* if strength is the only candidate, give it 50% chance */
+    if (conveys_STR && count == 1 && !rn2(2))
+        prop = 0;
+
+    return prop;
+}
 
 void
 violated_vegetarian(void)
@@ -1352,10 +1384,19 @@ consume_tin(const char *mesg)
         /* charge for one at pre-eating cost */
         tin = costly_tin(COST_OPEN);
 
-        if (tintxts[r].nut < 0) /* rotten */
+        if (tintxts[r].nut < 0) { /* rotten */
             make_vomiting((long) rn1(15, 10), FALSE);
-        else
-            lesshungry(tintxts[r].nut);
+        } else {
+            int nutamt = tintxts[r].nut;
+
+            /* nutrition from a homemade tin (made from a single corpse)
+               shouldn't be more than nutrition from the corresponding
+               corpse; other tinning modes might use more than one corpse
+               or add extra ingredients so aren't similarly restricted */
+            if (r == HOMEMADE_TIN && nutamt > mons[mnum].cnutrit)
+                nutamt = mons[mnum].cnutrit;
+            lesshungry(nutamt);
+        }
 
         if (tintxts[r].greasy) {
             /* Assume !Glib, because you can't open tins when Glib. */
@@ -1595,6 +1636,7 @@ eatcorpse(struct obj *otmp)
     if (mnum != PM_ACID_BLOB && !stoneable && !slimeable && rotted > 5L) {
         boolean cannibal = maybe_cannibal(mnum, FALSE);
 
+        /* tp++; -- early return makes this unnecessary */
         pline("Ulch - that %s was tainted%s!",
               (mons[mnum].mlet == S_FUNGUS) ? "fungoid vegetation"
                   : glob ? "glob"
@@ -1670,6 +1712,8 @@ eatcorpse(struct obj *otmp)
         pline("This tastes just like chicken!");
     } else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
         You("peck the eyeball with delight.");
+    } else if (tp) {
+        ; /* we've already delivered a message; don't add "it tastes okay" */
     } else {
         /* yummy is always False for omnivores, palatable always True */
         boolean yummy = (vegan(&mons[mnum])
@@ -3364,6 +3408,24 @@ eaten_stat(int base, struct obj *obj)
 void
 consume_oeaten(struct obj *obj, int amt)
 {
+    if (!obj_nutrition(obj)) {
+        char itembuf[40];
+        int otyp = obj->otyp;
+
+        if (otyp == CORPSE || otyp == EGG || otyp == TIN) {
+            Strcpy(itembuf, (otyp == CORPSE) ? "corpse"
+                            : (otyp == EGG) ? "egg"
+                              : (otyp == TIN) ? "tin" : "other?");
+            Sprintf(eos(itembuf), " [%d]", obj->corpsenm);
+        } else {
+            Sprintf(itembuf, "%d", otyp);
+        }
+        impossible(
+            "oeaten: attempting to set 0 nutrition food (%s) partially eaten",
+                   itembuf);
+        return;
+    }
+
     /*
      * This is a hack to try to squelch several long standing mystery
      * food bugs.  A better solution would be to rewrite the entire

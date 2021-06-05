@@ -899,10 +899,6 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 }
 
 #ifdef CTRL_V_HACK
-#ifndef C
-#define C(c) (0x1f & (c))
-#endif
-
 // called when ^V is typed while the main window has keyboard focus;
 // all other control characters go through NetHackQtBind::notify()
 void NetHackQtMainWindow::CtrlV()

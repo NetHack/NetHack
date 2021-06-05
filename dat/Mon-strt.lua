@@ -71,7 +71,9 @@ des.door("closed",52,14)
 -- Unattended Altar - unaligned due to conflict - player must align it.
 des.altar({ x=28,y=09, align="noalign", type="altar" })
 -- The Grand Master
-des.monster("Grand Master", 28, 10)
+des.monster({ id = "Grand Master", coord = {28, 10}, inventory = function()
+   des.object({ id = "robe", spe = 6 });
+end })
 -- No treasure chest!
 -- guards for the audience chamber
 des.monster("abbot", 32, 07)

@@ -191,7 +191,7 @@ pri_move(struct monst *priest)
     gy += rn1(3, -1);
 
     if (!priest->mpeaceful
-        || (Conflict && !resist(priest, RING_CLASS, 0, 0))) {
+        || (Conflict && !resist_conflict(priest))) {
         if (monnear(priest, u.ux, u.uy)) {
             if (Displaced)
                 Your("displaced image doesn't fool %s!", mon_nam(priest));

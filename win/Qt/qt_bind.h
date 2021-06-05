@@ -57,7 +57,7 @@ public:
 		const char *str, unsigned int itemflags);
 	static void qt_end_menu(winid wid, const char *prompt);
 	static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);
-	static void qt_update_inventory();
+	static void qt_update_inventory(int);
 	static void qt_mark_synch();
 	static void qt_wait_synch();
 

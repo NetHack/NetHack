@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1610667899 2021/01/14 23:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1620861209 2021/05/12 23:13:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3757,7 +3757,7 @@ shk_move(struct monst* shkp)
 
     if ((udist = distu(omx, omy)) < 3 && (shkp->data != &mons[PM_GRID_BUG]
                                           || (omx == u.ux || omy == u.uy))) {
-        if (ANGRY(shkp) || (Conflict && !resist(shkp, RING_CLASS, 0, 0))) {
+        if (ANGRY(shkp) || (Conflict && !resist_conflict(shkp))) {
             if (Displaced)
                 Your("displaced image doesn't fool %s!", shkname(shkp));
             (void) mattacku(shkp);
@@ -4740,7 +4740,7 @@ globby_bill_fixup(struct obj* obj_absorber, struct obj* obj_absorbed)
     struct bill_x *bp, *bp_absorber = (struct bill_x *) 0;
     struct monst *shkp = 0;
     struct eshk *eshkp;
-    long amount, per_unit_cost = set_cost(obj_absorbed, shkp);
+    long amount, per_unit_cost;
     boolean floor_absorber = (obj_absorber->where == OBJ_FLOOR);
 
     if (!obj_absorber->globby)
@@ -4769,6 +4769,7 @@ globby_bill_fixup(struct obj* obj_absorber, struct obj* obj_absorbed)
     bp_absorber = onbill(obj_absorber, shkp, FALSE);
     bp = onbill(obj_absorbed, shkp, FALSE);
     eshkp = ESHK(shkp);
+    per_unit_cost = set_cost(obj_absorbed, shkp);
 
     /**************************************************************
      * Scenario 1. Shop-owned glob absorbing into shop-owned glob

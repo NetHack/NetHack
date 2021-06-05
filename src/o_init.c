@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1611882611 2021/01/29 01:10:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1614812489 2021/03/03 23:01:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -167,14 +167,14 @@ init_objects(void)
                 break;
             }
         }
-    check:
+ checkprob:
         sum = 0;
         for (i = first; i < last; i++)
             sum += objects[i].oc_prob;
         if (sum == 0) {
             for (i = first; i < last; i++)
                 objects[i].oc_prob = (1000 + i - first) / (last - first);
-            goto check;
+            goto checkprob;
         }
         if (sum != 1000)
             error("init-prob error for class %d (%d%%)", oclass, sum);
@@ -190,6 +190,23 @@ init_objects(void)
     for (last = MAXOCLASSES - 1; last >= 0; --last)
         if (!g.bases[last])
             g.bases[last] = g.bases[last + 1];
+
+    /* check objects[].oc_name_known */
+    for (i = 0; i < NUM_OBJECTS; ++i) {
+        int nmkn = objects[i].oc_name_known != 0;
+
+        if (!OBJ_DESCR(objects[i]) ^ nmkn) {
+            if (iflags.sanity_check) {
+                impossible(
+                    "obj #%d (%s) name is %s despite%s alternate description",
+                           i, OBJ_NAME(objects[i]),
+                           nmkn ? "pre-known" : "not known",
+                           nmkn ? "" : " no");
+            }
+            /* repair the mistake and keep going */
+            objects[i].oc_name_known = nmkn ? 0 : 1;
+        }
+    }
 
     /* shuffle descriptions */
     shuffle_all();
@@ -662,7 +679,7 @@ dodiscovered(void) /* free after Robert Viduya */
                relevant header above; if we're alphabetizing across all
                classes, we normally don't need a header; but it we showed
                any unique items or any artifacts then we do need one */
-            if ((uniq_ct || arti_ct) && !alphabyclass)
+            if ((uniq_ct || arti_ct) && alphabetized && !alphabyclass)
                 putstr(tmpwin, iflags.menu_headings, "Discovered items");
             qsort(sorted_lines, sorted_ct, sizeof (char *), discovered_cmp);
             for (j = 0; j < sorted_ct; ++j) {

@@ -709,7 +709,7 @@ TOOL("drum of earthquake","drum", 0, 0, 1, 1,  2, 25, 25, LEATHER, HI_LEATHER),
 WEPTOOL("pick-axe", None,
         1, 0, 0, 20, 100,  50,  6,  3, WHACK,  P_PICK_AXE, IRON, HI_METAL),
 WEPTOOL("grappling hook", None,
-        0, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL,    IRON, HI_METAL),
+        1, 0, 0,  5,  30,  50,  2,  6, WHACK,  P_FLAIL,    IRON, HI_METAL),
 WEPTOOL("unicorn horn", None,
         1, 1, 1,  0,  20, 100, 12, 12, PIERCE, P_UNICORN_HORN,
                                                            BONE, CLR_WHITE),
@@ -1054,8 +1054,8 @@ WAND(None,            "jeweled",  0, 150, 1, 0, IRON, HI_MINERAL),
 
 /* coins ... - so far, gold is all there is */
 #define COIN(name,prob,metal,worth) \
-    OBJECT(OBJ(name, None),                                        \
-           BITS(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, metal),    \
+    OBJECT(OBJ(name, None),                                         \
+           BITS(1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, metal),    \
            0, COIN_CLASS, prob, 0, 1, worth, 0, 0, 0, 0, 0, HI_GOLD)
 COIN("gold piece", 1000, GOLD, 1),
 #undef COIN

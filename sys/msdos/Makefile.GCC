@@ -42,13 +42,13 @@ PDCURSES_TOP=../../pdcurses
 ifeq "$(LUA_VERSION)" "5.3.5"
 LUAVER=5.3.5
 else
-LUAVER=5.4.2
+LUAVER=5.4.3
 endif
 #---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.4.2.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.3.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -305,7 +305,7 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.2.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.3.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
@@ -577,7 +577,7 @@ endif
 	@$(subst /,\,copy $(SSHR)/NetHack.cnf  $(GAMEDIR)/defaults.nh)
 	-@$(subst /,\,touch $(GAMEDIR)/record)
 	@$(subst /,\,copy $(DOC)/guideb*.txt  $(GAMEDIR))
-	@$(subst /,\,copy ../sys/winnt/sysconf  $(GAMEDIR))
+	@$(subst /,\,copy ../sys/windows/sysconf  $(GAMEDIR))
 	@$(subst /,\,if not exist $(GAMEDIR)/sysconf touch $(GAMEDIR)/sysconf)
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI

@@ -5,9 +5,6 @@
 // qt_xcmd.cpp -- extended command widget
 //
 // TODO:
-//  Maybe extend filtering to be able to omit commands that can be invoked
-//    by a 'normal' keystroke (not Meta) with current key bindings, or to
-//    exclude commands which don't autocomplete to match '#?'.
 //  Either disable [Layout] when prompt has a partial response, or
 //    preserve that partial response across widget tear-down/rebuild.
 //  Maybe make the number of grid columns user settable?  Or a way to
@@ -41,12 +38,11 @@
 //   "#drop[type]", "#known[class]", "#takeoff[all]", "#version[short]");
 //   button is left justitied (prior to addition of the filter/layout/reset
 //   buttons, [Cancel] stretched all the way across the top of the widget);
-// [Filter] is grayed out when outside wizard mode; when in wizard mode,
-//   it cycles through "all commands", "normal mode commands only", and
-//   "wizard mode extra commands only"; [if it ever gets extended to do
-//   anything in normal play, it will need a more substantial interface
-//   than repeated clicks but those seem adequate for present wizard
-//   mode-only usage];
+// [Filter] toggles between normal and autocomplete when playing in normal
+//   or explore mode, cycles through "all", "normal", "autocomplete", and
+//   "wizard mode extra commands only" when playing in wizard mode; that's
+//   kind of clumsy but probably not important enough to implement a more
+//   sophisticated interface;
 // [Layout] toggles between displaying the command buttons down columns
 //   (as shown above) versus across rows ([cmd_1][cmd_2]...[cmd_9], &c);
 // [Reset] clears typed partial response, if any, and sets filtering back
@@ -111,11 +107,10 @@ extern uchar keyValue(QKeyEvent *key_event); // from qt_menu.cpp
 void centerOnMain(QWidget *);
 // end temporary
 
-static inline bool
+static /*inline*/ bool
 interesting_command(unsigned indx, int cmds)
 {
-    if (!WizardMode)
-        cmds = normal_cmds;
+    bool skip_wizard = !WizardMode || cmds == normal_cmds;
 
     // entry 0 is a no-op; don't bother displaying it in the command grid
     if (indx == 0 && !strcmp("#", extcmdlist[indx].ef_txt))
@@ -128,8 +123,14 @@ interesting_command(unsigned indx, int cmds)
         return false;
     // if picking from normal mode-only don't show wizard mode commands
     // or if picking from wizard mode-only don't show normal commands
-    if ((cmds == normal_cmds && (extcmdlist[indx].flags & WIZMODECMD) != 0)
+    if ((skip_wizard && (extcmdlist[indx].flags & WIZMODECMD) != 0)
      || (cmds == wizard_cmds && (extcmdlist[indx].flags & WIZMODECMD) == 0))
+        return false;
+    // autocomplete subset is essentially the traditional set of extended
+    // commands; many can be invoked by Alt+char but not by ordinary char
+    // or Ctrl+char; [X11's extended command selection uses this subset]
+    if (cmds == autocomplete_cmds
+        && (extcmdlist[indx].flags & AUTOCOMPLETE) == 0)
         return false;
     // if we've gotten here, this command isn't filtered away, so show it
     return true;
@@ -144,8 +145,8 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     butoffset(0),
     exactmatchindx(xcmdNoMatch)
 {
-    if (!WizardMode)
-        set = normal_cmds; // {all,wizard}_cmds are wizard mode only
+    if (!WizardMode && set != normal_cmds)
+        set = autocomplete_cmds; // {all,wizard}_cmds are wizard mode only
 
     QVBoxLayout *xl = new QVBoxLayout(this);  // overall xcmd layout
     int butw = 50; // initial button width; will be increased if too small
@@ -169,6 +170,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     // Filter: change the [sub]set of commands that get shown;
     // presently only useful when running in wizard mode
     QPushButton *filter_btn = new QPushButton("Filter", this);
+#if 0   /* [later] normal vs autocomplete matters regardless of wizard mode */
     if (!WizardMode) { // nothing to filter if not in wizard mode
         filter_btn->setEnabled(false); // gray the [Filter] button out
 #if 0   /* This works but makes [Reset] seem to be redundant. */
@@ -178,6 +180,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
         filter_btn->hide();
 #endif
     }
+#endif
     filter_btn->setMinimumSize(filter_btn->sizeHint());
     butw = std::max(butw, filter_btn->width());
     ctrls->addWidget(filter_btn);
@@ -199,14 +202,16 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     prompt->setFont(qt_settings->normalFixedFont());
 
     // grid title rather than overall popup title
-    const char *ctitle = ((set == all_cmds)
-                          ? "All extended commands"
+    const char *ctitle = ((set == all_cmds) // implies wizard mode
+                          ? "All commands"
                           : (set == normal_cmds)
-                            ? (WizardMode ? "Normal mode extended commands"
-                                          : "Extended commands")
-                            : (set == wizard_cmds)
-                              ? "Debug mode extended commands"
-                              : "(unknown)"); // won't happen
+                            ? (WizardMode ? "Normal mode commands"
+                                          : "Available commands")
+                            : (set == autocomplete_cmds)
+                              ? "Traditional extended commands"
+                              : (set == wizard_cmds)
+                                ? "Debug mode commands"
+                                : "(unknown)"); // won't happen
     const QString &qtitle = QString(ctitle);
     // rectangular grid to hold a button for each extended command name
     QGroupBox *grid = new QGroupBox(); /* new QGroupBox(title, this); */
@@ -264,14 +269,15 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
 
     /* 'ncols' could be calculated to fit (or enable a vertical scrollbar
        when resulting 'nrows' is too big, if GroupBox supports that);
-       it used to be hardcoded 4 but after every command became accessible
+       it used to be hardcoded 4, but once every command became accessible
        as an extended command, that resulted in so many rows that some of
        the grid was chopped off at the bottom of the screen and the buttons
        in that portion were out of reach */
-    unsigned ncols = (set == all_cmds) ? 9
+    unsigned ncols = (set == all_cmds) ? 8
                      : (set == normal_cmds) ? 7
-                       : (set == wizard_cmds) ? (byRow ? 7 : 4)
-                         : 1; // can't happen
+                       : (set == autocomplete_cmds) ? (WizardMode ? 6 : 5)
+                         : (set == wizard_cmds) ? (byRow ? 6 : 5)
+                           : 1; // can't happen
     unsigned nrows = (ncmds + ncols - 1) / ncols;
     /*
      * Grid layout:  by-column is the default.  Can be toggled by clicking
@@ -367,13 +373,14 @@ void NetHackQtExtCmdRequestor::Cancel()
 // Respond to a click on the [Filter] button
 void NetHackQtExtCmdRequestor::Filter()
 {
-    // TEMP: step from one [sub]set to the next, then wrap back to the first.
-    if (++set > std::max(std::max(all_cmds, normal_cmds), wizard_cmds))
-        set = std::min(std::min(all_cmds, normal_cmds), wizard_cmds);
-
-    // TODO: put up a popup--dialog or maybe simple pick-one menu--that
-    //       has player choose between all_cmds, normal_cmds, wizard_cmds.
-    // Only meaningful for wizard mode so maybe the temp version suffices.
+    do {
+        if (++set > std::max(std::max(all_cmds, normal_cmds),
+                             std::max(autocomplete_cmds, wizard_cmds)))
+            set = std::min(std::min(all_cmds, normal_cmds),
+                           std::min(autocomplete_cmds, wizard_cmds));
+        if (WizardMode)
+            break;
+    } while (set != normal_cmds && set != autocomplete_cmds);
 
     if (set != qt_settings->xcmd_set) {
         Retry();
@@ -434,6 +441,9 @@ void NetHackQtExtCmdRequestor::Retry()
 // it for user's preferred kill character, so use hardcoded ^U.
 // Player who prefers something else can cope by using ESC instead.
 #define KILL_CHAR Ctrl('u')
+
+// used by keyPressEvent() and enableButtons()
+static const QString &rest = "rest"; // informal synonym for "wait"
 
 // Receive the next character of typed input
 void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
@@ -501,10 +511,13 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
                 uc = tolower(uc);
             promptstr += QChar(uc); // add new char to typed text
         }
-	QString typedstr = promptstr.mid(1); // skip the '#'
-	unsigned matches = 0;
-	unsigned matchindx = 0;
-	for (unsigned i = 0; extcmdlist[i].ef_txt; ++i) {
+        QString typedstr = promptstr.mid(1); // skip the '#'
+        if (typedstr == rest)
+            typedstr = "wait";
+        std::size_t len = typedstr.size();
+        unsigned matches = 0;
+        unsigned matchindx = 0;
+        for (unsigned i = 0; extcmdlist[i].ef_txt; ++i) {
             if (!interesting_command(i, set))
                 continue;
             const QString &cmdtxt = QString(extcmdlist[i].ef_txt);
@@ -530,9 +543,10 @@ void NetHackQtExtCmdRequestor::keyPressEvent(QKeyEvent *event)
         } else if (checkexact) {
             // <return> or <space> without a pending exact match; cancel
             reject();
-        } else if (matches >= 2) {
+        } else if (matches >= 2
+                   || promptstr.midRef(1, len) == rest.leftRef(len)) {
             // update the text-so-far
-	    prompt->setText(promptstr);
+            prompt->setText(promptstr);
         } else if (saveexactmatchindx != xcmdNoMatch) {
             // had a pending exact match but typed something other than
             // <return> which didn't yield another match; prompt string
@@ -572,7 +586,10 @@ void NetHackQtExtCmdRequestor::enableButtons()
     // remaining buttons were widened to take the space.  Now the grid is
     // forced to have fixed layout (via stretch settings in constructor).
     for (auto b = buttons.begin(); b != buttons.end(); ++b) {
-        bool showit = ((*b)->text().left(len) == typedstr);
+        const QString &buttext = (*b)->text();
+        bool showit = (buttext.left(len) == typedstr
+                       || (buttext.contains("(rest)")
+                           && typedstr == rest.left(len)));
         (*b)->setVisible(showit);
     }
 }

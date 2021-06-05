@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1608673689 2020/12/22 21:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.256 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1619919402 2021/05/02 01:36:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.267 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -819,8 +819,7 @@ menu_drop(int retry)
     long cnt;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
-    boolean all_categories = TRUE;
-    boolean drop_everything = FALSE;
+    boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
 
     if (retry) {
         all_categories = (retry == -2);
@@ -834,12 +833,14 @@ menu_drop(int retry)
         if (!n)
             goto drop_done;
         for (i = 0; i < n; i++) {
-            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED)
+            if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
-            else if (pick_list[i].item.a_int == 'A')
-                drop_everything = TRUE;
-            else
+            } else if (pick_list[i].item.a_int == 'A') {
+                drop_everything = autopick = TRUE;
+            } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
+                drop_everything = FALSE;
+            }
         }
         free((genericptr_t) pick_list);
     } else if (flags.menu_style == MENU_COMBINATION) {
@@ -856,7 +857,7 @@ menu_drop(int retry)
         }
     }
 
-    if (drop_everything) {
+    if (autopick) {
         /*
          * Dropping a burning potion of oil while levitating can cause
          * an explosion which might destroy some of hero's inventory,
@@ -870,10 +871,16 @@ menu_drop(int retry)
          * Use the bypass bit to mark items already processed (hence
          * not droppable) and rescan inventory until no unbypassed
          * items remain.
+         *
+         * FIXME?  if something explodes, or even breaks, we probably
+         * ought to halt the traversal or perhaps ask player whether
+         * to halt it.
          */
         bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */
-        while ((otmp = nxt_unbypassed_obj(g.invent)) != 0)
-            n_dropped += drop(otmp);
+        while ((otmp = nxt_unbypassed_obj(g.invent)) != 0) {
+            if (drop_everything || all_categories || allow_category(otmp))
+                n_dropped += drop(otmp);
+        }
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
         bypass_objlist(g.invent, FALSE);
@@ -1941,7 +1948,7 @@ revive_mon(anything *arg, long timeout UNUSED)
         } else { /* rot this corpse away */
             You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
             action = ROT_CORPSE;
-            when = 250L - (g.monstermoves - body->age);
+            when = (long) d(5, 50) - (g.monstermoves - body->age);
             if (when < 1L)
                 when = 1L;
         }
@@ -1950,22 +1957,22 @@ revive_mon(anything *arg, long timeout UNUSED)
 }
 
 /* Timeout callback. Revive the corpse as a zombie. */
-/*ARGSUSED*/
 void
-zombify_mon(anything *arg, long timeout UNUSED)
+zombify_mon(anything *arg, long timeout)
 {
     struct obj *body = arg->a_obj;
     int zmon = zombie_form(&mons[body->corpsenm]);
 
-    if (zmon != NON_PM) {
-
+    if (zmon != NON_PM && !(g.mvitals[zmon].mvflags & G_GENOD)) {
         if (has_omid(body))
             free_omid(body);
         if (has_omonst(body))
             free_omonst(body);
 
-        body->corpsenm = zmon;
+        set_corpsenm(body, zmon);
         revive_mon(arg, timeout);
+    } else {
+        rot_corpse(arg, timeout);
     }
 }
 

@@ -6,13 +6,13 @@
 #include "hack.h"
 #include "dlb.h"
 
-/* If UPDATE_RECORD_IN_PLACE is defined, we don't want to rewrite the
- * whole file, because that entails creating a new version which
- * requires that the old one be deletable. UPDATE_RECORD_IN_PLACE
- * had to be defined more centrally in 3.7 to ensure that the
- * final_fpos field gets included in struct instance_globals aka 'g'.
-*/
-
+#if defined(VMS) && !defined(UPDATE_RECORD_IN_PLACE)
+/* We don't want to rewrite the whole file, because that entails
+   creating a new version which requires that the old one be deletable.
+   [Write and Delete are separate permissions on VMS.  'record' should
+   be writable but not deletable there.]  */
+#define UPDATE_RECORD_IN_PLACE
+#endif
 
 /*
  * Updating in place can leave junk at the end of the file in some
@@ -20,6 +20,9 @@
  * way to truncate it).  The trailing junk is harmless and the code
  * which reads the scores will ignore it.
  */
+#ifdef UPDATE_RECORD_IN_PLACE
+static long final_fpos; /* [note: do not move this to the 'g' struct] */
+#endif
 
 #define done_stopprint g.program_state.stopprint
 
@@ -49,10 +52,12 @@ struct toptenentry {
     char plalign[ROLESZ + 1];
     char name[NAMSZ + 1];
     char death[DTHSZ + 1];
-} * tt_head;
+} *tt_head;
 /* size big enough to read in all the string fields at once; includes
    room for separating space or trailing newline plus string terminator */
 #define SCANBUFSZ (4 * (ROLESZ + 1) + (NAMSZ + 1) + (DTHSZ + 1) + 1)
+
+static struct toptenentry zerott;
 
 static void topten_print(const char *);
 static void topten_print_bold(const char *);
@@ -143,7 +148,8 @@ formatkiller(
 
     if (incl_helpless && g.multi) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
-        if (g.multi_reason && strlen(g.multi_reason) + sizeof ", while " <= siz)
+        if (g.multi_reason
+            && strlen(g.multi_reason) + sizeof ", while " <= siz)
             Sprintf(buf, ", while %s", g.multi_reason);
         /* either g.multi_reason wasn't specified or wouldn't fit */
         else if (sizeof ", while helpless" <= siz)
@@ -162,7 +168,7 @@ topten_print(const char *x)
 }
 
 static void
-topten_print_bold(const char* x)
+topten_print_bold(const char *x)
 {
     if (g.toptenwin == WIN_ERR)
         raw_print_bold(x);
@@ -225,7 +231,7 @@ readentry(FILE* rfile, struct toptenentry* tt)
 
 #ifdef UPDATE_RECORD_IN_PLACE
     /* note: input below must read the record's terminating newline */
-    g.final_fpos = tt->fpos = ftell(rfile);
+    final_fpos = tt->fpos = ftell(rfile);
 #endif
 #define TTFIELDS 13
     if (fscanf(rfile, fmt, &tt->ver_major, &tt->ver_minor, &tt->patchlevel,
@@ -605,29 +611,24 @@ free_ttlist(struct toptenentry* tt)
 void
 topten(int how, time_t when)
 {
-    int uid = getuid();
-    int rank, rank0 = -1, rank1 = 0;
-    int occ_cnt = sysopt.persmax;
     register struct toptenentry *t0, *tprev;
     struct toptenentry *t1;
     FILE *rfile;
-    register int flg = 0;
-    boolean t0_used;
 #ifdef LOGFILE
     FILE *lfile;
-#endif /* LOGFILE */
+#endif
 #ifdef XLOGFILE
     FILE *xlfile;
-#endif /* XLOGFILE */
-
-#ifdef _DCC
-    /* Under DICE 3.0, this crashes the system consistently, apparently due to
-     * corruption of *rfile somewhere.  Until I figure this out, just cut out
-     * topten support entirely - at least then the game exits cleanly.  --AC
-     */
-    return;
 #endif
+    int uid = getuid();
+    int rank, rank0 = -1, rank1 = 0;
+    int occ_cnt = sysopt.persmax;
+    int flg = 0;
+    boolean t0_used, skip_scores;
 
+#ifdef UPDATE_RECORD_IN_PLACE
+    final_fpos = 0L;
+#endif
     /* If we are in the midst of a panic, cut out topten entirely.
      * topten uses alloc() several times, which will lead to
      * problems if the panic was the result of an alloc() failure.
@@ -651,6 +652,7 @@ topten(int how, time_t when)
     /* create a new 'topten' entry */
     t0_used = FALSE;
     t0 = newttentry();
+    *t0 = zerott;
     t0->ver_major = VERSION_MAJOR;
     t0->ver_minor = VERSION_MINOR;
     t0->patchlevel = PATCHLEVEL;
@@ -742,7 +744,7 @@ topten(int how, time_t when)
     t1 = tt_head = newttentry();
     tprev = 0;
     /* rank0: -1 undefined, 0 not_on_list, n n_th on list */
-    for (rank = 1;;) {
+    for (rank = 1; ; ) {
         readentry(rfile, t1);
         if (t1->points < sysopt.pointsmin)
             t1->points = 0;
@@ -774,7 +776,7 @@ topten(int how, time_t when)
                     char pbuf[BUFSZ];
 
                     Sprintf(pbuf,
-                        "You didn't beat your previous score of %ld points.",
+                         "You didn't beat your previous score of %ld points.",
                             t1->points);
                     topten_print(pbuf);
                     topten_print("");
@@ -797,8 +799,7 @@ topten(int how, time_t when)
     }
     if (flg) { /* rewrite record file */
 #ifdef UPDATE_RECORD_IN_PLACE
-        (void) fseek(rfile, (t0->fpos >= 0 ? t0->fpos : g.final_fpos),
-                     SEEK_SET);
+        (void) fseek(rfile, (t0->fpos >= 0) ? t0->fpos : final_fpos, SEEK_SET);
 #else
         (void) fclose(rfile);
         if (!(rfile = fopen_datafile(RECORD, "w", SCOREPREFIX))) {
@@ -823,43 +824,45 @@ topten(int how, time_t when)
                 topten_print("");
             }
     }
+    skip_scores = !flags.end_top && !flags.end_around && !flags.end_own;
     if (rank0 == 0)
         rank0 = rank1;
     if (rank0 <= 0)
         rank0 = rank;
-    if (!done_stopprint)
+    if (!skip_scores && !done_stopprint)
         outheader();
-    t1 = tt_head;
-    for (rank = 1; t1->points != 0; rank++, t1 = t1->tt_next) {
+    for (t1 = tt_head, rank = 1; t1->points != 0; t1 = t1->tt_next, ++rank) {
         if (flg
 #ifdef UPDATE_RECORD_IN_PLACE
             && rank >= rank0
 #endif
             )
             writeentry(rfile, t1);
-        if (done_stopprint)
+        if (skip_scores || done_stopprint)
             continue;
-        if (rank > flags.end_top && (rank < rank0 - flags.end_around
-                                     || rank > rank0 + flags.end_around)
-            && (!flags.end_own
-                || (sysopt.pers_is_uid
-                        ? t1->uid == t0->uid
-                        : strncmp(t1->name, t0->name, NAMSZ) == 0)))
-            continue;
-        if (rank == rank0 - flags.end_around
-            && rank0 > flags.end_top + flags.end_around + 1 && !flags.end_own)
-            topten_print("");
-        if (rank != rank0)
-            outentry(rank, t1, FALSE);
-        else if (!rank1)
-            outentry(rank, t1, TRUE);
-        else {
-            outentry(rank, t1, TRUE);
-            outentry(0, t0, TRUE);
+        if (rank <= flags.end_top
+            || (rank >= rank0 - flags.end_around
+                && rank <= rank0 + flags.end_around)
+            || (flags.end_own && (sysopt.pers_is_uid
+                                  ? t1->uid == t0->uid
+                                  : !strncmp(t1->name, t0->name, NAMSZ)))) {
+            if (rank == rank0 - flags.end_around
+                && rank0 > flags.end_top + flags.end_around + 1
+                && !flags.end_own)
+                topten_print("");
+
+            if (rank != rank0) {
+                outentry(rank, t1, FALSE);
+            } else if (!rank1) {
+                outentry(rank, t1, TRUE);
+            } else {
+                outentry(rank, t1, TRUE);
+                outentry(0, t0, TRUE);
+            }
         }
     }
     if (rank0 >= rank)
-        if (!done_stopprint)
+        if (!skip_scores && !done_stopprint)
             outentry(0, t0, TRUE);
 #ifdef UPDATE_RECORD_IN_PLACE
     if (flg) {
@@ -868,16 +871,16 @@ topten(int how, time_t when)
         truncate_file(rfile);
 #else
         /* use sentinel record rather than relying on truncation */
-        t1->points = 0L; /* terminates file when read back in */
-        t1->ver_major = t1->ver_minor = t1->patchlevel = 0;
-        t1->uid = t1->deathdnum = t1->deathlev = 0;
-        t1->maxlvl = t1->hp = t1->maxhp = t1->deaths = 0;
+        *t1 = zerott;
+        t1->points = 0L; /* [redundant] terminates file when read back in */
         t1->plrole[0] = t1->plrace[0] = t1->plgend[0] = t1->plalign[0] = '-';
-        t1->plrole[1] = t1->plrace[1] = t1->plgend[1] = t1->plalign[1] = 0;
         t1->birthdate = t1->deathdate = yyyymmdd((time_t) 0L);
         Strcpy(t1->name, "@");
-        Strcpy(t1->death, "<eod>\n");
+        Strcpy(t1->death, "<eod>\n"); /* end of data */
         writeentry(rfile, t1);
+        /* note: there might be junk (if file has shrunk due to shorter
+           entries supplanting longer ones) after this dummy entry, but
+           reading and/or updating will ignore it */
         (void) fflush(rfile);
 #endif /* TRUNCATE_FILE */
     }
@@ -886,10 +889,10 @@ topten(int how, time_t when)
     unlock_file(RECORD);
     free_ttlist(tt_head);
 
-showwin:
+ showwin:
     if (iflags.toptenwin && !done_stopprint)
-        display_nhwindow(g.toptenwin, 1);
-destroywin:
+        display_nhwindow(g.toptenwin, TRUE);
+ destroywin:
     if (!t0_used)
         dealloc_ttentry(t0);
     if (iflags.toptenwin) {
@@ -1310,7 +1313,7 @@ get_rnd_toptenentry(void)
 
     tt = &tt_buf;
     rank = rnd(sysopt.tt_oname_maxrank);
-pickentry:
+ pickentry:
     for (i = rank; i; i--) {
         readentry(rfile, tt);
         if (tt->points == 0)

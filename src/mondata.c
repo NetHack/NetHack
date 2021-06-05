@@ -1223,4 +1223,51 @@ olfaction(struct permonst* mdat)
     return TRUE;
 }
 
+/* Convert attack damage type AD_foo to M_SEEN_bar */
+unsigned long
+cvt_adtyp_to_mseenres(uchar adtyp)
+{
+    switch (adtyp) {
+    case AD_MAGM: return M_SEEN_MAGR;
+    case AD_FIRE: return M_SEEN_FIRE;
+    case AD_COLD: return M_SEEN_COLD;
+    case AD_SLEE: return M_SEEN_SLEEP;
+    case AD_DISN: return M_SEEN_DISINT;
+    case AD_ELEC: return M_SEEN_ELEC;
+    case AD_DRST: return M_SEEN_POISON;
+    case AD_ACID: return M_SEEN_ACID;
+    /* M_SEEN_REFL has no corresponding AD_foo type */
+    default: return M_SEEN_NOTHING;
+    }
+}
+
+/* Monsters remember hero resisting effect M_SEEN_foo */
+void
+monstseesu(unsigned long seenres)
+{
+    struct monst *mtmp;
+
+    if (seenres == M_SEEN_NOTHING)
+        return;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp) && m_canseeu(mtmp))
+            m_setseenres(mtmp, seenres);
+}
+
+/* Can monster resist conflict caused by hero?
+
+   High-CHA heroes will be able to 'convince' monsters
+   (through the magic of the ring, of course) to fight
+   for them much more easily than low-CHA ones.
+*/
+boolean
+resist_conflict(struct monst* mtmp)
+{
+    /* always a small chance at 19 */
+    int resist_chance = min(19, (ACURR(A_CHA) - mtmp->m_lev + u.ulevel));
+
+    return (rnd(20) > resist_chance);
+}
+
 /*mondata.c*/

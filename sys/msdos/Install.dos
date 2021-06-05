@@ -1,12 +1,12 @@
 
-	   Copyright (c) NetHack PC Development Team 1990-2020.
+	   Copyright (c) NetHack PC Development Team 1990-2021.
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
 		     NetHack 3.7 on a DOS system
          ======================================================
                    (or, How to make PC NetHack 3.7)
-        Last revision: $NHDT-Date: 1596508786 2020/08/04 02:39:46 $
+        Last revision: $NHDT-Date: 1596508786 2021/06/04 08:45:00 $
 
 Credit for a runnable full PC NetHack 3.7 goes to the PC Development team
 of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer,
@@ -34,8 +34,8 @@ II. There once was a time when people built NetHack right on their DOS machine.
     much gnashing of teeth, squeezing large things into small spaces, and
     required the sacrifice of copious amounts of time and coffee.
 
-    These days, to compile your copy of NetHack on Linux or macOS machine using
-    Andrew Wu's djgpp cross-compiler from:
+    These days, to compile your copy of NetHack on Linux or macOS machine you
+    can use Andrew Wu's djgpp cross-compiler from:
         https://github.com/andrewwutw/build-djgpp
     downloaded from:
         https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/ 
@@ -44,7 +44,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
     and pdcurses from:
         https://github.com/wmcbrine/PDCurses.git
     and Lua from:
-        http://www.lua.org/ftp/lua-5.4.1.tar.gz
+        http://www.lua.org/ftp/lua-5.4.3.tar.gz
 
     - A shell script to download the above-mentioned djgpp cross-compiler and
       associated support pieces for either linux or macOS is available:

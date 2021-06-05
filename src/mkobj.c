@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1606343579 2020/11/25 22:32:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.191 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1620923920 2021/05/13 16:38:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -706,7 +706,39 @@ costly_alteration(struct obj* obj, int alter_type)
 
 static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
                                 SCROLL_CLASS, GEM_CLASS,  SPBOOK_CLASS,
-                                WEAPON_CLASS, TOOL_CLASS, 0 };
+                                WEAPON_CLASS, TOOL_CLASS, VENOM_CLASS, 0 };
+
+/* set obj->dknown to 0 for most types of objects, to 1 otherwise;
+   split off from unknow_object() */
+void
+clear_dknown(struct obj *obj)
+{
+    obj->dknown = index(dknowns, obj->oclass) ? 0 : 1;
+    if ((obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD)
+        || obj->otyp == SHIELD_OF_REFLECTION
+        || objects[obj->otyp].oc_merge)
+        obj->dknown = 0;
+    /* globs always have dknown flag set (to maximize merging) but for new
+       object, globby flag won't be set yet so isn't available to check */
+    if (Is_pudding(obj))
+        obj->dknown = 1;
+}
+
+/* some init for a brand new object, or partial re-init when hero loses
+   potentially known info about an object (called when an unseen monster
+   picks up or uses it); moved from invent.c to here for access to dknowns */
+void
+unknow_object(struct obj *obj)
+{
+    clear_dknown(obj); /* obj->dknown = 0; */
+
+    obj->bknown = obj->rknown = 0;
+    obj->cknown = obj->lknown = 0;
+    /* for an existing object, awareness of charges or enchantment has
+       gone poof...  [object types which don't use the known flag have
+       it set True for some reason] */
+    obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
+}
 
 /* mksobj(): create a specific type of object; result it always non-Null */
 struct obj *
@@ -726,15 +758,7 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp->oclass = let;
     otmp->otyp = otyp;
     otmp->where = OBJ_FREE;
-    otmp->dknown = index(dknowns, let) ? 0 : 1;
-    if ((otmp->otyp >= ELVEN_SHIELD && otmp->otyp <= ORCISH_SHIELD)
-        || otmp->otyp == SHIELD_OF_REFLECTION
-        || objects[otmp->otyp].oc_merge)
-        otmp->dknown = 0;
-    if (!objects[otmp->otyp].oc_uses_known)
-        otmp->known = 1;
-    otmp->lknown = 0;
-    otmp->cknown = 0;
+    unknow_object(otmp); /* set up dknown and known: non-0 for some things */
     otmp->corpsenm = NON_PM;
     otmp->lua_ref_cnt = 0;
 
@@ -1060,7 +1084,7 @@ mksobj(int otyp, boolean init, boolean artif)
 
 /*
  * Several areas of the code made direct reassignments
- * to obj->corpsenm. Because some special handling is
+ * to obj->corpsenm.  Because some special handling is
  * required in certain cases, place that handling here
  * and call this routine in place of the direct assignment.
  *
@@ -1079,18 +1103,35 @@ mksobj(int otyp, boolean init, boolean artif)
  *
  */
 void
-set_corpsenm(struct obj* obj, int id)
+set_corpsenm(struct obj *obj, int id)
 {
+    int old_id = obj->corpsenm;
     long when = 0L;
 
     if (obj->timed) {
-        if (obj->otyp == EGG)
+        if (obj->otyp == EGG) {
             when = stop_timer(HATCH_EGG, obj_to_any(obj));
-        else {
+        } else {
             when = 0L;
             obj_stop_timers(obj); /* corpse or figurine */
         }
     }
+    /* oeaten is used to determine how much nutrition is left in
+       multiple-bite food and also used to derive how many hit points
+       a creature resurrected from a partly eaten corpse gets; latter
+       is of interest when a <foo> corpse revives as a <foo> zombie
+       in case they are defined with different mons[].cnutrit values */
+    if (obj->otyp == CORPSE && obj->oeaten != 0
+        /* when oeaten is non-zero, index old_id can't be NON_PM
+           and divisor mons[old_id].cnutrit can't be zero */
+        && mons[old_id].cnutrit != mons[id].cnutrit) {
+        /* oeaten and cnutrit are unsigned; theoretically that could
+           be 16 bits and the calculation might overflow, so force long */
+        obj->oeaten = (unsigned) ((long) obj->oeaten
+                                  * (long) mons[id].cnutrit
+                                  / (long) mons[old_id].cnutrit);
+    }
+
     obj->corpsenm = id;
     switch (obj->otyp) {
     case CORPSE:
@@ -1136,44 +1177,43 @@ void
 start_corpse_timeout(struct obj* body)
 {
     long when;       /* rot away when this old */
-    long corpse_age; /* age of corpse          */
+    long age;        /* age of corpse          */
     int rot_adjust;
     short action;
-    boolean no_revival;
 
-    /* if a troll corpse was frozen, it won't get a revive timer */
-    no_revival = (body->norevive != 0);
-    body->norevive = 0; /* always clear corpse's 'frozen' flag */
+    /*
+     * Note:
+     *      if body->norevive is set, the corpse will rot away instead
+     *      of revive when its REVIVE_MON timer finishes.
+     */
 
     /* lizards and lichen don't rot or revive */
     if (body->corpsenm == PM_LIZARD || body->corpsenm == PM_LICHEN)
         return;
 
-    action = ROT_CORPSE;             /* default action: rot away */
+    action = ROT_CORPSE;               /* default action: rot away */
     rot_adjust = g.in_mklev ? 25 : 10; /* give some variation */
-    corpse_age = g.monstermoves - body->age;
-    if (corpse_age > ROT_AGE)
+    age = g.monstermoves - body->age;
+    if (age > ROT_AGE)
         when = rot_adjust;
     else
-        when = ROT_AGE - corpse_age;
+        when = ROT_AGE - age;
     when += (long) (rnz(rot_adjust) - rot_adjust);
 
     if (is_rider(&mons[body->corpsenm])) {
         action = REVIVE_MON;
         when = rider_revival_time(body, FALSE);
-    } else if (mons[body->corpsenm].mlet == S_TROLL && !no_revival) {
-        long age;
-
+    } else if (mons[body->corpsenm].mlet == S_TROLL) {
         for (age = 2; age <= TAINT_AGE; age++)
             if (!rn2(TROLL_REVIVE_CHANCE)) { /* troll revives */
                 action = REVIVE_MON;
                 when = age;
                 break;
             }
-    } else if (!no_revival && g.zombify
-               && zombie_form(&mons[body->corpsenm]) != NON_PM) {
+    } else if (g.zombify && zombie_form(&mons[body->corpsenm]) != NON_PM
+               && !body->norevive) {
         action = ZOMBIFY_MON;
-        when = 5 + rn2(15);
+        when = rn1(15, 5); /* 5..19 */
     }
 
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
@@ -1463,10 +1503,10 @@ mkgold(long amount, int x, int y)
  */
 struct obj *
 mkcorpstat(
-    int objtype, /* CORPSE or STATUE */
-    struct monst *mtmp,
-    struct permonst *ptr,
-    int x, int y,
+    int objtype,          /* CORPSE or STATUE */
+    struct monst *mtmp,   /* dead monster, might be Null */
+    struct permonst *ptr, /* if non-Null, overrides mtmp->mndx */
+    int x, int y,         /* where to place corpse; <0,0> => random */
     unsigned corpstatflags)
 {
     struct obj *otmp;
@@ -1480,6 +1520,7 @@ mkcorpstat(
     } else {
         otmp = mksobj_at(objtype, x, y, init, FALSE);
     }
+    otmp->norevive = g.mkcorpstat_norevive;
 
     /* when 'mtmp' is non-null save the monster's details with the
        corpse or statue; it will also force the 'ptr' override below */
@@ -1627,10 +1668,15 @@ mk_tt_object(
     /* player statues never contain books */
     initialize_it = (objtype != STATUE);
     otmp = mksobj_at(objtype, x, y, initialize_it, FALSE);
-    /* tt_oname() will return null if the scoreboard is empty;
-       assigning an object name used to allocate a new obj but
-       doesn't any more so we can safely ignore the return value */
-    (void) tt_oname(otmp);
+
+    /* tt_oname() will return null if the scoreboard is empty, which in
+       turn leaves the random corpsenm value; force it to match a player */
+    if (!tt_oname(otmp)) {
+        int pm = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+
+        /* update weight for either, force timer sanity for corpses */
+        set_corpsenm(otmp, pm);
+    }
 
     return otmp;
 }

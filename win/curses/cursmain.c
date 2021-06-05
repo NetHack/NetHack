@@ -48,7 +48,7 @@ struct window_procs curses_procs = {
 #endif
      | WC2_FLUSH_STATUS | WC2_TERM_SIZE
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
-     | WC2_SUPPRESS_HIST),
+     | WC2_SUPPRESS_HIST | WC2_MENU_SHIFT),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,
     curses_player_selection,
@@ -299,6 +299,19 @@ curses_get_nh_event(void)
     }
 }
 
+/* restore terminal state; extracted from curses_exit_nhwindows() */
+void
+curses_uncurse_terminal(void)
+{
+   /* also called by panictrace_handler(), a signal handler, so somewhat
+      iffy in that situation; but without this, newlines behave as raw
+      line feeds so subseqent backtrace gets scrawled all over the screen
+      and is nearly useless */
+    curses_cleanup();
+    curs_set(orig_cursor);
+    endwin();
+}
+
 /* Exits the window system.  This should dismiss all windows,
    except the "window" used for raw_print().  str is printed if possible.
 */
@@ -311,9 +324,8 @@ curses_exit_nhwindows(const char *str)
     curses_destroy_nhwindow(MESSAGE_WIN);
     curs_destroy_all_wins();
 
-    curses_cleanup();
-    curs_set(orig_cursor);
-    endwin();
+    curses_uncurse_terminal();
+
     iflags.window_inited = 0;
     if (str != NULL) {
         raw_print(str);
@@ -424,6 +436,7 @@ curses_destroy_nhwindow(winid wid)
             curses_status_finish(); /* discard cached status data */
         break;
     case INV_WIN:
+        curs_purge_perminv_data(TRUE);
         iflags.perm_invent = 0; /* avoid unexpected update_inventory() */
         break;
     case MAP_WIN:
@@ -556,7 +569,7 @@ curses_add_menu(winid wid, const glyph_info *glyphinfo,
         /* persistent inventory window; nothing is selectable;
            omit glyphinfo because perm_invent is to the side of
            the map so usually cramped for space */
-        curses_add_inv(inv_update, accelerator, curses_attr, str);
+        curs_add_invt(inv_update, accelerator, curses_attr, str);
         inv_update++;
         return;
     }
@@ -619,24 +632,34 @@ curses_select_menu(winid wid, int how, MENU_ITEM_P ** selected)
 }
 
 void
-curses_update_inventory(void)
+curses_update_inventory(int arg)
 {
-    /* Don't do anything if perm_invent is off unless we
-       changed the option. */
+    /* Don't do anything if perm_invent is off unless it was on and
+       player just changed the option. */
     if (!iflags.perm_invent) {
         if (curses_get_nhwin(INV_WIN)) {
             curs_reset_windows(TRUE, FALSE);
+            curs_purge_perminv_data(FALSE);
         }
         return;
     }
 
-    /* Update inventory sidebar. NetHack uses normal menu functions
-       when drawing the inventory, and we don't want to change the
-       underlying code. So instead, track if an inventory update is
-       being performed with a static variable. */
-    inv_update = 1;
-    curses_update_inv();
-    inv_update = 0;
+    /* skip inventory updating during character initialization */
+    if (!g.program_state.in_moveloop && !g.program_state.gameover)
+        return;
+
+    if (!arg) {
+        /* Update inventory sidebar.  NetHack uses normal menu functions
+           when gathering the inventory, and we don't want to change the
+           underlying code.  So instead, track if an inventory update is
+           being performed with a static variable. */
+        inv_update = 1;
+        curs_update_invt(0);
+        inv_update = 0;
+    } else {
+        /* perform scrolling operations on persistent inventory window */
+        curs_update_invt(arg);
+    }
 }
 
 /*

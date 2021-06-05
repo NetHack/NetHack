@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1609442596 2020/12/31 19:23:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.276 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1617035736 2021/03/29 16:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -178,6 +178,9 @@ moverock(void)
             }
 
             if (ttmp) {
+                int newlev = 0; /* lint suppression */
+                d_level dest;
+
                 /* if a trap operates on the boulder, don't attempt
                    to move any others at this location; return -1
                    if another boulder is in hero's way, or 0 if he
@@ -236,16 +239,14 @@ moverock(void)
                         newsym(rx, ry);
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                 case LEVEL_TELEP:
-                case TELEP_TRAP: {
-                    int newlev = 0; /* lint suppression */
-                    d_level dest;
-
-                    if (ttmp->ttyp == LEVEL_TELEP) {
-                        newlev = random_teleport_level();
-                        if (newlev == depth(&u.uz) || In_endgame(&u.uz))
-                            /* trap didn't work; skip "disappears" message */
-                            goto dopush;
-                    }
+                    /* 20% chance of picking current level; 100% chance for
+                       that if in single-level branch (Knox) or in endgame */
+                    newlev = random_teleport_level();
+                    /* if trap doesn't work, skip "disappears" message */
+                    if (newlev == depth(&u.uz))
+                        goto dopush;
+                    /*FALLTHRU*/
+                case TELEP_TRAP:
                     if (u.usteed)
                         pline("%s pushes %s and suddenly it disappears!",
                               upstart(y_monnam(u.usteed)), the(xname(otmp)));
@@ -264,7 +265,6 @@ moverock(void)
                     }
                     seetrap(ttmp);
                     return sobj_at(BOULDER, sx, sy) ? -1 : 0;
-                }
                 default:
                     break; /* boulder not affected by this trap */
                 }
@@ -958,8 +958,10 @@ findtravelpath(int mode)
 {
     /* if travel to adjacent, reachable location, use normal movement rules */
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
-        && distmin(u.ux, u.uy, u.tx, u.ty) == 1
-        && !(u.ux != u.tx && u.uy != u.ty && NODIAG(u.umonnum))) {
+        /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
+        && distu(u.tx, u.ty) <= 2 /* one step away */
+        /* handle restricted diagonals */
+        && crawl_destination(u.tx, u.ty)) {
         end_running(FALSE);
         if (test_move(u.ux, u.uy, u.tx - u.ux, u.ty - u.uy, TEST_MOVE)) {
             if (mode == TRAVP_TRAVEL) {
@@ -1751,7 +1753,11 @@ domove_core(void)
 
         nomul(0);
         if (explo) {
-            wake_nearby();
+            struct attack *attk;
+            /* no monster has been attacked so we have bypassed explum() */
+            wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
+            if ((attk = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY)))
+                explum((struct monst *) 0, attk);
             u.mh = -1; /* dead in the current form */
             rehumanize();
         }
@@ -2647,6 +2653,9 @@ check_special_room(boolean newlev)
                 for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                     if (DEADMONSTER(mtmp))
                         continue;
+                    if (!isok(mtmp->mx,mtmp->my)
+                        || roomno != (int) levl[mtmp->mx][mtmp->my].roomno)
+                        continue;
                     if (!Stealth && !rn2(3))
                         mtmp->msleeping = 0;
                 }
@@ -2938,7 +2947,8 @@ doorless_door(int x, int y)
     return !(lev_p->doormask & ~(D_NODOOR | D_BROKEN));
 }
 
-/* used by drown() to check whether hero can crawl from water to <x,y> */
+/* used by drown() to check whether hero can crawl from water to <x,y>;
+   also used by findtravelpath() when destination is one step away */
 boolean
 crawl_destination(int x, int y)
 {
@@ -3001,9 +3011,8 @@ end_running(boolean and_travel)
        all clear it too */
     if (and_travel)
         g.context.travel = g.context.travel1 = g.context.mv = 0;
-    
-    // Cancel mutli
-    if (g.multi > 0) 
+    /* cancel mutli */
+    if (g.multi > 0)
         g.multi = 0;
 }
 
@@ -3017,7 +3026,7 @@ nomul(int nval)
     u.usleep = 0;
     g.multi = nval;
     if (nval == 0)
-        g.multi_reason = NULL;
+        g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
     end_running(TRUE);
 }
 
@@ -3044,7 +3053,7 @@ unmul(const char *msg_override)
     }
     g.nomovemsg = 0;
     u.usleep = 0;
-    g.multi_reason = NULL;
+    g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
     if (g.afternmv) {
         int (*f)(void) = g.afternmv;
 

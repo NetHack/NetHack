@@ -1133,15 +1133,15 @@ engrave(void)
         }
     }
 
-    dulling_wep = (stylus && stylus->oclass == WEAPON_CLASS
+    dulling_wep = (carving && stylus && stylus->oclass == WEAPON_CLASS
                    && (stylus->otyp != ATHAME || stylus->cursed));
     marker = (stylus && stylus->otyp == MAGIC_MARKER);
 
     g.context.engraving.actionct++;
 
     /* sanity checks */
-    if (dulling_wep && !carving) {
-        impossible("using weapon for non-carve engraving");
+    if (dulling_wep && !is_blade(stylus)) {
+        impossible("carving with non-bladed weapon");
     }
     else if (g.context.engraving.type == MARK && !marker) {
         impossible("making graffiti with non-marker stylus");

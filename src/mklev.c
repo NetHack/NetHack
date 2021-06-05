@@ -65,7 +65,7 @@ mkroom_cmp(const genericptr vx, const genericptr vy)
 }
 
 /* Return TRUE if a door placed at (x, y) which otherwise passes okdoor()
- * checks would be connecting into an area that was declared as joined = 0.
+ * checks would be connecting into an area that was declared as joined = false.
  * Checking for this in finddpos() enables us to have rooms with sub-areas
  * (such as shops) that will never randomly generate unwanted doors in order
  * to connect them up to other areas.
@@ -277,6 +277,8 @@ makerooms(void)
             } else {
                 /* success; save state for this dungeon branch */
                 g.luathemes[u.uz.dnum] = (genericptr_t) themes;
+                /* keep themes context, so not 'nhl_done(themes);' */
+                iflags.in_lua = FALSE; /* can affect error messages */
             }
         }
         if (!themes) /* don't try again when making next level */
@@ -299,11 +301,11 @@ makerooms(void)
             }
         } else {
             if (themes) {
-                g.in_mk_themerooms = TRUE;
+                iflags.in_lua = g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
                 lua_call(themes, 0, 0);
-                g.in_mk_themerooms = FALSE;
+                iflags.in_lua = g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)
                         || (g.nroom >= (MAXNROFROOMS / 6))))
@@ -767,7 +769,7 @@ fill_ordinary_room(struct mkroom *croom)
     if (x <= 1)
         x = 2;
     while (!rn2(x) && (++trycnt < 1000))
-        mktrap(0, 0, croom, (coord *) 0);
+        mktrap(0, MKTRAP_NOFLAGS, croom, (coord *) 0);
     if (!rn2(3) && somexyspace(croom, &pos))
         (void) mkgold(0L, pos.x, pos.y);
     if (Is_rogue_level(&u.uz))
@@ -1320,7 +1322,7 @@ occupied(register xchar x, register xchar y)
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
 /* if tm != null, make trap at that location */
 void
-mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
+mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
 {
     register int kind;
     struct trap *t;
@@ -1375,19 +1377,21 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
                     kind = NO_TRAP;
                 break;
             case LEVEL_TELEP:
-                if (lvl < 5 || g.level.flags.noteleport)
+                if (lvl < 5 || g.level.flags.noteleport
+                    || single_level_branch(&u.uz))
                     kind = NO_TRAP;
                 break;
             case SPIKED_PIT:
                 if (lvl < 5)
                     kind = NO_TRAP;
                 break;
+            case ANTI_MAGIC:
             case LANDMINE:
                 if (lvl < 6)
                     kind = NO_TRAP;
                 break;
             case WEB:
-                if (lvl < 7)
+                if (lvl < 7 && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
                     kind = NO_TRAP;
                 break;
             case STATUE_TRAP:
@@ -1424,7 +1428,7 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
         do {
             if (++tryct > 200)
                 return;
-            if (mazeflag)
+            if (mktrapflags & MKTRAP_MAZEFLAG)
                 mazexy(&m);
             else if (!somexy(croom, &m))
                 return;
@@ -1437,7 +1441,7 @@ mktrap(int num, int mazeflag, struct mkroom *croom, coord *tm)
        should prevent cases where that might not happen) but be paranoid */
     kind = t ? t->ttyp : NO_TRAP;
 
-    if (kind == WEB)
+    if (kind == WEB && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
 
     /* The hero isn't the only person who's entered the dungeon in

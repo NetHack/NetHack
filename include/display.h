@@ -38,6 +38,11 @@ enum explosion_types {
  *
  * Returns true if the hero can sense the given monster.  This includes
  * monsters that are hiding or mimicing other monsters.
+ *
+ * [3.7] Note: the map doesn't display any monsters when hero is swallowed
+ * (or display non-adjacent, non-submerged ones when hero is underwater),
+ * so treat those situations as blocking telepathy, detection, and warning
+ * even though conceptually they shouldn't do so.
  */
 #define tp_sensemon(mon) \
     (/* The hero can always sense a monster IF:        */  \
@@ -49,15 +54,19 @@ enum explosion_types {
           /*        object and in range                */  \
           || (Unblind_telepat                              \
               && (distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM)))))
-
+/* organized to perform cheaper tests first;
+   is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
+   lava, but presumeably any monster there is on top so not sensed */
 #define sensemon(mon) \
-    (tp_sensemon(mon) || Detect_monsters || MATCH_WARN_OF_MON(mon))
+    (   (!u.uswallow || (mon) == u.ustuck)                                 \
+     && (!Underwater || (distu((mon)->mx, (mon)->my) <= 2                  \
+                         && is_pool((mon)->mx, (mon)->my)))                \
+     && (Detect_monsters || tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))   )
 
 /*
  * mon_warning() is used to warn of any dangerous monsters in your
  * vicinity, and a glyph representing the warning level is displayed.
  */
-
 #define mon_warning(mon)                                                 \
     (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
      && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))

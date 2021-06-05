@@ -114,9 +114,9 @@ mk_mplayer_armor(struct monst* mon, short typ)
 }
 
 struct monst *
-mk_mplayer(register struct permonst* ptr, xchar x, xchar y, register boolean special)
+mk_mplayer(struct permonst *ptr, xchar x, xchar y, boolean special)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     char nam[PL_NSIZ];
 
     if (!is_mplayer(ptr))

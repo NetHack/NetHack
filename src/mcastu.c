@@ -292,6 +292,7 @@ castmu(register struct monst *mtmp,
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
             pline("But you resist the effects.");
+            monstseesu(M_SEEN_FIRE);
             dmg = 0;
         }
         burn_away_slime();
@@ -301,6 +302,7 @@ castmu(register struct monst *mtmp,
         if (Cold_resistance) {
             shieldeff(u.ux, u.uy);
             pline("But you resist the effects.");
+            monstseesu(M_SEEN_COLD);
             dmg = 0;
         }
         break;
@@ -309,6 +311,7 @@ castmu(register struct monst *mtmp,
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
             pline_The("missiles bounce off!");
+            monstseesu(M_SEEN_MAGR);
             dmg = 0;
         } else
             dmg = d((int) mtmp->m_lev / 2 + 1, 6);
@@ -343,6 +346,24 @@ m_cure_self(struct monst *mtmp, int dmg)
     return dmg;
 }
 
+void
+touch_of_death(void)
+{
+    int dmg = 50 + d(8, 6);
+    int drain = dmg / 2;
+
+    You_feel("drained...");
+
+    if (drain >= u.uhpmax) {
+        g.killer.format = KILLED_BY_AN;
+        Strcpy(g.killer.name, "touch of death");
+        done(DIED);
+    } else {
+        u.uhpmax -= drain;
+        losehp(dmg, "touch of death", KILLED_BY_AN);
+    }
+}
+
 /* monster wizard and cleric spellcasting functions */
 /*
    If dmg is zero, then the monster is not casting at you.
@@ -370,13 +391,13 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             if (Hallucination) {
                 You("have an out of body experience.");
             } else {
-                g.killer.format = KILLED_BY_AN;
-                Strcpy(g.killer.name, "touch of death");
-                done(DIED);
+                touch_of_death();
             }
         } else {
-            if (Antimagic)
+            if (Antimagic) {
                 shieldeff(u.ux, u.uy);
+                monstseesu(M_SEEN_MAGR);
+            }
             pline("Lucky for you, it didn't work!");
         }
         dmg = 0;
@@ -425,6 +446,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
     case MGC_DESTRY_ARMR:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             pline("A field of force surrounds you!");
         } else if (!destroy_arm(some_armor(&g.youmonst))) {
             Your("skin itches.");
@@ -434,6 +456,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
     case MGC_WEAKEN_YOU: /* drain strength */
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             You_feel("momentarily weakened.");
         } else {
             You("suddenly feel weaker!");
@@ -461,6 +484,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
     case MGC_STUN_YOU:
         if (Antimagic || Free_action) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             if (!Stunned)
                 You_feel("momentarily disoriented.");
             make_stunned(1L, FALSE);
@@ -485,6 +509,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
            made the spell virtually harmless to players with magic res. */
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             dmg = (dmg + 1) / 2;
         }
         if (dmg <= 5)
@@ -528,6 +553,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         pline("A pillar of fire strikes all around you!");
         if (Fire_resistance) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_FIRE);
             dmg = 0;
         } else
             dmg = d(8, 6);
@@ -549,8 +575,11 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         if (reflects || Shock_resistance) {
             shieldeff(u.ux, u.uy);
             dmg = 0;
-            if (reflects)
+            if (reflects) {
+                monstseesu(M_SEEN_REFL);
                 break;
+            }
+            monstseesu(M_SEEN_ELEC);
         } else
             dmg = d(8, 6);
         if (Half_spell_damage)
@@ -660,6 +689,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     case CLC_PARALYZE:
         if (Antimagic || Free_action) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             if (g.multi >= 0)
                 You("stiffen briefly.");
             nomul(-1);
@@ -679,6 +709,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     case CLC_CONFUSE_YOU:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             You_feel("momentarily dizzy.");
         } else {
             boolean oldprop = !!Confusion;
@@ -700,6 +731,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     case CLC_OPEN_WOUNDS:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
+            monstseesu(M_SEEN_MAGR);
             dmg = (dmg + 1) / 2;
         }
         if (dmg <= 5)

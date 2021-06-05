@@ -1593,11 +1593,17 @@ show_glyph(int x, int y, int glyph)
 
     if (g.gbuf[y][x].glyph != glyph
 #ifndef UNBUFFERED_GLYPHINFO
-           /* I don't think we have to test for changes in TTYCHAR or COLOR
-              because they typically only change if the glyph changed */
-            || g.gbuf[y][x].glyphinfo.glyphflags != glyphinfo.glyphflags
+        /* flags might change (single object vs pile, monster tamed or pet
+           gone feral), color might change (altar's alignment converted by
+           invisible hero), but ttychar normally won't change unless the
+           glyph does too (changing boulder symbol would be an exception,
+           but that triggers full redraw so doesn't matter here); still,
+           be thorough and check everything */
+        || g.gbuf[y][x].glyphinfo.glyphflags != glyphinfo.glyphflags
+        || g.gbuf[y][x].glyphinfo.ttychar != glyphinfo.ttychar
+        || g.gbuf[y][x].glyphinfo.color != glyphinfo.color
 #endif
-            || iflags.use_background_glyph ) {
+        || iflags.use_background_glyph) {
         g.gbuf[y][x].glyph = glyph;
         g.gbuf[y][x].gnew = 1;
 #ifndef UNBUFFERED_GLYPHINFO
