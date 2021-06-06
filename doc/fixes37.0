@@ -708,6 +708,8 @@ when using 'O' to set menu color patterns, the reminder message that the
 	was sometimes given even when already True
 stair revamp unintentionally resulted in cursed potion of levitation no longer
 	causing hero to hit head on ceiling
+enlightenment/disclosure when wielding two weapons with two-weap skill higher
+	than secondary weapon's skill had "with" duplicated in the feedback
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
