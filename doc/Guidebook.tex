@@ -2461,10 +2461,9 @@ location ordinarily wouldn't be seen any more.
 
 %.pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In {\it NetHack}, this is accomplished automatically by walking over
-the object (unless you turn off the {\it autopickup\/}
-option (see below), or move with the `{\tt m}' prefix (see above)), or
-manually by using the `{\tt ,}' command.
+it up.  In {\it NetHack}, this is accomplished by using the `{\tt ,}' command.
+If {\it autopickup\/} option is on, you will automatically pick up the object
+by walking over it, unless you move with the `{\tt m}' prefix.
 %.pg
 If you're carrying too many items, {\it NetHack\/} will tell you so and you
 won't be able to pick up anything more.  Otherwise, it will add the object(s)
@@ -3837,7 +3836,7 @@ Walking into a closed door attempts to open it (default true).
 Persistent.
 %.lp
 \item[\ib{autopickup}]
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default off).
 Persistent.
 \\
 %.lp ""
@@ -4776,8 +4775,7 @@ Setting {\tt ascii\verb+_+map} to {\it True\/} forces
 %.lp
 \item[\ib{color}]
 If {\it NetHack\/} can, it should display color for different monsters,
-objects, and dungeon features.
-
+objects, and dungeon features (default on).
 %.lp
 \item[\ib{eight\verb+_+bit\verb+_+tty}]
 Pass eight-bit character values (for example, specified with the

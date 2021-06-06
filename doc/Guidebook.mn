@@ -2253,11 +2253,13 @@ location ordinarily wouldn't be seen any more.
 Objects
 .pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In NetHack, this is accomplished automatically by walking over
+it up.  In NetHack, this is accomplished by using the \(oq,\(cq command.
+automatically by walking over
 the object (unless you turn off the
+If
 .op autopickup
-option (see below), or move with the \(oqm\(cq prefix (see above)), or
-manually by using the \(oq,\(cq command.
+option is on, you will automatically pick up the object
+by walking over, unless you move with the \(oqm\(cq prefix.
 .pg
 If you're carrying too many items, NetHack will tell you so and you won't
 be able to pick up anything more.
@@ -3550,7 +3552,7 @@ Persistent.
 Walking into a closed door attempts to open it (default true).
 Persistent.
 .lp "autopickup  "
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default off).
 Persistent.
 .lp ""
 See
@@ -4382,7 +4384,7 @@ to \fITrue\fP forces
 to be \fIFalse\fP.
 .lp color
 If NetHack can, it should display color if it can for different monsters,
-objects, and dungeon features.
+objects, and dungeon features (default on).
 .lp eight_bit_tty
 If NetHack can, it should pass eight-bit character values (for example,
 specified with the

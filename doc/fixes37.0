@@ -540,6 +540,7 @@ when moving the cursor to examine the map, have '^' move to next trap even if
 change valkyrie and warrior (valk quest) monsters from chaotic to lawful
 change attendant (healer quest) monster from lawful to neutral
 quit is not longer bound to M-q
+change default value of autopickup to off and color to on
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

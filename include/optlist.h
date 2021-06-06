@@ -105,7 +105,7 @@ opt_##a,
                 &flags.autodig)
     NHOPTB(autoopen, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.autoopen)
-    NHOPTB(autopickup, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
+    NHOPTB(autopickup, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.pickup)
     NHOPTO("autopickup exceptions", o_autopickup_exceptions, BUFSZ, opt_in,
            set_in_game, No, Yes, No, NoAlias, "edit autopickup exceptions")
@@ -141,7 +141,7 @@ opt_##a,
                 &iflags.clicklook)
     NHOPTB(cmdassist, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.cmdassist)
-    NHOPTB(color, 0, opt_in, set_in_game, Off, Yes, No, No, "colour",
+    NHOPTB(color, 0, opt_in, set_in_game, On, Yes, No, No, "colour",
                 &iflags.wc_color)
     NHOPTB(confirm, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.confirm)
