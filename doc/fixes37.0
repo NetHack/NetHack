@@ -758,6 +758,7 @@ curses: sometimes entering a count during menu selection caused the menu to
 	disappear (example was apply/loot in-out container menu with two or
 	more digits typed followed by non-digit); in-out menu was still active
 	but no longer displayed
+curses: support backspace/delete when entering a count during menu selection
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

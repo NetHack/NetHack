@@ -460,6 +460,10 @@ curses_count_window(const char *count_text)
 
     mvwprintw(countwin, 0, 0, "%s", count_text);
     wrefresh(countwin);
+    if (activemenu) {
+        touchwin(activemenu);
+        wrefresh(activemenu);
+    }
 }
 
 /* Gets a "line" (buffer) of input. */

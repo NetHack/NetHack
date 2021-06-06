@@ -691,30 +691,25 @@ curses_rtrim(char *str)
 /* Read numbers until non-digit is encountered, and return number
 in int form. */
 
-int
+long
 curses_get_count(int first_digit)
 {
-    long current_count = first_digit;
     int current_char;
+    long current_count = 0L;
 
-    current_char = curses_read_char();
-
-    while (isdigit(current_char)) {
-        current_count = (current_count * 10) + (current_char - '0');
-        if (current_count > LARGEST_INT) {
-            current_count = LARGEST_INT;
-        }
-
-        custompline(SUPPRESS_HISTORY, "Count: %ld", current_count);
-        current_char = curses_read_char();
-    }
+    /* use core's count routine; we have the first digit; if any more
+       are typed, get_count() will send "Count:123" to the message window;
+       curses's message window will display that in count window instead */
+    current_char = get_count(NULL, (char) first_digit,
+                             /* 0L => no limit on value unless it wraps
+                              * to negative;
+                              * FALSE => suppress from message history */
+                             0L, &current_count, FALSE);
 
     ungetch(current_char);
-
     if (current_char == '\033') {     /* Cancelled with escape */
         current_count = -1;
     }
-
     return current_count;
 }
 

@@ -4340,6 +4340,7 @@ click_to_cmd(int x, int y, int mod)
     return cmd;
 }
 
+/* gather typed digits into a number in *count; return the next non-digit */
 char
 get_count(char *allowchars, char inkey,
           long maxcount, long *count,
@@ -4363,12 +4364,12 @@ get_count(char *allowchars, char inkey,
 
         if (digit(key)) {
             cnt = 10L * cnt + (long) (key - '0');
-            if (cnt < 0)
-                cnt = 0;
-            else if (maxcount > 0 && cnt > maxcount)
+            if (cnt < 0L)
+                cnt = 0L;
+            else if (maxcount > 0L && cnt > maxcount)
                 cnt = maxcount;
         } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
-            cnt = cnt / 10;
+            cnt = cnt / 10L;
             backspaced = TRUE;
         } else if (key == g.Cmd.spkeys[NHKF_ESC]) {
             break;
