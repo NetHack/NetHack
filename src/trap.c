@@ -597,6 +597,8 @@ animate_statue(
     int cause,
     int *fail_reason)
 {
+    static const char
+        historic_statue_is_gone[] = "that the historic statue is now gone";
     int mnum = statue->corpsenm;
     struct permonst *mptr = &mons[mnum];
     struct monst *mon = 0, *shkp;
@@ -607,8 +609,6 @@ animate_statue(
             golem_xform = FALSE, use_saved_traits;
     const char *comes_to_life;
     char statuename[BUFSZ], tmpbuf[BUFSZ];
-    static const char historic_statue_is_gone[] =
-        "that the historic statue is now gone";
 
     if (cant_revive(&mnum, TRUE, statue)) {
         /* mnum has changed; we won't be animating this statue as itself */
@@ -632,6 +632,11 @@ animate_statue(
         if (mon && mon->mtame && !mon->isminion)
             wary_dog(mon, TRUE);
     } else {
+        int sgend = (statue->spe & CORPSTAT_GENDER);
+        long mmflags = (NO_MINVENT
+                        | ((sgend == CORPSTAT_MALE) ? MM_MALE : 0)
+                        | ((sgend == CORPSTAT_FEMALE) ? MM_FEMALE : 0));
+
         /* statues of unique monsters from bones or wishing end
            up here (cant_revive() sets mnum to be doppelganger;
            mptr reflects the original form for use by newcham()) */
@@ -639,22 +644,17 @@ animate_statue(
             /* block quest guards from other roles */
             || (mptr->msound == MS_GUARDIAN
                 && quest_info(MS_GUARDIAN) != mnum)) {
-            mon = makemon(&mons[PM_DOPPELGANGER], x, y,
-                          NO_MINVENT | MM_NOCOUNTBIRTH | MM_ADJACENTOK);
+            mmflags |= MM_NOCOUNTBIRTH | MM_ADJACENTOK;
+            mon = makemon(&mons[PM_DOPPELGANGER], x, y, mmflags);
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
             if (mon && mon->cham >= LOW_PM)
                 (void) newcham(mon, mptr, FALSE, FALSE);
         } else {
-            mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL)
-                                          ? (NO_MINVENT | MM_ADJACENTOK)
-                                          : NO_MINVENT);
+            if (cause == ANIMATE_SPELL)
+                mmflags |= MM_ADJACENTOK;
+            mon = makemon(mptr, x, y, mmflags);
         }
-        /* a non-montraits() statue might specify gender */
-        if ((statue->spe & CORPSTAT_MALE) != 0)
-            mon->female = 0;
-        else if ((statue->spe & CORPSTAT_FEMALE) != 0)
-            mon->female = 1;
     }
 
     if (!mon) {

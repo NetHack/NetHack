@@ -1421,9 +1421,9 @@ corpse_xname(
         /* avoid "aligned priest"; it just exposes internal details */
         mnam = "priest";
     } else {
-        int cspe = (otmp->spe & CORPSTAT_GENDER),
-            mgend = (cspe == CORPSTAT_FEMALE) ? FEMALE
-                    : (cspe == CORPSTAT_MALE) ? MALE
+        int cgend = (otmp->spe & CORPSTAT_GENDER),
+            mgend = (cgend == CORPSTAT_FEMALE) ? FEMALE
+                    : (cgend == CORPSTAT_MALE) ? MALE
                       : NEUTRAL;
 
         mnam = pmname(&mons[omndx], mgend);

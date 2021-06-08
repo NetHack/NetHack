@@ -757,7 +757,8 @@ revive(struct obj *corpse, boolean by_hero)
     coord xy;
     xchar x, y;
     boolean one_of;
-    int montype, container_nesting = 0;
+    long mmflags = NO_MINVENT | MM_NOWAIT;
+    int montype, cgend, container_nesting = 0;
 
     if (corpse->otyp != CORPSE) {
         impossible("Attempting to revive %s?", xname(corpse));
@@ -825,10 +826,17 @@ revive(struct obj *corpse, boolean by_hero)
         return (struct monst *) 0;
     }
 
+    /* applicable when montraits/corpse->oextra->omonst aren't used */
+    cgend = (corpse->spe & CORPSTAT_GENDER);
+    if (cgend == CORPSTAT_MALE)
+        mmflags |= MM_MALE;
+    else if (cgend == CORPSTAT_FEMALE)
+        mmflags |= MM_FEMALE;
+
     if (cant_revive(&montype, TRUE, corpse)) {
         /* make a zombie or doppelganger instead */
         /* note: montype has changed; mptr keeps old value for newcham() */
-        mtmp = makemon(&mons[montype], x, y, NO_MINVENT | MM_NOWAIT);
+        mtmp = makemon(&mons[montype], x, y, mmflags);
         if (mtmp) {
             /* skip ghost handling */
             if (has_omid(corpse))
@@ -851,20 +859,10 @@ revive(struct obj *corpse, boolean by_hero)
             wary_dog(mtmp, TRUE);
     } else {
         /* make a new monster */
-        mtmp = makemon(mptr, x, y, NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH);
+        mtmp = makemon(mptr, x, y, mmflags | MM_NOCOUNTBIRTH);
     }
     if (!mtmp)
         return (struct monst *) 0;
-
-    /* if we didn't use montraits, corpse might specify mon's gender */
-    if (!has_omonst(corpse)) {
-        int cspe = (corpse->spe & CORPSTAT_GENDER);
-
-        if (cspe == CORPSTAT_MALE)
-            mtmp->female = 0;
-        else if (cspe == CORPSTAT_FEMALE)
-            mtmp->female = 1;
-    }
 
     /* hiders shouldn't already be re-hidden when they revive */
     if (mtmp->mundetected) {
