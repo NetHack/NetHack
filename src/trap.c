@@ -603,7 +603,7 @@ animate_statue(
     struct obj *item;
     coord cc;
     boolean historic = (Role_if(PM_ARCHEOLOGIST)
-                        && (statue->spe & STATUE_HISTORIC) != 0),
+                        && (statue->spe & CORPSTAT_HISTORIC) != 0),
             golem_xform = FALSE, use_saved_traits;
     const char *comes_to_life;
     char statuename[BUFSZ], tmpbuf[BUFSZ];
@@ -645,10 +645,16 @@ animate_statue(
                be NON_PM; otherwise, set form to match the statue */
             if (mon && mon->cham >= LOW_PM)
                 (void) newcham(mon, mptr, FALSE, FALSE);
-        } else
+        } else {
             mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL)
                                           ? (NO_MINVENT | MM_ADJACENTOK)
                                           : NO_MINVENT);
+        }
+        /* a non-montraits() statue might specify gender */
+        if ((statue->spe & CORPSTAT_MALE) != 0)
+            mon->female = 0;
+        else if ((statue->spe & CORPSTAT_FEMALE) != 0)
+            mon->female = 1;
     }
 
     if (!mon) {
@@ -659,11 +665,6 @@ animate_statue(
         return (struct monst *) 0;
     }
 
-    /* a non-montraits() statue might specify gender */
-    if (statue->spe & STATUE_MALE)
-        mon->female = FALSE;
-    else if (statue->spe & STATUE_FEMALE)
-        mon->female = TRUE;
     /* if statue has been named, give same name to the monster */
     if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));

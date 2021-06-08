@@ -2169,7 +2169,8 @@ map_glyphinfo(xchar x, xchar y, int glyph,
         special |= MG_STATUE;
         if (is_objpile(x,y))
             special |= MG_OBJPILE;
-        if ((obj = sobj_at(STATUE, x, y)) && (obj->spe & STATUE_FEMALE))
+        if ((obj = sobj_at(STATUE, x, y)) != 0
+            && (obj->spe & CORPSTAT_GENDER) == CORPSTAT_FEMALE)
             special |= MG_FEMALE;
     } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) { /* warn flash */
         idx = offset + SYM_OFF_W;

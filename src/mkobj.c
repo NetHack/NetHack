@@ -1520,7 +1520,9 @@ mkcorpstat(
     } else {
         otmp = mksobj_at(objtype, x, y, init, FALSE);
     }
-    otmp->norevive = g.mkcorpstat_norevive;
+    /* record gender and 'historic statue' in overloaded enchantment field */
+    otmp->spe = (corpstatflags & CORPSTAT_SPE_VAL);
+    otmp->norevive = g.mkcorpstat_norevive; /* via envrmt rather than flags */
 
     /* when 'mtmp' is non-null save the monster's details with the
        corpse or statue; it will also force the 'ptr' override below */
@@ -1685,10 +1687,10 @@ mk_tt_object(
    never returns Null */
 struct obj *
 mk_named_object(
-int objtype, /* CORPSE or STATUE */
-struct permonst *ptr,
-int x, int y,
-const char *nm)
+    int objtype, /* CORPSE or STATUE */
+    struct permonst *ptr,
+    int x, int y,
+    const char *nm)
 {
     struct obj *otmp;
     unsigned corpstatflags = (objtype != STATUE) ? CORPSTAT_INIT

@@ -257,10 +257,14 @@ l_obj_to_table(lua_State *L)
     nhl_add_table_entry_int(L, "quan", obj->quan);
     nhl_add_table_entry_int(L, "spe", obj->spe);
 
-    if (obj->otyp == STATUE) {
-        nhl_add_table_entry_int(L, "historic", (obj->spe & STATUE_HISTORIC));
-        nhl_add_table_entry_int(L, "statue_male", (obj->spe & STATUE_MALE));
-        nhl_add_table_entry_int(L, "statue_female", (obj->spe & STATUE_FEMALE));
+    if (obj->otyp == STATUE)
+        nhl_add_table_entry_int(L, "historic",
+                                (obj->spe & CORPSTAT_HISTORIC) != 0);
+    if (obj->otyp == CORPSE || obj->otyp == STATUE) {
+        nhl_add_table_entry_int(L, "male",
+                                (obj->spe & CORPSTAT_MALE) != 0);
+        nhl_add_table_entry_int(L, "female",
+                                (obj->spe & CORPSTAT_FEMALE) != 0);
     }
 
     nhl_add_table_entry_char(L, "oclass",

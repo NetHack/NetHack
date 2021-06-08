@@ -606,18 +606,16 @@ xname_flags(
     case ROCK_CLASS:
         if (typ == STATUE && omndx != NON_PM) {
             char anbuf[10];
-            int mgend = (obj->spe & STATUE_FEMALE) ? FEMALE : MALE;
+            int mgend = (((obj->spe & CORPSTAT_GENDER) == CORPSTAT_FEMALE)
+                         ? FEMALE : MALE);
 
             Sprintf(buf, "%s%s of %s%s",
-                    (Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC))
-                       ? "historic "
-                       : "",
+                    (Role_if(PM_ARCHEOLOGIST)
+                     && (obj->spe & CORPSTAT_HISTORIC)) ? "historic " : "",
                     actualn,
-                    type_is_pname(&mons[omndx])
-                       ? ""
-                       : the_unique_pm(&mons[omndx])
-                          ? "the "
-                          : just_an(anbuf, pmname(&mons[omndx], mgend)),
+                    type_is_pname(&mons[omndx]) ? ""
+                      : the_unique_pm(&mons[omndx]) ? "the "
+                        : just_an(anbuf, pmname(&mons[omndx], mgend)),
                     pmname(&mons[omndx], mgend));
         } else
             Strcpy(buf, actualn);
@@ -1423,7 +1421,12 @@ corpse_xname(
         /* avoid "aligned priest"; it just exposes internal details */
         mnam = "priest";
     } else {
-        mnam = mons[omndx].pmnames[NEUTRAL];
+        int cspe = (otmp->spe & CORPSTAT_GENDER),
+            mgend = (cspe == CORPSTAT_FEMALE) ? FEMALE
+                    : (cspe == CORPSTAT_MALE) ? MALE
+                      : NEUTRAL;
+
+        mnam = pmname(&mons[omndx], mgend);
         if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
             mnam = s_suffix(mnam);
             possessive = TRUE;
@@ -3264,7 +3267,7 @@ readobjnam_init(char* bp, struct _readobjnam_data* d)
         = d->looted /* wizard mode fountain/sink/throne/tree and grave */
         = d->real = d->fake = 0; /* Amulet */
     d->tvariety = RANDOM_TIN;
-    d->mgend = MALE;
+    d->mgend = NEUTRAL;
     d->mntmp = NON_PM;
     d->contents = UNDEFINED;
     d->oclass = 0;
@@ -3650,8 +3653,8 @@ readobjnam_postparse1(struct _readobjnam_data* d)
                 d->typ = TIN;
                 return 2; /*goto typfnd;*/
             } else if ((d->p = strstri(d->bp, " of ")) != 0
-                       && (d->mntmp = name_to_mon(d->p + 4,
-                                                  &d->mgend)) >= LOW_PM)
+                       && ((d->mntmp = name_to_mon(d->p + 4, &d->mgend))
+                           >= LOW_PM))
                 *d->p = 0;
         }
     }
@@ -3665,8 +3668,8 @@ readobjnam_postparse1(struct _readobjnam_data* d)
         const char *rest = 0;
 
         if (d->mntmp < LOW_PM && strlen(d->bp) > 2
-            && (d->mntmp = name_to_monplus(d->bp, &rest,
-                                           &d->mgend)) >= LOW_PM) {
+            && ((d->mntmp = name_to_monplus(d->bp, &rest, &d->mgend))
+                >= LOW_PM)) {
             char *obp = d->bp;
 
             /* 'rest' is a pointer past the matching portion; if that was
@@ -4302,11 +4305,20 @@ readobjnam(char* bp, struct obj* no_wish)
     case HEAVY_IRON_BALL:
     case IRON_CHAIN:
         break;
-    case STATUE:
-        /* otmp->cobj already done in mksobj() */
-        if (d.mgend)
-            d.otmp->spe |= STATUE_FEMALE;
+    case STATUE: /* otmp->cobj already done in mksobj() */
+    case CORPSE: {
+        struct permonst *P = (d.mntmp >= LOW_PM) ? &mons[d.mntmp] : 0;
+
+        d.otmp->spe = !P ? CORPSTAT_RANDOM
+                      /* if neuter, force neuter regardless of wish request */
+                      : is_neuter(P) ? CORPSTAT_NEUTER
+                        /* not neuter, honor wish unless it conflicts */
+                        : (d.mgend == FEMALE && !is_male(P)) ? CORPSTAT_FEMALE
+                          : (d.mgend == MALE && !is_female(P)) ? CORPSTAT_MALE
+                            /* unspecified or wish conflicts */
+                            : CORPSTAT_RANDOM;
         break;
+    };
 #ifdef MAIL_STRUCTURES
     /* scroll of mail:  0: delivered in-game via external event (or randomly
        for fake mail); 1: from bones or wishing; 2: written with marker */
@@ -4379,7 +4391,7 @@ readobjnam(char* bp, struct obj* no_wish)
             d.otmp->corpsenm = d.mntmp;
             if (Has_contents(d.otmp) && verysmall(&mons[d.mntmp]))
                 delete_contents(d.otmp); /* no spellbook */
-            d.otmp->spe |= d.ishistoric ? STATUE_HISTORIC : 0;
+            d.otmp->spe |= d.ishistoric ? CORPSTAT_HISTORIC : 0;
             break;
         case SCALE_MAIL:
             /* Dragon mail - depends on the order of objects & dragons. */

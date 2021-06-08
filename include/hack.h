@@ -285,10 +285,19 @@ typedef struct sortloot_item Loot;
                                * to make an extra call to goodpos()]        */
 #define GP_ALLOW_U  0x080000L /* don't reject hero's location */
 
-/* flags for make_corpse() and mkcorpstat() */
-#define CORPSTAT_NONE 0x00
-#define CORPSTAT_INIT 0x01   /* pass init flag to mkcorpstat */
-#define CORPSTAT_BURIED 0x02 /* bury the corpse or statue */
+/* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
+#define CORPSTAT_NONE     0x00
+#define CORPSTAT_GENDER   0x03 /* 0x01 | 0x02 */
+#define CORPSTAT_HISTORIC 0x04 /* historic statue; not used for corpse */
+#define CORPSTAT_SPE_VAL  0x07 /* 0x03 | 0x04 */
+#define CORPSTAT_INIT     0x08 /* pass init flag to mkcorpstat */
+#define CORPSTAT_BURIED   0x10 /* bury the corpse or statue */
+/* note: gender flags have different values from those used for monsters
+   so that 0 can be unspecified/random instead of male */
+#define CORPSTAT_RANDOM 0
+#define CORPSTAT_FEMALE 1
+#define CORPSTAT_MALE   2
+#define CORPSTAT_NEUTER 3
 
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */

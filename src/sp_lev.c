@@ -2002,6 +2002,7 @@ create_monster(monster* m, struct mkroom* croom)
                 block_point(x, y);
         }
 
+        mtmp->female = m->female;
         if (m->peaceful >= 0) {
             mtmp->mpeaceful = m->peaceful;
             /* changed mpeaceful again; have to reset malign */
@@ -2020,8 +2021,6 @@ create_monster(monster* m, struct mkroom* croom)
         }
         if (m->seentraps)
             mtmp->mtrapseen = m->seentraps;
-        if (m->female)
-            mtmp->female = 1;
         if (m->cancelled)
             mtmp->mcan = 1;
         if (m->revived)
@@ -3379,20 +3378,21 @@ lspo_object(lua_State *L)
         || tmpobj.id == CORPSE || tmpobj.id == TIN
         || tmpobj.id == FIGURINE) {
         struct permonst *pm = NULL;
-        int i, lflags = 0;
+        int i;
         char *montype = get_table_str_opt(L, "montype", NULL);
 
         if (montype) {
             if (strlen(montype) == 1
                 && def_char_to_monclass(*montype) != MAXMCLASSES) {
-                pm = mkclass(def_char_to_monclass(*montype), G_NOGEN|G_IGNORE);
+                pm = mkclass(def_char_to_monclass(*montype),
+                             G_NOGEN | G_IGNORE);
             } else {
                 for (i = LOW_PM; i < NUMMONS; i++)
                     if (!strcmpi(mons[i].pmnames[NEUTRAL], montype)
                         || (mons[i].pmnames[MALE] != 0
-                               && !strcmpi(mons[i].pmnames[MALE], montype))
+                            && !strcmpi(mons[i].pmnames[MALE], montype))
                         || (mons[i].pmnames[FEMALE] != 0
-                               && !strcmpi(mons[i].pmnames[FEMALE], montype))) {
+                            && !strcmpi(mons[i].pmnames[FEMALE], montype))) {
                         pm = &mons[i];
                         break;
                     }
@@ -3403,16 +3403,20 @@ lspo_object(lua_State *L)
             else
                 nhl_error(L, "Unknown montype");
         }
-        if (tmpobj.id == STATUE) {
+        if (tmpobj.id == STATUE || tmpobj.id == CORPSE) {
+            int lflags = 0;
+
             if (get_table_boolean_opt(L, "historic", 0))
-                lflags |= STATUE_HISTORIC;
+                lflags |= CORPSTAT_HISTORIC;
             if (get_table_boolean_opt(L, "male", 0))
-                lflags |= STATUE_MALE;
+                lflags |= CORPSTAT_MALE;
             if (get_table_boolean_opt(L, "female", 0))
-                lflags |= STATUE_FEMALE;
+                lflags |= CORPSTAT_FEMALE;
             tmpobj.spe = lflags;
         } else if (tmpobj.id == EGG) {
             tmpobj.spe = get_table_boolean_opt(L, "laid_by_you", 0) ? 1 : 0;
+        } else {
+            tmpobj.spe = 0;
         }
     }
 
@@ -3719,7 +3723,8 @@ lspo_room(lua_State *L)
         tmproom.chance = get_table_int_opt(L, "chance", 100);
         tmproom.rlit = get_table_int_opt(L, "lit", -1);
         /* theme rooms default to unfilled */
-        tmproom.needfill = get_table_int_opt(L, "filled", g.in_mk_themerooms ? 0 : 1);
+        tmproom.needfill = get_table_int_opt(L, "filled",
+                                             g.in_mk_themerooms ? 0 : 1);
         tmproom.joined = get_table_boolean_opt(L, "joined", TRUE);
 
         if (!g.coder->failed_room[g.coder->n_subroom - 1]) {
@@ -4055,8 +4060,7 @@ lspo_trap(lua_State *L)
 
         get_table_xy_or_coord(L, &x, &y);
         tmptrap.type = get_table_traptype_opt(L, "type", -1);
-        tmptrap.spider_on_web
-            = get_table_boolean_opt(L, "spider_on_web", 1);
+        tmptrap.spider_on_web = get_table_boolean_opt(L, "spider_on_web", 1);
     }
 
     if (tmptrap.type == NO_TRAP)

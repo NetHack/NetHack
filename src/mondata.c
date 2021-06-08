@@ -655,7 +655,7 @@ struct alt_spl {
 /* figure out what type of monster a user-supplied string is specifying;
    ingore anything past the monster name */
 int
-name_to_mon(const char *in_str, int * gender_name_var)
+name_to_mon(const char *in_str, int *gender_name_var)
 {
     return name_to_monplus(in_str, (const char **) 0, gender_name_var);
 }
@@ -691,6 +691,8 @@ name_to_monplus(
 
     if (remainder_p)
         *remainder_p = (const char *) 0;
+    if (gender_name_var)
+        *gender_name_var = 0;
 
     str = strcpy(buf, in_str);
 
@@ -740,13 +742,16 @@ name_to_monplus(
             { "master of assassin", PM_MASTER_ASSASSIN, NEUTRAL },
             /* Outdated names */
             { "invisible stalker", PM_STALKER, NEUTRAL },
-            { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is obsolete */
+            { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is
+                                                        * obsolete */
             /* other misspellings or incorrect words */
             { "wood-elf", PM_WOODLAND_ELF, NEUTRAL },
             { "wood elf", PM_WOODLAND_ELF, NEUTRAL },
             { "woodland nymph", PM_WOOD_NYMPH, NEUTRAL },
-            { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for polyself */
-            { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for ^G/#wizgenesis */
+            { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for
+                                                    * polyself */
+            { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for
+                                              * ^G/#wizgenesis */
             /* prefix used to workaround duplicate monster names for
                monsters with alternate forms */
             { "human wererat", PM_HUMAN_WERERAT, NEUTRAL },

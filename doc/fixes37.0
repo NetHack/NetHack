@@ -541,6 +541,7 @@ change valkyrie and warrior (valk quest) monsters from chaotic to lawful
 change attendant (healer quest) monster from lawful to neutral
 quit is not longer bound to M-q
 change default value of autopickup to off and color to on
+resurrected corpse of mon could end up with different gender from original mon
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -710,6 +711,8 @@ stair revamp unintentionally resulted in cursed potion of levitation no longer
 	causing hero to hit head on ceiling
 enlightenment/disclosure when wielding two weapons with two-weap skill higher
 	than secondary weapon's skill had "with" duplicated in the feedback
+corpse of monster with gender specific names (king vs queen and so forth)
+	was always described by the neutral name (ruler and such)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

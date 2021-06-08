@@ -856,6 +856,16 @@ revive(struct obj *corpse, boolean by_hero)
     if (!mtmp)
         return (struct monst *) 0;
 
+    /* if we didn't use montraits, corpse might specify mon's gender */
+    if (!has_omonst(corpse)) {
+        int cspe = (corpse->spe & CORPSTAT_GENDER);
+
+        if (cspe == CORPSTAT_MALE)
+            mtmp->female = 0;
+        else if (cspe == CORPSTAT_FEMALE)
+            mtmp->female = 1;
+    }
+
     /* hiders shouldn't already be re-hidden when they revive */
     if (mtmp->mundetected) {
         mtmp->mundetected = 0;
@@ -4896,7 +4906,8 @@ break_statue(struct obj *obj)
         obj_extract_self(item);
         place_object(item, obj->ox, obj->oy);
     }
-    if (by_you && Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC)) {
+    if (by_you && Role_if(PM_ARCHEOLOGIST)
+        && (obj->spe & CORPSTAT_HISTORIC)) {
         You_feel("guilty about damaging such a historic statue.");
         adjalign(-1);
     }
