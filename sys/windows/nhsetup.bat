@@ -1,5 +1,5 @@
 @REM  NetHack 3.7	nhsetup.bat	$NHDT-Date: 1596498315 2020/08/03 23:45:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
-@REM  Copyright (c) NetHack PC Development Team 1993-2019
+@REM  Copyright (c) NetHack PC Development Team 1993-2021
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.windows for details
 @REM
@@ -57,49 +57,6 @@ copy Makefile.gcc ..\..\src\Makefile.gcc >nul
 echo MinGW Makefile copied ok.
 
 echo Done copying files.
-
-echo Checking version of VC++ installed...
-:vscheck2019
-SET REGTREE=HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio
-@REM i can see your house from here... or at least your VC++ folder
-set VCDir="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\"
-if not defined VCDir goto :vscheck2017
-if not exist %VCDir% goto :vscheck2017
-if not "%VSCMD_VER%"=="16.0.0" goto :vscheck2017
-set MSVCVERSION=2019
-set MSVCPROJ=2017
-goto :fallback
-
-:vscheck2017
-SET REGTREE=HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\SxS\VS7
-@REM i can see your house from here... or at least your VC++ folder
-for /f "usebackq skip=2 tokens=1-2*" %%a IN (`reg query %REGTREE% /v 15.0`) do @set VCDir="%%c"
-if not defined VCDir goto :vscheck2015
-if not exist %VCDir% goto :vscheck2015
-set MSVCVERSION=2017
-set MSVCPROJ=2017
-goto :fallback
-
-:vscheck2015
-rem cannot use the registry trick used for vc2017
-rem 14 = 2015
-SET VCVERS=14
-rem Finally, let's determine the root folder for this VC installation.
-set VCROOT=%%VS%VCVERS%0COMNTOOLS%%
-if "%VCROOT:~-1%"=="\" set VCROOT=%VCROOT:~0,-1%
-rem VCROOT=VSDir\Common7\Tools
-call :dirname VCROOT "%VCROOT%"
-rem VCROOT=VSDir\Common7
-call :dirname VCROOT "%VCROOT%"
-rem VCROOT=VSDir
-set VCDir=%VCROOT%\VC
-SET MSVCVERSION=2015
-
-:fallback
-echo Using VS%MSVCVERSION%.
-set SRCPATH=%WIN32PATH%\vs%MSVCPROJ%
-echo NetHack VS%MSVCVERSION% project files are in %SRCPATH%
-goto :done
 
 :err_win
 echo Some of the files needed to build graphical NetHack
