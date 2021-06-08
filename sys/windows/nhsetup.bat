@@ -26,6 +26,7 @@ if not exist ..\..\src\hack.c goto :err_dir
 if not exist ..\..\dat\wizard1.lua goto :err_dir
 if not exist ..\..\util\makedefs.c goto :err_dir
 if not exist ..\..\sys\windows\windsys.c goto :err_dir
+if not exist ..\..\win\win32\mhmain.c goto :err_dir
 echo Directories look ok.
 
 :movemakes
@@ -57,13 +58,7 @@ copy Makefile.gcc ..\..\src\Makefile.gcc >nul
 echo MinGW Makefile copied ok.
 
 echo Done copying files.
-
-:err_win
-echo Some of the files needed to build graphical NetHack
-echo for Windows are not in the expected places.
-echo Check "Install.windows" for a list of the steps required 
-echo to build NetHack.
-goto :fini
+goto :done
 
 :err_dir
 echo Your directories are not set up properly, please re-read the
