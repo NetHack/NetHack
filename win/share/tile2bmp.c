@@ -36,7 +36,7 @@ extern void objects_globals_init(void);
 # endif
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(_WIN64)
 #define UNALIGNED_POINTER __unaligned
 #else
 #define UNALIGNED_POINTER
