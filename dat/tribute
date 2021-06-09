@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1620076692 2021/05/03 21:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
+# NetHack 3.7  tribute       $NHDT-Date: 1623282330 2021/06/09 23:45:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -4771,7 +4771,7 @@ them.  [...]"
 #
 #
 #
-%title Hogfather (10)
+%title Hogfather (13)
 # p. 1 (Harper Torch edition)
 %passage 1
 Everything starts somewhere, though many physicists disagree.
@@ -5040,6 +5040,65 @@ YES.  JUSTICE.  MERCY.  DUTY.  THAT SORT OF THING.
 
 SOME PEOPLE WILL DO ANYTHING FOR THE SHEER FASCINATION OF DOING IT, said
 Death.  OR THE FAME.  OR BECAUSE THEY SHOULDN'T.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
+#
+# 3 new passages added for 3.7
+#
+# pp. 2-3 (the door turns out to lead to a bathroom designed by Bergholt
+#          Stuttly "Bloody Stupid" Johnson, an infamous architect and
+#          landscape designer known for creating dangerous and/or unusable
+#          versions of whatever he'd been hired to produce)
+%passage 11
+The senior wizards of Unseen University stood and looked at the door.
+
+There was no doubt that whoever had shut it wanted it to stay shut.  Dozens
+of nails secured it to the door frame.  Planks had been nailed right across.
+And finally it had, up until this morning, been hidden by a bookcase that
+had been put in front of it.
+
+"And there's the sign, Ridcully," said the Dean.  "You /have/ read it, I
+assume.  You know?  The sign which says 'Do not, under any circumstances,
+open this door'?"
+
+"Of course I've read it," said Ridcully.  "Why d'yer think I want it
+opened?"
+
+"Er... why?" said the Lecturer in Recent Runes.
+
+"To see why they wanted it shut, of course."(1)
+
+(1) This exchange contains almost all you need to know about human
+civilization.  At least, those bits of it that are now under the sea,
+fenced off or still smoking.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
+# p. 144 (the wizards have been discussing hangover cures and are hoping to
+#         produce one for Bilious, the god--actually "oh god"--of hangovers)
+%passage 12
+Then the Dean repeated the mantra that has had such a marked effect on the
+progress of knowledge throughout the ages.
+
+"Why don't we just mix up absolutely everything and see what happens?" he
+said.
+
+And Ridcully responded with the traditional response.
+
+"It's got to be worth a try," he said.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
+# p. 192 (senior wizards are discussing Hex, an organic+clockwork computer
+#         invented, built, and run by junior wizards and advanced students)
+%passage 13
+"I don't hold with using that thinking machine," said the Dean.  "I've said
+this before.  It's meddling with the cult.  The /oc/cult has always been
+good enough for me, thank you very much."
+
+"On the other hand it's the only person round here who can think straight
+and it does what it's told," said Ridcully.
 
   [Hogfather, by Terry Pratchett]
 %e passage
