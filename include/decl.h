@@ -645,6 +645,25 @@ struct _create_particular_data {
 #define LUA_COPYRIGHT_BUFSIZ 120
 
 /*
+ * Rudimentary command queue.
+ * Allows the code to put keys and extended commands into the queue,
+ * and they're executed just as if the user did them.  Time passes
+ * normally when doing queued actions.  The queue will get cleared
+ * if hero is interrupted.
+ */
+enum cmdq_cmdtypes {
+    CMDQ_KEY = 0, /* a literal character, cmdq_add_key() */
+    CMDQ_EXTCMD,  /* extended command, cmdq_add_ec() */
+};
+
+struct _cmd_queue {
+    int typ;
+    char key;
+    const struct ext_func_tab *ec_entry;
+    struct _cmd_queue *next;
+};
+
+/*
  * 'g' -- instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * and set in decl.c during early early engine initialization.
@@ -655,6 +674,8 @@ struct _create_particular_data {
  * which came with them don't make much sense out of their original context.
  */
 struct instance_globals {
+
+    struct _cmd_queue *command_queue;
 
     /* apply.c */
     int jumping_is_magic; /* current jump result of magic */

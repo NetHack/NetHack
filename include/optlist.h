@@ -170,6 +170,8 @@ opt_##a,
                 &iflags.extmenu)
     NHOPTB(female, 0, opt_in, set_in_config, Off, Yes, No, No, "male",
                 &flags.female)
+    NHOPTB(fireassist, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
+                &iflags.fireassist)
     NHOPTB(fixinv, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.invlet_constant)
     NHOPTC(font_map, 40, opt_in, set_gameview, Yes, Yes, Yes, No, NoAlias,

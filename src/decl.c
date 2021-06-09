@@ -207,6 +207,9 @@ const struct Race urace_init_data = {
 };
 
 const struct instance_globals g_init = {
+
+    NULL, /* command_queue */
+
     /* apply.c */
     0,  /* jumping_is_magic */
     -1, /* polearm_range_min */

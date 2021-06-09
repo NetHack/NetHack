@@ -2228,11 +2228,13 @@ glibr(void)
             otmp = uleft;
             Ring_off(uleft);
             dropx(otmp);
+            cmdq_clear();
         }
         if (rightfall) {
             otmp = uright;
             Ring_off(uright);
             dropx(otmp);
+            cmdq_clear();
         }
     }
 
@@ -2253,6 +2255,7 @@ glibr(void)
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */
+        cmdq_clear();
         if (canletgo(otmp, ""))
             dropx(otmp);
     }
@@ -2288,6 +2291,7 @@ glibr(void)
         /* xfl++; */
         otmp->quan = savequan;
         setuwep((struct obj *) 0);
+        cmdq_clear();
         if (canletgo(otmp, ""))
             dropx(otmp);
     }

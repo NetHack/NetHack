@@ -797,6 +797,12 @@ If your wielded weapon has the throw-and-return property, your quiver
 is empty, and
 .op autoquiver
 is false, you will throw that wielded weapon instead of filling the quiver.
+If
+.op fireassist
+is true, firing will automatically try to wield a launcher (for example,
+a bow or a sling) matching the ammo in the quiver; this might take multiple
+turns, and get interrupted by a monster.
+Remember to swap back to your main melee weapon afterwards.
 .lp ""
 See also \(oqt\(cq (throw) for more general throwing and shooting.
 .lp i
@@ -924,7 +930,7 @@ If you throw an arrow while not wielding a bow, you are throwing
 it by hand and it will generally be less effective than when shot.
 .lp ""
 See also \(oqf\(cq (fire) for throwing or shooting an item pre-selected
-via the \(oqQ\(cq (quiver) command.
+via the \(oqQ\(cq (quiver) command, with some extra assistance.
 .lp T
 Take off armor.
 .lp ""
@@ -1234,7 +1240,7 @@ You can set the
 .op paranoid_confirmation:quit
 option to require a response of \f(CRyes\fP instead.
 .lp "#fire    "
-Fire ammunition from quiver.
+Fire ammunition from quiver, possibly autowielding a launcher.
 Default key is \(oqf\(cq.
 .lp "#force   "
 Force a lock.
@@ -2416,7 +2422,7 @@ Some of the more obscure weapons (such as the \fIaklys\fP,
 appendix to \fIUnearthed Arcana\fP, an AD&D supplement.
 .pg
 The commands to use weapons are \(oqw\(cq (wield), \(oqt\(cq (throw),
-\(oqf\(cq (fire, an alternate way of throwing), \(oqQ\(cq (quiver),
+\(oqf\(cq (fire), \(oqQ\(cq (quiver),
 \(oqx\(cq (exchange), \(oqX\(cq (twoweapon), and \(lq#enhance\(rq
 (see below).
 .hn 3
@@ -2458,6 +2464,9 @@ If your quiver is empty,
 .op autoquiver
 is false, and you are wielding a weapon which returns when thrown,
 you will throw that weapon instead of filling the quiver.
+The fire command also has extra assistance, if
+.op fireassist
+is on it will try to wield a launcher matching the ammo in the quiver.
 .pg
 Some characters have the ability to throw or shoot a volley of multiple
 items (from the same stack) in a single action.
@@ -3686,6 +3695,10 @@ extended ones (off).
 .lp female
 An obsolete synonym for \(lqgender:female\(rq.
 Cannot be set with the \(oqO\(cq command.
+.lp fireassist
+This option controls what happens when you attempt the \(oqf\(cq (fire)
+and don't have an appropriate launcher, such as a bow or a sling, wielded.
+If on, you will automatically wield the launcher. Default is on.
 .lp fixinv
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.

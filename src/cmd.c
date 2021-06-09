@@ -228,6 +228,76 @@ set_occupation(int (*fn)(void), const char *txt, int xtime)
     return;
 }
 
+/* add extended command function to the command queue */
+void
+cmdq_add_ec(int (*fn)(void))
+{
+    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *cq = g.command_queue;
+
+    tmp->typ = CMDQ_EXTCMD;
+    tmp->ec_entry = ext_func_tab_from_func(fn);
+    tmp->next = NULL;
+
+    while (cq && cq->next)
+        cq = cq->next;
+
+    if (cq)
+        cq->next = tmp;
+    else
+        g.command_queue = tmp;
+}
+
+/* add a key to the command queue */
+void
+cmdq_add_key(char key)
+{
+    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *cq = g.command_queue;
+
+    tmp->typ = CMDQ_KEY;
+    tmp->key = key;
+    tmp->next = NULL;
+
+    while (cq && cq->next)
+        cq = cq->next;
+
+    if (cq)
+        cq->next = tmp;
+    else
+        g.command_queue = tmp;
+}
+
+/* pop off the topmost command from the command queue.
+ * caller is responsible for freeing the returned _cmd_queue.
+ */
+struct _cmd_queue *
+cmdq_pop(void)
+{
+    struct _cmd_queue *tmp = g.command_queue;
+
+    if (tmp) {
+        g.command_queue = tmp->next;
+        tmp->next = NULL;
+    }
+    return tmp;
+}
+
+/* clear all commands from the command queue */
+void
+cmdq_clear(void)
+{
+    struct _cmd_queue *tmp = g.command_queue;
+    struct _cmd_queue *tmp2;
+
+    while (tmp) {
+        tmp2 = tmp->next;
+        free(tmp);
+        tmp = tmp2;
+    }
+    g.command_queue = NULL;
+}
+
 static char popch(void);
 
 static char
@@ -2482,6 +2552,18 @@ dokeylist(void)
     destroy_nhwindow(datawin);
 }
 
+const struct ext_func_tab *
+ext_func_tab_from_func(int (*fn)(void))
+{
+    const struct ext_func_tab *extcmd;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (extcmd->ef_funct == fn)
+            return extcmd;
+
+    return NULL;
+}
+
 char
 cmd_from_func(int (*fn)(void))
 {
@@ -3350,13 +3432,30 @@ rhack(char *cmd)
     int spkey;
     boolean prefix_seen, bad_command,
         firsttime = (cmd == 0);
+    struct _cmd_queue *cmdq = NULL;
+    const struct ext_func_tab *cmdq_ec = NULL;
 
     iflags.menu_requested = FALSE;
 #ifdef SAFERHANGUP
     if (g.program_state.done_hup)
         end_of_input();
 #endif
-    if (firsttime) {
+    if ((cmdq = cmdq_pop()) != 0) {
+        /* doing queued commands */
+        if (cmdq->typ == CMDQ_KEY) {
+            static char commandline[2];
+
+            if (!cmd)
+                cmd = commandline;
+            cmd[0] = cmdq->key;
+            cmd[1] = '\0';
+        } else if (cmdq->typ == CMDQ_EXTCMD) {
+            cmdq_ec = cmdq->ec_entry;
+        }
+        free(cmdq);
+        if (cmdq_ec)
+            goto do_cmdq_extcmd;
+    } else if (firsttime) {
         g.context.nopick = 0;
         cmd = parse();
     }
@@ -3539,14 +3638,22 @@ rhack(char *cmd)
         register const struct ext_func_tab *tlist;
         int res, (*func)(void);
 
+do_cmdq_extcmd:
+        if (cmdq_ec)
+            tlist = cmdq_ec;
+        else
+            tlist = g.Cmd.commands[*cmd & 0xff];
+
         /* current - use *cmd to directly index cmdlist array */
-        if ((tlist = g.Cmd.commands[*cmd & 0xff]) != 0) {
+        if (tlist != 0) {
             if (!wizard && (tlist->flags & WIZMODECMD)) {
                 You_cant("do that!");
                 res = 0;
+                cmdq_clear();
             } else if (u.uburied && !(tlist->flags & IFBURIED)) {
                 You_cant("do that while you are buried!");
                 res = 0;
+                cmdq_clear();
             } else {
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
@@ -3575,6 +3682,7 @@ rhack(char *cmd)
 
         if (!prefix_seen || !help_dir(c1, spkey, "Invalid direction key!"))
             Norep("Unknown command '%s'.", expcmd);
+        cmdq_clear();
     }
     /* didn't move */
     g.context.move = FALSE;

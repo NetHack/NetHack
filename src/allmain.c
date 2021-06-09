@@ -568,6 +568,7 @@ stop_occupation(void)
     } else if (g.multi >= 0) {
         nomul(0);
     }
+    cmdq_clear();
 }
 
 void

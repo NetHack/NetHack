@@ -545,6 +545,8 @@ resurrected corpse of mon could end up with different gender from original mon
 using a bullwhip to snatch a wielded cockatrice corpse from a monster when not
 	wearing gloves and without life-saving could trigger "obj_is_local"
 	panic during final cleanup
+make fire-command autowield an appropriate launcher and add fireassist boolean
+	option to toggle the assistance off
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1488,6 +1488,31 @@ getobj(const char *word,
     boolean oneloop = FALSE;
     Loot *sortedinvent, *srtinv;
 
+    struct _cmd_queue *cmdq = cmdq_pop();
+
+    if (cmdq) {
+        /* it's not a key, abort */
+        if (cmdq->typ != CMDQ_KEY) {
+            free(cmdq);
+            return (struct obj *)0;
+        }
+
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (otmp->invlet == cmdq->key) {
+                int v = (*obj_ok)(otmp);
+
+                if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY) {
+                    free(cmdq);
+                    return otmp;
+                }
+            }
+
+        /* did not find the object, abort */
+        free(cmdq);
+        cmdq_clear();
+        return (struct obj *)0;
+    }
+
     /* is "hands"/"self" a valid thing to do this action on? */
     switch ((*obj_ok)((struct obj *) 0)) {
     case GETOBJ_SUGGEST: /* treat as likely candidate */
