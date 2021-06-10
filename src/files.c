@@ -4167,8 +4167,13 @@ reveal_paths(VOID_ARGS)
     if (sysopt.portable_device_paths) {
         const char *pd = get_portable_device();
 
-        raw_printf("portable_device_paths (set in sysconf):");
-        raw_printf("    \"%s\"", pd);
+        /* an empty value for pd indicates that portable_device_paths
+           got set TRUE in a sysconf file other than the one containing
+           the executable; disregard it */
+        if (strlen(pd) > 0) {
+            raw_printf("portable_device_paths (set in sysconf):");
+            raw_printf("    \"%s\"", pd);
+	}
     }
 #endif
 
