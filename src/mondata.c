@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1606473489 2020/11/27 10:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1623489867 2021/06/12 09:24:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -686,13 +686,13 @@ name_to_monplus(
     register int mntmp = NON_PM;
     register char *s, *str, *term;
     char buf[BUFSZ];
-    int len, slen, mgend;
+    int len, slen, mgend, matchgend = NEUTRAL;
     boolean exact_match = FALSE;
 
     if (remainder_p)
         *remainder_p = (const char *) 0;
     if (gender_name_var)
-        *gender_name_var = 0;
+        *gender_name_var = matchgend; /* NEUTRAL */
 
     str = strcpy(buf, in_str);
 
@@ -802,7 +802,7 @@ name_to_monplus(
                 && (!str[len] || str[len] == ' ' || str[len] == '\'')) {
                 if (remainder_p)
                     *remainder_p = in_str + (&str[len] - buf);
-                if (gender_name_var != (int *) 0)
+                if (gender_name_var)
                     *gender_name_var = namep->genderhint;
                 return namep->pm_val;
             }
@@ -821,8 +821,7 @@ name_to_monplus(
             if (m_i_len == slen) {
                 mntmp = i;
                 len = m_i_len;
-                if (gender_name_var != (int *) 0)
-                    *gender_name_var = mgend;
+                matchgend = mgend;
                 exact_match = TRUE;
                 break; /* exact match */
             } else if (slen > m_i_len
@@ -837,16 +836,20 @@ name_to_monplus(
                            || !strncmpi(&str[m_i_len], "es ", 3))) {
                 mntmp = i;
                 len = m_i_len;
+                matchgend = mgend;
             }
         }
       }
       if (exact_match)
         break;
     }
+    /* FIXME: some titles have gender; title_to_mon() doesn't propagate it */
     if (mntmp == NON_PM)
         mntmp = title_to_mon(str, (int *) 0, &len);
     if (len && remainder_p)
         *remainder_p = in_str + (&str[len] - buf);
+    if (gender_name_var)
+        *gender_name_var = matchgend;
     return mntmp;
 }
 
