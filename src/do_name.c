@@ -1672,12 +1672,12 @@ rndghostname(void)
  * options works, since those are special cases.
  */
 char *
-x_monnam(register struct monst *mtmp, int article,
+x_monnam(struct monst *mtmp, int article,
          const char *adjective, int suppress, boolean called)
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
-    const char *pm_name = pmname(mdat, Mgender(mtmp));
+    const char *pm_name = mon_pmname(mtmp);
     boolean do_hallu, do_invis, do_it, do_saddle, do_name;
     boolean name_at_start, has_adjectives;
     char *bp;
@@ -2054,7 +2054,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
                 mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
-                pmname(mon->data, Mgender(mon)), mon->mx, mon->my);
+                mon_pmname(mon), mon->mx, mon->my);
         if (mon->cham != NON_PM)
             Sprintf(eos(outbuf), "{%s}",
                     pmname(&mons[mon->cham], Mgender(mon)));
@@ -2080,12 +2080,38 @@ Mgender(struct monst *mtmp)
 const char *
 pmname(struct permonst *pm, int mgender)
 {
-    if ((mgender >= MALE && mgender < NUM_MGENDERS) && pm->pmnames[mgender])
-        return pm->pmnames[mgender];
-    else
-        return pm->pmnames[NEUTRAL];
+    if (mgender < MALE || mgender >= NUM_MGENDERS || !pm->pmnames[mgender])
+        mgender = NEUTRAL;
+    return pm->pmnames[mgender];
 }
 #endif /* PMNAME_MACROS */
+
+/* mons[]->pmname for a monster */
+const char *
+mon_pmname(struct monst *mon)
+{
+    /* for neuter, mon->data->pmnames[MALE] will be Null and use [NEUTRAL] */
+    return pmname(mon->data, mon->female ? FEMALE : MALE);
+}
+
+/* mons[]->pmname for a corpse or statue or figurine */
+const char *
+obj_pmname(struct obj *obj)
+{
+    if (has_omonst(obj))
+        return mon_pmname(OMONST(obj));
+
+    if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
+        && obj->corpsenm >= LOW_PM) {
+        int cgend = (obj->spe & CORPSTAT_GENDER),
+            mgend = ((cgend == CORPSTAT_MALE) ? MALE
+                     : (cgend == CORPSTAT_FEMALE) ? FEMALE
+                       : NEUTRAL);
+
+        return pmname(&mons[obj->corpsenm], mgend);
+    }
+    return "";
+}
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
 char *

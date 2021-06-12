@@ -11,8 +11,7 @@
 #define NUMOBUF 12
 
 struct _readobjnam_data {
-    char globbuf[BUFSZ];
-    char fruitbuf[BUFSZ];
+    struct obj *otmp;
     char *bp;
     char *origbp;
     char oclass;
@@ -28,7 +27,8 @@ struct _readobjnam_data {
     int tmp, tinv, tvariety, mgend;
     int wetness, gsize;
     int ftype;
-    struct obj *otmp;
+    char globbuf[BUFSZ];
+    char fruitbuf[BUFSZ];
 };
 
 static char *strprepend(char *, const char *);
@@ -515,10 +515,9 @@ xname_flags(
 
         if (typ == FIGURINE && omndx != NON_PM) {
             char anbuf[10]; /* [4] would be enough: 'a','n',' ','\0' */
+            const char *pm_name = mons[omndx].pmnames[NEUTRAL];
 
-            Sprintf(eos(buf), " of %s%s",
-                    just_an(anbuf, mons[omndx].pmnames[NEUTRAL]),
-                    mons[omndx].pmnames[NEUTRAL]);
+            Sprintf(eos(buf), " of %s%s", just_an(anbuf, pm_name), pm_name);
         } else if (is_wet_towel(obj)) {
             if (wizard)
                 Sprintf(eos(buf), " (%d)", obj->spe);
@@ -606,8 +605,7 @@ xname_flags(
     case ROCK_CLASS:
         if (typ == STATUE && omndx != NON_PM) {
             char anbuf[10];
-            int mgend = (((obj->spe & CORPSTAT_GENDER) == CORPSTAT_FEMALE)
-                         ? FEMALE : MALE);
+            const char *statue_pmname = obj_pmname(obj);
 
             Sprintf(buf, "%s%s of %s%s",
                     (Role_if(PM_ARCHEOLOGIST)
@@ -615,8 +613,8 @@ xname_flags(
                     actualn,
                     type_is_pname(&mons[omndx]) ? ""
                       : the_unique_pm(&mons[omndx]) ? "the "
-                        : just_an(anbuf, pmname(&mons[omndx], mgend)),
-                    pmname(&mons[omndx], mgend));
+                        : just_an(anbuf, statue_pmname),
+                    statue_pmname);
         } else
             Strcpy(buf, actualn);
         break;
@@ -1421,12 +1419,7 @@ corpse_xname(
         /* avoid "aligned priest"; it just exposes internal details */
         mnam = "priest";
     } else {
-        int cgend = (otmp->spe & CORPSTAT_GENDER),
-            mgend = (cgend == CORPSTAT_FEMALE) ? FEMALE
-                    : (cgend == CORPSTAT_MALE) ? MALE
-                      : NEUTRAL;
-
-        mnam = pmname(&mons[omndx], mgend);
+        mnam = obj_pmname(otmp);
         if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
             mnam = s_suffix(mnam);
             possessive = TRUE;
@@ -3254,8 +3247,9 @@ wizterrainwish(struct _readobjnam_data *d)
 #define SPINACH 2
 
 static void
-readobjnam_init(char* bp, struct _readobjnam_data* d)
+readobjnam_init(char *bp, struct _readobjnam_data *d)
 {
+    d->otmp = (struct obj *) 0;
     d->cnt = d->spe = d->spesgn = d->typ = 0;
     d->very = d->rechrg = d->blessed = d->uncursed = d->iscursed
         = d->ispoisoned = d->isgreased = d->eroded = d->eroded2
@@ -3277,12 +3271,13 @@ readobjnam_init(char* bp, struct _readobjnam_data* d)
     d->bp = d->origbp = bp;
     d->p = (char *) 0;
     d->name = (const char *) 0;
-    d->otmp = (struct obj *) 0;
     d->ftype = g.context.current_fruit;
+    (void) memset(d->globbuf, '\0', sizeof d->globbuf);
+    (void) memset(d->fruitbuf, '\0', sizeof d->globbuf);
 }
 
 static int
-readobjnam_preparse(struct _readobjnam_data* d)
+readobjnam_preparse(struct _readobjnam_data *d)
 {
     for (;;) {
         register int l;
@@ -3443,7 +3438,7 @@ readobjnam_preparse(struct _readobjnam_data* d)
 }
 
 static void
-readobjnam_parse_charges(struct _readobjnam_data* d)
+readobjnam_parse_charges(struct _readobjnam_data *d)
 {
     if (strlen(d->bp) > 1 && (d->p = rindex(d->bp, '(')) != 0) {
         boolean keeptrailingchars = TRUE;
@@ -3505,7 +3500,7 @@ readobjnam_parse_charges(struct _readobjnam_data* d)
 }
 
 static int
-readobjnam_postparse1(struct _readobjnam_data* d)
+readobjnam_postparse1(struct _readobjnam_data *d)
 {
     int i;
 
@@ -3879,7 +3874,7 @@ readobjnam_postparse1(struct _readobjnam_data* d)
 }
 
 static int
-readobjnam_postparse2(struct _readobjnam_data* d)
+readobjnam_postparse2(struct _readobjnam_data *d)
 {
     int i;
 
@@ -3940,7 +3935,7 @@ readobjnam_postparse2(struct _readobjnam_data* d)
 }
 
 static int
-readobjnam_postparse3(struct _readobjnam_data* d)
+readobjnam_postparse3(struct _readobjnam_data *d)
 {
     int i;
 
@@ -4108,7 +4103,7 @@ readobjnam_postparse3(struct _readobjnam_data* d)
  * return null.
  */
 struct obj *
-readobjnam(char* bp, struct obj* no_wish)
+readobjnam(char *bp, struct obj *no_wish)
 {
     struct _readobjnam_data d;
 
@@ -4281,15 +4276,15 @@ readobjnam(char* bp, struct obj* no_wish)
     if (d.spesgn == -1)
         d.spe = -d.spe;
 
-    /* set otmp->spe.  This may, or may not, use spe... */
+    /* set otmp->spe.  This may, or may not, use d.spe... */
     switch (d.typ) {
     case TIN:
+        d.otmp->spe = 0; /* default: not spinach */
         if (d.contents == EMPTY) {
             d.otmp->corpsenm = NON_PM;
-            d.otmp->spe = 0;
         } else if (d.contents == SPINACH) {
             d.otmp->corpsenm = NON_PM;
-            d.otmp->spe = 1;
+            d.otmp->spe = 1; /* spinach after all */
         }
         break;
     case TOWEL:
@@ -4317,6 +4312,12 @@ readobjnam(char* bp, struct obj* no_wish)
                           : (d.mgend == MALE && !is_female(P)) ? CORPSTAT_MALE
                             /* unspecified or wish conflicts */
                             : CORPSTAT_RANDOM;
+        if (P && d.otmp->spe == CORPSTAT_RANDOM)
+            d.otmp->spe = is_male(P) ? CORPSTAT_MALE
+                          : is_female(P) ? CORPSTAT_FEMALE
+                            : rn2(2) ? CORPSTAT_MALE : CORPSTAT_FEMALE;
+        if (d.ishistoric && d.typ == STATUE)
+            d.otmp->spe |= CORPSTAT_HISTORIC;
         break;
     };
 #ifdef MAIL_STRUCTURES
@@ -4356,7 +4357,6 @@ readobjnam(char* bp, struct obj* no_wish)
 
         switch (d.typ) {
         case TIN:
-            d.otmp->spe = 0; /* No spinach */
             if (dead_species(d.mntmp, FALSE)) {
                 d.otmp->corpsenm = NON_PM; /* it's empty */
             } else if ((!(mons[d.mntmp].geno & G_UNIQ) || wizard)
@@ -4391,7 +4391,6 @@ readobjnam(char* bp, struct obj* no_wish)
             d.otmp->corpsenm = d.mntmp;
             if (Has_contents(d.otmp) && verysmall(&mons[d.mntmp]))
                 delete_contents(d.otmp); /* no spellbook */
-            d.otmp->spe |= d.ishistoric ? CORPSTAT_HISTORIC : 0;
             break;
         case SCALE_MAIL:
             /* Dragon mail - depends on the order of objects & dragons. */
@@ -4582,7 +4581,7 @@ Japanese_item_name(int i)
 }
 
 const char *
-suit_simple_name(struct obj* suit)
+suit_simple_name(struct obj *suit)
 {
     const char *suitnm, *esuitp;
 
@@ -4603,7 +4602,7 @@ suit_simple_name(struct obj* suit)
 }
 
 const char *
-cloak_simple_name(struct obj* cloak)
+cloak_simple_name(struct obj *cloak)
 {
     if (cloak) {
         switch (cloak->otyp) {
@@ -4624,7 +4623,7 @@ cloak_simple_name(struct obj* cloak)
 
 /* helm vs hat for messages */
 const char *
-helm_simple_name(struct obj* helmet)
+helm_simple_name(struct obj *helmet)
 {
     /*
      *  There is some wiggle room here; the result has been chosen
@@ -4643,7 +4642,7 @@ helm_simple_name(struct obj* helmet)
 
 /* gloves vs gauntlets; depends upon discovery state */
 const char *
-gloves_simple_name(struct obj* gloves)
+gloves_simple_name(struct obj *gloves)
 {
     static const char gauntlets[] = "gauntlets";
 
@@ -4662,7 +4661,7 @@ gloves_simple_name(struct obj* gloves)
 
 /* boots vs shoes; depends upon discovery state */
 const char *
-boots_simple_name(struct obj* boots)
+boots_simple_name(struct obj *boots)
 {
     static const char shoes[] = "shoes";
 
@@ -4681,7 +4680,7 @@ boots_simple_name(struct obj* boots)
 
 /* simplified shield for messages */
 const char *
-shield_simple_name(struct obj* shield)
+shield_simple_name(struct obj *shield)
 {
     if (shield) {
         /* xname() describes unknown (unseen) reflection as smooth */
@@ -4711,13 +4710,13 @@ shield_simple_name(struct obj* shield)
 
 /* for completness */
 const char *
-shirt_simple_name(struct obj* shirt UNUSED)
+shirt_simple_name(struct obj *shirt UNUSED)
 {
     return "shirt";
 }
 
 const char *
-mimic_obj_name(struct monst* mtmp)
+mimic_obj_name(struct monst *mtmp)
 {
     if (M_AP_TYPE(mtmp) == M_AP_OBJECT) {
         if (mtmp->mappearance == GOLD_PIECE)

@@ -1052,8 +1052,7 @@ unturn_dead(struct monst *mon)
                 pline("%s%s suddenly %s%s%s!", owner, corpse,
                       nonliving(mtmp2->data) ? "reanimates" : "comes alive",
                       different_type ? " as " : "",
-                      different_type ? an(pmname(mtmp2->data, Mgender(mtmp2)))
-                                     : "");
+                      different_type ? an(mon_pmname(mtmp2)) : "");
             else if (canseemon(mtmp2))
                 pline("%s suddenly appears!", Amonnam(mtmp2));
         } else {

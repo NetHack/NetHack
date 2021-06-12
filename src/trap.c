@@ -3162,13 +3162,13 @@ void
 selftouch(const char *arg)
 {
     char kbuf[BUFSZ];
+    const char *corpse_pmname;
 
     if (uwep && uwep->otyp == CORPSE && touch_petrifies(&mons[uwep->corpsenm])
         && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg,
-              mons[uwep->corpsenm].pmnames[NEUTRAL]);
-        Sprintf(kbuf, "%s corpse",
-              an(mons[uwep->corpsenm].pmnames[NEUTRAL]));
+        corpse_pmname = obj_pmname(uwep);
+        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse if we can't handle it */
         if (!uarmg && !Stone_resistance)
@@ -3178,10 +3178,9 @@ selftouch(const char *arg)
        allow two-weapon combat when either weapon is a corpse] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE
         && touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg,
-              mons[uswapwep->corpsenm].pmnames[NEUTRAL]);
-        Sprintf(kbuf, "%s corpse",
-                an(mons[uswapwep->corpsenm].pmnames[NEUTRAL]));
+        corpse_pmname = obj_pmname(uswapwep);
+        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse */
         if (!uarmg && !Stone_resistance)
@@ -4715,17 +4714,17 @@ help_monster_out(
 
     /* is it a cockatrice?... */
     if (touch_petrifies(mtmp->data) && !uarmg && !Stone_resistance) {
+        const char *mtmp_pmname = mon_pmname(mtmp);
+
         You("grab the trapped %s using your bare %s.",
-            pmname(mtmp->data, Mgender(mtmp)),
-            makeplural(body_part(HAND)));
+            mtmp_pmname, makeplural(body_part(HAND)));
 
         if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else {
             char kbuf[BUFSZ];
 
-            Sprintf(kbuf, "trying to help %s out of a pit",
-                    an(pmname(mtmp->data, Mgender(mtmp))));
+            Sprintf(kbuf, "trying to help %s out of a pit", an(mtmp_pmname));
             instapetrify(kbuf);
             return 1;
         }
