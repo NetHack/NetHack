@@ -2110,7 +2110,7 @@ obj_pmname(struct obj *obj)
 
         return pmname(&mons[obj->corpsenm], mgend);
     }
-    return "";
+    return "two-legged glorkum-seeker";
 }
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
