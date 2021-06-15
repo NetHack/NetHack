@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1622363509 2021/05/30 08:31:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1623791632 2021/06/15 21:13:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2098,8 +2098,13 @@ mon_pmname(struct monst *mon)
 const char *
 obj_pmname(struct obj *obj)
 {
-    if (has_omonst(obj) && OMONST(obj)->data)
-        return mon_pmname(OMONST(obj));
+    if (has_omonst(obj)) {
+        struct monst *m = OMONST(obj);
+
+        /* obj->oextra->omonst->data is Null but ...->mnum is set */
+        if (m->mnum >= LOW_PM)
+            return pmname(&mons[m->mnum], m->female ? FEMALE : MALE);
+    }
 
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
         && obj->corpsenm >= LOW_PM) {
