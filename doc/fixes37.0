@@ -713,6 +713,8 @@ enlightenment/disclosure when wielding two weapons with two-weap skill higher
 	than secondary weapon's skill had "with" duplicated in the feedback
 corpse of monster with gender specific names (king vs queen and so forth)
 	was always described by the neutral name (ruler and such)
+prevent obj_pmname() from calling mon_pmname(&monst) when monst->data is null
+	to prevent a null pointer dereference
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

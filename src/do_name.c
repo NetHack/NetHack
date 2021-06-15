@@ -2098,7 +2098,7 @@ mon_pmname(struct monst *mon)
 const char *
 obj_pmname(struct obj *obj)
 {
-    if (has_omonst(obj))
+    if (has_omonst(obj) && OMONST(obj)->data)
         return mon_pmname(OMONST(obj));
 
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
