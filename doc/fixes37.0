@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.568 $ $NHDT-Date: 1623282330 2021/06/09 23:45:30 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.571 $ $NHDT-Date: 1623807747 2021/06/16 01:42:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -542,6 +542,9 @@ change attendant (healer quest) monster from lawful to neutral
 quit is not longer bound to M-q
 change default value of autopickup to off and color to on
 resurrected corpse of mon could end up with different gender from original mon
+using a bullwhip to snatch a wielded cockatrice corpse from a monster when not
+	wearing gloves and without life-saving could trigger "obj_is_local"
+	panic during final cleanup
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
