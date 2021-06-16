@@ -3429,8 +3429,8 @@ ch2spkeys(char c, int start, int end)
 void
 rhack(char *cmd)
 {
-    int spkey;
-    boolean prefix_seen, bad_command,
+    int spkey = NHKF_ESC;
+    boolean prefix_seen = FALSE, bad_command,
         firsttime = (cmd == 0);
     struct _cmd_queue *cmdq = NULL;
     const struct ext_func_tab *cmdq_ec = NULL;
