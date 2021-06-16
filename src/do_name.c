@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1623791632 2021/06/15 21:13:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1623878512 2021/06/16 21:21:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2098,6 +2098,10 @@ mon_pmname(struct monst *mon)
 const char *
 obj_pmname(struct obj *obj)
 {
+#if 0   /* ignore saved montraits even when they're available; they determine
+         * what a corpse would revive as if resurrected (human corpse from
+         * slain vampire revives as vampire rather than as human, for example)
+         * and don't necessarily reflect the state of the corpse itself */
     if (has_omonst(obj)) {
         struct monst *m = OMONST(obj);
 
@@ -2105,7 +2109,7 @@ obj_pmname(struct obj *obj)
         if (m->mnum >= LOW_PM)
             return pmname(&mons[m->mnum], m->female ? FEMALE : MALE);
     }
-
+#endif
     if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
         && obj->corpsenm >= LOW_PM) {
         int cgend = (obj->spe & CORPSTAT_GENDER),
