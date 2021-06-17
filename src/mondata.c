@@ -686,13 +686,11 @@ name_to_monplus(
     register int mntmp = NON_PM;
     register char *s, *str, *term;
     char buf[BUFSZ];
-    int len, slen, mgend, matchgend = NEUTRAL;
+    int len, slen, mgend, matchgend = -1;
     boolean exact_match = FALSE;
 
     if (remainder_p)
         *remainder_p = (const char *) 0;
-    if (gender_name_var)
-        *gender_name_var = matchgend; /* NEUTRAL */
 
     str = strcpy(buf, in_str);
 
@@ -848,8 +846,12 @@ name_to_monplus(
         mntmp = title_to_mon(str, (int *) 0, &len);
     if (len && remainder_p)
         *remainder_p = in_str + (&str[len] - buf);
-    if (gender_name_var)
-        *gender_name_var = matchgend;
+    if (gender_name_var && matchgend != -1) {
+        /* don't override with neuter if caller has already specified male
+           or female and we've matched the neuter name */
+        if (*gender_name_var == -1 || matchgend != NEUTRAL)
+            *gender_name_var = matchgend;
+    }
     return mntmp;
 }
 

@@ -1055,6 +1055,14 @@ mksobj(int otyp, boolean init, boolean artif)
     case FIGURINE:
         if (otmp->corpsenm == NON_PM)
             otmp->corpsenm = rndmonnum();
+        if (otmp->corpsenm != NON_PM) {
+            struct permonst *ptr = &mons[otmp->corpsenm];
+
+            otmp->spe = (is_neuter(ptr) ? CORPSTAT_NEUTER
+                         : is_female(ptr) ? CORPSTAT_FEMALE
+                           : is_male(ptr) ? CORPSTAT_MALE
+                             : rn2(2) ? CORPSTAT_FEMALE : CORPSTAT_MALE);
+        }
         /*FALLTHRU*/
     case EGG:
     /* case TIN: */

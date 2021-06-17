@@ -71,9 +71,11 @@ make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
     int chance, trycnt = 100;
 
     do {
-        if (otmp) { /* figurine; otherwise spell */
-            int mndx = otmp->corpsenm;
+        long mmflags;
+        int cgend, mndx;
 
+        if (otmp) { /* figurine; otherwise spell */
+            mndx = otmp->corpsenm;
             pm = &mons[mndx];
             /* activating a figurine provides one way to exceed the
                maximum number of the target critter created--unless
@@ -97,7 +99,12 @@ make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
             }
         }
 
-        mtmp = makemon(pm, x, y, MM_EDOG | MM_IGNOREWATER | NO_MINVENT);
+        mmflags = MM_EDOG | MM_IGNOREWATER | NO_MINVENT;
+        cgend = otmp ? (otmp->spe & CORPSTAT_GENDER) : 0;
+        mmflags |= ((cgend == CORPSTAT_FEMALE) ? MM_FEMALE
+                    : (cgend == CORPSTAT_MALE) ? MM_MALE : 0L);
+
+        mtmp = makemon(pm, x, y, mmflags);
         if (otmp && !mtmp) { /* monster was genocided or square occupied */
             if (!quietly)
                 pline_The("figurine writhes and then shatters into pieces!");

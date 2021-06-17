@@ -515,7 +515,7 @@ xname_flags(
 
         if (typ == FIGURINE && omndx != NON_PM) {
             char anbuf[10]; /* [4] would be enough: 'a','n',' ','\0' */
-            const char *pm_name = mons[omndx].pmnames[NEUTRAL];
+            const char *pm_name = obj_pmname(obj);
 
             Sprintf(eos(buf), " of %s%s", just_an(anbuf, pm_name), pm_name);
         } else if (is_wet_towel(obj)) {
@@ -3261,7 +3261,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
         = d->looted /* wizard mode fountain/sink/throne/tree and grave */
         = d->real = d->fake = 0; /* Amulet */
     d->tvariety = RANDOM_TIN;
-    d->mgend = NEUTRAL;
+    d->mgend = -1; /* not specified, aka random */
     d->mntmp = NON_PM;
     d->contents = UNDEFINED;
     d->oclass = 0;
@@ -3276,14 +3276,20 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
     (void) memset(d->fruitbuf, '\0', sizeof d->globbuf);
 }
 
+/* return 1 if d->bp is empty or contains only various qualifiers like
+   "blessed", "rustproof", and so on, or 0 if anything else is present */
 static int
 readobjnam_preparse(struct _readobjnam_data *d)
 {
+    char *save_bp = 0;
+    int more_l = 0, res = 1;
+
     for (;;) {
         register int l;
 
         if (!d->bp || !*d->bp)
-            return 1;
+            break;
+
         if (!strncmpi(d->bp, "an ", l = 3) || !strncmpi(d->bp, "a ", l = 2)) {
             d->cnt = 1;
         } else if (!strncmpi(d->bp, "the ", l = 4)) {
@@ -3430,11 +3436,47 @@ readobjnam_preparse(struct _readobjnam_data *d)
             d->fake = 1, d->real = 0;
             /* ['real' isn't actually needed (unless we someday add
                "real gem" for random non-glass, non-stone)] */
-        } else
+        } else if (!strncmpi(d->bp, "female ", l = 7)) {
+            d->mgend = FEMALE;
+            /* if after "corpse/statue/figurine of", remove from string */
+            if (save_bp)
+                strsubst(d->bp, "female ", ""), l = 0;
+        } else if (!strncmpi(d->bp, "male ", l = 5)) {
+            d->mgend = MALE;
+            if (save_bp)
+                strsubst(d->bp, "male ", ""), l = 0;
+        } else if (!strncmpi(d->bp, "neuter ", l = 7)) {
+            d->mgend = NEUTRAL;
+            if (save_bp)
+                strsubst(d->bp, "neuter ", ""), l = 0;
+
+        /*
+         * Corpse/statue/figurine gender hack:  in order to accept
+         * "statue of a female gnome ruler" for gnome queen we need
+         * to recognize and skip over "statue of [a ]".  Otherwise
+         * we would only accept "female gnome ruler statue" and the
+         * viable but silly "female statue of a gnome ruler".
+         */
+        } else if ((!strncmpi(d->bp, "corpse ", l = 7)
+                    || !strncmpi(d->bp, "statue ", l = 7)
+                    || !strncmpi(d->bp, "figurine ", l = 9))
+                   && !strncmpi(d->bp + l, "of ", more_l = 3)) {
+            save_bp = d->bp; /* we'll backtrack to here later */
+            l += more_l, more_l = 0;
+            if (!strncmpi(d->bp + l, "a ", more_l = 2)
+                || !strncmpi(d->bp + l, "an ", more_l = 3)
+                || !strncmpi(d->bp + l, "the ", more_l = 4))
+                l += more_l;
+            res = 0;
+        } else {
+            res = 0;
             break;
+        }
         d->bp += l;
     }
-    return 0;
+    if (save_bp)
+        d->bp = save_bp;
+    return res;
 }
 
 static void
@@ -4301,6 +4343,7 @@ readobjnam(char *bp, struct obj *no_wish)
     case IRON_CHAIN:
         break;
     case STATUE: /* otmp->cobj already done in mksobj() */
+    case FIGURINE:
     case CORPSE: {
         struct permonst *P = (d.mntmp >= LOW_PM) ? &mons[d.mntmp] : 0;
 

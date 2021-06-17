@@ -55,8 +55,9 @@ struct obj {
                 * candy bar wrapper index;
                 * scroll of mail (normal==0, bones or wishing==1, written==2);
                 * splash of venom (normal==0, wishing==1);
-                * gender for corpses and statues (0..3, CORPSTAT_GENDER),
-                * historic flag (4, CORPSTAT_HISTORIC) for statues */
+                * gender for corpses, statues, and figurines (0..3,
+                *   CORPSTAT_GENDER),
+                * historic flag for statues (4, CORPSTAT_HISTORIC) */
     char oclass;    /* object class */
     char invlet;    /* designation in inventory */
     char oartifact; /* artifact array index */
