@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1623282330 2021/06/09 23:45:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $
+# NetHack 3.7  tribute       $NHDT-Date: 1624053070 2021/06/18 21:51:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -5106,7 +5106,7 @@ and it does what it's told," said Ridcully.
 #
 #
 #
-%title Jingo (12)
+%title Jingo (14)
 %passage 1
 # p. 206 (Harper Torch Edition; passage starts mid-paragraph)
 It was so much easier to blame it on Them.  It was bleakly depressing to
@@ -5369,6 +5369,44 @@ they say, lad.  'Give a man a fire and he's warm for a day, but set fire to
 him and he's warm for the rest of his life.'  See my point?"
 
 "I don't think that's actually what the saying is--"
+
+  [Jingo, by Terry Pratchett]
+%e passage
+#
+# 2 new passages added for 3.7
+#
+# p. 90 (second line beginning with "Sir." rather than "Sir," is accurate)
+%passage 13
+"We need simple answers, Vimes."
+
+"Sir.  Fred and Nobby are /good/ at simple."
+
+The Patrician turned away and looked out over the city.
+
+"Ah," he said in a quieter voice.  "Simple men to see the simple truth."
+
+"This is a fact, sir."
+
+"You are learning fast, Vimes."
+
+"Couldn't say about that, sir."
+
+"And when they have found the simple truth, Vimes?"
+
+"Can't argue with the truth, sir."
+
+"In my experience, Vimes, you can argue with anything."
+
+  [Jingo, by Terry Pratchett]
+%e passage
+# p. 238 (the name "71-hour Ahmed" is accurate)
+%passage 14
+71-hour Ahmed was not /super/stitious.  He was substitious, which put him
+in a minority among humans.  He didn't believe in the things everyone
+believed in but which nevertheless weren't true.  He believed instead in
+the things that were true in which no one else believed.  There are many
+such substitions, ranging from "It'll get better if you don't pick at it"
+all the way up to "Sometimes things just happen."
 
   [Jingo, by Terry Pratchett]
 %e passage

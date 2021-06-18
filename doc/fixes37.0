@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.571 $ $NHDT-Date: 1623807747 2021/06/16 01:42:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ $NHDT-Date: 1624053070 2021/06/18 21:51:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1041,7 +1041,7 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	the quiver (inspired by xNetHack)
 3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
 	Lords and Ladies, two to Soul Music, three to Interesting Times, four
-	to Maskerade, three to Hogfather
+	to Maskerade, three to Hogfather, two to Jingo
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole
