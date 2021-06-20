@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1620923916 2021/05/13 16:38:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.971 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1624232719 2021/06/20 23:45:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.983 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1502,6 +1502,7 @@ extern boolean big_little_match(int, int);
 extern const char *locomotion(const struct permonst *, const char *);
 extern const char *stagger(const struct permonst *, const char *);
 extern const char *on_fire(struct permonst *, struct attack *);
+extern const char *msummon_environ(struct permonst *);
 extern const struct permonst *raceptr(struct monst *);
 extern boolean olfaction(struct permonst *);
 unsigned long cvt_adtyp_to_mseenres(uchar);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	minion.c	$NHDT-Date: 1596498180 2020/08/03 23:43:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.7	minion.c	$NHDT-Date: 1624232728 2021/06/20 23:45:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,6 +49,10 @@ monster_census(boolean spotted) /* seen|sensed vs all */
 int
 msummon(struct monst *mon)
 {
+    static const int elementals[4] = {
+        PM_AIR_ELEMENTAL, PM_FIRE_ELEMENTAL,
+        PM_EARTH_ELEMENTAL, PM_WATER_ELEMENTAL
+    };
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
     aligntyp atyp;
@@ -64,10 +68,9 @@ msummon(struct monst *mon)
         }
 
         atyp = mon->ispriest ? EPRI(mon)->shralign
-                             : mon->isminion ? EMIN(mon)->min_align
-                                             : (ptr->maligntyp == A_NONE)
-                                                   ? A_NONE
-                                                   : sgn(ptr->maligntyp);
+               : mon->isminion ? EMIN(mon)->min_align
+                 : (ptr->maligntyp == A_NONE) ? A_NONE
+                   : sgn(ptr->maligntyp);
     } else {
         ptr = &mons[PM_WIZARD_OF_YENDOR];
         atyp = (ptr->maligntyp == A_NONE) ? A_NONE : sgn(ptr->maligntyp);
@@ -98,7 +101,7 @@ msummon(struct monst *mon)
         if (!rn2(6)) {
             switch (atyp) { /* see summon_minion */
             case A_NEUTRAL:
-                dtype = PM_AIR_ELEMENTAL + rn2(4);
+                dtype = elementals[rn2(SIZE(elementals))];
                 break;
             case A_CHAOTIC:
             case A_NONE:
@@ -145,8 +148,16 @@ msummon(struct monst *mon)
                 EMIN(mtmp)->renegade =
                     (atyp != u.ualign.type) ^ !mtmp->mpeaceful;
             }
-            if (is_demon(ptr) && canseemon(mtmp))
-                pline("%s appears in a cloud of smoke!", Amonnam(mtmp));
+
+            if (cnt == 1 && canseemon(mtmp)) {
+                const char *what = msummon_environ(mtmp->data), /* "smoke" */
+                           *cloud = !strcmpi(what, "sparks") ? "shower"
+                                    : !strcmpi(what, "flame") ? "burst"
+                                      : "cloud";
+
+                pline("%s appears in a %s of %s!", Amonnam(mtmp),
+                      cloud, what);
+            }
         }
         cnt--;
     }
