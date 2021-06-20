@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
+ /* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2143,6 +2143,7 @@ static const struct sing_plur one_off[] = {
     { "knife", "knives" },
     { "labrum", "labra" }, /* candelabrum */
     { "louse", "lice" },
+    { "monarch", "monarchs" },
     { "mouse", "mice" },
     { "mumak", "mumakil" },
     { "nemesis", "nemeses" },
