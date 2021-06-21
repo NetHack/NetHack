@@ -2631,10 +2631,10 @@ ch_ksound(const char *basestr)
     /* these are some *ch words/suffixes that make a k-sound. They pluralize by
        adding 's' rather than 'es' */
     static const char *ch_k[] = {
-        "monarch",  "poch",        "tech", "stomach",   "amphibrach",  "anarch",
-        "atriarch", "azedarach",   "bach", "broch",     "gastrotrich", "isopach",
-        "loch",     "oligarch",    "mech", "peritrich", "sandarach",   "psych",
-        "sumach",   "symposiarch", "tech",
+        "monarch",     "poch",    "tech",     "mech",      "stomach", "psych",
+        "amphibrach",  "anarch",  "atriarch", "azedarach", "broch",
+        "gastrotrich", "isopach", "loch",     "oligarch",  "peritrich",
+        "sandarach",   "sumach",  "symposiarch",
     };
     int i, al;
     const char *endstr;
