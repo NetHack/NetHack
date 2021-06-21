@@ -1,4 +1,4 @@
- /* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -41,6 +41,7 @@ static char *doname_base(struct obj *obj, unsigned);
 static boolean singplur_lookup(char *, char *, boolean,
                                const char *const *);
 static char *singplur_compound(char *);
+static boolean ch_ksound(const char *basestr);
 static boolean badman(const char *, boolean);
 static boolean wishymatch(const char *, const char *, boolean);
 static short rnd_otyp_by_wpnskill(schar);
@@ -2143,7 +2144,6 @@ static const struct sing_plur one_off[] = {
     { "knife", "knives" },
     { "labrum", "labra" }, /* candelabrum */
     { "louse", "lice" },
-    { "monarch", "monarchs" },
     { "mouse", "mice" },
     { "mumak", "mumakil" },
     { "nemesis", "nemeses" },
@@ -2462,11 +2462,7 @@ makeplural(const char* oldstr)
     if (index("zxs", lo_c)
         || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1)))
             /* 21st century k-sound */
-            && !(len >= 4 &&
-                 ((lowc(*(spot - 2)) == 'e'
-                    && index("mt", lowc(*(spot - 3)))) ||
-                  (lowc(*(spot - 2)) == 'o'
-                    && index("lp", lowc(*(spot - 3)))))))
+            && !(len >= 4 && lowc(*(spot - 1)) == 'c' && ch_ksound(str)))
         /* Kludge to get "tomatoes" and "potatoes" right */
         || (len >= 4 && !strcmpi(spot - 2, "ato"))
         || (len >= 5 && !strcmpi(spot - 4, "dingo"))) {
@@ -2626,6 +2622,33 @@ makesingular(const char* oldstr)
         Strcat(bp, excess);
 
     return bp;
+}
+
+
+static boolean
+ch_ksound(const char *basestr)
+{
+    /* these are some *ch words/suffixes that make a k-sound. They pluralize by
+       adding 's' rather than 'es' */
+    static const char *ch_k[] = {
+        "monarch",  "poch",        "tech", "stomach",   "amphibrach",  "anarch",
+        "atriarch", "azedarach",   "bach", "broch",     "gastrotrich", "isopach",
+        "loch",     "oligarch",    "mech", "peritrich", "sandarach",   "psych",
+        "sumach",   "symposiarch", "tech",
+    };
+    int i, al;
+    const char *endstr;
+
+    if (!basestr || strlen(basestr) < 4)
+        return FALSE;
+
+    endstr = eos((char *) basestr);
+    for (i = 0; i < SIZE(ch_k); i++) {
+        al = (int) strlen(ch_k[i]);
+        if (!BSTRCMPI(basestr, endstr - al, ch_k[i]))
+            return TRUE;
+    }
+    return FALSE;
 }
 
 static boolean
