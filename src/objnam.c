@@ -3956,7 +3956,7 @@ readobjnam_postparse2(struct _readobjnam_data *d)
             s += 9;
         if (!strcmpi(s, "glass")) { /* choose random color */
             /* 9 different kinds */
-            d->typ = LAST_GEM + rnd(9);
+            d->typ = LAST_GEM + rnd(NUM_GLASS_GEMS);
             if (objects[d->typ].oc_class == GEM_CLASS)
                 return 2; /*goto typfnd;*/
             else
