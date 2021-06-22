@@ -1,9 +1,17 @@
-/* NetHack 3.7	minion.c	$NHDT-Date: 1624232728 2021/06/20 23:45:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.7	minion.c	$NHDT-Date: 1624322864 2021/06/22 00:47:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+
+/* used to pick among the four basic elementals without worrying whether
+   they've been reordered (difficulty reassessment?) or any new ones have
+   been introduced (hybrid types added to 'E'-class?) */
+static const int elementals[4] = {
+    PM_AIR_ELEMENTAL, PM_FIRE_ELEMENTAL,
+    PM_EARTH_ELEMENTAL, PM_WATER_ELEMENTAL
+};
 
 void
 newemin(struct monst *mtmp)
@@ -49,10 +57,6 @@ monster_census(boolean spotted) /* seen|sensed vs all */
 int
 msummon(struct monst *mon)
 {
-    static const int elementals[4] = {
-        PM_AIR_ELEMENTAL, PM_FIRE_ELEMENTAL,
-        PM_EARTH_ELEMENTAL, PM_WATER_ELEMENTAL
-    };
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
     aligntyp atyp;
@@ -119,13 +123,13 @@ msummon(struct monst *mon)
         return 0;
 
     /* sanity checks */
-    if (cnt > 1 && (mons[dtype].geno & G_UNIQ))
+    if (cnt > 1 && (mons[dtype].geno & G_UNIQ) != 0)
         cnt = 1;
     /*
      * If this daemon is unique and being re-summoned (the only way we
      * could get this far with an extinct dtype), try another.
      */
-    if (g.mvitals[dtype].mvflags & G_GONE) {
+    if ((g.mvitals[dtype].mvflags & G_GONE) != 0) {
         dtype = ndemon(atyp);
         if (dtype == NON_PM)
             return 0;
@@ -147,13 +151,14 @@ msummon(struct monst *mon)
                    or peaceful but different alignment */
                 EMIN(mtmp)->renegade =
                     (atyp != u.ualign.type) ^ !mtmp->mpeaceful;
+                /* TODO: set templit at new monster's spot and in one spot
+                   radius around it to match forthcoming "flash of light"
+                   instead of ordinary "cloud of smoke" */
             }
 
             if (cnt == 1 && canseemon(mtmp)) {
-                const char *what = msummon_environ(mtmp->data), /* "smoke" */
-                           *cloud = !strcmpi(what, "sparks") ? "shower"
-                                    : !strcmpi(what, "flame") ? "burst"
-                                      : "cloud";
+                const char *cloud = 0,
+                           *what = msummon_environ(mtmp->data, &cloud);
 
                 pline("%s appears in a %s of %s!", Amonnam(mtmp),
                       cloud, what);
@@ -180,7 +185,7 @@ summon_minion(aligntyp alignment, boolean talk)
         mnum = lminion();
         break;
     case A_NEUTRAL:
-        mnum = PM_AIR_ELEMENTAL + rn2(4);
+        mnum = elementals[rn2(SIZE(elementals))];
         break;
     case A_CHAOTIC:
     case A_NONE:
