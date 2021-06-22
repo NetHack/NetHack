@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ $NHDT-Date: 1624053070 2021/06/18 21:51:10 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.575 $ $NHDT-Date: 1624322667 2021/06/22 00:44:27 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -547,6 +547,8 @@ using a bullwhip to snatch a wielded cockatrice corpse from a monster when not
 	panic during final cleanup
 make fire-command autowield an appropriate launcher and add fireassist boolean
 	option to toggle the assistance off
+Angels and priests were always described as "the {Angel,priest,high priest} of
+	<deity>" when first two should have been "{an Angel,a high priest}..."
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

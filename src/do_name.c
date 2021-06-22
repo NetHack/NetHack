@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1623878512 2021/06/16 21:21:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1624322669 2021/06/22 00:44:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1672,14 +1672,19 @@ rndghostname(void)
  * options works, since those are special cases.
  */
 char *
-x_monnam(struct monst *mtmp, int article,
-         const char *adjective, int suppress, boolean called)
+x_monnam(
+    struct monst *mtmp,
+    int article,
+    const char *adjective,
+    int suppress,
+    boolean called)
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
     const char *pm_name = mon_pmname(mtmp);
     boolean do_hallu, do_invis, do_it, do_saddle, do_name;
-    boolean name_at_start, has_adjectives;
+    boolean name_at_start, has_adjectives,
+            falseCap = (*pm_name != lowc(*pm_name));
     char *bp;
 
     if (g.program_state.gameover)
@@ -1715,7 +1720,7 @@ x_monnam(struct monst *mtmp, int article,
             EHalluc_resistance = 1L;
         if (!do_invis)
             mtmp->minvis = 0;
-        name = priestname(mtmp, priestnambuf);
+        name = priestname(mtmp, article, priestnambuf);
         EHalluc_resistance = save_prop;
         mtmp->minvis = save_invis;
         if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
@@ -1815,11 +1820,21 @@ x_monnam(struct monst *mtmp, int article,
             article = ARTICLE_THE;
         else
             article = ARTICLE_NONE;
-    } else if ((mdat->geno & G_UNIQ) && article == ARTICLE_A) {
+    } else if ((mdat->geno & G_UNIQ) != 0 && article == ARTICLE_A) {
         article = ARTICLE_THE;
     }
 
-    {
+    if (article == ARTICLE_A && falseCap && !name_at_start) {
+        char buf2[BUFSZ], buf3[BUFSZ];
+
+        /* some type names like "Archon", "Green-elf", and "Uruk-hai" fool
+           an() because of the capitalization and would result in "the " */
+        Strcpy(buf3, buf);
+        *buf3 = lowc(*buf3);
+        (void) just_an(buf2, buf3);
+        Strcat(buf2, buf);
+        return strcpy(buf, buf2);
+    } else {
         char buf2[BUFSZ];
 
         switch (article) {
