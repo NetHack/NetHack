@@ -2641,6 +2641,7 @@ extern boolean chest_trap(struct obj *, int, boolean);
 extern void deltrap(struct trap *);
 extern boolean delfloortrap(struct trap *);
 extern struct trap *t_at(int, int);
+extern int count_traps(int);
 extern void b_trapped(const char *, int);
 extern boolean unconscious(void);
 extern void blow_up_landmine(struct trap *);

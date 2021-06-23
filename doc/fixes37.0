@@ -1049,6 +1049,7 @@ monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole
 	level visible and remembered traps
+spiders will occasionally spin webs when moving around
 
 
 Platform- and/or Interface-Specific New Features
