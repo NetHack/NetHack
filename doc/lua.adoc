@@ -253,6 +253,26 @@ Example:
  local str = nh.s_suffix("foo");
 
 
+=== stairways
+
+Returns an array of stairway data. Each entry is a hash with the following keys:
+
+|===
+| x, y   | location of the stairs on the map
+| up     | boolean, is it up stairs?
+| ladder | boolean, is it a ladder?
+| dnum   | dungeon number where the stairs lead to
+| dlevel | dungeon level where the stairs lead to
+|===
+
+Example:
+
+ local stairs = nh.stairways();
+ for k, v in pairs(stairs) do
+   nh.pline("stair[" .. k .. "]:(" .. v.x .. "," .. v.y .. ")," .. tostring(v.up));
+ end
+
+
 === verbalize
 
 Show the text in the message area as if someone said it, obeying eg. hero's deafness.

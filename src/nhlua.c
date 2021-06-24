@@ -18,6 +18,7 @@
 static int nhl_dump_fmtstr(lua_State *);
 #endif /* DUMPLOG */
 static int nhl_dnum_name(lua_State *);
+static int nhl_stairways(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
@@ -880,6 +881,36 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
+/* local stairs = stairways(); */
+static int
+nhl_stairways(lua_State *L)
+{
+    stairway *tmp = g.stairs;
+    int i = 1; /* lua arrays should start at 1 */
+
+    lua_newtable(L);
+
+    while (tmp) {
+
+        lua_pushinteger(L, i);
+        lua_newtable(L);
+
+        nhl_add_table_entry_bool(L, "up", tmp->up);
+        nhl_add_table_entry_bool(L, "ladder", tmp->isladder);
+        nhl_add_table_entry_int(L, "x", tmp->sx);
+        nhl_add_table_entry_int(L, "y", tmp->sy);
+        nhl_add_table_entry_int(L, "dnum", tmp->tolev.dnum);
+        nhl_add_table_entry_int(L, "dlevel", tmp->tolev.dlevel);
+
+        lua_settable(L, -3);
+
+        tmp = tmp->next;
+        i++;
+    }
+
+    return 1;
+}
+
 /*
   test( { x = 123, y = 456 } );
 */
@@ -935,6 +966,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"dump_fmtstr", nhl_dump_fmtstr},
 #endif /* DUMPLOG */
     {"dnum_name", nhl_dnum_name},
+    {"stairways", nhl_stairways},
     {NULL, NULL}
 };
 
