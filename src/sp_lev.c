@@ -1865,7 +1865,7 @@ create_monster(monster* m, struct mkroom* croom)
     else if (PM_ARCHEOLOGIST <= m->id && m->id <= PM_WIZARD)
         mtmp = mk_mplayer(pm, x, y, FALSE);
     else
-        mtmp = makemon(pm, x, y, NO_MM_FLAGS);
+        mtmp = makemon(pm, x, y, m->mm_flags);
 
     if (mtmp) {
         x = mtmp->mx, y = mtmp->my; /* sanity precaution */
@@ -3047,6 +3047,7 @@ lspo_monster(lua_State *L)
     tmpmons.seentraps = 0;
     tmpmons.has_invent = 0;
     tmpmons.waiting = 0;
+    tmpmons.mm_flags = NO_MM_FLAGS;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *paramstr = luaL_checkstring(L, 1);
@@ -3113,6 +3114,17 @@ lspo_monster(lua_State *L)
         tmpmons.waiting = get_table_int_opt(L, "waiting", 0);
         tmpmons.seentraps = 0; /* TODO: list of trap names to bitfield */
         tmpmons.has_invent = 0;
+
+        if (!get_table_int_opt(L, "tail", 1))
+            tmpmons.mm_flags |= MM_NOTAIL;
+        if (!get_table_int_opt(L, "group", 1))
+            tmpmons.mm_flags |= MM_NOGRP;
+        if (get_table_int_opt(L, "adjacentok", 0))
+            tmpmons.mm_flags |= MM_ADJACENTOK;
+        if (get_table_int_opt(L, "ignorewater", 0))
+            tmpmons.mm_flags |= MM_IGNOREWATER;
+        if (!get_table_int_opt(L, "countbirth", 1))
+            tmpmons.mm_flags |= MM_NOCOUNTBIRTH;
 
         mappear = get_table_str_opt(L, "appear_as", NULL);
         if (mappear) {
