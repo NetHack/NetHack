@@ -5407,7 +5407,7 @@ count_traps(int ttyp)
     struct trap *trap = g.ftrap;
 
     while (trap) {
-        if (trap->ttyp == ttyp)
+        if ((int) trap->ttyp == ttyp)
             ret++;
         trap = trap->ntrap;
     }
