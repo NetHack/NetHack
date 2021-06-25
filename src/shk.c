@@ -59,6 +59,9 @@ static boolean angry_shk_exists(void);
 static void rile_shk(struct monst *);
 static void rouse_shk(struct monst *, boolean);
 static void remove_damage(struct monst *, boolean);
+static xchar *litter_getpos(int *, xchar, xchar, struct monst *);
+static void litter_scatter(xchar *, int, xchar, xchar, struct monst *);
+static void litter_newsyms(xchar *, xchar, xchar);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
 static void dropped_container(struct obj *, struct monst *, boolean);
@@ -3566,6 +3569,114 @@ remove_damage(struct monst* shkp, boolean croaked)
         stop_occupation();
 }
 
+#define LITTER_UPDATE 0x01
+#define LITTER_OPEN   0x02
+#define LITTER_INSHOP 0x04
+#define horiz(i) ((i % 3) - 1)
+#define vert(i) ((i / 3) - 1)
+
+static xchar *
+litter_getpos(int *k, xchar x, xchar y, struct monst *shkp)
+{
+    static xchar litter[9];
+    int i, ix, iy;
+
+    (void) memset((genericptr_t) litter, 0, sizeof litter);
+
+    if (!k) return litter;
+
+    *k = 0; /* number of adjacent shop spots */
+
+    if (g.level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
+        for (i = 0; i < 9; i++) {
+            ix = x + horiz(i);
+            iy = y + vert(i);
+            if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
+                continue;
+            litter[i] = LITTER_OPEN;
+            if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
+                litter[i] |= LITTER_INSHOP;
+                ++(*k);
+            }
+        }
+    }
+    return litter;
+}
+
+static void
+litter_scatter(xchar *litter, int k, xchar x, xchar y, struct monst *shkp)
+{
+    struct obj *otmp;
+
+    /* placement below assumes there is always at least one adjacent
+       spot; the 'k' check guards against getting stuck in an infinite
+       loop if some irregularly shaped room breaks that assumption */
+    if (k > 0) {
+        /* Scatter objects haphazardly into the shop */
+        if (Punished && !u.uswallow
+            && ((uchain->ox == x && uchain->oy == y)
+                || (uball->ox == x && uball->oy == y))) {
+            /*
+             * Either the ball or chain is in the repair location.
+             * Take the easy way out and put ball&chain under hero.
+             *
+             * FIXME: message should be reworded; this might be the
+             * shop's doorway rather than a wall, there might be some
+             * other stuff here which isn't junk, and "your junk" has
+             * a slang connotation which could be applicable if hero
+             * has Passes_walls ability.
+             */
+            if (!Deaf && !muteshk(shkp))
+                verbalize("Get your junk out of my wall!");
+            unplacebc(); /* pick 'em up */
+            placebc();   /* put 'em down */
+        }
+        while ((otmp = g.level.objects[x][y]) != 0)
+            /* Don't mess w/ boulders -- just merge into wall */
+            if (otmp->otyp == BOULDER || otmp->otyp == ROCK) {
+                obj_extract_self(otmp);
+                obfree(otmp, (struct obj *) 0);
+            } else {
+                int trylimit = 10;
+                int i = rn2(9), ix, iy;
+
+                /* otmp must be moved otherwise g.level.objects[x][y] will
+                   never become Null and while-loop won't terminate */
+                do {
+                    i++;
+                } while (--trylimit && !(litter[i % 9] & LITTER_INSHOP));
+                if ((litter[i] & (LITTER_OPEN | LITTER_INSHOP)) != 0) {
+                    ix = x + horiz(i);
+                    iy = y + vert(i);
+                } else {
+                    /* we know shk isn't at <x,y> because repair
+                       is deferred in that situation */
+                    ix = shkp->mx;
+                    iy = shkp->my;
+                }
+                remove_object(otmp);
+                place_object(otmp, ix, iy);
+                litter[i] |= LITTER_UPDATE;
+            }
+    }
+}
+
+static void
+litter_newsyms(xchar *litter, xchar x, xchar y)
+{
+    int i;
+
+    for (i = 0; i < 9; i++)
+        if (litter[i] & LITTER_UPDATE)
+            newsym(x + horiz(i), y + vert(i));
+}
+
+#undef LITTER_UPDATE
+#undef LITTER_OPEN
+#undef LITTER_INSHOP
+#undef vert
+#undef horiz
+
 /*
  * 0: repair postponed, 1: silent repair (no messages), 2: normal repair
  * 3: untrap
@@ -3578,11 +3689,11 @@ repair_damage(
     boolean catchup) /* restoring a level */
 {
     xchar x, y;
-    xchar litter[9];
+    xchar *litter;
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *ttmp;
-    int i, k, ix, iy, disposition = 1;
+    int k, disposition = 1;
 
     if ((g.monstermoves - tmp_dam->when) < REPAIR_DELAY)
         return 0;
@@ -3642,76 +3753,9 @@ repair_damage(
     if (IS_DOOR(tmp_dam->typ))
         levl[x][y].doormask = D_CLOSED; /* arbitrary */
 
-    (void) memset((genericptr_t) litter, 0, sizeof litter);
-#define NEED_UPDATE 1
-#define OPEN 2
-#define INSHOP 4
-#define horiz(i) ((i % 3) - 1)
-#define vert(i) ((i / 3) - 1)
-    k = 0; /* number of adjacent shop spots */
-    if (g.level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
-        for (i = 0; i < 9; i++) {
-            ix = x + horiz(i);
-            iy = y + vert(i);
-            if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
-                continue;
-            litter[i] = OPEN;
-            if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
-                litter[i] |= INSHOP;
-                ++k;
-            }
-        }
-    }
-    /* placement below assumes there is always at least one adjacent
-       spot; the 'k' check guards against getting stuck in an infinite
-       loop if some irregularly shaped room breaks that assumption */
-    if (k > 0) {
-        /* Scatter objects haphazardly into the shop */
-        if (Punished && !u.uswallow
-            && ((uchain->ox == x && uchain->oy == y)
-                || (uball->ox == x && uball->oy == y))) {
-            /*
-             * Either the ball or chain is in the repair location.
-             * Take the easy way out and put ball&chain under hero.
-             *
-             * FIXME: message should be reworded; this might be the
-             * shop's doorway rather than a wall, there might be some
-             * other stuff here which isn't junk, and "your junk" has
-             * a slang connotation which could be applicable if hero
-             * has Passes_walls ability.
-             */
-            if (!Deaf && !muteshk(shkp))
-                verbalize("Get your junk out of my wall!");
-            unplacebc(); /* pick 'em up */
-            placebc();   /* put 'em down */
-        }
-        while ((otmp = g.level.objects[x][y]) != 0)
-            /* Don't mess w/ boulders -- just merge into wall */
-            if (otmp->otyp == BOULDER || otmp->otyp == ROCK) {
-                obj_extract_self(otmp);
-                obfree(otmp, (struct obj *) 0);
-            } else {
-                int trylimit = 50;
+    litter = litter_getpos(&k, x, y, shkp);
+    litter_scatter(litter, k, x, y, shkp);
 
-                /* otmp must be moved otherwise g.level.objects[x][y] will
-                   never become Null and while-loop won't terminate */
-                do {
-                    i = rn2(9);
-                } while (--trylimit && !(litter[i] & INSHOP));
-                if ((litter[i] & (OPEN | INSHOP)) != 0) {
-                    ix = x + horiz(i);
-                    iy = y + vert(i);
-                } else {
-                    /* we know shk isn't at <x,y> because repair
-                       is deferred in that situation */
-                    ix = shkp->mx;
-                    iy = shkp->my;
-                }
-                remove_object(otmp);
-                place_object(otmp, ix, iy);
-                litter[i] |= NEED_UPDATE;
-            }
-    }
     if (catchup)
         return 1; /* repair occurred while off level so no messages */
 
@@ -3722,18 +3766,12 @@ repair_damage(
             levl[x][y].seenv = SVALL;
         newsym(x, y);
     }
-    for (i = 0; i < 9; i++)
-        if (litter[i] & NEED_UPDATE)
-            newsym(x + horiz(i), y + vert(i));
+
+    litter_newsyms(litter, x, y);
 
     if (disposition < 3)
         disposition = 2;
     return disposition;
-#undef NEED_UPDATE
-#undef OPEN
-#undef INSHOP
-#undef vert
-#undef horiz
 }
 
 /*
