@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1624053070 2021/06/18 21:51:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.105 $
+# NetHack 3.7  tribute       $NHDT-Date: 1624656533 2021/06/25 21:28:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -5414,7 +5414,10 @@ all the way up to "Sometimes things just happen."
 #
 #
 #
-%title The Last Continent (10)
+# The last continent is Discworld's analog of Australia, known variously
+# as "XXXX", "EcksEcksEcksEcks", and "FourEcks".
+#
+%title The Last Continent (14)
 # p. 260 (Harper Torch edition)
 %passage 1
 "Is it true that your life passes before your eyes before you die?"
@@ -5430,6 +5433,7 @@ FRONT OF THEIR EYES BEFORE THEY DIE.  THE PROCESS IS CALLED "LIVING".  [...]
 
   [The Last Continent, by Terry Pratchett]
 %e passage
+# p. 16
 %passage 2
 "When You're Up to Your Ass in Alligators, Today Is the First Day of the
 Rest of Your Life."
@@ -5587,6 +5591,99 @@ of clothes, often with the same sort of insignia.
 "Archchancellor, Ponder Stibbons is a fully trained wizard!" said the Dean.
 
 "Thank you for that very concise and definite answer, Dean," said Ridcully.
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+#
+# 4 new passages added for 3.7
+#
+# pp. 113-114 (passage ends mid-paragraph)
+%passage 11
+"This is certainly a very... /original/ cart," said Rincewind.
+
+"Got a few modifications of my own," said Mad.  He grinned evilly.  "You a
+wizard, mister?"
+
+"Broadly speaking, yes."
+
+"Any good?"  Mad was loading another crossbow.
+
+Rincewind hesitated.  "No," he said.
+
+"Lucky for you," said Mad.  "I'd have killed you if you were.  Can't stand
+wizards.  Bunch of wowsers, right?"
+
+He grasped the handles of the bent stovepipe and swiveled it around.
+
+"Here they come," he muttered.
+
+Rincewind peered over the top of Mad's head.  There was a piece of mirror
+in the bend of the pipe.  It showed the road behind, and half a dozen dots
+under another cloud of red dust.
+
+"Road gang," said Mad.  "After my cargo.  Steal anything, they will.  All
+bastards are bastards, but some bastards is /bastards/."  [...]
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# pp. 246-247 (Ponder Stibbins had stayed behind, then changed his mind and
+#              isn't wearing his robe after swimming to catch up with the
+#              senior wizards' boat; Ridcully is smoking a pipe)
+%passage 12
+"And, while it is good to see you, Stibbins, albeit rather more of you
+than I would usually care to contemplate, I am moved to ask why you are,
+in fact, here."
+
+"I suddenly felt it would be unfair to deprive the University of my
+services, sir."
+
+"Really?  A sudden rush of nostalgia for the old alma mater, eh?"
+
+"You could say that, sir."
+
+Ridcully's eyes twinkled behind the smoke and, not for the first time,
+Ponder suspected that the man was sometimes rather cleverer than he
+appeared.  It would not be hard.
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# p. 263 (Rincewind is going to be executed the next day; a previous prisoner
+#         who was well known for multiple escapes had scratched "look at the
+#         hinges" on the cell's wall--the cell's door just lifts off)
+%passage 13
+At moments like this cowardice was an exact science.  There were times
+that called for mindless, terror-filled panic, and times that called for
+measured, considered, /thoughtful/ panic.  Right now he was in a place of
+safety.  It was, admittedly, the death cell, but the point was that it
+was perhaps the one place in this country where nothing bad was going to
+happen for a little while.  The Ecksians didn't look like the kind of
+people who went in for torture, although it was always possible that they
+might make him eat some more of their food.  So, for the moment, he had
+/time/.  Time to plan ahead, to consider his next move, to apply his
+intellect to the problem at hand.
+
+He stared at the wall for a moment, then stood up and gripped the bars.
+
+Right.  That seemed to be about long enough.  Now to run like hell.
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# pp. 333-334 (passage starts mid-paragraph and ends mid-paragraph; Rincewind
+#              has asked whether a haunted brewery might have been built on a
+#              site that's sacred to indigenous people; the answer is no)
+%passage 14
+"[...]  Some chief went to prison to see the prime minister and said,
+'Mate, your mob can dig it all up and drop it over the edge of the world,
+no worries.'"
+
+"Why did he have to go to prison?"
+
+"We put all our politicians in prison as soon as they're elected.  Don't
+you?"
+
+"Why?"
+
+"It saves time.  [...]"
 
   [The Last Continent, by Terry Pratchett]
 %e passage

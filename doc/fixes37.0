@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.575 $ $NHDT-Date: 1624322667 2021/06/22 00:44:27 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.578 $ $NHDT-Date: 1624656533 2021/06/25 21:28:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -122,7 +122,7 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
 	 word "had": 'it was /fate/ that _had_ let Edward'
 	Interesting Times passage #1, italicize several words
-	Feet of Clay passage #1, "does not need" -> "doesn't even need"
+	Feet of Clay passage #1, second "does not need" -> "doesn't even need"
 	Hogfather passage #7 missing initial double quote for "Oh, just ...",
 	 also #7 insert missing "you" into "Why are you feeling [...]"
 	Soul Music passage #1, italicize /feel/, #8, "fossile" -> "fossil"
@@ -1045,7 +1045,8 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	the quiver (inspired by xNetHack)
 3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
 	Lords and Ladies, two to Soul Music, three to Interesting Times, four
-	to Maskerade, three to Hogfather, two to Jingo
+	to Maskerade, three to Hogfather, two to Jingo, four to The Last
+	Continent
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole
