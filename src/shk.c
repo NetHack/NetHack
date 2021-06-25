@@ -3643,8 +3643,8 @@ litter_scatter(xchar *litter, int k, xchar x, xchar y, struct monst *shkp)
                 /* otmp must be moved otherwise g.level.objects[x][y] will
                    never become Null and while-loop won't terminate */
                 do {
-                    i++;
-                } while (--trylimit && !(litter[i % 9] & LITTER_INSHOP));
+                    i = (i + 1) % 9;
+                } while (--trylimit && !(litter[i] & LITTER_INSHOP));
                 if ((litter[i] & (LITTER_OPEN | LITTER_INSHOP)) != 0) {
                     ix = x + horiz(i);
                     iy = y + vert(i);
