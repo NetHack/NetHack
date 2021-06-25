@@ -59,6 +59,7 @@ msummon(struct monst *mon)
 {
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
+    boolean xlight;
     aligntyp atyp;
     struct monst *mtmp;
 
@@ -138,6 +139,7 @@ msummon(struct monst *mon)
     /* some candidates can generate a group of monsters, so simple
        count of non-null makemon() result is not sufficient */
     census = monster_census(FALSE);
+    xlight = FALSE;
 
     while (cnt > 0) {
         mtmp = makemon(&mons[dtype], u.ux, u.uy, MM_EMIN);
@@ -151,9 +153,16 @@ msummon(struct monst *mon)
                    or peaceful but different alignment */
                 EMIN(mtmp)->renegade =
                     (atyp != u.ualign.type) ^ !mtmp->mpeaceful;
-                /* TODO: set templit at new monster's spot and in one spot
-                   radius around it to match forthcoming "flash of light"
-                   instead of ordinary "cloud of smoke" */
+            }
+
+            if (mtmp->data->mlet == S_ANGEL && !Blind) {
+                /* for any 'A', 'cloud of smoke' will be 'flash of light';
+                   if more than one monster is being created, that message
+                   might be skipped for this monster but show 'mtmp' anyway */
+                show_transient_light((struct obj *) 0, mtmp->mx, mtmp->my);
+                xlight = TRUE;
+                /* we don't do this for 'burst of flame' (fire elemental)
+                   because those monsters become their own light source */
             }
 
             if (cnt == 1 && canseemon(mtmp)) {
@@ -165,6 +174,13 @@ msummon(struct monst *mon)
             }
         }
         cnt--;
+    }
+
+    if (xlight) {
+        /* Note: if we forced --More-- here, the 'A's would be visible for
+           long enough to be seen, but like with clairvoyance, some players
+           would be annoyed at the disruption of having to acknowledge it */
+        transient_light_cleanup();
     }
 
     /* how many monsters exist now compared to before? */
