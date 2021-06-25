@@ -907,6 +907,8 @@ maybe_spin_web(struct monst *mtmp)
                 pline("%s spins a web.", upstart(mbuf));
                 trap->tseen = 1;
             }
+            if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
+                add_damage(mtmp->mx, mtmp->my, 0L);
         }
     }
 }

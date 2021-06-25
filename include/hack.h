@@ -50,6 +50,8 @@ enum encumbrance_types {
 #define SHOP_HOLE_COST 200L /* cost of making hole/trapdoor */
 #define SHOP_WALL_COST 200L /* cost of destroying a wall */
 #define SHOP_WALL_DMG  (10L * ACURRSTR) /* damaging a wall */
+#define SHOP_PIT_COST  100L /* cost of making a pit */
+#define SHOP_WEB_COST   30L /* cost of removing a web */
 
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {

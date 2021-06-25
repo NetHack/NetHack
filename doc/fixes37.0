@@ -549,6 +549,7 @@ make fire-command autowield an appropriate launcher and add fireassist boolean
 	option to toggle the assistance off
 Angels and priests were always described as "the {Angel,priest,high priest} of
 	<deity>" when first two should have been "{an Angel,a high priest}..."
+shopkeepers can remove pits and webs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

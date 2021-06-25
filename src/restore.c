@@ -175,7 +175,7 @@ restdamage(NHFILE* nhfp)
                 struct monst *shkp = shop_keeper(*shp);
 
                 if (shkp && inhishop(shkp)
-                    && repair_damage(shkp, tmp_dam, (int *) 0, TRUE))
+                    && repair_damage(shkp, tmp_dam, TRUE))
                     break;
             }
         }
