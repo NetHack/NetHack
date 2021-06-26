@@ -523,6 +523,9 @@ savelev(NHFILE* nhfp, xchar lev)
         g.level.buriedobjlist = 0;
         g.billobjs = 0;
         stairway_free_all();
+        (void) memset(g.rooms, 0, sizeof(g.rooms));
+        g.nroom = g.nsubroom = 0;
+        g.rooms[0].hx = g.subrooms[0].hx = -1;
         /* level.bonesinfo = 0; -- handled by savecemetery() */
     }
     save_engravings(nhfp);
