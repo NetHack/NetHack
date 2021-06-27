@@ -1100,15 +1100,10 @@ use_pick_axe2(struct obj *obj)
                        && (trap_with_u = t_at(u.ux, u.uy))
                        && is_pit(trap->ttyp)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
-                int idx;
+                int idx = xytod(u.dx, u.dy);
 
-                for (idx = 0; idx < 8; idx++) {
-                    if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-                        break;
-                }
-                /* idx is valid if < 8 */
-                if (idx < 8) {
-                    int adjidx = (idx + 4) % 8;
+                if (idx != DIR_ERR) {
+                    int adjidx = DIR_180(idx);
 
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
@@ -1458,11 +1453,7 @@ zap_dig(void)
     if (u.utrap && u.utraptype == TT_PIT
         && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = TRUE;
-        for (diridx = 0; diridx < 8; diridx++) {
-            if (xdir[diridx] == u.dx && ydir[diridx] == u.dy)
-                break;
-            /* diridx is valid if < 8 */
-        }
+        diridx = xytod(u.dx, u.dy);
     }
     digdepth = rn1(18, 8);
     tmp_at(DISP_BEAM, cmap_to_glyph(S_digbeam));
@@ -1476,10 +1467,12 @@ zap_dig(void)
         if (pitdig) { /* we are already in a pit if this is true */
             coord cc;
             struct trap *adjpit = t_at(zx, zy);
-            if ((diridx < 8) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
+
+            if ((diridx != DIR_ERR) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0; /* limited to the adjacent location only */
                 if (!(adjpit && is_pit(adjpit->ttyp))) {
                     char buf[BUFSZ];
+
                     cc.x = zx;
                     cc.y = zy;
                     if (!adj_pit_checks(&cc, buf)) {
@@ -1491,9 +1484,9 @@ zap_dig(void)
                         adjpit = t_at(zx, zy);
                     }
                 }
-                if (adjpit
-                    && is_pit(adjpit->ttyp)) {
-                    int adjidx = (diridx + 4) % 8;
+                if (adjpit && is_pit(adjpit->ttyp)) {
+                    int adjidx = DIR_180(diridx);
+
                     trap_with_u->conjoined |= (1 << diridx);
                     adjpit->conjoined |= (1 << adjidx);
                     flow_x = zx;
@@ -1701,7 +1694,7 @@ pit_flow(struct trap *trap, schar filltyp)
                     (t.tx == u.ux && t.ty == u.uy)
                         ? "Suddenly %s flows in from the adjacent pit!"
                         : (char *) 0);
-        for (idx = 0; idx < 8; ++idx) {
+        for (idx = 0; idx < N_DIRS; ++idx) {
             if (t.conjoined & (1 << idx)) {
                 int x, y;
                 struct trap *t2;
@@ -1714,7 +1707,7 @@ pit_flow(struct trap *trap, schar filltyp)
                  * called deltrap() which cleaned up the
                  * conjoined fields on both pits.
                  */
-                if (t2 && (t2->conjoined & (1 << ((idx + 4) % 8))))
+                if (t2 && (t2->conjoined & (1 << DIR_180(idx))))
 #endif
                 /* recursion */
                 pit_flow(t2, filltyp);

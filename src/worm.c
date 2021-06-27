@@ -770,26 +770,26 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
 
         if (tryct <= 50)
 #else   /* new code */
-        int i, j, k, dirs[8];
+        int i, j, k, dirs[N_DIRS];
 
         /* instead of picking a random direction up to 50 times, try each
            of the eight directions at most once after shuffling their order */
-        for (i = 0; i < 8; ++i)
+        for (i = 0; i < N_DIRS; ++i)
             dirs[i] = i;
-        for (i = 8; i > 0; --i) {
+        for (i = N_DIRS; i > 0; --i) {
             j = rn2(i);
             k = dirs[j];
             dirs[j] = dirs[i - 1];
             dirs[i - 1] = k;
         }
-        for (i = 0; i < 8; ++i) {
+        for (i = 0; i < N_DIRS; ++i) {
             nx = ox + xdir[dirs[i]];
             ny = oy + ydir[dirs[i]];
             if (goodpos(nx, ny, worm, 0)) /* includes an isok() check */
                 break;
         }
 
-        if (i < 8)
+        if (i < N_DIRS)
 #endif
         {
             place_worm_seg(worm, nx, ny);

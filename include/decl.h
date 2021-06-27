@@ -173,7 +173,32 @@ struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 };
 
-E const schar xdir[], ydir[], zdir[];
+enum movementdirs {
+    DIR_ERR = -1,
+    DIR_W,
+    DIR_NW,
+    DIR_N,
+    DIR_NE,
+    DIR_E,
+    DIR_SE,
+    DIR_S,
+    DIR_SW,
+    DIR_UP,
+    DIR_DOWN,
+
+    N_DIRS_Z
+};
+/* N_DIRS_Z, minus up & down */
+#define N_DIRS (N_DIRS_Z - 2)
+/* direction adjustments */
+#define DIR_180(dir) (((dir) + 4) % N_DIRS)
+#define DIR_LEFT(dir) (((dir) + 7) % N_DIRS)
+#define DIR_RIGHT(dir) (((dir) + 1) % N_DIRS)
+#define DIR_LEFT2(dir) (((dir) + 6) % N_DIRS)
+#define DIR_RIGHT2(dir) (((dir) + 2) % N_DIRS)
+#define DIR_CLAMP(dir) (((dir) + N_DIRS) % N_DIRS)
+
+extern const schar xdir[], ydir[], zdir[], dirs_ord[];
 
 struct multishot {
     int n, i;
@@ -474,7 +499,7 @@ struct cmd {
     boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
     boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
-    char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
+    char move[N_DIRS];     /* char used for moving one step in direction */
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */

@@ -1241,12 +1241,12 @@ dog_move(register struct monst *mtmp,
             goto dognext;
 
         i = xytod(nx, ny);
-        for (j = (i + 7) % 8; j < (i + 1) % 8; j++) {
+        for (j = DIR_LEFT(i); j < DIR_RIGHT(i); j++) {
             dtoxy(&cc, j);
             if (goodpos(cc.x, cc.y, mtmp, 0))
                 goto dognext;
         }
-        for (j = (i + 6) % 8; j < (i + 2) % 8; j++) {
+        for (j = DIR_LEFT2(i); j < DIR_RIGHT2(i); j++) {
             dtoxy(&cc, j);
             if (goodpos(cc.x, cc.y, mtmp, 0))
                 goto dognext;

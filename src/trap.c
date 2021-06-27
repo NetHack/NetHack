@@ -2964,7 +2964,7 @@ mkroll_launch(
     if (ttmp->ttyp == ROLLING_BOULDER_TRAP)
         mindist = 2;
     distance = rn1(5, 4); /* 4..8 away */
-    tmp = rn2(8);         /* randomly pick a direction to try first */
+    tmp = rn2(N_DIRS);         /* randomly pick a direction to try first */
     while (distance >= mindist) {
         dx = xdir[tmp];
         dy = ydir[tmp];
@@ -5453,12 +5453,9 @@ conjoined_pits(
         return FALSE;
     dx = sgn(trap2->tx - trap1->tx);
     dy = sgn(trap2->ty - trap1->ty);
-    for (diridx = 0; diridx < 8; diridx++)
-        if (xdir[diridx] == dx && ydir[diridx] == dy)
-            break;
-    /* diridx is valid if < 8 */
-    if (diridx < 8) {
-        adjidx = (diridx + 4) % 8;
+    diridx = xytod(dx, dy);
+    if (diridx != DIR_ERR) {
+        adjidx = DIR_180(diridx);
         if ((trap1->conjoined & (1 << diridx))
             && (trap2->conjoined & (1 << adjidx)))
             return TRUE;
@@ -5473,14 +5470,14 @@ clear_conjoined_pits(struct trap* trap)
     struct trap *t;
 
     if (trap && is_pit(trap->ttyp)) {
-        for (diridx = 0; diridx < 8; ++diridx) {
+        for (diridx = 0; diridx < N_DIRS; ++diridx) {
             if (trap->conjoined & (1 << diridx)) {
                 x = trap->tx + xdir[diridx];
                 y = trap->ty + ydir[diridx];
                 if (isok(x, y)
                     && (t = t_at(x, y)) != 0
                     && is_pit(t->ttyp)) {
-                    adjidx = (diridx + 4) % 8;
+                    adjidx = DIR_180(diridx);
                     t->conjoined &= ~(1 << adjidx);
                 }
                 trap->conjoined &= ~(1 << diridx);
@@ -5496,12 +5493,8 @@ adj_nonconjoined_pit(struct trap* adjtrap)
 
     if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT
         && is_pit(trap_with_u->ttyp) && is_pit(adjtrap->ttyp)) {
-        int idx;
-
-        for (idx = 0; idx < 8; idx++) {
-            if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-                return TRUE;
-        }
+        if (xytod(u.dx, u.dy) != DIR_ERR)
+            return TRUE;
     }
     return FALSE;
 }
@@ -5519,7 +5512,7 @@ join_adjacent_pits(struct trap* trap)
 
     if (!trap)
         return;
-    for (diridx = 0; diridx < 8; ++diridx) {
+    for (diridx = 0; diridx < N_DIRS; ++diridx) {
         x = trap->tx + xdir[diridx];
         y = trap->ty + ydir[diridx];
         if (isok(x, y)) {

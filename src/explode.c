@@ -718,7 +718,7 @@ scatter(int sx, int sy,  /* location of objects to scatter */
             stmp->obj = otmp;
             stmp->ox = sx;
             stmp->oy = sy;
-            tmp = rn2(8); /* get the direction */
+            tmp = rn2(N_DIRS); /* get the direction */
             stmp->dx = xdir[tmp];
             stmp->dy = ydir[tmp];
             tmp = blastforce - (otmp->owt / 40);

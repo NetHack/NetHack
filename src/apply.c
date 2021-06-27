@@ -3548,7 +3548,7 @@ do_break_wand(struct obj *obj)
     zapsetup();
 
     /* this makes it hit us last, so that we can see the action first */
-    for (i = 0; i <= 8; i++) {
+    for (i = 0; i <= N_DIRS; i++) {
         g.bhitpos.x = x = obj->ox + xdir[i];
         g.bhitpos.y = y = obj->oy + ydir[i];
         if (!isok(x, y))

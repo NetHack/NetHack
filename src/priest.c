@@ -219,16 +219,16 @@ priestini(d_level *lvl, struct mkroom *sroom, int sx, int sy,
     struct monst *priest;
     struct obj *otmp;
     int cnt;
-    int px = 0, py = 0, i, si = rn2(8);
+    int px = 0, py = 0, i, si = rn2(N_DIRS);
     struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC];
 
-    for (i = 0; i < 8; i++) {
-        px = sx + xdir[(i+si) % 8];
-        py = sy + ydir[(i+si) % 8];
+    for (i = 0; i < N_DIRS; i++) {
+        px = sx + xdir[DIR_CLAMP(i+si)];
+        py = sy + ydir[DIR_CLAMP(i+si)];
         if (pm_good_location(px, py, prim))
             break;
     }
-    if (i == 8)
+    if (i == N_DIRS)
         px = sx, py = sy;
 
     if (MON_AT(px, py))

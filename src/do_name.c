@@ -110,7 +110,8 @@ getpos_help(boolean force, const char *goal)
 
     Sprintf(sbuf,
             "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
-            g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E, goal);
+            g.Cmd.move[DIR_W], g.Cmd.move[DIR_S],
+            g.Cmd.move[DIR_N], g.Cmd.move[DIR_E], goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
             "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
@@ -726,7 +727,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
         }
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < N_DIRS; i++) {
             int dx, dy;
 
             if (g.Cmd.dirchars[i] == c) {
@@ -948,7 +949,8 @@ getpos(coord *ccp, boolean force, const char *goal)
                         Strcpy(note, "aborted");
                     else /* hjkl */
                         Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
-                                g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E,
+                                g.Cmd.move[DIR_W], g.Cmd.move[DIR_S],
+                                g.Cmd.move[DIR_N], g.Cmd.move[DIR_E],
                                 visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);

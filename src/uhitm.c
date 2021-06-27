@@ -545,15 +545,13 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
        with a backswing--that doesn't impact actual play, just spoils the
        simulation attempt a bit */
     static boolean clockwise = FALSE;
-    unsigned i;
+    int i;
     coord save_bhitpos;
     int count, umort, x = u.ux, y = u.uy;
 
     /* find the direction toward primary target */
-    for (i = 0; i < 8; ++i)
-        if (xdir[i] == u.dx && ydir[i] == u.dy)
-            break;
-    if (i == 8) {
+    i = xytod(u.dx, u.dy);
+    if (i == DIR_ERR) {
         impossible("hitum_cleave: unknown target direction [%d,%d,%d]?",
                    u.dx, u.dy, u.dz);
         return TRUE; /* target hasn't been killed */
@@ -561,7 +559,7 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
     /* adjust direction by two so that loop's increment (for clockwise)
        or decrement (for counter-clockwise) will point at the spot next
        to primary target */
-    i = (i + (clockwise ? 6 : 2)) % 8;
+    i = clockwise ? DIR_LEFT2(i) : DIR_RIGHT2(i);
     umort = u.umortality; /* used to detect life-saving */
     save_bhitpos = g.bhitpos;
 
@@ -578,7 +576,7 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
         int tx, ty, tmp, dieroll, mhit, attknum, armorpenalty;
 
         /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
-        i = (i + (clockwise ? 1 : 7)) % 8;
+        i = clockwise ? DIR_RIGHT(i) : DIR_LEFT(i);
 
         tx = x + xdir[i], ty = y + ydir[i]; /* current target location */
         if (!isok(tx, ty))

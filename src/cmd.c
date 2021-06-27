@@ -2391,28 +2391,13 @@ dokeylist(void)
     (void) memset((genericptr_t) keys_used, 0, sizeof keys_used);
     (void) memset((genericptr_t) pfx_seen, 0, sizeof pfx_seen);
 
-    keys_used[(uchar) g.Cmd.move_NW] = keys_used[(uchar) g.Cmd.move_N]
-        = keys_used[(uchar) g.Cmd.move_NE] = keys_used[(uchar) g.Cmd.move_W]
-        = keys_used[(uchar) g.Cmd.move_E] = keys_used[(uchar) g.Cmd.move_SW]
-        = keys_used[(uchar) g.Cmd.move_S] = keys_used[(uchar) g.Cmd.move_SE]
-        = TRUE;
+    for (i = 0; i < N_DIRS; i++)
+        keys_used[(uchar) g.Cmd.move[i]] = TRUE;
     if (!iflags.num_pad) {
-        keys_used[(uchar) highc(g.Cmd.move_NW)]
-            = keys_used[(uchar) highc(g.Cmd.move_N)]
-            = keys_used[(uchar) highc(g.Cmd.move_NE)]
-            = keys_used[(uchar) highc(g.Cmd.move_W)]
-            = keys_used[(uchar) highc(g.Cmd.move_E)]
-            = keys_used[(uchar) highc(g.Cmd.move_SW)]
-            = keys_used[(uchar) highc(g.Cmd.move_S)]
-            = keys_used[(uchar) highc(g.Cmd.move_SE)] = TRUE;
-        keys_used[(uchar) C(g.Cmd.move_NW)]
-            = keys_used[(uchar) C(g.Cmd.move_N)]
-            = keys_used[(uchar) C(g.Cmd.move_NE)]
-            = keys_used[(uchar) C(g.Cmd.move_W)]
-            = keys_used[(uchar) C(g.Cmd.move_E)]
-            = keys_used[(uchar) C(g.Cmd.move_SW)]
-            = keys_used[(uchar) C(g.Cmd.move_S)]
-            = keys_used[(uchar) C(g.Cmd.move_SE)] = TRUE;
+        for (i = 0; i < N_DIRS; i++) {
+            keys_used[(uchar) highc(g.Cmd.move[i])] = TRUE;
+            keys_used[(uchar) C(g.Cmd.move[i])] = TRUE;
+        }
     } else {
         /* num_pad */
         keys_used[(uchar) M('1')] = keys_used[(uchar) M('2')]
@@ -3289,14 +3274,8 @@ reset_commands(boolean initial)
                        : (!g.Cmd.phone_layout ? ndir : ndir_phone_layout);
     g.Cmd.alphadirchars = !g.Cmd.num_pad ? g.Cmd.dirchars : sdir;
 
-    g.Cmd.move_W = g.Cmd.dirchars[0];
-    g.Cmd.move_NW = g.Cmd.dirchars[1];
-    g.Cmd.move_N = g.Cmd.dirchars[2];
-    g.Cmd.move_NE = g.Cmd.dirchars[3];
-    g.Cmd.move_E = g.Cmd.dirchars[4];
-    g.Cmd.move_SE = g.Cmd.dirchars[5];
-    g.Cmd.move_S = g.Cmd.dirchars[6];
-    g.Cmd.move_SW = g.Cmd.dirchars[7];
+    for (i = 0; i < N_DIRS; i++)
+        g.Cmd.move[i] = g.Cmd.dirchars[i];
 
     if (!initial) {
         for (i = 0; i < 8; i++) {
@@ -3696,19 +3675,20 @@ xytod(schar x, schar y)
 {
     register int dd;
 
-    for (dd = 0; dd < 8; dd++)
+    for (dd = 0; dd < N_DIRS; dd++)
         if (x == xdir[dd] && y == ydir[dd])
             return dd;
-    return -1;
+    return DIR_ERR;
 }
 
 /* convert a direction code into an x,y pair */
 void
 dtoxy(coord *cc, int dd)
 {
-    cc->x = xdir[dd];
-    cc->y = ydir[dd];
-    return;
+    if (dd > DIR_ERR && dd < N_DIRS_Z) {
+        cc->x = xdir[dd];
+        cc->y = ydir[dd];
+    }
 }
 
 /* also sets u.dz, but returns false for <> */
@@ -3857,26 +3837,26 @@ show_direction_keys(winid win, /* should specify a window which is
         centerchar = ' ';
 
     if (nodiag) {
-        Sprintf(buf, "             %c   ", g.Cmd.move_N);
+        Sprintf(buf, "             %c   ", g.Cmd.move[DIR_N]);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
         Sprintf(buf, "          %c- %c -%c",
-                g.Cmd.move_W, centerchar, g.Cmd.move_E);
+                g.Cmd.move[DIR_W], centerchar, g.Cmd.move[DIR_E]);
         putstr(win, 0, buf);
         putstr(win, 0, "             |   ");
-        Sprintf(buf, "             %c   ", g.Cmd.move_S);
+        Sprintf(buf, "             %c   ", g.Cmd.move[DIR_S]);
         putstr(win, 0, buf);
     } else {
         Sprintf(buf, "          %c  %c  %c",
-                g.Cmd.move_NW, g.Cmd.move_N, g.Cmd.move_NE);
+                g.Cmd.move[DIR_NW], g.Cmd.move[DIR_N], g.Cmd.move[DIR_NE]);
         putstr(win, 0, buf);
         putstr(win, 0, "           \\ | / ");
         Sprintf(buf, "          %c- %c -%c",
-                g.Cmd.move_W, centerchar, g.Cmd.move_E);
+                g.Cmd.move[DIR_W], centerchar, g.Cmd.move[DIR_E]);
         putstr(win, 0, buf);
         putstr(win, 0, "           / | \\ ");
         Sprintf(buf, "          %c  %c  %c",
-                g.Cmd.move_SW, g.Cmd.move_S, g.Cmd.move_SE);
+                g.Cmd.move[DIR_SW], g.Cmd.move[DIR_S], g.Cmd.move[DIR_SE]);
         putstr(win, 0, buf);
     };
 }
@@ -4039,7 +4019,7 @@ help_dir(char sym,
 void
 confdir(void)
 {
-    register int x = NODIAG(u.umonnum) ? 2 * rn2(4) : rn2(8);
+    register int x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
 
     u.dx = xdir[x];
     u.dy = ydir[x];
@@ -4049,12 +4029,12 @@ confdir(void)
 const char *
 directionname(int dir)
 {
-    static NEARDATA const char *const dirnames[] = {
+    static NEARDATA const char *const dirnames[N_DIRS_Z] = {
         "west",      "northwest", "north",     "northeast", "east",
         "southeast", "south",     "southwest", "down",      "up",
     };
 
-    if (dir < 0 || dir >= SIZE(dirnames))
+    if (dir < 0 || dir >= N_DIRS_Z)
         return "invalid";
     return dirnames[dir];
 }

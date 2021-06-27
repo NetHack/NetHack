@@ -3667,12 +3667,10 @@ boomhit(struct obj *obj, int dx, int dy)
     g.bhitpos.x = u.ux;
     g.bhitpos.y = u.uy;
     boom = counterclockwise ? S_boomleft : S_boomright;
-    for (i = 0; i < 8; i++)
-        if (xdir[i] == dx && ydir[i] == dy)
-            break;
+    i = xytod(dx, dy);
     tmp_at(DISP_FLASH, cmap_to_glyph(boom));
     for (ct = 0; ct < 10; ct++) {
-        i = (i + 8) % 8;                          /* 0..7 (8 -> 0, -1 -> 7) */
+        i = DIR_CLAMP(i);
         boom = (S_boomleft + S_boomright - boom); /* toggle */
         tmp_at(DISP_CHANGE, cmap_to_glyph(boom)); /* change glyph */
         dx = xdir[i];
@@ -3713,7 +3711,7 @@ boomhit(struct obj *obj, int dx, int dy)
         /* ct==0, initial position, we want next delta to be same;
            ct==5, opposite position, repeat delta undoes first one */
         if (ct % 5 != 0)
-            i += (counterclockwise ? -1 : 1);
+            i = counterclockwise ? DIR_LEFT(i) : DIR_RIGHT(i);
     }
     tmp_at(DISP_END, 0); /* do not leave last symbol */
     return (struct monst *) 0;
