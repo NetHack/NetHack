@@ -724,6 +724,7 @@ corpse of monster with gender specific names (king vs queen and so forth)
 prevent obj_pmname() from calling mon_pmname(monst) when monst->data is null
 	to prevent a null pointer dereference
 correct the pluralization of monarch to monarchs, rather than monarches
+don't allow web spun by spider to interfere with solving Soloban
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
