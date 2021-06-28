@@ -3186,7 +3186,7 @@ reset_commands(boolean initial)
     static const int ylist[] = {
         'y', 'Y', C('y'), M('y'), M('Y'), M(C('y'))
     };
-    static struct ext_func_tab *back_dir_cmd[8];
+    static struct ext_func_tab *back_dir_cmd[N_DIRS];
     static boolean backed_dir_cmd = FALSE;
     const struct ext_func_tab *cmdtmp;
     boolean flagtemp;
@@ -3201,7 +3201,7 @@ reset_commands(boolean initial)
         commands_init();
     } else {
         if (backed_dir_cmd) {
-            for (i = 0; i < 8; i++) {
+            for (i = 0; i < N_DIRS; i++) {
                 g.Cmd.commands[(uchar) g.Cmd.dirchars[i]] = back_dir_cmd[i];
             }
         }
@@ -3278,14 +3278,14 @@ reset_commands(boolean initial)
         g.Cmd.move[i] = g.Cmd.dirchars[i];
 
     if (!initial) {
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < N_DIRS; i++) {
             uchar di = (uchar) g.Cmd.dirchars[i];
 
             back_dir_cmd[i] = (struct ext_func_tab *) g.Cmd.commands[di];
             g.Cmd.commands[di] = (struct ext_func_tab *) 0;
         }
         backed_dir_cmd = TRUE;
-        for (i = 0; i < 8; i++)
+        for (i = 0; i < N_DIRS; i++)
             (void) bind_key(g.Cmd.dirchars[i], "nothing");
     }
 }
@@ -3353,7 +3353,7 @@ randomkey(void)
     case 10:
     case 11:
     case 12:
-        c = g.Cmd.dirchars[rn2(8)];
+        c = g.Cmd.dirchars[rn2(N_DIRS)];
         if (!rn2(7))
             c = !g.Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
         break;
