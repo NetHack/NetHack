@@ -15,7 +15,7 @@ NEARDATA long yn_number = 0L;
 
 const char disclosure_options[] = "iavgco";
 
-/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 up/down) */
+/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
 const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
 const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
 const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };

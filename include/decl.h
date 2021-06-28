@@ -183,8 +183,8 @@ enum movementdirs {
     DIR_SE,
     DIR_S,
     DIR_SW,
-    DIR_UP,
     DIR_DOWN,
+    DIR_UP,
 
     N_DIRS_Z
 };
