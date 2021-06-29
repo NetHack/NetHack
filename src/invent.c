@@ -927,9 +927,11 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     if (flags.pickup_thrown && !uquiver && obj_was_thrown
         /* if Mjollnir is thrown and fails to return, we want to
            auto-pick it when we move to its spot, but not into quiver;
-           aklyses behave like Mjollnir when thrown while wielded, but
-           we lack sufficient information here make them exceptions */
+           aklyses behave like Mjollnir when thrown while wielded, so
+           treat them similarly unless hero is wielding something else
+           already. */
         && obj->oartifact != ART_MJOLLNIR
+        && (obj->otyp != AKLYS || uwep)
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
  added:
