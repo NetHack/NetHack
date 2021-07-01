@@ -1102,22 +1102,37 @@ peffects(struct obj *otmp)
         break;
     }
     case POT_OIL: { /* P. Winner */
-        boolean good_for_you = FALSE;
+        boolean good_for_you = FALSE, vulnerable;
 
         if (otmp->lamplit) {
             if (likes_fire(g.youmonst.data)) {
                 pline("Ahh, a refreshing drink.");
                 good_for_you = TRUE;
             } else {
+                /*
+                 * Note: if poly'd into green slime, hero ought to take
+                 * extra damage, but drinking potions in that form isn't
+                 * possible so there's no need to try to handle that.
+                 */
                 You("burn your %s.", body_part(FACE));
                 /* fire damage */
-                losehp(d(Fire_resistance ? 1 : 3, 4), "burning potion of oil",
-                       KILLED_BY_AN);
+                vulnerable = !Fire_resistance || Cold_resistance;
+                losehp(d(vulnerable ? 4 : 2, 4),
+                       "quaffing a burning potion of oil",
+                       KILLED_BY);
             }
-        } else if (otmp->cursed)
+            /*
+             * This is slightly iffy because the burning isn't being
+             * spread across the body.  But the message is "the slime
+             * that covers you burns away" and having that follow
+             * "you burn your face" seems consistent enough.
+             */
+            burn_away_slime();
+        } else if (otmp->cursed) {
             pline("This tastes like castor oil.");
-        else
+        } else {
             pline("That was smooth!");
+        }
         exercise(A_WIS, good_for_you);
         break;
     }

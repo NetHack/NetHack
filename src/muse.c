@@ -300,7 +300,8 @@ mquaffmsg(struct monst* mtmp, struct obj* otmp)
 static boolean
 m_use_healing(struct monst* mtmp)
 {
-    struct obj *obj = 0;
+    struct obj *obj;
+
     if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
         g.m.defensive = obj;
         g.m.has_defense = MUSE_POT_FULL_HEALING;
@@ -2795,6 +2796,38 @@ muse_unslime(
                     by_you ? -EXPL_FIERY : EXPL_FIERY);
             dmg = 0; /* damage has been applied by explode() */
         }
+    } else if (otyp == POT_OIL) {
+        char Pronoun[40];
+        boolean was_lit = obj->lamplit ? TRUE : FALSE, saw_lit = FALSE;
+        /*
+         * If not already lit, requires two actions.  We cheat and let
+         * monster do both rather than render the potion unuseable.
+         *
+         * Monsters don't start with oil and don't actively pick up oil
+         * so this may never occur in a real game.  (Possible though;
+         * nymph can steal potions of oil; shapechanger could take on
+         * nymph form or vacuum up stuff as a g.cube and then eventually
+         * engage with a green slime.)
+         */
+
+        if (obj->quan > 1L)
+            obj = splitobj(obj, 1L);
+        if (vis && !was_lit) {
+            pline("%s ignites %s.", Monnam(mon), ansimpleoname(obj));
+            saw_lit = TRUE;
+        }
+        begin_burn(obj, was_lit);
+        vis |= canseemon(mon); /* burning potion may improve visibility */
+        if (vis) {
+            if (!Unaware)
+                obj->dknown = 1; /* hero is watching mon drink obj */
+            pline("%s quaffs a burning %s",
+                  saw_lit ? upstart(strcpy(Pronoun, mhe(mon))) : Monnam(mon),
+                  simpleonames(obj));
+            makeknown(POT_OIL);
+        }
+        dmg = d(3, 4); /* [**TEMP** (different from hero)] */
+        m_useup(mon, obj);
     } else { /* wand/horn of fire w/ positive charge count */
         mplayhorn(mon, obj, TRUE);
         /* -1 => monster's wand of fire; 2 => # of damage dice */
@@ -2837,12 +2870,18 @@ muse_unslime(
 
 /* decide whether obj can be used to cure green slime */
 static int
-cures_sliming(struct monst* mon, struct obj* obj)
+cures_sliming(struct monst *mon, struct obj *obj)
 {
-    /* scroll of fire, non-empty wand or horn of fire */
+    /* scroll of fire */
     if (obj->otyp == SCR_FIRE)
-        return (haseyes(mon->data) && mon->mcansee);
-    /* hero doesn't need hands or even limbs to zap, so mon doesn't either */
+        return (haseyes(mon->data) && mon->mcansee && !nohands(mon->data));
+
+    /* potion of oil; will be set burning if not already */
+    if (obj->otyp == POT_OIL)
+        return !nohands(mon->data);
+
+    /* non-empty wand or horn of fire;
+       hero doesn't need hands or even limbs to zap, so mon doesn't either */
     return ((obj->otyp == WAN_FIRE
              || (obj->otyp == FIRE_HORN && can_blow(mon)))
             && obj->spe > 0);
