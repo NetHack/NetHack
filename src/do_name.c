@@ -17,6 +17,7 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(int, int, int);
 static void gather_locs(coord **, int *, int);
 static void auto_describe(int, int);
+static void truncate_to_map(int *, int *, schar, schar);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
 static void do_oname(struct obj *);
@@ -623,6 +624,29 @@ getpos_menu(coord *ccp, int gloc)
     return (pick_cnt > 0);
 }
 
+/* add dx,dy to cx,cy, truncating at map edges */
+static void
+truncate_to_map(int *cx, int *cy, schar dx, schar dy)
+{
+    /* diagonal moves complicate this... */
+    if (*cx + dx < 1) {
+        dy -= sgn(dy) * (1 - (*cx + dx));
+        dx = 1 - *cx; /* so that (cx+dx == 1) */
+    } else if (*cx + dx > COLNO - 1) {
+        dy += sgn(dy) * ((COLNO - 1) - (*cx + dx));
+        dx = (COLNO - 1) - *cx;
+    }
+    if (*cy + dy < 0) {
+        dx -= sgn(dx) * (0 - (*cy + dy));
+        dy = 0 - *cy; /* so that (cy+dy == 0) */
+    } else if (*cy + dy > ROWNO - 1) {
+        dx += sgn(dx) * ((ROWNO - 1) - (*cy + dy));
+        dy = (ROWNO - 1) - *cy;
+    }
+    *cx += dx;
+    *cy += dy;
+}
+
 int
 getpos(coord *ccp, boolean force, const char *goal)
 {
@@ -758,23 +782,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             } else
                 continue;
 
-            /* truncate at map edge; diagonal moves complicate this... */
-            if (cx + dx < 1) {
-                dy -= sgn(dy) * (1 - (cx + dx));
-                dx = 1 - cx; /* so that (cx+dx == 1) */
-            } else if (cx + dx > COLNO - 1) {
-                dy += sgn(dy) * ((COLNO - 1) - (cx + dx));
-                dx = (COLNO - 1) - cx;
-            }
-            if (cy + dy < 0) {
-                dx -= sgn(dx) * (0 - (cy + dy));
-                dy = 0 - cy; /* so that (cy+dy == 0) */
-            } else if (cy + dy > ROWNO - 1) {
-                dx += sgn(dx) * ((ROWNO - 1) - (cy + dy));
-                dy = (ROWNO - 1) - cy;
-            }
-            cx += dx;
-            cy += dy;
+            truncate_to_map(&cx, &cy, dx, dy);
             goto nxtc;
         }
 
