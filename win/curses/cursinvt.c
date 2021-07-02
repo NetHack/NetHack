@@ -151,7 +151,11 @@ curs_scroll_invt(WINDOW *win UNUSED)
              menukeys, *menukeys ? " " : "", "Ret Esc");
 
     curses_count_window(qbuf);
+#ifdef REALTIME_ON_BOTL
+    ch = getch_timeout();
+#else
     ch = getch();
+#endif
     curses_count_window((char *) 0);
     curses_clear_unhighlight_message_window();
 

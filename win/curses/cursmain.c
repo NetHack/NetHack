@@ -816,7 +816,6 @@ curses_nhgetch(void)
     curses_prehousekeeping();
     ch = curses_read_char();
     curses_posthousekeeping();
-
     return ch;
 }
 

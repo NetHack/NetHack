@@ -15,7 +15,9 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
 
 static const char *rank(void);
 static void bot_via_windowport(void);
+#ifndef REALTIME_ON_BOTL
 static void stat_update_time(void);
+#endif
 #ifdef STATUS_HILITES
 static unsigned long query_conditions(void);
 static boolean status_hilite_remove(int);
@@ -986,7 +988,11 @@ bot_via_windowport(void)
 
 
 /* update just the status lines' 'time' and 'realtime' fields */
+#ifdef REALTIME_ON_BOTL
+void
+#else
 static void
+#endif
 stat_update_time(void)
 {
     int idx = g.now_or_before_idx; /* no 0/1 toggle */

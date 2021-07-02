@@ -30,7 +30,11 @@ static int curses_status_colors[MAXBLSTATS];
 static int hpbar_percent, hpbar_color;
 static int vert_status_dirty;
 
+#ifdef REALTIME_ON_BOTL
+void draw_status(void);
+#else
 static void draw_status(void);
+#endif
 static void draw_vertical(boolean);
 static void draw_horizontal(boolean);
 static void curs_HPbar(char *, int);
@@ -206,7 +210,11 @@ curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+#ifdef REALTIME_ON_BOTL
+void
+#else
 static void
+#endif
 draw_status(void)
 {
     WINDOW *win = curses_get_nhwin(STATUS_WIN);

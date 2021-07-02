@@ -265,4 +265,8 @@ struct istat_s {
 
 extern const char *status_fieldnames[]; /* in botl.c */
 
+#ifdef REALTIME_ON_BOTL
+void stat_update_time(void);
+#endif
+
 #endif /* BOTL_H */
