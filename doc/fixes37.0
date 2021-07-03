@@ -555,6 +555,7 @@ perm_invent: when buying shop goods using itemized purchasing while persistent
 	soon as any item was bought (actual item-by-item purchase worked ok)
 change getloc fastmove keys in number_pad mode from hardcoded HJKL to the
 	run/rush movement keys (meta+number)
+allow using rush/run prefix key in getloc to fastmove the cursor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

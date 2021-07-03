@@ -108,6 +108,8 @@ getpos_help(boolean force, const char *goal)
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
+    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
+    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     Sprintf(sbuf,
             "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
@@ -119,6 +121,9 @@ getpos_help(boolean force, const char *goal)
             visctrl(g.Cmd.run[DIR_W]), visctrl(g.Cmd.run[DIR_S]),
             visctrl(g.Cmd.run[DIR_N]), visctrl(g.Cmd.run[DIR_E]),
             fastmovemode[iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
+    Sprintf(sbuf, "(or prefix normal move with '%s' or '%s' to fast-move)",
+            visctrl(g.Cmd.spkeys[runkey]), visctrl(g.Cmd.spkeys[rushkey]));
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
@@ -688,6 +693,9 @@ getpos(coord *ccp, boolean force, const char *goal)
     int gidx[NUM_GLOCS] = DUMMY;
     schar udx = u.dx, udy = u.dy, udz = u.dz;
     int dx, dy;
+    boolean rushrun = FALSE;
+    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
+    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
         pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
@@ -724,6 +732,8 @@ getpos(coord *ccp, boolean force, const char *goal)
             auto_describe(cx, cy);
         }
 
+        rushrun = FALSE;
+
         c = readchar_poskey(&tx, &ty, &sidx);
 
         if (hilite_state) {
@@ -742,6 +752,10 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = -1;
             break;
         }
+        if (c == g.Cmd.spkeys[runkey] || c == g.Cmd.spkeys[rushkey]) {
+            c = readchar_poskey(&tx, &ty, &sidx);
+            rushrun = TRUE;
+        }
         if (c == 0) {
             if (!isok(tx, ty))
                 continue;
@@ -755,11 +769,14 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
         } else if (movecmd(c, MV_WALK)) {
+            if (rushrun)
+                goto do_rushrun;
             dx = u.dx;
             dy = u.dy;
             truncate_to_map(&cx, &cy, dx, dy);
             goto nxtc;
         } else if (movecmd(c, MV_RUSH) || movecmd(c, MV_RUN)) {
+ do_rushrun:
             if (iflags.getloc_moveskip) {
                 /* skip same glyphs */
                 int glyph = glyph_at(cx, cy);
