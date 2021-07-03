@@ -959,10 +959,11 @@ dig_up_grave(coord *cc)
 int
 use_pick_axe(struct obj *obj)
 {
-    const char *sdp, *verb;
+    const char *verb;
     char *dsp, dirsyms[12], qbuf[BUFSZ];
     boolean ispick;
     int rx, ry, downok, res = 0;
+    int dir;
 
     /* Check tool */
     if (obj != uwep) {
@@ -985,13 +986,19 @@ use_pick_axe(struct obj *obj)
     /* construct list of directions to show player for likely choices */
     downok = !!can_reach_floor(FALSE);
     dsp = dirsyms;
-    for (sdp = g.Cmd.dirchars; *sdp; ++sdp) {
+    for (dir = 0; dir < N_DIRS_Z; dir++) {
+        char dirch;
+        if (dir == DIR_DOWN)
+            dirch = cmd_from_func(dodown);
+        else if (dir == DIR_UP)
+            dirch = cmd_from_func(doup);
+        else
+            dirch = g.Cmd.move[dir];
         /* filter out useless directions */
         if (u.uswallow) {
             ; /* all directions are viable when swallowed */
-        } else if (movecmd(*sdp)) {
-            /* normal direction, within plane of the level map;
-               movecmd() sets u.dx, u.dy, u.dz and returns !u.dz */
+        } else if (movecmd(dirch, MV_WALK)) {
+            /* normal direction, within plane of the level map */
             if (!dxdy_moveok())
                 continue; /* handle NODIAG */
             rx = u.ux + u.dx;
@@ -1008,7 +1015,7 @@ use_pick_axe(struct obj *obj)
                 continue;
         }
         /* include this direction */
-        *dsp++ = *sdp;
+        *dsp++ = dirch;
     }
     *dsp = 0;
     Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);

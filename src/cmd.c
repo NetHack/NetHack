@@ -6,10 +6,6 @@
 #include "hack.h"
 #include "func_tab.h"
 
-#ifdef ALTMETA
-static boolean alt_esc = FALSE;
-#endif
-
 #ifdef UNIX
 /*
  * Some systems may have getchar() return EOF for various reasons, and
@@ -154,6 +150,7 @@ static boolean accept_menu_prefix(int (*)(void));
 static void add_herecmd_menuitem(winid, int (*)(void), const char *);
 static char here_cmd_menu(boolean);
 static char there_cmd_menu(boolean, int, int);
+static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
 static boolean help_dir(char, int, const char *);
@@ -2194,11 +2191,11 @@ key2extcmddesc(uchar key)
        commands table because it contains entries for number_pad commands
        that match !number_pad movement (like 'j' for "jump") */
     key2cmdbuf[0] = '\0';
-    if (movecmd(k = key))
+    if (movecmd(k = key, MV_WALK))
         Strcpy(key2cmdbuf, "move"); /* "move or attack"? */
-    else if (movecmd(k = unctrl(key)))
+    else if (movecmd(k = key, MV_RUSH))
         Strcpy(key2cmdbuf, "rush");
-    else if (movecmd(k = (g.Cmd.num_pad ? unmeta(key) : lowc(key))))
+    else if (movecmd(k = key, MV_RUN))
         Strcpy(key2cmdbuf, "run");
     if (*key2cmdbuf) {
         for (mov = &movtab[0]; mov->k1; ++mov) {
@@ -2391,19 +2388,10 @@ dokeylist(void)
     (void) memset((genericptr_t) keys_used, 0, sizeof keys_used);
     (void) memset((genericptr_t) pfx_seen, 0, sizeof pfx_seen);
 
-    for (i = 0; i < N_DIRS; i++)
+    for (i = 0; i < N_DIRS; i++) {
         keys_used[(uchar) g.Cmd.move[i]] = TRUE;
-    if (!iflags.num_pad) {
-        for (i = 0; i < N_DIRS; i++) {
-            keys_used[(uchar) highc(g.Cmd.move[i])] = TRUE;
-            keys_used[(uchar) C(g.Cmd.move[i])] = TRUE;
-        }
-    } else {
-        /* num_pad */
-        keys_used[(uchar) M('1')] = keys_used[(uchar) M('2')]
-            = keys_used[(uchar) M('3')] = keys_used[(uchar) M('4')]
-            = keys_used[(uchar) M('6')] = keys_used[(uchar) M('7')]
-            = keys_used[(uchar) M('8')] = keys_used[(uchar) M('9')] = TRUE;
+        keys_used[(uchar) g.Cmd.rush[i]] = TRUE;
+        keys_used[(uchar) g.Cmd.run[i]] = TRUE;
     }
 #ifndef NO_SIGNAL
     /* this is actually ambiguous; tty raw mode will override SIGINT;
@@ -3274,8 +3262,16 @@ reset_commands(boolean initial)
                        : (!g.Cmd.phone_layout ? ndir : ndir_phone_layout);
     g.Cmd.alphadirchars = !g.Cmd.num_pad ? g.Cmd.dirchars : sdir;
 
-    for (i = 0; i < N_DIRS; i++)
+    for (i = 0; i < N_DIRS; i++) {
         g.Cmd.move[i] = g.Cmd.dirchars[i];
+        if (!g.Cmd.num_pad) {
+            g.Cmd.run[i]  = highc(g.Cmd.move[i]);
+            g.Cmd.rush[i] = C(g.Cmd.move[i]);
+        } else {
+            g.Cmd.run[i]  = M(g.Cmd.move[i]);
+            g.Cmd.rush[i] = M(g.Cmd.move[i]);
+        }
+    }
 
     if (!initial) {
         for (i = 0; i < N_DIRS; i++) {
@@ -3353,9 +3349,13 @@ randomkey(void)
     case 10:
     case 11:
     case 12:
-        c = g.Cmd.dirchars[rn2(N_DIRS)];
-        if (!rn2(7))
-            c = !g.Cmd.num_pad ? (!rn2(3) ? C(c) : (c + 'A' - 'a')) : M(c);
+        {
+            int d = rn2(N_DIRS);
+            if (!rn2(7))
+                c = !rn2(3) ? g.Cmd.rush[d] : g.Cmd.run[d];
+            else
+                c = g.Cmd.move[d];
+        }
         break;
     case 13:
         c = (char) rn1('9' - '0' + 1, '0');
@@ -3469,7 +3469,7 @@ rhack(char *cmd)
             break;
         /*FALLTHRU*/
     case NHKF_RUSH:
-        if (movecmd(cmd[1])) {
+        if (movecmd(cmd[1], MV_ANY)) {
             g.context.run = 2;
             g.domove_attempting |= DOMOVE_RUSH;
         } else
@@ -3480,7 +3480,7 @@ rhack(char *cmd)
             break;
         /*FALLTHRU*/
     case NHKF_RUN:
-        if (movecmd(lowc(cmd[1]))) {
+        if (movecmd(cmd[1], MV_ANY)) {
             g.context.run = 3;
             g.domove_attempting |= DOMOVE_RUSH;
         } else
@@ -3496,14 +3496,14 @@ rhack(char *cmd)
      * normal movement: attack if 'I', move otherwise.
      */
     case NHKF_FIGHT:
-        if (movecmd(cmd[1])) {
+        if (movecmd(cmd[1], MV_ANY)) {
             g.context.forcefight = 1;
             g.domove_attempting |= DOMOVE_WALK;
         } else
             prefix_seen = TRUE;
         break;
     case NHKF_NOPICKUP:
-        if (movecmd(cmd[1]) || u.dz) {
+        if (movecmd(cmd[1], MV_ANY) || u.dz) {
             g.context.run = 0;
             g.context.nopick = 1;
             if (!u.dz)
@@ -3514,7 +3514,7 @@ rhack(char *cmd)
             prefix_seen = TRUE;
         break;
     case NHKF_RUN_NOPICKUP:
-        if (movecmd(lowc(cmd[1]))) {
+        if (movecmd(cmd[1], MV_ANY)) {
             g.context.run = 1;
             g.context.nopick = 1;
             g.domove_attempting |= DOMOVE_RUSH;
@@ -3542,13 +3542,13 @@ rhack(char *cmd)
         g.domove_attempting |= DOMOVE_RUSH;
         break;
     default:
-        if (movecmd(*cmd)) { /* ordinary movement */
+        if (movecmd(*cmd, MV_WALK)) { /* ordinary movement */
             g.context.run = 0; /* only matters here if it was 8 */
             g.domove_attempting |= DOMOVE_WALK;
-        } else if (movecmd(g.Cmd.num_pad ? unmeta(*cmd) : lowc(*cmd))) {
+        } else if (movecmd(*cmd, MV_RUN)) {
             g.context.run = 1;
             g.domove_attempting |= DOMOVE_RUSH;
-        } else if (movecmd(unctrl(*cmd))) {
+        } else if (movecmd(*cmd, MV_RUSH)) {
             g.context.run = 3;
             g.domove_attempting |= DOMOVE_RUSH;
         }
@@ -3693,26 +3693,41 @@ dtoxy(coord *cc, int dd)
 
 /* also sets u.dz, but returns false for <> */
 int
-movecmd(char sym)
+movecmd(char sym, int mode)
 {
-    register const char *dp = index(g.Cmd.dirchars, sym);
+    int d = DIR_ERR;
 
-    u.dz = 0;
-    if (!dp || !*dp)
-        return 0;
-    u.dx = xdir[dp - g.Cmd.dirchars];
-    u.dy = ydir[dp - g.Cmd.dirchars];
-    u.dz = zdir[dp - g.Cmd.dirchars];
-#if 0 /* now handled elsewhere */
-    if (u.dx && u.dy && NODIAG(u.umonnum)) {
-        u.dx = u.dy = 0;
-        return 0;
+    if (g.Cmd.commands[(uchar)sym]
+        && g.Cmd.commands[(uchar)sym]->ef_funct == dodown) {
+        d = DIR_DOWN;
+    } else if (g.Cmd.commands[(uchar)sym]
+               && g.Cmd.commands[(uchar)sym]->ef_funct == doup) {
+        d = DIR_UP;
+    } else {
+        char *mvkeys = (mode == MV_WALK) ? g.Cmd.move :
+            ((mode == MV_RUN) ? g.Cmd.run : g.Cmd.rush);
+
+        for (d = 0; d < N_DIRS; d++) {
+            if (mode == MV_ANY) {
+                if (sym == g.Cmd.move[d]
+                    || sym == g.Cmd.rush[d]
+                    || sym == g.Cmd.run[d])
+                    break;
+            } else if (sym == mvkeys[d])
+                break;
+        }
     }
-#endif
-    return !u.dz;
+    if (d != DIR_ERR) {
+        u.dx = xdir[d];
+        u.dy = ydir[d];
+        u.dz = zdir[d];
+        return !u.dz;
+    }
+    u.dz = 0;
+    return 0;
 }
 
-/* grid bug handling which used to be in movecmd() */
+/* grid bug handling */
 int
 dxdy_moveok(void)
 {
@@ -3799,7 +3814,7 @@ getdir(const char *s)
     if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
         || dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF2]) {
         u.dx = u.dy = u.dz = 0;
-    } else if (!(is_mov = movecmd(dirsym)) && !u.dz) {
+    } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
 
         if (!index(quitchars, dirsym)) {
@@ -4297,7 +4312,7 @@ here_cmd_menu(boolean doit)
 }
 
 /*
- * convert a MAP window position into a movecmd
+ * convert a MAP window position into a movement key usable with movecmd()
  */
 const char *
 click_to_cmd(int x, int y, int mod)
@@ -4374,7 +4389,7 @@ click_to_cmd(int x, int y, int mod)
         dir = xytod(x, y);
         if (!m_at(u.ux + x, u.uy + y)
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
-            cmd[1] = g.Cmd.dirchars[dir];
+            cmd[1] = g.Cmd.move[dir];
             cmd[2] = '\0';
 
             if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
@@ -4418,11 +4433,9 @@ click_to_cmd(int x, int y, int mod)
     /* move, attack, etc. */
     cmd[1] = 0;
     if (mod == CLICK_1) {
-        cmd[0] = g.Cmd.dirchars[dir];
+        cmd[0] = g.Cmd.move[dir];
     } else {
-        cmd[0] = (g.Cmd.num_pad
-                     ? M(g.Cmd.dirchars[dir])
-                     : (g.Cmd.dirchars[dir] - 'a' + 'A')); /* run command */
+        cmd[0] = g.Cmd.run[dir];
     }
 
     return cmd;
@@ -4499,16 +4512,10 @@ parse(void)
     g.context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
-#ifdef ALTMETA
-    alt_esc = iflags.altmeta; /* readchar() hack */
-#endif
     if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
         foo = get_count((char *) 0, '\0', LARGEST_INT, &g.command_count, FALSE);
         g.last_command_count = g.command_count;
     }
-#ifdef ALTMETA
-    alt_esc = FALSE; /* readchar() reset */
-#endif
 
     if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
         && (g.Cmd.commands[foo & 0x0ff]
@@ -4627,18 +4634,17 @@ end_of_input(void)
 }
 #endif /* HANGUPHANDLING */
 
-char
-readchar(void)
+static char
+readchar_core(int *x, int *y, int *mod)
 {
     register int sym;
-    int x = u.ux, y = u.uy, mod = 0;
 
     if (iflags.debug_fuzzer)
         return randomkey();
     if (*readchar_queue)
         sym = *readchar_queue++;
     else
-        sym = g.in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
+        sym = g.in_doagain ? pgetchar() : nh_poskey(x, y, mod);
 
 #ifdef NR_OF_EOFS
     if (sym == EOF) {
@@ -4661,7 +4667,7 @@ readchar(void)
 #endif
         sym = '\033';
 #ifdef ALTMETA
-    } else if (sym == '\033' && alt_esc) {
+    } else if (sym == '\033' && iflags.altmeta) {
         /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' */
         sym = *readchar_queue ? *readchar_queue++ : pgetchar();
         if (sym == EOF || sym == 0)
@@ -4671,10 +4677,29 @@ readchar(void)
 #endif /*ALTMETA*/
     } else if (sym == 0) {
         /* click event */
-        readchar_queue = click_to_cmd(x, y, mod);
+        readchar_queue = click_to_cmd(*x, *y, *mod);
         sym = *readchar_queue++;
     }
     return (char) sym;
+}
+
+char
+readchar(void)
+{
+    char ch;
+    int x = u.ux, y = u.uy, mod = 0;
+
+    ch = readchar_core(&x, &y, &mod);
+    return ch;
+}
+
+char
+readchar_poskey(int *x, int *y, int *mod)
+{
+    char ch;
+
+    ch = readchar_core(x, y, mod);
+    return ch;
 }
 
 /* '_' command, #travel, via keyboard rather than mouse click */

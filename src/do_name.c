@@ -110,12 +110,14 @@ getpos_help(boolean force, const char *goal)
     winid tmpwin = create_nhwindow(NHW_MENU);
 
     Sprintf(sbuf,
-            "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
-            g.Cmd.move[DIR_W], g.Cmd.move[DIR_S],
-            g.Cmd.move[DIR_N], g.Cmd.move[DIR_E], goal);
+            "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
+            visctrl(g.Cmd.move[DIR_W]), visctrl(g.Cmd.move[DIR_S]),
+            visctrl(g.Cmd.move[DIR_N]), visctrl(g.Cmd.move[DIR_E]), goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
-            "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
+            "Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s.",
+            visctrl(g.Cmd.run[DIR_W]), visctrl(g.Cmd.run[DIR_S]),
+            visctrl(g.Cmd.run[DIR_N]), visctrl(g.Cmd.run[DIR_E]),
             fastmovemode[iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
@@ -684,6 +686,8 @@ getpos(coord *ccp, boolean force, const char *goal)
     coord *garr[NUM_GLOCS] = DUMMY;
     int gcount[NUM_GLOCS] = DUMMY;
     int gidx[NUM_GLOCS] = DUMMY;
+    schar udx = u.dx, udy = u.dy, udz = u.dz;
+    int dx, dy;
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
         pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
@@ -720,7 +724,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             auto_describe(cx, cy);
         }
 
-        c = nh_poskey(&tx, &ty, &sidx);
+        c = readchar_poskey(&tx, &ty, &sidx);
 
         if (hilite_state) {
             (*getpos_hilitefunc)(2);
@@ -750,38 +754,31 @@ getpos(coord *ccp, boolean force, const char *goal)
             /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
             result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
-        }
-        for (i = 0; i < N_DIRS; i++) {
-            int dx, dy;
+        } else if (movecmd(c, MV_WALK)) {
+            dx = u.dx;
+            dy = u.dy;
+            truncate_to_map(&cx, &cy, dx, dy);
+            goto nxtc;
+        } else if (movecmd(c, MV_RUSH) || movecmd(c, MV_RUN)) {
+            if (iflags.getloc_moveskip) {
+                /* skip same glyphs */
+                int glyph = glyph_at(cx, cy);
 
-            if (g.Cmd.dirchars[i] == c) {
-                /* a normal movement letter or digit */
-                dx = xdir[i];
-                dy = ydir[i];
-            } else if (g.Cmd.alphadirchars[i] == lowc((char) c)
-                       || (g.Cmd.num_pad && g.Cmd.dirchars[i] == (c & 0177))) {
-                /* a shifted movement letter or Meta-digit */
-                if (iflags.getloc_moveskip) {
-                    /* skip same glyphs */
-                    int glyph = glyph_at(cx, cy);
+                dx = u.dx;
+                dy = u.dy;
+                while (isok(cx + dx, cy + dy)
+                       && glyph == glyph_at(cx + dx, cy + dy)
+                       && isok(cx + dx + xdir[i], cy + dy + ydir[i])
+                       && glyph == glyph_at(cx + dx + xdir[i],
+                                            cy + dy + ydir[i])) {
+                    dx += u.dx;
+                    dy += u.dy;
 
-                    dx = xdir[i];
-                    dy = ydir[i];
-                    while (isok(cx + dx, cy + dy)
-                           && glyph == glyph_at(cx + dx, cy + dy)
-                           && isok(cx + dx + xdir[i], cy + dy + ydir[i])
-                           && glyph == glyph_at(cx + dx + xdir[i],
-                                                cy + dy + ydir[i])) {
-                        dx += xdir[i];
-                        dy += ydir[i];
-                    }
-                } else {
-                    dx = 8 * xdir[i];
-                    dy = 8 * ydir[i];
                 }
-            } else
-                continue;
-
+            } else {
+                dx = 8 * u.dx;
+                dy = 8 * u.dy;
+            }
             truncate_to_map(&cx, &cy, dx, dy);
             goto nxtc;
         }
@@ -994,6 +991,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void (*)(int)) 0;
     getpos_getvalid = (boolean (*)(int, int)) 0;
+    u.dx = udx, u.dy = udy, u.dz = udz;
     return result;
 }
 

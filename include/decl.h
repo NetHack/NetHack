@@ -173,6 +173,15 @@ struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 };
 
+enum movemodes {
+    MV_ANY = -1,
+    MV_WALK,
+    MV_RUN,
+    MV_RUSH,
+
+    N_MOVEMODES
+};
+
 enum movementdirs {
     DIR_ERR = -1,
     DIR_W,
@@ -500,6 +509,8 @@ struct cmd {
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
     boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
     char move[N_DIRS];     /* char used for moving one step in direction */
+    char rush[N_DIRS];
+    char run[N_DIRS];
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */

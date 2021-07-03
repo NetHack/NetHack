@@ -553,6 +553,8 @@ shopkeepers can remove pits and webs
 perm_invent: when buying shop goods using itemized purchasing while persistent
 	inventory window was enabled, the prices of unpaid items went away as
 	soon as any item was bought (actual item-by-item purchase worked ok)
+change getloc fastmove keys in number_pad mode from hardcoded HJKL to the
+	run/rush movement keys (meta+number)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

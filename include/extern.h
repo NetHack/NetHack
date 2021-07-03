@@ -225,7 +225,7 @@ extern boolean bind_key(uchar, const char *);
 extern void dokeylist(void);
 extern int xytod(schar, schar);
 extern void dtoxy(coord *, int);
-extern int movecmd(char);
+extern int movecmd(char, int);
 extern int dxdy_moveok(void);
 extern int getdir(const char *);
 extern void confdir(void);
@@ -239,6 +239,7 @@ extern void hangup(int);
 extern void end_of_input(void);
 #endif
 extern char readchar(void);
+extern char readchar_poskey(int *, int *, int *);
 extern void sanity_check(void);
 extern char* key2txt(uchar, char *);
 extern char yn_function(const char *, const char *, char);
