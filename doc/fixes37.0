@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.578 $ $NHDT-Date: 1624656533 2021/06/25 21:28:53 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.581 $ $NHDT-Date: 1625277130 2021/07/03 01:52:10 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -548,8 +548,11 @@ using a bullwhip to snatch a wielded cockatrice corpse from a monster when not
 make fire-command autowield an appropriate launcher and add fireassist boolean
 	option to toggle the assistance off
 Angels and priests were always described as "the {Angel,priest,high priest} of
-	<deity>" when first two should have been "{an Angel,a high priest}..."
+	<deity>" when first two should have been "{an Angel,a priest}..."
 shopkeepers can remove pits and webs
+perm_invent: when buying shop goods using itemized purchasing while persistent
+	inventory window was enabled, the prices of unpaid items went away as
+	soon as any item was bought (actual item-by-item purchase worked ok)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

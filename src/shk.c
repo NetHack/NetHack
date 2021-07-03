@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1620861209 2021/05/12 23:13:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1625277130 2021/07/03 01:52:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1621,6 +1621,8 @@ dopayobj(
                   ltmp, "");
     obj->quan = save_quan; /* restore original count */
     /* quan => amount just bought, save_quan => remaining unpaid count */
+
+    iflags.suppress_price--; /* before update_inventory() below */
     if (consumed) {
         if (quan != bp->bquan) {
             /* eliminate used-up portion; remainder is still unpaid */
@@ -1634,9 +1636,9 @@ dopayobj(
             dealloc_obj(obj);
             *obj_p = 0; /* destroy pointer to freed object */
         }
-    } else if (itemize)
+    } else if (itemize) {
         update_inventory(); /* Done just once in dopay() if !itemize. */
-    iflags.suppress_price--;
+    }
     return buy;
 }
 
