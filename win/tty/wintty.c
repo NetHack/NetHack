@@ -78,8 +78,10 @@ extern short glyph2tile[];
 #endif /* ?HANGUP_HANDLING */
 
 #ifdef REALTIME_ON_BOTL
-#include <sys/select.h>
+#ifdef UNIX
+#include <poll.h>
 #include <time.h>
+#endif
 #endif
 
 /* Interface definition, for windows.c */
@@ -3519,16 +3521,16 @@ tty_nhgetch(void)
     } else {
 #ifdef UNIX
 #ifdef REALTIME_ON_BOTL
-        fd_set read_set;
+        struct pollfd pf;
+        pf.fd = fileno(stdin);
+        pf.events = POLLIN;
         struct timespec timeout;
-        int select_retval;
+        int ppoll_ret;
         for (;;) {
-            FD_SET(fileno(stdin), &read_set);
             timeout.tv_sec = 0;
-            timeout.tv_nsec = 3e8;
-            select_retval = pselect(1, &read_set, NULL, NULL, &timeout, NULL);
-            if (FD_ISSET(fileno(stdin), &read_set)) {
-                FD_CLR(fileno(stdin), &read_set);
+            timeout.tv_nsec = 4e8;
+            ppoll_ret = ppoll(&pf, 1, &timeout, NULL);
+            if (ppoll_ret > 0) {
                 i = (++nesting == 1)
                     ? tgetch()
                     : (read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
