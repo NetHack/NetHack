@@ -77,6 +77,11 @@ extern short glyph2tile[];
 #define HUPSKIP_RESULT(RES) /*empty*/
 #endif /* ?HANGUP_HANDLING */
 
+#ifdef REALTIME_ON_BOTL
+#include <sys/select.h>
+#include <time.h>
+#endif
+
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
     "tty",
@@ -3513,11 +3518,37 @@ tty_nhgetch(void)
         i = randomkey();
     } else {
 #ifdef UNIX
+#ifdef REALTIME_ON_BOTL
+        fd_set read_set;
+        struct timespec timeout;
+        int select_retval;
+        for (;;) {
+            FD_SET(fileno(stdin), &read_set);
+            timeout.tv_sec = 0;
+            timeout.tv_nsec = 3e8;
+            select_retval = pselect(1, &read_set, NULL, NULL, &timeout, NULL);
+            if (FD_ISSET(fileno(stdin), &read_set)) {
+                FD_CLR(fileno(stdin), &read_set);
+                i = (++nesting == 1)
+                    ? tgetch()
+                    : (read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
+                        ? (int) nestbuf : EOF;
+                --nesting;
+                break;
+            } else {
+                printf("\0337"); // save cursor
+                stat_update_time();
+                printf("\0338"); // restore cursor
+                fflush(stdout);
+            }
+        }
+#else
         i = (++nesting == 1)
               ? tgetch()
               : (read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
                   ? (int) nestbuf : EOF;
         --nesting;
+#endif
 #else
         i = tgetch();
 #endif
