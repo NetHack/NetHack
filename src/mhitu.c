@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitu.c	$NHDT-Date: 1606473488 2020/11/27 10:38:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.196 $ */
+/* NetHack 3.7	mhitu.c	$NHDT-Date: 1625446012 2021/07/05 00:46:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.245 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -967,9 +967,10 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
      */
     if (mtmp->mundetected && (hides_under(mdat) || mdat->mlet == S_EEL)) {
         mtmp->mundetected = 0;
-        if (!(Blind ? Blind_telepat : Unblind_telepat)) {
+        if (!tp_sensemon(mtmp) && !Detect_monsters) {
             struct obj *obj;
             const char *what;
+            char Amonbuf[BUFSZ];
 
             if ((obj = g.level.objects[mtmp->mx][mtmp->my]) != 0) {
                 if (Blind && !obj->dknown)
@@ -979,7 +980,11 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                 else
                     what = doname(obj);
 
-                pline("%s was hidden under %s!", Amonnam(mtmp), what);
+                Strcpy(Amonbuf, Amonnam(mtmp));
+                /* mtmp might be invisible with hero unable to see same */
+                if (!strcmp(Amonbuf, "It")) /* note: not strcmpi() */
+                    Strcpy(Amonbuf, Something);
+                pline("%s was hidden under %s!", Amonbuf, what);
             }
             newsym(mtmp->mx, mtmp->my);
         }

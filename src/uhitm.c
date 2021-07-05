@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1617035737 2021/03/29 16:35:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.300 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1625446013 2021/07/05 00:46:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.311 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -202,17 +202,24 @@ attack_checks(struct monst *mtmp,
             seemimic(mtmp);
             return FALSE;
         }
-        if (!((Blind ? Blind_telepat : Unblind_telepat) || Detect_monsters)) {
+        if (!tp_sensemon(mtmp) && !Detect_monsters) {
             struct obj *obj;
+            char lmonbuf[BUFSZ];
+            boolean notseen;
 
+            Strcpy(lmonbuf, l_monnam(mtmp));
+            /* might be unseen if invisible and hero can't see invisible */
+            notseen = !strcmp(lmonbuf, "it"); /* note: not strcmpi() */
             if (!Blind && Hallucination)
-                pline("A %s %s appeared!",
-                      mtmp->mtame ? "tame" : "wild", l_monnam(mtmp));
+                pline("A %s %s %s!", mtmp->mtame ? "tame" : "wild",
+                      notseen ? "creature" : (const char *) lmonbuf,
+                      notseen ? "is present" : "appears");
             else if (Blind || (is_pool(mtmp->mx, mtmp->my) && !Underwater))
                 pline("Wait!  There's a hidden monster there!");
             else if ((obj = g.level.objects[mtmp->mx][mtmp->my]) != 0)
                 pline("Wait!  There's %s hiding under %s!",
-                      an(l_monnam(mtmp)), doname(obj));
+                      notseen ? something : (const char *) an(lmonbuf),
+                      doname(obj));
             return TRUE;
         }
     }

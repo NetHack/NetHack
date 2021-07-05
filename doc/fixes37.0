@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.581 $ $NHDT-Date: 1625277130 2021/07/03 01:52:10 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.584 $ $NHDT-Date: 1625446012 2021/07/05 00:46:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -556,6 +556,8 @@ perm_invent: when buying shop goods using itemized purchasing while persistent
 change getloc fastmove keys in number_pad mode from hardcoded HJKL to the
 	run/rush movement keys (meta+number)
 allow using rush/run prefix key in getloc to fastmove the cursor
+avoid "it" in messages "Wait!  There's an it hiding under <an object>!" (hero
+	moving) and "It was hidden under <an object>!" (unseen monster moving)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
