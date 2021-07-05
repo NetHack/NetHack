@@ -1181,8 +1181,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         /* u.uswldtim always set > 1 */
         u.uswldtim = (unsigned) ((tim_tmp < 2) ? 2 : tim_tmp);
         swallowed(1); /* update the map display, shows hero swallowed */
-        for (otmp2 = g.invent; otmp2; otmp2 = otmp2->nobj)
-            (void) snuff_lit(otmp2);
+        if (monsndx(mtmp->data) != PM_FIRE_VORTEX) {
+            /* fire vortices don't extinguish flames */
+            for (otmp2 = g.invent; otmp2; otmp2 = otmp2->nobj)
+                (void) snuff_lit(otmp2);
+        }
     }
 
     if (mtmp != u.ustuck)
