@@ -68,6 +68,7 @@
 #define STDC_Pragma_AVAILABLE
 
 #elif defined(_MSC_VER)
+#if _MSC_VER > 1916
 #define DISABLE_WARNING_UNREACHABLE_CODE \
                            _Pragma("warning( push )") \
                            _Pragma("warning( disable : 4702 )")
@@ -81,6 +82,21 @@
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("warning( pop )")
 #define RESTORE_WARNINGS _Pragma("warning( pop )")
 #define STDC_Pragma_AVAILABLE
+#else  /* Visual Studio prior to 2019 below */
+#define DISABLE_WARNING_UNREACHABLE_CODE \
+                           __pragma(warning(push)) \
+                           __pragma(warning(disable:4702))
+#define DISABLE_WARNING_FORMAT_NONLITERAL \
+                           __pragma(warning(push)) \
+                           __pragma(warning(disable:4774))
+#define DISABLE_WARNING_CONDEXPR_IS_CONSTANT \
+                           __pragma(warning(push)) \
+                           __pragma(warning(disable:4127))
+#define RESTORE_WARNING_CONDEXPR_IS_CONSTANT __pragma(warning(pop))
+#define RESTORE_WARNING_FORMAT_NONLITERAL __pragma(warning(pop))
+#define RESTORE_WARNINGS  __pragma(warning(pop))
+#define STDC_Pragma_AVAILABLE
+#endif /* vs2019 or vs2017 */
 
 #endif /* various compiler detections */
 #endif /* ACTIVATE_WARNING_PRAGMAS */

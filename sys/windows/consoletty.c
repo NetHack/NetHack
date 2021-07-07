@@ -1899,11 +1899,10 @@ void nethack_enter_consoletty()
 
     /* grow the size of the console buffer if it is not wide enough */
     if (console.origcsbi.dwSize.X < console.width) {
-        COORD screen_size = {
-            screen_size.Y = console.origcsbi.dwSize.Y,
-            screen_size.X = console.width
-        };
+        COORD screen_size = {0};
 
+        screen_size.Y = console.origcsbi.dwSize.Y,
+        screen_size.X = console.width;
         SetConsoleScreenBufferSize(console.hConOut, screen_size);
     }
 
