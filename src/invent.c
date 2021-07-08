@@ -2357,8 +2357,6 @@ doperminv(void)
      * (typically by typing <return> or <esc> but that's up to interface).
      */
 
-    if (iflags.debug_fuzzer)
-        return 0;
 #if 0
     /* [currently this would redraw the persistent inventory window
        whether that's needed or not, so also reset any previous

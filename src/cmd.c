@@ -102,6 +102,7 @@ static int doherecmdmenu(void);
 static int dotherecmdmenu(void);
 static int doprev_message(void);
 static int timed_occupation(void);
+static boolean can_do_extcmd(const struct ext_func_tab *);
 static int doextcmd(void);
 static int dotravel(void);
 static int doterrain(void);
@@ -351,6 +352,23 @@ savech(char ch)
     return;
 }
 
+static boolean
+can_do_extcmd(const struct ext_func_tab *extcmd)
+{
+    int ecflags = extcmd->flags;
+
+    if (!wizard && (ecflags & WIZMODECMD)) {
+        You_cant("do that!");
+        return FALSE;
+    } else if (u.uburied && !(ecflags & IFBURIED)) {
+        You_cant("do that while you are buried!");
+        return FALSE;
+    } else if (iflags.debug_fuzzer && (ecflags & NOFUZZERCMD)) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 /* here after # - now read a full-word command */
 static int
 doextcmd(void)
@@ -365,10 +383,8 @@ doextcmd(void)
             return 0; /* quit */
 
         func = extcmdlist[idx].ef_funct;
-        if (!wizard && (extcmdlist[idx].flags & WIZMODECMD)) {
-            You("can't do that.");
+        if (!can_do_extcmd(&extcmdlist[idx]))
             return 0;
-        }
         if (iflags.menu_requested && !accept_menu_prefix(func)) {
             pline("'%s' prefix has no effect for the %s command.",
                   visctrl(g.Cmd.spkeys[NHKF_REQMENU]),
@@ -795,9 +811,6 @@ domonability(void)
 int
 enter_explore_mode(void)
 {
-    if (iflags.debug_fuzzer)
-        return 0;
-
     if (discover) {
         You("are already in explore mode.");
     } else {
@@ -1047,7 +1060,7 @@ wiz_detect(void)
 static int
 wiz_load_lua(void)
 {
-    if (wizard && !iflags.debug_fuzzer) {
+    if (wizard) {
         char buf[BUFSZ];
 
         buf[0] = '\0';
@@ -1065,7 +1078,7 @@ wiz_load_lua(void)
 static int
 wiz_load_splua(void)
 {
-    if (wizard && !iflags.debug_fuzzer) {
+    if (wizard) {
         boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
         char buf[BUFSZ];
         int ridx;
@@ -1903,7 +1916,7 @@ struct ext_func_tab extcmdlist[] = {
     /* #exploremode should be flagged AUTOCOMPETE but that would negatively
        impact frequently used #enhance by making #e become ambiguous */
     { M('X'), "exploremode", "enter explore (discovery) mode",
-              enter_explore_mode, IFBURIED | GENERALCMD, NULL },
+              enter_explore_mode, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { 'f',    "fire", "fire ammunition from quiver",
               dofire, 0, NULL },
     { M('f'), "force", "force a lock",
@@ -1962,7 +1975,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'p',    "pay", "pay your shopping bill",
               dopay, 0, NULL },
     { '|',    "perminv", "scroll persistent inventory display",
-              doperminv, IFBURIED | GENERALCMD, NULL },
+              doperminv, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { ',',    "pickup", "pick up things at the current location",
               dopickup, 0, NULL },
     { '\0',   "polyself", "polymorph self",
@@ -1976,7 +1989,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'q',    "quaff", "quaff (drink) something",
               dodrink, 0, NULL },
     { '\0', "quit", "exit without saving current game",
-              done2, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
+              done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD, NULL },
     { 'Q',    "quiver", "select ammunition for quiver",
               dowieldquiver, 0, NULL },
     { 'r',    "read", "read a scroll or spellbook",
@@ -1990,7 +2003,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('r'), "rub", "rub a lamp or a stone",
               dorub, AUTOCOMPLETE, NULL },
     { 'S',    "save", "save the game and exit",
-              dosave, IFBURIED | GENERALCMD, NULL },
+              dosave, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { 's',    "search", "search for traps and secret doors",
               dosearch, IFBURIED, "searching" },
     { '*',    "seeall", "show all equipment in use",
@@ -2006,7 +2019,7 @@ struct ext_func_tab extcmdlist[] = {
     { WEAPON_SYM, "seeweapon", "show the weapon currently wielded",
               doprwep, IFBURIED, NULL },
     { '!', "shell", "leave game to enter a sub-shell ('exit' to come back)",
-              dosh_core, (IFBURIED | GENERALCMD
+              dosh_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SHELL
                         | CMD_NOT_AVAILABLE
 #endif /* SHELL */
@@ -2023,7 +2036,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "stats", "show memory statistics",
               wiz_show_stats, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { C('z'), "suspend", "push game to background ('fg' to come back)",
-              dosuspend_core, (IFBURIED | GENERALCMD
+              dosuspend_core, (IFBURIED | GENERALCMD | NOFUZZERCMD
 #ifndef SUSPEND
                                | CMD_NOT_AVAILABLE
 #endif /* SUSPEND */
@@ -2102,9 +2115,9 @@ struct ext_func_tab extcmdlist[] = {
     { C('v'), "wizlevelport", "teleport to another level",
               wiz_level_tele, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizloaddes", "load and execute a des-file lua script",
-              wiz_load_splua, IFBURIED | WIZMODECMD, NULL },
+              wiz_load_splua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { '\0',   "wizloadlua", "load and execute a lua script",
-              wiz_load_lua, IFBURIED | WIZMODECMD, NULL },
+              wiz_load_lua, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { '\0',   "wizmakemap", "recreate the current level",
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
     { C('f'), "wizmap", "map the level",
@@ -3625,12 +3638,7 @@ do_cmdq_extcmd:
 
         /* current - use *cmd to directly index cmdlist array */
         if (tlist != 0) {
-            if (!wizard && (tlist->flags & WIZMODECMD)) {
-                You_cant("do that!");
-                res = 0;
-                cmdq_clear();
-            } else if (u.uburied && !(tlist->flags & IFBURIED)) {
-                You_cant("do that while you are buried!");
+            if (!can_do_extcmd(tlist)) {
                 res = 0;
                 cmdq_clear();
             } else {
@@ -4516,12 +4524,6 @@ parse(void)
         foo = get_count((char *) 0, '\0', LARGEST_INT, &g.command_count, FALSE);
         g.last_command_count = g.command_count;
     }
-
-    if (iflags.debug_fuzzer /* if fuzzing, override '!' and ^Z */
-        && (g.Cmd.commands[foo & 0x0ff]
-            && (g.Cmd.commands[foo & 0x0ff]->ef_funct == dosuspend_core
-                || g.Cmd.commands[foo & 0x0ff]->ef_funct == dosh_core)))
-        foo = g.Cmd.spkeys[NHKF_ESC];
 
     if (foo == g.Cmd.spkeys[NHKF_ESC]) { /* esc cancels count (TH) */
         clear_nhwindow(WIN_MESSAGE);

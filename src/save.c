@@ -49,8 +49,6 @@ static void zerocomp_bputc(int);
 int
 dosave(void)
 {
-    if (iflags.debug_fuzzer)
-        return 0;
     clear_nhwindow(WIN_MESSAGE);
     if (yn("Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);

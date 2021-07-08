@@ -327,8 +327,6 @@ done1(int sig_unused UNUSED)
 int
 done2(void)
 {
-    if (iflags.debug_fuzzer)
-        return 0;
     if (!paranoid_query(ParanoidQuit, "Really quit?")) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
