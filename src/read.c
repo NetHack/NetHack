@@ -1546,7 +1546,7 @@ seffect_charging(struct obj **sobjp)
        getobj picklist because the "disappears" message
        was already delivered */
     useup(sobj);
-    sobjp = 0; /* it's gone */
+    *sobjp = 0; /* it's gone */
     otmp = getobj("charge", charge_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     if (otmp)
         recharge(otmp, scursed ? -1 : sblessed ? 1 : 0);
@@ -1589,7 +1589,7 @@ seffect_fire(struct obj **sobjp)
     cval = bcsign(sobj);
     dam = (2 * (rn1(3, 3) + 2 * cval) + 1) / 3;
     useup(sobj);
-    sobjp = 0; /* it's gone */
+    *sobjp = 0; /* it's gone */
     if (!already_known)
         (void) learnscrolltyp(SCR_FIRE);
     if (confused) {
@@ -1764,7 +1764,7 @@ seffect_gold_detection(struct obj **sobjp)
     boolean confused = (Confusion != 0);
 
     if ((confused || scursed) ? trap_detect(sobj) : gold_detect(sobj))
-        sobjp = 0; /* failure: strange_feeling() -> useup() */
+        *sobjp = 0; /* failure: strange_feeling() -> useup() */
 }
 
 static void
@@ -1773,7 +1773,7 @@ seffect_food_detection(struct obj **sobjp)
     struct obj *sobj = *sobjp;
 
     if (food_detect(sobj))
-        sobjp = 0; /* nothing detected: strange_feeling -> useup */
+        *sobjp = 0; /* nothing detected: strange_feeling -> useup */
 }
 
 static void
@@ -1793,7 +1793,7 @@ seffect_identify(struct obj **sobjp)
         /* use up the scroll first, before learnscrolltyp() -> makeknown()
            performs perm_invent update; also simplifies empty invent check */
         useup(sobj);
-        sobjp = 0; /* it's gone */
+        *sobjp = 0; /* it's gone */
         /* scroll just identifies itself for any scroll read while confused
            or for cursed scroll read without knowing identify yet */
         if (confused || (scursed && !already_known))
