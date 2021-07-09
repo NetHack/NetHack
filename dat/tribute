@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1624656533 2021/06/25 21:28:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
+# NetHack 3.7  tribute       $NHDT-Date: 1625796801 2021/07/09 02:13:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -5691,7 +5691,7 @@ you?"
 #
 #
 #
-%title Carpe Jugulum (8)
+%title Carpe Jugulum (12)
 # p. 10 (Harper Torch edition)
 %passage 1
 Agnes tended to obey rules.  Perdita didn't.  Perdita thought that not
@@ -5786,19 +5786,80 @@ saw what happened to the others!  /You/ got your fingers burned!."
 
   [Carpe Jugulum, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
+# p. 24 (elipsis occurs at start of paragraph; Quite Reverend Oats has opened
+#        /The Book of Om/ at random and is reading the passage found there)
+%passage 9
+"... silence is an answer that begs three more questions.  Seek and you will
+find, but first you should know what you seek."
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 71 (conversation between witches Nanny Ogg and Agnes Nitt; King Verance II
+#        of Lancre has invited a family of vampires from Uberwald, among many
+#        other guests, to attend his and Queen Magrat's baby's naming ceremony
+#        at midnight; Nanny has gotten their servant Igor drunk; he passed out)
+%passage 10
+"But /vampires/... what's Granny going to say?"
+
+"Listen, my girl.  They'll be gone by tomorrow... well today, really.  We'll
+just keep an eye on 'em and wave 'em goodbye when they go."
+
+"We don't even know what they look like!"
+
+Nanny looked at the recumbant Igor.
+
+"On reflection, maybe, I should've asked him." she said.  She brightened up.
+"Still, there's one way to find them.  There's something everyone knows
+about vampires..."
+
+In fact there are many things everyone knows about vampires, without really
+taking into account that perhaps the vampires known them by now, too.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 297 (Granny Weatherwax has just regained consciousness after nearly
+#         freezing to death and has figured out that Oats has used his copy of
+#         /The Book of Om/ as fuel for a campfire to save her)
+%passage 11
+"Good thing you were able to get a fire going, all the same," she said,
+without turning around.
+
+"I have always found that if I put my trust in Om a way will be found,"
+said Oats, hurrying after her.
+
+"I reckon Om helps those who helps themselves," said Granny.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 316 ("He" is Shawn Ogg, Lancre's one-man army [because they haven't
+#         needed more rather than because of competence on his part])
+%passage 12
+He was trying to find some help in the ancient military journals of General
+Tacticus, whose intelligent campaigning had been so successful that he'd
+lent his very name to the detailed prosecution of martial endeavor, and had
+actually found a section headed What to Do If One Army Occupies a Well-
+fortified and Superior Ground and the Other Does Not, but since the first
+sentence read "Endeavor to be the one inside" he'd rather lost heart.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
 %title The Fifth Elephant (9)
+# p. 25 (Harper Torch edition) [passage starts mid-paragraph]
 %passage 1
-You did something because it had always been done,
-and the explanation was "but we've always done it this way."
-A million dead people can't have been wrong, can they?
+You did something because it had always been done, and the explanation
+was "but we've /always/ done it this way."  A million dead people can't
+have been wrong, can they?
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
-# p. 233 (Harper Torch edition) [this is a footnote]
+# p. 233 (this is a footnote)
 %passage 2
 He'd noticed that sex bore some resemblance to cookery:  It fascinated
 people, they sometimes bought books full of complicated recipes and
@@ -5809,7 +5870,9 @@ maybe had a slice of tomato.
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
-# pp. 80-81 (Harper Torch edition) [the pigeon is trained to carry messages]
+# pp. 80-81 ('[...]' represents more than a full page which has been omitted;
+#            passage ends mid-paragraph;
+#            the pigeon is trained to carry messages for the Watch)
 %passage 3
 Constable Shoe saluted, but a little testily.  He'd been waiting rather a
 long time.
@@ -5919,7 +5982,7 @@ I'M NOT SURE.
 "And who gives him /his/ orders?"
 
 "Everyone," said Tantony bitterly.  Vimes nodded.  Been there, he thought.
-Been there, done that, bought the dublet...
+Been there, done that, bought the doublet...
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
@@ -5940,14 +6003,14 @@ don't think so.  My glass was full!  And it was a bigger glass!  Who's been
 pinching my beer?
 
   [The Truth, by Terry Pratchett]
-%e passage 1
+%e passage
 %passage 2
 The world is made up of four elements: Earth, Air, Fire and Water.
 This is a fact well known even to Corporal Nobbs.  It's also wrong.
 There's a fifth element, and generally it's called Surprise.
 
   [The Truth, by Terry Pratchett]
-%e passage 2
+%e passage
 # pp. 1-2 (Harper Torch edition)
 %passage 3
 The rumor spread through the city like wildfire (which had quite often
