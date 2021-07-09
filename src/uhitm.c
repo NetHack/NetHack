@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1625446013 2021/07/05 00:46:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.311 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1625838649 2021/07/09 13:50:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.312 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4223,8 +4223,10 @@ gulpum(struct monst *mdef, struct attack *mattk)
         return MM_MISS;
 
     if (u.uhunger < 1500 && !u.uswallow) {
-        for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
-            (void) snuff_lit(otmp);
+        if (!flaming(g.youmonst.data)) {
+            for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
+                (void) snuff_lit(otmp);
+        }
 
         /* force vampire in bat, cloud, or wolf form to revert back to
            vampire form now instead of dealing with that when it dies */

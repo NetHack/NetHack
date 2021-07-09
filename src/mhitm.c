@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1614910020 2021/03/05 02:07:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1625838646 2021/07/09 13:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.198 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -744,8 +744,10 @@ gulpmm(register struct monst *magr, register struct monst *mdef,
         Sprintf(buf, "%s swallows", Monnam(magr));
         pline("%s %s.", buf, mon_nam(mdef));
     }
-    for (obj = mdef->minvent; obj; obj = obj->nobj)
-        (void) snuff_lit(obj);
+    if (!flaming(magr->data)) {
+        for (obj = mdef->minvent; obj; obj = obj->nobj)
+            (void) snuff_lit(obj);
+    }
 
     if (is_vampshifter(mdef)
         && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
