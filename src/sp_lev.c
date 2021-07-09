@@ -32,6 +32,7 @@ static void set_wall_property(xchar, xchar, xchar, xchar, int);
 static void count_features(void);
 static void remove_boundary_syms(void);
 static void set_door_orientation(int, int);
+static boolean shared_with_room(int, int, struct mkroom *);
 static void maybe_add_door(int, int, struct mkroom *);
 static void link_doors_rooms(void);
 static int rnddoor(void);
@@ -86,6 +87,7 @@ static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
                                         int);
 static void sel_set_lit(int, int, genericptr_t);
+static void add_doors_to_room(struct mkroom *);
 static void selection_iterate(struct selectionvar *, select_iter_func,
                               genericptr_t);
 static void sel_set_ter(int, int, genericptr_t);
@@ -968,13 +970,40 @@ set_door_orientation(int x, int y)
     levl[x][y].horizontal = ((wleft || wright) && !(wup && wdown)) ? 1 : 0;
 }
 
+/* is x,y right next to room droom? */
+static boolean
+shared_with_room(int x, int y, struct mkroom *droom)
+{
+    int rmno = (droom - g.rooms) + ROOMOFFSET;
+
+    if (!isok(x,y))
+        return FALSE;
+    if (levl[x][y].roomno == rmno && !levl[x][y].edge)
+        return FALSE;
+    if (isok(x-1, y) && levl[x-1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x+1, y) && levl[x+1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x, y-1) && levl[x][y-1].roomno == rmno)
+        return TRUE;
+    if (isok(x, y+1) && levl[x][y+1].roomno == rmno)
+        return TRUE;
+    return FALSE;
+}
+
+/* maybe add door at x,y to room droom */
 static void
 maybe_add_door(int x, int y, struct mkroom* droom)
 {
-    if (droom->hx >= 0 && g.doorindex < DOORMAX && inside_room(droom, x, y))
+    if (droom->hx >= 0 && g.doorindex < DOORMAX
+        && ((!droom->irregular && inside_room(droom, x, y))
+            || levl[x][y].roomno == (droom - g.rooms) + ROOMOFFSET
+            || shared_with_room(x, y, droom))) {
         add_door(x, y, droom);
+    }
 }
 
+/* link all doors in the map to their corresponding rooms */
 static void
 link_doors_rooms(void)
 {
@@ -4857,7 +4886,6 @@ lspo_door(lua_State *L)
         tmpd.wall = walldirs2i[get_table_option(L, "wall", "all", walldirs)];
 
         create_door(&tmpd, g.coder->croom);
-        link_doors_rooms();
     } else {
         /*selection_iterate(sel, sel_set_door, (genericptr_t) &typ);*/
         get_location_coord(&x, &y, ANY_LOC, g.coder->croom,
@@ -5459,6 +5487,18 @@ sel_set_lit(int x, int y, genericptr_t arg)
      levl[x][y].lit = (levl[x][y].typ == LAVAPOOL) ? 1 : lit;
 }
 
+/* Add to the room any doors within/bordering it */
+static void
+add_doors_to_room(struct mkroom *croom)
+{
+    int x, y;
+
+    for (x = croom->lx - 1; x <= croom->hx + 1; x++)
+        for (y = croom->ly - 1; y <= croom->hy + 1; y++)
+            if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+                maybe_add_door(x, y, croom);
+}
+
 /* region(selection, lit); */
 /* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL,
             irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
@@ -5592,6 +5632,7 @@ lspo_region(lua_State *L)
             } else
                 lua_pop(L, 1);
             spo_endroom(g.coder);
+            add_doors_to_room(troom);
         }
     }
 
