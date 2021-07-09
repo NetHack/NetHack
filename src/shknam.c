@@ -613,7 +613,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
         if (wizard) {
             register int j = sroom->doorct;
 
-            pline("Where is shopdoor?");
+            impossible("Where is shopdoor?");
             pline("Room at (%d,%d),(%d,%d).", sroom->lx, sroom->ly, sroom->hx,
                   sroom->hy);
             pline("doormax=%d doorct=%d fdoor=%d", g.doorindex, sroom->doorct,

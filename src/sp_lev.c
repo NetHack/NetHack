@@ -3784,6 +3784,7 @@ lspo_room(lua_State *L)
                 } else
                     lua_pop(L, 1);
                 spo_endroom(g.coder);
+                add_doors_to_room(tmpcr);
                 return 0;
             }
             if (g.in_mk_themerooms)
