@@ -1151,6 +1151,7 @@ differentiating gendered monster tiles from NullCGT (#430)
 check bones data directly for deja vu messages (#374)
 unify code for extracting an object from a monster's inventory (#455)
 make engraving an occupation (#460)
+fpostfx index out of bounds when eating standard eggs (github pr#547)
 
 
 Code Cleanup and Reorganization
