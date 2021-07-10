@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1620348711 2021/05/07 00:51:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.315 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1625884843 2021/07/10 02:40:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.324 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3824,6 +3824,12 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     }
     if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 9, "spellbook")) {
         d->typ = SPE_BLANK_PAPER;
+        return 2; /*goto typfnd;*/
+    }
+    /* without this, player would need to specify "paperback spellbook" to
+       get a novel using its description */
+    if (!BSTRCMPI(d->bp, d->p - 14, "paperback book")) {
+        d->typ = SPE_NOVEL;
         return 2; /*goto typfnd;*/
     }
     /* specific food rather than color of gem/potion/spellbook[/scales] */

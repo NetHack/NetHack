@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.586 $ $NHDT-Date: 1625838646 2021/07/09 13:50:46 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.588 $ $NHDT-Date: 1625884843 2021/07/10 02:40:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -560,6 +560,8 @@ allow using rush/run prefix key in getloc to fastmove the cursor
 avoid "it" in messages "Wait!  There's an it hiding under <an object>!" (hero
 	moving) and "It was hidden under <an object>!" (unseen monster moving)
 don't extinguish burning objects when engulfed by a fire vortex
+allow wishing for a novel via description "paperback book" (previously only
+	worked when specifying "paperback spellbook")
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
