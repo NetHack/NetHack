@@ -2355,7 +2355,7 @@ extern void price_quote(struct obj *);
 extern void shk_chat(struct monst *);
 extern void check_unpaid_usage(struct obj *, boolean);
 extern void check_unpaid(struct obj *);
-extern void costly_gold(xchar, xchar, long);
+extern void costly_gold(xchar, xchar, long, boolean);
 extern long get_cost_of_shop_item(struct obj *, int *);
 extern int oid_price_adjustment(struct obj *, unsigned);
 extern boolean block_door(xchar, xchar);
@@ -2364,6 +2364,7 @@ extern char *shk_your(char *, struct obj *);
 extern char *Shk_Your(char *, struct obj *);
 extern void globby_bill_fixup(struct obj *, struct obj *);
 extern void globby_donation(struct obj *, struct obj *);
+extern void credit_report(struct monst *shkp, int idx, boolean silent);
 
 /* ### shknam.c ### */
 

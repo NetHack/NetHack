@@ -644,7 +644,8 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     long qtmp;
     boolean used_up;
     boolean individual_object = obj ? TRUE : FALSE;
-    struct monst *mtmp;
+    boolean shop_origin, lostgoods = FALSE;
+    struct monst *mtmp, *shkp = 0;
     struct scatter_chain *stmp, *stmp2 = 0;
     struct scatter_chain *schain = (struct scatter_chain *) 0;
     long total = 0L;
@@ -652,6 +653,11 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     if (individual_object && (obj->ox != sx || obj->oy != sy))
         impossible("scattered object <%d,%d> not at scatter site <%d,%d>",
                    obj->ox, obj->oy, sx, sy);
+
+    shop_origin = ((shkp = shop_keeper(*in_rooms(sx, sy, SHOPBASE))) != 0
+                && costly_spot(sx, sy));
+    if (shop_origin)
+        credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
 
     while ((otmp = (individual_object ? obj : g.level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
@@ -792,14 +798,35 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     }
     for (stmp = schain; stmp; stmp = stmp2) {
         int x, y;
+        boolean obj_left_shop = FALSE;
 
         stmp2 = stmp->next;
         x = stmp->ox;
         y = stmp->oy;
         if (stmp->obj) {
-            if (x != sx || y != sy)
+            if (x != sx || y != sy) {
                 total += stmp->obj->quan;
+                obj_left_shop = (shop_origin && !costly_spot(x, y));
+            }
             if (!flooreffects(stmp->obj, x, y, "land")) {
+                if (obj_left_shop
+                    && index(u.urooms, *in_rooms(u.ux, u.uy, SHOPBASE))) {
+                    /* At the moment this only takes on gold. While it is
+                       simple enough to call addtobill for other items that
+                       leave the shop due to scatter(), by default the hero
+                       will get billed for the full shopkeeper asking-price
+                       on the object's way out of shop. That can leave the
+                       hero in a pickle. Even if the hero then manages to
+                       retrieve the item and drop it back inside the shop,
+                       the owed charges will only be reduced at that point
+                       by the lesser shopkeeper buying-price.
+                       The non-gold situation will likely get adjusted further.
+                     */
+                    if (stmp->obj->otyp == GOLD_PIECE) {
+                        addtobill(stmp->obj, FALSE, FALSE, TRUE);
+                        lostgoods = TRUE;
+                    }
+                }
                 place_object(stmp->obj, x, y);
                 stackobj(stmp->obj);
             }
@@ -811,6 +838,8 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     if (sx == u.ux && sy == u.uy && u.uundetected
         && hides_under(g.youmonst.data))
         (void) hideunder(&g.youmonst);
+    if (lostgoods) /* implies shop_origin and therefore shkp valid */
+        credit_report(shkp, 1, FALSE);
     return total;
 }
 

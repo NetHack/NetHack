@@ -432,6 +432,42 @@ u_left_shop(char* leavestring, boolean newlev)
     }
 }
 
+void
+credit_report(struct monst *shkp, int idx, boolean silent)
+{
+    struct eshk *eshkp = ESHK(shkp);
+    static long credit_snap[2][3] = {{0L, 0L, 0L}, {0L, 0L, 0L}};
+
+    if (!idx) {
+        credit_snap[BEFORE][0] = credit_snap[NOW][0] = 0L;
+        credit_snap[BEFORE][1] = credit_snap[NOW][1] = 0L;
+        credit_snap[BEFORE][2] = credit_snap[NOW][2] = 0L;
+    } else {
+        idx = 1;
+    }
+
+    credit_snap[idx][0] = eshkp->credit;
+    credit_snap[idx][1] = eshkp->debit;
+    credit_snap[idx][2] = eshkp->loan;
+
+    if (idx && !silent) {
+        long amt = 0L;
+        const char *msg = "debt has increased";
+
+        if (credit_snap[NOW][0] < credit_snap[BEFORE][0]) {
+            amt = credit_snap[BEFORE][0] - credit_snap[NOW][0];
+            msg = "credit has been reduced";
+        } else if (credit_snap[NOW][1] > credit_snap[BEFORE][1]) {
+            amt = credit_snap[NOW][1] - credit_snap[BEFORE][1];
+        } else if (credit_snap[NOW][2] > credit_snap[BEFORE][2]) {
+            amt = credit_snap[NOW][2] - credit_snap[BEFORE][2];
+        }
+        if (amt)
+            Your("%s by %ld %s.", msg, amt, currency(amt));
+
+    }
+}
+
 /* robbery from outside the shop via telekinesis or grappling hook */
 void
 remote_burglary(xchar x, xchar y)
@@ -2573,7 +2609,7 @@ addtobill(
         return;
 
     if (obj->oclass == COIN_CLASS) {
-        costly_gold(obj->ox, obj->oy, obj->quan);
+        costly_gold(obj->ox, obj->oy, obj->quan, silent);
         return;
     } else if (ESHK(shkp)->billct == BILLSZ) {
         if (!silent)
@@ -2607,7 +2643,7 @@ addtobill(
         ltmp += cltmp;
 
         if (gltmp) {
-            costly_gold(obj->ox, obj->oy, gltmp);
+            costly_gold(obj->ox, obj->oy, gltmp, silent);
             if (!ltmp)
                 return;
         }
@@ -4574,7 +4610,7 @@ check_unpaid(struct obj* otmp)
 }
 
 void
-costly_gold(register xchar x, register xchar y, register long amount)
+costly_gold(xchar x, xchar y, long amount, boolean silent)
 {
     register long delta;
     register struct monst *shkp;
@@ -4587,19 +4623,23 @@ costly_gold(register xchar x, register xchar y, register long amount)
 
     eshkp = ESHK(shkp);
     if (eshkp->credit >= amount) {
-        if (eshkp->credit > amount)
-            Your("credit is reduced by %ld %s.", amount, currency(amount));
-        else
-            Your("credit is erased.");
+        if (!silent) {
+            if (eshkp->credit > amount)
+                Your("credit is reduced by %ld %s.", amount, currency(amount));
+            else
+                Your("credit is erased.");
+        }
         eshkp->credit -= amount;
     } else {
         delta = amount - eshkp->credit;
-        if (eshkp->credit)
-            Your("credit is erased.");
-        if (eshkp->debit)
-            Your("debt increases by %ld %s.", delta, currency(delta));
-        else
-            You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
+        if (!silent) {
+            if (eshkp->credit)
+                Your("credit is erased.");
+            if (eshkp->debit)
+                Your("debt increases by %ld %s.", delta, currency(delta));
+            else
+                You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
+        }
         eshkp->debit += delta;
         eshkp->loan += delta;
         eshkp->credit = 0L;

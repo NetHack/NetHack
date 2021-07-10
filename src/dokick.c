@@ -689,7 +689,7 @@ really_kick_object(xchar x, xchar y)
     if (costly && (!costly_spot(g.bhitpos.x, g.bhitpos.y)
                    || *in_rooms(x, y, SHOPBASE) != bhitroom)) {
         if (isgold)
-            costly_gold(x, y, g.kickedobj->quan);
+            costly_gold(x, y, g.kickedobj->quan, FALSE);
         else
             (void) stolen_value(g.kickedobj, x, y, (boolean) shkp->mpeaceful,
                                 FALSE);
