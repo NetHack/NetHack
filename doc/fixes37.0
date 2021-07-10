@@ -562,6 +562,7 @@ avoid "it" in messages "Wait!  There's an it hiding under <an object>!" (hero
 don't extinguish burning objects when engulfed by a fire vortex
 allow wishing for a novel via description "paperback book" (previously only
 	worked when specifying "paperback spellbook")
+deal with gold leaving a shop via scatter()
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
