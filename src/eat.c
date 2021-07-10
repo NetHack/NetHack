@@ -2252,7 +2252,7 @@ fpostfx(struct obj *otmp)
             heal_legs(0);
         break;
     case EGG:
-        if (flesh_petrifies(&mons[otmp->corpsenm])) {
+        if (otmp->corpsenm >= LOW_PM && flesh_petrifies(&mons[otmp->corpsenm])) {
             if (!Stone_resistance
                 && !(poly_when_stoned(g.youmonst.data)
                      && polymon(PM_STONE_GOLEM))) {
@@ -2334,7 +2334,7 @@ edibility_prompts(struct obj *otmp)
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
         /* These checks must match those in eatcorpse() */
-        stoneorslime = (flesh_petrifies(&mons[mnum]) && !Stone_resistance
+        stoneorslime = (mnum >= LOW_PM && flesh_petrifies(&mons[mnum]) && !Stone_resistance
                         && !poly_when_stoned(g.youmonst.data));
 
         if (mnum == PM_GREEN_SLIME || otmp->otyp == GLOB_OF_GREEN_SLIME)
