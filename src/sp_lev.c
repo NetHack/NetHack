@@ -978,15 +978,15 @@ shared_with_room(int x, int y, struct mkroom *droom)
 
     if (!isok(x,y))
         return FALSE;
-    if (levl[x][y].roomno == rmno && !levl[x][y].edge)
+    if ((int) levl[x][y].roomno == rmno && !levl[x][y].edge)
         return FALSE;
-    if (isok(x-1, y) && levl[x-1][y].roomno == rmno)
+    if (isok(x-1, y) && (int) levl[x-1][y].roomno == rmno)
         return TRUE;
-    if (isok(x+1, y) && levl[x+1][y].roomno == rmno)
+    if (isok(x+1, y) && (int) levl[x+1][y].roomno == rmno)
         return TRUE;
-    if (isok(x, y-1) && levl[x][y-1].roomno == rmno)
+    if (isok(x, y-1) && (int) levl[x][y-1].roomno == rmno)
         return TRUE;
-    if (isok(x, y+1) && levl[x][y+1].roomno == rmno)
+    if (isok(x, y+1) && (int) levl[x][y+1].roomno == rmno)
         return TRUE;
     return FALSE;
 }
@@ -997,7 +997,7 @@ maybe_add_door(int x, int y, struct mkroom* droom)
 {
     if (droom->hx >= 0 && g.doorindex < DOORMAX
         && ((!droom->irregular && inside_room(droom, x, y))
-            || levl[x][y].roomno == (droom - g.rooms) + ROOMOFFSET
+            || (int) levl[x][y].roomno == (droom - g.rooms) + ROOMOFFSET
             || shared_with_room(x, y, droom))) {
         add_door(x, y, droom);
     }

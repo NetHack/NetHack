@@ -526,7 +526,7 @@ mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
         sroom->rtype = SWAMP;
         for (sx = sroom->lx; sx <= sroom->hx; sx++)
             for (sy = sroom->ly; sy <= sroom->hy; sy++) {
-                if (!IS_ROOM(levl[sx][sy].typ) || levl[sx][sy].roomno != rmno)
+                if (!IS_ROOM(levl[sx][sy].typ) || (int) levl[sx][sy].roomno != rmno)
                     continue;
                 if (!OBJ_AT(sx, sy) && !MON_AT(sx, sy) && !t_at(sx, sy)
                     && !nexttodoor(sx, sy)) {
