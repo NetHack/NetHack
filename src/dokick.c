@@ -1,4 +1,4 @@
-/* NetHack 3.7	dokick.c	$NHDT-Date: 1608673689 2020/12/22 21:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.7	dokick.c	$NHDT-Date: 1625963851 2021/07/11 00:37:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -641,9 +641,10 @@ really_kick_object(xchar x, xchar y)
                     "send coins flying in all directions",
                 };
 
-                pline("Thwwpingg!");
+                if (!Deaf)
+                    pline1("Thwwpingg!");
                 You("%s!", flyingcoinmsg[rn2(SIZE(flyingcoinmsg))]);
-                (void) scatter(x, y, rn2(3) + 1, VIS_EFFECTS | MAY_HIT,
+                (void) scatter(x, y, rnd(3), VIS_EFFECTS | MAY_HIT,
                                g.kickedobj);
                 newsym(x, y);
                 return 1;
