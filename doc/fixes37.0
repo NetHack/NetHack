@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.588 $ $NHDT-Date: 1625884843 2021/07/10 02:40:43 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.591 $ $NHDT-Date: 1625962417 2021/07/11 00:13:37 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -738,6 +738,8 @@ prevent obj_pmname() from calling mon_pmname(monst) when monst->data is null
 	to prevent a null pointer dereference
 correct the pluralization of monarch to monarchs, rather than monarches
 don't allow web spun by spider to interfere with solving Soloban
+fix parsing of wish adjectives (return value broken by changes accompanying
+	figurine gender patch)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

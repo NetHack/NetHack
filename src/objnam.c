@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1625884843 2021/07/10 02:40:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.324 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1625962417 2021/07/11 00:13:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.325 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3313,6 +3313,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
 
         if (!d->bp || !*d->bp)
             break;
+        res = 0;
 
         if (!strncmpi(d->bp, "an ", l = 3) || !strncmpi(d->bp, "a ", l = 2)) {
             d->cnt = 1;
@@ -3335,18 +3336,12 @@ readobjnam_preparse(struct _readobjnam_data *d)
             l = 0;
         } else if (!strncmpi(d->bp, "blessed ", l = 8)
                    || !strncmpi(d->bp, "holy ", l = 5)) {
-            d->blessed = 1;
-        } else if (!strncmpi(d->bp, "moist ", l = 6)
-                   || !strncmpi(d->bp, "wet ", l = 4)) {
-            if (!strncmpi(d->bp, "wet ", 4))
-                d->wetness = rn2(3) + 3;
-            else
-                d->wetness = rnd(2);
+            d->blessed = 1, d->uncursed = d->iscursed = 0;
         } else if (!strncmpi(d->bp, "cursed ", l = 7)
                    || !strncmpi(d->bp, "unholy ", l = 7)) {
-            d->iscursed = 1;
+            d->iscursed = 1, d->blessed = d->uncursed = 0;
         } else if (!strncmpi(d->bp, "uncursed ", l = 9)) {
-            d->uncursed = 1;
+            d->uncursed = 1, d->blessed = d->iscursed = 0;
         } else if (!strncmpi(d->bp, "rustproof ", l = 10)
                    || !strncmpi(d->bp, "erodeproof ", l = 11)
                    || !strncmpi(d->bp, "corrodeproof ", l = 13)
@@ -3360,7 +3355,16 @@ readobjnam_preparse(struct _readobjnam_data *d)
         } else if (!strncmpi(d->bp, "unlit ", l = 6)
                    || !strncmpi(d->bp, "extinguished ", l = 13)) {
             d->islit = 0;
-            /* "unlabeled" and "blank" are synonymous */
+
+        /* "wet" and "moist" are only applicable for towels */
+        } else if (!strncmpi(d->bp, "moist ", l = 6)
+                   || !strncmpi(d->bp, "wet ", l = 4)) {
+            if (!strncmpi(d->bp, "wet ", 4))
+                d->wetness = 3 + rn2(3); /* 3..5 */
+            else
+                d->wetness = rnd(2); /* 1..2 */
+
+        /* "unlabeled" and "blank" are synonymous */
         } else if (!strncmpi(d->bp, "unlabeled ", l = 10)
                    || !strncmpi(d->bp, "unlabelled ", l = 11)
                    || !strncmpi(d->bp, "blank ", l = 6)) {
@@ -3491,9 +3495,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
                 || !strncmpi(d->bp + l, "an ", more_l = 3)
                 || !strncmpi(d->bp + l, "the ", more_l = 4))
                 l += more_l;
-            res = 0;
         } else {
-            res = 0;
             break;
         }
         d->bp += l;
@@ -3811,12 +3813,29 @@ readobjnam_postparse1(struct _readobjnam_data *d)
 
     d->p = eos(d->bp);
     if (!BSTRCMPI(d->bp, d->p - 10, "holy water")) {
-        d->typ = POT_WATER;
-        if ((d->p - d->bp) >= 12 && *(d->p - 12) == 'u')
-            d->iscursed = 1; /* unholy water */
+        /* this isn't needed for "[un]holy water" because adjective parsing
+           handles holy==blessed and unholy==cursed and leaves "water" for
+           the object type, but it is needed for "potion of [un]holy water"
+           since that parsing stops when it reaches "potion"; also, neither
+           "holy water" nor "unholy water" is an actual type of potion */
+        if (!BSTRNCMPI(d->bp, d->p - 10 - 2, "un", 2))
+            d->iscursed = 1, d->blessed = d->uncursed = 0; /* unholy water */
         else
-            d->blessed = 1;
+            d->blessed = 1, d->iscursed = d->uncursed = 0; /* holy water */
+        d->typ = POT_WATER;
         return 2; /*goto typfnd;*/
+    }
+    /* accept "paperback" or "paperback book", reject "paperback spellbook" */
+    if (!strncmpi(d->bp, "paperback", 9)) {
+        char *dbp = d->bp + 9; /* just past "paperback" */
+
+        if (!*dbp || !strncmpi(dbp, " book", 5)) {
+            d->typ = SPE_NOVEL;
+            return 2; /*goto typfnd;*/
+        } else {
+            d->otmp = (struct obj *) 0;
+            return 3;
+        }
     }
     if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 6, "scroll")) {
         d->typ = SCR_BLANK_PAPER;
@@ -3824,12 +3843,6 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     }
     if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 9, "spellbook")) {
         d->typ = SPE_BLANK_PAPER;
-        return 2; /*goto typfnd;*/
-    }
-    /* without this, player would need to specify "paperback spellbook" to
-       get a novel using its description */
-    if (!BSTRCMPI(d->bp, d->p - 14, "paperback book")) {
-        d->typ = SPE_NOVEL;
         return 2; /*goto typfnd;*/
     }
     /* specific food rather than color of gem/potion/spellbook[/scales] */
