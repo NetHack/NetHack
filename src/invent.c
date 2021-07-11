@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1620861205 2021/05/12 23:13:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1625969349 2021/07/11 02:09:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -924,12 +924,16 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     obj->where = OBJ_INVENT;
 
     /* fill empty quiver if obj was thrown */
-    if (flags.pickup_thrown && !uquiver && obj_was_thrown
+    if (obj_was_thrown && flags.pickup_thrown && !uquiver
         /* if Mjollnir is thrown and fails to return, we want to
-           auto-pick it when we move to its spot, but not into quiver;
-           aklyses behave like Mjollnir when thrown while wielded, but
-           we lack sufficient information here make them exceptions */
-        && obj->oartifact != ART_MJOLLNIR
+           auto-pick it when we move to its spot, but not into quiver
+           because it needs to be wielded to be re-thrown;
+           aklys likewise because player using 'f' to throw it might
+           not notice that it isn't wielded until it fails to return
+           several times; we never auto-wield, just omit from quiver
+           so that player will be prompted for what to throw and
+           possibly realize that re-wielding is necessary */
+        && obj->oartifact != ART_MJOLLNIR && obj->otyp != AKLYS
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
  added:

@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.591 $ $NHDT-Date: 1625962417 2021/07/11 00:13:37 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.592 $ $NHDT-Date: 1625969349 2021/07/11 02:09:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -740,6 +740,8 @@ correct the pluralization of monarch to monarchs, rather than monarches
 don't allow web spun by spider to interfere with solving Soloban
 fix parsing of wish adjectives (return value broken by changes accompanying
 	figurine gender patch)
+when picking up a thrown weapon while quiver is empty, don't put it into the
+	quiver slot if it needs to be wielded for throw-and-return action
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
