@@ -673,7 +673,6 @@ redist_attr(void)
         if (ABASE(i) < ATTRMIN(i))
             ABASE(i) = ATTRMIN(i);
     }
-    (void) encumber_msg();
 }
 
 static

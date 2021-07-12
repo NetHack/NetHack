@@ -365,6 +365,7 @@ newman(void)
             Strcpy(g.killer.name, "unsuccessful polymorph");
             done(DIED);
             newuhs(FALSE);
+            (void) encumber_msg();
             return; /* lifesaved */
         }
     }
