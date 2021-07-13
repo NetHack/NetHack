@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.592 $ $NHDT-Date: 1625969349 2021/07/11 02:09:09 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.593 $ $NHDT-Date: 1626142353 2021/07/13 02:12:33 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -130,9 +130,10 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	 missing opening single quote on second sentence of Lord Downey's
 	 line, passage #11 both in footnote:  "genious" -> "genius",
 	 "was, oddly enough, was one [...]" -> "was, oddly enough, one [...]"
-        The Fifth Elephant #1, italicize /always/, #9, "dublet" -> "doublet"
+	The Fifth Elephant #1, italicize /always/, #9, "dublet" -> "doublet"
+	Thief of Time #2, "gold starts" -> "gold stars"
 	A Hat Full of Sky passage #9 "though" -> "thought"
-	various, including Death quotes:  separate sentences by two spaces
+	various, including Death quotes:  use two spaces to separate sentences
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
@@ -1064,7 +1065,7 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
 	Lords and Ladies, two to Soul Music, three to Interesting Times, four
 	to Maskerade, three to Hogfather, two to Jingo, four to The Last
-	Continent, four to Carpe Jugulum
+	Continent, four to Carpe Jugulum, three to The Fifth Elephant
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole

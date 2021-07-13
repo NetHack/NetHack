@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1625796801 2021/07/09 02:13:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $
+# NetHack 3.7  tribute       $NHDT-Date: 1626142354 2021/07/13 02:12:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -5850,7 +5850,7 @@ sentence read "Endeavor to be the one inside" he'd rather lost heart.
 #
 #
 #
-%title The Fifth Elephant (9)
+%title The Fifth Elephant (12)
 # p. 25 (Harper Torch edition) [passage starts mid-paragraph]
 %passage 1
 You did something because it had always been done, and the explanation
@@ -5983,6 +5983,59 @@ I'M NOT SURE.
 
 "Everyone," said Tantony bitterly.  Vimes nodded.  Been there, he thought.
 Been there, done that, bought the doublet...
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+#
+# 3 new passages added for 3.7
+#
+# pp. 34-35 (a footnote about Cpl Nobbs lately dressing as a woman omitted)
+%passage 10
+Corporal Cheery Littlebottom pronounced her name "Cheri."  She was a she,
+and therefore a rare bloom in Ankh-Morpork.
+
+It wasn't that dwarfs weren't interested in sex.  They saw the vital need
+for fresh dwarfs to leave their goods to and continue the mining work
+after they had gone.  It was simply that they also saw no point in
+distinguishing between the sexes anywhere but in private.  There was no
+such thing as a Dwarfish female pronoun or, once the children were on
+solids, any such thing as women's work.
+
+Then Cheery Littlebottom had arrived in Ankh-Morpork, and had seen that
+there were men out there who did /not/ wear chain mail or leather
+underwear(1), but /did/ wear interesting colors and exciting makeup, and
+these men were called "women."
+
+And in the little bullet head the thought had arisen:  "Why not me?"
+
+Now she was being denounced in cellars and dwarf bars across the city as
+the first dwarf in Ankh-Morpork to wear a skirt.  It was hard-wearing
+brown leather and as objectively erotic as a piece of wood but, as some
+older dwarfs would point out, somewhere under there were his /knees/.(2)
+
+(1) At least of the sort /she/ normally wore.
+
+(2) They couldn't bring themselves to utter the word "her."
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+# p. 38 (omitted portion spans two separate sentences; pasg ends mid-paragraph)
+%passage 11
+Uberwald [...] was mostly so thickly forested, so creased by little
+mountain ranges and beset by rivers, that it was largely unmapped.  It
+was mostly unexplored, too.(1)
+
+(1) At least, by proper explorers.  Just living there doesn't count.
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+# p. 219 (passage begins mid-sentence)
+%passage 12
+[...] Sam Vines had learned a lot from watching Lady Sybil.  She didn't
+mean to act like that, but she'd been born to it, into a class which had
+always behaved this way:  You went through the world as if there was
+/no possibility/ that anyone would stop you or question you, and most of
+the time that's exactly what didn't happen.
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
@@ -6129,7 +6182,7 @@ EYES...
 %e passage
 # p. 24 (Harper Torch edition)
 %passage 2
-Silver stars weren't awarded frequently, and gold starts happened less
+Silver stars weren't awarded frequently, and gold stars happened less
 than once a fortnight, and were vied for accordingly.  Right now, Miss
 Susan selected a silver star.  Pretty soon Vincent the Keen would have a
 galaxy of his very own.  To give him his due, he was quite disinterested
