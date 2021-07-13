@@ -56,4 +56,8 @@ struct menucoloring {
     struct menucoloring *next;
 };
 
+/* For monstercolors: special value that indicates a monstercolor isn't
+ * configured for a given monster and it should use the default */
+#define MONSTERCOLOR_DEFAULT (CLR_MAX + 1)
+
 #endif /* COLOR_H */
