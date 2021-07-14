@@ -1922,6 +1922,8 @@ bhito(struct obj *obj, struct obj *otmp)
 {
     int res = 1; /* affected object by default */
     boolean learn_it = FALSE, maybelearnit;
+    /* rloco will modify bhitpos; make sure we can reset it */
+    coord save_bhitpos = g.bhitpos;
 
     /* fundamental: a wand effect hitting itself doesn't do anything;
        otherwise we need to guard against accessing otmp after something
@@ -2098,6 +2100,7 @@ bhito(struct obj *obj, struct obj *otmp)
         case WAN_TELEPORTATION:
         case SPE_TELEPORT_AWAY:
             (void) rloco(obj);
+            g.bhitpos = save_bhitpos;
             break;
         case WAN_MAKE_INVISIBLE:
             break;
