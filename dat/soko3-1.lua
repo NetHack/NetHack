@@ -4,7 +4,7 @@
 --
 des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "noteleport", "premapped", "solidify");
+des.level_flags("mazelevel", "noteleport", "premapped", "solidify", "noflip");
 
 des.map([[
 -----------       -----------
