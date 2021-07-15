@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1613600809 2021/02/17 22:26:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1626312523 2021/07/15 01:28:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -364,7 +364,9 @@ newman(void)
             g.killer.format = KILLED_BY_AN;
             Strcpy(g.killer.name, "unsuccessful polymorph");
             done(DIED);
+            /* must have been life-saved to get here */
             newuhs(FALSE);
+            (void) encumber_msg(); /* used to be done by redist_attr() */
             return; /* lifesaved */
         }
     }
