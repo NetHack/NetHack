@@ -235,6 +235,9 @@
      && !BFlying)
 /* May touch surface; does not override any others */
 
+#define Airborne (Flying || Levitation || is_clinger(g.youmonst.data))
+/* Does not need to touch surface when traversing level */
+
 #define EWwalking u.uprops[WWALKING].extrinsic
 #define Wwalking (EWwalking && !Is_waterlevel(&u.uz))
 /* Don't get wet, can't go under water; overrides others except levitation */

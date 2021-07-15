@@ -400,7 +400,7 @@ do_earthquake(int force)
                         Your("chain breaks!");
                         reset_utrap(TRUE);
                     }
-                    if (Levitation || Flying || is_clinger(g.youmonst.data)) {
+                    if (Airborne) {
                         if (!tu_pit) { /* no pit here previously */
                             pline("A chasm opens up under you!");
                             You("don't fall in!");

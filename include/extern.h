@@ -969,6 +969,7 @@ extern int doattributes(void);
 extern void enlightenment(int, int);
 extern void youhiding(boolean, int);
 extern char *trap_predicament(char *, int, boolean);
+extern boolean cause_known(int);
 extern int doconduct(void);
 extern void show_conduct(int);
 extern void record_achievement(schar);

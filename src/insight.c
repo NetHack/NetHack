@@ -20,7 +20,6 @@ static void enlght_line(const char *, const char *, const char *,
 static char *enlght_combatinc(const char *, int, int, char *);
 static void enlght_halfdmg(int, int);
 static boolean walking_on_water(void);
-static boolean cause_known(int);
 static char *attrval(int, int, char *);
 static void background_enlightenment(int, int);
 static void basics_enlightenment(int, int);
@@ -182,7 +181,7 @@ trap_predicament(char *outbuf, int final, boolean wizxtra)
 /* check whether hero is wearing something that player definitely knows
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
-static boolean
+boolean
 cause_known(int propindx) /* index of a property which can be conveyed by worn item */
 {
     register struct obj *o;
