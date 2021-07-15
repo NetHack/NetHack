@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1620413928 2021/05/07 18:58:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1626390628 2021/07/15 23:10:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4457,7 +4457,7 @@ melt_ice(xchar x, xchar y, const char *msg)
     if (Underwater)
         vision_recalc(1);
     newsym(x, y);
-    if (cansee(x, y))
+    if (cansee(x, y) || (x == u.ux && y == u.uy))
         Norep("%s", msg);
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))

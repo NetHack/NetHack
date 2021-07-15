@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.595 $ $NHDT-Date: 1626315675 2021/07/15 02:21:15 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.596 $ $NHDT-Date: 1626390626 2021/07/15 23:10:26 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1080,6 +1080,7 @@ menu for what-is command supports /^ and /" to view a list of nearby or whole
 spiders will occasionally spin webs when moving around
 drinking a burning potion of oil will cure being turned into slime
 new bigroom variant, a boulder maze
+vomiting on an altar provokes the deities wrath
 
 
 Platform- and/or Interface-Specific New Features
