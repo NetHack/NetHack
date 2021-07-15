@@ -750,6 +750,10 @@ xname_flags(
             if (*lbl)
                 Sprintf(eos(buf), " labeled \"%s\"", lbl);
             break;
+        case HAWAIIAN_SHIRT:
+            Sprintf(eos(buf), " with %s motif",
+                    an(hawaiian_motif(obj, tmpbuf)));
+            break;
         default:
             break;
         }
