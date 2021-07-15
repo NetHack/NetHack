@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1619919402 2021/05/02 01:36:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.267 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1626315675 2021/07/15 02:21:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -130,19 +130,23 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
     struct trap *t;
     struct monst *mtmp;
     struct obj *otmp;
+    coord save_bhitpos;
     boolean tseen;
-    int ttyp = NO_TRAP;
+    int ttyp = NO_TRAP, res = FALSE;
 
     if (obj->where != OBJ_FREE)
         panic("flooreffects: obj not free");
 
     /* make sure things like water_damage() have no pointers to follow */
     obj->nobj = obj->nexthere = (struct obj *) 0;
-    /* erode_obj() needs this (called from water_damage() or lava_damage()) */
+    /* erode_obj() (called from water_damage() or lava_damage()) needs
+       bhitpos, but that was screwing up wand zapping that called us from
+       rloco(), so we now restore bhitpos before we return */
+    save_bhitpos = g.bhitpos;
     g.bhitpos.x = x, g.bhitpos.y = y;
 
     if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE)) {
-        return TRUE;
+        res = TRUE;
     } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
                && (is_pit(t->ttyp) || is_hole(t->ttyp))) {
         ttyp = t->ttyp;
@@ -182,7 +186,7 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
                         (void) hmon(mtmp, obj, HMON_THROWN, dieroll);
                     }
                     if (!DEADMONSTER(mtmp) && !is_whirly(mtmp->data))
-                        return FALSE; /* still alive */
+                        res = FALSE; /* still alive, boulder still intact */
                 }
                 mtmp->mtrapped = 0;
             } else {
@@ -213,15 +217,15 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
          * Note:  trap might have gone away via ((hmon -> killed -> xkilled)
          *  || mondied) -> mondead -> m_detach -> fill_pit.
          */
-deletedwithboulder:
+ deletedwithboulder:
         if ((t = t_at(x, y)) != 0)
             deltrap(t);
         useupf(obj, 1L);
         bury_objs(x, y);
         newsym(x, y);
-        return TRUE;
+        res = TRUE;
     } else if (is_lava(x, y)) {
-        return lava_damage(obj, x, y);
+        res = lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
         /* Reasonably bulky objects (arbitrary) splash when dropped.
          * If you're floating above the water even small things make
@@ -238,7 +242,7 @@ deletedwithboulder:
             map_background(x, y, 0);
             newsym(x, y);
         }
-        return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
+        res = water_damage(obj, NULL, FALSE) == ER_DESTROYED;
     } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0
                && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
         if (Blind && !Deaf)
@@ -248,7 +252,7 @@ deletedwithboulder:
                   otense(obj, "tumble"), the_your[t->madeby_u],
                   is_pit(t->ttyp) ? "pit" : "hole");
         if (is_hole(t->ttyp) && ship_object(obj, x, y, FALSE))
-            return TRUE;
+            res = TRUE;
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
@@ -257,9 +261,11 @@ deletedwithboulder:
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (boolean) !obj;
+        res = (boolean) !obj;
     }
-    return FALSE;
+
+    g.bhitpos = save_bhitpos;
+    return res;
 }
 
 /* obj is an object dropped on an altar */

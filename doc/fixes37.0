@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.594 $ $NHDT-Date: 1626312521 2021/07/15 01:28:41 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.595 $ $NHDT-Date: 1626315675 2021/07/15 02:21:15 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -746,6 +746,10 @@ fix parsing of wish adjectives (return value broken by changes accompanying
 	figurine gender patch)
 when picking up a thrown weapon while quiver is empty, don't put it into the
 	quiver slot if it needs to be wielded for throw-and-return action
+using bhitpos in flooreffects to handle erosion damage broke its original use
+	of tracking wand zaps if a teleportation zap hit an object; subsequent
+	zap traversal was done from object's landing spot rather than from its
+	zap hit spot, resulting in scrambled wand targetting
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
