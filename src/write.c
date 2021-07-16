@@ -179,8 +179,20 @@ dowrite(struct obj *pen)
         if (!OBJ_NAME(objects[i]))
             continue;
 
-        if (!strcmpi(OBJ_NAME(objects[i]), nm))
-            goto found;
+        if (!strcmpi(OBJ_NAME(objects[i]), nm)) {
+            if (objects[i].oc_name_known
+                /* spellbooks can only be written by_name, so no need to
+                   hold out for a 'better' by_descr match */
+                || paper->oclass == SPBOOK_CLASS) {
+                by_descr = FALSE;
+                goto found;
+            } else if (!deferralchance) {
+                /* save item in case there are no better by_descr matches;
+                   don't increment deferralchance so that the first uname
+                   match will always override this */
+                deferred = i;
+            }
+        }
         if (!strcmpi(OBJ_DESCR(objects[i]), nm)) {
             by_descr = TRUE;
             goto found;
@@ -200,15 +212,17 @@ dowrite(struct obj *pen)
              *   and 2/3 chance to keep previous 50:50
              *   choice; so on for higher match counts.
              */
-            && !rn2(++deferralchance))
+            && !rn2(++deferralchance)) {
             deferred = i;
+            /* writing by user-assigned name is same as by description:
+               fails for books, works for scrolls (having an assigned
+               type name guarantees presence on discoveries list) */
+            by_descr = TRUE;
+        }
     }
-    /* writing by user-assigned name is same as by description:
-       fails for books, works for scrolls (having an assigned
-       type name guarantees presence on discoveries list) */
+
     if (deferred) {
         i = deferred;
-        by_descr = TRUE;
         goto found;
     }
 
