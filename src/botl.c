@@ -1928,7 +1928,7 @@ noneoftheabove(const char *hl_text)
  *     pointer to rule that applies; Null if no rule does.
  */
 static struct hilite_s *
-get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc, 
+get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc,
            int *colorptr)
 {
     struct hilite_s *hl, *rule = 0;
@@ -3603,9 +3603,11 @@ choose_value:
                 goto choose_field;
             return FALSE;
         }
-        Sprintf(colorqry, "Choose a color for conditions %s:",
+        Snprintf(colorqry, sizeof(colorqry),
+                "Choose a color for conditions %s:",
                 conditionbitmask2str(cond));
-        Sprintf(attrqry, "Choose attribute for conditions %s:",
+        Snprintf(attrqry, sizeof(attrqry),
+                "Choose attribute for conditions %s:",
                 conditionbitmask2str(cond));
     } else if (behavior == BL_TH_TEXTMATCH) {
         char qry_buf[BUFSZ];
