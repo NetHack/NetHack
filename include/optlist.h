@@ -390,6 +390,12 @@ opt_##a,
     NHOPTB(rawio, 0, opt_in, set_in_config, Off, No, No, No, NoAlias,
                 (boolean *) 0)
 #endif
+#ifdef REALTIME_ON_BOTL
+    NHOPTC(realtime, 5, opt_in, set_in_game, Yes, Yes, No, Yes, NoAlias,
+           "show realtime in status line")
+    NHOPTC(realtime_format, 5, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,
+           "format of realtime in status line")
+#endif
     NHOPTB(rest_on_space, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.rest_on_space)
     NHOPTC(roguesymset, 70, opt_in, set_in_game, No, Yes, No, Yes, NoAlias,

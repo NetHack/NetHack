@@ -2603,6 +2603,163 @@ optfn_race(int optidx, int req, boolean negated, char *opts, char *op)
     return optn_ok;
 }
 
+#ifdef REALTIME_ON_BOTL
+static int
+optfn_realtime(int optidx, int req, boolean negated, char *opts, char *op)
+{
+    int retval = optn_ok;
+    int tmp;
+
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        /* '\0': disabled
+           'p': play time
+           'w': wallclock time
+        */
+
+        if (op == empty_optstr) {
+            tmp = negated ? '\0' : 'p';
+        } else {
+            if (negated) {
+                bad_negation(allopt[optidx].name, TRUE);
+                return optn_err;
+            }
+            tmp = lowc(*op);
+        }
+        switch (tmp) {
+        case 'd':
+            tmp = '\0';
+            /*FALLTHRU*/
+        case '\0':
+        case 'p':
+        case 'w':
+            iflags.show_realtime = (char) tmp;
+            break;
+        default:
+            config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
+                             op);
+            retval = optn_err;
+        }
+        return retval;
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        opts[0] = '\0';
+        tmp = iflags.show_realtime;
+        Sprintf(opts, "%s", (tmp == 'p') ? "play time"
+                            : (tmp == 'w') ? "wallclock time"
+                              : "disabled");
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        winid tmpwin;
+        anything any;
+        menu_item *window_pick = (menu_item *) 0;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        any = cg.zeroany;
+        any.a_char = 'd';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'd',
+                    0, ATR_NONE, "disabled", MENU_ITEMFLAGS_NONE);
+        any.a_char = 'p';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'p',
+                    0, ATR_NONE, "play time", MENU_ITEMFLAGS_NONE);
+        any.a_char = 'w';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'w',
+                    0, ATR_NONE, "wallclock time", MENU_ITEMFLAGS_NONE);
+        end_menu(tmpwin, "Type of time to show on status bar:");
+        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+            tmp = window_pick->item.a_char;
+            iflags.show_realtime = tmp == 'd' ? '\0' : tmp;
+            free((genericptr_t) window_pick);
+
+            status_initialize(REASSESS_ONLY);
+        }
+        destroy_nhwindow(tmpwin);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+
+static int
+optfn_realtime_format(int optidx, int req, boolean negated, char *opts, char *op)
+{
+    int retval = optn_ok;
+    int tmp;
+
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+        /* realtime_format:seconds, condensed, units */
+
+        if (op == empty_optstr) {
+            config_error_add("%s must take a parameter", allopt[optidx].name);
+            return optn_err;
+        }
+        if (negated) {
+            bad_negation(allopt[optidx].name, TRUE);
+            return optn_err;
+        }
+        tmp = lowc(*op);
+        switch (tmp) {
+        case 's':
+        case 'c':
+        case 'u':
+            iflags.realtime_format = (char) tmp;
+            break;
+        default:
+            config_error_add("Unknown %s parameter '%s'", allopt[optidx].name,
+                             op);
+            retval = optn_err;
+        }
+        return retval;
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        opts[0] = '\0';
+        tmp = iflags.realtime_format;
+        Sprintf(opts, "%s", (tmp == 's') ? "seconds"
+                            : (tmp == 'c') ? "condensed"
+                              : "units");
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        winid tmpwin;
+        anything any;
+        menu_item *window_pick = (menu_item *) 0;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        any = cg.zeroany;
+        any.a_char = 's';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 's',
+                    0, ATR_NONE, "seconds (s)", MENU_ITEMFLAGS_NONE);
+        any.a_char = 'c';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'c',
+                    0, ATR_NONE, "condensed (h:mm)", MENU_ITEMFLAGS_NONE);
+        any.a_char = 'u';
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'u',
+                    0, ATR_NONE, "units (hh:mm:ss)", MENU_ITEMFLAGS_NONE);
+        end_menu(tmpwin, "Format used by realtime display:");
+        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+            iflags.realtime_format = window_pick->item.a_char;
+            free((genericptr_t) window_pick);
+
+            status_initialize(REASSESS_ONLY);
+        }
+        destroy_nhwindow(tmpwin);
+        return optn_ok;
+    }
+    return optn_ok;
+}
+#endif
+
 static int
 optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
                   char *opts, char *op)

@@ -21,6 +21,34 @@ static int curs_y = -1;
 
 static int parse_escape_sequence(void);
 
+#ifdef REALTIME_ON_BOTL
+int
+wgetch_timeout(WINDOW *win)
+{
+    int ch, y, x;
+    leaveok(win, false);
+    getyx(win, y, x);
+    for (;;) {
+        wtimeout(win, 333);
+        ch = wgetch(win);
+        if (ch == -1) {
+            stat_update_time();
+            wmove(win, y, x);
+            refresh();
+        } else {
+            wtimeout(win, -1);
+            refresh();
+            return ch;
+        }
+    }
+}
+
+int
+getch_timeout()
+{
+    return wgetch_timeout(curses_get_nhwin(MAP_WIN));
+}
+#endif
 
 /* Read a character of input from the user */
 
@@ -35,7 +63,11 @@ curses_read_char(void)
     /* cancel message suppression; all messages have had a chance to be read */
     curses_got_input();
 
+#ifdef REALTIME_ON_BOTL
+    ch = getch_timeout();
+#else
     ch = getch();
+#endif
 #if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
     tmpch = ch;
 #endif

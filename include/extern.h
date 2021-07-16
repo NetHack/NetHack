@@ -173,6 +173,9 @@ extern void max_rank_sz(void);
 #ifdef SCORE_ON_BOTL
 extern long botl_score(void);
 #endif
+#ifdef REALTIME_ON_BOTL
+extern const char *botl_realtime(void);
+#endif
 extern int describe_level(char *);
 extern void status_initialize(boolean);
 extern void status_finish(void);
