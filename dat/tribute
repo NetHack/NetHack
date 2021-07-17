@@ -6043,24 +6043,26 @@ the time that's exactly what didn't happen.
 #
 #
 #
-%title The Truth (8)
+%title The Truth (13)
+# p. 21 (Harper Torch edition)
 %passage 1
 There are, it has been said, two types of people in the world.  There are
 those who, when presented with a glass that is exactly half full, say: this
 glass is half full.  And then there are those who say: this glass is half
 empty.
 
-The world belongs, however, to those who can look at the glass and say:
-What's up with this glass?  Excuse me?  Excuse me?  This is my glass?  I
-don't think so.  My glass was full!  And it was a bigger glass!  Who's been
-pinching my beer?
+The world /belongs/, however, to those who can look at the glass and say:
+What's up with this glass?  Excuse me?  Excuse /me/?  /This/ is my glass?
+I don't /think/ so.  My glass was full!  /And/ it was a bigger glass!
+Who's been pinching my beer?
 
   [The Truth, by Terry Pratchett]
 %e passage
+# p. 5
 %passage 2
-The world is made up of four elements: Earth, Air, Fire and Water.
-This is a fact well known even to Corporal Nobbs.  It's also wrong.
-There's a fifth element, and generally it's called Surprise.
+The world is made up of four elements: Earth, Air, Fire and Water.  This
+is a fact well known even to Corporal Nobbs.  It's also wrong.  There's a
+fifth element, and generally it's called Surprise.
 
   [The Truth, by Terry Pratchett]
 %e passage
@@ -6167,6 +6169,91 @@ NO, THAT WAS THE BIT JUST NOW.
 THE BIT, said Death, BETWEEN YOU BEING BORN AND YOU DYING.  NO, THIS...
 MR. TULIP, THIS IS YOUR WHOLE LIFE AS IT PASSED BEFORE /OTHER PEOPLE'S/
 EYES...
+
+  [The Truth, by Terry Pratchett]
+%e passage
+#
+# 5 new passages added for 3.7
+#
+# p. 3 (two paragraphs in the middle skipped)
+%passage 9
+And the rumor came to the ears of William de Worde, and in a sense it
+stopped there, because he dutifully wrote it down.
+
+It was his job.  Lady Margolotta of Uberwald sent him five dollars a month
+to do it.  The Dowager Duchess of Quirm also sent him five dollars.  So
+did King Verence of Lancre, and a few other Ramtop notables.  So did the
+Seriph of Al-Khali, although in this case the payment was half a cartload
+of figs, twice a year.
+
+[...]
+
+A young man without too many responsibilities could live modestly in
+Ankh-Morpork on thirty or forty dollars a month; he always sold the figs,
+because although it was possible to live on figs you soon wished you
+didn't.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 31
+%passage 10
+"And these are your reasons, my lord?"
+
+"Do you think I have others?" said Lord Vetenari.  "My motives, as ever,
+are entirely transparent."
+
+Hughnon reflected that "entirely transparent" meant either that you could
+see right through them or couldn't see them at all.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 59-60 (passage ends mid-paragraph)
+%passage 11
+The Firm had, indeed, not operated in Ankh-Morpork before.  Mr. Pin had
+kept away because, well, there were plenty of other cities, and an
+instinct for survival had told him that the Big Wahooni(1) should wait
+a while.  [...]
+
+(1) The world's rarest and most evil-smelling vegetable, and consequently
+much prized by connoisseurs (who seldom prize anything cheap and common).
+Also a slang term for Ankh-Morpork, although it does not smell as bad as
+that.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 87-88 ('it' is an imp inside the PDA; warranty text is in a smaller font
+#           than the rest of text; page 297 has more conditions, effectively
+#           impossible to comply with, applying to transfer of ownership)
+%passage 12
+"Good for you!" it said.  "You have wisely purchased the Dis-organizer
+Mk II, the latest in biothaumaturgic design, with a host of useful
+features and no resemblance whatsoever to the Mk I, which you may have
+inadvertently destroyed by stamping on it heavily!" it said, adding,
+"This device is provided without warranty of any kind as to reliability,
+accuracy, existence or otherwise or fitness for any particular purpose
+and Bioalchemic Products specifically does not warrant, guarantee, imply
+or make any representations as to its merchantability for any particular
+purpose and furthermore shall have no liability for or responsibility to
+you or any other person, entity or deity with respect to any loss or
+damage whatsoever caused by this device or object or by any attempts to
+destroy it by hammering it against a wall or dropping it into a deep well
+or by any other means whatsoever and moreover asserts that you indicate
+your acceptance of this agreement or any other agreement that may be
+substituted at any time by coming within five miles of the product or
+observing it through large telescopes or by any other means because you
+are such an easily cowed moron who will happily accept arrogant and
+unilateral conditions on a piece of highly priced garbage that you would
+not dream of accepting on a bag of dog biscuits and is used solely at
+your own risk."
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 168
+%passage 13
+It looked to Sacharissa that the only tools a dwarf needed was his ax and
+some means of making fire.  That'd eventually get him a forge, and with
+that he could make simple tools, and with those he could make /complex/
+tools, and with complex tools a dwarf could more or less make anything.
 
   [The Truth, by Terry Pratchett]
 %e passage
