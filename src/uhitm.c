@@ -4441,6 +4441,7 @@ hmonas(struct monst *mon)
     int i, tmp, armorpenalty, sum[NATTK], nsum = MM_MISS,
         dhit = 0, attknum = 0;
     int dieroll, multi_claw = 0;
+    boolean monster_survived;
 
     /* not used here but umpteen mhitm_ad_xxxx() need this */
     g.vis = (canseemon(mon) || distu(mon->mx, mon->my) <= 2);
@@ -4521,17 +4522,18 @@ hmonas(struct monst *mon)
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             /* caller must set g.bhitpos */
-            if (!known_hitum(mon, weapon, &dhit, tmp,
-                             armorpenalty, mattk, dieroll)) {
+            monster_survived = known_hitum(mon, weapon, &dhit, tmp,
+                                           armorpenalty, mattk, dieroll);
+            /* originalweapon points to an equipment slot which might
+               now be empty if the weapon was destroyed during the hit;
+               passive(,weapon,...) won't call passive_obj() in that case */
+            weapon = *originalweapon; /* might receive passive erosion */
+            if (!monster_survived) {
                 /* enemy dead, before any special abilities used */
                 sum[i] = MM_DEF_DIED;
                 break;
             } else
                 sum[i] = dhit ? MM_HIT : MM_MISS;
-            /* originalweapon points to an equipment slot which might
-               now be empty if the weapon was destroyed during the hit;
-               passive(,weapon,...) won't call passive_obj() in that case */
-            weapon = *originalweapon; /* might receive passive erosion */
             /* might be a worm that gets cut in half; if so, early return */
             if (m_at(u.ux + u.dx, u.uy + u.dy) != mon) {
                 i = NATTK; /* skip additional attacks */

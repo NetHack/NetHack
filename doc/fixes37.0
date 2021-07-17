@@ -568,6 +568,7 @@ deal with gold leaving a shop via scatter()
 defer encumbrance check during polymorph to new man; newman() -> redist_attr()
 	-> encumber_msg() could report change in encumbrance that immediately
 	became obsolete if polyman() subsequently restored old attributes
+fix heap-use-after-free when attacking monster with potion
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
