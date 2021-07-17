@@ -1685,10 +1685,16 @@ just_an(char *outbuf, const char *str)
                || !strcmpi(str, "iron bars") || !strcmpi(str, "ice")) {
         ; /* no article */
     } else {
-        if ((index(vowels, c0) && strncmpi(str, "one-", 4)
-             && strncmpi(str, "eucalyptus", 10) && strncmpi(str, "unicorn", 7)
-             && strncmpi(str, "uranium", 7) && strncmpi(str, "useful", 6))
-            || (index("x", c0) && !index(vowels, lowc(str[1]))))
+        /* normal case is "an <vowel>" or "a <consonant>" */
+        if ((index(vowels, c0) /* some exceptions warranting "a <vowel>" */
+             /* 'wun' initial sound */
+             && (strncmpi(str, "one", 3) || (str[3] && !index("-_ ", str[3])))
+             /* long 'u' initial sound */
+             && strncmpi(str, "eu", 2) /* "eucalyptus leaf" */
+             && strncmpi(str, "uke", 7) && strncmpi(str, "ukulele", 7)
+             && strncmpi(str, "unicorn", 7) && strncmpi(str, "uranium", 7)
+             && strncmpi(str, "useful", 6)) /* "useful tool" */
+            || (c0 == 'x' && !index(vowels, lowc(str[1]))))
             Strcpy(outbuf, "an ");
         else
             Strcpy(outbuf, "a ");
