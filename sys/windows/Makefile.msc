@@ -10,6 +10,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition
 #            - Microsoft Visual Studio 2019 Community Edition
+#            - Microsoft Visual Studio 2022 Community Edition Preview 2
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -547,8 +548,10 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that
 # is too old or untested.
 #
+# Recently tested versions:
 #NMAKE version 1429300370 from latest VS 2019 (May 25, 2021 version 16.10.0)
 #NMAKE version 1429300400 from latest VS 2019 (July 20, 2021 version 16.10.4)
+#NMAKE version 1430304010 from latest VS 2022 preview 2 (July 2021)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -559,6 +562,7 @@ MAKEVERSION=$(MAKEVERSION: =)
 #!MESSAGE $(_NMAKE_VER)
 #!MESSAGE $(MAKEVERSION)
 
+VSSPECIAL=
 VSNEWEST=2019
 !IF ($(MAKEVERSION) < 1000000000)
 VSVER=0000		#untested ancient version
@@ -574,13 +578,17 @@ VSVER=2015
 VSVER=2017
 !ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1429300401)
 VSVER=$(VSNEWEST)
+!ELSEIF ($(MAKEVERSION) > 1429300400) && ($(MAKEVERSION) < 1430304011)
+VSVER=2022
+VSNEWEST=2022
+VSSPECIAL=preview
 !ELSEIF ($(MAKEVERSION) > 1429300400)
 VSVER=2999              #untested future version
 !ENDIF
 
 !IF ($(VSVER) >= 2012)
 !IF ($(VSVER) <= $(VSNEWEST))
-!MESSAGE Autodetected Visual Studio $(VSVER)
+!MESSAGE Autodetected Visual Studio $(VSVER) $(VSSPECIAL)
 !ENDIF
 !ENDIF
 !IF ($(VSVER) == 2999)
