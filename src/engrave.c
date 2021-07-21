@@ -1146,7 +1146,8 @@ engrave(void)
 
     dulling_wep = (carving && stylus && stylus->oclass == WEAPON_CLASS
                    && (stylus->otyp != ATHAME || stylus->cursed));
-    marker = (stylus && stylus->otyp == MAGIC_MARKER);
+    marker = (stylus && stylus->otyp == MAGIC_MARKER
+              && g.context.engraving.type == MARK);
 
     g.context.engraving.actionct++;
 
