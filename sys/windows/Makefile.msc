@@ -547,8 +547,8 @@ rc=Rc
 # Visual Studio we are using.  We set VSVER to 0000 to flag any version that
 # is too old or untested.
 #
-#NMAKE version 1428293370 from latest VS 2019 (Feb 9, 2021 version 16.8.5)
 #NMAKE version 1429300370 from latest VS 2019 (May 25, 2021 version 16.10.0)
+#NMAKE version 1429300400 from latest VS 2019 (July 20, 2021 version 16.10.4)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -572,9 +572,9 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1429300371)
+!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1429300401)
 VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1429300370)
+!ELSEIF ($(MAKEVERSION) > 1429300400)
 VSVER=2999              #untested future version
 !ENDIF
 
