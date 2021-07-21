@@ -3705,7 +3705,7 @@ movecmd(char sym, int mode)
         char *mvkeys = (mode == MV_WALK) ? g.Cmd.move :
             ((mode == MV_RUN) ? g.Cmd.run : g.Cmd.rush);
 
-        for (d = N_DIRS; d > DIR_ERR; d--) {
+        for (d = N_DIRS - 1; d > DIR_ERR; d--) {
             if (mode == MV_ANY) {
                 if (sym == g.Cmd.move[d]
                     || sym == g.Cmd.rush[d]
