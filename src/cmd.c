@@ -16,7 +16,6 @@
 #endif
 #endif
 
-#define CMD_TRAVEL (char) 0x90
 #define CMD_CLICKLOOK (char) 0x8F
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
@@ -105,6 +104,7 @@ static int timed_occupation(void);
 static boolean can_do_extcmd(const struct ext_func_tab *);
 static int doextcmd(void);
 static int dotravel(void);
+static int dotravel_target(void);
 static int doterrain(void);
 static int wiz_wish(void);
 static int wiz_identify(void);
@@ -1998,6 +1998,8 @@ struct ext_func_tab extcmdlist[] = {
               doredraw, IFBURIED | GENERALCMD, NULL },
     { 'R',    "remove", "remove an accessory (ring, amulet, etc)",
               doremring, 0, NULL },
+    { C('_'), "retravel", "travel to previously selected travel location",
+              dotravel_target, 0, NULL },
     { M('R'), "ride", "mount or dismount a saddled steed",
               doride, AUTOCOMPLETE, NULL },
     { M('r'), "rub", "rub a lamp or a stone",
@@ -3048,7 +3050,6 @@ static struct {
     { NHKF_NOPICKUP,         'm', "nopickup" },
     { NHKF_RUN_NOPICKUP,     'M', "run.nopickup" },
     { NHKF_DOINV,            '0', "doinv" },
-    { NHKF_TRAVEL,           CMD_TRAVEL, (char *) 0 }, /* no binding */
     { NHKF_CLICKLOOK,        CMD_CLICKLOOK, (char *) 0 }, /* no binding */
     { NHKF_REDRAW,           C('r'), "redraw" },
     { NHKF_REDRAW2,          C('l'), "redraw.numpad" },
@@ -3547,13 +3548,6 @@ rhack(char *cmd)
             do_look(2, &g.clicklook_cc);
         }
         return;
-    case NHKF_TRAVEL:
-        g.context.travel = 1;
-        g.context.travel1 = 1;
-        g.context.run = 8;
-        g.context.nopick = 1;
-        g.domove_attempting |= DOMOVE_RUSH;
-        break;
     default:
         if (movecmd(*cmd, MV_WALK)) { /* ordinary movement */
             g.context.run = 0; /* only matters here if it was 8 */
@@ -4362,9 +4356,9 @@ click_to_cmd(int x, int y, int mod)
         if (abs(x) <= 1 && abs(y) <= 1) {
             x = sgn(x), y = sgn(y);
         } else {
-            u.tx = u.ux + x;
-            u.ty = u.uy + y;
-            cmd[0] = g.Cmd.spkeys[NHKF_TRAVEL];
+            iflags.travelcc.x = u.tx = u.ux + x;
+            iflags.travelcc.y = u.ty = u.uy + y;
+            cmdq_add_ec(dotravel_target);
             return cmd;
         }
 
@@ -4708,7 +4702,6 @@ readchar_poskey(int *x, int *y, int *mod)
 static int
 dotravel(void)
 {
-    static char cmd[2];
     coord cc;
 
     /*
@@ -4722,7 +4715,6 @@ dotravel(void)
      * there's no reason for the option to disable travel-by-keys.
      */
 
-    cmd[1] = 0;
     cc.x = iflags.travelcc.x;
     cc.y = iflags.travelcc.y;
     if (cc.x == 0 && cc.y == 0) {
@@ -4748,12 +4740,33 @@ dotravel(void)
             return 0;
         }
     }
-    iflags.getloc_travelmode = FALSE;
     iflags.travelcc.x = u.tx = cc.x;
     iflags.travelcc.y = u.ty = cc.y;
-    cmd[0] = g.Cmd.spkeys[NHKF_TRAVEL];
-    readchar_queue = cmd;
-    return 0;
+
+    return dotravel_target();
+}
+
+/* #retravel, travel to iflags.travelcc, which must be set */
+static int
+dotravel_target(void)
+{
+    if (!isok(iflags.travelcc.x, iflags.travelcc.y))
+        return 0;
+
+    iflags.getloc_travelmode = FALSE;
+
+    g.context.travel = 1;
+    g.context.travel1 = 1;
+    g.context.run = 8;
+    g.context.nopick = 1;
+    g.domove_attempting |= DOMOVE_RUSH;
+
+    if (!g.multi)
+        g.multi = max(COLNO, ROWNO);
+    u.last_str_turn = 0;
+    g.context.mv = TRUE;
+
+    return 1;
 }
 
 /*

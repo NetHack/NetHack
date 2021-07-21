@@ -1432,6 +1432,10 @@ is on.
 .lp "#remove  "
 Remove an accessory (ring, amulet, etc).
 Default key is \(oqR\(cq.
+.lp "#retravel"
+Travel to a previously selected travel destination.
+Default key is \(oqC-_\(cq.
+See also #travel.
 .lp "#ride    "
 Ride (or stop riding) a saddled creature.
 Autocompletes.
@@ -1557,6 +1561,7 @@ When picking a target with cursor and the
 .op autodescribe
 option is on, the top line will show \(lq(no travel path)\(rq if
 your character does not know of a path to that location.
+See also #retravel.
 .lp "#turn    "
 Turn undead away.
 Autocompletes.
