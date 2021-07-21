@@ -1767,7 +1767,7 @@ ignore_extcmd(int idx)
     /* #shell or #suspect might not be available;
        'extmenu' option controls whether we show full list
        or just the traditional extended commands */
-    if ((extcmdlist[idx].flags & CMD_NOT_AVAILABLE) != 0
+    if ((extcmdlist[idx].flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0
         || ((extcmdlist[idx].flags & AUTOCOMPLETE) == 0 && !ec_full_list)
         || strlen(extcmdlist[idx].ef_txt) < 2) /* ignore "#" and "?" */
         return TRUE;

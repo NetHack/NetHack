@@ -16,8 +16,6 @@
 #endif
 #endif
 
-#define CMD_CLICKLOOK (char) 0x8F
-
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
 extern int doapply(void);            /**/
 extern int dorub(void);              /**/
@@ -105,6 +103,7 @@ static boolean can_do_extcmd(const struct ext_func_tab *);
 static int doextcmd(void);
 static int dotravel(void);
 static int dotravel_target(void);
+static int doclicklook(void);
 static int doterrain(void);
 static int wiz_wish(void);
 static int wiz_identify(void);
@@ -515,7 +514,7 @@ doextlist(void)
             for (efp = extcmdlist; efp->ef_txt; efp++) {
                 int wizc;
 
-                if ((efp->flags & CMD_NOT_AVAILABLE) != 0)
+                if ((efp->flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0)
                     continue;
                 /* if hiding non-autocomplete commands, skip such */
                 if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
@@ -651,7 +650,7 @@ extcmd_via_menu(void)
         any = cg.zeroany;
         /* populate choices */
         for (efp = extcmdlist; efp->ef_txt; efp++) {
-            if ((efp->flags & CMD_NOT_AVAILABLE)
+            if ((efp->flags & (CMD_NOT_AVAILABLE|INTERNALCMD))
                 || !(efp->flags & AUTOCOMPLETE)
                 || (!wizard && (efp->flags & WIZMODECMD)))
                 continue;
@@ -2138,6 +2137,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_show_wmodes, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { 'z',    "zap", "zap a wand",
               dozap, 0, NULL },
+    /* internal commands: only used by game core, not available for user */
+    { '\0',   "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
@@ -2267,6 +2268,8 @@ bind_key(uchar key, const char *command)
 
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
         if (strcmpi(command, extcmd->ef_txt))
+            continue;
+        if ((extcmd->flags & INTERNALCMD) != 0)
             continue;
         g.Cmd.commands[key] = extcmd;
 #if 0 /* silently accept key binding for unavailable command (!SHELL,&c) */
@@ -3050,7 +3053,6 @@ static struct {
     { NHKF_NOPICKUP,         'm', "nopickup" },
     { NHKF_RUN_NOPICKUP,     'M', "run.nopickup" },
     { NHKF_DOINV,            '0', "doinv" },
-    { NHKF_CLICKLOOK,        CMD_CLICKLOOK, (char *) 0 }, /* no binding */
     { NHKF_REDRAW,           C('r'), "redraw" },
     { NHKF_REDRAW2,          C('l'), "redraw.numpad" },
     { NHKF_GETDIR_SELF,      '.', "getdir.self" },
@@ -3475,7 +3477,7 @@ rhack(char *cmd)
     /* handle most movement commands */
     prefix_seen = FALSE;
     g.context.travel = g.context.travel1 = 0;
-    spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_CLICKLOOK);
+    spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_DOINV);
 
     switch (spkey) {
     case NHKF_RUSH2:
@@ -3541,12 +3543,6 @@ rhack(char *cmd)
         (void) ddoinv(); /* a convenience borrowed from the PC */
         g.context.move = FALSE;
         g.multi = 0;
-        return;
-    case NHKF_CLICKLOOK:
-        if (iflags.clicklook) {
-            g.context.move = FALSE;
-            do_look(2, &g.clicklook_cc);
-        }
         return;
     default:
         if (movecmd(*cmd, MV_WALK)) { /* ordinary movement */
@@ -4327,7 +4323,7 @@ click_to_cmd(int x, int y, int mod)
     if (iflags.clicklook && mod == CLICK_2) {
         g.clicklook_cc.x = x;
         g.clicklook_cc.y = y;
-        cmd[0] = g.Cmd.spkeys[NHKF_CLICKLOOK];
+        cmdq_add_ec(doclicklook);
         return cmd;
     }
     /* this used to be inside the 'if (flags.travelcmd)' block, but
@@ -4767,6 +4763,19 @@ dotravel_target(void)
     g.context.mv = TRUE;
 
     return 1;
+}
+
+/* mouse click look command */
+static int
+doclicklook(void)
+{
+    if (!iflags.clicklook || !isok(g.clicklook_cc.x, g.clicklook_cc.y))
+        return 0;
+
+    g.context.move = FALSE;
+    do_look(2, &g.clicklook_cc);
+
+    return 0;
 }
 
 /*

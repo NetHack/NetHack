@@ -252,7 +252,7 @@ ext_cmd_getlin_hook(char *base)
 
     com_index = -1;
     for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0; oindex++) {
-        if (extcmdlist[oindex].flags & CMD_NOT_AVAILABLE)
+        if (extcmdlist[oindex].flags & (CMD_NOT_AVAILABLE|INTERNALCMD))
             continue;
         if ((extcmdlist[oindex].flags & AUTOCOMPLETE)
             && !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
