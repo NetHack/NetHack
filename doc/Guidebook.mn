@@ -4761,12 +4761,6 @@ With
 .op number_pad
 only.
 Default is \(oqn\(cq.
-.lp doinv
-Show inventory.
-With
-.op number_pad
-only.
-Default is \(oq0\(cq.
 .lp fight
 Prefix key to force fight a direction.
 Default is \(oqF\(cq.

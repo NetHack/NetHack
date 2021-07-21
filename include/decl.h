@@ -458,7 +458,6 @@ enum nh_keyfunc {
     NHKF_FIGHT2,       /* '-' */
     NHKF_NOPICKUP,     /* 'm' */
     NHKF_RUN_NOPICKUP, /* 'M' */
-    NHKF_DOINV,        /* '0' */
 
     NHKF_REDRAW,
     NHKF_REDRAW2,

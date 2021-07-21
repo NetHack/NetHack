@@ -2168,10 +2168,6 @@ static const struct {
       "Prefix: request a menu (for some non-movement commands)", FALSE },
     { NHKF_COUNT,
       "Prefix: for digits when preceding a command with a count", TRUE },
-    { NHKF_DOINV, "numpad: view full inventory", TRUE },
-    /* NHKF_DOINV2 for num_pad+pcHack_compat isn't implemented:
-    { NHKF_DOINV2, "numpad: view inventory of one class of objects", TRUE },
-    */
     { NHKF_DOAGAIN , "repeat: perform the previous command again", FALSE },
     { 0, (const char *) 0, FALSE }
 };
@@ -3052,7 +3048,6 @@ static struct {
     { NHKF_FIGHT2,           '-', "fight.numpad" },
     { NHKF_NOPICKUP,         'm', "nopickup" },
     { NHKF_RUN_NOPICKUP,     'M', "run.nopickup" },
-    { NHKF_DOINV,            '0', "doinv" },
     { NHKF_REDRAW,           C('r'), "redraw" },
     { NHKF_REDRAW2,          C('l'), "redraw.numpad" },
     { NHKF_GETDIR_SELF,      '.', "getdir.self" },
@@ -3477,7 +3472,7 @@ rhack(char *cmd)
     /* handle most movement commands */
     prefix_seen = FALSE;
     g.context.travel = g.context.travel1 = 0;
-    spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_DOINV);
+    spkey = ch2spkeys(*cmd, NHKF_RUN, NHKF_RUN_NOPICKUP);
 
     switch (spkey) {
     case NHKF_RUSH2:
@@ -3537,13 +3532,6 @@ rhack(char *cmd)
         } else
             prefix_seen = TRUE;
         break;
-    case NHKF_DOINV:
-        if (!g.Cmd.num_pad)
-            break;
-        (void) ddoinv(); /* a convenience borrowed from the PC */
-        g.context.move = FALSE;
-        g.multi = 0;
-        return;
     default:
         if (movecmd(*cmd, MV_WALK)) { /* ordinary movement */
             g.context.run = 0; /* only matters here if it was 8 */
@@ -4551,9 +4539,6 @@ parse(void)
             break;
         case M('5'):
             foo = g.Cmd.spkeys[NHKF_RUN];
-            break;
-        case M('0'):
-            foo = g.Cmd.spkeys[NHKF_DOINV];
             break;
         default:
             break; /* as is */
