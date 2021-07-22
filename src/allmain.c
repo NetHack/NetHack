@@ -12,6 +12,8 @@
 #include <signal.h>
 #endif
 
+static void moveloop_preamble(boolean);
+static void moveloop_core(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -28,16 +30,9 @@ early_init(void)
     sys_early_init();
 }
 
-void
-moveloop(boolean resuming)
+static void
+moveloop_preamble(boolean resuming)
 {
-#if defined(MICRO) || defined(WIN32)
-    char ch;
-    int abort_lev;
-#endif
-    int moveamt = 0, wtcap = 0, change = 0;
-    boolean monscanmove = FALSE;
-
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
        to use up the save file and require confirmation for explore mode */
@@ -88,6 +83,17 @@ moveloop(boolean resuming)
        invent is fully populated and the in_moveloop flag has been set */
     if (iflags.perm_invent)
         update_inventory();
+}
+
+static void
+moveloop_core(void)
+{
+#if defined(MICRO) || defined(WIN32)
+    char ch;
+    int abort_lev;
+#endif
+    int moveamt = 0, wtcap = 0, change = 0;
+    boolean monscanmove = FALSE;
 
     for (;;) {
 #ifdef SAFERHANGUP
@@ -478,6 +484,13 @@ moveloop(boolean resuming)
             display_nhwindow(WIN_MAP, FALSE);
         }
     }
+}
+
+void
+moveloop(boolean resuming)
+{
+    moveloop_preamble(resuming);
+    moveloop_core();
 }
 
 #define U_CAN_REGEN() (Regeneration || (Sleepy && u.usleep))
