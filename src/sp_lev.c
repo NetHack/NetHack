@@ -2032,22 +2032,13 @@ create_monster(monster* m, struct mkroom* croom)
         }
 
         mtmp->female = m->female;
-        if (m->peaceful >= 0) {
+        if (m->peaceful > BOOL_RANDOM) {
             mtmp->mpeaceful = m->peaceful;
             /* changed mpeaceful again; have to reset malign */
             set_malign(mtmp);
         }
-        if (m->asleep >= 0) {
-#ifdef UNIXPC
-            /* optimizer bug strikes again */
-            if (m->asleep)
-                mtmp->msleeping = 1;
-            else
-                mtmp->msleeping = 0;
-#else
+        if (m->asleep > BOOL_RANDOM)
             mtmp->msleeping = m->asleep;
-#endif
-        }
         if (m->seentraps)
             mtmp->mtrapseen = m->seentraps;
         if (m->cancelled)
@@ -3124,35 +3115,35 @@ lspo_monster(lua_State *L)
     } else {
         lcheck_param_table(L);
 
-        tmpmons.peaceful = get_table_int_opt(L, "peaceful", -1); /* TODO: alias hostile=!peaceful */
-        tmpmons.asleep = get_table_int_opt(L, "asleep", -1);
+        tmpmons.peaceful = get_table_boolean_opt(L, "peaceful", BOOL_RANDOM);
+        tmpmons.asleep = get_table_boolean_opt(L, "asleep", BOOL_RANDOM);
         tmpmons.name.str = get_table_str_opt(L, "name", NULL);
         tmpmons.appear = 0;
         tmpmons.appear_as.str = (char *) 0;
         tmpmons.sp_amask = get_table_align(L);
-        tmpmons.female = get_table_int_opt(L, "female", 0);
-        tmpmons.invis = get_table_int_opt(L, "invisible", 0);
-        tmpmons.cancelled = get_table_int_opt(L, "cancelled", 0);
-        tmpmons.revived = get_table_int_opt(L, "revived", 0);
-        tmpmons.avenge = get_table_int_opt(L, "avenge", 0);
+        tmpmons.female = get_table_boolean_opt(L, "female", FALSE);
+        tmpmons.invis = get_table_boolean_opt(L, "invisible", FALSE);
+        tmpmons.cancelled = get_table_boolean_opt(L, "cancelled", FALSE);
+        tmpmons.revived = get_table_boolean_opt(L, "revived", FALSE);
+        tmpmons.avenge = get_table_boolean_opt(L, "avenge", FALSE);
         tmpmons.fleeing = get_table_int_opt(L, "fleeing", 0);
         tmpmons.blinded = get_table_int_opt(L, "blinded", 0);
         tmpmons.paralyzed = get_table_int_opt(L, "paralyzed", 0);
-        tmpmons.stunned = get_table_int_opt(L, "stunned", 0);
-        tmpmons.confused = get_table_int_opt(L, "confused", 0);
-        tmpmons.waiting = get_table_int_opt(L, "waiting", 0);
+        tmpmons.stunned = get_table_boolean_opt(L, "stunned", FALSE);
+        tmpmons.confused = get_table_boolean_opt(L, "confused", FALSE);
+        tmpmons.waiting = get_table_boolean_opt(L, "waiting", FALSE);
         tmpmons.seentraps = 0; /* TODO: list of trap names to bitfield */
         tmpmons.has_invent = 0;
 
-        if (!get_table_int_opt(L, "tail", 1))
+        if (!get_table_boolean_opt(L, "tail", TRUE))
             tmpmons.mm_flags |= MM_NOTAIL;
-        if (!get_table_int_opt(L, "group", 1))
+        if (!get_table_boolean_opt(L, "group", TRUE))
             tmpmons.mm_flags |= MM_NOGRP;
-        if (get_table_int_opt(L, "adjacentok", 0))
+        if (get_table_boolean_opt(L, "adjacentok", FALSE))
             tmpmons.mm_flags |= MM_ADJACENTOK;
-        if (get_table_int_opt(L, "ignorewater", 0))
+        if (get_table_boolean_opt(L, "ignorewater", FALSE))
             tmpmons.mm_flags |= MM_IGNOREWATER;
-        if (!get_table_int_opt(L, "countbirth", 1))
+        if (!get_table_boolean_opt(L, "countbirth", TRUE))
             tmpmons.mm_flags |= MM_NOCOUNTBIRTH;
 
         mappear = get_table_str_opt(L, "appear_as", NULL);

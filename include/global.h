@@ -67,6 +67,7 @@ typedef xchar boolean; /* 0 or 1 */
 #define TRUE ((boolean) 1)
 #define FALSE ((boolean) 0)
 #endif
+#define BOOL_RANDOM (-1)
 
 enum optchoice { opt_in, opt_out};
 

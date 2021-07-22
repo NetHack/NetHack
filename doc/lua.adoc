@@ -489,25 +489,25 @@ The hash parameter accepts the following keys:
 | class          | string | monster class, eg "D"
 | x, y           | integers |
 | coord          | table of two integer |
-| peaceful       | 0 or 1 |
-| asleep         | 0 or 1 |
+| peaceful       | boolean |
+| asleep         | boolean |
 | name           | string | name of the monster
-| female         | 0 or 1 |
-| invisible      | 0 or 1 |
-| cancelled      | 0 or 1 |
-| revived        | 0 or 1 |
-| avenge         | 0 or 1 |
+| female         | boolean |
+| invisible      | boolean |
+| cancelled      | boolean |
+| revived        | boolean |
+| avenge         | boolean |
 | fleeing        | 0 - 127 |
 | blinded        | 0 - 127 |
 | paralyzed      | 0 - 127 |
-| stunned        | 0 or 1 |
-| confused       | 0 or 1 |
-| waiting        | 0 or 1 | monster will wait until hero gets next to it
-| tail           | 0 or 1 | generate worm without a tail?
-| group          | 0 or 1 | generate a group of monsters?
-| adjacentok     | 0 or 1 | is adjacent location ok, if given one is not suitable?
-| ignorewater    | 0 or 1 | ignore water when choosing location for the monster
-| countbirth     | 0 or 1 | do we count this monster as generated
+| stunned        | boolean |
+| confused       | boolean |
+| waiting        | boolean | monster will wait until hero gets next to it
+| tail           | boolean | generate worm without a tail?
+| group          | boolean | generate a group of monsters?
+| adjacentok     | boolean | is adjacent location ok, if given one is not suitable?
+| ignorewater    | boolean | ignore water when choosing location for the monster
+| countbirth     | boolean | do we count this monster as generated
 | appear_as      | string | monster can appear as object, monster, or terrain. Add "obj:", "mon:", or "ter:" prefix to the value. |
 | inventory      | function | objects generated in the function are given to the monster
 |===
