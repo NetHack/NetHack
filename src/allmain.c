@@ -13,6 +13,7 @@
 #endif
 
 static void moveloop_preamble(boolean);
+static void u_calc_moveamt(int);
 static void moveloop_core(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
@@ -86,13 +87,60 @@ moveloop_preamble(boolean resuming)
 }
 
 static void
+u_calc_moveamt(int wtcap)
+{
+    int moveamt = 0;
+
+    /* calculate how much time passed. */
+    if (u.usteed && u.umoved) {
+        /* your speed doesn't augment steed's speed */
+        moveamt = mcalcmove(u.usteed, TRUE);
+    } else {
+        moveamt = g.youmonst.data->mmove;
+
+        if (Very_fast) { /* speed boots, potion, or spell */
+            /* gain a free action on 2/3 of turns */
+            if (rn2(3) != 0)
+                moveamt += NORMAL_SPEED;
+        } else if (Fast) { /* intrinsic */
+            /* gain a free action on 1/3 of turns */
+            if (rn2(3) == 0)
+                moveamt += NORMAL_SPEED;
+        }
+    }
+
+    switch (wtcap) {
+    case UNENCUMBERED:
+        break;
+    case SLT_ENCUMBER:
+        moveamt -= (moveamt / 4);
+        break;
+    case MOD_ENCUMBER:
+        moveamt -= (moveamt / 2);
+        break;
+    case HVY_ENCUMBER:
+        moveamt -= ((moveamt * 3) / 4);
+        break;
+    case EXT_ENCUMBER:
+        moveamt -= ((moveamt * 7) / 8);
+        break;
+    default:
+        break;
+    }
+
+    g.youmonst.movement += moveamt;
+    if (g.youmonst.movement < 0)
+        g.youmonst.movement = 0;
+}
+
+static void
 moveloop_core(void)
 {
 #if defined(MICRO) || defined(WIN32)
     char ch;
     int abort_lev;
 #endif
-    int moveamt = 0, wtcap = 0, change = 0;
+    int wtcap = 0, change = 0;
     boolean monscanmove = FALSE;
 
     for (;;) {
@@ -142,46 +190,7 @@ moveloop_core(void)
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
-                    /* calculate how much time passed. */
-                    if (u.usteed && u.umoved) {
-                        /* your speed doesn't augment steed's speed */
-                        moveamt = mcalcmove(u.usteed, TRUE);
-                    } else {
-                        moveamt = g.youmonst.data->mmove;
-
-                        if (Very_fast) { /* speed boots, potion, or spell */
-                            /* gain a free action on 2/3 of turns */
-                            if (rn2(3) != 0)
-                                moveamt += NORMAL_SPEED;
-                        } else if (Fast) { /* intrinsic */
-                            /* gain a free action on 1/3 of turns */
-                            if (rn2(3) == 0)
-                                moveamt += NORMAL_SPEED;
-                        }
-                    }
-
-                    switch (wtcap) {
-                    case UNENCUMBERED:
-                        break;
-                    case SLT_ENCUMBER:
-                        moveamt -= (moveamt / 4);
-                        break;
-                    case MOD_ENCUMBER:
-                        moveamt -= (moveamt / 2);
-                        break;
-                    case HVY_ENCUMBER:
-                        moveamt -= ((moveamt * 3) / 4);
-                        break;
-                    case EXT_ENCUMBER:
-                        moveamt -= ((moveamt * 7) / 8);
-                        break;
-                    default:
-                        break;
-                    }
-
-                    g.youmonst.movement += moveamt;
-                    if (g.youmonst.movement < 0)
-                        g.youmonst.movement = 0;
+                    u_calc_moveamt(wtcap);
                     settrack();
 
                     g.monstermoves++; /* [obsolete (for a long time...)] */
