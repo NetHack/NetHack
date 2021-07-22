@@ -2839,7 +2839,7 @@ splev_initlev(lev_init* linit)
     case LVLINIT_NONE:
         break;
     case LVLINIT_SOLIDFILL:
-        if (linit->lit == -1)
+        if (linit->lit == BOOL_RANDOM)
             linit->lit = rn2(2);
         lvlfill_solid(linit->filling, linit->lit);
         break;
@@ -2853,7 +2853,7 @@ splev_initlev(lev_init* linit)
         makeroguerooms();
         break;
     case LVLINIT_MINES:
-        if (linit->lit == -1)
+        if (linit->lit == BOOL_RANDOM)
             linit->lit = rn2(2);
         if (linit->filling > -1)
             lvlfill_solid(linit->filling, 0);
@@ -2861,7 +2861,7 @@ splev_initlev(lev_init* linit)
         mkmap(linit);
         break;
     case LVLINIT_SWAMP:
-        if (linit->lit == -1)
+        if (linit->lit == BOOL_RANDOM)
             linit->lit = rn2(2);
         lvlfill_swamp(linit->fg, linit->bg, linit->lit);
         break;
@@ -3565,14 +3565,14 @@ lspo_level_init(lua_State *L)
         = initstyles2i[get_table_option(L, "style", "solidfill", initstyles)];
     init_lev.fg = get_table_mapchr_opt(L, "fg", ROOM);
     init_lev.bg = get_table_mapchr_opt(L, "bg", INVALID_TYPE);
-    init_lev.smoothed = get_table_boolean_opt(L, "smoothed", 0);
-    init_lev.joined = get_table_boolean_opt(L, "joined", 0);
-    init_lev.lit = get_table_int_or_random(L, "lit", -1); /* TODO: allow lit=BOOL */
-    init_lev.walled = get_table_boolean_opt(L, "walled", 0);
+    init_lev.smoothed = get_table_boolean_opt(L, "smoothed", FALSE);
+    init_lev.joined = get_table_boolean_opt(L, "joined", FALSE);
+    init_lev.lit = get_table_boolean_opt(L, "lit", BOOL_RANDOM);
+    init_lev.walled = get_table_boolean_opt(L, "walled", FALSE);
     init_lev.filling = get_table_mapchr_opt(L, "filling", init_lev.fg);
     init_lev.corrwid = get_table_int_opt(L, "corrwid", -1);
     init_lev.wallthick = get_table_int_opt(L, "wallthick", -1);
-    init_lev.rm_deadends = !get_table_boolean_opt(L, "deadends", 1);
+    init_lev.rm_deadends = !get_table_boolean_opt(L, "deadends", TRUE);
 
     g.coder->lvl_is_joined = init_lev.joined;
 

@@ -46,6 +46,9 @@ function test_level_init()
    des.level_init({ style = "solidfill", fg = " " });
 
    des.reset_level();
+   des.level_init({ style = "solidfill", fg = " ", lit = false });
+
+   des.reset_level();
    des.level_init({ style = "mazegrid", bg ="-" });
 
    des.reset_level();
@@ -64,7 +67,13 @@ function test_level_init()
    des.level_init({ style = "mines", fg = ".", bg = "L", smoothed = true, joined = true, lit = 0 });
 
    des.reset_level();
+   des.level_init({ style = "mines", fg = ".", bg = "L", smoothed = true, joined = true, lit = true });
+
+   des.reset_level();
    des.level_init({ style = "mines", fg = ".", bg = " ", smoothed = true, joined = true, walled = true });
+   des.reset_level();
+   des.level_init({ style = "swamp", fg = " ", lit = false });
+
 
    des.reset_level();
    des.level_init({ style = "solidfill", fg = ".", lit = 1 });
