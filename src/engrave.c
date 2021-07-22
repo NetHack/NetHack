@@ -994,6 +994,9 @@ doengrave(void)
                     You("will overwrite the current message.");
                 eow = TRUE;
             }
+        } else if (oep && (int) strlen(oep->engr_txt) >= BUFSZ - 1) {
+            There("is no room to add anything else here.");
+            return 1;
         }
     }
 
@@ -1120,7 +1123,7 @@ engrave(void)
     boolean dulling_wep, marker;
     char *endc; /* points at character 1 beyond the last character to engrave
                    this action */
-    int i;
+    int i, space_left;
 
     if (g.context.engraving.pos.x != u.ux
         || g.context.engraving.pos.y != u.uy) { /* teleported? */
@@ -1247,6 +1250,18 @@ engrave(void)
 
     /* actions that happen at the end of every engraving action go here */
 
+    Strcpy(buf, "");
+    oep = engr_at(u.ux, u.uy);
+    if (oep) /* add to existing engraving */
+        Strcpy(buf, oep->engr_txt);
+
+    space_left = sizeof buf - (int) strlen(buf) - 1;
+    if (endc - g.context.engraving.nextc > space_left) {
+        You("run out of room to write.");
+        endc = g.context.engraving.nextc + space_left;
+        truncate = TRUE;
+    }
+
     /* If the stylus did wear out mid-engraving, truncate the input so that we
      * can't go any further. */
     if (truncate && *endc != '\0') {
@@ -1259,12 +1274,8 @@ engrave(void)
         truncate = FALSE;
     }
 
-    Strcpy(buf, "");
-    oep = engr_at(u.ux, u.uy);
-    if (oep) /* add to existing engraving */
-        Strcpy(buf, oep->engr_txt);
     (void) strncat(buf, g.context.engraving.nextc,
-                   endc - g.context.engraving.nextc);
+                   min(space_left, endc - g.context.engraving.nextc));
     make_engr_at(u.ux, u.uy, buf, g.moves - g.multi, g.context.engraving.type);
 
     if (*endc) {
