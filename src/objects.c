@@ -377,6 +377,8 @@ HELM("helm of telepathy", "visored helmet",
 /* 3.4.1: dragon scale mail reclassified as "magic" since magic is
    needed to create them */
 DRGN_ARMR("gray dragon scale mail",    1, ANTIMAGIC,  1200, 1, CLR_GRAY),
+    /* gold DSM is a light source; there's no property for that */
+DRGN_ARMR("gold dragon scale mail",    1, 0,           900, 1, HI_GOLD),
 DRGN_ARMR("silver dragon scale mail",  1, REFLECTING, 1200, 1, DRAGON_SILVER),
 #if 0 /* DEFERRED */
 DRGN_ARMR("shimmering dragon scale mail", 1, DISPLACED, 1200, 1, CLR_CYAN),
@@ -389,9 +391,10 @@ DRGN_ARMR("blue dragon scale mail",    1, SHOCK_RES,   900, 1, CLR_BLUE),
 DRGN_ARMR("green dragon scale mail",   1, POISON_RES,  900, 1, CLR_GREEN),
 DRGN_ARMR("yellow dragon scale mail",  1, ACID_RES,    900, 1, CLR_YELLOW),
 /* For now, only dragons leave these. */
-/* 3.4.1: dragon scales left classified as "non-magic"; they confer
-   magical properties but are produced "naturally" */
+/* 3.4.1: dragon scales left classified as "non-magic"; they confer magical
+   properties but are produced "naturally"; affects use as polypile fodder */
 DRGN_ARMR("gray dragon scales",        0, ANTIMAGIC,   700, 7, CLR_GRAY),
+DRGN_ARMR("gold dragon scales",        0, 0,           500, 7, HI_GOLD),
 DRGN_ARMR("silver dragon scales",      0, REFLECTING,  700, 7, DRAGON_SILVER),
 #if 0 /* DEFERRED */
 DRGN_ARMR("shimmering dragon scales",  0, DISPLACED,   700, 7, CLR_CYAN),

@@ -1338,6 +1338,7 @@ extern struct obj *rnd_treefruit_at(int, int);
 extern void set_corpsenm(struct obj *, int);
 extern long rider_revival_time(struct obj *, boolean);
 extern void start_corpse_timeout(struct obj *);
+extern void maybe_adjust_light(struct obj *, int);
 extern void bless(struct obj *);
 extern void unbless(struct obj *);
 extern void curse(struct obj *);

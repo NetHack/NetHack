@@ -298,8 +298,10 @@ bee_eat_jelly(struct monst* mon, struct obj* obj)
     return -1; /* a queen is already present; ordinary bee hasn't moved yet */
 }
 
-#define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN]     \
-                          && (uwep && artifact_light(uwep) && uwep->lamplit))
+#define flees_light(mon) \
+    ((mon)->data == &mons[PM_GREMLIN]                           \
+     && ((uwep && uwep->lamplit && artifact_light(uwep))        \
+         || (uarm && uarm->lamplit && artifact_light(uarm))))
 /* we could include this in the above macro, but probably overkill/overhead */
 /*      && (!(which_armor((mon), W_ARMC) != 0                               */
 /*            && which_armor((mon), W_ARMH) != 0))                          */

@@ -528,8 +528,9 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
               boolean racialexception)
 {
     struct obj *old, *best, *obj;
+    long oldmask = 0L;
     int m_delay = 0;
-    int unseen = !canseemon(mon);
+    int sawmon = canseemon(mon), sawloc = cansee(mon->mx, mon->my);
     boolean autocurse;
     char nambuf[BUFSZ];
 
@@ -629,13 +630,15 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
         m_delay += 2;
     /* when upgrading a piece of armor, account for time spent
        taking off current one */
-    if (old)
+    if (old) {
         m_delay += objects[old->otyp].oc_delay;
 
-    if (old) /* do this first to avoid "(being worn)" */
-        old->owornmask = 0L;
+        oldmask = old->owornmask; /* needed later by artifact_light() */
+        old->owornmask = 0L; /* avoid doname() showing "(being worn)" */
+    }
+
     if (!creation) {
-        if (canseemon(mon)) {
+        if (sawmon) {
             char buf[BUFSZ];
 
             if (old)
@@ -654,20 +657,45 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
         if (mon->mfrozen)
             mon->mcanmove = 0;
     }
-    if (old)
+    if (old) {
         update_mon_intrinsics(mon, old, FALSE, creation);
+
+        /* owornmask was cleared above but artifact_light() expects it */
+        old->owornmask = oldmask;
+        if (old->lamplit && artifact_light(old))
+            end_burn(old, FALSE);
+        old->owornmask = 0L;
+    }
     mon->misc_worn_check |= flag;
     best->owornmask |= flag;
     if (autocurse)
         curse(best);
+    if (artifact_light(best) && !best->lamplit) {
+        begin_burn(best, FALSE);
+        vision_recalc(1);
+        if (!creation && best->lamplit && cansee(mon->mx, mon->my)) {
+            const char *adesc = arti_light_description(best);
+
+            if (sawmon) /* could already see monster */
+                pline("%s %s to shine %s.", Yname2(best),
+                      otense(best, "begin"), adesc);
+            else if (canseemon(mon)) /* didn't see it until new light */
+                pline("%s %s shining %s.", Yname2(best),
+                      otense(best, "are"), adesc);
+            else if (sawloc) /* saw location but not invisible monster */
+                pline("%s begins to shine %s.", Something, adesc);
+            else /* didn't see location until new light */
+                pline("%s is shining %s.", Something, adesc);
+        }
+    }
     update_mon_intrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
-    if (!creation && (unseen ^ !canseemon(mon))) {
+    if (!creation && (sawmon ^ !canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
             pline("Suddenly you cannot see %s.", nambuf);
             makeknown(best->otyp);
-        } /* else if (!mon->minvis) pline("%s suddenly appears!",
-             Amonnam(mon)); */
+        } /* else if (!mon->minvis)
+           *     pline("%s suddenly appears!", Amonnam(mon)); */
     }
 }
 #undef RACE_EXCEPTION
@@ -1057,6 +1085,11 @@ extract_from_minvent(
         impossible("extract_from_minvent called on object not in minvent");
         return;
     }
+    /* handle gold dragon scales/scale-mail (lit when worn) before clearing
+       obj->owornmask because artifact_light() expects that to be W_ARM */
+    if ((unwornmask & W_ARM) != 0 && obj->lamplit && artifact_light(obj))
+        end_burn(obj, FALSE);
+
     obj_extract_self(obj);
     obj->owornmask = 0L;
     if (unwornmask) {

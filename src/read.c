@@ -1113,11 +1113,17 @@ seffect_enchant_armor(struct obj **sobjp)
         ? rnd(3 - otmp->spe / 3)
         : 1;
     if (s >= 0 && Is_dragon_scales(otmp)) {
+        unsigned was_lit = otmp->lamplit;
+        int old_light = artifact_light(otmp) ? arti_light_radius(otmp) : 0;
+
         /* dragon scales get turned into dragon scale mail */
         pline("%s merges and hardens!", Yname2(otmp));
         setworn((struct obj *) 0, W_ARM);
         /* assumes same order */
         otmp->otyp += GRAY_DRAGON_SCALE_MAIL - GRAY_DRAGON_SCALES;
+        otmp->lamplit = 0; /* don't want bless() or uncurse() to adjust
+                            * light radius because scales -> scale_mail will
+                            * result in a second increase with own message */
         if (sblessed) {
             otmp->spe++;
             cap_spe(otmp);
@@ -1129,6 +1135,9 @@ seffect_enchant_armor(struct obj **sobjp)
         setworn(otmp, W_ARM);
         if (otmp->unpaid)
             alter_cost(otmp, 0L); /* shop bill */
+        otmp->lamplit = was_lit;
+        if (old_light)
+            maybe_adjust_light(otmp, old_light);
         return;
     }
     pline("%s %s%s%s%s for a %s.", Yname2(otmp),

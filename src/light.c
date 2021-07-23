@@ -775,6 +775,8 @@ candle_light_range(struct obj *obj)
 int
 arti_light_radius(struct obj *obj)
 {
+    int res;
+
     /*
      * Used by begin_burn() when setting up a new light source
      * (obj->lamplit will already be set by this point) and
@@ -789,20 +791,34 @@ arti_light_radius(struct obj *obj)
     /* cursed radius of 1 is not noticeable for an item that's
        carried by the hero but is if it's carried by a monster
        or left lit on the floor (not applicable for Sunsword) */
-    return (obj->blessed ? 3 : !obj->cursed ? 2 : 1);
+    res = (obj->blessed ? 3 : !obj->cursed ? 2 : 1);
+
+    /* if poly'd into gold dragon with embedded scales, make the scales
+       have minimum radiance (hero as light source will use light radius
+       based on monster form); otherwise, worn gold DSM gives off more
+       light than other light sources */
+    if (obj == uskin)
+        res = 1;
+    else if (obj->otyp == GOLD_DRAGON_SCALE_MAIL) /* DSM but not scales */
+        ++res;
+
+    return res;
 }
 
-/* adverb describing lit artifact's light; depends on curse/bless state */
+/* adverb describing lit artifact's light; radius varies depending upon
+   curse/bless state; also used for gold dragon scales/scale mail */
 const char *
 arti_light_description(struct obj *obj)
 {
     switch (arti_light_radius(obj)) {
+    case 4:
+        return "radiantly"; /* blessed gold dragon scale mail */
     case 3:
-        return "brilliantly"; /* blessed */
+        return "brilliantly"; /* blessed artifact, uncursed gold DSM */
     case 2:
-        return "brightly"; /* uncursed */
+        return "brightly"; /* uncursed artifact, cursed gold DSM */
     case 1:
-        return "dimly"; /* cursed */
+        return "dimly"; /* cursed artifact, embedded scales */
     default:
         break;
     }
