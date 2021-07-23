@@ -1851,6 +1851,8 @@ sokoban_detect(void)
         for (y = 0; y < ROWNO; y++) {
             levl[x][y].seenv = SVALL;
             levl[x][y].waslit = TRUE;
+            if (levl[x][y].typ == SDOOR)
+                levl[x][y].wall_info = 0; /* see rm.h for explanation */
             map_background(x, y, 1);
             if ((obj = sobj_at(BOULDER, x, y)) != 0)
                 map_object(obj, 1);
