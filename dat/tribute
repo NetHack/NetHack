@@ -6261,7 +6261,8 @@ tools, and with complex tools a dwarf could more or less make anything.
 #
 #
 #
-%title Thief of Time (8)
+%title Thief of Time (14)
+# p. 97 (Harper Torch edition)
 %passage 1
 "No running with scythes!"
 
@@ -6462,6 +6463,94 @@ strangely attractive.  And it was a reason to go on living.
 [...]  Susan [...] took the view that, if there were rules, they applied to
 everyone, even her.  Otherwise they were merely tyranny.  But rules were
 there to make you think before you broke them.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+#
+# 6 new passages added for 3.7
+#
+# p. 80 (passage ends mid-paragraph)
+%passage 9
+Well, she was partly immortal, and that was all there was to it.  She could
+see things that were really there(1) [...]
+
+(1) Which is much harder than seeing things that /aren't/ there.  /Everyone/
+does that.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 82 (passage starts mid-paragraph)
+%passage 10
+[...]  Some humans would do anything to see if it was possible to do it.
+If you put a large switch in some cave somewhere, with a sign on it saying
+"End-of-the-World Switch.  PLEASE DO NOT TOUCH," the paint wouldn't even
+have time to dry.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 115 (passage ends mid-paragraph; Lobsang's "there" is inside the area
+#         below, where a hole in the wall leads; Lu-Tze is already inside and
+#         his "there" is outside where he just was and Lobsang still is)
+%passage 11
+"But novices aren't allowed in there under pain of death!"
+
+"That's a coincidence," said Lu-Tze, lowering himself to the tips of his
+fingers.  "Because death is what awaits you if you stay out there, too."
+
+He dropped into the darkness.  A moment later there was an unenlightened
+curse from below.
+
+Lobsang climbed in, hung by his fingertips, dropped, and rolled when he hit
+the floor below.
+
+"Well done," said Lu-Tze in the gloom.  "When in doubt, choose to live."
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 132 (passage starts mid-paragraph; the abbot's recent reincarnation is
+#         still an infant)
+%passage 12
+"[...]  I mean, mentally he's nine hundred years old."
+
+"That must make him very wise."
+
+"Pretty wise, pretty wise.  But age and wisdom don't necessarily go
+together, I've always found," said Lu-Tze, as they approached the abbot's
+rooms.  "Some people just become stupid with more authority.  Not his
+Reverence, of course."
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 144 (two instances of singular "Igor" for the person then two plural
+#         "Igors" for his clan is accurate)
+%passage 13
+Igor didn't much like the clock.  He was a /people/ person.  He preferred
+things that bled.  And as the clock grew, with its shimmering crystal parts
+that didn't seem entirely all /here/, so Jeremy grew more absorbed and Igor
+grew more tense.  There was definitely something new happening here, and
+Igors were avid to learn new things.  But there were limits.  Igors did not
+believe in "Forbidden Knowledge" and "Things Man Was Not Meant to Know" but
+obviously there were /some/ things a man was not meant to know, such as
+what it felt like to have every single particle of your body sucked into a
+little hole, and that seemed to be one of the options available in the
+immediate future.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 170 ('spake' is accurate, as is ending the first paragraph with a colon)
+%passage 14
+/In the Second Scroll of Wen the Eternally Surprised/, a story is written
+concerning one day when the apprentice Clodpool, in a rebellious mood,
+approached Wen and spake thusly:
+
+"Master, what is the difference between a humanistic, monastic system of
+belief in which wisdom is sought by means of an apparently nonsensical
+system of questions and answers, and a lot of mystic gibberish made up on
+the spur of the moment?"
+
+Wen considered this for some time, and at last said:  "A fish!"
+
+And Clodpool went away, satisfied.
 
   [Thief of Time, by Terry Pratchett]
 %e passage
