@@ -3000,6 +3000,8 @@ mapseen_temple(struct monst *priest UNUSED) /* currently unused;
 {
     mapseen *mptr = find_mapseen(&u.uz);
 
+    if (!mptr)
+        return;
     if (Is_valley(&u.uz))
         mptr->flags.valley = 1;
     else if (Is_sanctum(&u.uz))
@@ -3012,7 +3014,8 @@ room_discovered(int roomno)
 {
     mapseen *mptr = find_mapseen(&u.uz);
 
-    mptr->msrooms[roomno].seen = 1;
+    if (mptr)
+        mptr->msrooms[roomno].seen = 1;
 }
 
 /* #overview command */
