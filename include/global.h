@@ -424,7 +424,7 @@ struct savefile_info {
 #if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
 #define PANICTRACE_LIBC
 #endif
-#if defined(MACOSX)
+#if defined(MACOS)
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX

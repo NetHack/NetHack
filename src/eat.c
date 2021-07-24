@@ -1871,9 +1871,9 @@ fprefx(struct obj *otmp)
         } else if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
             ; /* skip core joke; feedback deferred til fpostfx() */
 
-#if defined(MAC) || defined(MACOSX)
+#if defined(MAC) || defined(MACOS)
         /* KMH -- Why should Unix have all the fun?
-           We check MACOSX before UNIX to get the Apple-specific apple
+           We check MACOS before UNIX to get the Apple-specific apple
            message; the '#if UNIX' code will still kick in for pear. */
         } else if (otmp->otyp == APPLE) {
             pline("Delicious!  Must be a Macintosh!");

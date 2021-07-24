@@ -122,7 +122,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
         QString qvers = version_string(cvers);
         QCoreApplication::setApplicationVersion(qvers);
     }
-#ifdef MACOSX
+#ifdef MACOS
     /* without this, neither control+x nor option+x do anything;
        with it, control+x is ^X and option+x still does nothing */
     QCoreApplication::setAttribute(Qt::AA_MacDontSwapCtrlAndMeta);

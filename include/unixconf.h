@@ -117,7 +117,7 @@
  */
 /* #define TIMED_DELAY */ /* usleep() */
 #endif
-#if defined(MACOSX) && !defined(TIMED_DELAY)
+#if defined(MACOS) && !defined(TIMED_DELAY)
 #define TIMED_DELAY
 #endif
 
@@ -335,7 +335,7 @@
 /* the high quality random number routines */
 #ifndef USE_ISAAC64
 # if defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) \
-    || defined(RANDOM) || defined(MACOSX)
+    || defined(RANDOM) || defined(MACOS)
 #  define Rand() random()
 # else
 #  define Rand() lrand48()
@@ -392,7 +392,7 @@
 #endif /* LINUX */
 #endif /* GNOME_GRAPHICS */
 
-#if defined(MACOSX) && !defined(LIBNH)
+#if defined(MACOS) && !defined(LIBNH)
 # define RUNTIME_PASTEBUF_SUPPORT
 #endif
 
@@ -405,7 +405,7 @@
 #ifdef LINUX
 # define DEV_RANDOM "/dev/urandom"
 #else
-# if defined(BSD) || defined(MACOSX)
+# if defined(BSD) || defined(MACOS)
 #  define DEV_RANDOM "/dev/random"
 # endif
 #endif

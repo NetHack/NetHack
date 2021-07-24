@@ -578,7 +578,7 @@ get_window_frame_extents(Widget w,
         /*
          * FIXME!
          */
-#ifdef MACOSX
+#ifdef MACOS
         /*
          * Default window manager doesn't support _NET_FRAME_EXTENTS.
          * Without this position tweak, the persistent inventory window

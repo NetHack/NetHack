@@ -534,10 +534,10 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     setWindowTitle("NetHack-Qt");
     setWindowIcon(QIcon(QPixmap(qt_compact_mode ? nh_icon_small : nh_icon)));
 
-#ifdef MACOSX
+#ifdef MACOS
     /*
-     * OSX Note:
-     *  The toolbar on OSX starts with a system menu labeled with the
+     * MacOS Note:
+     *  The toolbar on MacOS starts with a system menu labeled with the
      *  Apple logo and an application menu labeled with the application's
      *  name (taken from Info.plist if present, otherwise the base name
      *  of the running program).  After that, application-specific menus
@@ -585,7 +585,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,    "History",            3, dohistory},
         { game,    "Redraw",             0, doredraw}, // useless
         { game,
-#ifdef MACOSX
+#ifdef MACOS
             /* Qt on OSX would rename "Options" to "Preferences..." and
                move it from intended destination to the application menu;
                the ampersand produces &O which makes Alt+O into a keyboard
@@ -597,7 +597,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { game,    0, 3},
         { game,    "Save-and-exit",      3, dosave},
         { game,
-#ifdef MACOSX
+#ifdef MACOS
             /* need something to prevent matching leading "quit" so that it
                isn't hijacked for the application menu; the ampersand is to
                make &Q be a keyboard shortcut (but see Options above) */
@@ -687,7 +687,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     };
 
     QAction *actn;
-#ifndef MACOSX
+#ifndef MACOS
     (void) game->addAction("Qt settings...", this, SLOT(doQtSettings(bool)));
 #else
     /* on OSX, put this in the application menu instead of the game menu;
@@ -707,7 +707,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 #endif
 
     actn = help->addAction("About NetHack-Qt", this, SLOT(doAbout(bool)));
-#ifdef MACOSX
+#ifdef MACOS
     actn->setMenuRole(QWidgetAction::AboutRole);
     /* for OSX, the preceding "About" went into the application menu;
        now add another duplicate one to the Help dropdown menu */
@@ -793,7 +793,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	info->setTitle("Info");
 	menubar->addMenu(info);
 	menubar->addSeparator();
-#ifndef MACOSX
+#ifndef MACOS
 	help->setTitle("Help");
 #else
         // On OSX, an entry in the menubar called "Help" will get an
@@ -1021,7 +1021,7 @@ void NetHackQtMainWindow::doQuit(bool)
     // either one, other implementations only have that other one (plus
     // nethack's #quit command itself) but this routine is unconditional
     // in case someone wants to change that
-#ifdef MACOSX
+#ifdef MACOS
     QString info;
     info.sprintf("This will end your NetHack session.%s",
                  !g.program_state.something_worth_saving ? ""

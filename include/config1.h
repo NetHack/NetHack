@@ -37,7 +37,7 @@
  * Mac Stuff.
  */
 #if defined(__APPLE__) && defined(__MACH__)
-#define MACOSX
+#define MACOS
 #endif
 
 #ifdef macintosh /* Auto-defined symbol for MPW compilers (sc and mrc) */
