@@ -880,13 +880,13 @@ bot_via_windowport(void)
 #endif
         }
     }
-    condtests[bl_blind].test     = (Blind);
+    condtests[bl_blind].test     = (Blind) ? TRUE : FALSE;
     condtests[bl_conf].test      = (Confusion) ? TRUE : FALSE;
-    condtests[bl_deaf].test      = (Deaf);
-    condtests[bl_fly].test       = (Flying);
-    condtests[bl_glowhands].test = (u.umconf);
-    condtests[bl_hallu].test     = (Hallucination);
-    condtests[bl_lev].test       = (Levitation);
+    condtests[bl_deaf].test      = (Deaf) ? TRUE : FALSE;
+    condtests[bl_fly].test       = (Flying) ? TRUE : FALSE;
+    condtests[bl_glowhands].test = (u.umconf) ? TRUE : FALSE;
+    condtests[bl_hallu].test     = (Hallucination) ? TRUE : FALSE;
+    condtests[bl_lev].test       = (Levitation) ? TRUE : FALSE;
     condtests[bl_ride].test      = (u.usteed) ? TRUE : FALSE;
     condtests[bl_slime].test     = (Slimed) ? TRUE : FALSE;
     condtests[bl_stone].test     = (Stoned) ? TRUE : FALSE;
@@ -897,7 +897,7 @@ bot_via_windowport(void)
     test_if_enabled(bl_bareh)    = (!uarmg && !uwep);
     test_if_enabled(bl_icy)      = (levl[u.ux][u.uy].typ == ICE);
     test_if_enabled(bl_slippery) = (Glib) ? TRUE : FALSE;
-    test_if_enabled(bl_woundedl) = (Wounded_legs);
+    test_if_enabled(bl_woundedl) = (Wounded_legs) ? TRUE : FALSE;
 
     if (g.multi < 0) {
         cond_cache_prepA();
