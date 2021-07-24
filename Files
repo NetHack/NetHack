@@ -465,7 +465,7 @@ sys/windows/vs/uudecode:
 afteruudecode.proj  uudecode.vcxproj
 
 test:
-(files in top directory)
+(files for testing)
 test_cnf.lua  test_des.lua  test_lev.lua  test_obj.lua  test_sel.lua
 test_shk.lua  test_src.lua  testwish.lua
 
