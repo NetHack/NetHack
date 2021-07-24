@@ -467,7 +467,7 @@ afteruudecode.proj  uudecode.vcxproj
 test:
 (files in top directory)
 test_cnf.lua  test_des.lua  test_lev.lua  test_obj.lua  test_sel.lua
-test_src.lua  testwish.lua
+test_shk.lua  test_src.lua  testwish.lua
 
 util:
 (files for all versions)
