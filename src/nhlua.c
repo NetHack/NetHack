@@ -976,6 +976,11 @@ static const struct {
 } nhl_consts[] = {
     { "COLNO",  COLNO },
     { "ROWNO",  ROWNO },
+#ifdef DLB
+    { "DLB", 1},
+#else
+    { "DLB", 0},
+#endif /* DLB */
     { NULL, 0 },
 };
 

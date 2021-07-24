@@ -1067,20 +1067,11 @@ mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob,
 }
 
 void
-mklev(void)
+level_finalize_topology(void)
 {
     struct mkroom *croom;
     int ridx;
 
-    reseed_random(rn2);
-    reseed_random(rn2_on_display_rng);
-
-    init_mapseen(&u.uz);
-    if (getbones())
-        return;
-
-    g.in_mklev = TRUE;
-    makelevel();
     bound_digging();
     mineralize(-1, -1, -1, -1, FALSE);
     g.in_mklev = FALSE;
@@ -1102,6 +1093,22 @@ mklev(void)
        entered; g.rooms[].orig_rtype always retains original rtype value */
     for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
         g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
+}
+
+void
+mklev(void)
+{
+    reseed_random(rn2);
+    reseed_random(rn2_on_display_rng);
+
+    init_mapseen(&u.uz);
+    if (getbones())
+        return;
+
+    g.in_mklev = TRUE;
+    makelevel();
+
+    level_finalize_topology();
 
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);

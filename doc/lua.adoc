@@ -352,6 +352,14 @@ Example:
  des.feature({ type = "throne", coord = {4, 6}, looted = true });
  des.feature({ type = "tree", coord = {4, 6}, looted = true, swarm = false });
 
+=== finalize_level
+
+Only used for testing purposes. See also <<_reset_level>>.
+
+Example:
+
+ des.finalize_level();
+
 === gold
 
 Create a pile of gold.
@@ -613,7 +621,7 @@ Example:
 
 === reset_level
 
-Only used for testing purposes.
+Only used for testing purposes. See also <<_finalize_level>>.
 
 Example:
 

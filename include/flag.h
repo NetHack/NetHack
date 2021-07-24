@@ -173,6 +173,7 @@ struct instance_flags {
      * behaviour of various NetHack functions and probably warrant
      * a structure of their own elsewhere some day.
      */
+    boolean lua_testing;   /* doing lua tests */
     boolean debug_fuzzer;  /* fuzz testing */
     boolean in_lua;        /* executing a lua script */
     boolean defer_plname;  /* X11 hack: askname() might not set g.plname */

@@ -1251,6 +1251,7 @@ extern void free_luathemes(boolean);
 extern void makecorridors(void);
 extern void add_door(int, int, struct mkroom *);
 extern void clear_level_structures(void);
+extern void level_finalize_topology(void);
 extern void mklev(void);
 #ifdef SPECIALIZATION
 extern void topologize(struct mkroom *, boolean));
@@ -2450,6 +2451,8 @@ extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
                                  int);
 extern void selection_do_gradient(struct selectionvar *, long, long, long,
                                   long, long, long, long, long);
+extern int lspo_reset_level(lua_State *);
+extern int lspo_finalize_level(lua_State *);
 extern void update_croom(void);
 extern const char *get_trapname_bytype(int);
 extern void l_register_des(lua_State *);

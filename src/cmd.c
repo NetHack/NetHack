@@ -1078,9 +1078,7 @@ static int
 wiz_load_splua(void)
 {
     if (wizard) {
-        boolean was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz);
         char buf[BUFSZ];
-        int ridx;
 
         buf[0] = '\0';
         getlin("Load which des lua file?", buf);
@@ -1088,37 +1086,11 @@ wiz_load_splua(void)
             return 0;
         if (!strchr(buf, '.'))
             strcat(buf, ".lua");
-        makemap_prepost(TRUE, was_in_W_tower);
 
-        /* TODO: need to split some of this out of mklev(), makelevel(),
-           makemaz() */
-        g.in_mklev = TRUE;
-        oinit(); /* assign level dependent obj probabilities */
-        clear_level_structures();
-
+        lspo_reset_level(NULL);
         (void) load_special(buf);
+        lspo_finalize_level(NULL);
 
-        bound_digging();
-        mineralize(-1, -1, -1, -1, FALSE);
-        g.in_mklev = FALSE;
-        if (g.level.flags.has_morgue)
-            g.level.flags.graveyard = 1;
-        if (!g.level.flags.is_maze_lev) {
-            struct mkroom *croom;
-            for (croom = &g.rooms[0]; croom != &g.rooms[g.nroom]; croom++)
-#ifdef SPECIALIZATION
-                topologize(croom, FALSE);
-#else
-            topologize(croom);
-#endif
-        }
-        set_wall_state();
-        /* for many room types, rooms[].rtype is zeroed once the room has been
-           entered; rooms[].orig_rtype always retains original rtype value */
-        for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
-            g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
-
-        makemap_prepost(FALSE, was_in_W_tower);
     } else
         pline("Unavailable command 'wiz_load_splua'.");
     return 0;

@@ -146,6 +146,7 @@ int lspo_random_corridors(lua_State *);
 int lspo_region(lua_State *);
 int lspo_replace_terrain(lua_State *);
 int lspo_reset_level(lua_State *);
+int lspo_finalize_level(lua_State *);
 int lspo_room(lua_State *);
 int lspo_stair(lua_State *);
 int lspo_teleport_region(lua_State *);
@@ -2285,7 +2286,7 @@ create_object(object* o, struct mkroom* croom)
             } else {
                 impossible(prize_warning, "sokoban end");
             }
-        } else {
+        } else if (!iflags.lua_testing) {
             char lbuf[QBUFSZ];
 
             (void) describe_level(lbuf); /* always has a trailing space */
@@ -5906,9 +5907,65 @@ lspo_reset_level(lua_State *L UNUSED)
 {
     boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
 
-    create_des_coder();
+    iflags.lua_testing = TRUE;
+    if (L)
+        create_des_coder();
     makemap_prepost(TRUE, wtower);
+    g.in_mklev = TRUE;
+    oinit(); /* assign level dependent obj probabilities */
     clear_level_structures();
+    return 0;
+}
+
+/* finalize_level is only needed for testing purposes */
+int
+lspo_finalize_level(lua_State *L UNUSED)
+{
+    boolean wtower = In_W_tower(u.ux, u.uy, &u.uz);
+    int i;
+
+    if (L)
+        create_des_coder();
+
+    link_doors_rooms();
+    remove_boundary_syms();
+
+    /* TODO: ensure_way_out() needs rewrite */
+    if (L && g.coder->check_inaccessibles)
+        ensure_way_out();
+
+    /* FIXME: Ideally, we want this call to only cover areas of the map
+     * which were not inserted directly by the special level file (see
+     * the insect legs on Baalzebub's level, for instance). Since that
+     * is currently not possible, we overload the corrmaze flag for this
+     * purpose.
+     */
+    if (!g.level.flags.corrmaze)
+        wallification(1, 0, COLNO - 1, ROWNO - 1);
+
+    if (L)
+        flip_level_rnd(g.coder->allow_flips, FALSE);
+
+    count_features();
+
+    if (L && g.coder->solidify)
+        solidify_map();
+
+    /* This must be done before sokoban_detect(),
+     * otherwise branch stairs won't be premapped. */
+    fixup_special();
+
+    if (L && g.coder->premapped)
+        sokoban_detect();
+
+    level_finalize_topology();
+
+    for (i = 0; i < g.nroom; ++i) {
+        fill_special_room(&g.rooms[i]);
+    }
+
+    makemap_prepost(FALSE, wtower);
+    iflags.lua_testing = FALSE;
     return 0;
 }
 
@@ -6258,6 +6315,7 @@ static const struct luaL_Reg nhl_functions[] = {
     { "non_passwall", lspo_non_passwall },
     { "teleport_region", lspo_teleport_region },
     { "reset_level", lspo_reset_level },
+    { "finalize_level", lspo_finalize_level },
     /* TODO: { "branch", lspo_branch }, */
     /* TODO: { "portal", lspo_portal }, */
     { NULL, NULL }
