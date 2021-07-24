@@ -981,13 +981,13 @@ shared_with_room(int x, int y, struct mkroom *droom)
         return FALSE;
     if ((int) levl[x][y].roomno == rmno && !levl[x][y].edge)
         return FALSE;
-    if (isok(x-1, y) && (int) levl[x-1][y].roomno == rmno)
+    if (isok(x-1, y) && (int) levl[x-1][y].roomno == rmno && x-1 <= droom->hx)
         return TRUE;
-    if (isok(x+1, y) && (int) levl[x+1][y].roomno == rmno)
+    if (isok(x+1, y) && (int) levl[x+1][y].roomno == rmno && x+1 >= droom->lx)
         return TRUE;
-    if (isok(x, y-1) && (int) levl[x][y-1].roomno == rmno)
+    if (isok(x, y-1) && (int) levl[x][y-1].roomno == rmno && y-1 <= droom->hy)
         return TRUE;
-    if (isok(x, y+1) && (int) levl[x][y+1].roomno == rmno)
+    if (isok(x, y+1) && (int) levl[x][y+1].roomno == rmno && y+1 >= droom->ly)
         return TRUE;
     return FALSE;
 }
