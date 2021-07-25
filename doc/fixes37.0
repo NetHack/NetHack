@@ -755,6 +755,8 @@ using bhitpos in flooreffects to handle erosion damage broke its original use
 	of tracking wand zaps if a teleportation zap hit an object; subsequent
 	zap traversal was done from object's landing spot rather than from its
 	zap hit spot, resulting in scrambled wand targetting
+restore previous behavior of the 'altmeta' option (only wait for a second
+	character when getting a command keystroke, not other key input)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
