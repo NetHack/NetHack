@@ -2486,25 +2486,30 @@ dokeylist(void)
     putstr(datawin, 0, "");
     show_menu_controls(datawin, TRUE);
 
-    if (keylist_putcmds(datawin, TRUE, GENERALCMD, WIZMODECMD, keys_used)) {
+    if (keylist_putcmds(datawin, TRUE, GENERALCMD,
+                        WIZMODECMD | INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "General commands:");
-        (void) keylist_putcmds(datawin, FALSE, GENERALCMD, WIZMODECMD,
+        (void) keylist_putcmds(datawin, FALSE, GENERALCMD,
+                               WIZMODECMD | INTERNALCMD,
                                  keys_used);
     }
 
     if (keylist_putcmds(datawin, TRUE, 0,
-                        GENERALCMD | WIZMODECMD, keys_used)) {
+                        GENERALCMD | WIZMODECMD | INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Game commands:");
         (void) keylist_putcmds(datawin, FALSE, 0,
-                               GENERALCMD | WIZMODECMD, keys_used);
+                               GENERALCMD | WIZMODECMD | INTERNALCMD,
+                               keys_used);
     }
 
-    if (wizard && keylist_putcmds(datawin, TRUE, WIZMODECMD, 0, keys_used)) {
+    if (wizard && keylist_putcmds(datawin, TRUE,
+                                  WIZMODECMD, INTERNALCMD, keys_used)) {
         putstr(datawin, 0, "");
         putstr(datawin, 0, "Debug mode commands:");
-        (void) keylist_putcmds(datawin, FALSE, WIZMODECMD, 0, keys_used);
+        (void) keylist_putcmds(datawin, FALSE,
+                               WIZMODECMD, INTERNALCMD, keys_used);
     }
 
     display_nhwindow(datawin, FALSE);
