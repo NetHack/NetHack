@@ -572,6 +572,7 @@ fix heap-use-after-free when attacking monster with potion
 for "a" vs "an", add ukulele and uke as exceptions for "an u<anything>"
 add new extended command #retravel
 remove special doinv key, functionality was equal to BIND=0:inventory
+some monsters should not have been scared of bugle playing
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
