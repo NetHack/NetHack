@@ -128,9 +128,17 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
 
 /*
  *  Default screen symbols with explanations and colors.
+ *
+ *  If adding to or removing from this list, please note that,
+ *  for builds with tile support, there is an array in
+ *  win/share/tiletext.c that requires the same number of elements as
+ *  this, in the same order. It is used for tile name matching when
+ *  parsing other.txt because some of the useful tile names don't exist
+ *  within NetHack itself.
  */
 const struct symdef defsyms[MAXPCHARS] = {
-/* 0*/ { ' ', "stone", C(NO_COLOR) },                /* stone */
+/* 0*/
+       { ' ', "stone", C(NO_COLOR) },                /* stone */
        { '|', "wall", C(CLR_GRAY) },                 /* vwall */
        { '-', "wall", C(CLR_GRAY) },                 /* hwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tlcorn */
@@ -140,7 +148,8 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '-', "wall", C(CLR_GRAY) },                 /* crwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tuwall */
        { '-', "wall", C(CLR_GRAY) },                 /* tdwall */
-/*10*/ { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
+/*10*/
+       { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
        { '|', "wall", C(CLR_GRAY) },                 /* trwall */
        { '.', "doorway", C(CLR_GRAY) },              /* ndoor */
        { '-', "open door", C(CLR_BROWN) },           /* vodoor */
@@ -150,7 +159,8 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '#', "iron bars", C(HI_METAL) },            /* bars */
        { '#', "tree", C(CLR_GREEN) },                /* tree */
        { '.', "floor of a room", C(CLR_GRAY) },      /* room */
-/*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
+/*20*/
+       { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
        { '#', "corridor", C(CLR_GRAY) },             /* dark corr */
        { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr, see map_glyphinfo() */
        { '<', "staircase up", C(CLR_GRAY) },         /* upstair */
@@ -160,57 +170,63 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '<', "branch staircase up", C(CLR_YELLOW) },   /* brupstair */
        { '>', "branch staircase down", C(CLR_YELLOW) }, /* brdnstair */
        { '<', "branch ladder up", C(CLR_YELLOW) },   /* brupladder */
+/*30*/
        { '>', "branch ladder down", C(CLR_YELLOW) }, /* brdnladder */
        { '_', "altar", C(CLR_GRAY) },                /* altar */
        { '|', "grave", C(CLR_WHITE) },               /* grave */
        { '\\', "opulent throne", C(HI_GOLD) },       /* throne */
-/*30*/ { '#', "sink", C(CLR_GRAY) },                 /* sink */
+       { '#', "sink", C(CLR_GRAY) },                 /* sink */
        { '{', "fountain", C(CLR_BRIGHT_BLUE) },      /* fountain */
        { '}', "water", C(CLR_BLUE) },                /* pool */
        { '.', "ice", C(CLR_CYAN) },                  /* ice */
        { '}', "molten lava", C(CLR_RED) },           /* lava */
        { '.', "lowered drawbridge", C(CLR_BROWN) },  /* vodbridge */
+/*40*/
        { '.', "lowered drawbridge", C(CLR_BROWN) },  /* hodbridge */
        { '#', "raised drawbridge", C(CLR_BROWN) },   /* vcdbridge */
        { '#', "raised drawbridge", C(CLR_BROWN) },   /* hcdbridge */
        { ' ', "air", C(CLR_CYAN) },                  /* open air */
-/*40*/ { '#', "cloud", C(CLR_GRAY) },                /* [part of] a cloud */
+       { '#', "cloud", C(CLR_GRAY) },                /* [part of] a cloud */
        { '}', "water", C(CLR_BLUE) },                /* under water */
        { '^', "arrow trap", C(HI_METAL) },           /* trap */
        { '^', "dart trap", C(HI_METAL) },            /* trap */
        { '^', "falling rock trap", C(CLR_GRAY) },    /* trap */
        { '^', "squeaky board", C(CLR_BROWN) },       /* trap */
+/*50*/
        { '^', "bear trap", C(HI_METAL) },            /* trap */
        { '^', "land mine", C(CLR_RED) },             /* trap */
        { '^', "rolling boulder trap", C(CLR_GRAY) }, /* trap */
        { '^', "sleeping gas trap", C(HI_ZAP) },      /* trap */
-/*50*/ { '^', "rust trap", C(CLR_BLUE) },            /* trap */
+       { '^', "rust trap", C(CLR_BLUE) },            /* trap */
        { '^', "fire trap", C(CLR_ORANGE) },          /* trap */
        { '^', "pit", C(CLR_BLACK) },                 /* trap */
        { '^', "spiked pit", C(CLR_BLACK) },          /* trap */
        { '^', "hole", C(CLR_BROWN) },                /* trap */
        { '^', "trap door", C(CLR_BROWN) },           /* trap */
+/*60*/
        { '^', "teleportation trap", C(CLR_MAGENTA) },  /* trap */
        { '^', "level teleporter", C(CLR_MAGENTA) },    /* trap */
        { '^', "magic portal", C(CLR_BRIGHT_MAGENTA) }, /* trap */
        { '"', "web", C(CLR_GRAY) },                    /* web */
-/*60*/ { '^', "statue trap", C(CLR_GRAY) },            /* trap */
+       { '^', "statue trap", C(CLR_GRAY) },            /* trap */
        { '^', "magic trap", C(HI_ZAP) },               /* trap */
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
        { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
        { '~', "vibrating square", C(CLR_MAGENTA) },    /* "trap" */
        /* zap colors are changed by map_glyphinfo() to match type of beam */
        { '|', "", C(CLR_GRAY) },                /* vbeam */
+/*70*/
        { '-', "", C(CLR_GRAY) },                /* hbeam */
        { '\\', "", C(CLR_GRAY) },               /* lslant */
        { '/', "", C(CLR_GRAY) },                /* rslant */
        { '*', "", C(CLR_WHITE) },               /* dig beam */
        { '!', "", C(CLR_WHITE) },               /* camera flash beam */
        { ')', "", C(HI_WOOD) },                 /* boomerang open left */
-/*70*/ { '(', "", C(HI_WOOD) },                 /* boomerang open right */
+       { '(', "", C(HI_WOOD) },                 /* boomerang open right */
        { '0', "", C(HI_ZAP) },                  /* 4 magic shield symbols */
        { '#', "", C(HI_ZAP) },
        { '@', "", C(HI_ZAP) },
+/*80*/
        { '*', "", C(HI_ZAP) },
        { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
        { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
@@ -218,10 +234,11 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '/', "", C(CLR_GREEN) },         /* swallow top left      */
        { '-', "", C(CLR_GREEN) },         /* swallow top center    */
        { '\\', "", C(CLR_GREEN) },        /* swallow top right     */
-/*80*/ { '|', "", C(CLR_GREEN) },         /* swallow middle left   */
+       { '|', "", C(CLR_GREEN) },         /* swallow middle left   */
        { '|', "", C(CLR_GREEN) },         /* swallow middle right  */
        { '\\', "", C(CLR_GREEN) },        /* swallow bottom left   */
        { '-', "", C(CLR_GREEN) },         /* swallow bottom center */
+/*90*/
        { '/', "", C(CLR_GREEN) },         /* swallow bottom right  */
        /* explosion colors are changed by map_glyphinfo() to match type of expl. */
        { '/', "", C(CLR_ORANGE) },        /* explosion top left     */
@@ -229,7 +246,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
        { '|', "", C(CLR_ORANGE) },        /* explosion middle left  */
        { ' ', "", C(CLR_ORANGE) },        /* explosion middle center*/
-/*90*/ { '|', "", C(CLR_ORANGE) },        /* explosion middle right */
+       { '|', "", C(CLR_ORANGE) },        /* explosion middle right */
        { '\\', "", C(CLR_ORANGE) },       /* explosion bottom left  */
        { '-', "", C(CLR_ORANGE) },        /* explosion bottom center*/
        { '/', "", C(CLR_ORANGE) },        /* explosion bottom right */
