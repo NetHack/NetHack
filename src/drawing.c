@@ -130,7 +130,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  Default screen symbols with explanations and colors.
  *
  *  If adding to or removing from this list, please note that,
- *  for builds with tile support, there is an array in
+ *  for builds with tile support, there is an array call altlabels[] in
  *  win/share/tiletext.c that requires the same number of elements as
  *  this, in the same order. It is used for tile name matching when
  *  parsing other.txt because some of the useful tile names don't exist
