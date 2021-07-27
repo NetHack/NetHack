@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.608 $ $NHDT-Date: 1627413528 2021/07/27 19:18:48 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.609 $ $NHDT-Date: 1627414178 2021/07/27 19:29:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -575,6 +575,7 @@ remove special doinv key, functionality was equal to BIND=0:inventory
 some monsters should not have been scared of bugle playing
 monsters that drowned would never leave a corpse (holdover from decades ago
 	when it wasn't possible to recover anything from a water location)
+give alternate message if hero is blind when throne gives "your vision clears"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
