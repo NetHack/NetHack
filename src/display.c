@@ -1806,6 +1806,7 @@ back_to_glyph(xchar x, xchar y)
 {
     int idx;
     struct rm *ptr = &(levl[x][y]);
+    struct stairway *sway;
 
     switch (ptr->typ) {
     case SCORR:
@@ -1854,10 +1855,18 @@ back_to_glyph(xchar x, xchar y)
         idx = S_pool;
         break;
     case STAIRS:
-        idx = (ptr->ladder & LA_DOWN) ? S_dnstair : S_upstair;
+        sway = stairway_at(x, y);
+        if (sway && (sway->tolev.dnum != u.uz.dnum))
+            idx = (ptr->ladder & LA_DOWN) ? S_brdnstair : S_brupstair;
+        else
+            idx = (ptr->ladder & LA_DOWN) ? S_dnstair : S_upstair;
         break;
     case LADDER:
-        idx = (ptr->ladder & LA_DOWN) ? S_dnladder : S_upladder;
+        sway = stairway_at(x, y);
+        if (sway && (sway->tolev.dnum != u.uz.dnum))
+            idx = (ptr->ladder & LA_DOWN) ? S_brdnladder : S_brupladder;
+        else
+            idx = (ptr->ladder & LA_DOWN) ? S_dnladder : S_upladder;
         break;
     case FOUNTAIN:
         idx = S_fountain;
