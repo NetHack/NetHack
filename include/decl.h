@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1607641577 2020/12/10 23:06:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1627408982 2021/07/27 18:03:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,6 +105,10 @@ struct sinfo {
     int in_paniclog;
 #endif
     int wizkit_wishing;
+    /* getting_a_command:  only used for ALTMETA config to process ESC, but
+       present and updated unconditionally; set by parse() when requesting
+       next command keystroke, reset by readchar() as it returns a key */
+    int getting_a_command;
 };
 
 /* Flags for controlling uptodate */

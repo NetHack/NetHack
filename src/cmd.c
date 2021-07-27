@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1621377703 2021/05/18 22:41:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1627408993 2021/07/27 18:03:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.481 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -170,9 +170,6 @@ static const char *readchar_queue = "";
 static const char unavailcmd[] = "Unavailable command '%s'.";
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
-
-/* only needed for #if ALTMETA config but present unconditionally */
-static boolean getting_cmd = FALSE; /* True when parse() gets next command */
 
 static int
 doprev_message(void)
@@ -4478,8 +4475,9 @@ parse(void)
     g.context.move = 1;
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
-    getting_cmd = TRUE; /* affects readchar() behavior if the 'altmeta'
-                         * option is On; reset to False by readchar() */
+    g.program_state.getting_a_command = 1; /* affects readchar() behavior for
+                                            * ESC iff 'altmeta' option is On;
+                                            * reset to 0 by readchar() */
     if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &g.command_count, FALSE);
@@ -4627,7 +4625,8 @@ readchar_core(int *x, int *y, int *mod)
 #endif
         sym = '\033';
 #ifdef ALTMETA
-    } else if (sym == '\033' && iflags.altmeta && getting_cmd) {
+    } else if (sym == '\033' && iflags.altmeta
+               && g.program_state.getting_a_command) {
         /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' but
            only when we're called by parse() [possibly via get_count()] */
         sym = *readchar_queue ? *readchar_queue++ : pgetchar();
@@ -4641,8 +4640,9 @@ readchar_core(int *x, int *y, int *mod)
         readchar_queue = click_to_cmd(*x, *y, *mod);
         sym = *readchar_queue++;
     }
-    getting_cmd = FALSE; /* next readchar() will be for an ordinary char
-                          * unless parse() sets this back to True */
+    g.program_state.getting_a_command = 0; /* next readchar() will be for an
+                                            * ordinary char unless parse()
+                                            * sets this back to 1 */
     return (char) sym;
 }
 
