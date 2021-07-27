@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.596 $ $NHDT-Date: 1626390626 2021/07/15 23:10:26 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.609 $ $NHDT-Date: 1627414178 2021/07/27 19:29:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -573,6 +573,9 @@ for "a" vs "an", add ukulele and uke as exceptions for "an u<anything>"
 add new extended command #retravel
 remove special doinv key, functionality was equal to BIND=0:inventory
 some monsters should not have been scared of bugle playing
+monsters that drowned would never leave a corpse (holdover from decades ago
+	when it wasn't possible to recover anything from a water location)
+give alternate message if hero is blind when throne gives "your vision clears"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
