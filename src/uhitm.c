@@ -4967,6 +4967,15 @@ passive(struct monst *mon,
             } else if (aatyp == AT_BITE || aatyp == AT_BUTT
                        || (aatyp >= AT_STNG && aatyp < AT_WEAP)) {
                 break; /* no object involved */
+            } else {
+                /*
+                 * TODO:  #H2668 - if hitting with a ring that has a
+                 * positive enchantment, it ought to be subject to
+                 * having that enchantment reduced.  But we don't have
+                 * sufficient information here to know which hand/ring
+                 * has delived a weaponless blow.
+                 */
+                ;
             }
             passive_obj(mon, weapon, &(ptr->mattk[i]));
         }
