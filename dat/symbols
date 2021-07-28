@@ -67,8 +67,12 @@ start: NHAccess
 	S_litcorr: \062
 	S_upstair: \060
 	S_dnstair: \062
+	S_brupstair: \060
+	S_brdnstair: \062
 	S_upladder: \095
 	S_dnladder: \092
+	S_brupladder: \095
+	S_brdnladder: \092
 	S_altar: \035
 	S_grave: \126
 	S_throne: \126
@@ -170,6 +174,8 @@ start: Blank
         S_digbeam: \032
         S_dnladder: \032
         S_dnstair: \032
+        S_brdnladder: \032
+        S_brdnstair: \032
         S_dog: \032
         S_dragon: \032
         S_eel: \032
@@ -288,7 +294,9 @@ start: Blank
         S_umber: \032
         S_unicorn: \032
         S_upladder: \032
+        S_brupladder: \032
         S_upstair: \032
+        S_brupstair: \032
         S_vampire: \032
         S_vbeam: \032
         S_vcdbridge: \032
@@ -428,6 +436,8 @@ start: RogueIBM
 	S_litcorr: \xb2
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
+	S_brupstair: \xf0		# Greek Xi
+	S_brdnstair: \xf0
 finish
 
 start: RogueEpyx
@@ -454,6 +464,8 @@ start: RogueEpyx
 	S_litcorr: \xb2
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
+	S_brupstair: \xf0		# Greek Xi
+	S_brdnstair: \xf0
 	S_arrow_trap: \x04		# diamond (cards)
 	S_dart_trap: \x04
 	S_falling_rock_trap: \x04
@@ -530,6 +542,8 @@ start: RogueWindows
 	S_litcorr: \xb2
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
+	S_brupstair: \xf0		# Greek Xi
+	S_brdnstair: \xf0
 finish
 
 start: curses
@@ -587,6 +601,8 @@ start: DECgraphics
 	S_room: \xfe			# meta-~, centered dot
 	S_upladder: \xf9		# meta-y, less-than-or-equals
 	S_dnladder: \xfa		# meta-z, greater-than-or-equals
+	S_brupladder: \xf9		# meta-y, less-than-or-equals
+	S_brdnladder: \xfa		# meta-z, greater-than-or-equals
 	S_altar: \xfb			# meta-{, pi (used to default to '_')
 	S_pool: \xe0			# meta-\, diamond
 	S_ice: \xfe			# meta-~, centered dot
