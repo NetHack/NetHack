@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.609 $ $NHDT-Date: 1627414178 2021/07/27 19:29:38 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.610 $ $NHDT-Date: 1627505147 2021/07/28 20:45:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -576,6 +576,8 @@ some monsters should not have been scared of bugle playing
 monsters that drowned would never leave a corpse (holdover from decades ago
 	when it wasn't possible to recover anything from a water location)
 give alternate message if hero is blind when throne gives "your vision clears"
+monster wearing an alchemy smock was only getting poison resistance from it,
+	not acid resistance; give both properties, just like for hero
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
