@@ -1123,6 +1123,9 @@ makemon(register struct permonst *ptr,
     fakemon = cg.zeromonst;
     cc.x = cc.y = 0;
 
+    if (iflags.debug_mongen)
+        return (struct monst *) 0;
+
     /* if caller wants random location, do it here */
     if (x == 0 && y == 0) {
         fakemon.data = ptr; /* set up for goodpos */

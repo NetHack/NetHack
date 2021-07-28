@@ -18,6 +18,7 @@ extern char *fmt_ptr(const void *);
 
 /* ### allmain.c ### */
 
+extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
 extern void display_gamewindows(void);

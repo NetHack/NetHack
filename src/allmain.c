@@ -14,7 +14,6 @@
 
 static void moveloop_preamble(boolean);
 static void u_calc_moveamt(int);
-static void moveloop_core(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -133,17 +132,17 @@ u_calc_moveamt(int wtcap)
         g.youmonst.movement = 0;
 }
 
-static void
+#if defined(MICRO) || defined(WIN32)
+static int mvl_abort_lev;
+#endif
+static int mvl_wtcap = 0;
+static int mvl_change = 0;
+
+void
 moveloop_core(void)
 {
-#if defined(MICRO) || defined(WIN32)
-    char ch;
-    int abort_lev;
-#endif
-    int wtcap = 0, change = 0;
     boolean monscanmove = FALSE;
 
-    for (;;) {
 #ifdef SAFERHANGUP
         if (g.program_state.done_hup)
             end_of_input();
@@ -158,7 +157,7 @@ moveloop_core(void)
             g.youmonst.movement -= NORMAL_SPEED;
 
             do { /* hero can't move this turn loop */
-                wtcap = encumber_msg();
+                mvl_wtcap = encumber_msg();
 
                 g.context.mon_moving = TRUE;
                 do {
@@ -190,7 +189,7 @@ moveloop_core(void)
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
-                    u_calc_moveamt(wtcap);
+                    u_calc_moveamt(mvl_wtcap);
                     settrack();
 
                     g.monstermoves++; /* [obsolete (for a long time...)] */
@@ -236,24 +235,24 @@ moveloop_core(void)
                      */
                     if (u.uinvulnerable) {
                         /* for the moment at least, you're in tiptop shape */
-                        wtcap = UNENCUMBERED;
+                        mvl_wtcap = UNENCUMBERED;
                     } else if (!Upolyd ? (u.uhp < u.uhpmax)
                                        : (u.mh < u.mhmax
                                           || g.youmonst.data->mlet == S_EEL)) {
                         /* maybe heal */
-                        regen_hp(wtcap);
+                        regen_hp(mvl_wtcap);
                     }
 
                     /* moving around while encumbered is hard work */
-                    if (wtcap > MOD_ENCUMBER && u.umoved) {
-                        if (!(wtcap < EXT_ENCUMBER ? g.moves % 30
+                    if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
+                        if (!(mvl_wtcap < EXT_ENCUMBER ? g.moves % 30
                                                    : g.moves % 10)) {
                             overexert_hp();
                         }
                     }
 
                     if (u.uen < u.uenmax
-                        && ((wtcap < MOD_ENCUMBER
+                        && ((mvl_wtcap < MOD_ENCUMBER
                              && (!(g.moves % ((MAXULEV + 8 - u.ulevel)
                                             * (Role_if(PM_WIZARD) ? 3 : 4)
                                             / 6)))) || Energy_regeneration)) {
@@ -281,22 +280,22 @@ moveloop_core(void)
                             }
                         }
                         /* delayed change may not be valid anymore */
-                        if ((change == 1 && !Polymorph)
-                            || (change == 2 && u.ulycn == NON_PM))
-                            change = 0;
+                        if ((mvl_change == 1 && !Polymorph)
+                            || (mvl_change == 2 && u.ulycn == NON_PM))
+                            mvl_change = 0;
                         if (Polymorph && !rn2(100))
-                            change = 1;
+                            mvl_change = 1;
                         else if (u.ulycn >= LOW_PM && !Upolyd
                                  && !rn2(80 - (20 * night())))
-                            change = 2;
-                        if (change && !Unchanging) {
+                            mvl_change = 2;
+                        if (mvl_change && !Unchanging) {
                             if (g.multi >= 0) {
                                 stop_occupation();
-                                if (change == 1)
+                                if (mvl_change == 1)
                                     polyself(0);
                                 else
                                     you_were();
-                                change = 0;
+                                mvl_change = 0;
                             }
                         }
                     }
@@ -418,21 +417,23 @@ moveloop_core(void)
 
         if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
-            abort_lev = 0;
+            mvl_abort_lev = 0;
             if (kbhit()) {
+                char ch;
+
                 if ((ch = pgetchar()) == ABORT)
-                    abort_lev++;
+                    mvl_abort_lev++;
                 else
                     pushch(ch);
             }
-            if (!abort_lev && (*g.occupation)() == 0)
+            if (!mvl_abort_lev && (*g.occupation)() == 0)
 #else
             if ((*g.occupation)() == 0)
 #endif
                 g.occupation = 0;
             if (
 #if defined(MICRO) || defined(WIN32)
-                abort_lev ||
+                mvl_abort_lev ||
 #endif
                 monster_nearby()) {
                 stop_occupation();
@@ -442,7 +443,7 @@ moveloop_core(void)
             if (!(++g.occtime % 7))
                 display_nhwindow(WIN_MAP, FALSE);
 #endif
-            continue;
+            return;
         }
 
         if (iflags.sanity_check || iflags.debug_fuzzer)
@@ -460,7 +461,7 @@ moveloop_core(void)
             if (!g.multi) {
                 /* lookaround may clear multi */
                 g.context.move = 0;
-                continue;
+                return;
             }
             if (g.context.mv) {
                 if (g.multi < COLNO && !--g.multi)
@@ -492,14 +493,15 @@ moveloop_core(void)
             /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }
-    }
 }
 
 void
 moveloop(boolean resuming)
 {
     moveloop_preamble(resuming);
-    moveloop_core();
+    for (;;) {
+        moveloop_core();
+    }
 }
 
 #define U_CAN_REGEN() (Regeneration || (Sleepy && u.usleep))
