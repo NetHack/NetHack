@@ -131,7 +131,7 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *
  *  If adding to or removing from this list, please note that,
  *  for builds with tile support, there is an array called altlabels[] in
- *  win/share/tiletext.c that requires the same number of elements as
+ *  win/share/tilemap.c that requires the same number of elements as
  *  this, in the same order. It is used for tile name matching when
  *  parsing other.txt because some of the useful tile names don't exist
  *  within NetHack itself.
