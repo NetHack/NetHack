@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1626315675 2021/07/15 02:21:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1627516694 2021/07/28 23:58:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.270 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1248,7 +1248,11 @@ u_collide_m(struct monst *mtmp)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal)
+goto_level(
+    d_level *newlevel, /* destination */
+    boolean at_stairs, /* True if arriving via stairs/ladder */
+    boolean falling,   /* when fallling to level, objects might tag along */
+    boolean portal)    /* True if arriving via magic portal */
 {
     int l_idx, save_mode;
     NHFILE *nhfp;
