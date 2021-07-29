@@ -734,6 +734,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 
         rushrun = FALSE;
 
+        g.program_state.getting_a_command = 1;
         c = readchar_poskey(&tx, &ty, &sidx);
 
         if (hilite_state) {
