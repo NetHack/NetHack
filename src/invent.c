@@ -3283,7 +3283,7 @@ dfeature_at(int x, int y, char *buf)
     int ltyp = lev->typ, cmap = -1;
     const char *dfeature = 0;
     static char altbuf[BUFSZ];
-    stairway *stway = stairway_at(x,y);
+    stairway *stway = stairway_at(x, y);
 
     if (IS_DOOR(ltyp)) {
         switch (lev->doormask) {
@@ -3324,15 +3324,20 @@ dfeature_at(int x, int y, char *buf)
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
-    } else if (stway && !stway->isladder && stway->up)
-        cmap = S_upstair; /* "staircase up" */
-    else if (stway && !stway->isladder && !stway->up)
-        cmap = S_dnstair; /* "staircase down" */
-    else if (stway && stway->isladder && stway->up)
-        cmap = S_upladder; /* "ladder up" */
-    else if (stway && stway->isladder && !stway->up)
-        cmap = S_dnladder; /* "ladder down" */
-    else if (ltyp == DRAWBRIDGE_DOWN)
+    } else if (stway) {
+        (void) known_branch_stairs(stway, altbuf, TRUE);
+        dfeature = altbuf;
+#if 0
+        if (!stway->isladder && stway->up)
+            cmap = S_upstair; /* "staircase up" */
+        else if (!stway->isladder && !stway->up)
+            cmap = S_dnstair; /* "staircase down" */
+        else if (stway->isladder && stway->up)
+            cmap = S_upladder; /* "ladder up" */
+        else if (stway->isladder && !stway->up)
+            cmap = S_dnladder; /* "ladder down" */
+#endif
+    } else if (ltyp == DRAWBRIDGE_DOWN)
         cmap = S_vodbridge; /* "lowered drawbridge" */
     else if (ltyp == DBWALL)
         cmap = S_vcdbridge; /* "raised drawbridge" */

@@ -1856,14 +1856,14 @@ back_to_glyph(xchar x, xchar y)
         break;
     case STAIRS:
         sway = stairway_at(x, y);
-        if (sway && (sway->tolev.dnum != u.uz.dnum))
+        if (known_branch_stairs(sway, (char *) 0, FALSE))
             idx = (ptr->ladder & LA_DOWN) ? S_brdnstair : S_brupstair;
         else
             idx = (ptr->ladder & LA_DOWN) ? S_dnstair : S_upstair;
         break;
     case LADDER:
         sway = stairway_at(x, y);
-        if (sway && (sway->tolev.dnum != u.uz.dnum))
+        if (known_branch_stairs(sway, (char *) 0, FALSE))
             idx = (ptr->ladder & LA_DOWN) ? S_brdnladder : S_brupladder;
         else
             idx = (ptr->ladder & LA_DOWN) ? S_dnladder : S_upladder;

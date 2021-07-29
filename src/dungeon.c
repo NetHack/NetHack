@@ -1279,7 +1279,8 @@ ledger_to_dnum(xchar ledgerno)
     /* find i such that (i->base + 1) <= ledgerno <= (i->base + i->count) */
     for (i = 0; i < g.n_dgns; i++)
         if (g.dungeons[i].ledger_start < ledgerno
-            && ledgerno <= g.dungeons[i].ledger_start + g.dungeons[i].num_dunlevs)
+            && (ledgerno
+                <= g.dungeons[i].ledger_start + g.dungeons[i].num_dunlevs))
             return (xchar) i;
 
     panic("level number out of range [ledger_to_dnum(%d)]", (int) ledgerno);
@@ -1950,7 +1951,7 @@ level_difficulty(void)
          * below rather than stairs 1 level beneath the entry level.
          */
         else if (On_W_tower_level(&u.uz) && In_W_tower(some_X, some_Y, &u.uz))
-            res += (fakewiz1.dlev - u.uz.dlev);
+            res += (fakewiz1.dlevel - u.uz.dlevel);
             /*
              * Handling this properly would need more information here:
              * an inside/outside flag, or coordinates to calculate it.
@@ -2103,6 +2104,50 @@ tport_menu(winid win, char *entry, struct lchoice *lchoices,
         lchoices->menuletter++;
     lchoices->idx++;
     return;
+}
+
+/* this is only an approximation; to make it accurate, the stair list
+   should track which stairs have been traversed */
+boolean
+known_branch_stairs(stairway *sway, char *outbuf, boolean stcase)
+{
+    d_level tolev;
+    const char *stairs, *updown;
+    int ledgr, dest_visited;
+
+    if (outbuf)
+        *outbuf = '\0';
+    if (!sway)
+        return FALSE;
+
+    tolev = sway->tolev;
+    stairs = sway->isladder ? "ladder" : stcase ? "staircase" : "stairs";
+    updown = sway->up ? "up" : "down";
+    ledgr = ledger_no(&tolev);
+    dest_visited = (g.level_info[ledgr].flags & VISITED) != 0;
+
+    if (tolev.dnum == u.uz.dnum || !dest_visited) {
+        if (outbuf) {
+            Sprintf(outbuf, "%s %s", stairs, updown);
+            if (dest_visited) {
+                boolean specialdepth = (tolev.dnum == quest_dnum
+                                        || tolev.dnum == knox_level.dnum);
+                int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
+
+                Sprintf(eos(outbuf), " to level %d", to_dlev);
+            }
+        }
+        /* might actually be branch stairs but if the branch hasn't been
+           visited yet, the hero won't know that */
+        return FALSE;
+    }
+    if (outbuf) {
+        Sprintf(outbuf, "branch %s %s to %s",
+                stairs, updown, g.dungeons[tolev.dnum].dname);
+        (void) strsubst(outbuf, "The ", "the ");
+    }
+    /* branch stairs and hero knows it */
+    return TRUE;
 }
 
 /* Convert a branch type to a string usable by print_dungeon(). */
