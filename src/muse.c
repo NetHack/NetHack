@@ -2829,7 +2829,10 @@ muse_unslime(
         dmg = d(3, 4); /* [**TEMP** (different from hero)] */
         m_useup(mon, obj);
     } else { /* wand/horn of fire w/ positive charge count */
-        mplayhorn(mon, obj, TRUE);
+        if (obj->otyp == FIRE_HORN)
+            mplayhorn(mon, obj, TRUE);
+        else
+            mzapwand(mon, obj, TRUE);
         /* -1 => monster's wand of fire; 2 => # of damage dice */
         dmg = zhitm(mon, by_you ? 1 : -1, 2, &odummyp);
     }

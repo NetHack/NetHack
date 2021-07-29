@@ -2956,7 +2956,7 @@ rnd_otyp_by_namedesc(
      * probabilities are not very useful because they don't take
      * the class generation probability into account.  [If 10%
      * of spellbooks were blank and 1% of scrolls were blank,
-     * "blank" would have 10/11 chance to yield a blook even though
+     * "blank" would have 10/11 chance to yield a book even though
      * scrolls are supposed to be much more common than books.]
      */
     for (i = lo; i <= hi; ++i) {
@@ -3910,6 +3910,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
             register int j = strlen(wrp[i]);
 
+            /* check for "<class> [ of ] something" */
             if (!strncmpi(d->bp, wrp[i], j)) {
                 d->oclass = wrpsym[i];
                 if (d->oclass != AMULET_CLASS) {
@@ -3921,12 +3922,27 @@ readobjnam_postparse1(struct _readobjnam_data *d)
                     d->actualn = d->bp;
                 return 1; /*goto srch;*/
             }
+            /* check for "something <class>" */
             if (!BSTRCMPI(d->bp, d->p - j, wrp[i])) {
                 d->oclass = wrpsym[i];
-                d->p -= j;
-                *d->p = 0;
-                if (d->p > d->bp && d->p[-1] == ' ')
-                    d->p[-1] = 0;
+                /* for "foo amulet", leave the class name so that
+                   wishymatch() can do "of inversion" to try matching
+                   "amulet of foo"; other classes don't include their
+                   class name in their full object names (where
+                   "potion of healing" is just "healing", for instance) */
+                if (d->oclass != AMULET_CLASS) {
+                    d->p -= j;
+                    *d->p = '\0';
+                    if (d->p > d->bp && d->p[-1] == ' ')
+                        d->p[-1] = '\0';
+                } else {
+                    /* amulet without "of"; convoluted wording but better a
+                       special case that's handled than one that's missing */
+                    if (!strncmpi(d->bp, "versus poison ", 14)) {
+                        d->typ = AMULET_VERSUS_POISON;
+                        return 2; /*goto typfnd;*/
+                    }
+                }
                 d->actualn = d->dn = d->bp;
                 return 1; /*goto srch;*/
             }

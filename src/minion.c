@@ -236,9 +236,13 @@ summon_minion(aligntyp alignment, boolean talk)
     }
     if (mon) {
         if (talk) {
-            pline_The("voice of %s booms:", align_gname(alignment));
+            if (!Deaf)
+                pline_The("voice of %s booms:", align_gname(alignment));
+            else
+                You_feel("%s booming voice:",
+                         s_suffix(align_gname(alignment)));
             verbalize("Thou shalt pay for thine indiscretion!");
-            if (!Blind)
+            if (canspotmon(mon))
                 pline("%s appears before you.", Amonnam(mon));
             mon->mstrategy &= ~STRAT_APPEARMSG;
         }
@@ -289,16 +293,18 @@ demon_talk(register struct monst *mtmp)
         newsym(mtmp->mx, mtmp->my);
     }
     if (g.youmonst.data->mlet == S_DEMON) { /* Won't blackmail their own. */
-        pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
-              flags.female ? "Sister" : "Brother");
+        if (!Deaf)
+            pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
+                  flags.female ? "Sister" : "Brother");
+        else if (canseemon(mtmp))
+            pline("%s says something.", Amonnam(mtmp));
         if (!tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
         return 1;
     }
     cash = money_cnt(g.invent);
-    demand =
-        (cash * (rnd(80) + 20 * Athome))
-        / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
+    demand = (cash * (rnd(80) + 20 * Athome))
+           / (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
 
     if (!demand || g.multi < 0) { /* you have no gold or can't move */
         mtmp->mpeaceful = 0;
@@ -308,13 +314,21 @@ demon_talk(register struct monst *mtmp)
         /* make sure that the demand is unmeetable if the monster
            has the Amulet, preventing monster from being satisfied
            and removed from the game (along with said Amulet...) */
-        if (mon_has_amulet(mtmp))
-            demand = cash + (long) rn1(1000, 40);
+        /* [actually the Amulet is safe; it would be dropped when
+           mongone() gets rid of the monster; force combat anyway;
+           also make it unmeetable if the player is Deaf, to simplify
+           handling that case as player-won't-pay] */
+        if (mon_has_amulet(mtmp) || Deaf)
+            /* 125: 5*25 in case hero has maximum possible charisma */
+            demand = cash + (long) rn1(1000, 125);
 
-        pline("%s demands %ld %s for safe passage.", Amonnam(mtmp), demand,
-              currency(demand));
-
-        if ((offer = bribe(mtmp)) >= demand) {
+        if (!Deaf)
+            pline("%s demands %ld %s for safe passage.",
+                  Amonnam(mtmp), demand, currency(demand));
+        else if (canseemon(mtmp))
+            pline("%s seems to be demanding something.", Amonnam(mtmp));
+        offer = 0L;
+        if (!Deaf && ((offer = bribe(mtmp)) >= demand)) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
         } else if (offer > 0L
@@ -477,12 +491,18 @@ gain_guardian_angel(void)
     Hear_again(); /* attempt to cure any deafness now (divine
                      message will be heard even if that fails) */
     if (Conflict) {
-        pline("A voice booms:");
+       if (!Deaf)
+            pline("A voice booms:");
+        else
+            You_feel("a booming voice:");
         verbalize("Thy desire for conflict shall be fulfilled!");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
     } else if (u.ualign.record > 8) { /* fervent */
-        pline("A voice whispers:");
+        if (!Deaf)
+            pline("A voice whispers:");
+        else
+            You_feel("a soft voice:");
         verbalize("Thou hast been worthy of me!");
         mm.x = u.ux;
         mm.y = u.uy;

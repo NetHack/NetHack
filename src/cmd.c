@@ -3349,7 +3349,8 @@ randomkey(void)
         c = (char) rn1('9' - '0' + 1, '0');
         break;
     case 14:
-        c = (char) rn2(iflags.wc_eight_bit_input ? 256 : 128);
+        /* any char, but avoid '\0' because it's used for mouse click */
+        c = (char) rnd(iflags.wc_eight_bit_input ? 255 : 127);
         break;
     }
 
