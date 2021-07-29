@@ -13,7 +13,7 @@ local POS = { x = 10, y = 05 };
 local number_pad = 0;
 
 function initlev()
-   nh.monster_generation(false);
+   nh.debug_flags({mongen = false, hunger = false });
    des.level_flags("noflip");
    des.reset_level();
    des.level_init({ style = "solidfill", fg = ".", lit = true });

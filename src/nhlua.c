@@ -21,7 +21,7 @@ static int nhl_dnum_name(lua_State *);
 static int nhl_stairways(lua_State *);
 static int nhl_pushkey(lua_State *);
 static int nhl_doturn(lua_State *);
-static int nhl_monster_generation(lua_State *);
+static int nhl_debug_flags(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
@@ -973,17 +973,22 @@ nhl_doturn(lua_State *L)
     return 0;
 }
 
-/* disable or enable monster generation. debugging use only. */
-/* disabling also kills all monsters on current level. */
-/* local prevvalue = nh.monster_generation(false); */
+/* set debugging flags. debugging use only, of course. */
+/* nh.debug_flags({ mongen = false, hunger = false }); */
 static int
-nhl_monster_generation(lua_State *L)
+nhl_debug_flags(lua_State *L)
 {
     int argc = lua_gettop(L);
-    boolean val = !iflags.debug_mongen; /* value in lua is negated */
+    int val;
 
-    if (argc == 1) {
-        iflags.debug_mongen = !lua_toboolean(L, 1);
+    int i;
+
+    lcheck_param_table(L);
+
+    /* disable monster generation */
+    val = get_table_boolean_opt(L, "mongen", -1);
+    if (val != -1) {
+        iflags.debug_mongen = !(boolean)val; /* value in lua is negated */
         if (iflags.debug_mongen) {
             register struct monst *mtmp, *mtmp2;
 
@@ -996,8 +1001,13 @@ nhl_monster_generation(lua_State *L)
         }
     }
 
-    lua_pushboolean(L, val);
-    return 1;
+    /* prevent hunger */
+    val = get_table_boolean_opt(L, "hunger", -1);
+    if (val != -1) {
+        iflags.debug_hunger = !(boolean)val; /* value in lua is negated */
+    }
+
+    return 0;
 }
 
 
@@ -1034,7 +1044,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"stairways", nhl_stairways},
     {"pushkey", nhl_pushkey},
     {"doturn", nhl_doturn},
-    {"monster_generation", nhl_monster_generation},
+    {"debug_flags", nhl_debug_flags},
     {NULL, NULL}
 };
 

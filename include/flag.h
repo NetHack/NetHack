@@ -205,6 +205,7 @@ struct instance_flags {
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
     boolean debug_mongen;  /* debug: prevent monster generation */
+    boolean debug_hunger;  /* debug: prevent hunger */
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     boolean in_dumplog;    /* doing the dumplog right now? */
     boolean in_parse;      /* is a command being parsed? */
