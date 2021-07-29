@@ -578,6 +578,8 @@ monsters that drowned would never leave a corpse (holdover from decades ago
 give alternate message if hero is blind when throne gives "your vision clears"
 monster wearing an alchemy smock was only getting poison resistance from it,
 	not acid resistance; give both properties, just like for hero
+in wizard mode, knowing teleport away spell resulted in ^T always attempting
+	the spell instead of teleporting on demand
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
