@@ -31,6 +31,10 @@ function setup1(param)
    des.terrain(POS.x - 2, POS.y, param);
 end
 
+function setup2(param)
+   des.terrain(POS.x + 15, POS.y, param);
+end
+
 local basicmoves = {
    -- move
    h = { dx = -1,  dy =  0, number_pad = 0 },
@@ -89,6 +93,16 @@ local basicmoves = {
    { key = "h", dx =  0, dy = 0, number_pad = 0, setup = setup1, param = "F" },
    { key = "h", dx = -1, dy = 0, number_pad = 0, setup = setup1, param = "#" },
    { key = "h", dx = -1, dy = 0, number_pad = 0, setup = setup1, param = "." },
+
+   -- run and terrains
+   { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = " " },
+   { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = "|" },
+   { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = "-" },
+   { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = "F" },
+   { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = "L" },
+   { key = "L", x = nhc.COLNO - 2, y = POS.y, number_pad = 0, setup = setup2, param = "#" },
+   { key = "L", x = nhc.COLNO - 2, y = POS.y, number_pad = 0, setup = setup2, param = "C" },
+
 };
 
 
