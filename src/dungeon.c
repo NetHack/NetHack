@@ -1361,6 +1361,9 @@ next_level(boolean at_stairs)
     stairway *stway = stairway_at(u.ux, u.uy);
     d_level newlevel;
 
+    if (at_stairs && stway)
+        stway->u_traversed = TRUE;
+
     if (at_stairs && stway) {
         newlevel.dnum = stway->tolev.dnum;
         newlevel.dlevel = stway->tolev.dlevel;
@@ -1378,6 +1381,9 @@ prev_level(boolean at_stairs)
 {
     stairway *stway = stairway_at(u.ux, u.uy);
     d_level newlevel;
+
+    if (at_stairs && stway)
+        stway->u_traversed = TRUE;
 
     if (at_stairs && stway && stway->tolev.dnum != u.uz.dnum) {
         /* Taking an up dungeon branch. */
@@ -1464,6 +1470,7 @@ stairway_add(int x, int y, boolean up, boolean isladder, d_level *dest)
     tmp->sy = y;
     tmp->up = up;
     tmp->isladder = isladder;
+    tmp->u_traversed = FALSE;
     assign_level(&(tmp->tolev), dest);
     tmp->next = g.stairs;
     g.stairs = tmp;
@@ -2106,8 +2113,6 @@ tport_menu(winid win, char *entry, struct lchoice *lchoices,
     return;
 }
 
-/* this is only an approximation; to make it accurate, the stair list
-   should track which stairs have been traversed */
 boolean
 known_branch_stairs(stairway *sway, char *outbuf, boolean stcase)
 {
@@ -2126,7 +2131,7 @@ known_branch_stairs(stairway *sway, char *outbuf, boolean stcase)
     ledgr = ledger_no(&tolev);
     dest_visited = (g.level_info[ledgr].flags & VISITED) != 0;
 
-    if (tolev.dnum == u.uz.dnum || !dest_visited) {
+    if (tolev.dnum == u.uz.dnum || !sway->u_traversed) {
         if (outbuf) {
             Sprintf(outbuf, "%s %s", stairs, updown);
             if (dest_visited) {

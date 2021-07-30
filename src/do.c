@@ -1525,9 +1525,10 @@ goto_level(
     } else if (at_stairs && !In_endgame(&u.uz)) {
         if (up) {
             stairway *stway = stairway_find_from(&u.uz0, g.at_ladder);
-            if (stway)
+            if (stway) {
                 u_on_newpos(stway->sx, stway->sy);
-            else if (newdungeon)
+                stway->u_traversed = TRUE;
+            } else if (newdungeon)
                 u_on_sstairs(1);
             else
                 u_on_dnstairs();
@@ -1542,9 +1543,10 @@ goto_level(
                       g.at_ladder ? "ladder" : "stairs");
         } else { /* down */
             stairway *stway = stairway_find_from(&u.uz0, g.at_ladder);
-            if (stway)
+            if (stway) {
                 u_on_newpos(stway->sx, stway->sy);
-            else if (newdungeon)
+                stway->u_traversed = TRUE;
+            } else if (newdungeon)
                 u_on_sstairs(0);
             else
                 u_on_upstairs();

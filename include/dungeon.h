@@ -36,6 +36,7 @@ typedef struct stairway { /* basic stairway identifier */
     d_level tolev;        /* where does it go */
     boolean up;           /* up or down? */
     boolean isladder;     /* ladder or stairway? */
+    boolean u_traversed;  /* hero has traversed this stair */
     struct stairway *next;
 } stairway;
 
