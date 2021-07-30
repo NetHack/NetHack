@@ -978,10 +978,7 @@ nhl_doturn(lua_State *L)
 static int
 nhl_debug_flags(lua_State *L)
 {
-    int argc = lua_gettop(L);
     int val;
-
-    int i;
 
     lcheck_param_table(L);
 
