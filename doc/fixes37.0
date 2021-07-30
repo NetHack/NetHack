@@ -983,7 +983,7 @@ when hallucinating, see hallucinated liquids when looking at water or lava
 applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
 	"secret door" when at a door or wall location), hidden corridor
-	spots ("secret corridor" at a corridor location), and clouds
+	spots ("secret corridor" at a corridor location), clouds and walls
 tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be

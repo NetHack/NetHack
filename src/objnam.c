@@ -3211,8 +3211,16 @@ wizterrainwish(struct _readobjnam_data *d)
         }
     } else if (!BSTRCMPI(bp, p - 4, "wall")
                          && (bp == p - 4 || p[-4] == ' ')) {
-        pline("Wishing for walls is not implemented.");
-        badterrain = TRUE;
+        schar wall = HWALL;
+
+        if ((isok(u.ux, u.uy-1) && IS_WALL(levl[u.ux][u.uy-1].typ))
+            || (isok(u.ux, u.uy+1) && IS_WALL(levl[u.ux][u.uy+1].typ)))
+            wall = VWALL;
+        madeterrain = TRUE;
+        lev->typ = wall;
+        fix_wall_spines(max(0,u.ux-1), max(0,u.uy-1),
+                        min(COLNO,u.ux+1), min(ROWNO,u.uy+1));
+        pline("A wall.");
     } else if (!BSTRCMPI(bp, p - 15, "secret corridor")) {
         if (lev->typ == CORR) {
             lev->typ = SCORR;
