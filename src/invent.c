@@ -3325,18 +3325,7 @@ dfeature_at(int x, int y, char *buf)
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
     } else if (stway) {
-        (void) known_branch_stairs(stway, altbuf, TRUE);
-        dfeature = altbuf;
-#if 0
-        if (!stway->isladder && stway->up)
-            cmap = S_upstair; /* "staircase up" */
-        else if (!stway->isladder && !stway->up)
-            cmap = S_dnstair; /* "staircase down" */
-        else if (stway->isladder && stway->up)
-            cmap = S_upladder; /* "ladder up" */
-        else if (stway->isladder && !stway->up)
-            cmap = S_dnladder; /* "ladder down" */
-#endif
+        dfeature = stairs_description(stway, altbuf, TRUE);
     } else if (ltyp == DRAWBRIDGE_DOWN)
         cmap = S_vodbridge; /* "lowered drawbridge" */
     else if (ltyp == DBWALL)

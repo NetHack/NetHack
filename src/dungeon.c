@@ -2113,46 +2113,48 @@ tport_menu(winid win, char *entry, struct lchoice *lchoices,
     return;
 }
 
+/* return True if 'sway' is a branch staircase and hero has used these stairs
+   to visit the branch */
 boolean
-known_branch_stairs(stairway *sway, char *outbuf, boolean stcase)
+known_branch_stairs(stairway *sway)
+{
+    return (sway && sway->tolev.dnum != u.uz.dnum && sway->u_traversed);
+}
+
+/* describe staircase 'sway' based on whether hero knows the destination */
+char *
+stairs_description(
+    stairway *sway, /* stairs/ladder to describe */
+    char *outbuf,   /* result buffer */
+    boolean stcase) /* True: "staircase" or "ladder", always singular;
+                     * False: "stairs" or "ladder"; caller needs to deal
+                     * with singular vs plural when forming a sentence */
 {
     d_level tolev;
     const char *stairs, *updown;
-    int ledgr, dest_visited;
-
-    if (outbuf)
-        *outbuf = '\0';
-    if (!sway)
-        return FALSE;
 
     tolev = sway->tolev;
     stairs = sway->isladder ? "ladder" : stcase ? "staircase" : "stairs";
     updown = sway->up ? "up" : "down";
-    ledgr = ledger_no(&tolev);
-    dest_visited = (g.level_info[ledgr].flags & VISITED) != 0;
 
-    if (tolev.dnum == u.uz.dnum || !sway->u_traversed) {
-        if (outbuf) {
-            Sprintf(outbuf, "%s %s", stairs, updown);
-            if (dest_visited) {
-                boolean specialdepth = (tolev.dnum == quest_dnum
-                                        || tolev.dnum == knox_level.dnum);
-                int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
+    if (!known_branch_stairs(sway)) {
+        /* ordinary stairs or branch stairs to not-yet-visited branch */
+        Sprintf(outbuf, "%s %s", stairs, updown);
+        if (sway->u_traversed) {
+            boolean specialdepth = (tolev.dnum == quest_dnum
+                                    || single_level_branch(&tolev)); /* knox */
+            int to_dlev = specialdepth ? dunlev(&tolev) : depth(&tolev);
 
-                Sprintf(eos(outbuf), " to level %d", to_dlev);
-            }
+            Sprintf(eos(outbuf), " to level %d", to_dlev);
         }
-        /* might actually be branch stairs but if the branch hasn't been
-           visited yet, the hero won't know that */
-        return FALSE;
-    }
-    if (outbuf) {
+    } else {
+        /* known branch stairs; tacking on destination level is too verbose */
         Sprintf(outbuf, "branch %s %s to %s",
                 stairs, updown, g.dungeons[tolev.dnum].dname);
+        /* dungeons[].dname is capitalized; undo that for "The <Branch>" */
         (void) strsubst(outbuf, "The ", "the ");
     }
-    /* branch stairs and hero knows it */
-    return TRUE;
+    return outbuf;
 }
 
 /* Convert a branch type to a string usable by print_dungeon(). */
