@@ -13,12 +13,15 @@ local POS = { x = 10, y = 05 };
 local number_pad = 0;
 
 function initlev()
-   nh.debug_flags({mongen = false, hunger = false });
+   nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
    des.level_flags("noflip");
    des.reset_level();
    des.level_init({ style = "solidfill", fg = ".", lit = true });
    des.teleport_region({ region = {POS.x,POS.y,POS.x,POS.y}, region_islev = true, dir="both" });
    des.finalize_level();
+   for k, v in pairs(nh.stairways()) do
+      des.terrain(v.x - 1, v.y, ".");
+   end
 end
 
 function ctrl(key)

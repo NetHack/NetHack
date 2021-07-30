@@ -196,11 +196,14 @@ struct mapfragment {
     char *data;
 };
 
+#define CAN_OVERWRITE_TERRAIN(ttyp) \
+    (iflags.debug_overwrite_stairs || !((ttyp) == LADDER || (ttyp) == STAIRS))
+
 #define SET_TYPLIT(x, y, ttyp, llit) \
     do {                                                          \
         if ((x) >= 1 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
-            if ((ttyp) < MAX_TYPE && levl[(x)][(y)].typ != STAIRS \
-                && levl[(x)][(y)].typ != LADDER)                  \
+            if ((ttyp) < MAX_TYPE                                 \
+                && CAN_OVERWRITE_TERRAIN(levl[(x)][(y)].typ))     \
                 levl[(x)][(y)].typ = (ttyp);                      \
             if ((ttyp) == LAVAPOOL)                               \
                 levl[(x)][(y)].lit = 1;                           \

@@ -2338,7 +2338,7 @@ create_altar(altar* a, struct mkroom* croom)
 
     /* check for existing features */
     oldtyp = levl[x][y].typ;
-    if (oldtyp == STAIRS || oldtyp == LADDER)
+    if (!CAN_OVERWRITE_TERRAIN(oldtyp))
         return;
 
     amask = sp_amask_to_amask(a->sp_amask);
