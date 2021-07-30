@@ -5002,16 +5002,9 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
         quan = obj->quan;
         switch (osym) {
         case RING_CLASS:
-            if (obj->otyp == RIN_SHOCK_RESISTANCE) {
+            if (obj->otyp == RIN_SHOCK_RESISTANCE || (obj->owornmask && uarmg && !is_metallic(uarmg))) {
                 skip++;
                 break;
-            }
-            if (obj->owornmask && uarmg) {
-                if (obj->owornmask & W_RING && !is_metallic(uarmg)) { /* metallic gloves conduct electricity */
-                    pline("Your %s is protected by the %s you're wearing !", xname(obj), xname(uarmg)); /* for debug purposes */
-                    skip++;
-                    break;
-                }
             }
             dindx = 5;
             dmg = 0;
