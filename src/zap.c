@@ -5006,6 +5006,13 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
                 skip++;
                 break;
             }
+            if (obj->owornmask && uarmg) {
+                if (obj->owornmask & W_RING && !is_metallic(uarmg)) { /* metallic gloves conduct electricity */
+                    pline("Your %s is protected by the %s you're wearing !", xname(obj), xname(uarmg)); /* for debug purposes */
+                    skip++;
+                    break;
+                }
+            }
             dindx = 5;
             dmg = 0;
             break;
