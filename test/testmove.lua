@@ -1,11 +1,6 @@
 
 -- Tests for moving the hero
 
--- TODO: running stops if hero walks over stairs -> test fails.
---       prevent stair generation? check where the stairs are?
--- TODO: prevent hero from getting hungry
-
-
 nh.parse_config("OPTIONS=number_pad:0");
 nh.parse_config("OPTIONS=runmode:teleport");
 
@@ -30,6 +25,10 @@ end
 
 function meta(key)
    return string.char(0x80 | string.byte(key));
+end
+
+function setup1(param)
+   des.terrain(POS.x - 2, POS.y, param);
 end
 
 local basicmoves = {
@@ -82,11 +81,22 @@ local basicmoves = {
    [meta("9")] = { x = POS.x + POS.y, y = 0, number_pad = 1 },
    [meta("1")] = { x = 2, y = 13, number_pad = 1 },
    [meta("3")] = { x = 25, y = nhc.ROWNO-1, number_pad = 1 },
+
+   -- check some terrains
+   { key = "h", dx =  0, dy = 0, number_pad = 0, setup = setup1, param = " " },
+   { key = "h", dx =  0, dy = 0, number_pad = 0, setup = setup1, param = "|" },
+   { key = "h", dx =  0, dy = 0, number_pad = 0, setup = setup1, param = "-" },
+   { key = "h", dx =  0, dy = 0, number_pad = 0, setup = setup1, param = "F" },
+   { key = "h", dx = -1, dy = 0, number_pad = 0, setup = setup1, param = "#" },
+   { key = "h", dx = -1, dy = 0, number_pad = 0, setup = setup1, param = "." },
 };
+
 
 
 for k, v in pairs(basicmoves) do
    initlev();
+
+   local key = v.key and v.key or k;
 
    if (v.number_pad ~= nil) then
       if (v.number_pad ~= number_pad) then
@@ -95,22 +105,26 @@ for k, v in pairs(basicmoves) do
       end
    end
 
+   if (v.setup ~= nil) then
+      v.setup(v.param);
+   end
+
    local x = u.ux;
    local y = u.uy;
 
-   nh.pushkey(k);
+   nh.pushkey(key);
    nh.doturn(true);
 
    if (v.dx ~= nil) then
-      if (not (x == u.ux - v.dx and y == u.uy - v.dy)) then
+      if (not ((x == (u.ux - v.dx)) and (y == (u.uy - v.dy)))) then
          error(string.format("Move: key '%s' gave (%i,%i), should have been (%i,%i)",
-                             k, u.ux, u.uy, u.ux - v.dx, u.uy - v.dy));
+                             key, u.ux, u.uy, u.ux - v.dx, u.uy - v.dy));
          return;
       end
    elseif (v.x ~= nil) then
       if (not (u.ux == v.x and u.uy == v.y)) then
          error(string.format("Move: key '%s' gave (%i,%i), should have been (%i,%i)",
-                             k, u.ux, u.uy, v.x, v.y));
+                             key, u.ux, u.uy, v.x, v.y));
          return;
       end
    end
