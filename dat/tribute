@@ -6563,7 +6563,7 @@ And Clodpool went away, satisfied.
 # text pages include decorations of varying degrees of elaborateness.
 # The actual text is probably only novella length.
 #
-%title The Last Hero (7)
+%title The Last Hero (13)
 # p. 41 (EOS edition)
 %passage 1
 Too many people, when listing all the perils to be found in the search
@@ -6681,6 +6681,102 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
+#
+# 6 new passages added for 3.7
+#
+# p. 16
+%passage 8
+The wizards began to gather around the device.
+
+'Can you see into the future?' said Lord Vetinari.
+
+'In /theory/ yes, sir.' said Ponder.  'But that would be highly... well,
+inadvisable, you see, because initial studies indicate that the fact of
+observation would collapse the waveform in phase space.'
+
+Not a muscle moved on the Patrician's face.
+
+'Pardon me, I'm a little out of date on faculty staff,' he said.  'Are you
+the one who has to take the dried frog pills?'
+
+'No, sir.  That's the Bursar, sir,' said Ponder.  'He has to have them
+because he's insane, sir.'
+
+'Ah,' said Lord Vetinari, and now he /did/ have an expression.  It was that
+of a man resolutely refraining from saying what was on his mind.
+
+'What Mr Stibbons /means/, my lord,' said the Archancellor, 'is that there
+are billions and billions of futures that, er, /sort of/ exist, d'yer see?
+They're all... the possible /shapes/ of the future.  But apparently the
+first one you actually /look/ at is the one that /becomes/ the future.
+It might not be one you'd like.  Apparently it's all to do with the
+Uncertainty Principle.'
+
+'And that is...'
+
+'I'm not sure.  Mr Stibbons is the one who knows about that sort of thing.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 31 (Leonard of Quirm is heading up a project for Lord Vetinari and
+#        describing requirements)
+%passage 9
+[...]
+
+'And the help of, oh, sixty apprentices and journeymen from the Guild of
+Cunning Artificers.  Perhaps there should be a hundred.  They will need to
+work round the clock.'
+
+'Apprentices?  But I can see to it that the finest craftsmen--'
+
+Leonard held up a hand.
+
+'Not craftsmen, my lord,' he said.  'I have no use for people who have
+learned the limits of the possible.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 80
+%passage 10
+'I'd rather die than sign my name,' said Boy Willie.
+
+'I'd rather face a dragon,' said Caleb.  'One of the proper old ones, too,
+not the fireworky ones you get today.'
+
+'Once they get you signin' your name, they've got you where they want you,'
+said Cohen.
+
+'Too many letters,' said Truckle.  'All different shapes, too.  I always
+put an X.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 97
+%passage 11
+He hesitated.  Lord Vetinari was not a man who delighted in the technical.
+There were two cultures, as far as he was concerned.  One was the real
+one, the other was occupied by people who liked machinery and ate pizza
+at unreasonable hours.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 122 (/Kite/ is the ship's name)
+%passage 12
+On the /Kite/, the situation was being 'workshopped.'  This is the means by
+which people who don't know anything get together to pool their ignorance.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 161 (Carrot and Rincewind are wondering about the fate of Cohen and
+#         "the Silver Horde" who seem to have plummeted to certain death)
+%passage 13
+'There's always hope.'
+
+'So?  There's always taxes, too.  It doesn't make any /difference/.
+
+Carrot sighed and straightened up.  'I wish you weren't right.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e title
 #
 #
