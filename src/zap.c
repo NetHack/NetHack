@@ -5003,7 +5003,8 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
         switch (osym) {
         case RING_CLASS:
             if (obj->otyp == RIN_SHOCK_RESISTANCE ||
-                    (obj->owornmask & W_RING && uarmg && !is_metallic(uarmg))) {
+                    ((obj->owornmask & W_RING) && 
+                        uarmg && !is_metallic(uarmg))) {
                 skip++;
                 break;
             }
