@@ -1154,6 +1154,7 @@ Qt: [later] augment extended command selection dialog's Filter to add a
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
+tty: use bright colors directly on supporting terminals
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 X11: implement 'selectsaved', restore via menu of saved games
