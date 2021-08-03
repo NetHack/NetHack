@@ -66,6 +66,10 @@ local tests = {
       woman = "women",
       wumpus = "wumpuses",
       zorkmid = "zorkmids",
+      monarch = "monarchs",
+      stomach = "stomachs",
+      loch = "lochs",
+      tech = "techs",
    },
    an = {
       a = "an a",
@@ -79,6 +83,9 @@ local tests = {
       ["one-eyed"] = "a one-eyed",
       candy = "a candy",
       eucalyptus = "a eucalyptus",
+      ukulele = "a ukulele",
+      uke = "a uke",
+      ["useful tool"] = "a useful tool",
    }
 }
 

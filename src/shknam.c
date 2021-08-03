@@ -463,11 +463,7 @@ mkshobj_at(const struct shclass* shp, int sx, int sy, boolean mkspecl)
     if (rn2(100) < depth(&u.uz) && !MON_AT(sx, sy)
         && (ptr = mkclass(S_MIMIC, 0)) != 0
         && (mtmp = makemon(ptr, sx, sy, NO_MM_FLAGS)) != 0) {
-        /* note: makemon will set the mimic symbol to a shop item */
-        if (rn2(10) >= depth(&u.uz)) {
-            mtmp->m_ap_type = M_AP_OBJECT;
-            mtmp->mappearance = STRANGE_OBJECT;
-        }
+        /* nothing */
     } else {
         atype = get_shop_item((int) (shp - shtypes));
         if (atype == VEGETARIAN_CLASS)
@@ -617,7 +613,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
         if (wizard) {
             register int j = sroom->doorct;
 
-            pline("Where is shopdoor?");
+            impossible("Where is shopdoor?");
             pline("Room at (%d,%d),(%d,%d).", sroom->lx, sroom->ly, sroom->hx,
                   sroom->hy);
             pline("doormax=%d doorct=%d fdoor=%d", g.doorindex, sroom->doorct,

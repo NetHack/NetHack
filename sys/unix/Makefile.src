@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1612127122 2021/01/31 21:05:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1626967328 2021/07/22 15:22:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -754,7 +754,7 @@ tags: $(CSOURCES)
 
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
-	-rm monstr.c vis_tab.c ../include/vis_tab.h  #obsolete generated files
+	-rm -f monstr.c vis_tab.c ../include/vis_tab.h #obsolete generated files
 	$(CLEANMORE)
 
 spotless: clean

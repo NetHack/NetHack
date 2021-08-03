@@ -965,8 +965,11 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
                 DeleteObject(brush);
                 intensity = (wch == 0x2591 ? 100 : 200);
                 brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
-                RECT smallRect = { rect->left + 1, rect->top + 1,
-                                    rect->right - 1, rect->bottom - 1 };
+                RECT smallRect = {0};
+                smallRect.left = rect->left + 1;
+                smallRect.top = rect->top + 1;
+                smallRect.right = rect->right - 1;
+                smallRect.bottom = rect->bottom - 1;
                 FillRect(data->backBufferDC, &smallRect, brush);
                 DeleteObject(brush);
             } else {

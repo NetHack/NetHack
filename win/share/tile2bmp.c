@@ -36,6 +36,12 @@ extern void objects_globals_init(void);
 # endif
 #endif
 
+#if defined(_MSC_VER) && defined(_WIN64)
+#define UNALIGNED_POINTER __unaligned
+#else
+#define UNALIGNED_POINTER
+#endif
+
 #if (TILE_X == 32)
 #define COLORS_IN_USE 256
 #else
@@ -159,7 +165,7 @@ FILE *tibfile2;
 pixel tilepixels[TILE_Y][TILE_X];
 
 static void build_bmfh(BITMAPFILEHEADER *);
-static void build_bmih(BITMAPINFOHEADER *);
+static void build_bmih(UNALIGNED_POINTER BITMAPINFOHEADER *);
 static void build_bmptile(pixel(*) [TILE_X]);
 
 const char *tilefiles[] = {
@@ -230,8 +236,11 @@ main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         if (!initflag) {
+            UNALIGNED_POINTER BITMAPINFOHEADER *bmih;
+
             build_bmfh(&bmp.bmfh);
-            build_bmih(&bmp.bmih);
+            bmih = &bmp.bmih;
+            build_bmih(bmih);
             for (i = 0; i < MAX_Y; ++i)
                 for (j = 0; j < MAX_X; ++j)
                     bmp.packtile[i][j] = (uchar) 0;
@@ -284,7 +293,7 @@ build_bmfh(BITMAPFILEHEADER* pbmfh)
 }
 
 static void
-build_bmih(BITMAPINFOHEADER* pbmih)
+build_bmih(UNALIGNED_POINTER BITMAPINFOHEADER* pbmih)
 {
     WORD cClrBits;
     int w, h;

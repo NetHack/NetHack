@@ -119,7 +119,7 @@ interesting_command(unsigned indx, int cmds)
     if (!strcmp("?", extcmdlist[indx].ef_txt))
         return true;
     // some commands might have been compiled-out; don't show them
-    if ((extcmdlist[indx].flags & CMD_NOT_AVAILABLE) != 0)
+    if ((extcmdlist[indx].flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0)
         return false;
     // if picking from normal mode-only don't show wizard mode commands
     // or if picking from wizard mode-only don't show normal commands

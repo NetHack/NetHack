@@ -23,18 +23,19 @@ extern char erase_char, kill_char;
 
 /* Dialog windows for curses interface */
 
+WINDOW *activemenu = NULL; /* for count_window refresh handling */
 
 /* Private declarations */
 
 typedef struct nhmi {
     winid wid;                  /* NetHack window id */
-    glyph_info glyphinfo;       /* holds menu glyph and additional glyph info */
+    glyph_info glyphinfo;       /* holds menu glyph and additional info */
     anything identifier;        /* Value returned if item selected */
-    char accelerator;         /* Character used to select item from menu */
-    char group_accel;         /* Group accelerator for menu item, if any */
+    char accelerator;           /* Character used to select item from menu */
+    char group_accel;           /* Group accelerator for menu item, if any */
     int attr;                   /* Text attributes for item */
     const char *str;            /* Text of menu item */
-    boolean presel;           /* Whether menu item should be preselected */
+    boolean presel;             /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
     unsigned itemflags;
     int page_num;               /* Display page number for entry */
@@ -269,6 +270,8 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
     if (iflags.wc_popup_dialog /*|| curses_stupid_hack*/) {
         askwin = curses_create_window(prompt_width, prompt_height, UP);
+        activemenu = askwin;
+
         for (count = 0; count < prompt_height; count++) {
             linestr = curses_break_str(askstr, maxwidth, count + 1);
             mvwaddstr(askwin, count + 1, 1, linestr);
@@ -321,11 +324,14 @@ curses_character_input_dialog(const char *prompt, const char *choices,
         if (digit(answer)) {
             if (accept_count) {
                 if (answer != '0') {
-                    yn_number = curses_get_count(answer - '0');
-                    touchwin(askwin);
-                    refresh();
-                }
+                    yn_number = curses_get_count(answer);
 
+                    if (iflags.wc_popup_dialog) {
+                        curses_count_window(NULL);
+                        touchwin(askwin);
+                        wrefresh(askwin);
+                    }
+                }
                 answer = '#';
                 break;
             }
@@ -1434,7 +1440,7 @@ static int
 menu_get_selections(WINDOW *win, nhmenu *menu, int how)
 {
     int curletter, menucmd;
-    int count = -1;
+    long count = -1L;
     int count_letter = '\0';
     int curpage = !menu->bottom_heavy ? 1 : menu->num_pages;
     int num_selected = 0;
@@ -1442,6 +1448,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     char selectors[256];
     nhmenu_item *menu_item_ptr = menu->entries;
 
+    activemenu = win;
     menu_display_page(menu, win, curpage, selectors);
 
     while (!dismiss) {
@@ -1496,13 +1503,16 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             /*FALLTHRU*/
         default:
             if (isdigit(curletter)) {
-                count = curses_get_count(curletter - '0');
-                touchwin(win);
-                refresh();
+                count = curses_get_count(curletter);
+                /* after count, we know some non-digit is already pending */
                 curletter = getch();
-                if (count > 0) {
-                    count_letter = curletter;
-                }
+                count_letter = (count > 0L) ? curletter : '\0';
+
+                /* remove the count wind (erases last line of message wind) */
+                curses_count_window(NULL);
+                /* force redraw of the menu that is receiving the count */
+                touchwin(win);
+                wrefresh(win);
             }
         }
 
@@ -1510,8 +1520,10 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             dismiss = curs_nonselect_menu_action(win, (void *) menu, how,
                                                  curletter, &curpage,
                                                  selectors, &num_selected);
-            if (num_selected == -1)
+            if (num_selected == -1) {
+                activemenu = NULL;
                 return -1;
+            }
         }
 
         menu_item_ptr = menu->entries;
@@ -1566,6 +1578,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
         }
     }
 
+    activemenu = NULL;
     return num_selected;
 }
 

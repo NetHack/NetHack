@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{March 25, 2021}
+\date{July 27, 2021}
 
 \maketitle
 
@@ -879,6 +879,10 @@ computer pick something appropriate if {\it autoquiver\/} is true.
 If your wielded weapon has the throw-and-return property, your quiver
 is empty, and {\it autoquiver\/}
 is false, you will throw that wielded weapon instead of filling the quiver.
+If {\it fireassist\/} is true, firing will automatically try to wield a launcher
+(for example, a bow or a sling) matching the ammo in the quiver; this might
+take multiple turns, and get interrupted by a monster.
+Remember to swap back to your main melee weapon afterwards.
 %.lp ""
 \\
 See also `{\tt t}' (throw) for more general throwing and shooting.
@@ -1011,7 +1015,7 @@ If you ``throw'' an arrow while not wielding a bow, you are throwing
 it by hand and it will generally be less effective than when shot.\\
 %.lp ""
 See also `{\tt f}' (fire) for throwing or shooting an item pre-selected
-via the `{\tt Q}' (quiver) command.
+via the `{\tt Q}' (quiver) command, with some extra assistance.
 %.lp
 \item[\tb{T}]
 Take off armor.\\
@@ -1326,7 +1330,8 @@ You can set the
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#fire}]
-Fire ammunition from quiver. Default key is `{\tt f}'.
+Fire ammunition from quiver, possibly autowielding a launcher.
+Default key is `{\tt f}'.
 %.lp
 \item[\tb{\#force}]
 Force a lock. Autocompletes. Default key is `{\tt M-f}'.
@@ -1520,6 +1525,11 @@ and also `{\tt \^{}L}' if {\it number\verb+_+pad\/} is on.
 \item[\tb{\#remove}]
 Remove an accessory (ring, amulet, etc). Default key is `{\tt R}'.
 %.lp
+\item[\tb{\#retravel}]
+Travel to a previously selected travel destination.
+Default key is `{\tt C-_}'.
+See also {\tt \#travel}.
+%.lp
 \item[\tb{\#ride}]
 Ride (or stop riding) a saddled creature. Autocompletes.
 Default key is `{\tt M-R}'.
@@ -1653,6 +1663,7 @@ without asking to move the cursor.
 When picking a target with cursor and the {\it autodescribe\/}
 option is on, the top line will show ``(no travel path)'' if
 your character does not know of a path to that location.
+See also {\tt \#retravel}.
 %.lp
 \item[\tb{\#turn}]
 Turn undead away. Autocompletes. Default key is `{\tt M-t}'.
@@ -2461,10 +2472,9 @@ location ordinarily wouldn't be seen any more.
 
 %.pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In {\it NetHack}, this is accomplished automatically by walking over
-the object (unless you turn off the {\it autopickup\/}
-option (see below), or move with the `{\tt m}' prefix (see above)), or
-manually by using the `{\tt ,}' command.
+it up.  In {\it NetHack}, this is accomplished by using the `{\tt ,}' command.
+If {\it autopickup\/} option is on, you will automatically pick up the object
+by walking over it, unless you move with the `{\tt m}' prefix.
 %.pg
 If you're carrying too many items, {\it NetHack\/} will tell you so and you
 won't be able to pick up anything more.  Otherwise, it will add the object(s)
@@ -2631,7 +2641,7 @@ in an appendix to {\it Unearthed Arcana}, an AD\&D supplement.
 
 %.pg
 The commands to use weapons are `{\tt w}' (wield), `{\tt t}' (throw),
-`{\tt f}' (fire, an alternate way of throwing), `{\tt Q}' (quiver),
+`{\tt f}' (fire), `{\tt Q}' (quiver),
 `{\tt x}' (exchange), `{\tt X}' (twoweapon), and ``{\tt \#enhance}''
 (see below).
 
@@ -2673,6 +2683,8 @@ for `{\tt Q}' runs out.
 If your quiver is empty, {\it autoquiver\/}
 is false, and you are wielding a weapon which returns when thrown,
 you will throw that weapon instead of filling the quiver.
+The fire command also has extra assistance, if {\it fireassist\/}
+is on it will try to wield a launcher matching the ammo in the quiver.
 
 %.pg
 Some characters have the ability to throw or shoot a volley of multiple
@@ -3837,7 +3849,7 @@ Walking into a closed door attempts to open it (default true).
 Persistent.
 %.lp
 \item[\ib{autopickup}]
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default off).
 Persistent.
 \\
 %.lp ""
@@ -3981,6 +3993,11 @@ extended ones (off).
 \item[\ib{female}]
 An obsolete synonym for ``{\tt gender:female}''.  Cannot be set with the
 `{\tt O}' command.
+%.lp
+\item[\ib{fireassist}]
+This option controls what happens when you attempt the `{\tt f}' (fire)
+and don't have an appropriate launcher, such as a bow or a sling, wielded.
+If on, you will automatically wield the launcher. Default is on.
 %.lp
 \item[\ib{fixinv}]
 An object's inventory letter sticks to it when it's dropped (default on).
@@ -4776,8 +4793,7 @@ Setting {\tt ascii\verb+_+map} to {\it True\/} forces
 %.lp
 \item[\ib{color}]
 If {\it NetHack\/} can, it should display color for different monsters,
-objects, and dungeon features.
-
+objects, and dungeon features (default on).
 %.lp
 \item[\ib{eight\verb+_+bit\verb+_+tty}]
 Pass eight-bit character values (for example, specified with the
@@ -5207,9 +5223,6 @@ can only be bound to a single key.
 \item[{\bb{count}}]
 Prefix key to start a count, to repeat a command this many times.
 With {\it number\verb+_+pad\/} only. Default is~`{\tt n}'.
-%.lp
-\item[{\bb{doinv}}]
-Show inventory. With {\it number\verb+_+pad\/} only. Default is~`{\tt 0}'.
 %.lp
 \item[{\bb{fight}}]
 Prefix key to force fight a direction. Default is~`{\tt F}'.
@@ -5762,6 +5775,10 @@ Default                      & Symbol Name                & Description\\
 \verb@(@ & S\verb+_+boomright               &	(boomerang open right)\\
 \verb@`@ & S\verb+_+boulder                 &	(boulder)\\
 \verb@-@ & S\verb+_+brcorn                  &	(bottom right corner)\\
+\verb@>@ & S\verb+_+brdnladder              &	(branch ladder down)\\
+\verb@>@ & S\verb+_+brdnstair               &	(branch staircase down)\\
+\verb@<@ & S\verb+_+brupladder              &	(branch ladder up)\\
+\verb@<@ & S\verb+_+brupstair               &	(branch staircase up)\\
 \verb@C@ & S\verb+_+centaur                 &	(centaur)\\
 \verb@_@ & S\verb+_+chain                   &	(iron chain)\\
 \# & S\verb+_+cloud                   &	(cloud)\\

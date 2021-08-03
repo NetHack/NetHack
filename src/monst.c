@@ -1126,11 +1126,16 @@ NEARDATA struct permonst mons_init[] = {
     /* The order of the dragons is VERY IMPORTANT.  Quite a few
      * pieces of code depend on gray being first and yellow being last.
      * The code also depends on the *order* being the same as that for
-     * dragon scale mail and dragon scales in objects.c.  Baby dragons
-     * cannot confer intrinsics, to avoid polyself/egg abuse.
+     * dragon scale mail and dragon scales in objects.c.  [Also,
+     * 'tilemap' assumes that shimmering dragon follows silver dragon.]
      *
-     * As reptiles, dragons are cold-blooded and thus aren't seen
-     * with infravision.  Red dragons are the exception.
+     * Adult dragons are all lawful or chaotic; baby dragons are all
+     * neutral.  This affects monster generation on some special levels.
+     * Baby dragons cannot confer intrinsics, to avoid polyself/egg abuse.
+     *
+     * As reptiles, dragons are cold-blooded and thus aren't seen with
+     * infravision.  Red and gold dragons (also Chromatic Dragon) are
+     * the exceptions because they breathe fire.
      */
     MON("baby gray dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -1138,6 +1143,13 @@ NEARDATA struct permonst mons_init[] = {
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, CLR_GRAY),
+    MON("baby gold dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
+          NO_ATTK),
+        SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, M3_INFRAVISIBLE,
+        13, HI_GOLD),
     MON("baby silver dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -1145,6 +1157,7 @@ NEARDATA struct permonst mons_init[] = {
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, DRAGON_SILVER),
 #if 0 /* DEFERRED */
+    /* [see "shimmering dragon" below] */
     MON("baby shimmering dragon", S_DRAGON,
         LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6),
@@ -1205,6 +1218,15 @@ NEARDATA struct permonst mons_init[] = {
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, 20, CLR_GRAY),
+    MON("gold dragon", S_DRAGON, LVL(15, 9, -1, 20, 4), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_FIRE, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), MR_FIRE, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+            | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        M3_INFRAVISIBLE, 20, HI_GOLD),
     MON("silver dragon", S_DRAGON, LVL(15, 9, -1, 20, 4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_COLD, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
           ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4), NO_ATTK,
@@ -1215,6 +1237,10 @@ NEARDATA struct permonst mons_init[] = {
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         0, 20, DRAGON_SILVER),
 #if 0 /* DEFERRED */
+    /* shimmering scales/scale-mail would confer displacement when worn by
+       the hero, so shimmering dragon ought to be displaced (hero who can
+       see one might misjudge its location) but monster displacement hasn't
+       been implemented so we don't include it */
     MON("shimmering dragon", S_DRAGON,
         LVL(15, 9, -1, 20, 4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_MAGM, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
@@ -3042,7 +3068,8 @@ struct permonst _mons2[] = {
             | M2_HOSTILE | M2_NASTY | M2_COLLECT | M2_MAGIC,
         M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, 22, HI_LORD),
     /* Multi-headed, possessing the breath attacks of all the other dragons
-     * (selected at random when attacking).
+     * (selected at random when attacking).  Despite being a superset of
+     * gold dragon, does not emit light.
      */
     MON("Chromatic Dragon", S_DRAGON, LVL(16, 12, 0, 30, -14),
         (G_NOGEN | G_UNIQ),

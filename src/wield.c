@@ -320,6 +320,7 @@ dowield(void)
     g.multi = 0;
     if (cantwield(g.youmonst.data)) {
         pline("Don't be ridiculous!");
+        cmdq_clear();
         return 0;
     }
 
@@ -327,12 +328,14 @@ dowield(void)
     clear_splitobjs();
     if (!(wep = getobj("wield", wield_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT))) {
         /* Cancelled */
+        cmdq_clear();
         return 0;
     } else if (wep == uwep) {
  already_wielded:
         You("are already wielding that!");
         if (is_weptool(wep) || is_wet_towel(wep))
             g.unweapon = FALSE; /* [see setuwep()] */
+        cmdq_clear();
         return 0;
     } else if (welded(uwep)) {
         weldmsg(uwep);
@@ -341,6 +344,7 @@ dowield(void)
         /* if player chose a partial stack but can't wield it, undo split */
         if (wep->o_id && wep->o_id == g.context.objsplit.child_oid)
             unsplitobj(wep);
+        cmdq_clear();
         return 0;
     } else if (wep->o_id && wep->o_id == g.context.objsplit.child_oid) {
         /* if wep is the result of supplying a count to getobj()
@@ -396,6 +400,7 @@ dowield(void)
         setuqwep((struct obj *) 0);
     } else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot wield that!");
+        cmdq_clear();
         return 0;
     }
 
@@ -428,10 +433,12 @@ doswapweapon(void)
     g.multi = 0;
     if (cantwield(g.youmonst.data)) {
         pline("Don't be ridiculous!");
+        cmdq_clear();
         return 0;
     }
     if (welded(uwep)) {
         weldmsg(uwep);
+        cmdq_clear();
         return 0;
     }
 

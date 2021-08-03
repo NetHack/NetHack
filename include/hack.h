@@ -50,6 +50,8 @@ enum encumbrance_types {
 #define SHOP_HOLE_COST 200L /* cost of making hole/trapdoor */
 #define SHOP_WALL_COST 200L /* cost of destroying a wall */
 #define SHOP_WALL_DMG  (10L * ACURRSTR) /* damaging a wall */
+#define SHOP_PIT_COST  100L /* cost of making a pit */
+#define SHOP_WEB_COST   30L /* cost of removing a web */
 
 /* hunger states - see hu_stat in eat.c */
 enum hunger_state_types {
@@ -285,10 +287,19 @@ typedef struct sortloot_item Loot;
                                * to make an extra call to goodpos()]        */
 #define GP_ALLOW_U  0x080000L /* don't reject hero's location */
 
-/* flags for make_corpse() and mkcorpstat() */
-#define CORPSTAT_NONE 0x00
-#define CORPSTAT_INIT 0x01   /* pass init flag to mkcorpstat */
-#define CORPSTAT_BURIED 0x02 /* bury the corpse or statue */
+/* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
+#define CORPSTAT_NONE     0x00
+#define CORPSTAT_GENDER   0x03 /* 0x01 | 0x02 */
+#define CORPSTAT_HISTORIC 0x04 /* historic statue; not used for corpse */
+#define CORPSTAT_SPE_VAL  0x07 /* 0x03 | 0x04 */
+#define CORPSTAT_INIT     0x08 /* pass init flag to mkcorpstat */
+#define CORPSTAT_BURIED   0x10 /* bury the corpse or statue */
+/* note: gender flags have different values from those used for monsters
+   so that 0 can be unspecified/random instead of male */
+#define CORPSTAT_RANDOM 0
+#define CORPSTAT_FEMALE 1
+#define CORPSTAT_MALE   2
+#define CORPSTAT_NEUTER 3
 
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
@@ -469,6 +480,7 @@ enum bodypart_types {
 /* Some misc definitions */
 #define POTION_OCCUPANT_CHANCE(n) (13 + 2 * (n))
 #define WAND_BACKFIRE_CHANCE 100
+#define WAND_WREST_CHANCE 121
 #define BALL_IN_MON (u.uswallow && uball && uball->where == OBJ_FREE)
 #define CHAIN_IN_MON (u.uswallow && uchain && uchain->where == OBJ_FREE)
 #define NODIAG(monnum) ((monnum) == PM_GRID_BUG)

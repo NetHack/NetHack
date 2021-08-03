@@ -1179,6 +1179,16 @@ init_hilite(void)
             Sprintf(hilites[c], "\033[0;3%dm", c);
         }
     }
+
+    /* See TEXTCOLOR && TERMLIB && UNIX && TERMINFO code above. */
+    if (iflags.wc2_darkgray) {
+        /* Bright black is dark gray. */
+        hilites[CLR_BLACK] = (char *) alloc(sizeof "\033[1;30m");
+        Sprintf(hilites[CLR_BLACK], "\033[1;30m");
+    } else {
+        /* Use blue for black. */
+        hilites[CLR_BLACK] = hilites[CLR_BLUE];
+    }
 }
 
 static void
@@ -1200,7 +1210,12 @@ kill_hilite(void)
         if (hilites[c | BRIGHT] && hilites[c | BRIGHT] != nh_HI)
             free((genericptr_t) hilites[c | BRIGHT]), hilites[c | BRIGHT] = 0;
     }
-    return;
+
+    if (hilites[CLR_BLACK]) {
+        if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
+            free(hilites[CLR_BLACK]);
+        hilites[CLR_BLACK] = 0;
+    }
 }
 #endif /* TEXTCOLOR && !TERMLIB && ANSI_DEFAULT */
 

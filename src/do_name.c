@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1622363509 2021/05/30 08:31:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1625885761 2021/07/10 02:56:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.213 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,6 +17,7 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(int, int, int);
 static void gather_locs(coord **, int *, int);
 static void auto_describe(int, int);
+static void truncate_to_map(int *, int *, schar, schar);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
 static void do_oname(struct obj *);
@@ -107,14 +108,22 @@ getpos_help(boolean force, const char *goal)
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
+    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
+    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     Sprintf(sbuf,
-            "Use '%c', '%c', '%c', '%c' to move the cursor to %s.", /* hjkl */
-            g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E, goal);
+            "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
+            visctrl(g.Cmd.move[DIR_W]), visctrl(g.Cmd.move[DIR_S]),
+            visctrl(g.Cmd.move[DIR_N]), visctrl(g.Cmd.move[DIR_E]), goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
-            "Use 'H', 'J', 'K', 'L' to fast-move the cursor, %s.",
+            "Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s.",
+            visctrl(g.Cmd.run[DIR_W]), visctrl(g.Cmd.run[DIR_S]),
+            visctrl(g.Cmd.run[DIR_N]), visctrl(g.Cmd.run[DIR_E]),
             fastmovemode[iflags.getloc_moveskip]);
+    putstr(tmpwin, 0, sbuf);
+    Sprintf(sbuf, "(or prefix normal move with '%s' or '%s' to fast-move)",
+            visctrl(g.Cmd.spkeys[runkey]), visctrl(g.Cmd.spkeys[rushkey]));
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
@@ -622,6 +631,29 @@ getpos_menu(coord *ccp, int gloc)
     return (pick_cnt > 0);
 }
 
+/* add dx,dy to cx,cy, truncating at map edges */
+static void
+truncate_to_map(int *cx, int *cy, schar dx, schar dy)
+{
+    /* diagonal moves complicate this... */
+    if (*cx + dx < 1) {
+        dy -= sgn(dy) * (1 - (*cx + dx));
+        dx = 1 - *cx; /* so that (cx+dx == 1) */
+    } else if (*cx + dx > COLNO - 1) {
+        dy += sgn(dy) * ((COLNO - 1) - (*cx + dx));
+        dx = (COLNO - 1) - *cx;
+    }
+    if (*cy + dy < 0) {
+        dx -= sgn(dx) * (0 - (*cy + dy));
+        dy = 0 - *cy; /* so that (cy+dy == 0) */
+    } else if (*cy + dy > ROWNO - 1) {
+        dx += sgn(dx) * ((ROWNO - 1) - (*cy + dy));
+        dy = (ROWNO - 1) - *cy;
+    }
+    *cx += dx;
+    *cy += dy;
+}
+
 int
 getpos(coord *ccp, boolean force, const char *goal)
 {
@@ -659,6 +691,11 @@ getpos(coord *ccp, boolean force, const char *goal)
     coord *garr[NUM_GLOCS] = DUMMY;
     int gcount[NUM_GLOCS] = DUMMY;
     int gidx[NUM_GLOCS] = DUMMY;
+    schar udx = u.dx, udy = u.dy, udz = u.dz;
+    int dx, dy;
+    boolean rushrun = FALSE;
+    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
+    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
         pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
@@ -695,7 +732,10 @@ getpos(coord *ccp, boolean force, const char *goal)
             auto_describe(cx, cy);
         }
 
-        c = nh_poskey(&tx, &ty, &sidx);
+        rushrun = FALSE;
+
+        g.program_state.getting_a_command = 1;
+        c = readchar_poskey(&tx, &ty, &sidx);
 
         if (hilite_state) {
             (*getpos_hilitefunc)(2);
@@ -713,6 +753,10 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = -1;
             break;
         }
+        if (c == g.Cmd.spkeys[runkey] || c == g.Cmd.spkeys[rushkey]) {
+            c = readchar_poskey(&tx, &ty, &sidx);
+            rushrun = TRUE;
+        }
         if (c == 0) {
             if (!isok(tx, ty))
                 continue;
@@ -725,55 +769,35 @@ getpos(coord *ccp, boolean force, const char *goal)
             /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
             result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
-        }
-        for (i = 0; i < 8; i++) {
-            int dx, dy;
+        } else if (movecmd(c, MV_WALK)) {
+            if (rushrun)
+                goto do_rushrun;
+            dx = u.dx;
+            dy = u.dy;
+            truncate_to_map(&cx, &cy, dx, dy);
+            goto nxtc;
+        } else if (movecmd(c, MV_RUSH) || movecmd(c, MV_RUN)) {
+ do_rushrun:
+            if (iflags.getloc_moveskip) {
+                /* skip same glyphs */
+                int glyph = glyph_at(cx, cy);
 
-            if (g.Cmd.dirchars[i] == c) {
-                /* a normal movement letter or digit */
-                dx = xdir[i];
-                dy = ydir[i];
-            } else if (g.Cmd.alphadirchars[i] == lowc((char) c)
-                       || (g.Cmd.num_pad && g.Cmd.dirchars[i] == (c & 0177))) {
-                /* a shifted movement letter or Meta-digit */
-                if (iflags.getloc_moveskip) {
-                    /* skip same glyphs */
-                    int glyph = glyph_at(cx, cy);
+                dx = u.dx;
+                dy = u.dy;
+                while (isok(cx + dx, cy + dy)
+                       && glyph == glyph_at(cx + dx, cy + dy)
+                       && isok(cx + dx + xdir[i], cy + dy + ydir[i])
+                       && glyph == glyph_at(cx + dx + xdir[i],
+                                            cy + dy + ydir[i])) {
+                    dx += u.dx;
+                    dy += u.dy;
 
-                    dx = xdir[i];
-                    dy = ydir[i];
-                    while (isok(cx + dx, cy + dy)
-                           && glyph == glyph_at(cx + dx, cy + dy)
-                           && isok(cx + dx + xdir[i], cy + dy + ydir[i])
-                           && glyph == glyph_at(cx + dx + xdir[i],
-                                                cy + dy + ydir[i])) {
-                        dx += xdir[i];
-                        dy += ydir[i];
-                    }
-                } else {
-                    dx = 8 * xdir[i];
-                    dy = 8 * ydir[i];
                 }
-            } else
-                continue;
-
-            /* truncate at map edge; diagonal moves complicate this... */
-            if (cx + dx < 1) {
-                dy -= sgn(dy) * (1 - (cx + dx));
-                dx = 1 - cx; /* so that (cx+dx == 1) */
-            } else if (cx + dx > COLNO - 1) {
-                dy += sgn(dy) * ((COLNO - 1) - (cx + dx));
-                dx = (COLNO - 1) - cx;
+            } else {
+                dx = 8 * u.dx;
+                dy = 8 * u.dy;
             }
-            if (cy + dy < 0) {
-                dx -= sgn(dx) * (0 - (cy + dy));
-                dy = 0 - cy; /* so that (cy+dy == 0) */
-            } else if (cy + dy > ROWNO - 1) {
-                dx += sgn(dx) * ((ROWNO - 1) - (cy + dy));
-                dy = (ROWNO - 1) - cy;
-            }
-            cx += dx;
-            cy += dy;
+            truncate_to_map(&cx, &cy, dx, dy);
             goto nxtc;
         }
 
@@ -948,7 +972,8 @@ getpos(coord *ccp, boolean force, const char *goal)
                         Strcpy(note, "aborted");
                     else /* hjkl */
                         Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
-                                g.Cmd.move_W, g.Cmd.move_S, g.Cmd.move_N, g.Cmd.move_E,
+                                g.Cmd.move[DIR_W], g.Cmd.move[DIR_S],
+                                g.Cmd.move[DIR_N], g.Cmd.move[DIR_E],
                                 visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
@@ -984,6 +1009,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void (*)(int)) 0;
     getpos_getvalid = (boolean (*)(int, int)) 0;
+    u.dx = udx, u.dy = udy, u.dz = udz;
     return result;
 }
 
@@ -1672,14 +1698,19 @@ rndghostname(void)
  * options works, since those are special cases.
  */
 char *
-x_monnam(register struct monst *mtmp, int article,
-         const char *adjective, int suppress, boolean called)
+x_monnam(
+    struct monst *mtmp,
+    int article,
+    const char *adjective,
+    int suppress,
+    boolean called)
 {
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
-    const char *pm_name = pmname(mdat, Mgender(mtmp));
+    const char *pm_name = mon_pmname(mtmp);
     boolean do_hallu, do_invis, do_it, do_saddle, do_name;
-    boolean name_at_start, has_adjectives;
+    boolean name_at_start, has_adjectives,
+            falseCap = (*pm_name != lowc(*pm_name));
     char *bp;
 
     if (g.program_state.gameover)
@@ -1715,7 +1746,7 @@ x_monnam(register struct monst *mtmp, int article,
             EHalluc_resistance = 1L;
         if (!do_invis)
             mtmp->minvis = 0;
-        name = priestname(mtmp, priestnambuf);
+        name = priestname(mtmp, article, priestnambuf);
         EHalluc_resistance = save_prop;
         mtmp->minvis = save_invis;
         if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
@@ -1815,11 +1846,21 @@ x_monnam(register struct monst *mtmp, int article,
             article = ARTICLE_THE;
         else
             article = ARTICLE_NONE;
-    } else if ((mdat->geno & G_UNIQ) && article == ARTICLE_A) {
+    } else if ((mdat->geno & G_UNIQ) != 0 && article == ARTICLE_A) {
         article = ARTICLE_THE;
     }
 
-    {
+    if (article == ARTICLE_A && falseCap && !name_at_start) {
+        char buf2[BUFSZ], buf3[BUFSZ];
+
+        /* some type names like "Archon", "Green-elf", and "Uruk-hai" fool
+           an() because of the capitalization and would result in "the " */
+        Strcpy(buf3, buf);
+        *buf3 = lowc(*buf3);
+        (void) just_an(buf2, buf3);
+        Strcat(buf2, buf);
+        return strcpy(buf, buf2);
+    } else {
         char buf2[BUFSZ];
 
         switch (article) {
@@ -2054,7 +2095,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
     } else {
         Sprintf(outbuf, "%s%s <%d,%d>",
                 mon->mtame ? "tame " : mon->mpeaceful ? "peaceful " : "",
-                pmname(mon->data, Mgender(mon)), mon->mx, mon->my);
+                mon_pmname(mon), mon->mx, mon->my);
         if (mon->cham != NON_PM)
             Sprintf(eos(outbuf), "{%s}",
                     pmname(&mons[mon->cham], Mgender(mon)));
@@ -2080,12 +2121,47 @@ Mgender(struct monst *mtmp)
 const char *
 pmname(struct permonst *pm, int mgender)
 {
-    if ((mgender >= MALE && mgender < NUM_MGENDERS) && pm->pmnames[mgender])
-        return pm->pmnames[mgender];
-    else
-        return pm->pmnames[NEUTRAL];
+    if (mgender < MALE || mgender >= NUM_MGENDERS || !pm->pmnames[mgender])
+        mgender = NEUTRAL;
+    return pm->pmnames[mgender];
 }
 #endif /* PMNAME_MACROS */
+
+/* mons[]->pmname for a monster */
+const char *
+mon_pmname(struct monst *mon)
+{
+    /* for neuter, mon->data->pmnames[MALE] will be Null and use [NEUTRAL] */
+    return pmname(mon->data, mon->female ? FEMALE : MALE);
+}
+
+/* mons[]->pmname for a corpse or statue or figurine */
+const char *
+obj_pmname(struct obj *obj)
+{
+#if 0   /* ignore saved montraits even when they're available; they determine
+         * what a corpse would revive as if resurrected (human corpse from
+         * slain vampire revives as vampire rather than as human, for example)
+         * and don't necessarily reflect the state of the corpse itself */
+    if (has_omonst(obj)) {
+        struct monst *m = OMONST(obj);
+
+        /* obj->oextra->omonst->data is Null but ...->mnum is set */
+        if (m->mnum >= LOW_PM)
+            return pmname(&mons[m->mnum], m->female ? FEMALE : MALE);
+    }
+#endif
+    if ((obj->otyp == CORPSE || obj->otyp == STATUE || obj->otyp == FIGURINE)
+        && obj->corpsenm >= LOW_PM) {
+        int cgend = (obj->spe & CORPSTAT_GENDER),
+            mgend = ((cgend == CORPSTAT_MALE) ? MALE
+                     : (cgend == CORPSTAT_FEMALE) ? FEMALE
+                       : NEUTRAL);
+
+        return pmname(&mons[obj->corpsenm], mgend);
+    }
+    return "two-legged glorkum-seeker";
+}
 
 /* fake monsters used to be in a hard-coded array, now in a data file */
 char *
@@ -2351,6 +2427,8 @@ lookup_novel(const char *lookname, int *idx)
         lookname = "Sourcery"; /* [4] */
     else if (!strcmpi(lookname, "Masquerade"))
         lookname = "Maskerade"; /* [17] */
+    else if (!strcmpi(lookname, "Thud"))
+        lookname = "Thud!"; /* [33] */
 
     for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
         if (!strcmpi(lookname, sir_Terry_novels[k])

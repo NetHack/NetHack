@@ -18,6 +18,10 @@
 static int nhl_dump_fmtstr(lua_State *);
 #endif /* DUMPLOG */
 static int nhl_dnum_name(lua_State *);
+static int nhl_stairways(lua_State *);
+static int nhl_pushkey(lua_State *);
+static int nhl_doturn(lua_State *);
+static int nhl_debug_flags(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
@@ -880,6 +884,36 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
+/* local stairs = stairways(); */
+static int
+nhl_stairways(lua_State *L)
+{
+    stairway *tmp = g.stairs;
+    int i = 1; /* lua arrays should start at 1 */
+
+    lua_newtable(L);
+
+    while (tmp) {
+
+        lua_pushinteger(L, i);
+        lua_newtable(L);
+
+        nhl_add_table_entry_bool(L, "up", tmp->up);
+        nhl_add_table_entry_bool(L, "ladder", tmp->isladder);
+        nhl_add_table_entry_int(L, "x", tmp->sx);
+        nhl_add_table_entry_int(L, "y", tmp->sy);
+        nhl_add_table_entry_int(L, "dnum", tmp->tolev.dnum);
+        nhl_add_table_entry_int(L, "dlevel", tmp->tolev.dlevel);
+
+        lua_settable(L, -3);
+
+        tmp = tmp->next;
+        i++;
+    }
+
+    return 1;
+}
+
 /*
   test( { x = 123, y = 456 } );
 */
@@ -904,6 +938,83 @@ nhl_test(lua_State *L)
 
     return 1;
 }
+
+/* push a key into command queue */
+/* nh.pushkey("i"); */
+static int
+nhl_pushkey(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        const char *key = luaL_checkstring(L, 1);
+
+        cmdq_add_key(key[0]);
+    }
+
+    return 0;
+}
+
+/* do a turn of moveloop, or until g.multi is done if param is true. */
+/* nh.doturn(); nh.doturn(true); */
+static int
+nhl_doturn(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    boolean domulti = FALSE;
+
+    if (argc == 1)
+        domulti = lua_toboolean(L, 1);
+
+    do {
+        moveloop_core();
+    } while (domulti && g.multi);
+
+    return 0;
+}
+
+/* set debugging flags. debugging use only, of course. */
+/* nh.debug_flags({ mongen = false,
+                    hunger = false,
+                    overwrite_stairs = true }); */
+static int
+nhl_debug_flags(lua_State *L)
+{
+    int val;
+
+    lcheck_param_table(L);
+
+    /* disable monster generation */
+    val = get_table_boolean_opt(L, "mongen", -1);
+    if (val != -1) {
+        iflags.debug_mongen = !(boolean)val; /* value in lua is negated */
+        if (iflags.debug_mongen) {
+            register struct monst *mtmp, *mtmp2;
+
+            for (mtmp = fmon; mtmp; mtmp = mtmp2) {
+                mtmp2 = mtmp->nmon;
+                if (DEADMONSTER(mtmp))
+                    continue;
+                mongone(mtmp);
+            }
+        }
+    }
+
+    /* prevent hunger */
+    val = get_table_boolean_opt(L, "hunger", -1);
+    if (val != -1) {
+        iflags.debug_hunger = !(boolean)val; /* value in lua is negated */
+    }
+
+    /* allow overwriting stairs */
+    val = get_table_boolean_opt(L, "overwrite_stairs", -1);
+    if (val != -1) {
+        iflags.debug_overwrite_stairs = (boolean)val;
+    }
+
+    return 0;
+}
+
 
 static const struct luaL_Reg nhl_functions[] = {
     {"test", nhl_test},
@@ -935,6 +1046,10 @@ static const struct luaL_Reg nhl_functions[] = {
     {"dump_fmtstr", nhl_dump_fmtstr},
 #endif /* DUMPLOG */
     {"dnum_name", nhl_dnum_name},
+    {"stairways", nhl_stairways},
+    {"pushkey", nhl_pushkey},
+    {"doturn", nhl_doturn},
+    {"debug_flags", nhl_debug_flags},
     {NULL, NULL}
 };
 
@@ -944,6 +1059,11 @@ static const struct {
 } nhl_consts[] = {
     { "COLNO",  COLNO },
     { "ROWNO",  ROWNO },
+#ifdef DLB
+    { "DLB", 1},
+#else
+    { "DLB", 0},
+#endif /* DLB */
     { NULL, 0 },
 };
 

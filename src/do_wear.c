@@ -695,21 +695,37 @@ static int
 Armor_on(void)
 {
     /*
-     * No suits require special handling.  Special properties conferred by
-     * suits are set up as intrinsics (actually 'extrinsics') by setworn()
-     * which is called by armor_or_accessory_on() before Armor_on().
+     * Gold DSM requires special handling since it emits light when worn.
      */
-    if (uarm) /* no known instances of !uarm here but play it safe */
-        uarm->known = 1; /* suit's +/- evident because of status line AC */
+    if (!uarm) /* no known instances of !uarm here but play it safe */
+        return 0;
+    uarm->known = 1; /* suit's +/- evident because of status line AC */
+
+    if (artifact_light(uarm) && !uarm->lamplit) {
+        begin_burn(uarm, FALSE);
+        if (!Blind)
+            pline("%s %s to shine %s!",
+                  Yname2(uarm), otense(uarm, "begin"),
+                  arti_light_description(uarm));
+    }
     return 0;
 }
 
 int
 Armor_off(void)
 {
+    struct obj *otmp = uarm;
+    boolean was_arti_light = otmp && otmp->lamplit && artifact_light(otmp);
+
     g.context.takeoff.mask &= ~W_ARM;
     setworn((struct obj *) 0, W_ARM);
     g.context.takeoff.cancelled_don = FALSE;
+
+    if (was_arti_light && !artifact_light(otmp)) {
+        end_burn(otmp, FALSE);
+        if (!Blind)
+            pline("%s shining.", Tobjnam(otmp, "stop"));
+    }
     return 0;
 }
 
@@ -722,9 +738,18 @@ Armor_off(void)
 int
 Armor_gone(void)
 {
+    struct obj *otmp = uarm;
+    boolean was_arti_light = otmp && otmp->lamplit && artifact_light(otmp);
+
     g.context.takeoff.mask &= ~W_ARM;
     setnotworn(uarm);
     g.context.takeoff.cancelled_don = FALSE;
+
+    if (was_arti_light && !artifact_light(otmp)) {
+        end_burn(otmp, FALSE);
+        if (!Blind)
+            pline("%s shining.", Tobjnam(otmp, "stop"));
+    }
     return 0;
 }
 
@@ -2228,11 +2253,13 @@ glibr(void)
             otmp = uleft;
             Ring_off(uleft);
             dropx(otmp);
+            cmdq_clear();
         }
         if (rightfall) {
             otmp = uright;
             Ring_off(uright);
             dropx(otmp);
+            cmdq_clear();
         }
     }
 
@@ -2253,6 +2280,7 @@ glibr(void)
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */
+        cmdq_clear();
         if (canletgo(otmp, ""))
             dropx(otmp);
     }
@@ -2288,6 +2316,7 @@ glibr(void)
         /* xfl++; */
         otmp->quan = savequan;
         setuwep((struct obj *) 0);
+        cmdq_clear();
         if (canletgo(otmp, ""))
             dropx(otmp);
     }
@@ -2769,6 +2798,10 @@ destroy_arm(register struct obj *atmp)
     } else if (DESTROY_ARM(uarm)) {
         if (donning(otmp))
             cancel_don();
+        /* for gold DSM, we don't want Armor_gone() to report that it
+           stops shining _after_ we've been told that it is destroyed */
+        if (otmp->lamplit)
+            end_burn(otmp, FALSE);
         Your("armor turns to dust and falls to the %s!", surface(u.ux, u.uy));
         (void) Armor_gone();
         useup(otmp);

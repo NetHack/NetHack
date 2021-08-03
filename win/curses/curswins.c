@@ -152,6 +152,8 @@ curses_destroy_win(WINDOW *win)
     werase(win);
     wrefresh(win);
     delwin(win);
+    if (win == activemenu)
+        activemenu = NULL;
     curses_refresh_nethack_windows();
 }
 

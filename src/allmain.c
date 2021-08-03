@@ -12,6 +12,8 @@
 #include <signal.h>
 #endif
 
+static void moveloop_preamble(boolean);
+static void u_calc_moveamt(int);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -28,16 +30,9 @@ early_init(void)
     sys_early_init();
 }
 
-void
-moveloop(boolean resuming)
+static void
+moveloop_preamble(boolean resuming)
 {
-#if defined(MICRO) || defined(WIN32)
-    char ch;
-    int abort_lev;
-#endif
-    int moveamt = 0, wtcap = 0, change = 0;
-    boolean monscanmove = FALSE;
-
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
        to use up the save file and require confirmation for explore mode */
@@ -88,8 +83,66 @@ moveloop(boolean resuming)
        invent is fully populated and the in_moveloop flag has been set */
     if (iflags.perm_invent)
         update_inventory();
+}
 
-    for (;;) {
+static void
+u_calc_moveamt(int wtcap)
+{
+    int moveamt = 0;
+
+    /* calculate how much time passed. */
+    if (u.usteed && u.umoved) {
+        /* your speed doesn't augment steed's speed */
+        moveamt = mcalcmove(u.usteed, TRUE);
+    } else {
+        moveamt = g.youmonst.data->mmove;
+
+        if (Very_fast) { /* speed boots, potion, or spell */
+            /* gain a free action on 2/3 of turns */
+            if (rn2(3) != 0)
+                moveamt += NORMAL_SPEED;
+        } else if (Fast) { /* intrinsic */
+            /* gain a free action on 1/3 of turns */
+            if (rn2(3) == 0)
+                moveamt += NORMAL_SPEED;
+        }
+    }
+
+    switch (wtcap) {
+    case UNENCUMBERED:
+        break;
+    case SLT_ENCUMBER:
+        moveamt -= (moveamt / 4);
+        break;
+    case MOD_ENCUMBER:
+        moveamt -= (moveamt / 2);
+        break;
+    case HVY_ENCUMBER:
+        moveamt -= ((moveamt * 3) / 4);
+        break;
+    case EXT_ENCUMBER:
+        moveamt -= ((moveamt * 7) / 8);
+        break;
+    default:
+        break;
+    }
+
+    g.youmonst.movement += moveamt;
+    if (g.youmonst.movement < 0)
+        g.youmonst.movement = 0;
+}
+
+#if defined(MICRO) || defined(WIN32)
+static int mvl_abort_lev;
+#endif
+static int mvl_wtcap = 0;
+static int mvl_change = 0;
+
+void
+moveloop_core(void)
+{
+    boolean monscanmove = FALSE;
+
 #ifdef SAFERHANGUP
         if (g.program_state.done_hup)
             end_of_input();
@@ -104,7 +157,7 @@ moveloop(boolean resuming)
             g.youmonst.movement -= NORMAL_SPEED;
 
             do { /* hero can't move this turn loop */
-                wtcap = encumber_msg();
+                mvl_wtcap = encumber_msg();
 
                 g.context.mon_moving = TRUE;
                 do {
@@ -136,46 +189,7 @@ moveloop(boolean resuming)
                         (void) makemon((struct permonst *) 0, 0, 0,
                                        NO_MM_FLAGS);
 
-                    /* calculate how much time passed. */
-                    if (u.usteed && u.umoved) {
-                        /* your speed doesn't augment steed's speed */
-                        moveamt = mcalcmove(u.usteed, TRUE);
-                    } else {
-                        moveamt = g.youmonst.data->mmove;
-
-                        if (Very_fast) { /* speed boots, potion, or spell */
-                            /* gain a free action on 2/3 of turns */
-                            if (rn2(3) != 0)
-                                moveamt += NORMAL_SPEED;
-                        } else if (Fast) { /* intrinsic */
-                            /* gain a free action on 1/3 of turns */
-                            if (rn2(3) == 0)
-                                moveamt += NORMAL_SPEED;
-                        }
-                    }
-
-                    switch (wtcap) {
-                    case UNENCUMBERED:
-                        break;
-                    case SLT_ENCUMBER:
-                        moveamt -= (moveamt / 4);
-                        break;
-                    case MOD_ENCUMBER:
-                        moveamt -= (moveamt / 2);
-                        break;
-                    case HVY_ENCUMBER:
-                        moveamt -= ((moveamt * 3) / 4);
-                        break;
-                    case EXT_ENCUMBER:
-                        moveamt -= ((moveamt * 7) / 8);
-                        break;
-                    default:
-                        break;
-                    }
-
-                    g.youmonst.movement += moveamt;
-                    if (g.youmonst.movement < 0)
-                        g.youmonst.movement = 0;
+                    u_calc_moveamt(mvl_wtcap);
                     settrack();
 
                     g.monstermoves++; /* [obsolete (for a long time...)] */
@@ -221,24 +235,24 @@ moveloop(boolean resuming)
                      */
                     if (u.uinvulnerable) {
                         /* for the moment at least, you're in tiptop shape */
-                        wtcap = UNENCUMBERED;
+                        mvl_wtcap = UNENCUMBERED;
                     } else if (!Upolyd ? (u.uhp < u.uhpmax)
                                        : (u.mh < u.mhmax
                                           || g.youmonst.data->mlet == S_EEL)) {
                         /* maybe heal */
-                        regen_hp(wtcap);
+                        regen_hp(mvl_wtcap);
                     }
 
                     /* moving around while encumbered is hard work */
-                    if (wtcap > MOD_ENCUMBER && u.umoved) {
-                        if (!(wtcap < EXT_ENCUMBER ? g.moves % 30
+                    if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
+                        if (!(mvl_wtcap < EXT_ENCUMBER ? g.moves % 30
                                                    : g.moves % 10)) {
                             overexert_hp();
                         }
                     }
 
                     if (u.uen < u.uenmax
-                        && ((wtcap < MOD_ENCUMBER
+                        && ((mvl_wtcap < MOD_ENCUMBER
                              && (!(g.moves % ((MAXULEV + 8 - u.ulevel)
                                             * (Role_if(PM_WIZARD) ? 3 : 4)
                                             / 6)))) || Energy_regeneration)) {
@@ -266,22 +280,22 @@ moveloop(boolean resuming)
                             }
                         }
                         /* delayed change may not be valid anymore */
-                        if ((change == 1 && !Polymorph)
-                            || (change == 2 && u.ulycn == NON_PM))
-                            change = 0;
+                        if ((mvl_change == 1 && !Polymorph)
+                            || (mvl_change == 2 && u.ulycn == NON_PM))
+                            mvl_change = 0;
                         if (Polymorph && !rn2(100))
-                            change = 1;
+                            mvl_change = 1;
                         else if (u.ulycn >= LOW_PM && !Upolyd
                                  && !rn2(80 - (20 * night())))
-                            change = 2;
-                        if (change && !Unchanging) {
+                            mvl_change = 2;
+                        if (mvl_change && !Unchanging) {
                             if (g.multi >= 0) {
                                 stop_occupation();
-                                if (change == 1)
+                                if (mvl_change == 1)
                                     polyself(0);
                                 else
                                     you_were();
-                                change = 0;
+                                mvl_change = 0;
                             }
                         }
                     }
@@ -403,21 +417,23 @@ moveloop(boolean resuming)
 
         if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
-            abort_lev = 0;
+            mvl_abort_lev = 0;
             if (kbhit()) {
+                char ch;
+
                 if ((ch = pgetchar()) == ABORT)
-                    abort_lev++;
+                    mvl_abort_lev++;
                 else
                     pushch(ch);
             }
-            if (!abort_lev && (*g.occupation)() == 0)
+            if (!mvl_abort_lev && (*g.occupation)() == 0)
 #else
             if ((*g.occupation)() == 0)
 #endif
                 g.occupation = 0;
             if (
 #if defined(MICRO) || defined(WIN32)
-                abort_lev ||
+                mvl_abort_lev ||
 #endif
                 monster_nearby()) {
                 stop_occupation();
@@ -427,7 +443,7 @@ moveloop(boolean resuming)
             if (!(++g.occtime % 7))
                 display_nhwindow(WIN_MAP, FALSE);
 #endif
-            continue;
+            return;
         }
 
         if (iflags.sanity_check || iflags.debug_fuzzer)
@@ -445,7 +461,7 @@ moveloop(boolean resuming)
             if (!g.multi) {
                 /* lookaround may clear multi */
                 g.context.move = 0;
-                continue;
+                return;
             }
             if (g.context.mv) {
                 if (g.multi < COLNO && !--g.multi)
@@ -477,6 +493,14 @@ moveloop(boolean resuming)
             /* [should this be flush_screen() instead?] */
             display_nhwindow(WIN_MAP, FALSE);
         }
+}
+
+void
+moveloop(boolean resuming)
+{
+    moveloop_preamble(resuming);
+    for (;;) {
+        moveloop_core();
     }
 }
 
@@ -568,6 +592,7 @@ stop_occupation(void)
     } else if (g.multi >= 0) {
         nomul(0);
     }
+    cmdq_clear();
 }
 
 void

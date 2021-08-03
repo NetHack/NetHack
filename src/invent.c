@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1620861205 2021/05/12 23:13:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.331 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1625969349 2021/07/11 02:09:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -924,12 +924,16 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     obj->where = OBJ_INVENT;
 
     /* fill empty quiver if obj was thrown */
-    if (flags.pickup_thrown && !uquiver && obj_was_thrown
+    if (obj_was_thrown && flags.pickup_thrown && !uquiver
         /* if Mjollnir is thrown and fails to return, we want to
-           auto-pick it when we move to its spot, but not into quiver;
-           aklyses behave like Mjollnir when thrown while wielded, but
-           we lack sufficient information here make them exceptions */
-        && obj->oartifact != ART_MJOLLNIR
+           auto-pick it when we move to its spot, but not into quiver
+           because it needs to be wielded to be re-thrown;
+           aklys likewise because player using 'f' to throw it might
+           not notice that it isn't wielded until it fails to return
+           several times; we never auto-wield, just omit from quiver
+           so that player will be prompted for what to throw and
+           possibly realize that re-wielding is necessary */
+        && obj->oartifact != ART_MJOLLNIR && obj->otyp != AKLYS
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
  added:
@@ -1487,6 +1491,31 @@ getobj(const char *word,
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
     Loot *sortedinvent, *srtinv;
+
+    struct _cmd_queue *cmdq = cmdq_pop();
+
+    if (cmdq) {
+        /* it's not a key, abort */
+        if (cmdq->typ != CMDQ_KEY) {
+            free(cmdq);
+            return (struct obj *)0;
+        }
+
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (otmp->invlet == cmdq->key) {
+                int v = (*obj_ok)(otmp);
+
+                if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY) {
+                    free(cmdq);
+                    return otmp;
+                }
+            }
+
+        /* did not find the object, abort */
+        free(cmdq);
+        cmdq_clear();
+        return (struct obj *)0;
+    }
 
     /* is "hands"/"self" a valid thing to do this action on? */
     switch ((*obj_ok)((struct obj *) 0)) {
@@ -2332,8 +2361,6 @@ doperminv(void)
      * (typically by typing <return> or <esc> but that's up to interface).
      */
 
-    if (iflags.debug_fuzzer)
-        return 0;
 #if 0
     /* [currently this would redraw the persistent inventory window
        whether that's needed or not, so also reset any previous
@@ -3256,7 +3283,7 @@ dfeature_at(int x, int y, char *buf)
     int ltyp = lev->typ, cmap = -1;
     const char *dfeature = 0;
     static char altbuf[BUFSZ];
-    stairway *stway = stairway_at(x,y);
+    stairway *stway = stairway_at(x, y);
 
     if (IS_DOOR(ltyp)) {
         switch (lev->doormask) {
@@ -3297,15 +3324,9 @@ dfeature_at(int x, int y, char *buf)
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
-    } else if (stway && !stway->isladder && stway->up)
-        cmap = S_upstair; /* "staircase up" */
-    else if (stway && !stway->isladder && !stway->up)
-        cmap = S_dnstair; /* "staircase down" */
-    else if (stway && stway->isladder && stway->up)
-        cmap = S_upladder; /* "ladder up" */
-    else if (stway && stway->isladder && !stway->up)
-        cmap = S_dnladder; /* "ladder down" */
-    else if (ltyp == DRAWBRIDGE_DOWN)
+    } else if (stway) {
+        dfeature = stairs_description(stway, altbuf, TRUE);
+    } else if (ltyp == DRAWBRIDGE_DOWN)
         cmap = S_vodbridge; /* "lowered drawbridge" */
     else if (ltyp == DBWALL)
         cmap = S_vcdbridge; /* "raised drawbridge" */

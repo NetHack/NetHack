@@ -1,12 +1,22 @@
 
 -- Test all of the special levels
 
+function saferequire(file)
+   if (not pcall(require, file)) then
+       nh.pline("Cannot load level file '" .. file .. "'.");
+       if (nhc.DLB == 1) then
+           nh.pline("Maybe due to compile-time option DLB.")
+       end
+       return false;
+   end
+   return true;
+end;
+
 local special_levels = {
 "air",
 "asmodeus",
 "astral",
 "baalz",
-"bigrm-10",
 "bigrm-1",
 "bigrm-2",
 "bigrm-3",
@@ -16,6 +26,8 @@ local special_levels = {
 "bigrm-7",
 "bigrm-8",
 "bigrm-9",
+"bigrm-10",
+"bigrm-11",
 "castle",
 "earth",
 "fakewiz1",
@@ -71,5 +83,8 @@ end
 
 for _,lev in ipairs(special_levels) do
    des.reset_level();
-   require(lev)
+   if (not saferequire(lev)) then
+      error("Cannot load a required file.");
+   end
+   des.finalize_level();
 end

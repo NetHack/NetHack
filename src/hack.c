@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1617035736 2021/03/29 16:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1627951429 2021/08/03 00:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.291 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1013,14 +1013,13 @@ findtravelpath(int mode)
                 int dir;
                 int x = travelstepx[set][i];
                 int y = travelstepy[set][i];
-                static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
                 /* no diagonal movement for grid bugs */
-                int dirmax = NODIAG(u.umonnum) ? 4 : 8;
+                int dirmax = NODIAG(u.umonnum) ? 4 : N_DIRS;
                 boolean alreadyrepeated = FALSE;
 
                 for (dir = 0; dir < dirmax; ++dir) {
-                    int nx = x + xdir[ordered[dir]];
-                    int ny = y + ydir[ordered[dir]];
+                    int nx = x + xdir[dirs_ord[dir]];
+                    int ny = y + ydir[dirs_ord[dir]];
 
                     /*
                      * When guessing and trying to travel as close as possible
@@ -2970,7 +2969,8 @@ crawl_destination(int x, int y)
         return FALSE;
     /* finally, are we trying to squeeze through a too-narrow gap? */
     return !(bad_rock(g.youmonst.data, u.ux, y)
-             && bad_rock(g.youmonst.data, x, u.uy));
+             && bad_rock(g.youmonst.data, x, u.uy)
+             && cant_squeeze_thru(&g.youmonst));
 }
 
 /* something like lookaround, but we are not running */
@@ -3007,6 +3007,7 @@ end_running(boolean and_travel)
     if (flags.time && g.context.run)
         iflags.time_botl = TRUE;
     g.context.run = 0;
+    g.domove_attempting = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
     if (and_travel)
@@ -3028,6 +3029,7 @@ nomul(int nval)
     if (nval == 0)
         g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
     end_running(TRUE);
+    cmdq_clear();
 }
 
 /* called when a non-movement, multi-turn action has completed */

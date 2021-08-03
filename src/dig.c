@@ -606,6 +606,8 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
                 You("dig a pit in the %s.", surface_type);
             if (shopdoor)
                 pay_for_damage("ruin", FALSE);
+            else
+                add_damage(x, y, madeby_u ? SHOP_PIT_COST : 0L);
         } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
         } else if (cansee(x, y) && flags.verbose) {
@@ -957,10 +959,11 @@ dig_up_grave(coord *cc)
 int
 use_pick_axe(struct obj *obj)
 {
-    const char *sdp, *verb;
+    const char *verb;
     char *dsp, dirsyms[12], qbuf[BUFSZ];
     boolean ispick;
     int rx, ry, downok, res = 0;
+    int dir;
 
     /* Check tool */
     if (obj != uwep) {
@@ -983,13 +986,19 @@ use_pick_axe(struct obj *obj)
     /* construct list of directions to show player for likely choices */
     downok = !!can_reach_floor(FALSE);
     dsp = dirsyms;
-    for (sdp = g.Cmd.dirchars; *sdp; ++sdp) {
+    for (dir = 0; dir < N_DIRS_Z; dir++) {
+        char dirch;
+        if (dir == DIR_DOWN)
+            dirch = cmd_from_func(dodown);
+        else if (dir == DIR_UP)
+            dirch = cmd_from_func(doup);
+        else
+            dirch = g.Cmd.move[dir];
         /* filter out useless directions */
         if (u.uswallow) {
             ; /* all directions are viable when swallowed */
-        } else if (movecmd(*sdp)) {
-            /* normal direction, within plane of the level map;
-               movecmd() sets u.dx, u.dy, u.dz and returns !u.dz */
+        } else if (movecmd(dirch, MV_WALK)) {
+            /* normal direction, within plane of the level map */
             if (!dxdy_moveok())
                 continue; /* handle NODIAG */
             rx = u.ux + u.dx;
@@ -1006,7 +1015,7 @@ use_pick_axe(struct obj *obj)
                 continue;
         }
         /* include this direction */
-        *dsp++ = *sdp;
+        *dsp++ = dirch;
     }
     *dsp = 0;
     Sprintf(qbuf, "In what direction do you want to %s? [%s]", verb, dirsyms);
@@ -1098,15 +1107,10 @@ use_pick_axe2(struct obj *obj)
                        && (trap_with_u = t_at(u.ux, u.uy))
                        && is_pit(trap->ttyp)
                        && !conjoined_pits(trap, trap_with_u, FALSE)) {
-                int idx;
+                int idx = xytod(u.dx, u.dy);
 
-                for (idx = 0; idx < 8; idx++) {
-                    if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-                        break;
-                }
-                /* idx is valid if < 8 */
-                if (idx < 8) {
-                    int adjidx = (idx + 4) % 8;
+                if (idx != DIR_ERR) {
+                    int adjidx = DIR_180(idx);
 
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
@@ -1191,8 +1195,10 @@ use_pick_axe2(struct obj *obj)
             assign_level(&g.context.digging.level, &u.uz);
             g.context.digging.effort = 0;
             You("start %s downward.", verbing);
-            if (*u.ushops)
+            if (*u.ushops) {
                 shopdig(0);
+                add_damage(u.ux, u.uy, SHOP_PIT_COST);
+            }
         } else
             You("continue %s downward.", verbing);
         g.did_dig_msg = FALSE;
@@ -1454,11 +1460,7 @@ zap_dig(void)
     if (u.utrap && u.utraptype == TT_PIT
         && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = TRUE;
-        for (diridx = 0; diridx < 8; diridx++) {
-            if (xdir[diridx] == u.dx && ydir[diridx] == u.dy)
-                break;
-            /* diridx is valid if < 8 */
-        }
+        diridx = xytod(u.dx, u.dy);
     }
     digdepth = rn1(18, 8);
     tmp_at(DISP_BEAM, cmap_to_glyph(S_digbeam));
@@ -1472,10 +1474,12 @@ zap_dig(void)
         if (pitdig) { /* we are already in a pit if this is true */
             coord cc;
             struct trap *adjpit = t_at(zx, zy);
-            if ((diridx < 8) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
+
+            if ((diridx != DIR_ERR) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0; /* limited to the adjacent location only */
                 if (!(adjpit && is_pit(adjpit->ttyp))) {
                     char buf[BUFSZ];
+
                     cc.x = zx;
                     cc.y = zy;
                     if (!adj_pit_checks(&cc, buf)) {
@@ -1487,9 +1491,9 @@ zap_dig(void)
                         adjpit = t_at(zx, zy);
                     }
                 }
-                if (adjpit
-                    && is_pit(adjpit->ttyp)) {
-                    int adjidx = (diridx + 4) % 8;
+                if (adjpit && is_pit(adjpit->ttyp)) {
+                    int adjidx = DIR_180(diridx);
+
                     trap_with_u->conjoined |= (1 << diridx);
                     adjpit->conjoined |= (1 << adjidx);
                     flow_x = zx;
@@ -1697,7 +1701,7 @@ pit_flow(struct trap *trap, schar filltyp)
                     (t.tx == u.ux && t.ty == u.uy)
                         ? "Suddenly %s flows in from the adjacent pit!"
                         : (char *) 0);
-        for (idx = 0; idx < 8; ++idx) {
+        for (idx = 0; idx < N_DIRS; ++idx) {
             if (t.conjoined & (1 << idx)) {
                 int x, y;
                 struct trap *t2;
@@ -1710,7 +1714,7 @@ pit_flow(struct trap *trap, schar filltyp)
                  * called deltrap() which cleaned up the
                  * conjoined fields on both pits.
                  */
-                if (t2 && (t2->conjoined & (1 << ((idx + 4) % 8))))
+                if (t2 && (t2->conjoined & (1 << DIR_180(idx))))
 #endif
                 /* recursion */
                 pit_flow(t2, filltyp);

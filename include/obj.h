@@ -55,10 +55,9 @@ struct obj {
                 * candy bar wrapper index;
                 * scroll of mail (normal==0, bones or wishing==1, written==2);
                 * splash of venom (normal==0, wishing==1);
-                * historic flag and gender for statues */
-#define STATUE_HISTORIC 0x01
-#define STATUE_MALE 0x02
-#define STATUE_FEMALE 0x04
+                * gender for corpses, statues, and figurines (0..3,
+                *   CORPSTAT_GENDER),
+                * historic flag for statues (4, CORPSTAT_HISTORIC) */
     char oclass;    /* object class */
     char invlet;    /* designation in inventory */
     char oartifact; /* artifact array index */
@@ -346,7 +345,7 @@ struct obj {
      || (otmp)->otyp == ALCHEMY_SMOCK || (otmp)->otyp == CREDIT_CARD         \
      || (otmp)->otyp == CAN_OF_GREASE || (otmp)->otyp == MAGIC_MARKER        \
      || (otmp)->oclass == COIN_CLASS || (otmp)->oartifact == ART_ORB_OF_FATE \
-     || (otmp)->otyp == CANDY_BAR)
+     || (otmp)->otyp == CANDY_BAR || (otmp)->otyp == HAWAIIAN_SHIRT)
 
 /* special stones */
 #define is_graystone(obj)                                 \

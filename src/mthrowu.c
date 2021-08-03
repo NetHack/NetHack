@@ -556,7 +556,7 @@ m_throw(
                 nomul(0);
 
             if (singleobj->oclass == GEM_CLASS
-                && singleobj->otyp <= LAST_GEM + 9 /* 9 glass colors */
+                && singleobj->otyp <= LAST_GEM + NUM_GLASS_GEMS
                 && is_unicorn(g.youmonst.data)) {
                 if (singleobj->otyp > LAST_GEM) {
                     You("catch the %s.", xname(singleobj));

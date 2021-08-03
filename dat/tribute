@@ -1,4 +1,4 @@
-# NetHack 3.7  tribute       $NHDT-Date: 1620076692 2021/05/03 21:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
+# NetHack 3.7  tribute       $NHDT-Date: 1626142354 2021/07/13 02:12:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $
 # Copyright (c) 2017 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 # A tribute introduced in NetHack 3.6.0 to:
@@ -4771,7 +4771,7 @@ them.  [...]"
 #
 #
 #
-%title Hogfather (10)
+%title Hogfather (13)
 # p. 1 (Harper Torch edition)
 %passage 1
 Everything starts somewhere, though many physicists disagree.
@@ -5043,11 +5043,70 @@ Death.  OR THE FAME.  OR BECAUSE THEY SHOULDN'T.
 
   [Hogfather, by Terry Pratchett]
 %e passage
+#
+# 3 new passages added for 3.7
+#
+# pp. 2-3 (the door turns out to lead to a bathroom designed by Bergholt
+#          Stuttly "Bloody Stupid" Johnson, an infamous architect and
+#          landscape designer known for creating dangerous and/or unusable
+#          versions of whatever he'd been hired to produce)
+%passage 11
+The senior wizards of Unseen University stood and looked at the door.
+
+There was no doubt that whoever had shut it wanted it to stay shut.  Dozens
+of nails secured it to the door frame.  Planks had been nailed right across.
+And finally it had, up until this morning, been hidden by a bookcase that
+had been put in front of it.
+
+"And there's the sign, Ridcully," said the Dean.  "You /have/ read it, I
+assume.  You know?  The sign which says 'Do not, under any circumstances,
+open this door'?"
+
+"Of course I've read it," said Ridcully.  "Why d'yer think I want it
+opened?"
+
+"Er... why?" said the Lecturer in Recent Runes.
+
+"To see why they wanted it shut, of course."(1)
+
+(1) This exchange contains almost all you need to know about human
+civilization.  At least, those bits of it that are now under the sea,
+fenced off or still smoking.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
+# p. 144 (the wizards have been discussing hangover cures and are hoping to
+#         produce one for Bilious, the god--actually "oh god"--of hangovers)
+%passage 12
+Then the Dean repeated the mantra that has had such a marked effect on the
+progress of knowledge throughout the ages.
+
+"Why don't we just mix up absolutely everything and see what happens?" he
+said.
+
+And Ridcully responded with the traditional response.
+
+"It's got to be worth a try," he said.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
+# p. 192 (senior wizards are discussing Hex, an organic+clockwork computer
+#         invented, built, and run by junior wizards and advanced students)
+%passage 13
+"I don't hold with using that thinking machine," said the Dean.  "I've said
+this before.  It's meddling with the cult.  The /oc/cult has always been
+good enough for me, thank you very much."
+
+"On the other hand it's the only person round here who can think straight
+and it does what it's told," said Ridcully.
+
+  [Hogfather, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Jingo (12)
+%title Jingo (14)
 %passage 1
 # p. 206 (Harper Torch Edition; passage starts mid-paragraph)
 It was so much easier to blame it on Them.  It was bleakly depressing to
@@ -5313,11 +5372,52 @@ him and he's warm for the rest of his life.'  See my point?"
 
   [Jingo, by Terry Pratchett]
 %e passage
+#
+# 2 new passages added for 3.7
+#
+# p. 90 (second line beginning with "Sir." rather than "Sir," is accurate)
+%passage 13
+"We need simple answers, Vimes."
+
+"Sir.  Fred and Nobby are /good/ at simple."
+
+The Patrician turned away and looked out over the city.
+
+"Ah," he said in a quieter voice.  "Simple men to see the simple truth."
+
+"This is a fact, sir."
+
+"You are learning fast, Vimes."
+
+"Couldn't say about that, sir."
+
+"And when they have found the simple truth, Vimes?"
+
+"Can't argue with the truth, sir."
+
+"In my experience, Vimes, you can argue with anything."
+
+  [Jingo, by Terry Pratchett]
+%e passage
+# p. 238 (the name "71-hour Ahmed" is accurate)
+%passage 14
+71-hour Ahmed was not /super/stitious.  He was substitious, which put him
+in a minority among humans.  He didn't believe in the things everyone
+believed in but which nevertheless weren't true.  He believed instead in
+the things that were true in which no one else believed.  There are many
+such substitions, ranging from "It'll get better if you don't pick at it"
+all the way up to "Sometimes things just happen."
+
+  [Jingo, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title The Last Continent (10)
+# The last continent is Discworld's analog of Australia, known variously
+# as "XXXX", "EcksEcksEcksEcks", and "FourEcks".
+#
+%title The Last Continent (14)
 # p. 260 (Harper Torch edition)
 %passage 1
 "Is it true that your life passes before your eyes before you die?"
@@ -5333,6 +5433,7 @@ FRONT OF THEIR EYES BEFORE THEY DIE.  THE PROCESS IS CALLED "LIVING".  [...]
 
   [The Last Continent, by Terry Pratchett]
 %e passage
+# p. 16
 %passage 2
 "When You're Up to Your Ass in Alligators, Today Is the First Day of the
 Rest of Your Life."
@@ -5493,11 +5594,104 @@ of clothes, often with the same sort of insignia.
 
   [The Last Continent, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
+# pp. 113-114 (passage ends mid-paragraph)
+%passage 11
+"This is certainly a very... /original/ cart," said Rincewind.
+
+"Got a few modifications of my own," said Mad.  He grinned evilly.  "You a
+wizard, mister?"
+
+"Broadly speaking, yes."
+
+"Any good?"  Mad was loading another crossbow.
+
+Rincewind hesitated.  "No," he said.
+
+"Lucky for you," said Mad.  "I'd have killed you if you were.  Can't stand
+wizards.  Bunch of wowsers, right?"
+
+He grasped the handles of the bent stovepipe and swiveled it around.
+
+"Here they come," he muttered.
+
+Rincewind peered over the top of Mad's head.  There was a piece of mirror
+in the bend of the pipe.  It showed the road behind, and half a dozen dots
+under another cloud of red dust.
+
+"Road gang," said Mad.  "After my cargo.  Steal anything, they will.  All
+bastards are bastards, but some bastards is /bastards/."  [...]
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# pp. 246-247 (Ponder Stibbins had stayed behind, then changed his mind and
+#              isn't wearing his robe after swimming to catch up with the
+#              senior wizards' boat; Ridcully is smoking a pipe)
+%passage 12
+"And, while it is good to see you, Stibbins, albeit rather more of you
+than I would usually care to contemplate, I am moved to ask why you are,
+in fact, here."
+
+"I suddenly felt it would be unfair to deprive the University of my
+services, sir."
+
+"Really?  A sudden rush of nostalgia for the old alma mater, eh?"
+
+"You could say that, sir."
+
+Ridcully's eyes twinkled behind the smoke and, not for the first time,
+Ponder suspected that the man was sometimes rather cleverer than he
+appeared.  It would not be hard.
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# p. 263 (Rincewind is going to be executed the next day; a previous prisoner
+#         who was well known for multiple escapes had scratched "look at the
+#         hinges" on the cell's wall--the cell's door just lifts off)
+%passage 13
+At moments like this cowardice was an exact science.  There were times
+that called for mindless, terror-filled panic, and times that called for
+measured, considered, /thoughtful/ panic.  Right now he was in a place of
+safety.  It was, admittedly, the death cell, but the point was that it
+was perhaps the one place in this country where nothing bad was going to
+happen for a little while.  The Ecksians didn't look like the kind of
+people who went in for torture, although it was always possible that they
+might make him eat some more of their food.  So, for the moment, he had
+/time/.  Time to plan ahead, to consider his next move, to apply his
+intellect to the problem at hand.
+
+He stared at the wall for a moment, then stood up and gripped the bars.
+
+Right.  That seemed to be about long enough.  Now to run like hell.
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
+# pp. 333-334 (passage starts mid-paragraph and ends mid-paragraph; Rincewind
+#              has asked whether a haunted brewery might have been built on a
+#              site that's sacred to indigenous people; the answer is no)
+%passage 14
+"[...]  Some chief went to prison to see the prime minister and said,
+'Mate, your mob can dig it all up and drop it over the edge of the world,
+no worries.'"
+
+"Why did he have to go to prison?"
+
+"We put all our politicians in prison as soon as they're elected.  Don't
+you?"
+
+"Why?"
+
+"It saves time.  [...]"
+
+  [The Last Continent, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Carpe Jugulum (8)
+%title Carpe Jugulum (12)
 # p. 10 (Harper Torch edition)
 %passage 1
 Agnes tended to obey rules.  Perdita didn't.  Perdita thought that not
@@ -5592,19 +5786,80 @@ saw what happened to the others!  /You/ got your fingers burned!."
 
   [Carpe Jugulum, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
+# p. 24 (elipsis occurs at start of paragraph; Quite Reverend Oats has opened
+#        /The Book of Om/ at random and is reading the passage found there)
+%passage 9
+"... silence is an answer that begs three more questions.  Seek and you will
+find, but first you should know what you seek."
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 71 (conversation between witches Nanny Ogg and Agnes Nitt; King Verance II
+#        of Lancre has invited a family of vampires from Uberwald, among many
+#        other guests, to attend his and Queen Magrat's baby's naming ceremony
+#        at midnight; Nanny has gotten their servant Igor drunk; he passed out)
+%passage 10
+"But /vampires/... what's Granny going to say?"
+
+"Listen, my girl.  They'll be gone by tomorrow... well today, really.  We'll
+just keep an eye on 'em and wave 'em goodbye when they go."
+
+"We don't even know what they look like!"
+
+Nanny looked at the recumbant Igor.
+
+"On reflection, maybe, I should've asked him." she said.  She brightened up.
+"Still, there's one way to find them.  There's something everyone knows
+about vampires..."
+
+In fact there are many things everyone knows about vampires, without really
+taking into account that perhaps the vampires known them by now, too.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 297 (Granny Weatherwax has just regained consciousness after nearly
+#         freezing to death and has figured out that Oats has used his copy of
+#         /The Book of Om/ as fuel for a campfire to save her)
+%passage 11
+"Good thing you were able to get a fire going, all the same," she said,
+without turning around.
+
+"I have always found that if I put my trust in Om a way will be found,"
+said Oats, hurrying after her.
+
+"I reckon Om helps those who helps themselves," said Granny.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
+# p. 316 ("He" is Shawn Ogg, Lancre's one-man army [because they haven't
+#         needed more rather than because of competence on his part])
+%passage 12
+He was trying to find some help in the ancient military journals of General
+Tacticus, whose intelligent campaigning had been so successful that he'd
+lent his very name to the detailed prosecution of martial endeavor, and had
+actually found a section headed What to Do If One Army Occupies a Well-
+fortified and Superior Ground and the Other Does Not, but since the first
+sentence read "Endeavor to be the one inside" he'd rather lost heart.
+
+  [Carpe Jugulum, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title The Fifth Elephant (9)
+%title The Fifth Elephant (12)
+# p. 25 (Harper Torch edition) [passage starts mid-paragraph]
 %passage 1
-You did something because it had always been done,
-and the explanation was "but we've always done it this way."
-A million dead people can't have been wrong, can they?
+You did something because it had always been done, and the explanation
+was "but we've /always/ done it this way."  A million dead people can't
+have been wrong, can they?
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
-# p. 233 (Harper Torch edition) [this is a footnote]
+# p. 233 (this is a footnote)
 %passage 2
 He'd noticed that sex bore some resemblance to cookery:  It fascinated
 people, they sometimes bought books full of complicated recipes and
@@ -5615,7 +5870,9 @@ maybe had a slice of tomato.
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
-# pp. 80-81 (Harper Torch edition) [the pigeon is trained to carry messages]
+# pp. 80-81 ('[...]' represents more than a full page which has been omitted;
+#            passage ends mid-paragraph;
+#            the pigeon is trained to carry messages for the Watch)
 %passage 3
 Constable Shoe saluted, but a little testily.  He'd been waiting rather a
 long time.
@@ -5725,7 +5982,60 @@ I'M NOT SURE.
 "And who gives him /his/ orders?"
 
 "Everyone," said Tantony bitterly.  Vimes nodded.  Been there, he thought.
-Been there, done that, bought the dublet...
+Been there, done that, bought the doublet...
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+#
+# 3 new passages added for 3.7
+#
+# pp. 34-35 (a footnote about Cpl Nobbs lately dressing as a woman omitted)
+%passage 10
+Corporal Cheery Littlebottom pronounced her name "Cheri."  She was a she,
+and therefore a rare bloom in Ankh-Morpork.
+
+It wasn't that dwarfs weren't interested in sex.  They saw the vital need
+for fresh dwarfs to leave their goods to and continue the mining work
+after they had gone.  It was simply that they also saw no point in
+distinguishing between the sexes anywhere but in private.  There was no
+such thing as a Dwarfish female pronoun or, once the children were on
+solids, any such thing as women's work.
+
+Then Cheery Littlebottom had arrived in Ankh-Morpork, and had seen that
+there were men out there who did /not/ wear chain mail or leather
+underwear(1), but /did/ wear interesting colors and exciting makeup, and
+these men were called "women."
+
+And in the little bullet head the thought had arisen:  "Why not me?"
+
+Now she was being denounced in cellars and dwarf bars across the city as
+the first dwarf in Ankh-Morpork to wear a skirt.  It was hard-wearing
+brown leather and as objectively erotic as a piece of wood but, as some
+older dwarfs would point out, somewhere under there were his /knees/.(2)
+
+(1) At least of the sort /she/ normally wore.
+
+(2) They couldn't bring themselves to utter the word "her."
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+# p. 38 (omitted portion spans two separate sentences; pasg ends mid-paragraph)
+%passage 11
+Uberwald [...] was mostly so thickly forested, so creased by little
+mountain ranges and beset by rivers, that it was largely unmapped.  It
+was mostly unexplored, too.(1)
+
+(1) At least, by proper explorers.  Just living there doesn't count.
+
+  [The Fifth Elephant, by Terry Pratchett]
+%e passage
+# p. 219 (passage begins mid-sentence)
+%passage 12
+[...] Sam Vines had learned a lot from watching Lady Sybil.  She didn't
+mean to act like that, but she'd been born to it, into a class which had
+always behaved this way:  You went through the world as if there was
+/no possibility/ that anyone would stop you or question you, and most of
+the time that's exactly what didn't happen.
 
   [The Fifth Elephant, by Terry Pratchett]
 %e passage
@@ -5733,27 +6043,29 @@ Been there, done that, bought the dublet...
 #
 #
 #
-%title The Truth (8)
+%title The Truth (13)
+# p. 21 (Harper Torch edition)
 %passage 1
 There are, it has been said, two types of people in the world.  There are
 those who, when presented with a glass that is exactly half full, say: this
 glass is half full.  And then there are those who say: this glass is half
 empty.
 
-The world belongs, however, to those who can look at the glass and say:
-What's up with this glass?  Excuse me?  Excuse me?  This is my glass?  I
-don't think so.  My glass was full!  And it was a bigger glass!  Who's been
-pinching my beer?
+The world /belongs/, however, to those who can look at the glass and say:
+What's up with this glass?  Excuse me?  Excuse /me/?  /This/ is my glass?
+I don't /think/ so.  My glass was full!  /And/ it was a bigger glass!
+Who's been pinching my beer?
 
   [The Truth, by Terry Pratchett]
-%e passage 1
+%e passage
+# p. 5
 %passage 2
-The world is made up of four elements: Earth, Air, Fire and Water.
-This is a fact well known even to Corporal Nobbs.  It's also wrong.
-There's a fifth element, and generally it's called Surprise.
+The world is made up of four elements: Earth, Air, Fire and Water.  This
+is a fact well known even to Corporal Nobbs.  It's also wrong.  There's a
+fifth element, and generally it's called Surprise.
 
   [The Truth, by Terry Pratchett]
-%e passage 2
+%e passage
 # pp. 1-2 (Harper Torch edition)
 %passage 3
 The rumor spread through the city like wildfire (which had quite often
@@ -5860,11 +6172,97 @@ EYES...
 
   [The Truth, by Terry Pratchett]
 %e passage
+#
+# 5 new passages added for 3.7
+#
+# p. 3 (two paragraphs in the middle skipped)
+%passage 9
+And the rumor came to the ears of William de Worde, and in a sense it
+stopped there, because he dutifully wrote it down.
+
+It was his job.  Lady Margolotta of Uberwald sent him five dollars a month
+to do it.  The Dowager Duchess of Quirm also sent him five dollars.  So
+did King Verence of Lancre, and a few other Ramtop notables.  So did the
+Seriph of Al-Khali, although in this case the payment was half a cartload
+of figs, twice a year.
+
+[...]
+
+A young man without too many responsibilities could live modestly in
+Ankh-Morpork on thirty or forty dollars a month; he always sold the figs,
+because although it was possible to live on figs you soon wished you
+didn't.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 31
+%passage 10
+"And these are your reasons, my lord?"
+
+"Do you think I have others?" said Lord Vetenari.  "My motives, as ever,
+are entirely transparent."
+
+Hughnon reflected that "entirely transparent" meant either that you could
+see right through them or couldn't see them at all.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 59-60 (passage ends mid-paragraph)
+%passage 11
+The Firm had, indeed, not operated in Ankh-Morpork before.  Mr. Pin had
+kept away because, well, there were plenty of other cities, and an
+instinct for survival had told him that the Big Wahooni(1) should wait
+a while.  [...]
+
+(1) The world's rarest and most evil-smelling vegetable, and consequently
+much prized by connoisseurs (who seldom prize anything cheap and common).
+Also a slang term for Ankh-Morpork, although it does not smell as bad as
+that.
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 87-88 ('it' is an imp inside the PDA; warranty text is in a smaller font
+#           than the rest of text; page 297 has more conditions, effectively
+#           impossible to comply with, applying to transfer of ownership)
+%passage 12
+"Good for you!" it said.  "You have wisely purchased the Dis-organizer
+Mk II, the latest in biothaumaturgic design, with a host of useful
+features and no resemblance whatsoever to the Mk I, which you may have
+inadvertently destroyed by stamping on it heavily!" it said, adding,
+"This device is provided without warranty of any kind as to reliability,
+accuracy, existence or otherwise or fitness for any particular purpose
+and Bioalchemic Products specifically does not warrant, guarantee, imply
+or make any representations as to its merchantability for any particular
+purpose and furthermore shall have no liability for or responsibility to
+you or any other person, entity or deity with respect to any loss or
+damage whatsoever caused by this device or object or by any attempts to
+destroy it by hammering it against a wall or dropping it into a deep well
+or by any other means whatsoever and moreover asserts that you indicate
+your acceptance of this agreement or any other agreement that may be
+substituted at any time by coming within five miles of the product or
+observing it through large telescopes or by any other means because you
+are such an easily cowed moron who will happily accept arrogant and
+unilateral conditions on a piece of highly priced garbage that you would
+not dream of accepting on a bag of dog biscuits and is used solely at
+your own risk."
+
+  [The Truth, by Terry Pratchett]
+%e passage
+# p. 168
+%passage 13
+It looked to Sacharissa that the only tools a dwarf needed was his ax and
+some means of making fire.  That'd eventually get him a forge, and with
+that he could make simple tools, and with those he could make /complex/
+tools, and with complex tools a dwarf could more or less make anything.
+
+  [The Truth, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Thief of Time (8)
+%title Thief of Time (14)
+# p. 97 (Harper Torch edition)
 %passage 1
 "No running with scythes!"
 
@@ -5872,7 +6270,7 @@ EYES...
 %e passage
 # p. 24 (Harper Torch edition)
 %passage 2
-Silver stars weren't awarded frequently, and gold starts happened less
+Silver stars weren't awarded frequently, and gold stars happened less
 than once a fortnight, and were vied for accordingly.  Right now, Miss
 Susan selected a silver star.  Pretty soon Vincent the Keen would have a
 galaxy of his very own.  To give him his due, he was quite disinterested
@@ -6068,6 +6466,94 @@ there to make you think before you broke them.
 
   [Thief of Time, by Terry Pratchett]
 %e passage
+#
+# 6 new passages added for 3.7
+#
+# p. 80 (passage ends mid-paragraph)
+%passage 9
+Well, she was partly immortal, and that was all there was to it.  She could
+see things that were really there(1) [...]
+
+(1) Which is much harder than seeing things that /aren't/ there.  /Everyone/
+does that.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 82 (passage starts mid-paragraph)
+%passage 10
+[...]  Some humans would do anything to see if it was possible to do it.
+If you put a large switch in some cave somewhere, with a sign on it saying
+"End-of-the-World Switch.  PLEASE DO NOT TOUCH," the paint wouldn't even
+have time to dry.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 115 (passage ends mid-paragraph; Lobsang's "there" is inside the area
+#         below, where a hole in the wall leads; Lu-Tze is already inside and
+#         his "there" is outside where he just was and Lobsang still is)
+%passage 11
+"But novices aren't allowed in there under pain of death!"
+
+"That's a coincidence," said Lu-Tze, lowering himself to the tips of his
+fingers.  "Because death is what awaits you if you stay out there, too."
+
+He dropped into the darkness.  A moment later there was an unenlightened
+curse from below.
+
+Lobsang climbed in, hung by his fingertips, dropped, and rolled when he hit
+the floor below.
+
+"Well done," said Lu-Tze in the gloom.  "When in doubt, choose to live."
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 132 (passage starts mid-paragraph; the abbot's recent reincarnation is
+#         still an infant)
+%passage 12
+"[...]  I mean, mentally he's nine hundred years old."
+
+"That must make him very wise."
+
+"Pretty wise, pretty wise.  But age and wisdom don't necessarily go
+together, I've always found," said Lu-Tze, as they approached the abbot's
+rooms.  "Some people just become stupid with more authority.  Not his
+Reverence, of course."
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 144 (two instances of singular "Igor" for the person then two plural
+#         "Igors" for his clan is accurate)
+%passage 13
+Igor didn't much like the clock.  He was a /people/ person.  He preferred
+things that bled.  And as the clock grew, with its shimmering crystal parts
+that didn't seem entirely all /here/, so Jeremy grew more absorbed and Igor
+grew more tense.  There was definitely something new happening here, and
+Igors were avid to learn new things.  But there were limits.  Igors did not
+believe in "Forbidden Knowledge" and "Things Man Was Not Meant to Know" but
+obviously there were /some/ things a man was not meant to know, such as
+what it felt like to have every single particle of your body sucked into a
+little hole, and that seemed to be one of the options available in the
+immediate future.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
+# p. 170 ('spake' is accurate, as is ending the first paragraph with a colon)
+%passage 14
+/In the Second Scroll of Wen the Eternally Surprised/, a story is written
+concerning one day when the apprentice Clodpool, in a rebellious mood,
+approached Wen and spake thusly:
+
+"Master, what is the difference between a humanistic, monastic system of
+belief in which wisdom is sought by means of an apparently nonsensical
+system of questions and answers, and a lot of mystic gibberish made up on
+the spur of the moment?"
+
+Wen considered this for some time, and at last said:  "A fish!"
+
+And Clodpool went away, satisfied.
+
+  [Thief of Time, by Terry Pratchett]
+%e passage
 %e title
 #
 #
@@ -6077,7 +6563,7 @@ there to make you think before you broke them.
 # text pages include decorations of varying degrees of elaborateness.
 # The actual text is probably only novella length.
 #
-%title The Last Hero (7)
+%title The Last Hero (13)
 # p. 41 (EOS edition)
 %passage 1
 Too many people, when listing all the perils to be found in the search
@@ -6195,6 +6681,102 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
+#
+# 6 new passages added for 3.7
+#
+# p. 16
+%passage 8
+The wizards began to gather around the device.
+
+'Can you see into the future?' said Lord Vetinari.
+
+'In /theory/ yes, sir.' said Ponder.  'But that would be highly... well,
+inadvisable, you see, because initial studies indicate that the fact of
+observation would collapse the waveform in phase space.'
+
+Not a muscle moved on the Patrician's face.
+
+'Pardon me, I'm a little out of date on faculty staff,' he said.  'Are you
+the one who has to take the dried frog pills?'
+
+'No, sir.  That's the Bursar, sir,' said Ponder.  'He has to have them
+because he's insane, sir.'
+
+'Ah,' said Lord Vetinari, and now he /did/ have an expression.  It was that
+of a man resolutely refraining from saying what was on his mind.
+
+'What Mr Stibbons /means/, my lord,' said the Archancellor, 'is that there
+are billions and billions of futures that, er, /sort of/ exist, d'yer see?
+They're all... the possible /shapes/ of the future.  But apparently the
+first one you actually /look/ at is the one that /becomes/ the future.
+It might not be one you'd like.  Apparently it's all to do with the
+Uncertainty Principle.'
+
+'And that is...'
+
+'I'm not sure.  Mr Stibbons is the one who knows about that sort of thing.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 31 (Leonard of Quirm is heading up a project for Lord Vetinari and
+#        describing requirements)
+%passage 9
+[...]
+
+'And the help of, oh, sixty apprentices and journeymen from the Guild of
+Cunning Artificers.  Perhaps there should be a hundred.  They will need to
+work round the clock.'
+
+'Apprentices?  But I can see to it that the finest craftsmen--'
+
+Leonard held up a hand.
+
+'Not craftsmen, my lord,' he said.  'I have no use for people who have
+learned the limits of the possible.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 80
+%passage 10
+'I'd rather die than sign my name,' said Boy Willie.
+
+'I'd rather face a dragon,' said Caleb.  'One of the proper old ones, too,
+not the fireworky ones you get today.'
+
+'Once they get you signin' your name, they've got you where they want you,'
+said Cohen.
+
+'Too many letters,' said Truckle.  'All different shapes, too.  I always
+put an X.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 97
+%passage 11
+He hesitated.  Lord Vetinari was not a man who delighted in the technical.
+There were two cultures, as far as he was concerned.  One was the real
+one, the other was occupied by people who liked machinery and ate pizza
+at unreasonable hours.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 122 (/Kite/ is the ship's name)
+%passage 12
+On the /Kite/, the situation was being 'workshopped.'  This is the means by
+which people who don't know anything get together to pool their ignorance.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# p. 161 (Carrot and Rincewind are wondering about the fate of Cohen and
+#         "the Silver Horde" who seem to have plummeted to certain death)
+%passage 13
+'There's always hope.'
+
+'So?  There's always taxes, too.  It doesn't make any /difference/.
+
+Carrot sighed and straightened up.  'I wish you weren't right.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e title
 #
 #

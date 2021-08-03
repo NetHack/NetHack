@@ -73,11 +73,11 @@ mkroom_cmp(const genericptr vx, const genericptr vy)
 static boolean
 door_into_nonjoined(xchar x, xchar y)
 {
-    xchar tx, ty, diridx;
+    xchar tx, ty, i;
 
-    for (diridx = 0; diridx <= 6; diridx += 2) {
-        tx = x + xdir[diridx];
-        ty = y + ydir[diridx];
+    for (i = 0; i < 4; i++) {
+        tx = x + xdir[dirs_ord[i]];
+        ty = y + ydir[dirs_ord[i]];
         if (!isok(tx, ty) || IS_ROCK(levl[tx][ty].typ))
             continue;
 
@@ -375,7 +375,7 @@ join(register int a, register int b, boolean nxcor)
     yy = cc.y;
     tx = tt.x - dx;
     ty = tt.y - dy;
-    if (nxcor && levl[xx + dx][yy + dy].typ)
+    if (nxcor && levl[xx + dx][yy + dy].typ != STONE)
         return;
     if (okdoor(xx, yy) || !nxcor)
         dodoor(xx, yy, croom);
@@ -1067,20 +1067,11 @@ mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob,
 }
 
 void
-mklev(void)
+level_finalize_topology(void)
 {
     struct mkroom *croom;
     int ridx;
 
-    reseed_random(rn2);
-    reseed_random(rn2_on_display_rng);
-
-    init_mapseen(&u.uz);
-    if (getbones())
-        return;
-
-    g.in_mklev = TRUE;
-    makelevel();
     bound_digging();
     mineralize(-1, -1, -1, -1, FALSE);
     g.in_mklev = FALSE;
@@ -1102,6 +1093,22 @@ mklev(void)
        entered; g.rooms[].orig_rtype always retains original rtype value */
     for (ridx = 0; ridx < SIZE(g.rooms); ridx++)
         g.rooms[ridx].orig_rtype = g.rooms[ridx].rtype;
+}
+
+void
+mklev(void)
+{
+    reseed_random(rn2);
+    reseed_random(rn2_on_display_rng);
+
+    init_mapseen(&u.uz);
+    if (getbones())
+        return;
+
+    g.in_mklev = TRUE;
+    makelevel();
+
+    level_finalize_topology();
 
     reseed_random(rn2);
     reseed_random(rn2_on_display_rng);

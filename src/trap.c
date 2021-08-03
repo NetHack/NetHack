@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1615759958 2021/03/14 22:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.403 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1627951430 2021/08/03 00:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -597,18 +597,18 @@ animate_statue(
     int cause,
     int *fail_reason)
 {
+    static const char
+        historic_statue_is_gone[] = "that the historic statue is now gone";
     int mnum = statue->corpsenm;
     struct permonst *mptr = &mons[mnum];
     struct monst *mon = 0, *shkp;
     struct obj *item;
     coord cc;
     boolean historic = (Role_if(PM_ARCHEOLOGIST)
-                        && (statue->spe & STATUE_HISTORIC) != 0),
+                        && (statue->spe & CORPSTAT_HISTORIC) != 0),
             golem_xform = FALSE, use_saved_traits;
     const char *comes_to_life;
     char statuename[BUFSZ], tmpbuf[BUFSZ];
-    static const char historic_statue_is_gone[] =
-        "that the historic statue is now gone";
 
     if (cant_revive(&mnum, TRUE, statue)) {
         /* mnum has changed; we won't be animating this statue as itself */
@@ -632,6 +632,11 @@ animate_statue(
         if (mon && mon->mtame && !mon->isminion)
             wary_dog(mon, TRUE);
     } else {
+        int sgend = (statue->spe & CORPSTAT_GENDER);
+        long mmflags = (NO_MINVENT
+                        | ((sgend == CORPSTAT_MALE) ? MM_MALE : 0)
+                        | ((sgend == CORPSTAT_FEMALE) ? MM_FEMALE : 0));
+
         /* statues of unique monsters from bones or wishing end
            up here (cant_revive() sets mnum to be doppelganger;
            mptr reflects the original form for use by newcham()) */
@@ -639,16 +644,17 @@ animate_statue(
             /* block quest guards from other roles */
             || (mptr->msound == MS_GUARDIAN
                 && quest_info(MS_GUARDIAN) != mnum)) {
-            mon = makemon(&mons[PM_DOPPELGANGER], x, y,
-                          NO_MINVENT | MM_NOCOUNTBIRTH | MM_ADJACENTOK);
+            mmflags |= MM_NOCOUNTBIRTH | MM_ADJACENTOK;
+            mon = makemon(&mons[PM_DOPPELGANGER], x, y, mmflags);
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
             if (mon && mon->cham >= LOW_PM)
                 (void) newcham(mon, mptr, FALSE, FALSE);
-        } else
-            mon = makemon(mptr, x, y, (cause == ANIMATE_SPELL)
-                                          ? (NO_MINVENT | MM_ADJACENTOK)
-                                          : NO_MINVENT);
+        } else {
+            if (cause == ANIMATE_SPELL)
+                mmflags |= MM_ADJACENTOK;
+            mon = makemon(mptr, x, y, mmflags);
+        }
     }
 
     if (!mon) {
@@ -659,11 +665,6 @@ animate_statue(
         return (struct monst *) 0;
     }
 
-    /* a non-montraits() statue might specify gender */
-    if (statue->spe & STATUE_MALE)
-        mon->female = FALSE;
-    else if (statue->spe & STATUE_FEMALE)
-        mon->female = TRUE;
     /* if statue has been named, give same name to the monster */
     if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));
@@ -2963,7 +2964,7 @@ mkroll_launch(
     if (ttmp->ttyp == ROLLING_BOULDER_TRAP)
         mindist = 2;
     distance = rn1(5, 4); /* 4..8 away */
-    tmp = rn2(8);         /* randomly pick a direction to try first */
+    tmp = rn2(N_DIRS);         /* randomly pick a direction to try first */
     while (distance >= mindist) {
         dx = xdir[tmp];
         dy = ydir[tmp];
@@ -3161,13 +3162,13 @@ void
 selftouch(const char *arg)
 {
     char kbuf[BUFSZ];
+    const char *corpse_pmname;
 
     if (uwep && uwep->otyp == CORPSE && touch_petrifies(&mons[uwep->corpsenm])
         && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg,
-              mons[uwep->corpsenm].pmnames[NEUTRAL]);
-        Sprintf(kbuf, "%s corpse",
-              an(mons[uwep->corpsenm].pmnames[NEUTRAL]));
+        corpse_pmname = obj_pmname(uwep);
+        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse if we can't handle it */
         if (!uarmg && !Stone_resistance)
@@ -3177,10 +3178,9 @@ selftouch(const char *arg)
        allow two-weapon combat when either weapon is a corpse] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE
         && touch_petrifies(&mons[uswapwep->corpsenm]) && !Stone_resistance) {
-        pline("%s touch the %s corpse.", arg,
-              mons[uswapwep->corpsenm].pmnames[NEUTRAL]);
-        Sprintf(kbuf, "%s corpse",
-                an(mons[uswapwep->corpsenm].pmnames[NEUTRAL]));
+        corpse_pmname = obj_pmname(uswapwep);
+        pline("%s touch the %s corpse.", arg, corpse_pmname);
+        Sprintf(kbuf, "%s corpse", an(corpse_pmname));
         instapetrify(kbuf);
         /* life-saved; unwield the corpse */
         if (!uarmg && !Stone_resistance)
@@ -4229,6 +4229,7 @@ drown(void)
     if (g.multi < 0 || (Upolyd && !g.youmonst.data->mmove))
         goto crawl;
     /* look around for a place to crawl to */
+#if 0
     for (i = 0; i < 100; i++) {
         x = rn1(3, u.ux - 1);
         y = rn1(3, u.uy - 1);
@@ -4244,6 +4245,31 @@ drown(void)
                 crawl_ok = TRUE;
                 goto crawl;
             }
+#else
+    {
+        int j, k, dirs[N_DIRS];
+
+        /* instead of picking a random direction up to 100 times, try each
+           of the eight directions at most once after shuffling their order */
+        for (i = 0; i < N_DIRS; ++i)
+            dirs[i] = i;
+        for (i = N_DIRS; i > 0; --i) {
+            j = rn2(i);
+            k = dirs[j];
+            dirs[j] = dirs[i - 1];
+            dirs[i - 1] = k;
+        }
+        for (i = 0; i < N_DIRS; ++i) {
+            x = u.ux + xdir[dirs[i]];
+            y = u.uy + ydir[dirs[i]];
+            /* note: crawl_dest calls goodpos() which performs isok() check */
+            if (crawl_destination(x, y)) {
+                crawl_ok = TRUE;
+                break;
+            }
+        }
+    }
+#endif
  crawl:
     if (crawl_ok) {
         boolean lost = FALSE;
@@ -4714,17 +4740,17 @@ help_monster_out(
 
     /* is it a cockatrice?... */
     if (touch_petrifies(mtmp->data) && !uarmg && !Stone_resistance) {
+        const char *mtmp_pmname = mon_pmname(mtmp);
+
         You("grab the trapped %s using your bare %s.",
-            pmname(mtmp->data, Mgender(mtmp)),
-            makeplural(body_part(HAND)));
+            mtmp_pmname, makeplural(body_part(HAND)));
 
         if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM)) {
             display_nhwindow(WIN_MESSAGE, FALSE);
         } else {
             char kbuf[BUFSZ];
 
-            Sprintf(kbuf, "trying to help %s out of a pit",
-                    an(pmname(mtmp->data, Mgender(mtmp))));
+            Sprintf(kbuf, "trying to help %s out of a pit", an(mtmp_pmname));
             instapetrify(kbuf);
             return 1;
         }
@@ -5399,6 +5425,22 @@ t_at(register int x, register int y)
     return (struct trap *) 0;
 }
 
+/* return number of traps of type ttyp on this level */
+int
+count_traps(int ttyp)
+{
+    int ret = 0;
+    struct trap *trap = g.ftrap;
+
+    while (trap) {
+        if ((int) trap->ttyp == ttyp)
+            ret++;
+        trap = trap->ntrap;
+    }
+
+    return ret;
+}
+
 void
 deltrap(register struct trap* trap)
 {
@@ -5437,12 +5479,9 @@ conjoined_pits(
         return FALSE;
     dx = sgn(trap2->tx - trap1->tx);
     dy = sgn(trap2->ty - trap1->ty);
-    for (diridx = 0; diridx < 8; diridx++)
-        if (xdir[diridx] == dx && ydir[diridx] == dy)
-            break;
-    /* diridx is valid if < 8 */
-    if (diridx < 8) {
-        adjidx = (diridx + 4) % 8;
+    diridx = xytod(dx, dy);
+    if (diridx != DIR_ERR) {
+        adjidx = DIR_180(diridx);
         if ((trap1->conjoined & (1 << diridx))
             && (trap2->conjoined & (1 << adjidx)))
             return TRUE;
@@ -5457,14 +5496,14 @@ clear_conjoined_pits(struct trap* trap)
     struct trap *t;
 
     if (trap && is_pit(trap->ttyp)) {
-        for (diridx = 0; diridx < 8; ++diridx) {
+        for (diridx = 0; diridx < N_DIRS; ++diridx) {
             if (trap->conjoined & (1 << diridx)) {
                 x = trap->tx + xdir[diridx];
                 y = trap->ty + ydir[diridx];
                 if (isok(x, y)
                     && (t = t_at(x, y)) != 0
                     && is_pit(t->ttyp)) {
-                    adjidx = (diridx + 4) % 8;
+                    adjidx = DIR_180(diridx);
                     t->conjoined &= ~(1 << adjidx);
                 }
                 trap->conjoined &= ~(1 << diridx);
@@ -5480,12 +5519,8 @@ adj_nonconjoined_pit(struct trap* adjtrap)
 
     if (trap_with_u && adjtrap && u.utrap && u.utraptype == TT_PIT
         && is_pit(trap_with_u->ttyp) && is_pit(adjtrap->ttyp)) {
-        int idx;
-
-        for (idx = 0; idx < 8; idx++) {
-            if (xdir[idx] == u.dx && ydir[idx] == u.dy)
-                return TRUE;
-        }
+        if (xytod(u.dx, u.dy) != DIR_ERR)
+            return TRUE;
     }
     return FALSE;
 }
@@ -5503,7 +5538,7 @@ join_adjacent_pits(struct trap* trap)
 
     if (!trap)
         return;
-    for (diridx = 0; diridx < 8; ++diridx) {
+    for (diridx = 0; diridx < N_DIRS; ++diridx) {
         x = trap->tx + xdir[diridx];
         y = trap->ty + ydir[diridx];
         if (isok(x, y)) {

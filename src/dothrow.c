@@ -11,6 +11,7 @@ static int throw_obj(struct obj *, int);
 static boolean ok_to_throw(int *);
 static int throw_ok(struct obj *);
 static void autoquiver(void);
+static struct obj *find_launcher(struct obj *);
 static int gem_accept(struct monst *, struct obj *);
 static void tmiss(struct obj *, struct monst *, boolean);
 static int throw_gold(struct obj *);
@@ -399,6 +400,23 @@ autoquiver(void)
     return;
 }
 
+/* look through hero inventory for launcher matching ammo,
+   avoiding known cursed items. Returns NULL if no match. */
+static struct obj *
+find_launcher(struct obj *ammo)
+{
+    struct obj *otmp;
+
+    if (!ammo)
+        return (struct obj *)0;
+
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (ammo_and_launcher(ammo, otmp) && !(otmp->cursed && otmp->bknown))
+            return otmp;
+
+    return (struct obj *)0;
+}
+
 /* f command -- fire: throw from the quiver */
 int
 dofire(void)
@@ -451,6 +469,28 @@ dofire(void)
             uquiver->owornmask &= ~W_QUIVER; /* less verbose */
             prinv("You ready:", uquiver, 0L);
             uquiver->owornmask |= W_QUIVER;
+        }
+    }
+
+    if (uquiver && iflags.fireassist) {
+        struct obj *olauncher;
+
+        /* Try to find a launcher */
+        if (ammo_and_launcher(uquiver, uwep)) {
+            /* Do nothing, already wielding a launcher */
+        } else if (ammo_and_launcher(uquiver, uswapwep)) {
+            /* swap weapons and retry fire */
+            cmdq_add_ec(doswapweapon);
+            cmdq_add_ec(dofire);
+            return 0;
+        } else if ((olauncher = find_launcher(obj)) != 0) {
+            /* wield launcher, retry fire */
+            if (uwep && !flags.pushweapon)
+                cmdq_add_ec(doswapweapon);
+            cmdq_add_ec(dowield);
+            cmdq_add_key(olauncher->invlet);
+            cmdq_add_ec(dofire);
+            return 0;
         }
     }
 

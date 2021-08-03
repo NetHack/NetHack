@@ -20,7 +20,7 @@
 #define DYNAMIC_STATUSLINES
 
 // NetHackQtBind::notify() doesn't see ^V on OSX
-#ifdef MACOSX
+#ifdef MACOS
 #define CTRL_V_HACK
 #endif
 

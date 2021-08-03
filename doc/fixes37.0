@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.555 $ $NHDT-Date: 1622421099 2021/05/31 00:31:39 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.615 $ $NHDT-Date: 1627951429 2021/08/03 00:43:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -122,7 +122,7 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	Men at Arms passage #1, italicize /for/, passage #2, insert omitted
 	 word "had": 'it was /fate/ that _had_ let Edward'
 	Interesting Times passage #1, italicize several words
-	Feet of Clay passage #1, "does not need" -> "doesn't even need"
+	Feet of Clay passage #1, second "does not need" -> "doesn't even need"
 	Hogfather passage #7 missing initial double quote for "Oh, just ...",
 	 also #7 insert missing "you" into "Why are you feeling [...]"
 	Soul Music passage #1, italicize /feel/, #8, "fossile" -> "fossil"
@@ -130,8 +130,11 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	 missing opening single quote on second sentence of Lord Downey's
 	 line, passage #11 both in footnote:  "genious" -> "genius",
 	 "was, oddly enough, was one [...]" -> "was, oddly enough, one [...]"
+	The Fifth Elephant #1, italicize /always/, #9, "dublet" -> "doublet"
+	The Truth #1, italicize several words
+	Thief of Time #2, "gold starts" -> "gold stars"
 	A Hat Full of Sky passage #9 "though" -> "thought"
-	various, including Death quotes:  separate sentences by two spaces
+	various, including Death quotes:  use two spaces to separate sentences
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
 impose tighter restraints on 'summon nasties', both for spellcasting monsters
@@ -540,6 +543,47 @@ when moving the cursor to examine the map, have '^' move to next trap even if
 change valkyrie and warrior (valk quest) monsters from chaotic to lawful
 change attendant (healer quest) monster from lawful to neutral
 quit is not longer bound to M-q
+change default value of autopickup to off and color to on
+resurrected corpse of mon could end up with different gender from original mon
+using a bullwhip to snatch a wielded cockatrice corpse from a monster when not
+	wearing gloves and without life-saving could trigger "obj_is_local"
+	panic during final cleanup
+make fire-command autowield an appropriate launcher and add fireassist boolean
+	option to toggle the assistance off
+Angels and priests were always described as "the {Angel,priest,high priest} of
+	<deity>" when first two should have been "{an Angel,a priest}..."
+shopkeepers can remove pits and webs
+perm_invent: when buying shop goods using itemized purchasing while persistent
+	inventory window was enabled, the prices of unpaid items went away as
+	soon as any item was bought (actual item-by-item purchase worked ok)
+change getloc fastmove keys in number_pad mode from hardcoded HJKL to the
+	run/rush movement keys (meta+number)
+allow using rush/run prefix key in getloc to fastmove the cursor
+avoid "it" in messages "Wait!  There's an it hiding under <an object>!" (hero
+	moving) and "It was hidden under <an object>!" (unseen monster moving)
+don't extinguish burning objects when engulfed by a fire vortex
+allow wishing for a novel via description "paperback book" (previously only
+	worked when specifying "paperback spellbook")
+deal with gold leaving a shop via scatter()
+defer encumbrance check during polymorph to new man; newman() -> redist_attr()
+	-> encumber_msg() could report change in encumbrance that immediately
+	became obsolete if polyman() subsequently restored old attributes
+fix heap-use-after-free when attacking monster with potion
+for "a" vs "an", add ukulele and uke as exceptions for "an u<anything>"
+add new extended command #retravel
+remove special doinv key, functionality was equal to BIND=0:inventory
+some monsters should not have been scared of bugle playing
+monsters that drowned would never leave a corpse (holdover from decades ago
+	when it wasn't possible to recover anything from a water location)
+give alternate message if hero is blind when throne gives "your vision clears"
+monster wearing an alchemy smock was only getting poison resistance from it,
+	not acid resistance; give both properties, just like for hero
+in wizard mode, knowing teleport away spell resulted in ^T always attempting
+	the spell instead of teleporting on demand
+describe a couple of isolated moat spots on Samurai quest home level as water
+	rather than as moat
+crawling out of water to avoid drowning didn't work as intended when trying
+	to move diagonally through a tight squeeze
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -702,6 +746,29 @@ applying a book to check readability treated novels as if they were spellbooks
 	error (example was an attempt to interactively set bouldersym to an
 	invalid value), the error reporting routine crashed via segfault
 lighting for baalz level defaulted to random and could end up being lit
+when using 'O' to set menu color patterns, the reminder message that the
+	boolean menucolors option needs to be set to True for them to work
+	was sometimes given even when already True
+stair revamp unintentionally resulted in cursed potion of levitation no longer
+	causing hero to hit head on ceiling
+enlightenment/disclosure when wielding two weapons with two-weap skill higher
+	than secondary weapon's skill had "with" duplicated in the feedback
+corpse of monster with gender specific names (king vs queen and so forth)
+	was always described by the neutral name (ruler and such)
+prevent obj_pmname() from calling mon_pmname(monst) when monst->data is null
+	to prevent a null pointer dereference
+correct the pluralization of monarch to monarchs, rather than monarches
+don't allow web spun by spider to interfere with solving Soloban
+fix parsing of wish adjectives (return value broken by changes accompanying
+	figurine gender patch)
+when picking up a thrown weapon while quiver is empty, don't put it into the
+	quiver slot if it needs to be wielded for throw-and-return action
+using bhitpos in flooreffects to handle erosion damage broke its original use
+	of tracking wand zaps if a teleportation zap hit an object; subsequent
+	zap traversal was done from object's landing spot rather than from its
+	zap hit spot, resulting in scrambled wand targetting
+restore previous behavior of the 'altmeta' option (only wait for a second
+	character when getting a command keystroke, not other key input)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -747,6 +814,13 @@ curses: for vertical status, line up conditions in columns; usually two but
 	[at present, highlighting with inverse video includes trailing spaces
 	used to align entries in their columns--that's a feature...]
 curses: indent items in perm_invent window by one space
+curses: don't change the terminal's default colors
+curses: remove unnecessary special handling for dark gray
+curses: sometimes entering a count during menu selection caused the menu to
+	disappear (example was apply/loot in-out container menu with two or
+	more digits typed followed by non-digit); in-out menu was still active
+	but no longer displayed
+curses: support backspace/delete when entering a count during menu selection
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -913,7 +987,7 @@ when hallucinating, see hallucinated liquids when looking at water or lava
 applying a spellbook hints about read charges left
 wizard mode wishing for level topology can now create hidden doors (ask for
 	"secret door" when at a door or wall location), hidden corridor
-	spots ("secret corridor" at a corridor location), and clouds
+	spots ("secret corridor" at a corridor location), clouds and walls
 tiny chance for randomly created spellbooks to be Discworld novels instead
 	of having only one in the first book or scroll shop created (won't
 	occur in hero's initial inventory or NPC priest inventory or be
@@ -953,8 +1027,10 @@ boiling a pool or fountain now creates a temporary cloud of steam
 random themed rooms in the dungeons of doom
 extended achievement and conduct fields for xlogfile
 record amount of gold in hero's possession in xlogfile
-new objects:  amulets of flying and guarding
-new monsters:  displacer beast ('f') and genetic engineer ('Q')
+new objects:  amulets of flying and guarding, gold dragon scale mail and
+	set of gold dragon scales
+new monsters:  displacer beast ('f') and genetic engineer ('Q'), gold dragon
+	and baby gold dragon (both 'D')
 make camera flash which reveals previously unseen map features or objects or
 	monsters record those on the hero's map; monsters revert to 'unseen'
 boolean options can optionally have the form "name:value" with value taken
@@ -1016,11 +1092,18 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	the quiver (inspired by xNetHack)
 3.6's tribute: add one new passage to Sourcery, three to Small Gods, one to
 	Lords and Ladies, two to Soul Music, three to Interesting Times, four
-	to Maskerade
+	to Maskerade, three to Hogfather, two to Jingo, four to The Last
+	Continent, four to Carpe Jugulum, three to The Fifth Elephant, five
+	to The Truth, six to Thief of Time, six to The Last Hero
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole
 	level visible and remembered traps
+spiders will occasionally spin webs when moving around
+drinking a burning potion of oil will cure being turned into slime
+new bigroom variant, a boulder maze
+vomiting on an altar provokes the deities wrath
+branch stairs have a different glyph, show up in yellow color in tty
 
 
 Platform- and/or Interface-Specific New Features
@@ -1105,6 +1188,8 @@ differentiating gendered monster tiles from NullCGT (#430)
 check bones data directly for deja vu messages (#374)
 unify code for extracting an object from a monster's inventory (#455)
 make engraving an occupation (#460)
+fpostfx index out of bounds when eating standard eggs (github pr#547)
+"readable" Hawaiian shirt designs (github pr#407)
 
 
 Code Cleanup and Reorganization

@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1607641577 2020/12/10 23:06:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1627408982 2021/07/27 18:03:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,6 +105,10 @@ struct sinfo {
     int in_paniclog;
 #endif
     int wizkit_wishing;
+    /* getting_a_command:  only used for ALTMETA config to process ESC, but
+       present and updated unconditionally; set by parse() when requesting
+       next command keystroke, reset by readchar() as it returns a key */
+    int getting_a_command;
 };
 
 /* Flags for controlling uptodate */
@@ -173,7 +177,41 @@ struct kinfo {
     char name[BUFSZ]; /* actual killer name */
 };
 
-E const schar xdir[], ydir[], zdir[];
+enum movemodes {
+    MV_ANY = -1,
+    MV_WALK,
+    MV_RUN,
+    MV_RUSH,
+
+    N_MOVEMODES
+};
+
+enum movementdirs {
+    DIR_ERR = -1,
+    DIR_W,
+    DIR_NW,
+    DIR_N,
+    DIR_NE,
+    DIR_E,
+    DIR_SE,
+    DIR_S,
+    DIR_SW,
+    DIR_DOWN,
+    DIR_UP,
+
+    N_DIRS_Z
+};
+/* N_DIRS_Z, minus up & down */
+#define N_DIRS (N_DIRS_Z - 2)
+/* direction adjustments */
+#define DIR_180(dir) (((dir) + 4) % N_DIRS)
+#define DIR_LEFT(dir) (((dir) + 7) % N_DIRS)
+#define DIR_RIGHT(dir) (((dir) + 1) % N_DIRS)
+#define DIR_LEFT2(dir) (((dir) + 6) % N_DIRS)
+#define DIR_RIGHT2(dir) (((dir) + 2) % N_DIRS)
+#define DIR_CLAMP(dir) (((dir) + N_DIRS) % N_DIRS)
+
+extern const schar xdir[], ydir[], zdir[], dirs_ord[];
 
 struct multishot {
     int n, i;
@@ -424,9 +462,6 @@ enum nh_keyfunc {
     NHKF_FIGHT2,       /* '-' */
     NHKF_NOPICKUP,     /* 'm' */
     NHKF_RUN_NOPICKUP, /* 'M' */
-    NHKF_DOINV,        /* '0' */
-    NHKF_TRAVEL,       /* via mouse */
-    NHKF_CLICKLOOK,
 
     NHKF_REDRAW,
     NHKF_REDRAW2,
@@ -474,7 +509,9 @@ struct cmd {
     boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
     boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
-    char move_W, move_NW, move_N, move_NE, move_E, move_SE, move_S, move_SW;
+    char move[N_DIRS];     /* char used for moving one step in direction */
+    char rush[N_DIRS];
+    char run[N_DIRS];
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */
@@ -645,6 +682,25 @@ struct _create_particular_data {
 #define LUA_COPYRIGHT_BUFSIZ 120
 
 /*
+ * Rudimentary command queue.
+ * Allows the code to put keys and extended commands into the queue,
+ * and they're executed just as if the user did them.  Time passes
+ * normally when doing queued actions.  The queue will get cleared
+ * if hero is interrupted.
+ */
+enum cmdq_cmdtypes {
+    CMDQ_KEY = 0, /* a literal character, cmdq_add_key() */
+    CMDQ_EXTCMD,  /* extended command, cmdq_add_ec() */
+};
+
+struct _cmd_queue {
+    int typ;
+    char key;
+    const struct ext_func_tab *ec_entry;
+    struct _cmd_queue *next;
+};
+
+/*
  * 'g' -- instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
  * and set in decl.c during early early engine initialization.
@@ -655,6 +711,8 @@ struct _create_particular_data {
  * which came with them don't make much sense out of their original context.
  */
 struct instance_globals {
+
+    struct _cmd_queue *command_queue;
 
     /* apply.c */
     int jumping_is_magic; /* current jump result of magic */

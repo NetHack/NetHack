@@ -67,6 +67,7 @@ typedef xchar boolean; /* 0 or 1 */
 #define TRUE ((boolean) 1)
 #define FALSE ((boolean) 0)
 #endif
+#define BOOL_RANDOM (-1)
 
 enum optchoice { opt_in, opt_out};
 
@@ -423,7 +424,7 @@ struct savefile_info {
 #if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
 #define PANICTRACE_LIBC
 #endif
-#if defined(MACOSX)
+#if defined(MACOS)
 #define PANICTRACE_LIBC
 #endif
 #ifdef UNIX

@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1620861209 2021/05/12 23:13:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1625277130 2021/07/03 01:52:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -58,7 +58,15 @@ static long get_pricing_units(struct obj *);
 static boolean angry_shk_exists(void);
 static void rile_shk(struct monst *);
 static void rouse_shk(struct monst *, boolean);
-static void remove_damage(struct monst *, boolean);
+static boolean shk_impaired(struct monst *);
+static boolean repairable_damage(struct damage *, struct monst *);
+static struct damage *find_damage(struct monst *);
+static void discard_damage_struct(struct damage *);
+static void discard_damage_owned_by(struct monst *);
+static void shk_fixes_damage(struct monst *);
+static xchar *litter_getpos(int *, xchar, xchar, struct monst *);
+static void litter_scatter(xchar *, int, xchar, xchar, struct monst *);
+static void litter_newsyms(xchar *, xchar, xchar);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
 static void dropped_container(struct obj *, struct monst *, boolean);
@@ -182,7 +190,7 @@ shkgone(struct monst* mtmp)
     /* [BUG: some of this should be done on the shop level */
     /*       even when the shk dies on a different level.] */
     if (on_level(&eshk->shoplevel, &u.uz)) {
-        remove_damage(mtmp, TRUE);
+        discard_damage_owned_by(mtmp);
         sroom->resident = (struct monst *) 0;
         if (!search_special(ANY_SHOP))
             g.level.flags.has_shop = 0;
@@ -421,6 +429,42 @@ u_left_shop(char* leavestring, boolean newlev)
 
     if (rob_shop(shkp)) {
         call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
+    }
+}
+
+void
+credit_report(struct monst *shkp, int idx, boolean silent)
+{
+    struct eshk *eshkp = ESHK(shkp);
+    static long credit_snap[2][3] = {{0L, 0L, 0L}, {0L, 0L, 0L}};
+
+    if (!idx) {
+        credit_snap[BEFORE][0] = credit_snap[NOW][0] = 0L;
+        credit_snap[BEFORE][1] = credit_snap[NOW][1] = 0L;
+        credit_snap[BEFORE][2] = credit_snap[NOW][2] = 0L;
+    } else {
+        idx = 1;
+    }
+
+    credit_snap[idx][0] = eshkp->credit;
+    credit_snap[idx][1] = eshkp->debit;
+    credit_snap[idx][2] = eshkp->loan;
+
+    if (idx && !silent) {
+        long amt = 0L;
+        const char *msg = "debt has increased";
+
+        if (credit_snap[NOW][0] < credit_snap[BEFORE][0]) {
+            amt = credit_snap[BEFORE][0] - credit_snap[NOW][0];
+            msg = "credit has been reduced";
+        } else if (credit_snap[NOW][1] > credit_snap[BEFORE][1]) {
+            amt = credit_snap[NOW][1] - credit_snap[BEFORE][1];
+        } else if (credit_snap[NOW][2] > credit_snap[BEFORE][2]) {
+            amt = credit_snap[NOW][2] - credit_snap[BEFORE][2];
+        }
+        if (amt)
+            Your("%s by %ld %s.", msg, amt, currency(amt));
+
     }
 }
 
@@ -1613,6 +1657,8 @@ dopayobj(
                   ltmp, "");
     obj->quan = save_quan; /* restore original count */
     /* quan => amount just bought, save_quan => remaining unpaid count */
+
+    iflags.suppress_price--; /* before update_inventory() below */
     if (consumed) {
         if (quan != bp->bquan) {
             /* eliminate used-up portion; remainder is still unpaid */
@@ -1626,9 +1672,9 @@ dopayobj(
             dealloc_obj(obj);
             *obj_p = 0; /* destroy pointer to freed object */
         }
-    } else if (itemize)
+    } else if (itemize) {
         update_inventory(); /* Done just once in dopay() if !itemize. */
-    iflags.suppress_price--;
+    }
     return buy;
 }
 
@@ -2563,7 +2609,7 @@ addtobill(
         return;
 
     if (obj->oclass == COIN_CLASS) {
-        costly_gold(obj->ox, obj->oy, obj->quan);
+        costly_gold(obj->ox, obj->oy, obj->quan, silent);
         return;
     } else if (ESHK(shkp)->billct == BILLSZ) {
         if (!silent)
@@ -2597,7 +2643,7 @@ addtobill(
         ltmp += cltmp;
 
         if (gltmp) {
-            costly_gold(obj->ox, obj->oy, gltmp);
+            costly_gold(obj->ox, obj->oy, gltmp, silent);
             if (!ltmp)
                 return;
         }
@@ -3425,243 +3471,182 @@ add_damage(
         levl[x][y].seenv = SVALL;
 }
 
-/*
- * Do something about damage. Either (!croaked) try to repair it, or
- * (croaked) just discard damage structs for non-shared locations, since
- * they'll never get repaired. Assume that shared locations will get
- * repaired eventually by the other shopkeeper(s). This might be an erroneous
- * assumption (they might all be dead too), but we have no reasonable way of
- * telling that.
- */
-static
-void
-remove_damage(struct monst* shkp, boolean croaked)
+/* is shopkeeper impaired, so they cannot act? */
+static boolean
+shk_impaired(struct monst *shkp)
 {
-    struct damage *tmp_dam, *tmp2_dam;
-    struct obj *shk_inv = shkp->minvent;
-    boolean did_repair = FALSE, saw_door = FALSE, saw_floor = FALSE,
-            stop_picking = FALSE, doorway_trap = FALSE, skip_msg = FALSE;
-    int saw_walls = 0, saw_untrap = 0, feedback;
-    char trapmsg[BUFSZ];
-
-    feedback = !croaked; /* 1 => give feedback, 0 => don't or already did */
-    tmp_dam = g.level.damagelist;
-    tmp2_dam = 0;
-    while (tmp_dam) {
-        register xchar x = tmp_dam->place.x, y = tmp_dam->place.y;
-        char shops[5];
-        int disposition;
-        unsigned old_doormask = 0;
-
-        disposition = 0;
-        Strcpy(shops, in_rooms(x, y, SHOPBASE));
-        if (index(shops, ESHK(shkp)->shoproom)) {
-            if (IS_DOOR(levl[x][y].typ))
-                old_doormask = levl[x][y].doormask;
-
-            if (croaked) {
-                disposition = (shops[1]) ? 0 : 1;
-            } else if (stop_picking) {
-                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
-            } else {
-                /* Defer the stop_occupation() until after repair msgs */
-                if (closed_door(x, y))
-                    stop_picking = picking_at(x, y);
-                disposition = repair_damage(shkp, tmp_dam, &feedback, FALSE);
-                if (!disposition)
-                    stop_picking = FALSE;
-            }
-        }
-
-        if (!disposition) {
-            tmp2_dam = tmp_dam;
-            tmp_dam = tmp_dam->next;
-            continue;
-        }
-
-        if (disposition > 1) {
-            did_repair = TRUE;
-            if (cansee(x, y)) {
-                if (IS_WALL(levl[x][y].typ)) {
-                    saw_walls++;
-                } else if (IS_DOOR(levl[x][y].typ)
-                           /* an existing door here implies trap removal */
-                           && !(old_doormask & (D_ISOPEN | D_CLOSED))) {
-                    saw_door = TRUE;
-                } else if (disposition == 3) { /* untrapped */
-                    saw_untrap++;
-                    if (IS_DOOR(levl[x][y].typ))
-                        doorway_trap = TRUE;
-                } else {
-                    saw_floor = TRUE;
-                }
-            }
-        }
-
-        tmp_dam = tmp_dam->next;
-        if (!tmp2_dam) {
-            free((genericptr_t) g.level.damagelist);
-            g.level.damagelist = tmp_dam;
-        } else {
-            free((genericptr_t) tmp2_dam->next);
-            tmp2_dam->next = tmp_dam;
-        }
-    }
-    if (!did_repair)
-        return;
-
-    trapmsg[0] = '\0'; /* not just lint suppression... */
-    shk_inv = (shkp->minvent != shk_inv) ? shkp->minvent : 0;
-    if (saw_untrap == 1 && shk_inv
-        && (shk_inv->otyp == BEARTRAP || shk_inv->otyp == LAND_MINE)
-        && canseemon(shkp)) {
-        pline("%s untraps %s.", Shknam(shkp), ansimpleoname(shk_inv));
-        /* we've already reported this trap (and know it's the only one) */
-        saw_untrap = 0;
-        skip_msg = !(saw_walls || saw_door || saw_floor);
-    } else if (saw_untrap) {
-        Sprintf(trapmsg, "%s trap%s",
-                (saw_untrap > 3) ? "several" : (saw_untrap > 1) ? "some"
-                                                                : "a",
-                plur(saw_untrap));
-        Sprintf(eos(trapmsg), " %s", vtense(trapmsg, "are"));
-        Sprintf(eos(trapmsg), " removed from the %s",
-                (doorway_trap && saw_untrap == 1) ? "doorway" : "floor");
-    }
-
-    if (skip_msg) {
-        ; /* already gave an untrap message which covered the only repair */
-    } else if (saw_walls) {
-        char wallbuf[BUFSZ];
-
-        Sprintf(wallbuf, "section%s", plur(saw_walls));
-        pline("Suddenly, %s %s of wall %s up!",
-              (saw_walls == 1) ? "a" : (saw_walls <= 3) ? "some" : "several",
-              wallbuf, vtense(wallbuf, "close"));
-
-        if (saw_door)
-            pline_The("shop door reappears!");
-        if (saw_floor)
-            pline_The("floor is repaired!");
-        if (saw_untrap)
-            pline("%s!", upstart(trapmsg));
-    } else {
-        if (saw_door || saw_floor || saw_untrap)
-            pline("Suddenly, %s%s%s%s%s!",
-                  saw_door ? "the shop door reappears" : "",
-                  (saw_door && saw_floor) ? " and " : "",
-                  saw_floor ? "the floor damage is gone" : "",
-                  ((saw_door || saw_floor) && *trapmsg) ? " and " : "",
-                  trapmsg);
-        /* FIXME:
-         *  these messages aren't right if the unseen repairs were only
-         *  for trap removal (except for hole and possibly trap door).
-         */
-        else if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
-            You_feel("more claustrophobic than before.");
-        else if (!Deaf && !rn2(10))
-            Norep("The dungeon acoustics noticeably change.");
-    }
-    if (stop_picking)
-        stop_occupation();
+    if (!shkp || !shkp->isshk || !inhishop(shkp))
+        return TRUE;
+    if (shkp->msleeping || !shkp->mcanmove || ESHK(shkp)->following)
+        return TRUE;
+    return FALSE;
 }
 
-/*
- * 0: repair postponed, 1: silent repair (no messages), 2: normal repair
- * 3: untrap
- */
-int
-repair_damage(
-    struct monst *shkp,
-    struct damage *tmp_dam,
-    int *once,
-    boolean catchup) /* restoring a level */
+/* is damage dam repairable by shopkeeper shkp? */
+static boolean
+repairable_damage(struct damage *dam, struct monst *shkp)
 {
-    xchar x, y;
-    xchar litter[9];
+    xchar x = dam->place.x, y = dam->place.y;
+    struct trap* ttmp;
     struct monst *mtmp;
-    struct obj *otmp;
-    struct trap *ttmp;
-    int i, k, ix, iy, disposition = 1;
 
-    if ((g.monstermoves - tmp_dam->when) < REPAIR_DELAY)
-        return 0;
-    if (shkp->msleeping || !shkp->mcanmove || ESHK(shkp)->following)
-        return 0;
-    x = tmp_dam->place.x;
-    y = tmp_dam->place.y;
-    if (!IS_ROOM(tmp_dam->typ)) {
+    if (!dam || shk_impaired(shkp))
+        return FALSE;
+
+    /* too soon to fix it? */
+    if ((g.monstermoves - dam->when) < REPAIR_DELAY)
+        return FALSE;
+    /* is it a wall? don't fix if anyone is in the way */
+    if (!IS_ROOM(dam->typ)) {
         if ((x == u.ux && y == u.uy && !Passes_walls)
             || (x == shkp->mx && y == shkp->my)
             || ((mtmp = m_at(x, y)) != 0 && !passes_walls(mtmp->data)))
-            return 0;
+            return FALSE;
     }
+    /* is it a trap? don't fix if hero or monster is in it */
     ttmp = t_at(x, y);
-    if (ttmp && x == u.ux && y == u.uy && !Passes_walls)
-        return 0;
-
-    if (once && *once) {
-        boolean shk_closeby = (distu(shkp->mx, shkp->my)
-                               <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
-
-        /* this is suboptimal if we eventually give a "shk untraps"
-           message for the only repair, but perhaps the shop repair
-           incantation means that shk's untrap attempt will never fail */
-        if (canseemon(shkp))
-            pline("%s whispers %s.", Shknam(shkp),
-                  shk_closeby ? "an incantation" : "something");
-        else if (!Deaf && shk_closeby)
-            You_hear("someone muttering an incantation.");
-        *once = 0;
-    }
     if (ttmp) {
-        if ((ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP)
-            && dist2(x, y, shkp->mx, shkp->my) <= 2) {
-            /* convert to an object */
-            otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP,
-                          TRUE, FALSE);
-            otmp->quan = 1L;
-            otmp->owt = weight(otmp);
-            (void) mpickobj(shkp, otmp);
-        }
-        deltrap(ttmp);
-        if (cansee(x, y))
-            newsym(x, y);
-        if (!catchup)
-            disposition = 3;
+        if (x == u.ux && y == u.uy)
+            return FALSE;
+        if ((mtmp = m_at(x,y)) != 0 && mtmp->mtrapped)
+            return FALSE;
     }
-    if (IS_ROOM(tmp_dam->typ)
-        || (tmp_dam->typ == levl[x][y].typ
-            && (!IS_DOOR(tmp_dam->typ) || levl[x][y].doormask > D_BROKEN)))
-        /* no terrain fix necessary (trap removal or manually repaired) */
-        return disposition;
+    /* does it belong to shkp? */
+    if (!index(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom))
+        return FALSE;
 
-    /* door or wall repair; trap, if any, is now gone;
-       restore original terrain type and move any items away */
-    levl[x][y].typ = tmp_dam->typ;
-    if (IS_DOOR(tmp_dam->typ))
-        levl[x][y].doormask = D_CLOSED; /* arbitrary */
+    return TRUE;
+}
 
-    (void) memset((genericptr_t) litter, 0, sizeof litter);
-#define NEED_UPDATE 1
-#define OPEN 2
-#define INSHOP 4
+/* find any damage shopkeeper shkp could repair. returns NULL is none found */
+static struct damage *
+find_damage(struct monst *shkp)
+{
+    struct damage *dam = g.level.damagelist;
+
+    if (shk_impaired(shkp))
+        return NULL;
+
+    while (dam) {
+        if (repairable_damage(dam, shkp))
+            return dam;
+
+        dam = dam->next;
+    }
+
+    return NULL;
+}
+
+static void
+discard_damage_struct(struct damage *dam)
+{
+    if (!dam)
+        return;
+
+    if (dam == g.level.damagelist) {
+        g.level.damagelist = dam->next;
+    } else {
+        struct damage *prev = g.level.damagelist;
+
+        while (prev && prev->next != dam)
+            prev = prev->next;
+        if (prev)
+            prev->next = dam->next;
+    }
+    (void) memset(dam, 0, sizeof(struct damage));
+    free((genericptr_t) dam);
+}
+
+/* discard all damage structs owned by shopkeeper */
+static void
+discard_damage_owned_by(struct monst *shkp)
+{
+    struct damage *dam = g.level.damagelist, *dam2, *prevdam = NULL;
+
+    while (dam) {
+        xchar x = dam->place.x, y = dam->place.y;
+
+        if (index(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom)) {
+            dam2 = dam->next;
+            if (prevdam)
+                prevdam->next = dam2;
+            if (dam == g.level.damagelist)
+                g.level.damagelist = dam2;
+            (void) memset(dam, 0, sizeof(struct damage));
+            free((genericptr_t) dam);
+            dam = dam2;
+        } else {
+            prevdam = dam;
+            dam2 = dam->next;
+        }
+
+        dam = dam2;
+    }
+}
+
+/* Shopkeeper tries to repair damage belonging to them */
+static void
+shk_fixes_damage(struct monst* shkp)
+{
+    struct damage *dam = find_damage(shkp);
+    boolean shk_closeby;
+
+    if (!dam)
+        return;
+
+    shk_closeby = (distu(shkp->mx, shkp->my)
+                   <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
+
+    if (canseemon(shkp))
+        pline("%s whispers %s.", Shknam(shkp),
+              shk_closeby ? "an incantation" : "something");
+    else if (!Deaf && shk_closeby)
+        You_hear("someone muttering an incantation.");
+
+    (void) repair_damage(shkp, dam, FALSE);
+
+    discard_damage_struct(dam);
+}
+
+#define LITTER_UPDATE 0x01
+#define LITTER_OPEN   0x02
+#define LITTER_INSHOP 0x04
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
-    k = 0; /* number of adjacent shop spots */
+
+static xchar *
+litter_getpos(int *k, xchar x, xchar y, struct monst *shkp)
+{
+    static xchar litter[9];
+    int i, ix, iy;
+
+    (void) memset((genericptr_t) litter, 0, sizeof litter);
+
+    if (!k) return litter;
+
+    *k = 0; /* number of adjacent shop spots */
+
     if (g.level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
         for (i = 0; i < 9; i++) {
             ix = x + horiz(i);
             iy = y + vert(i);
             if (i == 4 || !isok(ix, iy) || !ZAP_POS(levl[ix][iy].typ))
                 continue;
-            litter[i] = OPEN;
+            litter[i] = LITTER_OPEN;
             if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
-                litter[i] |= INSHOP;
-                ++k;
+                litter[i] |= LITTER_INSHOP;
+                ++(*k);
             }
         }
     }
+    return litter;
+}
+
+static void
+litter_scatter(xchar *litter, int k, xchar x, xchar y, struct monst *shkp)
+{
+    struct obj *otmp;
+
     /* placement below assumes there is always at least one adjacent
        spot; the 'k' check guards against getting stuck in an infinite
        loop if some irregularly shaped room breaks that assumption */
@@ -3691,14 +3676,15 @@ repair_damage(
                 obj_extract_self(otmp);
                 obfree(otmp, (struct obj *) 0);
             } else {
-                int trylimit = 50;
+                int trylimit = 10;
+                int i = rn2(9), ix, iy;
 
                 /* otmp must be moved otherwise g.level.objects[x][y] will
                    never become Null and while-loop won't terminate */
                 do {
-                    i = rn2(9);
-                } while (--trylimit && !(litter[i] & INSHOP));
-                if ((litter[i] & (OPEN | INSHOP)) != 0) {
+                    i = (i + 1) % 9;
+                } while (--trylimit && !(litter[i] & LITTER_INSHOP));
+                if ((litter[i] & (LITTER_OPEN | LITTER_INSHOP)) != 0) {
                     ix = x + horiz(i);
                     iy = y + vert(i);
                 } else {
@@ -3709,31 +3695,132 @@ repair_damage(
                 }
                 remove_object(otmp);
                 place_object(otmp, ix, iy);
-                litter[i] |= NEED_UPDATE;
+                litter[i] |= LITTER_UPDATE;
             }
     }
+}
+
+static void
+litter_newsyms(xchar *litter, xchar x, xchar y)
+{
+    int i;
+
+    for (i = 0; i < 9; i++)
+        if (litter[i] & LITTER_UPDATE)
+            newsym(x + horiz(i), y + vert(i));
+}
+
+#undef LITTER_UPDATE
+#undef LITTER_OPEN
+#undef LITTER_INSHOP
+#undef vert
+#undef horiz
+
+/*
+ * 0: repair postponed, 1: silent repair (no messages), 2: normal repair
+ * 3: untrap
+ */
+int
+repair_damage(
+    struct monst *shkp,
+    struct damage *tmp_dam,
+    boolean catchup) /* restoring a level */
+{
+    xchar x, y;
+    xchar *litter;
+    struct obj *otmp;
+    struct trap *ttmp;
+    int k, disposition = 1;
+    boolean stop_picking = FALSE;
+
+    if (!repairable_damage(tmp_dam, shkp))
+        return 0;
+
+    x = tmp_dam->place.x;
+    y = tmp_dam->place.y;
+
+    ttmp = t_at(x, y);
+
+    if (ttmp) {
+        switch (ttmp->ttyp) {
+        case LANDMINE:
+        case BEAR_TRAP:
+            /* convert to an object */
+            otmp = mksobj((ttmp->ttyp == LANDMINE) ? LAND_MINE : BEARTRAP,
+                          TRUE, FALSE);
+            otmp->quan = 1L;
+            otmp->owt = weight(otmp);
+            if (!catchup) {
+                if (canseemon(shkp) && dist2(x, y, shkp->mx, shkp->my) <= 2)
+                    pline("%s untraps %s.", Shknam(shkp), ansimpleoname(otmp));
+                else if (ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
+                    pline("The %s vanishes.", trapname(ttmp->ttyp, TRUE));
+            }
+            (void) mpickobj(shkp, otmp);
+            break;
+        case HOLE:
+        case PIT:
+        case SPIKED_PIT:
+            if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
+                pline("The %s is filled in.", trapname(ttmp->ttyp, TRUE));
+            break;
+        default:
+            if (!catchup && ttmp->tseen && cansee(ttmp->tx, ttmp->ty))
+                pline("The %s vanishes.", trapname(ttmp->ttyp, TRUE));
+            break;
+        }
+        deltrap(ttmp);
+        if (cansee(x, y))
+            newsym(x, y);
+        if (!catchup)
+            disposition = 3;
+    }
+    if (IS_ROOM(tmp_dam->typ)
+        || (tmp_dam->typ == levl[x][y].typ
+            && (!IS_DOOR(tmp_dam->typ) || levl[x][y].doormask > D_BROKEN)))
+        /* no terrain fix necessary (trap removal or manually repaired) */
+        return disposition;
+
+    if (closed_door(x, y))
+        stop_picking = picking_at(x, y);
+
+    /* door or wall repair; trap, if any, is now gone;
+       restore original terrain type and move any items away */
+    levl[x][y].typ = tmp_dam->typ;
+    if (IS_DOOR(tmp_dam->typ))
+        levl[x][y].doormask = D_CLOSED; /* arbitrary */
+
+    litter = litter_getpos(&k, x, y, shkp);
+    litter_scatter(litter, k, x, y, shkp);
+
     if (catchup)
         return 1; /* repair occurred while off level so no messages */
 
     block_point(x, y);
     if (cansee(x, y)) {
-        if (IS_WALL(tmp_dam->typ))
+        if (IS_WALL(tmp_dam->typ)) {
             /* player sees actual repair process, so KNOWS it's a wall */
             levl[x][y].seenv = SVALL;
+            pline("Suddenly, a section of the wall closes up!");
+        } else if (IS_DOOR(tmp_dam->typ)) {
+            pline("Suddenly, the shop door reappears!");
+        }
         newsym(x, y);
+    } else if (IS_WALL(tmp_dam->typ)) {
+        if (inside_shop(u.ux, u.uy) == ESHK(shkp)->shoproom)
+            You_feel("more claustrophobic than before.");
+        else if (!Deaf && !rn2(10))
+            Norep("The dungeon acoustics noticeably change.");
     }
-    for (i = 0; i < 9; i++)
-        if (litter[i] & NEED_UPDATE)
-            newsym(x + horiz(i), y + vert(i));
+
+    if (stop_picking)
+        stop_occupation();
+
+    litter_newsyms(litter, x, y);
 
     if (disposition < 3)
         disposition = 2;
     return disposition;
-#undef NEED_UPDATE
-#undef OPEN
-#undef INSHOP
-#undef vert
-#undef horiz
 }
 
 /*
@@ -3753,7 +3840,7 @@ shk_move(struct monst* shkp)
     omy = shkp->my;
 
     if (inhishop(shkp))
-        remove_damage(shkp, FALSE);
+        shk_fixes_damage(shkp);
 
     if ((udist = distu(omx, omy)) < 3 && (shkp->data != &mons[PM_GRID_BUG]
                                           || (omx == u.ux || omy == u.uy))) {
@@ -4523,7 +4610,7 @@ check_unpaid(struct obj* otmp)
 }
 
 void
-costly_gold(register xchar x, register xchar y, register long amount)
+costly_gold(xchar x, xchar y, long amount, boolean silent)
 {
     register long delta;
     register struct monst *shkp;
@@ -4536,19 +4623,23 @@ costly_gold(register xchar x, register xchar y, register long amount)
 
     eshkp = ESHK(shkp);
     if (eshkp->credit >= amount) {
-        if (eshkp->credit > amount)
-            Your("credit is reduced by %ld %s.", amount, currency(amount));
-        else
-            Your("credit is erased.");
+        if (!silent) {
+            if (eshkp->credit > amount)
+                Your("credit is reduced by %ld %s.", amount, currency(amount));
+            else
+                Your("credit is erased.");
+        }
         eshkp->credit -= amount;
     } else {
         delta = amount - eshkp->credit;
-        if (eshkp->credit)
-            Your("credit is erased.");
-        if (eshkp->debit)
-            Your("debt increases by %ld %s.", delta, currency(delta));
-        else
-            You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
+        if (!silent) {
+            if (eshkp->credit)
+                Your("credit is erased.");
+            if (eshkp->debit)
+                Your("debt increases by %ld %s.", delta, currency(delta));
+            else
+                You("owe %s %ld %s.", shkname(shkp), delta, currency(delta));
+        }
         eshkp->debit += delta;
         eshkp->loan += delta;
         eshkp->credit = 0L;

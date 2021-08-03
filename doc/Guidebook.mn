@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 25, 2021
+.ds f2 "July 27, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -797,6 +797,12 @@ If your wielded weapon has the throw-and-return property, your quiver
 is empty, and
 .op autoquiver
 is false, you will throw that wielded weapon instead of filling the quiver.
+If
+.op fireassist
+is true, firing will automatically try to wield a launcher (for example,
+a bow or a sling) matching the ammo in the quiver; this might take multiple
+turns, and get interrupted by a monster.
+Remember to swap back to your main melee weapon afterwards.
 .lp ""
 See also \(oqt\(cq (throw) for more general throwing and shooting.
 .lp i
@@ -924,7 +930,7 @@ If you throw an arrow while not wielding a bow, you are throwing
 it by hand and it will generally be less effective than when shot.
 .lp ""
 See also \(oqf\(cq (fire) for throwing or shooting an item pre-selected
-via the \(oqQ\(cq (quiver) command.
+via the \(oqQ\(cq (quiver) command, with some extra assistance.
 .lp T
 Take off armor.
 .lp ""
@@ -1234,7 +1240,7 @@ You can set the
 .op paranoid_confirmation:quit
 option to require a response of \f(CRyes\fP instead.
 .lp "#fire    "
-Fire ammunition from quiver.
+Fire ammunition from quiver, possibly autowielding a launcher.
 Default key is \(oqf\(cq.
 .lp "#force   "
 Force a lock.
@@ -1426,6 +1432,10 @@ is on.
 .lp "#remove  "
 Remove an accessory (ring, amulet, etc).
 Default key is \(oqR\(cq.
+.lp "#retravel"
+Travel to a previously selected travel destination.
+Default key is \(oqC-_\(cq.
+See also #travel.
 .lp "#ride    "
 Ride (or stop riding) a saddled creature.
 Autocompletes.
@@ -1551,6 +1561,7 @@ When picking a target with cursor and the
 .op autodescribe
 option is on, the top line will show \(lq(no travel path)\(rq if
 your character does not know of a path to that location.
+See also #retravel.
 .lp "#turn    "
 Turn undead away.
 Autocompletes.
@@ -2253,11 +2264,13 @@ location ordinarily wouldn't be seen any more.
 Objects
 .pg
 When you find something in the dungeon, it is common to want to pick
-it up.  In NetHack, this is accomplished automatically by walking over
+it up.  In NetHack, this is accomplished by using the \(oq,\(cq command.
+automatically by walking over
 the object (unless you turn off the
+If
 .op autopickup
-option (see below), or move with the \(oqm\(cq prefix (see above)), or
-manually by using the \(oq,\(cq command.
+option is on, you will automatically pick up the object
+by walking over, unless you move with the \(oqm\(cq prefix.
 .pg
 If you're carrying too many items, NetHack will tell you so and you won't
 be able to pick up anything more.
@@ -2414,7 +2427,7 @@ Some of the more obscure weapons (such as the \fIaklys\fP,
 appendix to \fIUnearthed Arcana\fP, an AD&D supplement.
 .pg
 The commands to use weapons are \(oqw\(cq (wield), \(oqt\(cq (throw),
-\(oqf\(cq (fire, an alternate way of throwing), \(oqQ\(cq (quiver),
+\(oqf\(cq (fire), \(oqQ\(cq (quiver),
 \(oqx\(cq (exchange), \(oqX\(cq (twoweapon), and \(lq#enhance\(rq
 (see below).
 .hn 3
@@ -2456,6 +2469,9 @@ If your quiver is empty,
 .op autoquiver
 is false, and you are wielding a weapon which returns when thrown,
 you will throw that weapon instead of filling the quiver.
+The fire command also has extra assistance, if
+.op fireassist
+is on it will try to wield a launcher matching the ammo in the quiver.
 .pg
 Some characters have the ability to throw or shoot a volley of multiple
 items (from the same stack) in a single action.
@@ -3550,7 +3566,7 @@ Persistent.
 Walking into a closed door attempts to open it (default true).
 Persistent.
 .lp "autopickup  "
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default off).
 Persistent.
 .lp ""
 See
@@ -3684,6 +3700,10 @@ extended ones (off).
 .lp female
 An obsolete synonym for \(lqgender:female\(rq.
 Cannot be set with the \(oqO\(cq command.
+.lp fireassist
+This option controls what happens when you attempt the \(oqf\(cq (fire)
+and don't have an appropriate launcher, such as a bow or a sling, wielded.
+If on, you will automatically wield the launcher. Default is on.
 .lp fixinv
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
@@ -4382,7 +4402,7 @@ to \fITrue\fP forces
 to be \fIFalse\fP.
 .lp color
 If NetHack can, it should display color if it can for different monsters,
-objects, and dungeon features.
+objects, and dungeon features (default on).
 .lp eight_bit_tty
 If NetHack can, it should pass eight-bit character values (for example,
 specified with the
@@ -4741,12 +4761,6 @@ With
 .op number_pad
 only.
 Default is \(oqn\(cq.
-.lp doinv
-Show inventory.
-With
-.op number_pad
-only.
-Default is \(oq0\(cq.
 .lp fight
 Prefix key to force fight a direction.
 Default is \(oqF\(cq.
@@ -5260,6 +5274,10 @@ b	S_blob	(blob)
 (	S_boomright	(boomerang open right)
 \`	S_boulder	(boulder)
 \-	S_brcorn	(bottom right corner)
+>	S_brdnladder	(branch ladder down)
+>	S_brdnstair	(branch staircase down)
+<	S_brupladder	(branch ladder up)
+<	S_brupstair	(branch staircase up)
 C	S_centaur	(centaur)
 \&_	S_chain	(iron chain)
 #	S_cloud	(cloud)

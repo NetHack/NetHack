@@ -175,7 +175,7 @@ restdamage(NHFILE* nhfp)
                 struct monst *shkp = shop_keeper(*shp);
 
                 if (shkp && inhishop(shkp)
-                    && repair_damage(shkp, tmp_dam, (int *) 0, TRUE))
+                    && repair_damage(shkp, tmp_dam, TRUE))
                     break;
             }
         }
@@ -894,6 +894,7 @@ rest_stairs(NHFILE* nhfp)
     int buflen = 0;
     stairway stway = UNDEFINED_VALUES;
     int len = 0;
+    stairway *newst;
 
     stairway_free_all();
     while (1) {
@@ -915,6 +916,9 @@ rest_stairs(NHFILE* nhfp)
         }
         stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
                      &(stway.tolev));
+        newst = stairway_at(stway.sx, stway.sy);
+        if (newst)
+            newst->u_traversed = stway.u_traversed;
     }
 }
 

@@ -720,8 +720,9 @@ angrygods(aligntyp resp_god)
                   (on_altar() && (a_align(u.ux, u.uy) != resp_god))
                       ? "scorn"
                       : "call upon");
+        /* [why isn't this using verbalize()?] */
         pline("\"Then die, %s!\"",
-              g.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+              (g.youmonst.data->mlet == S_HUMAN) ? "mortal" : "creature");
         summon_minion(resp_god, FALSE);
         break;
 

@@ -91,13 +91,13 @@ E int srandom(unsigned int);
 #endif
 #endif
 #else
-#if defined(MACOSX)
+#if defined(MACOS)
 E long lrand48(void);
 E void srand48(long);
 #else
 extern long lrand48(void);
 extern void srand48(long);
-#endif /* MACOSX */
+#endif /* MACOS */
 #endif /* BSD || ULTRIX || RANDOM */
 
 #if !defined(BSD) || defined(ultrix)

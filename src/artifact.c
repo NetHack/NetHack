@@ -1675,6 +1675,13 @@ finesse_ahriman(struct obj *obj)
 boolean
 artifact_light(struct obj *obj)
 {
+    /* not artifacts but treat them as if they were because they emit
+       light without burning */
+    if (obj && (obj->otyp == GOLD_DRAGON_SCALE_MAIL
+                || obj->otyp == GOLD_DRAGON_SCALES)
+        && (obj->owornmask & W_ARM) != 0L)
+        return TRUE;
+
     return (boolean) (get_artifact(obj) && obj->oartifact == ART_SUNSWORD);
 }
 

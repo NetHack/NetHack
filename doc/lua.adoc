@@ -253,6 +253,26 @@ Example:
  local str = nh.s_suffix("foo");
 
 
+=== stairways
+
+Returns an array of stairway data. Each entry is a hash with the following keys:
+
+|===
+| x, y   | location of the stairs on the map
+| up     | boolean, is it up stairs?
+| ladder | boolean, is it a ladder?
+| dnum   | dungeon number where the stairs lead to
+| dlevel | dungeon level where the stairs lead to
+|===
+
+Example:
+
+ local stairs = nh.stairways();
+ for k, v in pairs(stairs) do
+   nh.pline("stair[" .. k .. "]:(" .. v.x .. "," .. v.y .. ")," .. tostring(v.up));
+ end
+
+
 === verbalize
 
 Show the text in the message area as if someone said it, obeying eg. hero's deafness.
@@ -331,6 +351,14 @@ Example:
  des.feature({ type = "fountain", coord = {4, 6} });
  des.feature({ type = "throne", coord = {4, 6}, looted = true });
  des.feature({ type = "tree", coord = {4, 6}, looted = true, swarm = false });
+
+=== finalize_level
+
+Only used for testing purposes. See also <<_reset_level>>.
+
+Example:
+
+ des.finalize_level();
 
 === gold
 
@@ -458,6 +486,40 @@ Example:
 
 === monster
 
+Create a monster.
+
+The hash parameter accepts the following keys:
+
+[options="header"]
+|===
+| parameter      | type   | description
+| id             | string | specific monster type, eg. "wood nymph"
+| class          | string | monster class, eg "D"
+| x, y           | integers |
+| coord          | table of two integer |
+| peaceful       | boolean |
+| asleep         | boolean |
+| name           | string | name of the monster
+| female         | boolean |
+| invisible      | boolean |
+| cancelled      | boolean |
+| revived        | boolean |
+| avenge         | boolean |
+| fleeing        | 0 - 127 |
+| blinded        | 0 - 127 |
+| paralyzed      | 0 - 127 |
+| stunned        | boolean |
+| confused       | boolean |
+| waiting        | boolean | monster will wait until hero gets next to it
+| tail           | boolean | generate worm without a tail?
+| group          | boolean | generate a group of monsters?
+| adjacentok     | boolean | is adjacent location ok, if given one is not suitable?
+| ignorewater    | boolean | ignore water when choosing location for the monster
+| countbirth     | boolean | do we count this monster as generated
+| appear_as      | string | monster can appear as object, monster, or terrain. Add "obj:", "mon:", or "ter:" prefix to the value. |
+| inventory      | function | objects generated in the function are given to the monster
+|===
+
 Example:
 
  des.monster();
@@ -559,7 +621,7 @@ Example:
 
 === reset_level
 
-Only used for testing purposes.
+Only used for testing purposes. See also <<_finalize_level>>.
 
 Example:
 

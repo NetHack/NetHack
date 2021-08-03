@@ -12,6 +12,9 @@ static int disturb(struct monst *);
 static void release_hero(struct monst *);
 static void distfleeck(struct monst *, int *, int *, int *);
 static int m_arrival(struct monst *);
+static boolean holds_up_web(xchar, xchar);
+static int count_webbing_walls(xchar, xchar);
+static boolean soko_allow_web(struct monst *);
 static boolean m_balks_at_approaching(struct monst *);
 static boolean stuff_prevents_passage(struct monst *);
 static int vamp_shift(struct monst *, struct permonst *, boolean);
@@ -295,8 +298,10 @@ bee_eat_jelly(struct monst* mon, struct obj* obj)
     return -1; /* a queen is already present; ordinary bee hasn't moved yet */
 }
 
-#define flees_light(mon) ((mon)->data == &mons[PM_GREMLIN]     \
-                          && (uwep && artifact_light(uwep) && uwep->lamplit))
+#define flees_light(mon) \
+    ((mon)->data == &mons[PM_GREMLIN]                           \
+     && ((uwep && uwep->lamplit && artifact_light(uwep))        \
+         || (uarm && uarm->lamplit && artifact_light(uarm))))
 /* we could include this in the above macro, but probably overkill/overhead */
 /*      && (!(which_armor((mon), W_ARMC) != 0                               */
 /*            && which_armor((mon), W_ARMH) != 0))                          */
@@ -855,6 +860,75 @@ m_balks_at_approaching(struct monst* mtmp)
         return TRUE;
 
     return FALSE;
+}
+
+static boolean
+holds_up_web(xchar x, xchar y)
+{
+    stairway *sway;
+
+    if (!isok(x, y)
+        || IS_ROCK(levl[x][y].typ)
+        || ((levl[x][y].typ == STAIRS || levl[x][y].typ == LADDER)
+            && (sway = stairway_at(x, y)) != 0 && sway->up)
+        || levl[x][y].typ == IRONBARS)
+        return TRUE;
+
+    return FALSE;
+}
+
+/* returns the number of walls in the four cardinal directions that could
+   hold up a web */
+static int
+count_webbing_walls(xchar x, xchar y)
+{
+    return (holds_up_web(x, y - 1) + holds_up_web(x + 1, y)
+            + holds_up_web(x, y + 1) + holds_up_web(x - 1, y));
+}
+
+/* reject webs which interfere with solving Sokoban */
+static boolean
+soko_allow_web(struct monst *mon)
+{
+    stairway *stway;
+
+    /* for a non-Sokoban level or a solved Sokoban level, no restriction */
+    if (!Sokoban)
+        return TRUE;
+    /* not-yet-solved Sokoban level:  allow web only when spinner can see
+       the stairs up [we really want 'is in same chamber as stairs up'] */
+    stway = stairway_find_dir(TRUE); /* stairs up */
+    if (stway && m_cansee(mon, stway->sx, stway->sy))
+        return TRUE;
+    return FALSE;
+}
+
+/* monster might spin a web */
+static void
+maybe_spin_web(struct monst *mtmp)
+{
+    if (webmaker(mtmp->data)
+        && mtmp->mcanmove && !mtmp->msleeping && !mtmp->mspec_used
+        && !t_at(mtmp->mx, mtmp->my) && soko_allow_web(mtmp)) {
+        struct trap *trap;
+        int prob = ((((mtmp->data == &mons[PM_GIANT_SPIDER]) ? 15 : 5)
+                     * (count_webbing_walls(mtmp->mx, mtmp->my) + 1))
+                    - (3 * count_traps(WEB)));
+
+        if (rn2(1000) < prob
+            && (trap = maketrap(mtmp->mx, mtmp->my, WEB)) != 0) {
+            mtmp->mspec_used = d(4, 4); /* 4..16 */
+            if (cansee(mtmp->mx, mtmp->my)) {
+                char mbuf[BUFSZ];
+
+                Strcpy(mbuf, canspotmon(mtmp) ? y_monnam(mtmp) : something);
+                pline("%s spins a web.", upstart(mbuf));
+                trap->tseen = 1;
+            }
+            if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
+                add_damage(mtmp->mx, mtmp->my, 0L);
+        }
+    }
 }
 
 /* Return values:
@@ -1552,6 +1626,8 @@ m_move(register struct monst* mtmp, register int after)
                     see_wsegs(mtmp);
             }
         }
+
+        maybe_spin_web(mtmp);
 
         if (hides_under(ptr) || ptr->mlet == S_EEL) {
             /* Always set--or reset--mundetected if it's already hidden

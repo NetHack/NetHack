@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1606473489 2020/11/27 10:38:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1624322866 2021/06/22 00:47:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -655,7 +655,7 @@ struct alt_spl {
 /* figure out what type of monster a user-supplied string is specifying;
    ingore anything past the monster name */
 int
-name_to_mon(const char *in_str, int * gender_name_var)
+name_to_mon(const char *in_str, int *gender_name_var)
 {
     return name_to_monplus(in_str, (const char **) 0, gender_name_var);
 }
@@ -686,7 +686,7 @@ name_to_monplus(
     register int mntmp = NON_PM;
     register char *s, *str, *term;
     char buf[BUFSZ];
-    int len, slen, mgend;
+    int len, slen, mgend, matchgend = -1;
     boolean exact_match = FALSE;
 
     if (remainder_p)
@@ -740,13 +740,16 @@ name_to_monplus(
             { "master of assassin", PM_MASTER_ASSASSIN, NEUTRAL },
             /* Outdated names */
             { "invisible stalker", PM_STALKER, NEUTRAL },
-            { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is obsolete */
+            { "high-elf", PM_ELVEN_MONARCH, NEUTRAL }, /* PM_HIGH_ELF is
+                                                        * obsolete */
             /* other misspellings or incorrect words */
             { "wood-elf", PM_WOODLAND_ELF, NEUTRAL },
             { "wood elf", PM_WOODLAND_ELF, NEUTRAL },
             { "woodland nymph", PM_WOOD_NYMPH, NEUTRAL },
-            { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for polyself */
-            { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for ^G/#wizgenesis */
+            { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for
+                                                    * polyself */
+            { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for
+                                              * ^G/#wizgenesis */
             /* prefix used to workaround duplicate monster names for
                monsters with alternate forms */
             { "human wererat", PM_HUMAN_WERERAT, NEUTRAL },
@@ -797,7 +800,7 @@ name_to_monplus(
                 && (!str[len] || str[len] == ' ' || str[len] == '\'')) {
                 if (remainder_p)
                     *remainder_p = in_str + (&str[len] - buf);
-                if (gender_name_var != (int *) 0)
+                if (gender_name_var)
                     *gender_name_var = namep->genderhint;
                 return namep->pm_val;
             }
@@ -816,8 +819,7 @@ name_to_monplus(
             if (m_i_len == slen) {
                 mntmp = i;
                 len = m_i_len;
-                if (gender_name_var != (int *) 0)
-                    *gender_name_var = mgend;
+                matchgend = mgend;
                 exact_match = TRUE;
                 break; /* exact match */
             } else if (slen > m_i_len
@@ -832,16 +834,24 @@ name_to_monplus(
                            || !strncmpi(&str[m_i_len], "es ", 3))) {
                 mntmp = i;
                 len = m_i_len;
+                matchgend = mgend;
             }
         }
       }
       if (exact_match)
         break;
     }
+    /* FIXME: some titles have gender; title_to_mon() doesn't propagate it */
     if (mntmp == NON_PM)
         mntmp = title_to_mon(str, (int *) 0, &len);
     if (len && remainder_p)
         *remainder_p = in_str + (&str[len] - buf);
+    if (gender_name_var && matchgend != -1) {
+        /* don't override with neuter if caller has already specified male
+           or female and we've matched the neuter name */
+        if (*gender_name_var == -1 || matchgend != NEUTRAL)
+            *gender_name_var = matchgend;
+    }
     return mntmp;
 }
 
@@ -1164,7 +1174,7 @@ stagger(const struct permonst* ptr, const char* def)
 
 /* return phrase describing the effect of fire attack on a type of monster */
 const char *
-on_fire(struct permonst* mptr, struct attack* mattk)
+on_fire(struct permonst *mptr, struct attack *mattk)
 {
     const char *what;
 
@@ -1200,6 +1210,56 @@ on_fire(struct permonst* mptr, struct attack* mattk)
     return what;
 }
 
+/* similar to on_fire(); creature is summoned in a cloud of <something> */
+const char *
+msummon_environ(struct permonst *mptr, const char **cloud)
+{
+    const char *what;
+    int mndx = ((mptr->mlet == S_ANGEL) ? PM_ANGEL
+                : (mptr->mlet == S_LIGHT) ? PM_YELLOW_LIGHT
+                  : monsndx(mptr));
+
+    *cloud = "cloud"; /* default is "cloud of <something>" */
+    switch (mndx) {
+    case PM_WATER_DEMON:
+    case PM_AIR_ELEMENTAL:
+    case PM_WATER_ELEMENTAL:
+    case PM_FOG_CLOUD:
+    case PM_ICE_VORTEX:
+    case PM_FREEZING_SPHERE:
+        what = "vapor";
+        break;
+    case PM_STEAM_VORTEX:
+        what = "steam";
+        break;
+    case PM_ENERGY_VORTEX:
+    case PM_SHOCKING_SPHERE:
+        *cloud = "shower"; /* "shower of sparks" instead of "cloud of..." */
+        what = "sparks";
+        break;
+    case PM_EARTH_ELEMENTAL:
+    case PM_DUST_VORTEX:
+        what = "dust";
+        break;
+    case PM_FIRE_ELEMENTAL:
+    case PM_FIRE_VORTEX:
+    case PM_FLAMING_SPHERE:
+    /*case PM_SALAMANDER:*/
+        *cloud = "ball"; /* "ball of flame" instead of "cloud of..." */
+        what = "flame";
+        break;
+    case PM_ANGEL: /* actually any 'A'-class */
+    case PM_YELLOW_LIGHT: /* any 'y'-class */
+        *cloud = "flash"; /* "flash of light" instead of "cloud of..." */
+        what = "light";
+        break;
+    default:
+        what = "smoke";
+        break;
+    }
+    return what;
+}
+
 /*
  * Returns:
  *      True if monster is presumed to have a sense of smell.
@@ -1210,7 +1270,7 @@ on_fire(struct permonst* mptr, struct attack* mattk)
  * We're assuming all insects can smell at a distance too.
  */
 boolean
-olfaction(struct permonst* mdat)
+olfaction(struct permonst *mdat)
 {
     if (is_golem(mdat)
         || mdat->mlet == S_EYE /* spheres  */

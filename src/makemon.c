@@ -1123,6 +1123,9 @@ makemon(register struct permonst *ptr,
     fakemon = cg.zeromonst;
     cc.x = cc.y = 0;
 
+    if (iflags.debug_mongen)
+        return (struct monst *) 0;
+
     /* if caller wants random location, do it here */
     if (x == 0 && y == 0) {
         fakemon.data = ptr; /* set up for goodpos */
@@ -2212,6 +2215,10 @@ set_mimic_sym(register struct monst *mtmp)
      */
 
     } else if (rt >= SHOPBASE) {
+        if (rn2(10) >= depth(&u.uz)) {
+            s_sym = S_MIMIC_DEF; /* -> STRANGE_OBJECT */
+            goto assign_sym;
+        }
         s_sym = get_shop_item(rt - SHOPBASE);
         if (s_sym < 0) {
             ap_type = M_AP_OBJECT;

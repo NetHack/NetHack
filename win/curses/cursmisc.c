@@ -65,7 +65,7 @@ curses_read_char(void)
     }
 #endif
 
-    if (counting && !isdigit(ch)) { /* Dismiss count window if necissary */
+    if (counting && !isdigit(ch)) { /* dismiss count window if necessary */
         curses_count_window(NULL);
         curses_refresh_nethack_windows();
     }
@@ -100,7 +100,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     if (color == 0) {           /* make black fg visible */
 # ifdef USE_DARKGRAY
         if (iflags.wc2_darkgray) {
-            if (can_change_color() && (COLORS > 16)) {
+            if (COLORS > 16) {
                 /* colorpair for black is already darkgray */
             } else {            /* Use bold for a bright black */
                 wattron(win, A_BOLD);
@@ -135,7 +135,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
                 wattroff(win, A_BOLD);
             }
 # ifdef USE_DARKGRAY
-            if ((color == 0) && (!can_change_color() || (COLORS <= 16))) {
+            if ((color == 0) && (COLORS <= 16)) {
                 wattroff(win, A_BOLD);
             }
 # else
@@ -691,30 +691,25 @@ curses_rtrim(char *str)
 /* Read numbers until non-digit is encountered, and return number
 in int form. */
 
-int
+long
 curses_get_count(int first_digit)
 {
-    long current_count = first_digit;
     int current_char;
+    long current_count = 0L;
 
-    current_char = curses_read_char();
-
-    while (isdigit(current_char)) {
-        current_count = (current_count * 10) + (current_char - '0');
-        if (current_count > LARGEST_INT) {
-            current_count = LARGEST_INT;
-        }
-
-        custompline(SUPPRESS_HISTORY, "Count: %ld", current_count);
-        current_char = curses_read_char();
-    }
+    /* use core's count routine; we have the first digit; if any more
+       are typed, get_count() will send "Count:123" to the message window;
+       curses's message window will display that in count window instead */
+    current_char = get_count(NULL, (char) first_digit,
+                             /* 0L => no limit on value unless it wraps
+                              * to negative;
+                              * FALSE => suppress from message history */
+                             0L, &current_count, FALSE);
 
     ungetch(current_char);
-
     if (current_char == '\033') {     /* Cancelled with escape */
         current_count = -1;
     }
-
     return current_count;
 }
 

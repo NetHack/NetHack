@@ -11,7 +11,7 @@
 
 des.level_flags("mazelevel")
 
-des.level_init({ style="mines", fg=".", bg=" ", smoothed=true ,joined=true, lit="random", walled=true })
+des.level_init({ style="mines", fg=".", bg=" ", smoothed=true, joined=true, walled=true })
 
 des.map([[
 .....................................

@@ -1,4 +1,4 @@
-/* NetHack 3.7	sit.c	$NHDT-Date: 1596498210 2020/08/03 23:43:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	sit.c	$NHDT-Date: 1627414178 2021/07/27 19:29:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -245,7 +245,30 @@ dosit(void)
                         do_mapping();
                     }
                 } else {
-                    Your("vision becomes clear.");
+                    /* avoid "vision clears" if hero can't see */
+                    if (!Blind) {
+                        Your("vision becomes clear.");
+                    } else {
+                        int num_of_eyes = eyecount(g.youmonst.data);
+                        const char *eye = body_part(EYE);
+
+                        /* note: 1 eye case won't actually happen--can't
+                           sit on throne when poly'd into always-levitating
+                           floating eye and can't polymorph into Cyclops */
+                        switch (num_of_eyes) { /* 2, 1, or 0 */
+                        default:
+                        case 2: /* more than 1 eye */
+                            eye = makeplural(eye);
+                            /*FALLTHRU*/
+                        case 1: /* one eye (Cyclops, floating eye) */
+                            Your("%s %s...", eye, vtense(eye, "tingle"));
+                            break;
+                        case 0: /* no eyes */
+                            You("have a very strange feeling in your %s.",
+                                body_part(HEAD));
+                            break;
+                        }
+                    }
                     HSee_invisible |= FROMOUTSIDE;
                     newsym(u.ux, u.uy);
                 }

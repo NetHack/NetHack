@@ -261,6 +261,7 @@ static void free_one_menu_coloring(int);
 static int count_menucolors(void);
 static boolean parse_role_opts(int, boolean, const char *,
                                char *, char **);
+static unsigned int longest_option_name(int, int);
 static void doset_add_menu(winid, const char *, int, int);
 static int handle_add_list_remove(const char *, int);
 static void remove_autopickup_exception(struct autopickup_exception *);
@@ -5049,14 +5050,16 @@ handler_menu_colors(void)
            inventory window; we don't track whether an actual changed
            occurred, so just assume there was one and that it matters;
            if we're wrong, a redundant update is cheap... */
-        if (iflags.use_menu_color && iflags.perm_invent)
-            update_inventory();
+        if (iflags.use_menu_color) {
+            if (iflags.perm_invent)
+                update_inventory();
 
-        /* menu colors aren't being used; if any are defined, remind
-           player how to use them */
-        else if (nmc > 0)
+        /* menu colors aren't being used yet; if any MENUCOLOR rules are
+           defined, remind player how to activate them */
+        } else if (nmc > 0) {
             pline(
     "To have menu colors become active, toggle 'menucolors' option to True.");
+        }
         return optn_ok;
 
     } else if (opt_idx == 0) { /* add new */
@@ -7188,6 +7191,32 @@ get_option_value(const char *optname)
     return (char *) 0;
 }
 
+static unsigned int
+longest_option_name(int startpass, int endpass)
+{
+    /* spin through the options to find the longest name */
+    unsigned longest_name_len = 0;
+    int i, pass, optflags;
+    const char *name;
+
+    for (pass = 0; pass < 2; pass++)
+        for (i = 0; (name = allopt[i].name) != 0; i++) {
+            if (pass == 0 &&
+                (allopt[i].opttyp != BoolOpt || !allopt[i].addr))
+                continue;
+            optflags = allopt[i].setwhere;
+            if (optflags < startpass || optflags > endpass)
+                continue;
+            if ((is_wc_option(name) && !wc_supported(name))
+                || (is_wc2_option(name) && !wc2_supported(name)))
+                continue;
+
+            if (strlen(name) > longest_name_len)
+                longest_name_len = strlen(name);
+        }
+    return longest_name_len;
+}
+
 /* the 'O' command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
@@ -7200,9 +7229,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     winid tmpwin;
     anything any;
     menu_item *pick_list;
-    int indexoffset, startpass, endpass, optflags;
+    int indexoffset, startpass, endpass;
     boolean setinitial = FALSE, fromfile = FALSE;
-    unsigned longest_name_len;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -7218,25 +7246,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     endpass = (wizard) ? set_wizonly : set_in_game;
 
     if (!made_fmtstr && !iflags.menu_tab_sep) {
-        /* spin through the options to find the longest name
-           and adjust the format string accordingly */
-        longest_name_len = 0;
-        for (pass = 0; pass < 2; pass++)
-            for (i = 0; (name = allopt[i].name) != 0; i++) {
-                if (pass == 0 &&
-                    (allopt[i].opttyp != BoolOpt || !allopt[i].addr))
-                    continue;
-                optflags = allopt[i].setwhere;
-                if (optflags < startpass || optflags > endpass)
-                    continue;
-                if ((is_wc_option(name) && !wc_supported(name))
-                    || (is_wc2_option(name) && !wc2_supported(name)))
-                    continue;
-
-                if (strlen(name) > longest_name_len)
-                    longest_name_len = strlen(name);
-            }
-        Sprintf(fmtstr_doset, "%%s%%-%us [%%s]", longest_name_len);
+        Sprintf(fmtstr_doset, "%%s%%-%us [%%s]",
+                longest_option_name(startpass, endpass));
         made_fmtstr = TRUE;
     }
 

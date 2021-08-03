@@ -7,7 +7,6 @@
 
 static void mkbox_cnts(struct obj *);
 static unsigned nextoid(struct obj *, struct obj *);
-static void maybe_adjust_light(struct obj *, int);
 static void obj_timer_checks(struct obj *, xchar, xchar, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
@@ -1055,6 +1054,14 @@ mksobj(int otyp, boolean init, boolean artif)
     case FIGURINE:
         if (otmp->corpsenm == NON_PM)
             otmp->corpsenm = rndmonnum();
+        if (otmp->corpsenm != NON_PM) {
+            struct permonst *ptr = &mons[otmp->corpsenm];
+
+            otmp->spe = (is_neuter(ptr) ? CORPSTAT_NEUTER
+                         : is_female(ptr) ? CORPSTAT_FEMALE
+                           : is_male(ptr) ? CORPSTAT_MALE
+                             : rn2(2) ? CORPSTAT_FEMALE : CORPSTAT_MALE);
+        }
         /*FALLTHRU*/
     case EGG:
     /* case TIN: */
@@ -1219,8 +1226,8 @@ start_corpse_timeout(struct obj* body)
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
 }
 
-static void
-maybe_adjust_light(struct obj* obj, int old_range)
+void
+maybe_adjust_light(struct obj *obj, int old_range)
 {
     char buf[BUFSZ];
     xchar ox, oy;
@@ -1230,9 +1237,9 @@ maybe_adjust_light(struct obj* obj, int old_range)
        so will change after blessing or cursing */
     if (delta) {
         obj_adjust_light_radius(obj, new_range);
-        /* simplifying assumptions:  hero is wielding this object;
-           artifacts have to be in use to emit light and monsters'
-           gear won't change bless or curse state */
+        /* simplifying assumptions:  hero is wielding or wearing this object;
+           artifacts have to be in use to emit light and monsters' gear won't
+           change bless or curse state */
         if (!Blind && get_obj_location(obj, &ox, &oy, 0)) {
             *buf = '\0';
             if (iflags.last_msg == PLNMSG_OBJ_GLOWS)
@@ -1520,7 +1527,9 @@ mkcorpstat(
     } else {
         otmp = mksobj_at(objtype, x, y, init, FALSE);
     }
-    otmp->norevive = g.mkcorpstat_norevive;
+    /* record gender and 'historic statue' in overloaded enchantment field */
+    otmp->spe = (corpstatflags & CORPSTAT_SPE_VAL);
+    otmp->norevive = g.mkcorpstat_norevive; /* via envrmt rather than flags */
 
     /* when 'mtmp' is non-null save the monster's details with the
        corpse or statue; it will also force the 'ptr' override below */
@@ -1685,10 +1694,10 @@ mk_tt_object(
    never returns Null */
 struct obj *
 mk_named_object(
-int objtype, /* CORPSE or STATUE */
-struct permonst *ptr,
-int x, int y,
-const char *nm)
+    int objtype, /* CORPSE or STATUE */
+    struct permonst *ptr,
+    int x, int y,
+    const char *nm)
 {
     struct obj *otmp;
     unsigned corpstatflags = (objtype != STATUE) ? CORPSTAT_INIT

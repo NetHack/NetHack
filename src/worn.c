@@ -1,4 +1,4 @@
-/* NetHack 3.7	worn.c	$NHDT-Date: 1606919259 2020/12/02 14:27:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	worn.c	$NHDT-Date: 1627505148 2021/07/28 20:45:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -333,6 +333,16 @@ mon_adjust_speed(struct monst *mon,
     }
 }
 
+/* alchemy smock confers two properites, poison and acid resistance
+   but objects[ALCHEMY_SMOCK].oc_oprop can only describe one of them;
+   if it is poison resistance, alternate property is acid resistance;
+   if someone changes it to acid resistance, alt becomes posion resist;
+   if someone changes it to hallucination resistance, all bets are off */
+#define altprop(o) \
+    (((o)->otyp == ALCHEMY_SMOCK)                               \
+     ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
+     : 0)
+
 /* armor put on or taken off; might be magical variety
    [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
 void
@@ -342,12 +352,14 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
     int unseen;
     uchar mask;
     struct obj *otmp;
-    int which = (int) objects[obj->otyp].oc_oprop;
+    int which = (int) objects[obj->otyp].oc_oprop,
+        altwhich = altprop(obj);
 
     unseen = !canseemon(mon);
     if (!which)
         goto maybe_blocks;
 
+ again:
     if (on) {
         switch (which) {
         case INVIS:
@@ -409,20 +421,43 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
         case POISON_RES:
         case ACID_RES:
         case STONE_RES:
+            /*
+             * Update monster's extrinsics (for worn objects only;
+             * 'obj' itself might still be worn or already unworn).
+             *
+             * If an alchemy smock is being taken off, this code will
+             * be run twice (via 'goto again') and other worn gear
+             * gets tested for conferring poison resistance on the
+             * first pass and acid resistance on the second.
+             *
+             * If some other item is being taken off, there will be
+             * only one pass but a worn alchemy smock will be an
+             * alternate source for either of those two resistances.
+             */
             mask = (uchar) (1 << (which - 1));
-            /* update monster's extrinsics (for worn objects only;
-               'obj' itself might still be worn or already unworn) */
-            for (otmp = mon->minvent; otmp; otmp = otmp->nobj)
-                if (otmp != obj
-                    && otmp->owornmask
-                    && (int) objects[otmp->otyp].oc_oprop == which)
+            for (otmp = mon->minvent; otmp; otmp = otmp->nobj) {
+                if (otmp == obj || !otmp->owornmask)
+                    continue;
+                if ((int) objects[otmp->otyp].oc_oprop == which)
                     break;
+                /* check whether 'otmp' confers target property as an extra
+                   one rather than as the one specified for it in objects[] */
+                if (altprop(otmp) == which)
+                    break;
+            }
             if (!otmp)
                 mon->mextrinsics &= ~((unsigned short) mask);
             break;
         default:
             break;
         }
+    }
+
+    /* worn alchemy smock/apron confers both poison resistance and acid
+       resistance to the hero so do likewise for monster who wears one */
+    if (altwhich && which != altwhich) {
+        which = altwhich;
+        goto again;
     }
 
  maybe_blocks:
@@ -445,6 +480,8 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
     if (!silently && (unseen ^ !canseemon(mon)))
         newsym(mon->mx, mon->my);
 }
+
+#undef altprop
 
 int
 find_mac(struct monst *mon)
@@ -528,8 +565,9 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
               boolean racialexception)
 {
     struct obj *old, *best, *obj;
+    long oldmask = 0L;
     int m_delay = 0;
-    int unseen = !canseemon(mon);
+    int sawmon = canseemon(mon), sawloc = cansee(mon->mx, mon->my);
     boolean autocurse;
     char nambuf[BUFSZ];
 
@@ -629,13 +667,15 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
         m_delay += 2;
     /* when upgrading a piece of armor, account for time spent
        taking off current one */
-    if (old)
+    if (old) {
         m_delay += objects[old->otyp].oc_delay;
 
-    if (old) /* do this first to avoid "(being worn)" */
-        old->owornmask = 0L;
+        oldmask = old->owornmask; /* needed later by artifact_light() */
+        old->owornmask = 0L; /* avoid doname() showing "(being worn)" */
+    }
+
     if (!creation) {
-        if (canseemon(mon)) {
+        if (sawmon) {
             char buf[BUFSZ];
 
             if (old)
@@ -654,20 +694,45 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
         if (mon->mfrozen)
             mon->mcanmove = 0;
     }
-    if (old)
+    if (old) {
         update_mon_intrinsics(mon, old, FALSE, creation);
+
+        /* owornmask was cleared above but artifact_light() expects it */
+        old->owornmask = oldmask;
+        if (old->lamplit && artifact_light(old))
+            end_burn(old, FALSE);
+        old->owornmask = 0L;
+    }
     mon->misc_worn_check |= flag;
     best->owornmask |= flag;
     if (autocurse)
         curse(best);
+    if (artifact_light(best) && !best->lamplit) {
+        begin_burn(best, FALSE);
+        vision_recalc(1);
+        if (!creation && best->lamplit && cansee(mon->mx, mon->my)) {
+            const char *adesc = arti_light_description(best);
+
+            if (sawmon) /* could already see monster */
+                pline("%s %s to shine %s.", Yname2(best),
+                      otense(best, "begin"), adesc);
+            else if (canseemon(mon)) /* didn't see it until new light */
+                pline("%s %s shining %s.", Yname2(best),
+                      otense(best, "are"), adesc);
+            else if (sawloc) /* saw location but not invisible monster */
+                pline("%s begins to shine %s.", Something, adesc);
+            else /* didn't see location until new light */
+                pline("%s is shining %s.", Something, adesc);
+        }
+    }
     update_mon_intrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
-    if (!creation && (unseen ^ !canseemon(mon))) {
+    if (!creation && (sawmon ^ !canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
             pline("Suddenly you cannot see %s.", nambuf);
             makeknown(best->otyp);
-        } /* else if (!mon->minvis) pline("%s suddenly appears!",
-             Amonnam(mon)); */
+        } /* else if (!mon->minvis)
+           *     pline("%s suddenly appears!", Amonnam(mon)); */
     }
 }
 #undef RACE_EXCEPTION
@@ -1057,6 +1122,11 @@ extract_from_minvent(
         impossible("extract_from_minvent called on object not in minvent");
         return;
     }
+    /* handle gold dragon scales/scale-mail (lit when worn) before clearing
+       obj->owornmask because artifact_light() expects that to be W_ARM */
+    if ((unwornmask & W_ARM) != 0 && obj->lamplit && artifact_light(obj))
+        end_burn(obj, FALSE);
+
     obj_extract_self(obj);
     obj->owornmask = 0L;
     if (unwornmask) {

@@ -1,4 +1,4 @@
-/* NetHack 3.7	priest.c	$NHDT-Date: 1597931337 2020/08/20 13:48:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1624322670 2021/06/22 00:44:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -219,16 +219,16 @@ priestini(d_level *lvl, struct mkroom *sroom, int sx, int sy,
     struct monst *priest;
     struct obj *otmp;
     int cnt;
-    int px = 0, py = 0, i, si = rn2(8);
+    int px = 0, py = 0, i, si = rn2(N_DIRS);
     struct permonst *prim = &mons[sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC];
 
-    for (i = 0; i < 8; i++) {
-        px = sx + xdir[(i+si) % 8];
-        py = sy + ydir[(i+si) % 8];
+    for (i = 0; i < N_DIRS; i++) {
+        px = sx + xdir[DIR_CLAMP(i+si)];
+        py = sy + ydir[DIR_CLAMP(i+si)];
         if (pm_good_location(px, py, prim))
             break;
     }
-    if (i == 8)
+    if (i == N_DIRS)
         px = sx, py = sy;
 
     if (MON_AT(px, py))
@@ -291,26 +291,48 @@ mon_aligntyp(struct monst *mon)
  *              the true name even when under that influence
  */
 char *
-priestname(struct monst *mon,
-           char *pname) /* caller-supplied output buffer */
+priestname(
+    struct monst *mon,
+    int article,
+    char *pname) /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
             aligned_priest = mon->data == &mons[PM_ALIGNED_CLERIC],
             high_priest = mon->data == &mons[PM_HIGH_CLERIC];
     char whatcode = '\0';
-    const char *what = do_hallu ? rndmonnam(&whatcode)
-                                : pmname(mon->data, Mgender(mon));
+    const char *what = do_hallu ? rndmonnam(&whatcode) : mon_pmname(mon);
 
     if (!mon->ispriest && !mon->isminion) /* should never happen...  */
         return strcpy(pname, what);       /* caller must be confused */
 
     *pname = '\0';
-    if (!do_hallu || !bogon_is_pname(whatcode))
-        Strcat(pname, "the ");
-    if (mon->minvis)
+    if (article != ARTICLE_NONE && (!do_hallu || !bogon_is_pname(whatcode))) {
+        if (article == ARTICLE_YOUR || (article == ARTICLE_A && high_priest))
+            article = ARTICLE_THE;
+        if (article == ARTICLE_THE) {
+            Strcat(pname, "the ");
+        } else {
+            char buf2[BUFSZ];
+
+            /* don't let "Angel of <foo>" fool an() into using "the " */
+            Strcpy(buf2, pname);
+            *buf2 = lowc(*buf2);
+            (void) just_an(pname, buf2);
+        }
+    }
+    /* pname[] contains "" or {"a ","an ","the "} */
+    if (mon->minvis) {
+        /* avoid "a invisible priest" */
+        if (!strcmp(pname, "a "))
+            Strcpy(pname, "an ");
         Strcat(pname, "invisible ");
-    if (mon->isminion && EMIN(mon)->renegade)
+    }
+    if (mon->isminion && EMIN(mon)->renegade) {
+        /* avoid "an renegade Angel" */
+        if (!strcmp(pname, "an ")) /* will fail for "an invisible " */
+            Strcpy(pname, "a ");
         Strcat(pname, "renegade ");
+    }
 
     if (mon->ispriest || aligned_priest) { /* high_priest implies ispriest */
         if (!aligned_priest && !high_priest) {

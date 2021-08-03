@@ -2018,6 +2018,8 @@ do_objs(void)
     int prefix = 0;
     char class = '\0';
     boolean sumerr = FALSE;
+    int n_glass_gems = 0;
+    int start_glass_gems = 0;
 
     filename[0] = '\0';
 #ifdef FILE_PREFIX
@@ -2091,6 +2093,14 @@ do_objs(void)
             if (objects[i].oc_material == GLASS) {
                 Fprintf(ofp, "/* #define\t%s\t%d */\n", objnam, i);
                 prefix = -1;
+                if (!n_glass_gems)
+                    start_glass_gems = i;
+                if (i != n_glass_gems + start_glass_gems) {
+                    Fprintf(stderr, "glass gems not sequential\n");
+                    (void) fflush(stderr);
+                    sumerr = TRUE;
+                }
+                n_glass_gems++;
                 break;
             }
             /*FALLTHRU*/
@@ -2112,15 +2122,20 @@ do_objs(void)
         prefix = 0;
 
         sum += objects[i].oc_prob;
+
+        if (sumerr)
+            break;
     }
 
     /* check last set of probabilities */
-    if (sum && sum != 1000) {
+    if (!sumerr && sum && sum != 1000) {
         Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
         (void) fflush(stderr);
         sumerr = TRUE;
     }
 
+    Fprintf(ofp, "\n");
+    Fprintf(ofp, "#define\tNUM_GLASS_GEMS\t%d\n", n_glass_gems);
     Fprintf(ofp, "#define\tLAST_GEM\t(JADE)\n");
     Fprintf(ofp, "#define\tMAXSPELL\t%d\n", nspell + 1);
     Fprintf(ofp, "#define\tNUM_OBJECTS\t%d\n", i);

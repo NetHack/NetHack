@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1620923921 2021/05/13 16:38:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1627413528 2021/07/27 19:18:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.382 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -480,7 +480,7 @@ pm_to_cham(int mndx)
  * etc....
  */
 static struct obj *
-make_corpse(register struct monst* mtmp, unsigned int corpseflags)
+make_corpse(struct monst *mtmp, unsigned int corpseflags)
 {
     register struct permonst *mdat = mtmp->data;
     int num;
@@ -490,6 +490,11 @@ make_corpse(register struct monst* mtmp, unsigned int corpseflags)
     int mndx = monsndx(mdat);
     unsigned corpstatflags = corpseflags;
     boolean burythem = ((corpstatflags & CORPSTAT_BURIED) != 0);
+
+    if (mtmp->female)
+        corpstatflags |= CORPSTAT_FEMALE;
+    else if (!is_neuter(mtmp->data))
+        corpstatflags |= CORPSTAT_MALE;
 
     switch (mndx) {
     case PM_GRAY_DRAGON:
@@ -567,7 +572,8 @@ make_corpse(register struct monst* mtmp, unsigned int corpseflags)
     case PM_GLASS_GOLEM:
         num = d(2, 4); /* very low chance of creating all glass gems */
         while (num--)
-            obj = mksobj_at((LAST_GEM + rnd(9)), x, y, TRUE, FALSE);
+            obj = mksobj_at((LAST_GEM + rnd(NUM_GLASS_GEMS)),
+                            x, y, TRUE, FALSE);
         free_mgivenname(mtmp);
         break;
     case PM_CLAY_GOLEM:
@@ -578,8 +584,8 @@ make_corpse(register struct monst* mtmp, unsigned int corpseflags)
         break;
     case PM_STONE_GOLEM:
         corpstatflags &= ~CORPSTAT_INIT;
-        obj =
-            mkcorpstat(STATUE, (struct monst *) 0, mdat, x, y, corpstatflags);
+        obj = mkcorpstat(STATUE, (struct monst *) 0, mdat, x, y,
+                         corpstatflags);
         break;
     case PM_WOOD_GOLEM:
         num = d(2, 4);
@@ -726,7 +732,7 @@ minliquid_core(struct monst* mtmp)
         if (mtmp->mhpmax > dam)
             mtmp->mhpmax -= dam;
         if (DEADMONSTER(mtmp)) {
-            mondead(mtmp);
+            mondied(mtmp);
             if (DEADMONSTER(mtmp))
                 return 1;
         }
@@ -762,7 +768,7 @@ minliquid_core(struct monst* mtmp)
                    case is not expected to happen (and we haven't made a
                    player-against-monster variation of the message above) */
                 if (g.context.mon_moving)
-                    mondead(mtmp);
+                    mondead(mtmp); /* no corpse */
                 else
                     xkilled(mtmp, XKILL_NOMSG);
             } else {
@@ -770,7 +776,7 @@ minliquid_core(struct monst* mtmp)
                 if (DEADMONSTER(mtmp)) {
                     if (cansee(mtmp->mx, mtmp->my))
                         pline("%s surrenders to the fire.", Monnam(mtmp));
-                    mondead(mtmp);
+                    mondead(mtmp); /* no corpse */
                 } else if (cansee(mtmp->mx, mtmp->my))
                     pline("%s burns slightly.", Monnam(mtmp));
             }
@@ -809,7 +815,7 @@ minliquid_core(struct monst* mtmp)
                       Monnam(mtmp), hliquid("water"));
             }
             if (g.context.mon_moving)
-                mondead(mtmp);
+                mondied(mtmp); /* ok to leave corpse despite water */
             else
                 xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp)) {

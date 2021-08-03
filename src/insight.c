@@ -183,7 +183,8 @@ trap_predicament(char *outbuf, int final, boolean wizxtra)
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
 static boolean
-cause_known(int propindx) /* index of a property which can be conveyed by worn item */
+cause_known(
+    int propindx) /* index of a property which can be conveyed by worn item */
 {
     register struct obj *o;
     long mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
@@ -1207,7 +1208,7 @@ weapon_insight(int final)
                     Strcpy(pfx, "Your two weapon skill ");
                     Sprintf(sfx, " %slimited by ", also2);
                     if (sklvl2 > P_ISRESTRICTED)
-                        Sprintf(eos(sfx), "being %s with", sklvlbuf2);
+                        Sprintf(eos(sfx), "being %s", sklvlbuf2);
                     else
                         Strcat(eos(sfx), "having no skill");
                     Sprintf(eos(sfx), " with %s", sknambuf2);
@@ -1379,21 +1380,35 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         you_are("warned of undead", from_what(WARN_UNDEAD));
     if (Searching)
         you_have("automatic searching", from_what(SEARCHING));
-    if (Clairvoyant)
+    if (Clairvoyant) {
         you_are("clairvoyant", from_what(CLAIRVOYANT));
-    else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
+    } else if ((HClairvoyant || EClairvoyant) && BClairvoyant) {
         Strcpy(buf, from_what(-CLAIRVOYANT));
-        if (!strncmp(buf, " because of ", 12))
-            /* overwrite substring */
-            memcpy(buf, " if not for ", 12);
+        (void) strsubst(buf, " because of ", " if not for ");
         enl_msg(You_, "could be", "could have been", " clairvoyant", buf);
     }
     if (Infravision)
         you_have("infravision", from_what(INFRAVISION));
-    if (Detect_monsters)
-        you_are("sensing the presence of monsters", "");
-    if (u.umconf)
-        you_are("going to confuse monsters", "");
+    if (Detect_monsters) {
+        Strcpy(buf, "sensing the presence of monsters");
+        if (wizard) {
+            long detectmon_timeout = (HDetect_monsters & TIMEOUT);
+
+            if (detectmon_timeout)
+                Sprintf(eos(buf), " (%ld)", detectmon_timeout);
+        }
+        you_are(buf, "");
+    }
+    if (u.umconf) { /* 'u.umconf' is a counter rather than a timeout */
+        Strcpy(buf, " monsters when hitting them");
+        if (wizard && !final) {
+            if (u.umconf == 1)
+                Strcat(buf, " (next hit only)");
+            else /* u.umconf > 1 */
+                Sprintf(eos(buf), " (next %u hits)", u.umconf);
+        }
+        enl_msg(You_, "will confuse", "would have confused", buf, "");
+    }
 
     /*** Appearance and behavior ***/
     if (Adornment) {

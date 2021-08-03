@@ -197,10 +197,15 @@
 #define emits_light(ptr)                                          \
     (((ptr)->mlet == S_LIGHT || (ptr) == &mons[PM_FLAMING_SPHERE] \
       || (ptr) == &mons[PM_SHOCKING_SPHERE]                       \
+      || (ptr) == &mons[PM_BABY_GOLD_DRAGON]                      \
       || (ptr) == &mons[PM_FIRE_VORTEX])                          \
          ? 1                                                      \
-         : ((ptr) == &mons[PM_FIRE_ELEMENTAL]) ? 1 : 0)
-/*	[note: the light ranges above were reduced to 1 for performance...] */
+         : ((ptr) == &mons[PM_FIRE_ELEMENTAL]                     \
+            || (ptr) == &mons[PM_GOLD_DRAGON]) ? 1 : 0)
+    /* [Note: the light ranges above were reduced to 1 for performance,
+     *  otherwise screen updating on the plane of fire slowed to a crawl.
+     *  Note too: that was with 1990s hardware and before fumarole smoke
+     *  blocking line of sight was added, so might no longer be necessary.] */
 #define likes_lava(ptr) \
     (ptr == &mons[PM_FIRE_ELEMENTAL] || ptr == &mons[PM_SALAMANDER])
 #define pm_invisible(ptr) \

@@ -12,6 +12,8 @@
 #define WIZMODECMD   0x04 /* wizard-mode command */
 #define GENERALCMD   0x08 /* general command, does not take game time */
 #define CMD_NOT_AVAILABLE 0x10 /* recognized but non-functional (!SHELL,&c) */
+#define NOFUZZERCMD  0x20 /* fuzzer cannot execute this command */
+#define INTERNALCMD  0x40 /* only for internal use, not for user */
 
 struct ext_func_tab {
     uchar key;
