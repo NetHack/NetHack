@@ -769,6 +769,7 @@ using bhitpos in flooreffects to handle erosion damage broke its original use
 	zap hit spot, resulting in scrambled wand targetting
 restore previous behavior of the 'altmeta' option (only wait for a second
 	character when getting a command keystroke, not other key input)
+baby gold dragons weren't able to grow into adult gold dragons
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
