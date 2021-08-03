@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.610 $ $NHDT-Date: 1627505147 2021/07/28 20:45:47 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.614 $ $NHDT-Date: 1627951222 2021/08/03 00:40:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -580,6 +580,8 @@ monster wearing an alchemy smock was only getting poison resistance from it,
 	not acid resistance; give both properties, just like for hero
 in wizard mode, knowing teleport away spell resulted in ^T always attempting
 	the spell instead of teleporting on demand
+describe a couple of isolated moat spots on Samurai quest home level as water
+	rather than as moat
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

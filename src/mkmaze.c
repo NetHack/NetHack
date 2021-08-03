@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1596498182 2020/08/03 23:43:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1627951223 2021/08/03 00:40:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1616,7 +1616,10 @@ waterbody_name(xchar x, xchar y)
         ; /* fall through to default return value */
     else if (Is_juiblex_level(&u.uz))
         return "swamp";
-    else if (ltyp == MOAT && !Is_medusa_level(&u.uz))
+    else if (ltyp == MOAT && !Is_medusa_level(&u.uz)
+             /* samurai has two moat spots on quest home level that seem
+                silly if described as such (maybe change them to pools?) */
+             && !(Role_if(PM_SAMURAI) && Is_qstart(&u.uz)))
         return "moat";
 
     return hliquid("water");
