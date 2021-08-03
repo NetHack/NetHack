@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1617035736 2021/03/29 16:35:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1627951429 2021/08/03 00:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.291 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2969,7 +2969,8 @@ crawl_destination(int x, int y)
         return FALSE;
     /* finally, are we trying to squeeze through a too-narrow gap? */
     return !(bad_rock(g.youmonst.data, u.ux, y)
-             && bad_rock(g.youmonst.data, x, u.uy));
+             && bad_rock(g.youmonst.data, x, u.uy)
+             && cant_squeeze_thru(&g.youmonst));
 }
 
 /* something like lookaround, but we are not running */

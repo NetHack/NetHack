@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1615759958 2021/03/14 22:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.403 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1627951430 2021/08/03 00:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.416 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4229,6 +4229,7 @@ drown(void)
     if (g.multi < 0 || (Upolyd && !g.youmonst.data->mmove))
         goto crawl;
     /* look around for a place to crawl to */
+#if 0
     for (i = 0; i < 100; i++) {
         x = rn1(3, u.ux - 1);
         y = rn1(3, u.uy - 1);
@@ -4244,6 +4245,31 @@ drown(void)
                 crawl_ok = TRUE;
                 goto crawl;
             }
+#else
+    {
+        int j, k, dirs[N_DIRS];
+
+        /* instead of picking a random direction up to 100 times, try each
+           of the eight directions at most once after shuffling their order */
+        for (i = 0; i < N_DIRS; ++i)
+            dirs[i] = i;
+        for (i = N_DIRS; i > 0; --i) {
+            j = rn2(i);
+            k = dirs[j];
+            dirs[j] = dirs[i - 1];
+            dirs[i - 1] = k;
+        }
+        for (i = 0; i < N_DIRS; ++i) {
+            x = u.ux + xdir[dirs[i]];
+            y = u.uy + ydir[dirs[i]];
+            /* note: crawl_dest calls goodpos() which performs isok() check */
+            if (crawl_destination(x, y)) {
+                crawl_ok = TRUE;
+                break;
+            }
+        }
+    }
+#endif
  crawl:
     if (crawl_ok) {
         boolean lost = FALSE;

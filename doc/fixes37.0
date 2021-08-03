@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.614 $ $NHDT-Date: 1627951222 2021/08/03 00:40:22 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.615 $ $NHDT-Date: 1627951429 2021/08/03 00:43:49 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -582,6 +582,8 @@ in wizard mode, knowing teleport away spell resulted in ^T always attempting
 	the spell instead of teleporting on demand
 describe a couple of isolated moat spots on Samurai quest home level as water
 	rather than as moat
+crawling out of water to avoid drowning didn't work as intended when trying
+	to move diagonally through a tight squeeze
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
