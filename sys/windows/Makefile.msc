@@ -369,12 +369,6 @@ COMCTRL = comctl32.lib
 
 KEYDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
 
-TILEUTIL16  = $(UTIL)\tile2bmp.exe
-TILEBMP16   = $(SRC)\tiles.bmp
-
-TILEUTIL32  = $(UTIL)\til2bm32.exe
-TILEBMP32   = $(SRC)\tiles32.bmp
-
 SOUND = $(OBJ)\ntsound.o
 
 VVOBJ  = $(O)version.o
@@ -1053,7 +1047,7 @@ $(O)sp_lev.tag:
 	echo sp_levs done > $(O)sp_lev.tag
 
 $(O)utility.tag: $(INCL)\nhlua.h $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(TILEUTIL16)
+		$(U)tile2bmp.exe
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1068,10 +1062,11 @@ $(INCL)\nhlua.h:
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-$(O)NetHackW.res: $(TILEBMP16) $(MSWIN)\NetHackW.rc $(MSWIN)\mnsel.bmp \
+$(O)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc \
+	$(MSWIN)\mnsel.bmp \
 	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
-	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico $(MSWIN)\rip.bmp \
-	$(MSWIN)\splash.bmp
+	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico \
+	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp
 	@$(rc) -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
 
 $(O)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
@@ -1376,14 +1371,9 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 		)
 <<
 
-$(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
+$(SRC)\tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
 	@echo Creating 16x16 binary tile files (this may take some time)
-	@$(U)tile2bmp $(TILEBMP16)
-
-#$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
-#	@echo Creating 32x32 binary tile files (this may take some time)
-#	@$(U)til2bm32 $(TILEBMP32)
-
+	@$(U)tile2bmp $@
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
     	@echo Linking $(@:\=/)
@@ -1404,8 +1394,8 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /Fo$@ $(WSHR)\tile2bmp.c
 
-$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
+#$(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(MSWSYS)\win32api.h
+#	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -I$(WSHR) /DPACKED_FILE /DTILE_X=32 /DTILE_Y=32 /Fo$@ $(WSHR)\tile2bmp.c
 
 $(U)tile2x11.exe: $(O)tile2x11.o $(O)tiletext.o $(O)tiletxt.o $(O)alloc.o \
 		$(O)panic.o $(O)monst.o $(O)objects.o
@@ -1695,7 +1685,6 @@ clean:
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
 	if exist $(O)install.tag   del $(O)install.tag
-	if exist $(O)console.res  del $(O)console.res
 	if exist $(O)dlb.MAP      del $(O)dlb.MAP
 	if exist $(O)dlb.PDB      del $(O)dlb.PDB
 	if exist $(O)gamedir.tag  del $(O)gamedir.tag
@@ -1722,8 +1711,10 @@ clean:
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
-	if exist $(TILEBMP16)        del $(TILEBMP16)
-	if exist $(TILEBMP32)        del $(TILEBMP32)
+	if exist $(SRC)\tiles.bmp del $(SRC)\tiles.bmp
+	if exist $(O)console.res  del $(O)console.res
+	if exist $(O)NetHack.res  del $(O)NetHack.res
+	if exist $(O)NetHackW.res del $(O)NetHackW.res
 
 #===================================================================
 # OTHER DEPENDENCIES
