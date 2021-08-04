@@ -584,6 +584,10 @@ describe a couple of isolated moat spots on Samurai quest home level as water
 	rather than as moat
 crawling out of water to avoid drowning didn't work as intended when trying
 	to move diagonally through a tight squeeze
+in wizard mode, polymorphing into hero's role monster in order to revert to
+	normal form would complain about missing light source if hero was
+	changing back from the form of a light-emitting monster [didn't affect
+	normal play because role monsters are invalid polymorph targets there]
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
