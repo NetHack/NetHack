@@ -733,6 +733,7 @@ give genetic engineers teleport capability (as they had in slash'em); 'port
 if an invisible hero managed to convert an unaligned altar to an aligned one
 	with color enabled, altar wasn't immediately redrawn with new color
 repair some regressions to (a)pply introduced by "getobj refactor" patch
+getobj too: allow attempting to (E)ngrave with any item in inventory
 fix ^X feedback when held typo: "unseen createure" -> "unseen creature"
 if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
 	eaten at revival time and monster <foo> is defined as providing more
