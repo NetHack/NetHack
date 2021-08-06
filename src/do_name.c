@@ -2427,6 +2427,8 @@ lookup_novel(const char *lookname, int *idx)
         lookname = "Sourcery"; /* [4] */
     else if (!strcmpi(lookname, "Masquerade"))
         lookname = "Maskerade"; /* [17] */
+    else if (!strcmpi(The(lookname), "The Amazing Maurice"))
+        lookname = "The Amazing Maurice and His Educated Rodents"; /* [27] */
     else if (!strcmpi(lookname, "Thud"))
         lookname = "Thud!"; /* [33] */
 
