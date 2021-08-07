@@ -48,7 +48,7 @@ struct window_procs curses_procs = {
 #endif
      | WC2_FLUSH_STATUS | WC2_TERM_SIZE
      | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
-     | WC2_SUPPRESS_HIST | WC2_MENU_SHIFT),
+     | WC2_SUPPRESS_HIST | WC2_MENU_SHIFT | WC2_PERM_NEARBY),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,
     curses_player_selection,
@@ -71,6 +71,7 @@ struct window_procs curses_procs = {
     curses_select_menu,
     genl_message_menu,
     curses_update_inventory,
+    curses_update_nearby,
     curses_mark_synch,
     curses_wait_synch,
 #ifdef CLIPPING
@@ -322,6 +323,7 @@ curses_exit_nhwindows(const char *str)
     curses_destroy_nhwindow(MAP_WIN);
     curses_destroy_nhwindow(STATUS_WIN);
     curses_destroy_nhwindow(MESSAGE_WIN);
+    curses_destroy_nhwindow(NEARBY_WIN);
     curs_destroy_all_wins();
 
     curses_uncurse_terminal();
@@ -438,6 +440,9 @@ curses_destroy_nhwindow(winid wid)
     case INV_WIN:
         curs_purge_perminv_data(TRUE);
         iflags.perm_invent = 0; /* avoid unexpected update_inventory() */
+        break;
+    case NEARBY_WIN:
+        iflags.perm_nearby = 0; /* discard window */
         break;
     case MAP_WIN:
         break;
@@ -659,6 +664,36 @@ curses_update_inventory(int arg)
     } else {
         /* perform scrolling operations on persistent inventory window */
         curs_update_invt(arg);
+    }
+}
+
+void
+curses_update_nearby(int arg)
+{
+    /* Don't do anything if perm_invent is off unless it was on and
+       player just changed the option. */
+    if (!iflags.perm_nearby) {
+        if (curses_get_nhwin(NEARBY_WIN)) {
+            curs_reset_windows(TRUE, FALSE);
+        }
+        return;
+    }
+
+    /* skip nearby character updating during character initialization */
+    if (!g.program_state.in_moveloop && !g.program_state.gameover)
+        return;
+
+    if (!arg) {
+        /* Update nearby character sidebar.  NetHack uses normal menu functions
+           when gathering the inventory, and we don't want to change the
+           underlying code.  So instead, track if an inventory update is
+           being performed with a static variable. */
+        inv_update = 1;
+        curs_update_nearby(0);
+        inv_update = 0;
+    } else {
+        /* perform scrolling operations on persistent inventory window */
+        curs_update_nearby(arg);
     }
 }
 

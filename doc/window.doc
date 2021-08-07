@@ -63,6 +63,7 @@ a few fixed window names that are known throughout the code:
 	WIN_MESSAGE	(top line)
 	WIN_MAP		(main dungeon)
 	WIN_INVEN	(inventory)
+	WIN_NEARBY  (nearby characters)
 
 Other windows are created and destroyed as needed.
 
@@ -662,8 +663,8 @@ the window interface to the rest of NetHack.
 
 char toplines[BUFSZ]	Contains the last message printed to the WIN_MESSAGE
 			window, used by Norep().
-winid WIN_MESSAGE, WIN_MAP, WIN_INVEN
-			The three standard windows.
+winid WIN_MESSAGE, WIN_MAP, WIN_INVEN, WIN_NEARBY
+			The four standard windows.
 			There is also a window called WIN_STATUS that is used
 			only for backward compatibility in the genl_status_*
 			set of generic status display functions.
@@ -817,6 +818,7 @@ to support:
   |  hitpointbar       | WC2_HITPOINTBAR    | wc2_hitpointbar    |boolean |
   |  menu_shift_left   | WC2_MENU_SHIFT     |  n/a               |char    |
   |  menu_shift_right  | WC2_MENU_SHIFT     |  n/a               |char    |
+  |  perm_nearby       | WC2_PERM_NEARBY    | wc2_perm_nearby    |boolean |
   |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |

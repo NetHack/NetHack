@@ -505,6 +505,7 @@ win/curses:
 Bugs.txt    Readme.txt  Todo.txt    cursdial.c  cursdial.h  cursinit.c
 cursinit.h  cursinvt.c  cursinvt.h  cursmain.c  cursmesg.c  cursmesg.h
 cursmisc.c  cursmisc.h  cursstat.c  cursstat.h  curswins.c  curswins.h
+cursnearby.c cursnearby.h
 
 win/macosx:
 (files for macosx versions)

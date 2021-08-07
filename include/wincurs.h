@@ -33,7 +33,8 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #define STATUS_WIN  2
 #define MAP_WIN     3
 #define INV_WIN     4
-#define NHWIN_MAX   5
+#define NEARBY_WIN  5
+#define NHWIN_MAX   6
 #define MESG_HISTORY_MAX   200
 #if !defined(__APPLE__) || !defined(NCURSES_VERSION)
 # define USE_DARKGRAY /* Allow "bright" black; delete if not visible */
@@ -90,6 +91,7 @@ extern void curses_add_menu(winid wid, const glyph_info *,
 extern void curses_end_menu(winid wid, const char *prompt);
 extern int curses_select_menu(winid wid, int how, MENU_ITEM_P **selected);
 extern void curses_update_inventory(int);
+extern void curses_update_nearby(int);
 extern void curses_mark_synch(void);
 extern void curses_wait_synch(void);
 extern void curses_cliparound(int x, int y);
@@ -200,6 +202,9 @@ extern void curses_status_update(int, genericptr_t, int, int, int,
 extern void curs_purge_perminv_data(boolean);
 extern void curs_update_invt(int);
 extern void curs_add_invt(int, char, attr_t, const char *);
+
+/* cursnearby.c */
+extern void curs_update_nearby(int);
 
 /* cursinit.c */
 

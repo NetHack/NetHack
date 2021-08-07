@@ -149,7 +149,7 @@ extern NhWindow *theWindows;
 extern struct window_procs mac_procs;
 
 #define NHW_BASE 0
-extern winid BASE_WINDOW, WIN_MAP, WIN_MESSAGE, WIN_INVEN, WIN_STATUS;
+extern winid BASE_WINDOW, WIN_MAP, WIN_MESSAGE, WIN_INVEN, WIN_NEARBY, WIN_STATUS;
 
 /*
  * External declarations for the window routines.

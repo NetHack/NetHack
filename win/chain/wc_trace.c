@@ -512,6 +512,18 @@ trace_update_inventory(void *vp, int arg)
 }
 
 void
+trace_update_nearby(void *vp, int arg)
+{
+    struct trace_data *tdp = vp;
+
+    fprintf(wc_tracelogf, "%supdate_nearby(%d)\n", INDENT, arg);
+
+    PRE;
+    (*tdp->nprocs->win_update_nearby)(tdp->ndata, arg);
+    POST;
+}
+
+void
 trace_mark_synch(vp)
 void *vp;
 {
@@ -1142,6 +1154,7 @@ struct chain_procs trace_procs = {
     trace_destroy_nhwindow, trace_curs, trace_putstr, trace_putmixed,
     trace_display_file, trace_start_menu, trace_add_menu, trace_end_menu,
     trace_select_menu, trace_message_menu, trace_update_inventory,
+    trace_update_nearby,
     trace_mark_synch, trace_wait_synch,
 #ifdef CLIPPING
     trace_cliparound,

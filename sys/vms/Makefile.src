@@ -80,9 +80,9 @@ WINTTYOBJ = getline.obj,termcap.obj,topl.obj,wintty.obj $(TERMCAPOBJ)
 # [native curses is incompatible with ncurses and PDcurses; it won't work]
 WINCURSESSRC = $(CURSES)cursdial.c $(CURSES)cursmesg.c $(CURSES)cursinit.c \
 	$(CURSES)cursmisc.c $(CURSES)cursinvt.c $(CURSES)cursstat.c \
-	$(CURSES)cursmain.c $(CURSES)curswins.c
+	$(CURSES)cursmain.c $(CURSES)curswins.c $(CURSES)cursnearby.c
 WINCURSESOBJ = cursdial.obj,cursmesg.obj,cursinit.obj,cursmisc.obj, \
-	cursinvt.obj,cursstat.obj,cursmain.obj,curswins.obj
+	cursinvt.obj,cursstat.obj,cursmain.obj,curswins.obj,cursnearby.obj
 #
 # an X11 port (not supported under DECwindows)
 WINX11SRC = $(X11)Window.c $(X11)dialogs.c $(X11)winX.c $(X11)winmap.c \
@@ -440,6 +440,8 @@ cursmesg.obj : 	$(CURSES)cursmesg.c $(HACK_H) $(INC)wincurs.h \
 		$(CURSES)cursmesg.h
 cursinvt.obj : 	$(CURSES)cursinvt.c $(HACK_H) $(INC)wincurs.h \
 		$(CURSES)cursinvt.h
+cursnearby.obj : 	$(CURSES)cursnearby.c $(HACK_H) $(INC)wincurs.h \
+		$(CURSES)cursnearby.h
 Window.obj :	$(X11)Window.c $(INC)xwindowp.h $(INC)xwindow.h $(CONFIG_H)
 dialogs.obj :	$(X11)dialogs.c $(CONFIG_H)
 winX.obj :	$(X11)winX.c $(HACK_H) $(INC)winX.h $(INC)dlb.h \

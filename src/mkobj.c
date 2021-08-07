@@ -1794,6 +1794,9 @@ place_object(struct obj* otmp, int x, int y)
     fobj = otmp;
     if (otmp->timed)
         obj_timer_checks(otmp, x, y, 0);
+    
+    /* Update narby list */
+    update_nearby();
 }
 
 #define ROT_ICE_ADJUSTMENT 2 /* rotting on ice takes 2 times as long */
@@ -1927,6 +1930,8 @@ remove_object(struct obj* otmp)
         unblock_point(x, y); /* vision */
     if (otmp->timed)
         obj_timer_checks(otmp, x, y, 0);
+    /* Update nearby list */
+    update_nearby();
 }
 
 /* throw away all of a monster's inventory */

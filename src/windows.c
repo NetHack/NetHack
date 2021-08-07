@@ -552,6 +552,7 @@ static struct window_procs hup_procs = {
     hup_display_file, hup_void_fdecl_winid_ulong,      /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
     hup_void_fdecl_int,                                /* update_inventory */
+    hup_void_fdecl_int,                                /* update_nearby */
     hup_void_ndecl,                                    /* mark_synch */
     hup_void_ndecl,                                    /* wait_synch */
 #ifdef CLIPPING

@@ -337,7 +337,8 @@ MDLIB = $(O)mdlib.o
 CURSESOBJ=
 !ELSE
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
-	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
+	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o \
+	   $(O)cursnearby.o
 !ENDIF
 
 SOBJ   = $(O)windmain.o $(O)windsys.o $(O)win10.o \
@@ -685,8 +686,8 @@ scall  =
 # 4310 a constant value is cast to a smaller type
 # 4706 assignment within conditional
 # 4774 format string is not a string literal (default is off at W4)
-# 4777 format string requires an argument of type ‘type’,
-#      but variadic argument ‘position’ has type ‘type’
+# 4777 format string requires an argument of type ï¿½typeï¿½,
+#      but variadic argument ï¿½positionï¿½ has type ï¿½typeï¿½
 # 4820 padding in struct
 cflags = $(cflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44774 -w44777 -wd4820
 !ENDIF
@@ -1514,6 +1515,7 @@ $(O)ttystub.o: $(WINDHDR) $(HACK_H) $(MSWSYS)\stubs.c
 $(O)cursdial.o: $(WCURSES)\cursdial.c $(WCURSES)\cursdial.h $(INCL)\wincurs.h
 $(O)cursinit.o: $(WCURSES)\cursinit.c $(WCURSES)\cursinit.h $(INCL)\wincurs.h
 $(O)cursinvt.o: $(WCURSES)\cursinvt.c $(WCURSES)\cursinvt.h $(INCL)\wincurs.h
+$(O)cursnearby.o: $(WCURSES)\cursnearby.c $(WCURSES)\cursnearby.h $(INCL)\wincurs.h
 $(O)cursmain.o: $(WCURSES)\cursmain.c $(INCL)\wincurs.h
 $(O)cursmesg.o: $(WCURSES)\cursmesg.c $(WCURSES)\cursmesg.h $(INCL)\wincurs.h
 $(O)cursmisc.o: $(WCURSES)\cursmisc.c $(WCURSES)\cursmisc.h $(INCL)\wincurs.h
@@ -1793,6 +1795,9 @@ $(O)cursmesg.o: ..\win\curses\cursmesg.c $(HACK_H) $(INCL)\wincurs.h \
 $(O)cursinvt.o: ..\win\curses\cursinvt.c $(HACK_H) $(INCL)\wincurs.h \
 		..\win\curses\cursinvt.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\curses\cursinvt.c
+$(O)cursnearby.o: ..\win\curses\cursnearby.c $(HACK_H) $(INCL)\wincurs.h \
+		..\win\curses\cursnearby.h
+#	@$(cc) $(cflagsBuild) -Fo$@  ..\win\curses\cursnearby.c
 #$(O)Window.o: $(X11)\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 #		$(CONFIG_H) $(INCL)\lint.h
 #	@$(cc) $(cflagsBuild) $(X11CFLAGS) -Fo$@  $(X11)\Window.c

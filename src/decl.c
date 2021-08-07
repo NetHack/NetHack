@@ -112,7 +112,7 @@ const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
 char emptystr[] = {0};       /* non-const */
 
 /* Global windowing data, defined here for multi-window-system support */
-NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
+NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN, WIN_NEARBY;
 #ifdef WIN32
 boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
                                             FALSE, FALSE, FALSE,
@@ -756,7 +756,7 @@ decl_globals_init(void)
     uarmh = uarms = uarmg = uarmf = uamul = uright = uleft = NULL;
     ublindf = uchain = uball = NULL;
 
-    WIN_MESSAGE =  WIN_STATUS =  WIN_MAP = WIN_INVEN = WIN_ERR;
+    WIN_MESSAGE =  WIN_STATUS =  WIN_MAP = WIN_INVEN = WIN_NEARBY = WIN_ERR;
 
     g.urole = urole_init_data;
     g.urace = urace_init_data;

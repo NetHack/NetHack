@@ -1036,7 +1036,9 @@ extern int count_unidentified(struct obj *);
 extern void identify_pack(int, boolean);
 extern void learn_unseen_invent(void);
 extern void update_inventory(void);
+extern void update_nearby(void);
 extern int doperminv(void);
+extern int dopermnearby(void);
 extern void prinv(const char *, struct obj *, long);
 extern char *xprname(struct obj *, const char *, char, boolean, long, long);
 extern int ddoinv(void);
@@ -1864,6 +1866,8 @@ extern void msgtype_free(void);
 /* ### pager.c ### */
 
 extern char *self_lookat(char *);
+extern void look_at_object(char *, int, int, int);
+extern void look_at_monster(char *, char *, struct monst *, int, int);
 extern char *monhealthdescr(struct monst *mon, boolean, char *);
 extern void mhidden_description(struct monst *, boolean, char *);
 extern boolean object_from_map(int,int,int,struct obj **);

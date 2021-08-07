@@ -55,6 +55,7 @@ OPTIONS=!autopickup
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
 #OPTIONS=perm_invent
+#OPTIONS=perm_nearby
 
 
 # Highlight menu lines with different colors. You need to define the colors

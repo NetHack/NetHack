@@ -240,6 +240,12 @@ chainin_update_inventory(int arg)
 }
 
 void
+chainin_update_nearby(int arg)
+{
+    (*cibase->nprocs->win_update_nearby)(cibase->ndata, arg);
+}
+
+void
 chainin_mark_synch()
 {
     (*cibase->nprocs->win_mark_synch)(cibase->ndata);
@@ -529,6 +535,7 @@ struct window_procs chainin_procs = {
     chainin_putstr, chainin_putmixed, chainin_display_file,
     chainin_start_menu, chainin_add_menu, chainin_end_menu,
     chainin_select_menu, chainin_message_menu, chainin_update_inventory,
+    chainin_update_nearby,
     chainin_mark_synch, chainin_wait_synch,
 #ifdef CLIPPING
     chainin_cliparound,

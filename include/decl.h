@@ -331,7 +331,7 @@ E char emptystr[];
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;
 E NEARDATA winid WIN_STATUS;
-E NEARDATA winid WIN_MAP, WIN_INVEN;
+E NEARDATA winid WIN_MAP, WIN_INVEN, WIN_NEARBY;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)

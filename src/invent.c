@@ -2348,6 +2348,15 @@ update_inventory(void)
     (*windowprocs.win_update_inventory)(0);
 }
 
+void
+update_nearby(void)
+{
+    if (g.program_state.saving || g.program_state.restoring)
+        return;
+
+    (*windowprocs.win_update_nearby)(0);
+}
+
 /* '|' command - call interface's persistent inventory manipulation routine */
 int
 doperminv(void)
@@ -2392,6 +2401,22 @@ doperminv(void)
 
     } /* iflags.perm_invent */
 
+    return 0;
+}
+
+/* ']' command - call interface's persistent nearby characters toggle routine */
+int
+dopermnearby(void)
+{
+    /* If permanent nearby items list is enabled, then interact with it. */
+    if ((windowprocs.wincap2 & WC2_PERM_NEARBY) == 0) {
+        pline("Persistent nearby characters display is not supported by '%s'.",
+              windowprocs.name);
+    } else if (!iflags.perm_nearby) {
+        pline("Persistent nearby characters ('perm_nearby' option) is not presently enabled.");
+    } else {
+        (*windowprocs.win_update_nearby)(1);
+    }
     return 0;
 }
 

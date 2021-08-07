@@ -1377,6 +1377,11 @@ You'll be prompted for menu scrolling keystrokes such
 as \(oq\f(CR>\fP\(cq and \(oq\f(CR<\fP\(cq.
 Press \f(CRReturn\fP or \f(CREscape\fP to resume normal play.
 Default key is \(oq|\(cq.
+.lp "#permnearby "
+If persistent nearby characters display is supported and enabled (with the
+.op perm_invent
+option), toggle whether it is displaying nearby monsters or items.
+Default key is \(oq]\(cq.
 .lp "#pickup  "
 Pick up things at the current location.
 Default key is \(oq,\(cq.

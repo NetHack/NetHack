@@ -220,6 +220,9 @@
 # Always show the inventory window? X11 and Windows GUI only.
 #OPTIONS=perm_invent
 
+# Always show a list of nearby characters? Curses GUI only.
+#OPTIONS=perm_nearby
+
 # Specify the type of your initial pet, if you are playing a character class
 # that uses multiple types of pets; or choose to have no initial pet at all.
 # Possible values are "cat", "dog", "horse", and "none".

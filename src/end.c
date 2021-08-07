@@ -1088,6 +1088,12 @@ done_object_cleanup(void)
         iflags.perm_invent = FALSE;
         update_inventory(); /* make interface notice the change */
     }
+    /* destroy the nearby monsters window, since it's no longer
+       needed - Kes */
+    if (iflags.perm_nearby) {
+        iflags.perm_nearby = FALSE;
+        update_nearby();
+    }
     return;
 }
 
@@ -1268,6 +1274,7 @@ really_done(int how)
         done_object_cleanup();
     /* in case we're panicking; normally cleared by done_object_cleanup() */
     iflags.perm_invent = FALSE;
+    iflags.perm_nearby = FALSE;
 
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
@@ -1480,7 +1487,11 @@ really_done(int how)
         if (WIN_INVEN != WIN_ERR) {
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
             /* precaution in case any late update_inventory() calls occur */
-            iflags.perm_invent = 0;
+            iflags.perm_invent = FALSE;
+        }
+        if (WIN_NEARBY != WIN_ERR) {
+            destroy_nhwindow(WIN_NEARBY),  WIN_NEARBY = WIN_ERR;
+            iflags.perm_nearby = FALSE;
         }
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;

@@ -193,12 +193,16 @@ curses_create_main_windows(void)
         int inv_y = 0;
         int map_x = 0;
         int map_y = 0;
+        int nearby_x = 0;
+        int nearby_y = 0;
         int message_height = 0;
         int message_width = 0;
         int status_height = 0;
         int status_width = 0;
         int inv_height = 0;
         int inv_width = 0;
+        int nearby_width = 0;
+        int nearby_height = 0;
         int map_height = (term_rows - border_space);
         int map_width = (term_cols - border_space);
         int statusheight = (iflags.wc2_statuslines < 3) ? 2 : 3;
@@ -251,6 +255,19 @@ curses_create_main_windows(void)
                                 &map_x, &map_y, &map_width, &map_height,
                                 border_space, -1, -25);
 
+        if (iflags.perm_nearby) {
+            /* Take up all width unless mgbar is also vertical. */
+            int width = msg_vertical ? 25 : -25;
+
+            set_window_position(&nearby_x, &nearby_y, &nearby_width, &nearby_height,
+                                ALIGN_RIGHT, &map_x, &map_y,
+                                &map_width, &map_height,
+                                border_space, -1, width);
+            /* suppress borders on perm_invent window, part I */
+            if (noperminv_borders)
+                nearby_width += border_space, nearby_height += border_space; /*+=2*/
+        }
+
         if (map_width > COLNO)
             map_width = COLNO;
         if (map_height > ROWNO)
@@ -264,6 +281,7 @@ curses_create_main_windows(void)
             curses_del_nhwin(MESSAGE_WIN);
             curses_del_nhwin(MAP_WIN);
             curses_del_nhwin(INV_WIN);
+            curses_del_nhwin(NEARBY_WIN);
             clear();
         }
 
@@ -282,6 +300,12 @@ curses_create_main_windows(void)
         curses_add_nhwin(MAP_WIN, map_height, map_width,
                          map_y, map_x, 0, borders);
 
+        if (iflags.perm_nearby)
+            curses_add_nhwin(NEARBY_WIN, nearby_height, nearby_width, nearby_y, nearby_x,
+                             ALIGN_LEFT,
+                             /* suppress perm_invent borders, part II */
+                             borders && !noperminv_borders);
+
         refresh();
 
         curses_refresh_nethack_windows();
@@ -290,6 +314,8 @@ curses_create_main_windows(void)
             curses_update_stats();
             if (iflags.perm_invent)
                 curses_update_inventory();
+            if (iflags.perm_nearby)
+                curses_update_nearby();
         } else {
             iflags.window_inited = TRUE;
         }

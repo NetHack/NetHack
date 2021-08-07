@@ -1420,6 +1420,8 @@ docrt(void)
 
     /* perm_invent */
     update_inventory();
+    /* perm_nearby */
+    update_nearby();
 
     g.context.botlx = 1; /* force a redraw of the bottom line */
 }

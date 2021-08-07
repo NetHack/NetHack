@@ -5053,6 +5053,8 @@ handler_menu_colors(void)
         if (iflags.use_menu_color) {
             if (iflags.perm_invent)
                 update_inventory();
+            if (iflags.perm_nearby)
+                update_nearby();
 
         /* menu colors aren't being used yet; if any MENUCOLOR rules are
            defined, remind player how to activate them */

@@ -357,6 +357,8 @@ opt_##a,
                 "prayconfirm", "extra prompting in certain situations")
     NHOPTB(perm_invent, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.perm_invent)
+    NHOPTB(perm_nearby, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
+                &iflags.perm_nearby)
     NHOPTC(petattr, 88, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "attributes for highlighting pets")
     NHOPTC(pettype, 4, opt_in, set_gameview, Yes, Yes, No, No, "pet",

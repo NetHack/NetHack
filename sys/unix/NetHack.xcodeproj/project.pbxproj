@@ -126,6 +126,7 @@
 		31B8A40B21A23EEC0055BD01 /* cursmisc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40321A23EEB0055BD01 /* cursmisc.c */; };
 		31B8A40C21A23EEC0055BD01 /* cursdial.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40421A23EEB0055BD01 /* cursdial.c */; };
 		31B8A40D21A23EEC0055BD01 /* cursinvt.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40521A23EEB0055BD01 /* cursinvt.c */; };
+		31B8A40D21A23EEC0055BD01 /* cursnearby.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40521A23EEB0055BD01 /* cursnearby.c */; };
 		31B8A40E21A23EEC0055BD01 /* cursinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40621A23EEB0055BD01 /* cursinit.c */; };
 		31B8A40F21A23EEC0055BD01 /* cursmesg.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40721A23EEB0055BD01 /* cursmesg.c */; };
 		31B8A41021A23EEC0055BD01 /* cursmain.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A40821A23EEB0055BD01 /* cursmain.c */; };
@@ -305,6 +306,7 @@
 		3186A3D521A4B14B0052BF02 /* cursmesg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursmesg.h; path = ../../win/curses/cursmesg.h; sourceTree = "<group>"; };
 		3186A3D621A4B14B0052BF02 /* cursinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursinit.h; path = ../../win/curses/cursinit.h; sourceTree = "<group>"; };
 		3186A3D721A4B14B0052BF02 /* cursinvt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursinvt.h; path = ../../win/curses/cursinvt.h; sourceTree = "<group>"; };
+		3186A3D721A4B14B0052BF02 /* cursnearby.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursnearby.h; path = ../../win/curses/cursnearby.h; sourceTree = "<group>"; };
 		3186A3D821A4B14B0052BF02 /* cursmisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursmisc.h; path = ../../win/curses/cursmisc.h; sourceTree = "<group>"; };
 		3186A3D921A4B14B0052BF02 /* curswins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = curswins.h; path = ../../win/curses/curswins.h; sourceTree = "<group>"; };
 		3189577121A1FCC100FB2ABE /* NetHack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetHack; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -430,6 +432,7 @@
 		31B8A40321A23EEB0055BD01 /* cursmisc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursmisc.c; path = ../../win/curses/cursmisc.c; sourceTree = "<group>"; };
 		31B8A40421A23EEB0055BD01 /* cursdial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursdial.c; path = ../../win/curses/cursdial.c; sourceTree = "<group>"; };
 		31B8A40521A23EEB0055BD01 /* cursinvt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursinvt.c; path = ../../win/curses/cursinvt.c; sourceTree = "<group>"; };
+		31B8A40521A23EEB0055BD01 /* cursnearby.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursnearby.c; path = ../../win/curses/cursnearby.c; sourceTree = "<group>"; };
 		31B8A40621A23EEB0055BD01 /* cursinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursinit.c; path = ../../win/curses/cursinit.c; sourceTree = "<group>"; };
 		31B8A40721A23EEB0055BD01 /* cursmesg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursmesg.c; path = ../../win/curses/cursmesg.c; sourceTree = "<group>"; };
 		31B8A40821A23EEB0055BD01 /* cursmain.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cursmain.c; path = ../../win/curses/cursmain.c; sourceTree = "<group>"; };
@@ -780,6 +783,7 @@
 				3186A3D421A4B14B0052BF02 /* cursdial.h */,
 				3186A3D621A4B14B0052BF02 /* cursinit.h */,
 				3186A3D721A4B14B0052BF02 /* cursinvt.h */,
+				3186A3D721A4B14B0052BF02 /* cursnearby.h */,
 				3186A3D521A4B14B0052BF02 /* cursmesg.h */,
 				3186A3D821A4B14B0052BF02 /* cursmisc.h */,
 				3186A3D321A4B14B0052BF02 /* cursstat.h */,
@@ -787,6 +791,7 @@
 				31B8A40421A23EEB0055BD01 /* cursdial.c */,
 				31B8A40621A23EEB0055BD01 /* cursinit.c */,
 				31B8A40521A23EEB0055BD01 /* cursinvt.c */,
+				31B8A40521A23EEB0055BD01 /* cursnearby.c */,
 				31B8A40821A23EEB0055BD01 /* cursmain.c */,
 				31B8A40721A23EEB0055BD01 /* cursmesg.c */,
 				31B8A40321A23EEB0055BD01 /* cursmisc.c */,
@@ -1466,6 +1471,7 @@
 				31B8A39A21A238060055BD01 /* questpgr.c in Sources */,
 				31B8A3E621A238B30055BD01 /* dog.c in Sources */,
 				31B8A40D21A23EEC0055BD01 /* cursinvt.c in Sources */,
+				31B8A40D21A23EEC0055BD01 /* cursnearby.c in Sources */,
 				31B8A38721A238060055BD01 /* o_init.c in Sources */,
 				31B8A40E21A23EEC0055BD01 /* cursinit.c in Sources */,
 				31B8A3F521A23DD10055BD01 /* unixunix.c in Sources */,

@@ -147,5 +147,6 @@ PANICTRACE_LIBC=0
 # ~/.nethackrc run-time configuration file.
 #OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
 OPTIONS=perm_invent
+OPTIONS=perm_nearby
 
 #eof

@@ -1046,6 +1046,7 @@ void js_globals_init() {
     CREATE_GLOBAL(WIN_MAP, "i");
     CREATE_GLOBAL(WIN_MESSAGE, "i");
     CREATE_GLOBAL(WIN_INVEN, "i");
+    CREATE_GLOBAL(WIN_NEARBY, "i");
     CREATE_GLOBAL(WIN_STATUS, "i");
 }
 

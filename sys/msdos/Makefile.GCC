@@ -289,7 +289,8 @@ LUA_QTEXT_FILE = "quest.lua"
 
 ifeq "$(ADD_CURSES)" "Y"
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
-	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
+	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o \
+	   $(O)cursnearby.o
 else
 CURSESOBJ=
 endif

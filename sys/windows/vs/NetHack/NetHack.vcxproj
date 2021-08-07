@@ -178,6 +178,7 @@
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursdial.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursinit.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursinvt.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursnearby.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmain.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmesg.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(WinCursDir)cursmisc.c" />
@@ -244,6 +245,7 @@
     <ClInclude Include="$(WinCursDir)cursdial.h" />
     <ClInclude Include="$(WinCursDir)cursinit.h" />
     <ClInclude Include="$(WinCursDir)cursinvt.h" />
+    <ClInclude Include="$(WinCursDir)cursnearby.h" />
     <ClInclude Include="$(WinCursDir)cursmesg.h" />
     <ClInclude Include="$(WinCursDir)cursmisc.h" />
     <ClInclude Include="$(WinCursDir)cursstat.h" />

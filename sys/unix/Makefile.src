@@ -217,11 +217,13 @@ WINTTYOBJ = $(TARGETPFX)getline.o $(TARGETPFX)termcap.o $(TARGETPFX)topl.o \
 WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
 	../win/curses/cursmisc.c ../win/curses/cursdial.c \
 	../win/curses/cursstat.c ../win/curses/cursinit.c \
-	../win/curses/cursmesg.c ../win/curses/cursinvt.c
+	../win/curses/cursmesg.c ../win/curses/cursinvt.c \
+	../win/curses/cursnearby.c
 WINCURSESOBJ = $(TARGETPFX)cursmain.o $(TARGETPFX)curswins.o \
 	$(TARGETPFX)cursmisc.o $(TARGETPFX)cursdial.o \
 	$(TARGETPFX)cursstat.o $(TARGETPFX)cursinit.o \
-	$(TARGETPFX)cursmesg.o $(TARGETPFX)cursinvt.o
+	$(TARGETPFX)cursmesg.o $(TARGETPFX)cursinvt.o \
+	$(TARGETPFX)cursnearby.o
 #
 # files for an X11 port
 # (tile.c is a generated source file)
@@ -873,6 +875,9 @@ $(TARGETPFX)cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) \
 $(TARGETPFX)cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) \
 		../include/wincurs.h ../win/curses/cursinvt.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinvt.c
+$(TARGETPFX)cursnearby.o: ../win/curses/cursnearby.c $(HACK_H) \
+		../include/wincurs.h ../win/curses/cursnearby.h
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursnearby.c
 $(TARGETPFX)Window.o: ../win/X11/Window.c ../include/xwindowp.h \
 		../include/xwindow.h $(CONFIG_H) ../include/lint.h \
 		../include/winX.h ../include/color.h ../include/wintype.h

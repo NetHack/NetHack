@@ -12,8 +12,6 @@
 static boolean is_swallow_sym(int);
 static int append_str(char *, const char *);
 static void trap_description(char *, int, int, int);
-static void look_at_object(char *, int, int, int);
-static void look_at_monster(char *, char *, struct monst *, int, int);
 static struct permonst *lookat(int, int, char *, char *);
 static void checkfile(char *, struct permonst *, boolean, boolean,
                       char *);
@@ -289,7 +287,7 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
-static void
+void
 look_at_object(char *buf, /* output buffer */
                int x, int y, int glyph)
 {
@@ -323,7 +321,7 @@ look_at_object(char *buf, /* output buffer */
     return;
 }
 
-static void
+void
 look_at_monster(char *buf,
                 char *monbuf, /* buf: output, monbuf: optional output */
                 struct monst *mtmp,

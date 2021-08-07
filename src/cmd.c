@@ -1947,6 +1947,8 @@ struct ext_func_tab extcmdlist[] = {
               dopay, 0, NULL },
     { '|',    "perminv", "scroll persistent inventory display",
               doperminv, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
+    { ']',    "permnearby", "switch displaying nearby monsters and ojbects",
+              dopermnearby, IFBURIED | GENERALCMD | NOFUZZERCMD, NULL },
     { ',',    "pickup", "pick up things at the current location",
               dopickup, 0, NULL },
     { '\0',   "polyself", "polymorph self",

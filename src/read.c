@@ -1427,8 +1427,10 @@ seffect_create_monster(struct obj **sobjp)
                         + ((sblessed || rn2(73)) ? 0 : rnd(4)),
                         confused ? &mons[PM_ACID_BLOB]
                         : (struct permonst *) 0,
-                        FALSE))
+                        FALSE)) {
         g.known = TRUE;
+        update_nearby();
+    }
     /* no need to flush monsters; we ask for identification only if the
      * monsters are not visible
      */

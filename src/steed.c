@@ -783,6 +783,7 @@ place_monster(struct monst* mon, int x, int y)
     g.level.monsters[x][y] = mon;
     mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
                      | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
+    update_nearby();
 }
 
 /*steed.c*/

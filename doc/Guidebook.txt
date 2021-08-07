@@ -1507,6 +1507,11 @@
                strokes such as `>' and `<'.  Press Return or Escape to  re-
                sume normal play.  Default key is `|'.
 
+          #permnearby
+               If persistent nearby characters display is supported and enabled
+               (with the perm_nearby option), toggle whether it is displaying
+               nearby monsters or items. Default key is ']'.
+
           #pickup
                Pick up things at the current location.  Default key is `,'.
                The `m' prefix forces use of a menu.

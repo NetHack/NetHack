@@ -519,6 +519,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     char timebuf[15];
     unsigned long uid = 0;
     boolean defer_perm_invent;
+    boolean defer_perm_nearby;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &uid, sizeof uid);
@@ -558,6 +559,9 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
        to figure out where it really belongs now] */
     defer_perm_invent = iflags.perm_invent;
     iflags.perm_invent = FALSE;
+    /* defer the nearby menu as well, for the sake of consistency. */
+    defer_perm_nearby = iflags.perm_nearby;
+    iflags.perm_nearby = FALSE;
     /* wizard and discover are actually flags.debug and flags.explore;
        player might be overriding the save file values for them;
        in the discover case, we don't want to set that for a normal
@@ -609,6 +613,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
         /* revert to pre-restore option settings */
         iflags.deferred_X = FALSE;
         iflags.perm_invent = defer_perm_invent;
+        iflags.perm_nearby = defer_perm_nearby;
         flags = newgameflags;
         g.context = newgamecontext;
         g.youmonst = cg.zeromonst;
@@ -696,6 +701,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     relink_light_sources(FALSE);
     /* inventory display is now viable */
     iflags.perm_invent = defer_perm_invent;
+    iflags.perm_nearby = defer_perm_nearby;
     return TRUE;
 }
 

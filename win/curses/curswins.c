@@ -163,12 +163,13 @@ curses_destroy_win(WINDOW *win)
 void
 curses_refresh_nethack_windows(void)
 {
-    WINDOW *status_window, *message_window, *map_window, *inv_window;
+    WINDOW *status_window, *message_window, *map_window, *inv_window, *nearby_window;
 
     status_window = curses_get_nhwin(STATUS_WIN);
     message_window = curses_get_nhwin(MESSAGE_WIN);
     map_window = curses_get_nhwin(MAP_WIN);
     inv_window = curses_get_nhwin(INV_WIN);
+    nearby_window = curses_get_nhwin(NEARBY_WIN);
 
     if ((g.moves <= 1) && !g.invent) {
         /* Main windows not yet displayed; refresh base window instead */
@@ -181,6 +182,8 @@ curses_refresh_nethack_windows(void)
         wnoutrefresh(map_window);
         touchwin(message_window);
         wnoutrefresh(message_window);
+        touchwin(nearby_window);
+        wnoutrefresh(nearby_window);
         if (inv_window) {
             touchwin(inv_window);
             wnoutrefresh(inv_window);
@@ -564,6 +567,7 @@ curses_alert_main_borders(boolean onoff)
     curses_alert_win_border(MESSAGE_WIN, onoff);
     curses_alert_win_border(STATUS_WIN, onoff);
     curses_alert_win_border(INV_WIN, onoff);
+    curses_alert_win_border(NEARBY_WIN, onoff);
 }
 
 /* Return true if given wid is a main NetHack window */
@@ -572,7 +576,8 @@ static boolean
 is_main_window(winid wid)
 {
     if (wid == MESSAGE_WIN || wid == MAP_WIN
-        || wid == STATUS_WIN || wid == INV_WIN)
+        || wid == STATUS_WIN || wid == INV_WIN
+        || wid == NEARBY_WIN)
         return TRUE;
 
     return FALSE;

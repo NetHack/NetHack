@@ -83,6 +83,8 @@ moveloop_preamble(boolean resuming)
        invent is fully populated and the in_moveloop flag has been set */
     if (iflags.perm_invent)
         update_inventory();
+    if (iflags.perm_nearby)
+        update_nearby();
 }
 
 static void
@@ -221,6 +223,10 @@ moveloop_core(void)
                         glibr();
                     nh_timeout();
                     run_regions();
+
+                    /* Update the list of nearby monsters, since a new 
+                       one may have come into sight. */
+                    update_nearby();
 
                     if (u.ublesscnt)
                         u.ublesscnt--;
@@ -606,6 +612,7 @@ display_gamewindows(void)
     }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
+    WIN_NEARBY = create_nhwindow(NHW_MENU);
     /* in case of early quit where WIN_INVEN could be destroyed before
        ever having been used, use it here to pacify the Qt interface */
     start_menu(WIN_INVEN, 0U), end_menu(WIN_INVEN, (char *) 0);
