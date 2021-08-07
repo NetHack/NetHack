@@ -28,10 +28,6 @@ curs_update_nearby(int arg)
         /* It's not. Re-initialize the main windows if the
            option was enabled. */
         if (iflags.perm_nearby) {
-            /* [core_]status_initialize, curses_create_main_windows,
-               curses_last_messages, [core_]doredraw; doredraw will
-               call (*update_inventory) [curses_update_inventory] which
-               will call us but 'win' should be defined that time */
             curs_reset_windows(TRUE, FALSE);
             /* TODO: guard against window creation failure [if that's
                possible] which would lead to uncontrolled recursion */
@@ -61,7 +57,7 @@ curs_nearby_updated(WINDOW *win)
     wnoutrefresh(win);
 }
 
-/* display the inventory menu-like data collected in pi.array[] */
+/* display the nearby data */
 static void
 curs_show_nearby(WINDOW *win)
 {
@@ -127,9 +123,6 @@ curs_show_nearby(WINDOW *win)
                     curses_menu_color_attr(win, NO_COLOR, A_REVERSE, ON);
                     mvwaddstr(win, 1, 1, outbuf);
                     curses_menu_color_attr(win, NO_COLOR, A_REVERSE, OFF);
-                    #if 0
-                    putstr(win, 0, "    "); /* separator */
-                    #endif
                 }
                 Sprintf(outbuf, " %s %s ", 
                     decode_mixed(glyphbuf, encglyph(glyph)),
