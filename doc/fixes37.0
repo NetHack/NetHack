@@ -584,6 +584,10 @@ describe a couple of isolated moat spots on Samurai quest home level as water
 	rather than as moat
 crawling out of water to avoid drowning didn't work as intended when trying
 	to move diagonally through a tight squeeze
+in wizard mode, polymorphing into hero's role monster in order to revert to
+	normal form would complain about missing light source if hero was
+	changing back from the form of a light-emitting monster [didn't affect
+	normal play because role monsters are invalid polymorph targets there]
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -729,6 +733,7 @@ give genetic engineers teleport capability (as they had in slash'em); 'port
 if an invisible hero managed to convert an unaligned altar to an aligned one
 	with color enabled, altar wasn't immediately redrawn with new color
 repair some regressions to (a)pply introduced by "getobj refactor" patch
+getobj too: allow attempting to (E)ngrave with any item in inventory
 fix ^X feedback when held typo: "unseen createure" -> "unseen creature"
 if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
 	eaten at revival time and monster <foo> is defined as providing more
@@ -769,6 +774,9 @@ using bhitpos in flooreffects to handle erosion damage broke its original use
 	zap hit spot, resulting in scrambled wand targetting
 restore previous behavior of the 'altmeta' option (only wait for a second
 	character when getting a command keystroke, not other key input)
+baby gold dragons weren't able to grow into adult gold dragons
+when hero is displaced, make monsters who try to stay out of direct line do so
+	with spot where they think the hero is rather than where he really is
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -790,6 +798,8 @@ tty: previous change resulted in remnants of previous level being shown on
 	new level after level change when S_unexplored is <space>
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
+Windows: new tile additions in win/share did not trigger the creation of a new
+	NetHackW.res file
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
@@ -1094,7 +1104,8 @@ using 'f' while quiver is empty and 'autoquiver' is Off when wielding a
 	Lords and Ladies, two to Soul Music, three to Interesting Times, four
 	to Maskerade, three to Hogfather, two to Jingo, four to The Last
 	Continent, four to Carpe Jugulum, three to The Fifth Elephant, five
-	to The Truth, six to Thief of Time, six to The Last Hero
+	to The Truth, six to Thief of Time, six to The Last Hero, four to
+	The Amazing Maurice
 monsters can see and remember hero resistances
 monsters can gain resistances by eating corpses
 menu for what-is command supports /^ and /" to view a list of nearby or whole
@@ -1143,6 +1154,7 @@ Qt: [later] augment extended command selection dialog's Filter to add a
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
+tty: use bright colors directly on supporting terminals
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 X11: implement 'selectsaved', restore via menu of saved games

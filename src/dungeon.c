@@ -1464,7 +1464,7 @@ u_on_rndspot(int upflag)
 void
 stairway_add(int x, int y, boolean up, boolean isladder, d_level *dest)
 {
-    stairway *tmp = (stairway *)alloc(sizeof(stairway));
+    stairway *tmp = (stairway *) alloc(sizeof (stairway));
 
     tmp->sx = x;
     tmp->sy = y;
@@ -1701,8 +1701,8 @@ get_level(d_level *newlevel, int levnum)
     if (levnum <= 0) {
         /* can only currently happen in endgame */
         levnum = u.uz.dlevel;
-    } else if (levnum
-               > g.dungeons[dgn].depth_start + g.dungeons[dgn].num_dunlevs - 1) {
+    } else if (levnum > (g.dungeons[dgn].depth_start
+                         + g.dungeons[dgn].num_dunlevs - 1)) {
         /* beyond end of dungeon, jump to last level */
         levnum = g.dungeons[dgn].num_dunlevs;
     } else {
@@ -2147,6 +2147,22 @@ stairs_description(
 
             Sprintf(eos(outbuf), " to level %d", to_dlev);
         }
+    } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up) {
+        /* stairs up from level one are a special case; they are marked
+           as having been traversed because the hero obviously started
+           the game by coming down them, but the remote side varies
+           depending on whether the Amulet is being carried */
+        Sprintf(outbuf, "%s%s %s %s",
+                !u.uhave.amulet ? "" : "branch ",
+                stairs, updown,
+                !u.uhave.amulet ? "out of the dungeon"
+                /* minimize our expectations about what comes next */
+                : (on_level(&tolev, &earth_level)
+                   || on_level(&tolev, &air_level)
+                   || on_level(&tolev, &fire_level)
+                   || on_level(&tolev, &water_level))
+                  ? "to the Elemental Planes"
+                  : "to the end game");
     } else {
         /* known branch stairs; tacking on destination level is too verbose */
         Sprintf(outbuf, "branch %s %s to %s",

@@ -862,11 +862,11 @@ static char nilstring[] = "";
 static void
 init_hilite(void)
 {
-    register int c;
     char *setf, *scratch;
-    int md_len;
+    int c, md_len;
+    int colors = tgetnum("Co");
 
-    if (tgetnum("Co") < 8 || (MD == NULL) || (strlen(MD) == 0)
+    if (colors < 8 || (MD == NULL) || (strlen(MD) == 0)
         || ((setf = tgetstr("AF", (char **) 0)) == (char *) 0
             && (setf = tgetstr("Sf", (char **) 0)) == (char *) 0)) {
         /* Fallback when colors not available
@@ -892,39 +892,70 @@ init_hilite(void)
         return;
     }
 
-    md_len = strlen(MD);
+    if (colors >= 16) {
+        for (c = 0; c < SIZE(ti_map); c++) {
+            char *work;
 
-    c = 6;
-    while (c--) {
-        char *work;
+            /* system colors */
+            scratch = tparm(setf, ti_map[c].nh_color);
+            work = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(work, scratch);
+            hilites[ti_map[c].nh_color] = work;
 
-        scratch = tparm(setf, ti_map[c].ti_color);
-        work = (char *) alloc(strlen(scratch) + md_len + 1);
-        Strcpy(work, MD);
-        hilites[ti_map[c].nh_bright_color] = work;
-        work += md_len;
-        Strcpy(work, scratch);
-        hilites[ti_map[c].nh_color] = work;
+            /* bright colors */
+            scratch = tparm(setf, ti_map[c].nh_bright_color);
+            work = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(work, scratch);
+            hilites[ti_map[c].nh_bright_color] = work;
+        }
+    } else {
+        /* 8 system colors */
+        md_len = strlen(MD);
+
+        c = 6;
+        while (c--) {
+            char *work;
+
+            scratch = tparm(setf, ti_map[c].ti_color);
+            work = (char *) alloc(strlen(scratch) + md_len + 1);
+            Strcpy(work, MD);
+            hilites[ti_map[c].nh_bright_color] = work;
+            work += md_len;
+            Strcpy(work, scratch);
+            hilites[ti_map[c].nh_color] = work;
+        }
     }
 
-    scratch = tparm(setf, COLOR_WHITE);
-    hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
-    Strcpy(hilites[CLR_WHITE], MD);
-    Strcat(hilites[CLR_WHITE], scratch);
+    if (colors >= 16) {
+        scratch = tparm(setf, COLOR_WHITE|BRIGHT);
+        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(hilites[CLR_WHITE], scratch);
+    } else {
+        scratch = tparm(setf, COLOR_WHITE);
+        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
+        Strcpy(hilites[CLR_WHITE], MD);
+        Strcat(hilites[CLR_WHITE], scratch);
+    }
 
     hilites[CLR_GRAY] = nilstring;
     hilites[NO_COLOR] = nilstring;
 
     if (iflags.wc2_darkgray) {
-        /* On many terminals, esp. those using classic PC CGA/EGA/VGA
-         * textmode, specifying "hilight" and "black" simultaneously
-         * produces a dark shade of gray that is visible against a
-         * black background.  We can use it to represent black objects.
-         */
-        scratch = tparm(setf, COLOR_BLACK);
-        hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + md_len + 1);
-        Strcpy(hilites[CLR_BLACK], MD);
-        Strcat(hilites[CLR_BLACK], scratch);
+        if (colors >= 16) {
+            scratch = tparm(setf, COLOR_BLACK|BRIGHT);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_BLACK], scratch);
+        } else {
+            /* On many terminals, esp. those using classic PC CGA/EGA/VGA
+            * textmode, specifying "hilight" and "black" simultaneously
+            * produces a dark shade of gray that is visible against a
+            * black background.  We can use it to represent black objects.
+            */
+            scratch = tparm(setf, COLOR_BLACK);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + md_len + 1);
+            Strcpy(hilites[CLR_BLACK], MD);
+            Strcat(hilites[CLR_BLACK], scratch);
+        }
     } else {
         /* But it's concievable that hilighted black-on-black could
          * still be invisible on many others.  We substitute blue for
@@ -937,6 +968,8 @@ init_hilite(void)
 static void
 kill_hilite(void)
 {
+    int c;
+
     /* if colors weren't available, no freeing needed */
     if (hilites[CLR_BLACK] == nh_HI)
         return;
@@ -944,37 +977,47 @@ kill_hilite(void)
     if (hilites[CLR_BLACK]) {
         if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
             free(hilites[CLR_BLACK]);
-        hilites[CLR_BLACK] = 0;
     }
-    /* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
-    /* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
-    /* CLR_CYAN overlaps CLR_BRIGHT_CYAN, do not free */
-    /* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
-    /* CLR_RED overlaps CLR_ORANGE, do not free */
-    /* CLR_BROWN overlaps CLR_YELLOW, do not free */
+    if (tgetnum("Co") >= 16) {
+        if (hilites[CLR_BLUE])
+            free(hilites[CLR_BLUE]);
+        if (hilites[CLR_GREEN])
+            free(hilites[CLR_GREEN]);
+        if (hilites[CLR_CYAN])
+            free(hilites[CLR_CYAN]);
+        if (hilites[CLR_MAGENTA])
+            free(hilites[CLR_MAGENTA]);
+        if (hilites[CLR_RED])
+            free(hilites[CLR_RED]);
+        if (hilites[CLR_BROWN])
+            free(hilites[CLR_BROWN]);
+    } else {
+        /* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
+        /* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
+        /* CLR_CYAN overlaps CLR_BRIGHT_CYAN, do not free */
+        /* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
+        /* CLR_RED overlaps CLR_ORANGE, do not free */
+        /* CLR_BROWN overlaps CLR_YELLOW, do not free */
+    }
     /* CLR_GRAY is static 'nilstring', do not free */
     /* NO_COLOR is static 'nilstring', do not free */
     if (hilites[CLR_BRIGHT_BLUE])
-        free(hilites[CLR_BRIGHT_BLUE]),
-            hilites[CLR_BRIGHT_BLUE] = hilites[CLR_BLUE] = 0;
+        free(hilites[CLR_BRIGHT_BLUE]);
     if (hilites[CLR_BRIGHT_GREEN])
-        free(hilites[CLR_BRIGHT_GREEN]),
-            hilites[CLR_BRIGHT_GREEN] = hilites[CLR_GREEN] = 0;
+        free(hilites[CLR_BRIGHT_GREEN]);
     if (hilites[CLR_BRIGHT_CYAN])
-        free(hilites[CLR_BRIGHT_CYAN]),
-            hilites[CLR_BRIGHT_CYAN] = hilites[CLR_CYAN] = 0;
+        free(hilites[CLR_BRIGHT_CYAN]);
     if (hilites[CLR_BRIGHT_MAGENTA])
-        free(hilites[CLR_BRIGHT_MAGENTA]),
-            hilites[CLR_BRIGHT_MAGENTA] = hilites[CLR_MAGENTA] = 0;
+        free(hilites[CLR_BRIGHT_MAGENTA]);
     if (hilites[CLR_ORANGE])
-        free(hilites[CLR_ORANGE]),
-            hilites[CLR_ORANGE] = hilites[CLR_RED] = 0;
+        free(hilites[CLR_ORANGE]);
     if (hilites[CLR_YELLOW])
-        free(hilites[CLR_YELLOW]),
-            hilites[CLR_YELLOW] = hilites[CLR_BROWN] = 0;
+        free(hilites[CLR_YELLOW]);
     if (hilites[CLR_WHITE])
-        free(hilites[CLR_WHITE]), hilites[CLR_WHITE] = 0;
-    hilites[CLR_GRAY] = hilites[NO_COLOR] = 0;
+        free(hilites[CLR_WHITE]);
+
+    for (c = 0; c < CLR_MAX; c++)
+        hilites[c] = 0;
 }
 
 #else /* UNIX && TERMINFO */

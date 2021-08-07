@@ -836,6 +836,7 @@ makelevel(void)
 {
     register struct mkroom *croom;
     branch *branchp;
+    stairway *prevstairs;
     int room_threshold;
     register s_level *slev = Is_special(&u.uz);
     int i;
@@ -950,8 +951,16 @@ makelevel(void)
             do_mkroom(COCKNEST);
 
  skip0:
+        prevstairs = g.stairs; /* used to test for place_branch() success */
         /* Place multi-dungeon branch. */
         place_branch(branchp, 0, 0);
+
+        /* for main dungeon level 1, the stairs up where the hero starts
+           are branch stairs; treat them as if hero had just come down
+           them by marking them as having been traversed; most recently
+           created stairway is held in 'g.stairs' */
+        if (u.uz.dnum == 0 && u.uz.dlevel == 1 && g.stairs != prevstairs)
+            g.stairs->u_traversed = TRUE;
 
         /* for each room: put things inside */
         for (croom = g.rooms; croom->hx > 0; croom++) {
@@ -1252,7 +1261,7 @@ place_branch(branch *br,       /* branch to place */
         boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up
                                                      : !br->end1_up;
 
-        stairway_add(x,y, goes_up, FALSE, dest);
+        stairway_add(x, y, goes_up, FALSE, dest);
         levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
         levl[x][y].typ = STAIRS;
     }

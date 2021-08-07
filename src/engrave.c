@@ -442,7 +442,7 @@ stylus_ok(struct obj *obj)
         && (obj->otyp == TOWEL || obj->otyp == MAGIC_MARKER))
         return GETOBJ_SUGGEST;
 
-    return GETOBJ_EXCLUDE;
+    return GETOBJ_DOWNPLAY;
 }
 
 /* can hero engrave at all (at their location)? */
@@ -879,11 +879,12 @@ doengrave(void)
         break;
 
     case VENOM_CLASS:
-        if (wizard) {
-            pline("Writing a poison pen letter??");
-            break;
-        }
-        /*FALLTHRU*/
+        /* this used to be ``if (wizard)'' and fall through to ILLOBJ_CLASS
+           for normal play, but splash of venom isn't "illegal" because it
+           could occur in normal play via wizard mode bones */
+        pline("Writing a poison pen letter?");
+        break;
+
     case ILLOBJ_CLASS:
         impossible("You're engraving with an illegal object!");
         break;
