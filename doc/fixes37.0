@@ -775,6 +775,8 @@ using bhitpos in flooreffects to handle erosion damage broke its original use
 restore previous behavior of the 'altmeta' option (only wait for a second
 	character when getting a command keystroke, not other key input)
 baby gold dragons weren't able to grow into adult gold dragons
+when hero is displaced, make monsters who try to stay out of direct line do so
+	with spot where they think the hero is rather than where he really is
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -7,26 +7,26 @@
 #include "mfndpos.h"
 #include <ctype.h>
 
-static void sanity_check_single_mon(struct monst *, boolean,
-                                    const char *);
-static boolean restrap(struct monst *);
+static void sanity_check_single_mon(struct monst *, boolean, const char *);
+static struct obj *make_corpse(struct monst *, unsigned);
+static int minliquid_core(struct monst *);
+static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
 static long mm_displacement(struct monst *, struct monst *);
-static int pick_animal(void);
-static void kill_eggs(struct obj *);
-static int pickvampshape(struct monst *);
-static boolean isspecmon(struct monst *);
-static boolean validspecmon(struct monst *, int);
-static struct permonst *accept_newcham_form(struct monst *, int);
-static struct obj *make_corpse(struct monst *, unsigned);
-static int minliquid_core(struct monst *);
 static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
 static void migrate_mon(struct monst *, xchar, xchar);
 static boolean ok_to_obliterate(struct monst *);
 static void deal_with_overcrowding(struct monst *);
+static boolean restrap(struct monst *);
+static int pick_animal(void);
+static int pickvampshape(struct monst *);
+static boolean isspecmon(struct monst *);
+static boolean validspecmon(struct monst *, int);
+static struct permonst *accept_newcham_form(struct monst *, int);
+static void kill_eggs(struct obj *);
 
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
@@ -1658,6 +1658,13 @@ can_carry(struct monst* mtmp, struct obj* otmp)
     return iquan;
 }
 
+/* is <nx,ny> in direct line with where 'mon' thinks hero is? */
+static boolean
+monlineu(struct monst *mon, int nx, int ny)
+{
+    return online2(nx, ny, mon->mux, mon->muy);
+}
+
 /* return flags based on monster data, for mfndpos() */
 long
 mon_allowflags(struct monst* mtmp)
@@ -1909,7 +1916,7 @@ mfndpos(
                         continue;
                     info[cnt] |= ALLOW_ROCK;
                 }
-                if (monseeu && onlineu(nx, ny)) {
+                if (monseeu && monlineu(mon, nx, ny)) {
                     if (flag & NOTONL)
                         continue;
                     info[cnt] |= NOTONL;
@@ -3159,8 +3166,8 @@ ok_to_obliterate(struct monst* mtmp)
 void
 elemental_clog(struct monst* mon)
 {
-    int m_lev = 0;
     static long msgmv = 0L;
+    int m_lev = 0;
     struct monst *mtmp, *m1, *m2, *m3, *m4, *m5, *zm;
 
     if (In_endgame(&u.uz)) {
@@ -4245,7 +4252,8 @@ newcham(
     }
     /* we need this one whether msg is true or not */
     Strcpy(l_oldname, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                               has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+                               has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0,
+                               FALSE));
 
     /* mdat = 0 -> caller wants a random monster shape */
     if (mdat == 0) {
@@ -4278,7 +4286,8 @@ newcham(
      * polymorphed, so dropping rank for mplayers seems reasonable.
      */
     if (In_endgame(&u.uz) && is_mplayer(olddata)
-        && has_mgivenname(mtmp) && (p = strstr(MGIVENNAME(mtmp), " the ")) != 0)
+        && has_mgivenname(mtmp)
+        && (p = strstr(MGIVENNAME(mtmp), " the ")) != 0)
         *p = '\0';
 
     if (mtmp->wormno) { /* throw tail away */
