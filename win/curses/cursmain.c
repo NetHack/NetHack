@@ -683,18 +683,7 @@ curses_update_nearby(int arg)
     if (!g.program_state.in_moveloop && !g.program_state.gameover)
         return;
 
-    if (!arg) {
-        /* Update nearby character sidebar.  NetHack uses normal menu functions
-           when gathering the inventory, and we don't want to change the
-           underlying code.  So instead, track if an inventory update is
-           being performed with a static variable. */
-        inv_update = 1;
-        curs_update_nearby(0);
-        inv_update = 0;
-    } else {
-        /* perform scrolling operations on persistent inventory window */
-        curs_update_nearby(arg);
-    }
+    curs_update_nearby(arg);
 }
 
 /*
