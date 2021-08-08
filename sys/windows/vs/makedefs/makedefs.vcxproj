@@ -42,7 +42,8 @@
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)monattk.h" />
     <ClInclude Include="$(IncDir)monflag.h" />
-    <ClInclude Include="$(IncDir)monsym.h" />
+    <ClInclude Include="$(IncDir)sym.h" />
+    <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
     <ClInclude Include="$(IncDir)patchlevel.h" />

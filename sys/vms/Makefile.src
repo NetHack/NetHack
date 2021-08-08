@@ -176,13 +176,13 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(RANDSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 #
 HACKINCL = align.h artifact.h artilist.h attrib.h color.h \
-	   config.h config1.h context.h coord.h decl.h display.h \
+	   config.h config1.h context.h coord.h decl.h defsym.h display.h \
 	   dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h global.h \
 	   hack.h mextra.h mfndpos.h micro.h mkroom.h \
-	   monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
+	   monattk.h mondata.h monflag.h monst.h sym.h obj.h objclass.h \
 	   patchlevel.h pcconf.h permonst.h prop.h rect.h \
-	   region.h rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h \
-	   tradstdc.h trap.h unixconf.h vision.h \
+	   region.h sym.h defsym.h rm.h sp_lev.h spell.h sys.h system.h \
+	   tcap.h timeout.h tradstdc.h trap.h unixconf.h vision.h \
 	   vmsconf.h wintty.h winX.h winprocs.h wintype.h you.h youprop.h
 
 #HSOURCES = $(HACKINCL) date.h onames.h pm.h
@@ -323,9 +323,9 @@ objects.obj :
 
 $(MAKEDEFS) :	$(FIRSTOBJ) $(UTL)makedefs.c \
 		$(CONFIG_H) $(INC)permonst.h $(INC)objclass.h \
-		$(INC)monsym.h $(INC)artilist.h $(INC)dungeon.h \
-		$(INC)obj.h $(INC)monst.h $(INC)you.h $(INC)flag.h \
-		$(INC)dlb.h $(INC)patchlevel.h \
+		$(INC)sym.h $(INC)defsym.h $(INC)artilist.h \
+		$(INC)dungeon.h $(INC)obj.h $(INC)monst.h $(INC)you.h \
+		$(INC)flag.h $(INC)dlb.h $(INC)patchlevel.h \
 		$(LIBOPT) $(ID_OPT)
 	$(CD) $(UTL)
 	$(MAKE)$(MAKEFLAGS) $(MAKEDEFS)
@@ -390,7 +390,7 @@ $(CONFIG_H) : $(INC)config.h $(INC)config1.h $(INC)tradstdc.h $(INC)global.h \
 	$(TOUCH) $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H) : $(INC)hack.h $(CONFIG_H) $(INC)align.h \
-		$(INC)dungeon.h $(INC)monsym.h $(INC)mkroom.h \
+		$(INC)dungeon.h $(INC)sym.h $(INC)defsym.h $(INC)mkroom.h \
 		$(INC)objclass.h $(INC)youprop.h $(INC)prop.h \
 		$(INC)permonst.h $(INC)monattk.h \
 		$(INC)monflag.h $(INC)mondata.h $(INC)pm.h \
@@ -544,8 +544,8 @@ mon.obj :	mon.c $(HACK_H) $(INC)mfndpos.h
 mondata.obj :	mondata.c $(HACK_H)
 monmove.obj :	monmove.c $(HACK_H) $(INC)mfndpos.h $(INC)artifact.h
 monst.obj :	monst.c $(CONFIG_H) $(INC)permonst.h $(INC)align.h \
-		$(INC)monattk.h $(INC)monflag.h $(INC)monsym.h \
-		$(INC)color.h
+		$(INC)monattk.h $(INC)monflag.h $(INC)sym.h \
+		$(INC)defsym.h $(INC)color.h
 mplayer.obj :	mplayer.c $(HACK_H)
 mthrowu.obj :	mthrowu.c $(HACK_H)
 muse.obj :	muse.c $(HACK_H)

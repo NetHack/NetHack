@@ -382,25 +382,25 @@ REGION_H   = $(INCL)/region.h
 RM_H	   = $(INCL)/align.h	$(INCL)/rm.h
 SKILLS_H   = $(INCL)/skills.h
 SP_LEV_H   = $(INCL)/align.h	$(INCL)/sp_lev.h
-YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h    \
+YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h     \
 	    $(INCL)/pm.h       $(INCL)/youprop.h
-YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h   \
+YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h    \
 	     $(INCL)/attrib.h	$(INCL)/you.h
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
-PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h \
+PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h   \
 	    $(MSYS)/pcvideo.h
 CONFIG_H   = $(GLOBAL_H)	$(INCL)/fnamesiz.h  $(INCL)/tradstdc.h \
 	     $(INCL)/config1.h $(INCL)/config.h
-DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h   \
-	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h      \
+DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h    \
+	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h       \
 	      $(INCL)/decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
 HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
-	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/monsym.h    \
-	     $(INCL)/mkroom.h	$(INCL)/objclass.h $(INCL)/trap.h      \
-	     $(INCL)/flag.h     $(RM_H)		   $(INCL)/vision.h    \
-	     $(INCL)/wintype.h  $(INCL)/engrave.h  $(INCL)/rect.h      \
-	     $(INCL)/hack.h     $(REGION_H)	       \
+	     $(DECL_H)	      	$(DISPLAY_H)	   $(INCL)/sym.h       \
+	     $(INCL)/defsym.h   $(INCL)/mkroom.h   $(INCL)/objclass.h  \
+	     $(INCL)/trap.h     $(INCL)/flag.h     $(RM_H)             \
+	     $(INCL)/vision.h   $(INCL)/wintype.h  $(INCL)/engrave.h   \
+	     $(INCL)/rect.h     $(INCL)/hack.h     $(REGION_H)         \
 	     $(INCL)/sys.h
 DLB_H      = $(INCL)/dlb.h
 
@@ -661,7 +661,7 @@ $(U)makedefs.exe:  $(MAKEDEFSOBJS)
 	$(LINK) $(LFLAGS) -o$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o:  $(CONFIG_H)	$(PERMONST_H)	   $(INCL)/objclass.h \
-		$(INCL)/monsym.h   $(U)makedefs.c
+		$(INCL)/sym.h   $(INCL)/defsym.h $(U)makedefs.c
 
 #==========================================
 #  Recover Utility
@@ -814,8 +814,8 @@ $(O)drawing.o: $(CONFIG_H) drawing.c $(MSYS)/pcvideo.h
 $(O)decl.o: $(CONFIG_H) decl.c
 	$(CC) $(cflags) -o$@ decl.c
 
-$(O)monst.o: $(CONFIG_H) $(PERMONST_H) $(INCL)/monsym.h   \
-	$(INCL)/color.h	 monst.c
+$(O)monst.o: $(CONFIG_H) $(PERMONST_H) $(INCL)/sym.h   \
+	$(INCL)/defsym.h $(INCL)/color.h	 monst.c
 	$(CC) $(cflags) -o$@ monst.c
 
 $(O)objects.o: $(CONFIG_H)	      $(INCL)/obj.h	 $(INCL)/objclass.h \
@@ -1209,8 +1209,8 @@ $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)mondata.o: mondata.c $(HACK_H)
 $(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
-		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
-		$(INCL)/color.h
+		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/sym.h \
+		$(INCL)/defsym.h $(INCL)/color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)

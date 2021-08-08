@@ -487,11 +487,12 @@ CONFIG_H = $(INCL)\config.h $(INCL)\patchlevel.h \
 		$(INCL)\windconf.h
 
 HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
-		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
+		$(INCL)\dungeon.h $(INCL)\mkroom.h \
 		$(INCL)\objclass.h $(INCL)\youprop.h $(INCL)\prop.h \
 		$(INCL)\permonst.h $(INCL)\monattk.h \
 		$(INCL)\monflag.h $(INCL)\mondata.h $(INCL)\pm.h \
-		$(INCL)\wintype.h $(INCL)\context.h $(INCL)\rm.h \
+		$(INCL)\wintype.h $(INCL)\context.h \
+		$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h \
 		$(INCL)\botl.h $(INCL)\rect.h \
 		$(INCL)\region.h $(INCL)\decl.h $(INCL)\quest.h \
 		$(INCL)\spell.h $(INCL)\color.h $(INCL)\obj.h \
@@ -1091,7 +1092,7 @@ $(U)makedefs.exe:	$(MAKEDEFSOBJS)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
-		$(INCL)\objclass.h $(INCL)\monsym.h \
+		$(INCL)\objclass.h $(INCL)\sym.h $(INCL)\defsym.h \
 		$(INCL)\artilist.h $(INCL)\dungeon.h $(INCL)\obj.h \
 		$(INCL)\monst.h $(INCL)\you.h $(INCL)\flag.h \
 		$(INCL)\dlb.h
@@ -1566,18 +1567,19 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 $(O)drawing_host.o: drawing.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ drawing.c
 
-$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\color.h $(INCL)\rm.h \
-		$(INCL)\objclass.h $(INCL)\monsym.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)\color.h \
+		$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h \
+		$(INCL)\objclass.h
 	@$(cc) $(cflagsBuild) -Fo$@ drawing.c
 
 $(O)monst_host.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
-		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
-		$(INCL)\color.h
+		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\sym.h \
+		$(INCL)\defsym.h $(INCL)\color.h
 	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
-		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
-		$(INCL)\color.h
+		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\sym.h \
+		$(INCL)\defsym.h $(INCL)\color.h
 	@$(cc) $(cflagsBuild) -Fo$@ monst.c
 
 $(O)objects_host.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
@@ -1988,7 +1990,7 @@ $(O)makemon.o: makemon.c $(HACK_H)
 $(O)mcastu.o: mcastu.c $(HACK_H)
 $(O)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 		$(INCL)\monattk.h $(INCL)\monflag.h \
-		$(INCL)\objclass.h $(INCL)\monsym.h \
+		$(INCL)\objclass.h $(INCL)\sym.h $(INCL)\defsym.h \
 		$(INCL)\artilist.h $(INCL)\dungeon.h $(INCL)\obj.h \
 		$(INCL)\monst.h $(INCL)\mextra.h $(INCL)\you.h \
 		$(INCL)\attrib.h $(INCL)\prop.h $(INCL)\skills.h \
@@ -2005,8 +2007,8 @@ $(O)mon.o: mon.c $(HACK_H) $(INCL)\mfndpos.h
 $(O)mondata.o: mondata.c $(HACK_H)
 $(O)monmove.o: monmove.c $(HACK_H) $(INCL)\mfndpos.h $(INCL)\artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
-		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\monsym.h \
-		$(INCL)\color.h
+		$(INCL)\monattk.h $(INCL)\monflag.h $(INCL)\sym.h \
+		$(INCL)\defsym.h $(INCL)\color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)
