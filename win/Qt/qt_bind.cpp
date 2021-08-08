@@ -468,10 +468,12 @@ void NetHackQtBind::qt_update_inventory(int arg UNUSED)
     */
 }
 
-void NetHackQtBind::qt_update_nearby(int arg UNUSED)
+void NetHackQtBind::qt_update_nearby(int arg)
 {
+    bool toggle;
+    if (arg) toggle = 1;
     if (main)
-	main->updateNearby();
+	main->updateNearby(arg);
 }
 
 void NetHackQtBind::qt_mark_synch()

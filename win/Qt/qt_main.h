@@ -59,7 +59,7 @@ public:
 	void AddStatusWindow(NetHackQtStatusWindow* window);
 	void RemoveWindow(NetHackQtWindow* window);
 	void updateInventory();
-	void updateNearby();
+	void updateNearby(int);
 
 	void fadeHighlighting(bool before_key);
 

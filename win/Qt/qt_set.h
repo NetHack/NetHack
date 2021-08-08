@@ -80,10 +80,10 @@ private:
             static_cast <NetHackQtMainWindow *> (NetHackQtBind::mainWidget())
                 ->updateInventory();
         }
-		void updateNearby()
+		void updateNearby(int arg)
         {
             static_cast <NetHackQtMainWindow *> (NetHackQtBind::mainWidget())
-                ->updateNearby();
+                ->updateNearby(arg);
         }
 #endif
 

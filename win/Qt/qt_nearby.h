@@ -17,10 +17,8 @@ class NetHackQtNearbyWindow : QScrollArea, public NetHackQtWindow {
 public:
 	NetHackQtNearbyWindow();
 	~NetHackQtNearbyWindow();
-    
-    virtual void Display();
 
-	virtual void Update();
+	virtual void Update(int toggle);
 
 	virtual QWidget* Widget();
 
@@ -31,8 +29,7 @@ public:
 private:
         QListWidget *list;
         QScrollArea *scrollarea;
-        bool changed;
-        int currgetmsg;
+		int monsters;
 	NetHackQtMapWindow2* map;
 
 private slots:

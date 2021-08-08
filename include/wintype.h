@@ -90,6 +90,14 @@ typedef struct mi {
 #define NHW_MAP 3
 #define NHW_MENU 4
 #define NHW_TEXT 5
+/* The exception to the above rule is the NHW_NEARBY window for qt
+   graphical ports. In order for the nearby window to function, qt
+   NEEDS to have NHW_NEARBY passed in from allmain.c.
+   This is a hack, and I'm not happy with it, but I think it's the
+   best way to go about this for now. - Kes. */
+#ifdef QT_GRAPHICS
+#define NHW_NEARBY 34
+#endif
 
 /* attribute types for putstr; the same as the ANSI value, for convenience */
 #define ATR_NONE       0

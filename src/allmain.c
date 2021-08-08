@@ -613,7 +613,7 @@ display_gamewindows(void)
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
 #ifdef QT_GRAPHICS
-    WIN_NEARBY = create_nhwindow(34);
+    WIN_NEARBY = create_nhwindow(NHW_NEARBY);
 #else
     WIN_NEARBY = create_nhwindow(NHW_MENU);
 #endif

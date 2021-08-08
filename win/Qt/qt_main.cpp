@@ -1159,10 +1159,10 @@ void NetHackQtMainWindow::updateInventory()
     }
 }
 
-void NetHackQtMainWindow::updateNearby()
+void NetHackQtMainWindow::updateNearby(int arg)
 {
     if (nearby) {
-    nearby->Update();
+    nearby->Update(arg);
     }
 }
 

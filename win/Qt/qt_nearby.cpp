@@ -32,7 +32,6 @@ NetHackQtNearbyWindow::NetHackQtNearbyWindow() :
     scrollarea->takeWidget();
     ::iflags.window_inited = 1;
     map = 0;
-    currgetmsg = 0;
     connect(qt_settings,SIGNAL(fontChanged()),this,SLOT(updateFont()));
     updateFont();
 }
@@ -66,26 +65,20 @@ void NetHackQtNearbyWindow::Scroll(int dx UNUSED, int dy UNUSED)
     //RLC list->Scroll(dx,dy);
 }
 
-void NetHackQtNearbyWindow::Display()
-{
-    if (changed) {
-	list->repaint();
-	changed=false;
-    }
-}
-
-void NetHackQtNearbyWindow::Update()
+void NetHackQtNearbyWindow::Update(int toggle)
 {
 
     int cx, cy, lo_x, lo_y, hi_x, hi_y, glyph;
     int count = 0;
     char lookbuf[BUFSZ], outbuf[BUFSZ], glyphbuf[40];
-    boolean do_mons = true;
     boolean peaceful = false;
     glyph_info glyphinfo;
 
     // Clear the list of nearby characters
     list->clear();
+
+    // Toggle display
+    if (toggle) monsters = !monsters;
 
     // Add the list items
     lo_y = TRUE ? std::max(u.uy - BOLT_LIM, 0) : 0;
@@ -98,7 +91,7 @@ void NetHackQtNearbyWindow::Update()
             glyph = glyph_at(cx, cy);
             map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
             peaceful = FALSE;
-            if (do_mons) {
+            if (monsters) {
                 if (glyph_is_monster(glyph)) {
                     struct monst *mtmp;
 
@@ -116,7 +109,7 @@ void NetHackQtNearbyWindow::Update()
                     Strcpy(lookbuf, def_warnsyms[warnindx].explanation);
                     ++count;
                 }
-            } else { /* !do_mons */
+            } else { /* !monsters */
                 if (glyph_is_object(glyph)) {
                     look_at_object(lookbuf, cx, cy, glyph);
                     ++count;
@@ -125,7 +118,7 @@ void NetHackQtNearbyWindow::Update()
             if (*lookbuf) {
                 char coordbuf[20], which[12], cmode;
                 if (count == 1) {
-                    Strcpy(which, do_mons ? "monsters" : "objects");
+                    Strcpy(which, monsters ? "monsters" : "objects");
                     if (TRUE)
                         Sprintf(outbuf, "Nearby %s (Toggle: ])",
                                 upstart(which));

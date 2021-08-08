@@ -15,7 +15,7 @@
 #ifndef qt_win_h
 #define qt_win_h
 
-#define NHW_NEARBY 34
+// #define NHW_NEARBY 34
 
 namespace nethack_qt_ {
 
