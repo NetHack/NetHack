@@ -1835,7 +1835,8 @@ qt_bind.o: $(QT)\qt_bind.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_rip.h $(QT)\qt_msg.h $(QT)\qt_plsel.h \
 		$(QT)\qt_svsel.h $(QT)\qt_set.h $(QT)\qt_stat.h \
 		$(QT)\qt_icon.h $(QT)\qt_streq.h $(QT)\qt_line.h \
-		$(QT)\qt_yndlg.h $(QT)\qt_str.h $(INCL)\dlb.h
+		$(QT)\qt_yndlg.h $(QT)\qt_str.h $(INCL)\dlb.h \
+		$(QT)\qt_nearby.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_bind.cpp
 qt_click.o: $(QT)\qt_click.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_post.h $(QT)\qt_click.h
@@ -1871,7 +1872,7 @@ qt_main.o: $(QT)\qt_main.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_inv.h $(QT)\qt_key.h $(QT)\qt_map.h \
 		$(QT)\qt_win.h $(QT)\qt_clust.h $(QT)\qt_msg.h \
 		$(QT)\qt_set.h $(QT)\qt_stat.h $(QT)\qt_icon.h \
-		$(QT)\qt_str.h qt_kde0.moc
+		$(QT)\qt_str.h $(QT)\qt_nearby.h qt_kde0.moc
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_main.cpp
 qt_map.o: $(QT)\qt_map.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_post.h $(QT)\qt_map.h $(QT)\qt_win.h \
@@ -1893,6 +1894,12 @@ qt_msg.o: $(QT)\qt_msg.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
 		$(QT)\qt_kde0.h $(QT)\qt_str.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_msg.cpp
+qt_nearby.o: $(QT)\qt_nearby.cpp $(HACK_H) $(QT)\qt_pre.h \
+		$(QT)\qt_post.h $(QT)\qt_nearby.h $(QT)\qt_win.h \
+		qt_nearby.moc $(QT)\qt_map.h $(QT)\qt_clust.h \
+		$(QT)\qt_set.h $(QT)\qt_bind.h $(QT)\qt_main.h \
+		$(QT)\qt_kde0.h $(QT)\qt_str.h
+	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_nearby.cpp
 qt_plsel.o: $(QT)\qt_plsel.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_post.h $(QT)\qt_plsel.h qt_plsel.moc \
 		$(QT)\qt_bind.h $(QT)\qt_main.h $(QT)\qt_kde0.h \
@@ -1929,7 +1936,7 @@ qt_win.o: $(QT)\qt_win.cpp $(HACK_H) $(QT)\qt_pre.h \
 		$(QT)\qt_glyph.h $(QT)\qt_inv.h $(QT)\qt_key.h \
 		$(QT)\qt_icon.h $(QT)\qt_map.h $(QT)\qt_clust.h \
 		$(QT)\qt_menu.h $(QT)\qt_rip.h $(QT)\qt_msg.h \
-		$(QT)\qt_set.h
+		$(QT)\qt_set.h $(QT)\qt_nearby.h
 	$(CXX) $(CXXFLAGS) -Fo$@  $(QT)\qt_win.cpp
 qt_xcmd.o: $(QT)\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(QT)\qt_pre.h $(QT)\qt_post.h $(QT)\qt_xcmd.h \

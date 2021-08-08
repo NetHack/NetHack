@@ -80,6 +80,11 @@ private:
             static_cast <NetHackQtMainWindow *> (NetHackQtBind::mainWidget())
                 ->updateInventory();
         }
+		void updateNearby()
+        {
+            static_cast <NetHackQtMainWindow *> (NetHackQtBind::mainWidget())
+                ->updateNearby();
+        }
 #endif
 
 private slots:

@@ -257,7 +257,7 @@ WINQTSRC = ../win/Qt/qt_bind.cpp ../win/Qt/qt_click.cpp \
 	../win/Qt/qt_plsel.cpp ../win/Qt/qt_rip.cpp ../win/Qt/qt_set.cpp \
 	../win/Qt/qt_stat.cpp ../win/Qt/qt_str.cpp ../win/Qt/qt_streq.cpp \
 	../win/Qt/qt_svsel.cpp ../win/Qt/qt_win.cpp ../win/Qt/qt_xcmd.cpp \
-	../win/Qt/qt_yndlg.cpp
+	../win/Qt/qt_yndlg.cpp ../win/Qt/qt_nearby.cpp
 WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_clust.o $(TARGETPFX)qt_delay.o \
 	$(TARGETPFX)qt_glyph.o $(TARGETPFX)qt_icon.o \
@@ -266,7 +266,8 @@ WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_msg.o $(TARGETPFX)qt_plsel.o $(TARGETPFX)qt_rip.o \
 	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
 	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
-	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o
+	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o \
+	$(TARGETPFX)qt_nearby.o
 
 # Files for Shim windowing interface for libnh -- doesn't do anything,
 # just passes along the API calls to the library
@@ -684,6 +685,8 @@ qt_menu.moc : ../win/Qt/qt_menu.h
 	$(QTDIR)/bin/$(MOC) -o qt_menu.moc ../win/Qt/qt_menu.h
 qt_msg.moc : ../win/Qt/qt_msg.h
 	$(QTDIR)/bin/$(MOC) -o qt_msg.moc ../win/Qt/qt_msg.h
+qt_nearby.moc : ../win/Qt/qt_nearby.h
+	$(QTDIR)/bin/$(MOC) -o qt_nearby.moc ../win/Qt/qt_nearby.h
 qt_plsel.moc : ../win/Qt/qt_plsel.h
 	$(QTDIR)/bin/$(MOC) -o qt_plsel.moc ../win/Qt/qt_plsel.h
 qt_set.moc : ../win/Qt/qt_set.h
@@ -921,7 +924,8 @@ $(TARGETPFX)qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_rip.h ../win/Qt/qt_msg.h ../win/Qt/qt_plsel.h \
 		../win/Qt/qt_svsel.h ../win/Qt/qt_set.h ../win/Qt/qt_stat.h \
 		../win/Qt/qt_icon.h ../win/Qt/qt_streq.h ../win/Qt/qt_line.h \
-		../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h ../include/dlb.h
+		../win/Qt/qt_yndlg.h ../win/Qt/qt_str.h ../include/dlb.h \
+		../win/Qt/qt_nearby.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_bind.cpp
 $(TARGETPFX)qt_click.o: ../win/Qt/qt_click.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_click.h
@@ -957,7 +961,7 @@ $(TARGETPFX)qt_main.o: ../win/Qt/qt_main.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_inv.h ../win/Qt/qt_key.h ../win/Qt/qt_map.h \
 		../win/Qt/qt_win.h ../win/Qt/qt_clust.h ../win/Qt/qt_msg.h \
 		../win/Qt/qt_set.h ../win/Qt/qt_stat.h ../win/Qt/qt_icon.h \
-		../win/Qt/qt_str.h qt_kde0.moc
+		../win/Qt/qt_str.h ../win/Qt/qt_nearby.h qt_kde0.moc
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_main.cpp
 $(TARGETPFX)qt_map.o: ../win/Qt/qt_map.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_map.h ../win/Qt/qt_win.h \
@@ -978,6 +982,12 @@ $(TARGETPFX)qt_msg.o: ../win/Qt/qt_msg.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
 		../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_msg.cpp
+$(TARGETPFX)qt_nearby.o: ../win/Qt/qt_nearby.cpp $(HACK_H) ../win/Qt/qt_pre.h \
+		../win/Qt/qt_post.h ../win/Qt/qt_nearby.h ../win/Qt/qt_win.h \
+		qt_nearby.moc ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
+		../win/Qt/qt_set.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \
+		../win/Qt/qt_kde0.h ../win/Qt/qt_str.h
+	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_nearby.cpp
 $(TARGETPFX)qt_plsel.o: ../win/Qt/qt_plsel.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_plsel.h qt_plsel.moc \
 		../win/Qt/qt_bind.h ../win/Qt/qt_main.h ../win/Qt/qt_kde0.h \
@@ -1015,7 +1025,7 @@ $(TARGETPFX)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_glyph.h ../win/Qt/qt_inv.h ../win/Qt/qt_key.h \
 		../win/Qt/qt_icon.h ../win/Qt/qt_map.h ../win/Qt/qt_clust.h \
 		../win/Qt/qt_menu.h ../win/Qt/qt_rip.h ../win/Qt/qt_msg.h \
-		../win/Qt/qt_set.h
+		../win/Qt/qt_set.h  ../win/Qt/qt_nearby.h
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_win.cpp
 $(TARGETPFX)qt_xcmd.o: ../win/Qt/qt_xcmd.cpp $(HACK_H) ../include/func_tab.h \
 		../win/Qt/qt_pre.h ../win/Qt/qt_post.h ../win/Qt/qt_xcmd.h \

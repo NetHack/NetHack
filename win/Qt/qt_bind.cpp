@@ -28,6 +28,7 @@ extern "C" {
 #include "qt_map.h"
 #include "qt_menu.h"
 #include "qt_msg.h"
+#include "qt_nearby.h"
 #include "qt_plsel.h"
 #include "qt_svsel.h"
 #include "qt_set.h"
@@ -459,6 +460,12 @@ void NetHackQtBind::qt_update_inventory(int arg UNUSED)
     if (g.program_state.something_worth_saving && iflags.perm_invent)
         display_inventory(NULL, false);
     */
+}
+
+void NetHackQtBind::qt_update_nearby(int arg UNUSED)
+{
+    if (main)
+	main->updateNearby();
 }
 
 void NetHackQtBind::qt_mark_synch()
@@ -991,7 +998,8 @@ struct window_procs Qt_procs = {
 #ifdef SELECTSAVED
      | WC2_SELECTSAVED
 #endif
-     | WC2_STATUSLINES),
+     | WC2_STATUSLINES
+     | WC2_PERM_NEARBY),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
@@ -1014,6 +1022,7 @@ struct window_procs Qt_procs = {
     nethack_qt_::NetHackQtBind::qt_select_menu,
     genl_message_menu,      /* no need for Qt-specific handling */
     nethack_qt_::NetHackQtBind::qt_update_inventory,
+    nethack_qt_::NetHackQtBind::qt_update_nearby,
     nethack_qt_::NetHackQtBind::qt_mark_synch,
     nethack_qt_::NetHackQtBind::qt_wait_synch,
 #ifdef CLIPPING

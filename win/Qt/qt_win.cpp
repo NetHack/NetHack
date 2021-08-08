@@ -69,6 +69,7 @@ extern "C" {
 #include "qt_map.h"
 #include "qt_menu.h"
 #include "qt_msg.h"
+#include "qt_nearby.h"
 #include "qt_set.h"
 
 #include "qt_clust.h"

@@ -24,6 +24,7 @@ extern "C" {
 #include "qt_key.h"
 #include "qt_map.h"
 #include "qt_msg.h"
+#include "qt_nearby.h"
 #include "qt_set.h"
 #include "qt_stat.h"
 #include "qt_str.h"
@@ -677,6 +678,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
         { info,  "Discoveries",      3, dodiscovered},
         { info,  "List/reorder spells",  3, dovspell},
         { info,  "Adjust inventory letters", 3, doorganize },
+        { info,  "Toggle nearby character display", 3, dopermnearby },
         { info,  0, 3},
         { info,  "Name object or creature", 3, docallcmd},
         { info,  "Annotate level",   3, donamelevel },
@@ -893,6 +895,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 	setCentralWidget(vsplitter);
 	hsplitter = new QSplitter(Qt::Horizontal);
 	invusage = new NetHackQtInvUsageWindow(hsplitter);
+    nearby = new NetHackQtNearbyWindow();
 	vsplitter->insertWidget(0, hsplitter);
 	hsplitter->insertWidget(1, invusage);
     }
@@ -1096,9 +1099,22 @@ void NetHackQtMainWindow::AddMessageWindow(NetHackQtMessageWindow* window)
     ShowIfReady();
 }
 
+void NetHackQtMainWindow::AddNearbyWindow(NetHackQtNearbyWindow* window)
+{
+    nearby=window;
+    if (!qt_compact_mode)
+        hsplitter->insertWidget(0, nearby->Widget());
+    ShowIfReady();
+}
+
 NetHackQtMessageWindow * NetHackQtMainWindow::GetMessageWindow()
 {
     return message;
+}
+
+NetHackQtNearbyWindow * NetHackQtMainWindow::GetNearbyWindow()
+{
+    return nearby;
 }
 
 void NetHackQtMainWindow::AddMapWindow(NetHackQtMapWindow2* window)
@@ -1130,6 +1146,9 @@ void NetHackQtMainWindow::RemoveWindow(NetHackQtWindow* window)
     } else if (window==message) {
 	message=0;
 	ShowIfReady();
+    } else if (window==nearby) {
+    nearby=0;
+    ShowIfReady();
     }
 }
 
@@ -1137,6 +1156,13 @@ void NetHackQtMainWindow::updateInventory()
 {
     if (invusage) {
 	invusage->repaint();
+    }
+}
+
+void NetHackQtMainWindow::updateNearby()
+{
+    if (nearby) {
+    nearby->Display();
     }
 }
 
@@ -1158,7 +1184,7 @@ void NetHackQtMainWindow::layout()
 #if 0
     if ( qt_compact_mode )
 	return;
-    if (message && map && status) {
+    if (message && map && status && nearby) {
 	QSize maxs=map->Widget()->maximumSize();
 	int maph=std::min(height()*2/3,maxs.height());
 
@@ -1169,6 +1195,7 @@ void NetHackQtMainWindow::layout()
 	int topw=(c->width()-iuw)/2;
 
 	message->Widget()->setGeometry(0,0,topw,toph);
+    nearby->Widget()->setGeometry(0,0,topw,toph);
 	invusage->setGeometry(topw,0,iuw,toph);
 	status->Widget()->setGeometry(topw+iuw,0,topw,toph);
 	map->Widget()->setGeometry(std::max(0,(c->width()-maxs.width())/2),
@@ -1177,7 +1204,7 @@ void NetHackQtMainWindow::layout()
 #endif
 
     if (qt_settings && !qt_compact_mode
-        && map && message && status && invusage) {
+        && map && message && nearby && status && invusage) {
         // For the initial PaperDoll sizing, message window
         // and/or status window might still be empty;
         // widen them before changing PaperDoll to use saved settings.
@@ -1347,9 +1374,13 @@ void NetHackQtMainWindow::keyPressEvent(QKeyEvent* event)
 	dirkey = 0;
 	if (message) message->Scroll(0,-1);
         break;
+    if (nearby) nearby->Scroll(0, -1);
+        break;
     case Qt::Key_PageDown:
 	dirkey = 0;
 	if (message) message->Scroll(0,+1);
+        break;
+    if (nearby) message->Scroll(0,+1);
         break;
     case Qt::Key_Space:
         //if (flags.rest_on_space) {
@@ -1404,12 +1435,13 @@ void NetHackQtMainWindow::closeEvent(QCloseEvent *e UNUSED)
 
 void NetHackQtMainWindow::ShowIfReady()
 {
-    if (message && map && status) {
+    if (message && map && status && nearby) {
         QWidget* hp = qt_compact_mode ? static_cast<QWidget *>(stack)
                                       : static_cast<QWidget *>(hsplitter);
         QWidget* vp = qt_compact_mode ? static_cast<QWidget *>(stack)
                                       : static_cast<QWidget *>(vsplitter);
 	message->Widget()->setParent(hp);
+    nearby->Widget()->setParent(hp);
 	map->Widget()->setParent(vp);
 	status->Widget()->setParent(hp);
 	if ( qt_compact_mode ) {
@@ -1417,6 +1449,7 @@ void NetHackQtMainWindow::ShowIfReady()
 	    stack->addWidget(map->Widget());
 	    stack->addWidget(message->Widget());
 	    stack->addWidget(status->Widget());
+        stack->addWidget(nearby->Widget());
 	    raiseMap();
 	} else {
 	    layout();

@@ -450,6 +450,7 @@ extern void X11_add_menu(winid, const glyph_info *, const ANY_P *, char,
 extern void X11_end_menu(winid, const char *);
 extern int X11_select_menu(winid, int, MENU_ITEM_P **);
 extern void X11_update_inventory(int);
+extern void X11_update_nearby(int);
 extern void X11_mark_synch(void);
 extern void X11_wait_synch(void);
 #ifdef CLIPPING

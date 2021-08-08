@@ -30,6 +30,7 @@ class NetHackQtInvUsageWindow;
 class NetHackQtKeyBuffer;
 class NetHackQtMapWindow2;
 class NetHackQtMessageWindow;
+class NetHackQtNearbyWindow;
 class NetHackQtStatusWindow;
 class NetHackQtWindow;
 
@@ -52,10 +53,13 @@ public:
 
 	void AddMessageWindow(NetHackQtMessageWindow* window);
 	NetHackQtMessageWindow * GetMessageWindow();
+	void AddNearbyWindow(NetHackQtNearbyWindow* window);
+	NetHackQtNearbyWindow * GetNearbyWindow();
 	void AddMapWindow(NetHackQtMapWindow2* window);
 	void AddStatusWindow(NetHackQtStatusWindow* window);
 	void RemoveWindow(NetHackQtWindow* window);
 	void updateInventory();
+	void updateNearby();
 
 	void fadeHighlighting(bool before_key);
 
@@ -103,6 +107,7 @@ private:
 	QMenuBar* menubar;
 #endif
 	NetHackQtMessageWindow* message;
+	NetHackQtNearbyWindow* nearby;
 	NetHackQtMapWindow2* map;
 	NetHackQtStatusWindow* status;
 	NetHackQtInvUsageWindow* invusage;

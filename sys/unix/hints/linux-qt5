@@ -43,8 +43,8 @@ CCXXFLAGS = $(CFLAGS)
 WINSRC = $(WINQTSRC)
 WINOBJ = $(WINQTOBJ)
 WINLIB = $(WINQT5LIB)
-#MOC = moc
-MOC = moc-qt5
+MOC = moc
+#MOC = moc-qt5
 
 VARDATND = nhtiles.bmp rip.xpm nhsplash.xpm pet_mark.xbm pilemark.xbm
 

@@ -485,7 +485,7 @@ qt_post.h      qt_pre.h       qt_rip.cpp     qt_rip.h       qt_set.cpp
 qt_set.h       qt_stat.cpp    qt_stat.h      qt_str.cpp     qt_str.h
 qt_streq.cpp   qt_streq.h     qt_svsel.cpp   qt_svsel.h     qt_win.cpp
 qt_win.h       qt_xcmd.cpp    qt_xcmd.h      qt_xpms.h      qt_yndlg.cpp
-qt_yndlg.h
+qt_yndlg.h     qt_nearby.cpp  qt_nearby.h
 
 win/X11:
 (files for X versions)
