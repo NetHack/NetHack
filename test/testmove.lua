@@ -35,6 +35,19 @@ function setup2(param)
    des.terrain(POS.x + 15, POS.y, param);
 end
 
+function setup3(param)
+   local mapstr = [[
+-------
+|CCCCC|
+|C---C|
+|C---C|
+|CCCCC|
+-------
+]];
+   des.map({ x = POS.x - 1, y = POS.y - 4, map = mapstr });
+   des.replace_terrain({ region={01,01, 74,18}, fromterrain="C", toterrain=param, chance=100 });
+end
+
 local basicmoves = {
    -- move
    h = { dx = -1,  dy =  0, number_pad = 0 },
@@ -102,6 +115,12 @@ local basicmoves = {
    { key = "L", x = POS.x + 15, y = POS.y, number_pad = 0, setup = setup2, param = "L" },
    { key = "L", x = nhc.COLNO - 2, y = POS.y, number_pad = 0, setup = setup2, param = "#" },
    { key = "L", x = nhc.COLNO - 2, y = POS.y, number_pad = 0, setup = setup2, param = "C" },
+
+   -- rush behaves differently in corridors vs in rooms
+   { key = ctrl("l"), x = POS.x + 4, y = POS.y, number_pad = 0, setup = setup3, param = "." },
+   { key = ctrl("l"), x = POS.x + 4, y = POS.y - 3, number_pad = 0, setup = setup3, param = "#" },
+   { key = ctrl("k"), x = POS.x, y = POS.y - 3, number_pad = 0, setup = setup3, param = "." },
+   { key = ctrl("k"), x = POS.x + 4, y = POS.y - 3, number_pad = 0, setup = setup3, param = "#" },
 
 };
 
