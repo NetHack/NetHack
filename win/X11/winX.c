@@ -1271,7 +1271,8 @@ X11_update_inventory(int arg)
 void
 X11_update_nearby(int arg)
 {
-    
+    /* nearby characters window is not supported in X11 */
+    return;
 }
 
 /* The current implementation has all of the saved lines on the screen. */

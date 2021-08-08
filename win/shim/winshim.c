@@ -174,6 +174,7 @@ void shim_update_inventory() {
 #else /* !__EMSCRIPTEN__ */
 VDECLCB(shim_update_inventory,(void), "v")
 #endif
+VDECLB(shim_update_nearby,(void), "v")
 
 /* Interface definition used in windows.c */
 struct window_procs shim_procs = {
@@ -200,8 +201,8 @@ struct window_procs shim_procs = {
     shim_create_nhwindow, shim_clear_nhwindow, shim_display_nhwindow,
     shim_destroy_nhwindow, shim_curs, shim_putstr, genl_putmixed,
     shim_display_file, shim_start_menu, shim_add_menu, shim_end_menu,
-    shim_select_menu, shim_message_menu, shim_update_inventory, shim_mark_synch,
-    shim_wait_synch,
+    shim_select_menu, shim_message_menu, shim_update_inventory, 
+    shim_update_nearby, shim_mark_synch, shim_wait_synch,
 #ifdef CLIPPING
     shim_cliparound,
 #endif

@@ -58,7 +58,8 @@ struct window_procs mswin_procs = {
     mswin_display_file, mswin_start_menu, mswin_add_menu, mswin_end_menu,
     mswin_select_menu,
     genl_message_menu, /* no need for X-specific handling */
-    mswin_update_inventory, mswin_mark_synch, mswin_wait_synch,
+    mswin_update_inventory, mswin_update_nearby,
+    mswin_mark_synch, mswin_wait_synch,
 #ifdef CLIPPING
     mswin_cliparound,
 #endif
@@ -1155,6 +1156,12 @@ void
 mswin_update_inventory()
 {
     logDebug("mswin_update_inventory()\n");
+}
+
+void
+mswin_update_nearby()
+{
+    logDebug("mswin_update_nearby()\n");
 }
 
 /*

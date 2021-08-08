@@ -100,7 +100,8 @@ struct window_procs mswin_procs = {
     genl_putmixed, mswin_display_file, mswin_start_menu, mswin_add_menu,
     mswin_end_menu, mswin_select_menu,
     genl_message_menu, /* no need for X-specific handling */
-    mswin_update_inventory, mswin_mark_synch, mswin_wait_synch,
+    mswin_update_inventory, mswin_update_nearby,
+    mswin_mark_synch, mswin_wait_synch,
 #ifdef CLIPPING
     mswin_cliparound,
 #endif
@@ -1242,6 +1243,18 @@ mswin_update_inventory(int arg)
 }
 
 /*
+    -- Indicate to the window port that the nearby list has been changed.
+    -- Not currently implemented.
+*/
+void
+mswin_update_nearby(int arg)
+{
+    /* nearby characters is not supported for the windows port */
+    logDebug("mswin_update_nearby(%d)\n", arg);
+    return;
+}
+
+/*
 mark_synch()    -- Don't go beyond this point in I/O on any channel until
                    all channels are caught up to here.  Can be an empty call
                    for the moment
@@ -2060,6 +2073,11 @@ mswin_preference_update(const char *pref)
 
     if (stricmp(pref, "perm_invent") == 0) {
         mswin_update_inventory(0);
+        return;
+    }
+
+    if (stricmp(pref, "perm_nearby") == 0) {
+        mswin_update_nearby(0);
         return;
     }
 }

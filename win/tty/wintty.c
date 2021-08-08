@@ -107,8 +107,8 @@ struct window_procs tty_procs = {
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
     tty_destroy_nhwindow, tty_curs, tty_putstr, genl_putmixed,
     tty_display_file, tty_start_menu, tty_add_menu, tty_end_menu,
-    tty_select_menu, tty_message_menu, tty_update_inventory, tty_mark_synch,
-    tty_wait_synch,
+    tty_select_menu, tty_message_menu, tty_update_inventory, 
+    tty_update_nearby, tty_mark_synch, tty_wait_synch,
 #ifdef CLIPPING
     tty_cliparound,
 #endif
@@ -3156,6 +3156,14 @@ void
 tty_update_inventory(int arg UNUSED)
 {
     /* tty doesn't support persistent inventory window */
+    return;
+}
+
+/* update persistent nearby characters window */
+void
+tty_update_nearby(int arg UNUSED)
+{
+    /* tty doesn't support persistent nearby window */
     return;
 }
 
