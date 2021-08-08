@@ -15,6 +15,8 @@
 #ifndef qt_win_h
 #define qt_win_h
 
+#define NHW_NEARBY 34
+
 namespace nethack_qt_ {
 
 void centerOnMain(QWidget *); /* in the namespace but not in any class */

@@ -314,6 +314,12 @@ winid NetHackQtBind::qt_create_nhwindow(int type)
 	window=w;
         break;
     }
+    case NHW_NEARBY: {
+    NetHackQtNearbyWindow* w=new NetHackQtNearbyWindow;
+    main->AddNearbyWindow(w);
+    window = w;
+        break;
+    }
     case NHW_MENU:
 	window=new NetHackQtMenuOrTextWindow(mainWidget());
         break;

@@ -1162,7 +1162,7 @@ void NetHackQtMainWindow::updateInventory()
 void NetHackQtMainWindow::updateNearby()
 {
     if (nearby) {
-    nearby->Display();
+    nearby->Update();
     }
 }
 
@@ -1195,7 +1195,7 @@ void NetHackQtMainWindow::layout()
 	int topw=(c->width()-iuw)/2;
 
 	message->Widget()->setGeometry(0,0,topw,toph);
-    nearby->Widget()->setGeometry(0,0,topw,toph);
+    nearby->Widget()->setGeometry(topw,0,iuw,toph);
 	invusage->setGeometry(topw,0,iuw,toph);
 	status->Widget()->setGeometry(topw+iuw,0,topw,toph);
 	map->Widget()->setGeometry(std::max(0,(c->width()-maxs.width())/2),
@@ -1446,6 +1446,7 @@ void NetHackQtMainWindow::ShowIfReady()
 	status->Widget()->setParent(hp);
 	if ( qt_compact_mode ) {
 	    message->setMap(map);
+        nearby->setMap(map);
 	    stack->addWidget(map->Widget());
 	    stack->addWidget(message->Widget());
 	    stack->addWidget(status->Widget());
