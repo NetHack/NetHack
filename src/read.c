@@ -1029,6 +1029,19 @@ display_stinking_cloud_positions(int state)
     }
 }
 
+/* getobj callback for armor object to enchant */
+static int
+armor_enchant_ok(struct obj* obj)
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->owornmask & W_ARMOR)
+        return GETOBJ_SUGGEST;
+
+    return GETOBJ_EXCLUDE_INACCESS;
+}
+
 static void
 seffect_enchant_armor(struct obj **sobjp)
 {
@@ -1036,11 +1049,16 @@ seffect_enchant_armor(struct obj **sobjp)
     register schar s;
     boolean special_armor;
     boolean same_color;
-    struct obj *otmp = some_armor(&g.youmonst);
     boolean sblessed = sobj->blessed;
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
     boolean old_erodeproof, new_erodeproof;
+
+    struct obj *otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
+    while (otmp && !(otmp->owornmask & W_ARMOR)) {
+        You("cannot target armor that is not worn.");
+        otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
+    }
 
     if (!otmp) {
         strange_feeling(sobj, !Blind
