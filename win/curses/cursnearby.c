@@ -15,7 +15,7 @@ struct pn_data {
     boolean monsters;       /* Display nearby monsters or items */
 };
 
-static struct pn_data pn = { FALSE };
+static struct pn_data pn = { TRUE };
 
 /* Runs when the game indicates that the nearby characters window has been updated */
 void
