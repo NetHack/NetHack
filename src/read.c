@@ -1046,6 +1046,7 @@ static void
 seffect_enchant_armor(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
+    int otyp = sobj->otyp;
     register schar s;
     boolean special_armor;
     boolean same_color;
@@ -1053,6 +1054,13 @@ seffect_enchant_armor(struct obj **sobjp)
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
     boolean old_erodeproof, new_erodeproof;
+    boolean already_known = (sobj->oclass == SPBOOK_CLASS /* spell */
+                             || objects[otyp].oc_name_known);
+
+    if (!already_known) {
+        pline("This is an enchant armor scroll.");
+        learnscroll(sobj);
+    }
 
     struct obj *otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
     while (otmp && !(otmp->owornmask & W_ARMOR)) {
@@ -1185,7 +1193,6 @@ seffect_enchant_armor(struct obj **sobjp)
         s = otmp->spe - oldspe; /* cap_spe() might have throttled 's' */
         if (s) /* skip if it got changed to 0 */
             adj_abon(otmp, s); /* adjust armor bonus for Dex or Int+Wis */
-        g.known = otmp->known;
         /* update shop bill to reflect new higher price */
         if (s > 0 && otmp->unpaid)
             alter_cost(otmp, 0L);
