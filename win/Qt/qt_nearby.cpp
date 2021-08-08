@@ -77,7 +77,7 @@ void NetHackQtNearbyWindow::Display()
 void NetHackQtNearbyWindow::Update()
 {
 
-    int attr, color, cx, cy, lo_x, lo_y, hi_x, hi_y, glyph;
+    int cx, cy, lo_x, lo_y, hi_x, hi_y, glyph;
     int count = 0;
     char lookbuf[BUFSZ], outbuf[BUFSZ], glyphbuf[40];
     boolean do_mons = true;
@@ -97,9 +97,7 @@ void NetHackQtNearbyWindow::Update()
             lookbuf[0] = '\0';
             glyph = glyph_at(cx, cy);
             map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
-            color = glyphinfo.color;
             peaceful = FALSE;
-            attr = 0;
             if (do_mons) {
                 if (glyph_is_monster(glyph)) {
                     struct monst *mtmp;
@@ -107,7 +105,6 @@ void NetHackQtNearbyWindow::Update()
                     if ((mtmp = m_at(cx, cy)) != 0) {
                         look_at_monster(lookbuf, (char *) 0, mtmp, cx, cy);
                         ++count;
-                        if (mtmp->mtame) attr = iflags.wc2_petattr;
                         if (mtmp->mpeaceful) peaceful = TRUE;
                     }
                 } else if (glyph_is_invisible(glyph)) {
@@ -135,10 +132,8 @@ void NetHackQtNearbyWindow::Update()
                     else
                         Sprintf(outbuf, "Shown %s",
                                 which);
-                    //curses_menu_color_attr(win, NO_COLOR, A_REVERSE, ON);
                     QListWidgetItem *item = new QListWidgetItem(outbuf);
                     list->addItem(outbuf);
-                    //curses_menu_color_attr(win, NO_COLOR, A_REVERSE, OFF);
                 }
                 Sprintf(outbuf, " %s %s ", 
                     decode_mixed(glyphbuf, encglyph(glyph)),
@@ -146,10 +141,8 @@ void NetHackQtNearbyWindow::Update()
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
                 Strcat(outbuf, lookbuf);
-                //curses_menu_color_attr(win, color, attr, ON);
                 QListWidgetItem *item = new QListWidgetItem(outbuf);
                 list->addItem(outbuf);
-                //curses_menu_color_attr(win, color, attr, OFF);
             }
         }
     }
