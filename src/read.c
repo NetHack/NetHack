@@ -1039,7 +1039,10 @@ armor_enchant_ok(struct obj* obj)
     if (obj->owornmask & W_ARMOR)
         return GETOBJ_SUGGEST;
 
-    return GETOBJ_EXCLUDE_INACCESS;
+    if (obj->oclass == ARMOR_CLASS)
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
 static void
@@ -1065,7 +1068,7 @@ seffect_enchant_armor(struct obj **sobjp)
 
     otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
     while (otmp && !(otmp->owornmask & W_ARMOR)) {
-        You("cannot target armor that is not worn.");
+        You("can only target worn armor.");
         otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
     }
 
