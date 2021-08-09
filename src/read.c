@@ -1056,13 +1056,14 @@ seffect_enchant_armor(struct obj **sobjp)
     boolean old_erodeproof, new_erodeproof;
     boolean already_known = (sobj->oclass == SPBOOK_CLASS /* spell */
                              || objects[otyp].oc_name_known);
+    struct obj *otmp;
 
     if (!already_known) {
         pline("This is an enchant armor scroll.");
         learnscroll(sobj);
     }
 
-    struct obj *otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
+    otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
     while (otmp && !(otmp->owornmask & W_ARMOR)) {
         You("cannot target armor that is not worn.");
         otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
