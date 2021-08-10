@@ -498,18 +498,18 @@ CONFIG_H = $(INCL)/config.h $(INCL)/patchlevel.h \
 		$(INCL)/micro.h $(INCL)/pcconf.h $(INCL)/windconf.h
 
 HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
-	       $(INCL)/dungeon.h $(INCL)/monsym.h $(INCL)/mkroom.h \
-	       $(INCL)/objclass.h $(INCL)/youprop.h $(INCL)/prop.h \
-	       $(INCL)/permonst.h $(INCL)/monattk.h \
+	       $(INCL)/dungeon.h $(INCL)/sym.h $(INCL)/defsym.h \
+	       $(INCL)/mkroom.h $(INCL)/objclass.h $(INCL)/youprop.h \
+	       $(INCL)/prop.h $(INCL)/permonst.h $(INCL)/monattk.h \
 	       $(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/pm.h \
 	       $(INCL)/wintype.h $(INCL)/decl.h $(INCL)/quest.h \
 	       $(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
 	       $(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h $(INCL)/lint.h \
 	       $(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
-	       $(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h $(INCL)/rm.h \
-	       $(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
-	       $(INCL)/rect.h $(INCL)/region.h $(INCL)/winprocs.h \
-	       $(INCL)/wintty.h $(INCL)/sys.h
+	       $(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h \
+	       $(INCL)/rm.h $(INCL)/vision.h $(INCL)/display.h \
+	       $(INCL)/engrave.h $(INCL)/rect.h $(INCL)/region.h \
+	       $(INCL)/winprocs.h $(INCL)/wintty.h $(INCL)/sys.h
 
 DGN_FILE_H  = $(INCL)/dgn_file.h
 SP_LEV_H    = $(INCL)/sp_lev.h
@@ -918,7 +918,7 @@ $(U)makedefs.exe: $(MAKEDEFSOBJS)
 	$(link) $(LFLAGSU) -o$@ $(MAKEDEFSOBJS)
 
 $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
-	 $(INCL)/objclass.h $(INCL)/monsym.h \
+	 $(INCL)/objclass.h $(INCL)/sym.h $(INCL)/defsym.h \
 	 $(U)makedefs.c $(SRC)\mdlib.c
 	$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
@@ -1619,8 +1619,9 @@ $(O)dog.o: dog.c $(HACK_H)
 $(O)dogmove.o: dogmove.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)dokick.o: dokick.c $(HACK_H)
 $(O)dothrow.o: dothrow.c $(HACK_H)
-$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/color.h $(INCL)/rm.h \
-		$(INCL)/objclass.h $(INCL)/monsym.h
+$(O)drawing.o: drawing.c $(CONFIG_H) $(INCL)/color.h $(INCL)/sym.h \
+		$(INCL)/defsym.h $(INCL)/rm.h \
+		$(INCL)/objclass.h
 $(O)dungeon.o: dungeon.c $(HACK_H) $(INCL)/dgn_file.h $(INCL)/dlb.h
 $(O)eat.o: eat.c $(HACK_H)
 $(O)end.o: end.c $(HACK_H) $(INCL)/dlb.h
@@ -1651,8 +1652,7 @@ $(O)mon.o: mon.c $(HACK_H) $(INCL)/mfndpos.h
 $(O)mondata.o: mondata.c $(HACK_H)
 $(O)monmove.o: monmove.c $(HACK_H) $(INCL)/mfndpos.h $(INCL)/artifact.h
 $(O)monst.o: monst.c $(CONFIG_H) $(INCL)/permonst.h $(INCL)/align.h \
-		$(INCL)/monattk.h $(INCL)/monflag.h $(INCL)/monsym.h \
-		$(INCL)/color.h
+		$(INCL)/monattk.h $(INCL)/monflag.h  $(INCL)/color.h
 $(O)mplayer.o: mplayer.c $(HACK_H)
 $(O)mthrowu.o: mthrowu.c $(HACK_H)
 $(O)muse.o: muse.c $(HACK_H)

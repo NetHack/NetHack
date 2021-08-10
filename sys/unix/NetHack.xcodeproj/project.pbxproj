@@ -249,7 +249,7 @@
 		3186A38121A4B0FB0052BF02 /* pcconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pcconf.h; path = ../../include/pcconf.h; sourceTree = "<group>"; };
 		3186A38221A4B0FB0052BF02 /* skills.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = skills.h; path = ../../include/skills.h; sourceTree = "<group>"; };
 		3186A38321A4B0FB0052BF02 /* permonst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = permonst.h; path = ../../include/permonst.h; sourceTree = "<group>"; };
-		3186A38421A4B0FB0052BF02 /* monsym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monsym.h; path = ../../include/monsym.h; sourceTree = "<group>"; };
+		3186A38421A4B0FB0052BF02 /* sym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sym.h; path = ../../include/sym.h; sourceTree = "<group>"; };
 		3186A38521A4B0FB0052BF02 /* mextra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mextra.h; path = ../../include/mextra.h; sourceTree = "<group>"; };
 		3186A38721A4B0FB0052BF02 /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../include/color.h; sourceTree = "<group>"; };
 		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
@@ -683,7 +683,7 @@
 				3186A3C821A4B0FE0052BF02 /* mondata.h */,
 				3186A38F21A4B0FC0052BF02 /* monflag.h */,
 				3186A3BB21A4B0FD0052BF02 /* monst.h */,
-				3186A38421A4B0FB0052BF02 /* monsym.h */,
+				3186A38421A4B0FB0052BF02 /* sym.h */,
 				3186A39B21A4B0FD0052BF02 /* windconf.h */,
 				3186A39521A4B0FC0052BF02 /* obj.h */,
 				3186A3A821A4B0FD0052BF02 /* objclass.h */,

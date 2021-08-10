@@ -13,6 +13,7 @@
 #include "onames.h"
 #include "permonst.h"
 #include "objclass.h"
+#include "sym.h"
 #include "rm.h"
 #include "display.h"
 
@@ -90,7 +91,7 @@ struct conditionals_t {
 /*
  * Some entries in glyph2tile[] should be substituted for on various levels.
  * The tiles used for the substitute entries will follow the usual ones in
- * other.til in the order given here, which should have every substitution
+ * other.txt in the order given here, which should have every substitution
  * for the same set of tiles grouped together.  You will have to change
  * more code in process_substitutions()/substitute_tiles() if the sets
  * overlap in the future.
@@ -301,6 +302,21 @@ init_tilemap(void)
     int corpsetile, swallowbase;
     int file_entry = 0;
 
+#ifdef OBTAIN_TILEMAP
+    tilemap_file = fopen("tilemappings.lst", "w");
+    Fprintf(tilemap_file, "NUMMONS = %d\n", NUMMONS);
+    Fprintf(tilemap_file, "NUM_OBJECTS = %d\n", NUM_OBJECTS);
+    Fprintf(tilemap_file, "MAXEXPCHARS = %d\n", MAXEXPCHARS);
+    Fprintf(tilemap_file, "MAXPCHARS = %d\n", MAXPCHARS);
+    Fprintf(tilemap_file, "MAX_GLYPH = %d\n", MAX_GLYPH);
+    Fprintf(tilemap_file, "GLYPH_MON_OFF = %d\n", GLYPH_MON_OFF);
+    Fprintf(tilemap_file, "GLYPH_PET_OFF = %d\n", GLYPH_PET_OFF);
+    Fprintf(tilemap_file, "GLYPH_DETECT_OFF = %d\n", GLYPH_DETECT_OFF);
+    Fprintf(tilemap_file, "GLYPH_RIDDEN_OFF = %d\n", GLYPH_RIDDEN_OFF);
+    Fprintf(tilemap_file, "GLYPH_BODY_OFF = %d\n", GLYPH_BODY_OFF);
+    Fprintf(tilemap_file, "GLYPH_SWALLOW_OFF = %d\n", GLYPH_SWALLOW_OFF);
+#endif
+
     for (i = 0; i < MAX_GLYPH; i++) {
         tilemap[i].tilenum = -1;
     }
@@ -327,14 +343,12 @@ init_tilemap(void)
         }
     }
 
-#ifdef OBTAIN_TILEMAP
-    tilemap_file = fopen("tilemappings.lst", "w");
-#endif
     tilenum = 0;
     for (i = 0; i < NUMMONS; i++) {
 #ifdef OBTAIN_TILEMAP
         char buf[256];
 #endif
+
         tilemap[GLYPH_MON_OFF + i].tilenum = tilenum;
         tilemap[GLYPH_PET_OFF + i].tilenum = tilenum;
         tilemap[GLYPH_DETECT_OFF + i].tilenum = tilenum;
@@ -702,121 +716,29 @@ RESTORE_WARNINGS
 
 struct {
     int idx;
-    const char *betterlabel;
+    const char *tilelabel;
     const char *expectedlabel;
 } altlabels[MAXPCHARS] = {
-{S_stone,    "dark part of a room", "dark part of a room"},
-{S_vwall,    "vertical wall", "wall"},
-{S_hwall,    "horizontal wall", "wall"},
-{S_tlcorn,   "top left corner wall", "wall"},
-{S_trcorn,   "top right corner wall", "wall"},
-{S_blcorn,   "bottom left corner wall", "wall"},
-{S_brcorn,   "bottom right corner wall", "wall"},
-{S_crwall,   "cross wall", "wall"},
-{S_tuwall,   "tuwall", "wall"},
-{S_tdwall,   "tdwall", "wall"},
-{S_tlwall,   "tlwall", "wall"},
-{S_trwall,   "trwall", "wall"},
-{S_ndoor,    "no door", "doorway"},
-{S_vodoor,   "vertical open door", "open door"},
-{S_hodoor,   "horizontal open door", "open door"},
-{S_vcdoor,   "vertical closed door", "closed door"},
-{S_hcdoor,   "horizontal closed door", "closed door"},
-{S_bars,     "iron bars", "iron bars"},
-{S_tree,     "tree", "tree"},
-{S_room,     "room", "floor of a room"},
-{S_darkroom, "darkroom", "dark part of a room"},
-{S_corr,     "corridor", "corridor"},
-{S_litcorr,  "lit corridor", "lit corridor"},
-{S_upstair,  "up stairs", "staircase up"},
-{S_dnstair,  "down stairs", "staircase down"},
-{S_upladder, "up ladder", "ladder up"},
-{S_dnladder, "down ladder", "ladder down"},
-{S_brupstair, "branch staircase up", "branch staircase up"},
-{S_brdnstair, "branch staircase down", "branch staircase down"},
-{S_brupladder, "branch ladder up", "branch ladder up"},
-{S_brdnladder, "branch ladder down", "branch ladder down"},
-{S_altar,    "altar", "altar"},
-{S_grave,    "grave", "grave"},
-{S_throne,   "throne", "opulent throne"},
-{S_sink,     "sink", "sink"},
-{S_fountain, "fountain", "fountain"},
-{S_pool,     "pool", "water"},
-{S_ice,      "ice", "ice"},
-{S_lava,     "lava", "molten lava"},
-{S_vodbridge, "vertical open drawbridge", "lowered drawbridge"},
-{S_hodbridge, "horizontal open drawbridge", "lowered drawbridge"},
-{S_vcdbridge, "vertical closed drawbridge", "raised drawbridge"},
-{S_hcdbridge, "horizontal closed drawbridge", "raised drawbridge"},
-{S_air,      "air", "air"},
-{S_cloud,    "cloud", "cloud"},
-{S_water,    "water", "water"},
-{S_arrow_trap,           "arrow trap", "arrow trap"},
-{S_dart_trap,            "dart trap", "dart trap"},
-{S_falling_rock_trap,    "falling rock trap", "falling rock trap"},
-{S_squeaky_board,        "squeaky board", "squeaky board"},
-{S_bear_trap,            "bear trap", "bear trap"},
-{S_land_mine,            "land mine", "land mine"},
-{S_rolling_boulder_trap, "rolling boulder trap", "rolling boulder trap"},
-{S_sleeping_gas_trap,    "sleeping gas trap", "sleeping gas trap"},
-{S_rust_trap,            "rust trap", "rust trap"},
-{S_fire_trap,            "fire trap", "fire trap"},
-{S_pit,                  "pit", "pit"},
-{S_spiked_pit,           "spiked pit", "spiked pit"},
-{S_hole,                 "hole", "hole"},
-{S_trap_door,            "trap door", "trap door"},
-{S_teleportation_trap,   "teleportation trap", "teleportation trap"},
-{S_level_teleporter,     "level teleporter", "level teleporter"},
-{S_magic_portal,         "magic portal", "magic portal"},
-{S_web,                  "web", "web"},
-{S_statue_trap,          "statue trap", "statue trap"},
-{S_magic_trap,           "magic trap", "magic trap"},
-{S_anti_magic_trap,      "anti magic trap", "anti-magic field"},
-{S_polymorph_trap,       "polymorph trap", "polymorph trap"},
-{S_vibrating_square,     "vibrating square", "vibrating square"},
-{S_vbeam,    "vertical beam", "cmap 69"},
-{S_hbeam,    "horizontal beam", "cmap 70"},
-{S_lslant,   "left slant beam", "cmap 71"},
-{S_rslant,   "right slant beam", "cmap 72"},
-{S_digbeam,  "dig beam", "cmap 73"},
-{S_flashbeam, "flash beam", "cmap 74"},
-{S_boomleft, "boom left", "cmap 75"},
-{S_boomright, "boom right", "cmap 76"},
-{S_ss1,      "shield1", "cmap 77"},
-{S_ss2,      "shield2", "cmap 78"},
-{S_ss3,      "shield3", "cmap 79"},
-{S_ss4,      "shield4", "cmap 80"},
-{S_poisoncloud, "poison cloud", "poison cloud"},
-{S_goodpos,  "valid position", "valid position"},
-{S_sw_tl,    "swallow top left", "cmap 83"},
-{S_sw_tc,    "swallow top center", "cmap 84"},
-{S_sw_tr,    "swallow top right", "cmap 85"},
-{S_sw_ml,    "swallow middle left", "cmap 86"},
-{S_sw_mr,    "swallow middle right", "cmap 87"},
-{S_sw_bl,    "swallow bottom left ", "cmap 88"},
-{S_sw_bc,    "swallow bottom center", "cmap 89"},
-{S_sw_br,    "swallow bottom right", "cmap 90"},
-{S_explode1, "explosion top left", "explosion dark 0"},
-{S_explode2, "explosion top centre", "explosion dark 1"},
-{S_explode3, "explosion top right", "explosion dark 2"},
-{S_explode4, "explosion middle left", "explosion dark 3"},
-{S_explode5, "explosion middle center", "explosion dark 4"},
-{S_explode6, "explosion middle right", "explosion dark 5"},
-{S_explode7, "explosion bottom left", "explosion dark 6"},
-{S_explode8, "explosion bottom center", "explosion dark 7"},
-{S_explode9, "explosion bottom right", "explosion dark 8"},
+#define PCHAR_TILES
+#include "defsym.h"
+#undef PCHAR_TILES
 };
 
 boolean
 acceptable_tilename(int glyph_set, int idx, const char *encountered,
-                    const char *expected)
+                    const char *expected UNUSED)
 {
     if (glyph_set == OTH_GLYPH) {
         if (idx >= 0 && idx < SIZE(altlabels)) {
+#if 0
             if (!strcmp(altlabels[idx].expectedlabel, expected)) {
-                if (!strcmp(altlabels[idx].betterlabel, encountered))
+                if (!strcmp(altlabels[idx].tilelabel, encountered))
                     return TRUE;
             }
+#else
+            if (!strcmp(altlabels[idx].tilelabel, encountered))
+                    return TRUE;
+#endif
         }
         return FALSE;
     }

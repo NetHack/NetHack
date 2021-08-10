@@ -183,7 +183,7 @@ typedef struct {
 
 #include "align.h"
 #include "dungeon.h"
-#include "monsym.h"
+#include "sym.h"
 #include "mkroom.h"
 #include "objclass.h"
 #include "youprop.h"
@@ -194,9 +194,9 @@ typedef struct {
 
 /* Symbol offsets */
 #define SYM_OFF_P (0)
-#define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)   /* MAXPCHARS from rm.h */
+#define SYM_OFF_O (SYM_OFF_P + MAXPCHARS)   /* MAXPCHARS from sym.h */
 #define SYM_OFF_M (SYM_OFF_O + MAXOCLASSES) /* MAXOCLASSES from objclass.h */
-#define SYM_OFF_W (SYM_OFF_M + MAXMCLASSES) /* MAXMCLASSES from monsym.h*/
+#define SYM_OFF_W (SYM_OFF_M + MAXMCLASSES) /* MAXMCLASSES from sym.h*/
 #define SYM_OFF_X (SYM_OFF_W + WARNCOUNT)
 #define SYM_MAX (SYM_OFF_X + MAXOTHER)
 

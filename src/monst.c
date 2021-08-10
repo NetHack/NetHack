@@ -5,7 +5,7 @@
 
 #include "config.h"
 #include "permonst.h"
-#include "monsym.h"
+#include "sym.h"
 
 #define NO_ATTK    \
     {              \
