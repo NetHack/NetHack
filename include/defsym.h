@@ -4,10 +4,10 @@
 
 
 /*
-    This header is included in multiple places to produced
-    differing code depending on its use. Its purpose is to
+    This header is included in multiple places to produce
+    different code depending on its use. Its purpose is to
     ensure that there is only one definitive source for
-    pchar, objclass and mon
+    pchar, objclass and mon symbols.
 
     The morphing macro expansions are used in these places:
   - in include/sym.h for enums of some S_ symbol values
