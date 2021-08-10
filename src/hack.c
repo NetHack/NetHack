@@ -1487,7 +1487,7 @@ domove_core(void)
     register struct rm *tmpr;
     register xchar x, y;
     struct trap *trap = NULL;
-    int wtcap;
+    int wtcap, glyph;
     boolean on_ice;
     xchar chainx = 0, chainy = 0,
           ballx = 0, bally = 0;         /* ball&chain new positions */
@@ -1705,6 +1705,7 @@ domove_core(void)
     g.bhitpos.x = x;
     g.bhitpos.y = y;
     tmpr = &levl[x][y];
+    glyph = glyph_at(x, y);
 
     /* attack monster */
     if (mtmp) {
@@ -1729,7 +1730,8 @@ domove_core(void)
          * different message and makes the player remember the monster.
          */
         if (g.context.nopick && !g.context.travel
-            && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
+            && (canspotmon(mtmp) || glyph_is_invisible(glyph)
+                || glyph_is_warning(glyph))) {
             if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
                 && !sensemon(mtmp))
                 stumble_onto_mimic(mtmp);
@@ -1782,11 +1784,10 @@ domove_core(void)
     /* specifying 'F' with no monster wastes a turn */
     if (g.context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(levl[x][y].glyph) && !g.context.nopick)) {
+        || (glyph_is_invisible(glyph) && !g.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
                 solid = !accessible(x, y);
-        int glyph = glyph_at(x, y); /* might be monster */
         char buf[BUFSZ];
 
         if (!Underwater) {
