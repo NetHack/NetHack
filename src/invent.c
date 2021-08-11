@@ -3431,7 +3431,8 @@ look_here(int obj_cnt, /* obj_cnt > 0 implies that autopickup is in progress */
         }
         if (dfeature && !drift && !strcmp(dfeature, surface(u.ux, u.uy)))
             dfeature = 0; /* ice already identified */
-        if (!can_reach_floor(TRUE)) {
+        trap = t_at(u.ux, u.uy);
+        if (!can_reach_floor(trap && is_pit(trap->ttyp))) {
             pline("But you can't reach it!");
             return 0;
         }
