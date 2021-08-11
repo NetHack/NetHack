@@ -4734,6 +4734,7 @@ dotravel_target(void)
     u.last_str_turn = 0;
     g.context.mv = TRUE;
 
+    domove();
     return 1;
 }
 
