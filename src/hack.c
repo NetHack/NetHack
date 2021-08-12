@@ -2807,7 +2807,7 @@ lookaround(void)
             if ((mtmp = m_at(x, y)) != 0
                 && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
-                && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
+                && mon_visible(mtmp)) {
                 if ((g.context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
                         && !g.context.travel)) {

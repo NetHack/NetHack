@@ -212,6 +212,7 @@
     <ClInclude Include="$(IncDir)coord.h" />
     <ClInclude Include="$(IncDir)date.h" />
     <ClInclude Include="$(IncDir)decl.h" />
+    <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)dgn_comp.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
     <ClInclude Include="$(IncDir)display.h" />
@@ -239,7 +240,6 @@
     <ClInclude Include="$(IncDir)mondata.h" />
     <ClInclude Include="$(IncDir)monflag.h" />
     <ClInclude Include="$(IncDir)monst.h" />
-    <ClInclude Include="$(IncDir)monsym.h" />
     <ClInclude Include="$(IncDir)nhlua.h" />
     <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
@@ -258,6 +258,7 @@
     <ClInclude Include="$(IncDir)skills.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
+    <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)sys.h" />
     <ClInclude Include="$(IncDir)system.h" />
     <ClInclude Include="$(IncDir)tcap.h" />

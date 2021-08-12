@@ -19,7 +19,7 @@
 #endif
 #include "permonst.h"
 #include "objclass.h"
-#include "monsym.h"
+#include "sym.h"
 #include "artilist.h"
 #include "dungeon.h"
 #include "obj.h"

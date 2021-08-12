@@ -7822,6 +7822,14 @@ parsesymbols(register char *opts, int which_set)
 struct symparse *
 match_sym(char *buf)
 {
+    int i;
+    struct alternate_parse {
+        const char *altnm;
+        const char *nm;
+    } alternates[] = {
+        { "S_armour" , "S_armor"},
+    };
+
     size_t len = strlen(buf);
     const char *p = index(buf, ':'), *q = index(buf, '=');
     struct symparse *sp = loadsyms;
@@ -7839,6 +7847,17 @@ match_sym(char *buf)
         if ((len >= strlen(sp->name)) && !strncmpi(buf, sp->name, len))
             return sp;
         sp++;
+    }
+    for (i = 0; i < SIZE(alternates); ++i) {
+        if ((len >= strlen(alternates[i].altnm))
+            && !strncmpi(buf, alternates[i].altnm, len)) {
+            sp = loadsyms;
+            while (sp->range) {
+                if (!strcmp(alternates[i].nm, sp->name))
+                    return sp;
+                sp++;
+            }
+        }
     }
     return (struct symparse *) 0;
 }

@@ -207,7 +207,7 @@ makedefs:	$(MAKEOBJS) mdgrep.h
 	$(CLINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
 makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
-		../include/objclass.h ../include/monsym.h \
+		../include/objclass.h ../include/sym.h ../include/defsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h

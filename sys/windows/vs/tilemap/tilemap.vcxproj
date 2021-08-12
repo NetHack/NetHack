@@ -41,6 +41,7 @@
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
     <ClInclude Include="$(IncDir)decl.h" />
+    <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)dgn_comp.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
     <ClInclude Include="$(IncDir)display.h" />
@@ -51,7 +52,6 @@
     <ClInclude Include="$(IncDir)mkroom.h" />
     <ClInclude Include="$(IncDir)monattk.h" />
     <ClInclude Include="$(IncDir)monst.h" />
-    <ClInclude Include="$(IncDir)monsym.h" />
     <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
@@ -65,6 +65,7 @@
     <ClInclude Include="$(IncDir)rm.h" />
     <ClInclude Include="$(IncDir)skills.h" />
     <ClInclude Include="$(IncDir)spell.h" />
+    <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)timeout.h" />
     <ClInclude Include="$(IncDir)tradstdc.h" />
     <ClInclude Include="$(IncDir)trap.h" />
