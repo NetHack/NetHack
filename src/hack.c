@@ -2775,7 +2775,7 @@ dopickup(void)
     return pickup(-count);
 }
 
-/* stop running if we see something interesting */
+/* stop running if we see something interesting next to us */
 /* turn around a corner if that is the only way we can proceed */
 /* do not turn left or right twice */
 void
@@ -2799,15 +2799,20 @@ lookaround(void)
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            /* ignore out of bounds, and our own location */
             if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
+            /* (grid bugs) ignore diagonals */
             if (NODIAG(u.umonnum) && x != u.ux && y != u.uy)
                 continue;
 
+            /* can we see a monster there? */
             if ((mtmp = m_at(x, y)) != 0
                 && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && mon_visible(mtmp)) {
+                /* running movement and not a tame monster */
+                /* OR it blocks our move direction and we're not traveling */
                 if ((g.context.run != 1 && !mtmp->mtame)
                     || (x == u.ux + u.dx && y == u.uy + u.dy
                         && !g.context.travel)) {
@@ -2817,15 +2822,20 @@ lookaround(void)
                 }
             }
 
+            /* stone is never interesting */
             if (levl[x][y].typ == STONE)
                 continue;
+            /* ignore the square we're moving away from */
             if (x == u.ux - u.dx && y == u.uy - u.dy)
                 continue;
 
+            /* more uninteresting terrain */
             if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM
                 || IS_AIR(levl[x][y].typ)) {
                 continue;
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
+                /* a closed door? */
+                /* ignore if diagonal */
                 if (x != u.ux && y != u.uy)
                     continue;
                 if (g.context.run != 1) {
@@ -2833,17 +2843,27 @@ lookaround(void)
                         You("stop in front of the door.");
                     goto stop;
                 }
+                /* we're orthonal to a closed door, consider it a corridor */
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
+                /* corridor */
  bcorr:
                 if (levl[u.ux][u.uy].typ != ROOM) {
+                    /* running or traveling */
                     if (g.context.run == 1 || g.context.run == 3
                         || g.context.run == 8) {
+                        /* distance from x,y to location we're moving to */
                         i = dist2(x, y, u.ux + u.dx, u.uy + u.dy);
+                        /* ignore if not on or directly adjacent to it */
                         if (i > 2)
                             continue;
+                        /* x,y is (adjacent to) the location we're moving to */
+                        /* if we've seen one corridor, and x,y is not directly
+                           orthogonally next to it, mark noturn */
                         if (corrct == 1 && dist2(x, y, x0, y0) != 1)
                             noturn = 1;
+                        /* if previous x,y was diagonal, now x,y is orthogonal */
+                        /* (or this is the first time we're here) */
                         if (i < i0) {
                             i0 = i;
                             x0 = x;
