@@ -12,7 +12,7 @@
     The morphing macro expansions are used in these places:
   - in include/sym.h for enums of some S_ symbol values
     (define PCHAR_ENUM, MONSYMS_ENUM prior to #include defsym.h)
-  - in include/objclass.h for enums of some S_ symbol values
+  - in include/objclass.h for enums of some *_CLASS values
     (define OBJCLASS_ENUM prior to #include defsym.h)
   - in src/symbols.c for parsing S_ entries in config files
     (define PCHAR_PARSE, MONSYMS_PARSE, OBJCLASS_PARSE prior
