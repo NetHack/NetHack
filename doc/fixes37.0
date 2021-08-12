@@ -1202,6 +1202,8 @@ unify code for extracting an object from a monster's inventory (#455)
 make engraving an occupation (#460)
 fpostfx index out of bounds when eating standard eggs (github pr#547)
 "readable" Hawaiian shirt designs (github pr#407)
+permit blind feeling for objects on trap door and fix up msgs when dropping
+	on trapdoor (github pr#574)
 
 
 Code Cleanup and Reorganization
