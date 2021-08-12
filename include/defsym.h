@@ -48,6 +48,7 @@
        idx:     index used in enum
        ch:      character symbol
        sym:     symbol name for parsing purposes
+       tilenm:  tile file description if different from desc
        desc:    description
        clr:     color
 */
@@ -131,7 +132,10 @@
     PCHAR( 43, ' ',  S_air, "air", CLR(CLR_CYAN))
     PCHAR( 44, '#',  S_cloud, "cloud", CLR(CLR_GRAY))
     PCHAR( 45, '}',  S_water, "water", CLR(CLR_BLUE))
-    /* end dungeon characters, begin traps */
+    /* end dungeon characters                                          */
+    /*                                                                 */
+    /* begin traps                                                     */
+    /*                                                                 */
     PCHAR( 46, '^',  S_arrow_trap, "arrow trap", CLR(HI_METAL))
     PCHAR( 47, '^',  S_dart_trap, "dart trap", CLR(HI_METAL))
     PCHAR( 48, '^',  S_falling_rock_trap, "falling rock trap", CLR(CLR_GRAY))
@@ -155,8 +159,12 @@
     PCHAR2(66, '^',  S_anti_magic_trap, "anti magic trap", "anti-magic field", CLR(HI_ZAP))
     PCHAR( 67, '^',  S_polymorph_trap, "polymorph trap", CLR(CLR_BRIGHT_GREEN))
     PCHAR( 68, '~',  S_vibrating_square, "vibrating square", CLR(CLR_MAGENTA))
-    /* end traps, begin special effects */
+    /* end traps                                                       */
+    /*                                                                 */
+    /* begin special effects                                           */
+    /*                                                                 */
     /* zap colors are changed by map_glyphinfo() to match type of beam */
+    /*                                                                 */
     PCHAR2(69, '|',  S_vbeam, "vertical beam", "", CLR(CLR_GRAY))
     PCHAR2(70, '-',  S_hbeam, "horizontal beam", "", CLR(CLR_GRAY))
     PCHAR2(71, '\\', S_lslant, "left slant beam", "", CLR(CLR_GRAY))
@@ -165,34 +173,54 @@
     PCHAR2(74, '!',  S_flashbeam, "flash beam", "", CLR(CLR_WHITE))
     PCHAR2(75, ')',  S_boomleft, "boom left", "", CLR(HI_WOOD))
     PCHAR2(76, '(',  S_boomright, "boom right", "", CLR(HI_WOOD))
-    /* 4 magic shield symbols */
+    /*                                                                 */
+    /* 4 magic shield symbols                                          */
+    /*                                                                 */
     PCHAR2(77, '0',  S_ss1, "shield1", "", CLR(HI_ZAP))
     PCHAR2(78, '#',  S_ss2, "shield2", "", CLR(HI_ZAP))
     PCHAR2(79, '@',  S_ss3, "shield3", "", CLR(HI_ZAP))
     PCHAR2(80, '*',  S_ss4, "shield4", "", CLR(HI_ZAP))
     PCHAR( 81, '#',  S_poisoncloud, "poison cloud", CLR(CLR_BRIGHT_GREEN))
     PCHAR( 82, '?',  S_goodpos, "valid position", CLR(CLR_BRIGHT_GREEN))
-    /* The 8 swallow symbols.  Do NOT separate.  To change order or add, */
-    /* see the function swallow_to_glyph() in display.c.                 */
-    /* swallow colors are changed by map_glyphinfo() to match engulfing monst */
-    PCHAR2(83, '/',  S_sw_tl, "swallow top left", "", CLR(CLR_GREEN))      /* 1        */
-    PCHAR2(84, '-',  S_sw_tc, "swallow top center", "", CLR(CLR_GREEN))    /* 2 Order: */
-    PCHAR2(85, '\\', S_sw_tr, "swallow top right", "", CLR(CLR_GREEN))     /* 3        */
-    PCHAR2(86, '|',  S_sw_ml, "swallow middle left", "", CLR(CLR_GREEN))   /* 4  1 2 3 */
-    PCHAR2(87, '|',  S_sw_mr, "swallow middle right", "", CLR(CLR_GREEN))  /* 6  4 5 6 */
-    PCHAR2(88, '\\', S_sw_bl, "swallow bottom left", "", CLR(CLR_GREEN))   /* 7  7 8 9 */
-    PCHAR2(89, '-',  S_sw_bc, "swallow bottom center", "", CLR(CLR_GREEN)) /* 8        */
-    PCHAR2(90, '/',  S_sw_br, "swallow bottom right", "", CLR(CLR_GREEN))  /* 9        */
-    /* explosion colors are changed by map_glyphinfo() to match type of expl. */
-    PCHAR2(91, '/',  S_explode1, "explosion top left", "", CLR(CLR_ORANGE))      /*     */
-    PCHAR2(92, '-',  S_explode2, "explosion top center", "", CLR(CLR_ORANGE))    /*     */
-    PCHAR2(93, '\\', S_explode3, "explosion top right", "", CLR(CLR_ORANGE))     /*Ex.  */
-    PCHAR2(94, '|',  S_explode4, "explosion middle left", "", CLR(CLR_ORANGE))   /*     */
-    PCHAR2(95, ' ',  S_explode5, "explosion middle center", "", CLR(CLR_ORANGE)) /* /-\ */
-    PCHAR2(96, '|',  S_explode6, "explosion middle right", "", CLR(CLR_ORANGE))  /* |@| */
-    PCHAR2(97, '\\', S_explode7, "explosion bottom left", "", CLR(CLR_ORANGE))   /* \-/ */
-    PCHAR2(98, '-',  S_explode8, "explosion bottom center", "", CLR(CLR_ORANGE)) /*     */
-    PCHAR2(99, '/',  S_explode9, "explosion bottom right", "", CLR(CLR_ORANGE))  /*     */
+    /*                                                             */
+    /* The 8 swallow symbols.  Do NOT separate.                    */
+    /* To change order or add, see the function swallow_to_glyph() */
+    /* in display.c. swallow colors are changed by map_glyphinfo() */
+    /* to match the engulfing monst.                               */
+    /*                                                             */
+    /*  Order:                                                     */
+    /*                                                             */
+    /*      1 2 3                                                  */
+    /*      4 5 6                                                  */
+    /*      7 8 9                                                  */
+    /*                                                             */
+    PCHAR2(83, '/',  S_sw_tl, "swallow top left", "", CLR(CLR_GREEN))      /* 1 */
+    PCHAR2(84, '-',  S_sw_tc, "swallow top center", "", CLR(CLR_GREEN))    /* 2 */
+    PCHAR2(85, '\\', S_sw_tr, "swallow top right", "", CLR(CLR_GREEN))     /* 3 */
+    PCHAR2(86, '|',  S_sw_ml, "swallow middle left", "", CLR(CLR_GREEN))   /* 4 */
+    PCHAR2(87, '|',  S_sw_mr, "swallow middle right", "", CLR(CLR_GREEN))  /* 6 */
+    PCHAR2(88, '\\', S_sw_bl, "swallow bottom left", "", CLR(CLR_GREEN))   /* 7 */
+    PCHAR2(89, '-',  S_sw_bc, "swallow bottom center", "", CLR(CLR_GREEN)) /* 8 */
+    PCHAR2(90, '/',  S_sw_br, "swallow bottom right", "", CLR(CLR_GREEN))  /* 9 */
+    /*                                                             */
+    /* explosion colors are changed by map_glyphinfo() to match    */
+    /* the type of expl.                                           */
+    /*                                                             */
+    /*    Ex.                                                      */
+    /*                                                             */
+    /*      /-\                                                    */
+    /*      |@|                                                    */
+    /*      \-/                                                    */
+    /*                                                             */
+    PCHAR2(91, '/',  S_explode1, "explosion top left", "", CLR(CLR_ORANGE))
+    PCHAR2(92, '-',  S_explode2, "explosion top center", "", CLR(CLR_ORANGE))
+    PCHAR2(93, '\\', S_explode3, "explosion top right", "", CLR(CLR_ORANGE))
+    PCHAR2(94, '|',  S_explode4, "explosion middle left", "", CLR(CLR_ORANGE))
+    PCHAR2(95, ' ',  S_explode5, "explosion middle center", "", CLR(CLR_ORANGE))
+    PCHAR2(96, '|',  S_explode6, "explosion middle right", "", CLR(CLR_ORANGE))
+    PCHAR2(97, '\\', S_explode7, "explosion bottom left", "", CLR(CLR_ORANGE))
+    PCHAR2(98, '-',  S_explode8, "explosion bottom center", "", CLR(CLR_ORANGE))
+    PCHAR2(99, '/',  S_explode9, "explosion bottom right", "", CLR(CLR_ORANGE))
 #undef PCHAR
 #undef PCHAR2
 #endif /* PCHAR_ENUM || PCHAR_DEFSYMS || PCHAR_DRAWING || PCHAR_TILES */
