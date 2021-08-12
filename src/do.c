@@ -245,14 +245,17 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
         res = water_damage(obj, NULL, FALSE) == ER_DESTROYED;
     } else if (u.ux == x && u.uy == y && (t = t_at(x, y)) != 0
                && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
-        if (Blind && !Deaf)
-            You_hear("%s tumble downwards.", the(xname(obj)));
-        else
-            pline("%s %s into %s %s.", The(xname(obj)),
-                  otense(obj, "tumble"), the_your[t->madeby_u],
-                  is_pit(t->ttyp) ? "pit" : "hole");
-        if (is_hole(t->ttyp) && ship_object(obj, x, y, FALSE))
+        if (is_pit(t->ttyp)) {
+            if (Blind && !Deaf)
+                You_hear("%s tumble downwards.", the(xname(obj)));
+            else
+                pline("%s into %s pit.", Tobjnam(obj, "tumble"),
+                      the_your[t->madeby_u]);
+        } else if (ship_object(obj, x, y, FALSE)) {
+            /* ship_object will print an appropriate "the item falls
+             * through the hole" message, so no need to do it here. */
             res = TRUE;
+        }
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
