@@ -348,13 +348,25 @@
         || defined (OBJCLASS_DRAWING)
 
 /*
-    OBJCLASS(idx, class, defsym, sym, name, explain)
-        idx:     index used in enum
-        class:   enum entry
-        defsym:  symbol macro (defined in sym.h)
-        sym:     symbol name for parsing purposes
-        name:    used in object_detect()
-        explain: used in do_look()
+    OBJCLASS(idx, ch, basename, sym, name, explain)
+        idx:      index used in enum
+        ch:       default character
+        basename: unadorned base name of objclass, used
+                  to construct enums through suffixes/prefixes
+        sym:      symbol name for enum and parsing purposes
+        name:     used in object_detect()
+        explain:  used in do_look()
+
+    OBJCLASS7(idx, ch, basename, sname, sym, name, explain)
+        idx:      index used in enum
+        ch:       default character
+        basename: unadorned base name of objclass, used
+                  to construct enums through suffixes/prefixes
+        sname:    hardcoded *_SYM value for this entry (required
+                  only because basename and GOLD_SYM differ
+        sym:      symbol name for enum and parsing purposes
+        name:     used in object_detect()
+        explain:  used in do_look()
 */
 
 #if defined(OBJCLASS_CLASS_ENUM)
