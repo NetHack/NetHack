@@ -748,7 +748,7 @@ extern void explode(int, int, int, int, char, int);
 extern long scatter(int, int, int, unsigned int, struct obj *);
 extern void splatter_burning_oil(int, int, boolean);
 extern void explode_oil(struct obj *, int, int);
-extern int adtyp_to_expltype(int);
+extern int adtyp_to_expltype(const int);
 extern void mon_explodes(struct monst *, struct attack *);
 
 /* ### extralev.c ### */

@@ -100,7 +100,7 @@ GAMEDIR = ..\binary               # Default game build directory
 #    of your PDCurses C files.
 #
 #ADD_CURSES=Y
-#PDCURSES_TOP=..\lib\pdcurses
+#PDCURSES_TOP=..\lib\pdcursesmod
 #
 #------------------------------------------------------------------------------
 # OPTIONAL - zlib support (to allow compressed savefile exchange across platforms
@@ -658,22 +658,22 @@ lcommon= /NOLOGO /INCREMENTAL:NO
 
 !IF "$(DEBUGINFO)" == "Y"
 ldebug = /DEBUG
-cflags1=$(ccommon) $(cdebug)
+ctmpflags1=$(ccommon) $(cdebug)
 lflags1=$(lcommon) $(ldebug)
 !ELSE
 ldebug= /DEBUG
-cflags1=$(ccommon) $(crelease)
+ctmpflags1=$(ccommon) $(crelease)
 lflags1=$(lcommon) $(ldebug)
 !ENDIF
 
 lflags= $(lflags1)
 
 !IF "$(TARGET_CPU)" == "x86"
-cflags = $(cflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+ctmpflags = $(ctmpflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
 scall  = -Gz
 
 !ELSEIF "$(TARGET_CPU)" == "x64"
-cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
+ctmpflags = $(ctmpflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
 scall  =
 !ENDIF
 
@@ -689,7 +689,9 @@ scall  =
 # 4777 format string requires an argument of type ‘type’,
 #      but variadic argument ‘position’ has type ‘type’
 # 4820 padding in struct
-cflags = $(cflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44774 -w44777 -wd4820
+ctmpflags = $(ctmpflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44777 -wd4820
+cppflags = $(ctmpflags)
+cflags = $(ctmpflags) -w44774
 !ENDIF
 
 #More verbose warning output options below
@@ -734,6 +736,7 @@ INCLDIR= /I..\include /I..\sys\windows $(LUAINCL)
 #==========================================
 
 cflagsBuild = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG) -DSAFEPROCS
+cppflagsBuild = $(cppflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG) -DSAFEPROCS
 lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
 
 #==========================================
@@ -772,7 +775,7 @@ DLB =
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET)  -Fo$@  $<
 
 {$(SSYS)}.cpp{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EHsc -Fo$@  $<
+	@$(cc) $(cppflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EHsc -Fo$@  $<
 
 #==========================================
 # Rules for files in sys\windows
