@@ -145,7 +145,7 @@ void NetHackQtMapViewport::SetupTextmapFont(QPainter &painter)
         QFont f(fontfamily, pts, maybebold);
         painter.setFont(QFont(fontfamily, pts));
         QFontMetrics fm = painter.fontMetrics();
-        if (fm.width("M") > qt_settings->glyphs().width())
+        if (fm.horizontalAdvance("M") > qt_settings->glyphs().width())
             break;
         if (fm.height() > qt_settings->glyphs().height())
             break;

@@ -106,7 +106,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 	splash->repaint();
 	lsplash->repaint();
 	capt->repaint();
-	qApp->flush();
+	qApp->processEvents();
 
     } else {
 	splash = 0;
@@ -156,7 +156,6 @@ void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
     seteuid(getuid());
 #endif
 
-    QApplication::setColorSpec(ManyColor);
     instance=new NetHackQtBind(*argc,argv);
 
 #ifdef UNIX
@@ -416,8 +415,7 @@ void NetHackQtBind::qt_display_file(const char *filename, boolean must_exist)
     }
 
     if (complain) {
-	QString message;
-	message.sprintf("File not found: %s\n",filename);
+	QString message = QString::asprintf("File not found: %s\n",filename);
 	QMessageBox::warning(NULL, "File Error", message, QMessageBox::Ignore);
     }
 }

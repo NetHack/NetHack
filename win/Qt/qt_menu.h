@@ -24,7 +24,7 @@ public:
 	int width = 0;
 	QFontMetrics fm(font());
 	for (int i = 0; i < count(); i++) {
-	    int lwidth = fm.width(item(i)->text());
+	    int lwidth = fm.horizontalAdvance(item(i)->text());
 	    width = std::max(width, lwidth);
 	}
 	return width;

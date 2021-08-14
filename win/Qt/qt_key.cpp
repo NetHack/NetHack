@@ -94,7 +94,7 @@ int NetHackQtKeyBuffer::GetAscii()
 
 Qt::KeyboardModifiers NetHackQtKeyBuffer::GetState()
 {
-    if ( Empty() ) return 0;
+    if ( Empty() ) return Qt::NoModifier;
     Qt::KeyboardModifiers r=TopState();
     out=(out+1)%maxkey;
     return r;
@@ -114,7 +114,7 @@ int NetHackQtKeyBuffer::TopAscii() const
 
 Qt::KeyboardModifiers NetHackQtKeyBuffer::TopState() const
 {
-    if ( Empty() ) return 0;
+    if ( Empty() ) return Qt::NoModifier;
     return state[out];
 }
 

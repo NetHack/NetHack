@@ -106,7 +106,7 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, long v, long cv,
     if (v==NoNum) {
 	buf = "";
     } else {
-	buf.sprintf("%ld", v);
+	buf = QString::asprintf("%ld", v);
     }
     setLabel(t + buf + tail, cv < prev_value);
     prev_value=cv;

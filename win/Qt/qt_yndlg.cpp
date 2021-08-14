@@ -148,7 +148,7 @@ char NetHackQtYnDialog::Exec()
 	    q->setMargin(4);
 	    vb->addWidget(q);
 	}
-	QGroupBox *group = new QGroupBox(bigq ? QString::null : qlabel, this);
+	QGroupBox *group = new QGroupBox(bigq ? QString() : qlabel, this);
 	vb->addWidget(group);
 	QHBoxLayout *groupbox = new QHBoxLayout();
 	group->setLayout(groupbox);
@@ -350,7 +350,7 @@ char NetHackQtYnDialog::Exec()
 	QPushButton cancel("Dismiss",this);
 	label.setFrameStyle(QFrame::Box|QFrame::Sunken);
 	label.setAlignment(Qt::AlignCenter);
-	label.resize(fontMetrics().width(qlabel)+60,30+fontMetrics().height());
+	label.resize(fontMetrics().horizontalAdvance(qlabel)+60,30+fontMetrics().height());
 	cancel.move(width()/2-cancel.width()/2,label.geometry().bottom()+8);
 	connect(&cancel,SIGNAL(clicked()),this,SLOT(reject()));
 	centerOnMain(this);

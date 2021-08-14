@@ -50,8 +50,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 
 	tile_file = PIXMAPDIR "/x11tiles";
 	if (!img.load(tile_file)) {
-	    QString msg;
-            msg.sprintf("Cannot load 'nhtiles.bmp' or 'x11tiles'.");
+	    QString msg = QString::asprintf("Cannot load 'nhtiles.bmp' or 'x11tiles'.");
             QMessageBox::warning(0, "IO Error", msg);
             iflags.wc_ascii_map = 1;
             iflags.wc_tiled_map = 0;

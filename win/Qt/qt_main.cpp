@@ -458,8 +458,7 @@ aboutMsg()
         *p = '\0';
     /* it's also long; break it into two pieces */
     (void) strsubst(vbuf, " - ", "\n- ");
-    QString msg;
-    msg.sprintf(
+    QString msg = QString::asprintf(
         // format
         "NetHack-Qt is a version of NetHack built using" // no newline
 #ifdef KDE
@@ -1022,8 +1021,7 @@ void NetHackQtMainWindow::doQuit(bool)
     // nethack's #quit command itself) but this routine is unconditional
     // in case someone wants to change that
 #ifdef MACOS
-    QString info;
-    info.sprintf("This will end your NetHack session.%s",
+    QString info = QString::asprintf("This will end your NetHack session.%s",
                  !g.program_state.something_worth_saving ? ""
                  : "\n(Cancel quitting and use the Save command"
                    "\nto save your current game.)");
