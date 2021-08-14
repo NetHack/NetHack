@@ -10,10 +10,16 @@
     pchar, objclass and mon symbols.
 
     The morphing macro expansions are used in these places:
-  - in include/sym.h for enums of some S_ symbol values
-    (define PCHAR_ENUM, MONSYMS_ENUM prior to #include defsym.h)
+  - in include/sym.h for enums of some S_* symbol values
+    (define PCHAR_S_ENUM, MONSYMS_S_ENUM prior to #include defsym.h)
+  - in include/sym.h for enums of some DEF_* symbol values
+    (define MONSYMS_DEFCHAR_ENUM prior to #include defsym.h)
+  - in include/objclass.h for enums of some default character values
+    (define OBJCLASS_DEFCHAR_ENUM prior to #include defsym.h)
   - in include/objclass.h for enums of some *_CLASS values
-    (define OBJCLASS_ENUM prior to #include defsym.h)
+    (define OBJCLASS_CLASS_ENUM prior to #include defsym.h)
+  - in include/objclass.h for enums of S_* symbol values
+    (define OBJCLASS_S_ENUM prior to #include defsym.h)
   - in src/symbols.c for parsing S_ entries in config files
     (define PCHAR_PARSE, MONSYMS_PARSE, OBJCLASS_PARSE prior
     to #include defsym.h)
@@ -34,26 +40,29 @@
 #define CLR(n)
 #endif
 
-#if defined(PCHAR_ENUM) || defined(PCHAR_PARSE) || defined(PCHAR_DRAWING) || defined(PCHAR_TILES)
+#if defined(PCHAR_S_ENUM) || defined(PCHAR_PARSE) \
+    || defined(PCHAR_DRAWING) || defined(PCHAR_TILES)
 
 /*
    PCHAR(idx, ch, sym, desc, clr)
        idx:     index used in enum
        ch:      character symbol
-       sym:     symbol name for parsing purposes
+       sym:     symbol name for parsing purposes (also tile name)
        desc:    description
        clr:     color
 
    PCHAR2(idx, ch, sym, tilenm, desc, clr)
        idx:     index used in enum
        ch:      character symbol
+       tilenm:  if the name in the txt file differs from sym,
+                the tile name can be specified here.
        sym:     symbol name for parsing purposes
        tilenm:  tile file description if different from desc
        desc:    description
        clr:     color
 */
 
-#if defined(PCHAR_ENUM)
+#if defined(PCHAR_S_ENUM)
 /* sym.h */
 #define PCHAR(idx, ch, sym, desc, clr) \
         sym = idx,
@@ -223,9 +232,10 @@
     PCHAR2(99, '/',  S_explode9, "explosion bottom right", "", CLR(CLR_ORANGE))
 #undef PCHAR
 #undef PCHAR2
-#endif /* PCHAR_ENUM || PCHAR_DEFSYMS || PCHAR_DRAWING || PCHAR_TILES */
+#endif /* PCHAR_S_ENUM || PCHAR_PARSE || PCHAR_DRAWING || PCHAR_TILES */
 
-#if defined(MONSYMS_ENUM) || defined(MONSYMS_PARSE) || defined (MONSYMS_DRAWING)
+#if defined(MONSYMS_S_ENUM) || defined(MONSYMS_DEFCHAR_ENUM) \
+        || defined(MONSYMS_PARSE) || defined(MONSYMS_DRAWING)
 
 /*
     MONSYM(idx, ch, sym desc)
@@ -235,99 +245,107 @@
         desc:    description
 */
 
-#if defined(MONSYMS_ENUM)
+#if defined(MONSYMS_S_ENUM)
 /* sym.h */
-#define MONSYM(idx, ch, sym, desc) \
+#define MONSYM(idx, ch, basename, sym, desc) \
     sym = idx,
+
+#elif defined(MONSYMS_DEFCHAR_ENUM)
+/* sym.h */
+#define MONSYM(idx, ch, basename, sym,  desc) \
+    DEF_##basename = ch,
 
 #elif defined(MONSYMS_PARSE)
 /* symbols.c */
-#define MONSYM(idx, ch, sym, desc) \
+#define MONSYM(idx, ch, basename, sym, desc) \
     { SYM_MON, sym + SYM_OFF_M, #sym },
 
 #elif defined(MONSYMS_DRAWING)
 /* drawing.c */
-#define MONSYM(idx, ch, sym, desc) \
-    { ch, "", desc },
+#define MONSYM(idx, ch, basename, sym, desc) \
+    { DEF_##basename, "", desc },
 #endif
 
-    MONSYM( 1, DEF_ANT,  S_ANT, "ant or other insect")
-    MONSYM( 2, DEF_BLOB, S_BLOB, "blob")
-    MONSYM( 3, DEF_COCKATRICE, S_COCKATRICE, "cockatrice")
-    MONSYM( 4, DEF_DOG, S_DOG, "dog or other canine")
-    MONSYM( 5, DEF_EYE, S_EYE, "eye or sphere")
-    MONSYM( 6, DEF_FELINE, S_FELINE, "cat or other feline")
-    MONSYM( 7, DEF_GREMLIN, S_GREMLIN, "gremlin")
+    MONSYM( 1, 'a', ANT, S_ANT,   "ant or other insect")
+    MONSYM( 2, 'b', BLOB, S_BLOB, "blob")
+    MONSYM( 3, 'c', COCKATRICE, S_COCKATRICE, "cockatrice")
+    MONSYM( 4, 'd', DOG, S_DOG, "dog or other canine")
+    MONSYM( 5, 'e', EYE, S_EYE, "eye or sphere")
+    MONSYM( 6, 'f', FELINE, S_FELINE, "cat or other feline")
+    MONSYM( 7, 'g', GREMLIN, S_GREMLIN, "gremlin")
     /* small humanoids: hobbit, dwarf */
-    MONSYM( 8, DEF_HUMANOID, S_HUMANOID, "humanoid")
+    MONSYM( 8, 'h', HUMANOID, S_HUMANOID, "humanoid")
     /* minor demons */
-    MONSYM( 9, DEF_IMP, S_IMP, "imp or minor demon")
-    MONSYM(10, DEF_JELLY, S_JELLY, "jelly")
-    MONSYM(11, DEF_KOBOLD, S_KOBOLD, "kobold")
-    MONSYM(12, DEF_LEPRECHAUN, S_LEPRECHAUN, "leprechaun")
-    MONSYM(13, DEF_MIMIC, S_MIMIC, "mimic")    /* 'm' */
-    MONSYM(14, DEF_NYMPH, S_NYMPH, "nymph")
-    MONSYM(15, DEF_ORC, S_ORC, "orc")
-    MONSYM(16, DEF_PIERCER, S_PIERCER, "piercer")
+    MONSYM( 9, 'i', IMP, S_IMP, "imp or minor demon")
+    MONSYM(10, 'j', JELLY, S_JELLY, "jelly")
+    MONSYM(11, 'k', KOBOLD, S_KOBOLD, "kobold")
+    MONSYM(12, 'l', LEPRECHAUN, S_LEPRECHAUN, "leprechaun")
+    MONSYM(13, 'm', MIMIC, S_MIMIC, "mimic")
+    MONSYM(14, 'n', NYMPH, S_NYMPH, "nymph")
+    MONSYM(15, 'o', ORC, S_ORC, "orc")
+    MONSYM(16, 'p', PIERCER, S_PIERCER, "piercer")
     /* quadruped excludes horses */
-    MONSYM(17, DEF_QUADRUPED, S_QUADRUPED, "quadruped")
-    MONSYM(18, DEF_RODENT, S_RODENT, "rodent")
-    MONSYM(19, DEF_SPIDER, S_SPIDER, "arachnid or centipede")
-    MONSYM(20, DEF_TRAPPER, S_TRAPPER, "trapper or lurker above")
+    MONSYM(17, 'q', QUADRUPED, S_QUADRUPED, "quadruped")
+    MONSYM(18, 'r', RODENT, S_RODENT, "rodent")
+    MONSYM(19, 's', SPIDER, S_SPIDER, "arachnid or centipede")
+    MONSYM(20, 't', TRAPPER, S_TRAPPER, "trapper or lurker above")
     /* unicorn, horses */
-    MONSYM(21, DEF_UNICORN, S_UNICORN, "unicorn or horse")
-    MONSYM(22, DEF_VORTEX, S_VORTEX, "vortex")
-    MONSYM(23, DEF_WORM, S_WORM, "worm")
-    MONSYM(24, DEF_XAN, S_XAN, "xan or other mythical/fantastic insect")
+    MONSYM(21, 'u', UNICORN, S_UNICORN, "unicorn or horse")
+    MONSYM(22, 'v', VORTEX, S_VORTEX, "vortex")
+    MONSYM(23, 'w', WORM, S_WORM, "worm")
+    MONSYM(24, 'x', XAN, S_XAN, "xan or other mythical/fantastic insect")
     /* yellow light, black light */
-    MONSYM(25, DEF_LIGHT, S_LIGHT, "light")
-    MONSYM(26, DEF_ZRUTY, S_ZRUTY, "zruty")
-    MONSYM(27, DEF_ANGEL, S_ANGEL, "angelic being")
-    MONSYM(28, DEF_BAT, S_BAT, "bat or bird")
-    MONSYM(29, DEF_CENTAUR, S_CENTAUR, "centaur")
-    MONSYM(30, DEF_DRAGON, S_DRAGON, "dragon")
+    MONSYM(25, 'y', LIGHT, S_LIGHT, "light")
+    MONSYM(26, 'z', ZRUTY, S_ZRUTY, "zruty")
+    MONSYM(27, 'A', ANGEL, S_ANGEL, "angelic being")
+    MONSYM(28, 'B', BAT, S_BAT, "bat or bird")
+    MONSYM(29, 'C', CENTAUR, S_CENTAUR, "centaur")
+    MONSYM(30, 'D', DRAGON, S_DRAGON, "dragon")
     /* elemental includes invisible stalker */
-    MONSYM(31, DEF_ELEMENTAL, S_ELEMENTAL, "elemental")
-    MONSYM(32, DEF_FUNGUS, S_FUNGUS, "fungus or mold")
-    MONSYM(33, DEF_GNOME, S_GNOME, "gnome")
+    MONSYM(31, 'E', ELEMENTAL, S_ELEMENTAL, "elemental")
+    MONSYM(32, 'F', FUNGUS, S_FUNGUS, "fungus or mold")
+    MONSYM(33, 'G', GNOME, S_GNOME, "gnome")
     /* large humanoid: giant, ettin, minotaur */
-    MONSYM(34, DEF_GIANT, S_GIANT, "giant humanoid")
-    MONSYM(35, DEF_INVISIBLE, S_invisible, "invisible monster")
-    MONSYM(36, DEF_JABBERWOCK, S_JABBERWOCK, "jabberwock")
-    MONSYM(37, DEF_KOP, S_KOP, "Keystone Kop")
-    MONSYM(38, DEF_LICH, S_LICH, "lich")
-    MONSYM(39, DEF_MUMMY, S_MUMMY, "mummy")
-    MONSYM(40, DEF_NAGA, S_NAGA, "naga")
-    MONSYM(41, DEF_OGRE, S_OGRE, "ogre")
-    MONSYM(42, DEF_PUDDING, S_PUDDING, "pudding or ooze")
-    MONSYM(43, DEF_QUANTMECH, S_QUANTMECH, "quantum mechanic")
-    MONSYM(44, DEF_RUSTMONST, S_RUSTMONST, "rust monster or disenchanter")
-    MONSYM(45, DEF_SNAKE, S_SNAKE, "snake")
-    MONSYM(46, DEF_TROLL, S_TROLL, "troll")
+    MONSYM(34, 'H', GIANT, S_GIANT, "giant humanoid")
+    MONSYM(35, 'I', INVISIBLE, S_invisible, "invisible monster")
+    MONSYM(36, 'J', JABBERWOCK, S_JABBERWOCK, "jabberwock")
+    MONSYM(37, 'K', KOP, S_KOP, "Keystone Kop")
+    MONSYM(38, 'L', LICH, S_LICH, "lich")
+    MONSYM(39, 'M', MUMMY, S_MUMMY, "mummy")
+    MONSYM(40, 'N', NAGA, S_NAGA, "naga")
+    MONSYM(41, 'O', OGRE, S_OGRE, "ogre")
+    MONSYM(42, 'P', PUDDING, S_PUDDING, "pudding or ooze")
+    MONSYM(43, 'Q', QUANTMECH, S_QUANTMECH, "quantum mechanic")
+    MONSYM(44, 'R', RUSTMONST, S_RUSTMONST, "rust monster or disenchanter")
+    MONSYM(45, 'S', SNAKE, S_SNAKE, "snake")
+    MONSYM(46, 'T', TROLL, S_TROLL, "troll")
     /* umber hulk */
-    MONSYM(47, DEF_UMBER, S_UMBER, "umber hulk")
-    MONSYM(48, DEF_VAMPIRE, S_VAMPIRE, "vampire")
-    MONSYM(49, DEF_WRAITH, S_WRAITH, "wraith")
-    MONSYM(50, DEF_XORN, S_XORN, "xorn")
+    MONSYM(47, 'U', UMBER, S_UMBER, "umber hulk")
+    MONSYM(48, 'V', VAMPIRE, S_VAMPIRE, "vampire")
+    MONSYM(49, 'W', WRAITH, S_WRAITH, "wraith")
+    MONSYM(50, 'X', XORN, S_XORN, "xorn")
     /* apelike creature includes owlbear, monkey */
-    MONSYM(51, DEF_YETI, S_YETI, "apelike creature")
-    MONSYM(52, DEF_ZOMBIE, S_ZOMBIE, "zombie")
-    MONSYM(53, DEF_HUMAN, S_HUMAN, "human or elf")
+    MONSYM(51, 'Y', YETI, S_YETI, "apelike creature")
+    MONSYM(52, 'Z', ZOMBIE, S_ZOMBIE, "zombie")
+    MONSYM(53, '@', HUMAN, S_HUMAN, "human or elf")
     /* space symbol*/
-    MONSYM(54, DEF_GHOST, S_GHOST, "ghost")
-    MONSYM(55, DEF_GOLEM, S_GOLEM, "golem")
-    MONSYM(56, DEF_DEMON, S_DEMON, "major demon")
+    MONSYM(54, ' ', GHOST, S_GHOST, "ghost")
+    MONSYM(55, '\'', GOLEM, S_GOLEM, "golem")
+    MONSYM(56, '&', DEMON, S_DEMON, "major demon")
     /* fish */
-    MONSYM(57, DEF_EEL,  S_EEL, "sea monster")
+    MONSYM(57, ';', EEL, S_EEL,  "sea monster")
     /* reptiles */
-    MONSYM(58, DEF_LIZARD, S_LIZARD, "lizard")
-    MONSYM(59, DEF_WORM_TAIL,  S_WORM_TAIL, "long worm tail")
-    MONSYM(60, DEF_MIMIC_DEF,  S_MIMIC_DEF, "mimic")
+    MONSYM(58, ':', LIZARD, S_LIZARD, "lizard")
+    MONSYM(59, '~', WORM_TAIL, S_WORM_TAIL, "long worm tail")
+    MONSYM(60, ']', MIMIC_DEF, S_MIMIC_DEF, "mimic")
 
 #undef MONSYM
-#endif /* MONSYMS_ENUM || MONSYMS_PARSE || MONSYMS_DRAWING */
+#endif /* MONSYMS_S_ENUM || MONSYMS_DEFCHAR_ENUM || MONSYMS_PARSE */
+       /* || MONSYMS_DRAWING */
 
-#if defined(OBJCLASS_ENUM) || defined(OBJCLASS_PARSE) || defined (OBJCLASS_DRAWING)
+#if defined(OBJCLASS_S_ENUM) || defined(OBJCLASS_DEFCHAR_ENUM) \
+        || defined(OBJCLASS_CLASS_ENUM) || defined(OBJCLASS_PARSE) \
+        || defined (OBJCLASS_DRAWING)
 
 /*
     OBJCLASS(idx, class, defsym, sym, name, explain)
@@ -339,47 +357,79 @@
         explain: used in do_look()
 */
 
-#if defined(OBJCLASS_ENUM)
+#if defined(OBJCLASS_CLASS_ENUM)
 /* objclass.h */
-#define OBJCLASS(idx, class, defsym, sym, name, explain) \
-    class = idx,
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    basename##_CLASS = idx,
+#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+    basename##_CLASS = idx,
+
+#elif defined(OBJCLASS_DEFCHAR_ENUM)
+/* objclass.h */
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    basename##_SYM = ch,
+#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+    sname = ch,
+
+#elif defined(OBJCLASS_S_ENUM)
+/* objclass.h */
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    sym = idx,
+#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+    sym = idx,
 
 #elif defined(OBJCLASS_PARSE)
 /* symbols.c */
-#define OBJCLASS(idx, class, defsym, sym, name, explain) \
-    { SYM_OC, class + SYM_OFF_O, #sym },
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    { SYM_OC, sym + SYM_OFF_O, #sym },
+#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+    { SYM_OC, sym + SYM_OFF_O, #sym },
 
 #elif defined(OBJCLASS_DRAWING)
 /* drawing.c */
-#define OBJCLASS(idx, class, defsym, sym, name, explain) \
-    { defsym, name, explain },
+#define OBJCLASS(idx, ch, basename, sym, name, explain) \
+    { basename##_SYM, name, explain },
+#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+    { sname, name, explain },
 #endif
 
-    OBJCLASS( 1, ILLOBJ_CLASS, ILLOBJ_SYM, S_strange_obj,
-                "illegal objects", "strange object")
-    OBJCLASS( 2, WEAPON_CLASS, WEAPON_SYM, S_weapon, "weapons", "weapon")
-    OBJCLASS( 3, ARMOR_CLASS, ARMOR_SYM, S_armor,
-                    "armor", "suit or piece of armor")
-    OBJCLASS( 4, RING_CLASS, RING_SYM, S_ring, "rings", "ring")
-    OBJCLASS( 5, AMULET_CLASS, AMULET_SYM, S_amulet, "amulets", "amulet")
-    OBJCLASS( 6, TOOL_CLASS, TOOL_SYM, S_tool,
-                    "tools", "useful item (pick-axe, key, lamp...)")
-    OBJCLASS( 7, FOOD_CLASS, FOOD_SYM, S_food, "food", "piece of food")
-    OBJCLASS( 8, POTION_CLASS, POTION_SYM, S_potion, "potions", "potion")
-    OBJCLASS( 9, SCROLL_CLASS, SCROLL_SYM, S_scroll, "scrolls", "scroll")
-    OBJCLASS(10, SPBOOK_CLASS, SPBOOK_SYM, S_book, "spellbooks", "spellbook")
-    OBJCLASS(11, WAND_CLASS, WAND_SYM, S_wand, "wands", "wand")
-    OBJCLASS(12, COIN_CLASS, GOLD_SYM, S_coin, "coins", "pile of coins")
-    OBJCLASS(13, GEM_CLASS, GEM_SYM, S_gem, "rocks", "gem or rock")
-    OBJCLASS(14, ROCK_CLASS, ROCK_SYM, S_rock,
-                    "large stones", "boulder or statue")
-    OBJCLASS(15, BALL_CLASS, BALL_SYM, S_ball, "iron balls", "iron ball")
-    OBJCLASS(16, CHAIN_CLASS, CHAIN_SYM, S_chain, "chains", "iron chain")
-    OBJCLASS(17, VENOM_CLASS, VENOM_SYM, S_venom, "venoms", "splash of venom")
+    OBJCLASS( 1,  ']', ILLOBJ, S_strange_obj, "illegal objects",
+                           "strange object")
+    OBJCLASS( 2,  ')', WEAPON, S_weapon, "weapons", "weapon")
+    OBJCLASS( 3,  '[', ARMOR, S_armor, "armor", "suit or piece of armor")
+    OBJCLASS( 4,  '=', RING, S_ring, "rings", "ring")
+    OBJCLASS( 5,  '"', AMULET, S_amulet, "amulets", "amulet")
+    OBJCLASS( 6,  '(', TOOL, S_tool, "tools",
+                           "useful item (pick-axe, key, lamp...)")
+    OBJCLASS( 7,  '%', FOOD, S_food, "food", "piece of food")
+    OBJCLASS( 8,  '!', POTION, S_potion, "potions", "potion")
+    OBJCLASS( 9,  '?', SCROLL, S_scroll, "scrolls", "scroll")
+    OBJCLASS(10,  '+', SPBOOK, S_book, "spellbooks", "spellbook")
+    OBJCLASS(11,  '/', WAND, S_wand, "wands", "wand")
+    OBJCLASS7(12, '$', COIN, GOLD_SYM, S_coin, "coins", "pile of coins")
+    OBJCLASS(13,  '*', GEM, S_gem, "rocks", "gem or rock")
+    OBJCLASS(14,  '`', ROCK, S_rock, "large stones", "boulder or statue")
+    OBJCLASS(15,  '0', BALL, S_ball, "iron balls", "iron ball")
+    OBJCLASS(16,  '_', CHAIN, S_chain, "chains", "iron chain")
+    OBJCLASS(17,  '.', VENOM, S_venom, "venoms", "splash of venom")
 
 #undef OBJCLASS
-#endif /* OBJCLASS_ENUM || OBJCLASS_PARSE || OBJCLASS_DRAWING */
+#undef OBJCLASS7
+#endif /* OBJCLASS_S_ENUM || OBJCLASS_DEFCHAR_ENUM || OBJCLASS_CLASS_ENUM */
+       /* || OBJCLASS_PARSE || OBJCLASS_DRAWING */
 
 #undef CLR
+
+#ifdef DEBUG
+#if !defined(PCHAR_S_ENUM) && !defined(PCHAR_DRAWING) \
+    && !defined(PCHAR_PARSE) && !defined(PCHAR_TILES) \
+    && !defined(MONSYMS_S_ENUM) && !defined(MONSYMS_DEFCHAR_ENUM) \
+    && !defined(MONSYMS_PARSE) && !defined(MONSYMS_DRAWING) \
+    && !defined(OBJCLASS_S_ENUM) && !defined(OBJCLASS_DEFCHAR_ENUM) \
+    && !defined(OBJCLASS_CLASS_ENUM) && !defined(OBJCLASS_PARSE) \
+    && !defined (OBJCLASS_DRAWING)
+#error Non-productive inclusion of defsym.h
+#endif
+#endif
 
 /* end of defsym.h */

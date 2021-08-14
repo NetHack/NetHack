@@ -141,13 +141,28 @@ extern NEARDATA struct objdescr obj_descr[];
  * All objects have a class. Make sure that all classes have a corresponding
  * symbol below.
  */
-enum obj_class_types {
-    RANDOM_CLASS =  0, /* used for generating random objects */
-#define OBJCLASS_ENUM
+
+enum objclass_defchars {
+#define OBJCLASS_DEFCHAR_ENUM
 #include "defsym.h"
-#undef OBJCLASS_ENUM
+#undef OBJCLASS_DEFCHAR_ENUM
+};
+
+enum objclass_classes {
+    RANDOM_CLASS =  0, /* used for generating random objects */
+#define OBJCLASS_CLASS_ENUM
+#include "defsym.h"
+#undef OBJCLASS_CLASS_ENUM
     MAXOCLASSES
 };
+
+/* Default characters for object classes */
+enum objclass_syms {
+#define OBJCLASS_S_ENUM
+#include "defsym.h"
+#undef OBJCLASS_S_ENUM
+};
+
 /* for mkobj() use ONLY! odd '-SPBOOK_CLASS' is in case of unsigned enums */
 #define SPBOOK_no_NOVEL (0 - (int) SPBOOK_CLASS)
 

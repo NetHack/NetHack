@@ -9,104 +9,28 @@
  * Default characters for monsters.
  */
 /* clang-format off */
-#define DEF_ANT         'a'
-#define DEF_BLOB        'b'
-#define DEF_COCKATRICE  'c'
-#define DEF_DOG         'd'
-#define DEF_EYE         'e'
-#define DEF_FELINE      'f'
-#define DEF_GREMLIN     'g'
-#define DEF_HUMANOID    'h'
-#define DEF_IMP         'i'
-#define DEF_JELLY       'j'
-#define DEF_KOBOLD      'k'
-#define DEF_LEPRECHAUN  'l'
-#define DEF_MIMIC       'm'
-#define DEF_NYMPH       'n'
-#define DEF_ORC         'o'
-#define DEF_PIERCER     'p'
-#define DEF_QUADRUPED   'q'
-#define DEF_RODENT      'r'
-#define DEF_SPIDER      's'
-#define DEF_TRAPPER     't'
-#define DEF_UNICORN     'u'
-#define DEF_VORTEX      'v'
-#define DEF_WORM        'w'
-#define DEF_XAN         'x'
-#define DEF_LIGHT       'y'
-#define DEF_ZRUTY       'z'
-#define DEF_ANGEL       'A'
-#define DEF_BAT         'B'
-#define DEF_CENTAUR     'C'
-#define DEF_DRAGON      'D'
-#define DEF_ELEMENTAL   'E'
-#define DEF_FUNGUS      'F'
-#define DEF_GNOME       'G'
-#define DEF_GIANT       'H'
-#define DEF_JABBERWOCK  'J'
-#define DEF_KOP         'K'
-#define DEF_LICH        'L'
-#define DEF_MUMMY       'M'
-#define DEF_NAGA        'N'
-#define DEF_OGRE        'O'
-#define DEF_PUDDING     'P'
-#define DEF_QUANTMECH   'Q'
-#define DEF_RUSTMONST   'R'
-#define DEF_SNAKE       'S'
-#define DEF_TROLL       'T'
-#define DEF_UMBER       'U'
-#define DEF_VAMPIRE     'V'
-#define DEF_WRAITH      'W'
-#define DEF_XORN        'X'
-#define DEF_YETI        'Y'
-#define DEF_ZOMBIE      'Z'
-#define DEF_HUMAN       '@'
-#define DEF_GHOST       ' '
-#define DEF_GOLEM       '\''
-#define DEF_DEMON       '&'
-#define DEF_EEL         ';'
-#define DEF_LIZARD      ':'
-
-#define DEF_INVISIBLE   'I'
-#define DEF_WORM_TAIL   '~'
-#define DEF_MIMIC_DEF   ']'
+enum mon_defchars {
+#define MONSYMS_DEFCHAR_ENUM
+#include "defsym.h"
+#undef MONSYMS_DEFCHAR_ENUM
+};
 /* clang-format on */
 
-enum mon_class_types {
-#define MONSYMS_ENUM
+enum mon_syms {
+#define MONSYMS_S_ENUM
 #include "defsym.h"
-#undef MONSYMS_ENUM
+#undef MONSYMS_S_ENUM
 
     MAXMCLASSES  /* number of monster classes */
 };
 
 #ifndef MAKEDEFS_C
 
-/* Default characters for object classes */
-
-#define ILLOBJ_SYM  ']' /* also used for mimics */
-#define WEAPON_SYM  ')'
-#define ARMOR_SYM   '['
-#define RING_SYM    '='
-#define AMULET_SYM  '"'
-#define TOOL_SYM    '('
-#define FOOD_SYM    '%'
-#define POTION_SYM  '!'
-#define SCROLL_SYM  '?'
-#define SPBOOK_SYM  '+'
-#define WAND_SYM    '/'
-#define GOLD_SYM    '$'
-#define GEM_SYM     '*'
-#define ROCK_SYM    '`'
-#define BALL_SYM    '0'
-#define CHAIN_SYM   '_'
-#define VENOM_SYM   '.'
-
 /* Default characters for dungeon surroundings and furniture */
 enum screen_symbols {
-#define PCHAR_ENUM
+#define PCHAR_S_ENUM
 #include "defsym.h"
-#undef PCHAR_ENUM
+#undef PCHAR_S_ENUM
     MAXPCHARS
 };
 
