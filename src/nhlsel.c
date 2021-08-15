@@ -570,17 +570,21 @@ l_selection_match(lua_State *L)
 
 
 /* local s = selection.floodfill(x,y); */
+/* local s = selection.floodfill(x,y, diagonals); */
 static int
 l_selection_flood(lua_State *L)
 {
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
     xchar x = 0, y = 0;
+    boolean diagonals = FALSE;
 
-    if (argc == 2) {
+    if (argc == 2 || argc == 3) {
         x = (xchar) luaL_checkinteger(L, 1);
         y = (xchar) luaL_checkinteger(L, 2);
-        lua_pop(L, 2);
+        if (argc == 3)
+            diagonals = lua_toboolean(L, 3);
+        lua_pop(L, argc);
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
     } else {
@@ -593,7 +597,7 @@ l_selection_flood(lua_State *L)
 
     if (isok(x, y)) {
         set_floodfillchk_match_under(levl[x][y].typ);
-        selection_floodfill(sel, x, y, FALSE);
+        selection_floodfill(sel, x, y, diagonals);
     }
     return 1;
 }

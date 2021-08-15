@@ -114,6 +114,7 @@ function test_selection_params()
    selection.fillrect(1,2, 7,8);
    selection.area(1,2, 7,8);
    selection.floodfill(1,1);
+   selection.floodfill(1,1, true);
    selection.circle(40, 10, 9);
    selection.circle(40, 10, 9, 1);
    selection.ellipse(40, 10, 20, 8);
@@ -357,22 +358,35 @@ function test_sel_filter_mapchar()
    sel_has_n_points(seld, 1659, __func__);
 end -- test_sel_filter_mapchar
 
-function test_sel_flood()
-   local __func__ = "test_sel_flood";
-   local sela = selection.new();
-   local sela_clone = sela:clone();
-
+function set_flood_test_pattern()
    des.terrain(selection.negate(), ".");
    des.terrain(5,5, "L");
    des.terrain(6,5, "L");
    des.terrain(7,5, "L");
    des.terrain(8,6, "L");
+end
+
+function test_sel_flood()
+   local __func__ = "test_sel_flood";
+   local sela = selection.new();
+   local sela_clone = sela:clone();
+
+   set_flood_test_pattern();
 
    local selb = selection.floodfill(6,5);
    sel_has_n_points(selb, 3, __func__);
    sel_pt_ne(selb, 5,5, 1, __func__);
    sel_pt_ne(selb, 6,5, 1, __func__);
    sel_pt_ne(selb, 7,5, 1, __func__);
+
+   set_flood_test_pattern();
+
+   local selc = selection.floodfill(6,5, true);
+   sel_has_n_points(selc, 4, __func__);
+   sel_pt_ne(selc, 5,5, 1, __func__);
+   sel_pt_ne(selc, 6,5, 1, __func__);
+   sel_pt_ne(selc, 7,5, 1, __func__);
+   sel_pt_ne(selc, 8,6, 1, __func__);
 end -- test_sel_flood
 
 function test_sel_match()

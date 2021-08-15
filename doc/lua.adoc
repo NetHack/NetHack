@@ -809,11 +809,13 @@ Example:
 
 Select locations by starting floodfill at (x,y),
 matching the same map terrain in cardinal directions.
+If the optional third parameter is true, also checks diagonals.
 
 Example:
 
  local s = selection.floodfill(sel, x, y);
  local s = selection.floodfill(x,y);
+ local s = selection.floodfill(x,y, true);
 
 === get
 
