@@ -80,8 +80,8 @@ bool NetHackQtStringRequestor::Get(char *buffer, int maxchar, int minchar)
     input.setMaxLength(maxchar - 1);
 
     const QString &txt = prompt.text();
-    int pw = fontMetrics().horizontalAdvance(txt),
-        ww = minchar * input.fontMetrics().horizontalAdvance(QChar('X'));
+    int pw = fontMetrics().QFM_WIDTH(txt),
+        ww = minchar * input.fontMetrics().QFM_WIDTH(QChar('X'));
     int heightfactor = ((txt.size() > 16) ? 3 : 2) * 2; // 2 or 3 lines high
     int widthfudge = (((txt.size() > 16) ? 1 : 2) * 5) * 2; // 5: margn, guttr
     resize(pw + ww + widthfudge, fontMetrics().height() * heightfactor);

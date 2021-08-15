@@ -244,7 +244,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
     for (i = 0; extcmdlist[i].ef_txt; ++i) {
         if (interesting_command(i, set)) {
             ++ncmds;
-            butw = std::max(butw, 30 + fm.horizontalAdvance(extcmdlist[i].ef_txt));
+            butw = std::max(butw, 30 + fm.QFM_WIDTH(extcmdlist[i].ef_txt));
         }
     }
     // if any of the choice buttons were bigger than the control buttons,

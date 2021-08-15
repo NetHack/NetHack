@@ -379,7 +379,7 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
     QString col0width_str = "";
     if (biggestcount > 0L)
         col0width_str = QString::asprintf("%*ld", std::max(countdigits, 1), biggestcount);
-    int col0width_int = (int) fm.horizontalAdvance(col0width_str) + MENU_WIDTH_SLOP;
+    int col0width_int = (int) fm.QFM_WIDTH(col0width_str) + MENU_WIDTH_SLOP;
     if (col0width_int > table->columnWidth(0))
 	WidenColumn(0, col0width_int);
 
@@ -401,7 +401,7 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
             QStringList columns = itemlist[row].str.split("\t");
             for (int fld = 0; fld < (int) columns.size(); ++fld) {
                 bool lastcol = (fld == (int) columns.size() - 1);
-                int w = fm.horizontalAdvance(columns[fld] + (lastcol ? "" : "  "));
+                int w = fm.QFM_WIDTH(columns[fld] + (lastcol ? "" : "  "));
                 if (fld >= (int) col_widths.size()) {
                     col_widths.push_back(w); // add another element
                 } else if (col_widths[fld] < w) {
@@ -435,14 +435,14 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
             for (int fld = 0; fld < (int) columns.size() - 1; ++fld) {
                 //columns[fld] += "\t"; /* (used to pad with tabs) */
                 int width = col_widths[fld];
-                while (fm.horizontalAdvance(columns[fld]) < width)
+                while (fm.QFM_WIDTH(columns[fld]) < width)
                     columns[fld] += " "; //"\t";
             }
             text = columns.join("");
             twi->setText(text);
         }
         // TODO? if description needs to wrap, increase the height of this row
-        int wid = fm.horizontalAdvance(text) + MENU_WIDTH_SLOP;
+        int wid = fm.QFM_WIDTH(text) + MENU_WIDTH_SLOP;
         if (wid > widest4)
             widest4 = wid;
     }
@@ -552,7 +552,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
 	table->setItem(row, 0, twi);
 	twi->setFlags(Qt::ItemIsEnabled);
 #if 0   // active count field now widened as needed rather than preset
-        WidenColumn(0, fm.horizontalAdvance("999999") + MENU_WIDTH_SLOP);
+        WidenColumn(0, fm.QFM_WIDTH("999999") + MENU_WIDTH_SLOP);
 #else
         WidenColumn(0, MENU_WIDTH_SLOP);
 #endif
@@ -600,7 +600,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     // for the normal case of "a - ", the trailing space hid the fact that
     // the column wasn't wide enough for four characters; for the "   #"
     // and "   *" cases, the last character was replaced by very tiny "..."
-    int w = (int) fm.horizontalAdvance(letter);
+    int w = (int) fm.QFM_WIDTH(letter);
     if (w)
         w += MENU_WIDTH_SLOP / 2;
     WidenColumn(3, w);
@@ -608,7 +608,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     twi = new QTableWidgetItem(text);
     table->setItem(row, 4, twi);
     table->item(row, 4)->setFlags(Qt::ItemIsEnabled);
-    WidenColumn(4, fm.horizontalAdvance(text));
+    WidenColumn(4, fm.QFM_WIDTH(text));
 
     if ((int) mi.color != -1) {
 	twi->setForeground(colors[mi.color].q);
