@@ -464,7 +464,7 @@ CONFIG_H = ../src/config.h-t
 HACK_H	= ../src/hack.h-t
 
 # all .c that are part of the main NetHack program and are not operating- or
-# windowing-system specific
+# windowing-system specific. Do not include date.c in this list.
 HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
 	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
@@ -514,7 +514,7 @@ VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
-# all .h files except date.h, onames.h, and pm.h which would
+# all .h files except date.h, which would
 # cause dependency loops if run through "make depend"
 # and dgn_file.h, special level & dungeon files.
 #
@@ -522,19 +522,22 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h fnamesiz.h \
 	func_tab.h global.h warnings.h hack.h lint.h mextra.h mfndpos.h \
-	micro.h mkroom.h \
-	monattk.h mondata.h monflag.h monst.h obj.h objclass.h \
-	optlist.h patchlevel.h pcconf.h permonst.h prop.h rect.h \
-	region.h sym.h defsym.h rm.h sp_lev.h spell.h sys.h system.h \
-	tcap.h timeout.h tradstdc.h trap.h unixconf.h vision.h vmsconf.h \
-	wintty.h wincurs.h winX.h winprocs.h wintype.h you.h youprop.h
+	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
+	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
+	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
+	spell.h sys.h system.h tcap.h timeout.h tradstdc.h trap.h unixconf.h \
+	vision.h vmsconf.h wintty.h wincurs.h winX.h winprocs.h wintype.h \
+	you.h youprop.h
 
-HSOURCES = $(HACKINCL) date.h onames.h pm.h dgn_file.h
+HSOURCES = $(HACKINCL) dgn_file.h
 
 # the following .o's _must_ be made before any others (for makedefs)
 FIRSTOBJ = monst.o objects.o
 HOSTOBJ = $(FIRSTOBJ) alloc.o drawing.o
 
+#
+# $(TARGETPFX)date.o is not included in this list
+#
 HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)apply.o $(TARGETPFX)artifact.o $(TARGETPFX)attrib.o \
 	$(TARGETPFX)ball.o $(TARGETPFX)bones.o $(TARGETPFX)botl.o \
@@ -576,6 +579,9 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
 	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) \
 	$(TARGETPFX)version.o
+#
+DATE_O = $(TARGETPFX)date.o
+
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 # first target is also the default target for 'make' without any arguments
@@ -588,40 +594,40 @@ pregame:
 $(GAME):	pregame $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
-Sysunix:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 	@touch Sysunix
 
-Sys3B2:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+Sys3B2:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(WINLIB) $(LUALIB) -lmalloc
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB) -lmalloc
 	@touch Sys3B2
 
-Sysatt:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+Sysatt:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Loading $(GAME)."
 	$(AT)$(LD) $(TARGET_LFLAGS) /lib/crt0s.o /lib/shlib.ifile -o $(GAMEBIN) \
-		$(HOSTOBJ) $(HOBJ) $(LUALIB)
+		$(HOSTOBJ) $(HOBJ) $(DATE_O) $(LUALIB)
 	@touch Sysatt
 
-Systos:	$(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+Systos:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(WINLIB) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB)
 	@touch Systos
 
-SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(WINLIB) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB)
 	@touch SysV-AT
 
-SysBe: $(HOSTOBJ) $(HOBJ) $(BUILDMORE) Makefile
+SysBe: $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAME) \
-		$(HOBJ) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
@@ -696,11 +702,12 @@ qt_yndlg.moc : ../win/Qt/qt_yndlg.h
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
 		../util/makedefs.c ../src/mdlib.c $(CONFIG_H) \
-		../include/permonst.h \
-		../include/objclass.h ../include/sym.h ../include/defsym.h \
-		../include/artilist.h ../include/dungeon.h ../include/obj.h \
-		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h
+		../include/permonst.h ../include/monsters.h \
+		../include/objclass.h ../include/objects.h ../include/sym.h \
+		../include/defsym.h ../include/artilist.h \
+		../include/dungeon.h ../include/obj.h ../include/monst.h \
+		../include/you.h ../include/flag.h ../include/dlb.h \
+		../include/patchlevel.h
 	@( cd ../util ; $(MAKE) makedefs )
 
 #	Source files created by 'makedefs' at build time.
@@ -711,17 +718,23 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 #	process of building it for foo.h.)
 ../include/onames.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/onames.h )
-../include/pm.h: $(MAKEDEFS) ../include/onames.h
+../include/pm.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/pm.h )
 #	Created at build time for configurations which support tiles,
 #	but not by makedefs so not connected to the others.
 tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
+
 ../win/gnome/gn_rip.h: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm ../win/gnome/gn_rip.h
 
 $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
+
+#	date.c should be recompiled any time any of the source or include code
+#	is modified.
+$(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC) $(HOBJ)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(GITHASH) $(GITBRANCH) -c -o $@ date.c
 
 #	date.h should be remade any time any of the source or include code
 #	is modified.  Unfortunately, this would make the contents of this
@@ -731,9 +744,7 @@ $(TARGETPFX)sfstruct.o: sfstruct.c $(HACK_H)
 #	Do NOT include ../dat/gitinfo.txt as either a prerequisite or target.
 #	'makedefs -v' processes it when present and ignores it if not.
 #
-#	hack.h depends on makedefs' output, so we know makedefs will be
-#	up to date before being executed
-../include/date.h:	$(VERSOURCES) $(HACK_H)
+../include/date.h: ../util/makedefs $(VERSOURCES) $(HACK_H)
 	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
 	../util/makedefs -v
 
@@ -800,14 +811,14 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/dungeon.h ../include/mkroom.h \
 		../include/objclass.h ../include/youprop.h ../include/prop.h \
 		../include/permonst.h ../include/monattk.h \
-		../include/monflag.h ../include/mondata.h ../include/pm.h \
+		../include/monflag.h ../include/mondata.h  \
 		../include/wintype.h ../include/context.h \
 		../include/sym.h ../include/defsym.h ../include/rm.h \
 		../include/botl.h ../include/rect.h ../include/region.h \
 		../include/decl.h ../include/quest.h ../include/spell.h \
 		../include/color.h ../include/obj.h ../include/engrave.h \
 		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/mextra.h ../include/skills.h ../include/onames.h \
+		../include/mextra.h ../include/skills.h ../include/monsters.h \
 		../include/timeout.h ../include/trap.h ../include/flag.h \
 		../include/vision.h ../include/display.h ../include/winprocs.h \
 		../include/sys.h
@@ -1097,8 +1108,9 @@ $(TARGETPFX)mondata.o: mondata.c $(HACK_H)
 $(TARGETPFX)monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h \
 		../include/artifact.h
 $(TARGETPFX)monst.o: monst.c $(CONFIG_H) ../include/permonst.h \
-		../include/align.h ../include/monattk.h ../include/monflag.h \
-		../include/sym.h ../include/defsym.h ../include/color.h
+		../include/monsters.h ../include/align.h ../include/monattk.h \
+		../include/monflag.h ../include/sym.h ../include/defsym.h \
+		../include/color.h
 $(TARGETPFX)mplayer.o: mplayer.c $(HACK_H)
 $(TARGETPFX)mthrowu.o: mthrowu.c $(HACK_H)
 $(TARGETPFX)muse.o: muse.c $(HACK_H)

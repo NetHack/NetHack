@@ -28,6 +28,7 @@ early_init(void)
     objects_globals_init();
     monst_globals_init();
     sys_early_init();
+    runtime_info_init();
 }
 
 static void
@@ -803,6 +804,9 @@ static const struct early_opt earlyopts[] = {
     {ARG_DEBUG, "debug", 5, TRUE},
     {ARG_VERSION, "version", 4, TRUE},
     {ARG_SHOWPATHS, "showpaths", 9, FALSE},
+#ifndef NODUMPENUMS
+    {ARG_DUMPENUMS, "dumpenums", 9, FALSE},
+#endif
 #ifdef WIN32
     {ARG_WINDOWS, "windows", 4, TRUE},
 #endif
@@ -881,6 +885,12 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         case ARG_SHOWPATHS: {
             return 2;
         }
+#ifndef NODUMPENUMS
+        case ARG_DUMPENUMS: {
+            dump_enums();
+            return 2;
+        }
+#endif
 #ifdef WIN32
         case ARG_WINDOWS: {
             if (extended_opt) {
@@ -953,4 +963,59 @@ debug_fields(const char *opts)
 #endif
     return;
 }
+
+#ifndef NODUMPENUMS
+void
+dump_enums(void)
+{
+    int i, j;
+    enum enum_dumps {
+        monsters_enum,
+        objects_enum,
+        objects_misc_enum,
+        NUM_ENUM_DUMPS
+    };
+    static const char *titles[NUM_ENUM_DUMPS] =
+        { "monnums", "objects_nums" , "misc_object_nums" };
+    struct enum_dump {
+        int val;
+        const char *nm;
+    };
+
+#define DUMP_ENUMS
+    struct enum_dump monsdump[] = {
+#include "monsters.h"
+        { NUMMONS, "NUMMONS" },
+    };
+    struct enum_dump objdump[] = {
+#include "objects.h"
+        { NUM_OBJECTS, "NUM_OBJECTS" },
+    };
+#undef DUMP_ENUMS
+
+    struct enum_dump omdump[] = {
+            { LAST_GEM, "LAST_GEM" },
+            { NUM_GLASS_GEMS, "NUM_GLASS_GEMS" },
+            { MAXSPELL, "MAXSPELL" },
+    };
+    struct enum_dump *ed[NUM_ENUM_DUMPS] = { monsdump, objdump, omdump };
+    static const char *pfx[NUM_ENUM_DUMPS] = { "PM_", "", "" };
+    int szd[NUM_ENUM_DUMPS] = { SIZE(monsdump), SIZE(objdump), SIZE(omdump) };
+
+    for (i = 0; i < NUM_ENUM_DUMPS; ++ i) {
+        raw_printf("enum %s = {", titles[i]);
+        for (j = 0; j < szd[i]; ++j) {
+            raw_printf("    %s%s = %i%s",
+                       (j == szd[i] - 1) ? "" : pfx[i],
+                       ed[i]->nm,
+                       ed[i]->val,
+                       (j == szd[i] - 1) ? "" : ",");
+            ed[i]++;
+       }
+        raw_print("};");
+        raw_print("");
+    }
+    raw_print("");
+}
+#endif /* NODUMPENUMS */
 /*allmain.c*/

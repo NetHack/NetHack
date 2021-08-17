@@ -36,12 +36,13 @@
 #
 #       There are currently 4 decisions that you can choose to make.
 #       None of the 4 decisions are absolutely required because defaults are in place:
-#	1. Where do you want your build to end up?
-#	2. Do you want debug information in the executable?
-#	3. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
-#       4. Do you want to include any optional interfaces in the port?
-#          4a) curses
-#          4b) Qt
+#	1. Do you have git commands in your path and NetHack in a git repository?
+#	2. Where do you want your build results to end up?
+#	3. Do you want debug information in the executable?
+#	4. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
+#       5. Do you want to include any optional interfaces in the port?
+#          5a) curses
+#          5b) Qt
 #
 # Mandatory LUA source Location
 #
@@ -277,11 +278,53 @@ O  = $(OBJ)/
 
 U  = $(UTIL)/
 
+HACKINCL = $(INCL)/align.h $(INCL)/artifact.h $(INCL)/artilist.h \
+	$(INCL)/attrib.h $(INCL)/botl.h $(INCL)/color.h $(INCL)/config.h \
+	$(INCL)/config1.h $(INCL)/context.h $(INCL)/coord.h $(INCL)/decl.h \
+	$(INCL)/display.h $(INCL)/dlb.h $(INCL)/dungeon.h $(INCL)/engrave.h \
+	$(INCL)/extern.h $(INCL)/flag.h $(INCL)/fnamesiz.h $(INCL)/func_tab.h \
+	$(INCL)/global.h $(INCL)/warnings.h $(INCL)/hack.h $(INCL)/lint.h \
+	$(INCL)/mextra.h $(INCL)/mfndpos.h $(INCL)/micro.h $(INCL)/mkroom.h \
+	$(INCL)/monattk.h $(INCL)/mondata.h $(INCL)/monflag.h $(INCL)/monst.h \
+	$(INCL)/monsters.h $(INCL)/obj.h $(INCL)/objects.h $(INCL)/objclass.h \
+	$(INCL)/optlist.h $(INCL)/patchlevel.h $(INCL)/pcconf.h \
+	$(INCL)/permonst.h $(INCL)/prop.h $(INCL)/rect.h $(INCL)/region.h \
+	$(INCL)/sym.h $(INCL)/defsym.h $(INCL)/rm.h $(INCL)/sp_lev.h \
+	$(INCL)/spell.h $(INCL)/sys.h $(INCL)/system.h $(INCL)/tcap.h \
+	$(INCL)/timeout.h $(INCL)/tradstdc.h $(INCL)/trap.h \
+	$(INCL)/unixconf.h $(INCL)/vision.h $(INCL)/vmsconf.h \
+	$(INCL)/wintty.h $(INCL)/wincurs.h $(INCL)/winX.h \
+	$(INCL)/winprocs.h $(INCL)/wintype.h $(INCL)/you.h \
+	$(INCL)/youprop.h
+
+# all .c that are part of the main NetHack program and are not operating- or
+# windowing-system specific
+HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
+	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
+	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
+	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
+	   files.c fountain.c hack.c hacklib.c \
+	   insight.c invent.c isaac64.c light.c \
+	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
+	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
+	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
+	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
+	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
+	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
+	   shk.c shknam.c sit.c sounds.c \
+	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   timeout.c topten.c track.c trap.c u_init.c \
+	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   windows.c wizard.c worm.c worn.c write.c zap.c
+
+
 #
 # Utility Objects.
 #
 
-MAKEDEFSOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
+MAKEDEFSOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o \
+			$(O)date.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -491,21 +534,31 @@ endif
 # Header file macros
 #==========================================
 
+ifdef GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+endif
+
+ifdef GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+
 CONFIG_H = $(INCL)/config.h $(INCL)/patchlevel.h \
 		$(INCL)/config1.h $(INCL)/tradstdc.h \
 		$(INCL)/global.h $(INCL)/fnamesiz.h $(INCL)/coord.h \
 		$(INCL)/vmsconf.h $(INCL)/system.h $(INCL)/unixconf.h \
-		$(INCL)/micro.h $(INCL)/pcconf.h $(INCL)/windconf.h
+		$(INCL)/micro.h $(INCL)/pcconf.h $(INCL)/windconf.h \
+		$(INCL)/objects.h
 
 HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
 	       $(INCL)/dungeon.h $(INCL)/sym.h $(INCL)/defsym.h \
 	       $(INCL)/mkroom.h $(INCL)/objclass.h $(INCL)/youprop.h \
 	       $(INCL)/prop.h $(INCL)/permonst.h $(INCL)/monattk.h \
-	       $(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/pm.h \
+	       $(INCL)/monflag.h $(INCL)/mondata.h $(INCL)/monsters.h \
 	       $(INCL)/wintype.h $(INCL)/decl.h $(INCL)/quest.h \
 	       $(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
+	       $(INCL)/objects.h \
 	       $(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h $(INCL)/lint.h \
-	       $(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
+	       $(INCL)/mextra.h $(INCL)/skills.h \
 	       $(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h \
 	       $(INCL)/rm.h $(INCL)/vision.h $(INCL)/display.h \
 	       $(INCL)/engrave.h $(INCL)/rect.h $(INCL)/region.h \
@@ -805,8 +858,7 @@ recover: $(U)recover.exe
 $(O)sp_lev.tag: $(O)utility.tag
 	$(subst /,\,echo sp_levs done > $(O)sp_lev.tag)
 
-$(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
-	 $(TILEUTIL16)
+$(O)utility.tag: $(TILEUTIL16)
 	$(subst /,\,@echo utilities made >$@)
 	@echo utilities made.
 
@@ -840,11 +892,12 @@ gamedir.tag:
 	test -d $(GAMEDIR) && echo directory created > $@
 
 $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)consoletty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o $(KEYDLLS) \
+			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(GUIOBJ) $(O)conres.o $(KEYDLLS) \
 			$(LUATARGETS)
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)consoletty.o $(O)tile.o \
-		$(O)guistub.o $(O)conres.o $(PDCLIB) $(LUALIB) $(conlibs) -static -lstdc++
+		$(O)guistub.o $(O)date.o $(O)conres.o $(PDCLIB) $(LUALIB) \
+		$(conlibs) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 # NetHackW
@@ -860,7 +913,8 @@ $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS) \
 			$(LUATARGETS)
 	@echo Linking $@...
-	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
+	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o \
+		$(O)ttystub.o $(O)date.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) $(LUALIB) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 endif
@@ -922,9 +976,25 @@ $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 	 $(U)makedefs.c $(SRC)\mdlib.c
 	$(cc) $(CFLAGSU) -o$@ $(U)makedefs.c
 
+ifeq "$(GIT_AVAILABLE)" "1"
+GIT_HASH := $(shell echo `git rev-parse --verify HEAD` 2>&1)
+GIT_BRANCH := $(shell echo `git rev-parse --abbrev-ref HEAD` 2>&1)
+
+ifdef GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+endif
+ifdef GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+endif
+
+$(O)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJ)
+	$(cc) $(CFLAGS) $(GITHASH) $(GITBRANCH) -o$@ $(SRC)/date.c
+
 #
-#  date.h should be remade every time any of the source or include
-#  files is modified.
+#  if you are making date.h for reference purposes (it isn't required
+#  for the build anymore), it should be remade every time any of the
+#  source or include files is modified.
 #
 
 $(INCL)/date.h $(OPTIONS_FILE): $(U)makedefs.exe
@@ -1453,7 +1523,7 @@ $(O)termcap.o: ../win/tty/termcap.c $(HACK_H) $(INCL)/tcap.h
 $(O)topl.o: ../win/tty/topl.c $(HACK_H) $(INCL)/tcap.h
 	$(cc) $(CFLAGS) -o$@ ../win/tty/topl.c
 $(O)wintty.o: ../win/tty/wintty.c $(HACK_H) $(INCL)/dlb.h \
-		$(INCL)/date.h $(INCL)/tcap.h
+		$(INCL)/tcap.h
 	$(cc) $(CFLAGS) -o$@ ../win/tty/wintty.c
 #$(O)Window.o: ../win/X11/Window.c $(INCL)/xwindowp.h $(INCL)/xwindow.h \
 #		$(CONFIG_H)
@@ -1702,7 +1772,7 @@ $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)/date.h
+$(O)version.o: version.c $(HACK_H)
 $(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)

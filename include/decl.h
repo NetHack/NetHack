@@ -250,11 +250,6 @@ E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;
 E NEARDATA struct u_realtime urealtime;
 
-#include "onames.h"
-#ifndef PM_H /* (pm.h has already been included via youprop.h) */
-#include "pm.h"
-#endif
-
 struct mvitals {
     uchar born;
     uchar died;
@@ -434,6 +429,9 @@ E const char *ARGV0;
 #endif
 
 enum earlyarg {ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
+#ifndef NODUMPENUMS
+    , ARG_DUMPENUMS
+#endif
 #ifdef WIN32
     ,ARG_WINDOWS
 #endif

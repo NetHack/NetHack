@@ -9,10 +9,10 @@
  */
 
 #include "config.h"
-#include "pm.h"
-#include "onames.h"
+/* #include "onames.h" */
 #include "permonst.h"
 #include "objclass.h"
+/* #include "pm.h" */
 #include "sym.h"
 #include "rm.h"
 #include "display.h"

@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.msc
-#       Copyright (c) NetHack PC Development Team 1993-2020
+#       Copyright (c) NetHack PC Development Team 1993-2021
 #
 #==============================================================================
 # Build Tools Environment
@@ -65,12 +65,14 @@
 #       none of the 5 decisions are absolutely required because defaults
 #       are in place:
 #
-#	1. Where do you want your build results to end up?
-#       2. Do you want to include the optional curses port?
-#       3. Do you want to include compressed savefile support to
+#       1. Do you have git commands in your path and NetHack in a
+#          git repository?
+#	2. Where do you want your build results to end up?
+#       3. Do you want to include the optional curses port?
+#       4. Do you want to include compressed savefile support to
 #          transfer compressed savefiles between platforms?
-#	4. Do you want debug information in the executable?
-#	5. Do you want to explicitly override auto-detection of
+#	5. Do you want debug information in the executable?
+#	6. Do you want to explicitly override auto-detection of
 #          a 32-bit or 64-bit target?
 #
 # Mandatory Lua source Location (not optional)
@@ -82,16 +84,24 @@
 #
 #------------------------------------------------------------------------------
 #==============================================================================
+
 #
 #------------------------------------------------------------------------------
-# 1. Where do you want the game to be built (which folder)?
+# 1. Do you have git commands available and NetHack in a git repository.
+#    If not, such as if you obtained the NetHack sources in a zip file download,
+#    set GIT_AVAILABLE = 0
+#
+GIT_AVAILABLE = 1
+#
+#------------------------------------------------------------------------------
+# 2. Where do you want the game to be built (which folder)?
 #
 GAMEDIR = ..\binary               # Default game build directory
 #
 #------------------------------------------------------------------------------
 # OPTIONAL - Curses window port support
 #
-# 2. Uncomment these and set them appropriately if you want to
+# 3. Uncomment these and set them appropriately if you want to
 #    include curses port support alongside TTY support in your
 #    NetHack.exe binary.
 #
@@ -100,24 +110,24 @@ GAMEDIR = ..\binary               # Default game build directory
 #    of your PDCurses C files.
 #
 #ADD_CURSES=Y
-#PDCURSES_TOP=..\lib\pdcursesmod
+#PDCURSES_TOP=..\lib\pdcurses
 #
 #------------------------------------------------------------------------------
 # OPTIONAL - zlib support (to allow compressed savefile exchange across platforms
 #
-# 3. Location of zlib sources
+# 4. Location of zlib sources
 #
 #
 #ADD_ZLIB=Y
 #ZLIBTOP=..\lib\zlib
 #
 #------------------------------------------------------------------------------
-# 4. Do you want debug information available to the executable?
+# 5. Do you want debug information available to the executable?
 #
 DEBUGINFO = Y
 #
 #------------------------------------------------------------------------------
-# 5. This Makefile will attempt to auto-detect your selected target architecture
+# 6. This Makefile will attempt to auto-detect your selected target architecture
 #    based on Visual Studio command prompt configuration settins etc.
 #    However, if you want to manually override generation of a
 #    32-bit or 64-bit build target, you can uncomment the apppropriate
@@ -260,13 +270,55 @@ CROSSCOMPILE_TARGET=
 CROSSCOMPILE=
 !ENDIF
 
+HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
+	$(INCL)\attrib.h $(INCL)\botl.h $(INCL)\color.h $(INCL)\config.h \
+	$(INCL)\config1.h $(INCL)\context.h $(INCL)\coord.h $(INCL)\decl.h \
+	$(INCL)\display.h $(INCL)\dlb.h $(INCL)\dungeon.h $(INCL)\engrave.h \
+	$(INCL)\extern.h $(INCL)\flag.h $(INCL)\fnamesiz.h $(INCL)\func_tab.h \
+	$(INCL)\global.h $(INCL)\warnings.h $(INCL)\hack.h $(INCL)\lint.h \
+	$(INCL)\mextra.h $(INCL)\mfndpos.h $(INCL)\micro.h $(INCL)\mkroom.h \
+	$(INCL)\monattk.h $(INCL)\mondata.h $(INCL)\monflag.h $(INCL)\monst.h \
+	$(INCL)\monsters.h $(INCL)\obj.h $(INCL)\objects.h $(INCL)\objclass.h \
+	$(INCL)\optlist.h $(INCL)\patchlevel.h $(INCL)\pcconf.h \
+	$(INCL)\permonst.h $(INCL)\prop.h $(INCL)\rect.h $(INCL)\region.h \
+	$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h $(INCL)\sp_lev.h \
+	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\system.h $(INCL)\tcap.h \
+	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
+	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
+	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
+	$(INCL)\winprocs.h $(INCL)\wintype.h $(INCL)\you.h \
+	$(INCL)\youprop.h
+
+# all .c that are part of the main NetHack program and are not operating- or
+# windowing-system specific
+HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
+	   botl.c cmd.c dbridge.c decl.c detect.c dig.c display.c dlb.c do.c \
+	   do_name.c do_wear.c dog.c dogmove.c dokick.c dothrow.c drawing.c \
+	   dungeon.c eat.c end.c engrave.c exper.c explode.c extralev.c \
+	   files.c fountain.c hack.c hacklib.c \
+	   insight.c invent.c isaac64.c light.c \
+	   lock.c mail.c makemon.c mcastu.c mdlib.c mhitm.c \
+	   mhitu.c minion.c mklev.c mkmap.c mkmaze.c mkobj.c mkroom.c mon.c \
+	   mondata.c monmove.c monst.c mplayer.c mthrowu.c muse.c music.c \
+	   nhlua.c nhlsel.c nhlobj.c o_init.c objects.c objnam.c \
+	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
+	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
+	   shk.c shknam.c sit.c sounds.c \
+	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
+	   timeout.c topten.c track.c trap.c u_init.c \
+	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   windows.c wizard.c worm.c worn.c write.c zap.c
+
+
 #
 # Utility Objects.
 #
 
 MAKESRC       = $(U)makedefs.c
 
-MAKEDEFSOBJS  = $(O)makedefs.o $(O)monst$(HOST).o $(O)objects$(HOST).o
+MAKEDEFSOBJS  = $(O)makedefs.o $(O)monst$(HOST).o $(O)objects$(HOST).o \
+		$(O)date.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -332,6 +384,14 @@ REGEX  = $(O)cppregex.o
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 MDLIB = $(O)mdlib.o
+
+!IFDEF GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+!ENDIF
+
+!IFDEF GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+!ENDIF
 
 !IFNDEF ADD_CURSES
 CURSESOBJ=
@@ -490,14 +550,14 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\dungeon.h $(INCL)\mkroom.h \
 		$(INCL)\objclass.h $(INCL)\youprop.h $(INCL)\prop.h \
 		$(INCL)\permonst.h $(INCL)\monattk.h \
-		$(INCL)\monflag.h $(INCL)\mondata.h $(INCL)\pm.h \
+		$(INCL)\monflag.h $(INCL)\mondata.h \
 		$(INCL)\wintype.h $(INCL)\context.h \
 		$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h \
 		$(INCL)\botl.h $(INCL)\rect.h \
 		$(INCL)\region.h $(INCL)\decl.h $(INCL)\quest.h \
 		$(INCL)\spell.h $(INCL)\color.h $(INCL)\obj.h \
 		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\monst.h \
-		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
+		$(INCL)\mextra.h $(INCL)\skills.h \
 		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
 		$(INCL)\winprocs.h $(INCL)\sys.h $(INCL)\wintty.h
@@ -918,7 +978,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 
 
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(O)console.res $(KEYDLLS) \
+			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(O)console.res $(KEYDLLS) \
 			$(LUATARGETS) $(PDCLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
@@ -930,6 +990,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub
 		$(O)consoletty.o
 		$(O)tile.o
 		$(O)guistub.o
+		$(O)date.o
 		$(O)console.res
 <<
 	@if exist $(O)install.tag del $(O)install.tag
@@ -943,7 +1004,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub
 #    objs: $(GAMEOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(GUIOBJ) $(O)NetHackW.res \
+			$(ALLOBJ) $(GUIOBJ) $(O)date.o $(O)NetHackW.res \
 			$(O)gamedir.tag $(KEYDLLS) \
 			$(LUATARGETS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
@@ -955,6 +1016,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 		$(GUIOBJ)
 		$(O)tile.o
 		$(O)ttystub.o
+		$(O)date.o
 		$(O)NetHackW.res
 <<
 
@@ -1050,8 +1112,7 @@ recover: $(U)recover.exe
 $(O)sp_lev.tag:
 	echo sp_levs done > $(O)sp_lev.tag
 
-$(O)utility.tag: $(INCL)\nhlua.h $(INCL)\date.h $(INCL)\onames.h $(INCL)\pm.h \
-		$(U)tile2bmp.exe
+$(O)utility.tag: $(INCL)\nhlua.h $(U)tile2bmp.exe $(U)makedefs.exe
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1103,6 +1164,34 @@ $(O)makedefs.o: $(U)makedefs.c $(SRC)\mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) -Fo$@ $(U)makedefs.c
 #	@$(cc) -DENUM_PM $(cflagsBuild) $(CROSSCOMPILE) /EP -Fo$@ $(U)makedefs.c >makedefs.c.preprocessed
+
+#
+# This is awful, but it allows the GITHASH and GITBRANCH macros to be
+# defined and utilized, using only build-in Windows and nmake commands,
+# as well as the necessary git commands.
+#
+# We build a temporary Makefile on-the-fly for compiling date.c and
+# invoke nmake again.
+#
+$(O)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJ)
+!IF "$(GIT_AVAILABLE)" == "1"
+	@git rev-parse --verify HEAD 2>&1 >$(O)date1.tmp
+	@git rev-parse --abbrev-ref HEAD 2>&1 >$(O)date2.tmp
+	@echo.>date.nmk
+	@echo OBJ = $(OBJ)>>date.nmk
+	@echo O = ^$(OBJ)^^^\>>date.nmk
+	@echo cc = $(cc)>>date.nmk
+	@echo cflagsBuild = $(cflagsBuild) ^\>>date.nmk
+	@for /F "usebackq" %%A IN ("$(O)date1.tmp") DO @echo.	-DNETHACK_GIT_SHA=\"%%A\" ^\>>date.nmk
+	@for /F "usebackq" %%A IN ("$(O)date2.tmp") DO @echo.	-DNETHACK_GIT_BRANCH=\"%%A\">>date.nmk
+	@echo.>>date.nmk
+	@echo default: ^$(O)date.o>>date.nmk
+	@echo.>>date.nmk
+	@echo ^$(O)date.o: >>date.nmk
+	@echo. 	^$(cc) ^$(cflagsBuild) -Fo^$@ date.c>>date.nmk
+	@echo.>>date.nmk
+	@$(MAKE) /NOLOGO /A -f date.nmk
+!ENDIF
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1349,7 +1438,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 #==========================================
 
 $(U)gif2txt.exe: $(GIFREADERS_HOST) $(TEXT_IO)
-    	@echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS_HOST:^	=^
 		)
@@ -1358,7 +1447,7 @@ $(U)gif2txt.exe: $(GIFREADERS_HOST) $(TEXT_IO)
 <<
 
 $(U)gif2tx32.exe: $(GIFREADERS32_HOST) $(TEXT_IO32)
-    	@echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32_HOST:^	=^
 		)
@@ -1367,7 +1456,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32_HOST) $(TEXT_IO32)
 <<
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
-    	@echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
@@ -1380,7 +1469,7 @@ $(SRC)\tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
 	@$(U)tile2bmp $@
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
-    	@echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
@@ -1388,7 +1477,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 <<
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
-    	@echo Linking $(@:\=/)
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
@@ -1420,10 +1509,10 @@ $(O)tile2x11.o: $(X11)\tile2x11.c $(HACK_H) $(TILE_H) $(INCL)\tile2x11.h
 
 $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 				$(WSHR)\other.txt \
-                                $(WSHR)\monsters.txt
+				$(WSHR)\monsters.txt
 	$(U)tile2x11 $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 				$(WSHR)\other.txt \
-                                -grayscale $(WSHR)\monsters.txt
+				-grayscale $(WSHR)\monsters.txt
 
 #===============================================================================
 # PDCurses
@@ -1587,11 +1676,13 @@ $(O)monst.o: monst.c $(CONFIG_H) $(INCL)\permonst.h $(INCL)\align.h \
 
 $(O)objects_host.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
-	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ objects.c
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) /EP  $(@B).c > $(O)$(@B).c.preproc
+	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@  $(@B).c
 
 $(O)objects.o: objects.c $(CONFIG_H) $(INCL)\obj.h $(INCL)\objclass.h \
 		$(INCL)\prop.h $(INCL)\skills.h $(INCL)\color.h
-	@$(cc) $(cflagsBuild) -Fo$@ objects.c
+	@$(cc) $(cflagsBuild) /EP  $(@B).c > $(O)$(@B).c.preproc
+	@$(cc) $(cflagsBuild) -Fo$@  $(@B).c
 
 $(O)alloc_host.o: alloc.c $(CONFIG_H)
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ alloc.c
@@ -1948,6 +2039,8 @@ $(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
 $(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
 #	@$(cc) $(cflagsBuild) -Fo$@  ..\win\chain\wc_trace.c
 $(O)allmain.o: allmain.c $(HACK_H)
+	@$(cc) $(cflagsBuild) /EP  $(@B).c > $(O)$(@B).c.preproc
+	@$(cc) $(cflagsBuild) -Fo$@  $(@B).c
 $(O)alloc.o: alloc.c $(CONFIG_H)
 $(O)apply.o: apply.c $(HACK_H)
 $(O)artifact.o: artifact.c $(HACK_H) $(INCL)\artifact.h $(INCL)\artilist.h
@@ -2064,7 +2157,7 @@ $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h
+$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ version.c
 $(O)vision.o: vision.c $(HACK_H)
 $(O)weapon.o: weapon.c $(HACK_H)

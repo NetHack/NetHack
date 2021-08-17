@@ -8,11 +8,7 @@
 #include "mhsplash.h"
 #include "mhmsg.h"
 #include "mhfont.h"
-#if !defined(CROSSCOMPILE)
-#include "date.h"
-#else
 #include "config.h"
-#endif
 #if !defined(VERSION_MAJOR)
 #include "patchlevel.h"
 #endif
@@ -149,7 +145,7 @@ mswin_display_splash_window(BOOL show_ver)
     /* Fill the text control */
     strbuf_reserve(&strbuf, BUFSIZ);
     Sprintf(strbuf.str, "%s\n%s\n%s\n%s\n\n", COPYRIGHT_BANNER_A,
-            COPYRIGHT_BANNER_B, COPYRIGHT_BANNER_C, COPYRIGHT_BANNER_D);
+            COPYRIGHT_BANNER_B, nomakedefs.copyright_banner_c, COPYRIGHT_BANNER_D);
 
     if (show_ver) {
         /* Show complete version information */

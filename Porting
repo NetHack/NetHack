@@ -182,20 +182,23 @@ NetHack requires the following steps to be carried out:
 
 Compile and link util/makedefs. Run makedefs repeatedly with different command
 line options to produce several output files that are required for:
-          (a) additional build steps to follow, including some header
-              files: pm.h, onames.h, date.h.
-          (b) creation of files, containing information required by,
+          (a) creation of files, containing information required by,
               or about the game during its execution, that are stored in a
               portable, platform-independent way, that need to be inserted
               into the final game package.
 
-          util/makedefs -v
-          util/makedefs -o
-          util/makedefs -p
-          util/makedefs -d
-          util/makedefs -r
-          util/makedefs -h
-          util/makedefs -s
+          Required for complete packaging of the game, but not the C source
+          game compile:
+              util/makedefs -d
+              util/makedefs -r
+              util/makedefs -h
+              util/makedefs -s
+
+          For reference purposes, but no longer a required prerequisite for the
+          game compile process:
+              util/makedefs -v
+              util/makedefs -o
+              util/makedefs -p
 
      4.2. Other utilities
 

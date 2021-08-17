@@ -8,7 +8,6 @@
 #include "prop.h"
 #include "permonst.h"
 #include "mondata.h"
-#include "pm.h"
 
 /* KMH, intrinsics patch.
  * Reorganized and rewritten for >32-bit properties.

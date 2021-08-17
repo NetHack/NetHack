@@ -197,7 +197,7 @@ static const char *const shkhealthfoods[] = {
  * The iprobs array in each entry defines the probabilities for various kinds
  * of objects to be present in the given shop type.  You can associate with
  * each percentage either a generic object type (represented by one of the
- * *_CLASS macros) or a specific object (represented by an onames.h define).
+ * *_CLASS enum value) or a specific object enum value.
  * In the latter case, prepend it with a unary minus so the code can know
  * (by testing the sign) whether to use mkobj() or mksobj().
  */

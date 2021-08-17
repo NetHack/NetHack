@@ -539,9 +539,4 @@ xexit(int retcd)
     /*NOTREACHED*/
 }
 
-#ifdef AMIGA
-#include "date.h"
-const char amiga_version_string[] = AMIGA_VERSION_STRING;
-#endif
-
 /*dlb_main.c*/

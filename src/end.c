@@ -1763,6 +1763,7 @@ nh_terminate(int status)
         dlb_cleanup();
         l_nhcore_done();
     }
+    free_nomakedefs();
 
 #ifdef VMS
     /*

@@ -383,7 +383,7 @@ RM_H	   = $(INCL)/align.h	$(INCL)/rm.h
 SKILLS_H   = $(INCL)/skills.h
 SP_LEV_H   = $(INCL)/align.h	$(INCL)/sp_lev.h
 YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h     \
-	    $(INCL)/pm.h       $(INCL)/youprop.h
+	    $(INCL)/youprop.h
 YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h    \
 	     $(INCL)/attrib.h	$(INCL)/you.h
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
@@ -392,7 +392,7 @@ PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h   \
 CONFIG_H   = $(GLOBAL_H)	$(INCL)/fnamesiz.h  $(INCL)/tradstdc.h \
 	     $(INCL)/config1.h $(INCL)/config.h
 DECL_H	   = $(YOU_H)		$(INCL)/spell.h	    $(INCL)/color.h    \
-	     $(INCL)/obj.h	$(INCL)/onames.h    $(INCL)/pm.h       \
+	     $(INCL)/obj.h	$(INCL)/objects.h                      \
 	      $(INCL)/decl.h
 GLOBAL_H   = $(PCCONF_H)	$(INCL)/coord.h	   $(INCL)/global.h
 HACK_H	   = $(CONFIG_H)	$(INCL)/context.h  $(DUNGEON_H)	       \
@@ -547,8 +547,8 @@ default: $(GAMEFILE)
 
 util: $(O)utility.tag
 
-$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/onames.h \
-	$(INCL)/pm.h	  $(TILEUTIL)
+$(O)utility.tag: $(INCL)/date.h $(INCL)/trap.h    $(INCL)/objects.h \
+	$(TILEUTIL)
 	$(subst /,\,echo utilities made > $@)
 
 tileutil: $(U)gif2txt.exe $(U)txt2ppm.exe

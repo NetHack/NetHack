@@ -50,8 +50,8 @@ the file NewInstall.unx.
 6.  Edit the top sections of the src and util Makefiles.  (If you are doing
     a full recompile, or if you got your files from someplace besides the
     official distribution, type 'touch makedefs.c' to make sure certain files
-    (onames.h, pm.h) get remade instead of relying on the potentially
-    troublesome timestamps.)  Then type 'make' in src and go get a cup of
+    get remade instead of relying on the potentially troublesome timestamps.)
+    Then type 'make' in src and go get a cup of
     coffee or take a nap, depending on the speed of your system.  You should
     now have created the game executable.
 

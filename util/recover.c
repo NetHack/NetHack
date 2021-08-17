@@ -444,11 +444,6 @@ exepath(char *str)
 }
 #endif /* EXEPATH */
 
-#ifdef AMIGA
-#include "date.h"
-const char amiga_version_string[] = AMIGA_VERSION_STRING;
-#endif
-
 #ifdef WIN_CE
 void
 nhce_message(FILE *f, const char *str, ...)

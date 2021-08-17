@@ -66,6 +66,13 @@ struct permonst {
 
 extern NEARDATA struct permonst mons[]; /* the master list of monster types */
 
+enum monnums {
+#define MONS_ENUM
+#include "monsters.h"
+#undef MONS_ENUM
+        NUMMONS
+};
+
 #define VERY_SLOW 3
 #define SLOW_SPEED 9
 #define NORMAL_SPEED 12 /* movement rates */
@@ -82,4 +89,5 @@ extern NEARDATA struct permonst mons[]; /* the master list of monster types */
 #define pmname(pm,g) ((((g) == MALE || (g) == FEMALE) && (pm)->pmnames[g]) \
                         ? (pm)->pmnames[g] : (pm)->pmnames[NEUTRAL])
 #endif
+
 #endif /* PERMONST_H */

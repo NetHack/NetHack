@@ -239,9 +239,9 @@ Setting Up
 
     If you are recompiling after patching your sources, or if you got
     your files from somewhere other than the official distribution,
-    "touch makedefs.c" to ensure that certain files (onames.h and pm.h)
-    are remade, lest potentially troublesome timestamps fool your make
-    (or nmake) utility.
+    "touch makedefs.c" to ensure that certain files are remade,
+    lest potentially troublesome timestamps fool your make (or nmake)
+    utility.
 
 Compiling
 

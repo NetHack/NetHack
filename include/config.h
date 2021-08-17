@@ -271,6 +271,16 @@
 #endif
 
 /*
+ *      NODUMPENUMS
+ *      If there are memory constraints and you don't want to store information
+ *      about the internal enum values for monsters and objects, this can be
+ *      uncommented to define NODUMPENUMS. Doing so will disable the
+ *          nethack --dumpenums
+ *      command line option.
+ */
+/* #define NODUMPENUMS */
+
+/*
  *      If COMPRESS is defined, it should contain the full path name of your
  *      'compress' program.
  *

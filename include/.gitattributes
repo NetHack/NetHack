@@ -1,5 +1,5 @@
 * NH_filestag=(file%s_for_all_versions)
-..files NH_filegenerated=win32api.h,tile.h,dgn_comp.h,lev_comp.h,date.h,onames.h,pm.h
+..files NH_filegenerated=win32api.h,tile.h,date.h
 
 win32api.h NH_filesgentag=(file%s_for_win32_that_are_moved_into_include_at_compile_time)
 
@@ -9,8 +9,6 @@ dgn_comp.h NH_filesgentag=(file%s_generated_by_yacc_(or_copied_from_sys/share)_a
 lev_comp.h NH_filesgentag=>dgn_comp.h
 
 date.h NH_filesgentag=(file%s_generated_by_makedefs_at_compile_time)
-onames.h NH_filesgentag=>date.h
-pm.h NH_filesgentag=>date.h
 
 wintty.h NH_filestag=(file%s_for_tty_versions)
 

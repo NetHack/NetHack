@@ -239,7 +239,6 @@
 		3186A37421A4B0FA0052BF02 /* attrib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attrib.h; path = ../../include/attrib.h; sourceTree = "<group>"; };
 		3186A37521A4B0FA0052BF02 /* patchlevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = patchlevel.h; path = ../../include/patchlevel.h; sourceTree = "<group>"; };
 		3186A37621A4B0FA0052BF02 /* wincurs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wincurs.h; path = ../../include/wincurs.h; sourceTree = "<group>"; };
-		3186A37721A4B0FA0052BF02 /* pm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pm.h; path = ../../include/pm.h; sourceTree = "<group>"; };
 		3186A37921A4B0FA0052BF02 /* monattk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monattk.h; path = ../../include/monattk.h; sourceTree = "<group>"; };
 		3186A37A21A4B0FA0052BF02 /* integer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = integer.h; path = ../../include/integer.h; sourceTree = "<group>"; };
 		3186A37B21A4B0FA0052BF02 /* region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = region.h; path = ../../include/region.h; sourceTree = "<group>"; };
@@ -254,7 +253,6 @@
 		3186A38721A4B0FB0052BF02 /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../include/color.h; sourceTree = "<group>"; };
 		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
 		3186A38A21A4B0FB0052BF02 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = ../../include/system.h; sourceTree = "<group>"; };
-		3186A38B21A4B0FC0052BF02 /* onames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onames.h; path = ../../include/onames.h; sourceTree = "<group>"; };
 		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
@@ -687,11 +685,9 @@
 				3186A39B21A4B0FD0052BF02 /* windconf.h */,
 				3186A39521A4B0FC0052BF02 /* obj.h */,
 				3186A3A821A4B0FD0052BF02 /* objclass.h */,
-				3186A38B21A4B0FC0052BF02 /* onames.h */,
 				3186A37521A4B0FA0052BF02 /* patchlevel.h */,
 				3186A38121A4B0FB0052BF02 /* pcconf.h */,
 				3186A38321A4B0FB0052BF02 /* permonst.h */,
-				3186A37721A4B0FA0052BF02 /* pm.h */,
 				3186A37F21A4B0FA0052BF02 /* prop.h */,
 				3186A39E21A4B0FD0052BF02 /* quest.h */,
 				3186A37C21A4B0FA0052BF02 /* rect.h */,

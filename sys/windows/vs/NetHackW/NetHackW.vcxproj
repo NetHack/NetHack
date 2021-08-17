@@ -244,12 +244,10 @@
     <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
-    <ClInclude Include="$(IncDir)onames.h" />
     <ClInclude Include="$(IncDir)optlist.h" />
     <ClInclude Include="$(IncDir)patchlevel.h" />
     <ClInclude Include="$(IncDir)pcconf.h" />
     <ClInclude Include="$(IncDir)permonst.h" />
-    <ClInclude Include="$(IncDir)pm.h" />
     <ClInclude Include="$(IncDir)prop.h" />
     <ClInclude Include="$(IncDir)quest.h" />
     <ClInclude Include="$(IncDir)rect.h" />

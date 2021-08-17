@@ -185,6 +185,18 @@ typedef struct {
 #include "dungeon.h"
 #include "sym.h"
 #include "mkroom.h"
+
+enum artifacts_nums {
+#define ARTI_ENUM
+#include "artilist.h"
+#undef ARTI_ENUM
+    AFTER_LAST_ARTIFACT
+};
+
+enum misc_arti_nums {
+    NROFARTIFACTS = (AFTER_LAST_ARTIFACT - 1)
+};
+
 #include "objclass.h"
 #include "youprop.h"
 #include "wintype.h"

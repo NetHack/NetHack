@@ -247,6 +247,11 @@ extern char yn_function(const char *, const char *, char);
 extern boolean paranoid_query(boolean, const char *);
 extern void makemap_prepost(boolean, boolean);
 
+/* ### date.c ### */
+
+extern void populate_nomakedefs(struct version_info *);
+extern void free_nomakedefs(void);
+
 /* ### dbridge.c ### */
 
 extern boolean is_pool(int, int);
@@ -1193,6 +1198,9 @@ extern int buzzmu(struct monst *, struct attack *);
 
 extern void runtime_info_init(void);
 extern const char *do_runtime_info(int *);
+#ifndef NODUMPENUMS
+extern void dump_enums(void);
+#endif
 
 /* ### mhitm.c ### */
 

@@ -1269,3 +1269,17 @@ adjust window port interface to pass a pointer to a glyph_info struct which
 	and the symset index; this affects two window port calls that get
 	passed glyphs: print_glyph() and add_menu().
 switch from k&r C to C99
+remove the game-compile dependencies on any pre-generated header files
+date.h dependency and inclusion is removed and comparable functionality is
+	produced at runtime; REPRODUCIBLE_BUILD capability will need to be
+	reviewed and adjusted
+pm.h dependency and inclusion is removed and comparable functionality is
+	produced by moving the monster definitions from monst.c into new header
+	file called monsters.h, then taking advantage of the C preprocessor to
+	generate appropriate enum values during compile
+onames.h dependency and inclusion is removed and comparable functionality is
+	produced by moving the object definitions from objects.c into new header
+	file called objects.h, then taking advantage of the C preprocessor to
+	generate appropriate enum values during compile
+artilist.h is used to generate appropriate artifact enum values by the C
+	preprocessor during compile

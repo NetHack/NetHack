@@ -134,9 +134,6 @@ struct objdescr {
     const char *oc_descr; /* description when name unknown */
 };
 
-extern NEARDATA struct objclass objects[];
-extern NEARDATA struct objdescr obj_descr[];
-
 /*
  * All objects have a class. Make sure that all classes have a corresponding
  * symbol below.
@@ -183,6 +180,23 @@ struct fruit {
 #define newfruit() (struct fruit *) alloc(sizeof(struct fruit))
 #define dealloc_fruit(rind) free((genericptr_t)(rind))
 
+enum objects_nums {
+#define OBJECTS_ENUM
+#include "objects.h"
+#undef OBJECTS_ENUM
+    NUM_OBJECTS
+};
+
+enum misc_object_nums {
+    LAST_GEM = (JADE),
+    NUM_GLASS_GEMS = ((LUCKSTONE - JADE) - 1),
+    MAXSPELL = ((SPE_BOOK_OF_THE_DEAD - SCR_BLANK_PAPER) + 1)
+};
+
+extern NEARDATA struct objclass objects[NUM_OBJECTS + 1];
+extern NEARDATA struct objdescr obj_descr[NUM_OBJECTS + 1];
+
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
+
 #endif /* OBJCLASS_H */

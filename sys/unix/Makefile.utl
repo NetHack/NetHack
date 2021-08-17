@@ -179,7 +179,7 @@ CALLOC = ../src/alloc.c panic.c
 OALLOC = $(OBJDIR)/alloc.o panic.o
 
 # object files for makedefs
-MAKEOBJS = makedefs.o $(OMONOBJ)
+MAKEOBJS = makedefs.o $(OMONOBJ) $(OBJDIR)/date.o
 
 # object files for recovery utility
 RECOVOBJS = recover.o
@@ -209,17 +209,19 @@ makedefs:	$(MAKEOBJS) mdgrep.h
 makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/sym.h ../include/defsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
-		../include/monst.h ../include/you.h ../include/flag.h \
-		../include/dlb.h ../include/patchlevel.h
+		../include/monst.h ../include/monsters.h ../include/objects.h \
+		../include/you.h ../include/flag.h ../include/dlb.h \
+		../include/patchlevel.h
 	$(CC) $(CFLAGS) -c makedefs.c -o $@
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
 	perl mdgrep.pl
 
-../include/onames.h: makedefs
+# These are for reference purposes only. They aren't required in the build.
+../include/onames.h: makedefs ../include/objects.h
 	./makedefs -o
-../include/pm.h: makedefs
+../include/pm.h: makedefs ../include/monsters.h
 	./makedefs -p
 
 lintdefs:

@@ -112,6 +112,10 @@ main(int argc, char *argv[])
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
 
+#ifndef NODUMPENUMS
+        if (argcheck(argc, argv, ARG_DUMPENUMS) == 2)
+            exit(EXIT_SUCCESS);
+#endif
         if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
 #ifdef CHDIR
             chdirx((char *) 0, 0);
