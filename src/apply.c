@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1623807747 2021/06/16 01:42:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1629242800 2021/08/17 23:26:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -674,8 +674,15 @@ use_leash(struct obj *obj)
             pline("%s has no extremities the leash would fit.",
                   Monnam(mtmp));
         } else if (!leashable(mtmp)) {
+            char lmonbuf[BUFSZ];
+            char *lmonnam = l_monnam(mtmp);
+
+            if (cc.x != mtmp->mx || cc.y != mtmp->my) {
+                Sprintf(lmonbuf, "%s tail", s_suffix(lmonnam));
+                lmonnam = lmonbuf;
+            }
             pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
-                  l_monnam(mtmp));
+                  lmonnam);
         } else {
             You("slip the leash around %s%s.", spotmon ? "your " : "",
                 l_monnam(mtmp));
