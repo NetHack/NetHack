@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1612658075 2021/02/07 00:34:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1629317892 2021/08/18 20:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -354,11 +354,10 @@ toggle_blindness(void)
 }
 
 boolean
-make_hallucinated(long xtime, /* nonzero if this is an attempt to turn on
-                                 hallucination */
-                  boolean talk,
-                  long mask) /* nonzero if resistance status should change
-                                by mask */
+make_hallucinated(
+    long xtime,   /* nonzero if this is an attempt to turn on hallucination */
+    boolean talk,
+    long mask)    /* nonzero if resistance status should change by mask */
 {
     long old = HHallucination;
     boolean changed = 0;
@@ -485,8 +484,8 @@ ghost_from_bottle(void)
     g.nomovemsg = "You regain your composure.";
 }
 
-/* getobj callback for object to drink from, which also does double duty as the
- * callback for dipping into (both just allow potions). */
+/* getobj callback for object to drink from, which also does double duty as
+   the callback for dipping into (both just allow potions). */
 static int
 drink_ok(struct obj *obj)
 {
@@ -1398,9 +1397,9 @@ const char *bottlenames[] = { "bottle", "phial", "flagon", "carafe",
                               "flask",  "jar",   "vial" };
 const char *hbottlenames[] = {
     "jug", "pitcher", "barrel", "tin", "bag", "box", "glass", "beaker",
-    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup", "teapot",
-    "keg", "bucket", "thermos", "amphora", "wineskin", "parcel", "bowl",
-    "ampoule"
+    "tumbler", "vase", "flowerpot", "pan", "thingy", "mug", "teacup",
+    "teapot", "keg", "bucket", "thermos", "amphora", "wineskin", "parcel",
+    "bowl", "ampoule"
 };
 
 const char *
@@ -1414,11 +1413,11 @@ bottlename(void)
 
 /* handle item dipped into water potion or steed saddle splashed by same */
 static boolean
-H2Opotion_dip(struct obj *potion,    /* water */
-              struct obj *targobj,   /* item being dipped into the water */
-              boolean useeit,        /* will hero see the glow/aura? */
-              const char *objphrase) /* "Your widget glows" or
-                                      * "Steed's saddle glows" */
+H2Opotion_dip(
+    struct obj *potion,    /* water */
+    struct obj *targobj,   /* item being dipped into the water */
+    boolean useeit,        /* will hero see the glow/aura? */
+    const char *objphrase) /* "Your widget glows" or "Steed's saddle glows" */
 {
     void (*func)(struct obj *) = 0;
     const char *glowcolor = 0;
@@ -1501,7 +1500,7 @@ H2Opotion_dip(struct obj *potion,    /* water */
     return res;
 }
 
-/* potion obj hits monster mon, which might be g.youmonst; obj always used up */
+/* potion obj hits monster mon, which might be youmonst; obj always used up */
 void
 potionhit(struct monst *mon, struct obj *obj, int how)
 {
@@ -2598,8 +2597,9 @@ djinni_from_bottle(struct obj *obj)
 /* clone a gremlin or mold (2nd arg non-null implies heat as the trigger);
    hit points are cut in half (odd HP stays with original) */
 struct monst *
-split_mon(struct monst *mon,  /* monster being split */
-          struct monst *mtmp) /* optional attacker whose heat triggered it */
+split_mon(
+    struct monst *mon,  /* monster being split */
+    struct monst *mtmp) /* optional attacker whose heat triggered it */
 {
     struct monst *mtmp2;
     char reason[BUFSZ];
