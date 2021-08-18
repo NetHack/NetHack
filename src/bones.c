@@ -235,10 +235,10 @@ drop_upon_death(struct monst *mtmp, /* monster if hero turned into one (other th
         if (!mtmp || is_undead(mtmp->data))
             obj_no_longer_held(otmp);
 
-        otmp->owornmask = 0L;
         /* lamps don't go out when dropped */
         if ((cont || artifact_light(otmp)) && obj_is_burning(otmp))
             end_burn(otmp, TRUE); /* smother in statue */
+        otmp->owornmask = 0L;
 
         if (otmp->otyp == SLIME_MOLD)
             goodfruit(otmp->spe);
