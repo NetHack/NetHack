@@ -588,6 +588,8 @@ in wizard mode, polymorphing into hero's role monster in order to revert to
 	normal form would complain about missing light source if hero was
 	changing back from the form of a light-emitting monster [didn't affect
 	normal play because role monsters are invalid polymorph targets there]
+revise a 3.6.1 fix: if a spellbook which is being read becomes cursed, always
+	stop reading: "The <book> slams shut!" and set book->bknown
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

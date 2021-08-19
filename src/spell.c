@@ -327,14 +327,16 @@ deadbook(struct obj* book2)
     return;
 }
 
-/* 'book' has just become cursed; if we're reading it and realize it is
-   now cursed, interrupt */
+/* 'book' has just become cursed; if we're reading it, interrupt */
 void
-book_cursed(struct obj* book)
+book_cursed(struct obj *book)
 {
-    if (g.occupation == learn && g.context.spbook.book == book
-        && book->cursed && book->bknown && g.multi >= 0)
+    if (book->cursed && g.multi >= 0
+        && g.occupation == learn && g.context.spbook.book == book) {
+        pline("%s shut!", Tobjnam(book, "slam"));
+        set_bknown(book, 1);
         stop_occupation();
+    }
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
