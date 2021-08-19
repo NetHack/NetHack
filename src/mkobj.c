@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1629332223 2021/08/19 00:17:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1629403671 2021/08/19 20:07:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,7 @@ static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
 static void mon_obj_sanity(struct monst *, const char *);
 static void insane_obj_bits(struct obj *, struct monst *);
+static boolean nomerge_exception(struct obj *);
 static const char *where_name(struct obj *);
 static void insane_object(struct obj *, const char *, const char *,
                           struct monst *);
@@ -2412,13 +2413,31 @@ mon_obj_sanity(struct monst *monlist, const char *mesg)
 static void
 insane_obj_bits(struct obj *obj, struct monst *mon)
 {
-    char infobuf[QBUFSZ];
+    unsigned o_in_use = obj->in_use, o_bypass = obj->bypass,
+             /* having obj->nomerge be set might be intentional */
+             o_nomerge = obj->nomerge && !nomerge_exception(obj);
 
-    Sprintf(infobuf, "flagged%s%s%s",
-            obj->in_use ? " in_use" : "",
-            obj->bypass ? " bypass" : "",
-            obj->nomerge ? " nomerge" : "");
-    insane_object(obj, ofmt0, infobuf, mon);
+    if (o_in_use || o_bypass || o_nomerge) {
+        char infobuf[QBUFSZ];
+
+        Sprintf(infobuf, "flagged%s%s%s",
+                o_in_use ? " in_use" : "",
+                o_bypass ? " bypass" : "",
+                o_nomerge ? " nomerge" : "");
+        insane_object(obj, ofmt0, infobuf, mon);
+    }
+}
+
+/* does 'obj' use the 'nomerge' flag persistently? */
+static boolean
+nomerge_exception(struct obj *obj)
+{
+    /* special prize objects for achievement tracking are set 'nomerge'
+       until they get picked up by the hero */
+    if (is_mines_prize(obj) || is_soko_prize(obj))
+        return TRUE;
+
+    return FALSE;
 }
 
 /* This must stay consistent with the defines in obj.h. */
