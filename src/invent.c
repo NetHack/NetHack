@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1629408035 2021/08/19 21:20:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.338 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1629409876 2021/08/19 21:51:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1168,6 +1168,7 @@ freeinv(struct obj *obj)
     update_inventory();
 }
 
+/* drawbridge is destroying all objects at <x,y> */
 void
 delallobj(int x, int y)
 {
@@ -1199,6 +1200,7 @@ delobj(struct obj *obj)
          * are indestructible via drawbridges, and exploding
          * chests, and golem creation, and ...
          */
+        obj->in_use = 0; /* in case caller has set this to 1 */
         return;
     }
     update_map = (obj->where == OBJ_FLOOR);
