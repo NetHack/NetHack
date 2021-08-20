@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1629317892 2021/08/18 20:18:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1629497464 2021/08/20 22:11:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1804,6 +1804,7 @@ potionbreathe(struct obj *obj)
 {
     int i, ii, isdone, kn = 0;
     boolean cureblind = FALSE;
+    unsigned already_in_use = obj->in_use;
 
     /* potion of unholy water might be wielded; prevent
        you_were() -> drop_weapon() from dropping it so that it
@@ -1971,6 +1972,9 @@ potionbreathe(struct obj *obj)
         break;
      */
     }
+
+    if (!already_in_use)
+        obj->in_use = 0;
     /* note: no obfree() -- that's our caller's responsibility */
     if (obj->dknown) {
         if (kn)
@@ -1979,6 +1983,7 @@ potionbreathe(struct obj *obj)
                  && !objects[obj->otyp].oc_uname)
             docall(obj);
     }
+    return;
 }
 
 /* returns the potion type when o1 is dipped in o2 */
