@@ -31,24 +31,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(RootDir)util\makedefs.c" />
+    <ClCompile Include="$(RootDir)src\date.c" />
     <ClCompile Include="$(RootDir)src\monst.c" />
     <ClCompile Include="$(RootDir)src\objects.c" />
-    <ClCompile Include="..\..\..\..\src\date.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(IncDir)config.h" />
     <ClInclude Include="$(IncDir)config1.h" />
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)monattk.h" />
     <ClInclude Include="$(IncDir)monflag.h" />
-    <ClInclude Include="$(IncDir)sym.h" />
-    <ClInclude Include="$(IncDir)defsym.h" />
-    <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
     <ClInclude Include="$(IncDir)patchlevel.h" />
+    <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)tradstdc.h" />
+    <ClInclude Include="$(IncDir)windconf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="GenerateHeader" BeforeTargets="ClCompile" Outputs="$(IncDir)\nhlua.h">
