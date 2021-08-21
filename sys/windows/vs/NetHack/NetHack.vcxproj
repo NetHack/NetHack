@@ -56,6 +56,7 @@
     <ClCompile Include="$(SrcDir)botl.c" />
     <ClCompile Include="$(SrcDir)cmd.c" />
     <ClCompile Include="$(SrcDir)dbridge.c" />
+    <ClCompile Include="$(SrcDir)date.c" />
     <ClCompile Include="$(SrcDir)decl.c" />
     <ClCompile Include="$(SrcDir)detect.c" />
     <ClCompile Include="$(SrcDir)dig.c" />
@@ -195,7 +196,6 @@
     <ClInclude Include="$(IncDir)config1.h" />
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
-    <ClInclude Include="$(IncDir)date.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)display.h" />
@@ -214,11 +214,13 @@
     <ClInclude Include="$(IncDir)monattk.h" />
     <ClInclude Include="$(IncDir)mondata.h" />
     <ClInclude Include="$(IncDir)monflag.h" />
+    <ClInclude Include="$(IncDir)monsters.h" />
     <ClInclude Include="$(IncDir)monst.h" />
     <ClInclude Include="$(IncDir)nhlua.h" />
     <ClInclude Include="$(IncDir)windconf.h" />
     <ClInclude Include="$(IncDir)obj.h" />
     <ClInclude Include="$(IncDir)objclass.h" />
+    <ClInclude Include="$(IncDir)objects.h" />
     <ClInclude Include="$(IncDir)patchlevel.h" />
     <ClInclude Include="$(IncDir)permonst.h" />
     <ClInclude Include="$(IncDir)prop.h" />

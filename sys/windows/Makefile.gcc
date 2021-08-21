@@ -1006,22 +1006,23 @@ $(INCL)/onames.h : $(U)makedefs.exe
 $(INCL)/pm.h : $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -p)
 
-$(DAT)/data: $(O)utility.tag    $(DATABASE)
+$(DAT)/data: $(U)makedefs.exe $(O)utility.tag $(DATABASE)
 	$(subst /,\,$(U)makedefs -d)
 
-$(DAT)/rumors: $(O)utility.tag    $(DAT)/rumors.tru   $(DAT)/rumors.fal
+$(DAT)/rumors: $(U)makedefs.exe $(O)utility.tag $(DAT)/rumors.tru \
+	$(DAT)/rumors.fal
 	$(subst /,\,$(U)makedefs -r)
 
-$(DAT)/oracles: $(O)utility.tag    $(DAT)/oracles.txt
+$(DAT)/oracles: $(U)makedefs.exe $(O)utility.tag $(DAT)/oracles.txt
 	$(subst /,\,$(U)makedefs -h)
 
-$(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
+$(DAT)/engrave: $(U)makedefs.exe $(DAT)/engrave.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
+$(DAT)/epitaph: $(U)makedefs.exe $(DAT)/epitaph.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
+$(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
 #==========================================
