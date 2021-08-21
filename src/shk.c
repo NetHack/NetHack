@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1629496872 2021/08/20 22:01:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1629548922 2021/08/21 12:28:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2447,7 +2447,7 @@ unpaid_cost(
 }
 
 static void
-add_one_tobill(struct obj* obj, boolean dummy, struct monst* shkp)
+add_one_tobill(struct obj *obj, boolean dummy, struct monst *shkp)
 {
     struct eshk *eshkp;
     struct bill_x *bp;
@@ -2459,6 +2459,11 @@ add_one_tobill(struct obj* obj, boolean dummy, struct monst* shkp)
 
     if (eshkp->billct == BILLSZ) {
         You("got that for free!");
+        /*
+         * FIXME:
+         *  What happens when this is a dummy object?  It won't be on any
+         *  object list.
+         */
         return;
     }
 
@@ -2496,6 +2501,11 @@ add_to_billobjs(struct obj* obj)
     obj->nobj = g.billobjs;
     g.billobjs = obj;
     obj->where = OBJ_ONBILL;
+
+    /* if hero drinks a shop-owned potion, it will have been flagged
+       in_use by dodrink/dopotion but isn't being be used up yet because
+       it stays on the bill; only object sanity checking actually cares */
+    obj->in_use = 0;
 }
 
 /* recursive billing of objects within containers. */
