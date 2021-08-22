@@ -2305,7 +2305,7 @@ in_container(struct obj *obj)
         }
     }
     if (Icebox && !age_is_relative(obj)) {
-        obj->age = g.monstermoves - obj->age; /* actual age */
+        obj->age = g.moves - obj->age; /* actual age */
         /* stop any corpse timeouts when frozen */
         if (obj->otyp == CORPSE) {
             if (obj->timed) {
@@ -2445,7 +2445,7 @@ void
 removed_from_icebox(struct obj *obj)
 {
     if (!age_is_relative(obj)) {
-        obj->age = g.monstermoves - obj->age; /* actual age */
+        obj->age = g.moves - obj->age; /* actual age */
         if (obj->otyp == CORPSE) {
             struct monst *m = get_mtraits(obj, FALSE);
             boolean iceT = m ? (m->data == &mons[PM_ICE_TROLL])
@@ -2531,7 +2531,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
             /* set_corpsenm() will start the rot timer that was removed
                when makemon() created SchroedingersBox; start it from
                now rather than from when this special corpse got created */
-            deadcat->age = g.monstermoves;
+            deadcat->age = g.moves;
             set_corpsenm(deadcat, PM_HOUSECAT);
             deadcat = oname(deadcat, sc);
         }

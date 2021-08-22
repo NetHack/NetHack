@@ -2598,14 +2598,14 @@ mon_consume_unstone(
     if (mon->mtame && !mon->isminion && nutrit > 0) {
         struct edog *edog = EDOG(mon);
 
-        if (edog->hungrytime < g.monstermoves)
-            edog->hungrytime = g.monstermoves;
+        if (edog->hungrytime < g.moves)
+            edog->hungrytime = g.moves;
         edog->hungrytime += nutrit;
         mon->mconf = 0;
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = g.monstermoves;
+    mon->mlstmv = g.moves;
 }
 
 /* decide whether obj can cure petrification; also used when picking up */
@@ -2867,7 +2867,7 @@ muse_unslime(
     }
     /* use up monster's next move */
     mon->movement -= NORMAL_SPEED;
-    mon->mlstmv = g.monstermoves;
+    mon->mlstmv = g.moves;
     return res;
 }
 

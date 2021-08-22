@@ -3471,12 +3471,12 @@ add_damage(
     for (tmp_dam = g.level.damagelist; tmp_dam; tmp_dam = tmp_dam->next)
         if (tmp_dam->place.x == x && tmp_dam->place.y == y) {
             tmp_dam->cost += cost;
-            tmp_dam->when = g.monstermoves; /* needed by pay_for_damage() */
+            tmp_dam->when = g.moves; /* needed by pay_for_damage() */
             return;
         }
     tmp_dam = (struct damage *) alloc((unsigned) sizeof *tmp_dam);
     (void) memset((genericptr_t) tmp_dam, 0, sizeof *tmp_dam);
-    tmp_dam->when = g.monstermoves;
+    tmp_dam->when = g.moves;
     tmp_dam->place.x = x;
     tmp_dam->place.y = y;
     tmp_dam->cost = cost;
@@ -3511,7 +3511,7 @@ repairable_damage(struct damage *dam, struct monst *shkp)
         return FALSE;
 
     /* too soon to fix it? */
-    if ((g.monstermoves - dam->when) < REPAIR_DELAY)
+    if ((g.moves - dam->when) < REPAIR_DELAY)
         return FALSE;
     /* is it a wall? don't fix if anyone is in the way */
     if (!IS_ROOM(dam->typ)) {
@@ -4115,7 +4115,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
     for (tmp_dam = g.level.damagelist; tmp_dam; tmp_dam = tmp_dam->next) {
         char *shp;
 
-        if (tmp_dam->when != g.monstermoves || !tmp_dam->cost)
+        if (tmp_dam->when != g.moves || !tmp_dam->cost)
             continue;
         cost_of_damage += tmp_dam->cost;
         Strcpy(shops_affected,

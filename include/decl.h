@@ -834,8 +834,7 @@ struct instance_globals {
     struct mkroom rooms[(MAXNROFROOMS + 1) * 2];
     struct mkroom *subrooms;
     dlevel_t level; /* level map */
-    long moves;
-    long monstermoves; /* moves and monstermoves diverge when player is Fast */
+    long moves; /* turn counter */
     long wailmsg;
     struct obj *migrating_objs; /* objects moving to another dungeon level */    
     struct obj *billobjs; /* objects not yet paid for */

@@ -754,7 +754,7 @@ mksobj(int otyp, boolean init, boolean artif)
 
     otmp = newobj();
     *otmp = cg.zeroobj;
-    otmp->age = g.monstermoves;
+    otmp->age = g.moves;
     otmp->o_id = g.context.ident++;
     if (!otmp->o_id)
         otmp->o_id = g.context.ident++; /* ident overflowed */
@@ -1205,7 +1205,7 @@ start_corpse_timeout(struct obj *body)
 
     action = ROT_CORPSE;               /* default action: rot away */
     rot_adjust = g.in_mklev ? 25 : 10; /* give some variation */
-    age = g.monstermoves - body->age;
+    age = g.moves - body->age;
     if (age > ROT_AGE)
         when = rot_adjust;
     else
@@ -1841,12 +1841,12 @@ peek_at_iced_corpse_age(struct obj *otmp)
 
     if (otmp->otyp == CORPSE && otmp->on_ice) {
         /* Adjust the age; must be same as obj_timer_checks() for off ice*/
-        age = g.monstermoves - otmp->age;
+        age = g.moves - otmp->age;
         retval += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
         debugpline3(
           "The %s age has ice modifications: otmp->age = %ld, returning %ld.",
                     s_suffix(doname(otmp)), otmp->age, retval);
-        debugpline1("Effective age of corpse: %ld.", g.monstermoves - retval);
+        debugpline1("Effective age of corpse: %ld.", g.moves - retval);
     }
     return retval;
 }
@@ -1885,8 +1885,8 @@ obj_timer_checks(
                later calculations behave as if it had been on ice during
                that time (longwinded way of saying this is the inverse
                of removing it from the ice and of peeking at its age). */
-            age = g.monstermoves - otmp->age;
-            otmp->age = g.monstermoves - (age * ROT_ICE_ADJUSTMENT);
+            age = g.moves - otmp->age;
+            otmp->age = g.moves - (age * ROT_ICE_ADJUSTMENT);
         }
 
     /* Check for corpses coming off ice */
@@ -1907,7 +1907,7 @@ obj_timer_checks(
             tleft /= ROT_ICE_ADJUSTMENT;
             restart_timer = TRUE;
             /* Adjust the age */
-            age = g.monstermoves - otmp->age;
+            age = g.moves - otmp->age;
             otmp->age += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
         }
     }

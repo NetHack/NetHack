@@ -162,7 +162,7 @@ restdamage(NHFILE* nhfp)
             mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
 
         if (ghostly)
-            tmp_dam->when += (g.monstermoves - g.omoves);
+            tmp_dam->when += (g.moves - g.omoves);
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
@@ -278,7 +278,7 @@ restobjchn(NHFILE* nhfp, boolean frozen)
          * immediately after old player died.
          */
         if (ghostly && !frozen && !age_is_relative(otmp))
-            otmp->age = g.monstermoves - g.omoves + otmp->age;
+            otmp->age = g.moves - g.omoves + otmp->age;
 
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
@@ -672,7 +672,6 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     restlevchn(nhfp);
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
-        mread(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
         mread(nhfp->fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
         mread(nhfp->fd, (genericptr_t) g.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     }
@@ -1065,7 +1064,7 @@ getlev(NHFILE* nhfp, int pid, xchar lev)
         mread(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
         mread(nhfp->fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
     }
-    elapsed = g.monstermoves - g.omoves;
+    elapsed = g.moves - g.omoves;
 
     if (nhfp->structlevel) {
         rest_stairs(nhfp);

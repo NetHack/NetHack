@@ -1626,7 +1626,7 @@ eatcorpse(struct obj *otmp)
     if (!nonrotting_corpse(mnum)) {
         long age = peek_at_iced_corpse_age(otmp);
 
-        rotted = (g.monstermoves - age) / (10L + rn2(20));
+        rotted = (g.moves - age) / (10L + rn2(20));
         if (otmp->cursed)
             rotted += 2L;
         else if (otmp->blessed)
@@ -2345,7 +2345,7 @@ edibility_prompts(struct obj *otmp)
 
             /* worst case rather than random
                in this calculation to force prompt */
-            rotted = (g.monstermoves - age) / (10L + 0 /* was rn2(20) */);
+            rotted = (g.moves - age) / (10L + 0 /* was rn2(20) */);
             if (otmp->cursed)
                 rotted += 2L;
             else if (otmp->blessed)
@@ -2714,7 +2714,7 @@ doeat(void)
         g.context.victual.reqtime = objects[otmp->otyp].oc_delay;
         if (otmp->otyp != FORTUNE_COOKIE
             && (otmp->cursed || (!nonrotting_food(otmp->otyp)
-                                 && (g.monstermoves - otmp->age)
+                                 && (g.moves - otmp->age)
                                         > (otmp->blessed ? 50L : 30L)
                                  && (otmp->orotten || !rn2(7))))) {
             if (rottenfood(otmp)) {

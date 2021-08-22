@@ -2151,7 +2151,7 @@ fig_transform(anything *arg, long timeout)
         impossible("null figurine in fig_transform()");
         return;
     }
-    silent = (timeout != g.monstermoves); /* happened while away */
+    silent = (timeout != g.moves); /* happened while away */
     okay_spot = get_obj_location(figurine, &cc.x, &cc.y, 0);
     if (figurine->where == OBJ_INVENT || figurine->where == OBJ_MINVENT)
         okay_spot = enexto(&cc, cc.x, cc.y, &mons[figurine->corpsenm]);

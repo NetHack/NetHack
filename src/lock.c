@@ -192,7 +192,7 @@ breakchestlock(struct obj *box, boolean destroyit)
                 useup(otmp);
             }
             if (box->otyp == ICE_BOX && otmp->otyp == CORPSE) {
-                otmp->age = g.monstermoves - otmp->age; /* actual age */
+                otmp->age = g.moves - otmp->age; /* actual age */
                 start_corpse_timeout(otmp);
             }
             place_object(otmp, u.ux, u.uy);

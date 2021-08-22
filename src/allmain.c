@@ -196,7 +196,6 @@ moveloop_core(void)
                 u_calc_moveamt(mvl_wtcap);
                 settrack();
 
-                g.monstermoves++; /* [obsolete (for a long time...)] */
                 g.moves++;
                 /*
                  * Never allow 'moves' to grow big enough to wrap.
