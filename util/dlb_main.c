@@ -14,11 +14,13 @@
 #include <string.h>
 #endif
 
-static void grow_ld(libdir **, int *, int);
 static void xexit(int) NORETURN;
+char *eos(char *); /* also used by dlb.c */
+FILE *fopen_datafile(const char *, const char *);
 
 #ifdef DLB
 #ifdef DLBLIB
+static void grow_ld(libdir **, int *, int);
 
 #define DLB_DIRECTORY "Directory" /* name of lib directory */
 #define LIBLISTFILE "dlb.lst"     /* default list file */
@@ -26,9 +28,6 @@ static void xexit(int) NORETURN;
 /* library functions (from dlb.c) */
 extern boolean open_library(const char *, library *);
 extern void close_library(library *);
-
-char *eos(char *); /* also used by dlb.c */
-FILE *fopen_datafile(const char *, const char *);
 
 static void Write(int, char *, long);
 static void usage(void) NORETURN;
@@ -128,14 +127,8 @@ Write(int out, char *buf, long len)
         xexit(EXIT_FAILURE);
     }
 }
-
-char *
-eos(char *s)
-{
-    while (*s)
-        s++;
-    return s;
-}
+#endif /* DLBLIB */
+#endif /* DLB */
 
 /* open_library(dlb.c) needs this (which normally comes from src/files.c) */
 FILE *
@@ -144,11 +137,24 @@ fopen_datafile(const char *filename, const char *mode)
     return fopen(filename, mode);
 }
 
-#endif /* DLBLIB */
-#endif /* DLB */
+	char *
+eos(char *s)
+{
+    while (*s)
+        s++;
+    return s;
+}
 
 int
-main(int argc, char **argv)
+main(int argc 
+#ifndef DLB
+     UNUSED 
+#endif
+     , char **argv
+#ifndef DLB
+     UNUSED
+#endif
+     )
 {
 #ifdef DLB
 #ifdef DLBLIB
