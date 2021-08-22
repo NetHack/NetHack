@@ -34,7 +34,7 @@ static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
                                schar, boolean, boolean);
 static void makerooms(void);
 static boolean door_into_nonjoined(xchar, xchar);
-static void finddpos(coord *, xchar, xchar, xchar, xchar);
+static boolean finddpos(coord *, xchar, xchar, xchar, xchar);
 static void mkinvpos(xchar, xchar, int);
 static void mk_knox_portal(xchar, xchar);
 
@@ -90,7 +90,7 @@ door_into_nonjoined(xchar x, xchar y)
     return FALSE;
 }
 
-static void
+static boolean
 finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
 {
     register xchar x, y;
@@ -112,12 +112,11 @@ finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
     /* cannot find something reasonable -- strange */
     x = xl;
     y = yh;
-    impossible("finddpos: couldn't find door pos within (%d,%d,%d,%d)",
-               xl, yl, xh, yh);
+    return FALSE;
  gotit:
     cc->x = x;
     cc->y = y;
-    return;
+    return TRUE;
 }
 
 /* Sort rooms on the level so they're ordered from left to right on the map.
@@ -347,29 +346,37 @@ join(register int a, register int b, boolean nxcor)
         dy = 0;
         xx = croom->hx + 1;
         tx = troom->lx - 1;
-        finddpos(&cc, xx, croom->ly, xx, croom->hy);
-        finddpos(&tt, tx, troom->ly, tx, troom->hy);
+        if (!finddpos(&cc, xx, croom->ly, xx, croom->hy))
+            return;
+        if (!finddpos(&tt, tx, troom->ly, tx, troom->hy))
+            return;
     } else if (troom->hy < croom->ly) {
         dy = -1;
         dx = 0;
         yy = croom->ly - 1;
-        finddpos(&cc, croom->lx, yy, croom->hx, yy);
         ty = troom->hy + 1;
-        finddpos(&tt, troom->lx, ty, troom->hx, ty);
+        if (!finddpos(&cc, croom->lx, yy, croom->hx, yy))
+            return;
+        if (!finddpos(&tt, troom->lx, ty, troom->hx, ty))
+            return;
     } else if (troom->hx < croom->lx) {
         dx = -1;
         dy = 0;
         xx = croom->lx - 1;
         tx = troom->hx + 1;
-        finddpos(&cc, xx, croom->ly, xx, croom->hy);
-        finddpos(&tt, tx, troom->ly, tx, troom->hy);
+        if (!finddpos(&cc, xx, croom->ly, xx, croom->hy))
+            return;
+        if (!finddpos(&tt, tx, troom->ly, tx, troom->hy))
+            return;
     } else {
         dy = 1;
         dx = 0;
         yy = croom->hy + 1;
         ty = troom->ly - 1;
-        finddpos(&cc, croom->lx, yy, croom->hx, yy);
-        finddpos(&tt, troom->lx, ty, troom->hx, ty);
+        if (!finddpos(&cc, croom->lx, yy, croom->hx, yy))
+            return;
+        if (!finddpos(&tt, troom->lx, ty, troom->hx, ty))
+            return;
     }
     xx = cc.x;
     yy = cc.y;
@@ -541,10 +548,12 @@ place_niche(register struct mkroom *aroom, int *dy, int *xx, int *yy)
 
     if (rn2(2)) {
         *dy = 1;
-        finddpos(&dd, aroom->lx, aroom->hy + 1, aroom->hx, aroom->hy + 1);
+        if (!finddpos(&dd, aroom->lx, aroom->hy + 1, aroom->hx, aroom->hy + 1))
+            return FALSE;
     } else {
         *dy = -1;
-        finddpos(&dd, aroom->lx, aroom->ly - 1, aroom->hx, aroom->ly - 1);
+        if (!finddpos(&dd, aroom->lx, aroom->ly - 1, aroom->hx, aroom->ly - 1))
+            return FALSE;
     }
     *xx = dd.x;
     *yy = dd.y;
