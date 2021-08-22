@@ -45,7 +45,9 @@
 /* #define SHORT_FILENAMES */ /* All NT filesystems support long names now
  */
 
+#ifdef DLB
 #define VERSION_IN_DLB_FILENAME     /* Append version digits to nhdat */
+#endif
 
 #ifdef MICRO
 #undef MICRO /* never define this! */
@@ -213,7 +215,7 @@ extern void interject(int);
 #define C(c) (0x1f & (c))
 #endif
 
-#if defined(DLB)
+#if defined(DLB) || defined(_MSC_VER)
 #define FILENAME_CMP stricmp /* case insensitive */
 #endif
 
