@@ -293,7 +293,6 @@ savegamestate(NHFILE* nhfp)
     savelevchn(nhfp);
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
-        bwrite(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
         bwrite(nhfp->fd, (genericptr_t) &g.quest_status, sizeof g.quest_status);
         bwrite(nhfp->fd, (genericptr_t) g.spl_book,
                sizeof (struct spell) * (MAXSPELL + 1));
@@ -484,7 +483,7 @@ savelev(NHFILE* nhfp, xchar lev)
              (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
-        bwrite(nhfp->fd, (genericptr_t) &g.monstermoves, sizeof g.monstermoves);
+        bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
         save_stairs(nhfp);
         bwrite(nhfp->fd, (genericptr_t) &g.updest, sizeof (dest_area));
         bwrite(nhfp->fd, (genericptr_t) &g.dndest, sizeof (dest_area));

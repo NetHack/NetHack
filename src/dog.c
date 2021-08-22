@@ -41,7 +41,7 @@ initedog(struct monst *mtmp)
     EDOG(mtmp)->dropdist = 10000;
     EDOG(mtmp)->apport = ACURR(A_CHA);
     EDOG(mtmp)->whistletime = 0;
-    EDOG(mtmp)->hungrytime = 1000 + g.monstermoves;
+    EDOG(mtmp)->hungrytime = 1000 + g.moves;
     EDOG(mtmp)->ogoal.x = -1; /* force error if used before set */
     EDOG(mtmp)->ogoal.y = -1;
     EDOG(mtmp)->abuse = 0;
@@ -212,7 +212,7 @@ update_mlstmv(void)
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
-        mon->mlstmv = g.monstermoves;
+        mon->mlstmv = g.moves;
     }
 }
 
@@ -357,12 +357,12 @@ mon_arrive(struct monst *mtmp, boolean with_you)
      * specify its final destination.
      */
 
-    if (mtmp->mlstmv < g.monstermoves - 1L) {
+    if (mtmp->mlstmv < g.moves - 1L) {
         /* heal monster for time spent in limbo */
-        long nmv = g.monstermoves - 1L - mtmp->mlstmv;
+        long nmv = g.moves - 1L - mtmp->mlstmv;
 
         mon_catchup_elapsed_time(mtmp, nmv);
-        mtmp->mlstmv = g.monstermoves - 1L;
+        mtmp->mlstmv = g.moves - 1L;
 
         /* let monster move a bit on new level (see placement code below) */
         wander = (xchar) min(nmv, 8);
@@ -556,8 +556,8 @@ mon_catchup_elapsed_time(struct monst *mtmp,
         && (carnivorous(mtmp->data) || herbivorous(mtmp->data))) {
         struct edog *edog = EDOG(mtmp);
 
-        if ((g.monstermoves > edog->hungrytime + 500 && mtmp->mhp < 3)
-            || (g.monstermoves > edog->hungrytime + 750))
+        if ((g.moves > edog->hungrytime + 500 && mtmp->mhp < 3)
+            || (g.moves > edog->hungrytime + 750))
             mtmp->mtame = mtmp->mpeaceful = 0;
     }
 
@@ -672,7 +672,7 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
             relmon(mtmp, &g.mydogs);   /* move it from map to g.mydogs */
             mtmp->mx = mtmp->my = 0; /* avoid mnexto()/MON_AT() problem */
             mtmp->wormno = num_segs;
-            mtmp->mlstmv = g.monstermoves;
+            mtmp->mlstmv = g.moves;
         } else if (mtmp->iswiz) {
             /* we want to be able to find him when his next resurrection
                chance comes up, but have him resume his present location
@@ -733,7 +733,7 @@ migrate_to_level(struct monst *mtmp,
     if (In_W_tower(mtmp->mx, mtmp->my, &u.uz))
         xyflags |= 2;
     mtmp->wormno = num_segs;
-    mtmp->mlstmv = g.monstermoves;
+    mtmp->mlstmv = g.moves;
     mtmp->mtrack[2].x = u.uz.dnum; /* migrating from this dungeon */
     mtmp->mtrack[2].y = u.uz.dlevel; /* migrating from this dungeon level */
     mtmp->mtrack[1].x = cc ? cc->x : mtmp->mx;
@@ -789,7 +789,7 @@ dogfood(struct monst *mon, struct obj *obj)
            when starving; they never eat stone-to-flesh'd meat */
         if (mptr == &mons[PM_GHOUL]) {
             if (obj->otyp == CORPSE)
-                return (peek_at_iced_corpse_age(obj) + 50L <= g.monstermoves
+                return (peek_at_iced_corpse_age(obj) + 50L <= g.moves
                         && fptr != &mons[PM_LIZARD]
                         && fptr != &mons[PM_LICHEN])
                            ? DOGFOOD
@@ -811,7 +811,7 @@ dogfood(struct monst *mon, struct obj *obj)
         case EGG:
             return carni ? CADAVER : MANFOOD;
         case CORPSE:
-            if ((peek_at_iced_corpse_age(obj) + 50L <= g.monstermoves
+            if ((peek_at_iced_corpse_age(obj) + 50L <= g.moves
                  && obj->corpsenm != PM_LIZARD && obj->corpsenm != PM_LICHEN
                  && mptr->mlet != S_FUNGUS)
                 || (acidic(fptr) && !resists_acid(mon))
@@ -927,7 +927,7 @@ tamedog(struct monst *mtmp, struct obj *obj)
         if (mtmp->mcanmove && !mtmp->mconf && !mtmp->meating
             && ((tasty = dogfood(mtmp, obj)) == DOGFOOD
                 || (tasty <= ACCFOOD
-                    && EDOG(mtmp)->hungrytime <= g.monstermoves))) {
+                    && EDOG(mtmp)->hungrytime <= g.moves))) {
             /* pet will "catch" and eat this thrown food */
             if (canseemon(mtmp)) {
                 boolean big_corpse =
@@ -1045,8 +1045,8 @@ wary_dog(struct monst *mtmp, boolean was_dead)
         edog->killed_by_u = 0;
         edog->abuse = 0;
         edog->ogoal.x = edog->ogoal.y = -1;
-        if (was_dead || edog->hungrytime < g.monstermoves + 500L)
-            edog->hungrytime = g.monstermoves + 500L;
+        if (was_dead || edog->hungrytime < g.moves + 500L)
+            edog->hungrytime = g.moves + 500L;
         if (was_dead) {
             edog->droptime = 0L;
             edog->dropdist = 10000;

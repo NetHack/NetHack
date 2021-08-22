@@ -967,9 +967,9 @@ movemon(void)
            mon->isgd flag so that dmonsfree() will get rid of mon) */
         if (mtmp->isgd && !mtmp->mx) {
             /* parked at <0,0>; eventually isgd should get set to false */
-            if (g.monstermoves > mtmp->mlstmv) {
+            if (g.moves > mtmp->mlstmv) {
                 (void) gd_move(mtmp);
-                mtmp->mlstmv = g.monstermoves;
+                mtmp->mlstmv = g.moves;
             }
             continue;
         }
@@ -1273,7 +1273,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                 while ((otmp3 = otmp->cobj) != 0) {
                     obj_extract_self(otmp3);
                     if (otmp->otyp == ICE_BOX && otmp3->otyp == CORPSE) {
-                        otmp3->age = g.monstermoves - otmp3->age;
+                        otmp3->age = g.moves - otmp3->age;
                         start_corpse_timeout(otmp3);
                     }
                     (void) mpickobj(mtmp, otmp3);

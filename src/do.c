@@ -969,8 +969,8 @@ dodown(void)
                 for (obj = g.invent; obj; obj = obj->nobj) {
                     if (obj->oartifact
                         && artifact_has_invprop(obj, LEVITATION)) {
-                        if (obj->age < g.monstermoves)
-                            obj->age = g.monstermoves;
+                        if (obj->age < g.moves)
+                            obj->age = g.moves;
                         obj->age += rnz(100);
                     }
                 }
@@ -1963,7 +1963,7 @@ revive_mon(anything *arg, long timeout UNUSED)
         } else { /* rot this corpse away */
             You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
             action = ROT_CORPSE;
-            when = (long) d(5, 50) - (g.monstermoves - body->age);
+            when = (long) d(5, 50) - (g.moves - body->age);
             if (when < 1L)
                 when = 1L;
         }

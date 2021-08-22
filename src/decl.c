@@ -325,7 +325,6 @@ const struct instance_globals g_init = {
     NULL, /* subrooms */
     UNDEFINED_VALUES, /* level */
     1, /* moves */
-    1, /* monstermoves */
     0, /* wailmsg */
     NULL, /* migrating_objs */
     NULL, /* billobjs */

@@ -341,7 +341,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
      * some cases, in which case this still counts as its move for the round
      * and it shouldn't move again.
      */
-    magr->mlstmv = g.monstermoves;
+    magr->mlstmv = g.moves;
 
     /* controls whether a mind flayer uses all of its tentacle-for-DRIN
        attacks; when fighting a headless monster, stop after the first
