@@ -779,6 +779,8 @@ restore previous behavior of the 'altmeta' option (only wait for a second
 baby gold dragons weren't able to grow into adult gold dragons
 when hero is displaced, make monsters who try to stay out of direct line do so
 	with spot where they think the hero is rather than where he really is
+if hero died while wearing gold dragon scales/mail and left bones, they would
+	still be emitting light witout being worn when bones got loaded
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
