@@ -804,9 +804,10 @@ Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new
 	NetHackW.res file
-Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen()
-	that is necessary to ensure binary mode for navigating around a file
- 	with fseek(), ftell() and fread() reliably
+Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),
+	which is required on Windows to set binary mode; binary mode is
+	required in order to be able to reliably navigate through a file using
+	fseek(), ftell() and fread()
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
