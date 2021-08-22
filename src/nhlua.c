@@ -1244,7 +1244,7 @@ nhl_loadlua(lua_State *L, const char *fname)
        if we did, we could choose between "nhdat(<fname>)" and "<fname>"
        but since we don't, compromise */
     Sprintf(altfname, "(%s)", fname);
-    fh = dlb_fopen(fname, "r");
+    fh = dlb_fopen(fname, RDBMODE);
     if (!fh) {
         impossible("nhl_loadlua: Error loading %s", altfname);
         ret = FALSE;
