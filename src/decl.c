@@ -528,6 +528,7 @@ const struct instance_globals g_init = {
 
     /* o_init.c */
     DUMMY, /* disco */
+    DUMMY, /* oclass_prob_totals */
 
     /* objname.c */
     0, /* distantname */

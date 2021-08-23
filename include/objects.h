@@ -651,7 +651,7 @@ BOOTS("levitation boots", "snow boots",
     OBJECT(OBJ(name, stone),                                          \
            BITS(0, 0, spec, 0, mgc, spec, 0, 0, 0,                    \
                 HARDGEM(mohs), 0, P_NONE, metal),                     \
-           power, RING_CLASS, 0, 0, 3, cost, 0, 0, 0, 0, 15, color,sn)
+           power, RING_CLASS, 1, 0, 3, cost, 0, 0, 0, 0, 15, color,sn)
 RING("adornment", "wooden",
      ADORNED,                  100, 1, 1, 2, WOOD, HI_WOOD, RIN_ADORNMENT),
 RING("gain strength", "granite",

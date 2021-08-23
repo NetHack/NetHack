@@ -1739,6 +1739,7 @@ extern void consoletty_exit(void);
 /* ### o_init.c ### */
 
 extern void init_objects(void);
+extern void init_oclass_probs(void);
 extern void obj_shuffle_range(int, int *, int *);
 extern int find_skates(void);
 extern boolean objdescr_is(struct obj *, const char *);

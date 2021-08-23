@@ -1056,6 +1056,7 @@ struct instance_globals {
 
     /* o_init.c */
     short disco[NUM_OBJECTS];
+    short oclass_prob_totals[MAXOCLASSES];
 
     /* objname.c */
     /* distantname used by distant_name() to pass extra information to
