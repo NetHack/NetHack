@@ -1,4 +1,3 @@
-
 /* vim:set cin ft=c sw=4 sts=4 ts=8 et ai cino=Ls\:0t0(0 : -*- mode:c;fill-column:80;tab-width:8;c-basic-offset:4;indent-tabs-mode:nil;c-file-style:"k&r" -*-*/
 /* NetHack 3.7 cursmain.c */
 /* Copyright (c) Karl Garrison, 2010. */
@@ -188,24 +187,26 @@ curses_init_nhwindows(int *argcp UNUSED,
 #ifdef PDCURSES
 # ifdef DEF_GAME_NAME
 #  ifdef VERSION_STRING
-    sprintf(window_title, "%s %s", DEF_GAME_NAME, VERSION_STRING);
+    Snprintf(window_title, sizeof window_title, "%s %s",
+                DEF_GAME_NAME, VERSION_STRING);
 #  else
     if (nomakedefs.version_string)
-        sprintf(window_title, "%s %s", DEF_GAME_NAME,
-                    nomakedefs.version_string);
+        Snprintf(window_title, sizeof window_title, "%s %s",
+                DEF_GAME_NAME, nomakedefs.version_string);
     else
-        sprintf(window_title, "%s", DEF_GAME_NAME);
+        Snprintf(window_title, sizeof window_title, "%s", DEF_GAME_NAME);
 #  endif
        /* VERSION_STRING */
 # else
 #  ifdef VERSION_STRING
-    sprintf(window_title, "%s %s", "NetHack", VERSION_STRING);
+    Snprintf(window_title, sizeof window_title, "%s %s",
+                "NetHack", VERSION_STRING);
 #  else
     if (nomakedefs.version_string)
-        sprintf(window_title, "%s %s", "NetHack",
-                    nomakedefs.version_string);
+        Snprintf(window_title, sizeof window_title, "%s %s",
+                    "NetHack", nomakedefs.version_string);
     else
-        sprintf(window_title, "%s", "NetHack");
+        Snprintf(window_title, sizeof window_title, "%s", "NetHack");
 #  endif
        /* VERSION_STRING */
 # endif/* DEF_GAME_NAME */
