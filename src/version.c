@@ -25,7 +25,6 @@ getversionstring(char *buf)
 {
     Strcpy(buf, nomakedefs.version_id);
 
-#if defined(RUNTIME_PORT_ID)
     {
         int c = 0;
 #if defined(RUNTIME_PORT_ID)
@@ -61,7 +60,6 @@ getversionstring(char *buf)
             Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
                      "%s", ".");
     }
-#endif /* RUNTIME_PORT_ID */
     return buf;
 }
 
