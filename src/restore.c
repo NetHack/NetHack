@@ -527,7 +527,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &uid, sizeof uid);
-      
+
     if (SYSOPT_CHECK_SAVE_UID
         && uid != (unsigned long) getuid()) { /* strange ... */
         /* for wizard mode, issue a reminder; for others, treat it
@@ -582,7 +582,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &u, sizeof(struct you));
     g.youmonst.cham = u.mcham;
-        
+
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) timebuf, 14);
     timebuf[14] = '\0';
@@ -692,7 +692,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     }
     freefruitchn(g.ffruit); /* clean up fruit(s) made by initoptions() */
     g.ffruit = loadfruitchn(nhfp);
-  
+
     restnames(nhfp);
     restore_waterlevel(nhfp);
     restore_msghistory(nhfp);
@@ -857,6 +857,7 @@ dorecover(NHFILE* nhfp)
     substitute_tiles(&u.uz);
 #endif
     max_rank_sz(); /* to recompute g.mrank_sz (botl.c) */
+    init_oclass_probs(); /* recompute g.oclass_prob_totals[] */
     /* take care of iron ball & chain */
     for (otmp = fobj; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
@@ -1078,7 +1079,7 @@ getlev(NHFILE* nhfp, int pid, xchar lev)
         g.doorindex = g.rooms[g.nroom - 1].fdoor + g.rooms[g.nroom - 1].doorct;
     else
         g.doorindex = 0;
-  
+
     restore_timers(nhfp, RANGE_LEVEL, elapsed);
     restore_light_sources(nhfp);
     fmon = restmonchn(nhfp);

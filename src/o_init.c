@@ -42,7 +42,7 @@ shuffle_tiles(void)
 static void
 setgemprobs(d_level* dlev)
 {
-    int j, first, lev;
+    int j, first, lev, sum = 0;
 
     if (dlev)
         lev = (ledger_no(dlev) > maxledgerno()) ? maxledgerno()
@@ -62,6 +62,11 @@ setgemprobs(d_level* dlev)
     }
     for (j = first; j <= LAST_GEM; j++)
         objects[j].oc_prob = (171 + j - first) / (LAST_GEM + 1 - first);
+
+    /* recompute GEM_CLASS total oc_prob - including rocks/stones */
+    for (j = g.bases[GEM_CLASS]; j < g.bases[GEM_CLASS + 1]; j++)
+        sum += objects[j].oc_prob;
+    g.oclass_prob_totals[GEM_CLASS] = sum;
 }
 
 /* shuffle descriptions on objects o_low to o_high */
@@ -106,7 +111,7 @@ shuffle(int o_low, int o_high, boolean domaterial)
 void
 init_objects(void)
 {
-    int i, first, last, sum, prevoclass;
+    int i, first, last, prevoclass;
     char oclass;
 #ifdef TEXTCOLOR
 #define COPY_OBJ_DESCR(o_dst, o_src) \
@@ -167,17 +172,6 @@ init_objects(void)
                 break;
             }
         }
- checkprob:
-        sum = 0;
-        for (i = first; i < last; i++)
-            sum += objects[i].oc_prob;
-        if (sum == 0) {
-            for (i = first; i < last; i++)
-                objects[i].oc_prob = (1000 + i - first) / (last - first);
-            goto checkprob;
-        }
-        if (sum != 1000)
-            error("init-prob error for class %d (%d%%)", oclass, sum);
         first = last;
         prevoclass = (int) oclass;
     }
@@ -207,6 +201,8 @@ init_objects(void)
             objects[i].oc_name_known = nmkn ? 0 : 1;
         }
     }
+    /* compute oclass_prob_totals */
+    init_oclass_probs();
 
     /* shuffle descriptions */
     shuffle_all();
@@ -214,6 +210,33 @@ init_objects(void)
     shuffle_tiles();
 #endif
     objects[WAN_NOTHING].oc_dir = rn2(2) ? NODIR : IMMEDIATE;
+}
+
+/* Compute the total probability of each object class.
+ * Assumes g.bases[] has already been set. */
+void
+init_oclass_probs(void)
+{
+    int i;
+    short sum;
+    int oclass;
+    for (oclass = 0; oclass < MAXOCLASSES; ++oclass) {
+        sum = 0;
+        for (i = g.bases[oclass]; i < g.bases[oclass + 1]; ++i) {
+            sum += objects[i].oc_prob;
+        }
+        if (sum <= 0 && oclass != ILLOBJ_CLASS
+            && g.bases[oclass] != g.bases[oclass + 1]) {
+            impossible("zero or negative probability total for oclass %d",
+                       oclass);
+            /* gracefully fail by setting all members of this class to 1 */
+            for (i = g.bases[oclass]; i < g.bases[oclass + 1]; ++i) {
+                objects[i].oc_prob = 1;
+                sum++;
+            }
+        }
+        g.oclass_prob_totals[oclass] = sum;
+    }
 }
 
 /* retrieve the range of objects that otyp shares descriptions with */
