@@ -1120,7 +1120,8 @@ $(TARGETPFX)nhlsel.o: nhlsel.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)nhlobj.o: nhlobj.c $(HACK_H) ../include/sp_lev.h
 $(TARGETPFX)o_init.o: o_init.c $(HACK_H)
 $(TARGETPFX)objects.o: objects.c $(CONFIG_H) ../include/obj.h \
-		../include/objclass.h ../include/prop.h ../include/skills.h \
+		../include/objects.h ../include/objclass.h \
+		../include/prop.h ../include/skills.h \
 		../include/color.h
 $(TARGETPFX)objnam.o: objnam.c $(HACK_H)
 $(TARGETPFX)options.o: options.c $(CONFIG_H) ../include/objclass.h \
