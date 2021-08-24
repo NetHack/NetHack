@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1606765214 2020/11/30 19:40:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.173 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1629818407 2021/08/24 15:20:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -335,12 +335,12 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
         }
         /* egd - vault guard */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
 
         if (buflen > 0) {
             newegd(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EGD(mtmp), sizeof(struct egd));
+                mread(nhfp->fd, (genericptr_t) EGD(mtmp), sizeof (struct egd));
         }
         /* epri - temple priest */
         if (nhfp->structlevel)
@@ -348,7 +348,8 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
         if (buflen > 0) {
             newepri(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EPRI(mtmp), sizeof(struct epri));
+                mread(nhfp->fd, (genericptr_t) EPRI(mtmp),
+                      sizeof (struct epri));
         }
         /* eshk - shopkeeper */
         if (nhfp->structlevel)
@@ -356,7 +357,8 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
         if (buflen > 0) {
             neweshk(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) ESHK(mtmp), sizeof(struct eshk));
+                mread(nhfp->fd, (genericptr_t) ESHK(mtmp),
+                      sizeof (struct eshk));
         }
         /* emin - minion */
         if (nhfp->structlevel)
@@ -364,7 +366,8 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
         if (buflen > 0) {
             newemin(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EMIN(mtmp), sizeof(struct emin));
+                mread(nhfp->fd, (genericptr_t) EMIN(mtmp),
+                      sizeof (struct emin));
         }
         /* edog - pet */
         if (nhfp->structlevel)
@@ -372,12 +375,14 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
         if (buflen > 0) {
             newedog(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EDOG(mtmp), sizeof(struct edog));
+                mread(nhfp->fd, (genericptr_t) EDOG(mtmp),
+                      sizeof (struct edog));
         }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
+            mread(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp),
+                  sizeof MCORPSENM(mtmp));
     } /* mextra */
 }
 
@@ -1122,11 +1127,10 @@ getlev(NHFILE* nhfp, int pid, xchar lev)
             /* reset peaceful/malign relative to new character;
                shopkeepers will reset based on name */
             if (!mtmp->isshk)
-                mtmp->mpeaceful =
-                    (is_unicorn(mtmp->data)
-                     && sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))
-                        ? TRUE
-                        : peace_minded(mtmp->data);
+                mtmp->mpeaceful = (is_unicorn(mtmp->data)
+                                   && (sgn(u.ualign.type)
+                                       == sgn(mtmp->data->maligntyp))) ? 1
+                                  : peace_minded(mtmp->data);
             set_malign(mtmp);
         } else if (elapsed > 0L) {
             mon_catchup_elapsed_time(mtmp, elapsed);
