@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.615 $ $NHDT-Date: 1627951429 2021/08/03 00:43:49 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.629 $ $NHDT-Date: 1629817676 2021/08/24 15:07:56 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -590,6 +590,10 @@ in wizard mode, polymorphing into hero's role monster in order to revert to
 	normal play because role monsters are invalid polymorph targets there]
 revise a 3.6.1 fix: if a spellbook which is being read becomes cursed, always
 	stop reading: "The <book> slams shut!" and set book->bknown
+concealed mimic could trigger sanity check warning "mimic concealed as an
+	object despite Prot-from-shape-changers" if hidden as "strange object"
+cancelled shape changer would become uncancelled if saved and restored (even
+	just leaving its level and then returning)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

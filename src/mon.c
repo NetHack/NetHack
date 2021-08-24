@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1627413528 2021/07/27 19:18:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.382 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1629817677 2021/08/24 15:07:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.384 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3644,41 +3644,58 @@ seemimic(register struct monst* mtmp)
     newsym(mtmp->mx, mtmp->my);
 }
 
-/* force all chameleons to become normal */
+/* [taken out of rescham() in order to be shared by restore_cham()] */
 void
-rescham(void)
+normal_shape(struct monst *mon)
 {
-    register struct monst *mtmp;
-    int mcham;
+    int mcham = (int) mon->cham;
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        mcham = (int) mtmp->cham;
-        if (mcham >= LOW_PM) {
-            (void) newcham(mtmp, &mons[mcham], FALSE, FALSE);
-            mtmp->cham = NON_PM;
-        }
-        if (is_were(mtmp->data) && mtmp->data->mlet != S_HUMAN)
-            new_were(mtmp);
-        if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
-            /* this used to include a cansee() check but Protection_from_
-               _shape_changers shouldn't be trumped by being unseen */
-            if (!mtmp->meating) {
-                /* make revealed mimic fall asleep in lieu of shape change */
-                if (M_AP_TYPE(mtmp) != M_AP_MONSTER)
-                    mtmp->msleeping = 1;
-                seemimic(mtmp);
-            } else {
-                /* quickmimic: pet is midst of eating a mimic corpse;
-                   this terminates the meal early */
-                finish_meating(mtmp);
-            }
+    if (mcham >= LOW_PM) {
+        unsigned mcan = mon->mcan;
+
+        (void) newcham(mon, &mons[mcham], FALSE, FALSE);
+        mon->cham = NON_PM;
+        /* newcham() may uncancel a polymorphing monster; override that */
+        if (mcan)
+            mon->mcan = 1;
+        newsym(mon->mx, mon->my);
+    }
+    if (is_were(mon->data) && mon->data->mlet != S_HUMAN) {
+        new_were(mon);
+    }
+    if (M_AP_TYPE(mon) != M_AP_NOTHING) {
+        /* this used to include a cansee() check but Protection_from_
+           _shape_changers shouldn't be trumped by being unseen */
+        if (!mon->meating) {
+            /* make revealed mimic fall asleep in lieu of shape change */
+            if (M_AP_TYPE(mon) != M_AP_MONSTER)
+                mon->msleeping = 1;
+            seemimic(mon);
+        } else {
+            /* quickmimic: pet is midst of eating a mimic corpse;
+               this terminates the meal early */
+            finish_meating(mon);
         }
     }
 }
 
-/* Let the chameleons change again -dgk */
+/* force all chameleons and mimics to become themselves and werecreatures
+   to revert to human form; called when Protection_from_shape_changers gets
+   activated via wearing or eating ring */
+void
+rescham(void)
+{
+    register struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        normal_shape(mtmp);
+    }
+}
+
+/* let chameleons change and mimics hide again; called when taking off
+   ring of protection from shape changers */
 void
 restartcham(void)
 {
@@ -3689,8 +3706,7 @@ restartcham(void)
             continue;
         if (!mtmp->mcan)
             mtmp->cham = pm_to_cham(monsndx(mtmp->data));
-        if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping
-            && cansee(mtmp->mx, mtmp->my)) {
+        if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping) {
             set_mimic_sym(mtmp);
             newsym(mtmp->mx, mtmp->my);
         }
@@ -3701,26 +3717,20 @@ restartcham(void)
    against shape-changing might be different now than it was at the
    time the level was saved. */
 void
-restore_cham(struct monst* mon)
+restore_cham(struct monst *mon)
 {
-    int mcham;
-
-    if (Protection_from_shape_changers) {
-        mcham = (int) mon->cham;
-        if (mcham >= LOW_PM) {
-            mon->cham = NON_PM;
-            (void) newcham(mon, &mons[mcham], FALSE, FALSE);
-        } else if (is_were(mon->data) && !is_human(mon->data)) {
-            new_were(mon);
-        }
+    if (Protection_from_shape_changers || mon->mcan) {
+        /* force chameleon or mimic to revert to its natural shape */
+        normal_shape(mon);
     } else if (mon->cham == NON_PM) {
+        /* chameleon doesn't change shape here, just gets allowed to do so */
         mon->cham = pm_to_cham(monsndx(mon->data));
     }
 }
 
 /* unwatched hiders may hide again; if so, returns True */
 static boolean
-restrap(struct monst* mtmp)
+restrap(struct monst *mtmp)
 {
     struct trap *t;
 

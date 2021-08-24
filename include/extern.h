@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1624322857 2021/06/22 00:47:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.985 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1629817676 2021/08/24 15:07:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.998 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1452,6 +1452,7 @@ extern void wakeup(struct monst *, boolean);
 extern void wake_nearby(void);
 extern void wake_nearto(int, int, int);
 extern void seemimic(struct monst *);
+extern void normal_shape(struct monst *mon);
 extern void rescham(void);
 extern void restartcham(void);
 extern void restore_cham(struct monst *);

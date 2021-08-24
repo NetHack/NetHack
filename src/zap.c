@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1626390628 2021/07/15 23:10:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1629817679 2021/08/24 15:07:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.372 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2898,19 +2898,8 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
         }
     } else {
         mdef->mcan = 1;
-        /* force shapeshifter into its base form */
-        if (M_AP_TYPE(mdef) != M_AP_NOTHING)
-            seemimic(mdef);
-        /* [not 'else if'; chameleon might have been hiding as a mimic] */
-        if (mdef->cham >= LOW_PM) {
-            /* note: newcham() uncancels shapechangers (resets m->mcan
-               to 0), but only for shapechangers whose m->cham is already
-               NON_PM and we just verified that it's LOW_PM or higher */
-            newcham(mdef, &mons[mdef->cham], FALSE, FALSE);
-            mdef->cham = NON_PM; /* cancelled shapeshifter can't shift */
-        }
-        if (is_were(mdef->data) && !is_human(mdef->data))
-            were_change(mdef);
+        /* force shapeshifter into its base form or mimic to unhide */
+        normal_shape(mdef);
 
         if (mdef->data == &mons[PM_CLAY_GOLEM]) {
             if (canseemon(mdef))
