@@ -244,8 +244,8 @@ savegamestate(NHFILE* nhfp)
         bwrite(nhfp->fd, (genericptr_t) &flags, sizeof flags);
     }
     urealtime.finish_time = getnow();
-    urealtime.realtime += (long) (urealtime.finish_time
-                                    - urealtime.start_timing);
+    urealtime.realtime += timet_delta(urealtime.finish_time,
+                                      urealtime.start_timing);
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &u, sizeof u);
         bwrite(nhfp->fd, yyyymmddhhmmss(ubirthday), 14);

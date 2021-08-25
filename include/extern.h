@@ -18,15 +18,16 @@ extern char *fmt_ptr(const void *);
 
 /* ### allmain.c ### */
 
+extern void early_init(void);
 extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
 extern void display_gamewindows(void);
 extern void newgame(void);
 extern void welcome(boolean);
-extern time_t get_realtime(void);
 extern int argcheck(int, char **, enum earlyarg);
-extern void early_init(void);
+extern long timet_to_seconds(time_t);
+extern long timet_delta(time_t, time_t);
 
 /* ### apply.c ### */
 

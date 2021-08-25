@@ -1273,7 +1273,7 @@ really_done(int how)
        topten figure it out separately and possibly getting different
        time or even day if player is slow responding to --More-- */
     urealtime.finish_time = endtime = getnow();
-    urealtime.realtime += (long) (endtime - urealtime.start_timing);
+    urealtime.realtime += timet_delta(endtime, urealtime.start_timing);
     /* collect these for end of game disclosure (not used during play) */
     iflags.at_night = night();
     iflags.at_midnight = midnight();

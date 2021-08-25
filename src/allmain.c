@@ -964,6 +964,24 @@ debug_fields(const char *opts)
     return;
 }
 
+/* convert from time_t to number of seconds */
+long
+timet_to_seconds(time_t ttim)
+{
+    /* for Unix-based and Posix-compliant systems, a cast to 'long' would
+       suffice but the C Standard doesn't require time_t to be that simple */
+    return timet_delta(ttim, (time_t) 0);
+}
+
+/* calculate the difference in seconds between two time_t values */
+long
+timet_delta(time_t etim, time_t stim) /* end and start times */
+{
+    /* difftime() is a STDC routine which returns the number of seconds
+       between two time_t values as a 'double' */
+    return (long) difftime(etim, stim);
+}
+
 #ifndef NODUMPENUMS
 void
 dump_enums(void)
@@ -1018,4 +1036,5 @@ dump_enums(void)
     raw_print("");
 }
 #endif /* NODUMPENUMS */
+
 /*allmain.c*/

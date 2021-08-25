@@ -367,8 +367,9 @@ writexlentry(FILE* rfile, struct toptenentry* tt, int how)
     Fprintf(rfile, "%cachieveX=%s", XLOG_SEP, encode_extended_achievements());
     Fprintf(rfile, "%cconductX=%s", XLOG_SEP, encode_extended_conducts());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
-            (long) urealtime.realtime, XLOG_SEP,
-            (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);
+            urealtime.realtime, XLOG_SEP,
+            timet_to_seconds(ubirthday), XLOG_SEP,
+            timet_to_seconds(urealtime.finish_time));
     Fprintf(rfile, "%cgender0=%s%calign0=%s", XLOG_SEP,
             genders[flags.initgend].filecode, XLOG_SEP,
             aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
