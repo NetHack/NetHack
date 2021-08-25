@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1627408993 2021/07/27 18:03:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.481 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1629928192 2021/08/25 21:49:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.483 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4841,8 +4841,13 @@ dosuspend_core(void)
 #ifdef SUSPEND
     /* Does current window system support suspend? */
     if ((*windowprocs.win_can_suspend)()) {
+        time_t now = getnow();
+
+        urealtime.realtime += timet_delta(now, urealtime.start_timing);
+        urealtime.start_timing = now; /* as a safeguard against panic save */
         /* NB: SYSCF SHELLERS handled in port code. */
         dosuspend();
+        urealtime.start_timing = getnow(); /* resume keeping track of time */
     } else
 #endif
         Norep(cmdnotavail, "#suspend");
@@ -4854,8 +4859,13 @@ static int
 dosh_core(void)
 {
 #ifdef SHELL
+    time_t now = getnow();
+
+    urealtime.realtime += timet_delta(now, urealtime.start_timing);
+    urealtime.start_timing = now; /* (see dosuspend_core) */
     /* access restrictions, if any, are handled in port code */
     dosh();
+    urealtime.start_timing = getnow();
 #else
     Norep(cmdnotavail, "#shell");
 #endif
