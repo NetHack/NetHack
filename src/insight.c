@@ -22,6 +22,7 @@ static void enlght_halfdmg(int, int);
 static boolean walking_on_water(void);
 static boolean cause_known(int);
 static char *attrval(int, int, char *);
+static char *fmt_elapsed_time(char *, int);
 static void background_enlightenment(int, int);
 static void basics_enlightenment(int, int);
 static void characteristics_enlightenment(int, int);
@@ -215,10 +216,69 @@ attrval(int attrindx, int attrvalue,
     return resultbuf;
 }
 
+/* format urealtime.realtime as
+      " D days, H hours, M minutes and S seconds"
+   with any fields having a value of 0 omitted:
+      0-00:00:20 => " 20 seconds"
+      0-00:15:05 => " 15 minutes and 5 seconds"
+      0-00:16:00 => " 16 minutes"
+      0-01:15:10 => " 1 hour, 15 minutes and 10 seconds"
+      0-02:00:01 => " 2 hours and 1 second"
+      3-00:25:40 => " 3 days, 25 minutes and 40 seconds"
+   (note: for a list of more than two entries, nethack usually includes the
+   [style-wise] optional comma before "and" but in this instance it does not)
+ */
+static char *
+fmt_elapsed_time(char *outbuf, int final)
+{
+    int fieldcnt;
+    long edays, ehours, eminutes, eseconds;
+    /* for a game that's over, reallydone() has updated urealtime.realtime
+       to its final value before calling us during end of game disclosure;
+       for a game that's still in progress, it holds the amount of elapsed
+       game time from previous sessions up through most recent save/restore
+       (or up through latest level change when 'checkpoint' is On);
+       '.start_timing' has a non-zero value even if '.realtime' is 0 */
+    long etim = urealtime.realtime;
+
+    if (!final)
+        etim += timet_delta(getnow(), urealtime.start_timing);
+    /* we could use localtime() to convert the value into a 'struct tm'
+       to get date and time fields but this is simple and straightforward */
+    eseconds = etim % 60L, etim /= 60L;
+    eminutes = etim % 60L, etim /= 60L;
+    ehours = etim % 24L;
+    edays = etim / 24L;
+    fieldcnt = !!edays + !!ehours + !!eminutes + !!eseconds;
+
+    Strcpy(outbuf, fieldcnt ? "" : " none"); /* 'none' should never happen */
+    if (edays) {
+        Sprintf(eos(outbuf), " %ld day%s", edays, plur(edays));
+        if (fieldcnt > 1) /* hours and/or minutes and/or seconds to follow */
+            Strcat(outbuf, (fieldcnt == 2) ? " and" : ",");
+        --fieldcnt; /* edays has been processed */
+    }
+    if (ehours) {
+        Sprintf(eos(outbuf), " %ld hour%s", ehours, plur(ehours));
+        if (fieldcnt > 1) /* minutes and/or seconds to follow */
+            Strcat(outbuf, (fieldcnt == 2) ? " and" : ",");
+        --fieldcnt; /* ehours has been processed */
+    }
+    if (eminutes) {
+        Sprintf(eos(outbuf), " %ld minute%s", eminutes, plur(eminutes));
+        if (fieldcnt > 1) /* seconds to follow */
+            Strcat(outbuf, " and");
+        /* eminutes has been processed but no need to decrement fieldcnt */
+    }
+    if (eseconds)
+        Sprintf(eos(outbuf), " %ld second%s", eseconds, plur(eseconds));
+    return outbuf;
+}
+
 void
-enlightenment(int mode,  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
-              int final) /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE,
-                            ENL_GAMEOVERDEAD */
+enlightenment(
+    int mode,  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
+    int final) /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
@@ -257,10 +317,11 @@ enlightenment(int mode,  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
         /* intrinsics and other traditional enlightenment feedback */
         attributes_enlightenment(mode, final);
     }
+
+    enlght_out(""); /* separator */
+    enlght_out("Miscellaneous:");
     /* reminder to player and/or information for dumplog */
     if ((mode & BASICENLIGHTENMENT) != 0 && (wizard || discover || final)) {
-        enlght_out(""); /* separator */
-        enlght_out("Miscellaneous:");
         if (wizard || discover) {
             Sprintf(buf, "running in %s mode", wizard ? "debug" : "explore");
             you_are(buf, "");
@@ -276,6 +337,8 @@ enlightenment(int mode,  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
             you_have_X(buf);
         }
     }
+    (void) fmt_elapsed_time(buf, final);
+    enl_msg("Total elapsed playing time ", "is", "was", buf, "");
 
     if (!g.en_via_menu) {
         display_nhwindow(g.en_win, TRUE);
