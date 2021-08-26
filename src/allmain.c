@@ -145,356 +145,356 @@ moveloop_core(void)
     boolean monscanmove = FALSE;
 
 #ifdef SAFERHANGUP
-        if (g.program_state.done_hup)
-            end_of_input();
+    if (g.program_state.done_hup)
+        end_of_input();
 #endif
-        get_nh_event();
+    get_nh_event();
 #ifdef POSITIONBAR
-        do_positionbar();
+    do_positionbar();
 #endif
 
-        if (g.context.bypasses)
-            clear_bypasses();
+    if (g.context.bypasses)
+        clear_bypasses();
 
-        if (g.context.move) {
-            /* actual time passed */
-            g.youmonst.movement -= NORMAL_SPEED;
+    if (g.context.move) {
+        /* actual time passed */
+        g.youmonst.movement -= NORMAL_SPEED;
 
-            do { /* hero can't move this turn loop */
-                mvl_wtcap = encumber_msg();
+        do { /* hero can't move this turn loop */
+            mvl_wtcap = encumber_msg();
 
-                g.context.mon_moving = TRUE;
-                do {
-                    monscanmove = movemon();
-                    if (g.youmonst.movement >= NORMAL_SPEED)
-                        break; /* it's now your turn */
-                } while (monscanmove);
-                g.context.mon_moving = FALSE;
+            g.context.mon_moving = TRUE;
+            do {
+                monscanmove = movemon();
+                if (g.youmonst.movement >= NORMAL_SPEED)
+                    break; /* it's now your turn */
+            } while (monscanmove);
+            g.context.mon_moving = FALSE;
 
-                if (!monscanmove && g.youmonst.movement < NORMAL_SPEED) {
-                    /* both hero and monsters are out of steam this round */
-                    struct monst *mtmp;
+            if (!monscanmove && g.youmonst.movement < NORMAL_SPEED) {
+                /* both hero and monsters are out of steam this round */
+                struct monst *mtmp;
 
-                    /* set up for a new turn */
-                    mcalcdistress(); /* adjust monsters' trap, blind, etc */
+                /* set up for a new turn */
+                mcalcdistress(); /* adjust monsters' trap, blind, etc */
 
-                    /* reallocate movement rations to monsters; don't need
-                       to skip dead monsters here because they will have
-                       been purged at end of their previous round of moving */
-                    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-                        mtmp->movement += mcalcmove(mtmp, TRUE);
+                /* reallocate movement rations to monsters; don't need
+                   to skip dead monsters here because they will have
+                   been purged at end of their previous round of moving */
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+                    mtmp->movement += mcalcmove(mtmp, TRUE);
 
-                    /* occasionally add another monster; since this takes
-                       place after movement has been allotted, the new
-                       monster effectively loses its first turn */
-                    if (!rn2(u.uevent.udemigod ? 25
-                             : (depth(&u.uz) > depth(&stronghold_level)) ? 50
-                               : 70))
-                        (void) makemon((struct permonst *) 0, 0, 0,
-                                       NO_MM_FLAGS);
+                /* occasionally add another monster; since this takes
+                   place after movement has been allotted, the new
+                   monster effectively loses its first turn */
+                if (!rn2(u.uevent.udemigod ? 25
+                         : (depth(&u.uz) > depth(&stronghold_level)) ? 50
+                         : 70))
+                    (void) makemon((struct permonst *) 0, 0, 0,
+                                   NO_MM_FLAGS);
 
-                    u_calc_moveamt(mvl_wtcap);
-                    settrack();
+                u_calc_moveamt(mvl_wtcap);
+                settrack();
 
-                    g.monstermoves++; /* [obsolete (for a long time...)] */
-                    g.moves++;
-                    /*
-                     * Never allow 'moves' to grow big enough to wrap.
-                     * We don't care what the maximum possible 'long int'
-                     * is for the current configuration, we want a value
-                     * that is the same for all viable configurations.
-                     * When imposing the limit, use a mystic decimal value
-                     * instead of a magic binary one such as 0x7fffffffL.
-                     */
-                    if (g.moves >= 1000000000L) {
-                        display_nhwindow(WIN_MESSAGE, TRUE);
-                        pline_The("dungeon capitulates.");
-                        done(ESCAPED);
+                g.monstermoves++; /* [obsolete (for a long time...)] */
+                g.moves++;
+                /*
+                 * Never allow 'moves' to grow big enough to wrap.
+                 * We don't care what the maximum possible 'long int'
+                 * is for the current configuration, we want a value
+                 * that is the same for all viable configurations.
+                 * When imposing the limit, use a mystic decimal value
+                 * instead of a magic binary one such as 0x7fffffffL.
+                 */
+                if (g.moves >= 1000000000L) {
+                    display_nhwindow(WIN_MESSAGE, TRUE);
+                    pline_The("dungeon capitulates.");
+                    done(ESCAPED);
+                }
+
+                if (flags.time && !g.context.run)
+                    iflags.time_botl = TRUE; /* 'moves' just changed */
+
+                /********************************/
+                /* once-per-turn things go here */
+                /********************************/
+
+                l_nhcore_call(NHCORE_MOVELOOP_TURN);
+
+                if (Glib)
+                    glibr();
+                nh_timeout();
+                run_regions();
+
+                if (u.ublesscnt)
+                    u.ublesscnt--;
+
+                /* One possible result of prayer is healing.  Whether or
+                 * not you get healed depends on your current hit points.
+                 * If you are allowed to regenerate during the prayer,
+                 * the end-of-prayer calculation messes up on this.
+                 * Another possible result is rehumanization, which
+                 * requires that encumbrance and movement rate be
+                 * recalculated.
+                 */
+                if (u.uinvulnerable) {
+                    /* for the moment at least, you're in tiptop shape */
+                    mvl_wtcap = UNENCUMBERED;
+                } else if (!Upolyd ? (u.uhp < u.uhpmax)
+                           : (u.mh < u.mhmax
+                              || g.youmonst.data->mlet == S_EEL)) {
+                    /* maybe heal */
+                    regen_hp(mvl_wtcap);
+                }
+
+                /* moving around while encumbered is hard work */
+                if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
+                    if (!(mvl_wtcap < EXT_ENCUMBER ? g.moves % 30
+                          : g.moves % 10)) {
+                        overexert_hp();
                     }
+                }
 
-                    if (flags.time && !g.context.run)
-                        iflags.time_botl = TRUE; /* 'moves' just changed */
+                if (u.uen < u.uenmax
+                    && ((mvl_wtcap < MOD_ENCUMBER
+                         && (!(g.moves % ((MAXULEV + 8 - u.ulevel)
+                                          * (Role_if(PM_WIZARD) ? 3 : 4)
+                                          / 6)))) || Energy_regeneration)) {
+                    u.uen += rn1(
+                             (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
+                    if (u.uen > u.uenmax)
+                        u.uen = u.uenmax;
+                    g.context.botl = TRUE;
+                    if (u.uen == u.uenmax)
+                        interrupt_multi("You feel full of energy.");
+                }
 
-                    /********************************/
-                    /* once-per-turn things go here */
-                    /********************************/
+                if (!u.uinvulnerable) {
+                    if (Teleportation && !rn2(85)) {
+                        xchar old_ux = u.ux, old_uy = u.uy;
 
-                    l_nhcore_call(NHCORE_MOVELOOP_TURN);
-
-                    if (Glib)
-                        glibr();
-                    nh_timeout();
-                    run_regions();
-
-                    if (u.ublesscnt)
-                        u.ublesscnt--;
-
-                    /* One possible result of prayer is healing.  Whether or
-                     * not you get healed depends on your current hit points.
-                     * If you are allowed to regenerate during the prayer,
-                     * the end-of-prayer calculation messes up on this.
-                     * Another possible result is rehumanization, which
-                     * requires that encumbrance and movement rate be
-                     * recalculated.
-                     */
-                    if (u.uinvulnerable) {
-                        /* for the moment at least, you're in tiptop shape */
-                        mvl_wtcap = UNENCUMBERED;
-                    } else if (!Upolyd ? (u.uhp < u.uhpmax)
-                                       : (u.mh < u.mhmax
-                                          || g.youmonst.data->mlet == S_EEL)) {
-                        /* maybe heal */
-                        regen_hp(mvl_wtcap);
-                    }
-
-                    /* moving around while encumbered is hard work */
-                    if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
-                        if (!(mvl_wtcap < EXT_ENCUMBER ? g.moves % 30
-                                                   : g.moves % 10)) {
-                            overexert_hp();
-                        }
-                    }
-
-                    if (u.uen < u.uenmax
-                        && ((mvl_wtcap < MOD_ENCUMBER
-                             && (!(g.moves % ((MAXULEV + 8 - u.ulevel)
-                                            * (Role_if(PM_WIZARD) ? 3 : 4)
-                                            / 6)))) || Energy_regeneration)) {
-                        u.uen += rn1(
-                            (int) (ACURR(A_WIS) + ACURR(A_INT)) / 15 + 1, 1);
-                        if (u.uen > u.uenmax)
-                            u.uen = u.uenmax;
-                        g.context.botl = TRUE;
-                        if (u.uen == u.uenmax)
-                            interrupt_multi("You feel full of energy.");
-                    }
-
-                    if (!u.uinvulnerable) {
-                        if (Teleportation && !rn2(85)) {
-                            xchar old_ux = u.ux, old_uy = u.uy;
-
-                            tele();
-                            if (u.ux != old_ux || u.uy != old_uy) {
-                                if (!next_to_u()) {
-                                    check_leash(old_ux, old_uy);
-                                }
-                                /* clear doagain keystrokes */
-                                pushch(0);
-                                savech(0);
+                        tele();
+                        if (u.ux != old_ux || u.uy != old_uy) {
+                            if (!next_to_u()) {
+                                check_leash(old_ux, old_uy);
                             }
+                            /* clear doagain keystrokes */
+                            pushch(0);
+                            savech(0);
                         }
-                        /* delayed change may not be valid anymore */
-                        if ((mvl_change == 1 && !Polymorph)
-                            || (mvl_change == 2 && u.ulycn == NON_PM))
+                    }
+                    /* delayed change may not be valid anymore */
+                    if ((mvl_change == 1 && !Polymorph)
+                        || (mvl_change == 2 && u.ulycn == NON_PM))
+                        mvl_change = 0;
+                    if (Polymorph && !rn2(100))
+                        mvl_change = 1;
+                    else if (u.ulycn >= LOW_PM && !Upolyd
+                             && !rn2(80 - (20 * night())))
+                        mvl_change = 2;
+                    if (mvl_change && !Unchanging) {
+                        if (g.multi >= 0) {
+                            stop_occupation();
+                            if (mvl_change == 1)
+                                polyself(0);
+                            else
+                                you_were();
                             mvl_change = 0;
-                        if (Polymorph && !rn2(100))
-                            mvl_change = 1;
-                        else if (u.ulycn >= LOW_PM && !Upolyd
-                                 && !rn2(80 - (20 * night())))
-                            mvl_change = 2;
-                        if (mvl_change && !Unchanging) {
-                            if (g.multi >= 0) {
-                                stop_occupation();
-                                if (mvl_change == 1)
-                                    polyself(0);
-                                else
-                                    you_were();
-                                mvl_change = 0;
-                            }
-                        }
-                    }
-
-                    if (Searching && g.multi >= 0)
-                        (void) dosearch0(1);
-                    if (Warning)
-                        warnreveal();
-                    mkot_trap_warn();
-                    dosounds();
-                    do_storms();
-                    gethungry();
-                    age_spells();
-                    exerchk();
-                    invault();
-                    if (u.uhave.amulet)
-                        amulet();
-                    if (!rn2(40 + (int) (ACURR(A_DEX) * 3)))
-                        u_wipe_engr(rnd(3));
-                    if (u.uevent.udemigod && !u.uinvulnerable) {
-                        if (u.udg_cnt)
-                            u.udg_cnt--;
-                        if (!u.udg_cnt) {
-                            intervene();
-                            u.udg_cnt = rn1(200, 50);
-                        }
-                    }
-                    restore_attrib();
-/* XXX This should be recoded to use something like regions - a list of
- * things that are active and need to be handled that is dynamically
- * maintained and not a list of special cases. */
-                    /* underwater and waterlevel vision are done here */
-                    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
-                        movebubbles();
-                    else if (Is_firelevel(&u.uz))
-                        fumaroles();
-                    else if (Underwater)
-                        under_water(0);
-                    /* vision while buried done here */
-                    else if (u.uburied)
-                        under_ground(0);
-
-                    /* when immobile, count is in turns */
-                    if (g.multi < 0) {
-                        if (++g.multi == 0) { /* finished yet? */
-                            unmul((char *) 0);
-                            /* if unmul caused a level change, take it now */
-                            if (u.utotype)
-                                deferred_goto();
                         }
                     }
                 }
-            } while (g.youmonst.movement < NORMAL_SPEED); /* hero can't move */
 
-            /******************************************/
-            /* once-per-hero-took-time things go here */
-            /******************************************/
+                if (Searching && g.multi >= 0)
+                    (void) dosearch0(1);
+                if (Warning)
+                    warnreveal();
+                mkot_trap_warn();
+                dosounds();
+                do_storms();
+                gethungry();
+                age_spells();
+                exerchk();
+                invault();
+                if (u.uhave.amulet)
+                    amulet();
+                if (!rn2(40 + (int) (ACURR(A_DEX) * 3)))
+                    u_wipe_engr(rnd(3));
+                if (u.uevent.udemigod && !u.uinvulnerable) {
+                    if (u.udg_cnt)
+                        u.udg_cnt--;
+                    if (!u.udg_cnt) {
+                        intervene();
+                        u.udg_cnt = rn1(200, 50);
+                    }
+                }
+                restore_attrib();
+/* XXX This should be recoded to use something like regions - a list of
+ * things that are active and need to be handled that is dynamically
+ * maintained and not a list of special cases. */
+                /* underwater and waterlevel vision are done here */
+                if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
+                    movebubbles();
+                else if (Is_firelevel(&u.uz))
+                    fumaroles();
+                else if (Underwater)
+                    under_water(0);
+                /* vision while buried done here */
+                else if (u.uburied)
+                    under_ground(0);
+
+                /* when immobile, count is in turns */
+                if (g.multi < 0) {
+                    if (++g.multi == 0) { /* finished yet? */
+                        unmul((char *) 0);
+                        /* if unmul caused a level change, take it now */
+                        if (u.utotype)
+                            deferred_goto();
+                    }
+                }
+            }
+        } while (g.youmonst.movement < NORMAL_SPEED); /* hero can't move */
+
+        /******************************************/
+        /* once-per-hero-took-time things go here */
+        /******************************************/
 
 #ifdef STATUS_HILITES
-            if (iflags.hilite_delta)
-                status_eval_next_unhilite();
+        if (iflags.hilite_delta)
+            status_eval_next_unhilite();
 #endif
-            if (g.moves >= g.context.seer_turn) {
-                if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
-                    && !BClairvoyant)
-                    do_vicinity_map((struct obj *) 0);
-                /* we maintain this counter even when clairvoyance isn't
-                   taking place; on average, go again 30 turns from now */
-                g.context.seer_turn = g.moves + (long) rn1(31, 15); /*15..45*/
-                /* [it used to be that on every 15th turn, there was a 50%
-                   chance of farsight, so it could happen as often as every
-                   15 turns or theoretically never happen at all; but when
-                   a fast hero got multiple moves on that 15th turn, it
-                   could actually happen more than once on the same turn!] */
-            }
-            /* [fast hero who gets multiple moves per turn ends up sinking
-               multiple times per turn; is that what we really want?] */
-            if (u.utrap && u.utraptype == TT_LAVA)
-                sink_into_lava();
-            /* when/if hero escapes from lava, he can't just stay there */
-            else if (!u.umoved)
-                (void) pooleffects(FALSE);
-
-        } /* actual time passed */
-
-        /****************************************/
-        /* once-per-player-input things go here */
-        /****************************************/
-
-        clear_splitobjs();
-        find_ac();
-        if (!g.context.mv || Blind) {
-            /* redo monsters if hallu or wearing a helm of telepathy */
-            if (Hallucination) { /* update screen randomly */
-                see_monsters();
-                see_objects();
-                see_traps();
-                if (u.uswallow)
-                    swallowed(0);
-            } else if (Unblind_telepat) {
-                see_monsters();
-            } else if (Warning || Warn_of_mon)
-                see_monsters();
-
-            if (g.vision_full_recalc)
-                vision_recalc(0); /* vision! */
+        if (g.moves >= g.context.seer_turn) {
+            if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
+                && !BClairvoyant)
+                do_vicinity_map((struct obj *) 0);
+            /* we maintain this counter even when clairvoyance isn't
+               taking place; on average, go again 30 turns from now */
+            g.context.seer_turn = g.moves + (long) rn1(31, 15); /*15..45*/
+            /* [it used to be that on every 15th turn, there was a 50%
+               chance of farsight, so it could happen as often as every
+               15 turns or theoretically never happen at all; but when
+               a fast hero got multiple moves on that 15th turn, it
+               could actually happen more than once on the same turn!] */
         }
-        if (g.context.botl || g.context.botlx) {
-            bot();
-            curs_on_u();
-        } else if (iflags.time_botl) {
-            timebot();
-            curs_on_u();
-        }
+        /* [fast hero who gets multiple moves per turn ends up sinking
+           multiple times per turn; is that what we really want?] */
+        if (u.utrap && u.utraptype == TT_LAVA)
+            sink_into_lava();
+        /* when/if hero escapes from lava, he can't just stay there */
+        else if (!u.umoved)
+            (void) pooleffects(FALSE);
 
-        g.context.move = 1;
+    } /* actual time passed */
 
-        if (g.multi >= 0 && g.occupation) {
+    /****************************************/
+    /* once-per-player-input things go here */
+    /****************************************/
+
+    clear_splitobjs();
+    find_ac();
+    if (!g.context.mv || Blind) {
+        /* redo monsters if hallu or wearing a helm of telepathy */
+        if (Hallucination) { /* update screen randomly */
+            see_monsters();
+            see_objects();
+            see_traps();
+            if (u.uswallow)
+                swallowed(0);
+        } else if (Unblind_telepat) {
+            see_monsters();
+        } else if (Warning || Warn_of_mon)
+            see_monsters();
+
+        if (g.vision_full_recalc)
+            vision_recalc(0); /* vision! */
+    }
+    if (g.context.botl || g.context.botlx) {
+        bot();
+        curs_on_u();
+    } else if (iflags.time_botl) {
+        timebot();
+        curs_on_u();
+    }
+
+    g.context.move = 1;
+
+    if (g.multi >= 0 && g.occupation) {
 #if defined(MICRO) || defined(WIN32)
-            mvl_abort_lev = 0;
-            if (kbhit()) {
-                char ch;
+        mvl_abort_lev = 0;
+        if (kbhit()) {
+            char ch;
 
-                if ((ch = pgetchar()) == ABORT)
-                    mvl_abort_lev++;
-                else
-                    pushch(ch);
-            }
-            if (!mvl_abort_lev && (*g.occupation)() == 0)
+            if ((ch = pgetchar()) == ABORT)
+                mvl_abort_lev++;
+            else
+                pushch(ch);
+        }
+        if (!mvl_abort_lev && (*g.occupation)() == 0)
 #else
             if ((*g.occupation)() == 0)
 #endif
                 g.occupation = 0;
-            if (
+        if (
 #if defined(MICRO) || defined(WIN32)
-                mvl_abort_lev ||
+            mvl_abort_lev ||
 #endif
-                monster_nearby()) {
-                stop_occupation();
-                reset_eat();
-            }
-#if defined(MICRO) || defined(WIN32)
-            if (!(++g.occtime % 7))
-                display_nhwindow(WIN_MAP, FALSE);
-#endif
-            return;
+            monster_nearby()) {
+            stop_occupation();
+            reset_eat();
         }
+#if defined(MICRO) || defined(WIN32)
+        if (!(++g.occtime % 7))
+            display_nhwindow(WIN_MAP, FALSE);
+#endif
+        return;
+    }
 
-        if (iflags.sanity_check || iflags.debug_fuzzer)
-            sanity_check();
+    if (iflags.sanity_check || iflags.debug_fuzzer)
+        sanity_check();
 
 #ifdef CLIPPING
-        /* just before rhack */
-        cliparound(u.ux, u.uy);
+    /* just before rhack */
+    cliparound(u.ux, u.uy);
 #endif
 
-        u.umoved = FALSE;
+    u.umoved = FALSE;
 
-        if (g.multi > 0) {
-            lookaround();
-            if (!g.multi) {
-                /* lookaround may clear multi */
-                g.context.move = 0;
-                return;
-            }
-            if (g.context.mv) {
-                if (g.multi < COLNO && !--g.multi)
-                    g.context.travel = g.context.travel1 = g.context.mv =
-                        g.context.run = 0;
-                domove();
-            } else {
-                --g.multi;
-                nhassert(g.command_count != 0);
-                rhack(g.command_line);
-            }
-        } else if (g.multi == 0) {
+    if (g.multi > 0) {
+        lookaround();
+        if (!g.multi) {
+            /* lookaround may clear multi */
+            g.context.move = 0;
+            return;
+        }
+        if (g.context.mv) {
+            if (g.multi < COLNO && !--g.multi)
+                g.context.travel = g.context.travel1 = g.context.mv =
+                    g.context.run = 0;
+            domove();
+        } else {
+            --g.multi;
+            nhassert(g.command_count != 0);
+            rhack(g.command_line);
+        }
+    } else if (g.multi == 0) {
 #ifdef MAIL
-            ckmailstatus();
+        ckmailstatus();
 #endif
-            rhack((char *) 0);
-        }
-        if (u.utotype)       /* change dungeon level */
-            deferred_goto(); /* after rhack() */
+        rhack((char *) 0);
+    }
+    if (u.utotype)       /* change dungeon level */
+        deferred_goto(); /* after rhack() */
 
-        if (g.vision_full_recalc)
-            vision_recalc(0); /* vision! */
-        /* when running in non-tport mode, this gets done through domove() */
-        if ((!g.context.run || flags.runmode == RUN_TPORT)
-            && (g.multi && (!g.context.travel ? !(g.multi % 7)
-                                              : !(g.moves % 7L)))) {
-            if (flags.time && g.context.run)
-                g.context.botl = TRUE;
-            /* [should this be flush_screen() instead?] */
-            display_nhwindow(WIN_MAP, FALSE);
-        }
+    if (g.vision_full_recalc)
+        vision_recalc(0); /* vision! */
+    /* when running in non-tport mode, this gets done through domove() */
+    if ((!g.context.run || flags.runmode == RUN_TPORT)
+        && (g.multi && (!g.context.travel ? !(g.multi % 7)
+                        : !(g.moves % 7L)))) {
+        if (flags.time && g.context.run)
+            g.context.botl = TRUE;
+        /* [should this be flush_screen() instead?] */
+        display_nhwindow(WIN_MAP, FALSE);
+    }
 }
 
 void
