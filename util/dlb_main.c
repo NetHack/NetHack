@@ -1,4 +1,4 @@
-/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1596498258 2020/08/03 23:44:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1629969943 2021/08/26 09:25:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -137,7 +137,7 @@ fopen_datafile(const char *filename, const char *mode)
     return fopen(filename, mode);
 }
 
-	char *
+char *
 eos(char *s)
 {
     while (*s)
@@ -145,16 +145,14 @@ eos(char *s)
     return s;
 }
 
+#ifdef DLB
+#define UNUSED_if_no_DLB /*empty*/
+#else
+#define UNUSED_if_no_DLB UNUSED
+#endif
+
 int
-main(int argc 
-#ifndef DLB
-     UNUSED 
-#endif
-     , char **argv
-#ifndef DLB
-     UNUSED
-#endif
-     )
+main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
 {
 #ifdef DLB
 #ifdef DLBLIB
