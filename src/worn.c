@@ -839,6 +839,11 @@ clear_bypasses(void)
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
+
+    /* ball can be "floating", not on any chain */
+    if (uball)
+        uball->bypass = 0;
+
     /* g.billobjs and g.mydogs chains don't matter here */
     g.context.bypasses = FALSE;
 }
