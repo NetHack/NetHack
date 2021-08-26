@@ -153,6 +153,9 @@ moveloop_core(void)
         do_positionbar();
 #endif
 
+        if (g.context.bypasses)
+            clear_bypasses();
+
         if (g.context.move) {
             /* actual time passed */
             g.youmonst.movement -= NORMAL_SPEED;
@@ -359,8 +362,6 @@ moveloop_core(void)
             if (iflags.hilite_delta)
                 status_eval_next_unhilite();
 #endif
-            if (g.context.bypasses)
-                clear_bypasses();
             if (g.moves >= g.context.seer_turn) {
                 if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
                     && !BClairvoyant)
