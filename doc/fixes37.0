@@ -1296,3 +1296,4 @@ onames.h dependency and inclusion is removed and comparable functionality is
 artilist.h is used to generate appropriate artifact enum values by the C
 	preprocessor during compile
 remove requirement of object probabilities adding to 1000
+delete obsolete variable 'g.monstermoves' (copperwater pull request #579)
