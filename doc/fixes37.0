@@ -596,6 +596,9 @@ cancelled shape changer would become uncancelled if saved and restored (even
 	just leaving its level and then returning)
 don't include time spent suspended in background (^Z) or in shell escape (!)
 	in the total elapsed time recorded to xlogfile
+if a monster is starting to turn into green slime, eat the corpse, tin, or
+	egg of any creature that might polymorph into a fiery monster to cure
+	the slime, not just of one of a chameleon
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
