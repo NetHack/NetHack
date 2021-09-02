@@ -5122,7 +5122,7 @@ lspo_replace_terrain(lua_State *L)
             (void) selection_not(sel);
         } else {
             xchar rx1, ry1, rx2, ry2;
-            rx1 = x1, ry1 = y1, rx2 = x2, ry2 = x2;
+            rx1 = x1, ry1 = y1, rx2 = x2, ry2 = y2;
             get_location(&rx1, &ry1, ANY_LOC, g.coder->croom);
             get_location(&rx2, &ry2, ANY_LOC, g.coder->croom);
             for (x = max(rx1, 0); x <= min(rx2, COLNO - 1); x++)
