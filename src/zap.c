@@ -12,6 +12,7 @@
  */
 #define MAGIC_COOKIE 1000
 
+static boolean zombie_can_dig(xchar x, xchar y);
 static void polyuse(struct obj *, int, int);
 static void create_polymon(struct obj *, int);
 static int stone_to_flesh_obj(struct obj *);
@@ -742,6 +743,22 @@ get_container_location(struct obj *obj, int *loc, int *container_nesting)
     return (struct monst *) 0;
 }
 
+/* can zombie dig the location at x,y */
+static boolean
+zombie_can_dig(xchar x, xchar y)
+{
+    if (isok(x,y)) {
+        schar typ = levl[x][y].typ;
+        struct trap *ttmp;
+
+        if ((ttmp = t_at(x, y)) != 0)
+            return FALSE;
+        if (typ == ROOM || typ == CORR || typ == GRAVE)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /*
  * Attempt to revive the given corpse, return the revived monster if
  * successful.  Note: this does NOT use up the corpse if it fails.
@@ -759,6 +776,7 @@ revive(struct obj *corpse, boolean by_hero)
     boolean one_of;
     long mmflags = NO_MINVENT | MM_NOWAIT;
     int montype, cgend, container_nesting = 0;
+    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
     if (corpse->otyp != CORPSE) {
         impossible("Attempting to revive %s?", xname(corpse));
@@ -767,9 +785,11 @@ revive(struct obj *corpse, boolean by_hero)
 
     x = y = 0;
     if (corpse->where != OBJ_CONTAINED) {
-        /* only for invent, minvent, or floor */
+        int locflags = is_zomb ? BURIED_TOO : 0;
+
+        /* only for invent, minvent, or floor, or if zombie, buried */
         container = 0;
-        (void) get_obj_location(corpse, &x, &y, 0);
+        (void) get_obj_location(corpse, &x, &y, locflags);
     } else {
         /* deal with corpses in [possibly nested] containers */
         struct monst *carrier;
@@ -802,6 +822,10 @@ revive(struct obj *corpse, boolean by_hero)
         || (container && (container->olocked || container_nesting > 2
                           || container->otyp == STATUE
                           || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
+        return (struct monst *) 0;
+
+    /* buried zombie cannot dig itself out, do not revive */
+    if (is_zomb && corpse->where == OBJ_BURIED && !zombie_can_dig(x, y))
         return (struct monst *) 0;
 
     /* record the object's location now that we're sure where it is */
@@ -977,6 +1001,13 @@ revive(struct obj *corpse, boolean by_hero)
         obj_extract_self(corpse);
         obfree(corpse, (struct obj *) 0);
         break;
+    case OBJ_BURIED:
+        if (is_zomb) {
+            obj_extract_self(corpse);
+            obfree(corpse, (struct obj *) 0);
+            break;
+        }
+        /*FALLTHRU*/
     default:
         panic("revive");
     }

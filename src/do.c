@@ -1848,6 +1848,7 @@ revive_corpse(struct obj *corpse)
     char cname[BUFSZ];
     struct obj *container = (struct obj *) 0;
     int container_where = 0;
+    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
     where = corpse->where;
     is_uwep = (corpse == uwep);
@@ -1915,6 +1916,21 @@ revive_corpse(struct obj *corpse)
             }
             break;
         }
+        case OBJ_BURIED:
+            if (is_zomb) {
+                maketrap(mtmp->mx, mtmp->my, PIT);
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    struct trap *ttmp;
+
+                    ttmp = t_at(mtmp->mx, mtmp->my);
+                    ttmp->tseen = TRUE;
+                    pline("%s claws itself out of the ground!", Amonnam(mtmp));
+                    newsym(mtmp->mx, mtmp->my);
+                } else if (distu(mtmp->mx, mtmp->my) < 5*5)
+                    You_hear("scratching noises.");
+                break;
+            }
+            /*FALLTHRU*/
         default:
             /* we should be able to handle the other cases... */
             impossible("revive_corpse: lost corpse @ %d", where);
@@ -1961,13 +1977,15 @@ revive_mon(anything *arg, long timeout UNUSED)
             action = REVIVE_MON;
             when = rider_revival_time(body, TRUE);
         } else { /* rot this corpse away */
-            You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
+            if (!obj_has_timer(body, ROT_CORPSE))
+                You_feel("%sless hassled.", is_rider(mptr) ? "much " : "");
             action = ROT_CORPSE;
             when = (long) d(5, 50) - (g.moves - body->age);
             if (when < 1L)
                 when = 1L;
         }
-        (void) start_timer(when, TIMER_OBJECT, action, arg);
+        if (!obj_has_timer(body, action))
+            (void) start_timer(when, TIMER_OBJECT, action, arg);
     }
 }
 

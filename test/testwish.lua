@@ -39,6 +39,8 @@ local wishtest_objects = {
    ["spinach"] = { otyp_name = "tin", oclass = "%", corpsenm = -1, spe = 1 },
    ["trapped tin of floating eye meat"] = { otyp_name = "tin", oclass = "%", otrapped = 1, corpsenm_name = "floating eye" },
    ["hill orc corpse"] = { otyp_name = "corpse", oclass = "%", corpsenm_name = "hill orc" },
+   -- TODO: zombifying and other timers cannot be seen via lua
+   ["zombifying elf corpse"] = { otyp_name = "corpse", oclass = "%", corpsenm_name = "elf" },
    ["destroy armor"] = { otyp_name = "destroy armor", oclass = "?" },
    ["enchant weapon"] = { otyp_name = "enchant weapon", oclass = "?" },
    ["scroll of food detection"] = { otyp_name = "food detection", oclass = "?" },

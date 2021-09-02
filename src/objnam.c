@@ -27,6 +27,7 @@ struct _readobjnam_data {
     int tmp, tinv, tvariety, mgend;
     int wetness, gsize;
     int ftype;
+    boolean zombify;
     char globbuf[BUFSZ];
     char fruitbuf[BUFSZ];
 };
@@ -3317,6 +3318,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
     d->actualn = d->dn = d->un = 0;
     d->wetness = 0;
     d->gsize = 0;
+    d->zombify = FALSE;
     d->bp = d->origbp = bp;
     d->p = (char *) 0;
     d->name = (const char *) 0;
@@ -3432,6 +3434,8 @@ readobjnam_preparse(struct _readobjnam_data *d)
             d->looted = 1;
         } else if (!strncmpi(d->bp, "greased ", l = 8)) {
             d->isgreased = 1;
+        } else if (!strncmpi(d->bp, "zombifying ", l = 11)) {
+            d->zombify = TRUE;
         } else if (!strncmpi(d->bp, "very ", l = 5)) {
             /* very rusted very heavy iron ball */
             d->very = 1;
@@ -4498,6 +4502,10 @@ readobjnam(char *bp, struct obj *no_wish)
                 if (mons[d.mntmp].msound == MS_GUARDIAN)
                     d.mntmp = genus(d.mntmp, 1);
                 set_corpsenm(d.otmp, d.mntmp);
+            }
+            if (d.zombify && zombie_form(&mons[d.mntmp])) {
+                (void) start_timer(rn1(5, 10), TIMER_OBJECT,
+                                   ZOMBIFY_MON, obj_to_any(d.otmp));
             }
             break;
         case EGG:
