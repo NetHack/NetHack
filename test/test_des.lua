@@ -458,6 +458,22 @@ function test_terrain()
 end
 
 function test_replace_terrain()
+   des.reset_level();
+   des.replace_terrain({ x1=2, y1=3, x2=4,y2=5, fromterrain=" ", toterrain="I", lit=1 });
+   for x = 2,4 do
+      for y = 3,5 do
+         is_map_at(x,y, "I", true);
+      end
+   end
+   for x = 1,5 do
+      is_map_at(x,2, " ", false);
+      is_map_at(x,6, " ", false);
+   end
+   for y = 2,6 do
+      is_map_at(1, y, " ", false);
+      is_map_at(5, y, " ", false);
+   end
+
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", lit=1 });
    des.replace_terrain({ x1=1, y1=1, x2=70,y2=19, fromterrain=".", toterrain="I", chance=50 });
    des.replace_terrain({ region={1,1, 70,19}, fromterrain=".", toterrain="L", chance=25 });
