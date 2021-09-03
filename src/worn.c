@@ -727,7 +727,7 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
     }
     update_mon_intrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
-    if (!creation && (sawmon ^ !canseemon(mon))) {
+    if (!creation && (sawmon ^ canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
             pline("Suddenly you cannot see %s.", nambuf);
             makeknown(best->otyp);
