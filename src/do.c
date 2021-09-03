@@ -52,6 +52,8 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
         const char *what = waterbody_name(rx, ry);
         schar ltyp = levl[rx][ry].typ;
         int chance = rn2(10); /* water: 90%; lava: 10% */
+        struct monst *mtmp;
+
         fills_up = lava ? chance == 0 : chance != 0;
 
         if (fills_up) {
@@ -62,6 +64,9 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
                 levl[rx][ry].drawbridgemask |= DB_FLOOR;
             } else
                 levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
+
+            if ((mtmp = m_at(rx, ry)) != 0)
+                mondied(mtmp);
 
             if (ttmp)
                 (void) delfloortrap(ttmp);
