@@ -66,13 +66,14 @@ struct objclass {
     Bitfield(oc_tough, 1); /* hard gems/rings */
 
     Bitfield(oc_dir, 3);
-#define NODIR 1     /* for wands/spells: non-directional */
-#define IMMEDIATE 2 /*               directional */
-#define RAY 3       /*               zap beams */
-
-#define PIERCE 1 /* for weapons & tools used as weapons */
-#define SLASH 2  /* (latter includes iron ball & chain) */
-#define WHACK 4
+    /* oc_dir: zap style for wands and spells */
+#define NODIR     1 /* non-directional */
+#define IMMEDIATE 2 /* directional beam that doesn't ricochet */
+#define RAY       3 /* beam that does bounce off walls */
+    /* overloaded oc_dir: strike mode bit mask for weapons and weptools */
+#define PIERCE   01 /* pointed weapon punctures target */
+#define SLASH    02 /* sharp weapon cuts target */
+#define WHACK    04 /* blunt weapon bashes target */
 
     /* 3 free bits */
 
