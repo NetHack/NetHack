@@ -790,6 +790,8 @@ when hero is displaced, make monsters who try to stay out of direct line do so
 	with spot where they think the hero is rather than where he really is
 if hero died while wearing gold dragon scales/mail and left bones, they would
 	still be emitting light witout being worn when bones got loaded
+if an invisible monster put on or took off armor while out of hero's sight
+	spurious message "Suddenly you cannot see it" would be given
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
