@@ -156,6 +156,9 @@ moveloop_core(void)
     if (g.context.bypasses)
         clear_bypasses();
 
+    if (iflags.sanity_check || iflags.debug_fuzzer)
+        sanity_check();
+
     if (g.context.move) {
         /* actual time passed */
         g.youmonst.movement -= NORMAL_SPEED;
@@ -446,9 +449,6 @@ moveloop_core(void)
 #endif
         return;
     }
-
-    if (iflags.sanity_check || iflags.debug_fuzzer)
-        sanity_check();
 
 #ifdef CLIPPING
     /* just before rhack */
