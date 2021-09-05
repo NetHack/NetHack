@@ -599,6 +599,12 @@ don't include time spent suspended in background (^Z) or in shell escape (!)
 if a monster is starting to turn into green slime, eat the corpse, tin, or
 	egg of any creature that might polymorph into a fiery monster to cure
 	the slime, not just of one of a chameleon
+yet another fix for display problems during restore:  if game is saved while
+	hero is hallucinating but that's suppressed because of wielding
+	Grayswandir, hero is riding, and the steed is on or over an object,
+	restore will try to update hero's spot when making sure objects aren't
+	being obfuscated by hallucination, but when displaying the hero there
+	instead it would access steed pointer before that has been set up
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

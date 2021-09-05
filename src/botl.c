@@ -57,6 +57,9 @@ do_statusline1(void)
     register char *nb;
     register int i, j;
 
+    if (suppress_map_output())
+        return strcpy(newbot1, "");
+
     Strcpy(newbot1, g.plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
@@ -111,6 +114,9 @@ do_statusline2(void)
     unsigned dln, dx, hln, xln, tln, cln;
     int hp, hpmax, cap;
     long money;
+
+    if (suppress_map_output())
+        return strcpy(newbot2, "");
 
     /*
      * Various min(x,9999)'s are to avoid having excessive values
@@ -241,9 +247,10 @@ do_statusline2(void)
 void
 bot(void)
 {
-    /* dosave() flags completion by setting u.uhp to -1 */
+    /* dosave() flags completion by setting u.uhp to -1; supprss_map_output()
+       covers program_state.restoring and is used for status as well as map */
     if (u.uhp != -1 && g.youmonst.data && iflags.status_updates
-        && !g.program_state.saving && !g.program_state.restoring) {
+        && !g.program_state.saving && !suppress_map_output()) {
         if (VIA_WINDOWPORT()) {
             bot_via_windowport();
         } else {
@@ -256,11 +263,18 @@ bot(void)
     g.context.botl = g.context.botlx = iflags.time_botl = FALSE;
 }
 
+/* special purpose status update: move counter ('time' status) only */
 void
 timebot(void)
 {
+    /* we're called when iflags.time_botl is set and general g.context.botl
+       is clear; iflags.time_botl gets set whenever g.moves changes value
+       so there's no benefit in tracking previous value to decide whether
+       to skip update; suppress_map_output() handles program_state.restoring
+       and program_state.done_hup (tty hangup => no further output at all)
+       and we use it for maybe skipping status as well as for the map */
     if (flags.time && iflags.status_updates
-        && !g.program_state.saving && !g.program_state.restoring) {
+        && !g.program_state.saving && !suppress_map_output()) {
         if (VIA_WINDOWPORT()) {
             stat_update_time();
         } else {

@@ -349,6 +349,7 @@ extern void map_invisible(xchar, xchar);
 extern boolean unmap_invisible(int, int);
 extern void unmap_object(int, int);
 extern void map_location(int, int, int);
+extern boolean suppress_map_output(void);
 extern void feel_newsym(xchar, xchar);
 extern void feel_location(xchar, xchar);
 extern void newsym(int, int);
