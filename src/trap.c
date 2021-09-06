@@ -187,6 +187,8 @@ erode_obj(
 
     switch (type) {
     case ERODE_BURN:
+        if (uvictim && u_adtyp_resistance_obj(AD_FIRE) && rn2(100))
+            return ER_NOTHING;
         vulnerable = is_flammable(otmp);
         check_grease = FALSE;
         cost_type = COST_BURN;
@@ -202,6 +204,8 @@ erode_obj(
         cost_type = COST_ROT;
         break;
     case ERODE_CORRODE:
+        if (uvictim && u_adtyp_resistance_obj(AD_ACID) && rn2(100))
+            return ER_NOTHING;
         vulnerable = is_corrodeable(otmp);
         is_primary = FALSE;
         cost_type = COST_CORRODE;
@@ -3870,6 +3874,9 @@ acid_damage(struct obj* obj)
 
     victim = carried(obj) ? &g.youmonst : mcarried(obj) ? obj->ocarry : NULL;
     vismon = victim && (victim != &g.youmonst) && canseemon(victim);
+
+    if (victim == &g.youmonst && u_adtyp_resistance_obj(AD_ACID) && rn2(100))
+        return;
 
     if (obj->greased) {
         grease_protect(obj, (char *) 0, victim);

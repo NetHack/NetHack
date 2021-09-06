@@ -605,6 +605,7 @@ yet another fix for display problems during restore:  if game is saved while
 	restore will try to update hero's spot when making sure objects aren't
 	being obfuscated by hallucination, but when displaying the hero there
 	instead it would access steed pointer before that has been set up
+resistances gained from worn or wielded items also protect hero's inventory
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
