@@ -53,6 +53,9 @@ struct obj {
                 * Schroedinger's Box (1) or royal coffers for a court (2);
                 * named fruit index;
                 * candy bar wrapper index;
+                * scroll of scare monster (when uncursed: never picked up==0,
+                *   has been picked up==1, turns to dust if picked up again;
+                *   when blessed|cursed: flag not checked, set, or cleared);
                 * scroll of mail (normal==0, bones or wishing==1, written==2);
                 * splash of venom (normal==0, wishing==1);
                 * gender for corpses, statues, and figurines (0..3,
