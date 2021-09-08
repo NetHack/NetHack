@@ -800,6 +800,8 @@ if hero died while wearing gold dragon scales/mail and left bones, they would
 	still be emitting light witout being worn when bones got loaded
 if an invisible monster put on or took off armor while out of hero's sight
 	spurious message "Suddenly you cannot see it" would be given
+an item thrown or dropped while swallowed was treated as being picked up by an
+	unseen monster so object fields {known, dknown, bknown} got cleared
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

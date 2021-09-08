@@ -529,8 +529,10 @@ mpickobj(register struct monst* mtmp, register struct obj* otmp)
         otmp->no_charge = 0;
     /* if monster is unseen, info hero knows about this object becomes lost;
        continual pickup and drop by pets makes this too annoying if it is
-       applied to them */
-    if (!mtmp->mtame && !canseemon(mtmp))
+       applied to them; when engulfed (where monster can't be seen because
+       vision is disabled), or when held (or poly'd and holding) while blind,
+       behave as if the monster can be 'seen' by touch */
+    if (!mtmp->mtame && !(canseemon(mtmp) || mtmp == u.ustuck))
         unknow_object(otmp);
     /* Must do carrying effects on object prior to add_to_minv() */
     carry_obj_effects(otmp);
