@@ -802,6 +802,7 @@ if an invisible monster put on or took off armor while out of hero's sight
 	spurious message "Suddenly you cannot see it" would be given
 an item thrown or dropped while swallowed was treated as being picked up by an
 	unseen monster so object fields {known, dknown, bknown} got cleared
+segfault if gremlin fled weaponless hero wearing gold dragon scales/mail
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

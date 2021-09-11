@@ -298,13 +298,15 @@ bee_eat_jelly(struct monst* mon, struct obj* obj)
     return -1; /* a queen is already present; ordinary bee hasn't moved yet */
 }
 
+/* FIXME: gremlins don't flee from monsters wielding Sunsword or wearing
+   gold dragon scales/mail, nor from gold dragons, only from the hero */
 #define flees_light(mon) \
-    ((mon)->data == &mons[PM_GREMLIN]                           \
-     && ((uwep && uwep->lamplit && artifact_light(uwep))        \
-         || (uarm && uarm->lamplit && artifact_light(uarm))))
-/* we could include this in the above macro, but probably overkill/overhead */
-/*      && (!(which_armor((mon), W_ARMC) != 0                               */
-/*            && which_armor((mon), W_ARMH) != 0))                          */
+    ((mon)->data == &mons[PM_GREMLIN]                                     \
+     && ((uwep && uwep->lamplit && artifact_light(uwep))                  \
+         || (uarm && uarm->lamplit && artifact_light(uarm)))              \
+     /* not applicable if mon can't see or hero isn't in line of sight */ \
+     && mon->mcansee && couldsee(mon->mx, mon->my))                       \
+     /* doesn't matter if hero is invisible--light being emitted isn't */
 
 /* monster begins fleeing for the specified time, 0 means untimed flee
  * if first, only adds fleetime if monster isn't already fleeing
@@ -343,13 +345,28 @@ monflee(
             if (!mtmp->mcanmove || !mtmp->data->mmove) {
                 pline("%s seems to flinch.", Adjmonnam(mtmp, "immobile"));
             } else if (flees_light(mtmp)) {
-                if (rn2(10) || Deaf)
+                if (Unaware) {
+                    /* tell the player even if the hero is unconscious */
+                    pline("%s is frightened.", Monnam(mtmp));
+                } else if (rn2(10) || Deaf) {
+                    /* via flees_light(), will always be either via uwep
+                       (Sunsword) or uarm (gold dragon scales/mail) or both;
+                       TODO? check for both and describe the one which is
+                       emitting light with a bigger radius */
+                    const char *lsrc = (uwep && artifact_light(uwep))
+                                       ? bare_artifactname(uwep)
+                                       : (uarm && artifact_light(uarm))
+                                         ? yname(uarm)
+                                         : "[its imagination?]";
+
                     pline("%s flees from the painful light of %s.",
-                          Monnam(mtmp), bare_artifactname(uwep));
-                else
+                          Monnam(mtmp), lsrc);
+                } else {
                     verbalize("Bright light!");
-            } else
+                }
+            } else {
                 pline("%s turns to flee.", Monnam(mtmp));
+            }
         }
         mtmp->mflee = 1;
     }
