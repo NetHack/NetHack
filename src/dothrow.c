@@ -982,6 +982,14 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     if (dx && dy && NODIAG(monsndx(mon->data)))
         return;
 
+    /* undetected monster can be moved by your strike */
+    if (mon->mundetected) {
+        mon->mundetected = 0;
+        newsym(mon->mx, mon->my);
+    }
+    if (M_AP_TYPE(mon))
+        seemimic(mon);
+
     /* Send the monster along the path */
     mc.x = mon->mx;
     mc.y = mon->my;
