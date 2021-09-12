@@ -21,6 +21,13 @@
 #define HARDGEM(n) (0)
 #endif
 
+/*
+ * Note...
+ *  OBJECTS() currently has 15 parameters; it more become needed, some
+ *  will need to be combined the way BITS() is used, because compilers
+ *  are allowed to impose a limit of 15.
+ */
+
 #if defined(OBJECTS_DESCR_INIT)
 #define OBJ(name,desc)  name, desc
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt, \
@@ -28,21 +35,28 @@
 
 #elif defined(OBJECTS_INIT)
 #define COLOR_FIELD(X) X,
+/* notes: 'sub' was once a bitfield but got changed to separate schar when
+   it was overloaded to hold negative weapon skill indices; the first zero
+   is padding for oc_prediscovered which has variable init at run-time;
+   the second zero is oc_spare1 for padding between oc_tough and oc_dir */
 #define BITS(nmkn,mrg,uskn,ctnr,mgc,chrg,uniq,nwsh,big,tuf,dir,sub,mtrl) \
-  nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,dir,mtrl,sub /*SCO cpp fodder*/
-#define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color,sn) \
+    nmkn,mrg,uskn,0,mgc,chrg,uniq,nwsh,big,tuf,0,dir,mtrl,sub /*cpp fodder*/
+#define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
+               cost,sdam,ldam,oc1,oc2,nut,color,sn) \
   { 0, 0, (char *) 0, bits, prp, sym, dly, COLOR_FIELD(color) prob, wt, \
     cost, sdam, ldam, oc1, oc2, nut }
 
 #elif defined(OBJECTS_ENUM)
 #define OBJ(name,desc)
-#define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color,sn) \
+#define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
+               cost,sdam,ldam,oc1,oc2,nut,color,sn) \
     sn
 
 #elif defined(DUMP_ENUMS)
 #define OBJ(name,desc)
-#define OBJECT(obj,bits,prp,sym,prob,dly,wt,cost,sdam,ldam,oc1,oc2,nut,color,sn) \
-    {sn, #sn}
+#define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
+               cost,sdam,ldam,oc1,oc2,nut,color,sn) \
+  { sn, #sn }
 
 #else
 #error Unproductive inclusion of objects.h
@@ -75,6 +89,7 @@ OBJECT(OBJ("strange object", NoDes),
 /* Note: for weapons that don't do an even die of damage (ex. 2-7 or 3-18)
    the extra damage is added on in weapon.c, not here! */
 
+/* weapon strike mode overloads the oc_dir field */
 #define P PIERCE
 #define S SLASH
 #define B WHACK

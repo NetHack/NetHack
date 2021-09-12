@@ -50,11 +50,11 @@ struct objclass {
     Bitfield(oc_name_known, 1);     /* discovered */
     Bitfield(oc_merge, 1);          /* merge otherwise equal objects */
     Bitfield(oc_uses_known, 1);     /* obj->known affects full description;
-                                       otherwise, obj->dknown and obj->bknown
-                                       tell all, and obj->known should always
-                                       be set for proper merging behavior. */
-    Bitfield(oc_pre_discovered, 1); /* Already known at start of game;
-                                       won't be listed as a discovery. */
+                                     * otherwise, obj->dknown and obj->bknown
+                                     * tell all, and obj->known should always
+                                     * be set for proper merging behavior. */
+    Bitfield(oc_pre_discovered, 1); /* already known at start of game; flagged
+                                     * as such when discoveries are listed */
     Bitfield(oc_magic, 1);          /* inherently magical object */
     Bitfield(oc_charged, 1);        /* may have +n or (n) charges */
     Bitfield(oc_unique, 1);         /* special one-of-a-kind object */
@@ -65,6 +65,10 @@ struct objclass {
 #define oc_bulky oc_big    /* for armor */
     Bitfield(oc_tough, 1); /* hard gems/rings */
 
+    Bitfield(oc_spare1, 6);         /* padding to align oc_dir + oc_material;
+                                     * can be canabalized for other use;
+                                     * aka 6 free bits */
+
     Bitfield(oc_dir, 3);
     /* oc_dir: zap style for wands and spells */
 #define NODIR     1 /* non-directional */
@@ -74,30 +78,7 @@ struct objclass {
 #define PIERCE   01 /* pointed weapon punctures target */
 #define SLASH    02 /* sharp weapon cuts target */
 #define WHACK    04 /* blunt weapon bashes target */
-
-    /* 3 free bits */
-
     Bitfield(oc_material, 5); /* one of obj_material_types */
-
-#define is_organic(otmp) (objects[otmp->otyp].oc_material <= WOOD)
-#define is_metallic(otmp)                    \
-    (objects[otmp->otyp].oc_material >= IRON \
-     && objects[otmp->otyp].oc_material <= MITHRIL)
-
-/* primary damage: fire/rust/--- */
-/* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
-#define is_rustprone(otmp) (objects[otmp->otyp].oc_material == IRON)
-
-/* secondary damage: rot/acid/acid */
-#define is_corrodeable(otmp)                   \
-    (objects[otmp->otyp].oc_material == COPPER \
-     || objects[otmp->otyp].oc_material == IRON)
-
-#define is_damageable(otmp)                                        \
-    (is_rustprone(otmp) || is_flammable(otmp) || is_rottable(otmp) \
-     || is_corrodeable(otmp))
-
-    /* 3 free bits */
 
     schar oc_subtyp;
 #define oc_skill oc_subtyp  /* Skills of weapons, spellbooks, tools, gems */
@@ -199,5 +180,22 @@ extern NEARDATA struct objdescr obj_descr[NUM_OBJECTS + 1];
 
 #define OBJ_NAME(obj) (obj_descr[(obj).oc_name_idx].oc_name)
 #define OBJ_DESCR(obj) (obj_descr[(obj).oc_descr_idx].oc_descr)
+
+#define is_organic(otmp) (objects[otmp->otyp].oc_material <= WOOD)
+#define is_metallic(otmp) \
+    (objects[otmp->otyp].oc_material >= IRON            \
+     && objects[otmp->otyp].oc_material <= MITHRIL)
+
+/* primary damage: fire/rust/--- */
+/* is_flammable(otmp), is_rottable(otmp) in mkobj.c */
+#define is_rustprone(otmp) (objects[otmp->otyp].oc_material == IRON)
+/* secondary damage: rot/acid/acid */
+#define is_corrodeable(otmp) \
+    (objects[otmp->otyp].oc_material == COPPER          \
+     || objects[otmp->otyp].oc_material == IRON)
+/* subject to any damage */
+#define is_damageable(otmp) \
+    (is_rustprone(otmp) || is_flammable(otmp)           \
+     || is_rottable(otmp) || is_corrodeable(otmp))
 
 #endif /* OBJCLASS_H */
