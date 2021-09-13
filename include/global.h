@@ -220,13 +220,17 @@ typedef uchar nhsym;
 
 #if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) \
     || defined(WIN32)
+#ifndef NO_TILE_C
 #ifndef USE_TILES
 #define USE_TILES /* glyph2tile[] will be available */
 #endif
 #endif
+#endif
 #if defined(AMII_GRAPHICS) || defined(GEM_GRAPHICS)
+#ifndef NO_TILE_C
 #ifndef USE_TILES
 #define USE_TILES
+#endif
 #endif
 #endif
 

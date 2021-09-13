@@ -213,7 +213,6 @@
     <ClInclude Include="$(IncDir)coord.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
-    <ClInclude Include="$(IncDir)dgn_comp.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
     <ClInclude Include="$(IncDir)display.h" />
     <ClInclude Include="$(IncDir)dlb.h" />
@@ -228,7 +227,6 @@
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)integer.h" />
     <ClInclude Include="$(IncDir)isaac64.h" />
-    <ClInclude Include="$(IncDir)lev_comp.h" />
     <ClInclude Include="$(IncDir)lint.h" />
     <ClInclude Include="$(IncDir)load_img.h" />
     <ClInclude Include="$(IncDir)mail.h" />

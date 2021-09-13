@@ -31,6 +31,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(WinShareDir)tilemap.c" />
+    <ClCompile Include="$(SrcDir)drawing.c" />
+    <ClCompile Include="$(SrcDir)monst.c" />
+    <ClCompile Include="$(SrcDir)objects.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(IncDir)align.h" />
@@ -42,7 +45,6 @@
     <ClInclude Include="$(IncDir)coord.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
-    <ClInclude Include="$(IncDir)dgn_comp.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
     <ClInclude Include="$(IncDir)display.h" />
     <ClInclude Include="$(IncDir)dungeon.h" />
