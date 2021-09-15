@@ -1489,6 +1489,7 @@ endif
 #   * the CONFIG_H and HACK_H sections comment out
 #   * win/X11/Window.o commented due to conflict with pdcurses
 #   * commented out $(TARGETPFX)tile.o: tile.c $(HACK_H)
+#   * the curses targets were commented out
 # but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
@@ -1496,6 +1497,8 @@ endif
 TARGETPFX=$(O)
 TARGET_CC=$(cc)
 TARGET_CFLAGS=$(CFLAGS)
+TARGET_CXX=g++
+TARGET_CXXFLAGS=$(CFLAGS)
 #
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
@@ -1561,35 +1564,35 @@ $(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h \
 $(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/tcap.h ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/wintty.c
-$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
-$(TARGETPFX)curswins.o: ../win/curses/curswins.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/curswins.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/curswins.c
-$(TARGETPFX)cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursmisc.h \
-		../include/func_tab.h ../include/dlb.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmisc.c
-$(TARGETPFX)cursdial.o: ../win/curses/cursdial.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursdial.h \
-		../include/func_tab.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursdial.c
-$(TARGETPFX)cursstat.o: ../win/curses/cursstat.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursstat.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursstat.c
-$(TARGETPFX)cursinit.o: ../win/curses/cursinit.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursinit.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinit.c
-$(TARGETPFX)cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursmesg.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmesg.c
-$(TARGETPFX)cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) \
-		../include/wincurs.h ../win/curses/cursinvt.h
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinvt.c
-#$(TARGETPFX)Window.o: ../win/X11/Window.c ../include/xwindowp.h \
+#$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
+#$(TARGETPFX)curswins.o: ../win/curses/curswins.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/curswins.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/curswins.c
+#$(TARGETPFX)cursmisc.o: ../win/curses/cursmisc.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursmisc.h \
+#		../include/func_tab.h ../include/dlb.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmisc.c
+#$(TARGETPFX)cursdial.o: ../win/curses/cursdial.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursdial.h \
+#		../include/func_tab.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursdial.c
+#$(TARGETPFX)cursstat.o: ../win/curses/cursstat.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursstat.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursstat.c
+#$(TARGETPFX)cursinit.o: ../win/curses/cursinit.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursinit.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinit.c
+#$(TARGETPFX)cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursmesg.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmesg.c
+#$(TARGETPFX)cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) \
+#		../include/wincurs.h ../win/curses/cursinvt.h
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinvt.c
+##$(TARGETPFX)Window.o: ../win/X11/Window.c ../include/xwindowp.h \
 #		../include/xwindow.h $(CONFIG_H) ../include/lint.h \
 #		../include/winX.h ../include/color.h ../include/wintype.h
-	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
+#	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/Window.c
 $(TARGETPFX)dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h \
 		../include/winX.h ../include/color.h ../include/wintype.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/dialogs.c
