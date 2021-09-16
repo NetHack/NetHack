@@ -604,8 +604,10 @@ rc=Rc
 # is too old or untested.
 #
 # Recently tested versions:
+#NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.39)
 #NMAKE version 1429300370 from latest VS 2019 (May 25, 2021 version 16.10.0)
-#NMAKE version 1429300400 from latest VS 2019 (July 20, 2021 version 16.10.4)
+#NMAKE version 1429300400 from latest VS 2019 (Jul 20, 2021 version 16.10.4)
+#NMAKE version 1429301330 from latest VS 2019 (Sep 14, 2021 version 16.11.3)
 #NMAKE version 1430304010 from latest VS 2022 preview 2 (July 2021)
 
 #!MESSAGE $(MAKEFLAGS)
@@ -629,9 +631,9 @@ VSVER=2012
 VSVER=2013
 !ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
 VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270312)
+!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270451)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270311) && ($(MAKEVERSION) < 1429300401)
+!ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301331)
 VSVER=$(VSNEWEST)
 !ELSEIF ($(MAKEVERSION) > 1429300400) && ($(MAKEVERSION) < 1430304011)
 VSVER=2022
@@ -1620,7 +1622,7 @@ $(O)ttystub.o: $(WINDHDR) $(HACK_H) $(MSWSYS)\stubs.c
 #===================================================================
 
 (O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
-	@$(CC) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ ..\sys\share\cppregex.cpp
+	@$(CC) $(cppflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ ..\sys\share\cppregex.cpp
 
 #===================================================================
 # curses window port dependencies
@@ -1755,7 +1757,6 @@ spotless: clean
 	if exist $(INCL)\date.h          del $(INCL)\date.h
 	if exist $(INCL)\onames.h        del $(INCL)\onames.h
 	if exist $(INCL)\pm.h            del $(INCL)\pm.h
-	if exist $(SRC)\tile.c           del $(SRC)\tile.c
 	if exist $(U)*.lnk               del $(U)*.lnk
 	if exist $(U)*.map               del $(U)*.map
 	if exist $(DAT)\data             del $(DAT)\data
@@ -1797,6 +1798,7 @@ spotless: clean
 
 clean:
 	if exist $(O)*.o del $(O)*.o
+	if exist $(SRC)\tile.c     del $(SRC)\tile.c
 	if exist $(INCL)\nhlua.h   del $(INCL)\nhlua.h
 	if exist $(O)utility.tag   del $(O)utility.tag
 	if exist $(U)makedefs.exe  del $(U)makedefs.exe
@@ -1854,6 +1856,8 @@ clean:
 TARGETPFX=$(O)
 TARGET_CC=$(cc)
 TARGET_CFLAGS=$(cflagsBuild)
+TARGET_CXX=$(cc)
+TARGET_CXXFLAGS=$(cppflagsBuild)
 #
 # DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT
 
