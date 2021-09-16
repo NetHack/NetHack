@@ -2535,7 +2535,7 @@ display_pickinv(
 {
     static const char not_carrying_anything[] = "Not carrying anything";
     struct obj *otmp, wizid_fakeobj;
-    char ilet, ret;
+    char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
     int n, classcount;
     winid win;                        /* windows being used */
@@ -2697,9 +2697,14 @@ display_pickinv(
                 any.a_char = ilet;
             tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
             map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
+            formattedobj = doname(otmp);
             add_menu(win, &tmpglyphinfo, &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
-                     ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, formattedobj, MENU_ITEMFLAGS_NONE);
+            /* doname() uses a static pool of obuf[] output buffers and
+               we don't want inventory display to overwrite all of them,
+               so when we've used one we release it for re-use */
+            maybereleaseobuf(formattedobj);
             gotsomething = TRUE;
         }
     }

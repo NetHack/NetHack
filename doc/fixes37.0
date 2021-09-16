@@ -607,6 +607,16 @@ yet another fix for display problems during restore:  if game is saved while
 	instead it would access steed pointer before that has been set up
 resistances gained from worn or wielded items also protect hero's inventory
 non-metallic gloves protect worn rings from shock
+message "Oops!  food rations out of your grasp!" occurred due to perm_invent
+	in mid-operation overwriting all of xname's/doname's obufs; fixed by
+	having hold_another_object() defer perm_invent update til done with
+	all its args (so fixed as a side-effect of "spurious add and remove
+	perm_invent updates" above, prior to being reported as #K3401)
+similar "The ogre lord yanks Cleaver from your corpses!" due to caching the
+	result from makeplural(body_part(HAND)) then having a perm_invent
+	update clobber that; fixed by having inventory display release the
+	obuf used for each item so that the same one will be reused for the
+	next item, to avoid churning through the whole pool of obufs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1762,6 +1762,7 @@ extern void objects_globals_init(void);
 
 /* ### objnam.c ### */
 
+extern void maybereleaseobuf(char *);
 extern char *obj_typename(int);
 extern char *simple_typename(int);
 extern char *safe_typename(int);
