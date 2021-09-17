@@ -1076,7 +1076,7 @@ extern void free_pickinv_cache(void);
 extern int count_unpaid(struct obj *);
 extern int count_buc(struct obj *, int, boolean(*)(struct obj *));
 extern void tally_BUCX(struct obj *, boolean, int *, int *, int *, int *,
-                       int *);
+                       int *, int *);
 extern long count_contents(struct obj *, boolean, boolean, boolean, boolean);
 extern void carry_obj_effects(struct obj *);
 extern const char *currency(long);
@@ -1950,6 +1950,9 @@ extern boolean allow_category(struct obj *);
 extern boolean is_worn_by_type(struct obj *);
 extern int ck_bag(struct obj *);
 extern void removed_from_icebox(struct obj *);
+extern void reset_justpicked(struct obj *);
+extern int count_justpicked(struct obj *);
+extern struct obj *find_justpicked(struct obj *);
 extern int pickup(int);
 extern int pickup_object(struct obj *, long, boolean);
 extern int query_category(const char *, struct obj *, int, menu_item **, int);

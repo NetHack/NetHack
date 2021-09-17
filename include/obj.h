@@ -117,7 +117,8 @@ struct obj {
     Bitfield(cknown, 1); /* for containers (including statues): the contents
                           * are known; also applicable to tins */
     Bitfield(lknown, 1); /* locked/unlocked status is known */
-    /* 4 free bits */
+    Bitfield(pickup_prev, 1); /* was picked up previously */
+    /* 3 free bits */
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */
 #define leashmon corpsenm /* gets m_id of attached pet */

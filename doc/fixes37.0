@@ -1158,6 +1158,7 @@ new bigroom variant, a boulder maze
 vomiting on an altar provokes the deities wrath
 branch stairs have a different glyph, show up in yellow color in tty
 duration of confusion when drinking booze depends upon hunger state
+using 'D' allows dropping items picked up previously
 
 
 Platform- and/or Interface-Specific New Features

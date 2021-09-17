@@ -57,6 +57,7 @@ moveloop_preamble(boolean resuming)
     if (!resuming) { /* new game */
         g.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
+        reset_justpicked(g.invent);
         (void) pickup(1);      /* autopickup at initial location */
         /* only matters if someday a character is able to start with
            clairvoyance (wizard with cornuthaum perhaps?); without this,

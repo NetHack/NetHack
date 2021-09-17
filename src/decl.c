@@ -553,6 +553,8 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* class_filter */
     UNDEFINED_VALUE, /* bucx_filter */
     UNDEFINED_VALUE, /* shop_filter */
+    UNDEFINED_VALUE, /* picked_filter */
+    UNDEFINED_VALUE, /* loot_reset_justpicked */
 
     /* pline.c */
     0, /* pline_flags */

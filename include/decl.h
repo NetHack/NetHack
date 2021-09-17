@@ -1094,6 +1094,8 @@ struct instance_globals {
     boolean class_filter;
     boolean bucx_filter;
     boolean shop_filter;
+    boolean picked_filter;
+    boolean loot_reset_justpicked;
 
     /* pline.c */
     unsigned pline_flags;

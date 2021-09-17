@@ -400,6 +400,7 @@ splitobj(struct obj *obj, long num)
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
     otmp->lua_ref_cnt = 0;
+    otmp->pickup_prev = 0;
 
     g.context.objsplit.parent_oid = obj->o_id;
     g.context.objsplit.child_oid = otmp->o_id;
@@ -765,6 +766,7 @@ mksobj(int otyp, boolean init, boolean artif)
     unknow_object(otmp); /* set up dknown and known: non-0 for some things */
     otmp->corpsenm = NON_PM;
     otmp->lua_ref_cnt = 0;
+    otmp->pickup_prev = 0;
 
     if (init) {
         switch (let) {

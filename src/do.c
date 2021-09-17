@@ -12,6 +12,7 @@ static void polymorph_sink(void);
 static boolean teleport_sink(void);
 static void dosinkring(struct obj *);
 static int drop(struct obj *);
+static int menudrop_split(struct obj *, int);
 static boolean engulfer_digests_food(struct obj *);
 static int wipeoff(void);
 static int menu_drop(int);
@@ -825,15 +826,32 @@ doddrop(void)
     return result;
 }
 
+static int
+menudrop_split(struct obj *otmp, int cnt)
+{
+    if (cnt && cnt < otmp->quan) {
+        if (welded(otmp)) {
+            ; /* don't split */
+        } else if (otmp->otyp == LOADSTONE && otmp->cursed) {
+            /* same kludge as getobj(), for canletgo()'s use */
+            otmp->corpsenm = (int) cnt; /* don't split */
+        } else {
+            otmp = splitobj(otmp, cnt);
+        }
+    }
+    return drop(otmp);
+}
+
 /* Drop things from the hero's inventory, using a menu. */
 static int
 menu_drop(int retry)
 {
     int n, i, n_dropped = 0;
-    long cnt;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
+    boolean drop_justpicked = FALSE;
+    long justpicked_quan = 0;
 
     if (retry) {
         all_categories = (retry == -2);
@@ -842,7 +860,7 @@ menu_drop(int retry)
         n = query_category("Drop what type of items?", g.invent,
                            (UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL
                             | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
-                            | BUC_UNKNOWN | INCLUDE_VENOM),
+                            | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
         if (!n)
             goto drop_done;
@@ -851,6 +869,10 @@ menu_drop(int retry)
                 all_categories = TRUE;
             } else if (pick_list[i].item.a_int == 'A') {
                 drop_everything = autopick = TRUE;
+            } else if (pick_list[i].item.a_int == 'P') {
+                justpicked_quan = max(0, pick_list[i].count);
+                drop_justpicked = TRUE;
+                add_valid_menu_class(pick_list[i].item.a_int);
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
                 drop_everything = FALSE;
@@ -898,6 +920,11 @@ menu_drop(int retry)
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
         bypass_objlist(g.invent, FALSE);
+    } else if (drop_justpicked && count_justpicked(g.invent) == 1) {
+        /* drop the just picked item automatically, if only one stack */
+        otmp = find_justpicked(g.invent);
+        if (otmp)
+            n_dropped += menudrop_split(otmp, justpicked_quan);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &g.invent,
@@ -926,18 +953,7 @@ menu_drop(int retry)
                 if (!otmp2 || !otmp2->bypass)
                     continue;
                 /* found next selected invent item */
-                cnt = pick_list[i].count;
-                if (cnt < otmp->quan) {
-                    if (welded(otmp)) {
-                        ; /* don't split */
-                    } else if (otmp->otyp == LOADSTONE && otmp->cursed) {
-                        /* same kludge as getobj(), for canletgo()'s use */
-                        otmp->corpsenm = (int) cnt; /* don't split */
-                    } else {
-                        otmp = splitobj(otmp, cnt);
-                    }
-                }
-                n_dropped += drop(otmp);
+                n_dropped += menudrop_split(otmp, pick_list[i].count);
             }
             bypass_objlist(g.invent, FALSE); /* reset g.invent to normal */
             free((genericptr_t) pick_list);

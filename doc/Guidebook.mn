@@ -729,6 +729,8 @@ drop all objects known to be uncursed.
 drop all objects known to be cursed.
 .PL DX
 drop all objects of unknown B/U/C status.
+.PL DP
+drop objects picked up last.
 .PL Da
 drop all objects, without asking for confirmation.
 .PL Di
@@ -826,6 +828,8 @@ list all items known to be uncursed;
 list all items known to be cursed;
 .PL IX
 list all items whose bless/curse status is unknown;
+.PL IP
+list items picked up last;
 .PL I$
 count your money.
 .PE

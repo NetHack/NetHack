@@ -719,6 +719,9 @@ merged(struct obj **potmp, struct obj **pobj)
             otmp = *potmp = oname(otmp, ONAME(obj));
         obj_extract_self(obj);
 
+        if (obj->pickup_prev && otmp->where == OBJ_INVENT)
+            otmp->pickup_prev = 1;
+
         /* really should merge the timeouts */
         if (obj->lamplit)
             obj_merge_light_sources(obj, otmp);
@@ -877,6 +880,11 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     obj_was_thrown = obj->was_thrown;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
+    if (g.loot_reset_justpicked) {
+        g.loot_reset_justpicked = FALSE;
+        reset_justpicked(g.invent);
+    }
+
     addinv_core1(obj);
 
     /* for addinv_before(); if something has been removed and is now being
@@ -937,6 +945,7 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
         && (throwing_weapon(obj) || is_ammo(obj)))
         setuqwep(obj);
  added:
+    obj->pickup_prev = 1;
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
     if (update_perm_invent)
@@ -1164,6 +1173,7 @@ void
 freeinv(struct obj *obj)
 {
     extract_nobj(obj, &g.invent);
+    obj->pickup_prev = 0;
     freeinv_core(obj);
     update_inventory();
 }
@@ -1869,7 +1879,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
-    char sym, *ip, olets[MAXOCLASSES + 5], ilets[MAXOCLASSES + 10];
+    char sym, *ip, olets[MAXOCLASSES + 6], ilets[MAXOCLASSES + 11];
     char extra_removeables[3 + 1]; /* uwep,uswapwep,uquiver */
     char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
 
@@ -1908,6 +1918,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             ilets[iletct++] = 'C';
         if (count_buc(g.invent, BUC_UNKNOWN, ofilter))
             ilets[iletct++] = 'X';
+        if (count_justpicked(g.invent))
+            ilets[iletct++] = 'P';
         ilets[iletct++] = 'a';
     }
     ilets[iletct++] = 'i';
@@ -1988,8 +2000,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (sym == 'u') {
             add_valid_menu_class('u');
             ckfn = ckunpaid;
-        } else if (index("BUCX", sym)) {
-            add_valid_menu_class(sym); /* 'B','U','C',or 'X' */
+        } else if (index("BUCXP", sym)) {
+            add_valid_menu_class(sym); /* 'B','U','C','X', or 'P' */
             ckfn = ckvalidcat;
         } else if (sym == 'm') {
             m_seen = TRUE;
@@ -2916,7 +2928,7 @@ count_buc(struct obj *list, int type, boolean (*filterfunc)(OBJ_P))
    rather than looking for a specific type */
 void
 tally_BUCX(struct obj *list, boolean by_nexthere,
-           int *bcp, int *ucp, int *ccp, int *xcp, int *ocp)
+           int *bcp, int *ucp, int *ccp, int *xcp, int *ocp, int *jcp)
 {
     /* Future extensions:
      *  Skip current_container when list is invent, uchain when
@@ -2937,6 +2949,8 @@ tally_BUCX(struct obj *list, boolean by_nexthere,
                 ++(*ucp);
             continue;
         }
+        if (list->pickup_prev)
+            ++(*jcp);
         /* ordinary items */
         if (!list->bknown)
             ++(*xcp);
@@ -3109,6 +3123,9 @@ this_type_only(struct obj *obj)
         case 'X':
             res = !obj->bknown;
             break;
+        case 'P':
+            res = obj->pickup_prev;
+            break;
         default:
             break; /* use 'res' as-is */
         }
@@ -3124,7 +3141,7 @@ dotypeinv(void)
     int n, i = 0;
     char *extra_types, types[BUFSZ];
     int class_count, oclass, unpaid_count, itemcount;
-    int bcnt, ccnt, ucnt, xcnt, ocnt;
+    int bcnt, ccnt, ucnt, xcnt, ocnt, jcnt;
     boolean billx = *u.ushops && doinvbill(0);
     menu_item *pick_list;
     boolean traditional = TRUE;
@@ -3135,7 +3152,7 @@ dotypeinv(void)
         return 0;
     }
     unpaid_count = count_unpaid(g.invent);
-    tally_BUCX(g.invent, FALSE, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+    tally_BUCX(g.invent, FALSE, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt, &jcnt);
 
     if (flags.menu_style != MENU_TRADITIONAL) {
         if (flags.menu_style == MENU_FULL
@@ -3152,6 +3169,8 @@ dotypeinv(void)
                 i |= BUC_CURSED;
             if (xcnt)
                 i |= BUC_UNKNOWN;
+            if (jcnt)
+                i |= JUSTPICKED;
             i |= INCLUDE_VENOM;
             n = query_category(prompt, g.invent, i, &pick_list, PICK_ONE);
             if (!n)
@@ -3180,6 +3199,8 @@ dotypeinv(void)
             types[class_count++] = 'C';
         if (xcnt)
             types[class_count++] = 'X';
+        if (jcnt)
+            types[class_count++] = 'P';
         types[class_count] = '\0';
         /* add everything not already included; user won't see these */
         extra_types = eos(types);
@@ -3236,7 +3257,7 @@ dotypeinv(void)
         return 0;
     }
     if (traditional) {
-        if (index("BUCX", c))
+        if (index("BUCXP", c))
             oclass = c; /* not a class but understood by this_type_only() */
         else
             oclass = def_char_to_objclass(c); /* change to object class */
@@ -3260,6 +3281,9 @@ dotypeinv(void)
             case 'X':
                 after = " whose blessed/uncursed/cursed status is unknown";
                 break; /* better phrasing is desirable */
+            case 'P':
+                after = " you just picked up";
+                break;
             default:
                 /* 'c' is an object class, because we've already handled
                    all the non-class letters which were put into 'types[]';

@@ -46,6 +46,7 @@ static boolean able_to_loot(int, int, boolean);
 static boolean reverse_loot(void);
 static boolean mon_beside(int, int);
 static int do_loot_cont(struct obj **, int, int);
+static int doloot_core(void);
 static void tipcontainer(struct obj *);
 
 /* define for query_objlist() and autopickup() */
@@ -133,7 +134,7 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
     boolean not_everything, filtered;
     char qbuf[QBUFSZ];
     boolean m_seen;
-    int itemcount, bcnt, ucnt, ccnt, xcnt, ocnt;
+    int itemcount, bcnt, ucnt, ccnt, xcnt, ocnt, jcnt;
 
     oclasses[oclassct = 0] = '\0';
     *one_at_a_time = *everything = m_seen = FALSE;
@@ -159,7 +160,7 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
     if (count_unpaid(objs))
         ilets[iletct++] = 'u';
 
-    tally_BUCX(objs, here, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+    tally_BUCX(objs, here, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt, &jcnt);
     if (bcnt)
         ilets[iletct++] = 'B';
     if (ucnt)
@@ -168,6 +169,8 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
         ilets[iletct++] = 'C';
     if (xcnt)
         ilets[iletct++] = 'X';
+    if (jcnt)
+        ilets[iletct++] = 'P';
     ilets[iletct] = '\0';
 
     if (iletct > 1) {
@@ -203,8 +206,8 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
                 goto ask_again;
             } else if (sym == 'm') {
                 m_seen = TRUE;
-            } else if (index("uBUCX", sym)) {
-                add_valid_menu_class(sym); /* 'u' or 'B','U','C',or 'X' */
+            } else if (index("uBUCXP", sym)) {
+                add_valid_menu_class(sym); /* 'u' or 'B','U','C','X','P' */
                 filtered = TRUE;
             } else {
                 oc_of_sym = def_char_to_objclass(sym);
@@ -407,6 +410,7 @@ add_valid_menu_class(int c)
     if (c == 0) { /* reset */
         vmc_count = 0;
         g.class_filter = g.bucx_filter = g.shop_filter = FALSE;
+        g.picked_filter = FALSE;
     } else if (!menu_class_present(c)) {
         g.valid_menu_classes[vmc_count++] = (char) c;
         /* categorize the new class */
@@ -416,6 +420,9 @@ add_valid_menu_class(int c)
         case 'C': /*FALLTHRU*/
         case 'X':
             g.bucx_filter = TRUE;
+            break;
+        case 'P':
+            g.picked_filter = TRUE;
             break;
         case 'u':
             g.shop_filter = TRUE;
@@ -457,6 +464,8 @@ allow_category(struct obj *obj)
                  ? (index(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
                  : g.shop_filter /* coins are never unpaid, but check anyway */
                     ? (obj->unpaid ? TRUE : FALSE)
+            : g.picked_filter
+            ? obj->pickup_prev
                     : g.bucx_filter
                        ? (index(g.valid_menu_classes, flags.goldX ? 'X' : 'U')
                           ? TRUE : FALSE)
@@ -500,6 +509,8 @@ allow_category(struct obj *obj)
         if (!index(g.valid_menu_classes, bucx))
             return FALSE;
     }
+    if (g.picked_filter && !obj->pickup_prev)
+        return FALSE;
     /* obj didn't fail any of the filter checks, so accept */
     return TRUE;
 }
@@ -522,6 +533,41 @@ boolean
 is_worn_by_type(struct obj *otmp)
 {
     return (is_worn(otmp) && allow_category(otmp)) ? TRUE : FALSE;
+}
+
+/* reset last-picked-up flags */
+void
+reset_justpicked(struct obj *olist)
+{
+    struct obj *otmp;
+
+    for (otmp = olist; otmp; otmp = otmp->nobj)
+        otmp->pickup_prev = 0;
+}
+
+int
+count_justpicked(struct obj *olist)
+{
+    struct obj *otmp;
+    int cnt = 0;
+
+    for (otmp = olist; otmp; otmp = otmp->nobj)
+        if (otmp->pickup_prev)
+            cnt++;
+
+    return cnt;
+}
+
+struct obj *
+find_justpicked(struct obj *olist)
+{
+    struct obj *otmp;
+
+    for (otmp = olist; otmp; otmp = otmp->nobj)
+        if (otmp->pickup_prev)
+            return otmp;
+
+    return (struct obj *) 0;
 }
 
 /*
@@ -601,6 +647,7 @@ pickup(int what) /* should be a long */
             nomul(0);
     }
 
+    reset_justpicked(g.invent);
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
         objchain_p = &g.level.objects[u.ux][u.uy];
@@ -1083,6 +1130,7 @@ query_category(const char *qstr,      /* query string */
             do_buc_unknown = FALSE;
     int num_buc_types = 0;
     unsigned itemflags = MENU_ITEMFLAGS_NONE;
+    int num_justpicked = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist)
@@ -1106,6 +1154,9 @@ query_category(const char *qstr,      /* query string */
     if ((qflags & BUC_UNKNOWN) && count_buc(olist, BUC_UNKNOWN, ofilter)) {
         do_buc_unknown = TRUE;
         num_buc_types++;
+    }
+    if (qflags & JUSTPICKED) {
+        num_justpicked = count_justpicked(olist);
     }
 
     ccount = count_categories(olist, qflags);
@@ -1245,6 +1296,19 @@ query_category(const char *qstr,      /* query string */
         any.a_int = 'X';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
                  "Items of unknown Bless/Curse status", itemflags);
+    }
+    if (num_justpicked) {
+        char tmpbuf[BUFSZ];
+
+        if (num_justpicked == 1)
+            Sprintf(tmpbuf, "%s", doname(find_justpicked(olist)));
+        else
+            Sprintf(tmpbuf, "Items you just picked up");
+        invlet = 'P';
+        any = cg.zeroany;
+        any.a_int = 'P';
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
+                 tmpbuf, itemflags);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
@@ -1834,9 +1898,21 @@ do_loot_cont(struct obj **cobjp,
     return use_container(cobjp, 0, (boolean) (cindex < ccount));
 }
 
-/* loot a container on the floor or loot saddle from mon. */
+/* #loot extended command */
 int
 doloot(void)
+{
+    int res;
+
+    g.loot_reset_justpicked = TRUE;
+    res = doloot_core();
+    g.loot_reset_justpicked = FALSE;
+    return res;
+}
+
+/* loot a container on the floor or loot saddle from mon. */
+static int
+doloot_core(void)
 {
     struct obj *cobj, *nobj;
     register int c = -1;
@@ -2901,6 +2977,7 @@ menu_loot(int retry, boolean put_in)
     int n, i, n_looted = 0;
     boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
     char buf[BUFSZ];
+    boolean loot_justpicked = FALSE;
     const char *action = put_in ? "Put in" : "Take out";
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
@@ -2912,7 +2989,8 @@ menu_loot(int retry, boolean put_in)
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL);
+        mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
+                  | JUSTPICKED );
         n = query_category(buf, put_in ? g.invent : g.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
@@ -2920,6 +2998,10 @@ menu_loot(int retry, boolean put_in)
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == 'A') {
                 loot_everything = autopick = TRUE;
+            } else if (put_in && pick_list[i].item.a_int == 'P') {
+                loot_justpicked = TRUE;
+                count = max(0, pick_list[i].count);
+                add_valid_menu_class(pick_list[i].item.a_int);
             } else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else {
@@ -2958,10 +3040,22 @@ menu_loot(int retry, boolean put_in)
                 n_looted += res;
             }
         }
+    } else if (put_in && loot_justpicked && count_justpicked(g.invent) == 1) {
+        otmp = find_justpicked(g.invent);
+        if (otmp) {
+            n_looted = 1;
+            if (count > 0 && count < otmp->quan) {
+                otmp = splitobj(otmp, count);
+            }
+            (void) in_container(otmp);
+            /* return value doesn't matter, even if container blew up */
+        }
     } else {
         mflags = INVORDER_SORT | INCLUDE_VENOM;
         if (put_in && flags.invlet_constant)
             mflags |= USE_INVLET;
+        if (put_in && loot_justpicked)
+            mflags |= JUSTPICKED;
         if (!put_in)
             g.current_container->cknown = 1;
         Sprintf(buf, "%s what?", action);
