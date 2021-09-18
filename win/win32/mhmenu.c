@@ -73,8 +73,6 @@ typedef struct mswin_nethack_menu_window {
     BOOL is_active;
 } NHMenuWindow, *PNHMenuWindow;
 
-extern short glyph2tile[];
-
 static WNDPROC wndProcListViewOrig = NULL;
 static WNDPROC editControlWndProc = NULL;
 
@@ -1087,7 +1085,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
             monitorScale2 = win10_monitor_scale(hWnd);
 
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
-            ntile = glyph2tile[item->glyphinfo.glyph];
+            ntile = item->glyphinfo.gm.tileidx;
             t_x =
                 (ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X;
             t_y =

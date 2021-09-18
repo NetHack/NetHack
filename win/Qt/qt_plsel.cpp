@@ -82,14 +82,14 @@ public:
     {
     }
 
-    void setGlyph(int g, bool fem)
+    void setGlyph(int g, int tileidx, bool fem)
     {
 	NetHackQtGlyphs& glyphs = qt_settings->glyphs();
 	int gw = glyphs.width();
 	int gh = glyphs.height();
 	QPixmap pm(gw,gh);
 	QPainter p(&pm);
-	glyphs.drawGlyph(p, g, 0, 0, fem);
+	glyphs.drawGlyph(p, g, tileidx, 0, 0, fem);
 	p.end();
 	setIcon(QIcon(pm));
 	//RLC setHeight(std::max(pm.height()+1,height()));
@@ -124,7 +124,10 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(roles[id].malenum), false);
+	glyph_info gi;
+	int glyph = monnum_to_glyph(roles[id].malenum, MALE);
+	map_glyphinfo(0, 0, glyph, 0, &gi);
+	setGlyph(glyph, gi.gm.tileidx, false);
     }
 };
 
@@ -139,7 +142,10 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(races[id].malenum), false);
+	glyph_info gi;
+	int glyph = monnum_to_glyph(races[id].malenum, MALE);
+	map_glyphinfo(0, 0, glyph, 0, &gi);
+	setGlyph(glyph, gi.gm.tileidx, false);
     }
 };
 

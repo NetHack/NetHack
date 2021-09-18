@@ -59,9 +59,6 @@ extern int ReadPlanarTileFile_O(int, struct overview_planar_cell_struct **);
 #ifdef PACKED_FILE
 extern int ReadPackedTileFile(int, char (*)[TILE_X]);
 #endif
-
-extern short glyph2tile[MAX_GLYPH]; /* in tile.c (made from tilemap.c) */
-
 #endif /* USE_TILES */
 
 /* pctiles.h */

@@ -11,10 +11,6 @@ extern int dotcnt; /* shared with save */
 extern int dotrow; /* shared with save */
 #endif
 
-#ifdef USE_TILES
-extern void substitute_tiles(d_level *); /* from tile.c */
-#endif
-
 #ifdef ZEROCOMP
 static void zerocomp_minit(void);
 static void zerocomp_mread(int, genericptr_t, unsigned int);
@@ -852,9 +848,7 @@ dorecover(NHFILE* nhfp)
         (void) delete_savefile();
     if (Is_rogue_level(&u.uz))
         assign_graphics(ROGUESET);
-#ifdef USE_TILES
-    substitute_tiles(&u.uz);
-#endif
+    reset_glyphmap(gm_levelchange);
     max_rank_sz(); /* to recompute g.mrank_sz (botl.c) */
     init_oclass_probs(); /* recompute g.oclass_prob_totals[] */
     /* take care of iron ball & chain */

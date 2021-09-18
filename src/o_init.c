@@ -13,8 +13,8 @@ static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *oclass_to_name(char, char *);
 
 #ifdef USE_TILES
+extern glyph_map glyphmap[MAX_GLYPH];
 static void shuffle_tiles(void);
-extern short glyph2tile[]; /* from tile.c */
 
 /* Shuffle tile assignments to match descriptions, so a red potion isn't
  * displayed with a blue tile and so on.
@@ -29,13 +29,16 @@ static void
 shuffle_tiles(void)
 {
     int i;
-    short tmp_tilemap[NUM_OBJECTS];
+    short tmp_tilemap[2][NUM_OBJECTS];
 
-    for (i = 0; i < NUM_OBJECTS; i++)
-        tmp_tilemap[i] = glyph2tile[objects[i].oc_descr_idx + GLYPH_OBJ_OFF];
-
-    for (i = 0; i < NUM_OBJECTS; i++)
-        glyph2tile[i + GLYPH_OBJ_OFF] = tmp_tilemap[i];
+    for (i = 0; i < NUM_OBJECTS; i++) {
+        tmp_tilemap[0][i] = glyphmap[objects[i].oc_descr_idx + GLYPH_OBJ_OFF].tileidx;
+        tmp_tilemap[1][i] = glyphmap[objects[i].oc_descr_idx + GLYPH_OBJ_PILETOP_OFF].tileidx;
+    }
+    for (i = 0; i < NUM_OBJECTS; i++) {
+        glyphmap[i + GLYPH_OBJ_OFF].tileidx = tmp_tilemap[0][i];
+        glyphmap[i + GLYPH_OBJ_PILETOP_OFF].tileidx = tmp_tilemap[1][i];
+    }
 }
 #endif /* USE_TILES */
 

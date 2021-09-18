@@ -222,7 +222,7 @@ typedef uchar nhsym;
     || defined(WIN32)
 #ifndef NO_TILE_C
 #ifndef USE_TILES
-#define USE_TILES /* glyph2tile[] will be available */
+#define USE_TILES /* glyphmap[] with prefilled tile mappings will be available */
 #endif
 #endif
 #endif

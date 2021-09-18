@@ -23,14 +23,16 @@ public:
 	void toggleSize();
 	void setSize(int w, int h);
 
-        void drawGlyph(QPainter &, int glyph, int pixelx, int pixely,
+        void drawGlyph(QPainter &, int glyph, int tileidx,
+                       int pixelx, int pixely,
                        bool fem, bool reversed = false);
-        void drawCell(QPainter &, int glyph, int cellx, int celly, bool fem);
-        void drawBorderedCell(QPainter &, int glyph,
+        void drawCell(QPainter &, int glyph, int tileidx,
+                      int cellx, int celly, bool fem);
+        void drawBorderedCell(QPainter &, int glyph, int tileidx,
                               int cellx, int celly, int bordercode,
                               bool reversed, bool fem = false);
-        QPixmap glyph(int glyphindx, bool fem = false);
-        QPixmap reversed_pixmap(int glyphindx, bool fem = false);
+        QPixmap glyph(int glyphindx, int tileidx, bool fem = false);
+        QPixmap reversed_pixmap(int glyphindx, int tileidx, bool fem = false);
 
 private:
 	QImage img;

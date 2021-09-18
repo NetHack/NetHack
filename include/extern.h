@@ -381,6 +381,7 @@ extern void set_wall_state(void);
 extern void unset_seenv(struct rm *, int, int, int, int);
 extern int warning_of(struct monst *);
 extern void map_glyphinfo(xchar, xchar, int, unsigned, glyph_info *);
+extern void reset_glyphmap(enum glyphmap_change_triggers trigger);
 
 /* ### do.c ### */
 

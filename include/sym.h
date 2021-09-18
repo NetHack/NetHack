@@ -27,7 +27,7 @@ enum mon_syms {
 #ifndef MAKEDEFS_C
 
 /* Default characters for dungeon surroundings and furniture */
-enum screen_symbols {
+enum cmap_symbols {
 #define PCHAR_S_ENUM
 #include "defsym.h"
 #undef PCHAR_S_ENUM

@@ -296,8 +296,9 @@ tile2beos: tile2beos.o $(TEXT_IO)
 #  that without mucking about with extra OS-specific CFLAGS and/or LFLAGS
 #tilemap: ../win/share/tilemap.c $(HACK_H)
 #	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
-tilemap: tilemap.o
-	$(CLINK) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
+tilemap: tilemap.o $(OBJDIR)/objects.o $(OBJDIR)/monst.o $(OBJDIR)/drawing.o
+	$(CLINK) $(LFLAGS) -o tilemap tilemap.o $(OBJDIR)/objects.o  \
+		$(OBJDIR)/monst.o  $(OBJDIR)/drawing.o $(LIBS)
 ../src/tile.c: tilemap
 	./tilemap
 

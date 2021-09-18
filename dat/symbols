@@ -355,8 +355,8 @@ start: IBMgraphics
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_expl_ml: \xb3		# meta-3, vertical rule
-	S_expl_mr: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3			# meta-3, vertical rule
+	S_expl_mr: \xb3			# meta-3, vertical rule
 finish
 
 start: IBMGraphics_1
@@ -377,8 +377,8 @@ start: IBMGraphics_1
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_expl_ml: \xb3		# meta-3, vertical rule
-	S_expl_mr: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3			# meta-3, vertical rule
+	S_expl_mr: \xb3			# meta-3, vertical rule
 finish
 
 start: IBMGraphics_2
@@ -403,8 +403,8 @@ start: IBMGraphics_2
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_expl_ml: \xb3		# meta-3, vertical rule
-	S_expl_mr: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3			# meta-3, vertical rule
+	S_expl_mr: \xb3			# meta-3, vertical rule
 finish
 
 start: RogueIBM
@@ -574,8 +574,8 @@ start: curses
 	S_hbeam: \xf1			# meta-D, horizontal rule
 	S_sw_ml: \xf8			# meta-3, vertical rule
 	S_sw_mr: \xf8			# meta-3, vertical rule
-	S_expl_ml: \xf8		# meta-3, vertical rule
-	S_expl_mr: \xf8		# meta-3, vertical rule
+	S_expl_ml: \xf8			# meta-3, vertical rule
+	S_expl_mr: \xf8			# meta-3, vertical rule
 finish
 
 start: DECgraphics
@@ -619,7 +619,7 @@ start: DECgraphics
 	S_expl_tc: \xef			# meta-o, high horizontal line
 	S_expl_ml: \xf8			# meta-x, vertical rule
 	S_expl_mr: \xf8			# meta-x, vertical rule
-	S_expl_bc: \xf3		# meta-s, low horizontal line
+	S_expl_bc: \xf3			# meta-s, low horizontal line
 finish
 
 start: MACgraphics

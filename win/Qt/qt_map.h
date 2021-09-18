@@ -46,6 +46,10 @@ private:
         unsigned int &Glyphflags(int x, int y) {
             return glyphflags[y][x];
         }
+        unsigned short glyphtileidx[ROWNO][COLNO];
+        unsigned short &Glyphtileidx(int x, int y) {
+            return glyphtileidx[y][x];
+        }
         QPoint cursor;
         QPixmap pet_annotation;
         QPixmap pile_annotation;

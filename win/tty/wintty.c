@@ -40,7 +40,6 @@ extern void msmsg(const char *, ...);
 #define VT_ANSI_COMMAND 'z'
 #endif
 #ifdef TTY_TILES_ESCCODES
-extern short glyph2tile[];
 #define AVTC_GLYPH_START   0
 #define AVTC_GLYPH_END     1
 #define AVTC_SELECT_WINDOW 2
@@ -3359,7 +3358,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
 {
     boolean inverse_on = FALSE;
     int ch, color;
-#if defined(TTY_TILES_ESCCODES) || defined(MSDOS)
+#if defined(TTY_TILES_ESCCODES)
     int glyph;
 #endif
     unsigned special;
@@ -3372,19 +3371,19 @@ tty_print_glyph(winid window, xchar x, xchar y,
     }
 #endif
     /* get glyph ttychar, color, and special flags */
-#if defined(TTY_TILES_ESCCODES) || defined(MSDOS)
+#if defined(TTY_TILES_ESCCODES)
     glyph = glyphinfo->glyph;
 #endif
     ch = glyphinfo->ttychar;
-    color = glyphinfo->color;
-    special = glyphinfo->glyphflags;
+    color = glyphinfo->gm.color;
+    special = glyphinfo->gm.glyphflags;
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
     /* Move the cursor. */
     tty_curs(window, x, y);
 
-    print_vt_code3(AVTC_GLYPH_START, glyph2tile[glyph], special);
+    print_vt_code3(AVTC_GLYPH_START, glyphinfo->tileidx, special);
 
 #ifndef NO_TERMS
     if (ul_hack && ch == '_') { /* non-destructive underscore */
@@ -3424,7 +3423,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
 
 #if defined(USE_TILES) && defined(MSDOS)
     if (iflags.grmode && iflags.tile_view)
-        xputg(glyph, ch, special);
+        xputg(glyphinfo);
     else
 #endif
         g_putch(ch); /* print the character */

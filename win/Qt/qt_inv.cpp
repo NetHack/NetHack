@@ -75,6 +75,7 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
                                        const char *alttip, int flags)
 {
     short int glyph;
+    glyph_info gi;
     int border;
     char tipstr[1 + BUFSZ + 1]; // extra room for leading and trailing space
     bool rev = (flags == dollReverse),
@@ -112,6 +113,8 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
             tips[x][y] = dupstr(tipstr);
 #endif
         glyph = obj_to_glyph(nhobj, rn2_on_display_rng);
+	map_glyphinfo(0, 0, glyph, 0, &gi); /* this skirts the defined
+					       interface unfortunately */
     } else {
         border = NO_BORDER;
 #ifdef ENHANCED_PAPERDOLL
@@ -133,7 +136,7 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
         // an empty slot is shown as floor tile unless it's always empty
         glyph = canbe ? cmap_to_glyph(S_room) : GLYPH_UNEXPLORED;
     }
-    qt_settings->glyphs().drawBorderedCell(painter, glyph, x, y, border, rev);
+    qt_settings->glyphs().drawBorderedCell(painter, glyph, gi.gm.tileidx, x, y, border, rev);
 }
 
 // called to update the paper doll inventory subset

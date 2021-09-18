@@ -593,17 +593,17 @@ xputc(int ch) /* write out character (and attribute) */
 }
 
 /* write out a glyph picture at current location */
-void xputg(int glyphnum, int ch, unsigned special)
+void xputg(const glyph_info *glyphinfo)
 {
     if (!iflags.grmode || !iflags.tile_view) {
-        (void) xputc((char) ch);
+        (void) xputc((char) glyphinfo->ttychar);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
-        vga_xputg(glyphnum, ch, special);
+        vga_xputg(glyphinfo);
 #endif
 #ifdef SCREEN_VESA
     } else if (iflags.grmode && iflags.usevesa) {
-        vesa_xputg(glyphnum, ch, special);
+        vesa_xputg(glyphinfo);
 #endif
     }
 }

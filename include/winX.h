@@ -61,6 +61,7 @@ struct text_map_info_t {
 
 struct tile_glyph_info_t {
     unsigned short glyph;
+    unsigned short tileidx;
     unsigned glyphflags;
 };
 

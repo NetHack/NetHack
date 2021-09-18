@@ -4129,6 +4129,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         case opt_ascii_map:
         case opt_tiled_map:
             g.opt_need_redraw = TRUE;
+            g.opt_need_glyph_reset = TRUE;
             break;
         case opt_hilite_pet:
 #ifdef CURSES_GRAPHICS
@@ -4166,6 +4167,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             }
 #endif
             g.opt_need_redraw = TRUE;
+            g.opt_need_glyph_reset = TRUE;
             break;
         case opt_menucolors:
         case opt_guicolor:
@@ -5839,7 +5841,7 @@ initoptions_finish(void)
     if (sym)
         g.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
     reglyph_darkroom();
-
+    reset_glyphmap(gm_optionchange);
 #ifdef STATUS_HILITES
     /*
      * A multi-interface binary might only support status highlighting
@@ -7347,6 +7349,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 #endif
     end_menu(tmpwin, "Set what options?");
     g.opt_need_redraw = FALSE;
+    g.opt_need_glyph_reset = FALSE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
         /*
          * Walk down the selection list and either invert the booleans
@@ -7394,6 +7397,9 @@ doset(void) /* changing options via menu by Per Liboriussen */
     }
 
     destroy_nhwindow(tmpwin);
+    if (g.opt_need_glyph_reset) {
+        reset_glyphmap(gm_optionchange);
+    }
     if (g.opt_need_redraw) {
         check_gold_symbol();
         reglyph_darkroom();

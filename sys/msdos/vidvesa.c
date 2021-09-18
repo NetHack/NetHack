@@ -85,6 +85,7 @@ static struct map_struct {
     int ch;
     int attr;
     unsigned special;
+    short int tileidx;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
 #define vesa_clearmap()                                   \
@@ -667,14 +668,13 @@ vesa_xputc(char ch, int attr)
 #if defined(USE_TILES)
 /* Place tile represent. a glyph at current location */
 void
-vesa_xputg(int glyphnum, int ch,
-           unsigned special) /* special feature: corpse, invis, detected, pet, ridden -
-                                hack.h */
+vesa_xputg(const glyph_info *glyphinfo)
 {
+    int glyphnum = glyphinfo->glyph, ch = glyphinfo->ttychar;
+    unsigned special = glyphinfo->gm.glyphflags;
     int col, row;
     int attr;
     int ry;
-    int tilenum = 0;
 
     row = currow;
     col = curcol;
@@ -685,6 +685,7 @@ vesa_xputg(int glyphnum, int ch,
     map[ry][col].glyph = glyphnum;
     map[ry][col].ch = ch;
     map[ry][col].special = special;
+    map[ry][col].tileidx = glyphinfo->gm.tileidx;
     attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     map[ry][col].attr = attr;
     if (iflags.traditional_view) {
@@ -696,10 +697,7 @@ vesa_xputg(int glyphnum, int ch,
             if (!iflags.over_view && map[ry][col].special)
                 decal_packed(packcell, special);
 #endif
-            tilenum = glyph2tile[glyphnum];
-            if (map[ry][col].special & MG_FEMALE)
-                tilenum++;
-            vesa_DisplayCell(tilenum, col - clipx, ry - clipy);
+            vesa_DisplayCell(glyphinfo->gm.tileidx, col - clipx, ry - clipy);
         }
     }
     if (col < (CO - 1))
@@ -807,7 +805,7 @@ vesa_redrawmap(void)
         for (cy = 0; cy < ROWNO; ++cy) {
             for (py = 0; py < vesa_oview_height; ++py) {
                 for (cx = 0; cx < COLNO; ++cx) {
-                    tile = vesa_oview_tiles[glyph2tile[map[cy][cx].glyph]];
+                    tile = vesa_oview_tiles[map[cy][cx].tileidx];
                     vesa_WritePixelRow(offset + p_row_width * cx, tile + p_row_width * py, p_row_width);
                 }
                 x = COLNO * vesa_oview_width;
@@ -827,7 +825,7 @@ vesa_redrawmap(void)
         for (cy = clipy; cy <= (unsigned) clipymax && cy < ROWNO; ++cy) {
             for (py = 0; py < (unsigned) iflags.wc_tile_height; ++py) {
                 for (cx = clipx; cx <= (unsigned) clipxmax && cx < COLNO; ++cx) {
-                    tile = vesa_tiles[glyph2tile[map[cy][cx].glyph]];
+                    tile = vesa_tiles[map[cy][cx].tileidx];
                     vesa_WritePixelRow(offset + p_row_width * (cx - clipx), tile + p_row_width * py, p_row_width);
                 }
                 x = (cx - clipx) * iflags.wc_tile_width;

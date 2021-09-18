@@ -747,9 +747,9 @@ curses_print_glyph(winid wid, xchar x, xchar y,
     int attr = -1;
 
     glyph = glyphinfo->glyph;
-    special = glyphinfo->glyphflags;
+    special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
-    color = glyphinfo->color;
+    color = glyphinfo->gm.color;
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }

@@ -257,9 +257,9 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
             else
                 otmp->corpsenm = MCORPSENM(mtmp);
         } else if (otmp->otyp == CORPSE && glyph_is_body(glyph)) {
-            otmp->corpsenm = glyph - GLYPH_BODY_OFF;
+            otmp->corpsenm = glyph_to_body_corpsenm(glyph);
         } else if (otmp->otyp == STATUE && glyph_is_statue(glyph)) {
-            otmp->corpsenm = glyph - GLYPH_STATUE_OFF;
+            otmp->corpsenm = glyph_to_statue_corpsenm(glyph);
         }
         if (otmp->otyp == LEASH)
             otmp->leashmon = 0;

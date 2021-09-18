@@ -120,10 +120,10 @@ boolean read_gif_tile(pixel[TILE_Y][TILE_X]);
 Array provided by shared code for NetHack use, by compiling and running
 tilemap.c to form tile.c:
 
-short glyph2tile[MAXGLYPH];
-	maps glyph number to tile number for display purposes, assuming
-	(non-blank) tiles are numbered sequentially through
-	monsters/objects/other
+glyph_map glyphmap[MAXGLYPH];
+	maps glyph number to tile number, ( and later to ttychar, symidx,
+        glyphflags) for display purposes, assuming (non-blank) tiles are
+        numbered sequentially through monsters/objects/other
 
 tilemap.c (shudder) accounts for things disappearing due to compilation
 options -- there should be a tile for everything appearing under any

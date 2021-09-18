@@ -1375,7 +1375,7 @@ glyph2symidx(int glyph)
     glyph_info glyphinfo;
 
     map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
-    return glyphinfo.symidx;
+    return glyphinfo.gm.symidx;
 }
 
 char *
@@ -1419,7 +1419,7 @@ decode_mixed(char *buf, const char *str)
                         else
                             break;
                     map_glyphinfo(0, 0, gv, 0, &glyphinfo);
-                    so = glyphinfo.symidx;
+                    so = glyphinfo.gm.symidx;
                     *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */

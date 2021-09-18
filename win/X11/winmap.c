@@ -45,8 +45,7 @@
 #endif
 
 /* from tile.c */
-extern short glyph2tile[];
-extern int total_tiles_used;
+extern int total_tiles_used, Tile_corr;
 
 /* Define these if you really want a lot of junk on your screen. */
 /* #define VERBOSE */        /* print various info & events as they happen */
@@ -87,10 +86,16 @@ X11_print_glyph(winid window, xchar x, xchar y, const glyph_info *glyphinfo,
 
     /* update both the tile and text backing stores */
     {
-        unsigned short *t_ptr = &map_info->tile_map.glyphs[y][x].glyph;
+        unsigned short *g_ptr = &map_info->tile_map.glyphs[y][x].glyph,
+                       *t_ptr = &map_info->tile_map.glyphs[y][x].tileidx;
 
-        if (*t_ptr != glyphinfo->glyph) {
-            *t_ptr = glyphinfo->glyph;
+        if (*g_ptr != glyphinfo->glyph) {
+            *g_ptr = glyphinfo->glyph;
+            if (map_info->is_tile)
+                update_bbox = TRUE;
+        }
+        if (*t_ptr != glyphinfo->gm.tileidx) {
+            *t_ptr = glyphinfo->gm.tileidx;
             if (map_info->is_tile)
                 update_bbox = TRUE;
         }
@@ -105,8 +110,8 @@ X11_print_glyph(winid window, xchar x, xchar y, const glyph_info *glyphinfo,
         register unsigned char *co_ptr;
 #endif
 
-        color = glyphinfo->color;
-        special = glyphinfo->glyphflags;
+        color = glyphinfo->gm.color;
+        special = glyphinfo->gm.glyphflags;
         och = glyphinfo->ttychar;
         ch = (uchar) och;
 
@@ -530,7 +535,11 @@ ntiles %ld\n",
     values.foreground =
         WhitePixelOfScreen(screen)
         ^ XGetPixel(tile_image, 0,
+#if 0
                     tile_height * glyph2tile[cmap_to_glyph(S_corr)]);
+#else
+                    tile_height * T_corr);
+#endif
     values.function = GXxor;
     tile_info->white_gc = XtGetGC(wp->w, mask, &values);
 
@@ -1251,14 +1260,21 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
         for (row = start_row; row <= stop_row; row++) {
             for (cur_col = start_col; cur_col <= stop_col; cur_col++) {
+#if 0
                 int glyph = tile_map->glyphs[row][cur_col].glyph;
                 int tile = glyph2tile[glyph];
+#else
+                int tile = tile_map->glyphs[row][cur_col].tileidx;
+#endif
                 int src_x, src_y;
                 int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
 
+#if 0
+                /* not required with the new glyph representations */
                 if ((tile_map->glyphs[row][cur_col].glyphflags & MG_FEMALE))
                     tile++; /* advance to the female tile variation */
+#endif
                 src_x = (tile % TILES_PER_ROW) * tile_width;
                 src_y = (tile / TILES_PER_ROW) * tile_height;
                 XCopyArea(dpy, tile_pixmap, XtWindow(wp->w),

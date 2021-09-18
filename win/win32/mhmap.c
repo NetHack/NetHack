@@ -24,8 +24,6 @@
 #define CURSOR_BLINK_INTERVAL 1000 // milliseconds
 #define CURSOR_HEIGHT 2 // pixels
 
-extern short glyph2tile[];
-
 #define TILEBMP_X(ntile) \
     ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
 #define TILEBMP_Y(ntile) \
@@ -825,7 +823,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 
     if (bkglyph != NO_GLYPH) {
-        ntile = glyph2tile[bkglyph];
+        ntile = data->bkmap[i][j].gm.tileidx;
         t_x = TILEBMP_X(ntile);
         t_y = TILEBMP_Y(ntile);
 
@@ -838,9 +836,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
 
     if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
         /* rely on NetHack core helper routine */
-        ntile = glyph2tile[glyph];
-        if (data->map[i][j].glyphflags & MG_FEMALE)
-            ntile++;
+        ntile = data->map[i][j].gm.tileidx;
         t_x = TILEBMP_X(ntile);
         t_y = TILEBMP_Y(ntile);
 
@@ -861,7 +857,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
     }
 
 #ifdef USE_PILEMARK
-    if ((glyph != NO_GLYPH) && (data->map[i][j].glyphflags & MG_PET)
+    if ((glyph != NO_GLYPH) && (data->map[i][j].gm.glyphflags & MG_PET)
 #else
     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
 #endif
@@ -884,7 +880,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
         DeleteDC(hdcPetMark);
     }
 #ifdef USE_PILEMARK
-    if ((glyph != NO_GLYPH) && (data->map[i][j].glyphflags & MG_OBJPILE)
+    if ((glyph != NO_GLYPH) && (data->map[i][j].gm.glyphflags & MG_OBJPILE)
         && iflags.hilite_pile) {
         /* apply pilemark transparently over other image */
         HDC hdcPileMark;
@@ -934,9 +930,9 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
     #else
         ch = (char) data->map[i][j].ttychar;
-        color = (int) data->map[i][j].color;
-        if (((data->map[i][j].glyphflags & MG_PET) && iflags.hilite_pet)
-            || ((data->map[i][j].glyphflags & (MG_DETECT | MG_BW_LAVA))
+        color = (int) data->map[i][j].gm.color;
+        if (((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
+            || ((data->map[i][j].gm.glyphflags & (MG_DETECT | MG_BW_LAVA))
                 && iflags.use_inverse)) {
             back_brush =
                 CreateSolidBrush(nhcolor_to_RGB(CLR_GRAY));
@@ -1004,8 +1000,9 @@ static void setGlyph(PNHMapWindow data, int i, int j,
     if ((data->map[i][j].glyph != fg->glyph)
             || (data->bkmap[i][j].glyph != bg->glyph)
         || data->map[i][j].ttychar != fg->ttychar
-        || data->map[i][j].color != fg->color
-        || data->map[i][j].glyphflags != fg->glyphflags) {
+        || data->map[i][j].gm.color != fg->gm.color
+        || data->map[i][j].gm.glyphflags != fg->gm.glyphflags
+        || data->map[i][j].gm.tileidx != fg->gm.tileidx) {
         data->map[i][j] = *fg;
         data->bkmap[i][j] = *bg;
         data->locDirty[i][j] = TRUE;

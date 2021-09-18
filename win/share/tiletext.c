@@ -50,9 +50,9 @@ static const int graymappings[] = {
 };
 
 void
-set_grayscale(int g)
+set_grayscale(int gs)
 {
-    grayscale = g;
+    grayscale = gs;
 }
 
 static void

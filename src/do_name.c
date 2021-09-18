@@ -370,7 +370,8 @@ gather_locs_interesting(int x, int y, int gloc)
         /* unlike '/M', this skips monsters revealed by
            warning glyphs and remembered unseen ones */
         return (glyph_is_monster(glyph)
-                && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+                && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL,MALE) &&
+                   glyph != monnum_to_glyph(PM_LONG_WORM_TAIL, FEMALE));
     case GLOC_OBJS:
         return (glyph_is_object(glyph)
                 && glyph != objnum_to_glyph(BOULDER)

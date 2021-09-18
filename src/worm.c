@@ -491,9 +491,12 @@ detect_wsegs(struct monst *worm, boolean use_detection_glyph)
     int what_tail = what_mon(PM_LONG_WORM_TAIL, newsym_rn2);
 
     while (curr != wheads[worm->wormno]) {
-        num = use_detection_glyph ? detected_monnum_to_glyph(what_tail)
-              : worm->mtame ? petnum_to_glyph(what_tail)
-                : monnum_to_glyph(what_tail);
+        num = use_detection_glyph ? detected_monnum_to_glyph(what_tail,
+                    worm->female ? FEMALE : MALE)
+              : worm->mtame ? petnum_to_glyph(what_tail,
+                    worm->female ? FEMALE : MALE)
+                : monnum_to_glyph(what_tail,
+                    worm->female ? FEMALE : MALE);
         show_glyph(curr->wx, curr->wy, num);
         curr = curr->nseg;
     }

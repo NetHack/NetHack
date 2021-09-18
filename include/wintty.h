@@ -125,7 +125,7 @@ E void tty_shutdown(void);
 E int xputc(int);
 E void xputs(const char *);
 #if defined(SCREEN_VGA) || defined(SCREEN_8514)
-E void xputg(int, int, unsigned);
+E void xputg(const glyph_info *);
 #endif
 E void cl_end(void);
 E void clear_screen(void);

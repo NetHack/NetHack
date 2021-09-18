@@ -1136,7 +1136,7 @@ mswin_add_menu(winid wid, const glyph_info *glyphinfo,
 {
     boolean presel = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     logDebug("mswin_add_menu(%d, %d, %u, %p, %c, %c, %d, %s, %u)\n", wid,
-             glyphinfo->glyph, glyphinfo->glyphflags,
+             glyphinfo->glyph, glyphinfo->gm.glyphflags,
              identifier, (char) accelerator, (char) group_accel, attr, str,
              itemflags);
     if ((wid >= 0) && (wid < MAXWINDOWS)
