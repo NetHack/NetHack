@@ -2982,7 +2982,7 @@ menu_loot(int retry, boolean put_in)
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
     int mflags, res;
-    long count;
+    long count = 0;
 
     if (retry) {
         all_categories = (retry == -2);
