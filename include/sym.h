@@ -76,7 +76,7 @@ struct symsetentry {
 
 #define MAXDCHARS (S_water - S_stone + 1) /* mapped dungeon characters */
 #define MAXTCHARS (S_vibrating_square - S_arrow_trap + 1) /* trap chars */
-#define MAXECHARS (S_explode9 - S_vbeam + 1) /* mapped effects characters */
+#define MAXECHARS (S_expl_br - S_vbeam + 1) /* mapped effects characters */
 #define MAXEXPCHARS 9 /* number of explosion characters */
 
 #define DARKROOMSYM (Is_rogue_level(&u.uz) ? S_stone : S_darkroom)

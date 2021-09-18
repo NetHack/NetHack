@@ -2217,7 +2217,7 @@ map_glyphinfo(xchar x, xchar y, int glyph,
         else
             zap_color((offset >> 2));
     } else if ((offset = (glyph - GLYPH_EXPLODE_OFF)) >= 0) { /* explosion */
-        idx = ((offset % MAXEXPCHARS) + S_explode1) + SYM_OFF_P;
+        idx = ((offset % MAXEXPCHARS) + S_expl_tl) + SYM_OFF_P;
         explode_color(offset / MAXEXPCHARS);
     } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) { /* cmap */
         idx = offset + SYM_OFF_P;

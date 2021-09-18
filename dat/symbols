@@ -127,15 +127,15 @@ start: NHAccess
 	S_sw_bl: \092
 	S_sw_bc: \045
 	S_sw_br: \047
-	S_explode1: \047
-	S_explode2: \045
-	S_explode3: \092
-	S_explode4: \058
-	S_explode5: \032
-	S_explode6: \058
-	S_explode7: \092
-	S_explode8: \045
-	S_explode9: \047
+	S_expl_tl: \047
+	S_expl_tc: \045
+	S_expl_tr: \092
+	S_expl_ml: \058
+	S_expl_mc: \032
+	S_expl_mr: \058
+	S_expl_bl: \092
+	S_expl_bc: \045
+	S_expl_br: \047
 finish
 
 # All symbols are spaces
@@ -180,15 +180,15 @@ start: Blank
         S_dragon: \032
         S_eel: \032
         S_elemental: \032
-        S_explode1: \032
-        S_explode2: \032
-        S_explode3: \032
-        S_explode4: \032
-        S_explode5: \032
-        S_explode6: \032
-        S_explode7: \032
-        S_explode8: \032
-        S_explode9: \032
+        S_expl_tl: \032
+        S_expl_tc: \032
+        S_expl_tr: \032
+        S_expl_ml: \032
+        S_expl_mc: \032
+        S_expl_mr: \032
+        S_expl_bl: \032
+        S_expl_bc: \032
+        S_expl_br: \032
         S_eye: \032
         S_falling_rock_trap: \032
         S_feline: \032
@@ -355,8 +355,8 @@ start: IBMgraphics
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_explode4: \xb3		# meta-3, vertical rule
-	S_explode6: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3		# meta-3, vertical rule
+	S_expl_mr: \xb3		# meta-3, vertical rule
 finish
 
 start: IBMGraphics_1
@@ -377,8 +377,8 @@ start: IBMGraphics_1
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_explode4: \xb3		# meta-3, vertical rule
-	S_explode6: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3		# meta-3, vertical rule
+	S_expl_mr: \xb3		# meta-3, vertical rule
 finish
 
 start: IBMGraphics_2
@@ -403,8 +403,8 @@ start: IBMGraphics_2
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
 	S_sw_mr: \xb3			# meta-3, vertical rule
-	S_explode4: \xb3		# meta-3, vertical rule
-	S_explode6: \xb3		# meta-3, vertical rule
+	S_expl_ml: \xb3		# meta-3, vertical rule
+	S_expl_mr: \xb3		# meta-3, vertical rule
 finish
 
 start: RogueIBM
@@ -574,8 +574,8 @@ start: curses
 	S_hbeam: \xf1			# meta-D, horizontal rule
 	S_sw_ml: \xf8			# meta-3, vertical rule
 	S_sw_mr: \xf8			# meta-3, vertical rule
-	S_explode4: \xf8		# meta-3, vertical rule
-	S_explode6: \xf8		# meta-3, vertical rule
+	S_expl_ml: \xf8		# meta-3, vertical rule
+	S_expl_mr: \xf8		# meta-3, vertical rule
 finish
 
 start: DECgraphics
@@ -616,10 +616,10 @@ start: DECgraphics
 	S_sw_ml: \xf8			# meta-x, vertical rule
 	S_sw_mr: \xf8			# meta-x, vertical rule
 	S_sw_bc: \xf3			# meta-s, low horizontal line
-	S_explode2: \xef		# meta-o, high horizontal line
-	S_explode4: \xf8		# meta-x, vertical rule
-	S_explode6: \xf8		# meta-x, vertical rule
-	S_explode8: \xf3		# meta-s, low horizontal line
+	S_expl_tc: \xef			# meta-o, high horizontal line
+	S_expl_ml: \xf8			# meta-x, vertical rule
+	S_expl_mr: \xf8			# meta-x, vertical rule
+	S_expl_bc: \xf3		# meta-s, low horizontal line
 finish
 
 start: MACgraphics

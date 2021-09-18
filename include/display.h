@@ -379,7 +379,7 @@ enum explosion_types {
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx) + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype, idx) \
-    ((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
+    ((((expltype) * MAXEXPCHARS) + ((idx) - S_expl_tl)) + GLYPH_EXPLODE_OFF)
 
 #define trap_to_glyph(trap)                                \
     cmap_to_glyph(trap_to_defsym((trap)->ttyp))

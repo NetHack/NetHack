@@ -7827,9 +7827,17 @@ match_sym(char *buf)
         const char *altnm;
         const char *nm;
     } alternates[] = {
-        { "S_armour" , "S_armor"},
+        { "S_armour" , "S_armor" },
+        { "S_explode1" , "S_expl_tl" },
+        { "S_explode2" , "S_expl_tc" },
+        { "S_explode3" , "S_expl_tr" },
+        { "S_explode4" , "S_expl_ml" },
+        { "S_explode5" , "S_expl_mc" },
+        { "S_explode6" , "S_expl_mr" },
+        { "S_explode7" , "S_expl_bl" },
+        { "S_explode8" , "S_expl_bc" },
+        { "S_explode9" , "S_expl_br" },
     };
-
     size_t len = strlen(buf);
     const char *p = index(buf, ':'), *q = index(buf, '=');
     struct symparse *sp = loadsyms;

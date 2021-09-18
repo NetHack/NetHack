@@ -5,9 +5,10 @@
 #include "hack.h"
 
 /* Note: Arrays are column first, while the screen is row first */
-static const int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
-                               { S_explode2, S_explode5, S_explode8 },
-                               { S_explode3, S_explode6, S_explode9 } };
+static const int explosion[3][3] = {
+        { S_expl_tl, S_expl_ml, S_expl_bl },
+        { S_expl_tc, S_expl_mc, S_expl_bc },
+        { S_expl_tr, S_expl_mr, S_expl_br } };
 
 /* Note: I had to choose one of three possible kinds of "type" when writing
  * this function: a wand type (like in zap.c), an adtyp, or an object type.

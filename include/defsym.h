@@ -221,15 +221,15 @@
     /*      |@|                                                    */
     /*      \-/                                                    */
     /*                                                             */
-    PCHAR2(91, '/',  S_explode1, "explosion top left", "", CLR(CLR_ORANGE))
-    PCHAR2(92, '-',  S_explode2, "explosion top center", "", CLR(CLR_ORANGE))
-    PCHAR2(93, '\\', S_explode3, "explosion top right", "", CLR(CLR_ORANGE))
-    PCHAR2(94, '|',  S_explode4, "explosion middle left", "", CLR(CLR_ORANGE))
-    PCHAR2(95, ' ',  S_explode5, "explosion middle center", "", CLR(CLR_ORANGE))
-    PCHAR2(96, '|',  S_explode6, "explosion middle right", "", CLR(CLR_ORANGE))
-    PCHAR2(97, '\\', S_explode7, "explosion bottom left", "", CLR(CLR_ORANGE))
-    PCHAR2(98, '-',  S_explode8, "explosion bottom center", "", CLR(CLR_ORANGE))
-    PCHAR2(99, '/',  S_explode9, "explosion bottom right", "", CLR(CLR_ORANGE))
+    PCHAR2(91, '/',  S_expl_tl, "explosion top left", "", CLR(CLR_ORANGE))
+    PCHAR2(92, '-',  S_expl_tc, "explosion top center", "", CLR(CLR_ORANGE))
+    PCHAR2(93, '\\', S_expl_tr, "explosion top right", "", CLR(CLR_ORANGE))
+    PCHAR2(94, '|',  S_expl_ml, "explosion middle left", "", CLR(CLR_ORANGE))
+    PCHAR2(95, ' ',  S_expl_mc, "explosion middle center", "", CLR(CLR_ORANGE))
+    PCHAR2(96, '|',  S_expl_mr, "explosion middle right", "", CLR(CLR_ORANGE))
+    PCHAR2(97, '\\', S_expl_bl, "explosion bottom left", "", CLR(CLR_ORANGE))
+    PCHAR2(98, '-',  S_expl_bc, "explosion bottom center", "", CLR(CLR_ORANGE))
+    PCHAR2(99, '/',  S_expl_br, "explosion bottom right", "", CLR(CLR_ORANGE))
 #undef PCHAR
 #undef PCHAR2
 #endif /* PCHAR_S_ENUM || PCHAR_PARSE || PCHAR_DRAWING || PCHAR_TILES */
