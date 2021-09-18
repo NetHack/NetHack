@@ -17,6 +17,7 @@ static boolean doorless_door(int, int);
 static void move_update(boolean);
 static int pickup_checks(void);
 static void maybe_smudge_engr(int, int, int, int);
+static void check_buried_zombies(xchar, xchar);
 static void domove_core(void);
 
 #define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
@@ -1371,6 +1372,25 @@ u_rooted(void)
     return FALSE;
 }
 
+/* reduce zombification timeout of buried zombies around px, py */
+static void
+check_buried_zombies(xchar x, xchar y)
+{
+    struct obj *otmp;
+    long t;
+
+    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        if (otmp->otyp == CORPSE && otmp->timed
+            && otmp->ox >= x - 1 && otmp->ox <= x + 1
+            && otmp->oy >= y - 1 && otmp->oy <= y + 1
+            && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
+            t = stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
+            (void) start_timer(max(1, t - rn2(10)), TIMER_OBJECT,
+                               ZOMBIFY_MON, obj_to_any(otmp));
+        }
+    }
+}
+
 void
 domove(void)
 {
@@ -1969,6 +1989,9 @@ domove_core(void)
                 || IS_FURNITURE(tmpr->typ))
                 nomul(0);
     }
+
+    if (!Levitation && !Flying && !Stealth)
+        check_buried_zombies(u.ux, u.uy);
 
     if (hides_under(g.youmonst.data) || g.youmonst.data->mlet == S_EEL
         || u.dx || u.dy)
