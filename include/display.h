@@ -956,7 +956,7 @@ enum altar_types {
     altar_chaotic,
     altar_neutral,
     altar_lawful,
-    shrine
+    altar_shrine
 };
 
 enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */

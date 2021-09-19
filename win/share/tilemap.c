@@ -329,7 +329,7 @@ tilename(int set, const int file_entry, int gend UNUSED)
 
         /* Altars */
         cmap = S_altar;
-        for (k = altar_unaligned; k <= shrine; k++) {
+        for (k = altar_unaligned; k <= altar_shrine; k++) {
             /* Since defsyms only has one altar symbol,
                it isn't much help in identifying details
                these. Roll our own name. */
@@ -889,7 +889,7 @@ init_tilemap(void)
     /* Altars */
     cmap = S_altar;
     j = 0;
-    for (k = altar_unaligned; k <= shrine; k++) {
+    for (k = altar_unaligned; k <= altar_shrine; k++) {
         offset = GLYPH_ALTAR_OFF + j;
         precheck((offset), "altar");
         tilemap[offset].tilenum = tilenum;
