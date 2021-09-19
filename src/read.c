@@ -22,8 +22,7 @@ static void p_glow1(struct obj *);
 static void p_glow2(struct obj *, const char *);
 static void forget(int);
 static int maybe_tame(struct monst *, struct obj *);
-static boolean get_valid_stinking_cloud_pos(int, int);
-static boolean is_valid_stinking_cloud_pos(int, int, boolean);
+static boolean can_center_cloud(int, int);
 static void display_stinking_cloud_positions(int);
 static void seffect_enchant_armor(struct obj **);
 static void seffect_destroy_armor(struct obj **);
@@ -52,6 +51,7 @@ static void seffect_mail(struct obj **);
 #endif /* MAIL_STRUCTURES */
 static void set_lit(int, int, genericptr);
 static void do_class_genocide(void);
+static void do_stinking_cloud(struct obj *, boolean);
 static boolean create_particular_parse(char *,
                                        struct _create_particular_data *);
 static boolean create_particular_creation(struct _create_particular_data *);
@@ -989,23 +989,26 @@ maybe_tame(struct monst* mtmp, struct obj* sobj)
     return 0;
 }
 
-static boolean
-get_valid_stinking_cloud_pos(int x,int y)
+/* Can a stinking cloud physically exist at a certain position?
+ * NOT the same thing as can_center_cloud.
+ */
+boolean
+valid_cloud_pos(int x, int y)
 {
-    return (!(!isok(x,y) || !cansee(x, y)
-              || !ACCESSIBLE(levl[x][y].typ)
-              || distu(x, y) >= 32));
+    if (!isok(x,y))
+        return FALSE;
+    return ACCESSIBLE(levl[x][y].typ) || is_pool(x, y) || is_lava(x, y);
 }
 
-static boolean
-is_valid_stinking_cloud_pos(int x, int y, boolean showmsg)
+/* Callback for getpos_sethilite, also used in determining whether a scroll
+ * should have its regular effects, or not because it was out of range.
+ */
+boolean
+can_center_cloud(int x, int y)
 {
-    if (!get_valid_stinking_cloud_pos(x,y)) {
-        if (showmsg)
-            You("smell rotten eggs.");
+    if (!valid_cloud_pos(x, y))
         return FALSE;
-    }
-    return TRUE;
+    return (cansee(x, y) && distu(x, y) < 32);
 }
 
 static void
@@ -1021,7 +1024,7 @@ display_stinking_cloud_positions(int state)
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
                 y = u.uy + dy;
-                if (get_valid_stinking_cloud_pos(x,y))
+                if (can_center_cloud(x,y))
                     tmp_at(x, y);
             }
     } else {
@@ -1702,9 +1705,9 @@ seffect_fire(struct obj **sobjp)
             dam *= 5;
             pline("Where do you want to center the explosion?");
             getpos_sethilite(display_stinking_cloud_positions,
-                             get_valid_stinking_cloud_pos);
+                             can_center_cloud);
             (void) getpos(&cc, TRUE, "the desired position");
-            if (!is_valid_stinking_cloud_pos(cc.x, cc.y, FALSE)) {
+            if (!can_center_cloud(cc.x, cc.y)) {
                 /* try to reach too far, get burned */
                 cc.x = u.ux;
                 cc.y = u.uy;
@@ -1786,25 +1789,11 @@ seffect_stinking_cloud(struct obj **sobjp)
     int otyp = sobj->otyp;
     boolean already_known = (sobj->oclass == SPBOOK_CLASS /* spell */
                              || objects[otyp].oc_name_known);
-    coord cc;
 
     if (!already_known)
         You("have found a scroll of stinking cloud!");
     g.known = TRUE;
-    pline("Where do you want to center the %scloud?",
-          already_known ? "stinking " : "");
-    cc.x = u.ux;
-    cc.y = u.uy;
-    getpos_sethilite(display_stinking_cloud_positions,
-                     get_valid_stinking_cloud_pos);
-    if (getpos(&cc, TRUE, "the desired position") < 0) {
-        pline1(Never_mind);
-        return;
-    }
-    if (!is_valid_stinking_cloud_pos(cc.x, cc.y, TRUE))
-        return;
-    (void) create_gas_cloud(cc.x, cc.y, 3 + bcsign(sobj),
-                            8 + 4 * bcsign(sobj));
+    do_stinking_cloud(sobj, already_known);
 }
 
 static void
@@ -2757,6 +2746,34 @@ unpunish(void)
     dealloc_obj(savechain);
     /* the chain is gone but the no longer attached ball persists */
     setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
+}
+
+/* Prompt the player to create a stinking cloud and then create it if they give
+ * a location. */
+static void
+do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
+{
+    coord cc;
+
+    pline("Where do you want to center the %scloud?",
+          mention_stinking ? "stinking " : "");
+    cc.x = u.ux;
+    cc.y = u.uy;
+    getpos_sethilite(display_stinking_cloud_positions, can_center_cloud);
+    if (getpos(&cc, TRUE, "the desired position") < 0) {
+        pline(Never_mind);
+        return;
+    } else if (!can_center_cloud(cc.x, cc.y)) {
+        if (Hallucination)
+            pline("Ugh... someone cut the cheese.");
+        else
+            pline("%s a whiff of rotten eggs.",
+                  sobj->oclass == SCROLL_CLASS ? "The scroll crumbles with"
+                                               : "You smell");
+        return;
+    }
+    (void) create_gas_cloud(cc.x, cc.y, 15 + 10 * bcsign(sobj),
+                            8 + 4 * bcsign(sobj));
 }
 
 /* some creatures have special data structures that only make sense in their

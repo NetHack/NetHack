@@ -617,6 +617,8 @@ similar "The ogre lord yanks Cleaver from your corpses!" due to caching the
 	update clobber that; fixed by having inventory display release the
 	obuf used for each item so that the same one will be reused for the
 	next item, to avoid churning through the whole pool of obufs
+gas clouds are a little random in how they spread out from a point
+Izchak occasionally stocks wands/scrolls/spellbooks of light
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1159,6 +1161,7 @@ vomiting on an altar provokes the deities wrath
 branch stairs have a different glyph, show up in yellow color in tty
 duration of confusion when drinking booze depends upon hunger state
 using 'D' allows dropping items picked up previously
+bones piles can be ransacked by adjacent monsters
 
 
 Platform- and/or Interface-Specific New Features

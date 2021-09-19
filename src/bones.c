@@ -8,6 +8,7 @@
 static boolean no_bones_level(d_level *);
 static void goodfruit(int);
 static void resetobjs(struct obj *, boolean);
+static void give_to_nearby_mon(struct obj *, int, int);
 static boolean fixuporacle(struct monst *);
 
 static boolean
@@ -213,6 +214,41 @@ sanitize_name(char *namebuf)
     }
 }
 
+/* Give object to a random object-liking monster on or adjacent to x,y
+   but skipping hero's location.
+   If no such monster, place object on floor at x,y. */
+static void
+give_to_nearby_mon(struct obj *otmp, int x, int y)
+{
+    struct monst *mtmp;
+    struct monst *selected = (struct monst *) 0;
+    int nmon = 0, xx, yy;
+
+    for (xx = x - 1; xx <= x + 1; ++xx) {
+        for (yy = y - 1; yy <= y + 1; ++yy) {
+            if (!isok(xx, yy))
+                continue;
+            if (xx == u.ux && yy == u.uy)
+                continue;
+            if (!(mtmp = m_at(xx, yy)))
+                continue;
+            /* This doesn't do any checks on otmp to see that it matches the
+             * likes_* property, intentionally. Assume that the monster is
+             * rifling through and taking things that look interesting. */
+            if (!(likes_gold(mtmp->data) || likes_gems(mtmp->data)
+                  || likes_objs(mtmp->data) || likes_magic(mtmp->data)))
+                continue;
+            nmon++;
+            if (!rn2(nmon))
+                selected = mtmp;
+        }
+    }
+    if (selected && can_carry(selected, otmp))
+        add_to_minv(selected, otmp);
+    else
+        place_object(otmp, x, y);
+}
+
 /* called by savebones(); also by finish_paybill(shk.c) */
 void
 drop_upon_death(struct monst *mtmp, /* monster if hero turned into one (other than ghost) */
@@ -249,6 +285,8 @@ drop_upon_death(struct monst *mtmp, /* monster if hero turned into one (other th
             (void) add_to_minv(mtmp, otmp);
         else if (cont)
             (void) add_to_container(cont, otmp);
+        else if (!rn2(8))
+            give_to_nearby_mon(otmp, x, y);
         else
             place_object(otmp, x, y);
     }

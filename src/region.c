@@ -1034,27 +1034,96 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
     return FALSE; /* Monster is still alive */
 }
 
+/* Create a gas cloud which starts at (x,y) and grows outward from it via
+ * breadth-first search.
+ * cloudsize is the number of squares the cloud will attempt to fill.
+ * damage is how much it deals to afflicted creatures. */
+#define MAX_CLOUD_SIZE 150
 NhRegion *
-create_gas_cloud(xchar x, xchar y, int radius, int damage)
+create_gas_cloud(xchar x, xchar y, int cloudsize, int damage)
 {
     NhRegion *cloud;
-    int i, nrect;
+    int i, j;
     NhRect tmprect;
 
+    /* store visited coords */
+    xchar xcoords[MAX_CLOUD_SIZE];
+    xchar ycoords[MAX_CLOUD_SIZE];
+    xcoords[0] = x;
+    ycoords[0] = y;
+    int curridx;
+    int newidx = 1; /* initial spot is already taken */
+
+    if (cloudsize > MAX_CLOUD_SIZE) {
+        impossible("create_gas_cloud: cloud too large (%d)!", cloudsize);
+        cloudsize = MAX_CLOUD_SIZE;
+    }
+
+    for (curridx = 0; curridx < newidx; curridx++) {
+        if (newidx >= cloudsize)
+            break;
+        int xx = xcoords[curridx];
+        int yy = ycoords[curridx];
+        /* Do NOT check for if there is already a gas cloud created at some
+         * other time at this position. They can overlap. */
+
+        /* Primitive Fisher-Yates-Knuth shuffle to randomize the order of
+         * directions chosen. */
+        coord dirs[4] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+        for (i = 4; i > 0; --i) {
+            xchar swapidx = rn2(i);
+            coord tmp = dirs[swapidx];
+            dirs[swapidx] = dirs[i-1];
+            dirs[i-1] = tmp;
+        }
+        int nvalid = 0; /* # of valid adjacent spots */
+        for (i = 0; i < 4; ++i) {
+            /* try all 4 directions */
+
+            int dx = dirs[i].x, dy = dirs[i].y;
+            boolean isunpicked = TRUE;
+
+            if (valid_cloud_pos(xx + dx, yy + dy)) {
+                nvalid++;
+                /* don't pick a location we've already picked */
+                for (j = 0; j < newidx; ++j) {
+                    if (xcoords[j] == xx + dx && ycoords[j] == yy + dy) {
+                        isunpicked = FALSE;
+                        break;
+                    }
+                }
+                /* randomly disrupt the natural breadth-first search, so that
+                 * clouds released in open spaces don't always tend towards a
+                 * rhombus shape */
+                if (nvalid == 4 && !rn2(2))
+                    continue;
+
+                if (isunpicked) {
+                    xcoords[newidx] = xx + dx;
+                    ycoords[newidx] = yy + dy;
+                    newidx++;
+                }
+            }
+            if (newidx >= cloudsize) {
+                /* don't try further directions */
+                break;
+            }
+        }
+    }
+    /* we have now either filled up xcoord and ycoord entirely or run out of
+     * space. In either case, newidx is the correct total number of coordinates
+     * inserted. */
     cloud = create_region((NhRect *) 0, 0);
-    nrect = radius;
-    tmprect.lx = x;
-    tmprect.hx = x;
-    tmprect.ly = y - (radius - 1);
-    tmprect.hy = y + (radius - 1);
-    for (i = 0; i < nrect; i++) {
+    for (i = 0; i < newidx; ++i) {
+        tmprect.lx = tmprect.hx = xcoords[i];
+        tmprect.ly = tmprect.hy = ycoords[i];
         add_rect_to_reg(cloud, &tmprect);
-        tmprect.lx--;
-        tmprect.hx++;
-        tmprect.ly++;
-        tmprect.hy--;
     }
     cloud->ttl = rn1(3, 4);
+    /* If the cloud was constrained in a small space, give it more time to
+     * live. */
+    cloud->ttl = (cloud->ttl * cloudsize) / newidx;
+
     if (!g.in_mklev && !g.context.mon_moving)
         set_heros_fault(cloud); /* assume player has created it */
     cloud->inside_f = INSIDE_GAS_CLOUD;
