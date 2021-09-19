@@ -2141,6 +2141,7 @@ extern void assign_candy_wrapper(struct obj *);
 extern int doread(void);
 extern int charge_ok(struct obj *);
 extern void recharge(struct obj *, int);
+extern boolean valid_cloud_pos(int, int);
 extern int seffects(struct obj *);
 extern void drop_boulder_on_player(boolean, boolean, boolean, boolean);
 extern boolean drop_boulder_on_monster(int, int, boolean, boolean);

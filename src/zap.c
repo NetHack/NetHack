@@ -4599,7 +4599,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
             /* don't create steam clouds on Plane of Water; air bubble
                movement and gas regions don't understand each other */
             if (!on_water_level)
-                create_gas_cloud(x, y, rnd(3), 0); /* radius 1..3, no damg */
+                create_gas_cloud(x, y, rnd(5), 0); /* 1..5, no damg */
 
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP or WATER */
                 if (on_water_level)
@@ -4629,7 +4629,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
                 newsym(x, y);
             }
         } else if (IS_FOUNTAIN(lev->typ)) {
-            create_gas_cloud(x, y, rnd(2), 0); /* radius 1..2, no damage */
+            create_gas_cloud(x, y, rnd(3), 0); /* 1..3, no damage */
             if (see_it)
                 pline("Steam billows from the fountain.");
             rangemod -= 1;
