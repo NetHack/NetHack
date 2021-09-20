@@ -1330,3 +1330,37 @@ artilist.h is used to generate appropriate artifact enum values by the C
 	preprocessor during compile
 remove requirement of object probabilities adding to 1000
 delete obsolete variable 'g.monstermoves' (copperwater pull request #579)
+expand glyphs to map wall styles that can vary between main, mines, gehennom,
+	knox and sokoban; tile interfaces were already doing that on the fly
+	by swapping several tiles in and out on those levels
+expand glyphs to map altars that can vary between unaligned, chaotic,
+	neutral, lawful and shrines; tty was already doing that on the fly
+	per map cell via display code
+explosion types are mapped and can vary between dark, noxious, muddy, wet,
+	magical, fiery and frosty; tile interfaces already had unique tiles
+	for each and tty was altering the color on the fly via per map cell
+	via display code
+expand glyphs to uniquely represent things that are at the top of a pile of
+	objects (piletops); some window ports were already doing that on the
+	fly via a glyphmap flag, but NetHack itself had no awareness beyond
+	setting the glyphmap flag within the display code
+expand glyphs to uniquely represent male and female variations of monsters,
+	pets, ridden monsters, detected monsters and the statues of monsters;
+	tile interfaces were already mapping them uniquely via a glyphmap flag
+	and mapping to separate tiles within the window port code, but NetHack
+	itself had very little awareness beyond setting the glyphmap flag
+	within the display code
+added glyph_to_body_corpsenm(glyph) and glyph_to_statue_corpsenm(glyph)
+	macros to display.h for use by pager.c; the game core code is better
+	off using such display macros/functions for all glyph_to_* mappings
+	that are needed, rather than resorting to direct references of glyph
+	offsets that could change as the set of glyphs expands or gets adjusted
+map_glyphinfo() now simply references an internal array that maps each unique
+	glyph to a color, a ttychar, or a tile, also to a set of glyphflags
+	that confirm some unique characteristics of that glyph; the glyph
+	mappings are set at game init/restore after config file processing, and
+	are reset upon level change, or when some game options are adjusted
+	in-game that could have an impact on the mappings, but they remain
+	stable between those events
+added MG_MALE glyphflag to complement the MG_FEMALE glyphflag that was there
+
