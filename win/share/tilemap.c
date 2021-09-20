@@ -126,7 +126,7 @@ void process_substitutions(FILE *);
 boolean acceptable_tilename(int, int, const char *, const char *);
 #if defined(OBTAIN_TILEMAP)
 void precheck(int offset, const char *glyphtype);
-void add_tileref(int n, int glyphref, enum tilesrc src, int tile_file_entry, 
+void add_tileref(int n, int glyphref, enum tilesrc src, int tile_file_entry,
                  const char *nam, const char *prefix);
 void dump_tilerefs(FILE *fp);
 void free_tilerefs(void);
@@ -299,7 +299,7 @@ tilename(int set, const int file_entry, int gend UNUSED)
                 tilenum++;
             }
         }
-        
+
         /* cmap A */
         for (cmap = S_ndoor; cmap <= S_brdnladder; cmap++) {
             i = cmap - S_ndoor;
@@ -695,13 +695,13 @@ init_tilemap(void)
         Sprintf(tilemap[GLYPH_RIDDEN_MALE_OFF + i].name, "%s male %s", "ridden", buf);
         Sprintf(tilemap[GLYPH_BODY_OFF + i].name, "%s %s", "body of", buf);
         Sprintf(tilemap[GLYPH_BODY_PILETOP_OFF + i].name, "%s %s", "piletop body of", buf);
-        add_tileref(tilenum, GLYPH_MON_MALE_OFF + i, monsters_file, 
+        add_tileref(tilenum, GLYPH_MON_MALE_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_MON_MALE_OFF + i].name, "");
-        add_tileref(tilenum, GLYPH_PET_MALE_OFF + i, monsters_file, 
+        add_tileref(tilenum, GLYPH_PET_MALE_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_PET_MALE_OFF + i].name, "");
-        add_tileref(tilenum, GLYPH_DETECT_MALE_OFF + i, monsters_file, 
+        add_tileref(tilenum, GLYPH_DETECT_MALE_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_DETECT_MALE_OFF + i].name,"");
-        add_tileref(tilenum, GLYPH_RIDDEN_MALE_OFF + i, monsters_file, 
+        add_tileref(tilenum, GLYPH_RIDDEN_MALE_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_RIDDEN_MALE_OFF + i].name, "");
         add_tileref(corpsetile, GLYPH_BODY_OFF + i, objects_file, CORPSE,
                     tilemap[GLYPH_BODY_OFF + i].name, "");
@@ -763,7 +763,7 @@ init_tilemap(void)
 #endif
     lastmontile = tilenum;
     tilenum++;
-    file_entry++; /* non-productive, but in case something ever gets 
+    file_entry++; /* non-productive, but in case something ever gets
                      inserted right below here ahead of objects */
 
     /* start of objects */
@@ -809,7 +809,7 @@ init_tilemap(void)
     precheck((GLYPH_CMAP_STONE_OFF), "stone");
     tilemap[GLYPH_CMAP_STONE_OFF].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-    Snprintf(tilemap[GLYPH_CMAP_STONE_OFF].name, 
+    Snprintf(tilemap[GLYPH_CMAP_STONE_OFF].name,
             sizeof tilemap[0].name,
             "%s (cmap=%d)",
             tilename(OTH_GLYPH, file_entry, 0),
@@ -830,7 +830,7 @@ init_tilemap(void)
             precheck(offset + i, "walls");
             tilemap[offset + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-            Snprintf(tilemap[offset + i].name, 
+            Snprintf(tilemap[offset + i].name,
                     sizeof tilemap[0].name,
                     "%s (cmap=%d)",
                     tilename(OTH_GLYPH, file_entry, 0),
@@ -924,7 +924,7 @@ init_tilemap(void)
         precheck((GLYPH_CMAP_B_OFF + i), "cmap B");
         tilemap[GLYPH_CMAP_B_OFF + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_CMAP_B_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_CMAP_B_OFF + i].name,
                  sizeof tilemap[0].name,
                 "%s (cmap=%d)",
                 tilename(OTH_GLYPH, file_entry, 0), cmap);
@@ -955,7 +955,7 @@ init_tilemap(void)
             precheck((offset + i), "zaps");
             tilemap[offset + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-            Snprintf(tilemap[offset + i].name, 
+            Snprintf(tilemap[offset + i].name,
                      sizeof tilemap[0].name,
                     "%s (%d) (%d)",
                     tilename(OTH_GLYPH, file_entry, 0), file_entry, cmap);
@@ -984,7 +984,7 @@ init_tilemap(void)
     for (i = 0; i < NUM_ZAP << 2; i++) {
         tilemap[GLYPH_ZAP_OFF + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_ZAP_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_ZAP_OFF + i].name,
                  sizeof tilemap[0].name,
                 "zap %s (cmap=%d)",
                 tilename(OTH_GLYPH, file_entry, 0), (i >> 2));
@@ -1013,7 +1013,7 @@ init_tilemap(void)
         precheck((GLYPH_CMAP_C_OFF + i), "cmap C");
         tilemap[GLYPH_CMAP_C_OFF + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_CMAP_C_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_CMAP_C_OFF + i].name,
                  sizeof tilemap[0].name,
                  "%s (cmap=%d)",
                  tilename(OTH_GLYPH, file_entry, 0), cmap);
@@ -1052,12 +1052,12 @@ init_tilemap(void)
             precheck((offset + i), "swallows");
             tilemap[offset + i].tilenum = swallowbase + i;
 #if defined(OBTAIN_TILEMAP)
-            Snprintf(tilemap[offset + i].name, 
+            Snprintf(tilemap[offset + i].name,
                      sizeof tilemap[0].name,
                      "%s %s (cmap=%d)",
                      swallow_text[i],
                      mons[k].pmnames[NEUTRAL], cmap);
-            add_tileref(swallowbase + i, offset + i, 
+            add_tileref(swallowbase + i, offset + i,
                         other_file, file_entry + i,
                         tilemap[offset + i].name, "");
 #endif
@@ -1075,7 +1075,7 @@ init_tilemap(void)
             precheck((offset + i), "explosions");
             tilemap[offset + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-            Snprintf(tilemap[offset + i].name, 
+            Snprintf(tilemap[offset + i].name,
                      sizeof tilemap[0].name,
                      "%s (cmap=%d)",
                      tilename(OTH_GLYPH, file_entry, 0), cmap);
@@ -1104,7 +1104,7 @@ init_tilemap(void)
         precheck((GLYPH_WARNING_OFF + i), "warnings");
         tilemap[GLYPH_WARNING_OFF + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_WARNING_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_WARNING_OFF + i].name,
                  sizeof tilemap[0].name,
                  "%s (warn=%d)",
                  tilename(OTH_GLYPH, file_entry, 0), file_entry);
@@ -1119,7 +1119,7 @@ init_tilemap(void)
         precheck((GLYPH_UNEXPLORED_OFF + i), "unexplored");
         tilemap[GLYPH_UNEXPLORED_OFF + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_UNEXPLORED_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_UNEXPLORED_OFF + i].name,
                  sizeof tilemap[0].name,
                  "unexplored %s (%d)",
                  tilemap[GLYPH_UNEXPLORED_OFF + i].name, file_entry);
@@ -1135,7 +1135,7 @@ init_tilemap(void)
         precheck(GLYPH_NOTHING + i, "nothing");
         tilemap[GLYPH_NOTHING + i].tilenum = tilenum;
 #if defined(OBTAIN_TILEMAP)
-        Snprintf(tilemap[GLYPH_NOTHING + i].name, 
+        Snprintf(tilemap[GLYPH_NOTHING + i].name,
                  sizeof tilemap[0].name,
                  " nothing %s (%d)",
                  tilename(OTH_GLYPH, file_entry, 0), file_entry);
@@ -1185,7 +1185,7 @@ init_tilemap(void)
         tilemap[GLYPH_STATUE_OFF + i].tilenum =
             tilemap[GLYPH_OBJ_OFF + STATUE].tilenum;
 #ifdef OBTAIN_TILEMAP
-        Snprintf(tilemap[GLYPH_STATUE_OFF + i].name, 
+        Snprintf(tilemap[GLYPH_STATUE_OFF + i].name,
                  sizeof tilemap[0].name,
                  "%s (%d)",
                  tilename(OTH_GLYPH, file_entry, 0), file_entry);

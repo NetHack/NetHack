@@ -75,7 +75,7 @@ typedef struct glyph_map_entry {
    if you add fields or change the ordering, fix up the following:
         g_info initialization in display.c
         nul_glyphinfo initialization in diplay.c
- */    
+ */
 typedef struct gi {
     int glyph;            /* the display entity */
     int ttychar;

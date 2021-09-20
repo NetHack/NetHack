@@ -25,3 +25,5 @@ readtags
 # dev tool for analyzing data collected by nethack's #define MONITOR_HEAP
 heaputil
 heaputil.c
+tilemappings.lst
+
