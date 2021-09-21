@@ -2250,7 +2250,7 @@ int wallcolors[sokoban_walls + 1] = {
 #define explode_color(n) \
     color = iflags.use_color ? explodecolors[n] : NO_COLOR
 #define wall_color(n) color = iflags.use_color ? wallcolors[n] : NO_COLOR
-
+#define altar_color(n) color = iflags.use_color ? altarcolors[n] : NO_COLOR
 #else /* no text color */
 
 #define zap_color(n)
@@ -2262,6 +2262,7 @@ int wallcolors[sokoban_walls + 1] = {
 #define warn_color(n)
 #define explode_color(n)
 #define wall_color(n)
+#define altar_color(n)
 #endif
 
 #if 0
@@ -2438,7 +2439,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             /* unaligned, chaotic, neutral, lawful, shrine */
             gmap->symidx = S_altar + SYM_OFF_P;
             if (g.glyphmap_perlevel_flags & GMAP_ALTARCOLOR)
-                color = altarcolors[offset];
+                altar_color(offset);
             else
                 cmap_color(S_altar); /* gray */
         } else if ((offset = (glyph - GLYPH_CMAP_A_OFF)) >= 0) {
