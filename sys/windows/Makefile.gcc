@@ -1162,8 +1162,8 @@ $(SRC)/tile.c: $(U)tilemap.exe
 	@echo A new $@ has been created
 	@$(U)tilemap
 
-$(U)tilemap.exe: $(O)tilemap.o
-	$(link) $(LFLAGSU) -o$@ $(O)tilemap.o
+$(U)tilemap.exe: $(O)tilemap.o  $(O)monst.o $(O)objects.o $(O)drawing.o
+	$(link) $(LFLAGSU) -o$@ $(O)tilemap.o $(O)monst.o $(O)objects.o $(O)drawing.o
 
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H)
 	$(cc) $(CFLAGSU) -o$@ $(WSHR)/tilemap.c
