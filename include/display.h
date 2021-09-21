@@ -234,17 +234,16 @@
          ? ridden_mon_to_glyph(u.usteed, rn2_on_display_rng) \
          : (otherwise_self))
 
-#define display_self()                                                        \
-    show_glyph(u.ux, u.uy,                                                    \
-               maybe_display_usteed(                                          \
-                   ((int) U_AP_TYPE == M_AP_NOTHING) ? hero_glyph             \
-                   : ((int) U_AP_TYPE == M_AP_FURNITURE)                      \
-                       ? cmap_to_glyph((int) g.youmonst.mappearance)          \
-                   : ((int) U_AP_TYPE == M_AP_OBJECT)                         \
-                       ? objnum_to_glyph(                                     \
-                           (int) g.youmonst.mappearance) /* else U_AP_TYPE == \
-                                                      M_AP_MONSTER */         \
-                       : monnum_to_glyph((int) g.youmonst.mappearance, (int) Ugender)))
+#define display_self() \
+    show_glyph(u.ux, u.uy, maybe_display_usteed(                        \
+        ((int) U_AP_TYPE == M_AP_NOTHING)                               \
+        ? hero_glyph                                                    \
+        : ((int) U_AP_TYPE == M_AP_FURNITURE)                           \
+          ? cmap_to_glyph((int) g.youmonst.mappearance)                 \
+          : ((int) U_AP_TYPE == M_AP_OBJECT)                            \
+            ? objnum_to_glyph((int) g.youmonst.mappearance)             \
+            /* else U_AP_TYPE == M_AP_MONSTER */                        \
+            : monnum_to_glyph((int) g.youmonst.mappearance, Ugender)))
 
 /*
  * NetHack glyphs
