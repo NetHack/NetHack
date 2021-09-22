@@ -1901,7 +1901,7 @@ flush_screen(int cursor_on_u)
 int
 back_to_glyph(xchar x, xchar y)
 {
-    int idx;
+    int idx, bypass_glyph = NO_GLYPH;
     struct rm *ptr = &(levl[x][y]);
     struct stairway *sway;
 
@@ -1972,7 +1972,14 @@ back_to_glyph(xchar x, xchar y)
         idx = S_sink;
         break;
     case ALTAR:
-        idx = S_altar;
+        /* 5 altar types share one cmap entry, so
+           ptr->altarmask needs to be considered.
+           An alternative would be to add 4 additional cmap
+           entries for the 5 altar types and symbols
+           S_altar_unaligned, S_altar_chaotic,
+           S_altar_neutral, S_altar_lawful, S_altar_shrine. */
+        idx = S_altar;  /* not really used */
+        bypass_glyph = altar_to_glyph(ptr->altarmask);
         break;
     case GRAVE:
         idx = S_grave;
@@ -2028,7 +2035,7 @@ back_to_glyph(xchar x, xchar y)
         break;
     }
 
-    return cmap_to_glyph(idx);
+    return (bypass_glyph != NO_GLYPH) ? bypass_glyph : cmap_to_glyph(idx);
 }
 
 /*
