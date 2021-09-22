@@ -23,7 +23,19 @@ static void quickmimic(struct monst *);
 struct obj *
 droppables(struct monst *mon)
 {
-    struct obj *obj, *wep, dummy, *pickaxe, *unihorn, *key;
+    /*
+     * 'key|pickaxe|&c = &dummy' is used to make various creatures
+     * that can't use a key/pick-axe/&c behave as if they are already
+     * holding one so that any other such item in their inventory will
+     * be considered a duplicate and get treated as a normal candidate
+     * for dropping.
+     *
+     * This could be 'auto', but then 'gcc -O2' warns that this function
+     * might return the address of a local variable.  It's mistaken,
+     * &dummy is never returned.  'static' is simplest way to shut it up.
+     */
+    static struct obj dummy;
+    struct obj *obj, *wep, *pickaxe, *unihorn, *key;
 
     dummy = cg.zeroobj;
     dummy.otyp = GOLD_PIECE; /* not STRANGE_OBJECT or tools of interest */
