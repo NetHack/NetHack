@@ -2334,7 +2334,10 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 
         if (Is_rogue_level(&u.uz)) {
             g.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
-        } else if ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) {
+        } else if (Is_astralevel(&u.uz)
+                   || Is_sanctum(&u.uz)
+                   || In_mines(&u.uz)
+                   || Is_valley(&u.uz)) {
             g.glyphmap_perlevel_flags |= GMAP_ALTARCOLOR;
         }
     }

@@ -1455,7 +1455,6 @@ goto_level(
 
     if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
         assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
-    reset_glyphmap(gm_levelchange);
     check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
@@ -1637,7 +1636,8 @@ goto_level(
     /* Reset the screen. */
     vision_reset(); /* reset the blockages */
     g.glyphmap_perlevel_flags = 0L; /* force per-level map_glyphinfo() changes */
-    docrt();        /* does a full vision recalc */
+    reset_glyphmap(gm_levelchange);
+    docrt(); /* does a full vision recalc */
     flush_screen(-1);
 
     /*

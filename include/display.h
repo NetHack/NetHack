@@ -896,7 +896,7 @@ enum zap_colors {
 
 enum altar_colors {
     altar_color_unaligned = CLR_RED,
-#if 0
+#if defined(USE_GENERAL_ALTAR_COLORS)
         /* On OSX with TERM=xterm-color256 these render as
          *  white -> tty: gray, curses: ok
          *  gray  -> both tty and curses: black
