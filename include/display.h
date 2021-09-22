@@ -317,7 +317,7 @@
  * cmap A           S_ndoor through S_brdnladder
  *                  Count: (S_brdnladder - S_ndoor) + 1 = 19
  *
- * Altars           Altar (Unaligned, Chaotic, Neutral, Lawful, shrine)
+ * Altars           Altar (Unaligned, Chaotic, Neutral, Lawful, high altar)
  *                  Count: 5
  *
  * cmap B           S_grave through S_vibrating_square
@@ -460,15 +460,16 @@ enum glyph_offsets {
 #define altar_to_glyph(amsk) \
     (((amsk & (AM_MASK | AM_SHRINE)) == AM_NONE)               \
        ? (GLYPH_ALTAR_OFF + 0)                                 \
-       : ((amsk & (AM_MASK | AM_SHRINE)) == AM_CHAOTIC)        \
-         ? (GLYPH_ALTAR_OFF + 1)                               \
-         : ((amsk & (AM_MASK | AM_SHRINE)) == AM_NEUTRAL)      \
-           ? (GLYPH_ALTAR_OFF + 2)                             \
-           : ((amsk & (AM_MASK | AM_SHRINE)) == AM_LAWFUL)     \
-             ? (GLYPH_ALTAR_OFF + 3)                           \
-             : ((amsk & AM_SHRINE) == AM_SHRINE)               \
-               ? (GLYPH_ALTAR_OFF + 4)                         \
-               : (GLYPH_ALTAR_OFF + 2))
+       : (((amsk & AM_SHRINE) == AM_SHRINE)                    \
+          && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))      \
+          ? (GLYPH_ALTAR_OFF + 4)                              \
+          : ((amsk & AM_MASK) == AM_CHAOTIC)                   \
+            ? (GLYPH_ALTAR_OFF + 1)                            \
+            : ((amsk & AM_MASK) == AM_NEUTRAL)                 \
+              ? (GLYPH_ALTAR_OFF + 2)                          \
+              : ((amsk & AM_MASK) == AM_LAWFUL)                \
+                ? (GLYPH_ALTAR_OFF + 3)                        \
+                : (GLYPH_ALTAR_OFF + 2))
 
 /* not used, nor is it correct
 #define zap_to_glyph(zaptype, cmap_idx) \
@@ -915,7 +916,7 @@ enum altar_colors {
     altar_color_neutral = CLR_GRAY,
     altar_color_lawful  = CLR_GRAY,
 #endif
-    altar_color_shrine  = CLR_BRIGHT_MAGENTA
+    altar_color_highaltar = CLR_BRIGHT_MAGENTA,
 };
 
 /* types of explosions */
@@ -955,7 +956,7 @@ enum altar_types {
     altar_chaotic,
     altar_neutral,
     altar_lawful,
-    altar_shrine
+    altar_highaltar
 };
 
 enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */

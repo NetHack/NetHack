@@ -2183,9 +2183,9 @@ get_bk_glyph(xchar x, xchar y)
 #define HI_DOMESTIC CLR_WHITE /* monst.c */
 
 /* masks for per-level variances kept in g.glyphmap_perlevel_flags */
-#define GMAP_SET        0x0001
-#define GMAP_ROGUELEVEL 0x0002
-#define GMAP_ALTARCOLOR 0x0004
+#define GMAP_SET            0x0001
+#define GMAP_ROGUELEVEL     0x0002
+#define GMAP_HIGHALTARCOLOR 0x0004
 
 void
 map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
@@ -2240,9 +2240,9 @@ const int zapcolors[NUM_ZAP] = {
     zap_color_sleep,      zap_color_death, zap_color_lightning,
     zap_color_poison_gas, zap_color_acid,
 };
-const int altarcolors[5] = {
+const int altarcolors[] = {
     altar_color_unaligned, altar_color_chaotic, altar_color_neutral,
-    altar_color_lawful,    altar_color_shrine,
+    altar_color_lawful, altar_color_highaltar
 };
 const int explodecolors[7] = {
     explode_color_dark,   explode_color_noxious, explode_color_muddy,
@@ -2328,17 +2328,14 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
         /*
          *    GMAP_SET                0x00000001
          *    GMAP_ROGUELEVEL         0x00000002
-         *    GMAP_ALTARCOLOR         0x00000004
+         *    GMAP_HIGHALTARCOLOR     0x00000004
          */
         g.glyphmap_perlevel_flags |= GMAP_SET;
 
         if (Is_rogue_level(&u.uz)) {
             g.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
-        } else if (Is_astralevel(&u.uz)
-                   || Is_sanctum(&u.uz)
-                   || In_mines(&u.uz)
-                   || Is_valley(&u.uz)) {
-            g.glyphmap_perlevel_flags |= GMAP_ALTARCOLOR;
+        } else if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
+            g.glyphmap_perlevel_flags |= GMAP_HIGHALTARCOLOR;
         }
     }
 
@@ -2460,12 +2457,9 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             gmap->symidx = S_grave + offset + SYM_OFF_P;
             cmap_color(S_grave + offset);
         } else if ((offset = (glyph - GLYPH_ALTAR_OFF)) >= 0) {
-            /* unaligned, chaotic, neutral, lawful, shrine */
+            /* unaligned, chaotic, neutral, lawful, high altar */
             gmap->symidx = S_altar + SYM_OFF_P;
-            if (g.glyphmap_perlevel_flags & GMAP_ALTARCOLOR)
-                altar_color(offset);
-            else
-                cmap_color(S_altar); /* gray */
+            altar_color(offset);
         } else if ((offset = (glyph - GLYPH_CMAP_A_OFF)) >= 0) {
             int cmap = S_ndoor + offset;
             gmap->symidx = cmap + SYM_OFF_P;
