@@ -2330,6 +2330,8 @@ create_altar(altar* a, struct mkroom* croom)
     if (a->shrine) { /* Is it a shrine  or sanctum? */
         priestini(&u.uz, croom, x, y, (a->shrine > 1));
         levl[x][y].altarmask |= AM_SHRINE;
+        if (a->shrine == 2) /* high altar or sanctum */
+            levl[x][y].altarmask |= AM_SANCTUM;
         g.level.flags.has_temple = TRUE;
     }
 }

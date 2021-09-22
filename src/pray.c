@@ -1468,8 +1468,7 @@ dosacrifice(void)
         You("are not standing on an altar.");
         return ECMD_OK;
     }
-    highaltar = ((Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
-                 && (levl[u.ux][u.uy].altarmask & AM_SHRINE));
+    highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
 
     otmp = floorfood("sacrifice", 1);
     if (!otmp)

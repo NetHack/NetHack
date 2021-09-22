@@ -544,10 +544,9 @@ enum glyph_offsets {
             (((mon)->female == 0) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
 
 #define altar_to_glyph(amsk) \
-    (((amsk & (AM_MASK | AM_SHRINE)) == AM_NONE)               \
+    (((amsk & (AM_MASK | AM_SHRINE | AM_SANCTUM)) == AM_NONE)  \
        ? (GLYPH_ALTAR_OFF + altar_unaligned)                   \
-       : (((amsk & AM_SHRINE) == AM_SHRINE)                    \
-          && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))      \
+       : ((amsk & AM_SANCTUM) == AM_SANCTUM)                   \
           ? (GLYPH_ALTAR_OFF + altar_other)                    \
           : ((amsk & AM_MASK) == AM_CHAOTIC)                   \
             ? (GLYPH_ALTAR_OFF + altar_chaotic)                \
