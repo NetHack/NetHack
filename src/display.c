@@ -370,6 +370,18 @@ show_mon_or_warn(int x, int y, int monglyph)
     show_glyph(x, y, monglyph);
 }
 
+/*
+ * map_altar(x, y, amsk)
+ */
+void
+map_altar(xchar x, xchar y, int amsk)
+{
+    int glyph = altar_to_glyph(amsk);
+
+    if (g.level.flags.hero_memory)
+        levl[x][y].glyph = glyph;
+    show_glyph(x, y, glyph);
+}
 #define DETECTED 2
 #define PHYSICALLY_SEEN 1
 #define is_worm_tail(mon) ((mon) && ((x != (mon)->mx) || (y != (mon)->my)))
@@ -825,6 +837,8 @@ newsym(register int x, register int y)
                 display_warning(mon);
             } else if (glyph_is_invisible(lev->glyph)) {
                 map_invisible(x, y);
+            } else if (IS_ALTAR(levl[x][y].typ)) {
+                map_altar(x, y, levl[x][y].altarmask);
             } else
                 _map_location(x, y, 1); /* map the location */\
         }

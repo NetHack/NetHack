@@ -458,17 +458,17 @@ enum glyph_offsets {
             (((mon)->female == 0) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
 
 #define altar_to_glyph(amsk) \
-    (((amsk & AM_NONE) == AM_NONE)               \
-       ? (GLYPH_ALTAR_OFF + 0)                   \
-       : ((amsk & AM_CHAOTIC) == AM_CHAOTIC)     \
-         ? (GLYPH_ALTAR_OFF + 1)                 \
-         : ((amsk & AM_NEUTRAL) == AM_NEUTRAL)   \
-           ? (GLYPH_ALTAR_OFF + 2)               \
-           : ((amsk & AM_NEUTRAL) == AM_LAWFUL)  \
-           ? (GLYPH_ALTAR_OFF + 3)               \
-           : ((amsk & AM_NEUTRAL) == AM_SHRINE)  \
-             ? (GLYPH_ALTAR_OFF + 4)             \
-             : (GLYPH_ALTAR_OFF + 2))
+    (((amsk & (AM_MASK | AM_SHRINE)) == AM_NONE)               \
+       ? (GLYPH_ALTAR_OFF + 0)                                 \
+       : ((amsk & (AM_MASK | AM_SHRINE)) == AM_CHAOTIC)        \
+         ? (GLYPH_ALTAR_OFF + 1)                               \
+         : ((amsk & (AM_MASK | AM_SHRINE)) == AM_NEUTRAL)      \
+           ? (GLYPH_ALTAR_OFF + 2)                             \
+           : ((amsk & (AM_MASK | AM_SHRINE)) == AM_LAWFUL)     \
+             ? (GLYPH_ALTAR_OFF + 3)                           \
+             : ((amsk & AM_SHRINE) == AM_SHRINE)               \
+               ? (GLYPH_ALTAR_OFF + 4)                         \
+               : (GLYPH_ALTAR_OFF + 2))
 
 /* not used, nor is it correct
 #define zap_to_glyph(zaptype, cmap_idx) \
