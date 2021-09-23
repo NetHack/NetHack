@@ -258,6 +258,89 @@
  * colors, but would also be represented by different symbols.
  */
 
+
+#include "color.h"
+/* 3.6.3: poison gas zap used to be yellow and acid zap was green,
+   which conflicted with the corresponding dragon colors */
+enum zap_colors {
+    zap_color_missile    = HI_ZAP,
+    zap_color_fire       = CLR_ORANGE,
+    zap_color_frost      = CLR_WHITE,
+    zap_color_sleep      = HI_ZAP,
+    zap_color_death      = CLR_BLACK,
+    zap_color_lightning  = CLR_WHITE,
+    zap_color_poison_gas = CLR_GREEN,
+    zap_color_acid       = CLR_YELLOW
+};
+
+enum altar_colors {
+    altar_color_unaligned = CLR_RED,
+#if defined(USE_GENERAL_ALTAR_COLORS)
+        /* On OSX with TERM=xterm-color256 these render as
+         *  white -> tty: gray, curses: ok
+         *  gray  -> both tty and curses: black
+         *  black -> both tty and curses: blue
+         *  red   -> both tty and curses: ok.
+         * Since the colors have specific associations (with the
+         * unicorns matched with each alignment), we shouldn't use
+         * scrambled colors and we don't have sufficient information
+         * to handle platform-specific color variations.
+         */
+    altar_color_chaotic = CLR_BLACK,
+    altar_color_neutral = CLR_GRAY,
+    altar_color_lawful  = CLR_WHITE,
+#else
+    altar_color_chaotic = CLR_GRAY,
+    altar_color_neutral = CLR_GRAY,
+    altar_color_lawful  = CLR_GRAY,
+#endif
+    altar_color_other = CLR_BRIGHT_MAGENTA,
+};
+
+/* types of explosions */
+enum explosion_types {
+    EXPL_DARK = 0,
+    EXPL_NOXIOUS = 1,
+    EXPL_MUDDY = 2,
+    EXPL_WET = 3,
+    EXPL_MAGICAL = 4,
+    EXPL_FIERY = 5,
+    EXPL_FROSTY = 6,
+    EXPL_MAX = 7
+};
+
+/* above plus this redundant? */
+enum expl_types {
+    expl_dark,
+    expl_noxious,
+    expl_muddy,
+    expl_wet,
+    expl_magical,
+    expl_fiery,
+    expl_frosty,
+};
+
+enum explode_colors {
+    explode_color_dark = CLR_BLACK,
+    explode_color_noxious = CLR_GREEN,
+    explode_color_muddy = CLR_BROWN,
+    explode_color_wet = CLR_BLUE,
+    explode_color_magical = CLR_MAGENTA,
+    explode_color_fiery = CLR_ORANGE,
+    explode_color_frosty = CLR_WHITE
+};
+enum altar_types {
+    altar_unaligned,
+    altar_chaotic,
+    altar_neutral,
+    altar_lawful,
+    altar_other
+};
+enum level_walls  { main_walls, mines_walls, gehennom_walls,
+                    knox_walls, sokoban_walls };
+enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */
+enum glyphmap_change_triggers { gm_nochange, gm_levelchange, gm_optionchange,
+                                gm_symchange, gm_accessibility_change };
 #define NUM_ZAP 8 /* number of zap beam types */
 
 /*
@@ -459,17 +542,17 @@ enum glyph_offsets {
 
 #define altar_to_glyph(amsk) \
     (((amsk & (AM_MASK | AM_SHRINE)) == AM_NONE)               \
-       ? (GLYPH_ALTAR_OFF + 0)                                 \
+       ? (GLYPH_ALTAR_OFF + altar_unaligned)                   \
        : (((amsk & AM_SHRINE) == AM_SHRINE)                    \
           && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))      \
-          ? (GLYPH_ALTAR_OFF + 4)                              \
+          ? (GLYPH_ALTAR_OFF + altar_other)                    \
           : ((amsk & AM_MASK) == AM_CHAOTIC)                   \
-            ? (GLYPH_ALTAR_OFF + 1)                            \
+            ? (GLYPH_ALTAR_OFF + altar_chaotic)                \
             : ((amsk & AM_MASK) == AM_NEUTRAL)                 \
-              ? (GLYPH_ALTAR_OFF + 2)                          \
+              ? (GLYPH_ALTAR_OFF + altar_neutral)              \
               : ((amsk & AM_MASK) == AM_LAWFUL)                \
-                ? (GLYPH_ALTAR_OFF + 3)                        \
-                : (GLYPH_ALTAR_OFF + 2))
+                ? (GLYPH_ALTAR_OFF + altar_lawful)             \
+                : (GLYPH_ALTAR_OFF + altar_neutral))
 
 /* not used, nor is it correct
 #define zap_to_glyph(zaptype, cmap_idx) \
@@ -874,104 +957,17 @@ enum glyph_offsets {
 #define MG_FEMALE  0x02000  /* represents a female mon variation or statue of one */
 #define MG_BADXY   0x04000  /* bad coordinates were passed */
 
-#include "color.h"
-#ifdef TEXTCOLOR
-
-/* 3.6.3: poison gas zap used to be yellow and acid zap was green,
-   which conflicted with the corresponding dragon colors */
-#endif /* TEXTCOLOR */
-
-enum level_walls  { main_walls, mines_walls, gehennom_walls,
-                    knox_walls, sokoban_walls };
-
-enum zap_colors {
-    zap_color_missile    = HI_ZAP,
-    zap_color_fire       = CLR_ORANGE,
-    zap_color_frost      = CLR_WHITE,
-    zap_color_sleep      = HI_ZAP,
-    zap_color_death      = CLR_BLACK,
-    zap_color_lightning  = CLR_WHITE,
-    zap_color_poison_gas = CLR_GREEN,
-    zap_color_acid       = CLR_YELLOW
-};
-
-enum altar_colors {
-    altar_color_unaligned = CLR_RED,
-#if defined(USE_GENERAL_ALTAR_COLORS)
-        /* On OSX with TERM=xterm-color256 these render as
-         *  white -> tty: gray, curses: ok
-         *  gray  -> both tty and curses: black
-         *  black -> both tty and curses: blue
-         *  red   -> both tty and curses: ok.
-         * Since the colors have specific associations (with the
-         * unicorns matched with each alignment), we shouldn't use
-         * scrambled colors and we don't have sufficient information
-         * to handle platform-specific color variations.
-         */
-    altar_color_chaotic = CLR_BLACK,
-    altar_color_neutral = CLR_GRAY,
-    altar_color_lawful  = CLR_WHITE,
-#else
-    altar_color_chaotic = CLR_GRAY,
-    altar_color_neutral = CLR_GRAY,
-    altar_color_lawful  = CLR_GRAY,
-#endif
-    altar_color_other = CLR_BRIGHT_MAGENTA,
-};
-
-/* types of explosions */
-enum explosion_types {
-    EXPL_DARK = 0,
-    EXPL_NOXIOUS = 1,
-    EXPL_MUDDY = 2,
-    EXPL_WET = 3,
-    EXPL_MAGICAL = 4,
-    EXPL_FIERY = 5,
-    EXPL_FROSTY = 6,
-    EXPL_MAX = 7
-};
-
-/* above plus this redundant? */
-enum expl_types {
-    expl_dark,
-    expl_noxious,
-    expl_muddy,
-    expl_wet,
-    expl_magical,
-    expl_fiery,
-    expl_frosty,
-};
-
-enum explode_colors {
-    explode_color_dark = CLR_BLACK,
-    explode_color_noxious = CLR_GREEN,
-    explode_color_muddy = CLR_BROWN,
-    explode_color_wet = CLR_BLUE,
-    explode_color_magical = CLR_MAGENTA,
-    explode_color_fiery = CLR_ORANGE,
-    explode_color_frosty = CLR_WHITE
-};
-enum altar_types {
-    altar_unaligned,
-    altar_chaotic,
-    altar_neutral,
-    altar_lawful,
-    altar_other
-};
-
-enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */
-enum glyphmap_change_triggers { gm_nochange, gm_levelchange, gm_optionchange,
-                                gm_symchange, gm_accessibility_change };
-
 typedef struct {
     xchar gnew; /* perhaps move this bit into the rm structure. */
     glyph_info glyphinfo;
 } gbuf_entry;
 
+#ifdef TEXTCOLOR
 extern const int altarcolors[];
 extern const int zapcolors[];
 extern const int explodecolors[];
 extern int wallcolors[];
+#endif
 
 /* If USE_TILES is defined during build, this comes from the generated
  * tile.c, complete with appropriate tile references in the initialization.
