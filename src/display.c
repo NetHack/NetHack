@@ -370,18 +370,6 @@ show_mon_or_warn(int x, int y, int monglyph)
     show_glyph(x, y, monglyph);
 }
 
-/*
- * map_altar(x, y, amsk)
- */
-void
-map_altar(xchar x, xchar y, int amsk)
-{
-    int glyph = altar_to_glyph(amsk);
-
-    if (g.level.flags.hero_memory)
-        levl[x][y].glyph = glyph;
-    show_glyph(x, y, glyph);
-}
 #define DETECTED 2
 #define PHYSICALLY_SEEN 1
 #define is_worm_tail(mon) ((mon) && ((x != (mon)->mx) || (y != (mon)->my)))
@@ -837,8 +825,6 @@ newsym(register int x, register int y)
                 display_warning(mon);
             } else if (glyph_is_invisible(lev->glyph)) {
                 map_invisible(x, y);
-            } else if (IS_ALTAR(levl[x][y].typ)) {
-                map_altar(x, y, levl[x][y].altarmask);
             } else
                 _map_location(x, y, 1); /* map the location */\
         }
@@ -1972,12 +1958,6 @@ back_to_glyph(xchar x, xchar y)
         idx = S_sink;
         break;
     case ALTAR:
-        /* 5 altar types share one cmap entry, so
-           ptr->altarmask needs to be considered.
-           An alternative would be to add 4 additional cmap
-           entries for the 5 altar types and symbols
-           S_altar_unaligned, S_altar_chaotic,
-           S_altar_neutral, S_altar_lawful, S_altar_shrine. */
         idx = S_altar;  /* not really used */
         bypass_glyph = altar_to_glyph(ptr->altarmask);
         break;
@@ -2185,7 +2165,6 @@ get_bk_glyph(xchar x, xchar y)
 /* masks for per-level variances kept in g.glyphmap_perlevel_flags */
 #define GMAP_SET            0x0001
 #define GMAP_ROGUELEVEL     0x0002
-#define GMAP_HIGHALTARCOLOR 0x0004
 
 void
 map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
@@ -2242,7 +2221,7 @@ const int zapcolors[NUM_ZAP] = {
 };
 const int altarcolors[] = {
     altar_color_unaligned, altar_color_chaotic, altar_color_neutral,
-    altar_color_lawful, altar_color_highaltar
+    altar_color_lawful, altar_color_other
 };
 const int explodecolors[7] = {
     explode_color_dark,   explode_color_noxious, explode_color_muddy,
@@ -2328,14 +2307,11 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
         /*
          *    GMAP_SET                0x00000001
          *    GMAP_ROGUELEVEL         0x00000002
-         *    GMAP_HIGHALTARCOLOR     0x00000004
          */
         g.glyphmap_perlevel_flags |= GMAP_SET;
 
         if (Is_rogue_level(&u.uz)) {
             g.glyphmap_perlevel_flags |= GMAP_ROGUELEVEL;
-        } else if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
-            g.glyphmap_perlevel_flags |= GMAP_HIGHALTARCOLOR;
         }
     }
 
@@ -2457,7 +2433,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             gmap->symidx = S_grave + offset + SYM_OFF_P;
             cmap_color(S_grave + offset);
         } else if ((offset = (glyph - GLYPH_ALTAR_OFF)) >= 0) {
-            /* unaligned, chaotic, neutral, lawful, high altar */
+            /* unaligned, chaotic, neutral, lawful, other altar */
             gmap->symidx = S_altar + SYM_OFF_P;
             altar_color(offset);
         } else if ((offset = (glyph - GLYPH_CMAP_A_OFF)) >= 0) {

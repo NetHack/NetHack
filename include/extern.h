@@ -342,7 +342,6 @@ extern int wiz_debug_cmd_bury(void);
 /* ### display.c ### */
 
 extern void magic_map_background(xchar, xchar, int);
-extern void map_altar(xchar, xchar, int);
 extern void map_background(xchar, xchar, int);
 extern void map_trap(struct trap *, int);
 extern void map_object(struct obj *, int);

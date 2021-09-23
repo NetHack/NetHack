@@ -60,7 +60,7 @@ struct {
 enum {MON_GLYPH, OBJ_GLYPH, OTH_GLYPH, TERMINATOR = -1};
 #define EXTRA_SCROLL_DESCR_COUNT ((SCR_BLANK_PAPER - SCR_STINKING_CLOUD) - 1)
 const char *altar_text[] = {
-    "unaligned", "chaotic", "neutral", "lawful", "high altar",
+    "unaligned", "chaotic", "neutral", "lawful", "other altar",
 };
 enum wall_levels { main_dungeon, mines, gehennom, knox, sokoban };
 
@@ -329,7 +329,7 @@ tilename(int set, const int file_entry, int gend UNUSED)
 
         /* Altars */
         cmap = S_altar;
-        for (k = altar_unaligned; k <= altar_highaltar; k++) {
+        for (k = altar_unaligned; k <= altar_other; k++) {
             /* Since defsyms only has one altar symbol,
                it isn't much help in identifying details
                these. Roll our own name. */
@@ -889,7 +889,7 @@ init_tilemap(void)
     /* Altars */
     cmap = S_altar;
     j = 0;
-    for (k = altar_unaligned; k <= altar_highaltar; k++) {
+    for (k = altar_unaligned; k <= altar_other; k++) {
         offset = GLYPH_ALTAR_OFF + j;
         precheck((offset), "altar");
         tilemap[offset].tilenum = tilenum;
@@ -1377,7 +1377,7 @@ acceptable_tilename(int glyph_set, int idx, const char *encountered,
         { "raised drawbridge", "vertical closed drawbridge" },
         { "raised drawbridge", "horizontal closed drawbridge" },
         { "altar", "unaligned altar" },
-        { "altar", "high altar" },
+        { "altar", "other altar" },
 #if 0
         { "dark part of a room", "stone" },
 #endif

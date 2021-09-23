@@ -317,7 +317,7 @@
  * cmap A           S_ndoor through S_brdnladder
  *                  Count: (S_brdnladder - S_ndoor) + 1 = 19
  *
- * Altars           Altar (Unaligned, Chaotic, Neutral, Lawful, high altar)
+ * Altars           Altar (unaligned, chaotic, neutral, lawful, other)
  *                  Count: 5
  *
  * cmap B           S_grave through S_vibrating_square
@@ -916,7 +916,7 @@ enum altar_colors {
     altar_color_neutral = CLR_GRAY,
     altar_color_lawful  = CLR_GRAY,
 #endif
-    altar_color_highaltar = CLR_BRIGHT_MAGENTA,
+    altar_color_other = CLR_BRIGHT_MAGENTA,
 };
 
 /* types of explosions */
@@ -956,7 +956,7 @@ enum altar_types {
     altar_chaotic,
     altar_neutral,
     altar_lawful,
-    altar_highaltar
+    altar_other
 };
 
 enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */
