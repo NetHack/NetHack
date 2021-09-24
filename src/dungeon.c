@@ -2765,6 +2765,7 @@ recalc_mapseen(void)
     struct trap *t;
     unsigned i, ridx, atmp;
     int x, y, ltyp, count;
+    char uroom;
 
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets
@@ -2816,18 +2817,14 @@ recalc_mapseen(void)
     /* flags.msanctum, .valley, and .vibrating_square handled below */
 
     /* track rooms the hero is in */
-    for (i = 0; i < SIZE(u.urooms); ++i) {
-        if (!u.urooms[i])
-            continue;
-
-        ridx = u.urooms[i] - ROOMOFFSET;
+    for (i = 0; (uroom = u.urooms[i]) != '\0'; ++i) {
+        ridx = (unsigned) uroom - ROOMOFFSET;
         mptr->msrooms[ridx].seen = 1;
         mptr->msrooms[ridx].untended =
             (g.rooms[ridx].rtype >= SHOPBASE)
-                ? (!(mtmp = shop_keeper(u.urooms[i])) || !inhishop(mtmp))
+                ? (!(mtmp = shop_keeper(uroom)) || !inhishop(mtmp))
                 : (g.rooms[ridx].rtype == TEMPLE)
-                      ? (!(mtmp = findpriest(u.urooms[i]))
-                         || !inhistemple(mtmp))
+                      ? (!(mtmp = findpriest(uroom)) || !inhistemple(mtmp))
                       : 0;
     }
 
