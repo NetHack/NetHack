@@ -231,9 +231,8 @@ static const char default_menu_cmds[] = {
 #ifdef TTY_TILES_ESCCODES
 static int vt_tile_current_window = -2;
 
-void
-print_vt_code(i, c, d)
-int i, c, d;
+static void
+print_vt_code(int i, int c, int d)
 {
     HUPSKIP();
     if (iflags.vt_tiledata) {
@@ -259,8 +258,8 @@ int i, c, d;
 #define print_vt_code2(i,c)   print_vt_code((i), (c), -1)
 #define print_vt_code3(i,c,d) print_vt_code((i), (c), (d))
 
-#ifdef TTY_SOUND_ESCCODES
-void
+#if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
+static void
 print_vt_soundcode_idx(int idx, int v)
 {
     HUPSKIP();
@@ -3358,9 +3357,6 @@ tty_print_glyph(winid window, xchar x, xchar y,
 {
     boolean inverse_on = FALSE;
     int ch, color;
-#if defined(TTY_TILES_ESCCODES)
-    int glyph;
-#endif
     unsigned special;
 
     HUPSKIP();
@@ -3371,9 +3367,6 @@ tty_print_glyph(winid window, xchar x, xchar y,
     }
 #endif
     /* get glyph ttychar, color, and special flags */
-#if defined(TTY_TILES_ESCCODES)
-    glyph = glyphinfo->glyph;
-#endif
     ch = glyphinfo->ttychar;
     color = glyphinfo->gm.color;
     special = glyphinfo->gm.glyphflags;
@@ -3383,7 +3376,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
     /* Move the cursor. */
     tty_curs(window, x, y);
 
-    print_vt_code3(AVTC_GLYPH_START, glyphinfo->tileidx, special);
+    print_vt_code3(AVTC_GLYPH_START, glyphinfo->gm.tileidx, special);
 
 #ifndef NO_TERMS
     if (ul_hack && ch == '_') { /* non-destructive underscore */
@@ -3845,7 +3838,7 @@ tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
  */
 
 DISABLE_WARNING_FORMAT_NONLITERAL
- 
+
 void
 tty_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
                   int color, unsigned long *colormasks)
@@ -4145,7 +4138,7 @@ status_sanity_check(void)
         "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",           /* 16.. 19 */
         "BL_LEVELDESC", "BL_EXP", "BL_CONDITION"              /* 20.. 22 */
     };
-   
+
     if (in_sanity_check)
         return;
     in_sanity_check = TRUE;
