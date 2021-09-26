@@ -1258,11 +1258,10 @@ check bones data directly for deja vu messages (pr #374 by entrez)
 unify code for extracting an object from a monster's inventory (pr #455 by
 	copperwater)
 make engraving an occupation (pr #460 by copperwater)
-fpostfx index out of bounds when eating standard eggs (github pr#547 by
-	janne-hmp)
+fpostfx index out of bounds when eating standard eggs (pr#547 by janne-hmp)
 "readable" Hawaiian shirt designs (github pr#407 by entrez)
 permit blind feeling for objects on trap door and fix up msgs when dropping
-	on trapdoor (github pr#574 by entrez)
+	on trapdoor (pr#574 by entrez)
 m-prefix movement into warning symbol (pr #575 by entrez)
 running on ice sent hero in weird directions (pr #588 by copperwater)
 delete extra lines in Guidebook.mn (pr #590 by argrath)
