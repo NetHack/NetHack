@@ -2271,8 +2271,6 @@ Objects
 .pg
 When you find something in the dungeon, it is common to want to pick
 it up.  In NetHack, this is accomplished by using the \(oq,\(cq command.
-automatically by walking over
-the object (unless you turn off the
 If
 .op autopickup
 option is on, you will automatically pick up the object
