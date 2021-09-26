@@ -2854,7 +2854,7 @@ lookaround(void)
 
             /* more uninteresting terrain */
             if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM
-                || IS_AIR(levl[x][y].typ)) {
+                || IS_AIR(levl[x][y].typ) || levl[x][y].typ == ICE) {
                 continue;
             } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 /* a closed door? */
@@ -3050,7 +3050,6 @@ end_running(boolean and_travel)
     if (flags.time && g.context.run)
         iflags.time_botl = TRUE;
     g.context.run = 0;
-    g.domove_attempting = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
     if (and_travel)
