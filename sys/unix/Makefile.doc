@@ -39,10 +39,13 @@ ONEPAGECMD = $(ONEPAGE_PREFORMAT) | nroff -c -Tascii | $(COLCMD) \
 
 # Only generate output for the current configuration:
 NHGREP = $(MAKEDEFS) --grep --input - --output -
+NEEDMAKEDEFS = $(MAKEDEFS)
 # Generate output for all configurations:
 #NHGREP = $(MAKEDEFS) --grep --input - --output - --grep-define ALLDOCS
+#NEEDMAKEDEFS = $(MAKEDEFS)
 # Fallback:
 #NHGREP = cat
+#NEEDMAKEDEFS =
 
 GUIDE_PREFORMAT = cat Guidebook.mn | $(NHGREP) | tbl tmac.n -
 # for Guidebook.dat, unpaginated version of Guidebook.txt
@@ -50,21 +53,27 @@ ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn Guidebook.mn Gbk-1pg-sfx.mn \
 	| $(NHGREP) | tbl tmac.n -
 
 # the basic guidebook
-Guidebook:	Guidebook.mn tmac.n tmac.nh
+Guidebook	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDECMD) > Guidebook
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
-Guidebook.ps:	Guidebook.mn tmac.n tmac.nh
+Guidebook.ps	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
 
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
 # - The invocation command for LaTeX may vary in different installations.
 # - To print Guidebook.dvi you need to use a suitable dvi-driver.
 # - LaTeX needs to be run twice; second pass uses Guidebook.aux made by first.
-Guidebook.dvi:	Guidebook.tex
+Guidebook.dvi	: Guidebook.tex
 	latex Guidebook.tex
 	latex Guidebook.tex
 
+# makedefs has more dependencies than these; this is mainly to cope with the
+# case where it hasn't been built yet since it is usually needed for $(NHGREP)
+# (note: 'make makedefs', not 'make $(MAKEDEFS)')
+$(MAKEDEFS)	: ../util/makedefs.c ../include/config.h ../src/mdlib.c \
+		  ../util/mdgrep.h
+	( cd ../util ; make makedefs )
 
 GAME	= nethack
 MANDIR	= /usr/man/man6
@@ -94,9 +103,10 @@ DISTRIB = Guidebook.txt nethack.txt recover.txt \
 distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
 
-Guidebook.txt	: Guidebook.mn tmac.n tmac.nh
+Guidebook.txt	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDECMD) > Guidebook.txt
-Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn Guidebook.mn tmac.n tmac.nh
+Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn Guidebook.mn tmac.n tmac.nh \
+		  $(NEEDMAKEDEFS)
 	$(ONEPAGECMD) > Guidebook.dat
 
 MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)

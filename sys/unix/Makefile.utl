@@ -3,6 +3,11 @@
 # Copyright (c) 2018 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
+#
+# Note: as of nethack 3.7, 'lev_comp' and 'dgn_comp' are no longer present
+#	so use of yacc and lex to build them is no longer required.
+#
+
 # Root of source tree:
 NHSROOT=..
 
@@ -206,12 +211,18 @@ TARGET_CXXFLAGS = $(CXXFLAGS)
 makedefs:	$(MAKEOBJS) mdgrep.h
 	$(CLINK) $(LFLAGS) -o makedefs $(MAKEOBJS)
 
-makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) ../include/permonst.h \
-		../include/objclass.h ../include/sym.h ../include/defsym.h \
+
+# note: the headers listed here are maintained manually rather than via
+#	'make depend'; only the ones which are directly included by
+#	makedefs.c are listed, without various nested ones that they include;
+#	for makedefs (but not for nethack's core), mdlib.c gets included
+#	rather than be compiled separately
+makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) \
+		../include/permonst.h ../include/objclass.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/monsters.h ../include/objects.h \
-		../include/you.h ../include/flag.h ../include/dlb.h \
-		../include/patchlevel.h
+		../include/you.h ../include/context.h ../include/flag.h \
+		../include/dlb.h ../include/patchlevel.h mdgrep.h
 	$(CC) $(CFLAGS) -c makedefs.c -o $@
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.

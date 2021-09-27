@@ -710,7 +710,8 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 		../include/patchlevel.h
 	@( cd ../util ; $(MAKE) makedefs )
 
-#	Source files created by 'makedefs' at build time.
+#	Source files formerly created by 'makedefs' at build time
+#	but no longer used.
 #	Each is given an artificial dependency upon the one before
 #	so that parallel makes will have to build them sequentially.
 #	(More for documentation than effect; 'make' should know not
@@ -771,7 +772,8 @@ clean:
 spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*
 	-rm -f ../include/nhlua.h
-	-rm -f ../include/date.h ../include/onames.h ../include/pm.h
+	-rm -f ../include/date.h #created but no longer used, at least by core
+	-rm -f ../include/onames.h ../include/pm.h #obsolete generated files
 	-rm -f tile.c *.moc
 	-rm -f ../win/gnome/gn_rip.h
 
