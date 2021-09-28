@@ -53,7 +53,10 @@ extern void objects_globals_init(void);
 
 extern char *tilename(int, int);
 
-#define MAGICTILENO (340 + 440 + 231 + 340)
+/* The numbers in the following calculation are the
+   count of tiles present in:
+   monsters.txt objects.txt other.txt monsters.txt */
+#define MAGICTILENO (788 + 459 + 237 + 788)
 
 #if BITCOUNT == 4
 #define MAX_X 320 /* 2 per byte, 4 bits per pixel */
@@ -64,7 +67,7 @@ extern char *tilename(int, int);
 #define MAX_Y ((MAGICTILENO * 32) / 40) * 2
 #else
 #define MAX_X (16 * 40)
-#define MAX_Y ((MAGICTILENO * 16) / 40) * 2
+#define MAX_Y (((16 * MAGICTILENO) / 40) + 16)
 #endif
 #endif
 
