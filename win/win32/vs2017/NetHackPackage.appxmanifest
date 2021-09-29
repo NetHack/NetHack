@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp rescap">
-  <Identity Name="30485NetHackDevTeam.NetHack3.6" Publisher="CN=8BDC628A-FAAA-4EBA-8B5B-EB61BA93BA1F" Version="363.0.28.0" />
+  <Identity Name="30485NetHackDevTeam.NetHack3.6" Publisher="CN=8BDC628A-FAAA-4EBA-8B5B-EB61BA93BA1F" Version="366.0.2.0" />
   <Properties>
     <DisplayName>NetHack 3.6</DisplayName>
     <PublisherDisplayName>NetHack DevTeam</PublisherDisplayName>

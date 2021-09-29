@@ -7,7 +7,7 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-.clang-format  .travis.yml    Files          Porting        README
+.clang-format  Files          Porting        README
 
 DEVEL:
 (files for people developing changes to NetHack)
