@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.6 by Mike Stephenson and others)
 
-                                    March 8, 2020
+                                 September 29, 2021
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -324,7 +324,7 @@
                Intelligence affects your ability to cast  spells  and  read
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -390,7 +390,7 @@
                ical attacks.  Many dungeons show only your experience level
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -522,7 +522,7 @@
                nasty and vicious.  Sometimes, however, they can be helpful.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -588,7 +588,7 @@
                symbol at the chosen location, conditionally check for "More
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -654,7 +654,7 @@
                if you remember a monster there).
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -852,7 +852,7 @@
                once  you've  closed  this  menu.  The available options are
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1050,7 +1050,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1578,7 +1578,7 @@
                When picking a  target  with  cursor  and  the  autodescribe
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1842,7 +1842,7 @@
           the `^D' (kick) command.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1908,7 +1908,7 @@
           on the corresponding staircase  at  your  destination.   However,
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2040,7 +2040,7 @@
           member a monster but want to try fighting anyway, you can use the
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2106,7 +2106,7 @@
           ers (or even former incarnations of yourself!) and their personal
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2172,7 +2172,7 @@
           ter.   Many commands that operate on objects must ask you to find
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2238,7 +2238,7 @@
           In  some cases "uncursed" will be omitted as being redundant when
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2304,7 +2304,7 @@
           to taking off other worn items.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2436,7 +2436,7 @@
           ondary  is  just an item in your inventory that's been designated
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2634,7 +2634,7 @@
           the  wall,  you might decide to go for broke and break your wand.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2700,7 +2700,7 @@
           cation  rather  than  just specify a particular direction.  Other
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2817,7 +2817,7 @@
 
                Normally, if you have seen an object at a particular map lo-
           cation  and move to another location where you can't directly see
-          that object any more, if will continue to be  displayed  on  your
+          that object any more, it will continue to be  displayed  on  your
           map.   That remains the case even if it is not actually there any
           more -- perhaps a monster has picked it up or it has rotted  away
           --  until  you  can see or feel that location again.  One notable
@@ -2832,7 +2832,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2898,7 +2898,7 @@
           brains while polymorphed into a mind flayer, is considered eating
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -2964,7 +2964,7 @@
           type  ("polypiling")  or  the  form of your own body into another
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3030,7 +3030,7 @@
           tion,  and  are  ignored  unless  a  CHOOSE statement was used to
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3096,7 +3096,7 @@
             pletion has no effect for the X11 windowport.  You can  specify
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3162,7 +3162,7 @@
             "Configuring User Sounds" section.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3294,7 +3294,7 @@
             tion controls whether the description includes map coordinates.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3360,7 +3360,7 @@
             was defined during compilation.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3426,7 +3426,7 @@
             display for end-of-game disclosure follows a set sequence.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3492,7 +3492,7 @@
             "no",  you will exclude that gender from being picked randomly.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3558,7 +3558,7 @@
             sistent.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3624,7 +3624,7 @@
             fault `\'.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3690,7 +3690,7 @@
             Prompt for new form whenever any monster changes shape (default
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3756,7 +3756,7 @@
             Valid settings are:
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3822,7 +3822,7 @@
                           item.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3888,7 +3888,7 @@
             (Default `S').  Persistent.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -3954,7 +3954,7 @@
             be set with the `O' command.  Persistent.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4020,7 +4020,7 @@
             off).  Persistent.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4086,7 +4086,7 @@
             only; "X11" interface always uses a  timer  based  delay.   The
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4218,7 +4218,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4284,7 +4284,7 @@
             If NetHack can, it should use this size font for text windows.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4350,7 +4350,7 @@
             Number  of  lines for traditional below-the-map status display.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4482,7 +4482,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4548,7 +4548,7 @@
           pressions. It is possible  to  compile  NetHack  without  regular
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4614,7 +4614,7 @@
           key can be a single character ("x"), a control key ("^X", "C-x"),
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4680,7 +4680,7 @@
             When  asked  for  a  location,  the key to toggle autodescribe.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4746,7 +4746,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4812,7 +4812,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5010,7 +5010,7 @@
           cyan,  gray,  orange,  light-green,  yellow,  light-blue,  light-
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5076,7 +5076,7 @@
                  value changes upwards or downwards.  This attribute  times
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5472,7 +5472,7 @@
           may want to alter settings via SYMBOLS= and ROGUESYMBOLS= in your
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5604,7 +5604,7 @@
             spectively, to identify unique people for the score file.
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5736,7 +5736,7 @@
           a  very  different  game, and published (at least) three versions
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5802,7 +5802,7 @@
           3.1  for  the  Macintosh,  porting it for MPW.  Building on their
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5868,7 +5868,7 @@
           ber,  Dean  Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -5934,7 +5934,7 @@
           ginning of a long release hiatus. 3.4.3 proved to be a remarkably
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -6066,7 +6066,7 @@
           netland sends a particularly intriguing modification to help  out
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.6                                         March 8, 2020
+          NetHack 3.6                                    September 29, 2021
 
 
 
