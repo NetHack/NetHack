@@ -1254,14 +1254,14 @@ allow rereading spellbooks to refresh memory at any time (pr #261 by
 allow themed rooms constrained by level difficulty (pr #344 by copperwater)
 add a varied form of LIBNH nethack library contribution (pr #385, #403
 	by apowers313)
-add cross-compile to WASM (github #385, #403, #412 by apowers313)
+add cross-compile to WASM (pr #385, #403, #412 by apowers313)
 differentiating gendered monster tiles (pr #430 by NullCGT)
 check bones data directly for deja vu messages (pr #374 by entrez)
 unify code for extracting an object from a monster's inventory (pr #455 by
 	copperwater)
 make engraving an occupation (pr #460 by copperwater)
 fpostfx index out of bounds when eating standard eggs (pr#547 by janne-hmp)
-"readable" Hawaiian shirt designs (github pr#407 by entrez)
+"readable" Hawaiian shirt designs (pr#407 by entrez)
 permit blind feeling for objects on trap door and fix up msgs when dropping
 	on trapdoor (pr#574 by entrez)
 travel from 'interesting position' (pr #575 by entrez)
