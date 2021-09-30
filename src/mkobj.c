@@ -273,7 +273,7 @@ mkbox_cnts(struct obj *box)
 
     for (n = rn2(n + 1); n > 0; n--) {
         if (box->otyp == ICE_BOX) {
-            otmp = mksobj(CORPSE, TRUE, TRUE);
+            otmp = mksobj(CORPSE, TRUE, FALSE);
             /* Note: setting age to 0 is correct.  Age has a different
              * from usual meaning for objects stored in ice boxes. -KAA
              */
@@ -288,7 +288,7 @@ mkbox_cnts(struct obj *box)
 
             for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
                 ;
-            if (!(otmp = mkobj(iprobs->iclass, TRUE)))
+            if (!(otmp = mkobj(iprobs->iclass, FALSE)))
                 continue;
 
             /* handle a couple of special cases */
