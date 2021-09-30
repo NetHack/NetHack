@@ -1264,7 +1264,7 @@ fpostfx index out of bounds when eating standard eggs (pr#547 by janne-hmp)
 "readable" Hawaiian shirt designs (github pr#407 by entrez)
 permit blind feeling for objects on trap door and fix up msgs when dropping
 	on trapdoor (pr#574 by entrez)
-m-prefix movement into warning symbol (pr #575 by entrez)
+travel from 'interesting position' (pr #575 by entrez)
 running on ice sent hero in weird directions (pr #588 by copperwater)
 delete extra lines in Guidebook.mn (pr #590 by argrath)
 Supply missing changes on Guidebook.tex (pr #591 by argrath)
