@@ -2954,6 +2954,8 @@ xkilled(
             if (mdat->msize < MZ_HUMAN && otyp != FIGURINE
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
+                if (otmp->oartifact)
+                    artifact_exists(otmp, safe_oname(otmp), FALSE);
                 delobj(otmp);
             } else if (!flooreffects(otmp, x, y, nomsg ? "" : "fall")) {
                 place_object(otmp, x, y);
