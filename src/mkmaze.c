@@ -418,17 +418,18 @@ baalz_fixup(void)
        both top and bottom gets a bogus extra connection to room area,
        producing unwanted rectangles; change back to separated legs */
     x = g.bughack.delarea.x1, y = g.bughack.delarea.y1;
-    if (isok(x, y) && levl[x][y].typ == TLWALL
+    if (isok(x, y) && (levl[x][y].typ == TLWALL || levl[x][y].typ == TRWALL)
         && isok(x, y + 1) && levl[x][y + 1].typ == TUWALL) {
-        levl[x][y].typ = BRCORNER;
+        levl[x][y].typ = (levl[x][y].typ == TLWALL) ? BRCORNER : BLCORNER;
         levl[x][y + 1].typ = HWALL;
         if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
             (void) rloc(mtmp, FALSE);
     }
+
     x = g.bughack.delarea.x2, y = g.bughack.delarea.y2;
-    if (isok(x, y) && levl[x][y].typ == TLWALL
+    if (isok(x, y) && (levl[x][y].typ == TLWALL || levl[x][y].typ == TRWALL)
         && isok(x, y - 1) && levl[x][y - 1].typ == TDWALL) {
-        levl[x][y].typ = TRCORNER;
+        levl[x][y].typ = (levl[x][y].typ == TLWALL) ? TRCORNER : TLCORNER;
         levl[x][y - 1].typ = HWALL;
         if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
             (void) rloc(mtmp, FALSE);
