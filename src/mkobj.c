@@ -358,9 +358,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
         OMONST(obj2)->mextra = (struct mextra *) 0;
         OMONST(obj2)->nmon = (struct monst *) 0;
 #if 0
-        OMONST(obj2)->m_id = g.context.ident++;
-        if (OMONST(obj2)->m_id) /* ident overflowed */
-            OMONST(obj2)->m_id = g.context.ident++;
+        OMONST(obj2)->m_id = next_ident();
 #endif
         if (OMONST(obj1)->mextra)
             copy_mextra(OMONST(obj2), OMONST(obj1));
@@ -421,6 +419,34 @@ splitobj(struct obj *obj, long num)
     return otmp;
 }
 
+/* return the value of context.ident and then increment it to be ready for
+   its next use; used to be simple += 1 so that every value from 1 to N got
+   used but now has a random increase that skips half of potential values */
+unsigned
+next_ident(void)
+{
+    unsigned res = g.context.ident;
+
+    /* +rnd(2): originally just +1; changed to rnd() to avoid potential
+       exploit of player using #adjust to split an object stack in a manner
+       that makes most recent ident%2 known; since #adjust takes no time,
+       no intervening activity like random creation of a new monster will
+       take place before next user command; with former +1, o_id%2 of the
+       next object to be created was knowable and player could make a wish
+       under controlled circumstances for an item that is affected by the
+       low bits of its obj->o_id [particularly helm of opposite alignment] */
+    g.context.ident += rnd(2); /* ready for next new object or monster */
+
+    /* if ident has wrapped to 0, force it to be non-zero; if/when it
+       ever wraps past 0 (unlikely, but possible on a configuration which
+       uses 16-bit 'int'), just live with that and hope no o_id conflicts
+       between objects or m_id conflicts between monsters arise */
+    if (!g.context.ident)
+        g.context.ident = rnd(2);
+
+    return res;
+}
+
 /* when splitting a stack that has o_id-based shop prices, pick an
    o_id value for the new stack that will maintain the same price */
 static unsigned
@@ -436,8 +462,9 @@ nextoid(struct obj *oldobj, struct obj *newobj)
             ++oid;
         newdif = oid_price_adjustment(newobj, oid);
     } while (newdif != olddif && --trylimit >= 0);
-    g.context.ident = oid + 1; /* ready for next new object */
-    return oid;
+    g.context.ident = oid; /* update 'last ident used' */
+    (void) next_ident(); /* increment context.ident for next use */
+    return oid; /* caller will use this ident */
 }
 
 /* try to find the stack obj was split from, then merge them back together;
@@ -756,9 +783,7 @@ mksobj(int otyp, boolean init, boolean artif)
     otmp = newobj();
     *otmp = cg.zeroobj;
     otmp->age = g.moves;
-    otmp->o_id = g.context.ident++;
-    if (!otmp->o_id)
-        otmp->o_id = g.context.ident++; /* ident overflowed */
+    otmp->o_id = next_ident();
     otmp->quan = 1L;
     otmp->oclass = let;
     otmp->otyp = otyp;

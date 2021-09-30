@@ -1329,6 +1329,7 @@ extern struct obj *mkobj(int, boolean);
 extern int rndmonnum(void);
 extern boolean bogon_is_pname(char);
 extern struct obj *splitobj(struct obj *, long);
+extern unsigned next_ident(void);
 extern struct obj *unsplitobj(struct obj *);
 extern void clear_splitobjs(void);
 extern void replace_object(struct obj *, struct obj *);

@@ -624,6 +624,12 @@ data tracking for #overview was mis-using u.urooms[] and after being in a
 	levels might flag unvisisted rooms as having been visited
 special damage attacks by the Riders and by fatal-illness inflictors such as
 	Demogorgon did no damage against other monsters, only against the hero
+using obj->o_id to control 'random' behavior of a helm of opposite alignment
+	could potentially be controlled by player when wishing for such
+obj->o_id might be set to invalid value 0 when a partly used up stack had a
+	dummy copy added to a shop's bill or when a bones file was loaded
+	(in theory that could happen on any system but in practice it could
+	only happen on a configuration that uses 16-bit ints)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

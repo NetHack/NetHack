@@ -837,9 +837,7 @@ clone_mon(struct monst *mon,
     m2->mextra = (struct mextra *) 0;
     m2->nmon = fmon;
     fmon = m2;
-    m2->m_id = g.context.ident++;
-    if (!m2->m_id)
-        m2->m_id = g.context.ident++; /* ident overflowed */
+    m2->m_id = next_ident();
     m2->mx = mm.x;
     m2->my = mm.y;
 
@@ -1205,9 +1203,7 @@ makemon(register struct permonst *ptr,
         mtmp->msleeping = 1;
     mtmp->nmon = fmon;
     fmon = mtmp;
-    mtmp->m_id = g.context.ident++;
-    if (!mtmp->m_id)
-        mtmp->m_id = g.context.ident++; /* ident overflowed */
+    mtmp->m_id = next_ident();
     set_mon_data(mtmp, ptr); /* mtmp->data = ptr; */
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
         g.quest_status.leader_m_id = mtmp->m_id;

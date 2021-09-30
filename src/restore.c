@@ -263,7 +263,8 @@ restobjchn(NHFILE* nhfp, boolean frozen)
             otmp2->nobj = otmp;
 
         if (ghostly) {
-            unsigned nid = g.context.ident++;
+            unsigned nid = next_ident();
+
             add_id_mapping(otmp->o_id, nid);
             otmp->o_id = nid;
         }
@@ -404,7 +405,8 @@ restmonchn(NHFILE* nhfp)
             mtmp2->nmon = mtmp;
 
         if (ghostly) {
-            unsigned nid = g.context.ident++;
+            unsigned nid = next_ident();
+
             add_id_mapping(mtmp->m_id, nid);
             mtmp->m_id = nid;
         }
