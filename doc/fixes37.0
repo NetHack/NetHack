@@ -622,6 +622,8 @@ Izchak occasionally stocks wands/scrolls/spellbooks of light
 data tracking for #overview was mis-using u.urooms[] and after being in a
 	situation where hero was in multiple rooms at once, visiting other
 	levels might flag unvisisted rooms as having been visited
+special damage attacks by the Riders and by fatal-illness inflictors such as
+	Demogorgon did no damage against other monsters, only against the hero
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
