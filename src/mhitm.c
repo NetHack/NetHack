@@ -243,13 +243,22 @@ mdisplacem(register struct monst *magr, register struct monst *mdef,
     }
 
     remove_monster(fx, fy); /* pick up from orig position */
-    remove_monster(tx, ty);
+    if (mdef->wormno)
+        remove_worm(mdef);
+    else
+        remove_monster(tx, ty);
     place_monster(magr, tx, ty); /* put down at target spot */
     place_monster(mdef, fx, fy);
+    if (mdef->wormno) /* now put down tail */
+        place_worm_tail_randomly(mdef, fx, fy);
+    /* either creature might move into or out of a poison gas cloud */
+    update_monster_region(magr);
+    update_monster_region(mdef);
+
     if (g.vis && !quietly)
         pline("%s moves %s out of %s way!", Monnam(magr), mon_nam(mdef),
               is_rider(pa) ? "the" : mhis(magr));
-    newsym(fx, fy);  /* see it */
+    newsym(fx, fy);  /* see it       */
     newsym(tx, ty);  /*   all happen */
     flush_screen(0); /* make sure it shows up */
 

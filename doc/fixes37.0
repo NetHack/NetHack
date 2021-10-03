@@ -630,6 +630,10 @@ obj->o_id might be set to invalid value 0 when a partly used up stack had a
 	dummy copy added to a shop's bill or when a bones file was loaded
 	(in theory that could happen on any system but in practice it could
 	only happen on a configuration that uses 16-bit ints)
+if a Rider or displacer beast swapped places with a single-segment long worm
+	the segment co-located with the head wasn't moved with that head;
+	if sanity_checking was enabled a warning could be triggered:
+	mon (000000) at seg location is not worm (123abc)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
