@@ -3380,8 +3380,8 @@ read_wizkit(void)
 
 /* ----------  BEGIN SYMSET FILE HANDLING ----------- */
 
-extern const char *known_handling[];     /* drawing.c */
-extern const char *known_restrictions[]; /* drawing.c */
+extern const char *known_handling[];     /* symbols.c */
+extern const char *known_restrictions[]; /* symbols.c */
 
 static
 FILE *
