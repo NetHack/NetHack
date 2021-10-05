@@ -220,7 +220,8 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef DEF_PAGER
-    if (!(g.catmore = nh_getenv("HACKPAGER"))
+    if (!(g.catmore = nh_getenv("NETHACKPAGER"))
+        && !(g.catmore = nh_getenv("HACKPAGER"))
         && !(g.catmore = nh_getenv("PAGER")))
         g.catmore = DEF_PAGER;
 #endif

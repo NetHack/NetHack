@@ -93,10 +93,12 @@
 /*
  * Define DEF_PAGER as your default pager, e.g. "/bin/cat" or "/usr/ucb/more"
  * If defined, it can be overridden by the environment variable PAGER.
- * Hack will use its internal pager if DEF_PAGER is not defined.
- * (This might be preferable for security reasons.)
+ * NetHack will use its internal pager if DEF_PAGER is not defined _or_
+ * if DLB is defined since an external pager won't know how to access the
+ * contents of the dlb container file.
+ * (Note: leaving DEF_PAGER undefined is preferable for security reasons.)
  */
-/* #define DEF_PAGER ".../mydir/mypager" */
+/* #define DEF_PAGER "/usr/bin/less" */
 
 /*
  * Define PORT_HELP to be the name of the port-specfic help file.

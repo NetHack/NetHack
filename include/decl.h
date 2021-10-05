@@ -838,7 +838,7 @@ struct instance_globals {
     int locknum; /* max num of simultaneous users */
 #endif
 #ifdef DEF_PAGER
-    char *catmore; /* default pager */
+    const char *catmore; /* external pager; from getenv() or DEF_PAGER */
 #endif
 #ifdef MICRO
     char levels[PATHLEN]; /* where levels are */

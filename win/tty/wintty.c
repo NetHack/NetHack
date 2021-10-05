@@ -36,6 +36,20 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
+#ifdef DEF_PAGER
+    /* DEF_PAGER implies UNIX; when dlb is in use, the only file accessible
+       to an external pager is 'license'; override 'DEF_PAGER' for that
+       situation rather than using code to fallback to DLB plus internal
+       pager after open() failure */
+#ifdef DLB
+#undef DEF_PAGER
+#else
+#ifndef O_RDONLY /* (same logic as unixmain.c) */
+#include <fcntl.h>
+#endif
+#endif /* DLB */
+#endif /* DEF_PAGER */
+
 #if defined(TTY_TILES_ESCCODES) || defined(TTY_SOUND_ESCCODES)
 #define VT_ANSI_COMMAND 'z'
 #endif
@@ -2791,7 +2805,7 @@ tty_display_file(const char *fname, boolean complain)
 #ifdef DEF_PAGER /* this implies that UNIX is defined */
     {
         /* use external pager; this may give security problems */
-        register int fd = open(fname, 0);
+        int fd = open(fname, O_RDONLY);
 
         if (fd < 0) {
             if (complain)
