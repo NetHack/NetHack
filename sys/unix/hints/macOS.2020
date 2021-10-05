@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.2020 $NHDT-Date: 1599687615 2020/09/09 21:40:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.73 $
+# NetHack 3.7  macOS.2020 $NHDT-Date: 1633401749 2021/10/05 02:42:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -56,7 +56,7 @@ endif
 # NetHack sources control
 NHCFLAGS+=-DDLB
 NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
-NHCFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
+NHCFLAGS+=-DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\"
 NHCFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 #NHCFLAGS+=-DTIMED_DELAY
 #NHCFLAGS+=-DDUMPLOG
