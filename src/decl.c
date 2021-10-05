@@ -580,7 +580,6 @@ const struct instance_globals g_init = {
     /* restore.c */
     0, /* n_ids_mapped */
     0, /* id_map */
-    FALSE, /* restoring */
     UNDEFINED_PTR, /* oldfruit */
     UNDEFINED_VALUE, /* omoves */
 

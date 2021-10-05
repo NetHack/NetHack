@@ -539,7 +539,7 @@ warning_of(struct monst *mon)
 boolean
 suppress_map_output(void)
 {
-    if (g.in_mklev || g.program_state.restoring)
+    if (g.in_mklev || g.program_state.saving || g.program_state.restoring)
         return TRUE;
 #ifdef HANGUPHANDLING
     if (g.program_state.done_hup)
@@ -1480,7 +1480,7 @@ redraw_map(void)
      * !u.ux: display isn't ready yet; (restoring || !on_level()): was part
      * of cliparound() but interface shouldn't access this much internals
      */
-    if (!u.ux || g.restoring || !on_level(&u.uz0, &u.uz))
+    if (!u.ux || suppress_map_output() || !on_level(&u.uz0, &u.uz))
         return;
 
     /*
@@ -1829,7 +1829,7 @@ flush_screen(int cursor_on_u)
     glyph_info bkglyphinfo = nul_glyphinfo;
 
     /* 3.7: don't update map, status, or perm_invent during save/restore */
-    if (g.program_state.saving || g.program_state.restoring)
+    if (suppress_map_output())
         return;
 
     if (cursor_on_u == -1)

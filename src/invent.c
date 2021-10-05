@@ -2346,12 +2346,12 @@ learn_unseen_invent(void)
 
 /* persistent inventory window is maintained by interface code;
    'update_inventory' used to be a macro for
-   (*windowprocs.win_update_inventory) but the restore hackery
-   was getting out of hand; this is now a central call point */
+   (*windowprocs.win_update_inventory) but the restore hackery to suppress
+   screen updates was getting out of hand; this is now a central call point */
 void
 update_inventory(void)
 {
-    if (g.program_state.saving || g.program_state.restoring)
+    if (suppress_map_output()) /* despite name, used for perm_invent too */
         return;
 
     /*

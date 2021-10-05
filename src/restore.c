@@ -756,7 +756,9 @@ dorecover(NHFILE* nhfp)
     int rtmp;
     struct obj *otmp;
 
+    /* suppress map display if some part of the code tries to update that */
     g.program_state.restoring = 1;
+
     get_plname_from_file(nhfp, g.plname);
     getlev(nhfp, 0, (xchar) 0);
     if (!restgamestate(nhfp, &stuckid, &steedid)) {

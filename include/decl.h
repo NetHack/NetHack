@@ -1131,7 +1131,6 @@ struct instance_globals {
     /* restore.c */
     int n_ids_mapped;
     struct bucket *id_map;
-    boolean restoring;
     struct fruit *oldfruit;
     long omoves;
 

@@ -249,8 +249,8 @@ bot(void)
 {
     /* dosave() flags completion by setting u.uhp to -1; supprss_map_output()
        covers program_state.restoring and is used for status as well as map */
-    if (u.uhp != -1 && g.youmonst.data && iflags.status_updates
-        && !g.program_state.saving && !suppress_map_output()) {
+    if (u.uhp != -1 && g.youmonst.data
+        && iflags.status_updates && !suppress_map_output()) {
         if (VIA_WINDOWPORT()) {
             bot_via_windowport();
         } else {
@@ -273,8 +273,7 @@ timebot(void)
        to skip update; suppress_map_output() handles program_state.restoring
        and program_state.done_hup (tty hangup => no further output at all)
        and we use it for maybe skipping status as well as for the map */
-    if (flags.time && iflags.status_updates
-        && !g.program_state.saving && !suppress_map_output()) {
+    if (flags.time && iflags.status_updates && !suppress_map_output()) {
         if (VIA_WINDOWPORT()) {
             stat_update_time();
         } else {
