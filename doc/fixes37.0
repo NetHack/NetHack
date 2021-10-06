@@ -634,6 +634,11 @@ if a Rider or displacer beast swapped places with a single-segment long worm
 	the segment co-located with the head wasn't moved with that head;
 	if sanity_checking was enabled a warning could be triggered:
 	mon (000000) at seg location is not worm (123abc)
+blessed scroll of remove curse read while confused blesses or curses any
+	uncursed items in inventory, but if hero was dual-wielding and the
+	scroll cursed the secondary weapon, that would be dropped and further
+	object traversal would process items on the floor at hero's spot
+	instead of the rest of inventory
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

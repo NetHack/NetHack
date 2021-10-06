@@ -1310,12 +1310,13 @@ seffect_scare_monster(struct obj **sobjp)
 static void
 seffect_remove_curse(struct obj **sobjp)
 {
-    struct obj *sobj = *sobjp;
+    struct obj *sobj = *sobjp; /* scroll or fake spellbook */
     int otyp = sobj->otyp;
     boolean sblessed = sobj->blessed;
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
-    register struct obj *obj;
+    register struct obj *obj, *nxto;
+    long wornmask;
 
     You_feel(!Hallucination
              ? (!confused ? "like someone is helping you."
@@ -1326,9 +1327,14 @@ seffect_remove_curse(struct obj **sobjp)
     if (scursed) {
         pline_The("scroll disintegrates.");
     } else {
-        for (obj = g.invent; obj; obj = obj->nobj) {
-            long wornmask;
-
+        /* 3.7: this used to use a straight
+               for (obj = invent; obj; obj = obj->nobj) {}
+           traversal, but for the confused case, secondary weapon might
+           become cursed and be dropped, moving it from the invent chain
+           to the floor chain at hero's spot, so we have to remember the
+           next object prior to processing the current one */
+        for (obj = g.invent; obj; obj = nxto) {
+            nxto = obj->nobj;
             /* gold isn't subject to cursing and blessing */
             if (obj->oclass == COIN_CLASS)
                 continue;
