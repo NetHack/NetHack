@@ -828,7 +828,7 @@ xname_flags(
      potion of object detection -- if discovered
  */
 static char *
-minimal_xname(struct obj* obj)
+minimal_xname(struct obj *obj)
 {
     char *bufp;
     struct obj bareobj;
@@ -861,6 +861,7 @@ minimal_xname(struct obj* obj)
     if (obj->otyp == SLIME_MOLD)
         bareobj.spe = obj->spe;
 
+    /* bufp will be an obuf[] and a pointer into middle of that is viable */
     bufp = distant_name(&bareobj, xname); /* xname(&bareobj) */
     if (!strncmp(bufp, "uncursed ", 9))
         bufp += 9; /* Role_if(PM_CLERIC) */
@@ -2006,7 +2007,12 @@ simpleonames(struct obj* obj)
     char *obufp, *simpleoname = minimal_xname(obj);
 
     if (obj->quan != 1L) {
-        simpleoname = makeplural(obufp = simpleoname);
+        /* 'simpleoname' points to an obuf; makeplural() will allocate
+           another one and only that one can be explicitly released for
+           re-use, so this is slightly convoluted to cope with that;
+           makeplural() will be fully evaluated and done with its input
+           argument before strcpy() touches its output argument */
+        Strcpy(simpleoname, obufp = makeplural(simpleoname));
         releaseobuf(obufp);
     }
     return simpleoname;
