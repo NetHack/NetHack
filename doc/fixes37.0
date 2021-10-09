@@ -837,6 +837,8 @@ an item thrown or dropped while swallowed was treated as being picked up by an
 segfault if gremlin fled weaponless hero wearing gold dragon scales/mail
 'disambiguate WHACK' patch affected field layout of objects[] but EDITLEVEL
 	wasn't incremented, allowing incompatable save files to be restored
+restore the boulder exception for piletops that had been unintentionally
+	removed during the expanded-glyphs changes
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

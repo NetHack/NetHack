@@ -888,9 +888,17 @@ enum glyph_offsets {
     ((int) ((obj)->corpsenm + (obj_is_piletop(obj)        \
                                 ? GLYPH_BODY_PILETOP_OFF  \
                                 : GLYPH_BODY_OFF)))
+
+/* Paraphrased rationale from the original commit for the boulder
+   exception: If a boulder is the topmost item on a pile, then it is
+   not mapped to a piletop glyph; mainly because boulders are "solid";
+   boulders dropped by monsters are nearly always over other objects;
+   also done so that special levels such a Sokoban can "hide" items
+   under the boulders. */
 #define normal_obj_to_glyph(obj) \
-    ((int) ((obj)->otyp + (obj_is_piletop(obj)            \
-                                ? GLYPH_OBJ_PILETOP_OFF   \
+    ((int) ((obj)->otyp + \
+            ((obj_is_piletop(obj) && ((obj)->otyp != BOULDER))      \
+                                ? GLYPH_OBJ_PILETOP_OFF             \
                                 : GLYPH_OBJ_OFF)))
 
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
