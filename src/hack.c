@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1627951429 2021/08/03 00:43:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.291 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1633802068 2021/10/09 17:54:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -98,12 +98,24 @@ static int
 moverock(void)
 {
     register xchar rx, ry, sx, sy;
-    register struct obj *otmp;
-    register struct trap *ttmp;
-    register struct monst *mtmp;
+    struct obj *otmp;
+    struct trap *ttmp;
+    struct monst *mtmp;
+    const char *what;
+    boolean firstboulder = TRUE;
+    int res = 0;
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
+        /* when otmp->next_boulder is 1, xname() will format it as
+           "next boulder" instead of just "boulder"; affects
+           boulder_hits_pool()'s messages as well as messages below */
+        otmp->next_boulder = firstboulder ? 0 : 1;
+        /* FIXME?  'firstboulder' should be reset to True if this boulder
+           isn't the first and the previous one is named differently from
+           this one.  Probably not worth bothering with... */
+        firstboulder = FALSE;
+
         /* make sure that this boulder is visible as the top object */
         if (otmp != g.level.objects[sx][sy])
             movobj(otmp, sx, sy);
@@ -116,7 +128,8 @@ moverock(void)
                 feel_location(sx, sy);
             You("don't have enough leverage to push %s.", the(xname(otmp)));
             /* Give them a chance to climb over it? */
-            return -1;
+            res = -1;
+            goto moverock_done;
         }
         if (verysmall(g.youmonst.data) && !u.usteed) {
             if (Blind)
@@ -140,8 +153,11 @@ moverock(void)
                 goto cannot_push;
             }
 
-            if (revive_nasty(rx, ry, "You sense movement on the other side."))
-                return -1;
+            if (revive_nasty(rx, ry,
+                             "You sense movement on the other side.")) {
+                res = -1;
+                goto moverock_done;
+            }
 
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
@@ -200,7 +216,8 @@ moverock(void)
                         fill_pit(u.ux, u.uy);
                         if (cansee(rx, ry))
                             newsym(rx, ry);
-                        return sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                        res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                        goto moverock_done;
                     }
                     break;
                 case SPIKED_PIT:
@@ -216,7 +233,8 @@ moverock(void)
                     }
                     if (mtmp && !Blind)
                         newsym(rx, ry);
-                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    goto moverock_done;
                 case HOLE:
                 case TRAPDOOR:
                     if (Blind)
@@ -238,7 +256,8 @@ moverock(void)
                     levl[rx][ry].candig = 1;
                     if (cansee(rx, ry))
                         newsym(rx, ry);
-                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    goto moverock_done;
                 case LEVEL_TELEP:
                     /* 20% chance of picking current level; 100% chance for
                        that if in single-level branch (Knox) or in endgame */
@@ -254,6 +273,7 @@ moverock(void)
                     else
                         You("push %s and suddenly it disappears!",
                             the(xname(otmp)));
+                    otmp->next_boulder = 0; /* reset before moving it */
                     if (ttmp->ttyp == TELEP_TRAP) {
                         (void) rloco(otmp);
                     } else {
@@ -265,7 +285,8 @@ moverock(void)
                         otmp->owornmask = (long) MIGR_RANDOM;
                     }
                     seetrap(ttmp);
-                    return sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    res = sobj_at(BOULDER, sx, sy) ? -1 : 0;
+                    goto moverock_done;
                 default:
                     break; /* boulder not affected by this trap */
                 }
@@ -275,6 +296,7 @@ moverock(void)
                 goto nopushmsg;
             if (boulder_hits_pool(otmp, rx, ry, TRUE))
                 continue;
+
             /*
              * Re-link at top of fobj chain so that pile order is preserved
              * when level is restored.
@@ -293,16 +315,18 @@ moverock(void)
                 static NEARDATA long lastmovetime;
 #endif
  dopush:
+                what = the(xname(otmp));
                 if (!u.usteed) {
+                    /* FIXME: also remember boulder->o_id and override
+                       lastmovetime if this is a different boulder */
                     if (g.moves > lastmovetime + 2 || g.moves < lastmovetime)
                         pline("With %s effort you move %s.",
                               throws_rocks(g.youmonst.data) ? "little"
-                                                          : "great",
-                              the(xname(otmp)));
+                                                            : "great",
+                              what);
                     exercise(A_STR, TRUE);
                 } else
-                    pline("%s moves %s.", upstart(y_monnam(u.usteed)),
-                          the(xname(otmp)));
+                    pline("%s moves %s.", upstart(y_monnam(u.usteed)), what);
                 lastmovetime = g.moves;
             }
 
@@ -318,11 +342,12 @@ moverock(void)
             }
         } else {
  nopushmsg:
+            what = the(xname(otmp));
             if (u.usteed)
                 pline("%s tries to move %s, but cannot.",
-                      upstart(y_monnam(u.usteed)), the(xname(otmp)));
+                      upstart(y_monnam(u.usteed)), what);
             else
-                You("try to move %s, but in vain.", the(xname(otmp)));
+                You("try to move %s, but in vain.", what);
             if (Blind)
                 feel_location(sx, sy);
  cannot_push:
@@ -375,11 +400,20 @@ moverock(void)
                    "However, you can squeeze yourself into a small opening.");
                 sokoban_guilt();
                 break;
-            } else
-                return -1;
+            } else {
+                res = -1;
+                goto moverock_done;
+            }
         }
     }
-    return 0;
+    res = 0;
+
+ moverock_done:
+    for (otmp = g.level.objects[sx][sy]; otmp; otmp = otmp->nexthere)
+        if (otmp->otyp == BOULDER)
+            otmp->next_boulder = 0; /* resume normal xname() for this obj */
+
+    return res;
 }
 
 /*
@@ -934,7 +968,8 @@ test_move(int ux, int uy, int dx, int dy, int mode)
             /* don't pick two boulders in a row, unless there's a way thru */
             if (sobj_at(BOULDER, ux, uy) && !Sokoban) {
                 if (!Passes_walls
-                    && !(tunnels(g.youmonst.data) && !needspick(g.youmonst.data))
+                    && !(tunnels(g.youmonst.data)
+                         && !needspick(g.youmonst.data))
                     && !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK)
                     && !((obj = carrying(WAN_DIGGING))
                          && !objects[obj->otyp].oc_name_known))

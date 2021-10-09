@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1625962417 2021/07/11 00:13:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.325 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1633802071 2021/10/09 17:54:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.335 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -664,8 +664,12 @@ xname_flags(
                       : the_unique_pm(&mons[omndx]) ? "the "
                         : just_an(anbuf, statue_pmname),
                     statue_pmname);
-        } else
-            Strcpy(buf, actualn);
+        } else {
+            if (typ == BOULDER && obj->next_boulder)
+                Strcat(strcpy(buf, "next "), actualn);
+            else
+                Strcpy(buf, actualn);
+        }
         break;
     case BALL_CLASS:
         Sprintf(buf, "%sheavy iron ball",

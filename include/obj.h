@@ -1,4 +1,4 @@
-/* NetHack 3.7	obj.h	$NHDT-Date: 1611097668 2021/01/19 23:07:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.7	obj.h	$NHDT-Date: 1633802062 2021/10/09 17:54:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -125,6 +125,9 @@ struct obj {
 #define fromsink corpsenm /* a potion from a sink */
 #define novelidx corpsenm /* 3.6 tribute - the index of the novel title */
 #define migr_species corpsenm /* species to endow for MIGR_TO_SPECIES */
+#define next_boulder corpsenm /* flag for xname() when pushing a pile of
+                               * boulders, 0 for first (top of pile),
+                               * 1 for others (format as "next boulder") */
     int usecount;           /* overloaded for various things that tally */
 #define spestudied usecount /* # of times a spellbook has been studied */
     unsigned oeaten;        /* nutrition left in food, if partly eaten */
