@@ -2479,7 +2479,7 @@ insane_obj_bits(struct obj *obj, struct monst *mon)
                 pushing boulders and should be reset by next sanity check */
              o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
 
-    if (o_in_use || o_bypass || o_nomerge) {
+    if (o_in_use || o_bypass || o_nomerge || o_boulder) {
         char infobuf[QBUFSZ];
 
         Sprintf(infobuf, "flagged%s%s%s%s",
