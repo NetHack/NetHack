@@ -2311,7 +2311,7 @@ void
 obj_sanity_check(void)
 {
     int x, y;
-    struct obj *obj;
+    struct obj *obj, *otop, *prevo;
 
     objlist_sanity(fobj, OBJ_FLOOR, "floor sanity");
 
@@ -2319,19 +2319,40 @@ obj_sanity_check(void)
        those objects should have already been sanity checked via
        the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x++)
-        for (y = 0; y < ROWNO; y++)
-            for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere) {
+        for (y = 0; y < ROWNO; y++) {
+            char at_fmt[BUFSZ];
+
+            otop = g.level.objects[x][y];
+            prevo = 0;
+            for (obj = otop; obj; prevo = obj, obj = prevo->nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj->where != OBJ_FLOOR || x == 0
                     || obj->ox != x || obj->oy != y) {
-                    char at_fmt[BUFSZ];
-
                     Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
                             x, y, obj->ox, obj->oy);
                     insane_object(obj, at_fmt, "location sanity",
                                   (struct monst *) 0);
+
+                /* when one or more boulders are present, they should always
+                   be at the top of their pile; also never in water or lava */
+                } else if (obj->otyp == BOULDER) {
+                    if (prevo && prevo->otyp != BOULDER) {
+                        Sprintf(at_fmt,
+                                "%%s boulder@<%d,%d> %%s %%s: not on top",
+                                x, y);
+                        insane_object(obj, at_fmt, "boulder sanity",
+                                      (struct monst *) 0);
+                    }
+                    if (is_pool_or_lava(x, y)) {
+                        Sprintf(at_fmt,
+                                "%%s boulder@<%d,%d> %%s %%s: on/in %s",
+                                x, y, is_pool(x, y) ? "water" : "lava");
+                        insane_object(obj, at_fmt, "boulder sanity",
+                                      (struct monst *) 0);
+                    }
                 }
             }
+        }
 
     objlist_sanity(g.invent, OBJ_INVENT, "invent sanity");
     objlist_sanity(g.migrating_objs, OBJ_MIGRATING, "migrating sanity");
@@ -2410,7 +2431,8 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
             check_glob(obj, mesg);
         /* temporary flags that might have been set but which should
            be clear by the time this sanity check is taking place */
-        if (obj->in_use || obj->bypass || obj->nomerge)
+        if (obj->in_use || obj->bypass || obj->nomerge
+            || (obj->otyp == BOULDER && obj->next_boulder))
             insane_obj_bits(obj, (struct monst *) 0);
     }
 }
@@ -2440,7 +2462,8 @@ mon_obj_sanity(struct monst *monlist, const char *mesg)
             if (obj->globby)
                 check_glob(obj, mesg);
             check_contained(obj, mesg);
-            if (obj->in_use || obj->bypass || obj->nomerge)
+            if (obj->in_use || obj->bypass || obj->nomerge
+                || (obj->otyp == BOULDER && obj->next_boulder))
                 insane_obj_bits(obj, mon);
         }
     }
@@ -2451,15 +2474,19 @@ insane_obj_bits(struct obj *obj, struct monst *mon)
 {
     unsigned o_in_use = obj->in_use, o_bypass = obj->bypass,
              /* having obj->nomerge be set might be intentional */
-             o_nomerge = obj->nomerge && !nomerge_exception(obj);
+             o_nomerge = (obj->nomerge && !nomerge_exception(obj)),
+             /* next_boulder is only for object name formatting when
+                pushing boulders and should be reset by next sanity check */
+             o_boulder = (obj->otyp == BOULDER && obj->next_boulder);
 
     if (o_in_use || o_bypass || o_nomerge) {
         char infobuf[QBUFSZ];
 
-        Sprintf(infobuf, "flagged%s%s%s",
+        Sprintf(infobuf, "flagged%s%s%s%s",
                 o_in_use ? " in_use" : "",
                 o_bypass ? " bypass" : "",
-                o_nomerge ? " nomerge" : "");
+                o_nomerge ? " nomerge" : "",
+                o_boulder ? " nxtbldr" : "");
         insane_object(obj, ofmt0, infobuf, mon);
     }
 }
