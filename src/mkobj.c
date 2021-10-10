@@ -1049,8 +1049,7 @@ mksobj(int otyp, boolean init, boolean artif)
             }
             break;
         case ROCK_CLASS:
-            switch (otmp->otyp) {
-            case STATUE:
+            if (otmp->otyp == STATUE) {
                 /* possibly overridden by mkcorpstat() */
                 otmp->corpsenm = rndmonnum();
                 if (!verysmall(&mons[otmp->corpsenm])
@@ -1058,6 +1057,7 @@ mksobj(int otyp, boolean init, boolean artif)
                     (void) add_to_container(otmp,
                                             mkobj(SPBOOK_no_NOVEL, FALSE));
             }
+            /* boulder init'd below in the 'regardless of !init' code */
             break;
         case COIN_CLASS:
             break; /* do nothing */
@@ -1098,6 +1098,12 @@ mksobj(int otyp, boolean init, boolean artif)
     case EGG:
     /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
+        break;
+    case BOULDER:
+        /* next_boulder overloads corpsenm so the default value is NON_PM;
+           since that is non-zero, the "next boulder" case in xname() would
+           happen when it shouldn't; explicitly set it to 0 */
+        otmp->next_boulder = 0;
         break;
     case POT_OIL:
         otmp->age = MAX_OIL_IN_FLASK; /* amount of oil */
@@ -2521,11 +2527,10 @@ insane_object(
     }
 }
 
-/*
- * Initialize a dummy obj with just enough info
- * to allow some of the tests in obj.h that
- * take an obj pointer to work.
- */
+
+/* initialize a dummy obj with just enough info to allow some of the tests in
+   obj.h that take an obj pointer to work; used when applying a stethoscope
+   toward a mimic mimicking an object */
 struct obj *
 init_dummyobj(struct obj *obj, short otyp, long oquan)
 {
@@ -2541,6 +2546,8 @@ init_dummyobj(struct obj *obj, short otyp, long oquan)
                          : !objects[otyp].oc_uses_known;
          obj->quan = oquan ? oquan : 1L;
          obj->corpsenm = NON_PM; /* suppress statue and figurine details */
+         if (obj->otyp == BOULDER)
+             obj->next_boulder = 0; /* overloads corpsenm, avoid NON_PM */
          /* but suppressing fruit details leads to "bad fruit #0" */
          if (obj->otyp == SLIME_MOLD)
              obj->spe = g.context.current_fruit;
