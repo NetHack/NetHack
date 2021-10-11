@@ -716,7 +716,9 @@ merged(struct obj **potmp, struct obj **pobj)
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
 
-        /* update bknown */
+        /* if a stack of unknown BUC is merging with a stack of
+           known BUC, make sure the BUC of the combined stack is
+           known */
         if (otmp->oclass != COIN_CLASS)
             otmp->bknown = obj->bknown = otmp->bknown || obj->bknown;
 
