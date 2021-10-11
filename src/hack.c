@@ -94,6 +94,8 @@ revive_nasty(int x, int y, const char *msg)
     return revived;
 }
 
+#define squeezeablylightinvent() (!g.invent || inv_weight() <= -850)
+
 static int
 moverock(void)
 {
@@ -124,11 +126,14 @@ moverock(void)
         ry = u.uy + 2 * u.dy;
         nomul(0);
 
-        /* using m<dir> towards an adjacent boulder steps over/onto it
-           if poly'd into a giant but is a no-op in other circumstances
-           unless the move attempt reveals an unseen boulder or lack of
-           remembered, unseen monster */
+        /* using m<dir> towards an adjacent boulder steps over/onto it if
+           poly'd into a giant or squeezes under/beside it if small/light
+           enough but is a no-op in other circumstances unless move attempt
+           reveals an unseen boulder or lack of remembered, unseen monster */
         if (g.context.nopick) {
+            int oldglyph = glyph_at(sx, sy); /* before feel_location() */
+
+            feel_location(sx, sy); /* same for all 3 if/else-if/else cases */
             if (throws_rocks(g.youmonst.data)) {
                 /* player has used 'm<dir>' to move, so step to boulder's
                    spot without pushing it; hero is poly'd into a giant,
@@ -139,10 +144,12 @@ moverock(void)
                 /* ["over" seems weird on air level but what else to say?] */
                 sokoban_guilt();
                 res = 0; /* move to <sx,sy> */
+            } else if (!u.usteed && (squeezeablylightinvent()
+                                     || verysmall(g.youmonst.data))) {
+                You("squeeze yourself against the boulder.");
+                sokoban_guilt();
+                res = 0; /* move to <sx,sy> */
             } else {
-                int oldglyph = glyph_at(sx, sy);
-
-                feel_location(sx, sy);
                 There("is a boulder in your way.");
                 /* use a move if hero learns something; see test_move() for
                    how/why 'context.door_opened' is being dragged into this */
@@ -424,11 +431,13 @@ moverock(void)
                 break;
             }
 
-            if (!u.usteed
-                && (((!g.invent || inv_weight() <= -850)
-                     && (!u.dx || !u.dy || (IS_ROCK(levl[u.ux][sy].typ)
-                                            && IS_ROCK(levl[sx][u.uy].typ))))
-                    || verysmall(g.youmonst.data))) {
+            /* similar to m<dir> above, but that doesn't care if you're
+               moving orthogonally or toward a diagonal squeeze */
+            if (!u.usteed && ((squeezeablylightinvent()
+                               && (!u.dx || !u.dy
+                                   || (IS_ROCK(levl[u.ux][sy].typ)
+                                       && IS_ROCK(levl[sx][u.uy].typ))))
+                              || verysmall(g.youmonst.data))) {
                 pline(
                    "However, you can squeeze yourself into a small opening.");
                 sokoban_guilt();

@@ -640,7 +640,8 @@ blessed scroll of remove curse read while confused blesses or curses any
 	object traversal would process items on the floor at hero's spot
 	instead of the rest of inventory
 can now use m<dir> to try to move to an adjacent boulder's spot without
-	pushing it; hero poly'd into a giant will succeed, others will fail
+	pushing it; hero poly'd into a giant or a tiny creature or carrying so
+	little as to be able to squeeze there will succeed, others will fail
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
