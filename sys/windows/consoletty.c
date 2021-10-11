@@ -13,6 +13,10 @@
  *
  */
 
+#ifndef NO_VT
+#define VIRTUAL_TERMINAL_SEQUENCES
+#endif
+
 #ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "win32api.h"
@@ -21,6 +25,12 @@
 #include "wintty.h"
 #include <sys\types.h>
 #include <sys\stat.h>
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+#include <locale.h>
+#ifndef INTEGER_H
+#include "integer.h"
+#endif
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 extern int redirect_stdout;
@@ -37,22 +47,52 @@ extern int redirect_stdout;
  * change.
  *
  */
-
-#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN \
-                                                | FOREGROUND_BLUE)
-#define CONSOLE_CLEAR_CHARACTER (' ')
-
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
+#define CONSOLE_CLEAR_ATTRIBUTE \
+    (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
 #define CONSOLE_UNDEFINED_ATTRIBUTE (0)
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+#define CONSOLE_CLEAR_ATTRIBUTE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define CONSOLE_CLEAR_CHARACTER (' ')
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
 #define CONSOLE_UNDEFINED_CHARACTER ('\0')
 
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+enum console_attributes {
+    atr_bold = 1,
+    atr_dim = 2,
+    atr_uline = 4,
+    atr_blink = 8,
+    atr_inverse = 16
+};
+#define MAX_UTF8_SEQUENCE 7
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
 typedef struct {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     WCHAR   character;
     WORD    attribute;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    uint8 utf8str[MAX_UTF8_SEQUENCE];
+    WCHAR wcharacter;
+    WORD attr;
+    long color24;
+    const char *colorseq;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 } cell_t;
 
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 cell_t clear_cell = { CONSOLE_CLEAR_CHARACTER, CONSOLE_CLEAR_ATTRIBUTE };
 cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
                           CONSOLE_UNDEFINED_ATTRIBUTE };
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+cell_t clear_cell = { { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
+                        CONSOLE_CLEAR_CHARACTER, 0, 0L, "\x1b[0m" };
+cell_t undefined_cell = { { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
+                            CONSOLE_UNDEFINED_CHARACTER, 0, 0L, (const char *) 0 };
+static const uint8 empty_utf8str[MAX_UTF8_SEQUENCE] = { 0 };
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -65,13 +105,19 @@ cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
  * SetConsoleCtrlHandler
  * PeekConsoleInput
  * ReadConsoleInput
+ * GetConsoleOutputCP
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
  * WriteConsoleOutputCharacter
  * FillConsoleOutputAttribute
- * GetConsoleOutputCP
+#endif
  */
 
 static BOOL CtrlHandler(DWORD);
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 static void xputc_core(char);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+static void xputc_core(int);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 void cmov(int, int);
 void nocmov(int, int);
 int process_keystroke(INPUT_RECORD *, boolean *, boolean numberpad,
@@ -83,6 +129,11 @@ static boolean check_font_widths(void);
 static void set_known_good_console_font(void);
 static void restore_original_console_font(void);
 extern void safe_routines(void);
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+void tty_ibmgraphics_fixup(void);
+extern void (*utf8graphics_mode_callback)(void); /* symbols.c */
+extern void (*ibmgraphics_mode_callback)(void); /* symbols.c */
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 /* Win32 Screen buffer,coordinate,console I/O information */
 COORD ntcoord;
@@ -132,7 +183,7 @@ struct console_t {
     COORD cursor;
     HANDLE hConOut;
     HANDLE hConIn;
-    CONSOLE_SCREEN_BUFFER_INFO origcsbi;
+    CONSOLE_SCREEN_BUFFER_INFO orig_csbi;
     int width;
     int height;
     boolean has_unicode;
@@ -141,14 +192,33 @@ struct console_t {
     cell_t * back_buffer;
     WCHAR cpMap[256];
     boolean font_changed;
-    CONSOLE_FONT_INFOEX original_font_info;
+    CONSOLE_FONT_INFOEX orig_font_info;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     UINT original_code_page;
 } console = {
     0,
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED),
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED),
     NO_COLOR,
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    UINT orig_code_page;
+    char *orig_localestr;
+    DWORD orig_in_cmode;
+    DWORD orig_out_cmode;
+    CONSOLE_FONT_INFOEX font_info;
+    UINT code_page;
+    char *localestr;
+    DWORD in_cmode;
+    DWORD out_cmode;
+    long color24;
+} console = { 
+    (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* background */
+    (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
+    0,                                                     /* attr */
+    0,                                                     /* current_nhcolor */
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     {0, 0},
     NULL,
     NULL,
@@ -163,6 +233,31 @@ struct console_t {
     FALSE,
     { 0 },
     0
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    { 0, 0 },                                              /* cursor */
+    NULL,     /* hConOut*/
+    NULL,     /* hConIn */
+    { 0 },    /* cbsi */
+    0,        /* width */
+    0,        /* height */
+    FALSE,    /* has_unicode */
+    0,        /* buffer_size */
+    { 0 },    /* front_buffer */
+    { 0 },    /* back_buffer */
+    { 0 },    /* cpMap */
+    FALSE,    /* font_changed */
+    { 0 },    /* orig_font_info */
+    0U,       /* orig_code_page */
+    NULL,     /* orig_localestr */
+    0,        /* orig_in_cmode */
+    0,        /* orig_out_cmode */
+    { 0 },    /* font_info */
+    0U,       /* code_page */
+    NULL,     /* localestr */
+    0,        /* in_cmode */
+    0,        /* out_cmode */
+    0L        /* color24 */
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 };
 
 static DWORD ccount, acount;
@@ -206,39 +301,501 @@ typedef struct {
 } keyboard_handler_t;
 
 keyboard_handler_t keyboard_handler;
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+long customcolors[CLR_MAX];
+const char *esc_seq_colors[CLR_MAX];
 
+struct rgbvalues {
+    int idx;
+    const char *name;
+    const char *hexval;
+    long r, gn, b;
+} rgbtable[] = {
+    { 0, "maroon", "#800000", 128, 0, 0 },
+    { 1, "dark red", "#8B0000", 139, 0, 0 },
+    { 2, "brown", "#A52A2A", 165, 42, 42 },
+    { 3, "firebrick", "#B22222", 178, 34, 34 },
+    { 4, "crimson", "#DC143C", 220, 20, 60 },
+    { 5, "red", "#FF0000", 255, 0, 0 },
+    { 6, "tomato", "#FF6347", 255, 99, 71 },
+    { 7, "coral", "#FF7F50", 255, 127, 80 },
+    { 8, "indian red", "#CD5C5C", 205, 92, 92 },
+    { 9, "light coral", "#F08080", 240, 128, 128 },
+    { 10, "dark salmon", "#E9967A", 233, 150, 122 },
+    { 11, "salmon", "#FA8072", 250, 128, 114 },
+    { 12, "light salmon", "#FFA07A", 255, 160, 122 },
+    { 13, "orange red", "#FF4500", 255, 69, 0 },
+    { 14, "dark orange", "#FF8C00", 255, 140, 0 },
+    { 15, "orange", "#FFA500", 255, 165, 0 },
+    { 16, "gold", "#FFD700", 255, 215, 0 },
+    { 17, "dark golden rod", "#B8860B", 184, 134, 11 },
+    { 18, "golden rod", "#DAA520", 218, 165, 32 },
+    { 19, "pale golden rod", "#EEE8AA", 238, 232, 170 },
+    { 20, "dark khaki", "#BDB76B", 189, 183, 107 },
+    { 21, "khaki", "#F0E68C", 240, 230, 140 },
+    { 22, "olive", "#808000", 128, 128, 0 },
+    { 23, "yellow", "#FFFF00", 255, 255, 0 },
+    { 24, "yellow green", "#9ACD32", 154, 205, 50 },
+    { 25, "dark olive green", "#556B2F", 85, 107, 47 },
+    { 26, "olive drab", "#6B8E23", 107, 142, 35 },
+    { 27, "lawn green", "#7CFC00", 124, 252, 0 },
+    { 28, "chart reuse", "#7FFF00", 127, 255, 0 },
+    { 29, "green yellow", "#ADFF2F", 173, 255, 47 },
+    { 30, "dark green", "#006400", 0, 100, 0 },
+    { 31, "green", "#008000", 0, 128, 0 },
+    { 32, "forest green", "#228B22", 34, 139, 34 },
+    { 33, "lime", "#00FF00", 0, 255, 0 },
+    { 34, "lime green", "#32CD32", 50, 205, 50 },
+    { 35, "light green", "#90EE90", 144, 238, 144 },
+    { 36, "pale green", "#98FB98", 152, 251, 152 },
+    { 37, "dark sea green", "#8FBC8F", 143, 188, 143 },
+    { 38, "medium spring green", "#00FA9A", 0, 250, 154 },
+    { 39, "spring green", "#00FF7F", 0, 255, 127 },
+    { 40, "sea green", "#2E8B57", 46, 139, 87 },
+    { 41, "medium aqua marine", "#66CDAA", 102, 205, 170 },
+    { 42, "medium sea green", "#3CB371", 60, 179, 113 },
+    { 43, "light sea green", "#20B2AA", 32, 178, 170 },
+    { 44, "dark slate gray", "#2F4F4F", 47, 79, 79 },
+    { 45, "teal", "#008080", 0, 128, 128 },
+    { 46, "dark cyan", "#008B8B", 0, 139, 139 },
+    { 47, "aqua", "#00FFFF", 0, 255, 255 },
+    { 48, "cyan", "#00FFFF", 0, 255, 255 },
+    { 49, "light cyan", "#E0FFFF", 224, 255, 255 },
+    { 50, "dark turquoise", "#00CED1", 0, 206, 209 },
+    { 51, "turquoise", "#40E0D0", 64, 224, 208 },
+    { 52, "medium turquoise", "#48D1CC", 72, 209, 204 },
+    { 53, "pale turquoise", "#AFEEEE", 175, 238, 238 },
+    { 54, "aqua marine", "#7FFFD4", 127, 255, 212 },
+    { 55, "powder blue", "#B0E0E6", 176, 224, 230 },
+    { 56, "cadet blue", "#5F9EA0", 95, 158, 160 },
+    { 57, "steel blue", "#4682B4", 70, 130, 180 },
+    { 58, "corn flower blue", "#6495ED", 100, 149, 237 },
+    { 59, "deep sky blue", "#00BFFF", 0, 191, 255 },
+    { 60, "dodger blue", "#1E90FF", 30, 144, 255 },
+    { 61, "light blue", "#ADD8E6", 173, 216, 230 },
+    { 62, "sky blue", "#87CEEB", 135, 206, 235 },
+    { 63, "light sky blue", "#87CEFA", 135, 206, 250 },
+    { 64, "midnight blue", "#191970", 25, 25, 112 },
+    { 65, "navy", "#000080", 0, 0, 128 },
+    { 66, "dark blue", "#00008B", 0, 0, 139 },
+    { 67, "medium blue", "#0000CD", 0, 0, 205 },
+    { 68, "blue", "#0000FF", 0, 0, 255 },
+    { 69, "royal blue", "#4169E1", 65, 105, 225 },
+    { 70, "blue violet", "#8A2BE2", 138, 43, 226 },
+    { 71, "indigo", "#4B0082", 75, 0, 130 },
+    { 72, "dark slate blue", "#483D8B", 72, 61, 139 },
+    { 73, "slate blue", "#6A5ACD", 106, 90, 205 },
+    { 74, "medium slate blue", "#7B68EE", 123, 104, 238 },
+    { 75, "medium purple", "#9370DB", 147, 112, 219 },
+    { 76, "dark magenta", "#8B008B", 139, 0, 139 },
+    { 77, "dark violet", "#9400D3", 148, 0, 211 },
+    { 78, "dark orchid", "#9932CC", 153, 50, 204 },
+    { 79, "medium orchid", "#BA55D3", 186, 85, 211 },
+    { 80, "purple", "#800080", 128, 0, 128 },
+    { 81, "thistle", "#D8BFD8", 216, 191, 216 },
+    { 82, "plum", "#DDA0DD", 221, 160, 221 },
+    { 83, "violet", "#EE82EE", 238, 130, 238 },
+    { 84, "magenta / fuchsia", "#FF00FF", 255, 0, 255 },
+    { 85, "orchid", "#DA70D6", 218, 112, 214 },
+    { 86, "medium violet red", "#C71585", 199, 21, 133 },
+    { 87, "pale violet red", "#DB7093", 219, 112, 147 },
+    { 88, "deep pink", "#FF1493", 255, 20, 147 },
+    { 89, "hot pink", "#FF69B4", 255, 105, 180 },
+    { 90, "light pink", "#FFB6C1", 255, 182, 193 },
+    { 91, "pink", "#FFC0CB", 255, 192, 203 },
+    { 92, "antique white", "#FAEBD7", 250, 235, 215 },
+    { 93, "beige", "#F5F5DC", 245, 245, 220 },
+    { 94, "bisque", "#FFE4C4", 255, 228, 196 },
+    { 95, "blanched almond", "#FFEBCD", 255, 235, 205 },
+    { 96, "wheat", "#F5DEB3", 245, 222, 179 },
+    { 97, "corn silk", "#FFF8DC", 255, 248, 220 },
+    { 98, "lemon chiffon", "#FFFACD", 255, 250, 205 },
+    { 99, "light golden rod yellow", "#FAFAD2", 250, 250, 210 },
+    { 100, "light yellow", "#FFFFE0", 255, 255, 224 },
+    { 101, "saddle brown", "#8B4513", 139, 69, 19 },
+    { 102, "sienna", "#A0522D", 160, 82, 45 },
+    { 103, "chocolate", "#D2691E", 210, 105, 30 },
+    { 104, "peru", "#CD853F", 205, 133, 63 },
+    { 105, "sandy brown", "#F4A460", 244, 164, 96 },
+    { 106, "burly wood", "#DEB887", 222, 184, 135 },
+    { 107, "tan", "#D2B48C", 210, 180, 140 },
+    { 108, "rosy brown", "#BC8F8F", 188, 143, 143 },
+    { 109, "moccasin", "#FFE4B5", 255, 228, 181 },
+    { 110, "navajo white", "#FFDEAD", 255, 222, 173 },
+    { 111, "peach puff", "#FFDAB9", 255, 218, 185 },
+    { 112, "misty rose", "#FFE4E1", 255, 228, 225 },
+    { 113, "lavender blush", "#FFF0F5", 255, 240, 245 },
+    { 114, "linen", "#FAF0E6", 250, 240, 230 },
+    { 115, "old lace", "#FDF5E6", 253, 245, 230 },
+    { 116, "papaya whip", "#FFEFD5", 255, 239, 213 },
+    { 117, "sea shell", "#FFF5EE", 255, 245, 238 },
+    { 118, "mint cream", "#F5FFFA", 245, 255, 250 },
+    { 119, "slate gray", "#708090", 112, 128, 144 },
+    { 120, "light slate gray", "#778899", 119, 136, 153 },
+    { 121, "light steel blue", "#B0C4DE", 176, 196, 222 },
+    { 122, "lavender", "#E6E6FA", 230, 230, 250 },
+    { 123, "floral white", "#FFFAF0", 255, 250, 240 },
+    { 124, "alice blue", "#F0F8FF", 240, 248, 255 },
+    { 125, "ghost white", "#F8F8FF", 248, 248, 255 },
+    { 126, "honeydew", "#F0FFF0", 240, 255, 240 },
+    { 127, "ivory", "#FFFFF0", 255, 255, 240 },
+    { 128, "azure", "#F0FFFF", 240, 255, 255 },
+    { 129, "snow", "#FFFAFA", 255, 250, 250 },
+    { 130, "black", "#000000", 0, 0, 0 },
+    { 131, "dim gray / dim grey", "#696969", 105, 105, 105 },
+    { 132, "gray / grey", "#808080", 128, 128, 128 },
+    { 133, "dark gray / dark grey", "#A9A9A9", 169, 169, 169 },
+    { 134, "silver", "#C0C0C0", 192, 192, 192 },
+    { 135, "light gray / light grey", "#D3D3D3", 211, 211, 211 },
+    { 136, "gainsboro", "#DCDCDC", 220, 220, 220 },
+    { 137, "white smoke", "#F5F5F5", 245, 245, 245 },
+    { 138, "white", "#FFFFFF", 255, 255, 255 },
+};
+
+long
+rgbtable_to_long(struct rgbvalues *tbl)
+{
+    long rgblong = (tbl->r << 0) | (tbl->gn << 8) | (tbl->b << 16);
+    return rgblong;
+}
+
+static void
+init_custom_colors(void)
+{
+    customcolors[CLR_BLACK] = rgbtable_to_long(&rgbtable[131]);
+    customcolors[CLR_RED] = rgbtable_to_long(&rgbtable[5]);
+    customcolors[CLR_GREEN] = rgbtable_to_long(&rgbtable[31]);
+    customcolors[CLR_BROWN] = rgbtable_to_long(&rgbtable[104]);
+    customcolors[CLR_BLUE] = rgbtable_to_long(&rgbtable[58]);
+    customcolors[CLR_MAGENTA] = rgbtable_to_long(&rgbtable[76]);
+    customcolors[CLR_CYAN] = rgbtable_to_long(&rgbtable[48]);
+    customcolors[CLR_GRAY] = rgbtable_to_long(&rgbtable[73]);
+    customcolors[NO_COLOR] = rgbtable_to_long(&rgbtable[137]);
+    customcolors[CLR_ORANGE] = rgbtable_to_long(&rgbtable[15]);
+    customcolors[CLR_BRIGHT_GREEN] = rgbtable_to_long(&rgbtable[34]);
+    customcolors[CLR_YELLOW] = rgbtable_to_long(&rgbtable[18]);
+    customcolors[CLR_BRIGHT_BLUE] = rgbtable_to_long(&rgbtable[69]);
+    customcolors[CLR_BRIGHT_MAGENTA] = rgbtable_to_long(&rgbtable[84]);
+    customcolors[CLR_BRIGHT_CYAN] = rgbtable_to_long(&rgbtable[49]);
+    customcolors[CLR_WHITE] = rgbtable_to_long(&rgbtable[138]);
+
+/*    esc_seq_colors[CLR_BLACK] = "\x1b[30m"; */
+    esc_seq_colors[CLR_BLACK] = "\x1b[38;2;47;79;79m";
+    esc_seq_colors[CLR_RED] = "\x1b[31m";
+    esc_seq_colors[CLR_GREEN] = "\x1b[32m";
+    esc_seq_colors[CLR_YELLOW] = "\x1b[38;2;255;255;0m";
+    esc_seq_colors[CLR_BLUE] = "\x1b[38;2;100;149;237m";
+    esc_seq_colors[CLR_MAGENTA] = "\x1b[35m";
+    esc_seq_colors[CLR_CYAN] = "\x1b[36m";
+    esc_seq_colors[CLR_WHITE] = "\x1b[37m";
+
+    esc_seq_colors[CLR_BROWN] = "\x1b[38;2;205;133;63m";
+//    esc_seq_colors[CLR_GRAY] = "\x1b[31m\x1b[32m\x1b[34m";
+    esc_seq_colors[CLR_GRAY] = "\x1b[90m";
+    esc_seq_colors[NO_COLOR] = "\x1b[39m";
+    esc_seq_colors[CLR_ORANGE] = "\x1b[38;2;255;140;0m";
+    esc_seq_colors[CLR_BRIGHT_GREEN] = "\x1b[39m";
+    esc_seq_colors[CLR_BRIGHT_BLUE] = "\x1b[34m\x1b[94m";
+    esc_seq_colors[CLR_BRIGHT_MAGENTA] = "\x1b[35m\x1b[95m";
+    esc_seq_colors[CLR_BRIGHT_CYAN] = "\x1b[36m\x1b[96m";
+}
+
+void emit_start_bold(void);
+void emit_stop_bold(void);
+void emit_start_dim(void);
+void emit_stop_dim(void);
+void emit_start_blink(void);
+void emit_stop_blink(void);
+void emit_start_underline(void);
+void emit_stop_underline(void);
+void emit_start_inverse(void);
+void emit_stop_inverse(void);
+void emit_start_24bitcolor(long color24bit);
+void emit_default_color(void);
+void emit_return_to_default(void);
+void emit_hide_cursor(void);
+void emit_show_curor(void);
+
+void
+emit_hide_cursor(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[?25l";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_show_cursor(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[?25h";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_start_bold(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[4m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_stop_bold(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[24m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+#if 0
+emit_start_dim(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[4m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_stop_dim(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[24m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+#endif
+
+void
+emit_start_blink(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[5m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_stop_blink(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[25m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_start_underline(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[4m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_stop_underline(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[24m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+void
+emit_start_inverse(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[7m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+void
+emit_stop_inverse(void)
+{
+    DWORD unused, reserved;
+    static const char escseq[] = "\x1b[27m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+
+#define tcfmtstr "\x1b[38;2;%d;%d;%dm"
+#if 0
+#define tcfmtstr "\x1b[38:2:%d:%d:%dm"
+#endif
+
+void
+emit_start_24bitcolor(long color24bit)
+{
+    DWORD unused, reserved;
+    static char tcolorbuf[QBUFSZ];
+    long mcolor24bit =
+        (color24bit & 0xFFFFFF); /* color 0 has bit 0x1000000 set */
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr,
+             ((mcolor24bit >> 0) & 0xFF),   /* red */
+             ((mcolor24bit >> 8) & 0xFF),   /* green */
+             ((mcolor24bit >> 16) & 0xFF)); /* blue */
+    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
+                  (int) strlen(tcolorbuf), &unused, &reserved);
+}
+
+void
+emit_default_color(void)
+{
+    DWORD unused, reserved;
+    static char escseq[] = "\x1b[39m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+void
+emit_return_to_default(void)
+{
+    DWORD unused, reserved;
+    static char escseq[] = "\x1b[0m";
+
+    WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
+                  &unused, &reserved);
+}
+static boolean newattr_on = TRUE;
+static boolean color24_on = TRUE;
+
+/* for debugging */
+WORD what_is_there_now;
+BOOL success;
+DWORD error_result;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 /* Console buffer flipping support */
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+enum do_flags { do_utf8_content = 1, do_wide_content = 2, do_colorseq = 4, do_color24 = 8, do_newattr = 16 };
+enum did_flags { did_utf8_content = 1, did_wide_content = 2, did_colorseq = 4, did_color24 = 8, did_newattr = 16 };
+#endif
 
-static void back_buffer_flip()
+static void back_buffer_flip(void)
 {
-    cell_t * back = console.back_buffer;
-    cell_t * front = console.front_buffer;
+    cell_t *back = console.back_buffer;
+    cell_t *front = console.front_buffer;
     COORD pos;
     DWORD unused;
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    DWORD reserved;
+    unsigned do_anything, did_anything;
 
+    emit_hide_cursor();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
         for (pos.X = 0; pos.X < console.width; pos.X++) {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
             if (back->attribute != front->attribute) {
                 WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
                                             1, pos, &unused);
                 front->attribute = back->attribute;
-            }
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+            boolean pos_set = FALSE;
+            do_anything = did_anything = 0U;
+            if (back->color24 != front->color24)
+                do_anything |= do_color24;
+            if (back->colorseq != front->colorseq)
+                do_anything |= do_colorseq;
+            if (back->attr != front->attr)
+                do_anything |= do_newattr;
+            if (strcmp((const char *) back->utf8str,
+                       (const char *) front->utf8str))
+                do_anything |= do_utf8_content;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
             if (back->character != front->character) {
                 if (console.has_unicode) {
                     WriteConsoleOutputCharacterW(console.hConOut,
                         &back->character, 1, pos, &unused);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+            if (do_anything) {
+                SetConsoleCursorPosition(console.hConOut, pos);
+                pos_set = TRUE;
+
+                {
+                    did_anything |= did_newattr;
+                    if (back->attr) {
+                        if (back->attr & atr_bold)
+                            emit_start_bold();
+                        //  if (back->attr & atr_dim)
+                        //      emit_start_dim();
+                        if (back->attr & atr_uline)
+                            emit_start_underline();
+                        // if (back->attr & atr_blink)
+                        //    emit_start_blink();
+                        if (back->attr & atr_inverse)
+                            emit_start_inverse();
+                        // front->attr = back->attr; /* will happen below due
+                        // to did_newattr */
+                    } else {
+                        emit_return_to_default();
+                    }
+                }
+                if (color24_on && back->color24) {
+                    did_anything |= did_color24;
+                    if (back->color24) {
+                        emit_start_24bitcolor(back->color24);
+                    }
+                } else if (back->colorseq) {
+                    did_anything |= did_colorseq;
+                    WriteConsoleA(console.hConOut, back->colorseq,
+                                  (int) strlen(back->colorseq), &unused,
+                                  &reserved);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 } else {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                     char ch = (char)back->character;
                     WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
                                                     &unused);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                    did_anything |= did_colorseq;
+                    emit_default_color();
                 }
+                if (did_anything
+                    || (do_anything & (do_wide_content | do_utf8_content))) {
+                        WriteConsoleW(console.hConOut, &back->wcharacter, 1,
+                                      &unused, &reserved);
+                        did_anything |= did_wide_content;
+                }
+            }
+            if (did_anything) {
+                if (!pos_set) {
+                    SetConsoleCursorPosition(console.hConOut, pos);
+                    pos_set = TRUE;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+                }
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+                emit_return_to_default();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 *front = *back;
             }
             back++;
             front++;
         }
     }
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    emit_show_cursor();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
 void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
@@ -313,11 +870,17 @@ settty(const char* s)
         raw_print(s);
     restore_original_console_font();
     if (orig_QuickEdit) {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         DWORD cmode;
 
         GetConsoleMode(console.hConIn, &cmode);
         cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
         SetConsoleMode(console.hConIn, cmode);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+        GetConsoleMode(console.hConIn, &console.in_cmode);
+        console.in_cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
+        SetConsoleMode(console.hConIn, console.in_cmode);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     }
 }
 
@@ -351,6 +914,9 @@ tty_start_screen()
 {
     if (iflags.num_pad)
         tty_number_pad(1); /* make keypad send digits */
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    ibmgraphics_mode_callback = tty_ibmgraphics_fixup;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
 void
@@ -390,7 +956,7 @@ CtrlHandler(DWORD ctrltype)
 void
 consoletty_open(int mode)
 {
-    DWORD cmode;
+    int debugvar;
 
     /* Initialize the function pointer that points to
      * the kbhit() equivalent, in this TTY case consoletty_kbhit()
@@ -399,7 +965,7 @@ consoletty_open(int mode)
 
     if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE)) {
         /* Unable to set control handler */
-        cmode = 0; /* just to have a statement to break on for debugger */
+        debugvar = 0; /* just to have a statement to break on for debugger */
     }
 
     LI = console.height;
@@ -553,6 +1119,7 @@ nocmov(int x, int y)
     set_console_cursor(x, y);
 }
 
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 /* same signature as 'putchar()' with potential failure result ignored */
 int
 xputc(int ch)
@@ -562,6 +1129,7 @@ xputc(int ch)
     return 0;
 }
 
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
 void
 xputs(const char* s)
 {
@@ -573,21 +1141,39 @@ xputs(const char* s)
 
     if (s) {
         for (k = 0; k < slen && s[k]; ++k)
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
             xputc_core(s[k]);
+#else
+            xputc_core((int) s[k]);
+#endif
     }
 }
 
-/* xputc_core() and g_putch() are the only
- * two routines that actually place output
- * on the display.
- */
-void
-xputc_core(char ch)
+/* xputc_core() and g_putch() are the only routines that actually place output.
+   same signature as 'putchar()' with potential failure result ignored */
+int
+xputc(int ch)
 {
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+    xputc_core(ch);
+    return 0;
+}
+void
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
+xputc_core(char ch)
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+xputc_core(int ch)
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+{
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    int ccount = 1;     /* default non-zero, but char conversion results will alter */
+    WCHAR wch[2];
+#else
+    boolean inverse = FALSE;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     nhassert(console.cursor.X >= 0 && console.cursor.X < console.width);
     nhassert(console.cursor.Y >= 0 && console.cursor.Y < console.height);
 
-    boolean inverse = FALSE;
     cell_t cell;
 
     switch (ch) {
@@ -607,7 +1193,7 @@ xputc_core(char ch)
         }
         break;
     default:
-
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
         console.attr = (inverse) ?
                         ttycolors_inv[console.current_nhcolor] :
@@ -625,9 +1211,42 @@ xputc_core(char ch)
             if (console.cursor.Y < console.height - 1) {
                 console.cursor.X = 1;
                 console.cursor.Y++;
-            }
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+        /* this causes way too much performance degradation */
+        /* cell.color24 = customcolors[console.current_nhcolor]; */
+        cell.colorseq = esc_seq_colors[console.current_nhcolor];
+        cell.attr = console.attr;
+        //if (console.color24)
+        //    __debugbreak();
+        cell.color24 = 0L;
+        wch[1] = 0;
+        if (console.has_unicode) {
+            wch[0] = (ch >= 0 && ch < SIZE(console.cpMap)) ? console.cpMap[ch]
+                                                           : ch;
+                /* store the wide version here also, so we don't slow
+                   down back_buffer_flip() with conversions */
+                cell.wcharacter = wch[0];
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
         } else {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
             console.cursor.X++;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+            /* we can just use the UTF-8 utf8str field, since ascii is a
+               single-byte representation of a small subset of unicode */
+            cell.utf8str[0] = ch;
+            cell.utf8str[1] = 0;
+        }
+        if (ccount) {
+            buffer_write(console.back_buffer, &cell, console.cursor);
+            if (console.cursor.X == console.width - 1) {
+                if (console.cursor.Y < console.height - 1) {
+                    console.cursor.X = 1;
+                    console.cursor.Y++;
+                }
+            } else {
+                console.cursor.X++;
+            }
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
         }
     }
 
@@ -639,14 +1258,19 @@ xputc_core(char ch)
  * Overrides wintty.c function of the same name
  * for win32. It is used for glyphs only, not text.
  */
-
 void
 g_putch(int in_ch)
 {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     boolean inverse = FALSE;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    int ccount = 0;
+    WCHAR wch[2];
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     unsigned char ch = (unsigned char) in_ch;
 
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 
     inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
     console.attr = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse) ?
@@ -655,13 +1279,45 @@ g_putch(int in_ch)
     if (console.current_nhattr[ATR_BOLD])
         console.attr |= (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
 
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
     cell_t cell;
-
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     cell.attribute = console.attr;
     cell.character = (console.has_unicode ? cp437[ch] : ch);
-
+#else
+    cell.attr = console.attr;
+    cell.colorseq = esc_seq_colors[console.current_nhcolor];
+    cell.color24 = console.color24 ? console.color24 : 0L;
+    wch[1] = 0;
+    if (console.has_unicode) {
+        wch[0] = (ch >= 0 && ch < SIZE(console.cpMap)) ? console.cpMap[ch] : ch;
+            /* store the wide version here also, so we don't slow
+               down back_buffer_flip() with conversions */
+            cell.wcharacter = wch[0];
+    } else {
+        /* we can just use the UTF-8 utf8str field, since ascii is a
+           single-byte representation of a small subset of unicode */
+        cell.utf8str[0] = ch;
+        cell.utf8str[1] = 0;
+        ccount = 2;
+    }
+#endif
     buffer_write(console.back_buffer, &cell, console.cursor);
 }
+
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+void
+term_start_24bitcolor(long color24bit)
+{
+    console.color24 = color24bit; /* color 0 has bit 0x1000000 set */
+}
+
+void
+term_end_24bitcolor(void)
+{
+    console.color24 = 0L;
+}
+#endif VIRTUAL_TERMINAL_SEQUENCES
 
 void
 cl_end(void)
@@ -680,9 +1336,19 @@ raw_clear_screen(void)
         cell_t * front = console.front_buffer;
         COORD pos;
         DWORD unused;
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        DWORD reserved;
+#endif
 
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        pos.Y = 0;
+        pos.X = 0;
+        SetConsoleCursorPosition(console.hConOut, pos);
+        emit_return_to_default();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
         for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
             for (pos.X = 0; pos.X < console.width; pos.X++) {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                  WriteConsoleOutputAttribute(console.hConOut, &back->attribute,
                                              1, pos, &unused);
                  front->attribute = back->attribute;
@@ -694,9 +1360,18 @@ raw_clear_screen(void)
                      WriteConsoleOutputCharacterA(console.hConOut, &ch, 1, pos,
                                                          &unused);
                  }
-                 *front = *back;
-                 back++;
-                 front++;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                *back = clear_cell;
+                if (console.has_unicode)
+                    WriteConsoleW(console.hConOut, &back->wcharacter, 1,
+                                  &unused, &reserved);
+                else
+                    WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
+                                    (int) strlen((char *) back->utf8str), &unused, &reserved);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+                *front = *back;
+                back++;
+                front++;
             }
         }
     }
@@ -759,24 +1434,24 @@ tty_delay_output(void)
 }
 
 /*
- * CLR_BLACK		0
- * CLR_RED		1
- * CLR_GREEN		2
- * CLR_BROWN		3	low-intensity yellow
- * CLR_BLUE		4
- * CLR_MAGENTA 		5
- * CLR_CYAN		6
- * CLR_GRAY		7	low-intensity white
- * NO_COLOR		8
- * CLR_ORANGE		9
- * CLR_BRIGHT_GREEN	10
- * CLR_YELLOW		11
- * CLR_BRIGHT_BLUE	12
- * CLR_BRIGHT_MAGENTA  	13
- * CLR_BRIGHT_CYAN	14
- * CLR_WHITE		15
- * CLR_MAX		16
- * BRIGHT		8
+ * CLR_BLACK             0
+ * CLR_RED               1
+ * CLR_GREEN             2
+ * CLR_BROWN             3  low-intensity yellow
+ * CLR_BLUE              4
+ * CLR_MAGENTA           5
+ * CLR_CYAN              6
+ * CLR_GRAY              7  low-intensity white
+ * NO_COLOR              8
+ * CLR_ORANGE            9
+ * CLR_BRIGHT_GREEN     10
+ * CLR_YELLOW           11
+ * CLR_BRIGHT_BLUE      12
+ * CLR_BRIGHT_MAGENTA   13
+ * CLR_BRIGHT_CYAN      14
+ * CLR_WHITE            15
+ * CLR_MAX              16
+ * BRIGHT                8
  */
 
 static void
@@ -831,22 +1506,6 @@ init_ttycolor(void)
     init_ttycolor_completed = TRUE;
 }
 
-#if 0
-int
-has_color(int color)        /* this function is commented out */
-{
-#ifdef TEXTCOLOR
-    if ((color >= 0) && (color < CLR_MAX))
-        return 1;
-#else
-    if ((color == CLR_BLACK) || (color == CLR_WHITE) || (color == NO_COLOR))
-        return 1;
-#endif
-    else
-        return 0;
-}
-#endif
-
 int
 term_attr_fixup(int attrmask)
 {
@@ -856,6 +1515,22 @@ term_attr_fixup(int attrmask)
 void
 term_start_attr(int attrib)
 {
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    switch (attrib) {
+    case ATR_INVERSE:
+        console.attr |= atr_inverse;
+        break;
+    case ATR_ULINE:
+        console.attr |= atr_uline;
+        break;
+    case ATR_BLINK:
+        console.attr |= atr_blink;
+        break;
+    case ATR_BOLD:
+        console.attr |= atr_bold;
+        break;
+    }
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhattr[attrib] = TRUE;
     if (attrib) console.current_nhattr[ATR_NONE] = FALSE;
 }
@@ -867,9 +1542,24 @@ term_end_attr(int attrib)
 
     switch (attrib) {
     case ATR_INVERSE:
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        console.attr &= ~atr_inverse;
+        break;
+#endif
     case ATR_ULINE:
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        console.attr &= ~atr_uline;
+        break;
+#endif
     case ATR_BLINK:
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        console.attr &= ~atr_blink;
+        break;
+#endif
     case ATR_BOLD:
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+        console.attr &= ~atr_bold;
+#endif
         break;
     }
     console.current_nhattr[attrib] = FALSE;
@@ -910,7 +1600,9 @@ term_end_color(void)
 #ifdef TEXTCOLOR
     console.foreground = DEFTEXTCOLOR;
 #endif
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     console.attr = (console.foreground | console.background);
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhcolor = NO_COLOR;
 }
 
@@ -931,30 +1623,62 @@ void
 toggle_mouse_support(void)
 {
     static int qeinit = 0;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     DWORD cmode;
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
 
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     GetConsoleMode(console.hConIn, &cmode);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    GetConsoleMode(console.hConIn, &console.in_cmode);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     if (!qeinit) {
         qeinit = 1;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         orig_QuickEdit = ((cmode & ENABLE_QUICK_EDIT_MODE) != 0);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+        orig_QuickEdit = ((console.in_cmode & ENABLE_QUICK_EDIT_MODE) != 0);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     }
     switch(iflags.wc_mouse_support) {
         case 2:
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                 cmode |= ENABLE_MOUSE_INPUT;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                console.in_cmode |= ENABLE_MOUSE_INPUT;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 break;
         case 1:
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                 cmode |= ENABLE_MOUSE_INPUT;
                 cmode &= ~ENABLE_QUICK_EDIT_MODE;
                 cmode |= ENABLE_EXTENDED_FLAGS;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                console.in_cmode |= ENABLE_MOUSE_INPUT;
+                console.in_cmode &= ~ENABLE_QUICK_EDIT_MODE;
+                console.in_cmode |= ENABLE_EXTENDED_FLAGS;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 break;
         case 0:
                 /*FALLTHRU*/
         default:
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                 cmode &= ~ENABLE_MOUSE_INPUT;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                console.in_cmode &= ~ENABLE_MOUSE_INPUT;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
                 if (orig_QuickEdit)
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
                     cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+                    console.in_cmode |= (ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     }
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     SetConsoleMode(console.hConIn, cmode);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    SetConsoleMode(console.hConIn, console.in_cmode);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 #endif
 
@@ -967,9 +1691,48 @@ consoletty_preference_update(const char* pref)
         toggle_mouse_support();
 #endif
     }
-    if (stricmp(pref, "symset") == 0)
+#endif
+    if (stricmp(pref, "symset") == 0) {
+        if (SYMHANDLING(H_IBM)) {
+            tty_ibmgraphics_fixup();
+        } 
         check_and_set_font();
+    }
     return;
+}
+
+/*
+ * This is called when making the switch to a symset
+ * with an IBM handler to allow any operating system
+ * specific changes to be carried out.
+ */
+void
+tty_ibmgraphics_fixup(void)
+{
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    char buf[BUFSZ], *bp, *localestr;
+
+    if (!console.hConOut)
+        console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    /* the locale */
+    Snprintf(buf, sizeof buf, "%s", console.orig_localestr);
+    if ((bp = strstri(buf, ".utf8")) != 0)
+        *bp = '\0';
+    localestr = setlocale(LC_ALL, buf);
+    if (localestr) {
+        if (console.localestr)
+            free(console.localestr);
+        console.localestr = strdup(localestr);
+    }
+    set_known_good_console_font();
+    /* the console mode */
+    GetConsoleMode(console.hConOut, &console.out_cmode);
+    if ((console.out_cmode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0) {
+        console.out_cmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(console.hConOut, console.out_cmode);
+        GetConsoleMode(console.hConOut, &console.out_cmode);
+    }
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
 #ifdef PORT_DEBUG
@@ -1581,7 +2344,11 @@ check_and_set_font()
  * fit within the width of a single console cell.
  */
 boolean
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 check_font_widths()
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+check_font_widths(void)
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 {
     CONSOLE_FONT_INFOEX console_font_info;
     console_font_info.cbSize = sizeof(console_font_info);
@@ -1684,44 +2451,70 @@ clean_up:
  * settings so that they can be restored prior to NetHack exit.
  */
 void
-set_known_good_console_font()
+set_known_good_console_font(void)
 {
     CONSOLE_FONT_INFOEX console_font_info;
     console_font_info.cbSize = sizeof(console_font_info);
     BOOL success = GetCurrentConsoleFontEx(console.hConOut, FALSE,
                                             &console_font_info);
 
+    success = SetConsoleOutputCP(437);
+    nhassert(success);
     console.font_changed = TRUE;
-    console.original_font_info = console_font_info;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
+    console.orig_font_info = console_font_info;
     console.original_code_page = GetConsoleOutputCP();
 
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    console.code_page = GetConsoleOutputCP();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
     wcscpy_s(console_font_info.FaceName,
         sizeof(console_font_info.FaceName)
             / sizeof(console_font_info.FaceName[0]),
         L"Consolas");
-
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     success = SetConsoleOutputCP(437);
     nhassert(success);
-
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
     success = SetCurrentConsoleFontEx(console.hConOut, FALSE, &console_font_info);
     nhassert(success);
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    if (success)
+        console.font_info = console_font_info;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
 /* restore_original_console_font will restore the console font and code page
  * settings to what they were when NetHack was launched.
  */
 void
-restore_original_console_font()
+restore_original_console_font(void)
 {
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    char *tmplocalestr;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
     if (console.font_changed) {
         BOOL success;
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         raw_print("Restoring original font and code page\n");
         success = SetConsoleOutputCP(console.original_code_page);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+        raw_print("Restoring original font, code page and locale\n");
+
+        tmplocalestr = setlocale(LC_ALL, console.orig_localestr);
+        if (tmplocalestr) {
+            if (console.localestr)
+                free(console.localestr);
+            console.localestr = strdup(tmplocalestr);
+        }
+        success = SetConsoleOutputCP(console.orig_code_page);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
         if (!success)
             raw_print("Unable to restore original code page\n");
 
         success = SetCurrentConsoleFontEx(console.hConOut, FALSE,
-                                            &console.original_font_info);
+                                            &console.orig_font_info);
         if (!success)
             raw_print("Unable to restore original font\n");
 
@@ -1735,18 +2528,31 @@ restore_original_console_font()
  * wish to print to the console.
  */
 
-void set_cp_map()
+void set_cp_map(void)
 {
     if (console.has_unicode) {
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         UINT codePage = GetConsoleOutputCP();
+#else
+        console.code_page = GetConsoleOutputCP();
+#endif
 
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
         if (codePage == 437) {
+#else
+        if (console.code_page == 437) {
+#endif
             memcpy(console.cpMap, cp437, sizeof(console.cpMap));
         } else {
             for (int i = 0; i < 256; i++) {
                 char c = (char)i;
-                int count = MultiByteToWideChar(codePage, 0, &c, 1,
-                                                &console.cpMap[i], 1);
+                int count = MultiByteToWideChar(
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
+                                                codePage, 
+#else
+                                                console.code_page,
+#endif
+                                              0, &c, 1, &console.cpMap[i], 1);
                 nhassert(count == 1);
 
                 // If a character was mapped to unicode control codes,
@@ -1847,38 +2653,40 @@ void early_raw_print(const char *s)
  *
  */
 
-void nethack_enter_consoletty()
+void nethack_enter_consoletty(void)
 {
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    char buf[BUFSZ], *bp, *localestr;
+    BOOL success;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 #if 0
     /* set up state needed by early_raw_print() */
     windowprocs.win_raw_print = early_raw_print;
 #endif
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
     nhassert(console.hConOut != NULL); // NOTE: this assert will not print
-
-    GetConsoleScreenBufferInfo(console.hConOut, &console.origcsbi);
-
+    GetConsoleScreenBufferInfo(console.hConOut, &console.orig_csbi);
     /* Testing of widths != COLNO has not turned up any problems.  Need
      * to do a bit more testing and then we are likely to enable having
      * console width match window width.
      */
 #if 0
-    console.width = console.origcsbi.srWindow.Right -
-                     console.origcsbi.srWindow.Left + 1;
+    console.width = console.orig_csbi.srWindow.Right -
+                     console.orig_csbi.srWindow.Left + 1;
     console.Width = max(console.Width, COLNO);
 #else
     console.width = COLNO;
 #endif
 
-    console.height = console.origcsbi.srWindow.Bottom -
-                     console.origcsbi.srWindow.Top + 1;
+    console.height = console.orig_csbi.srWindow.Bottom -
+                     console.orig_csbi.srWindow.Top + 1;
     console.height = max(console.height, ROWNO + 3);
 
     console.buffer_size = console.width * console.height;
 
 
     /* clear the entire console buffer */
-    int size = console.origcsbi.dwSize.X * console.origcsbi.dwSize.Y;
+    int size = console.orig_csbi.dwSize.X * console.orig_csbi.dwSize.Y;
     DWORD unused;
     set_console_cursor(0, 0);
     FillConsoleOutputAttribute(
@@ -1898,10 +2706,10 @@ void nethack_enter_consoletty()
     nhassert(console.hConIn  != NULL);
 
     /* grow the size of the console buffer if it is not wide enough */
-    if (console.origcsbi.dwSize.X < console.width) {
+    if (console.orig_csbi.dwSize.X < console.width) {
         COORD screen_size = {0};
 
-        screen_size.Y = console.origcsbi.dwSize.Y,
+        screen_size.Y = console.orig_csbi.dwSize.Y,
         screen_size.X = console.width;
         SetConsoleScreenBufferSize(console.hConOut, screen_size);
     }
@@ -1918,26 +2726,96 @@ void nethack_enter_consoletty()
     /* determine whether OS version has unicode support */
     console.has_unicode = ((GetVersion() & 0x80000000) == 0);
 
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    /* store the original code page*/
+    console.orig_code_page = GetConsoleOutputCP();
+
+    /* store the original locale */
+    console.orig_localestr = dupstr(setlocale(LC_ALL, ""));
+
+    /* store the original font */
+    console.orig_font_info.cbSize = sizeof(console.orig_font_info);
+    success = GetCurrentConsoleFontEx(console.hConOut,
+                                      FALSE, &console.orig_font_info);
+    console.font_info = console.orig_font_info;
+
+    /* adjust the locale */
+    Snprintf(buf, sizeof buf, "%s", console.orig_localestr);
+    if ((bp = strstri(buf, ".utf8")) != 0)
+        *bp = '\0';
+    localestr = setlocale(LC_ALL, buf);
+    if (localestr) {
+        if (console.localestr)
+            free(console.localestr);
+        console.localestr = strdup(localestr);
+    }
+    console.code_page = console.orig_code_page;
+    if (console.has_unicode) {
+        if (console.code_page != 437)
+            success = SetConsoleOutputCP(437);
+    } else if (console.code_page != 1252) {
+        success = SetConsoleOutputCP(1252);
+    }
+    console.code_page = GetConsoleOutputCP();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+
     /* check the font before we capture the code page map */
     check_and_set_font();
     set_cp_map();
 
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     /* Set console mode */
     DWORD cmode, mask;
     GetConsoleMode(console.hConIn, &cmode);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    /* input console mode */
+    DWORD disablemask;
+    GetConsoleMode(console.hConIn, &console.orig_in_cmode);
+    GetConsoleMode(console.hConOut, &console.orig_out_cmode);
+
+    console.in_cmode = console.orig_in_cmode;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 #ifdef NO_MOUSE_ALLOWED
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_MOUSE_INPUT
+#else
+    disablemask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_MOUSE_INPUT
+#endif
            | ENABLE_ECHO_INPUT | ENABLE_WINDOW_INPUT;
 #else
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     mask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
+#else
+    disablemask = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
+#endif
            | ENABLE_WINDOW_INPUT;
 #endif
     /* Turn OFF the settings specified in the mask */
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     cmode &= ~mask;
-#ifndef NO_MOUSE_ALLOWED
-    cmode |= ENABLE_MOUSE_INPUT;
+#else
+    console.in_cmode &= ~disablemask;
 #endif
+#ifndef NO_MOUSE_ALLOWED
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
+    cmode |= ENABLE_MOUSE_INPUT;
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    console.in_cmode |= ENABLE_MOUSE_INPUT;
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
+#endif /* NO_MOUSE_ALLOWED */
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
     SetConsoleMode(console.hConIn, cmode);
+#else /* VIRTUAL_TERMINAL_SEQUENCES */
+    SetConsoleMode(console.hConIn, console.in_cmode);
+
+    console.out_cmode = console.orig_out_cmode;
+    if ((console.out_cmode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0) {
+        /* recognize escape sequences */
+        console.out_cmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(console.hConOut, console.out_cmode);
+    }
+    GetConsoleMode(console.hConOut, &console.out_cmode);
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
     /* load default keyboard handler */
     HKL keyboard_layout = GetKeyboardLayout(0);
@@ -1955,6 +2833,9 @@ void nethack_enter_consoletty()
                 error("Unable to load nhraykey.dll");
         }
     }
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+    init_custom_colors();
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 #endif /* TTY_GRAPHICS */
 
@@ -1994,5 +2875,7 @@ VA_DECL(const char *, fmt)
     VA_END();
     return;
 }
+#ifndef VIRTUAL_TERMINAL_SEQUENCES
 
+#endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
 #endif /* WIN32 */

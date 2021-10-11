@@ -15,7 +15,9 @@ void (*decgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 void (*ibmgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 void (*ascgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
 #endif
-
+#ifdef WIN32
+void (*ibmgraphics_mode_callback)(void) = 0; /* set in tty_start_screen() */
+#endif
 #ifdef CURSES_GRAPHICS
 void (*cursesgraphics_mode_callback)(void) = 0;
 #endif
