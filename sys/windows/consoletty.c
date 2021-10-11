@@ -248,8 +248,8 @@ struct console_t {
     0,        /* height */
     FALSE,    /* has_unicode */
     0,        /* buffer_size */
-    { 0 },    /* front_buffer */
-    { 0 },    /* back_buffer */
+    NULL,     /* front_buffer */
+    NULL,     /* back_buffer */
     { 0 },    /* cpMap */
     FALSE,    /* font_changed */
     { 0 },    /* orig_font_info */
