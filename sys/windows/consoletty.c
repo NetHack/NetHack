@@ -32,6 +32,12 @@
 #endif
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
+#ifdef __MINGW32__
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING  0x0004
+#endif
+#endif
+
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 extern int redirect_stdout;
 
@@ -1317,7 +1323,7 @@ term_end_24bitcolor(void)
 {
     console.color24 = 0L;
 }
-#endif VIRTUAL_TERMINAL_SEQUENCES
+#endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 void
 cl_end(void)
