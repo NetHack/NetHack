@@ -671,7 +671,7 @@ newgame(void)
     u_init();
 
     l_nhcore_init();
-
+    reset_glyphmap(gm_newgame);
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif

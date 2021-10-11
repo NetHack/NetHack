@@ -339,8 +339,9 @@ enum altar_types {
 enum level_walls  { main_walls, mines_walls, gehennom_walls,
                     knox_walls, sokoban_walls };
 enum { GM_FLAGS, GM_TTYCHAR, GM_COLOR, NUM_GLYPHMOD }; /* glyphmod entries */
-enum glyphmap_change_triggers { gm_nochange, gm_levelchange, gm_optionchange,
-                                gm_symchange, gm_accessibility_change };
+enum glyphmap_change_triggers { gm_nochange, gm_newgame, gm_levelchange,
+                                gm_optionchange, gm_symchange,
+                                gm_accessibility_change };
 #define NUM_ZAP 8 /* number of zap beam types */
 
 /*
