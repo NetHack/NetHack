@@ -211,7 +211,7 @@ struct console_t {
     DWORD in_cmode;
     DWORD out_cmode;
     long color24;
-} console = { 
+} console = {
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* background */
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
     0,                                                     /* attr */
@@ -801,7 +801,7 @@ static void back_buffer_flip(void)
 void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 {
     nhassert(x >= 0 && x < console.width);
-    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height &&
                                                  x == 0)));
 
     cell_t * dst = buffer + console.width * y + x;
@@ -816,7 +816,7 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
 {
     nhassert(x >= 0 && x < console.width);
-    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height &&
                                                  x == 0)));
     cell_t * dst = buffer + console.width * y + x;
     cell_t *sentinel = buffer + console.width * (y + 1);
@@ -1380,7 +1380,7 @@ raw_clear_screen(void)
 void
 clear_screen(void)
 {
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);    
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     home();
 }
 
@@ -1695,7 +1695,7 @@ consoletty_preference_update(const char* pref)
     if (stricmp(pref, "symset") == 0) {
         if (SYMHANDLING(H_IBM)) {
             tty_ibmgraphics_fixup();
-        } 
+        }
         check_and_set_font();
     }
     return;
@@ -2548,7 +2548,7 @@ void set_cp_map(void)
                 char c = (char)i;
                 int count = MultiByteToWideChar(
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
-                                                codePage, 
+                                                codePage,
 #else
                                                 console.code_page,
 #endif
@@ -2560,7 +2560,7 @@ void set_cp_map(void)
                 // code page 437 mappings.
                 if (console.cpMap[i] < 32)
                     console.cpMap[i] = cp437[console.cpMap[i]];
-            }        
+            }
         }
 
     }
