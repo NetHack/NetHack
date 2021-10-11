@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "September 17, 2021
+.ds f2 "October 11, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -2913,24 +2913,32 @@ choosing what to wear or take off.
 .hn 2
 Gems (\(oq*\(cq)
 .pg
-Some gems are valuable, and can be sold for a lot of gold.  They are also
-a far more efficient way of carrying your riches.  Valuable gems increase
-your score if you bring them with you when you exit.
+Some gems are valuable, and can be sold for a lot of gold.
+They are also a far more efficient way of carrying your riches.
+Valuable gems increase your score if you bring them with you when you exit.
 .pg
 Other small rocks are also categorized as gems, but they are much less
-valuable.  All rocks, however, can be used as projectile weapons (if you
-have a sling).  In the most desperate of cases, you can still throw them
-by hand.
+valuable.
+All rocks, however, can be used as projectile weapons (if you have a sling).
+In the most desperate of cases, you can still throw them by hand.
 .hn 2
 Large rocks (\(oq\`\(cq)
 .pg
-Statues and boulders are not particularly useful, and are generally
-heavy.  It is rumored that some statues are not what they seem.
+Statues and boulders are not particularly useful, and are generally heavy.
+It is rumored that some statues are not what they seem.
 .pg
 Boulders occasionally block your path.
 You can push one forward (by attempting to walk onto its spot)
 when nothing blocks \fIits\fP path, or you can
 smash it into a pile of small rocks with breaking magic or a pick-axe.
+It is possible to move onto a boulder's location if certain conditions
+are met; ordinarily one of those conditions is that pushing it any
+further be blocked.
+Using the move-without-picking-up prefix (default key \(oq\f(CRm\fP\(cq)
+prior to the direction of movement will attempt to move to a boulder's
+location without pushing it in addition to the prefix's usual action of
+suppressing auto-pickup at the destination.
+.pg
 Very large humanoids (giants and their ilk) have been known to pick up
 boulders and use them as missile weapons.
 .pg

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{September 17, 2021}
+\date{October 11, 2021}
 
 \maketitle
 
@@ -3177,27 +3177,36 @@ choosing what to wear or take off.
 \subsection*{Gems (`{\tt *}')}
 
 %.pg
-Some gems are valuable, and can be sold for a lot of gold.  They are also
-a far more efficient way of carrying your riches.  Valuable gems increase
-your score if you bring them with you when you exit.
+Some gems are valuable, and can be sold for a lot of gold.
+They are also a far more efficient way of carrying your riches.
+Valuable gems increase your score if you bring them with you when you exit.
 
 %.pg
 Other small rocks are also categorized as gems, but they are much less
-valuable.  All rocks, however, can be used as projectile weapons (if you
-have a sling).  In the most desperate of cases, you can still throw them
-by hand.
+valuable.
+All rocks, however, can be used as projectile weapons (if you have a sling).
+In the most desperate of cases, you can still throw them by hand.
 
 %.hn 2
 \subsection*{Large rocks (`{\tt `}')}
 %.pg
-Statues and boulders are not particularly useful, and are generally
-heavy.  It is rumored that some statues are not what they seem.
+Statues and boulders are not particularly useful, and are generally heavy.
+It is rumored that some statues are not what they seem.
 
 %.pg
 Boulders occasionally block your path.
 You can push one forward (by attempting to walk onto its spot)
 when nothing blocks {\it its\/} path, or you can
 smash it into a pile of small rocks with breaking magic or a pick-axe.
+It is possible to move onto a boulder's location if certain conditions
+are met; ordinarily one of those conditions is that pushing it any
+further be blocked.
+Using the move-without-picking-up prefix (default key `{\tt m}')
+prior to the direction of movement will attempt to move to a boulder's
+location without pushing it in addition to the prefix's usual action of
+suppressing auto-pickup at the destination.
+
+%.pg
 Very large humanoids (giants and their ilk) have been known to pick up
 boulders and use them as missile weapons.
 
