@@ -4502,13 +4502,9 @@ parse(void)
     }
 
     g.multi = g.command_count;
-
-    if (g.multi) {
+    if (g.multi)
         g.multi--;
-        g.save_cm = g.command_line;
-    } else {
-        g.save_cm = (char *) 0;
-    }
+
     /* in 3.4.3 this was in rhack(), where it was too late to handle M-5 */
     if (g.Cmd.pcHack_compat) {
         /* This handles very old inconsistent DOS/Windows behaviour

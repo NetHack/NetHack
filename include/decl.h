@@ -772,7 +772,6 @@ struct instance_globals {
     stairway *stairs;
     int smeq[MAXNROFROOMS + 1];
     int doorindex;
-    char *save_cm;
     long done_money;
     long domove_attempting;
     long domove_succeeded;
@@ -997,7 +996,6 @@ struct instance_globals {
     /* mkmaze.c */
     lev_region bughack; /* for preserving the insect legs when wallifying
                          * baalz level */
-    boolean was_waterlevel; /* ugh... this shouldn't be needed */
     struct bubble *bbubbles;
     struct bubble *ebubbles;
     struct trap *wportal;

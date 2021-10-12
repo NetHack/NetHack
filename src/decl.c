@@ -262,7 +262,6 @@ const struct instance_globals g_init = {
     NULL, /* stairs */
     DUMMY, /* smeq */
     0, /* doorindex */
-    NULL, /* save_cm */
     0, /* done_money */
     0L, /* domove_attempting */
     0L, /* domove_succeeded */
@@ -466,7 +465,6 @@ const struct instance_globals g_init = {
 
     /* mkmaze.c */
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0} }, /* bughack */
-    FALSE, /* was_waterlevel */
     UNDEFINED_PTR, /* bbubbles */
     UNDEFINED_PTR, /* ebubbles */
     UNDEFINED_PTR, /* wportal */
