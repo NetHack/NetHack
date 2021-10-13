@@ -871,6 +871,8 @@ Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),
 	which is required on Windows to set binary mode; binary mode is
 	required in order to be able to reliably navigate through a file using
 	fseek(), ftell() and fread()
+Windows: when VIRTUAL_TERMINAL_SEQUENCES was not defined, the preprocessing
+	would fail on consoletty.c
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in
