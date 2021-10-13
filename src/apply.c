@@ -2951,10 +2951,11 @@ use_whip(struct obj *obj)
             else
                 You("flick your bullwhip towards %s.", mon_nam(mtmp));
             if (proficient) {
-                if (do_attack(mtmp))
-                    return 1;
-                else
+                boolean save_forcefight = g.context.forcefight;
+                g.context.forcefight = TRUE;
+                if (!do_attack(mtmp))
                     pline1(msg_snap);
+                g.context.forcefight = save_forcefight;
             }
         }
 
