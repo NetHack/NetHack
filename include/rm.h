@@ -114,20 +114,27 @@ enum levl_typ_types {
  *      a secret door is revealed, the door gets set to D_CLOSED iff
  *      it isn't set to D_LOCKED (see cvt_sdoor_to_door() in detect.c).
  *
- *      D_TRAPPED conflicts with W_NONDIGGABLE but the latter is not
- *      expected to be used on door locations.
+ *      D_LOCKED conflicts with W_NONDIGGABLE but the latter is not
+ *      expected to be used on door locations.  D_TRAPPED conflicts
+ *      with W_NONPASSWALL but secret doors aren't trapped.
+ *      D_SECRET would not fit within struct rm's 5-bit 'flags' field.
  */
 
 /*
  * The 5 possible states of doors.
+ * For historical reasons they are numbered as mask bits rather than 0..4.
+ * The trapped flag is OR'd onto the state and only valid if that state
+ * is closed or locked.
+ * The no-door state allows egress when moving diagonally, others do not.
  */
-#define D_NODOOR 0
-#define D_BROKEN 1
-#define D_ISOPEN 2
-#define D_CLOSED 4
-#define D_LOCKED 8
-#define D_TRAPPED 16
-#define D_SECRET 32 /* only used by sp_lev.c, NOT in rm-struct */
+#define D_NODOOR  0x00
+#define D_BROKEN  0x01
+#define D_ISOPEN  0x02
+#define D_CLOSED  0x04
+#define D_LOCKED  0x08
+
+#define D_TRAPPED 0x10
+#define D_SECRET  0x20 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
  * Thrones should only be looted once.
@@ -213,7 +220,7 @@ enum levl_typ_types {
  */
 struct rm {
     int glyph;               /* what the hero thinks is there */
-    schar typ;               /* what is really there */
+    schar typ;               /* what is really there  [why is this signed?] */
     uchar seenv;             /* seen vector */
     Bitfield(flags, 5);      /* extra information for typ */
     Bitfield(horizontal, 1); /* wall/door/etc is horiz. (more typ info) */
@@ -322,7 +329,8 @@ struct damage {
     struct damage *next;
     long when, cost;
     coord place;
-    schar typ;
+    schar typ; /* from struct rm */
+    uchar flags; /* also from struct rm; an unsigned 5-bit field there */
 };
 
 /* for bones levels:  identify the dead character, who might have died on

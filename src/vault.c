@@ -83,6 +83,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
         if (lev->typ == CORR && cansee(fcx, fcy))
             sawcorridor = TRUE;
         lev->typ = egrd->fakecorr[fcbeg].ftyp;
+        lev->flags = egrd->fakecorr[fcbeg].flags;
         if (IS_STWALL(lev->typ)) {
             /* destroy any trap here (pit dug by you, hole dug via
                wand while levitating or by monster, bear trap or land
@@ -506,25 +507,29 @@ invault(void)
         EGD(guard)->fcbeg = 0;
         EGD(guard)->fakecorr[0].fx = x;
         EGD(guard)->fakecorr[0].fy = y;
-        if (IS_WALL(levl[x][y].typ)) {
-            EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
-        } else { /* the initial guard location is a dug door */
+        EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
+        EGD(guard)->fakecorr[0].flags = levl[x][y].flags;
+        if (!IS_WALL(levl[x][y].typ)) {
+            /* the initial guard location happens to be a dug door */
             int vlt = EGD(guard)->vroom;
             xchar lowx = g.rooms[vlt].lx, hix = g.rooms[vlt].hx;
             xchar lowy = g.rooms[vlt].ly, hiy = g.rooms[vlt].hy;
+            int typ = levl[x][y].typ;
 
             if (x == lowx - 1 && y == lowy - 1)
-                EGD(guard)->fakecorr[0].ftyp = TLCORNER;
+                typ = TLCORNER;
             else if (x == hix + 1 && y == lowy - 1)
-                EGD(guard)->fakecorr[0].ftyp = TRCORNER;
+                typ = TRCORNER;
             else if (x == lowx - 1 && y == hiy + 1)
-                EGD(guard)->fakecorr[0].ftyp = BLCORNER;
+                typ = BLCORNER;
             else if (x == hix + 1 && y == hiy + 1)
-                EGD(guard)->fakecorr[0].ftyp = BRCORNER;
+                typ = BRCORNER;
             else if (y == lowy - 1 || y == hiy + 1)
-                EGD(guard)->fakecorr[0].ftyp = HWALL;
+                typ = HWALL;
             else if (x == lowx - 1 || x == hix + 1)
-                EGD(guard)->fakecorr[0].ftyp = VWALL;
+                typ = VWALL;
+
+            EGD(guard)->fakecorr[0].ftyp = typ;
         }
         levl[x][y].typ = DOOR;
         levl[x][y].doormask = D_NODOOR;
@@ -581,14 +586,19 @@ wallify_vault(struct monst *grd)
                 if ((trap = t_at(x, y)) != 0)
                     deltrap(trap);
                 if (x == lox)
-                    typ =
-                        (y == loy) ? TLCORNER : (y == hiy) ? BLCORNER : VWALL;
+                    typ = (y == loy) ? TLCORNER
+                          : (y == hiy) ? BLCORNER
+                            : VWALL;
                 else if (x == hix)
-                    typ =
-                        (y == loy) ? TRCORNER : (y == hiy) ? BRCORNER : VWALL;
+                    typ = (y == loy) ? TRCORNER
+                          : (y == hiy) ? BRCORNER
+                            : VWALL;
                 else /* not left or right side, must be top or bottom */
                     typ = HWALL;
                 levl[x][y].typ = typ;
+                /* FIXME?  both rm.doormask and rm.wall_info overlay
+                   rm.flags, so clearing doormask clobbers wall_info
+                   rather than reset it to the proper value.  Do we care? */
                 levl[x][y].doormask = 0;
                 /*
                  * hack: player knows walls are restored because of the
@@ -789,6 +799,7 @@ gd_move(struct monst *grd)
                     verbalize("You've been warned, knave!");
                 mnexto(grd);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
+                levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
                 grd->mpeaceful = 0;
                 return -1;
@@ -805,6 +816,7 @@ gd_move(struct monst *grd)
                 n = grd->my;
                 (void) rloc(grd, TRUE);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
+                levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
                 grd->mpeaceful = 0;
  letknow:
@@ -832,8 +844,8 @@ gd_move(struct monst *grd)
     if (egrd->fcend > 1) {
         if (egrd->fcend > 2 && in_fcorridor(grd, grd->mx, grd->my)
             && !egrd->gddone && !in_fcorridor(grd, u.ux, u.uy)
-            && levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
-                   == egrd->fakecorr[0].ftyp) {
+            && (levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
+                == egrd->fakecorr[0].ftyp)) {
             pline("%s, confused, disappears.", noit_Monnam(grd));
             disappear_msg_seen = TRUE;
             goto cleanup;
@@ -902,7 +914,8 @@ gd_move(struct monst *grd)
         for (ny = y - 1; ny <= y + 1; ny++) {
             if ((nx == x || ny == y) && (nx != x || ny != y)
                 && isok(nx, ny)) {
-                typ = (crm = &levl[nx][ny])->typ;
+                crm = &levl[nx][ny];
+                typ = crm->typ;
                 if (!IS_STWALL(typ) && !IS_POOL(typ)) {
                     if (in_fcorridor(grd, nx, ny))
                         goto nextnxy;
@@ -914,16 +927,11 @@ gd_move(struct monst *grd)
                     egrd->gddone = 1;
                     if (ACCESSIBLE(typ))
                         goto newpos;
-#ifdef STUPID
-                    if (typ == SCORR)
-                        crm->typ = CORR;
-                    else
-                        crm->typ = DOOR;
-#else
                     crm->typ = (typ == SCORR) ? CORR : DOOR;
-#endif
                     if (crm->typ == DOOR)
                         crm->doormask = D_NODOOR;
+                    else
+                        crm->flags = 0;
                     goto proceed;
                 }
             }
@@ -971,6 +979,7 @@ gd_move(struct monst *grd)
         break;
     }
     crm->typ = CORR;
+    crm->flags = 0;
  proceed:
     newspot = TRUE;
     unblock_point(nx, ny); /* doesn't block light */
@@ -979,11 +988,15 @@ gd_move(struct monst *grd)
 
     if ((nx != gx || ny != gy) || (grd->mx != gx || grd->my != gy)) {
         fcp = &(egrd->fakecorr[egrd->fcend]);
+        /* fakecorr overflow does not occur because egrd->fakecorr[]
+           is too small, but it has occurred when the same <x,y> are
+           put into it repeatedly for some as yet unexplained reason */
         if (egrd->fcend++ == FCSIZ)
             panic("fakecorr overflow");
         fcp->fx = nx;
         fcp->fy = ny;
         fcp->ftyp = typ;
+        fcp->flags = crm->flags;
     } else if (!egrd->gddone) {
         /* We're stuck, so try to find a new destination. */
         if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)

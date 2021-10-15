@@ -2720,9 +2720,10 @@ append_honorific(char *buf)
 {
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
-    static const char *const honored[] = { "good", "honored", "most gracious",
-                                           "esteemed",
-                                           "most renowned and sacred" };
+    static const char *const honored[] = {
+        "good", "honored", "most gracious", "esteemed",
+        "most renowned and sacred"
+    };
 
     Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
     if (is_vampire(g.youmonst.data))
@@ -3481,6 +3482,7 @@ add_damage(
     tmp_dam->place.y = y;
     tmp_dam->cost = cost;
     tmp_dam->typ = levl[x][y].typ;
+    tmp_dam->flags = levl[x][y].flags;
     tmp_dam->next = g.level.damagelist;
     g.level.damagelist = tmp_dam;
     /* If player saw damage, display as a wall forever */
@@ -3570,7 +3572,7 @@ discard_damage_struct(struct damage *dam)
         if (prev)
             prev->next = dam->next;
     }
-    (void) memset(dam, 0, sizeof(struct damage));
+    (void) memset(dam, 0, sizeof *dam);
     free((genericptr_t) dam);
 }
 
@@ -3802,10 +3804,14 @@ repair_damage(
         stop_picking = picking_at(x, y);
 
     /* door or wall repair; trap, if any, is now gone;
-       restore original terrain type and move any items away */
+       restore original terrain type and move any items away;
+       rm.doormask and rm.wall_info are both overlaid on rm.flags
+       so the new flags value needs to match the restored typ */
     levl[x][y].typ = tmp_dam->typ;
     if (IS_DOOR(tmp_dam->typ))
         levl[x][y].doormask = D_CLOSED; /* arbitrary */
+    else /* not a door; set rm.wall_info or whatever old flags are relevant */
+        levl[x][y].flags = tmp_dam->flags;
 
     litter = litter_getpos(&k, x, y, shkp);
     litter_scatter(litter, k, x, y, shkp);

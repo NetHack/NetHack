@@ -642,6 +642,10 @@ blessed scroll of remove curse read while confused blesses or curses any
 can now use m<dir> to try to move to an adjacent boulder's spot without
 	pushing it; hero poly'd into a giant or a tiny creature or carrying so
 	little as to be able to squeeze there will succeed, others will fail
+breaching a shop wall, using locking magic to put a door there, then unlocking
+	that door yielded a situation where subsequent shop damage repair
+	produced invalid map data which resulted in an impossible() warning
+	about "wall_angle: unknown" during map display
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

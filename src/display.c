@@ -2971,16 +2971,44 @@ t_warn(struct rm *lev)
     static const char warn_str[] = "wall_angle: %s: case %d: seenv = 0x%x";
     const char *wname;
 
-    if (lev->typ == TUWALL)
+    /* 3.7: non-T_wall cases added after shop repair (via breaching a wall,
+       using locking magic to put a door there, then unlocking the door;
+       D_CLOSED carried over to the wall) triggered warning for "unknown" */
+    switch (lev->typ) {
+    case TUWALL:
         wname = "tuwall";
-    else if (lev->typ == TLWALL)
+        break;
+    case TLWALL:
         wname = "tlwall";
-    else if (lev->typ == TRWALL)
+        break;
+    case TRWALL:
         wname = "trwall";
-    else if (lev->typ == TDWALL)
+        break;
+    case TDWALL:
         wname = "tdwall";
-    else
+        break;
+    case VWALL:
+        wname = "vwall";
+        break;
+    case HWALL:
+        wname = "hwall";
+        break;
+    case TLCORNER:
+        wname = "tlcorner";
+        break;
+    case TRCORNER:
+        wname = "trcorner";
+        break;
+    case BLCORNER:
+        wname = "blcorner";
+        break;
+    case BRCORNER:
+        wname = "brcorner";
+        break;
+    default:
         wname = "unknown";
+        break;
+    }
     impossible(warn_str, wname, lev->wall_info & WM_MASK,
                (unsigned int) lev->seenv);
 }

@@ -69,7 +69,9 @@
 #define GD_DESTROYGOLD 0x02
 
 struct fakecorridor {
-    xchar fx, fy, ftyp;
+    xchar fx, fy;
+    schar ftyp; /* from struct rm's typ */
+    uchar flags; /* also from struct rm; an unsigned 5-bit field there */
 };
 
 struct egd {
