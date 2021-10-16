@@ -306,7 +306,7 @@ invault(void)
     if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
         /* if time ok and no guard now. */
         char buf[BUFSZ];
-        register int x, y, gx, gy;
+        int x, y, gx, gy, typ;
         xchar rx, ry;
         long umoney;
 
@@ -319,15 +319,15 @@ invault(void)
         x = u.ux;
         y = u.uy;
         if (levl[x][y].typ != ROOM) { /* player dug a door and is in it */
-            if (levl[x + 1][y].typ == ROOM)
+            if (levl[x + 1][y].typ == ROOM) {
                 x = x + 1;
-            else if (levl[x][y + 1].typ == ROOM)
+            } else if (levl[x][y + 1].typ == ROOM) {
                 y = y + 1;
-            else if (levl[x - 1][y].typ == ROOM)
+            } else if (levl[x - 1][y].typ == ROOM) {
                 x = x - 1;
-            else if (levl[x][y - 1].typ == ROOM)
+            } else if (levl[x][y - 1].typ == ROOM) {
                 y = y - 1;
-            else if (levl[x + 1][y + 1].typ == ROOM) {
+            } else if (levl[x + 1][y + 1].typ == ROOM) {
                 x = x + 1;
                 y = y + 1;
             } else if (levl[x - 1][y - 1].typ == ROOM) {
@@ -507,14 +507,14 @@ invault(void)
         EGD(guard)->fcbeg = 0;
         EGD(guard)->fakecorr[0].fx = x;
         EGD(guard)->fakecorr[0].fy = y;
-        EGD(guard)->fakecorr[0].ftyp = levl[x][y].typ;
-        EGD(guard)->fakecorr[0].flags = levl[x][y].flags;
-        if (!IS_WALL(levl[x][y].typ)) {
-            /* the initial guard location happens to be a dug door */
+        typ = levl[x][y].typ;
+        if (!IS_WALL(typ)) {
+            /* guard arriving at non-wall implies a door; vault wall was
+               dug into an empty doorway (which could subsequently have
+               been plugged with an intact door by use of locking magic) */
             int vlt = EGD(guard)->vroom;
             xchar lowx = g.rooms[vlt].lx, hix = g.rooms[vlt].hx;
             xchar lowy = g.rooms[vlt].ly, hiy = g.rooms[vlt].hy;
-            int typ = levl[x][y].typ;
 
             if (x == lowx - 1 && y == lowy - 1)
                 typ = TLCORNER;
@@ -529,11 +529,18 @@ invault(void)
             else if (x == lowx - 1 || x == hix + 1)
                 typ = VWALL;
 
-            EGD(guard)->fakecorr[0].ftyp = typ;
+            /* we lack access to the original wall_info bit mask for this
+               former wall location so recreate it */
+            levl[x][y].typ = typ; /* wall; will be changed to door below */
+            levl[x][y].wall_info = 0; /* will be reset too via doormask */
+            xy_set_wall_state(x, y); /* set WA_MASK bits in .wall_info */
         }
+        EGD(guard)->fakecorr[0].ftyp = typ;
+        EGD(guard)->fakecorr[0].flags = levl[x][y].flags;
+        /* guard's entry point where confrontation with hero takes place */
         levl[x][y].typ = DOOR;
         levl[x][y].doormask = D_NODOOR;
-        unblock_point(x, y); /* doesn't block light */
+        unblock_point(x, y); /* empty doorway doesn't block light */
         EGD(guard)->fcend = 1;
         EGD(guard)->warncnt = 1;
     }
@@ -595,11 +602,10 @@ wallify_vault(struct monst *grd)
                             : VWALL;
                 else /* not left or right side, must be top or bottom */
                     typ = HWALL;
+
                 levl[x][y].typ = typ;
-                /* FIXME?  both rm.doormask and rm.wall_info overlay
-                   rm.flags, so clearing doormask clobbers wall_info
-                   rather than reset it to the proper value.  Do we care? */
-                levl[x][y].doormask = 0;
+                levl[x][y].wall_info = 0;
+                xy_set_wall_state(x, y); /* set WA_MASK bits in .wall_info */
                 /*
                  * hack: player knows walls are restored because of the
                  * message, below, so show this on the screen.

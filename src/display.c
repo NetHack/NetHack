@@ -2799,13 +2799,66 @@ set_crosswall(int x, int y)
     return wmode;
 }
 
+/* called for every <x,y> by set_wall_state() and for specific <x,y> during
+   vault wall repair */
+void
+xy_set_wall_state(int x, int y)
+{
+    int wmode;
+    struct rm *lev = &levl[x][y];
+
+    switch (lev->typ) {
+    case SDOOR:
+        wmode = set_wall(x, y, (int) lev->horizontal);
+        break;
+    case VWALL:
+        wmode = set_wall(x, y, 0);
+        break;
+    case HWALL:
+        wmode = set_wall(x, y, 1);
+        break;
+    case TDWALL:
+        wmode = set_twall(x, y, x, y - 1, x - 1, y + 1, x + 1, y + 1);
+        break;
+    case TUWALL:
+        wmode = set_twall(x, y, x, y + 1, x + 1, y - 1, x - 1, y - 1);
+        break;
+    case TLWALL:
+        wmode = set_twall(x, y, x + 1, y, x - 1, y - 1, x - 1, y + 1);
+        break;
+    case TRWALL:
+        wmode = set_twall(x, y, x - 1, y, x + 1, y + 1, x + 1, y - 1);
+        break;
+    case TLCORNER:
+        wmode = set_corn(x - 1, y - 1, x, y - 1, x - 1, y, x + 1, y + 1);
+        break;
+    case TRCORNER:
+        wmode = set_corn(x, y - 1, x + 1, y - 1, x + 1, y, x - 1, y + 1);
+        break;
+    case BLCORNER:
+        wmode = set_corn(x, y + 1, x - 1, y + 1, x - 1, y, x + 1, y - 1);
+        break;
+    case BRCORNER:
+        wmode = set_corn(x + 1, y, x + 1, y + 1, x, y + 1, x - 1, y - 1);
+        break;
+    case CROSSWALL:
+        wmode = set_crosswall(x, y);
+        break;
+
+    default:
+        wmode = -1; /* don't set wall info */
+        break;
+    }
+
+    if (wmode >= 0)
+        lev->wall_info = (lev->wall_info & ~WM_MASK) | wmode;
+}
+
 /* Called from mklev.  Scan the level and set the wall modes. */
 void
 set_wall_state(void)
 {
     int x, y;
-    int wmode;
-    struct rm *lev;
 
 #ifdef WA_VERBOSE
     for (x = 0; x < MAX_TYPE; x++)
@@ -2813,57 +2866,8 @@ set_wall_state(void)
 #endif
 
     for (x = 0; x < COLNO; x++)
-        for (lev = &levl[x][0], y = 0; y < ROWNO; y++, lev++) {
-            switch (lev->typ) {
-            case SDOOR:
-                wmode = set_wall(x, y, (int) lev->horizontal);
-                break;
-            case VWALL:
-                wmode = set_wall(x, y, 0);
-                break;
-            case HWALL:
-                wmode = set_wall(x, y, 1);
-                break;
-            case TDWALL:
-                wmode = set_twall(x, y, x, y - 1, x - 1, y + 1, x + 1, y + 1);
-                break;
-            case TUWALL:
-                wmode = set_twall(x, y, x, y + 1, x + 1, y - 1, x - 1, y - 1);
-                break;
-            case TLWALL:
-                wmode = set_twall(x, y, x + 1, y, x - 1, y - 1, x - 1, y + 1);
-                break;
-            case TRWALL:
-                wmode = set_twall(x, y, x - 1, y, x + 1, y + 1, x + 1, y - 1);
-                break;
-            case TLCORNER:
-                wmode =
-                    set_corn(x - 1, y - 1, x, y - 1, x - 1, y, x + 1, y + 1);
-                break;
-            case TRCORNER:
-                wmode =
-                    set_corn(x, y - 1, x + 1, y - 1, x + 1, y, x - 1, y + 1);
-                break;
-            case BLCORNER:
-                wmode =
-                    set_corn(x, y + 1, x - 1, y + 1, x - 1, y, x + 1, y - 1);
-                break;
-            case BRCORNER:
-                wmode =
-                    set_corn(x + 1, y, x + 1, y + 1, x, y + 1, x - 1, y - 1);
-                break;
-            case CROSSWALL:
-                wmode = set_crosswall(x, y);
-                break;
-
-            default:
-                wmode = -1; /* don't set wall info */
-                break;
-            }
-
-            if (wmode >= 0)
-                lev->wall_info = (lev->wall_info & ~WM_MASK) | wmode;
-        }
+        for (y = 0; y < ROWNO; y++)
+            xy_set_wall_state(x, y);
 
 #ifdef WA_VERBOSE
     /* check if any bad positions found */

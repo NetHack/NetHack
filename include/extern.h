@@ -377,6 +377,7 @@ extern int back_to_glyph(xchar, xchar);
 extern int zapdir_to_glyph(int, int, int);
 extern int glyph_at(xchar, xchar);
 extern void reglyph_darkroom(void);
+extern void xy_set_wall_state(int, int);
 extern void set_wall_state(void);
 extern void unset_seenv(struct rm *, int, int, int, int);
 extern int warning_of(struct monst *);
