@@ -969,7 +969,7 @@ FOOD("meatball",              0,  1,  1, 0, FLESH,   5, CLR_BROWN,
                                                         MEATBALL),
 FOOD("meat stick",            0,  1,  1, 0, FLESH,   5, CLR_BROWN,
                                                         MEAT_STICK),
-FOOD("huge chunk of meat",    0, 20,400, 0, FLESH,2000, CLR_BROWN,
+FOOD("giant meatball",        0, 20,400, 0, FLESH,2000, CLR_BROWN,
                                                         HUGE_CHUNK_OF_MEAT),
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", NoDes),
