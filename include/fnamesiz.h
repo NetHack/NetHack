@@ -2,7 +2,7 @@
 /*-Copyright (c) Michael Allison, 2020. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef FNAMESIZ_H 
+#ifndef FNAMESIZ_H
 #define FNAMESIZ_H
 
 /*

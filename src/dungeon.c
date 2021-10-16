@@ -153,7 +153,7 @@ save_dungeon(NHFILE *nhfp, boolean perform_write, boolean free_data)
               bwrite(nhfp->fd, (genericptr_t) curr, sizeof *curr);
         }
         count = maxledgerno();
-        if (nhfp->structlevel) { 
+        if (nhfp->structlevel) {
             bwrite(nhfp->fd, (genericptr_t) &count, sizeof count);
             bwrite(nhfp->fd, (genericptr_t) g.level_info,
                    (unsigned) count * sizeof (struct linfo));
@@ -168,7 +168,7 @@ save_dungeon(NHFILE *nhfp, boolean perform_write, boolean free_data)
 
         for (curr_ms = g.mapseenchn; curr_ms; curr_ms = curr_ms->next) {
             save_mapseen(nhfp, curr_ms);
-        }    
+        }
     }
 
     if (free_data) {

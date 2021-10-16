@@ -119,7 +119,7 @@ struct sinfo {
 
 /* NetHack ftypes */
 #define NHF_LEVELFILE       1
-#define NHF_SAVEFILE        2 
+#define NHF_SAVEFILE        2
 #define NHF_BONESFILE       3
 /* modes */
 #define READING  0x0
@@ -137,7 +137,7 @@ struct fieldlevel_content {
     boolean binary;       /* binary rather than text */
     boolean json;         /* JSON */
 };
-    
+
 typedef struct {
     int fd;               /* for traditional structlevel binary writes */
     int mode;             /* holds READING, WRITING, or FREEING modes  */
@@ -822,7 +822,7 @@ struct instance_globals {
     dlevel_t level; /* level map */
     long moves; /* turn counter */
     long wailmsg;
-    struct obj *migrating_objs; /* objects moving to another dungeon level */    
+    struct obj *migrating_objs; /* objects moving to another dungeon level */
     struct obj *billobjs; /* objects not yet paid for */
 #if defined(MICRO) || defined(WIN32)
     char hackdir[PATHLEN]; /* where rumors, help, record are */
@@ -832,7 +832,7 @@ struct instance_globals {
     struct context_info context;
     char *fqn_prefix[PREFIX_COUNT];
     /* Windowing stuff that's really tty oriented, but present for all ports */
-    struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */     
+    struct tc_gbl_data tc_gbl_data; /* AS,AE, LI,CO */
 #if defined(UNIX) || defined(VMS)
     int locknum; /* max num of simultaneous users */
 #endif
@@ -883,7 +883,7 @@ struct instance_globals {
     char dogname[PL_PSIZ];
     char catname[PL_PSIZ];
     char horsename[PL_PSIZ];
-    char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */    
+    char preferred_pet; /* '\0', 'c', 'd', 'n' (none) */
     struct monst *mydogs; /* monsters that went down/up together with @ */
     struct monst *migrating_mons; /* monsters moving to another level */
     struct autopickup_exception *apelist;
@@ -949,7 +949,7 @@ struct instance_globals {
 
     /* invent.c */
     int lastinvnr;  /* 0 ... 51 (never saved&restored) */
-    unsigned sortlootmode; /* set by sortloot() for use by sortloot_cmp(); 
+    unsigned sortlootmode; /* set by sortloot() for use by sortloot_cmp();
                             * reset by sortloot when done */
     char *invbuf;
     unsigned invbufsiz;
@@ -990,7 +990,7 @@ struct instance_globals {
     int min_rx; /* rectangle bounds for regions */
     int max_rx;
     int min_ry;
-    int max_ry; 
+    int max_ry;
     int n_loc_filled;
 
     /* mkmaze.c */

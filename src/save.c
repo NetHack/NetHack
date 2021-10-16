@@ -874,7 +874,7 @@ savetrapchn(NHFILE* nhfp, register struct trap* trap)
     while (trap) {
         trap2 = trap->ntrap;
         if (perform_bwrite(nhfp)) {
-            if (nhfp->structlevel)  
+            if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) trap, sizeof *trap);
         }
         if (release_data(nhfp))

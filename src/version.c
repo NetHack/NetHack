@@ -39,7 +39,7 @@ getversionstring(char *buf)
 #if defined(RUNTIME_PORT_ID)
         tmp = get_port_id(tmpbuf);
         if (tmp)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1, 
+            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
                      "%s%s", c++ ? "," : "", tmp);
 #endif
         if (nomakedefs.git_sha)
@@ -223,7 +223,7 @@ early_version_info(boolean pastebuf)
     raw_printf("%s", buf);
 
     if (pastebuf) {
-#if defined(RUNTIME_PASTEBUF_SUPPORT) && !defined(LIBNH) 
+#if defined(RUNTIME_PASTEBUF_SUPPORT) && !defined(LIBNH)
         /*
          * Call a platform/port-specific routine to insert the
          * version information into a paste buffer. Useful for

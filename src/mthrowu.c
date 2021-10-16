@@ -40,7 +40,7 @@ m_has_launcher_and_ammo(struct monst* mtmp)
 /* hero is hit by something other than a monster */
 int
 thitu(
-    int tlev, 
+    int tlev,
     int dam,
     struct obj **objp,
     const char *name) /* if null, then format `*objp' */

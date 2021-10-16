@@ -1531,7 +1531,7 @@ root_plselection_prompt(
 
 char *
 build_plselection_prompt(
-    char *buf, int buflen, 
+    char *buf, int buflen,
     int rolenum, int racenum, int gendnum, int alignnum)
 {
     const char *defprompt = "Shall I pick a character for you? [ynaq] ";

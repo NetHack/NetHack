@@ -34,7 +34,7 @@ struct TileSetImage {
     struct Pixel *pixels; /* for direct color */
     unsigned char *indexes; /* for paletted images */
     struct Pixel palette[256];
-    
+
     /* Image description from the file */
     char *image_desc;
 

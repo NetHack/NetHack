@@ -142,7 +142,7 @@ enexto(
 boolean
 enexto_core(
     coord *cc,
-    xchar xx, 
+    xchar xx,
     xchar yy,
     struct permonst *mdat,
     long entflags)
@@ -1135,7 +1135,7 @@ level_tele_trap(struct trap* trap, unsigned int trflags)
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
 static boolean
 rloc_pos_ok(
-    register int x, 
+    register int x,
     register int y, /* x,y - coordinates of candidate location */
     struct monst *mtmp)
 {

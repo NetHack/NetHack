@@ -23,7 +23,7 @@
 
 #define CONFIG_FILE "defaults.nh"
 #define GUIDEBOOK_FILE "Guidebook.txt"
- 
+
 /*
  *  The following options are somewhat configurable depending on
  *  your compiler.

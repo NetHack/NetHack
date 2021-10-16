@@ -1887,7 +1887,7 @@ peek_at_iced_corpse_age(struct obj *otmp)
 static void
 obj_timer_checks(
     struct obj *otmp,
-    xchar x, xchar y, 
+    xchar x, xchar y,
     int force) /* 0 = no force so do checks, <0 = force off, >0 force on */
 {
     long tleft = 0L;

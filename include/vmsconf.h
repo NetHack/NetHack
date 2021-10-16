@@ -169,7 +169,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define FCMASK 0660 /* file creation mask */
 
 /*
- * 
+ *
  */
 #define NO_VSNPRINTF /* Avoid vsnprintf, use less-safe vsprintf instead. */
 
@@ -178,12 +178,12 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
  */
 
 /* This used to be force-defined for VMS in topten.c, but with
- * the global variable consolidation into g in 3.7, it has to be 
+ * the global variable consolidation into g in 3.7, it has to be
  * defined here so that decl.h includes the field in g.
  */
 #define UPDATE_RECORD_IN_PLACE
 
-/* data librarian defs */                              
+/* data librarian defs */
 #ifdef DLB
 #define DLBFILE "nh-data.dlb"
 /*

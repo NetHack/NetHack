@@ -788,7 +788,7 @@ should_displace(
     coord *poss, /* coord poss[9] */
     long *info,  /* long info[9] */
     int cnt,
-    xchar gx, 
+    xchar gx,
     xchar gy)
 {
     int shortest_with_displacing = -1;

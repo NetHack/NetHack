@@ -3314,7 +3314,7 @@ maybe_mnexto(struct monst* mtmp)
 int
 mnearto(
     register struct monst *mtmp,
-    xchar x, 
+    xchar x,
     xchar y,
     boolean move_other) /* make sure mtmp gets to x, y! so move m_at(x, y) */
 {

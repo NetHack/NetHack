@@ -312,10 +312,10 @@ joinm:
 
 static void
 finish_map(
-    schar fg_typ, 
-    schar bg_typ, 
-    boolean lit, 
-    boolean walled, 
+    schar fg_typ,
+    schar bg_typ,
+    boolean lit,
+    boolean walled,
     boolean icedpools)
 {
     int i, j;

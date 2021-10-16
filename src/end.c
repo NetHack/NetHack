@@ -123,7 +123,7 @@ panictrace_handler(int sig_unused UNUSED)
         curses_uncurse_terminal();
     }
 #endif
-    
+
     f2 = (int) write(2, SIG_MSG, sizeof SIG_MSG - 1);
     nhUse(f2);  /* what could we do if write to fd#2 (stderr) fails  */
     NH_abort(); /* ... and we're already in the process of quitting? */

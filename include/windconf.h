@@ -111,7 +111,7 @@ extern void interject(int);
 #endif
 /* extern int getlock(void); */
 #endif
- 
+
 #ifdef _MSC_VER
 #define HAS_STDINT
 #if (_MSC_VER > 1000)

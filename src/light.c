@@ -382,7 +382,7 @@ save_light_sources(NHFILE *nhfp, int range)
             panic("counted %d light sources, wrote %d! [range=%d]", count,
                   actual, range);
     }
-    
+
      if (release_data(nhfp)) {
         for (prev = &g.light_base; (curr = *prev) != 0; ) {
             if (!curr->id.a_monst) {

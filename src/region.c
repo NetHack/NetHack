@@ -677,7 +677,7 @@ save_regions(NHFILE* nhfp)
             bwrite(nhfp->fd, (genericptr_t) &g.regions[i]->arg, sizeof (anything));
         }
     }
-  
+
   skip_lots:
     if (release_data(nhfp))
         clear_regions();
