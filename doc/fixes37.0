@@ -1295,8 +1295,8 @@ permit blind feeling for objects on trap door and fix up msgs when dropping
 travel from 'interesting position' (pr #575 by entrez)
 running on ice sent hero in weird directions (pr #588 by copperwater)
 delete extra lines in Guidebook.mn (pr #590 by argrath)
-Supply missing changes on Guidebook.tex (pr #591 by argrath)
-
+supply missing changes on Guidebook.tex (pr #591 by argrath)
+fix out-of-bounds access of xdir and ydir in farlook (pr #592 by copperwater)
 
 
 Code Cleanup and Reorganization
