@@ -1299,7 +1299,7 @@ supply missing changes on Guidebook.tex (pr #591 by argrath)
 fix out-of-bounds access of xdir and ydir in farlook (pr #592 by copperwater)
 variation of imp's period-speak (pr #602 by Vivit-R)
 fix m-prefix movement into warning symbol (pr #573 by entrez)
- 
+
 
 Code Cleanup and Reorganization
 -------------------------------
