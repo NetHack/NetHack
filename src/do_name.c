@@ -787,9 +787,8 @@ getpos(coord *ccp, boolean force, const char *goal)
                 dy = u.dy;
                 while (isok(cx + dx, cy + dy)
                        && glyph == glyph_at(cx + dx, cy + dy)
-                       && isok(cx + dx + xdir[i], cy + dy + ydir[i])
-                       && glyph == glyph_at(cx + dx + xdir[i],
-                                            cy + dy + ydir[i])) {
+                       && isok(cx + dx + u.dx, cy + dy + u.dy)
+                       && glyph == glyph_at(cx + dx + u.dx, cy + dy + u.dy)) {
                     dx += u.dx;
                     dy += u.dy;
 
