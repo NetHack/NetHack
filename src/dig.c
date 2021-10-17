@@ -889,8 +889,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
             retval = TRUE;
         }
     }
-    if (retval)
-        spot_checks(dig_x, dig_y, old_typ);
+    spot_checks(dig_x, dig_y, old_typ);
     return retval;
 }
 
