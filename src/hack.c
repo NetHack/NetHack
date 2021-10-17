@@ -3430,4 +3430,26 @@ money_cnt(struct obj *otmp)
     return 0L;
 }
 
+void
+spot_checks(xchar x, xchar y, schar old_typ)
+{
+    schar new_typ = levl[x][y].typ;
+    boolean db_ice_now = FALSE;
+
+    switch (old_typ) {
+    case DRAWBRIDGE_UP:
+        db_ice_now = ((levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE);
+        /*FALLTHRU*/
+    case ICE:
+        if ((new_typ != old_typ) || !db_ice_now) {
+            /* make sure there's no MELT_ICE_AWAY timer */
+            if (spot_time_left(x, y, MELT_ICE_AWAY)) {
+                spot_stop_timers(x, y, MELT_ICE_AWAY);
+            }
+            /* adjust things affected by the ice */
+            obj_ice_effects(x, y, FALSE);
+        }
+        break;
+    }
+}
 /*hack.c*/

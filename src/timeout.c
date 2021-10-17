@@ -1860,7 +1860,7 @@ timer_sanity_check(void)
     timer_element *curr;
 
     /* this should be much more complete */
-    for (curr = g.timer_base; curr; curr = curr->next)
+    for (curr = g.timer_base; curr; curr = curr->next) {
         if (curr->kind == TIMER_OBJECT) {
             struct obj *obj = curr->arg.a_obj;
 
@@ -1868,7 +1868,20 @@ timer_sanity_check(void)
                 impossible("timer sanity: untimed obj %s, timer %ld",
                       fmt_ptr((genericptr_t) obj), curr->tid);
             }
+        } else if (curr->kind == TIMER_LEVEL) {
+            long where = curr->arg.a_long;
+            xchar x = (xchar) ((where >> 16) & 0xFFFF),
+                  y = (xchar) (where & 0xFFFF);
+
+            if (!isok(x, y)) {
+                impossible("timer sanity: spot timer %d at <%d,%d>",
+                           curr->tid, x, y);
+            } else if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y)) {
+                impossible("timer sanity: melt timer %d on non-ice %d <%d,%d>",
+                           curr->tid, levl[x][y].typ, x, y);
+            }
         }
+    }
 }
 
 /*

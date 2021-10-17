@@ -897,6 +897,7 @@ extern int max_capacity(void);
 extern boolean check_capacity(const char *);
 extern int inv_cnt(boolean);
 extern long money_cnt(struct obj *);
+extern void spot_checks(xchar, xchar, schar);
 
 /* ### hacklib.c ### */
 
@@ -2685,6 +2686,7 @@ extern void sink_into_lava(void);
 extern void sokoban_guilt(void);
 extern const char * trapname(int, boolean);
 extern void ignite_items(struct obj *);
+extern void trap_ice_effects(xchar x, xchar y, boolean ice_is_melting);
 
 /* ### u_init.c ### */
 

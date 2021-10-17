@@ -646,6 +646,8 @@ breaching a shop wall, using locking magic to put a door there, then unlocking
 	that door yielded a situation where subsequent shop damage repair
 	produced invalid map data which resulted in an impossible() warning
 	about "wall_angle: unknown" during map display
+melting ice timer could persist after the ice was gone from digging or from an
+	exploding land mine
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
