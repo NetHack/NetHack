@@ -1164,7 +1164,7 @@ hits_bars(
                 hits = TRUE;
             else
                 hits = (obj_type == MEAT_STICK
-                        || obj_type == HUGE_CHUNK_OF_MEAT);
+                        || obj_type == GIANT_MEATBALL);
             break;
         case SPBOOK_CLASS:
         case WAND_CLASS:

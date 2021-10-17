@@ -3045,7 +3045,7 @@ rnd_otyp_by_namedesc(
                type ooze/pudding/slime don't match glob of same since that
                ought to match "corpse/egg/figurine of type" too but won't */
             || (check_of
-                && i != BELL_OF_OPENING && i != HUGE_CHUNK_OF_MEAT
+                && i != BELL_OF_OPENING && i != GIANT_MEATBALL
                 && (i < minglob || i > maxglob)
                 && (of = strstri(zn, " of ")) != 0
                 && wishymatch(name, of + 4, FALSE)) /* partial name */

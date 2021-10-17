@@ -806,7 +806,7 @@ dogfood(struct monst *mon, struct obj *obj)
         case MEATBALL:
         case MEAT_RING:
         case MEAT_STICK:
-        case HUGE_CHUNK_OF_MEAT:
+        case GIANT_MEATBALL:
             return carni ? DOGFOOD : MANFOOD;
         case EGG:
             return carni ? CADAVER : MANFOOD;

@@ -735,7 +735,7 @@ engulfer_digests_food(struct obj *obj)
        corpse, glob, or meat <item> but not other types of food */
     if (is_animal(u.ustuck->data)
         && (obj->otyp == CORPSE || obj->globby
-            || obj->otyp == MEATBALL || obj->otyp == HUGE_CHUNK_OF_MEAT
+            || obj->otyp == MEATBALL || obj->otyp == GIANT_MEATBALL
             || obj->otyp == MEAT_RING || obj->otyp == MEAT_STICK)) {
         boolean could_petrify = FALSE,
                 could_poly = FALSE, could_slime = FALSE,
