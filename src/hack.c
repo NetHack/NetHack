@@ -3441,7 +3441,8 @@ spot_checks(xchar x, xchar y, schar old_typ)
         db_ice_now = ((levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE);
         /*FALLTHRU*/
     case ICE:
-        if ((new_typ != old_typ) || !db_ice_now) {
+        if ((new_typ != old_typ) 
+            || (old_typ == DRAWBRIDGE_UP && !db_ice_now)) {
             /* make sure there's no MELT_ICE_AWAY timer */
             if (spot_time_left(x, y, MELT_ICE_AWAY)) {
                 spot_stop_timers(x, y, MELT_ICE_AWAY);

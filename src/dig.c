@@ -769,7 +769,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     struct obj *boulder_here;
     schar typ, old_typ;
     xchar dig_x, dig_y;
-    boolean nohole, retval = TRUE;
+    boolean nohole, retval = FALSE;
 
     if (!cc) {
         dig_x = u.ux;
@@ -805,12 +805,12 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
            closed "door" where the portcullis/mechanism is located */
         if (pit_only) {
             pline_The("drawbridge seems too hard to dig through.");
-            retval = FALSE;
         } else {
             int x = dig_x, y = dig_y;
             /* if under the portcullis, the bridge is adjacent */
             (void) find_drawbridge(&x, &y);
             destroy_drawbridge(x, y);
+            retval = TRUE;
         }
 
     } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) != 0) {
@@ -831,6 +831,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     } else if (IS_GRAVE(old_typ)) {
         digactualhole(dig_x, dig_y, BY_YOU, PIT);
         dig_up_grave(cc);
+        retval = TRUE;
     } else if (old_typ == DRAWBRIDGE_UP) {
         /* must be floor or ice, other cases handled above */
         /* dig "pit" and let fluid flow in (if possible) */
@@ -844,12 +845,12 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
             pline_The("%s %shere is too hard to dig in.",
                       surface(dig_x, dig_y),
                       (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
-            retval = FALSE;
         } else {
             lev->drawbridgemask &= ~DB_UNDER;
             lev->drawbridgemask |= (typ == LAVAPOOL) ? DB_LAVA : DB_MOAT;
             liquid_flow(dig_x, dig_y, typ, ttmp,
                         "As you dig, the hole fills with %s!");
+            retval = TRUE;
         }
 
     /* the following two are here for the wand of digging */
@@ -869,6 +870,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
                 liquid_flow(dig_x, dig_y, typ, ttmp,
                             "As you dig, the hole fills with %s!");
             }
+            retval = TRUE;
         } else {
             /* magical digging disarms settable traps */
             if (by_magic && ttmp
@@ -884,9 +886,11 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
                 digactualhole(dig_x, dig_y, BY_YOU, PIT);
             else
                 digactualhole(dig_x, dig_y, BY_YOU, HOLE);
+            retval = TRUE;
         }
     }
-    spot_checks(dig_x, dig_y, old_typ);
+    if (retval)
+        spot_checks(dig_x, dig_y, old_typ);
     return retval;
 }
 
