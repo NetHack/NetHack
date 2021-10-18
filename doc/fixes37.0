@@ -645,7 +645,12 @@ can now use m<dir> to try to move to an adjacent boulder's spot without
 breaching a shop wall, using locking magic to put a door there, then unlocking
 	that door yielded a situation where subsequent shop damage repair
 	produced invalid map data which resulted in an impossible() warning
-	about "wall_angle: unknown" during map display
+	about "wall_angle: unknown" during map display; similar for a vault
+	wall if it's the spot where the guard arrives to lead hero out
+if vault guard arrives on a boulder in a breach in the vault wall when coming
+	to lead the hero out, smash that boulder into rocks so that the hero
+	won't try--and fail, because the guard will be in its way--to push it
+when vault walls are repaired, destroy any rocks or boulders at their spots
 melting ice timer could persist after the ice was gone from digging or from an
 	exploding land mine
 

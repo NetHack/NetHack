@@ -293,6 +293,7 @@ void
 invault(void)
 {
     struct monst *guard;
+    struct obj *otmp;
     boolean gsensed;
     int trycount, vaultroom = (int) vault_occupied(u.urooms);
 
@@ -381,6 +382,25 @@ invault(void)
         EGD(guard)->warncnt = 0;
 
         reset_faint(); /* if fainted - wake up */
+        /* if there are any boulders in the guard's way, destroy them;
+           perhaps the guard knows a touch equivalent of force bolt;
+           otherwise the hero wouldn't be able to push one to follow the
+           guard out of the vault because that guard would be in its way */
+        if ((otmp = sobj_at(BOULDER, guard->mx, guard->my)) != 0) {
+            void (*func)(const char *, ...) PRINTF_F(1, 2);
+            const char *bname = simpleonames(otmp);
+            int bcnt = 0;
+
+            do {
+                ++bcnt;
+                fracture_rock(otmp);
+                otmp = sobj_at(BOULDER, guard->mx, guard->my);
+            } while (otmp);
+            /* You_hear() will handle Deaf/!Deaf */
+            func = !Blind ? You_see : You_hear;
+            (*func)("%s shatter.",
+                    (bcnt == 1) ? an(bname) : makeplural(bname));
+        }
         gsensed = !canspotmon(guard);
         if (!gsensed)
             pline("Suddenly one of the Vault's %s enters!",
@@ -388,6 +408,7 @@ invault(void)
         else
             pline("Someone else has entered the Vault.");
         newsym(guard->mx, guard->my);
+
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
             if (!Deaf)
@@ -569,7 +590,7 @@ wallify_vault(struct monst *grd)
     xchar lox = g.rooms[vlt].lx - 1, hix = g.rooms[vlt].hx + 1,
           loy = g.rooms[vlt].ly - 1, hiy = g.rooms[vlt].hy + 1;
     struct monst *mon;
-    struct obj *gold;
+    struct obj *gold, *rocks;
     struct trap *trap;
     boolean fixed = FALSE;
     boolean movedgold = FALSE;
@@ -580,18 +601,32 @@ wallify_vault(struct monst *grd)
             if (x != lox && x != hix && y != loy && y != hiy)
                 continue;
 
-            if (!IS_WALL(levl[x][y].typ) && !in_fcorridor(grd, x, y)) {
+            if ((!IS_WALL(levl[x][y].typ) || g_at(x, y)
+                 || sobj_at(ROCK, x, y) || sobj_at(BOULDER, x, y))
+                && !in_fcorridor(grd, x, y)) {
                 if ((mon = m_at(x, y)) != 0 && mon != grd) {
                     if (mon->mtame)
                         yelp(mon);
                     (void) rloc(mon, FALSE);
                 }
+                /* move gold at wall locations into the vault */
                 if ((gold = g_at(x, y)) != 0) {
                     move_gold(gold, EGD(grd)->vroom);
                     movedgold = TRUE;
                 }
+                /* destroy rocks and boulders (subsume them into the walls);
+                   other objects present stay intact and become embedded */
+                while ((rocks = sobj_at(ROCK, x, y)) != 0) {
+                    obj_extract_self(rocks);
+                    obfree(rocks, (struct obj *) 0);
+                }
+                while ((rocks = sobj_at(BOULDER, x, y)) != 0) {
+                    obj_extract_self(rocks);
+                    obfree(rocks, (struct obj *) 0);
+                }
                 if ((trap = t_at(x, y)) != 0)
                     deltrap(trap);
+
                 if (x == lox)
                     typ = (y == loy) ? TLCORNER
                           : (y == hiy) ? BLCORNER

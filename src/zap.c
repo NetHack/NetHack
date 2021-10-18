@@ -4466,14 +4466,7 @@ melt_ice(xchar x, xchar y, const char *msg)
     if (lev->typ == DRAWBRIDGE_UP || lev->typ == DRAWBRIDGE_DOWN) {
         lev->drawbridgemask &= ~DB_ICE; /* revert to DB_MOAT */
     } else { /* lev->typ == ICE */
-#ifdef STUPID
-        if (lev->icedpool == ICED_POOL)
-            lev->typ = POOL;
-        else
-            lev->typ = MOAT;
-#else
         lev->typ = (lev->icedpool == ICED_POOL ? POOL : MOAT);
-#endif
         lev->icedpool = 0;
     }
     spot_stop_timers(x, y, MELT_ICE_AWAY); /* no more ice to melt away */
@@ -4877,7 +4870,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
     return rangemod;
 }
 
-/* fractured by pick-axe or wand of striking */
+/* fractured by pick-axe or wand of striking or by vault guard */
 void
 fracture_rock(struct obj *obj) /* no texts here! */
 {
