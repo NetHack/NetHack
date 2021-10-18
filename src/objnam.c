@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1633802071 2021/10/09 17:54:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.335 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1634584224 2021/10/18 19:10:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.336 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -859,7 +859,9 @@ minimal_xname(struct obj *obj)
                         /* default is "on" for types which don't use it */
                         : !objects[otyp].oc_uses_known;
     bareobj.quan = 1L;         /* don't want plural */
-    bareobj.corpsenm = NON_PM; /* suppress statue and figurine details */
+    /* for a boulder, leave corpsenm as 0; non-zero produces "next boulder" */
+    if (otyp != BOULDER)
+        bareobj.corpsenm = NON_PM; /* suppress statue and figurine details */
     /* but suppressing fruit details leads to "bad fruit #0"
        [perhaps we should force "slime mold" rather than use xname?] */
     if (obj->otyp == SLIME_MOLD)
