@@ -3723,14 +3723,36 @@ mergable(register struct obj *otmp, register struct obj *obj)
 int
 doprgold(void)
 {
-    /* the messages used to refer to "carrying gold", but that didn't
-       take containers into account */
+    /* Command now takes containers into account. */
     long umoney = money_cnt(g.invent);
 
-    if (!umoney)
-        Your("wallet is empty.");
-    else
-        Your("wallet contains %ld %s.", umoney, currency(umoney));
+    /* Only list the money you know about.  Guards and shopkeepers
+       can somehow tell if there is any gold anywhere gold on your
+       person, but you have no such preternatural gold-sense. */
+    long hmoney = hidden_gold(FALSE);
+
+    if (flags.verbose) {
+        if (!umoney && !hmoney)
+            Your("wallet is empty.");
+        else if (umoney && !hmoney)
+            Your("wallet contains %ld %s.", umoney, currency(umoney));
+        else if (!umoney && hmoney)
+            Your("wallet is empty, but there %s %ld %s stashed away in "
+                 "your pack.",
+                 (hmoney == 1) ?  "is" : "are",
+                 hmoney, currency(hmoney));
+        else if (umoney && hmoney)
+            Your("wallet contains %ld %s, and there %s %ld more stashed "
+                 "away in your pack.", umoney, currency(umoney),
+                 (hmoney == 1) ? "is" : "are",
+                 hmoney);
+    } else {
+        long total = umoney + hmoney;
+        if (total)
+            You("are carrying a total of %ld %s.", total, currency(total));
+        else
+            You("have no money.");
+    }
     shopper_financial_report();
     return 0;
 }
