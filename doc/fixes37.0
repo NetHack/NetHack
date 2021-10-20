@@ -556,6 +556,8 @@ shopkeepers can remove pits and webs
 perm_invent: when buying shop goods using itemized purchasing while persistent
 	inventory window was enabled, the prices of unpaid items went away as
 	soon as any item was bought (actual item-by-item purchase worked ok)
+perm_invent: making an engraving which reduced known enchantment of a weapon
+	or known charge count of a marker didn't update persistent inventory
 change getloc fastmove keys in number_pad mode from hardcoded HJKL to the
 	run/rush movement keys (meta+number)
 allow using rush/run prefix key in getloc to fastmove the cursor

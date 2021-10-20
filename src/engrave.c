@@ -79,18 +79,21 @@ static const struct {
 
 /* degrade some of the characters in a string */
 void
-wipeout_text(char *engr, int cnt,
-             unsigned seed) /* for semi-controlled randomization */
+wipeout_text(
+    char *engr,    /* engraving text */
+    int cnt,       /* number of chars to degrade */
+    unsigned seed) /* for semi-controlled randomization */
 {
     char *s;
-    int i, j, nxt, use_rubout, lth = (int) strlen(engr);
+    int i, j, nxt, use_rubout;
+    unsigned lth = (unsigned) strlen(engr);
 
     if (lth && cnt > 0) {
         while (cnt--) {
             /* pick next character */
             if (!seed) {
                 /* random */
-                nxt = rn2(lth);
+                nxt = rn2((int) lth);
                 use_rubout = rn2(4);
             } else {
                 /* predictable; caller can reproduce the same sequence by
@@ -110,23 +113,25 @@ wipeout_text(char *engr, int cnt,
                 continue;
             }
 
-            if (!use_rubout)
+            if (!use_rubout) {
                 i = SIZE(rubouts);
-            else
+            } else {
                 for (i = 0; i < SIZE(rubouts); i++)
                     if (*s == rubouts[i].wipefrom) {
+                        unsigned ln = (unsigned) strlen(rubouts[i].wipeto);
                         /*
                          * Pick one of the substitutes at random.
                          */
-                        if (!seed)
-                            j = rn2(strlen(rubouts[i].wipeto));
-                        else {
+                        if (!seed) {
+                            j = rn2((int) ln);
+                        } else {
                             seed *= 31, seed %= (BUFSZ - 1);
-                            j = seed % (strlen(rubouts[i].wipeto));
+                            j = seed % ln;
                         }
                         *s = rubouts[i].wipeto[j];
                         break;
                     }
+            }
 
             /* didn't pick rubout; use '?' for unreadable character */
             if (i == SIZE(rubouts))
@@ -182,9 +187,9 @@ cant_reach_floor(int x, int y, boolean up, boolean check_pit)
 }
 
 const char *
-surface(register int x, register int y)
+surface(int x, int y)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
 
     if (x == u.ux && y == u.uy && u.uswallow && is_animal(u.ustuck->data))
         return "maw";
@@ -213,9 +218,9 @@ surface(register int x, register int y)
 }
 
 const char *
-ceiling(register int x, register int y)
+ceiling(int x, int y)
 {
-    register struct rm *lev = &levl[x][y];
+    struct rm *lev = &levl[x][y];
     const char *what;
 
     /* other room types will no longer exist when we're interested --
@@ -308,7 +313,7 @@ wipe_engr_at(xchar x, xchar y, xchar cnt, boolean magical)
 void
 read_engr_at(int x, int y)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
     int sensed = 0;
 
     /* Sensing an engraving does not require sight,
@@ -407,7 +412,7 @@ make_engr_at(int x, int y, const char *s, long e_time, xchar e_type)
 void
 del_engr_at(int x, int y)
 {
-    register struct engr *ep = engr_at(x, y);
+    struct engr *ep = engr_at(x, y);
 
     if (ep)
         del_engr(ep);
@@ -565,8 +570,9 @@ doengrave(void)
     if (otmp == &cg.zeroobj) {
         Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
-    } else
+    } else {
         writer = yname(otmp);
+    }
 
     /* There's no reason you should be able to write with a wand
      * while both your hands are tied up.
@@ -805,10 +811,11 @@ doengrave(void)
                 if (!Blind) {
                     Strcpy(post_engr_text, "Lightning arcs from the wand.");
                     doblind = TRUE;
-                } else
+                } else {
                     Strcpy(post_engr_text, !Deaf
                                 ? "You hear crackling!"     /* Deaf-aware */
                                 : "Your hair stands up!");
+                }
                 break;
 
             /* type = MARK wands */
@@ -855,7 +862,7 @@ doengrave(void)
         case TOWEL:
             /* Can't really engrave with a towel */
             ptext = FALSE;
-            if (oep)
+            if (oep) {
                 if (oep->engr_type == DUST
                     || oep->engr_type == ENGR_BLOOD
                     || oep->engr_type == MARK) {
@@ -867,11 +874,13 @@ doengrave(void)
                         pline("%s %s.", Yobjnam2(otmp, "get"),
                               is_ice(u.ux, u.uy) ? "frosty" : "dusty");
                     dengr = TRUE;
-                } else
+                } else {
                     pline("%s can't wipe out this engraving.", Yname2(otmp));
-            else
+                }
+            } else {
                 pline("%s %s.", Yobjnam2(otmp, "get"),
                       is_ice(u.ux, u.uy) ? "frosty" : "dusty");
+            }
             break;
         default:
             break;
@@ -949,7 +958,7 @@ doengrave(void)
      * possible) by now.
      */
     if (oep) {
-        register char c = 'n';
+        char c = 'n';
 
         /* Give player the choice to add to engraving. */
         if (type == HEADSTONE) {
@@ -979,10 +988,10 @@ doengrave(void)
                                 : "written");
                     del_engr(oep);
                     oep = (struct engr *) 0;
-                } else
-                    /* Don't delete engr until after we *know* we're engraving
-                     */
+                } else {
+                    /* defer deletion until after we *know* we're engraving */
                     eow = TRUE;
+                }
             } else if (type == DUST || type == MARK || type == ENGR_BLOOD) {
                 You("cannot wipe out the message that is %s the %s here.",
                     oep->engr_type == BURN
@@ -1111,12 +1120,12 @@ static int
 engrave(void)
 {
     struct engr *oep;
-    char buf[BUFSZ]; /* holds the post-this-action engr text, including anything
-                      * already there */
+    char buf[BUFSZ]; /* holds the post-this-action engr text, including
+                      * anything already there */
     const char *finishverb; /* "You finish [foo]." */
     struct obj * stylus; /* shorthand for g.context.engraving.stylus */
     boolean firsttime = (g.context.engraving.actionct == 0);
-    int rate = 10; /* # characters we are capable of engraving in this action */
+    int rate = 10; /* # characters that can be engraved in this action */
     boolean truncate = FALSE;
 
     boolean carving = (g.context.engraving.type == ENGRAVE
@@ -1135,8 +1144,7 @@ engrave(void)
      * Not safe to dereference stylus until after this. */
     if (g.context.engraving.stylus == &cg.zeroobj) { /* bare finger */
         stylus = (struct obj *) 0;
-    }
-    else {
+    } else {
         for (stylus = g.invent; stylus; stylus = stylus->nobj) {
             if (stylus == g.context.engraving.stylus) {
                 break;
@@ -1158,8 +1166,7 @@ engrave(void)
     /* sanity checks */
     if (dulling_wep && !is_blade(stylus)) {
         impossible("carving with non-bladed weapon");
-    }
-    else if (g.context.engraving.type == MARK && !marker) {
+    } else if (g.context.engraving.type == MARK && !marker) {
         impossible("making graffiti with non-marker stylus");
     }
 
@@ -1169,8 +1176,7 @@ engrave(void)
             || stylus->oclass == GEM_CLASS)) {
         /* slow engraving methods */
         rate = 1;
-    }
-    else if (marker) {
+    } else if (marker) {
         /* one charge / 2 letters */
         rate = min(rate, stylus->spe * 2);
     }
@@ -1208,19 +1214,21 @@ engrave(void)
                     impossible("<= -3 weapon valid for engraving");
                 }
                 truncate = TRUE;
-            }
-            else if (*endc) {
+            } else if (*endc) {
                 stylus->spe -= 1;
+                update_inventory();
             }
         }
-    }
-    else if (marker) {
+    } else if (marker) {
         int ink_cost = max(rate / 2, 1); /* Prevent infinite graffiti */
+
         if (stylus->spe < ink_cost) {
-            impossible("dry marker valid for graffiti");
+            impossible("overly dry marker valid for graffiti?");
+            ink_cost = stylus->spe;
             truncate = TRUE;
         }
         stylus->spe -= ink_cost;
+        update_inventory();
         if (stylus->spe == 0) {
             /* can't engrave any further; truncate the string */
             Your("marker dries out.");
@@ -1241,7 +1249,7 @@ engrave(void)
         break;
     case BURN:
         finishverb = is_ice(u.ux, u.uy) ? "melting your message into the ice"
-                                        : "burning your message into the floor";
+                     : "burning your message into the floor";
         break;
     case MARK:
         finishverb = "defacing the dungeon";
@@ -1252,12 +1260,12 @@ engrave(void)
 
     /* actions that happen at the end of every engraving action go here */
 
-    Strcpy(buf, "");
+    buf[0] = '\0';
     oep = engr_at(u.ux, u.uy);
     if (oep) /* add to existing engraving */
         Strcpy(buf, oep->engr_txt);
 
-    space_left = sizeof buf - (int) strlen(buf) - 1;
+    space_left = (int) (sizeof buf - strlen(buf) - 1U);
     if (endc - g.context.engraving.nextc > space_left) {
         You("run out of room to write.");
         endc = g.context.engraving.nextc + space_left;
@@ -1269,8 +1277,7 @@ engrave(void)
     if (truncate && *endc != '\0') {
         *endc = '\0';
         You("are only able to write \"%s\".", g.context.engraving.text);
-    }
-    else {
+    } else {
         /* input was not truncated; stylus may still have worn out on the last
          * character, though */
         truncate = FALSE;
@@ -1283,16 +1290,14 @@ engrave(void)
     if (*endc) {
         g.context.engraving.nextc = endc;
         return 1; /* not yet finished this turn */
-    }
-    else { /* finished engraving */
+    } else { /* finished engraving */
         /* actions that happen after the engraving is finished go here */
 
         if (truncate) {
             /* Now that "You are only able to write 'foo'" also prints at the
              * end of engraving, this might be redundant. */
             You("cannot write any more.");
-        }
-        else if (!firsttime) {
+        } else if (!firsttime) {
             /* only print this if engraving took multiple actions */
             You("finish %s.", finishverb);
         }
@@ -1325,8 +1330,10 @@ save_engravings(NHFILE *nhfp)
         ep2 = ep->nxt_engr;
         if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(nhfp)) {
             if (nhfp->structlevel) {
-                bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth), sizeof(ep->engr_lth));
-                bwrite(nhfp->fd, (genericptr_t)ep, sizeof(struct engr) + ep->engr_lth);
+                bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth),
+                       sizeof ep->engr_lth);
+                bwrite(nhfp->fd, (genericptr_t)ep,
+                       sizeof (struct engr) + ep->engr_lth);
             }
         }
         if (release_data(nhfp))
@@ -1386,12 +1393,12 @@ engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
-del_engr(register struct engr *ep)
+del_engr(struct engr *ep)
 {
     if (ep == head_engr) {
         head_engr = ep->nxt_engr;
     } else {
-        register struct engr *ept;
+        struct engr *ept;
 
         for (ept = head_engr; ept; ept = ept->nxt_engr)
             if (ept->nxt_engr == ep) {
