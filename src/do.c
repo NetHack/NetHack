@@ -2036,7 +2036,7 @@ cmd_safety_prevention(const char *cmddesc, const char *act, int *flagcounter)
         char buf[QBUFSZ];
 
         buf[0] = '\0';
-        if (iflags.cmdassist || !*flagcounter++)
+        if (iflags.cmdassist || !(*flagcounter)++)
             Sprintf(buf, "  Use '%s' prefix to force %s.",
                     visctrl(g.Cmd.spkeys[NHKF_REQMENU]), cmddesc);
         Norep("%s%s", act, buf);
