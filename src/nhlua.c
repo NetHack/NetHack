@@ -1375,7 +1375,8 @@ nhl_init(void)
 void
 nhl_done(lua_State *L)
 {
-    lua_close(L);
+    if (L)
+        lua_close(L);
     iflags.in_lua = FALSE;
 }
 
