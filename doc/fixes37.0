@@ -1314,6 +1314,7 @@ MAX_RADIUS defines the outer bound of the radius table, so leave it at 15
 	(pr #613 by argrath) 
 variable attknum was declared without initialization, and was used in
 	find_roll_to_hit() (pr #615 by argrath)
+check for NULL lua_State before calling lua_close() (pr #616 by argrath)
 
 
 Code Cleanup and Reorganization
