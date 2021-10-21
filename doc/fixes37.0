@@ -1308,6 +1308,12 @@ supply missing changes on Guidebook.tex (pr #591 by argrath)
 fix out-of-bounds access of xdir and ydir in farlook (pr #592 by copperwater)
 variation of imp's period-speak (pr #602 by Vivit-R)
 fix m-prefix movement into warning symbol (pr #573 by entrez)
+pointer precedence fix incrementing flagcounter in do.c (pr #612 by argrath)
+MAX_RADIUS defines the outer bound of the radius table, so leave it at 15
+	to avoid out-of-bound access in view_from() and do_clear_area()
+	(pr #613 by argrath) 
+variable attknum was declared without initialization, and was used in
+	find_roll_to_hit() (pr #615 by argrath)
 
 
 Code Cleanup and Reorganization
