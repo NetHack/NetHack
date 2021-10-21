@@ -580,7 +580,7 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
      */
     for (count = 3; count > 0; --count) {
         struct monst *mtmp;
-        int tx, ty, tmp, dieroll, mhit, attknum, armorpenalty;
+        int tx, ty, tmp, dieroll, mhit, attknum = 0, armorpenalty;
 
         /* ++i, wrap 8 to i=0 /or/ --i, wrap -1 to i=7 */
         i = clockwise ? DIR_RIGHT(i) : DIR_LEFT(i);
