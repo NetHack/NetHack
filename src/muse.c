@@ -2048,10 +2048,11 @@ DISABLE_WARNING_UNREACHABLE_CODE
 int
 use_misc(struct monst* mtmp)
 {
-    int i;
-    struct obj *otmp = g.m.misc;
-    boolean vis, vismon, oseen;
     char nambuf[BUFSZ];
+    boolean vis, vismon, vistrapspot, oseen;
+    int i;
+    struct trap *t;
+    struct obj *otmp = g.m.misc;
 
     if ((i = precheck(mtmp, otmp)) != 0)
         return i;
@@ -2159,17 +2160,28 @@ use_misc(struct monst* mtmp)
         if (oseen)
             makeknown(POT_POLYMORPH);
         return 2;
-    case MUSE_BAG:
-        return mloot_container(mtmp, otmp, vismon);
     case MUSE_POLY_TRAP:
-        if (vismon) {
+        t = t_at(g.trapx, g.trapy);
+        vistrapspot = cansee(t->tx, t->ty);
+        if (vis || vistrapspot)
+            seetrap(t);
+        if (vismon || vistrapspot) {
             const char *Mnam = Monnam(mtmp);
 
-            pline("%s deliberately %s onto a polymorph trap!", Mnam,
-                  vtense(fakename[0], locomotion(mtmp->data, "jump")));
+            /* when the trap is seen but the monster isn't, Monnam()
+               will yield "It"; change that to "Someone" or "Something";
+               the canspotmon() check is to avoid making the change if
+               mtmp has been explicitly named "It" */
+            if (!strcmp(Mnam, "It") && !canspotmon(mtmp))
+                Mnam = humanoid(mtmp->data) ? "Someone" : "Something";
+            pline("%s deliberately %s onto a %s trap!", Mnam,
+                  vtense(fakename[0], locomotion(mtmp->data, "jump")),
+                  t->tseen ? "polymorph" : "hidden");
+            /* note: if mtmp is unseen because it is invisible, its new
+               shape will also be invisible and could produce "Its armor
+               falls off" messages during the transformation; those make
+               more sense after we've given "Someone jumps onto a trap." */
         }
-        if (vis)
-            seetrap(t_at(g.trapx, g.trapy));
 
         /*  don't use rloc() due to worms */
         remove_monster(mtmp->mx, mtmp->my);
@@ -2181,6 +2193,8 @@ use_misc(struct monst* mtmp)
 
         (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
         return 2;
+    case MUSE_BAG:
+        return mloot_container(mtmp, otmp, vismon);
     case MUSE_BULLWHIP:
         /* attempt to disarm hero */
         {
