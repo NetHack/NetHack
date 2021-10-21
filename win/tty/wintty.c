@@ -218,7 +218,8 @@ static void setup_gendmenu(winid, boolean, int, int, int);
 static void setup_algnmenu(winid, boolean, int, int, int);
 static boolean reset_role_filtering(void);
 #ifdef STATUS_HILITES
-static boolean check_fields(boolean, int *);
+#define MAX_STATUS_ROWS 3
+static boolean check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS]);
 static void render_status(void);
 static void tty_putstatusfield(const char *, int, int);
 static boolean check_windowdata(void);
@@ -3980,9 +3981,10 @@ static int
 make_things_fit(boolean force_update)
 {
     int trycnt, fitting = 0, requirement;
-    int rowsz[3], num_rows, condrow, otheroptions = 0;
+    int rowsz[MAX_STATUS_ROWS], num_rows, condrow, otheroptions = 0;
 
-    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS)
+                    ? 2 : MAX_STATUS_ROWS;
     condrow = num_rows - 1; /* always last row, 1 for 0..1 or 2 for 0..2 */
     cond_shrinklvl = 0;
     if (enc_shrinklvl > 0 && num_rows == 2)
@@ -4040,7 +4042,7 @@ make_things_fit(boolean force_update)
  * This is now done at an individual field case-by-case level.
  */
 static boolean
-check_fields(boolean forcefields, int sz[3])
+check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS])
 {
     int c, i, row, col, num_rows, idx;
     boolean valid = TRUE, matchprev, update_right;
@@ -4048,7 +4050,8 @@ check_fields(boolean forcefields, int sz[3])
     if (!windowdata_init && !check_windowdata())
         return FALSE;
 
-    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS)
+                    ? 2 : MAX_STATUS_ROWS;
 
     for (row = 0; row < num_rows; ++row) {
         sz[row] = 0;
@@ -4392,7 +4395,7 @@ render_status(void)
         return;
     }
 
-    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS) ? 2 : MAX_STATUS_ROWS;
     for (row = 0; row < num_rows; ++row) {
         HUPSKIP();
         y = row;
@@ -4418,7 +4421,7 @@ render_status(void)
                     /* if no bits are set, we can fall through condition
                        rendering code to finalx[] handling (and subsequent
                        rest-of-line erasure if line is shorter than before) */
-                    if (num_rows == 3 && bits != 0L) {
+                    if (num_rows == MAX_STATUS_ROWS && bits != 0L) {
                         int k;
                         char *dat = &cw->data[y][0];
 
