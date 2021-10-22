@@ -1874,10 +1874,10 @@ timer_sanity_check(void)
                   y = (xchar) (where & 0xFFFF);
 
             if (!isok(x, y)) {
-                impossible("timer sanity: spot timer %d at <%d,%d>",
+                impossible("timer sanity: spot timer %lu at <%d,%d>",
                            curr->tid, x, y);
             } else if (curr->func_index == MELT_ICE_AWAY && !is_ice(x, y)) {
-                impossible("timer sanity: melt timer %d on non-ice %d <%d,%d>",
+                impossible("timer sanity: melt timer %lu on non-ice %d <%d,%d>",
                            curr->tid, levl[x][y].typ, x, y);
             }
         }
