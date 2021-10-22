@@ -23,6 +23,7 @@ boolean panicking;
 void panic(const char *, ...);
 
 DISABLE_WARNING_FORMAT_NONLITERAL
+DISABLE_WARNING_UNREACHABLE_CODE
 
 void panic
 VA_DECL(const char *, str)
@@ -45,9 +46,11 @@ VA_DECL(const char *, str)
         abort(); /* generate core dump */
 #endif
     VA_END();
+    /* UNREACHABLE_CODE */
     exit(EXIT_FAILURE); /* redundant */
 }
 
+RESTORE_WARNING_UNREACHABLE_CODE
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 #ifdef ALLOCA_HACK

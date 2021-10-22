@@ -50,6 +50,7 @@
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("clang diagnostic pop")
+#define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("clang diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 #define STDC_Pragma_AVAILABLE
 
@@ -64,6 +65,7 @@
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("GCC diagnostic pop")
+#define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("GCC diagnostic pop")
 #define RESTORE_WARNINGS _Pragma("GCC diagnostic pop")
 #define STDC_Pragma_AVAILABLE
 
@@ -80,6 +82,7 @@
                            _Pragma("warning( disable : 4127 )")
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT _Pragma("warning( pop )")
 #define RESTORE_WARNING_FORMAT_NONLITERAL _Pragma("warning( pop )")
+#define RESTORE_WARNING_UNREACHABLE_CODE _Pragma("warning( pop )")
 #define RESTORE_WARNINGS _Pragma("warning( pop )")
 #define STDC_Pragma_AVAILABLE
 #else  /* Visual Studio prior to 2019 below */
@@ -94,6 +97,7 @@
                            __pragma(warning(disable:4127))
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT __pragma(warning(pop))
 #define RESTORE_WARNING_FORMAT_NONLITERAL __pragma(warning(pop))
+#define RESTORE_WARNING_UNREACHABLE_CODE __pragma(warning(pop))
 #define RESTORE_WARNINGS  __pragma(warning(pop))
 #define STDC_Pragma_AVAILABLE
 #endif /* vs2019 or vs2017 */
@@ -112,6 +116,7 @@
 #define DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 #define RESTORE_WARNING_FORMAT_NONLITERAL
+#define RESTORE_WARNING_UNREACHABLE_CODE
 #define RESTORE_WARNINGS
 #endif
 

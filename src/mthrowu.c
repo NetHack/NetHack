@@ -579,10 +579,9 @@ m_throw(
                 potionhit(&g.youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
             }
-
             oldumort = u.umortality;
+
             switch (singleobj->otyp) {
-                int dam, hitv;
             case EGG:
                 if (!touch_petrifies(&mons[singleobj->corpsenm])) {
                     impossible("monster throwing egg type %d",
@@ -596,24 +595,28 @@ m_throw(
                 hitu = thitu(8, 0, &singleobj, (char *) 0);
                 break;
             default:
-                dam = dmgval(singleobj, &g.youmonst);
-                hitv = 3 - distmin(u.ux, u.uy, mon->mx, mon->my);
-                if (hitv < -4)
-                    hitv = -4;
-                if (is_elf(mon->data)
-                    && objects[singleobj->otyp].oc_skill == P_BOW) {
-                    hitv++;
-                    if (MON_WEP(mon) && MON_WEP(mon)->otyp == ELVEN_BOW)
+                {
+                    int dam, hitv;
+
+                    dam = dmgval(singleobj, &g.youmonst);
+                    hitv = 3 - distmin(u.ux, u.uy, mon->mx, mon->my);
+                    if (hitv < -4)
+                        hitv = -4;
+                    if (is_elf(mon->data)
+                        && objects[singleobj->otyp].oc_skill == P_BOW) {
                         hitv++;
-                    if (singleobj->otyp == ELVEN_ARROW)
-                        dam++;
+                        if (MON_WEP(mon) && MON_WEP(mon)->otyp == ELVEN_BOW)
+                            hitv++;
+                        if (singleobj->otyp == ELVEN_ARROW)
+                            dam++;
+                    }
+                    if (bigmonst(g.youmonst.data))
+                        hitv++;
+                    hitv += 8 + singleobj->spe;
+                    if (dam < 1)
+                        dam = 1;
+                    hitu = thitu(hitv, dam, &singleobj, (char *) 0);
                 }
-                if (bigmonst(g.youmonst.data))
-                    hitv++;
-                hitv += 8 + singleobj->spe;
-                if (dam < 1)
-                    dam = 1;
-                hitu = thitu(hitv, dam, &singleobj, (char *) 0);
             }
             if (hitu && singleobj->opoisoned && is_poisonable(singleobj)) {
                 char onmbuf[BUFSZ], knmbuf[BUFSZ];

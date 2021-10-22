@@ -116,6 +116,8 @@ l_nhcore_call(int callidx)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 void
 nhl_error(lua_State *L, const char *msg)
 {
@@ -136,7 +138,10 @@ nhl_error(lua_State *L, const char *msg)
 #endif
     (void) lua_error(L);
     /*NOTREACHED*/
+    /* UNREACHABLE_CODE */
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* Check that parameters are nothing but single table,
    or if no parameters given, put empty table there */

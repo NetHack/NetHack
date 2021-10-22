@@ -1570,6 +1570,8 @@ create_subroom(
     return TRUE;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /*
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
@@ -1659,6 +1661,7 @@ create_door(room_door* dd, struct mkroom* broom)
         default:
             x = y = 0;
             panic("create_door: No wall for door!");
+            /*UNREACHABLE_CODE*/
             goto outdirloop;
         }
  outdirloop:
@@ -1674,6 +1677,8 @@ create_door(room_door* dd, struct mkroom* broom)
     levl[x][y].typ = (dd->secret ? SDOOR : DOOR);
     levl[x][y].doormask = dd->mask;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * Create a secret door in croom on any one of the specified walls.

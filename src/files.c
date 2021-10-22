@@ -923,7 +923,10 @@ set_savefile_name(boolean regularize_it)
             overflow = 2;
     }
 #ifdef SAVE_EXTENSION
-    if (strlen(SAVE_EXTENSION) > 0 && !overflow) {
+    /* (0) is placed in brackets below so that the [&& !overflow] is
+       explicit dead code (the ">" comparison is detected as always
+       FALSE at compile-time). Done to appease clang's -Wunreachable-code */
+    if (strlen(SAVE_EXTENSION) > (0) && !overflow) {
         if (strlen(g.SAVEF) + strlen(SAVE_EXTENSION) < (SAVESIZE - 1)) {
             Strcat(g.SAVEF, SAVE_EXTENSION);
 #ifdef MSDOS

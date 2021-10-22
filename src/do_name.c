@@ -530,11 +530,14 @@ coord_desc(int x, int y, char *outbuf, char cmode)
         /* for normal map sizes, force a fixed-width formatting so that
            /m, /M, /o, and /O output lines up cleanly; map sizes bigger
            than Nx999 or 999xM will still work, but not line up like normal
-           when displayed in a column setting */
+           when displayed in a column setting.
+
+	   The (100) is placed in brackets below to mark the [: "03"] as
+           explicit compile-time dead code for clang */
         if (!*screen_fmt)
             Sprintf(screen_fmt, "[%%%sd,%%%sd]",
-                    (ROWNO - 1 + 2 < 100) ? "02" :  "03",
-                    (COLNO - 1 < 100) ? "02" : "03");
+                    (ROWNO - 1 + 2 < (100)) ? "02" :  "03",
+                    (COLNO - 1 < (100)) ? "02" : "03");
         /* map line 0 is screen row 2;
            map column 0 isn't used, map column 1 is screen column 1 */
         Sprintf(outbuf, screen_fmt, y + 2, x);

@@ -32,10 +32,7 @@ CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
 CFLAGS+=-Wformat-nonliteral
-# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
-# # leave it out by default.
-# #CFLAGS+=-Wunreachable-code
-# #
+CFLAGS+=-Wunreachable-code
 #
 # the following are not allowed in C++
 CFLAGS+=-Wimplicit
