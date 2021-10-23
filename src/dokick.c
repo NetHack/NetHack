@@ -618,7 +618,7 @@ really_kick_object(xchar x, xchar y)
     }
 
     /* fragile objects should not be kicked */
-    if (hero_breaks(g.kickedobj, g.kickedobj->ox, g.kickedobj->oy, FALSE))
+    if (hero_breaks(g.kickedobj, g.kickedobj->ox, g.kickedobj->oy, 0))
         return 1;
 
     /* too heavy to move.  range is calculated as potential distance from

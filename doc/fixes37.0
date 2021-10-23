@@ -655,6 +655,9 @@ if vault guard arrives on a boulder in a breach in the vault wall when coming
 when vault walls are repaired, destroy any rocks or boulders at their spots
 melting ice timer could persist after the ice was gone from digging or from an
 	exploding land mine
+using 'F'orcefight against iron bars while wielding something breakable could
+	yield erratic outcome because non-deterministic breaktest() was being
+	called twice and could yield results that conflicted
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -2108,7 +2108,7 @@ bhito(struct obj *obj, struct obj *otmp)
                 int ooy = obj->oy;
                 if (g.context.mon_moving
                         ? !breaks(obj, obj->ox, obj->oy)
-                        : !hero_breaks(obj, obj->ox, obj->oy, FALSE))
+                        : !hero_breaks(obj, obj->ox, obj->oy, 0))
                     maybelearnit = FALSE; /* nothing broke */
                 else
                     newsym_force(oox,ooy);

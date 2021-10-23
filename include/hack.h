@@ -522,6 +522,15 @@ enum bodypart_types {
                                exiting early with "You don't have anything to
                                foo" if nothing in inventory is valid) */
 
+/* flags for hero_breaks() and hits_bars(); BRK_KNOWN* let callers who have
+   already called breaktest() prevent it from being called again since it
+   has a random factor which makes it be non-deterministic */
+#define BRK_BY_HERO        1
+#define BRK_FROM_INV       2
+#define BRK_KNOWN2BREAK    4
+#define BRK_KNOWN2NOTBREAK 8
+#define BRK_KNOWN_OUTCOME  (BRK_KNOWN2BREAK | BRK_KNOWN2NOTBREAK)
+
 /* values returned from getobj() callback functions */
 enum getobj_callback_returns {
     /* generally invalid - can't be used for this purpose. will give a "silly

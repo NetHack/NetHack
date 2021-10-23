@@ -1770,30 +1770,29 @@ domove_core(void)
         if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
             || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
                 && !is_safemon(mtmp))) {
-
             /* target monster might decide to switch places with you... */
-            if (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
-                && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
-                && mtmp->mcanmove && !mtmp->msleeping && !mtmp->meating
-                && !mtmp->mtrapped && !u.utrap && !u.ustuck && !u.usteed
-                && !(u.dx && u.dy
-                     && (NODIAG(u.umonnum)
-                         || (bad_rock(mtmp->data, x, u.uy0)
-                             && bad_rock(mtmp->data, u.ux0, y))
-                         || (bad_rock(g.youmonst.data, u.ux0, y)
-                             && bad_rock(g.youmonst.data, x, u.uy0))))
-                && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U))
-                displaceu = TRUE;
-
-            /* try to attack; note that it might evade;
+            displaceu = (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
+                         && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
+                         && mtmp->mcanmove && !mtmp->msleeping
+                         && !mtmp->meating && !mtmp->mtrapped
+                         && !u.utrap && !u.ustuck && !u.usteed
+                         && !(u.dx && u.dy
+                              && (NODIAG(u.umonnum)
+                                  || (bad_rock(mtmp->data, x, u.uy0)
+                                      && bad_rock(mtmp->data, u.ux0, y))
+                                  || (bad_rock(g.youmonst.data, u.ux0, y)
+                                      && bad_rock(g.youmonst.data, x, u.uy0))))
+                         && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U));
+            /* if not displacing, try to attack; note that it might evade;
                also, we don't attack tame when _safepet_ */
-            else if (do_attack(mtmp))
+            if (!displaceu && do_attack(mtmp))
                 return;
         }
     }
 
     if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
         struct obj *obj = uwep;
+        unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV);
 
         if (breaktest(obj)) {
             if (obj->quan > 1L)
@@ -1801,8 +1800,12 @@ domove_core(void)
             else
                 setuwep((struct obj *)0);
             freeinv(obj);
+            breakflags |= BRK_KNOWN2BREAK;
+        } else {
+            breakflags |= BRK_KNOWN2NOTBREAK;
         }
-        hit_bars(&obj, u.ux, u.uy, x, y, TRUE, TRUE);
+
+        hit_bars(&obj, u.ux, u.uy, x, y, breakflags);
         return;
     }
 

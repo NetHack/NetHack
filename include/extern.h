@@ -565,7 +565,7 @@ extern boolean throwing_weapon(struct obj *);
 extern void throwit(struct obj *, long, boolean, struct obj *);
 extern int omon_adj(struct monst *, struct obj *, boolean);
 extern int thitmonst(struct monst *, struct obj *);
-extern int hero_breaks(struct obj *, xchar, xchar, boolean);
+extern int hero_breaks(struct obj *, xchar, xchar, unsigned);
 extern int breaks(struct obj *, xchar, xchar);
 extern void release_camera_demon(struct obj *, xchar, xchar);
 extern void breakobj(struct obj *, xchar, xchar, boolean, boolean);
@@ -1637,7 +1637,7 @@ extern int breamm(struct monst *, struct attack *, struct monst *);
 extern void m_useupall(struct monst *, struct obj *);
 extern void m_useup(struct monst *, struct obj *);
 extern void m_throw(struct monst *, int, int, int, int, int, struct obj *);
-extern void hit_bars(struct obj **, int, int, int, int, boolean, boolean);
+extern void hit_bars(struct obj **, int, int, int, int, unsigned);
 extern boolean hits_bars(struct obj **, int, int, int, int, int, int);
 
 /* ### muse.c ### */
