@@ -12,14 +12,30 @@ CCFLAGS = -g
 #	rules for compiling C code; specifying a value for that on the
 #	'make' command line should be avoided.
 
+#If you want to force use of one particular set of compilers, do it
+#here, ahead of the detection, so that the detection will match your
+#choice and set variables CCISCLANG, GCCGTEQ, CLANGPPGTEQ9 etc.
+#accordingly.
+#
+#CC= gcc
+#CXX= g++ -std-gnu++11
+#
+#CC= clang
+#CXX=clang++ -std=gnu++11
+
+#detection
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
 ifeq "$(CCISCLANG)" ""
 CXX=g++ -std=gnu++11
 else
 CXX=clang++ -std=gnu++11
 endif
-# if you want to override the compiler detection just carried out
-# uncomment one of the following pairs as desired.
+
+# If you want to override the compiler detection just carried out
+# uncomment one of the following pairs. Note, however, that
+# doing this after the detection above will likely result in
+# mismatched variable values for CCISCLANG, GCCGTEQ, CLANGPPGTEQ9 etc.
+#
 #CC= gcc
 #CXX= g++ -std-gnu++11
 #
