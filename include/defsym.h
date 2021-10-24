@@ -107,8 +107,10 @@
     PCHAR2(12, '.',  S_ndoor, "no door", "doorway", CLR(CLR_GRAY))
     PCHAR2(13, '-',  S_vodoor, "vertical open door", "open door", CLR(CLR_BROWN))
     PCHAR2(14, '|',  S_hodoor, "horizontal open door", "open door", CLR(CLR_BROWN))
-    PCHAR( 15, '+',  S_vcdoor, "vertical closed door", CLR(CLR_BROWN))
-    PCHAR( 16, '+',  S_hcdoor, "horizontal closed door", CLR(CLR_BROWN))
+    PCHAR2(15, '+',  S_vcdoor,
+           "vertical closed door", "closed door", CLR(CLR_BROWN))
+    PCHAR2(16, '+',  S_hcdoor,
+           "horizontal closed door", "closed door", CLR(CLR_BROWN))
     PCHAR( 17, '#',  S_bars, "iron bars", CLR(HI_METAL))
     PCHAR( 18, '#',  S_tree, "tree", CLR(CLR_GREEN))
     PCHAR( 19, '.',  S_room, "floor of a room", CLR(CLR_GRAY))

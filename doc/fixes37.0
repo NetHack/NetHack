@@ -860,6 +860,8 @@ restore the boulder exception for piletops that had been unintentionally
 	removed during the expanded-glyphs changes
 misaligned potion colors due to lack of reset_glyphmap() following obj shuffle;
 	this issue only impacted a new game
+closed doors were described as "horizontal closed door" or "vertical closed
+	door" instead of just "closed door"
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
