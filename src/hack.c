@@ -3330,8 +3330,8 @@ weight_cap(void)
             if (EWounded_legs & RIGHT_SIDE)
                 carrcap -= 100;
         }
-        if (carrcap < 0)
-            carrcap = 0;
+        if (carrcap < 1)
+            carrcap = 1;
     }
 
     if (ELevitation != save_ELev || BLevitation != save_BLev) {
