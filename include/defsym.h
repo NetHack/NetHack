@@ -178,7 +178,7 @@
     /*                                                                   */
     /* begin special effects                                             */
     /*                                                                   */
-    /* zap colors are changed by reset_glyphinfo() to match type of beam */
+    /* zap colors are changed by reset_glyphmap() to match type of beam */
     /*                                                                   */
     PCHAR2(69, '|',  S_vbeam, "vertical beam", "", CLR(CLR_GRAY))
     PCHAR2(70, '-',  S_hbeam, "horizontal beam", "", CLR(CLR_GRAY))
