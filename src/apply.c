@@ -3054,6 +3054,7 @@ display_polearm_positions(int state)
 static int
 use_pole(struct obj *obj)
 {
+    const char thump[] = "Thump!  Your blow bounces harmlessly off the %s.";
     int res = 0, typ, max_range, min_range, glyph;
     coord cc;
     struct monst *mtmp;
@@ -3067,8 +3068,7 @@ use_pole(struct obj *obj)
     if (obj != uwep) {
         if (!wield_tool(obj, "swing"))
             return 0;
-        else
-            res = 1;
+        res = 1;
     }
     /* assert(obj == uwep); */
 
@@ -3158,13 +3158,31 @@ use_pole(struct obj *obj)
                Note:  we only do this when a statue is displayed here,
                because the player is probably attempting to attack it;
                other statues obscured by anything are just ignored. */
-            pline("Thump!  Your blow bounces harmlessly off the statue.");
+            pline(thump, "statue");
             wake_nearto(g.bhitpos.x, g.bhitpos.y, 25);
         }
     } else {
         /* no monster here and no statue seen or remembered here */
         (void) unmap_invisible(g.bhitpos.x, g.bhitpos.y);
-        You("miss; there is no one there to hit.");
+
+        if (glyph_to_obj(glyph) == BOULDER
+            && sobj_at(BOULDER, g.bhitpos.x, g.bhitpos.y)) {
+            pline(thump, "boulder");
+            wake_nearto(g.bhitpos.x, g.bhitpos.y, 25);
+        } else if (!accessible(g.bhitpos.x, g.bhitpos.y)
+                   || IS_FURNITURE(levl[g.bhitpos.x][g.bhitpos.y].typ)) {
+            /* similar to 'F'orcefight with a melee weapon; we know that
+               the spot can be seen or we wouldn't have gotten this far */
+            You("uselessly attack %s.",
+                (levl[g.bhitpos.x][g.bhitpos.y].typ == STONE
+                 || levl[g.bhitpos.x][g.bhitpos.y].typ == SCORR)
+                ? "stone"
+                : glyph_is_cmap(glyph)
+                  ? the(defsyms[glyph_to_cmap(glyph)].explanation)
+                  : (const char *) "an unknown obstacle");
+        } else {
+            You("miss; there is no one there to hit.");
+        }
     }
     u_wipe_engr(2); /* same as for melee or throwing */
     return 1;

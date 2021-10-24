@@ -1815,7 +1815,7 @@ domove_core(void)
         || (glyph_is_invisible(glyph) && !g.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
-                solid = !accessible(x, y);
+                solid = (!accessible(x, y) || IS_FURNITURE(levl[x][y].typ));
         char buf[BUFSZ];
 
         if (!Underwater) {
@@ -1859,15 +1859,17 @@ domove_core(void)
                          : "nothing");
         } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
-               unlike searching, this won't reveal what that terrain is
-               (except for solid rock, where the glyph would otherwise
-               yield ludicrous "dark part of a room") */
-            Strcpy(buf, (levl[x][y].typ == STONE) ? "solid rock"
+               unlike searching, this won't reveal what that terrain is;
+               3.7: used to say "solid rock" for the stone case, but that
+               made it be different from unmapped walls outside of rooms */
+            Strcpy(buf, (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+                         ? "stone"
                          : glyph_is_cmap(glyph)
                             ? the(defsyms[glyph_to_cmap(glyph)].explanation)
                             : (const char *) "an unknown obstacle");
             /* note: 'solid' is misleadingly named and catches pools
-               of water and lava as well as rock and walls */
+               of water and lava as well as rock and walls;
+               3.7: furniture too */
         } else {
             Strcpy(buf, "thin air");
         }
