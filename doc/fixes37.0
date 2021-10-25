@@ -660,6 +660,8 @@ using 'F'orcefight against iron bars while wielding something breakable could
 	called twice and could yield results that conflicted
 have applying a polearm give feedback similar to 'F' for melee weapon when
 	attacking a wall or boulder
+if weight_cap() ever returned 0 (which probably can't happen), using #untrap
+	to pull a monster out of a pit would trigger a divide by 0 crash
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

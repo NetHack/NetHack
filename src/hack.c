@@ -3330,8 +3330,6 @@ weight_cap(void)
             if (EWounded_legs & RIGHT_SIDE)
                 carrcap -= 100;
         }
-        if (carrcap < 0)
-            carrcap = 0;
     }
 
     if (ELevitation != save_ELev || BLevitation != save_BLev) {
@@ -3340,7 +3338,7 @@ weight_cap(void)
         float_vs_flight();
     }
 
-    return (int) carrcap;
+    return (int) max(carrcap, 1L); /* never return 0 */
 }
 
 /* returns how far beyond the normal capacity the player is currently. */

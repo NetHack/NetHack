@@ -4687,18 +4687,15 @@ disarm_shooting_trap(struct trap* ttmp, int otyp)
     return 1;
 }
 
-/* Is the weight too heavy?
- * Formula as in near_capacity() & check_capacity() */
+/* trying to #untrap a monster from a pit; is the weight too heavy? */
 static int
 try_lift(
-    struct monst *mtmp,
-    struct trap *ttmp,
-    int wt,
-    boolean stuff)
+    struct monst *mtmp, /* trapped monster */
+    struct trap *ttmp, /* pit, possibly made by hero, or spiked pit */
+    int xtra_wt, /* monster (corpse weight) + (stuff ? minvent weight : 0) */
+    boolean stuff) /* False: monster w/o minvent; True: w/ minvent */
 {
-    int wc = weight_cap();
-
-    if (((wt * 2) / wc) >= HVY_ENCUMBER) {
+    if (calc_capacity(xtra_wt) >= HVY_ENCUMBER) {
         pline("%s is %s for you to lift.", Monnam(mtmp),
               stuff ? "carrying too much" : "too heavy");
         if (!ttmp->madeby_u && !mtmp->mpeaceful && mtmp->mcanmove
@@ -4719,7 +4716,7 @@ help_monster_out(
     struct monst *mtmp,
     struct trap *ttmp)
 {
-    int wt;
+    int xtra_wt;
     struct obj *otmp;
     boolean uprob;
 
@@ -4788,15 +4785,18 @@ help_monster_out(
     }
 
     /* is the monster too heavy? */
-    wt = inv_weight() + mtmp->data->cwt;
-    if (!try_lift(mtmp, ttmp, wt, FALSE))
+    xtra_wt = mtmp->data->cwt;
+    if (!try_lift(mtmp, ttmp, xtra_wt, FALSE))
         return 1;
 
-    /* is the monster with inventory too heavy? */
-    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-        wt += otmp->owt;
-    if (!try_lift(mtmp, ttmp, wt, TRUE))
-        return 1;
+    /* monster without its inventory isn't too heavy; if it carries
+       anything, include that minvent weight and check again */
+    if (mtmp->minvent) {
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+            xtra_wt += otmp->owt;
+        if (!try_lift(mtmp, ttmp, xtra_wt, TRUE))
+            return 1;
+    }
 
     You("pull %s out of the pit.", mon_nam(mtmp));
     mtmp->mtrapped = 0;
