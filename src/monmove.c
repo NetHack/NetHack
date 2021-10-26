@@ -1907,6 +1907,7 @@ vamp_shift(
 {
     int reslt = 0;
     char oldmtype[BUFSZ];
+    boolean sawmon = canseemon(mon); /* before shape change */
 
     /* remember current monster type before shapechange */
     Strcpy(oldmtype, domsg ? noname_monnam(mon, ARTICLE_THE) : "");
@@ -1920,9 +1921,14 @@ vamp_shift(
     }
 
     if (reslt && domsg) {
-        pline("You %s %s where %s was.",
-              !canseemon(mon) ? "now detect" : "observe",
-              noname_monnam(mon, ARTICLE_A), oldmtype);
+        /* might have seen vampire/bat/wolf with infravision then be
+           unable to see the same creature when it turns into a fog cloud */
+        if (canspotmon(mon))
+            You("%s %s where %s was.",
+                !canseemon(mon) ? "now detect" : "observe",
+                noname_monnam(mon, ARTICLE_A), oldmtype);
+        else
+            You("can no longer %s %s.", sawmon ? "see" : "sense", oldmtype);
         /* this message is given when it turns into a fog cloud
            in order to move under a closed door */
         display_nhwindow(WIN_MESSAGE, FALSE);
