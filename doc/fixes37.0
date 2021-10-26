@@ -664,6 +664,12 @@ if weight_cap() ever returned 0 (which probably can't happen), using #untrap
 	to pull a monster out of a pit would trigger a divide by 0 crash
 avoid "you now detect it where the vampire bat was" when a vampire shifts from
 	a bat seen with infravision to an unseen fog cloud
+if an artifact gets created as a random treasure drop and then deleted because
+	it is too big to include with a small corpse, explicitly uncreate it
+	instead of just discarding it so that it is eligible for use later
+when creating random contents for a container, explicitly exclude artifacts
+	(already implicitly excluded because randomly generated artifacts are
+	all weapons and containers don't start with any weapons in them)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
