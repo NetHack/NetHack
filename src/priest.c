@@ -571,7 +571,7 @@ priest_talk(struct monst *priest)
     /* priests don't chat unless peaceful and in their own temple */
     if (!inhistemple(priest) || !priest->mpeaceful
         || !priest->mcanmove || priest->msleeping) {
-        static const char *cranky_msg[3] = {
+        static const char *const cranky_msg[3] = {
             "Thou wouldst have words, eh?  I'll give thee a word or two!",
             "Talk?  Here is what I have to say!",
             "Pilgrim, I would speak no longer with thee."

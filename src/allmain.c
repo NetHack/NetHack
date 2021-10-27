@@ -1012,7 +1012,7 @@ dump_enums(void)
         objects_misc_enum,
         NUM_ENUM_DUMPS
     };
-    static const char *titles[NUM_ENUM_DUMPS] =
+    static const char *const titles[NUM_ENUM_DUMPS] =
         { "monnums", "objects_nums" , "misc_object_nums" };
     struct enum_dump {
         int val;
@@ -1036,7 +1036,7 @@ dump_enums(void)
             { MAXSPELL, "MAXSPELL" },
     };
     struct enum_dump *ed[NUM_ENUM_DUMPS] = { monsdump, objdump, omdump };
-    static const char *pfx[NUM_ENUM_DUMPS] = { "PM_", "", "" };
+    static const char *const pfx[NUM_ENUM_DUMPS] = { "PM_", "", "" };
     int szd[NUM_ENUM_DUMPS] = { SIZE(monsdump), SIZE(objdump), SIZE(omdump) };
 
     for (i = 0; i < NUM_ENUM_DUMPS; ++ i) {

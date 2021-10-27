@@ -1047,7 +1047,7 @@ parse_cond_option(boolean negated, char *opts)
 void
 cond_menu(void)
 {
-    static const char *menutitle[2] = { "alphabetically", "by ranking"};
+    static const char *const menutitle[2] = { "alphabetically", "by ranking"};
     int i, res, idx = 0;
     int sequence[CONDITION_COUNT];
     winid tmpwin;
@@ -2372,9 +2372,9 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
     char tmpbuf[BUFSZ];
-    static const char *aligntxt[] = { "chaotic", "neutral", "lawful" };
+    static const char *const aligntxt[] = { "chaotic", "neutral", "lawful" };
     /* hu_stat[] from eat.c has trailing spaces which foul up comparisons */
-    static const char *hutxt[] = { "Satiated", "", "Hungry", "Weak",
+    static const char *const hutxt[] = { "Satiated", "", "Hungry", "Weak",
                                    "Fainting", "Fainted", "Starved" };
 
     /* Examples:
@@ -3653,7 +3653,7 @@ status_hilite_menu_add(int origfld)
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, enc_stat[rv]);
         } else if (fld == BL_ALIGN) {
-            static const char *aligntxt[] = {
+            static const char *const aligntxt[] = {
                 "chaotic", "neutral", "lawful"
             };
             int rv = query_arrayvalue(qry_buf,
@@ -3665,7 +3665,7 @@ status_hilite_menu_add(int origfld)
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, aligntxt[rv]);
         } else if (fld == BL_HUNGER) {
-            static const char *hutxt[] = { "Satiated", (char *) 0, "Hungry",
+            static const char *const hutxt[] = { "Satiated", (char *) 0, "Hungry",
                                            "Weak", "Fainting", "Fainted",
                                            "Starved" };
             int rv = query_arrayvalue(qry_buf,

@@ -1787,7 +1787,7 @@ optfn_mouse_support(
 #define MOUSEFIX1 ", O/S adjusted"
 #define MOUSEFIX2 ", O/S unchanged"
 #endif
-        static const char *mousemodes[][2] = {
+        static const char *const mousemodes[][2] = {
             { "0=off", "" },
             { "1=on",  MOUSEFIX1 },
             { "2=on",  MOUSEFIX2 },
@@ -1979,7 +1979,7 @@ optfn_number_pad(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val) {
-        static const char *numpadmodes[] = {
+        static const char *const numpadmodes[] = {
             "0=off", "1=on", "2=on, MSDOS compatible",
             "3=on, phone-style layout",
             "4=on, phone layout, MSDOS compatible",
@@ -4359,7 +4359,7 @@ handler_disclose(void)
     char buf[BUFSZ];
     /* order of disclose_names[] must correspond to
        disclosure_options in decl.c */
-    static const char *disclosure_names[] = {
+    static const char *const disclosure_names[] = {
         "inventory", "attributes", "vanquished",
         "genocides", "conduct",    "overview",
     };
@@ -4515,7 +4515,7 @@ handler_number_pad(void)
     winid tmpwin;
     anything any;
     int i;
-    static const char *npchoices[] = {
+    static const char *const npchoices[] = {
         " 0 (off)", " 1 (on)", " 2 (on, MSDOS compatible)",
         " 3 (on, phone-style digit layout)",
         " 4 (on, phone-style layout, MSDOS compatible)",
@@ -6497,7 +6497,7 @@ query_msgtype(void)
 static boolean
 msgtype_add(int typ, char *pattern)
 {
-    static const char *re_error = "MSGTYPE regex error";
+    static const char *const re_error = "MSGTYPE regex error";
     struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof *tmp);
 
     tmp->msgtype = typ;
@@ -8058,7 +8058,7 @@ static const char *opt_intro[] = {
     (char *) 0
 };
 
-static const char *opt_epilog[] = {
+static const char *const opt_epilog[] = {
     "",
     "Some of the options can only be set before the game is started;",
     "those items will not be selectable in the 'O' command's menu.",
@@ -8544,8 +8544,8 @@ wc_set_window_colors(char *op)
     int j;
     char buf[BUFSZ];
     char *wn, *tfg, *tbg, *newop;
-    static const char *wnames[] = { "menu", "message", "status", "text" };
-    static const char *shortnames[] = { "mnu", "msg", "sts", "txt" };
+    static const char *const wnames[] = { "menu", "message", "status", "text" };
+    static const char *const shortnames[] = { "mnu", "msg", "sts", "txt" };
     static char **fgp[] = { &iflags.wc_foregrnd_menu,
                             &iflags.wc_foregrnd_message,
                             &iflags.wc_foregrnd_status,

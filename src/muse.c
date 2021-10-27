@@ -55,7 +55,7 @@ precheck(struct monst* mon, struct obj* obj)
 
     if (obj->oclass == POTION_CLASS) {
         coord cc;
-        static const char *empty = "The potion turns out to be empty.";
+        static const char *const empty = "The potion turns out to be empty.";
         struct monst *mtmp;
 
         if (objdescr_is(obj, "milky")) {

@@ -83,7 +83,7 @@ static const char *cad(boolean);
                     obj->quan <= bp->bquan
  */
 
-static const char *angrytexts[] = { "quite upset", "ticked off", "furious" };
+static const char *const angrytexts[] = { "quite upset", "ticked off", "furious" };
 
 /*
  *  Transfer money from inventory to monster when paying

@@ -5944,7 +5944,7 @@ maybe_finish_sokoban(void)
 const char *
 trapname(int ttyp, boolean override)
 {
-    static const char *halu_trapnames[] = {
+    static const char *const halu_trapnames[] = {
         /* riffs on actual nethack traps */
         "bottomless pit", "polymorphism trap", "devil teleporter",
         "falling boulder trap", "anti-anti-magic field", "weeping gas trap",

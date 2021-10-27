@@ -1365,7 +1365,7 @@ draft_message(boolean unexpected)
         } else {
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */
-            static const char *draft_reaction[] = {
+            static const char *const draft_reaction[] = {
                 "enlisting", "marching", "protesting", "fleeing",
             };
             int dridx;

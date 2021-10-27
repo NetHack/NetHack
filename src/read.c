@@ -97,7 +97,7 @@ erode_obj_text(struct obj* otmp, char* buf)
 char *
 tshirt_text(struct obj* tshirt, char* buf)
 {
-    static const char *shirt_msgs[] = {
+    static const char *const shirt_msgs[] = {
         /* Scott Bigham */
       "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
         "Is that Mjollnir in your pocket or are you just happy to see me?",
@@ -186,7 +186,7 @@ tshirt_text(struct obj* tshirt, char* buf)
 char *
 hawaiian_motif(struct obj *shirt, char *buf)
 {
-    static const char *hawaiian_motifs[] = {
+    static const char *const hawaiian_motifs[] = {
         /* birds */
         "flamingo",
         "parrot",
@@ -220,7 +220,7 @@ hawaiian_motif(struct obj *shirt, char *buf)
 static char *
 hawaiian_design(struct obj *shirt, char *buf)
 {
-    static const char *hawaiian_bgs[] = {
+    static const char *const hawaiian_bgs[] = {
         /* solid colors */
         "purple",
         "yellow",
@@ -250,7 +250,7 @@ hawaiian_design(struct obj *shirt, char *buf)
 char *
 apron_text(struct obj* apron, char* buf)
 {
-    static const char *apron_msgs[] = {
+    static const char *const apron_msgs[] = {
         "Kiss the cook",
         "I'm making SCIENCE!",
         "Don't mess with the chef",
@@ -277,7 +277,7 @@ apron_text(struct obj* apron, char* buf)
     return erode_obj_text(apron, buf);
 }
 
-static const char *candy_wrappers[] = {
+static const char *const candy_wrappers[] = {
     "",                         /* (none -- should never happen) */
     "Apollo",                   /* Lost */
     "Moon Crunchy",             /* South Park */
@@ -434,7 +434,7 @@ doread(void)
             docall(scroll);
         return ECMD_TIME;
     } else if (otyp == CREDIT_CARD) {
-        static const char *card_msgs[] = {
+        static const char *const card_msgs[] = {
             "Leprechaun Gold Tru$t - Shamrock Card",
             "Magic Memory Vault Charge Card",
             "Larn National Bank",                /* Larn */

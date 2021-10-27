@@ -1447,7 +1447,7 @@ enum spl_sort_types {
     NUM_SPELL_SORTBY
 };
 
-static const char *spl_sortchoices[NUM_SPELL_SORTBY] = {
+static const char *const spl_sortchoices[NUM_SPELL_SORTBY] = {
     "by casting letter",
     "alphabetically",
     "by level, low to high",

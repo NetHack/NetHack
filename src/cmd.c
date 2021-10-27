@@ -451,7 +451,7 @@ doextlist(void)
     int n, pass;
     int menumode = 0, menushown[2], onelist = 0;
     boolean redisplay = TRUE, search = FALSE;
-    static const char *headings[] = { "Extended commands",
+    static const char *const headings[] = { "Extended commands",
                                       "Debugging Extended Commands" };
 
     searchbuf[0] = '\0';

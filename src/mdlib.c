@@ -422,7 +422,7 @@ build_savebones_compat_string(void)
                 VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 }
 
-static const char *build_opts[] = {
+static const char *const build_opts[] = {
 #ifdef AMIGA_WBENCH
     "Amiga WorkBench support",
 #endif
@@ -755,7 +755,7 @@ build_options(void)
 
 #if defined(MAKEDEFS_C) || defined(FOR_RUNTIME)
     {
-        static const char *lua_info[] = {
+        static const char *const lua_info[] = {
  "", "NetHack 3.7.* uses the 'Lua' interpreter to process some data:", "",
  "    :LUACOPYRIGHT:", "",
  /*        1         2         3         4         5         6         7
