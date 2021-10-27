@@ -404,9 +404,17 @@ baalz_fixup(void)
                     g.bughack.delarea.x2 = x, g.bughack.delarea.y2 = y;
             } else if (levl[x][y].typ == IRONBARS) {
                 /* novelty effect; allowing digging in front of 'eyes' */
-                levl[x - 1][y].wall_info &= ~W_NONDIGGABLE;
-                if (isok(x - 2, y))
-                    levl[x - 2][y].wall_info &= ~W_NONDIGGABLE;
+                if (isok(x - 1, y)
+                    && (levl[x - 1][y].wall_info & W_NONDIGGABLE) != 0) {
+                    levl[x - 1][y].wall_info &= ~W_NONDIGGABLE;
+                    if (isok(x - 2, y))
+                        levl[x - 2][y].wall_info &= ~W_NONDIGGABLE;
+                } else if (isok(x + 1, y)
+                    && (levl[x + 1][y].wall_info & W_NONDIGGABLE) != 0) {
+                    levl[x + 1][y].wall_info &= ~W_NONDIGGABLE;
+                    if (isok(x + 2, y))
+                        levl[x + 2][y].wall_info &= ~W_NONDIGGABLE;
+                }
             }
 
     wallification(max(g.bughack.inarea.x1 - 2, 1),
