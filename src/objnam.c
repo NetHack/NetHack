@@ -2112,7 +2112,7 @@ bare_artifactname(struct obj* obj)
     return outbuf;
 }
 
-static const char *wrp[] = {
+static const char *const wrp[] = {
     "wand",   "ring",      "potion",     "scroll", "gem",
     "amulet", "spellbook", "spell book",
     /* for non-specific wishes */
@@ -2756,7 +2756,7 @@ ch_ksound(const char *basestr)
 {
     /* these are some *ch words/suffixes that make a k-sound. They pluralize by
        adding 's' rather than 'es' */
-    static const char *ch_k[] = {
+    static const char *const ch_k[] = {
         "monarch",     "poch",    "tech",     "mech",      "stomach", "psych",
         "amphibrach",  "anarch",  "atriarch", "azedarach", "broch",
         "gastrotrich", "isopach", "loch",     "oligarch",  "peritrich",
@@ -2783,7 +2783,7 @@ badman(
     boolean to_plural)  /* True: makeplural, False: makesingular */
 {
     /* these are all the prefixes for *man that don't have a *men plural */
-    static const char *no_men[] = {
+    static const char *const no_men[] = {
         "albu", "antihu", "anti", "ata", "auto", "bildungsro", "cai", "cay",
         "ceru", "corner", "decu", "des", "dura", "fir", "hanu", "het",
         "infrahu", "inhu", "nonhu", "otto", "out", "prehu", "protohu",
@@ -2791,7 +2791,7 @@ badman(
         "hu", "un", "le", "re", "so", "to", "at", "a",
     };
     /* these are all the prefixes for *men that don't have a *man singular */
-    static const char *no_man[] = {
+    static const char *const no_man[] = {
         "abdo", "acu", "agno", "ceru", "cogno", "cycla", "fleh", "grava",
         "hegu", "preno", "sonar", "speci", "dai", "exa", "fla", "sta", "teg",
         "tegu", "vela", "da", "hy", "lu", "no", "nu", "ra", "ru", "se", "vi",

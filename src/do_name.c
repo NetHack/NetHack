@@ -477,7 +477,7 @@ dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
         /* explicit direction; 'one step' is implicit */
         Sprintf(buf, "%s", directionname(dst));
     } else {
-        static const char *dirnames[4][2] = {
+        static const char *const dirnames[4][2] = {
             { "n", "north" },
             { "s", "south" },
             { "w", "west" },
@@ -2372,8 +2372,8 @@ coyotename(struct monst *mtmp, char *buf)
 char *
 rndorcname(char *s)
 {
-    static const char *v[] = { "a", "ai", "og", "u" };
-    static const char *snd[] = { "gor", "gris", "un", "bane", "ruk",
+    static const char *const v[] = { "a", "ai", "og", "u" };
+    static const char *const snd[] = { "gor", "gris", "un", "bane", "ruk",
                                  "oth","ul", "z", "thos","akh","hai" };
     int i, iend = rn1(2, 3), vstart = rn2(2);
 

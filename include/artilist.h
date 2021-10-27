@@ -9,7 +9,7 @@
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \
           cost, clr, bn) nam
 
-static const char *artifact_names[] = {
+static const char *const artifact_names[] = {
 
 #elif defined(ARTI_ENUM)
 #define A(nam, typ, s1, s2, mt, atk, dfn, cry, inv, al, cl, rac, \

@@ -1135,13 +1135,13 @@ raceptr(struct monst* mtmp)
         return mtmp->data;
 }
 
-static const char *levitate[4] = { "float", "Float", "wobble", "Wobble" };
-static const char *flys[4] = { "fly", "Fly", "flutter", "Flutter" };
-static const char *flyl[4] = { "fly", "Fly", "stagger", "Stagger" };
-static const char *slither[4] = { "slither", "Slither", "falter", "Falter" };
-static const char *ooze[4] = { "ooze", "Ooze", "tremble", "Tremble" };
-static const char *immobile[4] = { "wiggle", "Wiggle", "pulsate", "Pulsate" };
-static const char *crawl[4] = { "crawl", "Crawl", "falter", "Falter" };
+static const char *const levitate[4] = { "float", "Float", "wobble", "Wobble" };
+static const char *const flys[4] = { "fly", "Fly", "flutter", "Flutter" };
+static const char *const flyl[4] = { "fly", "Fly", "stagger", "Stagger" };
+static const char *const slither[4] = { "slither", "Slither", "falter", "Falter" };
+static const char *const ooze[4] = { "ooze", "Ooze", "tremble", "Tremble" };
+static const char *const immobile[4] = { "wiggle", "Wiggle", "pulsate", "Pulsate" };
+static const char *const crawl[4] = { "crawl", "Crawl", "falter", "Falter" };
 
 const char *
 locomotion(const struct permonst* ptr, const char* def)

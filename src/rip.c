@@ -21,7 +21,7 @@ static void center(int, char *);
 
 #ifndef NH320_DEDICATION
 /* A normal tombstone for end of game display. */
-static const char *rip_txt[] = {
+static const char *const rip_txt[] = {
     "                       ----------",
     "                      /          \\",
     "                     /    REST    \\",
@@ -41,7 +41,7 @@ static const char *rip_txt[] = {
 #define STONE_LINE_CENT 28 /* char[] element of center of stone face */
 #else                      /* NH320_DEDICATION */
 /* NetHack 3.2.x displayed a dual tombstone as a tribute to Izchak. */
-static const char *rip_txt[] = {
+static const char *const rip_txt[] = {
     "              ----------                      ----------",
     "             /          \\                    /          \\",
     "            /    REST    \\                  /    This    \\",

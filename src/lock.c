@@ -37,7 +37,7 @@ static const char *
 lock_action(void)
 {
     /* "unlocking"+2 == "locking" */
-    static const char *actions[] = {
+    static const char *const actions[] = {
         "unlocking the door",   /* [0] */
         "unlocking the chest",  /* [1] */
         "unlocking the box",    /* [2] */

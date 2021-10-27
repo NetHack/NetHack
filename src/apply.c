@@ -4042,7 +4042,7 @@ flip_through_book(struct obj *obj)
     } else if (obj->otyp == SPE_NOVEL) {
         pline("This looks like it might be interesting to read.");
     } else {
-        static const char *fadeness[] = {
+        static const char *const fadeness[] = {
             "fresh",
             "slightly faded",
             "very faded",

@@ -1841,7 +1841,7 @@ glow_color(int arti_indx)
 }
 
 /* glow verb; [0] holds the value used when blind */
-static const char *glow_verbs[] = {
+static const char *const glow_verbs[] = {
     "quiver", "flicker", "glimmer", "gleam"
 };
 

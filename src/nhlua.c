@@ -54,7 +54,7 @@ static void init_u_data(lua_State *);
 static int nhl_set_package_path(lua_State *, const char *);
 static int traceback_handler(lua_State *);
 
-static const char *nhcore_call_names[NUM_NHCORE_CALLS] = {
+static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "start_new_game",
     "restore_old_game",
     "moveloop_turn",

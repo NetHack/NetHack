@@ -885,7 +885,7 @@ drop_ball(xchar x, xchar y)
     }
 
     if (x != u.ux || y != u.uy) {
-        static const char *pullmsg = "The ball pulls you out of the %s!";
+        static const char *const pullmsg = "The ball pulls you out of the %s!";
         struct trap *t;
         long side;
 
