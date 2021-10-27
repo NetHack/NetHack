@@ -670,6 +670,7 @@ if an artifact gets created as a random treasure drop and then deleted because
 when creating random contents for a container, explicitly exclude artifacts
 	(already implicitly excluded because randomly generated artifacts are
 	all weapons and containers don't start with any weapons in them)
+don't give lance or mattock as starting equipment when creating soldiers
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
