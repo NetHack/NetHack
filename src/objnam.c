@@ -665,7 +665,12 @@ xname_flags(
                         : just_an(anbuf, statue_pmname),
                     statue_pmname);
         } else {
-            if (typ == BOULDER && obj->next_boulder)
+            /* sometimes caller wants "next boulder" rather than just
+               "boulder" (when pushing against a pile of more than one);
+               originally we just tested for non-0 but checking for 1 is
+               more robust because the default value for that overloaded
+               field (obj->corpsenm) is NON_PM (-1) rather than 0 */
+            if (typ == BOULDER && obj->next_boulder == 1)
                 Strcat(strcpy(buf, "next "), actualn);
             else
                 Strcpy(buf, actualn);
