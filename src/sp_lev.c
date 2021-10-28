@@ -2016,11 +2016,11 @@ create_monster(monster* m, struct mkroom* croom)
                         /* used to give light, now doesn't, or vice versa,
                            or light's range has changed */
                         if (emits_light(olddata))
-                            del_light_source(LS_MONSTER, (genericptr_t) mtmp);
+                            del_light_source(LS_MONSTER, monst_to_any(mtmp));
                         if (emits_light(mtmp->data))
                             new_light_source(mtmp->mx, mtmp->my,
                                              emits_light(mtmp->data),
-                                             LS_MONSTER, (genericptr_t) mtmp);
+                                             LS_MONSTER, monst_to_any(mtmp));
                     }
                     if (!mtmp->perminvis || pm_invisible(olddata))
                         mtmp->perminvis = pm_invisible(mdat);
