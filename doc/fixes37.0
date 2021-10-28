@@ -674,6 +674,9 @@ don't give lance or mattock as starting equipment when creating soldiers
 fixup for the insect "legs" (some extraneous walls inside solid stone) on the
 	baalz level didn't work as intended if that level was flipped
 handle flipped level when fixing up the baalz level "eyes" too
+prevent normal monster activity from picking up the mines' luckstone or the
+	Sokoban amulet/bag before hero has done so; relying on scare monster
+	and/or engraved Elbereth wasn't sufficient to guard the Sokoban prize
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

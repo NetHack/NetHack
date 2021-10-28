@@ -1184,6 +1184,11 @@ m_move(register struct monst* mtmp, register int after)
                    down on move overhead by filtering out most common item */
                 if (otmp->otyp == ROCK)
                     continue;
+                /* avoid special items; once hero picks them up, they'll
+                   cease being special */
+                if (is_mines_prize(otmp) || is_soko_prize(otmp))
+                    continue;
+
                 xx = otmp->ox;
                 yy = otmp->oy;
                 /* Nymphs take everything.  Most other creatures should not

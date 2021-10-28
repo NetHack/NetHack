@@ -1191,6 +1191,12 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
     for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
 
+        /* avoid special items; once hero picks them up, they'll cease
+           being special, becoming eligible for engulf and devore if
+           dropped again */
+        if (is_mines_prize(otmp) || is_soko_prize(otmp))
+            continue;
+
         /* touch sensitive items */
         if (otmp->otyp == CORPSE && is_rider(&mons[otmp->corpsenm])) {
             int ox = otmp->ox, oy = otmp->oy;
@@ -1493,6 +1499,12 @@ mpickstuff(register struct monst* mtmp, register const char* str)
 
     for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
+
+        /* avoid special items; once hero picks them up, they'll cease
+           being special, becoming eligible for normal pickup */
+        if (is_mines_prize(otmp) || is_soko_prize(otmp))
+            continue;
+
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
         if (!str ? searches_for_item(mtmp, otmp)
                  : !!(index(str, otmp->oclass))) {

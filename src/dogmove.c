@@ -441,7 +441,9 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 #ifdef MAIL_STRUCTURES
             && obj->otyp != SCR_MAIL
 #endif
-            ) {
+            /* avoid special items; once hero picks them up, they'll cease
+               being special and become eligible for normal monst activity */
+            && !(is_mines_prize(obj) || is_soko_prize(obj))) {
             int edible = dogfood(mtmp, obj);
 
             if ((edible <= CADAVER
