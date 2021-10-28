@@ -215,9 +215,11 @@ tilename(int set, const int file_entry, int gend UNUSED)
                  ++condnum) {
                 if (conditionals[condnum].sequence == MON_GLYPH
                     && conditionals[condnum].predecessor == i) {
-                    tilenum += 2;
-                    if (tilenum == file_entry)
-                        return conditionals[condnum].name;
+                    for (k = 0; k < 2; k++) { /* male and female */
+                        tilenum++;
+                        if (tilenum == file_entry)
+                            return conditionals[condnum].name;
+                    }
                 }
             }
             tilenum++;

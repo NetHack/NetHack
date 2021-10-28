@@ -46,7 +46,7 @@ Z = (195, 195, 195)
   PPAPPPPPPJPPPPPP
   PPPPPPPPPPPPPPPP
 }
-# tile 1 (vertical wall)
+# tile 1 (main walls vertical)
 {
   ANNOA1PPPPP1NNOA
   AOOOA1P1PP11OOOA
@@ -65,7 +65,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 2 (horizontal wall)
+# tile 2 (main walls horizontal)
 {
   AAANOOAAAAANOOAA
   OOONOOA1OOONOOA1
@@ -84,7 +84,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 3 (top left corner wall)
+# tile 3 (main walls tlcorn)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -103,7 +103,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 4 (top right corner wall)
+# tile 4 (main walls trcorn)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -122,7 +122,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 5 (bottom left corner wall)
+# tile 5 (main walls blcorn)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -141,7 +141,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 6 (bottom right corner wall)
+# tile 6 (main walls brcorn)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -160,7 +160,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 7 (cross wall)
+# tile 7 (main walls cross wall)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -179,7 +179,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 8 (tuwall)
+# tile 8 (main walls tuwall)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -198,7 +198,7 @@ Z = (195, 195, 195)
   1111111111111111
   AAAAAAAAAAAAAAAA
 }
-# tile 9 (tdwall)
+# tile 9 (main walls tdwall)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -217,7 +217,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 10 (tlwall)
+# tile 10 (main walls tlwall)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
@@ -236,7 +236,7 @@ Z = (195, 195, 195)
   A111A11PPPP1111A
   AOPPA11PPPP1OP1A
 }
-# tile 11 (trwall)
+# tile 11 (main walls trwall)
 {
   AAANNNNOOOOOOAAA
   NNNNAA11PPPPO111
