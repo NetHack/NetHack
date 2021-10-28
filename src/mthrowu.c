@@ -247,9 +247,7 @@ monshoot(struct monst* mtmp, struct obj* otmp, struct obj* mwep)
             onm = obj_is_pname(otmp) ? the(onm) : an(onm);
         }
         g.m_shot.s = ammo_and_launcher(otmp, mwep) ? TRUE : FALSE;
-        Strcpy(trgbuf, mtarg ? mon_nam(mtarg) : "");
-        if (!strcmp(trgbuf, "it"))
-            Strcpy(trgbuf, humanoid(mtmp->data) ? "someone" : something);
+        Strcpy(trgbuf, mtarg ? some_mon_nam(mtarg) : "");
         pline("%s %s %s%s%s!", Monnam(mtmp),
               g.m_shot.s ? "shoots" : "throws", onm,
               mtarg ? " at " : "", trgbuf);

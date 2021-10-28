@@ -1669,9 +1669,13 @@ rndghostname(void)
  *                seen        unseen       detected               named
  * mon_nam:     the newt        it      the invisible orc       Fido
  * noit_mon_nam:the newt (as if detected) the invisible orc     Fido
+ * some_mon_nam:the newt    someone     the invisible orc       Fido
+ *          or              something
  * l_monnam:    newt            it      invisible orc           dog called Fido
  * Monnam:      The newt        It      The invisible orc       Fido
  * noit_Monnam: The newt (as if detected) The invisible orc     Fido
+ * Some_Monnam: The newt    Someone     The invisible orc       Fido
+ *          or              Something
  * Adjmonnam:   The poor newt   It      The poor invisible orc  The poor Fido
  * Amonnam:     A newt          It      An invisible orc        Fido
  * a_monnam:    a newt          it      an invisible orc        Fido
@@ -1711,7 +1715,7 @@ x_monnam(
     char *buf = nextmbuf();
     struct permonst *mdat = mtmp->data;
     const char *pm_name = mon_pmname(mtmp);
-    boolean do_hallu, do_invis, do_it, do_saddle, do_name;
+    boolean do_hallu, do_invis, do_it, do_saddle, do_name, augment_it;
     boolean name_at_start, has_adjectives,
             falseCap = (*pm_name != lowc(*pm_name));
     char *bp;
@@ -1728,12 +1732,16 @@ x_monnam(
             && !(u.uswallow && mtmp == u.ustuck) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
     do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
+    augment_it = (suppress & AUGMENT_IT) != 0;
 
     buf[0] = '\0';
 
-    /* unseen monsters, etc.  Use "it" */
+    /* unseen monsters, etc.; usually "it" but sometimes more specific;
+       when hallucinating, the more specific values might be inverted */
     if (do_it) {
-        Strcpy(buf, "it");
+        Strcpy(buf, !augment_it ? "it"
+                    : (!do_hallu ? humanoid(mdat) : !rn2(2)) ? "someone"
+                      : "something");
         return buf;
     }
 
@@ -1908,8 +1916,19 @@ char *
 noit_mon_nam(struct monst *mtmp)
 {
     return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                    (has_mgivenname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
-                                      : SUPPRESS_IT,
+                    (has_mgivenname(mtmp) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+                                          : SUPPRESS_IT),
+                    FALSE);
+}
+
+/* in between noit_mon_nam() and mon_nam(); if the latter would pick "it",
+   use "someone" (for humanoids) or "something" (for others) instead */
+char *
+some_mon_nam(struct monst *mtmp)
+{
+    return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                    (has_mgivenname(mtmp) ? (SUPPRESS_SADDLE | AUGMENT_IT)
+                                          : AUGMENT_IT),
                     FALSE);
 }
 
@@ -1926,6 +1945,15 @@ char *
 noit_Monnam(struct monst *mtmp)
 {
     register char *bp = noit_mon_nam(mtmp);
+
+    *bp = highc(*bp);
+    return  bp;
+}
+
+char *
+Some_Monnam(struct monst *mtmp)
+{
+    char *bp = some_mon_nam(mtmp);
 
     *bp = highc(*bp);
     return  bp;

@@ -2166,15 +2166,7 @@ use_misc(struct monst* mtmp)
         if (vis || vistrapspot)
             seetrap(t);
         if (vismon || vistrapspot) {
-            const char *Mnam = Monnam(mtmp);
-
-            /* when the trap is seen but the monster isn't, Monnam()
-               will yield "It"; change that to "Someone" or "Something";
-               the canspotmon() check is to avoid making the change if
-               mtmp has been explicitly named "It" */
-            if (!strcmp(Mnam, "It") && !canspotmon(mtmp))
-                Mnam = humanoid(mtmp->data) ? "Someone" : "Something";
-            pline("%s deliberately %s onto a %s trap!", Mnam,
+            pline("%s deliberately %s onto a %s trap!", Some_Monnam(mtmp),
                   vtense(fakename[0], locomotion(mtmp->data, "jump")),
                   t->tseen ? "polymorph" : "hidden");
             /* note: if mtmp is unseen because it is invisible, its new

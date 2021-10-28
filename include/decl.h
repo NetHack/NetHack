@@ -310,13 +310,14 @@ E char emptystr[];
 #define ARTICLE_A 2
 #define ARTICLE_YOUR 3
 
-/* Monster name suppress masks */
+/* x_monnam() monster name suppress masks */
 #define SUPPRESS_IT 0x01
 #define SUPPRESS_INVISIBLE 0x02
 #define SUPPRESS_HALLUCINATION 0x04
 #define SUPPRESS_SADDLE 0x08
 #define EXACT_NAME 0x0F
 #define SUPPRESS_NAME 0x10
+#define AUGMENT_IT 0x20 /* use "someone" or "something" instead of "it" */
 
 /* Window system stuff */
 E NEARDATA winid WIN_MESSAGE;

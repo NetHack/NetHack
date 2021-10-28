@@ -745,12 +745,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     }
 
     if (see_it) { /* cansee(goldx, goldy) */
-        char monnambuf[BUFSZ];
-
-        Strcpy(monnambuf, Monnam(grd));
-        if (!strcmpi(monnambuf, "It"))
-            Strcpy(monnambuf, "Someone");
-        pline("%s%s picks up the gold%s.", monnambuf,
+        pline("%s%s picks up the gold%s.", Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
                  ? " calms down and" : "",
               under_u ? " from beneath you" : "");
