@@ -1340,6 +1340,7 @@ variable attknum was declared without initialization, and was used in
 	find_roll_to_hit() (pr #615 by argrath)
 check for NULL lua_State before calling lua_close() (pr #616 by argrath)
 use %lu, not %d, in format string in timer_sanity_check() (pr #617 by argrath)
+bad cast making sp_lev chameleon light source (pr #625 by entrez)
 
 
 Code Cleanup and Reorganization
