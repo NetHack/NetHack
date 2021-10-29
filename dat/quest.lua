@@ -128,7 +128,7 @@ Go now!  You are banished from this place.]],
          "\"Only thy reflection could love thee!\"",
          "\"Hast thou considered masking thine odour?\"",
          "\"Hold! Thy face is a most exquisite torture!\"",
-         "\"I shouldst fart in thy direction to improve thy smell!\"",
+         "\"I should fart in thy direction, but it might improve thy smell!\"",
       },
       legacy = {
          synopsis = "[%dC has chosen you to recover the Amulet of Yendor for %dI.]",
