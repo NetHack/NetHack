@@ -7087,7 +7087,8 @@ Bloodthirsty rats right behind you can give you wings.
 #
 #
 #
-%title Night Watch (7)
+%title Night Watch (12)
+# p. 393
 %passage 1
 When Mister Safety Catch Is Not On, Mister Crossbow Is Not Your Friend.
 
@@ -7213,11 +7214,102 @@ And they had to give the target a chance.
 
   [Night Watch, by Terry Pratchett]
 %e passage
+# p. 51
+%passage 8
+"We are here, and this is now."  Constable Visit, a strict believer in
+the Omnian religion, occasionally quoted from their holy book.  Vimes
+understood it to mean, in less exalted copperspeak, that you have to do
+the job that is in front of you.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 85 (Vimes fell through the roof of Unseen University's Library during
+#        a thunderstorm and ended up 30 years in the past; the Discworld's
+#        "history monks" aren't just observers and Lu-Tze wants to help
+#        Vimes get back to same time and circumstances that he came from)
+%passage 9
+"Oh, for heavens' sake, Lu-Tze!  This is completely unauthorized, you
+know!  We're supposed to prune out rogue history loops, not expend vast
+amounts of time keeping them going!"
+
+"This one's important.  We owe it to the man.  It wasn't his fault we had
+a temporal shattering just as he fell through the dome."
+
+"Two timelines running side by side," moaned Qu.  "That's quite
+unacceptable, you know.  I'm having to use techniques that are completely
+untried."
+
+"Yes, but it's only a few days."
+
+"What about Vimes?  Is he strong enough?  He's got no training for this!"
+
+"He defaults to being a copper.  A copper's a copper, wherever he is."
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 198 (young assassin is Vetinari, well before he eventually becomes
+#         Patrician; Sam Vimes is living as John Keel, a Watch sergeant,
+#         and among other things, training his younger self to be a Watchman)
+%passage 10
+"Really?  That doesn't sound like Swing.  How much do I owe you."
+
+The young man called Havelock gave a shrug.  "Call it a dollar," he said.
+
+"That's very cheap."
+
+"He wasn't worth more.  I should warn you, though.  Soon you may want me
+to deal with Keel."
+
+"Surely someone like him wouldn't side with people like Winder and Swing?"
+
+"He's a side all by himself.  He's a complication.  You may think it best
+if he... ceased to complicate."
+
+The rattling of the coach underlined the silence this remark caused.  It
+was moving through a richer part of the city now, where there was more
+light and the curfew, being for poorer people, was less rigorously
+observed.  The figure opposite the Assassin stroked the cat on her lap.
+
+"No.  He'll serve some purpose," said Madam.  "Everyone is telling me
+about Keel.  In a world where we all move in curves he proceeds in a
+straight line.  And going straight in a world of curves makes things
+happen."
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 199 (this is a continuation of the conversation in passage 10, with
+#         several paragraphs leading to it skipped; topic is now about a
+#         rare book that has callously been destroyed; a sentence about
+#         "dark green" is omitted)
+%passage 11
+"Ah.  It contained information of value.  [...]  Will you tell me?"
+
+"I /could/ tell you."  Havelock smiled again.  "But then I would have to
+find someone to pay me to kill you."
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 250
+%passage 12
+People on the side of The People always ended up disappointed, in any
+case.  They found that The People tended not to be grateful or
+appreciative or forward-thinking or obedient.  The People tended to
+be small-minded and conservative and not very clever and were even
+distrustful of cleverness.  And so, the children of the revolution
+were faced with the age-old problem:  it wasn't that you had the wrong
+kind of government, which was obvious, but that you had the wrong kind
+of people.
+
+As soon as you saw people as things to be measured, they didn't measure
+up.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title The Wee Free Men (9)
+%title The Wee Free Men (13)
 # p. 100 (HarperTempest edition; quin==queen;
 #         this rallying cry occurs multiple times; p. 167 has "/Nae quin!
 #         Nae king!  Nae laird!  Nae master!  We willna be fooled again!/",
@@ -7377,6 +7469,75 @@ and /Nac Mac Feegle/ shouldna turn up in the same sentence!"
 
 "Gettin' lost is something that happens to other people!" declared Rob
 Anybody.  "I want to make that point perfectly clear!"
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 2-3 (passage begins mid-paragraph)
+%passage 10
+The lowlands weren't good to witches.  Miss Tick was making pennies by
+doing bits of medicine and misfortune-telling,(1) and slept in barns
+most nights.  She'd twice been thrown into ponds.
+
+(1) Ordinary fortune-tellers tell you what you /want/ to happen; witches
+tell you what's going to happen whether you want it to or not.  Strangely
+enough, witches tend to be more accurate but less popular.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 103-104 (passage ends mid-paragraph; the talking toad has been loaned
+#              from Miss Tick to Tiffany; it is apparently a transformed human
+#              lawyer [Feegles' swords don't glow in its presence though :-]
+#              'ye', 'agin', 'distrainment', and hyphenated 'comp-li-cated'
+#              are all accurate)
+%passage 11
+"I'm the Big Man o' the clan, mistress," he said.  "An' my name it is..."
+he swallowed.  "Rob Anybody Feegle, mistress.  But I beg ye not to use it
+agin me!"
+
+The toad was ready for this.
+
+"They think names have magic in them," he murmured.  "They don't tell them
+to people in case they are written down."
+
+"Aye, an' put upon comp-li-cated documents," said a Feegle.
+
+"An' summonses and such things," said another.
+
+"Or 'Wanted' posters," said another.
+
+"Aye, an' bills an' affidavits," said another.
+
+"Writs of distrainment, even!"  The Feegles looked around in panic at the
+very thought of written-down things.
+
+"They think written words are even more powerful," whispered the toad.
+"They think all writing is magic.  Words worry them.  See their swords?
+They glow in the presense of lawyers."
+
+"All /right/," said Tiffany.  "We're getting somewhere.  I promise not
+to write his name down.  [...]"
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 130 ('whut' for 'what' is accurate)
+%passage 12
+"Whut's the plan, Rob?" said one of them.
+
+"Okay, lads, this is what we'll do.  As soon as we see somethin', we'll
+attack it.  Right?"
+
+This caused a cheer.
+
+"Ach, 'tis a good plan," said Daft Wullie.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 145 (passage ends mid-paragraph)
+%passage 13
+"On your honor as a drunken rowdy thief?" said Tiffany.
+
+Rob Anybody beamed.  "Aye!" he said.  "An' I got a lot of good big
+reputation to protect there!  [...]"
 
   [The Wee Free Men, by Terry Pratchett]
 %e passage
