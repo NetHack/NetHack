@@ -11,7 +11,7 @@
 
 static void putmesg(const char *);
 static char *You_buf(int);
-#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+#if defined(MSGHANDLER)
 static void execplinehandler(const char *);
 #endif
 #ifdef USER_SOUNDS
@@ -187,7 +187,7 @@ vpline(const char *line, va_list the_args)
 
     putmesg(line);
 
-#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+#if defined(MSGHANDLER)
     execplinehandler(line);
 #endif
 
@@ -486,7 +486,7 @@ vraw_printf(const char *line, va_list the_args)
         pbuf[BUFSZ - 1] = '\0'; /* terminate strncpy or truncate vsprintf */
     }
     raw_print(line);
-#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+#if defined(MSGHANDLER)
     execplinehandler(line);
 #endif
 }
@@ -528,7 +528,7 @@ impossible(const char *s, ...)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+#if defined(MSGHANDLER)
 static boolean use_pline_handler = TRUE;
 
 static void
@@ -546,6 +546,7 @@ execplinehandler(const char *line)
         return;
     }
 
+#if defined(POSIX_TYPES) || defined(__GNUC__)
     f = fork();
     if (f == 0) { /* child */
         args[0] = env;
@@ -566,8 +567,19 @@ execplinehandler(const char *line)
         use_pline_handler = FALSE;
         pline("%s", "Fork to message handler failed.");
     }
+#elif defined(WIN32)
+    {
+        intptr_t ret;
+        args[0] = env;
+        args[1] = line;
+        args[2] = NULL;
+        ret = _spawnv(_P_NOWAIT, env, args);
+    }
+#else
+#error MSGHANDLER is not implemented on this sysytem.
+#endif
 }
-#endif /* MSGHANDLER && (POSIX_TYPES || __GNUC__) */
+#endif /* MSGHANDLER */
 
 /*
  * varargs handling for files.c

@@ -554,7 +554,7 @@ typedef unsigned char uchar;
 /* NetHack will execute an external program whenever a new message-window
  * message is shown.  The program to execute is given in environment variable
  * NETHACK_MSGHANDLER.  It will get the message as the only parameter.
- * Only available with POSIX_TYPES or GNU C */
+ * Only available with POSIX_TYPES, GNU C, or WIN32 */
 /* #define MSGHANDLER */
 
 /* enable status highlighting via STATUS_HILITE directives in run-time
