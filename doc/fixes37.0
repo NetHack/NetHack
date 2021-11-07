@@ -678,6 +678,7 @@ prevent normal monster activity from picking up the mines' luckstone or the
 	Sokoban amulet/bag before hero has done so; relying on scare monster
 	and/or engraved Elbereth wasn't sufficient to guard the Sokoban prize
 proceed a little further into dochat() if hero is deaf
+stacks of 1 to 49 gold pieces weighed 0
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

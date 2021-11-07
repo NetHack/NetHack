@@ -1654,6 +1654,11 @@ weight(struct obj *obj)
 {
     int wt = (int) objects[obj->otyp].oc_weight;
 
+    if (obj->quan < 1L) {
+        impossible("Calculating weight of %ld %s?",
+                   obj->quan, simpleonames(obj));
+        return 0;
+    }
     /* glob absorpsion means that merging globs accumulates weight while
        quantity stays 1, so update 'wt' to reflect that, unless owt is 0,
        when we assume this is a brand new glob so use objects[].oc_weight */
@@ -1699,7 +1704,9 @@ weight(struct obj *obj)
     } else if (obj->oclass == FOOD_CLASS && obj->oeaten) {
         return eaten_stat((int) obj->quan * wt, obj);
     } else if (obj->oclass == COIN_CLASS) {
-        return (int) ((obj->quan + 50L) / 100L);
+        /* 3.7: always weigh at least 1 unit; used to yield 0 for 1..49 */
+        wt = (int) ((obj->quan + 50L) / 100L);
+        return max(wt, 1);
     } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
         return (int) obj->owt; /* kludge for "very" heavy iron ball */
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->spe) {
