@@ -1086,12 +1086,7 @@ dochat(void)
         Your("speech is unintelligible underwater.");
         return 0;
     }
-    if (Deaf) {
-        pline("How can you hold a conversation when you cannot hear?");
-        return 0;
-    }
-
-    if (!Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *) 0) {
+    if (!Deaf && !Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *) 0) {
         /* standing on something in a shop and chatting causes the shopkeeper
            to describe the price(s).  This can inhibit other chatting inside
            a shop, but that shouldn't matter much.  shop_object() returns an
@@ -1153,7 +1148,7 @@ dochat(void)
                           Hallucination ? rndmonnam((char *) 0) : "statue");
             return 0;
         }
-        if (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR) {
+        if (!Deaf && (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR)) {
             /* Talking to a wall; secret door remains hidden by behaving
                like a wall; IS_WALL() test excludes solid rock even when
                that serves as a wall bordering a corridor */
@@ -1201,13 +1196,23 @@ dochat(void)
     /* if this monster is waiting for something, prod it into action */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
 
-    if (mtmp->mtame && mtmp->meating) {
+    if (!Deaf && mtmp->mtame && mtmp->meating) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         pline("%s is eating noisily.", Monnam(mtmp));
         return 0;
     }
+    if (Deaf) {
+        const char *xresponse = humanoid(g.youmonst.data)
+                    ? "falls on deaf ears"
+                    : "is inaudible";
 
+        pline("Any response%s%s %s.",
+              canspotmon(mtmp) ? " from " : "",
+              canspotmon(mtmp) ? mon_nam(mtmp) : "",
+              xresponse);
+        return 0;
+    }
     return domonnoise(mtmp);
 }
 

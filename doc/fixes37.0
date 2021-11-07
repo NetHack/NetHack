@@ -677,6 +677,7 @@ handle flipped level when fixing up the baalz level "eyes" too
 prevent normal monster activity from picking up the mines' luckstone or the
 	Sokoban amulet/bag before hero has done so; relying on scare monster
 	and/or engraved Elbereth wasn't sufficient to guard the Sokoban prize
+proceed a little further into dochat() if hero is deaf
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
