@@ -1381,7 +1381,8 @@ shrink_glob(
     iflags.partly_eaten_hack = FALSE;
 
     if (obj->owt > 0) {
-        shrink = (obj->owt % 20) == 0;
+        /* objects[].oc_weight for all globs is 20 */
+        shrink = (obj->owt % objects[obj->otyp].oc_weight) == 0;
         obj->owt -= 1;
         /* if glob is partly eaten, reduce the amount still available (but
            not all the way to 0 which would change it back to untouched) */
@@ -1401,6 +1402,11 @@ shrink_glob(
                   gone ? "dissippates completely" : "shrinks");
         updinv = TRUE;
     } else if (contnr) {
+        /* if obj->owt has dropped to 0, weight() will assume that this is a
+           brand new glob and use 20 instead; that would yield an incorrect
+           total weight for enclosing container(s), so take it out now */
+        if (gone)
+            obj_extract_self(obj);
         /* when in a container, it might be nested so find outermost one */
         topcontnr = contnr;
         while (topcontnr->where == OBJ_CONTAINED)
@@ -1409,7 +1415,7 @@ shrink_glob(
            container(s) haven't been adjusted for that yet */
         old_top_owt = topcontnr->owt;
         /* update those weights now; recursively updates nested containers */
-        container_weight(obj->ocontainer);
+        container_weight(contnr);
 
         if (topcontnr->where == OBJ_INVENT) {
             /* for regular containers, the weight will always be reduced
@@ -1421,13 +1427,13 @@ shrink_glob(
                however, always say the bag is lighter for the 'gone' case */
             if (gone || (shrink && topcontnr->owt != old_top_owt)
                 || near_capacity() != g.oldcap)
-                pline("%s %s %s lighter.", Yname2(topcontnr),
+                pline("%s %s%s lighter.", Yname2(topcontnr),
                       /* containers also always have quantity 1 */
                       (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
                       /* TODO?  maybe also skip "slightly" if description
                          is changing (from "very large" to "large",
                          "large" to "medium", or "medium to "small") */
-                      !gone ? "slightly " : "");
+                      !gone ? " slightly" : "");
             updinv = TRUE;
         }
     }
@@ -1439,8 +1445,10 @@ shrink_glob(
                          && get_obj_location(obj, &ox, &oy, 0)
                          && cansee(ox, oy));
 
-        /* weight has been reduced to 0 so destroy the glob */
-        obj_extract_self(obj);
+        /* weight has been reduced to 0 so destroy the glob; if it was
+           contained, it has already been removed from its container above */
+        if (obj->where != OBJ_FREE)
+            obj_extract_self(obj);
         obfree(obj, (struct obj *) 0);
 
         if (seeit) {
@@ -1675,8 +1683,9 @@ weight(struct obj *obj)
          *  weight equations.
          */
         if (obj->otyp == BAG_OF_HOLDING)
-            cwt = obj->cursed ? (cwt * 2) : obj->blessed ? ((cwt + 3) / 4)
-                                                         : ((cwt + 1) / 2);
+            cwt = obj->cursed ? (cwt * 2)
+                  : obj->blessed ? ((cwt + 3) / 4)
+                    : ((cwt + 1) / 2); /* uncursed */
 
         return wt + cwt;
     }
@@ -1699,7 +1708,9 @@ weight(struct obj *obj)
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }
 
-static const int treefruits[] = { APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF };
+static const int treefruits[] = {
+    APPLE, ORANGE, PEAR, BANANA, EUCALYPTUS_LEAF
+};
 
 /* called when a tree is kicked; never returns Null */
 struct obj *
