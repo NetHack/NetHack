@@ -2351,12 +2351,7 @@ in_container(struct obj *obj)
     /* boxes, boulders, and big statues can't fit into any container */
     if (obj->otyp == ICE_BOX || Is_box(obj) || obj->otyp == BOULDER
         || (obj->otyp == STATUE && bigmonst(&mons[obj->corpsenm]))) {
-        /*
-         *  xname() uses a static result array.  Save obj's name
-         *  before g.current_container's name is computed.  Don't
-         *  use the result of strcpy() within You() --- the order
-         *  of evaluation of the parameters is undefined.
-         */
+        /* consumes multiple obufs but not enough to overwrite the result */
         Strcpy(buf, the(xname(obj)));
         You("cannot fit %s into %s.", buf, the(xname(g.current_container)));
         return 0;
@@ -2391,6 +2386,8 @@ in_container(struct obj *obj)
             /* if this is the corpse of a cancelled ice troll, uncancel it */
             if (obj->corpsenm == PM_ICE_TROLL && has_omonst(obj))
                 OMONST(obj)->mcan = 0;
+        } else if (obj->globby && obj->timed) {
+            (void) stop_timer(SHRINK_GLOB, obj_to_any(obj));
         }
     } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
         /* explicitly mention what item is triggering the explosion */
@@ -2531,6 +2528,9 @@ removed_from_icebox(struct obj *obj)
                otherwise start a rot-away timer (even for other trolls) */
             obj->norevive = iceT ? 0 : 1;
             start_corpse_timeout(obj);
+        } else if (obj->globby) {
+            /* non-frozen globs gradually shrink away to nothing */
+            start_glob_timeout(obj, 0L);
         }
     }
 }

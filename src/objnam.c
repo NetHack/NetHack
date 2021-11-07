@@ -502,10 +502,7 @@ xname_flags(
     if (!Blind && !g.distantname)
         obj->dknown = 1;
     if (Role_if(PM_CLERIC))
-        obj->bknown = 1; /* actively avoid set_bknown();
-                          * we mustn't call update_inventory() now because
-                          * it would call xname() (via doname()) recursively
-                          * and could end up clobbering all the obufs... */
+        obj->bknown = 1; /* avoid set_bknown() to bypass update_inventory() */
 
     if (iflags.override_ID) {
         known = dknown = bknown = TRUE;
@@ -604,6 +601,7 @@ xname_flags(
             Strcat(buf, dn);
         break;
     case FOOD_CLASS:
+        /* we could include partly-eaten-hack on fruit but don't need to */
         if (typ == SLIME_MOLD) {
             struct fruit *f = fruit_from_indx(obj->spe);
 
@@ -630,15 +628,22 @@ xname_flags(
             }
             break;
         }
+        if (iflags.partly_eaten_hack && obj->oeaten) {
+            /* normally "partly eaten" is supplied by doname() when
+               appropriate and omitted by xname(); shrink_glob() wants
+               it but uses Yname2() -> yname() -> xname() rather than
+               doname() so we've added an external flag to request it */
+            Strcat(buf, "partly eaten ");
+        }
         if (obj->globby) {
-            Sprintf(buf, "%s%s",
+            Sprintf(eos(buf), "%s%s",
                     (obj->owt <= 100)
                        ? "small "
                        : (obj->owt > 500)
                           ? "very large "
                           : (obj->owt > 300)
                              ? "large "
-                             : "",
+                             : "medium ",
                     actualn);
             break;
         }
@@ -3404,7 +3409,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
     d->name = (const char *) 0;
     d->ftype = g.context.current_fruit;
     (void) memset(d->globbuf, '\0', sizeof d->globbuf);
-    (void) memset(d->fruitbuf, '\0', sizeof d->globbuf);
+    (void) memset(d->fruitbuf, '\0', sizeof d->fruitbuf);
 }
 
 /* return 1 if d->bp is empty or contains only various qualifiers like
@@ -3550,9 +3555,11 @@ readobjnam_preparse(struct _readobjnam_data *d)
                 break;
             d->gsize = 1;
         } else if (!strncmpi(d->bp, "medium ", l = 7)) {
-            /* xname() doesn't display "medium" but without this
-               there'd be no way to ask for the intermediate size
-               ("glob" without size prefix yields smallest one) */
+            /* 3.7: in 3.6, "medium" was only used during wishing and the
+               mid-size glob had no adjective when formatted, but as of
+               3.7, "medium" has become an explicit part of the name for
+               combined globs of at least 5 individual ones (owt >= 100)
+               and less than 15 (owt < 300) */
             d->gsize = 2;
         } else if (!strncmpi(d->bp, "large ", l = 6)) {
             /* "large" might be part of monster name (dog, cat, koboold,

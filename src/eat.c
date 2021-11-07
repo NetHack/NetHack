@@ -1633,15 +1633,16 @@ eatcorpse(struct obj *otmp)
             rotted -= 2L;
     }
 
-    if (mnum != PM_ACID_BLOB && !stoneable && !slimeable && rotted > 5L) {
+    /* 3.7: globs don't become tainted, they shrink away */
+    if (mnum != PM_ACID_BLOB && !glob && !stoneable && !slimeable
+        && rotted > 5L) {
         boolean cannibal = maybe_cannibal(mnum, FALSE);
 
         /* tp++; -- early return makes this unnecessary */
         pline("Ulch - that %s was tainted%s!",
               (mons[mnum].mlet == S_FUNGUS) ? "fungoid vegetation"
-                  : glob ? "glob"
-                      : vegetarian(&mons[mnum]) ? "protoplasm"
-                          : "meat",
+              : vegetarian(&mons[mnum]) ? "protoplasm"
+                : "meat",
               cannibal ? ", you cannibal" : "");
         if (Sick_resistance) {
             pline("It doesn't seem at all sickening, though...");
@@ -1801,6 +1802,13 @@ start_eating(struct obj *otmp, boolean already_partly_eaten)
 
     Sprintf(msgbuf, "eating %s", food_xname(otmp, TRUE));
     set_occupation(eatfood, msgbuf, 0);
+}
+
+/* used by shrink_glob() timer routine */
+boolean
+eating_glob(struct obj *glob)
+{
+    return (g.occupation == eatfood && glob == g.context.victual.piece);
 }
 
 /*
@@ -2322,8 +2330,8 @@ edibility_prompts(struct obj *otmp)
      */
     char buf[BUFSZ], foodsmell[BUFSZ],
          it_or_they[QBUFSZ], eat_it_anyway[QBUFSZ];
-    boolean cadaver = (otmp->otyp == CORPSE || otmp->globby),
-            stoneorslime = FALSE;
+    /* 3.7: decaying globs don't become tainted anymore; in 3.6, they did */
+    boolean cadaver = (otmp->otyp == CORPSE), stoneorslime = FALSE;
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
 
@@ -2334,7 +2342,9 @@ edibility_prompts(struct obj *otmp)
 
     if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
         /* These checks must match those in eatcorpse() */
-        stoneorslime = (mnum >= LOW_PM && flesh_petrifies(&mons[mnum]) && !Stone_resistance
+        stoneorslime = (mnum >= LOW_PM
+                        && flesh_petrifies(&mons[mnum])
+                        && !Stone_resistance
                         && !poly_when_stoned(g.youmonst.data));
 
         if (mnum == PM_GREEN_SLIME || otmp->otyp == GLOB_OF_GREEN_SLIME)

@@ -236,11 +236,10 @@ loot_xname(struct obj *obj)
        three group together */
     if (obj->otyp == TOWEL)
         obj->spe = 0;
-    /* group "<size> glob of <foo>" by <foo> rather than by <size> */
+    /* group globs by monster type rather than by size:  force all to
+       have the same size adjective hence same "small glob of " prefix */
     if (obj->globby)
-        obj->owt = 200; /* 200: weight of combined glob from ten creatures
-                           (five or fewer is "small", more than fifteen is
-                           "large", in between has no prefix) */
+        obj->owt = 20; /* weight of a fresh glob (one pudding's worth) */
     /* suppress user-assigned name */
     if (save_oname && !obj->oartifact)
         ONAME(obj) = 0;

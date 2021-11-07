@@ -7,6 +7,7 @@
 
 static void mkbox_cnts(struct obj *);
 static unsigned nextoid(struct obj *, struct obj *);
+static int item_on_ice(struct obj *);
 static void obj_timer_checks(struct obj *, xchar, xchar, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
@@ -877,6 +878,7 @@ mksobj(int otyp, boolean init, boolean artif)
                 otmp->known = otmp->dknown = 1;
                 otmp->corpsenm = PM_GRAY_OOZE
                                  + (otmp->otyp - GLOB_OF_GRAY_OOZE);
+                start_glob_timeout(otmp, 0L);
             } else {
                 if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING
                     && otmp->otyp != KELP_FROND && !rn2(6)) {
@@ -1262,6 +1264,201 @@ start_corpse_timeout(struct obj *body)
     }
 
     (void) start_timer(when, TIMER_OBJECT, action, obj_to_any(body));
+}
+
+/* used by item_on_ice() and shrink_glob() */
+enum obj_on_ice {
+    NOT_ON_ICE = 0,
+    SET_ON_ICE = 1,
+    BURIED_UNDER_ICE = 2
+};
+
+/* used by shrink_glob(); is 'item' or enclosing container on or under ice? */
+static int
+item_on_ice(struct obj *item)
+{
+    struct obj *otmp;
+    xchar ox, oy;
+
+    otmp = item;
+    /* if in a container, it might be nested so find outermost one since
+       that's the item whose location needs to be checked */
+    while (otmp->where == OBJ_CONTAINED)
+        otmp = otmp->ocontainer;
+
+    if (get_obj_location(otmp, &ox, &oy, BURIED_TOO)) {
+        switch (otmp->where) {
+        case OBJ_FLOOR:
+            if (is_ice(ox, oy))
+                return SET_ON_ICE;
+            break;
+        case OBJ_BURIED:
+            if (is_ice(ox, oy))
+                return BURIED_UNDER_ICE;
+            break;
+        default:
+            break;
+        }
+    }
+    return NOT_ON_ICE;
+}
+
+/* schedule a timer that will shrink the target glob by 1 unit of weight */
+void
+start_glob_timeout(
+    struct obj *obj, /* glob */
+    long when)       /* when to shrink; if 0L, use random value close to 25 */
+{
+    if (!obj->globby) {
+        impossible("start_glob_timeout for non-glob [%s: %s]?",
+                   obj->otyp, simpleonames(obj));
+        return; /* skip timer creation */
+    }
+    /* sanity precaution */
+    if (obj->timed)
+        (void) stop_timer(SHRINK_GLOB, obj_to_any(obj));
+
+    if (when < 1L) /* caller usually passes 0L; should never be negative */
+        when = 25L + (long) rn2(5) - 2L; /* 25+[0..4]-2 => 23..27, avg 25 */
+    /* 1 new glob weighs 20 units and loses 1 unit every 25 turns,
+       so lasts for 500 turns, twice as long as the average corpse */
+    (void) start_timer(when, TIMER_OBJECT, SHRINK_GLOB, obj_to_any(obj));
+}
+
+/* globs have quantity 1 and size which varies by multiples of 20 in owt;
+   they don't become tainted with age, but every 25 turns this timer runs
+   and reduces owt by 1; when it hits 0, destroy the glob (if some other
+   part of the program destroys it, the timer will be cancelled) */
+void
+shrink_glob(
+    anything *arg,           /* glob (in arg->a_obj) */
+    long expire_time UNUSED) /* timer callback data, not referenced here */
+{
+    char globnambuf[BUFSZ];
+    int globloc;
+    struct obj *obj = arg->a_obj;
+    boolean ininv = (obj->where == OBJ_INVENT),
+            shrink = FALSE, gone = FALSE, updinv = FALSE;
+    struct obj *contnr = (obj->where == OBJ_CONTAINED) ? obj->ocontainer : 0,
+               *topcontnr = 0;
+    unsigned old_top_owt = 0;
+
+    if (!obj->globby) {
+        impossible("shrink_glob for non-glob [%s: %s]?",
+                   obj->otyp, simpleonames(obj));
+        return; /* old timer is gone, don't start a new one */
+    }
+    /* note: if check_glob() complains about a problem, the " obj " here
+       will be replaced in the feedback with info about this glob */
+    check_glob(obj, "shrink obj ");
+
+    /*
+     * When on ice, only shrink every third try.  If buried under ice,
+     * don't shrink at all, similar to being contained in an ice box
+     * except that the timer remains active.  [FIXME:  stop the timer
+     * for obj in pool that becomes frozen, restart it if/when unburied.]
+     *
+     * If the glob is actively being eaten by hero, skip weight reduction
+     * to avoid messing up the context.victual data (if/when eaten by a
+     * monster, timer won't have a chance to run before meal is finished).
+     */
+    if (eating_glob(obj)
+        || (globloc = item_on_ice(obj)) == BURIED_UNDER_ICE
+        || (globloc == SET_ON_ICE && (g.moves % 3L) == 1L)) {
+        /* schedule next shrink attempt; for the being eaten case, the
+           glob and its timer might be deleted before this kicks in */
+        start_glob_timeout(obj, 0L);
+        return;
+    }
+
+    /* format "Your/Shk's/The [partly eaten] glob of <goo>" into
+       globnambuf[] before shrinking the glob; Yname2() calls yname()
+       which calls xname() which ordinarly leaves "partly eaten" to
+       doname() rather than inserting that itself; ask xname() to add
+       that when appropriate */
+    iflags.partly_eaten_hack = TRUE;
+    Strcpy(globnambuf, Yname2(obj));
+    iflags.partly_eaten_hack = FALSE;
+
+    if (obj->owt > 0) {
+        shrink = (obj->owt % 20) == 0;
+        obj->owt -= 1;
+        /* if glob is partly eaten, reduce the amount still available (but
+           not all the way to 0 which would change it back to untouched) */
+        if (obj->oeaten > 1)
+            obj->oeaten -= 1;
+    }
+    gone = !obj->owt;
+
+    /* timer might go off when the glob is migrating to another level and
+       possibly delete it; messages are only given for in-open-inventory,
+       inside-container-in-invent, and going away when can-see-on-floor */
+    if (ininv) {
+        if (shrink || gone)
+            pline("%s %s.", globnambuf,
+                  /* globs always have quantity 1 so we don't need otense()
+                     because the verb always references a singular item */
+                  gone ? "dissippates completely" : "shrinks");
+        updinv = TRUE;
+    } else if (contnr) {
+        /* when in a container, it might be nested so find outermost one */
+        topcontnr = contnr;
+        while (topcontnr->where == OBJ_CONTAINED)
+            topcontnr = topcontnr->ocontainer;
+        /* obj's weight has been reduced, but weight(s) of enclosing
+           container(s) haven't been adjusted for that yet */
+        old_top_owt = topcontnr->owt;
+        /* update those weights now; recursively updates nested containers */
+        container_weight(obj->ocontainer);
+
+        if (topcontnr->where == OBJ_INVENT) {
+            /* for regular containers, the weight will always be reduced
+               when glob's weight has been reduced but we only say so
+               when shrinking beneath an integral number of globs or
+               if we're going to report a change in carrying capacity;
+               for a non-cursed bag of holding the total weight might not
+               change because only a fraction of glob's weight is counted;
+               however, always say the bag is lighter for the 'gone' case */
+            if (gone || (shrink && topcontnr->owt != old_top_owt)
+                || near_capacity() != g.oldcap)
+                pline("%s %s %s lighter.", Yname2(topcontnr),
+                      /* containers also always have quantity 1 */
+                      (topcontnr->owt != old_top_owt) ? "becomes" : "seems",
+                      /* TODO?  maybe also skip "slightly" if description
+                         is changing (from "very large" to "large",
+                         "large" to "medium", or "medium to "small") */
+                      !gone ? "slightly " : "");
+            updinv = TRUE;
+        }
+    }
+
+    if (gone) {
+        xchar ox = 0, oy = 0;
+        /* check location for visibility before destroying obj */
+        boolean seeit = (obj->where == OBJ_FLOOR
+                         && get_obj_location(obj, &ox, &oy, 0)
+                         && cansee(ox, oy));
+
+        /* weight has been reduced to 0 so destroy the glob */
+        obj_extract_self(obj);
+        obfree(obj, (struct obj *) 0);
+
+        if (seeit) {
+            newsym(ox, oy);
+            if ((ox != u.ux || oy != u.uy) && !strncmp(globnambuf, "The ", 4))
+                /* fortunately none of the glob adjectives warrant "An " */
+                (void) strsubst(globnambuf, "The ", "A ");
+            /* again, quantity is always 1 so no need for otense()/vtense() */
+            pline("%s fades away.", globnambuf);
+        }
+    } else {
+        /* schedule next shrink ~25 turns from now */
+        start_glob_timeout(obj, 0L);
+    }
+    if (updinv) {
+        update_inventory();
+        (void) encumber_msg();
+    }
 }
 
 void
@@ -2636,9 +2833,15 @@ check_glob(struct obj *obj, const char *mesg)
 #define HIGHEST_GLOB GLOB_OF_BLACK_PUDDING
     if (obj->quan != 1L || obj->owt == 0
         || obj->otyp < LOWEST_GLOB || obj->otyp > HIGHEST_GLOB
+#if 0   /*
+         * This was relevant before the shrink_glob timer was adopted but
+         * now any glob could have a weight that isn't a multiple of 20.
+         */
         /* a partially eaten glob could have any non-zero weight but an
            intact one should weigh an exact multiple of base weight (20) */
-        || ((obj->owt % objects[obj->otyp].oc_weight) != 0 && !obj->oeaten)) {
+        || ((obj->owt % objects[obj->otyp].oc_weight) != 0 && !obj->oeaten)
+#endif
+        ) {
         char mesgbuf[BUFSZ], globbuf[QBUFSZ];
 
         Sprintf(globbuf, " glob %d,quan=%ld,owt=%u ",
@@ -2902,12 +3105,11 @@ obj_nexto_xy(struct obj *obj, int x, int y, boolean recurs)
 }
 
 /*
- * Causes one object to absorb another, increasing
- * weight accordingly. Frees obj2; obj1 remains and
- * is returned.
+ * Causes one object to absorb another, increasing weight
+ * accordingly.  Frees obj2; obj1 remains and is returned.
  */
 struct obj *
-obj_absorb(struct obj** obj1, struct obj** obj2)
+obj_absorb(struct obj **obj1, struct obj **obj2)
 {
     struct obj *otmp1, *otmp2;
     int o1wt, o2wt;
@@ -2934,11 +3136,22 @@ obj_absorb(struct obj** obj1, struct obj** obj2)
             agetmp = (((g.moves - otmp1->age) * o1wt
                        + (g.moves - otmp2->age) * o2wt)
                       / (o1wt + o2wt));
-            otmp1->age = g.moves - agetmp; /* conv. relative back to absolute */
+            /* convert relative age back to absolute age */
+            otmp1->age = g.moves - agetmp;
             otmp1->owt += o2wt;
             if (otmp1->oeaten || otmp2->oeaten)
                 otmp1->oeaten = o1wt + o2wt;
             otmp1->quan = 1L;
+            if (otmp1->globby && otmp2->globby) {
+                /* average (not weighted, no pun intended) the two globs'
+                   shrink timers and use that to give otmp1 a new timer */
+                long tm1 = stop_timer(SHRINK_GLOB, obj_to_any(otmp1)),
+                     tm2 = stop_timer(SHRINK_GLOB, obj_to_any(otmp2));
+
+                tm1 = ((tm1 ? tm1 : 25L) + (tm2 ? tm2 : 25L) + 1L) / 2L;
+                start_glob_timeout(otmp1, tm1);
+            }
+            /* get rid of second glob, return augmented first one */
             obj_extract_self(otmp2);
             dealloc_obj(otmp2);
             *obj2 = (struct obj *) 0;

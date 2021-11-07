@@ -1011,7 +1011,7 @@ learn_egg_type(int mnum)
 
 /* Attach a fig_transform timeout to the given figurine. */
 void
-attach_fig_transform_timeout(struct obj* figurine)
+attach_fig_transform_timeout(struct obj *figurine)
 {
     int i;
 
@@ -1120,7 +1120,7 @@ slip_or_trip(void)
 
 /* Print a lamp flicker message with tailer. */
 static void
-see_lamp_flicker(struct obj* obj, const char* tailer)
+see_lamp_flicker(struct obj *obj, const char *tailer)
 {
     switch (obj->where) {
     case OBJ_INVENT:
@@ -1135,7 +1135,7 @@ see_lamp_flicker(struct obj* obj, const char* tailer)
 
 /* Print a dimming message for brass lanterns. */
 static void
-lantern_message(struct obj* obj)
+lantern_message(struct obj *obj)
 {
     /* from adventure */
     switch (obj->where) {
@@ -1158,7 +1158,7 @@ lantern_message(struct obj* obj)
  * See begin_burn() for meanings of obj->age and obj->spe.
  */
 void
-burn_object(anything* arg, long timeout)
+burn_object(anything *arg, long timeout)
 {
     struct obj *obj = arg->a_obj;
     boolean canseeit, many, menorah, need_newsym, need_invupdate;
@@ -1466,7 +1466,7 @@ burn_object(anything* arg, long timeout)
  * This is a "silent" routine - it should not print anything out.
  */
 void
-begin_burn(struct obj* obj, boolean already_lit)
+begin_burn(struct obj *obj, boolean already_lit)
 {
     int radius = 3;
     long turns = 0;
@@ -1558,7 +1558,7 @@ begin_burn(struct obj* obj, boolean already_lit)
  * light source.
  */
 void
-end_burn(struct obj* obj, boolean timer_attached)
+end_burn(struct obj *obj, boolean timer_attached)
 {
     if (!obj->lamplit) {
         impossible("end_burn: obj %s not lit", xname(obj));
@@ -1582,19 +1582,18 @@ end_burn(struct obj* obj, boolean timer_attached)
  * Cleanup a burning object if timer stopped.
  */
 static void
-cleanup_burn(anything* arg, long expire_time)
+cleanup_burn(anything *arg, long expire_time)
 {
     struct obj *obj = arg->a_obj;
+
     if (!obj->lamplit) {
         impossible("cleanup_burn: obj %s not lit", xname(obj));
         return;
     }
 
     del_light_source(LS_OBJECT, obj_to_any(obj));
-
     /* restore unused time */
     obj->age += expire_time - g.moves;
-
     obj->lamplit = 0;
 
     if (obj->where == OBJ_INVENT)
@@ -1721,15 +1720,9 @@ typedef struct {
     timeout_proc f, cleanup;
 #ifdef VERBOSE_TIMER
     const char *name;
-#define TTAB(a, b, c) \
-    {                 \
-        a, b, c       \
-    }
+#define TTAB(a, b, c) { a, b, c }
 #else
-#define TTAB(a, b, c) \
-    {                 \
-        a, b          \
-    }
+#define TTAB(a, b, c) { a, b } /* ignore c for !VERBOSE_TIMER */
 #endif
 } ttable;
 
@@ -1742,7 +1735,8 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(burn_object, cleanup_burn, "burn_object"),
     TTAB(hatch_egg, (timeout_proc) 0, "hatch_egg"),
     TTAB(fig_transform, (timeout_proc) 0, "fig_transform"),
-    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away")
+    TTAB(melt_ice_away, (timeout_proc) 0, "melt_ice_away"),
+    TTAB(shrink_glob, (timeout_proc) 0, "shrink_glob"),
 };
 #undef TTAB
 

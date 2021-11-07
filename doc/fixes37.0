@@ -1228,6 +1228,10 @@ branch stairs have a different glyph, show up in yellow color in tty
 duration of confusion when drinking booze depends upon hunger state
 using 'D' allows dropping items picked up previously
 bones piles can be ransacked by adjacent monsters
+decaying globs of {ooze,pudding,slime} shrink over time based on their total
+	weight, eventually to nothing; for combined globs it can take a long
+	time, and while doing so they no longer give the tainted corpse food
+	poisoning effect when eaten
 
 
 Platform- and/or Interface-Specific New Features
