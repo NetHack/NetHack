@@ -2763,7 +2763,7 @@ use_whip(struct obj *obj)
                 (void) fire_damage(uwep, FALSE, u.ux, u.uy);
             return 1;
         }
-        if (Levitation || u.usteed) {
+        if (Flying || Levitation || u.usteed) {
             /* Have a shot at snaring something on the floor */
             otmp = g.level.objects[u.ux][u.uy];
             if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
