@@ -1380,9 +1380,14 @@ shrink_glob(
     Strcpy(globnambuf, Yname2(obj));
     iflags.partly_eaten_hack = FALSE;
 
-    if (obj->owt > 0) {
-        /* objects[].oc_weight for all globs is 20 */
-        shrink = (obj->owt % objects[obj->otyp].oc_weight) == 0;
+    if (obj->owt > 0) { /* sanity precaution */
+        /* globs start out weighing 20 units; give two messages per glob,
+           when going from 20 to 19 and from 10 to 9; a different message
+           is given for going from 1 to 0 (gone) */
+        unsigned basewt = objects[obj->otyp].oc_weight, /* 20 */
+                 msgwt = (max(basewt, 1U) + 1U) / 2U; /* 10 */
+
+        shrink = (obj->owt % msgwt) == 0;
         obj->owt -= 1;
         /* if glob is partly eaten, reduce the amount still available (but
            not all the way to 0 which would change it back to untouched) */
@@ -1420,7 +1425,8 @@ shrink_glob(
         if (topcontnr->where == OBJ_INVENT) {
             /* for regular containers, the weight will always be reduced
                when glob's weight has been reduced but we only say so
-               when shrinking beneath an integral number of globs or
+               when shrinking beneath a particular threshold (N*20 to
+               (N-1)*20 + 19 or (N-1)*20 + 10 to (N-1)*20 + 9), or
                if we're going to report a change in carrying capacity;
                for a non-cursed bag of holding the total weight might not
                change because only a fraction of glob's weight is counted;
