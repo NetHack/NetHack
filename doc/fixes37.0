@@ -883,6 +883,7 @@ misaligned potion colors due to lack of reset_glyphmap() following obj shuffle;
 	this issue only impacted a new game
 closed doors were described as "horizontal closed door" or "vertical closed
 	door" instead of just "closed door"
+glob shrinkage while hero was away from glob's level wasn't handled properly
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

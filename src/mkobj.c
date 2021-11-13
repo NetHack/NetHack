@@ -1331,12 +1331,14 @@ start_glob_timeout(
    part of the program destroys it, the timer will be cancelled) */
 void
 shrink_glob(
-    anything *arg,           /* glob (in arg->a_obj) */
-    long expire_time UNUSED) /* timer callback data, not referenced here */
+    anything *arg,    /* glob (in arg->a_obj) */
+    long expire_time) /* turn the timer should have gone off; if less than
+                       * current 'moves', we're making up for lost time
+                       * after leaving and then returning to this level */
 {
     char globnambuf[BUFSZ];
-    int globloc;
     struct obj *obj = arg->a_obj;
+    int globloc = item_on_ice(obj);
     boolean ininv = (obj->where == OBJ_INVENT),
             shrink = FALSE, gone = FALSE, updinv = FALSE;
     struct obj *contnr = (obj->where == OBJ_CONTAINED) ? obj->ocontainer : 0,
@@ -1353,6 +1355,35 @@ shrink_glob(
     check_glob(obj, "shrink obj ");
 
     /*
+     * If shrinkage occurred while we were on another level, catch up now.
+     */
+    if (expire_time < g.moves && globloc != BURIED_UNDER_ICE) {
+        /* number of units of weight to remove */
+        long delta = (g.moves - expire_time + 24L) / 25L,
+             /* leftover amount to use for new timer */
+            moddelta = 25L - (delta % 25L);
+
+        if (globloc == SET_ON_ICE)
+            delta = (delta + 2L) / 3L;
+
+        if (delta >= (long) obj->owt) {
+            /* no newsym() or message here; forthcoming map update for
+               level arrival is all that's needed */
+            obj_extract_self(obj);
+            obfree(obj, (struct obj *) 0);
+
+            /* won't be a container carried by hero but might be a floor
+               one or one carried by a monster */
+            if (contnr)
+                container_weight(contnr);
+        } else {
+            obj->owt -= (unsigned) delta;
+            start_glob_timeout(obj, moddelta);
+        }
+        return;
+    }
+
+    /*
      * When on ice, only shrink every third try.  If buried under ice,
      * don't shrink at all, similar to being contained in an ice box
      * except that the timer remains active.  [FIXME:  stop the timer
@@ -1363,7 +1394,7 @@ shrink_glob(
      * monster, timer won't have a chance to run before meal is finished).
      */
     if (eating_glob(obj)
-        || (globloc = item_on_ice(obj)) == BURIED_UNDER_ICE
+        || globloc == BURIED_UNDER_ICE
         || (globloc == SET_ON_ICE && (g.moves % 3L) == 1L)) {
         /* schedule next shrink attempt; for the being eaten case, the
            glob and its timer might be deleted before this kicks in */
