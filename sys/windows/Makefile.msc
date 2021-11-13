@@ -10,7 +10,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition
 #            - Microsoft Visual Studio 2019 Community Edition
-#            - Microsoft Visual Studio 2022 Community Edition Preview 2
+#            - Microsoft Visual Studio 2022 Community Edition
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -605,8 +605,8 @@ rc=Rc
 #
 # Recently tested versions:
 #NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.39)
-#NMAKE version 1429301360 from latest VS 2019 (Oct 12, 2021 version 16.11.5)
-#NMAKE version 1430307050 from latest VS 2022 preview 7 (October 26, 2021)
+#NMAKE version 1429301370 from latest VS 2019 (Nov  9, 2021 version 16.11.6)
+#NMAKE version 1430307050 from latest VS 2022 (Nov  8, 2021 version 17.0.0)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -618,7 +618,7 @@ MAKEVERSION=$(MAKEVERSION: =)
 #!MESSAGE $(MAKEVERSION)
 
 VSSPECIAL=
-VSNEWEST=2019
+VSNEWEST=2022
 !IF ($(MAKEVERSION) < 1000000000)
 VSVER=0000		#untested ancient version
 !ELSEIF ($(MAKEVERSION) > 1000000000) && ($(MAKEVERSION) < 1100000000)
@@ -631,13 +631,11 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270451)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301361)
-VSVER=$(VSNEWEST)
-!ELSEIF ($(MAKEVERSION) > 1429301360) && ($(MAKEVERSION) < 1430307051)
+!ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301371)
+VSVER=2019
+!ELSEIF ($(MAKEVERSION) > 1429301370) && ($(MAKEVERSION) < 1430307051)
 VSVER=2022
-VSNEWEST=2022
-VSSPECIAL=preview
-!ELSEIF ($(MAKEVERSION) > 1429300400)
+!ELSEIF ($(MAKEVERSION) > 1430307050)
 VSVER=2999              #untested future version
 !ENDIF
 
