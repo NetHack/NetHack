@@ -1438,11 +1438,6 @@ shrink_glob(
                   gone ? "dissippates completely" : "shrinks");
         updinv = TRUE;
     } else if (contnr) {
-        /* if obj->owt has dropped to 0, weight() will assume that this is a
-           brand new glob and use 20 instead; that would yield an incorrect
-           total weight for enclosing container(s), so take it out now */
-        if (gone)
-            obj_extract_self(obj);
         /* when in a container, it might be nested so find outermost one */
         topcontnr = contnr;
         while (topcontnr->where == OBJ_CONTAINED)
@@ -1450,8 +1445,15 @@ shrink_glob(
         /* obj's weight has been reduced, but weight(s) of enclosing
            container(s) haven't been adjusted for that yet */
         old_top_owt = topcontnr->owt;
-        /* update those weights now; recursively updates nested containers */
-        container_weight(contnr);
+        /* update those weights now; recursively updates nested containers
+           (extracting from a container does that automatically); if obj->owt
+           has dropped to 0, weight() will assume that this is a brand new
+           glob and use 20 instead; that would yield an incorrect total
+           weight for enclosing container(s), so take 'gone' glob out now */
+        if (gone)
+            obj_extract_self(obj);
+        else
+            container_weight(contnr);
 
         if (topcontnr->where == OBJ_INVENT) {
             /* for regular containers, the weight will always be reduced
