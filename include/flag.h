@@ -157,6 +157,14 @@ enum getloc_filters {
     NUM_GFILTER
 };
 
+#ifdef WIN32
+enum windows_key_handling {
+    default_keyhandling,
+    ray_keyhandling,
+    nh340_keyhandling
+};
+#endif
+
 struct debug_flags {
     boolean test;
 #ifdef TTY_GRAPHICS
@@ -364,8 +372,9 @@ struct instance_flags {
     int wc2_windowborders;	/* display borders on NetHack windows */
     int wc2_petattr;            /* text attributes for pet */
 #ifdef WIN32
-#define MAX_ALTKEYHANDLER 25
-    char altkeyhandler[MAX_ALTKEYHANDLER];
+#define MAX_ALTKEYHANDLING 25
+    char altkeyhandling[MAX_ALTKEYHANDLING];
+    enum windows_key_handling key_handling;
 #endif
     /* copies of values in struct u, used during detection when the
        originals are temporarily cleared; kept here rather than

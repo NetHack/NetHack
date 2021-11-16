@@ -637,18 +637,18 @@ optfn_align_status(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_altkeyhandler(int optidx UNUSED, int req, boolean negated UNUSED,
+optfn_altkeyhandling(int optidx UNUSED, int req, boolean negated UNUSED,
                     char *opts, char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
-        /* altkeyhandler:string */
+        /* altkeyhandling:string */
 
 #if defined(WIN32) && defined(TTY_GRAPHICS)
         if (op != empty_optstr) {
-            set_altkeyhandler(op);
+            set_altkeyhandling(op);
         } else {
             return optn_err;
         }
@@ -661,10 +661,19 @@ optfn_altkeyhandler(int optidx UNUSED, int req, boolean negated UNUSED,
         opts[0] = '\0';
 #ifdef WIN32
         Sprintf(opts, "%s",
-                iflags.altkeyhandler[0] ? iflags.altkeyhandler : "default");
+                (iflags.key_handling == nh340_keyhandling)
+                    ? "340"
+                    : (iflags.key_handling == ray_keyhandling)
+                        ? "ray"
+                        : "default");
 #endif
         return optn_ok;
     }
+#ifdef WIN32
+    if (req == do_handler) {
+        return set_keyhandling_via_option();
+    }
+#endif
     return optn_ok;
 }
 

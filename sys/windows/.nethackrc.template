@@ -27,13 +27,11 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=windowtype:curses
 #
 # Keyboard handling
-# Different keyboard handlers can be loaded.
-# Default is nhdefkey.dll but you can override that.
-# Ray Chason's keyboard handler
-# OPTIONS=altkeyhandler:nhraykey.dll
+# Ray Chason's keyboard handling
+# OPTIONS=altkeyhandling:ray
 #
 # NetHack 3.4.0 keyboard handling
-# OPTIONS=altkeyhandler:nh340key.dll
+# OPTIONS=altkeyhandling:340
 
 # *** Personal Preferences ***
 # Some options to set personal preferences.  Uncomment and change these to

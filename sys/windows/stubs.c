@@ -190,4 +190,14 @@ play_usersound_via_idx(int idx, int volume)
 }
 #endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */
 
+void
+set_altkeyhandling(const char *inName)
+{
+}
+
+int
+set_keyhandling_via_option(void)
+{
+    return 1;
+}
 #endif /* TTYSTUBS */

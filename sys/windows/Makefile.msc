@@ -427,8 +427,6 @@ ALL_GUIHDR = $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 
 COMCTRL = comctl32.lib
 
-KEYDLLS	= $(GAMEDIR)\nhdefkey.dll $(GAMEDIR)\nh340key.dll $(GAMEDIR)\nhraykey.dll
-
 SOUND = $(OBJ)\ntsound.o
 
 VVOBJ  = $(O)version.o
@@ -979,7 +977,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 
 
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(O)console.res $(KEYDLLS) \
+			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(O)console.res \
 			$(LUATARGETS) $(PDCLIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
@@ -1006,7 +1004,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub
 
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(GUIOBJ) $(O)date.o $(O)NetHackW.res \
-			$(O)gamedir.tag $(KEYDLLS) \
+			$(O)gamedir.tag \
 			$(LUATARGETS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
@@ -1025,63 +1023,6 @@ $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
-
-$(O)nhdefkey.def:
-	@echo LIBRARY $(@B) >$@
-! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
-! ELSE
-	@echo EXPORTS >>$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-! ENDIF
-
-$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $(@:\=/)
-	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
-		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
-
-$(O)nh340key.def:
-	@echo LIBRARY $(@B) >$@
-! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
-! ELSE
-	@echo EXPORTS >>$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-! ENDIF
-
-$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $(@:\=/)
-	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
-		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
-
-$(O)nhraykey.def:
-	@echo LIBRARY $(@B) >$@
-! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
-! ELSE
-	@echo EXPORTS >>$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-! ENDIF
-
-$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $(@:\=/)
-	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
-		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
 		$(O)sp_lev.tag $(DLB)
@@ -1744,9 +1685,6 @@ $(DAT)\bogusmon: $(U)makedefs.exe $(DAT)\bogusmon.txt
 spotless: clean
 ! IF ("$(OBJ)"!="")
 	if exist $(OBJ)\* rmdir $(OBJ) /s /Q
-	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
-	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
-	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
 	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
 	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
 	if exist $(GAMEDIR)\nhdat$(NHV)  del $(GAMEDIR)\nhdat$(NHV)
@@ -1808,21 +1746,6 @@ clean:
 	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
 	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
 	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
-	if exist $(O)nh340key.def del $(O)nh340key.def
-	if exist $(O)nh340key.exp del $(O)nh340key.exp
-	if exist $(O)nh340key.lib del $(O)nh340key.lib
-	if exist $(O)nh340key.map del $(O)nh340key.map
-	if exist $(O)nh340key.PDB del $(O)nh340key.PDB
-	if exist $(O)nhdefkey.def del $(O)nhdefkey.def
-	if exist $(O)nhdefkey.exp del $(O)nhdefkey.exp
-	if exist $(O)nhdefkey.lib del $(O)nhdefkey.lib
-	if exist $(O)nhdefkey.map del $(O)nhdefkey.map
-	if exist $(O)nhdefkey.PDB del $(O)nhdefkey.PDB
-	if exist $(O)nhraykey.def del $(O)nhraykey.def
-	if exist $(O)nhraykey.exp del $(O)nhraykey.exp
-	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
-	if exist $(O)nhraykey.map del $(O)nhraykey.map
-	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
 	if exist $(O)envchk.tag   del $(O)envchk.tag
 	if exist $(O)obj.tag      del $(O)obj.tag
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag

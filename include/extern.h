@@ -1746,6 +1746,7 @@ extern void set_output_mode(int);
 extern void synch_cursor(void);
 extern void nethack_enter_consoletty(void);
 extern void consoletty_exit(void);
+extern int set_keyhandling_via_option(void);
 #endif /* WIN32 */
 
 /* ### o_init.c ### */

@@ -35,7 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "October 11, 2021
+.ds f2 "November 16, 2021
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4588,11 +4588,10 @@ Platform-specific Customization options
 .pg
 Here are explanations of options that are used by specific platforms or ports
 to customize and change the port behavior.
-.lp altkeyhandler
-Select an alternate keystroke handler dll to load (Win32 tty NetHack only).
-The name of the handler is specified without the .dll extension and without
-any path information.
-Cannot be set with the \(oqO\(cq command.
+.lp altkeyhandling
+Select an alternate way to handle keystrokes (Win32 tty NetHack only).
+The name of the handling type is one of \(lqdefault\(rq, \(lqray\(rq,
+\(lq340\(rq.
 .lp altmeta
 On Amiga, this option controls whether typing \(lqAlt\(rq plus another key
 functions as a meta-shift for that key (default on).

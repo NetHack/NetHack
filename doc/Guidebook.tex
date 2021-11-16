@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
-\date{October 11, 2021}
+\date{November 16, 2021}
 
 \maketitle
 
@@ -5052,11 +5052,9 @@ or ports to customize and change the port behavior.
 
 \blist{}
 %.lp
-\item[\ib{altkeyhandler}]
-Select an alternate keystroke handler dll to load ({\it Win32 tty\/ NetHack\/} only).
-The name of the handler is specified without the .dll extension and without any
-path information.
-Cannot be set with the `{\tt O}' command.
+\item[\ib{altkeyhandling}]
+Select an alternate way to handle keystrokes ({\it Win32 tty\/ NetHack\/} only).
+The name of the handling type is one of {\it default}, {\it ray}, {\it 340}
 %.lp
 \item[\ib{altmeta}]
 On Amiga, this option controls whether typing ``Alt'' plus another key

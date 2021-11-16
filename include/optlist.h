@@ -88,8 +88,8 @@ opt_##a,
                "message window alignment")
     NHOPTC(align_status, 20, opt_in, set_gameview, No, Yes, No, Yes, NoAlias,
                "status window alignment")
-    NHOPTC(altkeyhandler, 20, opt_in, set_in_game, No, Yes, No, No, NoAlias,
-               "alternate key handler")
+    NHOPTC(altkeyhandling, 20, opt_in, set_in_game, No, Yes, No, Yes,
+               "altkeyhandler", "alternative key handling")
 #ifdef ALTMETA
     NHOPTB(altmeta, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
                &iflags.altmeta)

@@ -441,9 +441,6 @@ endif
 
 COMCTRL = comctl32.lib
 
-KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll \
-	  $(GAMEDIR)/nhraykey.dll
-
 TILEUTIL16  = $(UTIL)/tile2bmp.exe
 TILEBMP16   = $(SRC)/tiles.bmp
 
@@ -892,7 +889,7 @@ gamedir.tag:
 	test -d $(GAMEDIR) && echo directory created > $@
 
 $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)consoletty.o $(O)guistub.o \
-			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(GUIOBJ) $(O)conres.o $(KEYDLLS) \
+			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(GUIOBJ) $(O)conres.o \
 			$(LUATARGETS)
 	@echo Linking $@...
 	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)consoletty.o $(O)tile.o \
@@ -910,7 +907,7 @@ $(GAMEDIR)/NetHack.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)consoletty.o $(O)g
 
 ifneq "$(SKIP_NETHACKW)" "Y"
 $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
-			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS) \
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o \
 			$(LUATARGETS)
 	@echo Linking $@...
 	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o \
@@ -918,30 +915,6 @@ $(GAMEDIR)/NetHackW.exe : gamedir.tag $(PDCLIB) $(O)tile.o $(O)ttystub.o \
 		$(O)winres.o $(PDCLIB) $(guilibs) $(LUALIB) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 endif
-
-$(O)nhdefkey.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c
-
-$(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o gamedir.tag
-	@echo Linking $@
-	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
-
-$(O)nh340key.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c
-
-$(GAMEDIR)/nh340key.dll : $(O)nh340key.o gamedir.tag
-	@echo Linking $@
-	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
-
-$(O)nhraykey.o:
-		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c
-
-$(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o gamedir.tag
-	@echo Linking $@
-	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
 
 $(GAME)_.ico : $(MSWSYS)/$(GAME).ico
 	$(subst /,\,@copy $(MSWSYS)/$(GAME).ico $@)
@@ -1268,9 +1241,6 @@ spotless: clean
 	if exist gamedir.tag del gamedir.tag
 ifneq "$(W_GAMEDIR)" ""
 	if exist $(W_GAMEDIR)\NetHack.exe  del $(W_GAMEDIR)\NetHack.exe
-	if exist $(W_GAMEDIR)\nhdefkey.dll del $(W_GAMEDIR)\nhdefkey.dll
-	if exist $(W_GAMEDIR)\nh340key.dll del $(W_GAMEDIR)\nh340key.dll
-	if exist $(W_GAMEDIR)\nhraykey.dll del $(W_GAMEDIR)\nhraykey.dll
 	if exist $(W_GAMEDIR)\NetHack.exe  del $(W_GAMEDIR)\NetHack.exe
 	if exist $(W_GAMEDIR)\NetHack.pdb  del $(W_GAMEDIR)\NetHack.pdb
 	if exist $(W_GAMEDIR)\nhdat$(NHV)  del $(W_GAMEDIR)\nhdat$(NHV)
@@ -1334,9 +1304,6 @@ ifneq "$(W_OBJ)" ""
 endif
 endif
 	if exist $(W_GAMEDIR)\license. del $(W_GAMEDIR)\license.
-	if exist $(W_GAMEDIR)\nh340key.dll del $(W_GAMEDIR)\nh340key.dll
-	if exist $(W_GAMEDIR)\nhdefkey.dll del $(W_GAMEDIR)\nhdefkey.dll
-	if exist $(W_GAMEDIR)\nhraykey.dll del $(W_GAMEDIR)\nhraykey.dll
 	-test -d ..\binary && rd ..\binary
 
 clean:
@@ -1362,21 +1329,6 @@ ifneq "$(W_OBJ)" ""
 	if exist $(W_OBJ)\makedefs.MAP     del $(W_OBJ)\makedefs.MAP
 	if exist $(W_OBJ)\makedefs.PDB     del $(W_OBJ)\makedefs.PDB
 	if exist $(W_OBJ)\NetHack.MAP      del $(W_OBJ)\NetHack.MAP
-	if exist $(W_OBJ)\nh340key.def     del $(W_OBJ)\nh340key.def
-	if exist $(W_OBJ)\nh340key.exp     del $(W_OBJ)\nh340key.exp
-	if exist $(W_OBJ)\nh340key.lib     del $(W_OBJ)\nh340key.lib
-	if exist $(W_OBJ)\nh340key.map     del $(W_OBJ)\nh340key.map
-	if exist $(W_OBJ)\nh340key.PDB     del $(W_OBJ)\nh340key.PDB
-	if exist $(W_OBJ)\nhdefkey.def     del $(W_OBJ)\nhdefkey.def
-	if exist $(W_OBJ)\nhdefkey.exp     del $(W_OBJ)\nhdefkey.exp
-	if exist $(W_OBJ)\nhdefkey.lib     del $(W_OBJ)\nhdefkey.lib
-	if exist $(W_OBJ)\nhdefkey.map     del $(W_OBJ)\nhdefkey.map
-	if exist $(W_OBJ)\nhdefkey.PDB     del $(W_OBJ)\nhdefkey.PDB
-	if exist $(W_OBJ)\nhraykey.def     del $(W_OBJ)\nhraykey.def
-	if exist $(W_OBJ)\nhraykey.exp     del $(W_OBJ)\nhraykey.exp
-	if exist $(W_OBJ)\nhraykey.lib     del $(W_OBJ)\nhraykey.lib
-	if exist $(W_OBJ)\nhraykey.map     del $(W_OBJ)\nhraykey.map
-	if exist $(W_OBJ)\nhraykey.PDB     del $(W_OBJ)\nhraykey.PDB
 	if exist $(W_OBJ)\envchk.tag       del $(W_OBJ)\envchk.tag
 	if exist $(W_OBJ)\obj.tag          del $(W_OBJ)\obj.tag
 	if exist $(W_OBJ)\sp_lev.tag       del $(W_OBJ)\sp_lev.tag

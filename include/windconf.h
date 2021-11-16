@@ -229,7 +229,7 @@ extern void consoletty_preference_update(const char *);
 extern void toggle_mouse_support(void);
 extern void map_subkeyvalue(char *);
 #if defined(WIN32CON)
-extern void set_altkeyhandler(const char *);
+extern void set_altkeyhandling(const char *);
 #endif
 extern void raw_clear_screen(void);
 
