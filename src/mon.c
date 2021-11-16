@@ -828,7 +828,8 @@ minliquid_core(struct monst* mtmp)
         }
     } else {
         /* but eels have a difficult time outside */
-        if (mtmp->data->mlet == S_EEL && !Is_waterlevel(&u.uz)) {
+        if (mtmp->data->mlet == S_EEL && !Is_waterlevel(&u.uz)
+            && !breathless(mtmp->data)) {
             /* as mhp gets lower, the rate of further loss slows down */
             if (mtmp->mhp > 1 && rn2(mtmp->mhp) > rn2(8))
                 mtmp->mhp--;
