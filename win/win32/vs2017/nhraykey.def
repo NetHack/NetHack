@@ -1,8 +1,0 @@
-LIBRARY nhraykey
-EXPORTS
-ProcessKeystroke
-NHkbhit
-CheckInput
-SourceWhere
-SourceAuthor
-KeyHandlerName

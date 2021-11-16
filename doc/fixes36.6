@@ -34,6 +34,8 @@ windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
 	abort
 windows: the console.rc file had outdated information stating 3.6.3 when the
 	official 3.6.6 binary was built.
+windows: switch from using keyhandling dll's to incorporating the three 
+	variations (default, ray, 340) in sys/winnt/nttty.c
 curses: cherry-picked selectsaved code from 3.7 for menu of save files
 NetHackW: fix delay rendering of cursor when using farlook
 during engraving, spaces were counted instead of non-space (cherry-pick of

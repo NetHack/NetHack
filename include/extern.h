@@ -1680,7 +1680,8 @@ E void FDECL(set_output_mode, (int));
 E void NDECL(synch_cursor);
 E void NDECL(nethack_enter_nttty);
 E void NDECL(nttty_exit);
-#endif
+E int NDECL(set_keyhandling_via_option);
+#endif /* WIN32 */
 
 /* ### o_init.c ### */
 

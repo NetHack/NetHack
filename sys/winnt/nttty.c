@@ -8,8 +8,8 @@
  * Initial Creation 				M. Allison	1993/01/31
  * Switch to low level console output routines	M. Allison	2003/10/01
  * Restrict cursor movement until input pending	M. Lehotay	2003/10/02
- * Call Unicode version of output API on NT     R. Chason   2005/10/28
- * Use of back buffer to improve performance    B. House    2018/05/06
+ * Call Unicode version of output API on NT     R. Chason	2005/10/28
+ * Use of back buffer to improve performance    B. House	2018/05/06
  *
  */
 
@@ -179,33 +179,36 @@ static char nullstr[] = "";
 char erase_char, kill_char;
 #define DEFTEXTCOLOR ttycolors[7]
 
-/* dynamic keystroke handling .DLL support */
-typedef int(__stdcall *PROCESS_KEYSTROKE)(HANDLE, INPUT_RECORD *, boolean *,
-                                          BOOLEAN_P, int);
+int default_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, boolean, int);
+int default_kbhit(HANDLE, INPUT_RECORD *);
+int default_checkinput(HANDLE, INPUT_RECORD *, DWORD *, boolean,
+                       int, int *, coord *);
 
-typedef int(__stdcall *NHKBHIT)(HANDLE, INPUT_RECORD *);
+int ray_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, boolean, int);
+int ray_kbhit(HANDLE, INPUT_RECORD *);
+int ray_checkinput(HANDLE, INPUT_RECORD *, DWORD *, boolean,
+                       int, int *, coord *);
 
-typedef int(__stdcall *CHECKINPUT)(HANDLE, INPUT_RECORD *, DWORD *, BOOLEAN_P,
+int nh340_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, boolean, int);
+int nh340_kbhit(HANDLE, INPUT_RECORD *);
+int nh340_checkinput(HANDLE, INPUT_RECORD *, DWORD *, boolean,
+                       int, int *, coord *);
+
+struct keyboard_handling_t {
+    char *pKeyHandlingName;
+    int (*pProcessKeystroke)(HANDLE, INPUT_RECORD *, boolean *,
+                                          boolean, int);
+    int (*pNHkbhit)(HANDLE, INPUT_RECORD *);
+    int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                                    int, int *, coord *);
+} keyboard_handling = {
+    no_keyhandling,
+    default_processkeystroke,
+    default_kbhit,
+    default_checkinput
+};
 
-typedef int(__stdcall *SOURCEWHERE)(char **);
-
-typedef int(__stdcall *SOURCEAUTHOR)(char **);
-
-typedef int(__stdcall *KEYHANDLERNAME)(char **, int);
-
-typedef struct {
-    char *              name;       // name without DLL extension
-    HANDLE              hLibrary;
-    PROCESS_KEYSTROKE   pProcessKeystroke;
-    NHKBHIT             pNHkbhit;
-    CHECKINPUT          pCheckInput;
-    SOURCEWHERE         pSourceWhere;
-    SOURCEAUTHOR        pSourceAuthor;
-    KEYHANDLERNAME      pKeyHandlerName;
-} keyboard_handler_t;
-
-keyboard_handler_t keyboard_handler;
+static INPUT_RECORD bogus_key;
 
 
 /* Console buffer flipping support */
@@ -244,7 +247,7 @@ static void back_buffer_flip()
 void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 {
     nhassert(x >= 0 && x < console.width);
-    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height &&
                                                  x == 0)));
 
     cell_t * dst = buffer + console.width * y + x;
@@ -259,7 +262,7 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
 static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
 {
     nhassert(x >= 0 && x < console.width);
-    nhassert(y >= 0 && ((y < console.height) || (y == console.height && 
+    nhassert(y >= 0 && ((y < console.height) || (y == console.height &&
                                                  x == 0)));
     cell_t * dst = buffer + console.width * y + x;
     cell_t *sentinel = buffer + console.width * (y + 1);
@@ -433,7 +436,7 @@ int portdebug;
     if (Cmd.swap_yz)
         numberpad |= 0x10;
 #endif
-    ch = keyboard_handler.pProcessKeystroke(
+    ch = keyboard_handling.pProcessKeystroke(
                     console.hConIn, ir, valid, numberpad, portdebug);
 #ifdef QWERTZ_SUPPORT
     numberpad &= ~0x10;
@@ -447,7 +450,7 @@ int portdebug;
 int
 nttty_kbhit()
 {
-    return keyboard_handler.pNHkbhit(console.hConIn, &ir);
+    return keyboard_handling.pNHkbhit(console.hConIn, &ir);
 }
 
 int
@@ -468,7 +471,7 @@ tgetch()
 
     return (program_state.done_hup)
                ? '\033'
-               : keyboard_handler.pCheckInput(
+               : keyboard_handling.pCheckInput(
                    console.hConIn, &ir, &count, numpad, 0, &mod, &cc);
 }
 
@@ -490,7 +493,7 @@ int *x, *y, *mod;
 #endif
     ch = (program_state.done_hup)
              ? '\033'
-             : keyboard_handler.pCheckInput(
+             : keyboard_handling.pCheckInput(
                    console.hConIn, &ir, &count, numpad, 1, mod, &cc);
 #ifdef QWERTZ_SUPPORT
     numpad &= ~0x10;
@@ -710,7 +713,7 @@ raw_clear_screen()
 void
 clear_screen()
 {
-    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);    
+    buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     home();
 }
 
@@ -995,38 +998,6 @@ win32con_debug_keystrokes()
     (void) doredraw();
 }
 void
-win32con_handler_info()
-{
-    char *buf;
-    int ci;
-    if (!keyboard_handler.pSourceAuthor && !keyboard_handler.pSourceWhere)
-        pline("Keyboard handler source info and author unavailable.");
-    else {
-        if (keyboard_handler.pKeyHandlerName &&
-            keyboard_handler.pKeyHandlerName(&buf, 1)) {
-            xputs("\n");
-            xputs("Keystroke handler loaded: \n    ");
-            xputs(buf);
-        }
-        if (keyboard_handler.pSourceAuthor &&
-            keyboard_handler.pSourceAuthor(&buf)) {
-            xputs("\n");
-            xputs("Keystroke handler Author: \n    ");
-            xputs(buf);
-        }
-        if (keyboard_handler.pSourceWhere &&
-            keyboard_handler.pSourceWhere(&buf)) {
-            xputs("\n");
-            xputs("Keystroke handler source code available at:\n    ");
-            xputs(buf);
-        }
-        xputs("\nPress any key to resume.");
-        ci = nhgetch();
-        (void) doredraw();
-    }
-}
-
-void
 win32con_toggle_cursor_info()
 {
     display_cursor_info = !display_cursor_info;
@@ -1065,81 +1036,6 @@ register char *op;
     if (idx >= MAX_OVERRIDES || idx < 0 || val >= MAX_OVERRIDES || val < 1)
         return;
     key_overrides[idx] = val;
-}
-
-void unload_keyboard_handler()
-{
-    nhassert(keyboard_handler.hLibrary != NULL);
-
-    FreeLibrary(keyboard_handler.hLibrary);
-    memset(&keyboard_handler, 0, sizeof(keyboard_handler_t));
-}
-
-boolean
-load_keyboard_handler(const char * inName)
-{
-    char path[MAX_ALTKEYHANDLER + 4];
-    strcpy(path, inName);
-    strcat(path, ".dll");
-
-    HANDLE hLibrary = LoadLibrary(path);
-
-    if (hLibrary == NULL)
-        return FALSE;
-
-    PROCESS_KEYSTROKE pProcessKeystroke = (PROCESS_KEYSTROKE) GetProcAddress(
-        hLibrary, TEXT("ProcessKeystroke"));
-    NHKBHIT pNHkbhit = (NHKBHIT) GetProcAddress(
-        hLibrary, TEXT("NHkbhit"));
-    CHECKINPUT pCheckInput =
-        (CHECKINPUT) GetProcAddress(hLibrary, TEXT("CheckInput"));
-
-    if (!pProcessKeystroke || !pNHkbhit || !pCheckInput)
-    {
-        return FALSE;
-    } else {
-        if (keyboard_handler.hLibrary != NULL)
-            unload_keyboard_handler();
-
-        keyboard_handler.hLibrary = hLibrary;
-
-        keyboard_handler.pProcessKeystroke = pProcessKeystroke;
-        keyboard_handler.pNHkbhit = pNHkbhit;
-        keyboard_handler.pCheckInput = pCheckInput;
-
-        keyboard_handler.pSourceWhere =
-            (SOURCEWHERE) GetProcAddress(hLibrary, TEXT("SourceWhere"));
-        keyboard_handler.pSourceAuthor =
-            (SOURCEAUTHOR) GetProcAddress(hLibrary, TEXT("SourceAuthor"));
-        keyboard_handler.pKeyHandlerName = (KEYHANDLERNAME) GetProcAddress(
-            hLibrary, TEXT("KeyHandlerName"));
-    }
-
-    return TRUE;
-}
-
-void set_altkeyhandler(const char * inName)
-{
-    if (strlen(inName) >= MAX_ALTKEYHANDLER) {
-        config_error_add("altkeyhandler name '%s' is too long", inName);
-        return;
-    }
-
-    char name[MAX_ALTKEYHANDLER];
-    strcpy(name, inName);
-
-    /* We support caller mistakenly giving name with '.dll' extension */
-    char * ext = strchr(name, '.');
-    if (ext != NULL) *ext = '\0';
-
-    if (load_keyboard_handler(name))
-        strcpy(iflags.altkeyhandler, name);
-    else {
-        config_error_add("unable to load altkeyhandler '%s'", name);
-        return;
-    }
-
-    return;
 }
 
 
@@ -1759,7 +1655,7 @@ void set_cp_map()
                 // code page 437 mappings.
                 if (console.cpMap[i] < 32)
                     console.cpMap[i] = cp437[console.cpMap[i]];
-            }        
+            }
         }
 
     }
@@ -1952,13 +1848,11 @@ void nethack_enter_nttty()
     /* This was overriding the handler that had already
        been loaded during options parsing. Needs to
        check first */
-    if (!iflags.altkeyhandler[0]) {
+    if (iflags.key_handling == no_keyhandling) {
         if (primary_language == LANG_ENGLISH) {
-            if (!load_keyboard_handler("nhdefkey"))
-                error("Unable to load nhdefkey.dll");
+            set_altkeyhandling("default");
         } else {
-            if (!load_keyboard_handler("nhraykey"))
-                error("Unable to load nhraykey.dll");
+            set_altkeyhandling("ray");
         }
     }
 }
@@ -1999,6 +1893,1273 @@ VA_DECL(const char *, fmt)
     }
     VA_END();
     return;
+}
+
+
+/*
+ *  Keyboard translation tables.
+ *  (Adopted from the MSDOS port)
+ */
+
+#define KEYPADLO 0x47
+#define KEYPADHI 0x53
+
+#define PADKEYS (KEYPADHI - KEYPADLO + 1)
+#define iskeypad(x) (KEYPADLO <= (x) && (x) <= KEYPADHI)
+#define isnumkeypad(x) \
+    (KEYPADLO <= (x) && (x) <= 0x51 && (x) != 0x4A && (x) != 0x4E)
+
+#ifdef QWERTZ_SUPPORT
+/* when 'numberpad' is 0 and Cmd.swap_yz is True
+   (signaled by setting 0x10 on boolean numpad argument)
+   treat keypress of numpad 7 as 'z' rather than 'y' */
+static boolean qwertz = FALSE;
+#endif
+#define inmap(x, vk) (((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
+
+const struct pad {
+    uchar normal, shift, cntrl;
+};
+
+/*
+ * default key handling
+ *
+ * This is the default NetHack keystroke processing.
+ * Use the .nethackrc "altkeyhandling" option to set a
+ * different handling type.
+ *
+ */
+/*
+ * Keypad keys are translated to the normal values below.
+ * Shifted keypad keys are translated to the
+ *    shift values below.
+ */
+
+static const struct pad default_keypad[PADKEYS] = {
+      { 'y', 'Y', C('y') },    /* 7 */
+      { 'k', 'K', C('k') },    /* 8 */
+      { 'u', 'U', C('u') },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { 'h', 'H', C('h') },    /* 4 */
+      { 'g', 'G', 'g' },       /* 5 */
+      { 'l', 'L', C('l') },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { 'b', 'B', C('b') },    /* 1 */
+      { 'j', 'J', C('j') },    /* 2 */
+      { 'n', 'N', C('n') },    /* 3 */
+      { 'i', 'I', C('i') },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+}, default_numpad[PADKEYS] = {
+      { '7', M('7'), '7' },    /* 7 */
+      { '8', M('8'), '8' },    /* 8 */
+      { '9', M('9'), '9' },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { '4', M('4'), '4' },    /* 4 */
+      { '5', M('5'), '5' },    /* 5 */
+      { '6', M('6'), '6' },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { '1', M('1'), '1' },    /* 1 */
+      { '2', M('2'), '2' },    /* 2 */
+      { '3', M('3'), '3' },    /* 3 */
+      { '0', M('0'), '0' },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+};
+
+/*
+ * Keypad keys are translated to the normal values below.
+ * Shifted keypad keys are translated to the
+ *    shift values below.
+ */
+
+static const struct pad
+ray_keypad[PADKEYS] = {
+      { 'y', 'Y', C('y') },    /* 7 */
+      { 'k', 'K', C('k') },    /* 8 */
+      { 'u', 'U', C('u') },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { 'h', 'H', C('h') },    /* 4 */
+      { 'g', 'G', 'g' },       /* 5 */
+      { 'l', 'L', C('l') },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { 'b', 'B', C('b') },    /* 1 */
+      { 'j', 'J', C('j') },    /* 2 */
+      { 'n', 'N', C('n') },    /* 3 */
+      { 'i', 'I', C('i') },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+},
+ray_numpad[PADKEYS] = {
+      { '7', M('7'), '7' },    /* 7 */
+      { '8', M('8'), '8' },    /* 8 */
+      { '9', M('9'), '9' },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { '4', M('4'), '4' },    /* 4 */
+      { 'g', 'G', 'g' },       /* 5 */
+      { '6', M('6'), '6' },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { '1', M('1'), '1' },    /* 1 */
+      { '2', M('2'), '2' },    /* 2 */
+      { '3', M('3'), '3' },    /* 3 */
+      { 'i', 'I', C('i') },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+};
+
+static const struct pad
+nh340_keypad[PADKEYS] = {
+      { 'y', 'Y', C('y') },    /* 7 */
+      { 'k', 'K', C('k') },    /* 8 */
+      { 'u', 'U', C('u') },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { 'h', 'H', C('h') },    /* 4 */
+      { 'g', 'G', 'g' },       /* 5 */
+      { 'l', 'L', C('l') },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { 'b', 'B', C('b') },    /* 1 */
+      { 'j', 'J', C('j') },    /* 2 */
+      { 'n', 'N', C('n') },    /* 3 */
+      { 'i', 'I', C('i') },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+},
+nh340_numpad[PADKEYS] = {
+      { '7', M('7'), '7' },    /* 7 */
+      { '8', M('8'), '8' },    /* 8 */
+      { '9', M('9'), '9' },    /* 9 */
+      { 'm', C('p'), C('p') }, /* - */
+      { '4', M('4'), '4' },    /* 4 */
+      { 'g', 'G', 'g' },       /* 5 */
+      { '6', M('6'), '6' },    /* 6 */
+      { '+', 'P', C('p') },    /* + */
+      { '1', M('1'), '1' },    /* 1 */
+      { '2', M('2'), '2' },    /* 2 */
+      { '3', M('3'), '3' },    /* 3 */
+      { 'i', 'I', C('i') },    /* Ins */
+      { '.', ':', ':' }        /* Del */
+};
+
+static struct pad keypad[PADKEYS], numpad[PADKEYS];
+static BYTE KeyState[256];
+static const char default_name[] = "default";
+const char *const legal_key_handling[] = {
+    "none",
+    "default",
+    "ray",
+    "340",
+};
+enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling, ray_keyhandling,
+                                     nh340_keyhandling };
+
+void set_altkeyhandling(const char *inName)
+{
+    int i, k;
+    /*backward compatibility - so people's existing config files
+      may work as is */
+    if (!strcmpi(inName, "nhraykey.dll"))
+        inName = legal_key_handling[ray_keyhandling];
+    else if (!strcmpi(inName, "nh340key.dll"))
+        inName = legal_key_handling[nh340_keyhandling];
+    else if (!strcmpi(inName, "nhdefkey.dll"))
+        inName = legal_key_handling[default_keyhandling];
+
+    for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
+        if (!strcmpi(inName, legal_key_handling[i])) {
+            iflags.key_handling = keyh[i];
+            if (keyboard_handling.pKeyHandlingName) {
+                free((genericptr_t) keyboard_handling.pKeyHandlingName);
+                keyboard_handling.pKeyHandlingName = (char *) 0;
+            }
+            switch(iflags.key_handling) {
+            case ray_keyhandling:
+                keyboard_handling.pKeyHandlingName = strdup("ray");
+                keyboard_handling.pProcessKeystroke = ray_processkeystroke;
+                keyboard_handling.pNHkbhit = ray_kbhit;
+                keyboard_handling.pCheckInput = ray_checkinput;
+                /* A bogus key that will be filtered when received, to keep ReadConsole
+                 * from blocking */
+                bogus_key.EventType = KEY_EVENT;
+                bogus_key.Event.KeyEvent.bKeyDown = 1;
+                bogus_key.Event.KeyEvent.wRepeatCount = 1;
+                bogus_key.Event.KeyEvent.wVirtualKeyCode = 0;
+                bogus_key.Event.KeyEvent.wVirtualScanCode = 0;
+                bogus_key.Event.KeyEvent.uChar.AsciiChar = (uchar) 0x80;
+                bogus_key.Event.KeyEvent.dwControlKeyState = 0;
+                for (k = 0; k < SIZE(keypad); ++k) {
+                    keypad[k] = ray_keypad[k];
+                    numpad[k] = ray_numpad[k];
+                }
+                break;
+            case nh340_keyhandling:
+                keyboard_handling.pKeyHandlingName = strdup("340");
+                keyboard_handling.pProcessKeystroke = nh340_processkeystroke;
+                keyboard_handling.pNHkbhit = nh340_kbhit;
+                keyboard_handling.pCheckInput = nh340_checkinput;
+                for (k = 0; k < SIZE(keypad); ++k) {
+                    keypad[k] = nh340_keypad[k];
+                    numpad[k] = nh340_numpad[k];
+                }
+                break;
+            case default_keyhandling:
+            default:
+                keyboard_handling.pKeyHandlingName = strdup("default");
+                keyboard_handling.pProcessKeystroke
+                                            = default_processkeystroke;
+                keyboard_handling.pNHkbhit = default_kbhit;
+                keyboard_handling.pCheckInput = default_checkinput;
+                for (k = 0; k < SIZE(keypad); ++k) {
+                    keypad[k] = default_keypad[k];
+                    numpad[k] = default_numpad[k];
+                }
+                break;
+            }
+            return;
+        }
+    }
+    config_error_add("invalid altkeyhandling '%s'", inName);
+    return;
+}
+
+int
+set_keyhandling_via_option(void)
+{
+    winid tmpwin;
+    anything any;
+    int i;
+    menu_item *console_key_handling_pick = (menu_item *) 0;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
+        any.a_int = i + 1;
+        add_menu(tmpwin, 0, &any, 'a' + i,
+                 0, ATR_NONE,
+                 legal_key_handling[i], 0);
+    }
+    end_menu(tmpwin, "Select windows console key handling:");
+    if (select_menu(tmpwin, PICK_ONE, &console_key_handling_pick) > 0) {
+        iflags.key_handling = keyh[console_key_handling_pick->item.a_int - 1];
+        free((genericptr_t) console_key_handling_pick);
+    }
+    destroy_nhwindow(tmpwin);
+    set_altkeyhandling(legal_key_handling[iflags.key_handling]);
+    return 1;       /* optn_ok */
+}
+
+int
+default_processkeystroke(
+    HANDLE hConIn,
+    INPUT_RECORD* ir,
+    boolean* valid,
+    boolean numberpad,
+    int portdebug)
+{
+    int k = 0;
+    int keycode, vk;
+    unsigned char ch, pre_ch;
+    unsigned short int scan;
+    unsigned long shiftstate;
+    int altseq = 0;
+    const struct pad *kpad;
+
+#ifdef QWERTZ_SUPPORT
+    if (numberpad & 0x10) {
+        numberpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+    shiftstate = 0L;
+    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    scan = ir->Event.KeyEvent.wVirtualScanCode;
+    vk = ir->Event.KeyEvent.wVirtualKeyCode;
+    keycode = MapVirtualKey(vk, 2);
+    shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+    KeyState[VK_SHIFT] = (shiftstate & SHIFT_PRESSED) ? 0x81 : 0;
+    KeyState[VK_CONTROL] =
+        (shiftstate & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) ? 0x81 : 0;
+    KeyState[VK_CAPITAL] = (shiftstate & CAPSLOCK_ON) ? 0x81 : 0;
+
+    if (shiftstate & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) {
+        if (ch || inmap(keycode, vk))
+            altseq = 1;
+        else
+            altseq = -1; /* invalid altseq */
+    }
+    if (ch || (iskeypad(scan)) || (altseq > 0))
+        *valid = TRUE;
+    /* if (!valid) return 0; */
+    /*
+     * shiftstate can be checked to see if various special
+     * keys were pressed at the same time as the key.
+     * Currently we are using the ALT & SHIFT & CONTROLS.
+     *
+     *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
+     *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
+     *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
+     *           CAPSLOCK_ON, ENHANCED_KEY
+     *
+     * are all valid bit masks to use on shiftstate.
+     * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
+     *      left control key was pressed with the keystroke.
+     */
+    if (iskeypad(scan)) {
+        kpad = numberpad ? numpad : keypad;
+        if (shiftstate & SHIFT_PRESSED) {
+            ch = kpad[scan - KEYPADLO].shift;
+        } else if (shiftstate & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) {
+            ch = kpad[scan - KEYPADLO].cntrl;
+        } else {
+            ch = kpad[scan - KEYPADLO].normal;
+        }
+#ifdef QWERTZ_SUPPORT
+        /* OPTIONS=number_pad:-1 is for qwertz keyboard; for that setting,
+           'numberpad' will be 0; core swaps y to zap, z to move northwest;
+           we want numpad 7 to move northwest, so when qwertz is set,
+           tell core that user who types numpad 7 typed z rather than y */
+        if (qwertz && kpad[scan - KEYPADLO].normal == 'y')
+            ch += 1; /* changes y to z, Y to Z, ^Y to ^Z */
+#endif /*QWERTZ_SUPPORT*/
+    } else if (altseq > 0) { /* ALT sequence */
+        if (vk == 0xBF)
+            ch = M('?');
+        else
+            ch = M(tolower((uchar) keycode));
+    }
+    /* Attempt to work better with international keyboards. */
+    else {
+        WORD chr[2];
+        k = ToAscii(vk, scan, KeyState, chr, 0);
+        if (k <= 2)
+            switch (k) {
+            case 2: /* two characters */
+                ch = (unsigned char) chr[1];
+                *valid = TRUE;
+                break;
+            case 1: /* one character */
+                ch = (unsigned char) chr[0];
+                *valid = TRUE;
+                break;
+            case 0:  /* no translation */
+            default: /* negative */
+                *valid = FALSE;
+            }
+    }
+    if (ch == '\r')
+        ch = '\n';
+#ifdef PORT_DEBUG
+    if (portdebug) {
+        char buf[BUFSZ];
+        Sprintf(buf, "PORTDEBUG (%s): ch=%u, sc=%u, vk=%d, pre=%d, sh=0x%lX, "
+                     "ta=%d (ESC to end)",
+                "default", ch, scan, vk, pre_ch, shiftstate, k);
+        fprintf(stdout, "\n%s", buf);
+    }
+#endif
+    return ch;
+}
+
+int
+default_kbhit(HANDLE hConIn, INPUT_RECORD *ir)
+{
+    int done = 0; /* true =  "stop searching"        */
+    int retval;   /* true =  "we had a match"        */
+    DWORD count;
+    unsigned short int scan;
+    unsigned char ch;
+    unsigned long shiftstate;
+    int altseq = 0, keycode, vk;
+    done = 0;
+    retval = 0;
+    while (!done) {
+        count = 0;
+        PeekConsoleInput(hConIn, ir, 1, &count);
+        if (count > 0) {
+            if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
+                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                scan = ir->Event.KeyEvent.wVirtualScanCode;
+                shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+                vk = ir->Event.KeyEvent.wVirtualKeyCode;
+                keycode = MapVirtualKey(vk, 2);
+                if (shiftstate & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) {
+                    if (ch || inmap(keycode, vk))
+                        altseq = 1;
+                    else
+                        altseq = -1; /* invalid altseq */
+                }
+                if (ch || iskeypad(scan) || altseq) {
+                    done = 1;   /* Stop looking         */
+                    retval = 1; /* Found what we sought */
+                } else {
+                    /* Strange Key event; let's purge it to avoid trouble */
+                    ReadConsoleInput(hConIn, ir, 1, &count);
+                }
+
+            } else if ((ir->EventType == MOUSE_EVENT
+                        && (ir->Event.MouseEvent.dwButtonState
+                            & MOUSEMASK))) {
+                done = 1;
+                retval = 1;
+            }
+
+            else /* Discard it, it's an insignificant event */
+                ReadConsoleInput(hConIn, ir, 1, &count);
+        } else /* There are no events in console event queue */ {
+            done = 1; /* Stop looking               */
+            retval = 0;
+        }
+    }
+    return retval;
+}
+
+int
+default_checkinput(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    DWORD* count,
+    boolean numpad,
+    int mode,
+    int *mod,
+    coord *cc)
+{
+#if defined(SAFERHANGUP)
+    DWORD dwWait;
+#endif
+    int ch = 0;
+    boolean valid = 0, done = 0;
+
+#ifdef QWERTZ_SUPPORT
+    if (numpad & 0x10) {
+        numpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+    while (!done) {
+#if defined(SAFERHANGUP)
+        dwWait = WaitForSingleObjectEx(hConIn,   // event object to wait for
+                                       INFINITE, // waits indefinitely
+                                       TRUE);    // alertable wait enabled
+        if (dwWait == WAIT_FAILED)
+            return '\033';
+#endif
+        ReadConsoleInput(hConIn, ir, 1, count);
+        if (mode == 0) {
+            if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+                ch = default_processkeystroke(hConIn, ir, &valid, numpad, 0);
+                done = valid;
+            }
+        } else {
+            if (count > 0) {
+                if (ir->EventType == KEY_EVENT
+                    && ir->Event.KeyEvent.bKeyDown) {
+#ifdef QWERTZ_SUPPORT
+                    if (qwertz)
+                        numpad |= 0x10;
+#endif
+                    ch = default_processkeystroke(hConIn, ir, &valid, numpad, 0);
+#ifdef QWERTZ_SUPPORT
+                    numpad &= ~0x10;
+#endif
+                    if (valid)
+                        return ch;
+                } else if (ir->EventType == MOUSE_EVENT) {
+                    if ((ir->Event.MouseEvent.dwEventFlags == 0)
+                        && (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
+                        cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
+                        cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
+
+                        if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
+                            *mod = CLICK_1;
+                        else if (ir->Event.MouseEvent.dwButtonState
+                                 & RIGHTBUTTON)
+                            *mod = CLICK_2;
+#if 0 /* middle button */
+				    else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
+			      		*mod = CLICK_3;
+#endif
+                        return 0;
+                    }
+                }
+            } else
+                done = 1;
+        }
+    }
+    return mode ? 0 : ch;
+}
+
+/*
+ * Keystroke handling contributed by Ray Chason.
+ * The following text was written by Ray Chason.
+ *
+ * The problem
+ * ===========
+ *
+ * The console-mode Nethack wants both keyboard and mouse input.  The
+ * problem is that the Windows API provides no easy way to get mouse input
+ * and also keyboard input properly translated according to the user's
+ * chosen keyboard layout.
+ *
+ * The ReadConsoleInput function returns a stream of keyboard and mouse
+ * events.  Nethack is interested in those events that represent a key
+ * pressed, or a click on a mouse button.  The keyboard events from
+ * ReadConsoleInput are not translated according to the keyboard layout,
+ * and do not take into account the shift, control, or alt keys.
+ *
+ * The PeekConsoleInput function works similarly to ReadConsoleInput,
+ * except that it does not remove an event from the queue and it returns
+ * instead of blocking when the queue is empty.
+ *
+ * A program can also use ReadConsole to get a properly translated stream
+ * of characters.  Unfortunately, ReadConsole does not return mouse events,
+ * does not distinguish the keypad from the main keyboard, does not return
+ * keys shifted with Alt, and does not even return the ESC key when
+ * pressed.
+ *
+ * We want both the functionality of ReadConsole and the functionality of
+ * ReadConsoleInput.  But Microsoft didn't seem to think of that.
+ *
+ *
+ * The solution, in the original code
+ * ==================================
+ *
+ * The original 3.4.1 distribution tries to get proper keyboard translation
+ * by passing keyboard events to the ToAscii function.  This works, to some
+ * extent -- it takes the shift key into account, and it processes dead
+ * keys properly.  But it doesn't take non-US keyboards into account.  It
+ * appears that ToAscii is meant for windowed applications, and does not
+ * have enough information to do its job properly in a console application.
+ *
+ *
+ * The Finnish keyboard patch
+ * ==========================
+ *
+ * This patch adds the "subkeyvalue" option to the defaults.nh file.  The
+ * user can then add OPTIONS=sukeyvalue:171/92, for instance, to replace
+ * the 171 character with 92, which is \.  This works, once properly
+ * configured, but places too much burden on the user.  It also bars the
+ * use of the substituted characters in naming objects or monsters.
+ *
+ *
+ * The solution presented here
+ * ===========================
+ *
+ * The best way I could find to combine the functionality of ReadConsole
+ * with that of ReadConsoleInput is simple in concept.  First, call
+ * PeekConsoleInput to get the first event.  If it represents a key press,
+ * call ReadConsole to retrieve the key.  Otherwise, pop it off the queue
+ * with ReadConsoleInput and, if it's a mouse click, return it as such.
+ *
+ * But the Devil, as they say, is in the details.  The problem is in
+ * recognizing an event that ReadConsole will return as a key.  We don't
+ * want to call ReadConsole unless we know that it will immediately return:
+ * if it blocks, the mouse and the Alt sequences will cease to function
+ * until it returns.
+ *
+ * Separating process_keystroke into two functions, one for commands and a
+ * new one, process_keystroke2, for answering prompts, makes the job a lot
+ * easier.  process_keystroke2 doesn't have to worry about mouse events or
+ * Alt sequences, and so the consequences are minor if ReadConsole blocks.
+ * process_keystroke, OTOH, never needs to return a non-ASCII character
+ * that was read from ReadConsole; it returns bytes with the high bit set
+ * only in response to an Alt sequence.
+ *
+ * So in process_keystroke, before calling ReadConsole, a bogus key event
+ * is pushed on the queue.  This event causes ReadConsole to return, even
+ * if there was no other character available.  Because the bogus key has
+ * the eighth bit set, it is filtered out.  This is not done in
+ * process_keystroke2, because that would render dead keys unusable.
+ *
+ * A separate process_keystroke2 can also process the numeric keypad in a
+ * way that makes sense for prompts:  just return the corresponding symbol,
+ * and pay no mind to number_pad or the num lock key.
+ *
+ * The recognition of Alt sequences is modified, to support the use of
+ * characters generated with the AltGr key.  A keystroke is an Alt sequence
+ * if an Alt key is seen that can't be an AltGr (since an AltGr sequence
+ * could be a character, and in some layouts it could even be an ASCII
+ * character).  This recognition is different on NT-based and 95-based
+ * Windows:
+ *
+ *    * On NT-based Windows, AltGr signals as right Alt and left Ctrl
+ *      together.  So an Alt sequence is recognized if either Alt key is
+ *      pressed and if right Alt and left Ctrl are not both present.  This
+ *      is true even if the keyboard in use does not have an AltGr key, and
+ *      uses right Alt for AltGr.
+ *
+ *    * On 95-based Windows, with a keyboard that lacks the AltGr key, the
+ *      right Alt key is used instead.  But it still signals as right Alt,
+ *      without left Ctrl.  There is no way for the application to know
+ *      whether right Alt is Alt or AltGr, and so it is always assumed
+ *      to be AltGr.  This means that Alt sequences must be formed with
+ *      left Alt.
+ *
+ * So the patch processes keystrokes as follows:
+ *
+ *     * If the scan and virtual key codes are both 0, it's the bogus key,
+ *       and we ignore it.
+ *
+ *     * Keys on the numeric keypad are processed for commands as in the
+ *       unpatched Nethack, and for prompts by returning the ASCII
+ *       character, even if the num lock is off.
+ *
+ *     * Alt sequences are processed for commands as in the unpatched
+ *       Nethack, and ignored for prompts.
+ *
+ *     * Control codes are returned as received, because ReadConsole will
+ *       not return the ESC key.
+ *
+ *     * Other key-down events are passed to ReadConsole.  The use of
+ *       ReadConsole is different for commands than for prompts:
+ *
+ *       o For commands, the bogus key is pushed onto the queue before
+ *         ReadConsole is called.  On return, non-ASCII characters are
+ *         filtered, so they are not mistaken for Alt sequences; this also
+ *         filters the bogus key.
+ *
+ *       o For prompts, the bogus key is not used, because that would
+ *         interfere with dead keys.  Eight bit characters may be returned,
+ *         and are coded in the configured code page.
+ *
+ *
+ * Possible improvements
+ * =====================
+ *
+ * Some possible improvements remain:
+ *
+ *     * Integrate the existing Finnish keyboard patch, for use with non-
+ *       QWERTY layouts such as the German QWERTZ keyboard or Dvorak.
+ *
+ *     * Fix the keyboard glitches in the graphical version.  Namely, dead
+ *       keys don't work, and input comes in as ISO-8859-1 but is displayed
+ *       as code page 437 if IBMgraphics is set on startup.
+ *
+ *     * Transform incoming text to ISO-8859-1, for full compatibility with
+ *       the graphical version.
+ *
+ *     * After pushing the bogus key and calling ReadConsole, check to see
+ *       if we got the bogus key; if so, and an Alt is pressed, process the
+ *       event as an Alt sequence.
+ *
+ */
+
+#if 0
+static char where_to_get_source[] = "http://www.nethack.org/";
+static char author[] = "Ray Chason";
+#endif
+
+int process_keystroke2(HANDLE hConIn, INPUT_RECORD *ir, boolean *valid);
+
+/* Use ray_processkeystroke for key commands, process_keystroke2 for prompts */
+/* int ray_processkeystroke(INPUT_RECORD *ir, boolean *valid, int
+ *                          portdebug);
+ */
+
+int process_keystroke2(HANDLE, INPUT_RECORD *ir, boolean *valid);
+static int is_altseq(unsigned long shiftstate);
+
+static int
+is_altseq(unsigned long shiftstate)
+{
+    /* We need to distinguish the Alt keys from the AltGr key.
+     * On NT-based Windows, AltGr signals as right Alt and left Ctrl together;
+     * on 95-based Windows, AltGr signals as right Alt only.
+     * So on NT, we signal Alt if either Alt is pressed and left Ctrl is not,
+     * and on 95, we signal Alt for left Alt only. */
+    switch (shiftstate
+            & (RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED)) {
+    case LEFT_ALT_PRESSED:
+    case LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED:
+        return 1;
+
+    case RIGHT_ALT_PRESSED:
+    case RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED:
+        return (GetVersion() & 0x80000000) == 0;
+
+    default:
+        return 0;
+    }
+}
+
+int ray_processkeystroke(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    boolean *valid,
+    boolean numberpad,
+    int portdebug)
+{
+    int keycode, vk;
+    unsigned char ch, pre_ch;
+    unsigned short int scan;
+    unsigned long shiftstate;
+    int altseq = 0;
+    const struct pad *kpad;
+    DWORD count;
+
+#ifdef QWERTZ_SUPPORT
+    if (numberpad & 0x10) {
+        numberpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+    shiftstate = 0L;
+    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    scan = ir->Event.KeyEvent.wVirtualScanCode;
+    vk = ir->Event.KeyEvent.wVirtualKeyCode;
+    keycode = MapVirtualKey(vk, 2);
+    shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+    if (scan == 0 && vk == 0) {
+        /* It's the bogus_key */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        *valid = FALSE;
+        return 0;
+    }
+
+    if (is_altseq(shiftstate)) {
+        if (ch || inmap(keycode, vk))
+            altseq = 1;
+        else
+            altseq = -1; /* invalid altseq */
+    }
+    if (ch || (iskeypad(scan)) || (altseq > 0))
+        *valid = TRUE;
+    /* if (!valid) return 0; */
+    /*
+     * shiftstate can be checked to see if various special
+     * keys were pressed at the same time as the key.
+     * Currently we are using the ALT & SHIFT & CONTROLS.
+     *
+     *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
+     *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
+     *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
+     *           CAPSLOCK_ON, ENHANCED_KEY
+     *
+     * are all valid bit masks to use on shiftstate.
+     * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
+     *      left control key was pressed with the keystroke.
+     */
+    if (iskeypad(scan)) {
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        kpad = numberpad ? numpad : keypad;
+        if (shiftstate & SHIFT_PRESSED) {
+            ch = kpad[scan - KEYPADLO].shift;
+        } else if (shiftstate & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) {
+            ch = kpad[scan - KEYPADLO].cntrl;
+        } else {
+            ch = kpad[scan - KEYPADLO].normal;
+        }
+#ifdef QWERTZ_SUPPORT
+        /* OPTIONS=number_pad:-1 is for qwertz keyboard; for that setting,
+           'numberpad' will be 0; core swaps y to zap, z to move northwest;
+           we want numpad 7 to move northwest, so when qwertz is set,
+           tell core that user who types numpad 7 typed z rather than y */
+        if (qwertz && kpad[scan - KEYPADLO].normal == 'y')
+            ch += 1; /* changes y to z, Y to Z, ^Y to ^Z */
+#endif /*QWERTZ_SUPPORT*/
+    } else if (altseq > 0) { /* ALT sequence */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        if (vk == 0xBF)
+            ch = M('?');
+        else
+            ch = M(tolower((uchar) keycode));
+    } else if (ch < 32 && !isnumkeypad(scan)) {
+        /* Control code; ReadConsole seems to filter some of these,
+         * including ESC */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+    }
+    /* Attempt to work better with international keyboards. */
+    else {
+        CHAR ch2;
+        DWORD written;
+        /* The bogus_key guarantees that ReadConsole will return,
+         * and does not itself do anything */
+        WriteConsoleInput(hConIn, &bogus_key, 1, &written);
+        ReadConsole(hConIn, &ch2, 1, &count, NULL);
+        /* Prevent high characters from being interpreted as alt
+         * sequences; also filter the bogus_key */
+        if (ch2 & 0x80)
+            *valid = FALSE;
+        else
+            ch = ch2;
+        if (ch == 0)
+            *valid = FALSE;
+    }
+    if (ch == '\r')
+        ch = '\n';
+#ifdef PORT_DEBUG
+    if (portdebug) {
+        char buf[BUFSZ];
+        Sprintf(buf, "PORTDEBUG: ch=%u, scan=%u, vk=%d, pre=%d, "
+                     "shiftstate=0x%lX (ESC to end)\n",
+                ch, scan, vk, pre_ch, shiftstate);
+        fprintf(stdout, "\n%s", buf);
+    }
+#endif
+    return ch;
+}
+
+int
+process_keystroke2(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    boolean *valid)
+{
+    /* Use these values for the numeric keypad */
+    static const char keypad_nums[] = "789-456+1230.";
+
+    unsigned char ch;
+    int vk;
+    unsigned short int scan;
+    unsigned long shiftstate;
+    int altseq;
+    DWORD count;
+
+    ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    vk = ir->Event.KeyEvent.wVirtualKeyCode;
+    scan = ir->Event.KeyEvent.wVirtualScanCode;
+    shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+
+    if (scan == 0 && vk == 0) {
+        /* It's the bogus_key */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        *valid = FALSE;
+        return 0;
+    }
+
+    altseq = is_altseq(shiftstate);
+    if (ch || (iskeypad(scan)) || altseq)
+        *valid = TRUE;
+    /* if (!valid) return 0; */
+    /*
+     * shiftstate can be checked to see if various special
+     * keys were pressed at the same time as the key.
+     * Currently we are using the ALT & SHIFT & CONTROLS.
+     *
+     *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
+     *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
+     *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
+     *           CAPSLOCK_ON, ENHANCED_KEY
+     *
+     * are all valid bit masks to use on shiftstate.
+     * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
+     *      left control key was pressed with the keystroke.
+     */
+    if (iskeypad(scan) && !altseq) {
+        ReadConsoleInput(hConIn, ir, 1, &count);
+        ch = keypad_nums[scan - KEYPADLO];
+    } else if (ch < 32 && !isnumkeypad(scan)) {
+        /* Control code; ReadConsole seems to filter some of these,
+         * including ESC */
+        ReadConsoleInput(hConIn, ir, 1, &count);
+    }
+    /* Attempt to work better with international keyboards. */
+    else {
+        CHAR ch2;
+        ReadConsole(hConIn, &ch2, 1, &count, NULL);
+        ch = ch2 & 0xFF;
+        if (ch == 0)
+            *valid = FALSE;
+    }
+    if (ch == '\r')
+        ch = '\n';
+    return ch;
+}
+
+int
+ray_checkinput(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    DWORD *count,
+    boolean numpad,
+    int mode,
+    int *mod,
+    coord *cc)
+{
+#if defined(SAFERHANGUP)
+    DWORD dwWait;
+#endif
+    int ch = 0;
+    boolean valid = 0, done = 0;
+
+#ifdef QWERTZ_SUPPORT
+    if (numpad & 0x10) {
+        numpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+    while (!done) {
+        *count = 0;
+        dwWait = WaitForSingleObject(hConIn, INFINITE);
+#if defined(SAFERHANGUP)
+        if (dwWait == WAIT_FAILED)
+            return '\033';
+#endif
+        PeekConsoleInput(hConIn, ir, 1, count);
+        if (mode == 0) {
+            if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+                ch = process_keystroke2(hConIn, ir, &valid);
+                done = valid;
+            } else
+                ReadConsoleInput(hConIn, ir, 1, count);
+        } else {
+            ch = 0;
+            if (count > 0) {
+                if (ir->EventType == KEY_EVENT
+                    && ir->Event.KeyEvent.bKeyDown) {
+#ifdef QWERTZ_SUPPORT
+                    if (qwertz)
+                        numpad |= 0x10;
+#endif
+                    ch = ray_processkeystroke(hConIn, ir, &valid, numpad,
+#ifdef PORTDEBUG
+                                          1);
+#else
+                                          0);
+#endif
+#ifdef QWERTZ_SUPPORT
+                    numpad &= ~0x10;
+#endif
+                    if (valid)
+                        return ch;
+                } else {
+                    ReadConsoleInput(hConIn, ir, 1, count);
+                    if (ir->EventType == MOUSE_EVENT) {
+                        if ((ir->Event.MouseEvent.dwEventFlags == 0)
+                            && (ir->Event.MouseEvent.dwButtonState
+                                & MOUSEMASK)) {
+                            cc->x =
+                                ir->Event.MouseEvent.dwMousePosition.X + 1;
+                            cc->y =
+                                ir->Event.MouseEvent.dwMousePosition.Y - 1;
+
+                            if (ir->Event.MouseEvent.dwButtonState
+                                & LEFTBUTTON)
+                                *mod = CLICK_1;
+                            else if (ir->Event.MouseEvent.dwButtonState
+                                     & RIGHTBUTTON)
+                                *mod = CLICK_2;
+#if 0 /* middle button */
+				else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
+			      		*mod = CLICK_3;
+#endif
+                            return 0;
+                        }
+                    }
+#if 0
+			/* We ignore these types of console events */
+		        else if (ir->EventType == FOCUS_EVENT) {
+		        }
+		        else if (ir->EventType == MENU_EVENT) {
+		        }
+#endif
+                }
+            } else
+                done = 1;
+        }
+    }
+    *mod = 0;
+    return ch;
+}
+
+int
+ray_kbhit(
+    HANDLE hConIn,
+    INPUT_RECORD *ir)
+{
+    int done = 0; /* true =  "stop searching"        */
+    int retval;   /* true =  "we had a match"        */
+    DWORD count;
+    unsigned short int scan;
+    unsigned char ch;
+    unsigned long shiftstate;
+    int altseq = 0, keycode, vk;
+
+    done = 0;
+    retval = 0;
+    while (!done) {
+        count = 0;
+        PeekConsoleInput(hConIn, ir, 1, &count);
+        if (count > 0) {
+            if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
+                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                scan = ir->Event.KeyEvent.wVirtualScanCode;
+                shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+                vk = ir->Event.KeyEvent.wVirtualKeyCode;
+                if (scan == 0 && vk == 0) {
+                    /* It's the bogus_key.  Discard it */
+                    ReadConsoleInput(hConIn,ir,1,&count);
+                } else {
+                    keycode = MapVirtualKey(vk, 2);
+                    if (is_altseq(shiftstate)) {
+                        if (ch || inmap(keycode, vk))
+                            altseq = 1;
+                        else
+                            altseq = -1; /* invalid altseq */
+                    }
+                    if (ch || iskeypad(scan) || altseq) {
+                        done = 1;   /* Stop looking         */
+                        retval = 1; /* Found what we sought */
+                    } else {
+                        /* Strange Key event; let's purge it to avoid trouble */
+                        ReadConsoleInput(hConIn, ir, 1, &count);
+                    }
+                }
+
+            } else if ((ir->EventType == MOUSE_EVENT
+                        && (ir->Event.MouseEvent.dwButtonState
+                            & MOUSEMASK))) {
+                done = 1;
+                retval = 1;
+            }
+
+            else /* Discard it, it's an insignificant event */
+                ReadConsoleInput(hConIn, ir, 1, &count);
+        } else /* There are no events in console event queue */ {
+            done = 1; /* Stop looking               */
+            retval = 0;
+        }
+    }
+    return retval;
+}
+
+/*
+ * nh340 key handling
+ *
+ * This is the NetHack keystroke processing from NetHack 3.4.0.
+ * It can be built as a run-time loadable dll (nh340key.dll),
+ * placed in the same directory as the nethack.exe executable,
+ * and loaded by specifying OPTIONS=altkeyhandler:nh340key
+ * in defaults.nh
+ *
+ * Keypad keys are translated to the normal values below.
+ * Shifted keypad keys are translated to the
+ *    shift values below.
+ */
+
+int
+nh340_processkeystroke(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    boolean *valid,
+    boolean numberpad,
+    int portdebug)
+{
+    int keycode, vk;
+    unsigned char ch, pre_ch;
+    unsigned short int scan;
+    unsigned long shiftstate;
+    int altseq = 0;
+    const struct pad *kpad;
+
+#ifdef QWERTZ_SUPPORT
+    if (numberpad & 0x10) {
+        numberpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+
+    shiftstate = 0L;
+    ch = pre_ch = ir->Event.KeyEvent.uChar.AsciiChar;
+    scan = ir->Event.KeyEvent.wVirtualScanCode;
+    vk = ir->Event.KeyEvent.wVirtualKeyCode;
+    keycode = MapVirtualKey(vk, 2);
+    shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+
+    if (shiftstate & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) {
+        if (ch || inmap(keycode, vk))
+            altseq = 1;
+        else
+            altseq = -1; /* invalid altseq */
+    }
+    if (ch || (iskeypad(scan)) || (altseq > 0))
+        *valid = TRUE;
+    /* if (!valid) return 0; */
+    /*
+     * shiftstate can be checked to see if various special
+     * keys were pressed at the same time as the key.
+     * Currently we are using the ALT & SHIFT & CONTROLS.
+     *
+     *           RIGHT_ALT_PRESSED, LEFT_ALT_PRESSED,
+     *           RIGHT_CTRL_PRESSED, LEFT_CTRL_PRESSED,
+     *           SHIFT_PRESSED,NUMLOCK_ON, SCROLLLOCK_ON,
+     *           CAPSLOCK_ON, ENHANCED_KEY
+     *
+     * are all valid bit masks to use on shiftstate.
+     * eg. (shiftstate & LEFT_CTRL_PRESSED) is true if the
+     *      left control key was pressed with the keystroke.
+     */
+    if (iskeypad(scan)) {
+        kpad = numberpad ? numpad : keypad;
+        if (shiftstate & SHIFT_PRESSED) {
+            ch = kpad[scan - KEYPADLO].shift;
+        } else if (shiftstate & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) {
+            ch = kpad[scan - KEYPADLO].cntrl;
+        } else {
+            ch = kpad[scan - KEYPADLO].normal;
+        }
+#ifdef QWERTZ_SUPPORT
+        /* OPTIONS=number_pad:-1 is for qwertz keyboard; for that setting,
+           'numberpad' will be 0; core swaps y to zap, z to move northwest;
+           we want numpad 7 to move northwest, so when qwertz is set,
+           tell core that user who types numpad 7 typed z rather than y */
+        if (qwertz && kpad[scan - KEYPADLO].normal == 'y')
+            ch += 1; /* changes y to z, Y to Z, ^Y to ^Z */
+#endif /*QWERTZ_SUPPORT*/
+    } else if (altseq > 0) { /* ALT sequence */
+        if (vk == 0xBF)
+            ch = M('?');
+        else
+            ch = M(tolower((uchar) keycode));
+    }
+    if (ch == '\r')
+        ch = '\n';
+#ifdef PORT_DEBUG
+    if (portdebug) {
+        char buf[BUFSZ];
+        Sprintf(buf,
+                "PORTDEBUG (%s): ch=%u, sc=%u, vk=%d, sh=0x%lX (ESC to end)",
+                "nh340", ch, scan, vk, shiftstate);
+        fprintf(stdout, "\n%s", buf);
+    }
+#endif
+    return ch;
+}
+
+int
+nh340_kbhit(
+    HANDLE hConIn,
+    INPUT_RECORD *ir)
+{
+    int done = 0; /* true =  "stop searching"        */
+    int retval;   /* true =  "we had a match"        */
+    DWORD count;
+    unsigned short int scan;
+    unsigned char ch;
+    unsigned long shiftstate;
+    int altseq = 0, keycode, vk;
+    done = 0;
+    retval = 0;
+    while (!done) {
+        count = 0;
+        PeekConsoleInput(hConIn, ir, 1, &count);
+        if (count > 0) {
+            if (ir->EventType == KEY_EVENT && ir->Event.KeyEvent.bKeyDown) {
+                ch = ir->Event.KeyEvent.uChar.AsciiChar;
+                scan = ir->Event.KeyEvent.wVirtualScanCode;
+                shiftstate = ir->Event.KeyEvent.dwControlKeyState;
+                vk = ir->Event.KeyEvent.wVirtualKeyCode;
+                keycode = MapVirtualKey(vk, 2);
+                if (shiftstate & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) {
+                    if (ch || inmap(keycode, vk))
+                        altseq = 1;
+                    else
+                        altseq = -1; /* invalid altseq */
+                }
+                if (ch || iskeypad(scan) || altseq) {
+                    done = 1;   /* Stop looking         */
+                    retval = 1; /* Found what we sought */
+                } else {
+                    /* Strange Key event; let's purge it to avoid trouble */
+                    ReadConsoleInput(hConIn, ir, 1, &count);
+                }
+
+            } else if ((ir->EventType == MOUSE_EVENT
+                        && (ir->Event.MouseEvent.dwButtonState
+                            & MOUSEMASK))) {
+                done = 1;
+                retval = 1;
+            }
+
+            else /* Discard it, it's an insignificant event */
+                ReadConsoleInput(hConIn, ir, 1, &count);
+        } else /* There are no events in console event queue */ {
+            done = 1; /* Stop looking               */
+            retval = 0;
+        }
+    }
+    return retval;
+}
+
+int
+nh340_checkinput(
+    HANDLE hConIn,
+    INPUT_RECORD *ir,
+    DWORD *count,
+    boolean numpad,
+    int mode,
+    int *mod,
+    coord *cc)
+{
+#if defined(SAFERHANGUP)
+    DWORD dwWait;
+#endif
+    int ch = 0;
+    boolean valid = 0, done = 0;
+
+#ifdef QWERTZ_SUPPORT
+    if (numpad & 0x10) {
+        numpad &= ~0x10;
+        qwertz = TRUE;
+    } else {
+        qwertz = FALSE;
+    }
+#endif
+    while (!done) {
+#if defined(SAFERHANGUP)
+        dwWait = WaitForSingleObjectEx(hConIn,   // event object to wait for
+                                       INFINITE, // waits indefinitely
+                                       TRUE);    // alertable wait enabled
+        if (dwWait == WAIT_FAILED)
+            return '\033';
+#endif
+        ReadConsoleInput(hConIn, ir, 1, count);
+        if (mode == 0) {
+            if ((ir->EventType == KEY_EVENT) && ir->Event.KeyEvent.bKeyDown) {
+#ifdef QWERTZ_SUPPORT
+                if (qwertz)
+                    numpad |= 0x10;
+#endif
+                ch = nh340_processkeystroke(hConIn, ir, &valid, numpad, 0);
+#ifdef QWERTZ_SUPPORT
+                numpad &= ~0x10;
+#endif
+                done = valid;
+            }
+        } else {
+            if (count > 0) {
+                if (ir->EventType == KEY_EVENT
+                    && ir->Event.KeyEvent.bKeyDown) {
+                    ch = nh340_processkeystroke(hConIn, ir, &valid, numpad, 0);
+                    if (valid)
+                        return ch;
+                } else if (ir->EventType == MOUSE_EVENT) {
+                    if ((ir->Event.MouseEvent.dwEventFlags == 0)
+                        && (ir->Event.MouseEvent.dwButtonState & MOUSEMASK)) {
+                        cc->x = ir->Event.MouseEvent.dwMousePosition.X + 1;
+                        cc->y = ir->Event.MouseEvent.dwMousePosition.Y - 1;
+
+                        if (ir->Event.MouseEvent.dwButtonState & LEFTBUTTON)
+                            *mod = CLICK_1;
+                        else if (ir->Event.MouseEvent.dwButtonState
+                                 & RIGHTBUTTON)
+                            *mod = CLICK_2;
+#if 0 /* middle button */
+				    else if (ir->Event.MouseEvent.dwButtonState & MIDBUTTON)
+			      		*mod = CLICK_3;
+#endif
+                        return 0;
+                    }
+                }
+            } else
+                done = 1;
+        }
+    }
+    return mode ? 0 : ch;
 }
 
 #endif /* WIN32 */

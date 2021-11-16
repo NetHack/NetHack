@@ -234,7 +234,7 @@ extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
 #if defined(WIN32CON)
-extern void FDECL(set_altkeyhandler, (const char *));
+extern void set_altkeyhandling(const char *);
 #endif
 extern void NDECL(raw_clear_screen);
 

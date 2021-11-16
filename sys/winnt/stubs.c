@@ -189,4 +189,14 @@ set_altkeyhandler(const char *inName)
 {
     return;
 }
+void
+set_altkeyhandling(const char *inName)
+{
+}
+
+int
+set_keyhandling_via_option(void)
+{
+    return 1;
+}
 #endif /* TTYSTUBS */
