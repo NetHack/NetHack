@@ -1812,6 +1812,8 @@ the(const char* str)
 {
     char *buf = nextobuf();
     boolean insert_the = FALSE;
+    const char *rest;
+    int mnum;
 
     if (!str || !*str) {
         impossible("Alphabet soup: 'the(%s)'.", str ? "\"\"" : "<null>");
@@ -1824,7 +1826,11 @@ the(const char* str)
     } else if (*str < 'A' || *str > 'Z'
                /* treat named fruit as not a proper name, even if player
                   has assigned a capitalized proper name as his/her fruit */
-               || fruit_from_name(str, TRUE, (int *) 0)) {
+               || fruit_from_name(str, TRUE, (int *) 0)
+               /* some monster names, like Angel or Keystone Kop, are
+                  capitalized despite not being proper names */
+               || (((mnum = name_to_monplus(str, &rest, (int *) 0)) > NON_PM
+                    && !type_is_pname(&mons[mnum]) && !*rest))) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
     } else {
