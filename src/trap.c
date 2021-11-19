@@ -4370,13 +4370,13 @@ dountrap(void)
 
 /* Probability of disabling a trap.  Helge Hafting */
 static int
-untrap_prob(struct trap* ttmp)
+untrap_prob(struct trap *ttmp)
 {
     int chance = 3;
 
     /* Only spiders know how to deal with webs reliably */
     if (ttmp->ttyp == WEB && !webmaker(g.youmonst.data))
-        chance = 30;
+        chance = 7; /* 3.7: used to be 30 */
     if (Confusion || Hallucination)
         chance++;
     if (Blind)
@@ -4431,7 +4431,7 @@ cnv_trap_obj(
 
 /* while attempting to disarm an adjacent trap, we've fallen into it */
 static void
-move_into_trap(struct trap* ttmp)
+move_into_trap(struct trap *ttmp)
 {
     int bc = 0;
     xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
@@ -4473,7 +4473,9 @@ move_into_trap(struct trap* ttmp)
  * 2: succeeds
  */
 static int
-try_disarm(struct trap* ttmp, boolean force_failure)
+try_disarm(
+    struct trap *ttmp,
+    boolean force_failure)
 {
     struct monst *mtmp = m_at(ttmp->tx, ttmp->ty);
     int ttype = ttmp->ttyp;
@@ -4521,19 +4523,25 @@ try_disarm(struct trap* ttmp, boolean force_failure)
                     if (DEADMONSTER(mtmp))
                         killed(mtmp);
                 } else if (ttype == WEB) {
-                    if (!webmaker(g.youmonst.data)) {
-                        struct trap *ttmp2 = maketrap(u.ux, u.uy, WEB);
+                    struct trap *ttmp2 = t_at(u.ux, u.uy);
 
-                        if (ttmp2) {
-                            pline_The(
-                                "webbing sticks to you.  You're caught too!");
-                            dotrap(ttmp2, NOWEBMSG);
-                            if (u.usteed && u.utrap) {
-                                /* you, not steed, are trapped */
-                                dismount_steed(DISMOUNT_FELL);
-                            }
+                    if (!webmaker(g.youmonst.data)
+                        /* don't always try to spread the web */
+                        && !rn2(3)
+                        /* is there already a trap at hero's spot?
+                           if so, don't clobber it with spreading web */
+                        && (ttmp2
+                            ? (ttmp2->ttyp == WEB)
+                            /* make a new web to trap hero in */
+                            : (ttmp2 = maketrap(u.ux, u.uy, WEB)) != 0)) {
+                        pline_The("web sticks to you.  You're caught too!");
+                        dotrap(ttmp2, NOWEBMSG);
+                        if (u.usteed && u.utrap) {
+                            /* you, not steed, are trapped */
+                            dismount_steed(DISMOUNT_FELL);
                         }
-                    } else
+                    }
+                    if (mtmp->mtrapped)
                         pline("%s remains entangled.", Monnam(mtmp));
                 }
             } else if (under_u) {

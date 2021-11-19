@@ -679,6 +679,11 @@ prevent normal monster activity from picking up the mines' luckstone or the
 	and/or engraved Elbereth wasn't sufficient to guard the Sokoban prize
 proceed a little further into dochat() if hero is deaf
 stacks of 1 to 49 gold pieces weighed 0
+the chance for #untrap to free a monster stuck in a web was very unlikely
+	unless was poly'd into spider form; make it less hard
+if #untrap monst-from-web failure happened while hero was standing on a spot
+	where a new web couldn't be created (furniture, grave, magic portal),
+	the expected "<monst> remains entangled" feedback wasn't delivered
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
