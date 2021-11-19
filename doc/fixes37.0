@@ -684,6 +684,8 @@ the chance for #untrap to free a monster stuck in a web was very unlikely
 if #untrap monst-from-web failure happened while hero was standing on a spot
 	where a new web couldn't be created (furniture, grave, magic portal),
 	the expected "<monst> remains entangled" feedback wasn't delivered
+if hero is wearing an amulet of magical breathing and polymorphs into a fish
+	or sea monster, don't lose health for turns spent out of water
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
