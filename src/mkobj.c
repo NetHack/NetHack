@@ -1346,7 +1346,7 @@ shrink_glob(
     unsigned old_top_owt = 0;
 
     if (!obj->globby) {
-        impossible("shrink_glob for non-glob [%s: %s]?",
+        impossible("shrink_glob for non-glob [%d: %s]?",
                    obj->otyp, simpleonames(obj));
         return; /* old timer is gone, don't start a new one */
     }
