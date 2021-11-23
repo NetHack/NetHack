@@ -302,7 +302,7 @@ struct keyboard_handling_t {
     int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                                    int, int *, coord *);
 } keyboard_handling = {
-    0,
+    no_keyhandling,
     default_processkeystroke,
     default_kbhit,
     default_checkinput
@@ -2718,7 +2718,7 @@ void nethack_enter_consoletty(void)
     /* This was overriding the handler that had already
        been loaded during options parsing. Needs to
        check first */
-    if (!iflags.key_handling) {
+    if (iflags.key_handling == no_keyhandling) {
         if (primary_language == LANG_ENGLISH) {
             set_altkeyhandling("default");
         } else {
@@ -2914,11 +2914,12 @@ static struct pad keypad[PADKEYS], numpad[PADKEYS];
 static BYTE KeyState[256];
 static const char default_name[] = "default";
 const char *const legal_key_handling[] = {
+    "none",
     "default",
     "ray",
     "340",
 };
-enum windows_key_handling keyh[] = { default_keyhandling, ray_keyhandling,
+enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling, ray_keyhandling,
                                      nh340_keyhandling };
 
 void set_altkeyhandling(const char *inName)
@@ -2933,7 +2934,7 @@ void set_altkeyhandling(const char *inName)
     else if (!strcmpi(inName, "nhdefkey.dll"))
         inName = legal_key_handling[default_keyhandling];
 
-    for (i = 0; i < SIZE(legal_key_handling); i++) {
+    for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
         if (!strcmpi(inName, legal_key_handling[i])) {
             iflags.key_handling = keyh[i];
             if (keyboard_handling.pKeyHandlingName) {
@@ -3001,7 +3002,7 @@ set_keyhandling_via_option(void)
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
-    for (i = 0; i < SIZE(legal_key_handling); i++) {
+    for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
                  0, ATR_NONE,
