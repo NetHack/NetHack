@@ -159,6 +159,7 @@ enum getloc_filters {
 
 #ifdef WIN32
 enum windows_key_handling {
+    no_keyhandling,
     default_keyhandling,
     ray_keyhandling,
     nh340_keyhandling
