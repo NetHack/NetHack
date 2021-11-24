@@ -54,6 +54,7 @@ evil overlord
 newsgroup troll
 ninja pirate zombie robot
 octarine dragon
+plaid unicorn
 gonzo journalist
 lag monster
 loan shark
@@ -232,6 +233,9 @@ questing beast
 # Movie
 Predator
 
+# Harry Potter
+dementor
+
 # common pest
 mother-in-law
 
@@ -265,6 +269,7 @@ dahu
 dropbear
 wild haggis
 jackalope
+flying monkey
 flying pig
 hippocampus
 hippogriff
