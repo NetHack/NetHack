@@ -688,6 +688,9 @@ if hero is wearing an amulet of magical breathing and polymorphs into a fish
 	or sea monster, don't lose health for turns spent out of water
 fix up some "the" handling for monsters whose type name is upper case to avoid
 	"Uruk-hai is healthy for a statue", "You can't polymorph into Oracle"
+controlled polymorph would turn hero into new man or woman if player asked to
+	become a unique monster of the same race (so usually human) instead of
+	being told that polymorphing into the specified form wasn't allowed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -478,8 +478,11 @@ polyself(int psflags)
             } else if (!polyok(&mons[mntmp])
                        /* Note:  humans are illegal as monsters, but an
                           illegal monster forces newman(), which is what
-                          we want if they specified a human.... */
-                       && !(mntmp == PM_HUMAN || your_race(&mons[mntmp])
+                          we want if they specified a human.... (unless
+                          they specified a unique monster) */
+                       && !(mntmp == PM_HUMAN
+                            || (your_race(&mons[mntmp])
+                                && (mons[mntmp].geno & G_UNIQ) == 0)
                             || mntmp == g.urole.malenum
                             || mntmp == g.urole.femalenum)) {
                 const char *pm_name;
