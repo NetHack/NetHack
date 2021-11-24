@@ -44,6 +44,12 @@ static void init_rumors(dlb *);
 static void init_oracles(dlb *);
 static void others_check(const char *ftype, const char *, winid *);
 static void couldnt_open_file(const char *);
+static void init_CapMons(void);
+
+/* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
+   there's no need for these to be put into 'struct instance_globals g' */
+static unsigned CapMonSiz = 0;
+static const char **CapMons = 0;
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -404,12 +410,15 @@ get_rnd_text(const char* fname, char* buf, int (*rng)(int))
         endtxt = dlb_ftell(fh);
         sizetxt = endtxt - starttxt;
         /* might be zero (only if file is empty); should complain in that
-           case but if could happen over and over, also the suggestion
+           case but it could happen over and over, also the suggestion
            that save and restore might fix the problem wouldn't be useful */
         if (sizetxt < 1L)
             return buf;
         tidbit = (*rng)(sizetxt);
 
+        /* position randomly which will probably be in the middle of a line;
+           read the rest of that line, then use the next one; if there's no
+           next one (ie, end of file), go back to beginning and use first */
         (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
         (void) dlb_fgets(line, sizeof line, fh);
         if (!dlb_fgets(line, sizeof line, fh)) {
@@ -674,6 +683,181 @@ couldnt_open_file(const char *filename)
 
     impossible("Can't open '%s' file.", filename);
     g.program_state.something_worth_saving = save_something;
+}
+
+/* is 'word' a capitalized monster name that should be preceded by "the"?
+   (non-unique monster like Mordor Orc, or capitalized title like Norn
+   rather than a name); used by the() on a string without any context;
+   this sets up a list of names rather than scan all of mons[] every time
+   the decision is needed (resulting list currently contains 27 monster
+   entries and 20 hallucination entries) */
+boolean
+CapitalMon(
+    const char *word) /* potential monster name; a name might be followed by
+                       * something like " corpse" */
+{
+    const char *nam;
+    unsigned i, wln, nln;
+
+    if (!word || !*word || *word == lowc(*word))
+        return FALSE; /* 'word' is not a capitalized monster name */
+
+    if (!CapMons)
+        init_CapMons();
+
+    wln = (unsigned) strlen(word);
+    for (i = 0; i < CapMonSiz - 1; ++i) {
+        nam = CapMons[i];
+        if (*nam == '\033') /* if dynamic alloc flag is present, skip it */
+            ++nam;
+        nln = (unsigned) strlen(nam);
+        if (wln < nln)
+            continue;
+        /*
+         * Unlike name_to_mon(), we don't need to find the longest match
+         * or return the gender or a pointer to trailing stuff.  We do
+         * check full words though: "Foo" matches "Foo" and "Foo bar" but
+         * not "Foobar".  We use case-sensitive matching here.
+         */
+        if (!strncmp(nam, word, nln) && (!word[nln] || word[nln] == ' '))
+            return TRUE; /* 'word' is a capitalized monster name */
+    }
+    return FALSE;
+}
+
+/* one-time initialization of CapMons[], a list of non-unique monsters
+   having a capitalized type name like Green-elf or Archon, plus unique
+   monsters whose "name" is a title rather than a personal name, plus
+   hallucinatory monster names that fall into either of those categories */
+static void
+init_CapMons(void)
+{
+    unsigned pass;
+    dlb *bogonfile = dlb_fopen(BOGUSMONFILE, "r");
+
+    if (CapMons) /* sanity precaution */
+        free_CapMons();
+
+    /* first pass: count the number of relevant monster names, then
+       allocate memory for CapMons[]; second pass: populate CapMons[] */
+    for (pass = 1; pass <= 2; ++pass) {
+        struct permonst *mptr;
+        const char *nam;
+        unsigned mndx, mgend, count;
+
+        count = 0;
+
+        /* gather applicable actual monsters */
+        for (mndx = LOW_PM; mndx < NUMMONS; ++mndx) {
+            mptr = &mons[mndx];
+            if ((mptr->geno & G_UNIQ) != 0 && !the_unique_pm(mptr))
+                continue;
+            for (mgend = MALE; mgend < NUM_MGENDERS; ++mgend) {
+                nam = mptr->pmnames[mgend];
+                if (nam && *nam != lowc(*nam)) {
+                    if (pass == 2)
+                        CapMons[count] = nam;
+                    ++count;
+                }
+            }
+        }
+
+        /* now gather applicable hallucinatory monsters; don't reset count */
+        if (bogonfile) {
+            char hline[BUFSZ], xbuf[BUFSZ], *endp, *startp, code;
+
+            /* rewind; effectively a no-op for pass 1; essential for pass 2 */
+            (void) dlb_fseek(bogonfile, 0L, SEEK_SET);
+            /* skip "don't edit" comment (first line of file) */
+            (void) dlb_fgets(hline, sizeof hline, bogonfile);
+
+            /* one monster name per line in rudimentary encrypted format;
+               some are prefixed by a classification code to indicate
+               gender and/or to distinguish an individual from a type
+               (code is a single punctuation character when present) */
+            while (dlb_fgets(hline, sizeof hline, bogonfile)) {
+                if ((endp = index(hline, '\n')) != 0)
+                    *endp = '\0'; /* strip newline */
+                (void) xcrypt(hline, xbuf);
+
+                if (letter(xbuf[0]))
+                    code = '\0', startp = &xbuf[0]; /* ordinary */
+                else
+                    code = xbuf[0], startp = &xbuf[1]; /* special */
+
+                if (*startp != lowc(*startp) && !bogon_is_pname(code)) {
+                    if (pass == 2) {
+                        /* insert a "dynamically allocated flag" and save a
+                           copy of bogus monst name without its prefix code */
+                        hline[0] = '\033';
+                        Strcpy(&hline[1], startp);
+                        CapMons[count] = dupstr(hline);
+                    }
+                    ++count;
+                }
+            }
+        }
+
+        /* finish the current pass */
+        if (pass == 1) {
+            CapMonSiz = count + 1; /* +1: room for terminator */
+            CapMons = (const char **) alloc(CapMonSiz * sizeof *CapMons);
+        } else { /* pass == 2 */
+            /* terminator; not strictly needed */
+            CapMons[count] = (const char *) 0;
+
+            if (bogonfile)
+                (void) dlb_fclose(bogonfile), bogonfile = (dlb *) 0;
+        }
+    }
+#ifdef DEBUG
+    /*
+     * CapMons[] init doesn't kick in until needed.  To force this name
+     * dump, set DEBUGFILES to "CapMons" in your environment (or in
+     * sysconf) prior to starting nethack, wish for a statue of an Archon
+     * and drop it if held, then step away and apply a stethscope towards
+     * it to trigger a message that passes "Archon" to the() which will
+     * then call CapitalMon() which in turn will call init_CapMons().
+     */
+    if (wizard && explicitdebug("CapMons")) {
+        char buf[BUFSZ];
+        const char *nam;
+        unsigned i;
+        winid tmpwin = create_nhwindow(NHW_TEXT);
+
+        putstr(tmpwin, 0,
+              "Capitalized monster type names normally preceded by \"the\":");
+        for (i = 0; i < CapMonSiz - 1; ++i) {
+            nam = CapMons[i];
+            if (*nam == '\033')
+                ++nam;
+            Sprintf(buf, "  %.77s", nam);
+            putstr(tmpwin, 0, buf);
+        }
+        display_nhwindow(tmpwin, TRUE);
+        destroy_nhwindow(tmpwin);
+    }
+#endif
+    return;
+}
+
+/* release memory allocated for the list of capitalized monster type names */
+void
+free_CapMons(void)
+{
+    /* note: some elements of CapMons[] are string literals from
+       mons[].pmnames[] and should not be freed, others are dynamically
+       allocated copies of hallucinatory monster names and should be freed;
+       the first character for each element of the latter group is ESC */
+    if (CapMons) {
+        unsigned idx;
+
+        for (idx = 0; idx < CapMonSiz - 1; ++idx)
+            if (CapMons[idx] && *CapMons[idx] == '\033')
+                free((genericptr_t) CapMons[idx]); /* cast: discard 'const' */
+        free((genericptr_t) CapMons), CapMons = (const char **) 0;
+    }
+    CapMonSiz = 0;
 }
 
 /*rumors.c*/

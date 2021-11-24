@@ -2270,6 +2270,8 @@ extern void save_oracles(NHFILE *);
 extern void restore_oracles(NHFILE *);
 extern int doconsult(struct monst *);
 extern void rumor_check(void);
+extern boolean CapitalMon(const char *);
+extern void free_CapMons(void);
 
 /* ### save.c ### */
 

@@ -1524,6 +1524,9 @@ corpse_xname(
        to precede capitalized unique monsters (pnames are handled above) */
     if (the_prefix)
         Strcat(nambuf, "the ");
+    /* note: over time, various instances of the(mon_name()) have crept
+       into the code, so the() has been modified to deal with capitalized
+       monster names; we could switch to using it below like an() */
 
     if (!adjective || !*adjective) {
         /* normal case:  newt corpse */
@@ -1822,6 +1825,8 @@ the(const char* str)
         Strcpy(&buf[1], str + 1);
         return buf;
     } else if (*str < 'A' || *str > 'Z'
+               /* some capitalized monster names want "the", others don't */
+               || CapitalMon(str)
                /* treat named fruit as not a proper name, even if player
                   has assigned a capitalized proper name as his/her fruit */
                || fruit_from_name(str, TRUE, (int *) 0)) {

@@ -686,6 +686,8 @@ if #untrap monst-from-web failure happened while hero was standing on a spot
 	the expected "<monst> remains entangled" feedback wasn't delivered
 if hero is wearing an amulet of magical breathing and polymorphs into a fish
 	or sea monster, don't lose health for turns spent out of water
+fix up some "the" handling for monsters whose type name is upper case to avoid
+	"Uruk-hai is healthy for a statue", "You can't polymorph into Oracle"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
