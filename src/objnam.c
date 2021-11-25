@@ -1031,7 +1031,7 @@ doname_base(
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
                               * the start of prefix instead of the
                               * end (Strcat is used on the end) */
-    const char *aname;
+    const char *aname = 0;
     int omndx = obj->corpsenm;
     register char *bp = xname(obj);
 
@@ -1061,7 +1061,7 @@ doname_base(
        want "the" prefix and when it doesn't, avoid "a"/"an" prefix too */
     fake_arti = (obj->otyp == SLIME_MOLD
                  && (aname = artifact_name(bp, (short *) 0)) != 0);
-    force_the = (fake_arti && aname && !strncmpi(aname, "the ", 4));
+    force_the = (fake_arti && !strncmpi(aname, "the ", 4));
 
     prefix[0] = '\0';
     if (obj->quan != 1L) {
