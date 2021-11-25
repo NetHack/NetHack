@@ -219,7 +219,8 @@ artifact_name(const char *name, short *otyp)
         if (!strncmpi(aname, "the ", 4))
             aname += 4;
         if (!strcmpi(name, aname)) {
-            *otyp = a->otyp;
+            if (otyp)
+                *otyp = a->otyp;
             return a->name;
         }
     }

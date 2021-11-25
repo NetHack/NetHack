@@ -1016,18 +1016,23 @@ erosion_matters(struct obj* obj)
 #define DONAME_WITH_PRICE 1
 #define DONAME_VAGUE_QUAN 2
 
+/* core of doname() */
 static char *
-doname_base(struct obj* obj, unsigned int doname_flags)
+doname_base(
+    struct obj* obj,       /* object to format */
+    unsigned doname_flags) /* special case requests */
 {
     boolean ispoisoned = FALSE,
             with_price = (doname_flags & DONAME_WITH_PRICE) != 0,
             vague_quan = (doname_flags & DONAME_VAGUE_QUAN) != 0;
-    boolean known, dknown, cknown, bknown, lknown;
-    int omndx = obj->corpsenm;
+    boolean known, dknown, cknown, bknown, lknown,
+            fake_arti, force_the;
     char prefix[PREFIX];
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
-                                the start of prefix instead of the
-                                end (Strcat is used on the end) */
+                              * the start of prefix instead of the
+                              * end (Strcat is used on the end) */
+    const char *aname;
+    int omndx = obj->corpsenm;
     register char *bp = xname(obj);
 
     if (iflags.override_ID) {
@@ -1051,6 +1056,14 @@ doname_base(struct obj* obj, unsigned int doname_flags)
         ispoisoned = TRUE;
     }
 
+    /* fruits are allowed to be given artifact names; when that happens,
+       format the name like the corresponding artifact, which may or may not
+       want "the" prefix and when it doesn't, avoid "a"/"an" prefix too */
+    fake_arti = (obj->otyp == SLIME_MOLD
+                 && (aname = artifact_name(bp, (short *) 0)) != 0);
+    force_the = (fake_arti && aname && !strncmpi(aname, "the ", 4));
+
+    prefix[0] = '\0';
     if (obj->quan != 1L) {
         if (dknown || !vague_quan)
             Sprintf(prefix, "%ld ", obj->quan);
@@ -1059,12 +1072,13 @@ doname_base(struct obj* obj, unsigned int doname_flags)
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
-        *prefix = '\0';
-    } else if (obj_is_pname(obj) || the_unique_obj(obj)) {
+        ;
+    } else if (force_the || obj_is_pname(obj) || the_unique_obj(obj)) {
         if (!strncmpi(bp, "the ", 4))
             bp += 4;
         Strcpy(prefix, "the ");
-    } else {
+    } else if (!fake_arti) {
+        /* default prefix */
         Strcpy(prefix, "a ");
     }
 
@@ -1813,6 +1827,7 @@ An(const char* str)
 char *
 the(const char* str)
 {
+    const char *aname;
     char *buf = nextobuf();
     boolean insert_the = FALSE;
 
@@ -1828,8 +1843,11 @@ the(const char* str)
                /* some capitalized monster names want "the", others don't */
                || CapitalMon(str)
                /* treat named fruit as not a proper name, even if player
-                  has assigned a capitalized proper name as his/her fruit */
-               || fruit_from_name(str, TRUE, (int *) 0)) {
+                  has assigned a capitalized proper name as his/her fruit,
+                  unless it matches an artifact name */
+               || (fruit_from_name(str, TRUE, (int *) 0)
+                   && ((aname = artifact_name(str, (short *) 0)) == 0
+                       || strncmpi(aname, "the ", 4) == 0))) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
     } else {

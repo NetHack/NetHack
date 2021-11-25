@@ -691,6 +691,10 @@ fix up some "the" handling for monsters whose type name is upper case to avoid
 controlled polymorph would turn hero into new man or woman if player asked to
 	become a unique monster of the same race (so usually human) instead of
 	being told that polymorphing into the specified form wasn't allowed
+assigning a fruit name that matches the name of an artifact which doesn't use
+	any "the" prefix could yield messages showing "the Artifact" when
+	dealing with the artifact rather than fruit: "You are blasted by _the_
+	Excalibur's power!"; didn't impact basic inventory formatting
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
