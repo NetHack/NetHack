@@ -946,6 +946,10 @@ obfree(register struct obj* obj, register struct obj* merge)
         if (!merge) {
             bp->useup = 1;
             obj->unpaid = 0; /* only for doinvbill */
+            /* for used up glob, put back origial weight in case it gets
+               formatted ('I x' or itemized billing) with 'wizweight' On */
+            if (obj->globby && !obj->owt && has_omid(obj))
+                obj->owt = OMID(obj);
             add_to_billobjs(obj);
             return;
         }
@@ -2483,9 +2487,14 @@ add_one_tobill(struct obj *obj, boolean dummy, struct monst *shkp)
     } else
         bp->useup = 0;
     bp->price = get_cost(obj, shkp);
-    if (obj->globby)
+    if (obj->globby) {
         /* for globs, the amt charged for quan 1 depends on owt */
         bp->price *= get_pricing_units(obj);
+        /* remember the weight this glob had when it was added to bill;
+           glob oextra_owt field overlays corpse omid field */
+        newomid(obj);
+        OMID(obj) = obj->owt;
+    }
     eshkp->billct++;
     obj->unpaid = 1;
 }

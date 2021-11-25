@@ -900,6 +900,9 @@ misaligned potion colors due to lack of reset_glyphmap() following obj shuffle;
 closed doors were described as "horizontal closed door" or "vertical closed
 	door" instead of just "closed door"
 glob shrinkage while hero was away from glob's level wasn't handled properly
+unpaid shop-owned glob that shrank to nothing had weight 0 which triggered
+	onbill warnings when 'sanity_check' was On; for 'Ix' and itemized
+	billing, the empty weight was shown to player if 'wizweight' was On
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -23,7 +23,8 @@ struct oextra {
     char *oname;          /* ptr to name of object */
     struct monst *omonst; /* ptr to attached monst struct */
     char *omailcmd;       /* response_cmd for mail delivery */
-    unsigned omid;        /* for corpse; m_id of corpse's ghost */
+    unsigned omid;        /* for corpse: m_id of corpse's ghost; overloaded
+                           * for glob: owt at time added to shop's bill */
 };
 
 struct obj {
