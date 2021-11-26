@@ -40,6 +40,7 @@
  * and placed there by 'makedefs'.
  */
 
+static void unpadline(char *);
 static void init_rumors(dlb *);
 static void init_oracles(dlb *);
 static void others_check(const char *ftype, const char *, winid *);
@@ -50,6 +51,24 @@ static void init_CapMons(void);
    there's no need for these to be put into 'struct instance_globals g' */
 static unsigned CapMonSiz = 0;
 static const char **CapMons = 0;
+
+/* makedefs pads short rumors, epitaphs, engravings, and hallucinatory
+   monster names with trailing underscores; strip those off */
+static void
+unpadline(char *line)
+{
+    char *p = eos(line);
+
+    /* remove newline if still present; caller should have stripped it */
+    if (p > line && p[-1] == '\n')
+        --p;
+
+    /* remove padding */
+    while (p > line && p[-1] == '_')
+        --p;
+
+    *p = '\0';
+}
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -158,21 +177,7 @@ getrumor(
         g.true_rumor_size = -1; /* don't try to open it again */
     }
 
-    /* this is safe either way, so do it always since we can't get the
-     * definition out of makedefs.c
-     */
-#define PAD_RUMORS_TO
-#ifdef PAD_RUMORS_TO
-    /* remove padding */
-    {
-        char *x = eos(rumor_buf) - 1;
-
-        while (x > rumor_buf && *x == '_')
-            x--;
-        *++x = '\n';
-        *x = '\0';
-    }
-#endif
+    unpadline(rumor_buf);
     return rumor_buf;
 }
 
@@ -426,8 +431,9 @@ get_rnd_text(const char* fname, char* buf, int (*rng)(int))
             (void) dlb_fgets(line, sizeof line, fh);
         }
         if ((endp = index(line, '\n')) != 0)
-            *endp = 0;
+            *endp = '\0';
         Strcat(buf, xcrypt(line, xbuf));
+        unpadline(buf); /* strip padding that makedefs added to end of line */
         (void) dlb_fclose(fh);
     } else {
         couldnt_open_file(fname);

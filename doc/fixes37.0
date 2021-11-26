@@ -695,6 +695,12 @@ assigning a fruit name that matches the name of an artifact which doesn't use
 	any "the" prefix could yield messages showing "the Artifact" when
 	dealing with the artifact rather than fruit: "You are blasted by _the_
 	Excalibur's power!"; didn't impact basic inventory formatting
+selection of random engravings, epitaphs, and hallucinatory monster names had
+	the same problem that rumor selection used to have:  entries which
+	follow longer than average lines are most likely to be chosen and
+	ones which follow shorter than average lines are least likely; use
+	same workaround as for rumors:  pad the shortest lines; result isn't
+	uniforn distribution but is better (tradeoff vs size; see makedefs)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
