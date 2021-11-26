@@ -785,6 +785,7 @@ init_CapMons(void)
                 if ((endp = index(hline, '\n')) != 0)
                     *endp = '\0'; /* strip newline */
                 (void) xcrypt(hline, xbuf);
+                (void) unpadline(xbuf);
 
                 if (letter(xbuf[0]))
                     code = '\0', startp = &xbuf[0]; /* ordinary */
