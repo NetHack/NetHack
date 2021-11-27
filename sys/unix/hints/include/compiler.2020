@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  compiler.2020 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  compiler.2020 $NHDT-Date: 1637992237 2021/11/27 05:50:37 $  $NHDT-Branch: NetHack-3.7 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -47,7 +47,7 @@ CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
-CFLAGS+=-Wformat-nonliteral
+CFLAGS+=-Wno-format-nonliteral
 CFLAGS+=-Wunreachable-code
 #
 # the following are not allowed in C++
@@ -63,7 +63,7 @@ CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
 CCXXFLAGS+=-Wmissing-declarations
-CCXXFLAGS+=-Wformat-nonliteral
+CCXXFLAGS+=-Wno-format-nonliteral
 
 ifeq "$(CCISCLANG)" ""
 # gcc-specific follows

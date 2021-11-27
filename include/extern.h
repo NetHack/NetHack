@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1629817676 2021/08/24 15:07:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.998 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1637992233 2021/11/27 05:50:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1018 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -703,7 +703,7 @@ extern void done1(int);
 extern int done2(void);
 extern void done_in_by(struct monst *, int);
 #endif /* !MAKEDEFS_C && MDLIB_C */
-extern void panic(const char *, ...) NORETURN;
+extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
 extern void done(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
@@ -977,7 +977,7 @@ extern void shuffle_int_array(int *, int);
 #define Snprintf(str, size, ...) \
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
-                        const char *fmt, ...);
+                        const char *fmt, ...) PRINTF_F(5, 6);
 
 /* ### insight.c ### */
 
@@ -1922,7 +1922,7 @@ extern int dosh(void);
 extern void append_slash(char *);
 extern void getreturn(const char *);
 #ifndef AMIGA
-extern void msmsg(const char *, ...);
+extern void msmsg(const char *, ...) PRINTF_F(1, 2);
 #endif
 /* E FILE *fopenp(const char *, const char *); */
 #endif /* MICRO || WIN2 */
@@ -1933,7 +1933,7 @@ extern void msmsg(const char *, ...);
 extern void gettty(void);
 extern void settty(const char *);
 extern void setftty(void);
-extern void error(const char *, ...);
+extern void error(const char *, ...) PRINTF_F(1, 2);
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 extern void msleep(unsigned);
 #endif
@@ -1987,22 +1987,22 @@ extern boolean autopick_testobj(struct obj *, boolean);
 extern void dumplogmsg(const char *);
 extern void dumplogfreemessages(void);
 #endif
-extern void pline(const char *, ...);
-extern void custompline(unsigned, const char *, ...);
-extern void Norep(const char *, ...);
+extern void pline(const char *, ...) PRINTF_F(1, 2);
+extern void custompline(unsigned, const char *, ...) PRINTF_F(2, 3);
+extern void Norep(const char *, ...) PRINTF_F(1, 2);
 extern void free_youbuf(void);
-extern void You(const char *, ...);
-extern void Your(const char *, ...);
-extern void You_feel(const char *, ...);
-extern void You_cant(const char *, ...);
-extern void You_hear(const char *, ...);
-extern void You_see(const char *, ...);
-extern void pline_The(const char *, ...);
-extern void There(const char *, ...);
-extern void verbalize(const char *, ...);
-extern void raw_printf(const char *, ...);
-extern void impossible(const char *, ...);
-extern void config_error_add(const char *, ...);
+extern void You(const char *, ...) PRINTF_F(1, 2);
+extern void Your(const char *, ...) PRINTF_F(1, 2);
+extern void You_feel(const char *, ...) PRINTF_F(1, 2);
+extern void You_cant(const char *, ...) PRINTF_F(1, 2);
+extern void You_hear(const char *, ...) PRINTF_F(1, 2);
+extern void You_see(const char *, ...) PRINTF_F(1, 2);
+extern void pline_The(const char *, ...) PRINTF_F(1, 2);
+extern void There(const char *, ...) PRINTF_F(1, 2);
+extern void verbalize(const char *, ...) PRINTF_F(1, 2);
+extern void raw_printf(const char *, ...) PRINTF_F(1, 2);
+extern void impossible(const char *, ...) PRINTF_F(1, 2);
+extern void config_error_add(const char *, ...) PRINTF_F(1, 2);
 extern void nhassert_failed(const char *, const char *, int);
 
 /* ### polyself.c ### */
@@ -2826,7 +2826,7 @@ extern void settty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void error (const char *, ...);
+extern void error (const char *, ...) PRINTF_F(1, 2);
 #endif /* UNIX || __BEOS__ */
 
 /* ### unixunix.c ### */
@@ -2972,7 +2972,7 @@ extern void shuttty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void error (const char *, ...);
+extern void error (const char *, ...) PRINTF_F(1, 2);
 #ifdef TIMED_DELAY
 extern void msleep(unsigned);
 #endif
