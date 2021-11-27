@@ -407,6 +407,7 @@ const struct instance_globals g_init = {
     NULL, /* config_section_chosen */
     NULL, /* config_section_current */
     0, /* nesting */
+    0, /* no_sound_notified */
     0, /* symset_count */
     FALSE, /* chosen_symset_start */
     FALSE, /* chosen_symset_end */

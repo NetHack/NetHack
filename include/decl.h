@@ -930,6 +930,9 @@ struct instance_globals {
     char *config_section_chosen;
     char *config_section_current;
     int nesting;
+    int no_sound_notified; /* run-time option processing: warn once if built
+                            * without USER_SOUNDS and config file contains
+                            * SOUND=foo or SOUNDDIR=bar */
     int symset_count;             /* for pick-list building only */
     boolean chosen_symset_start;
     boolean chosen_symset_end;

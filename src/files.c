@@ -2773,7 +2773,15 @@ parse_config_line(char *origbuf)
         sounddir = dupstr(bufp);
     } else if (match_varname(buf, "SOUND", 5)) {
         add_sound_mapping(bufp);
-#endif
+#else /* !USER_SOUNDS */
+    } else if (match_varname(buf, "SOUNDDIR", 8)
+               || match_varname(buf, "SOUND", 5)) {
+        if (!g.no_sound_notified++) {
+            config_error_add("SOUND and SOUNDDIR are not available.");
+        }
+        ; /* skip this and any further SOUND or SOUNDDIR lines
+           * but leave 'retval' set to True */
+#endif /* ?USER_SOUNDS */
     } else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
 #ifdef QT_GRAPHICS
         extern char *qt_tilewidth;
