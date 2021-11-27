@@ -2263,7 +2263,7 @@ extern const char *Goodbye(void);
 /* ### rumors.c ### */
 
 extern char *getrumor(int, char *, boolean);
-extern char *get_rnd_text(const char *, char *, int(*)(int));
+extern char *get_rnd_text(const char *, char *, int(*)(int), unsigned);
 extern void outrumor(int, int);
 extern void outoracle(boolean, boolean);
 extern void save_oracles(NHFILE *);

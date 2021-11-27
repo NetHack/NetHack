@@ -395,7 +395,11 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 /* Gets a random line of text from file 'fname', and returns it.
    rng is the random number generator to use, and should act like rn2 does. */
 char *
-get_rnd_text(const char* fname, char* buf, int (*rng)(int))
+get_rnd_text(
+    const char *fname,
+    char *buf,
+    int (*rng)(int),
+    unsigned padlength)
 {
     dlb *fh;
 
@@ -404,6 +408,7 @@ get_rnd_text(const char* fname, char* buf, int (*rng)(int))
     if (fh) {
         /* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents? */
         long sizetxt = 0L, starttxt = 0L, endtxt = 0L, tidbit = 0L;
+        int trylimit;
         char *endp, line[BUFSZ], xbuf[BUFSZ];
 
         /* skip "don't edit" comment */
@@ -419,14 +424,29 @@ get_rnd_text(const char* fname, char* buf, int (*rng)(int))
            that save and restore might fix the problem wouldn't be useful */
         if (sizetxt < 1L)
             return buf;
-        tidbit = (*rng)(sizetxt);
+        /* 'rumors' is about 3/4 of the way to the limit on a 16-bit config */
+        nhassert(sizetxt <= INT_MAX); /* essential for rn2(sizetxt) */
 
-        /* position randomly which will probably be in the middle of a line;
-           read the rest of that line, then use the next one; if there's no
-           next one (ie, end of file), go back to beginning and use first */
-        (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
-        (void) dlb_fgets(line, sizeof line, fh);
+        /*
+         * Position randomly which will probably be in the middle of a line.
+         * Read the rest of that line, then use the next one.  If there's no
+         * next line (ie, end of file), go back to beginning and use first.
+         *
+         * When short lines have been padded to length N, only accept long
+         * lines if we land within last N+1 characters (+1 is for newline
+         * which hasn't been stripped away yet), effectively shortening
+         * them to normal length.  That yields even selection distribution.
+         */
+        for (trylimit = 5; trylimit > 0; --trylimit) {
+            tidbit = (long) (*rng)((int) sizetxt);
+            (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
+            (void) dlb_fgets(line, sizeof line, fh);
+            if (!padlength || (unsigned) strlen(line) <= padlength + 1)
+                break;
+        }
+        /* use next line */
         if (!dlb_fgets(line, sizeof line, fh)) {
+            /* assume failure is due to end-of-file; go back to start */
             (void) dlb_fseek(fh, starttxt, SEEK_SET);
             (void) dlb_fgets(line, sizeof line, fh);
         }

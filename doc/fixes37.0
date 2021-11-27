@@ -701,6 +701,8 @@ selection of random engravings, epitaphs, and hallucinatory monster names had
 	ones which follow shorter than average lines are least likely; use
 	same workaround as for rumors:  pad the shortest lines; result isn't
 	uniforn distribution but is better (tradeoff vs size; see makedefs)
+make selection of random rumors, engravings, epitaphs, and hallucinatory monst
+	names have uniform distribution by handling long lines specially
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

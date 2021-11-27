@@ -9,7 +9,8 @@
 #include <stdio.h>
 
 /*
- * Files expected to exist in the playground directory.
+ * Files expected to exist in the playground directory (possibly inside
+ * a dlb container file).
  */
 
 #define RECORD "record"         /* file containing list of topscorers */
@@ -31,6 +32,14 @@
 #define BOGUSMONFILE "bogusmon" /* hallucinatory monsters */
 #define TRIBUTEFILE "tribute"   /* 3.6 tribute to Terry Pratchett */
 #define LEV_EXT ".lua"          /* extension for special level files */
+
+/* padding amounts for files that have lines chosen by fseek to random spot,
+   advancing to the next line, and using that line; makedefs forces shorter
+   lines to be padded to these lengths; value of 0 will inhibit any padding,
+   avoiding an increase in files' sizes, but resulting in biased selection;
+   used by makedefs while building and by core's callers of get_rnd_text() */
+#define MD_PAD_RUMORS 60u /* for RUMORFILE, EPITAPHFILE, and ENGRAVEFILE */
+#define MD_PAD_BOGONS 20u /* for BOGUSMONFILE */
 
 /* Assorted definitions that may depend on selections in config.h. */
 
