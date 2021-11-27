@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1629403671 2021/08/19 20:07:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1637992348 2021/11/27 05:52:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1310,7 +1310,7 @@ start_glob_timeout(
     long when)       /* when to shrink; if 0L, use random value close to 25 */
 {
     if (!obj->globby) {
-        impossible("start_glob_timeout for non-glob [%s: %s]?",
+        impossible("start_glob_timeout for non-glob [%d: %s]?",
                    obj->otyp, simpleonames(obj));
         return; /* skip timer creation */
     }

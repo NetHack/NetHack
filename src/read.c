@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1615760296 2021/03/14 22:18:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1637992351 2021/11/27 05:52:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2767,7 +2767,7 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
     cc.y = u.uy;
     getpos_sethilite(display_stinking_cloud_positions, can_center_cloud);
     if (getpos(&cc, TRUE, "the desired position") < 0) {
-        pline(Never_mind);
+        pline1(Never_mind);
         return;
     } else if (!can_center_cloud(cc.x, cc.y)) {
         if (Hallucination)
