@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1606504240 2020/11/27 19:10:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1637982230 2021/11/27 03:03:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -525,7 +525,7 @@ vconfig_error_add(const char *str, va_list the_args)
     char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
 #if !defined(NO_VSNPRINTF)
-    vlen = vsnprintf(buf, sizeof(buf), str, the_args);
+    vlen = vsnprintf(buf, sizeof buf, str, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
         panic("%s: truncation of buffer at %zu of %d bytes",
@@ -544,15 +544,31 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 void
 nhassert_failed(const char *expression, const char *filepath, int line)
 {
-    const char * filename;
+    const char *filename, *p;
 
-    /* attempt to get filename from path.  TODO: we really need a port provided
-     * function to return a filename from a path */
-    filename = strrchr(filepath, '/');
-    filename = (filename == NULL ? strrchr(filepath, '\\') : filename);
-    filename = (filename == NULL ? filepath : filename + 1);
+    /* Attempt to get filename from path.
+       TODO: we really need a port provided function to return a filename
+       from a path. */
+    filename = filepath;
+    if ((p = strrchr(filename, '/')) != 0)
+        filename = p + 1;
+    if ((p = strrchr(filename, '\\')) != 0)
+        filename = p + 1;
+#ifdef VMS
+    /* usually "device:[directory]name"
+       but might be "device:[root.][directory]name"
+       and either "[directory]" or "[root.]" or both can be delimited
+       by <> rather than by []; find the last of ']', '>', and ':'  */
+    if ((p = strrchr(filename, ']')) != 0)
+        filename = p + 1;
+    if ((p = strrchr(filename, '>')) != 0)
+        filename = p + 1;
+    if ((p = strrchr(filename, ':')) != 0)
+        filename = p + 1;
+#endif
 
-    impossible("nhassert(%s) failed in file '%s' at line %d", expression, filename, line);
+    impossible("nhassert(%s) failed in file '%s' at line %d",
+               expression, filename, line);
 }
 
 /*pline.c*/
