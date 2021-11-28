@@ -7545,7 +7545,9 @@ reputation to protect there!  [...]"
 #
 #
 #
-%title Monstrous Regiment (8)
+%title Monstrous Regiment (12)
+# pp. 44-45 (page citation if for Harper Torch Edition; that uses double
+#            quotes so the transciption came from some other edition)
 %passage 1
 'How can you protect yourself by carrying a sword if you don't know how
 to use it?'
@@ -7684,11 +7686,58 @@ girls of seven are magnetically attracted to the color pink.
 
   [Monstrous Regiment, by Terry Pratchett]
 %e passage
+#
+# 4 new passages added for 3.7
+#
+# p. 114 (the sergeant known as "Threeparts" is a bit daft, but Polly does
+#         eventually walk with Death--not die, just walk and talk with him)
+%passage 9
+"Best of luck, lads," he added cheerfully.  "You'll walk with Death every
+day, but I've seen 'im and he's been known to wink.  And remember:  fill
+your boots with soup!"
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# pp. 191-192 (passage starts mid-paragraph; speaker is William de Worde,
+#              writer/editor/publisher of Ankh-Morpork's leading newspaper)
+%passage 10
+"[...]  You see, the curious thing is that although Ankh-Morpork is probably
+the biggest bully around, in a subtle kind of way, we nevertheless have a
+soft spot for people who stand up to bullies.  Especially royal ones.  We
+tend to be on their side, provided it doesn't cost us too much."
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# pp. 211-212 (passage starts mid-paragraph)
+%passage 11
+The presence of those seeking the truth is infinitely to be preferred to
+the presence of those who think they've found it.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 225 ("[Sam Vimes]" inserted for clarity)
+%passage 12
+He [Sam Vimes] swore under his breath.  Prince Heinrich had inherited the
+throne in a country where the chief export was a kind of hand-painted
+wooden clog, but in ten years, he vowed, his capital city of Rigour would
+be "the Ankh-Morpork of the mountains!"
+
+For some reason, he thought Ankh-Morpork would be pleased about this.
+
+He was anxious, he said, to learn the Ankh-Morpork way of doing things, the
+kind of innocent ambition that could well lead to an aspiring leader...
+well, finding out the Ankh-Morpork way of doing things.  Heinrich had a
+reputation locally for cunning, but Ankh-Morpork had overtaken cunning a
+thousand years ago, had sped past devious, had left artful far behind, and
+had now, by a roundabout route, arrived at straightforward.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title A Hat Full of Sky (11)
+%title A Hat Full of Sky (13)
 # p. 405 (HarperTempest edition)
 %passage 1
 Why do you go away?  So that you can come back.  So that you can see the
@@ -7841,6 +7890,29 @@ are.  Would you like to hear the rest of the story?"
 ancestors.  They're in the way I look, in the color of my hair.  And I'm
 made up of everyone I've ever met who's changed the way I think.  So who
 is 'me'?"
+
+  [A Hat Full of Sky, by Terry Pratchett]
+%e passage
+#
+# 2 new passages added for 3.7
+#
+# p. 124 (first speaker is Tiffany)
+%passage 12
+"Well, couldn't you help him by magic?"
+
+"I'll see to it that he's in no pain, yes," said Miss Level.
+
+"But that's just herbs."
+
+"It's still magic.  Knowing things is magical, if other people don't know
+them."
+
+  [A Hat Full of Sky, by Terry Pratchett]
+%e passage
+# p. 405 (passage starts mid-paragraph, actually the next one after passage 1)
+%passage 13
+Joy is to fun what the deep sea is to a puddle.  It's a feeling inside that
+can hardly be contained.
 
   [A Hat Full of Sky, by Terry Pratchett]
 %e passage
