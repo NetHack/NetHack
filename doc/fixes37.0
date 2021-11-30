@@ -703,6 +703,8 @@ selection of random engravings, epitaphs, and hallucinatory monster names had
 	uniforn distribution but is better (tradeoff vs size; see makedefs)
 make selection of random rumors, engravings, epitaphs, and hallucinatory monst
 	names have uniform distribution by handling long lines specially
+when filling a special room with monsters, if one that can come in groups got
+	picked the group could spill to outside of the room
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
