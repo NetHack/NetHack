@@ -340,7 +340,7 @@ fill_zoo(struct mkroom* sroom)
                                              : (type == ANTHOLE)
                                                  ? antholemon()
                                                  : (struct permonst *) 0,
-                          sx, sy, MM_ASLEEP);
+                          sx, sy, MM_ASLEEP | MM_NOGRP);
             if (mon) {
                 mon->msleeping = 1;
                 if (type == COURT && mon->mpeaceful) {
