@@ -1369,13 +1369,8 @@ shrink_glob(
         if (delta >= (long) obj->owt) {
             /* no newsym() or message here; forthcoming map update for
                level arrival is all that's needed */
-            obj_extract_self(obj);
+            obj_extract_self(obj); /* if contained, updates container's owt */
             obfree(obj, (struct obj *) 0);
-
-            /* won't be a container carried by hero but might be a floor
-               one or one carried by a monster */
-            if (contnr)
-                container_weight(contnr);
         } else {
             obj->owt -= (unsigned) delta;
             start_glob_timeout(obj, moddelta);

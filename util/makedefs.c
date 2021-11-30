@@ -317,7 +317,7 @@ do_makedefs(char *options)
                                MD_PAD_RUMORS); /* '_RUMORS' is correct here */
             do_rnd_access_file(ENGRAVEFILE,
                 /* default engraving:  popularized by "The Adventures of
-                   Buckaroo Bonzai Across the 8th Dimenstion" but predates
+                   Buckaroo Bonzai Across the 8th Dimension" but predates
                    that 1984 movie; some attribute it to Confucius */
                                "No matter where you go, there you are.",
                                MD_PAD_RUMORS); /* '_RUMORS' used here too */

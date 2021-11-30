@@ -680,7 +680,7 @@ prevent normal monster activity from picking up the mines' luckstone or the
 proceed a little further into dochat() if hero is deaf
 stacks of 1 to 49 gold pieces weighed 0
 the chance for #untrap to free a monster stuck in a web was very unlikely
-	unless was poly'd into spider form; make it less hard
+	unless hero was poly'd into spider form; make it less hard
 if #untrap monst-from-web failure happened while hero was standing on a spot
 	where a new web couldn't be created (furniture, grave, magic portal),
 	the expected "<monst> remains entangled" feedback wasn't delivered
