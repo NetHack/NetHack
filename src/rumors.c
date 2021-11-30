@@ -52,8 +52,13 @@ static void init_CapMons(void);
 
 /* used by CapitalMon(); set up by init_CapMons(), released by free_CapMons();
    there's no need for these to be put into 'struct instance_globals g' */
-static unsigned CapMonSiz = 0;
+static unsigned CapMonstCnt = 0, CapBogonCnt = 0,
+                CapMonSiz = 0; /* CapMonstCnt+CapBogonCnt+1 when non-zero */
 static const char **CapMons = 0;
+
+/* list of bogusmons prefixes used to indicate special monster type such as
+   unique or always a particular gender; see dat/bogusmon.txt */
+extern const char bogon_codes[]; /* from do_name.c */
 
 /* makedefs pads short rumors, epitaphs, engravings, and hallucinatory
    monster names with trailing underscores; strip those off */
@@ -420,7 +425,7 @@ get_rnd_line(
         return buf;
     /* 'rumors' is about 3/4 of the way to the limit on a 16-bit config
        for the whole, roughly 3/8 of the way for either half; all active
-       active configuations these days are at least 32-bits anyway */
+       configuations these days are at least 32-bits anyway */
     nhassert(filechunksize <= INT_MAX); /* essential for rn2() */
 
     /*
@@ -773,8 +778,6 @@ CapitalMon(
     wln = (unsigned) strlen(word);
     for (i = 0; i < CapMonSiz - 1; ++i) {
         nam = CapMons[i];
-        if (*nam == '\033') /* if dynamic alloc flag is present, skip it */
-            ++nam;
         nln = (unsigned) strlen(nam);
         if (wln < nln)
             continue;
@@ -808,9 +811,14 @@ init_CapMons(void)
     for (pass = 1; pass <= 2; ++pass) {
         struct permonst *mptr;
         const char *nam;
-        unsigned mndx, mgend, count;
+        unsigned mndx, mgend;
 
-        count = 0;
+        /* the first CapMonstCnt entries come from mons[].pmnames[] and
+           the next CapBogonCnt entries from from the 'bogusmons' file;
+           there is an extra entry for Null at the end, but that is only
+           useful to force non-zero array size in case both mons[] and
+           bogusmons get modified to have no applicable monster names */
+        CapMonstCnt = CapBogonCnt = 0;
 
         /* gather applicable actual monsters */
         for (mndx = LOW_PM; mndx < NUMMONS; ++mndx) {
@@ -821,13 +829,13 @@ init_CapMons(void)
                 nam = mptr->pmnames[mgend];
                 if (nam && *nam != lowc(*nam)) {
                     if (pass == 2)
-                        CapMons[count] = nam;
-                    ++count;
+                        CapMons[CapMonstCnt] = nam;
+                    ++CapMonstCnt;
                 }
             }
         }
 
-        /* now gather applicable hallucinatory monsters; don't reset count */
+        /* now gather applicable hallucinatory monsters */
         if (bogonfile) {
             char hline[BUFSZ], xbuf[BUFSZ], *endp, *startp, code;
 
@@ -846,31 +854,26 @@ init_CapMons(void)
                 (void) xcrypt(hline, xbuf);
                 unpadline(xbuf);
 
-                if (letter(xbuf[0]))
+                if (!xbuf[0] || !index(bogon_codes, xbuf[0]))
                     code = '\0', startp = &xbuf[0]; /* ordinary */
                 else
                     code = xbuf[0], startp = &xbuf[1]; /* special */
 
                 if (*startp != lowc(*startp) && !bogon_is_pname(code)) {
-                    if (pass == 2) {
-                        /* insert a "dynamically allocated flag" and save a
-                           copy of bogus monst name without its prefix code */
-                        hline[0] = '\033';
-                        Strcpy(&hline[1], startp);
-                        CapMons[count] = dupstr(hline);
-                    }
-                    ++count;
+                    if (pass == 2)
+                        CapMons[CapMonstCnt + CapBogonCnt] = dupstr(startp);
+                    ++CapBogonCnt;
                 }
             }
         }
 
         /* finish the current pass */
         if (pass == 1) {
-            CapMonSiz = count + 1; /* +1: room for terminator */
+            CapMonSiz = CapMonstCnt + CapBogonCnt + 1; /* +1: terminator */
             CapMons = (const char **) alloc(CapMonSiz * sizeof *CapMons);
         } else { /* pass == 2 */
             /* terminator; not strictly needed */
-            CapMons[count] = (const char *) 0;
+            CapMons[CapMonSiz - 1] = (const char *) 0;
 
             if (bogonfile)
                 (void) dlb_fclose(bogonfile), bogonfile = (dlb *) 0;
@@ -887,17 +890,13 @@ init_CapMons(void)
      */
     if (wizard && explicitdebug("CapMons")) {
         char buf[BUFSZ];
-        const char *nam;
         unsigned i;
         winid tmpwin = create_nhwindow(NHW_TEXT);
 
         putstr(tmpwin, 0,
               "Capitalized monster type names normally preceded by \"the\":");
         for (i = 0; i < CapMonSiz - 1; ++i) {
-            nam = CapMons[i];
-            if (*nam == '\033')
-                ++nam;
-            Sprintf(buf, "  %.77s", nam);
+            Sprintf(buf, "  %.77s", CapMons[i]);
             putstr(tmpwin, 0, buf);
         }
         display_nhwindow(tmpwin, TRUE);
@@ -913,14 +912,13 @@ free_CapMons(void)
 {
     /* note: some elements of CapMons[] are string literals from
        mons[].pmnames[] and should not be freed, others are dynamically
-       allocated copies of hallucinatory monster names and should be freed;
-       the first character for each element of the latter group is ESC */
+       allocated copies of hallucinatory monster names and should be freed */
     if (CapMons) {
         unsigned idx;
 
-        for (idx = 0; idx < CapMonSiz - 1; ++idx)
-            if (CapMons[idx] && *CapMons[idx] == '\033')
-                free((genericptr_t) CapMons[idx]); /* cast: discard 'const' */
+        /* skip 0..MonstCnt-1, free MonstCnt..(MonstCnt+BogonCnt-1) */
+        for (idx = CapMonstCnt; idx < CapMonSiz - 1; ++idx)
+            free((genericptr_t) CapMons[idx]); /* cast: discard 'const' */
         free((genericptr_t) CapMons), CapMons = (const char **) 0;
     }
     CapMonSiz = 0;
