@@ -1912,7 +1912,7 @@ bury_objs(int x, int y)
     newsym(x, y);
 
     if (costly && loss) {
-        You("owe %s %ld %s for burying merchandise.", mon_nam(shkp), loss,
+        You("owe %s %ld %s for burying merchandise.", shkname(shkp), loss,
             currency(loss));
     }
 }

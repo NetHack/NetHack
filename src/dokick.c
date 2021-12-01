@@ -434,7 +434,7 @@ container_impact_dmg(struct obj *obj, xchar x,
             You("caused %ld %s worth of damage!", loss, currency(loss));
             make_angry_shk(shkp, x, y);
         } else {
-            You("owe %s %ld %s for objects destroyed.", mon_nam(shkp), loss,
+            You("owe %s %ld %s for objects destroyed.", shkname(shkp), loss,
                 currency(loss));
         }
     }
@@ -1459,7 +1459,7 @@ impact_drop(struct obj *missile, /* caused impact, won't drop itself */
                 if (ESHK(shkp)->customer[0] == 0)
                     (void) strncpy(ESHK(shkp)->customer, g.plname, PL_NSIZ);
                 if (angry)
-                    pline("%s is infuriated!", Monnam(shkp));
+                    pline("%s is infuriated!", Shknam(shkp));
                 else
                     pline("\"%s, you are a thief!\"", g.plname);
             } else
@@ -1470,7 +1470,7 @@ impact_drop(struct obj *missile, /* caused impact, won't drop itself */
         }
         if (ESHK(shkp)->debit > debit) {
             long amt = (ESHK(shkp)->debit - debit);
-            You("owe %s %ld %s for goods lost.", Monnam(shkp), amt,
+            You("owe %s %ld %s for goods lost.", shkname(shkp), amt,
                 currency(amt));
         }
     }

@@ -1814,11 +1814,11 @@ poly_obj(struct obj *obj, int id)
                     && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
                 } else {
-                    pline("%s gets angry!", Monnam(shkp));
+                    pline("%s gets angry!", Shknam(shkp));
                     hot_pursuit(shkp);
                 }
             } else
-                Norep("%s is furious!", Monnam(shkp));
+                Norep("%s is furious!", Shknam(shkp));
         }
     }
     delobj(obj);
