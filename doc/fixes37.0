@@ -705,6 +705,8 @@ make selection of random rumors, engravings, epitaphs, and hallucinatory monst
 	names have uniform distribution by handling long lines specially
 when filling a special room with monsters, if one that can come in groups got
 	picked the group could spill to outside of the room
+extend 3.6.1 fix to explicitly use name of unseen shopkeeper instead of "It"
+	in various shop related messages (ones issued outside of shk.c)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
