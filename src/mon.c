@@ -2695,6 +2695,7 @@ monstone(struct monst* mdef)
 
     if ((int) mdef->data->msize > MZ_TINY
         || !rn2(2 + ((int) (mdef->data->geno & G_FREQ) > 2))) {
+        unsigned corpstatflags = CORPSTAT_NONE;
         oldminvent = 0;
         /* some objects may end up outside the statue */
         while ((obj = mdef->minvent) != 0) {
@@ -2719,7 +2720,14 @@ monstone(struct monst* mdef)
         /* defer statue creation until after inventory removal
            so that saved monster traits won't retain any stale
            item-conferred attributes */
-        otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, CORPSTAT_NONE);
+        if (mdef->female)
+            corpstatflags |= CORPSTAT_FEMALE;
+        else if (!is_neuter(mdef->data))
+            corpstatflags |= CORPSTAT_MALE;
+        /* Archeologists should not break unique statues */
+        if (mdef->data->geno & G_UNIQ)
+            corpstatflags |= CORPSTAT_HISTORIC;
+        otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, corpstatflags);
         if (has_mgivenname(mdef))
             otmp = oname(otmp, MGIVENNAME(mdef));
         while ((obj = oldminvent) != 0) {
@@ -2727,9 +2735,6 @@ monstone(struct monst* mdef)
             obj->nobj = 0; /* avoid merged-> obfree-> dealloc_obj-> panic */
             (void) add_to_container(otmp, obj);
         }
-        /* Archeologists should not break unique statues */
-        if (mdef->data->geno & G_UNIQ)
-            otmp->spe = 1;
         otmp->owt = weight(otmp);
     } else
         otmp = mksobj_at(ROCK, x, y, TRUE, FALSE);
