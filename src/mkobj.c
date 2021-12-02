@@ -1367,12 +1367,19 @@ shrink_glob(
             delta = (delta + 2L) / 3L;
 
         if (delta >= (long) obj->owt) {
-            /* no newsym() or message here; forthcoming map update for
+            /* gone; no newsym() or message here--forthcoming map update for
                level arrival is all that's needed */
-            obj_extract_self(obj); /* if contained, updates container's owt */
+            obj_extract_self(obj); /* if contained, also updates container's
+                                    * weight (recursively when nested) */
             obfree(obj, (struct obj *) 0);
         } else {
+            /* shrank but not gone; reduce remaining weight */
             obj->owt -= (unsigned) delta;
+            /* won't be in container carried by hero but might be in floor one
+               or one carried by monster; if so, update container's weight */
+            if (contnr)
+                container_weight(contnr);
+            /* resume regular shrinking */
             start_glob_timeout(obj, moddelta);
         }
         return;
