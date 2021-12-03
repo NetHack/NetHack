@@ -115,8 +115,9 @@ erode_armor(struct monst *mdef, int hurt)
 
 /* FALSE means it's OK to attack */
 boolean
-attack_checks(struct monst *mtmp,
-              struct obj *wep) /* uwep for do_attack(), null for kick_monster() */
+attack_checks(
+    struct monst *mtmp, /* target */
+    struct obj *wep)    /* uwep for do_attack(), null for kick_monster() */
 {
     int glyph;
 
@@ -346,12 +347,28 @@ find_roll_to_hit(struct monst *mtmp,
     return tmp;
 }
 
+/* temporarily override 'safepet' (by faking use of 'F' prefix) when possibly
+   unintentionally attacking peaceful monsters and optionally pets */
+boolean
+force_attack(struct monst *mtmp, boolean pets_too)
+{
+    boolean attacked, save_Forcefight;
+
+    save_Forcefight = g.context.forcefight;
+    /* always set forcefight On for hostiles and peacefuls, maybe for pets */
+    if (pets_too || !mtmp->mtame)
+        g.context.forcefight = TRUE;
+    attacked = do_attack(mtmp);
+    g.context.forcefight = save_Forcefight;
+    return attacked;
+}
+
 /* try to attack; return False if monster evaded;
    u.dx and u.dy must be set */
 boolean
 do_attack(struct monst *mtmp)
 {
-    register struct permonst *mdat = mtmp->data;
+    struct permonst *mdat = mtmp->data;
 
     /* This section of code provides protection against accidentally
      * hitting peaceful (like '@') and tame (like 'd') monsters.

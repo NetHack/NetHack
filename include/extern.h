@@ -2707,6 +2707,7 @@ extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);
 extern int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
+extern boolean force_attack(struct monst *, boolean);
 extern boolean do_attack(struct monst *);
 extern boolean hmon(struct monst *, struct obj *, int, int);
 extern boolean shade_miss(struct monst *, struct monst *, struct obj *,

@@ -2702,8 +2702,7 @@ use_whip(struct obj *obj)
     if (obj != uwep) {
         if (!wield_tool(obj, "lash"))
             return 0;
-        else
-            res = 1;
+        res = 1;
     }
     if (!getdir((char *) 0))
         return res;
@@ -2739,7 +2738,7 @@ use_whip(struct obj *obj)
     if (proficient < 0)
         proficient = 0;
 
-    if (u.uswallow && do_attack(u.ustuck)) {
+    if (u.uswallow) {
         There("is not enough room to flick your bullwhip.");
 
     } else if (Underwater) {
@@ -2763,8 +2762,10 @@ use_whip(struct obj *obj)
                 (void) fire_damage(uwep, FALSE, u.ux, u.uy);
             return 1;
         }
-        if (Levitation || u.usteed) {
-            /* Have a shot at snaring something on the floor */
+        if (Levitation || u.usteed || Flying) {
+            /* Have a shot at snaring something on the floor.  A flyer
+               can reach the floor so could just pick an item up, but
+               allow snagging by whip too. */
             otmp = g.level.objects[u.ux][u.uy];
             if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
                 pline("Why beat a dead horse?");
@@ -2796,34 +2797,34 @@ use_whip(struct obj *obj)
          *
          * if you're in a pit
          *    - you are attempting to get out of the pit
-         * or, if you are applying it towards a small monster
-         *    - then it is assumed that you are trying to hit it
-         * else if the monster is wielding a weapon
-         *    - you are attempting to disarm a monster
-         * else
-         *    - you are attempting to hit the monster.
+         *    - if there is no suitable boulder or furniture to target,
+         *      target a big monster for that, or if a small or medium
+         *      monster is present, attack it
+         *      [if both boulder and furniture are present, target the
+         *      former because it is on top of the latter]
+         * else if you are applying it towards a monster
+         *    - if monster is concealed, reveal it and proceed;
+         *    - if it was not concealed and is wielding a weapon, attempt
+         *      to disarm it;
+         *    - otherwise attack it.
          *
          * if you're confused (and thus off the mark)
          *    - you only end up hitting.
-         *
          */
-        const char *wrapped_what = (char *) 0;
+        const char *wrapped_what = sobj_at(BOULDER, rx, ry) ? "a boulder"
+                                   : IS_FURNITURE(levl[rx][ry].typ)
+                                     ? something : (char *) 0;
 
         if (mtmp) {
-            if (bigmonst(mtmp->data)) {
+            /* if a big monster is known to be present, target it in
+               preference to boulder or furniture; if any small or medium
+               monster is present, or an unseen big one, use the boulder
+               or furniture if available, otherwise attack */
+            if (bigmonst(mtmp->data) && canspotmon(mtmp))
                 wrapped_what = strcpy(buf, mon_nam(mtmp));
-            } else if (proficient) {
-                if (do_attack(mtmp))
-                    return 1;
-                else
-                    pline1(msg_snap);
-            }
-        }
-        if (!wrapped_what) {
-            if (IS_FURNITURE(levl[rx][ry].typ))
-                wrapped_what = something;
-            else if (sobj_at(BOULDER, rx, ry))
-                wrapped_what = "a boulder";
+
+            if (!wrapped_what)
+                goto whipattack;
         }
         if (wrapped_what) {
             coord cc;
@@ -2834,8 +2835,10 @@ use_whip(struct obj *obj)
             if (proficient && rn2(proficient + 2)) {
                 if (!mtmp || enexto(&cc, rx, ry, g.youmonst.data)) {
                     You("yank yourself out of the pit!");
+                    reset_utrap(TRUE); /* [was after teleds(); do this before
+                                        * in case it has no alternative other
+                                        * than to put hero in another trap] */
                     teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
-                    reset_utrap(TRUE);
                     g.vision_full_recalc = 1;
                 }
             } else {
@@ -2847,11 +2850,31 @@ use_whip(struct obj *obj)
             pline1(msg_snap);
 
     } else if (mtmp) {
-        if (!canspotmon(mtmp) && !glyph_is_invisible(levl[rx][ry].glyph)) {
-            pline("A monster is there that you couldn't see.");
-            map_invisible(rx, ry);
+ whipattack:
+        otmp = 0; /* if monster is unseen, can't attempt to disarm it */
+        if (!canspotmon(mtmp)) {
+            boolean spotitnow;
+
+            mtmp->mundetected = 0; /* bring non-mimic hider out of hiding */
+            /* check visibility again after mundetected=0 in case being
+               brought out of hiding has exposed it (might not if hero is
+               blind or formerly hidden monster is also invisible) */
+            spotitnow = canspotmon(mtmp);
+            if (spotitnow || !glyph_is_invisible(levl[rx][ry].glyph)) {
+                pline("%s is there that you %s.",
+                      !spotitnow ? "A monster" : Amonnam(mtmp),
+                      !Blind ? "couldn't see" : "hadn't noticed");
+                if (!spotitnow)
+                    map_invisible(rx, ry);
+                else
+                    newsym(rx, ry);
+            }
+        } else {
+            /* monster is known so if it is wielding something, try to
+               disarm it rather than make a direct attack */
+            otmp = MON_WEP(mtmp);
         }
-        otmp = MON_WEP(mtmp); /* can be null */
+
         if (otmp) {
             char onambuf[BUFSZ];
             const char *mon_hand;
@@ -2943,20 +2966,23 @@ use_whip(struct obj *obj)
             } else {
                 pline1(msg_slipsfree);
             }
-            wakeup(mtmp, TRUE);
-        } else {
+        } else { /* mtmp isn't wielding a weapon; attack it */
+            boolean do_snap = TRUE;
+
             if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
-                && !sensemon(mtmp))
+                && !sensemon(mtmp)) {
                 stumble_onto_mimic(mtmp);
-            else
+                do_snap = FALSE;
+            } else {
                 You("flick your bullwhip towards %s.", mon_nam(mtmp));
-            if (proficient) {
-                if (do_attack(mtmp))
-                    return 1;
-                else
-                    pline1(msg_snap);
             }
+            if (proficient && force_attack(mtmp, FALSE))
+                return 1;
+            if (do_snap)
+                pline1(msg_snap);
         }
+        /* regardless of mtmp's weapon or hero's proficiency */
+        wakeup(mtmp, TRUE);
 
     } else if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
         /* it must be air -- water checked above */
