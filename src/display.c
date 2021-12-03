@@ -2179,11 +2179,14 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
          Unique glyphs in glyphmap[] determine everything else (what). */
     if (is_you) {
 #ifdef TEXTCOLOR
-        if (iflags.use_color && HAS_ROGUE_IBM_GRAPHICS
-            && g.symset[g.currentgraphics].nocolor == 0) {
+        if (!glyph_is_normal_monster(glyph) || !iflags.use_color) {
+            /* restrict color change to actual hero -- not item, furniture,
+               steed, zap, etc -- when color is enabled */
+        } else if (HAS_ROGUE_IBM_GRAPHICS
+                   && !g.symset[g.currentgraphics].nocolor) {
             /* actually player should be yellow-on-gray if in corridor */
             glyphinfo->gm.color = CLR_YELLOW;
-        } else if (iflags.use_color && flags.showrace && !Upolyd) {
+        } else if (flags.showrace && !Upolyd) {
             /* special case the hero for `showrace' option */
             glyphinfo->gm.color = HI_DOMESTIC;
         }
