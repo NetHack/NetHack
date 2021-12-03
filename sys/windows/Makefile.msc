@@ -10,7 +10,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition
 #            - Microsoft Visual Studio 2019 Community Edition
-#            - Microsoft Visual Studio 2022 Community Edition
+#            - Microsoft Visual Studio 2022 Community Edition v 17.0.2
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -605,7 +605,7 @@ rc=Rc
 #NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.39)
 #NMAKE version 1429301370 from latest VS 2019 (Nov  9, 2021 version 16.11.6)
 #NMAKE version 1430307050 from latest VS 2022 (Nov  8, 2021 version 17.0.0)
-
+#NMAKE version 1430307060 from latest VS 2022 (Nov 30, 2021 version 17.0.2)
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
 #!MESSAGE $(MAKE)
@@ -631,9 +631,9 @@ VSVER=2015
 VSVER=2017
 !ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301371)
 VSVER=2019
-!ELSEIF ($(MAKEVERSION) > 1429301370) && ($(MAKEVERSION) < 1430307051)
+!ELSEIF ($(MAKEVERSION) > 1429301370) && ($(MAKEVERSION) < 1430307061)
 VSVER=2022
-!ELSEIF ($(MAKEVERSION) > 1430307050)
+!ELSEIF ($(MAKEVERSION) > 1430307060)
 VSVER=2999              #untested future version
 !ENDIF
 
