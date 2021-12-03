@@ -140,6 +140,8 @@
 		31B8A46021A26AE70055BD01 /* dlb_main.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A45F21A26AE70055BD01 /* dlb_main.c */; };
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
+		5439B3BC275AADC600B8FB2F /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = 5439B3BB275AADC600B8FB2F /* date.c */; };
+		5439B3BE275AADCE00B8FB2F /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = 5439B3BD275AADCE00B8FB2F /* date.c */; };
 		54435B52247999CB00804CB3 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 54435B51247999CB00804CB3 /* nhlobj.c */; };
 		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
 		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
@@ -439,6 +441,8 @@
 		31B8A45121A26A750055BD01 /* recover.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = recover.c; path = ../../util/recover.c; sourceTree = "<group>"; };
 		31B8A45721A26A970055BD01 /* dlb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dlb; sourceTree = BUILT_PRODUCTS_DIR; };
 		31B8A45F21A26AE70055BD01 /* dlb_main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dlb_main.c; path = ../../util/dlb_main.c; sourceTree = "<group>"; };
+		5439B3BB275AADC600B8FB2F /* date.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = date.c; path = ../../src/date.c; sourceTree = "<group>"; };
+		5439B3BD275AADCE00B8FB2F /* date.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = date.c; path = ../../src/date.c; sourceTree = "<group>"; };
 		54435B51247999CB00804CB3 /* nhlobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlobj.c; path = ../../src/nhlobj.c; sourceTree = "<group>"; };
 		544768A8239949FA004B9739 /* sfstruct.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sfstruct.c; path = ../../src/sfstruct.c; sourceTree = "<group>"; };
 		544768AC23994A17004B9739 /* nhlsel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nhlsel.c; path = ../../src/nhlsel.c; sourceTree = "<group>"; };
@@ -489,6 +493,8 @@
 		3189576821A1FCC100FB2ABE = {
 			isa = PBXGroup;
 			children = (
+				5439B3BB275AADC600B8FB2F /* date.c */,
+				5439B3BD275AADCE00B8FB2F /* date.c */,
 				2A953FB221A3F404007906E5 /* XCode.xcconfig */,
 				31B8A3F821A23E490055BD01 /* win */,
 				31B8A3E921A23CC40055BD01 /* sys */,
@@ -839,7 +845,7 @@
 				317E7C4B21A35F0500F6E4E5 /* Copy makedefs */,
 				319CBA3821A3458100150830 /* Build data */,
 				317E7C4521A3548F00F6E4E5 /* Build rumors */,
-				317E7C4E21A3697300F6E4E5 /* Build options and headers */,
+				317E7C4E21A3697300F6E4E5 /* Build options */,
 				544768B8239954B9004B9739 /* Build Lua library */,
 				317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */,
 				3192867F21A3AF8000325BEB /* Build oracles */,
@@ -977,7 +983,7 @@
 			shellPath = /bin/sh;
 			shellScript = "cp \"${BUILT_PRODUCTS_DIR}\"/makedefs \"${NH_UTIL_DIR}\"/makedefs\n";
 		};
-		317E7C4E21A3697300F6E4E5 /* Build options and headers */ = {
+		317E7C4E21A3697300F6E4E5 /* Build options */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -987,17 +993,15 @@
 			inputPaths = (
 				"$(NH_UTIL_DIR)/makedefs",
 			);
-			name = "Build options and headers";
+			name = "Build options";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 				"$(NH_UTIL_DIR)/options",
-				"$(NH_INC_DIR)/date.h",
-				"$(NH_INC_DIR)/onames.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -v\ncd \"${NH_UTIL_DIR}\"\n./makedefs -o\n./makedefs -p\n";
+			shellScript = "cd \"${NH_DAT_DIR}\"\n\"${NH_UTIL_DIR}\"/makedefs -v\n";
 		};
 		317E7C4F21A36A5700F6E4E5 /* Build engrave, epitaph and bogusmon */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1362,6 +1366,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5439B3BE275AADCE00B8FB2F /* date.c in Sources */,
 				54435B52247999CB00804CB3 /* nhlobj.c in Sources */,
 				31B8A3BC21A238060055BD01 /* eat.c in Sources */,
 				31B8A3A921A238060055BD01 /* music.c in Sources */,
@@ -1501,6 +1506,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5439B3BC275AADC600B8FB2F /* date.c in Sources */,
 				31B8A31021A20DC10055BD01 /* monst.c in Sources */,
 				31B8A30F21A20DC10055BD01 /* objects.c in Sources */,
 				31B8A30C21A20D8B0055BD01 /* makedefs.c in Sources */,

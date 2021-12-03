@@ -863,7 +863,7 @@ static void
 init_hilite(void)
 {
     char *setf, *scratch;
-    int c, md_len;
+    int c, md_len = 0;
     int colors = tgetnum("Co");
 
     if (colors < 8 || (MD == NULL) || (strlen(MD) == 0)
