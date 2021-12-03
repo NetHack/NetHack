@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1611522041 2021/01/24 21:00:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1638499998 2021/12/03 02:53:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -972,7 +972,18 @@ spelleffects(int spell, boolean atme)
     }
 
     if (energy > u.uen) {
-        You("don't have enough energy to cast that spell.");
+        /*
+         * Hero has insufficient energy/power to cast the spell.
+         * Augment the message when current energy is at maximum.
+         * "yet": mainly for level 1 characters who already know a spell
+         * but don't start with enough energy to cast it.
+         *
+         * TODO: track peak energy (which can be reduced by traps or
+         * monster attacks or loss of levels) and say "any more" instead
+         * of "yet" if it was ever high enough to make this cast.
+         */
+        You("don't have enough energy to cast that spell%s.",
+            (u.uen >= u.uenmax) ? " yet" : "");
         return res;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
