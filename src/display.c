@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1609101156 2020/12/27 20:32:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1638622699 2021/12/04 12:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2194,7 +2194,7 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
                    && g.symset[g.currentgraphics].nocolor == 0) {
             /* actually player should be yellow-on-gray if in corridor */
             glyphinfo->gm.color = CLR_YELLOW;
-        } else if (flags.showrace) {
+        } else if (flags.showrace && glyph == hero_glyph) {
             /* for showrace, non-human hero is displayed by the symbol of
                corresponding type of monster rather than by '@' (handled
                by newsym()); we change the color to same as human hero */
@@ -2619,8 +2619,9 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             int pet_override = ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
                          ? g.ov_rogue_syms[SYM_PET_OVERRIDE + SYM_OFF_X]
                          : g.ov_primary_syms[SYM_PET_OVERRIDE + SYM_OFF_X]);
+
             if (g.showsyms[pet_override] != ' ')
-                gmap->symidx = pet_override;
+                gmap->symidx = SYM_PET_OVERRIDE + SYM_OFF_X;
         }
 #ifdef TEXTCOLOR
         /* Turn off color if no color defined, or rogue level w/o PC graphics.
