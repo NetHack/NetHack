@@ -661,8 +661,8 @@ u_init(void)
     set_uasmon();
 
     u.ulevel = 0; /* set up some of the initial attributes */
-    u.uhp = u.uhpmax = newhp();
-    u.uen = u.uenmax = newpw();
+    u.uhp = u.uhpmax = u.uhppeak = newhp();
+    u.uen = u.uenmax = u.uenpeak = newpw();
     u.uspellprot = 0;
     adjabil(0, 1);
     u.ulevel = u.ulevelmax = 1;

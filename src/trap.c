@@ -1959,6 +1959,8 @@ trapeffect_magic_trap(
             losehp(rnd(10), "magical explosion", KILLED_BY_AN);
             Your("body absorbs some of the magical energy!");
             u.uen = (u.uenmax += 2);
+            if (u.uenmax > u.uenpeak)
+                u.uenpeak = u.uenmax;
             return 0;
         } else {
             domagictrap();

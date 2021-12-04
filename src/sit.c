@@ -185,8 +185,11 @@ dosit(void)
                         u.mhmax += 4;
                     u.mh = u.mhmax;
                 }
-                if (u.uhp >= (u.uhpmax - 5))
+                if (u.uhp >= (u.uhpmax - 5)) {
                     u.uhpmax += 4;
+                    if (u.uhpmax > u.uhppeak)
+                        u.uhppeak = u.uhpmax;
+                }
                 u.uhp = u.uhpmax;
                 u.ucreamed = 0;
                 make_blinded(0L, TRUE);

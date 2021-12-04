@@ -1000,6 +1000,8 @@ Mb_hit(struct monst *magr, /* attacker */
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
                     u.uenmax++;
+                    if (u.uenmax > u.uenpeak)
+                        u.uenpeak = u.uenmax;
                     u.uen++;
                     g.context.botl = TRUE;
                     You("absorb magical energy!");

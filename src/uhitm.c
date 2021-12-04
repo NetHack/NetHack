@@ -3662,8 +3662,11 @@ mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 u.uhp += rnd(7);
                 if (!rn2(7)) {
                     /* hard upper limit via nurse care: 25 * ulevel */
-                    if (u.uhpmax < 5 * u.ulevel + d(2 * u.ulevel, 10))
+                    if (u.uhpmax < 5 * u.ulevel + d(2 * u.ulevel, 10)) {
                         u.uhpmax++;
+                        if (u.uhpmax > u.uhppeak)
+                            u.uhppeak = u.uhpmax;
+                    }
                     if (!rn2(13))
                         goaway = TRUE;
                 }

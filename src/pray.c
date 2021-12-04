@@ -387,6 +387,8 @@ fix_worst_trouble(int trouble)
             u.uhpmax += rnd(5);
         if (u.uhpmax <= 5)
             u.uhpmax = 5 + 1;
+        if (u.uhpmax > u.uhppeak)
+            u.uhppeak = u.uhpmax;
         u.uhp = u.uhpmax;
         g.context.botl = 1;
         break;
@@ -1087,6 +1089,8 @@ pleased(aligntyp g_align)
                 pluslvl(FALSE);
             } else {
                 u.uhpmax += 5;
+                if (u.uhpmax > u.uhppeak)
+                    u.uhppeak = u.uhpmax;
                 if (Upolyd)
                     u.mhmax += 5;
             }

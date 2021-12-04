@@ -1174,7 +1174,9 @@ peffect_gain_energy(struct obj *otmp)
     if (otmp->cursed)
         num = -num; /* subtract instead of add when cursed */
     u.uenmax += num;
-    if (u.uenmax <= 0)
+    if (u.uenmax > u.uenpeak)
+        u.uenpeak = u.uenmax;
+    else if (u.uenmax <= 0)
         u.uenmax = 0;
     u.uen += 3 * num;
     if (u.uen > u.uenmax)
@@ -1356,8 +1358,11 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
                 u.mh = (u.mhmax += nxtra);
         } else {
             u.uhp += nhp;
-            if (u.uhp > u.uhpmax)
+            if (u.uhp > u.uhpmax) {
                 u.uhp = (u.uhpmax += nxtra);
+                if (u.uhpmax > u.uhppeak)
+                    u.uhppeak = u.uhpmax;
+            }
         }
     }
     if (cureblind) {
@@ -1966,6 +1971,7 @@ potionbreathe(struct obj *obj)
         break;
     /*
     case POT_GAIN_LEVEL:
+    case POT_GAIN_ENERGY:
     case POT_LEVITATION:
     case POT_FRUIT_JUICE:
     case POT_MONSTER_DETECTION:

@@ -400,7 +400,8 @@ struct you {
     int umonster;               /* hero's "real" monster num */
     int umonnum;                /* current monster number */
 
-    int mh, mhmax, mtimedone;   /* for polymorph-self */
+    int mh, mhmax,              /* current and max hit points when polyd */
+        mtimedone;              /* no. of turns until polymorph times out */
     struct attribs macurr,      /* for monster attribs */
                    mamax;       /* for monster attribs */
     int ulycn;                  /* lycanthrope type */
@@ -450,8 +451,10 @@ struct you {
     uchar uspellprot;        /* protection by SPE_PROTECTION */
     uchar usptime;           /* #moves until uspellprot-- */
     uchar uspmtime;          /* #moves between uspellprot-- */
-    int uhp, uhpmax;         /* hit points, aka health */
-    int uen, uenmax;         /* magical energy - M. Stephenson */
+    int uhp, uhpmax,         /* hit points, aka health */
+        uhppeak;             /* highest value of uhpmax so far */
+    int uen, uenmax,         /* magical energy, aka spell power */
+        uenpeak;             /* highest value of uenmax so far */
     xchar uhpinc[MAXULEV],   /* increases to uhpmax for each level gain */
           ueninc[MAXULEV];   /* increases to uenmax for each level gain */
     int ugangr;              /* if the gods are angry at you */
@@ -459,7 +462,7 @@ struct you {
     int ublessed, ublesscnt; /* blessing/duration from #pray */
     long umoney0;
     long uspare1;
-    long uexp, urexp;
+    long uexp, urexp;        /* exper pts for gaining levels and for score */
     long ucleansed;          /* to record moves when player was cleansed */
     long usleep;             /* sleeping; monstermove you last started */
     int uinvault;

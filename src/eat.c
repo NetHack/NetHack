@@ -937,8 +937,11 @@ eye_of_newt_buzz(void)
 
         u.uen += rnd(3);
         if (u.uen > u.uenmax) {
-            if (!rn2(3))
+            if (!rn2(3)) {
                 u.uenmax++;
+                if (u.uenmax > u.uenpeak)
+                    u.uenpeak = u.uenmax;
+            }
             u.uen = u.uenmax;
         }
         if (old_uen != u.uen) {
@@ -2247,8 +2250,11 @@ fpostfx(struct obj *otmp)
         } else {
             u.uhp += otmp->cursed ? -rnd(20) : rnd(20);
             if (u.uhp > u.uhpmax) {
-                if (!rn2(17))
+                if (!rn2(17)) {
                     u.uhpmax++;
+                    if (u.uhpmax > u.uhppeak)
+                        u.uhppeak = u.uhpmax;
+                }
                 u.uhp = u.uhpmax;
             } else if (u.uhp <= 0) {
                 g.killer.format = KILLED_BY_AN;

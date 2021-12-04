@@ -1953,6 +1953,8 @@ doseduce(struct monst *mon)
             You_feel("raised to your full potential.");
             exercise(A_CON, TRUE);
             u.uen = (u.uenmax += rnd(5));
+            if (u.uenmax > u.uenpeak)
+                u.uenpeak = u.uenmax;
             break;
         case 1:
             You_feel("good enough to do it again.");

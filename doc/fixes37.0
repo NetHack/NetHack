@@ -1270,6 +1270,7 @@ decaying globs of {ooze,pudding,slime} shrink over time based on their total
 	weight, eventually to nothing; for combined globs it can take a long
 	time, and while doing so they no longer give the tainted corpse food
 	poisoning effect when eaten
+track peak maximum HP and peak maximum energy/power; no noticeable effect
 
 
 Platform- and/or Interface-Specific New Features

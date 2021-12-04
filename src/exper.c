@@ -289,11 +289,15 @@ pluslvl(boolean incr) /* true iff via incremental experience growth */
     }
     hpinc = newhp();
     u.uhpmax += hpinc;
+    if (u.uhpmax > u.uhppeak)
+        u.uhppeak = u.uhpmax;
     u.uhp += hpinc;
 
     /* increase spell power/energy points */
     eninc = newpw();
     u.uenmax += eninc;
+    if (u.uenmax > u.uenpeak)
+        u.uenpeak = u.uenmax;
     u.uen += eninc;
 
     /* increase level (unless already maxxed) */
