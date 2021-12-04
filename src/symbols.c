@@ -237,6 +237,7 @@ assign_graphics(int whichset)
         g.currentgraphics = PRIMARY;
         break;
     }
+    reset_glyphmap(gm_symchange);
 }
 
 void
