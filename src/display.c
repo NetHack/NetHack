@@ -1794,7 +1794,7 @@ row_refresh(int start, int stop, int y)
             bkglyphinfo.glyph = get_bk_glyph(x, y);
             print_glyph(WIN_MAP, x, y,
                         Glyphinfo_at(x, y, glyph), &bkglyphinfo);
-	}
+        }
     }
 }
 
@@ -2496,7 +2496,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
                 }
             } else if (has_rogue_color) {
                 color = cmap_to_roguecolor(cmap);
-	    }
+            }
         } else if ((offset = (glyph - GLYPH_ALTAR_OFF)) >= 0) {
             /* unaligned, chaotic, neutral, lawful, other altar */
             gmap->symidx = S_altar + SYM_OFF_P;
