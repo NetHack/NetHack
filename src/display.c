@@ -2171,20 +2171,33 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
               glyph_info *glyphinfo)
 {
     int offset;
-    boolean is_you = (x == u.ux && y == u.uy);
+    boolean is_you = (x == u.ux && y == u.uy
+                      /* verify hero or steed (not something underneath
+                         when hero is invisible without see invisible) */
+                      && canspotself());
     const glyph_map *gmap = &glyphmap[glyph];
 
     glyphinfo->gm = *gmap; /* glyphflags, symidx, color, tileidx */
-    /*   Only hero tinkering permitted on-the-fly (who).
-         Unique glyphs in glyphmap[] determine everything else (what). */
+    /*
+     * Only hero tinkering permitted on-the-fly (who).
+     * Unique glyphs in glyphmap[] determine everything else (what).
+     *
+     * (Note: if hero is invisible without see invisible, he/she usually
+     * can't see himself/herself.  This applies to accessibility hacks
+     * as well as to regular display.)
+     */
     if (is_you) {
 #ifdef TEXTCOLOR
-        if (iflags.use_color && HAS_ROGUE_IBM_GRAPHICS
-            && g.symset[g.currentgraphics].nocolor == 0) {
+        if (!iflags.use_color || Upolyd) {
+            ; /* color tweak not needed (!use_color) or not wanted (Upolyd) */
+        } else if (HAS_ROGUE_IBM_GRAPHICS
+                   && g.symset[g.currentgraphics].nocolor == 0) {
             /* actually player should be yellow-on-gray if in corridor */
             glyphinfo->gm.color = CLR_YELLOW;
-        } else if (iflags.use_color && flags.showrace && !Upolyd) {
-            /* special case the hero for `showrace' option */
+        } else if (flags.showrace) {
+            /* for showrace, non-human hero is displayed by the symbol of
+               corresponding type of monster rather than by '@' (handled
+               by newsym()); we change the color to same as human hero */
             glyphinfo->gm.color = HI_DOMESTIC;
         }
 #endif
@@ -2297,9 +2310,8 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 
     /* condense multiple tests in macro version down to single */
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS,
-            has_rogue_color =
-                (has_rogue_ibm_graphics
-                 && g.symset[g.currentgraphics].nocolor == 0);
+            has_rogue_color = (has_rogue_ibm_graphics
+                               && g.symset[g.currentgraphics].nocolor == 0);
     if (trigger == gm_levelchange)
         g.glyphmap_perlevel_flags = 0;
 

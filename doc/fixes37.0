@@ -916,6 +916,8 @@ glob shrinkage while hero was away from glob's level wasn't handled properly
 unpaid shop-owned glob that shrank to nothing had weight 0 which triggered
 	onbill warnings when 'sanity_check' was On; for 'Ix' and itemized
 	billing, the empty weight was shown to player if 'wizweight' was On
+if 'showrace' was On and invisible hero couldn't see invisible so didn't see
+	self, the color of wharever could be seen underneath changed to white
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
