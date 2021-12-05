@@ -2173,8 +2173,12 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
     int offset;
     boolean is_you = (x == u.ux && y == u.uy
                       /* verify hero or steed (not something underneath
-                         when hero is invisible without see invisible) */
-                      && canspotself());
+                         when hero is invisible without see invisible,
+                         or a temporary display effect like an explosion);
+                         this is only approximate, because hero might be
+                         mimicking an object (after eating mimic corpse or
+                         if polyd into mimic) or furniture (only if polyd) */
+                      && glyph_is_monster(glyph));
     const glyph_map *gmap = &glyphmap[glyph];
 
     glyphinfo->gm = *gmap; /* glyphflags, symidx, color, tileidx */
@@ -2188,13 +2192,14 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
      */
     if (is_you) {
 #ifdef TEXTCOLOR
-        if (!iflags.use_color || Upolyd) {
-            ; /* color tweak not needed (!use_color) or not wanted (Upolyd) */
+        if (!iflags.use_color || glyph != hero_glyph) {
+            ; /* color tweak not needed (!use_color) or not wanted (poly'd
+                 or riding--which uses steed's color, not hero's) */
         } else if (HAS_ROGUE_IBM_GRAPHICS
                    && g.symset[g.currentgraphics].nocolor == 0) {
             /* actually player should be yellow-on-gray if in corridor */
             glyphinfo->gm.color = CLR_YELLOW;
-        } else if (flags.showrace && glyph == hero_glyph) {
+        } else if (flags.showrace) {
             /* for showrace, non-human hero is displayed by the symbol of
                corresponding type of monster rather than by '@' (handled
                by newsym()); we change the color to same as human hero */
