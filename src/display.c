@@ -2167,8 +2167,11 @@ get_bk_glyph(xchar x, xchar y)
 #define GMAP_ROGUELEVEL     0x0002
 
 void
-map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
-              glyph_info *glyphinfo)
+map_glyphinfo(
+    xchar x, xchar y,
+    int glyph,
+    unsigned mgflags,
+    glyph_info *glyphinfo)
 {
     int offset;
     boolean is_you = (x == u.ux && y == u.uy
@@ -2192,7 +2195,7 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
      */
     if (is_you) {
 #ifdef TEXTCOLOR
-        if (!iflags.use_color || glyph != hero_glyph) {
+        if (!iflags.use_color || Upolyd || glyph != hero_glyph) {
             ; /* color tweak not needed (!use_color) or not wanted (poly'd
                  or riding--which uses steed's color, not hero's) */
         } else if (HAS_ROGUE_IBM_GRAPHICS
@@ -2208,7 +2211,8 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
 #endif
         /* accessibility
           This unchanging display character for hero was requested by
-          a blind player to enhance screen reader use */
+          a blind player to enhance screen reader use.
+          Turn on override symbol if caller hasn't specified NOOVERRIDE. */
         if (sysopt.accessibility == 1 && !(mgflags & MG_FLAG_NOOVERRIDE)) {
             offset = SYM_HERO_OVERRIDE + SYM_OFF_X;
             if ((g.glyphmap_perlevel_flags & GMAP_ROGUELEVEL)
@@ -2220,7 +2224,8 @@ map_glyphinfo(xchar x, xchar y, int glyph, unsigned mgflags,
     }
     if (sysopt.accessibility == 1
         && (mgflags & MG_FLAG_NOOVERRIDE) && glyph_is_pet(glyph)) {
-        /* one more accessiblity kludge */
+        /* one more accessiblity kludge;
+           turn off override symbol if caller has specfieid NOOVERRIDE */
         glyphinfo->gm.symidx = mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M;
     }
     glyphinfo->ttychar = g.showsyms[glyphinfo->gm.symidx];
