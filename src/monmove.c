@@ -481,7 +481,7 @@ dochug(register struct monst* mtmp)
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz
         && !noteleport_level(mtmp)) {
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
         return 0;
     }
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
@@ -538,7 +538,7 @@ dochug(register struct monst* mtmp)
             if (is_demon(g.youmonst.data)) {
                 /* "Good hunting, brother" */
                 if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, TRUE);
+                    (void) rloc(mtmp, RLOC_MSG);
             } else {
                 mtmp->minvis = mtmp->perminvis = 0;
                 /* Why?  For the same reason in real demon talk */
@@ -1077,9 +1077,9 @@ m_move(register struct monst* mtmp, register int after)
     if (ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan
         && !tele_restrict(mtmp)) {
         if (mtmp->mhp < 7 || mtmp->mpeaceful || rn2(2))
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         else
-            mnexto(mtmp);
+            mnexto(mtmp, RLOC_MSG);
         mmoved = 1;
         goto postmov;
     }
@@ -1402,7 +1402,7 @@ m_move(register struct monst* mtmp, register int after)
         mtmp->mtrack[0].y = omy;
     } else {
         if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
             return 1;
         }
         /* for a long worm, shrink it (by discarding end of tail) when

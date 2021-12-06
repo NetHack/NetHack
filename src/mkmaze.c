@@ -334,7 +334,7 @@ put_lregion_here(
         if ((mtmp = m_at(x, y)) != 0) {
             /* move the monster if no choice, or just try again */
             if (oneshot) {
-                if (!rloc(mtmp, TRUE))
+                if (!rloc(mtmp, RLOC_NOMSG))
                     m_into_limbo(mtmp);
             } else
                 return FALSE;
@@ -431,7 +431,7 @@ baalz_fixup(void)
         levl[x][y].typ = (levl[x][y].typ == TLWALL) ? BRCORNER : BLCORNER;
         levl[x][y + 1].typ = HWALL;
         if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
     }
 
     x = g.bughack.delarea.x2, y = g.bughack.delarea.y2;
@@ -440,7 +440,7 @@ baalz_fixup(void)
         levl[x][y].typ = (levl[x][y].typ == TLWALL) ? TRCORNER : TLCORNER;
         levl[x][y - 1].typ = HWALL;
         if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
     }
 
     /* reset bughack region; set low end to <COLNO,ROWNO> so that
@@ -1867,7 +1867,7 @@ mv_bubble(struct bubble* b, int dx, int dy, boolean ini)
 
                 /* mnearto() might fail. We can jump right to elemental_clog
                    from here rather than deal_with_overcrowding() */
-                if (!mnearto(mon, cons->x, cons->y, TRUE))
+                if (!mnearto(mon, cons->x, cons->y, TRUE, RLOC_NOMSG))
                     elemental_clog(mon);
                 break;
             }
@@ -1880,7 +1880,7 @@ mv_bubble(struct bubble* b, int dx, int dy, boolean ini)
                 newsym(ux0, uy0); /* clean up old position */
 
                 if (mtmp) {
-                    mnexto(mtmp);
+                    mnexto(mtmp, RLOC_NOMSG);
                 }
                 break;
             }

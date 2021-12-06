@@ -507,7 +507,8 @@ use_magic_whistle(struct obj *obj)
                 if (M_AP_TYPE(mtmp))
                     seemimic(mtmp);
                 omx = mtmp->mx, omy = mtmp->my;
-                mnexto(mtmp);
+                if (distu(omx, omy) > 2)
+                    mnexto(mtmp, RLOC_MSG);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
                     if (canspotmon(mtmp))
@@ -732,7 +733,7 @@ next_to_u(void)
             continue;
         if (mtmp->mleashed) {
             if (distu(mtmp->mx, mtmp->my) > 2)
-                mnexto(mtmp);
+                mnexto(mtmp, RLOC_NOMSG);
             if (distu(mtmp->mx, mtmp->my) > 2) {
                 for (otmp = g.invent; otmp; otmp = otmp->nobj)
                     if (otmp->otyp == LEASH
@@ -994,7 +995,7 @@ use_mirror(struct obj *obj)
         freeinv(obj);
         (void) mpickobj(mtmp, obj);
         if (!tele_restrict(mtmp))
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
     } else if (!is_unicorn(mtmp->data) && !humanoid(mtmp->data)
                && (!mtmp->minvis || perceives(mtmp->data)) && rn2(5)) {
         boolean do_react = TRUE;

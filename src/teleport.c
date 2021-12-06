@@ -9,6 +9,7 @@ static boolean tele_jump_ok(int, int, int, int);
 static boolean teleok(int, int, boolean);
 static void vault_tele(void);
 static boolean rloc_pos_ok(int, int, struct monst *);
+static void rloc_to_core(struct monst *, int, int, unsigned);
 static void mvault_tele(struct monst *);
 
 /* teleporting is prevented on this level for this monster? */
@@ -1201,16 +1202,31 @@ rloc_pos_ok(
  * a value because mtmp is a migrating_mon.  Worm tails are always
  * placed randomly around the head of the worm.
  */
-void
-rloc_to(struct monst* mtmp, register int x, register int y)
+static void
+rloc_to_core(struct monst* mtmp,
+             int x, int y,
+             unsigned int rlocflags)
 {
     register int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
+    boolean preventmsg = (rlocflags & RLOC_NOMSG) != 0;
+    boolean vanishmsg = (rlocflags & RLOC_MSG) != 0;
+    boolean appearmsg = (mtmp->mstrategy & STRAT_APPEARMSG) != 0;
+    boolean domsg = !g.in_mklev && (vanishmsg || appearmsg) && !preventmsg;
+    boolean telemsg = FALSE;
 
     if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp)
         return; /* that was easy */
 
     if (oldx) { /* "pick up" monster */
+        if (domsg && canspotmon(mtmp)) {
+            if (couldsee(x, y) || sensemon(mtmp)) {
+                telemsg = TRUE;
+            } else {
+                pline("%s vanishes!", Monnam(mtmp));
+            }
+        }
+
         if (mtmp->wormno) {
             remove_worm(mtmp);
         } else {
@@ -1238,6 +1254,24 @@ rloc_to(struct monst* mtmp, register int x, register int y)
     maybe_unhide_at(x, y);
     newsym(x, y);      /* update new location */
     set_apparxy(mtmp); /* orient monster */
+    if (domsg && (canspotmon(mtmp) || appearmsg)) {
+        mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
+        if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
+            pline("%s vanishes and reappears%s.",
+                  Monnam(mtmp),
+                  distu(x, y) <= 2 ? " next to you"
+                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
+                  : (distu(x, y) < distu(oldx, oldy)) ? " closer to you"
+                  : " further away");
+        } else {
+            pline("%s %s%s%s!",
+                  appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
+                  appearmsg ? "suddenly " : "",
+                  !Blind ? "appears" : "arrives",
+                  distu(x, y) <= 2 ? " next to you"
+                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by" : "");
+        }
+    }
 
     /* shopkeepers will only teleport if you zap them with a wand of
        teleportation or if they've been transformed into a jumpy monster;
@@ -1248,6 +1282,18 @@ rloc_to(struct monst* mtmp, register int x, register int y)
     /* trapped monster teleported away */
     if (mtmp->mtrapped && !mtmp->wormno)
         (void) mintrap(mtmp);
+}
+
+void
+rloc_to(struct monst *mtmp, int x, int y)
+{
+    rloc_to_core(mtmp, x, y, RLOC_NOMSG);
+}
+
+void
+rloc_to_flag(struct monst *mtmp, int x, int y, unsigned int rlocflags)
+{
+    rloc_to_core(mtmp, x, y, rlocflags);
 }
 
 static stairway *
@@ -1263,10 +1309,11 @@ stairway_find_forwiz(boolean isladder, boolean up)
 
 /* place a monster at a random location, typically due to teleport */
 /* return TRUE if successful, FALSE if not */
+/* rlocflags is RLOC_foo flags */
 boolean
 rloc(
     struct monst *mtmp, /* mx==0 implies migrating monster arrival */
-    boolean suppress_impossible)
+    unsigned int rlocflags)
 {
     register int x, y, trycount;
 
@@ -1312,12 +1359,12 @@ rloc(
                 goto found_xy;
 
     /* level either full of monsters or somehow faulty */
-    if (!suppress_impossible)
+    if ((rlocflags & RLOC_ERR) != 0)
         impossible("rloc(): couldn't relocate monster");
     return FALSE;
 
  found_xy:
-    rloc_to(mtmp, x, y);
+    rloc_to_core(mtmp, x, y, rlocflags);
     return TRUE;
 }
 
@@ -1331,7 +1378,7 @@ mvault_tele(struct monst* mtmp)
         rloc_to(mtmp, c.x, c.y);
         return;
     }
-    (void) rloc(mtmp, TRUE);
+    (void) rloc(mtmp, RLOC_NONE);
 }
 
 boolean
@@ -1364,7 +1411,7 @@ mtele_trap(struct monst* mtmp, struct trap* trap, int in_sight)
         if (trap->once)
             mvault_tele(mtmp);
         else
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_NONE);
 
         if (in_sight) {
             if (canseemon(mtmp))
@@ -1611,12 +1658,12 @@ u_teleport_mon(struct monst* mtmp, boolean give_feedback)
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
     } else if (is_rider(mtmp->data) && rn2(13)
                && enexto(&cc, u.ux, u.uy, mtmp->data))
         rloc_to(mtmp, cc.x, cc.y);
     else
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
     return TRUE;
 }
 

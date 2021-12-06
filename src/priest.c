@@ -232,7 +232,7 @@ priestini(d_level *lvl, struct mkroom *sroom, int sx, int sy,
         px = sx, py = sy;
 
     if (MON_AT(px, py))
-        (void) rloc(m_at(px, py), FALSE); /* insurance */
+        (void) rloc(m_at(px, py), RLOC_NOMSG); /* insurance */
 
     priest = makemon(prim, px, py, MM_EPRI);
     if (priest) {
@@ -672,7 +672,7 @@ mk_roamer(struct permonst *ptr, aligntyp alignment, xchar x, xchar y,
 #endif
 
     if (MON_AT(x, y))
-        (void) rloc(m_at(x, y), FALSE); /* insurance */
+        (void) rloc(m_at(x, y), RLOC_NOMSG); /* insurance */
 
     if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN)))
         return (struct monst *) 0;

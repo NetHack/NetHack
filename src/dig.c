@@ -60,7 +60,7 @@ mkcavepos(xchar x, xchar y, int dist, boolean waslit, boolean rockit)
             return;                   /* don't cover the portal */
         if ((mtmp = m_at(x, y)) != 0) /* make sure crucial monsters survive */
             if (!passes_walls(mtmp->data))
-                (void) rloc(mtmp, TRUE);
+                (void) rloc(mtmp, RLOC_NOMSG);
     } else if (lev->typ == ROOM)
         return;
 

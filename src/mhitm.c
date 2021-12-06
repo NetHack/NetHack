@@ -1038,7 +1038,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 if (magr == &g.youmonst)
                     tele();
                 else if (!tele_restrict(magr))
-                    (void) rloc(magr, TRUE);
+                    (void) rloc(magr, RLOC_MSG);
             }
         } else {
             if (g.vis && flags.verbose)

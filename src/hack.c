@@ -2497,7 +2497,7 @@ spoteffects(boolean pick)
                 pline("%s attacks you by surprise!", Amonnam(mtmp));
             break;
         }
-        mnexto(mtmp); /* have to move the monster */
+        mnexto(mtmp, RLOC_NOMSG); /* have to move the monster */
     }
  spotdone:
     if (!--inspoteffects) {

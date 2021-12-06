@@ -710,6 +710,7 @@ extend 3.6.1 fix to explicitly use name of unseen shopkeeper instead of "It"
 fix some inconsistencies with applied bullwhip vs monster
 polymorphing while wearing an amulet of strangulation from a form that wasn't
 	vulnerable to one that was gave wrong message ("still constricts")
+for accessibility reasons, give a message when monster teleports
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

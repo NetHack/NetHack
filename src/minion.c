@@ -299,7 +299,7 @@ demon_talk(register struct monst *mtmp)
         else if (canseemon(mtmp))
             pline("%s says something.", Amonnam(mtmp));
         if (!tele_restrict(mtmp))
-            (void) rloc(mtmp, TRUE);
+            (void) rloc(mtmp, RLOC_MSG);
         return 1;
     }
     cash = money_cnt(g.invent);

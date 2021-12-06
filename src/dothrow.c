@@ -2014,7 +2014,7 @@ gem_accept(register struct monst *mon, register struct obj *obj)
     if (!Blind)
         pline1(buf);
     if (!tele_restrict(mon))
-        (void) rloc(mon, TRUE);
+        (void) rloc(mon, RLOC_MSG);
     return ret;
 }
 

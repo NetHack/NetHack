@@ -1255,7 +1255,7 @@ u_collide_m(struct monst *mtmp)
         && distu(cc.x, cc.y) <= 2)
         u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
     else
-        mnexto(mtmp);
+        mnexto(mtmp, RLOC_NOMSG);
 
     if ((mtmp = m_at(u.ux, u.uy)) != 0) {
         /* there was an unconditional impossible("mnexto failed")
@@ -1263,7 +1263,7 @@ u_collide_m(struct monst *mtmp)
            with the situation, so only say something when debugging */
         if (wizard)
             pline("(monster in hero's way)");
-        if (!rloc(mtmp, TRUE) || (mtmp = m_at(u.ux, u.uy)) != 0)
+        if (!rloc(mtmp, RLOC_NOMSG) || (mtmp = m_at(u.ux, u.uy)) != 0)
             /* no room to move it; send it away, to return later */
             m_into_limbo(mtmp);
     }
@@ -1977,7 +1977,7 @@ revive_mon(anything *arg, long timeout UNUSED)
         boolean notice_it = canseemon(mtmp); /* before rloc() */
         char *monname = Monnam(mtmp);
 
-        if (rloc(mtmp, TRUE)) {
+        if (rloc(mtmp, RLOC_NOMSG)) {
             if (notice_it && !canseemon(mtmp))
                 pline("%s vanishes.", monname);
             else if (!notice_it && canseemon(mtmp))

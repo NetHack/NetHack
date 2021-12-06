@@ -750,7 +750,7 @@ minliquid_core(struct monst* mtmp)
             /* not fair...?  hero doesn't automatically teleport away
                from lava, just from water */
             if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
-                if (rloc(mtmp, TRUE))
+                if (rloc(mtmp, RLOC_MSG))
                     return 0;
             }
             if (!resists_fire(mtmp)) {
@@ -783,7 +783,7 @@ minliquid_core(struct monst* mtmp)
             if (!DEADMONSTER(mtmp)) {
                 (void) fire_damage_chain(mtmp->minvent, FALSE, FALSE,
                                          mtmp->mx, mtmp->my);
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
                 return 0;
             }
             return 1;
@@ -798,7 +798,7 @@ minliquid_core(struct monst* mtmp)
             /* like hero with teleport intrinsic or spell, teleport away
                if possible */
             if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
-                if (rloc(mtmp, TRUE))
+                if (rloc(mtmp, RLOC_MSG))
                     return 0;
             }
             if (cansee(mtmp->mx, mtmp->my)) {
@@ -820,7 +820,7 @@ minliquid_core(struct monst* mtmp)
                 xkilled(mtmp, XKILL_NOMSG);
             if (!DEADMONSTER(mtmp)) {
                 water_damage_chain(mtmp->minvent, FALSE);
-                if (!rloc(mtmp, TRUE))
+                if (!rloc(mtmp, RLOC_NOMSG))
                     deal_with_overcrowding(mtmp);
                 return 0;
             }
@@ -3256,10 +3256,9 @@ elemental_clog(struct monst* mon)
 /* make monster mtmp next to you (if possible);
    might place monst on far side of a wall or boulder */
 void
-mnexto(struct monst* mtmp)
+mnexto(struct monst* mtmp, unsigned int rlocflags)
 {
     coord mm;
-    boolean couldspot = canspotmon(mtmp);
 
     if (mtmp == u.usteed) {
         /* Keep your steed in sync with you instead */
@@ -3272,13 +3271,7 @@ mnexto(struct monst* mtmp)
         deal_with_overcrowding(mtmp);
         return;
     }
-    rloc_to(mtmp, mm.x, mm.y);
-    if (!g.in_mklev && (mtmp->mstrategy & STRAT_APPEARMSG)) {
-        mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
-        if (!couldspot && canspotmon(mtmp))
-            pline("%s suddenly %s!", Amonnam(mtmp),
-                  !Blind ? "appears" : "arrives");
-    }
+    rloc_to_flag(mtmp, mm.x, mm.y, rlocflags);
     return;
 }
 
@@ -3331,7 +3324,8 @@ mnearto(
     register struct monst *mtmp,
     xchar x,
     xchar y,
-    boolean move_other) /* make sure mtmp gets to x, y! so move m_at(x, y) */
+    boolean move_other, /* make sure mtmp gets to x, y! so move m_at(x, y) */
+    unsigned int rlocflags)
 {
     struct monst *othermon = (struct monst *) 0;
     xchar newx, newy;
@@ -3371,11 +3365,11 @@ mnearto(
         newx = mm.x;
         newy = mm.y;
     }
-    rloc_to(mtmp, newx, newy);
+    rloc_to_flag(mtmp, newx, newy, rlocflags);
 
     if (move_other && othermon) {
         res = 2; /* moving another monster out of the way */
-        if (!mnearto(othermon, x, y, FALSE))  /* no 'move_other' this time */
+        if (!mnearto(othermon, x, y, FALSE, rlocflags))  /* no 'move_other' this time */
             deal_with_overcrowding(othermon);
     }
 

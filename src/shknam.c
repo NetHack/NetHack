@@ -632,7 +632,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
     }
 
     if (MON_AT(sx, sy))
-        (void) rloc(m_at(sx, sy), FALSE); /* insurance */
+        (void) rloc(m_at(sx, sy), RLOC_NOMSG); /* insurance */
 
     /* now initialize the shopkeeper monster structure */
     if (!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK)))

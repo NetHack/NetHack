@@ -2318,7 +2318,8 @@ mhitm_ad_sgld(struct monst *magr, struct attack *mattk, struct monst *mdef,
         if (!tele_restrict(magr)) {
             boolean couldspot = canspotmon(magr);
 
-            (void) rloc(magr, TRUE);
+            (void) rloc(magr, RLOC_NOMSG);
+            /* TODO: use RLOC_MSG instead? */
             if (g.vis && couldspot && !canspotmon(magr))
                 pline("%s suddenly disappears!", buf);
         }
@@ -2412,7 +2413,8 @@ mhitm_ad_tlpt(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (g.vis && wasseen)
                 Strcpy(mdef_Monnam, Monnam(mdef));
             mdef->mstrategy &= ~STRAT_WAITFORU;
-            (void) rloc(mdef, TRUE);
+            (void) rloc(mdef, RLOC_NOMSG);
+            /* TODO: use RLOC_MSG instead? */
             if (g.vis && wasseen && !canspotmon(mdef) && mdef != u.usteed)
                 pline("%s suddenly disappears!", mdef_Monnam);
             if (mhm->damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
@@ -3687,7 +3689,7 @@ mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 return;
             } else if (!rn2(33)) {
                 if (!tele_restrict(magr))
-                    (void) rloc(magr, TRUE);
+                    (void) rloc(magr, RLOC_MSG);
                 monflee(magr, d(3, 6), TRUE, FALSE);
                 mhm->done = TRUE;
                 mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
@@ -3966,7 +3968,7 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
                       ? "brags about the goods some dungeon explorer provided"
                   : "makes some remarks about how difficult theft is lately");
             if (!tele_restrict(magr))
-                (void) rloc(magr, TRUE);
+                (void) rloc(magr, RLOC_MSG);
             mhm->hitflags = MM_AGR_DONE; /* return 3??? */
             mhm->done = TRUE;
             return;
@@ -3978,7 +3980,7 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
                       flags.female ? "unaffected" : "uninterested");
             if (rn2(3)) {
                 if (!tele_restrict(magr))
-                    (void) rloc(magr, TRUE);
+                    (void) rloc(magr, RLOC_MSG);
                 mhm->hitflags = MM_AGR_DONE; /* return 3??? */
                 mhm->done = TRUE;
                 return;
@@ -3995,7 +3997,7 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
             return;
         default:
             if (!is_animal(magr->data) && !tele_restrict(magr))
-                (void) rloc(magr, TRUE);
+                (void) rloc(magr, RLOC_MSG);
             if (is_animal(magr->data) && *buf) {
                 if (canseemon(magr))
                     pline("%s tries to %s away with %s.", Monnam(magr),
@@ -4050,7 +4052,8 @@ mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
                 boolean couldspot = canspotmon(magr);
 
-                (void) rloc(magr, TRUE);
+                (void) rloc(magr, RLOC_NOMSG);
+                /* TODO: use RLOC_MSG instead? */
                 if (g.vis && couldspot && !canspotmon(magr))
                     pline("%s suddenly disappears!", buf);
             }

@@ -123,7 +123,7 @@ mk_mplayer(struct permonst *ptr, xchar x, xchar y, boolean special)
         return ((struct monst *) 0);
 
     if (MON_AT(x, y))
-        (void) rloc(m_at(x, y), FALSE); /* insurance */
+        (void) rloc(m_at(x, y), RLOC_ERR|RLOC_NOMSG); /* insurance */
 
     if (!In_endgame(&u.uz))
         special = FALSE;

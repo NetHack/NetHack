@@ -348,7 +348,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
             && !rn2(mtmp->mtame ? 10 : mtmp->mpeaceful ? 5 : 2))
             rloc_to(mtmp, u.ux, u.uy);
         else
-            mnexto(mtmp);
+            mnexto(mtmp, RLOC_NOMSG);
         return;
     }
     /*
@@ -470,9 +470,9 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     mtmp->mx = 0; /*(already is 0)*/
     mtmp->my = xyflags;
     if (xlocale)
-        failed_to_place = !mnearto(mtmp, xlocale, ylocale, FALSE);
+        failed_to_place = !mnearto(mtmp, xlocale, ylocale, FALSE, RLOC_NOMSG);
     else
-        failed_to_place = !rloc(mtmp, TRUE);
+        failed_to_place = !rloc(mtmp, RLOC_NOMSG);
 
     if (failed_to_place)
         m_into_limbo(mtmp); /* try again next time hero comes to this level */

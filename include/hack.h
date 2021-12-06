@@ -442,6 +442,12 @@ typedef struct sortloot_item Loot;
 #define SUPPRESS_HISTORY 4
 #define URGENT_MESSAGE   8
 
+/* rloc() flags */
+#define RLOC_NONE    0x00
+#define RLOC_ERR     0x01 /* allow impossible() if no rloc */
+#define RLOC_MSG     0x02 /* show vanish/appear msg */
+#define RLOC_NOMSG   0x04 /* prevent appear msg, even for STRAT_APPEARMSG */
+
 /* Lua callback functions */
 enum nhcore_calls {
     NHCORE_START_NEW_GAME = 0,

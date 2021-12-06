@@ -720,7 +720,7 @@ use_defensive(struct monst* mtmp)
         }
         if (oseen && how)
             makeknown(how);
-        (void) rloc(mtmp, TRUE);
+        (void) rloc(mtmp, RLOC_MSG);
         return 2;
     case MUSE_WAN_TELEPORTATION:
         g.zap_oseen = oseen;
@@ -1395,7 +1395,7 @@ mbhitm(register struct monst* mtmp, register struct obj* otmp)
                 if (cansee(mtmp->mx, mtmp->my))
                     pline("%s resists the magic!", Monnam(mtmp));
             } else if (!tele_restrict(mtmp))
-                (void) rloc(mtmp, TRUE);
+                (void) rloc(mtmp, RLOC_MSG);
         }
         break;
 #endif

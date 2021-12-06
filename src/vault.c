@@ -75,7 +75,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
             } else {
                 if (mtmp->mtame)
                     yelp(mtmp);
-                if (!rloc(mtmp, TRUE))
+                if (!rloc(mtmp, RLOC_MSG))
                     m_into_limbo(mtmp);
             }
         }
@@ -607,7 +607,7 @@ wallify_vault(struct monst *grd)
                 if ((mon = m_at(x, y)) != 0 && mon != grd) {
                     if (mon->mtame)
                         yelp(mon);
-                    (void) rloc(mon, FALSE);
+                    (void) rloc(mon, RLOC_ERR);
                 }
                 /* move gold at wall locations into the vault */
                 if ((gold = g_at(x, y)) != 0) {
@@ -672,7 +672,7 @@ gd_mv_monaway(struct monst *grd, int nx, int ny)
     if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
         if (!Deaf)
             verbalize("Out of my way, scum!");
-        if (!rloc(m_at(nx, ny), FALSE) || MON_AT(nx, ny))
+        if (!rloc(m_at(nx, ny), RLOC_ERR|RLOC_MSG) || MON_AT(nx, ny))
             m_into_limbo(m_at(nx, ny));
     }
 }
@@ -796,7 +796,7 @@ gd_move(struct monst *grd)
         if (!u_in_vault
             && (grd_in_vault || (in_fcorridor(grd, grd->mx, grd->my)
                                  && !in_fcorridor(grd, u.ux, u.uy)))) {
-            (void) rloc(grd, TRUE);
+            (void) rloc(grd, RLOC_MSG);
             wallify_vault(grd);
             if (!in_fcorridor(grd, grd->mx, grd->my))
                 (void) clear_fcorr(grd, TRUE);
@@ -833,7 +833,7 @@ gd_move(struct monst *grd)
                 n = grd->my;
                 if (!Deaf)
                     verbalize("You've been warned, knave!");
-                mnexto(grd);
+                mnexto(grd, RLOC_NOMSG);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
@@ -850,7 +850,7 @@ gd_move(struct monst *grd)
             if (u_carry_gold) { /* player teleported */
                 m = grd->mx;
                 n = grd->my;
-                (void) rloc(grd, TRUE);
+                (void) rloc(grd, RLOC_MSG);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
@@ -1111,7 +1111,7 @@ paygd(boolean silently)
         if (grd->mpeaceful) /* peaceful guard has no "right" to your gold */
             goto remove_guard;
 
-        mnexto(grd);
+        mnexto(grd, RLOC_NOMSG);
         if (!silently)
             pline("%s remits your gold to the vault.", Monnam(grd));
         gx = g.rooms[EGD(grd)->vroom].lx + rn2(2);
