@@ -257,8 +257,8 @@ worm_move(struct monst *worm)
             /* can't exceed segment-derived limit unless level increase after
                peak tail growth has already done so; when that isn't the case,
                if segment growth exceeds current max HP then increase it */
-            if (worm->mhp > whpcap)
-                worm->mhp = whpcap;
+            if (worm->mhp > whplimit)
+                worm->mhp = whplimit;
             if (worm->mhp > worm->mhpmax)
                 worm->mhpmax = worm->mhp;
         } else {
