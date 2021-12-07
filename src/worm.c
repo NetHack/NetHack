@@ -214,7 +214,7 @@ worm_move(struct monst *worm)
     wheads[wnum] = new_seg; /* move the end pointer */
 
     if (wgrowtime[wnum] <= g.moves) {
-        int whplimit, whpcap, wsegs = count_wsegs(worm);
+        int whplimit, whpcap, prev_mhp, wsegs = count_wsegs(worm);
 
         /* first set up for the next time to grow */
         if (!wgrowtime[wnum]) {
@@ -251,6 +251,7 @@ worm_move(struct monst *worm)
         if (whplimit > MHPMAX)
             whplimit = MHPMAX;
 
+        prev_mhp = worm->mhp;
         worm->mhp += d(2, 2); /* 2..4, average 3 */
         whpcap = max(whplimit, worm->mhpmax);
         if (worm->mhp < whpcap) {
@@ -258,7 +259,7 @@ worm_move(struct monst *worm)
                peak tail growth has already done so; when that isn't the case,
                if segment growth exceeds current max HP then increase it */
             if (worm->mhp > whplimit)
-                worm->mhp = whplimit;
+                worm->mhp = max(prev_mhp, whplimit);
             if (worm->mhp > worm->mhpmax)
                 worm->mhpmax = worm->mhp;
         } else {
