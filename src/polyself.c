@@ -141,6 +141,8 @@ check_strangling(boolean on)
 {
     /* on -- maybe resume strangling */
     if (on) {
+        boolean was_strangled = (Strangled != 0L);
+
         /* when Strangled is already set, polymorphing from one
            vulnerable form into another causes the counter to be reset */
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
@@ -148,7 +150,7 @@ check_strangling(boolean on)
             Strangled = 6L;
             g.context.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
-                 Strangled ? "still constricts" : "begins constricting",
+                 was_strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
             makeknown(AMULET_OF_STRANGULATION);
         }

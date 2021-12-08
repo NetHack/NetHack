@@ -708,6 +708,8 @@ when filling a special room with monsters, if one that can come in groups got
 extend 3.6.1 fix to explicitly use name of unseen shopkeeper instead of "It"
 	in various shop related messages (ones issued outside of shk.c)
 fix some inconsistencies with applied bullwhip vs monster
+polymorphing while wearing an amulet of strangulation from a form that wasn't
+	vulnerable to one that was gave wrong message ("still constricts")
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
