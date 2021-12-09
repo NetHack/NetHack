@@ -229,7 +229,7 @@ set_occupation(int (*fn)(void), const char *txt, int xtime)
 void
 cmdq_add_ec(int (*fn)(void))
 {
-    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
     struct _cmd_queue *cq = g.command_queue;
 
     tmp->typ = CMDQ_EXTCMD;
@@ -249,7 +249,7 @@ cmdq_add_ec(int (*fn)(void))
 void
 cmdq_add_key(char key)
 {
-    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
     struct _cmd_queue *cq = g.command_queue;
 
     tmp->typ = CMDQ_KEY;
@@ -1960,7 +1960,8 @@ struct ext_func_tab extcmdlist[] = {
     { 'q',    "quaff", "quaff (drink) something",
               dodrink, 0, NULL },
     { '\0', "quit", "exit without saving current game",
-              done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD, NULL },
+              done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD,
+              NULL },
     { 'Q',    "quiver", "select ammunition for quiver",
               dowieldquiver, 0, NULL },
     { 'r',    "read", "read a scroll or spellbook",
