@@ -1368,7 +1368,8 @@ shrink_glob(
 
         if (delta >= (long) obj->owt) {
             /* gone; no newsym() or message here--forthcoming map update for
-               level arrival is all that's needed */
+               level arrival is all that's needed; no owornmask handling is
+               necessary (obj is not in invent, monsters never wield globs) */
             obj_extract_self(obj); /* if contained, also updates container's
                                     * weight (recursively when nested) */
             obfree(obj, (struct obj *) 0);
@@ -1486,11 +1487,22 @@ shrink_glob(
                          && get_obj_location(obj, &ox, &oy, 0)
                          && cansee(ox, oy));
 
-        /* weight has been reduced to 0 so destroy the glob; if it was
-           contained, it has already been removed from its container above */
-        if (obj->where != OBJ_FREE)
-            obj_extract_self(obj);
-        obfree(obj, (struct obj *) 0);
+        /* weight has been reduced to 0 so destroy the glob */
+        if (ininv) {
+            if (obj->owornmask) {
+                remove_worn_item(obj, FALSE);
+                stop_occupation();
+            }
+            useupall(obj); /* freeinv()+obfree() */
+        } else {
+            /* no owornmask handling necessary (when not in hero's invent,
+               can't be worn: monsters don't wield globs and shrink timer
+               can't fire for migrating objects); if glob was contained, it
+               has already been removed from its container and is now free */
+            if (obj->where != OBJ_FREE)
+                obj_extract_self(obj);
+            obfree(obj, (struct obj *) 0);
+        }
 
         if (seeit) {
             newsym(ox, oy);

@@ -923,6 +923,8 @@ if 'showrace' was On and invisible hero couldn't see invisible so didn't see
 in wizard mode, a poly'd priest/priestess attempting to polymorph into priest
 	or priestess in order to rehumanize became a new man or woman instead
 	because "priest" matched "aligned cleric" rather than the role monster
+if a glob which has just shrunk away to nothing was wielded or quivered,
+	unwield it before destroying it
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
