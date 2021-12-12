@@ -479,6 +479,12 @@ attrcurse(void)
     case 7:
         if (HSee_invisible & INTRINSIC) {
             HSee_invisible &= ~INTRINSIC;
+            if (!See_invisible) {
+                set_mimic_blocking();
+                see_monsters();
+                /* might not be able to see self anymore */
+                newsym(u.ux, u.uy);
+            }
             You("%s!", Hallucination ? "tawt you taw a puttie tat"
                                      : "thought you saw something");
             break;

@@ -1265,6 +1265,7 @@ under_ground(int mode)
  *      + hallucinating
  *      + doing a full screen redraw
  *      + see invisible times out or a ring of see invisible is taken off
+ *        or intrinsic see invisible is stolen by a gremlin
  *      + when a potion of see invisible is quaffed or a ring of see
  *        invisible is put on
  *      + gaining telepathy when blind [givit() in eat.c, pleased() in pray.c]
