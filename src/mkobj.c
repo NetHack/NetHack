@@ -8,6 +8,7 @@
 static void mkbox_cnts(struct obj *);
 static unsigned nextoid(struct obj *, struct obj *);
 static int item_on_ice(struct obj *);
+static void shrinking_glob_gone(struct obj *);
 static void obj_timer_checks(struct obj *, xchar, xchar, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
@@ -282,6 +283,7 @@ mkbox_cnts(struct obj *box)
             if (otmp->timed) {
                 (void) stop_timer(ROT_CORPSE, obj_to_any(otmp));
                 (void) stop_timer(REVIVE_MON, obj_to_any(otmp));
+                (void) stop_timer(SHRINK_GLOB, obj_to_any(otmp));
             }
         } else {
             register int tprob;
@@ -1328,7 +1330,9 @@ start_glob_timeout(
 /* globs have quantity 1 and size which varies by multiples of 20 in owt;
    they don't become tainted with age, but every 25 turns this timer runs
    and reduces owt by 1; when it hits 0, destroy the glob (if some other
-   part of the program destroys it, the timer will be cancelled) */
+   part of the program destroys it, the timer will be cancelled);
+   note: timer keeps going if an object gets buried or scheduled to
+   migrate to another level and can delete the glob in those states */
 void
 shrink_glob(
     anything *arg,    /* glob (in arg->a_obj) */
@@ -1361,18 +1365,15 @@ shrink_glob(
         /* number of units of weight to remove */
         long delta = (g.moves - expire_time + 24L) / 25L,
              /* leftover amount to use for new timer */
-            moddelta = 25L - (delta % 25L);
+             moddelta = 25L - (delta % 25L);
 
         if (globloc == SET_ON_ICE)
             delta = (delta + 2L) / 3L;
 
         if (delta >= (long) obj->owt) {
             /* gone; no newsym() or message here--forthcoming map update for
-               level arrival is all that's needed; no owornmask handling is
-               necessary (obj is not in invent, monsters never wield globs) */
-            obj_extract_self(obj); /* if contained, also updates container's
-                                    * weight (recursively when nested) */
-            obfree(obj, (struct obj *) 0);
+               level arrival is all that's needed */
+            shrinking_glob_gone(obj);
         } else {
             /* shrank but not gone; reduce remaining weight */
             obj->owt -= (unsigned) delta;
@@ -1488,21 +1489,7 @@ shrink_glob(
                          && cansee(ox, oy));
 
         /* weight has been reduced to 0 so destroy the glob */
-        if (ininv) {
-            if (obj->owornmask) {
-                remove_worn_item(obj, FALSE);
-                stop_occupation();
-            }
-            useupall(obj); /* freeinv()+obfree() */
-        } else {
-            /* no owornmask handling necessary (when not in hero's invent,
-               can't be worn: monsters don't wield globs and shrink timer
-               can't fire for migrating objects); if glob was contained, it
-               has already been removed from its container and is now free */
-            if (obj->where != OBJ_FREE)
-                obj_extract_self(obj);
-            obfree(obj, (struct obj *) 0);
-        }
+        shrinking_glob_gone(obj);
 
         if (seeit) {
             newsym(ox, oy);
@@ -1519,6 +1506,35 @@ shrink_glob(
     if (updinv) {
         update_inventory();
         (void) encumber_msg();
+    }
+}
+
+/* a glob has shrunk away to nothing; handle owornmask, then delete glob */
+static void
+shrinking_glob_gone(struct obj *obj)
+{
+    if (obj->where == OBJ_INVENT) {
+        if (obj->owornmask) {
+            remove_worn_item(obj, FALSE);
+            stop_occupation();
+        }
+        useupall(obj); /* freeinv()+obfree() */
+    } else {
+        if (obj->where == OBJ_MIGRATING) {
+            /* clear destination flag so that obfree()'s check for freeing
+               a worn object doesn't get a false hit */
+            obj->owornmask = 0L;
+        } else if (obj->where == OBJ_MINVENT) {
+            /* monsters don't wield globs so this isn't strictly needed */
+            if (obj->owornmask && obj == MON_WEP(obj->ocarry))
+                setmnotwielded(obj->ocarry, obj); /* clears owornmask */
+        }
+        /* glob might already be free if shrink_glob() has removed it from
+           a container; otherwise, free it now */
+        if (obj->where != OBJ_FREE)
+            obj_extract_self(obj);
+        /* delete it */
+        obfree(obj, (struct obj *) 0);
     }
 }
 
