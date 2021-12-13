@@ -1024,7 +1024,8 @@ query_objlist(const char *qstr,        /* query string */
                          (qflags & USE_INVLET) ? curr->invlet
                            : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
-                         ATR_NONE, doname_with_price(curr), MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, doname_with_price(curr),
+                         MENU_ITEMFLAGS_NONE);
                 first = FALSE;
             }
         }
@@ -1039,8 +1040,8 @@ query_objlist(const char *qstr,        /* query string */
         if (sorted && n > 1) {
             Sprintf(buf, "%s Creatures",
                     is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings, buf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
+                     buf, MENU_ITEMFLAGS_NONE);
         }
         fake_hero_object = cg.zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */
@@ -1447,7 +1448,7 @@ carry_count(struct obj *obj,            /* object to pick up... */
         wt = iw + (int) GOLD_WT(umoney + qq);
     } else if (count > 1 || count < obj->quan) {
         /*
-         * Ugh. Calc num to lift by changing the quan of of the
+         * Ugh. Calc num to lift by changing the quan of the
          * object and calling weight.
          *
          * This works for containers only because containers
@@ -2755,11 +2756,15 @@ use_container(struct obj **objp,
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
         g.current_container->owt = weight(g.current_container);
     }
-    inokay = (g.invent != 0
-              && !(g.invent == g.current_container && !g.current_container->nobj));
+    /* might put something in if carring anything other than just the
+       container itself (invent is not the container or has a next object) */
+    inokay = (g.invent != 0 && (g.invent != g.current_container
+                                || g.invent->nobj));
+    /* might take something out if container isn't empty */
     outokay = Has_contents(g.current_container);
     if (!outokay) /* preformat the empty-container message */
-        Sprintf(emptymsg, "%s is %sempty.", Ysimple_name2(g.current_container),
+        Sprintf(emptymsg, "%s is %sempty.",
+                Ysimple_name2(g.current_container),
                 (quantum_cat || cursed_mbag) ? "now " : "");
 
     /*
@@ -2770,7 +2775,8 @@ use_container(struct obj **objp,
      * that it's empty (latter can change on subsequent
      * iterations if player picks ':' response);
      * include the put-in choices ('i','s') if hero
-     * carries any inventory (including gold);
+     * carries any inventory (including gold) aside from
+     * the container itself;
      * include do-both when 'o' is available, even if
      * inventory is empty--taking out could alter that;
      * include do-both-reversed when 'i' is available,
@@ -2805,7 +2811,8 @@ use_container(struct obj **objp,
                    trying to do both will yield proper feedback */
                 c = 'b';
             } else {
-                c = in_or_out_menu(qbuf, g.current_container, outmaybe, inokay,
+                c = in_or_out_menu(qbuf, g.current_container,
+                                   outmaybe, inokay,
                                    (boolean) (used != 0), more_containers);
             }
         } else { /* TRADITIONAL or COMBINATION */
@@ -2863,10 +2870,13 @@ use_container(struct obj **objp,
                 used |= (menu_loot(0, FALSE) > 0);
             add_valid_menu_class(0);
         }
+        /* recalculate 'inokay' in case something was just taken out and
+           inventory is no longer empty or no longer just the container */
+        inokay = (g.invent && (g.invent != g.current_container
+                               || g.invent->nobj));
     }
 
-    if ((loot_in || stash_one)
-        && (!g.invent || (g.invent == g.current_container && !g.invent->nobj))) {
+    if ((loot_in || stash_one) && !inokay) {
         You("don't have anything%s to %s.", g.invent ? " else" : "",
             stash_one ? "stash" : "put in");
         loot_in = stash_one = FALSE;
@@ -3181,8 +3191,8 @@ tip_ok(struct obj *obj)
     }
 
     /* include horn of plenty if sufficiently discovered */
-    if (obj->otyp == HORN_OF_PLENTY && obj->dknown &&
-        objects[obj->otyp].oc_name_known)
+    if (obj->otyp == HORN_OF_PLENTY && obj->dknown
+        && objects[obj->otyp].oc_name_known)
         return GETOBJ_SUGGEST;
 
     /* allow trying anything else in inventory */
@@ -3242,7 +3252,8 @@ dotip(void)
                        containers that it's already being used */
                     i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
                     add_menu(win, &nul_glyphinfo, &any, i, 0, ATR_NONE,
-                             "tip something being carried", MENU_ITEMFLAGS_SELECTED);
+                             "tip something being carried",
+                             MENU_ITEMFLAGS_SELECTED);
                 }
                 end_menu(win, "Tip which container?");
                 n = select_menu(win, PICK_ONE, &pick_list);
