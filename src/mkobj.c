@@ -1380,7 +1380,7 @@ shrink_glob(
         if (delta >= (long) obj->owt) {
             /* gone; no newsym() or message here--forthcoming map update for
                level arrival is all that's needed */
-            obj->owt = 0; /* not required; accurately reflect's obj's state */
+            obj->owt = 0; /* not required; accurately reflects obj's state */
             shrinking_glob_gone(obj);
         } else {
             /* shrank but not gone; reduce remaining weight */
@@ -1524,8 +1524,8 @@ shrinking_glob_gone(struct obj *obj)
         useupall(obj); /* freeinv()+obfree() */
     } else {
         if (obj->where == OBJ_MIGRATING) {
-            /* clear destination flag so that obfree()'s check for freeing
-               a worn object doesn't get a false hit */
+            /* destination flag overloads owornmask; clear it so obfree()'s
+               check for freeing a worn object doesn't get a false hit */
             obj->owornmask = 0L;
         } else if (obj->where == OBJ_MINVENT) {
             /* monsters don't wield globs so this isn't strictly needed */
