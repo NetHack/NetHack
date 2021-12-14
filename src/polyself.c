@@ -266,7 +266,8 @@ change_sex(void)
     } else if (u.umonnum == PM_AMOROUS_DEMON) {
         flags.female = !flags.female;
 #if 0
-        /* change monster type to match new sex; disabled with PM_AMOROUS_DEMON */
+        /* change monster type to match new sex; disabled with
+           PM_AMOROUS_DEMON */
 
         u.umonnum = (u.umonnum == PM_SUCCUBUS) ? PM_INCUBUS : PM_SUCCUBUS;
 #endif
@@ -832,12 +833,12 @@ polymon(int mntmp)
         if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst))
             pline(use_thec, monsterc, "change shape");
 
-        if (lays_eggs(g.youmonst.data) && flags.female &&
-            !(g.youmonst.data == &mons[PM_GIANT_EEL]
-                || g.youmonst.data == &mons[PM_ELECTRIC_EEL]))
+        if (lays_eggs(g.youmonst.data) && flags.female
+            && !(g.youmonst.data == &mons[PM_GIANT_EEL]
+                 || g.youmonst.data == &mons[PM_ELECTRIC_EEL]))
             pline(use_thec, "sit",
-                  eggs_in_water(g.youmonst.data) ?
-                      "spawn in the water" : "lay an egg");
+                  eggs_in_water(g.youmonst.data) ? "spawn in the water"
+                                                 : "lay an egg");
     }
 
     /* you now know what an egg of your type looks like */
@@ -1517,7 +1518,8 @@ dogaze(void)
                     /* as if gazing at a sleeping anything is fruitful... */
                     You("turn to stone...");
                     g.killer.format = KILLED_BY;
-                    Strcpy(g.killer.name, "deliberately meeting Medusa's gaze");
+                    Strcpy(g.killer.name,
+                           "deliberately meeting Medusa's gaze");
                     done(STONING);
                 }
             }
@@ -1976,12 +1978,12 @@ polysense(void)
 boolean
 ugenocided(void)
 {
-    return (boolean) ((g.mvitals[g.urole.malenum].mvflags & G_GENOD)
-                      || (g.urole.femalenum != NON_PM
-                          && (g.mvitals[g.urole.femalenum].mvflags & G_GENOD))
-                      || (g.mvitals[g.urace.malenum].mvflags & G_GENOD)
-                      || (g.urace.femalenum != NON_PM
-                          && (g.mvitals[g.urace.femalenum].mvflags & G_GENOD)));
+    return ((g.mvitals[g.urole.malenum].mvflags & G_GENOD)
+            || (g.urole.femalenum != NON_PM
+                && (g.mvitals[g.urole.femalenum].mvflags & G_GENOD))
+            || (g.mvitals[g.urace.malenum].mvflags & G_GENOD)
+            || (g.urace.femalenum != NON_PM
+                && (g.mvitals[g.urace.femalenum].mvflags & G_GENOD)));
 }
 
 /* how hero feels "inside" after self-genocide of role or race */

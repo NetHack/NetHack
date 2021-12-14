@@ -1265,8 +1265,8 @@ trapeffect_slp_gas_trap(
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
 
-        if (!resists_sleep(mtmp) && !breathless(mtmp->data) && !mtmp->msleeping
-            && mtmp->mcanmove) {
+        if (!resists_sleep(mtmp) && !breathless(mtmp->data)
+            && !mtmp->msleeping && mtmp->mcanmove) {
             if (sleep_monst(mtmp, rnd(25), -1) && in_sight) {
                 pline("%s suddenly falls asleep!", Monnam(mtmp));
                 seetrap(trap);
@@ -1698,7 +1698,7 @@ trapeffect_hole(
                     seetrap(trap);
                     if (tt == TRAPDOOR)
                         pline(
-                              "A trap door opens, but %s doesn't fall through.",
+                            "A trap door opens, but %s doesn't fall through.",
                               mon_nam(mtmp));
                     else /* (tt == HOLE) */
                         pline("%s doesn't fall through the hole.",
@@ -4637,8 +4637,8 @@ unsqueak_ok(struct obj* obj)
     if (obj->otyp == CAN_OF_GREASE)
         return GETOBJ_SUGGEST;
 
-    if (obj->otyp == POT_OIL && obj->dknown &&
-        objects[POT_OIL].oc_name_known)
+    if (obj->otyp == POT_OIL && obj->dknown
+        && objects[POT_OIL].oc_name_known)
         return GETOBJ_SUGGEST;
 
     /* downplay all other potions, including unidentified oil

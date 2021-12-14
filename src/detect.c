@@ -28,8 +28,8 @@ static void openone(int, int, genericptr_t);
 static int mfind0(struct monst *, boolean);
 static int reveal_terrain_getglyph(int, int, int, unsigned, int, int);
 
-/* wildcard class for clear_stale_map - this used to be used as a getobj() input
- * but it's no longer used for that function */
+/* wildcard class for clear_stale_map - this used to be used as a getobj()
+   input but it's no longer used for that function */
 #define ALL_CLASSES (MAXOCLASSES + 1)
 
 /* bring hero out from underwater or underground or being engulfed;
@@ -39,8 +39,9 @@ unconstrain_map(void)
 {
     boolean res = u.uinwater || u.uburied || u.uswallow;
 
-    /* bring Underwater, buried, or swallowed hero to normal map */
-    iflags.save_uinwater = u.uinwater, u.uinwater = 0; /* bypass set_uinwater() */
+    /* bring Underwater, buried, or swallowed hero to normal map;
+       bypass set_uinwater() */
+    iflags.save_uinwater = u.uinwater, u.uinwater = 0;
     iflags.save_uburied  = u.uburied,  u.uburied  = 0;
     iflags.save_uswallow = u.uswallow, u.uswallow = 0;
 
@@ -51,7 +52,8 @@ unconstrain_map(void)
 static void
 reconstrain_map(void)
 {
-    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0; /* set_uinwater() */
+    /* if was in water and taken out, put back; bypass set_uinwater() */
+    u.uinwater = iflags.save_uinwater, iflags.save_uinwater = 0;
     u.uburied  = iflags.save_uburied,  iflags.save_uburied  = 0;
     u.uswallow = iflags.save_uswallow, iflags.save_uswallow = 0;
 }
@@ -235,8 +237,8 @@ check_map_spot(int x, int y, char oclass, unsigned material)
     if (glyph_is_object(glyph)) {
         /* there's some object shown here */
         if (oclass == ALL_CLASSES) {
-            return (boolean) !(g.level.objects[x][y] /* stale if nothing here */
-                               || ((mtmp = m_at(x, y)) != 0 && mtmp->minvent));
+            return !(g.level.objects[x][y] /* stale if nothing here */
+                     || ((mtmp = m_at(x, y)) != 0 && mtmp->minvent));
         } else {
             if (material
                 && objects[glyph_to_obj(glyph)].oc_material == material) {
@@ -1952,7 +1954,8 @@ dump_map(void)
 {
     int x, y, glyph, skippedrows, lastnonblank;
     int subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
-    int default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree : S_stone);
+    int default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree
+                                                             : S_stone);
     char buf[COLBUFSZ];
     boolean blankrow, toprow;
 
@@ -2005,10 +2008,9 @@ dump_map(void)
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain */
 void
-reveal_terrain(int full,          /* wizard|explore modes allow player
-                                     to request full map */
-               int which_subset)  /* when not full, whether to suppress
-                                     objs and/or traps */
+reveal_terrain(
+    int full,      /* wizard|explore modes allow player to request full map */
+    int which_subset) /* if not full, whether to suppress objs and/or traps */
 {
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");
@@ -2023,7 +2025,8 @@ reveal_terrain(int full,          /* wizard|explore modes allow player
 
         if (unconstrain_map())
             docrt();
-        default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree : S_stone);
+        default_glyph = cmap_to_glyph(g.level.flags.arboreal ? S_tree
+                                                             : S_stone);
 
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {

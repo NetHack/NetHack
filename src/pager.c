@@ -280,10 +280,10 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */
-    if (fakeobj && mtmp && mimic_obj &&
-        (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
-            mtmp->m_ap_type |= M_AP_F_DKNOWN;
-            otmp->dknown = 1;
+    if (fakeobj && mtmp && mimic_obj
+        && (otmp->dknown || (M_AP_FLAG(mtmp) & M_AP_F_DKNOWN))) {
+        mtmp->m_ap_type |= M_AP_F_DKNOWN;
+        otmp->dknown = 1;
     }
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
@@ -459,8 +459,8 @@ lookat(int x, int y, char *buf, char *monbuf)
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()
-        && !(iflags.save_uswallow &&
-             glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
+        && !(iflags.save_uswallow
+             && glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
@@ -1469,8 +1469,9 @@ do_look(int mode, coord *click_cc)
 DISABLE_WARNING_FORMAT_NONLITERAL /* RESTORE is after do_supplemental_info() */
 
 static void
-look_all(boolean nearby,  /* True => within BOLTLIM, False => entire map */
-         boolean do_mons) /* True => monsters, False => objects */
+look_all(
+    boolean nearby,  /* True => within BOLTLIM, False => entire map */
+    boolean do_mons) /* True => monsters, False => objects */
 {
     winid win;
     int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;

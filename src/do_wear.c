@@ -2927,7 +2927,7 @@ inaccessible_equipment(struct obj *obj,
     return FALSE;
 }
 
-/* not a getobj callback - unifies code among the other four getobj callbacks */
+/* not a getobj callback - unifies code among the other 4 getobj callbacks */
 static int
 equip_ok(struct obj *obj, boolean removing, boolean accessory)
 {
@@ -2937,7 +2937,7 @@ equip_ok(struct obj *obj, boolean removing, boolean accessory)
     if (!obj)
         return GETOBJ_EXCLUDE;
 
-    /* ignore for putting on if already worn, or removing if not already worn */
+    /* ignore for putting on if already worn, or removing if not worn */
     is_worn = ((obj->owornmask & (W_ARMOR | W_ACCESSORY)) != 0);
     if (removing ^ is_worn)
         return GETOBJ_EXCLUDE_INACCESS;
@@ -2956,8 +2956,8 @@ equip_ok(struct obj *obj, boolean removing, boolean accessory)
         return GETOBJ_DOWNPLAY;
 
     /* armor we can't wear, e.g. from polyform */
-    if (obj->oclass == ARMOR_CLASS && !removing &&
-        !canwearobj(obj, &dummymask, FALSE))
+    if (obj->oclass == ARMOR_CLASS && !removing
+        && !canwearobj(obj, &dummymask, FALSE))
         return GETOBJ_DOWNPLAY;
 
     /* Possible extension: downplay items (both accessories and armor) which

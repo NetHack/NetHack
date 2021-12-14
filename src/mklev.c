@@ -82,8 +82,8 @@ door_into_nonjoined(xchar x, xchar y)
             continue;
 
         /* Is this connecting to a room that doesn't want joining? */
-        if (levl[tx][ty].roomno >= ROOMOFFSET &&
-            !g.rooms[levl[tx][ty].roomno - ROOMOFFSET].needjoining) {
+        if (levl[tx][ty].roomno >= ROOMOFFSET
+            && !g.rooms[levl[tx][ty].roomno - ROOMOFFSET].needjoining) {
             return TRUE;
         }
     }
@@ -1610,7 +1610,7 @@ mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
 
 void
 mkstairs(xchar x, xchar y,
-         char up,	/* [why 'char' when usage is boolean?] */
+         char up,       /* [why 'char' when usage is boolean?] */
          struct mkroom *croom UNUSED)
 {
     d_level dest;

@@ -73,8 +73,8 @@ dosit(void)
         obj = g.level.objects[u.ux][u.uy];
         if (g.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
             You("coil up around your %shoard.",
-                (obj->quan + money_cnt(g.invent) < u.ulevel * 1000) ? "meager "
-                                                                  : "");
+                (obj->quan + money_cnt(g.invent) < u.ulevel * 1000)
+                ? "meager " : "");
         } else if (obj->otyp == TOWEL) {
             pline("It's probably not a good time for a picnic...");
         } else {
@@ -133,7 +133,8 @@ dosit(void)
             (void) water_damage(uarm, "armor", TRUE);
     } else if (IS_SINK(typ)) {
         You(sit_message, defsyms[S_sink].explanation);
-        Your("%s gets wet.", humanoid(g.youmonst.data) ? "rump" : "underside");
+        Your("%s gets wet.",
+             humanoid(g.youmonst.data) ? "rump" : "underside");
     } else if (IS_ALTAR(typ)) {
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
@@ -331,9 +332,9 @@ dosit(void)
                 pline("A splash tetra you are not.");
                 return 0;
             }
-            if (Upolyd &&
-                (g.youmonst.data == &mons[PM_GIANT_EEL]
-                 || g.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+            if (Upolyd
+                && (g.youmonst.data == &mons[PM_GIANT_EEL]
+                    || g.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
                 You("yearn for the Sargasso Sea.");
                 return 0;
             }

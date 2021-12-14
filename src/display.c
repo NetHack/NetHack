@@ -1742,7 +1742,8 @@ clear_glyph_buffer(void)
 #ifndef UNBUFFERED_GLYPHINFO
     nul_gbuf.gnew = (giptr->ttychar != nul_gbuf.glyphinfo.ttychar
                      || giptr->gm.color != nul_gbuf.glyphinfo.gm.color
-                     || giptr->gm.glyphflags != nul_gbuf.glyphinfo.gm.glyphflags
+                     || giptr->gm.glyphflags
+                        != nul_gbuf.glyphinfo.gm.glyphflags
                      || giptr->gm.tileidx != nul_gbuf.glyphinfo.gm.tileidx)
 #else
     nul_gbuf.gnew = (giptr->glyphinfo.ttychar != ' '
@@ -2029,12 +2030,13 @@ back_to_glyph(xchar x, xchar y)
 static int
 swallow_to_glyph(int mnum, int loc)
 {
+    int m_3 = what_mon(mnum, rn2_on_display_rng) << 3;
+
     if (loc < S_sw_tl || S_sw_br < loc) {
         impossible("swallow_to_glyph: bad swallow location");
         loc = S_sw_br;
     }
-    return ((int) (what_mon(mnum, rn2_on_display_rng) << 3) |
-            (loc - S_sw_tl)) + GLYPH_SWALLOW_OFF;
+    return (m_3 | (loc - S_sw_tl)) + GLYPH_SWALLOW_OFF;
 }
 
 /*
@@ -2327,8 +2329,8 @@ cmap_to_roguecolor(int cmap)
 
    gm_levelchange    called when the player has gone to a new level.
 
-   gm_symchange      called if someone has interactively altered the symbols for
-                     the game, most likely at the options menu.
+   gm_symchange      called if someone has interactively altered the symbols
+                     for the game, most likely at the options menu.
 
    gm_optionchange   The game settings have been toggled and some of them
                      are configured to trigger a reset_glyphmap()

@@ -980,8 +980,8 @@ use_mirror(struct obj *obj)
         if (vis)
             pline("%s confuses itself!", Monnam(mtmp));
         mtmp->mconf = 1;
-    } else if (monable &&
-               (mlet == S_NYMPH || mtmp->data == &mons[PM_AMOROUS_DEMON])) {
+    } else if (monable && (mlet == S_NYMPH
+                           || mtmp->data == &mons[PM_AMOROUS_DEMON])) {
         if (vis) {
             char buf[BUFSZ]; /* "She" or "He" */
 
@@ -1546,8 +1546,8 @@ light_cocktail(struct obj **optr)
     *optr = obj;
 }
 
-/* getobj callback for object to be rubbed - not selecting a secondary object to
- * rub on a gray stone or rub jelly on */
+/* getobj callback for object to be rubbed - not selecting a secondary object
+   to rub on a gray stone or rub jelly on */
 static int
 rub_ok(struct obj *obj)
 {
@@ -3630,12 +3630,12 @@ do_break_wand(struct obj *obj)
                                   ? (char *) 0
                                   : "Some holes are quickly filled with %s!");
                     fillmsg = TRUE;
-                } else
-                    digactualhole(x, y, BY_OBJECT, (rn2(obj->spe) < 3
-                                                    || (!Can_dig_down(&u.uz)
-                                                        && !levl[x][y].candig))
-                                                      ? PIT
-                                                      : HOLE);
+                } else {
+                    digactualhole(x, y, BY_OBJECT,
+                                  (rn2(obj->spe) < 3
+                                   || (!Can_dig_down(&u.uz)
+                                       && !levl[x][y].candig)) ? PIT : HOLE);
+                }
             }
             continue;
         } else if (obj->otyp == WAN_CREATE_MONSTER) {

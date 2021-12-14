@@ -283,7 +283,7 @@ comp_times(long filetime)
 {
     /* BUILD_TIME is constant but might have L suffix rather than UL;
        'filetime' is historically signed but ought to have been unsigned */
-    return (boolean) ((unsigned long) filetime < (unsigned long) nomakedefs.build_time);
+    return ((unsigned long) filetime < (unsigned long) nomakedefs.build_time);
 }
 #endif
 
@@ -311,10 +311,10 @@ check_version(struct version_info *version_data, const char *filename,
 #endif
         || ((utdflags & UTD_SKIP_SANITY1) == 0
              && version_data->entity_count != nomakedefs.version_sanity1)
-        || ((utdflags & UTD_CHECKSIZES) &&
-            (version_data->struct_sizes1 != nomakedefs.version_sanity2))
-        || ((utdflags & UTD_CHECKSIZES) &&
-            (version_data->struct_sizes2 != nomakedefs.version_sanity3))) {
+        || ((utdflags & UTD_CHECKSIZES) != 0
+            && version_data->struct_sizes1 != nomakedefs.version_sanity2)
+        || ((utdflags & UTD_CHECKSIZES) != 0
+            && version_data->struct_sizes2 != nomakedefs.version_sanity3)) {
         if (complain)
             pline("Configuration incompatibility for file \"%s\".", filename);
         return FALSE;
@@ -381,11 +381,16 @@ store_version(NHFILE *nhfp)
         0UL,0UL,0UL,0UL,0Ul
     };
 
-    version_data.incarnation = nomakedefs.version_number;    /* actual version number */
-    version_data.feature_set = nomakedefs.version_features;  /* bitmask of config settings */
-    version_data.entity_count  = nomakedefs.version_sanity1; /* # of monsters and objects */
-    version_data.struct_sizes1 = nomakedefs.version_sanity2; /* size of key structs */
-    version_data.struct_sizes2 = nomakedefs.version_sanity3; /* size of more key structs */
+    /* actual version number */
+    version_data.incarnation = nomakedefs.version_number;
+    /* bitmask of config settings */
+    version_data.feature_set = nomakedefs.version_features;
+    /* # of monsters and objects */
+    version_data.entity_count  = nomakedefs.version_sanity1;
+    /* size of key structs */
+    version_data.struct_sizes1 = nomakedefs.version_sanity2;
+    /* size of more key structs */
+    version_data.struct_sizes2 = nomakedefs.version_sanity3;
 
     if (nhfp->structlevel) {
         bufoff(nhfp->fd);
