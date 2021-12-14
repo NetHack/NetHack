@@ -977,13 +977,14 @@ spelleffects(int spell, boolean atme)
          * Augment the message when current energy is at maximum.
          * "yet": mainly for level 1 characters who already know a spell
          * but don't start with enough energy to cast it.
-         *
-         * TODO: track peak energy (which can be reduced by traps or
-         * monster attacks or loss of levels) and say "any more" instead
-         * of "yet" if it was ever high enough to make this cast.
+         * "anymore": maximum energy was high enough at some point but
+         * isn't now (lost energy when losing levels or polymorphing into
+         * new person or had some stripped away by traps or monsters).
          */
         You("don't have enough energy to cast that spell%s.",
-            (u.uen >= u.uenmax) ? " yet" : "");
+            (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
+            : (energy > u.uenpeak) ? " yet" /* haven't ever had enough */
+              : " anymore"); /* once had enough but have lost some since */
         return res;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
