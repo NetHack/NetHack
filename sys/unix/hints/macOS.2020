@@ -155,8 +155,9 @@ LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-LIBNHSYSOBJ= libnhmain.o ioctl.o unixtty.o unixunix.o \
-                unixres.o winshim.o
+LIBNHSYSOBJ = libnhmain.o $(TARGETPFX)ioctl.o \
+		$(TARGETPFX)unixtty.o $(TARGETPFX)unixunix.o \
+		$(TARGETPFX)unixres.o winshim.o
 #don't bother building the game executable as it will fail
 #without winshim
 override GAME=
