@@ -155,13 +155,13 @@ LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-LIBNHSYSOBJ = libnhmain.o $(TARGETPFX)ioctl.o \
+LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
 		$(TARGETPFX)unixtty.o $(TARGETPFX)unixunix.o \
-		$(TARGETPFX)unixres.o winshim.o
+		$(TARGETPFX)unixres.o $(TARGETPFX)winshim.o
 #don't bother building the game executable as it will fail
 #without winshim
 override GAME=
-MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnh.a )
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
 endif  # WANT_LIBNH
 
 WANT_BUNDLE=1
@@ -275,12 +275,12 @@ VARDIR=$(HACKDIR)
 #-POST
 
 ifdef WANT_LIBNH
-libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
-libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
+$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
-winshim.o : ../win/shim/winshim.c $(HACK_H)
+$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
 
