@@ -955,7 +955,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                         goto foundc;
                                 }
                                 continue;
-                            foundc:
+ foundc:
                                 cx = tx, cy = ty;
                                 if (msg_given) {
                                     clear_nhwindow(WIN_MESSAGE);
@@ -992,7 +992,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = 0; /* not -1 */
             break;
         }
-    nxtc:
+ nxtc:
         ;
 #ifdef CLIPPING
         cliparound(cx, cy);
@@ -2074,7 +2074,7 @@ mon_nam_too(struct monst *mon, struct monst *other_mon)
 char *
 monverbself(
     struct monst *mon,
-    char *monnamtext, /* modifiable 'mbuf' with adequare room at end */
+    char *monnamtext, /* modifiable 'mbuf' with adequate room at end */
     const char *verb,
     const char *othertext)
 {
@@ -2419,7 +2419,9 @@ christen_orc(struct monst *mtmp, const char *gang, const char *other)
     return mtmp;
 }
 
-/* make sure "The Colour of Magic" remains the first entry in here */
+/* Discworld novel titles, in the order that they were published; a subset
+   of them have index macros used for variant spellings; if the titles are
+   reordered for some reason, make sure that those get renumbered to match */
 static const char *const sir_Terry_novels[] = {
     "The Colour of Magic", "The Light Fantastic", "Equal Rites", "Mort",
     "Sourcery", "Wyrd Sisters", "Pyramids", "Guards! Guards!", "Eric",
@@ -2433,6 +2435,11 @@ static const char *const sir_Terry_novels[] = {
     "Making Money", "Unseen Academicals", "I Shall Wear Midnight", "Snuff",
     "Raising Steam", "The Shepherd's Crown"
 };
+#define NVL_COLOUR_OF_MAGIC 0
+#define NVL_SOURCERY 4
+#define NVL_MASKERADE 17
+#define NVL_AMAZING_MAURICE 27
+#define NVL_THUD 33
 
 const char *
 noveltitle(int *novidx)
@@ -2462,15 +2469,15 @@ lookup_novel(const char *lookname, int *idx)
      * _Sourcery_ is a joke rather than British spelling of "sorcery".
      */
     if (!strcmpi(The(lookname), "The Color of Magic"))
-        lookname = sir_Terry_novels[0];
+        lookname = sir_Terry_novels[NVL_COLOUR_OF_MAGIC];
     else if (!strcmpi(lookname, "Sorcery"))
-        lookname = "Sourcery"; /* [4] */
+        lookname = sir_Terry_novels[NVL_SOURCERY];
     else if (!strcmpi(lookname, "Masquerade"))
-        lookname = "Maskerade"; /* [17] */
+        lookname = sir_Terry_novels[NVL_MASKERADE];
     else if (!strcmpi(The(lookname), "The Amazing Maurice"))
-        lookname = "The Amazing Maurice and His Educated Rodents"; /* [27] */
+        lookname = sir_Terry_novels[NVL_AMAZING_MAURICE];
     else if (!strcmpi(lookname, "Thud"))
-        lookname = "Thud!"; /* [33] */
+        lookname = sir_Terry_novels[NVL_THUD];
 
     for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
         if (!strcmpi(lookname, sir_Terry_novels[k])
