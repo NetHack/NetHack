@@ -276,6 +276,24 @@ check_caitiff(struct monst *mtmp)
     }
 }
 
+/* wake up monster, maybe unparalyze it */
+void
+mon_maybe_wakeup_on_hit(struct monst *mtmp)
+{
+    if (mtmp->msleeping)
+        mtmp->msleeping = 0;
+
+    if (!mtmp->mcanmove) {
+        if (!rn2(10)) {
+            mtmp->mcanmove = 1;
+            mtmp->mfrozen = 0;
+        }
+    }
+}
+
+/* how easy it is for hero to hit a monster,
+   using attack type aatyp and/or weapon.
+   larger value == easier to hit */
 int
 find_roll_to_hit(struct monst *mtmp,
                  uchar aatyp,        /* usually AT_WEAP or AT_KICK */
@@ -296,23 +314,15 @@ find_roll_to_hit(struct monst *mtmp,
         check_caitiff(mtmp);
     }
 
-    /* adjust vs. (and possibly modify) monster state */
+    /* adjust vs. monster state */
     if (mtmp->mstun)
         tmp += 2;
     if (mtmp->mflee)
         tmp += 2;
-
-    if (mtmp->msleeping) {
-        mtmp->msleeping = 0;
+    if (mtmp->msleeping)
         tmp += 2;
-    }
-    if (!mtmp->mcanmove) {
+    if (!mtmp->mcanmove)
         tmp += 4;
-        if (!rn2(10)) {
-            mtmp->mcanmove = 1;
-            mtmp->mfrozen = 0;
-        }
-    }
 
     /* role/race adjustments */
     if (Role_if(PM_MONK) && !Upolyd) {
@@ -614,6 +624,7 @@ hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
 
         tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
                                &attknum, &armorpenalty);
+        mon_maybe_wakeup_on_hit(mtmp);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
         g.bhitpos.x = tx, g.bhitpos.y = ty; /* normally set up by
@@ -649,6 +660,8 @@ hitum(struct monst *mon, struct attack *uattk)
     int dieroll = rnd(20);
     int mhit = (tmp > dieroll || u.uswallow);
 
+    mon_maybe_wakeup_on_hit(mon);
+
     /* Cleaver attacks three spots, 'mon' and one on either side of 'mon';
        it can't be part of dual-wielding but we guard against that anyway;
        cleave return value reflects status of primary target ('mon') */
@@ -670,6 +683,7 @@ hitum(struct monst *mon, struct attack *uattk)
     if (u.twoweap && !g.override_confirmation && malive && m_at(x, y) == mon) {
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
+        mon_maybe_wakeup_on_hit(mon);
         dieroll = rnd(20);
         mhit = (tmp > dieroll || u.uswallow);
         malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk,
@@ -4584,6 +4598,7 @@ hmonas(struct monst *mon)
 
             tmp = find_roll_to_hit(mon, AT_WEAP, weapon, &attknum,
                                    &armorpenalty);
+            mon_maybe_wakeup_on_hit(mon);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             /* caller must set g.bhitpos */
@@ -4625,6 +4640,7 @@ hmonas(struct monst *mon)
         /*weaponless:*/
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
+            mon_maybe_wakeup_on_hit(mon);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             if (dhit) {
@@ -4817,6 +4833,7 @@ hmonas(struct monst *mon)
         case AT_ENGL:
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
+            mon_maybe_wakeup_on_hit(mon);
             if ((dhit = (tmp > rnd(20 + i)))) {
                 wakeup(mon, TRUE);
                 if (mon->data == &mons[PM_SHADE]) {

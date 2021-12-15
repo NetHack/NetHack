@@ -2707,6 +2707,7 @@ extern void dynamic_multi_reason(struct monst *, const char *, boolean);
 extern void erode_armor(struct monst *, int);
 extern boolean attack_checks(struct monst *, struct obj *);
 extern void check_caitiff(struct monst *);
+extern void mon_maybe_wakeup_on_hit(struct monst *);
 extern int find_roll_to_hit(struct monst *, uchar, struct obj *, int *, int *);
 extern boolean force_attack(struct monst *, boolean);
 extern boolean do_attack(struct monst *);
