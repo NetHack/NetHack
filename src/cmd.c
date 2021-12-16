@@ -2074,7 +2074,8 @@ struct ext_func_tab extcmdlist[] = {
               doborn, IFBURIED | WIZMODECMD, NULL },
 #ifdef DEBUG
     { '\0',   "wizbury", "bury objs under and around you",
-              wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+              wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD,
+              NULL },
 #endif
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
@@ -3587,7 +3588,7 @@ rhack(char *cmd)
         register const struct ext_func_tab *tlist;
         int res, (*func)(void);
 
-do_cmdq_extcmd:
+ do_cmdq_extcmd:
         if (cmdq_ec)
             tlist = cmdq_ec;
         else

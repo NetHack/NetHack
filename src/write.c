@@ -214,7 +214,7 @@ dowrite(struct obj *pen)
 
     There("is no such %s!", typeword);
     return 1;
-found:
+ found:
 
     if (i == SCR_BLANK_PAPER || i == SPE_BLANK_PAPER) {
         You_cant("write that!");

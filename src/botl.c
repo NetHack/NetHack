@@ -575,7 +575,8 @@ const struct condmap condition_aliases[] = {
     { "opt_in",         BL_MASK_BAREH | BL_MASK_BUSY | BL_MASK_GLOWHANDS
                         | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ
                         | BL_MASK_SLEEPING | BL_MASK_SLIPPERY
-                        | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED
+                        | BL_MASK_SUBMERGED | BL_MASK_TETHERED
+                        | BL_MASK_TRAPPED
                         | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL
                         | BL_MASK_HOLDING },
 };
@@ -1298,7 +1299,9 @@ evaluate_and_notify_windowport(boolean *valsetlist, int idx)
 }
 
 void
-status_initialize(boolean reassessment) /* TRUE: just recheck fields w/o other initialization */
+status_initialize(
+    boolean reassessment) /* TRUE: just recheck fields without other
+                           * initialization */
 {
     enum statusfields fld;
     boolean fldenabl;
@@ -1633,7 +1636,8 @@ percentage(struct istat_s *bl, struct istat_s *maxbl)
        from a non-zero input; note: if we ever change to something like
        ((((1000 * val) / max) + 5) / 10) for a rounded result, we'll
        also need to check for and convert false 100 to 99 */
-    if (result == 0 && (ival != 0 || lval != 0L || uval != 0U || ulval != 0UL))
+    if (result == 0
+        && (ival != 0 || lval != 0L || uval != 0U || ulval != 0UL))
         result = 1;
 
     return result;
@@ -1863,12 +1867,13 @@ status_eval_next_unhilite(void)
     struct istat_s *curr;
     long next_unhilite, this_unhilite;
 
-    g.bl_hilite_moves = g.moves; /* simpllfied; used to try to encode fractional
-                              * amounts for multiple moves within same turn */
+    g.bl_hilite_moves = g.moves; /* simpllfied; at one point we used to try
+                                  * to encode fractional amounts for multiple
+                                  * moves within same turn */
     /* figure out whether an unhilight needs to be performed now */
     next_unhilite = 0L;
     for (i = 0; i < MAXBLSTATS; ++i) {
-        curr = &g.blstats[0][i]; /* g.blstats[0][*].time == g.blstats[1][*].time */
+        curr = &g.blstats[0][i]; /* blstats[0][*].time == blstats[1][*].time */
 
         if (curr->chg) {
             struct istat_s *prev = &g.blstats[1][i];
@@ -2282,8 +2287,11 @@ splitsubfields(char *str, char ***sfarr, int maxsf)
 #undef MAX_SUBFIELDS
 
 static boolean
-is_fld_arrayvalues(const char *str, const char *const *arr,
-                   int arrmin, int arrmax, int *retidx)
+is_fld_arrayvalues(
+    const char *str,
+    const char *const *arr,
+    int arrmin, int arrmax,
+    int *retidx)
 {
     int i;
 
@@ -2296,7 +2304,10 @@ is_fld_arrayvalues(const char *str, const char *const *arr,
 }
 
 static int
-query_arrayvalue(const char *querystr, const char *const *arr, int arrmin, int arrmax)
+query_arrayvalue(
+    const char *querystr,
+    const char *const *arr,
+    int arrmin, int arrmax)
 {
     int i, res, ret = arrmin - 1;
     winid tmpwin;
@@ -3296,7 +3307,8 @@ status_hilite_menu_choose_behavior(int fld)
         nopts++;
     }
 
-    Sprintf(buf, "Select %s field hilite behavior:", initblstats[fld].fldname);
+    Sprintf(buf, "Select %s field hilite behavior:",
+            initblstats[fld].fldname);
     end_menu(tmpwin, buf);
 
     if (nopts > 1) {
@@ -3403,7 +3415,7 @@ status_hilite_menu_add(int origfld)
     char colorqry[BUFSZ];
     char attrqry[BUFSZ];
 
-choose_field:
+ choose_field:
     fld = origfld;
     if (fld == BL_FLUSH) {
         fld = status_hilite_menu_choose_field();
@@ -3423,7 +3435,7 @@ choose_field:
     hilite.set = FALSE; /* mark it "unset" */
     hilite.fld = fld;
 
-choose_behavior:
+ choose_behavior:
     behavior = status_hilite_menu_choose_behavior(fld);
 
     if (behavior == (BL_TH_NONE - 1)) {
@@ -3436,7 +3448,7 @@ choose_behavior:
 
     hilite.behavior = behavior;
 
-choose_value:
+ choose_value:
     if (behavior == BL_TH_VAL_PERCENTAGE
         || behavior == BL_TH_VAL_ABSOLUTE) {
         char inbuf[BUFSZ], buf[BUFSZ];
@@ -3642,7 +3654,9 @@ choose_value:
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, enc_stat[rv]);
         } else if (fld == BL_ALIGN) {
-            static const char *aligntxt[] = { "chaotic", "neutral", "lawful" };
+            static const char *aligntxt[] = {
+                "chaotic", "neutral", "lawful"
+            };
             int rv = query_arrayvalue(qry_buf,
                                       aligntxt, 0, 2 + 1);
 
@@ -3729,7 +3743,7 @@ choose_value:
                 initblstats[fld].fldname);
     }
 
-choose_color:
+ choose_color:
     clr = query_color(colorqry);
     if (clr == -1) {
         if (behavior != BL_TH_ALWAYS_HILITE)
@@ -3830,11 +3844,13 @@ status_hilite_remove(int id)
                     hlprev->next = hl->next;
                 } else {
                     g.blstats[0][fld].thresholds = hl->next;
-                    g.blstats[1][fld].thresholds = g.blstats[0][fld].thresholds;
+                    g.blstats[1][fld].thresholds
+                        = g.blstats[0][fld].thresholds;
                 }
                 if (g.blstats[0][fld].hilite_rule == hl) {
                     g.blstats[0][fld].hilite_rule
-                        = g.blstats[1][fld].hilite_rule = (struct hilite_s *) 0;
+                        = g.blstats[1][fld].hilite_rule
+                        = (struct hilite_s *) 0;
                     g.blstats[0][fld].time = g.blstats[1][fld].time = 0L;
                 }
                 free((genericptr_t) hl);
@@ -3960,7 +3976,7 @@ status_hilite_menu_fld(int fld)
         free((genericptr_t) picks);
     }
 
-shlmenu_free:
+ shlmenu_free:
 
     picks = (menu_item *) 0;
     destroy_nhwindow(tmpwin);
@@ -3998,7 +4014,7 @@ status_hilite_menu(void)
     boolean redo;
     int countall;
 
-shlmenu_redo:
+ shlmenu_redo:
     redo = FALSE;
 
     tmpwin = create_nhwindow(NHW_MENU);

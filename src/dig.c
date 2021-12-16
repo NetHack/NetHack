@@ -230,9 +230,9 @@ dig_check(struct monst *madeby, boolean verbose, int x, int y)
 static int
 dig(void)
 {
-    register struct rm *lev;
-    register xchar dpx = g.context.digging.pos.x, dpy = g.context.digging.pos.y;
-    register boolean ispick = uwep && is_pick(uwep);
+    struct rm *lev;
+    xchar dpx = g.context.digging.pos.x, dpy = g.context.digging.pos.y;
+    boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
     lev = &levl[dpx][dpy];
@@ -451,7 +451,7 @@ dig(void)
             b_trapped("door", 0);
             newsym(dpx, dpy);
         }
-    cleanup:
+ cleanup:
         g.context.digging.lastdigtime = g.moves;
         g.context.digging.quiet = FALSE;
         g.context.digging.level.dnum = 0;
@@ -1471,7 +1471,8 @@ zap_dig(void)
             coord cc;
             struct trap *adjpit = t_at(zx, zy);
 
-            if ((diridx != DIR_ERR) && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
+            if (diridx != DIR_ERR
+                && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0; /* limited to the adjacent location only */
                 if (!(adjpit && is_pit(adjpit->ttyp))) {
                     char buf[BUFSZ];

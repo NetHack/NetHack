@@ -609,7 +609,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
     } else if (sy == sroom->hy + 1) {
         sy--;
     } else {
-    shk_failed:
+ shk_failed:
 #ifdef DEBUG
         /* Said to happen sometimes, but I have never seen it. */
         /* Supposedly fixed by fdoor change in mklev.c */

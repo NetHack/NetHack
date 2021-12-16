@@ -219,7 +219,7 @@ str_end_is(const char *str, const char *chkstr)
     return FALSE;
 }
 
-/* return the max line length from buffer comprising of newline-separated strings */
+/* return max line length from buffer comprising newline-separated strings */
 int
 str_lines_maxlen(const char *str)
 {
@@ -396,9 +396,10 @@ onlyspace(const char *s)
 
 /* expand tabs into proper number of spaces (in place) */
 char *
-tabexpand(char *sbuf) /* assumed to be [BUFSZ] but can be smaller provided that
-                       * expanded string fits; expansion bigger than BUFSZ-1
-                       * will be truncated */
+tabexpand(
+    char *sbuf) /* assumed to be [BUFSZ] but can be smaller provided that
+                 * expanded string fits; expansion bigger than BUFSZ-1
+                 * will be truncated */
 {
     char buf[BUFSZ + 10];
     register char *bp, *s = sbuf;
@@ -521,10 +522,11 @@ strsubst(char *bp, const char *orig, const char *replacement)
    if N is 0, substitute all occurrences; returns the number of subsitutions;
    maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
 int
-strNsubst(char *inoutbuf,   /* current string, and result buffer */
-          const char *orig, /* old substring; if "" then insert in front of Nth char */
-          const char *replacement, /* new substring; if "" then delete old substring */
-          int n) /* which occurrence to replace; 0 => all */
+strNsubst(
+    char *inoutbuf,   /* current string, and result buffer */
+    const char *orig, /* old substring; if "", insert in front of Nth char */
+    const char *replacement, /* new substring; if "", delete old substring */
+    int n) /* which occurrence to replace; 0 => all */
 {
     char *bp, *op, workbuf[BUFSZ];
     const char *rp;
@@ -690,7 +692,7 @@ pmatch_internal(const char *patrn, const char *strng,
      *  Simple pattern matcher:  '*' matches 0 or more characters, '?' matches
      *  any single character.  Returns TRUE if 'strng' matches 'patrn'.
      */
-pmatch_top:
+ pmatch_top:
     if (!sk) {
         s = *strng++;
         p = *patrn++; /* get next chars and pre-advance */
@@ -732,7 +734,9 @@ pmatchi(const char *patrn, const char *strng)
     return pmatch_internal(patrn, strng, TRUE, (const char *) 0);
 }
 
-/* case-insensitive wildcard fuzzymatch */
+#if 0
+/* case-insensitive wildcard fuzzymatch;
+   NEVER WORKED AS INTENDED but fortunately isn't needed */
 boolean
 pmatchz(const char *patrn, const char *strng)
 {
@@ -741,6 +745,7 @@ pmatchz(const char *patrn, const char *strng)
 
     return pmatch_internal(patrn, strng, TRUE, fuzzychars);
 }
+#endif
 
 #ifndef STRNCMPI
 /* case insensitive counted string comparison */
@@ -884,14 +889,15 @@ static void
 set_random(unsigned long seed,
            int (*fn)(int) UNUSED)
 {
-    /* the types are different enough here that sweeping the different
-     * routine names into one via #defines is even more confusing
+    /*
+     * The types are different enough here that sweeping the different
+     * routine names into one via #defines is even more confusing.
      */
 # ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
 # else
-#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) \
-    || defined(CYGWIN32) /* system srandom() */
+#  if defined(__APPLE__) || defined(BSD) || defined(LINUX) \
+    || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
 #   if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
     (void)
 #   endif
@@ -1227,7 +1233,7 @@ nonconst(const char *str, char *buf, size_t bufsz)
 
     if (str && buf)
         if (strlen(str) <= (bufsz - 1)) {
-	    Strcpy(buf, str);
+            Strcpy(buf, str);
             retval = buf;
         }
     return retval;
@@ -1265,15 +1271,17 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * Wrap reasons:
  *   1. If there are any platform issues, we have one spot to fix them -
  *      snprintf is a routine with a troubling history of bad implementations.
- *   2. Add combersome error checking in one spot.  Problems with text wrangling
- *      do not have to be fatal.
+ *   2. Add combersome error checking in one spot.  Problems with text
+ *      wrangling do not have to be fatal.
  *   3. Gcc 9+ will issue a warning unless the return value is used.
  *      Annoyingly, explicitly casting to void does not remove the error.
  *      So, use the result - see reason #2.
  */
 void
-nh_snprintf(const char *func, int line, char *str, size_t size,
-            const char *fmt, ...)
+nh_snprintf(
+    const char *func, int line,
+    char *str, size_t size,
+    const char *fmt, ...)
 {
     va_list ap;
     int n;
@@ -1285,12 +1293,11 @@ nh_snprintf(const char *func, int line, char *str, size_t size,
     n = vsnprintf(str, size, fmt, ap);
 #endif
     va_end(ap);
-    if (n < 0 || (size_t)n >= size) { /* is there a problem? */
+    if (n < 0 || (size_t) n >= size) { /* is there a problem? */
         impossible("snprintf %s: func %s, file line %d",
-                   n < 0 ? "format error"
-                         : "overflow",
+                   (n < 0) ? "format error" : "overflow",
                    func, line);
-        str[size-1] = 0; /* make sure it is nul terminated */
+        str[size - 1] = '\0'; /* make sure it is nul terminated */
     }
 }
 

@@ -125,7 +125,7 @@ dosit(void)
         else
             You("sit down on the muddy bottom.");
     } else if (is_pool(u.ux, u.uy) && !eggs_in_water(g.youmonst.data)) {
-    in_water:
+ in_water:
         You("sit in the %s.", hliquid("water"));
         if (!rn2(10) && uarm)
             (void) water_damage(uarm, "armor", TRUE);

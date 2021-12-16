@@ -197,7 +197,7 @@ vpline(const char *line, va_list the_args)
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
-pline_done:
+ pline_done:
     --in_pline;
 }
 

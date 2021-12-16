@@ -57,8 +57,10 @@ get_map(int col, int row, schar bg_typ)
     return levl[col][row].typ;
 }
 
-static const int dirs[16] = { -1, -1 /**/, -1, 0 /**/,  -1, 1 /**/, 0, -1 /**/,
-                               0,  1 /**/,  1,  -1 /**/, 1,  0 /**/, 1, 1 };
+static const int dirs[16] = {
+    -1, -1 /**/, -1,  0 /**/, -1, 1 /**/, 0, -1 /**/,
+     0,  1 /**/,  1, -1 /**/,  1, 0 /**/, 1,  1
+};
 
 static void
 pass_one(schar bg_typ, schar fg_typ)
@@ -257,8 +259,8 @@ join_map(schar bg_typ, schar fg_typ)
                 g.n_loc_filled = 0;
                 flood_fill_rm(i, j, g.nroom + ROOMOFFSET, FALSE, FALSE);
                 if (g.n_loc_filled > 3) {
-                    add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry, FALSE, OROOM,
-                             TRUE);
+                    add_room(g.min_rx, g.min_ry, g.max_rx, g.max_ry,
+                             FALSE, OROOM, TRUE);
                     g.rooms[g.nroom - 1].irregular = TRUE;
                     if (g.nroom >= (MAXNROFROOMS * 2))
                         goto joinm;
@@ -278,14 +280,15 @@ join_map(schar bg_typ, schar fg_typ)
             }
         }
 
-joinm:
+ joinm:
     /*
      * Ok, now we can actually join the regions with fg_typ's.
      * The rooms are already sorted due to the previous loop,
      * so don't call sort_rooms(), which can screw up the roomno's
      * validity in the levl structure.
      */
-    for (croom = &g.rooms[0], croom2 = croom + 1; croom2 < &g.rooms[g.nroom];) {
+    for (croom = &g.rooms[0], croom2 = croom + 1;
+         croom2 < &g.rooms[g.nroom]; ) {
         /* pick random starting and end locations for "corridor" */
         if (!somexy(croom, &sm) || !somexy(croom2, &em)) {
             /* ack! -- the level is going to be busted */
