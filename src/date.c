@@ -1,4 +1,4 @@
-/* NetHack 3.7  date.c  $NHDT-Date: 1608933420 2020/12/25 21:57:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.7  date.c  $NHDT-Date: 1639622347 2021/12/16 02:39:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Michael Allison, 2021.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,7 +100,7 @@ populate_nomakedefs(struct version_info *version)
             t.tm_sec = atoi(tmpbuf2);
             timeresult = mktime(&t);
             nomakedefs.build_time = (unsigned long) timeresult;
-            nomakedefs.build_date = strdup(tmpbuf1);
+            nomakedefs.build_date = dupstr(tmpbuf1);
         }
 
         nomakedefs.version_number = version->incarnation;
@@ -111,17 +111,16 @@ populate_nomakedefs(struct version_info *version)
         nomakedefs.version_sanity1 = version->entity_count;
         nomakedefs.version_sanity2 = version->struct_sizes1;
         nomakedefs.version_sanity3 = version->struct_sizes2;
-        nomakedefs.version_string = strdup(mdlib_version_string(tmpbuf2, "."));
-        nomakedefs.version_id = strdup(version_id_string(tmpbuf2, sizeof tmpbuf2,
-                                            nomakedefs.build_date));
-        nomakedefs.copyright_banner_c = strdup(bannerc_string(
-                                                tmpbuf2, sizeof tmpbuf2,
-                                                nomakedefs.build_date));
+        nomakedefs.version_string = dupstr(mdlib_version_string(tmpbuf2, "."));
+        nomakedefs.version_id = dupstr(
+           version_id_string(tmpbuf2, sizeof tmpbuf2, nomakedefs.build_date));
+        nomakedefs.copyright_banner_c = dupstr(
+              bannerc_string(tmpbuf2, sizeof tmpbuf2, nomakedefs.build_date));
 #ifdef NETHACK_GIT_SHA
-        nomakedefs.git_sha = strdup(NETHACK_GIT_SHA);
+        nomakedefs.git_sha = dupstr(NETHACK_GIT_SHA);
 #endif
 #ifdef NETHACK_GIT_BRANCH
-        nomakedefs.git_branch = strdup(NETHACK_GIT_BRANCH);
+        nomakedefs.git_branch = dupstr(NETHACK_GIT_BRANCH);
 #endif
 }
 
@@ -129,13 +128,17 @@ void
 free_nomakedefs(void)
 {
     if (nomakedefs.build_date)
-        free((genericptr_t) nomakedefs.build_date);
+        free((genericptr_t) nomakedefs.build_date),
+            nomakedefs.build_date = 0;
     if (nomakedefs.version_string)
-        free((genericptr_t) nomakedefs.version_string);
+        free((genericptr_t) nomakedefs.version_string),
+            nomakedefs.version_string = 0;
     if (nomakedefs.version_id)
-        free((genericptr_t) nomakedefs.version_id);
+        free((genericptr_t) nomakedefs.version_id),
+            nomakedefs.version_id = 0;
     if (nomakedefs.copyright_banner_c)
-        free((genericptr_t) nomakedefs.copyright_banner_c);
+        free((genericptr_t) nomakedefs.copyright_banner_c),
+            nomakedefs.copyright_banner_c = 0;
 }
 
 #endif /* __DATE__ && __TIME__ */

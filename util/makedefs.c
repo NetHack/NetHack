@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1600855420 2020/09/23 10:03:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1639622361 2021/12/16 02:39:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -8,9 +8,6 @@
 #define MAKEDEFS_C /* use to conditionally include file sections */
 
 #include "config.h"
-#ifdef MONITOR_HEAP
-#undef free /* makedefs doesn't use the alloc and free in src/alloc.c */
-#endif
 #include "permonst.h"
 #include "objclass.h"
 #include "sym.h"
@@ -173,6 +170,40 @@ static boolean use_enum = TRUE;
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
 #endif
+
+#ifdef MONITOR_HEAP
+/* for monitor heap, free(ptr) is a macro that expands to
+   nhfree(ptr,__FILE__,__LINE__) and nhfree() calls actual free();
+   makedefs wants to call actual free() so get rid of the macro */
+#undef free
+
+/* makedefs doesn't use alloc() from src/alloc.c but it links with
+   src/date.o which calls free() hence nhfree() if MONITOR_HEAP is
+   enabled; provide a substitute to satisfy the linker */
+void
+nhfree(genericptr_t ptr, const char *file UNUSED, int line UNUSED)
+{
+    free(ptr);
+}
+
+/* likewise for dupstr() which is also used in src/date.c */
+#undef dupstr
+
+char *
+nhdupstr(const char *string, const char *file UNUSED, int line UNUSED)
+{
+    return strcpy((char *) malloc(strlen(string) + 1), string);
+}
+#else /* !MONITOR_HEAP */
+
+/* without MONITOR_HEAP, we don't need to undef dupstr or provide
+   nhdupstr() but we do still need to provide a substitute dupstr() */
+char *
+dupstr(const char *string)
+{
+    return strcpy((char *) malloc(strlen(string) + 1), string);
+}
+#endif /* ?MONITOR_HEAP */
 
 /*
  * Some of the routines in this source file were moved into .../src/mdlib
@@ -2238,6 +2269,7 @@ tmpdup(const char* str)
     return buf;
 }
 
+/* the STRICT_REF_DEF checking is way out of date... */
 #ifdef STRICT_REF_DEF
 NEARDATA struct flag flags;
 #ifdef ATTRIB_H

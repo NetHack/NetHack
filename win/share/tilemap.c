@@ -1,4 +1,4 @@
-/* NetHack 3.7	tilemap.c	$NHDT-Date: 1596498340 2020/08/03 23:45:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.7	tilemap.c	$NHDT-Date: 1639622363 2021/12/16 02:39:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.63 $ */
 /*      Copyright (c) 2016 by Michael Allison                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,6 +20,13 @@
 #include "hack.h"
 #include "display.h"
 #include <stdarg.h>
+#endif
+
+#ifdef MONITOR_HEAP
+/* with heap monitoring enabled, free(ptr) is a macro which expands to
+   nhfree(ptr,__FILE__,__LINE__); since tilemap doesn't link with
+   src/alloc.o it doesn't have access to nhfree(); use actual free */
+#undef free
 #endif
 
 #define Fprintf (void) fprintf
@@ -1423,8 +1430,13 @@ precheck(int offset, const char *glyphtype)
                 glyphtype);
 }
 
-void add_tileref(int n, int glyphref, enum tilesrc src, int entrynum,
-                 const char *nam, const char *prefix)
+void add_tileref(
+    int n,
+    int glyphref,
+    enum tilesrc src,
+    int entrynum,
+    const char *nam,
+    const char *prefix)
 {
     struct tiles_used temp = { 0 };
     static const char ellipsis[] UNUSED = "...";
@@ -1476,8 +1488,7 @@ free_tilerefs(void)
 
     for (i = 0; i < SIZE(tilelist); i++) {
         if (tilelist[i])
-            free(tilelist[i]);
-        tilelist[i] = (struct tiles_used *) 0;
+            free((genericptr_t) tilelist[i]), tilelist[i] = 0;
     }
 }
 
