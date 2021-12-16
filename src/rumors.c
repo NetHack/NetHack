@@ -81,7 +81,7 @@ unpadline(char *line)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 static void
-init_rumors(dlb* fp)
+init_rumors(dlb *fp)
 {
     static const char rumors_header[] = "%d,%ld,%lx;%d,%ld,%lx;0,0,%lx\n";
     int true_count, false_count; /* in file but not used here */
@@ -183,17 +183,11 @@ getrumor(
 void
 rumor_check(void)
 {
-    dlb *rumors = 0;
+    dlb *rumors;
     winid tmpwin = WIN_ERR;
     char *endp, line[BUFSZ], xbuf[BUFSZ], rumor_buf[BUFSZ];
 
-    if (g.true_rumor_size < 0L) { /* we couldn't open RUMORFILE */
- no_rumors:
-        pline("rumors not accessible.");
-        return;
-    }
-
-    rumors = dlb_fopen(RUMORFILE, "r");
+    rumors = (g.true_rumor_size >= 0) ? dlb_fopen(RUMORFILE, "r") : 0;
     if (rumors) {
         long ftell_rumor_start = 0L;
 
@@ -267,6 +261,17 @@ rumor_check(void)
         putstr(tmpwin, 0, rumor_buf);
 
         (void) dlb_fclose(rumors);
+
+    /* if a previous attempt couldn't open file or rejected its contents,
+       we didn't bother trying again this time */
+    } else if (g.true_rumor_size < 0L) {
+ no_rumors: /* file could be opened but init_rumors() didn't like it */
+        pline("rumors not accessible.");
+        /* engravings, epitaphs, and bogus monsters will still be shown,
+           and in tmpwin rather than via additional pline() calls */
+        display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+
+    /* first attempt to open file has just failed */
     } else {
         couldnt_open_file(RUMORFILE);
         g.true_rumor_size = -1; /* don't try to open it again */
@@ -288,7 +293,10 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* 3.7: augments rumors_check(); test 'engrave' or 'epitaph' or 'bogusmon' */
 static void
-others_check(const char* ftype, const char* fname, winid* winptr)
+others_check(
+    const char *ftype, /* header: "{Engravings|Epitaphs|Bogus monsters}:" */
+    const char *fname, /* filename: {ENGRAVEFILE|EPITAPHFILE|BOGUSMONFILE} */
+    winid *winptr)     /* text window for output; created here if necessary */
 {
     static const char errfmt[] = "others_check(\"%s\"): %s";
     dlb *fh;
@@ -552,7 +560,7 @@ outrumor(
 }
 
 static void
-init_oracles(dlb* fp)
+init_oracles(dlb *fp)
 {
     register int i;
     char line[BUFSZ];
@@ -573,7 +581,7 @@ init_oracles(dlb* fp)
 }
 
 void
-save_oracles(NHFILE* nhfp)
+save_oracles(NHFILE *nhfp)
 {
     if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
@@ -595,7 +603,7 @@ save_oracles(NHFILE* nhfp)
 }
 
 void
-restore_oracles(NHFILE* nhfp)
+restore_oracles(NHFILE *nhfp)
 {
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &g.oracle_cnt, sizeof g.oracle_cnt);
@@ -667,7 +675,7 @@ outoracle(boolean special, boolean delphi)
 }
 
 int
-doconsult(struct monst* oracl)
+doconsult(struct monst *oracl)
 {
     long umoney;
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
