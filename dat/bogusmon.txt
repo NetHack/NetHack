@@ -412,8 +412,8 @@ Greater Hell Beast
 # Dungeon Crawl Stone Soup
 +Sigmund
 lernaean hydra
-+Ijyb
-+Gloorx Vloq
+-Ijyb
+=Gloorx Vloq
 +Blork the orc
 
 # Wil Wheaton, John Scalzi
