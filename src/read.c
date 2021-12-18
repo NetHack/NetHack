@@ -2467,7 +2467,7 @@ do_class_genocide(void)
                         u.mh = -1;
                         if (Unchanging) {
                             if (!feel_dead++)
-                                You("die.");
+                                custompline(URGENT_MESSAGE, "You die.");
                             /* finish genociding this class of
                                monsters before ultimately dying */
                             gameover = TRUE;
@@ -2484,7 +2484,7 @@ do_class_genocide(void)
                                 You_feel("%s inside.", udeadinside());
                         } else {
                             if (!feel_dead++)
-                                You("die.");
+                                custompline(URGENT_MESSAGE, "You die.");
                             gameover = TRUE;
                         }
                     }

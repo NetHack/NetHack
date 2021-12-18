@@ -2635,7 +2635,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         Sprintf(g.killer.name, "shot %sself with a death ray", uhim());
         g.killer.format = NO_KILLER_PREFIX;
         You("irradiate yourself with pure energy!");
-        You("die.");
+        custompline(URGENT_MESSAGE, "You die.");
         /* They might survive with an amulet of life saving */
         done(DIED);
         break;

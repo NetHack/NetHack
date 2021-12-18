@@ -109,9 +109,9 @@ struct window_procs tty_procs = {
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
      | WC2_RESET_STATUS
 #endif
-     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_STATUSLINES),
+     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES),
 #ifdef TEXTCOLOR
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
 #else
     {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 #endif
@@ -2662,7 +2662,13 @@ tty_putstr(winid window, int attr, const char *str)
 
     switch (cw->type) {
     case NHW_MESSAGE: {
-        int suppress_history = (attr & ATR_NOHISTORY);
+        int suppress_history = (attr & ATR_NOHISTORY),
+            urgent_message = (attr & ATR_URGENT);
+
+        /* if message is designated 'urgent' don't suppress it if user has
+           typed ESC at --More-- prompt when dismissing an earlier message */
+        if (urgent_message)
+            cw->flags &= ~WIN_STOP;
 
         /* in case we ever support display attributes for topline
            messages, clear flag mask leaving only display attr */

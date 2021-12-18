@@ -3252,7 +3252,7 @@ maybe_wail(void)
 }
 
 void
-losehp(register int n, register const char *knam, boolean k_format)
+losehp(int n, const char *knam, boolean k_format)
 {
 #if 0   /* code below is prepared to handle negative 'loss' so don't add this
          * until we've verified that no callers intentionally rely on that */
@@ -3281,7 +3281,7 @@ losehp(register int n, register const char *knam, boolean k_format)
         g.killer.format = k_format;
         if (g.killer.name != knam) /* the thing that killed you */
             Strcpy(g.killer.name, knam ? knam : "");
-        You("die...");
+        custompline(URGENT_MESSAGE, "You die...");
         done(DIED);
     } else if (n > 0 && u.uhp * 10 < u.uhpmax) {
         maybe_wail();

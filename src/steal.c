@@ -428,22 +428,23 @@ steal(struct monst* mtmp, char* objnambuf)
                     unmul((char *) 0);
                 slowly = (armordelay >= 1 || g.multi < 0);
                 if (flags.female)
-                    pline("%s charms you.  You gladly %s your %s.",
-                          !seen ? "She" : Monnam(mtmp),
-                          curssv ? "let her take"
-                                 : !slowly ? "hand over"
-                                           : was_doffing ? "continue removing"
-                                                         : "start removing",
-                          equipname(otmp));
+                    custompline(URGENT_MESSAGE,
+                                "%s charms you.  You gladly %s your %s.",
+                                !seen ? "She" : Monnam(mtmp),
+                                curssv ? "let her take"
+                                : !slowly ? "hand over"
+                                  : was_doffing ? "continue removing"
+                                    : "start removing",
+                                equipname(otmp));
                 else
-                    pline("%s seduces you and %s off your %s.",
-                          !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
-                          curssv
-                              ? "helps you to take"
-                              : !slowly ? "you take"
-                                        : was_doffing ? "you continue taking"
-                                                      : "you start taking",
-                          equipname(otmp));
+                    custompline(URGENT_MESSAGE,
+                                "%s seduces you and %s off your %s.",
+                                !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
+                                curssv ? "helps you to take"
+                                : !slowly ? "you take"
+                                  : was_doffing ? "you continue taking"
+                                    : "you start taking",
+                                equipname(otmp));
                 named++;
                 /* the following is to set multi for later on */
                 nomul(-armordelay);
@@ -478,9 +479,10 @@ steal(struct monst* mtmp, char* objnambuf)
         subfrombill(otmp, shop_keeper(*u.ushops));
     freeinv(otmp);
     /* if attached ball was taken, uball and uchain are now Null */
-    pline("%s%s stole %s.", named ? "She" : Monnam(mtmp),
-          (was_punished && !Punished) ? " removed your chain and" : "",
-          doname(otmp));
+    custompline(URGENT_MESSAGE,
+                "%s%s stole %s.", named ? "She" : Monnam(mtmp),
+                (was_punished && !Punished) ? " removed your chain and" : "",
+                doname(otmp));
     could_petrify = (otmp->otyp == CORPSE
                      && touch_petrifies(&mons[otmp->corpsenm]));
     (void) mpickobj(mtmp, otmp); /* may free otmp */

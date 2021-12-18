@@ -712,6 +712,8 @@ polymorphing while wearing an amulet of strangulation from a form that wasn't
 	vulnerable to one that was gave wrong message ("still constricts")
 for accessibility reasons, give a message when monster teleports
 if a gremlin stole intrinsic 'see invisible' the map wasn't updated properly
+mark some messages as urgent ("You die*.", having equipment stolen, being
+	caught in a magical explosion)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1323,6 +1325,8 @@ tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
 tty: use bright colors directly on supporting terminals
+tty: if a message is marked urgent, override message suppression initiated
+	by user having typed ESC at previous --More-- prompt
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
 X11: implement 'selectsaved', restore via menu of saved games

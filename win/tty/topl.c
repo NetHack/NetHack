@@ -582,8 +582,9 @@ msghistory_snapshot(boolean purge) /* clear message history buffer
 
 /* release memory allocated to message history snapshot */
 static void
-free_msghistory_snapshot(boolean purged) /* True: took history's pointers,
-                                            False: just cloned them */
+free_msghistory_snapshot(
+    boolean purged) /* True: took history's pointers,
+                     * False: just cloned them */
 {
     if (snapshot_mesgs) {
         /* snapshot pointers are no longer in use */
