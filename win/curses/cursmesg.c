@@ -20,7 +20,7 @@ extern char erase_char, kill_char;
 /* player can type ESC at More>> prompt to avoid seeing more messages
    for the current move; but hero might get more than one move per turn,
    so the input routines need to be able to cancel this */
-long curs_mesg_suppress_turn = -1;
+long curs_mesg_suppress_turn = -1L;
 
 /* Message window routines for curses interface */
 
@@ -166,7 +166,7 @@ void
 curses_got_input(void)
 {
     /* if messages are being suppressed, reenable them */
-    curs_mesg_suppress_turn = -1;
+    curs_mesg_suppress_turn = -1L;
 
     /* misleadingly named; represents number of lines delivered since
        player was sure to have had a chance to read them; if player
