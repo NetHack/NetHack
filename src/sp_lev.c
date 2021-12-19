@@ -1570,17 +1570,15 @@ create_subroom(
     return TRUE;
 }
 
-DISABLE_WARNING_UNREACHABLE_CODE
-
 /*
  * Create a new door in a room.
  * It's placed on a wall (north, south, east or west).
  */
 static void
-create_door(room_door* dd, struct mkroom* broom)
+create_door(room_door *dd, struct mkroom *broom)
 {
     int x = 0, y = 0;
-    int trycnt = 0, wtry = 0;
+    int trycnt;
 
     if (dd->secret == -1)
         dd->secret = rn2(2);
@@ -1610,8 +1608,8 @@ create_door(room_door* dd, struct mkroom* broom)
         }
     }
 
-    do {
-        register int dwall, dpos;
+    for (trycnt = 0; trycnt < 100; ++trycnt) {
+        int dwall, dpos;
 
         dwall = dd->wall;
         if (dwall == -1) /* The wall is RANDOM */
@@ -1620,65 +1618,58 @@ create_door(room_door* dd, struct mkroom* broom)
         dpos = dd->pos;
 
         /* Convert wall and pos into an absolute coordinate! */
-        wtry = rn2(4);
-        switch (wtry) {
+        switch (rn2(4)) {
         case 0:
             if (!(dwall & W_NORTH))
-                goto redoloop;
+                continue;
             y = broom->ly - 1;
-            x = broom->lx
-                + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
+            x = broom->lx + ((dpos == -1) ? rn2(1 + broom->hx - broom->lx)
+                                          : dpos);
             if (!isok(x, y - 1) || IS_ROCK(levl[x][y - 1].typ))
-                goto redoloop;
-            goto outdirloop;
+                continue;
+            break;
         case 1:
             if (!(dwall & W_SOUTH))
-                goto redoloop;
+                continue;
             y = broom->hy + 1;
-            x = broom->lx
-                + ((dpos == -1) ? rn2(1 + (broom->hx - broom->lx)) : dpos);
+            x = broom->lx + ((dpos == -1) ? rn2(1 + broom->hx - broom->lx)
+                                          : dpos);
             if (!isok(x, y + 1) || IS_ROCK(levl[x][y + 1].typ))
-                goto redoloop;
-            goto outdirloop;
+                continue;
+            break;
         case 2:
             if (!(dwall & W_WEST))
-                goto redoloop;
+                continue;
             x = broom->lx - 1;
-            y = broom->ly
-                + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
+            y = broom->ly + ((dpos == -1) ? rn2(1 + broom->hy - broom->ly)
+                                          : dpos);
             if (!isok(x - 1, y) || IS_ROCK(levl[x - 1][y].typ))
-                goto redoloop;
-            goto outdirloop;
+                continue;
+            break;
         case 3:
             if (!(dwall & W_EAST))
-                goto redoloop;
+                continue;
             x = broom->hx + 1;
-            y = broom->ly
-                + ((dpos == -1) ? rn2(1 + (broom->hy - broom->ly)) : dpos);
+            y = broom->ly + ((dpos == -1) ? rn2(1 + broom->hy - broom->ly)
+                                          : dpos);
             if (!isok(x + 1, y) || IS_ROCK(levl[x + 1][y].typ))
-                goto redoloop;
-            goto outdirloop;
+                continue;
+            break;
         default:
-            x = y = 0;
-            panic("create_door: No wall for door!");
-            /*UNREACHABLE_CODE*/
-            goto outdirloop;
+            /*NOTREACHED*/
+            break;
         }
- outdirloop:
+
         if (okdoor(x, y))
             break;
- redoloop:
-        ;
-    } while (++trycnt <= 100);
-    if (trycnt > 100) {
+    }
+    if (trycnt >= 100) {
         impossible("create_door: Can't find a proper place!");
         return;
     }
     levl[x][y].typ = (dd->secret ? SDOOR : DOOR);
     levl[x][y].doormask = dd->mask;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * Create a secret door in croom on any one of the specified walls.
