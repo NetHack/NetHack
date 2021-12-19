@@ -947,6 +947,8 @@ Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
 	for some other target could crash
+Qt: changes in glyph handling in the core introduced a bug in the "paper doll"
+	display for inventory subset
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
