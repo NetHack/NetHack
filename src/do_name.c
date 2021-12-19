@@ -1107,6 +1107,9 @@ christen_monst(struct monst *mtmp, const char *name)
     new_mgivenname(mtmp, lth); /* removes old name if one is present */
     if (lth)
         Strcpy(MGIVENNAME(mtmp), name);
+    /* if 'mtmp' is leashed, persistent inventory window needs updating */
+    if (mtmp->mleashed)
+        update_inventory(); /* x - leash (attached to Fido) */
     return mtmp;
 }
 
