@@ -27,6 +27,7 @@ static int trapeffect_level_telep(struct monst *, struct trap *, unsigned);
 static int trapeffect_web(struct monst *, struct trap *, unsigned);
 static int trapeffect_statue_trap(struct monst *, struct trap *, unsigned);
 static int trapeffect_magic_trap(struct monst *, struct trap *, unsigned);
+static int en_to_hp_drain(long, int);
 static int trapeffect_anti_magic(struct monst *, struct trap *, unsigned);
 static int trapeffect_poly_trap(struct monst *, struct trap *, unsigned);
 static int trapeffect_landmine(struct monst *, struct trap *, unsigned);
@@ -1974,6 +1975,34 @@ trapeffect_magic_trap(
     return 0;
 }
 
+/* Return an approximation of maxhp * (1-exp(-en/maxhp)).
+ * When en/maxhp is small, hp loss is approximately en.
+ * As en/maxhp increases, hp loss approaches maxhp.
+ */
+static int
+en_to_hp_drain(long en, int maxhp)
+{
+    long rhp = maxhp; /* remaining hp */
+    int i = en / maxhp;
+    en = en - maxhp * i;
+    /* Handle integer part of en/maxhp: rhp = maxhp * exp(-i) */
+    while (i--) {
+        rhp = rhp * 71 / 193; /* approximation of exp(-1) */
+    }
+    /* Handle fractional part with a Taylor series approximation of exp(-x),
+     * where x = en/rhp: 1 - x + x^2/2 - x^3/6 + x^4/24 ... */
+    if (rhp > 0) {
+        /* (en / 2 * en) overflows 32-bit signed long if en>65535 */
+        if (en > 65535) en = 65535;
+        rhp = rhp - en + en / 2 * en / rhp
+            - en / 6 * en / rhp * en / rhp
+            + en / 24 * en / rhp * en / rhp * en / rhp;
+    }
+    /* at worst, drain maxhp-1 */
+    if (rhp <= 0) rhp = 1;
+    return maxhp - rhp;
+}
+
 static int
 trapeffect_anti_magic(
     struct monst* mtmp,
@@ -2011,6 +2040,9 @@ trapeffect_anti_magic(
                 dmgval2 += rnd(4);
             if (Passes_walls)
                 dmgval2 = (dmgval2 + 3) / 4;
+
+            dmgval2 = en_to_hp_drain(dmgval2, Upolyd ? u.mhmax : u.uhpmax);
+            dmgval2 = max(1, dmgval2);
 
             You_feel((dmgval2 >= hp) ? "unbearably torpid!"
                      : (dmgval2 >= hp / 4) ? "very lethargic."
@@ -2052,7 +2084,8 @@ trapeffect_anti_magic(
 
             if (in_sight)
                 seetrap(trap);
-            mtmp->mhp -= dmgval2;
+            dmgval2 = en_to_hp_drain(dmgval2, mtmp->mhpmax);
+            mtmp->mhp -= max(1, dmgval2);
             if (DEADMONSTER(mtmp))
                 monkilled(mtmp,
                           in_sight
