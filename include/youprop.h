@@ -66,7 +66,8 @@
 
 /* Intrinsics only */
 #define HSick_resistance u.uprops[SICK_RES].intrinsic
-#define Sick_resistance (HSick_resistance || defends(AD_DISE, uwep))
+#define ESick_resistance u.uprops[SICK_RES].extrinsic
+#define Sick_resistance (HSick_resistance || ESick_resistance || defends(AD_DISE, uwep))
 
 #define Invulnerable u.uprops[INVULNERABLE].intrinsic /* [Tom] */
 

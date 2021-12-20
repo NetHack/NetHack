@@ -717,6 +717,7 @@ mark some messages as urgent ("You die*.", having equipment stolen, being
 if a leashed pet changed name (#name m) or an unnamed pet changed type
 	(polymorph or grow-up) and perm_invent was On, persistent inventory
 	display didn't get updated to show the leash's changed information
+give some dragon armor extra effects when worn
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
