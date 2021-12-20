@@ -207,12 +207,28 @@ RESTORE_WARNING_FORMAT_NONLITERAL
    message history (tty interface uses pline() to issue prompts and
    they shouldn't be blockable via MSGTYPE=hide) */
 void
-custompline(unsigned pflags, const char * line, ...)
+custompline(unsigned pflags, const char *line, ...)
 {
     va_list the_args;
 
     va_start(the_args, line);
     g.pline_flags = pflags;
+    vpline(line, the_args);
+    g.pline_flags = 0;
+    va_end(the_args);
+}
+
+/* if player has dismissed --More-- with ESC to suppress further messages
+   until next input request, tell the interface that it should override that
+   and re-enable them; equivalent to custompline(URGENT_MESSAGE, line, ...)
+   but slightly simpler to use */
+void
+urgent_pline(const char *line, ...)
+{
+    va_list the_args;
+
+    va_start(the_args, line);
+    g.pline_flags = URGENT_MESSAGE;
     vpline(line, the_args);
     g.pline_flags = 0;
     va_end(the_args);

@@ -1989,6 +1989,7 @@ extern void dumplogfreemessages(void);
 #endif
 extern void pline(const char *, ...) PRINTF_F(1, 2);
 extern void custompline(unsigned, const char *, ...) PRINTF_F(2, 3);
+extern void urgent_pline(const char *, ...) PRINTF_F(1, 2);
 extern void Norep(const char *, ...) PRINTF_F(1, 2);
 extern void free_youbuf(void);
 extern void You(const char *, ...) PRINTF_F(1, 2);

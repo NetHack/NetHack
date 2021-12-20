@@ -2392,9 +2392,9 @@ in_container(struct obj *obj)
         }
     } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
         /* explicitly mention what item is triggering the explosion */
-        custompline(URGENT_MESSAGE,
+        urgent_pline(
               "As you put %s inside, you are blasted by a magical explosion!",
-                    doname(obj));
+                     doname(obj));
         /* did not actually insert obj yet */
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);

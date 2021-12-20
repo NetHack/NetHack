@@ -2634,8 +2634,10 @@ zapyourself(struct obj *obj, boolean ordinary)
         learn_it = TRUE;
         Sprintf(g.killer.name, "shot %sself with a death ray", uhim());
         g.killer.format = NO_KILLER_PREFIX;
-        You("irradiate yourself with pure energy!");
-        custompline(URGENT_MESSAGE, "You die.");
+        /* probably don't need these to be urgent; player just gave input
+           without subsequent opportunity to dismiss --More-- with ESC */
+        urgent_pline("You irradiate yourself with pure energy!");
+        urgent_pline("You die.");
         /* They might survive with an amulet of life saving */
         done(DIED);
         break;

@@ -3281,7 +3281,7 @@ losehp(int n, const char *knam, boolean k_format)
         g.killer.format = k_format;
         if (g.killer.name != knam) /* the thing that killed you */
             Strcpy(g.killer.name, knam ? knam : "");
-        custompline(URGENT_MESSAGE, "You die...");
+        urgent_pline("You die...");
         done(DIED);
     } else if (n > 0 && u.uhp * 10 < u.uhpmax) {
         maybe_wail();
