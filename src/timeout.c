@@ -263,9 +263,9 @@ choke_dialogue(void)
     register long i = (Strangled & TIMEOUT);
 
     if (i > 0 && i <= SIZE(choke_texts)) {
-        if (Breathless || !rn2(50))
+        if (Breathless || !rn2(50)) {
             pline(choke_texts2[SIZE(choke_texts2) - i], body_part(NECK));
-        else {
+        } else {
             const char *str = choke_texts[SIZE(choke_texts) - i];
 
             if (index(str, '%'))
@@ -344,11 +344,13 @@ slime_dialogue(void)
             if (i == 4L) {  /* "you are turning green" */
                 if (!Blind) /* [what if you're already green?] */
                     pline(buf, hcolor(NH_GREEN));
-            } else
+            } else {
                 pline(buf,
                       an(Hallucination ? rndmonnam(NULL) : "green slime"));
-        } else
+            }
+        } else {
             pline1(buf);
+        }
     }
 
     switch (i) {
@@ -434,10 +436,10 @@ slimed_to_death(struct kinfo* kptr)
         Strcpy(slimebuf, "green slime has been genocided...");
         if (iflags.last_msg == PLNMSG_OK_DONT_DIE)
             /* follows "OK, so you don't die." and arg is second sentence */
-            pline("Yes, you do.  %s", upstart(slimebuf));
+            urgent_pline("Yes, you do.  %s", upstart(slimebuf));
         else
             /* follows "The medallion crumbles to dust." */
-            pline("Unfortunately, %s", slimebuf);
+            urgent_pline("Unfortunately, %s", slimebuf);
         /* die again; no possibility of amulet this time */
         done(GENOCIDED); /* [should it be done_timeout(GENOCIDED, SLIMED)?] */
         /* could be life-saved again (only in explore or wizard mode)
@@ -583,8 +585,8 @@ nh_timeout(void)
                 make_vomiting(0L, TRUE);
                 break;
             case SICK:
-                /* You might be able to bounce back from food poisoning, but not
-                 * other forms of illness. */
+                /* hero might be able to bounce back from food poisoning,
+                   but not other forms of illness */
                 if ((u.usick_type & SICK_NONVOMITABLE) == 0
                     && rn2(100) < ACURR(A_CON)) {
                     You("have recovered from your illness.");
@@ -593,7 +595,7 @@ nh_timeout(void)
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
-                You("die from your illness.");
+                urgent_pline("You die from your illness.");
                 if (kptr && kptr->name[0]) {
                     g.killer.format = kptr->format;
                     Strcpy(g.killer.name, kptr->name);

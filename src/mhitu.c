@@ -1121,11 +1121,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
              * like horses for now :-)
              */
             Strcpy(buf, mon_nam(u.usteed));
-            pline("%s lunges forward and plucks you off %s!", Monnam(mtmp),
-                  buf);
+            urgent_pline("%s lunges forward and plucks you off %s!",
+                         Monnam(mtmp), buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
-            pline("%s engulfs you!", Monnam(mtmp));
+            urgent_pline("%s engulfs you!", Monnam(mtmp));
         }
         stop_occupation();
         reset_occupations(); /* behave as if you had moved */
@@ -1495,7 +1495,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
             stop_occupation();
             if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))
                 break;
-            You("turn to stone...");
+            urgent_pline("You turn to stone...");
             g.killer.format = KILLED_BY;
             Strcpy(g.killer.name, pmname(mtmp->data, Mgender(mtmp)));
             done(STONING);

@@ -2646,8 +2646,9 @@ mhitm_ad_drst(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_drin(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_drin(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -2744,8 +2745,9 @@ mhitm_ad_drin(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_stck(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_stck(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -2816,7 +2818,8 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     mhm->damage = 0;
                 } else {
                     set_ustuck(magr); /* before message, for botl update */
-                    pline("%s swings itself around you!", Monnam(magr));
+                    urgent_pline("%s swings itself around you!",
+                                 Monnam(magr));
                 }
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious) {
@@ -2825,7 +2828,7 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                                    && !Is_medusa_level(&u.uz)
                                    && !Is_waterlevel(&u.uz);
 
-                    pline("%s drowns you...", Monnam(magr));
+                    urgent_pline("%s drowns you...", Monnam(magr));
                     g.killer.format = KILLED_BY_AN;
                     Sprintf(g.killer.name, "%s by %s",
                             moat ? "moat" : "pool of water",

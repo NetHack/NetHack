@@ -2782,7 +2782,14 @@ menu_remarm(int retry)
 int
 destroy_arm(register struct obj *atmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
+    /*
+     * Note: if there were any artifact cloaks, the 90% chance of
+     * resistance here means that the cloak could survive and then
+     * the suit or shirt underneath could be destroyed.  Likewise for
+     * artifact suit over a shirt.  That would be a bug.  Since there
+     * aren't any, we'll just look the other way.
+     */
 #define DESTROY_ARM(o)                            \
     ((otmp = (o)) != 0 && (!atmp || atmp == otmp) \
              && (!obj_resists(otmp, 0, 90))       \
@@ -2792,48 +2799,57 @@ destroy_arm(register struct obj *atmp)
     if (DESTROY_ARM(uarmc)) {
         if (donning(otmp))
             cancel_don();
-        Your("%s crumbles and turns to dust!", cloak_simple_name(uarmc));
+        urgent_pline("Your %s crumbles and turns to dust!",
+                     /* cloak/robe/apron/smock (ID'd apron)/wrapping */
+                     cloak_simple_name(uarmc));
         (void) Cloak_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarm)) {
+        const char *suit = suit_simple_name(uarm);
+
         if (donning(otmp))
             cancel_don();
         /* for gold DSM, we don't want Armor_gone() to report that it
            stops shining _after_ we've been told that it is destroyed */
         if (otmp->lamplit)
             end_burn(otmp, FALSE);
-        Your("armor turns to dust and falls to the %s!", surface(u.ux, u.uy));
+        urgent_pline("Your %s %s to dust and %s to the %s!",
+                     /* suit might be "dragon scales" so vtense() is needed */
+                     suit, vtense(suit, "turn"), vtense(suit, "fall"),
+                     surface(u.ux, u.uy));
         (void) Armor_gone();
         useup(otmp);
     } else if (DESTROY_ARM(uarmu)) {
         if (donning(otmp))
             cancel_don();
-        Your("shirt crumbles into tiny threads and falls apart!");
+        urgent_pline("Your %s crumbles into tiny threads and falls apart!",
+                     shirt_simple_name(uarmu)); /* always "shirt" */
         (void) Shirt_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarmh)) {
         if (donning(otmp))
             cancel_don();
-        Your("%s turns to dust and is blown away!", helm_simple_name(uarmh));
+        urgent_pline("Your %s turns to dust and is blown away!",
+                     helm_simple_name(uarmh)); /* "helm" or "hat" */
         (void) Helmet_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarmg)) {
         if (donning(otmp))
             cancel_don();
-        Your("gloves vanish!");
+        urgent_pline("Your %s vanish!", gloves_simple_name(uarmg));
         (void) Gloves_off();
         useup(otmp);
         selftouch("You");
     } else if (DESTROY_ARM(uarmf)) {
         if (donning(otmp))
             cancel_don();
-        Your("boots disintegrate!");
+        urgent_pline("Your %s disintegrate!", boots_simple_name(uarmf));
         (void) Boots_off();
         useup(otmp);
     } else if (DESTROY_ARM(uarms)) {
         if (donning(otmp))
             cancel_don();
-        Your("shield crumbles away!");
+        urgent_pline("Your %s crumbles away!", shield_simple_name(uarms));
         (void) Shield_off();
         useup(otmp);
     } else {
