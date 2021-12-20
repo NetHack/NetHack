@@ -2309,8 +2309,9 @@ process_text_window(winid window, struct WinDesc *cw)
 
 /*ARGSUSED*/
 void
-tty_display_nhwindow(winid window,
-                    boolean blocking) /* with ttys, all windows are blocking */
+tty_display_nhwindow(
+    winid window,
+    boolean blocking) /* with ttys, all windows are blocking */
 {
     register struct WinDesc *cw = 0;
     short s_maxcol;
@@ -2666,9 +2667,17 @@ tty_putstr(winid window, int attr, const char *str)
             urgent_message = (attr & ATR_URGENT);
 
         /* if message is designated 'urgent' don't suppress it if user has
-           typed ESC at --More-- prompt when dismissing an earlier message */
-        if (urgent_message)
-            cw->flags &= ~WIN_STOP;
+           typed ESC at --More-- prompt when dismissing an earlier message;
+           besides turning off WIN_STOP, we need to prevent current message
+           from provoking --More-- and giving the user another chance at
+           using ESC to suppress, otherwise this message wouldn't get shown */
+        if (urgent_message) {
+            if ((cw->flags & WIN_STOP) != 0) {
+                tty_clear_nhwindow(WIN_MESSAGE);
+                cw->flags &= ~WIN_STOP;
+            }
+            cw->flags |= WIN_NOSTOP;
+        }
 
         /* in case we ever support display attributes for topline
            messages, clear flag mask leaving only display attr */
@@ -2684,6 +2693,8 @@ tty_putstr(winid window, int attr, const char *str)
             /* write to top line without remembering what we're writing */
             show_topl(str);
         }
+
+        cw->flags &= ~WIN_NOSTOP; /* NOSTOP is a one-shot operation */
         break;
     }
 #ifndef STATUS_HILITES

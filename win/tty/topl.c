@@ -144,7 +144,12 @@ show_topl(const char *str)
 {
     struct WinDesc *cw = wins[WIN_MESSAGE];
 
-    if (!(cw->flags & WIN_STOP)) {
+    /* show if either STOP isn't set or current message specifies NOSTOP */
+    if ((cw->flags & (WIN_STOP | WIN_NOSTOP)) != WIN_STOP) {
+        /* NOSTOP cancels persistent STOP and is a one-shot operation;
+           force both to be cleared (no-op for either bit that isn't set) */
+        cw->flags &= ~(WIN_STOP | WIN_NOSTOP);
+
         if (ttyDisplay->cury && ttyDisplay->toplin == TOPLINE_NON_EMPTY)
             tty_clear_nhwindow(WIN_MESSAGE);
 
@@ -184,7 +189,7 @@ remember_topl(void)
 void
 addtopl(const char *s)
 {
-    register struct WinDesc *cw = wins[WIN_MESSAGE];
+    struct WinDesc *cw = wins[WIN_MESSAGE];
 
     tty_curs(BASE_WINDOW, cw->curx + 1, cw->cury);
     putsyms(s);
@@ -220,8 +225,10 @@ more(void)
 
     xwaitforspace("\033 ");
 
-    if (morc == '\033')
-        cw->flags |= WIN_STOP;
+    if (morc == '\033') {
+        if (!(cw->flags & WIN_NOSTOP))
+            cw->flags |= WIN_STOP;
+    }
 
     if (ttyDisplay->toplin && cw->cury) {
         docorner(1, cw->cury + 1);
@@ -243,24 +250,25 @@ update_topl(register const char *bp)
     register int n0;
     int notdied = 1;
     struct WinDesc *cw = wins[WIN_MESSAGE];
+    boolean skip = (cw->flags & (WIN_STOP | WIN_NOSTOP)) == WIN_STOP;
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
-    if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || (cw->flags & WIN_STOP))
+    if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || skip)
         && cw->cury == 0
         && n0 + (int) strlen(g.toplines) + 3 < CO - 8 /* room for --More-- */
         && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(g.toplines, "  ");
         Strcat(g.toplines, bp);
         cw->curx += 2;
-        if (!(cw->flags & WIN_STOP))
+        if (!skip)
             addtopl(bp);
         return;
-    } else if (!(cw->flags & WIN_STOP)) {
+    } else if (!skip) {
         if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
             more();
-        } else if (cw->cury) { /* for toplin == TOPLINE_NON_EMPTY && cury > 1 */
+        } else if (cw->cury) { /* for toplin==TOPLINE_NON_EMPTY && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }
@@ -283,9 +291,9 @@ update_topl(register const char *bp)
         *tl++ = '\n';
         n0 = strlen(tl);
     }
-    if (!notdied)
-        cw->flags &= ~WIN_STOP;
-    if (!(cw->flags & WIN_STOP))
+    if (!notdied) /* double negative => "You die"; avoid suppressing mesg */
+        cw->flags &= ~WIN_STOP, skip = FALSE;
+    if (!skip)
         redotoplin(g.toplines);
 }
 
@@ -351,18 +359,19 @@ extern char erase_char; /* from xxxtty.c; don't need kill_char */
 /* returns a single keystroke; also sets 'yn_number' */
 char
 tty_yn_function(const char *query, const char *resp, char def)
-/*
- *   Generic yes/no function. 'def' is the default (returned by space or
- *   return; 'esc' returns 'q', or 'n', or the default, depending on
- *   what's in the string. The 'query' string is printed before the user
- *   is asked about the string.
- *   If resp is NULL, any single character is accepted and returned.
- *   If not-NULL, only characters in it are allowed (exceptions:  the
- *   quitchars are always allowed, and if it contains '#' then digits
- *   are allowed); if it includes an <esc>, anything beyond that won't
- *   be shown in the prompt to the user but will be acceptable as input.
- */
 {
+    /*
+     * Generic yes/no function.  'def' is the default (returned by space
+     * or return; 'esc' returns 'q', or 'n', or the default, depending on
+     * what's in the string.  The 'query' string is printed before the user
+     * is asked about the string.
+     *
+     * If resp is NULL, any single character is accepted and returned.
+     * If not-NULL, only characters in it are allowed (exceptions:  the
+     * quitchars are always allowed, and if it contains '#' then digits
+     * are allowed).  If it includes an <esc>, anything beyond that won't
+     * be shown in the prompt to the user but will be acceptable as input.
+     */
     register char q;
     char rtmp[40];
     boolean digit_ok, allow_num, preserve_case = FALSE;
@@ -371,9 +380,10 @@ tty_yn_function(const char *query, const char *resp, char def)
     char prompt[BUFSZ];
 
     yn_number = 0L;
-    if (ttyDisplay->toplin == TOPLINE_NEED_MORE && !(cw->flags & WIN_STOP))
+    if (ttyDisplay->toplin == TOPLINE_NEED_MORE
+        && (cw->flags & (WIN_STOP | WIN_NOSTOP)) != WIN_STOP)
         more();
-    cw->flags &= ~WIN_STOP;
+    cw->flags &= ~(WIN_STOP | WIN_NOSTOP);
     ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
     ttyDisplay->inread++;
     if (resp) {
