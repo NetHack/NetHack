@@ -2299,12 +2299,12 @@ extern void closelog(NHFILE *);
 /* ### sfstruct.c ### */
 
 #ifndef TRACEBUFFERING
-extern void newread(NHFILE *, int, int, genericptr_t, unsigned int);
+extern void newread(NHFILE *, int, int, genericptr_t, unsigned);
 extern void bufon(int);
 extern void bufoff(int);
 extern void bflush(int);
-extern void bwrite(int, genericptr_t, unsigned int);
-extern void mread(int, genericptr_t, unsigned int);
+extern void bwrite(int, const genericptr_t, unsigned);
+extern void mread(int, genericptr_t, unsigned);
 extern void minit(void);
 extern void bclose(int);
 #else
@@ -2319,11 +2319,11 @@ extern void bclose(int);
 extern void Bufon(int, const char *, int);
 extern void Bufoff(int, const char *, int);
 extern void Bflush(int, const char *, int);
-extern void Bwrite(int, genericptr_t, unsigned int, const char *, int);
-extern void Bread(int, genericptr_t, unsigned int, const char *, int);
+extern void Bwrite(int, const genericptr_t, unsigned, const char *, int);
+extern void Bread(int, genericptr_t, unsigned, const char *, int);
 extern void Binit(const char *, int);
 extern void Bclose(int, const char *, int);
-extern void Mread(int, genericptr_t, unsigned int, const char *, int);
+extern void Mread(int, genericptr_t, unsigned, const char *, int);
 extern void Minit(const char *, int);
 #if defined(ZEROCOMP)
 extern void zerocomp_bclose(int);

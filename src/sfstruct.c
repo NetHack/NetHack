@@ -32,12 +32,12 @@
 #ifdef minit
 #undef minit
 #endif
-void newread(NHFILE *, int, int, genericptr_t, unsigned int);
+void newread(NHFILE *, int, int, genericptr_t, unsigned);
 void bufon(int);
 void bufoff(int);
 void bflush(int);
-void bwrite(int, genericptr_t, unsigned int);
-void mread(int, genericptr_t, unsigned int);
+void bwrite(int, const genericptr_t, unsigned);
+void mread(int, genericptr_t, unsigned);
 void minit(void);
 void bclose(int);
 #endif /* TRACE_BUFFERING */
@@ -48,7 +48,7 @@ static int getidx(int, int);
 #endif
 
 struct restore_info restoreinfo = {
-	"externalcomp", 0,
+    "externalcomp", 0,
 };
 
 #define MAXFD 5
@@ -197,7 +197,7 @@ bflush(int fd)
 }
 
 void
-bwrite(register int fd, register genericptr_t loc, register unsigned num)
+bwrite(int fd, const genericptr_t loc, unsigned num)
 {
     boolean failed;
     int idx = getidx(fd, NOFLG);
@@ -237,9 +237,9 @@ minit(void)
 }
 
 void
-mread(register int fd, register genericptr_t buf, register unsigned int len)
+mread(int fd, genericptr_t buf, unsigned len)
 {
-    register int rlen;
+    int rlen;
 #if defined(BSD) || defined(ULTRIX)
 #define readLenType int
 #else /* e.g. SYSV, __TURBOC__ */
@@ -269,9 +269,12 @@ static FILE *tracefile;
 #define TFILE "trace-buffering.log"
 
 #define TRACE(xx) \
-    tracefile = fopen(TFILE, "a"); \
-    (void) fprintf(tracefile, "%s from %s:%d (%d)\n", __FUNCTION__, fncname, linenum, xx); \
-    fclose(tracefile);
+    do {                                                        \
+        tracefile = fopen(TFILE, "a");                          \
+        (void) fprintf(tracefile, "%s from %s:%d (%d)\n",       \
+                       __FUNCTION__, fncname, linenum, xx);     \
+        fclose(tracefile);                                      \
+    } while (0)
 
 void
 Bufon(int fd, const char *fncname, int linenum)
@@ -296,9 +299,9 @@ Bflush(int fd, const char* fncname, int linenum)
 
 void
 Bwrite(
-    register int fd,
-    register genericptr_t loc,
-    register unsigned num,
+    int fd,
+    const genericptr_t loc,
+    unsigned num,
     const char *fncname,
     int linenum)
 {
@@ -322,9 +325,9 @@ Minit(const char*fncname, int linenum)
 
 void
 Mread(
-    register int fd,
-    register genericptr_t buf,
-    register unsigned int len,
+    int fd,
+    genericptr_t buf,
+    unsigned len,
     const char *fncname,
     int linenum)
 {
