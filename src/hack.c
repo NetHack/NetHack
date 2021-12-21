@@ -2141,7 +2141,15 @@ domove_core(void)
         g.nomovemsg = "";
     }
 
-    if (g.context.run && flags.runmode != RUN_TPORT) {
+    runmode_delay_output();
+}
+
+/* delay output based on value of runmode,
+   if hero is running or doing a multi-turn action */
+void
+runmode_delay_output(void)
+{
+    if ((g.context.run || g.multi) && flags.runmode != RUN_TPORT) {
         /* for tport mode, don't display anything until we've stopped;
            for normal (leap) mode, update display every 7th step
            (relative to turn counter; ought to be to start of running);

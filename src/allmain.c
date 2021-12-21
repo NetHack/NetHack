@@ -336,6 +336,7 @@ moveloop_core(void)
 
                 /* when immobile, count is in turns */
                 if (g.multi < 0) {
+                    runmode_delay_output();
                     if (++g.multi == 0) { /* finished yet? */
                         unmul((char *) 0);
                         /* if unmul caused a level change, take it now */
@@ -433,10 +434,7 @@ moveloop_core(void)
             stop_occupation();
             reset_eat();
         }
-#if defined(MICRO) || defined(WIN32)
-        if (!(++g.occtime % 7))
-            display_nhwindow(WIN_MAP, FALSE);
-#endif
+        runmode_delay_output();
         return;
     }
 
@@ -449,6 +447,7 @@ moveloop_core(void)
 
     if (g.multi > 0) {
         lookaround();
+        runmode_delay_output();
         if (!g.multi) {
             /* lookaround may clear multi */
             g.context.move = 0;

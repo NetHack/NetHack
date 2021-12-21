@@ -874,6 +874,7 @@ extern int wiz_debug_cmd_traveldisplay(void);
 #endif
 extern boolean u_rooted(void);
 extern void domove(void);
+extern void runmode_delay_output(void);
 extern void overexert_hp(void);
 extern boolean overexertion(void);
 extern void invocation_message(void);

@@ -720,6 +720,7 @@ if a leashed pet changed name (#name m) or an unnamed pet changed type
 attack feedback when using a bullwhip said "swing"; change to "lash"
 attack feedback for monster using polearm when adjacent said "thrust"; change
 	to "bash"
+apply runmode delay to multiturn actions, not just running
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
