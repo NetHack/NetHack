@@ -64,11 +64,12 @@
 #define EStone_resistance u.uprops[STONE_RES].extrinsic
 #define Stone_resistance (HStone_resistance || EStone_resistance)
 
-/* Intrinsics only */
 #define HSick_resistance u.uprops[SICK_RES].intrinsic
 #define ESick_resistance u.uprops[SICK_RES].extrinsic
-#define Sick_resistance (HSick_resistance || ESick_resistance || defends(AD_DISE, uwep))
+#define Sick_resistance (HSick_resistance || ESick_resistance \
+                         || defends(AD_DISE, uwep))
 
+/* Intrinsics only */
 #define Invulnerable u.uprops[INVULNERABLE].intrinsic /* [Tom] */
 
 /*** Troubles ***/
