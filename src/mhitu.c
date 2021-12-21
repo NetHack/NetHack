@@ -9,7 +9,7 @@
 static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 
 static void missmu(struct monst *, boolean, struct attack *);
-static void mswings(struct monst *, struct obj *);
+static void mswings(struct monst *, struct obj *, boolean);
 static void wildmiss(struct monst *, struct attack *);
 static void summonmu(struct monst *, boolean);
 static int hitmu(struct monst *, struct attack *);
@@ -85,13 +85,40 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
     stop_occupation();
 }
 
+/* strike types P|S|B: Pierce (pointed: stab) => "thrusts",
+   Slash (edged: slice) or whack (blunt: Bash) => "swings" */
+const char *
+mswings_verb(
+    struct obj *mwep, /* attacker's weapon */
+    boolean bash)     /* True: using polearm while too close */
+{
+    const char *verb;
+    int otyp = mwep->otyp,
+        lash = (otyp == BULLWHIP),
+        /* some weapons can have more than one strike type; for those,
+           give a mix of thrust and swing (caller doesn't care either way) */
+        thrust = ((objects[otyp].oc_dir & PIERCE) != 0
+                  && ((objects[otyp].oc_dir & ~PIERCE) == 0 || !rn2(2)));
+
+    verb = bash ? "bashes with" /*sigh*/
+           : lash ? "lashes"
+             : thrust ? "thrusts"
+               : "swings";
+    /* (might have caller also pass attacker's formatted name so that
+       if hallucination makes that be plural, we could use vtense() to
+       adjust the result to match) */
+    return verb;
+}
+
 /* monster swings obj */
 static void
-mswings(struct monst *mtmp, struct obj *otemp)
+mswings(
+    struct monst *mtmp, /* attacker */
+    struct obj *otemp,  /* attacker's weapon */
+    boolean bash)       /* True: polearm used at too close range */
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
-        pline("%s %s %s%s %s.", Monnam(mtmp),
-              (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
+        pline("%s %s %s%s %s.", Monnam(mtmp), mswings_verb(otemp, bash),
               (otemp->quan > 1L) ? "one of " : "", mhis(mtmp), xname(otemp));
     }
 }
@@ -727,9 +754,12 @@ mattacku(register struct monst *mtmp)
                 if (foundyou) {
                     mon_currwep = MON_WEP(mtmp);
                     if (mon_currwep) {
+                        boolean bash = (is_pole(mon_currwep)
+                                        && distu(mtmp->mx, mtmp->my) <= 2);
+
                         hittmp = hitval(mon_currwep, &g.youmonst);
                         tmp += hittmp;
-                        mswings(mtmp, mon_currwep);
+                        mswings(mtmp, mon_currwep, bash);
                     }
                     if (tmp > (j = g.mhitu_dieroll = rnd(20 + i)))
                         sum[i] = hitmu(mtmp, mattk);

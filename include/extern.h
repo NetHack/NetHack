@@ -1227,6 +1227,7 @@ extern void rustm(struct monst *, struct obj *);
 /* ### mhitu.c ### */
 
 extern void hitmsg(struct monst *, struct attack *);
+extern const char *mswings_verb(struct obj *, boolean);
 extern const char *mpoisons_subj(struct monst *, struct attack *);
 extern void u_slow_down(void);
 extern struct monst *cloneu(void);

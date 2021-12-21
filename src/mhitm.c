@@ -1116,11 +1116,16 @@ rustm(struct monst *mdef, struct obj *obj)
 }
 
 static void
-mswingsm(struct monst *magr, struct monst *mdef, struct obj *otemp)
+mswingsm(
+    struct monst *magr, /* attacker */
+    struct monst *mdef, /* defender */
+    struct obj *otemp)  /* attacker's weapon */
 {
     if (flags.verbose && !Blind && mon_visible(magr)) {
-        pline("%s %s %s%s %s at %s.", Monnam(magr),
-              (objects[otemp->otyp].oc_dir & PIERCE) ? "thrusts" : "swings",
+        boolean bash = (is_pole(otemp)
+                        && dist2(magr->mx, magr->my, mdef->mx, mdef->my) <= 2);
+
+        pline("%s %s %s%s %s at %s.", Monnam(magr), mswings_verb(otemp, bash),
               (otemp->quan > 1L) ? "one of " : "", mhis(magr), xname(otemp),
               mon_nam(mdef));
     }

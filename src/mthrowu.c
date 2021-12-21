@@ -909,17 +909,34 @@ thrwmu(struct monst* mtmp)
         return;
 
     if (is_pole(otmp)) {
-        int dam, hitv;
+        int dam, hitv, rang;
 
         if (otmp != MON_WEP(mtmp))
             return; /* polearm must be wielded */
-        if (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) > MON_POLE_DIST
-            || !couldsee(mtmp->mx, mtmp->my))
+
+        /*
+         * MON_POLE_DIST encompasses knight's move range (5): two spots
+         * away provided it's not on a straight diagonal, same as skilled
+         * hero.  Using polearm while adjacent is allowed but the verb
+         * is adjusted from "thrusts" to "bashes", where the hero would
+         * have to switch from applying a polearm to ordinary melee attack
+         * to accomplish that.
+         *
+         *  .545.
+         *  52125
+         *  41014
+         *  52125
+         *  .545.
+         */
+        rang = dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy);
+        if (rang > MON_POLE_DIST || !couldsee(mtmp->mx, mtmp->my))
             return; /* Out of range, or intervening wall */
 
         if (canseemon(mtmp)) {
             onm = xname(otmp);
-            pline("%s thrusts %s.", Monnam(mtmp),
+            pline("%s %s %s.", Monnam(mtmp),
+                  /* "thrusts" or "swings", or "bashes with" if adjacent */
+                  mswings_verb(otmp, (rang <= 2) ? TRUE : FALSE),
                   obj_is_pname(otmp) ? the(onm) : an(onm));
         }
 

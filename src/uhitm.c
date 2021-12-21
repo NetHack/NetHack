@@ -1351,8 +1351,11 @@ hmon_hitmon(struct monst *mon,
             You("hit it.");
         else
             You("%s %s%s",
-                (obj && (is_shield(obj) || obj->otyp == HEAVY_IRON_BALL))
-                  ? "bash" : Role_if(PM_BARBARIAN) ? "smite" : "hit",
+                (obj && (is_shield(obj)
+                         || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
+                : (obj && obj->otyp == BULLWHIP) ? "lash" /* hand_to_hand */
+                  : Role_if(PM_BARBARIAN) ? "smite"
+                    : "hit",
                 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
     }
 
