@@ -4595,7 +4595,7 @@ kill_genocided_monsters(void)
                      && (g.mvitals[mtmp->cham].mvflags & G_GENOD));
         if ((g.mvitals[mndx].mvflags & G_GENOD) || kill_cham) {
             if (mtmp->cham >= LOW_PM && !kill_cham)
-                (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
+                (void) newcham(mtmp, (struct permonst *) 0, FALSE, TRUE);
             else
                 mondead(mtmp);
         }
