@@ -3964,6 +3964,10 @@ pickvampshape(struct monst* mon)
         mndx = (!rn2(4) && !uppercase_only) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
         break;
     }
+
+    if (g.mvitals[mndx].mvflags & G_GENOD)
+        return mon->cham;
+
     return mndx;
 }
 
