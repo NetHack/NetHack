@@ -182,9 +182,12 @@ ONAMING = $(OBJDIR)/drawing.o $(OMONOBJ)
 # dynamic memory allocation
 CALLOC = ../src/alloc.c panic.c
 OALLOC = $(OBJDIR)/alloc.o panic.o
+# build time info
+CDATE = ../src/date.c
+ODATE = $(OBJDIR)/date.o
 
 # object files for makedefs
-MAKEOBJS = makedefs.o $(OMONOBJ) $(OBJDIR)/date.o
+MAKEOBJS = makedefs.o $(OMONOBJ) $(ODATE) $(OALLOC)
 
 # object files for recovery utility
 RECOVOBJS = recover.o
@@ -262,6 +265,7 @@ recover: $(RECOVOBJS)
 	$(CLINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
 
 recover.o: recover.c $(CONFIG_H) ../include/date.h
+	$(CC) $(CFLAGS) -c recover.c -o $@
 
 
 #	dependencies for dlb
@@ -371,18 +375,30 @@ tileedit: tileedit.o $(TEXT_IO)
 # in util...
 
 # make sure host object files from src are available when needed
+# (note: these dependencies have been copied from Makefile.src so only come
+# indirectly from 'make depend', hence are subject to bit rot as src changes)
 $(OBJDIR)/alloc.o: ../src/alloc.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/alloc.c -o $@
-$(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H)
+$(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H) ../include/color.h \
+		../include/rm.h ../include/objclass.h ../include/defsym.h \
+		../include/objects.h ../include/sym.h
 	$(CC) $(CFLAGS) -c ../src/drawing.c -o $@
-$(OBJDIR)/decl.o: ../src/decl.c $(CONFIG_H)
+$(OBJDIR)/decl.o: ../src/decl.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../src/decl.c -o $@
-$(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H)
+$(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H) ../include/permonst.h \
+		../include/align.h ../include/monattk.h ../include/monflag.h \
+		../include/monsters.h ../include/sym.h ../include/defsym.h \
+		../include/color.h
 	$(CC) $(CFLAGS) -c ../src/monst.c -o $@
-$(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H)
+$(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H) ../include/obj.h \
+		../include/prop.h ../include/skills.h ../include/color.h \
+		../include/objclass.h ../include/defsym.h ../include/objects.h
 	$(CC) $(CFLAGS) -c ../src/objects.c -o $@
 $(OBJDIR)/dlb.o: ../src/dlb.c $(CONFIG_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../src/dlb.c -o $@
+# this differs substantially from what Makefile.src specifies
+$(OBJDIR)/date.o: ../src/date.c $(CONFIG_H)
+	$(CC) $(CFLAGS) -c ../src/date.c -o $@
 
 # make sure hack.h dependencies get transitive information
 $(HACK_H): $(CONFIG_H)

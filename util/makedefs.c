@@ -171,40 +171,6 @@ static boolean use_enum = TRUE;
 extern unsigned _stklen = STKSIZ;
 #endif
 
-#ifdef MONITOR_HEAP
-/* for monitor heap, free(ptr) is a macro that expands to
-   nhfree(ptr,__FILE__,__LINE__) and nhfree() calls actual free();
-   makedefs wants to call actual free() so get rid of the macro */
-#undef free
-
-/* makedefs doesn't use alloc() from src/alloc.c but it links with
-   src/date.o which calls free() hence nhfree() if MONITOR_HEAP is
-   enabled; provide a substitute to satisfy the linker */
-void
-nhfree(genericptr_t ptr, const char *file UNUSED, int line UNUSED)
-{
-    free(ptr);
-}
-
-/* likewise for dupstr() which is also used in src/date.c */
-#undef dupstr
-
-char *
-nhdupstr(const char *string, const char *file UNUSED, int line UNUSED)
-{
-    return strcpy((char *) malloc(strlen(string) + 1), string);
-}
-#else /* !MONITOR_HEAP */
-
-/* without MONITOR_HEAP, we don't need to undef dupstr or provide
-   nhdupstr() but we do still need to provide a substitute dupstr() */
-char *
-dupstr(const char *string)
-{
-    return strcpy((char *) malloc(strlen(string) + 1), string);
-}
-#endif /* ?MONITOR_HEAP */
-
 /*
  * Some of the routines in this source file were moved into .../src/mdlib
  * to facilitate the use of a cross-compiler generation of some of the
@@ -409,7 +375,7 @@ getfp(const char* template, const char* tag, const char* mode, int flg)
         (void) snprintf(tmpfbuf, sizeof tmpfbuf, DATA_TEMPLATE, "mdXXXXXX");
         tmpfd = mkstemp(tmpfbuf);
         if (tmpfd >= 0) {
-            rv = fdopen(tmpfd, WRTMODE);   /* temp file is always read+write */
+            rv = fdopen(tmpfd, WRTMODE); /* temp file is always read+write */
             Unlink(tmpfbuf);
         }
     }
@@ -922,9 +888,11 @@ padline(char *line, unsigned padlength)
     unsigned len = (unsigned) strlen(line); /* includes newline */
 
     if (len <= padlength) {
-        endp = index(line, '\n');
+        endp = index(line, '\n'); /* fgetline() guarantees a newline even if
+                                   * the input file's last line lacks one */
 
-        /* this is only safe because fgetline() overallocates */
+        /* this is safe provided that padlength+1 is less than the allocation
+           amount used in fgetline(); currently 144 (BUFSZ/2+16) */
         while (len++ < padlength) {
             *endp++ = '_';
         }
@@ -964,7 +932,7 @@ read_rumors_file(
         *rumor_size += strlen(line); /* includes newline */
 #endif
         (void) fputs(xcrypt(line), tfp);
-        free(line);
+        free((genericptr_t) line);
     }
     /* record the current position; next rumors section will start here */
     rumor_offset = (unsigned long) ftell(tfp);
@@ -1088,14 +1056,14 @@ do_rumors(void)
         goto rumors_failure;
 
     /* get ready to transfer the contents of temp file to output file */
-    line = malloc(BUFSZ + MAXFNAMELEN);
+    line = (char *) alloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0) {
         perror(line);
-        free(line);
+        free((genericptr_t) line);
         goto rumors_failure;
     }
-    free(line);
+    free((genericptr_t) line);
 
     /* output the header record */
     Fprintf(ofp, rumors_header, Dont_Edit_Data, true_rumor_count,
@@ -1106,16 +1074,16 @@ do_rumors(void)
         perror(tempfile);
         goto rumors_failure;
     }
-    free(line);
+    free((genericptr_t) line);
     if (!(line = fgetline(tfp))) { /* count,size,offset */
         perror(tempfile);
         goto rumors_failure;
     }
-    free(line);
+    free((genericptr_t) line);
     /* copy the rest of the temp file into the final output file */
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
-        free(line);
+        free((genericptr_t) line);
     }
     /* all done; delete temp file */
     Fclose(tfp);
@@ -1123,7 +1091,7 @@ do_rumors(void)
     Fclose(ofp);
     return;
 
-rumors_failure:
+ rumors_failure:
     Fclose(ofp);
     Unlink(filename); /* kill empty or incomplete output file */
     Fclose(tfp);
@@ -1287,7 +1255,8 @@ do_date(void)
 #endif /* !__EMSCRIPTEN__ */
 
     Fprintf(ofp, "\n");
-    Fprintf(ofp, "#define VERSION_STRING \"%s\"\n", mdlib_version_string(buf, "."));
+    Fprintf(ofp, "#define VERSION_STRING \"%s\"\n",
+            mdlib_version_string(buf, "."));
     Fprintf(ofp, "#define VERSION_ID \\\n \"%s\"\n",
             version_id_string(buf, sizeof buf, cbuf));
     Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
@@ -1372,8 +1341,8 @@ get_gitinfo(char *githash, char *gitbranch)
                 Strcpy(githash, strval);
                 havehash = TRUE;
             }
-	}
-        free(line);
+        }
+        free((genericptr_t) line);
     }
     Fclose(gifp);
     if (havebranch && havehash)
@@ -1518,7 +1487,7 @@ do_data(void)
     /* read through the input file and split it into two sections */
     while ((line = fgetline(ifp)) != 0) {
         if (d_filter(line)) {
-            free(line);
+            free((genericptr_t) line);
             continue;
         }
         if (*line > ' ') { /* got an entry name */
@@ -1536,7 +1505,7 @@ do_data(void)
             (void) fputs(line, tfp);
             line_cnt++; /* update line counter */
         }
-        free(line);
+        free((genericptr_t) line);
     }
     /* output an end marker and then record the current position */
     if (line_cnt)
@@ -1550,11 +1519,11 @@ do_data(void)
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
-    free(line);
+    free((genericptr_t) line);
     /* copy all lines of text from the scratch file into the output file */
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
-        free(line);
+        free((genericptr_t) line);
     }
 
     /* finished with scratch file */
@@ -1562,7 +1531,7 @@ do_data(void)
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    line = malloc(BUFSZ + MAXFNAMELEN);
+    line = (char *) alloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
@@ -1571,15 +1540,15 @@ do_data(void)
                       (unsigned long) txt_offset) >= 0);
     }
     if (!ok) {
-    dead_data:
+ dead_data:
         perror(line); /* report the problem */
-        free(line);
+        free((genericptr_t) line);
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }
-    free(line);
+    free((genericptr_t) line);
 
     /* all done */
     Fclose(ofp);
@@ -1599,12 +1568,12 @@ h_filter(char *line)
     if (*line == '#')
         return TRUE; /* ignore comment lines */
 
-    tag = malloc(strlen(line));
+    tag = (char *) alloc((unsigned) strlen(line)); /* don't need +1 here */
     if (sscanf(line, "----- %s", tag) == 1) {
         skip = FALSE;
     } else if (skip && !strncmp(line, "-----", 5))
         skip = FALSE;
-    free(tag);
+    free((genericptr_t) tag);
     return skip;
 }
 
@@ -1689,12 +1658,12 @@ do_oracles(void)
         SpinCursor(3);
 
         if (h_filter(line)) {
-            free(line);
+            free((genericptr_t) line);
             continue;
         }
         if (!strncmp(line, "-----", 5)) {
             if (!in_oracle) {
-                free(line);
+                free((genericptr_t) line);
                 continue;
             }
             in_oracle = FALSE;
@@ -1706,7 +1675,7 @@ do_oracles(void)
             in_oracle = TRUE;
             (void) fputs(xcrypt(line), tfp);
         }
-        free(line);
+        free((genericptr_t) line);
     }
 
     if (in_oracle) { /* need to terminate last oracle */
@@ -1721,15 +1690,15 @@ do_oracles(void)
     Fclose(ifp); /* all done with original input file */
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
-    line = malloc(BUFSZ + MAXFNAMELEN);
+    line = (char *) alloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
-    free(line);
+    free((genericptr_t) line);
     /* copy all lines of text from the scratch file into the output file */
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
-        free(line);
+        free((genericptr_t) line);
     }
 
     /* finished with scratch file */
@@ -1737,7 +1706,7 @@ do_oracles(void)
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    line = malloc(BUFSZ + MAXFNAMELEN);
+    line = (char *) alloc(BUFSZ + MAXFNAMELEN);
     Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
@@ -1776,15 +1745,15 @@ do_oracles(void)
         }
     }
     if (!ok) {
-    dead_data:
+ dead_data:
         perror(line); /* report the problem */
-        free(line);
+        free((genericptr_t) line);
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }
-    free(line);
+    free((genericptr_t) line);
 
     /* all done */
     Fclose(ofp);
@@ -1824,11 +1793,11 @@ do_dungeon(void)
         SpinCursor(3);
 
         if (line[0] == '#') {
-            free(line);
+            free((genericptr_t) line);
             continue; /* discard comments */
         }
         (void) fputs(line, ofp);
-        free(line);
+        free((genericptr_t) line);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -1844,8 +1813,8 @@ do_dungeon(void)
  * in generated file src/monstr.c.  It wasn't used in 3.6.  For 3.7 it
  * has been reincarnated as a way to generate default monster strength
  * values:
- *      add new monster(s) to src/monst.c with placeholder value for
- *          the monstr field;
+ *      add new monster(s) to include/monsters.h with placeholder value
+ *          for the monstr field;
  *      run 'makedefs -m' to create src/monstr.c; ignore the complaints
  *          about it being deprecated;
  *      transfer relevant generated monstr values to src/monst.c;
@@ -1862,27 +1831,27 @@ static boolean ranged_attk(struct permonst *);
 static int
 mstrength(struct permonst* ptr)
 {
-    int	i, tmp2, n, tmp = ptr->mlevel;
+    int i, tmp2, n, tmp = ptr->mlevel;
 
-    if (tmp > 49)		/* special fixed hp monster */
+    if (tmp > 49) /* special fixed hp monster */
         tmp = 2 * (tmp - 6) / 4;
 
-    /*	For creation in groups */
+    /* for creation in groups */
     n = (!!(ptr->geno & G_SGROUP));
     n += (!!(ptr->geno & G_LGROUP)) << 1;
 
-    /*	For ranged attacks */
+    /* for ranged attacks */
     if (ranged_attk(ptr))
         n++;
 
-    /*	For higher ac values */
+    /* for higher ac values */
     n += (ptr->ac < 4);
     n += (ptr->ac < 0);
 
-    /*	For very fast monsters */
+    /* for very fast monsters */
     n += (ptr->mmove >= 18);
 
-    /*	For each attack and "special" attack */
+    /* for each attack and "special" attack */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].aatyp;
         n += (tmp2 > 0);
@@ -1890,7 +1859,7 @@ mstrength(struct permonst* ptr)
         n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
     }
 
-    /*	For each "special" damage type */
+    /* for each "special" damage type */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].adtyp;
         if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
@@ -1901,12 +1870,12 @@ mstrength(struct permonst* ptr)
         n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
     }
 
-    /*	Leprechauns are special cases.  They have many hit dice so they
-	can hit and are hard to kill, but they don't really do much damage. */
+    /* Leprechauns are special cases.  They have many hit dice so they
+       can hit and are hard to kill, but they don't really do much damage. */
     if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun"))
         n -= 2;
 
-    /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    /* finally, adjust the monster level  0 <= n <= 24 (approx.) */
     if (n == 0)
         tmp--;
     else if (n >= 6)
@@ -1980,7 +1949,7 @@ do_monstr(void)
     Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
     for (ptr = &mons[0]; ptr->mlet; ptr++) {
         i = mstrength(ptr);
-        Fprintf(ofp, "%-24s %2u\n", ptr->pmnames[NEUTRAL], (unsigned int) (uchar) i);
+        Fprintf(ofp, "%-24s %2u\n", ptr->pmnames[NEUTRAL], (unsigned) i);
     }
     Fprintf(ofp, " *\n */\n\n");
 
@@ -2028,7 +1997,8 @@ do_permonst(void)
             Fprintf(ofp, "\n        PM_");
         else
             Fprintf(ofp, "\n#define\tPM_");
-        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].pmnames[NEUTRAL], "were", 4))
+        if (mons[i].mlet == S_HUMAN
+            && !strncmp(mons[i].pmnames[NEUTRAL], "were", 4))
             Fprintf(ofp, "HUMAN_");
         for (nam = c = tmpdup(mons[i].pmnames[NEUTRAL]); *c; c++)
             if (*c >= 'a' && *c <= 'z')
@@ -2066,7 +2036,7 @@ do_questtxt(void)
 
 static char temp[32];
 
-static char *limit(char* name, int pref) /* limit a name to 30 characters length */
+static char *limit(char* name, int pref) /* limit a name to 30 characters */
 {
     (void) strncpy(temp, name, pref ? 26 : 30);
     temp[pref ? 26 : 30] = 0;
@@ -2232,28 +2202,48 @@ do_objs(void)
 }
 
 /* Read one line from input, up to and including the next newline
- * character. Returns a pointer to the heap-allocated string, or a
+ * character.  Returns a pointer to the heap-allocated string, or a
  * null pointer if no characters were read.
+ * 3.7: redone to use nethack's alloc() rather than libc's malloc()
+ * and realloc().
  */
 static char *
 fgetline(FILE *fd)
 {
-    static const int inc = 256;
-    int len = inc;
-    char *c = malloc(len), *ret;
+    static const int inc = (BUFSZ / 2) + 16; /* fgets() wants signed int */
+    unsigned len = (unsigned) inc, newlen; /* alloc() wants unsigned int */
+    char *c = (char *) alloc(len), *cprime, *ret;
 
+    *c = '\0';
     for (;;) {
         ret = fgets(c + len - inc, inc, fd);
         if (!ret) {
-            free(c);
-            c = NULL;
-            break;
+            /* don't just assume ret==Null indicates an error; last line
+               might lack terminating newline; if previous fgets() read it,
+               instead of returning we would have expanded the buffer and
+               tried for more, then got Null due to end of file having
+               already been reached */
+            if (feof(fd) && *c && strlen(c) < len) {
+                Strcat(c, "\n"); /* append missing newline */
+            } else {
+                free((genericptr_t) c), c = NULL;
+            }
+            break; /* either with or without added newline, we're done */
         } else if (index(c, '\n')) {
             /* normal case: we have a full line */
             break;
         }
-        len += inc;
-        c = realloc(c, len);
+        /* didn't fit in c[0..len-1]; expand buffer and read some more
+           [this was much simpler (and possibly slightly more efficient)
+           with realloc() but less safe because return values from malloc()
+           and realloc() were not being checked for Null, and efficiency is
+           a red herring because growing the buffer will be extremely rate] */
+        newlen = len + (unsigned) inc;
+        cprime = (char *) alloc(newlen);
+        (void) memcpy(cprime, c, len);
+        free((genericptr_t) c);
+        c = cprime;
+        len = newlen;
     }
     return c;
 }
