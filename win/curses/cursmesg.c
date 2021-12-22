@@ -372,13 +372,14 @@ curses_prev_mesg(void)
 
     for (count = 0; count < num_messages; ++count) {
         mesg = get_msg_line(do_lifo, count);
-        if (turn != mesg->turn && count != 0) {
-            curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                            A_NORMAL, "---", MENU_ITEMFLAGS_NONE);
+        if (mesg->turn != turn) {
+            if (count > 0) /* skip separator for first line */
+                curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
+                                A_NORMAL, "---", MENU_ITEMFLAGS_NONE);
+            turn = mesg->turn;
         }
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
                         A_NORMAL, mesg->str, MENU_ITEMFLAGS_NONE);
-        turn = mesg->turn;
     }
     if (!count)
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
@@ -787,6 +788,7 @@ mesg_add_line(const char *mline)
             current_mesg->str = dupstr(mline);
         }
     }
+    current_mesg->turn = g.moves;
 
     if (num_messages == 0) {
         /* very first message; set up head */
