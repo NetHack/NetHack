@@ -21,6 +21,11 @@ extern char erase_char, kill_char;
    for the current move; but hero might get more than one move per turn,
    so the input routines need to be able to cancel this */
 long curs_mesg_suppress_turn = -1L;
+/* if a message is marked urgent, existing suppression will be overridden
+   so that messages resume being shown; this is used in case the urgent
+   message triggers More>> for the previous message and the player responds
+   with ESC; we need to avoid initiating suppression in that situation */
+boolean curs_mesg_suppress_suppression = FALSE;
 
 /* Message window routines for curses interface */
 
@@ -109,9 +114,10 @@ curses_message_win_puts(const char *message, boolean recursed)
             /* bottom of message win */
             if (++turn_lines > height
                 || (turn_lines == height && mx > border_space)) {
-                /* Pause until key is hit - Esc suppresses any further
-                   messages that turn */
-                if (curses_more() == '\033') {
+                 /* pause until key is hit - ESC suppresses further messages
+                    this turn unless an urgent message is being delivered */
+                if (curses_more() == '\033'
+                    && !curs_mesg_suppress_suppression) {
                     curs_mesg_suppress_turn = g.moves;
                     return;
                 }
