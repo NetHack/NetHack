@@ -3134,7 +3134,7 @@ instapetrify(const char *str)
         return;
     if (poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))
         return;
-    You("turn to stone...");
+    urgent_pline("You turn to stone...");
     g.killer.format = KILLED_BY;
     if (str != g.killer.name)
         Strcpy(g.killer.name, str ? str : "");
@@ -4299,7 +4299,7 @@ drown(void)
         pline("But in vain.");
     }
     set_uinwater(1); /* u.uinwater = 1 */
-    You("drown.");
+    urgent_pline("You drown.");
     for (i = 0; i < 5; i++) { /* arbitrary number of loops */
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
@@ -5803,7 +5803,8 @@ lava_effects(void)
                because lifesaving resets them */
             g.killer.format = KILLED_BY;
             Strcpy(g.killer.name, lava_killer);
-            You("%s...", boil_away ? "boil away" : "burn to a crisp");
+            urgent_pline("You %s...", boil_away ? "boil away"
+                                                : "burn to a crisp");
             done(BURNING);
             if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
@@ -5862,7 +5863,7 @@ sink_into_lava(void)
         if (u.utrap < (1 << 8)) {
             g.killer.format = KILLED_BY;
             Strcpy(g.killer.name, "molten lava");
-            You("sink below the surface and die.");
+            urgent_pline("You sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);
             /* can only get here via life-saving; try to get away from lava */

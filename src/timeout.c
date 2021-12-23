@@ -114,7 +114,7 @@ static NEARDATA const char *const stoned_texts[] = {
 static void
 stoned_dialogue(void)
 {
-    register long i = (Stoned & TIMEOUT);
+    long i = (Stoned & TIMEOUT);
 
     if (i > 0L && i <= SIZE(stoned_texts)) {
         char buf[BUFSZ];
@@ -122,7 +122,7 @@ stoned_dialogue(void)
         Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
         if (nolimbs(g.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
-        pline1(buf);
+        urgent_pline("%s", buf);
     }
     switch ((int) i) {
     case 5: /* slowing down */
@@ -260,18 +260,19 @@ static NEARDATA const char *const choke_texts2[] = {
 static void
 choke_dialogue(void)
 {
-    register long i = (Strangled & TIMEOUT);
+    long i = (Strangled & TIMEOUT);
 
     if (i > 0 && i <= SIZE(choke_texts)) {
         if (Breathless || !rn2(50)) {
-            pline(choke_texts2[SIZE(choke_texts2) - i], body_part(NECK));
+            urgent_pline(choke_texts2[SIZE(choke_texts2) - i],
+                         body_part(NECK));
         } else {
             const char *str = choke_texts[SIZE(choke_texts) - i];
 
             if (index(str, '%'))
-                pline(str, hcolor(NH_BLUE));
+                urgent_pline(str, hcolor(NH_BLUE));
             else
-                pline1(str);
+                urgent_pline("%s", str);
         }
     }
     exercise(A_STR, FALSE);
@@ -302,8 +303,8 @@ levitation_dialogue(void)
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
 
-            pline(s, danger ? "over" : "in",
-                  danger ? surface(u.ux, u.uy) : "air");
+            urgent_pline(s, danger ? "over" : "in",
+                         danger ? surface(u.ux, u.uy) : "air");
         } else
             pline1(s);
     }
@@ -343,13 +344,13 @@ slime_dialogue(void)
         if (index(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
                 if (!Blind) /* [what if you're already green?] */
-                    pline(buf, hcolor(NH_GREEN));
+                    urgent_pline(buf, hcolor(NH_GREEN));
             } else {
-                pline(buf,
-                      an(Hallucination ? rndmonnam(NULL) : "green slime"));
+                urgent_pline(buf, an(Hallucination ? rndmonnam(NULL)
+                                                   : "green slime"));
             }
         } else {
-            pline1(buf);
+            urgent_pline("%s", buf);
         }
     }
 

@@ -198,7 +198,7 @@ polyman(const char *fmt, const char *arg)
 
     newsym(u.ux, u.uy);
 
-    You(fmt, arg);
+    urgent_pline(fmt, arg);
     /* check whether player foolishly genocided self while poly'd */
     if (ugenocided()) {
         /* intervening activity might have clobbered genocide info */
@@ -363,7 +363,8 @@ newman(void)
                 u.uhp = 1;
         } else {
  dead:      /* we come directly here if experience level went to 0 or less */
-            Your("new form doesn't seem healthy enough to survive.");
+            urgent_pline(
+                     "Your new form doesn't seem healthy enough to survive.");
             g.killer.format = KILLED_BY_AN;
             Strcpy(g.killer.name, "unsuccessful polymorph");
             done(DIED);
@@ -374,7 +375,7 @@ newman(void)
         }
     }
     newuhs(FALSE);
-    polyman("feel like a new %s!",
+    polyman("You feel like a new %s!",
             /* use saved gender we're about to revert to, not current */
             ((Upolyd ? u.mfemale : flags.female) && g.urace.individual.f)
                 ? g.urace.individual.f
@@ -1155,7 +1156,7 @@ rehumanize(void)
 
     if (emits_light(g.youmonst.data))
         del_light_source(LS_MONSTER, monst_to_any(&g.youmonst));
-    polyman("return to %s form!", g.urace.adj);
+    polyman("You return to %s form!", g.urace.adj);
 
     if (u.uhp < 1) {
         /* can only happen if some bit of code reduces u.uhp
@@ -1516,7 +1517,7 @@ dogaze(void)
                     pline("Gazing at the awake %s is not a very good idea.",
                           l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
-                    You("turn to stone...");
+                    urgent_pline("You turn to stone...");
                     g.killer.format = KILLED_BY;
                     Strcpy(g.killer.name,
                            "deliberately meeting Medusa's gaze");

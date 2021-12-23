@@ -3613,8 +3613,9 @@ mhitm_ad_ston(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_were(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_were(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pa = magr->data;
 
@@ -3631,7 +3632,7 @@ mhitm_ad_were(struct monst *magr, struct attack *mattk, struct monst *mdef,
         hitmsg(magr, mattk);
         if (uncancelled && !rn2(4) && u.ulycn == NON_PM
             && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
-            You_feel("feverish.");
+            urgent_pline("You feel feverish.");
             exercise(A_CON, FALSE);
             set_ulycn(monsndx(pa));
             retouch_equipment(2);
