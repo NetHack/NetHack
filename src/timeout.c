@@ -11,6 +11,7 @@ static void choke_dialogue(void);
 static void levitation_dialogue(void);
 static void slime_dialogue(void);
 static void slimed_to_death(struct kinfo *);
+static void sickness_dialogue(void);
 static void phaze_dialogue(void);
 static void done_timeout(int, int);
 static void slip_or_trip(void);
@@ -278,6 +279,37 @@ choke_dialogue(void)
     exercise(A_STR, FALSE);
 }
 
+static NEARDATA const char *const sickness_texts[] = {
+    "Your illness feels worse.",
+    "Your illness is severe.",
+    "You are at Death's door.",
+};
+
+static void
+sickness_dialogue(void)
+{
+    long j = (Sick & TIMEOUT), i = j / 2L;
+
+    if (i > 0L && i <= SIZE(sickness_texts) && (j % 2) != 0) {
+        char buf[BUFSZ], pronounbuf[40];
+
+        Strcpy(buf, sickness_texts[SIZE(sickness_texts) - i]);
+        /* change the message slightly for food poisoning */
+        if ((u.usick_type & SICK_NONVOMITABLE) == 0)
+            (void) strsubst(buf, "illness", "sickness");
+        if (Hallucination && strstri(buf, "Death's door")) {
+            /* youmonst: for Hallucination, mhe()'s mon argument isn't used */
+            Strcpy(pronounbuf, mhe(&g.youmonst));
+            Sprintf(eos(buf), "  %s %s inviting you in.",
+                    /* upstart() modifies its argument but vtense() doesn't
+                       care whether or not that has already happened */
+                    upstart(pronounbuf), vtense(pronounbuf, "are"));
+        }
+        urgent_pline("%s", buf);
+    }
+    exercise(A_CON, FALSE);
+}
+
 static NEARDATA const char *const levi_texts[] = {
     "You float slightly lower.",
     "You wobble unsteadily %s the %s."
@@ -530,6 +562,8 @@ nh_timeout(void)
         vomiting_dialogue();
     if (Strangled)
         choke_dialogue();
+    if (Sick)
+        sickness_dialogue();
     if (HLevitation & TIMEOUT)
         levitation_dialogue();
     if (HPasses_walls & TIMEOUT)

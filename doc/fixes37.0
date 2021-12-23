@@ -1299,6 +1299,8 @@ decaying globs of {ooze,pudding,slime} shrink over time based on their total
 	poisoning effect when eaten
 track peak maximum HP and peak maximum energy/power; no noticeable effect
 give some dragon armor extra effects when worn
+issue messages during last stage of food poisoning/terminal illness countdown
+	when hero's demise is imminent
 
 
 Platform- and/or Interface-Specific New Features
