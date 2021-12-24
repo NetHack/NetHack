@@ -602,7 +602,7 @@ rc=Rc
 # is too old or untested.
 #
 # Recently tested versions:
-#NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.39)
+#NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.41)
 #NMAKE version 1429301380 from latest VS 2019 (Dec 14, 2021 version 16.11.8)
 #NMAKE version 1430307060 from latest VS 2022 (Dec 16, 2021 version 17.0.4)
 #!MESSAGE $(MAKEFLAGS)
