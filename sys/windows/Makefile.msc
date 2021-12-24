@@ -8,9 +8,9 @@
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2017 Community Edition
-#            - Microsoft Visual Studio 2019 Community Edition
-#            - Microsoft Visual Studio 2022 Community Edition v 17.0.2
+#            - Microsoft Visual Studio 2017 Community Edition v 15.9.41
+#            - Microsoft Visual Studio 2019 Community Edition v 16.11.8
+#            - Microsoft Visual Studio 2022 Community Edition v 17.0.4
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -318,7 +318,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 MAKESRC       = $(U)makedefs.c
 
 MAKEDEFSOBJS  = $(O)makedefs.o $(O)monst$(HOST).o $(O)objects$(HOST).o \
-		$(O)date.o
+		$(O)date.o $(O)alloc.o $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -603,9 +603,8 @@ rc=Rc
 #
 # Recently tested versions:
 #NMAKE version 1416270450 from latest VS 2017 (Sep 14, 2021 version 15.9.39)
-#NMAKE version 1429301370 from latest VS 2019 (Nov  9, 2021 version 16.11.6)
-#NMAKE version 1430307050 from latest VS 2022 (Nov  8, 2021 version 17.0.0)
-#NMAKE version 1430307060 from latest VS 2022 (Nov 30, 2021 version 17.0.2)
+#NMAKE version 1429301380 from latest VS 2019 (Dec 14, 2021 version 16.11.8)
+#NMAKE version 1430307060 from latest VS 2022 (Dec 16, 2021 version 17.0.4)
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
 #!MESSAGE $(MAKE)
@@ -629,9 +628,9 @@ VSVER=2013
 VSVER=2015
 !ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270451)
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301371)
+!ELSEIF ($(MAKEVERSION) > 1416270450) && ($(MAKEVERSION) < 1429301381)
 VSVER=2019
-!ELSEIF ($(MAKEVERSION) > 1429301370) && ($(MAKEVERSION) < 1430307061)
+!ELSEIF ($(MAKEVERSION) > 1429301380) && ($(MAKEVERSION) < 1430307061)
 VSVER=2022
 !ELSEIF ($(MAKEVERSION) > 1430307060)
 VSVER=2999              #untested future version
