@@ -396,6 +396,8 @@ defends(int adtyp, struct obj *otmp)
 {
     struct artifact *weap;
 
+    if (!otmp)
+        return FALSE;
     if ((weap = get_artifact(otmp)) != 0)
         return (boolean) (weap->defn.adtyp == adtyp);
     if (Is_dragon_armor(otmp)) {
