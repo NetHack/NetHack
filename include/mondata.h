@@ -29,7 +29,8 @@
 #define resists_ston(mon) \
     ((mon_resistancebits(mon) & MR_STONE) != 0)
 
-#define immune_poisongas(ptr) ((ptr) == &mons[PM_HEZROU])
+#define immune_poisongas(ptr) ((ptr) == &mons[PM_HEZROU]        \
+                               || (ptr) == &mons[PM_VROCK])
 
 #define is_lminion(mon) \
     (is_minion((mon)->data) && mon_aligntyp(mon) == A_LAWFUL)

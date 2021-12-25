@@ -368,6 +368,12 @@ monflee(
                 pline("%s turns to flee.", Monnam(mtmp));
             }
         }
+
+        if (mtmp->data == &mons[PM_VROCK] && !mtmp->mspec_used) {
+            mtmp->mspec_used = 75 + rn2(25);
+            (void) create_gas_cloud(mtmp->mx, mtmp->my, 5, 8);
+        }
+
         mtmp->mflee = 1;
     }
     /* ignore recently-stepped spaces when made to flee */

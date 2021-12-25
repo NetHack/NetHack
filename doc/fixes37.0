@@ -146,6 +146,7 @@ level compiler creates correct novel with supplied name
 for farlook, describe water in the castle moat and in Juiblex's swamp as moat
 	and as swamp, respectively, rather than just as "water"
 make hezrous emit poison clouds when they move
+make vrocks emit a poison cloud when they flee
 stepping from one type of terrain to another was triggering an unnecessary
 	status update
 make shriekers summon baby purple worms if purple worms would be too tough
