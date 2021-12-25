@@ -1905,8 +1905,9 @@ mhitm_ad_dren(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_drli(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_drli(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -1914,7 +1915,8 @@ mhitm_ad_drli(struct monst *magr, struct attack *mattk, struct monst *mdef,
         /* since hero can't be cancelled, only defender's armor applies */
         boolean negated = !(rn2(10) >= 3 * armpro);
 
-        if (!negated && !rn2(3) && !resists_drli(mdef)) {
+        if (!negated && !rn2(3)
+            && !(resists_drli(mdef) || defended(mdef, AD_FIRE))) {
             mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl
                                     * (usually 1d8) */
             pline("%s becomes weaker!", Monnam(mdef));
@@ -1958,8 +1960,9 @@ mhitm_ad_drli(struct monst *magr, struct attack *mattk, struct monst *mdef,
         int armpro = magic_negation(mdef);
         boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
 
-        if (!cancelled && !rn2(3) && !resists_drli(mdef)) {
-            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl(usually 1d8) */
+        if (!cancelled && !rn2(3)
+            && !(resists_drli(mdef) || defended(mdef, AD_DRLI))) {
+            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl (1d8) */
             if (g.vis && canspotmon(mdef))
                 pline("%s becomes weaker!", Monnam(mdef));
             if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
@@ -1982,8 +1985,9 @@ mhitm_ad_drli(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_fire(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_fire(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -2017,7 +2021,7 @@ mhitm_ad_fire(struct monst *magr, struct attack *mattk, struct monst *mdef,
         }
         mhm->damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
         mhm->damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
-        if (resists_fire(mdef)) {
+        if (resists_fire(mdef) || defended(mdef, AD_FIRE)) {
             if (!Blind)
                 pline_The("fire doesn't heat %s!", mon_nam(mdef));
             golemeffects(mdef, AD_FIRE, mhm->damage);
@@ -2087,7 +2091,7 @@ mhitm_ad_fire(struct monst *magr, struct attack *mattk, struct monst *mdef,
         }
         mhm->damage += destroy_mitem(mdef, SCROLL_CLASS, AD_FIRE);
         mhm->damage += destroy_mitem(mdef, SPBOOK_CLASS, AD_FIRE);
-        if (resists_fire(mdef)) {
+        if (resists_fire(mdef) || defended(mdef, AD_FIRE)) {
             if (g.vis && canseemon(mdef))
                 pline_The("fire doesn't seem to burn %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
@@ -2101,8 +2105,9 @@ mhitm_ad_fire(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_cold(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_cold(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -2116,7 +2121,7 @@ mhitm_ad_cold(struct monst *magr, struct attack *mattk, struct monst *mdef,
         }
         if (!Blind)
             pline("%s is covered in frost!", Monnam(mdef));
-        if (resists_cold(mdef)) {
+        if (resists_cold(mdef) || defended(mdef, AD_COLD)) {
             shieldeff(mdef->mx, mdef->my);
             if (!Blind)
                 pline_The("frost doesn't chill %s!", mon_nam(mdef));
@@ -2152,7 +2157,7 @@ mhitm_ad_cold(struct monst *magr, struct attack *mattk, struct monst *mdef,
         }
         if (g.vis && canseemon(mdef))
             pline("%s is covered in frost!", Monnam(mdef));
-        if (resists_cold(mdef)) {
+        if (resists_cold(mdef) || defended(mdef, AD_COLD)) {
             if (g.vis && canseemon(mdef))
                 pline_The("frost doesn't seem to chill %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
@@ -2164,8 +2169,9 @@ mhitm_ad_cold(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_elec(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_elec(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -2180,7 +2186,7 @@ mhitm_ad_elec(struct monst *magr, struct attack *mattk, struct monst *mdef,
         if (!Blind)
             pline("%s is zapped!", Monnam(mdef));
         mhm->damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
-        if (resists_elec(mdef)) {
+        if (resists_elec(mdef) || defended(mdef, AD_ELEC)) {
             if (!Blind)
                 pline_The("zap doesn't shock %s!", mon_nam(mdef));
             golemeffects(mdef, AD_ELEC, mhm->damage);
@@ -2220,7 +2226,7 @@ mhitm_ad_elec(struct monst *magr, struct attack *mattk, struct monst *mdef,
         if (g.vis && canseemon(mdef))
             pline("%s gets zapped!", Monnam(mdef));
         mhm->damage += destroy_mitem(mdef, WAND_CLASS, AD_ELEC);
-        if (resists_elec(mdef)) {
+        if (resists_elec(mdef) || defended(mdef, AD_ELEC)) {
             if (g.vis && canseemon(mdef))
                 pline_The("zap doesn't shock %s!", mon_nam(mdef));
             shieldeff(mdef->mx, mdef->my);
@@ -2233,12 +2239,13 @@ mhitm_ad_elec(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_acid(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_acid(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
-        if (resists_acid(mdef))
+        if (resists_acid(mdef) || defended(mdef, AD_ACID))
             mhm->damage = 0;
     } else if (mdef == &g.youmonst) {
         /* mhitu */
@@ -2261,7 +2268,7 @@ mhitm_ad_acid(struct monst *magr, struct attack *mattk, struct monst *mdef,
             mhm->damage = 0;
             return;
         }
-        if (resists_acid(mdef)) {
+        if (resists_acid(mdef) || defended(mdef, AD_ACID)) {
             if (g.vis && canseemon(mdef))
                 pline("%s is covered in %s, but it seems harmless.",
                       Monnam(mdef), hliquid("acid"));
@@ -2279,8 +2286,9 @@ mhitm_ad_acid(struct monst *magr, struct attack *mattk, struct monst *mdef,
 
 /* steal gold */
 void
-mhitm_ad_sgld(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_sgld(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pa = magr->data;
     struct permonst *pd = mdef->data;
@@ -3085,9 +3093,13 @@ mhitm_ad_ench(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_slow(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm UNUSED)
+mhitm_ad_slow(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
+    if (defended(mdef, AD_SLOW))
+        return;
+
     if (magr == &g.youmonst) {
         /* uhitm */
         int armpro = magic_negation(mdef);
@@ -3107,7 +3119,7 @@ mhitm_ad_slow(struct monst *magr, struct attack *mattk, struct monst *mdef,
         boolean uncancelled = !magr->mcan && (rn2(10) >= 3 * armpro);
 
         hitmsg(magr, mattk);
-        if (uncancelled && HFast && !defends(AD_SLOW, uwep) && !rn2(4))
+        if (uncancelled && HFast && !rn2(4))
             u_slow_down();
     } else {
         /* mhitm */
@@ -3930,10 +3942,10 @@ mhitm_ad_samu(struct monst *magr, struct attack *mattk, struct monst *mdef,
 
 /* disease */
 void
-mhitm_ad_dise(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_dise(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    struct obj *mwep;
     struct permonst *pa = magr->data, *pd = mdef->data;
 
     if (magr == &g.youmonst) {
@@ -3948,11 +3960,11 @@ mhitm_ad_dise(struct monst *magr, struct attack *mattk, struct monst *mdef,
             mhm->damage = 0;
     } else {
  mhitm_dise:
-        /* mhitm; protected monsters use the same criteria as for
-           poly'd hero gaining sick resistance combined with any hero
-           [hypothetically] wielding a weapon that guards against disease */
+        /* mhitm; protected monsters use the same criteria as for poly'd
+           hero gaining sick resistance combined with any hero wielding a
+           weapon or wearing dragon scales/mail that guards against disease */
         if (pd->mlet == S_FUNGUS || pd == &mons[PM_GHOUL]
-            || ((mwep = MON_WEP(mdef)) != 0 && defends(AD_DISE, mwep)))
+            || defended(mdef, AD_DISE))
             mhm->damage = 0;
         /* else does ordinary damage */
     }
@@ -3960,8 +3972,9 @@ mhitm_ad_dise(struct monst *magr, struct attack *mattk, struct monst *mdef,
 
 /* seduce and also steal item */
 void
-mhitm_ad_sedu(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_sedu(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pa = magr->data;
 

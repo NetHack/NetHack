@@ -76,7 +76,7 @@ noattacks(struct permonst* ptr)
 
 /* does monster-type transform into something else when petrified? */
 boolean
-poly_when_stoned(struct permonst* ptr)
+poly_when_stoned(struct permonst *ptr)
 {
     /* non-stone golems turn into stone golems unless latter is genocided */
     return (boolean) (is_golem(ptr) && ptr != &mons[PM_STONE_GOLEM]
@@ -84,20 +84,56 @@ poly_when_stoned(struct permonst* ptr)
     /* allow G_EXTINCT */
 }
 
+/* is 'mon' (possibly youmonst) protected against damage type 'adtype' via
+   wielded weapon or worn dragon scales? [or by virtue of being a dragon?] */
+boolean
+defended(struct monst *mon, int adtyp)
+{
+    struct obj *o, otemp;
+    int mndx;
+    boolean is_you = (mon == &g.youmonst);
+
+    /* is 'mon' wielding an artifact that protects against 'adtyp'? */
+    o = is_you ? uwep : MON_WEP(mon);
+    if (o && o->oartifact && defends(adtyp, o))
+        return TRUE;
+
+    /* if 'mon' is an adult dragon, treat it as if it was wearing scales
+       so that it has the same benefit as a hero wearing dragon scales */
+    mndx = monsndx(mon->data);
+    if (mndx >= PM_GRAY_DRAGON && mndx <= PM_YELLOW_DRAGON) {
+        /* a dragon is its own suit...  if mon is poly'd hero, we don't
+           care about embedded scales (uskin) because being a dragon with
+           embedded scales is no better than just being a dragon */
+        otemp = cg.zeroobj;
+        otemp.oclass = ARMOR_CLASS;
+        otemp.otyp = GRAY_DRAGON_SCALES + (mndx - PM_GRAY_DRAGON);
+        /* defends() and Is_dragon_armor() only care about otyp so ignore
+           the rest of otemp's fields */
+        o = &otemp;
+    } else {
+        /* ordinary case: not an adult dragon */
+        o = is_you ? uarm : which_armor(mon, W_ARM);
+    }
+    /* is 'mon' wearing dragon scales that protect against 'adtyp'? */
+    if (o && Is_dragon_armor(o) && defends(adtyp, o))
+        return TRUE;
+
+    return FALSE;
+}
+
 /* returns True if monster is drain-life resistant */
 boolean
-resists_drli(struct monst* mon)
+resists_drli(struct monst *mon)
 {
     struct permonst *ptr = mon->data;
-    struct obj *wep;
 
     if (is_undead(ptr) || is_demon(ptr) || is_were(ptr)
         /* is_were() doesn't handle hero in human form */
         || (mon == &g.youmonst && u.ulycn >= LOW_PM)
         || ptr == &mons[PM_DEATH] || is_vampshifter(mon))
         return TRUE;
-    wep = (mon == &g.youmonst) ? uwep : MON_WEP(mon);
-    return (boolean) (wep && wep->oartifact && defends(AD_DRLI, wep));
+    return defended(mon, AD_DRLI);
 }
 
 /* True if monster is magic-missile (actually, general magic) resistant */

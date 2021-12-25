@@ -337,7 +337,8 @@ mon_adjust_speed(struct monst *mon,
    but objects[ALCHEMY_SMOCK].oc_oprop can only describe one of them;
    if it is poison resistance, alternate property is acid resistance;
    if someone changes it to acid resistance, alt becomes posion resist;
-   if someone changes it to hallucination resistance, all bets are off */
+   if someone changes it to hallucination resistance, all bets are off
+   [TODO: handle alternate propertices conferred by dragon scales/mail] */
 #define altprop(o) \
     (((o)->otyp == ALCHEMY_SMOCK)                               \
      ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
@@ -346,8 +347,11 @@ mon_adjust_speed(struct monst *mon,
 /* armor put on or taken off; might be magical variety
    [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
 void
-update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
-                      boolean silently)
+update_mon_intrinsics(
+    struct monst *mon,
+    struct obj *obj,   /* armor being worn or taken off */
+    boolean on,
+    boolean silently)
 {
     int unseen;
     uchar mask;
@@ -356,7 +360,7 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
         altwhich = altprop(obj);
 
     unseen = !canseemon(mon);
-    if (!which)
+    if (!which && !altwhich)
         goto maybe_blocks;
 
  again:
@@ -376,6 +380,7 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
         /* properties handled elsewhere */
         case ANTIMAGIC:
         case REFLECTING:
+        case PROTECTION:
             break;
         /* properties which have no effect for monsters */
         case CLAIRVOYANT:
@@ -384,16 +389,17 @@ update_mon_intrinsics(struct monst *mon, struct obj *obj, boolean on,
             break;
         /* properties which should have an effect but aren't implemented */
         case LEVITATION:
+        case FLYING:
         case WWALKING:
             break;
         /* properties which maybe should have an effect but don't */
         case DISPLACED:
         case FUMBLING:
         case JUMPING:
-        case PROTECTION:
             break;
         default:
-            if (which <= 8) { /* 1 thru 8 correspond to MR_xxx mask values */
+            /* 1 through 8 correspond to MR_xxx mask values */
+            if (which >= 1 && which <= 8) {
                 /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
                 mask = (uchar) (1 << (which - 1));
                 mon->mextrinsics |= (unsigned short) mask;

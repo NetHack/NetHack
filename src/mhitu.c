@@ -1392,7 +1392,7 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
         return MM_MISS;
 
     tmp = d((int) mattk->damn, (int) mattk->damd);
-    not_affected = defends((int) mattk->adtyp, uwep);
+    not_affected = defended(mtmp, (int) mattk->adtyp);
 
     if (!ufound) {
         pline("%s explodes at a spot in %s!",
@@ -1642,7 +1642,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         break;
     case AD_SLOW:
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && (HFast & (INTRINSIC | TIMEOUT)) && !defends(AD_SLOW, uwep)
+            && (HFast & (INTRINSIC | TIMEOUT)) && !defended(mtmp, AD_SLOW)
             && !rn2(4)) {
             if (cancelled) {
                 react = 7; /* "dulled" */

@@ -1495,6 +1495,7 @@ extern struct attack *attacktype_fordmg(struct permonst *, int, int);
 extern boolean attacktype(struct permonst *, int);
 extern boolean noattacks(struct permonst *);
 extern boolean poly_when_stoned(struct permonst *);
+extern boolean defended(struct monst *, int);
 extern boolean resists_drli(struct monst *);
 extern boolean resists_magm(struct monst *);
 extern boolean resists_blnd(struct monst *);

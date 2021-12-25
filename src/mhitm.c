@@ -1064,7 +1064,7 @@ paralyze_monst(struct monst *mon, int amt)
 int
 sleep_monst(struct monst *mon, int amt, int how)
 {
-    if (resists_sleep(mon)
+    if (resists_sleep(mon) || defended(mon, AD_SLEE)
         || (how >= 0 && resist(mon, (char) how, 0, NOTELL))) {
         shieldeff(mon->mx, mon->my);
     } else if (mon->mcanmove) {
