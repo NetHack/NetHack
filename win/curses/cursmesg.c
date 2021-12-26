@@ -371,6 +371,17 @@ curses_prev_mesg(void)
     nhprev_mesg *mesg;
     menu_item *selected = NULL;
     boolean do_lifo = (iflags.prevmsg_window != 'f');
+#ifdef DEBUG
+    static int showturn = 0; /* 1: show hero_seq value in separators */
+
+    /*
+     * Set DEBUGFILES=MesgTurn in environment or sysconf to decorate
+     * separator line between blocks of messages with the turn they
+     * were issued.
+     */
+    if (!showturn)
+        showturn = (wizard && explicitdebug("MesgTurn")) ? 1 : -1;
+#endif
 
     wid = curses_get_wid(NHW_MENU);
     curses_create_nhmenu(wid, 0UL);
@@ -379,9 +390,18 @@ curses_prev_mesg(void)
     for (count = 0; count < num_messages; ++count) {
         mesg = get_msg_line(do_lifo, count);
         if (mesg->turn != turn) {
-            if (count > 0) /* skip separator for first line */
+            if (count > 0) { /* skip separator for first line */
+                char sepbuf[50];
+
+                Strcpy(sepbuf, "---");
+#ifdef DEBUG
+                if (showturn == 1)
+                    Sprintf(sepbuf, "- %ld+%ld",
+                            (mesg->turn >> 3), (mesg->turn & 7L));
+#endif
                 curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                                A_NORMAL, "---", MENU_ITEMFLAGS_NONE);
+                                A_NORMAL, sepbuf, MENU_ITEMFLAGS_NONE);
+            }
             turn = mesg->turn;
         }
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
@@ -895,12 +915,10 @@ curses_getmsghistory(boolean init)
 void
 curses_putmsghistory(const char *msg, boolean restoring_msghist)
 {
+    /* FIXME: these should be moved to struct instance_globals g */
     static boolean initd = FALSE;
     static int stash_count;
     static nhprev_mesg *stash_head = 0;
-#ifdef DUMPLOG
-    /* extern unsigned g.saved_pline_index; */ /* pline.c */
-#endif
 
     if (restoring_msghist && !initd) {
         /* hide any messages we've gathered since starting current session
@@ -918,8 +936,11 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
 
     if (msg) {
         mesg_add_line(msg);
-        /* treat all saved and restored messages as turn #1 */
-        last_mesg->turn = 1L;
+        /* treat all saved and restored messages as turn #1;
+           however, we aren't only called when restoring history;
+           core uses putmsghistory() for other stuff during play
+           and those messages should have a normal turn value */
+        last_mesg->turn = restoring_msghist ? (1L << 3) : g.hero_seq;
 #ifdef DUMPLOG
         dumplogmsg(last_mesg->str);
 #endif

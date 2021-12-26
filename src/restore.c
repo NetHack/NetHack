@@ -670,8 +670,12 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     restlevchn(nhfp);
     if (nhfp->structlevel) {
         mread(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
-        mread(nhfp->fd, (genericptr_t) &g.quest_status, sizeof (struct q_score));
-        mread(nhfp->fd, (genericptr_t) g.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
+        /* hero_seq isn't saved and restored because it can be recalculated */
+        g.hero_seq = g.moves << 3; /* normally handled in moveloop() */
+        mread(nhfp->fd, (genericptr_t) &g.quest_status,
+              sizeof (struct q_score));
+        mread(nhfp->fd, (genericptr_t) g.spl_book,
+              (MAXSPELL + 1) * sizeof (struct spell));
     }
     restore_artifacts(nhfp);
     restore_oracles(nhfp);
