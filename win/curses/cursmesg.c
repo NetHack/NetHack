@@ -20,12 +20,12 @@ extern char erase_char, kill_char;
 /* player can type ESC at More>> prompt to avoid seeing more messages
    for the current move; but hero might get more than one move per turn,
    so the input routines need to be able to cancel this */
-long curs_mesg_suppress_turn = -1L;
+long curs_mesg_suppress_seq = -1L;
 /* if a message is marked urgent, existing suppression will be overridden
    so that messages resume being shown; this is used in case the urgent
    message triggers More>> for the previous message and the player responds
    with ESC; we need to avoid initiating suppression in that situation */
-boolean curs_mesg_suppress_suppression = FALSE;
+boolean curs_mesg_no_suppress = FALSE;
 
 /* Message window routines for curses interface */
 
@@ -77,7 +77,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 #endif
 
-    if (curs_mesg_suppress_turn == g.moves) {
+    if (curs_mesg_suppress_seq == g.hero_seq) {
         return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
@@ -117,8 +117,8 @@ curses_message_win_puts(const char *message, boolean recursed)
                  /* pause until key is hit - ESC suppresses further messages
                     this turn unless an urgent message is being delivered */
                 if (curses_more() == '\033'
-                    && !curs_mesg_suppress_suppression) {
-                    curs_mesg_suppress_turn = g.moves;
+                    && !curs_mesg_no_suppress) {
+                    curs_mesg_suppress_seq = g.hero_seq;
                     return;
                 }
                 /* turn_lines reset to 0 by more()->block()->got_input() */
@@ -172,7 +172,7 @@ void
 curses_got_input(void)
 {
     /* if messages are being suppressed, reenable them */
-    curs_mesg_suppress_turn = -1L;
+    curs_mesg_suppress_seq = -1L;
 
     /* misleadingly named; represents number of lines delivered since
        player was sure to have had a chance to read them; if player
@@ -794,7 +794,7 @@ mesg_add_line(const char *mline)
             current_mesg->str = dupstr(mline);
         }
     }
-    current_mesg->turn = g.moves;
+    current_mesg->turn = g.hero_seq;
 
     if (num_messages == 0) {
         /* very first message; set up head */

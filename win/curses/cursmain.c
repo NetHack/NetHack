@@ -17,8 +17,8 @@ char erase_char, kill_char;
 extern char erase_char, kill_char;
 #endif
 
-extern long curs_mesg_suppress_turn; /* from cursmesg.c */
-extern boolean curs_mesg_suppress_suppression; /* ditto */
+extern long curs_mesg_suppress_seq; /* from cursmesg.c */
+extern boolean curs_mesg_no_suppress; /* ditto */
 
 /* stubs for curses_procs{} */
 #ifdef POSITIONBAR
@@ -502,8 +502,8 @@ curses_putstr(winid wid, int attr, const char *text)
     /* this is comparable to tty's cw->flags &= ~WIN_STOP; if messages are
        being suppressed after >>ESC, override that and resume showing them */
     if ((mesgflags & ATR_URGENT) != 0) {
-         curs_mesg_suppress_turn = -1L;
-         curs_mesg_suppress_suppression = TRUE;
+         curs_mesg_suppress_seq = -1L;
+         curs_mesg_no_suppress = TRUE;
     }
 
     if (wid == WIN_MESSAGE && (mesgflags & ATR_NOHISTORY) != 0) {
@@ -516,7 +516,7 @@ curses_putstr(winid wid, int attr, const char *text)
     }
 
     /* urgent message handling is a one-shot operation; we're done */
-    curs_mesg_suppress_suppression = FALSE;
+    curs_mesg_no_suppress = FALSE;
 }
 
 /* Display the file named str.  Complain about missing files
