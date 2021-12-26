@@ -66,7 +66,15 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
             } else
                 levl[rx][ry].typ = ROOM, levl[rx][ry].flags = 0;
 
-            if ((mtmp = m_at(rx, ry)) != 0)
+            /* 3.7: normally DEADMONSTER() is used when traversing the fmon
+               list--dead monsters usually aren't still at specific map
+               locations; however, if ice melts causing a giant to drown,
+               that giant would still be on the map when it drops inventory;
+               if it was carrying a boulder which now fills the pool, 'mtmp'
+               will be dead here; killing it again would yield impossible
+               "dmonsfree: N removed doesn't match N+1 pending" when other
+               monsters have finished their current turn */
+            if ((mtmp = m_at(rx, ry)) != 0 && !DEADMONSTER(mtmp))
                 mondied(mtmp);
 
             if (ttmp)

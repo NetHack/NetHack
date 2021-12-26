@@ -722,6 +722,9 @@ attack feedback when using a bullwhip said "swing"; change to "lash"
 attack feedback for monster using polearm when adjacent said "thrust"; change
 	to "bash"
 apply runmode delay to multiturn actions, not just running
+if a giant carrying a boulder was on ice that melted, it could be killed
+	twice, first by drowning, then by boulder filling the resulting pool
+	when it dropped inventory before being removed from the map
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
