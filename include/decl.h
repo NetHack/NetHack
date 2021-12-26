@@ -822,6 +822,8 @@ struct instance_globals {
     struct mkroom *subrooms;
     dlevel_t level; /* level map */
     long moves; /* turn counter */
+    long hero_seq; /* 'moves*8 + n' where n is updated each hero move during
+                    * the current turn */
     long wailmsg;
     struct obj *migrating_objs; /* objects moving to another dungeon level */
     struct obj *billobjs; /* objects not yet paid for */

@@ -212,9 +212,12 @@ moveloop_core(void)
                  */
                 if (g.moves >= 1000000000L) {
                     display_nhwindow(WIN_MESSAGE, TRUE);
-                    pline_The("dungeon capitulates.");
+                    urgent_pline("The dungeon capitulates.");
                     done(ESCAPED);
                 }
+                /* 'moves' is misnamed; it represents turns; hero_seq is
+                   a value that is distinct every time the hero moves */
+                g.hero_seq = g.moves << 3;
 
                 if (flags.time && !g.context.run)
                     iflags.time_botl = TRUE; /* 'moves' just changed */
@@ -351,6 +354,7 @@ moveloop_core(void)
         /* once-per-hero-took-time things go here */
         /******************************************/
 
+        g.hero_seq++; /* moves*8 + n for n == 1..7 */
 #ifdef STATUS_HILITES
         if (iflags.hilite_delta)
             status_eval_next_unhilite();
@@ -648,7 +652,6 @@ newgame(void)
 
     g.context.botlx = TRUE;
     g.context.ident = 1;
-    g.context.stethoscope_move = -1L;
     g.context.warnlevel = 1;
     g.context.next_attrib_check = 600L; /* arbitrary first setting */
     g.context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */

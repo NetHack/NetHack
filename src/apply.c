@@ -319,10 +319,8 @@ use_stethoscope(struct obj *obj)
     if (!getdir((char *) 0))
         return 0;
 
-    res = (g.moves == g.context.stethoscope_move)
-          && (g.youmonst.movement == g.context.stethoscope_movement);
-    g.context.stethoscope_move = g.moves;
-    g.context.stethoscope_movement = g.youmonst.movement;
+    res = (g.hero_seq == g.context.stethoscope_seq);
+    g.context.stethoscope_seq = g.hero_seq;
 
     g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
     g.notonhead = u.uswallow;

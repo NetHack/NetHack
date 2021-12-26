@@ -2111,10 +2111,11 @@ release_camera_demon(struct obj *obj, xchar x, xchar y)
  * and break messages have been delivered prior to getting here.
  */
 void
-breakobj(struct obj *obj,
-         xchar x, xchar y,    /* object location (ox, oy may not be right) */
-         boolean hero_caused, /* is this the hero's fault? */
-         boolean from_invent)
+breakobj(
+    struct obj *obj,
+    xchar x, xchar y,    /* object location (ox, oy may not be right) */
+    boolean hero_caused, /* is this the hero's fault? */
+    boolean from_invent)
 {
     boolean fracture = FALSE;
 
@@ -2175,19 +2176,20 @@ breakobj(struct obj *obj,
             struct monst *shkp = shop_keeper(*o_shop);
 
             if (shkp) { /* (implies *o_shop != '\0') */
-                static NEARDATA long lastmovetime = 0L;
-                static NEARDATA boolean peaceful_shk = FALSE;
-                /*  We want to base shk actions on her peacefulness
-                    at start of this turn, so that "simultaneous"
-                    multiple breakage isn't drastically worse than
-                    single breakage.  (ought to be done via ESHK)  */
-                if (g.moves != lastmovetime)
-                    peaceful_shk = shkp->mpeaceful;
-                if (stolen_value(obj, x, y, peaceful_shk, FALSE) > 0L
+                struct eshk *eshkp = ESHK(shkp);
+
+                /* base shk actions on her peacefulness at start of
+                   this turn, so that "simultaneous" multiple breakage
+                   isn't drastically worse than single breakage */
+                if (g.hero_seq != eshkp->break_seq)
+                    eshkp->seq_peaceful = shkp->mpeaceful;
+                if ((stolen_value(obj, x, y, eshkp->seq_peaceful, FALSE) > 0L)
                     && (*o_shop != u.ushops[0] || !inside_shop(u.ux, u.uy))
-                    && g.moves != lastmovetime)
+                    && g.hero_seq != eshkp->break_seq)
                     make_angry_shk(shkp, x, y);
-                lastmovetime = g.moves;
+                /* make_angry_shk() is only called on the first instance
+                   of breakage during any particular hero move */
+                eshkp->break_seq = g.hero_seq;
             }
         }
     }

@@ -305,8 +305,11 @@ const struct instance_globals g_init = {
     DUMMY, /* rooms */
     NULL, /* subrooms */
     UNDEFINED_VALUES, /* level */
-    1, /* moves */
-    0, /* wailmsg */
+    1L, /* moves; misnamed turn counter */
+    1L << 3, /* hero_seq: sequence number for hero movement, 'moves*8 + n'
+              * where n is usually 1, sometimes 2 when Fast/Very_fast, maybe
+              * higher if polymorphed into something that's even faster */
+    0L, /* wailmsg */
     NULL, /* migrating_objs */
     NULL, /* billobjs */
 #if defined(MICRO) || defined(WIN32)
@@ -709,13 +712,13 @@ decl_globals_init(void)
     g.valuables[2].size = 0;
 
     if (g_init.magic != IVMAGIC) {
-        printf("decl_globals_init: g_init.magic in unexpected state (%lx)\n",
-                g_init.magic);
+        raw_printf(
+                 "decl_globals_init: g_init.magic in unexpected state (%lx).",
+                   g_init.magic);
         exit(1);
     }
-
     if (g_init.havestate != TRUE) {
-        printf("decl_globals_init: g_init..havestate not TRUE\n");
+        raw_print("decl_globals_init: g_init.havestate not True.");
         exit(1);
     }
 
@@ -739,8 +742,6 @@ decl_globals_init(void)
 
     g.urole = urole_init_data;
     g.urace = urace_init_data;
-
-
 }
 
 /*decl.c*/
