@@ -2331,7 +2331,7 @@ learn_unseen_invent(void)
         return; /* sanity check */
 
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
-        if (otmp->dknown)
+        if (otmp->dknown && (otmp->bknown || !Role_if(PM_CLERIC)))
             continue; /* already seen */
         /* set dknown, perhaps bknown (for priest[ess]) */
         (void) xname(otmp);

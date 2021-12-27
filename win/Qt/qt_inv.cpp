@@ -83,10 +83,15 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
 
     if (nhobj) {
         border = BORDER_DEFAULT;
+        // don't expect this to happen but check just in case;
+        // learn_unseen_invent() is normally called when regaining sight
+        // and sets dknown and maybe bknown, then updates perm_invent (do
+        // it regardless of ENHANCED_PAPERDOLL for same effect either way)
+        if (!Blind && (!nhobj->dknown
+                       || (Role_if(PM_CLERIC) && !nhobj->bknown)))
+            ::learn_unseen_invent();
 #ifdef ENHANCED_PAPERDOLL
         // color margin around cell containing item whose BUC state is known
-        if (Role_if('P') && !Blind)
-            nhobj->bknown = 1;
         if (nhobj->bknown)
             border = nhobj->cursed ? BORDER_CURSED
                      : !nhobj->blessed ? BORDER_UNCURSED
