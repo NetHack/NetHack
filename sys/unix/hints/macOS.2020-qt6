@@ -31,7 +31,7 @@ endif
 ifdef WANT_WIN_QT
 #QTDIR=/Developer/Qt
 # Qt installed via homebrew
-QTDIR=$(shell brew --prefix)/opt/qt@5
+QTDIR=$(shell brew --prefix)/opt/qt@6
 # Qt installed via macports
 #QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT
@@ -120,8 +120,10 @@ endif	# WANT_WIN_X11
 ifdef WANT_WIN_QT
 # Qt5 requires C++11
 LINK = $(CXX)
-QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
-WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore
+MOC = moc
+MOCPATH = $(QTDIR)/share/qt/libexec/moc
+WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm

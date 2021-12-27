@@ -49,6 +49,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -78,10 +79,10 @@ namespace nethack_qt_ {
 void
 centerOnMain(QWidget *w)
 {
+    QPoint p(0, 0);
     QWidget *m = NetHackQtBind::mainWidget();
-    if (!m)
-        m = qApp->desktop();
-    QPoint p = m->mapToGlobal(QPoint(0, 0));
+    if (m)
+        p = m->mapToGlobal(p);
     w->move(p.x() + m->width() / 2  - w->width() / 2,
             p.y() + m->height() / 2 - w->height() / 2);
 }
