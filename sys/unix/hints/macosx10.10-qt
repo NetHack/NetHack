@@ -32,7 +32,7 @@ WANT_DEFAULT=Qt
 #     library installation root.  (Qt2 or Qt3 will not work.)
 ifdef WANT_WIN_QT
 # Qt installed via homebrew
-QTDIR=$(shell brew --prefix)/opt/qt
+QTDIR=$(shell brew --prefix)/opt/qt@5
 # Qt installed via macports (qt511 package; 5.13 requires OSX 10.12 or later)
 #QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT

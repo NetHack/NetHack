@@ -7,6 +7,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -25,10 +26,10 @@ uchar keyValue(QKeyEvent *key_event)
     const int k = key_event->key();
     Qt::KeyboardModifiers mod = key_event->modifiers();
     const QString &txt = key_event->text();
-    QChar ch = !txt.isEmpty() ? txt.at(0) : 0;
+    QChar ch = !txt.isEmpty() ? txt.at(0) : QChar(0);
 
-    if (ch >= 128)
-        ch = 0;
+    if (ch >= QChar(128))
+        ch = QChar(0);
     // on OSX, ascii control codes are not sent, force them
     if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
         if (k >= Qt::Key_A && k <= Qt::Key_Underscore)

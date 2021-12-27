@@ -31,7 +31,7 @@ endif
 ifdef WANT_WIN_QT
 #QTDIR=/Developer/Qt
 # Qt installed via homebrew
-QTDIR=$(shell brew --prefix)/opt/qt@5
+QTDIR=$(shell brew --prefix)/opt/qt@6
 # Qt installed via macports
 #QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT
@@ -120,8 +120,10 @@ endif	# WANT_WIN_X11
 ifdef WANT_WIN_QT
 # Qt5 requires C++11
 LINK = $(CXX)
-QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
-WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore
+MOC = moc
+MOCPATH = $(QTDIR)/share/qt/libexec/moc
+WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
@@ -155,13 +157,12 @@ LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
-LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
-		$(TARGETPFX)unixtty.o $(TARGETPFX)unixunix.o \
-		$(TARGETPFX)unixres.o $(TARGETPFX)winshim.o
+LIBNHSYSOBJ= libnhmain.o ioctl.o unixtty.o unixunix.o \
+                unixres.o winshim.o
 #don't bother building the game executable as it will fail
 #without winshim
 override GAME=
-MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
+MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) libnh.a )
 endif  # WANT_LIBNH
 
 WANT_BUNDLE=1
@@ -275,12 +276,12 @@ VARDIR=$(HACKDIR)
 #-POST
 
 ifdef WANT_LIBNH
-$(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
+libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	@echo "$@ built."
-$(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
+libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
-$(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
+winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
 

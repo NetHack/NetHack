@@ -28,6 +28,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -1132,7 +1133,7 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
 	search.show();
 	rip.hide();
     }
-    int mh = QApplication::desktop()->height()*3/5;
+    int mh = screen()->size().height()*3/5;
     if ( (qt_compact_mode && lines->TotalHeight() > mh) || use_rip ) {
 	// big, so make it fill
 	showMaximized();
