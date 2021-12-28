@@ -148,6 +148,7 @@
 		544768AF23994A17004B9739 /* nhlua.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AD23994A17004B9739 /* nhlua.c */; };
 		544768B123994A2C004B9739 /* mdlib.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768B023994A2C004B9739 /* mdlib.c */; };
 		544768BA23995BB7004B9739 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 544768B923995BB7004B9739 /* liblua.a */; };
+		544A5CF0277B40CF00734B53 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		5462D14823E7B19200969423 /* insight.c in Sources */ = {isa = PBXBuildFile; fileRef = 5462D14723E7B19200969423 /* insight.c */; };
 		5493735A277AAE830031FE02 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
 		54FB2B4B246310A600397C0E /* symbols.c in Sources */ = {isa = PBXBuildFile; fileRef = 54FB2B4A246310A600397C0E /* symbols.c */; };
@@ -1507,6 +1508,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				544A5CF0277B40CF00734B53 /* panic.c in Sources */,
 				5493735A277AAE830031FE02 /* alloc.c in Sources */,
 				5439B3BC275AADC600B8FB2F /* date.c in Sources */,
 				31B8A31021A20DC10055BD01 /* monst.c in Sources */,

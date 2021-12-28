@@ -324,7 +324,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 #
 
 MAKEDEFSOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o \
-			$(O)date.o $(O)alloc.o
+			$(O)date.o $(O)alloc.o $(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
