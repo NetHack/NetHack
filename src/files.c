@@ -2975,6 +2975,15 @@ config_error_done(void)
     if (!config_error_data)
         return 0;
     n = config_error_data->num_errors;
+#ifndef USER_SOUNDS
+    if (g.no_sound_notified > 0) {
+        /* no USER_SOUNDS; config_error_add() was called once for first
+           SOUND or SOUNDDIR entry seen, then skipped for any others;
+           include those skipped ones in the total error count */
+        n += (g.no_sound_notified - 1);
+        g.no_sound_notified = 0;
+    }
+#endif
     if (n) {
         pline("\n%d error%s in %s.\n", n, plur(n),
               *config_error_data->source ? config_error_data->source
