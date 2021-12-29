@@ -1133,7 +1133,12 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
 	search.show();
 	rip.hide();
     }
-    int mh = screen()->size().height()*3/5;
+#if QT_VERSION < 0x060000
+    QSize screensize = QApplication::desktop()->size();
+#else
+    QSize screensize = screen()->size();
+#endif
+    int mh = screensize.height()*3/5;
     if ( (qt_compact_mode && lines->TotalHeight() > mh) || use_rip ) {
 	// big, so make it fill
 	showMaximized();

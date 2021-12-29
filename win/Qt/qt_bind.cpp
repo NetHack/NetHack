@@ -95,8 +95,13 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 	    lsplash->setFixedSize(pm.size());
 	    lsplash->setMask(QBitmap(pm));
 	}
-	splash->move((splash->screen()->size().width()-pm.width())/2,
-		      (splash->screen()->size().height()-pm.height())/2);
+#if QT_VERSION < 0x060000
+	QSize screensize = QApplication::desktop()->size();
+#else
+	QSize screensize = splash->screen()->size();
+#endif
+	splash->move((screensize.width()-pm.width())/2,
+		      (screensize.height()-pm.height())/2);
 	//splash->setGeometry(0,0,100,100);
 	if ( qt_compact_mode ) {
 	    splash->showMaximized();

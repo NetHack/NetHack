@@ -861,9 +861,14 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     setMenu (menubar);
 #endif
 
+#if QT_VERSION < 0x060000
+    QSize screensize = QApplication::desktop()->size();
+#else
+    QSize screensize = screen()->size();
+#endif
     int x=0,y=0;
-    int w=screen()->size().width()-10; // XXX arbitrary extra space for frame
-    int h=screen()->size().height()-50;
+    int w=screensize.width()-10; // XXX arbitrary extra space for frame
+    int h=screensize.height()-50;
 
     int maxwn;
     int maxhn;
