@@ -799,6 +799,7 @@ If your wielded weapon has the throw-and-return property, your quiver
 is empty, and
 .op autoquiver
 is false, you will throw that wielded weapon instead of filling the quiver.
+This will also automatically use a polearm if wielded.
 If
 .op fireassist
 is true, firing will automatically try to wield a launcher (for example,
@@ -1244,7 +1245,8 @@ You can set the
 .op paranoid_confirmation:quit
 option to require a response of \f(CRyes\fP instead.
 .lp "#fire    "
-Fire ammunition from quiver, possibly autowielding a launcher.
+Fire ammunition from quiver, possibly autowielding a launcher,
+or hit with a wielded polearm.
 Default key is \(oqf\(cq.
 .lp "#force   "
 Force a lock.

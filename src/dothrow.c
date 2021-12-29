@@ -417,7 +417,7 @@ find_launcher(struct obj *ammo)
     return (struct obj *)0;
 }
 
-/* f command -- fire: throw from the quiver */
+/* f command -- fire: throw from the quiver or use wielded polearm */
 int
 dofire(void)
 {
@@ -445,8 +445,21 @@ dofire(void)
         if (!flags.autoquiver) {
             if (uwep && AutoReturn(uwep, uwep->owornmask))
                 obj = uwep;
-            else
-                You("have no ammunition readied.");
+            else {
+                /* if we're wielding a polearm, apply it */
+                if (uwep && is_pole(uwep))
+                    return use_pole(uwep, TRUE);
+                else if (iflags.fireassist
+                         && uswapwep && is_pole(uswapwep)
+                         && !(uswapwep->cursed && uswapwep->bknown)) {
+                    /* we have a known not-cursed polearm as swap weapon.
+                       swap to it and retry */
+                    cmdq_add_ec(doswapweapon);
+                    cmdq_add_ec(dofire);
+                    return 0;
+                } else
+                    You("have no ammunition readied.");
+            }
         } else {
             autoquiver();
             if ((obj = uquiver) == 0)

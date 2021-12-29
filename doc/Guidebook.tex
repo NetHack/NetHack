@@ -896,6 +896,7 @@ computer pick something appropriate if {\it autoquiver\/} is true.
 If your wielded weapon has the throw-and-return property, your quiver
 is empty, and {\it autoquiver\/}
 is false, you will throw that wielded weapon instead of filling the quiver.
+This will also automatically use a polearm if wielded.
 If {\it fireassist\/} is true, firing will automatically try to wield a launcher
 (for example, a bow or a sling) matching the ammo in the quiver; this might
 take multiple turns, and get interrupted by a monster.
@@ -1348,7 +1349,8 @@ You can set the
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#fire}]
-Fire ammunition from quiver, possibly autowielding a launcher.
+Fire ammunition from quiver, possibly autowielding a launcher,
+or hit with a wielded polearm.
 Default key is `{\tt f}'.
 %.lp
 \item[\tb{\#force}]

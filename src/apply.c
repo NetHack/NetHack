@@ -30,7 +30,6 @@ static void use_stone(struct obj *);
 static int set_trap(void); /* occupation callback */
 static int use_whip(struct obj *);
 static void display_polearm_positions(int);
-static int use_pole(struct obj *);
 static int use_cream_pie(struct obj *);
 static int jelly_ok(struct obj *);
 static int use_royal_jelly(struct obj *);
@@ -3076,8 +3075,8 @@ display_polearm_positions(int state)
 }
 
 /* Distance attacks by pole-weapons */
-static int
-use_pole(struct obj *obj)
+int
+use_pole(struct obj *obj, boolean autohit)
 {
     const char thump[] = "Thump!  Your blow bounces harmlessly off the %s.";
     int res = 0, typ, max_range, min_range, glyph;
@@ -3125,7 +3124,8 @@ use_pole(struct obj *obj)
     g.polearm_range_max = max_range;
 
     /* Prompt for a location */
-    pline(where_to_hit);
+    if (!autohit)
+        pline(where_to_hit);
     cc.x = u.ux;
     cc.y = u.uy;
     if (!find_poleable_mon(&cc, min_range, max_range) && hitm
@@ -3135,16 +3135,21 @@ use_pole(struct obj *obj)
         cc.x = hitm->mx;
         cc.y = hitm->my;
     }
-    getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
-    if (getpos(&cc, TRUE, "the spot to hit") < 0)
-        return res; /* ESC; uses turn iff polearm became wielded */
+    if (!autohit) {
+        getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
+        if (getpos(&cc, TRUE, "the spot to hit") < 0)
+            return res; /* ESC; uses turn iff polearm became wielded */
+    }
 
     glyph = glyph_at(cc.x, cc.y);
     if (distu(cc.x, cc.y) > max_range) {
         pline("Too far!");
         return res;
     } else if (distu(cc.x, cc.y) < min_range) {
-        pline("Too close!");
+        if (autohit && cc.x == u.ux && cc.y == u.uy)
+            pline("Don't know what to hit.");
+        else
+            pline("Too close!");
         return res;
     } else if (!cansee(cc.x, cc.y) && !glyph_is_poleable(glyph)) {
         You(cant_see_spot);
@@ -3948,7 +3953,7 @@ doapply(void)
     default:
         /* Pole-weapons can strike at a distance */
         if (is_pole(obj)) {
-            res = use_pole(obj);
+            res = use_pole(obj, FALSE);
             break;
         } else if (is_pick(obj) || is_axe(obj)) {
             res = use_pick_axe(obj);
