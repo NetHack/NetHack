@@ -2237,7 +2237,7 @@ fgetline(FILE *fd)
            [this was much simpler (and possibly slightly more efficient)
            with realloc() but less safe because return values from malloc()
            and realloc() were not being checked for Null, and efficiency is
-           a red herring because growing the buffer will be extremely rate] */
+           a red herring because growing the buffer will be extremely rare] */
         newlen = len + (unsigned) inc;
         cprime = (char *) alloc(newlen);
         (void) memcpy(cprime, c, len);
