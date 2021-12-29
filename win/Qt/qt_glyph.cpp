@@ -98,7 +98,7 @@ void NetHackQtGlyphs::drawGlyph(QPainter& painter, int glyph, int tileidx,
         painter.drawPixmap(x, y, pm, px, py, width(), height());
     } else {
         // for paper doll; mirrored image for left side of two-handed weapon
-        painter.drawPixmap(x, y, reversed_pixmap(glyph, fem),
+        painter.drawPixmap(x, y, reversed_pixmap(glyph, tileidx, fem),
                            0, 0, width(), height());
     }
 }
