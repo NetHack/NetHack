@@ -72,6 +72,7 @@
 //    the rest of status.  That takes up more space, which is ok, but it
 //    also increases the vertical margin in between them by more than is
 //    necessary.  Should squeeze some of that excess blank space out.
+//  Add tool tips for the status condition icons, maybe the other icons.
 //
 
 extern "C" {
