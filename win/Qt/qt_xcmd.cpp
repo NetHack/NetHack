@@ -77,7 +77,6 @@ extern "C" {
 #include "hack.h"
 #include "func_tab.h"
 }
-#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>

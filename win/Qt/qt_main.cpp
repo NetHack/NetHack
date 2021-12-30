@@ -6,9 +6,8 @@
 
 extern "C" {
 #include "hack.h"
+#define CTRL(c) (0x1f & (c)) // substitute for C() from global.h, for ^V hack
 }
-#undef C
-#define CTRL(c) (0x1f & (c))
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>

@@ -6,6 +6,7 @@
  * #include after "hack.h", before <Qt.../Qt...>.
  */
 
+#undef C            // conflicts with Qt6 header
 #undef Invisible
 #undef Warning
 #undef index
