@@ -7,6 +7,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -96,7 +97,7 @@ char NetHackQtYnDialog::Exec()
 		if ( question[c] == '-' ) {
 		    from = question[c - 1].cell();
 		} else if ( from != 0 ) {
-		    for (unsigned f=from+1; f<=question[c]; f++)
+		    for (unsigned f=from+1; QChar(f)<=question[c]; f++)
 			ch.append(QChar(f));
 		    from = 0;
 		} else {
@@ -259,7 +260,7 @@ char NetHackQtYnDialog::Exec()
                     // two consecutive ampersands are needed to display
                     // one in a button label; first check whether caller
                     // has already done that, skip this one if so
-                    if (i > 0 && ch[i - 1].cell() == QChar('&'))
+                    if (i > 0 && ch[i - 1].cell() == '&')
                         continue; // next i
                     button_name = "&&";
                     break;

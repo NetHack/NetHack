@@ -18,6 +18,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>

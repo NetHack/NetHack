@@ -7,15 +7,20 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
 #include <QtCore/QStringList>
-#if QT_VERSION >= 0x050000
+#if QT_VERSION < 0x050000
+#include <QtGui/QSound>
+#elif QT_VERSION < 0x060000
 #include <QtWidgets/QtWidgets>
 #include <QtMultimedia/QSound>
 #else
-#include <QtGui/QSound>
+#include <QtWidgets/QtWidgets>
+#undef QT_NO_SOUND
+#define QT_NO_SOUND 1
 #endif
 #include "qt_post.h"
 #include "qt_bind.h"
@@ -88,10 +93,15 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
 	capt->setAlignment(Qt::AlignCenter);
 	if ( !pm.isNull() ) {
 	    lsplash->setFixedSize(pm.size());
-	    lsplash->setMask(pm);
+	    lsplash->setMask(QBitmap(pm));
 	}
-	splash->move((QApplication::desktop()->width()-pm.width())/2,
-		      (QApplication::desktop()->height()-pm.height())/2);
+#if QT_VERSION < 0x060000
+	QSize screensize = QApplication::desktop()->size();
+#else
+	QSize screensize = splash->screen()->size();
+#endif
+	splash->move((screensize.width()-pm.width())/2,
+		      (screensize.height()-pm.height())/2);
 	//splash->setGeometry(0,0,100,100);
 	if ( qt_compact_mode ) {
 	    splash->showMaximized();
@@ -930,9 +940,9 @@ bool NetHackQtBind::notify(QObject *receiver, QEvent *event)
                 }
             }
             QString key = key_event->text();
-            QChar ch = !key.isEmpty() ? key.at(0) : 0;
-            if (ch > 128)
-                ch = 0;
+            QChar ch = !key.isEmpty() ? key.at(0) : QChar(0);
+            if (ch > QChar(128))
+                ch = QChar(0);
             // on OSX, ascii control codes are not sent, force them
             if (ch == 0 && (mod & Qt::ControlModifier) != 0) {
                 if (k >= Qt::Key_A && k <= Qt::Key_Underscore)

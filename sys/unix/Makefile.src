@@ -179,6 +179,7 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 CXXFLAGS = $(CCXXFLAGS) -I. -I$(QTDIR)/include $(QTCXXFLAGS)
 CXX ?= g++
 MOC ?= moc
+MOCPATH ?= $(QTDIR)/bin/$(MOC)
 #LINK=g++
 
 # The default is for the TARGET_* variables to match the defaults.
@@ -679,25 +680,25 @@ qt3tableview.moc: ../win/Qt3/qt3tableview.h
 
 # Qt 4 windowport meta-object-compiler output
 qt_kde0.moc : ../win/Qt/qt_kde0.h
-	$(QTDIR)/bin/$(MOC) -o qt_kde0.moc ../win/Qt/qt_kde0.h
+	$(MOCPATH) -o qt_kde0.moc ../win/Qt/qt_kde0.h
 qt_main.moc : ../win/Qt/qt_main.h
-	$(QTDIR)/bin/$(MOC) -o qt_main.moc ../win/Qt/qt_main.h
+	$(MOCPATH) -o qt_main.moc ../win/Qt/qt_main.h
 qt_map.moc : ../win/Qt/qt_map.h
-	$(QTDIR)/bin/$(MOC) -o qt_map.moc ../win/Qt/qt_map.h
+	$(MOCPATH) -o qt_map.moc ../win/Qt/qt_map.h
 qt_menu.moc : ../win/Qt/qt_menu.h
-	$(QTDIR)/bin/$(MOC) -o qt_menu.moc ../win/Qt/qt_menu.h
+	$(MOCPATH) -o qt_menu.moc ../win/Qt/qt_menu.h
 qt_msg.moc : ../win/Qt/qt_msg.h
-	$(QTDIR)/bin/$(MOC) -o qt_msg.moc ../win/Qt/qt_msg.h
+	$(MOCPATH) -o qt_msg.moc ../win/Qt/qt_msg.h
 qt_plsel.moc : ../win/Qt/qt_plsel.h
-	$(QTDIR)/bin/$(MOC) -o qt_plsel.moc ../win/Qt/qt_plsel.h
+	$(MOCPATH) -o qt_plsel.moc ../win/Qt/qt_plsel.h
 qt_set.moc : ../win/Qt/qt_set.h
-	$(QTDIR)/bin/$(MOC) -o qt_set.moc ../win/Qt/qt_set.h
+	$(MOCPATH) -o qt_set.moc ../win/Qt/qt_set.h
 qt_stat.moc : ../win/Qt/qt_stat.h
-	$(QTDIR)/bin/$(MOC) -o qt_stat.moc ../win/Qt/qt_stat.h
+	$(MOCPATH) -o qt_stat.moc ../win/Qt/qt_stat.h
 qt_xcmd.moc : ../win/Qt/qt_xcmd.h
-	$(QTDIR)/bin/$(MOC) -o qt_xcmd.moc ../win/Qt/qt_xcmd.h
+	$(MOCPATH) -o qt_xcmd.moc ../win/Qt/qt_xcmd.h
 qt_yndlg.moc : ../win/Qt/qt_yndlg.h
-	$(QTDIR)/bin/$(MOC) -o qt_yndlg.moc ../win/Qt/qt_yndlg.h
+	$(MOCPATH) -o qt_yndlg.moc ../win/Qt/qt_yndlg.h
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \

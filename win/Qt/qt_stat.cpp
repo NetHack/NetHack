@@ -78,6 +78,7 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
@@ -558,7 +559,9 @@ QHBoxLayout *NetHackQtStatusWindow::InitHitpointBar()
 
     QHBoxLayout *hpbar = new QHBoxLayout;
     hpbar->setSpacing(0);
+#if QT_VERSION < 0x060000
     hpbar->setMargin(0);
+#endif
     hpbar->addWidget(&hpbar_health);
     hpbar->setAlignment(&hpbar_health, Qt::AlignLeft);
     hpbar->addWidget(&hpbar_injury);

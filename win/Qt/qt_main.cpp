@@ -7,10 +7,16 @@
 extern "C" {
 #include "hack.h"
 }
+#undef C
+#define CTRL(c) (0x1f & (c))
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
+#if QT_VERSION >= 0x060000
+#include <QtGui/QShortcut>
+#else
 #include <QtWidgets/QShortcut>
+#endif
 
 #if QT_VERSION >= 0x050000
 #include <QtWidgets/QtWidgets>
@@ -855,9 +861,14 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     setMenu (menubar);
 #endif
 
+#if QT_VERSION < 0x060000
+    QSize screensize = QApplication::desktop()->size();
+#else
+    QSize screensize = screen()->size();
+#endif
     int x=0,y=0;
-    int w=QApplication::desktop()->width()-10; // XXX arbitrary extra space for frame
-    int h=QApplication::desktop()->height()-50;
+    int w=screensize.width()-10; // XXX arbitrary extra space for frame
+    int h=screensize.height()-50;
 
     int maxwn;
     int maxhn;
@@ -902,7 +913,7 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 // all other control characters go through NetHackQtBind::notify()
 void NetHackQtMainWindow::CtrlV()
 {
-    static const char cV[] = { C('V'), '\0' };
+    static const char cV[] = { CTRL('V'), '\0' };
     doKeys(cV);
 }
 #endif
