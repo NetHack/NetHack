@@ -28,10 +28,32 @@ ifndef WANT_WIN_QT
 ifdef WANT_WIN_ALL
 WANT_WIN_QT=1
 endif
-endif
+ifdef WANT_WIN_QT5
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT6
+endif   # not WANT_WIN_QT
+
 ifdef WANT_WIN_QT
+ifndef WANT_WIN_QT5
+ifndef WANT_WIN_QT6
+WANT_WIN_QT5=1
+endif   # not WANT_WIN_QT6
+endif   # not WANT_WIN_QT5
+ifdef WANT_WIN_QT5
 QTDIR=/usr
+endif  # WANT_WIN_QT5
+#ifdef WANT_WIN_QT6
+#QTDIR=/usr
+#endif   # WANT_WIN_QT6
 endif  # WANT_WIN_QT
+
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
 endif
