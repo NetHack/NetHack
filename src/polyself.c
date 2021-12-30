@@ -1186,17 +1186,17 @@ dobreathe(void)
 
     if (Strangled) {
         You_cant("breathe.  Sorry.");
-        return 0;
+        return ECMD_OK;
     }
     if (u.uen < 15) {
         You("don't have enough energy to breathe!");
-        return 0;
+        return ECMD_OK;
     }
     u.uen -= 15;
     g.context.botl = 1;
 
     if (!getdir((char *) 0))
-        return 0;
+        return ECMD_OK;
 
     mattk = attacktype_fordmg(g.youmonst.data, AT_BREA, AD_ANY);
     if (!mattk)
@@ -1206,7 +1206,7 @@ dobreathe(void)
     else
         buzz((int) (20 + mattk->adtyp - 1), (int) mattk->damn, u.ux, u.uy,
              u.dx, u.dy);
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1216,7 +1216,7 @@ dospit(void)
     struct attack *mattk;
 
     if (!getdir((char *) 0))
-        return 0;
+        return ECMD_OK;
     mattk = attacktype_fordmg(g.youmonst.data, AT_SPIT, AD_ANY);
     if (!mattk) {
         impossible("bad spit attack?");
@@ -1236,7 +1236,7 @@ dospit(void)
         otmp->spe = 1; /* to indicate it's yours */
         throwit(otmp, 0L, FALSE, (struct obj *) 0);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1246,13 +1246,13 @@ doremove(void)
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
             pline_The("ball and chain are buried firmly in the %s.",
                       surface(u.ux, u.uy));
-            return 0;
+            return ECMD_OK;
         }
         You("are not chained to anything!");
-        return 0;
+        return ECMD_OK;
     }
     unpunish();
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1263,13 +1263,13 @@ dospinweb(void)
     if (Levitation || Is_airlevel(&u.uz) || Underwater
         || Is_waterlevel(&u.uz)) {
         You("must be on the ground to spin a web.");
-        return 0;
+        return ECMD_OK;
     }
     if (u.uswallow) {
         You("release web fluid inside %s.", mon_nam(u.ustuck));
         if (is_animal(u.ustuck->data)) {
             expels(u.ustuck, u.ustuck->data, TRUE);
-            return 0;
+            return ECMD_OK;
         }
         if (is_whirly(u.ustuck->data)) {
             int i;
@@ -1296,14 +1296,14 @@ dospinweb(void)
                 }
                 pline_The("web %sis swept away!", sweep);
             }
-            return 0;
+            return ECMD_OK;
         } /* default: a nasty jelly-like creature */
         pline_The("web dissolves into %s.", mon_nam(u.ustuck));
-        return 0;
+        return ECMD_OK;
     }
     if (u.utrap) {
         You("cannot spin webs while stuck in a trap.");
-        return 0;
+        return ECMD_OK;
     }
     exercise(A_DEX, TRUE);
     if (ttmp) {
@@ -1314,33 +1314,33 @@ dospinweb(void)
             deltrap(ttmp);
             bury_objs(u.ux, u.uy);
             newsym(u.ux, u.uy);
-            return 1;
+            return ECMD_TIME;
         case SQKY_BOARD:
             pline_The("squeaky board is muffled.");
             deltrap(ttmp);
             newsym(u.ux, u.uy);
-            return 1;
+            return ECMD_TIME;
         case TELEP_TRAP:
         case LEVEL_TELEP:
         case MAGIC_PORTAL:
         case VIBRATING_SQUARE:
             Your("webbing vanishes!");
-            return 0;
+            return ECMD_OK;
         case WEB:
             You("make the web thicker.");
-            return 1;
+            return ECMD_TIME;
         case HOLE:
         case TRAPDOOR:
             You("web over the %s.",
                 (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
             deltrap(ttmp);
             newsym(u.ux, u.uy);
-            return 1;
+            return ECMD_TIME;
         case ROLLING_BOULDER_TRAP:
             You("spin a web, jamming the trigger.");
             deltrap(ttmp);
             newsym(u.ux, u.uy);
-            return 1;
+            return ECMD_TIME;
         case ARROW_TRAP:
         case DART_TRAP:
         case BEAR_TRAP:
@@ -1354,16 +1354,16 @@ dospinweb(void)
         case POLY_TRAP:
             You("have triggered a trap!");
             dotrap(ttmp, 0);
-            return 1;
+            return ECMD_TIME;
         default:
             impossible("Webbing over trap type %d?", ttmp->ttyp);
-            return 0;
+            return ECMD_OK;
         }
     } else if (On_stairs(u.ux, u.uy)) {
         /* cop out: don't let them hide the stairs */
         Your("web fails to impede access to the %s.",
              (levl[u.ux][u.uy].typ == STAIRS) ? "stairs" : "ladder");
-        return 1;
+        return ECMD_TIME;
     }
     ttmp = maketrap(u.ux, u.uy, WEB);
     if (ttmp) {
@@ -1372,7 +1372,7 @@ dospinweb(void)
         if (*in_rooms(u.ux, u.uy, SHOPBASE))
             add_damage(u.ux, u.uy, SHOP_WEB_COST);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1381,7 +1381,7 @@ dosummon(void)
     int placeholder;
     if (u.uen < 10) {
         You("lack the energy to send forth a call for help!");
-        return 0;
+        return ECMD_OK;
     }
     u.uen -= 10;
     g.context.botl = 1;
@@ -1390,7 +1390,7 @@ dosummon(void)
     exercise(A_WIS, TRUE);
     if (!were_summon(g.youmonst.data, TRUE, &placeholder, (char *) 0))
         pline("But none arrive.");
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1410,19 +1410,19 @@ dogaze(void)
     }
     if (adtyp != AD_CONF && adtyp != AD_FIRE) {
         impossible("gaze attack %d?", adtyp);
-        return 0;
+        return ECMD_OK;
     }
 
     if (Blind) {
         You_cant("see anything to gaze at.");
-        return 0;
+        return ECMD_OK;
     } else if (Hallucination) {
         You_cant("gaze at anything you can see.");
-        return 0;
+        return ECMD_OK;
     }
     if (u.uen < 15) {
         You("lack the energy to use your special gaze!");
-        return 0;
+        return ECMD_OK;
     }
     u.uen -= 15;
     g.context.botl = 1;
@@ -1503,7 +1503,7 @@ dogaze(void)
                                   : -200);
                         g.multi_reason = "frozen by a monster's gaze";
                         g.nomovemsg = 0;
-                        return 1;
+                        return ECMD_TIME;
                     } else
                         You("stiffen momentarily under %s gaze.",
                             s_suffix(mon_nam(mtmp)));
@@ -1528,7 +1528,7 @@ dogaze(void)
     }
     if (!looked)
         You("gaze at no place in particular.");
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1553,7 +1553,7 @@ dohide(void)
             g.youmonst.m_ap_type = M_AP_NOTHING;
             newsym(u.ux, u.uy);
         }
-        return 0;
+        return ECMD_OK;
     }
     /* note: the eel and hides_under cases are hypothetical;
        such critters aren't offered the option of hiding via #monster */
@@ -1563,24 +1563,24 @@ dohide(void)
         else
             There("is no %s to hide in here.", hliquid("water"));
         u.uundetected = 0;
-        return 0;
+        return ECMD_OK;
     }
     if (hides_under(g.youmonst.data) && !g.level.objects[u.ux][u.uy]) {
         There("is nothing to hide under here.");
         u.uundetected = 0;
-        return 0;
+        return ECMD_OK;
     }
     /* Planes of Air and Water */
     if (on_ceiling && !has_ceiling(&u.uz)) {
         There("is nowhere to hide above you.");
         u.uundetected = 0;
-        return 0;
+        return ECMD_OK;
     }
     if ((is_hider(g.youmonst.data) && !Flying) /* floor hider */
         && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
         There("is nowhere to hide beneath you.");
         u.uundetected = 0;
-        return 0;
+        return ECMD_OK;
     }
     /* TODO? inhibit floor hiding at furniture locations, or
      * else make youhiding() give smarter messages at such spots.
@@ -1588,7 +1588,7 @@ dohide(void)
 
     if (u.uundetected || (ismimic && U_AP_TYPE != M_AP_NOTHING)) {
         youhiding(FALSE, 1); /* "you are already hiding" */
-        return 0;
+        return ECMD_OK;
     }
 
     if (ismimic) {
@@ -1599,7 +1599,7 @@ dohide(void)
         u.uundetected = 1;
     newsym(u.ux, u.uy);
     youhiding(FALSE, 0); /* "you are now hiding" */
-    return 1;
+    return ECMD_TIME;
 }
 
 int
@@ -1615,7 +1615,7 @@ dopoly(void)
             newsym(u.ux, u.uy);
         }
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /* #monster for hero-as-mind_flayer giving psychic blast */
@@ -1627,7 +1627,7 @@ domindblast(void)
 
     if (u.uen < 10) {
         You("concentrate but lack the energy to maintain doing so.");
-        return 0;
+        return ECMD_OK;
     }
     u.uen -= 10;
     g.context.botl = 1;
@@ -1663,7 +1663,7 @@ domindblast(void)
                 killed(mtmp);
         }
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 void

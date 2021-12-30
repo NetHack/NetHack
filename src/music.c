@@ -693,13 +693,13 @@ do_play_instrument(struct obj* instr)
 
     if (Underwater) {
         You_cant("play music underwater!");
-        return 0;
+        return ECMD_OK;
     } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN
                 || instr->otyp == FIRE_HORN || instr->otyp == BUGLE)
                && !can_blow(&g.youmonst)) {
         You("are incapable of playing %s.", the(distant_name(instr, xname)));
-        return 0;
+        return ECMD_OK;
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE
         && !(Stunned || Confusion || Hallucination)) {
@@ -750,7 +750,7 @@ do_play_instrument(struct obj* instr)
                                     close_drawbridge(x, y);
                                 else
                                     open_drawbridge(x, y);
-                                return 1;
+                                return ECMD_TIME;
                             }
             } else if (!Deaf) {
                 if (u.uevent.uheard_tune < 1)
@@ -807,13 +807,13 @@ do_play_instrument(struct obj* instr)
                 }
             }
         }
-        return 1;
+        return ECMD_TIME;
     } else
-        return do_improvisation(instr);
+        return do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
 
  nevermind:
     pline1(Never_mind);
-    return 0;
+    return ECMD_OK;
 }
 
 /*music.c*/

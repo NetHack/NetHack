@@ -549,7 +549,7 @@ scrolltele(struct obj* scroll)
     (void) safe_teleds(TELEDS_TELEPORT);
 }
 
-/* ^T command; 'm ^T' == choose among several teleport modes */
+/* the #teleport command; 'm ^T' == choose among several teleport modes */
 int
 dotelecmd(void)
 {
@@ -565,7 +565,7 @@ dotelecmd(void)
 
     /* normal mode; ignore 'm' prefix if it was given */
     if (!wizard)
-        return dotele(FALSE);
+        return dotele(FALSE) ? ECMD_TIME : ECMD_OK;
 
     added = hidden = NOOP_SPELL;
     save_HTele = HTeleportation, save_ETele = ETeleportation;
@@ -625,7 +625,7 @@ dotelecmd(void)
             /* preselected one was explicitly chosen and got toggled off */
             tmode = 'w';
         } else { /* ESC */
-            return 0;
+            return ECMD_OK;
         }
         switch (tmode) {
         case 'n':
@@ -657,7 +657,7 @@ dotelecmd(void)
         /* can't both be non-NOOP so addition will yield the non-NOOP one */
         (void) tport_spell(added + hidden - NOOP_SPELL);
 
-    return res;
+    return res ? ECMD_TIME : ECMD_OK;
 }
 
 int
@@ -758,7 +758,7 @@ dotele(
         if (castit) {
             /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
-            if (spelleffects(sp_no, TRUE))
+            if ((spelleffects(sp_no, TRUE) & ECMD_TIME))
                 return 1;
             else if (!break_the_rules)
                 return 0;

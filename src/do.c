@@ -21,7 +21,7 @@ static void final_level(void);
 
 /* static boolean badspot(xchar,xchar); */
 
-/* 'd' command: drop one inventory item */
+/* the #drop command: drop one inventory item */
 int
 dodrop(void)
 {
@@ -615,13 +615,13 @@ static int
 drop(struct obj *obj)
 {
     if (!obj)
-        return 0;
+        return ECMD_OK;
     if (!canletgo(obj, "drop"))
-        return 0;
+        return ECMD_OK;
     if (obj == uwep) {
         if (welded(uwep)) {
             weldmsg(obj);
-            return 0;
+            return ECMD_OK;
         }
         setuwep((struct obj *) 0);
     }
@@ -647,7 +647,7 @@ drop(struct obj *obj)
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
             && IS_SINK(levl[u.ux][u.uy].typ)) {
             dosinkring(obj);
-            return 1;
+            return ECMD_TIME;
         }
         if (!can_reach_floor(TRUE)) {
             /* we might be levitating due to #invoke Heart of Ahriman;
@@ -663,13 +663,13 @@ drop(struct obj *obj)
             hitfloor(obj, TRUE);
             if (levhack)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
-            return 1;
+            return ECMD_TIME;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
             You("drop %s.", doname(obj));
     }
     dropx(obj);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* dropx - take dropped item out of inventory;
@@ -810,15 +810,15 @@ obj_no_longer_held(struct obj *obj)
     }
 }
 
-/* 'D' command: drop several things */
+/* the #droptype command: drop several things */
 int
 doddrop(void)
 {
-    int result = 0;
+    int result = ECMD_OK;
 
     if (!g.invent) {
         You("have nothing to drop.");
-        return 0;
+        return ECMD_OK;
     }
     add_valid_menu_class(0); /* clear any classes already there */
     if (*u.ushops)
@@ -834,7 +834,7 @@ doddrop(void)
     return result;
 }
 
-static int
+static int /* check callers */
 menudrop_split(struct obj *otmp, int cnt)
 {
     if (cnt && cnt < otmp->quan) {
@@ -923,7 +923,7 @@ menu_drop(int retry)
         bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */
         while ((otmp = nxt_unbypassed_obj(g.invent)) != 0) {
             if (drop_everything || all_categories || allow_category(otmp))
-                n_dropped += drop(otmp);
+                n_dropped += ((drop(otmp) == ECMD_TIME) ? 1 : 0);
         }
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
@@ -932,7 +932,7 @@ menu_drop(int retry)
         /* drop the just picked item automatically, if only one stack */
         otmp = find_justpicked(g.invent);
         if (otmp)
-            n_dropped += menudrop_split(otmp, justpicked_quan);
+            n_dropped += ((menudrop_split(otmp, justpicked_quan) == ECMD_TIME) ? 1 : 0);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &g.invent,
@@ -961,7 +961,7 @@ menu_drop(int retry)
                 if (!otmp2 || !otmp2->bypass)
                     continue;
                 /* found next selected invent item */
-                n_dropped += menudrop_split(otmp, pick_list[i].count);
+                n_dropped += ((menudrop_split(otmp, pick_list[i].count) == ECMD_TIME) ? 1 : 0);
             }
             bypass_objlist(g.invent, FALSE); /* reset g.invent to normal */
             free((genericptr_t) pick_list);
@@ -969,10 +969,10 @@ menu_drop(int retry)
     }
 
  drop_done:
-    return n_dropped;
+    return (n_dropped ? ECMD_TIME : ECMD_OK);
 }
 
-/* the '>' command */
+/* the #down command */
 int
 dodown(void)
 {
@@ -982,10 +982,10 @@ dodown(void)
             ladder_down = (stway && !stway->up &&  stway->isladder);
 
     if (u_rooted())
-        return 1;
+        return ECMD_TIME;
 
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
     /* Levitation might be blocked, but player can still use '>' to
        turn off controlled levitation */
@@ -1005,10 +1005,10 @@ dodown(void)
                 }
             }
             if (float_down(I_SPECIAL | TIMEOUT, W_ARTI)) {
-                return 1; /* came down, so moved */
+                return ECMD_TIME; /* came down, so moved */
             } else if (!HLevitation && !ELevitation) {
                 Your("latent levitation ceases.");
-                return 1; /* did something, effectively moved */
+                return ECMD_TIME; /* did something, effectively moved */
             }
         }
         if (BLevitation) {
@@ -1034,7 +1034,7 @@ dodown(void)
             floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
-        return 0; /* didn't move */
+        return ECMD_OK; /* didn't move */
     }
 
     if (Upolyd && ceiling_hider(&mons[u.umonnum]) && u.uundetected) {
@@ -1051,7 +1051,7 @@ dodown(void)
                     dotrap(trap, TOOKPLUNGE);
             }
         }
-        return 1; /* came out of hiding; might need '>' again to go down */
+        return ECMD_TIME; /* came out of hiding; might need '>' again to go down */
     }
 
     if (u.ustuck) {
@@ -1059,21 +1059,21 @@ dodown(void)
             !u.uswallow ? "being held" : is_animal(u.ustuck->data)
                                              ? "swallowed"
                                              : "engulfed");
-        return 1;
+        return ECMD_TIME;
     }
 
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
             dotrap(trap, TOOKPLUNGE);
-            return 1;
+            return ECMD_TIME;
         } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !g.context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else {
                 You_cant("go down here.");
-                return 0;
+                return ECMD_OK;
             }
         }
     }
@@ -1081,14 +1081,14 @@ dodown(void)
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
         if (yn("Are you sure you want to enter?") != 'y')
-            return 0;
+            return ECMD_OK;
         pline("So be it.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
     }
 
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return 0;
+        return ECMD_OK;
     }
 
     if (trap) {
@@ -1108,10 +1108,10 @@ dodown(void)
                            "contusion from a small passage", KILLED_BY);
                 } else {
                     You("were unable to fit %s.", down_or_thru);
-                    return 0;
+                    return ECMD_OK;
                 }
             } else {
-                return 0;
+                return ECMD_OK;
             }
         }
         You("%s %s the %s.", actn, down_or_thru,
@@ -1124,58 +1124,58 @@ dodown(void)
         next_level(!trap);
         g.at_ladder = FALSE;
     }
-    return 1;
+    return ECMD_TIME;
 }
 
-/* the '<' command */
+/* the #up command - move up a staircase */
 int
 doup(void)
 {
     stairway *stway = stairway_at(u.ux,u.uy);
 
     if (u_rooted())
-        return 1;
+        return ECMD_TIME;
 
     /* "up" to get out of a pit... */
     if (u.utrap && u.utraptype == TT_PIT) {
         climb_pit();
-        return 1;
+        return ECMD_TIME;
     }
 
     if (!stway || (stway && !stway->up)) {
         You_cant("go up here.");
-        return 0;
+        return ECMD_OK;
     }
     if (stucksteed(TRUE)) {
-        return 0;
+        return ECMD_OK;
     }
     if (u.ustuck) {
         You("are %s, and cannot go up.",
             !u.uswallow ? "being held" : is_animal(u.ustuck->data)
                                              ? "swallowed"
                                              : "engulfed");
-        return 1;
+        return ECMD_TIME;
     }
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
-        return 1;
+        return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
-            return 0;
+            return ECMD_OK;
         if (yn("Beware, there will be no return!  Still climb?") != 'y')
-            return 0;
+            return ECMD_OK;
     }
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return 0;
+        return ECMD_OK;
     }
     g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
     prev_level(TRUE);
     g.at_ladder = FALSE;
-    return 1;
+    return ECMD_TIME;
 }
 
 /* check that we can write out the current level */
@@ -2062,8 +2062,8 @@ donull(void)
     if (cmd_safety_prevention("a no-op (to rest)",
                           "Are you waiting to get hit?",
                           &g.did_nothing_flag))
-        return 0;
-    return 1; /* Do nothing, but let other things happen */
+        return ECMD_OK;
+    return ECMD_TIME; /* Do nothing, but let other things happen */
 }
 
 static int
@@ -2092,6 +2092,7 @@ wipeoff(void)
     return 1; /* still busy */
 }
 
+/* the #wipe command - wipe off your face */
 int
 dowipe(void)
 {
@@ -2103,10 +2104,10 @@ dowipe(void)
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
          */
-        return 1;
+        return ECMD_TIME;
     }
     Your("%s is already clean.", body_part(FACE));
-    return 1;
+    return ECMD_TIME;
 }
 
 /* common wounded legs feedback */

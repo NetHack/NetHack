@@ -46,6 +46,7 @@ static void zerocomp_bputc(int);
 #define HUP
 #endif
 
+/* the #save command */
 int
 dosave(void)
 {
@@ -69,7 +70,7 @@ dosave(void)
         } else
             (void) doredraw();
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /* returns 1 if save successful */

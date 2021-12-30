@@ -63,14 +63,14 @@ getversionstring(char *buf)
     return buf;
 }
 
-/* the 'v' command */
+/* the #versionshort command */
 int
 doversion(void)
 {
     char buf[BUFSZ];
 
     pline("%s", getversionstring(buf));
-    return 0;
+    return ECMD_OK;
 }
 
 /* the '#version' command; also a choice for '?' */
@@ -198,7 +198,7 @@ doextversion(void)
         (void) dlb_fclose(f);
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 
 void

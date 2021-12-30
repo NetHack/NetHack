@@ -1394,7 +1394,7 @@ call_ok(struct obj *obj)
     return GETOBJ_SUGGEST;
 }
 
-/* C and #name commands - player can name monster or object or type of obj */
+/* #call / #name command - player can name monster or object or type of obj */
 int
 docallcmd(void)
 {
@@ -1485,7 +1485,7 @@ docallcmd(void)
         donamelevel();
         break;
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /* for use by safe_qbuf() */

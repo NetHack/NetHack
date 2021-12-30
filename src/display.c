@@ -1405,11 +1405,12 @@ curs_on_u(void)
     flush_screen(1); /* Flush waiting glyphs & put cursor on hero */
 }
 
+/* the #redraw command */
 int
 doredraw(void)
 {
     docrt();
-    return 0;
+    return ECMD_OK;
 }
 
 void

@@ -496,6 +496,7 @@ drink_ok(struct obj *obj)
 }
 
 /* "Quaffing is like drinking, except you spill more." - Terry Pratchett */
+/* the #quaff command */
 int
 dodrink(void)
 {
@@ -503,7 +504,7 @@ dodrink(void)
 
     if (Strangled) {
         pline("If you can't breathe air, how can you drink liquid?");
-        return 0;
+        return ECMD_OK;
     }
     /* Is there a fountain to drink from here? */
     if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
@@ -511,7 +512,7 @@ dodrink(void)
         && can_reach_floor(FALSE)) {
         if (yn("Drink from the fountain?") == 'y') {
             drinkfountain();
-            return 1;
+            return ECMD_TIME;
         }
     }
     /* Or a kitchen sink? */
@@ -520,20 +521,20 @@ dodrink(void)
         && can_reach_floor(FALSE)) {
         if (yn("Drink from the sink?") == 'y') {
             drinksink();
-            return 1;
+            return ECMD_TIME;
         }
     }
     /* Or are you surrounded by water? */
     if (Underwater && !u.uswallow) {
         if (yn("Drink the water around you?") == 'y') {
             pline("Do you know what lives in this water?");
-            return 1;
+            return ECMD_TIME;
         }
     }
 
     otmp = getobj("drink", drink_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return 0;
+        return ECMD_OK;
 
     /* quan > 1 used to be left to useup(), but we need to force
        the current potion to be unworn, and don't want to do
@@ -556,13 +557,13 @@ dodrink(void)
         && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
         ghost_from_bottle();
         useup(otmp);
-        return 1;
+        return ECMD_TIME;
     } else if (objdescr_is(otmp, "smoky")
                && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
                && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
         djinni_from_bottle(otmp);
         useup(otmp);
-        return 1;
+        return ECMD_TIME;
     }
     return dopotion(otmp);
 }
@@ -575,7 +576,7 @@ dopotion(struct obj *otmp)
     otmp->in_use = TRUE;
     g.potion_nothing = g.potion_unkn = 0;
     if ((retval = peffects(otmp)) >= 0)
-        return retval;
+        return retval ? ECMD_TIME : ECMD_OK;
 
     if (g.potion_nothing) {
         g.potion_unkn++;
@@ -590,7 +591,7 @@ dopotion(struct obj *otmp)
             docall(otmp);
     }
     useup(otmp);
-    return 1;
+    return ECMD_TIME;
 }
 
 static void
@@ -2133,9 +2134,9 @@ dodip(void)
     const char *shortestname; /* last resort obj name for prompt */
 
     if (!(obj = getobj("dip", dip_ok, GETOBJ_PROMPT)))
-        return 0;
+        return ECMD_OK;
     if (inaccessible_equipment(obj, "dip", FALSE))
-        return 0;
+        return ECMD_OK;
 
     shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
     /*
@@ -2160,7 +2161,7 @@ dodip(void)
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
             dipfountain(obj);
-            return 1;
+            return ECMD_TIME;
         }
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
@@ -2180,7 +2181,7 @@ dodip(void)
                 if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
                     useup(obj);
             }
-            return 1;
+            return ECMD_TIME;
         }
     }
 
@@ -2189,10 +2190,10 @@ dodip(void)
              flags.verbose ? obuf : shortestname);
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
-        return 0;
+        return ECMD_OK;
     if (potion == obj && potion->quan == 1L) {
         pline("That is a potion bottle, not a Klein bottle!");
-        return 0;
+        return ECMD_OK;
     }
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {
@@ -2220,19 +2221,19 @@ dodip(void)
              */
             if (!obj) {
                 makeknown(POT_POLYMORPH);
-                return 1;
+                return ECMD_TIME;
             } else if (obj->otyp != save_otyp) {
                 makeknown(POT_POLYMORPH);
                 useup(potion);
                 prinv((char *) 0, obj, 0L);
-                return 1;
+                return ECMD_TIME;
             } else {
                 pline("Nothing seems to happen.");
                 goto poof;
             }
         }
         potion->in_use = FALSE; /* didn't go poof */
-        return 1;
+        return ECMD_TIME;
     } else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
         int amt = (int) obj->quan;
         boolean magic;
@@ -2278,7 +2279,7 @@ dodip(void)
             useupall(obj);
             losehp(amt + rnd(9), /* not physical damage */
                    "alchemic blast", KILLED_BY_AN);
-            return 1;
+            return ECMD_TIME;
         }
 
         obj->blessed = obj->cursed = obj->bknown = 0;
@@ -2307,7 +2308,7 @@ dodip(void)
                 useupall(obj);
                 pline_The("mixture %sevaporates.",
                           !Blind ? "glows brightly and " : "");
-                return 1;
+                return ECMD_TIME;
             }
         }
         obj->odiluted = (obj->otyp != POT_WATER);
@@ -2327,7 +2328,7 @@ dodip(void)
            as a consequence, mixing while Fumbling drops the mixture */
         freeinv(obj);
         hold_potion(obj, "You drop %s!", doname(obj), (const char *) 0);
-        return 1;
+        return ECMD_TIME;
     }
 
     if (potion->otyp == POT_ACID && obj->otyp == CORPSE
@@ -2341,7 +2342,7 @@ dodip(void)
             && !objects[potion->otyp].oc_name_known
             && !objects[potion->otyp].oc_uname)
             docall(potion);
-        return 1;
+        return ECMD_TIME;
     }
 
     if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
@@ -2415,7 +2416,7 @@ dodip(void)
         if (potion->dknown)
             makeknown(potion->otyp);
         useup(potion);
-        return 1;
+        return ECMD_TIME;
     }
  more_dips:
 
@@ -2427,7 +2428,7 @@ dodip(void)
             useup(potion);
             explode(u.ux, u.uy, 11, d(6, 6), 0, EXPL_FIERY);
             exercise(A_WIS, FALSE);
-            return 1;
+            return ECMD_TIME;
         }
         /* Adding oil to an empty magic lamp renders it into an oil lamp */
         if ((obj->otyp == MAGIC_LAMP) && obj->spe == 0) {
@@ -2453,7 +2454,7 @@ dodip(void)
             makeknown(POT_OIL);
         obj->spe = 1;
         update_inventory();
-        return 1;
+        return ECMD_TIME;
     }
 
     potion->in_use = FALSE; /* didn't go poof */
@@ -2517,11 +2518,11 @@ dodip(void)
            with compatible ones; override 'pickup_burden' while doing so */
         hold_potion(singlepotion, "You juggle and drop %s!",
                     doname(singlepotion), (const char *) 0);
-        return 1;
+        return ECMD_TIME;
     }
 
     pline("Interesting...");
-    return 1;
+    return ECMD_TIME;
 
  poof:
     if (potion->dknown
@@ -2529,7 +2530,7 @@ dodip(void)
         && !objects[potion->otyp].oc_uname)
         docall(potion);
     useup(potion);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* *monp grants a wish and then leaves the game */

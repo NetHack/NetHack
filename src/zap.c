@@ -2365,7 +2365,7 @@ zap_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
-/* 'z' command (or 'y' if numbed_pad==-1) */
+/* #zap command, 'z' (or 'y' if numbed_pad==-1) */
 int
 dozap(void)
 {
@@ -2374,13 +2374,13 @@ dozap(void)
 
     if (nohands(g.youmonst.data)) {
         You("aren't able to zap anything in your current form.");
-        return 0;
+        return ECMD_OK;
     }
     if (check_capacity((char *) 0))
-        return 0;
+        return ECMD_OK;
     obj = getobj("zap", zap_ok, GETOBJ_NOFLAGS);
     if (!obj)
-        return 0;
+        return ECMD_OK;
 
     check_unpaid(obj);
 
@@ -2392,7 +2392,7 @@ dozap(void)
         exercise(A_STR, FALSE);
         /* 'obj' is gone; skip update_inventory() because
            backfire() -> useupall() -> freeinv() did it */
-        return 1;
+        return ECMD_TIME;
     } else if (need_dir && !getdir((char *) 0)) {
         if (!Blind)
             pline("%s glows and fades.", The(xname(obj)));
@@ -2421,7 +2421,7 @@ dozap(void)
         useupall(obj); /* calls freeinv() -> update_inventory() */
     } else
         update_inventory(); /* maybe used a charge */
-    return 1;
+    return ECMD_TIME;
 }
 
 /* Lock or unlock all boxes in inventory */

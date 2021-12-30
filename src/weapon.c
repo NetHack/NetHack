@@ -1289,7 +1289,7 @@ enhance_weapon_skill(void)
             }
         }
     } while (speedy && n > 0);
-    return 0;
+    return ECMD_OK;
 }
 
 /*

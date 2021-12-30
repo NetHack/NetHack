@@ -40,7 +40,7 @@ dosit(void)
 
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));
-        return 0;
+        return ECMD_OK;
     }
     if (u.uundetected && is_hider(g.youmonst.data) && u.umonnum != PM_TRAPPER)
         u.uundetected = 0; /* no longer on the ceiling */
@@ -52,7 +52,7 @@ dosit(void)
             You("tumble in place.");
         else
             You("are sitting on air.");
-        return 0;
+        return ECMD_OK;
     } else if (u.ustuck && !sticks(g.youmonst.data)) {
         /* holding monster is next to hero rather than beneath, but
            hero is in no condition to actually sit at has/her own spot */
@@ -60,7 +60,7 @@ dosit(void)
             pline("%s won't offer %s lap.", Monnam(u.ustuck), mhis(u.ustuck));
         else
             pline("%s has no lap.", Monnam(u.ustuck));
-        return 0;
+        return ECMD_OK;
     } else if (is_pool(u.ux, u.uy) && !Underwater) { /* water walking */
         goto in_water;
     }
@@ -150,7 +150,7 @@ dosit(void)
         burn_away_slime();
         if (likes_lava(g.youmonst.data)) {
             pline_The("%s feels warm.", hliquid("lava"));
-            return 1;
+            return ECMD_TIME;
         }
         pline_The("%s burns you!", hliquid("lava"));
         losehp(d((Fire_resistance ? 2 : 10), 10), /* lava damage */
@@ -323,20 +323,20 @@ dosit(void)
                   Hallucination
                       ? "You may think you are a platypus, but a male still"
                       : "Males");
-            return 0;
+            return ECMD_OK;
         } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
             You("don't have enough energy to lay an egg.");
-            return 0;
+            return ECMD_OK;
         } else if (eggs_in_water(g.youmonst.data)) {
             if (!(Underwater || Is_waterlevel(&u.uz))) {
                 pline("A splash tetra you are not.");
-                return 0;
+                return ECMD_OK;
             }
             if (Upolyd
                 && (g.youmonst.data == &mons[PM_GIANT_EEL]
                     || g.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
                 You("yearn for the Sargasso Sea.");
-                return 0;
+                return ECMD_OK;
             }
         }
         uegg = mksobj(EGG, FALSE, FALSE);
@@ -353,7 +353,7 @@ dosit(void)
     } else {
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /* curse a few inventory items at random! */

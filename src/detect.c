@@ -1813,15 +1813,15 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
     return 1;
 }
 
-/* the 's' command -- explicit searching */
+/* the #search command -- explicit searching */
 int
 dosearch(void)
 {
     if (cmd_safety_prevention("another search",
                           "You already found a monster.",
                           &g.already_found_flag))
-        return 0;
-    return dosearch0(0);
+        return ECMD_OK;
+    return dosearch0(0) ? ECMD_TIME : ECMD_OK;
 }
 
 void

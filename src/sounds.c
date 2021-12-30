@@ -550,7 +550,7 @@ mon_is_gecko(struct monst* mon)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-static int
+static int /* check calls to this */
 domonnoise(register struct monst* mtmp)
 {
     char verbuf[BUFSZ];
@@ -562,9 +562,9 @@ domonnoise(register struct monst* mtmp)
 
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
-        return 0;
+        return ECMD_OK;
     if (is_silent(ptr))
-        return 0;
+        return ECMD_OK;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp->m_id == g.quest_status.leader_m_id && msound > MS_ANIMAL)
@@ -590,7 +590,7 @@ domonnoise(register struct monst* mtmp)
 
     switch (msound) {
     case MS_ORACLE:
-        return doconsult(mtmp);
+        return doconsult(mtmp); /* check this */
     case MS_PRIEST:
         priest_talk(mtmp);
         break;
@@ -749,7 +749,7 @@ domonnoise(register struct monst* mtmp)
         if (!mtmp->mpeaceful)
             pline_msg = "hisses!";
         else
-            return 0; /* no sound */
+            return ECMD_OK; /* no sound */
         break;
     case MS_BUZZ:
         pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
@@ -1047,7 +1047,7 @@ domonnoise(register struct monst* mtmp)
             verbalize1(verbl_msg);
         }
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -1072,19 +1072,19 @@ dochat(void)
     if (is_silent(g.youmonst.data)) {
         pline("As %s, you cannot speak.",
               an(pmname(g.youmonst.data, flags.female ? FEMALE : MALE)));
-        return 0;
+        return ECMD_OK;
     }
     if (Strangled) {
         You_cant("speak.  You're choking!");
-        return 0;
+        return ECMD_OK;
     }
     if (u.uswallow) {
         pline("They won't hear you out there.");
-        return 0;
+        return ECMD_OK;
     }
     if (Underwater) {
         Your("speech is unintelligible underwater.");
-        return 0;
+        return ECMD_OK;
     }
     if (!Deaf && !Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *) 0) {
         /* standing on something in a shop and chatting causes the shopkeeper
@@ -1095,25 +1095,25 @@ dochat(void)
            contains any objects other than just gold.
         */
         price_quote(otmp);
-        return 1;
+        return ECMD_TIME;
     }
 
     if (!getdir("Talk to whom? (in what direction)")) {
         /* decided not to chat */
-        return 0;
+        return ECMD_OK;
     }
 
     if (u.usteed && u.dz > 0) {
         if (!u.usteed->mcanmove || u.usteed->msleeping) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
-            return 1;
+            return ECMD_TIME;
         } else
             return domonnoise(u.usteed);
     }
 
     if (u.dz) {
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
-        return 0;
+        return ECMD_OK;
     }
 
     if (u.dx == 0 && u.dy == 0) {
@@ -1128,14 +1128,14 @@ dochat(void)
         }
          */
         pline("Talking to yourself is a bad habit for a dungeoneer.");
-        return 0;
+        return ECMD_OK;
     }
 
     tx = u.ux + u.dx;
     ty = u.uy + u.dy;
 
     if (!isok(tx, ty))
-        return 0;
+        return ECMD_OK;
 
     mtmp = m_at(tx, ty);
 
@@ -1146,7 +1146,7 @@ dochat(void)
                 pline_The("%s seems not to notice you.",
                           /* if hallucinating, you can't tell it's a statue */
                           Hallucination ? rndmonnam((char *) 0) : "statue");
-            return 0;
+            return ECMD_OK;
         }
         if (!Deaf && (IS_WALL(levl[tx][ty].typ) || levl[tx][ty].typ == SDOOR)) {
             /* Talking to a wall; secret door remains hidden by behaving
@@ -1175,14 +1175,14 @@ dochat(void)
                     idx = SIZE(walltalk) - 1;
                 pline_The("wall %s", walltalk[idx]);
             }
-            return 0;
+            return ECMD_OK;
         }
     }
 
     if (!mtmp || mtmp->mundetected
         || M_AP_TYPE(mtmp) == M_AP_FURNITURE
         || M_AP_TYPE(mtmp) == M_AP_OBJECT)
-        return 0;
+        return ECMD_OK;
 
     /* sleeping monsters won't talk, except priests (who wake up) */
     if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {
@@ -1190,7 +1190,7 @@ dochat(void)
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp))
             pline("%s seems not to notice you.", Monnam(mtmp));
-        return 0;
+        return ECMD_OK;
     }
 
     /* if this monster is waiting for something, prod it into action */
@@ -1200,7 +1200,7 @@ dochat(void)
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         pline("%s is eating noisily.", Monnam(mtmp));
-        return 0;
+        return ECMD_OK;
     }
     if (Deaf) {
         const char *xresponse = humanoid(g.youmonst.data)
@@ -1211,7 +1211,7 @@ dochat(void)
               canspotmon(mtmp) ? " from " : "",
               canspotmon(mtmp) ? mon_nam(mtmp) : "",
               xresponse);
-        return 0;
+        return ECMD_OK;
     }
     return domonnoise(mtmp);
 }

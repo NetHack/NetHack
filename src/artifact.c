@@ -1434,9 +1434,9 @@ doinvoke(void)
 
     obj = getobj("invoke", invoke_ok, GETOBJ_PROMPT);
     if (!obj)
-        return 0;
+        return ECMD_OK;
     if (!retouch_object(&obj, FALSE))
-        return 1;
+        return ECMD_TIME;
     return arti_invoke(obj);
 }
 
@@ -1446,14 +1446,14 @@ arti_invoke(struct obj *obj)
     register const struct artifact *oart = get_artifact(obj);
     if (!obj) {
         impossible("arti_invoke without obj");
-        return 0;
+        return ECMD_OK;
     }
     if (!oart || !oart->inv_prop) {
         if (obj->otyp == CRYSTAL_BALL)
             use_crystal_ball(&obj);
         else
             pline1(nothing_happens);
-        return 1;
+        return ECMD_TIME;
     }
 
     if (oart->inv_prop > LAST_PROP) {
@@ -1464,7 +1464,7 @@ arti_invoke(struct obj *obj)
                      otense(obj, "are"));
             /* and just got more so; patience is essential... */
             obj->age += (long) d(3, 10);
-            return 1;
+            return ECMD_TIME;
         }
         obj->age = g.moves + rnz(100);
 
@@ -1521,7 +1521,7 @@ arti_invoke(struct obj *obj)
         case UNTRAP: {
             if (!untrap(TRUE)) {
                 obj->age = 0; /* don't charge for changing their mind */
-                return 0;
+                return ECMD_OK;
             }
             break;
         }
@@ -1532,7 +1532,7 @@ arti_invoke(struct obj *obj)
 
             if (!otmp) {
                 obj->age = 0;
-                return 0;
+                return ECMD_OK;
             }
             b_effect = (obj->blessed && (oart->role == Role_switch
                                          || oart->role == NON_PM));
@@ -1641,7 +1641,7 @@ arti_invoke(struct obj *obj)
                      otense(obj, "are"));
             /* can't just keep repeatedly trying */
             obj->age += (long) d(3, 10);
-            return 1;
+            return ECMD_TIME;
         } else if (!on) {
             /* when turning off property, determine downtime */
             /* arbitrary for now until we can tune this -dlc */
@@ -1653,7 +1653,7 @@ arti_invoke(struct obj *obj)
             /* you had the property from some other source too */
             if (carried(obj))
                 You_feel("a surge of power, but nothing seems to happen.");
-            return 1;
+            return ECMD_TIME;
         }
         switch (oart->inv_prop) {
         case CONFLICT:
@@ -1682,7 +1682,7 @@ arti_invoke(struct obj *obj)
         }
     }
 
-    return 1;
+    return ECMD_TIME;
 }
 
 /* will freeing this object from inventory cause levitation to end? */
@@ -2053,7 +2053,7 @@ untouchable(struct obj *obj, boolean drop_untouchable)
                carried effect was turned off, else we leave that alone;
                we turn off invocation property here if still carried */
             if (invoked && obj)
-                arti_invoke(obj); /* reverse #invoke */
+                (void) arti_invoke(obj); /* reverse #invoke */
             return TRUE;
         }
     }

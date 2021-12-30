@@ -2431,7 +2431,7 @@ donamelevel(void)
     char nbuf[BUFSZ]; /* Buffer for response */
 
     if (!(mptr = find_mapseen(&u.uz)))
-        return 0;
+        return ECMD_OK;
 
     nbuf[0] = '\0';
 #ifdef EDIT_GETLIN
@@ -2453,7 +2453,7 @@ donamelevel(void)
     /* empty input or ESC means don't add or change annotation;
        space-only means discard current annotation without adding new one */
     if (!*nbuf || *nbuf == '\033')
-        return 0;
+        return ECMD_OK;
     /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
 
@@ -2469,7 +2469,7 @@ donamelevel(void)
         mptr->custom = dupstr(nbuf);
         mptr->custom_lth = strlen(mptr->custom);
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /* find the particular mapseen object in the chain; may return null */
@@ -3088,7 +3088,7 @@ int
 dooverview(void)
 {
     show_overview(0, 0);
-    return 0;
+    return ECMD_OK;
 }
 
 /* called for #overview or for end of game disclosure */

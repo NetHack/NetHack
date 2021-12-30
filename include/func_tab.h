@@ -18,7 +18,7 @@
 struct ext_func_tab {
     uchar key;
     const char *ef_txt, *ef_desc;
-    int (*ef_funct)(void);
+    int (*ef_funct)(void); /* must return ECMD_foo flags */
     int flags;
     const char *f_text;
 };

@@ -1829,7 +1829,7 @@ doattributes(void)
         mode |= MAGICENLIGHTENMENT;
 
     enlightenment(mode, ENL_GAMEINPROGRESS);
-    return 0;
+    return ECMD_OK;
 }
 
 void
@@ -1895,7 +1895,7 @@ int
 doconduct(void)
 {
     show_conduct(0);
-    return 0;
+    return ECMD_OK;
 }
 
 /* display conducts; for doconduct(), also disclose() and dump_everything() */
@@ -2415,7 +2415,7 @@ int
 dovanquished(void)
 {
     list_vanquished('a', FALSE);
-    return 0;
+    return ECMD_OK;
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -2450,7 +2450,7 @@ doborn(void)
     display_nhwindow(datawin, FALSE);
     destroy_nhwindow(datawin);
 
-    return 0;
+    return ECMD_OK;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL

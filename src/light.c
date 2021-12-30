@@ -825,6 +825,7 @@ arti_light_description(struct obj *obj)
     return "strangely";
 }
 
+/* the #lightsources command */
 int
 wiz_light_sources(void)
 {
@@ -834,7 +835,7 @@ wiz_light_sources(void)
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR)
-        return 0;
+        return ECMD_OK;
 
     Sprintf(buf, "Mobile light sources: hero @ (%2d,%2d)", u.ux, u.uy);
     putstr(win, 0, buf);
@@ -865,7 +866,7 @@ wiz_light_sources(void)
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 
-    return 0;
+    return ECMD_OK;
 }
 
 /*light.c*/

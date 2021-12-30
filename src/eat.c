@@ -2480,7 +2480,7 @@ edibility_prompts(struct obj *otmp)
     return 0;
 }
 
-/* 'e' command */
+/* the #eat command */
 int
 doeat(void)
 {
@@ -2491,12 +2491,12 @@ doeat(void)
 
     if (Strangled) {
         pline("If you can't breathe air, how can you consume solids?");
-        return 0;
+        return ECMD_OK;
     }
     if (!(otmp = floorfood("eat", 0)))
-        return 0;
+        return ECMD_OK;
     if (check_capacity((char *) 0))
-        return 0;
+        return ECMD_OK;
 
     if (u.uedibility) {
         int res = edibility_prompts(otmp);
@@ -2507,7 +2507,7 @@ doeat(void)
                  body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
-                return 0;
+                return ECMD_OK;
         }
     }
 
@@ -2521,7 +2521,7 @@ doeat(void)
                bars so wouldn't know that more turns of eating are required */
             You("pause to swallow.");
         }
-        return 1;
+        return ECMD_TIME;
     }
     /* We have to make non-foods take 1 move to eat, unless we want to
      * do ridiculous amounts of coding to deal with partly eaten plate
@@ -2530,15 +2530,15 @@ doeat(void)
      */
     if (!is_edible(otmp)) {
         You("cannot eat that!");
-        return 0;
+        return ECMD_OK;
     } else if ((otmp->owornmask & (W_ARMOR | W_TOOL | W_AMUL | W_SADDLE))
                != 0) {
         /* let them eat rings */
         You_cant("eat %s you're wearing.", something);
-        return 0;
+        return ECMD_OK;
     } else if (!(carried(otmp) ? retouch_object(&otmp, FALSE)
                                : touch_artifact(otmp, &g.youmonst))) {
-        return 1; /* got blasted so use a turn */
+        return ECMD_TIME; /* got blasted so use a turn */
     }
     if (is_metallic(otmp) && u.umonnum == PM_RUST_MONSTER
         && otmp->oerodeproof) {
@@ -2573,7 +2573,7 @@ doeat(void)
             }
             stackobj(otmp);
         }
-        return 1;
+        return ECMD_TIME;
     }
     /* KMH -- Slow digestion is... indigestible */
     if (otmp->otyp == RIN_SLOW_DIGESTION) {
@@ -2582,7 +2582,7 @@ doeat(void)
         if (otmp->dknown && !objects[otmp->otyp].oc_name_known
             && !objects[otmp->otyp].oc_uname)
             docall(otmp);
-        return 1;
+        return ECMD_TIME;
     }
     if (otmp->oclass != FOOD_CLASS) {
         int material;
@@ -2646,7 +2646,7 @@ doeat(void)
                       : singular(otmp, xname));
         }
         eatspecial();
-        return 1;
+        return ECMD_TIME;
     }
 
     if (otmp == g.context.victual.piece) {
@@ -2671,7 +2671,7 @@ doeat(void)
         You("%s your meal.",
             !one_bite_left ? "resume" : "consume the last bite of");
         start_eating(g.context.victual.piece, FALSE);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* nothing in progress - so try to find something. */
@@ -2679,7 +2679,7 @@ doeat(void)
     /* tins must also check conduct separately in case they're discarded */
     if (otmp->otyp == TIN) {
         start_tin(otmp);
-        return 1;
+        return ECMD_TIME;
     }
 
     /* KMH, conduct */
@@ -2703,7 +2703,7 @@ doeat(void)
             /* used up */
             g.context.victual.piece = (struct obj *) 0;
             g.context.victual.o_id = 0;
-            return 1;
+            return ECMD_TIME;
         } else if (tmp)
             dont_start = TRUE;
         /* if not used up, eatcorpse sets up reqtime and may modify oeaten */
@@ -2777,7 +2777,7 @@ doeat(void)
 
     if (!dont_start)
         start_eating(otmp, already_partly_eaten);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* getobj callback for object to be opened with a tin opener */
@@ -2795,11 +2795,11 @@ int
 use_tin_opener(struct obj *obj)
 {
     struct obj *otmp;
-    int res = 0;
+    int res = ECMD_OK;
 
     if (!carrying(TIN)) {
         You("have no tin to open.");
-        return 0;
+        return ECMD_OK;
     }
 
     if (obj != uwep) {
@@ -2808,11 +2808,11 @@ use_tin_opener(struct obj *obj)
 
             if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
                               obj, doname, thesimpleoname, "that")) != 'y')
-                return 0;
+                return ECMD_OK;
         }
         if (!wield_tool(obj, "use"))
-            return 0;
-        res = 1;
+            return ECMD_OK;
+        res = ECMD_TIME;
     }
 
     otmp = getobj("open", tinopen_ok, GETOBJ_NOFLAGS);
@@ -2820,7 +2820,7 @@ use_tin_opener(struct obj *obj)
         return res;
 
     start_tin(otmp);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* Take a single bite from a piece of food, checking for choking and

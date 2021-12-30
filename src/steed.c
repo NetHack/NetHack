@@ -40,28 +40,28 @@ use_saddle(struct obj* otmp)
     int chance;
 
     if (!u_handsy())
-        return 0;
+        return ECMD_OK;
 
     /* Select an animal */
     if (u.uswallow || Underwater || !getdir((char *) 0)) {
         pline1(Never_mind);
-        return 0;
+        return ECMD_OK;
     }
     if (!u.dx && !u.dy) {
         pline("Saddle yourself?  Very funny...");
-        return 0;
+        return ECMD_OK;
     }
     if (!isok(u.ux + u.dx, u.uy + u.dy)
         || !(mtmp = m_at(u.ux + u.dx, u.uy + u.dy)) || !canspotmon(mtmp)) {
         pline("I see nobody there.");
-        return 1;
+        return ECMD_TIME;
     }
 
     /* Is this a valid monster? */
     if ((mtmp->misc_worn_check & W_SADDLE) != 0L
         || which_armor(mtmp, W_SADDLE)) {
         pline("%s doesn't need another one.", Monnam(mtmp));
-        return 1;
+        return ECMD_TIME;
     }
     ptr = mtmp->data;
     if (touch_petrifies(ptr) && !uarmg && !Stone_resistance) {
@@ -77,16 +77,16 @@ use_saddle(struct obj* otmp)
     if (ptr == &mons[PM_AMOROUS_DEMON]) {
         pline("Shame on you!");
         exercise(A_WIS, FALSE);
-        return 1;
+        return ECMD_TIME;
     }
     if (mtmp->isminion || mtmp->isshk || mtmp->ispriest || mtmp->isgd
         || mtmp->iswiz) {
         pline("I think %s would mind.", mon_nam(mtmp));
-        return 1;
+        return ECMD_TIME;
     }
     if (!can_saddle(mtmp)) {
         You_cant("saddle such a creature.");
-        return 1;
+        return ECMD_TIME;
     }
 
     /* Calculate your chance */
@@ -134,7 +134,7 @@ use_saddle(struct obj* otmp)
         put_saddle_on_mon(otmp, mtmp);
     } else
         pline("%s resists!", Monnam(mtmp));
-    return 1;
+    return ECMD_TIME;
 }
 
 void
@@ -161,6 +161,7 @@ can_ride(struct monst* mtmp)
             && (!Underwater || is_swimmer(mtmp->data)));
 }
 
+/* the #ride command */
 int
 doride(void)
 {
@@ -171,11 +172,12 @@ doride(void)
     } else if (getdir((char *) 0) && isok(u.ux + u.dx, u.uy + u.dy)) {
         if (wizard && yn("Force the mount to succeed?") == 'y')
             forcemount = TRUE;
-        return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount));
+        return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount)
+                ? ECMD_TIME : ECMD_OK);
     } else {
-        return 0;
+        return ECMD_OK;
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /* Start riding, with the given monster */

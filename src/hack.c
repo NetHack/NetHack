@@ -910,7 +910,7 @@ test_move(int ux, int uy, int dx, int dy, int mode)
                     if (flags.autoopen && !g.context.run
                         && !Confusion && !Stunned && !Fumbling) {
                         g.context.door_opened
-                            = g.context.move = doopen_indir(x, y);
+                            = g.context.move = (doopen_indir(x, y) == ECMD_TIME ? 1 : 0);
                     } else if (x == ux || y == uy) {
                         if (Blind || Stunned || ACURR(A_DEX) < 10
                             || Fumbling) {
@@ -2894,7 +2894,7 @@ pickup_checks(void)
     return -1; /* can do normal pickup */
 }
 
-/* the ',' command */
+/* the #pickup command */
 int
 dopickup(void)
 {
@@ -2904,13 +2904,13 @@ dopickup(void)
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks()) >= 0) {
-        return ret;
+        return (ret ? ECMD_TIME : ECMD_OK);
     } else if (ret == -2) {
         tmpcount = -count;
-        return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
+        return (loot_mon(u.ustuck, &tmpcount, (boolean *) 0) ? ECMD_TIME : ECMD_OK);
     } /* else ret == -1 */
 
-    return pickup(-count);
+    return (pickup(-count) ? ECMD_TIME : ECMD_OK);
 }
 
 /* stop running if we see something interesting next to us */

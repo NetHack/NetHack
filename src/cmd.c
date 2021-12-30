@@ -171,10 +171,12 @@ static const char unavailcmd[] = "Unavailable command '%s'.";
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
 
+/* the #prevmsg command */
 static int
 doprev_message(void)
 {
-    return nh_doprev_message();
+    (void) nh_doprev_message();
+    return ECMD_OK;
 }
 
 /* Count down by decrementing multi */
@@ -379,7 +381,7 @@ doextcmd(void)
     do {
         idx = get_ext_cmd();
         if (idx < 0)
-            return 0; /* quit */
+            return ECMD_OK; /* quit */
 
         func = extcmdlist[idx].ef_funct;
         if (!can_do_extcmd(&extcmdlist[idx]))
@@ -608,7 +610,7 @@ doextlist(void)
         }
     }
     destroy_nhwindow(menuwin);
-    return 0;
+    return ECMD_OK;
 }
 
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
@@ -790,7 +792,7 @@ domonability(void)
             There("is no fountain here.");
     } else if (is_unicorn(g.youmonst.data)) {
         use_unicorn_horn((struct obj **) 0);
-        return 1;
+        return ECMD_TIME;
     } else if (g.youmonst.data->msound == MS_SHRIEK) {
         You("shriek.");
         if (u.uburied)
@@ -804,7 +806,7 @@ domonability(void)
     } else {
         You("don't have a special ability in your normal form!");
     }
-    return 0;
+    return ECMD_OK;
 }
 
 int
@@ -821,7 +823,7 @@ enter_explore_mode(void)
             || !check_user_string(sysopt.explorers)) {
             if (!wizard) {
                 You("cannot access explore mode.");
-                return 0;
+                return ECMD_OK;
             } else {
                 pline(
                  "Note: normally you wouldn't be allowed into explore mode.");
@@ -843,10 +845,10 @@ enter_explore_mode(void)
             pline("Continuing with %s.", oldmode);
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^W command - wish for something */
+/* #wizwish command - wish for something */
 static int
 wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
 {
@@ -859,10 +861,10 @@ wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
         (void) encumber_msg();
     } else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_wish)));
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^I command - reveal and optionally identify hero's inventory */
+/* #wizidentify command - reveal and optionally identify hero's inventory */
 static int
 wiz_identify(void)
 {
@@ -879,7 +881,7 @@ wiz_identify(void)
         iflags.override_ID = 0;
     } else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_identify)));
-    return 0;
+    return ECMD_OK;
 }
 
 void
@@ -999,10 +1001,10 @@ wiz_makemap(void)
     } else {
         pline(unavailcmd, "#wizmakemap");
     }
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^F command - reveal the level map and any traps on it */
+/* the #wizmap command - reveal the level map and any traps on it */
 static int
 wiz_map(void)
 {
@@ -1020,10 +1022,10 @@ wiz_map(void)
         HHallucination = save_Hhallu;
     } else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_map)));
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^G command - generate monster(s); a count prefix will be honored */
+/* #wizgenesis - generate monster(s); a count prefix will be honored */
 static int
 wiz_genesis(void)
 {
@@ -1031,10 +1033,10 @@ wiz_genesis(void)
         (void) create_particular();
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_genesis)));
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^O command - display dungeon layout */
+/* #wizwhere command - display dungeon layout */
 static int
 wiz_where(void)
 {
@@ -1042,10 +1044,10 @@ wiz_where(void)
         (void) print_dungeon(FALSE, (schar *) 0, (xchar *) 0);
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_where)));
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^E command - detect unseen (secret doors, traps, hidden monsters) */
+/* the #wizdetect command - detect secret doors, traps, hidden monsters */
 static int
 wiz_detect(void)
 {
@@ -1053,9 +1055,10 @@ wiz_detect(void)
         (void) findit();
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_detect)));
-    return 0;
+    return ECMD_OK;
 }
 
+/* the #wizloadlua command - load an arbitrary lua file */
 static int
 wiz_load_lua(void)
 {
@@ -1071,9 +1074,10 @@ wiz_load_lua(void)
         (void) load_lua(buf);
     } else
         pline("Unavailable command 'wiz_load_lua'.");
-    return 0;
+    return ECMD_OK;
 }
 
+/* the #wizloaddes command - load a special level lua file */
 static int
 wiz_load_splua(void)
 {
@@ -1093,10 +1097,10 @@ wiz_load_splua(void)
 
     } else
         pline("Unavailable command 'wiz_load_splua'.");
-    return 0;
+    return ECMD_OK;
 }
 
-/* ^V command - level teleport */
+/* the #wizlevelport command - level teleport */
 static int
 wiz_level_tele(void)
 {
@@ -1104,7 +1108,7 @@ wiz_level_tele(void)
         level_tele();
     else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_level_tele)));
-    return 0;
+    return ECMD_OK;
 }
 
 /* #wizfliplevel - transpose the current level */
@@ -1138,7 +1142,7 @@ wiz_flip_level(void)
             pline("%s", Never_mind);
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /* #levelchange command - adjust hero's experience level */
@@ -1158,14 +1162,14 @@ wiz_level_change(void)
 
     if (ret != 1) {
         pline1(Never_mind);
-        return 0;
+        return ECMD_OK;
     }
     if (newlevel == u.ulevel) {
         You("are already that experienced.");
     } else if (newlevel < u.ulevel) {
         if (u.ulevel == 1) {
             You("are already as inexperienced as you can get.");
-            return 0;
+            return ECMD_OK;
         }
         if (newlevel < 1)
             newlevel = 1;
@@ -1174,7 +1178,7 @@ wiz_level_change(void)
     } else {
         if (u.ulevel >= MAXULEV) {
             You("are already as experienced as you can get.");
-            return 0;
+            return ECMD_OK;
         }
         if (newlevel > MAXULEV)
             newlevel = MAXULEV;
@@ -1182,7 +1186,7 @@ wiz_level_change(void)
             pluslvl(FALSE);
     }
     u.ulevelmax = u.ulevel;
-    return 0;
+    return ECMD_OK;
 }
 
 /* #panic command - test program's panic handling */
@@ -1192,12 +1196,12 @@ wiz_panic(void)
     if (iflags.debug_fuzzer) {
         u.uhp = u.uhpmax = 1000;
         u.uen = u.uenmax = 1000;
-        return 0;
+        return ECMD_OK;
     }
     if (paranoid_query(TRUE,
                        "Do you want to call panic() and end your game?"))
         panic("Crash test.");
-    return 0;
+    return ECMD_OK;
 }
 
 /* #polyself command - change hero's form */
@@ -1205,7 +1209,7 @@ static int
 wiz_polyself(void)
 {
     polyself(1);
-    return 0;
+    return ECMD_OK;
 }
 
 /* #seenv command */
@@ -1249,7 +1253,7 @@ wiz_show_seenv(void)
     }
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 
 /* #vision command */
@@ -1284,7 +1288,7 @@ wiz_show_vision(void)
     }
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 
 /* #wmode command */
@@ -1320,7 +1324,7 @@ wiz_show_wmodes(void)
     }
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 
 /* wizard mode variant of #terrain; internal levl[][].typ values in base-36 */
@@ -1554,7 +1558,7 @@ wiz_smell(void)
     mndx = 0; /* gcc -Wall lint */
     if (!olfaction(g.youmonst.data)) {
         You("are incapable of detecting odors in your present form.");
-        return 0;
+        return ECMD_OK;
     }
 
     pline("You can move the cursor to a monster that you want to smell.");
@@ -1562,7 +1566,7 @@ wiz_smell(void)
         pline("Pick a monster to smell.");
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 0) {
-            return 0; /* done */
+            return ECMD_OK; /* done */
         }
         /* Convert the glyph at the selected position to a mndxbol. */
         glyph = glyph_at(cc.x, cc.y);
@@ -1577,7 +1581,7 @@ wiz_smell(void)
         } else
             pline("That is not a monster.");
     } while (TRUE);
-    return 0;
+    return ECMD_OK;
 }
 
 RESTORE_WARNING_CONDEXPR_IS_CONSTANT
@@ -1735,7 +1739,7 @@ wiz_intrinsic(void)
         doredraw();
     } else
         pline(unavailcmd, visctrl((int) cmd_from_func(wiz_intrinsic)));
-    return 0;
+    return ECMD_OK;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -1745,7 +1749,7 @@ static int
 wiz_rumor_check(void)
 {
     rumor_check();
-    return 0;
+    return ECMD_OK;
 }
 
 /* #terrain command -- show known map, inspired by crawl's '|' command */
@@ -1837,7 +1841,7 @@ doterrain(void)
     default:
         break;
     }
-    return 0; /* no time elapses */
+    return ECMD_OK; /* no time elapses */
 }
 
 /* extcmdlist: full command list, ordered by command name;
@@ -2875,7 +2879,7 @@ misc_stats(winid win, long *total_count, long *total_size)
     }
 }
 
-/*
+/* the #stats command
  * Display memory usage of all monsters and objects on the level.
  */
 static int
@@ -2959,7 +2963,7 @@ wiz_show_stats(void)
 
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2987,10 +2991,10 @@ wiz_migrate_mons(void)
 
     getlin("How many random monsters to migrate? [0]", inbuf);
     if (*inbuf == '\033')
-        return 0;
+        return ECMD_OK;
     mcount = atoi(inbuf);
     if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz))
-        return 0;
+        return ECMD_OK;
     while (mcount > 0) {
         if (Is_stronghold(&u.uz))
             assign_level(&tolevel, &valley_level);
@@ -3003,7 +3007,7 @@ wiz_migrate_mons(void)
                              (coord *) 0);
         mcount--;
     }
-    return 0;
+    return ECMD_OK;
 }
 #endif
 
@@ -3597,7 +3601,7 @@ rhack(char *cmd)
         /* current - use *cmd to directly index cmdlist array */
         if (tlist != 0) {
             if (!can_do_extcmd(tlist)) {
-                res = 0;
+                res = ECMD_OK;
                 cmdq_clear();
             } else {
                 /* we discard 'const' because some compilers seem to have
@@ -3607,7 +3611,7 @@ rhack(char *cmd)
                     set_occupation(func, tlist->f_text, g.multi);
                 res = (*func)(); /* perform the command */
             }
-            if (!res) {
+            if (!(res & ECMD_TIME)) {
                 g.context.move = FALSE;
                 g.multi = 0;
             }
@@ -4033,7 +4037,7 @@ doherecmdmenu(void)
 {
     char ch = here_cmd_menu(TRUE);
 
-    return ch ? 1 : 0;
+    return ch ? ECMD_TIME : ECMD_OK;
 }
 
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
@@ -4043,14 +4047,14 @@ dotherecmdmenu(void)
     char ch;
 
     if (!getdir((const char *) 0) || !isok(u.ux + u.dx, u.uy + u.dy))
-        return 0;
+        return ECMD_OK;
 
     if (u.dx || u.dy)
         ch = there_cmd_menu(TRUE, u.ux + u.dx, u.uy + u.dy);
     else
         ch = here_cmd_menu(TRUE);
 
-    return ch ? 1 : 0;
+    return ch ? ECMD_TIME : ECMD_OK;
 }
 
 static void
@@ -4695,7 +4699,7 @@ dotravel(void)
         if (!getpos_menu(&cc, GLOC_INTERESTING)) {
             iflags.getloc_filter = gf;
             iflags.getloc_travelmode = FALSE;
-            return 0;
+            return ECMD_OK;
         }
         iflags.getloc_filter = gf;
     } else {
@@ -4703,7 +4707,7 @@ dotravel(void)
         if (getpos(&cc, TRUE, "the desired destination") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
-            return 0;
+            return ECMD_OK;
         }
     }
     iflags.travelcc.x = u.tx = cc.x;
@@ -4717,7 +4721,7 @@ static int
 dotravel_target(void)
 {
     if (!isok(iflags.travelcc.x, iflags.travelcc.y))
-        return 0;
+        return ECMD_OK;
 
     iflags.getloc_travelmode = FALSE;
 
@@ -4733,7 +4737,7 @@ dotravel_target(void)
     g.context.mv = TRUE;
 
     domove();
-    return 1;
+    return ECMD_TIME;
 }
 
 /* mouse click look command */
@@ -4744,9 +4748,9 @@ doclicklook(void)
         return 0;
 
     g.context.move = FALSE;
-    do_look(2, &g.clicklook_cc);
+    (void) do_look(2, &g.clicklook_cc);
 
-    return 0;
+    return ECMD_OK;
 }
 
 /*
@@ -4850,7 +4854,7 @@ dosuspend_core(void)
     } else
 #endif
         Norep(cmdnotavail, "#suspend");
-    return 0;
+    return ECMD_OK;
 }
 
 /* '!' command, #shell */
@@ -4868,7 +4872,7 @@ dosh_core(void)
 #else
     Norep(cmdnotavail, "#shell");
 #endif
-    return 0;
+    return ECMD_OK;
 }
 
 /*cmd.c*/

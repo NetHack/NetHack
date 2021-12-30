@@ -54,14 +54,14 @@ use_camera(struct obj *obj)
 
     if (Underwater) {
         pline("Using your camera underwater would void the warranty.");
-        return 0;
+        return ECMD_OK;
     }
     if (!getdir((char *) 0))
-        return 0;
+        return ECMD_OK;
 
     if (obj->spe <= 0) {
         pline1(nothing_happens);
-        return 1;
+        return ECMD_TIME;
     }
     consume_obj_charge(obj, TRUE);
 
@@ -86,7 +86,7 @@ use_camera(struct obj *obj)
            to be deferred until after flash_hits_mon() */
         transient_light_cleanup();
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 static int
@@ -96,10 +96,10 @@ use_towel(struct obj *obj)
 
     if (!freehand()) {
         You("have no free %s!", body_part(HAND));
-        return 0;
+        return ECMD_OK;
     } else if (obj == ublindf) {
         You("cannot use it while you're wearing it!");
-        return 0;
+        return ECMD_OK;
     } else if (obj->cursed) {
         long old;
 
@@ -111,7 +111,7 @@ use_towel(struct obj *obj)
                  (old ? "are filthier than ever" : "get slimy"));
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
-            return 1;
+            return ECMD_TIME;
         case 1:
             if (!ublindf) {
                 old = u.ucreamed;
@@ -138,7 +138,7 @@ use_towel(struct obj *obj)
             }
             if (is_wet_towel(obj))
                 dry_a_towel(obj, -1, drying_feedback);
-            return 1;
+            return ECMD_TIME;
         case 0:
             break;
         }
@@ -150,7 +150,7 @@ use_towel(struct obj *obj)
             !uarmg ? makeplural(body_part(HAND)) : gloves_simple_name(uarmg));
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
-        return 1;
+        return ECMD_TIME;
     } else if (u.ucreamed) {
         Blinded -= u.ucreamed;
         u.ucreamed = 0;
@@ -165,13 +165,13 @@ use_towel(struct obj *obj)
         }
         if (is_wet_towel(obj))
             dry_a_towel(obj, -1, drying_feedback);
-        return 1;
+        return ECMD_TIME;
     }
 
     Your("%s and %s are already clean.", body_part(FACE),
          makeplural(body_part(HAND)));
 
-    return 0;
+    return ECMD_OK;
 }
 
 /* maybe give a stethoscope message based on floor objects */
@@ -232,7 +232,7 @@ its_dead(int rx, int ry, int *resp)
         }
         /* variations on "He's dead, Jim." (Star Trek's Dr McCoy) */
         You_hear("a voice say, \"%s, Jim.\"", buf);
-        *resp = 1;
+        *resp = ECMD_TIME;
         return TRUE;
 
     } else if (corpse) {
@@ -307,18 +307,18 @@ use_stethoscope(struct obj *obj)
 
     if (nohands(g.youmonst.data)) {
         You("have no hands!"); /* not `body_part(HAND)' */
-        return 0;
+        return ECMD_OK;
     } else if (Deaf) {
         You_cant("hear anything!");
-        return 0;
+        return ECMD_OK;
     } else if (!freehand()) {
         You("have no free %s.", body_part(HAND));
-        return 0;
+        return ECMD_OK;
     }
     if (!getdir((char *) 0))
-        return 0;
+        return ECMD_OK;
 
-    res = (g.hero_seq == g.context.stethoscope_seq);
+    res = (g.hero_seq == g.context.stethoscope_seq) ? ECMD_TIME : ECMD_OK;
     g.context.stethoscope_seq = g.hero_seq;
 
     g.bhitpos.x = u.ux, g.bhitpos.y = u.uy; /* tentative, reset below */
@@ -363,7 +363,7 @@ use_stethoscope(struct obj *obj)
     ry = u.uy + u.dy;
     if (!isok(rx, ry)) {
         You_hear("a faint typing noise.");
-        return 0;
+        return ECMD_OK;
     }
     if ((mtmp = m_at(rx, ry)) != 0) {
         const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *) 0,
@@ -618,15 +618,15 @@ use_leash(struct obj *obj)
                     ? "unleash %s from inside."
                     : "unleash anything from inside %s."),
                  noit_mon_nam(u.ustuck));
-        return 0;
+        return ECMD_OK;
     }
     if (!obj->leashmon && number_leashed() >= MAXLEASHED) {
         You("cannot leash any more pets.");
-        return 0;
+        return ECMD_OK;
     }
 
     if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
-        return 0;
+        return ECMD_OK;
 
     if (cc.x == u.ux && cc.y == u.uy) {
         if (u.usteed && u.dz > 0) {
@@ -635,7 +635,7 @@ use_leash(struct obj *obj)
             goto got_target;
         }
         pline("Leash yourself?  Very funny...");
-        return 0;
+        return ECMD_OK;
     }
 
     /*
@@ -645,7 +645,7 @@ use_leash(struct obj *obj)
     if (!(mtmp = m_at(cc.x, cc.y))) {
         There("is no creature there.");
         (void) unmap_invisible(cc.x, cc.y);
-        return 1;
+        return ECMD_TIME;
     }
 
     spotmon = canspotmon(mtmp);
@@ -704,7 +704,7 @@ use_leash(struct obj *obj)
                 spotmon ? "your " : "", l_monnam(mtmp));
         }
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /* assuming mtmp->mleashed has been checked */
@@ -853,7 +853,7 @@ use_mirror(struct obj *obj)
     boolean vis, invis_mirror, useeit, monable;
 
     if (!getdir((char *) 0))
-        return 0;
+        return ECMD_OK;
     invis_mirror = Invis;
     useeit = !Blind && (!invis_mirror || See_invisible);
     uvisage = beautiful();
@@ -863,7 +863,7 @@ use_mirror(struct obj *obj)
             pline_The("%s fogs up and doesn't reflect!", mirror);
         else
             pline("Nothing seems to happen.");
-        return 1;
+        return ECMD_TIME;
     }
     if (!u.dx && !u.dy && !u.dz) {
         if (!useeit) {
@@ -901,31 +901,31 @@ use_mirror(struct obj *obj)
                 You("look as %s as ever.", uvisage);
             }
         }
-        return 1;
+        return ECMD_TIME;
     }
     if (u.uswallow) {
         if (useeit)
             You("reflect %s %s.", s_suffix(mon_nam(u.ustuck)),
                 mbodypart(u.ustuck, STOMACH));
-        return 1;
+        return ECMD_TIME;
     }
     if (Underwater) {
         if (useeit)
             You(Hallucination ? "give the fish a chance to fix their makeup."
                               : "reflect the murky water.");
-        return 1;
+        return ECMD_TIME;
     }
     if (u.dz) {
         if (useeit)
             You("reflect the %s.",
                 (u.dz > 0) ? surface(u.ux, u.uy) : ceiling(u.ux, u.uy));
-        return 1;
+        return ECMD_TIME;
     }
     mtmp = bhit(u.dx, u.dy, COLNO, INVIS_BEAM,
                 (int (*) (MONST_P, OBJ_P)) 0,
                 (int (*) (OBJ_P, OBJ_P)) 0, &obj);
     if (!mtmp || !haseyes(mtmp->data) || g.notonhead)
-        return 1;
+        return ECMD_TIME;
 
     /* couldsee(mtmp->mx, mtmp->my) is implied by the fact that bhit()
        targetted it, so we can ignore possibility of X-ray vision */
@@ -959,7 +959,7 @@ use_mirror(struct obj *obj)
             pline("%s doesn't have a reflection.", Monnam(mtmp));
     } else if (monable && mtmp->data == &mons[PM_MEDUSA]) {
         if (mon_reflects(mtmp, "The gaze is reflected away by %s %s!"))
-            return 1;
+            return ECMD_TIME;
         if (vis)
             pline("%s is turned to stone!", Monnam(mtmp));
         g.stoned = TRUE;
@@ -1021,7 +1021,7 @@ use_mirror(struct obj *obj)
         else
             pline("%s ignores %s reflection.", Monnam(mtmp), mhis(mtmp));
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 static void
@@ -1559,6 +1559,7 @@ rub_ok(struct obj *obj)
     return GETOBJ_EXCLUDE;
 }
 
+/* the #rub command */
 int
 dorub(void)
 {
@@ -1566,26 +1567,26 @@ dorub(void)
 
     if (nohands(g.youmonst.data)) {
         You("aren't able to rub anything without hands.");
-        return 0;
+        return ECMD_OK;
     }
     obj = getobj("rub", rub_ok, GETOBJ_NOFLAGS);
     if (!obj) {
         /* pline1(Never_mind); -- handled by getobj() */
-        return 0;
+        return ECMD_OK;
     }
     if (obj->oclass == GEM_CLASS || obj->oclass == FOOD_CLASS) {
         if (is_graystone(obj)) {
             use_stone(obj);
-            return 1;
+            return ECMD_TIME;
         } else if (obj->otyp == LUMP_OF_ROYAL_JELLY) {
             return use_royal_jelly(obj);
         } else {
             pline("Sorry, I don't know how to use that.");
-            return 0;
+            return ECMD_OK;
         }
     }
     if (!wield_tool(obj, "rub"))
-        return 0;
+        return ECMD_OK;
 
     /* now uwep is obj */
     if (uwep->otyp == MAGIC_LAMP) {
@@ -1614,9 +1615,10 @@ dorub(void)
         pline("Anyway, nothing exciting happens.");
     } else
         pline1(nothing_happens);
-    return 1;
+    return ECMD_TIME;
 }
 
+/* the #jump command */
 int
 dojump(void)
 {
@@ -1777,61 +1779,61 @@ jump(int magic) /* 0=Physical, otherwise skill level */
         /* normally (nolimbs || slithy) implies !Jumping,
            but that isn't necessarily the case for knights */
         You_cant("jump; you have no legs!");
-        return 0;
+        return ECMD_OK;
     } else if (!magic && !Jumping) {
         You_cant("jump very far.");
-        return 0;
+        return ECMD_OK;
     /* if steed is immobile, can't do physical jump but can do spell one */
     } else if (!magic && u.usteed && stucksteed(FALSE)) {
         /* stucksteed gave "<steed> won't move" message */
-        return 0;
+        return ECMD_OK;
     } else if (u.uswallow) {
         if (magic) {
             You("bounce around a little.");
-            return 1;
+            return ECMD_TIME;
         }
         pline("You've got to be kidding!");
-        return 0;
+        return ECMD_OK;
     } else if (u.uinwater) {
         if (magic) {
             You("swish around a little.");
-            return 1;
+            return ECMD_TIME;
         }
         pline("This calls for swimming, not jumping!");
-        return 0;
+        return ECMD_OK;
     } else if (u.ustuck) {
         if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf) {
             struct monst *mtmp = u.ustuck;
 
             set_ustuck((struct monst *) 0);
             You("pull free from %s.", mon_nam(mtmp));
-            return 1;
+            return ECMD_TIME;
         }
         if (magic) {
             You("writhe a little in the grasp of %s!", mon_nam(u.ustuck));
-            return 1;
+            return ECMD_TIME;
         }
         You("cannot escape from %s!", mon_nam(u.ustuck));
-        return 0;
+        return ECMD_OK;
     } else if (Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)) {
         if (magic) {
             You("flail around a little.");
-            return 1;
+            return ECMD_TIME;
         }
         You("don't have enough traction to jump.");
-        return 0;
+        return ECMD_OK;
     } else if (!magic && near_capacity() > UNENCUMBERED) {
         You("are carrying too much to jump!");
-        return 0;
+        return ECMD_OK;
     } else if (!magic && (u.uhunger <= 100 || ACURR(A_STR) < 6)) {
         You("lack the strength to jump!");
-        return 0;
+        return ECMD_OK;
     } else if (!magic && Wounded_legs) {
         legs_in_no_shape("jumping", u.usteed != 0);
-        return 0;
+        return ECMD_OK;
     } else if (u.usteed && u.utrap) {
         pline("%s is stuck in a trap.", Monnam(u.usteed));
-        return 0;
+        return ECMD_OK;
     }
 
     pline("Where do you want to jump?");
@@ -1840,9 +1842,9 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     g.jumping_is_magic = magic;
     getpos_sethilite(display_jump_positions, get_valid_jump_position);
     if (getpos(&cc, TRUE, "the desired position") < 0)
-        return 0; /* user pressed ESC */
+        return ECMD_OK; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
-        return 0;
+        return ECMD_OK;
     } else {
         coord uc;
         int range, temp;
@@ -1868,7 +1870,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
             case TT_LAVA:
                 You("pull yourself above the %s!", hliquid("lava"));
                 reset_utrap(TRUE);
-                return 1;
+                return ECMD_TIME;
             case TT_BURIEDBALL:
             case TT_INFLOOR:
                 You("strain your %s, but you're still %s.",
@@ -1878,7 +1880,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
                         : "attached to the buried ball");
                 set_wounded_legs(LEFT_SIDE, rn1(10, 11));
                 set_wounded_legs(RIGHT_SIDE, rn1(10, 11));
-                return 1;
+                return ECMD_TIME;
             }
 
         /*
@@ -1907,7 +1909,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
         g.multi_reason = "jumping around";
         g.nomovemsg = "";
         morehungry(rnd(25));
-        return 1;
+        return ECMD_TIME;
     }
 }
 
@@ -2693,14 +2695,14 @@ use_whip(struct obj *obj)
     char buf[BUFSZ];
     struct monst *mtmp;
     struct obj *otmp;
-    int rx, ry, proficient, res = 0;
+    int rx, ry, proficient, res = ECMD_OK;
     const char *msg_slipsfree = "The bullwhip slips free.";
     const char *msg_snap = "Snap!";
 
     if (obj != uwep) {
         if (!wield_tool(obj, "lash"))
-            return 0;
-        res = 1;
+            return ECMD_OK;
+        res = ECMD_TIME;
     }
     if (!getdir((char *) 0))
         return res;
@@ -2752,13 +2754,13 @@ use_whip(struct obj *obj)
         if (u.usteed && !rn2(proficient + 2)) {
             You("whip %s!", mon_nam(u.usteed));
             kick_steed();
-            return 1;
+            return ECMD_TIME;
         }
         if (is_pool_or_lava(u.ux, u.uy)) {
             You("cause a small splash.");
             if (is_lava(u.ux, u.uy))
                 (void) fire_damage(uwep, FALSE, u.ux, u.uy);
-            return 1;
+            return ECMD_TIME;
         }
         if (Levitation || u.usteed || Flying) {
             /* Have a shot at snaring something on the floor.  A flyer
@@ -2767,14 +2769,14 @@ use_whip(struct obj *obj)
             otmp = g.level.objects[u.ux][u.uy];
             if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
                 pline("Why beat a dead horse?");
-                return 1;
+                return ECMD_TIME;
             }
             if (otmp && proficient) {
                 You("wrap your bullwhip around %s on the %s.",
                     an(singular(otmp, xname)), surface(u.ux, u.uy));
                 if (rnl(6) || pickup_object(otmp, 1L, TRUE) < 1)
                     pline1(msg_slipsfree);
-                return 1;
+                return ECMD_TIME;
             }
         }
         dam = rnd(2) + dbon() + obj->spe;
@@ -2783,7 +2785,7 @@ use_whip(struct obj *obj)
         You("hit your %s with your bullwhip.", body_part(FOOT));
         Sprintf(buf, "killed %sself with %s bullwhip", uhim(), uhis());
         losehp(Maybe_Half_Phys(dam), buf, NO_KILLER_PREFIX);
-        return 1;
+        return ECMD_TIME;
 
     } else if ((Fumbling || Glib) && !rn2(5)) {
         pline_The("bullwhip slips out of your %s.", body_part(HAND));
@@ -2975,7 +2977,7 @@ use_whip(struct obj *obj)
                 You("flick your bullwhip towards %s.", mon_nam(mtmp));
             }
             if (proficient && force_attack(mtmp, FALSE))
-                return 1;
+                return ECMD_TIME;
             if (do_snap)
                 pline1(msg_snap);
         }
@@ -2989,7 +2991,7 @@ use_whip(struct obj *obj)
     } else {
         pline1(msg_snap);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 static const char
@@ -3079,7 +3081,7 @@ int
 use_pole(struct obj *obj, boolean autohit)
 {
     const char thump[] = "Thump!  Your blow bounces harmlessly off the %s.";
-    int res = 0, typ, max_range, min_range, glyph;
+    int res = ECMD_OK, typ, max_range, min_range, glyph;
     coord cc;
     struct monst *mtmp;
     struct monst *hitm = g.context.polearm.hitmon;
@@ -3087,12 +3089,12 @@ use_pole(struct obj *obj, boolean autohit)
     /* Are you allowed to use the pole? */
     if (u.uswallow) {
         pline(not_enough_room);
-        return 0;
+        return ECMD_OK;
     }
     if (obj != uwep) {
         if (!wield_tool(obj, "swing"))
-            return 0;
-        res = 1;
+            return ECMD_OK;
+        res = ECMD_TIME;
     }
     /* assert(obj == uwep); */
 
@@ -3168,9 +3170,9 @@ use_pole(struct obj *obj, boolean autohit)
                res: 1 => polearm became wielded, 0 => already wielded;
                g.context.move: 1 => discovered hidden monster at target spot,
                0 => answered 'n' to "Really attack?" prompt */
-            return res || g.context.move;
+            return res | (g.context.move ? ECMD_TIME : ECMD_OK);
         if (overexertion())
-            return 1; /* burn nutrition; maybe pass out */
+            return ECMD_TIME; /* burn nutrition; maybe pass out */
         g.context.polearm.hitmon = mtmp;
         check_caitiff(mtmp);
         g.notonhead = (g.bhitpos.x != mtmp->mx || g.bhitpos.y != mtmp->my);
@@ -3215,7 +3217,7 @@ use_pole(struct obj *obj, boolean autohit)
         }
     }
     u_wipe_engr(2); /* same as for melee or throwing */
-    return 1;
+    return ECMD_TIME;
 }
 
 static int
@@ -3252,7 +3254,7 @@ use_cream_pie(struct obj *obj)
     costly_alteration(obj, COST_SPLAT);
     obj_extract_self(obj);
     delobj(obj);
-    return 0;
+    return ECMD_OK;
 }
 
 /* getobj callback for object to rub royal jelly on */
@@ -3284,7 +3286,7 @@ use_royal_jelly(struct obj *obj)
         addinv(obj); /* put the unused lump back; if it came from
                       * a split, it should merge back */
         /* pline1(Never_mind); -- getobj() took care of this */
-        return 0;
+        return ECMD_OK;
     }
 
     You("smear royal jelly all over %s.", yname(eobj));
@@ -3326,13 +3328,13 @@ use_royal_jelly(struct obj *obj)
     /* not useup() because we've already done freeinv() */
     setnotworn(obj);
     obfree(obj, (struct obj *) 0);
-    return 1;
+    return ECMD_TIME;
 }
 
 static int
 use_grapple(struct obj *obj)
 {
-    int res = 0, typ, max_range = 4, tohit;
+    int res = ECMD_OK, typ, max_range = 4, tohit;
     boolean save_confirm;
     coord cc;
     struct monst *mtmp;
@@ -3341,13 +3343,13 @@ use_grapple(struct obj *obj)
     /* Are you allowed to use the hook? */
     if (u.uswallow) {
         pline(not_enough_room);
-        return 0;
+        return ECMD_OK;
     }
     if (obj != uwep) {
         if (!wield_tool(obj, "cast"))
-            return 0;
+            return ECMD_OK;
         else
-            res = 1;
+            res = ECMD_TIME;
     }
     /* assert(obj == uwep); */
 
@@ -3424,7 +3426,7 @@ use_grapple(struct obj *obj)
             (void) pickup_object(otmp, 1L, FALSE);
             /* If pickup fails, leave it alone */
             newsym(cc.x, cc.y);
-            return 1;
+            return ECMD_TIME;
         }
         break;
     case 2: /* Monster */
@@ -3442,7 +3444,7 @@ use_grapple(struct obj *obj)
             You("pull in %s!", mon_nam(mtmp));
             mtmp->mundetected = 0;
             rloc_to(mtmp, cc.x, cc.y);
-            return 1;
+            return ECMD_TIME;
         } else if ((!bigmonst(mtmp->data) && !strongmonst(mtmp->data))
                    || rn2(4)) {
             flags.confirm = FALSE;
@@ -3450,7 +3452,7 @@ use_grapple(struct obj *obj)
             flags.confirm = save_confirm;
             check_caitiff(mtmp);
             (void) thitmonst(mtmp, uwep);
-            return 1;
+            return ECMD_TIME;
         }
     /*FALLTHRU*/
     case 3: /* Surface */
@@ -3461,18 +3463,18 @@ use_grapple(struct obj *obj)
             hurtle(sgn(cc.x - u.ux), sgn(cc.y - u.uy), 1, FALSE);
             spoteffects(TRUE);
         }
-        return 1;
+        return ECMD_TIME;
     default: /* Yourself (oops!) */
         if (P_SKILL(typ) <= P_BASIC) {
             You("hook yourself!");
             losehp(Maybe_Half_Phys(rn1(10, 10)), "a grappling hook",
                    KILLED_BY);
-            return 1;
+            return ECMD_TIME;
         }
         break;
     }
     pline1(nothing_happens);
-    return 1;
+    return ECMD_TIME;
 }
 
 #define BY_OBJECT ((struct monst *) 0)
@@ -3495,19 +3497,19 @@ do_break_wand(struct obj *obj)
 
     if (nohands(g.youmonst.data)) {
         You_cant("break %s without hands!", yname(obj));
-        return 0;
+        return ECMD_OK;
     } else if (!freehand()) {
         Your("%s are occupied!", makeplural(body_part(HAND)));
-        return 0;
+        return ECMD_OK;
     } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
         You("don't have the strength to break %s!", yname(obj));
-        return 0;
+        return ECMD_OK;
     }
     if (!paranoid_query(ParanoidBreakwand,
                         safe_qbuf(confirm,
                                   "Are you really sure you want to break ",
                                   "?", obj, yname, ysimple_name, "the wand")))
-        return 0;
+        return ECMD_OK;
     pline("Raising %s high above your %s, you %s it in two!", yname(obj),
           body_part(HEAD), is_fragile ? "snap" : "break");
 
@@ -3709,7 +3711,7 @@ do_break_wand(struct obj *obj)
     if (obj)
         delobj(obj);
     nomul(0);
-    return 1;
+    return ECMD_TIME;
 }
 
 /* getobj callback for object to apply - this is more complex than most other
@@ -3768,27 +3770,27 @@ apply_ok(struct obj *obj)
     return GETOBJ_EXCLUDE_SELECTABLE;
 }
 
-/* the 'a' command */
+/* the #apply command, 'a' */
 int
 doapply(void)
 {
     struct obj *obj;
-    register int res = 1;
+    register int res = ECMD_TIME;
 
     if (nohands(g.youmonst.data)) {
         You("aren't able to use or apply tools in your current form.");
-        return 0;
+        return ECMD_OK;
     }
     if (check_capacity((char *) 0))
-        return 0;
+        return ECMD_OK;
 
     obj = getobj("use or apply", apply_ok, GETOBJ_NOFLAGS);
     if (!obj)
-        return 0;
+        return ECMD_OK;
 
     if (!retouch_object(&obj, FALSE))
-        return 1; /* evading your grasp costs a turn; just be
-                     grateful that you don't drop it as well */
+        return ECMD_TIME; /* evading your grasp costs a turn; just be
+                             grateful that you don't drop it as well */
 
     if (obj->oclass == WAND_CLASS)
         return do_break_wand(obj);
@@ -3840,7 +3842,7 @@ doapply(void)
     case LOCK_PICK:
     case CREDIT_CARD:
     case SKELETON_KEY:
-        res = (pick_lock(obj, 0, 0, NULL) != 0);
+        res = (pick_lock(obj, 0, 0, NULL) != 0) ? ECMD_TIME : ECMD_OK;
         break;
     case PICK_AXE:
     case DWARVISH_MATTOCK:
@@ -3961,9 +3963,9 @@ doapply(void)
         }
         pline("Sorry, I don't know how to use that.");
         nomul(0);
-        return 0;
+        return ECMD_OK;
     }
-    if (res && obj && obj->oartifact)
+    if ((res & ECMD_TIME) && obj && obj->oartifact)
         arti_speak(obj);
     nomul(0);
     return res;
@@ -4017,7 +4019,7 @@ flip_through_book(struct obj *obj)
 {
     if (Underwater) {
         pline("You don't want to get the pages even more soggy, do you?");
-        return 0;
+        return ECMD_OK;
     }
 
     You("flip through the pages of %s.", thesimpleoname(obj));
@@ -4059,7 +4061,7 @@ flip_through_book(struct obj *obj)
               fadeness[findx]);
     }
 
-    return 1;
+    return ECMD_TIME;
 }
 
 /*apply.c*/

@@ -4347,27 +4347,27 @@ drain_en(int n)
     }
 }
 
-/* disarm a trap */
+/* the #untrap command - disarm a trap */
 int
 dountrap(void)
 {
     if (near_capacity() >= HVY_ENCUMBER) {
         pline("You're too strained to do that.");
-        return 0;
+        return ECMD_OK;
     }
     if ((nohands(g.youmonst.data) && !webmaker(g.youmonst.data))
         || !g.youmonst.data->mmove) {
         pline("And just how do you expect to do that?");
-        return 0;
+        return ECMD_OK;
     } else if (u.ustuck && sticks(g.youmonst.data)) {
         pline("You'll have to let go of %s first.", mon_nam(u.ustuck));
-        return 0;
+        return ECMD_OK;
     }
     if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
         Your("%s seem to be too busy for that.", makeplural(body_part(HAND)));
-        return 0;
+        return ECMD_OK;
     }
-    return untrap(FALSE);
+    return untrap(FALSE) ? ECMD_TIME : ECMD_OK;
 }
 
 /* Probability of disabling a trap.  Helge Hafting */

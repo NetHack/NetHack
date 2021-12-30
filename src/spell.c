@@ -732,7 +732,7 @@ getspell(int* spell_no)
                        spell_no);
 }
 
-/* the 'Z' command -- cast a spell */
+/* the #cast command -- cast a spell */
 int
 docast(void)
 {
@@ -740,7 +740,7 @@ docast(void)
 
     if (getspell(&spell_no))
         return spelleffects(spell_no, FALSE);
-    return 0;
+    return ECMD_OK;
 }
 
 static const char *
@@ -897,7 +897,7 @@ int
 spelleffects(int spell, boolean atme)
 {
     int energy, damage, chance, n, intell;
-    int otyp, skill, role_skill, res = 0;
+    int otyp, skill, role_skill, res = ECMD_OK;
     boolean confused = (Confusion != 0);
     boolean physical_damage = FALSE;
     struct obj *pseudo;
@@ -913,7 +913,7 @@ spelleffects(int spell, boolean atme)
      * place in getspell(), we don't get called.)
      */
     if (rejectcasting()) {
-        return 0; /* no time elapses */
+        return ECMD_OK; /* no time elapses */
     }
 
     /*
@@ -924,7 +924,7 @@ spelleffects(int spell, boolean atme)
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
-        return 1;
+        return ECMD_TIME;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
@@ -942,13 +942,13 @@ spelleffects(int spell, boolean atme)
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
-        return 0;
+        return ECMD_OK;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
         You("lack the strength to cast spells.");
-        return 0;
+        return ECMD_OK;
     } else if (check_capacity(
                 "Your concentration falters while carrying so much stuff.")) {
-        return 1;
+        return ECMD_TIME;
     }
 
     /* if the cast attempt is already going to fail due to insufficient
@@ -968,7 +968,7 @@ spelleffects(int spell, boolean atme)
         if (u.uen < 0)
             u.uen = 0;
         g.context.botl = 1;
-        res = 1; /* time is going to elapse even if spell doesn't get cast */
+        res = ECMD_TIME; /* time is used even if spell doesn't get cast */
     }
 
     if (energy > u.uen) {
@@ -1042,7 +1042,7 @@ spelleffects(int spell, boolean atme)
         You("fail to cast the spell correctly.");
         u.uen -= energy / 2;
         g.context.botl = 1;
-        return 1;
+        return ECMD_TIME;
     }
 
     u.uen -= energy;
@@ -1219,20 +1219,20 @@ spelleffects(int spell, boolean atme)
         cast_protection();
         break;
     case SPE_JUMPING:
-        if (!jump(max(role_skill, 1)))
+        if (!(jump(max(role_skill, 1)) & ECMD_TIME))
             pline1(nothing_happens);
         break;
     default:
         impossible("Unknown spell %d attempted.", spell);
         obfree(pseudo, (struct obj *) 0);
-        return 0;
+        return ECMD_OK;
     }
 
     /* gain skill for successful cast */
     use_skill(skill, spellev(spell));
 
     obfree(pseudo, (struct obj *) 0); /* now, get rid of it */
-    return 1;
+    return ECMD_TIME;
 }
 
 /*ARGSUSED*/
@@ -1610,7 +1610,7 @@ spellsortmenu(void)
     return FALSE;
 }
 
-/* the '+' command -- view known spells */
+/* the #showspells command -- view known spells */
 int
 dovspell(void)
 {
@@ -1643,7 +1643,7 @@ dovspell(void)
         g.spl_orderindx = 0;
     }
     g.spl_sortmode = SORTBY_LETTER; /* 0 */
-    return 0;
+    return ECMD_OK;
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL

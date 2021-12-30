@@ -98,7 +98,7 @@ throw_obj(struct obj *obj, int shotlimit)
         if (obj->o_id == g.context.objsplit.parent_oid
             || obj->o_id == g.context.objsplit.child_oid)
             (void) unsplitobj(obj);
-        return 0; /* no time passes */
+        return ECMD_OK; /* no time passes */
     }
 
     /*
@@ -110,23 +110,23 @@ throw_obj(struct obj *obj, int shotlimit)
      * possibly using a sling.
      */
     if (obj->oclass == COIN_CLASS && obj != uquiver)
-        return throw_gold(obj);
+        return throw_gold(obj); /* check */
 
     if (!canletgo(obj, "throw")) {
-        return 0;
+        return ECMD_OK;
     }
     if (obj->oartifact == ART_MJOLLNIR && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
-        return 0;
+        return ECMD_OK;
     }
     if ((obj->oartifact == ART_MJOLLNIR && ACURR(A_STR) < STR19(25))
         || (obj->otyp == BOULDER && !throws_rocks(g.youmonst.data))) {
         pline("It's too heavy.");
-        return 1;
+        return ECMD_TIME;
     }
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw an object at yourself.");
-        return 0;
+        return ECMD_OK;
     }
     u_wipe_engr(2);
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
@@ -141,7 +141,7 @@ throw_obj(struct obj *obj, int shotlimit)
     }
     if (welded(obj)) {
         weldmsg(obj);
-        return 1;
+        return ECMD_TIME;
     }
     if (is_wet_towel(obj))
         dry_a_towel(obj, -1, FALSE);
@@ -250,7 +250,7 @@ throw_obj(struct obj *obj, int shotlimit)
     g.m_shot.o = STRANGE_OBJECT;
     g.m_shot.s = FALSE;
 
-    return 1;
+    return ECMD_TIME;
 }
 
 /* common to dothrow() and dofire() */
@@ -308,7 +308,7 @@ throw_ok(struct obj *obj)
     return GETOBJ_DOWNPLAY;
 }
 
-/* t command - throw */
+/* the #throw command */
 int
 dothrow(void)
 {
@@ -327,13 +327,13 @@ dothrow(void)
      * [3.6.0:  shot count setup has been moved into ok_to_throw().]
      */
     if (!ok_to_throw(&shotlimit))
-        return 0;
+        return ECMD_OK;
 
     obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
-    return obj ? throw_obj(obj, shotlimit) : 0;
+    return obj ? throw_obj(obj, shotlimit) : ECMD_OK;
 }
 
 /* KMH -- Automatically fill quiver */
@@ -417,7 +417,7 @@ find_launcher(struct obj *ammo)
     return (struct obj *)0;
 }
 
-/* f command -- fire: throw from the quiver or use wielded polearm */
+/* the #fire command -- throw from the quiver or use wielded polearm */
 int
 dofire(void)
 {
@@ -439,7 +439,7 @@ dofire(void)
      * aborted (ESC at the direction prompt).]
      */
     if (!ok_to_throw(&shotlimit))
-        return 0;
+        return ECMD_OK;
 
     if ((obj = uquiver) == 0) {
         if (!flags.autoquiver) {
@@ -456,7 +456,7 @@ dofire(void)
                        swap to it and retry */
                     cmdq_add_ec(doswapweapon);
                     cmdq_add_ec(dofire);
-                    return 0;
+                    return ECMD_OK;
                 } else
                     You("have no ammunition readied.");
             }
@@ -495,7 +495,7 @@ dofire(void)
             /* swap weapons and retry fire */
             cmdq_add_ec(doswapweapon);
             cmdq_add_ec(dofire);
-            return 0;
+            return ECMD_OK;
         } else if ((olauncher = find_launcher(obj)) != 0) {
             /* wield launcher, retry fire */
             if (uwep && !flags.pushweapon)
@@ -503,11 +503,11 @@ dofire(void)
             cmdq_add_ec(dowield);
             cmdq_add_key(olauncher->invlet);
             cmdq_add_ec(dofire);
-            return 0;
+            return ECMD_OK;
         }
     }
 
-    return obj ? throw_obj(obj, shotlimit) : 0;
+    return obj ? throw_obj(obj, shotlimit) : ECMD_OK;
 }
 
 /* if in midst of multishot shooting/throwing, stop early */
@@ -2289,7 +2289,7 @@ throw_gold(struct obj *obj)
         if (obj->o_id == g.context.objsplit.parent_oid
             || obj->o_id == g.context.objsplit.child_oid)
             (void) unsplitobj(obj);
-        return 0;
+        return ECMD_OK;
     }
     freeinv(obj);
     if (u.uswallow) {
@@ -2297,7 +2297,7 @@ throw_gold(struct obj *obj)
                                         : "%s into %s.",
               "The gold disappears", mon_nam(u.ustuck));
         add_to_minv(u.ustuck, obj);
-        return 1;
+        return ECMD_TIME;
     }
 
     if (u.dz) {
@@ -2327,19 +2327,19 @@ throw_gold(struct obj *obj)
                        (int (*)(MONST_P, OBJ_P)) 0,
                        (int (*)(OBJ_P, OBJ_P)) 0, &obj);
             if (!obj)
-                return 1; /* object is gone */
+                return ECMD_TIME; /* object is gone */
             if (mon) {
                 if (ghitm(mon, obj)) /* was it caught? */
-                    return 1;
+                    return ECMD_TIME;
             } else {
                 if (ship_object(obj, g.bhitpos.x, g.bhitpos.y, FALSE))
-                    return 1;
+                    return ECMD_TIME;
             }
         }
     }
 
     if (flooreffects(obj, g.bhitpos.x, g.bhitpos.y, "fall"))
-        return 1;
+        return ECMD_TIME;
     if (u.dz > 0)
         pline_The("gold hits the %s.", surface(g.bhitpos.x, g.bhitpos.y));
     place_object(obj, g.bhitpos.x, g.bhitpos.y);
@@ -2347,7 +2347,7 @@ throw_gold(struct obj *obj)
         sellobj(obj, g.bhitpos.x, g.bhitpos.y);
     stackobj(obj);
     newsym(g.bhitpos.x, g.bhitpos.y);
-    return 1;
+    return ECMD_TIME;
 }
 
 /*dothrow.c*/

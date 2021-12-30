@@ -1225,6 +1225,7 @@ cheapest_item(register struct monst* shkp)
     return gmin;
 }
 
+/* the #pay command */
 int
 dopay(void)
 {
@@ -1260,12 +1261,12 @@ dopay(void)
 
     if ((!sk && (!Blind || Blind_telepat)) || (!Blind && !seensk)) {
         There("appears to be no shopkeeper here to receive your payment.");
-        return 0;
+        return ECMD_OK;
     }
 
     if (!seensk) {
         You_cant("see...");
-        return 0;
+        return ECMD_OK;
     }
 
     /* The usual case.  Allow paying at a distance when
@@ -1284,7 +1285,7 @@ dopay(void)
         if (shkp != resident && distu(shkp->mx, shkp->my) > 2) {
             pline("%s is not near enough to receive your payment.",
                   Shknam(shkp));
-            return 0;
+            return ECMD_OK;
         }
     } else {
         struct monst *mtmp;
@@ -1295,40 +1296,40 @@ dopay(void)
         cc.x = u.ux;
         cc.y = u.uy;
         if (getpos(&cc, TRUE, "the creature you want to pay") < 0)
-            return 0; /* player pressed ESC */
+            return ECMD_OK; /* player pressed ESC */
         cx = cc.x;
         cy = cc.y;
         if (cx < 0) {
             pline("Try again...");
-            return 0;
+            return ECMD_OK;
         }
         if (u.ux == cx && u.uy == cy) {
             You("are generous to yourself.");
-            return 0;
+            return ECMD_OK;
         }
         mtmp = m_at(cx, cy);
         if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
             You("can't %s anyone there.", !Blind ? "see" : "sense");
-            return 0;
+            return ECMD_OK;
         }
         if (!mtmp) {
             There("is no one there to receive your payment.");
-            return 0;
+            return ECMD_OK;
         }
         if (!mtmp->isshk) {
             pline("%s is not interested in your payment.", Monnam(mtmp));
-            return 0;
+            return ECMD_OK;
         }
         if (mtmp != resident && distu(mtmp->mx, mtmp->my) > 2) {
             pline("%s is too far to receive your payment.", Shknam(mtmp));
-            return 0;
+            return ECMD_OK;
         }
         shkp = mtmp;
     }
 
     if (!shkp) {
         debugpline0("dopay: null shkp.");
-        return 0;
+        return ECMD_OK;
     }
  proceed:
     eshkp = ESHK(shkp);
@@ -1341,7 +1342,7 @@ dopay(void)
     if (!shkp->mcanmove || shkp->msleeping) { /* still asleep/paralyzed */
         pline("%s %s.", Shknam(shkp),
               rn2(2) ? "seems to be napping" : "doesn't respond");
-        return 0;
+        return ECMD_OK;
     }
 
     if (shkp != resident && NOTANGRY(shkp)) {
@@ -1370,7 +1371,7 @@ dopay(void)
             else
                 make_happy_shk(shkp, FALSE);
         }
-        return 1;
+        return ECMD_TIME;
     }
 
     /* ltmp is still eshkp->robbed here */
@@ -1387,7 +1388,7 @@ dopay(void)
                     pline(no_money, stashed_gold ? " seem to" : "");
                 else
                     pline(not_enough_money, noit_mhim(shkp));
-                return 1;
+                return ECMD_TIME;
             }
             pline("But since %s shop has been robbed recently,",
                   noit_mhis(shkp));
@@ -1405,7 +1406,7 @@ dopay(void)
                     pline(no_money, stashed_gold ? " seem to" : "");
                 else
                     pline(not_enough_money, noit_mhim(shkp));
-                return 1;
+                return ECMD_TIME;
             }
             You("try to appease %s by giving %s 1000 gold pieces.",
                 canspotmon(shkp)
@@ -1418,13 +1419,13 @@ dopay(void)
             else
                 pline("But %s is as angry as ever.", shkname(shkp));
         }
-        return 1;
+        return ECMD_TIME;
     }
     if (shkp != resident) {
         impossible("dopay: not to shopkeeper?");
         if (resident)
             setpaid(resident);
-        return 0;
+        return ECMD_OK;
     }
     /* pay debt, if any, first */
     if (eshkp->debit) {
@@ -1448,7 +1449,7 @@ dopay(void)
             pline("But you don't%s have enough gold%s.",
                   stashed_gold ? " seem to" : "",
                   eshkp->credit ? " or credit" : "");
-            return 1;
+            return ECMD_TIME;
         } else {
             if (eshkp->credit >= dtmp) {
                 eshkp->credit -= dtmp;
@@ -1483,14 +1484,14 @@ dopay(void)
         if (!umoney && !eshkp->credit) {
             You("%shave no gold or credit%s.",
                 stashed_gold ? "seem to " : "", paid ? " left" : "");
-            return 0;
+            return ECMD_OK;
         }
         if ((umoney + eshkp->credit) < cheapest_item(shkp)) {
             You("don't have enough gold to buy%s the item%s you picked.",
                 eshkp->billct > 1 ? " any of" : "", plur(eshkp->billct));
             if (stashed_gold)
                 pline("Maybe you have some gold stashed away?");
-            return 0;
+            return ECMD_OK;
         }
 
         /* this isn't quite right; it itemizes without asking if the
@@ -1516,7 +1517,7 @@ dopay(void)
                 } else {
                     impossible("Shopkeeper administration out of order.");
                     setpaid(shkp); /* be nice to the player */
-                    return 1;
+                    return ECMD_TIME;
                 }
                 if (pass == bp->useup && otmp->quan == bp->bquan) {
                     /* pay for used-up items on first pass and others
@@ -1527,7 +1528,7 @@ dopay(void)
                 } else {
                     switch (dopayobj(shkp, bp, &otmp, pass, itemize)) {
                     case PAY_CANT:
-                        return 1; /*break*/
+                        return ECMD_TIME; /*break*/
                     case PAY_BROKE:
                         paid = TRUE;
                         goto thanks; /*break*/
@@ -1563,7 +1564,7 @@ dopay(void)
                   Shknam(shkp), noit_mhis(shkp),
                   shtypes[eshkp->shoptype - SHOPBASE].name);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /* return 2 if used-up portion paid

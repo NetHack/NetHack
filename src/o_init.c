@@ -606,7 +606,7 @@ choose_disco_sort(
     return n;
 }
 
-/* the '\' command - show discovered object types */
+/* the #known command - show discovered object types */
 int
 dodiscovered(void) /* free after Robert Viduya */
 {
@@ -622,7 +622,7 @@ dodiscovered(void) /* free after Robert Viduya */
 
     if (iflags.menu_requested) {
         if (choose_disco_sort(1) < 0)
-            return 0;
+            return ECMD_OK;
     }
     alphabyclass = (flags.discosort == 'c');
     alphabetized = (flags.discosort == 'a' || alphabyclass);
@@ -722,7 +722,7 @@ dodiscovered(void) /* free after Robert Viduya */
     }
     destroy_nhwindow(tmpwin);
 
-    return 0;
+    return ECMD_OK;
 }
 
 /* lower case let_to_name() output, which differs from def_oc_syms[].name */
@@ -737,7 +737,7 @@ oclass_to_name(char oclass, char *buf)
     return buf;
 }
 
-/* the '`' command - show discovered object types for one class */
+/* the #knownclass command - show discovered object types for one class */
 int
 doclassdisco(void)
 {
@@ -760,7 +760,7 @@ doclassdisco(void)
 
     if (iflags.menu_requested) {
         if (choose_disco_sort(2) < 0)
-            return 0;
+            return ECMD_OK;
     }
     alphabetized = (flags.discosort == 'a' || flags.discosort == 'c');
     lootsort = (flags.discosort == 's');
@@ -827,7 +827,7 @@ doclassdisco(void)
         You(havent_discovered_any, "items");
         if (tmpwin != WIN_ERR)
             destroy_nhwindow(tmpwin);
-        return 0;
+        return ECMD_OK;
     }
 
     /* have player choose a class */
@@ -868,7 +868,7 @@ doclassdisco(void)
         destroy_nhwindow(tmpwin);
     }
     if (!c)
-        return 0; /* player declined to make a selection */
+        return ECMD_OK; /* player declined to make a selection */
 
     /*
      * show discoveries for object class c
@@ -935,7 +935,7 @@ doclassdisco(void)
     if (ct)
         display_nhwindow(tmpwin, TRUE);
     destroy_nhwindow(tmpwin);
-    return 0;
+    return ECMD_OK;
 }
 
 /* put up nameable subset of discoveries list as a menu */

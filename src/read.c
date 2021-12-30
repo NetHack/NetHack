@@ -324,7 +324,7 @@ read_ok(struct obj* obj)
     return GETOBJ_DOWNPLAY;
 }
 
-/* the 'r' command; read a scroll or spell book or various other things */
+/* the #read command; read a scroll or spell book or various other things */
 int
 doread(void)
 {
@@ -352,11 +352,11 @@ doread(void)
 
     g.known = FALSE;
     if (check_capacity((char *) 0))
-        return 0;
+        return ECMD_OK;
 
     scroll = getobj("read", read_ok, GETOBJ_PROMPT);
     if (!scroll)
-        return 0;
+        return ECMD_OK;
     otyp = scroll->otyp;
 
     /* outrumor has its own blindness check */
@@ -367,7 +367,7 @@ doread(void)
         if (!Blind)
             u.uconduct.literate++;
         useup(scroll);
-        return 1;
+        return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
                || otyp == HAWAIIAN_SHIRT) {
         char buf[BUFSZ], *mesg;
@@ -375,7 +375,7 @@ doread(void)
 
         if (Blind) {
             You_cant(find_any_braille);
-            return 0;
+            return ECMD_OK;
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
         if ((otyp == T_SHIRT || otyp == HAWAIIAN_SHIRT) && uarm
@@ -383,12 +383,12 @@ doread(void)
             pline("%s shirt is obscured by %s%s.",
                   scroll->unpaid ? "That" : "Your", shk_your(buf, uarm),
                   suit_simple_name(uarm));
-            return 0;
+            return ECMD_OK;
         }
         if (otyp == HAWAIIAN_SHIRT) {
             pline("%s features %s.", flags.verbose ? "The design" : "It",
                   hawaiian_design(scroll, buf));
-            return 1;
+            return ECMD_TIME;
         }
         u.uconduct.literate++;
         /* populate 'buf[]' */
@@ -404,7 +404,7 @@ doread(void)
             pline("It reads:");
         }
         pline("\"%s\"%s", mesg, endpunct);
-        return 1;
+        return ECMD_TIME;
     } else if ((otyp == DUNCE_CAP || otyp == CORNUTHAUM)
         /* note: "DUNCE" isn't directly connected to tourists but
            if everyone could read it, they would always be able to
@@ -424,7 +424,7 @@ doread(void)
                because it suggests that there might be something on others */
             You_cant("find anything to read on this %s.",
                      simpleonames(scroll));
-            return 0;
+            return ECMD_OK;
         }
         pline("%s on the %s.  It reads:  %s.",
               !Blind ? "There is writing" : "You feel lettering",
@@ -434,7 +434,7 @@ doread(void)
            the object type, don't make it become a discovery for hero */
         if (!objects[otyp].oc_name_known && !objects[otyp].oc_uname)
             docall(scroll);
-        return 1;
+        return ECMD_TIME;
     } else if (otyp == CREDIT_CARD) {
         static const char *card_msgs[] = {
             "Leprechaun Gold Tru$t - Shamrock Card",
@@ -473,20 +473,20 @@ doread(void)
               (((int) scroll->o_id * 7) % 10),
               (flags.verbose || Blind) ? "." : "");
         u.uconduct.literate++;
-        return 1;
+        return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
         pline("This %s has no label.", singular(scroll, xname));
-        return 0;
+        return ECMD_OK;
     } else if (otyp == MAGIC_MARKER) {
         if (Blind) {
             You_cant(find_any_braille);
-            return 0;
+            return ECMD_OK;
         }
         if (flags.verbose)
             pline("It reads:");
         pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
         u.uconduct.literate++;
-        return 1;
+        return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
         if (Blind)
             You("feel the embossed words:");
@@ -494,7 +494,7 @@ doread(void)
             You("read:");
         pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         u.uconduct.literate++;
-        return 1;
+        return ECMD_TIME;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
         if (Blind)
             You("feel the engraved signature:");
@@ -502,25 +502,25 @@ doread(void)
             pline("It is signed:");
         pline("\"Odin.\"");
         u.uconduct.literate++;
-        return 1;
+        return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
         const char *wrapper = candy_wrapper_text(scroll);
 
         if (Blind) {
             You_cant(find_any_braille);
-            return 0;
+            return ECMD_OK;
         }
         if (!*wrapper) {
             pline("The candy bar's wrapper is blank.");
-            return 0;
+            return ECMD_OK;
         }
         pline("The wrapper reads: \"%s\".", wrapper);
         u.uconduct.literate++;
-        return 1;
+        return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {
         pline(silly_thing_to, "read");
-        return 0;
+        return ECMD_OK;
     } else if (Blind && otyp != SPE_BOOK_OF_THE_DEAD) {
         const char *what = 0;
 
@@ -534,7 +534,7 @@ doread(void)
             what = "formula on the scroll";
         if (what) {
             pline("Being blind, you cannot read the %s.", what);
-            return 0;
+            return ECMD_OK;
         }
     }
 
@@ -553,7 +553,7 @@ doread(void)
             if (!scroll->spe && yn(
              "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
                                    ) != 'y')
-                return 0;
+                return ECMD_OK;
         }
     }
 #endif
@@ -565,7 +565,7 @@ doread(void)
         u.uconduct.literate++;
 
     if (scroll->oclass == SPBOOK_CLASS) {
-        return study_book(scroll);
+        return study_book(scroll) ? ECMD_TIME : ECMD_OK;
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
     if (otyp != SCR_BLANK_PAPER) {
@@ -602,7 +602,7 @@ doread(void)
         if (otyp != SCR_BLANK_PAPER)
             useup(scroll);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 static void

@@ -537,6 +537,10 @@ enum bodypart_types {
 #define BRK_KNOWN2NOTBREAK 8
 #define BRK_KNOWN_OUTCOME  (BRK_KNOWN2BREAK | BRK_KNOWN2NOTBREAK)
 
+/* extended command return values */
+#define ECMD_OK   0x00  /* cmd done successfully */
+#define ECMD_TIME 0x01  /* cmd took time, uses up a turn */
+
 /* values returned from getobj() callback functions */
 enum getobj_callback_returns {
     /* generally invalid - can't be used for this purpose. will give a "silly

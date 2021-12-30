@@ -1325,7 +1325,7 @@ do_look(int mode, coord *click_cc)
         switch (i) {
         default:
         case 'q':
-            return 0;
+            return ECMD_OK;
         case 'y':
         case '/':
             from_screen = TRUE;
@@ -1340,7 +1340,7 @@ do_look(int mode, coord *click_cc)
 
             invlet = display_inventory((const char *) 0, TRUE);
             if (!invlet || invlet == '\033')
-                return 0;
+                return ECMD_OK;
             *out_str = '\0';
             for (invobj = g.invent; invobj; invobj = invobj->nobj)
                 if (invobj->invlet == invlet) {
@@ -1349,7 +1349,7 @@ do_look(int mode, coord *click_cc)
                 }
             if (*out_str)
                 checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
-            return 0;
+            return ECMD_OK;
           }
         case '?':
             from_screen = FALSE;
@@ -1359,32 +1359,32 @@ do_look(int mode, coord *click_cc)
                    condense consecutive internal whitespace */
                 mungspaces(out_str);
             if (out_str[0] == '\0' || out_str[0] == '\033')
-                return 0;
+                return ECMD_OK;
 
             if (out_str[1]) { /* user typed in a complete string */
                 checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
-                return 0;
+                return ECMD_OK;
             }
             sym = out_str[0];
             break;
         case 'm':
             look_all(TRUE, TRUE); /* list nearby monsters */
-            return 0;
+            return ECMD_OK;
         case 'M':
             look_all(FALSE, TRUE); /* list all monsters */
-            return 0;
+            return ECMD_OK;
         case 'o':
             look_all(TRUE, FALSE); /* list nearby objects */
-            return 0;
+            return ECMD_OK;
         case 'O':
             look_all(FALSE, FALSE); /* list all objects */
-            return 0;
+            return ECMD_OK;
         case '^':
             look_traps(TRUE); /* list nearby traps */
-            return 0;
+            return ECMD_OK;
         case '\"':
             look_traps(FALSE); /* list all traps (visible or remembered) */
-            return 0;
+            return ECMD_OK;
         }
     } else { /* clicklook */
         cc.x = click_cc->x;
@@ -1463,7 +1463,7 @@ do_look(int mode, coord *click_cc)
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
 
     flags.verbose = save_verbose;
-    return 0;
+    return ECMD_OK;
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL /* RESTORE is after do_supplemental_info() */
@@ -1713,21 +1713,21 @@ do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* the '/' command */
+/* the #whatis command */
 int
 dowhatis(void)
 {
     return do_look(0, (coord *) 0);
 }
 
-/* the ';' command */
+/* the #glance command */
 int
 doquickwhatis(void)
 {
     return do_look(1, (coord *) 0);
 }
 
-/* the '^' command */
+/* the #showtrap command */
 int
 doidtrap(void)
 {
@@ -1735,7 +1735,7 @@ doidtrap(void)
     int x, y, tt, glyph;
 
     if (!getdir("^"))
-        return 0;
+        return ECMD_OK;
     x = u.ux + u.dx;
     y = u.uy + u.dy;
 
@@ -1746,7 +1746,7 @@ doidtrap(void)
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
             pline("That is a trapped %s.", chesttrap ? "chest" : "door");
-            return 0; /* trap ID'd, but no time elapses */
+            return ECMD_OK; /* trap ID'd, but no time elapses */
         }
     }
 
@@ -1772,10 +1772,10 @@ doidtrap(void)
                            ? " dug"
                            : " set",
                   !trap->madeby_u ? "" : " by you");
-            return 0;
+            return ECMD_OK;
         }
     pline("I can't see a trap there.");
-    return 0;
+    return ECMD_OK;
 }
 
 /*
@@ -2042,6 +2042,7 @@ dowhatdoes_core(char q, char *cbuf)
 #endif /* 0 */
 }
 
+/* the whatdoes command */
 int
 dowhatdoes(void)
 {
@@ -2084,7 +2085,7 @@ dowhatdoes(void)
         pline("No such command '%s', char code %d (0%03o or 0x%02x).",
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);
     }
-    return 0;
+    return ECMD_OK;
 }
 
 static void
@@ -2213,7 +2214,7 @@ static const struct {
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* the '?' command */
+/* the #help command */
 int
 dohelp(void)
 {
@@ -2247,7 +2248,7 @@ dohelp(void)
         free((genericptr_t) selected);
         (void) (*help_menu_items[sel].f)();
     }
-    return 0;
+    return ECMD_OK;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -2257,7 +2258,7 @@ int
 dohistory(void)
 {
     display_file(HISTORY, TRUE);
-    return 0;
+    return ECMD_OK;
 }
 
 /*pager.c*/

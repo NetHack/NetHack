@@ -1819,6 +1819,7 @@ print_queue(winid win, timer_element* base)
     }
 }
 
+/* the #timeout command */
 int
 wiz_timeout_queue(void)
 {
@@ -1830,7 +1831,7 @@ wiz_timeout_queue(void)
 
     win = create_nhwindow(NHW_MENU); /* corner text window */
     if (win == WIN_ERR)
-        return 0;
+        return ECMD_OK;
 
     Sprintf(buf, "Current time = %ld.", g.moves);
     putstr(win, 0, buf);
@@ -1882,7 +1883,7 @@ wiz_timeout_queue(void)
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 
-    return 0;
+    return ECMD_OK;
 }
 
 void

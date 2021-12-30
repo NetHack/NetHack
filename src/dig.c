@@ -958,15 +958,15 @@ use_pick_axe(struct obj *obj)
     const char *verb;
     char *dsp, dirsyms[12], qbuf[BUFSZ];
     boolean ispick;
-    int rx, ry, downok, res = 0;
+    int rx, ry, downok, res = ECMD_OK;
     int dir;
 
     /* Check tool */
     if (obj != uwep) {
         if (!wield_tool(obj, "swing"))
-            return 0;
+            return ECMD_OK;
         else
-            res = 1;
+            res = ECMD_TIME;
     }
     ispick = is_pick(obj);
     verb = ispick ? "dig" : "chop";
@@ -1054,7 +1054,7 @@ use_pick_axe2(struct obj *obj)
         Sprintf(buf, "%s own %s", uhis(), OBJ_NAME(objects[obj->otyp]));
         losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
         g.context.botl = 1;
-        return 1;
+        return ECMD_TIME;
     } else if (u.dz == 0) {
         if (Stunned || (Confusion && !rn2(5)))
             confdir();
@@ -1062,11 +1062,11 @@ use_pick_axe2(struct obj *obj)
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {
             pline("Clash!");
-            return 1;
+            return ECMD_TIME;
         }
         lev = &levl[rx][ry];
         if (MON_AT(rx, ry) && do_attack(m_at(rx, ry)))
-            return 1;
+            return ECMD_TIME;
         dig_target = dig_typ(obj, rx, ry);
         if (dig_target == DIGTYP_UNDIGGABLE) {
             /* ACCESSIBLE or POOL */
@@ -1200,7 +1200,7 @@ use_pick_axe2(struct obj *obj)
         g.did_dig_msg = FALSE;
         set_occupation(dig, verbing, 0);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 /*
@@ -2120,7 +2120,7 @@ struct obj *otmp;
 #endif /*0*/
 
 #ifdef DEBUG
-/* bury everything at your loc and around */
+/* the #wizbury command - bury everything at your loc and around */
 int
 wiz_debug_cmd_bury(void)
 {
@@ -2130,7 +2130,7 @@ wiz_debug_cmd_bury(void)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
             if (isok(x, y))
                 bury_objs(x, y);
-    return 0;
+    return ECMD_OK;
 }
 #endif /* DEBUG */
 

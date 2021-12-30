@@ -687,13 +687,13 @@ doconsult(struct monst *oracl)
 
     if (!oracl) {
         There("is no one here to consult.");
-        return 0;
+        return ECMD_OK;
     } else if (!oracl->mpeaceful) {
         pline("%s is in no mood for consultations.", Monnam(oracl));
-        return 0;
+        return ECMD_OK;
     } else if (!umoney) {
         You("have no gold.");
-        return 0;
+        return ECMD_OK;
     }
 
     Sprintf(qbuf, "\"Wilt thou settle for a minor consultation?\" (%d %s)",
@@ -701,22 +701,22 @@ doconsult(struct monst *oracl)
     switch (ynq(qbuf)) {
     default:
     case 'q':
-        return 0;
+        return ECMD_OK;
     case 'y':
         if (umoney < (long) minor_cost) {
             You("don't even have enough gold for that!");
-            return 0;
+            return ECMD_OK;
         }
         u_pay = minor_cost;
         break;
     case 'n':
         if (umoney <= (long) minor_cost /* don't even ask */
             || (g.oracle_cnt == 1 || g.oracle_flg < 0))
-            return 0;
+            return ECMD_OK;
         Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long) major_cost));
         if (yn(qbuf) != 'y')
-            return 0;
+            return ECMD_OK;
         u_pay = (umoney < (long) major_cost) ? (int) umoney : major_cost;
         break;
     }
@@ -745,7 +745,7 @@ doconsult(struct monst *oracl)
         more_experienced(add_xpts, u_pay / 50);
         newexplevel();
     }
-    return 1;
+    return ECMD_TIME;
 }
 
 static void

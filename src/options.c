@@ -7270,7 +7270,7 @@ longest_option_name(int startpass, int endpass)
     return longest_name_len;
 }
 
-/* the 'O' command */
+/* the #options command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
 {
@@ -7460,7 +7460,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (g.context.botl || g.context.botlx) {
         bot();
     }
-    return 0;
+    return ECMD_OK;
 }
 
 /* doset('O' command) menu entries for compound options */
@@ -7719,7 +7719,7 @@ dotogglepickup(void)
         Strcpy(buf, "OFF");
     }
     pline("Autopickup: %s.", buf);
-    return 0;
+    return ECMD_OK;
 }
 
 int

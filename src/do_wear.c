@@ -1590,7 +1590,7 @@ armor_or_accessory_off(struct obj *obj)
 {
     if (!(obj->owornmask & (W_ARMOR | W_ACCESSORY))) {
         You("are not wearing that.");
-        return 0;
+        return ECMD_OK;
     }
     if (obj == uskin
         || ((obj == uarm) && uarmc)
@@ -1612,13 +1612,13 @@ armor_or_accessory_off(struct obj *obj)
             Strcpy(why, "; it's embedded");
         }
         You_cant("take that off%s.", why);
-        return 0;
+        return ECMD_OK;
     }
 
     reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
     (void) select_off(obj);
     if (!g.context.takeoff.mask)
-        return 0;
+        return ECMD_OK;
     /* none of armoroff()/Ring_/Amulet/Blindf_off() use context.takeoff.mask */
     reset_remarm();
 
@@ -1643,10 +1643,10 @@ armor_or_accessory_off(struct obj *obj)
         if (obj->owornmask)
             remove_worn_item(obj, FALSE);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
-/* the 'T' command */
+/* the #takeoff command - remove worn armor */
 int
 dotakeoff(void)
 {
@@ -1662,17 +1662,17 @@ dotakeoff(void)
                           : "dragon scale mail is");
         else
             pline("Not wearing any armor or accessories.");
-        return 0;
+        return ECMD_OK;
     }
     if (Narmorpieces != 1 || ParanoidRemove)
         otmp = getobj("take off", takeoff_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return 0;
+        return ECMD_OK;
 
     return armor_or_accessory_off(otmp);
 }
 
-/* the 'R' command */
+/* the #remove command - take off ring or other accessory */
 int
 doremring(void)
 {
@@ -1681,12 +1681,12 @@ doremring(void)
     count_worn_stuff(&otmp, TRUE);
     if (!Naccessories && !Narmorpieces) {
         pline("Not wearing any accessories or armor.");
-        return 0;
+        return ECMD_OK;
     }
     if (Naccessories != 1 || ParanoidRemove)
         otmp = getobj("remove", remove_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return 0;
+        return ECMD_OK;
 
     return armor_or_accessory_off(otmp);
 }
@@ -2015,7 +2015,7 @@ accessory_or_armor_on(struct obj *obj)
 
     if (obj->owornmask & (W_ACCESSORY | W_ARMOR)) {
         already_wearing(c_that_);
-        return 0;
+        return ECMD_OK;
     }
     armor = (obj->oclass == ARMOR_CLASS);
     ring = (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING);
@@ -2024,7 +2024,7 @@ accessory_or_armor_on(struct obj *obj)
     /* checks which are performed prior to actually touching the item */
     if (armor) {
         if (!canwearobj(obj, &mask, TRUE))
-            return 0;
+            return ECMD_OK;
 
         if (obj->otyp == HELM_OF_OPPOSITE_ALIGNMENT
             && qstart_level.dnum == u.uz.dnum) { /* in quest */
@@ -2035,7 +2035,7 @@ accessory_or_armor_on(struct obj *obj)
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
             g.context.botl = 1; /*for AC after zeroing u.ublessed */
-            return 1;
+            return ECMD_TIME;
         }
     } else {
         /*
@@ -2054,13 +2054,13 @@ accessory_or_armor_on(struct obj *obj)
 
             if (nolimbs(g.youmonst.data)) {
                 You("cannot make the ring stick to your body.");
-                return 0;
+                return ECMD_OK;
             }
             if (uleft && uright) {
                 There("are no more %s%s to fill.",
                       humanoid(g.youmonst.data) ? "ring-" : "",
                       fingers_or_gloves(FALSE));
-                return 0;
+                return ECMD_OK;
             }
             if (uleft) {
                 mask = RIGHT_RING;
@@ -2075,7 +2075,7 @@ accessory_or_armor_on(struct obj *obj)
                     switch (answer) {
                     case '\0':
                     case '\033':
-                        return 0;
+                        return ECMD_OK;
                     case 'l':
                     case 'L':
                         mask = LEFT_RING;
@@ -2091,13 +2091,14 @@ accessory_or_armor_on(struct obj *obj)
                 Your(
               "%s are too slippery to remove, so you cannot put on the ring.",
                      gloves_simple_name(uarmg));
-                return 1; /* always uses move */
+                return ECMD_TIME; /* always uses move */
             }
             if (uarmg && uarmg->cursed) {
                 res = !uarmg->bknown;
                 set_bknown(uarmg, 1);
                 You("cannot remove your %s to put on the ring.", c_gloves);
-                return res; /* uses move iff we learned gloves are cursed */
+                /* uses move iff we learned gloves are cursed */
+                return res ? ECMD_TIME : ECMD_OK;
             }
             if (uwep) {
                 res = !uwep->bknown; /* check this before calling welded() */
@@ -2109,18 +2110,19 @@ accessory_or_armor_on(struct obj *obj)
                         hand = makeplural(hand);
                     You("cannot free your weapon %s to put on the ring.",
                         hand);
-                    return res; /* uses move iff we learned weapon is cursed */
+                    /* uses move iff we learned weapon is cursed */
+                    return res ? ECMD_TIME : ECMD_OK;
                 }
             }
         } else if (obj->oclass == AMULET_CLASS) {
             if (uamul) {
                 already_wearing("an amulet");
-                return 0;
+                return ECMD_OK;
             }
         } else if (eyewear) {
             if (!has_head(g.youmonst.data)) {
                 You("have no head to wear %s on.", ansimpleoname(obj));
-                return 0;
+                return ECMD_OK;
             }
 
             if (ublindf) {
@@ -2140,17 +2142,17 @@ accessory_or_armor_on(struct obj *obj)
                 } else {
                     already_wearing(something); /* ??? */
                 }
-                return 0;
+                return ECMD_OK;
             }
         } else {
             /* neither armor nor accessory */
             You_cant("wear that!");
-            return 0;
+            return ECMD_OK;
         }
     }
 
     if (!retouch_object(&obj, FALSE))
-        return 1; /* costs a turn even though it didn't get worn */
+        return ECMD_TIME; /* costs a turn even though it didn't get worn */
 
     if (armor) {
         int delay;
@@ -2220,10 +2222,10 @@ accessory_or_armor_on(struct obj *obj)
         if (give_feedback && is_worn(obj))
             prinv((char *) 0, obj, 0L);
     }
-    return 1;
+    return ECMD_TIME;
 }
 
-/* the 'W' command */
+/* the #wear command */
 int
 dowear(void)
 {
@@ -2233,19 +2235,19 @@ dowear(void)
        verysmall() or nohands() checks for shields, gloves, etc... */
     if (verysmall(g.youmonst.data) || nohands(g.youmonst.data)) {
         pline("Don't even bother.");
-        return 0;
+        return ECMD_OK;
     }
     if (uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf
         && uleft && uright && uamul && ublindf) {
         /* 'W' message doesn't mention accessories */
         You("are already wearing a full complement of armor.");
-        return 0;
+        return ECMD_OK;
     }
     otmp = getobj("wear", wear_ok, GETOBJ_NOFLAGS);
-    return otmp ? accessory_or_armor_on(otmp) : 0;
+    return otmp ? accessory_or_armor_on(otmp) : ECMD_OK;
 }
 
-/* the 'P' command */
+/* the #puton command */
 int
 doputon(void)
 {
@@ -2258,10 +2260,10 @@ doputon(void)
              humanoid(g.youmonst.data) ? "ring-" : "",
              fingers_or_gloves(FALSE),
              (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
-        return 0;
+        return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
-    return otmp ? accessory_or_armor_on(otmp) : 0;
+    return otmp ? accessory_or_armor_on(otmp) : ECMD_OK;
 }
 
 /* calculate current armor class */
@@ -2777,7 +2779,7 @@ reset_remarm(void)
     g.context.takeoff.disrobing[0] = '\0';
 }
 
-/* the 'A' command -- remove multiple worn items */
+/* the #takeoffall command -- remove multiple worn items */
 int
 doddoremarm(void)
 {
@@ -2786,11 +2788,11 @@ doddoremarm(void)
     if (g.context.takeoff.what || g.context.takeoff.mask) {
         You("continue %s.", g.context.takeoff.disrobing);
         set_occupation(take_off, g.context.takeoff.disrobing, 0);
-        return 0;
+        return ECMD_OK;
     } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf && !uleft
                && !uright && !wearing_armor()) {
         You("are not wearing anything.");
-        return 0;
+        return ECMD_OK;
     }
 
     add_valid_menu_class(0); /* reset */
@@ -2813,7 +2815,7 @@ doddoremarm(void)
      * in take_off(); if we return 1, that would add an extra turn to each
      * disrobe.
      */
-    return 0;
+    return ECMD_OK;
 }
 
 static int
