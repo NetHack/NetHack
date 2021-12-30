@@ -6,7 +6,7 @@ if [ x$1 == "xlib" ]; then
         make spotless
     fi
     cd sys/unix
-    ./setup.sh hints/macOS.2020
+    ./setup.sh hints/macOS.370
     cd ../..
     make WANT_LIBNH=1
 fi
@@ -25,7 +25,7 @@ if [ x$1 == "xwasm" ]; then
         make spotless
     fi
     cd sys/unix
-    ./setup.sh hints/macOS.2020
+    ./setup.sh hints/macOS.370
     cd ../..
     make CROSS_TO_WASM=1
 fi
@@ -38,7 +38,7 @@ if [ x$1 == "xbin" ]; then
     echo Doing bin...
     make spotless
     cd sys/unix
-    ./setup.sh hints/macOS.2020
+    ./setup.sh hints/macOS.370
     cd ../..
     make
 fi

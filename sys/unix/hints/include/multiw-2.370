@@ -1,11 +1,11 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  multiw-2.2020 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  multiw-2.370 $NHDT-Date: 1599337709 2020/09/05 20:28:29 $  $NHDT-Branch: NetHack-3.7 $
 #
 # Sorts out support for multiple window ports (interfaces) to included in the build.
 #
 # Included from:
-#           hints/linux.2020
-#           hints/macOS.2020
+#           hints/linux.370
+#           hints/macOS.370
 #
 # The following will be set appropriately following this:
 #     - WANT_WIN_XXX  (at least one will be set; default is TTY)
@@ -104,6 +104,6 @@ WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 endif
 
-#end of hints/include/multiw-2.2020
+#end of hints/include/multiw-2.370
 #------------------------------------------------------------------------------
 

@@ -154,7 +154,7 @@ steps:
 
 - bash: |
     cd sys/unix
-    sh setup.sh hints/linux.2020
+    sh setup.sh hints/linux.370
     cd ../..
     make fetch-lua
     make WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc all
@@ -193,7 +193,7 @@ steps:
 
 - bash: |
     cd sys/unix
-    sh setup.sh hints/macos.2020
+    sh setup.sh hints/macos.370
     cd ../..
     make fetch-lua
     make all
@@ -204,7 +204,7 @@ steps:
 - bash: |
     export GCCVER=gcc1020
     cd sys/unix
-    sh setup.sh hints/linux.2020
+    sh setup.sh hints/linux.370
     cd ../..
     make fetch-lua
     sh sys/msdos/fetch-cross-compiler.sh

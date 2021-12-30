@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  compiler.2020 $NHDT-Date: 1637992237 2021/11/27 05:50:37 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  compiler.370 $NHDT-Date: 1637992237 2021/11/27 05:50:37 $  $NHDT-Branch: NetHack-3.7 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -106,5 +106,5 @@ endif  # clang-specific ends here
 CFLAGS+=-DGCC_WARN
 CCXXFLAGS+=-DGCC_WARN
 
-#end of compiler.2020
+#end of compiler.370
 #------------------------------------------------------------------------------

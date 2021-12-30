@@ -260,7 +260,7 @@ WASM_CFLAGS += -Wshadow
 # WASM_CFLAGS += -Wwrite-strings
 # WASM_CFLAGS += -Werror
 # Nethack C flags
-WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.2020
+WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.370
 WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
 WASM_CFLAGS += -g -I../include -DNOTPARMDECL
 WASM_CFLAGS += -DGCC_WARN

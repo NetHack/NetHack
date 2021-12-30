@@ -468,7 +468,7 @@ Cross-compiler pre-built binary downloads:
            sh sys/msdos/fetch-cross-compiler.sh
 
     That script won't install anything, it just does file fetches and stores
-    them in subfolders of lib. The linux.2020 and macOS.2020 hints files are
+    them in subfolders of lib. The linux.370 and macOS.370 hints files are
     configured to find the cross-compiler there if you add
         CROSS_TO_MSDOS=1
     on your make command line.
@@ -479,12 +479,12 @@ Cross-compiler pre-built binary downloads:
 
     On your linux host:
 
-        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/linux.370 ; cd ../..
         make fetch-lua
 
     On your macOS host:
 
-        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/macOS.370 ; cd ../..
         make fetch-lua
 
     The MSDOS cross-compile can then be carried out by specifying
@@ -563,12 +563,12 @@ Cross-compiler url:      https://github.com/bebbo/amiga-gcc
 
     On your linux host:
 
-        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/linux.370 ; cd ../..
         make fetch-lua
 
     On your macOS host:
 
-        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/macOS.370 ; cd ../..
         make fetch-lua
 
     The Amiga cross-compile can then be carried out by specifying
@@ -657,12 +657,12 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
     On your linux host, prepare to cross-compile NetHack as follows:
 
-        cd sys/unix ; sh setup.sh hints/linux.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/linux.370 ; cd ../..
         make fetch-lua
 
     On your macOS host, prepare to cross-compile NetHack as follows:
 
-        cd sys/unix ; sh setup.sh hints/macOS.2020 ; cd ../..
+        cd sys/unix ; sh setup.sh hints/macOS.370 ; cd ../..
         make fetch-lua
 
     Then, cross-compile to targets/wasm as follows:
@@ -685,7 +685,7 @@ Cross-compiler url: https://emscripten.org/docs/getting_started/downloads.html
 
     The cross-compiler hints additions are enclosed inside ifdef sections
     and shouldn't interfere with the non-cross-compile builds using
-    hints/linux.2020 or hints/macOS.2020.
+    hints/linux.370 or hints/macOS.370.
 
 ---
 

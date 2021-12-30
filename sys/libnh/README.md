@@ -12,14 +12,14 @@ Generally the build is the same as the unix build:
 
 [Edit Oct 4, 2020: Use the existing Makefile and hints, hints/include system for cross-compiles]
 1. `cd sys/unix`
-2. `./setup.sh hints/macOS.2020`
+2. `./setup.sh hints/macOS.370`
 3. `cd ../..`
 4. For `libnethack.a`: `make WANT_LIBNH=1 all`
 5. For `nethack.js`: `make CROSS_TO_WASM=1 all`
 
 [Original text was:]
 1. `cd sys/lib`
-2. For `libnethack.a`: `./setup.sh hints/macOS.2020`; for `nethack.js`: `./setup.sh hints/wasm`
+2. For `libnethack.a`: `./setup.sh hints/macOS.370`; for `nethack.js`: `./setup.sh hints/wasm`
 3. `cd ../..`
 4. `make`
 

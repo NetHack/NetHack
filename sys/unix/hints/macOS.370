@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.2020 $NHDT-Date: 1633401749 2021/10/05 02:42:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $
+# NetHack 3.7  macOS.370 $NHDT-Date: 1633401749 2021/10/05 02:42:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -17,7 +17,7 @@
 #
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2
-#-INCLUDE multiw-1.2020
+#-INCLUDE multiw-1.370
 
 # 3. If you set WANT_WIN_QT, you need to
 #  A) set QTDIR either here or in the environment to point to the Qt5
@@ -68,12 +68,12 @@ endif
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-#-INCLUDE multiw-2.2020
+#-INCLUDE multiw-2.370
 
-# compiler.2020 contains compiler detection and adjustments common
+# compiler.370 contains compiler detection and adjustments common
 # to both linux and macOS
 
-#-INCLUDE compiler.2020
+#-INCLUDE compiler.370
 
 # NetHack sources control
 NHCFLAGS+=-DDLB
@@ -93,10 +93,10 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DTTY_TILES_ESCCODES
 #NHCFLAGS+=-DTTY_SOUND_ESCCODES
 
-CFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.2020
+CFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)
 
-CCXXFLAGS+= $(WINCFLAGS) #WINCFLAGS set from multiw-2.2020
+CCXXFLAGS+= $(WINCFLAGS) #WINCFLAGS set from multiw-2.370
 CCXXFLAGS+= $(NHCFLAGS)
 
 VARDATND =
@@ -300,7 +300,7 @@ VARDIR=$(HACKDIR)
 # Install.Qt mentions a patch for macos - it's not there (it seems to be in the Qt binary
 # package under the docs directory).
 #
-#-INCLUDE cross-pre.2020
+#-INCLUDE cross-pre.370
 #
 #-POST
 
@@ -495,5 +495,5 @@ endif	# end of build_qt_pkg
 endif	# WANT_WIN_QT for packaging
 endif	# MAKEFILE_TOP
 #
-#-INCLUDE cross-post.2020
+#-INCLUDE cross-post.370
 #

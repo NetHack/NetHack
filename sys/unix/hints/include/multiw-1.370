@@ -1,6 +1,6 @@
 
 #------------------------------------------------------------------------------
-# NetHack 3.7  multiw-1.2020 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  multiw-1.370 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
 
 # 1. Which windowing interface(s) should be included in this binary?
 # One or more of these can be manually uncommented and/or can be specified
@@ -19,5 +19,5 @@
 #WANT_DEFAULT=Qt
 #WANT_DEFAULT=X11
 
-#end of multiw-1.2020
+#end of multiw-1.370
 #------------------------------------------------------------------------------
