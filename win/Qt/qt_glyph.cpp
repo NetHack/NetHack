@@ -8,7 +8,6 @@ extern "C" {
 #include "hack.h"
 #include "tile2x11.h" /* x11tiles is potential fallback for nhtiles.bmp */
 }
-#undef C
 
 #include "qt_pre.h"
 #include <QtGui/QtGui>
