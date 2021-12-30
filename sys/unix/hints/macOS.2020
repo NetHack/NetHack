@@ -27,14 +27,36 @@ ifndef WANT_WIN_QT
 ifdef WANT_WIN_ALL
 WANT_WIN_QT=1
 endif
-endif
+ifdef WANT_WIN_QT5
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT6
+endif   # not WANT_WIN_QT
+
 ifdef WANT_WIN_QT
+ifndef WANT_WIN_QT5
+ifndef WANT_WIN_QT6
+WANT_WIN_QT5=1
+endif   # not WANT_WIN_QT6
+endif   # not WANT_WIN_QT5
 #QTDIR=/Developer/Qt
-# Qt installed via homebrew
+ifdef WANT_WIN_QT5
+# Qt5 installed via homebrew
 QTDIR=$(shell brew --prefix)/opt/qt@5
-# Qt installed via macports
+endif   # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+QTDIR=$(shell brew --prefix)/opt/qt@6
+endif   # WANT_WIN_QT6
+# Qt5 installed via macports
 #QTDIR=/opt/local/libexec/qt5
 endif	# WANT_WIN_QT
+
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
 endif
@@ -118,10 +140,18 @@ LFLAGS=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
-# Qt5 requires C++11
 LINK = $(CXX)
+ifdef WANT_WIN_QT5
+# Qt5 requires C++11
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+endif    # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore
+MOC = moc
+MOCPATH = $(QTDIR)/share/qt/libexec/moc
+WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets
+endif    # WANT_WIN_QT6
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
