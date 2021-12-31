@@ -48,7 +48,7 @@ endif   # not WANT_WIN_QT5
 #QTDIR=/Developer/Qt
 ifdef WANT_WIN_QT5
 # Qt5 installed via homebrew
-QTDIR=$(shell brew --prefix)/opt/qt
+QTDIR=$(shell brew --prefix)/opt/qt@5
 endif   # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
 QTDIR=$(shell brew --prefix)/opt/qt@6
