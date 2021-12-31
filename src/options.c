@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1613723080 2021/02/19 08:24:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1640991743 2021/12/31 23:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.522 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -65,7 +65,7 @@ static struct allopt_t allopt_init[] = {
 #undef NHOPT_PARSE
 
 
-#ifdef DEFAULT_WC_TILED_MAP
+#if defined(USE_TILES) && defined(DEFAULT_WC_TILED_MAP)
 #define PREFER_TILED TRUE
 #else
 #define PREFER_TILED FALSE
