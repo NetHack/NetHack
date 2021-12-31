@@ -158,7 +158,7 @@ typedef uchar nhsym;
 #define PORT_ID "Mac"
 #endif
 #ifdef __APPLE__
-#define PORT_ID "MacOSX"
+#define PORT_ID "MacOS"
 #endif
 #ifdef MSDOS
 #ifdef PC9800
