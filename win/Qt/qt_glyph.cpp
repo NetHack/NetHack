@@ -40,29 +40,46 @@ static int tilefile_tile_H=16;
 
 NetHackQtGlyphs::NetHackQtGlyphs()
 {
-    const char* tile_file = PIXMAPDIR "/nhtiles.bmp";
+    boolean tilesok = TRUE, user_tiles = (::iflags.wc_tile_file != NULL);
+    char cbuf[BUFSZ];
+    const char *tile_file = NULL, *tile_list[2];
 
-    if (iflags.wc_tile_file)
-	tile_file = iflags.wc_tile_file;
+    tiles_per_row = TILES_PER_ROW;
 
-    if (!img.load(tile_file)) {
-        tiles_per_row = TILES_PER_ROW;
-
-	tile_file = PIXMAPDIR "/x11tiles";
-	if (!img.load(tile_file)) {
-	    QString msg = QString::asprintf("Cannot load 'nhtiles.bmp' or 'x11tiles'.");
-            QMessageBox::warning(0, "IO Error", msg);
-            iflags.wc_ascii_map = 1;
-            iflags.wc_tiled_map = 0;
-	} else {
-            if (img.width() % tiles_per_row) {
-                impossible(
-            "Tile file \"%s\" has %d columns, not multiple of row count (%d)",
-                           tile_file, img.width(), tiles_per_row);
-	    }
-	}
+    if (user_tiles) {
+        tile_list[0] = ::iflags.wc_tile_file;
+        Snprintf(cbuf, sizeof cbuf, "%s/%s", PIXMAPDIR, tile_list[0]);
+        tile_list[1] = cbuf;
     } else {
-	tiles_per_row = 40;
+        tile_list[0] = PIXMAPDIR "/nhtiles.bmp";
+        tile_list[1] = PIXMAPDIR "/x11tiles";
+    }
+
+    if (img.load(tile_list[0]))
+        tile_file = tile_list[0];
+    else if (img.load(tile_list[1]))
+        tile_file = tile_list[1];
+
+    if (!tile_file) {
+        tilesok = FALSE;
+        QString msg = QString::asprintf("Cannot load '%s'.",
+                                        user_tiles ? tile_list[0]
+                                          // mismatched quotes match format
+                                          : "nhtiles.bmp' or 'x11tiles");
+        QMessageBox::warning(0, "IO Error", msg);
+    } else {
+        if (img.width() % tiles_per_row) {
+            tilesok = FALSE;
+            impossible(
+            "Tile file \"%s\" has %d columns, not multiple of row count (%d)",
+                       tile_file, img.width(), tiles_per_row);
+        }
+    }
+
+    if (!tilesok) {
+        ::iflags.wc_ascii_map = 1;
+        ::iflags.wc_tiled_map = 0;
+        tiles_per_row = 40; // arbitrary
     }
 
     if (iflags.wc_tile_width)
