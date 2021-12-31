@@ -808,7 +808,7 @@ minliquid_core(struct monst* mtmp)
                     /* hero used fire to melt ice that monster was on */
                     You("drown %s.", mon_nam(mtmp));
             }
-            if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
+            if (engulfing_u(mtmp)) {
                 /* This can happen after a purple worm plucks you off a
                    flying steed while you are over water. */
                 pline("%s sinks as %s rushes in and flushes you out.",
@@ -907,7 +907,7 @@ mcalcdistress(void)
         /* possibly polymorph shapechangers and lycanthropes */
         if (mtmp->cham >= LOW_PM)
             decide_to_shapeshift(mtmp, (canspotmon(mtmp)
-                                        || (u.uswallow && mtmp == u.ustuck))
+                                        || engulfing_u(mtmp))
                                           ? SHIFT_MSG : 0);
         were_change(mtmp);
 
@@ -2748,7 +2748,7 @@ monstone(struct monst* mdef)
         newsym(x, y);
     /* We don't currently trap the hero in the statue in this case but we
      * could */
-    if (u.uswallow && u.ustuck == mdef)
+    if (engulfing_u(mdef))
         wasinside = TRUE;
     mondead(mdef);
     if (wasinside) {
@@ -2864,7 +2864,7 @@ xkilled(
     struct obj *otmp;
     struct trap *t;
     boolean be_sad;
-    boolean wasinside = u.uswallow && (u.ustuck == mtmp),
+    boolean wasinside = engulfing_u(mtmp),
             burycorpse = FALSE,
             nomsg = (xkill_flags & XKILL_NOMSG) != 0,
             nocorpse = (xkill_flags & XKILL_NOCORPSE) != 0,
@@ -3111,7 +3111,7 @@ vamp_stone(struct monst* mtmp)
             set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
             mtmp->mhp = mtmp->mhpmax;
             /* this can happen if previously a fog cloud */
-            if (u.uswallow && (mtmp == u.ustuck))
+            if (engulfing_u(mtmp))
                 expels(mtmp, mtmp->data, FALSE);
             if (in_door) {
                 coord new_xy;

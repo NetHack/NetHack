@@ -233,6 +233,8 @@ struct monst {
 #define troll_baned(m,o) \
     ((m)->data->mlet == S_TROLL && (o) && (o)->oartifact == ART_TROLLSBANE)
 
+#define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
+
 /* Get the maximum difficulty monsters that can currently be generated,
    given the current level difficulty and the hero's level. */
 #define monmax_difficulty(levdif) (((levdif) + u.ulevel) / 2)

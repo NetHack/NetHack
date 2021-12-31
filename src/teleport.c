@@ -1654,7 +1654,7 @@ u_teleport_mon(struct monst* mtmp, boolean give_feedback)
         if (give_feedback)
             pline("%s resists your magic!", Monnam(mtmp));
         return FALSE;
-    } else if (u.uswallow && mtmp == u.ustuck && noteleport_level(mtmp)) {
+    } else if (engulfing_u(mtmp) && noteleport_level(mtmp)) {
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);

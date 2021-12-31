@@ -124,7 +124,7 @@ attack_checks(
     /* if you're close enough to attack, alert any waiting monster */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
 
-    if (u.uswallow && mtmp == u.ustuck)
+    if (engulfing_u(mtmp))
         return FALSE;
 
     if (g.context.forcefight) {
@@ -503,7 +503,7 @@ do_attack(struct monst *mtmp)
      */
     if (g.context.forcefight && !DEADMONSTER(mtmp) && !canspotmon(mtmp)
         && !glyph_is_invisible(levl[u.ux + u.dx][u.uy + u.dy].glyph)
-        && !(u.uswallow && mtmp == u.ustuck))
+        && !engulfing_u(mtmp))
         map_invisible(u.ux + u.dx, u.uy + u.dy);
 
     return TRUE;
@@ -544,7 +544,7 @@ known_hitum(struct monst *mon, struct obj *weapon, int *mhit, int rollneeded,
         if (malive) {
             /* monster still alive */
             if (!rn2(25) && mon->mhp < mon->mhpmax / 2
-                && !(u.uswallow && mon == u.ustuck)) {
+                && !engulfing_u(mon)) {
                 /* maybe should regurgitate if swallowed? */
                 monflee(mon, !rn2(3) ? rnd(100) : 0, FALSE, TRUE);
 
@@ -2366,13 +2366,12 @@ mhitm_ad_tlpt(struct monst *magr, struct attack *mattk, struct monst *mdef,
             mhm->damage = 1;
         if (!negated) {
             char nambuf[BUFSZ];
-            boolean u_saw_mon = (canseemon(mdef)
-                                 || (u.uswallow && u.ustuck == mdef));
+            boolean u_saw_mon = (canseemon(mdef) || engulfing_u(mdef));
 
             /* record the name before losing sight of monster */
             Strcpy(nambuf, Monnam(mdef));
             if (u_teleport_mon(mdef, FALSE) && u_saw_mon
-                && !(canseemon(mdef) || (u.uswallow && u.ustuck == mdef)))
+                && !(canseemon(mdef) || engulfing_u(mdef)))
                 pline("%s suddenly disappears!", nambuf);
             if (mhm->damage >= mdef->mhp) { /* see hitmu(mhitu.c) */
                 if (mdef->mhp == 1)

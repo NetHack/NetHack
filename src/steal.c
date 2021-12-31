@@ -518,7 +518,7 @@ mpickobj(register struct monst* mtmp, register struct obj* otmp)
        the light to be extinguished rather than letting it shine thru */
     if (obj_sheds_light(otmp) && attacktype(mtmp->data, AT_ENGL)) {
         /* this is probably a burning object that you dropped or threw */
-        if (u.uswallow && mtmp == u.ustuck && !Blind)
+        if (engulfing_u(mtmp) && !Blind)
             pline("%s out.", Tobjnam(otmp, "go"));
         snuff_otmp = TRUE;
     }

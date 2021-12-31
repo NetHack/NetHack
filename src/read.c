@@ -2152,7 +2152,7 @@ drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
             pline("%s is hit by %s!", Monnam(mtmp), doname(otmp2));
             if (mtmp->minvis && !canspotmon(mtmp))
                 map_invisible(mtmp->mx, mtmp->my);
-        } else if (u.uswallow && mtmp == u.ustuck)
+        } else if (engulfing_u(mtmp))
             You_hear("something hit %s %s over your %s!",
                      s_suffix(mon_nam(mtmp)), mbodypart(mtmp, STOMACH),
                      body_part(HEAD));
@@ -2185,7 +2185,7 @@ drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
             wakeup(mtmp, byu);
         }
         wake_nearto(x, y, 4 * 4);
-    } else if (u.uswallow && mtmp == u.ustuck) {
+    } else if (engulfing_u(mtmp)) {
         obfree(otmp2, (struct obj *) 0);
         /* fall through to player */
         drop_boulder_on_player(confused, TRUE, FALSE, TRUE);

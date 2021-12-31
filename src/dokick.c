@@ -924,7 +924,7 @@ dokick(void)
                       to an unseen square doesn't leave an I behind */
                    && mtmp->mx == x && mtmp->my == y
                    && !glyph_is_invisible(glyph)
-                   && !(u.uswallow && mtmp == u.ustuck)) {
+                   && !engulfing_u(mtmp)) {
             map_invisible(x, y);
         }
         /* recoil if floating */

@@ -124,7 +124,7 @@ fightm(register struct monst *mtmp)
         if (itsstuck(mtmp))
             return 0;
     }
-    has_u_swallowed = (u.uswallow && (mtmp == u.ustuck));
+    has_u_swallowed = engulfing_u(mtmp);
 
     for (mon = fmon; mon; mon = nmon) {
         nmon = mon->nmon;
@@ -486,7 +486,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1)
                 continue;
             /* Engulfing attacks are directed at the hero if possible. -dlc */
-            if (u.uswallow && magr == u.ustuck)
+            if (engulfing_u(magr))
                 strike = 0;
             else if ((strike = (tmp > rnd(20 + i))) != 0)
                 res[i] = gulpmm(magr, mdef, mattk);

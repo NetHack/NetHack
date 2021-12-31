@@ -1678,7 +1678,7 @@ thitmonst(register struct monst *mon,
     register int tmp;     /* Base chance to hit */
     register int disttmp; /* distance modifier */
     int otyp = obj->otyp, hmode;
-    boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
+    boolean guaranteed_hit = engulfing_u(mon);
     int dieroll;
 
     hmode = (obj == uwep) ? HMON_APPLIED

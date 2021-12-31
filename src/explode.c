@@ -363,7 +363,7 @@ explode(
                     } while (*hallu_buf != lowc(*hallu_buf));
                     str = hallu_buf;
                 }
-                if (u.uswallow && mtmp == u.ustuck) {
+                if (engulfing_u(mtmp)) {
                     const char *adj = (char *) 0;
 
                     if (is_animal(u.ustuck->data)) {

@@ -4428,7 +4428,7 @@ display_minventory(struct monst *mon, int dflags, char *title)
     int n;
     menu_item *selected = 0;
     int do_all = (dflags & MINV_ALL) != 0,
-        incl_hero = (do_all && u.uswallow && mon == u.ustuck),
+        incl_hero = (do_all && engulfing_u(mon)),
         have_inv = (mon->minvent != 0), have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 

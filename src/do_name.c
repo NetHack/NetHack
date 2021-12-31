@@ -1734,7 +1734,7 @@ x_monnam(
     do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
     do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
             && !g.program_state.gameover && mtmp != u.usteed
-            && !(u.uswallow && mtmp == u.ustuck) && !(suppress & SUPPRESS_IT);
+            && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
     do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
     augment_it = (suppress & AUGMENT_IT) != 0;

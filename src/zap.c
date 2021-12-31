@@ -140,7 +140,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC
                                && M_AP_TYPE(mtmp) != M_AP_NOTHING);
 
-    if (u.uswallow && mtmp == u.ustuck)
+    if (engulfing_u(mtmp))
         reveal_invis = FALSE;
 
     g.notonhead = (mtmp->mx != g.bhitpos.x || mtmp->my != g.bhitpos.y);
@@ -177,7 +177,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 seemimic(mtmp);
             mon_adjust_speed(mtmp, -1, otmp);
             m_dowear(mtmp, FALSE); /* might want speed boots */
-            if (u.uswallow && (mtmp == u.ustuck) && is_whirly(mtmp->data)) {
+            if (engulfing_u(mtmp) && is_whirly(mtmp->data)) {
                 You("disrupt %s!", mon_nam(mtmp));
                 pline("A huge hole opens up...");
                 expels(mtmp, mtmp->data, TRUE);
@@ -229,7 +229,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             boolean polyspot = (otyp != POT_POLYMORPH),
                     give_msg = (!Hallucination
                                 && (canseemon(mtmp)
-                                    || (u.uswallow && mtmp == u.ustuck)));
+                                    || engulfing_u(mtmp)));
 
             /* dropped inventory (due to death by system shock,
                or loss of wielded weapon and/or worn armor due to
@@ -258,7 +258,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                            && newcham(mtmp, &mons[mtmp->cham],
                                       polyspot, give_msg) != 0)) {
                 if (give_msg && (canspotmon(mtmp)
-                                 || (u.uswallow && mtmp == u.ustuck)))
+                                 || engulfing_u(mtmp)))
                     learn_it = TRUE;
             }
 
@@ -529,7 +529,7 @@ probe_monster(struct monst *mtmp)
                                   (char *) 0);
     } else {
         pline("%s is not carrying anything%s.", noit_Monnam(mtmp),
-              (u.uswallow && mtmp == u.ustuck) ? " besides you" : "");
+              engulfing_u(mtmp) ? " besides you" : "");
     }
 }
 
@@ -3308,7 +3308,7 @@ hit(const char *str, struct monst *mtmp,
     const char *force) /* usually either "." or "!" */
 {
     if ((!cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp)
-         && !(u.uswallow && mtmp == u.ustuck)) || !flags.verbose)
+         && !engulfing_u(mtmp)) || !flags.verbose)
         pline("%s %s it.", The(str), vtense(str, "hit"));
     else
         pline("%s %s %s%s", The(str), vtense(str, "hit"),
@@ -3860,7 +3860,7 @@ zhitm(
         if (spellcaster)
             tmp = spell_damage_bonus(tmp);
         if (!resists_blnd(mon)
-            && !(type > 0 && u.uswallow && mon == u.ustuck)) {
+            && !(type > 0 && engulfing_u(mon))) {
             register unsigned rnd_tmp = rnd(50);
             mon->mcansee = 0;
             if ((mon->mblinded + rnd_tmp) > 127)

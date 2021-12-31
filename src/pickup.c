@@ -950,7 +950,7 @@ query_objlist(const char *qstr,        /* query string */
     /* can't depend upon 'engulfer' because that's used to indicate whether
        hero should be shown as an extra, fake item */
     engulfer_minvent = (olist && olist->where == OBJ_MINVENT
-                        && u.uswallow && olist->ocarry == u.ustuck);
+                        && engulfing_u(olist->ocarry));
     if (engulfer_minvent && n == 1 && olist->owornmask != 0L) {
         qflags &= ~AUTOSELECT_SINGLE;
     }
@@ -1629,7 +1629,7 @@ pickup_object(struct obj *obj, long count,
     if (obj == uchain) { /* do not pick up attached chain */
         return 0;
     } else if (obj->where == OBJ_MINVENT && obj->owornmask != 0L
-               && u.uswallow && obj->ocarry == u.ustuck) {
+               && engulfing_u(obj->ocarry)) {
         You_cant("pick %s up.", ysimple_name(obj));
         return 0;
     } else if (obj->oartifact && !touch_artifact(obj, &g.youmonst)) {

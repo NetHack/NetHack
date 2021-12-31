@@ -1147,7 +1147,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
     boolean youdefend = (mdef == &g.youmonst);
     boolean vis = (!youattack && magr && cansee(magr->mx, magr->my))
                   || (!youdefend && cansee(mdef->mx, mdef->my))
-                  || (youattack && u.uswallow && mdef == u.ustuck && !Blind);
+                  || (youattack && engulfing_u(mdef) && !Blind);
     boolean realizes_damage;
     const char *wepdesc;
     static const char you[] = "you";
@@ -1241,7 +1241,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
         if (otmp->oartifact == ART_TSURUGI_OF_MURAMASA && dieroll == 1) {
             wepdesc = "The razor-sharp blade";
             /* not really beheading, but so close, why add another SPFX */
-            if (youattack && u.uswallow && mdef == u.ustuck) {
+            if (youattack && engulfing_u(mdef)) {
                 You("slice %s wide open!", mon_nam(mdef));
                 *dmgptr = 2 * mdef->mhp + FATAL_DAMAGE_MODIFIER;
                 return TRUE;
@@ -1287,7 +1287,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
             static const char *const behead_msg[2] = { "%s beheads %s!",
                                                        "%s decapitates %s!" };
 
-            if (youattack && u.uswallow && mdef == u.ustuck)
+            if (youattack && engulfing_u(mdef))
                 return FALSE;
             wepdesc = artilist[ART_VORPAL_BLADE].name;
             if (!youdefend) {

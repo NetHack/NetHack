@@ -1136,7 +1136,7 @@ m_move(register struct monst* mtmp, register int after)
     gx = mtmp->mux;
     gy = mtmp->muy;
     appr = mtmp->mflee ? -1 : 1;
-    if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck)) {
+    if (mtmp->mconf || engulfing_u(mtmp)) {
         appr = 0;
     } else {
         boolean should_see = (couldsee(omx, omy)
@@ -1617,7 +1617,7 @@ m_move(register struct monst* mtmp, register int after)
                 return 2; /* mon died (position already updated) */
 
             /* set also in domove(), hack.c */
-            if (u.uswallow && mtmp == u.ustuck
+            if (engulfing_u(mtmp)
                 && (mtmp->mx != omx || mtmp->my != omy)) {
                 /* If the monster moved, then update */
                 u.ux0 = u.ux;
