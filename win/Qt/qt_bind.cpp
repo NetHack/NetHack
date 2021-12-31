@@ -77,49 +77,9 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     QApplication(argc,argv)
 #endif
 {
-    QPixmap pm("nhsplash.xpm");
-    if ( iflags.wc_splash_screen && !pm.isNull() ) {
-        splash = new QFrame(NULL, (Qt::FramelessWindowHint
-                                   | Qt::X11BypassWindowManagerHint
-                                   | Qt::WindowStaysOnTopHint));
-	QVBoxLayout *vb = new QVBoxLayout(splash);
-	QLabel *lsplash = new QLabel(splash);
-	vb->addWidget(lsplash);
-	lsplash->setAlignment(Qt::AlignCenter);
-	lsplash->setPixmap(pm);
-	QLabel* capt = new QLabel("Loading...",splash);
-	vb->addWidget(capt);
-	capt->setAlignment(Qt::AlignCenter);
-	if ( !pm.isNull() ) {
-	    lsplash->setFixedSize(pm.size());
-	    lsplash->setMask(QBitmap(pm));
-	}
-#if QT_VERSION < 0x060000
-	QSize screensize = QApplication::desktop()->size();
-#else
-	QSize screensize = splash->screen()->size();
-#endif
-	splash->move((screensize.width()-pm.width())/2,
-		      (screensize.height()-pm.height())/2);
-	//splash->setGeometry(0,0,100,100);
-	if ( qt_compact_mode ) {
-	    splash->showMaximized();
-	} else {
-	    splash->setFrameStyle(QFrame::WinPanel|QFrame::Raised);
-	    splash->setLineWidth(10);
-	    splash->adjustSize();
-	    splash->show();
-	}
-
-	// force content refresh outside event loop
-	splash->repaint();
-	lsplash->repaint();
-	capt->repaint();
-	qApp->processEvents();
-
-    } else {
-	splash = 0;
-    }
+    splash = 0;
+    if (iflags.wc_splash_screen)
+        NetHackQtBind::qt_Splash(); // show something while starting up
 
     // these used to be in MainWindow but we want them before QtSettings
     // which we want before MainWindow...
@@ -128,7 +88,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     QCoreApplication::setApplicationName("NetHack-Qt"); // Qt NetHack
     {
         char cvers[BUFSZ];
-        QString qvers = version_string(cvers);
+        QString qvers = QString(::version_string(cvers));
         QCoreApplication::setApplicationVersion(qvers);
     }
 #ifdef MACOS
@@ -144,6 +104,54 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     msgs_strings = new QStringList();
     msgs_initd = false;
     msgs_saved = false;
+}
+
+// before the game windows have been rendered, display a small, centered
+// window showing a red dragon with caption "Loading..."
+void
+NetHackQtBind::qt_Splash()
+{
+    QPixmap pm("nhsplash.xpm"); // load splash image from a file in HACKDIR
+    if (!pm.isNull()) {
+        splash = new QFrame(NULL, (Qt::FramelessWindowHint
+                                   | Qt::X11BypassWindowManagerHint
+                                   | Qt::WindowStaysOnTopHint));
+        QVBoxLayout *vb = new QVBoxLayout(splash);
+        QLabel *lsplash = new QLabel(splash);
+        vb->addWidget(lsplash);
+        lsplash->setAlignment(Qt::AlignCenter);
+        lsplash->setPixmap(pm);
+        QLabel *capt = new QLabel("Loading...", splash);
+        vb->addWidget(capt);
+        capt->setAlignment(Qt::AlignCenter);
+        lsplash->setFixedSize(pm.size());
+        lsplash->setMask(QBitmap(pm));
+
+#if QT_VERSION < 0x060000
+        QSize screensize = QApplication::desktop()->size();
+#else
+        QSize screensize = splash->screen()->size();
+#endif
+        splash->move((screensize.width() - pm.width()) / 2,
+                     (screensize.height() - pm.height()) / 2);
+        //splash->setGeometry(0,0,100,100);
+        if (qt_compact_mode) {
+            splash->showMaximized();
+        } else {
+            splash->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
+            splash->setLineWidth(10);
+            splash->adjustSize();
+            splash->show();
+        }
+
+        // force content refresh outside event loop
+        splash->repaint();
+        lsplash->repaint();
+        capt->repaint();
+        qApp->processEvents();
+    } else {
+        splash = 0; // caller has alrady done this...
+    }
 }
 
 void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)

@@ -35,6 +35,7 @@ private:
 	static NetHackQtMainWindow* main;
 
 public:
+        static void qt_Splash();
 	static void qt_init_nhwindows(int* argc, char** argv);
 	static void qt_player_selection();
 	static void qt_askname();
