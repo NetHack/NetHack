@@ -3371,7 +3371,7 @@ tipcontainer(struct obj *box) /* or bag */
     xchar ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
     boolean empty_it = TRUE, maybeshopgoods;
     struct obj *targetbox = (struct obj *) 0;
-    boolean cancelled;
+    boolean cancelled = FALSE;
 
     /* box is either held or on floor at hero's spot; no need to check for
        nesting; when held, we need to update its location to match hero's;
