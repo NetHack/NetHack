@@ -728,6 +728,7 @@ if a giant carrying a boulder was on ice that melted, it could be killed
 allow fire-command to automatically use a polearm, if wielding it
 make '$' command also count gold carried inside containers
 fleeing leprechauns bury their gold after teleporting
+allow #tipping container contents directly into another container
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
