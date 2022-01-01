@@ -1412,17 +1412,33 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 const char *
 get_lua_version(void)
 {
-    size_t len = (size_t) 0;
-    const char *vs = (const char *) 0;
-    lua_State *L;
-
     if (g.lua_ver[0] == 0) {
-        L = nhl_init();
+        lua_State *L = nhl_init();
 
         if (L) {
-            lua_getglobal(L, "_VERSION");
+            size_t len = 0;
+            const char *vs = (const char *) 0;
+
+            /* LUA_VERSION yields "<major>.<minor>" although we check to see
+               whether it is "Lua-<major>.<minor>" and strip prefix if so;
+               LUA_RELEASE is <LUA_VERSION>.<LUA_VERSION_RELEASE> but doesn't
+               get set up as a lua global */
+            lua_getglobal(L, "_RELEASE");
             if (lua_isstring(L, -1))
                 vs = lua_tolstring (L, -1, &len);
+#ifdef LUA_RELEASE
+            else
+                vs = LUA_RELEASE, len = strlen(vs);
+#endif
+            if (!vs) {
+                lua_getglobal(L, "_VERSION");
+                if (lua_isstring(L, -1))
+                    vs = lua_tolstring (L, -1, &len);
+#ifdef LUA_VERSION
+                else
+                    vs = LUA_VERSION, len = strlen(vs);
+#endif
+            }
             if (vs && len < sizeof g.lua_ver) {
                 if (!strncmpi(vs, "Lua", 3)) {
                     vs += 3;

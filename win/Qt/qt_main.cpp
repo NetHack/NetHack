@@ -459,7 +459,7 @@ aboutMsg()
     char *p, vbuf[BUFSZ];
     /* nethack's getversionstring() includes a final period
        but we're using it mid-sentence so strip period off */
-    if ((p = strrchr(getversionstring(vbuf), '.')) != 0 && *(p + 1) == '\0')
+    if ((p = strrchr(::getversionstring(vbuf), '.')) != 0 && *(p + 1) == '\0')
         *p = '\0';
     /* it's also long; break it into two pieces */
     (void) strsubst(vbuf, " - ", "\n- ");
@@ -471,7 +471,7 @@ aboutMsg()
 #endif
         " the Qt %d GUI toolkit.\n"                      // short Qt version
         "\n"
-        "This is %s%s.\n"       // long nethack version and full Qt version
+        "This is %s%s and Lua %s.\n" // long nethack version, Qt & Lua versions
         "\n"
         "NetHack's Qt interface originally developed by Warwick Allison.\n"
         "\n"
@@ -486,6 +486,7 @@ aboutMsg()
 #else
         "Qt:\n     http://www.troll.no/\n"      // obsolete
 #endif
+        "Lua:\n     https://lua.org/\n"
         "NetHack:\n     %s\n", // DEVTEAM_URL
         // arguments
 #ifdef QT_VERSION_MAJOR
@@ -499,6 +500,7 @@ aboutMsg()
 #else
         "",
 #endif
+        ::get_lua_version(),
         DEVTEAM_URL);
     return msg;
 }
