@@ -2728,6 +2728,7 @@ void nethack_enter_consoletty(void)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     init_custom_colors();
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
+    console.current_nhcolor = NO_COLOR;
 }
 #endif /* TTY_GRAPHICS */
 
