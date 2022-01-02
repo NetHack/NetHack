@@ -8324,12 +8324,6 @@ set_option_mod_status(const char *optnam, int status)
             return;
         }
     }
-    for (k = 0; allopt[k].name; k++) {
-        if (!strncmpi(allopt[k].name, optnam, strlen(optnam))) {
-            allopt[k].setwhere = status;
-            return;
-        }
-    }
 }
 
 /*
