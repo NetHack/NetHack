@@ -176,7 +176,8 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     // Actually indexed by grid[column][row].
 
 #ifdef ENHANCED_PAPERDOLL
-    if (iflags.wc_ascii_map)
+    if (qt_settings->doll_is_shown && ::iflags.wc_ascii_map
+        && qt_settings->glyphs().no_tiles)
         qt_settings->doll_is_shown = false;
     if (!qt_settings->doll_is_shown)
         return;
@@ -185,7 +186,7 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
                                   qt_settings->dollHeight);
 
     /* for drawWorn()'s use of obj->invlet */
-    if (!flags.invlet_constant)
+    if (!::flags.invlet_constant)
         reassign();
 #endif
 

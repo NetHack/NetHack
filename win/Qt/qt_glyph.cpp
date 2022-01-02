@@ -44,6 +44,7 @@ NetHackQtGlyphs::NetHackQtGlyphs()
     char cbuf[BUFSZ];
     const char *tile_file = NULL, *tile_list[2];
 
+    this->no_tiles = false;
     tiles_per_row = TILES_PER_ROW;
 
     if (user_tiles) {
@@ -77,9 +78,14 @@ NetHackQtGlyphs::NetHackQtGlyphs()
     }
 
     if (!tilesok) {
+        this->no_tiles = true;
+        /* tiles wouldn't load so force ascii map */
         ::iflags.wc_ascii_map = 1;
         ::iflags.wc_tiled_map = 0;
-        tiles_per_row = 40; // arbitrary
+        /* tiles wouldn't load so don't allow toggling to tiled map */
+        ::set_wc_option_mod_status(WC_ASCII_MAP | WC_TILED_MAP,
+                                   ::set_in_config);
+        tiles_per_row = 40; // arbitrary to avoid potential divide-by-0
     }
 
     if (iflags.wc_tile_width)

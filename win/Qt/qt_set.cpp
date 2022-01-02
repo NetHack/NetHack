@@ -136,17 +136,28 @@ NetHackQtSettings::NetHackQtSettings() :
     }
 
     theglyphs=new NetHackQtGlyphs();
-    resizeTiles();
+    if (!theglyphs->no_tiles) {
+        resizeTiles();
 
-    connect(&whichsize, SIGNAL(toggled(bool)), this, SLOT(setGlyphSize(bool)));
-    connect(&tilewidth, SIGNAL(valueChanged(int)), this, SLOT(resizeTiles()));
-    connect(&tileheight, SIGNAL(valueChanged(int)), this, SLOT(resizeTiles()));
+        connect(&whichsize, SIGNAL(toggled(bool)), this,
+                SLOT(setGlyphSize(bool)));
+        connect(&tilewidth, SIGNAL(valueChanged(int)), this,
+                SLOT(resizeTiles()));
+        connect(&tileheight, SIGNAL(valueChanged(int)), this,
+                SLOT(resizeTiles()));
 
 #ifdef ENHANCED_PAPERDOLL
-    connect(&dollshown, SIGNAL(toggled(bool)), this, SLOT(setDollShown(bool)));
-    connect(&dollwidth, SIGNAL(valueChanged(int)), this, SLOT(resizeDoll()));
-    connect(&dollheight, SIGNAL(valueChanged(int)), this, SLOT(resizeDoll()));
+        connect(&dollshown, SIGNAL(toggled(bool)), this,
+                SLOT(setDollShown(bool)));
+        connect(&dollwidth, SIGNAL(valueChanged(int)), this,
+                SLOT(resizeDoll()));
+        connect(&dollheight, SIGNAL(valueChanged(int)), this,
+                SLOT(resizeDoll()));
 #endif
+    } else {
+        // paper doll requires map tiles and those just failed to load
+        doll_is_shown = false;
+    }
 
     fontsize.setMinimumContentsLength((int) strlen("Medium"));
     fontsize.addItem("Huge");

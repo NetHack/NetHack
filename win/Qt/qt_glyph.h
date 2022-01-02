@@ -16,6 +16,8 @@ enum border_code {
 
 class NetHackQtGlyphs {
 public:
+        bool no_tiles;
+
 	NetHackQtGlyphs();
 
 	int width() const { return size.width(); }
