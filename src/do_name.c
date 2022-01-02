@@ -2296,6 +2296,7 @@ static NEARDATA const char *const hcolors[] = {
     "dancing", "singing", "loving", "loudy", "noisy", "clattery", "silent",
     "apocyan", "infra-pink", "opalescent", "violant", "tuneless",
     "viridian", "aureolin", "cinnabar", "purpurin", "gamboge", "madder",
+    "bistre", "ecru", "fulvous", "tekhelet", "selective yellow",
 };
 
 const char *
@@ -2325,6 +2326,7 @@ static NEARDATA const char *const hliquids[] = {
     "caramel sauce", "ink", "aqueous humour", "milk substitute",
     "fruit juice", "glowing lava", "gastric acid", "mineral water",
     "cough syrup", "quicksilver", "sweet vitriol", "grey goo", "pink slime",
+    "cosmic latte",
     /* "new coke (tm)", --better not */
 };
 
