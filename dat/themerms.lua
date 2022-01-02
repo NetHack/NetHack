@@ -222,6 +222,36 @@ themerooms = {
       });
    end,
 
+   -- Ghost of an Adventurer
+   function()
+      des.room({ type = "themed", lit = 0,
+                 contents = function(rm)
+                    local px = nh.rn2(rm.width);
+                    local py = nh.rn2(rm.height);
+                    des.monster({ id = "ghost", waiting = true, coord = {px,py} });
+                    if percent(65) then
+                       des.object({ id = "dagger", coord = {px,py}, buc = "not-blessed" });
+                    end
+                    if percent(55) then
+                       des.object({ class = ")", coord = {px,py}, buc = "not-blessed" });
+                    end
+                    if percent(45) then
+                       des.object({ id = "bow", coord = {px,py}, buc = "not-blessed" });
+                       des.object({ id = "arrow", coord = {px,py}, buc = "not-blessed" });
+                    end
+                    if percent(65) then
+                       des.object({ class = "[", coord = {px,py}, buc = "not-blessed" });
+                    end
+                    if percent(20) then
+                       des.object({ class = "=", coord = {px,py}, buc = "not-blessed" });
+                    end
+                    if percent(20) then
+                       des.object({ class = "?", coord = {px,py}, buc = "not-blessed" });
+                    end
+                 end
+      });
+   end,
+
    -- Mausoleum
    function()
       des.room({ type = "themed", w = 5 + nh.rn2(3)*2, h = 5 + nh.rn2(3)*2,
