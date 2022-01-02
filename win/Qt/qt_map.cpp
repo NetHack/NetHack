@@ -782,13 +782,14 @@ void NetHackQtMapWindow::Clear()
         Glyphcolor(0, j) = NO_COLOR;
         Glyphttychar(0, j) = ' ';
         Glyphflags(0, j) = 0;
-        Glyphtileidx(0, j) = 0;
+        Glyphtileidx(0, j) = ::glyphmap[GLYPH_NOTHING].tileidx;
+
         for (int i = 1; i < COLNO; ++i) {
             Glyph(i, j) = GLYPH_UNEXPLORED;
             Glyphcolor(i, j) = NO_COLOR;
             Glyphttychar(i, j) = ' ';
             Glyphflags(i, j) = 0;
-            Glyphtileidx(i, j) = 0;
+            Glyphtileidx(i, j) = ::glyphmap[GLYPH_UNEXPLORED].tileidx;
         }
     }
 
@@ -1035,6 +1036,6 @@ void NetHackQtMapWindow::Changed(int x, int y)
 {
     change.add(x,y);
 }
-#endif
+#endif /* 0 //RLC */
 
 } // namespace nethack_qt_
