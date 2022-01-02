@@ -480,7 +480,7 @@ opt_##a,
                 "height of tiles")
     NHOPTC(tile_width, 20, opt_in, set_gameview, Yes, Yes, No, No, NoAlias,
                 "width of tiles")
-    NHOPTB(tiled_map, 0, opt_in, set_in_config, tiled_map_Def, Yes, No, No,
+    NHOPTB(tiled_map, 0, opt_in, set_in_game, tiled_map_Def, Yes, No, No,
                 NoAlias, &iflags.wc_tiled_map)
     NHOPTB(time, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.time)
