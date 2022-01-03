@@ -93,6 +93,7 @@ extern int dozap(void);              /**/
 extern int doorganize(void);         /**/
 #endif /* DUMB */
 
+static const char *ecname_from_fn(int (*)(void));
 static int dosuspend_core(void);
 static int dosh_core(void);
 static int doherecmdmenu(void);
@@ -359,7 +360,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
     int ecflags = extcmd->flags;
 
     if (!wizard && (ecflags & WIZMODECMD)) {
-        You_cant("do that!");
+        pline(unavailcmd, extcmd->ef_txt);
         return FALSE;
     } else if (u.uburied && !(ecflags & IFBURIED)) {
         You_cant("do that while you are buried!");
@@ -860,7 +861,7 @@ wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
         flags.verbose = save_verbose;
         (void) encumber_msg();
     } else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_wish)));
+        pline(unavailcmd, ecname_from_fn(wiz_wish));
     return ECMD_OK;
 }
 
@@ -880,7 +881,7 @@ wiz_identify(void)
         (void) display_inventory((char *) 0, FALSE);
         iflags.override_ID = 0;
     } else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_identify)));
+        pline(unavailcmd, ecname_from_fn(wiz_identify));
     return ECMD_OK;
 }
 
@@ -999,7 +1000,7 @@ wiz_makemap(void)
         mklev();
         makemap_prepost(FALSE, was_in_W_tower);
     } else {
-        pline(unavailcmd, "#wizmakemap");
+        pline(unavailcmd, ecname_from_fn(wiz_makemap));
     }
     return ECMD_OK;
 }
@@ -1021,7 +1022,7 @@ wiz_map(void)
         HConfusion = save_Hconf;
         HHallucination = save_Hhallu;
     } else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_map)));
+        pline(unavailcmd, ecname_from_fn(wiz_map));
     return ECMD_OK;
 }
 
@@ -1032,7 +1033,7 @@ wiz_genesis(void)
     if (wizard)
         (void) create_particular();
     else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_genesis)));
+        pline(unavailcmd, ecname_from_fn(wiz_genesis));
     return ECMD_OK;
 }
 
@@ -1043,7 +1044,7 @@ wiz_where(void)
     if (wizard)
         (void) print_dungeon(FALSE, (schar *) 0, (xchar *) 0);
     else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_where)));
+        pline(unavailcmd, ecname_from_fn(wiz_where));
     return ECMD_OK;
 }
 
@@ -1054,7 +1055,7 @@ wiz_detect(void)
     if (wizard)
         (void) findit();
     else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_detect)));
+        pline(unavailcmd, ecname_from_fn(wiz_detect));
     return ECMD_OK;
 }
 
@@ -1073,7 +1074,7 @@ wiz_load_lua(void)
             strcat(buf, ".lua");
         (void) load_lua(buf);
     } else
-        pline("Unavailable command 'wiz_load_lua'.");
+        pline(unavailcmd, ecname_from_fn(wiz_load_lua));
     return ECMD_OK;
 }
 
@@ -1096,7 +1097,7 @@ wiz_load_splua(void)
         lspo_finalize_level(NULL);
 
     } else
-        pline("Unavailable command 'wiz_load_splua'.");
+        pline(unavailcmd, ecname_from_fn(wiz_load_splua));
     return ECMD_OK;
 }
 
@@ -1107,7 +1108,7 @@ wiz_level_tele(void)
     if (wizard)
         level_tele();
     else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_level_tele)));
+        pline(unavailcmd, ecname_from_fn(wiz_level_tele));
     return ECMD_OK;
 }
 
@@ -1738,7 +1739,7 @@ wiz_intrinsic(void)
             free((genericptr_t) pick_list);
         doredraw();
     } else
-        pline(unavailcmd, visctrl((int) cmd_from_func(wiz_intrinsic)));
+        pline(unavailcmd, ecname_from_fn(wiz_intrinsic));
     return ECMD_OK;
 }
 
@@ -2552,6 +2553,19 @@ cmd_from_func(int (*fn)(void))
     if (g.Cmd.commands[' '] && g.Cmd.commands[' ']->ef_funct == fn)
         return ' ';
     return '\0';
+}
+
+static const char *
+ecname_from_fn(int (*fn)(void))
+{
+    const struct ext_func_tab *extcmd, *cmdptr = 0;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (extcmd->ef_funct == fn) {
+            cmdptr = extcmd;
+            return cmdptr->ef_txt;
+        }
+    return (char *) 0;
 }
 
 /* return extended command name (without leading '#') for command (*fn)() */
