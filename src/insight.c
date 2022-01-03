@@ -1013,21 +1013,31 @@ status_enlightenment(int mode, int final)
         }
     }
     if (Wounded_legs) {
+        /* EWounded_legs is used to track left/right/both rather than some
+           form of extrinsic impairment; HWounded_legs is used for timeout;
+           both apply to steed instead of hero when mounted */
+        long whichleg = (EWounded_legs & BOTH_SIDES);
+        const char *bp = u.usteed ? mbodypart(u.usteed, LEG) : body_part(LEG),
+            *article = "a ", /* precedes "wounded", so never "an " */
+            *leftright = "";
+
+        if (whichleg == BOTH_SIDES)
+            bp = makeplural(bp), article = "";
+        else
+            leftright = (whichleg == LEFT_SIDE) ? "left " : "right ";
+        Sprintf(buf, "%swounded %s%s", article, leftright, bp);
+
         /* when mounted, Wounded_legs applies to steed rather than to
            hero; we only report steed's wounded legs in wizard mode */
         if (u.usteed) { /* not `Riding' here */
             if (wizard && steedname) {
-                Strcpy(buf, steedname);
-                *buf = highc(*buf);
-                enl_msg(buf, " has", " had", " wounded legs", "");
+                char steednambuf[BUFSZ];
+
+                Strcpy(steednambuf, steedname);
+                *steednambuf = highc(*steednambuf);
+                enl_msg(steednambuf, " has ", " had ", buf, "");
             }
         } else {
-            long wl = (EWounded_legs & BOTH_SIDES);
-            const char *bp = body_part(LEG), *article = "a ";
-
-            if (wl == BOTH_SIDES)
-                bp = makeplural(bp), article = "";
-            Sprintf(buf, "%swounded %s", article, bp);
             you_have(buf, "");
         }
     }
@@ -2841,8 +2851,20 @@ mstatusline(struct monst *mtmp)
                             ? ", digesting you"
                             : is_animal(u.ustuck->data) ? ", swallowing you"
                                : ", engulfing you");
-    if (mtmp == u.usteed)
+    if (mtmp == u.usteed) {
         Strcat(info, ", carrying you");
+        if (Wounded_legs) {
+            /* EWounded_legs is used to track left/right/both rather than
+               some form of extrinsic impairment; HWounded_legs is used for
+               timeout; both apply to steed instead of hero when mounted */
+            long legs = (EWounded_legs & BOTH_SIDES);
+            const char *what = mbodypart(mtmp, LEG);
+
+            if (legs == BOTH_SIDES)
+                what = makeplural(what);
+            Sprintf(eos(info), ", injured %s", what);
+        }
+    }
 
     /* avoid "Status of the invisible newt ..., invisible" */
     /* and unlike a normal mon_nam, use "saddled" even if it has a name */
@@ -2892,12 +2914,17 @@ ustatusline(void)
     }
     if (Stunned)
         Strcat(info, ", stunned");
-    if (!u.usteed && Wounded_legs) {
-        long legs = (EWounded_legs | HWounded_legs);
+    if (Wounded_legs && !u.usteed) {
+        /* EWounded_legs is used to track left/right/both rather than some
+           form of extrinsic impairment; HWounded_legs is used for timeout;
+           both apply to steed instead of hero when mounted */
+        long legs = (EWounded_legs & BOTH_SIDES);
         const char *what = body_part(LEG);
 
-        if ((legs & BOTH_SIDES) == BOTH_SIDES)
+        if (legs == BOTH_SIDES)
             what = makeplural(what);
+        /* when it's just one leg, ^X reports which, left or right;
+           ustatusline() doesn't, in order to keep the output a bit shorter */
         Sprintf(eos(info), ", injured %s", what);
     }
     if (Glib)

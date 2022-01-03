@@ -2137,20 +2137,24 @@ set_wounded_legs(long side, int timex)
      * You still call this function, but don't lose hp.
      * Caller is also responsible for adjusting messages.
      */
-
     g.context.botl = 1;
     if (!Wounded_legs)
         ATEMP(A_DEX)--;
 
-    if (!Wounded_legs || (HWounded_legs & TIMEOUT) < timex)
+    if (!Wounded_legs || (HWounded_legs & TIMEOUT) < (long) timex)
         set_itimeout(&HWounded_legs, (long) timex);
-    EWounded_legs = side;
+    /* the leg being wounded and its timeout might differ from one
+       attack to the next, but we don't track the legs separately;
+       3.7: both legs will ultimately heal together; this used to use
+       direct assignment instead of bitwise-OR so getting wounded in
+       one leg mysteriously healed the other */
+    EWounded_legs |= side;
     (void) encumber_msg();
 }
 
 void
-heal_legs(int how) /* 0: ordinary, 1: dismounting steed,
-                      2: limbs turn to stone */
+heal_legs(
+    int how) /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
 {
     if (Wounded_legs) {
         g.context.botl = 1;

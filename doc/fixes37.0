@@ -729,6 +729,10 @@ allow fire-command to automatically use a polearm, if wielding it
 make '$' command also count gold carried inside containers
 fleeing leprechauns bury their gold after teleporting
 allow #tipping container contents directly into another container
+when one leg is wounded, have ^X report which (already used plural if both)
+wand of probing used on steed ('z >') didn't include wounded leg(s) feedback
+getting wounded in one leg when the other was already wounded miraculously
+	healed old leg and kept longer of their recovery timeouts for new one
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1312,6 +1316,10 @@ track peak maximum HP and peak maximum energy/power; no noticeable effect
 give some dragon armor extra effects when worn
 issue messages during last stage of food poisoning/terminal illness countdown
 	when hero's demise is imminent
+drinking blessed potion of full healing heals wounded legs, either hero's or
+	steed's (when riding, wounded leg injury applies to steed, not hero)
+drinking uncursed potion of full healing or blessed potion of extra healing
+	heal hero's wounded legs when not riding; no effect on steed if riding
 
 
 Platform- and/or Interface-Specific New Features

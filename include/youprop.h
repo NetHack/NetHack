@@ -120,9 +120,13 @@
 #define EFumbling u.uprops[FUMBLING].extrinsic
 #define Fumbling (HFumbling || EFumbling)
 
+/* HWounded_legs indicates whether wounded leg(s) condition exists and
+   holds the timeout for recovery; EWounded_legs uses the worn-ring bits
+   to track left vs right vs both and is meaningless when HWounded_legs
+   is zero; both values apply to steed rather than to hero when riding */
 #define HWounded_legs u.uprops[WOUNDED_LEGS].intrinsic
 #define EWounded_legs u.uprops[WOUNDED_LEGS].extrinsic
-#define Wounded_legs (HWounded_legs || EWounded_legs)
+#define Wounded_legs (HWounded_legs) /* (don't include EWounded_legs here) */
 
 #define HSleepy u.uprops[SLEEPY].intrinsic
 #define ESleepy u.uprops[SLEEPY].extrinsic

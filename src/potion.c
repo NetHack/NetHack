@@ -1074,6 +1074,10 @@ peffect_extra_healing(struct obj *otmp)
     (void) make_hallucinated(0L, TRUE, 0L);
     exercise(A_CON, TRUE);
     exercise(A_STR, TRUE);
+    /* blessed potion also heals wounded legs unless riding (where leg
+       wounds apply to the steed rather than to the hero) */
+    if (Wounded_legs && (otmp->blessed && !u.usteed))
+        heal_legs(0);
 }
 
 static void
@@ -1091,6 +1095,10 @@ peffect_full_healing(struct obj *otmp)
     (void) make_hallucinated(0L, TRUE, 0L);
     exercise(A_STR, TRUE);
     exercise(A_CON, TRUE);
+    /* blessed potion heals wounded legs even when riding (so heals steed's
+       legs--it's magic); uncursed potion heals hero's legs unless riding */
+    if (Wounded_legs && (otmp->blessed || (!otmp->cursed && !u.usteed)))
+        heal_legs(0);
 }
 
 static void
