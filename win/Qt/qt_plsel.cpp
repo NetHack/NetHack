@@ -270,11 +270,15 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	;
     role->setRowCount(nrole);
     for (i=0; roles[i].name.m; i++) {
-	QTableWidgetItem *item = new QTableWidgetItem(
-                QIcon(qt_settings->glyphs().glyph(roles[i].malenum, fem)),
-                roles[i].name.m);
-	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-	role->setItem(i, 0, item);
+        glyph_info gi;
+        int glyph = monnum_to_glyph(roles[i].malenum, fem);
+        map_glyphinfo(0, 0, glyph, 0, &gi);
+
+        QTableWidgetItem *item = new QTableWidgetItem(
+                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx, fem)),
+                (fem && roles[i].name.f) ? roles[i].name.f : roles[i].name.m);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        role->setItem(i, 0, item);
     }
     connect(role, SIGNAL(currentCellChanged(int, int, int, int)),
             this, SLOT(selectRole(int, int, int, int)));
@@ -286,11 +290,15 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
 	;
     race->setRowCount(nrace);
     for (i=0; races[i].noun; i++) {
-	QTableWidgetItem *item = new QTableWidgetItem(
-                QIcon(qt_settings->glyphs().glyph(races[i].malenum, fem)),
-		races[i].noun);
-	item->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-	race->setItem(i, 0, item);
+        glyph_info gi;
+        int glyph = monnum_to_glyph(races[i].malenum, fem);
+        map_glyphinfo(0, 0, glyph, 0, &gi);
+
+        QTableWidgetItem *item = new QTableWidgetItem(
+                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx, fem)),
+                races[i].noun);
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        race->setItem(i, 0, item);
     }
     connect(race, SIGNAL(currentCellChanged(int, int, int, int)),
             this, SLOT(selectRace(int, int, int, int)));

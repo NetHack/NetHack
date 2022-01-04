@@ -972,6 +972,8 @@ Qt: searching a text window for something that wasn't found and then searching
 	for some other target could crash
 Qt: changes in glyph handling in the core introduced a bug in the "paper doll"
 	display for inventory subset
+Qt: during role selection, icons for role and race showed giant ant tile after
+	the glyph overhaul changes
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
