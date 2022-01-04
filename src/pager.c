@@ -17,6 +17,7 @@ static void look_at_monster(char *, char *, struct monst *, int, int);
 static struct permonst *lookat(int, int, char *, char *);
 static void checkfile(char *, struct permonst *, boolean, boolean,
                       char *);
+static void look_region_nearby(int *, int *, int *, int *, boolean);
 static void look_all(boolean, boolean);
 static void look_traps(boolean);
 static void do_supplemental_info(char *, struct permonst *, boolean);
@@ -1466,6 +1467,15 @@ do_look(int mode, coord *click_cc)
     return ECMD_OK;
 }
 
+static void
+look_region_nearby(int *lo_x, int *lo_y, int *hi_x, int *hi_y, boolean nearby)
+{
+    *lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
+    *lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
+    *hi_y = nearby ? min(u.uy + BOLT_LIM, ROWNO - 1) : ROWNO - 1;
+    *hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
+}
+
 DISABLE_WARNING_FORMAT_NONLITERAL /* RESTORE is after do_supplemental_info() */
 
 static void
@@ -1478,10 +1488,7 @@ look_all(
     char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
-    lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
-    lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
-    hi_y = nearby ? min(u.uy + BOLT_LIM, ROWNO - 1) : ROWNO - 1;
-    hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
+    look_region_nearby(&lo_x, &lo_y, &hi_x, &hi_y, nearby);
     for (y = lo_y; y <= hi_y; y++) {
         for (x = lo_x; x <= hi_x; x++) {
             lookbuf[0] = '\0';
@@ -1569,10 +1576,7 @@ look_traps(boolean nearby)
     char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
-    lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
-    lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
-    hi_y = nearby ? min(u.uy + BOLT_LIM, ROWNO - 1) : ROWNO - 1;
-    hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
+    look_region_nearby(&lo_x, &lo_y, &hi_x, &hi_y, nearby);
     for (y = lo_y; y <= hi_y; y++) {
         for (x = lo_x; x <= hi_x; x++) {
             lookbuf[0] = '\0';
