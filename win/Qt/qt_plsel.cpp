@@ -82,14 +82,14 @@ public:
     {
     }
 
-    void setGlyph(int g, int tileidx, bool fem)
+    void setGlyph(int g, int tileidx)
     {
 	NetHackQtGlyphs& glyphs = qt_settings->glyphs();
 	int gw = glyphs.width();
 	int gh = glyphs.height();
 	QPixmap pm(gw,gh);
 	QPainter p(&pm);
-	glyphs.drawGlyph(p, g, tileidx, 0, 0, fem);
+        glyphs.drawGlyph(p, g, tileidx, 0, 0, false);
 	p.end();
 	setIcon(QIcon(pm));
 	//RLC setHeight(std::max(pm.height()+1,height()));
@@ -127,7 +127,7 @@ public:
 	glyph_info gi;
 	int glyph = monnum_to_glyph(roles[id].malenum, MALE);
 	map_glyphinfo(0, 0, glyph, 0, &gi);
-	setGlyph(glyph, gi.gm.tileidx, false);
+	setGlyph(glyph, gi.gm.tileidx);
     }
 };
 
@@ -145,7 +145,7 @@ public:
 	glyph_info gi;
 	int glyph = monnum_to_glyph(races[id].malenum, MALE);
 	map_glyphinfo(0, 0, glyph, 0, &gi);
-	setGlyph(glyph, gi.gm.tileidx, false);
+	setGlyph(glyph, gi.gm.tileidx);
     }
 };
 
@@ -275,7 +275,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
         map_glyphinfo(0, 0, glyph, 0, &gi);
 
         QTableWidgetItem *item = new QTableWidgetItem(
-                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx, fem)),
+                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx)),
                 (fem && roles[i].name.f) ? roles[i].name.f : roles[i].name.m);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         role->setItem(i, 0, item);
@@ -295,7 +295,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(NetHackQtKeyBuffer& ks UNUSED) 
         map_glyphinfo(0, 0, glyph, 0, &gi);
 
         QTableWidgetItem *item = new QTableWidgetItem(
-                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx, fem)),
+                QIcon(qt_settings->glyphs().glyph(glyph, gi.gm.tileidx)),
                 races[i].noun);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         race->setItem(i, 0, item);
