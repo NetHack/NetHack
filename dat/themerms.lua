@@ -228,7 +228,7 @@ themerooms = {
                  contents = function(rm)
                     local px = nh.rn2(rm.width);
                     local py = nh.rn2(rm.height);
-                    des.monster({ id = "ghost", waiting = true, coord = {px,py} });
+                    des.monster({ id = "ghost", asleep = true, waiting = true, coord = {px,py} });
                     if percent(65) then
                        des.object({ id = "dagger", coord = {px,py}, buc = "not-blessed" });
                     end
