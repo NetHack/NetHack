@@ -14,6 +14,22 @@ Example:
 
  local str = nh.an("unicorn");
 
+
+=== debug_flags
+
+Set debugging flags.
+
+|===
+| mongen           | boolean | Do monsters generate
+| hunger           | boolean | Does hero's hunger-state increase
+| overwrite_stairs | boolean | Allow special-file commands overwrite the stairs
+|===
+
+Example:
+
+ nh.debug_flags({ mongen = false, hunger = false });
+
+
 === dnum_name
 
 Returns the full dungeon name (as defined in dungeon.lua) for the dungeon
@@ -22,6 +38,17 @@ number given as parameter.
 Example:
 
  local dungeon_name = nh.dnum_name(u.dnum);
+
+
+=== doturn
+
+Execute gameloop once, or until multi-turn action is done if
+optional boolean parameter is true.
+
+Example:
+
+ nh.doturn();
+
 
 === dump_fmtstr
 
@@ -140,7 +167,6 @@ Example:
  nh.deltrap(x, y);
 
 
-
 === ing_suffix
 
 Construct a gerund (a verb formed by appending "ing" to a noun).
@@ -158,6 +184,7 @@ Normally this is the level's physical depth from the surface.
 Example:
 
  local diff = nh.level_difficulty();
+
 
 === makeplural
 
@@ -226,6 +253,14 @@ Example:
 
  nh.pline("Message text to show.");
 
+
+=== pushkey
+
+Push a key into the command queue.
+
+Example:
+
+ nh.pushkey("i");
 
 === random
 
@@ -957,4 +992,14 @@ Example:
 | `"F"`     | iron bars
 | `"x"`     | "transparent" - used for <<_map>> parts.
 | `"w"`     | "any wall" - see <<_match>>
+|===
+
+== Constants
+
+These constants are in the `nhc` table.
+
+|===
+| COLNO | Number of map columns
+| ROWNO | Number of map rows
+| DLB   | 1 or 0, depending if NetHack is compiled with DLB
 |===
