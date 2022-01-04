@@ -703,17 +703,17 @@ init_tilemap(void)
 #if defined(OBTAIN_TILEMAP)
         Sprintf(buf, "%s (mnum=%d)", tilename(MON_GLYPH, file_entry, 0), i);
         Snprintf(tilemap[GLYPH_MON_MALE_OFF + i].name,
-		 sizeof tilemap[0].name,"male %s", buf);
+                 sizeof tilemap[0].name,"male %s", buf);
         Snprintf(tilemap[GLYPH_PET_MALE_OFF + i].name,
-		sizeof tilemap[0].name, "%s male %s", "pet", buf);
+                 sizeof tilemap[0].name, "%s male %s", "pet", buf);
         Snprintf(tilemap[GLYPH_DETECT_MALE_OFF + i].name,
-		sizeof tilemap[0].name, "%s male %s", "detected", buf);
+                 sizeof tilemap[0].name, "%s male %s", "detected", buf);
         Snprintf(tilemap[GLYPH_RIDDEN_MALE_OFF + i].name,
-		sizeof tilemap[0].name, "%s male %s", "ridden", buf);
+                 sizeof tilemap[0].name, "%s male %s", "ridden", buf);
         Snprintf(tilemap[GLYPH_BODY_OFF + i].name,
-		sizeof tilemap[0].name, "%s %s", "body of", buf);
+                 sizeof tilemap[0].name, "%s %s", "body of", buf);
         Snprintf(tilemap[GLYPH_BODY_PILETOP_OFF + i].name,
-		sizeof tilemap[0].name, "%s %s", "piletop body of", buf);
+                 sizeof tilemap[0].name, "%s %s", "piletop body of", buf);
         add_tileref(tilenum, GLYPH_MON_MALE_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_MON_MALE_OFF + i].name, "");
         add_tileref(tilenum, GLYPH_PET_MALE_OFF + i, monsters_file,
@@ -736,21 +736,21 @@ init_tilemap(void)
 #if defined(OBTAIN_TILEMAP)
         Sprintf(buf, "%s (mnum=%d)", tilename(MON_GLYPH, file_entry, 0), i);
         Snprintf(tilemap[GLYPH_MON_FEM_OFF + i].name, 
-		sizeof tilemap[0].name, "female %s", buf);
+                 sizeof tilemap[0].name, "female %s", buf);
         Snprintf(tilemap[GLYPH_PET_FEM_OFF + i].name,
-		sizeof tilemap[0].name, "%s female %s", "pet",
-                buf);
+                 sizeof tilemap[0].name, "%s female %s", "pet",
+                 buf);
         Snprintf(tilemap[GLYPH_DETECT_FEM_OFF + i].name,
-		sizeof tilemap[0].name, "%s female %s",
-                "detected", buf);
+                 sizeof tilemap[0].name, "%s female %s",
+                 "detected", buf);
         Snprintf(tilemap[GLYPH_RIDDEN_FEM_OFF + i].name,
-		 sizeof tilemap[0].name, "%s female %s",
-                "ridden", buf);
+                 sizeof tilemap[0].name, "%s female %s",
+                 "ridden", buf);
         Snprintf(tilemap[GLYPH_BODY_OFF + i].name,
-		sizeof tilemap[0].name, "%s %s", "body of", buf);
+                 sizeof tilemap[0].name, "%s %s", "body of", buf);
         Snprintf(tilemap[GLYPH_BODY_PILETOP_OFF + i].name,
-		sizeof tilemap[0].name, "%s %s",
-                "piletop body of", buf);
+                 sizeof tilemap[0].name, "%s %s",
+                 "piletop body of", buf);
         add_tileref(tilenum, GLYPH_MON_FEM_OFF + i, monsters_file,
                     file_entry, tilemap[GLYPH_MON_FEM_OFF + i].name, "");
         add_tileref(tilenum, GLYPH_PET_FEM_OFF + i, monsters_file,
@@ -889,7 +889,7 @@ init_tilemap(void)
 #if defined(OBTAIN_TILEMAP)
         Snprintf(tilemap[GLYPH_CMAP_A_OFF + i].name,
                  sizeof tilemap[0].name,
-		         "cmap A %s (cmap=%d)",
+                 "cmap A %s (cmap=%d)",
                  tilename(OTH_GLYPH, file_entry, 0), cmap);
         add_tileref(tilenum, GLYPH_CMAP_A_OFF + i, other_file, file_entry,
                     tilemap[GLYPH_CMAP_A_OFF + i].name, "");
