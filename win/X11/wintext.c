@@ -464,7 +464,7 @@ calculate_rip_text(int how, time_t when)
     long cash;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", g.plname);
+    Sprintf(rip_line[NAME_LINE], "%.16s", g.plname); /* STONE_LINE_LEN */
 
     /* Put $ on stone */
     cash = max(g.done_money, 0L);
