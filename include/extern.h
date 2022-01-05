@@ -2171,6 +2171,7 @@ extern boolean create_particular(void);
 /* ### rect.c ### */
 
 extern void init_rect(void);
+extern void free_rect(void);
 extern NhRect *get_rect(NhRect *);
 extern NhRect *rnd_rect(void);
 extern void remove_rect(NhRect *);
