@@ -972,6 +972,8 @@ Qt: searching a text window for something that wasn't found and then searching
 	for some other target could crash
 Qt: changes in glyph handling in the core introduced a bug in the "paper doll"
 	display for inventory subset
+Qt: during role selection, icons for role and race showed giant ant tile after
+	the glyph overhaul changes
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
@@ -1136,6 +1138,9 @@ Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
 Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
+Unix: work-around a build issue in ubuntu 21.10 by using ifdef to skip the
+	define of warn_unused_result to empty string in tradstdc.h whenever
+	__linux__ is defined during build unless GCC_URWARN is also defined
 user_sounds: move the message hook from inside individual window display ports
 	to the core where it allows MSGTYP_NOSHOW msgtyp's to still trigger
 	sounds to correct a reported github issue; also fixes a past reported

@@ -3421,7 +3421,7 @@ tipcontainer(struct obj *box) /* or bag */
          */
         if (targetbox)
             pline("%s into %s.",
-                  box->cobj->nobj ? "Objects tumble" : "Object tumbles",
+                  box->cobj->nobj ? "Objects tumble" : "An object tumbles",
                   the(xname(targetbox)));
         else
             pline("%s out%c",

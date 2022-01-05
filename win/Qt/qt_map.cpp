@@ -217,8 +217,8 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                 unsigned short g = Glyph(i,j);
 		unsigned special = Glyphflags(i, j);
 		unsigned tileidx = Glyphtileidx(i, j);
-                bool femflag = (special & MG_FEMALE) ? true : false;
-                glyphs.drawCell(painter, g, tileidx, i, j, femflag);
+
+                glyphs.drawCell(painter, g, tileidx, i, j);
 
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i * gW, j * gH),
@@ -906,9 +906,8 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		int ch = Glyphttychar(i,j);
 		unsigned special = Glyphflags(i,j);
 		unsigned short tileidx = Glyphtileidx(i,j);
-                bool femflag = (special & MG_FEMALE) ? true : false;
-                qt_settings->glyphs().drawCell(painter, g, tileidx,
-                                               i, j, femflag);
+
+                qt_settings->glyphs().drawCell(painter, g, tileidx, i, j);
 #ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
