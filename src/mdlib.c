@@ -90,7 +90,7 @@ static void build_savebones_compat_string(void);
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 40
 static char *opttext[120] = { 0 };
-char optbuf[BUFSZ];
+char optbuf[COLBUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
 
@@ -660,7 +660,7 @@ opt_out_words(char *str,     /* input, but modified during processing */
 void
 build_options(void)
 {
-    char buf[BUFSZ];
+    char buf[COLBUFSZ];
     int i, length, winsyscnt, cnt = 0;
     const char *defwinsys = DEFAULT_WINDOW_SYS;
 
