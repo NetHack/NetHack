@@ -158,7 +158,7 @@ static void opt_out_words(char *, int *);
 
 static char *fgetline(FILE*);
 static char *tmpdup(const char *);
-static char *limit(char *, int);
+static char *macronamelimit(char *, int);
 static void windowing_sanity(void);
 static boolean get_gitinfo(char *, char *);
 
@@ -1817,7 +1817,7 @@ do_dungeon(void)
  *          for the monstr field;
  *      run 'makedefs -m' to create src/monstr.c; ignore the complaints
  *          about it being deprecated;
- *      transfer relevant generated monstr values to src/monst.c;
+ *      transfer relevant generated monstr values to include/monsters.h;
  *      delete src/monstr.c.
  */
 static int mstrength(struct permonst *);
@@ -2034,13 +2034,21 @@ do_questtxt(void)
     return;
 }
 
-static char temp[32];
-
-static char *limit(char* name, int pref) /* limit a name to 30 characters */
+/* limit a name to 30 characters (26 if "xyz_" prefix precedes it) */
+static char *
+macronamelimit(char *name, int pref)
 {
-    (void) strncpy(temp, name, pref ? 26 : 30);
-    temp[pref ? 26 : 30] = 0;
-    return temp;
+    static char macronametemp[32];
+    unsigned len = pref ? 26 : 30;
+
+#if 0   /* avoid potential warning about strncpy() not guaranteeing '\0' */
+    (void) strncpy(macronametemp, name, len);
+    macronametemp[len] = '\0';
+#else   /* strncat() does guarantee terminating '\0' */
+    macronametemp[0] = '\0';
+    (void) strncat(macronametemp, name, len);
+#endif
+    return macronametemp;
 }
 
 void
@@ -2152,7 +2160,7 @@ do_objs(void)
             break;
         }
         if (prefix >= 0)
-            Fprintf(ofp, "%s\t%d\n", limit(objnam, prefix), i);
+            Fprintf(ofp, "%s\t%d\n", macronamelimit(objnam, prefix), i);
         prefix = 0;
 
         sum += objects[i].oc_prob;
@@ -2190,7 +2198,7 @@ do_objs(void)
         /* fudge _platinum_ YENDORIAN EXPRESS CARD */
         if (!strncmp(objnam, "PLATINUM_", 9))
             objnam += 9;
-        Fprintf(ofp, "#define\tART_%s\t%d\n", limit(objnam, 1), i);
+        Fprintf(ofp, "#define\tART_%s\t%d\n", macronamelimit(objnam, 1), i);
     }
 
     Fprintf(ofp, "#define\tNROFARTIFACTS\t%d\n", i - 1);
