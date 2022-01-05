@@ -1205,7 +1205,8 @@ engrave(void)
         if (g.context.engraving.actionct % 2 == 1) { /* 1st, 3rd, ... action */
             /* deduct a point on 1st, 3rd, 5th, ... turns, unless this is the
              * last character being engraved (a rather convoluted way to round
-             * down).
+             * down), but always deduct a point on the 1st turn to prevent
+             * zero-cost engravings.
              * Check for truncation *before* deducting a point - otherwise,
              * attempting to e.g. engrave 3 characters with a -2 weapon will
              * stop at the 1st. */
@@ -1214,7 +1215,7 @@ engrave(void)
                     impossible("<= -3 weapon valid for engraving");
                 }
                 truncate = TRUE;
-            } else if (*endc) {
+            } else if (*endc || g.context.engraving.actionct == 1) {
                 stylus->spe -= 1;
                 update_inventory();
             }
