@@ -629,7 +629,7 @@ nasty(struct monst *summoner)
                        limit spellcasters to inhibit chain summoning */
                     if ((mtmp = makemon((struct permonst *) 0,
                                         bypos.x, bypos.y,
-                                        NO_MM_FLAGS)) != 0) {
+                                        NO_MM_FLAGS|MM_NOMSG)) != 0) {
                         m_cls = mtmp->data->mlet;
                         if ((difcap > 0 && mtmp->data->difficulty >= difcap
                              && attacktype(mtmp->data, AT_MAGC))

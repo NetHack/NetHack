@@ -465,7 +465,7 @@ self_invis_message(void)
 static void
 ghost_from_bottle(void)
 {
-    struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS);
+    struct monst *mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG);
 
     if (!mtmp) {
         pline("This bottle turns out to be empty.");
@@ -2567,7 +2567,7 @@ djinni_from_bottle(struct obj *obj)
     struct monst *mtmp;
     int chance;
 
-    if (!(mtmp = makemon(&mons[PM_DJINNI], u.ux, u.uy, NO_MM_FLAGS))) {
+    if (!(mtmp = makemon(&mons[PM_DJINNI], u.ux, u.uy, MM_NOMSG))) {
         pline("It turns out to be empty.");
         return;
     }

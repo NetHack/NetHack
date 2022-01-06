@@ -3015,7 +3015,7 @@ wiz_migrate_mons(void)
         else
             get_level(&tolevel, depth(&u.uz) + 1);
         ptr = rndmonst();
-        mtmp = makemon(ptr, 0, 0, NO_MM_FLAGS);
+        mtmp = makemon(ptr, 0, 0, NO_MM_FLAGS|MM_NOMSG);
         if (mtmp)
             migrate_to_level(mtmp, ledger_no(&tolevel), MIGR_RANDOM,
                              (coord *) 0);

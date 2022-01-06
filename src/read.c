@@ -1584,7 +1584,7 @@ seffect_light(struct obj **sobjp)
 
             for (i = 0; i < numlights; ++i) {
                 struct monst * mon = makemon(&mons[pm], u.ux, u.uy,
-                                             MM_EDOG | NO_MINVENT);
+                                             MM_EDOG | NO_MINVENT | MM_NOMSG);
                 initedog(mon);
                 mon->msleeping = 0;
                 mon->mcan = TRUE;
@@ -2680,7 +2680,7 @@ do_genocide(int how)
         if (!(mons[mndx].geno & G_UNIQ)
             && !(g.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)))
             for (i = rn1(3, 4); i > 0; i--) {
-                if (!makemon(ptr, u.ux, u.uy, NO_MINVENT))
+                if (!makemon(ptr, u.ux, u.uy, NO_MINVENT|MM_NOMSG))
                     break; /* couldn't make one */
                 ++cnt;
                 if (g.mvitals[mndx].mvflags & G_EXTINCT)

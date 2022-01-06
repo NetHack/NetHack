@@ -613,7 +613,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
             if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
                 break;
             if ((pm = mkclass(let, 0)) != 0
-                && (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY)) != 0) {
+                && (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY|MM_NOMSG)) != 0) {
                 success = TRUE;
                 mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;
                 set_malign(mtmp2);

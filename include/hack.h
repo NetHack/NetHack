@@ -291,10 +291,11 @@ typedef struct sortloot_item Loot;
 #define MM_NOTAIL   0x008000L /* if a long worm, don't give it a tail */
 #define MM_MALE     0x010000L /* male variation */
 #define MM_FEMALE   0x020000L /* female variation */
+#define MM_NOMSG    0x040000L /* no appear message */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x040000L /* [actually used by enexto() to decide whether
+#define GP_ALLOW_XY 0x080000L /* [actually used by enexto() to decide whether
                                * to make an extra call to goodpos()]        */
-#define GP_ALLOW_U  0x080000L /* don't reject hero's location */
+#define GP_ALLOW_U  0x100000L /* don't reject hero's location */
 
 /* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
 #define CORPSTAT_NONE     0x00

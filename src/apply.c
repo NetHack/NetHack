@@ -1051,7 +1051,7 @@ use_bell(struct obj **optr)
             && !(g.mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
             && !(g.mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
             && !(g.mvitals[PM_MOUNTAIN_NYMPH].mvflags & G_GONE)
-            && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MINVENT))
+            && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MINVENT|MM_NOMSG))
                    != 0) {
             You("summon %s!", a_monnam(mtmp));
             if (!obj_resists(obj, 93, 100)) {

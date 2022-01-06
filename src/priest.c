@@ -514,7 +514,7 @@ intemple(int roomno)
                       make sure we give one the first time */
         }
         if (!rn2(5)
-            && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, NO_MM_FLAGS))
+            && (mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NOMSG))
                    != 0) {
             int ngen = g.mvitals[PM_GHOST].born;
             if (canspotmon(mtmp))
@@ -678,7 +678,7 @@ mk_roamer(struct permonst *ptr, aligntyp alignment, xchar x, xchar y,
     if (MON_AT(x, y))
         (void) rloc(m_at(x, y), RLOC_NOMSG); /* insurance */
 
-    if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN)))
+    if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN | MM_NOMSG)))
         return (struct monst *) 0;
 
     EMIN(roamer)->min_align = alignment;

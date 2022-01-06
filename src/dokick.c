@@ -1133,7 +1133,7 @@ dokick(void)
                 while (cnt--) {
                     if (enexto(&mm, mm.x, mm.y, &mons[PM_KILLER_BEE])
                         && makemon(&mons[PM_KILLER_BEE], mm.x, mm.y,
-                                   MM_ANGRY))
+                                   MM_ANGRY|MM_NOMSG))
                         made++;
                 }
                 if (made)
@@ -1164,7 +1164,7 @@ dokick(void)
                 else
                     pline("A %s ooze gushes up from the drain!",
                           hcolor(NH_BLACK));
-                (void) makemon(&mons[PM_BLACK_PUDDING], x, y, NO_MM_FLAGS);
+                (void) makemon(&mons[PM_BLACK_PUDDING], x, y, MM_NOMSG);
                 exercise(A_DEX, TRUE);
                 newsym(x, y);
                 g.maploc->looted |= S_LPUDDING;
@@ -1174,8 +1174,8 @@ dokick(void)
                 /* can't resist... */
                 pline("%s returns!", (Blind ? Something : "The dish washer"));
                 if (makemon(&mons[PM_AMOROUS_DEMON], x, y,
-                            (gend == 1 || (gend == 2 && rn2(2)))
-                                  ? MM_MALE : MM_FEMALE))
+                            MM_NOMSG | ((gend == 1 || (gend == 2 && rn2(2)))
+                                        ? MM_MALE : MM_FEMALE)))
                     newsym(x, y);
                 g.maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);

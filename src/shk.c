@@ -4108,7 +4108,7 @@ makekops(coord* mm)
 
         while (cnt--)
             if (enexto(mm, mm->x, mm->y, &mons[mndx]))
-                (void) makemon(&mons[mndx], mm->x, mm->y, NO_MM_FLAGS);
+                (void) makemon(&mons[mndx], mm->x, mm->y, MM_NOMSG);
     }
 }
 

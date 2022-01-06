@@ -2586,7 +2586,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
     if (itsalive) {
         if (makecat)
             livecat = makemon(&mons[PM_HOUSECAT], box->ox, box->oy,
-                              NO_MINVENT | MM_ADJACENTOK);
+                              NO_MINVENT | MM_ADJACENTOK | MM_NOMSG);
         if (livecat) {
             livecat->mpeaceful = 1;
             set_malign(livecat);

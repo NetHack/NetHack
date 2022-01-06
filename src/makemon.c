@@ -1409,8 +1409,17 @@ makemon(register struct permonst *ptr,
     if (allow_minvent && g.migrating_objs)
         deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case of waiting items */
 
-    if (!g.in_mklev)
+    if (!g.in_mklev) {
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
+        if (!(mmflags & MM_NOMSG)
+            && ((canseemon(mtmp) && (M_AP_TYPE(mtmp) == M_AP_NOTHING
+                                     || M_AP_TYPE(mtmp) == M_AP_MONSTER))
+                || sensemon(mtmp)))
+            pline("%s suddenly appears%s!", Amonnam(mtmp),
+                  distu(x, y) <= 2 ? " next to you"
+                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by" : "");
+        /* TODO: unify with teleport appears msg */
+    }
 
     return mtmp;
 }

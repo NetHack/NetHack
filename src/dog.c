@@ -99,7 +99,7 @@ make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
             }
         }
 
-        mmflags = MM_EDOG | MM_IGNOREWATER | NO_MINVENT;
+        mmflags = MM_EDOG | MM_IGNOREWATER | NO_MINVENT | MM_NOMSG;
         cgend = otmp ? (otmp->spe & CORPSTAT_GENDER) : 0;
         mmflags |= ((cgend == CORPSTAT_FEMALE) ? MM_FEMALE
                     : (cgend == CORPSTAT_MALE) ? MM_MALE : 0L);

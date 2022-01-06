@@ -618,7 +618,7 @@ montraits(struct obj *obj, coord *cc,
                            give mtmp any; it will be given a new 'wormno'
                            though (unless those are exhausted) so be able
                            to grow new tail segments */
-                        | MM_NOTAIL
+                        | MM_NOTAIL | MM_NOMSG
                         | (adjacentok ? MM_ADJACENTOK : 0)));
         if (!mtmp) {
             /* mtmp2 is a copy of obj's object->oextra->omonst extension
@@ -775,7 +775,7 @@ revive(struct obj *corpse, boolean by_hero)
     coord xy;
     xchar x, y;
     boolean one_of;
-    long mmflags = NO_MINVENT | MM_NOWAIT;
+    long mmflags = NO_MINVENT | MM_NOWAIT | MM_NOMSG;
     int montype, cgend, container_nesting = 0;
     boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
@@ -1482,7 +1482,7 @@ create_polymon(struct obj *obj, int okind)
     if (!(g.mvitals[pm_index].mvflags & G_GENOD))
         mdat = &mons[pm_index];
 
-    mtmp = makemon(mdat, obj->ox, obj->oy, NO_MM_FLAGS);
+    mtmp = makemon(mdat, obj->ox, obj->oy, MM_NOMSG);
     polyuse(obj, okind, (int) mons[pm_index].cwt);
 
     if (mtmp && cansee(mtmp->mx, mtmp->my)) {
@@ -1867,7 +1867,7 @@ stone_to_flesh_obj(struct obj *obj)
             } else { /* (obj->otyp == FIGURINE) */
                 if (golem_xform)
                     ptr = &mons[PM_FLESH_GOLEM];
-                mon = makemon(ptr, oox, ooy, NO_MINVENT);
+                mon = makemon(ptr, oox, ooy, NO_MINVENT|MM_NOMSG);
                 if (mon) {
                     if (costly_spot(oox, ooy)
                         && (carried(obj) ? obj->unpaid : !obj->no_charge)) {

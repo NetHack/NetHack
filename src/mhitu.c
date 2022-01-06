@@ -838,9 +838,10 @@ summonmu(struct monst *mtmp, boolean youseeit)
             char buf[BUFSZ], genericwere[BUFSZ];
 
             Strcpy(genericwere, "creature");
+            if (youseeit)
+                pline("%s summons help!", Monnam(mtmp));
             numhelp = were_summon(mdat, FALSE, &numseen, genericwere);
             if (youseeit) {
-                pline("%s summons help!", Monnam(mtmp));
                 if (numhelp > 0) {
                     if (numseen == 0)
                         You_feel("hemmed in.");
@@ -2300,7 +2301,8 @@ cloneu(void)
         return (struct monst *) 0;
     if (g.mvitals[mndx].mvflags & G_EXTINCT)
         return (struct monst *) 0;
-    mon = makemon(g.youmonst.data, u.ux, u.uy, NO_MINVENT | MM_EDOG);
+    mon = makemon(g.youmonst.data, u.ux, u.uy,
+                  NO_MINVENT | MM_EDOG | MM_NOMSG);
     if (!mon)
         return NULL;
     mon->mcloned = 1;

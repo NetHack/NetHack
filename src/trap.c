@@ -410,7 +410,8 @@ maketrap(int x, int y, int typ)
                  && sgn(u.ualign.type) == sgn(mptr->maligntyp));
         statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
                             CORPSTAT_NONE);
-        mtmp = makemon(&mons[statue->corpsenm], 0, 0, MM_NOCOUNTBIRTH);
+        mtmp = makemon(&mons[statue->corpsenm], 0, 0,
+                       MM_NOCOUNTBIRTH|MM_NOMSG);
         if (!mtmp)
             break; /* should never happen */
         while (mtmp->minvent) {
@@ -637,7 +638,7 @@ animate_statue(
             wary_dog(mon, TRUE);
     } else {
         int sgend = (statue->spe & CORPSTAT_GENDER);
-        long mmflags = (NO_MINVENT
+        long mmflags = (NO_MINVENT | MM_NOMSG
                         | ((sgend == CORPSTAT_MALE) ? MM_MALE : 0)
                         | ((sgend == CORPSTAT_FEMALE) ? MM_FEMALE : 0));
 
