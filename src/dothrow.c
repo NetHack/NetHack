@@ -382,6 +382,8 @@ autoquiver(void)
             /* Ordinary weapon */
             if (objects[otmp->otyp].oc_skill == P_DAGGER && !omissile)
                 omissile = otmp;
+            else if (otmp->otyp == AKLYS)
+                continue;
             else
                 omisc = otmp;
         }
