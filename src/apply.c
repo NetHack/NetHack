@@ -28,7 +28,6 @@ static void use_trap(struct obj *);
 static int touchstone_ok(struct obj *);
 static void use_stone(struct obj *);
 static int set_trap(void); /* occupation callback */
-static int use_whip(struct obj *);
 static void display_polearm_positions(int);
 static int use_cream_pie(struct obj *);
 static int jelly_ok(struct obj *);
@@ -2689,7 +2688,7 @@ set_trap(void)
     return 0;
 }
 
-static int
+int
 use_whip(struct obj *obj)
 {
     char buf[BUFSZ];
