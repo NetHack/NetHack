@@ -1117,6 +1117,9 @@ Qt: while a text window was shown (such as the "things that are here" popup
 Qt: if player's run-time options specified a tiles file and it couldn't be
 	loaded, Qt was falling back to x11tiles just like when the default
 	can't be loaded; fallback to player's file plus explicit path instead
+Qt: force the 'toptenwin' option On so that high scores display at end of game
+	is shown in a text window instead of being written to stdout where it
+	might not be seen (note: doesn't apply to 'nethack -s')
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text

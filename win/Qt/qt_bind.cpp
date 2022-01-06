@@ -154,9 +154,17 @@ NetHackQtBind::qt_Splash()
     }
 }
 
-void NetHackQtBind::qt_init_nhwindows(int* argc, char** argv)
+void NetHackQtBind::qt_init_nhwindows(int *argc, char **argv)
 {
-    iflags.menu_tab_sep = true;
+    // menu entries use embedded <tab> to align fields;
+    // it could be toggled off via 'O', but only when in wizard mode
+    ::iflags.menu_tab_sep = true;
+
+    // force high scores display to be shown in a window, and don't allow
+    // that to be toggled off via 'O' (note: 'nethack -s' won't reach here;
+    // its output goes to stdout so can potentially be redirected into a file)
+    ::iflags.toptenwin = true;
+    ::set_option_mod_status("toptenwin", ::set_in_config);
 
 #ifdef UNIX
 // Userid control
@@ -495,20 +503,29 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[(int)wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,xchar x,xchar y,
-                                   const glyph_info *glyphinfo,
-                                   const glyph_info *bkglyphinfo UNUSED)
+
+void NetHackQtBind::qt_print_glyph(
+    winid wid, xchar x, xchar y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo UNUSED)
 {
     /* TODO: bkglyph */
-    NetHackQtWindow* window=id_to_window[(int)wid];
-    window->PrintGlyph(x,y,glyphinfo);
+    NetHackQtWindow *window = id_to_window[(int) wid];
+    window->PrintGlyph(x, y, glyphinfo);
 }
-//void NetHackQtBind::qt_print_glyph_compose(winid wid,xchar x,xchar y,int glyph1, int glyph2)
-//{
-    //NetHackQtWindow* window=id_to_window[(int)wid];
-    //window->PrintGlyphCompose(x,y,glyph1,glyph2);
-//}
 
+#if 0
+void NetHackQtBind::qt_print_glyph_compose(
+    winid wid, xchar x, xchar y, int glyph1, int glyph2)
+{
+    NetHackQtWindow *window = id_to_window[(int) wid];
+    window->PrintGlyphCompose(x, y, glyph1, glyph2);
+}
+#endif /*0*/
+
+//
+// FIXME: sending output to stdout can mean that the player never sees it.
+//
 void NetHackQtBind::qt_raw_print(const char *str)
 {
     puts(str);
@@ -516,7 +533,7 @@ void NetHackQtBind::qt_raw_print(const char *str)
 
 void NetHackQtBind::qt_raw_print_bold(const char *str)
 {
-    puts(str);
+    qt_raw_print(str);
 }
 
 int NetHackQtBind::qt_nhgetch()
