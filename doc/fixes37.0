@@ -951,6 +951,8 @@ if a glob which has just shrunk away to nothing was wielded or quivered,
 after changes to gender tracking for corpses and statues, when a unique
 	monster got turned into a statue if was erroneouly flagged as female
 	rather than 'historic'
+changing engraving to an occupation resulted in not dulling a weapon used to
+	engrave a single character
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
