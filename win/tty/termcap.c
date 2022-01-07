@@ -227,34 +227,34 @@ tty_startup(int *wid, int *hgt)
     if (CO < COLNO || LI < ROWNO + 3)
         setclipped();
 #endif
-    nh_ND = Tgetstr("nd");
-    if (tgetflag("os"))
+    nh_ND = Tgetstr("nd"); /* move cursor right 1 column */
+    if (tgetflag("os")) /* term can overstrike */
         error("NetHack can't have OS.");
-    if (tgetflag("ul"))
+    if (tgetflag("ul")) /* underline by overstrike w/ underscore */
         ul_hack = TRUE;
-    CE = Tgetstr("ce");
-    UP = Tgetstr("up");
+    CE = Tgetstr("ce"); /* clear line from cursor to eol */
+    UP = Tgetstr("up"); /* move cursor up 1 line */
     /* It seems that xd is no longer supported, and we should use
        a linefeed instead; unfortunately this requires resetting
        CRMOD, and many output routines will have to be modified
        slightly. Let's leave that till the next release. */
     XD = Tgetstr("xd");
     /* not:             XD = Tgetstr("do"); */
-    if (!(nh_CM = Tgetstr("cm"))) {
+    if (!(nh_CM = Tgetstr("cm"))) { /* cm: move cursor */
         if (!UP && !HO)
             error("NetHack needs CM or UP or HO.");
         tty_raw_print("Playing NetHack on terminals without CM is suspect.");
         tty_wait_synch();
     }
-    SO = Tgetstr("so");
-    SE = Tgetstr("se");
-    nh_US = Tgetstr("us");
-    nh_UE = Tgetstr("ue");
+    SO = Tgetstr("so"); /* standout start */
+    SE = Tgetstr("se"); /* standout end */
+    nh_US = Tgetstr("us"); /* underline start */
+    nh_UE = Tgetstr("ue"); /* underline end */
     SG = tgetnum("sg"); /* -1: not fnd; else # of spaces left by so */
     if (!SO || !SE || (SG > 0))
         SO = SE = nh_US = nh_UE = nullstr;
-    TI = Tgetstr("ti");
-    TE = Tgetstr("te");
+    TI = Tgetstr("ti"); /* nonconsequential cursor movement start */
+    TE = Tgetstr("te"); /* nonconsequential cursor movement end */
     VS = VE = nullstr;
 #ifdef TERMINFO
     VS = Tgetstr("eA"); /* enable graphics */
@@ -282,9 +282,9 @@ tty_startup(int *wid, int *hgt)
     nh_HE = dupstr(&ME[i]);
     dynamic_HIHE = TRUE;
 
-    AS = Tgetstr("as");
-    AE = Tgetstr("ae");
-    nh_CD = Tgetstr("cd");
+    AS = Tgetstr("as"); /* alt charset start */
+    AE = Tgetstr("ae"); /* alt charset end */
+    nh_CD = Tgetstr("cd"); /* clear lines from cursor and down */
 #ifdef TEXTCOLOR
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin") || !strcmp(term, "tw52")
@@ -297,6 +297,7 @@ tty_startup(int *wid, int *hgt)
 #endif
     *wid = CO;
     *hgt = LI;
+    /* cl: clear screen, set cursor to upper left */
     if (!(CL = Tgetstr("cl"))) /* last thing set */
         error("NetHack needs CL.");
     if ((int) (tbufptr - tbuf) > (int) (sizeof tbuf))
