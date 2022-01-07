@@ -437,10 +437,10 @@ dig(void)
             switch (rn2(2)) {
             case 0:
                 mtmp = makemon(&mons[PM_EARTH_ELEMENTAL], dpx, dpy,
-                               NO_MM_FLAGS|MM_NOMSG);
+                               MM_NOMSG);
                 break;
             default:
-                mtmp = makemon(&mons[PM_XORN], dpx, dpy, NO_MM_FLAGS|MM_NOMSG);
+                mtmp = makemon(&mons[PM_XORN], dpx, dpy, MM_NOMSG);
                 break;
             }
             if (mtmp)
