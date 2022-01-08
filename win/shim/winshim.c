@@ -178,13 +178,13 @@ VDECLCB(shim_status_update,
 #ifdef __EMSCRIPTEN__
 /* XXX: calling display_inventory() from shim_update_inventory() causes reentrancy that breaks emscripten Asyncify */
 /* this should be fine since according to windows.doc, the only purpose of shim_update_inventory() is to call display_inventory() */
-void shim_update_inventory() {
+void shim_update_inventory(int a1 UNUSED) {
     if(iflags.perm_invent) {
         display_inventory(NULL, FALSE);
     }
 }
 #else /* !__EMSCRIPTEN__ */
-VDECLCB(shim_update_inventory,(void), "v")
+VDECLCB(shim_update_inventory,(int a1 UNUSED), "v")
 #endif
 
 /* Interface definition used in windows.c */
