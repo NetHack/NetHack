@@ -927,6 +927,7 @@ rest_stairs(NHFILE* nhfp)
         if (newst)
             newst->u_traversed = stway.u_traversed;
     }
+    nhUse(len);    /* unclear why this variable exists though */
 }
 
 void

@@ -6074,6 +6074,8 @@ parsebindings(char *bindings)
         ret |= parsebindings(bind);
     }
 
+    nhUse(ret);
+    
     /* parse a single binding: first split around : */
     if (! (bind = index(bindings, ':')))
         return FALSE; /* it's not a binding */
