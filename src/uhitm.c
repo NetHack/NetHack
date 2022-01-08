@@ -4541,7 +4541,7 @@ hmonas(struct monst *mon)
     int dieroll, multi_claw = 0;
     boolean monster_survived;
 
-    /* FIXME: One compiler was getting a fatal 
+    /* FIXME: One compiler was getting a 
        variable nsum set but not used [-Werror,-Wunused-but-set-variable]
        For now, I'm working around it with nhUse() but it should be
        investigated when someone has the time.
