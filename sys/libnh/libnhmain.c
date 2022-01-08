@@ -60,6 +60,7 @@ int
 main(int argc, char *argv[])
 
 #else /* !__EMSCRIPTEN__ */
+int nhmain(int argc, char *argv[]);
 
 int
 nhmain(int argc, char *argv[])

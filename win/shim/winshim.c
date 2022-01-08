@@ -33,6 +33,8 @@
  ************/
 EMSCRIPTEN_KEEPALIVE
 static char *shim_callback_name = NULL;
+void shim_graphics_set_callback(char *cbName);
+
 void shim_graphics_set_callback(char *cbName) {
     if (shim_callback_name != NULL) free(shim_callback_name);
     if(cbName && strlen(cbName) > 0) {
@@ -51,6 +53,8 @@ void local_callback (const char *cb_name, const char *shim_name, void *ret_ptr, 
 /* P2V = Pointer to Void */
 #define P2V (void *)
 #define DECLCB(ret_type, name, fn_args, fmt, ...) \
+ret_type name fn_args; \
+\
 ret_type name fn_args { \
     void *args[] = { __VA_ARGS__ }; \
     ret_type ret = (ret_type) 0; \
@@ -62,6 +66,8 @@ ret_type name fn_args { \
 }
 
 #define VDECLCB(name, fn_args, fmt, ...) \
+void name fn_args; \
+\
 void name fn_args { \
     void *args[] = { __VA_ARGS__ }; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
@@ -77,6 +83,8 @@ void name fn_args { \
  ************/
 typedef void(*shim_callback_t)(const char *name, void *ret_ptr, const char *fmt, ...);
 static shim_callback_t shim_graphics_callback = NULL;
+void shim_graphics_set_callback(shim_callback_t cb);
+
 void shim_graphics_set_callback(shim_callback_t cb) {
     shim_graphics_callback = cb;
 }
@@ -84,6 +92,8 @@ void shim_graphics_set_callback(shim_callback_t cb) {
 #define A2P
 #define P2V
 #define DECLCB(ret_type, name, fn_args, fmt, ...) \
+ret_type name fn_args;\
+\
 ret_type name fn_args { \
     ret_type ret = (ret_type) 0; \
     debugf("SHIM GRAPHICS: " #name "\n"); \
@@ -94,6 +104,8 @@ ret_type name fn_args { \
 }
 
 #define VDECLCB(name, fn_args, fmt, ...) \
+void name fn_args;\
+\
 void name fn_args { \
     debugf("SHIM GRAPHICS: " #name "\n"); \
     if (!shim_graphics_callback) return; \
