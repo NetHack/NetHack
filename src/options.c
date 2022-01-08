@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1640991743 2021/12/31 23:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.522 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1641673953 2022/01/08 20:32:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5854,12 +5854,12 @@ initoptions_finish(void)
             /* looks like a filename */
             if (strlen(opts) < BUFSZ / 2) {
                 config_error_init(TRUE, opts, CONFIG_ERROR_SECURE);
-                read_config_file(opts, set_in_config);
+                (void) read_config_file(opts, set_in_config);
                 config_error_done();
             }
         } else {
             config_error_init(TRUE, (char *) 0, FALSE);
-            read_config_file((char *) 0, set_in_config);
+            (void) read_config_file((char *) 0, set_in_config);
             config_error_done();
             /* let the total length of options be long;
              * parseoptions() will check each individually
@@ -5872,7 +5872,7 @@ initoptions_finish(void)
 #endif /* !MAC */
     /*else*/ {
         config_error_init(TRUE, (char *) 0, FALSE);
-        read_config_file((char *) 0, set_in_config);
+        (void) read_config_file((char *) 0, set_in_config);
         config_error_done();
     }
 
@@ -6059,22 +6059,38 @@ feature_alert_opts(char *op, const char *optn)
  *
  */
 
-/* parse key:command */
+/* parse key:command[,key2:command2,...] after BINDINGS= prefix has been
+   stripped; returns False if any problem seen, True if every binding in
+   the comma-separated list is successful */
 boolean
 parsebindings(char *bindings)
 {
     char *bind;
     uchar key;
     int i;
-    boolean ret = FALSE;
+    boolean ret = TRUE; /* assume success */
 
-    /* break off first binding from the rest; parse the rest */
+    /* look for first comma, then decide whether it is the key being bound
+       or a list element separator; if it's a key, find separator beyond it */
     if ((bind = index(bindings, ',')) != 0) {
-        *bind++ = 0;
-        ret |= parsebindings(bind);
-    }
+        /* at start so it represents a key */
+        if (bind == bindings)
+            bind = index(bind + 1, ',');
 
-    nhUse(ret);
+        /* to get here, bind is non-Null and not equal to bindings,
+           so it is greater than bindings and bind[-1] is valid; check
+           whether current comma happens to be for "\,:cmd" or "',':cmd"
+           (":cmd" part is assumed if the comma has expected quoting) */
+        else if (bind[-1] == '\\' || (bind[-1] == '\'' && bind[1] == '\''))
+            bind = index(bind + 2, ',');
+    }
+    /* if a comma separator has been found, break off first binding from rest;
+       parse the rest and then handle this first one when recursion returns */
+    if (bind) {
+        *bind++ = '\0';
+        if (!parsebindings(bind))
+            ret = FALSE;
+    }
     
     /* parse a single binding: first split around : */
     if (! (bind = index(bindings, ':')))
@@ -6092,7 +6108,7 @@ parsebindings(char *bindings)
 
     /* is it a special key? */
     if (bind_specialkey(key, bind))
-        return TRUE;
+        return ret;
 
     /* is it a menu command? */
     for (i = 0; default_menu_cmd_info[i].name; i++) {
@@ -6100,9 +6116,10 @@ parsebindings(char *bindings)
             if (illegal_menu_cmd_key(key)) {
                 config_error_add("Bad menu key %s:%s", visctrl(key), bind);
                 return FALSE;
-            } else
+            } else {
                 add_menu_cmd_alias((char) key, default_menu_cmd_info[i].cmd);
-            return TRUE;
+            }
+            return ret;
         }
     }
 
@@ -6111,7 +6128,7 @@ parsebindings(char *bindings)
         config_error_add("Unknown key binding command '%s'", bind);
         return FALSE;
     }
-    return TRUE;
+    return ret;
 }
 
 /*

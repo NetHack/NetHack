@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.630 $ $NHDT-Date: 1629928191 2021/08/25 21:49:51 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.734 $ $NHDT-Date: 1641673963 2022/01/08 20:32:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -735,6 +735,9 @@ when one leg is wounded, have ^X report which (already used plural if both)
 wand of probing used on steed ('z >') didn't include wounded leg(s) feedback
 getting wounded in one leg when the other was already wounded miraculously
 	healed old leg and kept longer of their recovery timeouts for new one
+when parsing config file entry "BINDINGS=key1:cmd1,key2:cmd2,key3:cmd3" allow
+	keyN to be either a naked comma or backslash+comma instead requiring
+	that comma's numeric value be used to bind comma to a command
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
