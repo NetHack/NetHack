@@ -1667,7 +1667,7 @@ dotakeoff(void)
     if (Narmorpieces != 1 || ParanoidRemove)
         otmp = getobj("take off", takeoff_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     return armor_or_accessory_off(otmp);
 }
@@ -1686,7 +1686,7 @@ doremring(void)
     if (Naccessories != 1 || ParanoidRemove)
         otmp = getobj("remove", remove_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     return armor_or_accessory_off(otmp);
 }
@@ -2244,7 +2244,7 @@ dowear(void)
         return ECMD_OK;
     }
     otmp = getobj("wear", wear_ok, GETOBJ_NOFLAGS);
-    return otmp ? accessory_or_armor_on(otmp) : ECMD_OK;
+    return otmp ? accessory_or_armor_on(otmp) : ECMD_CANCEL;
 }
 
 /* the #puton command */
@@ -2263,7 +2263,7 @@ doputon(void)
         return ECMD_OK;
     }
     otmp = getobj("put on", puton_ok, GETOBJ_NOFLAGS);
-    return otmp ? accessory_or_armor_on(otmp) : ECMD_OK;
+    return otmp ? accessory_or_armor_on(otmp) : ECMD_CANCEL;
 }
 
 /* calculate current armor class */

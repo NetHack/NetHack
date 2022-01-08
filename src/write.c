@@ -125,7 +125,7 @@ dowrite(struct obj *pen)
     /* get paper to write on */
     paper = getobj("write on", write_ok, GETOBJ_NOFLAGS);
     if (!paper)
-        return ECMD_OK;
+        return ECMD_CANCEL;
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
     typeword = (paper->otyp == SPE_NOVEL)

@@ -2380,7 +2380,7 @@ dozap(void)
         return ECMD_OK;
     obj = getobj("zap", zap_ok, GETOBJ_NOFLAGS);
     if (!obj)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     check_unpaid(obj);
 

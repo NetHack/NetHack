@@ -21,12 +21,12 @@ static void light_cocktail(struct obj **);
 static int rub_ok(struct obj *);
 static void display_jump_positions(int);
 static void use_tinning_kit(struct obj *);
-static void use_figurine(struct obj **);
+static int use_figurine(struct obj **);
 static int grease_ok(struct obj *);
-static void use_grease(struct obj *);
+static int use_grease(struct obj *);
 static void use_trap(struct obj *);
 static int touchstone_ok(struct obj *);
-static void use_stone(struct obj *);
+static int use_stone(struct obj *);
 static int set_trap(void); /* occupation callback */
 static void display_polearm_positions(int);
 static int use_cream_pie(struct obj *);
@@ -56,7 +56,7 @@ use_camera(struct obj *obj)
         return ECMD_OK;
     }
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     if (obj->spe <= 0) {
         pline1(nothing_happens);
@@ -315,7 +315,7 @@ use_stethoscope(struct obj *obj)
         return ECMD_OK;
     }
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     res = (g.hero_seq == g.context.stethoscope_seq) ? ECMD_TIME : ECMD_OK;
     g.context.stethoscope_seq = g.hero_seq;
@@ -852,7 +852,7 @@ use_mirror(struct obj *obj)
     boolean vis, invis_mirror, useeit, monable;
 
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
     invis_mirror = Invis;
     useeit = !Blind && (!invis_mirror || See_invisible);
     uvisage = beautiful();
@@ -1569,14 +1569,11 @@ dorub(void)
         return ECMD_OK;
     }
     obj = getobj("rub", rub_ok, GETOBJ_NOFLAGS);
-    if (!obj) {
-        /* pline1(Never_mind); -- handled by getobj() */
-        return ECMD_OK;
-    }
+    if (!obj)
+        return ECMD_CANCEL;
     if (obj->oclass == GEM_CLASS || obj->oclass == FOOD_CLASS) {
         if (is_graystone(obj)) {
-            use_stone(obj);
-            return ECMD_TIME;
+            return use_stone(obj);
         } else if (obj->otyp == LUMP_OF_ROYAL_JELLY) {
             return use_royal_jelly(obj);
         } else {
@@ -2280,7 +2277,7 @@ figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
     return TRUE;
 }
 
-static void
+static int
 use_figurine(struct obj **optr)
 {
     register struct obj *obj = *optr;
@@ -2290,11 +2287,11 @@ use_figurine(struct obj **optr)
     if (u.uswallow) {
         /* can't activate a figurine while swallowed */
         if (!figurine_location_checks(obj, (coord *) 0, FALSE))
-            return;
+            return ECMD_OK;
     }
     if (!getdir((char *) 0)) {
         g.context.move = g.multi = 0;
-        return;
+        return ECMD_CANCEL;
     }
     x = u.ux + u.dx;
     y = u.uy + u.dy;
@@ -2302,7 +2299,7 @@ use_figurine(struct obj **optr)
     cc.y = y;
     /* Passing FALSE arg here will result in messages displayed */
     if (!figurine_location_checks(obj, &cc, FALSE))
-        return;
+        return ECMD_TIME;
     You("%s and it %stransforms.",
         (u.dx || u.dy) ? "set the figurine beside you"
                        : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
@@ -2317,6 +2314,7 @@ use_figurine(struct obj **optr)
     if (Blind)
         map_invisible(cc.x, cc.y);
     *optr = 0;
+    return ECMD_TIME;
 }
 
 /* getobj callback for object to apply grease to */
@@ -2337,7 +2335,7 @@ grease_ok(struct obj *obj)
     return GETOBJ_SUGGEST;
 }
 
-static void
+static int
 use_grease(struct obj *obj)
 {
     struct obj *otmp;
@@ -2346,7 +2344,7 @@ use_grease(struct obj *obj)
         pline("%s from your %s.", Tobjnam(obj, "slip"),
               fingers_or_gloves(FALSE));
         dropx(obj);
-        return;
+        return ECMD_TIME;
     }
 
     if (obj->spe > 0) {
@@ -2358,13 +2356,13 @@ use_grease(struct obj *obj)
             pline("%s from your %s.", Tobjnam(obj, "slip"),
                   fingers_or_gloves(FALSE));
             dropx(obj);
-            return;
+            return ECMD_TIME;
         }
         otmp = getobj("grease", grease_ok, GETOBJ_PROMPT);
         if (!otmp)
-            return;
+            return ECMD_CANCEL;
         if (inaccessible_equipment(otmp, "grease", FALSE))
-            return;
+            return ECMD_OK;
         consume_obj_charge(obj, TRUE);
 
         oldglib = (int) (Glib & TIMEOUT);
@@ -2387,6 +2385,7 @@ use_grease(struct obj *obj)
             pline("%s to be empty.", Tobjnam(obj, "seem"));
     }
     update_inventory();
+    return ECMD_TIME;
 }
 
 /* getobj callback for object to rub on a known touchstone */
@@ -2412,7 +2411,7 @@ touchstone_ok(struct obj *obj)
 
 
 /* touchstones - by Ken Arnold */
-static void
+static int
 use_stone(struct obj *tstone)
 {
     static const char scritch[] = "\"scritch, scritch\"";
@@ -2433,11 +2432,11 @@ use_stone(struct obj *tstone)
        junk as likely candidates for rubbing */
     if ((obj = getobj(stonebuf, known ? touchstone_ok : any_obj_ok,
                       GETOBJ_PROMPT)) == 0)
-        return;
+        return ECMD_CANCEL;
 
     if (obj == tstone && obj->quan == 1L) {
         You_cant("rub %s on itself.", the(xname(obj)));
-        return;
+        return ECMD_OK;
     }
 
     if (tstone->otyp == TOUCHSTONE && tstone->cursed
@@ -2451,15 +2450,15 @@ use_stone(struct obj *tstone)
             pline("A sharp crack shatters %s%s.",
                   (obj->quan > 1L) ? "one of " : "", the(xname(obj)));
         useup(obj);
-        return;
+        return ECMD_TIME;
     }
 
     if (Blind) {
         pline(scritch);
-        return;
+        return ECMD_TIME;
     } else if (Hallucination) {
         pline("Oh wow, man: Fractals!");
-        return;
+        return ECMD_TIME;
     }
 
     do_scratch = FALSE;
@@ -2484,7 +2483,7 @@ use_stone(struct obj *tstone)
             makeknown(TOUCHSTONE);
             makeknown(obj->otyp);
             prinv((char *) 0, obj, 0L);
-            return;
+            return ECMD_TIME;
         } else {
             /* either a ring or the touchstone was not effective */
             if (objects[obj->otyp].oc_material == GLASS) {
@@ -2499,13 +2498,13 @@ use_stone(struct obj *tstone)
         switch (objects[obj->otyp].oc_material) {
         case CLOTH:
             pline("%s a little more polished now.", Tobjnam(tstone, "look"));
-            return;
+            return ECMD_TIME;
         case LIQUID:
             if (!obj->known) /* note: not "whetstone" */
                 You("must think this is a wetstone, do you?");
             else
                 pline("%s a little wetter now.", Tobjnam(tstone, "are"));
-            return;
+            return ECMD_TIME;
         case WAX:
             streak_color = "waxy";
             break; /* okay even if not touchstone */
@@ -2542,7 +2541,7 @@ use_stone(struct obj *tstone)
         You_see("%s streaks on the %s.", streak_color, stonebuf);
     else
         pline(scritch);
-    return;
+    return ECMD_TIME;
 }
 
 void
@@ -2704,7 +2703,7 @@ use_whip(struct obj *obj)
         res = ECMD_TIME;
     }
     if (!getdir((char *) 0))
-        return res;
+        return (res|ECMD_CANCEL);
 
     if (u.uswallow) {
         mtmp = u.ustuck;
@@ -3284,8 +3283,7 @@ use_royal_jelly(struct obj *obj)
     if (!eobj) {
         addinv(obj); /* put the unused lump back; if it came from
                       * a split, it should merge back */
-        /* pline1(Never_mind); -- getobj() took care of this */
-        return ECMD_OK;
+        return ECMD_CANCEL;
     }
 
     You("smear royal jelly all over %s.", yname(eobj));
@@ -3785,7 +3783,7 @@ doapply(void)
 
     obj = getobj("use or apply", apply_ok, GETOBJ_NOFLAGS);
     if (!obj)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     if (!retouch_object(&obj, FALSE))
         return ECMD_TIME; /* evading your grasp costs a turn; just be
@@ -3836,7 +3834,7 @@ doapply(void)
         (void) bagotricks(obj, FALSE, (int *) 0);
         break;
     case CAN_OF_GREASE:
-        use_grease(obj);
+        res = use_grease(obj);
         break;
     case LOCK_PICK:
     case CREDIT_CARD:
@@ -3921,7 +3919,7 @@ doapply(void)
         res = use_tin_opener(obj);
         break;
     case FIGURINE:
-        use_figurine(&obj);
+        res = use_figurine(&obj);
         break;
     case UNICORN_HORN:
         use_unicorn_horn(&obj);
@@ -3949,7 +3947,7 @@ doapply(void)
     case LUCKSTONE:
     case LOADSTONE:
     case TOUCHSTONE:
-        use_stone(obj);
+        res = use_stone(obj);
         break;
     default:
         /* Pole-weapons can strike at a distance */

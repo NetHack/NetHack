@@ -356,7 +356,7 @@ doread(void)
 
     scroll = getobj("read", read_ok, GETOBJ_PROMPT);
     if (!scroll)
-        return ECMD_OK;
+        return ECMD_CANCEL;
     otyp = scroll->otyp;
 
     /* outrumor has its own blindness check */

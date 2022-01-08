@@ -3606,6 +3606,11 @@ rhack(char *cmd)
                     set_occupation(func, tlist->f_text, g.multi);
                 res = (*func)(); /* perform the command */
             }
+            if ((res & ECMD_CANCEL)) {
+                /* command was canceled by user, maybe they declined to
+                   pick an object to act on. */
+                cmdq_clear();
+            }
             if (!(res & ECMD_TIME)) {
                 g.context.move = FALSE;
                 g.multi = 0;
@@ -4042,7 +4047,7 @@ dotherecmdmenu(void)
     char ch;
 
     if (!getdir((const char *) 0) || !isok(u.ux + u.dx, u.uy + u.dy))
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     if (u.dx || u.dy)
         ch = there_cmd_menu(TRUE, u.ux + u.dx, u.uy + u.dy);

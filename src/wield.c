@@ -329,8 +329,7 @@ dowield(void)
     clear_splitobjs();
     if (!(wep = getobj("wield", wield_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT))) {
         /* Cancelled */
-        cmdq_clear();
-        return ECMD_OK;
+        return ECMD_CANCEL;
     } else if (wep == uwep) {
  already_wielded:
         You("are already wielding that!");
@@ -491,7 +490,7 @@ dowieldquiver(void)
 
     if (!newquiver) {
         /* Cancelled */
-        return ECMD_OK;
+        return ECMD_CANCEL;
     } else if (newquiver == &cg.zeroobj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {

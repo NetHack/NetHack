@@ -1196,7 +1196,7 @@ dobreathe(void)
     g.context.botl = 1;
 
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     mattk = attacktype_fordmg(g.youmonst.data, AT_BREA, AD_ANY);
     if (!mattk)
@@ -1216,7 +1216,7 @@ dospit(void)
     struct attack *mattk;
 
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
     mattk = attacktype_fordmg(g.youmonst.data, AT_SPIT, AD_ANY);
     if (!mattk) {
         impossible("bad spit attack?");

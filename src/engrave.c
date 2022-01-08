@@ -565,7 +565,7 @@ doengrave(void)
 
     otmp = getobj("write with", stylus_ok, GETOBJ_PROMPT);
     if (!otmp) /* otmp == cg.zeroobj if fingers */
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     if (otmp == &cg.zeroobj) {
         Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));

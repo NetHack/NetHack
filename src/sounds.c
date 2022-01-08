@@ -1100,7 +1100,7 @@ dochat(void)
 
     if (!getdir("Talk to whom? (in what direction)")) {
         /* decided not to chat */
-        return ECMD_OK;
+        return ECMD_CANCEL;
     }
 
     if (u.usteed && u.dz > 0) {

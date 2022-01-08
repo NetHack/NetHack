@@ -45,7 +45,7 @@ use_saddle(struct obj* otmp)
     /* Select an animal */
     if (u.uswallow || Underwater || !getdir((char *) 0)) {
         pline1(Never_mind);
-        return ECMD_OK;
+        return ECMD_CANCEL;
     }
     if (!u.dx && !u.dy) {
         pline("Saddle yourself?  Very funny...");
@@ -175,7 +175,7 @@ doride(void)
         return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount)
                 ? ECMD_TIME : ECMD_OK);
     } else {
-        return ECMD_OK;
+        return ECMD_CANCEL;
     }
     return ECMD_TIME;
 }

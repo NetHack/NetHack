@@ -534,7 +534,7 @@ dodrink(void)
 
     otmp = getobj("drink", drink_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     /* quan > 1 used to be left to useup(), but we need to force
        the current potion to be unworn, and don't want to do
@@ -2142,7 +2142,7 @@ dodip(void)
     const char *shortestname; /* last resort obj name for prompt */
 
     if (!(obj = getobj("dip", dip_ok, GETOBJ_PROMPT)))
-        return ECMD_OK;
+        return ECMD_CANCEL;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
@@ -2198,7 +2198,7 @@ dodip(void)
              flags.verbose ? obuf : shortestname);
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
-        return ECMD_OK;
+        return ECMD_CANCEL;
     if (potion == obj && potion->quan == 1L) {
         pline("That is a potion bottle, not a Klein bottle!");
         return ECMD_OK;

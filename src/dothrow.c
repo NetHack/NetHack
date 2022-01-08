@@ -98,7 +98,7 @@ throw_obj(struct obj *obj, int shotlimit)
         if (obj->o_id == g.context.objsplit.parent_oid
             || obj->o_id == g.context.objsplit.child_oid)
             (void) unsplitobj(obj);
-        return ECMD_OK; /* no time passes */
+        return ECMD_CANCEL; /* no time passes */
     }
 
     /*
@@ -333,7 +333,7 @@ dothrow(void)
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
 
-    return obj ? throw_obj(obj, shotlimit) : ECMD_OK;
+    return obj ? throw_obj(obj, shotlimit) : ECMD_CANCEL;
 }
 
 /* KMH -- Automatically fill quiver */
@@ -479,6 +479,8 @@ dofire(void)
             /* choose something from inventory, then usually quiver it */
             obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
             /* Q command doesn't allow gold in quiver */
+            if (!obj)
+                return ECMD_CANCEL;
             if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
                 setuqwep(obj); /* demi-autoquiver */
         }
@@ -2294,7 +2296,7 @@ throw_gold(struct obj *obj)
         if (obj->o_id == g.context.objsplit.parent_oid
             || obj->o_id == g.context.objsplit.child_oid)
             (void) unsplitobj(obj);
-        return ECMD_OK;
+        return ECMD_CANCEL;
     }
     freeinv(obj);
     if (u.uswallow) {

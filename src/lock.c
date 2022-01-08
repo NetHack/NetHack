@@ -868,7 +868,7 @@ doclose(void)
     }
 
     if (!getdir((char *) 0))
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;

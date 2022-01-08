@@ -2817,7 +2817,7 @@ use_tin_opener(struct obj *obj)
 
     otmp = getobj("open", tinopen_ok, GETOBJ_NOFLAGS);
     if (!otmp)
-        return res;
+        return (res|ECMD_CANCEL);
 
     start_tin(otmp);
     return ECMD_TIME;

@@ -4174,7 +4174,7 @@ doorganize(void) /* inventory organizer by Del Lamb */
     /* get object the user wants to organize (the 'from' slot) */
     obj = getobj("adjust", adjust_filter, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
     if (!obj)
-        return ECMD_OK;
+        return ECMD_CANCEL;
     /* can only be gold if check_invent_gold() found a problem:  multiple '$'
        stacks and/or gold in some other slot, otherwise (*adjust_filter)()
        won't allow gold to be picked; if player has picked any stack of gold

@@ -3304,7 +3304,7 @@ dotip(void)
     /* either no floor container(s) or couldn't tip one or didn't tip any */
     cobj = getobj("tip", tip_ok, GETOBJ_PROMPT);
     if (!cobj)
-        return ECMD_OK;
+        return ECMD_CANCEL;
 
     /* normal case */
     if (Is_container(cobj) || cobj->otyp == HORN_OF_PLENTY) {

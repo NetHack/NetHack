@@ -1739,7 +1739,7 @@ doidtrap(void)
     int x, y, tt, glyph;
 
     if (!getdir("^"))
-        return ECMD_OK;
+        return ECMD_CANCEL;
     x = u.ux + u.dx;
     y = u.uy + u.dy;
 

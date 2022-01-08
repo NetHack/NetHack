@@ -1434,7 +1434,7 @@ doinvoke(void)
 
     obj = getobj("invoke", invoke_ok, GETOBJ_PROMPT);
     if (!obj)
-        return ECMD_OK;
+        return ECMD_CANCEL;
     if (!retouch_object(&obj, FALSE))
         return ECMD_TIME;
     return arti_invoke(obj);
@@ -1532,7 +1532,7 @@ arti_invoke(struct obj *obj)
 
             if (!otmp) {
                 obj->age = 0;
-                return ECMD_OK;
+                return ECMD_CANCEL;
             }
             b_effect = (obj->blessed && (oart->role == Role_switch
                                          || oart->role == NON_PM));
