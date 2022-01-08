@@ -900,20 +900,17 @@ rest_stairs(NHFILE* nhfp)
 {
     int buflen = 0;
     stairway stway = UNDEFINED_VALUES;
-    int len = 0;
     stairway *newst;
 
     stairway_free_all();
     while (1) {
         if (nhfp->structlevel) {
-            len += (int) sizeof(buflen);
             mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
         }
 
         if (buflen == -1)
             break;
 
-        len += (int) sizeof (stairway);
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
         }
@@ -927,7 +924,6 @@ rest_stairs(NHFILE* nhfp)
         if (newst)
             newst->u_traversed = stway.u_traversed;
     }
-    nhUse(len);    /* unclear why this variable exists though */
 }
 
 void
