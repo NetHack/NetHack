@@ -324,6 +324,8 @@ read_ok(struct obj* obj)
     return GETOBJ_DOWNPLAY;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* the #read command; read a scroll or spell book or various other things */
 int
 doread(void)
@@ -604,6 +606,8 @@ doread(void)
     }
     return ECMD_TIME;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 stripspe(register struct obj* obj)

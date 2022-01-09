@@ -20,6 +20,8 @@ mon_in_room(struct monst* mon, int rmtyp)
     return FALSE;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 dosounds(void)
 {
@@ -284,6 +286,8 @@ dosounds(void)
         return;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static const char *const h_sounds[] = {
     "beep",   "boing",   "sing",   "belche", "creak",   "cough",

@@ -165,6 +165,8 @@ check_strangling(boolean on)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* make a (new) human out of the player */
 static void
 polyman(const char *fmt, const char *arg)
@@ -232,6 +234,8 @@ polyman(const char *fmt, const char *arg)
 
     see_monsters();
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 change_sex(void)

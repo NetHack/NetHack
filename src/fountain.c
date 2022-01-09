@@ -12,6 +12,8 @@ static void dowaternymph(void);
 static void gush(int, int, genericptr_t);
 static void dofindgem(void);
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* used when trying to dip in or drink from fountain or sink or pool while
    levitating above it, or when trying to move downwards in that state */
 void
@@ -27,6 +29,8 @@ floating_above(const char *what)
     }
     You(umsg, what);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Fountain of snakes! */
 static void

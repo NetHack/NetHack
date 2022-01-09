@@ -2428,6 +2428,8 @@ searches_for_item(struct monst* mon, struct obj* obj)
     return FALSE;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 boolean
 mon_reflects(struct monst* mon, const char* str)
 {
@@ -2499,6 +2501,8 @@ ureflects(const char* fmt, const char* str)
     }
     return FALSE;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* cure mon's blindness (use_defensive, dog_eat, meatobj) */
 void

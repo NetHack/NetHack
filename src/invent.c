@@ -984,6 +984,8 @@ carry_obj_effects(struct obj *obj)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* Add an item to the inventory unless we're fumbling or it refuses to be
  * held (via touch_artifact), and give a message.
  * If there aren't any free inventory slots, we'll drop it instead.
@@ -1080,6 +1082,8 @@ hold_another_object(struct obj *obj, const char *drop_fmt,
     }
     return (struct obj *) 0; /* might be gone */
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* useup() all of an item regardless of its quantity */
 void
@@ -1774,6 +1778,8 @@ getobj(const char *word,
     return otmp;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 silly_thing(const char *word,
 #ifdef OBSOLETE_HANDLING
@@ -1810,6 +1816,8 @@ silly_thing(const char *word,
 #endif
         pline(silly_thing_to, word);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static int
 ckvalidcat(struct obj *otmp)

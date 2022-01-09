@@ -1130,6 +1130,8 @@ Mb_hit(struct monst *magr, /* attacker */
     return result;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* Function used when someone attacks someone else with an artifact
  * weapon.  Only adds the special (artifact) damage, and returns a 1 if it
  * did something special (in which case the caller won't print the normal
@@ -1403,6 +1405,8 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
     }
     return FALSE;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* getobj callback for object to be invoked */
 static int

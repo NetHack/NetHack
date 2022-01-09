@@ -721,6 +721,8 @@ hmon(struct monst *mon,
     return result;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* guts of hmon() */
 static boolean
 hmon_hitmon(struct monst *mon,
@@ -1483,6 +1485,8 @@ shade_aware(struct obj *obj)
         return TRUE;
     return FALSE;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* used for hero vs monster and monster vs monster; also handles
    monster vs hero but that won't happen because hero can't be a shade */
@@ -5265,6 +5269,8 @@ passive_obj(struct monst *mon,
         update_inventory();
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* Note: caller must ascertain mtmp is mimicking... */
 void
 stumble_onto_mimic(struct monst *mtmp)
@@ -5307,6 +5313,8 @@ stumble_onto_mimic(struct monst *mtmp)
         && !glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         map_invisible(mtmp->mx, mtmp->my);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 nohandglow(struct monst *mon)

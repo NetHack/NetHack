@@ -47,7 +47,6 @@ CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
-CFLAGS+=-Wno-format-nonliteral
 CFLAGS+=-Wunreachable-code
 #
 # the following are not allowed in C++
@@ -63,7 +62,6 @@ CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
 CCXXFLAGS+=-Wmissing-declarations
-CCXXFLAGS+=-Wno-format-nonliteral
 
 ifeq "$(CCISCLANG)" ""
 # gcc-specific follows

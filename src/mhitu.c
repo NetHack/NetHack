@@ -21,6 +21,8 @@ static int passiveum(struct permonst *, struct monst *, struct attack *);
 
 #define ld() ((yyyymmdd((time_t) 0) - (getyear() * 10000L)) == 0xe5)
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 hitmsg(struct monst *mtmp, struct attack *mattk)
 {
@@ -68,6 +70,8 @@ hitmsg(struct monst *mtmp, struct attack *mattk)
             pline(pfmt, Monst_name);
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* monster missed you */
 static void

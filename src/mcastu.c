@@ -531,6 +531,8 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         mdamageu(mtmp, dmg);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
 {
@@ -752,6 +754,8 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     if (dmg)
         mdamageu(mtmp, dmg);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static boolean
 is_undirected_spell(unsigned int adtyp, int spellnum)

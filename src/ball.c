@@ -865,6 +865,8 @@ drag_ball(xchar x, xchar y, int *bc_control,
     return TRUE;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*
  *  drop_ball()
  *
@@ -954,6 +956,8 @@ drop_ball(xchar x, xchar y)
         }
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* ball&chain cause hero to randomly lose stuff from inventory */
 static void

@@ -994,6 +994,8 @@ decal_packed(const struct TileImage *gp, unsigned special)
 }
 #endif
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /*
  * Open tile files,
  * initialize the SCREEN, switch it to graphics mode,
@@ -1046,7 +1048,7 @@ vesa_Init(void)
     vesa_mode = 0xFFFF; /* might want an 8 bit mode after loading tiles */
     vesa_detect();
     if (vesa_mode == 0xFFFF) {
-        raw_printf("Reverting to TTY mode, no VESA mode available.",
+        raw_printf("%s (%d)", "Reverting to TTY mode, no VESA mode available.",
                    tilefailure);
         wait_synch();
         iflags.usevga = 0;
@@ -1162,6 +1164,8 @@ vesa_Init(void)
     }
     free_tiles();
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* Set the size of the map viewport */
 static void

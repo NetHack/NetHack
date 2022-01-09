@@ -242,6 +242,8 @@ vomiting_dialogue(void)
     exercise(A_CON, FALSE);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL   /* RESTORE is after slime_dialogue */
+
 static NEARDATA const char *const choke_texts[] = {
     "You find it hard to breathe.",
     "You're gasping for air.",
@@ -406,6 +408,8 @@ slime_dialogue(void)
     }
     exercise(A_DEX, FALSE);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 burn_away_slime(void)

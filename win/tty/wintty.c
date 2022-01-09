@@ -1625,6 +1625,8 @@ free_window_info(struct WinDesc *cw, boolean free_data)
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 tty_clear_nhwindow(winid window)
 {
@@ -1679,6 +1681,8 @@ tty_clear_nhwindow(winid window)
     }
     cw->curx = cw->cury = 0;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static boolean
 toggle_menu_curr(winid window, tty_menu_item *curr, int lineno,
@@ -2306,6 +2310,8 @@ process_text_window(winid window, struct WinDesc *cw)
             cw->flags |= WIN_CANCELLED;
     }
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL    /* RESTORE after tty_select_menu */
 
 /*ARGSUSED*/
 void
@@ -3148,6 +3154,8 @@ tty_select_menu(winid window, int how, menu_item **menu_list)
 
     return n;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* special hack for treating top line --More-- as a one item menu */
 char

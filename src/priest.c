@@ -403,6 +403,8 @@ findpriest(char roomno)
     return (struct monst *) 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* called from check_special_room() when the player enters the temple room */
 void
 intemple(int roomno)
@@ -533,6 +535,8 @@ intemple(int roomno)
         }
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* reset the move counters used to limit temple entry feedback;
    leaving the level and then returning yields a fresh start */

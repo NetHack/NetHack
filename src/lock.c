@@ -338,6 +338,8 @@ autokey(boolean opening) /* True: key, pick, or card; False: key or pick */
     return key ? key : pick ? pick : card ? card : 0;
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* for doapply(); if player gives a direction or resumes an interrupted
    previous attempt then it costs hero a move even if nothing ultimately
    happens; when told "can't do that" before being asked for direction
@@ -599,6 +601,8 @@ pick_lock(struct obj *pick,
     set_occupation(picklock, lock_action(), 0);
     return PICKLOCK_DID_SOMETHING;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the #force command - try to force a chest with your weapon */
 int

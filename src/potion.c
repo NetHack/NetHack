@@ -353,6 +353,8 @@ toggle_blindness(void)
         learn_unseen_invent();
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 boolean
 make_hallucinated(
     long xtime,   /* nonzero if this is an attempt to turn on hallucination */
@@ -424,6 +426,8 @@ make_hallucinated(
     }
     return changed;
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 make_deaf(long xtime, boolean talk)
@@ -1019,6 +1023,8 @@ peffect_blindness(struct obj *otmp)
                  (boolean) !Blind);
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 peffect_gain_level(struct obj *otmp)
 {
@@ -1054,6 +1060,8 @@ peffect_gain_level(struct obj *otmp)
     if (otmp->blessed)
         u.uexp = rndexp(TRUE);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 peffect_healing(struct obj *otmp)

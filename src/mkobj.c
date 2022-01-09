@@ -2825,6 +2825,8 @@ where_name(struct obj *obj)
     return obj_state_names[where];
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 static void
 insane_object(
     struct obj *obj,
@@ -2853,6 +2855,7 @@ insane_object(
     }
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* initialize a dummy obj with just enough info to allow some of the tests in
    obj.h that take an obj pointer to work; used when applying a stethoscope
