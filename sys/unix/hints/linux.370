@@ -172,14 +172,15 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 endif
 
 ifdef WANT_LIBNH
-CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
+CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH -fpic
 LIBNHSYSSRC = ../sys/libnh/libnhmain.c \
 		../sys/share/ioctl.c ../sys/share/unixtty.c \
 		../sys/unix/unixunix.c ../sys/unix/unixres.c \
 		../win/shim/winshim.c
 LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
 		$(TARGETPFX)unixtty.o $(TARGETPFX)unixunix.o \
-		$(TARGETPFX)unixres.o $(TARGETPFX)winshim.o
+		$(TARGETPFX)unixres.o $(TARGETPFX)winshim.o \
+		$(TARGETPFX)date.o
 #don't bother building the game executable as it will fail
 #without winshim
 override GAME=

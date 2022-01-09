@@ -12,7 +12,7 @@ if [ x$1 == "xlib" ]; then
 fi
 
 if [ x$1 == "xrunlib" ]; then
-    LIBS="-Lsrc -lnethack -Llib/lua -llua -lm"
+    LIBS="-Lsrc -lnh -Llib/lua -llua -lm"
     BADLIBS="-lncurses"
     rm nhlibtest
     gcc -o nhlibtest libtest.c $LIBS $BADLIBS
