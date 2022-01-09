@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1613985000 2021/02/22 09:10:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1641763627 2022/01/09 21:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -85,6 +85,9 @@ void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 int click_x, click_y, click_button; /* Click position on a map window   */
                                     /* (filled by set_button_values()). */
 int updated_inventory; /* used to indicate perm_invent updating */
+
+static void X11_error_handler(String) NORETURN;
+static int X11_io_error_handler(Display *);
 
 static int (*old_error_handler) (Display *, XErrorEvent *);
 
@@ -1479,6 +1482,8 @@ X11_error_handler(String str)
 {
     nhUse(str);
     hangup(1);
+    nh_terminate(EXIT_FAILURE);
+    /*NOTREACHED*/
 }
 
 static int

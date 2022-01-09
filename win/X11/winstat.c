@@ -1,4 +1,4 @@
-/* NetHack 3.7	winstat.c	$NHDT-Date: 1611697183 2021/01/26 21:39:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.7	winstat.c	$NHDT-Date: 1641763638 2022/01/09 21:27:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -942,10 +942,12 @@ create_tty_status_field(int fld, int condindx, Widget above, Widget left)
     /* set up widget attributes which (mostly) aren't going to be changing */
     (void) memset((genericptr_t) args, 0, sizeof args);
     num_args = 0;
-    if (above)
+    if (above) {
         XtSetArg(args[num_args], nhStr(XtNfromVert), above); num_args++;
-    if (left)
+    }
+    if (left) {
         XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
+    }
 
     XtSetArg(args[num_args], nhStr(XtNhorizDistance), gap); num_args++;
     XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
@@ -977,8 +979,9 @@ create_tty_status(Widget parent, Widget top)
 
     (void) memset((genericptr_t) args, 0, sizeof args);
     num_args = 0;
-    if (top)
+    if (top) {
         XtSetArg(args[num_args], nhStr(XtNfromVert), top); num_args++;
+    }
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0); num_args++;
     XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     XtSetArg(args[num_args], XtNwidth, 400); num_args++;
