@@ -415,8 +415,8 @@ doc_extcmd_flagstr(winid menuwin,
 
         add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  "[A] Command autocompletes", MENU_ITEMFLAGS_NONE);
-        Sprintf(qbuf, "[m] Command accepts '%c' prefix",
-                g.Cmd.spkeys[NHKF_REQMENU]);
+        Sprintf(qbuf, "[m] Command accepts '%s' prefix",
+                visctrl(g.Cmd.spkeys[NHKF_REQMENU]));
         add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, qbuf,
                  MENU_ITEMFLAGS_NONE);
         return (char *) 0;
