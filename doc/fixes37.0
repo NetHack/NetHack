@@ -1123,6 +1123,8 @@ Qt: if player's run-time options specified a tiles file and it couldn't be
 Qt: force the 'toptenwin' option On so that high scores display at end of game
 	is shown in a text window instead of being written to stdout where it
 	might not be seen (note: doesn't apply to 'nethack -s')
+Qt: during role/race/&c selection, update role titles with their icons, and
+	also Valk eligibility, when gender is toggled
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text

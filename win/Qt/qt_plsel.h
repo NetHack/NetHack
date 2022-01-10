@@ -24,6 +24,9 @@ public slots:
         void Randomize();
         void plnamePlayVsQuit();
 
+        void populate_roles();
+        void populate_races();
+
 	void selectName(const QString& n);
 	void selectRole(int current, int, int previous, int);
 	void selectRace(int current, int, int previous, int);
@@ -43,6 +46,8 @@ private:
 	bool fully_specified_role;
         int chosen_gend;
         int chosen_align;
+        int cleric_role_row;
+        int human_race_row;
 
         QPushButton *rand_btn;
         QPushButton *play_btn;
