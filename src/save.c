@@ -12,10 +12,6 @@
 #include <fcntl.h>
 #endif
 
-#if defined(UNIX) || defined(WIN32)
-#define USE_BUFFERING
-#endif
-
 #ifdef MICRO
 int dotcnt, dotrow; /* also used in restore */
 #endif

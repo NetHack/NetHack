@@ -10,37 +10,6 @@
  * These were moved here from save.c and restore.c between 3.6.3 and 3.7.0.
  */
 
-#ifdef TRACE_BUFFERING
-#ifdef bufon
-#undef bufon
-#endif
-#ifdef bufoff
-#undef bufoff
-#endif
-#ifdef bflush
-#undef bflush
-#endif
-#ifdef bwrite
-#undef bwrite
-#endif
-#ifdef bclose
-#undef bclose
-#endif
-#ifdef mread
-#undef mread
-#endif
-#ifdef minit
-#undef minit
-#endif
-void newread(NHFILE *, int, int, genericptr_t, unsigned);
-void bufon(int);
-void bufoff(int);
-void bflush(int);
-void bwrite(int, const genericptr_t, unsigned);
-void mread(int, genericptr_t, unsigned);
-void minit(void);
-void bclose(int);
-#endif /* TRACE_BUFFERING */
 static int getidx(int, int);
 
 #if defined(UNIX) || defined(WIN32)
@@ -263,76 +232,4 @@ mread(int fd, genericptr_t buf, unsigned len)
     }
 }
 
-#ifdef TRACE_BUFFERING
-
-static FILE *tracefile;
-#define TFILE "trace-buffering.log"
-
-#define TRACE(xx) \
-    do {                                                        \
-        tracefile = fopen(TFILE, "a");                          \
-        (void) fprintf(tracefile, "%s from %s:%d (%d)\n",       \
-                       __FUNCTION__, fncname, linenum, xx);     \
-        fclose(tracefile);                                      \
-    } while (0)
-
-void
-Bufon(int fd, const char *fncname, int linenum)
-{
-    TRACE(fd);
-    bufon(fd);
-}
-
-void
-Bufoff(int fd, const char *fncname, int linenum)
-{
-    TRACE(fd);
-    bufoff(fd);
-}
-
-void
-Bflush(int fd, const char* fncname, int linenum)
-{
-    TRACE(fd);
-    bflush(fd);
-}
-
-void
-Bwrite(
-    int fd,
-    const genericptr_t loc,
-    unsigned num,
-    const char *fncname,
-    int linenum)
-{
-    TRACE(fd);
-    bwrite(fd, loc, num);
-}
-
-void
-Bclose(int fd, const char *fncname, int linenum)
-{
-    TRACE(fd);
-    bclose(fd);
-}
-
-void
-Minit(const char*fncname, int linenum)
-{
-    TRACE(-1);
-    minit();
-}
-
-void
-Mread(
-    int fd,
-    genericptr_t buf,
-    unsigned len,
-    const char *fncname,
-    int linenum)
-{
-    TRACE(fd);
-    mread(fd, buf, len);
-}
-#endif
 
