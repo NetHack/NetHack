@@ -1838,7 +1838,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     g.jumping_is_magic = magic;
     getpos_sethilite(display_jump_positions, get_valid_jump_position);
     if (getpos(&cc, TRUE, "the desired position") < 0)
-        return ECMD_OK; /* user pressed ESC */
+        return ECMD_CANCEL; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
         return ECMD_OK;
     } else {
@@ -3138,7 +3138,7 @@ use_pole(struct obj *obj, boolean autohit)
     if (!autohit) {
         getpos_sethilite(display_polearm_positions, get_valid_polearm_position);
         if (getpos(&cc, TRUE, "the spot to hit") < 0)
-            return res; /* ESC; uses turn iff polearm became wielded */
+            return (res|ECMD_CANCEL); /* ESC; uses turn iff polearm became wielded */
     }
 
     glyph = glyph_at(cc.x, cc.y);
@@ -3355,7 +3355,7 @@ use_grapple(struct obj *obj)
     cc.x = u.ux;
     cc.y = u.uy;
     if (getpos(&cc, TRUE, "the spot to hit") < 0)
-        return res; /* ESC; uses turn iff grapnel became wielded */
+        return (res|ECMD_CANCEL); /* ESC; uses turn iff grapnel became wielded */
 
     /* Calculate range; unlike use_pole(), there's no minimum for range */
     typ = uwep_skill_type();

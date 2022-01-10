@@ -1567,7 +1567,7 @@ wiz_smell(void)
         pline("Pick a monster to smell.");
         ans = getpos(&cc, TRUE, "a monster");
         if (ans < 0 || cc.x < 0) {
-            return ECMD_OK; /* done */
+            return ECMD_CANCEL; /* done */
         }
         /* Convert the glyph at the selected position to a mndxbol. */
         glyph = glyph_at(cc.x, cc.y);
@@ -4707,7 +4707,7 @@ dotravel(void)
         if (getpos(&cc, TRUE, "the desired destination") < 0) {
             /* user pressed ESC */
             iflags.getloc_travelmode = FALSE;
-            return ECMD_OK;
+            return ECMD_CANCEL;
         }
     }
     iflags.travelcc.x = u.tx = cc.x;

@@ -479,7 +479,7 @@ tele(void)
     scrolltele((struct obj *) 0);
 }
 
-/* teleport the hero; usually discover scroll of teleporation if via scroll */
+/* teleport the hero; usually discover scroll of teleportation if via scroll */
 void
 scrolltele(struct obj* scroll)
 {

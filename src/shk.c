@@ -1296,7 +1296,7 @@ dopay(void)
         cc.x = u.ux;
         cc.y = u.uy;
         if (getpos(&cc, TRUE, "the creature you want to pay") < 0)
-            return ECMD_OK; /* player pressed ESC */
+            return ECMD_CANCEL; /* player pressed ESC */
         cx = cc.x;
         cy = cc.y;
         if (cx < 0) {
