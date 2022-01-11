@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1605927391 2020/11/21 02:56:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1641940939 2022/01/11 22:42:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -606,14 +606,18 @@ enum glyph_offsets {
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */
 #define objnum_to_glyph(onum) ((int) (onum) + GLYPH_OBJ_OFF)
-#define monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        (((gnd) == MALE) ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF))
-#define detected_monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        (((gnd) == MALE) ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF))
-#define ridden_monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        (((gnd) == MALE) ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF))
-#define petnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        (((gnd) == MALE) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
+#define monnum_to_glyph(mnum,gnd) \
+    ((int) (mnum) + (((gnd) == MALE) ? GLYPH_MON_MALE_OFF       \
+                                     : GLYPH_MON_FEM_OFF))
+#define detected_monnum_to_glyph(mnum,gnd) \
+    ((int) (mnum) + (((gnd) == MALE) ? GLYPH_DETECT_MALE_OFF    \
+                                     : GLYPH_DETECT_FEM_OFF))
+#define ridden_monnum_to_glyph(mnum,gnd) \
+    ((int) (mnum) + (((gnd) == MALE) ? GLYPH_RIDDEN_MALE_OFF    \
+                                     : GLYPH_RIDDEN_FEM_OFF))
+#define petnum_to_glyph(mnum,gnd) \
+    ((int) (mnum) + (((gnd) == MALE) ? GLYPH_PET_MALE_OFF       \
+                                     : GLYPH_PET_FEM_OFF))
 
 /* The hero's glyph when seen as a monster.
  */
