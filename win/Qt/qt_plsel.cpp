@@ -12,6 +12,9 @@
 //    gender first and alignment first too);
 //  maybe add a set of radio buttons for normal mode vs explore mode
 //    [vs wizard mode if eligible]
+//  gray out character name / disable name specification box if player
+//    shouldn't be allowed to change it ("wizard" for debug mode, use
+//    of some forced value for multi-user system).
 //
 
 extern "C" {
@@ -199,26 +202,53 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
     quit_btn(new QPushButton("Quit"))
 {
     /*
-               0             1             2
-	  + Name ------------------------------------+
-	0 |                                          |
-	  + ---- ------------------------------------+
-	  + Race ---+   + Role ---+   + Gender ------+
-	  |         |   |         |   |  * Male      |
-	1 |         |   |         |   |  * Female    |
-	  |         |   |         |   +--------------+
-	  |         |   |         |   
-	  |         |   |         |   + Alignment ---+
-	2 |         |   |         |   |  * Male      |
-	  |         |   |         |   |  * Female    |
-	  |         |   |         |   +--------------+
-	3 |         |   |         |   ...stretch...
-	  |         |   |         |   
-	4 |         |   |         |   [ Random ]
-	5 |         |   |         |   [  Play  ]
-	6 |         |   |         |   [  Quit  ]
-	  +---------+   +---------+   
-    */
+               0              1              2
+	  + Name --------------------------------------+
+	0 |                                            |
+	  + -------------------------------------------+
+	  + Race ----+   + Role ----+   + Gender ------+
+	  | human    |   | Archeolog|   |  * Male      |
+	1 | elf      |   | Barbarian|   |  * Female    |
+	  | dwarf    |   |          |   +--------------+
+	  | gnome    |   |          |
+	  | orc      |   |          |   + Alignment ---+
+	2 |          |   |  .       |   |  * Lawful    |
+	  |          |   |  .       |   |  * Neutral   |
+	  |          |   |  .       |   |  * Chaotic   |
+	  |          |   |          |   +--------------+
+	3 |          |   |          |   ...stretch...
+	  |          |   |          |
+	4 |          |   | Valkyrie |   [    Random    ]
+	5 |          |   | Wizard   |   [     Play     ]
+	6 |          |   |          |   [     Quit     ]
+	  +----------+   +----------+
+     *
+     * Both Race and Role entries are actually two-part:  an icon (the map
+     *   tile for the corresponding monster) and text (race or role name);
+     * Race column is as tall as role one but mostly blank;
+     * Role names aren't truncated in the actual display, just here; the
+     *   race and role columns do have equal width;
+     * Roles with gender-specific names get changed to match chosen gender;
+     * Each of the four role/race/gender/alignment categories always has
+     *   one entry checked; [Random] will change to a new set;
+     * [Play] is selected by default if [Name] is non-empty but grayed out
+     *   if it is empty;
+     * [Quit] is selected by default when [Name] is empty;
+     * ...stretch... is "NetHack x.y.z" in large text over
+     *   "by the NetHack DevTeam" is smaller text with blank space above
+     *   and below the two lines of text.
+     *
+     * If currently selected race isn't allowed to be some roles, they'll
+     * be grayed out.  To switch to one of those, first check "human" which
+     * offers access to all roles (except Valk which will be grayed out if
+     * "male" is checked), pick the role of interest, and then re-pick race
+     * (some of which will be grayed out if chosen role doesn't allow them).
+     * To pick alignment first, check "human" and "priest[ess]" to make
+     * all three alignments accessible, pick the one of interest, then pick
+     * among the races and roles that are acceptable for that alignment.
+     * Gender can be picked at any time, except for male when Valkyrie is
+     * selected.
+     */
 
     QGridLayout *l = new QGridLayout(this);
     l->setColumnStretch(2, 1);
@@ -360,13 +390,13 @@ void
 NetHackQtPlayerSelector::populate_roles()
 {
     //
-    // each row in the role column shows a player-character tile
-    // and the role's name
+    // entry for each row in the role column shows a player-character tile
+    // (always gender-specific) and role's name (sometimes gender-specific)
     //
     QTableWidgetItem *item;
     const char *rolename;
     glyph_info gi;
-    int v, gf, gn = chosen_gend;
+    int v, gf, gn = chosen_gend, al = chosen_align;
     // if no race yet, we use human for gender check (gender doesn't affect
     // race but we need a valid race when filtering Valkyrie out or back in)
     int ra = race->currentRow(), hu = human_race_row;
@@ -378,7 +408,8 @@ NetHackQtPlayerSelector::populate_roles()
         gf = monnum_to_glyph(roles[i].malenum, is_f ? FEMALE : MALE);
         map_glyphinfo(0, 0, gf, 0, &gi);
         v = ((ra < 0 || validrace(i, ra))
-             && (gn < 0 || validgend(i, (ra >= 0) ? ra : hu, gn)));
+             && (gn < 0 || validgend(i, (ra >= 0) ? ra : hu, gn))
+             && (al < 0 || validalign(i, (ra >= 0) ? ra : hu, al)));
         item = role->item(i, 0);
         item->setText(rolename);
         item->setIcon(QIcon(glyphs.glyph(gf, gi.gm.tileidx)));
@@ -393,8 +424,8 @@ void
 NetHackQtPlayerSelector::populate_races()
 {
     //
-    // each row in the race column shows race's generic monster tile
-    // and the race's name
+    // entry for each row in race column shows race's generic monster tile
+    // (always gender-specific) and race's name (never gender-specific)
     //
     QTableWidgetItem *item;
     glyph_info gi;
