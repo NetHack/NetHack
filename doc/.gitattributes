@@ -10,3 +10,5 @@ tmac.nh NUSUBST
 fixes* NH_header=no
 *.txt NH_header=no
 * NH_filestag=(file%s_for_all_versions)
+Guidebook.tex	NH_DATESUB
+Guidebook.mn	NH_DATESUB
