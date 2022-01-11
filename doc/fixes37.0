@@ -958,6 +958,9 @@ after changes to gender tracking for corpses and statues, when a unique
 	rather than 'historic'
 changing engraving to an occupation resulted in not dulling a weapon used to
 	engrave a single character
+a change to wounded legs handling resulted in not recovering lost dexterity
+	or receiving the "leg(s) feel better" message if wound time expired
+	rather than having legs be explicitly healed
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
