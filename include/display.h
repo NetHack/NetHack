@@ -607,13 +607,13 @@ enum glyph_offsets {
 /* MRKR: ...and the generic statue */
 #define objnum_to_glyph(onum) ((int) (onum) + GLYPH_OBJ_OFF)
 #define monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        ((gnd == MALE) ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF))
+                        (((gnd) == MALE) ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF))
 #define detected_monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        ((gnd == MALE) ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF))
+                        (((gnd) == MALE) ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF))
 #define ridden_monnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        ((gnd == MALE) ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF))
+                        (((gnd) == MALE) ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF))
 #define petnum_to_glyph(mnum,gnd) ((int) (mnum) + \
-                        ((gnd == MALE) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
+                        (((gnd) == MALE) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
 
 /* The hero's glyph when seen as a monster.
  */
