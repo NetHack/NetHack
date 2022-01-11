@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.414 $ $NHDT-Date: 1613011698 2021/02/11 02:48:18 $
+.\" $NHDT-Branch: keni-datesub2 $:$NHDT-Revision: 1.437 $ $NHDT-Date: 1641933560 2022/01/11 20:39:20 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -35,6 +35,7 @@
 .ds vr "NetHack 3.7
 .ds f0 "\*(vr
 .ds f1
+.\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
 .ds f2 "November 16, 2021
 .
 .\" A note on some special characters:
