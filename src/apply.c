@@ -3982,7 +3982,9 @@ unfixable_trouble_count(boolean is_horn)
         unfixable_trbl++;
     if (Strangled)
         unfixable_trbl++;
-    if (Wounded_legs && !u.usteed)
+    if (ATEMP(A_DEX) < 0 && Wounded_legs)
+        unfixable_trbl++;
+    if (ATEMP(A_STR) < 0 && u.uhs >= WEAK)
         unfixable_trbl++;
     /* lycanthropy is undesirable, but it doesn't actually make you feel bad
        so don't count it as a trouble which can't be fixed */

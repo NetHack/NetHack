@@ -377,19 +377,26 @@ set_moreluck(void)
         u.moreluck = -LUCKADD;
 }
 
+/* (not used) */
 void
 restore_attrib(void)
 {
     int i, equilibrium;;
 
     /*
-     * Note:  this gets called on every turn but ATIME() is never set
-     * to non-zero anywhere, and ATEMP() is only used for strength loss
-     * from hunger, so it doesn't actually do anything.
+     * Note:  this used to get called by moveloop() on every turn but
+     * ATIME() is never set to non-zero anywhere so didn't do anything.
+     * Presumably it once supported something like potion of heroism
+     * which conferred temporary characteristics boost(s).
+     *
+     * ATEMP() is used for strength loss from hunger, which doesn't
+     * time out, and for dexterity loss from wounded legs, which has
+     * its own timeout routine.
      */
 
     for (i = 0; i < A_MAX; i++) { /* all temporary losses/gains */
-        equilibrium = (i == A_STR && u.uhs >= WEAK) ? -1 : 0;
+        equilibrium = ((i == A_STR && u.uhs >= WEAK)
+                       || (i == A_DEX && Wounded_legs)) ? -1 : 0;
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;

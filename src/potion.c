@@ -598,6 +598,8 @@ dopotion(struct obj *otmp)
     return ECMD_TIME;
 }
 
+/* potion or spell of restore ability; for spell, otmp is a temporary
+   spellbook object that will be blessed if hero is skilled in healing */
 static void
 peffect_restore_ability(struct obj *otmp)
 {
@@ -608,11 +610,13 @@ peffect_restore_ability(struct obj *otmp)
     } else {
         int i, ii;
 
-        /* unlike unicorn horn, overrides Fixed_abil */
+        /* unlike unicorn horn, overrides Fixed_abil;
+           does not recover temporary strength loss due to hunger
+           or temporary dexterity loss due to wounded legs */
         pline("Wow!  This makes you feel %s!",
-              (otmp->blessed)
-              ? (unfixable_trouble_count(FALSE) ? "better" : "great")
-              : "good");
+              (!otmp->blessed) ? "good"
+              : unfixable_trouble_count(FALSE) ? "better"
+                : "great");
         i = rn2(A_MAX); /* start at a random point */
         for (ii = 0; ii < A_MAX; ii++) {
             int lim = AMAX(i);

@@ -322,7 +322,6 @@ moveloop_core(void)
                         u.udg_cnt = rn1(200, 50);
                     }
                 }
-                restore_attrib();
 /* XXX This should be recoded to use something like regions - a list of
  * things that are active and need to be handled that is dynamically
  * maintained and not a list of special cases. */
