@@ -344,14 +344,9 @@ call_kops(register struct monst* shkp, register boolean nearshop)
 
     {
         coord mm;
-        stairway *stway = g.stairs;
+        xchar sx = 0, sy = 0;
 
-        while (stway) {
-            if (!stway->isladder && !stway->up
-                && stway->tolev.dnum == u.uz.dnum)
-                break;
-            stway = stway->next;
-        }
+        choose_stairs(&sx, &sy, TRUE);
 
         if (nearshop) {
             /* Create swarm around you, if you merely "stepped out" */
@@ -365,9 +360,11 @@ call_kops(register struct monst* shkp, register boolean nearshop)
         if (flags.verbose)
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
-        mm.x = stway->sx;
-        mm.y = stway->sy;
-        makekops(&mm);
+        if (isok(sx, sy)) {
+            mm.x = sx;
+            mm.y = sy;
+            makekops(&mm);
+        }
         /* Create swarm near shopkeeper (hinders return to shop) */
         mm.x = shkp->mx;
         mm.y = shkp->my;

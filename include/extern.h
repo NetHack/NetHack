@@ -3112,6 +3112,7 @@ extern void nethack_enter_windows(void);
 extern void amulet(void);
 extern int mon_has_amulet(struct monst *);
 extern int mon_has_special(struct monst *);
+extern void choose_stairs(xchar *, xchar *, boolean);
 extern int tactics(struct monst *);
 extern boolean has_aggravatables(struct monst *);
 extern void aggravate(void);

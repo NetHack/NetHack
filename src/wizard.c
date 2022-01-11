@@ -17,7 +17,6 @@ static struct obj *on_ground(short);
 static boolean you_have(int);
 static unsigned long target_on(int, struct monst *);
 static unsigned long strategy(struct monst *);
-static void choose_stairs(xchar *, xchar *);
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number
@@ -311,12 +310,12 @@ strategy(struct monst *mtmp)
     return dstrat;
 }
 
-static void
-choose_stairs(xchar *sx, xchar *sy)
+void
+choose_stairs(xchar *sx, xchar *sy, boolean dir)
 {
     xchar x = 0, y = 0;
     stairway *stway = g.stairs;
-    boolean stdir = !builds_up(&u.uz);
+    boolean stdir = dir && !builds_up(&u.uz);
 
     if ((stway = stairway_find_type_dir(FALSE, stdir)) != 0) {
         x = stway->sx;
@@ -335,7 +334,7 @@ choose_stairs(xchar *sx, xchar *sy)
         }
     }
 
-    if (x && y) {
+    if (isok(x, y)) {
         *sx = x;
         *sy = y;
     }
@@ -356,7 +355,7 @@ tactics(struct monst *mtmp)
     case STRAT_HEAL: /* hide and recover */
         mx = mtmp->mx, my = mtmp->my;
         /* if wounded, hole up on or near the stairs (to block them) */
-        choose_stairs(&sx, &sy);
+        choose_stairs(&sx, &sy, FALSE);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mx, my, &u.uz)
             || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
