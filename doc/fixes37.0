@@ -738,6 +738,13 @@ getting wounded in one leg when the other was already wounded miraculously
 when parsing config file entry "BINDINGS=key1:cmd1,key2:cmd2,key3:cmd3" allow
 	keyN to be either a naked comma or backslash+comma instead requiring
 	that comma's numeric value be used to bind comma to a command
+when two or more shops share a wall and hero uses Passes_walls to carry an
+	unpaid item from inside a shop into the shared wall, it could yield
+	impossible "unpaid_cost: object wasn't on any bill" when examining
+	inventory if the shop code picked wrong shopkeeper to determine cost
+when two or more shops share a wall and hero uses Passes_walls to carry an
+	unpaid item through the shared wall into another shop, theft of that
+	unpaid item from the first shop wasn't noticed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

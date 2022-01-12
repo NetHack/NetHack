@@ -385,7 +385,7 @@ inside_shop(register xchar x, register xchar y)
 }
 
 void
-u_left_shop(char* leavestring, boolean newlev)
+u_left_shop(char *leavestring, boolean newlev)
 {
     struct monst *shkp;
     struct eshk *eshkp;
@@ -400,7 +400,7 @@ u_left_shop(char* leavestring, boolean newlev)
     if (!*leavestring && (!levl[u.ux][u.uy].edge || levl[u.ux0][u.uy0].edge))
         return;
 
-    shkp = shop_keeper(*u.ushops0);
+    shkp = shop_keeper(*leavestring ? *leavestring : *u.ushops0);
     if (!shkp || !inhishop(shkp))
         return; /* shk died, teleported, changed levels... */
 
@@ -2422,19 +2422,20 @@ unpaid_cost(
     struct bill_x *bp = (struct bill_x *) 0;
     struct monst *shkp;
     long amt = 0L;
+
+#if 0   /* if two shops share a wall, this might find wrong shk */
     xchar ox, oy;
 
     if (!get_obj_location(unp_obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO))
         ox = u.ux, oy = u.uy; /* (shouldn't happen) */
     if ((shkp = shop_keeper(*in_rooms(ox, oy, SHOPBASE))) != 0) {
         bp = onbill(unp_obj, shkp, TRUE);
-    } else {
-        /* didn't find shk?  try searching bills */
-        for (shkp = next_shkp(fmon, TRUE); shkp;
-             shkp = next_shkp(shkp->nmon, TRUE))
-            if ((bp = onbill(unp_obj, shkp, TRUE)) != 0)
-                break;
-    }
+    } else /* didn't find shk?  try searching bills */
+#endif
+    for (shkp = next_shkp(fmon, TRUE); shkp;
+         shkp = next_shkp(shkp->nmon, TRUE))
+        if ((bp = onbill(unp_obj, shkp, TRUE)) != 0)
+            break;
 
     /* onbill() gave no message if unexpected problem occurred */
     if (!shkp || (unp_obj->unpaid && !bp)) {
