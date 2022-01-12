@@ -929,7 +929,7 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(roles[id].malenum));
+	setGlyph(monnum_to_glyph(roles[id].mnum));
     }
 };
 
@@ -944,7 +944,7 @@ public:
 #endif
 	)
     {
-	setGlyph(monnum_to_glyph(races[id].malenum));
+	setGlyph(monnum_to_glyph(races[id].mnum));
     }
 };
 

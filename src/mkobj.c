@@ -1090,7 +1090,7 @@ mksobj(int otyp, boolean init, boolean artif)
         if (otmp->corpsenm == NON_PM) {
             otmp->corpsenm = undead_to_corpse(rndmonnum());
             if (g.mvitals[otmp->corpsenm].mvflags & (G_NOCORPSE | G_GONE))
-                otmp->corpsenm = g.urole.malenum;
+                otmp->corpsenm = g.urole.mnum;
         }
         /*FALLTHRU*/
     case STATUE:

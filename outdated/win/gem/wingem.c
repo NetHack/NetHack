@@ -250,7 +250,7 @@ Gem_player_selection()
                     currch = lowc(roles[i].name.m[0]);
                     if (currch == lastch)
                         currch = highc(currch);
-                    add_menu(win, roles[i].malenum, &any, currch, 0, ATR_NONE,
+                    add_menu(win, roles[i].mnum, &any, currch, 0, ATR_NONE,
                              an(roles[i].name.m), MENU_ITEMFLAGS_NONE);
                     lastch = currch;
                 }

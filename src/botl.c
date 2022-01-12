@@ -327,7 +327,7 @@ rank_of(int lev, short monnum, boolean female)
 
     /* Find the role */
     for (role = roles; role->name.m; role++)
-        if (monnum == role->malenum || monnum == role->femalenum)
+        if (monnum == role->mnum)
             break;
     if (!role->name.m)
         role = &g.urole;
@@ -370,7 +370,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                     *rank_indx = j;
                 if (title_length)
                     *title_length = strlen(roles[i].rank[j].m);
-                return roles[i].malenum;
+                return roles[i].mnum;
             }
             if (roles[i].rank[j].f
                 && !strncmpi(str, roles[i].rank[j].f,
@@ -379,8 +379,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                     *rank_indx = j;
                 if (title_length)
                     *title_length = strlen(roles[i].rank[j].f);
-                return (roles[i].femalenum != NON_PM) ? roles[i].femalenum
-                                                      : roles[i].malenum;
+                return roles[i].mnum;
             }
         }
     }

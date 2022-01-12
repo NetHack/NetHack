@@ -654,9 +654,7 @@ u_init(void)
     u.umortality = 0;
     u.ugrave_arise = NON_PM;
 
-    u.umonnum = u.umonster = (flags.female && g.urole.femalenum != NON_PM)
-                                 ? g.urole.femalenum
-                                 : g.urole.malenum;
+    u.umonnum = u.umonster = g.urole.mnum;
     u.ulycn = NON_PM;
     set_uasmon();
 
@@ -1080,13 +1078,13 @@ ini_inv(struct trobj *trop)
                 g.nocreate4 = otyp;
         }
 
-        if (g.urace.malenum != PM_HUMAN) {
+        if (g.urace.mnum != PM_HUMAN) {
             /* substitute race-specific items; this used to be in
                the 'if (otyp != UNDEF_TYP) { }' block above, but then
                substitutions didn't occur for randomly generated items
                (particularly food) which have racial substitutes */
             for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                if (inv_subs[i].race_pm == g.urace.malenum
+                if (inv_subs[i].race_pm == g.urace.mnum
                     && otyp == inv_subs[i].item_otyp) {
                     debugpline3("ini_inv: substituting %s for %s%s",
                                 OBJ_NAME(objects[inv_subs[i].subs_otyp]),

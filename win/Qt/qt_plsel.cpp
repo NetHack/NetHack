@@ -134,7 +134,7 @@ public:
 	)
     {
 	glyph_info gi;
-	int glyph = monnum_to_glyph(roles[id].malenum, MALE);
+	int glyph = monnum_to_glyph(roles[id].mnum, MALE);
 	map_glyphinfo(0, 0, glyph, 0, &gi);
 	setGlyph(glyph, gi.gm.tileidx);
     }
@@ -152,7 +152,7 @@ public:
 	)
     {
 	glyph_info gi;
-	int glyph = monnum_to_glyph(races[id].malenum, MALE);
+	int glyph = monnum_to_glyph(races[id].mnum, MALE);
 	map_glyphinfo(0, 0, glyph, 0, &gi);
 	setGlyph(glyph, gi.gm.tileidx);
     }

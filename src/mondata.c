@@ -1166,7 +1166,7 @@ const struct permonst *
 raceptr(struct monst* mtmp)
 {
     if (mtmp == &g.youmonst && !Upolyd)
-        return &mons[g.urace.malenum];
+        return &mons[g.urace.mnum];
     else
         return mtmp->data;
 }
