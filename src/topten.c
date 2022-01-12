@@ -76,7 +76,7 @@ static char *encode_extended_achievements(void);
 static char *encode_extended_conducts(void);
 #endif
 static void free_ttlist(struct toptenentry *);
-static int classmon(char *, boolean);
+static int classmon(char *);
 static int score_wanted(boolean, int, struct toptenentry *, int,
                         const char **, int);
 #ifdef NO_SCAN_BRACK
@@ -1273,20 +1273,19 @@ prscore(int argc, char **argv)
 }
 
 static int
-classmon(char *plch, boolean fem)
+classmon(char *plch)
 {
     int i;
 
     /* Look for this role in the role table */
-    for (i = 0; roles[i].name.m; i++)
+    for (i = 0; roles[i].name.m; i++) {
         if (!strncmp(plch, roles[i].filecode, ROLESZ)) {
-            if (fem && roles[i].femalenum != NON_PM)
-                return roles[i].femalenum;
-            else if (roles[i].malenum != NON_PM)
-                return roles[i].malenum;
+            if (roles[i].mnum != NON_PM)
+                return roles[i].mnum;
             else
                 return PM_HUMAN;
         }
+    }
     /* this might be from a 3.2.x score for former Elf class */
     if (!strcmp(plch, "E"))
         return PM_RANGER;
@@ -1351,7 +1350,11 @@ tt_oname(struct obj* otmp)
     if (!tt)
         return (struct obj *) 0;
 
-    set_corpsenm(otmp, classmon(tt->plrole, (tt->plgend[0] == 'F')));
+    set_corpsenm(otmp, classmon(tt->plrole));
+    if (tt->plgend[0] == 'F')
+        otmp->spe = CORPSTAT_FEMALE;
+    else if (tt->plgend[0] == 'M')
+        otmp->spe = CORPSTAT_MALE;
     otmp = oname(otmp, tt->name);
 
     return otmp;

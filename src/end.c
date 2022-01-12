@@ -1404,15 +1404,10 @@ really_done(int how)
        this grave in the current level's features for #overview */
     if (bones_ok && u.ugrave_arise == NON_PM
         && !(g.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
-        int mnum = u.umonnum;
+        /* Base corpse on race when not poly'd since original u.umonnum
+           is based on role, and all role monsters are human. */
+        int mnum = !Upolyd ? g.urace.mnum : u.umonnum;
 
-        if (!Upolyd) {
-            /* Base corpse on race when not poly'd since original u.umonnum
-               is based on role, and all role monsters are human. */
-            mnum = (flags.female && g.urace.femalenum != NON_PM)
-                       ? g.urace.femalenum
-                       : g.urace.malenum;
-        }
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, g.plname);
         Sprintf(pbuf, "%s, ", g.plname);
         formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);

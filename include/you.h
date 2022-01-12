@@ -175,8 +175,7 @@ struct Role {
     const char *intermed; /* quest intermediate goal (from questpgr.c) */
 
     /*** Indices of important monsters and objects ***/
-    short malenum, /* index (PM_) as a male (botl.c) */
-        femalenum, /* ...or as a female (NON_PM == same) */
+    short mnum,    /* index (PM_) of role (botl.c) */
         petnum,    /* PM_ of preferred pet (NON_PM == random) */
         ldrnum,    /* PM_ of quest leader (questpgr.c) */
         guardnum,  /* PM_ of quest guardians (questpgr.c) */
@@ -230,8 +229,8 @@ struct Role {
 };
 
 extern const struct Role roles[]; /* table of available roles */
-#define Role_if(X) (g.urole.malenum == (X))
-#define Role_switch (g.urole.malenum)
+#define Role_if(X) (g.urole.mnum == (X))
+#define Role_switch (g.urole.mnum)
 
 /* used during initialization for race, gender, and alignment
    as well as for character class */
@@ -249,8 +248,7 @@ struct Race {
     struct RoleName individual; /* individual as a noun ("man", "elf") */
 
     /*** Indices of important monsters and objects ***/
-    short malenum, /* PM_ as a male monster */
-        femalenum, /* ...or as a female (NON_PM == same) */
+    short mnum,    /* PM_ as a monster */
         mummynum,  /* PM_ as a mummy */
         zombienum; /* PM_ as a zombie */
 
@@ -281,8 +279,8 @@ struct Race {
 };
 
 extern const struct Race races[]; /* Table of available races */
-#define Race_if(X) (g.urace.malenum == (X))
-#define Race_switch (g.urace.malenum)
+#define Race_if(X) (g.urace.mnum == (X))
+#define Race_switch (g.urace.mnum)
 
 /*** Unified structure specifying gender information ***/
 struct Gender {

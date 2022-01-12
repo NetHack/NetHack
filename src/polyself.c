@@ -87,7 +87,7 @@ set_uasmon(void)
     PROPSET(SEE_INVIS, perceives(mdat));
     PROPSET(TELEPAT, telepathic(mdat));
     /* note that Infravision uses mons[race] rather than usual mons[role] */
-    PROPSET(INFRAVISION, infravision(Upolyd ? mdat : &mons[g.urace.malenum]));
+    PROPSET(INFRAVISION, infravision(Upolyd ? mdat : &mons[g.urace.mnum]));
     PROPSET(INVIS, pm_invisible(mdat));
     PROPSET(TELEPORT, can_teleport(mdat));
     PROPSET(TELEPORT_CONTROL, control_teleport(mdat));
@@ -240,32 +240,24 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 void
 change_sex(void)
 {
-    /* setting u.umonster for caveman/cavewoman or priest/priestess
-       swap unintentionally makes `Upolyd' appear to be true */
-    boolean already_polyd = (boolean) Upolyd;
-
     /* Some monsters are always of one sex and their sex can't be changed;
      * Succubi/incubi can change, but are handled below.
      *
-     * !already_polyd check necessary because is_male() and is_female()
-     * are true if the player is a priest/priestess.
+     * !Upolyd check necessary because is_male() and is_female()
+     * may be true for certain roles
      */
-    if (!already_polyd
+    if (!Upolyd
         || (!is_male(g.youmonst.data) && !is_female(g.youmonst.data)
             && !is_neuter(g.youmonst.data)))
         flags.female = !flags.female;
-    if (already_polyd) /* poly'd: also change saved sex */
+    if (Upolyd) /* poly'd: also change saved sex */
         u.mfemale = !u.mfemale;
     max_rank_sz(); /* [this appears to be superfluous] */
-    if ((already_polyd ? u.mfemale : flags.female) && g.urole.name.f)
+    if ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
         Strcpy(g.pl_character, g.urole.name.f);
     else
         Strcpy(g.pl_character, g.urole.name.m);
-    u.umonster = ((already_polyd ? u.mfemale : flags.female)
-                  && g.urole.femalenum != NON_PM)
-                     ? g.urole.femalenum
-                     : g.urole.malenum;
-    if (!already_polyd) {
+    if (!Upolyd) {
         u.umonnum = u.umonster;
     } else if (u.umonnum == PM_AMOROUS_DEMON) {
         flags.female = !flags.female;
@@ -499,8 +491,7 @@ polyself(int psflags)
                        && !(mntmp == PM_HUMAN
                             || (your_race(&mons[mntmp])
                                 && (mons[mntmp].geno & G_UNIQ) == 0)
-                            || mntmp == g.urole.malenum
-                            || mntmp == g.urole.femalenum)) {
+                            || mntmp == g.urole.mnum)) {
                 const char *pm_name;
 
                 /* mkclass_poly() can pick a !polyok()
@@ -1983,12 +1974,8 @@ polysense(void)
 boolean
 ugenocided(void)
 {
-    return ((g.mvitals[g.urole.malenum].mvflags & G_GENOD)
-            || (g.urole.femalenum != NON_PM
-                && (g.mvitals[g.urole.femalenum].mvflags & G_GENOD))
-            || (g.mvitals[g.urace.malenum].mvflags & G_GENOD)
-            || (g.urace.femalenum != NON_PM
-                && (g.mvitals[g.urace.femalenum].mvflags & G_GENOD)));
+    return ((g.mvitals[g.urole.mnum].mvflags & G_GENOD)
+            || (g.mvitals[g.urace.mnum].mvflags & G_GENOD));
 }
 
 /* how hero feels "inside" after self-genocide of role or race */

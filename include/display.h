@@ -622,11 +622,8 @@ enum glyph_offsets {
 /* The hero's glyph when seen as a monster.
  */
 #define hero_glyph                                                      \
-    monnum_to_glyph((Upolyd || !flags.showrace)                         \
-                        ? u.umonnum                                     \
-                        : (flags.female && g.urace.femalenum != NON_PM) \
-                              ? g.urace.femalenum                       \
-                              : g.urace.malenum, (Ugender))
+    monnum_to_glyph((Upolyd || !flags.showrace) ? u.umonnum : g.urace.mnum, \
+                    (Ugender))
 
 /*
  * Change the given glyph into it's given type.  Note:
