@@ -2625,39 +2625,37 @@ in_town(register int x, register int y)
 static void
 move_update(register boolean newlev)
 {
-    char *ptr1, *ptr2, *ptr3, *ptr4;
+    char c, *ptr1, *ptr2, *ptr3, *ptr4;
 
     Strcpy(u.urooms0, u.urooms);
     Strcpy(u.ushops0, u.ushops);
     if (newlev) {
-        u.urooms[0] = '\0';
-        u.uentered[0] = '\0';
-        u.ushops[0] = '\0';
-        u.ushops_entered[0] = '\0';
+        (void) memset(u.urooms, '\0', sizeof u.urooms);
+        (void) memset(u.uentered, '\0', sizeof u.uentered);
+        (void) memset(u.ushops, '\0', sizeof u.ushops);
+        (void) memset(u.ushops_entered, '\0', sizeof u.ushops_entered);
         Strcpy(u.ushops_left, u.ushops0);
         return;
     }
     Strcpy(u.urooms, in_rooms(u.ux, u.uy, 0));
 
-    for (ptr1 = &u.urooms[0], ptr2 = &u.uentered[0], ptr3 = &u.ushops[0],
-         ptr4 = &u.ushops_entered[0];
-         *ptr1; ptr1++) {
-        if (!index(u.urooms0, *ptr1))
-            *(ptr2++) = *ptr1;
-        if (IS_SHOP(*ptr1 - ROOMOFFSET)) {
-            *(ptr3++) = *ptr1;
-            if (!index(u.ushops0, *ptr1))
-                *(ptr4++) = *ptr1;
+    for (ptr1 = u.urooms, ptr2 = u.uentered,
+         ptr3 = u.ushops, ptr4 = u.ushops_entered; *ptr1; ptr1++) {
+        c = *ptr1;
+        if (!index(u.urooms0, c))
+            *ptr2++ = c;
+        if (IS_SHOP(c - ROOMOFFSET)) {
+            *ptr3++ = c;
+            if (!index(u.ushops0, c))
+                *ptr4++ = c;
         }
     }
-    *ptr2 = '\0';
-    *ptr3 = '\0';
-    *ptr4 = '\0';
+    *ptr2 = '\0', *ptr3 = '\0', *ptr4 = '\0';
 
     /* filter u.ushops0 -> u.ushops_left */
-    for (ptr1 = &u.ushops0[0], ptr2 = &u.ushops_left[0]; *ptr1; ptr1++)
+    for (ptr1 = u.ushops0, ptr2 = u.ushops_left; *ptr1; ptr1++)
         if (!index(u.ushops, *ptr1))
-            *(ptr2++) = *ptr1;
+            *ptr2++ = *ptr1;
     *ptr2 = '\0';
 }
 
@@ -2665,7 +2663,7 @@ move_update(register boolean newlev)
 void
 check_special_room(boolean newlev)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
     char *ptr;
 
     move_update(newlev);
