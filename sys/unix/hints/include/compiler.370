@@ -26,10 +26,18 @@ CCFLAGS = -g
 #detection
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
 ifeq "$(CCISCLANG)" ""
+ifdef WANT_WIN_QT6
+CXX=g++ -std=c++17
+else
 CXX=g++ -std=gnu++11
+endif
+else
+ifdef WANT_WIN_QT6
+CXX=clang++ -std=c++17
 else
 CXX=clang++ -std=gnu++11
 endif
+endif   # clang
 
 # If you want to override the compiler detection just carried out
 # uncomment one of the following pairs. Note, however, that
