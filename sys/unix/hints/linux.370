@@ -168,13 +168,11 @@ QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
 MOCPATH = $(QTDIR)/libexec/moc
 endif
 else   # QT_PACKAGE_AVAILABLE
-$(error error is inside package)
 LINK = $(CXX)
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
 endif   # WANT_WIN_QT6
 else    # QT_PACKAGE_AVAILABLE
-$(error error QT_PACKAGE_AVAILABLE)
 endif   # QT_PACKAGE_AVAILABLE
 ifndef QTDIR
 $(error QTDIR not defined in the environment or Makefile)
