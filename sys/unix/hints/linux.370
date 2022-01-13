@@ -140,9 +140,8 @@ LFLAGS=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
-# Qt requires C++11
-ifdef WANT_WIN_QT5
 LINK = $(CXX)
+ifdef WANT_WIN_QT5
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif   # WANT_WIN_QT5
@@ -166,9 +165,9 @@ QTCXXFLAGS += -I$(QTDIR)/include/QtGui
 QTCXXFLAGS += -I$(QTDIR)/include/QtMultimedia
 QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
 MOCPATH = $(QTDIR)/libexec/moc
+WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 endif
 else   # QT_PACKAGE_AVAILABLE
-LINK = $(CXX)
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
 endif   # WANT_WIN_QT6
