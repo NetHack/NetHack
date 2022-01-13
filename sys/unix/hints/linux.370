@@ -147,7 +147,7 @@ QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Q
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif   # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-# As of January 2022 there was no Qt6 package was available.
+# As of January 2022 there was no Qt6 package available.
 ifndef QT_PACKAGE_AVAILABLE
 # Try some likely spots for a self-built Qt6.
 # You'll have to change these manually before using the hints file
