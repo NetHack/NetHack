@@ -454,8 +454,8 @@ opt_##a,
 #ifdef STATUS_HILITES
     NHOPTC(statushilites, 20, opt_in, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "0=no status highlighting, N=show highlights for N turns")
-    NHOPTO("status hilite rules", o_status_hilites, BUFSZ, opt_in, set_in_game,
-           No, Yes, No, NoAlias, "edit status hilites")
+    NHOPTO("status highlight rules", o_status_hilites, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit status hilites")
 #else
     NHOPTC(statushilites, 20, opt_in, set_in_config, Yes, Yes, Yes, No,
                 NoAlias, "highlight control")

@@ -7289,6 +7289,49 @@ longest_option_name(int startpass, int endpass)
     return longest_name_len;
 }
 
+/* text to optionally insert at the beginning of #options command's menu,
+   briefly describing how it works; [brevity is in the eye of the beholder
+   or perhaps a pig; it was brief when this comment was first written...] */
+static const char *const optmenu[] = {
+    "This menu shows the current value for all options and lets you",
+    "pick ones that you'd like to change.  Picking them doesn't make",
+    "any immediate changes though.  That will take place once you close",
+    "the menu.  For most of NetHack's interfaces, closing the menu is",
+    "done by pressing the <enter> key or <return> key; others might",
+    "require clicking on [ok].  Pressing the <escape> key or clicking",
+    "on [cancel] will close the menu and discard any pending changes.",
+    "",
+    "This menu is too long to fit on one screen.  Some interfaces",
+    "paginate menus; use the '>' key to advance a page or '<' to back",
+    "up.  They typically re-use selection letters (a-z) on each page.",
+    "Others use one long page and you need to use a scrollbar; once",
+    "past a-z and A-Z they'll have entries without selection letters.",
+    "Those can be selected by clicking on them.",
+    "",
+    "For toggling boolean (True/False or On/Off) options, selecting",
+    "them is all that is needed.  For compound options (below, after",
+    "the boolean ones), you will be prompted to supply a new value.",
+    "",
+    "At the start of each of the two sections are the values of some",
+    "unselectable options which can only be set before the game starts.",
+    "After the compound section are some \"other\" options which take a",
+    "set of multiple values and tend to be more complex to deal with.",
+    "",
+    "Some changes will only last until you save (or quit) the current",
+    "game.  Usually those are for things that might not be appropriate",
+    "if you were to restore the saved game on another computer with",
+    "different capabilities.  Other options will be included in this",
+    "game's save file and retain their settings after restore.  None set",
+    "here will affect other games, either already saved or new ones.",
+    "For that, you need to update your run-time configuration file and",
+    "specify the desired options settings there.  Even then, restoring",
+    "existing games that contain saved option values will use those.",
+    "",
+    "[Suppress this menu introduction by turning off 'cmdassist'.]",
+    "",
+    NULL
+};
+
 /* the #options command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
@@ -7306,6 +7349,16 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+    if (iflags.cmdassist) {
+        /* insert the optmenu[] explanatory text at the top of the menu */
+        any = cg.zeroany;
+        for (i = 0; optmenu[i]; ++i) {
+            Sprintf(buf, "%4s%.75s", "", optmenu[i]);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
+                     buf, MENU_ITEMFLAGS_NONE);
+        }
+    }
 
 #ifdef notyet /* SYSCF */
     /* XXX I think this is still fragile.  Fixing initial/from_file and/or
