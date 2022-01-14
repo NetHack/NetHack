@@ -1580,4 +1580,6 @@ map_glyphinfo() now simply references an internal array that maps each unique
 	in-game that could have an impact on the mappings, but they remain
 	stable between those events
 added MG_MALE glyphflag to complement the MG_FEMALE glyphflag that was there
+remove obsolete roles[].femalenum and rename roles[].malenum to roles[].mnum;
+	likewise for races[]
 

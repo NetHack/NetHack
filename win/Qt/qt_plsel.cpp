@@ -312,7 +312,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
         item = new QTableWidgetItem();
         role->setItem(i, 0, item);
 
-        if (roles[i].malenum == PM_CLERIC)
+        if (roles[i].mnum == PM_CLERIC)
             cleric_role_row = i; // for populate_races()
     }
 
@@ -323,7 +323,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
         item = new QTableWidgetItem();
         race->setItem(i, 0, item);
 
-        if (races[i].malenum == PM_HUMAN)
+        if (races[i].mnum == PM_HUMAN)
             human_race_row = i; // (always i==0) for populate_roles()
     }
 
@@ -405,7 +405,7 @@ NetHackQtPlayerSelector::populate_roles()
     for (int i = 0; roles[i].name.m; ++i) {
         rolename = (is_f && roles[i].name.f) ? roles[i].name.f
                                              : roles[i].name.m;
-        gf = monnum_to_glyph(roles[i].malenum, is_f ? FEMALE : MALE);
+        gf = monnum_to_glyph(roles[i].mnum, is_f ? FEMALE : MALE);
         map_glyphinfo(0, 0, gf, 0, &gi);
         v = ((ra < 0 || validrace(i, ra))
              && (gn < 0 || validgend(i, (ra >= 0) ? ra : hu, gn))
@@ -435,7 +435,7 @@ NetHackQtPlayerSelector::populate_races()
     bool is_f = (gn == 1);
     NetHackQtGlyphs& glyphs = qt_settings->glyphs();
     for (int j = 0; races[j].noun; ++j) {
-        gf = monnum_to_glyph(races[j].malenum, is_f ? FEMALE : MALE);
+        gf = monnum_to_glyph(races[j].mnum, is_f ? FEMALE : MALE);
         map_glyphinfo(0, 0, gf, 0, &gi);
         v = ((ro < 0 || validrace(ro, j))
              && (al < 0 || validalign((ro >= 0) ? ro : cl, j, al)));
