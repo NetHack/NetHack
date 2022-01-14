@@ -41,6 +41,10 @@ V       history display game history
 #               introduces an extended command (#? for a list of them)
 &       what-does describe the command a keystroke invokes
 
+Control characters are depicted as '^' followed by a letter.  Depress Ctrl
+or Control like a shift key then type the letter.  Control characters are
+case-insensitive; ^D is the same as ^d, Ctrl+d is same as Ctrl+Shift+d.
+
 Game commands:
 ^D      kick    kick (a door, or something else)
 ^T      'port   teleport (if you can)
@@ -91,8 +95,9 @@ _       travel  move via a shortest-path algorithm to a point on the map
 :       look    look at what is here
 ;       farlook look at what is somewhere else by selecting a map symbol
 
-Keyboards that have a meta key can also use these extended commands
-via the meta modifier instead of the # prefix:
+Keyboards that have a meta key (some use Alt for that, so typing Alt as a
+shift plus 'e' would generate 'M-e') can also use these extended commands
+via the meta modifier as an alternative to using the # prefix:
 
 M-?             display extended command help (if the platform allows this)
 M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
