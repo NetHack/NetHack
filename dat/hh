@@ -44,6 +44,8 @@ V       history display game history
 Control characters are depicted as '^' followed by a letter.  Depress Ctrl
 or Control like a shift key then type the letter.  Control characters are
 case-insensitive; ^D is the same as ^d, Ctrl+d is same as Ctrl+Shift+d.
+There are a few non-letter control characters; nethack uses ^[ as a synonym
+for Escape (or vice versa) and ^_ for #retravel but none of the others.
 
 Game commands:
 ^D      kick    kick (a door, or something else)
@@ -89,6 +91,7 @@ $       gold    count your gold
 +       spells  list the spells you know; also rearrange them if desired
 `       classkn display known items for one class of objects
 _       travel  move via a shortest-path algorithm to a point on the map
+^_      retravel resume travelling toward previously specified destination
 .       rest    wait a moment
 ,       pickup  pick up all you can carry
 @               toggle "pickup" (auto pickup) option on and off
@@ -97,7 +100,9 @@ _       travel  move via a shortest-path algorithm to a point on the map
 
 Keyboards that have a meta key (some use Alt for that, so typing Alt as a
 shift plus 'e' would generate 'M-e') can also use these extended commands
-via the meta modifier as an alternative to using the # prefix:
+via the meta modifier as an alternative to using the # prefix.  Unlike
+control characters, meta characters are case-sensitive so M-a is different
+from M-A.  Type the latter with two keys used as shifts, Meta+Shift+a.
 
 M-?             display extended command help (if the platform allows this)
 M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
