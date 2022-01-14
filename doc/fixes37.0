@@ -745,6 +745,7 @@ when two or more shops share a wall and hero uses Passes_walls to carry an
 when two or more shops share a wall and hero uses Passes_walls to carry an
 	unpaid item through the shared wall into another shop, theft of that
 	unpaid item from the first shop wasn't noticed
+redo the unpaid_cost fix to handle shop items inside hero-owned container
 flyers shouldn't fall on arrival when going down holes or trap doors
 
 
