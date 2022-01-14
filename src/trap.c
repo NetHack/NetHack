@@ -563,7 +563,7 @@ fall_through(
         Sprintf(msgbuf, "The hole in the %s above you closes up.",
                 ceiling(u.ux, u.uy));
 
-    schedule_goto(&dtmp, UTOTYPE_FALLING, (char *) 0,
+    schedule_goto(&dtmp, !Flying ? UTOTYPE_FALLING : UTOTYPE_NONE, (char *) 0,
                   !td ? msgbuf : (char *) 0);
 }
 
