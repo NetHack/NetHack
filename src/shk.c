@@ -2420,7 +2420,7 @@ unpaid_cost(
     boolean include_contents)
 {
     struct bill_x *bp = (struct bill_x *) 0;
-    struct monst *shkp;
+    struct monst *shkp = 0;
     char *shop;
     long amt = 0L;
 

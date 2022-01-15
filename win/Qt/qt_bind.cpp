@@ -125,7 +125,14 @@ NetHackQtBind::qt_Splash()
         vb->addWidget(capt);
         capt->setAlignment(Qt::AlignCenter);
         lsplash->setFixedSize(pm.size());
+
+#if QT_VERSION < 0x040000
+        // if used on 5.11, this produces a fuzzy image
         lsplash->setMask(QBitmap(pm));
+#else
+        // required for 6.2; on 5.11, this produces a crisp image
+        lsplash->setPixmap(pm);
+#endif
 
 #if QT_VERSION < 0x060000
         QSize screensize = QApplication::desktop()->size();
