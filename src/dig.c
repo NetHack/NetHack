@@ -987,13 +987,8 @@ use_pick_axe(struct obj *obj)
     downok = !!can_reach_floor(FALSE);
     dsp = dirsyms;
     for (dir = 0; dir < N_DIRS_Z; dir++) {
-        char dirch;
-        if (dir == DIR_DOWN)
-            dirch = cmd_from_func(dodown);
-        else if (dir == DIR_UP)
-            dirch = cmd_from_func(doup);
-        else
-            dirch = g.Cmd.move[dir];
+        char dirch = cmd_from_dir(dir, MV_WALK);
+
         /* filter out useless directions */
         if (u.uswallow) {
             ; /* all directions are viable when swallowed */

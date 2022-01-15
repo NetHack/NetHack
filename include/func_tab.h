@@ -15,6 +15,8 @@
 #define NOFUZZERCMD  0x20 /* fuzzer cannot execute this command */
 #define INTERNALCMD  0x40 /* only for internal use, not for user */
 #define CMD_M_PREFIX 0x80 /* accepts menu prefix */
+#define PREFIXCMD    0x100 /* prefix command, requires another one after it */
+#define MOVEMENTCMD  0x200 /* used to move hero/cursor */
 
 struct ext_func_tab {
     uchar key;

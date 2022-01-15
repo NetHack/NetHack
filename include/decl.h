@@ -445,20 +445,6 @@ enum nh_keyfunc {
     NHKF_ESC = 0,
     NHKF_DOAGAIN,
 
-    NHKF_REQMENU,
-
-    /* run ... clicklook need to be in a continuous block */
-    NHKF_RUN,          /* 'G' */
-    NHKF_RUN2,         /* '5' or M-5 */
-    NHKF_RUSH,         /* 'g' */
-    NHKF_RUSH2,        /* M-5 or '5' */
-    NHKF_FIGHT,        /* 'F' */
-    NHKF_FIGHT2,       /* '-' */
-    NHKF_NOPICKUP,     /* 'm' */
-    NHKF_RUN_NOPICKUP, /* 'M' */
-
-    NHKF_REDRAW,
-    NHKF_REDRAW2,
     NHKF_GETDIR_SELF,
     NHKF_GETDIR_SELF2,
     NHKF_GETDIR_HELP,
@@ -503,9 +489,6 @@ struct cmd {
     boolean pcHack_compat; /* for numpad:  affects 5, M-5, and M-0 */
     boolean phone_layout;  /* inverted keypad:  1,2,3 above, 7,8,9 below */
     boolean swap_yz;       /* QWERTZ keyboards; use z to move NW, y to zap */
-    char move[N_DIRS];     /* char used for moving one step in direction */
-    char rush[N_DIRS];
-    char run[N_DIRS];
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */

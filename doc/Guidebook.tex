@@ -1349,6 +1349,12 @@ You can set the
 {\it paranoid\verb+_+confirmation:quit\/}
 option to require a response of ``{\tt yes}'' instead.
 %.lp
+\item[\tb{\#fight}]
+Prefix key to force fight a direction, even if you see nothing
+to fight there.
+Default key is `{\tt F}', or `{\tt -}' with
+{\it number\verb+_+pad\/}
+%.lp
 \item[\tb{\#fire}]
 Fire ammunition from quiver, possibly autowielding a launcher,
 or hit with a wielded polearm.
@@ -1546,6 +1552,11 @@ and also `{\tt \^{}L}' if {\it number\verb+_+pad\/} is on.
 \item[\tb{\#remove}]
 Remove an accessory (ring, amulet, etc). Default key is `{\tt R}'.
 %.lp
+\item[\tb{\#reqmenu}]
+Prefix key to modify the behaviour or request menu from some commands.
+Prevents autopickup when used with movement commands.
+Default key is `{\tt m}'.
+%.lp
 \item[\tb{\#retravel}]
 Travel to a previously selected travel destination.
 Default key is `{\tt C-_}'.
@@ -1557,6 +1568,26 @@ Default key is `{\tt M-R}'.
 %.lp
 \item[\tb{\#rub}]
 Rub a lamp or a stone. Autocompletes. Default key is `{\tt M-r}'.
+%.lp
+\item[\tb{\#run}]
+Prefix key to run towards a direction.
+Default key is `{\tt G}' when
+{\it number\verb+_+pad\/}
+is off,
+`{\tt 5}' when
+{\it number\verb+_+pad\/}
+is set to 1~or~3,
+otherwise `{\tt M-5}' when it is set to 2~or~4.
+%.lp
+\item[\tb{\#rush}]
+Prefix key to rush towards a direction.
+Default key is `{\tt g}' when
+{\it number\verb+_+pad\/}
+is off,
+`{\tt M-5}' when
+{\it number\verb+_+pad\/}
+is set to 1~or~3,
+otherwise `{\tt 5}' when it is set to 2~or~4.
 %.lp
 \item[\tb{\#save}]
 Save the game and exit the program.
@@ -5265,13 +5296,6 @@ can only be bound to a single key.
 Prefix key to start a count, to repeat a command this many times.
 With {\it number\verb+_+pad\/} only. Default is~`{\tt n}'.
 %.lp
-\item[{\bb{fight}}]
-Prefix key to force fight a direction. Default is~`{\tt F}'.
-%.lp
-\item[{\bb{fight.numpad}}]
-Prefix key to force fight a direction. With {\it number\verb+_+pad\/} only.
-Default is~`{\tt -}'.
-%.lp
 \item[{\bb{getdir.help}}]
 When asked for a direction, the key to show the help. Default is~`{\tt ?}'.
 %.lp
@@ -5375,47 +5399,8 @@ Default is~`{\tt z}'.
 When asked for a location, the key to go to previous closest valid location.
 Default is~`{\tt Z}'.
 %.lp
-\item[{\bb{nopickup}}]
-Prefix key to move without picking up items. Default is~`{\tt m}'.
-%.lp
-\item[{\bb{redraw}}]
-Key to redraw the screen. Default is~`{\tt \^{}R}'.
-%.lp
-\item[{\bb{redraw.numpad}}]
-Key to redraw the screen. With {\it number\verb+_+pad\/} only.
-Default is~`{\tt \^{}L}'.
-%.lp
 \item[{\bb{repeat}}]
 Key to repeat previous command. Default is~`{\tt \^{}A}'.
-%.lp
-\item[{\bb{reqmenu}}]
-Prefix key to request menu from some commands. Default is~`{\tt m}'.
-%.lp
-\item[{\bb{run}}]
-Prefix key to run towards a direction. Default is~`{\tt G}'.
-%.lp
-\item[{\bb{run.nopickup}}]
-Prefix key to run towards a direction without picking up items on the way.
-Default is~`{\tt M}'.
-%.lp
-\item[{\bb{run.numpad}}]
-Prefix key to run towards a direction.
-With {\it number\verb+_+pad\/} only.
-
-%.lp ""
-Default is `{\tt 5}' when number_pad is set to 1~or~3,
-otherwise `{\tt M-5}' when it is set to 2~or~4.
-%.lp
-\item[{\bb{rush}}]
-Prefix key to rush towards a direction. Default is~`{\tt g}'.
-%.lp
-\item[{\bb{rush.numpad}}]
-Prefix key to rush towards a direction.
-With {\it number\verb+_+pad\/} only.
-
-.lp ""
-Default is `{\tt M-5}' when number_pad is set to 1~or~3,
-otherwise `{\tt 5}' when it is set to 2~or~4.
 \elist
 
 

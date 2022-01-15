@@ -108,22 +108,25 @@ getpos_help(boolean force, const char *goal)
     char sbuf[BUFSZ];
     boolean doing_what_is;
     winid tmpwin = create_nhwindow(NHW_MENU);
-    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
-    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     Sprintf(sbuf,
             "Use '%s', '%s', '%s', '%s' to move the cursor to %s.", /* hjkl */
-            visctrl(g.Cmd.move[DIR_W]), visctrl(g.Cmd.move[DIR_S]),
-            visctrl(g.Cmd.move[DIR_N]), visctrl(g.Cmd.move[DIR_E]), goal);
+            visctrl(cmd_from_func(do_move_west)),
+            visctrl(cmd_from_func(do_move_south)),
+            visctrl(cmd_from_func(do_move_north)),
+            visctrl(cmd_from_func(do_move_east)), goal);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf,
             "Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s.",
-            visctrl(g.Cmd.run[DIR_W]), visctrl(g.Cmd.run[DIR_S]),
-            visctrl(g.Cmd.run[DIR_N]), visctrl(g.Cmd.run[DIR_E]),
+            visctrl(cmd_from_func(do_run_west)),
+            visctrl(cmd_from_func(do_run_south)),
+            visctrl(cmd_from_func(do_run_north)),
+            visctrl(cmd_from_func(do_run_east)),
             fastmovemode[iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
     Sprintf(sbuf, "(or prefix normal move with '%s' or '%s' to fast-move)",
-            visctrl(g.Cmd.spkeys[runkey]), visctrl(g.Cmd.spkeys[rushkey]));
+            visctrl(cmd_from_func(do_run)),
+            visctrl(cmd_from_func(do_rush)));
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
@@ -698,8 +701,6 @@ getpos(coord *ccp, boolean force, const char *goal)
     schar udx = u.dx, udy = u.dy, udz = u.dz;
     int dx, dy;
     boolean rushrun = FALSE;
-    int runkey = iflags.num_pad ? NHKF_RUN2 : NHKF_RUN;
-    int rushkey = iflags.num_pad ? NHKF_RUSH2 : NHKF_RUSH;
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
         pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
@@ -757,7 +758,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             result = -1;
             break;
         }
-        if (c == g.Cmd.spkeys[runkey] || c == g.Cmd.spkeys[rushkey]) {
+        if (c == cmd_from_func(do_run) || c == cmd_from_func(do_rush)) {
             c = readchar_poskey(&tx, &ty, &sidx);
             rushrun = TRUE;
         }
@@ -974,9 +975,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                     if (!force)
                         Strcpy(note, "aborted");
                     else /* hjkl */
-                        Sprintf(note, "use '%c', '%c', '%c', '%c' or '%s'",
-                                g.Cmd.move[DIR_W], g.Cmd.move[DIR_S],
-                                g.Cmd.move[DIR_N], g.Cmd.move[DIR_E],
+                        Sprintf(note, "use '%s', '%s', '%s', '%s' or '%s'",
+                                visctrl(cmd_from_func(do_move_west)),
+                                visctrl(cmd_from_func(do_move_south)),
+                                visctrl(cmd_from_func(do_move_north)),
+                                visctrl(cmd_from_func(do_move_east)),
                                 visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
