@@ -3441,8 +3441,8 @@ reset_commands(boolean initial)
     static const int ylist[] = {
         'y', 'Y', C('y'), M('y'), M('Y'), M(C('y'))
     };
-    static struct ext_func_tab *back_dir_cmd[N_DIRS_Z][N_MOVEMODES];
-    static uchar back_dir_key[N_DIRS_Z][N_MOVEMODES];
+    static struct ext_func_tab *back_dir_cmd[N_DIRS][N_MOVEMODES];
+    static uchar back_dir_key[N_DIRS][N_MOVEMODES];
     static boolean backed_dir_cmd = FALSE;
     const struct ext_func_tab *cmdtmp;
     boolean flagtemp;
@@ -3458,7 +3458,7 @@ reset_commands(boolean initial)
         commands_init();
     } else {
         if (backed_dir_cmd) {
-            for (dir = 0; dir < N_DIRS_Z; dir++) {
+            for (dir = 0; dir < N_DIRS; dir++) {
                 for (mode = 0; mode < N_MOVEMODES; mode++) {
                     g.Cmd.commands[back_dir_key[dir][mode]] = back_dir_cmd[dir][mode];
                 }
@@ -3531,7 +3531,7 @@ reset_commands(boolean initial)
     g.Cmd.alphadirchars = !g.Cmd.num_pad ? g.Cmd.dirchars : sdir;
 
     /* back up the commands & keys overwritten by new movement keys */
-    for (dir = 0; dir < N_DIRS_Z; dir++) {
+    for (dir = 0; dir < N_DIRS; dir++) {
         for (mode = MV_WALK; mode < N_MOVEMODES; mode++) {
             uchar di = (uchar) g.Cmd.dirchars[dir];
 
