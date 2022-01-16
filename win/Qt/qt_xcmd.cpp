@@ -273,8 +273,8 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
        as an extended command, that resulted in so many rows that some of
        the grid was chopped off at the bottom of the screen and the buttons
        in that portion were out of reach */
-    unsigned ncols = (set == all_cmds) ? 8
-                     : (set == normal_cmds) ? 7
+    unsigned ncols = (set == all_cmds) ? 9
+                     : (set == normal_cmds) ? 8
                        : (set == autocomplete_cmds) ? (WizardMode ? 6 : 5)
                          : (set == wizard_cmds) ? (byRow ? 6 : 5)
                            : 1; // can't happen
