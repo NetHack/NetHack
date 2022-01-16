@@ -61,7 +61,7 @@ int NDECL(tty_self_recover_prompt);
 int NDECL(other_self_recover_prompt);
 
 char orgdir[PATHLEN];
-boolean getreturn_enabled;
+boolean getreturn_enabled = TRUE;
 int windows_startup_state = 0;    /* we flag whether to continue with this */
                                   /* 0 = keep starting up, everything is good */
 
