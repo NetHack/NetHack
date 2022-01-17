@@ -302,6 +302,13 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
             pb->setMaximumSize(pb->minimumSize());
             // i+butoffset is value that will be passed to the click handler
             group->addButton(pb, i + butoffset);
+            // gray out "repeat" because picking it would just repeat the "#"
+            // that caused us to be called rather than whatever came before;
+            // it can still be chosen by typing "rep" but appears grayed out
+            // while in the process so having it not behave usefully shouldn't
+            // come as much of a surprise
+            if (btn_lbl == "repeat")
+                pb->setEnabled(false);
             /*
              * by column: xcmd_by_row==false, the default
              *  0..R-1 down first column, R..2*R-1 down second column, ...
