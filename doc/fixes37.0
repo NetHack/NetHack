@@ -1386,6 +1386,7 @@ Qt: [later] augment extended command selection dialog's Filter to add a
 	fourth subset, those commands which autocomplete when typed for tty,
 	typically commands with no keystroke or only meta character keystroke;
 	that makes Filter useful in normal mode (much shorter list of choices)
+Qt: add '#' as "Extended-commands" to the 'game' dropdown menu
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c

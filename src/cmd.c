@@ -101,7 +101,6 @@ static int dotherecmdmenu(void);
 static int doprev_message(void);
 static int timed_occupation(void);
 static boolean can_do_extcmd(const struct ext_func_tab *);
-static int doextcmd(void);
 static int dotravel(void);
 static int dotravel_target(void);
 static int doclicklook(void);
@@ -372,7 +371,7 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
 }
 
 /* here after # - now read a full-word command */
-static int
+int
 doextcmd(void)
 {
     int idx, retval;
@@ -2091,7 +2090,8 @@ struct ext_func_tab extcmdlist[] = {
     { '#',    "#", "perform an extended command",
               doextcmd, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('?'), "?", "list all extended commands",
-              doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
+              doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX,
+              NULL },
     { M('a'), "adjust", "adjust inventory letters",
               doorganize, IFBURIED | AUTOCOMPLETE, NULL },
     { M('A'), "annotate", "name current level",

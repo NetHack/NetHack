@@ -247,6 +247,7 @@ extern void cmdq_clear(void);
 extern char pgetchar(void);
 extern void pushch(char);
 extern void savech(char);
+extern int doextcmd(void);
 extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);
 extern void parseautocomplete(char *, boolean);

@@ -580,11 +580,13 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
 
     enum { OnDesktop=1, OnHandhelds=2 };
     struct Macro {
-	QMenu* menu;
-	const char* name;
-	int flags;
+        QMenu *menu;
+        const char *name;
+        int flags;         // 1 desktop, 2 handheld, 3 either/both
         int (*funct)(void);
     } item[] = {
+        { game,    0, 3},
+        { game,    "Extended-commands",  3, doextcmd },
         { game,    0, 3},
         { game,    "Version",            3, doversion},
         { game,    "Compilation",        3, doextversion},
