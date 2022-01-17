@@ -1294,8 +1294,6 @@ include an indication of monsters' health during farlook feedback (including
 	/M and autodescribe); also include it in death reason when killed by
 	a monster: "killed by {an uninjured newt,a heavily injured mumak}"
 [later: suppress the indication of monsters' health]
-make DOAGAIN (^A) become unconditional; commenting it out in config.h makes
-	it be bound to NUL, a no-op, but allows BIND=k:repeat to set it to k
 add support for a single monster species to have distinct male, female,
 	and gender-neutral naming terms
 add support for a single monster species to have distinct male and female

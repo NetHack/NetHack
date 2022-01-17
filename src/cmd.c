@@ -2067,6 +2067,21 @@ do_fight(void)
     return ECMD_OK;
 }
 
+/* #repeat */
+int
+do_repeat(void)
+{
+    if (!g.in_doagain && g.saveq[0]) {
+        g.in_doagain = TRUE;
+        g.stail = 0;
+        rhack((char *) 0); /* read and execute command */
+        g.in_doagain = FALSE;
+        iflags.menu_requested = FALSE;
+        return ECMD_TIME;
+    }
+    return ECMD_OK;
+}
+
 /* extcmdlist: full command list, ordered by command name;
    commands with no keystroke or with only a meta keystroke generally
    need to be flagged as autocomplete and ones with a regular keystroke
@@ -2199,6 +2214,8 @@ struct ext_func_tab extcmdlist[] = {
               doredraw, IFBURIED | GENERALCMD, NULL },
     { 'R',    "remove", "remove an accessory (ring, amulet, etc)",
               doremring, 0, NULL },
+    { C('a'), "repeat", "repeat a previous command",
+              do_repeat, IFBURIED | GENERALCMD, NULL },
     { 'm',    "reqmenu", "prefix: request menu or modify command",
               do_reqmenu, PREFIXCMD, NULL },
     { C('_'), "retravel", "travel to previously selected travel location",
@@ -2427,7 +2444,6 @@ static const struct {
     { NHKF_ESC, "cancel current prompt or pending prefix", FALSE },
     { NHKF_COUNT,
       "Prefix: for digits when preceding a command with a count", TRUE },
-    { NHKF_DOAGAIN , "repeat: perform the previous command again", FALSE },
     { 0, (const char *) 0, FALSE }
 };
 
@@ -3295,17 +3311,12 @@ wiz_migrate_mons(void)
 }
 #endif
 
-#ifndef DOAGAIN /* might have gotten undefined in config.h */
-#define DOAGAIN '\0' /* undefined => 0, '\0' => no key to activate redo */
-#endif
-
 static struct {
     int nhkf;
     uchar key;
     const char *name;
 } const spkeys_binds[] = {
     { NHKF_ESC,              '\033', (char *) 0 }, /* no binding */
-    { NHKF_DOAGAIN,          DOAGAIN, "repeat" },
     { NHKF_GETDIR_SELF,      '.', "getdir.self" },
     { NHKF_GETDIR_SELF2,     's', "getdir.self2" },
     { NHKF_GETDIR_HELP,      '?', "getdir.help" },
@@ -3692,16 +3703,7 @@ got_prefix_input:
         iflags.menu_requested = FALSE;
         return;
     }
-    /* DOAGAIN might be '\0'; if so, don't execute it even if *cmd is too */
-    if ((*cmd && *cmd == g.Cmd.spkeys[NHKF_DOAGAIN])
-        && !g.in_doagain && g.saveq[0]) {
-        g.in_doagain = TRUE;
-        g.stail = 0;
-        rhack((char *) 0); /* read and execute command */
-        g.in_doagain = FALSE;
-        iflags.menu_requested = FALSE;
-        return;
-    }
+
     /* Special case of *cmd == ' ' handled better below */
     if (!*cmd || *cmd == (char) 0377) {
         nhbell();
@@ -4631,7 +4633,7 @@ parse(void)
         g.last_command_count = 0;
     } else if (g.in_doagain) {
         g.command_count = g.last_command_count;
-    } else if (foo && foo == g.Cmd.spkeys[NHKF_DOAGAIN]) {
+    } else if (foo && foo == cmd_from_func(do_repeat)) {
         // g.command_count will be set again when we
         // re-enter with g.in_doagain set true
         g.command_count = g.last_command_count;

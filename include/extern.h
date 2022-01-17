@@ -227,6 +227,7 @@ extern int do_reqmenu(void);
 extern int do_rush(void);
 extern int do_run(void);
 extern int do_fight(void);
+extern int do_repeat(void);
 extern char randomkey(void);
 extern void random_response(char *, int);
 extern int rnd_extcmd_idx(void);

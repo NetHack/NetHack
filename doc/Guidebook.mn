@@ -697,7 +697,7 @@ Remove one or more worn items, such as armor.
 Use \(oqT\(cq (take off) to take off only one piece of armor
 or \(oqR\(cq (remove) to take off only one accessory.
 .lp \(haA
-Redo the previous command.
+Repeat the previous command.
 .lp c
 Close a door.
 .lp C
@@ -1444,6 +1444,9 @@ is on.
 .lp "#remove  "
 Remove an accessory (ring, amulet, etc).
 Default key is \(oqR\(cq.
+.lp "#repeat  "
+Repeat the previous command.
+Default key is \(oq\(haA\(cq.
 .lp "#reqmenu "
 Prefix key to modify the behaviour or request menu from some commands.
 Prevents autopickup when used with movement commands.
@@ -4892,9 +4895,6 @@ Default is \(oqz\(cq.
 .lp getpos.valid.prev
 When asked for a location, the key to go to previous closest valid location.
 Default is \(oqZ\(cq.
-.lp repeat
-Key to repeat previous command.
-Default is \(oq\(haA\(cq.
 .hn 2
 Configuring Message Types
 .pg

@@ -443,7 +443,6 @@ struct early_opt {
 /* special key functions */
 enum nh_keyfunc {
     NHKF_ESC = 0,
-    NHKF_DOAGAIN,
 
     NHKF_GETDIR_SELF,
     NHKF_GETDIR_SELF2,

@@ -483,13 +483,6 @@ typedef unsigned char uchar;
 #endif
 #endif
 
-/* The "repeat" key used in cmd.c as NHKF_DOAGAIN; if commented out or the
- * value is changed from C('A') to 0, it won't be bound to any keystroke
- * unless you use the run-time configuration file's BIND directive for it.
- * [Note: C() macro isn't defined yet but it will be before DOAGAIN is used.]
- */
-#define DOAGAIN C('A') /* repeat previous command; default is ^A, '\001' */
-
 /* CONFIG_ERROR_SECURE: If user makes NETHACKOPTIONS point to a file ...
  *  TRUE: Show the first error, nothing else.
  *  FALSE: Show all errors as normal, with line numbers and context.
