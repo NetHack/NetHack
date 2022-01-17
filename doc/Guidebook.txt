@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  January 16, 2022
+                                  January 17, 2022
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -456,7 +456,7 @@
           scribe things that are impossible to represent visually.  If  you
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -762,7 +762,7 @@
                Use `T' (take off) to take off only one piece  of  armor  or
                `R' (remove) to take off only one accessory.
 
-          ^A   Redo the previous command.
+          ^A   Repeat the previous command.
 
           c    Close a door.
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -852,7 +852,7 @@
                it out); this is often useful to give yourself a breather.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -918,7 +918,7 @@
                that command.)
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -984,7 +984,7 @@
                to hold the saved data is deleted.  In  explore  mode,  once
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1050,7 +1050,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1116,7 +1116,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1182,7 +1182,7 @@
                `>',  `|'  by  default).   Some  interfaces   also   support
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1248,7 +1248,7 @@
                that  situation,  moving (no count given) a compatible stack
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1314,7 +1314,7 @@
                Go down a staircase.  Default key is `>'.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1380,7 +1380,7 @@
                On,  clicking  on  the  hero  (or  steed  when mounted) will
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1512,7 +1512,7 @@
                sume normal play.  Default key is `|'.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1578,7 +1578,7 @@
                `R'.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1587,6 +1587,9 @@
           NetHack Guidebook                                              25
 
 
+
+          #repeat
+               Repeat the previous command.  Default key is `^A'.
 
           #reqmenu
                Prefix key to modify the behaviour or request menu from some
@@ -1640,11 +1643,8 @@
           #seeweapon
                Show the weapon currently wielded.  Default key is `)'.
 
-          #shell
-               Do a shell escape, switching from NetHack to  a  subprocess.
 
-
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1654,6 +1654,8 @@
 
 
 
+          #shell
+               Do a shell escape, switching from NetHack to  a  subprocess.
                Can  be disabled at the time the program is built.  When en-
                abled, access for specific users can be  controlled  by  the
                system  configuration file.  Use the shell command `exit' to
@@ -1706,11 +1708,9 @@
                Show  map without obstructions.  In normal play you can view
                the explored portion of the current level's map without mon-
                sters;  without  monsters  and objects; or without monsters,
-               objects, and traps.
 
 
-
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1719,6 +1719,8 @@
           NetHack Guidebook                                              27
 
 
+
+               objects, and traps.
 
                In explore mode, you can choose to view the full map  rather
                than just its explored portion.  In debug mode there are ad-
@@ -1774,9 +1776,7 @@
                Go up a staircase.  Default key is `<'.
 
 
-
-
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2172,7 +2172,7 @@
           Sokoban.  (Hint: to solve Sokoban puzzles, you often need to move
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2238,7 +2238,7 @@
           ing  the  "#chat"  command  while  standing on it.  Using an item
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2304,7 +2304,7 @@
           object  or pile of objects, or on a trap, or attempt to move onto
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2370,7 +2370,7 @@
           creature.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2436,7 +2436,7 @@
           tent, which can be error prone if you're using `y' to move.   You
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2568,7 +2568,7 @@
           you  are  carrying  around  with  you  through  the  dungeon will
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2634,7 +2634,7 @@
           within  the  game.   A  "glass half full versus glass half empty"
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2700,7 +2700,7 @@
           of  armor--is  a factor too; also, some monsters are particularly
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2766,7 +2766,7 @@
           command  to  throw  it.   You'll  be  prompted for a direction as
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2832,7 +2832,7 @@
           hance".   (Divine  intervention  might  unrestrict  a  particular
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2898,7 +2898,7 @@
           the  weapons  or  having  one of them be stolen or destroyed will
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3030,7 +3030,7 @@
           generated  internal  to the game, these environment variables are
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3096,7 +3096,7 @@
           manent  magic,  unlike  the  usually fleeting effects of potions,
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3162,7 +3162,7 @@
           may  increase the potency of spells, reduce their risk of failure
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3228,7 +3228,7 @@
           Like   rings,  amulets  have  various  magical  properties,  some
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3360,7 +3360,7 @@
           a  physiological  need for water; thus there is no restriction on
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3426,7 +3426,7 @@
           ing  spoken  to  by an angry god, priest(ess), or other religious
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3492,7 +3492,7 @@
           type  ("polypiling")  or  the  form of your own body into another
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3558,7 +3558,7 @@
           perience levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.  The one for
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3624,7 +3624,7 @@
           ASCII  text  file can can be created with any text editor.  After
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3690,7 +3690,7 @@
             to HACKDIR, must be writable.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -3954,7 +3954,7 @@
             false).   When  true,  the  computer  will  fill your quiver or
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4020,7 +4020,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4086,7 +4086,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4152,7 +4152,7 @@
             "off".
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4218,7 +4218,7 @@
             Display an introductory message when starting the game (default
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4350,7 +4350,7 @@
             Default `}'.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4482,7 +4482,7 @@
             pray        - require `y' to confirm an attempt to pray  rather
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4614,7 +4614,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4680,7 +4680,7 @@
             of terminal.  Persistent.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4746,7 +4746,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4812,7 +4812,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5010,7 +5010,7 @@
             If NetHack can, it should use this size  font  for  the  status
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5274,7 +5274,7 @@
             keystrokes that the operating system returns to NetHack to help
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5340,7 +5340,7 @@
           beyond what is available through the pickup_types option.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5406,7 +5406,7 @@
             bind  a  key by using "nothing" as the extended command to bind
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5472,7 +5472,7 @@
             When  asked  for  a location, the key to show help.  Default is
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5538,7 +5538,7 @@
             fault is `@'.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5567,9 +5567,6 @@
           getpos.valid.prev
             When  asked  for  a location, the key to go to previous closest
             valid location.  Default is `Z'.
-
-          repeat
-            Key to repeat previous command.  Default is `^A'.
 
           9.10.  Configuring Message Types
 
@@ -5602,9 +5599,12 @@
             the  user  is prompted with more-prompt, and a message matching
             "You displaced <something>." is not shown at all.
 
+            The order of the defined MSGTYPE lines is important;  the  last
+            matching  rule  is used. Put the general case first, exceptions
+            below them.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5613,10 +5613,6 @@
           NetHack Guidebook                                              86
 
 
-
-            The order of the defined MSGTYPE lines is important;  the  last
-            matching  rule  is used. Put the general case first, exceptions
-            below them.
 
           9.11.  Configuring Menu Colors
 
@@ -5668,9 +5664,13 @@
                Note that if you intend to have one or more color specifica-
           tions match " uncursed ", you will probably want to turn the  im-
           plicit_uncursed option off so that all items known to be uncursed
+          are actually displayed with the "uncursed" description.
 
 
-          NetHack 3.7                                      January 16, 2022
+
+
+
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5679,8 +5679,6 @@
           NetHack Guidebook                                              87
 
 
-
-          are actually displayed with the "uncursed" description.
 
           9.12.  Configuring User Sounds
 
@@ -5735,8 +5733,10 @@
           tion file will cause wisdom to be displayed red if it  drops  and
           green if it rises:
 
+          OPTION=hilite_status:wisdom/down/red/up/green
 
-          NetHack 3.7                                      January 16, 2022
+
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5745,8 +5745,6 @@
           NetHack Guidebook                                              88
 
 
-
-          OPTION=hilite_status:wisdom/down/red/up/green
 
                Allowed  colors are black, red, green, brown, blue, magenta,
           cyan, gray, orange, light-green, yellow, light-blue, light-magen-
@@ -5800,9 +5798,11 @@
             Allowed behaviors are "always", "up", "down", "changed", a per-
             centage or absolute number threshold, or text to match against.
 
+               * "always" will set the default attributes for that field.
 
 
-          NetHack 3.7                                      January 16, 2022
+
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5811,8 +5811,6 @@
           NetHack Guidebook                                              89
 
 
-
-               * "always" will set the default attributes for that field.
 
                * "up",  "down"  set the field attributes for when the field
                  value changes upwards or downwards.  This attribute  times
@@ -5868,7 +5866,9 @@
           tushilites to 0.
 
 
-          NetHack 3.7                                      January 16, 2022
+
+
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6198,7 +6198,7 @@
           defaults.nh  file  to accomplish this, novices may find this task
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6330,7 +6330,7 @@
             option.  When disabled, incubi and succubi behave like nymphs.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6396,7 +6396,7 @@
           on  this  list.   If  you  score higher than someone else on this
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6462,7 +6462,7 @@
           mode instead.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6528,7 +6528,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6726,7 +6726,7 @@
           dows CE port for 3.4.1.
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6792,7 +6792,7 @@
           beloved community patches. Many bugs were fixed and some code was
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6858,7 +6858,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
@@ -6990,7 +6990,7 @@
 
 
 
-          NetHack 3.7                                      January 16, 2022
+          NetHack 3.7                                      January 17, 2022
 
 
 
