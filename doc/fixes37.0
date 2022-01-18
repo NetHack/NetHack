@@ -748,6 +748,8 @@ when two or more shops share a wall and hero uses Passes_walls to carry an
 redo the unpaid_cost fix to handle shop items inside hero-owned container
 flyers shouldn't fall on arrival when going down holes or trap doors
 change movement keys and some special keys into extended commands
+"WHAMMM!!!" feedback when kicking a door suggests noise so if hero is deaf an
+	alternate message should be given
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

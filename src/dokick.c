@@ -1296,7 +1296,10 @@ dokick(void)
         if (Blind)
             feel_location(x, y); /* we know we hit it */
         exercise(A_STR, TRUE);
-        pline("WHAMMM!!!");
+        /* note: this used to be unconditional "WHAMMM!!!" but that has a
+           fairly strong connotation of noise that a deaf hero shouldn't
+           hear; we've kept the extra 'm's and one of the extra '!'s */
+        pline("%s!!", (Deaf || !rn2(3)) ? "Thwack" : "Whammm");
         if (in_town(x, y))
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
