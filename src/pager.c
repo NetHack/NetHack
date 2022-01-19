@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1622421100 2021/05/31 00:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1642630920 2022/01/19 22:22:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -26,6 +26,7 @@ static void docontact(void);
 static void dispfile_help(void);
 static void dispfile_shelp(void);
 static void dispfile_optionfile(void);
+static void dispfile_optmenu(void);
 static void dispfile_license(void);
 static void dispfile_debughelp(void);
 static void hmenu_doextversion(void);
@@ -37,6 +38,7 @@ static void domenucontrols(void);
 #ifdef PORT_HELP
 extern void port_help(void);
 #endif
+static char *setopt_cmd(char *);
 
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
@@ -2141,6 +2143,12 @@ dispfile_optionfile(void)
 }
 
 static void
+dispfile_optmenu(void)
+{
+    display_file(OPTMENUHELP, TRUE);
+}
+
+static void
 dispfile_license(void)
 {
     display_file(LICENSE, TRUE);
@@ -2204,6 +2212,7 @@ static const struct {
     { hmenu_dowhatdoes, "Info on what a given key does." },
     { option_help, "List of game options." },
     { dispfile_optionfile, "Longer explanation of game options." },
+    { dispfile_optmenu, "Using the %s command to set options." },
     { dokeylist, "Full list of keyboard commands." },
     { hmenu_doextlist, "List of extended commands." },
     { domenucontrols, "List menu control keys." },
@@ -2223,7 +2232,7 @@ int
 dohelp(void)
 {
     winid tmpwin = create_nhwindow(NHW_MENU);
-    char helpbuf[QBUFSZ];
+    char helpbuf[QBUFSZ], tmpbuf[QBUFSZ];
     int i, n;
     menu_item *selected;
     anything any;
@@ -2237,6 +2246,8 @@ dohelp(void)
             continue;
         if (help_menu_items[i].text[0] == '%') {
             Sprintf(helpbuf, help_menu_items[i].text, PORT_ID);
+        } else if (help_menu_items[i].f == dispfile_optmenu) {
+            Sprintf(helpbuf, help_menu_items[i].text, setopt_cmd(tmpbuf));
         } else {
             Strcpy(helpbuf, help_menu_items[i].text);
         }
@@ -2256,6 +2267,28 @@ dohelp(void)
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
+
+/* format the key or extended command name of command used to set options;
+   normally 'O' but could be bound to something else, or not bound at all */
+static char *
+setopt_cmd(char *outbuf)
+{
+    char cmdnambuf[QBUFSZ];
+    const char *cmdname;
+    char key = cmd_from_func(doset);
+
+    if (key) {
+        /* key value enclosed within single quotes */
+        Sprintf(outbuf, "'%s'", visctrl(key));
+    } else {
+        /* extended command name, with leading "#", also in single quotes */
+        cmdname = cmdname_from_func(doset, cmdnambuf, TRUE);
+        if (!cmdname) /* paranoia */
+            cmdname = "options";
+        Sprintf(outbuf, "'%s%.31s'", (*cmdname != '#') ? "#" : "", cmdname);
+    }
+    return outbuf;
+}
 
 /* the 'V' command; also a choice for '?' */
 int

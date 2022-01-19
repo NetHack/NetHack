@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1629928192 2021/08/25 21:49:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.483 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1642630919 2022/01/19 22:21:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.500 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2856,8 +2856,10 @@ ecname_from_fn(int (*fn)(void))
 
 /* return extended command name (without leading '#') for command (*fn)() */
 const char *
-cmdname_from_func(int (*fn)(void), char outbuf[],
-                  boolean fullname) /* False: just enough to disambiguate */
+cmdname_from_func(
+    int (*fn)(void),  /* function whose command name is wanted */
+    char outbuf[],    /* place to store the result */
+    boolean fullname) /* False: just enough to disambiguate */
 {
     const struct ext_func_tab *extcmd, *cmdptr = 0;
     const char *res = 0;
