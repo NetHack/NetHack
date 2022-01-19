@@ -990,10 +990,10 @@ wet_a_towel(struct obj *obj,
 
 /* decrease a towel's wetness; unlike when wetting, 0 is not a no-op */
 void
-dry_a_towel(struct obj *obj,
-            int amt, /* positive or zero: new value;
-                        negative: decrement by abs(amt) */
-            boolean verbose)
+dry_a_towel(
+    struct obj *obj,
+    int amt, /* positive or zero: new value; negative: decrement by abs(amt) */
+    boolean verbose)
 {
     int newspe = (amt < 0) ? obj->spe + amt : amt;
 
@@ -1004,7 +1004,7 @@ dry_a_towel(struct obj *obj,
                 pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
                       !newspe ? " out" : "");
             else if (mcarried(obj) && canseemon(obj->ocarry))
-                pline("%s %s drie%s.", s_suffix(Monnam(obj->ocarry)),
+                pline("%s %s dries%s.", s_suffix(Monnam(obj->ocarry)),
                       xname(obj), !newspe ? " out" : "");
         }
     }
