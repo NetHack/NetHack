@@ -262,6 +262,7 @@ static int count_menucolors(void);
 static boolean parse_role_opts(int, boolean, const char *,
                                char *, char **);
 static unsigned int longest_option_name(int, int);
+static void explain_O_command(void);
 static void doset_add_menu(winid, const char *, int, int);
 static int handle_add_list_remove(const char *, int);
 static void remove_autopickup_exception(struct autopickup_exception *);
@@ -7293,15 +7294,17 @@ longest_option_name(int startpass, int endpass)
    briefly describing how it works; [brevity is in the eye of the beholder
    or perhaps a pig; it was brief when this comment was first written...] */
 static const char *const optmenu[] = {
-    "This menu shows the current value for all options and lets you",
-    "pick ones that you'd like to change.  Picking them doesn't make",
+    "How dynamically setting options works:",
+    "",
+    "The options menu shows the current value for all options and lets",
+    "you pick ones that you'd like to change.  Picking them doesn't make",
     "any immediate changes though.  That will take place once you close",
     "the menu.  For most of NetHack's interfaces, closing the menu is",
     "done by pressing the <enter> key or <return> key; others might",
     "require clicking on [ok].  Pressing the <escape> key or clicking",
     "on [cancel] will close the menu and discard any pending changes.",
     "",
-    "This menu is too long to fit on one screen.  Some interfaces",
+    "The options menu is too long to fit on one screen.  Some interfaces",
     "paginate menus; use the '>' key to advance a page or '<' to back",
     "up.  They typically re-use selection letters (a-z) on each page.",
     "Others use one long page and you need to use a scrollbar; once",
@@ -7327,10 +7330,27 @@ static const char *const optmenu[] = {
     "specify the desired options settings there.  Even then, restoring",
     "existing games that contain saved option values will use those.",
     "",
-    "[Suppress this menu introduction by turning off 'cmdassist'.]",
-    "",
     NULL
 };
+
+/* display the optmenu[] explanatory text in a popup text window */
+static void
+explain_O_command(void)
+{
+    anything any;
+    winid Ohlp;
+    char buf[BUFSZ];
+    int i;
+
+    Ohlp = create_nhwindow(NHW_TEXT);
+    any = cg.zeroany;
+    for (i = 0; optmenu[i]; ++i) {
+        Sprintf(buf, "  %.75s ", optmenu[i]);
+        putstr(Ohlp, ATR_NONE, buf);
+    }
+    display_nhwindow(Ohlp, TRUE);
+    destroy_nhwindow(Ohlp);
+}
 
 /* the #options command */
 int
@@ -7345,16 +7365,38 @@ doset(void) /* changing options via menu by Per Liboriussen */
     anything any;
     menu_item *pick_list;
     int indexoffset, startpass, endpass;
-    boolean setinitial = FALSE, fromfile = FALSE;
+    boolean setinitial = FALSE, fromfile = FALSE,
+            skiphelp = !iflags.cmdassist;
 
+    /* if we offer '?' as a choice and it is the only thing chosen,
+       we'll end up coming back here after showing the explanatory text */
+ rerun:
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
-    if (iflags.cmdassist) {
-        /* insert the optmenu[] explanatory text at the top of the menu */
+    /* offer novices a chance to request helpful [sic] advice */
+    if (!skiphelp) {
+        static const char *const helpintro[] = {
+            "For a brief explanation of how this works, type '?' to select",
+            "the next menu choice, then press <enter> or <return>.",
+            NULL,
+        }, *const helpepilog[] = {
+            "[To suppress this menu help, toggle off the 'cmdaddist' option.]",
+            "",
+            NULL,
+        };
         any = cg.zeroany;
-        for (i = 0; optmenu[i]; ++i) {
-            Sprintf(buf, "%4s%.75s", "", optmenu[i]);
+        for (i = 0; helpintro[i]; ++i) {
+            Sprintf(buf, "%4s%.75s", "", helpintro[i]);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
+                     buf, MENU_ITEMFLAGS_NONE);
+        }
+        any.a_int = '?' + 1; /* processing pick_list will subtract the 1 */
+        add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
+                 "view help for options menu", MENU_ITEMFLAGS_NONE);
+        any.a_int = 0;
+        for (i = 0; helpepilog[i]; ++i) {
+            Sprintf(buf, "%4s%.75s", "", helpepilog[i]);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
                      buf, MENU_ITEMFLAGS_NONE);
         }
@@ -7474,6 +7516,20 @@ doset(void) /* changing options via menu by Per Liboriussen */
     g.opt_need_redraw = FALSE;
     g.opt_need_glyph_reset = FALSE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
+        if (pick_list[0].item.a_int - 1 == '?') {
+            /* player chose the special '?' entry */
+            explain_O_command();
+            /* if '?' was the only thing selected, go back and pick all
+               over again without it as an available choice this time;
+               however, if any other stuff was also chosen, just continue
+               on below and perform the other requested option settings */
+            if (pick_cnt == 1) {
+                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
+                destroy_nhwindow(tmpwin);
+                skiphelp = TRUE;
+                goto rerun;
+            }
+        }
         /*
          * Walk down the selection list and either invert the booleans
          * or prompt for new values. In most cases, call parseoptions()
