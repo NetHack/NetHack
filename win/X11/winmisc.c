@@ -921,13 +921,15 @@ X11_player_selection_dialog(void)
         Widget racewidget;
 
         num_args = 0;
-        if (i > 0)
+        if (i > 0) {
             XtSetArg(args[num_args], nhStr(XtNfromVert),
                      tmpwidget); num_args++;
+        }
         XtSetArg(args[num_args], XtNwidth, cwid); num_args++;
-        if (i > 0)
+        if (i > 0) {
             XtSetArg(args[num_args], nhStr(XtNradioGroup),
                      plsel_race_radios[0]); num_args++;
+        }
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
 
         racewidget = XtCreateManagedWidget(races[i].noun,
@@ -983,13 +985,15 @@ X11_player_selection_dialog(void)
         Widget rolewidget;
 
         num_args = 0;
-        if (i > 0)
+        if (i > 0) {
             XtSetArg(args[num_args], nhStr(XtNfromVert),
                      tmpwidget); num_args++;
+        }
         XtSetArg(args[num_args], nhStr(XtNwidth), cwid); num_args++;
-        if (i > 0)
+        if (i > 0) {
             XtSetArg(args[num_args], nhStr(XtNradioGroup),
                      plsel_role_radios[0]); num_args++;
+        }
         XtSetArg(args[num_args], nhStr(XtNradioData), (i + 1)); num_args++;
 
         rolewidget = XtCreateManagedWidget(roles[i].name.m, toggleWidgetClass,
