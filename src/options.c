@@ -7318,7 +7318,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
             "the next menu choice, then press <enter> or <return>.",
             NULL,
         }, *const helpepilog[] = {
-            "[To suppress this menu help, toggle off the 'cmdaddist' option.]",
+            "[To suppress this menu help, toggle off the 'cmdassist' option.]",
             "",
             NULL,
         };
