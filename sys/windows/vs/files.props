@@ -183,6 +183,7 @@
     <DlbList Include = "$(DatDir)keyhelp"/>
     <DlbList Include = "$(DatDir)history"/>
     <DlbList Include = "$(DatDir)opthelp"/>
+    <DlbList Include = "$(DatDir)optmenu"/>
     <DlbList Include = "$(DatDir)wizhelp"/>
     <DlbList Include = "$(DatDir)license"/>
     <DlbList Include = "$(DatDir)*.lua"/>

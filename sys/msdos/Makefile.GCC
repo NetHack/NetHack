@@ -1,5 +1,5 @@
 # NetHack 3.7	Makefile.GCC	$NHDT-Date: 1596498268 2020/08/03 23:44:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $
-#	Copyright (c) NetHack PC Development Team 1996-2019.
+#	Copyright (c) NetHack PC Development Team 1996-2022.
 #	PC NetHack 3.7 Makefile for djgpp V2
 #
 #	Gnu gcc compiler for msdos (djgpp)
@@ -35,8 +35,8 @@ GAMEDIR =../binary
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-ADD_CURSES=Y
-PDCURSES_TOP=../../pdcurses
+#ADD_CURSES=Y
+#PDCURSES_TOP=../../pdcurses
 
 #---------------------------------------------------------------
 ifeq "$(LUA_VERSION)" "5.3.5"
@@ -870,7 +870,7 @@ $(DAT)/nhdat:	$(U)dlb_main.exe $(DAT)/data $(DAT)/rumors \
 	@$(subst /,\,cd $(DAT))
 	@$(subst /,\,copy $(MSYS)/msdoshlp.txt .)
 	@$(LS) data oracles options rumors help hh >dlb.lst
-	@$(LS) cmdhelp history opthelp wizhelp license msdoshlp.txt >>dlb.lst
+	@$(LS) cmdhelp history opthelp optmenu wizhelp license msdoshlp.txt >>dlb.lst
 	@$(LS) bogusmon engrave epitaph tribute >>dlb.lst
 	$(LS) $(subst /,\,*.lua) >>dlb.lst
 	@$(subst /,\,$(U)dlb_main cvIf dlb.lst nhdat)

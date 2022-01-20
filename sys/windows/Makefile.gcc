@@ -1092,7 +1092,7 @@ $(DAT)/porthelp: $(MSWSYS)/porthelp
 
 nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	$(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp $(DAT)/keyhelp \
-	$(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp \
+	$(DAT)/history $(DAT)/opthelp $(DAT)/optmenu $(DAT)/wizhelp \
 	$(DAT)/porthelp $(DAT)/license $(DAT)/engrave \
 	$(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
@@ -1108,6 +1108,7 @@ nhdat$(NHV):  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	$(subst /,\,echo keyhelp >>$(DAT)/dlb.lst)
 	$(subst /,\,echo history >>$(DAT)/dlb.lst)
 	$(subst /,\,echo opthelp >>$(DAT)/dlb.lst)
+	$(subst /,\,echo optmenu >>$(DAT)/dlb.lst)
 	$(subst /,\,echo wizhelp >>$(DAT)/dlb.lst)
 	$(subst /,\,echo license >>$(DAT)/dlb.lst)
 	$(subst /,\,echo engrave >>$(DAT)/dlb.lst)

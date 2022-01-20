@@ -1040,6 +1040,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
 	copy $(DAT)\hh $(GAMDEDIR)
 	copy $(DAT)\history $(GAMEDIR)
 	copy $(DAT)\license $(GAMEDIR)
+	copy $(DAT)\optmenu $(GAMEDIR)
 	copy $(DAT)\oracles $(GAMEDIR)
 	copy $(DAT)\rumors $(GAMEDIR)
 	copy $(DAT)\symbols $(GAMEDIR)
@@ -1320,7 +1321,7 @@ $(DAT)\porthelp: $(MSWSYS)\porthelp
 
 nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(DAT)\quest.lua \
 	$(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
-	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\porthelp \
+	$(DAT)\history $(DAT)\opthelp $(DAT)\optmenu $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
@@ -1336,6 +1337,7 @@ nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(DAT)\quest
 	echo keyhelp >>dlb.lst
 	echo history >>dlb.lst
 	echo opthelp >>dlb.lst
+	echo optmenu >>dlb.lst
 	echo wizhelp >>dlb.lst
 	echo license >>dlb.lst
 	echo engrave >>dlb.lst
