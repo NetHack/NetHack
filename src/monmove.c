@@ -232,6 +232,7 @@ disturb(register struct monst* mtmp)
             || (mtmp->data->mlet == S_DOG || mtmp->data->mlet == S_HUMAN)
             || (!rn2(7) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT))) {
+        wake_msg(mtmp, !mtmp->mpeaceful);
         mtmp->msleeping = 0;
         return 1;
     }

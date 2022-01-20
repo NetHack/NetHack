@@ -3635,10 +3635,21 @@ setmangry(struct monst* mtmp, boolean via_attack)
     }
 }
 
+/* Indicate via message that a monster has awoken. */
+void
+wake_msg(struct monst *mtmp, boolean interesting)
+{
+    if (mtmp->msleeping && canseemon(mtmp)) {
+        pline("%s wakes up%s%s", Monnam(mtmp), interesting ? "!" : ".",
+              mtmp->data == &mons[PM_FLESH_GOLEM] ? " It's alive!" : "");
+    }
+}
+
 /* wake up a monster, possibly making it angry in the process */
 void
 wakeup(struct monst* mtmp, boolean via_attack)
 {
+    wake_msg(mtmp, via_attack);
     mtmp->msleeping = 0;
     if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
         /* mimics come out of hiding, but disguised Wizard doesn't
@@ -3674,6 +3685,7 @@ wake_nearto(int x, int y, int distance)
         if (distance == 0 || dist2(mtmp->mx, mtmp->my, x, y) < distance) {
             /* sleep for N turns uses mtmp->mfrozen, but so does paralysis
                so we leave mfrozen monsters alone */
+            wake_msg(mtmp, FALSE);
             mtmp->msleeping = 0; /* wake indeterminate sleep */
             if (!(mtmp->data->geno & G_UNIQ))
                 mtmp->mstrategy &= ~STRAT_WAITMASK; /* wake 'meditation' */

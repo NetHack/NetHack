@@ -1503,6 +1503,7 @@ extern void maybe_mnexto(struct monst *);
 extern int mnearto(struct monst *, xchar, xchar, boolean, unsigned);
 extern void m_respond(struct monst *);
 extern void setmangry(struct monst *, boolean);
+extern void wake_msg(struct monst *, boolean);
 extern void wakeup(struct monst *, boolean);
 extern void wake_nearby(void);
 extern void wake_nearto(int, int, int);
