@@ -1828,13 +1828,14 @@ set_apparxy(register struct monst* mtmp)
      */
 
     /* pet knows your smell; grabber still has hold of you */
-    if (mtmp->mtame || mtmp == u.ustuck)
-        goto found_you;
-
-    /* monsters which know where you are don't suddenly forget,
+    if (mtmp->mtame || mtmp == u.ustuck ||
+        /* monsters which know where you are don't suddenly forget,
        if you haven't moved away */
-    if (u_at(mx, my))
-        goto found_you;
+        u_at(mx,my)) {
+            mtmp->mux = u.ux;
+            mtmp->muy = u.uy;
+            return;
+    }
 
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));
     notthere = (Displaced && mtmp->data != &mons[PM_DISPLACER_BEAST]);
@@ -1850,8 +1851,11 @@ set_apparxy(register struct monst* mtmp)
     } else {
         disp = 0;
     }
-    if (!disp)
-        goto found_you;
+    if (!disp) {
+        mtmp->mux = u.ux;
+        mtmp->muy = u.uy;
+        return;
+    }
 
     /* without something like the following, invisibility and displacement
        are too powerful */
@@ -1861,8 +1865,11 @@ set_apparxy(register struct monst* mtmp)
         register int try_cnt = 0;
 
         do {
-            if (++try_cnt > 200)
-                goto found_you; /* punt */
+            if (++try_cnt > 200) {
+                mx = u.ux;
+                my = u.uy;
+                break; /* punt */
+            }
             mx = u.ux - disp + rn2(2 * disp + 1);
             my = u.uy - disp + rn2(2 * disp + 1);
         } while (!isok(mx, my)
@@ -1873,7 +1880,6 @@ set_apparxy(register struct monst* mtmp)
                               && (can_ooze(mtmp) || can_fog(mtmp)))))
                  || !couldsee(mx, my));
     } else {
- found_you:
         mx = u.ux;
         my = u.uy;
     }
