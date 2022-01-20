@@ -1702,7 +1702,8 @@ m_move(register struct monst* mtmp, register int after)
             }
             /* Maybe a purple worm ate a corpse */
             if (ptr == &mons[PM_PURPLE_WORM]
-                || ptr == &mons[PM_BABY_PURPLE_WORM]) {
+                || ptr == &mons[PM_BABY_PURPLE_WORM]
+                || ptr == &mons[PM_PIRANHA]) {
                 if ((etmp = meatcorpse(mtmp)) >= 2)
                     return etmp; /* it died or got forced off the level */
             }
