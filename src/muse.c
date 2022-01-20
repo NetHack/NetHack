@@ -1291,8 +1291,7 @@ find_offensive(struct monst* mtmp)
             && !Teleport_control
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
-                || (stairway_at(u.ux, u.uy)
-                || IS_ALTAR(levl[u.ux][u.uy].typ])))) {
+                || (stairway_at(u.ux, u.uy)))) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_TELEPORTATION;
         }
