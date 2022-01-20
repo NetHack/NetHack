@@ -1136,7 +1136,7 @@ rnd_defensive_item(struct monst* mtmp)
 #define MUSE_FROST_HORN 12
 #define MUSE_FIRE_HORN 13
 #define MUSE_POT_ACID 14
-/*#define MUSE_WAN_TELEPORTATION 15*/
+#define MUSE_WAN_TELEPORTATION 15
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
 /*#define MUSE_WAN_UNDEAD_TURNING 20*/ /* also a defensive item so don't
@@ -1282,7 +1282,7 @@ find_offensive(struct monst* mtmp)
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_STRIKING;
         }
-#if 0   /* use_offensive() has had some code to support wand of teleportation
+        /* use_offensive() has had some code to support wand of teleportation
          * for a long time, but find_offensive() never selected one;
          * so for the time being, this is still disabled */
         nomore(MUSE_WAN_TELEPORTATION);
@@ -1291,11 +1291,11 @@ find_offensive(struct monst* mtmp)
             && !Teleport_control
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
-                || (stairway_at(u.ux, u.uy))) {
+                || (stairway_at(u.ux, u.uy)
+                || IS_ALTAR(levl[u.ux][u.uy].typ])))) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_TELEPORTATION;
         }
-#endif
         nomore(MUSE_POT_PARALYSIS);
         if (obj->otyp == POT_PARALYSIS && g.multi >= 0) {
             g.m.offensive = obj;
@@ -1399,7 +1399,6 @@ mbhitm(register struct monst* mtmp, register struct obj* otmp)
                 makeknown(WAN_STRIKING);
         }
         break;
-#if 0   /* disabled because find_offensive() never picks WAN_TELEPORTATION */
     case WAN_TELEPORTATION:
         if (hits_you) {
             tele();
@@ -1414,7 +1413,6 @@ mbhitm(register struct monst* mtmp, register struct obj* otmp)
                 (void) rloc(mtmp, RLOC_MSG);
         }
         break;
-#endif
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
         (void) cancel_monst(mtmp, otmp, FALSE, TRUE, FALSE);
