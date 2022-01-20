@@ -7303,7 +7303,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     menu_item *pick_list;
     int indexoffset, startpass, endpass;
     boolean setinitial = FALSE, fromfile = FALSE,
-            skiphelp = !iflags.cmdassist;
+            gavehelp = FALSE, skiphelp = !iflags.cmdassist;
 
     /* if we offer '?' as a choice and it is the only thing chosen,
        we'll end up coming back here after showing the explanatory text */
@@ -7463,16 +7463,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
             opt_indx = pick_list[pick_idx].item.a_int - 1;
             if (opt_indx == '?') {
                 display_file(OPTMENUHELP, FALSE);
-                /* if '?' was only the thing selected, go back and pick all
-                   over again without it as an available choice this time */
-                if (pick_cnt == 1) {
-                    free((genericptr_t) pick_list), pick_list = 0;
-                    destroy_nhwindow(tmpwin);
-                    skiphelp = TRUE;
-                    goto rerun;
-                }
-                /* otherwise process other picks normally */
-                continue; /* just handled '?' */
+                gavehelp = TRUE;
+                continue; /* just handled '?'; there might be more picks */
             }
             if (opt_indx < -1)
                 opt_indx++; /* -1 offset for select_menu() */
@@ -7513,6 +7505,15 @@ doset(void) /* changing options via menu by Per Liboriussen */
     }
 
     destroy_nhwindow(tmpwin);
+
+    if (pick_cnt == 1 && gavehelp) {
+        /* when '?' is only the thing selected, go back and pick all
+           over again without it as an available choice second time */
+        skiphelp = TRUE;
+        gavehelp = FALSE; /* currently True; reset for second pass */
+        goto rerun;
+    }
+
     if (g.opt_need_glyph_reset) {
         reset_glyphmap(gm_optionchange);
     }
