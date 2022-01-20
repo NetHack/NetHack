@@ -7453,20 +7453,6 @@ doset(void) /* changing options via menu by Per Liboriussen */
     g.opt_need_redraw = FALSE;
     g.opt_need_glyph_reset = FALSE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
-        if (pick_list[0].item.a_int - 1 == '?') {
-            /* player chose the special '?' entry */
-            display_file(OPTMENUHELP, FALSE);
-            /* if '?' was the only thing selected, go back and pick all
-               over again without it as an available choice this time;
-               however, if any other stuff was also chosen, just continue
-               on below and perform the other requested option settings */
-            if (pick_cnt == 1) {
-                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
-                destroy_nhwindow(tmpwin);
-                skiphelp = TRUE;
-                goto rerun;
-            }
-        }
         /*
          * Walk down the selection list and either invert the booleans
          * or prompt for new values. In most cases, call parseoptions()
@@ -7475,6 +7461,19 @@ doset(void) /* changing options via menu by Per Liboriussen */
          */
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
             opt_indx = pick_list[pick_idx].item.a_int - 1;
+            if (opt_indx == '?') {
+                display_file(OPTMENUHELP, FALSE);
+                /* if '?' was only the thing selected, go back and pick all
+                   over again without it as an available choice this time */
+                if (pick_cnt == 1) {
+                    free((genericptr_t) pick_list), pick_list = 0;
+                    destroy_nhwindow(tmpwin);
+                    skiphelp = TRUE;
+                    goto rerun;
+                }
+                /* otherwise process other picks normally */
+                continue; /* just handled '?' */
+            }
             if (opt_indx < -1)
                 opt_indx++; /* -1 offset for select_menu() */
             opt_indx -= indexoffset;
