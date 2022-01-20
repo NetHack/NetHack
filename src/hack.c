@@ -2791,8 +2791,10 @@ check_special_room(boolean newlev)
                     if (!isok(mtmp->mx,mtmp->my)
                         || roomno != (int) levl[mtmp->mx][mtmp->my].roomno)
                         continue;
-                    if (!Stealth && !rn2(3))
+                    if (!Stealth && !rn2(3)) {
+                        wake_msg(mtmp, FALSE);
                         mtmp->msleeping = 0;
+                    }
                 }
         }
     }
