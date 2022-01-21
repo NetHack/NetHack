@@ -541,12 +541,13 @@ int
 dochug(register struct monst* mtmp)
 {
     register struct permonst *mdat;
-    register int tmp = MMOVE_NOTHING;
+    register int status = MMOVE_NOTHING;
     int inrange, nearby, scared, res;
     struct obj *otmp;
     boolean panicattk = FALSE;
 
-    /*  Pre-movement adjustments
+    /*  
+     * PHASE ONE: Pre-movement adjustments 
      */
 
     mdat = mtmp->data;
@@ -591,13 +592,17 @@ dochug(register struct monst* mtmp)
     if (mtmp->mstun && !rn2(10))
         mtmp->mstun = 0;
 
-    /* some monsters teleport */
+    /* Some monsters teleport. Teleportation costs a turn. */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz
         && !noteleport_level(mtmp)) {
         if (rloc(mtmp, RLOC_MSG))
             leppie_stash(mtmp);
         return 0;
     }
+
+    /* Shriekers and Medusa have irregular abilities which must be
+       checked every turn. These abilities do not cost a turn when
+       used. */
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
         m_respond(mtmp);
     if (mdat == &mons[PM_MEDUSA] && couldsee(mtmp->mx, mtmp->my))
@@ -610,20 +615,26 @@ dochug(register struct monst* mtmp)
         && !rn2(25))
         mtmp->mflee = 0;
 
-    /* cease conflict-induced swallow/grab if conflict has ended */
+    /* Cease conflict-induced swallow/grab if conflict has ended. Releasing
+       the hero in this way uses up the monster's turn. */
     if (mtmp == u.ustuck && mtmp->mpeaceful && !mtmp->mconf && !Conflict) {
         release_hero(mtmp);
-        return 0; /* uses up monster's turn */
+        return 0;
     }
 
-    set_apparxy(mtmp);
-    /* Must be done after you move and before the monster does.  The
-     * set_apparxy() call in m_move() doesn't suffice since the variables
-     * inrange, etc. all depend on stuff set by set_apparxy().
+    /*  
+     * PHASE TWO: Special Movements and Actions
      */
 
-    /* Monsters that want to acquire things */
-    /* may teleport, so do it before inrange is set */
+    /* The monster decides where it thinks you are. This call to set_apparxy()
+       must be done after you move and before the monster does. The
+       set_apparxy() call in m_move() doesn't suffice since the variables
+       inrange, etc. all depend on stuff set by set_apparxy().
+     */
+    set_apparxy(mtmp);
+
+    /* Monsters that want to acquire things may teleport, so do it before
+       inrange is set. This costs a turn only if mstate is set.  */
     if (is_covetous(mdat)) {
         (void) tactics(mtmp);
         /* tactics -> mnexto -> deal_with_overcrowding */
@@ -669,6 +680,7 @@ dochug(register struct monst* mtmp)
     /* the watch will look around and see if you are up to no good :-) */
     if (is_watch(mdat)) {
         watch_on_duty(mtmp);
+    /* mind flayers can make psychic attacks! */
     } else if (is_mind_flayer(mdat) && !rn2(20)) {
         mind_blast(mtmp);
     }
@@ -698,12 +710,16 @@ dochug(register struct monst* mtmp)
         }
     }
 
-    /*  Now the actual movement phase
+    /*  
+     * PHASE THREE: Now the actual movement phase 
      */
 
+    /* Hezrous create clouds of stench. This does not cost a move. */
     if (mtmp->data == &mons[PM_HEZROU]) /* stench */
         create_gas_cloud(mtmp->mx, mtmp->my, 1, 8);
 
+    /* A killer bee may eat honey in order to turn into a queen bee,
+       costing it a move. */
     if (mdat == &mons[PM_KILLER_BEE]
         /* could be smarter and deliberately move to royal jelly, but
            then we'd need to scan the level for queen bee in advance;
@@ -712,12 +728,15 @@ dochug(register struct monst* mtmp)
         && (res = bee_eat_jelly(mtmp, otmp)) >= 0)
         return res;
 
+    /* A monster that passes the following checks has the opportunity
+       to move. Movement itself is handled by the m_move() function. */
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
         || (mdat->mlet == S_LEPRECHAUN && !findgold(g.invent)
             && (findgold(mtmp->minvent) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
         || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
+
         /* Possibly cast an undirected spell if not attacking you */
         /* note that most of the time castmu() will pick a directed
            spell and do nothing, so the monster moves normally */
@@ -732,19 +751,19 @@ dochug(register struct monst* mtmp)
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
                     if ((castmu(mtmp, a, FALSE, FALSE) & MM_HIT)) {
-                        tmp = MMOVE_DONE; /* bypass m_move() */
+                        status = MMOVE_DONE; /* bypass m_move() */
                         break;
                     }
                 }
             }
         }
 
-        if (!tmp)
-            tmp = m_move(mtmp, 0);
-        if (tmp != MMOVE_DIED)
+        if (!status)
+            status = m_move(mtmp, 0);
+        if (status != MMOVE_DIED)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
-        switch (tmp) { /* for pets, cases 0 and 3 are equivalent */
+        switch (status) { /* for pets, cases 0 and 3 are equivalent */
         case MMOVE_NOMOVES:
             if (scared)
                 panicattk = TRUE;
@@ -787,10 +806,12 @@ dochug(register struct monst* mtmp)
         }
     }
 
-    /*  Now, attack the player if possible - one attack set per monst
+    /*  
+     * PHASE FOUR: Standard Attacks
      */
 
-    if (tmp != MMOVE_DONE && (!mtmp->mpeaceful
+    /* Now, attack the player if possible - one attack set per monst */
+    if (status != MMOVE_DONE && (!mtmp->mpeaceful
                      || (Conflict && !resist_conflict(mtmp)))) {
         if (((inrange && !scared) || panicattk) && !noattacks(mdat)
             /* [is this hp check really needed?] */
@@ -811,8 +832,8 @@ dochug(register struct monst* mtmp)
         && couldsee(mtmp->mx, mtmp->my) && !mtmp->minvis && !rn2(5))
         cuss(mtmp);
 
-    /* note: can't get here when tmp==2 so this always returns 0 */
-    return (tmp == MMOVE_DIED);
+    /* note: can't get here when monster is dead, so this always returns 0 */
+    return (status == MMOVE_DIED);
 }
 
 static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS,
@@ -1044,6 +1065,7 @@ maybe_spin_web(struct monst *mtmp)
     }
 }
 
+/* Handles the movement of a standard monster. */
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1542,7 +1564,7 @@ m_move(register struct monst* mtmp, register int after)
             if (trapret == Trap_Killed_Mon || trapret == Trap_Moved_Mon) {
                 if (mtmp->mx)
                     newsym(mtmp->mx, mtmp->my);
-                return 2; /* it died */
+                return MMOVE_DIED; /* it died */
             }
             ptr = mtmp->data; /* in case mintrap() caused polymorph */
 
@@ -1588,7 +1610,7 @@ m_move(register struct monst* mtmp, register int after)
                     UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
                         if (mb_trapped(mtmp, canseeit))
-                            return 2;
+                            return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move2)) {
                             if (canseeit && canspotmon(mtmp))
@@ -1604,7 +1626,7 @@ m_move(register struct monst* mtmp, register int after)
                     UnblockDoor(here, mtmp, !btrapped ? D_ISOPEN : D_NODOOR);
                     if (btrapped) {
                         if (mb_trapped(mtmp, canseeit))
-                            return 2;
+                            return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move3)) {
                             if (canseeit && canspotmon(mtmp))
@@ -1625,7 +1647,7 @@ m_move(register struct monst* mtmp, register int after)
                     UnblockDoor(here, mtmp, mask);
                     if (btrapped) {
                         if (mb_trapped(mtmp, canseeit))
-                            return 2;
+                            return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move4)) {
                             if (canseeit && canspotmon(mtmp))
@@ -1651,7 +1673,7 @@ m_move(register struct monst* mtmp, register int after)
                     if (canseemon(mtmp))
                         pline("%s eats through the iron bars.", Monnam(mtmp));
                     dissolve_bars(mtmp->mx, mtmp->my);
-                    return 3;
+                    return MMOVE_DONE;
                 } else if (Verbose(2, m_move5) && canseemon(mtmp))
                     Norep("%s %s %s the iron bars.", Monnam(mtmp),
                           /* pluralization fakes verb conjugation */
@@ -1662,7 +1684,7 @@ m_move(register struct monst* mtmp, register int after)
             /* possibly dig */
             if (can_tunnel && may_dig(mtmp->mx, mtmp->my)
                 && mdig_tunnel(mtmp))
-                return 2; /* mon died (position already updated) */
+                return MMOVE_DIED; /* mon died (position already updated) */
 
             /* set also in domove(), hack.c */
             if (engulfing_u(mtmp)
@@ -1696,7 +1718,7 @@ m_move(register struct monst* mtmp, register int after)
             /* Maybe a rock mole just ate some metal object */
             if (metallivorous(ptr)) {
                 if (meatmetal(mtmp) == 2)
-                    return 2; /* it died */
+                    return MMOVE_DIED; /* it died */
             }
 
             if (g_at(mtmp->mx, mtmp->my) && likegold)
