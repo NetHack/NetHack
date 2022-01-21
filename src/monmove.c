@@ -12,6 +12,7 @@ static int disturb(struct monst *);
 static void release_hero(struct monst *);
 static void distfleeck(struct monst *, int *, int *, int *);
 static int m_arrival(struct monst *);
+static void mind_blast(struct monst *);
 static boolean holds_up_web(coordxy, coordxy);
 static int count_webbing_walls(coordxy, coordxy);
 static boolean soko_allow_web(struct monst *);
@@ -465,6 +466,73 @@ m_arrival(struct monst* mon)
     return -1;
 }
 
+/* a mind flayer unleashes a mind blast  */
+static void
+mind_blast(register struct monst* mtmp)
+{
+    struct monst *m2, *nmon = (struct monst *) 0;
+
+    if (canseemon(mtmp))
+        pline("%s concentrates.", Monnam(mtmp));
+    if (distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM) {
+        You("sense a faint wave of psychic energy.");
+        return;
+    }
+    pline("A wave of psychic energy pours over you!");
+    if (mtmp->mpeaceful
+        && (!Conflict || resist_conflict(mtmp))) {
+        pline("It feels quite soothing.");
+    } else if (!u.uinvulnerable) {
+        int dmg;
+        boolean m_sen = sensemon(mtmp);
+
+        if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
+            /* hiding monsters are brought out of hiding when hit by
+                a psychic blast, so do the same for hiding poly'd hero */
+            if (u.uundetected) {
+                u.uundetected = 0;
+                newsym(u.ux, u.uy);
+            } else if (U_AP_TYPE != M_AP_NOTHING
+                        /* hero has no way to hide as monster but
+                            check for that theoretical case anyway */
+                        && U_AP_TYPE != M_AP_MONSTER) {
+                g.youmonst.m_ap_type = M_AP_NOTHING;
+                g.youmonst.mappearance = 0;
+                newsym(u.ux, u.uy);
+            }
+            pline("It locks on to your %s!",
+                    m_sen ? "telepathy"
+                    : Blind_telepat ? "latent telepathy"
+                    : "mind"); /* note: hero is never mindless */
+            dmg = rnd(15);
+            if (Half_spell_damage)
+                dmg = (dmg + 1) / 2;
+            losehp(dmg, "psychic blast", KILLED_BY_AN);
+        }
+    }
+    for (m2 = fmon; m2; m2 = nmon) {
+        nmon = m2->nmon;
+        if (DEADMONSTER(m2))
+            continue;
+        if (m2->mpeaceful == mtmp->mpeaceful)
+            continue;
+        if (mindless(m2->data))
+            continue;
+        if (m2 == mtmp)
+            continue;
+        if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
+            || !rn2(10)) {
+            /* wake it up first, to bring hidden monster out of hiding */
+            wakeup(m2, FALSE);
+            if (cansee(m2->mx, m2->my))
+                pline("It locks on to %s.", mon_nam(m2));
+            m2->mhp -= rnd(15);
+            if (DEADMONSTER(m2))
+                monkilled(m2, "", AD_DRIN);
+        }
+    }
+}
+
 /* returns 1 if monster died moving, 0 otherwise */
 /* The whole dochugw/m_move/distfleeck/mfndpos section is serious spaghetti
  * code. --KAA
@@ -566,6 +634,7 @@ dochug(register struct monst* mtmp)
     /* check distance and scariness of attacks */
     distfleeck(mtmp, &inrange, &nearby, &scared);
 
+    /* search for and potentially use defensive or miscellaneous items. */
     if (find_defensive(mtmp)) {
         if (use_defensive(mtmp) != 0)
             return 1;
@@ -600,71 +669,9 @@ dochug(register struct monst* mtmp)
     /* the watch will look around and see if you are up to no good :-) */
     if (is_watch(mdat)) {
         watch_on_duty(mtmp);
-
     } else if (is_mind_flayer(mdat) && !rn2(20)) {
-        struct monst *m2, *nmon = (struct monst *) 0;
-
-        if (canseemon(mtmp))
-            pline("%s concentrates.", Monnam(mtmp));
-        if (distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM) {
-            You("sense a faint wave of psychic energy.");
-            goto toofar;
-        }
-        pline("A wave of psychic energy pours over you!");
-        if (mtmp->mpeaceful
-            && (!Conflict || resist_conflict(mtmp))) {
-            pline("It feels quite soothing.");
-        } else if (!u.uinvulnerable) {
-            int dmg;
-            boolean m_sen = sensemon(mtmp);
-
-            if (m_sen || (Blind_telepat && rn2(2)) || !rn2(10)) {
-                /* hiding monsters are brought out of hiding when hit by
-                   a psychic blast, so do the same for hiding poly'd hero */
-                if (u.uundetected) {
-                    u.uundetected = 0;
-                    newsym(u.ux, u.uy);
-                } else if (U_AP_TYPE != M_AP_NOTHING
-                           /* hero has no way to hide as monster but
-                              check for that theoretical case anyway */
-                           && U_AP_TYPE != M_AP_MONSTER) {
-                    g.youmonst.m_ap_type = M_AP_NOTHING;
-                    g.youmonst.mappearance = 0;
-                    newsym(u.ux, u.uy);
-                }
-                pline("It locks on to your %s!",
-                      m_sen ? "telepathy"
-                      : Blind_telepat ? "latent telepathy"
-                        : "mind"); /* note: hero is never mindless */
-                dmg = rnd(15);
-                if (Half_spell_damage)
-                    dmg = (dmg + 1) / 2;
-                losehp(dmg, "psychic blast", KILLED_BY_AN);
-            }
-        }
-        for (m2 = fmon; m2; m2 = nmon) {
-            nmon = m2->nmon;
-            if (DEADMONSTER(m2))
-                continue;
-            if (m2->mpeaceful == mtmp->mpeaceful)
-                continue;
-            if (mindless(m2->data))
-                continue;
-            if (m2 == mtmp)
-                continue;
-            if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
-                || !rn2(10)) {
-                /* wake it up first, to bring hidden monster out of hiding */
-                wakeup(m2, FALSE);
-                if (cansee(m2->mx, m2->my))
-                    pline("It locks on to %s.", mon_nam(m2));
-                m2->mhp -= rnd(15);
-                if (DEADMONSTER(m2))
-                    monkilled(m2, "", AD_DRIN);
-            }
-        }
+        mind_blast(mtmp);
     }
- toofar:
 
     /* If monster is nearby you, and has to wield a weapon, do so.  This
      * costs the monster a move, of course.
