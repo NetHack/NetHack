@@ -1028,7 +1028,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
     /*  First determine the base damage done */
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
     if ((is_undead(mdat) || is_vampshifter(mtmp)) && midnight())
-        mhm.damage += d((int) mattk->damn, (int) mattk->damd); /* extra damage */
+        mhm.damage += d((int) mattk->damn, (int) mattk->damd); /* extra dmg */
 
     mhitm_adtyping(mtmp, mattk, &g.youmonst, &mhm);
     if (mhm.done)
@@ -1051,10 +1051,9 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
 
     if (mhm.damage) {
         if (Half_physical_damage
-            /* Mitre of Holiness */
+            /* Mitre of Holiness, even if not currently blessed */
             || (Role_if(PM_CLERIC) && uarmh && is_quest_artifact(uarmh)
-                && (is_undead(mtmp->data) || is_demon(mtmp->data)
-                    || is_vampshifter(mtmp))))
+                && mon_hates_blessings(mtmp)))
             mhm.damage = (mhm.damage + 1) / 2;
 
         if (mhm.permdmg) { /* Death's life force drain */

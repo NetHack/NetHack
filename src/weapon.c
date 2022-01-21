@@ -159,8 +159,7 @@ hitval(struct obj *otmp, struct monst *mon)
     /* Put weapon vs. monster type "to hit" bonuses in below: */
 
     /* Blessed weapons used against undead or demons */
-    if (Is_weapon && otmp->blessed
-        && (is_demon(ptr) || is_undead(ptr) || is_vampshifter(mon)))
+    if (Is_weapon && otmp->blessed && mon_hates_blessings(mon))
         tmp += 2;
 
     if (is_spear(otmp) && index(kebabable, ptr->mlet))
@@ -322,8 +321,7 @@ dmgval(struct obj *otmp, struct monst *mon)
         || otmp->oclass == CHAIN_CLASS) {
         int bonus = 0;
 
-        if (otmp->blessed
-            && (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mon)))
+        if (otmp->blessed && mon_hates_blessings(mon))
             bonus += rnd(4);
         if (is_axe(otmp) && is_wooden(ptr))
             bonus += rnd(4);
@@ -357,15 +355,15 @@ dmgval(struct obj *otmp, struct monst *mon)
 /* check whether blessed and/or silver damage applies for *non-weapon* hit;
    return value is the amount of the extra damage */
 int
-special_dmgval(struct monst *magr,
-               struct monst *mdef,
-               long armask,       /* armor mask, multiple bits accepted for
-                                     W_ARMC|W_ARM|W_ARMU or
-                                     W_ARMG|W_RINGL|W_RINGR only */
-               long *silverhit_p) /* output flag mask for silver bonus */
+special_dmgval(
+    struct monst *magr, /* attacker */
+    struct monst *mdef, /* defender */
+    long armask,        /* armor mask, multiple bits accepted for
+                         * W_ARMC|W_ARM|W_ARMU or
+                         * W_ARMG|W_RINGL|W_RINGR only */
+    long *silverhit_p)  /* output flag mask for silver bonus */
 {
     struct obj *obj;
-    struct permonst *ptr = mdef->data;
     boolean left_ring = (armask & W_RINGL) ? TRUE : FALSE,
             right_ring = (armask & W_RINGR) ? TRUE : FALSE;
     long silverhit = 0L;
@@ -391,8 +389,7 @@ special_dmgval(struct monst *magr,
     }
 
     if (obj) {
-        if (obj->blessed
-            && (is_undead(ptr) || is_demon(ptr) || is_vampshifter(mdef)))
+        if (obj->blessed && mon_hates_blessings(mdef))
             bonus += rnd(4);
         /* the only silver armor is shield of reflection (silver dragon
            scales refer to color, not material) and the only way to hit

@@ -678,7 +678,7 @@ peffect_water(struct obj *otmp)
         return;
     }
     g.potion_unkn++;
-    if (is_undead(g.youmonst.data) || is_demon(g.youmonst.data)
+    if (mon_hates_blessings(&g.youmonst) /* undead or demon */
         || u.ualign.type == A_CHAOTIC) {
         if (otmp->blessed) {
             pline("This burns like %s!", hliquid("acid"));
@@ -1725,7 +1725,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
             }
             break;
         case POT_WATER:
-            if (is_undead(mon->data) || is_demon(mon->data)
+            if (mon_hates_blessings(mon) /* undead or demon */
                 || is_were(mon->data) || is_vampshifter(mon)) {
                 if (obj->blessed) {
                     pline("%s %s in pain!", Monnam(mon),

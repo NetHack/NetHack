@@ -327,30 +327,44 @@ ranged_attk(struct permonst* ptr)
 
 /* True if specific monster is especially affected by silver weapons */
 boolean
-mon_hates_silver(struct monst* mon)
+mon_hates_silver(struct monst *mon)
 {
     return (boolean) (is_vampshifter(mon) || hates_silver(mon->data));
 }
 
 /* True if monster-type is especially affected by silver weapons */
 boolean
-hates_silver(register struct permonst* ptr)
+hates_silver(struct permonst *ptr)
 {
     return (boolean) (is_were(ptr) || ptr->mlet == S_VAMPIRE || is_demon(ptr)
                       || ptr == &mons[PM_SHADE]
                       || (ptr->mlet == S_IMP && ptr != &mons[PM_TENGU]));
 }
 
+/* True if specific monster is especially affected by blessed objects */
+boolean
+mon_hates_blessings(struct monst *mon)
+{
+    return (boolean) (is_vampshifter(mon) || hates_blessings(mon->data));
+}
+
+/* True if monster-type is especially affected by blessed objects */
+boolean
+hates_blessings(struct permonst *ptr)
+{
+    return (boolean) (is_undead(ptr) || is_demon(ptr));
+}
+
 /* True if specific monster is especially affected by light-emitting weapons */
 boolean
-mon_hates_light(struct monst* mon)
+mon_hates_light(struct monst *mon)
 {
-    return (boolean) (hates_light(mon->data));
+    return (boolean) hates_light(mon->data);
 }
 
 /* True iff the type of monster pass through iron bars */
 boolean
-passes_bars(struct permonst* mptr)
+passes_bars(struct permonst *mptr)
 {
     return (boolean) (passes_walls(mptr) || amorphous(mptr) || unsolid(mptr)
                       || is_whirly(mptr) || verysmall(mptr)
