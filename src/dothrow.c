@@ -1097,7 +1097,8 @@ static boolean
 toss_up(struct obj *obj, boolean hitsroof)
 {
     const char *action;
-    boolean petrifier = ((obj->otyp == EGG || obj->otyp == CORPSE)
+    int otyp = obj->otyp;
+    boolean petrifier = ((otyp == EGG || otyp == CORPSE)
                          && touch_petrifies(&mons[obj->corpsenm]));
     /* note: obj->quan == 1 */
 
@@ -1122,7 +1123,6 @@ toss_up(struct obj *obj, boolean hitsroof)
     if (obj->oclass == POTION_CLASS) {
         potionhit(&g.youmonst, obj, POTHIT_HERO_THROW);
     } else if (breaktest(obj)) {
-        int otyp = obj->otyp;
         int blindinc;
 
         /* need to check for blindness result prior to destroying obj */
@@ -1167,7 +1167,10 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, FALSE);
         g.thrownobj = 0;
     } else { /* neither potion nor other breaking object */
-        boolean less_damage = uarmh && is_metallic(uarmh), artimsg = FALSE;
+        boolean is_silver = (objects[otyp].oc_material == SILVER),
+                less_damage = (uarmh && is_metallic(uarmh)
+                               && (!is_silver || !Hate_silver)),
+                artimsg = FALSE;
         int dmg = dmgval(obj, &g.youmonst);
 
         if (obj->oartifact)
@@ -1176,14 +1179,22 @@ toss_up(struct obj *obj, boolean hitsroof)
                                    rn1(18, 2));
 
         if (!dmg) { /* probably wasn't a weapon; base damage on weight */
-            dmg = (int) obj->owt / 100;
-            if (dmg < 1)
-                dmg = 1;
-            else if (dmg > 6)
+            dmg = ((int) obj->owt + 99) / 100;
+            dmg = (dmg <= 1) ? 1 : rnd(dmg);
+            if (dmg > 6)
                 dmg = 6;
-            if (g.youmonst.data == &mons[PM_SHADE]
-                && objects[obj->otyp].oc_material != SILVER)
+            /* since obj is a non-weapon, bonuses for silver and blessed
+               haven't been applied (otherwise '!dmg' test will fail when
+               they're applicable here); we don't have to worry about
+               dmgval()'s artifact light against gremlin or axe against
+               woody creature since both involve weapons; hero-as-shade is
+               hypothetical because hero can't polymorph into that form */
+            if (g.youmonst.data == &mons[PM_SHADE] && !is_silver)
                 dmg = 0;
+            if (obj->blessed && mon_hates_blessings(&g.youmonst))
+                dmg += rnd(4);
+            if (is_silver && Hate_silver)
+                dmg += rnd(20);
         }
         if (dmg > 1 && less_damage)
             dmg = 1;
@@ -1216,6 +1227,8 @@ toss_up(struct obj *obj, boolean hitsroof)
             done(STONING);
             return obj ? TRUE : FALSE;
         }
+        if (is_silver && Hate_silver)
+            pline_The("silver sears you!");
         hitfloor(obj, TRUE);
         g.thrownobj = 0;
         losehp(dmg, "falling object", KILLED_BY_AN);

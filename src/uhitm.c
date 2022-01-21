@@ -1166,13 +1166,15 @@ hmon_hitmon(struct monst *mon,
                            until after hit message */
                         dryit = (rn2(obj->spe + 1) > 0);
                     }
-                    /* things like silver wands can arrive here so
-                       so we need another silver check */
+                    /* things like silver wands can arrive here so we
+                       need another silver check; blessed check too */
                     if (objects[obj->otyp].oc_material == SILVER
                         && mon_hates_silver(mon)) {
                         tmp += rnd(20);
                         silvermsg = silverobj = TRUE;
                     }
+                    if (obj->blessed && mon_hates_blessings(mon))
+                        tmp += rnd(4);
                 }
             }
         }
