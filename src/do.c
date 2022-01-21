@@ -1070,6 +1070,7 @@ dodown(void)
         } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !g.context.nopick && uwep && is_pick(uwep)) {
+                u.dz = 1; /* the #down command doesn't call set_move_cmd() */
                 return use_pick_axe2(uwep);
             } else {
                 You_cant("go down here.");
