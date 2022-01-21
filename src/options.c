@@ -4225,6 +4225,9 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         case opt_mention_decor:
             iflags.prev_decor = STONE;
             break;
+        case opt_rest_on_space:
+            update_rest_on_space();
+            break;
         }
 
         /* boolean value has been toggled but some option changes can
@@ -5908,6 +5911,7 @@ initoptions_finish(void)
         }
     }
 #endif
+    update_rest_on_space();
     g.opt_initial = FALSE;
     return;
 }

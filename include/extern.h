@@ -252,6 +252,7 @@ extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);
 extern void parseautocomplete(char *, boolean);
 extern void reset_commands(boolean);
+extern void update_rest_on_space(void);
 extern void rhack(char *);
 extern int doextlist(void);
 extern int extcmd_via_menu(void);

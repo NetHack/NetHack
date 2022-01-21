@@ -980,8 +980,8 @@ changing engraving to an occupation resulted in not dulling a weapon used to
 a change to wounded legs handling resulted in not recovering lost dexterity
 	or receiving the "leg(s) feel better" message if wound time expired
 	rather than having legs be explicitly healed
-turning movement into commands interfered with using pick-axe plus autodig
-	in downward direction
+turning movement into commands broke the rest_on_space option; it also
+	interfered with using pick-axe plus autodig in downward direction
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -2574,9 +2574,10 @@ commands_init(void)
     (void) bind_key(M('2'), "twoweapon");
     (void) bind_key(M('n'), "name");
     (void) bind_key(M('N'), "name");
-
-    /* wait_on_space */
+#if 0
+    /* don't do this until the rest_on_space option is set or cleared */
     (void) bind_key(' ',    "wait");
+#endif
 }
 
 static boolean
@@ -3573,6 +3574,22 @@ reset_commands(boolean initial)
             (void) bind_key_fn(M(g.Cmd.dirchars[i]), move_funcs[i][MV_RUSH]);
         }
     }
+    update_rest_on_space();
+}
+
+void
+update_rest_on_space(void)
+{
+    /* cloned from extcmdlist['.'], then slightly modified to be distinct;
+       donull is all that's needed for it to operate; command name and
+       description get shown by help menu's "Info on what a given key does"
+       (which runs the '&' command) and "Full list of keyboard commands" */
+    static const struct ext_func_tab restonspace = {
+        ' ', "wait", "rest one move via 'rest_on_space' option",
+        donull, (IFBURIED | CMD_M_PREFIX), "waiting"
+    };
+
+    g.Cmd.commands[' '] = flags.rest_on_space ? &restonspace : 0;
 }
 
 /* commands which accept 'm' prefix to request menu operation */
