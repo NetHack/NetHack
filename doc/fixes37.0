@@ -720,7 +720,8 @@ mark some messages as urgent ("You die*.", having equipment stolen, being
 if a leashed pet changed name (#name m) or an unnamed pet changed type
 	(polymorph or grow-up) and perm_invent was On, persistent inventory
 	display didn't get updated to show the leash's changed information
-attack feedback when using a bullwhip said "swing"; change to "lash"
+attack feedback when using a bullwhip said "swing"; change to "lash";
+	use "lash" for hero hitting with wet towel too
 attack feedback for monster using polearm when adjacent said "thrust"; change
 	to "bash"
 apply runmode delay to multiturn actions, not just running
@@ -753,6 +754,9 @@ change movement keys and some special keys into extended commands
 fix typo in message shown when hero sees a monster's wet towel become drier
 for hero with slippery fingers, enlightenment reports "slippery fingers" or
 	"slippery gloves" but self-probing described it as "slippery hands"
+when hitting with wet towel causes it to lose some wetness, defer "your towel
+	dries" until after the hit message
+do some extra damage when hitting an iron golem with a wet towel
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

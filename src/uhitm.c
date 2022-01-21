@@ -744,7 +744,7 @@ hmon_hitmon(struct monst *mon,
     boolean ispoisoned = FALSE, needpoismsg = FALSE, poiskilled = FALSE,
             unpoisonmsg = FALSE;
     boolean silvermsg = FALSE, silverobj = FALSE;
-    boolean lightobj = FALSE;
+    boolean lightobj = FALSE, dryit = FALSE;
     boolean use_weapon_skill = FALSE, train_weapon_skill = FALSE;
     boolean unarmed = !uwep && !uarm && !uarms;
     boolean hand_to_hand = (thrown == HMON_MELEE
@@ -1146,30 +1146,32 @@ hmon_hitmon(struct monst *mon,
                 default:
                     /* non-weapons can damage because of their weight */
                     /* (but not too much) */
-                    tmp = obj->owt / 100;
-                    if (is_wet_towel(obj)) {
-                        /* wielded wet towel should probably use whip skill
-                           (but not by setting objects[TOWEL].oc_skill==P_WHIP
-                           because that would turn towel into a weptool) */
-                        tmp += obj->spe;
-                        if (rn2(obj->spe + 1)) /* usually lose some wetness */
-                            dry_a_towel(obj, -1, TRUE);
-                    }
-                    if (tmp < 1)
-                        tmp = 1;
-                    else
-                        tmp = rnd(tmp);
+                    tmp = (obj->owt + 99) / 100;
+                    tmp = (tmp <= 1) ? 1 : rnd(tmp);
                     if (tmp > 6)
                         tmp = 6;
-                    /*
-                     * Things like silver wands can arrive here so
-                     * so we need another silver check.
-                     */
+                    /* wet towel has modest damage bonus beyond its weight,
+                       based on its wetness */
+                    if (is_wet_towel(obj)) {
+                        boolean doubld = (mon->data == &mons[PM_IRON_GOLEM]);
+
+                        /* wielded wet towel should probably use whip skill
+                           (but not by setting objects[TOWEL].oc_skill==P_WHIP
+                           because that would turn towel into a weptool);
+                           due to low weight, tmp always starts at 1 here, and
+                           due to wet towel's definition, obj->spe is 1..7 */
+                        tmp += obj->spe * (doubld ? 2 : 1);
+                        tmp = rnd(tmp); /* wet towel damage not capped at 6 */
+                        /* usually lose some wetness but defer doing so
+                           until after hit message */
+                        dryit = (rn2(obj->spe + 1) > 0);
+                    }
+                    /* things like silver wands can arrive here so
+                       so we need another silver check */
                     if (objects[obj->otyp].oc_material == SILVER
                         && mon_hates_silver(mon)) {
                         tmp += rnd(20);
-                        silvermsg = TRUE;
-                        silverobj = TRUE;
+                        silvermsg = silverobj = TRUE;
                     }
                 }
             }
@@ -1358,15 +1360,18 @@ hmon_hitmon(struct monst *mon,
             hit(mshot_xname(obj), mon, exclam(tmp));
         else if (!flags.verbose)
             You("hit it.");
-        else
+        else /* hand_to_hand */
             You("%s %s%s",
                 (obj && (is_shield(obj)
                          || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
-                : (obj && obj->otyp == BULLWHIP) ? "lash" /* hand_to_hand */
+                : (obj && (obj->otyp == BULLWHIP
+                           || is_wet_towel(obj))) ? "lash"
                   : Role_if(PM_BARBARIAN) ? "smite"
                     : "hit",
                 mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
     }
+    if (dryit) /* dryit implies wet towel, so 'obj' is still intact */
+        dry_a_towel(obj, -1, TRUE);
 
     if (silvermsg) {
         const char *fmt;
