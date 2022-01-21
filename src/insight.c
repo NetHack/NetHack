@@ -2928,7 +2928,7 @@ ustatusline(void)
         Sprintf(eos(info), ", injured %s", what);
     }
     if (Glib)
-        Sprintf(eos(info), ", slippery %s", makeplural(body_part(HAND)));
+        Sprintf(eos(info), ", slippery %s", fingers_or_gloves(TRUE));
     if (u.utrap)
         Strcat(info, ", trapped");
     if (Fast)
