@@ -3577,6 +3577,10 @@ reset_commands(boolean initial)
     update_rest_on_space();
 }
 
+/* called when 'rest_on_space' is toggled, also called by reset_commands()
+   from initoptions_init() which takes place before key bindings have been
+   processed, and by initoptions_finish() after key bindings so that we
+   can remember anything bound to <space> in 'unrestonspace' */
 void
 update_rest_on_space(void)
 {
@@ -3588,8 +3592,16 @@ update_rest_on_space(void)
         ' ', "wait", "rest one move via 'rest_on_space' option",
         donull, (IFBURIED | CMD_M_PREFIX), "waiting"
     };
+    static const struct ext_func_tab *unrestonspace = 0;
+    const struct ext_func_tab *bound_f = g.Cmd.commands[' '];
 
-    g.Cmd.commands[' '] = flags.rest_on_space ? &restonspace : 0;
+    /* when 'rest_on_space' is On, <space> will run the #wait command;
+       when it is Off, <space> will use 'unrestonspace' which will either
+       be Null and elicit "Unknown command ' '." or have some non-Null
+       command bound in player's RC file */
+    if (bound_f != 0 && bound_f != &restonspace)
+        unrestonspace = bound_f;
+    g.Cmd.commands[' '] = flags.rest_on_space ? &restonspace : unrestonspace;
 }
 
 /* commands which accept 'm' prefix to request menu operation */
