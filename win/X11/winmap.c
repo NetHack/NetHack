@@ -143,10 +143,10 @@ X11_print_glyph(winid window, xchar x, xchar y, const glyph_info *glyphinfo,
     }
 
     if (update_bbox) { /* update row bbox */
-        if ((uchar) x < map_info->t_start[y])
-            map_info->t_start[y] = (uchar) x;
-        if ((uchar) x > map_info->t_stop[y])
-            map_info->t_stop[y] = (uchar) x;
+        if (x < map_info->t_start[y])
+            map_info->t_start[y] = x;
+        if (x > map_info->t_stop[y])
+            map_info->t_stop[y] = x;
     }
 }
 
@@ -875,18 +875,20 @@ display_map_window(struct xwindow *wp)
     if ((Is_rogue_level(&u.uz) ? map_info->is_tile
                                : (map_info->is_tile != iflags.wc_tiled_map))
         && map_info->tile_map.image_width) {
+        int i;
+
         /* changed map display mode, re-display the full map */
-        (void) memset((genericptr_t) map_info->t_start, (char) 0,
-                      sizeof(map_info->t_start));
-        (void) memset((genericptr_t) map_info->t_stop, (char) (COLNO - 1),
-                      sizeof(map_info->t_stop));
+        for (i = 0; i < ROWNO; i++) {
+            map_info->t_start[i] = 0;
+            map_info->t_stop[i] = COLNO-1;
+        }
         map_info->is_tile = iflags.wc_tiled_map && !Is_rogue_level(&u.uz);
         XClearWindow(XtDisplay(wp->w), XtWindow(wp->w));
         set_map_size(wp, COLNO, ROWNO);
         check_cursor_visibility(wp);
         highlight_yn(TRUE); /* change fg/bg to match map */
     } else if (wp->prevx != wp->cursx || wp->prevy != wp->cursy) {
-        register unsigned int x = wp->prevx, y = wp->prevy;
+        register xchar x = wp->prevx, y = wp->prevy;
 
         /*
          * Previous cursor position is not the same as the current
@@ -954,15 +956,16 @@ void
 clear_map_window(struct xwindow *wp)
 {
     struct map_info_t *map_info = wp->map_information;
+    int i;
 
     /* update both tile and text backing store, then update */
     map_all_unexplored(map_info);
 
     /* force a full update */
-    (void) memset((genericptr_t) map_info->t_start, (char) 0,
-                  sizeof map_info->t_start);
-    (void) memset((genericptr_t) map_info->t_stop, (char) COLNO - 1,
-                  sizeof map_info->t_stop);
+    for (i = 0; i < ROWNO; i++) {
+        map_info->t_start[i] = 0;
+        map_info->t_stop[i] = COLNO-1;
+    }
 
     display_map_window(wp);
 }
@@ -1470,6 +1473,7 @@ create_map_window(struct xwindow *wp,
 #if 0
     int screen_width, screen_height;
 #endif
+    int i;
 
     wp->type = NHW_MAP;
 
@@ -1539,10 +1543,10 @@ create_map_window(struct xwindow *wp,
     map_info->viewport_width = map_info->viewport_height = 0;
 
     /* reset the "new entry" indicators */
-    (void) memset((genericptr_t) map_info->t_start, (char) COLNO,
-                  sizeof (map_info->t_start));
-    (void) memset((genericptr_t) map_info->t_stop, (char) 0,
-                  sizeof (map_info->t_stop));
+    for (i = 0; i < ROWNO; i++) {
+        map_info->t_start[i] = COLNO;
+        map_info->t_stop[i] = 0;
+    }
 
     /* we probably want to restrict this to the 1st map window only */
     map_info->is_tile = (init_tiles(wp) && iflags.wc_tiled_map);

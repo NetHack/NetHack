@@ -81,7 +81,7 @@ struct tile_map_info_t {
 struct map_info_t {
     Dimension viewport_width,     /* Saved viewport size, so we can */
         viewport_height;          /*   clip to cursor on a resize.  */
-    unsigned char t_start[ROWNO], /* Starting column for new info. */
+    xchar t_start[ROWNO],         /* Starting column for new info. */
         t_stop[ROWNO];            /* Ending column for new info. */
 
     boolean is_tile; /* true if currently using tiles */
