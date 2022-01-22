@@ -373,7 +373,7 @@ curses_ext_cmd(void)
     int ret = -1;
     char cur_choice[BUFSZ];
     int matches = 0;
-    int *ecmatches;
+    int *ecmatches = NULL;
     WINDOW *extwin = NULL, *extwin2 = NULL;
 
     if (iflags.extmenu) {
@@ -421,14 +421,16 @@ curses_ext_cmd(void)
         wclrtoeol(extwin);
 
         /* if we have an autocomplete command, AND it matches uniquely */
-        if (matches == 1) {
+        if (matches == 1 && ecmatches) {
             struct ext_func_tab *ec = extcmds_getentry(ecmatches[0]);
 
-            curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
-            wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
-            wprintw(extwin, "%s",
-                    ec->ef_txt + (int) strlen(cur_choice));
-            curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
+            if (ec) {
+                curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
+                wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
+                wprintw(extwin, "%s",
+                        ec->ef_txt + (int) strlen(cur_choice));
+                curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
+            }
         }
 
         curs_set(1);
@@ -447,7 +449,7 @@ curses_ext_cmd(void)
             (void) mungspaces(cur_choice);
             if (ret == -1) {
                 matches = extcmds_match(cur_choice, ECM_IGNOREAC|ECM_EXACTMATCH, &ecmatches);
-                if (matches == 1)
+                if (matches == 1 && ecmatches)
                     ret = ecmatches[0];
             }
             break;
@@ -481,7 +483,7 @@ curses_ext_cmd(void)
             ret = -1;
         }
         matches = extcmds_match(cur_choice, ECM_NOFLAGS, &ecmatches);
-        if (matches == 1)
+        if (matches == 1 && ecmatches)
             ret = ecmatches[0];
     }
 
