@@ -255,7 +255,7 @@ get_unused_cs(xchar ***rows, xchar **rmin, xchar **rmax)
     nrmin = *rmin;
     nrmax = *rmax;
 
-    (void) memset((genericptr_t) **rows, 0, ROWNO * COLNO); /* see nothing */
+    (void) memset((genericptr_t) **rows, 0, sizeof(xchar) * (ROWNO * COLNO)); /* see nothing */
     for (row = 0; row < ROWNO; row++) { /* set row min & max */
         *nrmin++ = COLNO - 1;
         *nrmax++ = 1;
