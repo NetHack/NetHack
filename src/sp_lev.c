@@ -1151,7 +1151,7 @@ get_location(xchar *x, xchar *y, int humidity, struct mkroom* croom)
 static boolean
 is_ok_location(xchar x, xchar y, int humidity)
 {
-    register int typ;
+    register int typ = levl[x][y].typ;
 
     if (Is_waterlevel(&u.uz))
         return TRUE; /* accept any spot */
@@ -1160,17 +1160,15 @@ is_ok_location(xchar x, xchar y, int humidity)
     if (humidity & ANY_LOC)
         return TRUE;
 
-    if ((humidity & SOLID) && IS_ROCK(levl[x][y].typ))
+    if ((humidity & SOLID) && IS_ROCK(typ))
         return TRUE;
 
-    if (humidity & DRY) {
-        typ = levl[x][y].typ;
-        if (typ == ROOM || typ == AIR || typ == CLOUD || typ == ICE
-            || typ == CORR)
+    if ((humidity & (DRY|SPACELOC)) && SPACE_POS(typ)) {
+        boolean bould = (sobj_at(BOULDER, x, y) != NULL);
+
+        if (!bould || (bould && (humidity & SOLID)))
             return TRUE;
     }
-    if ((humidity & SPACELOC) && SPACE_POS(levl[x][y].typ))
-        return TRUE;
     if ((humidity & WET) && is_pool(x, y))
         return TRUE;
     if ((humidity & HOT) && is_lava(x, y))
@@ -1799,7 +1797,7 @@ pm_to_humidity(struct permonst* pm)
         loc |= (HOT | WET);
     if (passes_walls(pm) || noncorporeal(pm))
         loc |= SOLID;
-    if (flaming(pm))
+    if (likes_fire(pm))
         loc |= HOT;
     return loc;
 }
