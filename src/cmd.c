@@ -385,7 +385,7 @@ doextcmd(void)
 
         func = extcmdlist[idx].ef_funct;
         if (!can_do_extcmd(&extcmdlist[idx]))
-            return 0;
+            return ECMD_OK;
         if (iflags.menu_requested && !accept_menu_prefix(&extcmdlist[idx])) {
             pline("'%s' prefix has no effect for the %s command.",
                   visctrl(cmd_from_func(do_reqmenu)),
