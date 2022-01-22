@@ -248,23 +248,13 @@ xwaitforspace(register const char *s) /* chars allowed besides return */
 static boolean
 ext_cmd_getlin_hook(char *base)
 {
-    int oindex, com_index;
+    int *ecmatches;
+    int nmatches = extcmds_match(base, ECM_NOFLAGS, &ecmatches);
 
-    com_index = -1;
-    for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0; oindex++) {
-        if (extcmdlist[oindex].flags & (CMD_NOT_AVAILABLE|INTERNALCMD))
-            continue;
-        if ((extcmdlist[oindex].flags & AUTOCOMPLETE)
-            && !(!wizard && (extcmdlist[oindex].flags & WIZMODECMD))
-            && !strncmpi(base, extcmdlist[oindex].ef_txt, strlen(base))) {
-            if (com_index == -1) /* no matches yet */
-                com_index = oindex;
-            else /* more than 1 match */
-                return FALSE;
-        }
-    }
-    if (com_index >= 0) {
-        Strcpy(base, extcmdlist[com_index].ef_txt);
+    if (nmatches == 1) {
+        struct ext_func_tab *ec = extcmds_getentry(ecmatches[0]);
+
+        Strcpy(base, ec->ef_txt);
         return TRUE;
     }
 
@@ -278,8 +268,9 @@ ext_cmd_getlin_hook(char *base)
 int
 tty_get_ext_cmd(void)
 {
-    int i;
     char buf[BUFSZ];
+    int nmatches;
+    int *ecmatches;
 
     if (iflags.extmenu)
         return extcmd_via_menu();
@@ -298,9 +289,7 @@ tty_get_ext_cmd(void)
     if (buf[0] == 0 || buf[0] == '\033')
         return -1;
 
-    for (i = 0; extcmdlist[i].ef_txt != (char *) 0; i++)
-        if (!strcmpi(buf, extcmdlist[i].ef_txt))
-            break;
+    nmatches = extcmds_match(buf, ECM_IGNOREAC|ECM_EXACTMATCH, &ecmatches);
 
     if (!g.in_doagain) {
         int j;
@@ -309,12 +298,12 @@ tty_get_ext_cmd(void)
         savech('\n');
     }
 
-    if (extcmdlist[i].ef_txt == (char *) 0) {
+    if (nmatches != 1) {
         pline("%s: unknown extended command.", buf);
-        i = -1;
+        return -1;
     }
 
-    return i;
+    return ecmatches[0];
 }
 
 #endif /* TTY_GRAPHICS */

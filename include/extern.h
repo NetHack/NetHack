@@ -248,6 +248,8 @@ extern char pgetchar(void);
 extern void pushch(char);
 extern void savech(char);
 extern int doextcmd(void);
+extern struct ext_func_tab *extcmds_getentry(int);
+extern int extcmds_match(const char *, int, int **);
 extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);
 extern void parseautocomplete(char *, boolean);

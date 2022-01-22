@@ -368,11 +368,12 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 int
 curses_ext_cmd(void)
 {
-    int count, letter, prompt_width, startx, starty, winx, winy;
+    int letter, prompt_width, startx, starty, winx, winy;
     int messageh, messagew, maxlen = BUFSZ - 1;
     int ret = -1;
     char cur_choice[BUFSZ];
     int matches = 0;
+    int *ecmatches;
     WINDOW *extwin = NULL, *extwin2 = NULL;
 
     if (iflags.extmenu) {
@@ -421,10 +422,12 @@ curses_ext_cmd(void)
 
         /* if we have an autocomplete command, AND it matches uniquely */
         if (matches == 1) {
+            struct ext_func_tab *ec = extcmds_getentry(ecmatches[0]);
+
             curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
             wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
             wprintw(extwin, "%s",
-                    extcmdlist[ret].ef_txt + (int) strlen(cur_choice));
+                    ec->ef_txt + (int) strlen(cur_choice));
             curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
         }
 
@@ -441,13 +444,11 @@ curses_ext_cmd(void)
         }
 
         if (letter == '\r' || letter == '\n') {
+            (void) mungspaces(cur_choice);
             if (ret == -1) {
-                for (count = 0; extcmdlist[count].ef_txt; count++) {
-                    if (!strcasecmp(cur_choice, extcmdlist[count].ef_txt)) {
-                        ret = count;
-                        break;
-                    }
-                }
+                matches = extcmds_match(cur_choice, ECM_IGNOREAC|ECM_EXACTMATCH, &ecmatches);
+                if (matches == 1)
+                    ret = ecmatches[0];
             }
             break;
         }
@@ -463,6 +464,7 @@ curses_ext_cmd(void)
                 cur_choice[prompt_width - 1] = '\0';
                 letter = '*';
                 prompt_width--;
+                ret = -1;
             }
 
         /* honor kill_char if it's ^U or similar, but not if it's '@' */
@@ -478,30 +480,16 @@ curses_ext_cmd(void)
             cur_choice[prompt_width + 1] = '\0';
             ret = -1;
         }
-        for (count = 0; extcmdlist[count].ef_txt; count++) {
-            if (!wizard && (extcmdlist[count].flags & WIZMODECMD))
-                continue;
-            if (!(extcmdlist[count].flags & AUTOCOMPLETE))
-                continue;
-            if ((int) strlen(extcmdlist[count].ef_txt) > prompt_width) {
-                if (strncasecmp(cur_choice, extcmdlist[count].ef_txt,
-                                prompt_width) == 0) {
-                    if ((extcmdlist[count].ef_txt[prompt_width] ==
-                         lowc(letter)) || letter == '*') {
-                        if (matches == 0) {
-                            ret = count;
-                        }
-
-                        matches++;
-                    }
-                }
-            }
-        }
+        matches = extcmds_match(cur_choice, ECM_NOFLAGS, &ecmatches);
+        if (matches == 1)
+            ret = ecmatches[0];
     }
 
     curses_destroy_win(extwin);
     if (extwin2)
         curses_destroy_win(extwin2);
+    if (ret == -1 && *cur_choice)
+        pline("%s: unknown extended command.", cur_choice);
     return ret;
 }
 

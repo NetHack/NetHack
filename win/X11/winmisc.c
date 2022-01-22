@@ -1764,21 +1764,6 @@ ec_scroll_to_view(int ec_indx) /* might be greater than extended_cmd_selected */
     }
 }
 
-/* decide whether extcmdlist[idx] should be part of extended commands menu */
-static boolean
-ignore_extcmd(int idx)
-{
-    /* #shell or #suspect might not be available;
-       'extmenu' option controls whether we show full list
-       or just the traditional extended commands */
-    if ((extcmdlist[idx].flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0
-        || ((extcmdlist[idx].flags & AUTOCOMPLETE) == 0 && !ec_full_list)
-        || strlen(extcmdlist[idx].ef_txt) < 2) /* ignore "#" and "?" */
-        return TRUE;
-
-    return FALSE;
-}
-
 /* ARGSUSED */
 void
 ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
@@ -1899,22 +1884,24 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 init_extended_commands_popup(void)
 {
-    int i, j, num_commands, ignore_cmds = 0;
+    int i, j, num_commands;
+    int *matches;
+    int ecmflags = ECM_NO1CHARCMD;
 
-    /* count commands */
-    for (num_commands = 0; extcmdlist[num_commands].ef_txt; num_commands++)
-        if (ignore_extcmd(num_commands))
-            ++ignore_cmds;
+    if (ec_full_list)
+        ecmflags |= ECM_IGNOREAC;
 
-    j = num_commands - ignore_cmds;
+    num_commands = extcmds_match(NULL, ecmflags, &matches);
+
+    j = num_commands;
     command_list = (const char **) alloc((unsigned) (j * sizeof (char *) + 1));
     command_indx = (short *) alloc((unsigned) (j * sizeof (short) + 1));
 
     for (i = j = 0; i < num_commands; i++) {
-        if (ignore_extcmd(i))
-            continue;
-        command_indx[j] = (short) i;
-        command_list[j++] = extcmdlist[i].ef_txt;
+        struct ext_func_tab *ec = extcmds_getentry(matches[i]);
+
+        command_indx[j] = matches[i];
+        command_list[j++] = ec->ef_txt;
     }
     command_list[j] = (char *) 0;
     command_indx[j] = -1;

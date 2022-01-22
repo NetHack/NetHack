@@ -2449,6 +2449,58 @@ static const struct {
 
 int extcmdlist_length = SIZE(extcmdlist) - 1;
 
+/* get entry i in the extended commands list. for windowport use. */
+struct ext_func_tab *
+extcmds_getentry(int i)
+{
+    if (i < 0 || i > extcmdlist_length)
+        return 0;
+    return &extcmdlist[i];
+}
+
+/* find extended command entries matching findstr.
+   if findstr is NULL, returns all available entries.
+   returns: number of matching extended commands,
+            and the entry indexes in matchlist.
+   for windowport use. */
+int
+extcmds_match(const char *findstr, int ecmflags, int **matchlist)
+{
+    static int retmatchlist[SIZE(extcmdlist)] = DUMMY;
+    int i, mi = 0;
+    int fslen = findstr ? strlen(findstr) : 0;
+    boolean ignoreac = (ecmflags & ECM_IGNOREAC) != 0;
+    boolean exactmatch = (ecmflags & ECM_EXACTMATCH) != 0;
+    boolean no1charcmd = (ecmflags & ECM_NO1CHARCMD) != 0;
+
+    for (i = 0; extcmdlist[i].ef_txt; i++) {
+        if (extcmdlist[i].flags & (CMD_NOT_AVAILABLE|INTERNALCMD))
+            continue;
+        if (!wizard && (extcmdlist[i].flags & WIZMODECMD))
+            continue;
+        if (!ignoreac && !(extcmdlist[i].flags & AUTOCOMPLETE))
+            continue;
+        if (no1charcmd && (strlen(extcmdlist[i].ef_txt) == 1))
+            continue;
+        if (!findstr) {
+            retmatchlist[mi++] = i;
+        } else if (exactmatch) {
+            if (!strcmpi(findstr, extcmdlist[i].ef_txt)) {
+                retmatchlist[mi++] = i;
+            }
+        } else {
+            if (!strncmpi(findstr, extcmdlist[i].ef_txt, fslen)) {
+                retmatchlist[mi++] = i;
+            }
+        }
+    }
+
+    if (matchlist)
+        *matchlist = retmatchlist;
+
+    return mi;
+}
+
 const char *
 key2extcmddesc(uchar key)
 {
