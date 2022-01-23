@@ -680,7 +680,25 @@ fields:
 | lit       | Is the room lit or unlit? Defaults to -1 (random).
 | filled    | Is the room filled as per the room type. Defaults to 1 (filled).
 | joined    | Is the room joined to the rest of the level with corridors? Default is true.
-| contents  | A function called with one parameter, a table with "width" and "height", the room width and height, excluding the walls. All coordinates in the function will be relative to the room.
+| contents  | A function called with one parameter, a table with room data. See <<_room_contents>>.
+|===
+
+==== room contents
+
+The room contents function is called when the room is created.
+All coordinates in the function will be relative to the room.
+The function get passed one parameter, a table with room data:
+
+[options="header"]
+|===
+| parameter   | description
+| width       | room width, excluding the walls.
+| height      | room height, excluding the walls.
+| region      | table with 4 elements, the room region coordinates: x1, y1, x2, y2.
+| lit         | is the room lit or unlit?
+| irregular   | is the room irregular?
+| needjoining | does the room need joining with corridors?
+| type        | the room type.
 |===
 
 

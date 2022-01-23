@@ -103,7 +103,7 @@ static int floodfillchk_match_under(int, int);
 static int floodfillchk_match_accessible(int, int);
 static boolean sel_flood_havepoint(int, int, xchar *, xchar *, int);
 static long line_dist_coord(long, long, long, long, long, long);
-static void l_push_wid_hei_table(lua_State *, int, int);
+static void l_push_mkroom_table(lua_State *, struct mkroom *);
 static int get_table_align(lua_State *);
 static int get_table_monclass(lua_State *);
 static int find_montype(lua_State *, const char *, int *);
@@ -113,6 +113,7 @@ static int get_table_buc(lua_State *);
 static int get_table_objclass(lua_State *);
 static int find_objtype(lua_State *, const char *);
 static int get_table_objtype(lua_State *);
+static const char *get_mkroom_name(int);
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
@@ -2898,14 +2899,23 @@ static void
 l_push_wid_hei_table(lua_State *L, int wid, int hei)
 {
     lua_newtable(L);
+    nhl_add_table_entry_int(L, "width", wid);
+    nhl_add_table_entry_int(L, "height", hei);
+}
 
-    lua_pushstring(L, "width");
-    lua_pushinteger(L, wid);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "height");
-    lua_pushinteger(L, hei);
-    lua_rawset(L, -3);
+/* push a table on lua stack containing room data */
+static void
+l_push_mkroom_table(lua_State *L, struct mkroom *tmpr)
+{
+    lua_newtable(L);
+    nhl_add_table_entry_int(L, "width", 1 + (tmpr->hx - tmpr->lx));
+    nhl_add_table_entry_int(L, "height", 1 + (tmpr->hy - tmpr->ly));
+    nhl_add_table_entry_region(L, "region", tmpr->lx, tmpr->ly,
+                               tmpr->hx, tmpr->hy);
+    nhl_add_table_entry_bool(L, "lit", (boolean) tmpr->rlit);
+    nhl_add_table_entry_bool(L, "irregular", tmpr->irregular);
+    nhl_add_table_entry_bool(L, "needjoining", tmpr->needjoining);
+    nhl_add_table_entry_str(L, "type", get_mkroom_name(tmpr->rtype));
 }
 
 /* message("What a strange feeling!"); */
@@ -3683,6 +3693,17 @@ static const struct {
     { 0, 0 }
 };
 
+static const char *
+get_mkroom_name(int rtype)
+{
+    int i;
+
+    for (i = 0; room_types[i].name; i++)
+        if (room_types[i].type == rtype)
+            return room_types[i].name;
+    return NULL;
+}
+
 static int
 get_table_roomtype_opt(lua_State *L, const char *name, int defval)
 {
@@ -3766,8 +3787,7 @@ lspo_room(lua_State *L)
                 lua_getfield(L, 1, "contents");
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
-                    l_push_wid_hei_table(L, 1 + tmpcr->hx - tmpcr->lx,
-                                         1 + tmpcr->hy - tmpcr->ly);
+                    l_push_mkroom_table(L, tmpcr);
                     lua_call(L, 1, 0);
                 } else
                     lua_pop(L, 1);

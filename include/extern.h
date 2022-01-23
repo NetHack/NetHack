@@ -1751,6 +1751,9 @@ extern schar get_table_mapchr_opt(lua_State *, const char *, schar);
 extern void nhl_add_table_entry_int(lua_State *, const char *, int);
 extern void nhl_add_table_entry_char(lua_State *, const char *, char);
 extern void nhl_add_table_entry_str(lua_State *, const char *, const char *);
+extern void nhl_add_table_entry_bool(lua_State *, const char *, boolean);
+extern void nhl_add_table_entry_region(lua_State *, const char *,
+                                       xchar, xchar, xchar, xchar);
 extern schar splev_chr2typ(char);
 extern schar check_mapchr(const char *);
 extern int get_table_int(lua_State *, const char *);
