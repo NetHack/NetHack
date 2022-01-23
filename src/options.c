@@ -7317,29 +7317,27 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     /* offer novices a chance to request helpful [sic] advice */
     if (!skiphelp) {
-        static const char *const helpintro[] = {
+        /* help text surrounding '?' choice should have exactly one NULL */
+        static const char *const helptext[] = {
             "For a brief explanation of how this works, type '?' to select",
             "the next menu choice, then press <enter> or <return>.",
-            NULL,
-        }, *const helpepilog[] = {
+            NULL, /* actual '?' menu entry gets inserted here */
             "[To suppress this menu help, toggle off the 'cmdassist' option.]",
             "",
-            NULL,
         };
         any = cg.zeroany;
-        for (i = 0; helpintro[i]; ++i) {
-            Sprintf(buf, "%4s%.75s", "", helpintro[i]);
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
-                     buf, MENU_ITEMFLAGS_NONE);
-        }
-        any.a_int = '?' + 1; /* processing pick_list will subtract the 1 */
-        add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
-                 "view help for options menu", MENU_ITEMFLAGS_NONE);
-        any.a_int = 0;
-        for (i = 0; helpepilog[i]; ++i) {
-            Sprintf(buf, "%4s%.75s", "", helpepilog[i]);
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
-                     buf, MENU_ITEMFLAGS_NONE);
+        for (i = 0; i < SIZE(helptext); ++i) {
+            if (helptext[i]) {
+                Sprintf(buf, "%4s%.75s", "", helptext[i]);
+                any.a_int = 0;
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE,
+                         buf, MENU_ITEMFLAGS_NONE);
+            } else {
+                any.a_int = '?' + 1; /* processing pick_list subtracts 1 */
+                add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
+                         "view help for options menu",
+                         MENU_ITEMFLAGS_SKIPINVERT);
+            }
         }
     }
 
