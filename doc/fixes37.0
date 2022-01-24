@@ -757,6 +757,8 @@ for hero with slippery fingers, enlightenment reports "slippery fingers" or
 when hitting with wet towel causes it to lose some wetness, defer "your towel
 	dries" until after the hit message
 do some extra damage when hitting an iron golem with a wet towel
+when already at level 30 and gaining another level--which doesn't increase
+	level further but does add more HP and Pw--throttle the increases
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
