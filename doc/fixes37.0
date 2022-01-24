@@ -760,6 +760,7 @@ do some extra damage when hitting an iron golem with a wet towel
 when already at level 30 and gaining another level--which doesn't increase
 	level further but does add more HP and Pw--throttle the increases
 don't stop running when next to a peaceful, unless it blocks the way
+mindless monsters shouldn't cringe stepping on squeaky boards
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

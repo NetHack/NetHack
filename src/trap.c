@@ -1155,7 +1155,7 @@ trapeffect_sqky_board(
                 pline("A board beneath %s squeaks %s loudly.",
                       mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
-            } else {
+            } else if (!mindless(mtmp->data)) {
                 pline("%s stops momentarily and appears to cringe.",
                       Monnam(mtmp));
             }
