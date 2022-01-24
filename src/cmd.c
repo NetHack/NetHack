@@ -3784,6 +3784,11 @@ got_prefix_input:
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
         g.context.move = FALSE;
         iflags.menu_requested = FALSE;
+        g.context.run = 0;
+        g.context.nopick = g.context.forcefight = FALSE;
+        g.context.mv = FALSE;
+        g.multi = 0;
+        g.domove_attempting = 0;
         return;
     }
 
