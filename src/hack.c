@@ -2947,9 +2947,9 @@ lookaround(void)
                 && M_AP_TYPE(mtmp) != M_AP_FURNITURE
                 && M_AP_TYPE(mtmp) != M_AP_OBJECT
                 && mon_visible(mtmp)) {
-                /* running movement and not a tame monster */
+                /* running movement and not a hostile monster */
                 /* OR it blocks our move direction and we're not traveling */
-                if ((g.context.run != 1 && !mtmp->mtame)
+                if ((g.context.run != 1 && !is_safemon(mtmp))
                     || (x == u.ux + u.dx && y == u.uy + u.dy
                         && !g.context.travel)) {
                     if (flags.mention_walls)
