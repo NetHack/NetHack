@@ -40,4 +40,8 @@ during engraving, spaces were counted instead of non-space (cherry-pick of
 	4e0a1e04 from NetHack-3.7)
 avoid potential buffer overflow in append_str()
 resolve missing dependency in NetHack.sln
-
+code in include/tradstdc.h was trying to suppress warn_unused result by
+	defining warn_unused_result to an empty string and that began causing
+	a build error within a system-supplied header file cdefs.h when using
+	ubuntu impish 21.10; disable that for any Linux unless GCCC_URWARN is
+	defined to force it back into effect
