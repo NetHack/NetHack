@@ -237,7 +237,12 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     }
     GUILaunched = 1;
     /* let main do the argument processing */
-    (void) main(argc, argv);
+#ifndef __MINGW32__
+    main(argc, argv);
+#else
+    int mingw_main(int argc, char *argv[]);
+    mingw_main(argc, argv);
+#endif
     return 0;
 }
 
