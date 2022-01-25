@@ -1295,7 +1295,8 @@ rloc_to_core(
     boolean preventmsg = (rlocflags & RLOC_NOMSG) != 0;
     boolean vanishmsg = (rlocflags & RLOC_MSG) != 0;
     boolean appearmsg = (mtmp->mstrategy & STRAT_APPEARMSG) != 0;
-    boolean domsg = !gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg;
+    boolean domsg = !gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg &&
+        mtmp != u.ustuck;
     boolean telemsg = FALSE;
 
     if (x == mtmp->mx && y == mtmp->my && m_at(x, y) == mtmp)
