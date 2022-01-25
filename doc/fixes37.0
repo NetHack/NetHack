@@ -761,6 +761,7 @@ when already at level 30 and gaining another level--which doesn't increase
 	level further but does add more HP and Pw--throttle the increases
 don't stop running when next to a peaceful, unless it blocks the way
 mindless monsters shouldn't cringe stepping on squeaky boards
+falling down a hole or trapdoor will cause damage proportional to fall height
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
