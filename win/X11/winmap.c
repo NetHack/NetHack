@@ -1199,12 +1199,10 @@ map_exposed(Widget w, XtPointer client_data, /* unused */
         t_width = map_info->text_map.square_width;
     }
     start_row = y / t_height;
-    stop_row = ((y + height) / t_height)
-               + ((((y + height) % t_height) == 0) ? 0 : 1) - 1;
+    stop_row = ((y + height) / t_height) + 1;
 
     start_col = x / t_width;
-    stop_col = ((x + width) / t_width)
-               + ((((x + width) % t_width) == 0) ? 0 : 1) - 1;
+    stop_col = ((x + width) / t_width) + 1;
 
 #ifdef VERBOSE
     printf("map_exposed: x = %d, y = %d, width = %d, height = %d\n", x, y,

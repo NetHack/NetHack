@@ -1414,6 +1414,7 @@ Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 X11: implement 'selectsaved', restore via menu of saved games
 X11: echo getline prompt and response (wishes, applying names) to message
 	window and dumplog message history
+X11: fix map expose area, no longer leaving black bars on the map
 
 
 NetHack Community Patches (or Variation) Included
