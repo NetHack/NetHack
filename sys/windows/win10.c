@@ -9,6 +9,7 @@
 #include "hack.h"
 
 typedef DPI_AWARENESS_CONTEXT(WINAPI *GetThreadDpiAwarenessContextProc)(VOID);
+typedef DPI_AWARENESS_CONTEXT(WINAPI *SetThreadDpiAwarenessContextProc)(DPI_AWARENESS_CONTEXT);
 typedef BOOL(WINAPI *AreDpiAwarenessContextsEqualProc)(
     DPI_AWARENESS_CONTEXT dpiContextA, DPI_AWARENESS_CONTEXT dpiContextB);
 typedef UINT(WINAPI *GetDpiForWindowProc)(HWND hwnd);
@@ -17,6 +18,7 @@ typedef LONG (WINAPI *GetCurrentPackageFullNameProc)(UINT32 *packageFullNameLeng
 
 typedef struct {
     BOOL Valid;
+    SetThreadDpiAwarenessContextProc SetThreadDpiAwarenessContext;
     GetThreadDpiAwarenessContextProc GetThreadDpiAwarenessContext;
     AreDpiAwarenessContextsEqualProc AreDpiAwarenessContextsEqual;
     GetDpiForWindowProc GetDpiForWindow;
@@ -33,6 +35,10 @@ void win10_init(void)
 
         if (hUser32 == NULL) 
             panic("Unable to load user32.dll");
+
+        gWin10.SetThreadDpiAwarenessContext = (SetThreadDpiAwarenessContextProc) GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
+        if (gWin10.SetThreadDpiAwarenessContext == NULL)
+            panic("Unable to get address of SetThreadDpiAwarenessContext()");
 
         gWin10.GetThreadDpiAwarenessContext = (GetThreadDpiAwarenessContextProc) GetProcAddress(hUser32, "GetThreadDpiAwarenessContext");
         if (gWin10.GetThreadDpiAwarenessContext == NULL)
@@ -63,6 +69,10 @@ void win10_init(void)
     }
 
     if (gWin10.Valid) {
+        if (!gWin10.SetThreadDpiAwarenessContext(
+                DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
+            panic("Unable to set DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2");
+
         if (!gWin10.AreDpiAwarenessContextsEqual(
                 gWin10.GetThreadDpiAwarenessContext(),
                 DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2))
