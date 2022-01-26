@@ -142,7 +142,7 @@ DEBUGINFO = Y
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 !IFNDEF LUA_VERSION
-LUAVER=5.4.3
+LUAVER=5.4.4
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -151,7 +151,7 @@ LUAVER=$(LUA_VERSION)
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.3.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -437,7 +437,7 @@ OPTIONS_FILE = $(DAT)\options
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.3.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
 #=================================================================
 
 !IFNDEF LUAVER
@@ -453,8 +453,8 @@ LUAVER   = 5.4.1
 !IF "$(LUATMP)" == "5.4.2"
 LUAVER   = 5.4.2
 !ENDIF
-!IF "$(LUATMP)" == "5.4.3"
-LUAVER   = 5.4.3
+!IF "$(LUATMP)" == "5.4.4"
+LUAVER   = 5.4.4
 !ENDIF
 !ELSE
 !ERROR NetHack 3.7 requires LUA so LUATOP must be defined
@@ -466,7 +466,7 @@ LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
 !IF "$(LUATMP)" == "5.3.5"
 LUAVER   = 5.3.5
 !ELSE
-LUAVER   = 5.4.3
+LUAVER   = 5.4.4
 !ENDIF
 !ENDIF
 !ENDIF

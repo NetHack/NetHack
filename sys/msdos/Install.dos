@@ -44,7 +44,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
     and pdcurses from:
         https://github.com/wmcbrine/PDCurses.git
     and Lua from:
-        http://www.lua.org/ftp/lua-5.4.3.tar.gz
+        http://www.lua.org/ftp/lua-5.4.4.tar.gz
 
     - A shell script to download the above-mentioned djgpp cross-compiler and
       associated support pieces for either linux or macOS is available:
