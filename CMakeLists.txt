@@ -93,7 +93,7 @@ file(
 
 # nethack executable.
 add_executable(nethack ${NETHACK_SRC})
-target_link_libraries(nethack ncurses ${TOPLUALIB})
+target_link_libraries(nethack ncurses ${TOPLUALIB} ${CMAKE_DL_LIBS} m)
 
 # TODO: Add check-dlb, Guidebook
 add_dependencies(nethack util dat lua_support)
