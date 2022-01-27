@@ -54,6 +54,7 @@ ExternalProject_Add(
   BUILD_IN_SOURCE TRUE
   CONFIGURE_COMMAND ""
   BUILD_COMMAND make
+  BUILD_BYPRODUCTS <BINARY_DIR>/src/liblua.a
   INSTALL_COMMAND ""
   STEP_TARGETS build)
 
@@ -92,7 +93,7 @@ file(
 
 # nethack executable.
 add_executable(nethack ${NETHACK_SRC})
-target_link_libraries(nethack ncurses ${TOPLUALIB})
+target_link_libraries(nethack ncurses ${TOPLUALIB} ${CMAKE_DL_LIBS} m)
 
 # TODO: Add check-dlb, Guidebook
 add_dependencies(nethack util dat lua_support)
