@@ -1486,6 +1486,9 @@ use %lu, not %d, in format string in timer_sanity_check() (pr #617 by argrath)
 bad cast making sp_lev chameleon light source (pr #625 by entrez)
 add Ray Chason's adaptation of nethack's Qt5 interface to work with Qt6 (issue
 	#525 followup comment by chasonr)
+mingw32 build updates and replacement of sys/windows/Makefile.gcc with new
+	sys/windows/Makefile.mingw32 and sys/windows/Makefile.mingw32.depend
+	(pr #661 by feiyunw)
 
 
 Code Cleanup and Reorganization
