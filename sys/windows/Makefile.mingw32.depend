@@ -1,6 +1,6 @@
 .PHONY: depend cleandep
 
-cce = gcc -E -MM -MT $(@:d=o)
+cce = gcc -E -MM -MT "$(@:d=o) $@"
 
 # Copy all $(cc) commands w/ their targets from Makefile.mingw32, 3rd party code unnecessary
 # Replace .o w/ .d, $(cc) w/ $(cce)
@@ -115,7 +115,6 @@ depend: $(DEP_TARGETS)
 
 cleandep:
 	@-rm -f $(DEP_TARGETS) .depend
-	@echo Done.
 
-CLEAN_FILE += .depend $(DEP_TARGETS)
+clean: cleandep
 # end of file
