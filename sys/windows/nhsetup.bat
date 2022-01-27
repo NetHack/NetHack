@@ -1,5 +1,5 @@
 @REM  NetHack 3.7	nhsetup.bat	$NHDT-Date: 1596498315 2020/08/03 23:45:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $ */
-@REM  Copyright (c) NetHack PC Development Team 1993-2021
+@REM  Copyright (c) NetHack Development Team 1993-2022
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.windows for details
 @REM
@@ -45,17 +45,6 @@ echo           ..\..\src\Makefile-orig
 :domsc
 copy Makefile.msc ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
-
-echo Copying MinGW Makefile - Makefile.gcc to ..\..\src\Makefile.gcc...
-if NOT exist ..\..\src\Makefile.gcc goto :dogcc
-copy ..\..\src\Makefile.gcc ..\..\src\Makefile.gcc-orig >nul
-echo      Your existing
-echo           ..\..\src\Makefile.gcc
-echo      has been renamed to
-echo           ..\..\src\Makefile.gcc-orig
-:dogcc
-copy Makefile.gcc ..\..\src\Makefile.gcc >nul
-echo MinGW Makefile copied ok.
 
 echo Done copying files.
 goto :done
