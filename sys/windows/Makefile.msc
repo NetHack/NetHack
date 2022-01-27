@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.msc
-#       Copyright (c) NetHack PC Development Team 1993-2021
+#       Copyright (c) NetHack PC Development Team 1993-2022
 #
 #==============================================================================
 # Build Tools Environment
@@ -21,37 +21,11 @@
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.exe
 #
-#   BEFORE YOU START, in addition to your C compiler and linker,
-#
-#       o You will need a complete Lua source tree parallel to your
-#         NetHack source tree. Lua is not an optional requirement,
-#         it is required in order to process the level and dungeon
-#         description files during the game. You can obtain the
-#         Lua source from here:
-#             https://www.lua.org/download.html
-#
-#       o If you want to include the curses Window port in the non-GUI
-#         NetHack.exe build, you will need a complete PDCurses source
-#         tree parallel to your NetHack source tree. You can obtain the
-#         PDCurses source from here:
-#             https://sourceforge.net/projects/pdcurses/files/pdcurses/
-#         or via git from here:
-#             git clone https://github.com/wmcbrine/PDCurses.git ../pdcurses
-#
-#       o If you want your build of NetHack to include support for
-#         compressing your save files, or to be able to exchange and use
-#         compressed save files that originated on another platform such
-#         as Linux or a handheld phone or tablet, then you will need
-#         a copy of the zlib source tree parallel to your NetHack source
-#         tree. You can obtain the zlib source from here:
-#             https://www.zlib.net/zlib1211.zip
-#
-#   If you want to find out more information about Lua, PDCurses, or zlib,
+#   If you want to find out more information about Lua or PDCurses
 #   here are the home page links for each at the time of this writing:
 #
 #         Lua:       https://www.lua.org/
 #         PDCurses:  https://pdcurses.org/
-#         zlib:      https://www.zlib.net/
 #
 #   If you have any questions about building NetHack for the Windows platform
 #   please read sys/windows/Install.windows file included in the distribution.
@@ -68,19 +42,9 @@
 #       1. Do you have git commands in your path and NetHack in a
 #          git repository?
 #	2. Where do you want your build results to end up?
-#       3. Do you want to include the optional curses port?
-#       4. Do you want to include compressed savefile support to
-#          transfer compressed savefiles between platforms?
-#	5. Do you want debug information in the executable?
-#	6. Do you want to explicitly override auto-detection of
+#	3. Do you want debug information in the executable?
+#	4. Do you want to explicitly override auto-detection of
 #          a 32-bit or 64-bit target?
-#
-# Mandatory Lua source Location (not optional)
-#
-#       Lua source code or is required to build NetHack-3.7.
-#       LUATOP below must point to the correct location of the LUA sources.
-#       By default it is assumed to be parallel to your NetHack source tree in
-#       the same parent directory/folder.
 #
 #------------------------------------------------------------------------------
 #==============================================================================
@@ -99,35 +63,12 @@ GIT_AVAILABLE = 1
 GAMEDIR = ..\binary               # Default game build directory
 #
 #------------------------------------------------------------------------------
-# OPTIONAL - Curses window port support
-#
-# 3. Uncomment these and set them appropriately if you want to
-#    include curses port support alongside TTY support in your
-#    NetHack.exe binary.
-#
-#    You'll have to set PDCURSES_H to the correct location of the
-#    PDCurses header (.h) files and PDCURSES_C to the location
-#    of your PDCurses C files.
-#
-#ADD_CURSES=Y
-#PDCURSES_TOP=..\lib\pdcurses
-#
-#------------------------------------------------------------------------------
-# OPTIONAL - zlib support (to allow compressed savefile exchange across platforms
-#
-# 4. Location of zlib sources
-#
-#
-#ADD_ZLIB=Y
-#ZLIBTOP=..\lib\zlib
-#
-#------------------------------------------------------------------------------
-# 5. Do you want debug information available to the executable?
+# 3. Do you want debug information available to the executable?
 #
 DEBUGINFO = Y
 #
 #------------------------------------------------------------------------------
-# 6. This Makefile will attempt to auto-detect your selected target architecture
+# 4. This Makefile will attempt to auto-detect your selected target architecture
 #    based on Visual Studio command prompt configuration settins etc.
 #    However, if you want to manually override generation of a
 #    32-bit or 64-bit build target, you can uncomment the apppropriate
@@ -141,27 +82,6 @@ DEBUGINFO = Y
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
-!IFNDEF LUA_VERSION
-LUAVER=5.4.4
-!ELSE
-LUAVER=$(LUA_VERSION)
-!ENDIF
-#==============================================================================
-#
-# Location of LUA
-#
-# Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
-#
-#    This build assumes that the LUA sources are located
-#    at the specified location. If they are actually elsewhere
-#    you'll need to specify the correct spot below in order to
-#    successfully build NetHack-3.7.  You cannot build a functional
-#    version of NetHack-3.7 Work-in-progress without including Lua.
-#
-LUATOP=..\lib\lua-$(LUAVER)
-#
-#
 #==============================================================================
 #
 #TEST_CROSSCOMPILE=Y
@@ -268,6 +188,100 @@ CROSSCOMPILE= -DCROSSCOMPILE
 HOST=
 CROSSCOMPILE_TARGET=
 CROSSCOMPILE=
+!ENDIF
+
+#===============-=================================================
+# LUA library
+# Official source for Lua is http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#
+# Source for the NetHack repository submodule in ../submodules/lua
+# is https://github.com/lua/lua.git
+#=================================================================
+!IFNDEF LUA_VERSION
+LUAVER=5.4.4
+!ELSE
+LUAVER=$(LUA_VERSION)
+!ENDIF
+#==============================================================================
+#
+# Location of LUA
+#
+# Original source needs to be obtained from:
+#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.  You cannot build a functional
+#    version of NetHack-3.7 Work-in-progress without including Lua.
+#
+LUATOP=..\submodules\lua
+
+!IFNDEF LUAVER
+LUAVER=5.4.4
+!ENDIF
+
+LUASRC   = $(LUATOP)
+LUALIB   = $(O)lua$(LUAVER)-static.lib
+LUADLL   = $(O)lua$(LUAVER).dll
+LUAINCL  = /I$(LUASRC)
+LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c              \
+		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
+		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
+		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
+		loslib.c lparser.c lstate.c lstring.c lstrlib.c  \
+		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
+		lvm.c lzio.c
+
+LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o                \
+		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
+		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
+		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
+		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
+		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
+		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
+		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
+
+!IF "$(LUAVER)" == "5.3.5"
+LUASRCFILES = $(LUASRCFILES) lbitlib.c
+LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
+!ELSE
+#  5.4.0 added header files ljumptab.h and lopnames.h
+#        and removes lbitlib.c
+!ENDIF
+#===============-=================================================
+# PDCurses build macros
+# Source for the NetHack repository submodule in ../submodules/PDCurses
+# is https://github.com/wmcbrine/PDCurses.git
+#=================================================================
+ADD_CURSES=Y
+!IF "$(ADD_CURSES)" == "Y"
+PDCURSES_TOP = ..\submodules\pdcurses
+PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
+PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
+PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
+PDCSRC                  = $(PDCURSES_TOP)\pdcurses
+PDCWINCON               = $(PDCURSES_TOP)\wincon
+
+PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o \
+	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o \
+	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o \
+	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o \
+	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o \
+	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
+	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
+
+PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
+	$(O)pdcsetsc.o $(O)pdcutil.o
+
+PDCLIB = $(O)pdcurses.lib
+
+PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
+
+!ELSE
+PDCLIB =
 !ENDIF
 
 HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
@@ -393,12 +407,8 @@ GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
 GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 !ENDIF
 
-!IFNDEF ADD_CURSES
-CURSESOBJ=
-!ELSE
 CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
-!ENDIF
 
 SOBJ   = $(O)windmain.o $(O)windsys.o $(O)win10.o \
 	$(O)safeproc.o $(O)nhlan.o $(SOUND)
@@ -434,104 +444,6 @@ VVOBJ  = $(O)version.o
 ALLOBJ  = $(SOBJ) $(DLBOBJ)  $(WOBJ) $(OBJS) $(VVOBJ) $(LUAOBJ)
 
 OPTIONS_FILE = $(DAT)\options
-
-#===============-=================================================
-# LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
-#=================================================================
-
-!IFNDEF LUAVER
-!IFDEF LUATOP
-LUATMP   = $(LUATOP:..\lib\lua-=)    #strip leading "..\lib\lua-"
-LUATMP   = $(LUATMP:-beta=)         #strip suffix if exists "-beta"
-!IF "$(LUATMP)" == "5.4.0"
-LUAVER   = 5.4.0
-!ENDIF
-!IF "$(LUATMP)" == "5.4.1"
-LUAVER   = 5.4.1
-!ENDIF
-!IF "$(LUATMP)" == "5.4.2"
-LUAVER   = 5.4.2
-!ENDIF
-!IF "$(LUATMP)" == "5.4.4"
-LUAVER   = 5.4.4
-!ENDIF
-!ELSE
-!ERROR NetHack 3.7 requires LUA so LUATOP must be defined
-!ENDIF
-
-!IFNDEF LUAVER
-LUATMP   = $(LUATOP:..\lib\LUA-=)    #strip leading "..\lib\LUA-"
-LUATMP   = $(LUATMP:-BETA=)         #strip suffix if exists "-BETA"
-!IF "$(LUATMP)" == "5.3.5"
-LUAVER   = 5.3.5
-!ELSE
-LUAVER   = 5.4.4
-!ENDIF
-!ENDIF
-!ENDIF
-
-LUASRC   = $(LUATOP)\src
-LUALIB   = $(O)lua$(LUAVER)-static.lib
-LUADLL   = $(O)lua$(LUAVER).dll
-LUAINCL  = /I$(LUASRC)
-LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
-
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c              \
-		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
-		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
-		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
-		loslib.c lparser.c lstate.c lstring.c lstrlib.c  \
-		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
-		lvm.c lzio.c
-
-LUAOBJFILES =   $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o                \
-		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
-		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o         \
-		$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
-		$(O)lmathlib.o $(O)lmem.o $(O)loadlib.o $(O)lobject.o  \
-		$(O)lopcodes.o $(O)loslib.o $(O)lparser.o $(O)lstate.o \
-		$(O)lstring.o $(O)lstrlib.o $(O)ltable.o $(O)ltablib.o \
-		$(O)ltm.o $(O)lundump.o $(O)lutf8lib.o $(O)lvm.o $(O)lzio.o
-
-!IF "$(LUAVER)" == "5.3.5"
-LUASRCFILES = $(LUASRCFILES) lbitlib.c
-LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
-!ELSE
-#  5.4.0 added header files ljumptab.h and lopnames.h
-#        and removes lbitlib.c
-!ENDIF
-
-!IF "$(ADD_CURSES)" == "Y"	
-#===============-=================================================
-# PDCurses build macros
-# Latest PDCurses from https://github.com/wmcbrine/PDCurses.git
-#=================================================================
-
-PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
-PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
-PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
-PDCSRC                  = $(PDCURSES_TOP)\pdcurses
-PDCWINCON               = $(PDCURSES_TOP)\wincon
-
-PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o \
-	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o \
-	$(O)getch.o $(O)getstr.o $(O)getyx.o $(O)inch.o $(O)inchstr.o \
-	$(O)initscr.o $(O)inopts.o $(O)insch.o $(O)insstr.o $(O)instr.o $(O)kernel.o \
-	$(O)keyname.o $(O)mouse.o $(O)move.o $(O)outopts.o $(O)overlay.o $(O)pad.o \
-	$(O)panel.o $(O)printw.o $(O)refresh.o $(O)scanw.o $(O)scr_dump.o $(O)scroll.o \
-	$(O)slk.o $(O)termattr.o $(O)touch.o $(O)util.o $(O)window.o $(O)debug.o
-
-PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
-	$(O)pdcsetsc.o $(O)pdcutil.o
-
-PDCLIB = $(O)pdcurses.lib
-
-PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
-
-!ELSE
-PDCLIB =
-!ENDIF
 
 #==========================================
 # Header file macros
@@ -578,7 +490,7 @@ DATABASE = $(DAT)\data.base
 # ctags options
 #
 #CTAGSCMD=ctags-orig.exe
-!IF "$(TRAVIS_BUILD_DIR)" != ""	
+!IF "$(TRAVIS_BUILD_DIR)" != ""
 CTAGSCMD=..\lib\ctags\ctags.exe
 !ELSE
 CTAGSCMD=..\..\..\ctags\ctags.exe
@@ -925,11 +837,15 @@ default : install
 
 all :	install
 
-install: $(INCL)\nhlua.h $(O)envchk.tag $(O)obj.tag $(O)utility.tag \
+install: $(LUATOP)\lua.h $(INCL)\nhlua.h $(O)envchk.tag $(O)obj.tag $(O)utility.tag \
 		$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DAT)\engrave \
 		$(DAT)\epitaph $(DAT)\bogusmon $(GAMEDIR)\NetHack.exe \
 		$(GAMEDIR)\NetHackW.exe $(O)install.tag
 	@echo Done.
+
+$(LUATOP)\lua.h:
+	git submodule init
+	git submodule update --remote
 
 #==========================================
 #  Main game targets.
@@ -1078,11 +994,11 @@ $(O)utility.tag: $(INCL)\nhlua.h $(U)tile2bmp.exe $(U)makedefs.exe
 	     @echo utilities made.
 
 $(INCL)\nhlua.h:
-	@echo  /* nhlua.h - generated by Makefile */ > $@
-	@echo #include "../lib/lua-$(LUAVER)/src/lua.h" >> $@
+	@echo  /* nhlua.h - generated by Makefile from Makefile.msc */ > $@
+	@echo #include "../submodules/lua/lua.h" >> $@
 	@echo LUA_API int   (lua_error) (lua_State *L) NORETURN; >> $@
-	@echo #include "../lib/lua-$(LUAVER)/src/lualib.h" >> $@
-	@echo #include "../lib/lua-$(LUAVER)/src/lauxlib.h" >> $@
+	@echo #include "../submodules/lua/lualib.h" >> $@
+	@echo #include "../submodules/lua/lauxlib.h" >> $@
 	@echo /*nhlua.h*/ >> $@
 
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
@@ -1307,7 +1223,7 @@ $(O)dlb$(HOST).o: $(O)dlb_main$(HOST).o $(O)alloc$(HOST).o $(O)panic$(HOST).o $(
 
 $(O)dlb.o: $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) /Fo$@ $(SRC)\dlb.c
-	
+
 !IFDEF TEST_CROSSCOMPILE
 $(O)dlb_main$(HOST).o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) /Fo$@ $(UTIL)\dlb_main.c
@@ -1494,8 +1410,8 @@ $(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscr
 lua.exe: $(O)lua.o $(LUALIB)
 	link /OUT:$@ $(O)lua.o $(LUALIB)
 
-luac.exe: $(O)luac.o $(LUALIB)
-	link /OUT:$@ $(O)luac.o $(LUALIB)
+#luac.exe: $(O)luac.o $(LUALIB)
+#	link /OUT:$@ $(O)luac.o $(LUALIB)
 
 $(O)lua$(LUAVER).dll: $(LUAOBJFILES)
 	link /DLL /IMPLIB:lua$(LUAVER).lib /OUT:$@ $(LUAOBJFILES)
@@ -1504,7 +1420,7 @@ $(O)lua$(LUAVER)-static.lib: $(LUAOBJFILES)
 	lib /OUT:$@ $(LUAOBJFILES)
 
 $(O)lua.o: $(LUASRC)\lua.c
-$(O)luac.o: $(LUASRC)\luac.c
+#$(O)luac.o: $(LUASRC)\luac.c
 $(O)lapi.o: $(LUASRC)\lapi.c
 	@$(cc) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -wd4244 -wd4701 -wd4702 -Fo$@ $(LUASRC)\lapi.c
 
@@ -1722,7 +1638,7 @@ spotless: clean
 	if exist $(U)tilemap.exe         del $(U)tilemap.exe
 	if exist $(U)uudecode.exe        del $(U)uudecode.exe
 	if exist $(U)dlb.exe             del $(U)dlb.exe
-!IF "$(ADD_CURSES)" == "Y"	
+!IF "$(ADD_CURSES)" == "Y"
 	if exist $(O)pdcurses.lib        del $(O)pdcurses.lib
 !ENDIF
 	if exist $(DAT)\oracles		 del $(DAT)\oracles
