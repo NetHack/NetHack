@@ -207,8 +207,7 @@ dig_check(struct monst *madeby, boolean verbose, int x, int y)
     } else if ((IS_ROCK(levl[x][y].typ) && levl[x][y].typ != SDOOR
                 && (levl[x][y].wall_info & W_NONDIGGABLE) != 0)
                || (ttmp
-                   && (ttmp->ttyp == MAGIC_PORTAL
-                       || ttmp->ttyp == VIBRATING_SQUARE
+                   && (undestroyable_trap(ttmp->ttyp)
                        || (!Can_dig_down(&u.uz) && !levl[x][y].candig)))) {
         if (verbose)
             pline_The("%s here is too hard to %s.", surface(x, y), verb);
@@ -790,8 +789,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     nohole = (!Can_dig_down(&u.uz) && !lev->candig);
     old_typ = lev->typ;
 
-    if ((ttmp && (ttmp->ttyp == MAGIC_PORTAL
-                  || ttmp->ttyp == VIBRATING_SQUARE || nohole))
+    if ((ttmp && (undestroyable_trap(ttmp->ttyp) || nohole))
         || (IS_ROCK(old_typ) && old_typ != SDOOR
             && (lev->wall_info & W_NONDIGGABLE) != 0)) {
         pline_The("%s %shere is too hard to dig in.", surface(dig_x, dig_y),

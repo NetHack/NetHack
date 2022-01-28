@@ -84,6 +84,13 @@ enum trap_types {
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
+#define undestroyable_trap(ttyp) ((ttyp) == MAGIC_PORTAL         \
+                                  || (ttyp) == VIBRATING_SQUARE)
+#define is_magical_trap(ttyp) ((ttyp) == TELEP_TRAP     \
+                               || (ttyp) == LEVEL_TELEP \
+                               || (ttyp) == MAGIC_TRAP  \
+                               || (ttyp) == ANTI_MAGIC  \
+                               || (ttyp) == POLY_TRAP)
 /* "transportation" traps */
 #define is_xport(ttyp) ((ttyp) >= TELEP_TRAP && (ttyp) <= MAGIC_PORTAL)
 

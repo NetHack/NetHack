@@ -1365,6 +1365,7 @@ drinking blessed potion of full healing heals wounded legs, either hero's or
 	steed's (when riding, wounded leg injury applies to steed, not hero)
 drinking uncursed potion of full healing or blessed potion of extra healing
 	heal hero's wounded legs when not riding; no effect on steed if riding
+cancellation explodes most magical traps
 
 
 Platform- and/or Interface-Specific New Features
