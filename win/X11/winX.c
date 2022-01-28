@@ -1,4 +1,4 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1641763627 2022/01/09 21:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1643328675 2022/01/28 00:11:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1505,6 +1505,12 @@ X11_init_nhwindows(int *argcp, char **argv)
     /* Init windows to nothing. */
     for (i = 0; i < MAX_WINDOWS; i++)
         window_list[i].type = NHW_NONE;
+
+    /* force high scores display to be shown in a window, and don't allow
+       that to be toggled off via 'O' (note: 'nethack -s' won't reach here;
+       its output goes to stdout and could be redirected into a file) */
+    iflags.toptenwin = TRUE;
+    set_option_mod_status("toptenwin", set_in_config);
 
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, set_in_game);
