@@ -80,10 +80,10 @@ BUGS
        nism to avoid conflicts.
 
 COPYRIGHT
-       This file is  Copyright  (C)  Kenneth  Lorber  and  was  last  modified
-       2018/04/25  (version  NetHack-3.6.0:1.9).  NetHack may be freely redis-
-       tributed.  See license for details.
+       This  file  is  Copyright  (C)  Kenneth  Lorber,   2022   for   version
+       NetHack-3.6.0:1.9.   NetHack  may be freely redistributed.  See license
+       for details.
 
 
 
-NETHACK                        14 December 2015                     RECOVER(6)
+NETHACK                         22 January 2022                     RECOVER(6)

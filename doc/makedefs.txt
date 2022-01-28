@@ -132,14 +132,11 @@ MDGREP FUNCTIONS
 AUTHOR
        The NetHack Development Team
 
-SEE ALSO
-       dgn_comp(6)
-
 COPYRIGHT
-       This file is  Copyright  (C)  Kenneth  Lorber  and  was  last  modified
-       2018/04/25  (version NetHack-3.6.0:1.10).  NetHack may be freely redis-
-       tributed.  See license for details.
+       This  file  is  Copyright  (C)  Kenneth  Lorber,   2022   for   version
+       NetHack-3.6.0:1.10.   NetHack may be freely redistributed.  See license
+       for details.
 
 
 
-NETHACK                           1 Jan 2020                       MAKEDEFS(6)
+NETHACK                         22 January 2022                    MAKEDEFS(6)

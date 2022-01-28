@@ -339,13 +339,14 @@ vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/windows:
 (files for Windows 7/8.x/10 version)
-.nethackrc.template  Install.windows      Makefile.gcc
-Makefile.msc         console.rc           consoletty.c
-nethack.def          nhico.uu             nhsetup.bat
-ntsound.c            porthelp             stub-pdcscrn.c
-stubs.c              sysconf.template     travis-gcc.sh
-win10.c              win10.h              win32api.h
-windmain.c           windsys.c            winos.h
+.nethackrc.template      Install.windows          Makefile.mingw32
+Makefile.mingw32.depend  Makefile.msc             console.rc
+consoletty.c             nethack.def              nhico.uu
+nhsetup.bat              ntsound.c                porthelp
+stub-pdcscrn.c           stubs.c                  sysconf.template
+travis-gcc.sh            win10.c                  win10.h
+win32api.h               windmain.c               windsys.c
+winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2017 or 2019 Community Edition builds)
