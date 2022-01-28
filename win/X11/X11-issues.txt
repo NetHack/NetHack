@@ -18,20 +18,6 @@ fill that space immediately.  But if it is made wider, handling of the
 extra space seems to be erratic and it is sometimes left blank until
 window is dismissed and re-created via 'i' or toggling 'perm_invent'.
 
-When the map is clipped, sometimes panning leaves a gap in the display.
-Test case was with the map manually resized to avoid overlap with the
-persistent inventory window (resizing added scrollbars which hadn't
-been there previously).  The level was fully mapped and hero was in a
-room on the left side; clicking on horizontal scrollbar to pan to the
-right rendered the map correctly.  However, issuing a command that
-caused the map to auto-pan back to show the hero didn't render it
-correctly.  A portion of map which had been hidden beneath the vertical
-scrollbar while panned got moved into the middle of the window but got
-shown there with a vertical strip of unrendered background that was
-approximately half the width of the vertical scrollbar.  It wasn't
-inserted space in between two sides of map; it was undrawn map.  If it
-had been drawn, the map would have been normal.
-
 Menus which have entries that are too wide to display have their wide
 lines truncated rather than adding a horizontal scrollbar.  Resizing
 larger doesn't recover truncated text and resizing smaller truncates
