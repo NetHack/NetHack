@@ -139,9 +139,9 @@ steps:
     export LUA_VERSION=5.4.4
     export TRAVIS_COMPILER=1
     cp ../sys/windows/Makefile.mingw32* .
-    mingw32-make -f Makefile.mingw32 clean
-    mingw32-make -f Makefile.mingw32 depend
-    mingw32-make -f Makefile.mingw32
+    mingw32-make -f Makefile.mingw32 LUA_VERSION=$LUA_VERSION clean
+    mingw32-make -f Makefile.mingw32 LUA_VERSION=$LUA_VERSION depend
+    mingw32-make -f Makefile.mingw32 LUA_VERSION=$LUA_VERSION
   condition: eq( variables.toolchain, 'mingw' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src
   displayName: 'MinGW Build'
