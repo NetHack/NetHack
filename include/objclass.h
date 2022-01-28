@@ -147,6 +147,7 @@ enum objclass_syms {
 
 #define BURNING_OIL (MAXOCLASSES + 1) /* Can be used as input to explode.   */
 #define MON_EXPLODE (MAXOCLASSES + 2) /* Exploding monster (e.g. gas spore) */
+#define TRAP_EXPLODE (MAXOCLASSES + 3)
 
 #if 0 /* moved to decl.h so that makedefs.c won't see them */
 extern const struct class_sym

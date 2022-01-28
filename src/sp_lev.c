@@ -5256,8 +5256,7 @@ ensure_way_out(void)
     }
 
     while (ttmp) {
-        if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE
-             || is_hole(ttmp->ttyp))
+        if ((undestroyable_trap(ttmp->ttyp) || is_hole(ttmp->ttyp))
             && !selection_getpoint(ttmp->tx, ttmp->ty, ov))
             selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
         ttmp = ttmp->ntrap;

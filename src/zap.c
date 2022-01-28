@@ -21,6 +21,7 @@ static void zhitu(int, int, const char *, xchar, xchar);
 static void revive_egg(struct obj *);
 static boolean zap_steed(struct obj *);
 static void skiprange(int, int *, int *);
+static void maybe_explode_trap(struct trap *, struct obj *);
 static int zap_hit(int, int);
 static void disintegrate_mon(struct monst *, int, const char *);
 static int adtyp_to_prop(int);
@@ -3138,6 +3139,10 @@ zap_updown(struct obj *obj) /* wand or spell */
                 break;
             }
         }
+
+        maybe_explode_trap(ttmp, obj);
+        /* note: ttmp might be now gone */
+
     } else if (u.dz < 0) {
         /* zapping upward */
 
@@ -3335,6 +3340,34 @@ skiprange(int range, int *skipstart, int *skipend)
         *skipend = tmp - 1;
 }
 
+/* maybe explode a trap hit by object otmp's effect;
+   cancellation beam hitting a magical trap causes an explosion.
+   might delete the trap.  */
+static void
+maybe_explode_trap(struct trap *ttmp, struct obj *otmp)
+{
+    if (!ttmp || !otmp)
+        return;
+    if (otmp->otyp == WAN_CANCELLATION || otmp->otyp == SPE_CANCELLATION) {
+        xchar x = ttmp->tx, y = ttmp->ty;
+
+        if (undestroyable_trap(ttmp->ttyp)) {
+            shieldeff(x, y);
+            if (cansee(x, y)) {
+                ttmp->tseen = 1;
+                newsym(x, y);
+            }
+        } else if (is_magical_trap(ttmp->ttyp)) {
+            if (!Deaf)
+                pline("Kaboom!");
+            explode(x, y, -WAN_CANCELLATION,
+                    20+d(3,6), TRAP_EXPLODE, EXPL_MAGICAL);
+            deltrap(ttmp);
+            newsym(x, y);
+        }
+    }
+}
+
 /*
  *  Called for the following distance effects:
  *      when a weapon is thrown (weapon == THROWN_WEAPON)
@@ -3467,6 +3500,9 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
             if (learn_it)
                 learnwand(obj);
         }
+
+        if (weapon == ZAPPED_WAND)
+            maybe_explode_trap(t_at(g.bhitpos.x, g.bhitpos.y), obj);
 
         mtmp = m_at(g.bhitpos.x, g.bhitpos.y);
 
