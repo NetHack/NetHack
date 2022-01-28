@@ -96,7 +96,7 @@ DEBUGINFO = N
 
 #---------------------------------------------------------------
 ifndef LUA_VERSION
-LUAVER=5.4.3
+LUAVER=5.4.4
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -104,7 +104,7 @@ endif
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.3.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -206,10 +206,10 @@ rc = windres --target=pe-i386
 else
 cc = gcc -c
 ld = gcc
-ifeq "$(MSYSTEM)" "MINGW64"
-rc = windres --target=pe-x86-64
-else # MINGW32
+ifeq "$(MSYSTEM)" "MINGW32"
 rc = windres --target=pe-i386
+else # MINGW32
+rc = windres --target=pe-x86-64
 endif
 endif
 
@@ -250,7 +250,7 @@ CLEAN_DIR = $(GAMEDIR) $(OBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.3.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
 #=================================================================
 
 OLUA = $(O)lua

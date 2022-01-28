@@ -2793,7 +2793,7 @@ static boolean qwertz = FALSE;
 #endif
 #define inmap(x, vk) (((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
-const struct pad {
+struct pad {
     uchar normal, shift, cntrl;
 };
 
