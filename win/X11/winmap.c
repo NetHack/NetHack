@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmap.c	$NHDT-Date: 1596498372 2020/08/03 23:46:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.7	winmap.c	$NHDT-Date: 1643328598 2022/01/28 00:09:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,8 +71,11 @@ static void display_cursor(struct xwindow *);
 /* Global functions ======================================================= */
 
 void
-X11_print_glyph(winid window, xchar x, xchar y, const glyph_info *glyphinfo,
-                const glyph_info *bkglyphinfo UNUSED)
+X11_print_glyph(
+    winid window,
+    xchar x, xchar y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo UNUSED)
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -193,7 +196,10 @@ static struct tile_annotation pet_annotation;
 static struct tile_annotation pile_annotation;
 
 static void
-init_annotation(struct tile_annotation *annotation, char *filename, Pixel colorpixel)
+init_annotation(
+    struct tile_annotation *annotation,
+    char *filename,
+    Pixel colorpixel)
 {
     Display *dpy = XtDisplay(toplevel);
 
@@ -921,6 +927,8 @@ static void
 map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
 {
     int x, y;
+    glyph_info gi;
+    short unexp_idx, nothg_idx;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
     int mgunexp = ' ', mgnothg = ' ';
@@ -930,6 +938,11 @@ map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
     mgunexp = glyph2ttychar(GLYPH_UNEXPLORED);
     mgnothg = glyph2ttychar(GLYPH_NOTHING);
 
+    map_glyphinfo(0, 0, g_unexp, 0, &gi);
+    unexp_idx = gi.gm.tileidx;
+    map_glyphinfo(0, 0, g_nothg, 0, &gi);
+    nothg_idx = gi.gm.tileidx;
+
     /*
      * Tiles map tracks glyphs.
      * Text map tracks characters derived from glyphs.
@@ -938,6 +951,7 @@ map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
         for (y = 0; y < ROWNO; y++) {
             tile_map->glyphs[y][x].glyph = !x ? g_nothg : g_unexp;
             tile_map->glyphs[y][x].glyphflags = 0;
+            tile_map->glyphs[y][x].tileidx = !x ? nothg_idx : unexp_idx;
 
             text_map->text[y][x] = (uchar) (!x ? mgnothg : mgunexp);
 #ifdef TEXTCOLOR
@@ -1459,9 +1473,10 @@ static char map_translations[] = "#override\n\
  * The map window creation routine.
  */
 void
-create_map_window(struct xwindow *wp,
-                  boolean create_popup, /* parent is a popup shell that we create */
-                  Widget parent)
+create_map_window(
+    struct xwindow *wp,
+    boolean create_popup, /* True: parent is a popup shell that we create */
+    Widget parent)
 {
     struct map_info_t *map_info; /* map info pointer */
     Widget map, viewport;
