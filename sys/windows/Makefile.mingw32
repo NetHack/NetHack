@@ -208,7 +208,7 @@ cc = gcc -c
 ld = gcc
 ifeq "$(MSYSTEM)" "MINGW32"
 rc = windres --target=pe-i386
-else # MINGW32
+else # MINGW64
 rc = windres --target=pe-x86-64
 endif
 endif
