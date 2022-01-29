@@ -65,8 +65,8 @@ doc:
 (files for all versions)
 Gbk-1pg-pfx.mn     Gbk-1pg-sfx.mn     Guidebook.mn       Guidebook.tex
 Guidebook.txt      config.nh          dlb.6              dlb.txt
-fixes1-0-0.txt     fixes1-4-f.txt     fixes2-2-0.txt     fixes2-3-e.txt
-fixes3-0-0.txt     fixes3-0-pl01.txt  fixes3-0-pl02.txt  fixes3-0-pl03.txt
+fixes1-0--.txt     fixes1-4-f.txt     fixes2-2--.txt     fixes2-3-e.txt
+fixes3-0--.txt     fixes3-0-pl01.txt  fixes3-0-pl02.txt  fixes3-0-pl03.txt
 fixes3-0-pl04.txt  fixes3-0-pl05.txt  fixes3-0-pl06.txt  fixes3-0-pl07.txt
 fixes3-0-pl08.txt  fixes3-0-pl09.txt  fixes3-0-pl10.txt  fixes3-1-1.txt
 fixes3-1-2.txt     fixes3-1-3.txt     fixes3-2-0.txt     fixes3-2-1.txt
@@ -346,7 +346,7 @@ spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
 vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/windows:
-(files for Windows 7/8.x/10 version)
+(files for Windows 7/8.x/10/11 version)
 .nethackrc.template      Install.windows          Makefile.mingw32
 Makefile.mingw32.depend  Makefile.msc             console.rc
 consoletty.c             nethack.def              nhico.uu
@@ -356,7 +356,7 @@ win10.c                  win10.h                  win32api.h
 windmain.c               windsys.c                winos.h
 
 sys/windows/vs:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 NetHack.sln                   NetHackPackage.appxmanifest
 NetHackPackage.wapproj        NetHackProperties.props
 Package.StoreAssociation.xml  ScreenShot.PNG
@@ -368,7 +368,7 @@ dirs.props                    dll.props
 files.props
 
 sys/windows/vs/Images:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 BadgeLogo.scale-100.png
 BadgeLogo.scale-125.png
 BadgeLogo.scale-150.png
@@ -423,43 +423,43 @@ Wide310x150Logo.scale-200.png
 Wide310x150Logo.scale-400.png
 
 sys/windows/vs/NetHack:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 NetHack.vcxproj    afternethack.proj
 
 sys/windows/vs/NetHackW:
-(file for Visual Studio 2017 or 2019 Community Edition builds)
+(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 NetHackW.vcxproj
 
 sys/windows/vs/PDCurses:
-(file for Visual Studio 2017 or 2019 Community Edition builds)
+(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 PDCurses.vcxproj
 
 sys/windows/vs/dlb:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afterdlb.proj  dlb.vcxproj
 
 sys/windows/vs/makedefs:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 aftermakedefs.proj  makedefs.vcxproj
 
 sys/windows/vs/recover:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afterrecover.proj  recover.vcxproj
 
 sys/windows/vs/tile2bmp:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 aftertile2bmp.proj  tile2bmp.vcxproj
 
 sys/windows/vs/tilemap:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 aftertilemap.proj  tilemap.vcxproj
 
 sys/windows/vs/tiles:
-(file for Visual Studio 2017 or 2019 Community Edition builds)
+(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 tiles.vcxproj
 
 sys/windows/vs/uudecode:
-(files for Visual Studio 2017 or 2019 Community Edition builds)
+(files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afteruudecode.proj  uudecode.vcxproj
 
 test:
