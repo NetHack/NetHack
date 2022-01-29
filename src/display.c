@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1638622699 2021/12/04 12:58:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1643491545 2022/01/29 21:25:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,7 +15,7 @@
  * what to draw at a given location.  The routines for the vision system
  * can be found in vision.c and vision.h.  The routines for display can
  * be found in this file (display.c) and display.h.  The drawing routines
- * are part of the window port.  See doc/window.doc for the drawing
+ * are part of the window port.  See doc/window.txt for the drawing
  * interface.
  *
  * The display system deals with an abstraction called a glyph.  Anything

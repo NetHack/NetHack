@@ -1,10 +1,10 @@
-/* NetHack 3.7	winX.c	$NHDT-Date: 1643328675 2022/01/28 00:11:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.7	winX.c	$NHDT-Date: 1643491577 2022/01/29 21:26:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * "Main" file for the X window-port.  This contains most of the interface
- * routines.  Please see doc/window.doc for an description of the window
+ * routines.  Please see doc/window.txt for an description of the window
  * interface.
  */
 

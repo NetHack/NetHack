@@ -1,9 +1,9 @@
-/* NetHack 3.7	winX.h	$NHDT-Date: 1613272633 2021/02/14 03:17:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.7	winX.h	$NHDT-Date: 1643491525 2022/01/29 21:25:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- * Definitions for the X11 window-port.  See doc/window.doc for details on
+ * Definitions for the X11 window-port.  See doc/window.txt for details on
  * the window interface.
  */
 #ifndef WINX_H

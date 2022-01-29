@@ -44,7 +44,7 @@ new machine.  The basic steps in porting the program are:
 	    add an OS-specific library (see "msdos.c" and "tos.c" as
 	    examples) to provide functions NetHack wants and your OS lacks.
 
-	4.  If your machine uses a new windowing system, follow doc/window.doc
+	4.  If your machine uses a new windowing system, follow doc/window.txt
 	    carefully.  Put files implementing these routines in a win or
 	    sys subdirectory as appropriate.
 
@@ -268,6 +268,6 @@ by code within the game itself. That was done to facilitate cross-compiling of
 NetHack on one platform for game execution on another.
 
 
-# NetHack 3.7  Porting       $NHDT-Date: 1596498144 2020/08/03 23:42:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.9 $
+# NetHack 3.7  Porting       $NHDT-Date: 1643491454 2022/01/29 21:24:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $
 # Copyright (c) 2005 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.

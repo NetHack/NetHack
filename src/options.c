@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1642630919 2022/01/19 22:21:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.528 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1643491546 2022/01/29 21:25:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -20,7 +20,7 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 
 /*
  *  NOTE:  If you add (or delete) an option, please review the following:
- *             doc/options.doc
+ *             doc/options.txt
  *
  *         It contains how-to info and outlines some required/suggested
  *         updates that should accompany your change.

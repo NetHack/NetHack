@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1608861214 2020/12/25 01:53:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.264 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1643491577 2022/01/29 21:26:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3874,7 +3874,7 @@ tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
  *         Each condition bit must only ever appear in one of the
  *         CLR_ array members, but can appear in multiple HL_ATTCLR_
  *         offsets (because more than one attribute can co-exist).
- *         See doc/window.doc for more details.
+ *         See doc/window.txt for more details.
  */
 
 DISABLE_WARNING_FORMAT_NONLITERAL

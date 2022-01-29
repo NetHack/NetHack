@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.734 $ $NHDT-Date: 1641673963 2022/01/08 20:32:43 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1643491497 2022/01/29 21:24:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1521,7 +1521,7 @@ options overhaul: moved the option definitions into include/optlist.h;
 	combined the boolean and compound options into one allopt[] array;
 	each option has its own individual function for setting the option,
 	for retrieving the option value, and for processing the option
-	following its selection in the 'O' menu, added doc/options.doc file.
+	following its selection in the 'O' menu, added doc/options.txt file.
 function reglyph_darkroom() relocated from options.c to display.c
 resurrect 'makedefs -m' to be able to derive default mons[].diffculty values
 	suitable for assigning to new or changed monsters

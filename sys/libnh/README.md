@@ -39,10 +39,10 @@ WASM also has a npm module that can be published out of `sys/lib/npm-library`. A
 The API is two functions:
 * `nhmain(int argc, char *argv[])` - The main function for NetHack that configures the program and runs the `moveloop()` until the game is over. The arguments to this function are the [command line arguments](https://nethackwiki.com/wiki/Options) to NetHack.
 * `shim_graphics_set_callback(shim_callback_t cb)` - A single function that sets a callback to gather graphics events: write a string to screen, get user input, etc. Your job is to pass in a callback and handle all the requested rendering events to show NetHack on the scrren. The callback is `void shim_callback_t(const char *name, void *ret_ptr, const char *fmt,  ...)`
-  * `name` is the name of the [window function](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc) that needs to be handled
+  * `name` is the name of the [window function](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.txt) that needs to be handled
   * `ret_ptr` is a pointer to a memory space for the return value. The type expected to be returned in this pointer is described by the first character of the `fmt` string.
   * `fmt` is a string that describes the signature of the callback. The first character in the string is the return type and any additional characters describe the variable arguments: `i` for integer, `s` for string, `p` for pointer, `c` for character, `v` for void. For example, if format is "vis" the callback will have no return (void), the first argument will be an integer, and the second argument will be a string. If format is "iii" the callback must return an integer, and both the arguments passed in will be integers.
-  * [Variadic arguments](https://www.gnu.org/software/libc/manual/html_node/Variadic-Example.html): a variable number and type of arguments depending on the `window function` that is being called. The arguments associated with each `name` are described in the [NetHack window.doc](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc).
+  * [Variadic arguments](https://www.gnu.org/software/libc/manual/html_node/Variadic-Example.html): a variable number and type of arguments depending on the `window function` that is being called. The arguments associated with each `name` are described in the [NetHack window.txt](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.txt).
 
 Where is the header file for the API you ask? There isn't one. It's three functions, just drop the forward declarations at the top of your file (or create your own header). It's more work figuring out how to install and copy around header files than it's worth for such a small API. If you disagree, feel free to sumbit a PR to fix it. :)
 
@@ -50,8 +50,8 @@ Where is the header file for the API you ask? There isn't one. It's three functi
 The WebAssembly API has a similar signature to `libnethack.a` with minor syntactic differences:
 * `main(int argc, char argv[])` - The main function for NetHack
 * `shim_graphics_set_callback(char *cbName)` - A `String` representing a name of a callback function. The callback function be registered as `globalThis[cbName] = function yourCallback(name, ... args) { /* your stuff */ }`. Note that [globalThis](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis) points to `window` in browsers and `global` in node.js.
-  * `name` is the name of the [window function](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc) that needs to be handled
-  * `... args` is a variable number and type of arguments depending on the `window function` that is being called. The arguments associated with each `name` are described in the [NetHack window.doc](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.doc)
+  * `name` is the name of the [window function](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.txt) that needs to be handled
+  * `... args` is a variable number and type of arguments depending on the `window function` that is being called. The arguments associated with each `name` are described in the [NetHack window.txt](https://github.com/NetHack/NetHack/blob/NetHack-3.7/doc/window.txt)
   * The function must return the value expected for the specified `name`
 
 

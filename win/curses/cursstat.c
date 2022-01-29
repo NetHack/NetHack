@@ -131,7 +131,7 @@ curses_status_finish(void)
  *         Each condition bit must only ever appear in one of the
  *         CLR_ array members, but can appear in multiple HL_ATTCLR_
  *         offsets (because more than one attribute can co-exist).
- *         See doc/window.doc for more details.
+ *         See doc/window.txt for more details.
  */
 
 static int changed_fields = 0;

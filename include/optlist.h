@@ -6,7 +6,7 @@
 
 /*
  *  NOTE:  If you add (or delete) an option, please review:
- *             doc/options.doc
+ *             doc/options.txt
  *
  *         It contains how-to info and outlines some required/suggested
  *         updates that should accompany your change.
