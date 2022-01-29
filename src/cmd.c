@@ -1921,56 +1921,56 @@ do_move_southwest(void)
 int
 do_rush_west(void)
 {
-    set_move_cmd(DIR_W, 1);
+    set_move_cmd(DIR_W, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_northwest(void)
 {
-    set_move_cmd(DIR_NW, 1);
+    set_move_cmd(DIR_NW, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_north(void)
 {
-    set_move_cmd(DIR_N, 1);
+    set_move_cmd(DIR_N, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_northeast(void)
 {
-    set_move_cmd(DIR_NE, 1);
+    set_move_cmd(DIR_NE, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_east(void)
 {
-    set_move_cmd(DIR_E, 1);
+    set_move_cmd(DIR_E, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_southeast(void)
 {
-    set_move_cmd(DIR_SE, 1);
+    set_move_cmd(DIR_SE, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_south(void)
 {
-    set_move_cmd(DIR_S, 1);
+    set_move_cmd(DIR_S, 3);
     return ECMD_TIME;
 }
 
 int
 do_rush_southwest(void)
 {
-    set_move_cmd(DIR_SW, 1);
+    set_move_cmd(DIR_SW, 3);
     return ECMD_TIME;
 }
 
@@ -1978,56 +1978,56 @@ do_rush_southwest(void)
 int
 do_run_west(void)
 {
-    set_move_cmd(DIR_W, 3);
+    set_move_cmd(DIR_W, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_northwest(void)
 {
-    set_move_cmd(DIR_NW, 3);
+    set_move_cmd(DIR_NW, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_north(void)
 {
-    set_move_cmd(DIR_N, 3);
+    set_move_cmd(DIR_N, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_northeast(void)
 {
-    set_move_cmd(DIR_NE, 3);
+    set_move_cmd(DIR_NE, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_east(void)
 {
-    set_move_cmd(DIR_E, 3);
+    set_move_cmd(DIR_E, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_southeast(void)
 {
-    set_move_cmd(DIR_SE, 3);
+    set_move_cmd(DIR_SE, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_south(void)
 {
-    set_move_cmd(DIR_S, 3);
+    set_move_cmd(DIR_S, 1);
     return ECMD_TIME;
 }
 
 int
 do_run_southwest(void)
 {
-    set_move_cmd(DIR_SW, 3);
+    set_move_cmd(DIR_SW, 1);
     return ECMD_TIME;
 }
 
@@ -3622,8 +3622,9 @@ reset_commands(boolean initial)
             (void) bind_key_fn(highc(g.Cmd.dirchars[i]), move_funcs[i][MV_RUN]);
             (void) bind_key_fn(C(g.Cmd.dirchars[i]), move_funcs[i][MV_RUSH]);
         } else {
+            /* M(number) works when altmeta is on */
             (void) bind_key_fn(M(g.Cmd.dirchars[i]), move_funcs[i][MV_RUN]);
-            (void) bind_key_fn(M(g.Cmd.dirchars[i]), move_funcs[i][MV_RUSH]);
+            /* can't bind highc() or C() of numbers. just use the 5 prefix. */
         }
     }
     update_rest_on_space();
@@ -3835,6 +3836,7 @@ got_prefix_input:
                     /* it was a prefix command, mark and get another command */
                     prefix_seen = TRUE;
                     bad_command = FALSE;
+                    cmdq_ec = NULL;
                     goto got_prefix_input;
                 } else if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
                             && !g.context.travel && !dxdy_moveok()) {
