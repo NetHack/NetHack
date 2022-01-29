@@ -200,9 +200,8 @@ USE_DLB = Y
 #==========================================
 
 ifdef CI_COMPILER
-cc = i686-w64-mingw32-gcc.exe
-ld = i686-w64-mingw32-gcc.exe
-rc = windres --target=pe-i386
+cc = gcc -c
+ld = gcc
 # the mingw version on our CI is missing
 # winres.h. This will cause the Makefile.mingw32
 # to put a temporary copy into one of our folders
@@ -211,12 +210,12 @@ MISSING_HEADER = Y
 else
 cc = gcc -c
 ld = gcc
+MISSING_HEADER = N
+endif
 ifeq "$(MSYSTEM)" "MINGW32"
 rc = windres --target=pe-i386
 else # MINGW64
 rc = windres --target=pe-x86-64
-endif
-MISSING_HEADER = N
 endif
 
 #
