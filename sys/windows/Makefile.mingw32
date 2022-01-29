@@ -204,7 +204,7 @@ cc = i686-w64-mingw32-gcc.exe
 ld = i686-w64-mingw32-gcc.exe
 rc = windres --target=pe-i386
 # the mingw version on our CI is missing
-# windef.h. This will cause the Makefile.mingw32
+# winres.h. This will cause the Makefile.mingw32
 # to put a temporary copy into one of our folders
 # that windres is already looking in.
 MISSING_HEADER = Y
