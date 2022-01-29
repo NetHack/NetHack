@@ -773,7 +773,7 @@ all: install
 
 TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) \
 	     $(addprefix $(GAMEDIR)/, $(addsuffix .template, sysconf .nethackrc) \
-	     Guidebook.txt NetHack.txt license opthelp record)
+	     Guidebook.txt NetHack.txt license opthelp record symbols)
 
 ifeq "$(USE_LUADLL)" "Y"
 TO_INSTALL += $(LUADLL)
