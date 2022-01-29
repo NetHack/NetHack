@@ -63,22 +63,22 @@ water.lua     wizard1.lua   wizard2.lua   wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
-Gbk-1pg-pfx.mn  Gbk-1pg-sfx.mn  Guidebook.mn    Guidebook.tex
-Guidebook.txt   config.nh       dlb.6           dlb.txt
-fixes10.0       fixes14.f       fixes22.0       fixes23.e
-fixes30.0       fixes30.pl01    fixes30.pl02    fixes30.pl03
-fixes30.pl04    fixes30.pl05    fixes30.pl06    fixes30.pl07
-fixes30.pl08    fixes30.pl09    fixes30.pl10    fixes31.1
-fixes31.2       fixes31.3       fixes32.0       fixes32.1
-fixes32.2       fixes32.3       fixes33.0       fixes33.1
-fixes34.0       fixes34.1       fixes34.2       fixes34.3
-fixes35.0       fixes36.0       fixes36.1       fixes36.2
-fixes36.3       fixes36.4       fixes36.5       fixes36.6
-fixes37.0       fixesXX.X       lua.adoc        makedefs.6
-makedefs.txt    mn.7            mn.txt          mnh.7
-mnh.txt         nethack.6       nethack.txt     options.doc
-recover.6       recover.txt     tmac.n          tmac.nh
-window.doc
+Gbk-1pg-pfx.mn     Gbk-1pg-sfx.mn     Guidebook.mn       Guidebook.tex
+Guidebook.txt      config.nh          dlb.6              dlb.txt
+fixes1-0-0.txt     fixes1-4-f.txt     fixes2-2-0.txt     fixes2-3-e.txt
+fixes3-0-0.txt     fixes3-0-pl01.txt  fixes3-0-pl02.txt  fixes3-0-pl03.txt
+fixes3-0-pl04.txt  fixes3-0-pl05.txt  fixes3-0-pl06.txt  fixes3-0-pl07.txt
+fixes3-0-pl08.txt  fixes3-0-pl09.txt  fixes3-0-pl10.txt  fixes3-1-1.txt
+fixes3-1-2.txt     fixes3-1-3.txt     fixes3-2-0.txt     fixes3-2-1.txt
+fixes3-2-2.txt     fixes3-2-3.txt     fixes3-3-0.txt     fixes3-3-1.txt
+fixes3-4-0.txt     fixes3-4-1.txt     fixes3-4-2.txt     fixes3-4-3.txt
+fixes3-5-0.txt     fixes3-6-0.txt     fixes3-6-1.txt     fixes3-6-2.txt
+fixes3-6-3.txt     fixes3-6-4.txt     fixes3-6-5.txt     fixes3-6-6.txt
+fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc           makedefs.6
+makedefs.txt       mn.7               mn.txt             mnh.7
+mnh.txt            nethack.6          nethack.txt        options.txt
+recover.6          recover.txt        tmac.n             tmac.nh
+window.txt
 
 include:
 (files for X versions)
@@ -180,6 +180,14 @@ assert.h  errno.h   fcntl.h
 outdated/sys/wince/ceinc/sys:
 (sys/stat.h for Windows CE and PocketPC - untested for 3.6.2)
 stat.h
+
+outdated/sys/windows:
+(files that are no longer maintained for current game code)
+travis-gcc.sh
+
+outdated/sys/windows/vs:
+(files that are no longer maintained for current game code)
+travisci.sh
 
 outdated/win/Qt3:
 (files for the Qt 3 widget library - X11, Windows, Mac OS X, or Qtopia)
@@ -344,9 +352,8 @@ Makefile.mingw32.depend  Makefile.msc             console.rc
 consoletty.c             nethack.def              nhico.uu
 nhsetup.bat              ntsound.c                porthelp
 stub-pdcscrn.c           stubs.c                  sysconf.template
-travis-gcc.sh            win10.c                  win10.h
-win32api.h               windmain.c               windsys.c
-winos.h
+win10.c                  win10.h                  win32api.h
+windmain.c               windsys.c                winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2017 or 2019 Community Edition builds)
@@ -358,7 +365,7 @@ config.props                  console.props
 cpp.hint                      default.props
 default_dll.props             default_lib.props
 dirs.props                    dll.props
-files.props                   travisci.sh
+files.props
 
 sys/windows/vs/Images:
 (files for Visual Studio 2017 or 2019 Community Edition builds)
