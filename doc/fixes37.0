@@ -1490,6 +1490,7 @@ add Ray Chason's adaptation of nethack's Qt5 interface to work with Qt6 (issue
 mingw32 build updates and replacement of sys/windows/Makefile.gcc with new
 	sys/windows/Makefile.mingw32 and sys/windows/Makefile.mingw32.depend
 	(pr #661 by feiyunw)
+mark various pointers to const char as const pointers (pr #624 by argrath)
 
 
 Code Cleanup and Reorganization
