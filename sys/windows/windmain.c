@@ -355,15 +355,16 @@ void copy_sysconf_content()
     update_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
         g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
-    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
-        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
+//    update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+//        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     copy_file(g.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
         g.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
 
     update_file(g.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
-        g.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
+        g.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
+
 }
 
 void copy_config_content()
@@ -1239,14 +1240,16 @@ file_newer(const char* a_path, const char* b_path)
 {
     struct stat a_sb;
     struct stat b_sb;
+    double timediff;
 
     if (stat(a_path, &a_sb))
         return FALSE;
 
     if (stat(b_path, &b_sb))
         return TRUE;
+    timediff = difftime(a_sb.st_mtime, b_sb.st_mtime);
 
-    if(difftime(a_sb.st_mtime, b_sb.st_mtime) < 0)
+    if(timediff > 0)
         return TRUE;
     return FALSE;
 }

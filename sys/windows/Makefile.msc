@@ -971,7 +971,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	$(DAT)\oracles \
 	if exist $(DAT)\ttyoptions copy $(DAT)\ttyoptions $(GAMEDIR)
 ! ENDIF
 	if exist $(MSWSYS)\sysconf.template copy $(MSWSYS)\sysconf.template $(GAMEDIR)
-	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)\symbols.template
+	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)\symbols
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
