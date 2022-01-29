@@ -1,10 +1,10 @@
 #!/bin/sh
 set -x
 
-if [ -z "$TRAVIS_BUILD_DIR" ]; then
+if [ -z "$CI_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/lib/djgpp
 else
-	export DJGPP_TOP="$TRAVIS_BUILD_DIR/lib/djgpp"
+	export DJGPP_TOP="$CI_BUILD_DIR/lib/djgpp"
 fi
 
 if [ -z "$GCCVER" ]; then

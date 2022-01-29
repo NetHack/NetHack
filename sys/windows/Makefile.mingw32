@@ -199,7 +199,7 @@ USE_DLB = Y
 #==========================================
 #==========================================
 
-ifdef TRAVIS_COMPILER
+ifdef CI_COMPILER
 cc = i686-w64-mingw32-gcc.exe
 ld = i686-w64-mingw32-gcc.exe
 rc = windres --target=pe-i386
@@ -768,7 +768,7 @@ TO_INSTALL += $(DLB)
 endif
 
 install: $(TO_INSTALL)
-ifdef TRAVIS_COMPILER
+ifdef CI_COMPILER
 	ls -l $(SRC)
 	ls -l $(DAT)
 	ls -l $(UTIL)
