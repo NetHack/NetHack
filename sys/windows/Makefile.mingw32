@@ -23,29 +23,6 @@
 #   with the distribution.
 #
 #==============================================================================
-# DECISIONS SECTION
-#
-# Build Options Decisions
-#
-#       There are currently 4 decisions that you can choose to make.
-#       None of the 4 decisions are absolutely required because defaults are in place:
-#	1. Do you have git commands in your path and NetHack in a git repository?
-#	2. Where do you want your build results to end up?
-#	3. Do you want debug information in the executable?
-#	4. Do you want to explicitly override auto-detection of a 32-bit or 64-bit target?
-#       5. Do you want to include any optional interfaces in the port?
-#          5a) console without or with pdcurses
-#          5b) Windows
-#
-# Mandatory LUA source Location
-#
-#       LUA source code or is required to build NetHack-3.7.
-#       LUATOP must point to the location of the LUA sources.
-#
-#-----------------------------------------------------------------------------------------
-#=========================================================================================
-
-#==============================================================================
 #
 # The default make target (so just typing 'mingw32-make').
 #
@@ -53,57 +30,33 @@
 default: install
 
 #---------------------------------------------------------------
-# 1. Where do you want the game to be built (which folder)?
-#    If not present prior to compilation it gets created.
+# Where do you want the game to be built (which folder)?
+# If not present prior to compilation it gets created.
 #
 
 GAMEDIR = ../binary
 
 #
 #---------------------------------------------------------------
-# 2. Do you want debug information in the executable?
+# Do you want debug information in the executable?
 #
 
 DEBUGINFO = N
 
 #
 #---------------------------------------------------------------
-# 3. Do you want to explicitly override auto-detection of a 32-bit
-#    or 64-bit executable (save files do not interchange currently)?
+# Location of pdcurses
 #
-# It depends on which MSYS2 MinGW shell you are using.
-#
-#---------------------------------------------------------------
-# 4. Do you want additional GUI interfaces in the executable?
-#    Make these Y to enable the GUIs. Win32 is always enabled,
-#    and is the default.
-#
+# NetHack obtained via git clone (default)
+PDCURSES_TOP = ../submodules/pdcurses
 
-#4a Curses window port support
+# NetHack sources obtained by zip file download
+#PDCURSES_TOP = ../lib/pdcurses
 #
-#
-# 4. Uncomment these and set them appropriately if you want to
-#    include curses port support alongside TTY support in your
-#    NetHack.exe binary.
-#
-#    You'll have to set PDCURSES_H to the correct location of the
-#    PDCurses header (.h) files and PDCURSES_C to the location
-#    of your PDCurses C files which must already be resident on
-#    your machine.
-#
-# ADD_CURSES=Y
-# PDCURSES_TOP=../submodules/pdcurses
-
 #---------------------------------------------------------------
-ifndef LUA_VERSION
-LUAVER=5.4.4
-else
-LUAVER=$(LUA_VERSION)
-endif
-#---------------------------------------------------------------
-# Location of LUA
+# Location of LUA on this machine
 #
-# Original source needs to be obtained from:
+# Original Lua source can be obtained from:
 #    http://www.lua.org/ftp/lua-5.4.4.tar.gz
 #
 #    This build assumes that the LUA sources are located
@@ -111,13 +64,11 @@ endif
 #    you'll need to specify the correct spot below in order to
 #    successfully build NetHack-3.7.
 #
-USE_LUADLL = Y
-WANT_LUAC = N
+# NetHack obtained via git clone (default)
 LUATOP = ../submodules/lua
-#
-#==============================================================================
-# This marks the end of the BUILD DECISIONS section.
-#==============================================================================
+
+# NetHack sources obtained by zip file download (see Install.windows)
+#LUATOP = ../lib/lua-5.4.4
 #
 #===============================================
 #======= End of Modification Section ===========
@@ -132,6 +83,15 @@ LUATOP = ../submodules/lua
 #==============================================================================
 
 SKIP_NETHACKW = N
+USE_LUADLL = Y
+WANT_LUAC = N
+ADD_CURSES=Y
+
+ifndef LUA_VERSION
+LUAVER=5.4.4
+else
+LUAVER=$(LUA_VERSION)
+endif
 
 #==============================================================================
 

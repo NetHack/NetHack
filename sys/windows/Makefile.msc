@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.msc
-#       Copyright (c) NetHack PC Development Team 1993-2022
+#       Copyright (c) NetHack Development Team 1993-2022
 #
 #==============================================================================
 # Build Tools Environment
@@ -21,71 +21,77 @@
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.exe
 #
-#   If you want to find out more information about Lua or PDCurses
-#   here are the home page links for each at the time of this writing:
-#
-#         Lua:       https://www.lua.org/
-#         PDCurses:  https://pdcurses.org/
-#
 #   If you have any questions about building NetHack for the Windows platform
 #   please read sys/windows/Install.windows file included in the distribution.
 #
 #==============================================================================
-# DECISIONS SECTION
 #
-# Build Options Decisions
+# The default make target (so just typing 'nmake' is useful).
 #
-#       There are currently 5 decisions that you can choose to make.
-#       none of the 5 decisions are absolutely required because defaults
-#       are in place:
-#
-#       1. Do you have git commands in your path and NetHack in a
-#          git repository?
-#	2. Where do you want your build results to end up?
-#	3. Do you want debug information in the executable?
-#	4. Do you want to explicitly override auto-detection of
-#          a 32-bit or 64-bit target?
-#
-#------------------------------------------------------------------------------
-#==============================================================================
+
+default : install
 
 #
 #------------------------------------------------------------------------------
-# 1. Do you have git commands available and NetHack in a git repository.
-#    If not, such as if you obtained the NetHack sources in a zip file download,
-#    set GIT_AVAILABLE = 0
+# Where do you want the game to be built (which folder)?
 #
-GIT_AVAILABLE = 1
-#
-#------------------------------------------------------------------------------
-# 2. Where do you want the game to be built (which folder)?
-#
+
 GAMEDIR = ..\binary               # Default game build directory
+
 #
 #------------------------------------------------------------------------------
-# 3. Do you want debug information available to the executable?
+# Do you want debug information available to the executable?
 #
+
 DEBUGINFO = Y
+
+#
+#---------------------------------------------------------------
+# Location of pdcurses
+#
+# NetHack obtained via git clone (default)
+PDCURSES_TOP = ../submodules/pdcurses
+
+# NetHack sources obtained by zip file download
+#PDCURSES_TOP = ../lib/pdcurses
+#
+#---------------------------------------------------------------
+# Location of LUA on this machine
+#
+# Original Lua source can be obtained from:
+#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#
+#    This build assumes that the LUA sources are located
+#    at the specified location. If they are actually elsewhere
+#    you'll need to specify the correct spot below in order to
+#    successfully build NetHack-3.7.
+#
+# NetHack obtained via git clone (default)
+LUATOP = ..\submodules\lua
+
+# NetHack sources obtained by zip file download
+#LUATOP = ..\lib\lua-5.4.4
 #
 #------------------------------------------------------------------------------
-# 4. This Makefile will attempt to auto-detect your selected target architecture
-#    based on Visual Studio command prompt configuration settins etc.
-#    However, if you want to manually override generation of a
-#    32-bit or 64-bit build target, you can uncomment the apppropriate
-#    TARGET_CPU line below.
+# This Makefile will attempt to auto-detect your selected target architecture
+# based on Visual Studio command prompt configuration settins etc.
+# However, if you want to manually override generation of a
+# 32-bit or 64-bit build target, you can uncomment the apppropriate
+# TARGET_CPU line below.
 #
+
 #TARGET_CPU=x64
 #TARGET_CPU=x86
+
+#------------------------------------------------------------------------------
 #
 #
-#==============================================================================
-#==============================================================================
-# This marks the end of the BUILD DECISIONS section.
-#==============================================================================
-#==============================================================================
+# Do you have git commands available and NetHack in a git repository.
+# If not, such as if you obtained the NetHack sources in a zip file download,
+# set GIT_AVAILABLE = 0
 #
-#TEST_CROSSCOMPILE=Y
-#
+
+GIT_AVAILABLE = 1
 #==============================================================================
 #======================== End of Modification Section =========================
 #==============================================================================
@@ -96,6 +102,19 @@ DEBUGINFO = Y
 #       #                                               #
 #       #################################################
 #
+#==============================================================================
+
+SKIP_NETHACKW = N
+ADD_CURSES=Y
+
+!IFNDEF LUA_VERSION
+LUAVER=5.4.4
+!ELSE
+LUAVER=$(LUA_VERSION)
+!ENDIF
+
+#TEST_CROSSCOMPILE=Y
+
 #==============================================================================
 #
 #  The version of the game this Makefile was designed for
@@ -197,12 +216,6 @@ CROSSCOMPILE=
 # Source for the NetHack repository submodule in ../submodules/lua
 # is https://github.com/lua/lua.git
 #=================================================================
-!IFNDEF LUA_VERSION
-LUAVER=5.4.4
-!ELSE
-LUAVER=$(LUA_VERSION)
-!ENDIF
-#==============================================================================
 #
 # Location of LUA
 #
@@ -215,7 +228,6 @@ LUAVER=$(LUA_VERSION)
 #    successfully build NetHack-3.7.  You cannot build a functional
 #    version of NetHack-3.7 Work-in-progress without including Lua.
 #
-LUATOP=..\submodules\lua
 
 !IFNDEF LUAVER
 LUAVER=5.4.4
@@ -256,7 +268,6 @@ LUAOBJFILES =   $(LUAOBJFILES) $(O)lbitlib.o
 # Source for the NetHack repository submodule in ../submodules/PDCurses
 # is https://github.com/wmcbrine/PDCurses.git
 #=================================================================
-ADD_CURSES=Y
 !IF "$(ADD_CURSES)" == "Y"
 PDCURSES_TOP = ..\submodules\pdcurses
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
@@ -822,11 +833,6 @@ DLB =
 #==========================================
 #=============== TARGETS ==================
 #==========================================
-
-#
-#  The default make target (so just typing 'nmake' is useful).
-#
-default : install
 
 #
 #  The game target.

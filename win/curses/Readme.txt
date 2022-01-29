@@ -3,9 +3,9 @@ INTRO
 
 The "curses" windowport is a new text-based interface for NetHack,
 using high-level curses routines to control the display.  Currently, it
-has been compiled and tested on Linux and Windows, but it should also
-be portable to a number of other systems, such as other forms of UNIX,
-Mac OS X, MSDOS, and OS/2.
+has been compiled and tested on Linux, macOS, Windows, and msdos, but it
+should also be portable to a number of other systems, such as other
+forms of UNIX and OS/2.
 
 Some features of this interface compared to the traditional tty
 interface include:
@@ -22,25 +22,25 @@ interface include:
 BUILDING
 ========
 
-As of this writing code has been compiled on Linux and Windows.
+UNIX/Linux/macOS build instructions:
 
-UNIX/Linux build instructions: Follow the instructions in
+Follow the instructions in
 sys/unix/Install.unx.  By default, the Makefile is setup to compile
 against ncurses.  Edit Makefile.src if you wish to compile against a
 different curses library, such as PDCurses for SDL.
+See sys/unix/NewInstall.unx for more information about building
+NetHack 3.7 and above.
 
-Windows build instructions: If you are using Mingw32 as your compiler,
-then follow the instructions in sys/windows/Install.windows with the
-following changes:
+Windows build instructions:
 
- * After running nhsetup, manually copy the file cursmake.gcc to the
- src/ subdirectory
- * Instead of typing "mingw32-make -f Makefile.gcc install" you will
- type "mingw32-make -f cursmake.gcc install"
+By default, the Makefile.msc and Makefile.mingw32 are set up to build
+curses from the submodules/pdcurses submodules folder (assumes you
+obtained your NetHack sources via cloning a git repository),
+If you obtained your NetHack by another means, such as a zip download,
+follow the instructions in sys/windows/Install.windows.
 
 If you are using a different compiler, you will have to manually modify
 the appropriate Makefile to include the curses windowport files.
-
 
 GAMEPLAY
 ========
