@@ -466,7 +466,7 @@ readmail(struct obj *otmp UNUSED)
     int i;
     enum delivery_types delivery = normal_delivery;
     const char *recipient = 0;
-    const char *const junk_templates[] = {
+    static const char *const junk_templates[] = {
         "%sReport bugs to <%s>.%s", /*** must be first entry ***/
         "Please disregard previous letter.",
         "Welcome to NetHack.",
