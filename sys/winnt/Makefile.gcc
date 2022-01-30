@@ -1483,10 +1483,10 @@ endif
 ifeq "$(WANT_WIN_QT4)" "Y"
 # Qt dependencies
 
-$(GAMEDIR))/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
+$(GAMEDIR)/Qt5Core.dll : $(QT4_DIRECTORY)/bin/Qt5Core.dll
 	$(subst /,\,@copy $< $@ >nul)
 
-$(GAMEDIR))/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
+$(GAMEDIR)/Qt5Gui.dll : $(QT4_DIRECTORY)/bin/Qt5Gui.dll
 	$(subst /,\,@copy $< $@ >nul)
 
 $(GAMEDIR)/Qt5Widgets.dll : $(QT4_DIRECTORY)/bin/Qt5Widgets.dll
