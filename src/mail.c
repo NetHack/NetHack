@@ -461,7 +461,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 void
 readmail(struct obj *otmp UNUSED)
 {
-    static const char *const junk[] = {
+    static const char *junk[] = {
         "Report bugs to <%s>.", /*** must be first entry ***/
         "Please disregard previous letter.",
         "Welcome to NetHack.",
