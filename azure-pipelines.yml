@@ -138,9 +138,9 @@ steps:
     export PDCURSES_TOP=../submodules/pdcurses
     export LUA_VERSION=5.4.4
     cp ../sys/windows/Makefile.mingw32* .
-    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW32 LUA_VERSION=$LUA_VERSION clean
-    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW32 LUA_VERSION=$LUA_VERSION depend
-    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW32 LUA_VERSION=$LUA_VERSION
+    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW64 LUA_VERSION=$LUA_VERSION clean
+    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW64 LUA_VERSION=$LUA_VERSION depend
+    mingw32-make -f Makefile.mingw32 CI_COMPILER=1 MSYSTEM=MINGW64 LUA_VERSION=$LUA_VERSION
   condition: eq( variables.toolchain, 'mingw' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)/src
   displayName: 'MinGW Build'
