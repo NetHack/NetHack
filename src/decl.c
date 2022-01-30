@@ -646,7 +646,7 @@ const struct instance_globals g_init = {
     1, /* timer_id */
 
     /* topten.c */
-    WIN_ERR, /* topten */
+    WIN_ERR, /* toptenwin */
 
     /* trap.c */
     0, /* force_mintrap */
