@@ -457,12 +457,17 @@ ckmailstatus(void)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+enum delivery_types { faulty_delivery, normal_delivery, subst_delivery };
+
 /*ARGSUSED*/
 void
 readmail(struct obj *otmp UNUSED)
 {
-    static const char *junk[] = {
-        "Report bugs to <%s>.", /*** must be first entry ***/
+    int i;
+    enum delivery_types delivery = normal_delivery;
+    const char *recipient = 0;
+    const char *const junk_templates[] = {
+        "%sReport bugs to <%s>.%s", /*** must be first entry ***/
         "Please disregard previous letter.",
         "Welcome to NetHack.",
 #ifdef AMIGA
@@ -479,52 +484,35 @@ readmail(struct obj *otmp UNUSED)
            dollar sign and fractional zorkmids are inappropriate within
            nethack but are suitable for typical dysfunctional spam mail */
      "Buy a potion of gain level for only $19.99!  Guaranteed to be blessed!",
-        /* DEVTEAM_URL will be substituted for "%s"; terminating punctuation
+        /* DEVTEAM_URL will be substituted for 2nd "%s"; terminating punctuation
            (formerly "!") has deliberately been omitted so that it can't be
            mistaken for part of the URL (unfortunately that is still followed
            by a closing quote--in the pline below, not the data here) */
-        "Invitation: Visit the NetHack web site at %s"
+        "%sInvitation: Visit the NetHack web site at %s%s"
     };
+    const char *const it_reads = "It reads:  \"";
 
-    /* XXX replace with more general substitution code and add local
-     * contact message.
-     *
-     * FIXME:  this allocated memory is never freed.  However, if the
-     * game is restarted, the junk[] update will be a no-op for second
-     * and subsequent runs and this updated text will still be appropriate.
-     */
-    if (index(junk[0], '%')) {
-        char *tmp;
-        int i;
-
-        for (i = 0; i < SIZE(junk); ++i) {
-            if (index(junk[i], '%')) {
-                if (i == 0) {
-                    /* +2 from '%s' in junk[0] suffices as substitute
-                       for usual +1 for terminator */
-                    tmp = (char *) alloc(strlen(junk[0])
-                                         + strlen(DEVTEAM_EMAIL));
-                    Sprintf(tmp, junk[0], DEVTEAM_EMAIL);
-                    junk[0] = tmp;
-                } else if (strstri(junk[i], "web site")) {
-                    /* as with junk[0], room for terminator is present */
-                    tmp = (char *) alloc(strlen(junk[i])
-                                         + strlen(DEVTEAM_URL));
-                    Sprintf(tmp, junk[i], DEVTEAM_URL);
-                    junk[i] = tmp;
-                } else {
-                    /* could check for "%%" but unless that becomes needed,
-                       handling it is more complicated than necessary */
-                    impossible("fake mail #%d has undefined substitution", i);
-                    junk[i] = "Bad fake mail...";
-                }
-            }
+    i = rn2(SIZE(junk_templates));
+    if (index(junk_templates[i], '%')) {
+        if (i == 0) {
+            recipient = DEVTEAM_EMAIL;
+            delivery = subst_delivery;
+        } else if (strstri(junk_templates[i], "web site")) {
+            recipient = DEVTEAM_URL;
+            delivery = subst_delivery;
+        } else {
+            impossible("fake mail #%d has undefined substitution", i);
+            delivery = faulty_delivery;
         }
     }
     if (Blind) {
         pline("Unfortunately you cannot see what it says.");
-    } else
-        pline("It reads:  \"%s\"", junk[rn2(SIZE(junk))]);
+    } else {
+        if (delivery == subst_delivery)
+            pline(junk_templates[i], it_reads, recipient, "\"");
+        else if (delivery == normal_delivery)
+            pline("%s%s\"", it_reads, junk_templates[i]);
+    }
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
