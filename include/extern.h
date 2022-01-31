@@ -2220,6 +2220,7 @@ extern void split_rects(NhRect *, NhRect *);
 
 /* ## region.c ### */
 
+extern boolean inside_region(NhRegion *, int, int);
 extern void clear_regions(void);
 extern void run_regions(void);
 extern boolean in_out_region(xchar, xchar);

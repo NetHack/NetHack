@@ -15,7 +15,6 @@
 boolean inside_gas_cloud(genericptr, genericptr);
 boolean expire_gas_cloud(genericptr, genericptr);
 boolean inside_rect(NhRect *, int, int);
-boolean inside_region(NhRegion *, int, int);
 NhRegion *create_region(NhRect *, int);
 void add_rect_to_reg(NhRegion *, NhRect *);
 void add_mon_to_reg(NhRegion *, struct monst *);
@@ -290,13 +289,16 @@ add_region(NhRegion *reg)
     /* Check for monsters inside the region */
     for (i = reg->bounding_box.lx; i <= reg->bounding_box.hx; i++)
         for (j = reg->bounding_box.ly; j <= reg->bounding_box.hy; j++) {
+            boolean is_inside = inside_region(reg, i, j);
+
             /* Some regions can cross the level boundaries */
             if (!isok(i, j))
                 continue;
-            if (MON_AT(i, j) && inside_region(reg, i, j))
+            if (is_inside && MON_AT(i, j))
                 add_mon_to_reg(reg, g.level.monsters[i][j]);
             if (reg->visible) {
-                /*block_point(i, j);*/
+                if (is_inside)
+                    block_point(i, j);
                 if (cansee(i, j))
                     newsym(i, j);
             }
@@ -371,6 +373,10 @@ run_regions(void)
     register int i, j, k;
     int f_indx;
 
+    /* reset some messaging variables */
+    g.gas_cloud_diss_within = FALSE;
+    g.gas_cloud_diss_seen = 0;
+
     /* End of life ? */
     /* Do it backward because the array will be modified */
     for (i = g.n_regions - 1; i >= 0; i--) {
@@ -407,6 +413,13 @@ run_regions(void)
             }
         }
     }
+
+    if (g.gas_cloud_diss_within)
+        pline_The("gas cloud around you dissipates.");
+    if (g.gas_cloud_diss_seen)
+        You_see("%s dissipate.",
+                g.gas_cloud_diss_seen == 1
+                ? "a gas cloud" : "some gas clouds");
 }
 
 /*
@@ -952,6 +965,7 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
 {
     NhRegion *reg;
     int damage;
+    xchar x, y;
 
     reg = (NhRegion *) p1;
     damage = reg->arg.a_int;
@@ -964,6 +978,21 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
         reg->ttl = 2L; /* Here's the trick : reset ttl */
         return FALSE;  /* THEN return FALSE, means "still there" */
     }
+
+    /* The cloud no longer blocks vision. */
+    for (x = reg->bounding_box.lx; x <= reg->bounding_box.hx; x++) {
+        for (y = reg->bounding_box.ly; y <= reg->bounding_box.hy; y++) {
+            if (inside_region(reg, x, y)) {
+                if (!does_block(x, y, &levl[x][y]))
+                    unblock_point(x, y);
+                if (x == u.ux && y == u.uy)
+                    g.gas_cloud_diss_within = TRUE;
+                if (cansee(x, y))
+                    g.gas_cloud_diss_seen++;
+            }
+        }
+    }
+
     return TRUE; /* OK, it's gone, you can free it! */
 }
 

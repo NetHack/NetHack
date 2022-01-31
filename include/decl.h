@@ -1113,6 +1113,8 @@ struct instance_globals {
     NhRegion **regions;
     int n_regions;
     int max_regions;
+    boolean gas_cloud_diss_within;
+    int gas_cloud_diss_seen;
 
     /* restore.c */
     int n_ids_mapped;

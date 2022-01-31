@@ -577,6 +577,8 @@ const struct instance_globals g_init = {
     NULL, /* regions */
     0, /* n_regions */
     0, /* max_regions */
+    FALSE, /* gas_cloud_diss_within */
+    0, /* gas_cloud_diss_seen */
 
     /* restore.c */
     0, /* n_ids_mapped */
