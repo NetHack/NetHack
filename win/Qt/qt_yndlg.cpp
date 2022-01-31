@@ -164,11 +164,13 @@ char NetHackQtYnDialog::Exec()
              is_yn  = (ch == QString("yn")),  // [Yes ][ No ]
              is_lr  = (ch == QString(lrq));   // [ Left ][Right ]
 
+#if 0
 	const int margin=8;
 	const int gutter=8;
 	const int extra=fontMetrics().height(); // Extra for group
 	int x=margin, y=extra+margin;
-        int butheight = fontMetrics().height() * 2 + 5,
+#endif
+	int butheight = fontMetrics().height() * 2 + 5,
             butwidth = (butheight - 5) * ((is_ynq || is_lr) ? 3
                                           : (is_ynaq || is_yn) ? 2 : 1) + 5;
         if (butwidth == butheight) { // square, enough room for C or ^C
@@ -275,6 +277,7 @@ char NetHackQtYnDialog::Exec()
             button->setFixedSize(butwidth, butheight);
             if (ch[i] == def)
                 button->setDefault(true);
+#if 0
             // 'x' and 'y' don't seem to actually used anywhere
             // and limit of 10 buttons per row isn't enforced
             if (i % 10 == 9) {
@@ -284,6 +287,7 @@ char NetHackQtYnDialog::Exec()
             } else {
                 x += butwidth + gutter;
             }
+#endif
 	    groupbox->addWidget(button);
 	    bgroup->addButton(button, i);
 	}

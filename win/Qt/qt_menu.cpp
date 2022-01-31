@@ -1120,14 +1120,16 @@ void NetHackQtTextWindow::Display(bool block UNUSED)
 	lines->setFont(qt_settings->normalFont());
     }
 
-    int h=0;
+    /* int h=0; */
     if (use_rip) {
-	h+=rip.height();
+	/* h+=rip.height(); */
+	(void) rip.height();
 	ok.hide();
 	search.hide();
 	rip.show();
     } else {
-	h+=ok.height()*2 + 7;
+	/* h+=ok.height()*2 + 7; */
+	(void) ok.height(); 
 	ok.show();
 	search.show();
 	rip.hide();

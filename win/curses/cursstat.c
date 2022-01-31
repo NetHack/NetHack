@@ -298,7 +298,9 @@ draw_horizontal(boolean border)
 #endif
     int i, j, number_of_lines,
         cap_and_hunger, exp_points, sho_score,
-        height, width, w, xtra, clen, x, y, t, ex, ey,
+	/* both height and width get their values set,
+	 * but only width gets used in this function */
+        height UNUSED, width, w, xtra, clen, x, y, t, ex, ey,
         condstart = 0, conddummy = 0;
 #ifdef STATUS_HILITES
     int coloridx = NO_COLOR, attrmask = 0;
