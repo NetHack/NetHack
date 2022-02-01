@@ -561,7 +561,7 @@ E int abs(int);
 #ifdef atoi
 #undef atoi
 #endif
-E int atoi, (const char *);
+E int atoi(const char *);
 #endif
 
 #undef E
