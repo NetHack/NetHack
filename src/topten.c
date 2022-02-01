@@ -891,8 +891,16 @@ topten(int how, time_t when)
     free_ttlist(tt_head);
 
  showwin:
-    if (iflags.toptenwin && !done_stopprint)
-        display_nhwindow(g.toptenwin, TRUE);
+    if (!done_stopprint) {
+        if (iflags.toptenwin) {
+            display_nhwindow(g.toptenwin, TRUE);
+        } else {
+            /* when not a window, we need something comparable to more()
+               but can't use it directly because we aren't dealing with
+               the message window */
+            ;
+        }
+    }
  destroywin:
     if (!t0_used)
         dealloc_ttentry(t0);
@@ -1042,11 +1050,11 @@ outentry(int rank, struct toptenentry* t1, boolean so)
             Strcpy(linebuf3, bp);
         else
             Strcpy(linebuf3, bp + 1);
-        *bp = 0;
+        *bp = '\0';
         if (so) {
             while (bp < linebuf + (COLNO - 1))
                 *bp++ = ' ';
-            *bp = 0;
+            *bp = '\0';
             topten_print_bold(linebuf);
         } else
             topten_print(linebuf);
@@ -1069,11 +1077,9 @@ outentry(int rank, struct toptenentry* t1, boolean so)
 
     if (so) {
         bp = eos(linebuf);
-        if (so >= COLNO)
-            so = COLNO - 1;
-        while (bp < linebuf + so)
+        while (bp < linebuf + (COLNO - 1))
             *bp++ = ' ';
-        *bp = 0;
+        *bp = '\0';
         topten_print_bold(linebuf);
     } else
         topten_print(linebuf);
