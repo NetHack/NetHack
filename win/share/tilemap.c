@@ -1338,8 +1338,8 @@ main(int argc UNUSED, char *argv[] UNUSED)
     Fprintf(ofp, "%sTile_corr = %d,\n", indent, TILE_corr);       /* X11 references it */
     Fprintf(ofp, "%sTile_stone = %d,\n",  indent, TILE_stone);
     Fprintf(ofp, "%sTile_unexplored = %d;\n",  indent, TILE_unexplored);
-    Fprintf(ofp, "%smaxmontile = %d;\n", indent, lastmontile);
-    Fprintf(ofp, "%smaxobjtile = %d;\n", indent, lastobjtile);
+    Fprintf(ofp, "int maxmontile = %d,\n", lastmontile);
+    Fprintf(ofp, "%smaxobjtile = %d,\n", indent, lastobjtile);
     Fprintf(ofp, "%smaxothtile = %d;\n\n", indent, lastothtile);
     Fprintf(ofp,
       "/* glyph, ttychar, { color, symidx, ovidx, glyphflags, tileidx} */\n");
