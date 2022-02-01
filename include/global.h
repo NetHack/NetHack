@@ -147,7 +147,7 @@ typedef uchar nhsym;
 /* amiconf.h needs to be the last nested #include of config.h because
    'make depend' will turn it into a comment, hiding anything after it */
 #ifdef AMIGA
-/*#include "amiconf.h"*/
+#include "amiconf.h"
 #endif
 
 /* Displayable name of this port; don't redefine if defined in *conf.h */
