@@ -42,6 +42,7 @@
 extern char Initialized;
 extern struct window_procs amii_procs;
 struct ami_sysflags sysflags = {0};
+FILE *fopenp(const char *, const char *);
 
 #ifndef __SASC_60
 int Enable_Abort = 0; /* for stdio package */

@@ -63,6 +63,13 @@ void MyFreeBitMap(struct BitMap *bmp);
 extern void display_map(struct Window *);
 #endif
 
+#ifdef USE_TILES
+extern int maxmontile, maxobjtile, maxothtile; /* from tile.c */
+#define MAXMONTILE maxmontile
+#define MAXOBJTILE maxobjtile
+#define MAXOTHTILE maxothtile
+#endif
+
 /*
  *  These values will be available from tile.c source
  *
@@ -895,9 +902,12 @@ SetMazeType(MazeType t)
 int
 GlyphToIcon(int glyph)
 {
+    glyph_info gi;
+
+    map_glyphinfo(0, 0, glyph, 0, &gi);
     if (glyph > 10000)
         return glyph;
-    return (glyph2tile[glyph]);
+    return (gi.gm.tileidx);
 }
 #endif
 

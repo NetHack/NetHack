@@ -2002,8 +2002,14 @@ if(u.uz.dlevel != x){
     } else /* AMII, or Rogue level in either version */
     {
         /* map glyph to character and color */
-        (void) mapglyph(glyph, &och, &color, &special, x, y, 0);
-        ch = (uchar) och;
+#if 0
+    	(void) mapglyph(glyph, &och, &color, &special, x, y, 0);
+	ch = (uchar) och;
+#else
+	glyph_info gi;
+	map_glyphinfo(0, 0, glyph, 0, &gi);
+	ch = gi.ttychar;
+#endif
         if (WINVERS_AMIV) { /* implies Rogue level here */
             amii_curs(win, x, y);
             amiga_print_glyph(win, NO_COLOR, ch + 10000);
