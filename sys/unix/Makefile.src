@@ -670,35 +670,18 @@ objects.o:
 	$(CC) $(CFLAGS) -c -o $@ objects.c
 	@rm -f $(MAKEDEFS)
 
-# Qt 3 windowport meta-object-compiler output
+# outdated Qt 3 windowport meta-object-compiler output
 qt3_kde0.moc: ../win/Qt3/qt3_kde0.h
 	$(QTDIR)/bin/moc -o qt3kde0.moc ../win/Qt3/qt3_kde0.h
 qt3_win.moc: ../win/Qt3/qt3_win.h
 	$(QTDIR)/bin/moc -o qt3win.moc ../win/Qt3/qt3_win.h
 qt3tableview.moc: ../win/Qt3/qt3tableview.h
-	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt/qt3tableview.h
+	$(QTDIR)/bin/moc -o qt3tableview.moc ../win/Qt3/qt3tableview.h
 
-# Qt 4 windowport meta-object-compiler output
-qt_kde0.moc : ../win/Qt/qt_kde0.h
-	$(MOCPATH) -o qt_kde0.moc ../win/Qt/qt_kde0.h
-qt_main.moc : ../win/Qt/qt_main.h
-	$(MOCPATH) -o qt_main.moc ../win/Qt/qt_main.h
-qt_map.moc : ../win/Qt/qt_map.h
-	$(MOCPATH) -o qt_map.moc ../win/Qt/qt_map.h
-qt_menu.moc : ../win/Qt/qt_menu.h
-	$(MOCPATH) -o qt_menu.moc ../win/Qt/qt_menu.h
-qt_msg.moc : ../win/Qt/qt_msg.h
-	$(MOCPATH) -o qt_msg.moc ../win/Qt/qt_msg.h
-qt_plsel.moc : ../win/Qt/qt_plsel.h
-	$(MOCPATH) -o qt_plsel.moc ../win/Qt/qt_plsel.h
-qt_set.moc : ../win/Qt/qt_set.h
-	$(MOCPATH) -o qt_set.moc ../win/Qt/qt_set.h
-qt_stat.moc : ../win/Qt/qt_stat.h
-	$(MOCPATH) -o qt_stat.moc ../win/Qt/qt_stat.h
-qt_xcmd.moc : ../win/Qt/qt_xcmd.h
-	$(MOCPATH) -o qt_xcmd.moc ../win/Qt/qt_xcmd.h
-qt_yndlg.moc : ../win/Qt/qt_yndlg.h
-	$(MOCPATH) -o qt_yndlg.moc ../win/Qt/qt_yndlg.h
+# for Qt 5 and 6, template rules to build qt_xyz.moc from corresponding
+# ../win/Qt/qt_xyz.h are in sys/unix/hints/compiler.370 and get added
+# to src/Makefile if the appropriate hints file gets used with setup.sh;
+# so, build support for the Qt interface requires the use of hints...
 
 #	build monst.o and objects.o before executing '$(MAKE) makedefs'
 $(MAKEDEFS): $(FIRSTOBJ) \
@@ -775,7 +758,7 @@ spotless: clean
 	-rm -f ../include/nhlua.h
 	-rm -f ../include/date.h #created but no longer used, at least by core
 	-rm -f ../include/onames.h ../include/pm.h #obsolete generated files
-	-rm -f tile.c *.moc
+	-rm -f tile.c *.moc moc.qt*
 	-rm -f ../win/gnome/gn_rip.h
 
 package:
