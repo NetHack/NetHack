@@ -1,0 +1,224 @@
+#===============-=================================================
+# NetHack 3.7  include/cross-amiga-pre
+#
+# Cross-compiling -PRE section for amiga
+#
+
+CROSS=1
+CROSS_TO_AMIGA=1
+BUILD_TARGET_LUA=1
+BUILD_PDCURSES=1
+CROSS_SHARED=1
+override TARGET = amiga
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
+override TARGET_LIBS=
+
+ifdef CROSS
+override PREGAME=
+override BUILDMORE=
+override CLEANMORE=
+override PACKAGE=
+endif
+
+ifdef BUILD_TARGET_LUA
+#===============-=================================================
+# LUA library
+# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#=================================================================
+LUA_VERSION ?=5.4.4
+LUATOP ?= ../lib/lua-$(LUA_VERSION)
+LUASRCDIR ?= $(LUATOP)/src
+LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
+		$(TARGETPFX)lbaselib.o $(TARGETPFX)lcode.o \
+		$(TARGETPFX)lcorolib.o $(TARGETPFX)lctype.o \
+		$(TARGETPFX)ldblib.o
+ifeq "$(LUA_VERSION)" "5.3.5"
+LUAOBJFILES1 += $(TARGETPFX)lbitlib.o
+endif
+LUAOBJFILES2 =  $(TARGETPFX)ldebug.o $(TARGETPFX)ldo.o $(TARGETPFX)ldump.o \
+		$(TARGETPFX)lfunc.o $(TARGETPFX)lgc.o $(TARGETPFX)linit.o \
+		$(TARGETPFX)liolib.o $(TARGETPFX)llex.o
+LUAOBJFILES3 =  $(TARGETPFX)lmathlib.o $(TARGETPFX)lmem.o \
+		$(TARGETPFX)loadlib.o $(TARGETPFX)lobject.o \
+		$(TARGETPFX)lopcodes.o $(TARGETPFX)loslib.o \
+		$(TARGETPFX)lparser.o $(TARGETPFX)lstate.o
+LUAOBJFILES4 =  $(TARGETPFX)lstring.o $(TARGETPFX)lstrlib.o \
+		$(TARGETPFX)ltable.o $(TARGETPFX)ltablib.o \
+		$(TARGETPFX)ltm.o $(TARGETPFX)lundump.o \
+		$(TARGETPFX)lutf8lib.o $(TARGETPFX)lvm.o $(TARGETPFX)lzio.o
+LUALIBOBJS = $(LUAOBJFILES1) $(LUAOBJFILES2) $(LUAOBJFILES3) $(LUAOBJFILES4)
+LUACROSSLIB = $(TARGETPFX)lua$(subst .,,$(LUA_VERSION)).a
+LUAINCL  = -I$(LUASRCDIR)
+override BUILDMORE += $(LUACROSSLIB)
+override CLEANMORE += rm -f $(LUACROSSLIB) ;
+override TARGET_LIBS += $(LUACROSSLIB) -lm
+else
+LUAINCL=
+endif  # BUILD_TARGET_LUA
+
+ifdef BUILD_PDCURSES
+#===============-=================================================
+# PD Curses library
+#===============-=================================================
+ifdef WANT_WIN_CURSES
+PDCTOP = ../lib/pdcurses
+PDCURSESDEF= -I../lib/pdcurses -I../lib/pdcurses/dos \
+		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+PDCLIBOBJ1= $(TARGETPFX)addch.o $(TARGETPFX)addchstr.o \
+		$(TARGETPFX)addstr.o $(TARGETPFX)attr.o \
+		$(TARGETPFX)beep.o $(TARGETPFX)bkgd.o \
+		$(TARGETPFX)border.o $(TARGETPFX)clear.o \
+		$(TARGETPFX)color.o $(TARGETPFX)delch.o \
+		$(TARGETPFX)deleteln.o $(TARGETPFX)getch.o \
+		$(TARGETPFX)getstr.o $(TARGETPFX)getyx.o \
+		$(TARGETPFX)inch.o
+PDCLIBOBJ2= $(TARGETPFX)inchstr.o $(TARGETPFX)initscr.o \
+		$(TARGETPFX)inopts.o $(TARGETPFX)insch.o \
+		$(TARGETPFX)insstr.o $(TARGETPFX)instr.o \
+		$(TARGETPFX)kernel.o $(TARGETPFX)keyname.o \
+		$(TARGETPFX)mouse.o $(TARGETPFX)move.o \
+		$(TARGETPFX)outopts.o $(TARGETPFX)overlay.o
+PDCLIBOBJ3= $(TARGETPFX)pad.o $(TARGETPFX)panel.o $(TARGETPFX)printw.o \
+		$(TARGETPFX)refresh.o $(TARGETPFX)scanw.o \
+		$(TARGETPFX)scr_dump.o $(TARGETPFX)scroll.o \
+		$(TARGETPFX)slk.o $(TARGETPFX)termattr.o
+PDCLIBOBJ4= $(TARGETPFX)touch.o $(TARGETPFX)util.o $(TARGETPFX)window.o \
+		$(TARGETPFX)debug.o
+PDCLIBOBJS = $(PDCLIBOBJ1) $(PDCLIBOBJ2) $(PDCLIBOBJ3) $(PDCLIBOBJ4)
+PDCLIB = $(TARGETPFX)pdclib.a
+PDCINCL = -I$(PDCTOP) -I$(PDCTOP)/pdcurses
+PDCOBJS = $(TARGETPFX)pdcclip.o $(TARGETPFX)pdcdisp.o \
+		$(TARGETPFX)pdcgetsc.o $(TARGETPFX)pdckbd.o \
+		$(TARGETPFX)pdcscrn.o $(TARGETPFX)pdcsetsc.o \
+		$(TARGETPFX)pdcutil.o
+override TARGET_LIBS += $(PDCLIB)
+ifdef CROSS_TO_MSDOS
+endif
+override BUILDMORE += $(PDCLIB)
+override CLEANMORE += rm -f $(PDCLIB) ;
+else   #WANT_WIN_CURSES
+PDCURSESDEF=
+PDCLIBOBJS=
+PDCOBJS=
+PDCLIB=
+PDCINCL=
+endif  # WANT_WIN_CURSES
+endif  # BUILD_PDCURSES
+
+ifdef CROSS_TO_AMIGA
+#===============-=================================================
+# AmigaOS m68k cross-compile recipe
+#===============-=================================================
+# Uses an Amiga M68K cross-compiler on linux or macOS.
+#
+# 1. You can obtain the cross-compiler for your system via:
+#     sys/amiga/fetch-cross.sh
+# 2. Then
+#     make CROSS_TO_AMIGAOS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
+#
+# Amiga m68k from https://github.com/bebbo/amiga-gcc
+#=================================================================
+
+CFLAGS += -DCROSSCOMPILE
+
+#
+# Override the build tools and some obj files to
+# reflect the amiga-gccs cross-compiler.
+#
+TOOLTOP = /opt/amiga/bin
+#TOOLARCH = -m68020 -mcrt=clib2
+#TOOLARCH = -m68020   #newlib
+TOOLARCH = -m68020 -noixemul
+override REGEXOBJ = $(TARGETPFX)cppregex.o
+override TARGET_CC = $(TOOLTOP)/m68k-amigaos-gcc
+override TARGET_CXX = $(TOOLTOP)/m68k-amigaos-c++
+override TARGET_AR = $(TOOLTOP)/m68k-amigaos-ar
+override TARGET_STUBEDIT=
+#override TARGET_CFLAGS = -c -O $(TOOLARCH) -I../include -I../outdated/include
+override TARGET_CFLAGS = -c -O $(TOOLARCH) \
+	-I../include -I../outdated/include \
+	-I../outdated/sys/amiga -I../win/share \
+	$(LUAINCL) -DAMIGA -DUSE_TILES $(PDCURSESDEF) \
+	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_AMIGA \
+	-DAMIGA_VERSION_STRING=\""VER: NetHack 3.7.0\""
+#	-DMICRO -DPATHLEN=31 -DFILENAME=80
+override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
+ifeq "$(REGEXOBJ)" "$(TARGETPFX)cppregex.o"
+override TARGET_LINK = $(TARGET_CXX)
+else
+override TARGET_LINK = $(TARGET_CC)
+endif
+override TARGET_LFLAGS= $(TOOLARCH)
+#override TARGET_LIBS +=
+VARDATND += nhtiles.bmp
+override SYSSRC = ../outdated/sys/amiga/amidos.c ../outdated/sys/amiga/amigst.c \
+		../outdated/sys/amiga/amimenu.c ../outdated/sys/amiga/amirip.c \
+		../outdated/sys/amiga/amistack.c ../outdated/sys/amiga/amitty.c \
+		../outdated/sys/amiga/amiwind.c ../outdated/sys/amiga/clipwin.c \
+		../outdated/sys/amiga/colorwin.c \
+		../outdated/sys/amiga/winami.c ../outdated/sys/amiga/winchar.c \
+		../outdated/sys/amiga/winfuncs.c ../outdated/sys/amiga/winkey.c \
+		../outdated/sys/amiga/winamenu.c ../outdated/sys/amiga/winreq.c \
+		../outdated/sys/amiga/winstr.c ../sys/share/pcmain.c \
+		../win/share/bmptiles.c ../win/share/giftiles.c \
+		../win/share/tileset.c
+#		../outdated/sys/amiga/xpm2iff.c
+#		../outdated/sys/amiga/txt2iff.c
+override SYSOBJ = $(TARGETPFX)amidos.o $(TARGETPFX)amigst.o \
+		$(TARGETPFX)amirip.o $(TARGETPFX)amistack.o \
+		$(TARGETPFX)amitty.o $(TARGETPFX)amiwind.o \
+		$(TARGETPFX)winami.o $(TARGETPFX)winchar.o \
+		$(TARGETPFX)winfuncs.o $(TARGETPFX)winkey.o \
+		$(TARGETPFX)winamenu.o $(TARGETPFX)winreq.o \
+		$(TARGETPFX)winstr.o $(TARGETPFX)pcmain.o \
+		$(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o \
+		$(TARGETPFX)tileset.o
+#		$(TARGETPFX)xpm2iff.o
+#		../util/txt2iff.o
+override WINLIB=
+override LUALIB=
+override TOPLUALIB=
+override GAMEBIN = $(TARGETPFX)nethack
+override PACKAGE = amigapkg
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -r $(TARGETDIR) ;
+#		../util/txt2iff
+#
+ifdef WANT_WIN_CURSES
+# rules for pdcurses sdl1-specific files
+$(TARGETPFX)%.o : $(PDCTOP)/sdl1/%.c
+	$(TARGET_CC) $(PDCINCL) $(TARGET_CFLAGS) -o$@  $<
+endif  # WANT_WIN_CURSES
+# Rule for files in sys/amiga
+$(TARGETPFX)%.o : ../outdated/sys/amiga/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -o$@ $<
+endif  # CROSS_TO_AMIGA
+#=================================================================
+
+ifdef WANT_WIN_CURSES
+ifdef BUILD_PDCURSES
+# Rules for PDCurses files
+$(TARGETPFX)%.o : $(PDCTOP)/pdcurses/%.c
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) -c -o$@  $<
+endif  # BUILD_PDCURSES
+endif  # WANT_WIN_CURSES
+
+ifdef CROSS_SHARED
+# Rules for win/share files
+$(TARGETPFX)%.o : ../win/share/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
+# Rules for util files heading for target
+$(TARGETPFX)%.o : ../util/%.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
+endif  # CROSS_SHARED
+
+ifdef BUILD_TARGET_LUA
+# Rule for LUA files
+$(TARGETPFX)%.o : $(LUATOP)/src/%.c
+	$(TARGET_CC) $(LUA_TARGET_CFLAGS) -c $(LUA_FLAGS) -o$@ $<
+endif  # BUILD_TARGET_LUA
+#
+# End of cross-compiling -PRE section for Amiga
+#===============-=================================================
+
