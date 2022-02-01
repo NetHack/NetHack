@@ -1375,24 +1375,25 @@ term_end_attr(int attr)
     }
 }
 
+/* this is called 'start bold' but HI is derived from SO (standout) rather
+   than from MD (start bold attribute) */
 void
 term_start_raw_bold(void)
 {
-    if (!nh_HI)
-        nh_HI = tty_standout_on;
+    const char *soOn = nh_HI ? nh_HI : tty_standout_on;
 
-    if (*nh_HI)
-        xputs(nh_HI);
+    if (*soOn)
+        xputs(soOn);
 }
 
+/* this is called 'end bold' but HE is derived from ME (end all attributes) */
 void
 term_end_raw_bold(void)
 {
-    if (!nh_HE)
-        nh_HE = tty_standout_off;
+    const char *soOff = nh_HE ? nh_HE : tty_standout_off;
 
-    if (*nh_HE)
-        xputs(nh_HE);
+    if (*soOff)
+        xputs(soOff);
 }
 
 #ifdef TEXTCOLOR
