@@ -535,9 +535,9 @@ endmultishot(boolean verbose)
 /* Object hits floor at hero's feet.
    Called from drop(), throwit(), hold_another_object(), litter(). */
 void
-hitfloor(struct obj *obj,
-         boolean verbosely) /* usually True; False if caller has given
-                               drop message */
+hitfloor(
+    struct obj *obj,
+    boolean verbosely) /* usually True; False if caller has given drop mesg */
 {
     if (IS_SOFT(levl[u.ux][u.uy].typ) || u.uinwater || u.uswallow) {
         dropy(obj);
@@ -1056,7 +1056,8 @@ check_shop_obj(struct obj *obj, xchar x, xchar y, boolean broken)
 }
 
 /* Will 'obj' cause damage if it falls on hero's head when thrown upward?
-   Not used to handle things which break when they hit. */
+   Not used to handle things which break when they hit.
+   Stone missile hitting hero w/ Passes_walls attribute handled separately. */
 static boolean
 harmless_missile(struct obj *obj)
 {
@@ -1167,13 +1168,16 @@ toss_up(struct obj *obj, boolean hitsroof)
         hitfloor(obj, FALSE);
         g.thrownobj = 0;
     } else { /* neither potion nor other breaking object */
-        boolean is_silver = (objects[otyp].oc_material == SILVER),
+        int material = objects[otyp].oc_material;
+        boolean is_silver = (material == SILVER),
                 less_damage = (uarmh && is_metallic(uarmh)
                                && (!is_silver || !Hate_silver)),
+                harmless = (stone_missile(obj)
+                            && passes_rocks(g.youmonst.data)),
                 artimsg = FALSE;
         int dmg = dmgval(obj, &g.youmonst);
 
-        if (obj->oartifact)
+        if (obj->oartifact && !harmless)
             /* need a fake die roll here; rn1(18,2) avoids 1 and 20 */
             artimsg = artifact_hit((struct monst *) 0, &g.youmonst, obj, &dmg,
                                    rn1(18, 2));
@@ -1205,15 +1209,24 @@ toss_up(struct obj *obj, boolean hitsroof)
         dmg = Maybe_Half_Phys(dmg);
 
         if (uarmh) {
-            if (less_damage && dmg < (Upolyd ? u.mh : u.uhp)) {
-                if (!artimsg)
-                    pline("Fortunately, you are wearing a hard helmet.");
+            /* note: 'harmless' and 'petrifier' are mutually exclusive */
+            if ((less_damage && dmg < (Upolyd ? u.mh : u.uhp)) || harmless) {
+                if (!artimsg) {
+                    if (!harmless) /* !harmless => less_damage here */
+                        pline("Fortunately, you are wearing a hard helmet.");
+                    else
+                        pline("Unfortunately, you are wearing %s.",
+                              an(helm_simple_name(uarmh))); /* helm or hat */
+                }
 
             /* helmet definitely protects you when it blocks petrification */
             } else if (!petrifier) {
                 if (flags.verbose)
                     Your("%s does not protect you.", helm_simple_name(uarmh));
             }
+            /* stone missile against hero in xorn form would have been
+               harmless, but hitting a worn helmet negates that */
+            harmless = FALSE;
         } else if (petrifier && !Stone_resistance
                    && !(poly_when_stoned(g.youmonst.data)
                         && polymon(PM_STONE_GOLEM))) {
@@ -1229,9 +1242,13 @@ toss_up(struct obj *obj, boolean hitsroof)
         }
         if (is_silver && Hate_silver)
             pline_The("silver sears you!");
+        if (harmless)
+            hit(thesimpleoname(obj), &g.youmonst, " but doesn't hurt.");
+
         hitfloor(obj, TRUE);
         g.thrownobj = 0;
-        losehp(dmg, "falling object", KILLED_BY_AN);
+        if (!harmless)
+            losehp(dmg, "falling object", KILLED_BY_AN);
     }
     return TRUE;
 }
@@ -1692,8 +1709,9 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
  * Also used for kicked objects and for polearms/grapnel applied at range.
  */
 int
-thitmonst(register struct monst *mon,
-          register struct obj *obj) /* g.thrownobj or g.kickedobj or uwep */
+thitmonst(
+    struct monst *mon,
+    struct obj *obj) /* g.thrownobj or g.kickedobj or uwep */
 {
     register int tmp;     /* Base chance to hit */
     register int disttmp; /* distance modifier */

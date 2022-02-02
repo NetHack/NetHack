@@ -9,8 +9,7 @@ extern const char *const destroy_strings[][3]; /* from zap.c */
 
 static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
                                             struct obj *);
-static boolean mu_maybe_destroy_web(struct monst *, boolean,
-                                    struct trap *);
+static boolean mu_maybe_destroy_web(struct monst *, boolean, struct trap *);
 static struct obj *t_missile(int, struct trap *);
 static int trapeffect_arrow_trap(struct monst *, struct trap *, unsigned);
 static int trapeffect_dart_trap(struct monst *, struct trap *, unsigned);
@@ -1060,6 +1059,7 @@ trapeffect_rocktrap(
     unsigned trflags UNUSED)
 {
     struct obj *otmp;
+    boolean harmless = FALSE;
 
     if (mtmp == &g.youmonst) {
         if (trap->once && trap->tseen && !rn2(15)) {
@@ -1078,20 +1078,31 @@ trapeffect_rocktrap(
             pline("A trap door in %s opens and %s falls on your %s!",
                   the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
             if (uarmh) {
-                if (is_metallic(uarmh)) {
+                /* normally passes_rocks() would protect againt a falling
+                   rock, but not when wearing a helmet */
+                if (passes_rocks(g.youmonst.data)) {
+                    pline("Unfortunately, you are wearing %s.",
+                          an(helm_simple_name(uarmh))); /* helm or hat */
+                    dmg = 2;
+                } else if (is_metallic(uarmh)) {
                     pline("Fortunately, you are wearing a hard helmet.");
                     dmg = 2;
                 } else if (flags.verbose) {
                     pline("%s does not protect you.", Yname2(uarmh));
                 }
+            } else if (passes_rocks(g.youmonst.data)) {
+                pline("It passes harmlessly through you.");
+                harmless = TRUE;
             }
             if (!Blind)
                 otmp->dknown = 1;
             stackobj(otmp);
             newsym(u.ux, u.uy); /* map the rock */
 
-            losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
-            exercise(A_STR, FALSE);
+            if (!harmless) {
+                losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
+                exercise(A_STR, FALSE);
+            }
         }
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
@@ -2655,15 +2666,13 @@ force_launch_placement(void)
 int
 launch_obj(
     short otyp,
-    register int x1,
-    register int y1,
-    register int x2,
-    register int y2,
+    int x1, int y1,
+    int x2, int y2,
     int style)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp, *otmp2;
-    register int dx, dy;
+    struct monst *mtmp;
+    struct obj *otmp, *otmp2;
+    int dx, dy;
     struct obj *singleobj;
     boolean used_up = FALSE;
     boolean otherside = FALSE;
@@ -2733,8 +2742,8 @@ launch_obj(
         singleobj->otrapped = 1;
         style &= ~LAUNCH_KNOWN;
     /*FALLTHRU*/
- roll:
     case ROLL:
+ roll:
         delaycnt = 2;
     /*FALLTHRU*/
     default:
@@ -5637,14 +5646,13 @@ b_trapped(const char* item, int bodypart)
 }
 
 /* Monster is hit by trap. */
-/* Note: doesn't work if both obj and d_override are null */
 static boolean
 thitm(
-    int tlev,
-    struct monst *mon,
-    struct obj *obj,
-    int d_override,
-    boolean nocorpse)
+    int tlev,          /* missile's attack level */
+    struct monst *mon, /* target */
+    struct obj *obj,   /* missile; might be Null */
+    int d_override,    /* non-zero: force hit for this amount of damage */
+    boolean nocorpse)  /* True: a trap is completely burning up the target */
 {
     int strike;
     boolean trapkilled = FALSE;
@@ -5664,9 +5672,11 @@ thitm(
             pline("%s is almost hit by %s!", Monnam(mon), doname(obj));
     } else {
         int dam = 1;
+        boolean harmless = (stone_missile(obj) && passes_rocks(mon->data));
 
         if (obj && cansee(mon->mx, mon->my))
-            pline("%s is hit by %s!", Monnam(mon), doname(obj));
+            pline("%s is hit by %s%s", Monnam(mon), doname(obj),
+                  harmless ? " but is not harmed." : "!");
         if (d_override) {
             dam = d_override;
         } else if (obj) {
@@ -5674,15 +5684,19 @@ thitm(
             if (dam < 1)
                 dam = 1;
         }
-        mon->mhp -= dam;
-        if (mon->mhp <= 0) {
-            int xx = mon->mx, yy = mon->my;
+        if (!harmless) {
+            mon->mhp -= dam;
+            if (mon->mhp <= 0) {
+                int xx = mon->mx, yy = mon->my;
 
-            monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
-            if (DEADMONSTER(mon)) {
-                newsym(xx, yy);
-                trapkilled = TRUE;
+                monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
+                if (DEADMONSTER(mon)) {
+                    newsym(xx, yy);
+                    trapkilled = TRUE;
+                }
             }
+        } else {
+            strike = 0; /* harmless; don't use up the missile */
         }
     }
     if (obj && (!strike || d_override)) {

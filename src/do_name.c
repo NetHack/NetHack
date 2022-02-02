@@ -1728,6 +1728,9 @@ x_monnam(
             falseCap = (*pm_name != lowc(*pm_name));
     char *bp;
 
+    if (mtmp == &g.youmonst)
+        return strcpy(buf, "you"); /* ignore article, "invisible", &c */
+
     if (g.program_state.gameover)
         suppress |= SUPPRESS_HALLUCINATION;
     if (article == ARTICLE_YOUR && !mtmp->mtame)

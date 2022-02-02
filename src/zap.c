@@ -3309,11 +3309,16 @@ exclam(int force)
 }
 
 void
-hit(const char *str, struct monst *mtmp,
-    const char *force) /* usually either "." or "!" */
+hit(const char *str,    /* zap text or missile name */
+    struct monst *mtmp, /* target; for missile, might be hero */
+    const char *force)  /* usually either "." or "!" via exclam() */
 {
-    if ((!cansee(g.bhitpos.x, g.bhitpos.y) && !canspotmon(mtmp)
-         && !engulfing_u(mtmp)) || !flags.verbose)
+    boolean verbosely = (mtmp == &g.youmonst
+                         || (flags.verbose
+                             && (cansee(g.bhitpos.x, g.bhitpos.y)
+                                 || canspotmon(mtmp) || engulfing_u(mtmp))));
+
+    if (!verbosely)
         pline("%s %s it.", The(str), vtense(str, "hit"));
     else
         pline("%s %s %s%s", The(str), vtense(str, "hit"),

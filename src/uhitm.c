@@ -295,11 +295,12 @@ mon_maybe_wakeup_on_hit(struct monst *mtmp)
    using attack type aatyp and/or weapon.
    larger value == easier to hit */
 int
-find_roll_to_hit(struct monst *mtmp,
-                 uchar aatyp,        /* usually AT_WEAP or AT_KICK */
-                 struct obj *weapon, /* uwep or uswapwep or NULL */
-                 int *attk_count,
-                 int *role_roll_penalty)
+find_roll_to_hit(
+    struct monst *mtmp,
+    uchar aatyp,        /* usually AT_WEAP or AT_KICK */
+    struct obj *weapon, /* uwep or uswapwep or NULL */
+    int *attk_count,
+    int *role_roll_penalty)
 {
     int tmp, tmp2;
 
@@ -574,10 +575,9 @@ known_hitum(
 /* hit the monster next to you and the monsters to the left and right of it;
    return False if the primary target is killed, True otherwise */
 static boolean
-hitum_cleave(struct monst *target, /* non-Null; forcefight at nothing doesn't
-                                      cleave... */
-             struct attack *uattk) /* ... but we don't enforce that here; Null
-                                      works ok */
+hitum_cleave(
+    struct monst *target, /* non-Null; forcefight at nothing doesn't cleave +*/
+    struct attack *uattk) /*+ but we don't enforce that here; Null works ok */
 {
     /* swings will be delivered in alternate directions; with consecutive
        attacks it will simulate normal swing and backswing; when swings
@@ -723,12 +723,13 @@ hmon(struct monst *mon,
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* guts of hmon() */
+/* guts of hmon(); returns True if 'mon' survives */
 static boolean
-hmon_hitmon(struct monst *mon,
-           struct obj *obj,
-           int thrown, /* HMON_xxx (0 => hand-to-hand, other => ranged) */
-           int dieroll)
+hmon_hitmon(
+    struct monst *mon,
+    struct obj *obj,
+    int thrown, /* HMON_xxx (0 => hand-to-hand, other => ranged) */
+    int dieroll)
 {
     int tmp;
     struct permonst *mdat = mon->data;
@@ -751,7 +752,7 @@ hmon_hitmon(struct monst *mon,
                             /* not grapnels; applied implies uwep */
                             || (thrown == HMON_APPLIED && is_pole(uwep)));
     int jousting = 0;
-    long silverhit = 0L;
+    int material = obj ? objects[obj->otyp].oc_material : 0;
     int wtype;
     struct obj *monwep;
     char saved_oname[BUFSZ];
@@ -760,6 +761,8 @@ hmon_hitmon(struct monst *mon,
 
     wakeup(mon, TRUE);
     if (!obj) { /* attack with bare hands */
+        long silverhit = 0L; /* armor mask */
+
         if (mdat == &mons[PM_SHADE]) {
             tmp = 0;
         } else {
@@ -781,10 +784,20 @@ hmon_hitmon(struct monst *mon,
             silvermsg = TRUE;
 
     } else {
+        /* stone missile does not hurt xorn or earth elemental, but doesn't
+           pass all the way through and continue on to some further target */
+        if ((thrown == HMON_THROWN || thrown == HMON_KICKED) /* not Applied */
+            && stone_missile(obj) && passes_rocks(mdat)) {
+            hit(mshot_xname(obj), mon, " but does no harm.");
+            return TRUE;
+        }
+        /* remember obj's name since it might end up being destroyed and
+           we'll want to use it after that */
         if (!(artifact_light(obj) && obj->lamplit))
             Strcpy(saved_oname, cxname(obj));
         else
             Strcpy(saved_oname, bare_artifactname(obj));
+
         if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
             || obj->oclass == GEM_CLASS) {
             /* is it not a melee weapon? */
@@ -803,10 +816,8 @@ hmon_hitmon(struct monst *mon,
                     tmp = 0;
                 else
                     tmp = rnd(2);
-                if (objects[obj->otyp].oc_material == SILVER
-                    && mon_hates_silver(mon)) {
-                    silvermsg = TRUE;
-                    silverobj = TRUE;
+                if (material == SILVER && mon_hates_silver(mon)) {
+                    silvermsg = silverobj = TRUE;
                     /* if it will already inflict dmg, make it worse */
                     tmp += rnd((tmp) ? 20 : 10);
                 }
@@ -891,10 +902,8 @@ hmon_hitmon(struct monst *mon,
                         return TRUE;
                     hittxt = TRUE;
                 }
-                if (objects[obj->otyp].oc_material == SILVER
-                    && mon_hates_silver(mon)) {
-                    silvermsg = TRUE;
-                    silverobj = TRUE;
+                if (material == SILVER && mon_hates_silver(mon)) {
+                    silvermsg = silverobj = TRUE;
                 }
                 if (artifact_light(obj) && obj->lamplit
                     && mon_hates_light(mon))
@@ -1168,8 +1177,7 @@ hmon_hitmon(struct monst *mon,
                     }
                     /* things like silver wands can arrive here so we
                        need another silver check; blessed check too */
-                    if (objects[obj->otyp].oc_material == SILVER
-                        && mon_hates_silver(mon)) {
+                    if (material == SILVER && mon_hates_silver(mon)) {
                         tmp += rnd(20);
                         silvermsg = silverobj = TRUE;
                     }
@@ -1336,9 +1344,9 @@ hmon_hitmon(struct monst *mon,
         /* iron weapon using melee or polearm hit [3.6.1: metal weapon too;
            also allow either or both weapons to cause split when twoweap] */
         && obj && (obj == uwep || (u.twoweap && obj == uswapwep))
-        && ((objects[obj->otyp].oc_material == IRON
+        && ((material == IRON
              /* allow scalpel and tsurugi to split puddings */
-             || objects[obj->otyp].oc_material == METAL)
+             || material == METAL)
             /* but not bashing with darts, arrows or ya */
             && !(is_ammo(obj) || is_missile(obj)))
         && hand_to_hand) {

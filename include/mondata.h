@@ -220,6 +220,11 @@
 #define touch_petrifies(ptr) \
     ((ptr) == &mons[PM_COCKATRICE] || (ptr) == &mons[PM_CHICKATRICE])
 
+/* missiles made of rocks don't harm these: xorns and earth elementals
+   (but not ghosts and shades because that would impact all missile use
+   and also require an exception for blessed rocks/gems/boulders) */
+#define passes_rocks(ptr) (passes_walls(ptr) && !unsolid(ptr))
+
 #define is_mind_flayer(ptr) \
     ((ptr) == &mons[PM_MIND_FLAYER] || (ptr) == &mons[PM_MASTER_MIND_FLAYER])
 

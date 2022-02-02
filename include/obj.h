@@ -226,6 +226,12 @@ struct obj {
 #define uslinging() (uwep && objects[uwep->otyp].oc_skill == P_SLING)
 /* 'is_quest_artifact()' only applies to the current role's artifact */
 #define any_quest_artifact(o) ((o)->oartifact >= ART_ORB_OF_DETECTION)
+/* 'missile' aspect is up to the caller and does not imply is_missile();
+   rings might be launched as missiles when being scattered by an explosion */
+#define stone_missile(o) \
+    ((o) && (objects[(o)->otyp].oc_material == GEMSTONE             \
+             || (objects[(o)->otyp].oc_material == MINERAL))        \
+         && (o)->oclass != RING_CLASS)
 
 /* Armor */
 #define is_shield(otmp)          \
