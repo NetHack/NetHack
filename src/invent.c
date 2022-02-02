@@ -4085,7 +4085,7 @@ check_invent_gold(const char *why) /* 'why' == caller in case of warning */
 }
 
 /* normal getobj callback for item to #adjust; excludes gold */
-int
+static int
 adjust_ok(struct obj *obj)
 {
     if (!obj || obj->oclass == COIN_CLASS)
@@ -4095,7 +4095,7 @@ adjust_ok(struct obj *obj)
 }
 
 /* getobj callback for item to #adjust if gold is wonky; allows gold */
-int
+static int
 adjust_gold_ok(struct obj *obj)
 {
     if (!obj)

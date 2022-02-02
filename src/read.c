@@ -1003,7 +1003,7 @@ valid_cloud_pos(int x, int y)
 /* Callback for getpos_sethilite, also used in determining whether a scroll
  * should have its regular effects, or not because it was out of range.
  */
-boolean
+static boolean
 can_center_cloud(int x, int y)
 {
     if (!valid_cloud_pos(x, y))

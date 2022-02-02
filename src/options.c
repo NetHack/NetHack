@@ -3840,7 +3840,7 @@ optfn_windowtype(int optidx, int req, boolean negated UNUSED,
  *    Prefix-handling functions
  */
 
-int
+static int
 pfxfn_cond_(int optidx UNUSED, int req, boolean negated,
             char *opts, char *op UNUSED)
 {
@@ -3881,7 +3881,7 @@ pfxfn_cond_(int optidx UNUSED, int req, boolean negated,
     return optn_ok;
 }
 
-int
+static int
 pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
 {
     int opttype = -1;
@@ -5302,7 +5302,7 @@ bad_negation(const char *optname, boolean with_parameter)
 /* go through all of the options and set the minmatch value
    based on what is needed for uniqueness of each individual
    option. Set a minimum of 3 characters. */
-void
+static void
 determine_ambiguities(void)
 {
     int i, j, len, tmpneeded, needed[SIZE(allopt)];
@@ -5338,7 +5338,7 @@ determine_ambiguities(void)
     }
 }
 
-int
+static int
 length_without_val(const char *user_string, int len)
 {
     const char *p = index(user_string, ':'),
@@ -6848,7 +6848,7 @@ parse_role_opts(int optidx, boolean negated, const char *fullname,
 }
 
 /* Check if character c is illegal as a menu command key */
-boolean
+static boolean
 illegal_menu_cmd_key(uchar c)
 {
     if (c == 0 || c == '\r' || c == '\n' || c == '\033' || c == ' '
@@ -7703,7 +7703,7 @@ count_cond(void)
     return cnt;
 }
 
-int
+static int
 count_apes(void)
 {
     int numapes = 0;

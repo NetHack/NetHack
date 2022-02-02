@@ -26,7 +26,7 @@ static struct rnglist_t rnglist[] = {
     { rn2_on_display_rng, FALSE, { 0 } },       /* DISP */
 };
 
-int
+static int
 whichrng(int (*fn)(int))
 {
     int i;

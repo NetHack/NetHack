@@ -605,7 +605,7 @@ static const char *const build_opts[] = {
     "and basic NetHack features"
 };
 
-int
+static int
 count_and_validate_winopts(void)
 {
     int i, cnt = 0;
