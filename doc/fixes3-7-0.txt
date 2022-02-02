@@ -764,6 +764,7 @@ mindless monsters shouldn't cringe stepping on squeaky boards
 falling down a hole or trapdoor will cause damage proportional to fall height
 stinking gas clouds block line-of-sight
 covetous monsters will teleport to downstairs or upstairs to heal
+have fake player monsters use verbalize instead of pline when reacting to chat
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
