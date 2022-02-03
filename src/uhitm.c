@@ -1374,7 +1374,7 @@ hmon_hitmon(
             You("%s %s%s",
                 (obj && (is_shield(obj)
                          || obj->otyp == HEAVY_IRON_BALL)) ? "bash"
-                : (obj && (obj->otyp == BULLWHIP
+                : (obj && (objects[obj->otyp].oc_skill == P_WHIP
                            || is_wet_towel(obj))) ? "lash"
                   : Role_if(PM_BARBARIAN) ? "smite"
                     : "hit",

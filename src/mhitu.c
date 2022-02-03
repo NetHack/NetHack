@@ -98,7 +98,8 @@ mswings_verb(
 {
     const char *verb;
     int otyp = mwep->otyp,
-        lash = (otyp == BULLWHIP),
+        /* (monsters don't actually wield towels, wet or otherwise) */
+        lash = (objects[otyp].oc_skill == P_WHIP || is_wet_towel(mwep)),
         /* some weapons can have more than one strike type; for those,
            give a mix of thrust and swing (caller doesn't care either way) */
         thrust = ((objects[otyp].oc_dir & PIERCE) != 0
