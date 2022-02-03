@@ -1,12 +1,14 @@
 config.h-t
-monstr.c
 hack.h-t
+monstr.c
+vis_tab.c
 tile.c
 Sysunix
 nethack
 *.o
 tiles.bmp
 *.moc
+moc.qt*
 *.lnk
 graphicschk
 nhdat

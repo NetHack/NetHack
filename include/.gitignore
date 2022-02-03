@@ -4,6 +4,7 @@ onames.h
 pm.h
 dgn_comp.h
 lev_comp.h
+vis_tab.h
 tile.h
 win32api.h
 nhlua.h
