@@ -294,6 +294,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
             QString btn_lbl = extcmdlist[i].ef_txt;
             if (btn_lbl == "wait")
                 btn_lbl += " (rest)";
+            QString btn_tip = QString::asprintf(" %s ", extcmdlist[i].ef_desc);
             QPushButton *pb = new QPushButton(btn_lbl, grid);
             pb->setMinimumSize(butw, pb->sizeHint().height());
             // force the button to have fixed width or it can move around a
@@ -309,6 +310,8 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
             // come as much of a surprise
             if (btn_lbl == "repeat")
                 pb->setEnabled(false);
+            // show command description if mouse hovers over this button
+            pb->setToolTip(btn_tip); // extcmdlist[i].ef_desc
             /*
              * by column: xcmd_by_row==false, the default
              *  0..R-1 down first column, R..2*R-1 down second column, ...
