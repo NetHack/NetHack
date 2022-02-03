@@ -27,18 +27,6 @@
 #define WT_ELF 800
 #define WT_DRAGON 4500
 
-#ifdef C
-#undef C
-#endif
-#ifdef TEXTCOLOR
-#include "color.h"
-#define C(color) color
-#define HI_DOMESTIC CLR_WHITE /* use for player + friendlies */
-#define HI_LORD CLR_MAGENTA
-#else
-#define C(color)
-#endif
-
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col, bn) \
     {                                                                      \
         {(const char *) 0, (const char *) 0, nam}, \
