@@ -1,7 +1,7 @@
 * NH_filestag=(file%s_for_all_versions)
 ..files NH_filegenerated=Makefile,Makefile.mingw32,qt_kde0.moc,qt_main.moc,qt_map.moc,qt_menu.moc,qt_msg.moc,qt_plsel.moc,qt_set.moc,qt_stat.moc,qt_xcmd.moc,qt_yndlg.moc,tile.c,monstr.c
 
-Makefile.mingw32=(file%s_for_win32_that_are_moved_into_src_at_compile_time)
+Makefile.mingw32=NH_filesgentag=(file%s_for_win32_that_are_moved_into_src_at_compile_time)
 Makefile	NH_filesgentag=>Makefile.mingw32
 
 qt_kde0.moc	NH_filesgentag=(file%s_generated_by_'moc'_for_Qt_interface_at_compile_time)
