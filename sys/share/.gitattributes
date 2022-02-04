@@ -1,8 +1,6 @@
 Makefile.* NHSUBST
 NetHack.cnf NHSUBST
 termcap NH_header=no
-dgn_comp.h NH_header=no
-lev_comp.h NH_header=no
 Makefile.lib NH_header=no
 
 Makefile.lib	NH_filestag=(file%s_for_OS/2_version_-_untested_for_3.7)
@@ -29,13 +27,6 @@ uudecode.c NH_filestag=(Berkeley_uudecode_file,_which_may_be_used_in_build_proce
 tclib.c NH_filestag=(file_for_VMS_version)
 
 termcap NH_filestag=(file_for_MSDOS,_OS/2,_and_VMS_versions)
-
-dgn_comp.h	NH_filestag=(lex/yacc_output_for_special_level_and_dungeon_compilers)
-dgn_lex.c	NH_filestag=>dgn_comp.h
-dgn_yacc.c	NH_filestag=>dgn_comp.h
-lev_comp.h	NH_filestag=>dgn_comp.h
-lev_lex.c	NH_filestag=>dgn_comp.h
-lev_yacc.c	NH_filestag=>dgn_comp.h
 
 posixregex.c NH_filestag=60(posix_regex_for_versions_that_include_regex_in_their_C_library)
 
