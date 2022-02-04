@@ -68,6 +68,17 @@ endif
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
+ifeq "$(GIT)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+ifeq "$(git)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
 #-INCLUDE multiw-2.370
 
 # compiler.370 contains compiler detection and adjustments common
@@ -193,6 +204,22 @@ LIBNHSYSOBJ = $(TARGETPFX)libnhmain.o $(TARGETPFX)ioctl.o \
 override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
 endif  # WANT_LIBNH
+
+# Lua
+# when building liblua.a, avoid warning that use of tmpnam() should be
+# replaced by mkstemp(); the lua code doesn't use nethack's config.h so
+# this needs to be passed via make rather than defined in unixconf.h
+SYSCFLAGS=-DLUA_USE_MACOSX
+ifdef GITSUBMODULES
+LUAFLAGS=CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
+ifneq "$(CCISCLANG)" ""
+# clang
+LUAFLAGS +=CWARNGCC=''
+endif   # clang
+override LUAHEADERS = submodules/lua
+override LUA2NHTOP = ../..
+override LUAMAKEFLAGS=$(LUAFLAGS)
+endif   # GITSUBMODULES
 
 WANT_BUNDLE=1
 ifdef WANT_SHARE_INSTALL

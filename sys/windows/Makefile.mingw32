@@ -45,30 +45,19 @@ DEBUGINFO = N
 
 #
 #---------------------------------------------------------------
-# Location of pdcurses
+# Do you have a connection to the internet available that you want
+# to utilize for obtaining prerequisite Lua source code and pdcurses source code
 #
-# NetHack obtained via git clone (default)
-PDCURSES_TOP = ../submodules/pdcurses
 
-# NetHack sources obtained by zip file download
-#PDCURSES_TOP = ../lib/pdcurses
+INTERNET_AVAILABLE = N
+
 #
 #---------------------------------------------------------------
-# Location of LUA on this machine
+# Do you have git commands available and NetHack in a git repository?
 #
-# Original Lua source can be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
-#
-#    This build assumes that the LUA sources are located
-#    at the specified location. If they are actually elsewhere
-#    you'll need to specify the correct spot below in order to
-#    successfully build NetHack-3.7.
-#
-# NetHack obtained via git clone (default)
-LUATOP = ../submodules/lua
 
-# NetHack sources obtained by zip file download (see Install.windows)
-#LUATOP = ../lib/lua-5.4.4
+GIT_AVAILABLE = N
+
 #
 #===============================================
 #======= End of Modification Section ===========
@@ -85,12 +74,111 @@ LUATOP = ../submodules/lua
 SKIP_NETHACKW = N
 USE_LUADLL = Y
 WANT_LUAC = N
-ADD_CURSES=Y
 
 ifndef LUA_VERSION
 LUAVER=5.4.4
 else
 LUAVER=$(LUA_VERSION)
+endif
+
+# if GIT=1 is passed on the make command, allow use of git and internet
+if "$(GIT)" "1"
+INTERNET_AVAILABLE=Y
+GIT_AVAILABLE=Y
+endif
+if "$(git)" "1"
+INTERNET_AVAILABLE=Y
+GIT_AVAILABLE=Y
+endif
+
+#
+#==============================================================================
+# Sanity checks for prerequisite Lua and pdcurses
+#
+LUA_MAY_PROCEED=N
+ADD_CURSES=N
+
+# First, Lua
+ifeq "$(INTERNET_AVAILABLE)" "Y"
+ifeq "$(GIT_AVAILABLE)" "Y"
+LUATOP=../submodules/lua
+LUASRC=$(LUATOP)
+LUA_MAY_PROCEED=Y
+else    # GIT_AVAILABLE
+LUATOP = ../lib/lua-$(LUAVER)
+LUASRC = $(LUATOP)/src
+LUA_MAY_PROCEED=Y
+endif   # GIT_AVAILABLE
+else    # INTERNET_AVAILABLE not
+# The internet is not available for obtaining Lua using either
+# method (git or download). Check to see if it is available already, with
+# precedence given to ../submodules, then ../lib.
+#
+ifneq ("$(wildcard ../submodules/lua/lua.h)", "")
+$(info Here- ../submodules/lua/lua.h)
+LUATOP=../submodules/lua
+LUASRC=$(LUATOP)
+LUA_MAY_PROCEED=Y
+else ifneq ("$(wildcard ../lib/lua-$(LUAVER)/src/lua.h)", "")
+$(info Here- ../lib/lua-$(LUAVER)/src/lua.h)
+LUATOP = ../lib/lua-$(LUAVER)
+LUASRC = $(LUATOP)/src
+LUA_MAY_PROCEED=Y
+else
+$(info NO MATCH)
+endif   # Lua sources
+ifeq "$(LUA_MAY_PROCEED)" "Y"
+$(info No internet connection was authorized in the Makefile,)
+$(info but a copy of lua-$(LUAVER) was found in $(LUASRC), so that will be used.)
+endif  # LUA_MAY_PROCEED
+endif  # INTERNET_AVAILABLE
+
+ifneq "$(LUA_MAY_PROCEED)" "Y"
+ifneq "$(INTERNET_AVAILABLE)" "Y"
+$(info Your Makefile settings do not allow use of the internet to obtain Lua)
+endif  # INTERNET_AVAILABLE
+$(info and no copy of Lua was found in either ../submodules/lua or ../lib/lua-$(LUAVER).)
+$(info Change youf make command line to include:)
+$(info     GIT=1)
+$(info or modify your Makefile to set the following:)
+$(info     INTERNET_AVAILABLE=Y)
+$(info     GIT_AVAILABLE=Y)
+$(error Stopping because NetHack 3.7 requires Lua for its build.)
+endif  # LUA_MAY_PROCEED
+
+# Now, pdcurses
+ifeq "$(INTERNET_AVAILABLE)" "Y"
+ifeq "$(GIT_AVAILABLE)" "Y"
+PDCURSES_TOP=../submodules/pdcurses
+ADD_CURSES=Y
+else  # GIT_AVAILABLE
+PDCURSES_TOP=../lib/pdcurses
+ADD_CURSES=Y
+endif  # GIT_AVAILABLE
+else   # INTERNET_AVAILABLE is not Y below
+# Your Makefile settings to not allow pdcurses to be obtained by
+# git or by download). Check to see if it is available at one of
+# the expected locations already, with precedence given to ../submodules,
+# then ../lib.
+#
+
+ifeq (,$(wildcard ../submodules/pdcurses/curses.h))
+PDCURSES_TOP=../submodules/pdcurses
+ADD_CURSES=Y
+else ifeq (,$(wildcard ../lib/pdcurses/curses.h))
+PDCURSES_TOP=../lib/pdcurses
+ADD_CURSES=Y
+endif  # pdcurses sources available somewhere
+
+ifeq "$(ADD_CURSES)" "Y"
+$(info Your Makefile settings do not allow pdcurses to be obtained by)
+$(info git or by download, but a copy of pdcurses was found in $(PDCURSES_TOP),)
+$(info so that will be used.)
+endif  # ADD_CURSES == Y
+endif  # INTERNET_AVAILABLE
+
+ifneq "$(ADD_CURSES)" "Y"
+$(info NetHack 3.7 will be built without support for the curses window-port.)
 endif
 
 #==============================================================================
@@ -219,7 +307,6 @@ CLEAN_DIR = $(GAMEDIR) $(OBJ)
 #=================================================================
 
 OLUA = $(O)lua
-LUASRC = $(LUATOP)
 LUAOBJS = $(addprefix $(OLUA)/, $(addsuffix .o, lapi lauxlib lbaselib lcode lcorolib lctype \
 	  ldblib ldebug ldo ldump lfunc lgc linit liolib llex lmathlib lmem \
 	  loadlib lobject lopcodes loslib lparser lstate lstring lstrlib ltable ltablib ltm \
@@ -275,7 +362,7 @@ CLEAN_FILE += $(LUATARGETS) $(LUAOBJS) $(OLUA)/lua.o $(OLUA)/luac.o
 NHLUAH = $(INCL)/nhlua.h
 
 $(NHLUAH):
-	echo "/* nhlua.h - generated by top Makefile */" > $@
+	echo "/* nhlua.h - generated by Makefile.mingw32 */" > $@
 	@echo "#include \"$(LUASRC)/lua.h\"" >> $@
 	@echo "LUA_API int (lua_error) (lua_State *L) NORETURN;" >>$@
 	@echo "#include \"$(LUASRC)/lualib.h\"" >> $@
@@ -346,6 +433,7 @@ PDCSRC = $(PDCURSES_TOP)/pdcurses
 PDCWINCON = $(PDCURSES_TOP)/wincon
 PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCWINCON)
 PDCLIB = $(O)pdcurses.a
+PDCDEP = $(PDCURSES_TOP)/curses.h
 
 pdcurses: $(PDCLIB)
 
@@ -576,6 +664,52 @@ CLEAN_DIR += $(ODLB)
 CLEAN_FILE += $(DTARGETS) $(DLBOBJS) $(INCL)/date.h
 
 #==========================================
+# Fetching other sources
+#==========================================
+
+ifeq "$(INTERNET_AVAILABLE)" "Y"
+ifeq "$(GIT_AVAILABLE)" "Y"
+
+fetchlua:
+	mkdir -p ../lib
+	if [ ! -f "$(LUASRC)/lua.h" ]; then \
+		git submodule init ../submodules/lua; \
+		git submodule update --remote ../submodules/lua; \
+	fi
+fetchpdcurses:
+	mkdir -p ../lib
+	if [ ! -f "$(PDCURSES_TOP)/curses.h" ]; then \
+		git submodule init ../submodules/pdcurses; \
+		git submodule update --remote ../submodules/pdcurses; \
+	fi
+else  # GIT_AVAILABLE no
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
+CURLLUADST=lua-5.4.4.tar.gz
+
+CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
+CURLPDCDST=pdcurses.zip
+
+fetchlua:
+	mkdir -p ../lib
+	if [ ! -f "$(LUASRC)/lua.h" ]; then \
+		cd ../lib; \
+		curl -L $(CURLLUASRC) -o $(CURLLUADST); \
+		/c/Windows/System32/tar -xvf $(CURLLUADST); \
+		cd ../src; \
+	fi
+fetchpdcurses:
+	mkdir -p ../lib
+	if [ ! -f "$(PDCURSES_TOP)/curses.h" ]; then \
+		cd ../lib; \
+		curl -L $(CURLPDCSRC) -o $(CURLPDCDST); \
+		mkdir -p pdcurses; \
+		/c/Windows/System32/tar -C pdcurses --strip-components=1 -xvf $(CURLPDCDST); \
+		cd ../src; \
+	fi
+endif  # GIT_AVAILABLE
+endif  # INTERNET_AVAILABLE
+
+#==========================================
 # nethackw
 #==========================================
 COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl cmd cppregex \
@@ -723,7 +857,8 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #==========================================
 
 .PHONY: all clean default install lua makedefs recover pdcurses \
-	tile2bmp tilemap uudecode dlb nethackw nethack tileutil
+	tile2bmp tilemap uudecode dlb nethackw nethack tileutil \
+	fetchlua fetchpdcurses
 
 #
 #  Everything
@@ -747,7 +882,7 @@ ifeq "$(USE_DLB)" "Y"
 TO_INSTALL += $(DLB)
 endif
 
-install: $(TO_INSTALL)
+install: fetchlua fetchpdcurses $(TO_INSTALL)
 ifdef CI_COMPILER
 	ls -l $(SRC)
 	ls -l $(DAT)

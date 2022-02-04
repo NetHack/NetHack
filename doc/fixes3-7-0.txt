@@ -1584,7 +1584,7 @@ expand glyphs to map altars that can vary between unaligned, chaotic,
 	per map cell via display code
 explosion types are mapped and can vary between dark, noxious, muddy, wet,
 	magical, fiery and frosty; tile interfaces already had unique tiles
-	for each and tty was altering the color on the fly via per map cell
+	for each and tty was altering the color on the fly via per map  cell
 	via display code
 expand glyphs to uniquely represent things that are at the top of a pile of
 	objects (piletops); some window ports were already doing that on the
@@ -1611,4 +1611,5 @@ map_glyphinfo() now simply references an internal array that maps each unique
 added MG_MALE glyphflag to complement the MG_FEMALE glyphflag that was there
 remove obsolete roles[].femalenum and rename roles[].malenum to roles[].mnum;
 	likewise for races[]
-
+add git submodule support to the Makefiles by specifying git=1 or GIT=1 on the
+	make command
