@@ -6,4 +6,4 @@ depend.awk NHSUBST
 sysconf NHSUBST
 *shr NH_header=no
 * NH_filestag=(file%s_for_UNIX_versions)
-cpp?.shr NH_filestag=(file%s_for_replacement_cpp,_only_needed_by_some_ancient_UNIX_systems)
+
