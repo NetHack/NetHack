@@ -3620,7 +3620,7 @@
           text file and can be created with any text editor.
 
                On  Windows,  it  is  ".nethackrc" in the folder "\%USERPRO-
-          FILE%\NetHack\3.6".  The file may not exist, but it is  a  normal
+          FILE%\NetHack\3.7".  The file may not exist, but it is  a  normal
           ASCII  text  file can can be created with any text editor.  After
 
 
@@ -3636,7 +3636,7 @@
 
           running NetHack for the first time, you  should  find  a  default
           template  for  the configuration file named ".nethackrc.template"
-          in "\%USERPROFILE%\NetHack\3.6".  If you had not created the con-
+          in "\%USERPROFILE%\NetHack\3.7".  If you had not created the con-
           figuration  file,  NetHack will create the configuration file for
           you using the default template file.
 
@@ -5699,7 +5699,7 @@
             parts:
 
             MESG        - message window mapping (the only one supported in
-                          3.6);
+                          3.7);
             pattern     - the pattern to match;
             sound file  - the sound file to play;
             volume      - the  volume  to  be  set  while playing the sound
@@ -6379,7 +6379,7 @@
             lows the following placeholders:
 
             %% - literal `%'
-            %v - version (eg. "3.6.3-0")
+            %v - version (eg. "3.7.0-0")
             %u - game UID
             %t - game start time, UNIX timestamp format
             %T - current time, UNIX timestamp format
