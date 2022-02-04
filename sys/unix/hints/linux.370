@@ -263,6 +263,7 @@ override LUAHEADERS = submodules/lua
 override LUA2NHTOP = ../..
 override LUAMAKEFLAGS=$(LUAFLAGS)
 endif   # GITSUBMODULES
+DLLIB = -ldl
 
 # Only needed for GLIBC stack trace:
 LFLAGS=-rdynamic

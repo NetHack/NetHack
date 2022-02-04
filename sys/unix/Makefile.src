@@ -458,7 +458,7 @@ PACKAGE=@true
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
-LUALIB = ../lib/lua/liblua.a -lm
+LUALIB = ../lib/lua/liblua.a -lm $(DLLIB)
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
