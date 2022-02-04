@@ -8,4 +8,4 @@
 *.props NH_header=no
 resource.h NH_header=no
 nhresource.h NH_header=no
-* NH_filestag=(file%s_for_Windows_versions_-_tested_up_to_Windows_10)
+* NH_filestag=(file%s_for_Windows_versions_-_tested_up_to_Windows_11)

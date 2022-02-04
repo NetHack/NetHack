@@ -1,15 +1,4 @@
 * NH_filestag=(file%s_for_all_versions)
-..files NH_filegenerated=win32api.h,tile.h,date.h
-
-win32api.h NH_filesgentag=(file%s_for_win32_that_are_moved_into_include_at_compile_time)
-
-tile.h NH_filesgentag=(file%s_for_tiles_support_copied_from_win/share_at_compile_time)
-
-dgn_comp.h NH_filesgentag=(file%s_generated_by_yacc_(or_copied_from_sys/share)_at_compile_time)
-lev_comp.h NH_filesgentag=>dgn_comp.h
-
-date.h NH_filesgentag=(file%s_generated_by_makedefs_at_compile_time)
-
 wintty.h NH_filestag=(file%s_for_tty_versions)
 
 tile2x11.h NH_filestag=(file%s_for_X_versions)
@@ -17,24 +6,4 @@ winX.h NH_filestag=>tile2x11.h
 xwindow.h NH_filestag=>tile2x11.h
 xwindowp.h NH_filestag=>tile2x11.h
 
-qt_clust.h NH_filestag=(file%s_for_Qt_versions)
-qt_kde0.h NH_filestag=>qt_clust.h
-qt_win.h NH_filestag=>qt_clust.h
-qt_xpms.h NH_filestag=>qt_clust.h
-qttableview.h NH_filestag=>qt_clust.h
 
-bitmfile.h   NH_filestag=(file%s_for_GEM_versions)
-gem_rsc.h NH_filestag=>bitmfile.h
-load_img.h NH_filestag=>bitmfile.h
-wingem.h NH_filestag=>bitmfile.h
-
-winGnome.h NH_filestag=(file%s_for_GNOME_versions)
-
-mac-carbon.h NH_filestag=(file%s_for_various_Macintosh_versions)
-mac-qt.h NH_filestag=>mac-carbon.h
-mac-term.h NH_filestag=>mac-carbon.h
-macconf.h NH_filestag=>mac-carbon.h
-macpopup.h NH_filestag=>mac-carbon.h
-mactty.h NH_filestag=>mac-carbon.h
-macwin.h NH_filestag=>mac-carbon.h
-mttypriv.h NH_filestag=>mac-carbon.h
