@@ -371,3 +371,7 @@ spotless-keep-lib: clean-keep-lib
 	( cd util ; $(MAKE) spotless )
 	( cd dat ; $(MAKE) spotless )
 	( cd doc ; $(MAKE) spotless )
+spotless-clean-submodule:
+	@( if test -f submodules/lua/lua.h ; then \
+	    git submodule deinit submodules/lua ; fi )
+
