@@ -1,14 +1,9 @@
 *.pl NHSUBST
 *.[ly] NHSUBST
 * NH_filestag=(file%s_for_all_versions)
-*.[ly] NH_filestag=(lex/yacc_input_for_special_level_and_dungeon_compilers)
 
-..files NH_filegenerated=uudecode.exe,tiletxt.c,dgn_lex.c,dgn_yacc.c,lev_lex.c,lev_yacc.c
-uudecode.exe NH_filesgentag=(file%s_generated_for_win32_at_compile_time)
+..files NH_filegenerated=uudecode.exe,tiletxt.c
+uudecode.exe NH_filesgentag=(file%s_generated_for_windows_at_compile_time)
 tiletxt.c NH_filesgentag=(file%s_generated_for_unix_at_compile_time_if_various_tiles_utilities_are_built)
 
-dgn_lex.c NH_filesgentag=(file%s_generated_by_lex_and_yacc_(or_copied_from_sys/share)_at_compile_time)
-dgn_yacc.c NH_filesgentag=>dgn_lex.c
-lev_lex.c NH_filesgentag=>dgn_lex.c
-lev_yacc.c NH_filesgentag=>dgn_lex.c
 
