@@ -321,9 +321,6 @@ XCode.xcconfig  depend.awk      gitinfo.sh      mkmkfile.sh
 nethack.sh      setup.sh        sysconf         unixmain.c
 unixres.c       unixunix.c
 
-(files for replacement cpp, only needed by some ancient UNIX systems)
-cpp1.shr  cpp2.shr  cpp3.shr
-
 sys/unix/NetHack.xcodeproj:
 (file for UNIX versions)
 project.pbxproj
