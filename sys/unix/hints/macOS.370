@@ -7,13 +7,13 @@
 # Tested on:
 #     - MacOS Catalina 10.15
 #
-# If this doesn't work for some other version of Mac OS X, consider
+# If this doesn't work for some other version of macOS, consider
 # making a new hints file it, rather than changing this one.
 # And let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
 
 #-PRE xxxx
-# macOS X hints file
+# macOS hints file
 #
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2

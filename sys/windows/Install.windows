@@ -260,7 +260,7 @@ Setting Up
     window-port, which evolved from work originally done by Karl Garrison,
     has been used in several NetHack variants and on nethack.alt.org and
     on www.hardfought.org/nethack/. The optional curses window-port is
-    available for Windows, Mac OS X, and Unix (and also DOS).
+    available for Windows, macOS, and Unix (and also DOS).
 
     The Makefiles are configured by default to include the curses
     window-port support in your command line Makefile build.

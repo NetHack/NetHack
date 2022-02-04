@@ -3324,7 +3324,7 @@ operating systems.
 On
 .UX ,
 Linux,
-and Mac OS X it is \(lq.nethackrc\(rq in the user's home directory.
+and macOS it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 .pg

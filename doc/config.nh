@@ -1,7 +1,7 @@
 # NetHack 3.7  config.nh       $NHDT-Date: 1596498144 2020/08/03 23:42:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
-# Sample config file for NetHack 3.6
+# Sample config file for NetHack 3.7
 #
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
@@ -9,9 +9,10 @@
 # playing.
 #
 # Copy the contents of this file into
-# * defaults.nh, same folder as nethack.exe or nethackW.exe (DOS, Windows)
-# * ~/.nethackrc (Unix, linux, Mac OS X)
+# * %USERPROFILE%\nethack\.nethackrc on Windows
+# * ~/.nethackrc (Unix, linux, macOS)
 # * "NetHack Defaults" on pre-OSX Mac and BeOS
+# * defaults.nh, same folder as nethack.exe on DOS
 # * NetHack.cnf on Amiga, Atari, OS/2, and VMS
 #
 # To change the configuration, comment out the unwanted lines, and

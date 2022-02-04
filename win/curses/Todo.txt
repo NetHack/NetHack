@@ -122,9 +122,8 @@ OTHER DIALOGS
 OTHER PLATFORMS
 ===============
 
- * PDCurses also work on DOS and OS/2.  PDCurses for SDL and ncurses
- exist for Mac OS X.  Porting the curses interface to these platforms
- should not be too difficult.
+ * PDCurses also work on DOS and OS/2.  Porting the curses interface to
+ these platforms should not be too difficult.
 
 
 MISC

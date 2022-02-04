@@ -65,7 +65,7 @@ A. If you have never set up git on this machine before:
 		git config --global user.name "MY NAME"
 		git config --global user.email USER@EXAMPLE.COM
    You probably want to set up a credential cache.
-	Mac OS X:
+	macOS (10 - 12):
 		git config --global credential.helper osxkeychain
 	Windows:
 		git config --global credential.helper store

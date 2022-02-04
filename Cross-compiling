@@ -182,7 +182,7 @@ cross-compiling possible:
        some research to find out if a cross-compiler exists that:
            - produces output for XX-Platform.
            - executes on a platform that you use and love (Linux, Windows,
-             Mac OS X are some examples of platforms that have cross-compilers
+             macOS are some examples of platforms that have cross-compilers
              for other targets available)
 
     o  Then, make the community, devteam, and others aware that you're starting
