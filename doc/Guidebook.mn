@@ -3329,12 +3329,12 @@ The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 .pg
 On Windows, it is \(lq.nethackrc\(rq in the folder
-\(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.  The file may not exist,
+\(lq\\%USERPROFILE%\\NetHack\\3.7\(rq.  The file may not exist,
 but it is a normal ASCII text file can can be created with any
 text editor.
 After running NetHack for the first time, you should find a default
 template for the configuration file named \(lq.nethackrc.template\(rq
-in \(lq\\%USERPROFILE%\\NetHack\\3.6\(rq.
+in \(lq\\%USERPROFILE%\\NetHack\\3.7\(rq.
 If you had not created the configuration file, NetHack will create
 the configuration file for you using the default template file.
 .pg
@@ -5020,7 +5020,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
-message window mapping (the only one supported in 3.6);
+message window mapping (the only one supported in 3.7);
 .PL pattern
 the pattern to match;
 .PL "sound file"
@@ -5618,7 +5618,7 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 .PL %%
 literal \(oq\f(CR%\fP\(cq
 .PL %v
-version (eg. \(lq\f(CR3.6.3\-0\fP\(rq)
+version (eg. \(lq\f(CR3.7.0\-0\fP\(rq)
 .PL %u
 game UID
 .PL %t
