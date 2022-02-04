@@ -876,11 +876,20 @@ test_move(int ux, int uy, int dx, int dy, int mode)
                 else if (Passes_walls && !may_passwall(x, y)
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
-                else if (flags.mention_walls)
-                    pline("It's %s.",
-                          (IS_WALL(tmpr->typ) || tmpr->typ == SDOOR) ? "a wall"
-                          : IS_TREE(tmpr->typ) ? "a tree"
-                          : "solid stone");
+                else if (flags.mention_walls) {
+                    char buf[BUFSZ];
+                    coord cc;
+                    int sym = 0;
+                    const char *firstmatch = 0;
+
+                    cc.x = x, cc.y = y;
+                    do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
+                    if (!strcmp(firstmatch, "stone"))
+                        Sprintf(buf, "solid stone");
+                    else
+                        Sprintf(buf, "%s", an(firstmatch));
+                    pline("It's %s.", buf);
+                }
             }
             return FALSE;
         }
