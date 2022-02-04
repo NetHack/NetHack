@@ -3615,9 +3615,9 @@
                The default name of the configuration file varies on differ-
           ent operating systems.
 
-               On  UNIX,  Linux, and Mac OS X it is ".nethackrc" in the us-
-          er's home directory.  The file may not exist, but it is a  normal
-          ASCII text file and can be created with any text editor.
+               On  UNIX,  Linux, and macOS it is ".nethackrc" in the user's
+          home directory.  The file may not exist, but it is a normal ASCII
+          text file and can be created with any text editor.
 
                On  Windows,  it  is  ".nethackrc" in the folder "\%USERPRO-
           FILE%\NetHack\3.6".  The file may not exist, but it is  a  normal
