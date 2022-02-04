@@ -209,9 +209,8 @@ endif  # WANT_LIBNH
 # when building liblua.a, avoid warning that use of tmpnam() should be
 # replaced by mkstemp(); the lua code doesn't use nethack's config.h so
 # this needs to be passed via make rather than defined in unixconf.h
-SYSCFLAGS=-DLUA_USE_MACOSX
 ifdef GITSUBMODULES
-LUAFLAGS=CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
+LUAFLAGS=CC='$(CC)' MYCFLAGS=' -DLUA_USE_MACOSX'
 ifneq "$(CCISCLANG)" ""
 # clang
 LUAFLAGS +=CWARNGCC=''
