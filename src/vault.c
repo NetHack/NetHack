@@ -256,13 +256,13 @@ uleftvault(struct monst *grd)
 static boolean
 find_guard_dest(struct monst *guard, xchar *rx, xchar *ry)
 {
-    register int x, y, dd, lx = 0, ly = 0;
+    register int x, y, dd, lx, ly;
 
     for (dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
-        for (y = u.uy - dd; y <= u.uy + dd; ly = y, y++) {
+        for (y = u.uy - dd; y <= u.uy + dd; y++) {
             if (y < 0 || y > ROWNO - 1)
                 continue;
-            for (x = u.ux - dd; x <= u.ux + dd; lx = x, x++) {
+            for (x = u.ux - dd; x <= u.ux + dd; x++) {
                 if (y != u.uy - dd && y != u.uy + dd && x != u.ux - dd)
                     x = u.ux + dd;
                 if (x < 1 || x > COLNO - 1)
