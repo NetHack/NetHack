@@ -1578,13 +1578,13 @@ seffect_light(struct obj **sobjp)
             pline("Tiny lights sparkle in the air momentarily.");
         } else {
             /* surround with cancelled tame lights which won't explode */
+            struct monst *mon;
             boolean sawlights = FALSE;
-            int numlights = rn1(2,3) + (sblessed * 2);
-            int i;
+            int i, numlights = rn1(2, 3) + (sblessed * 2);
 
             for (i = 0; i < numlights; ++i) {
-                struct monst * mon = makemon(&mons[pm], u.ux, u.uy,
-                                             MM_EDOG | NO_MINVENT | MM_NOMSG);
+                mon = makemon(&mons[pm], u.ux, u.uy,
+                              MM_EDOG | NO_MINVENT | MM_NOMSG);
                 initedog(mon);
                 mon->msleeping = 0;
                 mon->mcan = TRUE;
@@ -2279,32 +2279,65 @@ set_lit(int x, int y, genericptr_t val)
 }
 
 void
-litroom(register boolean on, struct obj* obj)
+litroom(
+    boolean on,      /* True: make nearby area lit; False: cursed scroll */
+    struct obj *obj) /* scroll, spellbook (for spell), or wand of light */
 {
-    char is_lit; /* value is irrelevant; we use its address
-                    as a `not null' flag for set_lit() */
+    struct obj *otmp;
+    boolean blessed_effect = (obj && obj->oclass == SCROLL_CLASS
+                              && obj->blessed);
+    char is_lit = 0; /* value is irrelevant but assign something anyway; its
+                      * address is used as a 'not null' flag for set_lit() */
 
-    /* first produce the text (provided you're not blind) */
+    /* update object lights and produce message (provided you're not blind) */
     if (!on) {
-        register struct obj *otmp;
+        int still_lit = 0;
 
-        if (!Blind) {
-            if (u.uswallow) {
-                pline("It seems even darker in here than before.");
-            } else {
-                if (uwep && artifact_light(uwep) && uwep->lamplit)
-                    pline("Suddenly, the only light left comes from %s!",
-                          the(xname(uwep)));
+        /*
+         * The magic douses lamps,&c too and might curse artifact lights.
+         *
+         * FIXME?
+         *  Shouldn't this affect all lit objects in the area of effect
+         *  rather than just those carried by the hero?
+         */
+        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+            if (otmp->lamplit) {
+                if (!artifact_light(otmp))
+                    (void) snuff_lit(otmp);
                 else
-                    You("are surrounded by darkness!");
+                    /* wielded Sunsword or worn gold dragon scales/mail;
+                       maybe lower its BUC state if not already cursed */
+                    impact_arti_light(otmp, TRUE, (boolean) !Blind);
+
+                if (otmp->lamplit)
+                    ++still_lit;
             }
         }
-
-        /* the magic douses lamps, et al, too */
-        for (otmp = g.invent; otmp; otmp = otmp->nobj)
-            if (otmp->lamplit)
-                (void) snuff_lit(otmp);
+        /* scroll of light becomes discovered when not blind, so some
+           message to justify that is needed */
+        if (Blind) {
+            /* for the still_lit case, we don't know at this point whether
+               anything currently visibly lit is going to go dark; if this
+               message came after the darkening, we could count visibly
+               lit squares before and after to know; we do know that being
+               swallowed won't be affected--the interior is still lit */
+            if (still_lit)
+                pline_The("ambient light seems dimmer.");
+            else if (u.uswallow)
+                pline("It seems even darker in here than before.");
+            else
+                You("are surrounded by darkness!");
+        }
     } else { /* on */
+        if (blessed_effect) {
+            /* might bless artifact lights; no effect on ordinary lights */
+            for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+                if (otmp->lamplit && artifact_light(otmp))
+                    /* wielded Sunsword or worn gold dragon scales/mail;
+                       maybe raise its BUC state if not already blessed */
+                    impact_arti_light(otmp, FALSE, (boolean) !Blind);
+            }
+        }
         if (u.uswallow) {
             if (Blind)
                 ; /* no feedback */
@@ -2338,16 +2371,15 @@ litroom(register boolean on, struct obj* obj)
 
         if (rnum >= 0) {
             for (rx = g.rooms[rnum].lx - 1; rx <= g.rooms[rnum].hx + 1; rx++)
-                for (ry = g.rooms[rnum].ly - 1; ry <= g.rooms[rnum].hy + 1; ry++)
+                for (ry = g.rooms[rnum].ly - 1;
+                     ry <= g.rooms[rnum].hy + 1; ry++)
                     set_lit(rx, ry,
                             (genericptr_t) (on ? &is_lit : (char *) 0));
             g.rooms[rnum].rlit = on;
         }
         /* hallways remain dark on the rogue level */
     } else
-        do_clear_area(u.ux, u.uy,
-                      (obj && obj->oclass == SCROLL_CLASS && obj->blessed)
-                         ? 9 : 5,
+        do_clear_area(u.ux, u.uy, blessed_effect ? 9 : 5,
                       set_lit, (genericptr_t) (on ? &is_lit : (char *) 0));
 
     /*
@@ -2379,6 +2411,7 @@ litroom(register boolean on, struct obj* obj)
             free((genericptr_t) gremlin);
         } while (gremlins);
     }
+    return;
 }
 
 static void

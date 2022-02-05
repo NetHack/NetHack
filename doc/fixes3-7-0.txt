@@ -991,6 +991,8 @@ a change to wounded legs handling resulted in not recovering lost dexterity
 	rather than having legs be explicitly healed
 turning movement into commands broke the rest_on_space option; it also
 	interfered with using pick-axe plus autodig in downward direction
+cursed scroll of light had special message when wielding Sunsword that didn't
+	work for wearing gold dragon scales/mail
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -1370,6 +1372,9 @@ drinking blessed potion of full healing heals wounded legs, either hero's or
 drinking uncursed potion of full healing or blessed potion of extra healing
 	heal hero's wounded legs when not riding; no effect on steed if riding
 cancellation explodes most magical traps
+reading a blessed scroll of light has a chance to improve bless/curse state
+	of wielded Sunsword or worn gold dragon scales/mail similar to dipping
+	those into holy water; cursed scroll has chance to worsen the state
 
 
 Platform- and/or Interface-Specific New Features

@@ -1447,7 +1447,7 @@ H2Opotion_dip(
     boolean useeit,        /* will hero see the glow/aura? */
     const char *objphrase) /* "Your widget glows" or "Steed's saddle glows" */
 {
-    void (*func)(struct obj *) = 0;
+    void (*func)(struct obj *) = (void (*)(struct obj *)) 0;
     const char *glowcolor = 0;
 #define COST_alter (-2)
 #define COST_none (-1)
@@ -1526,6 +1526,38 @@ H2Opotion_dip(
         res = TRUE;
     }
     return res;
+}
+
+/* used when blessed or cursed scroll of light interacts with artifact light;
+   if the lit object (Sunsword or gold dragon scales/mail) doesn't resist,
+   treat like dipping it in holy or unholy water (BUC change, glow message) */
+void
+impact_arti_light(
+    struct obj *obj, /* wielded Sunsword or worn gold dragon scales/mail */
+    boolean worsen,  /* True: lower BUC state unless already cursed;
+                      * False: raise BUC state unless already blessed */
+    boolean seeit)   /* True: give "<obj> glows <color>" message */
+{
+    struct obj *otmp;
+
+    /* if already worst/best BUC it can be, or if it resists, do nothing */
+    if ((worsen ? obj->cursed : obj->blessed) || obj_resists(obj, 75, 25))
+        return;
+
+    /* curse() and bless() take care of maybe_adjust_light() */
+    otmp = mksobj(POT_WATER, TRUE, FALSE);
+    if (worsen)
+        curse(otmp);
+    else
+        bless(otmp);
+    H2Opotion_dip(otmp, obj, seeit, seeit ? Yobjnam2(obj, "glow") : "");
+    dealloc_obj(otmp);
+#if 0   /* defer this until caller has used up the scroll so it won't be
+         * visible; player was told that it disappeared as hero read it */
+    if (carried(obj)) /* carried() will always be True here */
+        update_inventory();
+#endif
+    return;
 }
 
 /* potion obj hits monster mon, which might be youmonst; obj always used up */
