@@ -322,19 +322,19 @@ nethack.sh      setup.sh        sysconf         unixmain.c
 unixres.c       unixunix.c
 
 sys/unix/NetHack.xcodeproj:
-(file for UNIX versions)
+(file for macOS Xcode)
 project.pbxproj
 
 sys/unix/NetHack.xcodeproj/project.xcworkspace:
-(file for UNIX versions)
+(file for macOS Xcode)
 contents.xcworkspacedata
 
 sys/unix/NetHack.xcodeproj/project.xcworkspace/xcshareddata:
-(files for UNIX versions)
+(files for macOS Xcode)
 IDEWorkspaceChecks.plist      WorkspaceSettings.xcsettings
 
 sys/unix/NetHack.xcodeproj/xcshareddata/xcschemes:
-(files for UNIX versions)
+(files for macOS Xcode)
 NetHack.xcscheme   makedefs.xcscheme  recover.xcscheme
 
 sys/unix/hints:
