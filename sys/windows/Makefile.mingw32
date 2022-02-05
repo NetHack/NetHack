@@ -250,15 +250,9 @@ USE_DLB = Y
 ifdef CI_COMPILER
 cc = gcc -c
 ld = gcc
-# the mingw version on our CI is missing
-# winres.h. This will cause the Makefile.mingw32
-# to put a temporary copy into one of our folders
-# that windres is already looking in.
-MISSING_HEADER = Y
 else
 cc = gcc -c
 ld = gcc
-MISSING_HEADER = N
 endif
 ifeq "$(MSYSTEM)" "MINGW32"
 rc = windres --target=pe-i386
@@ -829,22 +823,7 @@ $(ONH)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $(PDCINCL) $< -o$@
 
 $(NHRES): $(MSWIN)/NetHack.rc $(MSWIN)/NetHack.ico | $(ONH)
-ifeq "$(MISSING_HEADER)" "Y"
-	echo '/**' > $(MSWIN)/winres.h
-	echo ' * This file has no copyright assigned and is placed in the Public Domain.' >> $(MSWIN)/winres.h
-	echo ' * This file is part of the mingw-w64 runtime package.' >> $(MSWIN)/winres.h
-	echo ' * No warranty is given; refer to the file DISCLAIMER.PD within this package.' >> $(MSWIN)/winres.h
-	echo ' */' >> $(MSWIN)/winres.h
-	echo '#include <winresrc.h>' >> $(MSWIN)/winres.h
-	echo '#ifdef IDC_STATIC' >> $(MSWIN)/winres.h
-	echo '#undef IDC_STATIC' >> $(MSWIN)/winres.h
-	echo '#endif' >> $(MSWIN)/winres.h
-	echo '#define IDC_STATIC (-1)' >> $(MSWIN)/winres.h
-endif
 	$(rc) --include-dir=$(MSWIN) --input=$< -o$@
-ifeq "$(MISSING_HEADER)" "Y"
-	@-rm -f $(MSWIN)/winres.h
-endif
 
 $(ONH):
 	@mkdir -p $@
