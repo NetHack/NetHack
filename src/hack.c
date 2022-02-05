@@ -133,6 +133,14 @@ moverock(void)
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
     while ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
+
+        if (Blind && glyph_to_obj(glyph_at(sx, sy)) != BOULDER) {
+            pline("That feels like a boulder.");
+            map_object(otmp, TRUE);
+            nomul(0);
+            return -1;
+        }
+
         /* when otmp->next_boulder is 1, xname() will format it as
            "next boulder" instead of just "boulder"; affects
            boulder_hits_pool()'s messages as well as messages below */

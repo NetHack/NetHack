@@ -766,6 +766,7 @@ stinking gas clouds block line-of-sight
 covetous monsters will teleport to downstairs or upstairs to heal
 have fake player monsters use verbalize instead of pline when reacting to chat
 fix mention_walls distinguishing unseen walls from solid stone
+don't push unknown boulders when moving
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
