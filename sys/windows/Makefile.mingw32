@@ -82,11 +82,11 @@ LUAVER=$(LUA_VERSION)
 endif
 
 # if GIT=1 is passed on the make command, allow use of git and internet
-if "$(GIT)" "1"
+ifeq "$(GIT)" "1"
 INTERNET_AVAILABLE=Y
 GIT_AVAILABLE=Y
 endif
-if "$(git)" "1"
+ifeq "$(git)" "1"
 INTERNET_AVAILABLE=Y
 GIT_AVAILABLE=Y
 endif
