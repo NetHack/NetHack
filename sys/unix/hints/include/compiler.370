@@ -118,21 +118,18 @@ ifdef MAKEFILE_SRC
 ifdef WANT_WIN_QT
 # when switching from Qt5 to Qt6 or vice versa, any old .moc files will be
 # incompatible; get rid of them in case user hasn't run 'make spotless';
-# moc.qt5 and moc.qt6 are empty timestamp files and at most one should exist
+# object files are incompatable with Qt library, so get rid of them too;
+# Qt*.h-t are empty timestamp files and at most one should exist
+QTany_H = Qt*.h-t
 ifdef WANT_WIN_QT6
 # Qt 6 builds and runs (with a couple of warnings) but needs more testing
-MOCSTAMP=moc.qt6
+QTn_H = Qt6.h-t
 else
 # Qt 5 is currently the default version for nethack 3.7.x's Qt interface
-MOCSTAMP=moc.qt5
+QTn_H = Qt5.h-t
 endif
-# rule to build src/qt_foo.moc from win/Qt/qt_foo.h
-%.moc : ../win/Qt/%.h $(MOCSTAMP)
-	$(MOCPATH) -o $@ $<
-moc.qt5::
-	@if test ! -f moc.qt5; then ( rm -f *.moc moc.qt6; touch $@ ); fi;
-moc.qt6::
-	@if test ! -f moc.qt6; then ( rm -f *.moc moc.qt5; touch $@ ); fi;
+$(QTn_H) ::
+	@if test ! -f $@; then ( rm -f $(QTany_H) *.moc qt_*.o; touch $@ ); fi;
 endif #WANT_WIN_QT
 endif #MAKFILE_SRC
 
