@@ -147,7 +147,7 @@ static void mon_chain(winid, const char *, struct monst *, boolean, long *,
 static void contained_stats(winid, const char *, long *, long *);
 static void misc_stats(winid, long *, long *);
 static boolean accept_menu_prefix(const struct ext_func_tab *);
-
+static void reset_cmd_vars(void);
 static void add_herecmd_menuitem(winid, int (*)(void), const char *);
 static char here_cmd_menu(boolean);
 static char there_cmd_menu(boolean, int, int);
@@ -2035,6 +2035,12 @@ do_run_southwest(void)
 int
 do_reqmenu(void)
 {
+    if (iflags.menu_requested) {
+        Norep("Double %s prefix, canceled.", visctrl(cmd_from_func(do_reqmenu)));
+        iflags.menu_requested = FALSE;
+        return ECMD_CANCEL;
+    }
+
     iflags.menu_requested = TRUE;
     return ECMD_OK;
 }
@@ -2043,6 +2049,13 @@ do_reqmenu(void)
 int
 do_rush(void)
 {
+    if ((g.domove_attempting & DOMOVE_RUSH)) {
+        Norep("Double rush prefix, canceled.");
+        g.context.run = 0;
+        g.domove_attempting = 0;
+        return ECMD_CANCEL;
+    }
+
     g.context.run = 2;
     g.domove_attempting |= DOMOVE_RUSH;
     return ECMD_OK;
@@ -2052,6 +2065,13 @@ do_rush(void)
 int
 do_run(void)
 {
+    if ((g.domove_attempting & DOMOVE_RUSH)) {
+        Norep("Double run prefix, canceled.");
+        g.context.run = 0;
+        g.domove_attempting = 0;
+        return ECMD_CANCEL;
+    }
+
     g.context.run = 3;
     g.domove_attempting |= DOMOVE_RUSH;
     return ECMD_OK;
@@ -3746,6 +3766,19 @@ rnd_extcmd_idx(void)
     return rn2(extcmdlist_length + 1) - 1;
 }
 
+static void
+reset_cmd_vars(void)
+{
+    g.context.run = 0;
+    g.context.nopick = g.context.forcefight = FALSE;
+    g.context.move = g.context.mv = FALSE;
+    g.domove_attempting = 0;
+    g.multi = 0;
+    iflags.menu_requested = FALSE;
+    g.context.travel = g.context.travel1 = 0;
+    cmdq_clear();
+}
+
 void
 rhack(char *cmd)
 {
@@ -3754,10 +3787,9 @@ rhack(char *cmd)
         firsttime = (cmd == 0);
     struct _cmd_queue *cmdq = NULL;
     const struct ext_func_tab *cmdq_ec = NULL;
+    boolean was_m_prefix = FALSE;
 
-    iflags.menu_requested = FALSE;
-    prefix_seen = FALSE;
-    g.context.nopick = 0;
+    reset_cmd_vars();
 got_prefix_input:
 #ifdef SAFERHANGUP
     if (g.program_state.done_hup)
@@ -3783,21 +3815,14 @@ got_prefix_input:
     }
 
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
-        g.context.move = FALSE;
-        iflags.menu_requested = FALSE;
-        g.context.run = 0;
-        g.context.nopick = g.context.forcefight = FALSE;
-        g.context.mv = FALSE;
-        g.multi = 0;
-        g.domove_attempting = 0;
+        reset_cmd_vars();
         return;
     }
 
     /* Special case of *cmd == ' ' handled better below */
     if (!*cmd || *cmd == (char) 0377) {
         nhbell();
-        g.context.move = FALSE;
-        iflags.menu_requested = FALSE;
+        reset_cmd_vars();
         return; /* probably we just had an interrupt */
     }
 
@@ -3817,13 +3842,18 @@ got_prefix_input:
         /* current - use *cmd to directly index cmdlist array */
         if (tlist != 0) {
             if (!can_do_extcmd(tlist)) {
+                /* can_do_extcmd() already gave a message */
+                reset_cmd_vars();
                 res = ECMD_OK;
-                cmdq_clear();
-            } else if (prefix_seen && !accept_menu_prefix(tlist)
-                       && !(tlist->flags & PREFIXCMD)) {
-                /* we got a prefix previously, can this command accept one? */
+            } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
+                       && was_m_prefix && !accept_menu_prefix(tlist)) {
+                /* we got 'm' prefix previously, can this command accept one? */
+                reset_cmd_vars();
                 res = ECMD_OK;
-                cmdq_clear();
+                prefix_seen = FALSE;
+                was_m_prefix = FALSE;
+                pline("The %s command does not accept %s prefix.",
+                      tlist->ef_txt, visctrl(cmd_from_func(do_reqmenu)));
             } else {
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
@@ -3833,20 +3863,27 @@ got_prefix_input:
                 res = (*func)(); /* perform the command */
 
                 if ((tlist->flags & PREFIXCMD)) {
-                    /* it was a prefix command, mark and get another command */
+                    /* it was a prefix command, mark and get another cmd */
+                    if ((res & ECMD_CANCEL)) {
+                        /* prefix commands cancel if pressed twice */
+                        reset_cmd_vars();
+                        return;
+                    }
                     prefix_seen = TRUE;
                     bad_command = FALSE;
                     cmdq_ec = NULL;
+                    if (func == do_reqmenu)
+                        was_m_prefix = TRUE;
                     goto got_prefix_input;
+                } else if (!(tlist->flags & MOVEMENTCMD)
+                           && g.domove_attempting) {
+                    /* not a movement command, but a move prefix earlier? */
+                    /* just do nothing */
                 } else if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
-                            && !g.context.travel && !dxdy_moveok()) {
+                           && !g.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     You_cant("get there from here...");
-                    g.context.run = 0;
-                    g.context.nopick = g.context.forcefight = FALSE;
-                    g.context.move = g.context.mv = FALSE;
-                    g.multi = 0;
-                    iflags.menu_requested = FALSE;
+                    reset_cmd_vars();
                     return;
                 } else if ((g.domove_attempting & DOMOVE_WALK) != 0L) {
                     if (g.multi)
@@ -3867,17 +3904,19 @@ got_prefix_input:
                     return;
                 }
                 prefix_seen = FALSE;
+                was_m_prefix = FALSE;
             }
             if ((res & ECMD_CANCEL)) {
                 /* command was canceled by user, maybe they declined to
                    pick an object to act on. */
-                iflags.menu_requested = FALSE;
-                cmdq_clear();
+                reset_cmd_vars();
+                prefix_seen = FALSE;
+                cmdq_ec = NULL;
             }
             if (!(res & ECMD_TIME)) {
-                iflags.menu_requested = FALSE;
-                g.context.move = FALSE;
-                g.multi = 0;
+                reset_cmd_vars();
+                prefix_seen = FALSE;
+                cmdq_ec = NULL;
             }
             return;
         }
