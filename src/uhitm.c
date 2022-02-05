@@ -1942,7 +1942,7 @@ mhitm_ad_drli(
         boolean negated = !(rn2(10) >= 3 * armpro);
 
         if (!negated && !rn2(3)
-            && !(resists_drli(mdef) || defended(mdef, AD_FIRE))) {
+            && !(resists_drli(mdef) || defended(mdef, AD_DRLI))) {
             mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl
                                     * (usually 1d8) */
             pline("%s becomes weaker!", Monnam(mdef));
