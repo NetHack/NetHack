@@ -1859,15 +1859,18 @@ flush_screen(int cursor_on_u)
             }
     }
 
+    /* get this done now, before we place the cursor on the hero */
+    if (g.context.botl || g.context.botlx)
+        bot();
+    else if (iflags.time_botl)
+        timebot();
+
+    /* This needs to be the final thing done in flush_screen  */
     if (cursor_on_u)
         curs(WIN_MAP, u.ux, u.uy); /* move cursor to the hero */
     display_nhwindow(WIN_MAP, FALSE);
     reset_glyph_bbox();
     flushing = 0;
-    if (g.context.botl || g.context.botlx)
-        bot();
-    else if (iflags.time_botl)
-        timebot();
 }
 
 /* ======================================================================== */
