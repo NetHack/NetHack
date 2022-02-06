@@ -4192,10 +4192,8 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You("%s into the %s%s%c", is_solid ? "plunge" : "fall",
-            is_solid ? "wall of " : "",
-            hliquid("water"),
-            Amphibious || Swimming ? '.' : '!');
+        You("%s into the %s%c", is_solid ? "plunge" : "fall",
+            waterbody_name(u.ux, u.uy), (Amphibious || Swimming) ? '.' : '!');
         if (!Swimming && !is_solid)
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
     }
@@ -5796,7 +5794,7 @@ lava_effects(void)
                 goto burn_stuff;
             }
         } else
-            You("fall into the %s!", hliquid("lava"));
+            You("fall into the %s!", waterbody_name(u.ux, u.uy));
 
         usurvive = Lifesaved || discover;
         if (wizard)
@@ -5855,7 +5853,7 @@ lava_effects(void)
            hero needs to escape immediately */
         set_utrap((unsigned) (rn1(4, 4) + ((boil_away ? 2 : rn1(4, 12)) << 8)),
                   TT_LAVA);
-        You("sink into the %s%s!", hliquid("lava"),
+        You("sink into the %s%s!", waterbody_name(u.ux, u.uy),
             !boil_away ? ", but it only burns slightly"
                        : " and are about to be immolated");
         if (Fire_resistance)

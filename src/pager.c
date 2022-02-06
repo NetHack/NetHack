@@ -448,6 +448,57 @@ look_at_monster(char *buf,
     } /* monbuf is non-null */
 }
 
+/* describe a pool location's contents; might return a static buffer so
+   caller should use it or copy it before calling waterbody_name() again
+   [3.7: moved here from mkmaze.c] */
+const char *
+waterbody_name(xchar x, xchar y)
+{
+    static char pooltype[40];
+    struct rm *lev;
+    schar ltyp;
+
+    if (!isok(x, y))
+        return "drink"; /* should never happen */
+    lev = &levl[x][y];
+    ltyp = lev->typ;
+    if (ltyp == DRAWBRIDGE_UP)
+        ltyp = db_under_typ(lev->drawbridgemask);
+
+    if (ltyp == LAVAPOOL) {
+        if (!Hallucination)
+            return "lava";
+        Snprintf(pooltype, sizeof pooltype, "molten %s", hliquid("lava"));
+        return pooltype;
+    } else if (ltyp == ICE) {
+        return "ice";
+    } else if (ltyp == POOL) {
+        Snprintf(pooltype, sizeof pooltype, "pool of %s", hliquid("water"));
+        return pooltype;
+    } else if (ltyp == MOAT) {
+        /* a bit of extra flavor over general moat */
+        if (Is_medusa_level(&u.uz))
+            /* somewhat iffy since ordinary stairs can take you beneath,
+               but previous generic "water" was rather anti-climactic */
+            return "shallow sea";
+        else if (Is_juiblex_level(&u.uz))
+            return "swamp";
+        else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz))
+            /* samurai quest home level has two isolated moat spots;
+               they sound silly if farlook describes them as such */
+            return "pond";
+        else
+            return "moat";
+    } else if (ltyp == WATER) {
+        Snprintf(pooltype, sizeof pooltype, "%s %s",
+                 !Is_waterlevel(&u.uz) ? "wall of" : "limitless",
+                 hliquid("water"));
+        return pooltype;
+    }
+    /* default; should be unreachable */
+    return "water"; /* don't hallucinate this as some other liquid */
+}
+
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.

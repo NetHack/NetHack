@@ -1350,7 +1350,6 @@ extern void movebubbles(void);
 extern void water_friction(void);
 extern void save_waterlevel(NHFILE *);
 extern void restore_waterlevel(NHFILE *);
-extern const char *waterbody_name(xchar, xchar);
 
 /* ### mkobj.c ### */
 
@@ -1934,6 +1933,7 @@ extern char *self_lookat(char *);
 extern char *monhealthdescr(struct monst *mon, boolean, char *);
 extern void mhidden_description(struct monst *, boolean, char *);
 extern boolean object_from_map(int,int,int,struct obj **);
+extern const char *waterbody_name(xchar, xchar);
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **);
 extern int do_look(int, coord *);
