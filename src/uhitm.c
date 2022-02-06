@@ -1985,10 +1985,14 @@ mhitm_ad_drli(
         /* mhitm */
         int armpro = magic_negation(mdef);
         boolean cancelled = magr->mcan || !(rn2(10) >= 3 * armpro);
+        /* mhitm_ad_deth gets redirected here for Death's touch */
+        boolean is_death = (mattk->adtyp == AD_DETH);
 
-        if (!cancelled && !rn2(3)
-            && !(resists_drli(mdef) || defended(mdef, AD_DRLI))) {
-            mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl (1d8) */
+        if (is_death
+            || (!cancelled && !rn2(3)
+                && !(resists_drli(mdef) || defended(mdef, AD_DRLI)))) {
+            if (!is_death)
+                mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl (1d8) */
             if (g.vis && canspotmon(mdef))
                 pline("%s becomes weaker!", Monnam(mdef));
             if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
@@ -3336,12 +3340,8 @@ mhitm_ad_deth(struct monst *magr, struct attack *mattk UNUSED,
            undead hero would; otherwise, just inflict the normal damage */
         if (is_undead(pd) && mhm->damage > 1)
             mhm->damage = rnd(mhm->damage / 2);
-        /*
-         * FIXME?
-         *  most monsters should be vulnerable to Death's touch
-         *  instead of only receiving ordinary damage, but is it
-         *  worth bothering with?
-         */
+        /* simulate Death's touch with drain life attack */
+        mhitm_ad_drli(magr, mattk, mdef, mhm);
     }
 }
 

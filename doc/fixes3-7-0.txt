@@ -771,6 +771,7 @@ in flush_screen, reorder the code slightly to complete the bot() and
 	timebot() calls prior to the window port call to place the cursor
         on the hero
 magic traps can toggle intrinsic invisibility
+Death attacking a monster does drain life attack
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
