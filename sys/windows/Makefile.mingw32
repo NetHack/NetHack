@@ -98,6 +98,7 @@ endif
 #
 LUA_MAY_PROCEED=N
 ADD_CURSES=N
+PDCURSES_TOP=
 
 # First, Lua
 ifeq "$(INTERNET_AVAILABLE)" "Y"
@@ -116,17 +117,14 @@ else    # INTERNET_AVAILABLE not
 # precedence given to ../submodules, then ../lib.
 #
 ifneq ("$(wildcard ../submodules/lua/lua.h)", "")
-$(info Here- ../submodules/lua/lua.h)
 LUATOP=../submodules/lua
 LUASRC=$(LUATOP)
 LUA_MAY_PROCEED=Y
 else ifneq ("$(wildcard ../lib/lua-$(LUAVER)/src/lua.h)", "")
-$(info Here- ../lib/lua-$(LUAVER)/src/lua.h)
 LUATOP = ../lib/lua-$(LUAVER)
 LUASRC = $(LUATOP)/src
 LUA_MAY_PROCEED=Y
 else
-$(info NO MATCH)
 endif   # Lua sources
 ifeq "$(LUA_MAY_PROCEED)" "Y"
 $(info No internet connection was authorized in the Makefile,)
@@ -139,7 +137,7 @@ ifneq "$(INTERNET_AVAILABLE)" "Y"
 $(info Your Makefile settings do not allow use of the internet to obtain Lua)
 endif  # INTERNET_AVAILABLE
 $(info and no copy of Lua was found in either ../submodules/lua or ../lib/lua-$(LUAVER).)
-$(info Change youf make command line to include:)
+$(info Change your make command line to include:)
 $(info     GIT=1)
 $(info or modify your Makefile to set the following:)
 $(info     INTERNET_AVAILABLE=Y)
@@ -162,11 +160,10 @@ else   # INTERNET_AVAILABLE is not Y below
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
 #
-
-ifeq (,$(wildcard ../submodules/pdcurses/curses.h))
+ifneq ("$(wildcard ../submodules/pdcurses/curses.h)", "")
 PDCURSES_TOP=../submodules/pdcurses
 ADD_CURSES=Y
-else ifeq (,$(wildcard ../lib/pdcurses/curses.h))
+else ifneq ("$(wildcard ../lib/pdcurses/curses.h)", "")
 PDCURSES_TOP=../lib/pdcurses
 ADD_CURSES=Y
 endif  # pdcurses sources available somewhere
@@ -180,6 +177,19 @@ endif  # INTERNET_AVAILABLE
 
 ifneq "$(ADD_CURSES)" "Y"
 $(info NetHack 3.7 will be built without support for the curses window-port.)
+endif
+
+ifeq "$(INTERNET_AVAILABLE)" "Y"
+ifeq "$(GIT_AVAILABLE)" "Y"
+GIT_HASH := $(shell echo `git rev-parse --verify HEAD` 2>&1)
+GIT_BRANCH := $(shell echo `git rev-parse --abbrev-ref HEAD` 2>&1)
+ifdef GIT_HASH
+GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
+endif
+ifdef GIT_BRANCH
+GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
+endif
+endif
 endif
 
 #==============================================================================
@@ -336,7 +346,7 @@ $(ULUADLL) $(LUAIMP): $(LUAOBJS) | $(OLUA)
 	$(ld) $(LDFLAGS) -fPIC -shared -Wl,--export-all-symbols -Wl,--add-stdcall-alias \
 		-Wl,--out-implib=$(LUAIMP) $^ -o$(ULUADLL)
 
-$(LUASTATIC): $(LUAOBJS) | $(OLUA)
+$(LUASTATIC): $(LUAOBJS) | $(OLUA) 
 	ar rcs $@ $^
 
 $(OLUA)/%.o: $(LUASRC)/%.c | $(OLUA)
@@ -658,25 +668,21 @@ $(DLB): $(U)dlb.exe $(DLBLST) | $(GAMEDIR)
 CLEAN_DIR += $(ODLB)
 CLEAN_FILE += $(DTARGETS) $(DLBOBJS) $(INCL)/date.h
 
-#==========================================
-# Fetching other sources
-#==========================================
+#============================================
+# Fetching other source files that are needed
+#============================================
 
 ifeq "$(INTERNET_AVAILABLE)" "Y"
 ifeq "$(GIT_AVAILABLE)" "Y"
 
 fetchlua:
-	mkdir -p ../lib
-	if [ ! -f "$(LUASRC)/lua.h" ]; then \
-		git submodule init ../submodules/lua; \
-		git submodule update --remote ../submodules/lua; \
-	fi
+	@if [ ! -f $(LUASRC)/lua.h ] ; then \
+	git submodule init ../submodules/lua && \
+	git submodule update --remote ../submodules/lua ; fi
 fetchpdcurses:
-	mkdir -p ../lib
-	if [ ! -f "$(PDCURSES_TOP)/curses.h" ]; then \
-		git submodule init ../submodules/pdcurses; \
-		git submodule update --remote ../submodules/pdcurses; \
-	fi
+	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
+	git submodule init ../submodules/pdcurses && \
+	git submodule update --remote ../submodules/pdcurses ; fi
 else  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
 CURLLUADST=lua-5.4.4.tar.gz
@@ -685,21 +691,21 @@ CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCDST=pdcurses.zip
 
 fetchlua:
-	mkdir -p ../lib
-	if [ ! -f "$(LUASRC)/lua.h" ]; then \
-		cd ../lib; \
-		curl -L $(CURLLUASRC) -o $(CURLLUADST); \
-		/c/Windows/System32/tar -xvf $(CURLLUADST); \
-		cd ../src; \
+	@if [ ! -f $(LUASRC)/lua.h ] ; then \
+	mkdir -p ../lib ; \
+	cd ../lib ; \
+	curl -L $(CURLLUASRC) -o $(CURLLUADST) ; \
+	/c/Windows/System32/tar -xvf $(CURLLUADST) ; \
+	cd ../src ;  \
 	fi
 fetchpdcurses:
 	mkdir -p ../lib
-	if [ ! -f "$(PDCURSES_TOP)/curses.h" ]; then \
-		cd ../lib; \
-		curl -L $(CURLPDCSRC) -o $(CURLPDCDST); \
-		mkdir -p pdcurses; \
-		/c/Windows/System32/tar -C pdcurses --strip-components=1 -xvf $(CURLPDCDST); \
-		cd ../src; \
+	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
+	cd ../lib ; \
+	curl -L $(CURLPDCSRC) -o $(CURLPDCDST) ; \
+	mkdir -p pdcurses ; \
+	/c/Windows/System32/tar -C pdcurses --strip-components=1 -xvf $(CURLPDCDST) ; \
+	cd ../src ; \
 	fi
 endif  # GIT_AVAILABLE
 endif  # INTERNET_AVAILABLE
@@ -749,7 +755,7 @@ $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 #       to ensure that date.c is always recompiled again after anything else that
 #       was just recompiled. date.h is not used in the build of NetHack 3.7.
 #
-$(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS)
+$(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS) | $(ONHW)
 	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
@@ -820,7 +826,7 @@ $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
 #       to ensure that date.c is always recompiled again after anything else that
 #       was just recompiled. date.h is not used in the build of NetHack 3.7.
 #
-$(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES)
+$(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES) | $(ONH)
 	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)

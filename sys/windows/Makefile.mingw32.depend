@@ -110,7 +110,7 @@ OBJS4DEP = $(MOBJS) $(ROBJS) \
 	   $(TMOBJS) $(UOBJS) $(DLBOBJS) $(NHWOBJS) $(NHOBJS)
 DEP_TARGETS = $(OBJS4DEP:o=d)
 
-depend: $(DEP_TARGETS)
+depend: fetchlua fetchpdcurses $(DEP_TARGETS)
 	@cat $(DEP_TARGETS) > .depend
 
 cleandep:
