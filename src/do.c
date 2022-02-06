@@ -1923,10 +1923,20 @@ revive_corpse(struct obj *corpse)
             break;
 
         case OBJ_FLOOR:
-            if (cansee(mtmp->mx, mtmp->my))
-                pline("%s rises from the dead!",
+            if (cansee(mtmp->mx, mtmp->my)) {
+                const char *effect = "";
+
+                if (mtmp->data == &mons[PM_DEATH])
+                    effect = " in a whirl of spectral skulls";
+                else if (mtmp->data == &mons[PM_PESTILENCE])
+                    effect = " in a churning pillar of flies";
+                else if (mtmp->data == &mons[PM_FAMINE])
+                    effect = " in a ring of withered crops";
+
+                pline("%s rises from the dead%s!",
                       chewed ? Adjmonnam(mtmp, "bite-covered")
-                             : Monnam(mtmp));
+                             : Monnam(mtmp), effect);
+            }
             break;
 
         case OBJ_MINVENT: /* probably a nymph's */
