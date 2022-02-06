@@ -768,9 +768,11 @@ have fake player monsters use verbalize instead of pline when reacting to chat
 fix mention_walls distinguishing unseen walls from solid stone
 don't push unknown boulders when moving
 in flush_screen, reorder the code slightly to complete the bot() and
-timebot() calls prior to the window port call to place the cursor on the hero
+	timebot() calls prior to the window port call to place the cursor
+        on the hero
+magic traps can toggle intrinsic invisibility
 
- 
+
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
 fix compile when DLB isn't defined

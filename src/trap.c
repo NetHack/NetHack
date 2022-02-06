@@ -3634,8 +3634,26 @@ domagictrap(void)
     } else {
         switch (fate) {
         case 10:
-        case 11:
             /* sometimes nothing happens */
+            break;
+        case 11: /* toggle intrinsic invisibility */
+            You_hear("a low hum.");
+            if (!Invis) {
+                if (!Blind)
+                    self_invis_message();
+            } else if (!EInvis && !pm_invisible(g.youmonst.data)) {
+                if (!Blind) {
+                    if (!See_invisible)
+                        You("can see yourself again!");
+                    else
+                        You_cant("see through yourself anymore.");
+                }
+            } else {
+                /* If we're invisible from another source */
+                You_feel("a little more %s now.", HInvis ? "obvious" : "hidden");
+            }
+            HInvis = HInvis ? 0 : HInvis | FROMOUTSIDE;
+            newsym(u.ux, u.uy);
             break;
         case 12: /* a flash of fire */
             dofiretrap((struct obj *) 0);
