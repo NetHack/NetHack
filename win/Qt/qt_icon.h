@@ -25,7 +25,7 @@ public:
         void setLabel(const QString &, long, const QString &tail=""); // number
         void setLabel(const QString &, long show_value,
                       long comparative_value, const QString &tail="");
-        void setIcon(const QPixmap &);
+        void setIcon(const QPixmap &, const QString &tooltip=NULL);
         virtual void setFont(const QFont &);
         //QString labelText() { return QString(this->label->text()); }
 

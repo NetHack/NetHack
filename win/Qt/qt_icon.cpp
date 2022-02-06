@@ -118,11 +118,15 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, long v,
     setLabel(t,v,v,tail);
 }
 
-void NetHackQtLabelledIcon::setIcon(const QPixmap& i)
+void NetHackQtLabelledIcon::setIcon(
+    const QPixmap& i,
+    const QString& tooltip)
 {
     if (!icon)
         icon = new QLabel(this);
     icon->setPixmap(i);
+    if (!tooltip.isNull() && !tooltip.isEmpty())
+        icon->setToolTip(" " + tooltip + " ");
     ForceResize();
     icon->resize(i.width(), i.height());
 }

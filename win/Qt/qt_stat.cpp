@@ -72,7 +72,6 @@
 //    the rest of status.  That takes up more space, which is ok, but it
 //    also increases the vertical margin in between them by more than is
 //    necessary.  Should squeeze some of that excess blank space out.
-//  Add tool tips for the status condition icons, maybe the other icons.
 //
 
 extern "C" {
@@ -156,6 +155,9 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
         int w = NetHackQtBind::mainWidget()->width();
         setMaximumWidth(w / 2);
     }
+    // for tool tips; they mostly work without this but sometimes changes
+    // to hunger or encumbrance seemed to cause tip display to stop
+    setMouseTracking(true);
 
     p_str = QPixmap(str_xpm);
     p_str = QPixmap(str_xpm);
@@ -193,31 +195,31 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     p_fly = QPixmap(fly_xpm);
     p_ride = QPixmap(ride_xpm);
 
-    str.setIcon(p_str);
-    dex.setIcon(p_dex);
-    con.setIcon(p_con);
-    intel.setIcon(p_int);
-    wis.setIcon(p_wis);
-    cha.setIcon(p_cha);
+    str.setIcon(p_str, "strength");
+    dex.setIcon(p_dex, "dexterity");
+    con.setIcon(p_con, "constitution");
+    intel.setIcon(p_int, "intelligence");
+    wis.setIcon(p_wis, "wisdom");
+    cha.setIcon(p_cha, "charisma");
 
     align.setIcon(p_neutral);
     blank2.setIcon(p_blank2); // used for spacing when Conditions row is empty
     hunger.setIcon(p_hungry);
     encumber.setIcon(p_encumber[0]);
 
-    stoned.setIcon(p_stoned);
-    slimed.setIcon(p_slimed);
-    strngld.setIcon(p_strngld);
-    sick_fp.setIcon(p_sick_fp);
-    sick_il.setIcon(p_sick_il);
-    stunned.setIcon(p_stunned);
-    confused.setIcon(p_confused);
-    hallu.setIcon(p_hallu);
-    blind.setIcon(p_blind);
-    deaf.setIcon(p_deaf);
-    lev.setIcon(p_lev);
-    fly.setIcon(p_fly);
-    ride.setIcon(p_ride);
+    stoned.setIcon(p_stoned, "turning to stone");
+    slimed.setIcon(p_slimed, "turning into slime");
+    strngld.setIcon(p_strngld, "being strangled");
+    sick_fp.setIcon(p_sick_fp, "severe food poisoning");
+    sick_il.setIcon(p_sick_il, "terminal illness");
+    stunned.setIcon(p_stunned, "stunned");
+    confused.setIcon(p_confused, "confused");
+    hallu.setIcon(p_hallu, "hallucinating");
+    blind.setIcon(p_blind, "cannot see");
+    deaf.setIcon(p_deaf, "cannot hear");
+    lev.setIcon(p_lev, "levitating");
+    fly.setIcon(p_fly, "flying");
+    ride.setIcon(p_ride, "riding");
 
     // separator lines
     hline1.setFrameStyle(QFrame::HLine | QFrame::Sunken);
@@ -625,7 +627,8 @@ void NetHackQtStatusWindow::HitpointBar()
             geoH.setRight(std::min(lox + pxl_health - 1, hix));
             hpbar_health.setGeometry(geoH);
             w = geoH.right() - geoH.left() + 1; // might yield 0 (ie, if dead)
-            styleH = QString::asprintf(styleformat, barcolors[colorindx][0], w, w);
+            styleH = QString::asprintf(styleformat, barcolors[colorindx][0],
+                                       w, w);
             hpbar_health.setStyleSheet(styleH);
             // when healing, having the old injury-side shown while the new
             // health-side expands pushes the injury farther right and it's
@@ -638,7 +641,8 @@ void NetHackQtStatusWindow::HitpointBar()
             geoI.setRight(hix);
             hpbar_injury.setGeometry(geoI);
             w = geoI.right() - geoI.left() + 1;
-            styleI = QString::asprintf(styleformat, barcolors[colorindx][1], w, w);
+            styleI = QString::asprintf(styleformat, barcolors[colorindx][1],
+                                       w, w);
             hpbar_injury.setStyleSheet(styleI);
             if (geoI.left() != oldleft)
                 hpbar_injury.move(geoI.left(), geoI.top());
@@ -656,7 +660,8 @@ void NetHackQtStatusWindow::HitpointBar()
             geoH.setRight(hix);
             hpbar_health.setGeometry(geoH);
             w = geoH.right() - geoH.left() + 1;
-            styleH = QString::asprintf(styleformat, barcolors[colorindx][0], w, w);
+            styleH = QString::asprintf(styleformat, barcolors[colorindx][0],
+                                       w, w);
             hpbar_health.setStyleSheet(styleH);
             hpbar_health.show();
 
@@ -727,6 +732,7 @@ void NetHackQtStatusWindow::updateStats()
 
     long qt_uhs = 0L;
     const char *hung = hu_stat[u.uhs];
+    QString qhung = QString(hung).trimmed();
     if (hung[0]==' ') {
         if (!hunger.isHidden()) {
             hunger.setLabel("", NetHackQtLabelledIcon::NoNum, qt_uhs);
@@ -745,8 +751,8 @@ void NetHackQtStatusWindow::updateStats()
         case FAINTING:   qt_uhs = 4L; break;
         default:         qt_uhs = 5L; break; // fainted, starved
         }
-	hunger.setIcon(u.uhs ? p_hungry : p_satiated);
-        hunger.setLabel(hung, NetHackQtLabelledIcon::NoNum, qt_uhs);
+        hunger.setIcon(u.uhs ? p_hungry : p_satiated, qhung.toLower());
+        hunger.setLabel(qhung, NetHackQtLabelledIcon::NoNum, qt_uhs);
         hunger.ForceResize();
 	++k, hunger.show();
     }
@@ -758,7 +764,7 @@ void NetHackQtStatusWindow::updateStats()
             encumber.hide();
         }
     } else {
-        encumber.setIcon(p_encumber[encindx - 1]);
+        encumber.setIcon(p_encumber[encindx - 1], QString(enc).toLower());
         encumber.setLabel(enc, NetHackQtLabelledIcon::NoNum, encindx);
         encumber.ForceResize();
 	++k, encumber.show();
@@ -838,9 +844,11 @@ void NetHackQtStatusWindow::updateStats()
         for (int i = ::flags.showexp ? 0 : 3; i < 4; ++i) {
             // passes 0,1,2 are with Exp, 3 is without Exp and always fits
             if (i < 3) {
-                buf = QString::asprintf("%s%ld/%ld", lvllbl[i], (long) u.ulevel, u.uexp);
+                buf = QString::asprintf("%s%ld/%ld", lvllbl[i],
+                                        (long) u.ulevel, u.uexp);
             } else {
-                buf = QString::asprintf("%s%ld", lvllbl[i - 3], (long) u.ulevel);
+                buf = QString::asprintf("%s%ld", lvllbl[i - 3],
+                                        (long) u.ulevel);
             }
             // +2: allow a couple of pixels at either end to be clipped off
             if (fm.size(0, buf).width() <= (2 + level.label->width() + 2))
@@ -870,20 +878,24 @@ void NetHackQtStatusWindow::updateStats()
     goldamt = std::min(goldamt, 99999999L); // ditto
     gold.setLabel("Gold:", goldamt);
 
-    const char *text = NULL;
+    const char *text;
+    QString qtext;
+    QPixmap *pxmp;
     if (u.ualign.type == A_LAWFUL) {
-        align.setIcon(p_lawful);
+        pxmp = &p_lawful;
         text = "Lawful";
     } else if (u.ualign.type == A_NEUTRAL) {
-        align.setIcon(p_neutral);
+        pxmp = &p_neutral;
         text = "Neutral";
     } else {
-        // Unaligned should never happen but handle it sanely if it does
-        align.setIcon(p_chaotic);
+        pxmp = &p_chaotic;
+        // Unaligned should never happen
         text = (u.ualign.type == A_CHAOTIC) ? "Chaotic"
                : (u.ualign.type == A_NONE) ? "unaligned"
                  : "other?";
     }
+    qtext = QString::asprintf("%sly aligned", text);
+    align.setIcon(*pxmp, qtext.toLower());
     align.setLabel(QString(text));
     // without this, the ankh pixmap shifts from centered to left
     // justified relative to the label text for some unknown reason...

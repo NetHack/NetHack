@@ -1419,6 +1419,7 @@ Qt: [later] augment extended command selection dialog's Filter to add a
 Qt: add '#' as "Extended-commands" to the 'game' dropdown menu
 Qt: add tool tips to the extended command selector's buttons to show command
 	descriptions
+Qt: add tool tips to the icons shown in the status window
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
