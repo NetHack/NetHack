@@ -59,8 +59,4 @@ The status window can't be resized while hitpointbar is active.
 Toggling it off, resizing as desired, then toggling it back on is a
 viable workaround.
 
-The 'toptenwin' option should probably be forced on, otherwise final
-high scores output gets sent to stdout and might not appear anywhere
-depending on how the program was launched.
-
 -----
