@@ -1,5 +1,6 @@
 # NetHack 3.7	Makefile.mingw32
-# Copyright (c) 2022 by Michael Allison
+# Copyright (c) 2022 by Feiyun Wang
+#-Copyright (c) 2022 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
 #
 #==============================================================================
@@ -707,7 +708,7 @@ endif  # INTERNET_AVAILABLE
 # nethackw
 #==========================================
 COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl cmd cppregex \
-	   date dbridge decl detect dig display dlb do do_name do_wear \
+	   dbridge decl detect dig display dlb do do_name do_wear \
 	   dog dogmove dokick dothrow drawing dungeon \
 	   eat end engrave exper explode extralev files fountain \
 	   hack hacklib insight invent isaac64 light lock \
@@ -726,6 +727,7 @@ ONHW = $(O)nethackw
 NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
 	  mhmsgwnd mhrip mhsplash mhstatus mhtext mswproc tile NetHackW win10)
 NHWOBJS = $(addprefix $(ONHW)/, $(COREOBJS) $(NHWONLY))
+DATEW_O  = $(addsuffix .o, $(addprefix $(ONHW)/, date))
 TILEFILES = $(addprefix $(WSHR)/, monsters.txt objects.txt other.txt)
 BMPS = $(addprefix $(MSWIN)/, $(addsuffix .bmp, mnsel mnselcnt mnunsel petmark pilemark rip splash tiles))
 NHWRES = $(ONHW)/winres.o
@@ -733,11 +735,22 @@ NHWTARGETS = $(GAMEDIR)/NetHackW.exe
 
 nethackw: $(NHWTARGETS)
 
-$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(LUALIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(DATEW_O) $(NHWRES) $(LUALIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ -o$@
 
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
+
+#       In NetHack 3.7, date.c must be recompiled after any other file is compiled,
+#       otherwise the game internal build timestamp (and potentially git hash)
+#       will not be accurate.
+#       Therefore, date must not be included in COREOBJS (and by extension
+#       NHWOBJS, NHWONLY). That allows those to be listed as explicit dependencies
+#       to ensure that date.c is always recompiled again after anything else that
+#       was just recompiled. date.h is not used in the build of NetHack 3.7.
+#
+$(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS)
+	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -785,6 +798,7 @@ ifeq "$(ADD_CURSES)" "Y"
 CFLAGSNH += -DCURSES_GRAPHICS -DCHTYPE_32 -DPDC_NCMOUSE
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
+DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))
 
 NHOBJS = $(addprefix $(ONH)/, $(COREOBJS) $(NHONLY))
 NHRES = $(ONH)/conres.o
@@ -792,11 +806,22 @@ NHTARGET = $(GAMEDIR)/NetHack.exe
 
 nethack: $(NHTARGET)
 
-$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(LUALIB) $(PDCLIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(DATE_O) $(NHRES) $(LUALIB) $(PDCLIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mconsole $^ $(LIBS) -static -lstdc++ -o$@
 
 $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
+
+#       In NetHack 3.7, date.c must be recompiled after any other file is compiled,
+#       otherwise the game internal build timestamp (and potentially git hash)
+#       will not be accurate.
+#       Therefore, date must not be included in COREOBJS (and by extension
+#       NHOBJS). That allows those to be listed as explicit dependencies of date.o
+#       to ensure that date.c is always recompiled again after anything else that
+#       was just recompiled. date.h is not used in the build of NetHack 3.7.
+#
+$(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES)
+	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@

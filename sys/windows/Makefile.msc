@@ -1184,9 +1184,9 @@ $(O)date.o: $(HACKINCL) $(HACKSRC) $(HACKOBJ) $(ALLOBJ)
 !ENDIF
 
 #
-#  date.h should be remade every time any of the source or include
-#  files is modified.
-#
+#  date.h is not used with NetHack 3.7
+#  onames.h is not used with NetHack 3.7
+#  pm.h is not used with NetHack 3.7
 
 $(INCL)\date.h $(OPTIONS_FILE) : $(U)makedefs.exe
 	$(U)makedefs -v
