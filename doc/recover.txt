@@ -86,4 +86,4 @@ COPYRIGHT
 
 
 
-NETHACK                         22 January 2022                     RECOVER(6)
+NETHACK                        06 February 2022                     RECOVER(6)
