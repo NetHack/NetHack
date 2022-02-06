@@ -2885,7 +2885,7 @@ pickup_checks(void)
     }
     traphere = t_at(u.ux, u.uy);
     if (!can_reach_floor(traphere && is_pit(traphere->ttyp))) {
-        /* it here's a hole here, any objects here clearly aren't at
+        /* if there's a hole here, any objects here clearly aren't at
            the bottom so only check for pits */
         if (traphere && uteetering_at_seen_pit(traphere)) {
             You("cannot reach the bottom of the pit.");
