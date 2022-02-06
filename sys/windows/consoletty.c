@@ -180,6 +180,7 @@ static COLORREF DefaultColors[CLR_MAX] = {
 };
 #endif
 struct console_t {
+    boolean is_ready;
     WORD background;
     WORD foreground;
     WORD attr;
@@ -217,6 +218,7 @@ struct console_t {
     DWORD out_cmode;
     long color24;
 } console = {
+    FALSE,
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* background */
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
     0,                                                     /* attr */
@@ -718,6 +720,9 @@ back_buffer_flip(void)
     DWORD reserved;
     unsigned do_anything, did_anything;
 
+    if (!console.is_ready)
+        return;
+
     emit_hide_cursor();
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
         for (pos.X = 0; pos.X < console.width; pos.X++) {
@@ -796,6 +801,9 @@ back_buffer_flip(void)
     cell_t *front = console.front_buffer;
     COORD pos;
     DWORD unused;
+
+    if (!console.is_ready)
+        return;
 
     for (pos.Y = 0; pos.Y < console.height; pos.Y++) {
         for (pos.X = 0; pos.X < console.width; pos.X++) {
@@ -2729,6 +2737,7 @@ void nethack_enter_consoletty(void)
     init_custom_colors();
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhcolor = NO_COLOR;
+    console.is_ready = TRUE;
 }
 #endif /* TTY_GRAPHICS */
 
