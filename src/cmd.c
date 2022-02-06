@@ -3783,14 +3783,13 @@ void
 rhack(char *cmd)
 {
     int spkey = NHKF_ESC;
-    boolean prefix_seen = FALSE, bad_command,
-        firsttime = (cmd == 0);
+    boolean bad_command, firsttime = (cmd == 0);
     struct _cmd_queue *cmdq = NULL;
-    const struct ext_func_tab *cmdq_ec = NULL;
+    const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
     boolean was_m_prefix = FALSE;
 
     reset_cmd_vars();
-got_prefix_input:
+ got_prefix_input:
 #ifdef SAFERHANGUP
     if (g.program_state.done_hup)
         end_of_input();
@@ -3846,14 +3845,20 @@ got_prefix_input:
                 reset_cmd_vars();
                 res = ECMD_OK;
             } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
-                       && was_m_prefix && !accept_menu_prefix(tlist)) {
-                /* we got 'm' prefix previously, can this command accept one? */
+                       && (!was_m_prefix || !accept_menu_prefix(tlist))) {
+                const char *which;
+
+                /* got prefix previously but this command doesn't accept one */
+                which = (prefix_seen->ef_funct == do_reqmenu)
+                           ? "move or request menu"
+                           : prefix_seen->ef_txt;
+                pline("The %s command does not accept %s prefix.",
+                      tlist->ef_txt, which);
+
                 reset_cmd_vars();
                 res = ECMD_OK;
-                prefix_seen = FALSE;
+                prefix_seen = 0;
                 was_m_prefix = FALSE;
-                pline("The %s command does not accept %s prefix.",
-                      tlist->ef_txt, visctrl(cmd_from_func(do_reqmenu)));
             } else {
                 /* we discard 'const' because some compilers seem to have
                    trouble with the pointer passed to set_occupation() */
@@ -3869,7 +3874,7 @@ got_prefix_input:
                         reset_cmd_vars();
                         return;
                     }
-                    prefix_seen = TRUE;
+                    prefix_seen = tlist;
                     bad_command = FALSE;
                     cmdq_ec = NULL;
                     if (func == do_reqmenu)
@@ -3879,7 +3884,8 @@ got_prefix_input:
                            && g.domove_attempting) {
                     /* not a movement command, but a move prefix earlier? */
                     /* just do nothing */
-                } else if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK)) != 0L)
+                } else if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK))
+                            != 0L)
                            && !g.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     You_cant("get there from here...");
@@ -3903,19 +3909,19 @@ got_prefix_input:
                     iflags.menu_requested = FALSE;
                     return;
                 }
-                prefix_seen = FALSE;
+                prefix_seen = 0;
                 was_m_prefix = FALSE;
             }
             if ((res & ECMD_CANCEL)) {
                 /* command was canceled by user, maybe they declined to
                    pick an object to act on. */
                 reset_cmd_vars();
-                prefix_seen = FALSE;
+                prefix_seen = 0;
                 cmdq_ec = NULL;
             }
             if (!(res & ECMD_TIME)) {
                 reset_cmd_vars();
-                prefix_seen = FALSE;
+                prefix_seen = 0;
                 cmdq_ec = NULL;
             }
             return;
@@ -4166,7 +4172,6 @@ help_dir(char sym,
      */
     dothat = "do that";
     how = " at"; /* for "<action> at yourself"; not used for up/down */
-    prefixhandling = FALSE;
 
     buf[0] = '\0';
     /* for movement prefix followed by '.' or (numpad && 's') to mean 'self';

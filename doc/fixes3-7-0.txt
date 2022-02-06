@@ -1000,6 +1000,8 @@ turning movement into commands broke the rest_on_space option; it also
 	interfered with using pick-axe plus autodig in downward direction
 cursed scroll of light had special message when wielding Sunsword that didn't
 	work for wearing gold dragon scales/mail
+giving a prefix keystroke other than 'm' prior to a command that doesn't use
+	prefixes was siliently ignored instead of being rejected
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
