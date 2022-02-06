@@ -4178,6 +4178,7 @@ drown(void)
     const char *pool_of_water;
     boolean inpool_ok = FALSE, crawl_ok;
     int i, x, y;
+    boolean is_solid = (levl[u.ux][u.uy].typ == WATER);
 
     feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */
@@ -4191,10 +4192,11 @@ drown(void)
     }
 
     if (!u.uinwater) {
-        You("%s into the %s%c", Is_waterlevel(&u.uz) ? "plunge" : "fall",
+        You("%s into the %s%s%c", is_solid ? "plunge" : "fall",
+            is_solid ? "wall of " : "",
             hliquid("water"),
             Amphibious || Swimming ? '.' : '!');
-        if (!Swimming && !Is_waterlevel(&u.uz))
+        if (!Swimming && !is_solid)
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
     }
 

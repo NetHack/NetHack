@@ -2263,7 +2263,7 @@ switch_terrain(void)
 {
     struct rm *lev = &levl[u.ux][u.uy];
     boolean blocklev = (IS_ROCK(lev->typ) || closed_door(u.ux, u.uy)
-                        || (Is_waterlevel(&u.uz) && lev->typ == WATER)),
+                        || lev->typ == WATER),
             was_levitating = !!Levitation, was_flying = !!Flying;
 
     if (blocklev) {
