@@ -289,10 +289,18 @@ curses_character_input_dialog(const char *prompt, const char *choices,
 
     curs_set(1);
     while (1) {
+#ifdef REALTIME_ON_BOTL
+#ifdef PDCURSES
+        answer = wgetch_timeout(message_window);
+#else
+        answer = getch_timeout();
+#endif
+#else
 #ifdef PDCURSES
         answer = wgetch(message_window);
 #else
         answer = getch();
+#endif
 #endif
         if (answer == ERR) {
             answer = def;
@@ -435,7 +443,12 @@ curses_ext_cmd(void)
 
         curs_set(1);
         wrefresh(extwin);
+#ifdef REALTIME_ON_BOTL
+        letter = getch_timeout();
+#else
         letter = getch();
+#endif
+
         curs_set(0);
         prompt_width = (int) strlen(cur_choice);
         matches = 0;
@@ -1442,7 +1455,11 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     menu_display_page(menu, win, curpage, selectors);
 
     while (!dismiss) {
+#ifdef REALTIME_ON_BOTL
+        curletter = getch_timeout();
+#else
         curletter = getch();
+#endif
 
         if (curletter == ERR) {
             num_selected = -1;
@@ -1495,7 +1512,11 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             if (isdigit(curletter)) {
                 count = curses_get_count(curletter);
                 /* after count, we know some non-digit is already pending */
+#ifdef REALTIME_ON_BOTL
+                curletter = getch_timeout();
+#else
                 curletter = getch();
+#endif
                 count_letter = (count > 0L) ? curletter : '\0';
 
                 /* remove the count wind (erases last line of message wind) */

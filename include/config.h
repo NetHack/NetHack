@@ -571,6 +571,9 @@ typedef unsigned char uchar;
 /* #define SCORE_ON_BOTL */         /* enable the 'showscore' option to
                                        show estimated score on status line */
 
+#define REALTIME_ON_BOTL            /* enable the 'showrealtime' option to
+   show elapsed time */
+
 /* FREE_ALL_MEMORY is neither experimental nor inadequately tested,
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */

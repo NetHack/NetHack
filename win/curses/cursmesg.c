@@ -219,6 +219,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
         mvwprintw(win, my, mx, ">>"), mx += 2;
     }
     curses_toggle_color_attr(win, MORECOLOR, moreattr, OFF);
+    curses_alert_main_borders(FALSE);
     wrefresh(win);
 
     /* cancel mesg suppression; all messages will have had chance to be read */
@@ -226,8 +227,13 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
 
     oldcrsr = curs_set(1);
     do {
+#ifdef REALTIME_ON_BOTL
+        ret = wgetch_timeout(win);
+        if (ret == '\0')
+#else
         ret = wgetch(win);
         if (ret == ERR || ret == '\0')
+#endif
             ret = '\n';
         /* msgtype=stop should require space/enter rather than any key,
            as we want to prevent YASD from direction keys. */
@@ -625,10 +631,18 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         curs_set(1);
         wrefresh(win);
         curses_got_input(); /* despite its name, before rather than after... */
+#ifdef REALTIME_ON_BOTL
+#ifdef PDCURSES
+        ch = wgetch_timeout(win);
+#else
+        ch = getch_timeout();
+#endif
+#else
 #ifdef PDCURSES
         ch = wgetch(win);
 #else
         ch = getch();
+#endif
 #endif
         curs_set(0);
 
