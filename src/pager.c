@@ -161,10 +161,10 @@ trap_description(char *outbuf, int tnum, int x, int y)
 /* describe a hidden monster; used for look_at during extended monster
    detection and for probing; also when looking at self */
 void
-mhidden_description(struct monst *mon,
-                    boolean altmon, /* for probing: if mimicking a monster,
-                                       say so */
-                    char *outbuf)
+mhidden_description(
+    struct monst *mon,
+    boolean altmon, /* for probing: if mimicking a monster, say so */
+    char *outbuf)
 {
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &g.youmonst);

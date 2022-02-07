@@ -1411,13 +1411,30 @@ makemon(register struct permonst *ptr,
 
     if (!g.in_mklev) {
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
-        if (!(mmflags & MM_NOMSG)
-            && ((canseemon(mtmp) && (M_AP_TYPE(mtmp) == M_AP_NOTHING
+        if (!(mmflags & MM_NOMSG)) {
+            char mbuf[BUFSZ], *what = 0;
+            /* MM_NOEXCLAM is used for #wizgenesis (^G) */
+            boolean exclaim = !(mmflags & MM_NOEXCLAM);
+
+            if ((canseemon(mtmp) && (M_AP_TYPE(mtmp) == M_AP_NOTHING
                                      || M_AP_TYPE(mtmp) == M_AP_MONSTER))
-                || sensemon(mtmp)))
-            pline("%s suddenly appears%s!", Amonnam(mtmp),
-                  distu(x, y) <= 2 ? " next to you"
-                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by" : "");
+                || sensemon(mtmp)) {
+                what = Amonnam(mtmp);
+                if (M_AP_TYPE(mtmp) == M_AP_MONSTER)
+                    exclaim = TRUE;
+            } else if (canseemon(mtmp)) {
+                /* mimic masquerading as furniture or object and not sensed */
+                mhidden_description(mtmp, FALSE, mbuf);
+                what = upstart(strsubst(mbuf, ", mimicking ", ""));
+            }
+            if (what)
+                Norep("%s%s appears%s%c", what,
+                      exclaim ? " suddenly" : "",
+                      distu(x, y) <= 2 ? " next to you"
+                      : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
+                        : "",
+                      exclaim ? '!' : '.');
+        }
         /* TODO: unify with teleport appears msg */
     }
 

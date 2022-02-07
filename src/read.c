@@ -2703,7 +2703,7 @@ do_genocide(int how)
         if (!(mons[mndx].geno & G_UNIQ)
             && !(g.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)))
             for (i = rn1(3, 4); i > 0; i--) {
-                if (!makemon(ptr, u.ux, u.uy, NO_MINVENT|MM_NOMSG))
+                if (!makemon(ptr, u.ux, u.uy, NO_MINVENT | MM_NOMSG))
                     break; /* couldn't make one */
                 ++cnt;
                 if (g.mvitals[mndx].mvflags & G_EXTINCT)
@@ -2977,10 +2977,12 @@ create_particular_creation(struct _create_particular_data* d)
         if (d->genderconf == -1) {
             /* no confict exists between explicit gender term and
                the specified monster name */
-            if (d->fem != -1
-                && (!whichpm || (!is_male(whichpm) && !is_female(whichpm))))
+            if (d->fem != -1 && (!whichpm || (!is_male(whichpm)
+                                              && !is_female(whichpm))))
                 mmflags |= (d->fem == FEMALE) ? MM_FEMALE
                                : (d->fem == MALE) ? MM_MALE : 0;
+            /* no surprise; "<mon> appears." rather than "<mon> appears!" */
+            mmflags |= MM_NOEXCLAM;
         } else {
             /* conundrum alert: an explicit gender term conflicts with an
                explicit gender-tied naming term (i.e. male cavewoman) */
@@ -2989,11 +2991,11 @@ create_particular_creation(struct _create_particular_data* d)
                commented out here */
             /*  d->fem = d->genderconf; */
 
-            /*  option chosen: let the explicit gender term (male or female)
-                override the gender-tied naming term, so leave d->fem as-is */
+            /* option chosen: let the explicit gender term (male or female)
+               override the gender-tied naming term, so leave d->fem as-is */
 
-               mmflags |= (d->fem == FEMALE) ? MM_FEMALE
-                               : (d->fem == MALE) ? MM_MALE : 0;
+            mmflags |= (d->fem == FEMALE) ? MM_FEMALE
+                           : (d->fem == MALE) ? MM_MALE : 0;
 
             /* another option would be to consider it a faulty specification
                and reject the request completely and produce a random monster
