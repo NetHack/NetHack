@@ -33,6 +33,78 @@ static char indentdata[10] = "         ";
 #define PRE indent_level++
 #define POST indent_level--
 
+void trace_init_nhwindows(void *,int *, char **);
+void trace_player_selection(void *);
+void trace_askname(void *);
+void trace_get_nh_event(void *);
+void trace_exit_nhwindows(void *,const char *);
+void trace_suspend_nhwindows(void *,const char *);
+void trace_resume_nhwindows(void *);
+winid trace_create_nhwindow(void *,int);
+void trace_clear_nhwindow(void *,winid);
+void trace_display_nhwindow(void *,winid, boolean);
+void trace_destroy_nhwindow(void *,winid);
+void trace_curs(void *,winid, int, int);
+void trace_putstr(void *,winid, int, const char *);
+void trace_putmixed(void *,winid, int, const char *);
+void trace_display_file(void *,const char *, boolean);
+void trace_start_menu(void *,winid, unsigned long);
+void trace_add_menu(void *,winid, const glyph_info *, const ANY_P *,
+		                         char, char, int,
+					                          const char *, unsigned int);
+void trace_end_menu(void *,winid, const char *);
+int trace_select_menu(void *,winid, int, MENU_ITEM_P **);
+char trace_message_menu(void *,char, int, const char *);
+void trace_update_inventory(void *,int);
+void trace_mark_synch(void *);
+void trace_wait_synch(void *);
+#ifdef CLIPPING
+void trace_cliparound(void *,int, int);
+#endif
+#ifdef POSITIONBAR
+void trace_update_positionbar(void *,char *);
+#endif
+void trace_print_glyph(void *,winid, xchar, xchar,
+		                            const glyph_info *, const glyph_info *);
+void trace_raw_print(void *,const char *);
+void trace_raw_print_bold(void *,const char *);
+int trace_nhgetch(void *);
+int trace_nh_poskey(void *,int *, int *, int *);
+void trace_nhbell(void *);
+int trace_doprev_message(void *);
+char trace_yn_function(void *,const char *, const char *, char);
+void trace_getlin(void *,const char *, char *);
+int trace_get_ext_cmd(void *);
+void trace_number_pad(void *,int);
+void trace_delay_output(void *);
+#ifdef CHANGE_COLOR
+void trace_change_color(void *,int, long, int);
+#ifdef MAC
+void trace_change_background(void *,int);
+short trace_set_font_name(void *,winid, char *);
+#endif
+char *trace_get_color_string(void *);
+#endif
+
+    /* other defs that really should go away (they're tty specific) */
+void trace_start_screen(void *);
+void trace_end_screen(void *);
+void trace_outrip(void *,winid, int, time_t);
+void trace_preference_update(void *,const char *);
+char *trace_getmsghistory(void *,boolean);
+void trace_putmsghistory(void *,const char *, boolean);
+void trace_status_init(void *);
+void trace_status_finish(void *);
+void trace_status_enablefield(void *,int, const char *, const char *,
+		                                boolean);
+void trace_status_update(void *,int, genericptr_t, int, int, int,
+		                           unsigned long *);
+
+boolean trace_can_suspend(void *);
+
+void trace_procs_init(int dir);
+void *trace_procs_chain(int cmd, int n, void *me, void *nextprocs, void *nextdata);
+
 struct trace_data {
     struct chain_procs *nprocs;
     void *ndata;
@@ -41,12 +113,12 @@ struct trace_data {
 };
 
 void *
-trace_procs_chain(cmd, n, me, nextprocs, nextdata)
-int cmd;
-int n;
-void *me;
-void *nextprocs;
-void *nextdata;
+trace_procs_chain(
+    int cmd,
+    int n,
+    void *me,
+    void *nextprocs,
+    void *nextdata)
 {
     struct trace_data *tdp = 0;
 
@@ -70,8 +142,7 @@ void *nextdata;
 }
 
 void
-trace_procs_init(dir)
-int dir;
+trace_procs_init(int dir)
 {
     char fname[200];
     long pid;
@@ -99,10 +170,10 @@ int dir;
  ***/
 
 void
-trace_init_nhwindows(vp, argcp, argv)
-void *vp;
-int *argcp;
-char **argv;
+trace_init_nhwindows(
+    void *vp,
+    int *argcp,
+    char **argv)
 {
     struct trace_data *tdp = vp;
 
@@ -114,8 +185,7 @@ char **argv;
 }
 
 void
-trace_player_selection(vp)
-void *vp;
+trace_player_selection(void *vp)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%splayer_selection()\n", INDENT);
@@ -126,8 +196,7 @@ void *vp;
 }
 
 void
-trace_askname(vp)
-void *vp;
+trace_askname(void *vp)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%saskname()\n", INDENT);
@@ -138,8 +207,7 @@ void *vp;
 }
 
 void
-trace_get_nh_event(vp)
-void *vp;
+trace_get_nh_event(void *vp)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%sget_nh_event()\n", INDENT);
@@ -150,9 +218,9 @@ void *vp;
 }
 
 void
-trace_exit_nhwindows(vp, str)
-void *vp;
-const char *str;
+trace_exit_nhwindows(
+    void *vp,
+    const char *str)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%sexit_nhwindows(%s)\n", INDENT, str);
@@ -163,9 +231,9 @@ const char *str;
 }
 
 void
-trace_suspend_nhwindows(vp, str)
-void *vp;
-const char *str;
+trace_suspend_nhwindows(
+    void *vp,
+    const char *str)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%ssuspend_nhwindows(%s)\n", INDENT, str);
@@ -176,8 +244,7 @@ const char *str;
 }
 
 void
-trace_resume_nhwindows(vp)
-void *vp;
+trace_resume_nhwindows(void *vp)
 {
     struct trace_data *tdp = vp;
     fprintf(wc_tracelogf, "%sresume_nhwindows()\n", INDENT);
@@ -188,8 +255,7 @@ void *vp;
 }
 
 static const char *
-NHWname(type)
-int type;
+NHWname(int type)
 {
     switch (type) {
     case NHW_MESSAGE:
@@ -213,9 +279,9 @@ int type;
 }
 
 winid
-trace_create_nhwindow(vp, type)
-void *vp;
-int type;
+trace_create_nhwindow(
+    void *vp,
+    int type)
 {
     struct trace_data *tdp = vp;
     const char *typestring = NHWname(type);
@@ -232,9 +298,9 @@ int type;
 }
 
 void
-trace_clear_nhwindow(vp, window)
-void *vp;
-winid window;
+trace_clear_nhwindow(
+    void *vp,
+    winid window)
 {
     struct trace_data *tdp = vp;
 
@@ -246,10 +312,10 @@ winid window;
 }
 
 void
-trace_display_nhwindow(vp, window, blocking)
-void *vp;
-winid window;
-boolean blocking;
+trace_display_nhwindow(
+    void *vp,
+    winid window,
+    boolean blocking)
 {
     struct trace_data *tdp = vp;
 
@@ -262,9 +328,9 @@ boolean blocking;
 }
 
 void
-trace_destroy_nhwindow(vp, window)
-void *vp;
-winid window;
+trace_destroy_nhwindow(
+    void *vp,
+    winid window)
 {
     struct trace_data *tdp = vp;
 
@@ -276,11 +342,11 @@ winid window;
 }
 
 void
-trace_curs(vp, window, x, y)
-void *vp;
-winid window;
-int x;
-int y;
+trace_curs(
+    void *vp,
+    winid window,
+    int x,
+    int y)
 {
     struct trace_data *tdp = vp;
 
@@ -292,11 +358,11 @@ int y;
 }
 
 void
-trace_putstr(vp, window, attr, str)
-void *vp;
-winid window;
-int attr;
-const char *str;
+trace_putstr(
+    void *vp,
+    winid window,
+    int attr,
+    const char *str)
 {
     struct trace_data *tdp = vp;
 
@@ -314,11 +380,11 @@ const char *str;
 }
 
 void
-trace_putmixed(vp, window, attr, str)
-void *vp;
-winid window;
-int attr;
-const char *str;
+trace_putmixed(
+    void *vp,
+    winid window,
+    int attr,
+    const char *str)
 {
     struct trace_data *tdp = vp;
 
@@ -336,10 +402,10 @@ const char *str;
 }
 
 void
-trace_display_file(vp, fname, complain)
-void *vp;
-const char *fname;
-boolean complain;
+trace_display_file(
+    void *vp,
+    const char *fname,
+    boolean complain)
 {
     struct trace_data *tdp = vp;
 
@@ -356,10 +422,10 @@ boolean complain;
 }
 
 void
-trace_start_menu(vp, window, mbehavior)
-void *vp;
-winid window;
-unsigned long mbehavior;
+trace_start_menu(
+    void *vp,
+    winid window,
+    unsigned long mbehavior)
 {
     struct trace_data *tdp = vp;
 
@@ -372,16 +438,16 @@ unsigned long mbehavior;
 }
 
 void
-trace_add_menu(vp, window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
-void *vp;
-winid window;               /* window to use, must be of type NHW_MENU */
-const glyph_info *glyphinfo /* glyph plus glyph info to display with item */
-const anything *identifier; /* what to return if selected */
-char ch;                    /* keyboard accelerator (0 = pick our own) */
-char gch;                   /* group accelerator (0 = no group) */
-int attr;                   /* attribute for string (like tty_putstr()) */
-const char *str;            /* menu string */
-unsigned int itemflags;     /* itemflags such as marked as selected */
+trace_add_menu(
+    void *vp,
+    winid window,               /* window to use, must be of type NHW_MENU */
+    const glyph_info *glyphinfo, /* glyph plus glyph info to display with item */
+    const anything *identifier, /* what to return if selected */
+    char ch,                    /* keyboard accelerator (0 = pick our own) */
+    char gch,                   /* group accelerator (0 = no group) */
+    int attr,                   /* attribute for string (like tty_putstr()) */
+    const char *str,            /* menu string */
+    unsigned int itemflags)     /* itemflags such as marked as selected */
 {
     struct trace_data *tdp = vp;
 
@@ -403,12 +469,12 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
     if (str) {
         fprintf(wc_tracelogf,
                 "%sadd_menu(%d, %d, %u, %p, %s, %s, %d, '%s'(%d), %u)\n", INDENT,
-                window, glyphinfo->glyph, glyphinfo->flags, (void *) identifier,
+                window, glyphinfo->glyph, glyphinfo->gm.glyphflags, (void *) identifier,
                 buf_ch, buf_gch, attr, str, (int) strlen(str), itemflags);
     } else {
         fprintf(wc_tracelogf,
                 "%sadd_menu(%d, %d, %u, %p, %s, %s, %d, NULL, %u)\n", INDENT,
-                window, glyphinfo->glyph, glyphinfo->flags, (void *) identifier,
+                window, glyphinfo->glyph, glyphinfo->gm.glyphflags, (void *) identifier,
                 buf_ch, buf_gch, attr, itemflags);
     }
 
@@ -419,10 +485,10 @@ unsigned int itemflags;     /* itemflags such as marked as selected */
 }
 
 void
-trace_end_menu(vp, window, prompt)
-void *vp;
-winid window;
-const char *prompt;
+trace_end_menu(
+    void *vp,
+    winid window,
+    const char *prompt)
 {
     struct trace_data *tdp = vp;
 
@@ -439,11 +505,11 @@ const char *prompt;
 }
 
 int
-trace_select_menu(vp, window, how, menu_list)
-void *vp;
-winid window;
-int how;
-menu_item **menu_list;
+trace_select_menu(
+    void *vp,
+    winid window,
+    int how,
+    menu_item **menu_list)
 {
     struct trace_data *tdp = vp;
     int rv;
@@ -461,11 +527,11 @@ menu_item **menu_list;
 }
 
 char
-trace_message_menu(vp, let, how, mesg)
-void *vp;
-char let;
-int how;
-const char *mesg;
+trace_message_menu(
+    void *vp,
+    char let,
+    int how,
+    const char *mesg)
 {
     struct trace_data *tdp = vp;
     char buf_let[10];
@@ -512,8 +578,7 @@ trace_update_inventory(void *vp, int arg)
 }
 
 void
-trace_mark_synch(vp)
-void *vp;
+trace_mark_synch(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -525,8 +590,7 @@ void *vp;
 }
 
 void
-trace_wait_synch(vp)
-void *vp;
+trace_wait_synch(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -539,10 +603,10 @@ void *vp;
 
 #ifdef CLIPPING
 void
-trace_cliparound(vp, x, y)
-void *vp;
-int x;
-int y;
+trace_cliparound(
+    void *vp,
+    int x,
+    int y)
 {
     struct trace_data *tdp = vp;
 
@@ -556,9 +620,9 @@ int y;
 
 #ifdef POSITIONBAR
 void
-trace_update_positionbar(vp, posbar)
-void *vp;
-char *posbar;
+trace_update_positionbar(
+    void *vp,
+    char *posbar)
 {
     struct trace_data *tdp = vp;
 
@@ -577,12 +641,13 @@ char *posbar;
 /* XXX can we decode the glyph in a meaningful way? see map_glyphinfo()?
  genl_putmixed?  */
 void
-trace_print_glyph(vp, window, x, y, glyphinfo, bkglyphinfo)
-void *vp;
-winid window;
-xchar x, y;
-const glyph_info *glyphinfo;
-const glyph_info *bkglyphinfo;
+trace_print_glyph(
+    void *vp,
+    winid window,
+    xchar x,
+    xchar y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo)
 {
     struct trace_data *tdp = vp;
 
@@ -595,9 +660,9 @@ const glyph_info *bkglyphinfo;
 }
 
 void
-trace_raw_print(vp, str)
-void *vp;
-const char *str;
+trace_raw_print(
+    void *vp,
+    const char *str)
 {
     struct trace_data *tdp = vp;
 
@@ -614,9 +679,9 @@ const char *str;
 }
 
 void
-trace_raw_print_bold(vp, str)
-void *vp;
-const char *str;
+trace_raw_print_bold(
+    void *vp,
+    const char *str)
 {
     struct trace_data *tdp = vp;
 
@@ -633,8 +698,7 @@ const char *str;
 }
 
 int
-trace_nhgetch(vp)
-void *vp;
+trace_nhgetch(void *vp)
 {
     struct trace_data *tdp = vp;
     int rv;
@@ -657,11 +721,11 @@ void *vp;
 }
 
 int
-trace_nh_poskey(vp, x, y, mod)
-void *vp;
-int *x;
-int *y;
-int *mod;
+trace_nh_poskey(
+    void *vp,
+    int *x,
+    int *y,
+    int *mod)
 {
     struct trace_data *tdp = vp;
     int rv;
@@ -684,8 +748,7 @@ int *mod;
 }
 
 void
-trace_nhbell(vp)
-void *vp;
+trace_nhbell(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -697,8 +760,7 @@ void *vp;
 }
 
 int
-trace_doprev_message(vp)
-void *vp;
+trace_doprev_message(void *vp)
 {
     struct trace_data *tdp = vp;
     int rv;
@@ -715,10 +777,11 @@ void *vp;
 }
 
 char
-trace_yn_function(vp, query, resp, def)
-void *vp;
-const char *query, *resp;
-char def;
+trace_yn_function(
+    void *vp,
+    const char *query,
+    const char *resp,
+    char def)
 {
     struct trace_data *tdp = vp;
     char rv;
@@ -761,10 +824,10 @@ char def;
 }
 
 void
-trace_getlin(vp, query, bufp)
-void *vp;
-const char *query;
-char *bufp;
+trace_getlin(
+    void *vp,
+    const char *query,
+    char *bufp)
 {
     struct trace_data *tdp = vp;
 
@@ -787,8 +850,7 @@ char *bufp;
 }
 
 int
-trace_get_ext_cmd(vp)
-void *vp;
+trace_get_ext_cmd(void *vp)
 {
     struct trace_data *tdp = vp;
     int rv;
@@ -816,9 +878,9 @@ void *vp;
 }
 
 void
-trace_number_pad(vp, state)
-void *vp;
-int state;
+trace_number_pad(
+    void *vp,
+    int state)
 {
     struct trace_data *tdp = vp;
 
@@ -830,8 +892,7 @@ int state;
 }
 
 void
-trace_delay_output(vp)
-void *vp;
+trace_delay_output(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -844,11 +905,11 @@ void *vp;
 
 #ifdef CHANGE_COLOR
 void
-trace_change_color(vp, color, value, reverse)
-void *vp;
-int color;
-long value;
-int reverse;
+trace_change_color(
+    void *vp,
+    int color,
+    long value,
+    int reverse)
 {
     struct trace_data *tdp = vp;
 
@@ -862,9 +923,9 @@ int reverse;
 
 #ifdef MAC
 void
-trace_change_background(vp, bw)
-void *vp;
-int bw;
+trace_change_background(
+    void *vp,
+    int bw)
 {
     struct trace_data *tdp = vp;
 
@@ -876,10 +937,10 @@ int bw;
 }
 
 short
-trace_set_font_name(vp, window, font)
-void *vp;
-winid window;
-char *font;
+trace_set_font_name(
+    void *vp,
+    winid window,
+    char *font)
 {
     struct trace_data *tdp = vp;
     short rv;
@@ -902,8 +963,7 @@ char *font;
 #endif
 
 char *
-trace_get_color_string(vp)
-void *vp;
+trace_get_color_string(void *vp)
 {
     struct trace_data *tdp = vp;
     char *rv;
@@ -928,8 +988,7 @@ void *vp;
 
 /* other defs that really should go away (they're tty specific) */
 void
-trace_start_screen(vp)
-void *vp;
+trace_start_screen(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -941,8 +1000,7 @@ void *vp;
 }
 
 void
-trace_end_screen(vp)
-void *vp;
+trace_end_screen(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -954,11 +1012,11 @@ void *vp;
 }
 
 void
-trace_outrip(vp, tmpwin, how, when)
-void *vp;
-winid tmpwin;
-int how;
-time_t when;
+trace_outrip(
+    void *vp,
+    winid tmpwin,
+    int how,
+    time_t when)
 {
     struct trace_data *tdp = vp;
 
@@ -971,9 +1029,9 @@ time_t when;
 }
 
 void
-trace_preference_update(vp, pref)
-void *vp;
-const char *pref;
+trace_preference_update(
+    void *vp,
+    const char *pref)
 {
     struct trace_data *tdp = vp;
 
@@ -990,9 +1048,9 @@ const char *pref;
 }
 
 char *
-trace_getmsghistory(vp, init)
-void *vp;
-boolean init;
+trace_getmsghistory(
+    void *vp,
+    boolean init)
 {
     struct trace_data *tdp = vp;
     char *rv;
@@ -1014,10 +1072,10 @@ boolean init;
 }
 
 void
-trace_putmsghistory(vp, msg, is_restoring)
-void *vp;
-const char *msg;
-boolean is_restoring;
+trace_putmsghistory(
+    void *vp,
+    const char *msg,
+    boolean is_restoring)
 {
     struct trace_data *tdp = vp;
 
@@ -1035,8 +1093,7 @@ boolean is_restoring;
 }
 
 void
-trace_status_init(vp)
-void *vp;
+trace_status_init(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -1048,8 +1105,7 @@ void *vp;
 }
 
 void
-trace_status_finish(vp)
-void *vp;
+trace_status_finish(void *vp)
 {
     struct trace_data *tdp = vp;
 
@@ -1061,12 +1117,12 @@ void *vp;
 }
 
 void
-trace_status_enablefield(vp, fieldidx, nm, fmt, enable)
-void *vp;
-int fieldidx;
-const char *nm;
-const char *fmt;
-boolean enable;
+trace_status_enablefield(
+    void *vp,
+    int fieldidx,
+    const char *nm,
+    const char *fmt,
+    boolean enable)
 {
     struct trace_data *tdp = vp;
 
@@ -1090,11 +1146,14 @@ boolean enable;
 }
 
 void
-trace_status_update(vp, idx, ptr, chg, percent, color, colormasks)
-void *vp;
-int idx, chg, percent, color;
-genericptr_t ptr;
-unsigned long *colormasks;
+trace_status_update(
+    void *vp,
+    int idx,
+    genericptr_t ptr,
+    int chg, 
+    int percent,
+    int color,
+    unsigned long *colormasks)
 {
     struct trace_data *tdp = vp;
 
@@ -1108,8 +1167,7 @@ unsigned long *colormasks;
 }
 
 boolean
-trace_can_suspend(vp)
-void *vp;
+trace_can_suspend(void *vp)
 {
     struct trace_data *tdp = vp;
     boolean rv;
@@ -1128,6 +1186,7 @@ void *vp;
 struct chain_procs trace_procs = {
     "+trace", 0, /* wincap */
     0,           /* wincap2 */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     /*
     XXX problem - the above need to come from the real window port, possibly
     modified.  May need to do something to call an additional init fn later

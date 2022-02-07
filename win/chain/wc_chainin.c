@@ -7,6 +7,78 @@
 
 #include "hack.h"
 
+void chainin_init_nhwindows(int *, char **);
+void chainin_player_selection(void);
+void chainin_askname(void);
+void chainin_get_nh_event(void);
+void chainin_exit_nhwindows(const char *);
+void chainin_suspend_nhwindows(const char *);
+void chainin_resume_nhwindows(void);
+winid chainin_create_nhwindow(int);
+void chainin_clear_nhwindow(winid);
+void chainin_display_nhwindow(winid, boolean);
+void chainin_destroy_nhwindow(winid);
+void chainin_curs(winid, int, int);
+void chainin_putstr(winid, int, const char *);
+void chainin_putmixed(winid, int, const char *);
+void chainin_display_file(const char *, boolean);
+void chainin_start_menu(winid, unsigned long);
+void chainin_add_menu(winid, const glyph_info *, const ANY_P *,
+                         char, char, int,
+                         const char *, unsigned int);
+void chainin_end_menu(winid, const char *);
+int chainin_select_menu(winid, int, MENU_ITEM_P **);
+char chainin_message_menu(char, int, const char *);
+void chainin_update_inventory(int);
+void chainin_mark_synch(void);
+void chainin_wait_synch(void);
+#ifdef CLIPPING
+void chainin_cliparound(int, int);
+#endif
+#ifdef POSITIONBAR
+void chainin_update_positionbar(char *);
+#endif
+void chainin_print_glyph(winid, xchar, xchar,
+                            const glyph_info *, const glyph_info *);
+void chainin_raw_print(const char *);
+void chainin_raw_print_bold(const char *);
+int chainin_nhgetch(void);
+int chainin_nh_poskey(int *, int *, int *);
+void chainin_nhbell(void);
+int chainin_doprev_message(void);
+char chainin_yn_function(const char *, const char *, char);
+void chainin_getlin(const char *, char *);
+int chainin_get_ext_cmd(void);
+void chainin_number_pad(int);
+void chainin_delay_output(void);
+#ifdef CHANGE_COLOR
+void chainin_change_color(int, long, int);
+#ifdef MAC
+void chainin_change_background(int);
+short chainin_set_font_name(winid, char *);
+#endif
+char *chainin_get_color_string(void);
+#endif
+
+    /* other defs that really should go away (they're tty specific) */
+void chainin_start_screen(void);
+void chainin_end_screen(void);
+void chainin_outrip(winid, int, time_t);
+void chainin_preference_update(const char *);
+char *chainin_getmsghistory(boolean);
+void chainin_putmsghistory(const char *, boolean);
+void chainin_status_init(void);
+void chainin_status_finish(void);
+void chainin_status_enablefield(int, const char *, const char *,
+                                boolean);
+void chainin_status_update(int, genericptr_t, int, int, int,
+                           unsigned long *);
+
+boolean chainin_can_suspend(void);
+
+void *chainin_procs_chain(int cmd, int n, void *me, void *nextprocs, void *nextdata);
+void chainin_procs_init(int dir);
+
 struct chainin_data {
     struct chain_procs *nprocs;
     void *ndata;
@@ -20,12 +92,12 @@ struct chainin_data {
 static struct chainin_data *cibase;
 
 void *
-chainin_procs_chain(cmd, n, me, nextprocs, nextdata)
-int cmd;
-int n;
-void *me;
-void *nextprocs;
-void *nextdata;
+chainin_procs_chain(
+    int cmd,
+    int n,
+    void *me,
+    void *nextprocs,
+    void *nextdata)
 {
     struct chainin_data *tdp = 0;
 
@@ -51,8 +123,8 @@ void *nextdata;
 
 /* XXX if we don't need this, take it out of the table */
 void
-chainin_procs_init(dir)
-int dir UNUSED;
+chainin_procs_init(
+    int dir UNUSED)
 {
 }
 
@@ -61,54 +133,54 @@ int dir UNUSED;
  ***/
 
 void
-chainin_init_nhwindows(argcp, argv)
-int *argcp;
-char **argv;
+chainin_init_nhwindows(
+    int *argcp,
+    char **argv)
 {
     (*cibase->nprocs->win_init_nhwindows)(cibase->ndata, argcp, argv);
 }
 
 void
-chainin_player_selection()
+chainin_player_selection(void)
 {
     (*cibase->nprocs->win_player_selection)(cibase->ndata);
 }
 
 void
-chainin_askname()
+chainin_askname(void)
 {
     (*cibase->nprocs->win_askname)(cibase->ndata);
 }
 
 void
-chainin_get_nh_event()
+chainin_get_nh_event(void)
 {
     (*cibase->nprocs->win_get_nh_event)(cibase->ndata);
 }
 
 void
-chainin_exit_nhwindows(str)
-const char *str;
+chainin_exit_nhwindows(
+    const char *str)
 {
     (*cibase->nprocs->win_exit_nhwindows)(cibase->ndata, str);
 }
 
 void
-chainin_suspend_nhwindows(str)
-const char *str;
+chainin_suspend_nhwindows(
+    const char *str)
 {
     (*cibase->nprocs->win_suspend_nhwindows)(cibase->ndata, str);
 }
 
 void
-chainin_resume_nhwindows()
+chainin_resume_nhwindows(void)
 {
     (*cibase->nprocs->win_resume_nhwindows)(cibase->ndata);
 }
 
 winid
-chainin_create_nhwindow(type)
-int type;
+chainin_create_nhwindow(
+    int type)
 {
     winid rv;
 
@@ -118,80 +190,80 @@ int type;
 }
 
 void
-chainin_clear_nhwindow(window)
-winid window;
+chainin_clear_nhwindow(
+    winid window)
 {
     (*cibase->nprocs->win_clear_nhwindow)(cibase->ndata, window);
 }
 
 void
-chainin_display_nhwindow(window, blocking)
-winid window;
-boolean blocking;
+chainin_display_nhwindow(
+    winid window,
+    boolean blocking)
 {
     (*cibase->nprocs->win_display_nhwindow)(cibase->ndata, window, blocking);
 }
 
 void
-chainin_destroy_nhwindow(window)
-winid window;
+chainin_destroy_nhwindow(
+    winid window)
 {
     (*cibase->nprocs->win_destroy_nhwindow)(cibase->ndata, window);
 }
 
 void
-chainin_curs(window, x, y)
-winid window;
-int x;
-int y;
+chainin_curs(
+    winid window,
+    int x,
+    int y)
 {
     (*cibase->nprocs->win_curs)(cibase->ndata, window, x, y);
 }
 
 void
-chainin_putstr(window, attr, str)
-winid window;
-int attr;
-const char *str;
+chainin_putstr(
+    winid window,
+    int attr,
+    const char *str)
 {
     (*cibase->nprocs->win_putstr)(cibase->ndata, window, attr, str);
 }
 
 void
-chainin_putmixed(window, attr, str)
-winid window;
-int attr;
-const char *str;
+chainin_putmixed(
+    winid window,
+    int attr,
+    const char *str)
 {
     (*cibase->nprocs->win_putmixed)(cibase->ndata, window, attr, str);
 }
 
 void
-chainin_display_file(fname, complain)
-const char *fname;
-boolean complain;
+chainin_display_file(
+    const char *fname,
+    boolean complain)
 {
     (*cibase->nprocs->win_display_file)(cibase->ndata, fname, complain);
 }
 
 void
-chainin_start_menu(window, mbehavior)
-winid window;
-unsigned long mbehavior;
+chainin_start_menu(
+    winid window,
+    unsigned long mbehavior)
 {
     (*cibase->nprocs->win_start_menu)(cibase->ndata, window, mbehavior);
 }
 
 void
-chainin_add_menu(window, glyphinfo, identifier, ch, gch, attr, str, itemflags)
-winid window;               /* window to use, must be of type NHW_MENU */
-const glyph_info *glyphinfo; /* glyph and other glyph info to display with item */
-const anything *identifier; /* what to return if selected */
-char ch;                    /* keyboard accelerator (0 = pick our own) */
-char gch;                   /* group accelerator (0 = no group) */
-int attr;                   /* attribute for string (like tty_putstr()) */
-const char *str;            /* menu string */
-unsigned int itemflags;     /* flags such as item is marked as selected
+chainin_add_menu(
+    winid window,               /* window to use, must be of type NHW_MENU */
+    const glyph_info *glyphinfo, /* glyph and other info to display with item */
+    const anything *identifier, /* what to return if selected */
+    char ch,                    /* keyboard accelerator (0 = pick our own) */
+    char gch,                   /* group accelerator (0 = no group) */
+    int attr,                   /* attribute for string (like tty_putstr()) */
+    const char *str,            /* menu string */
+    unsigned int itemflags)     /* flags such as item is marked as selected
                                MENU_ITEMFLAGS_SELECTED */
 {
     (*cibase->nprocs->win_add_menu)(cibase->ndata, window, glyphinfo,
@@ -199,18 +271,18 @@ unsigned int itemflags;     /* flags such as item is marked as selected
 }
 
 void
-chainin_end_menu(window, prompt)
-winid window;
-const char *prompt;
+chainin_end_menu(
+    winid window,
+    const char *prompt)
 {
     (*cibase->nprocs->win_end_menu)(cibase->ndata, window, prompt);
 }
 
 int
-chainin_select_menu(window, how, menu_list)
-winid window;
-int how;
-menu_item **menu_list;
+chainin_select_menu(
+    winid window,
+    int how,
+    menu_item **menu_list)
 {
     int rv;
 
@@ -221,10 +293,10 @@ menu_item **menu_list;
 }
 
 char
-chainin_message_menu(let, how, mesg)
-char let;
-int how;
-const char *mesg;
+chainin_message_menu(
+    char let,
+    int how,
+    const char *mesg)
 {
     char rv;
 
@@ -240,22 +312,20 @@ chainin_update_inventory(int arg)
 }
 
 void
-chainin_mark_synch()
+chainin_mark_synch(void)
 {
     (*cibase->nprocs->win_mark_synch)(cibase->ndata);
 }
 
 void
-chainin_wait_synch()
+chainin_wait_synch(void)
 {
     (*cibase->nprocs->win_wait_synch)(cibase->ndata);
 }
 
 #ifdef CLIPPING
 void
-chainin_cliparound(x, y)
-int x;
-int y;
+chainin_cliparound(int x, int y)
 {
     (*cibase->nprocs->win_cliparound)(cibase->ndata, x, y);
 }
@@ -263,8 +333,7 @@ int y;
 
 #ifdef POSITIONBAR
 void
-chainin_update_positionbar(posbar)
-char *posbar;
+chainin_update_positionbar(char *posbar)
 {
     (*cibase->nprocs->win_update_positionbar)(cibase->ndata, posbar);
 }
@@ -272,31 +341,30 @@ char *posbar;
 
 /* XXX can we decode the glyph in a meaningful way? */
 void
-chainin_print_glyph(window, x, y, glyphinfo, bkglyphinfo)
-winid window;
-xchar x, y;
-const glyph_info *glyphinfo;
-const glyph_info *bkglyphinfo;
+chainin_print_glyph(
+    winid window,
+    xchar x,
+    xchar y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo)
 {
     (*cibase->nprocs->win_print_glyph)(cibase->ndata, window, x, y, glyphinfo, bkglyphinfo);
 }
 
 void
-chainin_raw_print(str)
-const char *str;
+chainin_raw_print(const char *str)
 {
     (*cibase->nprocs->win_raw_print)(cibase->ndata, str);
 }
 
 void
-chainin_raw_print_bold(str)
-const char *str;
+chainin_raw_print_bold(const char *str)
 {
     (*cibase->nprocs->win_raw_print_bold)(cibase->ndata, str);
 }
 
 int
-chainin_nhgetch()
+chainin_nhgetch(void)
 {
     int rv;
 
@@ -306,10 +374,10 @@ chainin_nhgetch()
 }
 
 int
-chainin_nh_poskey(x, y, mod)
-int *x;
-int *y;
-int *mod;
+chainin_nh_poskey(
+    int *x,
+    int *y,
+    int *mod)
 {
     int rv;
 
@@ -319,13 +387,13 @@ int *mod;
 }
 
 void
-chainin_nhbell()
+chainin_nhbell(void)
 {
     (*cibase->nprocs->win_nhbell)(cibase->ndata);
 }
 
 int
-chainin_doprev_message()
+chainin_doprev_message(void)
 {
     int rv;
 
@@ -335,9 +403,10 @@ chainin_doprev_message()
 }
 
 char
-chainin_yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+chainin_yn_function(
+    const char *query,
+    const char *resp,
+    char def)
 {
     int rv;
 
@@ -347,15 +416,15 @@ char def;
 }
 
 void
-chainin_getlin(query, bufp)
-const char *query;
-char *bufp;
+chainin_getlin(
+    const char *query,
+    char *bufp)
 {
     (*cibase->nprocs->win_getlin)(cibase->ndata, query, bufp);
 }
 
 int
-chainin_get_ext_cmd()
+chainin_get_ext_cmd(void)
 {
     int rv;
 
@@ -365,40 +434,38 @@ chainin_get_ext_cmd()
 }
 
 void
-chainin_number_pad(state)
-int state;
+chainin_number_pad(int state)
 {
     (*cibase->nprocs->win_number_pad)(cibase->ndata, state);
 }
 
 void
-chainin_delay_output()
+chainin_delay_output(void)
 {
     (*cibase->nprocs->win_delay_output)(cibase->ndata);
 }
 
 #ifdef CHANGE_COLOR
 void
-chainin_change_color(color, value, reverse)
-int color;
-long value;
-int reverse;
+chainin_change_color(
+    int color,
+    long value,
+    int reverse)
 {
     (*cibase->nprocs->win_change_color)(cibase->ndata, color, value, reverse);
 }
 
 #ifdef MAC
 void
-chainin_change_background(bw)
-int bw;
+chainin_change_background(int bw)
 {
     (*cibase->nprocs->win_change_background)(cibase->ndata, bw);
 }
 
 short
-chainin_set_font_name(window, font)
-winid window;
-char *font;
+chainin_set_font_name(
+    winid window,
+    char *font)
 {
     short rv;
 
@@ -409,7 +476,7 @@ char *font;
 #endif
 
 char *
-trace_get_color_string()
+trace_get_color_string(void)
 {
     char *rv;
 
@@ -422,36 +489,34 @@ trace_get_color_string()
 
 /* other defs that really should go away (they're tty specific) */
 void
-chainin_start_screen()
+chainin_start_screen(void)
 {
     (*cibase->nprocs->win_start_screen)(cibase->ndata);
 }
 
 void
-chainin_end_screen()
+chainin_end_screen(void)
 {
     (*cibase->nprocs->win_end_screen)(cibase->ndata);
 }
 
 void
-chainin_outrip(tmpwin, how, when)
-winid tmpwin;
-int how;
-time_t when;
+chainin_outrip(
+    winid tmpwin,
+    int how,
+    time_t when)
 {
     (*cibase->nprocs->win_outrip)(cibase->ndata, tmpwin, how, when);
 }
 
 void
-chainin_preference_update(pref)
-const char *pref;
+chainin_preference_update(const char *pref)
 {
     (*cibase->nprocs->win_preference_update)(cibase->ndata, pref);
 }
 
 char *
-chainin_getmsghistory(init)
-boolean init;
+chainin_getmsghistory(boolean init)
 {
     char *rv;
 
@@ -461,48 +526,48 @@ boolean init;
 }
 
 void
-chainin_putmsghistory(msg, is_restoring)
-const char *msg;
-boolean is_restoring;
+chainin_putmsghistory(
+    const char *msg,
+    boolean is_restoring)
 {
     (*cibase->nprocs->win_putmsghistory)(cibase->ndata, msg, is_restoring);
 }
 
 void
-chainin_status_init()
+chainin_status_init(void)
 {
     (*cibase->nprocs->win_status_init)(cibase->ndata);
 }
 
 void
-chainin_status_finish()
+chainin_status_finish(void)
 {
     (*cibase->nprocs->win_status_finish)(cibase->ndata);
 }
 
 void
-chainin_status_enablefield(fieldidx, nm, fmt, enable)
-int fieldidx;
-const char *nm;
-const char *fmt;
-boolean enable;
+chainin_status_enablefield(
+    int fieldidx,
+    const char *nm,
+    const char *fmt,
+    boolean enable)
 {
     (*cibase->nprocs->win_status_enablefield)(cibase->ndata, fieldidx, nm,
                                               fmt, enable);
 }
 
-void
-chainin_status_update(idx, ptr, chg, percent, color, colormasks)
-int idx, chg, percent, color;
-genericptr_t ptr;
-unsigned long *colormasks;
+void chainin_status_update(
+	int idx,
+	genericptr_t ptr,
+	int chg, int percent, int color,
+	unsigned long *colormasks)
 {
     (*cibase->nprocs->win_status_update)(cibase->ndata, idx, ptr, chg,
                                          percent, color, colormasks);
 }
 
 boolean
-chainin_can_suspend()
+chainin_can_suspend(void)
 {
     boolean rv;
 
@@ -514,6 +579,7 @@ chainin_can_suspend()
 struct window_procs chainin_procs = {
     "-chainin", 0, /* wincap */
     0,             /* wincap2 */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     /*
     XXX problem - the above need to come from the real window port, possibly
     modified.  May need to do something to call an additional init fn later

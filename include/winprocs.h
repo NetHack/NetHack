@@ -318,6 +318,7 @@ struct chain_procs {
                            * '+' are reserved for processors. */
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
+    boolean has_color[CLR_MAX];
     void (*win_init_nhwindows)(CARGS, int *, char **);
     void (*win_player_selection)(CARGS);
     void (*win_askname)(CARGS);
@@ -340,7 +341,7 @@ struct chain_procs {
     void (*win_end_menu)(CARGS, winid, const char *);
     int (*win_select_menu)(CARGS, winid, int, MENU_ITEM_P **);
     char (*win_message_menu)(CARGS, char, int, const char *);
-    void (*win_update_inventory)(CARGS);
+    void (*win_update_inventory)(CARGS, int);
     void (*win_mark_synch)(CARGS);
     void (*win_wait_synch)(CARGS);
 #ifdef CLIPPING
@@ -358,7 +359,7 @@ struct chain_procs {
     int (*win_nh_poskey)(CARGS, int *, int *, int *);
     void (*win_nhbell)(CARGS);
     int (*win_doprev_message)(CARGS);
-    char (*win_yn_function),
+    char (*win_yn_function)
                (CARGS, const char *, const char *, char);
     void (*win_getlin)(CARGS, const char *, char *);
     int (*win_get_ext_cmd)(CARGS);
@@ -383,7 +384,7 @@ struct chain_procs {
     void (*win_putmsghistory)(CARGS, const char *, boolean);
     void (*win_status_init)(CARGS);
     void (*win_status_finish)(CARGS);
-    void (*win_status_enablefield),
+    void (*win_status_enablefield)
                (CARGS, int, const char *, const char *, boolean);
     void (*win_status_update)(CARGS, int, genericptr_t, int, int, int,
                               unsigned long *);

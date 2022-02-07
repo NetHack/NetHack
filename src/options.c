@@ -3724,7 +3724,7 @@ optfn_windowborders(
 
 #ifdef WINCHAIN
 static int
-optfn_windowchain(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_windowchain(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
