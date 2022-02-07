@@ -2142,7 +2142,9 @@ struct ext_func_tab extcmdlist[] = {
     { M('d'), "dip", "dip an object into something",
               dodip, AUTOCOMPLETE, NULL },
     { '>',    "down", "go down a staircase",
-              dodown, MOVEMENTCMD, NULL },
+              /* 'm' for move w/o autopickup rather than menu prefix;
+                 not general MOVEMENTCMD because g/G/F aren't allowed */
+              dodown, CMD_M_PREFIX, NULL },
     { 'd',    "drop", "drop an item",
               dodrop, 0, NULL },
     { 'D',    "droptype", "drop specific item types",
@@ -2327,7 +2329,9 @@ struct ext_func_tab extcmdlist[] = {
     { M('u'), "untrap", "untrap something",
               dountrap, AUTOCOMPLETE, NULL },
     { '<',    "up", "go up a staircase",
-              doup, MOVEMENTCMD, NULL },
+              /* 'm' for move w/o autopickup rather than menu prefix;
+                 not general MOVEMENTCMD because g/G/F aren't allowed */
+              doup, CMD_M_PREFIX, NULL },
     { '\0',   "vanquished", "list vanquished monsters",
               dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('v'), "version",
@@ -2458,6 +2462,7 @@ static int (*move_funcs[N_DIRS_Z][N_MOVEMODES])(void) = {
     { do_move_southeast, do_run_southeast, do_rush_southeast },
     { do_move_south,     do_run_south,     do_rush_south },
     { do_move_southwest, do_run_southwest, do_rush_southwest },
+    /* misleading because rush and run down or up are rejected by rhack() */
     { dodown,            dodown,           dodown },
     { doup,              doup,             doup },
 };
