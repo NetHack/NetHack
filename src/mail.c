@@ -559,6 +559,9 @@ ckmailstatus(void)
 }
 
 #if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
+
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 read_simplemail(char *mbox, boolean adminmsg)
 {
@@ -611,7 +614,7 @@ read_simplemail(char *mbox, boolean adminmsg)
 
         pline(msgfrom, curline);
         if (adminmsg)
-            verbalize(msg);
+            verbalize("%s", msg);
         else
             pline("It reads: \"%s\".", msg);
 
@@ -642,6 +645,9 @@ read_simplemail(char *mbox, boolean adminmsg)
     if (!adminmsg)
         pline("It appears to be all gibberish.");
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #endif /* SIMPLE_MAIL */
 
 void
