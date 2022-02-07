@@ -2905,6 +2905,11 @@ cmd_from_func(int (*fn)(void))
            keystroke invokes space's command */
         if (i == ' ')
             continue;
+        /* skip digits if number_pad is Off; also skip '-' unless it has
+           been bound to something other than what number_pad assigns */
+        if (((i >= '0' && i <= '9') || (i == '-' && fn == do_fight))
+            && !g.Cmd.num_pad)
+            continue;
 
         if (g.Cmd.commands[i] && g.Cmd.commands[i]->ef_funct == fn)
             return (char) i;
@@ -3848,11 +3853,13 @@ rhack(char *cmd)
                        && !(tlist->flags & (PREFIXCMD | MOVEMENTCMD))
                        && (!was_m_prefix || !accept_menu_prefix(tlist))) {
                 const char *which;
+                char pfxidx = cmd_from_func(prefix_seen->ef_funct);
 
                 /* got prefix previously but this command doesn't accept one */
-                which = (prefix_seen->ef_funct == do_reqmenu)
-                           ? "move-no-pickup or request-menu"
-                           : prefix_seen->ef_txt;
+                which = (pfxidx != 0) ? visctrl(pfxidx)
+                        : (prefix_seen->ef_funct == do_reqmenu)
+                          ? "move-no-pickup or request-menu"
+                          : prefix_seen->ef_txt;
                 pline("The %s command does not accept %s prefix.",
                       tlist->ef_txt, which);
 
