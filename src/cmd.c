@@ -2081,6 +2081,13 @@ do_run(void)
 int
 do_fight(void)
 {
+    if (g.context.forcefight) {
+        Norep("Double fight prefix, canceled.");
+        g.context.forcefight = 1;
+        g.domove_attempting = 0;
+        return ECMD_CANCEL;
+    }
+
     g.context.forcefight = 1;
     g.domove_attempting |= DOMOVE_WALK;
     return ECMD_OK;
