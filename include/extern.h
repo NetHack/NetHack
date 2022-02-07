@@ -199,6 +199,7 @@ extern boolean status_hilite_menu(void);
 
 /* ### cmd.c ### */
 
+extern void set_move_cmd(int, int);
 extern int do_move_west(void);
 extern int do_move_northwest(void);
 extern int do_move_north(void);

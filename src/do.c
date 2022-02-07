@@ -981,6 +981,8 @@ dodown(void)
     boolean stairs_down = (stway && !stway->up && !stway->isladder),
             ladder_down = (stway && !stway->up &&  stway->isladder);
 
+    set_move_cmd(DIR_DOWN, 0);
+
     if (u_rooted())
         return ECMD_TIME;
 
@@ -1051,7 +1053,7 @@ dodown(void)
                     dotrap(trap, TOOKPLUNGE);
             }
         }
-        return ECMD_TIME; /* came out of hiding; might need '>' again to go down */
+        return ECMD_TIME; /* came out of hiding; need '>' again to go down */
     }
 
     if (u.ustuck) {
@@ -1070,7 +1072,6 @@ dodown(void)
         } else if (!trap || !is_hole(trap->ttyp)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !g.context.nopick && uwep && is_pick(uwep)) {
-                u.dz = 1; /* the #down command doesn't call set_move_cmd() */
                 return use_pick_axe2(uwep);
             } else {
                 You_cant("go down here.");
@@ -1121,8 +1122,6 @@ dodown(void)
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
     } else {
-        if (!trap)
-            u.dz = 1;
         g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
         next_level(!trap);
         g.at_ladder = FALSE;
@@ -1135,6 +1134,8 @@ int
 doup(void)
 {
     stairway *stway = stairway_at(u.ux,u.uy);
+
+    set_move_cmd(DIR_UP, 0);
 
     if (u_rooted())
         return ECMD_TIME;
@@ -1176,7 +1177,6 @@ doup(void)
         return ECMD_OK;
     }
     g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
-    u.dz = -1;
     prev_level(TRUE);
     g.at_ladder = FALSE;
     return ECMD_TIME;

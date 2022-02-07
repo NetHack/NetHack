@@ -105,7 +105,6 @@ static int dotravel(void);
 static int dotravel_target(void);
 static int doclicklook(void);
 static int doterrain(void);
-static void set_move_cmd(int, int);
 static int wiz_wish(void);
 static int wiz_identify(void);
 static int wiz_map(void);
@@ -1844,20 +1843,20 @@ doterrain(void)
     return ECMD_OK; /* no time elapses */
 }
 
-static void
+void
 set_move_cmd(int dir, int run)
 {
+    u.dz = zdir[dir];
+    u.dx = xdir[dir];
+    u.dy = ydir[dir];
     /* #reqmenu -prefix disables autopickup during movement */
     if (iflags.menu_requested)
         g.context.nopick = 1;
     g.context.travel = g.context.travel1 = 0;
-    if (!g.domove_attempting) {
+    if (!g.domove_attempting && !u.dz) {
         g.context.run = run;
         g.domove_attempting |= (!run ? DOMOVE_WALK : DOMOVE_RUSH);
     }
-    u.dz = zdir[dir];
-    u.dx = xdir[dir];
-    u.dy = ydir[dir];
 }
 
 /* move or attack */
@@ -2036,7 +2035,8 @@ int
 do_reqmenu(void)
 {
     if (iflags.menu_requested) {
-        Norep("Double %s prefix, canceled.", visctrl(cmd_from_func(do_reqmenu)));
+        Norep("Double %s prefix, canceled.",
+              visctrl(cmd_from_func(do_reqmenu)));
         iflags.menu_requested = FALSE;
         return ECMD_CANCEL;
     }
@@ -2135,7 +2135,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('d'), "dip", "dip an object into something",
               dodip, AUTOCOMPLETE, NULL },
     { '>',    "down", "go down a staircase",
-              dodown, 0, NULL },
+              dodown, MOVEMENTCMD, NULL },
     { 'd',    "drop", "drop an item",
               dodrop, 0, NULL },
     { 'D',    "droptype", "drop specific item types",
@@ -2320,7 +2320,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('u'), "untrap", "untrap something",
               dountrap, AUTOCOMPLETE, NULL },
     { '<',    "up", "go up a staircase",
-              doup, 0, NULL },
+              doup, MOVEMENTCMD, NULL },
     { '\0',   "vanquished", "list vanquished monsters",
               dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('v'), "version",
@@ -2386,55 +2386,55 @@ struct ext_func_tab extcmdlist[] = {
     /* movement commands will be bound by reset_commands() */
     /* move or attack */
     { '\0', "movewest", "move west (screen left)",
-            do_move_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_west, MOVEMENTCMD, NULL },
     { '\0', "movenorthwest", "move northwest (screen upper left)",
-            do_move_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_northwest, MOVEMENTCMD, NULL },
     { '\0', "movenorth", "move north (screen up)",
-            do_move_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_north, MOVEMENTCMD, NULL },
     { '\0', "movenortheast", "move northeast (screen upper right)",
-            do_move_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_northeast, MOVEMENTCMD, NULL },
     { '\0', "moveeast", "move east (screen right)",
-            do_move_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_east, MOVEMENTCMD, NULL },
     { '\0', "movesoutheast", "move southeast (screen lower right)",
-            do_move_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_southeast, MOVEMENTCMD, NULL },
     { '\0', "movesouth", "move south (screen down)",
-            do_move_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_south, MOVEMENTCMD, NULL },
     { '\0', "movesouthwest", "move southwest (screen lower left)",
-            do_move_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_move_southwest, MOVEMENTCMD, NULL },
     /* rush */
     { '\0', "rushwest", "rush west (screen left)",
-            do_rush_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_west, MOVEMENTCMD, NULL },
     { '\0', "rushnorthwest", "rush northwest (screen upper left)",
-            do_rush_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_northwest, MOVEMENTCMD, NULL },
     { '\0', "rushnorth", "rush north (screen up)",
-            do_rush_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_north, MOVEMENTCMD, NULL },
     { '\0', "rushnortheast", "rush northeast (screen upper right)",
-            do_rush_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_northeast, MOVEMENTCMD, NULL },
     { '\0', "rusheast", "rush east (screen right)",
-            do_rush_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_east, MOVEMENTCMD, NULL },
     { '\0', "rushsoutheast", "rush southeast (screen lower right)",
-            do_rush_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_southeast, MOVEMENTCMD, NULL },
     { '\0', "rushsouth", "rush south (screen down)",
-            do_rush_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_south, MOVEMENTCMD, NULL },
     { '\0', "rushsouthwest", "rush southwest (screen lower left)",
-            do_rush_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_rush_southwest, MOVEMENTCMD, NULL },
     /* run */
     { '\0', "runwest", "run west (screen left)",
-            do_run_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_west, MOVEMENTCMD, NULL },
     { '\0', "runnorthwest", "run northwest (screen upper left)",
-            do_run_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_northwest, MOVEMENTCMD, NULL },
     { '\0', "runnorth", "run north (screen up)",
-            do_run_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_north, MOVEMENTCMD, NULL },
     { '\0', "runnortheast", "run northeast (screen upper right)",
-            do_run_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_northeast, MOVEMENTCMD, NULL },
     { '\0', "runeast", "run east (screen right)",
-            do_run_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_east, MOVEMENTCMD, NULL },
     { '\0', "runsoutheast", "run southeast (screen lower right)",
-            do_run_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_southeast, MOVEMENTCMD, NULL },
     { '\0', "runsouth", "run south (screen down)",
-            do_run_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_south, MOVEMENTCMD, NULL },
     { '\0', "runsouthwest", "run southwest (screen lower left)",
-            do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+            do_run_southwest, MOVEMENTCMD, NULL },
 
     /* internal commands: only used by game core, not available for user */
     { '\0',   "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
@@ -3844,13 +3844,14 @@ rhack(char *cmd)
                 /* can_do_extcmd() already gave a message */
                 reset_cmd_vars();
                 res = ECMD_OK;
-            } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
+            } else if (prefix_seen
+                       && !(tlist->flags & (PREFIXCMD | MOVEMENTCMD))
                        && (!was_m_prefix || !accept_menu_prefix(tlist))) {
                 const char *which;
 
                 /* got prefix previously but this command doesn't accept one */
                 which = (prefix_seen->ef_funct == do_reqmenu)
-                           ? "move or request menu"
+                           ? "move-no-pickup or request-menu"
                            : prefix_seen->ef_txt;
                 pline("The %s command does not accept %s prefix.",
                       tlist->ef_txt, which);
