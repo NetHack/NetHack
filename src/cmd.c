@@ -2142,8 +2142,9 @@ struct ext_func_tab extcmdlist[] = {
     { M('d'), "dip", "dip an object into something",
               dodip, AUTOCOMPLETE, NULL },
     { '>',    "down", "go down a staircase",
-              /* 'm' for move w/o autopickup rather than menu prefix;
-                 not general MOVEMENTCMD because g/G/F aren't allowed */
+              /* allows 'm' prefix (for move without autopickup) but not the
+                 g/G/F movement modifiers; not flagged as MOVEMENTCMD because
+                 that would would suppress it from dokeylist output */
               dodown, CMD_M_PREFIX, NULL },
     { 'd',    "drop", "drop an item",
               dodrop, 0, NULL },
@@ -2329,8 +2330,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('u'), "untrap", "untrap something",
               dountrap, AUTOCOMPLETE, NULL },
     { '<',    "up", "go up a staircase",
-              /* 'm' for move w/o autopickup rather than menu prefix;
-                 not general MOVEMENTCMD because g/G/F aren't allowed */
+              /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
     { '\0',   "vanquished", "list vanquished monsters",
               dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
@@ -2395,57 +2395,57 @@ struct ext_func_tab extcmdlist[] = {
     { 'z',    "zap", "zap a wand",
               dozap, 0, NULL },
     /* movement commands will be bound by reset_commands() */
-    /* move or attack */
+    /* move or attack; accept m/g/G/F prefixes */
     { '\0', "movewest", "move west (screen left)",
-            do_move_west, MOVEMENTCMD, NULL },
+            do_move_west, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movenorthwest", "move northwest (screen upper left)",
-            do_move_northwest, MOVEMENTCMD, NULL },
+            do_move_northwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movenorth", "move north (screen up)",
-            do_move_north, MOVEMENTCMD, NULL },
+            do_move_north, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movenortheast", "move northeast (screen upper right)",
-            do_move_northeast, MOVEMENTCMD, NULL },
+            do_move_northeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "moveeast", "move east (screen right)",
-            do_move_east, MOVEMENTCMD, NULL },
+            do_move_east, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movesoutheast", "move southeast (screen lower right)",
-            do_move_southeast, MOVEMENTCMD, NULL },
+            do_move_southeast, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movesouth", "move south (screen down)",
-            do_move_south, MOVEMENTCMD, NULL },
+            do_move_south, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
     { '\0', "movesouthwest", "move southwest (screen lower left)",
-            do_move_southwest, MOVEMENTCMD, NULL },
-    /* rush */
+            do_move_southwest, MOVEMENTCMD | CMD_MOVE_PREFIXES, NULL },
+    /* rush; accept m prefix but not g/G/F */
     { '\0', "rushwest", "rush west (screen left)",
-            do_rush_west, MOVEMENTCMD, NULL },
+            do_rush_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushnorthwest", "rush northwest (screen upper left)",
-            do_rush_northwest, MOVEMENTCMD, NULL },
+            do_rush_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushnorth", "rush north (screen up)",
-            do_rush_north, MOVEMENTCMD, NULL },
+            do_rush_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushnortheast", "rush northeast (screen upper right)",
-            do_rush_northeast, MOVEMENTCMD, NULL },
+            do_rush_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rusheast", "rush east (screen right)",
-            do_rush_east, MOVEMENTCMD, NULL },
+            do_rush_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushsoutheast", "rush southeast (screen lower right)",
-            do_rush_southeast, MOVEMENTCMD, NULL },
+            do_rush_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushsouth", "rush south (screen down)",
-            do_rush_south, MOVEMENTCMD, NULL },
+            do_rush_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "rushsouthwest", "rush southwest (screen lower left)",
-            do_rush_southwest, MOVEMENTCMD, NULL },
-    /* run */
+            do_rush_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
+    /* run; accept m prefix but not g/G/F */
     { '\0', "runwest", "run west (screen left)",
-            do_run_west, MOVEMENTCMD, NULL },
+            do_run_west, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runnorthwest", "run northwest (screen upper left)",
-            do_run_northwest, MOVEMENTCMD, NULL },
+            do_run_northwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runnorth", "run north (screen up)",
-            do_run_north, MOVEMENTCMD, NULL },
+            do_run_north, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runnortheast", "run northeast (screen upper right)",
-            do_run_northeast, MOVEMENTCMD, NULL },
+            do_run_northeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runeast", "run east (screen right)",
-            do_run_east, MOVEMENTCMD, NULL },
+            do_run_east, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runsoutheast", "run southeast (screen lower right)",
-            do_run_southeast, MOVEMENTCMD, NULL },
+            do_run_southeast, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runsouth", "run south (screen down)",
-            do_run_south, MOVEMENTCMD, NULL },
+            do_run_south, MOVEMENTCMD | CMD_M_PREFIX, NULL },
     { '\0', "runsouthwest", "run southwest (screen lower left)",
-            do_run_southwest, MOVEMENTCMD, NULL },
+            do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
 
     /* internal commands: only used by game core, not available for user */
     { '\0',   "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
@@ -2462,7 +2462,8 @@ static int (*move_funcs[N_DIRS_Z][N_MOVEMODES])(void) = {
     { do_move_southeast, do_run_southeast, do_rush_southeast },
     { do_move_south,     do_run_south,     do_rush_south },
     { do_move_southwest, do_run_southwest, do_rush_southwest },
-    /* misleading because rush and run down or up are rejected by rhack() */
+    /* misleading; rush and run for down or up are rejected by rhack()
+       because dodown() and doup() lack the CMD_gGF_PREFIX flag */
     { dodown,            dodown,           dodown },
     { doup,              doup,             doup },
 };
@@ -3694,7 +3695,9 @@ update_rest_on_space(void)
     g.Cmd.commands[' '] = flags.rest_on_space ? &restonspace : unrestonspace;
 }
 
-/* commands which accept 'm' prefix to request menu operation */
+/* commands which accept 'm' prefix to request menu operation or other
+   alternate behavior; it's also overloaded for move-without-autopickup;
+   there is no overlap between the two groups of commands */
 static boolean
 accept_menu_prefix(const struct ext_func_tab *ec)
 {
@@ -3861,20 +3864,18 @@ rhack(char *cmd)
                 /* can_do_extcmd() already gave a message */
                 reset_cmd_vars();
                 res = ECMD_OK;
-            } else if (prefix_seen
-                       && !(tlist->flags & (PREFIXCMD | MOVEMENTCMD))
-                       && (!was_m_prefix || !accept_menu_prefix(tlist))) {
-                const char *which;
-                char pfxidx = cmd_from_func(prefix_seen->ef_funct);
-
+            } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
+                       && !(tlist->flags & (was_m_prefix ? CMD_M_PREFIX
+                                                         : CMD_gGF_PREFIX))) {
                 /* got prefix previously but this command doesn't accept one */
-                which = (pfxidx != 0) ? visctrl(pfxidx)
-                        : (prefix_seen->ef_funct == do_reqmenu)
-                          ? "move-no-pickup or request-menu"
-                          : prefix_seen->ef_txt;
-                pline("The %s command does not accept %s prefix.",
-                      tlist->ef_txt, which);
+                char pfxidx = cmd_from_func(prefix_seen->ef_funct);
+                const char *which = (pfxidx != 0) ? visctrl(pfxidx)
+                                    : (prefix_seen->ef_funct == do_reqmenu)
+                                      ? "move-no-pickup or request-menu"
+                                      : prefix_seen->ef_txt;
 
+                pline("The %s command does not accept '%s' prefix.",
+                      tlist->ef_txt, which);
                 reset_cmd_vars();
                 res = ECMD_OK;
                 prefix_seen = 0;
@@ -3903,7 +3904,7 @@ rhack(char *cmd)
                 } else if (!(tlist->flags & MOVEMENTCMD)
                            && g.domove_attempting) {
                     /* not a movement command, but a move prefix earlier? */
-                    /* just do nothing */
+                    ; /* just do nothing */
                 } else if (((g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK))
                             != 0L)
                            && !g.context.travel && !dxdy_moveok()) {

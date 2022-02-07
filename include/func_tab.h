@@ -7,16 +7,18 @@
 #define FUNC_TAB_H
 
 /* extended command flags */
-#define IFBURIED     0x01 /* can do command when buried */
-#define AUTOCOMPLETE 0x02 /* command autocompletes */
-#define WIZMODECMD   0x04 /* wizard-mode command */
-#define GENERALCMD   0x08 /* general command, does not take game time */
-#define CMD_NOT_AVAILABLE 0x10 /* recognized but non-functional (!SHELL,&c) */
-#define NOFUZZERCMD  0x20 /* fuzzer cannot execute this command */
-#define INTERNALCMD  0x40 /* only for internal use, not for user */
-#define CMD_M_PREFIX 0x80 /* accepts menu prefix */
-#define PREFIXCMD    0x100 /* prefix command, requires another one after it */
-#define MOVEMENTCMD  0x200 /* used to move hero/cursor */
+#define IFBURIED     0x0001 /* can do command when buried */
+#define AUTOCOMPLETE 0x0002 /* command autocompletes */
+#define WIZMODECMD   0x0004 /* wizard-mode command */
+#define GENERALCMD   0x0008 /* general command, does not take game time */
+#define CMD_NOT_AVAILABLE 0x0010 /* recognized but non-functional (!SHELL,&c)*/
+#define NOFUZZERCMD  0x0020 /* fuzzer cannot execute this command */
+#define INTERNALCMD  0x0040 /* only for internal use, not for user */
+#define CMD_M_PREFIX 0x0080 /* accepts menu prefix */
+#define CMD_gGF_PREFIX 0x0100 /* accepts g/G/F prefix */
+#define CMD_MOVE_PREFIXES  (CMD_M_PREFIX | CMD_gGF_PREFIX)
+#define PREFIXCMD    0x0200 /* prefix command, requires another one after it */
+#define MOVEMENTCMD  0x0400 /* used to move hero/cursor */
 
 /* flags for extcmds_match() */
 #define ECM_NOFLAGS       0
