@@ -2083,7 +2083,7 @@ do_fight(void)
 {
     if (g.context.forcefight) {
         Norep("Double fight prefix, canceled.");
-        g.context.forcefight = 1;
+        g.context.forcefight = 0;
         g.domove_attempting = 0;
         return ECMD_CANCEL;
     }
