@@ -231,6 +231,7 @@ const struct instance_globals g_init = {
     WIN_ERR, /* en_win */
     FALSE, /* en_via_menu */
     UNDEFINED_VALUE, /* last_command_count */
+    NULL, /* ext_tlist */
 
     /* dbridge.c */
     UNDEFINED_VALUES, /* occupants */

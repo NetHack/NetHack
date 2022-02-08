@@ -391,6 +391,9 @@ doextcmd(void)
                   extcmdlist[idx].ef_txt);
             iflags.menu_requested = FALSE;
         }
+        /* tell rhack() what command is actually executing */
+        g.ext_tlist = &extcmdlist[idx];
+
         retval = (*func)();
     } while (func == doextlist);
 
@@ -3886,7 +3889,14 @@ rhack(char *cmd)
                 func = ((struct ext_func_tab *) tlist)->ef_funct;
                 if (tlist->f_text && !g.occupation && g.multi)
                     set_occupation(func, tlist->f_text, g.multi);
+                g.ext_tlist = NULL;
                 res = (*func)(); /* perform the command */
+                /* if 'func' is doextcmd(), 'tlist' is for Cmd.commands['#']
+                   rather than for the command that doextcmd() just ran;
+                   doextcmd() notifies us what that was via ext_tlist;
+                   other commands leave it Null */
+                if (g.ext_tlist)
+                    tlist = g.ext_tlist;
 
                 if ((tlist->flags & PREFIXCMD)) {
                     /* it was a prefix command, mark and get another cmd */

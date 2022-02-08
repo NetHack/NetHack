@@ -728,6 +728,7 @@ struct instance_globals {
     winid en_win;
     boolean en_via_menu;
     long last_command_count;
+    struct ext_func_tab *ext_tlist; /* info for rhack() from doextcmd() */
 
     /* dbridge.c */
     struct entity occupants[ENTITIES];
