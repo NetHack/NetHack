@@ -1573,6 +1573,7 @@ erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
             clear_screen();
         } else {
             docrt();
+            flush_screen(1);
         }
     } else {
         docorner((int) cw->offx, cw->maxrow + 1);
