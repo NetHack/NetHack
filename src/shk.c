@@ -3525,12 +3525,15 @@ shk_impaired(struct monst *shkp)
 static boolean
 repairable_damage(struct damage *dam, struct monst *shkp)
 {
-    xchar x = dam->place.x, y = dam->place.y;
+    xchar x, y;
     struct trap* ttmp;
     struct monst *mtmp;
 
     if (!dam || shk_impaired(shkp))
         return FALSE;
+
+    x = dam->place.x;
+    y = dam->place.y;
 
     /* too soon to fix it? */
     if ((g.moves - dam->when) < REPAIR_DELAY)
