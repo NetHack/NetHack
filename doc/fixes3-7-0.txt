@@ -1515,6 +1515,12 @@ mingw32 build updates and replacement of sys/windows/Makefile.gcc with new
 	sys/windows/Makefile.mingw32 and sys/windows/Makefile.mingw32.depend
 	(pr #661 by feiyunw)
 mark various pointers to const char as const pointers (pr #624 by argrath)
+function fill_special_room() in sp_lev.c was dereferencing a pointer
+	argument prior to a subsequent check for a NULL pointer that
+	resulted in an early function return (pr #669 by argrath)
+function repairable_damage() in shk.c was dereferencing a pointer
+	argument prior to a subsequent check for a NULL pointer that
+	resulted in an early function return (pr #671 by argrath)
 
 
 Code Cleanup and Reorganization
