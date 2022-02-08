@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1634584224 2021/10/18 19:10:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.336 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1644347179 2022/02/08 19:06:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.343 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3170,11 +3170,21 @@ wizterrainwish(struct _readobjnam_data *d)
 
     /* ("water" matches "potion of water" rather than terrain) */
     } else if (!BSTRCMPI(bp, p - 4, "pool")
-               || !BSTRCMPI(bp, p - 4, "moat")) {
-        lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL : MOAT;
+               || !BSTRCMPI(bp, p - 4, "moat")
+               || !BSTRCMPI(bp, p - 13, "wall of water")) {
+        long save_prop;
+        const char *new_water;
+
+        lev->typ = !BSTRCMPI(bp, p - 4, "pool") ? POOL
+                   : !BSTRCMPI(bp, p - 4, "moat") ? MOAT
+                     : WATER;
         lev->flags = 0;
         del_engr_at(x, y);
-        pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
+        save_prop = EHalluc_resistance;
+        EHalluc_resistance = 1;
+        new_water = waterbody_name(x, y);
+        EHalluc_resistance = save_prop;
+        pline("%s.", An(new_water));
         /* Must manually make kelp! */
         water_damage_chain(g.level.objects[x][y], TRUE);
         madeterrain = TRUE;
