@@ -134,7 +134,7 @@ AUTHOR
 
 COPYRIGHT
        This  file  is  Copyright  (C)  Kenneth  Lorber,   2022   for   version
-       NetHack-3.6.0:1.10.   NetHack may be freely redistributed.  See license
+       NetHack-3.7:1.18.   NetHack  may  be freely redistributed.  See license
        for details.
 
 
