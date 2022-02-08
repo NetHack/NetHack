@@ -3064,8 +3064,8 @@ int
 mintrap(register struct monst *mtmp)
 {
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
-    boolean trapkilled = FALSE;
     struct permonst *mptr = mtmp->data;
+    int trap_result = 0;
 
     if (!trap) {
         mtmp->mtrapped = 0;      /* perhaps teleported? */
@@ -3129,11 +3129,9 @@ mintrap(register struct monst *mtmp)
         if (trap->madeby_u && rnl(5))
             setmangry(mtmp, FALSE);
 
-        return trapeffect_selector(mtmp, trap, 0);
+        trap_result = trapeffect_selector(mtmp, trap, 0);
     }
-    if (trapkilled)
-        return 2;
-    return mtmp->mtrapped;
+    return (trap_result == 2) ? trap_result : mtmp->mtrapped;
 }
 
 /* Combine cockatrice checks into single functions to avoid repeating code. */
