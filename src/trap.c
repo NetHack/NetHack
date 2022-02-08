@@ -4468,6 +4468,7 @@ untrap_prob(struct trap *ttmp)
     int chance = 3;
 
     /* Only spiders know how to deal with webs reliably */
+    /* Assume ttmp is not NULL */
     if (ttmp->ttyp == WEB && !webmaker(g.youmonst.data))
         chance = 7; /* 3.7: used to be 30 */
     if (Confusion || Hallucination)
@@ -4479,7 +4480,7 @@ untrap_prob(struct trap *ttmp)
     if (Fumbling)
         chance *= 2;
     /* Your own traps are better known than others. */
-    if (ttmp && ttmp->madeby_u)
+    if (ttmp->madeby_u)
         chance--;
     if (Role_if(PM_ROGUE)) {
         if (rn2(2 * MAXULEV) < u.ulevel)
