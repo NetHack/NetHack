@@ -8702,7 +8702,7 @@ wc_set_window_colors(char *op)
 
     Strcpy(buf, op);
     newop = mungspaces(buf);
-    while (newop && *newop) {
+    while (*newop) {
         wn = tfg = tbg = (char *) 0;
 
         /* until first non-space in case there's leading spaces - before
@@ -8757,12 +8757,12 @@ wc_set_window_colors(char *op)
 
         for (j = 0; j < 4; ++j) {
             if (!strcmpi(wn, wnames[j]) || !strcmpi(wn, shortnames[j])) {
-                if (tfg && !strstri(tfg, " ")) {
+                if (!strstri(tfg, " ")) {
                     if (*fgp[j])
                         free((genericptr_t) *fgp[j]);
                     *fgp[j] = dupstr(tfg);
                 }
-                if (tbg && !strstri(tbg, " ")) {
+                if (!strstri(tbg, " ")) {
                     if (*bgp[j])
                         free((genericptr_t) *bgp[j]);
                     *bgp[j] = dupstr(tbg);
