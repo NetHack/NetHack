@@ -3036,7 +3036,7 @@ tty_add_menu(winid window,  /* window to use, must be of type NHW_MENU */
     item->selector = ch;
     item->gselector = gch;
     item->attr = attr;
-    item->str = dupstr(newstr ? newstr : "");
+    item->str = dupstr(newstr);
 
     item->next = cw->mlist;
     cw->mlist = item;
