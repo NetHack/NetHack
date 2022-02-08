@@ -1667,9 +1667,8 @@ adj_pit_checks(coord *cc, char *msg)
             supporting = "drawbridge";
 
         if (supporting) {
-            Sprintf(msg, "The %s%ssupporting structures remain intact.",
-                    supporting ? s_suffix(supporting) : "",
-                    supporting ? " " : "");
+            Sprintf(msg, "The %s supporting structures remain intact.",
+                    s_suffix(supporting));
             return FALSE;
         }
     }
