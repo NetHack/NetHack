@@ -457,6 +457,9 @@ savelev(NHFILE* nhfp, xchar lev)
 #endif
 
     g.program_state.saving++; /* even if current mode is FREEING */
+
+    if (!nhfp)
+        panic("Save on bad file!"); /* impossible */
     /*
      *  Level file contents:
      *    version info (handled by caller);
@@ -483,8 +486,6 @@ savelev(NHFILE* nhfp, xchar lev)
         if (iflags.purge_monsters)
             dmonsfree();
 
-        if (!nhfp)
-            panic("Save on bad file!"); /* impossible */
         if (lev >= 0 && lev <= maxledgerno())
             g.level_info[lev].flags |= VISITED;
         if (nhfp->structlevel)
