@@ -773,6 +773,7 @@ in flush_screen, reorder the code slightly to complete the bot() and
 magic traps can toggle intrinsic invisibility
 Death attacking a monster does drain life attack
 add unique Rider revival messages
+don't dereference NULL u.ustuck in dobuzz() when hero has been swallowed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

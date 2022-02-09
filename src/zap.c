@@ -4252,16 +4252,17 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
         if (type < 0)
             return;
         tmp = zhitm(u.ustuck, type, nd, &otmp);
-        if (!u.ustuck)
+        if (!u.ustuck) {
             u.uswallow = 0;
-        else
+        } else {
             pline("%s rips into %s%s", The(fltxt), mon_nam(u.ustuck),
                   exclam(tmp));
-        /* Using disintegration from the inside only makes a hole... */
-        if (tmp == MAGIC_COOKIE)
-            u.ustuck->mhp = 0;
-        if (DEADMONSTER(u.ustuck))
-            killed(u.ustuck);
+            /* Using disintegration from the inside only makes a hole... */
+            if (tmp == MAGIC_COOKIE)
+                u.ustuck->mhp = 0;
+            if (DEADMONSTER(u.ustuck))
+                killed(u.ustuck);
+	}
         return;
     }
     if (type < 0)
