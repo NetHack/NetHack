@@ -1359,7 +1359,7 @@ hmon_hitmon(
                 Sprintf(withwhat, " with %s", yname(obj));
             pline("%s divides as you hit it%s!", Monnam(mon), withwhat);
             hittxt = TRUE;
-            mintrap(mclone);
+            (void) mintrap(mclone);
         }
     }
 

@@ -438,7 +438,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
                             pline("%s divides as %s hits it!", buf,
                                   mon_nam(magr));
                         }
-                        mintrap(mclone);
+                        (void) mintrap(mclone);
                     }
                 }
             } else
@@ -810,7 +810,7 @@ gulpmm(register struct monst *magr, register struct monst *mdef,
         place_monster(magr, dx, dy);
         newsym(dx, dy);
         /* aggressor moves to <dx,dy> and might encounter trouble there */
-        if (minliquid(magr) || (t_at(dx, dy) && mintrap(magr) == 2))
+        if (minliquid(magr) || (t_at(dx, dy) && mintrap(magr) == Trap_Killed_Mon))
             status |= MM_AGR_DIED;
     } else if (status & MM_AGR_DIED) { /* aggressor died */
         place_monster(mdef, dx, dy);

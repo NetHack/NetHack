@@ -82,6 +82,9 @@ enum trap_types {
     TRAPNUM      = 24
 };
 
+/* some trap-related function return results */
+enum { Trap_No_Effect = 0, Trap_Is_Gone = 0, Trap_Killed_Mon = 2 };
+
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
 #define undestroyable_trap(ttyp) ((ttyp) == MAGIC_PORTAL         \

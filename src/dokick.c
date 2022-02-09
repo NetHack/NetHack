@@ -99,7 +99,7 @@ kickdmg(struct monst *mon, boolean clumsy)
                 place_monster(mon, mdx, mdy);
                 newsym(mon->mx, mon->my);
                 set_apparxy(mon);
-                if (mintrap(mon) == 2)
+                if (mintrap(mon) == Trap_Killed_Mon)
                     trapkilled = TRUE;
             }
         }
