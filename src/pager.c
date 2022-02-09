@@ -15,8 +15,10 @@ static void trap_description(char *, int, int, int);
 static void look_at_object(char *, int, int, int);
 static void look_at_monster(char *, char *, struct monst *, int, int);
 static struct permonst *lookat(int, int, char *, char *);
-static void checkfile(char *, struct permonst *, boolean, boolean,
-                      char *);
+static void checkfile(char *, struct permonst *, boolean, boolean, char *);
+static int add_cmap_descr(int, int, int, int, coord,
+                          const char *, const char *,
+                          boolean *, const char **, char *);
 static void look_region_nearby(int *, int *, int *, int *, boolean);
 static void look_all(boolean, boolean);
 static void look_traps(boolean);
@@ -457,6 +459,7 @@ waterbody_name(xchar x, xchar y)
     static char pooltype[40];
     struct rm *lev;
     schar ltyp;
+    boolean hallucinate = Hallucination && !g.program_state.gameover;
 
     if (!isok(x, y))
         return "drink"; /* should never happen */
@@ -466,33 +469,38 @@ waterbody_name(xchar x, xchar y)
         ltyp = db_under_typ(lev->drawbridgemask);
 
     if (ltyp == LAVAPOOL) {
-        if (!Hallucination)
-            return "lava";
         Snprintf(pooltype, sizeof pooltype, "molten %s", hliquid("lava"));
         return pooltype;
     } else if (ltyp == ICE) {
-        return "ice";
+        if (!hallucinate)
+            return "ice";
+        Snprintf(pooltype, sizeof pooltype, "frozen %s", hliquid("water"));
+        return pooltype;
     } else if (ltyp == POOL) {
         Snprintf(pooltype, sizeof pooltype, "pool of %s", hliquid("water"));
         return pooltype;
     } else if (ltyp == MOAT) {
         /* a bit of extra flavor over general moat */
-        if (Is_medusa_level(&u.uz))
+        if (hallucinate) {
+            Snprintf(pooltype, sizeof pooltype, "deep %s", hliquid("water"));
+            return pooltype;
+        } else if (Is_medusa_level(&u.uz)) {
             /* somewhat iffy since ordinary stairs can take you beneath,
                but previous generic "water" was rather anti-climactic */
             return "shallow sea";
-        else if (Is_juiblex_level(&u.uz))
+        } else if (Is_juiblex_level(&u.uz)) {
             return "swamp";
-        else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz))
+        } else if (Role_if(PM_SAMURAI) && Is_qstart(&u.uz)) {
             /* samurai quest home level has two isolated moat spots;
                they sound silly if farlook describes them as such */
             return "pond";
-        else
+        } else {
             return "moat";
+        }
     } else if (ltyp == WATER) {
-        Snprintf(pooltype, sizeof pooltype, "%s %s",
-                 !Is_waterlevel(&u.uz) ? "wall of" : "limitless",
-                 hliquid("water"));
+        if (Is_waterlevel(&u.uz))
+            return "limitless water"; /* even if hallucinating */
+        Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
         return pooltype;
     }
     /* default; should be unreachable */
@@ -590,8 +598,9 @@ lookat(int x, int y, char *buf, char *monbuf)
     } else {
         int amsk;
         aligntyp algn;
+        short symidx = glyph_to_cmap(glyph);
 
-        switch (glyph_to_cmap(glyph)) {
+        switch (symidx) {
         case S_altar:
             amsk = altarmask_at(x, y);
             algn = Amask2align(amsk & AM_MASK);
@@ -619,6 +628,9 @@ lookat(int x, int y, char *buf, char *monbuf)
                    Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
             break;
         case S_pool:
+        case S_water:
+        case S_lava:
+        case S_ice: /* for hallucination; otherwise defsyms[] would be fine */
             Strcpy(buf, waterbody_name(x, y));
             break;
         case S_stone:
@@ -636,7 +648,7 @@ lookat(int x, int y, char *buf, char *monbuf)
             }
             /*FALLTHRU*/
         default:
-            Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
+            Strcpy(buf, defsyms[symidx].explanation);
             break;
         }
     }
@@ -937,6 +949,106 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
     return;
 }
 
+/* extracted from do_screen_description() */
+static int
+add_cmap_descr(
+    int found,          /* number of matching descriptions so far */
+    int idx,            /* cmap index into defsyms[] */
+    int glyph,          /* map glyph of screen symbol being described;
+                         * anything other than NO_GLYPH implies 'looked' */
+    int article,        /* 0: (none), 1: a/an, 2: the */
+    coord cc,           /* map location */
+    const char *x_str,  /* description of defsyms[idx] */
+    const char *prefix, /* text to insert in front of first match */
+    boolean *hit_trap,  /* intput/output: True if a trap has been described */
+    const char **firstmatch, /* output: pointer to 1st matching description */
+    char *out_str)      /* input/output: current description gets appended */
+{
+    char *mbuf = NULL;
+    int absidx = abs(idx);
+
+    if (glyph == NO_GLYPH) {
+        /* use x_str [almost] as-is */
+        if (!strcmp(x_str, "water")) {
+            /* duplicate some transformations performed by waterbody_name() */
+            if (idx == S_pool)
+                x_str = "pool of water";
+            else if (idx == S_water)
+                x_str = !Is_waterlevel(&u.uz) ? "wall of water"
+                                              : "limitless water";
+        }
+        if (absidx == S_pool)
+            idx = S_pool;
+    } else if (absidx == S_pool || idx == S_water
+               || idx == S_lava || idx == S_ice) {
+        /* replace some descriptions (x_str) with waterbody_name() */
+        schar save_ltyp = levl[cc.x][cc.y].typ;
+        long save_prop = EHalluc_resistance;
+
+        /* grab a scratch buffer we can safely return (via *firstmatch
+           when applicable) */
+        mbuf = mon_nam(&g.youmonst);
+
+        if (absidx == S_pool) {
+            levl[cc.x][cc.y].typ = (idx == S_pool) ? POOL : MOAT;
+            idx = S_pool; /* force fake negative moat value to be positive */
+        } else {
+            /* we might be examining a pool location but trying to match
+               water or lava; override the terrain with what we're matching
+               because that's what waterbody_name() bases its result on;
+               it's not pool so must be one of water/lava/ice to get here */
+            levl[cc.x][cc.y].typ = (idx == S_water) ? WATER
+                                   : (idx == S_lava) ? LAVAPOOL
+                                     : ICE;
+        }
+        EHalluc_resistance = 1;
+        Strcpy(mbuf, waterbody_name(cc.x, cc.y));
+        EHalluc_resistance = save_prop;
+        levl[cc.x][cc.y].typ = save_ltyp;
+
+        /* shorten the feedback for farlook/quicklook: "a pool or ..." */
+        if (!strcmp(mbuf, "pool of water"))
+            mbuf[4] = '\0';
+        else if (!strcmp(mbuf, "molten lava"))
+            Strcpy(mbuf, "lava");
+        x_str = mbuf;
+        article = !(!strncmp(x_str, "water", 5)
+                    || !strncmp(x_str, "lava", 4)
+                    || !strncmp(x_str, "swamp", 5)
+                    || !strncmp(x_str, "molten", 6)
+                    || !strncmp(x_str, "shallow", 7)
+                    || !strncmp(x_str, "limitless", 9));
+    }
+
+    if (!found) {
+        /* this is the first match */
+        if (is_cmap_trap(idx)) {
+            Sprintf(out_str, "%sa trap", prefix);
+            *hit_trap = TRUE;
+        } else {
+            Sprintf(out_str, "%s%s", prefix,
+                    article == 2 ? the(x_str)
+                    : article == 1 ? an(x_str) : x_str);
+        }
+        *firstmatch = x_str;
+        found = 1;
+    } else if (!(*hit_trap && is_cmap_trap(idx))
+               && !(found >= 3 && is_cmap_drawbridge(idx))
+               /* don't mention vibrating square outside of Gehennom
+                  unless this happens to be one (hallucination?) */
+               && (idx != S_vibrating_square || Inhell
+                   || (glyph_is_trap(glyph)
+                       && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
+        /* append unless out_str already contains the string to append */
+        found += append_str(out_str, (article == 2) ? the(x_str)
+                                     : (article == 1) ? an(x_str)
+                                       : x_str);
+        if (is_cmap_trap(idx))
+            *hit_trap = TRUE;
+    }
+    return found;
+}
+
 int
 do_screen_description(coord cc, boolean looked, int sym, char *out_str,
                       const char **firstmatch,
@@ -945,8 +1057,8 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     static const char mon_interior[] = "the interior of a monster",
                       unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
-    char prefix[BUFSZ], gobbledygook[33];
-    int i, j, glyph = NO_GLYPH,
+    char prefix[BUFSZ];
+    int i, j, alt_i, glyph = NO_GLYPH,
         skipped_venom = 0, found = 0; /* count of matching syms found */
     boolean hit_trap, need_to_look = FALSE,
             submerged = (Underwater && !Is_waterlevel(&u.uz)),
@@ -955,7 +1067,6 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     nhsym tmpsym;
     glyph_info glyphinfo = nul_glyphinfo;
 
-    gobbledygook[0] = '\0'; /* no hallucinatory liquid (yet) */
     if (looked) {
         glyph = glyph_at(cc.x, cc.y);
         /* Convert glyph at selected position to a symbol for use below. */
@@ -1105,59 +1216,48 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     }
     /* Now check for graphics symbols */
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
-        x_str = defsyms[i].explanation;
-        if (sym == (looked ? g.showsyms[i] : defsyms[i].sym) && *x_str) {
-            /* POOL, MOAT, and WATER are "water", LAVAPOOL is "molten lava" */
-            boolean water_or_lava = (!strcmp(x_str, "water")
-                                     || !strcmp(x_str, "molten lava"));
-            /* avoid "an unexplored", "an stone", "an air", "a water",
-               "a molten lava", "a floor of a room", "a dark part of a room";
-               article==2 => "the", 1 => "an", 0 => (none) */
-            int article = strstri(x_str, " of a room") ? 2
-                          : !(i == S_stone
-                              || strcmp(x_str, "air") == 0
-                              || strcmp(x_str, "land") == 0
-                              || water_or_lava);
+        /*
+         * Index hackery:  we want
+         *   "a pool or a moat or a wall of water or molten lava"
+         * rather than
+         *   "a pool or a moat or molten lava or a wall of water"
+         * but S_lava comes before S_water so 'i' reaches it sooner.
+         */
+        alt_i = i;
+        if (alt_i == S_water || alt_i == S_lava)
+            alt_i = (S_water + S_lava) - alt_i;
+        x_str = defsyms[alt_i].explanation;
+        if (sym == (looked ? g.showsyms[alt_i] : defsyms[alt_i].sym)
+            && *x_str) {
+            int article; /* article==2 => "the", 1 => "an", 0 => (none) */
 
             /* check if dark part of a room was already included above */
-            if (i == S_darkroom && glyph && glyph_is_nothing(glyph))
+            if (alt_i == S_darkroom && glyph && glyph_is_nothing(glyph))
                 continue;
 
-            /* substitute for "water" and "molten lava" when hallucinating */
-            if (water_or_lava && hallucinate) {
-                if (*gobbledygook)
-                    continue; /* just 1 or player could tell h2o from lava */
-                x_str = strncpy(gobbledygook, hliquid(x_str),
-                                (int) sizeof gobbledygook - 1);
-                gobbledygook[sizeof gobbledygook - 1] = '\0';
+            /* avoid "an unexplored", "an stone", "an air",
+               "a floor of a room", "a dark part of a room" */
+            article = strstri(x_str, " of a room") ? 2
+                      : !(alt_i == S_stone
+                          || strcmp(x_str, "air") == 0
+                          || strcmp(x_str, "land") == 0);
+            found = add_cmap_descr(found, alt_i, glyph, article,
+                                   cc, x_str, prefix,
+                                   &hit_trap, firstmatch, out_str);
+            if (alt_i == S_pool) {
+                /* "pool of water" and "moat" use the same symbol and glyph
+                   but have different descriptions; when handling pool, add
+                   it a second time for moat but pass an alternate symbol;
+                   skip incrementing 'found' to avoid "can be many things" */
+                (void) add_cmap_descr(found, -S_pool, glyph, 1,
+                                      cc, "moat", prefix,
+                                      &hit_trap, firstmatch, out_str);
+                need_to_look = TRUE;
             }
 
-            if (!found) {
-                if (is_cmap_trap(i)) {
-                    Sprintf(out_str, "%sa trap", prefix);
-                    hit_trap = TRUE;
-                } else {
-                    Sprintf(out_str, "%s%s", prefix,
-                            article == 2 ? the(x_str)
-                            : article == 1 ? an(x_str) : x_str);
-                }
-                *firstmatch = x_str;
-                found++;
-            } else if (!(hit_trap && is_cmap_trap(i))
-                       && !(found >= 3 && is_cmap_drawbridge(i))
-                       /* don't mention vibrating square outside of Gehennom
-                          unless this happens to be one (hallucination?) */
-                       && (i != S_vibrating_square || Inhell
-                           || (looked && glyph_is_trap(glyph)
-                               && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
-                found += append_str(out_str, (article == 2) ? the(x_str)
-                                             : (article == 1) ? an(x_str)
-                                               : x_str);
-                if (is_cmap_trap(i))
-                    hit_trap = TRUE;
-            }
-
-            if (i == S_altar || is_cmap_trap(i))
+            if (alt_i == S_altar || is_cmap_trap(alt_i)
+                || (hallucinate && (alt_i == S_water /* S_pool already done */
+                                    || alt_i == S_lava || alt_i == S_ice)))
                 need_to_look = TRUE;
         }
     }
@@ -1201,15 +1301,18 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
                                        : g.ov_primary_syms[j];
         if (tmpsym && sym == tmpsym) {
             switch (j) {
-            case SYM_BOULDER + SYM_OFF_X:
+            case SYM_BOULDER + SYM_OFF_X: {
+                static const char boulder[] = "boulder";
+
                 if (!found) {
-                    *firstmatch = "boulder";
+                    *firstmatch = boulder;
                     Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
                     found++;
                 } else {
-                    found += append_str(out_str, "boulder");
+                    found += append_str(out_str, boulder);
                 }
                 break;
+            }
             case SYM_PET_OVERRIDE + SYM_OFF_X:
                 if (looked) {
                     /* convert to symbol without override in effect */
@@ -1261,27 +1364,21 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
             pm = lookat(cc.x, cc.y, look_buf, monbuf);
             if (pm && for_supplement)
                 *for_supplement = pm;
-            /* lookat() doesn't hallucinate liquids; substitute ours */
-            if (*gobbledygook && (!strcmp(look_buf, "water")
-                                  || !strcmp(look_buf, "molten lava")))
-                Strcpy(look_buf, gobbledygook);
 
             *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Snprintf(temp_buf, sizeof(temp_buf), " (%s)", *firstmatch);
+                Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
-                Snprintf(temp_buf, sizeof(temp_buf), " [seen: %s]", monbuf);
+                Snprintf(temp_buf, sizeof temp_buf, " [seen: %s]", monbuf);
                 (void) strncat(out_str, temp_buf,
                                BUFSZ - strlen(out_str) - 1);
             }
         }
     }
-    if (*firstmatch == gobbledygook) /* fixup for 'found==1' */
-        *firstmatch = strcpy(look_buf, gobbledygook);
 
     return found;
 }
