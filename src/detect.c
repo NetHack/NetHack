@@ -367,26 +367,24 @@ gold_detect(struct obj *sobj)
     if (!gk.known) {
         /* no gold found on floor or monster's inventory.
            adjust message if you have gold in your inventory */
-        if (sobj) {
-            char buf[BUFSZ];
+        char buf[BUFSZ];
 
-            if (gy.youmonst.data == &mons[PM_GOLD_GOLEM])
-                Sprintf(buf, "You feel like a million %s!", currency(2L));
-            else if (money_cnt(gi.invent) || hidden_gold(TRUE))
-                Strcpy(buf,
-                   "You feel worried about your future financial situation.");
-            else if (steedgold)
-                Sprintf(buf, "You feel interested in %s financial situation.",
-                        s_suffix(x_monnam(u.usteed,
-                                          u.usteed->mtame ? ARTICLE_YOUR
-                                                          : ARTICLE_THE,
-                                          (char *) 0,
-                                          SUPPRESS_SADDLE, FALSE)));
-            else
-                Strcpy(buf, "You feel materially poor.");
+        if (gy.youmonst.data == &mons[PM_GOLD_GOLEM])
+            Sprintf(buf, "You feel like a million %s!", currency(2L));
+        else if (money_cnt(gi.invent) || hidden_gold(TRUE))
+            Strcpy(buf,
+               "You feel worried about your future financial situation.");
+        else if (steedgold)
+            Sprintf(buf, "You feel interested in %s financial situation.",
+                    s_suffix(x_monnam(u.usteed,
+                                      u.usteed->mtame ? ARTICLE_YOUR
+                                                      : ARTICLE_THE,
+                                      (char *) 0,
+                                      SUPPRESS_SADDLE, FALSE)));
+        else
+            Strcpy(buf, "You feel materially poor.");
 
-            strange_feeling(sobj, buf);
-        }
+        strange_feeling(sobj, buf);
         return 1;
     }
     /* only under me - no separate display required */
