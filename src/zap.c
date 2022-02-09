@@ -2031,7 +2031,9 @@ bhito(struct obj *obj, struct obj *otmp)
                 break;
             }
             /* KMH, conduct */
-            u.uconduct.polypiles++;
+            if (!u.uconduct.polypiles++)
+                livelog_printf(LL_CONDUCT, "polymorphed %s first object", uhis());
+
             /* any saved lock context will be dangerously obsolete */
             if (Is_box(obj))
                 (void) boxlock(obj, otmp);
@@ -5520,8 +5522,10 @@ makewish(void)
 {
     char buf[BUFSZ] = DUMMY;
     char promptbuf[BUFSZ];
+    char bufcpy[BUFSZ];
     struct obj *otmp, nothing;
     int tries = 0;
+    int prev_artwish = u.uconduct.wisharti;
 
     promptbuf[0] = '\0';
     nothing = cg.zeroobj; /* lint suppression; only its address matters */
@@ -5546,6 +5550,7 @@ makewish(void)
      *  otmp == &zeroobj.  That includes an artifact which has been denied.
      *  Wishing for "nothing" requires a separate value to remain distinct.
      */
+    strcpy(bufcpy, buf);
     otmp = readobjnam(buf, &nothing);
     if (!otmp) {
         pline("Nothing fitting that description exists in the game.");
@@ -5562,7 +5567,15 @@ makewish(void)
     }
 
     /* KMH, conduct */
-    u.uconduct.wishes++;
+    if (!u.uconduct.wishes++)
+        livelog_printf(LL_CONDUCT | LL_WISH | (prev_artwish < u.uconduct.wisharti ? LL_ARTIFACT : 0),
+                       "made %s first wish - \"%s\"", uhis(), bufcpy);
+    else if (!prev_artwish && u.uconduct.wisharti) /* arti conduct handled in readobjnam() above */
+        livelog_printf(LL_CONDUCT | LL_WISH | LL_ARTIFACT, "made %s first artifact wish - \"%s\"",
+                       uhis(), bufcpy);
+    else
+        livelog_printf(LL_WISH | (prev_artwish < u.uconduct.wisharti ? LL_ARTIFACT : 0),
+                       "wished for \"%s\"", bufcpy);
 
     if (otmp != &cg.zeroobj) {
         const char

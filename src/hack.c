@@ -569,7 +569,17 @@ still_chewing(xchar x, xchar y)
     }
 
     /* Okay, you've chewed through something */
-    u.uconduct.food++;
+    if (!u.uconduct.food++)
+        livelog_printf(LL_CONDUCT, "ate for the first time, by chewing through %s",
+                       boulder
+                       ? "a boulder"
+                       : IS_TREE(lev->typ)
+                       ? "a tree"
+                       : IS_ROCK(lev->typ)
+                       ? "rock"
+                       : (lev->typ == IRONBARS)
+                       ? "iron bars"
+                       : "a door");
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -2071,7 +2081,8 @@ domove_core(void)
                        killed() so we duplicate some of the latter here */
                     int tmp, mndx;
 
-                    u.uconduct.killer++;
+                    if (!u.uconduct.killer++)
+                        livelog_printf(LL_CONDUCT, "killed for the first time");
                     mndx = monsndx(mtmp->data);
                     tmp = experience(mtmp, (int) g.mvitals[mndx].died);
                     more_experienced(tmp, 0);

@@ -2404,6 +2404,7 @@ in_container(struct obj *obj)
         if (obj->otyp == BAG_OF_HOLDING) /* one bag of holding into another */
             do_boh_explosion(obj, (obj->where == OBJ_FLOOR));
         obfree(obj, (struct obj *) 0);
+        livelog_printf(LL_ACHIEVE, "just blew up %s bag of holding", uhis());
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
            handle bill issues, but if on floor, we need to put them on bill
            before deleting them (non-shop items will be flagged 'no_charge') */

@@ -2578,6 +2578,13 @@ parse_config_line(char *origbuf)
             n = 10;
         }
         sysopt.tt_oname_maxrank = n;
+    } else if (src == set_in_sysconf && match_varname(buf, "LIVELOG", 7)) {
+        n = strtol(bufp,NULL,0);
+        if (n < 0 || n > 0xFFFF) {
+            raw_printf("Illegal value in LIVELOG (must be between 0 and 0xFFFF).");
+            return 0;
+        }
+        sysopt.livelog = n;
 
     /* SYSCF PANICTRACE options */
     } else if (in_sysconf && match_varname(buf, "PANICTRACE_LIBC", 15)) {
@@ -4657,5 +4664,53 @@ Death_quote(char *buf, int bufsz)
 }
 
 /* ----------  END TRIBUTE ----------- */
+
+#if defined LIVELOG
+#define LLOG_SEP '\t' /* livelog field separator */
+
+/* Locks the live log file and writes 'buffer'
+ * IF the ll_type matches sysopt.livelog mask
+ * lltype is included in LL entry for post-process filtering also
+ */
+void
+livelog_add(unsigned int ll_type, const char *str)
+{
+    FILE* livelogfile;
+
+    if (!(ll_type & sysopt.livelog))
+        return;
+    if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
+        if (!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
+            pline("Cannot open live log file!");
+            unlock_file(LIVELOGFILE);
+            return;
+        }
+        fprintf(livelogfile,
+                 "lltype=%d%cname=%s%crole=%s%crace=%s%cgender=%s%c"
+                 "align=%s%cturns=%ld%cstarttime=%ld%ccurtime=%ld%c"
+                 "message=%s\n",
+                 (ll_type & sysopt.livelog), LLOG_SEP,
+                 g.plname, LLOG_SEP,
+                 g.urole.filecode, LLOG_SEP,
+                 g.urace.filecode, LLOG_SEP,
+                 genders[flags.female].filecode, LLOG_SEP,
+                 aligns[1-u.ualign.type].filecode, LLOG_SEP,
+                 g.moves, LLOG_SEP,
+                 (long)ubirthday, LLOG_SEP,
+                 (long)time(NULL),
+                 LLOG_SEP, str);
+        (void) fclose(livelogfile);
+        unlock_file(LIVELOGFILE);
+    }
+}
+#undef LLOG_SEP
+
+#else
+void
+livelog_add(unsigned int ll_type UNUSED, const char *str UNUSED)
+{
+    /* nothing here */
+}
+#endif /* !LIVELOG */
 
 /*files.c*/

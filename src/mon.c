@@ -32,6 +32,14 @@ static void kill_eggs(struct obj *);
     (Is_rogue_level(&u.uz)            \
      || (g.level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
+/* A specific combination of x_monnam flags for livelogging. The livelog
+ * shouldn't show that you killed a hallucinatory monster and not what it
+ * actually is. */
+#define livelog_mon_nam(mtmp) \
+    x_monnam(mtmp, ARTICLE_THE, (char *) 0,                 \
+             (SUPPRESS_IT | SUPPRESS_HALLUCINATION), FALSE)
+
+
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
 const char *warnings[] = {
@@ -2570,6 +2578,30 @@ mondead(register struct monst* mtmp)
 #endif
     if (mtmp->data == &mons[PM_MEDUSA])
         record_achievement(ACH_MEDU);
+    else if (unique_corpstat(mtmp->data)) {
+        switch (g.mvitals[tmp].died) {
+            case 1:
+                livelog_printf(LL_UMONST, "%s %s",
+                               nonliving(mtmp->data) ? "destroyed" : "killed",
+                               livelog_mon_nam(mtmp));
+                break;
+            case 5:
+            case 10:
+            case 50:
+            case 100:
+            case 150:
+            case 200:
+            case 250:
+                livelog_printf(LL_UMONST, "%s %s (%d times)",
+                               nonliving(mtmp->data) ? "destroyed" : "killed",
+                               livelog_mon_nam(mtmp), g.mvitals[tmp].died);
+                break;
+            default:
+                /* don't spam the log every time */
+                break;
+        }
+    }
+
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
     m_detach(mtmp, mptr);
@@ -2884,7 +2916,8 @@ xkilled(
 
     mtmp->mhp = 0; /* caller will usually have already done this */
     if (!noconduct) /* KMH, conduct */
-        u.uconduct.killer++;
+        if (!u.uconduct.killer++)
+            livelog_printf(LL_CONDUCT, "killed for the first time");
 
     if (!nomsg) {
         boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
@@ -3064,6 +3097,14 @@ xkilled(
             You_hear("the rumble of distant thunder...");
         else
             You_hear("the studio audience applaud!");
+        if (!unique_corpstat(mdat)) {
+            boolean mname = has_mgivenname(mtmp);
+
+            livelog_printf(LL_KILLEDPET, "murdered %s%s%s faithful %s",
+                           mname ? MGIVENNAME(mtmp) : "",
+                           mname ? ", " : "",
+                           uhis(), pmname(mdat, Mgender(mtmp)));
+        }
     } else if (mtmp->mpeaceful)
         adjalign(-5);
 

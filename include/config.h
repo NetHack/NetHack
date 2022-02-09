@@ -173,9 +173,9 @@
 /*
  * Section 2:   Some global parameters and filenames.
  *
- *              LOGFILE, XLOGFILE, NEWS and PANICLOG refer to files in
- *              the playground directory.  Commenting out LOGFILE, XLOGFILE,
- *              NEWS or PANICLOG removes that feature from the game.
+ *              LOGFILE, XLOGFILE, LIVELOGFILE, NEWS and PANICLOG refer to
+ *              files in the playground directory.  Commenting out LOGFILE,
+ *              XLOGFILE, NEWS or PANICLOG removes that feature from the game.
  *
  *              Building with debugging features enabled is now unconditional;
  *              the old WIZARD setting for that has been eliminated.
@@ -597,6 +597,21 @@ typedef unsigned char uchar;
    to strip off characters at the end, or <escape> to discard the
    whole thing, then type a new end for the text. */
 /* #define EDIT_GETLIN */
+
+#ifndef NO_CHRONICLE
+/* CHRONICLE - enable #chronicle command, a log of major game events.
+   The logged messages will also appear in DUMPLOG. */
+#define CHRONICLE
+#ifdef CHRONICLE
+/* LIVELOG - log CHRONICLE events into LIVELOGFILE as they happen. */
+/* #define LIVELOG */
+#ifdef LIVELOG
+#define LIVELOGFILE "livelog" /* in-game events recorded, live */
+#endif /* LIVELOG */
+#endif /* CHRONICLE */
+#else
+#undef LIVELOG
+#endif /* NO_CHRONICLE */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
 #ifdef DUMPLOG

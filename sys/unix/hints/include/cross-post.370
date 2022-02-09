@@ -52,6 +52,7 @@ $(WASM_DATA_DIR): $(WASM_DATA_DIR)/nhdat
 	touch $(WASM_DATA_DIR)/record
 	touch $(WASM_DATA_DIR)/logfile
 	touch $(WASM_DATA_DIR)/xlogfile
+	touch $(WASM_DATA_DIR)/livelog
 	cp ../sys/libnh/sysconf $(WASM_DATA_DIR)/sysconf
 
 $(WASM_DATA_DIR)/nhdat:

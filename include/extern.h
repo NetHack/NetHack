@@ -260,6 +260,7 @@ extern void rhack(char *);
 extern int doextlist(void);
 extern int extcmd_via_menu(void);
 extern int enter_explore_mode(void);
+extern int do_gamelog(void);
 extern boolean bind_key(uchar, const char *);
 extern void dokeylist(void);
 extern int xytod(schar, schar);
@@ -879,6 +880,7 @@ extern void reveal_paths(void);
 extern boolean read_tribute(const char *, const char *, int, char *, int,
                             unsigned);
 extern boolean Death_quote(char *, int);
+extern void livelog_add(unsigned int ll_type, const char *);
 
 /* ### fountain.c ### */
 
@@ -2046,6 +2048,8 @@ extern void You_see(const char *, ...) PRINTF_F(1, 2);
 extern void pline_The(const char *, ...) PRINTF_F(1, 2);
 extern void There(const char *, ...) PRINTF_F(1, 2);
 extern void verbalize(const char *, ...) PRINTF_F(1, 2);
+extern void gamelog_add(unsigned int, long, const char *);
+extern void livelog_printf(unsigned int, const char *, ...) PRINTF_F(2, 3);
 extern void raw_printf(const char *, ...) PRINTF_F(1, 2);
 extern void impossible(const char *, ...) PRINTF_F(1, 2);
 extern void config_error_add(const char *, ...) PRINTF_F(1, 2);

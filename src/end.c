@@ -793,6 +793,8 @@ dump_everything(int how,
 
     dump_plines();
     putstr(0, 0, "");
+    (void) do_gamelog();
+    putstr(0, 0, "");
     putstr(0, 0, "Inventory:");
     (void) display_inventory((char *) 0, TRUE);
     container_contents(g.invent, TRUE, TRUE, FALSE);
@@ -1215,6 +1217,9 @@ done(int how)
         if (how == GENOCIDED) {
             pline("Unfortunately you are still genocided...");
         } else {
+            char killbuf[BUFSZ];
+            formatkiller(killbuf, BUFSZ, how, FALSE);
+            livelog_printf(LL_LIFESAVE, "averted death (%s)", killbuf);
             survive = TRUE;
         }
     }

@@ -363,7 +363,8 @@ doread(void)
             You("break up the cookie and throw away the pieces.");
         outrumor(bcsign(scroll), BY_COOKIE);
         if (!Blind)
-            u.uconduct.literate++;
+            if (!u.uconduct.literate++)
+                livelog_printf(LL_CONDUCT, "became literate by reading a fortune cookie");
         useup(scroll);
         return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
@@ -388,7 +389,10 @@ doread(void)
                   hawaiian_design(scroll, buf));
             return ECMD_TIME;
         }
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT, "became literate by reading %s",
+                           (scroll->otyp == T_SHIRT) ? "a T-shirt" : "an apron");
+
         /* populate 'buf[]' */
         mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
                                  : apron_text(scroll, buf);
@@ -427,7 +431,10 @@ doread(void)
         pline("%s on the %s.  It reads:  %s.",
               !Blind ? "There is writing" : "You feel lettering",
               simpleonames(scroll), cap_text);
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT, "became literate by reading %s",
+                           otyp == DUNCE_CAP ? "a dunce cap" : "a cornuthaum");
+
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
         if (!objects[otyp].oc_name_known && !objects[otyp].oc_uname)
@@ -470,7 +477,10 @@ doread(void)
               (!((int) scroll->o_id % 3)),
               (((int) scroll->o_id * 7) % 10),
               (flags.verbose || Blind) ? "." : "");
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                                 "became literate by reading a credit card");
+
         return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
         pline("This %s has no label.", singular(scroll, xname));
@@ -483,7 +493,10 @@ doread(void)
         if (flags.verbose)
             pline("It reads:");
         pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                                 "became literate by reading a magic marker");
+
         return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
         if (Blind)
@@ -491,7 +504,10 @@ doread(void)
         else if (flags.verbose)
             You("read:");
         pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                                 "became literate by reading a coin's engravings");
+
         return ECMD_TIME;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
         if (Blind)
@@ -499,7 +515,10 @@ doread(void)
         else
             pline("It is signed:");
         pline("\"Odin.\"");
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                                 "became literate by reading the divine signature of Odin");
+
         return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
         const char *wrapper = candy_wrapper_text(scroll);
@@ -513,7 +532,10 @@ doread(void)
             return ECMD_OK;
         }
         pline("The wrapper reads: \"%s\".", wrapper);
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT,
+                                 "became literate by reading a candy bar wrapper");
+
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {
@@ -560,7 +582,10 @@ doread(void)
     /* Novel conduct is handled in read_tribute so exclude it too */
     if (otyp != SPE_BOOK_OF_THE_DEAD && otyp != SPE_NOVEL
         && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
-        u.uconduct.literate++;
+        if (!u.uconduct.literate++)
+            livelog_printf(LL_CONDUCT, "became literate by reading %s",
+                           scroll->oclass == SPBOOK_CLASS ? "a book" :
+                           scroll->oclass == SCROLL_CLASS ? "a scroll" : "something");
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll) ? ECMD_TIME : ECMD_OK;
@@ -2418,6 +2443,7 @@ static void
 do_class_genocide(void)
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
+    int ll_done = 0;
     char buf[BUFSZ] = DUMMY;
     boolean gameover = FALSE; /* true iff killed self */
 
@@ -2488,6 +2514,15 @@ do_class_genocide(void)
                     /* This check must be first since player monsters might
                      * have G_GENOD or !G_GENO.
                      */
+                    if (!ll_done++) {
+                        if (!num_genocides())
+                            livelog_printf(LL_CONDUCT | LL_GENOCIDE,
+                                           "performed %s first genocide (class %c)",
+                                           uhis(), def_monsyms[class].sym);
+                        else
+                            livelog_printf(LL_GENOCIDE, "genocided class %c", def_monsyms[class].sym);
+                    }
+
                     g.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
                     kill_genocided_monsters();
                     update_inventory(); /* eggs & tins */
@@ -2665,6 +2700,12 @@ do_genocide(int how)
             which = !type_is_pname(ptr) ? "the " : "";
     }
     if (how & REALLY) {
+        if (!num_genocides())
+            livelog_printf(LL_CONDUCT | LL_GENOCIDE,
+                           "performed %s first genocide (%s)", uhis(), makeplural(buf));
+        else
+            livelog_printf(LL_GENOCIDE, "genocided %s", makeplural(buf));
+
         /* setting no-corpse affects wishing and random tin generation */
         g.mvitals[mndx].mvflags |= (G_GENOD | G_NOCORPSE);
         pline("Wiped out %s%s.", which,

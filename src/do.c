@@ -294,7 +294,10 @@ doaltarobj(struct obj *obj)
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
-        u.uconduct.gnostic++;
+        if (!u.uconduct.gnostic++)
+            livelog_printf(LL_CONDUCT,
+                           "eschewed atheism, by dropping %s on an altar",
+                           doname(obj));
     } else {
         /* coins don't have bless/curse status */
         obj->blessed = obj->cursed = 0;
@@ -1502,6 +1505,8 @@ goto_level(
         }
         mklev();
         new = TRUE; /* made the level */
+        livelog_printf(LL_DEBUG, "entered new level %d, %s",
+                       dunlev(&u.uz), g.dungeons[u.uz.dnum].dname);
 
         familiar = bones_include_name(g.plname);
     } else {

@@ -103,6 +103,8 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DMSGHANDLER
 #NHCFLAGS+=-DTTY_TILES_ESCCODES
 #NHCFLAGS+=-DTTY_SOUND_ESCCODES
+#NHCFLAGS+=-DNO_CHRONICLE
+#NHCFLAGS+=-DLIVELOG
 
 CFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)
@@ -449,7 +451,7 @@ build_package_root:
 	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
-	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile
+	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile $(PKGROOT_UGLN)/livelog
 	mkdir $(PKGROOT_UGLN)/save
 # XXX what about a news file?
 
@@ -473,6 +475,7 @@ build_package_root:
 	echo chmod $(VARFILEPERM) $(HACKDIR)/record   >> PKGSCRIPTS/postinstall
 	echo chmod $(VARFILEPERM) $(HACKDIR)/logfile  >> PKGSCRIPTS/postinstall
 	echo chmod $(VARFILEPERM) $(HACKDIR)/xlogfile >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/livelog  >> PKGSCRIPTS/postinstall
 	echo chmod $(VARFILEPERM) $(HACKDIR)/sysconf  >> PKGSCRIPTS/postinstall
 	echo chmod $(GAMEPERM)   $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
 	echo chmod $(EXEPERM)    $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall

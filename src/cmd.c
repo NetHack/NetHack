@@ -850,6 +850,36 @@ enter_explore_mode(void)
     return ECMD_OK;
 }
 
+int
+do_gamelog(void)
+{
+#ifdef CHRONICLE
+    struct gamelog_line *tmp = g.gamelog;
+    winid win;
+    char buf[BUFSZ];
+
+    if (!tmp) {
+        pline("No chronicled events.");
+        return ECMD_OK;
+    }
+
+    win = create_nhwindow(NHW_TEXT);
+    putstr(win, 0, "Major events:");
+    putstr(win, 0, "");
+    putstr(win, 0, " Turn");
+    while (tmp) {
+        Sprintf(buf, "%5li: %s", tmp->turn, tmp->text);
+        putstr(win, 0, buf);
+        tmp = tmp->next;
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+#else
+    pline("Chronicle was turned off during compile-time.");
+#endif /* !CHRONICLE */
+    return ECMD_OK;
+}
+
 /* #wizwish command - wish for something */
 static int
 wiz_wish(void) /* Unlimited wishes for debug mode by Paul Polderman */
@@ -2138,6 +2168,8 @@ struct ext_func_tab extcmdlist[] = {
               docast, IFBURIED, NULL },
     { M('c'), "chat", "talk to someone",
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
+    { '\0',   "chronicle", "show journal of major events",
+              do_gamelog, IFBURIED | GENERALCMD, NULL },
     { 'c',    "close", "close a door",
               doclose, 0, NULL },
     { M('C'), "conduct", "list voluntary challenges you have maintained",

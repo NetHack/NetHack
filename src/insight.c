@@ -44,6 +44,53 @@ static const char You_[] = "You ", are[] = "are ", were[] = "were ",
 static const char have_been[] = "have been ", have_never[] = "have never ",
                   never[] = "never ";
 
+/* for livelogging: */
+struct ll_achieve_msg {
+    unsigned long llflag;
+    const char *msg;
+};
+/* ordered per 'enum achievements' in you.h */
+/* take care to keep them in sync! */
+static struct ll_achieve_msg achieve_msg [] = {
+    { 0, "" }, /* actual achievements are numbered from 1 */
+    { LL_ACHIEVE, "acquired the Bell of Opening" },
+    { LL_ACHIEVE, "entered Gehennom" },
+    { LL_ACHIEVE, "acquired the Candelabrum of Invocation" },
+    { LL_ACHIEVE, "acquired the Book of the Dead" },
+    { LL_ACHIEVE, "performed the invocation" },
+    { LL_ACHIEVE, "acquired The Amulet of Yendor" },
+    { LL_ACHIEVE, "entered the Planes" },
+    { LL_ACHIEVE, "entered the Astral Plane" },
+    { LL_ACHIEVE, "ascended" },
+    { LL_ACHIEVE, "acquired the Mines' End luckstone" },
+    { LL_ACHIEVE, "completed Sokoban" },
+    { LL_ACHIEVE|LL_UMONST, "killed Medusa" },
+     /* these two are not logged */
+    { 0, "hero was always blond, no, blind" },
+    { 0, "hero never wore armor" },
+     /* */
+    { LL_MINORAC, "entered the Gnomish Mines" },
+    { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
+    { LL_MINORAC, "entered a shop" },
+    { LL_MINORAC, "entered a temple" },
+    { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
+    { LL_ACHIEVE, "read a Discworld novel" }, /* ditto */
+    { LL_ACHIEVE, "entered Sokoban" }, /* Keep as major for turn comparison w/completed soko */
+    { LL_ACHIEVE, "entered the Bigroom" },
+    /* The following 8 are for advancing through the ranks
+       messages differ by role so are created on the fly */
+    { LL_MINORAC, "" },
+    { LL_MINORAC, "" },
+    { LL_MINORAC, "" },
+    { LL_MINORAC, "" },
+    { LL_ACHIEVE, "" },
+    { LL_ACHIEVE, "" },
+    { LL_ACHIEVE, "" },
+    { LL_ACHIEVE, "" },
+    { 0, "" } /* keep this one at the end */
+};
+
+
 #define enl_msg(prefix, present, past, suffix, ps) \
     enlght_line(prefix, final ? past : present, suffix, ps)
 #define you_are(attr, ps) enl_msg(You_, are, were, attr, ps)
@@ -2231,7 +2278,15 @@ record_achievement(schar achidx)
         if (abs(u.uachieved[i]) == abs(achidx))
             return; /* already recorded, don't duplicate it */
     u.uachieved[i] = achidx;
-    return;
+
+    if (g.program_state.gameover)
+        return; /* don't livelog achievements recorded at end of game */
+    if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
+        livelog_printf(achieve_msg[absidx].llflag, "attained the rank of %s",
+                       rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
+                               Role_switch, (achidx < 0) ? TRUE : FALSE));
+    } else
+        livelog_printf(achieve_msg[absidx].llflag, "%s", achieve_msg[absidx].msg);
 }
 
 /* discard a recorded achievement; return True if removed, False otherwise */

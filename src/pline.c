@@ -398,6 +398,55 @@ verbalize(const char *line, ...)
     va_end(the_args);
 }
 
+#ifdef CHRONICLE
+
+void
+gamelog_add(unsigned int glflags, long gltime, const char *str)
+{
+    struct gamelog_line *tmp;
+    struct gamelog_line *lst = g.gamelog;
+
+    tmp = (struct gamelog_line *)alloc(sizeof(struct gamelog_line));
+    tmp->turn = gltime;
+    tmp->flags = glflags;
+    tmp->text = strdup(str);
+    tmp->next = NULL;
+    while (lst && lst->next)
+        lst = lst->next;
+    if (!lst)
+        g.gamelog = tmp;
+    else
+        lst->next = tmp;
+}
+
+void
+livelog_printf(unsigned int ll_type, const char *line, ...)
+{
+    char gamelogbuf[BUFSZ * 2];
+    va_list the_args;
+
+    va_start(the_args, line);
+    vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
+    va_end(the_args);
+
+    gamelog_add(ll_type, g.moves, gamelogbuf);
+    strNsubst(gamelogbuf, "\t", "_", 0);
+    livelog_add(ll_type, gamelogbuf);
+}
+
+#else
+void
+gamelog_add(unsigned int glflags UNUSED, long gltime UNUSED, const char *msg UNUSED)
+{
+    /* nothing here */
+}
+void
+livelog_printf(unsigned int ll_type UNUSED, const char *line UNUSED, ...)
+{
+    /* nothing here */
+}
+#endif /* !CHRONICLE */
+
 static void vraw_printf(const char *, va_list);
 
 void

@@ -791,6 +791,8 @@ gcrownu(void)
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
         verbalize("I crown thee...  The Hand of Elbereth!");
+        livelog_printf(LL_DIVINEGIFT,
+                       "was crowned \"The Hand of Elbereth\" by %s", u_gname());
         break;
     case A_NEUTRAL:
         u.uevent.uhand_of_elbereth = 2;
@@ -798,6 +800,8 @@ gcrownu(void)
         already_exists =
             exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
         verbalize("Thou shalt be my Envoy of Balance!");
+        livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
+                       s_suffix(u_gname()));
         break;
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
@@ -808,6 +812,11 @@ gcrownu(void)
                   ((already_exists && !in_hand)
                    || class_gift != STRANGE_OBJECT) ? "take lives"
                   : "steal souls");
+        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
+                       ((already_exists && !in_hand)
+                        || class_gift != STRANGE_OBJECT) ? "take lives"
+                       : "steal souls",
+                       u_gname());
         break;
     }
 
@@ -1369,7 +1378,11 @@ dosacrifice(void)
         struct monst *mtmp;
 
         /* KMH, conduct */
-        u.uconduct.gnostic++;
+        if (!u.uconduct.gnostic++)
+            livelog_printf(LL_CONDUCT,
+                           "rejected atheism by offering %s on an altar of %s",
+                           corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
+                           a_gname());
 
         /* you're handling this corpse, even if it was killed upon the altar
          */
@@ -1784,6 +1797,10 @@ dosacrifice(void)
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
+                    livelog_printf (LL_DIVINEGIFT|LL_ARTIFACT,
+                                    "had %s bestowed upon %s by %s",
+                                    artiname(otmp->oartifact),
+                                    uhim(), align_gname(u.ualign.type));
                     /* make sure we can use this weapon */
                     unrestrict_weapon_skill(weapon_type(otmp));
                     if (!Hallucination && !Blind) {
@@ -1873,7 +1890,13 @@ dopray(void)
     if (ParanoidPray && yn("Are you sure you want to pray?") != 'y')
         return ECMD_OK;
 
-    u.uconduct.gnostic++;
+    if (!u.uconduct.gnostic++)
+        /* breaking conduct should probably occur in can_pray() at
+         * "You begin praying to %s", as demons who find praying repugnant
+         * should not break conduct.  Also we can add more detail to the
+         * livelog message as p_aligntyp will be known.
+         */
+        livelog_printf(LL_CONDUCT, "rejected atheism with a prayer");
 
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE))
@@ -2002,7 +2025,9 @@ doturn(void)
         You("don't know how to turn undead!");
         return ECMD_OK;
     }
-    u.uconduct.gnostic++;
+    if (!u.uconduct.gnostic++)
+        livelog_printf(LL_CONDUCT, "rejected atheism by turning undead");
+
     Gname = halu_gname(u.ualign.type);
 
     /* [What about needing free hands (does #turn involve any gesturing)?] */

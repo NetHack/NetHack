@@ -231,7 +231,9 @@ dowrite(struct obj *pen)
     }
 
     /* KMH, conduct */
-    u.uconduct.literate++;
+    if (!u.uconduct.literate++)
+        livelog_printf(LL_CONDUCT,
+                       "became literate by writing %s", an(typeword));
 
     new_obj = mksobj(i, FALSE, FALSE);
     new_obj->bknown = (paper->bknown && pen->bknown);

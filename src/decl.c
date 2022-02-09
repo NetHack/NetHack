@@ -550,6 +550,7 @@ const struct instance_globals g_init = {
 #endif
     (char *) 0, /* you_buf */
     0, /* you_buf_siz */
+    NULL, /* gamelog */
 
     /* polyself.c */
     0, /* sex_change_ok */

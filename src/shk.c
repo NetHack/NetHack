@@ -513,6 +513,10 @@ rob_shop(struct monst* shkp)
     /* by this point, we know an actual robbery has taken place */
     eshkp->robbed += total;
     You("stole %ld %s worth of merchandise.", total, currency(total));
+    livelog_printf(LL_ACHIEVE, "stole %ld %s worth of merchandise from %s %s",
+                   total, currency(total), s_suffix(shkname(shkp)),
+                   shtypes[eshkp->shoptype - SHOPBASE].name);
+
     if (!Role_if(PM_ROGUE)) /* stealing is unlawful */
         adjalign(-sgn(u.ualign.type));
 
