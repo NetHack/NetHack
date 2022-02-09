@@ -438,6 +438,11 @@ com_pager_core(const char *section, const char *msgid, boolean showerror)
         return FALSE;
 
     L = nhl_init();
+    if (!L) {
+        if (showerror)
+            impossible("com_pager: nhl_init() failed");
+        goto compagerdone;
+    }
 
     if (!nhl_loadlua(L, QTEXT_FILE)) {
         if (showerror)
