@@ -225,6 +225,7 @@ losexp(const char *drainer) /* cause of death, if drain should be fatal */
         u.ulevel -= 1;
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
+        livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel);
     } else {
         if (drainer) {
             g.killer.format = KILLED_BY;
@@ -234,6 +235,7 @@ losexp(const char *drainer) /* cause of death, if drain should be fatal */
         }
         /* no drainer or lifesaved */
         u.uexp = 0;
+        livelog_printf(LL_MINORAC, "lost all experience");
     }
     num = (int) u.uhpinc[u.ulevel];
     u.uhpmax -= num;
@@ -333,6 +335,9 @@ pluslvl(boolean incr) /* true iff via incremental experience growth */
         newrank = xlev_to_rank(u.ulevel);
         if (newrank > oldrank)
             record_achievement(achieve_rank(newrank));
+        else
+            livelog_printf(LL_MINORAC, "gained experience level %d",
+                           u.ulevel);
     }
     g.context.botl = TRUE;
 }

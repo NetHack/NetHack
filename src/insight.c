@@ -2282,11 +2282,14 @@ record_achievement(schar achidx)
     if (g.program_state.gameover)
         return; /* don't livelog achievements recorded at end of game */
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
-        livelog_printf(achieve_msg[absidx].llflag, "attained the rank of %s",
+        livelog_printf(achieve_msg[absidx].llflag,
+                       "attained the rank of %s (level %d)",
                        rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
-                               Role_switch, (achidx < 0) ? TRUE : FALSE));
+                               Role_switch, (achidx < 0) ? TRUE : FALSE),
+                       u.ulevel);
     } else
-        livelog_printf(achieve_msg[absidx].llflag, "%s", achieve_msg[absidx].msg);
+        livelog_printf(achieve_msg[absidx].llflag, "%s",
+                       achieve_msg[absidx].msg);
 }
 
 /* discard a recorded achievement; return True if removed, False otherwise */

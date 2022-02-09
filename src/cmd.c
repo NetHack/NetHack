@@ -2155,7 +2155,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('a'), "adjust", "adjust inventory letters",
               doorganize, IFBURIED | AUTOCOMPLETE, NULL },
     { M('A'), "annotate", "name current level",
-              donamelevel, IFBURIED | AUTOCOMPLETE, NULL },
+              donamelevel, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { 'a',    "apply", "apply (use) a tool (pick-axe, key, lamp...)",
               doapply, CMD_M_PREFIX, NULL },
     { C('x'), "attributes", "show your attributes",
@@ -2169,11 +2169,11 @@ struct ext_func_tab extcmdlist[] = {
     { M('c'), "chat", "talk to someone",
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
     { '\0',   "chronicle", "show journal of major events",
-              do_gamelog, IFBURIED | GENERALCMD, NULL },
+              do_gamelog, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { 'c',    "close", "close a door",
               doclose, 0, NULL },
     { M('C'), "conduct", "list voluntary challenges you have maintained",
-              doconduct, IFBURIED | AUTOCOMPLETE, NULL },
+              doconduct, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { M('d'), "dip", "dip an object into something",
               dodip, AUTOCOMPLETE, NULL },
     { '>',    "down", "go down a staircase",
@@ -2248,7 +2248,7 @@ struct ext_func_tab extcmdlist[] = {
     /* #overview used to need autocomplete and has retained that even
        after being assigned to ^O [old wizard mode ^O is now #wizwhere] */
     { C('o'), "overview", "show a summary of the explored dungeon",
-              dooverview, IFBURIED | AUTOCOMPLETE, NULL },
+              dooverview, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     /* [should #panic actually autocomplete?] */
     { '\0',   "panic", "test panic routine (fatal to game)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
