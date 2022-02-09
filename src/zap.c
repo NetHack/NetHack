@@ -4262,7 +4262,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                 u.ustuck->mhp = 0;
             if (DEADMONSTER(u.ustuck))
                 killed(u.ustuck);
-	}
+        }
         return;
     }
     if (type < 0)
