@@ -981,7 +981,7 @@ trapeffect_arrow_trap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1049,7 +1049,7 @@ trapeffect_dart_trap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1126,7 +1126,7 @@ trapeffect_rocktrap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1159,7 +1159,7 @@ trapeffect_sqky_board(
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
 
         if (is_flyer(mtmp->data))
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         /* stepped on a squeaky board */
         if (in_sight) {
             if (!Deaf) {
@@ -1182,7 +1182,7 @@ trapeffect_sqky_board(
         /* wake up nearby monsters */
         wake_nearto(mtmp->mx, mtmp->my, 40);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1198,18 +1198,18 @@ trapeffect_bear_trap(
         int dmg = d(2, 4);
 
         if ((Levitation || Flying) && !forcetrap)
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         feeltrap(trap);
         if (amorphous(g.youmonst.data) || is_whirly(g.youmonst.data)
             || unsolid(g.youmonst.data)) {
             pline("%s bear trap closes harmlessly through you.",
                   A_Your[trap->madeby_u]);
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         if (!u.usteed && g.youmonst.data->msize <= MZ_SMALL) {
             pline("%s bear trap closes harmlessly over you.",
                   A_Your[trap->madeby_u]);
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         set_utrap((unsigned) rn1(4, 4), TT_BEARTRAP);
         if (u.usteed) {
@@ -1255,7 +1255,7 @@ trapeffect_bear_trap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1285,7 +1285,7 @@ trapeffect_slp_gas_trap(
             }
         }
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1414,7 +1414,7 @@ trapeffect_rust_trap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1496,7 +1496,7 @@ trapeffect_fire_trap(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1521,7 +1521,7 @@ trapeffect_pit(
 
         /* KMH -- You can't escape the Sokoban level traps */
         if (!Sokoban && (Levitation || (Flying && !plunged)))
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         feeltrap(trap);
         if (!Sokoban && is_clinger(g.youmonst.data) && !plunged) {
             if (trap->tseen) {
@@ -1532,7 +1532,7 @@ trapeffect_pit(
                       ttype == SPIKED_PIT ? "full of spikes " : "");
                 You("don't fall in!");
             }
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         if (!Sokoban) {
             char verbbuf[BUFSZ];
@@ -1648,10 +1648,10 @@ trapeffect_pit(
                     seetrap(trap);
                     pline("%s doesn't fall into the pit.", Monnam(mtmp));
                 }
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
             }
             if (!inescapable)
-                return Trap_No_Effect;               /* avoids trap */
+                return Trap_Effect_Finished;               /* avoids trap */
             fallverb = "is dragged"; /* sokoban pit */
         }
         if (!passes_walls(mptr))
@@ -1671,7 +1671,7 @@ trapeffect_pit(
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1685,7 +1685,7 @@ trapeffect_hole(
             seetrap(trap); /* normally done in fall_through */
             impossible("dotrap: %ss cannot exist on this level.",
                        trapname(trap->ttyp, TRUE));
-            return Trap_No_Effect; /* don't activate it after all */
+            return Trap_Effect_Finished; /* don't activate it after all */
         }
         fall_through(TRUE, (trflags & TOOKPLUNGE));
     } else {
@@ -1699,7 +1699,7 @@ trapeffect_hole(
         if (!Can_fall_thru(&u.uz)) {
             impossible("mintrap: %ss cannot exist on this level.",
                        trapname(tt, TRUE));
-            return Trap_No_Effect; /* don't activate it after all */
+            return Trap_Effect_Finished; /* don't activate it after all */
         }
         if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
             || (mtmp->wormno && count_wsegs(mtmp) > 5)
@@ -1716,7 +1716,7 @@ trapeffect_hole(
                         pline("%s doesn't fall through the hole.",
                               Monnam(mtmp));
                 }
-                return Trap_No_Effect; /* inescapable = FALSE; */
+                return Trap_Effect_Finished; /* inescapable = FALSE; */
             }
             if (inescapable) { /* sokoban hole */
                 if (in_sight) {
@@ -1726,11 +1726,11 @@ trapeffect_hole(
                     seetrap(trap);
                 }
             } else
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
         }
         return trapeffect_level_telep(mtmp, trap, trflags);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1747,7 +1747,7 @@ trapeffect_telep_trap(
 
         mtele_trap(mtmp, trap, in_sight);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1771,7 +1771,7 @@ trapeffect_level_telep(
         if (mlev_res)
             return mlev_res;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1794,12 +1794,12 @@ trapeffect_web(
 
         feeltrap(trap);
         if (mu_maybe_destroy_web(&g.youmonst, webmsgok, trap))
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         if (webmaker(g.youmonst.data)) {
             if (webmsgok)
                 pline(trap->madeby_u ? "You take a walk on your web."
                       : "There is a spider web here.");
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         if (webmsgok) {
             char verbbuf[BUFSZ];
@@ -1847,7 +1847,7 @@ trapeffect_web(
                         str = 17;
                 } else {
                     reset_utrap(FALSE);
-                    return Trap_No_Effect;
+                    return Trap_Effect_Finished;
                 }
 
                 webmsgok = FALSE; /* mintrap printed the messages */
@@ -1882,9 +1882,9 @@ trapeffect_web(
         struct permonst *mptr = mtmp->data;
 
         if (webmaker(mptr))
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         if (mu_maybe_destroy_web(mtmp, in_sight, trap))
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         tear_web = FALSE;
         switch (monsndx(mptr)) {
         case PM_OWLBEAR: /* Eric Backus */
@@ -1940,7 +1940,7 @@ trapeffect_web(
         }
         return mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1954,7 +1954,7 @@ trapeffect_statue_trap(
     } else {
         /* monsters don't trigger statue traps */
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -1974,7 +1974,7 @@ trapeffect_magic_trap(
             u.uen = (u.uenmax += 2);
             if (u.uenmax > u.uenpeak)
                 u.uenpeak = u.uenmax;
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         } else {
             domagictrap();
         }
@@ -1984,7 +1984,7 @@ trapeffect_magic_trap(
         if (!rn2(21))
             return trapeffect_fire_trap(mtmp, trap, trflags);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2079,7 +2079,7 @@ trapeffect_anti_magic(
         }
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2132,7 +2132,7 @@ trapeffect_poly_trap(
                 seetrap(trap);
         }
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2151,13 +2151,13 @@ trapeffect_landmine(
 
         if ((Levitation || Flying) && !forcetrap) {
             if (!already_seen && rn2(3))
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
             feeltrap(trap);
             pline("%s %s in a pile of soil below you.",
                   already_seen ? "There is" : "You discover",
                   trap->madeby_u ? "the trigger of your mine" : "a trigger");
             if (already_seen && rn2(3))
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
             pline("KAABLAMM!!!  %s %s%s off!",
                   forcebungle ? "Your inept attempt sets"
                   : "The air currents set",
@@ -2171,7 +2171,7 @@ trapeffect_landmine(
             static boolean recursive_mine = FALSE;
 
             if (recursive_mine)
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
             feeltrap(trap);
             pline("KAABLAMM!!!  You triggered %s land mine!",
                   a_your[trap->madeby_u]);
@@ -2205,7 +2205,7 @@ trapeffect_landmine(
         xchar tx = trap->tx, ty = trap->ty;
 
         if (rn2(3))
-            return Trap_No_Effect; /* monsters usually don't set it off */
+            return Trap_Effect_Finished; /* monsters usually don't set it off */
         if (is_flyer(mptr)) {
             boolean already_seen = trap->tseen;
 
@@ -2215,7 +2215,7 @@ trapeffect_landmine(
                 seetrap(trap);
             }
             if (rn2(3))
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
             if (in_sight) {
                 newsym(mtmp->mx, mtmp->my);
                 pline_The("air currents set %s off!",
@@ -2251,7 +2251,7 @@ trapeffect_landmine(
         }
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2300,7 +2300,7 @@ trapeffect_rolling_boulder_trap(
             return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
         }
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2315,7 +2315,7 @@ trapeffect_magic_portal(
     } else {
         return trapeffect_level_telep(mtmp, trap, trflags);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2358,7 +2358,7 @@ trapeffect_vibrating_square(
             }
         }
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 static int
@@ -2417,7 +2417,7 @@ trapeffect_selector(
                    (mtmp == &g.youmonst) ? "You" : "Some monster",
                    trap->ttyp);
     }
-    return Trap_No_Effect;
+    return Trap_Effect_Finished;
 }
 
 void
@@ -2506,7 +2506,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
     boolean trapkilled, steedhit;
 
     if (!steed || !trap)
-        return Trap_No_Effect;
+        return Trap_Effect_Finished;
     tt = trap->ttyp;
     steed->mx = u.ux;
     steed->my = u.uy;
@@ -2516,7 +2516,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
     case ARROW_TRAP:
         if (!otmp) {
             impossible("steed hit by non-existent arrow?");
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         trapkilled = thitm(8, steed, otmp, 0, FALSE);
         steedhit = TRUE;
@@ -2524,7 +2524,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
     case DART_TRAP:
         if (!otmp) {
             impossible("steed hit by non-existent dart?");
-            return Trap_No_Effect;
+            return Trap_Effect_Finished;
         }
         trapkilled = thitm(7, steed, otmp, 0, FALSE);
         steedhit = TRUE;
@@ -3120,7 +3120,7 @@ mintrap(register struct monst *mtmp)
                              || (tt == HOLE && !mindless(mptr)))) {
             /* it has been in such a trap - perhaps it escapes */
             if (rn2(4))
-                return Trap_No_Effect;
+                return Trap_Effect_Finished;
         } else {
             mtmp->mtrapseen |= (1 << (tt - 1));
         }

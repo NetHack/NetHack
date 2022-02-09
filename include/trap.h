@@ -83,7 +83,7 @@ enum trap_types {
 };
 
 /* some trap-related function return results */
-enum { Trap_No_Effect = 0, Trap_Is_Gone = 0, Trap_Killed_Mon = 2 };
+enum { Trap_Effect_Finished = 0, Trap_Is_Gone = 0, Trap_Killed_Mon = 2 };
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)
