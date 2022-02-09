@@ -1526,6 +1526,13 @@ function fill_special_room() in sp_lev.c was dereferencing a pointer
 function repairable_damage() in shk.c was dereferencing a pointer
 	argument prior to a subsequent check for a NULL pointer that
 	resulted in an early function return (pr #671 by argrath)
+function savelev() in save.c was dereferencing a NHFILE pointer for
+	nhfp->mode prior to a subsequent check for nhfp being NULL
+	to trigger a call to panic() if it was; move the check for NULL
+	above that usage (pr #675 by argrath)
+function tin_details() in eat.c was passing an obj pointer to
+	tin_variety() where it was dereferenced; move the tin_details()
+	NULL check above that tin_variety() call (pr #676 by argrath)
 
 
 Code Cleanup and Reorganization
