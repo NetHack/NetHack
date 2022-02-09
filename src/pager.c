@@ -960,7 +960,7 @@ add_cmap_descr(
     coord cc,           /* map location */
     const char *x_str,  /* description of defsyms[idx] */
     const char *prefix, /* text to insert in front of first match */
-    boolean *hit_trap,  /* intput/output: True if a trap has been described */
+    boolean *hit_trap,  /* input/output: True if a trap has been described */
     const char **firstmatch, /* output: pointer to 1st matching description */
     char *out_str)      /* input/output: current description gets appended */
 {
@@ -1218,17 +1218,19 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
         /*
          * Index hackery:  we want
-         *   "a pool or a moat or a wall of water or molten lava"
+         *   "a pool or a moat or a wall of water or lava"
          * rather than
-         *   "a pool or a moat or molten lava or a wall of water"
+         *   "a pool or a moat or lava or a wall of water"
          * but S_lava comes before S_water so 'i' reaches it sooner.
+         * Use 'alt_i' for the rest of the loop to behave as if their
+         * places were swapped.
          */
-        alt_i = i;
-        if (alt_i == S_water || alt_i == S_lava)
-            alt_i = (S_water + S_lava) - alt_i;
+        alt_i = ((i != S_water && i != S_lava) ? i /* as-is */
+                 : (S_water + S_lava) - i); /* swap water and lava */
         x_str = defsyms[alt_i].explanation;
-        if (sym == (looked ? g.showsyms[alt_i] : defsyms[alt_i].sym)
-            && *x_str) {
+        if (!*x_str)  /* cmap includes beams, shield effects, swallow  +*/
+            continue; /*+ boundaries, and explosions; skip all of those */
+        if (sym == (looked ? g.showsyms[alt_i] : defsyms[alt_i].sym)) {
             int article; /* article==2 => "the", 1 => "an", 0 => (none) */
 
             /* check if dark part of a room was already included above */
