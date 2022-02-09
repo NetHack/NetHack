@@ -4587,15 +4587,11 @@ help_dir(
     /* if '!cmdassist', display via pline() and we're done (note: asking
        for help at getdir() prompt forces cmdassist for this operation) */
     if (!viawindow) {
-        if (prefixhandling) {
-            if (!*buf)
-                Sprintf(buf, "Invalid direction for '%s' prefix.",
-                        visctrl(g.Cmd.spkeys[spkey]));
-            pline("%s", buf);
-            return TRUE;
-        }
-        /* when 'cmdassist' is off and caller doesn't insist, do nothing */
-        return FALSE;
+        if (!*buf)
+            Sprintf(buf, "Invalid direction for '%s' prefix.",
+                    visctrl(g.Cmd.spkeys[spkey]));
+        pline("%s", buf);
+        return TRUE;
     }
 
     win = create_nhwindow(NHW_TEXT);
