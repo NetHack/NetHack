@@ -40,6 +40,42 @@ enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
     "%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
     "(%d, %d, %d) "
 
+/*
+-----------------------------------------------------------------------------
+    Tile palette Feb 9, 2022
+
+    [0]  . = (71, 108, 108)
+    [1]  A = (0, 0, 0)        grayshade   maps to [1] itself
+    [2]  B = (0, 182, 255)                maps to [17] or Q for shade of gray
+    [3]  C = (255, 108, 0)                maps to [18] or R for shade of gray
+    [4]  D = (255, 0, 0)                  maps to [19] or S for shade of gray
+    [5]  E = (0, 0, 255)                  maps to [20] or T for shade of gray
+    [6]  F = (0, 145, 0)                  maps to [27] or 0 for shade of gray
+    [7]  G = (108, 255, 0)                maps to [22] or V for shade of gray
+    [8]  H = (255, 255, 0)                maps to [23] or W for shade of gray
+    [9]  I = (255, 0, 255)                maps to [24] or X for shade of gray
+    [10] J = (145, 71, 0)                 maps to [25] or Y for shade of gray
+    [11] K = (204, 79, 0)                 maps to [26] or Z for shade of gray
+    [12] L = (255, 182, 145)              maps to [21] or U for shade of gray
+    [13] M = (237, 237, 237)  grayshade   maps to [15] or O for shade of gray
+    [14] N = (255, 255, 255)  grayshade   maps to [13] or M for shade of gray
+    [15] O = (215, 215, 215)  grayshade   maps to [14] or N for shade of gray
+    [16] P = (108, 145, 182)              maps to [14] or N for shade of gray
+    [17] Q = (18, 18, 18)     grayshade   maps to [1]  or A for shade of gray
+    [18] R = (54, 54, 54)     grayshade   maps to [17] or Q for shade of gray
+    [19] S = (73, 73, 73)     grayshade   maps to [18] or R for shade of gray
+    [20] T = (82, 82, 82)     grayshade   maps to [19] or S for shade of gray
+    [21] U = (205,205,205)    grayshade   maps to [20] or T for shade of gray
+    [22] V = (104, 104, 104)  grayshade   maps to [27] or 0 for shade of gray
+    [23] W = (131, 131, 131)  grayshade   maps to [22] or V for shade of gray
+    [24] X = (140, 140, 140)  grayshade   not mapped in graymappings
+    [25] Y = (149, 149, 149)  grayshade   not mapped in graymappings
+    [26] Z = (195, 195, 195)  grayshade   not mapped in graymappings
+    [27] 0 = (100, 100, 100)  grayshade   not mapped in graymappings
+    [28] 1 = (72, 108, 108)               not mapped in graymappings
+-----------------------------------------------------------------------------
+*/
+
 static int grayscale = 0;
 /* grayscale color mapping */
 static const int graymappings[] = {
