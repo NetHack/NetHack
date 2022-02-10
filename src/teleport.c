@@ -729,6 +729,9 @@ dotele(
            but they both yield the same result.] */
 #define spellev(spell_otyp) ((int) objects[spell_otyp].oc_level)
         energy = 5 * spellev(SPE_TELEPORT_AWAY);
+#if 0
+        /* the addition of !break_the_rules to the outer if-block in
+           1ada454f rendered this dead code */
         if (break_the_rules) {
             if (!castit)
                 energy = 0;
@@ -739,7 +742,9 @@ dotele(
                having enough to cast (which also uses the move) */
             else if (u.uen < energy)
                 energy = u.uen;
-        } else if (u.uhunger <= 10) {
+        } else
+#endif
+        if (u.uhunger <= 10) {
             cantdoit = "are too weak from hunger";
         } else if (ACURR(A_STR) < 4) {
             cantdoit = "lack the strength";
