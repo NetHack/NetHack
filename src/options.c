@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1643491546 2022/01/29 21:25:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1644531493 2022/02/10 22:18:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.538 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4528,8 +4528,8 @@ handler_number_pad(void)
     any = cg.zeroany;
     for (i = 0; i < SIZE(npchoices); i++) {
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
-                 0, ATR_NONE, npchoices[i], MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
+                 ATR_NONE, npchoices[i], MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select number_pad mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {

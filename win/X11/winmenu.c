@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmenu.c	$NHDT-Date: 1615911117 2021/03/16 16:11:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.7	winmenu.c	$NHDT-Date: 1644531504 2022/02/10 22:18:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -271,8 +271,10 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
             }
             ; /* accept */
         } else if (digit(ch)) {
-            /* special case: '0' is also the default ball class */
-            if (ch == '0' && !menu_info->counting
+            /* special case: '0' is also the default ball class;
+               some menus use digits as potential group accelerators
+               but their entries don't rely on counts */
+            if (!menu_info->counting
                 && index(menu_info->curr_menu.gacc, ch))
                 goto group_accel;
             menu_info->menu_count *= 10L;

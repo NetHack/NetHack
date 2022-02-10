@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1643491577 2022/01/29 21:26:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1644531502 2022/02/10 22:18:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2055,11 +2055,6 @@ process_menu_window(winid window, struct WinDesc *cw)
 
         switch (morc) {
         case '0':
-            /* special case: '0' is also the default ball class */
-            if (!counting && index(gacc, morc))
-                goto group_accel;
-            /* fall through to count the zero */
-            /*FALLTHRU*/
         case '1':
         case '2':
         case '3':
@@ -2069,6 +2064,12 @@ process_menu_window(winid window, struct WinDesc *cw)
         case '7':
         case '8':
         case '9':
+            /* special case: '0' is also the default ball class;
+               some menus use digits as potential group accelerators
+               but their entries don't rely on counts */
+            if (!counting && index(gacc, morc))
+                goto group_accel;
+
             count = (count * 10L) + (long) (morc - '0');
             /*
              * It is debatable whether we should allow 0 to
