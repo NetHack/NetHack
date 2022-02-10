@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1621208846 2021/05/16 23:47:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1644517022 2022/02/10 18:17:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -753,13 +753,17 @@ welcome(boolean new_game) /* false => restoring an old game */
                 ? (g.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
                 : currentgend != flags.initgend))
         Sprintf(eos(buf), " %s", genders[currentgend].adj);
+    Sprintf(eos(buf), " %s %s", g.urace.adj,
+            (currentgend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
 
-    pline(new_game ? "%s %s, welcome to NetHack!  You are a%s %s %s."
-                   : "%s %s, the%s %s %s, welcome back to NetHack!",
-          Hello((struct monst *) 0), g.plname, buf, g.urace.adj,
-          (currentgend && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
+    pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
+                   : "%s %s, the%s, welcome back to NetHack!",
+          Hello((struct monst *) 0), g.plname, buf);
 
     l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
+    if (new_game)
+        livelog_printf(LL_MINORAC, "%s the%s entered the dungeon.",
+                       g.plname, buf);
 }
 
 #ifdef POSITIONBAR
