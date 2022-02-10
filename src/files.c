@@ -1217,7 +1217,7 @@ get_saved_games(void)
             if (findfirst((char *) fq_save)) {
                 i = 0;
                 do {
-                    files[i++] = strdup(foundfile);
+                    files[i++] = dupstr(foundfile);
                 } while (findnext());
             }
         }

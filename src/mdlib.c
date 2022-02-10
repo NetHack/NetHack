@@ -14,9 +14,6 @@
 #ifndef MAKEDEFS_C
 #define MDLIB_C
 #include "config.h"
-#ifdef MONITOR_HEAP
-#undef free /* makedefs, mdlib don't use the alloc and free in src/alloc.c */
-#endif
 #include "permonst.h"
 #include "objclass.h"
 #include "sym.h"
@@ -644,7 +641,7 @@ opt_out_words(char *str,     /* input, but modified during processing */
         if (word)
             *word = '\0';
         if (*length_p + (int) strlen(str) > COLNO - 5) {
-            opttext[idxopttext] = strdup(optbuf);
+            opttext[idxopttext] = dupstr(optbuf);
             if (idxopttext < (MAXOPT - 1))
                 idxopttext++;
             Sprintf(optbuf, "%s", opt_indent),
@@ -670,7 +667,7 @@ build_options(void)
 #endif
 #endif
     build_savebones_compat_string();
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
@@ -684,11 +681,11 @@ build_options(void)
 #endif /* NH_DEVEL_STATUS == NH_STATUS_RELEASED */
     Sprintf(optbuf, "%sNetHack version %d.%d.%d%s\n",
             opt_indent, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, STATUS_ARG);
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     Sprintf(optbuf, "Options compiled into this edition:");
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
@@ -706,17 +703,17 @@ build_options(void)
                (i < SIZE(build_opts) - 1) ? "," : ".");
         opt_out_words(buf, &length);
     }
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
     winsyscnt = count_and_validate_winopts();
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     Sprintf(optbuf, "Supported windowing system%s:",
             (winsyscnt > 1) ? "s" : "");
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
@@ -748,7 +745,7 @@ build_options(void)
         opt_out_words(buf, &length);
     }
 
-    opttext[idxopttext] = strdup(optbuf);
+    opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     optbuf[0] = '\0';
@@ -776,7 +773,7 @@ build_options(void)
         /* add lua copyright notice;
            ":TAG:" substitutions are deferred to caller */
         for (i = 0; lua_info[i]; ++i) {
-            opttext[idxopttext] = strdup(lua_info[i]);
+            opttext[idxopttext] = dupstr(lua_info[i]);
             if (idxopttext < (MAXOPT - 1))
                 idxopttext++;
         }
@@ -784,7 +781,7 @@ build_options(void)
 #endif /* MAKEDEFS_C || FOR_RUNTIME */
 
     /* end with a blank line */
-    opttext[idxopttext] = strdup("");
+    opttext[idxopttext] = dupstr("");
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
     return;

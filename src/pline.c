@@ -406,10 +406,10 @@ gamelog_add(unsigned int glflags, long gltime, const char *str)
     struct gamelog_line *tmp;
     struct gamelog_line *lst = g.gamelog;
 
-    tmp = (struct gamelog_line *)alloc(sizeof(struct gamelog_line));
+    tmp = (struct gamelog_line *) alloc(sizeof (struct gamelog_line));
     tmp->turn = gltime;
     tmp->flags = glflags;
-    tmp->text = strdup(str);
+    tmp->text = dupstr(str);
     tmp->next = NULL;
     while (lst && lst->next)
         lst = lst->next;
@@ -420,7 +420,7 @@ gamelog_add(unsigned int glflags, long gltime, const char *str)
 }
 
 void
-livelog_printf(unsigned int ll_type, const char *line, ...)
+livelog_printf(unsigned ll_type, const char *line, ...)
 {
     char gamelogbuf[BUFSZ * 2];
     va_list the_args;
@@ -435,16 +435,20 @@ livelog_printf(unsigned int ll_type, const char *line, ...)
 }
 
 #else
+
 void
-gamelog_add(unsigned int glflags UNUSED, long gltime UNUSED, const char *msg UNUSED)
+gamelog_add(
+    unsigned glflags UNUSED, long gltime UNUSED, const char *msg UNUSED)
 {
-    /* nothing here */
+    ; /* nothing here */
 }
+
 void
-livelog_printf(unsigned int ll_type UNUSED, const char *line UNUSED, ...)
+livelog_printf(unsigned ll_type UNUSED, const char *line UNUSED, ...)
 {
-    /* nothing here */
+    ; /* nothing here */
 }
+
 #endif /* !CHRONICLE */
 
 static void vraw_printf(const char *, va_list);
