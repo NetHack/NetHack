@@ -603,9 +603,9 @@ rc=Rc
 # is too old or untested.
 #
 # Recently tested versions:
-#NMAKE version 1416270450 from latest VS 2017 (Jan 11, 2022 version 15.9.43)
-#NMAKE version 1429301390 from latest VS 2019 (Jan 11, 2022 version 16.11.9)
-#NMAKE version 1430307090 from latest VS 2022 (Jan 11, 2022 version 17.0.5)
+#NMAKE version 1416270450 from latest VS 2017 (Feb 8, 2022 version 15.9.44)
+#NMAKE version 1429301390 from latest VS 2019 (Feb 8, 2022 version 16.11.10)
+#NMAKE version 1430307090 from latest VS 2022 (Feb 8, 2022 version 17.0.6)
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
 #!MESSAGE $(MAKE)
