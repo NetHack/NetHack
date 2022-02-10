@@ -1,4 +1,4 @@
-/* NetHack 3.7  date.c  $NHDT-Date: 1639622347 2021/12/16 02:39:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.7  date.c  $NHDT-Date: 1644524054 2022/02/10 20:14:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $ */
 /* Copyright (c) Michael Allison, 2021.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,6 +139,16 @@ free_nomakedefs(void)
     if (nomakedefs.copyright_banner_c)
         free((genericptr_t) nomakedefs.copyright_banner_c),
             nomakedefs.copyright_banner_c = 0;
+#ifdef NETHACK_GIT_SHA
+    if (nomakedefs.git_sha)
+        free((genericptr_t) nomakedefs.git_sha),
+            nomakedefs.git_sha = 0;
+#endif
+#ifdef NETHACK_GIT_BRANCH
+    if (nomakedefs.git_branch)
+        free((genericptr_t) nomakedefs.git_branch),
+            nomakedefs.git_branch = 0;
+#endif
 }
 
 #endif /* __DATE__ && __TIME__ */

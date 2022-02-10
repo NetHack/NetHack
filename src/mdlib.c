@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1608933420 2020/12/25 21:57:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1644524060 2022/02/10 20:14:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -78,12 +78,15 @@ extern int GUILaunched;
 /* these are in extern.h but we don't include hack.h */
 void runtime_info_init(void);
 const char *do_runtime_info(int *);
+void release_runtime_info(void);
 void populate_nomakedefs(struct version_info *);
+extern void free_nomakedefs(void); /* date.c */
 
 void build_options(void);
 static int count_and_validate_winopts(void);
 static void opt_out_words(char *, int *);
 static void build_savebones_compat_string(void);
+
 static int idxopttext, done_runtime_opt_init_once = 0;
 #define MAXOPT 40
 static char *opttext[120] = { 0 };
@@ -626,8 +629,9 @@ count_and_validate_winopts(void)
 }
 
 static void
-opt_out_words(char *str,     /* input, but modified during processing */
-              int *length_p) /* in/out */
+opt_out_words(
+    char *str,     /* input, but modified during processing */
+    int *length_p) /* in/out */
 {
     char *word;
 
@@ -645,7 +649,7 @@ opt_out_words(char *str,     /* input, but modified during processing */
             if (idxopttext < (MAXOPT - 1))
                 idxopttext++;
             Sprintf(optbuf, "%s", opt_indent),
-                    *length_p = (int) strlen(opt_indent);
+                *length_p = (int) strlen(opt_indent);
         } else {
             Sprintf(eos(optbuf), " "), (*length_p)++;
         }
@@ -832,6 +836,17 @@ do_runtime_info(int *rtcontext)
             *rtcontext += 1;
         }
     return retval;
+}
+
+void
+release_runtime_info()
+{
+    while (idxopttext > 0) {
+        --idxopttext;
+        free((genericptr_t) opttext[idxopttext]), opttext[idxopttext] = 0;
+    }
+    done_runtime_opt_init_once = 0;
+    free_nomakedefs();
 }
 
 /*mdlib.c*/

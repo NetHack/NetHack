@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1621380392 2021/05/18 23:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1644524059 2022/02/10 20:14:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -746,8 +746,9 @@ dump_plines(void)
 
 /*ARGSUSED*/
 static void
-dump_everything(int how,
-                time_t when) /* date+time at end of game */
+dump_everything(
+    int how,     /* ASCENDED, ESCAPED, QUIT, etc */
+    time_t when) /* date+time at end of game */
 {
 #ifdef DUMPLOG
     char pbuf[BUFSZ], datetimebuf[24]; /* [24]: room for 64-bit bogus value */
@@ -778,11 +779,11 @@ dump_everything(int how,
     putstr(0, 0, "");
 
     /* character name and basic role info */
-    Sprintf(pbuf, "%s, %s %s %s %s", g.plname,
-            aligns[1 - u.ualign.type].adj,
-            genders[flags.female].adj,
-            g.urace.adj,
-            (flags.female && g.urole.name.f) ? g.urole.name.f : g.urole.name.m);
+    Sprintf(pbuf, "%s, %s %s %s %s",
+            g.plname, aligns[1 - u.ualign.type].adj,
+            genders[flags.female].adj, g.urace.adj,
+            (flags.female && g.urole.name.f) ? g.urole.name.f
+                                             : g.urole.name.m);
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 
@@ -1776,7 +1777,6 @@ nh_terminate(int status)
         dlb_cleanup();
         l_nhcore_done();
     }
-    free_nomakedefs();
 
 #ifdef VMS
     /*
