@@ -364,7 +364,8 @@ doread(void)
         outrumor(bcsign(scroll), BY_COOKIE);
         if (!Blind)
             if (!u.uconduct.literate++)
-                livelog_printf(LL_CONDUCT, "became literate by reading a fortune cookie");
+                livelog_printf(LL_CONDUCT,
+                               "became literate by reading a fortune cookie");
         useup(scroll);
         return ECMD_TIME;
     } else if (otyp == T_SHIRT || otyp == ALCHEMY_SMOCK
@@ -391,7 +392,8 @@ doread(void)
         }
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           (scroll->otyp == T_SHIRT) ? "a T-shirt" : "an apron");
+                           (scroll->otyp == T_SHIRT) ? "a T-shirt"
+                           : "an apron");
 
         /* populate 'buf[]' */
         mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
@@ -433,7 +435,8 @@ doread(void)
               simpleonames(scroll), cap_text);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           otyp == DUNCE_CAP ? "a dunce cap" : "a cornuthaum");
+                           (otyp == DUNCE_CAP) ? "a dunce cap"
+                           : "a cornuthaum");
 
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
@@ -479,7 +482,7 @@ doread(void)
               (flags.verbose || Blind) ? "." : "");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                                 "became literate by reading a credit card");
+                           "became literate by reading a credit card");
 
         return ECMD_TIME;
     } else if (otyp == CAN_OF_GREASE) {
@@ -495,7 +498,7 @@ doread(void)
         pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                                 "became literate by reading a magic marker");
+                           "became literate by reading a magic marker");
 
         return ECMD_TIME;
     } else if (scroll->oclass == COIN_CLASS) {
@@ -506,7 +509,7 @@ doread(void)
         pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                                 "became literate by reading a coin's engravings");
+                           "became literate by reading a coin's engravings");
 
         return ECMD_TIME;
     } else if (scroll->oartifact == ART_ORB_OF_FATE) {
@@ -517,7 +520,7 @@ doread(void)
         pline("\"Odin.\"");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                                 "became literate by reading the divine signature of Odin");
+                   "became literate by reading the divine signature of Odin");
 
         return ECMD_TIME;
     } else if (otyp == CANDY_BAR) {
@@ -534,7 +537,7 @@ doread(void)
         pline("The wrapper reads: \"%s\".", wrapper);
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                                 "became literate by reading a candy bar wrapper");
+                           "became literate by reading a candy bar wrapper");
 
         return ECMD_TIME;
     } else if (scroll->oclass != SCROLL_CLASS
@@ -584,8 +587,9 @@ doread(void)
         && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           scroll->oclass == SPBOOK_CLASS ? "a book" :
-                           scroll->oclass == SCROLL_CLASS ? "a scroll" : "something");
+                           (scroll->oclass == SPBOOK_CLASS) ? "a book"
+                           : (scroll->oclass == SCROLL_CLASS) ? "a scroll"
+                             : something);
 
     if (scroll->oclass == SPBOOK_CLASS) {
         return study_book(scroll) ? ECMD_TIME : ECMD_OK;
@@ -2340,7 +2344,7 @@ litroom(
         }
         /* scroll of light becomes discovered when not blind, so some
            message to justify that is needed */
-        if (Blind) {
+        if (!Blind) {
             /* for the still_lit case, we don't know at this point whether
                anything currently visibly lit is going to go dark; if this
                message came after the darkening, we could count visibly
@@ -2517,10 +2521,11 @@ do_class_genocide(void)
                     if (!ll_done++) {
                         if (!num_genocides())
                             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                                           "performed %s first genocide (class %c)",
+                                     "performed %s first genocide (class %c)",
                                            uhis(), def_monsyms[class].sym);
                         else
-                            livelog_printf(LL_GENOCIDE, "genocided class %c", def_monsyms[class].sym);
+                            livelog_printf(LL_GENOCIDE, "genocided class %c",
+                                           def_monsyms[class].sym);
                     }
 
                     g.mvitals[i].mvflags |= (G_GENOD | G_NOCORPSE);
@@ -2702,7 +2707,8 @@ do_genocide(int how)
     if (how & REALLY) {
         if (!num_genocides())
             livelog_printf(LL_CONDUCT | LL_GENOCIDE,
-                           "performed %s first genocide (%s)", uhis(), makeplural(buf));
+                           "performed %s first genocide (%s)",
+                           uhis(), makeplural(buf));
         else
             livelog_printf(LL_GENOCIDE, "genocided %s", makeplural(buf));
 

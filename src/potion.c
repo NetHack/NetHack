@@ -1541,7 +1541,7 @@ impact_arti_light(
     struct obj *otmp;
 
     /* if already worst/best BUC it can be, or if it resists, do nothing */
-    if ((worsen ? obj->cursed : obj->blessed) || obj_resists(obj, 75, 25))
+    if ((worsen ? obj->cursed : obj->blessed) || obj_resists(obj, 25, 75))
         return;
 
     /* curse() and bless() take care of maybe_adjust_light() */
