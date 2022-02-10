@@ -3509,11 +3509,11 @@ setmangry(struct monst* mtmp, boolean via_attack)
             adjalign(2);
     } else
         adjalign(-1); /* attacking peaceful monsters is bad */
-    if (couldsee(mtmp->mx, mtmp->my)) {
-        if (humanoid(mtmp->data) || mtmp->isshk || mtmp->isgd)
+    if (humanoid(mtmp->data) || mtmp->isshk || mtmp->isgd) {
+        if (couldsee(mtmp->mx, mtmp->my))
             pline("%s gets angry!", Monnam(mtmp));
-        else if (flags.verbose && !Deaf)
-            growl(mtmp);
+    } else {
+        growl(mtmp);
     }
 
     /* attacking your own quest leader will anger his or her guardians */
@@ -3613,7 +3613,7 @@ setmangry(struct monst* mtmp, boolean via_attack)
                 } else if (mon->data->mlet == mtmp->data->mlet
                            && big_little_match(mndx, monsndx(mon->data))
                            && !rn2(3)) {
-                    if (!Deaf && !rn2(4)) {
+                    if (!rn2(4)) {
                         growl(mon);
                         exclaimed = (iflags.last_msg == PLNMSG_GROWL);
                     }

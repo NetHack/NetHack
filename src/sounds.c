@@ -348,7 +348,7 @@ growl(register struct monst* mtmp)
 {
     register const char *growl_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound)
+    if (mtmp->msleeping || !mtmp->mcanmove || mtmp->data->msound == MS_SILENT)
         return;
 
     /* presumably nearness and soundok checks have already been made */
@@ -357,10 +357,12 @@ growl(register struct monst* mtmp)
     else
         growl_verb = growl_sound(mtmp);
     if (growl_verb) {
-        pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
-        iflags.last_msg = PLNMSG_GROWL;
-        if (g.context.run)
-            nomul(0);
+        if (canseemon(mtmp) || !Deaf) {
+            pline("%s %s!", Monnam(mtmp), vtense((char *) 0, growl_verb));
+            iflags.last_msg = PLNMSG_GROWL;
+            if (g.context.run)
+                nomul(0);
+        }
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 18);
     }
 }
