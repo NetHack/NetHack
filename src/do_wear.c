@@ -867,23 +867,26 @@ Amulet_on(void)
             make_slimed(0L, (char *) 0);
         break;
     case AMULET_OF_CHANGE: {
-        int orig_sex = poly_gender();
+        int new_sex, orig_sex = poly_gender();
 
         if (Unchanging)
             break;
         change_sex();
+        new_sex = poly_gender();
         /* Don't use same message as polymorph */
-        if (orig_sex != poly_gender()) {
+        if (new_sex != orig_sex) {
             makeknown(AMULET_OF_CHANGE);
             You("are suddenly very %s!",
                 flags.female ? "feminine" : "masculine");
             g.context.botl = 1;
             newsym(u.ux, u.uy); /* glyphmon flag and tile may have gone
-                                   from male to female or vice versa */
-        } else
+                                 * from male to female or vice versa */
+        } else {
             /* already polymorphed into single-gender monster; only
                changed the character's base sex */
             You("don't feel like yourself.");
+        }
+        livelog_newform(FALSE, orig_sex, new_sex);
         pline_The("amulet disintegrates!");
         if (orig_sex == poly_gender() && uamul->dknown
             && !objects[AMULET_OF_CHANGE].oc_name_known

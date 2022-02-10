@@ -225,7 +225,7 @@ losexp(const char *drainer) /* cause of death, if drain should be fatal */
         u.ulevel -= 1;
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
-        livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel);
+        livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel + 1);
     } else {
         if (drainer) {
             g.killer.format = KILLED_BY;
@@ -285,8 +285,10 @@ newexplevel(void)
 }
 
 void
-pluslvl(boolean incr) /* true iff via incremental experience growth */
-{                     /*        (false for potion of gain level)    */
+pluslvl(
+    boolean incr) /* True: incremental experience growth;
+                   * False: potion of gain level or wraith corpse */
+{
     int hpinc, eninc;
 
     if (!incr)
@@ -314,7 +316,7 @@ pluslvl(boolean incr) /* true iff via incremental experience growth */
 
     /* increase level (unless already maxxed) */
     if (u.ulevel < MAXULEV) {
-        int newrank, oldrank = xlev_to_rank(u.ulevel);
+        int old_ach_cnt, newrank, oldrank = xlev_to_rank(u.ulevel);
 
         /* increase experience points to reflect new level */
         if (incr) {
@@ -332,12 +334,20 @@ pluslvl(boolean incr) /* true iff via incremental experience growth */
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
+
+        old_ach_cnt = count_achievements();
         newrank = xlev_to_rank(u.ulevel);
         if (newrank > oldrank)
             record_achievement(achieve_rank(newrank));
-        else
-            livelog_printf(LL_MINORAC, "gained experience level %d",
-                           u.ulevel);
+        /* a new rank achievement will log its own message; log a simpler
+           message here if we didn't just get an achievement (so when rank
+           hasn't changed or hero just regained a lost level and the rank
+           achievement doesn't get repeated) */
+        if (count_achievements() == old_ach_cnt)
+            livelog_printf(LL_MINORAC, "%sgained experience level %d",
+                           (u.ulevel <= u.ulevelpeak) ? "re" : "", u.ulevel);
+        if (u.ulevel > u.ulevelpeak)
+            u.ulevelpeak = u.ulevel;
     }
     g.context.botl = TRUE;
 }

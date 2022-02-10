@@ -358,8 +358,10 @@ struct you {
     boolean umoved;     /* changed map location (post-move) */
     int last_str_turn;  /* 0: none, 1: half turn, 2: full turn
                            +: turn right, -: turn left */
-    int ulevel;         /* 1 to MAXULEV */
-    int ulevelmax;
+    int ulevel;         /* 1 to MAXULEV (30) */
+    int ulevelmax;      /* highest level, but might go down (to throttle
+                         * lost level recovery via blessed full healing) */
+    int ulevelpeak;     /* really highest level reached; never does down */
     unsigned utrap;     /* trap timeout */
     unsigned utraptype; /* defined if utrap nonzero. one of utraptypes */
     char urooms[5];         /* rooms (roomno + 3) occupied now */

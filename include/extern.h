@@ -2060,6 +2060,7 @@ extern void nhassert_failed(const char *, const char *, int);
 extern void set_uasmon(void);
 extern void float_vs_flight(void);
 extern void change_sex(void);
+extern void livelog_newform(boolean, int, int);
 extern void polyself(int);
 extern int polymon(int);
 extern void rehumanize(void);

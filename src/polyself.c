@@ -264,17 +264,47 @@ change_sex(void)
 #if 0
         /* change monster type to match new sex; disabled with
            PM_AMOROUS_DEMON */
-
         u.umonnum = (u.umonnum == PM_SUCCUBUS) ? PM_INCUBUS : PM_SUCCUBUS;
 #endif
         set_uasmon();
     }
 }
 
+/* log a message if non-poly'd hero's gender has changed */
+void
+livelog_newform(boolean viapoly, int oldgend, int newgend)
+{
+    char buf[BUFSZ];
+    const char *oldrole, *oldrank, *newrole, *newrank;
+
+    /*
+     * TODO?
+     *  Give other logging feedback here instead of in newman().
+     */
+
+    if (!Upolyd) {
+        if (newgend != oldgend) {
+            oldrole = (oldgend && g.urole.name.f) ? g.urole.name.f
+                                                  : g.urole.name.m;
+            newrole = (newgend && g.urole.name.f) ? g.urole.name.f
+                                                  : g.urole.name.m;
+            oldrank = rank_of(u.ulevel, Role_switch, oldgend);
+            newrank = rank_of(u.ulevel, Role_switch, newgend);
+            Sprintf(buf, "%.10s %.30s", genders[flags.female].adj, newrank);
+            livelog_printf(LL_MINORAC, "%s into %s",
+                           viapoly ? "polymorphed" : "transformed",
+                           an(strcmp(newrole, oldrole) ? newrole
+                              : strcmp(newrank, oldrank) ? newrank
+                                : buf));
+        }
+    }
+}
+
 static void
 newman(void)
 {
-    int i, oldlvl, newlvl, hpmax, enmax;
+    const char *newform;
+    int i, oldlvl, newlvl, oldgend, newgend, hpmax, enmax;
 
     oldlvl = u.ulevel;
     newlvl = oldlvl + rn1(5, -2);     /* new = old + {-2,-1,0,+1,+2} */
@@ -295,6 +325,7 @@ newman(void)
         u.ulevelmax = newlvl;
     u.ulevel = newlvl;
 
+    oldgend = poly_gender();
     if (g.sex_change_ok && !rn2(10))
         change_sex();
 
@@ -371,13 +402,23 @@ newman(void)
         }
     }
     newuhs(FALSE);
-    polyman("You feel like a new %s!",
-            /* use saved gender we're about to revert to, not current */
-            ((Upolyd ? u.mfemale : flags.female) && g.urace.individual.f)
+    /* use saved gender we're about to revert to, not current */
+    newform = ((Upolyd ? u.mfemale : flags.female) && g.urace.individual.f)
                 ? g.urace.individual.f
                 : (g.urace.individual.m)
                    ? g.urace.individual.m
-                   : g.urace.noun);
+                   : g.urace.noun;
+    polyman("You feel like a new %s!", newform);
+
+    newgend = poly_gender();
+    /* note: newman() bypasses achievemnts for new ranks attained and
+       doesn't log "new <form>" when that isn't accompanied by level change */
+    if (newlvl != oldlvl)
+        livelog_printf(LL_MINORAC, "became experience level %d as a new %s",
+                       newlvl, newform);
+    else
+        livelog_newform(TRUE, oldgend, newgend);
+
     if (Slimed) {
         Your("body transforms, but there is still slime on you.");
         make_slimed(10L, (const char *) 0);
