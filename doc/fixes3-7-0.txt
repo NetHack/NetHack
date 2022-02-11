@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.782 $ $NHDT-Date: 1644545143 2022/02/11 02:05:43 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.784 $ $NHDT-Date: 1644602632 2022/02/11 18:03:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1079,6 +1079,9 @@ curses: sometimes entering a count during menu selection caused the menu to
 	but no longer displayed
 curses: support backspace/delete when entering a count during menu selection
 curses: make extended command prompt behave more sensibly
+curses: if a menu of objects contains at least one iron ball, and player is
+	not alreadly in the midst of entering a count, recognize '0' as a
+	group accelerator rather than the start of a count
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

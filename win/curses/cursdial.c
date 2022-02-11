@@ -75,15 +75,15 @@ static void menu_determine_pages(nhmenu *menu);
 static boolean menu_is_multipage(nhmenu *menu, int width, int height);
 static void menu_win_size(nhmenu *menu);
 #ifdef NCURSES_MOUSE_VERSION
-static nhmenu_item *get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED,
+static nhmenu_item *get_menuitem_y(nhmenu *menu, WINDOW *win UNUSED,
                                    int page_num, int liney);
 #endif /*NCURSES_MOUSE_VERSION*/
-static void menu_display_page(nhmenu *menu, WINDOW * win, int page_num,
-                              char *);
-static int menu_get_selections(WINDOW * win, nhmenu *menu, int how);
-static void menu_select_deselect(WINDOW * win, nhmenu_item *item,
+static void menu_display_page(nhmenu *menu, WINDOW *win, int page_num,
+                              char *, char *);
+static int menu_get_selections(WINDOW *win, nhmenu *menu, int how);
+static void menu_select_deselect(WINDOW *win, nhmenu_item *item,
                                  menu_op operation, int);
-static int menu_operation(WINDOW * win, nhmenu *menu, menu_op operation,
+static int menu_operation(WINDOW *win, nhmenu *menu, menu_op operation,
                           int page_num);
 static void menu_clear_selections(nhmenu *menu);
 static int menu_max_height(void);
@@ -101,7 +101,10 @@ static nhmenu *nhmenus = NULL;  /* NetHack menu array */
    or a wish.  Note: EDIT_GETLIN not supported for popup prompting. */
 
 void
-curses_line_input_dialog(const char *prompt, char *answer, int buffer)
+curses_line_input_dialog(
+    const char *prompt,
+    char *answer,
+    int buffer)
 {
     int map_height, map_width, maxwidth, remaining_buf, winx, winy, count;
     WINDOW *askwin, *bwin;
@@ -195,8 +198,10 @@ curses_line_input_dialog(const char *prompt, char *answer, int buffer)
 /* Get a single character response from the player, such as a y/n prompt */
 
 int
-curses_character_input_dialog(const char *prompt, const char *choices,
-                              char def)
+curses_character_input_dialog(
+    const char *prompt,
+    const char *choices,
+    char def)
 {
     WINDOW *askwin = NULL;
 #ifdef PDCURSES
@@ -427,8 +432,7 @@ curses_ext_cmd(void)
             if (ec) {
                 curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
                 wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
-                wprintw(extwin, "%s",
-                        ec->ef_txt + (int) strlen(cur_choice));
+                wprintw(extwin, "%s", ec->ef_txt + (int) strlen(cur_choice));
                 curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
             }
         }
@@ -448,7 +452,9 @@ curses_ext_cmd(void)
         if (letter == '\r' || letter == '\n') {
             (void) mungspaces(cur_choice);
             if (ret == -1) {
-                matches = extcmds_match(cur_choice, ECM_IGNOREAC|ECM_EXACTMATCH, &ecmatches);
+                matches = extcmds_match(cur_choice,
+                                        (ECM_IGNOREAC | ECM_EXACTMATCH),
+                                        &ecmatches);
                 if (matches == 1 && ecmatches)
                     ret = ecmatches[0];
             }
@@ -589,10 +595,15 @@ curs_new_menu_item(winid wid, const char *str)
 /* Add a menu item to the given menu window */
 
 void
-curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
-                       const ANY_P *identifier, char accelerator,
-                       char group_accel, int attr,
-                       const char *str, unsigned itemflags)
+curses_add_nhmenu_item(
+    winid wid,
+    const glyph_info *glyphinfo,
+    const ANY_P *identifier,
+    char accelerator,
+    char group_accel,
+    int attr,
+    const char *str,
+    unsigned itemflags)
 {
     nhmenu_item *new_item, *current_items, *menu_item_ptr;
     nhmenu *current_menu = get_menu(wid);
@@ -634,7 +645,9 @@ curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
 /* for menu->bottom_heavy -- insert enough blank lines at top of
    first page to make the last page become a full one */
 static void
-curs_pad_menu(nhmenu *current_menu, boolean do_pad UNUSED)
+curs_pad_menu(
+    nhmenu *current_menu,
+    boolean do_pad UNUSED)
 {
     nhmenu_item *menu_item_ptr;
     int numpages = current_menu->num_pages;
@@ -720,7 +733,10 @@ curses_finalize_nhmenu(winid wid, const char *prompt)
 /* Display a nethack menu, and return a selection, if applicable */
 
 int
-curses_display_nhmenu(winid wid, int how, MENU_ITEM_P ** _selected)
+curses_display_nhmenu(
+    winid wid,
+    int how,
+    MENU_ITEM_P **_selected)
 {
     nhmenu *current_menu = get_menu(wid);
     nhmenu_item *menu_item_ptr;
@@ -1078,7 +1094,11 @@ menu_win_size(nhmenu *menu)
 
 #ifdef NCURSES_MOUSE_VERSION
 static nhmenu_item *
-get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED, int page_num, int liney)
+get_menuitem_y(
+    nhmenu *menu,
+    WINDOW *win UNUSED,
+    int page_num,
+    int liney)
 {
     nhmenu_item *menu_item_ptr;
     int count, num_lines, entry_cols = menu->width;
@@ -1136,7 +1156,11 @@ get_menuitem_y(nhmenu *menu, WINDOW * win UNUSED, int page_num, int liney)
 /* Displays menu selections in the given window */
 
 static void
-menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
+menu_display_page(
+    nhmenu *menu, WINDOW *win,
+    int page_num,      /* page number, 1..n rather than 0..n-1 */
+    char *selectors,   /* selection letters on current page */
+    char *groupaccels) /* group accelerator characters on any page */
 {
     nhmenu_item *menu_item_ptr;
     int count, curletter, entry_cols, start_col, num_lines;
@@ -1148,6 +1172,9 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
     /* letters assigned to entries on current page */
     if (selectors)
         (void) memset((genericptr_t) selectors, 0, 256);
+    /* characters assigned to group accelerators on any page */
+    if (groupaccels)
+        (void) memset((genericptr_t) groupaccels, 0, 256);
 
     /* Cycle through entries until we are on the correct page */
 
@@ -1180,6 +1207,14 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
     /* Display items for current page */
 
     while (menu_item_ptr != NULL) {
+        /* collect group accelerators for every page */
+        if (groupaccels && menu_item_ptr->identifier.a_void != NULL) {
+            unsigned gch = (unsigned) menu_item_ptr->group_accel;
+
+            if (gch > 0 && gch <= 255) /* note: skip it if 0 */
+                groupaccels[gch] = 1;
+        }
+        /* remaining processing applies to current page only */
         if (menu_item_ptr->page_num != page_num) {
             break;
         }
@@ -1224,7 +1259,8 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
         }
 #if 0
         /* FIXME: menuglyphs not implemented yet */
-        if (menu_item_ptr->glyphinfo.glyph != NO_GLYPH && iflags.use_menu_glyphs) {
+        if (menu_item_ptr->glyphinfo.glyph != NO_GLYPH
+            && iflags.use_menu_glyphs) {
             color = (int) menu_item_ptr->glyphinfo.color;
             curses_toggle_color_attr(win, color, NONE, ON);
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
@@ -1299,9 +1335,13 @@ menu_display_page(nhmenu *menu, WINDOW * win, int page_num, char *selectors)
 /* split out from menu_get_selections() so that perm_invent scrolling
    can be controlled from outside the normal menu activity */
 boolean
-curs_nonselect_menu_action(WINDOW *win, void *menu_v, int how,
-                           int curletter, int *curpage_p,
-                           char selectors[256], int *num_selected_p)
+curs_nonselect_menu_action(
+    WINDOW *win, void *menu_v,
+    int how,
+    int curletter,
+    int *curpage_p,
+    char selectors[256],
+    int *num_selected_p)
 {
     nhmenu_item *menu_item_ptr;
     nhmenu *menu = (nhmenu *) menu_v;
@@ -1350,8 +1390,8 @@ curs_nonselect_menu_action(WINDOW *win, void *menu_v, int how,
     case MENU_NEXT_PAGE:
     case ' ':
         if (*curpage_p < menu->num_pages) {
-             ++(*curpage_p);
-            menu_display_page(menu, win, *curpage_p, selectors);
+            ++(*curpage_p);
+            menu_display_page(menu, win, *curpage_p, selectors, (char *) 0);
         } else if (menucmd == ' ') {
             dismiss = TRUE;
             break;
@@ -1362,21 +1402,21 @@ curs_nonselect_menu_action(WINDOW *win, void *menu_v, int how,
     case MENU_PREVIOUS_PAGE:
         if (*curpage_p > 1) {
             --(*curpage_p);
-            menu_display_page(menu, win, *curpage_p, selectors);
+            menu_display_page(menu, win, *curpage_p, selectors, (char *) 0);
         }
         break;
     case KEY_END:
     case MENU_LAST_PAGE:
         if (*curpage_p != menu->num_pages) {
             *curpage_p = menu->num_pages;
-            menu_display_page(menu, win, *curpage_p, selectors);
+            menu_display_page(menu, win, *curpage_p, selectors, (char *) 0);
         }
         break;
     case KEY_HOME:
     case MENU_FIRST_PAGE:
         if (*curpage_p != 1) {
             *curpage_p = 1;
-            menu_display_page(menu, win, *curpage_p, selectors);
+            menu_display_page(menu, win, *curpage_p, selectors, (char *) 0);
         }
         break;
     case MENU_SEARCH: {
@@ -1435,11 +1475,11 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     int curpage = !menu->bottom_heavy ? 1 : menu->num_pages;
     int num_selected = 0;
     boolean dismiss = FALSE;
-    char selectors[256];
+    char selectors[256], groupaccels[256];
     nhmenu_item *menu_item_ptr = menu->entries;
 
     activemenu = win;
-    menu_display_page(menu, win, curpage, selectors);
+    menu_display_page(menu, win, curpage, selectors, groupaccels);
 
     while (!dismiss) {
         curletter = getch();
@@ -1466,7 +1506,8 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             }
             break;
         case PICK_ANY:
-            if (curletter <= 0 || curletter >= 256 || !selectors[curletter]) {
+            if (curletter <= 0 || curletter >= 256
+                || (!selectors[curletter] && !groupaccels[curletter])) {
                 menucmd = (curletter <= 0 || curletter >= 255) ? curletter
                           : (int) (uchar) map_menu_cmd(curletter);
                 switch (menucmd) {
@@ -1492,7 +1533,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             }
             /*FALLTHRU*/
         default:
-            if (isdigit(curletter)) {
+            if (isdigit(curletter) && !groupaccels[curletter]) {
                 count = curses_get_count(curletter);
                 /* after count, we know some non-digit is already pending */
                 curletter = getch();
@@ -1506,7 +1547,8 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             }
         }
 
-        if (curletter <= 0 || curletter >= 256 || !selectors[curletter]) {
+        if (curletter <= 0 || curletter >= 256
+            || (!selectors[curletter] && !groupaccels[curletter])) {
             dismiss = curs_nonselect_menu_action(win, (void *) menu, how,
                                                  curletter, &curpage,
                                                  selectors, &num_selected);
@@ -1526,7 +1568,8 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
                         && curletter == menu_item_ptr->group_accel)) {
                     if (curpage != menu_item_ptr->page_num) {
                         curpage = menu_item_ptr->page_num;
-                        menu_display_page(menu, win, curpage, selectors);
+                        menu_display_page(menu, win, curpage, selectors,
+                                          (char *) 0);
                     }
 
                     if (how == PICK_ONE) {
@@ -1577,8 +1620,11 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
    page than the one currently shown. */
 
 static void
-menu_select_deselect(WINDOW *win, nhmenu_item *item,
-                     menu_op operation, int current_page)
+menu_select_deselect(
+    WINDOW *win,
+    nhmenu_item *item,
+    menu_op operation,
+    int current_page)
 {
     int curletter = item->accelerator;
     boolean visible = (item->page_num == current_page);
@@ -1612,8 +1658,11 @@ on the given menu page.  If menu_page is 0, then perform opetation on
 all pages in menu.  Returns last page displayed.  */
 
 static int
-menu_operation(WINDOW * win, nhmenu *menu, menu_op
-               operation, int page_num)
+menu_operation(
+    WINDOW *win,
+    nhmenu *menu,
+    menu_op operation,
+    int page_num)
 {
     int first_page, last_page, current_page;
     nhmenu_item *menu_item_ptr = menu->entries;
@@ -1637,7 +1686,7 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
     current_page = first_page;
 
     if (page_num == 0) {
-        menu_display_page(menu, win, current_page, (char *) 0);
+        menu_display_page(menu, win, current_page, (char *) 0, (char *) 0);
     }
 
     if (menu_item_ptr == NULL) {        /* Page not found */
@@ -1652,14 +1701,15 @@ menu_operation(WINDOW * win, nhmenu *menu, menu_op
             }
 
             current_page = menu_item_ptr->page_num;
-            menu_display_page(menu, win, current_page, (char *) 0);
+            menu_display_page(menu, win, current_page, (char *) 0, (char *) 0);
         }
 
         if (menu_item_ptr->identifier.a_void != NULL) {
             if (operation != INVERT
                 || menuitem_invert_test(0, menu_item_ptr->itemflags,
                                         menu_item_ptr->selected))
-                menu_select_deselect(win, menu_item_ptr, operation, current_page);
+                menu_select_deselect(win, menu_item_ptr,
+                                     operation, current_page);
         }
 
         menu_item_ptr = menu_item_ptr->next_item;
@@ -1690,3 +1740,5 @@ menu_max_height(void)
 {
     return term_rows - 2;
 }
+
+/*cursdial.c*/
