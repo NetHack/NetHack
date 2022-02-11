@@ -182,7 +182,9 @@ erode_obj(
     uvictim = (victim == &g.youmonst);
     vismon = victim && (victim != &g.youmonst) && canseemon(victim);
     /* Is g.bhitpos correct here? Ugh. */
-    visobj = !victim && cansee(g.bhitpos.x, g.bhitpos.y);
+    visobj = !victim && cansee(g.bhitpos.x, g.bhitpos.y)
+        && (!is_pool(g.bhitpos.x, g.bhitpos.y)
+            || (u.ux == g.bhitpos.x && u.uy == g.bhitpos.y && Underwater));
 
     switch (type) {
     case ERODE_BURN:

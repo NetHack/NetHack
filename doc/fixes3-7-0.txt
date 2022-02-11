@@ -776,6 +776,7 @@ add unique Rider revival messages
 don't dereference NULL u.ustuck in dobuzz() when hero has been swallowed
 monsters should growl even if you can't hear it
 give a sound effect message when thrown item lands in water or lava
+don't show rusting of items that land in water
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
