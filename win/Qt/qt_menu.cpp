@@ -378,7 +378,8 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
     QFontMetrics fm(table->font());
     QString col0width_str = "";
     if (biggestcount > 0L)
-        col0width_str = QString::asprintf("%*ld", std::max(countdigits, 1), biggestcount);
+        col0width_str = QString::asprintf("%*ld", std::max(countdigits, 1),
+                                          biggestcount);
     int col0width_int = (int) fm.QFM_WIDTH(col0width_str) + MENU_WIDTH_SLOP;
     if (col0width_int > table->columnWidth(0))
 	WidenColumn(0, col0width_int);
@@ -464,7 +465,8 @@ void NetHackQtMenuWindow::UpdateCountColumn(long newcount)
     } else {
         biggestcount = std::max(biggestcount, newcount);
         QString num;
-        num = QString::asprintf("%*ld", std::max(countdigits, 1), biggestcount);
+        num = QString::asprintf("%*ld", std::max(countdigits, 1),
+                                biggestcount);
         int numlen = (int) num.length();
         if (numlen % 2)
             ++numlen;
@@ -723,6 +725,16 @@ void NetHackQtMenuWindow::keyPressEvent(QKeyEvent *key_event)
             reject();
     } else if (key == '\r' || key == '\n' || key == ' ') {
         accept();
+    } else if ('0' <= key && key <= '9' && !counting) {
+        // check whether digit 'key' matches a group accelerator
+        int hits = 0;
+        for (int row = 0; row < itemcount; ++row)
+            if (key == (uchar) itemlist[row].gch) {
+                ToggleSelect(row, false); // matched so toggle this item
+                ++hits;
+            }
+        if (!hits) // didn't match any group accelerator; start a count
+            InputCount(key);
     } else if (('0' <= key && key <= '9')
                || (key == '#' && !counting)
                || key == '\b' || key == '\177') {
