@@ -2415,7 +2415,7 @@ christen_orc(struct monst *mtmp, const char *gang, const char *other)
     char buf[BUFSZ], buf2[BUFSZ], *orcname;
 
     orcname = rndorcname(buf2);
-    /* orcname is never NULL */
+    /* rndorcname() won't return NULL */
     sz = (int) strlen(orcname);
     if (gang)
         sz += (int) (strlen(gang) + sizeof " of " - sizeof "");
