@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.784 $ $NHDT-Date: 1644602632 2022/02/11 18:03:52 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.788 $ $NHDT-Date: 1644610217 2022/02/11 20:10:17 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1028,6 +1028,9 @@ curses: messages were tagged by turn in 3.6.x so that ^P can place a separator
 	between groups of messages; somehow the line of code that recorded
 	the turn vanished so ^P behaved as if every message came on its own
 	distinct turn, resulting in lots of "---" separators
+curses: when entering a count while in a menu, cursor would jump to the spot
+	on screen where the hero was, even if menu covered that part of map;
+	post-3.6--started when curses was changed to use core's get_count()
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching

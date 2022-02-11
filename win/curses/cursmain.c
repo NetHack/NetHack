@@ -834,9 +834,15 @@ curses_nhgetch(void)
 {
     int ch;
 
-    curses_prehousekeeping();
+    /* curses_prehousekeeping() assumes that the map window is active;
+       avoid it when a menu is active */
+    if (!activemenu)
+        curses_prehousekeeping();
+
     ch = curses_read_char();
-    curses_posthousekeeping();
+
+    if (!activemenu)
+        curses_posthousekeeping();
 
     return ch;
 }
