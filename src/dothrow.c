@@ -1590,6 +1590,12 @@ throwit(struct obj *obj,
             clear_thrownobj = TRUE;
             goto throwit_return;
         }
+        if (!Deaf && !Underwater) {
+            /* Some sound effects when item lands in water or lava */
+            if (is_pool(g.bhitpos.x, g.bhitpos.y)
+                || (is_lava(g.bhitpos.x, g.bhitpos.y) && !is_flammable(obj)))
+                pline((weight(obj) > 9) ? "Splash!" : "Plop!");
+        }
         if (flooreffects(obj, g.bhitpos.x, g.bhitpos.y, "fall")) {
             clear_thrownobj = TRUE;
             goto throwit_return;
