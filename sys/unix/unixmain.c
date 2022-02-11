@@ -729,33 +729,33 @@ void
 port_insert_pastebuf(char *buf)
 {
     /* This should be replaced when there is a Cocoa port. */
-    const char *errfmt;
+    const char *errarg;
     size_t len;
     FILE *PB = popen("/usr/bin/pbcopy", "w");
 
     if (!PB) {
-        errfmt = "Unable to start pbcopy (%d)\n";
+        errarg = "Unable to start pbcopy";
         goto error;
     }
 
     len = strlen(buf);
     /* Remove the trailing \n, carefully. */
-    if (buf[len - 1] == '\n')
+    if (len > 0 && buf[len - 1] == '\n')
         len--;
 
     /* XXX Sorry, I'm too lazy to write a loop for output this short. */
     if (len != fwrite(buf, 1, len, PB)) {
-        errfmt = "Error sending data to pbcopy (%d)\n";
+        errarg = "Error sending data to pbcopy";
         goto error;
     }
 
     if (pclose(PB) != -1) {
         return;
     }
-    errfmt = "Error finishing pbcopy (%d)\n";
+    errarg = "Error finishing pbcopy";
 
  error:
-    raw_printf(errfmt, strerror(errno));
+    raw_printf("%s: %s (%d)\n", errarg, strerror(errno), errno);
 }
 #endif /* __APPLE__ */
 
