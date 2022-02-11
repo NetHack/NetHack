@@ -3459,6 +3459,12 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
 
         typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
 
+        /* WATER aka "wall of water" stops items */
+        if (typ == WATER) {
+            if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
+                break;
+        }
+
         /* iron bars will block anything big enough and break some things */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
             if (obj->lamplit && !Blind)
