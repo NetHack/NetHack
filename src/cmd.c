@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1642630919 2022/01/19 22:21:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.500 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1644610344 2022/02/11 20:12:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.519 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4746,10 +4746,12 @@ click_to_cmd(int x, int y, int mod)
 
 /* gather typed digits into a number in *count; return the next non-digit */
 char
-get_count(char *allowchars, char inkey,
-          long maxcount, long *count,
-          boolean historicmsg) /* whether to include in message
-                                * history: True => yes */
+get_count(
+    char *allowchars,
+    char inkey,
+    long maxcount,
+    long *count,
+    boolean historicmsg) /* whether to include in ^P history: True => yes */
 {
     char qbuf[QBUFSZ];
     int key;

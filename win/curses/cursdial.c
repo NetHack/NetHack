@@ -326,20 +326,18 @@ curses_character_input_dialog(
             break;
         }
 
-        if (digit(answer)) {
-            if (accept_count) {
-                if (answer != '0') {
-                    yn_number = curses_get_count(answer);
+        if (digit(answer) && accept_count) {
+            if (answer != '0') {
+                yn_number = curses_get_count(answer);
 
-                    if (iflags.wc_popup_dialog) {
-                        curses_count_window(NULL);
-                        touchwin(askwin);
-                        wrefresh(askwin);
-                    }
+                if (iflags.wc_popup_dialog) {
+                    curses_count_window(NULL);
+                    touchwin(askwin);
+                    wrefresh(askwin);
                 }
-                answer = '#';
-                break;
             }
+            answer = '#';
+            break;
         }
 
         if (any_choice) {
