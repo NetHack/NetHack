@@ -1211,6 +1211,9 @@ tiles: add indicator of thonged portion to aklys tile
 tty: role and race selection menus weren't filtering out potential choices
 	which got excluded by OPTIONS=align:!lawful or !neutral or !chaotic
 tty: '$' can now select gold in a menu even when it isn't on current page
+tty: if a menu used full screen and brought up another menu that wasn't full
+	screen, sometimes only a small border of background was drawn around
+	it with most of the map left blank until after the menu was dismissed
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
