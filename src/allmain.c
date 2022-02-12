@@ -762,7 +762,7 @@ welcome(boolean new_game) /* false => restoring an old game */
 
     l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
     if (new_game)
-        livelog_printf(LL_MINORAC, "%s the%s entered the dungeon.",
+        livelog_printf(LL_MINORAC, "%s the%s entered the dungeon",
                        g.plname, buf);
 }
 

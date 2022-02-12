@@ -2129,7 +2129,12 @@ trapeffect_poly_trap(
         if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
         } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-            (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
+            (void) newcham(mtmp, (struct permonst *) 0, FALSE,
+                           /* if hero is moving, he probably just swapped
+                              places with a pet or perhaps used a joust
+                              attack to push mtmp into the trap; describe
+                              mtmp's transformation into another shape */
+                           (!g.context.mon_moving && in_sight));
             if (in_sight)
                 seetrap(trap);
         }
