@@ -769,7 +769,7 @@ fix mention_walls distinguishing unseen walls from solid stone
 don't push unknown boulders when moving
 in flush_screen, reorder the code slightly to complete the bot() and
 	timebot() calls prior to the window port call to place the cursor
-        on the hero
+	on the hero
 magic traps can toggle intrinsic invisibility
 Death attacking a monster does drain life attack
 add unique Rider revival messages
@@ -1086,7 +1086,7 @@ curses: sometimes entering a count during menu selection caused the menu to
 curses: support backspace/delete when entering a count during menu selection
 curses: make extended command prompt behave more sensibly
 curses: if a menu of objects contains at least one iron ball, and player is
-	not alreadly in the midst of entering a count, recognize '0' as a
+	not already in the midst of entering a count, recognize '0' as a
 	group accelerator rather than the start of a count
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
@@ -1521,7 +1521,7 @@ fix m-prefix movement into warning symbol (pr #573 by entrez)
 pointer precedence fix incrementing flagcounter in do.c (pr #612 by argrath)
 MAX_RADIUS defines the outer bound of the radius table, so leave it at 15
 	to avoid out-of-bound access in view_from() and do_clear_area()
-	(pr #613 by argrath) 
+	(pr #613 by argrath)
 variable attknum was declared without initialization, and was used in
 	find_roll_to_hit() (pr #615 by argrath)
 check for NULL lua_State before calling lua_close() (pr #616 by argrath)
@@ -1547,7 +1547,7 @@ function tin_details() in eat.c was passing an obj pointer to
 	tin_variety() where it was dereferenced; move the tin_details()
 	NULL check above that tin_variety() call (pr #676 by argrath)
 remove unnecessary null checks from christen_orc() (pr #681 by argrath)
- 
+
 
 Code Cleanup and Reorganization
 -------------------------------
