@@ -1010,9 +1010,11 @@ giving a prefix keystroke other than 'm' prior to a command that doesn't use
 prior revision broke all prefix usage
 movement command revamp broke 'm>' and 'm<' on stairs to avoid auto-pickup at
 	the destination
-when trapeffect_selector() returns 2 to caller mintrap(), meant to
-	signify that the monster was killed in the trap, ensure that
-	mintrap() returns that value too
+when trapeffect_selector() returns 2 to caller mintrap(), meant to signify
+	that the monster was killed in the trap, ensure that mintrap()
+	returns that value too
+have com_pager() check for failed nhl_init(); probably can't actually happen
+	because the program would never get that far if lua init was failing
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
