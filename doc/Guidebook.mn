@@ -4054,6 +4054,8 @@ than immediately praying; on by default;
 .PL Remove
 require selection from inventory for \(oqR\(cq and \(oqT\(cq
 commands even when wearing just one applicable item.
+.PL swim
+prevent walking into water or lava.
 .PL all
 turn on all of the above.
 .PE
@@ -5508,6 +5510,8 @@ If this is the case, disable the
 .op number_pad
 option and use the traditional
 Rogue-like commands.
+.lp paranoid_confirmation:swim
+Prevent walking into water or lava.
 .lp autodescribe
 Automatically describe the terrain under the cursor when targeting.
 .lp mention_walls

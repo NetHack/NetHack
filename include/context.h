@@ -150,6 +150,7 @@ struct context_info {
     boolean botlx;       /* print an entirely new bottom line */
     boolean door_opened; /* set to true if door was opened during test_move */
     boolean enhance_tip; /* player is informed about #enhance */
+    boolean swim_tip;    /* player was informed about walking into water */
     struct dig_info digging;
     struct victual_info victual;
     struct engrave_info engraving;

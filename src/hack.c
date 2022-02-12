@@ -13,6 +13,7 @@ static void dosinkfall(void);
 static boolean findtravelpath(int);
 static boolean trapmove(int, int, struct trap *);
 static void check_buried_zombies(xchar, xchar);
+static boolean swim_move_danger(xchar x, xchar y);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1519,6 +1520,46 @@ check_buried_zombies(xchar x, xchar y)
     }
 }
 
+/* Is it dangerous for hero to move to x,y due to water or lava? */
+static boolean
+swim_move_danger(xchar x, xchar y)
+{
+    if (!Levitation && !Flying && grounded(g.youmonst.data) && !Stunned
+        && !Confusion && levl[x][y].seenv
+        && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
+            || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
+        boolean known_wwalking, known_lwalking;
+
+        known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
+                          && objects[WATER_WALKING_BOOTS].oc_name_known
+                          && !u.usteed);
+        known_lwalking = (known_wwalking && Fire_resistance &&
+                          uarmf->oerodeproof && uarmf->rknown);
+        /* FIXME: This can be exploited to identify the ring of fire resistance
+        * if the player is wearing it unidentified and has identified
+        * fireproof boots of water walking and is walking over lava. However,
+        * this is such a marginal case that it may not be worth fixing. */
+        if ((is_pool(x, y) && !known_wwalking)
+            || (is_lava(x, y) && !known_lwalking)) {
+            if (g.context.nopick) {
+                /* moving with m-prefix */
+                g.context.swim_tip = TRUE;
+                return FALSE;
+            } else if (ParanoidSwim) {
+                You("avoid stepping into the %s.",
+                    waterbody_name(x, y));
+                if (!g.context.swim_tip) {
+                    pline("(Use '%s' prefix to step in if you really want to.)",
+                          visctrl(cmd_from_func(do_reqmenu)));
+                    g.context.swim_tip = TRUE;
+                }
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -1945,6 +1986,13 @@ domove_core(void)
         }
         return;
     }
+
+    /* Is it dangerous to swim in water or lava? */
+    if (swim_move_danger(x, y)) {
+        g.context.move = 0;
+        nomul(0);
+        return;
+     }
 
     /* Move ball and chain.  */
     if (Punished)
