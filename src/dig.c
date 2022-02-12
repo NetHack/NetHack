@@ -240,7 +240,7 @@ dig(void)
     if (u.uswallow || !uwep || (!ispick && !is_axe(uwep))
         || !on_level(&g.context.digging.level, &u.uz)
         || ((g.context.digging.down ? (dpx != u.ux || dpy != u.uy)
-                                  : (distu(dpx, dpy) > 2))))
+                                  : !next2u(dpx, dpy))))
         return 0;
 
     if (g.context.digging.down) {

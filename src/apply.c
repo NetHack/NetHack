@@ -503,7 +503,7 @@ use_magic_whistle(struct obj *obj)
                 if (M_AP_TYPE(mtmp))
                     seemimic(mtmp);
                 omx = mtmp->mx, omy = mtmp->my;
-                if (distu(omx, omy) > 2)
+                if (!next2u(omx, omy))
                     mnexto(mtmp, RLOC_MSG);
                 if (mtmp->mx != omx || mtmp->my != omy) {
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
@@ -728,9 +728,9 @@ next_to_u(void)
         if (DEADMONSTER(mtmp))
             continue;
         if (mtmp->mleashed) {
-            if (distu(mtmp->mx, mtmp->my) > 2)
+            if (!next2u(mtmp->mx, mtmp->my))
                 mnexto(mtmp, RLOC_NOMSG);
-            if (distu(mtmp->mx, mtmp->my) > 2) {
+            if (!next2u(mtmp->mx, mtmp->my)) {
                 for (otmp = g.invent; otmp; otmp = otmp->nobj)
                     if (otmp->otyp == LEASH
                         && (unsigned) otmp->leashmon == mtmp->m_id) {

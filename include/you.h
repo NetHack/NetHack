@@ -484,4 +484,7 @@ struct you {
 #define Upolyd (u.umonnum != u.umonster)
 #define Ugender ((Upolyd ? u.mfemale : flags.female) ? 1 : 0)
 
+/* point px,py is adjacent to (or same location as) hero */
+#define next2u(px,py) (distu((px),(py)) <= 2)
+
 #endif /* YOU_H */

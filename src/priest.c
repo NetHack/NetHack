@@ -359,7 +359,7 @@ priestname(
     Strcat(pname, what);
     /* same as distant_monnam(), more or less... */
     if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
-        || distu(mon->mx, mon->my) <= 2 || g.program_state.gameover) {
+        || next2u(mon->mx, mon->my) || g.program_state.gameover) {
         Strcat(pname, " of ");
         Strcat(pname, halu_gname(mon_aligntyp(mon)));
     }

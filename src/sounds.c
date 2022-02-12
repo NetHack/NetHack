@@ -1337,7 +1337,7 @@ tiphat(void)
 
             pline("%s %s%s%s at you...", Monnam(mtmp), reaction[which],
                   twice ? " and " : "", twice ? reaction[twice] : "");
-        } else if (distu(x, y) <= 2 && !Deaf && domonnoise(mtmp)) {
+        } else if (next2u(x, y) && !Deaf && domonnoise(mtmp)) {
             if (!vismon)
                 map_invisible(x, y);
         } else if (vismon) {

@@ -1247,7 +1247,7 @@ dopay(void)
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE)) {
         sk++;
-        if (ANGRY(shkp) && distu(shkp->mx, shkp->my) <= 2)
+        if (ANGRY(shkp) && next2u(shkp->mx, shkp->my))
             nxtm = shkp;
         if (canspotmon(shkp))
             seensk++;
@@ -1283,7 +1283,7 @@ dopay(void)
              shkp = next_shkp(shkp->nmon, FALSE))
             if (canspotmon(shkp))
                 break;
-        if (shkp != resident && distu(shkp->mx, shkp->my) > 2) {
+        if (shkp != resident && !next2u(shkp->mx, shkp->my)) {
             pline("%s is not near enough to receive your payment.",
                   Shknam(shkp));
             return ECMD_OK;
@@ -1321,7 +1321,7 @@ dopay(void)
             pline("%s is not interested in your payment.", Monnam(mtmp));
             return ECMD_OK;
         }
-        if (mtmp != resident && distu(mtmp->mx, mtmp->my) > 2) {
+        if (mtmp != resident && !next2u(mtmp->mx, mtmp->my)) {
             pline("%s is too far to receive your payment.", Shknam(mtmp));
             return ECMD_OK;
         }
@@ -1836,7 +1836,7 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
         takes[0] = '\0';
         if (!shkp->mcanmove || shkp->msleeping)
             Strcat(takes, "wakes up and ");
-        if (distu(shkp->mx, shkp->my) > 2)
+        if (!next2u(shkp->mx, shkp->my))
             Strcat(takes, "comes and ");
         Strcat(takes, "takes");
 
@@ -4070,10 +4070,10 @@ shopdig(register int fall)
             return;
 #endif
         }
-        if (distu(shkp->mx, shkp->my) > 2) {
+        if (!next2u(shkp->mx, shkp->my)) {
             mnexto(shkp, RLOC_MSG);
             /* for some reason the shopkeeper can't come next to you */
-            if (distu(shkp->mx, shkp->my) > 2) {
+            if (!next2u(shkp->mx, shkp->my)) {
                 if (lang == 2)
                     pline("%s curses you in anger and frustration!",
                           Shknam(shkp));

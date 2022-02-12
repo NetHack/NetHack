@@ -1430,7 +1430,7 @@ makemon(register struct permonst *ptr,
             if (what)
                 Norep("%s%s appears%s%c", what,
                       exclaim ? " suddenly" : "",
-                      distu(x, y) <= 2 ? " next to you"
+                      next2u(x, y) ? " next to you"
                       : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
                         : "",
                       exclaim ? '!' : '.');

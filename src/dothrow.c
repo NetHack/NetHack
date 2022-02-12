@@ -2186,7 +2186,7 @@ breakobj(
         obj->in_use = 1; /* in case it's fatal */
         if (obj->otyp == POT_OIL && obj->lamplit) {
             explode_oil(obj, x, y);
-        } else if (distu(x, y) <= 2) {
+        } else if (next2u(x, y)) {
             if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)) {
                 /* wet towel protects both eyes and breathing */
                 if (obj->otyp != POT_WATER && !Half_gas_damage) {

@@ -91,7 +91,7 @@ amulet(void)
             continue;
         if (mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
             mtmp->msleeping = 0;
-            if (distu(mtmp->mx, mtmp->my) > 2)
+            if (!next2u(mtmp->mx, mtmp->my))
                 You(
       "get the creepy feeling that somebody noticed your taking the Amulet.");
             return;

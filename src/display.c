@@ -756,7 +756,7 @@ newsym(register int x, register int y)
     if (Underwater && !Is_waterlevel(&u.uz)) {
         /* when underwater, don't do anything unless <x,y> is an
            adjacent water or lava or ice position */
-        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || distu(x, y) > 2)
+        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || !next2u(x, y))
             return;
     }
 

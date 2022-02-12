@@ -413,7 +413,7 @@ newmail(struct mail_info *info)
         if (info->response_cmd)
             new_omailcmd(obj, info->response_cmd);
 
-        if (distu(md->mx, md->my) > 2)
+        if (!next2u(md->mx, md->my))
             verbalize("Catch!");
         display_nhwindow(WIN_MESSAGE, FALSE);
         obj = hold_another_object(obj, "Oops!", (const char *) 0,

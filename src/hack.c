@@ -1084,7 +1084,7 @@ findtravelpath(int mode)
     /* if travel to adjacent, reachable location, use normal movement rules */
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
         /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
-        && distu(u.tx, u.ty) <= 2 /* one step away */
+        && next2u(u.tx, u.ty) /* one step away */
         /* handle restricted diagonals */
         && crawl_destination(u.tx, u.ty)) {
         end_running(FALSE);
@@ -1689,7 +1689,7 @@ domove_core(void)
         }
 
         if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
-            if (distu(u.ustuck->mx, u.ustuck->my) > 2) {
+            if (!next2u(u.ustuck->mx, u.ustuck->my)) {
                 /* perhaps it fled (or was teleported or ... ) */
                 set_ustuck((struct monst *) 0);
             } else if (sticks(g.youmonst.data)) {

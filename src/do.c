@@ -111,7 +111,7 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
                 docrt();
                 g.vision_full_recalc = 1;
                 You("find yourself on dry land again!");
-            } else if (lava && distu(rx, ry) <= 2) {
+            } else if (lava && next2u(rx, ry)) {
                 int dmg;
                 You("are hit by molten %s%c",
                     hliquid("lava"), Fire_resistance ? '.' : '!');
@@ -1267,7 +1267,7 @@ u_collide_m(struct monst *mtmp)
        or else the monster to any nearby location.  Prior to 3.3.0
        the latter was done unconditionally. */
     if (!rn2(2) && enexto(&cc, u.ux, u.uy, g.youmonst.data)
-        && distu(cc.x, cc.y) <= 2)
+        && next2u(cc.x, cc.y))
         u_on_newpos(cc.x, cc.y); /*[maybe give message here?]*/
     else
         mnexto(mtmp, RLOC_NOMSG);

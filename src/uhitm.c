@@ -170,7 +170,7 @@ attack_checks(
         if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
                 /* applied pole-arm attack is too far to get stuck */
-                && distu(mtmp->mx, mtmp->my) <= 2)
+                && next2u(mtmp->mx, mtmp->my))
                 set_ustuck(mtmp);
         }
         /* #H7329 - if hero is on engraved "Elbereth", this will end up
@@ -1564,7 +1564,7 @@ shade_miss(struct monst *magr, struct monst *mdef, struct obj *obj,
 
     if (verbose
         && ((youdef || cansee(mdef->mx, mdef->my) || sensemon(mdef))
-            || (magr == &g.youmonst && distu(mdef->mx, mdef->my) <= 2))) {
+            || (magr == &g.youmonst && next2u(mdef->mx, mdef->my)))) {
         static const char harmlessly_thru[] = " harmlessly through ";
 
         what = (!obj || shade_aware(obj)) ? "attack" : cxname(obj);
@@ -2843,7 +2843,7 @@ mhitm_ad_stck(
         /* since hero can't be cancelled, only defender's armor applies */
         boolean negated = !(rn2(10) >= 3 * armpro);
 
-        if (!negated && !sticks(pd) && distu(mdef->mx, mdef->my) <= 2)
+        if (!negated && !sticks(pd) && next2u(mdef->mx, mdef->my))
             set_ustuck(mdef); /* it's now stuck to you */
     } else if (mdef == &g.youmonst) {
         /* mhitu */
@@ -4613,7 +4613,7 @@ hmonas(struct monst *mon)
     boolean monster_survived;
 
     /* not used here but umpteen mhitm_ad_xxxx() need this */
-    g.vis = (canseemon(mon) || distu(mon->mx, mon->my) <= 2);
+    g.vis = (canseemon(mon) || next2u(mon->mx, mon->my));
 
     /* with just one touch/claw/weapon attack, both rings matter;
        with more than one, alternate right and left when checking
@@ -5340,7 +5340,7 @@ stumble_onto_mimic(struct monst *mtmp)
 
     if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK)
         /* must be adjacent; attack via polearm could be from farther away */
-        && distu(mtmp->mx, mtmp->my) <= 2)
+        && next2u(mtmp->mx, mtmp->my))
         set_ustuck(mtmp);
 
     if (Blind) {

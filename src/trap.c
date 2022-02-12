@@ -5178,7 +5178,7 @@ openholdingtrap(
                 pline("%s%s opens.", upstart(strcpy(buf, which)), trapdescr);
         }
         /* might pacify monster if adjacent */
-        if (rn2(2) && distu(mon->mx, mon->my) <= 2)
+        if (rn2(2) && next2u(mon->mx, mon->my))
             reward_untrap(t, mon);
     }
     return TRUE;

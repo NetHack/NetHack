@@ -276,7 +276,7 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
     /* if located at adjacent spot, mark it as having been seen up close
        (corpse type will be known even if dknown is 0, so we don't need a
        touch check for cockatrice corpse--we're looking without touching) */
-    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination
+    if (otmp && next2u(x, y) && !Blind && !Hallucination
         /* redundant: we only look for an object which matches current
            glyph among floor and buried objects; when !Blind, any buried
            object's glyph will have been replaced by whatever is present
@@ -589,7 +589,7 @@ lookat(int x, int y, char *buf, char *monbuf)
         if (Underwater && !Is_waterlevel(&u.uz)) {
             /* "unknown" == previously mapped but not visible when
                submerged; better terminology appreciated... */
-            Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
+            Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
         } else {
             Strcpy(buf, "unexplored area");
         }
@@ -607,7 +607,7 @@ lookat(int x, int y, char *buf, char *monbuf)
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
-                    (Is_astralevel(&u.uz) && distu(x, y) > 2)
+                    (Is_astralevel(&u.uz) && !next2u(x, y))
                         ? "aligned"
                         : align_str(algn),
                     ((amsk & AM_SHRINE) != 0
@@ -640,7 +640,7 @@ lookat(int x, int y, char *buf, char *monbuf)
             } else if (Underwater && !Is_waterlevel(&u.uz)) {
                 /* "unknown" == previously mapped but not visible when
                    submerged; better terminology appreciated... */
-                Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
+                Strcpy(buf, (next2u(x, y)) ? "land" : "unknown");
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
                 Strcpy(buf, "stone");
@@ -1100,7 +1100,7 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     x_str = 0;
     if (!looked) {
         ; /* skip special handling */
-    } else if (((u.uswallow || submerged) && distu(cc.x, cc.y) > 2)
+    } else if (((u.uswallow || submerged) && !next2u(cc.x, cc.y))
                /* detection showing some category, so mostly background */
                || ((iflags.terrainmode & (TER_DETECT | TER_MAP)) == TER_DETECT
                    && glyph == cmap_to_glyph(S_stone))) {

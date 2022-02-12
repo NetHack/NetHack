@@ -1855,7 +1855,7 @@ find_misc(struct monst* mtmp)
             && uwep && !rn2(5) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
             && mtmp->mux == u.ux && mtmp->muy == u.uy
-            && distu(mtmp->mx, mtmp->my) <= 2
+            && next2u(mtmp->mx, mtmp->my)
             /* don't bother if it can't work (this doesn't
                prevent cursed weapons from being targetted) */
             && (canletgo(uwep, "")
