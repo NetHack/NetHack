@@ -2103,12 +2103,8 @@ process_menu_window(winid window, struct WinDesc *cw)
         case '\0': /* finished (commit) */
         case '\n':
         case '\r':
-            /* only finished if we are actually picking something */
-            if (cw->how != PICK_NONE) {
-                finished = TRUE;
-                break;
-            }
-        /* else fall through */
+            finished = TRUE;
+            break;
         case ' ':
         case MENU_NEXT_PAGE:
             if (cw->npages > 0 && curr_page != cw->npages - 1) {

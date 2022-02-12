@@ -1214,6 +1214,8 @@ tty: '$' can now select gold in a menu even when it isn't on current page
 tty: if a menu used full screen and brought up another menu that wasn't full
 	screen, sometimes only a small border of background was drawn around
 	it with most of the map left blank until after the menu was dismissed
+tty: have <return> dismiss pick-none menus instead of acting like '>' (not
+	only wouldn't dismiss when not on last page, wouldn't dismiss at all)
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
