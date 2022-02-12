@@ -851,7 +851,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 {
     int i, idx;
     boolean match = FALSE;
-    char *userea = (char *)0;
+    char *userea = (char *) 0;
     const char *dashdash = "";
 
     for (idx = 0; idx < SIZE(earlyopts); idx++) {
@@ -859,7 +859,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             break;
     }
     if ((idx >= SIZE(earlyopts)) || (argc <= 1))
-            return FALSE;
+        return FALSE;
 
     for (i = 0; i < argc; ++i) {
         if (argv[i][0] != '-')
@@ -873,7 +873,8 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         match = match_optname(userea, earlyopts[idx].name,
                               earlyopts[idx].minlength,
                               earlyopts[idx].valallowed);
-        if (match) break;
+        if (match)
+            break;
     }
 
     if (match) {
