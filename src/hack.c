@@ -1532,8 +1532,10 @@ u_locomotion(const char *def)
 static boolean
 swim_move_danger(xchar x, xchar y)
 {
-    if (!Levitation && !Flying && grounded(g.youmonst.data) && !Stunned
-        && !Confusion && levl[x][y].seenv
+    boolean liquid_wall = (levl[x][y].typ == WATER);
+
+    if ((liquid_wall || (!Levitation && !Flying && grounded(g.youmonst.data)))
+        && !Stunned && !Confusion && levl[x][y].seenv
         && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
             || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
         boolean known_wwalking, known_lwalking;
@@ -1548,7 +1550,8 @@ swim_move_danger(xchar x, xchar y)
         * fireproof boots of water walking and is walking over lava. However,
         * this is such a marginal case that it may not be worth fixing. */
         if ((is_pool(x, y) && !known_wwalking)
-            || (is_lava(x, y) && !known_lwalking)) {
+            || (is_lava(x, y) && !known_lwalking)
+            || liquid_wall) {
             if (g.context.nopick) {
                 /* moving with m-prefix */
                 g.context.swim_tip = TRUE;
