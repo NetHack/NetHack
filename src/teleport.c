@@ -83,12 +83,14 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
             if (mtmp == &g.youmonst)
                 return (Swimming || Amphibious
                         || (!Is_waterlevel(&u.uz)
+                            && !(levl[x][y].typ == WATER)
                             /* water on the Plane of Water has no surface
                                so there's no way to be on or above that */
                             && (Levitation || Flying || Wwalking)));
             else
                 return (is_swimmer(mdat)
                         || (!Is_waterlevel(&u.uz)
+                            && !(levl[x][y].typ == WATER)
                             && (is_floater(mdat) || is_flyer(mdat)
                                 || is_clinger(mdat))));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
