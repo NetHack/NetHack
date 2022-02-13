@@ -13,7 +13,8 @@ static void dosinkfall(void);
 static boolean findtravelpath(int);
 static boolean trapmove(int, int, struct trap *);
 static void check_buried_zombies(xchar, xchar);
-static boolean swim_move_danger(xchar x, xchar y);
+static schar u_simple_floortyp(xchar, xchar);
+static boolean swim_move_danger(xchar, xchar);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1528,16 +1529,33 @@ u_locomotion(const char *def)
         : locomotion(g.youmonst.data, def);
 }
 
+/* Return a simplified floor solid/liquid state based on hero's state */
+static schar
+u_simple_floortyp(xchar x, xchar y)
+{
+    boolean u_in_air = (Levitation || Flying || !grounded(g.youmonst.data));
+
+    if (levl[x][y].typ == WATER)
+        return WATER; /* wall of water, fly/lev does not matter */
+    if (!u_in_air) {
+        if (is_pool(x,y))
+            return POOL;
+        if (is_lava(x,y))
+            return LAVAPOOL;
+    }
+    return ROOM;
+}
+
 /* Is it dangerous for hero to move to x,y due to water or lava? */
 static boolean
 swim_move_danger(xchar x, xchar y)
 {
-    boolean liquid_wall = (levl[x][y].typ == WATER);
+    schar newtyp = u_simple_floortyp(x, y);
+    boolean liquid_wall = (newtyp == WATER);
 
-    if ((liquid_wall || (!Levitation && !Flying && grounded(g.youmonst.data)))
+    if ((newtyp != u_simple_floortyp(u.ux, u.uy))
         && !Stunned && !Confusion && levl[x][y].seenv
-        && ((is_pool(x, y) && !is_pool(u.ux, u.uy))
-            || (is_lava(x, y) && !is_lava(u.ux, u.uy)))) {
+        && (is_pool(x, y) || is_lava(x, y) || liquid_wall)) {
         boolean known_wwalking, known_lwalking;
 
         known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
@@ -1556,7 +1574,7 @@ swim_move_danger(xchar x, xchar y)
                 /* moving with m-prefix */
                 g.context.swim_tip = TRUE;
                 return FALSE;
-            } else if (ParanoidSwim) {
+            } else if (ParanoidSwim || liquid_wall) {
                 You("avoid %s into the %s.",
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
