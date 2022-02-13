@@ -349,7 +349,9 @@ ing_suffix(const char *s)
         Strcpy(onoff, p);
         *p = '\0';
     }
-    if (p >= &buf[3] && !index(vowel, *(p - 1))
+    if (p >= &buf[2] && !strcmpi(p - 2, "er")) { /* slither + ing */
+        /* nothing here */
+    } else if (p >= &buf[3] && !index(vowel, *(p - 1))
         && index(vowel, *(p - 2)) && !index(vowel, *(p - 3))) {
         /* tip -> tipp + ing */
         *p = *(p - 1);

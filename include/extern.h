@@ -915,6 +915,7 @@ extern boolean test_move(int, int, int, int, int);
 extern int wiz_debug_cmd_traveldisplay(void);
 #endif
 extern boolean u_rooted(void);
+extern const char *u_locomotion(const char *);
 extern void domove(void);
 extern void runmode_delay_output(void);
 extern void overexert_hp(void);

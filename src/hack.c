@@ -1520,6 +1520,14 @@ check_buried_zombies(xchar x, xchar y)
     }
 }
 
+const char *
+u_locomotion(const char *def)
+{
+    return Levitation ? "levitate"
+        : Flying ? "fly"
+        : locomotion(g.youmonst.data, def);
+}
+
 /* Is it dangerous for hero to move to x,y due to water or lava? */
 static boolean
 swim_move_danger(xchar x, xchar y)
@@ -1546,7 +1554,8 @@ swim_move_danger(xchar x, xchar y)
                 g.context.swim_tip = TRUE;
                 return FALSE;
             } else if (ParanoidSwim) {
-                You("avoid stepping into the %s.",
+                You("avoid %s into the %s.",
+                    ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
                 if (!g.context.swim_tip) {
                     pline("(Use '%s' prefix to step in if you really want to.)",
