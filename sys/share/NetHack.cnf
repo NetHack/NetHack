@@ -20,9 +20,8 @@
 # try commenting out this line.
 OPTIONS=rawio,BIOS,symset:IBMGraphics_2,roguesymset:RogueEpyx
 
-# Here is a suggested symbol set from Michael Feir, 
-# for use by blind NetHack players
-#OPTIONS=symset:NHAccess,roguesymset:NHAccess
+# Here is a suggested symbol for use by blind NetHack players
+#OPTIONS=symset:plain
 
 # To use VGA graphical tiles on an MS-DOS PC with VGA or better,uncomment 
 # this:

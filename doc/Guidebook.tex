@@ -6019,31 +6019,13 @@ the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
 executable, which will be executed with the game message as the program's
 only parameter.
 %.pg
-While it is not difficult for experienced users to edit the {\it defaults.nh\/}
-file to accomplish this, novices may find this task somewhat daunting.
-Included within the symbol file of all official distributions of {\it NetHack\/}
-is a symset called {\it NHAccess\/}.  Selecting that symset in your
-configuration file will cause the game to run in a manner accessible
-to the blind. After you have gained some experience with the game
-and with editing files, you may want to alter settings via {\it SYMBOLS=\/}
-and {\it ROGUESYMBOLS=\/}
-in your configuration file to better suit your preferences.
-See the previous section for the special symbols S\verb+_+pet\verb+_+override
-to force a consistent symbol for all pets and S\verb+_+hero\verb+_+override
-to force a unique symbol for the player character if {\it accessibility\/}
-is enabled in the {\it sysconf\/} file.
 
-%.pg
 The most crucial settings to make the game more accessible are:
 %.pg
 \blist{}
 %.lp
-\item[\ib{symset:NHAccess}]
+\item[\ib{symset:plain}]
 Load a symbol set appropriate for use by blind players.
-%.lp
-\item[\ib{roguesymset:NHAccess}]
-Load a symbol set for the rogue level that is appropriate for
-use by blind players.
 %.lp
 \item[\ib{menustyle:traditional}]
 This will assist in the interface to speech synthesizers.

@@ -5477,29 +5477,10 @@ the capability, set the environment variable NETHACK_MSGHANDLER to an
 executable, which will be executed with the game message as the program's
 only parameter.
 .pg
-While it is not difficult for experienced users to edit the \fBdefaults.nh\fP
-file to accomplish this, novices may find this task somewhat daunting.
-Included within the \(lqsymbols\(rq file of all official distributions
-of NetHack is a symset called \fBNHAccess\fP.
-Selecting that symset in your
-configuration file will cause the game to run in a manner accessible
-to the blind.
-After you have gained some experience with the game
-and with editing files, you may want to alter settings via \fBSYMBOLS=\fP
-and \fBROGUESYMBOLS=\fP
-in your configuration file to better suit your preferences.
-See the previous section for the special symbols S_pet_override
-to force a consistent symbol for all pets and
-S_hero_override to force a unique symbol for the player character
-if \fBaccessibility\fP is enabled in the sysconf file.
-.pg
 The most crucial settings to make the game more accessible are:
 .pg
-.lp symset:NHAccess
+.lp symset:plain
 Load a symbol set appropriate for use by blind players.
-.lp roguesymset:NHAccess
-Load a symbol set for the rogue level that is appropriate for
-use by blind players.
 .lp menustyle:traditional
 This will assist in the interface to speech synthesizers.
 .lp nomenu_overlay
