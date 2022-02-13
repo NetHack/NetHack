@@ -1779,7 +1779,7 @@ mfndpos(
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
-    poolok = ((!Is_waterlevel(&u.uz)
+    poolok = ((!Is_waterlevel(&u.uz) && !(nowtyp != WATER)
                && (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be
