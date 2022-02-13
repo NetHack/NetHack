@@ -2466,7 +2466,7 @@ pooleffects(boolean newspot)             /* true if called by spoteffects */
         if (is_lava(u.ux, u.uy)) {
             if (lava_effects())
                 return TRUE;
-        } else if (!Wwalking
+        } else if ((!Wwalking || levl[u.ux][u.uy].typ == WATER)
                    && (newspot || !u.uinwater || !(Swimming || Amphibious))) {
             if (drown())
                 return TRUE;
