@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1605493691 2020/11/16 02:28:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1644866265 2022/02/14 19:17:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -49,7 +49,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef CHDIR
-    register char *dir;
+    char *dir;
 #endif
     NHFILE *nhfp;
     boolean exact_username;
@@ -107,6 +107,7 @@ main(int argc, char *argv[])
     dir = nh_getenv("NETHACKDIR");
     if (!dir)
         dir = nh_getenv("HACKDIR");
+#endif /* CHDIR */
 
     if (argc > 1) {
         if (argcheck(argc, argv, ARG_VERSION) == 2)
@@ -130,6 +131,7 @@ main(int argc, char *argv[])
             argc--;
             argv++;
         }
+#ifdef CHDIR
         if (argc > 1 && !strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
             /* avoid matching "-dec" for DECgraphics; since the man page
              * says -d directory, hope nobody's using -desomething_else
