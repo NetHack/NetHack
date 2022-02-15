@@ -18,8 +18,6 @@ pctty.c		NH_filestag=>NetHack.cnf
 ioctl.c		NH_filestag=(file%s_for_UNIX_and_Be_versions)
 unixtty.c	NH_filestag=>ioctl.c
 
-nhlan.c NH_filestag=(file_for_NT_version)
-
 random.c NH_filestag=(Berkeley_random_number_file,_which_may_be_included_in_any_version)
 
 uudecode.c NH_filestag=(Berkeley_uudecode_file,_which_may_be_used_in_build_process_of_any_version)
