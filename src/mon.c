@@ -1780,12 +1780,11 @@ mfndpos(
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
     poolok = ((!Is_waterlevel(&u.uz) && !(nowtyp != WATER)
-               && (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)))
+               && !grounded(mdat))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be
        simplified, but then adding another floater would be error prone */
-    lavaok = (is_flyer(mdat) || is_floater(mdat) || is_clinger(mdat)
-              || likes_lava(mdat));
+    lavaok = (!grounded(mdat) || likes_lava(mdat));
     if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
         lavaok = FALSE;
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);

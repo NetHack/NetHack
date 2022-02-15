@@ -2436,9 +2436,7 @@ pooleffects(boolean newspot)             /* true if called by spoteffects */
 
     /* check for entering water or lava */
     if (!u.ustuck && !Levitation && !Flying && is_pool_or_lava(u.ux, u.uy)) {
-        if (u.usteed
-            && (is_flyer(u.usteed->data) || is_floater(u.usteed->data)
-                || is_clinger(u.usteed->data))) {
+        if (u.usteed && !grounded(u.usteed->data)) {
             /* floating or clinging steed keeps hero safe (is_flyer() test
                is redundant; it can't be true since Flying yielded false) */
             return FALSE;

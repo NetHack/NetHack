@@ -91,8 +91,7 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
                 return (is_swimmer(mdat)
                         || (!Is_waterlevel(&u.uz)
                             && !(levl[x][y].typ == WATER)
-                            && (is_floater(mdat) || is_flyer(mdat)
-                                || is_clinger(mdat))));
+                            && !grounded(mdat)));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y)) {

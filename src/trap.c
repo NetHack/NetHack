@@ -1641,9 +1641,7 @@ trapeffect_pit(
         const char *fallverb;
 
         fallverb = "falls";
-        if (is_flyer(mptr) || is_floater(mptr)
-            || (mtmp->wormno && count_wsegs(mtmp) > 5)
-            || is_clinger(mptr)) {
+        if (!grounded(mptr) || (mtmp->wormno && count_wsegs(mtmp) > 5)) {
             if (g.force_mintrap && !Sokoban) {
                 /* openfallingtrap; not inescapable here */
                 if (in_sight) {
@@ -1703,8 +1701,7 @@ trapeffect_hole(
                        trapname(tt, TRUE));
             return Trap_Effect_Finished; /* don't activate it after all */
         }
-        if (is_flyer(mptr) || is_floater(mptr) || mptr == &mons[PM_WUMPUS]
-            || (mtmp->wormno && count_wsegs(mtmp) > 5)
+        if (!grounded(mptr) || (mtmp->wormno && count_wsegs(mtmp) > 5)
             || mptr->msize >= MZ_HUGE) {
             if (g.force_mintrap && !Sokoban) {
                 /* openfallingtrap; not inescapable here */

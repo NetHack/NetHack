@@ -695,8 +695,7 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
                 impact_drop((struct obj *) 0, x, y, 0);
             if (mtmp) {
                 /*[don't we need special sokoban handling here?]*/
-                if (is_flyer(mtmp->data) || is_floater(mtmp->data)
-                    || mtmp->data == &mons[PM_WUMPUS]
+                if (!grounded(mtmp->data)
                     || (mtmp->wormno && count_wsegs(mtmp) > 5)
                     || mtmp->data->msize >= MZ_HUGE)
                     return;
