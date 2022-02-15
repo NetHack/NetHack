@@ -146,7 +146,7 @@ static void mon_chain(winid, const char *, struct monst *, boolean, long *,
 static void contained_stats(winid, const char *, long *, long *);
 static void misc_stats(winid, long *, long *);
 static boolean accept_menu_prefix(const struct ext_func_tab *);
-static void reset_cmd_vars(void);
+static void reset_cmd_vars(boolean);
 static void add_herecmd_menuitem(winid, int (*)(void), const char *);
 static char here_cmd_menu(boolean);
 static char there_cmd_menu(boolean, int, int);
@@ -3822,7 +3822,7 @@ rnd_extcmd_idx(void)
 }
 
 static void
-reset_cmd_vars(void)
+reset_cmd_vars(boolean reset_cmdq)
 {
     g.context.run = 0;
     g.context.nopick = g.context.forcefight = FALSE;
@@ -3831,7 +3831,8 @@ reset_cmd_vars(void)
     g.multi = 0;
     iflags.menu_requested = FALSE;
     g.context.travel = g.context.travel1 = 0;
-    cmdq_clear();
+    if (reset_cmdq)
+        cmdq_clear();
 }
 
 void
@@ -3843,7 +3844,7 @@ rhack(char *cmd)
     const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
     boolean was_m_prefix = FALSE;
 
-    reset_cmd_vars();
+    reset_cmd_vars(FALSE);
  got_prefix_input:
 #ifdef SAFERHANGUP
     if (g.program_state.done_hup)
@@ -3869,14 +3870,14 @@ rhack(char *cmd)
     }
 
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
-        reset_cmd_vars();
+        reset_cmd_vars(TRUE);
         return;
     }
 
     /* Special case of *cmd == ' ' handled better below */
     if (!*cmd || *cmd == (char) 0377) {
         nhbell();
-        reset_cmd_vars();
+        reset_cmd_vars(TRUE);
         return; /* probably we just had an interrupt */
     }
 
@@ -3897,7 +3898,7 @@ rhack(char *cmd)
         if (tlist != 0) {
             if (!can_do_extcmd(tlist)) {
                 /* can_do_extcmd() already gave a message */
-                reset_cmd_vars();
+                reset_cmd_vars(TRUE);
                 res = ECMD_OK;
             } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
                        && !(tlist->flags & (was_m_prefix ? CMD_M_PREFIX
@@ -3911,7 +3912,7 @@ rhack(char *cmd)
 
                 pline("The %s command does not accept '%s' prefix.",
                       tlist->ef_txt, which);
-                reset_cmd_vars();
+                reset_cmd_vars(TRUE);
                 res = ECMD_OK;
                 prefix_seen = 0;
                 was_m_prefix = FALSE;
@@ -3934,7 +3935,7 @@ rhack(char *cmd)
                     /* it was a prefix command, mark and get another cmd */
                     if ((res & ECMD_CANCEL)) {
                         /* prefix commands cancel if pressed twice */
-                        reset_cmd_vars();
+                        reset_cmd_vars(TRUE);
                         return;
                     }
                     prefix_seen = tlist;
@@ -3952,7 +3953,7 @@ rhack(char *cmd)
                            && !g.context.travel && !dxdy_moveok()) {
                     /* trying to move diagonally as a grid bug */
                     You_cant("get there from here...");
-                    reset_cmd_vars();
+                    reset_cmd_vars(TRUE);
                     return;
                 } else if ((g.domove_attempting & DOMOVE_WALK) != 0L) {
                     if (g.multi)
@@ -3978,12 +3979,12 @@ rhack(char *cmd)
             if ((res & ECMD_CANCEL)) {
                 /* command was canceled by user, maybe they declined to
                    pick an object to act on. */
-                reset_cmd_vars();
+                reset_cmd_vars(TRUE);
                 prefix_seen = 0;
                 cmdq_ec = NULL;
             }
             if (!(res & ECMD_TIME)) {
-                reset_cmd_vars();
+                reset_cmd_vars(FALSE);
                 prefix_seen = 0;
                 cmdq_ec = NULL;
             }
