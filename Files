@@ -122,6 +122,10 @@ wceconf.h
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
 mactty.h      macwin.h      mttypriv.h
 
+outdated/sys:
+(files that are no longer maintained for current game code)
+share
+
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
 Build.ami     Install.ami   Makefile.agc  Makefile.ami  NetHack.cnf
@@ -288,9 +292,6 @@ NetHack.cnf  pctty.c
 
 (file for MSDOS, OS/2, and VMS versions)
 termcap
-
-(file for NT version)
-nhlan.c
 
 (file for VMS version)
 tclib.c
