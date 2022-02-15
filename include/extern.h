@@ -1660,7 +1660,6 @@ extern int dosuspend(void);
 #endif
 #endif /* TOS */
 #ifdef WIN32
-extern char *get_username(int *);
 extern void nt_regularize(char *);
 extern int(*nt_kbhit)(void);
 extern void Delay(int);

@@ -500,7 +500,7 @@ CURSESOBJ= $(O)cursdial.o $(O)cursinit.o $(O)cursinvt.o $(O)cursmain.o \
 	   $(O)cursmesg.o $(O)cursmisc.o $(O)cursstat.o $(O)curswins.o
 
 SOBJ   = $(O)windmain.o $(O)windsys.o $(O)win10.o \
-	$(O)safeproc.o $(O)nhlan.o $(SOUND)
+	$(O)safeproc.o $(SOUND)
 
 OBJS   = $(MDLIB) \
 	$(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \

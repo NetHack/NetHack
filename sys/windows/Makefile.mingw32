@@ -720,7 +720,7 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   hack hacklib insight invent isaac64 light lock \
 	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
 	   mon mondata monmove monst mplayer mthrowu muse music \
-	   nhlan nhlobj nhlsel nhlua ntsound o_init objects objnam options \
+	   nhlobj nhlsel nhlua ntsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region restore rip rnd role rumors \
 	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed stubs symbols sys \

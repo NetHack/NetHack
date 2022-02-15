@@ -176,38 +176,6 @@ void nt_regularize(char* s) /* normalize file name */
             *lp = '_';
 }
 
-/*
- * This is used in nhlan.c to implement some of the LAN_FEATURES.
- */
-char *
-get_username(int *lan_username_size)
-{
-    static TCHAR username_buffer[BUFSZ];
-    DWORD i = BUFSZ - 1;
-    BOOL allowUserName = TRUE;
-
-    Strcpy(username_buffer, "NetHack");
-
-#ifndef WIN32CON
-    /* Our privacy policy for the windows store version of nethack makes
-     * a promise about not collecting any personally identifiable information.
-     * Do not allow getting user name if we being run from windows store
-     * version of nethack.  In 3.7, we should remove use of username.
-     */
-    allowUserName = !win10_is_desktop_bridge_application();
-#endif
-
-    if (allowUserName) {
-        /* i gets updated with actual size */
-        if (GetUserName(username_buffer, &i))
-            username_buffer[i] = '\0';
-    }
-
-    if (lan_username_size)
-        *lan_username_size = strlen(username_buffer);
-    return username_buffer;
-}
-
 #if 0
 char *getxxx(void)
 {
