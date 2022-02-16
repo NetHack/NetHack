@@ -1178,6 +1178,7 @@ extern void reset_pick(void);
 extern void maybe_reset_pick(struct obj *);
 extern struct obj *autokey(boolean);
 extern int pick_lock(struct obj *, xchar, xchar, struct obj *);
+extern boolean u_have_forceable_weapon(void);
 extern int doforce(void);
 extern boolean boxlock(struct obj *, struct obj *);
 extern boolean doorlock(struct obj *, int, int);

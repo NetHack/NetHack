@@ -602,6 +602,20 @@ pick_lock(struct obj *pick,
     return PICKLOCK_DID_SOMETHING;
 }
 
+/* is hero wielding a weapon that can #force? */
+boolean
+u_have_forceable_weapon(void)
+{
+    if (!uwep /* proper type test */
+        || ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
+            ? (objects[uwep->otyp].oc_skill < P_DAGGER
+               || objects[uwep->otyp].oc_skill == P_FLAIL
+               || objects[uwep->otyp].oc_skill > P_LANCE)
+            : uwep->oclass != ROCK_CLASS))
+        return FALSE;
+    return TRUE;
+}
+
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* the #force command - try to force a chest with your weapon */
@@ -616,12 +630,7 @@ doforce(void)
         You_cant("force anything from inside here.");
         return ECMD_OK;
     }
-    if (!uwep /* proper type test */
-        || ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
-               ? (objects[uwep->otyp].oc_skill < P_DAGGER
-                  || objects[uwep->otyp].oc_skill == P_FLAIL
-                  || objects[uwep->otyp].oc_skill > P_LANCE)
-               : uwep->oclass != ROCK_CLASS)) {
+    if (!u_have_forceable_weapon()) {
         You_cant("force anything %s weapon.",
                  !uwep ? "when not wielding a"
                        : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))

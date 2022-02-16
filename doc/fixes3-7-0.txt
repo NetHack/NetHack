@@ -778,6 +778,8 @@ monsters should growl even if you can't hear it
 give a sound effect message when thrown item lands in water or lava
 don't show rusting of items that land in water
 the water used on the Plane of Water stops thrown or kicked items
+looting will do #force if you could do it and the container is locked
+	and you didn't have a tool to unlock it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
