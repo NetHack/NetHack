@@ -330,6 +330,9 @@ growl_sound(register struct monst* mtmp)
     case MS_WAIL:
         ret = "wail";
         break;
+    case MS_GROAN:
+        ret = "groan";
+        break;
     case MS_MOO:
         ret = "low";
         break;
@@ -776,6 +779,10 @@ domonnoise(register struct monst* mtmp)
         break;
     case MS_WAIL:
         pline_msg = "wails mournfully.";
+        break;
+    case MS_GROAN:
+        if (!rn2(3))
+            pline_msg = "groans.";
         break;
     case MS_GURGLE:
         pline_msg = "gurgles.";

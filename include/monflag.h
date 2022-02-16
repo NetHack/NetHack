@@ -53,7 +53,8 @@ enum ms_sounds {
     MS_ORACLE   = 38,   /* do a consultation */
     MS_PRIEST   = 39,   /* ask for contribution; do cleansing */
     MS_SPELL    = 40,   /* spellcaster not matching any of the above */
-    MS_BOAST    = 41    /* giants */
+    MS_BOAST    = 41,   /* giants */
+    MS_GROAN    = 42    /* zombies groan */
 };
 
 #define MR_FIRE         0x01 /* resists fire */
