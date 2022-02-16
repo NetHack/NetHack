@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1644531493 2022/02/10 22:18:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.538 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1645000577 2022/02/16 08:36:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.540 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5843,43 +5843,85 @@ initoptions_init(void)
     nmcpy(g.pl_fruit, OBJ_NAME(objects[SLIME_MOLD]), PL_FSIZ);
 }
 
+/*
+ *  Process user's run-time configuration file:
+ *    get value of NETHACKOPTIONS;
+ *    if command line specified -nethackrc=filename, use that;
+ *      if NETHACKOPTIONS is present,
+ *        honor it if it has a list of options to set
+ *        or ignore it if it specifies a file name;
+ *    else if not specified on command line and NETHACKOPTIONS names a file,
+ *      use that as the config file;
+ *      no extra options (normal use of NETHACKOPTIONS) will be set;
+ *    otherwise (not on command line and either no NETHACKOPTIONS or that
+ *        isn't a file name),
+ *      pass Null to read_config_file() so that it will read ~/.nethackrc
+ *        by default,
+ *      then process the value of NETHACKOPTIONS as extra options.
+ */
 void
 initoptions_finish(void)
 {
     nhsym sym = 0;
+    char *opts = 0, *xtraopts = 0;
 #ifndef MAC
-    char *opts = getenv("NETHACKOPTIONS");
+    const char *envname, *namesrc, *nameval;
 
-    if (!opts)
-        opts = getenv("HACKOPTIONS");
-    if (opts) {
-        if (*opts == '/' || *opts == '\\' || *opts == '@') {
-            if (*opts == '@')
-                opts++; /* @filename */
-            /* looks like a filename */
-            if (strlen(opts) < BUFSZ / 2) {
-                config_error_init(TRUE, opts, CONFIG_ERROR_SECURE);
-                (void) read_config_file(opts, set_in_config);
-                config_error_done();
-            }
-        } else {
-            config_error_init(TRUE, (char *) 0, FALSE);
-            (void) read_config_file((char *) 0, set_in_config);
-            config_error_done();
-            /* let the total length of options be long;
-             * parseoptions() will check each individually
-             */
-            config_error_init(FALSE, "NETHACKOPTIONS", FALSE);
-            (void) parseoptions(opts, TRUE, FALSE);
-            config_error_done();
-        }
+    /* getenv() instead of nhgetenv(): let total length of options be long;
+       parseoptions() will check each individually */
+    envname = "NETHACKOPTIONS";
+    opts = getenv(envname);
+    if (!opts) {
+        /* fall back to original name; discouraged */
+        envname = "HACKOPTIONS";
+        opts = getenv(envname);
+    }
+
+    if (g.cmdline_rcfile) {
+        namesrc = "command line";
+        nameval = g.cmdline_rcfile;
+        free((genericptr_t) g.cmdline_rcfile), g.cmdline_rcfile = 0;
+        xtraopts = opts;
+        if (opts && (*opts == '/' || *opts == '\\' || *opts == '@'))
+            xtraopts = 0; /* NETHACKOPTIONS is a file name; ignore it */
+    } else if (opts && (*opts == '/' || *opts == '\\' || *opts == '@')) {
+        /* NETHACKOPTIONS is a file name; use that instead of the default */
+        if (*opts == '@')
+            ++opts; /* @filename */
+        namesrc = envname;
+        nameval = opts;
+        xtraopts = 0;
     } else
 #endif /* !MAC */
     /*else*/ {
-        config_error_init(TRUE, (char *) 0, FALSE);
-        (void) read_config_file((char *) 0, set_in_config);
+        /* either no NETHACKOPTIONS or it wasn't a file name;
+           read the default configuration file */
+        nameval = namesrc = 0;
+        xtraopts = opts;
+    }
+
+    /* seemingly arbitrary name length restriction is to prevent error
+       messages, if any were to be delivered while accessing the file,
+       from potentially overflowing buffers */
+    if (nameval && (int) strlen(nameval) >= BUFSZ / 2) {
+        config_error_init(TRUE, namesrc, FALSE);
+        config_error_add(
+                   "nethackrc file name \"%.40s\"... too long; using default",
+                         nameval);
+        config_error_done();
+        nameval = namesrc = 0; /* revert to default nethackrc */
+    }
+
+    config_error_init(TRUE, nameval, nameval ? CONFIG_ERROR_SECURE : FALSE);
+    (void) read_config_file(nameval, set_in_config);
+    config_error_done();
+    if (xtraopts) {
+        /* NETHACKOPTIONS is present and not a file name */
+        config_error_init(FALSE, envname, FALSE);
+        (void) parseoptions(xtraopts, TRUE, FALSE);
         config_error_done();
     }
+    /*[end of nethackrc handling]*/
 
     (void) fruitadd(g.pl_fruit, (struct fruit *) 0);
     /*

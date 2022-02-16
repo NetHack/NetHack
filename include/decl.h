@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1627408982 2021/07/27 18:03:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1645000560 2022/02/16 08:36:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -918,6 +918,7 @@ struct instance_globals {
     struct rogueroom r[3][3];
 
     /* files.c */
+    char *cmdline_rcfile;  /* set in unixmain.c, used in options.c */
     char wizkit[WIZKIT_MAX];
     int lockptr;
     char *config_section_chosen;

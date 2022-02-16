@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1606919256 2020/12/02 14:27:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1645000574 2022/02/16 08:36:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -405,6 +405,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES,
 
     /* files.c */
+    NULL, /* cmdline_rcfile */
     UNDEFINED_VALUES, /* wizkit */
     UNDEFINED_VALUE, /* lockptr */
     NULL, /* config_section_chosen */
