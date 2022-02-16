@@ -2766,9 +2766,8 @@ void
 ubreatheu(struct attack *mattk)
 {
     int dtyp = 20 + mattk->adtyp - 1;      /* breath by hero */
-    const char *fltxt = flash_types[dtyp]; /* blast of <something> */
 
-    zhitu(dtyp, mattk->damn, fltxt, u.ux, u.uy);
+    zhitu(dtyp, mattk->damn, flash_str(dtyp, TRUE), u.ux, u.uy);
 }
 
 /* light damages hero in gremlin form */
@@ -4246,14 +4245,14 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE;
-    const char *fltxt;
     struct obj *otmp;
     int spell_type;
+    int fltyp = (type <= -30) ? abstype : abs(type);
+    int habstype = Hallucination ? rn2(6) : abstype;
 
     /* if its a Hero Spell then get its SPE_TYPE */
     spell_type = is_hero_spell(type) ? SPE_MAGIC_MISSILE + abstype : 0;
 
-    fltxt = flash_types[(type <= -30) ? abstype : abs(type)];
     if (u.uswallow) {
         register int tmp;
 
@@ -4263,8 +4262,8 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
         if (!u.ustuck) {
             u.uswallow = 0;
         } else {
-            pline("%s rips into %s%s", The(fltxt), mon_nam(u.ustuck),
-                  exclam(tmp));
+            pline("%s rips into %s%s", The(flash_str(fltyp, FALSE)),
+                  mon_nam(u.ustuck), exclam(tmp));
             /* Using disintegration from the inside only makes a hole... */
             if (tmp == MAGIC_COOKIE)
                 u.ustuck->mhp = 0;
@@ -4280,7 +4279,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
         range = 1;
     save_bhitpos = g.bhitpos;
 
-    tmp_at(DISP_BEAM, zapdir_to_glyph(dx, dy, abstype));
+    tmp_at(DISP_BEAM, zapdir_to_glyph(dx, dy, habstype));
     while (range-- > 0) {
         lsx = sx;
         sx += dx;
@@ -4322,7 +4321,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {
-                        hit(fltxt, mon, exclam(0));
+                        hit(flash_str(fltyp, FALSE), mon, exclam(0));
                         shieldeff(mon->mx, mon->my);
                         (void) mon_reflects(mon,
                                             "But it reflects from %s %s!");
@@ -4336,7 +4335,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     if (is_rider(mon->data)
                         && abs(type) == ZT_BREATH(ZT_DEATH)) {
                         if (canseemon(mon)) {
-                            hit(fltxt, mon, ".");
+                            hit(flash_str(fltyp, FALSE), mon, ".");
                             pline("%s disintegrates.", Monnam(mon));
                             pline("%s body reintegrates before your %s!",
                                   s_suffix(Monnam(mon)),
@@ -4350,7 +4349,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     }
                     if (mon->data == &mons[PM_DEATH] && abstype == ZT_DEATH) {
                         if (canseemon(mon)) {
-                            hit(fltxt, mon, ".");
+                            hit(flash_str(fltyp, FALSE), mon, ".");
                             pline("%s absorbs the deadly %s!", Monnam(mon),
                                   type == ZT_BREATH(ZT_DEATH) ? "blast"
                                                               : "ray");
@@ -4360,11 +4359,11 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     }
 
                     if (tmp == MAGIC_COOKIE) { /* disintegration */
-                        disintegrate_mon(mon, type, fltxt);
+                        disintegrate_mon(mon, type, flash_str(fltyp, FALSE));
                     } else if (DEADMONSTER(mon)) {
                         if (type < 0) {
                             /* mon has just been killed by another monster */
-                            monkilled(mon, fltxt, AD_RBRE);
+                            monkilled(mon, flash_str(fltyp, FALSE), AD_RBRE);
                         } else {
                             int xkflags = XKILL_GIVEMSG; /* killed(mon); */
 
@@ -4382,7 +4381,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                         if (!otmp) {
                             /* normal non-fatal hit */
                             if (say || canseemon(mon))
-                                hit(fltxt, mon, exclam(tmp));
+                                hit(flash_str(fltyp, FALSE), mon, exclam(tmp));
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
@@ -4398,7 +4397,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                 range -= 2;
             } else {
                 if (say || canseemon(mon))
-                    miss(fltxt, mon);
+                    miss(flash_str(fltyp, FALSE), mon);
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0);
@@ -4407,7 +4406,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                 goto buzzmonst;
             } else if (zap_hit((int) u.uac, 0)) {
                 range -= 2;
-                pline("%s hits you!", The(fltxt));
+                pline("%s hits you!", The(flash_str(fltyp, FALSE)));
                 if (Reflecting) {
                     if (!Blind) {
                         (void) ureflects("But %s reflects from your %s!",
@@ -4419,10 +4418,12 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     dy = -dy;
                     shieldeff(sx, sy);
                 } else {
-                    zhitu(type, nd, fltxt, sx, sy);
+                    /* flash_str here only used for killer; suppress
+                     * hallucination */
+                    zhitu(type, nd, flash_str(fltyp, TRUE), sx, sy);
                 }
             } else if (!Blind) {
-                pline("%s whizzes by you!", The(fltxt));
+                pline("%s whizzes by you!", The(flash_str(fltyp, FALSE)));
             } else if (abstype == ZT_LIGHTNING) {
                 Your("%s tingles.", body_part(ARM));
             }
@@ -4447,7 +4448,8 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
                 || fireball) {
                 if (Is_airlevel(&u.uz)) { /* nothing to bounce off of */
-                    pline_The("%s vanishes into the aether!", fltxt);
+                    pline_The("%s vanishes into the aether!",
+                              flash_str(fltyp, FALSE));
                     if (fireball)
                         type = ZT_WAND(ZT_FIRE); /* skip pending fireball */
                     break;
@@ -4456,7 +4458,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     sy = lsy;
                     break; /* fireballs explode before the obstacle */
                 } else
-                    pline_The("%s bounces!", fltxt);
+                    pline_The("%s bounces!", flash_str(fltyp, FALSE));
             }
             if (!dx || !dy || !rn2(bchance)) {
                 dx = -dx;
@@ -4485,7 +4487,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                     dx = -dx;
                     break;
                 }
-                tmp_at(DISP_CHANGE, zapdir_to_glyph(dx, dy, abstype));
+                tmp_at(DISP_CHANGE, zapdir_to_glyph(dx, dy, habstype));
             }
         }
     }
@@ -5600,6 +5602,27 @@ makewish(void)
                                    (const char *) 0);
         u.ublesscnt += rn1(100, 50); /* the gods take notice */
     }
+}
+
+/* Fills buf with the appropriate string for this ray.
+ * In the hallucination case, insert "blast of <silly thing>".
+ * Assumes that the caller will specify typ in the appropriate range for
+ * wand/spell/breath weapon. */
+const char*
+flash_str(int typ,
+          boolean nohallu) /* suppress hallucination (for death reasons) */
+{
+    static char fltxt[BUFSZ];
+    if (Hallucination && !nohallu) {
+        /* always return "blast of foo" for simplicity.
+         * This could be extended with hallucinatory rays, but probably not worth
+         * it at this time. */
+        Sprintf(fltxt, "blast of %s", rnd_hallublast());
+    }
+    else {
+        Strcpy(fltxt, flash_types[typ]);
+    }
+    return fltxt;
 }
 
 /*zap.c*/

@@ -7,6 +7,7 @@
 
 static int monmulti(struct monst *, struct obj *, struct obj *);
 static void monshoot(struct monst *, struct obj *, struct obj *);
+static const char* breathwep_name(int);
 static int drop_throw(struct obj *, boolean, int, int);
 static int m_lined_up(struct monst *, struct monst *);
 
@@ -21,6 +22,33 @@ static NEARDATA const char *breathwep[] = {
     "lightning", "poison gas", "acid", "strange breath #8",
     "strange breath #9"
 };
+
+/* hallucinatory ray types */
+const char *const hallublasts[] = {
+    "asteroids", "beads", "bubbles", "butterflies", "champagne", "chaos",
+    "coins", "cotton candy", "crumbs", "dark matter", "darkness", "dust specks",
+    "emoticons", "emotions", "entropy", "flowers", "foam", "fog", "gamma rays",
+    "gelatin", "gemstones", "ghosts", "glass shards", "glitter", "good vibes",
+    "gravel", "gravity", "gravy", "grawlixes", "holy light", "hornets",
+    "hot air", "hyphens", "hypnosis", "infrared", "insects", "laser beams",
+    "leaves", "lightening", "logic gates", "magma", "marbles", "mathematics",
+    "megabytes", "metal shavings", "metapatterns", "meteors", "mist", "mud",
+    "music", "nanites", "needles", "noise", "nostalgia", "oil", "paint",
+    "photons", "pixels", "plasma", "polarity", "powder", "powerups",
+    "prismatic light", "pure logic", "purple", "radio waves", "rainbows",
+    "rock music", "rocket fuel", "rope", "sadness", "salt", "sand", "scrolls",
+    "sludge", "smileys", "snowflakes", "sparkles", "specularity", "spores",
+    "stars", "steam", "tetrahedrons", "text", "the past", "tornadoes",
+    "toxic waste", "ultraviolet light", "viruses", "water", "waveforms", "wind",
+    "X-rays", "zorkmids"
+};
+
+/* Return a random hallucinatory blast. */
+const char *
+rnd_hallublast(void)
+{
+    return hallublasts[rn2(SIZE(hallublasts))];
+}
 
 boolean
 m_has_launcher_and_ammo(struct monst* mtmp)
@@ -829,6 +857,18 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
     return MM_MISS;
 }
 
+/* Return the name of a breath weapon. If the player is hallucinating, return
+ * a silly name instead.
+ * typ is AD_MAGM, AD_FIRE, etc */
+static const char *
+breathwep_name(int typ)
+{
+    if (Hallucination)
+        return rnd_hallublast();
+
+    return breathwep[typ - 1];
+}
+
 /* monster breathes at monster (ranged) */
 int
 breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
@@ -858,7 +898,8 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
                 boolean utarget = (mtarg == &g.youmonst);
                 if (canseemon(mtmp))
-                    pline("%s breathes %s!", Monnam(mtmp), breathwep[typ - 1]);
+                    pline("%s breathes %s!",
+                          Monnam(mtmp), breathwep_name(typ));
                 dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), utarget);
                 nomul(0);

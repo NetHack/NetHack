@@ -1670,6 +1670,7 @@ extern void Delay(int);
 
 /* ### mthrowu.c ### */
 
+extern const char *rnd_hallublast(void);
 extern boolean m_has_launcher_and_ammo(struct monst *);
 extern int thitu(int, int, struct obj **, const char *);
 extern int ohitmon(struct monst *, struct obj *, int, boolean);
@@ -3279,6 +3280,7 @@ extern void destroy_item(int, int);
 extern int destroy_mitem(struct monst *, int, int);
 extern int resist(struct monst *, char, int, int);
 extern void makewish(void);
+extern const char *flash_str(int, boolean);
 
 #endif /* !MAKEDEFS_C && !MDLIB_C */
 
