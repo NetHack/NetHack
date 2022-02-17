@@ -543,6 +543,7 @@ enum bodypart_types {
 #define ECMD_OK     0x00 /* cmd done successfully */
 #define ECMD_TIME   0x01 /* cmd took time, uses up a turn */
 #define ECMD_CANCEL 0x02 /* cmd canceled by user */
+#define ECMD_FAIL   0x04 /* cmd failed to finish, maybe with a yafm */
 
 /* values returned from getobj() callback functions */
 enum getobj_callback_returns {

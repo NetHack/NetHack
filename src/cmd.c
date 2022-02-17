@@ -3976,9 +3976,9 @@ rhack(char *cmd)
                 prefix_seen = 0;
                 was_m_prefix = FALSE;
             }
-            if ((res & ECMD_CANCEL)) {
+            if ((res & (ECMD_CANCEL|ECMD_FAIL))) {
                 /* command was canceled by user, maybe they declined to
-                   pick an object to act on. */
+                   pick an object to act on, or command failed to finish */
                 reset_cmd_vars(TRUE);
                 prefix_seen = 0;
                 cmdq_ec = NULL;

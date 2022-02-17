@@ -168,6 +168,7 @@ ready_weapon(struct obj *wep)
         You("cannot wield a two-handed %s while wearing a shield.",
             is_sword(wep) ? "sword" : wep->otyp == BATTLE_AXE ? "axe"
                                                               : "weapon");
+        res = ECMD_FAIL;
     } else if (!retouch_object(&wep, FALSE)) {
         res = ECMD_TIME; /* takes a turn even though it doesn't get wielded */
     } else {
@@ -420,7 +421,7 @@ dowield(void)
         setuswapwep(oldwep);
     untwoweapon();
 
-    return result ? ECMD_TIME : ECMD_OK;
+    return result;
 }
 
 /* the #swap command - swap wielded and secondary weapons */
@@ -466,7 +467,7 @@ doswapweapon(void)
     if (u.twoweap && !can_twoweapon())
         untwoweapon();
 
-    return result ? ECMD_TIME : ECMD_OK;
+    return result;
 }
 
 /* the #quiver command */
