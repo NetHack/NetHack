@@ -268,6 +268,7 @@ check_caitiff(struct monst *mtmp)
         return;
 
     if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL
+        && !is_undead(mtmp->data)
         && (!mtmp->mcanmove || mtmp->msleeping
             || (mtmp->mflee && !mtmp->mavenge))) {
         You("caitiff!");

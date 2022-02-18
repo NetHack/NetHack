@@ -784,6 +784,7 @@ use silly names for rays (such as breath weapons) when hallucinating
 zombies groan instead of being silent
 martial arts users, sasquatches, and heroes wearing kicking boots can
 	no longer miss a monster completely with a clumsy kick
+knights get no caitiff penalty against undead
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
