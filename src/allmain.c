@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1644517022 2022/02/10 18:17:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1645223894 2022/02/18 22:38:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.177 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -845,7 +845,6 @@ extern int windows_early_options(const char *);
  *    1 = found and skip past this argument
  *    2 = found and trigger immediate exit
  */
-
 int
 argcheck(int argc, char *argv[], enum earlyarg e_arg)
 {
@@ -858,7 +857,7 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         if (earlyopts[idx].e == e_arg)
             break;
     }
-    if ((idx >= SIZE(earlyopts)) || (argc <= 1))
+    if (idx >= SIZE(earlyopts) || argc < 1)
         return FALSE;
 
     for (i = 0; i < argc; ++i) {

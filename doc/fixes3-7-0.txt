@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.788 $ $NHDT-Date: 1644610217 2022/02/11 20:10:17 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.799 $ $NHDT-Date: 1645223893 2022/02/18 22:38:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1232,6 +1232,7 @@ Unix: add "ec2-user" to the list of user names 'sysconf' classifies as generic
 Unix: work-around a build issue in ubuntu 21.10 by using ifdef to skip the
 	define of warn_unused_result to empty string in tradstdc.h whenever
 	__linux__ is defined during build unless GCC_URWARN is also defined
+Unix: re-do command line parsing
 user_sounds: move the message hook from inside individual window display ports
 	to the core where it allows MSGTYP_NOSHOW msgtyp's to still trigger
 	sounds to correct a reported github issue; also fixes a past reported
@@ -1470,6 +1471,9 @@ tty: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous --More-- prompt
 Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 	unixconf.h from enabling SUSPEND without need to modify unixconf.h
+Unix: support --nethackrc=filename on the command line; same effect as
+	NETHACKOPTIONS='@filename' but leaves NETHACKOPTIONS available for
+	specifying options; --no-nethackrc is same as --nethackrc=/dev/null
 X11: implement 'selectsaved', restore via menu of saved games
 X11: echo getline prompt and response (wishes, applying names) to message
 	window and dumplog message history
