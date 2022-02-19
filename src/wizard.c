@@ -815,6 +815,7 @@ cuss(struct monst *mtmp)
         else
             com_pager("demon_cuss");
     }
+    wake_nearto(mtmp->mx, mtmp->my, 5 * 5);
 }
 
 /*wizard.c*/
