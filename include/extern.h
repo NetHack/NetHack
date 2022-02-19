@@ -955,6 +955,7 @@ extern char lowc(char);
 extern char *lcase(char *);
 extern char *ucase(char *);
 extern char *upstart(char *);
+extern char *upwords(char *);
 extern char *mungspaces(char *);
 extern char *trimspaces(char *);
 extern char *strip_newline(char *);

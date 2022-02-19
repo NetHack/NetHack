@@ -18,6 +18,7 @@
         char *          lcase           (char *)
         char *          ucase           (char *)
         char *          upstart         (char *)
+        char *          upwords         (char *)
         char *          mungspaces      (char *)
         char *          trimspaces      (char *)
         char *          strip_newline   (char *)
@@ -144,6 +145,25 @@ upstart(char *s)
 {
     if (s)
         *s = highc(*s);
+    return s;
+}
+
+/* capitalize first letter of every word in a string (in place) */
+char *
+upwords(char *s)
+{
+    char *p;
+    boolean space = TRUE;
+
+    for (p = s; *p; p++)
+        if (*p == ' ') {
+            space = TRUE;
+        } else if (space && letter(*p)) {
+            *p = highc(*p);
+            space = FALSE;
+        } else {
+            space = FALSE;
+        }
     return s;
 }
 

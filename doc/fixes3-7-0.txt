@@ -789,6 +789,7 @@ candy bars are bright blue in text mode
 towels weigh more than blindfolds
 knight quest home level contains some saddled warhorses
 allow creating unhidden traps in special levels
+reading magic marker shows the specific red ink color
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

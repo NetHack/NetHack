@@ -489,13 +489,22 @@ doread(void)
         pline("This %s has no label.", singular(scroll, xname));
         return ECMD_OK;
     } else if (otyp == MAGIC_MARKER) {
+        char buf[BUFSZ];
+        const int red_mons[] = { PM_FIRE_ANT, PM_PYROLISK, PM_HELL_HOUND,
+            PM_IMP, PM_LARGE_MIMIC, PM_LEOCROTTA, PM_SCORPION, PM_XAN,
+            PM_GIANT_BAT, PM_WATER_MOCCASIN, PM_FLESH_GOLEM, PM_BARBED_DEVIL,
+            PM_MARILITH, PM_PIRANHA };
+        struct permonst *pm = &mons[red_mons[scroll->o_id % SIZE(red_mons)]];
+
         if (Blind) {
             You_cant(find_any_braille);
             return ECMD_OK;
         }
         if (flags.verbose)
             pline("It reads:");
-        pline("\"Magic Marker(TM) Red Ink Marker Pen.  Water Soluble.\"");
+        Sprintf(buf, "%s", pmname(pm, NEUTRAL));
+        pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
+              upwords(buf));
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a magic marker");
