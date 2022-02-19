@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1609617569 2021/01/02 19:59:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1645311270 2022/02/19 22:54:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -970,7 +970,8 @@ dog_move(register struct monst *mtmp,
         uncursedcnt++;
     }
 
-    better_with_displacing = should_displace(mtmp, poss, info, cnt, g.gx, g.gy);
+    better_with_displacing = should_displace(mtmp, poss, info, cnt,
+                                             g.gx, g.gy);
 
     chcnt = 0;
     chi = -1;
@@ -1097,10 +1098,11 @@ dog_move(register struct monst *mtmp,
             && rn2(13 * uncursedcnt))
             continue;
 
-        /* lessen the chance of backtracking to previous position(s) */
-        /* This causes unintended issues for pets trying to follow
-           the hero. Thus, only run it if not leashed and >5 tiles
-           away. */
+        /*
+         * Lessen the chance of backtracking to previous position(s).
+         * This causes unintended issues for pets trying to follow the
+         * hero.  Thus, only run it if not leashed and >5 tiles away.
+         */
         if (!mtmp->mleashed && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 5) {
             k = has_edog ? uncursedcnt : cnt;
             for (j = 0; j < MTSZ && j < k - 1; j++)
@@ -1140,8 +1142,7 @@ dog_move(register struct monst *mtmp,
         }
 
         /* Identify the best target in a straight line from the pet;
-         * if there is such a target, we'll let the pet attempt an
-         * attack.
+         * if there is such a target, we'll let the pet attempt an attack.
          */
         mtarg = best_target(mtmp);
 
@@ -1153,10 +1154,11 @@ dog_move(register struct monst *mtmp,
                 if (mattacku(mtmp))
                     return 2;
                 /* Treat this as the pet having initiated an attack even if it
-                 * didn't, so it will lose its move. This isn't entirely fair,
-                 * but mattacku doesn't distinguish between "did not attack" and
-                 * "attacked but didn't die" cases, and this is preferable to
-                 * letting the pet attack the player and continuing to move */
+                 * didn't, so it will lose its move.  This isn't entirely fair,
+                 * but mattacku doesn't distinguish between "did not attack"
+                 * and "attacked but didn't die" cases, and this is preferable
+                 * to letting the pet attack the player and continuing to move.
+                 */
                 mstatus = MM_HIT;
             } else {
                 mstatus = mattackm(mtmp, mtarg);
@@ -1172,7 +1174,7 @@ dog_move(register struct monst *mtmp,
                 if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED)
                     && rn2(4) && mtarg != &g.youmonst) {
 
-                    /* Can monster see? If it can, it can retaliate
+                    /* Can monster see?  If it can, it can retaliate
                      * even if the pet is invisible, since it'll see
                      * the direction from which the ranged attack came;
                      * if it's blind or unseeing, it can't retaliate
@@ -1184,15 +1186,15 @@ dog_move(register struct monst *mtmp,
                     }
                 }
             }
-            /* Only return 3 if the pet actually made a ranged attack, and thus
-             * should lose the rest of its move.
+            /* Only return 3 if the pet actually made a ranged attack, and
+             * thus should lose the rest of its move.
              * There's a chain of assumptions here:
-             * 1. score_targ and best_target will never select a monster that
-             *    can be attacked in melee, so the mattackm call can only ever
-             *    try ranged options
-             * 2. if the only attacks available to mattackm are ranged options,
-             *    and the monster cannot make a ranged attack, it will return
-             *    MM_MISS.
+             * 1. score_targ and best_target will never select a monster
+             *    that can be attacked in melee, so the mattackm call can
+             *    only ever try ranged options
+             * 2. if the only attacks available to mattackm are ranged
+             *    options, and the monster cannot make a ranged attack, it
+             *    will return MM_MISS.
              */
             if (mstatus != MM_MISS)
                 return 3;
