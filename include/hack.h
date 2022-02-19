@@ -519,6 +519,7 @@ enum bodypart_types {
 #define MKTRAP_NOFLAGS       0x0
 #define MKTRAP_MAZEFLAG      0x1 /* trap placed on coords as if in maze */
 #define MKTRAP_NOSPIDERONWEB 0x2 /* web will not generate a spider */
+#define MKTRAP_SEEN          0x4 /* trap is seen */
 
 #define MON_POLE_DIST 5 /* How far monsters can use pole-weapons */
 #define PET_MISSILE_RANGE2 36 /* Square of distance within which pets shoot */
