@@ -2269,6 +2269,10 @@ fpostfx(struct obj *otmp)
                 livelog_printf(LL_CONDUCT, "became literate by reading the fortune inside a cookie");
         break;
     case LUMP_OF_ROYAL_JELLY:
+        if (g.youmonst.data == &mons[PM_KILLER_BEE] && !Unchanging
+            && polymon(PM_QUEEN_BEE))
+            break;
+
         /* This stuff seems to be VERY healthy! */
         gainstr(otmp, 1, TRUE);
         if (Upolyd) {
