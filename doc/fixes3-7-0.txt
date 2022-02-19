@@ -786,6 +786,7 @@ martial arts users, sasquatches, and heroes wearing kicking boots can
 	no longer miss a monster completely with a clumsy kick
 knights get no caitiff penalty against undead
 candy bars are bright blue in text mode
+towels weigh more than blindfolds
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
