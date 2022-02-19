@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.799 $ $NHDT-Date: 1645223893 2022/02/18 22:38:13 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.806 $ $NHDT-Date: 1645298657 2022/02/19 19:24:17 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1028,6 +1028,9 @@ when trapeffect_selector() returns 2 to caller mintrap(), meant to signify
 	returns that value too
 have com_pager() check for failed nhl_init(); probably can't actually happen
 	because the program would never get that far if lua init was failing
+rearranging first-kill and first-hit gamelog messages to get hit before kill
+	ordering resulted in "hit with a wielded weapon for first time" being
+	given twice if that hit was delivered via applied polearm
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
