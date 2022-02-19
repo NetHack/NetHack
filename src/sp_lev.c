@@ -2198,7 +2198,10 @@ create_object(object* o, struct mkroom* croom)
                 ; /* ['otmp' remains on floor] */
             } else {
                 remove_object(otmp);
-                (void) mpickobj(invent_carrying_monster, otmp);
+                if (otmp->otyp == SADDLE)
+                    put_saddle_on_mon(otmp, invent_carrying_monster);
+                else
+                    (void) mpickobj(invent_carrying_monster, otmp);
             }
         } else {
             struct obj *cobj = container_obj[container_idx - 1];

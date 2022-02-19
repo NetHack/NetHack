@@ -103,3 +103,7 @@ des.monster({ id = "quasit", x=32, y=00, peaceful=0 })
 des.monster({ id = "quasit", x=34, y=00, peaceful=0 })
 des.monster({ id = "quasit", x=36, y=00, peaceful=0 })
 
+-- Some warhorses
+for i = 1, 2 + nh.rn2(3) do
+    des.monster({ id = "warhorse", peaceful = 1, inventory = function() if percent(50) then des.object("saddle"); end end });
+end
