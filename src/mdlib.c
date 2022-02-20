@@ -839,7 +839,7 @@ do_runtime_info(int *rtcontext)
 }
 
 void
-release_runtime_info()
+release_runtime_info(void)
 {
     while (idxopttext > 0) {
         --idxopttext;
