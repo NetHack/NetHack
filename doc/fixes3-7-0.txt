@@ -793,6 +793,8 @@ reading magic marker shows the specific red ink color
 imps and other creatures cussing hero wake up nearby monsters
 make ravens oviparous
 thrown items can get stuck in webs
+engraving with Fire Brand burns the text on the floor and does not
+	dull the artifact
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

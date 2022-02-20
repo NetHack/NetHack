@@ -838,7 +838,9 @@ doengrave(void)
         break;
 
     case WEAPON_CLASS:
-        if (is_blade(otmp)) {
+        if (otmp->oartifact == ART_FIRE_BRAND)
+            type = BURN;
+        else if (is_blade(otmp)) {
             if ((int) otmp->spe > -3)
                 type = ENGRAVE;
             else
