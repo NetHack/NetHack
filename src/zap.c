@@ -3405,6 +3405,7 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
 {
     struct monst *mtmp, *result = (struct monst *) 0;
     struct obj *obj = *pobj;
+    struct trap *ttmp;
     uchar typ;
     boolean shopdoor = FALSE, point_blank = TRUE;
     boolean in_skip = FALSE, allow_skip = FALSE;
@@ -3517,6 +3518,18 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
             maybe_explode_trap(t_at(g.bhitpos.x, g.bhitpos.y), obj);
 
         mtmp = m_at(g.bhitpos.x, g.bhitpos.y);
+        ttmp = t_at(g.bhitpos.x, g.bhitpos.y);
+
+        if (!mtmp && ttmp && (ttmp->ttyp == WEB)
+            && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
+            && !rn2(3)) {
+            if (cansee(g.bhitpos.x, g.bhitpos.y)) {
+                pline("%s gets stuck in a web!", Yname2(obj));
+                ttmp->tseen = TRUE;
+                newsym(g.bhitpos.x, g.bhitpos.y);
+            }
+            break;
+        }
 
         /*
          * skipping rocks
