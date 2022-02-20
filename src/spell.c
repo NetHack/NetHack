@@ -1947,4 +1947,27 @@ spell_idx(short otyp)
     return -1;
 }
 
+/* forcibly learn spell otyp, if possible */
+boolean
+force_learn_spell(short otyp)
+{
+    int i;
+
+    if (known_spell(otyp))
+        return FALSE;
+
+    for (i = 0; i < MAXSPELL; i++)
+        if (spellid(i) == NO_SPELL)
+            break;
+    if (i == MAXSPELL)
+        impossible("Too many spells memorized");
+    else {
+        g.spl_book[i].sp_id = otyp;
+        g.spl_book[i].sp_lev = objects[otyp].oc_level;
+        incrnknow(i, 1);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /*spell.c*/

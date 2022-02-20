@@ -798,6 +798,8 @@ engraving with Fire Brand burns the text on the floor and does not
 make looting less tedious by getting rid of a y/n prompt making the command
 	go directly into the loot-in-out -menu
 always give a message when monster changes form via polytrap if seen
+illiterate hero receiving a spellbook from their deity gets the spell shoved
+	directly into their mind instead
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

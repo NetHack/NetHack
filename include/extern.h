@@ -2538,6 +2538,7 @@ extern int dovspell(void);
 extern void initialspell(struct obj *);
 extern boolean known_spell(short);
 extern int spell_idx(short);
+extern boolean force_learn_spell(short);
 
 /* ### steal.c ### */
 

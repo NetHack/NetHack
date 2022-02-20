@@ -1201,10 +1201,17 @@ pleased(aligntyp g_align)
                 }
                 otmp->otyp = rnd_class(g.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
             }
-            bless(otmp);
-            at_your_feet("A spellbook");
-            place_object(otmp, u.ux, u.uy);
-            newsym(u.ux, u.uy);
+            if (!u.uconduct.literate && !known_spell(otmp->otyp)) {
+                if (force_learn_spell(otmp->otyp))
+                    pline("Divine knowledge of %s fills your mind!",
+                          OBJ_NAME(objects[otmp->otyp]));
+                obfree(otmp, (struct obj *) 0);
+            } else {
+                bless(otmp);
+                at_your_feet("A spellbook");
+                place_object(otmp, u.ux, u.uy);
+                newsym(u.ux, u.uy);
+            }
             break;
         }
         default:
