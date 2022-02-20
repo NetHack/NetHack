@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1639622361 2021/12/16 02:39:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1645393932 2022/02/20 21:52:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -180,6 +180,18 @@ extern unsigned _stklen = STKSIZ;
 
 #include "../src/mdlib.c"
 
+static void makedefs_exit(int) NORETURN;
+
+static void
+makedefs_exit(int how)
+{
+#if 0   /* makedefs doesn't need to do this */
+    release_runtime_info(); /* dynamic data from mdlib.c and date.c */
+#endif
+    exit(how);
+    /*NOTREACHED*/
+}
+
 #ifdef MACsansMPWTOOL
 int
 main(void)
@@ -203,12 +215,14 @@ main(void)
         do_ext_makedefs(fakeargc, fakeargv);
 #else
         printf("extended makedefs not implemented for Mac OS9\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
 #endif
     }
 
     do_makedefs(buf);
-    exit(EXIT_SUCCESS);
+    makedefs_exit(EXIT_SUCCESS);
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -227,7 +241,8 @@ main(int argc, char *argv[])
         && !(argv[1][0] == '-' && argv[1][1] == '-'))) {
         Fprintf(stderr, "Bad arg count (%d).\n", argc - 1);
         (void) fflush(stderr);
-        return 1;
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
 #ifdef FILE_PREFIX
@@ -243,7 +258,7 @@ main(int argc, char *argv[])
     } else {
         do_makedefs(&argv[1][1]);
     }
-    exit(EXIT_SUCCESS);
+    makedefs_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
 }
@@ -330,12 +345,14 @@ do_makedefs(char *options)
         default:
             Fprintf(stderr, "Unknown option '%c'.\n", *options);
             (void) fflush(stderr);
-            exit(EXIT_FAILURE);
+            makedefs_exit(EXIT_FAILURE);
+            /*NOTREACHED*/
         }
         options++;
     }
     if (more_than_one)
         Fprintf(stderr, "Completed.\n"); /* feedback */
+    return;
 }
 
 static char namebuf[1000];
@@ -390,7 +407,8 @@ getfp(const char* template, const char* tag, const char* mode, int flg)
                 istemp ? tmpfbuf :
 #endif
                  name);
-            exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     return rv;
 }
@@ -427,7 +445,8 @@ static int grep_trace = 0;
     argv++, argc--;                          \
     if (argc == 0) {                         \
         Fprintf(stderr, "missing option\n"); \
-        exit(EXIT_FAILURE);                  \
+        makedefs_exit(EXIT_FAILURE);         \
+        /*NOTREACHED*/                       \
     }
 
 static void
@@ -443,7 +462,8 @@ do_ext_makedefs(int argc, char **argv)
             break;
         if (argv[0][1] != '-') {
             Fprintf(stderr, "Can't mix - and -- options.\n");
-            exit(EXIT_FAILURE);
+            makedefs_exit(EXIT_FAILURE);
+            /*NOTREACHED*/
         }
         IS_OPTION("svs") {
             /* short version string for packaging - note no \n */
@@ -455,7 +475,8 @@ do_ext_makedefs(int argc, char **argv)
             if (argv[0])
                 strcpy(delim, argv[0]);
             Fprintf(stdout, "%s", mdlib_version_string(buf, delim));
-            exit(EXIT_SUCCESS);
+            makedefs_exit(EXIT_SUCCESS);
+            /*NOTREACHED*/
         }
         IS_OPTION("debug") {
             debug = TRUE;
@@ -464,7 +485,8 @@ do_ext_makedefs(int argc, char **argv)
         IS_OPTION("make") {
             CONSUME;
             do_makedefs(argv[0]);
-            exit(EXIT_SUCCESS);
+            makedefs_exit(EXIT_SUCCESS);
+            /*NOTREACHED*/
         }
         IS_OPTION("input") {
             CONSUME;
@@ -474,7 +496,8 @@ do_ext_makedefs(int argc, char **argv)
                 inputfp = fopen(argv[0], RDTMODE);
                 if (!inputfp) {
                     Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
-                    exit(EXIT_FAILURE);
+                    makedefs_exit(EXIT_FAILURE);
+                    /*NOTREACHED*/
                 }
             }
             CONTINUE;
@@ -487,7 +510,8 @@ do_ext_makedefs(int argc, char **argv)
                 outputfp = fopen(argv[0], WRTMODE);
                 if (!outputfp) {
                     Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
-                    exit(EXIT_FAILURE);
+                    makedefs_exit(EXIT_FAILURE);
+                    /*NOTREACHED*/
                 }
             }
             CONTINUE;
@@ -495,14 +519,16 @@ do_ext_makedefs(int argc, char **argv)
         IS_OPTION("grep") {
             if (todo) {
                 Fprintf(stderr, "Can't do grep and something else.\n");
-                exit(EXIT_FAILURE);
+                makedefs_exit(EXIT_FAILURE);
+                /*NOTREACHED*/
             }
             todo = TODO_GREP;
             CONTINUE;
         }
         IS_OPTION("grep-showvars") {
             do_grep_showvars();
-            exit(EXIT_SUCCESS);
+            makedefs_exit(EXIT_SUCCESS);
+            /*NOTREACHED*/
         }
         IS_OPTION("grep-trace") {
             grep_trace = 1;
@@ -517,7 +543,8 @@ do_ext_makedefs(int argc, char **argv)
                 p->is_defined = 1;
             } else {
                 Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
-                exit(EXIT_FAILURE);
+                makedefs_exit(EXIT_FAILURE);
+                /*NOTREACHED*/
             }
             CONTINUE;
         }
@@ -530,7 +557,8 @@ do_ext_makedefs(int argc, char **argv)
                 p->is_defined = 0;
             } else {
                 Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
-                exit(EXIT_FAILURE);
+                makedefs_exit(EXIT_FAILURE);
+                /*NOTREACHED*/
             }
             CONTINUE;
         }
@@ -539,24 +567,31 @@ do_ext_makedefs(int argc, char **argv)
         }
 #endif
         Fprintf(stderr, "Unknown option '%s'.\n", argv[0]);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (argc) {
         Fprintf(stderr, "unexpected argument '%s'.\n", argv[0]);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     switch (todo) {
     default:
         Fprintf(stderr, "Confused about what to do?\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
+        break;
     case 0:
         Fprintf(stderr, "Nothing to do?\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
+        break;
     case TODO_GREP:
         do_grep();
         break;
     }
+    return;
 }
 
 #undef IS_OPTION
@@ -707,7 +742,8 @@ do_grep_control(char *buf)
     case '?': /* if ID */
         if (grep_sp == GREP_STACK_SIZE - 2) {
             Fprintf(stderr, "stack overflow at line %d.", grep_lineno);
-            exit(EXIT_FAILURE);
+            makedefs_exit(EXIT_FAILURE);
+            /*NOTREACHED*/
         }
         if (grep_writing) {
             isif = grep_check_id(&buf[1]) ? isif : !isif;
@@ -772,7 +808,8 @@ do_grep(void)
         Fprintf(stderr, "--grep requires --output\n");
     }
     if (!inputfp || !outputfp) {
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     grep0(inputfp, outputfp, 0);
@@ -822,11 +859,13 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
     }
     if (ferror(inputfp0)) {
         Fprintf(stderr, "read error!\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (ferror(outputfp0)) {
         Fprintf(stderr, "write error!\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     fclose(inputfp0);
 #ifndef HAS_NO_MKSTEMP
@@ -843,8 +882,10 @@ grep0(FILE *inputfp0, FILE* outputfp0, int flg)
     if (grep_errors) {
         Fprintf(stderr, "%d error%s detected.\n", grep_errors,
                 grep_errors == 1 ? "" : "s");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
+    return;
 }
 
 /* trivial text encryption routine which can't be broken with `tr' */
@@ -959,7 +1000,8 @@ do_rnd_access_file(
     Strcat(filename, ".txt");
     if (!(ifp = fopen(filename, RDTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     filename[0] = '\0';
 #ifdef FILE_PREFIX
@@ -968,7 +1010,8 @@ do_rnd_access_file(
     Sprintf(eos(filename), DATA_TEMPLATE, fname);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     Fprintf(ofp, "%s", Dont_Edit_Data);
     /* write out the default content entry unconditionally instead of
@@ -1024,12 +1067,14 @@ do_rumors(void)
     Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (!(tfp = fopen(tempfile, WRTMODE))) {
         perror(tempfile);
         Fclose(ofp);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     true_rumor_count = false_rumor_count = 0;
@@ -1096,7 +1141,8 @@ do_rumors(void)
     Unlink(filename); /* kill empty or incomplete output file */
     Fclose(tfp);
     Unlink(tempfile); /* and temporary file */
-    exit(EXIT_FAILURE);
+    makedefs_exit(EXIT_FAILURE);
+    /*NOTREACHED*/
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -1129,7 +1175,8 @@ do_date(void)
     Sprintf(eos(filename), INCLUDE_TEMPLATE, DATE_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     /* NB: We've moved on from SCCS, but this way this line
      * won't get clobbered when downstream projects import
@@ -1364,7 +1411,8 @@ do_options(void)
     Sprintf(eos(filename), DATA_TEMPLATE, OPTIONS_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     while ((optline = do_runtime_info(&infocontext)) != 0)
         Fprintf(ofp, "%s\n", optline);
@@ -1379,8 +1427,8 @@ windowing_sanity(void)
     /* pre-standard compilers didn't support #error; wait til run-time */
     Fprintf(stderr,
             "Configuration error: DEFAULT_WINDOW_SYS is not defined.\n");
-    exit(EXIT_FAILURE);
-/*NOTREACHED*/
+    makedefs_exit(EXIT_FAILURE);
+    /*NOTREACHED*/
 
 /* put in a dummy value so that do_options() will compile and makedefs
    will build, otherwise the message above won't ever get delivered */
@@ -1390,7 +1438,8 @@ windowing_sanity(void)
     if (!window_opts[0].id) {
         Fprintf(stderr, "Configuration error: no windowing systems "
                         "(TTY_GRAPHICS, &c) enabled.\n");
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     {
@@ -1405,10 +1454,12 @@ windowing_sanity(void)
             Fprintf(stderr,
                     " does not match any enabled windowing system (%s%s).\n",
                     window_opts[0].id, window_opts[1].id ? ", &c" : "");
-            exit(EXIT_FAILURE);
+            makedefs_exit(EXIT_FAILURE);
+            /*NOTREACHED*/
         }
     }
 #endif /*DEFAULT_WINDOW_SYS*/
+    return;
 }
 
 /* routine to decide whether to discard something from data.base */
@@ -1465,19 +1516,22 @@ do_data(void)
 #endif
     if (!(ifp = fopen(infile, RDTMODE))) { /* data.base */
         perror(infile);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (!(ofp = fopen(filename, WRTMODE))) { /* data */
         perror(filename);
         Fclose(ifp);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (!(tfp = fopen(tempfile, WRTMODE))) { /* database.tmp */
         perror(tempfile);
         Fclose(ifp);
         Fclose(ofp);
         Unlink(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     /* output a dummy header record; we'll rewind and overwrite it later */
@@ -1546,7 +1600,8 @@ do_data(void)
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     free((genericptr_t) line);
 
@@ -1620,19 +1675,22 @@ do_oracles(void)
     Strcat(infile, ".txt");
     if (!(ifp = fopen(infile, RDTMODE))) {
         perror(infile);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
         Fclose(ifp);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     if (!(tfp = fopen(tempfile, WRTMODE))) { /* oracles.tmp */
         perror(tempfile);
         Fclose(ifp);
         Fclose(ofp);
         Unlink(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
 
     /* output a dummy header record; we'll rewind and overwrite it later */
@@ -1751,7 +1809,8 @@ do_oracles(void)
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     free((genericptr_t) line);
 
@@ -1769,7 +1828,8 @@ do_dungeon(void)
     Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
     if (!(ifp = fopen(filename, RDTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     filename[0] = '\0';
 #ifdef FILE_PREFIX
@@ -1778,7 +1838,8 @@ do_dungeon(void)
     Sprintf(eos(filename), DGN_TEMPLATE, DGN_O_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     Fprintf(ofp, "%s", Dont_Edit_Data);
 
@@ -1901,6 +1962,7 @@ ranged_attk(register struct permonst* ptr)
     return FALSE;
 }
 
+/* not quite obsolete but no longer needed to build nethack */
 void
 do_monstr(void)
 {
@@ -1927,7 +1989,8 @@ do_monstr(void)
     Sprintf(eos(filename), SOURCE_TEMPLATE, MON_STR_C);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#include \"config.h\"\n");
@@ -1965,6 +2028,7 @@ do_monstr(void)
     return;
 }
 
+/* obsolete */
 void
 do_permonst(void)
 {
@@ -1978,7 +2042,8 @@ do_permonst(void)
     Sprintf(eos(filename), INCLUDE_TEMPLATE, MONST_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     Fprintf(ofp, "%s", Reference_file);
     Fprintf(ofp, "#ifndef PM_H\n#define PM_H\n");
@@ -2051,6 +2116,7 @@ macronamelimit(char *name, int pref)
     return macronametemp;
 }
 
+/* obsolete */
 void
 do_objs(void)
 {
@@ -2070,7 +2136,8 @@ do_objs(void)
     Sprintf(eos(filename), INCLUDE_TEMPLATE, ONAME_FILE);
     if (!(ofp = fopen(filename, WRTMODE))) {
         perror(filename);
-        exit(EXIT_FAILURE);
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
     }
     Fprintf(ofp, "%s", Reference_file);
     Fprintf(ofp, "#ifndef ONAMES_H\n#define ONAMES_H\n\n");
@@ -2082,13 +2149,16 @@ do_objs(void)
         if (!(objnam = tmpdup(OBJ_NAME(objects[i]))))
             continue;
 
-        /* make sure probabilities add up to 1000 */
+        /* done with current class? */
         if (objects[i].oc_class != class) {
+#if 0       /* [class total oc_prob of 1000 is no longer enforced] */
+            /* make sure probabilities add up to 1000 */
             if (sum && sum != 1000) {
                 Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
                 (void) fflush(stderr);
                 sumerr = TRUE;
             }
+#endif /*0*/
             class = objects[i].oc_class;
             sum = 0;
         }
@@ -2169,12 +2239,14 @@ do_objs(void)
             break;
     }
 
+#if 0   /* [class total oc_prob of 1000 is no longer enforced] */
     /* check last set of probabilities */
     if (!sumerr && sum && sum != 1000) {
         Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
         (void) fflush(stderr);
         sumerr = TRUE;
     }
+#endif /*0*/
 
     Fprintf(ofp, "\n");
     Fprintf(ofp, "#define\tNUM_GLASS_GEMS\t%d\n", n_glass_gems);
@@ -2204,8 +2276,10 @@ do_objs(void)
     Fprintf(ofp, "#define\tNROFARTIFACTS\t%d\n", i - 1);
     Fprintf(ofp, "\n#endif /* ONAMES_H */\n");
     Fclose(ofp);
-    if (sumerr)
-        exit(EXIT_FAILURE);
+    if (sumerr) {
+        makedefs_exit(EXIT_FAILURE);
+        /*NOTREACHED*/
+    }
     return;
 }
 
