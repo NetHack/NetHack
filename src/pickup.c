@@ -1868,7 +1868,7 @@ do_loot_cont(struct obj **cobjp,
     if (cobj->olocked) {
         struct obj *unlocktool;
 
-        if (ccount < 2)
+        if (ccount < 2 && (g.level.objects[cobj->ox][cobj->oy] == cobj))
             pline("%s locked.",
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
         else if (cobj->lknown)
@@ -1902,9 +1902,6 @@ do_loot_cont(struct obj **cobjp,
         g.abort_looting = TRUE;
         return ECMD_TIME;
     }
-
-    You("%sopen %s...", (!cobj->cknown || !cobj->lknown) ? "carefully " : "",
-        the(xname(cobj)));
     return use_container(cobjp, 0, (boolean) (cindex < ccount));
 }
 
@@ -1931,7 +1928,6 @@ doloot_core(void)
     boolean underfoot = TRUE;
     const char *dont_find_anything = "don't find anything";
     struct monst *mtmp;
-    char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
     int num_conts = 0;
@@ -2022,15 +2018,7 @@ doloot_core(void)
                 nobj = cobj->nexthere;
 
                 if (Is_container(cobj)) {
-                    c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
-                                      cobj, doname, ansimpleoname,
-                                      "a container"));
-                    if (c == 'q')
-                        return (timepassed ? ECMD_TIME : ECMD_OK);
-                    if (c == 'n')
-                        continue;
                     anyfound = TRUE;
-
                     timepassed |= do_loot_cont(&cobj, 1, 1);
                     if (g.abort_looting)
                         /* chest trap or magic bag explosion or <esc> */
