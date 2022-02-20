@@ -1040,6 +1040,9 @@ have com_pager() check for failed nhl_init(); probably can't actually happen
 rearranging first-kill and first-hit gamelog messages to get hit before kill
 	ordering resulted in "hit with a wielded weapon for first time" being
 	given twice if that hit was delivered via applied polearm
+counting "just picked up" items when deciding what pseudo-classes should be
+	included for the 'I' command's object class prompt was operating on
+	an uninitialized varaible
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
