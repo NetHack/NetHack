@@ -915,7 +915,7 @@ spelleffects(int spell, boolean atme)
      * (There's no duplication of messages; when the rejection takes
      * place in getspell(), we don't get called.)
      */
-    if (rejectcasting()) {
+    if ((spell < 0) || rejectcasting()) {
         return ECMD_OK; /* no time elapses */
     }
 
@@ -1921,6 +1921,30 @@ initialspell(struct obj* obj)
         incrnknow(i, 0);
     }
     return;
+}
+
+/* return TRUE if hero knows spell otyp, FALSE otherwise */
+boolean
+known_spell(short otyp)
+{
+    int i;
+
+    for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++)
+        if (spellid(i) == otyp)
+            return TRUE;
+    return FALSE;
+}
+
+/* return index for spell otyp, or -1 if not found */
+int
+spell_idx(short otyp)
+{
+    int i;
+
+    for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++)
+        if (spellid(i) == otyp)
+            return i;
+    return -1;
 }
 
 /*spell.c*/

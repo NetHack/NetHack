@@ -760,7 +760,6 @@ gcrownu(void)
     struct obj *obj;
     boolean already_exists, in_hand;
     short class_gift;
-    int sp_no;
 #define ok_wep(o) ((o) && ((o)->oclass == WEAPON_CLASS || is_weptool(o)))
 
     HSee_invisible |= FROMOUTSIDE;
@@ -829,12 +828,8 @@ gcrownu(void)
         u.ugifts++;
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
-        for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-            if (g.spl_book[sp_no].sp_id == class_gift) {
-                if (ok_wep(uwep))
-                    obj = uwep; /* to be blessed,&c */
-                break;
-            }
+        if (known_spell(class_gift) && ok_wep(uwep))
+            obj = uwep; /* to be blessed,&c */
     }
 
     switch (u.ualign.type) {
@@ -1189,17 +1184,14 @@ pleased(aligntyp g_align)
             /*FALLTHRU*/
         case 6: {
             struct obj *otmp;
-            int sp_no, trycnt = u.ulevel + 1;
+            int trycnt = u.ulevel + 1;
 
             /* not yet known spells given preference over already known ones;
                also, try to grant a spell for which there is a skill slot */
             otmp = mkobj(SPBOOK_no_NOVEL, TRUE);
             while (--trycnt > 0) {
                 if (otmp->otyp != SPE_BLANK_PAPER) {
-                    for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                        if (g.spl_book[sp_no].sp_id == otmp->otyp)
-                            break;
-                    if (sp_no == MAXSPELL
+                    if (!known_spell(otmp->otyp)
                         && !P_RESTRICTED(spell_skilltype(otmp->otyp)))
                         break; /* usable, but not yet known */
                 } else {
@@ -2007,21 +1999,9 @@ doturn(void)
     int once, range, xlev;
 
     if (!Role_if(PM_CLERIC) && !Role_if(PM_KNIGHT)) {
-        /* Try to use the "turn undead" spell.
-         *
-         * This used to be based on whether hero knows the name of the
-         * turn undead spellbook, but it's possible to know--and be able
-         * to cast--the spell while having lost the book ID to amnesia.
-         * (It also used to tell spelleffects() to cast at self?)
-         */
-        int sp_no;
-
-        for (sp_no = 0; sp_no < MAXSPELL; ++sp_no) {
-            if (g.spl_book[sp_no].sp_id == NO_SPELL)
-                break;
-            else if (g.spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
-                return spelleffects(sp_no, FALSE);
-        }
+        /* Try to use the "turn undead" spell. */
+        if (known_spell(SPE_TURN_UNDEAD))
+            return spelleffects(spell_idx(SPE_TURN_UNDEAD), FALSE);
         You("don't know how to turn undead!");
         return ECMD_OK;
     }

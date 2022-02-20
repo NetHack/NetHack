@@ -2536,6 +2536,8 @@ extern int tport_spell(int);
 extern void losespells(void);
 extern int dovspell(void);
 extern void initialspell(struct obj *);
+extern boolean known_spell(short);
+extern int spell_idx(short);
 
 /* ### steal.c ### */
 

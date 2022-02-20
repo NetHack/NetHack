@@ -701,19 +701,18 @@ dotele(
     }
     if (!trap && !break_the_rules) {
         boolean castit = FALSE;
-        register int sp_no = 0, energy = 0;
+        int energy = 0;
 
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(g.youmonst.data))) {
             /* Try to use teleport away spell. */
-            for (sp_no = 0; sp_no < MAXSPELL; sp_no++)
-                if (g.spl_book[sp_no].sp_id == SPE_TELEPORT_AWAY)
-                    break;
+            boolean knownsp = known_spell(SPE_TELEPORT_AWAY);
+
             /* casting isn't inhibited by being Stunned (...it ought to be) */
-            castit = (sp_no < MAXSPELL && !Confusion);
+            castit = (knownsp && !Confusion);
             if (!castit && !break_the_rules) {
                 You("%s.",
-                    !Teleportation ? ((sp_no < MAXSPELL)
+                    !Teleportation ? (knownsp
                                         ? "can't cast that spell"
                                         : "don't know that spell")
                                    : "are not able to teleport at will");
@@ -764,7 +763,7 @@ dotele(
         if (castit) {
             /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
-            if ((spelleffects(sp_no, TRUE) & ECMD_TIME))
+            if ((spelleffects(spell_idx(SPE_TELEPORT_AWAY), TRUE) & ECMD_TIME))
                 return 1;
             else if (!break_the_rules)
                 return 0;
