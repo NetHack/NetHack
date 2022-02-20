@@ -791,6 +791,7 @@ knight quest home level contains some saddled warhorses
 allow creating unhidden traps in special levels
 reading magic marker shows the specific red ink color
 imps and other creatures cussing hero wake up nearby monsters
+make ravens oviparous
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
