@@ -2943,7 +2943,7 @@ tally_BUCX(struct obj *list, boolean by_nexthere,
      *  have a function again (it was a counter for having skipped gold,
      *  but that's not skipped anymore).
      */
-    *bcp = *ucp = *ccp = *xcp = *ocp = 0;
+    *bcp = *ucp = *ccp = *xcp = *ocp = *jcp = 0;
     for ( ; list; list = (by_nexthere ? list->nexthere : list->nobj)) {
         /* priests always know bless/curse state */
         if (Role_if(PM_CLERIC))
