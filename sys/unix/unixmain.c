@@ -500,7 +500,7 @@ process_options(int argc, char *argv[])
 
     if (argc > 1) {
         int mxplyrs = atoi(argv[1]);
-        boolean mx_ok = mxplyrs != 0;
+        boolean mx_ok = (mxplyrs > 0);
 #ifdef SYSCF
         config_error_add("%s%s%s",
                          mx_ok ? "MAXPLAYERS are set in sysconf file"
@@ -780,7 +780,9 @@ chdirx(const char *dir, boolean wr)
 #ifdef VAR_PLAYGROUND
         /* FIXME: if termination cleanup ever frees fqn_prefix[0..N-1],
          * these will need to use dupstr() so that they have distinct
-         * values that can be freed separately.
+         * values that can be freed separately.  Or perhaps freeing
+         * fqn_prefix[j] can check [j+1] through [N-1] for duplicated
+         * pointer and just set the value to Null.
          */
         g.fqn_prefix[LEVELPREFIX] = g.fqn_prefix[SCOREPREFIX];
         g.fqn_prefix[SAVEPREFIX] = g.fqn_prefix[SCOREPREFIX];
