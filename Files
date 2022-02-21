@@ -107,6 +107,10 @@ outdated:
 (files that are no longer maintained for current game code)
 .travis.yml
 
+outdated/dat:
+(files that are no longer maintained for current game code)
+symbols
+
 outdated/include:
 (files for GEM versions)
 bitmfile.h  gem_rsc.h   load_img.h  wingem.h
