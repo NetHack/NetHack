@@ -5070,6 +5070,7 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
     int dmg, xresist, skip, dindx;
     const char *mult;
     boolean physical_damage;
+    boolean chargeit = FALSE;
 
     physical_damage = FALSE;
     xresist = skip = 0;
@@ -5137,6 +5138,9 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
                 || obj->otyp == RIN_SHOCK_RESISTANCE) {
                 skip++;
                 break;
+            } else if (objects[obj->otyp].oc_charged && rn2(3)) {
+                chargeit = TRUE;
+                break;
             }
             dindx = 5;
             dmg = 0;
@@ -5162,7 +5166,9 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
         break;
     }
 
-    if (!skip) {
+    if (chargeit)
+        recharge(obj, 0);
+    else if (!skip) {
         if (obj->in_use)
             --quan; /* one will be used up elsewhere */
         for (i = cnt = 0L; i < quan; i++)

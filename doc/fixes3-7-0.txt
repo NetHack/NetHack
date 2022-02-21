@@ -801,6 +801,7 @@ always give a message when monster changes form via polytrap if seen
 illiterate hero receiving a spellbook from their deity gets the spell shoved
 	directly into their mind instead
 adjust levels of sleep, confuse monster, and charm monster spells
+chargeable rings have a chance of getting charged when hit with electricity
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
