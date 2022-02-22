@@ -389,6 +389,8 @@ dig(void)
                 lev->typ = ROOM, lev->flags = 0;
                 if (!rn2(5))
                     (void) rnd_treefruit_at(dpx, dpy);
+                if (Race_if(PM_ELF) || Role_if(PM_RANGER))
+                    adjalign(-1);
             } else {
                 digtxt = "You succeed in cutting away some rock.";
                 lev->typ = CORR, lev->flags = 0;
