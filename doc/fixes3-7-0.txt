@@ -812,6 +812,8 @@ heroes starting with a spell have at least one level one spell, and
 huge monsters get easily out of pits
 give a message when a trapped monster frees itself from some trap
 change kitchen sink glyph to a white {
+killed wood golem has a chance to also drop small shields, clubs,
+	elven spears, and boomerangs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -598,7 +598,12 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_WOOD_GOLEM:
         num = d(2, 4);
         while (num--) {
-            obj = mksobj_at(QUARTERSTAFF, x, y, TRUE, FALSE);
+            obj = mksobj_at(
+                            rn2(2) ? QUARTERSTAFF
+                            : rn2(3) ? SMALL_SHIELD
+                            : rn2(3) ? CLUB
+                            : rn2(3) ? ELVEN_SPEAR : BOOMERANG,
+                            x, y, TRUE, FALSE);
         }
         free_mgivenname(mtmp);
         break;
