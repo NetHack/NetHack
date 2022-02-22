@@ -2085,7 +2085,7 @@ is_rottable(struct obj *otmp)
 void
 place_object(struct obj *otmp, int x, int y)
 {
-    register struct obj *otmp2 = g.level.objects[x][y];
+    register struct obj *otmp2;
 
     if (!isok(x, y)) { /* validate location */
         void (*func)(const char *, ...) PRINTF_F(1, 2);
@@ -2098,6 +2098,8 @@ place_object(struct obj *otmp, int x, int y)
     if (otmp->where != OBJ_FREE)
         panic("place_object: obj \"%s\" [%d] not free",
               safe_typename(otmp->otyp), otmp->where);
+
+    otmp2 = g.level.objects[x][y];
 
     obj_no_longer_held(otmp);
     if (otmp->otyp == BOULDER) {
