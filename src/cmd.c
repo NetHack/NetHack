@@ -1221,6 +1221,8 @@ wiz_level_change(void)
     return ECMD_OK;
 }
 
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 /* #wiztelekinesis */
 static int
 wiz_telekinesis(void)
@@ -1253,6 +1255,8 @@ wiz_telekinesis(void)
     } while (TRUE);
     return ECMD_OK;
 }
+
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 /* #panic command - test program's panic handling */
 static int
