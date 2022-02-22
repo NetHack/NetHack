@@ -901,19 +901,30 @@ static boolean
 mhurtle_step(genericptr_t arg, int x, int y)
 {
     struct monst *mon = (struct monst *) arg;
+    struct monst *mtmp;
 
     /* TODO: Treat walls, doors, iron bars, pools, lava, etc. specially
      * rather than just stopping before.
      */
     if (goodpos(x, y, mon, 0) && m_in_out_region(mon, x, y)) {
+        int res;
+
         remove_monster(mon->mx, mon->my);
         newsym(mon->mx, mon->my);
         place_monster(mon, x, y);
         newsym(mon->mx, mon->my);
         set_apparxy(mon);
-        (void) mintrap(mon);
+        res = mintrap(mon);
+        if (res == Trap_Killed_Mon || res == Trap_Caught_Mon)
+            return FALSE;
         return TRUE;
     }
+    if ((mtmp = m_at(x, y)) != 0 && (canseemon(mon) || canseemon(mtmp))) {
+        pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
+        wakeup(mon, !g.context.mon_moving);
+        wakeup(mtmp, !g.context.mon_moving);
+    }
+
     return FALSE;
 }
 

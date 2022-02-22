@@ -3139,7 +3139,8 @@ mintrap(register struct monst *mtmp)
 
         trap_result = trapeffect_selector(mtmp, trap, 0);
     }
-    return (trap_result == Trap_Killed_Mon) ? trap_result : mtmp->mtrapped;
+    return (trap_result == Trap_Killed_Mon) ? trap_result
+        : mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
 }
 
 /* Combine cockatrice checks into single functions to avoid repeating code. */

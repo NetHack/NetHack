@@ -1221,6 +1221,39 @@ wiz_level_change(void)
     return ECMD_OK;
 }
 
+/* #wiztelekinesis */
+static int
+wiz_telekinesis(void)
+{
+    int ans = 0;
+    coord cc;
+    struct monst *mtmp = (struct monst *) 0;
+
+    cc.x = u.ux;
+    cc.y = u.uy;
+
+    pline("Pick a monster to hurtle.");
+    do {
+        if (mtmp && !DEADMONSTER(mtmp) && canseemon(mtmp)) {
+            cc.x = mtmp->mx;
+            cc.y = mtmp->my;
+        }
+
+        ans = getpos(&cc, TRUE, "a monster");
+        if (ans < 0 || cc.x < 0)
+            return ECMD_CANCEL;
+
+        if (((mtmp = m_at(cc.x, cc.y)) != 0) && canseemon(mtmp)) {
+            if (!getdir("which direction?"))
+                return ECMD_CANCEL;
+
+            mhurtle(mtmp, u.dx, u.dy, 6);
+        }
+
+    } while (TRUE);
+    return ECMD_OK;
+}
+
 /* #panic command - test program's panic handling */
 static int
 wiz_panic(void)
@@ -2421,6 +2454,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_show_seenv, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizsmell", "smell monster",
               wiz_smell, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+    { '\0',   "wiztelekinesis", "telekinesis",
+              wiz_telekinesis, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizwhere", "show locations of special levels",
               wiz_where, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { C('w'), "wizwish", "wish for something",
