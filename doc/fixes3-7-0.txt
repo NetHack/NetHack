@@ -803,6 +803,7 @@ illiterate hero receiving a spellbook from their deity gets the spell shoved
 adjust levels of sleep, confuse monster, and charm monster spells
 replace monk starting sleep spell with confuse monster
 chargeable rings have a chance of getting charged when hit with electricity
+flint and hard gems break less often when thrown
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

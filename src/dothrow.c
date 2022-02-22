@@ -1923,6 +1923,11 @@ thitmonst(
                 if (obj->blessed && !rnl(4))
                     broken = 0;
 
+                /* Flint and hard gems don't break easily */
+                if (((obj->oclass == GEM_CLASS && objects[otyp].oc_tough)
+                     || obj->otyp == FLINT) && !rn2(2))
+                    broken = 0;
+
                 if (broken) {
                     if (*u.ushops || obj->unpaid)
                         check_shop_obj(obj, g.bhitpos.x, g.bhitpos.y, TRUE);
