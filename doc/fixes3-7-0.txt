@@ -1458,6 +1458,9 @@ added a chronicle of major events, and optional live logging of those
 paranoid:swim to prevent accidental dunking into dangerous liquids
 looking at a monster will indicate whether it is asleep, and waking up a
 	monster yields a message
+extend farlook's "<mon>, asleep" to "<mon>, can't move (paralyzed or sleeping
+	or busy)" for timed sleep and also "<mon>, meditating" for monster
+	that is waiting for hero to approach
 
 
 Platform- and/or Interface-Specific New Features

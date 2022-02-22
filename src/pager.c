@@ -359,11 +359,22 @@ look_at_monster(char *buf,
             Strcat(buf, (Upolyd && sticks(g.youmonst.data))
                           ? ", being held" : ", holding you");
     }
-    if (mtmp->msleeping)
+    /* if mtmp isn't able to move (other than because it is a type of
+       monster that never moves), say so [excerpt from mstatusline() for
+       stethoscope or wand of probing] */
+    if (mtmp->mfrozen)
+        /* unfortunately mfrozen covers temporary sleep and being busy
+           (donning armor, for instance) as well as paralysis */
+        Strcat(buf, ", can't move (paralyzed or sleeping or busy)");
+    else if (mtmp->msleeping)
+        /* sleeping for an indeterminate duration */
         Strcat(buf, ", asleep");
+    else if ((mtmp->mstrategy & STRAT_WAITMASK) != 0)
+        /* arbitrary reason why it isn't moving */
+        Strcat(buf, ", meditating");
+
     if (mtmp->mleashed)
         Strcat(buf, ", leashed to you");
-
     if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
         struct trap *t = t_at(mtmp->mx, mtmp->my);
         int tt = t ? t->ttyp : NO_TRAP;

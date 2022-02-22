@@ -2882,8 +2882,8 @@ mstatusline(struct monst *mtmp)
         Strcat(info, ", stunned");
     if (mtmp->msleeping)
         Strcat(info, ", asleep");
-#if 0 /* unfortunately mfrozen covers temporary sleep and being busy \
-         (donning armor, for instance) as well as paralysis */
+#if 0 /* unfortunately mfrozen covers temporary sleep and being busy
+       * (donning armor, for instance) as well as paralysis */
     else if (mtmp->mfrozen)
         Strcat(info, ", paralyzed");
 #else
@@ -2924,6 +2924,8 @@ mstatusline(struct monst *mtmp)
             Sprintf(eos(info), ", injured %s", what);
         }
     }
+    if (mtmp->mleashed)
+        Strcat(info, ", leashed");
 
     /* avoid "Status of the invisible newt ..., invisible" */
     /* and unlike a normal mon_nam, use "saddled" even if it has a name */
