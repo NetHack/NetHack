@@ -737,7 +737,7 @@ u_init(void)
         skill_init(Skill_K);
         break;
     case PM_MONK: {
-        static short M_spell[] = { SPE_HEALING, SPE_PROTECTION, SPE_SLEEP };
+        static short M_spell[] = { SPE_HEALING, SPE_PROTECTION, SPE_CONFUSE_MONSTER };
 
         Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
