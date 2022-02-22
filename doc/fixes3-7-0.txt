@@ -804,6 +804,7 @@ adjust levels of sleep, confuse monster, and charm monster spells
 replace monk starting sleep spell with confuse monster
 chargeable rings have a chance of getting charged when hit with electricity
 flint and hard gems break less often when thrown
+hobbits getting a sling also get some ammo for it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

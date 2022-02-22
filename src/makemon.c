@@ -353,6 +353,7 @@ m_initweap(register struct monst *mtmp)
                 break;
             case 2:
                 (void) mongets(mtmp, SLING);
+                m_initthrow(mtmp, !rn2(4) ? FLINT : ROCK, 6);
                 break;
             }
             if (!rn2(10))
