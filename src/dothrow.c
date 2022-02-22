@@ -637,6 +637,8 @@ walk_path(coord *src_cc, coord *dest_cc,
             /* check for early exit condition */
             if (!(keep_going = (*check_proc)(arg, x, y)))
                 break;
+            flush_screen(1);
+            delay_output();
         }
     } else {
         while (i++ < dx) {
@@ -651,6 +653,8 @@ walk_path(coord *src_cc, coord *dest_cc,
             /* check for early exit condition */
             if (!(keep_going = (*check_proc)(arg, x, y)))
                 break;
+            flush_screen(1);
+            delay_output();
         }
     }
 
@@ -902,6 +906,17 @@ mhurtle_step(genericptr_t arg, int x, int y)
 {
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;
+
+    if (is_pool(x, y) || is_lava(x, y)) {
+        remove_monster(mon->mx, mon->my);
+        newsym(mon->mx, mon->my);
+        place_monster(mon, x, y);
+        newsym(mon->mx, mon->my);
+        set_apparxy(mon);
+        if (minliquid(mon))
+            return FALSE;
+        return TRUE;
+    }
 
     /* TODO: Treat walls, doors, iron bars, pools, lava, etc. specially
      * rather than just stopping before.
