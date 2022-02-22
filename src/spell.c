@@ -1975,4 +1975,16 @@ force_learn_spell(short otyp)
     return FALSE;
 }
 
+/* number of spells hero knows */
+int
+num_spells(void)
+{
+    int i;
+
+    for (i = 0; i < MAXSPELL; i++)
+        if (spellid(i) == NO_SPELL)
+            break;
+    return i;
+}
+
 /*spell.c*/

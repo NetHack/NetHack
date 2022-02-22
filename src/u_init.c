@@ -932,6 +932,11 @@ u_init(void)
         break;
     }
 
+    /* If we have at least one spell, force starting Pw to be 5,
+       so hero can cast the level 1 spell they should have */
+    if (num_spells() && (u.uenmax < 5))
+        u.uen = u.uenmax = u.uenpeak = u.ueninc[u.ulevel] = 5;
+
     return;
 }
 
@@ -1000,6 +1005,7 @@ ini_inv(struct trobj *trop)
 {
     struct obj *obj;
     int otyp, i;
+    boolean got_sp1 = FALSE; /* got a level 1 spellbook? */
 
 	while (trop->trclass) {
         otyp = (int) trop->trotyp;
@@ -1042,7 +1048,7 @@ ini_inv(struct trobj *trop)
                       low level players or unbalancing; also
                       spells in restricted skill categories */
                    || (obj->oclass == SPBOOK_CLASS
-                       && (objects[otyp].oc_level > 3
+                       && (objects[otyp].oc_level > (got_sp1 ? 3 : 1)
                            || restricted_spell_discipline(otyp)))
                    || otyp == SPE_NOVEL) {
                 dealloc_obj(obj);
@@ -1076,6 +1082,9 @@ ini_inv(struct trobj *trop)
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
                 g.nocreate4 = otyp;
+            /* First spellbook should be level 1 - did we get it? */
+            if (obj->oclass == SPBOOK_CLASS && objects[obj->otyp].oc_level == 1)
+                got_sp1 = TRUE;
         }
 
         if (g.urace.mnum != PM_HUMAN) {

@@ -807,6 +807,8 @@ flint and hard gems break less often when thrown
 hobbits getting a sling also get some ammo for it
 elves and rangers get alignment penalty for cutting down trees
 casting a forgotten spell uses some random amount of power
+heroes starting with a spell have at least one level one spell, and
+	have just enough power to cast it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
