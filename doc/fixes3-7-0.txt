@@ -806,6 +806,7 @@ chargeable rings have a chance of getting charged when hit with electricity
 flint and hard gems break less often when thrown
 hobbits getting a sling also get some ammo for it
 elves and rangers get alignment penalty for cutting down trees
+casting a forgotten spell uses some random amount of power
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

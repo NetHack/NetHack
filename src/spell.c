@@ -920,6 +920,12 @@ spelleffects(int spell, boolean atme)
     }
 
     /*
+     *  Note: dotele() also calculates energy use and checks nutrition
+     *  and strength requirements; it any of these change, update it too.
+     */
+    energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
+
+    /*
      * Spell casting no longer affects knowledge of the spell. A
      * decrement of spell knowledge is done every turn.
      */
@@ -927,6 +933,10 @@ spelleffects(int spell, boolean atme)
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
+        u.uen -= rnd(energy);
+        if (u.uen < 0)
+            u.uen = 0;
+        g.context.botl = 1;
         return ECMD_TIME;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
@@ -937,11 +947,6 @@ spelleffects(int spell, boolean atme)
     } else if (spellknow(spell) <= KEEN / 10) { /* 2000 turns left */
         Your("recall of this spell is gradually fading.");
     }
-    /*
-     *  Note: dotele() also calculates energy use and checks nutrition
-     *  and strength requirements; it any of these change, update it too.
-     */
-    energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
