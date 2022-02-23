@@ -1236,7 +1236,7 @@ wiz_telekinesis(void)
 
     pline("Pick a monster to hurtle.");
     do {
-        if (mtmp && !DEADMONSTER(mtmp) && canseemon(mtmp)) {
+        if (mtmp && !DEADMONSTER(mtmp) && canspotmon(mtmp)) {
             cc.x = mtmp->mx;
             cc.y = mtmp->my;
         }
@@ -1245,7 +1245,7 @@ wiz_telekinesis(void)
         if (ans < 0 || cc.x < 0)
             return ECMD_CANCEL;
 
-        if (((mtmp = m_at(cc.x, cc.y)) != 0) && canseemon(mtmp)) {
+        if (((mtmp = m_at(cc.x, cc.y)) != 0) && canspotmon(mtmp)) {
             if (!getdir("which direction?"))
                 return ECMD_CANCEL;
 

@@ -907,21 +907,11 @@ mhurtle_step(genericptr_t arg, int x, int y)
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;
 
-    if (is_pool(x, y) || is_lava(x, y)) {
-        remove_monster(mon->mx, mon->my);
-        newsym(mon->mx, mon->my);
-        place_monster(mon, x, y);
-        newsym(mon->mx, mon->my);
-        set_apparxy(mon);
-        if (minliquid(mon))
-            return FALSE;
-        return is_waterwall(x, y) ? FALSE : TRUE;
-    }
-
     /* TODO: Treat walls, doors, iron bars, etc. specially
      * rather than just stopping before.
      */
-    if (goodpos(x, y, mon, 0) && m_in_out_region(mon, x, y)) {
+    if (goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA)
+        && m_in_out_region(mon, x, y)) {
         int res;
 
         remove_monster(mon->mx, mon->my);
@@ -929,6 +919,8 @@ mhurtle_step(genericptr_t arg, int x, int y)
         place_monster(mon, x, y);
         newsym(mon->mx, mon->my);
         set_apparxy(mon);
+        if (is_waterwall(x, y))
+            return FALSE;
         ++g.force_mintrap;
         res = mintrap(mon);
         --g.force_mintrap;
@@ -1047,6 +1039,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     cc.x = mon->mx + (dx * range);
     cc.y = mon->my + (dy * range);
     (void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t) mon);
+    (void) minliquid(mon);
     return;
 }
 

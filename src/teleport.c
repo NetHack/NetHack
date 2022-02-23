@@ -43,6 +43,7 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
 {
     struct permonst *mdat = (struct permonst *) 0;
     boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0),
+            ignorelava = ((gpflags & MM_IGNORELAVA) != 0),
             allow_u = ((gpflags & GP_ALLOW_U) != 0);
 
     if (!isok(x, y))
@@ -94,7 +95,7 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
                             && !grounded(mdat)));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
-        } else if (is_lava(x, y)) {
+        } else if (is_lava(x, y) && !ignorelava) {
             /* 3.6.3: floating eye can levitate over lava but it avoids
                that due the effect of the heat causing it to dry out */
             if (mdat == &mons[PM_FLOATING_EYE])
@@ -114,7 +115,8 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
             return TRUE;
     }
     if (!accessible(x, y)) {
-        if (!(is_pool(x, y) && ignorewater))
+        if (!(is_pool(x, y) && ignorewater)
+            && !(is_lava(x, y) && ignorelava))
             return FALSE;
     }
 
