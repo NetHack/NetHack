@@ -699,9 +699,7 @@ getspell(int* spell_no)
 
     if (flags.menu_style == MENU_TRADITIONAL) {
         /* we know there is at least 1 known spell */
-        for (nspells = 1; nspells < MAXSPELL && spellid(nspells) != NO_SPELL;
-             nspells++)
-            continue;
+        nspells = num_spells();
 
         if (nspells == 1)
             Strcpy(lets, "a");
@@ -742,7 +740,7 @@ docast(void)
     int spell_no;
 
     if (getspell(&spell_no))
-        return spelleffects(spell_no, FALSE);
+        return spelleffects(g.spl_book[spell_no].sp_id, FALSE);
     return ECMD_OK;
 }
 
@@ -896,9 +894,12 @@ spell_backfire(int spell)
     return;
 }
 
+/* hero casts a spell of type spell_otyp, eg. SPE_SLEEP.
+   hero must know the spell. */
 int
-spelleffects(int spell, boolean atme)
+spelleffects(int spell_otyp, boolean atme)
 {
+    int spell = spell_idx(spell_otyp);
     int energy, damage, chance, n, intell;
     int otyp, skill, role_skill, res = ECMD_OK;
     boolean confused = (Confusion != 0);
@@ -915,13 +916,13 @@ spelleffects(int spell, boolean atme)
      * (There's no duplication of messages; when the rejection takes
      * place in getspell(), we don't get called.)
      */
-    if ((spell < 0) || rejectcasting()) {
+    if ((spell == UNKNOWN_SPELL) || rejectcasting()) {
         return ECMD_OK; /* no time elapses */
     }
 
     /*
      *  Note: dotele() also calculates energy use and checks nutrition
-     *  and strength requirements; it any of these change, update it too.
+     *  and strength requirements; if any of these change, update it too.
      */
     energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
 
@@ -1656,6 +1657,9 @@ dovspell(void)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
+/* shows menu of known spells, with options to sort them.
+   return FALSE on cancel, TRUE otherwise.
+   spell_no is set to the internal spl_book index, if any selected */
 static boolean
 dospellmenu(
     const char *prompt,
@@ -1940,7 +1944,7 @@ known_spell(short otyp)
     return FALSE;
 }
 
-/* return index for spell otyp, or -1 if not found */
+/* return index for spell otyp, or UNKNOWN_SPELL if not found */
 int
 spell_idx(short otyp)
 {
@@ -1949,7 +1953,7 @@ spell_idx(short otyp)
     for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++)
         if (spellid(i) == otyp)
             return i;
-    return -1;
+    return UNKNOWN_SPELL;
 }
 
 /* forcibly learn spell otyp, if possible */

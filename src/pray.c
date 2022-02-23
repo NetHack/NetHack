@@ -2008,7 +2008,7 @@ doturn(void)
     if (!Role_if(PM_CLERIC) && !Role_if(PM_KNIGHT)) {
         /* Try to use the "turn undead" spell. */
         if (known_spell(SPE_TURN_UNDEAD))
-            return spelleffects(spell_idx(SPE_TURN_UNDEAD), FALSE);
+            return spelleffects(SPE_TURN_UNDEAD, FALSE);
         You("don't know how to turn undead!");
         return ECMD_OK;
     }

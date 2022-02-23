@@ -763,7 +763,7 @@ dotele(
         if (castit) {
             /* energy cost is deducted in spelleffects() */
             exercise(A_WIS, TRUE);
-            if ((spelleffects(spell_idx(SPE_TELEPORT_AWAY), TRUE) & ECMD_TIME))
+            if ((spelleffects(SPE_TELEPORT_AWAY, TRUE) & ECMD_TIME))
                 return 1;
             else if (!break_the_rules)
                 return 0;
