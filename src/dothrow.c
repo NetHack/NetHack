@@ -1016,8 +1016,11 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     /* Is the monster stuck or too heavy to push?
      * (very large monsters have too much inertia, even floaters and flyers)
      */
-    if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped)
+    if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped) {
+        if (canseemon(mon))
+            pline("%s doesn't budge!", Monnam(mon));
         return;
+    }
 
     /* Make sure dx and dy are [-1,0,1] */
     dx = sgn(dx);
