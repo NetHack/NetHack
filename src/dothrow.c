@@ -929,9 +929,9 @@ mhurtle_step(genericptr_t arg, int x, int y)
         place_monster(mon, x, y);
         newsym(mon->mx, mon->my);
         set_apparxy(mon);
-        g.force_mintrap = TRUE;
+        ++g.force_mintrap;
         res = mintrap(mon);
-        g.force_mintrap = FALSE;
+        --g.force_mintrap;
         if (res == Trap_Killed_Mon || res == Trap_Caught_Mon)
             return FALSE;
         return TRUE;
