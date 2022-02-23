@@ -851,7 +851,7 @@ hurtle_step(genericptr_t arg, int x, int y)
         switch_terrain();
 
     if (is_pool(x, y) && !u.uinwater) {
-        if ((Is_waterlevel(&u.uz) && levl[x][y].typ == WATER)
+        if ((Is_waterlevel(&u.uz) && is_waterwall(x,y))
             || !(Levitation || Flying || Wwalking)) {
             g.multi = 0; /* can move, so drown() allows crawling out of water */
             (void) drown();

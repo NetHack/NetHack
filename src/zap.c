@@ -3460,7 +3460,7 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
         typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
 
         /* WATER aka "wall of water" stops items */
-        if (typ == WATER) {
+        if (IS_WATERWALL(typ)) {
             if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
                 break;
         }
@@ -4705,7 +4705,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
             boolean lava = is_lava(x, y),
                     moat = is_moat(x, y);
 
-            if (lev->typ == WATER) {
+            if (IS_WATERWALL(lev->typ)) {
                 /* For now, don't let WATER freeze. */
                 if (see_it)
                     pline_The("%s freezes for a moment.", hliquid("water"));

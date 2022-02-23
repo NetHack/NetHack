@@ -2911,7 +2911,7 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious) {
                     boolean moat = (levl[magr->mx][magr->my].typ != POOL)
-                                   && (levl[magr->mx][magr->my].typ != WATER)
+                                   && !is_waterwall(magr->mx, magr->my)
                                    && !Is_medusa_level(&u.uz)
                                    && !Is_waterlevel(&u.uz);
 

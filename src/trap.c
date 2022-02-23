@@ -4185,7 +4185,7 @@ drown(void)
     const char *pool_of_water;
     boolean inpool_ok = FALSE, crawl_ok;
     int i, x, y;
-    boolean is_solid = (levl[u.ux][u.uy].typ == WATER);
+    boolean is_solid = is_waterwall(u.ux, u.uy);
 
     feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */

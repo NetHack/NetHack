@@ -708,7 +708,7 @@ static int
 minliquid_core(struct monst* mtmp)
 {
     boolean inpool, inlava, infountain;
-    boolean waterwall = (levl[mtmp->mx][mtmp->my].typ == WATER);
+    boolean waterwall = is_waterwall(mtmp->mx,mtmp->my);
 
     /* [ceiling clingers are handled below] */
     inpool = (is_pool(mtmp->mx, mtmp->my)
@@ -1785,7 +1785,7 @@ mfndpos(
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
-    poolok = ((!Is_waterlevel(&u.uz) && !(nowtyp != WATER)
+    poolok = ((!Is_waterlevel(&u.uz) && IS_WATERWALL(nowtyp)
                && !grounded(mdat))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be

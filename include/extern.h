@@ -296,6 +296,7 @@ extern void free_nomakedefs(void);
 
 /* ### dbridge.c ### */
 
+extern boolean is_waterwall(xchar, xchar);
 extern boolean is_pool(int, int);
 extern boolean is_lava(int, int);
 extern boolean is_pool_or_lava(int, int);

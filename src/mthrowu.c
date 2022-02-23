@@ -1079,7 +1079,7 @@ linedup_callback(
             if (!isok(bx, by))
                 return FALSE;
             if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by)
-                || levl[bx][by].typ == WATER)
+                || is_waterwall(bx, by))
                 return FALSE;
             if ((*fnc)(bx, by))
                 return TRUE;
@@ -1123,7 +1123,7 @@ linedup(
             /* <bx,by> is guaranteed to eventually converge with <ax,ay> */
             bx += dx, by += dy;
             if (IS_ROCK(levl[bx][by].typ) || closed_door(bx, by)
-                || levl[bx][by].typ == WATER)
+                || is_waterwall(bx, by))
                 return FALSE;
             if (sobj_at(BOULDER, bx, by))
                 ++boulderspots;

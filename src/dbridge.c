@@ -34,6 +34,14 @@ static boolean e_jumps(struct entity *);
 static void do_entity(struct entity *);
 
 boolean
+is_waterwall(xchar x, xchar y)
+{
+    if (isok(x, y) && IS_WATERWALL(levl[x][y].typ))
+        return TRUE;
+    return FALSE;
+}
+
+boolean
 is_pool(int x, int y)
 {
     schar ltyp;

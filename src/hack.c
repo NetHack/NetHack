@@ -1535,7 +1535,7 @@ u_simple_floortyp(xchar x, xchar y)
 {
     boolean u_in_air = (Levitation || Flying || !grounded(g.youmonst.data));
 
-    if (levl[x][y].typ == WATER)
+    if (is_waterwall(x,y))
         return WATER; /* wall of water, fly/lev does not matter */
     if (!u_in_air) {
         if (is_pool(x,y))
@@ -1551,7 +1551,7 @@ static boolean
 swim_move_danger(xchar x, xchar y)
 {
     schar newtyp = u_simple_floortyp(x, y);
-    boolean liquid_wall = (newtyp == WATER);
+    boolean liquid_wall = IS_WATERWALL(newtyp);
 
     if ((newtyp != u_simple_floortyp(u.ux, u.uy))
         && !Stunned && !Confusion && levl[x][y].seenv
@@ -2352,7 +2352,7 @@ switch_terrain(void)
 {
     struct rm *lev = &levl[u.ux][u.uy];
     boolean blocklev = (IS_ROCK(lev->typ) || closed_door(u.ux, u.uy)
-                        || lev->typ == WATER),
+                        || IS_WATERWALL(lev->typ)),
             was_levitating = !!Levitation, was_flying = !!Flying;
 
     if (blocklev) {
@@ -2464,7 +2464,7 @@ pooleffects(boolean newspot)             /* true if called by spoteffects */
         if (is_lava(u.ux, u.uy)) {
             if (lava_effects())
                 return TRUE;
-        } else if ((!Wwalking || levl[u.ux][u.uy].typ == WATER)
+        } else if ((!Wwalking || is_waterwall(u.ux,u.uy))
                    && (newspot || !u.uinwater || !(Swimming || Amphibious))) {
             if (drown())
                 return TRUE;

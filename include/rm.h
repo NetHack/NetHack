@@ -105,6 +105,7 @@ enum levl_typ_types {
 #define IS_FURNITURE(typ) ((typ) >= STAIRS && (typ) <= ALTAR)
 #define IS_AIR(typ) ((typ) == AIR || (typ) == CLOUD)
 #define IS_SOFT(typ) ((typ) == AIR || (typ) == CLOUD || IS_POOL(typ))
+#define IS_WATERWALL(typ) ((typ) == WATER)
 
 /*
  *      Note:  secret doors (SDOOR) want to use both rm.doormask and

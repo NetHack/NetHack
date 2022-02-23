@@ -510,7 +510,7 @@ waterbody_name(xchar x, xchar y)
         } else {
             return "moat";
         }
-    } else if (ltyp == WATER) {
+    } else if (IS_WATERWALL(ltyp)) {
         if (Is_waterlevel(&u.uz))
             return "limitless water"; /* even if hallucinating */
         Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
