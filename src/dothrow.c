@@ -918,7 +918,7 @@ mhurtle_step(genericptr_t arg, int x, int y)
         return TRUE;
     }
 
-    /* TODO: Treat walls, doors, iron bars, pools, lava, etc. specially
+    /* TODO: Treat walls, doors, iron bars, etc. specially
      * rather than just stopping before.
      */
     if (goodpos(x, y, mon, 0) && m_in_out_region(mon, x, y)) {
