@@ -161,10 +161,10 @@ FILES
                                    map features.
        options                     Data file containing a description  of  the
                                    build-time option settings.
-       help, hh                    Help data files.
-       cmdhelp, opthelp, wizhelp   More help data files.
+       help, hh, cmdhelp           Help data files.
+       opthelp, optmenu, wizhelp   More help data files.
        *.lua                       Predefined  special levels, dungeon control
-       for                             special levels, quest texts
+                                   for special levels, quest texts
        history                     A short history of NetHack.
        license                     Rules governing redistribution.
        record                      The list of top scorers.
@@ -225,11 +225,11 @@ BUGS
 
 COPYRIGHT
        This  file  is  Copyright  (C)  Robert Patrick Rankin, 2022 for version
-       NetHack-3.7:1.22.  NetHack may be freely  redistributed.   See  license
+       NetHack-3.7:1.23.  NetHack may be freely  redistributed.   See  license
        for details.
 
        Dungeons & Dragons is a Trademark of Wizards of the Coast, Inc.
 
 
 
-NETHACK                        06 February 2022                     NETHACK(6)
+NETHACK                        21 February 2022                     NETHACK(6)

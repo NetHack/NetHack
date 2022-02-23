@@ -139,4 +139,4 @@ COPYRIGHT
 
 
 
-NETHACK                        06 February 2022                    MAKEDEFS(6)
+NETHACK                         8 February 2022                    MAKEDEFS(6)
