@@ -915,7 +915,7 @@ mhurtle_step(genericptr_t arg, int x, int y)
         set_apparxy(mon);
         if (minliquid(mon))
             return FALSE;
-        return TRUE;
+        return is_waterwall(x, y) ? FALSE : TRUE;
     }
 
     /* TODO: Treat walls, doors, iron bars, etc. specially
