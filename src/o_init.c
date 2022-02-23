@@ -444,8 +444,8 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
             if (credit_hero)
                 exercise(A_WIS, TRUE);
         }
-        /* moves==1L => initial inventory, gameover => final disclosure */
-        if (g.moves > 1L && !g.program_state.gameover) {
+        /* !in_moveloop => initial inventory, gameover => final disclosure */
+        if (g.program_state.in_moveloop && !g.program_state.gameover) {
             if (objects[oindx].oc_class == GEM_CLASS)
                 gem_learned(oindx); /* could affect price of unpaid gems */
             update_inventory();

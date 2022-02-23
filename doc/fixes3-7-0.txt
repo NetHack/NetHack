@@ -814,6 +814,10 @@ give a message when a trapped monster frees itself from some trap
 change kitchen sink glyph to a white {
 killed wood golem has a chance to also drop small shields, clubs,
 	elven spears, and boomerangs
+discovering an object on first turn with persistent inventory enabled might
+	not update inventory info for that item (autopickup a blank scroll
+	or spellbook and read it as first action; it becomes discovered but
+	will still be shown as if undiscovered until next inventory update)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
