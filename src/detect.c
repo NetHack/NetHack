@@ -127,7 +127,7 @@ trapped_chest_at(int ttyp, int x, int y)
     if (sobj_at(CHEST, x, y) || sobj_at(LARGE_BOX, x, y))
         return TRUE;
     /* in inventory, we need to find one which is actually trapped */
-    if (x == u.ux && y == u.uy) {
+    if (u_at(x, y)) {
         for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (Is_box(otmp) && otmp->otrapped)
                 return TRUE;
@@ -397,7 +397,7 @@ gold_detect(struct obj *sobj)
             }
             map_object(temp, 1);
         }
-        if (temp && temp->ox == u.ux && temp->oy == u.uy)
+        if (temp && u_at(temp->ox, temp->oy))
             ugold = TRUE;
     }
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -426,7 +426,7 @@ gold_detect(struct obj *sobj)
                     break;
                 }
         }
-        if (temp && temp->ox == u.ux && temp->oy == u.uy)
+        if (temp && u_at(temp->ox, temp->oy))
             ugold = TRUE;
     }
     if (!ugold) {
@@ -459,7 +459,7 @@ food_detect(struct obj *sobj)
 
     for (obj = fobj; obj; obj = obj->nobj)
         if (o_in(obj, oclass)) {
-            if (obj->ox == u.ux && obj->oy == u.uy)
+            if (u_at(obj->ox, obj->oy))
                 ctu++;
             else
                 ct++;
@@ -469,7 +469,7 @@ food_detect(struct obj *sobj)
             continue;
         for (obj = mtmp->minvent; obj; obj = obj->nobj)
             if (o_in(obj, oclass)) {
-                if (mtmp->mx == u.ux && mtmp->my == u.uy)
+                if (u_at(mtmp->mx, mtmp->my))
                     ctu++; /* steed or an engulfer with inventory */
                 else
                     ct++;
@@ -610,7 +610,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
 
     for (obj = fobj; obj; obj = obj->nobj) {
         if ((!class && !boulder) || o_in(obj, class) || o_in(obj, boulder)) {
-            if (obj->ox == u.ux && obj->oy == u.uy)
+            if (u_at(obj->ox, obj->oy))
                 ctu++;
             else
                 ct++;
@@ -621,7 +621,7 @@ object_detect(struct obj *detector, /* object doing the detecting */
 
     for (obj = g.level.buriedobjlist; obj; obj = obj->nobj) {
         if (!class || o_in(obj, class)) {
-            if (obj->ox == u.ux && obj->oy == u.uy)
+            if (u_at(obj->ox, obj->oy))
                 ctu++;
             else
                 ct++;
@@ -885,7 +885,7 @@ detect_obj_traps(struct obj *objlist, boolean show_them,
     for (otmp = objlist; otmp; otmp = otmp->nobj) {
         if (Is_box(otmp) && otmp->otrapped
             && get_obj_location(otmp, &x, &y, BURIED_TOO | CONTAINED_TOO)) {
-            result |= (x == u.ux && y == u.uy) ? OTRAP_HERE : OTRAP_THERE;
+            result |= u_at(x, y) ? OTRAP_HERE : OTRAP_THERE;
             if (show_them)
                 sense_trap((struct trap *) 0, x, y, how);
         }
@@ -1467,7 +1467,7 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
        see_monsters() to update visible ones and warned-of ones */
     for (zx = lo_x; zx <= hi_x; zx++)
         for (zy = lo_y; zy <= hi_y; zy++) {
-            if (zx == u.ux && zy == u.uy)
+            if (u_at(zx, zy))
                 continue;
             newglyph = glyph_at(zx, zy);
             if (glyph_is_monster(newglyph)
@@ -1608,7 +1608,7 @@ openone(int zx, int zy, genericptr_t num)
             newsym(zx, zy);
             (*num_p)++;
         }
-        mon = (zx == u.ux && zy == u.uy) ? &g.youmonst : m_at(zx, zy);
+        mon = u_at(zx, zy) ? &g.youmonst : m_at(zx, zy);
         if (openholdingtrap(mon, &dummy)
             || openfallingtrap(mon, TRUE, &dummy))
             (*num_p)++;
@@ -1758,7 +1758,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
             for (y = u.uy - 1; y < u.uy + 2; y++) {
                 if (!isok(x, y))
                     continue;
-                if (x == u.ux && y == u.uy)
+                if (u_at(x, y))
                     continue;
 
                 if (Blind && !aflag)
@@ -1832,7 +1832,7 @@ warnreveal(void)
 
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy))
+            if (!isok(x, y) || u_at(x, y))
                 continue;
             if ((mtmp = m_at(x, y)) != 0
                 && warning_of(mtmp) && mtmp->mundetected)
@@ -1901,7 +1901,7 @@ reveal_terrain_getglyph(int x, int y, int full, unsigned swallowed,
            the invisible monster glyph, which is handled like
            an object, replacing any object or trap at its spot) */
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
-        if (keep_mons && x == u.ux && y == u.uy && swallowed)
+        if (keep_mons && u_at(x, y) && swallowed)
             glyph = mon_to_glyph(u.ustuck, rn2_on_display_rng);
         else if (((glyph_is_monster(glyph)
                    || glyph_is_warning(glyph)) && !keep_mons)

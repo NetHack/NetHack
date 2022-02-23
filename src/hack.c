@@ -633,7 +633,7 @@ still_chewing(xchar x, xchar y)
                updates hunger state and requests status update if changed */
             morehungry(-nut);
         }
-        digtxt = (x == u.ux && y == u.uy)
+        digtxt = u_at(x, y)
                  ? "devour the iron bars."
                  : "eat through the bars.";
         dissolve_bars(x, y);
@@ -1282,7 +1282,7 @@ findtravelpath(int mode)
                         }
                     }
 
-            if (px == u.ux && py == u.uy) {
+            if (u_at(px, py)) {
                 /* no guesses, just go in the general direction */
                 u.dx = sgn(u.tx - u.ux);
                 u.dy = sgn(u.ty - u.uy);
@@ -1332,7 +1332,7 @@ is_valid_travelpt(int x, int y)
     boolean ret;
     int glyph = glyph_at(x,y);
 
-    if (x == u.ux && y == u.uy)
+    if (u_at(x, y))
         return TRUE;
     if (isok(x,y) && glyph_is_cmap(glyph) && S_stone == glyph_to_cmap(glyph)
         && !levl[x][y].seenv)
@@ -2489,7 +2489,7 @@ spoteffects(boolean pick)
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
        damage that triggers rehumanize() which calls spoteffects()...] */
-    if (inspoteffects && u.ux == spotloc.x && u.uy == spotloc.y
+    if (inspoteffects && u_at(spotloc.x, spotloc.y)
         /* except when reason is transformed terrain (ice -> water) */
         && spotterrain == levl[u.ux][u.uy].typ
         /* or transformed trap (land mine -> pit) */
@@ -3042,7 +3042,7 @@ lookaround(void)
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
             /* ignore out of bounds, and our own location */
-            if (!isok(x, y) || (x == u.ux && y == u.uy))
+            if (!isok(x, y) || u_at(x, y))
                 continue;
             /* (grid bugs) ignore diagonals */
             if (NODIAG(u.umonnum) && x != u.ux && y != u.uy)
@@ -3246,7 +3246,7 @@ monster_nearby(void)
     /* Also see the similar check in dochugw() in monmove.c */
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy))
+            if (!isok(x, y) || u_at(x, y))
                 continue;
             if ((mtmp = m_at(x, y)) != 0
                 && M_AP_TYPE(mtmp) != M_AP_FURNITURE

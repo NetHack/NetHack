@@ -175,8 +175,7 @@ onscary(int x, int y, struct monst* mtmp)
      * Astral Plane; the influence of the Valar only reaches so far.
      */
     return (sengr_at("Elbereth", x, y, TRUE)
-            && ((u.ux == x && u.uy == y)
-                || (Displaced && mtmp->mux == x && mtmp->muy == y))
+            && (u_at(x, y) || (Displaced && mtmp->mux == x && mtmp->muy == y))
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
                  || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN
                  || mtmp->data == &mons[PM_MINOTAUR]
@@ -1398,7 +1397,7 @@ m_move(register struct monst* mtmp, register int after)
             nix = mtmp->mux;
             niy = mtmp->muy;
         }
-        if (nix == u.ux && niy == u.uy) {
+        if (u_at(nix, niy)) {
             mtmp->mux = u.ux;
             mtmp->muy = u.uy;
             return 0;
@@ -1751,7 +1750,7 @@ dissolve_bars(register int x, register int y)
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;
     newsym(x, y);
-    if (x == u.ux && y == u.uy)
+    if (u_at(x, y))
         switch_terrain();
 }
 
@@ -1792,7 +1791,7 @@ set_apparxy(register struct monst* mtmp)
 
     /* monsters which know where you are don't suddenly forget,
        if you haven't moved away */
-    if (mx == u.ux && my == u.uy)
+    if (u_at(mx, my))
         goto found_you;
 
     notseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data)));

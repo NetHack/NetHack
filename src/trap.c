@@ -350,7 +350,7 @@ maketrap(int x, int y, int typ)
         if (undestroyable_trap(ttmp->ttyp))
             return (struct trap *) 0;
         oldplace = TRUE;
-        if (u.utrap && x == u.ux && y == u.uy
+        if (u.utrap && u_at(x, y)
             && ((u.utraptype == TT_BEARTRAP && typ != BEAR_TRAP)
                 || (u.utraptype == TT_WEB && typ != WEB)
                 || (u.utraptype == TT_PIT && !is_pit(typ))
@@ -691,7 +691,7 @@ animate_statue(
                     : golem_xform ? "turns into flesh"
                       : (nonliving(mon->data) || is_vampshifter(mon)) ? "moves"
                         : "comes to life";
-    if ((x == u.ux && y == u.uy) || cause == ANIMATE_SPELL) {
+    if (u_at(x, y) || cause == ANIMATE_SPELL) {
         /* "the|your|Manlobbi's statue [of a wombat]" */
         shkp = shop_keeper(*in_rooms(mon->mx, mon->my, SHOPBASE));
         Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),
@@ -761,7 +761,7 @@ animate_statue(
     delobj(statue);
 
     /* avoid hiding under nothing */
-    if (x == u.ux && y == u.uy && Upolyd && hides_under(g.youmonst.data)
+    if (u_at(x, y) && Upolyd && hides_under(g.youmonst.data)
         && !OBJ_AT(x, y))
         u.uundetected = 0;
 
@@ -2797,7 +2797,7 @@ launch_obj(
                 launch_drop_spot((struct obj *) 0, 0, 0);
                 break;
             }
-        } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
+        } else if (u_at(g.bhitpos.x, g.bhitpos.y)) {
             if (g.multi)
                 nomul(0);
             if (thitu(9 + singleobj->spe, dmgval(singleobj, &g.youmonst),
@@ -4461,7 +4461,7 @@ cnv_trap_obj(
         stackobj(otmp);
     }
     newsym(ttmp->tx, ttmp->ty);
-    if (u.utrap && ttmp->tx == u.ux && ttmp->ty == u.uy)
+    if (u.utrap && u_at(ttmp->tx, ttmp->ty))
         reset_utrap(TRUE);
     deltrap(ttmp);
 }
@@ -4882,7 +4882,7 @@ untrap(boolean force)
     if (ttmp && !ttmp->tseen)
         ttmp = 0;
     trapdescr = ttmp ? trapname(ttmp->ttyp, FALSE) : 0;
-    here = (x == u.ux && y == u.uy); /* !u.dx && !u.dy */
+    here = u_at(x, y); /* !u.dx && !u.dy */
 
     if (here) /* are there are one or more containers here? */
         for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
@@ -4941,7 +4941,7 @@ untrap(boolean force)
             if (deal_with_floor_trap) {
                 if (u.utrap) {
                     You("cannot deal with %s while trapped%s!", the_trap,
-                        (x == u.ux && y == u.uy) ? " in it" : "");
+                        u_at(x, y) ? " in it" : "");
                     return 1;
                 }
                 if ((mtmp = m_at(x, y)) != 0
@@ -5354,9 +5354,9 @@ chest_trap(
             delete_contents(obj);
             /* unpunish() in advance if either ball or chain (or both)
                is going to be destroyed */
-            if (Punished && ((uchain->ox == u.ux && uchain->oy == u.uy)
+            if (Punished && (u_at(uchain->ox, uchain->oy)
                              || (uball->where == OBJ_FLOOR
-                                 && uball->ox == u.ux && uball->oy == u.uy)))
+                                 && u_at(uball->ox, uball->oy))))
                 unpunish();
 
             for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
@@ -5613,7 +5613,7 @@ boolean
 uteetering_at_seen_pit(struct trap* trap)
 {
     return (trap && is_pit(trap->ttyp) && trap->tseen
-            && trap->tx == u.ux && trap->ty == u.uy
+            && u_at(trap->tx, trap->ty)
             && !(u.utrap && u.utraptype == TT_PIT));
 }
 
@@ -5625,7 +5625,7 @@ boolean
 uescaped_shaft(struct trap* trap)
 {
     return (trap && is_hole(trap->ttyp) && trap->tseen
-            && trap->tx == u.ux && trap->ty == u.uy);
+            && u_at(trap->tx, trap->ty));
 }
 
 /* Destroy a trap that emanates from the floor. */
@@ -5642,7 +5642,7 @@ delfloortrap(struct trap* ttmp)
                  || (ttmp->ttyp == ANTI_MAGIC))) {
         register struct monst *mtmp;
 
-        if (ttmp->tx == u.ux && ttmp->ty == u.uy) {
+        if (u_at(ttmp->tx, ttmp->ty)) {
             if (u.utraptype != TT_BURIEDBALL)
                 reset_utrap(TRUE);
         } else if ((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) {

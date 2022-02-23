@@ -191,7 +191,7 @@ surface(int x, int y)
 {
     struct rm *lev = &levl[x][y];
 
-    if (x == u.ux && y == u.uy && u.uswallow && is_animal(u.ustuck->data))
+    if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
         return "maw";
     else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
         return "air";

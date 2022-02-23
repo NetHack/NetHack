@@ -55,7 +55,7 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
      * oh well.
      */
     if (!allow_u) {
-        if (x == u.ux && y == u.uy && mtmp != &g.youmonst
+        if (u_at(x, y) && mtmp != &g.youmonst
             && (mtmp != u.ustuck || !u.uswallow)
             && (!u.usteed || mtmp != u.usteed))
             return FALSE;
@@ -532,7 +532,7 @@ scrolltele(struct obj* scroll)
             if (teleok(cc.x, cc.y, FALSE)) {
                 /* for scroll, discover it regardless of destination */
                 teleds(cc.x, cc.y, TELEDS_TELEPORT);
-                if (iflags.travelcc.x == u.ux && iflags.travelcc.y == u.uy)
+                if (u_at(iflags.travelcc.x, iflags.travelcc.y))
                     iflags.travelcc.x = iflags.travelcc.y = 0;
                 return;
             }

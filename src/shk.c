@@ -534,7 +534,7 @@ deserted_shop(/*const*/ char* enterstring)
 
     for (x = r->lx; x <= r->hx; ++x)
         for (y = r->ly; y <= r->hy; ++y) {
-            if (x == u.ux && y == u.uy)
+            if (u_at(x, y))
                 continue;
             if ((mtmp = m_at(x, y)) != 0) {
                 ++n;
@@ -1304,7 +1304,7 @@ dopay(void)
             pline("Try again...");
             return ECMD_OK;
         }
-        if (u.ux == cx && u.uy == cy) {
+        if (u_at(cx, cy)) {
             You("are generous to yourself.");
             return ECMD_OK;
         }
@@ -1888,7 +1888,7 @@ set_repo_loc(struct monst* shkp)
     /* if you're not in this shk's shop room, or if you're in its doorway
         or entry spot, then your gear gets dumped all the way inside */
     if (*u.ushops != eshkp->shoproom || IS_DOOR(levl[u.ux][u.uy].typ)
-        || (u.ux == eshkp->shk.x && u.uy == eshkp->shk.y)) {
+        || u_at(eshkp->shk.x, eshkp->shk.y)) {
         /* shk.x,shk.y is the position immediately in
          * front of the door -- move in one more space
          */
@@ -3544,7 +3544,7 @@ repairable_damage(struct damage *dam, struct monst *shkp)
         return FALSE;
     /* is it a wall? don't fix if anyone is in the way */
     if (!IS_ROOM(dam->typ)) {
-        if ((x == u.ux && y == u.uy && !Passes_walls)
+        if ((u_at(x, y) && !Passes_walls)
             || (x == shkp->mx && y == shkp->my)
             || ((mtmp = m_at(x, y)) != 0 && !passes_walls(mtmp->data)))
             return FALSE;
@@ -3552,7 +3552,7 @@ repairable_damage(struct damage *dam, struct monst *shkp)
     /* is it a trap? don't fix if hero or monster is in it */
     ttmp = t_at(x, y);
     if (ttmp) {
-        if (x == u.ux && y == u.uy)
+        if (u_at(x, y))
             return FALSE;
         if ((mtmp = m_at(x,y)) != 0 && mtmp->mtrapped)
             return FALSE;
@@ -3956,7 +3956,7 @@ shk_move(struct monst* shkp)
         if (Invis || u.usteed) {
             avoid = FALSE;
         } else {
-            uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
+            uondoor = u_at(eshkp->shd.x, eshkp->shd.y);
             if (uondoor) {
                 badinv =
                     (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)

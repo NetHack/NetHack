@@ -533,7 +533,7 @@ lookat(int x, int y, char *buf, char *monbuf)
 
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
-    if (u.ux == x && u.uy == y && canspotself()
+    if (u_at(x, y) && canspotself()
         && !(iflags.save_uswallow
              && glyph == mon_to_glyph(u.ustuck, rn2_on_display_rng))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
@@ -1161,7 +1161,7 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
            playing a character which isn't normally displayed by that
            symbol; firstmatch is assumed to already be set for '@' */
         if ((looked ? (sym == g.showsyms[S_HUMAN + SYM_OFF_M]
-                       && cc.x == u.ux && cc.y == u.uy)
+                       && u_at(cc.x, cc.y))
                     : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
             && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
             found += append_str(out_str, "you"); /* tack on "or you" */
@@ -1664,7 +1664,7 @@ look_all(
 
                     g.bhitpos.x = x; /* [is this actually necessary?] */
                     g.bhitpos.y = y;
-                    if (x == u.ux && y == u.uy && canspotself()) {
+                    if (u_at(x, y) && canspotself()) {
                         (void) self_lookat(lookbuf);
                         ++count;
                     } else if ((mtmp = m_at(x, y)) != 0) {

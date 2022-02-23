@@ -1302,7 +1302,7 @@ wiz_show_seenv(void)
 
     for (y = 0; y < ROWNO; y++) {
         for (x = startx, curx = 0; x < stopx; x++, curx += 2) {
-            if (x == u.ux && y == u.uy) {
+            if (u_at(x, y)) {
                 row[curx] = row[curx + 1] = '@';
             } else {
                 v = levl[x][y].seenv & 0xff;
@@ -1340,7 +1340,7 @@ wiz_show_vision(void)
     putstr(win, 0, "");
     for (y = 0; y < ROWNO; y++) {
         for (x = 1; x < COLNO; x++) {
-            if (x == u.ux && y == u.uy) {
+            if (u_at(x, y)) {
                 row[x] = '@';
             } else {
                 v = g.viz_array[y][x]; /* data access should be hidden */
@@ -1376,7 +1376,7 @@ wiz_show_wmodes(void)
     for (y = 0; y < ROWNO; y++) {
         for (x = 0; x < COLNO; x++) {
             lev = &levl[x][y];
-            if (x == u.ux && y == u.uy)
+            if (u_at(x, y))
                 row[x] = '@';
             else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
                 row[x] = '0' + (lev->wall_info & WM_MASK);

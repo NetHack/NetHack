@@ -228,7 +228,7 @@ give_to_nearby_mon(struct obj *otmp, int x, int y)
         for (yy = y - 1; yy <= y + 1; ++yy) {
             if (!isok(xx, yy))
                 continue;
-            if (xx == u.ux && yy == u.uy)
+            if (u_at(xx, yy))
                 continue;
             if (!(mtmp = m_at(xx, yy)))
                 continue;

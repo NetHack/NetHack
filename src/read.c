@@ -1757,7 +1757,7 @@ seffect_fire(struct obj **sobjp)
                 cc.y = u.uy;
             }
         }
-        if (cc.x == u.ux && cc.y == u.uy) {
+        if (u_at(cc.x, cc.y)) {
             pline_The("scroll erupts in a tower of flame!");
             iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
             burn_away_slime();

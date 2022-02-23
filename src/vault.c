@@ -63,7 +63,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
         if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy))
             && egrd->gddone)
             forceshow = TRUE;
-        if ((u.ux == fcx && u.uy == fcy && !DEADMONSTER(grd))
+        if ((u_at(fcx, fcy) && !DEADMONSTER(grd))
             || (!forceshow && couldsee(fcx, fcy))
             || (Punished && !carried(uball) && uball->ox == fcx
                 && uball->oy == fcy))
@@ -352,7 +352,7 @@ invault(void)
             else
                 y += dy;
         }
-        if (x == u.ux && y == u.uy) {
+        if (u_at(x, y)) {
             if (levl[x + 1][y].typ == HWALL || levl[x + 1][y].typ == DOOR)
                 x = x + 1;
             else if (levl[x - 1][y].typ == HWALL
@@ -686,7 +686,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     coord newcc, bestcc;
     int gdelta, newdelta, bestdelta, tryct,
         guardx = grd->mx, guardy = grd->my;
-    boolean under_u = (goldx == u.ux && goldy == u.uy),
+    boolean under_u = u_at(goldx, goldy),
             see_it = cansee(goldx, goldy);
 
     if (under_u) {

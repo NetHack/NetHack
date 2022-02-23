@@ -181,7 +181,7 @@ drop_throw(
         if (!objgone) {
             if (!flooreffects(obj, x, y, "fall")) {
                 place_object(obj, x, y);
-                if (!mtmp && x == u.ux && y == u.uy)
+                if (!mtmp && u_at(x, y))
                     mtmp = &g.youmonst;
                 if (mtmp && ohit)
                     passive_obj(mtmp, obj, (struct attack *) 0);
@@ -598,7 +598,7 @@ m_throw(
         } else if (mtmp) {
             if (ohitmon(mtmp, singleobj, range, TRUE))
                 break;
-        } else if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
+        } else if (u_at(g.bhitpos.x, g.bhitpos.y)) {
             if (g.multi)
                 nomul(0);
 
@@ -1110,8 +1110,8 @@ linedup(
     /* straight line, orthogonal to the map or diagonal */
     if ((!g.tbx || !g.tby || abs(g.tbx) == abs(g.tby))
         && distmin(g.tbx, g.tby, 0, 0) < BOLT_LIM) {
-        if ((ax == u.ux && ay == u.uy) ? (boolean) couldsee(bx, by)
-                                       : clear_path(ax, ay, bx, by))
+        if (u_at(ax, ay) ? (boolean) couldsee(bx, by)
+                         : clear_path(ax, ay, bx, by))
             return TRUE;
         /* don't have line of sight, but might still be lined up
            if that lack of sight is due solely to boulders */

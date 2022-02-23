@@ -1432,7 +1432,7 @@ movebubbles(void)
                             mon->mx = mon->my = 0;
                             mon->mstate |= MON_BUBBLEMOVE;
                         }
-                        if (!u.uswallow && x == u.ux && y == u.uy) {
+                        if (!u.uswallow && u_at(x, y)) {
                             cons = (struct container *) alloc(sizeof *cons);
                             cons->x = x;
                             cons->y = y;

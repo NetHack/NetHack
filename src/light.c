@@ -162,7 +162,7 @@ do_light_sources(xchar **cs_rows)
 
         /* minor optimization: don't bother with duplicate light sources
            at hero */
-        if (ls->x == u.ux && ls->y == u.uy) {
+        if (u_at(ls->x, ls->y)) {
             if (at_hero_range >= ls->range)
                 ls->flags &= ~LSF_SHOW;
             else
@@ -190,7 +190,7 @@ do_light_sources(xchar **cs_rows)
                 if ((max_x = (ls->x + offset)) >= COLNO)
                     max_x = COLNO - 1;
 
-                if (ls->x == u.ux && ls->y == u.uy) {
+                if (u_at(ls->x, ls->y)) {
                     /*
                      * If the light source is located at the hero, then
                      * we can use the COULD_SEE bits already calculated

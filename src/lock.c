@@ -416,7 +416,7 @@ pick_lock(struct obj *pick,
         return PICKLOCK_DID_NOTHING;
     }
 
-    if (cc.x == u.ux && cc.y == u.uy) { /* pick lock on a container */
+    if (u_at(cc.x, cc.y)) { /* pick lock on a container */
         const char *verb;
         char qsfx[QBUFSZ];
         boolean it;
@@ -740,7 +740,7 @@ doopen_indir(int x, int y)
         return ECMD_OK;
 
     /* open at yourself/up/down */
-    if ((cc.x == u.ux) && (cc.y == u.uy))
+    if (u_at(cc.x, cc.y))
         return doloot();
 
     if (stumble_on_door_mimic(cc.x, cc.y))
@@ -885,7 +885,7 @@ doclose(void)
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
-    if ((x == u.ux) && (y == u.uy)) {
+    if (u_at(x, y)) {
         You("are in the way!");
         return ECMD_TIME;
     }

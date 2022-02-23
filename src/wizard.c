@@ -394,7 +394,7 @@ tactics(struct monst *mtmp)
         if (!targ) { /* simply wants you to close */
             return 0;
         }
-        if ((u.ux == tx && u.uy == ty) || where == STRAT_PLAYER) {
+        if (u_at(tx, ty) || where == STRAT_PLAYER) {
             /* player is standing on it (or has it) */
             mnexto(mtmp, RLOC_MSG);
             return 0;

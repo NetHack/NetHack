@@ -2040,7 +2040,7 @@ doloot_core(void)
         if (!get_adjacent_loc("Loot in what direction?",
                               "Invalid loot location", u.ux, u.uy, &cc))
             return ECMD_OK;
-        if (cc.x == u.ux && cc.y == u.uy) {
+        if (u_at(cc.x, cc.y)) {
             underfoot = TRUE;
             if (container_at(cc.x, cc.y, FALSE))
                 goto lootcont;

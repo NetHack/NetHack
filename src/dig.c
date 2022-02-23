@@ -561,7 +561,7 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
     struct monst *mtmp = m_at(x, y); /* may be madeby */
     boolean madeby_u = (madeby == BY_YOU);
     boolean madeby_obj = (madeby == BY_OBJECT);
-    boolean at_u = (x == u.ux) && (y == u.uy);
+    boolean at_u = u_at(x, y);
     boolean wont_fall = Levitation || Flying;
 
     if (at_u && u.utrap) {
@@ -738,7 +738,7 @@ liquid_flow(xchar x, xchar y, schar typ, struct trap *ttmp,
 {
     struct obj *objchain;
     struct monst *mon;
-    boolean u_spot = (x == u.ux && y == u.uy);
+    boolean u_spot = u_at(x, y);
 
     if (ttmp)
         (void) delfloortrap(ttmp);
@@ -1131,8 +1131,7 @@ use_pick_axe2(struct obj *obj)
                 || g.context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
                     && !g.context.digging.down
-                    && g.context.digging.pos.x == u.ux
-                    && g.context.digging.pos.y == u.uy
+                    && u_at(g.context.digging.pos.x, g.context.digging.pos.y)
                     && (g.moves <= g.context.digging.lastdigtime + 2
                         && g.moves >= g.context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
@@ -1693,7 +1692,7 @@ pit_flow(struct trap *trap, schar filltyp)
         t = *trap;
         levl[t.tx][t.ty].typ = filltyp, levl[t.tx][t.ty].flags = 0;
         liquid_flow(t.tx, t.ty, filltyp, trap,
-                    (t.tx == u.ux && t.ty == u.uy)
+                    u_at(t.tx, t.ty)
                         ? "Suddenly %s flows in from the adjacent pit!"
                         : (char *) 0);
         for (idx = 0; idx < N_DIRS; ++idx) {
@@ -2015,7 +2014,7 @@ rot_corpse(anything *arg, long timeout)
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        } else if (x == u.ux && y == u.uy
+        } else if (u_at(x, y)
                    && u.uundetected && hides_under(g.youmonst.data))
             (void) hideunder(&g.youmonst);
         newsym(x, y);

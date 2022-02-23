@@ -251,7 +251,7 @@ md_stop(coord *stopp,  /* stopping position (we fill it in) */
 
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y) || (x == u.ux && y == u.uy))
+            if (!isok(x, y) || u_at(x, y))
                 continue;
 
             if (accessible(x, y) && !MON_AT(x, y)) {
@@ -334,7 +334,7 @@ md_rush(struct monst *md,
 
         if ((mon = m_at(fx, fy)) != 0) /* save monster at this position */
             verbalize1(md_exclamations());
-        else if (fx == u.ux && fy == u.uy)
+        else if (u_at(fx, fy))
             verbalize("Excuse me.");
 
         if (mon)

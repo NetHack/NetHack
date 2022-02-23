@@ -403,7 +403,7 @@ mattacku(register struct monst *mtmp)
      */
     boolean ranged = (distu(mtmp->mx, mtmp->my) > 3),
             range2 = !monnear(mtmp, mtmp->mux, mtmp->muy),
-            foundyou = (mtmp->mux == u.ux && mtmp->muy == u.uy),
+            foundyou = u_at(mtmp->mux, mtmp->muy),
             youseeit = canseemon(mtmp),
             skipnonmagc = FALSE;
 

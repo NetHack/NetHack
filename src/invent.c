@@ -3935,7 +3935,7 @@ void
 useupf(struct obj *obj, long numused)
 {
     struct obj *otmp;
-    boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
+    boolean at_u = u_at(obj->ox, obj->oy);
 
     /* burn_floor_objects() keeps an object pointer that it tries to
      * useupf() multiple times, so obj must survive if plural */

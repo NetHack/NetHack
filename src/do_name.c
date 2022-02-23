@@ -447,8 +447,7 @@ gather_locs(coord **arr_p, int *cnt_p, int gloc)
     for (pass = 0; pass < 2; pass++) {
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
-                if ((x == u.ux && y == u.uy)
-                    || gather_locs_interesting(x, y, gloc)) {
+                if (u_at(x, y) || gather_locs_interesting(x, y, gloc)) {
                     if (!pass) {
                         ++*cnt_p;
                     } else {
@@ -1165,7 +1164,7 @@ do_mgivenname(void)
         return;
     cx = cc.x, cy = cc.y;
 
-    if (cx == u.ux && cy == u.uy) {
+    if (u_at(cx, cy)) {
         if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
         } else {
@@ -1596,7 +1595,7 @@ namefloorobj(void)
               ? "over" : "under");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
-    if (cc.x == u.ux && cc.y == u.uy) {
+    if (u_at(cc.x, cc.y)) {
         obj = vobj_at(u.ux, u.uy);
     } else {
         glyph = glyph_at(cc.x, cc.y);
@@ -1607,7 +1606,7 @@ namefloorobj(void)
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
         pline("There doesn't seem to be any object %s.",
-              (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
+              u_at(cc.x, cc.y) ? "under you" : "there");
         return;
     }
     /* note well: 'obj' might be an instance of STRANGE_OBJECT if target

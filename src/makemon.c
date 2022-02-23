@@ -1118,7 +1118,7 @@ makemon(register struct permonst *ptr,
     coord cc;
     int mndx, mcham, ct, mitem;
     boolean anymon = !ptr,
-            byyou = (x == u.ux && y == u.uy),
+            byyou = u_at(x, y),
             allow_minvent = ((mmflags & NO_MINVENT) == 0),
             countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0),
             allowtail = ((mmflags & MM_NOTAIL) == 0);

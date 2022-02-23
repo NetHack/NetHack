@@ -449,7 +449,7 @@ landing_spot(
     for (; !found && i < 2; ++i) {
         for (x = u.ux - 1; x <= u.ux + 1; x++)
             for (y = u.uy - 1; y <= u.uy + 1; y++) {
-                if (!isok(x, y) || (x == u.ux && y == u.uy))
+                if (!isok(x, y) || u_at(x, y))
                     continue;
 
                 if (accessible(x, y) && !MON_AT(x, y)

@@ -235,7 +235,7 @@ its_dead(int rx, int ry, int *resp)
         return TRUE;
 
     } else if (corpse) {
-        boolean here = (rx == u.ux && ry == u.uy),
+        boolean here = u_at(rx, ry),
                 one = (corpse->quan == 1L && !more_corpses), reviver = FALSE;
         int visglyph, corpseglyph;
 
@@ -265,7 +265,7 @@ its_dead(int rx, int ry, int *resp)
         mptr = &mons[statue->corpsenm];
         if (Blind) { /* ignore statue->dknown; it'll always be set */
             Sprintf(buf, "%s %s",
-                    (rx == u.ux && ry == u.uy) ? "This" : "That",
+                    u_at(rx, ry) ? "This" : "That",
                     humanoid(mptr) ? "person" : "creature");
             what = buf;
         } else {
@@ -627,7 +627,7 @@ use_leash(struct obj *obj)
     if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
         return ECMD_OK;
 
-    if (cc.x == u.ux && cc.y == u.uy) {
+    if (u_at(cc.x, cc.y)) {
         if (u.usteed && u.dz > 0) {
             mtmp = u.usteed;
             spotmon = 1;
@@ -2587,8 +2587,7 @@ use_trap(struct obj *otmp)
         return;
     }
     ttyp = (otmp->otyp == LAND_MINE) ? LANDMINE : BEAR_TRAP;
-    if (otmp == g.trapinfo.tobj && u.ux == g.trapinfo.tx
-                                && u.uy == g.trapinfo.ty) {
+    if (otmp == g.trapinfo.tobj && u_at(g.trapinfo.tx, g.trapinfo.ty)) {
         You("resume setting %s%s.", shk_your(buf, otmp),
             trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
@@ -3139,7 +3138,7 @@ use_pole(struct obj *obj, boolean autohit)
         pline("Too far!");
         return res;
     } else if (distu(cc.x, cc.y) < min_range) {
-        if (autohit && cc.x == u.ux && cc.y == u.uy)
+        if (autohit && u_at(cc.x, cc.y))
             pline("Don't know what to hit.");
         else
             pline("Too close!");

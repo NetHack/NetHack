@@ -484,7 +484,7 @@ find_defensive(struct monst* mtmp)
             /* skip if it's hero's location
                or a diagonal spot and monster can't move diagonally
                or some other monster is there */
-            if ((xx == u.ux && yy == u.uy)
+            if (u_at(xx, yy)
                 || (xx != x && yy != y && !diag_ok)
                 || (g.level.monsters[xx][yy] && !(xx == x && yy == y)))
                 continue;
@@ -1483,7 +1483,7 @@ mbhit(
             case WAN_STRIKING:
                 destroy_drawbridge(x, y);
             }
-        if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) {
+        if (u_at(g.bhitpos.x, g.bhitpos.y)) {
             (*fhitm)(&g.youmonst, obj);
             range -= 3;
         } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
@@ -1854,7 +1854,7 @@ find_misc(struct monst* mtmp)
                monster from attempting disarm every turn */
             && uwep && !rn2(5) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
-            && mtmp->mux == u.ux && mtmp->muy == u.uy
+            && u_at(mtmp->mux, mtmp->muy)
             && next2u(mtmp->mx, mtmp->my)
             /* don't bother if it can't work (this doesn't
                prevent cursed weapons from being targetted) */

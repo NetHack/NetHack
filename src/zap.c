@@ -3772,7 +3772,7 @@ boomhit(struct obj *obj, int dx, int dy)
             g.bhitpos.y -= dy;
             break;
         }
-        if (g.bhitpos.x == u.ux && g.bhitpos.y == u.uy) { /* ct == 9 */
+        if (u_at(g.bhitpos.x, g.bhitpos.y)) { /* ct == 9 */
             if (Fumbling || rn2(20) >= ACURR(A_DEX)) {
                 /* we hit ourselves */
                 (void) thitu(10 + obj->spe, dmgval(obj, &g.youmonst), &obj,
@@ -4149,11 +4149,11 @@ burn_floor_objects(int x, int y,
                 /* save name before potential delobj() */
                 if (give_feedback) {
                     obj->quan = 1L;
-                    Strcpy(buf1, (x == u.ux && y == u.uy)
+                    Strcpy(buf1, u_at(x, y)
                                      ? xname(obj)
                                      : distant_name(obj, xname));
                     obj->quan = 2L;
-                    Strcpy(buf2, (x == u.ux && y == u.uy)
+                    Strcpy(buf2, u_at(x, y)
                                      ? xname(obj)
                                      : distant_name(obj, xname));
                     obj->quan = scrquan;
@@ -4412,7 +4412,7 @@ dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
                 if (say || canseemon(mon))
                     miss(flash_str(fltyp, FALSE), mon);
             }
-        } else if (sx == u.ux && sy == u.uy && range >= 0) {
+        } else if (u_at(sx, sy) && range >= 0) {
             nomul(0);
             if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *) 0)) {
                 mon = u.usteed;
@@ -4545,7 +4545,7 @@ melt_ice(xchar x, xchar y, const char *msg)
     if (Underwater)
         vision_recalc(1);
     newsym(x, y);
-    if (cansee(x, y) || (x == u.ux && y == u.uy))
+    if (cansee(x, y) || u_at(x, y))
         Norep("%s", msg);
     if ((otmp = sobj_at(BOULDER, x, y)) != 0) {
         if (cansee(x, y))
@@ -4558,7 +4558,7 @@ melt_ice(xchar x, xchar y, const char *msg)
         } while (is_pool(x, y) && (otmp = sobj_at(BOULDER, x, y)) != 0);
         newsym(x, y);
     }
-    if (x == u.ux && y == u.uy)
+    if (u_at(x, y))
         spoteffects(TRUE); /* possibly drown, notice objects */
     else if (is_pool(x, y) && (mtmp = m_at(x, y)) != 0)
         (void) minliquid(mtmp);
@@ -4739,7 +4739,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
                 } else if (!lava)
                     You_hear("a crackling sound.");
 
-                if (x == u.ux && y == u.uy) {
+                if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */
                         set_uinwater(0); /* u.uinwater = 0 */

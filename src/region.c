@@ -985,7 +985,7 @@ expire_gas_cloud(genericptr_t p1, genericptr_t p2 UNUSED)
             if (inside_region(reg, x, y)) {
                 if (!does_block(x, y, &levl[x][y]))
                     unblock_point(x, y);
-                if (x == u.ux && y == u.uy)
+                if (u_at(x, y))
                     g.gas_cloud_diss_within = TRUE;
                 if (cansee(x, y))
                     g.gas_cloud_diss_seen++;

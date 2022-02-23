@@ -749,7 +749,7 @@ newsym(register int x, register int y)
 
     /* only permit updating the hero when swallowed */
     if (u.uswallow) {
-        if (x == u.ux && y == u.uy)
+        if (u_at(x, y))
             display_self();
         return;
     }
@@ -794,7 +794,7 @@ newsym(register int x, register int y)
             return;
         }
 
-        if (x == u.ux && y == u.uy) {
+        if (u_at(x, y)) {
             int see_self = canspotself();
 
             /* update map information for <u.ux,u.uy> (remembered topology
@@ -831,7 +831,7 @@ newsym(register int x, register int y)
 
     /* Can't see the location. */
     } else {
-        if (x == u.ux && y == u.uy) {
+        if (u_at(x, y)) {
             feel_location(u.ux, u.uy); /* forces an update */
 
             if (canspotself())
@@ -1216,7 +1216,7 @@ under_water(int mode)
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
             if (isok(x, y) && (is_pool_or_lava(x, y) || is_ice(x, y))) {
-                if (Blind && !(x == u.ux && y == u.uy))
+                if (Blind && !u_at(x, y))
                     show_glyph(x, y, GLYPH_UNEXPLORED);
                 else
                     newsym(x, y);
@@ -2182,7 +2182,7 @@ map_glyphinfo(
     glyph_info *glyphinfo)
 {
     int offset;
-    boolean is_you = (x == u.ux && y == u.uy
+    boolean is_you = (u_at(x, y)
                       /* verify hero or steed (not something underneath
                          when hero is invisible without see invisible,
                          or a temporary display effect like an explosion);
