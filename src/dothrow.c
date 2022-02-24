@@ -922,7 +922,9 @@ mhurtle_step(genericptr_t arg, int x, int y)
         if (is_waterwall(x, y))
             return FALSE;
         res = mintrap(mon);
-        if (res == Trap_Killed_Mon || res == Trap_Caught_Mon)
+        if (res == Trap_Killed_Mon
+            || res == Trap_Caught_Mon
+            || res == Trap_Moved_Mon)
             return FALSE;
         return TRUE;
     }

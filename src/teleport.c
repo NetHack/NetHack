@@ -1430,7 +1430,7 @@ mtele_trap(struct monst* mtmp, struct trap* trap, int in_sight)
     }
 }
 
-/* return 0 if still on level, 3 if not */
+/* return Trap_Effect_Finished if still on level, Trap_Moved_Mon if not */
 int
 mlevel_tele_trap(
     struct monst *mtmp,
@@ -1441,7 +1441,7 @@ mlevel_tele_trap(
     int tt = (trap ? trap->ttyp : NO_TRAP);
 
     if (mtmp == u.ustuck) /* probably a vortex */
-        return 0;         /* temporary? kludge */
+        return Trap_Effect_Finished; /* temporary? kludge */
     if (teleport_pet(mtmp, force_it)) {
         d_level tolevel;
         int migrate_typ = MIGR_RANDOM;
@@ -1453,7 +1453,7 @@ mlevel_tele_trap(
                 if (in_sight && trap->tseen)
                     pline("%s avoids the %s.", Monnam(mtmp),
                           (tt == HOLE) ? "hole" : "trap");
-                return 0;
+                return Trap_Effect_Finished;
             } else {
                 get_level(&tolevel, depth(&u.uz) + 1);
             }
@@ -1465,7 +1465,7 @@ mlevel_tele_trap(
                     pline("%s seems to shimmer for a moment.", Monnam(mtmp));
                     seetrap(trap);
                 }
-                return 0;
+                return Trap_Effect_Finished;
             } else {
                 assign_level(&tolevel, &trap->dst);
                 migrate_typ = MIGR_PORTAL;
@@ -1482,7 +1482,7 @@ mlevel_tele_trap(
                 if (in_sight)
                     pline("%s seems very disoriented for a moment.",
                           Monnam(mtmp));
-                return 0;
+                return Trap_Effect_Finished;
             }
             if (tt == NO_TRAP) {
                 /* creature is being forced off the level to make room;
@@ -1495,13 +1495,13 @@ mlevel_tele_trap(
                 if (nlev == depth(&u.uz)) {
                     if (in_sight)
                         pline("%s shudders for a moment.", Monnam(mtmp));
-                    return 0;
+                    return Trap_Effect_Finished;
                 }
                 get_level(&tolevel, nlev);
             }
         } else {
             impossible("mlevel_tele_trap: unexpected trap type (%d)", tt);
-            return 0;
+            return Trap_Effect_Finished;
         }
 
         if (in_sight) {
@@ -1510,9 +1510,9 @@ mlevel_tele_trap(
                 seetrap(trap);
         }
         migrate_to_level(mtmp, ledger_no(&tolevel), migrate_typ, (coord *) 0);
-        return 3; /* no longer on this level */
+        return Trap_Moved_Mon; /* no longer on this level */
     }
-    return 0;
+    return Trap_Effect_Finished;
 }
 
 /* place object randomly, returns False if it's gone (eg broken) */

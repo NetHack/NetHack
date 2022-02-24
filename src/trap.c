@@ -981,7 +981,8 @@ trapeffect_arrow_trap(
         if (thitm(8, mtmp, otmp, 0, FALSE))
             trapkilled = TRUE;
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1049,7 +1050,8 @@ trapeffect_dart_trap(
         if (thitm(7, mtmp, otmp, 0, FALSE))
             trapkilled = TRUE;
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1126,7 +1128,8 @@ trapeffect_rocktrap(
         if (thitm(0, mtmp, otmp, d(2, 6), FALSE))
             trapkilled = TRUE;
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1255,7 +1258,8 @@ trapeffect_bear_trap(
         if (mtmp->mtrapped)
             trapkilled = thitm(0, mtmp, (struct obj *) 0, d(2, 4), FALSE);
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1414,7 +1418,8 @@ trapeffect_rust_trap(
             (void) split_mon(mtmp, (struct monst *) 0);
         }
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1496,7 +1501,8 @@ trapeffect_fire_trap(
         if (see_it && t_at(mtmp->mx, mtmp->my))
             seetrap(trap);
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1669,7 +1675,8 @@ trapeffect_pit(
                                        rnd((tt == PIT) ? 6 : 10), FALSE))
             trapkilled = TRUE;
 
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -1745,6 +1752,7 @@ trapeffect_telep_trap(
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
 
         mtele_trap(mtmp, trap, in_sight);
+        return Trap_Moved_Mon;
     }
     return Trap_Effect_Finished;
 }
@@ -1759,16 +1767,13 @@ trapeffect_level_telep(
         seetrap(trap);
         level_tele_trap(trap, trflags);
     } else {
-        int mlev_res;
         int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean inescapable = (g.force_mintrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
-        mlev_res = mlevel_tele_trap(mtmp, trap, inescapable, in_sight);
-        if (mlev_res)
-            return mlev_res;
+        return mlevel_tele_trap(mtmp, trap, inescapable, in_sight);
     }
     return Trap_Effect_Finished;
 }
@@ -1937,7 +1942,7 @@ trapeffect_web(
                 seetrap(trap);
             }
         }
-        return mtmp->mtrapped;
+        return mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -2076,7 +2081,8 @@ trapeffect_anti_magic(
             if (see_it)
                 newsym(trap->tx, trap->ty);
         }
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -2248,7 +2254,8 @@ trapeffect_landmine(
             g.multi = -1;
             g.nomovemsg = "The explosion awakens you!";
         }
-        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+        return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+            ? Trap_Caught_Mon : Trap_Effect_Finished;
     }
     return Trap_Effect_Finished;
 }
@@ -2296,7 +2303,8 @@ trapeffect_rolling_boulder_trap(
                 deltrap(trap);
                 newsym(mtmp->mx, mtmp->my);
             }
-            return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped;
+            return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
+                ? Trap_Caught_Mon : Trap_Effect_Finished;
         }
     }
     return Trap_Effect_Finished;
@@ -3065,7 +3073,7 @@ mintrap(register struct monst *mtmp)
 {
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
     struct permonst *mptr = mtmp->data;
-    int trap_result = 0;
+    int trap_result = Trap_Effect_Finished;
 
     if (!trap) {
         mtmp->mtrapped = 0;      /* perhaps teleported? */
@@ -3114,6 +3122,7 @@ mintrap(register struct monst *mtmp)
                 mtmp->meating = 5;
             }
         }
+        trap_result = mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
     } else {
         register int tt = trap->ttyp;
         boolean inescapable = (g.force_mintrap
@@ -3139,8 +3148,7 @@ mintrap(register struct monst *mtmp)
 
         trap_result = trapeffect_selector(mtmp, trap, 0);
     }
-    return (trap_result == Trap_Killed_Mon) ? trap_result
-        : mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
+    return trap_result;
 }
 
 /* Combine cockatrice checks into single functions to avoid repeating code. */
@@ -5224,7 +5232,7 @@ closeholdingtrap(
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         ++g.force_mintrap;
-        result = (mintrap(mon) != 0);
+        result = (mintrap(mon) != Trap_Effect_Finished);
         --g.force_mintrap;
     }
     return result;

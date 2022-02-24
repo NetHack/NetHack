@@ -2138,16 +2138,16 @@ domove_core(void)
                          has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
-            switch (minliquid(mtmp) ? 2 : mintrap(mtmp)) {
-            case 0:
+            switch (minliquid(mtmp) ? Trap_Killed_Mon : mintrap(mtmp)) {
+            case Trap_Effect_Finished:
                 break;
-            case 1: /* trapped */
-            case 3: /* changed levels */
+            case Trap_Caught_Mon: /* trapped */
+            case Trap_Moved_Mon: /* changed levels */
                 /* there's already been a trap message, reinforce it */
                 abuse_dog(mtmp);
                 adjalign(-3);
                 break;
-            case 2:
+            case Trap_Killed_Mon:
                 /* drowned or died...
                  * you killed your pet by direct action, so get experience
                  * and possibly penalties;

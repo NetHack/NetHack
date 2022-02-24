@@ -86,7 +86,8 @@ enum trap_types {
 enum { Trap_Effect_Finished = 0,
        Trap_Is_Gone = 0,
        Trap_Caught_Mon = 1,
-       Trap_Killed_Mon = 2
+       Trap_Killed_Mon = 2,
+       Trap_Moved_Mon = 3, /* new location, or new level */
 };
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
