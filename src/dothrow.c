@@ -921,9 +921,7 @@ mhurtle_step(genericptr_t arg, int x, int y)
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
-        ++g.force_mintrap;
         res = mintrap(mon);
-        --g.force_mintrap;
         if (res == Trap_Killed_Mon || res == Trap_Caught_Mon)
             return FALSE;
         return TRUE;
