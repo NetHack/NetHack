@@ -11,6 +11,8 @@ static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
                                             struct obj *);
 static boolean mu_maybe_destroy_web(struct monst *, boolean, struct trap *);
 static struct obj *t_missile(int, struct trap *);
+static boolean floor_trigger(int);
+static boolean check_in_air(struct monst *, unsigned);
 static int trapeffect_arrow_trap(struct monst *, struct trap *, unsigned);
 static int trapeffect_dart_trap(struct monst *, struct trap *, unsigned);
 static int trapeffect_rocktrap(struct monst *, struct trap *, unsigned);
@@ -928,6 +930,43 @@ reset_utrap(boolean msg)
         if (!was_Fly && Flying)
             You("can fly.");
     }
+}
+
+/* is trap type ttyp triggered by touching the floor?  */
+static boolean
+floor_trigger(int ttyp)
+{
+    switch (ttyp) {
+    case ARROW_TRAP:
+    case DART_TRAP:
+    case ROCKTRAP:
+    case SQKY_BOARD:
+    case BEAR_TRAP:
+    case LANDMINE:
+    case ROLLING_BOULDER_TRAP:
+    case SLP_GAS_TRAP:
+    case RUST_TRAP:
+    case FIRE_TRAP:
+    case PIT:
+    case SPIKED_PIT:
+    case HOLE:
+    case TRAPDOOR:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+/* return TRUE if monster mtmp is up in the air, considering trap flags */
+static boolean
+check_in_air(struct monst *mtmp, unsigned trflags)
+{
+    boolean plunged = (trflags & TOOKPLUNGE) != 0;
+
+    return (is_floater(mtmp->data)
+            || (is_flyer(mtmp->data) && !plunged)
+            || (mtmp == &g.youmonst ?
+                (Levitation || (Flying && !plunged)) : 0));
 }
 
 static int
@@ -2456,15 +2495,17 @@ dotrap(register struct trap* trap, unsigned int trflags)
               a_your[trap->madeby_u],
               trapname(ttype, TRUE)); /* do force "pit" while hallucinating */
         /* then proceed to normal trap effect */
-    } else if (already_seen && !forcetrap) {
-        if ((Levitation || (Flying && !plunged))
-            && (is_pit(ttype) || ttype == HOLE || ttype == BEAR_TRAP)) {
-            You("%s over %s %s.", Levitation ? "float" : "fly",
-                a_your[trap->madeby_u],
-                trapname(ttype, FALSE));
+    } else if (!forcetrap) {
+        if (floor_trigger(ttype) && check_in_air(&g.youmonst, trflags)) {
+            if (already_seen) {
+                You("%s over %s %s.", Levitation ? "float" : "fly",
+                    (ttype == ARROW_TRAP && !trap->madeby_u)
+                    ? "an" : a_your[trap->madeby_u],
+                    trapname(ttype, FALSE));
+            }
             return;
         }
-        if (!Fumbling && !undestroyable_trap(ttype)
+        if (already_seen && !Fumbling && !undestroyable_trap(ttype)
             && ttype != ANTI_MAGIC && !forcebungle && !plunged
             && !conj_pit && !adj_pit
             && (!rn2(5) || (is_pit(ttype)
@@ -3130,21 +3171,24 @@ mintrap(register struct monst *mtmp, long mintrapflags)
     } else {
         register int tt = trap->ttyp;
         boolean forcetrap = ((mintrapflags & FORCETRAP) != 0);
-        boolean inescapable = (forcetrap
-                               || ((tt == HOLE || tt == PIT)
-                                   && Sokoban && !trap->madeby_u));
+        /* monster has seen such a trap before */
+        boolean already_seen = ((mtmp->mtrapseen & (1 << (tt - 1))) != 0
+                                || (tt == HOLE && !mindless(mptr)));
 
-        /* true when called from dotrap, inescapable is not an option */
-        if (mtmp == u.usteed)
-            inescapable = TRUE;
-        if (!inescapable && ((mtmp->mtrapseen & (1 << (tt - 1))) != 0
-                             || (tt == HOLE && !mindless(mptr)))) {
-            /* it has been in such a trap - perhaps it escapes */
-            if (rn2(4))
+        if (mtmp == u.usteed) {
+            /* true when called from dotrap, inescapable is not an option */
+        } else if (Sokoban && (is_pit(tt) || is_hole(tt)) && !trap->madeby_u) {
+            /* nothing here, the trap effects will handle messaging */
+        } else if (!forcetrap) {
+            if (floor_trigger(tt) && check_in_air(mtmp, mintrapflags)) {
                 return Trap_Effect_Finished;
-        } else {
-            mtmp->mtrapseen |= (1 << (tt - 1));
+            }
+            if (already_seen && rn2(4))
+                return Trap_Effect_Finished;
         }
+
+        mtmp->mtrapseen |= (1 << (tt - 1));
+
         /* Monster is aggravated by being trapped by you.
            Recognizing who made the trap isn't completely
            unreasonable; everybody has their own style. */
