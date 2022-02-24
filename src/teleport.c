@@ -1288,7 +1288,7 @@ rloc_to_core(struct monst* mtmp,
 
     /* trapped monster teleported away */
     if (mtmp->mtrapped && !mtmp->wormno)
-        (void) mintrap(mtmp);
+        (void) mintrap(mtmp, NO_TRAP_FLAGS);
 }
 
 void

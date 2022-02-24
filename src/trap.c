@@ -1248,7 +1248,7 @@ trapeffect_bear_trap(
                     || mptr == &mons[PM_BUGBEAR])
                     You_hear("the roaring of an angry bear!");
             }
-        } else if (g.force_mintrap) {
+        } else if (forcetrap) {
             if (in_sight) {
                 pline("%s evades %s bear trap!", Monnam(mtmp),
                       a_your[trap->madeby_u]);
@@ -1640,7 +1640,8 @@ trapeffect_pit(
         int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         boolean trapkilled = FALSE;
-        boolean inescapable = (g.force_mintrap
+        boolean forcetrap = ((trflags & FORCETRAP) != 0);
+        boolean inescapable = (forcetrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
         struct permonst *mptr = mtmp->data;
@@ -1648,7 +1649,7 @@ trapeffect_pit(
 
         fallverb = "falls";
         if (!grounded(mptr) || (mtmp->wormno && count_wsegs(mtmp) > 5)) {
-            if (g.force_mintrap && !Sokoban) {
+            if (forcetrap && !Sokoban) {
                 /* openfallingtrap; not inescapable here */
                 if (in_sight) {
                     seetrap(trap);
@@ -1699,7 +1700,8 @@ trapeffect_hole(
         int tt = trap->ttyp;
         struct permonst *mptr = mtmp->data;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
-        boolean inescapable = (g.force_mintrap
+        boolean forcetrap = ((trflags & FORCETRAP) != 0);
+        boolean inescapable = (forcetrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
@@ -1710,7 +1712,7 @@ trapeffect_hole(
         }
         if (!grounded(mptr) || (mtmp->wormno && count_wsegs(mtmp) > 5)
             || mptr->msize >= MZ_HUGE) {
-            if (g.force_mintrap && !Sokoban) {
+            if (forcetrap && !Sokoban) {
                 /* openfallingtrap; not inescapable here */
                 if (in_sight) {
                     seetrap(trap);
@@ -1769,7 +1771,8 @@ trapeffect_level_telep(
     } else {
         int tt = trap->ttyp;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
-        boolean inescapable = (g.force_mintrap
+        boolean forcetrap = ((trflags & FORCETRAP) != 0);
+        boolean inescapable = (forcetrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
@@ -1845,7 +1848,7 @@ trapeffect_web(
 
                 /* mintrap currently does not return Trap_Killed_Mon
                    (mon died) for webs */
-                if (mintrap(u.usteed)) {
+                if (mintrap(u.usteed, trflags) != Trap_Effect_Finished) {
                     u.usteed->mtrapped = 0;
                     if (strongmonst(u.usteed->data))
                         str = 17;
@@ -1883,6 +1886,7 @@ trapeffect_web(
         /* Monster in a web. */
         boolean tear_web;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
+        boolean forcetrap = ((trflags & FORCETRAP) != 0);
         struct permonst *mptr = mtmp->data;
 
         if (webmaker(mptr))
@@ -1935,7 +1939,7 @@ trapeffect_web(
                       a_your[trap->madeby_u]);
             deltrap(trap);
             newsym(mtmp->mx, mtmp->my);
-        } else if (g.force_mintrap && !mtmp->mtrapped) {
+        } else if (forcetrap && !mtmp->mtrapped) {
             if (in_sight) {
                 pline("%s avoids %s spider web!", Monnam(mtmp),
                       a_your[trap->madeby_u]);
@@ -2243,7 +2247,7 @@ trapeffect_landmine(
             trapkilled = TRUE;
         } else {
             /* monsters recursively fall into new pit */
-            if (mintrap(mtmp) == Trap_Killed_Mon)
+            if (mintrap(mtmp, trflags|FORCETRAP) == Trap_Killed_Mon)
                 trapkilled = TRUE;
         }
         /* a boulder may fill the new pit, crushing monster */
@@ -3069,7 +3073,7 @@ isclearpath(
 }
 
 int
-mintrap(register struct monst *mtmp)
+mintrap(register struct monst *mtmp, long mintrapflags)
 {
     register struct trap *trap = t_at(mtmp->mx, mtmp->my);
     struct permonst *mptr = mtmp->data;
@@ -3125,7 +3129,8 @@ mintrap(register struct monst *mtmp)
         trap_result = mtmp->mtrapped ? Trap_Caught_Mon : Trap_Effect_Finished;
     } else {
         register int tt = trap->ttyp;
-        boolean inescapable = (g.force_mintrap
+        boolean forcetrap = ((mintrapflags & FORCETRAP) != 0);
+        boolean inescapable = (forcetrap
                                || ((tt == HOLE || tt == PIT)
                                    && Sokoban && !trap->madeby_u));
 
@@ -3146,7 +3151,7 @@ mintrap(register struct monst *mtmp)
         if (trap->madeby_u && rnl(5))
             setmangry(mtmp, FALSE);
 
-        trap_result = trapeffect_selector(mtmp, trap, 0);
+        trap_result = trapeffect_selector(mtmp, trap, mintrapflags);
     }
     return trap_result;
 }
@@ -5221,9 +5226,7 @@ closeholdingtrap(
         /* dotrap calls mintrap when mounted hero encounters a web */
         if (u.usteed)
             dotrapflags |= NOWEBMSG;
-        ++g.force_mintrap;
-        dotrap(t, dotrapflags);
-        --g.force_mintrap;
+        dotrap(t, dotrapflags|FORCETRAP);
         result = (u.utrap != 0);
     } else {
         if (mon->mtrapped)
@@ -5231,9 +5234,7 @@ closeholdingtrap(
         /* you notice it if you see the trap close/tremble/whatever
            or if you sense the monster who becomes trapped */
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
-        ++g.force_mintrap;
-        result = (mintrap(mon) != Trap_Effect_Finished);
-        --g.force_mintrap;
+        result = (mintrap(mon, FORCETRAP) != Trap_Effect_Finished);
     }
     return result;
 }
@@ -5274,9 +5275,7 @@ openfallingtrap(
         *noticed = cansee(t->tx, t->ty) || canspotmon(mon);
         /* monster will be angered; mintrap doesn't handle that */
         wakeup(mon, TRUE);
-        ++g.force_mintrap;
-        result = (mintrap(mon) != 0);
-        --g.force_mintrap;
+        result = (mintrap(mon, FORCETRAP) != Trap_Effect_Finished);
         /* mon might now be on the migrating monsters list */
     }
     return result;

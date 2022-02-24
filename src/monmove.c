@@ -1021,7 +1021,7 @@ m_move(register struct monst* mtmp, register int after)
     int omx = mtmp->mx, omy = mtmp->my;
 
     if (mtmp->mtrapped) {
-        int i = mintrap(mtmp);
+        int i = mintrap(mtmp, NO_TRAP_FLAGS);
 
         if (i == Trap_Killed_Mon) {
             newsym(mtmp->mx, mtmp->my);
@@ -1491,7 +1491,7 @@ m_move(register struct monst* mtmp, register int after)
             }
 
             newsym(omx, omy); /* update the old position */
-            if (mintrap(mtmp) == Trap_Killed_Mon) {
+            if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon) {
                 if (mtmp->mx)
                     newsym(mtmp->mx, mtmp->my);
                 return 2; /* it died */

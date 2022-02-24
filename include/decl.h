@@ -1203,8 +1203,6 @@ struct instance_globals {
     winid toptenwin;
 
     /* trap.c */
-    int force_mintrap; /* mintrap() should take a flags argument, but for time
-                          being we use this */
     /* context for water_damage(), managed by water_damage_chain();
         when more than one stack of potions of acid explode while processing
         a chain of objects, use alternate phrasing after the first message */

@@ -634,7 +634,7 @@ digactualhole(int x, int y, struct monst *madeby, int ttyp)
                     pline("%s %s over the pit.", Monnam(mtmp),
                           (is_flyer(mtmp->data)) ? "flies" : "floats");
             } else if (mtmp != madeby)
-                (void) mintrap(mtmp);
+                (void) mintrap(mtmp, NO_TRAP_FLAGS);
         }
     } else { /* was TRAPDOOR now a HOLE*/
 

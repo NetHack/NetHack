@@ -2058,7 +2058,7 @@ domove_core(void)
            or blame if something bad happens to it */
         g.context.mon_moving = 1;
         if (!minliquid(mtmp))
-            (void) mintrap(mtmp);
+            (void) mintrap(mtmp, NO_TRAP_FLAGS);
         g.context.mon_moving = 0;
 
     /*
@@ -2138,7 +2138,8 @@ domove_core(void)
                          has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
             /* check for displacing it into pools and traps */
-            switch (minliquid(mtmp) ? Trap_Killed_Mon : mintrap(mtmp)) {
+            switch (minliquid(mtmp) ? Trap_Killed_Mon
+                    : mintrap(mtmp, NO_TRAP_FLAGS)) {
             case Trap_Effect_Finished:
                 break;
             case Trap_Caught_Mon: /* trapped */

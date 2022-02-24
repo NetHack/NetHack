@@ -616,7 +616,7 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
             stay_behind = FALSE;
             if (mtmp->mtrapped)
-                (void) mintrap(mtmp); /* try to escape */
+                (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
             if (mtmp == u.usteed) {
                 /* make sure steed is eligible to accompany hero */
                 mtmp->mtrapped = 0;       /* escape trap */

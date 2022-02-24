@@ -654,7 +654,6 @@ const struct instance_globals g_init = {
     WIN_ERR, /* toptenwin */
 
     /* trap.c */
-    0, /* force_mintrap */
     { 0, 0, FALSE },
     UNDEFINED_VALUES,
 

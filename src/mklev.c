@@ -1981,7 +1981,7 @@ mkinvpos(xchar x, xchar y, int dist)
             seemimic(mon);
 
         if ((ttmp = t_at(x, y)) != 0)
-            (void) mintrap(mon);
+            (void) mintrap(mon, NO_TRAP_FLAGS);
         else
             (void) minliquid(mon);
     }

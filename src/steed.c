@@ -662,7 +662,7 @@ dismount_steed(
 
                 /* Put your steed in your trap */
                 if (save_utrap)
-                    (void) mintrap(mtmp);
+                    (void) mintrap(mtmp, NO_TRAP_FLAGS);
             }
 
         /* Couldn't move hero... try moving the steed. */

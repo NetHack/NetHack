@@ -2775,9 +2775,7 @@ muse_unslime(
                       is_floater(mon->data) ? "over" : "onto",
                       trap->tseen ? "the" : "a");
         }
-        /* hack to avoid mintrap()'s chance of avoiding known trap */
-        mon->mtrapseen &= ~(1 << (FIRE_TRAP - 1));
-        (void) mintrap(mon);
+        (void) mintrap(mon, FORCETRAP);
     } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis)

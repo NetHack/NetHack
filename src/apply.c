@@ -509,7 +509,7 @@ use_magic_whistle(struct obj *obj)
                     mtmp->mundetected = 0; /* reveal non-mimic hider */
                     if (canspotmon(mtmp))
                         ++pet_cnt;
-                    if (mintrap(mtmp) == Trap_Killed_Mon)
+                    if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
                         change_luck(-1);
                 }
             }

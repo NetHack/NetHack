@@ -91,6 +91,7 @@ kickdmg(struct monst *mon, boolean clumsy)
         /* see if the monster has a place to move into */
         mdx = mon->mx + u.dx;
         mdy = mon->my + u.dy;
+        /* TODO: replace with mhurtle? */
         if (goodpos(mdx, mdy, mon, 0)) {
             pline("%s reels from the blow.", Monnam(mon));
             if (m_in_out_region(mon, mdx, mdy)) {
@@ -99,7 +100,7 @@ kickdmg(struct monst *mon, boolean clumsy)
                 place_monster(mon, mdx, mdy);
                 newsym(mon->mx, mon->my);
                 set_apparxy(mon);
-                if (mintrap(mon) == Trap_Killed_Mon)
+                if (mintrap(mon, NO_TRAP_FLAGS) == Trap_Killed_Mon)
                     trapkilled = TRUE;
             }
         }
