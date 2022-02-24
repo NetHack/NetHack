@@ -965,6 +965,7 @@ check_in_air(struct monst *mtmp, unsigned trflags)
 
     return (is_floater(mtmp->data)
             || (is_flyer(mtmp->data) && !plunged)
+            || (trflags & HURTLING) != 0
             || (mtmp == &g.youmonst ?
                 (Levitation || (Flying && !plunged)) : 0));
 }
@@ -3171,6 +3172,7 @@ mintrap(register struct monst *mtmp, long mintrapflags)
     } else {
         register int tt = trap->ttyp;
         boolean forcetrap = ((mintrapflags & FORCETRAP) != 0);
+        boolean forcebungle = (mintrapflags & FORCEBUNGLE) != 0;
         /* monster has seen such a trap before */
         boolean already_seen = ((mtmp->mtrapseen & (1 << (tt - 1))) != 0
                                 || (tt == HOLE && !mindless(mptr)));
@@ -3183,7 +3185,7 @@ mintrap(register struct monst *mtmp, long mintrapflags)
             if (floor_trigger(tt) && check_in_air(mtmp, mintrapflags)) {
                 return Trap_Effect_Finished;
             }
-            if (already_seen && rn2(4))
+            if (already_seen && rn2(4) && !forcebungle)
                 return Trap_Effect_Finished;
         }
 

@@ -921,7 +921,7 @@ mhurtle_step(genericptr_t arg, int x, int y)
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
-        res = mintrap(mon, NO_TRAP_FLAGS); /* TODO: TEMPFLIGHT? */
+        res = mintrap(mon, HURTLING);
         if (res == Trap_Killed_Mon
             || res == Trap_Caught_Mon
             || res == Trap_Moved_Mon)
@@ -1039,7 +1039,10 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     cc.x = mon->mx + (dx * range);
     cc.y = mon->my + (dy * range);
     (void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t) mon);
-    (void) minliquid(mon);
+    if (!DEADMONSTER(mon) && t_at(mon->mx, mon->my))
+        mintrap(mon, FORCEBUNGLE);
+    else
+        (void) minliquid(mon);
     return;
 }
 

@@ -390,6 +390,7 @@ typedef struct sortloot_item Loot;
 #define TOOKPLUNGE    0x10 /* used '>' to enter pit below you */
 #define VIASITTING    0x20 /* #sit while at trap location (affects message) */
 #define FAILEDUNTRAP  0x40 /* trap activated by failed untrap attempt */
+#define HURTLING      0x80 /* monster is hurtling through air */
 
 /* Flags to control test_move in hack.c */
 #define DO_MOVE 0   /* really doing the move */
