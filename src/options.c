@@ -5580,9 +5580,11 @@ boolean setinitial, setfromfile;
             assign_graphics(PRIMARY);
         preference_update("symset");
         need_redraw = TRUE;
+#ifdef WIN32
     } else if (!strcmp("altkeyhandler", optname)
                || !strcmp("altkeyhandling", optname)) {
         return set_keyhandling_via_option();
+#endif
     } else {
         /* didn't match any of the special options */
         return FALSE;
