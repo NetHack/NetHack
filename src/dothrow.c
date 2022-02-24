@@ -637,8 +637,6 @@ walk_path(coord *src_cc, coord *dest_cc,
             /* check for early exit condition */
             if (!(keep_going = (*check_proc)(arg, x, y)))
                 break;
-            flush_screen(1);
-            delay_output();
         }
     } else {
         while (i++ < dx) {
@@ -653,8 +651,6 @@ walk_path(coord *src_cc, coord *dest_cc,
             /* check for early exit condition */
             if (!(keep_going = (*check_proc)(arg, x, y)))
                 break;
-            flush_screen(1);
-            delay_output();
         }
     }
 
@@ -926,6 +922,9 @@ mhurtle_step(genericptr_t arg, int x, int y)
             || res == Trap_Caught_Mon
             || res == Trap_Moved_Mon)
             return FALSE;
+
+        flush_screen(1);
+        delay_output();
         return TRUE;
     }
     if ((mtmp = m_at(x, y)) != 0 && (canseemon(mon) || canseemon(mtmp))) {
