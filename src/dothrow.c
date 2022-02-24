@@ -766,7 +766,8 @@ hurtle_step(genericptr_t arg, int x, int y)
         }
         if ((u.ux - x) && (u.uy - y) && bad_rock(g.youmonst.data, u.ux, y)
             && bad_rock(g.youmonst.data, x, u.uy)) {
-            boolean too_much = (g.invent && (inv_weight() + weight_cap() > 600));
+            boolean too_much = (g.invent
+                                && (inv_weight() + weight_cap() > 600));
 
             /* Move at a diagonal. */
             if (bigmonst(g.youmonst.data) || too_much) {
@@ -791,17 +792,18 @@ hurtle_step(genericptr_t arg, int x, int y)
              && (Flying || Levitation || Wwalking))
 #endif
         ) {
-        const char *mnam, *pronoun;
+        const char *mnam;
         int glyph = glyph_at(x, y);
 
         mon->mundetected = 0; /* wakeup() will handle mimic */
-        mnam = a_monnam(mon); /* after unhiding */
-        pronoun = noit_mhim(mon);
-        if (!strcmp(mnam, "it")) {
-            mnam = !strcmp(pronoun, "it") ? "something" : "someone";
-        }
+        /* after unhiding; combination of a_monnam() and some_mon_nam();
+           yields "someone" or "something" instead of "it" for unseen mon */
+        mnam = x_monnam(mon, ARTICLE_A, (char *) 0,
+                        ((has_mgivenname(mon) ? SUPPRESS_SADDLE : 0)
+                         | AUGMENT_IT),
+                        FALSE);
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph))
-            You("find %s by bumping into %s.", mnam, pronoun);
+            You("find %s by bumping into %s.", mnam, noit_mhim(mon));
         else
             You("bump into %s.", mnam);
         wakeup(mon, FALSE);
@@ -849,12 +851,14 @@ hurtle_step(genericptr_t arg, int x, int y)
     if (is_pool(x, y) && !u.uinwater) {
         if ((Is_waterlevel(&u.uz) && is_waterwall(x,y))
             || !(Levitation || Flying || Wwalking)) {
-            g.multi = 0; /* can move, so drown() allows crawling out of water */
+            /* couldn't move while hurtling; allow movement now so that
+               drown() will give a chance to crawl out of pool and survive */
+            g.multi = 0;
             (void) drown();
             return FALSE;
         } else if (!Is_waterlevel(&u.uz) && !stopping_short) {
             Norep("You move over %s.", an(is_moat(x, y) ? "moat" : "pool"));
-       }
+        }
     } else if (is_lava(x, y) && !stopping_short) {
         Norep("You move over some lava.");
     }
@@ -870,19 +874,19 @@ hurtle_step(genericptr_t arg, int x, int y)
         if (stopping_short) {
             ; /* see the comment above hurtle_jump() */
         } else if (ttmp->ttyp == MAGIC_PORTAL) {
-            dotrap(ttmp, 0);
+            dotrap(ttmp, NO_TRAP_FLAGS);
             return FALSE;
         } else if (ttmp->ttyp == VIBRATING_SQUARE) {
             pline("The ground vibrates as you pass it.");
-            dotrap(ttmp, 0); /* doesn't print messages */
+            dotrap(ttmp, NO_TRAP_FLAGS); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
-            dotrap(ttmp, 0);
+            dotrap(ttmp, NO_TRAP_FLAGS);
         } else if ((is_pit(ttmp->ttyp) || is_hole(ttmp->ttyp))
                    && Sokoban) {
             /* air currents overcome the recoil in Sokoban;
                when jumping, caller performs last step and enters trap */
             if (!via_jumping)
-                dotrap(ttmp, 0);
+                dotrap(ttmp, NO_TRAP_FLAGS);
             *range = 0;
             return TRUE;
         } else {

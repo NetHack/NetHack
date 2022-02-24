@@ -3058,7 +3058,7 @@ zap_updown(struct obj *obj) /* wand or spell */
                 ttmp->tseen = 1;
                 newsym(x, y);
                 /* might fall down hole */
-                dotrap(ttmp, 0);
+                dotrap(ttmp, NO_TRAP_FLAGS);
             } else if (!striking && ttmp->ttyp == HOLE) {
                 /* locking transforms hole into trapdoor */
                 ttmp->ttyp = TRAPDOOR;

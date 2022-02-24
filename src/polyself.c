@@ -1392,7 +1392,7 @@ dospinweb(void)
         case ANTI_MAGIC:
         case POLY_TRAP:
             You("have triggered a trap!");
-            dotrap(ttmp, 0);
+            dotrap(ttmp, NO_TRAP_FLAGS);
             return ECMD_TIME;
         default:
             impossible("Webbing over trap type %d?", ttmp->ttyp);

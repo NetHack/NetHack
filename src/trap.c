@@ -2287,7 +2287,7 @@ trapeffect_landmine(
             trapkilled = TRUE;
         } else {
             /* monsters recursively fall into new pit */
-            if (mintrap(mtmp, trflags|FORCETRAP) == Trap_Killed_Mon)
+            if (mintrap(mtmp, trflags | FORCETRAP) == Trap_Killed_Mon)
                 trapkilled = TRUE;
         }
         /* a boulder may fill the new pit, crushing monster */
@@ -2472,9 +2472,9 @@ trapeffect_selector(
 }
 
 void
-dotrap(register struct trap* trap, unsigned int trflags)
+dotrap(struct trap *trap, unsigned trflags)
 {
-    register int ttype = trap->ttyp;
+    int ttype = trap->ttyp;
     boolean already_seen = trap->tseen,
             forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0),
@@ -3115,9 +3115,9 @@ isclearpath(
 }
 
 int
-mintrap(register struct monst *mtmp, long mintrapflags)
+mintrap(struct monst *mtmp, unsigned mintrapflags)
 {
-    register struct trap *trap = t_at(mtmp->mx, mtmp->my);
+    struct trap *trap = t_at(mtmp->mx, mtmp->my);
     struct permonst *mptr = mtmp->data;
     int trap_result = Trap_Effect_Finished;
 
@@ -3526,7 +3526,7 @@ float_down(
             /*FALLTHRU*/
         default:
             if (!u.utrap) /* not already in the trap */
-                dotrap(trap, 0);
+                dotrap(trap, NO_TRAP_FLAGS);
         }
     }
     if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !u.uswallow
@@ -5272,7 +5272,7 @@ closeholdingtrap(
         /* dotrap calls mintrap when mounted hero encounters a web */
         if (u.usteed)
             dotrapflags |= NOWEBMSG;
-        dotrap(t, dotrapflags|FORCETRAP);
+        dotrap(t, dotrapflags | FORCETRAP);
         result = (u.utrap != 0);
     } else {
         if (mon->mtrapped)
