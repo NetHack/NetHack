@@ -17,6 +17,7 @@ static schar u_simple_floortyp(xchar, xchar);
 static boolean swim_move_danger(xchar, xchar);
 static boolean domove_bump_mon(struct monst *, int);
 static boolean domove_attackmon_at(struct monst *, xchar, xchar, boolean *);
+static boolean domove_fight_ironbars(xchar, xchar);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1657,6 +1658,31 @@ domove_attackmon_at(struct monst *mtmp, xchar x, xchar y, boolean *displaceu)
     return FALSE;
 }
 
+/* force-fight iron bars with your weapon? */
+static boolean
+domove_fight_ironbars(xchar x, xchar y)
+{
+    if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
+        struct obj *obj = uwep;
+        unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV);
+
+        if (breaktest(obj)) {
+            if (obj->quan > 1L)
+                obj = splitobj(obj, 1L);
+            else
+                setuwep((struct obj *)0);
+            freeinv(obj);
+            breakflags |= BRK_KNOWN2BREAK;
+        } else {
+            breakflags |= BRK_KNOWN2NOTBREAK;
+        }
+
+        hit_bars(&obj, u.ux, u.uy, x, y, breakflags);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -1912,24 +1938,8 @@ domove_core(void)
             return;
     }
 
-    if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
-        struct obj *obj = uwep;
-        unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV);
-
-        if (breaktest(obj)) {
-            if (obj->quan > 1L)
-                obj = splitobj(obj, 1L);
-            else
-                setuwep((struct obj *)0);
-            freeinv(obj);
-            breakflags |= BRK_KNOWN2BREAK;
-        } else {
-            breakflags |= BRK_KNOWN2NOTBREAK;
-        }
-
-        hit_bars(&obj, u.ux, u.uy, x, y, breakflags);
+    if (domove_fight_ironbars(x, y))
         return;
-    }
 
     /* specifying 'F' with no monster wastes a turn */
     if (g.context.forcefight
