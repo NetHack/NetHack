@@ -19,6 +19,7 @@ static boolean domove_bump_mon(struct monst *, int);
 static boolean domove_attackmon_at(struct monst *, xchar, xchar, boolean *);
 static boolean domove_fight_ironbars(xchar, xchar);
 static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
+static boolean domove_fight_empty(xchar, xchar);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1803,6 +1804,95 @@ domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
     return !didnt_move;
 }
 
+/* force-fight (x,y) which doesn't have anything to fight */
+static boolean
+domove_fight_empty(xchar x, xchar y)
+{
+    int glyph = glyph_at(x, y);
+
+    /* specifying 'F' with no monster wastes a turn */
+    if (g.context.forcefight
+        /* remembered an 'I' && didn't use a move command */
+        || (glyph_is_invisible(glyph) && !g.context.nopick)) {
+        struct obj *boulder = 0;
+        boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
+                solid = (!accessible(x, y) || IS_FURNITURE(levl[x][y].typ));
+        char buf[BUFSZ];
+
+        if (!Underwater) {
+            boulder = sobj_at(BOULDER, x, y);
+            /* if a statue is displayed at the target location,
+               player is attempting to attack it [and boulder
+               handling below is suitable for handling that] */
+            if (glyph_is_statue(glyph)
+                || (Hallucination && glyph_is_monster(glyph)))
+                boulder = sobj_at(STATUE, x, y);
+
+            /* force fight at boulder/statue or wall/door while wielding
+               pick:  start digging to break the boulder or wall */
+            if (g.context.forcefight
+                /* can we dig? */
+                && uwep && dig_typ(uwep, x, y)
+                /* should we dig? */
+                && !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
+                (void) use_pick_axe2(uwep);
+                return TRUE;
+            }
+        }
+
+        /* about to become known empty -- remove 'I' if present */
+        unmap_object(x, y);
+        if (boulder)
+            map_object(boulder, TRUE);
+        newsym(x, y);
+        glyph = glyph_at(x, y); /* might have just changed */
+
+        if (boulder) {
+            Strcpy(buf, ansimpleoname(boulder));
+        } else if (Underwater && !is_pool(x, y)) {
+            /* Underwater, targetting non-water; the map just shows blank
+               because you don't see remembered terrain while underwater;
+               although the hero can attack an adjacent monster this way,
+               assume he can't reach out far enough to distinguish terrain */
+            Sprintf(buf, "%s",
+                    (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
+                         ? "an air bubble"
+                         : "nothing");
+        } else if (solid) {
+            /* glyph might indicate unseen terrain if hero is blind;
+               unlike searching, this won't reveal what that terrain is;
+               3.7: used to say "solid rock" for the stone case, but that
+               made it be different from unmapped walls outside of rooms */
+            Strcpy(buf, (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+                         ? "stone"
+                         : glyph_is_cmap(glyph)
+                            ? the(defsyms[glyph_to_cmap(glyph)].explanation)
+                            : (const char *) "an unknown obstacle");
+            /* note: 'solid' is misleadingly named and catches pools
+               of water and lava as well as rock and walls;
+               3.7: furniture too */
+        } else {
+            Strcpy(buf, "thin air");
+        }
+        You("%s%s %s.",
+            !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
+            explo ? "explode at" : "attack", buf);
+
+        nomul(0);
+        if (explo) {
+            struct attack *attk;
+            /* no monster has been attacked so we have bypassed explum() */
+            wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
+            if ((attk = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY)))
+                explum((struct monst *) 0, attk);
+            u.mh = -1; /* dead in the current form */
+            rehumanize();
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -2060,86 +2150,9 @@ domove_core(void)
     if (domove_fight_ironbars(x, y))
         return;
 
-    /* specifying 'F' with no monster wastes a turn */
-    if (g.context.forcefight
-        /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(glyph) && !g.context.nopick)) {
-        struct obj *boulder = 0;
-        boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
-                solid = (!accessible(x, y) || IS_FURNITURE(levl[x][y].typ));
-        char buf[BUFSZ];
-
-        if (!Underwater) {
-            boulder = sobj_at(BOULDER, x, y);
-            /* if a statue is displayed at the target location,
-               player is attempting to attack it [and boulder
-               handling below is suitable for handling that] */
-            if (glyph_is_statue(glyph)
-                || (Hallucination && glyph_is_monster(glyph)))
-                boulder = sobj_at(STATUE, x, y);
-
-            /* force fight at boulder/statue or wall/door while wielding
-               pick:  start digging to break the boulder or wall */
-            if (g.context.forcefight
-                /* can we dig? */
-                && uwep && dig_typ(uwep, x, y)
-                /* should we dig? */
-                && !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
-                (void) use_pick_axe2(uwep);
-                return;
-            }
-        }
-
-        /* about to become known empty -- remove 'I' if present */
-        unmap_object(x, y);
-        if (boulder)
-            map_object(boulder, TRUE);
-        newsym(x, y);
-        glyph = glyph_at(x, y); /* might have just changed */
-
-        if (boulder) {
-            Strcpy(buf, ansimpleoname(boulder));
-        } else if (Underwater && !is_pool(x, y)) {
-            /* Underwater, targetting non-water; the map just shows blank
-               because you don't see remembered terrain while underwater;
-               although the hero can attack an adjacent monster this way,
-               assume he can't reach out far enough to distinguish terrain */
-            Sprintf(buf, "%s",
-                    (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR)
-                         ? "an air bubble"
-                         : "nothing");
-        } else if (solid) {
-            /* glyph might indicate unseen terrain if hero is blind;
-               unlike searching, this won't reveal what that terrain is;
-               3.7: used to say "solid rock" for the stone case, but that
-               made it be different from unmapped walls outside of rooms */
-            Strcpy(buf, (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-                         ? "stone"
-                         : glyph_is_cmap(glyph)
-                            ? the(defsyms[glyph_to_cmap(glyph)].explanation)
-                            : (const char *) "an unknown obstacle");
-            /* note: 'solid' is misleadingly named and catches pools
-               of water and lava as well as rock and walls;
-               3.7: furniture too */
-        } else {
-            Strcpy(buf, "thin air");
-        }
-        You("%s%s %s.",
-            !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
-            explo ? "explode at" : "attack", buf);
-
-        nomul(0);
-        if (explo) {
-            struct attack *attk;
-            /* no monster has been attacked so we have bypassed explum() */
-            wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
-            if ((attk = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY)))
-                explum((struct monst *) 0, attk);
-            u.mh = -1; /* dead in the current form */
-            rehumanize();
-        }
+    if (domove_fight_empty(x, y))
         return;
-    }
+
     (void) unmap_invisible(x, y);
     /* not attacking an animal, so we try to move */
     if ((u.dx || u.dy) && u.usteed && stucksteed(FALSE)) {
