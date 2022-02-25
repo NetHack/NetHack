@@ -3161,6 +3161,8 @@ lookaround(void)
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            boolean infront = (x == u.ux + u.dx && y == u.uy + u.dy);
+
             /* ignore out of bounds, and our own location */
             if (!isok(x, y) || u_at(x, y))
                 continue;
@@ -3176,8 +3178,7 @@ lookaround(void)
                 /* running movement and not a hostile monster */
                 /* OR it blocks our move direction and we're not traveling */
                 if ((g.context.run != 1 && !is_safemon(mtmp))
-                    || (x == u.ux + u.dx && y == u.uy + u.dy
-                        && !g.context.travel)) {
+                    || (infront && !g.context.travel)) {
                     if (flags.mention_walls)
                         pline("%s blocks your path.", upstart(a_monnam(mtmp)));
                     goto stop;
@@ -3239,7 +3240,7 @@ lookaround(void)
             } else if ((trap = t_at(x, y)) && trap->tseen) {
                 if (g.context.run == 1)
                     goto bcorr; /* if you must */
-                if (x == u.ux + u.dx && y == u.uy + u.dy) {
+                if (infront) {
                     if (flags.mention_walls)
                         You("stop in front of %s.",
                             an(trapname(trap->ttyp, FALSE)));
@@ -3251,7 +3252,7 @@ lookaround(void)
                  * you even if you are running
                  */
                 if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-                    && x == u.ux + u.dx && y == u.uy + u.dy) {
+                    && infront) {
                     /* No Wwalking check; otherwise they'd be able
                      * to test boots by trying to SHIFT-direction
                      * into a pool and seeing if the game allowed it
