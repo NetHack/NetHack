@@ -2213,7 +2213,7 @@ domove_core(void)
                 }
                 break;
             default:
-                pline("that's strange, unknown mintrap result!");
+                impossible("that's strange, unknown mintrap result!");
                 break;
             }
         }
