@@ -746,7 +746,7 @@ tags: $(CSOURCES)
 	@( cd ../util ; $(MAKE) tags )
 
 clean:
-	-rm -f *.o $(HACK_H) $(CONFIG_H) moc.qt*
+	-rm -f *.o $(HACK_H) $(CONFIG_H)
 	-rm -f monstr.c vis_tab.c ../include/vis_tab.h #obsolete generated files
 	$(CLEANMORE)
 

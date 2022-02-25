@@ -14,7 +14,6 @@ nethack
 *.o
 tiles.bmp
 *.moc
-moc.qt*
 *.lnk
 graphicschk
 nhdat
