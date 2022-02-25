@@ -15,6 +15,8 @@ static boolean trapmove(int, int, struct trap *);
 static void check_buried_zombies(xchar, xchar);
 static schar u_simple_floortyp(xchar, xchar);
 static boolean swim_move_danger(xchar, xchar);
+static boolean domove_bump_mon(struct monst *, int);
+static boolean domove_attackmon_at(struct monst *, xchar, xchar, boolean *);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1590,6 +1592,71 @@ swim_move_danger(xchar x, xchar y)
     return FALSE;
 }
 
+/* moving with 'm' prefix, bump into a monster? */
+static boolean
+domove_bump_mon(struct monst *mtmp, int glyph)
+{
+    /* If they used a 'm' command, trying to move onto a monster
+     * prints the below message and wastes a turn.  The exception is
+     * if the monster is unseen and the player doesn't remember an
+     * invisible monster--then, we fall through to do_attack() and
+     * attack_check(), which still wastes a turn, but prints a
+     * different message and makes the player remember the monster.
+     */
+    if (g.context.nopick && !g.context.travel
+        && (canspotmon(mtmp) || glyph_is_invisible(glyph)
+            || glyph_is_warning(glyph))) {
+        if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
+            && !sensemon(mtmp))
+            stumble_onto_mimic(mtmp);
+        else if (mtmp->mpeaceful && !Hallucination)
+            /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
+            pline("Pardon me, %s.", m_monnam(mtmp));
+        else
+            You("move right into %s.", mon_nam(mtmp));
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* hero is moving, do we maybe attack a monster at (x,y)?
+   returns TRUE if hero movement is used up.
+   sets displaceu, if hero and monster could swap places instead.
+*/
+static boolean
+domove_attackmon_at(struct monst *mtmp, xchar x, xchar y, boolean *displaceu)
+{
+    /* only attack if we know it's there */
+    /* or if we used the 'F' command to fight blindly */
+    /* or if it hides_under, in which case we call do_attack() to print
+     * the Wait! message.
+     * This is different from ceiling hiders, who aren't handled in
+     * do_attack().
+     */
+    if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
+        || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
+            && !is_safemon(mtmp))) {
+        /* target monster might decide to switch places with you... */
+        *displaceu = (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
+                      && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
+                      && mtmp->mcanmove && !mtmp->msleeping
+                      && !mtmp->meating && !mtmp->mtrapped
+                      && !u.utrap && !u.ustuck && !u.usteed
+                      && !(u.dx && u.dy
+                           && (NODIAG(u.umonnum)
+                               || (bad_rock(mtmp->data, x, u.uy0)
+                                   && bad_rock(mtmp->data, u.ux0, y))
+                               || (bad_rock(g.youmonst.data, u.ux0, y)
+                                   && bad_rock(g.youmonst.data, x, u.uy0))))
+                      && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U));
+        /* if not displacing, try to attack; note that it might evade;
+           also, we don't attack tame when _safepet_ */
+        if (!*displaceu && do_attack(mtmp))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -1830,62 +1897,19 @@ domove_core(void)
     tmpr = &levl[x][y];
     glyph = glyph_at(x, y);
 
-    /* attack monster */
     if (mtmp) {
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, do_attack() in uhitm.c
            will stop travel rather than domove */
         if (!is_safemon(mtmp) || g.context.forcefight)
             nomul(0);
-        /* only attack if we know it's there */
-        /* or if we used the 'F' command to fight blindly */
-        /* or if it hides_under, in which case we call do_attack() to print
-         * the Wait! message.
-         * This is different from ceiling hiders, who aren't handled in
-         * do_attack().
-         */
 
-        /* If they used a 'm' command, trying to move onto a monster
-         * prints the below message and wastes a turn.  The exception is
-         * if the monster is unseen and the player doesn't remember an
-         * invisible monster--then, we fall through to do_attack() and
-         * attack_check(), which still wastes a turn, but prints a
-         * different message and makes the player remember the monster.
-         */
-        if (g.context.nopick && !g.context.travel
-            && (canspotmon(mtmp) || glyph_is_invisible(glyph)
-                || glyph_is_warning(glyph))) {
-            if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
-                && !sensemon(mtmp))
-                stumble_onto_mimic(mtmp);
-            else if (mtmp->mpeaceful && !Hallucination)
-                /* m_monnam(): "dog" or "Fido", no "invisible dog" or "it" */
-                pline("Pardon me, %s.", m_monnam(mtmp));
-            else
-                You("move right into %s.", mon_nam(mtmp));
+        if (domove_bump_mon(mtmp, glyph))
             return;
-        }
-        if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
-            || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
-                && !is_safemon(mtmp))) {
-            /* target monster might decide to switch places with you... */
-            displaceu = (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
-                         && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
-                         && mtmp->mcanmove && !mtmp->msleeping
-                         && !mtmp->meating && !mtmp->mtrapped
-                         && !u.utrap && !u.ustuck && !u.usteed
-                         && !(u.dx && u.dy
-                              && (NODIAG(u.umonnum)
-                                  || (bad_rock(mtmp->data, x, u.uy0)
-                                      && bad_rock(mtmp->data, u.ux0, y))
-                                  || (bad_rock(g.youmonst.data, u.ux0, y)
-                                      && bad_rock(g.youmonst.data, x, u.uy0))))
-                         && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U));
-            /* if not displacing, try to attack; note that it might evade;
-               also, we don't attack tame when _safepet_ */
-            if (!displaceu && do_attack(mtmp))
-                return;
-        }
+
+        /* attack monster */
+        if (domove_attackmon_at(mtmp, x, y, &displaceu))
+            return;
     }
 
     if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
