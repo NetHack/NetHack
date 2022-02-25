@@ -23,6 +23,7 @@ static boolean domove_fight_empty(xchar, xchar);
 static boolean air_turbulence(void);
 static void slippery_ice_fumbling(void);
 static boolean impaired_movement(xchar *, xchar *);
+static boolean move_out_of_bounds(xchar x, xchar y);
 static boolean carrying_too_much(void);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
@@ -1996,6 +1997,32 @@ impaired_movement(xchar *x, xchar *y)
     return FALSE;
 }
 
+static boolean
+move_out_of_bounds(xchar x, xchar y)
+{
+    if (!isok(x, y)) {
+        if (flags.mention_walls) {
+            int dx = u.dx, dy = u.dy;
+
+            if (dx && dy) { /* diagonal */
+                /* only as far as possible diagonally if in very
+                   corner; otherwise just report whichever of the
+                   cardinal directions has reached its limit */
+                if (isok(x, u.uy))
+                    dx = 0;
+                else if (isok(u.ux, y))
+                    dy = 0;
+            }
+            You("have already gone as far %s as possible.",
+                directionname(xytod(dx, dy)));
+        }
+        nomul(0);
+        g.context.move = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* carrying too much to be able to move? */
 static boolean
 carrying_too_much(void)
@@ -2075,26 +2102,9 @@ domove_core(void)
         if (water_turbulence(&x, &y))
             return;
 
-        if (!isok(x, y)) {
-            if (flags.mention_walls) {
-                int dx = u.dx, dy = u.dy;
-
-                if (dx && dy) { /* diagonal */
-                    /* only as far as possible diagonally if in very
-                       corner; otherwise just report whichever of the
-                       cardinal directions has reached its limit */
-                    if (isok(x, u.uy))
-                        dx = 0;
-                    else if (isok(u.ux, y))
-                        dy = 0;
-                }
-                You("have already gone as far %s as possible.",
-                    directionname(xytod(dx, dy)));
-            }
-            nomul(0);
-            g.context.move = 0;
+        if (move_out_of_bounds(x,y))
             return;
-        }
+
         if (((trap = t_at(x, y)) && trap->tseen)
             || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
