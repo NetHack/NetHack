@@ -20,6 +20,7 @@ static boolean domove_attackmon_at(struct monst *, xchar, xchar, boolean *);
 static boolean domove_fight_ironbars(xchar, xchar);
 static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
 static boolean domove_fight_empty(xchar, xchar);
+static boolean air_turbulence(void);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1893,6 +1894,29 @@ domove_fight_empty(xchar x, xchar y)
     return FALSE;
 }
 
+/* does the plane of air disturb movement? */
+static boolean
+air_turbulence(void)
+{
+    if (Is_airlevel(&u.uz) && rn2(4) && !Levitation && !Flying) {
+        switch (rn2(3)) {
+        case 0:
+            You("tumble in place.");
+            exercise(A_DEX, FALSE);
+            break;
+        case 1:
+            You_cant("control your movements very well.");
+            break;
+        case 2:
+            pline("It's hard to walk in thin air.");
+            exercise(A_DEX, TRUE);
+            break;
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -1946,22 +1970,8 @@ domove_core(void)
         u_on_newpos(x, y); /* set u.ux,uy and handle CLIPPING */
         mtmp = u.ustuck;
     } else {
-        if (Is_airlevel(&u.uz) && rn2(4) && !Levitation && !Flying) {
-            switch (rn2(3)) {
-            case 0:
-                You("tumble in place.");
-                exercise(A_DEX, FALSE);
-                break;
-            case 1:
-                You_cant("control your movements very well.");
-                break;
-            case 2:
-                pline("It's hard to walk in thin air.");
-                exercise(A_DEX, TRUE);
-                break;
-            }
+        if (air_turbulence())
             return;
-        }
 
         /* check slippery ice */
         on_ice = !Levitation && is_ice(u.ux, u.uy);
