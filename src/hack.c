@@ -1918,6 +1918,38 @@ air_turbulence(void)
     return FALSE;
 }
 
+/* does water disturb the movement? */
+static boolean
+water_turbulence(xchar *x, xchar *y)
+{
+    if (u.uinwater) {
+        int wtcap;
+        int wtmod = (Swimming ? MOD_ENCUMBER : SLT_ENCUMBER);
+
+        water_friction();
+        if (!u.dx && !u.dy) {
+            nomul(0);
+            return TRUE;
+        }
+        *x = u.ux + u.dx;
+        *y = u.uy + u.dy;
+
+        /* are we trying to move out of water while carrying too much? */
+        if (isok(*x, *y) && !is_pool(*x, *y) && !Is_waterlevel(&u.uz)
+            && (wtcap = near_capacity()) > wtmod) {
+            /* when escaping from drowning you need to be unencumbered
+               in order to crawl out of water, but when not drowning,
+               doing so while encumbered is feasible; if in an aquatic
+               form, stressed or less is allowed; otherwise (magical
+               breathing), only burdened is allowed */
+            You("are carrying too much to climb out of the water.");
+            nomul(0);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static void
 slippery_ice_fumbling(void)
 {
@@ -1960,7 +1992,7 @@ domove_core(void)
 {
     register struct monst *mtmp;
     register struct rm *tmpr;
-    register xchar x, y;
+    xchar x, y;
     struct trap *trap = NULL;
     int wtcap, glyph;
     xchar chainx = 0, chainy = 0,
@@ -2016,28 +2048,9 @@ domove_core(void)
             } while (!isok(x, y) || bad_rock(g.youmonst.data, x, y));
         }
         /* turbulence might alter your actual destination */
-        if (u.uinwater) {
-            water_friction();
-            if (!u.dx && !u.dy) {
-                nomul(0);
-                return;
-            }
-            x = u.ux + u.dx;
-            y = u.uy + u.dy;
+        if (water_turbulence(&x, &y))
+            return;
 
-            /* are we trying to move out of water while carrying too much? */
-            if (isok(x, y) && !is_pool(x, y) && !Is_waterlevel(&u.uz)
-                && wtcap > (Swimming ? MOD_ENCUMBER : SLT_ENCUMBER)) {
-                /* when escaping from drowning you need to be unencumbered
-                   in order to crawl out of water, but when not drowning,
-                   doing so while encumbered is feasible; if in an aquatic
-                   form, stressed or less is allowed; otherwise (magical
-                   breathing), only burdened is allowed */
-                You("are carrying too much to climb out of the water.");
-                nomul(0);
-                return;
-            }
-        }
         if (!isok(x, y)) {
             if (flags.mention_walls) {
                 int dx = u.dx, dy = u.dy;
