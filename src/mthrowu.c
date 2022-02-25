@@ -7,6 +7,7 @@
 
 static int monmulti(struct monst *, struct obj *, struct obj *);
 static void monshoot(struct monst *, struct obj *, struct obj *);
+static boolean ucatchgem(struct obj *, struct monst *);
 static const char* breathwep_name(int);
 static int drop_throw(struct obj *, boolean, int, int);
 static int m_lined_up(struct monst *, struct monst *);
@@ -189,8 +190,10 @@ drop_throw(
                 retvalu = 0;
             }
         }
-    } else
+    } else {
         delobj(obj);
+    }
+    g.thrownobj = 0;
     return retvalu;
 }
 
@@ -491,6 +494,34 @@ ohitmon(
     return 0;
 }
 
+/* hero catches gem thrown by mon iff poly'd into unicorn; might drop it */
+static boolean
+ucatchgem(
+    struct obj *gem,   /* caller has verified gem->oclass */
+    struct monst *mon)
+{
+    /* won't catch rock or gray stone; catch (then drop) worthless glass */
+    if (gem->otyp <= LAST_GEM + NUM_GLASS_GEMS
+        && is_unicorn(g.youmonst.data)) {
+        char *gem_xname = xname(gem),
+             *mon_s_name = s_suffix(mon_nam(mon));
+
+        if (gem->otyp > LAST_GEM) {
+            You("catch the %s.", gem_xname);
+            You("are not interested in %s junk.", mon_s_name);
+            makeknown(gem->otyp);
+            dropy(gem);
+        } else {
+            You("accept %s gift in the spirit in which it was intended.",
+                mon_s_name);
+            (void) hold_another_object(gem, "You catch, but drop, %s.",
+                                       gem_xname, "You catch:");
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 #define MT_FLIGHTCHECK(pre,forcehit) \
     (/* missile hits edge of screen */                                  \
      !isok(g.bhitpos.x + dx, g.bhitpos.y + dy)                          \
@@ -550,6 +581,8 @@ m_throw(
         singleobj = splitobj(obj, 1L);
         obj_extract_self(singleobj);
     }
+    /* global pointer for missile object in OBJ_FREE state */
+    g.thrownobj = singleobj;
 
     singleobj->owornmask = 0; /* threw one of multiple weapons in hand? */
     if (!canseemon(mon))
@@ -585,8 +618,8 @@ m_throw(
     if (sym)
         tmp_at(DISP_FLASH, obj_to_glyph(singleobj, rn2_on_display_rng));
     while (range-- > 0) { /* Actually the loop is always exited by break */
-        g.bhitpos.x += dx;
-        g.bhitpos.y += dy;
+        singleobj->ox = g.bhitpos.x += dx;
+        singleobj->oy = g.bhitpos.y += dy;
         if (cansee(g.bhitpos.x, g.bhitpos.y))
             singleobj->dknown = 1;
 
@@ -602,29 +635,13 @@ m_throw(
             if (g.multi)
                 nomul(0);
 
-            if (singleobj->oclass == GEM_CLASS
-                && singleobj->otyp <= LAST_GEM + NUM_GLASS_GEMS
-                && is_unicorn(g.youmonst.data)) {
-                if (singleobj->otyp > LAST_GEM) {
-                    You("catch the %s.", xname(singleobj));
-                    You("are not interested in %s junk.",
-                        s_suffix(mon_nam(mon)));
-                    makeknown(singleobj->otyp);
-                    dropy(singleobj);
-                } else {
-                    You(
-                     "accept %s gift in the spirit in which it was intended.",
-                        s_suffix(mon_nam(mon)));
-                    (void) hold_another_object(singleobj,
-                                               "You catch, but drop, %s.",
-                                               xname(singleobj),
-                                               "You catch:");
-                }
-                break;
-            }
             if (singleobj->oclass == POTION_CLASS) {
                 potionhit(&g.youmonst, singleobj, POTHIT_MONST_THROW);
                 break;
+            } else if (singleobj->oclass == GEM_CLASS) {
+                /* hero might be poly'd into a unicorn */
+                if (ucatchgem(singleobj, mon))
+                    break;
             }
             oldumort = u.umortality;
 
@@ -748,6 +765,9 @@ m_throw(
         if (!Blind)
             Your1(vision_clears);
     }
+    /* note: all early returns follow drop_throw() which clears thrownobj */
+    g.thrownobj = 0;
+    return;
 }
 
 #undef MT_FLIGHTCHECK

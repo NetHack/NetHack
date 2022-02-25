@@ -746,6 +746,7 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     while (farthest-- > 0) {
         for (stmp = schain; stmp; stmp = stmp->next) {
             if ((stmp->range-- > 0) && (!stmp->stopped)) {
+                g.thrownobj = stmp->obj; /* mainly in case it kills hero */
                 g.bhitpos.x = stmp->ox + stmp->dx;
                 g.bhitpos.y = stmp->oy + stmp->dy;
                 typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
@@ -794,6 +795,7 @@ scatter(int sx, int sy,  /* location of objects to scatter */
                 stmp->oy = g.bhitpos.y;
                 if (IS_SINK(levl[stmp->ox][stmp->oy].typ))
                     stmp->stopped = TRUE;
+                g.thrownobj = (struct obj *) 0;
             }
         }
     }

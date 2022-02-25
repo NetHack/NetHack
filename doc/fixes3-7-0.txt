@@ -819,6 +819,10 @@ discovering an object on first turn with persistent inventory enabled might
 	or spellbook and read it as first action; it becomes discovered but
 	will still be shown as if undiscovered until next inventory update)
 most traps now require touching the floor to trigger
+if a lit potion of oil on the floor was launched by an explosion and it hit
+	and killed the hero via missile damage rather than its own explosion,
+	it could trigger an "obj_is_local" panic when end of game cleanup
+	tried to extinguish it as a light source
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
