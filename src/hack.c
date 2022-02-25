@@ -22,6 +22,7 @@ static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
 static boolean domove_fight_empty(xchar, xchar);
 static boolean air_turbulence(void);
 static void slippery_ice_fumbling(void);
+static boolean impaired_movement(xchar *, xchar *);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1974,6 +1975,26 @@ slippery_ice_fumbling(void)
         HFumbling &= ~FROMOUTSIDE;
 }
 
+/* change movement dir if impaire. return TRUE if can't move */
+static boolean
+impaired_movement(xchar *x, xchar *y)
+{
+    if (Stunned || (Confusion && !rn2(5))) {
+        register int tries = 0;
+
+        do {
+            if (tries++ > 50) {
+                nomul(0);
+                return TRUE;
+            }
+            confdir();
+            *x = u.ux + u.dx;
+            *y = u.uy + u.dy;
+        } while (!isok(*x, *y) || bad_rock(g.youmonst.data, *x, *y));
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -2034,19 +2055,9 @@ domove_core(void)
 
         x = u.ux + u.dx;
         y = u.uy + u.dy;
-        if (Stunned || (Confusion && !rn2(5))) {
-            register int tries = 0;
+        if (impaired_movement(&x, &y))
+            return;
 
-            do {
-                if (tries++ > 50) {
-                    nomul(0);
-                    return;
-                }
-                confdir();
-                x = u.ux + u.dx;
-                y = u.uy + u.dy;
-            } while (!isok(x, y) || bad_rock(g.youmonst.data, x, y));
-        }
         /* turbulence might alter your actual destination */
         if (water_turbulence(&x, &y))
             return;
