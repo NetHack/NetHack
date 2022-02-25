@@ -1998,6 +1998,55 @@ impaired_movement(xchar *x, xchar *y)
 }
 
 static boolean
+avoid_moving_on_trap(xchar x, xchar y, boolean msg)
+{
+    struct trap *trap;
+
+    if ((trap = t_at(x, y)) && trap->tseen) {
+        if (msg && flags.mention_walls)
+            You("stop in front of %s.",
+                an(trapname(trap->ttyp, FALSE)));
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static boolean
+avoid_moving_on_liquid(xchar x, xchar y, boolean msg)
+{
+    if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
+        && is_pool_or_lava(x, y) && levl[x][y].seenv) {
+        if (msg && flags.mention_walls)
+            You("stop at the edge of the %s.",
+                hliquid(is_pool(x,y) ? "water" : "lava"));
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* when running/rushing, avoid stepping on a known trap or pool of liquid.
+   returns TRUE if avoided. */
+static boolean
+avoid_running_into_trap_or_liquid(xchar x, xchar y)
+{
+    if (!g.context.run)
+        return FALSE;
+
+    if (avoid_moving_on_trap(x,y, TRUE)) {
+        nomul(0);
+        g.context.move = 0;
+        return TRUE;
+    }
+    if (Blind && avoid_moving_on_liquid(x,y, TRUE)) {
+        nomul(0);
+        g.context.move = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* trying to move out-of-bounds? */
+static boolean
 move_out_of_bounds(xchar x, xchar y)
 {
     if (!isok(x, y)) {
@@ -2105,25 +2154,8 @@ domove_core(void)
         if (move_out_of_bounds(x,y))
             return;
 
-        if (((trap = t_at(x, y)) && trap->tseen)
-            || (Blind && !Levitation && !Flying && !is_clinger(g.youmonst.data)
-                && is_pool_or_lava(x, y) && levl[x][y].seenv)) {
-            if (g.context.run >= 2) {
-                if (flags.mention_walls) {
-                    if (trap && trap->tseen) {
-                        You("stop in front of %s.",
-                            an(trapname(trap->ttyp, FALSE)));
-                    } else if (is_pool_or_lava(x,y) && levl[x][y].seenv) {
-                        You("stop at the edge of the %s.",
-                            hliquid(is_pool(x,y) ? "water" : "lava"));
-                    }
-                }
-                nomul(0);
-                g.context.move = 0;
-                return;
-            } else
-                nomul(0);
-        }
+        if (avoid_running_into_trap_or_liquid(x, y))
+            return;
 
         if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
             if (!next2u(u.ustuck->mx, u.ustuck->my)) {
@@ -3147,7 +3179,6 @@ lookaround(void)
     int i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
     int corrct = 0, noturn = 0;
     struct monst *mtmp;
-    struct trap *trap;
 
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
@@ -3237,31 +3268,15 @@ lookaround(void)
                     corrct++;
                 }
                 continue;
-            } else if ((trap = t_at(x, y)) && trap->tseen) {
+            } else if (avoid_moving_on_trap(x, y, infront)) {
                 if (g.context.run == 1)
                     goto bcorr; /* if you must */
-                if (infront) {
-                    if (flags.mention_walls)
-                        You("stop in front of %s.",
-                            an(trapname(trap->ttyp, FALSE)));
+                if (infront)
                     goto stop;
-                }
                 continue;
-            } else if (is_pool_or_lava(x, y)) {
-                /* water and lava only stop you if directly in front, and stop
-                 * you even if you are running
-                 */
-                if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-                    && infront) {
-                    /* No Wwalking check; otherwise they'd be able
-                     * to test boots by trying to SHIFT-direction
-                     * into a pool and seeing if the game allowed it
-                     */
-                    if (flags.mention_walls)
-                        You("stop at the edge of the %s.",
-                            hliquid(is_pool(x,y) ? "water" : "lava"));
+            } else if (avoid_moving_on_liquid(x, y, infront)) {
+                if (infront)
                     goto stop;
-                }
                 continue;
             } else { /* e.g. objects or trap or stairs */
                 if (g.context.run == 1)
