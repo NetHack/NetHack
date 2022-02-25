@@ -18,6 +18,7 @@ static boolean swim_move_danger(xchar, xchar);
 static boolean domove_bump_mon(struct monst *, int);
 static boolean domove_attackmon_at(struct monst *, xchar, xchar, boolean *);
 static boolean domove_fight_ironbars(xchar, xchar);
+static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1683,6 +1684,125 @@ domove_fight_ironbars(xchar x, xchar y)
     return FALSE;
 }
 
+/* maybe swap places with a pet? returns TRUE if swapped places */
+static boolean
+domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
+{
+    struct trap *trap;
+    /* if it turns out we can't actually move */
+    boolean didnt_move = FALSE;
+    boolean u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
+
+    /* seemimic/newsym should be done before moving hero, otherwise
+       the display code will draw the hero here before we possibly
+       cancel the swap below (we can ignore steed mx,my here) */
+    u.ux = u.ux0, u.uy = u.uy0;
+    mtmp->mundetected = 0;
+    if (M_AP_TYPE(mtmp))
+        seemimic(mtmp);
+    u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
+
+    if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
+        && is_pit(trap->ttyp)
+        && sobj_at(BOULDER, trap->tx, trap->ty)) {
+        /* can't swap places with pet pinned in a pit by a boulder */
+        didnt_move = TRUE;
+    } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
+        /* can't swap places when pet can't move to your spot */
+        You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (u_with_boulder
+               && !(verysmall(mtmp->data)
+                    && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
+        /* can't swap places when pet won't fit there with the boulder */
+        You("stop.  %s won't fit into the same spot that you're at.",
+            upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
+               && bad_rock(mtmp->data, u.ux0, y)
+               && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
+        /* can't swap places when pet won't fit thru the opening */
+        You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (mtmp->mpeaceful && mtmp->mtrapped) {
+        /* all mtame are also mpeaceful, so this affects pets too */
+        You("stop.  %s can't move out of that trap.",
+            upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else if (mtmp->mpeaceful
+               && (!goodpos(u.ux0, u.uy0, mtmp, 0)
+                   || t_at(u.ux0, u.uy0) != NULL
+                   || mundisplaceable(mtmp))) {
+        /* displacing peaceful into unsafe or trapped space, or trying to
+         * displace quest leader, Oracle, shopkeeper, or priest */
+        You("stop.  %s doesn't want to swap places.",
+            upstart(y_monnam(mtmp)));
+        didnt_move = TRUE;
+    } else {
+        mtmp->mtrapped = 0;
+        remove_monster(x, y);
+        place_monster(mtmp, u.ux0, u.uy0);
+        newsym(x, y);
+        newsym(u.ux0, u.uy0);
+
+        You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
+            x_monnam(mtmp,
+                     mtmp->mtame ? ARTICLE_YOUR
+                     : (!has_mgivenname(mtmp)
+                        && !type_is_pname(mtmp->data)) ? ARTICLE_THE
+                     : ARTICLE_NONE,
+                     (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
+                     has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
+
+        /* check for displacing it into pools and traps */
+        switch (minliquid(mtmp) ? Trap_Killed_Mon
+                : mintrap(mtmp, NO_TRAP_FLAGS)) {
+        case Trap_Effect_Finished:
+            break;
+        case Trap_Caught_Mon: /* trapped */
+        case Trap_Moved_Mon: /* changed levels */
+            /* there's already been a trap message, reinforce it */
+            abuse_dog(mtmp);
+            adjalign(-3);
+            break;
+        case Trap_Killed_Mon:
+            /* drowned or died...
+             * you killed your pet by direct action, so get experience
+             * and possibly penalties;
+             * we want the level gain message, if it happens, to occur
+             * before the guilt message below
+             */
+            {
+                /* minliquid() and mintrap() call mondead() rather than
+                   killed() so we duplicate some of the latter here */
+                int tmp, mndx;
+
+                if (!u.uconduct.killer++)
+                    livelog_printf(LL_CONDUCT, "killed for the first time");
+                mndx = monsndx(mtmp->data);
+                tmp = experience(mtmp, (int) g.mvitals[mndx].died);
+                more_experienced(tmp, 0);
+                newexplevel(); /* will decide if you go up */
+            }
+            /* That's no way to treat a pet!  Your god gets angry.
+             *
+             * [This has always been pretty iffy.  Why does your
+             * patron deity care at all, let alone enough to get mad?]
+             */
+            if (rn2(4)) {
+                You_feel("guilty about losing your pet like this.");
+                u.ugangr++;
+                adjalign(-15);
+            }
+            break;
+        default:
+            impossible("that's strange, unknown mintrap result!");
+            break;
+        }
+    }
+    return !didnt_move;
+}
+
 void
 domove(void)
 {
@@ -1709,8 +1829,7 @@ domove_core(void)
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE,        /* dragging ball will skip a move */
-            displaceu = FALSE,          /* involuntary swap */
-            u_with_boulder = (sobj_at(BOULDER, u.ux, u.uy) != 0);
+            displaceu = FALSE;          /* involuntary swap */
 
     if (g.context.travel) {
         if (!findtravelpath(FALSE))
@@ -2107,118 +2226,7 @@ domove_core(void)
      */
     } else if (is_safemon(mtmp)
                && !(is_hider(mtmp->data) && mtmp->mundetected)) {
-        /* if it turns out we can't actually move */
-        boolean didnt_move = FALSE;
-
-        /* seemimic/newsym should be done before moving hero, otherwise
-           the display code will draw the hero here before we possibly
-           cancel the swap below (we can ignore steed mx,my here) */
-        u.ux = u.ux0, u.uy = u.uy0;
-        mtmp->mundetected = 0;
-        if (M_AP_TYPE(mtmp))
-            seemimic(mtmp);
-        u.ux = mtmp->mx, u.uy = mtmp->my; /* resume swapping positions */
-
-        if (mtmp->mtrapped && (trap = t_at(mtmp->mx, mtmp->my)) != 0
-            && is_pit(trap->ttyp)
-            && sobj_at(BOULDER, trap->tx, trap->ty)) {
-            /* can't swap places with pet pinned in a pit by a boulder */
-            didnt_move = TRUE;
-        } else if (u.ux0 != x && u.uy0 != y && NODIAG(mtmp->data - mons)) {
-            /* can't swap places when pet can't move to your spot */
-            You("stop.  %s can't move diagonally.", upstart(y_monnam(mtmp)));
-            didnt_move = TRUE;
-        } else if (u_with_boulder
-                   && !(verysmall(mtmp->data)
-                        && (!mtmp->minvent || curr_mon_load(mtmp) <= 600))) {
-            /* can't swap places when pet won't fit there with the boulder */
-            You("stop.  %s won't fit into the same spot that you're at.",
-                 upstart(y_monnam(mtmp)));
-            didnt_move = TRUE;
-        } else if (u.ux0 != x && u.uy0 != y && bad_rock(mtmp->data, x, u.uy0)
-                   && bad_rock(mtmp->data, u.ux0, y)
-                   && (bigmonst(mtmp->data) || (curr_mon_load(mtmp) > 600))) {
-            /* can't swap places when pet won't fit thru the opening */
-            You("stop.  %s won't fit through.", upstart(y_monnam(mtmp)));
-            didnt_move = TRUE;
-        } else if (mtmp->mpeaceful && mtmp->mtrapped) {
-            /* all mtame are also mpeaceful, so this affects pets too */
-            You("stop.  %s can't move out of that trap.",
-                upstart(y_monnam(mtmp)));
-            didnt_move = TRUE;
-        } else if (mtmp->mpeaceful
-                   && (!goodpos(u.ux0, u.uy0, mtmp, 0)
-                       || t_at(u.ux0, u.uy0) != NULL
-                       || mundisplaceable(mtmp))) {
-            /* displacing peaceful into unsafe or trapped space, or trying to
-             * displace quest leader, Oracle, shopkeeper, or priest */
-            You("stop.  %s doesn't want to swap places.",
-                upstart(y_monnam(mtmp)));
-            didnt_move = TRUE;
-        } else {
-            mtmp->mtrapped = 0;
-            remove_monster(x, y);
-            place_monster(mtmp, u.ux0, u.uy0);
-            newsym(x, y);
-            newsym(u.ux0, u.uy0);
-
-            You("%s %s.", mtmp->mpeaceful ? "swap places with" : "frighten",
-                x_monnam(mtmp,
-                         mtmp->mtame ? ARTICLE_YOUR
-                         : (!has_mgivenname(mtmp)
-                            && !type_is_pname(mtmp->data)) ? ARTICLE_THE
-                           : ARTICLE_NONE,
-                         (mtmp->mpeaceful && !mtmp->mtame) ? "peaceful" : 0,
-                         has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
-
-            /* check for displacing it into pools and traps */
-            switch (minliquid(mtmp) ? Trap_Killed_Mon
-                    : mintrap(mtmp, NO_TRAP_FLAGS)) {
-            case Trap_Effect_Finished:
-                break;
-            case Trap_Caught_Mon: /* trapped */
-            case Trap_Moved_Mon: /* changed levels */
-                /* there's already been a trap message, reinforce it */
-                abuse_dog(mtmp);
-                adjalign(-3);
-                break;
-            case Trap_Killed_Mon:
-                /* drowned or died...
-                 * you killed your pet by direct action, so get experience
-                 * and possibly penalties;
-                 * we want the level gain message, if it happens, to occur
-                 * before the guilt message below
-                 */
-                {
-                    /* minliquid() and mintrap() call mondead() rather than
-                       killed() so we duplicate some of the latter here */
-                    int tmp, mndx;
-
-                    if (!u.uconduct.killer++)
-                        livelog_printf(LL_CONDUCT, "killed for the first time");
-                    mndx = monsndx(mtmp->data);
-                    tmp = experience(mtmp, (int) g.mvitals[mndx].died);
-                    more_experienced(tmp, 0);
-                    newexplevel(); /* will decide if you go up */
-                }
-                /* That's no way to treat a pet!  Your god gets angry.
-                 *
-                 * [This has always been pretty iffy.  Why does your
-                 * patron deity care at all, let alone enough to get mad?]
-                 */
-                if (rn2(4)) {
-                    You_feel("guilty about losing your pet like this.");
-                    u.ugangr++;
-                    adjalign(-15);
-                }
-                break;
-            default:
-                impossible("that's strange, unknown mintrap result!");
-                break;
-            }
-        }
-
-        if (didnt_move) {
+        if (!domove_swap_with_pet(mtmp, x, y)) {
             u.ux = u.ux0, u.uy = u.uy0; /* didn't move after all */
             /* could skip this bit since we're about to call u_on_newpos() */
             if (u.usteed)
