@@ -92,6 +92,11 @@ dosave0(void)
         u.uinwater = 1, iflags.save_uinwater = 0; /* bypass set_uinwater() */
     if (iflags.save_uburied)
         u.uburied = 1, iflags.save_uburied = 0;
+    /* extra handling for hangup save or panic save; without this,
+       a thrown light source might trigger an "obj_is_local" panic;
+       if a thrown or kicked object is in transit, put it on the map;
+       when punished, make sure ball and chain are placed too */
+    done_object_cleanup(); /* maybe force some items onto map */
 
     if (!g.program_state.something_worth_saving || !g.SAVEF[0])
         goto done;
@@ -451,7 +456,7 @@ savestateinlock(void)
 #endif
 
 void
-savelev(NHFILE* nhfp, xchar lev)
+savelev(NHFILE *nhfp, xchar lev)
 {
 #ifdef TOS
     short tlev;
@@ -512,8 +517,7 @@ savelev(NHFILE* nhfp, xchar lev)
     if (nhfp->mode == FREEING) /* see above */
         goto skip_lots;
 
-    savelevl(nhfp,
-             (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
+    savelevl(nhfp, ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof g.lastseentyp);
         bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
@@ -1064,6 +1068,7 @@ free_dungeons(void)
     return;
 }
 
+/* free a lot of allocated memory which is ordinarily freed during save */
 void
 freedynamicdata(void)
 {
@@ -1097,6 +1102,7 @@ freedynamicdata(void)
     dmonsfree(); /* release dead monsters */
 
     /* level-specific data */
+    done_object_cleanup(); /* maybe force some OBJ_FREE items onto map */
     free_current_level();
 
     /* game-state data [ought to reorganize savegamestate() to handle this] */

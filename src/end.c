@@ -28,7 +28,6 @@ static void done_hangup(int);
 static void disclose(int, boolean);
 static void get_valuables(struct obj *);
 static void sort_valuables(struct valuable_data *, int);
-static void done_object_cleanup(void);
 static void artifact_score(struct obj *, boolean, winid);
 static void really_done(int) NORETURN;
 static void savelife(int);
@@ -1039,7 +1038,7 @@ odds_and_ends(struct obj *list, int what)
 #endif
 
 /* deal with some objects which may be in an abnormal state at end of game */
-static void
+void
 done_object_cleanup(void)
 {
     int ox, oy;

@@ -744,6 +744,7 @@ extern boolean Popeye(int);
 extern void done1(int);
 extern int done2(void);
 extern void done_in_by(struct monst *, int);
+extern void done_object_cleanup(void);
 #endif /* !MAKEDEFS_C && MDLIB_C */
 extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
