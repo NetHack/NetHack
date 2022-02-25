@@ -2088,7 +2088,7 @@ place_object(struct obj *otmp, int x, int y)
     register struct obj *otmp2 = g.level.objects[x][y];
 
     if (!isok(x, y)) { /* validate location */
-        void (*func)(const char *, ...);
+        void (*func)(const char *, ...) PRINTF_F(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;
