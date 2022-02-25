@@ -23,8 +23,12 @@ static boolean domove_fight_empty(xchar, xchar);
 static boolean air_turbulence(void);
 static void slippery_ice_fumbling(void);
 static boolean impaired_movement(xchar *, xchar *);
-static boolean move_out_of_bounds(xchar x, xchar y);
+static boolean avoid_moving_on_trap(xchar, xchar, boolean);
+static boolean avoid_moving_on_liquid(xchar, xchar, boolean);
+static boolean avoid_running_into_trap_or_liquid(xchar, xchar);
+static boolean move_out_of_bounds(xchar, xchar);
 static boolean carrying_too_much(void);
+static boolean escape_from_sticky_mon(xchar, xchar);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -2094,6 +2098,62 @@ carrying_too_much(void)
     return FALSE;
 }
 
+/* try to pull free from sticking monster, or you release a monster
+   you're sticking to. returns TRUE if you lose your movement. */
+static boolean
+escape_from_sticky_mon(xchar x, xchar y)
+{
+    if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
+        struct monst *mtmp;
+
+        if (!next2u(u.ustuck->mx, u.ustuck->my)) {
+            /* perhaps it fled (or was teleported or ... ) */
+            set_ustuck((struct monst *) 0);
+        } else if (sticks(g.youmonst.data)) {
+            /* When polymorphed into a sticking monster,
+             * u.ustuck means it's stuck to you, not you to it.
+             */
+            mtmp = u.ustuck;
+            set_ustuck((struct monst *) 0);
+            You("release %s.", mon_nam(mtmp));
+        } else {
+            /* If holder is asleep or paralyzed:
+             *      37.5% chance of getting away,
+             *      12.5% chance of waking/releasing it;
+             * otherwise:
+             *       7.5% chance of getting away.
+             * [strength ought to be a factor]
+             * If holder is tame and there is no conflict,
+             * guaranteed escape.
+             */
+            switch (rn2(!u.ustuck->mcanmove ? 8 : 40)) {
+            case 0:
+            case 1:
+            case 2:
+ pull_free:
+                mtmp = u.ustuck;
+                set_ustuck((struct monst *) 0);
+                You("pull free from %s.", mon_nam(mtmp));
+                break;
+            case 3:
+                if (!u.ustuck->mcanmove) {
+                    /* it's free to move on next turn */
+                    u.ustuck->mfrozen = 1;
+                    u.ustuck->msleeping = 0;
+                }
+                /*FALLTHRU*/
+            default:
+                if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf)
+                    goto pull_free;
+                You("cannot escape from %s!", mon_nam(u.ustuck));
+                nomul(0);
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
 void
 domove(void)
 {
@@ -2157,52 +2217,8 @@ domove_core(void)
         if (avoid_running_into_trap_or_liquid(x, y))
             return;
 
-        if (u.ustuck && (x != u.ustuck->mx || y != u.ustuck->my)) {
-            if (!next2u(u.ustuck->mx, u.ustuck->my)) {
-                /* perhaps it fled (or was teleported or ... ) */
-                set_ustuck((struct monst *) 0);
-            } else if (sticks(g.youmonst.data)) {
-                /* When polymorphed into a sticking monster,
-                 * u.ustuck means it's stuck to you, not you to it.
-                 */
-                mtmp = u.ustuck;
-                set_ustuck((struct monst *) 0);
-                You("release %s.", mon_nam(mtmp));
-            } else {
-                /* If holder is asleep or paralyzed:
-                 *      37.5% chance of getting away,
-                 *      12.5% chance of waking/releasing it;
-                 * otherwise:
-                 *       7.5% chance of getting away.
-                 * [strength ought to be a factor]
-                 * If holder is tame and there is no conflict,
-                 * guaranteed escape.
-                 */
-                switch (rn2(!u.ustuck->mcanmove ? 8 : 40)) {
-                case 0:
-                case 1:
-                case 2:
- pull_free:
-                    mtmp = u.ustuck;
-                    set_ustuck((struct monst *) 0);
-                    You("pull free from %s.", mon_nam(mtmp));
-                    break;
-                case 3:
-                    if (!u.ustuck->mcanmove) {
-                        /* it's free to move on next turn */
-                        u.ustuck->mfrozen = 1;
-                        u.ustuck->msleeping = 0;
-                    }
-                /*FALLTHRU*/
-                default:
-                    if (u.ustuck->mtame && !Conflict && !u.ustuck->mconf)
-                        goto pull_free;
-                    You("cannot escape from %s!", mon_nam(u.ustuck));
-                    nomul(0);
-                    return;
-                }
-            }
-        }
+        if (escape_from_sticky_mon(x, y))
+            return;
 
         mtmp = m_at(x, y);
         if (mtmp && !is_safemon(mtmp)) {
