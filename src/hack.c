@@ -23,6 +23,7 @@ static boolean domove_fight_empty(xchar, xchar);
 static boolean air_turbulence(void);
 static void slippery_ice_fumbling(void);
 static boolean impaired_movement(xchar *, xchar *);
+static boolean carrying_too_much(void);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1975,7 +1976,7 @@ slippery_ice_fumbling(void)
         HFumbling &= ~FROMOUTSIDE;
 }
 
-/* change movement dir if impaire. return TRUE if can't move */
+/* change movement dir if impaired. return TRUE if can't move */
 static boolean
 impaired_movement(xchar *x, xchar *y)
 {
@@ -1991,6 +1992,28 @@ impaired_movement(xchar *x, xchar *y)
             *x = u.ux + u.dx;
             *y = u.uy + u.dy;
         } while (!isok(*x, *y) || bad_rock(g.youmonst.data, *x, *y));
+    }
+    return FALSE;
+}
+
+/* carrying too much to be able to move? */
+static boolean
+carrying_too_much(void)
+{
+    int wtcap;
+
+    if (((wtcap = near_capacity()) >= OVERLOADED
+         || (wtcap > SLT_ENCUMBER
+             && (Upolyd ? (u.mh < 5 && u.mh != u.mhmax)
+                        : (u.uhp < 10 && u.uhp != u.uhpmax))))
+        && !Is_airlevel(&u.uz)) {
+        if (wtcap < OVERLOADED) {
+            You("don't have enough stamina to move.");
+            exercise(A_CON, FALSE);
+        } else
+            You("collapse under your load.");
+        nomul(0);
+        return TRUE;
     }
     return FALSE;
 }
@@ -2015,7 +2038,7 @@ domove_core(void)
     register struct rm *tmpr;
     xchar x, y;
     struct trap *trap = NULL;
-    int wtcap, glyph;
+    int glyph;
     xchar chainx = 0, chainy = 0,
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
@@ -2028,19 +2051,9 @@ domove_core(void)
         g.context.travel1 = 0;
     }
 
-    if (((wtcap = near_capacity()) >= OVERLOADED
-         || (wtcap > SLT_ENCUMBER
-             && (Upolyd ? (u.mh < 5 && u.mh != u.mhmax)
-                        : (u.uhp < 10 && u.uhp != u.uhpmax))))
-        && !Is_airlevel(&u.uz)) {
-        if (wtcap < OVERLOADED) {
-            You("don't have enough stamina to move.");
-            exercise(A_CON, FALSE);
-        } else
-            You("collapse under your load.");
-        nomul(0);
+    if (carrying_too_much())
         return;
-    }
+
     if (u.uswallow) {
         u.dx = u.dy = 0;
         x = u.ustuck->mx, y = u.ustuck->my;
