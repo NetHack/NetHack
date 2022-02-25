@@ -21,6 +21,7 @@ static boolean domove_fight_ironbars(xchar, xchar);
 static boolean domove_swap_with_pet(struct monst *, xchar, xchar);
 static boolean domove_fight_empty(xchar, xchar);
 static boolean air_turbulence(void);
+static void slippery_ice_fumbling(void);
 static void domove_core(void);
 static void maybe_smudge_engr(int, int, int, int);
 static struct monst *monstinroom(struct permonst *, int);
@@ -1917,6 +1918,30 @@ air_turbulence(void)
     return FALSE;
 }
 
+static void
+slippery_ice_fumbling(void)
+{
+    boolean on_ice = !Levitation && is_ice(u.ux, u.uy);
+
+    if (on_ice) {
+        static int skates = 0;
+
+        if (!skates)
+            skates = find_skates();
+        if ((uarmf && uarmf->otyp == skates) || resists_cold(&g.youmonst)
+            || Flying || is_floater(g.youmonst.data)
+            || is_clinger(g.youmonst.data) || is_whirly(g.youmonst.data)) {
+            on_ice = FALSE;
+        } else if (!rn2(Cold_resistance ? 3 : 2)) {
+            HFumbling |= FROMOUTSIDE;
+            HFumbling &= ~TIMEOUT;
+            HFumbling += 1; /* slip on next move */
+        }
+    }
+    if (!on_ice && (HFumbling & FROMOUTSIDE))
+        HFumbling &= ~FROMOUTSIDE;
+}
+
 void
 domove(void)
 {
@@ -1938,7 +1963,6 @@ domove_core(void)
     register xchar x, y;
     struct trap *trap = NULL;
     int wtcap, glyph;
-    boolean on_ice;
     xchar chainx = 0, chainy = 0,
           ballx = 0, bally = 0;         /* ball&chain new positions */
     int bc_control = 0;                 /* control for ball&chain */
@@ -1974,24 +1998,7 @@ domove_core(void)
             return;
 
         /* check slippery ice */
-        on_ice = !Levitation && is_ice(u.ux, u.uy);
-        if (on_ice) {
-            static int skates = 0;
-
-            if (!skates)
-                skates = find_skates();
-            if ((uarmf && uarmf->otyp == skates) || resists_cold(&g.youmonst)
-                || Flying || is_floater(g.youmonst.data)
-                || is_clinger(g.youmonst.data) || is_whirly(g.youmonst.data)) {
-                on_ice = FALSE;
-            } else if (!rn2(Cold_resistance ? 3 : 2)) {
-                HFumbling |= FROMOUTSIDE;
-                HFumbling &= ~TIMEOUT;
-                HFumbling += 1; /* slip on next move */
-            }
-        }
-        if (!on_ice && (HFumbling & FROMOUTSIDE))
-            HFumbling &= ~FROMOUTSIDE;
+        slippery_ice_fumbling();
 
         x = u.ux + u.dx;
         y = u.uy + u.dy;
