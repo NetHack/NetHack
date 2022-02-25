@@ -3198,6 +3198,16 @@ wizterrainwish(struct _readobjnam_data *d)
         if (!(Levitation || Flying))
             pooleffects(FALSE);
         madeterrain = TRUE;
+    } else if (!BSTRCMPI(bp, p - 3, "ice")) {
+        lev->typ = ICE;
+        lev->flags = 0;
+        del_engr_at(x, y);
+
+        if (!strncmpi(bp, "melting ", 8))
+            start_melt_ice_timeout(x, y, 0L);
+
+        pline("Ice.");
+        madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 5, "altar")) {
         aligntyp al;
 
