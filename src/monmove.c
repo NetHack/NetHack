@@ -1059,34 +1059,6 @@ m_move(register struct monst* mtmp, register int after)
         goto postmov;
     }
 
-    /* likewise for shopkeeper */
-    if (mtmp->isshk) {
-        int xm = shk_move(mtmp);
-        switch (xm) {
-        case -2: return MMOVE_DIED;
-        case -1: mmoved = MMOVE_NOTHING; break; /* follow hero outside shop */
-        case 0: mmoved = MMOVE_NOTHING; goto postmov;
-        case 1: mmoved = MMOVE_MOVED; goto postmov;
-        default: impossible("unknown shk_move return value (%i)", xm);
-            mmoved = MMOVE_NOTHING;
-            goto postmov;
-        }
-    }
-
-    /* and for the guard */
-    if (mtmp->isgd) {
-        int xm = gd_move(mtmp);
-        switch (xm) {
-        case -2: return MMOVE_DIED;
-        case -1: mmoved = MMOVE_NOTHING; break;
-        case 0: mmoved = MMOVE_NOTHING; goto postmov;
-        case 1: mmoved = MMOVE_MOVED; goto postmov;
-        default: impossible("unknown gd_move return value (%i)", xm);
-            mmoved = MMOVE_NOTHING;
-            goto postmov;
-        }
-    }
-
     /* and the acquisitive monsters get special treatment */
     if (is_covetous(ptr)) {
         xchar tx = STRAT_GOALX(mtmp->mstrategy),
@@ -1107,15 +1079,15 @@ m_move(register struct monst* mtmp, register int after)
         goto postmov;
     }
 
-    /* and for the priest */
-    if (mtmp->ispriest) {
-        int xm = pri_move(mtmp);
+    /* likewise for shopkeeper, guard, or priest */
+    if (mtmp->isshk || mtmp->isgd || mtmp->ispriest) {
+        int xm = mtmp->isshk ? shk_move(mtmp) : (mtmp->isgd ? gd_move(mtmp) : pri_move(mtmp));
         switch (xm) {
         case -2: return MMOVE_DIED;
-        case -1: mmoved = MMOVE_NOTHING; break;
+        case -1: mmoved = MMOVE_NOTHING; break; /* shk follow hero outside shop */
         case 0: mmoved = MMOVE_NOTHING; goto postmov;
         case 1: mmoved = MMOVE_MOVED; goto postmov;
-        default: impossible("unknown pri_move return value (%i)", xm);
+        default: impossible("unknown shk/gd/pri_move return value (%i)", xm);
             mmoved = MMOVE_NOTHING;
             goto postmov;
         }
