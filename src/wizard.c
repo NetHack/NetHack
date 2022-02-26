@@ -310,35 +310,41 @@ strategy(struct monst *mtmp)
     return dstrat;
 }
 
+/* pick a destination for a covetous monster to flee to so that it can
+   heal or for guardians (Kops) to congregate at to block hero's progress */
 void
-choose_stairs(xchar *sx, xchar *sy, boolean dir)
+choose_stairs(
+    xchar *sx, xchar *sy, /* output; left as-is if no spot found */
+    boolean dir) /* True: forward, False: backtrack (usually up) */
 {
-    xchar x = 0, y = 0;
     stairway *stway;
-    boolean stdir = dir && !builds_up(&u.uz);
+    boolean stdir = builds_up(&u.uz) ? dir : !dir;
 
-    if ((stway = stairway_find_type_dir(FALSE, stdir)) != 0) {
-        /* stairs in direction 'stdir' */
-        x = stway->sx;
-        y = stway->sy;
-    } else if ((stway = stairway_find_type_dir(TRUE, stdir)) != 0) {
-        /* ladder in direction 'stdir' */
-        x = stway->sx;
-        y = stway->sy;
-    } else {
-        /* branch stairs in any direction */
-        for (stway = g.stairs; stway; stway = stway->next)
-            if (stway->tolev.dnum != u.uz.dnum) {
-                x = stway->sx;
-                y = stway->sy;
-                break;
+    /* look for stairs in direction 'stdir' (True: up, False: down) */
+    stway = stairway_find_type_dir(FALSE, stdir);
+    if (!stway) {
+        /* no stairs; look for ladder it that direction */
+        stway = stairway_find_type_dir(TRUE, stdir);
+        if (!stway) {
+            /* no ladder either; look for branch stairs or ladder in any
+               direction */
+            for (stway = g.stairs; stway; stway = stway->next)
+                if (stway->tolev.dnum != u.uz.dnum)
+                    break;
+            /* if no branch stairs/ladder, check for regular stairs in
+               opposite direction, then for regular ladder if necessary */
+            if (!stway) {
+                stway = stairway_find_type_dir(FALSE, !stdir);
+                if (!stway)
+                    stway = stairway_find_type_dir(TRUE, !stdir);
             }
+        }
+        /* [note: 'stway' could still be Null if the only access to this
+           level is via magic portal] */
     }
 
-    if (isok(x, y)) {
-        *sx = x;
-        *sy = y;
-    }
+    if (stway)
+        *sx = stway->sx, *sy = stway->sy;
 }
 
 DISABLE_WARNING_UNREACHABLE_CODE

@@ -1067,6 +1067,8 @@ rearranging first-kill and first-hit gamelog messages to get hit before kill
 counting "just picked up" items when deciding what pseudo-classes should be
 	included for the 'I' command's object class prompt was operating on
 	an uninitialized varaible
+changes to stair internals resulted in summoned Kops blockcading the stairs up
+	rather than intended stairs down
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
