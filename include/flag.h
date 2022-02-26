@@ -312,8 +312,8 @@ struct instance_flags {
     boolean cmdassist;       /* provide detailed assistance for some comnds */
     boolean fireassist;      /* autowield launcher when using fire-command */
     boolean time_botl;       /* context.botl for 'time' (moves) only */
-    boolean wizweight;       /* display weight of everything in wizard mode */
     boolean wizmgender;      /* test gender info from core in window port */
+    boolean invweight;       /* display weights of items in inventory */
     /*
      * Window capability support.
      */

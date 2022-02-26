@@ -2460,8 +2460,13 @@ xprname(struct obj *obj,
     boolean use_invlet = (flags.invlet_constant
                           && let != CONTAINED_SYM && let != HANDS_SYM);
     long savequan = 0;
+    long save_owt = 0;
 
     if (quan && obj) {
+        if (iflags.invweight) {
+            save_owt = obj->owt;
+            obj->owt = obj->owt * quan / obj->quan;
+        }
         savequan = obj->quan;
         obj->quan = quan;
     }
@@ -2483,8 +2488,12 @@ xprname(struct obj *obj,
         Sprintf(li, "%c - %s%s", (use_invlet ? obj->invlet : let),
                 (txt ? txt : doname(obj)), (dot ? "." : ""));
     }
-    if (savequan)
+    if (savequan) {
         obj->quan = savequan;
+    }
+    if (save_owt) {
+        obj->owt = save_owt;
+    }
 
     return li;
 }
@@ -2687,6 +2696,17 @@ display_pickinv(
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
                  xtra_choice, MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
+    }
+
+    /* Show weight total and item limit. Only for full invent display, not
+     * within getobj. */
+    if (!lets) {
+        char invheading[QBUFSZ];
+        int wcap = weight_cap();
+        Sprintf(invheading, "Inventory: %d/%d weight (%d/52 slots)",
+                inv_weight() + wcap, wcap, inv_cnt(FALSE));
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_BOLD, invheading,
+                 MENU_ITEMFLAGS_NONE);
     }
 
  nextclass:

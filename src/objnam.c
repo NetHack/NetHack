@@ -1397,15 +1397,11 @@ doname_base(
         Strcat(prefix, tmpbuf);
     }
 
-    /* show weight for items (debug tourist info);
-       "aum" is stolen from Crawl's "Arbitrary Unit of Measure" */
-    if (wizard && iflags.wizweight) {
-        /* wizard mode user has asked to see object weights */
-        if (with_price && (*(eos(bp)-1) == ')'))
-            Sprintf(eos(bp)-1, ", %u aum)", obj->owt);
-        else
-            Sprintf(eos(bp), " (%u aum)", obj->owt);
+    /* show weight for items */
+    if (iflags.invweight && (obj->where == OBJ_INVENT || wizard)) {
+        Sprintf(eos(bp), " {%d}", obj->owt);
     }
+
     bp = strprepend(bp, prefix);
     return bp;
 }

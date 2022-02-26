@@ -3824,6 +3824,9 @@ other aspects of the description (default on).
 Persistent.
 .lp ""
 If you use menu coloring, you may want to turn this off.
+.lp invweight
+Augment inventory object descriptions with their objects' weight
+(default on).
 .lp legacy
 Display an introductory message when starting the game (default on).
 Persistent.
@@ -4406,9 +4409,6 @@ For a comma-separated list in NETHACKOPTIONS or an OPTIONS line in a
 configuration file,
 that would
 be the \fIrightmost\fP option in the list.
-.lp wizweight
-Augment object descriptions with their objects' weight (default off).
-Debug mode only.
 .lp zerocomp
 When writing out a save file, perform zero-comp compression of the
 contents. Not all ports support zero-comp compression. It has no effect
@@ -5543,17 +5543,17 @@ The syntax is the same as WIZARDS.
 MAXPLAYERS\ =\ Limit the maximum number of games that can be running
 at the same time.
 .lp
-SAVEFORMAT\ =\ A list of up to two save file formats separated by space. 
-The first format in the list will written as well as read. The second format 
+SAVEFORMAT\ =\ A list of up to two save file formats separated by space.
+The first format in the list will written as well as read. The second format
 will be read only if no save file in the first format exists.
-Valid choices are \(lqhistorical\(rq for binary writing of entire structs, 
+Valid choices are \(lqhistorical\(rq for binary writing of entire structs,
 \(lqlendian\(rq for binary writing of each field in little-endian order,
 \(lqascii\(rq for writing the save file content in ascii text.
 .lp
-BONESFORMAT\ =\ A list of up to two bones file formats separated by space. 
-The first format in the list will written as well as read. The second format 
+BONESFORMAT\ =\ A list of up to two bones file formats separated by space.
+The first format in the list will written as well as read. The second format
 will be read only if no bones files in the first format exist.
-Valid choices are \(lqhistorical\(rq for binary writing of entire structs, 
+Valid choices are \(lqhistorical\(rq for binary writing of entire structs,
 \(lqlendian\(rq for binary writing of each field in little-endian order,
 \(lqascii\(rq for writing the bones file content in ascii text.
 .lp
@@ -5587,7 +5587,7 @@ to identify unique people for the score file.
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
 .lp
-ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players 
+ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players
 to set S_pet_override and S_hero_override symbols in their configuration file.
 .lp
 PORTABLE_DEVICE_PATHS\ =\ 0 or 1 Windows OS only, the game will look
