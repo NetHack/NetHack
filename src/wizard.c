@@ -314,24 +314,25 @@ void
 choose_stairs(xchar *sx, xchar *sy, boolean dir)
 {
     xchar x = 0, y = 0;
-    stairway *stway = g.stairs;
+    stairway *stway;
     boolean stdir = dir && !builds_up(&u.uz);
 
     if ((stway = stairway_find_type_dir(FALSE, stdir)) != 0) {
+        /* stairs in direction 'stdir' */
         x = stway->sx;
         y = stway->sy;
     } else if ((stway = stairway_find_type_dir(TRUE, stdir)) != 0) {
+        /* ladder in direction 'stdir' */
         x = stway->sx;
         y = stway->sy;
     } else {
-        while (stway) {
+        /* branch stairs in any direction */
+        for (stway = g.stairs; stway; stway = stway->next)
             if (stway->tolev.dnum != u.uz.dnum) {
                 x = stway->sx;
                 y = stway->sy;
                 break;
             }
-            stway = stway->next;
-        }
     }
 
     if (isok(x, y)) {
