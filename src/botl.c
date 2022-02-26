@@ -3958,14 +3958,10 @@ status_hilite_menu_fld(int fld)
 
             if (idx == -1) {
                 /* delete selected hilites */
-                if (mode)
-                    goto shlmenu_free;
                 mode = -1;
                 break;
             } else if (idx == -2) {
                 /* create a new hilite */
-                if (mode)
-                    goto shlmenu_free;
                 mode = -2;
                 break;
             }
