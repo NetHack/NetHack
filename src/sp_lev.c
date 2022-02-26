@@ -1107,7 +1107,7 @@ get_location(xchar *x, xchar *y, int humidity, struct mkroom* croom)
         do {
             if (croom) { /* handle irregular areas */
                 coord tmpc;
-                somexy(croom, &tmpc);
+                (void) somexy(croom, &tmpc);
                 *x = tmpc.x;
                 *y = tmpc.y;
             } else {
