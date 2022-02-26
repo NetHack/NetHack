@@ -824,6 +824,7 @@ if a lit potion of oil on the floor was launched by an explosion and it hit
 	it could trigger an "obj_is_local" panic when end of game cleanup
 	tried to extinguish it as a light source
 place_object() validated coordinates after using them to index level.objects
+killed rope golem may drop leashes and bullwhips
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
