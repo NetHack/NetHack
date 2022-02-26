@@ -760,12 +760,7 @@ check_leash(xchar x, xchar y)
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp != LEASH || otmp->leashmon == 0)
             continue;
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            if (DEADMONSTER(mtmp))
-                continue;
-            if ((int) mtmp->m_id == otmp->leashmon)
-                break;
-        }
+        mtmp = find_mid(otmp->leashmon, FM_FMON);
         if (!mtmp) {
             impossible("leash in use isn't attached to anything?");
             otmp->leashmon = 0;
