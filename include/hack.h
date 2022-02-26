@@ -398,6 +398,12 @@ typedef struct sortloot_item Loot;
 #define TEST_TRAV 2 /* test a future travel location */
 #define TEST_TRAP 3 /* check if a future travel loc is a trap */
 
+/* m_move return values */
+#define MMOVE_NOTHING 0
+#define MMOVE_MOVED   1 /* monster moved */
+#define MMOVE_DIED    2 /* monster died */
+#define MMOVE_DONE    3 /* monster used up all actions */
+
 /*** some utility macros ***/
 #define yn(query) yn_function(query, ynchars, 'n')
 #define ynq(query) yn_function(query, ynqchars, 'q')

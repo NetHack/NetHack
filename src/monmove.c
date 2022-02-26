@@ -437,7 +437,7 @@ int
 dochug(register struct monst* mtmp)
 {
     register struct permonst *mdat;
-    register int tmp = 0;
+    register int tmp = MMOVE_NOTHING;
     int inrange, nearby, scared, res;
     struct obj *otmp;
 
@@ -688,7 +688,7 @@ dochug(register struct monst* mtmp)
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
                     if (castmu(mtmp, a, FALSE, FALSE)) {
-                        tmp = 3; /* bypass m_move() */
+                        tmp = MMOVE_DONE; /* bypass m_move() */
                         break;
                     }
                 }
@@ -697,12 +697,12 @@ dochug(register struct monst* mtmp)
 
         if (!tmp)
             tmp = m_move(mtmp, 0);
-        if (tmp != 2)
+        if (tmp != MMOVE_DIED)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
         switch (tmp) { /* for pets, cases 0 and 3 are equivalent */
-        case 0: /* no movement, but it can still attack you */
-        case 3: /* absolutely no movement */
+        case MMOVE_NOTHING: /* no movement, but it can still attack you */
+        case MMOVE_DONE: /* absolutely no movement */
             /* vault guard might have vanished */
             if (mtmp->isgd && (DEADMONSTER(mtmp) || mtmp->mx == 0))
                 return 1; /* behave as if it died */
@@ -712,7 +712,7 @@ dochug(register struct monst* mtmp)
             if (Hallucination)
                 newsym(mtmp->mx, mtmp->my);
             break;
-        case 1: /* monster moved */
+        case MMOVE_MOVED: /* monster moved */
             /* Maybe it stepped on a trap and fell asleep... */
             if (mtmp->msleeping || !mtmp->mcanmove)
                 return 0;
@@ -732,7 +732,7 @@ dochug(register struct monst* mtmp)
                     unstuck(mtmp);
             }
             return 0;
-        case 2: /* monster died */
+        case MMOVE_DIED: /* monster died */
             return 1;
         }
     }
@@ -740,7 +740,7 @@ dochug(register struct monst* mtmp)
     /*  Now, attack the player if possible - one attack set per monst
      */
 
-    if (tmp != 3 && (!mtmp->mpeaceful
+    if (tmp != MMOVE_DONE && (!mtmp->mpeaceful
                      || (Conflict && !resist_conflict(mtmp)))) {
         if (inrange && !scared && !noattacks(mdat)
             /* [is this hp check really needed?] */
@@ -762,7 +762,7 @@ dochug(register struct monst* mtmp)
         cuss(mtmp);
 
     /* note: can't get here when tmp==2 so this always returns 0 */
-    return (tmp == 2);
+    return (tmp == MMOVE_DIED);
 }
 
 static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS,
@@ -1015,7 +1015,7 @@ m_move(register struct monst* mtmp, register int after)
     boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
     struct monst *mtoo;
-    schar mmoved = 0; /* not strictly nec.: chi >= 0 will do */
+    schar mmoved = MMOVE_NOTHING; /* not strictly nec.: chi >= 0 will do */
     long info[9];
     long flag;
     int omx = mtmp->mx, omy = mtmp->my;
@@ -1025,10 +1025,10 @@ m_move(register struct monst* mtmp, register int after)
 
         if (i == Trap_Killed_Mon) {
             newsym(mtmp->mx, mtmp->my);
-            return 2;
+            return MMOVE_DIED;
         } /* it died */
         if (i == Trap_Caught_Mon)
-            return 0; /* still in trap, so didn't move */
+            return MMOVE_NOTHING; /* still in trap, so didn't move */
     }
     ptr = mtmp->data; /* mintrap() can change mtmp->data -dlc */
 
@@ -1036,10 +1036,10 @@ m_move(register struct monst* mtmp, register int after)
         mtmp->meating--;
         if (mtmp->meating <= 0)
             finish_meating(mtmp);
-        return 3; /* still eating */
+        return MMOVE_DONE; /* still eating */
     }
     if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))
-        return 0; /* do not leave hiding place */
+        return MMOVE_NOTHING; /* do not leave hiding place */
 
     /* Where does 'mtmp' think you are?  Not necessary if m_move() called
        from this file, but needed for other calls of m_move(). */
@@ -1061,22 +1061,30 @@ m_move(register struct monst* mtmp, register int after)
 
     /* likewise for shopkeeper */
     if (mtmp->isshk) {
-        mmoved = shk_move(mtmp);
-        if (mmoved == -2)
-            return 2;
-        if (mmoved >= 0)
+        int xm = shk_move(mtmp);
+        switch (xm) {
+        case -2: return MMOVE_DIED;
+        case -1: mmoved = MMOVE_NOTHING; break; /* follow hero outside shop */
+        case 0: mmoved = MMOVE_NOTHING; goto postmov;
+        case 1: mmoved = MMOVE_MOVED; goto postmov;
+        default: impossible("unknown shk_move return value (%i)", xm);
+            mmoved = MMOVE_NOTHING;
             goto postmov;
-        mmoved = 0; /* follow player outside shop */
+        }
     }
 
     /* and for the guard */
     if (mtmp->isgd) {
-        mmoved = gd_move(mtmp);
-        if (mmoved == -2)
-            return 2;
-        if (mmoved >= 0)
+        int xm = gd_move(mtmp);
+        switch (xm) {
+        case -2: return MMOVE_DIED;
+        case -1: mmoved = MMOVE_NOTHING; break;
+        case 0: mmoved = MMOVE_NOTHING; goto postmov;
+        case 1: mmoved = MMOVE_MOVED; goto postmov;
+        default: impossible("unknown gd_move return value (%i)", xm);
+            mmoved = MMOVE_NOTHING;
             goto postmov;
-        mmoved = 0;
+        }
     }
 
     /* and the acquisitive monsters get special treatment */
@@ -1092,21 +1100,25 @@ m_move(register struct monst* mtmp, register int after)
             && (intruder != mtmp)) {
             g.notonhead = (intruder->mx != tx || intruder->my != ty);
             if (mattackm(mtmp, intruder) == 2)
-                return 2;
-            mmoved = 1;
+                return MMOVE_DIED;
+            mmoved = MMOVE_MOVED;
         } else
-            mmoved = 0;
+            mmoved = MMOVE_NOTHING;
         goto postmov;
     }
 
     /* and for the priest */
     if (mtmp->ispriest) {
-        mmoved = pri_move(mtmp);
-        if (mmoved == -2)
-            return 2;
-        if (mmoved >= 0)
+        int xm = pri_move(mtmp);
+        switch (xm) {
+        case -2: return MMOVE_DIED;
+        case -1: mmoved = MMOVE_NOTHING; break;
+        case 0: mmoved = MMOVE_NOTHING; goto postmov;
+        case 1: mmoved = MMOVE_MOVED; goto postmov;
+        default: impossible("unknown pri_move return value (%i)", xm);
+            mmoved = MMOVE_NOTHING;
             goto postmov;
-        mmoved = 0;
+        }
     }
 
 #ifdef MAIL_STRUCTURES
@@ -1114,7 +1126,7 @@ m_move(register struct monst* mtmp, register int after)
         if (!Deaf && canseemon(mtmp))
             verbalize("I'm late!");
         mongone(mtmp);
-        return 2;
+        return MMOVE_DIED;
     }
 #endif
 
@@ -1125,12 +1137,12 @@ m_move(register struct monst* mtmp, register int after)
             (void) rloc(mtmp, RLOC_MSG);
         else
             mnexto(mtmp, RLOC_MSG);
-        mmoved = 1;
+        mmoved = MMOVE_MOVED;
         goto postmov;
     }
  not_special:
     if (u.uswallow && !mtmp->mflee && u.ustuck != mtmp)
-        return 1;
+        return MMOVE_MOVED;
     omx = mtmp->mx;
     omy = mtmp->my;
     gx = mtmp->mux;
@@ -1284,7 +1296,7 @@ m_move(register struct monst* mtmp, register int after)
                             gx = otmp->ox;
                             gy = otmp->oy;
                             if (gx == omx && gy == omy) {
-                                mmoved = 3; /* actually unnecessary */
+                                mmoved = MMOVE_DONE; /* actually unnecessary */
                                 goto postmov;
                             }
                         }
@@ -1365,7 +1377,7 @@ m_move(register struct monst* mtmp, register int after)
                 niy = ny;
                 nidist = ndist;
                 chi = i;
-                mmoved = 1;
+                mmoved = MMOVE_MOVED;
             }
  nxti:
             ;
@@ -1375,11 +1387,11 @@ m_move(register struct monst* mtmp, register int after)
     if (mmoved) {
         register int j;
 
-        if (mmoved == 1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
-            return 3;
+        if (mmoved == MMOVE_MOVED && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
+            return MMOVE_DONE;
 
-        if (mmoved == 1 && m_digweapon_check(mtmp, nix,niy))
-            return 3;
+        if (mmoved == MMOVE_MOVED && m_digweapon_check(mtmp, nix,niy))
+            return MMOVE_DONE;
 
         /* If ALLOW_U is set, either it's trying to attack you, or it
          * thinks it is.  In either case, attack this spot in preference to
@@ -1400,7 +1412,7 @@ m_move(register struct monst* mtmp, register int after)
         if (u_at(nix, niy)) {
             mtmp->mux = u.ux;
             mtmp->muy = u.uy;
-            return 0;
+            return MMOVE_NOTHING;
         }
         /* The monster may attack another based on 1 of 2 conditions:
          * 1 - It may be confused.
@@ -1418,14 +1430,14 @@ m_move(register struct monst* mtmp, register int after)
             mtmp2 = m_at(nix, niy);
             mstatus = mdisplacem(mtmp, mtmp2, FALSE);
             if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED))
-                return 2;
+                return MMOVE_DIED;
             if (mstatus & MM_HIT)
-                return 1;
-            return 3;
+                return MMOVE_MOVED;
+            return MMOVE_DONE;
         }
 
         if (!m_in_out_region(mtmp, nix, niy))
-            return 3;
+            return MMOVE_DONE;
 
         /* move a normal monster; for a long worm, remove_monster() and
            place_monster() only manipulate the head; they leave tail as-is */
@@ -1444,7 +1456,7 @@ m_move(register struct monst* mtmp, register int after)
     } else {
         if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
             (void) rloc(mtmp, RLOC_MSG);
-            return 1;
+            return MMOVE_MOVED;
         }
         /* for a long worm, shrink it (by discarding end of tail) when
            it has failed to move */
@@ -1452,11 +1464,11 @@ m_move(register struct monst* mtmp, register int after)
             worm_nomove(mtmp);
     }
  postmov:
-    if (mmoved == 1 || mmoved == 3) {
+    if (mmoved == MMOVE_MOVED || mmoved == MMOVE_DONE) {
         boolean canseeit = cansee(mtmp->mx, mtmp->my),
                 didseeit = canseeit;
 
-        if (mmoved == 1) {
+        if (mmoved == MMOVE_MOVED) {
             /* normal monster move will already have <nix,niy>,
                but pet dog_move() with 'goto postmov' won't */
             nix = mtmp->mx, niy = mtmp->my;
@@ -1680,7 +1692,7 @@ m_move(register struct monst* mtmp, register int after)
                 if (uses_items)
                     picked |= mpickstuff(mtmp, (char *) 0);
                 if (picked)
-                    mmoved = 3;
+                    mmoved = MMOVE_DONE;
             }
 
             if (mtmp->minvis) {
@@ -1731,7 +1743,7 @@ m_move_aggress(struct monst* mtmp, xchar x, xchar y)
     mstatus = mattackm(mtmp, mtmp2);
 
     if (mstatus & MM_AGR_DIED) /* aggressor died */
-        return 2;
+        return MMOVE_DIED;
 
     if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
         && mtmp2->movement >= NORMAL_SPEED) {
@@ -1739,9 +1751,9 @@ m_move_aggress(struct monst* mtmp, xchar x, xchar y)
         g.notonhead = 0;
         mstatus = mattackm(mtmp2, mtmp); /* return attack */
         if (mstatus & MM_DEF_DIED)
-            return 2;
+            return MMOVE_DIED;
     }
-    return 3;
+    return MMOVE_DONE;
 }
 
 void

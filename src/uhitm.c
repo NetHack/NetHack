@@ -487,7 +487,7 @@ do_attack(struct monst *mtmp)
     /* Is the "it died" check actually correct? */
     if (mdat->mlet == S_LEPRECHAUN && !mtmp->mfrozen && !mtmp->msleeping
         && !mtmp->mconf && mtmp->mcansee && !rn2(7)
-        && (m_move(mtmp, 0) == 2 /* it died */
+        && (m_move(mtmp, 0) == MMOVE_DIED /* it died */
             || mtmp->mx != u.ux + u.dx
             || mtmp->my != u.uy + u.dy)) { /* it moved */
         You("miss wildly and stumble forwards.");

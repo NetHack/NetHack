@@ -901,19 +901,19 @@ dog_move(register struct monst *mtmp,
     omx = mtmp->mx;
     omy = mtmp->my;
     if (has_edog && dog_hunger(mtmp, edog))
-        return 2; /* starved */
+        return MMOVE_DIED; /* starved */
 
     udist = distu(omx, omy);
     /* Let steeds eat and maybe throw rider during Conflict */
     if (mtmp == u.usteed) {
         if (Conflict && !resist_conflict(mtmp)) {
             dismount_steed(DISMOUNT_THROWN);
-            return 1;
+            return MMOVE_MOVED;
         }
         udist = 1;
     } else if (!udist)
         /* maybe we tamed him while being swallowed --jgm */
-        return 0;
+        return MMOVE_NOTHING;
 
     nix = omx; /* set before newdogpos */
     niy = omy;
@@ -923,7 +923,7 @@ dog_move(register struct monst *mtmp,
     if (has_edog) {
         j = dog_invent(mtmp, edog, udist);
         if (j == 2)
-            return 2; /* died */
+            return MMOVE_DIED; /* died */
         else if (j == 1)
             goto newdogpos; /* eating something */
 
@@ -934,7 +934,7 @@ dog_move(register struct monst *mtmp,
     appr = dog_goal(mtmp, has_edog ? edog : (struct edog *) 0, after, udist,
                     whappr);
     if (appr == -2)
-        return 0;
+        return MMOVE_NOTHING;
 
     if (Conflict && !resist_conflict(mtmp)) {
         if (!has_edog) {
@@ -942,7 +942,7 @@ dog_move(register struct monst *mtmp,
              * it disappears, angrily, and sends in some nasties
              */
             lose_guardian_angel(mtmp);
-            return 2; /* current monster is gone */
+            return MMOVE_DIED; /* current monster is gone */
         }
     }
 #if 0 /* [this is now handled in dochug()] */
@@ -1018,14 +1018,14 @@ dog_move(register struct monst *mtmp,
                 continue;
 
             if (after)
-                return 0; /* hit only once each move */
+                return MMOVE_NOTHING; /* hit only once each move */
 
             g.notonhead = 0;
             mstatus = mattackm(mtmp, mtmp2);
 
             /* aggressor (pet) died */
             if (mstatus & MM_AGR_DIED)
-                return 2;
+                return MMOVE_DIED;
 
             if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
                 && mtmp2->mlstmv != g.moves
@@ -1034,9 +1034,9 @@ dog_move(register struct monst *mtmp,
                 && monnear(mtmp2, mtmp->mx, mtmp->my)) {
                 mstatus = mattackm(mtmp2, mtmp); /* return attack */
                 if (mstatus & MM_DEF_DIED)
-                    return 2;
+                    return MMOVE_DIED;
             }
-            return 3;
+            return MMOVE_DONE;
         }
         if ((info[i] & ALLOW_MDISP) && MON_AT(nx, ny)
             && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
@@ -1045,8 +1045,8 @@ dog_move(register struct monst *mtmp,
 
             mstatus = mdisplacem(mtmp, mtmp2, FALSE); /* displace monster */
             if (mstatus & MM_DEF_DIED)
-                return 2;
-            return 0;
+                return MMOVE_DIED;
+            return MMOVE_NOTHING;
         }
 
         {
@@ -1152,7 +1152,7 @@ dog_move(register struct monst *mtmp,
 
             if (mtarg == &g.youmonst) {
                 if (mattacku(mtmp))
-                    return 2;
+                    return MMOVE_DIED;
                 /* Treat this as the pet having initiated an attack even if it
                  * didn't, so it will lose its move.  This isn't entirely fair,
                  * but mattacku doesn't distinguish between "did not attack"
@@ -1165,7 +1165,7 @@ dog_move(register struct monst *mtmp,
 
                 /* Shouldn't happen, really */
                 if (mstatus & MM_AGR_DIED)
-                    return 2;
+                    return MMOVE_DIED;
 
                 /* Allow the targeted nasty to strike back - if
                  * the targeted beast doesn't have a ranged attack,
@@ -1182,7 +1182,7 @@ dog_move(register struct monst *mtmp,
                     if (mtarg->mcansee && haseyes(mtarg->data)) {
                         mstatus = mattackm(mtarg, mtmp);
                         if (mstatus & MM_DEF_DIED)
-                            return 2;
+                            return MMOVE_DIED;
                     }
                 }
             }
@@ -1197,7 +1197,7 @@ dog_move(register struct monst *mtmp,
              *    will return MM_MISS.
              */
             if (mstatus != MM_MISS)
-                return 3;
+                return MMOVE_DONE;
         }
     }
 
@@ -1212,12 +1212,12 @@ dog_move(register struct monst *mtmp,
                 m_unleash(mtmp, FALSE);
             }
             (void) mattacku(mtmp);
-            return 3;
+            return MMOVE_DONE;
         }
         if (!m_in_out_region(mtmp, nix, niy))
-            return 1;
+            return MMOVE_MOVED;
         if (m_digweapon_check(mtmp, nix,niy))
-            return 0;
+            return MMOVE_NOTHING;
 
         /* insert a worm_move() if worms ever begin to eat things */
         wasseen = canseemon(mtmp);
@@ -1245,7 +1245,7 @@ dog_move(register struct monst *mtmp,
          */
         if (do_eat) {
             if (dog_eat(mtmp, obj, omx, omy, FALSE) == 2)
-                return 2;
+                return MMOVE_DIED;
         }
     } else if (mtmp->mleashed && distu(omx, omy) > 4) {
         /* an incredible kludge, but the only way to keep pooch near
@@ -1275,13 +1275,13 @@ dog_move(register struct monst *mtmp,
         cc.y = mtmp->my;
  dognext:
         if (!m_in_out_region(mtmp, nix, niy))
-            return 1;
+            return MMOVE_MOVED;
         remove_monster(mtmp->mx, mtmp->my);
         place_monster(mtmp, cc.x, cc.y);
         newsym(cc.x, cc.y);
         set_apparxy(mtmp);
     }
-    return 1;
+    return MMOVE_MOVED;
 }
 
 /* check if a monster could pick up objects from a location */
