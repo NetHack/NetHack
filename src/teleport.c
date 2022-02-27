@@ -1085,6 +1085,7 @@ domagicportal(register struct trap* ttmp)
         return;
     }
 
+    make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     target_level = ttmp->dst;
     schedule_goto(&target_level, UTOTYPE_PORTAL,
                   "You feel dizzy for a moment, but the sensation passes.",
@@ -1132,6 +1133,7 @@ level_tele_trap(struct trap* trap, unsigned int trflags)
         You("are momentarily blinded by a flash of light.");
     else
         You("are momentarily disoriented.");
+    make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     deltrap(trap);
     newsym(u.ux, u.uy); /* get rid of trap symbol */
     level_tele();
@@ -1506,6 +1508,7 @@ mlevel_tele_trap(
             if (trap)
                 seetrap(trap);
         }
+        mtmp->mstun = 1;
         migrate_to_level(mtmp, ledger_no(&tolevel), migrate_typ, (coord *) 0);
         return Trap_Moved_Mon; /* no longer on this level */
     }
