@@ -2183,6 +2183,10 @@ show_achievements(
         case ACH_MEDU:
             you_have_X("defeated Medusa");
             break;
+        case ACH_TUNE:
+            you_have_X(
+                "learned the tune to open and close the Castle's drawbridge");
+            break;
         case ACH_BELL:
             /* alternate phrasing for present vs past and also for
                possessing the item vs once held it */

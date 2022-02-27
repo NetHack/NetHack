@@ -1068,7 +1068,7 @@ pleased(aligntyp g_align)
             if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered) {
                 if (u.uevent.uheard_tune < 1) {
                     godvoice(g_align, (char *) 0);
-                    verbalize("Hark, %s!", g.youmonst.data->mlet == S_HUMAN
+                    verbalize("Hark, %s!", (g.youmonst.data->mlet == S_HUMAN)
                                                ? "mortal"
                                                : "creature");
                     verbalize(
@@ -1079,6 +1079,7 @@ pleased(aligntyp g_align)
                     You_hear("a divine music...");
                     pline("It sounds like:  \"%s\".", g.tune);
                     u.uevent.uheard_tune++;
+                    record_achievement(ACH_TUNE);
                     break;
                 }
             }

@@ -744,17 +744,20 @@ do_play_instrument(struct obj* instr)
             if (!strcmp(buf, g.tune)) {
                 /* Search for the drawbridge */
                 for (y = u.uy - 1; y <= u.uy + 1; y++)
-                    for (x = u.ux - 1; x <= u.ux + 1; x++)
-                        if (isok(x, y))
-                            if (find_drawbridge(&x, &y)) {
-                                /* tune now fully known */
-                                u.uevent.uheard_tune = 2;
-                                if (levl[x][y].typ == DRAWBRIDGE_DOWN)
-                                    close_drawbridge(x, y);
-                                else
-                                    open_drawbridge(x, y);
-                                return ECMD_TIME;
-                            }
+                    for (x = u.ux - 1; x <= u.ux + 1; x++) {
+                        if (!isok(x, y))
+                            continue;
+                        if (find_drawbridge(&x, &y)) {
+                            /* tune now fully known */
+                            u.uevent.uheard_tune = 2;
+                            record_achievement(ACH_TUNE);
+                            if (levl[x][y].typ == DRAWBRIDGE_DOWN)
+                                close_drawbridge(x, y);
+                            else
+                                open_drawbridge(x, y);
+                            return ECMD_TIME;
+                        }
+                    }
             } else if (!Deaf) {
                 if (u.uevent.uheard_tune < 1)
                     u.uevent.uheard_tune = 1;
@@ -804,8 +807,10 @@ do_play_instrument(struct obj* instr)
                         /* could only get `gears == 5' by playing five
                            correct notes followed by excess; otherwise,
                            tune would have matched above */
-                        if (gears == 5)
+                        if (gears == 5) {
                             u.uevent.uheard_tune = 2;
+                            record_achievement(ACH_TUNE);
+                        }
                     }
                 }
             }
