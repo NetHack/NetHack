@@ -696,8 +696,7 @@ dotele(
                 }
             }
             if (trap)
-                You("%s onto the teleportation trap.",
-                    locomotion(g.youmonst.data, "jump"));
+                You("%s onto the teleportation trap.", u_locomotion("jump"));
         } else
             trap = 0;
     }
@@ -1119,9 +1118,7 @@ level_tele_trap(struct trap* trap, unsigned int trflags)
         Strcpy(verbbuf, "trigger"); /* follows "You sit down." */
         intentional = TRUE;
     } else
-        Sprintf(verbbuf, "%s onto",
-                Levitation ? (const char *) "float"
-                           : locomotion(g.youmonst.data, "step"));
+        Sprintf(verbbuf, "%s onto", u_locomotion("step"));
     You("%s a level teleport trap!", verbbuf);
 
     if (Antimagic && !intentional) {

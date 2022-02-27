@@ -2806,7 +2806,7 @@ monstone(struct monst* mdef)
     if (wasinside) {
         if (is_animal(mdef->data))
             You("%s through an opening in the new %s.",
-                locomotion(g.youmonst.data, "jump"), xname(otmp));
+                u_locomotion("jump"), xname(otmp));
     }
 }
 

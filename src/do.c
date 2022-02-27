@@ -1097,8 +1097,7 @@ dodown(void)
 
     if (trap) {
         const char *down_or_thru = trap->ttyp == HOLE ? "down" : "through";
-        const char *actn = Flying ? "fly"
-                                  : locomotion(g.youmonst.data, "jump");
+        const char *actn = u_locomotion("jump");
 
         if (g.youmonst.data->msize >= MZ_HUGE) {
             char qbuf[QBUFSZ];
@@ -1577,7 +1576,7 @@ goto_level(
             if (flags.verbose || great_effort)
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
-                      Levitation ? "float" : Flying ? "fly" : "climb",
+                      u_locomotion("climb"),
                       (Flying && g.at_ladder) ? " along" : "",
                       g.at_ladder ? "ladder" : "stairs");
         } else { /* down */

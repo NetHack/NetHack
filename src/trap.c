@@ -1858,9 +1858,7 @@ trapeffect_web(
                         x_monnam(u.usteed, steed_article, "poor",
                                  SUPPRESS_SADDLE, FALSE));
             } else {
-                Sprintf(verbbuf, "%s into",
-                        Levitation ? (const char *) "float"
-                        : locomotion(g.youmonst.data, "stumble"));
+                Sprintf(verbbuf, "%s into", u_locomotion("stumble"));
             }
             You("%s %s spider web!", verbbuf, a_your[trap->madeby_u]);
         }
@@ -2155,9 +2153,7 @@ trapeffect_poly_trap(
                     x_monnam(u.usteed, steed_article, (char *) 0,
                              SUPPRESS_SADDLE, FALSE));
         else
-            Sprintf(verbbuf, "%s onto",
-                    Levitation ? (const char *) "float"
-                    : locomotion(g.youmonst.data, "step"));
+            Sprintf(verbbuf, "%s onto", u_locomotion("step"));
         You("%s a polymorph trap!", verbbuf);
         if (Antimagic || Unchanging) {
             shieldeff(u.ux, u.uy);
@@ -2499,7 +2495,7 @@ dotrap(struct trap *trap, unsigned trflags)
     } else if (!forcetrap) {
         if (floor_trigger(ttype) && check_in_air(&g.youmonst, trflags)) {
             if (already_seen) {
-                You("%s over %s %s.", Levitation ? "float" : "fly",
+                You("%s over %s %s.", u_locomotion("step"),
                     (ttype == ARROW_TRAP && !trap->madeby_u)
                     ? "an" : a_your[trap->madeby_u],
                     trapname(ttype, FALSE));
@@ -3561,7 +3557,7 @@ climb_pit(void)
     } else if ((Flying || is_clinger(g.youmonst.data)) && !Sokoban) {
         /* eg fell in pit, then poly'd to a flying monster;
            or used '>' to deliberately enter it */
-        You("%s from the %s.", Flying ? "fly" : "climb", pitname);
+        You("%s from the %s.", u_locomotion("climb"), pitname);
         reset_utrap(FALSE);
         fill_pit(u.ux, u.uy);
         g.vision_full_recalc = 1; /* vision limits change */

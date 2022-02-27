@@ -187,8 +187,7 @@ moverock(void)
                    spot without pushing it; hero is poly'd into a giant,
                    so exotic forms of locomotion are out, but might be
                    levitating (ring, potion, spell) or flying (amulet) */
-                You("%s over a boulder here.",
-                    Levitation ? "float" : Flying ? "fly" : "step");
+                You("%s over a boulder here.", u_locomotion("step"));
                 /* ["over" seems weird on air level but what else to say?] */
                 sokoban_guilt();
                 res = 0; /* move to <sx,sy> */
@@ -1535,11 +1534,14 @@ check_buried_zombies(xchar x, xchar y)
     }
 }
 
+/* return an appropriate locomotion word for hero */
 const char *
 u_locomotion(const char *def)
 {
-    return Levitation ? "levitate"
-        : Flying ? "fly"
+    boolean capitalize = (*def == highc(*def));
+
+    return Levitation ? (capitalize ? "Float" : "float")
+        : Flying ? (capitalize ? "Fly" : "fly")
         : locomotion(g.youmonst.data, def);
 }
 
@@ -2980,7 +2982,7 @@ check_special_room(boolean newlev)
             break;
         case MORGUE:
             if (midnight()) {
-                const char *run = locomotion(g.youmonst.data, "Run");
+                const char *run = u_locomotion("Run");
 
                 pline("%s away!  %s away!", run, run);
             } else

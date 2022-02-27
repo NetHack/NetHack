@@ -507,7 +507,7 @@ dismount_steed(
     case DISMOUNT_THROWN:
     case DISMOUNT_FELL:
         verb = (reason == DISMOUNT_THROWN) ? "are thrown"
-               : ulev ? "float" : ufly ? "fly" : "fall";
+            : u_locomotion("fall");
         You("%s off of %s!", verb, mon_nam(mtmp));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
