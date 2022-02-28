@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1644524059 2022/02/10 20:14:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1646084789 2022/02/28 21:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1391,6 +1391,14 @@ really_done(int how)
         if (strcmp(flags.end_disclose, "none"))
             disclose(how, taken);
 
+        /* it would be better to do this after killer.name fixups but
+           that comes too late; end-of-game is classified as a "major
+           achievement" even if it happens to be ending in failure */
+        formatkiller(pbuf, (unsigned) sizeof pbuf, how, TRUE);
+        if (!*pbuf)
+            Strcpy(pbuf, deaths[how]);
+        livelog_printf(LL_ACHIEVE, "%s", pbuf);
+
         dump_everything(how, endtime);
     }
 
@@ -1574,8 +1582,8 @@ really_done(int how)
             Strcat(pbuf, " ");
         }
         Sprintf(eos(pbuf), "%s with %ld point%s,",
-                how == ASCENDED ? "went to your reward"
-                                 : "escaped from the dungeon",
+                (how == ASCENDED) ? "went to your reward"
+                                  : "escaped from the dungeon",
                 u.urexp, plur(u.urexp));
         dump_forward_putstr(endwin, 0, pbuf, done_stopprint);
 
@@ -1631,7 +1639,7 @@ really_done(int how)
             if (Is_astralevel(&u.uz))
                 where = "The Astral Plane";
             Sprintf(pbuf, "You %s in %s", ends[how], where);
-            if (!In_endgame(&u.uz) && !Is_knox(&u.uz))
+            if (!In_endgame(&u.uz) && !single_level_branch(&u.uz))
                 Sprintf(eos(pbuf), " on dungeon level %d",
                         In_quest(&u.uz) ? dunlev(&u.uz) : depth(&u.uz));
         }

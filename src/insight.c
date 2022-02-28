@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1645298661 2022/02/19 19:24:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1646084789 2022/02/28 21:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,7 +64,7 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "ascended" },
     { LL_ACHIEVE, "acquired the Mines' End luckstone" },
     { LL_ACHIEVE, "completed Sokoban" },
-    { LL_ACHIEVE|LL_UMONST, "killed Medusa" },
+    { LL_ACHIEVE | LL_UMONST, "killed Medusa" },
      /* these two are not logged */
     { 0, "hero was always blond, no, blind" },
     { 0, "hero never wore armor" },
@@ -75,18 +75,21 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_MINORAC, "entered a temple" },
     { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
     { LL_ACHIEVE, "read a Discworld novel" }, /* ditto */
-    { LL_ACHIEVE, "entered Sokoban" }, /* Keep as major for turn comparison w/completed soko */
+    { LL_ACHIEVE, "entered Sokoban" }, /* keep as major for turn comparison
+                                        * with completed sokoban */
     { LL_ACHIEVE, "entered the Bigroom" },
     /* The following 8 are for advancing through the ranks
-       messages differ by role so are created on the fly */
-    { LL_MINORAC, "" },
-    { LL_MINORAC, "" },
-    { LL_MINORAC, "" },
-    { LL_MINORAC, "" },
-    { LL_ACHIEVE, "" },
-    { LL_ACHIEVE, "" },
-    { LL_ACHIEVE, "" },
-    { LL_ACHIEVE, "" },
+       and messages differ by role so are created on the fly;
+       rank 0 (Xp 1 and 2) isn't an achievement */
+    { LL_MINORAC, "" }, /* Xp 3 */
+    { LL_MINORAC, "" }, /* Xp 6 */
+    { LL_MINORAC, "" }, /* Xp 10 */
+    { LL_ACHIEVE, "" }, /* Xp 14, so able to attempt the quest */
+    { LL_ACHIEVE, "" }, /* Xp 18 */
+    { LL_ACHIEVE, "" }, /* Xp 22 */
+    { LL_ACHIEVE, "" }, /* Xp 26 */
+    { LL_ACHIEVE, "" }, /* Xp 30 */
+    { LL_MINORAC, "learned castle drawbridge's tune" },
     { 0, "" } /* keep this one at the end */
 };
 
@@ -2280,12 +2283,16 @@ record_achievement(schar achidx)
        an attempt to duplicate an achievement can happen if any of Bell,
        Candelabrum, Book, or Amulet is dropped then picked up again */
     for (i = 0; u.uachieved[i]; ++i)
-        if (abs(u.uachieved[i]) == abs(achidx))
+        if (abs(u.uachieved[i]) == absidx)
             return; /* already recorded, don't duplicate it */
     u.uachieved[i] = achidx;
 
+    /* avoid livelog for achievements recorded during final disclosure:
+       nudist and blind-from-birth; also ascension which is suppressed
+       by this gets logged separately in really_done() */
     if (g.program_state.gameover)
-        return; /* don't livelog achievements recorded at end of game */
+        return;
+
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
         livelog_printf(achieve_msg[absidx].llflag,
                        "attained the rank of %s (level %d)",

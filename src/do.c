@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1627516694 2021/07/28 23:58:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.270 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1646084773 2022/02/28 21:46:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1503,9 +1503,6 @@ goto_level(
         }
         mklev();
         new = TRUE; /* made the level */
-        livelog_printf(LL_DEBUG, "entered new level %d, %s",
-                       dunlev(&u.uz), g.dungeons[u.uz.dnum].dname);
-
         familiar = bones_include_name(g.plname);
     } else {
         /* returning to previously visited level; reload it */
@@ -1762,6 +1759,9 @@ goto_level(
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
                  || g.quest_status.leader_is_dead)) {
+            /* [TODO: copy of same TODO below; if an anchievement for
+               receiving quest call from leader gets added, that should
+               come after logging new level entry] */
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = 1;
                 /* main "leader needs help" message */
@@ -1772,6 +1772,21 @@ goto_level(
             }
         }
     }
+
+    /* this was originally done earlier; moved here to be logged after
+       any achievement related to entering a dungeon branch
+       [TODO: if an anchievement for receiving quest call from leader
+       gets added, that should come after this rather than take place
+       where the message is delivered above] */
+    if (new)
+        /* FIXME: this shows level number relative to the start of the
+           branch (so "entered new level 3, Vlad's Tower" when going
+           into the first level of that branch); it should be changed
+           to show the level number that appears on the status lines;
+           also in the endgame it shows arbitrary level number instead
+           of elemental plane name */
+        livelog_printf(LL_DEBUG, "entered new level %d, %s",
+                       dunlev(&u.uz), g.dungeons[u.uz.dnum].dname);
 
     assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
 #ifdef INSURANCE
@@ -1798,6 +1813,7 @@ goto_level(
     }
 
     (void) pickup(1);
+    return;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
