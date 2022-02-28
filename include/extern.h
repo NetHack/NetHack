@@ -247,7 +247,7 @@ extern const char *cmdname_from_func(int(*)(void), char *, boolean);
 extern boolean redraw_cmd(char);
 extern const char *levltyp_to_name(int);
 extern void reset_occupations(void);
-extern void set_occupation(int(*)(void), const char *, int);
+extern void set_occupation(int(*)(void), const char *, cmdcount_t);
 extern void cmdq_add_ec(int(*)(void));
 extern void cmdq_add_key(char);
 extern struct _cmd_queue *cmdq_pop(void);
