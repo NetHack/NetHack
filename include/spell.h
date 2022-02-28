@@ -25,4 +25,7 @@ struct spell {
 #define spellid(spell) g.spl_book[spell].sp_id
 #define spellknow(spell) g.spl_book[spell].sp_know
 
+/* how much Pw a spell of level lvl costs to cast? */
+#define SPELL_LEV_PW(lvl) ((lvl) * 5)
+
 #endif /* SPELL_H */

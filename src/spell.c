@@ -924,7 +924,7 @@ spelleffects(int spell_otyp, boolean atme)
      *  Note: dotele() also calculates energy use and checks nutrition
      *  and strength requirements; if any of these change, update it too.
      */
-    energy = (spellev(spell) * 5); /* 5 <= energy <= 35 */
+    energy = SPELL_LEV_PW(spellev(spell)); /* 5 <= energy <= 35 */
 
     /*
      * Spell casting no longer affects knowledge of the spell. A

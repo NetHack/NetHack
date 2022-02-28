@@ -932,10 +932,10 @@ u_init(void)
         break;
     }
 
-    /* If we have at least one spell, force starting Pw to be 5,
+    /* If we have at least one spell, force starting Pw to be enough,
        so hero can cast the level 1 spell they should have */
-    if (num_spells() && (u.uenmax < 5))
-        u.uen = u.uenmax = u.uenpeak = u.ueninc[u.ulevel] = 5;
+    if (num_spells() && (u.uenmax < SPELL_LEV_PW(1)))
+        u.uen = u.uenmax = u.uenpeak = u.ueninc[u.ulevel] = SPELL_LEV_PW(1);
 
     return;
 }
