@@ -4795,7 +4795,7 @@ get_count(
     char *allowchars,
     char inkey,
     long maxcount,
-    long *count,
+    cmdcount_t *count,
     boolean historicmsg) /* whether to include in ^P history: True => yes */
 {
     char qbuf[QBUFSZ];

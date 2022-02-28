@@ -676,6 +676,8 @@ struct _cmd_queue {
     struct _cmd_queue *next;
 };
 
+typedef long cmdcount_t;	/* Command counts */
+
 /*
  * 'g' -- instance_globals holds engine state that does not need to be
  * persisted upon game exit.  The initialization state is well defined
@@ -735,7 +737,7 @@ struct instance_globals {
     coord clicklook_cc;
     winid en_win;
     boolean en_via_menu;
-    long last_command_count;
+    cmdcount_t last_command_count;
     struct ext_func_tab *ext_tlist; /* info for rhack() from doextcmd() */
 
     /* dbridge.c */
@@ -748,9 +750,9 @@ struct instance_globals {
     int hackpid; /* current process id */
     char chosen_windowtype[WINTYPELEN];
     int bases[MAXOCLASSES + 1];
-    int multi;
+    cmdcount_t multi;
     char command_line[COLNO];
-    long command_count;
+    cmdcount_t command_count;
     const char *multi_reason;
     char multireasonbuf[QBUFSZ]; /* note: smaller than usual [BUFSZ] */
     int nroom;

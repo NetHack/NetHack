@@ -276,7 +276,7 @@ extern const char *directionname(int);
 extern int isok(int, int);
 extern int get_adjacent_loc(const char *, const char *, xchar, xchar, coord *);
 extern const char *click_to_cmd(int, int, int);
-extern char get_count(char *, char, long, long *, boolean);
+extern char get_count(char *, char, long, cmdcount_t *, boolean);
 #ifdef HANGUPHANDLING
 extern void hangup(int);
 extern void end_of_input(void);

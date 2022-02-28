@@ -533,7 +533,7 @@ exerchk(void)
     exerper();
 
     if (g.moves >= g.context.next_attrib_check) {
-        debugpline1("exerchk: ready to test. multi = %d.", g.multi);
+        debugpline1("exerchk: ready to test. multi = %ld.", g.multi);
     }
     /*  Are we ready for a test? */
     if (g.moves >= g.context.next_attrib_check && !g.multi) {
