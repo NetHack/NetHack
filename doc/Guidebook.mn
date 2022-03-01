@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: keni-datesub2 $:$NHDT-Revision: 1.437 $ $NHDT-Date: 1641933560 2022/01/11 20:39:20 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.450 $ $NHDT-Date: 1646146100 2022/03/01 14:48:20 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -3292,10 +3292,10 @@ corresponding achievement.
 The \fIMedusa\fP achievement is recorded if she dies for any reason,
 even if you are not directly responsible, and only if she dies.
 .pg
-The 5-note \fItune\fP can be learned via trail and error with a musical
+The 5-note \fItune\fP can be learned via trial and error with a musical
 instrument played closely
 enough\(embut not too close!\(emto
-the Castle level's drawbridge or be given to you via prayer boon.
+the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
 \fIBlind\fP and \fINudist\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
