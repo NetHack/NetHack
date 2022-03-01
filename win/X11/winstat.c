@@ -1,4 +1,4 @@
-/* NetHack 3.7	winstat.c	$NHDT-Date: 1641763638 2022/01/09 21:27:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.7	winstat.c	$NHDT-Date: 1646171629 2022/03/01 21:53:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1481,7 +1481,7 @@ update_val(struct X_status_value *attr_rec, long new_value)
                        rank_of(u.ulevel, g.pl_character[0], flags.female));
 
         } else if (attr_rec == &shown_stats[F_DLEVEL]) {
-            if (!describe_level(buf)) {
+            if (!describe_level(buf, 0)) {
                 Strcpy(buf, g.dungeons[u.uz.dnum].dname);
                 Sprintf(eos(buf), ", level %d", depth(&u.uz));
             }

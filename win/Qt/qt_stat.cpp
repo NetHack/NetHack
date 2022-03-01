@@ -812,7 +812,7 @@ void NetHackQtStatusWindow::updateStats()
                  buf.toLatin1().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
-    if (!describe_level(buf3)) {
+    if (!describe_level(buf3, 0)) {
 	Sprintf(buf3, "%s, level %d",
                 g.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
     }

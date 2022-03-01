@@ -1639,7 +1639,8 @@ curses_color_attr(int nh_color, int bg_color)
     return cattr;
 }
 
-/* Returns a complete curses attribute. Used to possibly bold/underline/etc HP/Pw. */
+/* Returns a complete curses attribute.
+   Used to possibly bold/underline/etc HP/Pw. */
 #ifdef STATUS_COLORS
 static attr_t
 hpen_color_attr(boolean is_hp, int cur, int max)
@@ -1665,17 +1666,18 @@ hpen_color_attr(boolean is_hp, int cur, int max)
 #endif
 
 /* Return color for the HP bar.
-   With status colors ON, this respect its configuration (defaulting to gray), but
-   only obeys the color (no weird attributes for the HP bar).
-   With status colors OFF, this returns reasonable defaults which are also used
-   for the HP/Pw text itself. */
+   With status colors ON, this respect its configuration (defaulting to gray),
+   but only obeys the color (no weird attributes for the HP bar).
+   With status colors OFF, this returns reasonable defaults which are also
+   used for the HP/Pw text itself. */
 static int
 hpen_color(boolean is_hp, int cur, int max)
 {
 #ifdef STATUS_COLORS
     if (iflags.use_status_colors) {
         struct color_option stat_color;
-        stat_color = percentage_color_of(cur, max, is_hp ? hp_colors : pw_colors);
+        stat_color = percentage_color_of(cur, max,
+                                         is_hp ? hp_colors : pw_colors);
 
         if (stat_color.color == NO_COLOR)
             return CLR_GRAY;
@@ -1872,7 +1874,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     y++;
     wmove(win, y, x);
 
-    describe_level(buf);
+    describe_level(buf, 0);
 
     wprintw(win, "%s", buf);
 
@@ -2135,7 +2137,8 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     if (Upolyd)
-        print_statdiff("Hit Dice:      ", &prevlevel, mons[u.umonnum].mlevel, STAT_OTHER);
+        print_statdiff("Hit Dice:      ", &prevlevel, mons[u.umonnum].mlevel,
+                       STAT_OTHER);
     else if (flags.showexp) {
         print_statdiff("Experience:    ", &prevlevel, u.ulevel, STAT_OTHER);
         /* use waddch, we don't want to highlight the '/' */
@@ -2153,7 +2156,8 @@ draw_vertical(int x, int y, int hp, int hpmax)
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore) {
-        print_statdiff("Score:         ", &prevscore, botl_score(), STAT_OTHER);
+        print_statdiff("Score:         ", &prevscore, botl_score(),
+                       STAT_OTHER);
         wmove(win, y++, x);
     }
 #endif /* SCORE_ON_BOTL */
@@ -2178,7 +2182,7 @@ curses_add_statuses(WINDOW *win, boolean align_right,
         *x = mx;
     }
 
-#define statprob(str, trouble)                                  \
+#define statprob(str, trouble) \
     curses_add_status(win, align_right, vertical, x, y, str, trouble)
 
     /* Hunger */
@@ -2214,7 +2218,8 @@ curses_add_status(WINDOW *win, boolean align_right, boolean vertical,
     if (!vertical && !align_right)
         waddch(win, ' ');
 
-    /* For whatever reason, hunger states have trailing spaces. Get rid of them. */
+    /* For whatever reason, hunger states have trailing spaces. Get rid of
+       them. */
     char buf[BUFSZ];
     Strcpy(buf, str);
     int i;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1646136939 2022/03/01 12:15:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.295 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1646171623 2022/03/01 21:53:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1778,15 +1778,15 @@ goto_level(
        [TODO: if an achievement for receiving quest call from leader
        gets added, that should come after this rather than take place
        where the message is delivered above] */
-    if (new)
-        /* FIXME: this shows level number relative to the start of the
-           branch (so "entered new level 3, Vlad's Tower" when going
-           into the first level of that branch); it should be changed
-           to show the level number that appears on the status lines;
-           also in the endgame it shows arbitrary level number instead
-           of elemental plane name */
-        livelog_printf(LL_DEBUG, "entered new level %d, %s",
-                       dunlev(&u.uz), g.dungeons[u.uz.dnum].dname);
+    if (new) {
+        char dloc[QBUFSZ];
+        /* Astral is excluded as a major event here because entry to it
+           is already one due to that being an achievement */
+        boolean major = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
+
+        (void) describe_level(dloc, 2);
+        livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, "entered %s", dloc);
+    }
 
     assign_level(&u.uz0, &u.uz); /* reset u.uz0 */
 #ifdef INSURANCE

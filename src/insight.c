@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1646136941 2022/03/01 12:15:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1646171624 2022/03/01 21:53:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,7 +59,7 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "acquired the Book of the Dead" },
     { LL_ACHIEVE, "performed the invocation" },
     { LL_ACHIEVE, "acquired The Amulet of Yendor" },
-    { LL_ACHIEVE, "entered the Planes" },
+    { LL_ACHIEVE, "entered the Elemental Planes" },
     { LL_ACHIEVE, "entered the Astral Plane" },
     { LL_ACHIEVE, "ascended" },
     { LL_ACHIEVE | LL_SPOILER, "acquired the Mines' End luckstone" },
@@ -1957,7 +1957,7 @@ youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
 int
 doconduct(void)
 {
-    show_conduct(0);
+    show_conduct(ENL_GAMEINPROGRESS);
     return ECMD_OK;
 }
 
@@ -2372,7 +2372,7 @@ do_gamelog(void)
 {
 #ifdef CHRONICLE
     if (g.gamelog) {
-        show_gamelog(0);
+        show_gamelog(ENL_GAMEINPROGRESS);
     } else {
         pline("No chronicled events.");
     }

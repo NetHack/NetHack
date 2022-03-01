@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1629817677 2021/08/24 15:07:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.384 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1646171625 2022/03/01 21:53:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2078,7 +2078,7 @@ mm_displacement(
 
 /* Is the square close enough for the monster to move or attack into? */
 boolean
-monnear(struct monst* mon, int x, int y)
+monnear(struct monst *mon, int x, int y)
 {
     int distance = dist2(mon->mx, mon->my, x, y);
 
@@ -2108,7 +2108,7 @@ dmonsfree(void)
     }
 
     if (count != iflags.purge_monsters) {
-        describe_level(buf);
+        describe_level(buf, 2);
         impossible("dmonsfree: %d removed doesn't match %d pending on %s",
                    count, iflags.purge_monsters, buf);
     }
@@ -2117,7 +2117,7 @@ dmonsfree(void)
 
 /* called when monster is moved to larger structure */
 void
-replmon(struct monst* mtmp, struct monst* mtmp2)
+replmon(struct monst *mtmp, struct monst *mtmp2)
 {
     struct obj *otmp;
 
@@ -2287,13 +2287,13 @@ dealloc_mextra(struct monst* m)
 }
 
 void
-dealloc_monst(struct monst* mon)
+dealloc_monst(struct monst *mon)
 {
     char buf[QBUFSZ];
 
     buf[0] = '\0';
     if (mon->nmon) {
-        describe_level(buf);
+        describe_level(buf, 2);
         panic("dealloc_monst with nmon on %s", buf);
     }
     if (mon->mextra)

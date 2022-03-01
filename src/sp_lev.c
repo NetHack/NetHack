@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1622361654 2021/05/30 08:00:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1646171627 2022/03/01 21:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2291,7 +2291,7 @@ create_object(object* o, struct mkroom* croom)
         } else if (!iflags.lua_testing) {
             char lbuf[QBUFSZ];
 
-            (void) describe_level(lbuf); /* always has a trailing space */
+            (void) describe_level(lbuf, 1 | 2);
             impossible("create_object: unknown achievement (%s\"%s\")",
                        lbuf, simpleonames(otmp));
         }

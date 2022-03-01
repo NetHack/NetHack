@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1646136928 2022/03/01 12:15:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1062 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1646171621 2022/03/01 21:53:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1063 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -180,7 +180,7 @@ extern void max_rank_sz(void);
 #ifdef SCORE_ON_BOTL
 extern long botl_score(void);
 #endif
-extern int describe_level(char *);
+extern int describe_level(char *, int);
 extern void status_initialize(boolean);
 extern void status_finish(void);
 extern boolean exp_percent_changing(void);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1606765211 2020/11/30 19:40:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1646171622 2022/03/01 21:53:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,7 +128,7 @@ do_statusline2(void)
      */
 
     /* dungeon location plus gold */
-    (void) describe_level(dloc); /* includes at least one trailing space */
+    (void) describe_level(dloc, 1); /* includes at least one trailing space */
     if ((money = money_cnt(g.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
     Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
@@ -423,25 +423,39 @@ botl_score(void)
 
 /* provide the name of the current level for display by various ports */
 int
-describe_level(char *buf)
+describe_level(
+    char *buf, /* output buffer */
+    int dflgs) /* 1: append trailing space; 2: include dungeon branch name */
 {
+    boolean addspace = (dflgs & 1) != 0,  /* (used to be unconditional) */
+            addbranch = (dflgs & 2) != 0; /* False: status, True: livelog */
     int ret = 1;
 
-    /* TODO:    Add in dungeon name */
     if (Is_knox(&u.uz)) {
-        Sprintf(buf, "%s ", g.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "%s", g.dungeons[u.uz.dnum].dname);
+        addbranch = FALSE;
     } else if (In_quest(&u.uz)) {
-        Sprintf(buf, "Home %d ", dunlev(&u.uz));
+        Sprintf(buf, "Home %d", dunlev(&u.uz));
     } else if (In_endgame(&u.uz)) {
         /* [3.6.2: this used to be "Astral Plane" or generic "End Game"] */
         (void) endgamelevelname(buf, depth(&u.uz));
-        (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
-        Strcat(buf, " ");
+        if (!addbranch)
+            (void) strsubst(buf, "Plane of ", ""); /* just keep <element> */
+        addbranch = FALSE;
     } else {
         /* ports with more room may expand this one */
-        Sprintf(buf, "Dlvl:%-2d ", depth(&u.uz));
+        if (!addbranch)
+            Sprintf(buf, "Dlvl:%-2d", depth(&u.uz));
+        else
+            Sprintf(buf, "level %d", depth(&u.uz));
         ret = 0;
     }
+    if (addbranch) {
+        Sprintf(eos(buf), ", %s", g.dungeons[u.uz.dnum].dname);
+        (void) strsubst(buf, "The ", "the ");
+    }
+    if (addspace)
+        Strcat(buf, " ");
     return ret;
 }
 
@@ -779,7 +793,7 @@ bot_via_windowport(void)
     g.blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
 
     /*  Dungeon level. */
-    (void) describe_level(g.blstats[idx][BL_LEVELDESC].val);
+    (void) describe_level(g.blstats[idx][BL_LEVELDESC].val, 1);
     g.valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
 
     /* Gold */
