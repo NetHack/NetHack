@@ -1409,7 +1409,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "mkdir -p \"${NH_INSTALL_DIR}\"/save\ncd \"${NH_DAT_DIR}\"\ncp nhdat license symbols \"${NH_INSTALL_DIR}\"\ncp \"${NH_SRC_DIR}\"/nethack \"${NH_INSTALL_DIR}\"\ncp \"${NH_UTIL_DIR}\"/recover \"${NH_INSTALL_DIR}\"\ntouch \"${NH_INSTALL_DIR}\"/perm\ntouch \"${NH_INSTALL_DIR}\"/record\ntouch \"${NH_INSTALL_DIR}\"/logfile\ntouch \"${NH_INSTALL_DIR}\"/xlogfile\ntouch \"${NH_INSTALL_DIR}\"/livelog\ncd \"${NH_UNIX_DIR}\"\nsh hints/macosx.sh editsysconf sysconf \"${NH_INSTALL_DIR}\"/sysconf\n";
+			shellScript = "mkdir -p \"${NH_INSTALL_DIR}\"/save\ncd \"${NH_DAT_DIR}\"\ncp nhdat license symbols \"${NH_INSTALL_DIR}\"\ncp \"${NH_SRC_DIR}\"/nethack \"${NH_INSTALL_DIR}\"\ncp \"${BUILT_PRODUCTS_DIR}\"/recover \"${NH_INSTALL_DIR}\"\ntouch \"${NH_INSTALL_DIR}\"/perm\ntouch \"${NH_INSTALL_DIR}\"/record\ntouch \"${NH_INSTALL_DIR}\"/logfile\ntouch \"${NH_INSTALL_DIR}\"/xlogfile\ntouch \"${NH_INSTALL_DIR}\"/livelog\ncd \"${NH_UNIX_DIR}\"\nsh hints/macosx.sh editsysconf sysconf \"${NH_INSTALL_DIR}\"/sysconf\n";
 		};
 		3192867121A3A2D500325BEB /* Copy nethack */ = {
 			isa = PBXShellScriptBuildPhase;
