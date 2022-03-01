@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1627951430 2021/08/03 00:43:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.416 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1646175653 2022/03/01 23:00:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.455 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6012,13 +6012,23 @@ maybe_finish_sokoban(void)
                 break;
         }
         if (!t) {
+            /* for livelog to report the sokoban depth in the way that
+               players tend to think about it: 1 for entry level, 4 for top */
+            int sokonum = g.dungeons[u.uz.dnum].entry_lev - u.uz.dlevel + 1;
+
             /* we've passed the last trap without finding a pit or hole;
                clear the sokoban_rules flag so that luck penalties for
                things like breaking boulders or jumping will no longer
                be given, and restrictions on diagonal moves are lifted */
             Sokoban = 0; /* clear g.level.flags.sokoban_rules */
-            /* TODO: give some feedback about solving the sokoban puzzle
-               (perhaps say "congratulations" in Japanese?) */
+            /*
+             * TODO: give some feedback about solving the sokoban puzzle
+             * (perhaps say "congratulations" in Japanese?).
+             */
+
+            /* log the completion event regardless of whether or not
+               any normal in-game feedback has just been given */
+            livelog_printf(LL_ACHIEVE, "completed sokoban %d", sokonum);
         }
     }
 }
